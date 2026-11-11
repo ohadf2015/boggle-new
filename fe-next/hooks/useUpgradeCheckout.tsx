@@ -29,6 +29,7 @@ interface Args {
   known: boolean | undefined;
   hasPro: boolean;
   offerTrial: boolean;
+  entrySource?: string | null;
 }
 
 /**
@@ -39,7 +40,7 @@ interface Args {
  * confirmed it before being sent to auth (a Pro account is never sent to buy
  * Pro again).
  */
-export function useUpgradeCheckout({ t, language, user, authLoading, proLoading, known, hasPro, offerTrial }: Args) {
+export function useUpgradeCheckout({ t, language, user, authLoading, proLoading, known, hasPro, offerTrial, entrySource = null }: Args) {
   const [pending, setPending] = useState<null | 'trial' | 'paid'>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [explainerFor, setExplainerFor] = useState<null | 'trial' | 'paid'>(null);
@@ -52,7 +53,7 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
         locale: language,
         placement: 'teacher_upgrade',
       });
-      trackTeacherProCheckoutStarted({ trial, signed_in: Boolean(user) });
+      trackTeacherProCheckoutStarted({ trial, signed_in: Boolean(user), source: entrySource });
     } catch {
       /* analytics must never block the till */
     }
@@ -60,7 +61,7 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial, locale: language }),
+        body: JSON.stringify({ trial, locale: language, ...(entrySource ? { source: entrySource } : {}) }),
       });
       if (!response.ok) {
         if (response.status === 401) {
@@ -102,15 +103,15 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
     } finally {
       setPending(null);
     }
-  }, [t, language, user]);
+  }, [t, language, user, entrySource]);
 
   // CTA opens the explainer, not the till. The confirm button runs the checkout.
-  const handleUpgrade = useCallback((trial: boolean) => {
+  const handleUpgrade = useCallback((trial: boolean, opts?: { auto?: boolean }) => {
     if (isCheckoutBlockedInApp()) {
-      toast(t('teacher.subscription.notInApp'));
+      if (!opts?.auto) toast(t('teacher.subscription.notInApp'));
       return;
     }
-    if (trial) {
+    if (trial && !opts?.auto) {
       try {
         trackTrialCtaTap({ source: 'upgrade_page' });
       } catch {

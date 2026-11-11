@@ -347,8 +347,8 @@ export function trackTeacherProUpgradeClick(args: {
 }
 
 /** Fired immediately before POST /api/subscription/checkout. */
-export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in: boolean }): void {
-  const props = { trial: args.trial, signed_in: args.signed_in };
+export function trackTeacherProCheckoutStarted(args: { trial: boolean; signed_in: boolean; source?: string | null }): void {
+  const props = { trial: args.trial, signed_in: args.signed_in, ...(args.source ? { entry_source: args.source } : {}) };
   safeCapture('teacher_pro_checkout_started', props);
   mirrorToGrowth('teacher_pro_checkout_started', props);
   if (!args.trial) {

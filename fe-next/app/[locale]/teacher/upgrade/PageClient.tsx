@@ -30,6 +30,7 @@ import { UpgradeFaq } from '@/components/teacher/pro/UpgradeFaq';
 import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
 import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses';
+import { entrySourceTag, isProOfferEntry } from '@/lib/education/pro/upgradeEntry';
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
@@ -85,9 +86,18 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   }, [showTrial, viewer]);
 
   const blockedInApp = useCheckoutBlockedInApp();
+  const entrySource = entrySourceTag(searchParams?.get('source'));
   const { pending, handleUpgrade, showAuthModal, setShowAuthModal, explainerFor, confirmExplainer, dismissExplainer } = useUpgradeCheckout({
-    t, language, user, authLoading, proLoading, known, hasPro, offerTrial,
+    t, language, user, authLoading, proLoading, known, hasPro, offerTrial, entrySource,
   });
+  // A teacher who tapped an in-product offer already chose: skip the second tap on a plan card.
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    if (autoOpened.current || !isProOfferEntry(entrySource)) return;
+    if (viewer === 'loading' || viewer === 'pro' || blockedInApp) return;
+    autoOpened.current = true;
+    handleUpgrade(showTrial, { auto: true });
+  }, [entrySource, viewer, blockedInApp, showTrial, handleUpgrade]);
   // Signed in and waiting on the entitlement: a skeleton, not a trial offer that flips away.
   const resolvingPlan = viewer === 'loading' && (Boolean(user) || hasSession);
 
