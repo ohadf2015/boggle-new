@@ -3,11 +3,11 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { StreakFreezeToast } from '@/components/daily/streak/StreakFreezeToast';
+import { StreakSavedMoment } from './StreakSavedMoment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { claimOnce, freezeToastKey } from '@/lib/daily/streakToastOnce';
 
-const TOAST_MS = 4000;
+export const SAVED_MOMENT_MS = 4000;
 
 interface StreakSavedToastProps {
   saved: { date: string; freezesRemaining: number } | null;
@@ -30,12 +30,12 @@ export function StreakSavedToast({ saved }: StreakSavedToastProps) {
 
   useEffect(() => {
     if (!shown) return undefined;
-    const timer = setTimeout(() => setShown(null), TOAST_MS);
+    const timer = setTimeout(() => setShown(null), SAVED_MOMENT_MS);
     return () => clearTimeout(timer);
   }, [shown]);
 
   if (!shown || typeof document === 'undefined') return null;
-  return createPortal(<StreakFreezeToast freezeApplied={shown} />, document.body);
+  return createPortal(<StreakSavedMoment saved={shown} onDismiss={() => setShown(null)} />, document.body);
 }
 
 export default StreakSavedToast;

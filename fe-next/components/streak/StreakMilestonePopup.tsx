@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStreakView } from '@/hooks/useStreakView';
 import { claimOnce } from '@/lib/daily/streakToastOnce';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { markMilestoneCheered } from './milestoneCheer';
 import type { StreakMilestone } from '@/lib/daily/streakRewards';
 
 const StreakMilestoneReveal = dynamic(() => import('./StreakMilestoneReveal'), { ssr: false });
@@ -42,11 +44,15 @@ export function StreakMilestonePopup({ source, blocked }: StreakMilestonePopupPr
   const claimable = view.loading ? null : view.milestone?.claimable ?? null;
   const days = claimable?.days;
   const coins = claimable?.coins;
+  const { current, playedToday } = view;
   useEffect(() => {
     if (!armed || blocked || open || !userId || !days || !coins) return;
     // Marked at show time: a reload must not pop it again; the hub card still offers the claim.
-    if (claimOnce(`lc:streak-milestone-shown:${userId}:${days}`)) setOpen({ days, coins });
-  }, [armed, blocked, open, userId, days, coins]);
+    if (claimOnce(`lc:streak-milestone-shown:${userId}:${days}`)) {
+      markMilestoneCheered(days, current, playedToday, getDailyChallengeDate());
+      setOpen({ days, coins });
+    }
+  }, [armed, blocked, open, userId, days, coins, current, playedToday]);
 
   if (!open) return null;
   return (

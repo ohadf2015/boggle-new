@@ -11,6 +11,7 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { PlayHero } from './PlayHero';
 import { DailyBlock } from './DailyBlock';
 import { StreakSavedToast } from '@/components/streak/StreakSavedToast';
+import { StreakMilestoneCheer } from '@/components/streak/StreakMilestoneCheer';
 import { FriendsBlock } from './FriendsBlock';
 import { MoreGames } from './MoreGames';
 import { HomeAdventureCard } from '@/components/landing/home/HomeAdventureCard';
@@ -79,6 +80,7 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
             onStreakChanged={() => streakView.refresh(true)}
           />
           <StreakSavedToast saved={streakView.loading ? null : streakView.freezeSaved} />
+          <StreakMilestoneCheer view={streakView} />
           <WeeklyThemeCard lang={language} t={tt} source="home" compact />
         </div>
         <div className="lg:col-span-5">

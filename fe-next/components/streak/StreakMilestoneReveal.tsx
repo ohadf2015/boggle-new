@@ -13,6 +13,9 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { claimStreakMilestoneRequest } from '@/lib/daily/streakClient';
 import type { StreakMilestone } from '@/lib/daily/streakRewards';
 import { StreakFlame } from './StreakFlame';
+import { StreakMascotAct } from './StreakMascotAct';
+import { cheerMascotSrc } from './milestoneCheer';
+import { useReducedEffects } from '@/hooks/useReducedEffects';
 
 type Phase = 'ready' | 'claiming' | 'paid' | 'failed';
 
@@ -22,13 +25,17 @@ interface StreakMilestoneRevealProps {
   source: string;
   onClose: () => void;
   onClaimed?: () => void;
+  /** `cheer`: the milestone moment with no coin claim (rewards not available or already handled). */
+  mode?: 'claim' | 'cheer';
 }
 
 const reducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /** The milestone moment: the mascot on fire, the tier's flame, one big claim button. */
-export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed }: StreakMilestoneRevealProps) {
+export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed, mode = 'claim' }: StreakMilestoneRevealProps) {
+  const cheer = mode === 'cheer';
+  const [reducedEffects] = useReducedEffects();
   const { t } = useLanguage();
   const [phase, setPhase] = useState<Phase>('ready');
   const coinsRef = useRef<HTMLSpanElement>(null);
@@ -37,11 +44,18 @@ export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed }:
 
   useEffect(() => {
     mounted.current = true;
-    trackGrowthEvent('streak_milestone_shown', { days: milestone.days, coins: milestone.coins, source });
+    trackGrowthEvent('streak_milestone_shown', cheer ? { days: milestone.days, source, mode } : { days: milestone.days, coins: milestone.coins, source });
     return () => {
       mounted.current = false;
     };
-  }, [milestone.days, milestone.coins, source]);
+  }, [milestone.days, milestone.coins, source, cheer, mode]);
+
+  useEffect(() => {
+    if (!cheer || reducedEffects) return;
+    if (milestone.days >= 30) fireFireworks(3, 1800);
+    else fireVictoryConfetti();
+    triggerHaptic('success');
+  }, [cheer, reducedEffects, milestone.days]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -84,6 +98,7 @@ export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed }:
       aria-labelledby="streak-milestone-title"
       data-testid="streak-milestone-reveal"
       data-phase={phase}
+      data-mode={mode}
       className="fixed inset-0 z-80 flex items-center justify-center bg-neo-navy/90 px-4"
       onClick={(event) => {
         if (event.target === event.currentTarget && phase !== 'claiming') onClose();
@@ -96,19 +111,34 @@ export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed }:
         transition={spring}
       >
         <p className="font-neo-display text-[11px] font-black uppercase tracking-[0.2em] text-neo-orange">
-          {t('dailyStreak.flame.milestoneEyebrow')}
+          {cheer ? t('dailyStreak.flame.cheerEyebrow') : t('dailyStreak.flame.milestoneEyebrow')}
         </p>
         <div className="relative flex items-end justify-center">
-          {/* eslint-disable-next-line @next/next/no-img-element -- small decorative mascot */}
-          <img src="/mascot/onfire-nobg.webp" alt="" width={112} height={112} className="-me-4 h-28 w-28 object-contain" draggable={false} />
+          {cheer ? (
+            <StreakMascotAct act="launch" src={cheerMascotSrc(milestone.days)} size={112} className="-me-4" />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- small decorative mascot
+            <img src="/mascot/onfire-nobg.webp" alt="" width={112} height={112} className="-me-4 h-28 w-28 object-contain" draggable={false} />
+          )}
           <StreakFlame days={milestone.days} size={104} />
         </div>
         <h2 id="streak-milestone-title" className="font-neo-display text-3xl font-black uppercase leading-none text-neo-cream">
           {t('dailyStreak.flame.milestoneTitle', { days: milestone.days })}
         </h2>
-        <p className="font-neo-body text-sm font-medium text-neo-white/75">{t('dailyStreak.flame.milestoneBody', { days: milestone.days })}</p>
+        <p className="font-neo-body text-sm font-medium text-neo-white/75">
+          {cheer ? t('dailyStreak.flame.cheerBody', { days: milestone.days }) : t('dailyStreak.flame.milestoneBody', { days: milestone.days })}
+        </p>
 
-        {phase === 'paid' ? (
+        {cheer ? (
+          <button
+            type="button"
+            data-testid="streak-milestone-cheer-close"
+            onClick={onClose}
+            className="mt-1 h-12 w-full rounded-xl border-[3px] border-neo-black bg-neo-lime font-neo-display font-black uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+          >
+            {t('dailyStreak.flame.cheerCta')}
+          </button>
+        ) : phase === 'paid' ? (
           <>
             <m.span
               data-testid="streak-milestone-paid"
