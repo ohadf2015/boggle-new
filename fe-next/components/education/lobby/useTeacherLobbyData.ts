@@ -11,6 +11,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
+import { onLessonsChanged } from '@/lib/education/lessonsChanged';
 import {
   getLessons,
   getClassrooms,
@@ -140,6 +141,18 @@ export function useTeacherLobbyData(
     if (!userId) return;
     void fetchTeacherData();
   }, [userId, fetchTeacherData]);
+
+  // A list edited from the lobby must reach the game; reload lists only, keeping the pick and no spinner.
+  useEffect(() => {
+    if (!userId) return;
+    return onLessonsChanged(() => {
+      void getLessons(userId).then(({ data }) => {
+        if (!data) return;
+        lessonsRef.current = data;
+        setLessons(data);
+      });
+    });
+  }, [userId]);
 
   const createLessonFromPack = useCallback(
     async (pack: StarterPackInput) => {

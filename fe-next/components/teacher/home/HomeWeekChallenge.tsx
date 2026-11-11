@@ -19,6 +19,7 @@ import { safeCapture } from '@/lib/education/telemetryCore';
 import { cn } from '@/lib/utils';
 import { NB_BLOCK, NB_PANEL } from '../nb/nbStyles';
 import { CHALLENGE_DAYS, firstWordSet, nextWordSet, pickWeekChallenge, type ChallengeLesson } from './weekChallengeModel';
+import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 const K = 'eduShell.home.challenge';
@@ -113,7 +114,9 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
         </h2>
         <span className="font-neo-body text-xs font-bold text-neo-cream/80">{status}</span>
       </div>
-      <p data-testid="home-challenge-list" className="font-neo-display text-lg font-black leading-tight">{name}</p>
+      <p data-testid="home-challenge-list" className="font-neo-display text-lg font-black leading-tight">
+        <ListNameButton lessonId={challenge.lessonId} name={name} />
+      </p>
       {challenge.students > 0 ? (<div>
         <div className="h-3 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={challenge.students} aria-valuenow={challenge.finished} aria-label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}>
           <div className="h-full bg-neo-lime" style={{ width: `${pct}%` }} />

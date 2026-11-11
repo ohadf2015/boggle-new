@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAssignments } from '@/hooks/useAssignments';
 import type { TeacherAssignment, AssignmentStatus } from '@/lib/supabase/education/types';
 import { cn } from '@/lib/utils';
-import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair, Grid2x2 } from 'lucide-react';
+import { Plus, BookOpen, Swords, ChevronDown, ChevronUp, Crosshair, Grid2x2, Pencil } from 'lucide-react';
 import { readAssignmentMode } from '@/lib/education/wordcraftAssignment';
 import { readAssignmentFocus } from '@/lib/education/vocabFocus';
 import { liveClassroomHref } from '@/lib/education/startLiveClassCta';
@@ -15,6 +15,7 @@ import { Loader } from '@/components/ui/Loader';
 import CompletionTracker from './CompletionTracker';
 import { StartLiveClassCta } from '../hq/StartLiveClassCta';
 import { CreateFirstAssignmentCta } from './CreateFirstAssignmentCta';
+import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 
 interface AssignmentTrackingPanelProps {
   classroomId: string;
@@ -146,6 +147,14 @@ function AssignmentCard({
       {/* Expanded: Completion Tracker */}
       {isExpanded && (
         <div className="border-t border-neo-cream/40 p-4 bg-neo-black/10">
+          <ListNameButton
+            lessonId={assignment.lesson_id}
+            name={assignment.vocabulary_lessons?.name || t('teacher.tracking.untitledLesson')}
+            className="mb-3 inline-flex min-h-11 items-center gap-2 font-neo-display font-bold text-neo-cream"
+          >
+            <Pencil className="size-4 shrink-0" aria-hidden="true" />
+            {assignment.vocabulary_lessons?.name || t('teacher.tracking.untitledLesson')}
+          </ListNameButton>
           <CompletionTracker
             assignmentId={assignment.id}
             totalStudents={assignment.student_count || 0}

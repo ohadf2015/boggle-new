@@ -14,6 +14,7 @@ import {
   type Language,
 } from '@/lib/supabase/education';
 import logger from '@/utils/logger';
+import { notifyLessonsChanged, onLessonsChanged } from '@/lib/education/lessonsChanged';
 import { trackEduTeacherActionFailed } from '@/lib/education/telemetry';
 import { isMissingColumnError } from '@/lib/education/libraryTypes';
 
@@ -59,12 +60,7 @@ interface UseLessonsActions {
 
 export type UseLessonsReturn = UseLessonsState & UseLessonsActions;
 
-// Every useLessons() keeps a private copy; a write anywhere must refresh them all.
-const lessonListSubscribers = new Set<() => void>();
-
-export function notifyLessonsChanged(): void {
-  lessonListSubscribers.forEach((notify) => notify());
-}
+export { notifyLessonsChanged } from '@/lib/education/lessonsChanged';
 
 /**
  * Hook for managing vocabulary lessons
@@ -120,9 +116,7 @@ export function useLessons(classroomId?: string): UseLessonsReturn {
 
   // Background reconcile when another list (or a library copy) writes; no spinner flash.
   useEffect(() => {
-    const notify = () => { void fetchLessons(); };
-    lessonListSubscribers.add(notify);
-    return () => { lessonListSubscribers.delete(notify); };
+    return onLessonsChanged(() => { void fetchLessons(); });
   }, [fetchLessons]);
 
   // Refresh lesson list

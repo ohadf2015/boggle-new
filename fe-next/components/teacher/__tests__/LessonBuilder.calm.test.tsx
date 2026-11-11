@@ -56,9 +56,11 @@ const fills = (root: ParentNode) =>
 describe('LessonBuilder: calm My lists', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('Given two lists, Then New list is the only colored fill and every card start button is outlined', () => {
+  it('Given two lists, Then outside the cards New list is the only colored fill, and each card wears its own color', () => {
     const { container } = render(<LessonBuilder />);
-    expect(fills(container)).toEqual([screen.getByTestId('lessons-create')]);
+    const cards = Array.from(container.querySelectorAll('[data-testid^="my-list-"]'));
+    expect(fills(container).filter((el) => !cards.some((c) => c.contains(el)))).toEqual([screen.getByTestId('lessons-create')]);
+    expect(new Set(cards.map((c) => c.getAttribute('data-accent'))).size).toBe(cards.length);
     expect(screen.getByTestId('lesson-host-lesson-1')).toHaveTextContent('eduShell.home.startLive');
   });
 

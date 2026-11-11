@@ -265,6 +265,7 @@ module.exports = {
         'hard-cyan-xl': '6px 6px 0px var(--neo-cyan)',
         'hard-pink-xl': '6px 6px 0px var(--neo-pink)',
         'hard-yellow-xl': '6px 6px 0px var(--neo-yellow)',
+        'hard-purple-xl': '6px 6px 0px var(--neo-purple)',
         // Remove default shadows
         'none': 'none',
       },
@@ -827,6 +828,7 @@ module.exports = {
         '[dir="rtl"] .shadow-hard-cyan-xl': { boxShadow: '-6px 6px 0px var(--neo-cyan)' },
         '[dir="rtl"] .shadow-hard-pink-xl': { boxShadow: '-6px 6px 0px var(--neo-pink)' },
         '[dir="rtl"] .shadow-hard-yellow-xl': { boxShadow: '-6px 6px 0px var(--neo-yellow)' },
+        '[dir="rtl"] .shadow-hard-purple-xl': { boxShadow: '-6px 6px 0px var(--neo-purple)' },
         '.badge-token-info': {
           backgroundColor: 'var(--badge-info)',
           color: 'var(--badge-info-text)',

@@ -20,6 +20,7 @@ import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
 import ListEditorSheet, { emptyListDraft, type ListDraft } from './lesson-creation/ListEditorSheet';
 import MyListCard from './lesson-creation/MyListCard';
+import { lessonToDraft, remixedFromOf, saveExistingList, shareResultToast } from './lesson-creation/listEditorSave';
 import { StarterPacksSection } from './StarterPacksSection';
 import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromPack';
 
@@ -34,20 +35,6 @@ const PAGE_SIZE = 9;
 const LIST_CARD_H = 180;
 const PAGER_RESERVE = 60;
 const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
-
-function lessonToDraft(lesson: LibraryLesson): ListDraft {
-  return {
-    id: lesson.id,
-    name: lesson.name,
-    description: lesson.description ?? '',
-    language: lesson.language,
-    gradeBand: lesson.grade_band ?? null,
-    topic: lesson.topic ?? null,
-    classroomId: lesson.classroom_id ?? '',
-    isPublic: lesson.is_public === true,
-    words: [...lesson.words],
-  };
-}
 
 export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hideDiscoverLink }: LessonBuilderProps = {}) {
   const { t, language } = useLanguage();
@@ -115,28 +102,13 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
     return minutes < 60 ? `${minutes}m ago` : `${Math.floor(minutes / 60)}h ago`;
   };
 
-  const shareResultToast = useCallback((result: Awaited<ReturnType<typeof publishList>>, isPublic: boolean) => {
-    if (result.ok) toast.success(isPublic ? t('eduLibrary.share.nowPublic') : t('eduLibrary.share.nowPrivate'));
-    else if (result.reason === 'moderation') toast.error(t('eduLibrary.share.blocked'));
-    else toast.error(t('eduLibrary.share.failed'));
-  }, [t]);
-
   const handleSave = async (draft: ListDraft): Promise<boolean> => {
     const extras = { gradeBand: draft.gradeBand, topic: draft.topic };
     if (draft.id) {
       const before = lessons.find((l) => l.id === draft.id) as LibraryLesson | undefined;
-      const result = await updateLesson(draft.id, { name: draft.name, description: draft.description || null, words: draft.words, ...extras });
-      if (!result.success) {
-        toast.error(result.error || t('teacher.lesson.error.updateFailed'));
-        return false;
-      }
-      if ((before?.is_public === true) !== draft.isPublic) {
-        shareResultToast(await publishList(draft.id, draft.isPublic), draft.isPublic);
-      } else {
-        toast.success(t('eduLibrary.editor.savedToast', { name: draft.name }));
-      }
-      setEditorOpen(false);
-      return true;
+      const ok = await saveExistingList({ ...draft, id: draft.id }, before, updateLesson, t);
+      if (ok) setEditorOpen(false);
+      return ok;
     }
 
     const result = await createLessonAndAssign({
@@ -158,7 +130,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
     if (result.assigned && classroomName) toast.success(t('teacher.lesson.savedAndAssigned', { classroom: classroomName }));
     else if (result.assignmentError) toast.error(t('teacher.lesson.savedNotAssigned', { classroom: classroomName ?? '' }));
     else toast.success(t('eduLibrary.editor.savedToast', { name: draft.name }));
-    if (draft.isPublic && result.lesson?.id) shareResultToast(await publishList(result.lesson.id, true), true);
+    if (draft.isPublic && result.lesson?.id) shareResultToast(await publishList(result.lesson.id, true), true, t);
     clearDraft();
     setEditorOpen(false);
     setPage(0);
@@ -168,7 +140,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
   const handleToggleShare = async (lesson: LibraryLesson) => {
     setSharingId(lesson.id);
     const next = lesson.is_public !== true;
-    shareResultToast(await publishList(lesson.id, next), next);
+    shareResultToast(await publishList(lesson.id, next), next, t);
     setSharingId(null);
   };
 
@@ -287,14 +259,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
         initial={editorInitial}
         classrooms={classrooms}
         onSave={handleSave}
-        remixedFrom={
-          editorInitial.id
-            ? (() => {
-                const l = lessons.find((x) => x.id === editorInitial.id) as LibraryLesson | undefined;
-                return l?.remixed_from_title ? { title: l.remixed_from_title, author: l.remixed_from_author ?? null } : null;
-              })()
-            : null
-        }
+        remixedFrom={editorInitial.id ? remixedFromOf(lessons.find((x) => x.id === editorInitial.id) as LibraryLesson | undefined) : null}
         onDraftChange={(d) => { latestDraft.current = d; }}
       />
 

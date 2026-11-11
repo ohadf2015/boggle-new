@@ -330,7 +330,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
       {quickView ? (
         <LobbyQuickSummary
           classroomName={classroom?.name ?? ''}
-          lessonNames={selectedLessons.map((l) => l.name)}
+          lessons={selectedLessons}
           wordCount={allPlayableWords.length}
           boardLanguage={lessonLanguage}
           onMoreOptions={() => setShowQuick(false)}
