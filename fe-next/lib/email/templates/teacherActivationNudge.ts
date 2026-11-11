@@ -1,7 +1,7 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { ActivationNudgeBucket } from '@/lib/education/activationNudge';
 import { renderNeoEmail, type NeoAccent, type NeoArt, type NeoBlock } from '@/lib/email/kit/neoEmail';
-import { TEACHER_EMAIL_REPLY_TO, teacherEmailUrl } from './teacherEmailLayout';
+import { firstName, TEACHER_EMAIL_REPLY_TO, teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -275,7 +275,7 @@ export function teacherActivationNudge({ full_name, locale, bucket }: Args) {
     ...LOOK[bucket],
     kicker: c.kicker,
     headline: b.headline,
-    greeting: c.greeting(full_name),
+    greeting: c.greeting(firstName(full_name) || full_name),
     blocks: [{ type: 'p', text: b.lead, strong: true }, ...b.blocks],
     cta: { label: b.cta, href: teacherEmailUrl(locale, '/teacher/classroom/new', `edu_activation_${bucket}`) },
     signoff: c.signoff,

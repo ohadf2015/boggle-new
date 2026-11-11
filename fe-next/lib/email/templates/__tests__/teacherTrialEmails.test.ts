@@ -55,3 +55,42 @@ describe('teacherTrialFeedback', () => {
     expect(html).toContain('שלום דנה,');
   });
 });
+
+describe('trial emails on the neo layout', () => {
+  const NEO = (html: string) => {
+    expect(html).toMatch(/border-(right|left)-width:6px/);
+    expect(html).not.toMatch(/undefined|\[object|NaN/);
+  };
+
+  it.each(['en', 'he', 'sv'] as const)('reminder %s shows the hourglass and a hard-shadow button', (locale) => {
+    for (const bucket of ['t-3', 't-0', 't+3'] as const) {
+      const { html } = teacherTrialReminder({ full_name: 'Ada', locale, bucket, trialExpiresAt: ENDS });
+      expect(html).toContain('/email/art/hourglass.png');
+      NEO(html);
+      if (locale === 'he') expect(html).toContain('dir="rtl"');
+    }
+  });
+
+  it('reminder keeps the price, the upgrade link and the classroom link', () => {
+    const { html } = teacherTrialReminder({ full_name: 'Ada', locale: 'en', bucket: 't-0', trialExpiresAt: ENDS });
+    expect(html).toContain('$9');
+    expect(html).toContain('/en/teacher/upgrade');
+    expect(html).toMatch(/\/en\/teacher\?utm/);
+  });
+
+  it.each(['en', 'he', 'sv'] as const)('feedback %s uses the neo layout with no upgrade link', (locale) => {
+    const { html } = teacherTrialFeedback({ full_name: 'Ada', locale, trialExpiresAt: ENDS });
+    expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+    expect(html).not.toContain('/teacher/upgrade');
+    NEO(html);
+  });
+
+  it('copy avoids em-dashes', () => {
+    for (const locale of ['en', 'he', 'sv'] as const) {
+      expect(teacherTrialFeedback({ full_name: 'Ada', locale, trialExpiresAt: ENDS }).html).not.toContain('—');
+      for (const bucket of ['t-3', 't-0', 't+3'] as const) {
+        expect(teacherTrialReminder({ full_name: 'Ada', locale, bucket, trialExpiresAt: ENDS }).html).not.toContain('—');
+      }
+    }
+  });
+});

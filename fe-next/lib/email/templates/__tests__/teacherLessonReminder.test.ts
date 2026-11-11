@@ -15,6 +15,8 @@ const BASE = {
   timezone: 'Asia/Jerusalem',
 };
 
+const esc = (url: string) => url.replace(/&/g, '&amp;');
+
 describe('teacherLessonReminder', () => {
   it('given an English teacher, when rendered, then greets by first name and names the class and time', () => {
     const { subject, html } = teacherLessonReminder({ ...BASE, locale: 'en' });
@@ -24,9 +26,18 @@ describe('teacherLessonReminder', () => {
     expect(html).toContain('5-minute warm-up is ready');
   });
 
-  it('given a join code, when rendered, then shows it left-to-right for the board', () => {
+  it('given a join code, when rendered, then shows it as left-to-right letter tiles for the board', () => {
     const { html } = teacherLessonReminder({ ...BASE, locale: 'he' });
-    expect(html).toMatch(/<p[^>]*dir="ltr"[^>]*>QX7K2M<\/p>/);
+    const tiles = html.match(/<table[^>]*dir="ltr"[^>]*><tr>(<td data-tile[\s\S]*?)<\/tr><\/table>/);
+    expect(tiles).toBeTruthy();
+    expect(tiles![1].replace(/<[^>]+>/g, '')).toBe('QX7K2M');
+  });
+
+  it.each(LOCALES)('given %s, when rendered, then it uses the neo layout with mascot art and a hard-shadow button', (locale) => {
+    const { html } = teacherLessonReminder({ ...BASE, locale });
+    expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+    expect(html).toMatch(/border-(right|left)-width:6px/);
+    expect(html).not.toMatch(/undefined|\[object|NaN/);
   });
 
   it('given a class, when rendered, then the main button opens the warm-up lobby for that class with the session template params', () => {
@@ -35,7 +46,7 @@ describe('teacherLessonReminder', () => {
     const params = Object.fromEntries(new URLSearchParams(sessionHostHref('en', warmUp, null, 'c-1').split('?')[1]));
     const expected = teacherEmailUrl('en', '/education/classroom-game', 'lesson_reminder', params);
     expect(lessonReminderGameUrl('en', 'c-1')).toBe(expected);
-    expect(html).toContain(`href="${expected}"`);
+    expect(html).toContain(`href="${esc(expected)}"`);
     expect(expected).toContain('/en/education/classroom-game?');
     expect(expected).not.toContain('/en/en/');
     expect(expected).toContain('classroomId=c-1');
@@ -44,7 +55,7 @@ describe('teacherLessonReminder', () => {
 
   it('given a class, when rendered, then the quiet link opens Teacher Home', () => {
     const { html } = teacherLessonReminder({ ...BASE, locale: 'sv' });
-    expect(html).toContain(teacherEmailUrl('sv', '/teacher', 'lesson_reminder'));
+    expect(html).toContain(esc(teacherEmailUrl('sv', '/teacher', 'lesson_reminder')));
   });
 
   it.each(LOCALES)('given %s, when rendered, then copy is native, not English', (locale) => {

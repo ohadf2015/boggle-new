@@ -1,3 +1,4 @@
+import { escapeHtml } from '@/lib/email/kit/neoEmail';
 import { describe, it, expect } from 'vitest';
 import { teacherAbandonedCheckout } from '../teacherAbandonedCheckout';
 import { abandonedCheckoutUpgradeUrl } from '@/lib/education/abandonedCheckout';
@@ -6,7 +7,7 @@ describe('teacherAbandonedCheckout', () => {
   it('asks a paid-checkout teacher to finish, linking a fresh checkout', () => {
     const { subject, html, replyTo } = teacherAbandonedCheckout({ full_name: 'Maya', locale: 'en', mode: 'paid' });
     expect(subject).toBe('Finish your Teacher Pro checkout');
-    expect(html).toContain(abandonedCheckoutUpgradeUrl('en'));
+    expect(html).toContain(escapeHtml(abandonedCheckoutUpgradeUrl('en')));
     expect(html).toContain('Maya');
     expect(html).toContain('$9');
     expect(replyTo).toBe('ohadf2015@gmail.com');
@@ -21,19 +22,19 @@ describe('teacherAbandonedCheckout', () => {
   it('renders Hebrew RTL with the Hebrew upgrade link', () => {
     const { html } = teacherAbandonedCheckout({ full_name: 'מורה', locale: 'he', mode: 'paid' });
     expect(html).toContain('dir="rtl"');
-    expect(html).toContain(abandonedCheckoutUpgradeUrl('he'));
+    expect(html).toContain(escapeHtml(abandonedCheckoutUpgradeUrl('he')));
     expect(html).not.toContain('Finish checkout');
   });
 
   it('has its own copy and link for every teacher locale', () => {
     const { subject, html } = teacherAbandonedCheckout({ full_name: 'Ana', locale: 'es', mode: 'paid' });
     expect(subject).toBe('Termina tu compra de Teacher Pro');
-    expect(html).toContain(abandonedCheckoutUpgradeUrl('es'));
+    expect(html).toContain(escapeHtml(abandonedCheckoutUpgradeUrl('es')));
     for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
       for (const mode of ['paid', 'trial', 'keep', 'ended'] as const) {
         const out = teacherAbandonedCheckout({ full_name: 'T', locale, mode });
         expect(out.subject.length).toBeGreaterThan(0);
-        expect(out.html).toContain(abandonedCheckoutUpgradeUrl(locale));
+        expect(out.html).toContain(escapeHtml(abandonedCheckoutUpgradeUrl(locale)));
         expect(out.html).toMatch(/\$9|9\$/);
       }
       if (locale !== 'en') {
@@ -75,5 +76,21 @@ describe('teacherAbandonedCheckout', () => {
     const { html } = teacherAbandonedCheckout({ full_name: '<script>x</script>', locale: 'en', mode: 'paid' });
     expect(html).not.toContain('<script>');
     expect(html).toContain('&lt;script&gt;');
+  });
+});
+
+describe('teacherAbandonedCheckout neo layout', () => {
+  it('renders every locale and mode on the neo layout without em-dashes', () => {
+    for (const locale of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
+      for (const mode of ['paid', 'trial', 'keep', 'ended'] as const) {
+        const { subject, html } = teacherAbandonedCheckout({ full_name: 'T', locale, mode });
+        expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+        expect(html).toMatch(/border-(right|left)-width:6px/);
+        expect(html).not.toMatch(/undefined|\[object|NaN/);
+        expect(`${subject}${html}`).not.toContain('—');
+        expect(subject.length).toBeLessThanOrEqual(55);
+        if (locale === 'he') expect(html).toContain('dir="rtl"');
+      }
+    }
   });
 });

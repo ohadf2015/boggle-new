@@ -109,7 +109,7 @@ describe('grantTeacherPro', () => {
     expect(sendEmail).toHaveBeenCalledTimes(1);
     const mail = (sendEmail.mock.calls[0] as any)[0];
     expect(mail.to).toBe('tori.plant@belcourt.k12.nd.us');
-    expect(mail.html).toContain('Tori Plant');
+    expect(mail.html).toContain('Hi Tori,');
     expect(mail.html).toContain('Sorry about Thursday.');
   });
 

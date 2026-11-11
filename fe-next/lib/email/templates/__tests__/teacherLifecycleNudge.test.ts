@@ -65,4 +65,21 @@ describe('teacherLifecycleNudge', () => {
       if (loc !== 'en') expect(dict[k]).not.toBe((en as never as { teacherLifecycleEmail: Record<string, string> }).teacherLifecycleEmail[k]);
     }
   });
+
+  it.each(Object.keys(LOCALES))('Given locale %s, Then every stage uses the neo layout with mascot art, a hard-shadow button and a stage headline', (loc) => {
+    const heads = new Set<string>();
+    for (const stage of STAGES) {
+      const { html } = teacherLifecycleNudge({ fullName: 'Ada', locale: loc as 'en', stage, classroom: { id: 'c1', joinCode: 'KITE43', language: null } });
+      expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+      expect(html).toMatch(/border-(right|left)-width:6px/);
+      expect(html).not.toMatch(/undefined|\[object|teacherLifecycleEmail\./);
+      heads.add(html.match(/<h1[^>]*>([^<]+)<\/h1>/)![1]);
+    }
+    expect(heads.size).toBe(STAGES.length);
+  });
+
+  it('Given a share-code email, Then the code is shown as letter tiles', () => {
+    const { html } = teacherLifecycleNudge({ fullName: 'Ada', locale: 'he', stage: 'share_code', classroom: { id: 'c1', joinCode: 'KITE43', language: 'he' } });
+    expect(html).toContain('data-tile');
+  });
 });

@@ -13,7 +13,7 @@ const dir = resolve(__dirname, '..', 'lib', 'email', 'samples');
     const { samples } = (await import(join(dir, f))) as { samples: EmailSample[] };
     for (const s of samples) {
       const { subject, html } = await s.render();
-      writeFileSync(join(out, `${s.name}.${s.locale}.html`), html.replaceAll('https://www.lexiclash.live/email/', `${pub}/email/`).replaceAll('https://www.lexiclash.live/icon-192.png', `${pub}/icon-192.png`).replace('<body', `<!-- ${subject.replace(/--/g, '')} --><body`));
+      writeFileSync(join(out, `${s.name}.${s.locale}.html`), html.replace(/https:\/\/www\.lexiclash\.live\/(email\/|icon-192\.png)/g, `${pub}/$1`).replace('<body', `<!-- ${subject.replace(/--/g, '')} --><body`));
     }
   }
   console.log('wrote', readdirSync(out).length, 'files to', out);

@@ -16,6 +16,7 @@ describe('every customer email renders on the neo layout', () => {
     expect(subject.trim().length).toBeGreaterThan(0);
     expect(html).not.toMatch(/undefined|\[object|NaN/);
     expect(html).toContain('/email/art/');
+    expect(html.toLowerCase(), 'pure black inverts in Gmail Android dark mode').not.toMatch(/#000000\b|#000\b/);
     expect(Buffer.byteLength(html)).toBeLessThan(90_000);
     if (RTL.has(s.locale)) expect(html).toContain('dir="rtl"');
     if (s.needsUnsubscribe) expect(html).toMatch(/unsubscribe/i);

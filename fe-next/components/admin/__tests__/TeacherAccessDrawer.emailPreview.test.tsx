@@ -64,7 +64,7 @@ describe('TeacherAccessDrawer email preview & copy', () => {
       expect(iframe.srcdoc).toContain('Welcome aboard');
     });
     // The applicant's name should appear in the rendered email.
-    expect(iframe.srcdoc).toContain('Jane Smith');
+    expect(iframe.srcdoc).toContain('Jane');
   });
 
   it('copies the generated email HTML to the clipboard', async () => {

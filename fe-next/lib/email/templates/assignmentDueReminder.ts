@@ -1,65 +1,16 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import { reportsUrl, type TeacherReminderPlan } from '@/lib/education/assignmentDueReminders';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { EMAIL_SITE, NEO_ACCENTS, NEO_COLORS, escapeHtml, renderNeoEmail, type NeoAccent, type NeoBlock } from '@/lib/email/kit/neoEmail';
+import { firstName } from './teacherEmailLayout';
+import { ASSIGNMENT_DUE_COPY, type AssignmentDueCopy } from './assignmentDueReminder.copy';
 
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+function siteLocale(locale: string): string {
+  return locale.toLowerCase().split('-')[0] || 'en';
 }
-
-const SITE = 'https://www.lexiclash.live';
 
 function upgradeUrl(locale: string): string {
-  const loc = locale.toLowerCase().split('-')[0] || 'en';
-  return `${SITE}/${loc}/teacher/upgrade`;
+  return `${EMAIL_SITE}/${siteLocale(locale)}/teacher/upgrade`;
 }
-
-interface Copy {
-  subjectDueSoon: (title: string) => string;
-  subjectOverdue: (n: number) => string;
-  subjectBoth: () => string;
-  greeting: (name: string) => string;
-  dueSoonIntro: string;
-  overdueIntro: string;
-  missing: (n: number) => string;
-  openReport: string;
-  cta: string;
-  ctaNote: string;
-  signoff: string;
-  dir: 'ltr' | 'rtl';
-}
-
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
-  en: {
-    subjectDueSoon: (title) => `Homework due tomorrow: ${title}`,
-    subjectOverdue: (n) =>
-      n === 1 ? '1 student overdue — open the progress report' : `${n} students overdue — open the progress report`,
-    subjectBoth: () => 'Due tomorrow + overdue homework',
-    greeting: (n) => `Hi ${n},`,
-    dueSoonIntro: 'Students still have time. Remind the class, or open the progress report to see who is missing.',
-    overdueIntro: 'These assignments are past due. The progress report shows who still owes the work.',
-    missing: (n) => (n === 1 ? '1 student missing' : `${n} students missing`),
-    openReport: 'Open progress report',
-    cta: `Start Teacher Pro — $${TEACHER_PRO_PRICE_USD}/mo`,
-    ctaNote: 'Printable CSV, full reports, unlimited classes. Cancel anytime.',
-    signoff: '— LexiClash',
-    dir: 'ltr',
-  },
-  he: {
-    subjectDueSoon: (title) => `שיעורי בית עד מחר: ${title}`,
-    subjectOverdue: (n) =>
-      n === 1 ? 'תלמיד אחד באיחור — פתחו את דוח ההתקדמות' : `${n} תלמידים באיחור — פתחו את דוח ההתקדמות`,
-    subjectBoth: () => 'עד מחר + משימות באיחור',
-    greeting: (n) => `שלום ${n},`,
-    dueSoonIntro: 'עדיין יש זמן. הזכירו לכיתה, או פתחו את דוח ההתקדמות לראות מי חסר.',
-    overdueIntro: 'המשימות האלה עברו את המועד. דוח ההתקדמות מראה למי עדיין חסר.',
-    missing: (n) => (n === 1 ? 'תלמיד אחד חסר' : `${n} תלמידים חסרים`),
-    openReport: 'פתחו את דוח ההתקדמות',
-    cta: `התחלת Teacher Pro — $${TEACHER_PRO_PRICE_USD}/חודש`,
-    ctaNote: 'ייצוא CSV, דוחות מלאים, כיתות ללא הגבלה. ביטול בכל עת.',
-    signoff: '— LexiClash',
-    dir: 'rtl',
-  },
-};
 
 export interface AssignmentDueReminderEmail {
   fullName: string;
@@ -70,61 +21,83 @@ export interface AssignmentDueReminderEmail {
   canOpenReport: boolean;
 }
 
-function copyFor(locale: TeacherLocale): Copy {
-  return COPY[locale] ?? COPY.en;
+function copyFor(locale: TeacherLocale): AssignmentDueCopy {
+  return ASSIGNMENT_DUE_COPY[locale] ?? ASSIGNMENT_DUE_COPY.en;
 }
 
-function listHtml(items: TeacherReminderPlan['dueSoon'], locale: TeacherLocale, linkReports: boolean): string {
-  const copy = copyFor(locale);
-  return items
+function listHtml(
+  items: TeacherReminderPlan['dueSoon'],
+  args: AssignmentDueReminderEmail,
+  copy: AssignmentDueCopy,
+  accent: NeoAccent,
+): string {
+  const align = copy.dir === 'rtl' ? 'right' : 'left';
+  const rows = items
     .map((n) => {
-      const label = `${escape(n.classroomName)} — ${escape(n.title)}`;
-      const item = linkReports ? `<a href="${escape(reportsUrl(locale, n.classroomId))}">${label}</a>` : label;
-      return `<li>${item} (${escape(copy.missing(n.missingCount))})</li>`;
+      const label = `${escapeHtml(n.classroomName)} · ${escapeHtml(n.title)}`;
+      const item = args.canOpenReport
+        ? `<a href="${escapeHtml(reportsUrl(args.locale, n.classroomId))}" style="color:${NEO_COLORS.ink};text-decoration:underline;">${label}</a>`
+        : label;
+      return `<tr><td dir="${copy.dir}" align="${align}" style="padding:10px 14px;border-bottom:2px solid ${NEO_COLORS.black};font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.4;color:${NEO_COLORS.ink};text-align:${align};"><strong>${item}</strong><br><span style="display:inline-block;margin-top:6px;background:${NEO_ACCENTS[accent]};border:2px solid ${NEO_COLORS.black};border-radius:4px;padding:2px 8px;font-size:13px;font-weight:700;">${escapeHtml(copy.missing(n.missingCount))}</span></td></tr>`;
     })
     .join('');
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" dir="${copy.dir}" style="margin:0 0 20px 0;background:${NEO_COLORS.white};border:3px solid ${NEO_COLORS.black};border-bottom-width:1px;">${rows}</table>`;
+}
+
+function section(
+  items: TeacherReminderPlan['dueSoon'],
+  title: string,
+  intro: string,
+  accent: NeoAccent,
+  args: AssignmentDueReminderEmail,
+  copy: AssignmentDueCopy,
+): NeoBlock[] {
+  if (items.length === 0) return [];
+  return [
+    { type: 'p', text: title, strong: true },
+    { type: 'p', text: intro },
+    { type: 'html', html: listHtml(items, args, copy, accent) },
+  ];
 }
 
 export function assignmentDueReminderEmail(args: AssignmentDueReminderEmail): { subject: string; html: string } {
   const copy = copyFor(args.locale);
-  const overdueCount = args.plan.overdue.reduce((sum, n) => sum + n.missingCount, 0);
+  const { dueSoon, overdue } = args.plan;
+  const overdueCount = overdue.reduce((sum, n) => sum + n.missingCount, 0);
+  const state = overdue.length > 0 && dueSoon.length > 0 ? 'both' : overdue.length > 0 ? 'overdue' : 'dueSoon';
   const subject =
-    args.plan.overdue.length > 0 && args.plan.dueSoon.length > 0
+    state === 'both'
       ? copy.subjectBoth()
-      : args.plan.overdue.length > 0
+      : state === 'overdue'
         ? copy.subjectOverdue(overdueCount)
-        : copy.subjectDueSoon(args.plan.dueSoon[0]?.title || 'assignment');
+        : copy.subjectDueSoon(dueSoon[0]?.title || copy.fallbackTitle);
 
-  const primaryClassroom =
-    args.plan.overdue[0]?.classroomId ?? args.plan.dueSoon[0]?.classroomId ?? '';
-  const reportHref = reportsUrl(args.locale, primaryClassroom);
-  const upgradeHref = upgradeUrl(args.locale);
+  const primaryClassroom = overdue[0]?.classroomId ?? dueSoon[0]?.classroomId ?? '';
+  const report = { label: copy.openReport, href: reportsUrl(args.locale, primaryClassroom) };
+  const upgrade = { label: copy.cta, href: upgradeUrl(args.locale) };
+  const reportIsMain = args.canOpenReport || args.hasPro;
 
-  const dueSoonBlock =
-    args.plan.dueSoon.length > 0
-      ? `<p>${escape(copy.dueSoonIntro)}</p><ul>${listHtml(args.plan.dueSoon, args.locale, args.canOpenReport)}</ul>`
-      : '';
-  const overdueBlock =
-    args.plan.overdue.length > 0
-      ? `<p>${escape(copy.overdueIntro)}</p><ul>${listHtml(args.plan.overdue, args.locale, args.canOpenReport)}</ul>`
-      : '';
+  const blocks: NeoBlock[] = [
+    ...section(overdue, copy.overdueTitle, copy.overdueIntro, 'pink', args, copy),
+    ...section(dueSoon, copy.dueSoonTitle, copy.dueSoonIntro, 'cyan', args, copy),
+  ];
+  if (!args.hasPro && !reportIsMain) blocks.push({ type: 'callout', text: copy.ctaNote });
 
-  const proCta = args.hasPro
-    ? ''
-    : `<p><a href="${escape(upgradeHref)}" data-testid="assignment-due-upgrade">${escape(copy.cta)}</a></p>
-       <p>${escape(copy.ctaNote)}</p>`;
-
-  const html = `<!doctype html>
-<html lang="${escape(args.locale)}" dir="${copy.dir}">
-<body>
-  <p>${escape(copy.greeting(args.fullName))}</p>
-  ${dueSoonBlock}
-  ${overdueBlock}
-  ${args.canOpenReport ? `<p><a href="${escape(reportHref)}" data-testid="assignment-due-report">${escape(copy.openReport)}</a></p>` : ''}
-  ${proCta}
-  <p>${escape(copy.signoff)}</p>
-</body>
-</html>`;
+  const html = renderNeoEmail({
+    lang: args.locale,
+    dir: copy.dir,
+    preheader: state === 'dueSoon' ? copy.preheaderDueSoon : copy.preheaderOverdue,
+    accent: state === 'dueSoon' ? 'cyan' : 'orange',
+    art: state === 'dueSoon' ? 'hourglass' : 'report',
+    kicker: copy.kicker,
+    headline: state === 'both' ? copy.headlineBoth : state === 'overdue' ? copy.headlineOverdue : copy.headlineDueSoon,
+    greeting: copy.greeting(firstName(args.fullName) || args.fullName),
+    blocks,
+    cta: reportIsMain ? report : upgrade,
+    secondary: reportIsMain && !args.hasPro ? upgrade : undefined,
+    signoff: copy.signoff,
+    footnote: reportIsMain && !args.hasPro ? copy.ctaNote : undefined,
+  });
 
   return { subject, html };
 }

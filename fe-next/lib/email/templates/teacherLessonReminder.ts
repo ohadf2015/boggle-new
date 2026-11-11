@@ -2,7 +2,8 @@ import type { TeacherLocale } from '@/lib/education/types';
 import { formatLessonTime } from '@/lib/education/lessonPlan';
 import { SESSION_TEMPLATES, sessionHostHref, sessionPackThemes } from '@/lib/education/sessionTemplates';
 import { isPackLanguage, themedPackCode } from '@/lib/education/themedPacks';
-import { TEACHER_EMAIL_REPLY_TO, firstName, renderTeacherEmail, teacherEmailUrl } from './teacherEmailLayout';
+import { renderNeoEmail } from '@/lib/email/kit/neoEmail';
+import { TEACHER_EMAIL_REPLY_TO, firstName, teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   fullName: string | null;
@@ -17,8 +18,9 @@ interface Args {
 
 interface Copy {
   subject: (cls: string) => string;
-  preheader: (when: string) => string;
+  preheader: (when: string, code: string) => string;
   tagline: string;
+  headline: string;
   greeting: (n: string) => string;
   lead: (cls: string, when: string) => string;
   board: string;
@@ -31,11 +33,12 @@ interface Copy {
 const COPY: Record<TeacherLocale, Copy> = {
   en: {
     subject: (cls) => `Your warm-up for ${cls} is ready`,
-    preheader: (when) => `Class starts ${when}. The game is one tap away.`,
+    preheader: (when, code) => `Class starts ${when}. Join code ${code}, and the game is one tap away.`,
     tagline: 'For teachers',
+    headline: 'Your warm-up is ready',
     greeting: (n) => (n ? `Hi ${n},` : 'Hi there,'),
     lead: (cls, when) => `${cls} starts ${when}. Your 5-minute warm-up is ready.`,
-    board: 'Put this code on the board. Students type it on their phone or laptop and they are in, no account needed:',
+    board: 'Put this code on the board. Students type it on a phone or laptop and they are in, no account needed.',
     cta: 'Open the game',
     secondary: 'Open my class',
     signoff: 'Have a good lesson! Ohad from LexiClash',
@@ -43,23 +46,25 @@ const COPY: Record<TeacherLocale, Copy> = {
   },
   he: {
     subject: (cls) => `משחק החימום של ${cls} מוכן`,
-    preheader: (when) => `השיעור מתחיל ב${when}. המשחק במרחק לחיצה.`,
+    preheader: (when, code) => `השיעור מתחיל ב${when}. קוד ההצטרפות ${code}, והמשחק במרחק לחיצה.`,
     tagline: 'למורים',
+    headline: 'משחק החימום מוכן',
     greeting: (n) => (n ? `היי ${n},` : 'היי,'),
-    lead: (cls, when) => `השיעור עם ${cls} מתחיל ב${when}. משחק חימום של 5 דקות כבר מחכה לך.`,
-    board: 'כדאי לכתוב את הקוד הזה על הלוח. התלמידים מקלידים אותו בטלפון או במחשב ונכנסים, בלי להירשם:',
-    cta: 'פתיחת המשחק',
+    lead: (cls, when) => `השיעור עם ${cls} מתחיל ב${when}. משחק חימום של 5 דקות כבר מחכה.`,
+    board: 'כותבים את הקוד הזה על הלוח. התלמידים מקלידים אותו בטלפון או במחשב ונכנסים, בלי להירשם.',
+    cta: 'לפתוח את המשחק',
     secondary: 'לכיתה שלי',
     signoff: 'שיעור מוצלח! אוהד מ-LexiClash',
     dir: 'rtl',
   },
   es: {
     subject: (cls) => `Tu calentamiento para ${cls} ya está listo`,
-    preheader: (when) => `La clase empieza el ${when}. El juego está a un toque.`,
+    preheader: (when, code) => `La clase empieza el ${when}. Código ${code}, y el juego está a un toque.`,
     tagline: 'Para docentes',
+    headline: 'Tu calentamiento está listo',
     greeting: (n) => (n ? `Hola, ${n}:` : 'Hola:'),
     lead: (cls, when) => `${cls} empieza el ${when}. Tu calentamiento de 5 minutos ya está listo.`,
-    board: 'Escribe este código en la pizarra. Tus alumnos lo meten en el móvil o el portátil y ya están dentro, sin crear cuenta:',
+    board: 'Escribe este código en la pizarra. Tus alumnos lo meten en el móvil o el portátil y ya están dentro, sin crear cuenta.',
     cta: 'Abrir el juego',
     secondary: 'Ir a mi clase',
     signoff: '¡Que vaya muy bien la clase! Ohad, de LexiClash',
@@ -67,11 +72,12 @@ const COPY: Record<TeacherLocale, Copy> = {
   },
   sv: {
     subject: (cls) => `Uppvärmningen för ${cls} är klar`,
-    preheader: (when) => `Lektionsstart: ${when}. Spelet är ett tryck bort.`,
+    preheader: (when, code) => `Lektionsstart: ${when}. Kod ${code}, och spelet är ett tryck bort.`,
     tagline: 'För lärare',
+    headline: 'Uppvärmningen ligger redo',
     greeting: (n) => (n ? `Hej ${n},` : 'Hej,'),
     lead: (cls, when) => `Nästa lektion med ${cls}: ${when}. Din uppvärmning på 5 minuter ligger redo.`,
-    board: 'Skriv den här koden på tavlan. Eleverna skriver in den i mobilen eller datorn och är med direkt, utan konto:',
+    board: 'Skriv den här koden på tavlan. Eleverna skriver in den i mobilen eller datorn och är med direkt, utan konto.',
     cta: 'Öppna spelet',
     secondary: 'Öppna min klass',
     signoff: 'Lycka till på lektionen! Ohad på LexiClash',
@@ -79,8 +85,9 @@ const COPY: Record<TeacherLocale, Copy> = {
   },
   ja: {
     subject: (cls) => `${cls}のウォームアップを用意しました`,
-    preheader: (when) => `授業は${when}。ゲームはワンタップで始められます。`,
+    preheader: (when, code) => `授業は${when}。参加コードは${code}、ゲームはワンタップで始められます。`,
     tagline: '先生向け',
+    headline: 'ウォームアップの準備完了',
     greeting: (n) => (n ? `${n}さん、こんにちは。` : 'こんにちは。'),
     lead: (cls, when) => `${cls}の授業は${when}からですね。5分のウォームアップを準備しておきました。`,
     board: 'このコードを黒板に書いてください。生徒はスマホやパソコンで入力するだけで参加できます。アカウントは不要です。',
@@ -91,11 +98,12 @@ const COPY: Record<TeacherLocale, Copy> = {
   },
   ru: {
     subject: (cls) => `Разминка готова: ${cls}`,
-    preheader: (when) => `Начало урока: ${when}. Игра откроется в одно касание.`,
+    preheader: (when, code) => `Начало урока: ${when}. Код ${code}, игра откроется в одно касание.`,
     tagline: 'Для учителей',
+    headline: 'Разминка уже готова',
     greeting: (n) => (n ? `Здравствуйте, ${n}!` : 'Здравствуйте!'),
     lead: (cls, when) => `${cls}, начало урока: ${when}. Пятиминутная разминка уже готова.`,
-    board: 'Напишите этот код на доске. Ученики вводят его на телефоне или ноутбуке и сразу попадают в игру, без регистрации:',
+    board: 'Напишите этот код на доске. Ученики вводят его на телефоне или ноутбуке и сразу попадают в игру, без регистрации.',
     cta: 'Открыть игру',
     secondary: 'Открыть мой класс',
     signoff: 'Хорошего урока! Охад из LexiClash',
@@ -118,15 +126,20 @@ export function teacherLessonReminder({ fullName, locale, className, joinCode, c
   const c = COPY[lang];
   const when = formatLessonTime(new Date(lessonAt), timezone, lang);
 
-  const html = renderTeacherEmail({
+  const html = renderNeoEmail({
     lang,
     dir: c.dir,
-    preheader: c.preheader(when),
-    tagline: c.tagline,
+    preheader: c.preheader(when, joinCode),
+    accent: 'lime',
+    art: 'projector',
+    kicker: c.tagline,
+    headline: c.headline,
     greeting: c.greeting(firstName(fullName)),
-    lead: c.lead(className, when),
-    paragraphs: [c.board],
-    code: joinCode,
+    blocks: [
+      { type: 'p', text: c.lead(className, when), strong: true },
+      { type: 'p', text: c.board },
+      { type: 'tiles', word: joinCode },
+    ],
     cta: { label: c.cta, href: lessonReminderGameUrl(lang, classroomId, boardLanguage) },
     secondary: { label: c.secondary, href: teacherEmailUrl(lang, '/teacher', 'lesson_reminder') },
     signoff: c.signoff,

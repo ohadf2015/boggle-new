@@ -57,6 +57,15 @@ describe('renderNeoEmail', () => {
     expect(rtl).toMatch(/dir="rtl"[^>]*><tr><td data-tile[^>]*>.{0,400}>ש</s);
   });
 
+  it('keeps line breaks inside a callout', () => {
+    const html = renderNeoEmail({ ...base, blocks: [{ type: 'callout', text: 'line one\nline <two>' }] });
+    expect(html).toContain('line one<br>line &lt;two&gt;');
+  });
+
+  it('never uses pure black, which Gmail Android dark mode inverts', () => {
+    expect(renderNeoEmail(base).toLowerCase()).not.toMatch(/#000000\b|#000\b/);
+  });
+
   it('omits optional parts cleanly', () => {
     const html = renderNeoEmail({ ...base, art: undefined, secondary: undefined, unsubscribe: undefined, greeting: undefined, signoff: undefined });
     expect(html).not.toContain('/email/art/');

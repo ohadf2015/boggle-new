@@ -2,7 +2,8 @@ import type { TeacherLocale } from '@/lib/education/types';
 import { teacherTrialStatus } from '@/lib/education/trial';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
-import { teacherEmailUrl } from './teacherEmailLayout';
+import { EMAIL_SITE, NEO_ACCENTS, NEO_COLORS, escapeHtml, renderNeoEmail, type NeoBlock } from '@/lib/email/kit/neoEmail';
+import { firstName, teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -12,17 +13,7 @@ interface Args {
   trialExpiresAt?: string | null;
 }
 
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-}
-
-// Escape, then turn newlines into <br> so an admin's multi-line note keeps its shape.
-function escapeMultiline(s: string): string {
-  return escape(s).replace(/\r?\n/g, '<br/>');
-}
-
-const SITE = 'https://www.lexiclash.live';
-const HERO = `${SITE}/email/teacher-welcome.jpg`;
+const SITE = EMAIL_SITE;
 const CONTACT = 'ohadf2015@gmail.com';
 
 /** Source tag for the Teacher Pro line; the click goes through a cookie-free server hop. */
@@ -40,210 +31,197 @@ export function approvalEmailProHref(locale: string): string {
 
 interface Copy {
   subject: string;
+  preheader: string;
+  kicker: string;
+  headline: string;
   greeting: (n: string) => string;
-  /** "I'm Ohad, the creator of LexiClash — your access is live." */
   intro: string;
   whatTitle: string;
-  /** 3 short bullets — the same feature list as the original email, trimmed. */
   features: string[];
-  /** One line on the trial window — informational, no urgency framing. */
+  /** One line on the trial window: informational, no urgency framing. */
   trialLine: (date: string) => string;
   cta: string;
-  /** The explicit feedback/feature-request ask naming the contact address. */
+  /** The feedback/feature-request ask naming the contact address. */
   ask: string;
   signoff: string;
   messageLabel: string;
   dir: 'ltr' | 'rtl';
 }
 
-// Locale -> BCP-47 tag for date formatting (TeacherLocale tags are already valid).
 const DATE_LOCALE: Record<TeacherLocale, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
 };
 
-// Short and personal: this email is from Ohad the creator, not "the team".
-// Approval is instant on form submit, so the copy is "it's live", never
-// "we'll review". Keep every locale under ~120 words of body copy.
+// From Ohad, not "the team". Approval is instant on form submit, so the copy says "it's live", never "we'll review".
 const COPY: Record<TeacherLocale, Copy> = {
   en: {
-    subject: 'Your LexiClash teacher access is live 🎉',
+    subject: 'Your LexiClash teacher access is live',
+    preheader: 'You can run your first word game with your class today.',
+    kicker: 'Teacher access',
+    headline: "You're in. Welcome!",
     greeting: (n) => `Hi ${n},`,
-    intro: "I'm Ohad, the creator of LexiClash — thanks for joining as a teacher. Your access is live right now.",
+    intro: "I'm Ohad, the creator of LexiClash. Thanks for joining as a teacher. Your access is live right now, so you can try it with a class today.",
     whatTitle: 'What you can do',
     features: [
-      'Host live classroom word games — students join from any device',
-      'Run vocabulary duels & drills built for learning',
-      'Track progress in your Teacher Dashboard',
+      'Host live classroom word games on the projector while students join from any phone or laptop.',
+      'Run vocabulary duels and drills built around the words you teach.',
+      'See how every student is doing in your Teacher Dashboard.',
     ],
     trialLine: (date) => `Your free trial runs until ${date}.`,
     cta: 'Open Teacher Dashboard',
-    ask: `Feedback or a feature request? Write me directly: ${CONTACT} — I read everything.`,
-    signoff: '— Ohad',
-    messageLabel: 'A note from our team',
+    ask: `Got feedback or a feature request? Write to me at ${CONTACT}. I read everything, and teachers' ideas are what I build next.`,
+    signoff: 'Ohad, who built LexiClash',
+    messageLabel: 'A note from me',
     dir: 'ltr',
   },
   he: {
-    subject: 'הגישה שלך כמורה ב-LexiClash פעילה 🎉',
-    greeting: (n) => `שלום ${n},`,
-    intro: 'אני אוהד, היוצר של LexiClash — תודה שהצטרפת כמורה. הגישה שלך פעילה עכשיו.',
+    subject: 'גישת המורה שלך ב-LexiClash פעילה',
+    preheader: 'אפשר להריץ את משחק המילים הראשון עם הכיתה כבר היום.',
+    kicker: 'גישת מורה',
+    headline: 'נכנסת. ברוכים הבאים!',
+    greeting: (n) => `היי ${n},`,
+    intro: 'אני אוהד, שבנה את LexiClash. תודה שהצטרפת כמורה. הגישה פעילה כבר עכשיו, כך שאפשר לנסות עם כיתה עוד היום.',
     whatTitle: 'מה אפשר לעשות',
     features: [
-      'להפעיל משחקי מילים חיים בכיתה — התלמידים מצטרפים מכל מכשיר',
-      'דו-קרבות אוצר מילים ותרגולים שבנויים ללמידה',
-      'לעקוב אחר ההתקדמות בלוח הבקרה למורה',
+      'להריץ משחקי מילים חיים בכיתה על המקרן, והתלמידים מצטרפים מכל טלפון או מחשב.',
+      'לקיים דו-קרבות אוצר מילים ותרגולים סביב המילים שמלמדים.',
+      'לראות איך כל תלמיד מתקדם בלוח הבקרה למורה.',
     ],
     trialLine: (date) => `תקופת הניסיון בחינם נמשכת עד ${date}.`,
-    cta: 'פתח/י את לוח הבקרה למורה',
-    ask: `משוב או בקשת פיצ׳ר? כתוב/י לי ישירות: ${CONTACT} — אני קורא הכל.`,
-    signoff: '— אוהד',
-    messageLabel: 'הערה מהצוות שלנו',
+    cta: 'לפתוח את לוח הבקרה',
+    ask: `יש משוב או רעיון לפיצ׳ר? אפשר לכתוב לי ל-${CONTACT}. אני קורא הכול, ומה שמורים מבקשים זה מה שאני בונה בהמשך.`,
+    signoff: 'אוהד, שבנה את LexiClash',
+    messageLabel: 'כמה מילים ממני',
     dir: 'rtl',
   },
   sv: {
-    subject: 'Din lärarbehörighet på LexiClash är live 🎉',
+    subject: 'Din lärarbehörighet på LexiClash är aktiv',
+    preheader: 'Du kan köra ditt första ordspel med klassen redan i dag.',
+    kicker: 'Lärarbehörighet',
+    headline: 'Du är med. Välkommen!',
     greeting: (n) => `Hej ${n},`,
-    intro: 'Jag är Ohad, skaparen av LexiClash — tack för att du gick med som lärare. Din behörighet är live nu.',
-    whatTitle: 'Vad du kan göra',
+    intro: 'Jag heter Ohad och har byggt LexiClash. Tack för att du gick med som lärare. Din behörighet är aktiv nu, så du kan testa med en klass redan i dag.',
+    whatTitle: 'Det här kan du göra',
     features: [
-      'Kör live-ordspel i klassrummet — eleverna ansluter från valfri enhet',
-      'Orddueller och övningar byggda för lärande',
-      'Följ framstegen i din lärarpanel',
+      'Kör ordspel live i klassrummet på projektorn medan eleverna går med från mobil eller dator.',
+      'Kör orddueller och övningar kring orden ni jobbar med.',
+      'Se hur det går för varje elev i din lärarpanel.',
     ],
     trialLine: (date) => `Din gratisperiod löper till ${date}.`,
     cta: 'Öppna lärarpanelen',
-    ask: `Feedback eller en funktionsönskan? Skriv direkt till mig: ${CONTACT} — jag läser allt.`,
-    signoff: '— Ohad',
-    messageLabel: 'En hälsning från vårt team',
+    ask: `Har du feedback eller en idé på en funktion? Skriv till mig på ${CONTACT}. Jag läser allt, och lärarnas idéer är det jag bygger härnäst.`,
+    signoff: 'Ohad, som byggde LexiClash',
+    messageLabel: 'Några ord från mig',
     dir: 'ltr',
   },
   ja: {
-    subject: 'LexiClash 教師アクセスが有効になりました 🎉',
-    greeting: (n) => `${n}様、`,
-    intro: 'LexiClashの作者、Ohadです。教師としてご参加いただきありがとうございます。アクセスは有効になっています。',
+    subject: 'LexiClashの教師アクセスが有効になりました',
+    preheader: '今日からクラスで単語ゲームを始められます。',
+    kicker: '教師アクセス',
+    headline: 'ようこそ、準備完了です',
+    greeting: (n) => `${n}様`,
+    intro: 'LexiClashを作っているOhadです。教師としてご参加いただきありがとうございます。アクセスはすでに有効なので、今日からクラスで試せます。',
     whatTitle: 'できること',
     features: [
-      'クラスでライブ単語ゲームを開催 — 生徒はどの端末からでも参加',
-      '学習のための語彙対戦とドリル',
-      '教師ダッシュボードで進捗を確認',
+      'プロジェクターでクラス全員のライブ単語ゲームを開催できます。生徒はスマホやパソコンから参加します。',
+      '授業で扱う単語を使った語彙対戦やドリルができます。',
+      '教師ダッシュボードで生徒一人ひとりの様子を確認できます。',
     ],
     trialLine: (date) => `無料トライアルは${date}までです。`,
     cta: '教師ダッシュボードを開く',
-    ask: `フィードバックや機能のリクエストは、${CONTACT} まで直接どうぞ。すべて読んでいます。`,
-    signoff: '— Ohad',
-    messageLabel: '私たちのチームより',
+    ask: `ご意見や欲しい機能があれば、${CONTACT} まで直接お送りください。すべて読んでいますし、先生方のアイデアを次の開発に活かしています。`,
+    signoff: 'LexiClash作者 Ohad',
+    messageLabel: '私からのひとこと',
     dir: 'ltr',
   },
   es: {
-    subject: 'Tu acceso de profesor en LexiClash está activo 🎉',
-    greeting: (n) => `Hola ${n},`,
-    intro: 'Soy Ohad, el creador de LexiClash — gracias por unirte como profesor. Tu acceso ya está activo.',
+    subject: 'Tu acceso docente en LexiClash ya está activo',
+    preheader: 'Puedes jugar tu primer juego de palabras con la clase hoy mismo.',
+    kicker: 'Acceso docente',
+    headline: '¡Ya estás dentro!',
+    greeting: (n) => `Hola, ${n}:`,
+    intro: 'Soy Ohad, el creador de LexiClash. Gracias por unirte como docente. Tu acceso ya está activo, así que puedes probarlo con una clase hoy mismo.',
     whatTitle: 'Qué puedes hacer',
     features: [
-      'Organiza juegos de palabras en vivo — los estudiantes se unen desde cualquier dispositivo',
-      'Duelos de vocabulario y ejercicios pensados para aprender',
-      'Sigue el progreso en tu panel de profesor',
+      'Organizar juegos de palabras en vivo en el proyector mientras tus estudiantes se unen desde el móvil o el portátil.',
+      'Hacer duelos de vocabulario y ejercicios con las palabras que estás enseñando.',
+      'Ver cómo va cada estudiante en tu panel de profesor.',
     ],
     trialLine: (date) => `Tu prueba gratuita dura hasta el ${date}.`,
     cta: 'Abrir panel de profesor',
-    ask: `¿Comentarios o una función que te gustaría? Escríbeme directamente: ${CONTACT} — lo leo todo.`,
-    signoff: '— Ohad',
-    messageLabel: 'Un mensaje de nuestro equipo',
+    ask: `¿Tienes comentarios o una función que te gustaría? Escríbeme a ${CONTACT}. Lo leo todo, y las ideas de los docentes son lo próximo que construyo.`,
+    signoff: 'Ohad, creador de LexiClash',
+    messageLabel: 'Unas palabras mías',
     dir: 'ltr',
   },
   ru: {
-    subject: 'Ваш доступ учителя в LexiClash активен 🎉',
+    subject: 'Ваш доступ учителя в LexiClash уже активен',
+    preheader: 'Первую игру в слова с классом можно провести уже сегодня.',
+    kicker: 'Доступ учителя',
+    headline: 'Готово, добро пожаловать!',
     greeting: (n) => `Здравствуйте, ${n}!`,
-    intro: 'Я Охад, создатель LexiClash — спасибо, что присоединились как учитель. Ваш доступ уже активен.',
+    intro: 'Меня зовут Охад, я создатель LexiClash. Спасибо, что присоединились как учитель. Доступ уже активен, так что попробовать с классом можно сегодня.',
     whatTitle: 'Что можно делать',
     features: [
-      'Проводите живые словесные игры в классе — ученики подключаются с любого устройства',
-      'Словесные дуэли и упражнения, созданные для обучения',
-      'Отслеживайте прогресс в панели учителя',
+      'Проводить живые игры в слова на проекторе, пока ученики подключаются с телефона или ноутбука.',
+      'Устраивать словесные дуэли и упражнения на слова, которые вы проходите.',
+      'Смотреть, как идут дела у каждого ученика, в панели учителя.',
     ],
-    trialLine: (date) => `Бесплатный пробный период — до ${date}.`,
+    trialLine: (date) => `Бесплатный пробный период продлится до ${date}.`,
     cta: 'Открыть панель учителя',
-    ask: `Отзыв или идея функции? Напишите мне напрямую: ${CONTACT} — я читаю всё.`,
-    signoff: '— Охад',
-    messageLabel: 'Заметка от нашей команды',
+    ask: `Есть отзыв или идея для новой функции? Напишите мне на ${CONTACT}. Я читаю всё, и именно идеи учителей я делаю дальше.`,
+    signoff: 'Охад, автор LexiClash',
+    messageLabel: 'Пара слов от меня',
     dir: 'ltr',
   },
 };
 
+function adminMessage(label: string, message: string, dir: 'ltr' | 'rtl'): string {
+  const align = dir === 'rtl' ? 'right' : 'left';
+  const side = dir === 'rtl' ? 'left' : 'right';
+  const text = escapeHtml(message).replace(/\r?\n/g, '<br>');
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:4px 0 20px 0;background:${NEO_COLORS.white};border:3px solid ${NEO_COLORS.black};border-${side}-width:5px;border-bottom-width:5px;border-radius:8px;">
+<tr><td id="admin-message" dir="${dir}" align="${align}" style="padding:14px 18px;font-family:Arial,Helvetica,sans-serif;font-size:16px;line-height:1.55;color:${NEO_COLORS.ink};text-align:${align};"><div style="font-weight:700;margin:0 0 6px 0;color:${NEO_COLORS.ink};"><span style="background:${NEO_ACCENTS.purple};padding:2px 6px;">${escapeHtml(label)}</span></div>${text}</td></tr></table>`;
+}
+
 export function teacherAccessConfirmation({ full_name, locale, message, trialExpiresAt }: Args) {
   const c = COPY[locale] || COPY.en;
-  const align = c.dir === 'rtl' ? 'right' : 'left';
   const trimmed = (message || '').trim();
-
-  // One informational trial line — no countdown box, no urgency. Shown only
-  // while the trial is actually active.
   const trial = teacherTrialStatus(trialExpiresAt, Date.now());
-  const trialLine = trial && !trial.isExpired
-    ? (() => {
-        const dateStr = new Date(trial.expiresAt).toLocaleDateString(DATE_LOCALE[locale] || 'en-US', {
-          year: 'numeric', month: 'long', day: 'numeric',
-        });
-        return `<p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.trialLine(dateStr))}</p>`;
-      })()
-    : '';
 
-  // Secondary Teacher Pro line under the main CTA. Same single-trial rules as every
-  // other entry (lib/education/pro/proOfferCopy): an approved teacher is inside the free
-  // access trial, so it asks to keep Pro after the trial (with the date); an ended trial
-  // goes straight to $9/mo; no date known -> the standard 14-day trial wording.
+  // An approved teacher is inside the free access trial, so the Pro line asks to keep Pro after it (with the date);
+  // an ended trial goes straight to paid; no date known falls back to the standard trial wording.
   const accessEnd = trial ? new Date(trial.expiresAt).toISOString() : null;
   const offer = resolveProOffer(
     locale,
     { known: true, trialUsed: false, accessTrialExpires: accessEnd, accessTrialEnded: Boolean(trial?.isExpired) },
     resultsTrialCopy(locale),
   );
-  const proBlock = `<tr><td dir="${c.dir}" align="center" id="teacher-pro-line" style="padding:0 28px 24px 28px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:center;">
-          <p style="font-size:14px;line-height:1.5;margin:0 0 4px 0;"><a href="${approvalEmailProHref(locale)}" style="color:#7a1fa2;font-weight:700;text-decoration:underline;">${escape(offer.label)}</a></p>
-          <p style="font-size:12px;line-height:1.4;margin:0;color:#6b7280;">${escape(offer.note)}</p>
-        </td></tr>`;
 
-  const features = c.features
-    .map((f) => `<li style="margin:0 0 6px 0;">${escape(f)}</li>`)
-    .join('');
+  const blocks: NeoBlock[] = [{ type: 'p', text: c.intro, strong: true }];
+  if (trial && !trial.isExpired) {
+    const date = new Date(trial.expiresAt).toLocaleDateString(DATE_LOCALE[locale] || 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    blocks.push({ type: 'callout', text: c.trialLine(date) });
+  }
+  blocks.push({ type: 'p', text: c.whatTitle, strong: true }, { type: 'steps', items: c.features });
+  if (trimmed) blocks.push({ type: 'html', html: adminMessage(c.messageLabel, trimmed, c.dir) });
+  blocks.push({ type: 'p', text: c.ask });
 
-  const messageBlock = trimmed
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-        <tr><td id="admin-message" style="background:#f4f7ff;border:2px solid #1a1a2e;border-radius:8px;padding:16px;font-size:15px;line-height:1.5;color:#1a1a2e;">
-          <div style="font-weight:700;margin-bottom:6px;">${escape(c.messageLabel)}</div>
-          <div>${escapeMultiline(trimmed)}</div>
-        </td></tr>
-      </table>`
-    : '';
-
-  const html = `<!doctype html>
-<html dir="${c.dir}" lang="${locale}">
-<body style="margin:0;padding:0;background:#0e1430;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1430;padding:24px 0;">
-    <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:3px solid #1a1a2e;">
-        <tr><td style="background:#1a1a2e;padding:0;">
-          <img src="${HERO}" width="600" alt="Welcome, Teacher!" style="display:block;width:100%;height:auto;border:0;" />
-        </td></tr>
-        <tr><td dir="${c.dir}" align="${align}" style="padding:28px 28px 8px 28px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:${align};">
-          <p style="font-size:18px;font-weight:700;margin:0 0 12px 0;">${c.greeting(escape(full_name))}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.intro)}</p>
-          ${trialLine}
-          <p style="font-size:15px;font-weight:700;margin:0 0 8px 0;">${escape(c.whatTitle)}</p>
-          <ul style="font-size:15px;line-height:1.5;margin:0 0 20px 0;padding-${align === 'right' ? 'right' : 'left'}:20px;">${features}</ul>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(c.ask)}</p>
-        </td></tr>
-        <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px;text-align:${align};">${messageBlock}</td></tr>
-        <tr><td align="center" style="padding:8px 28px 28px 28px;">
-          <a href="${teacherEmailUrl(locale, '/teacher', 'access_approved')}" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
-        </td></tr>
-        ${proBlock}
-        <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">
-          ${escape(c.signoff)}
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  const html = renderNeoEmail({
+    lang: locale,
+    dir: c.dir,
+    preheader: c.preheader,
+    accent: 'lime',
+    art: 'welcome',
+    kicker: c.kicker,
+    headline: c.headline,
+    greeting: c.greeting(firstName(full_name) || full_name),
+    blocks,
+    cta: { label: c.cta, href: teacherEmailUrl(locale, '/teacher', 'access_approved') },
+    secondary: { label: offer.label, href: approvalEmailProHref(locale) },
+    signoff: c.signoff,
+    footnote: offer.note,
+  });
 
   return { subject: c.subject, html };
 }
