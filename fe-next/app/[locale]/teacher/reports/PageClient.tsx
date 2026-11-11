@@ -8,7 +8,9 @@
 'use client';
 
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { EducationShell } from '@/components/education/shell/EducationShell';
+import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ClipboardList, Send } from 'lucide-react';
@@ -41,7 +43,7 @@ import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
 import { ReportsClassEmpty } from './ReportsClassEmpty';
 import { ReportsReteachPanel } from './ReportsReteachPanel';
-import { ReportsProGate, ReportsShell } from './ReportsGate';
+import { ReportsProGate } from './ReportsGate';
 import { NeoButton } from '@/components/ui/button';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
@@ -408,6 +410,32 @@ function roundPreviewProps(value: string | null | undefined) {
     ? Array.from({ length: 12 }, (_, i) => ({ ...ROUND_FIXTURE, gameCode: `FIX${String(i + 1).padStart(3, '0')}` }))
     : [ROUND_FIXTURE];
   return { previewGames, previewPro: value === 'pro' || value === 'dense' };
+}
+
+/**
+ * The shell wraps BOTH gates. Reports has five states a teacher can land on —
+ * the role loader, the role denial, the Pro upsell, the class picker, a report —
+ * and only the last two are this file's own markup. Measured live as a free
+ * teacher on `/en/teacher/reports`: the upsell rendered with no shell at all and
+ * `body` back to plain `.screen-fit`, i.e. the page scrolling again on the one
+ * screen we sell Pro from. One shell, above everything, so all five are held.
+ */
+function ReportsShell({ children }: { children: ReactNode }) {
+  const { t } = useLanguage();
+  return (
+    <EducationShell
+      className={TEACHER_TV_SCALE}
+      scrollRegionLabel={t("teacher.reports.title")}
+      contentClassName="relative p-4 sm:p-6 lg:p-8"
+    >
+      {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
+          behind a working deck. Dark-only surface (pitfall 5). */}
+      {/* On a phone the trial strip's full-width button would be the first tap and push the reteach action below the fold. */}
+      <div className="relative max-sm:flex max-sm:flex-col [&>[data-testid=pro-gate-lock]]:mx-auto [&>[data-testid=pro-gate-lock]]:max-w-5xl [&_[data-testid=pro-gate-preview]]:hidden [&_[data-testid=pro-gate-lock]>div]:block [&>[data-testid=pro-trial-preview]]:mx-auto [&>[data-testid=pro-trial-preview]]:max-w-5xl max-sm:[&>[data-testid=pro-trial-preview]]:order-last max-sm:[&>[data-testid=pro-trial-preview]]:mb-0 max-sm:[&>[data-testid=pro-trial-preview]]:mt-4">
+        {children}
+      </div>
+    </EducationShell>
+  );
 }
 
 export default function TeacherReportsPage({ gradePassbackEnabled = false }: { gradePassbackEnabled?: boolean }) {
