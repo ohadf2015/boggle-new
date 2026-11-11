@@ -33,6 +33,7 @@ import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen'
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
+import { countClassStudents } from './components/exitConfirmModel';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
 import { readLocalQuizVariant } from '@/lib/education/classroomCatalogueId';
 import type { HostViewProps } from './hostViewTypes';
@@ -61,6 +62,12 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     setDifficulty: state.setDifficulty,
     setMinWordLength: state.setMinWordLength,
   });
+
+  const inLobby = !runtime.gameStarted && !hasActiveGameData && !tournament.finalScores;
+  // An empty classroom lobby has nothing to lose: exit leaves without asking.
+  const lobbyExit = isClassroomMode && countClassStudents(players.playersReady, username) === 0
+    ? actions.confirmExitRoom
+    : actions.handleExitRoom;
 
   // Navigation hiding is managed by PageClient based on isActive/showResults
 
@@ -155,6 +162,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         onConfirm={actions.confirmExitRoom}
         t={t}
         classroom={isClassroomMode}
+        phase={inLobby ? 'lobby' : 'game'}
       />
 
       <SoloStartConfirmDialog
@@ -202,7 +210,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           tableData={runtime.tableData}
           onStartGame={actions.startGame}
           onAutoStartWithBots={actions.confirmSoloStart}
-          onExitRoom={actions.handleExitRoom}
+          onExitRoom={lobbyExit}
           onCancelTournament={actions.handleCancelTournamentDialog}
           onRegenerateBoard={actions.regenerateBoard}
           tournamentCreating={tournament.tournamentCreating}
@@ -227,7 +235,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           timerValue={settings.timerValue}
           difficulty={settings.difficulty}
           onStartGame={actions.startGame}
-          onExitRoom={actions.handleExitRoom}
+          onExitRoom={lobbyExit}
           tournamentCreating={tournament.tournamentCreating}
           setHostPlaying={state.setHostPlaying}
           onStartSoloDemoWithBots={actions.startSoloDemoWithBots}

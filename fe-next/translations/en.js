@@ -20589,7 +20589,11 @@ const en = {
       "title": "End the class game?",
       "body": "The room closes for every student and you'll be back on your Home screen.",
       "stay": "Keep playing",
-      "confirm": "End game"
+      "confirm": "End game",
+      "lobbyTitle": "Close the room?",
+      "lobbyBody": "Students who already joined will be sent out of the room.",
+      "lobbyConfirm": "Close room",
+      "lobbyStay": "Keep it open"
     },
     "live": {
       "panelTitle": "Live round",
@@ -20617,7 +20621,15 @@ const en = {
       "noLessonBody": "The points came from other words on the board. The class's best finds:",
       "noLessonBodyEmpty": "The points came from other words on the board.",
       "noLessonHint": "A bigger board or a longer timer gives the lesson words more room.",
-      "noLessonReteach": "Lesson words still to teach"
+      "noLessonReteach": "Lesson words still to teach",
+      "practice": {
+        "coverageNote": "This was a rehearsal with a practice student. When your class plays, this panel shows which lesson words they found and which ones to go over again.",
+        "coverageHeading": "Lesson words in this game",
+        "missedTitle": "Lesson words not found in the rehearsal",
+        "zeroTitle": "Rehearsal done",
+        "zeroBody": "You just ran the game with a practice student. With your class here, this card shows who won the round.",
+        "zeroNote": "In the real lesson, your students' scores fill this podium."
+      }
     },
     "reteach": {
       "playNow": "Play it now",

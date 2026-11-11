@@ -22,6 +22,8 @@ export interface TvCoveragePanelProps {
   verdict?: ReteachVerdictKind;
   /** Shares the screen with the Teacher Pro card: drop the secondary lines so Play again and the card stay on screen. */
   compact?: boolean;
+  /** A teacher rehearsal: explain the panel instead of judging a class that was not there. */
+  practice?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
@@ -30,7 +32,7 @@ export interface TvCoveragePanelProps {
  * empty panel), and the one region allowed to shrink and scroll when a class
  * missed everything, so Play again below it never leaves the wall.
  */
-export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, verdict, compact = false, t }: TvCoveragePanelProps) {
+export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWithoutLesson, phone, maxChips = 12, verdict, compact = false, practice = false, t }: TvCoveragePanelProps) {
   const chips = phone ? Math.min(6, maxChips) : maxChips;
   const size = phone ? 'card' : 'projector';
   const allFoundLine = verdict === undefined || verdict === 'allFound';
@@ -39,7 +41,15 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
       data-testid="tv-coverage-panel"
       className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
     >
-      {verdict === 'wholeLesson' && !(compact && phone) && (
+      {practice && !(compact && phone) && (
+        <p
+          data-testid="tv-practice-note"
+          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream'}
+        >
+          {t('eduLive.results.practice.coverageNote')}
+        </p>
+      )}
+      {!practice && verdict === 'wholeLesson' && !(compact && phone) && (
         <p
           data-testid="tv-reteach-whole-lesson"
           className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream'}
@@ -59,6 +69,7 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
           missedOnly
           maxChips={chips}
           allFoundLine={allFoundLine}
+          heading={practice ? t('eduLive.results.practice.coverageHeading') : undefined}
           calm
           t={t}
         />

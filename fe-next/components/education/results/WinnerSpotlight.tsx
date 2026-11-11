@@ -63,6 +63,8 @@ export interface WinnerSpotlightProps {
   leaders?: string[];
   /** Teacher wall: navy-light bar, a cream normal-case banner when nobody scored, smaller mascot. */
   tone?: 'default' | 'calm';
+  /** A teacher rehearsal: a scoreless round is described, not read as the class coming up empty. */
+  practice?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
   className?: string;
 }
@@ -92,6 +94,7 @@ export function WinnerSpotlight({
   outcome = 'winner',
   leaders,
   tone = 'default',
+  practice = false,
   t,
   className,
 }: WinnerSpotlightProps) {
@@ -99,6 +102,7 @@ export function WinnerSpotlight({
   const quiet = tone === 'calm';
   const kind: RoundOutcomeKind = !winner || winner.score <= 0 ? 'zero' : outcome;
   const earned = kind !== 'zero' && kind !== 'empty';
+  const banner = practice && !earned ? 'eduLive.results.practice.zeroTitle' : BANNER[kind];
   const names = kind === 'tie' && leaders && leaders.length > 1 ? leaders : winner ? [winner.username] : [];
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const celebratedRef = useRef(false);
@@ -226,7 +230,7 @@ export function WinnerSpotlight({
             projector ? (quiet ? 'text-2xl @[96rem]/results:text-3xl @[137.5rem]/results:text-5xl' : 'text-3xl @[137.5rem]/results:text-5xl') : quiet ? 'text-base' : 'text-sm'
           )}
         >
-          {active ? t(lostBoss ? 'classroomBoss.topHitter' : BANNER[kind]) : t('education.results.moment.drumroll')}
+          {active ? t(lostBoss ? 'classroomBoss.topHitter' : banner) : t('education.results.moment.drumroll')}
         </p>
         {/* No score here: the podium plate above counts its own, and a second count-up ran out of step with it. */}
         {active && earned && (
@@ -249,7 +253,7 @@ export function WinnerSpotlight({
               projector ? (quiet ? 'text-lg @[96rem]/results:text-xl @[137.5rem]/results:text-4xl' : 'text-xl @[137.5rem]/results:text-4xl') : 'text-sm'
             )}
           >
-            {t('eduLive.results.zeroBody')}
+            {t(practice ? 'eduLive.results.practice.zeroBody' : 'eduLive.results.zeroBody')}
           </p>
         )}
       </div>

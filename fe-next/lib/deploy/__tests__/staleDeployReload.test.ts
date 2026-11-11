@@ -255,6 +255,24 @@ describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)',
     clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
   });
+  it('Given sessionStorage throws, When the guard is claimed twice in one page load, Then only the first claim wins', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard } = await import('../staleDeployReload');
+    const real = window.sessionStorage;
+    Object.defineProperty(window, 'sessionStorage', {
+      configurable: true,
+      get: () => {
+        throw new Error('blocked');
+      },
+    });
+    try {
+      expect(claimChunkRecoveryGuard()).toBe(true);
+      expect(claimChunkRecoveryGuard()).toBe(false);
+    } finally {
+      Object.defineProperty(window, 'sessionStorage', { configurable: true, value: real });
+      clearChunkRecoveryGuard();
+    }
+    expect(claimChunkRecoveryGuard()).toBe(true);
+  });
 });
 
 describe('clearCachesAndReload activates waiting SW before unregister (t_9cc3561f)', () => {

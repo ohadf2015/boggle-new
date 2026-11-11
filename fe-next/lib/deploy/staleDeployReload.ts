@@ -257,6 +257,9 @@ export function stripChunkReloadParam(): void {
  * wire the full RecoveryDeps object. Returns true iff this call claimed the
  * reload slot (caller should then invoke clearCachesAndReload).
  */
+// Consulted only when sessionStorage throws, so one page load still gets at most one automatic reload.
+let memoryChunkGuard = false;
+
 export function claimChunkRecoveryGuard(): boolean {
   if (typeof window === 'undefined') return false;
   try {
@@ -264,14 +267,15 @@ export function claimChunkRecoveryGuard(): boolean {
     sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
     return true;
   } catch {
-    // sessionStorage unavailable — allow one navigation attempt; the SW /
-    // HTTP cache-bust is the primary loop backstop.
+    if (memoryChunkGuard) return false;
+    memoryChunkGuard = true;
     return true;
   }
 }
 
 export function clearChunkRecoveryGuard(): void {
   if (typeof window === 'undefined') return;
+  memoryChunkGuard = false;
   try {
     sessionStorage.removeItem(CHUNK_RECOVERY_GUARD_KEY);
   } catch {

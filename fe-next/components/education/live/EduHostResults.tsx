@@ -184,8 +184,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     reteach.replay(missed.map((w) => w.word));
   };
   const students = stats?.students ?? 0;
+  const practice = isPracticeRound(players);
   const shortWall = bossOver;
-  const proCard = !proLoading && !hasPro && !isPracticeRound(players) && summary.totalWords > 0;
+  const proCard = !proLoading && !hasPro && !practice && summary.totalWords > 0;
   const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
   const pulseBesideStage = showPodium && !phone && !bossOver;
@@ -201,7 +202,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const insight = hardest.length > 0 ? (
     <div data-testid="edu-results-hardest" className="flex flex-col gap-2">
       <HardestWordsInsight words={hardest} t={t} />
-      {!proLoading && !hasPro && !isPracticeRound(players) && (
+      {!proLoading && !hasPro && !practice && (
         <ProInsightLink
           placement="results_hardest_words"
           language={language}
@@ -254,7 +255,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   className={cn(phone && 'w-[min(100%,14rem)] @xl/results:w-[min(100%,24rem)]', podiumWidth)}
                 >
                   {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={isRevealed(1, stage)} tone="calm" t={t} />}
-                  {!outcome.celebrate && <ZeroRoundNote t={t} />}
+                  {!outcome.celebrate && <ZeroRoundNote t={t} practice={practice} />}
                 </PodiumStage>
               )}
               {showPodium && podium[0] && (
@@ -266,6 +267,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   cue={!swept}
                   size={phone ? 'card' : 'projector'}
                   tone="calm"
+                  practice={practice}
                   t={t}
                   className={cn('z-20 shrink-0', phone && bossOver && 'hidden')}
                 />
@@ -286,6 +288,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 phone={phone}
                 maxChips={bossOver ? 6 : 9}
                 verdict={reteachVerdict(summary).kind}
+                practice={practice}
                 t={t}
               />
             )}
@@ -297,7 +300,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 lead={missed.length > 0 ? insight : null}
                 maxChips={bossOver ? 6 : fillSide ? 14 : 8}
                 fill={fillSide}
-                title={tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}
+                title={practice ? t('eduLive.results.practice.missedTitle') : tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}
                 t={t}
               >
                 {practiceLeads && (
@@ -325,7 +328,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} round={round} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
                 exportSlot={
                   // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.
-                  !proLoading && summary.totalWords > 0 && students > 0 && !isPracticeRound(players) ? (
+                  !proLoading && summary.totalWords > 0 && students > 0 && !practice ? (
                     <ReportPdfExportButton
                       language={language}
                       summary={summary}
@@ -336,7 +339,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   ) : null
                 }
                 secondary={
-                  students > 0 && !isPracticeRound(players) ? (
+                  students > 0 && !practice ? (
                     <ParentShareLink
                       language={language}
                       hasPro={hasPro}
@@ -346,10 +349,10 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   ) : null
                 }
               />
-              {summary.classroomId && summary.lessonIds?.[0] && students > 0 && !isPracticeRound(players) ? (
+              {summary.classroomId && summary.lessonIds?.[0] && students > 0 && !practice ? (
                 <KeepOpenHomework classroomId={summary.classroomId} lessonId={summary.lessonIds[0]} />
               ) : null}
-              {summary.classroomId && isPracticeRound(players) ? <LessonPlanPrompt classroomId={summary.classroomId} /> : null}
+              {summary.classroomId && practice ? <LessonPlanPrompt classroomId={summary.classroomId} /> : null}
             </div>
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>

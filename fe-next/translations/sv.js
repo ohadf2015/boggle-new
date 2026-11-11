@@ -21544,7 +21544,11 @@ const sv = {
       "title": "Avsluta klassens spel?",
       "body": "Rummet stängs för alla elever och du kommer tillbaka till Hem.",
       "stay": "Fortsätt spela",
-      "confirm": "Avsluta spelet"
+      "confirm": "Avsluta spelet",
+      "lobbyTitle": "Stänga rummet?",
+      "lobbyBody": "Elever som redan har gått med lämnar rummet.",
+      "lobbyConfirm": "Stäng rummet",
+      "lobbyStay": "Låt det vara öppet"
     },
     "live": {
       "panelTitle": "Liverunda",
@@ -21572,7 +21576,15 @@ const sv = {
       "noLessonBody": "Poängen kom från andra ord på brädet. Klassens bästa fynd:",
       "noLessonBodyEmpty": "Poängen kom från andra ord på brädet.",
       "noLessonHint": "Ett större bräde eller längre tid ger lektionsorden mer plats.",
-      "noLessonReteach": "Lektionsord att öva vidare på"
+      "noLessonReteach": "Lektionsord att öva vidare på",
+      "practice": {
+        "coverageNote": "Det här var ett genrep med en övningselev. När klassen spelar visar den här rutan vilka ord från lektionen de hittade och vilka ni bör repetera.",
+        "coverageHeading": "Lektionens ord i den här omgången",
+        "missedTitle": "Lektionsord som inte hittades i genrepet",
+        "zeroTitle": "Genrepet är klart",
+        "zeroBody": "Du har just testkört spelet med en övningselev. När klassen är här visar kortet vem som vann rundan.",
+        "zeroNote": "På den riktiga lektionen fyller elevernas poäng prispallen."
+      }
     },
     "reteach": {
       "playNow": "Spela nu",
