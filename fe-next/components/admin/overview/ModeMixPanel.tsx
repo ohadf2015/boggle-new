@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
 import { Bomb, Calendar, Gamepad2, Map, RotateCw, Target, User, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -82,8 +83,7 @@ export function ModeMixPanel() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    fetch(`/api/game-mode-stats?days=${days}`)
-      .then((res) => res.json())
+    cachedAdminJson<{ stats?: GameModeStats[]; mpBreakdown?: MpModeBreakdownStat[] }>(`/api/game-mode-stats?days=${days}`)
       .then((json) => !cancelled && setData({ stats: json.stats ?? [], mpBreakdown: json.mpBreakdown ?? [] }))
       .catch(() => !cancelled && setData(null))
       .finally(() => !cancelled && setLoading(false));

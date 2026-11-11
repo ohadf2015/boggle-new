@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
 import {
   ResponsiveContainer,
   LineChart,
@@ -43,14 +44,8 @@ export function DailyActivityChart({ authToken }: DailyActivityChartProps) {
     setData(null);
     setError(null);
 
-    fetch(`/api/admin/activity/daily?days=${days}`, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((json: { daily?: DailyPoint[] }) => {
+    cachedAdminJson<{ daily?: DailyPoint[] }>(`/api/admin/activity/daily?days=${days}`, authToken)
+      .then((json) => {
         if (cancelled) return;
         setData(json.daily ?? []);
       })

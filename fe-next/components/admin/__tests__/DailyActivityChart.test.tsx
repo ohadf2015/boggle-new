@@ -3,6 +3,7 @@
  * Wires /api/admin/activity/daily timeseries into a chart.
  */
 
+import { clearAdminJsonCache } from '@/lib/admin/adminJsonCache';
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
@@ -50,6 +51,7 @@ const buildResponse = (days: number) => ({
 
 describe('DailyActivityChart', () => {
   beforeEach(() => {
+    clearAdminJsonCache();
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(buildResponse(30)),

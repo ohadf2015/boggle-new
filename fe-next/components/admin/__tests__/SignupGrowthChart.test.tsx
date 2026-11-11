@@ -1,4 +1,5 @@
 import React from 'react';
+import { clearAdminJsonCache } from '@/lib/admin/adminJsonCache';
 import { render, screen, waitFor } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -12,6 +13,8 @@ vi.mock('recharts', () => ({
 }));
 
 import { SignupGrowthChart } from '../overview/SignupGrowthChart';
+
+afterEach(() => clearAdminJsonCache());
 
 describe('SignupGrowthChart', () => {
   afterEach(() => vi.restoreAllMocks());

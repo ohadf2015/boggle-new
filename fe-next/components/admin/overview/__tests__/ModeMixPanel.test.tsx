@@ -1,4 +1,5 @@
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
+import { clearAdminJsonCache } from '@/lib/admin/adminJsonCache';
 import { ModeMixPanel } from '../ModeMixPanel';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -14,6 +15,8 @@ beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(PAYLOAD) }) as unknown as typeof fetch;
 });
 afterEach(() => vi.restoreAllMocks());
+
+afterEach(() => clearAdminJsonCache());
 
 describe('ModeMixPanel', () => {
   it('makes one request for both lists', async () => {

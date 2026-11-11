@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -30,14 +31,8 @@ export function SignupGrowthChart({ authToken }: { authToken: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/admin/analytics/signup-growth?weeks=26', {
-      headers: { Authorization: `Bearer ${authToken}` },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((json: { data?: { growth?: GrowthPoint[] } }) => {
+    cachedAdminJson<{ data?: { growth?: GrowthPoint[] } }>('/api/admin/analytics/signup-growth?weeks=26', authToken)
+      .then((json) => {
         if (!cancelled) setData(json.data?.growth ?? []);
       })
       .catch(() => {
