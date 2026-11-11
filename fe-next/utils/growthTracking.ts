@@ -392,6 +392,11 @@ export type GrowthEvent =
   // Results-page CTA tracking — experiment conversion funnel (exp-results-replay-cta-v1)
   // Properties: { cta: 'quick_replay' | 'back_to_lobby' | 'next_step', mode?: string }
   | 'results_cta_clicked'
+  // Solo results: the "so close to your best / the bot above" line above Again
+  // ({ kind: best|rival|newBest, gap, mode }) once per screen, and the Again tap
+  // ({ mode, near_miss: kind|none }) to compare replay rate with and without it.
+  | 'sp_near_miss_shown'
+  | 'sp_again_tapped'
   // Results screens (multiplayer, solo, Quick Play): the one "best word you
   // missed" line ({ word_length, points, mode }) and the single reward line
   // ({ coins, xp, mode }). Each fires once per results screen.

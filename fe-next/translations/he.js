@@ -9225,6 +9225,12 @@ const he = {
     "maybeLater": "אולי אחר כך"
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "כמעט! עוד {gap} והשיא שלך נשבר",
+      "rival": "{name} לפניך רק ב־{gap}. עוד סיבוב?",
+      "newBest": "שיא אישי חדש! עוד סיבוב לשבור אותו?",
+      "mascotAlt": "לקסי הקמע מגיב"
+    },
     "startCard": {
       "demo": "שיר",
       "titleOne": "נצחו את {bot}!",

@@ -9541,6 +9541,12 @@ const sv = {
     "maybeLater": "Kanske senare"
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "Så nära! Bara {gap} poäng från ditt rekord",
+      "rival": "Bara {gap} poäng efter {name}. Kör igen!",
+      "newBest": "Nytt personbästa! Klarar du att slå det?",
+      "mascotAlt": "Maskoten Lexi reagerar"
+    },
     "startCard": {
       "demo": "SOL",
       "titleOne": "Slå {bot}!",

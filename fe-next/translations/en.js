@@ -8685,6 +8685,12 @@ const en = {
     "maybeLater": "Not now"
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "So close! Just {gap} points off your best",
+      "rival": "Only {gap} points behind {name}. Go again!",
+      "newBest": "New personal best! Can you top it?",
+      "mascotAlt": "Lexi the mascot reacting"
+    },
     "startCard": {
       "demo": "CAT",
       "titleOne": "Beat {bot}!",

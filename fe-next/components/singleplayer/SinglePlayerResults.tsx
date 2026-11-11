@@ -73,6 +73,9 @@ import { useProgressSnapshot } from './results/hooks/useProgressSnapshot';
 import { ProgressPulseCard } from './results/components/ProgressPulseCard';
 import { NextGamePicker } from './results/components/NextGamePicker';
 import { buildNextGameOptions } from './results/nextGame';
+import { useSoloResultsMoment } from './results/hooks/useSoloResultsMoment';
+import { NearMissLine } from './results/components/NearMissLine';
+import { ResultsMascotMoment } from './results/components/ResultsMascotMoment';
 
 const HIDE_SAME = ['rematch-same'] as const;
 import { MissionsCompletedNote, RecordBadges } from './results/components/RecordBadges';
@@ -346,11 +349,18 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     return same?.kind === 'action' ? same.presetId : '';
   }, [onStartPreset, mode, difficulty, isWinner, language, pickerGamesPlayed, pickerDailyDoneEver]);
 
+  const { nearMiss, celebration } = useSoloResultsMoment({
+    snapshot: progressSnapshot, isNewHighScore: !!results.isNewHighScore, scoreIsRecord: !!recordFlags?.scoreIsRecord,
+    participants: allParticipants, playerRank, isWinner, isBotMatch: mode === 'solo-bots',
+    longestWordLength: (longestWordOf(results.playerWords || []) ?? '').length,
+  });
+
   const handleQuickReplay = useCallback(() => {
     trackGrowthEvent('results_cta_clicked', { cta: 'quick_replay', mode });
+    trackGrowthEvent('sp_again_tapped', { mode, near_miss: nearMiss?.kind ?? 'none' });
     if (replayPresetId && onStartPreset) void gateWithInterstitial().then(() => onStartPreset(replayPresetId));
     else handlePlayAgainGated();
-  }, [handlePlayAgainGated, mode, replayPresetId, onStartPreset, gateWithInterstitial]);
+  }, [handlePlayAgainGated, mode, replayPresetId, onStartPreset, gateWithInterstitial, nearMiss]);
 
   const pickerBlock = onStartPreset ? (
     <NextGamePicker
@@ -621,9 +631,11 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         barRef={stickyCtaRef}
         placement="fixed"
         shine
+        top={nearMiss ? <NearMissLine nearMiss={nearMiss} mode={mode} t={t} /> : undefined}
         primary={{ label: t('results.playAgainQuestion'), onClick: handleQuickReplay, testId: 'quick-replay-btn', icon: <RotateCcw className="h-5 w-5" strokeWidth={3} /> }}
         secondary={{ label: t('common.home'), onClick: handleBackToLobby, testId: 'results-home-btn', icon: <Home className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" /> }}
       />
+      <ResultsMascotMoment celebration={celebration} nearMiss={nearMiss} t={t} />
       <AnimatePresence>
         {showTomorrowPreview && (
           <TomorrowPreview mode={mode === 'practice' ? 'singleplayer' : mode as 'singleplayer'} onDismiss={handleTomorrowDismiss} />

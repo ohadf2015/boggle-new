@@ -9182,6 +9182,12 @@ const ja = {
     "maybeLater": "また今度"
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "おしい！自己ベストまであと{gap}点",
+      "rival": "{name}まであと{gap}点！もう一回？",
+      "newBest": "自己ベスト更新！まだまだいける？",
+      "mascotAlt": "リアクションするマスコットのレキシ"
+    },
     "startCard": {
       "demo": "さくら",
       "titleOne": "{bot}に勝とう！",
