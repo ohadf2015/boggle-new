@@ -2792,3 +2792,30 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
     `$rageclick` distinct_id at some small per-session ceiling before computing `reach`.
   - recommended owner: lane 07 (apply the flood-cap pattern already used for event counts to the
     `$rageclick` brief query in the Phase-0 collector)
+
+## 2026-11-11
+- [Sentry] AUTH Profile unavailable after retry (PostgREST "Cannot coerce the result to a single JSON object")
+  - JAVASCRIPT-NEXTJS-2P5, first/last seen 2026-11-10, 2 events, 1 user, /en/multiplayer
+  - logged from contexts/auth/hooks/useProfileManagement.ts:278 (fetchUserData retry path)
+  - status: deferred
+  - why: error code is NOT PGRST116 (0 rows) so it skips auto-create — message pattern matches `.single()` getting >1 rows, i.e. a possible duplicate `profiles` row for that user. Auth-adjacent code + possible data-integrity question; per autonomy matrix this is DEFER (auth code).
+  - recommended owner: backend — check `SELECT count(*) FROM profiles WHERE id='2fcdbfd1-b641-4383-845f-b19a17a4f428'` before touching useProfileManagement.ts
+- [Sentry] [useSaveCognitiveScore] Failed to create brain score — RLS violation (42501) on brain_scores insert
+  - JAVASCRIPT-NEXTJS-2P6, 2026-11-10, 2 events, 1 user, /en/multiplayer
+  - hooks/useSaveCognitiveScore.ts:303-317 upsert, policy requires auth.uid()=user_id (supabase/migrations/027_brain_training_tables.sql:156-157)
+  - status: deferred
+  - why: RLS policy involved — per hard rule any RLS-touching root cause is defer, not autonomous-fix. 1 user/2 events, low severity.
+  - recommended owner: backend — likely a stale/expired JWT race on reconnect (useAuth user object outlives the real session); needs auth-flow owner, not a policy edit.
+- [Sentry] imposketch:bing delegate access error tagged onto lexiclash project
+  - JAVASCRIPT-NEXTJS-2P2, culprit GET /api/cron, 2 users/14 events
+  - status: deferred
+  - why: message references "imposketch:bing" — looks like cross-tenant noise from a shared cron/SEO script reporting under the wrong Sentry project, not a lexiclash app bug.
+  - recommended owner: self — confirm which cron job fires this and point its Sentry init at the right project/DSN.
+- [Supabase] security_definer_view `public_profiles`, anon_security_definer_function_executable (8 fns), authenticated_security_definer_function_executable (86 fns), rls_enabled_no_policy (40 tables)
+  - status: deferred
+  - why: brief's "skip 217 unused_index + 69 authd-secdef intentionally kept" baseline doesn't cover all 86+8 here (grew since 2026-04-29 memory). A safe REVOKE needs a per-function anon-callsite grep (confirmed `bump_vocabulary_lesson_stat` IS called from guest/classroom code at `lib/education/lessonPlayStat.ts` — anon access there is intentional, guest students aren't authed). Full audit of 94 functions + 40 no-policy tables is too large to do safely in one lane tonight.
+  - recommended owner: self (lane 01) — next run: grep each of the 8 anon-executable fns' callsites first (cheaper subset), ship REVOKE only on ones with zero anon callsite.
+- [Supabase perf] auth_rls_initplan — 56 tables re-evaluate auth.uid() per-row instead of `(select auth.uid())`
+  - status: deferred
+  - why: WARN-level, 56-table sweep — too large/risky for one lane; each policy needs its own migration + verification. First two named: public.daily_streak_freezes, public.web_vitals.
+  - recommended owner: self (lane 01) — batch 5-10 tables/night via apply_migration, verify query plans don't regress.

@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/blast/legacy/BlastGame.tsx, fe-next/components/blast/legacy/__tests__/BlastGame.deadTimeSessionKey.test.tsx, docs/nightly/reports/2026-11-11.md, docs/nightly/impact-ledger.ndjson
+next_steps: iap_viewed/rewarded_ad_offered also CRATERED (-89%/-78% w/w) same window as dead_time_detected — check if the Blast wave-rebuild shortened round length enough to reduce ad-surface exposure per round too. Persist classify.md nightly so "newly-dead" becomes a real diff vs guesswork. Backlog: iap_purchased conversion event still unwired (biggest revenue blind spot per docs/telemetry-audit-2026-06-23.md).
