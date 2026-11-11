@@ -420,7 +420,7 @@ function roundPreviewProps(value: string | null | undefined) {
  * `body` back to plain `.screen-fit`, i.e. the page scrolling again on the one
  * screen we sell Pro from. One shell, above everything, so all five are held.
  */
-function ReportsShell({ children }: { children: ReactNode }) {
+export function ReportsShell({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   return (
     <EducationShell

@@ -9,7 +9,7 @@ import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import UpgradePricingPageClient from '@/app/[locale]/teacher/upgrade/PageClient';
 import { ReportsFreeInsightsView } from '@/app/[locale]/teacher/reports/ReportsFreeInsights';
-import { ReportsShell } from '@/app/[locale]/teacher/reports/ReportsGate';
+import { ReportsShell } from '@/app/[locale]/teacher/reports/PageClient';
 import { buildStudentPulses, type PulseRow } from '@/lib/education/pro/classInsights';
 import { rankWeekHardestWords, toFreeClassPulse, type FreeClassInsight } from '@/lib/education/pro/freeClassInsight';
 import type { ClassAnalytics } from '@/lib/education/pro/classAnalyticsServer';
