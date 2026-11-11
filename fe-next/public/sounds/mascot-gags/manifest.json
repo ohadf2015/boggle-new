@@ -44,14 +44,14 @@
   {
     "id": "tile-stack-wobble",
     "file": "/sounds/mascot-gags/tile-stack-wobble.mp3",
-    "durationMs": 1200,
-    "lufs": -12.2
+    "durationMs": 1150,
+    "lufs": -11.9
   },
   {
     "id": "tile-stack-crash",
     "file": "/sounds/mascot-gags/tile-stack-crash.mp3",
-    "durationMs": 1220,
-    "lufs": -12.0
+    "durationMs": 1150,
+    "lufs": -11.9
   },
   {
     "id": "tiny-whimper",
