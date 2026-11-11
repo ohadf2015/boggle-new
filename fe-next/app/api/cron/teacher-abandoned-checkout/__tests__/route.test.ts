@@ -102,7 +102,7 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     expect(body).toMatchObject({ success: true, sent: 1, failed: 0 });
     const mail = h.sendEmailSpy.mock.calls[0][0];
     expect(mail.to).toBe('ada@school.edu');
-    expect(mail.html).toContain('/he/teacher/upgrade?utm_source=email&utm_campaign=abandoned_checkout');
+    expect(mail.html).toContain('/he/teacher/upgrade?utm_source=email&utm_medium=lifecycle&utm_campaign=abandoned_checkout');
     expect(mail.headers['List-Unsubscribe']).toBe(`<https://www.lexiclash.live/api/email/unsubscribe?token=${TOKEN}>`);
     expect(h.inserts).toEqual([
       {

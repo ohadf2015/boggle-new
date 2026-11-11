@@ -1,5 +1,6 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { ActivationNudgeBucket } from '@/lib/education/activationNudge';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -11,7 +12,6 @@ function escape(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
-const SITE = 'https://www.lexiclash.live';
 const CONTACT = 'ohadf2015@gmail.com';
 
 interface BucketCopy {
@@ -206,7 +206,7 @@ export function teacherActivationNudge({ full_name, locale, bucket }: Args) {
           <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(b.body)}</p>
         </td></tr>
         <tr><td align="center" style="padding:8px 28px 20px 28px;">
-          <a href="${SITE}/${locale}/teacher/classroom/new" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(b.cta)}</a>
+          <a href="${escape(teacherEmailUrl(locale, '/teacher/classroom/new', `edu_activation_${bucket}`))}" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(b.cta)}</a>
         </td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">
           <p style="margin:0 0 8px 0;">${escape(c.ask)}</p>

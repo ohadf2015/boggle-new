@@ -1,5 +1,5 @@
 import type { TeacherLocale } from '@/lib/education/types';
-import { firstName, renderTeacherEmail, TEACHER_EMAIL_SITE } from './teacherEmailLayout';
+import { firstName, renderTeacherEmail, teacherEmailUrl } from './teacherEmailLayout';
 
 // One soft check-in a few days into the free teacher access. It asks how it is
 // going and nothing else: no price, no upgrade button. The trial-ending emails
@@ -84,7 +84,7 @@ export function teacherTrialFeedback({ full_name, locale, trialExpiresAt }: Args
     lead: c.lead,
     paragraphs: [c.access(dateStr)],
     callout: c.ask,
-    cta: { label: c.cta, href: `${TEACHER_EMAIL_SITE}/${lang}/teacher` },
+    cta: { label: c.cta, href: teacherEmailUrl(lang, '/teacher', 'trial_feedback') },
     signoff: c.signoff,
   });
 

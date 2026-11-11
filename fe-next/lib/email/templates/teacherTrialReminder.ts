@@ -1,6 +1,6 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { TrialReminderBucket } from '@/lib/education/trialReminders';
-import { firstName, renderTeacherEmail, TEACHER_EMAIL_SITE } from './teacherEmailLayout';
+import { firstName, renderTeacherEmail, teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -148,8 +148,8 @@ export function teacherTrialReminder({ full_name, locale, bucket, trialExpiresAt
     lead: b.lead(dateStr),
     paragraphs: [b.body],
     callout: c.ask,
-    cta: { label: b.cta, href: `${TEACHER_EMAIL_SITE}/${lang}/teacher/upgrade` },
-    secondary: { label: c.classroom, href: `${TEACHER_EMAIL_SITE}/${lang}/teacher` },
+    cta: { label: b.cta, href: teacherEmailUrl(lang, '/teacher/upgrade', `trial_${bucket}`) },
+    secondary: { label: c.classroom, href: teacherEmailUrl(lang, '/teacher', `trial_${bucket}`) },
     signoff: c.signoff,
   });
 

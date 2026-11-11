@@ -6,6 +6,16 @@ export const TEACHER_EMAIL_SITE = 'https://www.lexiclash.live';
 /** Replies to trial emails go to Ohad, who reads them. */
 export const TEACHER_EMAIL_REPLY_TO = 'ohadf2015@gmail.com';
 
+/** Every teacher-page link in an email goes through here, so the visit it brings is attributed to that email. */
+export function teacherEmailUrl(locale: string, path: string, campaign: string, params: Record<string, string> = {}): string {
+  const url = new URL(`${TEACHER_EMAIL_SITE}/${locale}${path}`);
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+  url.searchParams.set('utm_source', 'email');
+  url.searchParams.set('utm_medium', 'lifecycle');
+  url.searchParams.set('utm_campaign', campaign);
+  return url.toString().replace(/\+/g, '%20');
+}
+
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
