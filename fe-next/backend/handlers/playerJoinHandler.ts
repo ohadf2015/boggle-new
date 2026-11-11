@@ -175,8 +175,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // in another tab, their phone) while the board is live would otherwise take the
     // host seat over and leave the board dead: seat it as the practice seat instead.
     const payload = validation.data as JoinGamePayload;
-    const hostSocketLive = !!game.hostSocketId && game.hostSocketId !== socket.id && !!getSocketById(io, game.hostSocketId)?.connected;
-    const teacherSecondPage = !!seat.game && !!verifiedUserId && verifiedUserId === seat.game.teacherId && payload.hostSeat !== true && hostSocketLive;
+    const isOwnClassroomTeacher = !!seat.game && !!verifiedUserId && verifiedUserId === seat.game.teacherId && payload.hostSeat !== true;
+    const teacherSecondPage = isOwnClassroomTeacher && !!game.hostSocketId && game.hostSocketId !== socket.id && !!getSocketById(io, game.hostSocketId)?.connected;
     const practiceSeat = (wantsPracticeSeat || teacherSecondPage) && !!seat.game;
     if (teacherSecondPage && !wantsPracticeSeat && game.users[username]) {
       username = suggestAvailableGuestName(username, new Set(Object.keys(game.users))).name;
