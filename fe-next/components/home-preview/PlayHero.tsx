@@ -206,7 +206,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           <Link
             href={`/${lang}/multiplayer`}
             data-testid="hp-play-friends"
-            onClick={() => trackLandingCtaClick('home_play_friends')}
+            onClick={() => trackLandingCtaClick('home_play_friends', { opens_ftue: false })}
             className="relative flex h-[54px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[48px] rounded-2xl border-[3px] border-black bg-neo-pink px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-20 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-24"
           >
             <Users className="h-6 w-6 shrink-0 lg:h-10 lg:w-10" strokeWidth={2.75} aria-hidden="true" />

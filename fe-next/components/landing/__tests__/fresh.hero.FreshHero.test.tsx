@@ -83,6 +83,13 @@ describe('FreshHero', () => {
     expect(screen.queryByTestId('auth-modal')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'homeFresh.hero.account' }));
     expect(screen.getByTestId('auth-modal')).toBeInTheDocument();
+    expect(track).toHaveBeenCalledWith('fresh_hero_signin', { opens_ftue: false });
+  });
+
+  it('"Play a friend" tracks opens_ftue:false like every non-PLAY CTA', () => {
+    const { container } = render(<FreshHero />);
+    fireEvent.click(hero(container).querySelector('a[href="/en/multiplayer"]')!);
+    expect(track).toHaveBeenCalledWith('fresh_hero_play_friend', { opens_ftue: false });
   });
 
   it('hides "I have an account" on CrazyGames', () => {

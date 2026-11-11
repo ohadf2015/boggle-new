@@ -93,7 +93,7 @@ describe('PlayHero', () => {
     mockTrackCta.mockClear();
     renderHero();
     fireEvent.click(screen.getByTestId('hp-play-friends'));
-    expect(mockTrackCta).toHaveBeenCalledWith('home_play_friends');
+    expect(mockTrackCta).toHaveBeenCalledWith('home_play_friends', { opens_ftue: false });
   });
 
   it('given the hero, then the kicker no longer labels the whole hero as solo', () => {

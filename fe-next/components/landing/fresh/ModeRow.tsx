@@ -91,7 +91,7 @@ export function ModeRow() {
   const onCardClick = (key: string, featured = false) => {
     trackModeSelected(key, 'home');
     trackLandingCtaClick('mode_card', {
-      mode: key, variant: MODE_META[key]?.variant, surface: 'fresh', ...(featured && { featured: true }),
+      mode: key, variant: MODE_META[key]?.variant, surface: 'fresh', opens_ftue: false, ...(featured && { featured: true }),
     });
   };
 

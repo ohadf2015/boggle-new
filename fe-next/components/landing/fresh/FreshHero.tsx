@@ -124,7 +124,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
           <div className="flex flex-wrap items-center justify-center gap-x-6 sm:justify-start">
             <Link
               href={`/${language}/multiplayer`}
-              onClick={() => trackLandingCtaClick("fresh_hero_play_friend")}
+              onClick={() => trackLandingCtaClick("fresh_hero_play_friend", { opens_ftue: false })}
               className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-lime hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"
             >
               {t("homeFresh.hero.playFriend", "Play a friend")}
@@ -133,7 +133,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
               <button
                 type="button"
                 onClick={() => {
-                  trackLandingCtaClick("fresh_hero_signin");
+                  trackLandingCtaClick("fresh_hero_signin", { opens_ftue: false });
                   setAuthOpen(true);
                 }}
                 className="inline-flex min-h-11 items-center justify-center rounded-neo-lg px-4 font-neo-body text-base font-bold text-neo-cream/85 underline decoration-neo-cream/30 decoration-2 underline-offset-4 hover:text-neo-cream hover:decoration-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream sm:px-1"

@@ -57,7 +57,7 @@ export function HeroQuickLinks({ lang, t, streak, streakLoading, atRisk = false,
       <Chip
         // One tap into today's puzzle (the Word Wheel), not the hub in between.
         href={`/${lang}/daily`}
-        onClick={() => trackLandingCtaClick('home_daily_chip')}
+        onClick={() => trackLandingCtaClick('home_daily_chip', { opens_ftue: false })}
         trailing={
           <span className="ms-auto flex shrink-0 items-center gap-2">
             {freezes > 0 && (

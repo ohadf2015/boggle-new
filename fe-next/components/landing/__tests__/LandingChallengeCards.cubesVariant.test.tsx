@@ -59,7 +59,7 @@ describe('LandingChallengeCards — cubes layout', () => {
     const connectionsLink = container.querySelector('[data-cube-key="connections"]') as HTMLElement;
     fireEvent.click(connectionsLink);
     expect(trackModeSelected).toHaveBeenCalledWith('connections', 'home');
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', { mode: 'connections', variant: 'blue' });
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('mode_card', { mode: 'connections', variant: 'blue', opens_ftue: false });
   });
 
   it('renders multiple cubes in the grid', () => {

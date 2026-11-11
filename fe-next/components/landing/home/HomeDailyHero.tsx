@@ -68,7 +68,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       onPointerEnter={() => launch?.prefetch(href)}
       onPointerDown={() => launch?.prefetch(href)}
       onClick={(e) => {
-        trackLandingCtaClick('daily_banner', { mode: anyPlayed ? 'hub' : 'word-wheel', hasPlayed });
+        trackLandingCtaClick('daily_banner', { mode: anyPlayed ? 'hub' : 'word-wheel', hasPlayed, opens_ftue: false });
         launch?.start(e, { href, tone: 'yellow', title: anyPlayed ? t('daily.title') : t('sitemap.wordWheel', 'Word Wheel'), art: '/modes/cubes/daily.png' });
       }}
       aria-label={`${t('sitemap.wordWheel', 'Word Wheel')} #${puzzleNumber}`}

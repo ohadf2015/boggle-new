@@ -117,7 +117,7 @@ describe('HomeAdventureCard', () => {
     fireEvent.click(card());
     expect(trackModeSelected).toHaveBeenCalledWith('adventure', 'home');
     expect(trackGrowthEvent).toHaveBeenCalledWith('featured_mode_card_clicked', { mode: 'adventure', surface: 'home' });
-    expect(trackLandingCtaClick).toHaveBeenCalledWith('adventure_card', { mode: 'adventure', resume: true, world: 4 });
+    expect(trackLandingCtaClick).toHaveBeenCalledWith('adventure_card', { mode: 'adventure', resume: true, opens_ftue: false, world: 4 });
     expect(screen.getByTestId('home-launch')).toBeInTheDocument();
   });
 });

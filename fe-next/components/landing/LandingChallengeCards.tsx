@@ -212,7 +212,7 @@ export function LandingChallengeCards({
     const featured = key === FEATURED_HOME_MODE;
     const onClick = () => {
       if (TRACK_SELECTED.has(key)) trackModeSelected(key as never, 'home');
-      trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant, ...(featured && { featured: true }) });
+      trackLandingCtaClick('mode_card', { mode: key, variant: meta.variant, opens_ftue: false, ...(featured && { featured: true }) });
       // Track featured mode card engagement for promoted modes.
       if (key === 'adventure' || key === 'wordTowerV2') {
         trackGrowthEvent('featured_mode_card_clicked', {

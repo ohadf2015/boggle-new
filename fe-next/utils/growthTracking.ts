@@ -2196,7 +2196,10 @@ export const trackDeadTime = (
  * Landing-page CTA click. Used to diagnose the visitor → onboarding_started
  * gap (88 of 95 visitors drop pre-onboarding). `cta` is a stable id for the
  * surface (e.g. 'mode_card', 'hero_play'); extras carry disambiguators
- * (mode, variant) for breakdowns.
+ * (mode, variant) for breakdowns. Every caller sets `opens_ftue` so the
+ * property is total on the event — PLAY CTAs pass `!!onPlay` (the handler
+ * exists only for new users), every other landing CTA passes `false` — the
+ * null cohort once hid a whole code path from the funnel analysis.
  */
 export const trackLandingCtaClick = (
   cta: string,

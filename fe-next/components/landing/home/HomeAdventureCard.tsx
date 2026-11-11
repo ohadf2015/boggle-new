@@ -42,7 +42,7 @@ export function HomeAdventureCard() {
       onClick={(e) => {
         trackModeSelected('adventure', 'home');
         trackGrowthEvent('featured_mode_card_clicked', { mode: 'adventure', surface: 'home' });
-        trackLandingCtaClick('adventure_card', { mode: 'adventure', resume: !!resume, ...(resume && { world: resume.world }) });
+        trackLandingCtaClick('adventure_card', { mode: 'adventure', resume: !!resume, opens_ftue: false, ...(resume && { world: resume.world }) });
         launch?.start(e, { href, tone: 'lime', title: t('landing.adventureMode'), art: ART });
       }}
       className={cn(
