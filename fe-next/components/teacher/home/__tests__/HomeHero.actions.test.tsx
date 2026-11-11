@@ -13,12 +13,14 @@ const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.
 const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4, language: 'he' };
 
 describe('<HomeHero> three actions', () => {
-  it('Given a class, Then Home offers Start game, Share code and See results, each once', () => {
-    render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" resultsHref="/en/teacher/reports?classroomId=c1" t={t} />);
+  it('Given a class, Then the desk offers Start game and Share code once each; results live in the tile row under it', () => {
+    render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} />);
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
     expect(screen.getAllByTestId('home-share-code')).toHaveLength(1);
-    expect(screen.getByTestId('home-see-results')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c1');
-    expect(screen.getByTestId('home-see-results')).toHaveTextContent('eduShell.home.seeResults');
+    expect(screen.queryByTestId('home-see-results')).toBeNull();
+    const panel = screen.getByTestId('home-desk-code-panel');
+    expect(panel).toContainElement(screen.getByTestId('home-desk-code'));
+    expect(panel).toContainElement(screen.getByTestId('home-share-code'));
   });
 
   it('When the teacher taps Share code, Then the one share sheet opens', () => {

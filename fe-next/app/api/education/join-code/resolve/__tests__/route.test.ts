@@ -24,11 +24,21 @@ vi.mock('@/lib/apiRateLimit', () => ({ checkApiRateLimit: vi.fn(() => ({ success
 vi.mock('@/lib/education/classroomGameLookup', () => ({
   lookupLiveClassroomGame: vi.fn(async () => null),
 }));
+vi.mock('@/lib/education/liveGameForClassroom', () => ({
+  lookupLiveGameForClassroom: vi.fn(async () => null),
+}));
+const adminName = vi.hoisted(() => ({ value: null as string | null }));
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: async () => ({ data: adminName.value ? { name: adminName.value } : null, error: null }) }) }) }),
+  }),
+}));
 
 import { GET } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 
 const req = (code: string) =>
   new Request(`https://x.test/api/education/join-code/resolve?code=${code}`) as never;
@@ -50,6 +60,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   (lookupLiveClassroomGame as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
   (checkApiRateLimit as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ success: true });
+  (lookupLiveGameForClassroom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
+  adminName.value = null;
 });
 
 describe('GET /api/education/join-code/resolve', () => {
@@ -164,5 +176,30 @@ describe('GET /api/education/join-code/resolve', () => {
     withClassroom({ id: 'c1', name: 'ELA (7th)', language: 'en' });
     const res = await GET(req('%20q3uq2j%20'));
     await expect(res.json()).resolves.toMatchObject({ kind: 'classroom' });
+  });
+
+  it('a class code while that class plays carries the live game code, so the student is told the truth up front', async () => {
+    withClassroom({ id: 'c1', name: 'ELA (7th)', language: 'en' });
+    (lookupLiveGameForClassroom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue('TZCOQ7');
+    const res = await GET(req('Q3UQ2J'));
+    await expect(res.json()).resolves.toEqual({ kind: 'classroom', id: 'c1', name: 'ELA (7th)', language: 'en', liveGameCode: 'TZCOQ7' });
+  });
+
+  it('a class code with no game running answers exactly what it did before', async () => {
+    withClassroom({ id: 'c1', name: 'ELA (7th)', language: 'en' });
+    const res = await GET(req('Q3UQ2J'));
+    await expect(res.json()).resolves.toEqual({ kind: 'classroom', id: 'c1', name: 'ELA (7th)', language: 'en' });
+  });
+
+  it('a game code names the class for a not-yet-member, and never the teacher', async () => {
+    withClassroom(null);
+    adminName.value = '7B English';
+    (lookupLiveClassroomGame as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      classroomId: 'c1', lessonIds: ['l1'], teacherName: 'Ms. G',
+    });
+    const res = await GET(req('TZCOQ7'));
+    const body = await res.json();
+    expect(body.classroomName).toBe('7B English');
+    expect(Object.keys(body).sort()).toEqual(['classroomId', 'classroomName', 'gameCode', 'kind', 'lessonIds']);
   });
 });

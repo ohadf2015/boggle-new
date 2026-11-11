@@ -10,7 +10,9 @@ const {
   mockEndGame,
   mockGetGame,
   mockGetGameBySocketId,
+  mockAddUserToGame,
 } = vi.hoisted(() => ({
+  mockAddUserToGame: vi.fn(),
   mockEndGame: vi.fn(),
   mockGetGame: vi.fn(),
   mockGetGameBySocketId: vi.fn(),
@@ -36,7 +38,7 @@ vi.mock('../../../backend/modules/gameStateManager', () => ({
   updateGame: vi.fn(),
   deleteGame: vi.fn(),
   gameExists: mockGameExists,
-  addUserToGame: vi.fn(),
+  addUserToGame: mockAddUserToGame,
   getUsernameBySocketId: vi.fn(),
   getSocketIdByUsername: vi.fn(),
   getGameUsers: vi.fn().mockReturnValue([]),
@@ -171,6 +173,24 @@ describe('createGame on a classroom code', () => {
     expect(mockCreateGame).toHaveBeenCalledTimes(1);
     expect(createdOptions()).toMatchObject({ isClassroom: true, isPrivate: true });
   });
+
+  it('seats the host under the verified id when the payload has none, so a reload can reclaim the room', async () => {
+    mockGetClassroomGame.mockResolvedValue({ gameCode: 'CLS123', teacherId: 'teacher-1' });
+    const socket = createSocket('teacher-1');
+
+    await create(socket, { authUserId: null });
+
+    expect(mockAddUserToGame).toHaveBeenCalledWith('CLS123', 'Host', 'sock-1', expect.objectContaining({ isHost: true, authUserId: 'teacher-1' }));
+  });
+
+  it('never seats the classroom host under a payload id that differs from the verified one', async () => {
+    mockGetClassroomGame.mockResolvedValue({ gameCode: 'CLS123', teacherId: 'teacher-1' });
+    const socket = createSocket('teacher-1');
+
+    await create(socket, { authUserId: 'someone-else' });
+
+    expect(mockAddUserToGame).toHaveBeenCalledWith('CLS123', 'Host', 'sock-1', expect.objectContaining({ authUserId: 'teacher-1' }));
+  });
 });
 
 describe('createGame on a non-classroom code', () => {
@@ -192,6 +212,15 @@ describe('createGame on a non-classroom code', () => {
 
     expect(createdOptions()).toMatchObject({ isClassroom: false, isPrivate: false });
     expect(mockEmitError).not.toHaveBeenCalled();
+  });
+
+  it('keeps seating a public host under the payload id, as before', async () => {
+    mockGetClassroomGame.mockResolvedValue(null);
+    const socket = createSocket('user-1');
+
+    await create(socket, { authUserId: 'user-1' });
+
+    expect(mockAddUserToGame).toHaveBeenCalledWith('CLS123', 'Host', 'sock-1', expect.objectContaining({ authUserId: 'user-1' }));
   });
 });
 

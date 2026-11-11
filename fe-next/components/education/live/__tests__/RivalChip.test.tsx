@@ -1,6 +1,6 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { act, render, renderHook, screen } from '@testing-library/react';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -9,8 +9,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/components/Avatar', () => ({ default: () => <i data-testid="avatar" /> }));
+const sfx = { playLeadChangeSound: vi.fn() };
+vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => sfx }));
 
 import RivalChip from '../RivalChip';
+import { useRivalPresent } from '../rivalPresence';
 
 function fakeSocket() {
   const handlers: Record<string, Array<(d: unknown) => void>> = {};
@@ -27,91 +30,100 @@ function fakeSocket() {
 const update = (myScore: number, rivalScore: number, rivalName = 'Dana', extra = {}) =>
   ({ gameSessionId: 1, rival: { rivalName, rivalAvatar: null, myScore, rivalScore }, ...extra });
 
-describe('RivalChip', () => {
+function mount(my: number, theirs: number, name?: string) {
+  const s = fakeSocket();
+  render(<RivalChip socket={s.socket} />);
+  s.fire('rivalUpdate', update(my, theirs, name));
+  return s;
+}
+
+describe('RivalChip: a live tug bar against my rival', () => {
+  beforeEach(() => sfx.playLeadChangeSound.mockClear());
+
   it('Given no rival, When rendered, Then nothing shows', () => {
     const s = fakeSocket();
     const { container } = render(<RivalChip socket={s.socket} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('Given the student is behind, When rendered, Then it shows the name and a minus difference', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(3, 7));
-    expect(screen.getByTestId('rival-chip-name')).toHaveTextContent('Dana');
-    expect(screen.getByTestId('rival-chip-diff')).toHaveTextContent('−4');
-  });
-
-  it('Given the student is ahead, When rendered, Then the difference has a plus sign', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(9, 5));
-    expect(screen.getByTestId('rival-chip-diff')).toHaveTextContent('+4');
-  });
-
-  it('Given a level score, When rendered, Then it says level instead of a number', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(5, 5));
-    expect(screen.getByTestId('rival-chip-diff')).toHaveTextContent('education.rivals.level');
-  });
-
-  it('Given a very long name, When rendered, Then the name truncates and the number never shrinks', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(1, 2, 'Maximiliana-Alexandra-Fitzgerald-Montgomery'));
-    expect(screen.getByTestId('rival-chip-name').className).toMatch(/truncate/);
-    expect(screen.getByTestId('rival-chip-name').className).toMatch(/min-w-0/);
-    expect(screen.getByTestId('rival-chip-diff').className).toMatch(/shrink-0/);
-    expect(screen.getByTestId('rival-chip').className).toMatch(/max-w-full/);
-  });
-
-  it('Given the chip, When rendered, Then it never takes pointer or touch input', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(1, 2));
-    expect(screen.getByTestId('rival-chip').className).toMatch(/pointer-events-none/);
-  });
-
-  it('Given the number, When the page is RTL, Then the signed number keeps its left-to-right order', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(1, 5));
-    expect(screen.getByTestId('rival-chip-diff')).toHaveAttribute('dir', 'ltr');
-  });
-
-  it('Given the student takes the lead, When updated, Then a polite announcement names the rival and the pulse is motion-safe', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(1, 3));
-    s.fire('rivalUpdate', update(5, 3, 'Dana', { tookLead: true }));
-    const live = screen.getByTestId('rival-chip-live');
-    expect(live).toHaveAttribute('aria-live', 'polite');
-    expect(live).toHaveTextContent('education.rivals.announce.lead:{"name":"Dana"}');
-    expect(screen.getByTestId('rival-chip-diff').className).toMatch(/motion-safe:animate-neo-pop/);
+  it('Given I lead by 4, When rendered, Then my side of the rope holds well over half the bar', () => {
+    mount(41, 37);
+    const fill = screen.getByTestId('rival-tug-fill');
+    expect(parseInt(fill.style.width, 10)).toBeGreaterThan(65);
+    expect(screen.getByTestId('rival-chip')).toHaveAttribute('data-status', 'ahead');
   });
 
   it.each([
     [9, 5, 'bg-neo-lime', '+4'],
     [3, 7, 'bg-neo-pink', '−4'],
     [5, 5, 'bg-neo-cream', 'education.rivals.level'],
-  ])('Given my %i vs their %i, When rendered, Then the gap badge is %s and still carries its sign', (mine, theirs, tone, text) => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(mine, theirs));
+  ])('Given my %i vs their %i, When rendered, Then the gap badge is %s and carries its sign', (mine, theirs, tone, text) => {
+    mount(mine, theirs);
     const diff = screen.getByTestId('rival-chip-diff');
     expect(diff.className).toContain(tone);
     expect(diff).toHaveTextContent(text);
+    expect(diff).toHaveAttribute('dir', 'ltr');
+    expect(diff.className).toMatch(/shrink-0/);
   });
 
-  it('Given a rival, When rendered, Then the chip shows their avatar and is a full-size row (36px+, 14px bold text)', () => {
-    const s = fakeSocket();
-    render(<RivalChip socket={s.socket} />);
-    s.fire('rivalUpdate', update(1, 2));
-    expect(screen.getByTestId('rival-chip-avatar')).toBeInTheDocument();
+  it('Given a very long name on a phone row, When rendered, Then no name is cut off: the phone row shows the face, the tall rail shows the whole name wrapped', () => {
+    mount(1, 2, 'Maximiliana-Alexandra-Fitzgerald');
+    const name = screen.getByTestId('rival-chip-name');
+    expect(name.className).not.toMatch(/\btruncate\b/);
+    expect(name.className).toMatch(/\bhidden\b/);
+    expect(name.className).toMatch(/\blg:block\b/);
+    expect(name.className).toMatch(/overflow-wrap:anywhere/);
+    expect(screen.getByTestId('rival-chip')).toHaveAttribute('aria-label', expect.stringContaining('Maximiliana-Alexandra-Fitzgerald'));
+  });
+
+  it('Given a tall phone tray, Then the rival\'s first name rides above the rope, direction-isolated, cut with an ellipsis only past about ten characters', () => {
+    mount(1, 2, 'Maximiliana-Josefina');
+    const first = screen.getByTestId('rival-chip-first');
+    expect(first).toHaveTextContent(/^Maximiliana$/);
+    expect(first).toHaveAttribute('dir', 'auto');
+    expect(first.className).toMatch(/\bmax-w-\[10ch\]/);
+    expect(first.className).toMatch(/\btruncate\b/);
+    expect(first.className).toMatch(/\[@container\(min-height:300px\)\]:block/);
+    expect(first.className).toMatch(/\blg:hidden\b/);
+  });
+
+  it('Given the bar, When rendered, Then it never takes pointer or touch input and is a full-size row', () => {
+    mount(1, 2);
     const chip = screen.getByTestId('rival-chip');
+    expect(chip.className).toMatch(/pointer-events-none/);
     expect(chip.className).toMatch(/\bmin-h-9\b/);
-    expect(chip.className).toMatch(/\btext-sm\b/);
-    expect(chip.className).toMatch(/\bfont-bold\b|\bfont-black\b/);
+    expect(screen.getByTestId('rival-chip-avatar')).toBeInTheDocument();
+  });
+
+  it('Given I was behind, When I overtake, Then the bar shakes motion-safe, plays the lead sound and announces it politely', () => {
+    const s = mount(1, 3);
+    expect(screen.getByTestId('rival-chip')).not.toHaveAttribute('data-overtake');
+    const liveBefore = screen.getByTestId('rival-chip-live');
+    s.fire('rivalUpdate', update(5, 3, 'Dana', { tookLead: true }));
+    expect(screen.getByTestId('rival-chip-live')).toBe(liveBefore);
+    const chip = screen.getByTestId('rival-chip');
+    expect(chip).toHaveAttribute('data-overtake', 'took');
+    expect(chip.className).toMatch(/motion-safe:animate-\[edu-tug-shake/);
+    expect(sfx.playLeadChangeSound).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('rival-chip-live')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByTestId('rival-chip-live')).toHaveTextContent('education.rivals.announce.lead:{"name":"Dana"}');
+  });
+
+  it('Given I was ahead, When my rival passes me, Then the bar shakes but no victory sound plays', () => {
+    const s = mount(5, 3);
+    s.fire('rivalUpdate', update(5, 8));
+    expect(screen.getByTestId('rival-chip')).toHaveAttribute('data-overtake', 'lost');
+    expect(sfx.playLeadChangeSound).not.toHaveBeenCalled();
+  });
+
+  it('Given a duel, When the rival shows, Then the round knows a duel owns the voice, and forgets it when the chip leaves', () => {
+    const presence = renderHook(() => useRivalPresent());
+    expect(presence.result.current).toBe(false);
+    const s = fakeSocket();
+    const { unmount } = render(<RivalChip socket={s.socket} />);
+    s.fire('rivalUpdate', update(1, 2));
+    expect(presence.result.current).toBe(true);
+    unmount();
+    expect(presence.result.current).toBe(false);
   });
 });

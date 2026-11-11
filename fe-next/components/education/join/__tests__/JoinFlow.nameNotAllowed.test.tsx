@@ -54,4 +54,19 @@ describe('<JoinFlow> a name that cannot go on the class screen', () => {
     fireEvent.click(screen.getByText(/education\.student\.join\.useSuggestedName/));
     await waitFor(() => expect(mockJoin).toHaveBeenLastCalledWith('P45KRT', expect.objectContaining({ guestName: 'Turbo Toast' })));
   });
+
+  it('Given the name is refused, Then GO is disabled and the suggested name is the one primary, until the student types a new name', async () => {
+    mockJoin.mockResolvedValueOnce({ success: false, code: 'NAME_NOT_ALLOWED', suggestedName: 'Turbo Toast' });
+    render(<JoinFlow initialCode="P45KRT" />);
+    fireEvent.change(nameField(), { target: { value: 'rude word' } });
+    fireEvent.click(goButton());
+    await screen.findByRole('alert');
+    expect(goButton()).toBeDisabled();
+    const suggestion = screen.getByText(/education\.student\.join\.useSuggestedName/).closest('button')!;
+    expect(suggestion).toHaveAttribute('data-primary', 'true');
+    expect(screen.getAllByRole('button').filter((b) => b.getAttribute('data-primary') === 'true')).toHaveLength(1);
+    fireEvent.change(nameField(), { target: { value: 'Dana' } });
+    expect(goButton()).not.toBeDisabled();
+    expect(goButton()).toHaveAttribute('data-primary', 'true');
+  });
 });

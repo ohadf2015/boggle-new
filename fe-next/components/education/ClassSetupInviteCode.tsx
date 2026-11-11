@@ -22,16 +22,16 @@ export interface ClassSetupInviteCodeProps {
 }
 
 const CHIP_BASE = cn(
-  'flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-1 rounded-neo-lg border-[3px] border-neo-black px-1 py-1.5 shadow-hard-lg',
+  'flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-1 rounded-neo-lg border-[3px] border-neo-black px-1 py-1.5 shadow-hard',
   'font-neo-display text-xs font-black leading-tight sm:text-sm',
   pressClasses(2),
 );
-// One color per way to share, so each reads at a glance (same blocks as the live game).
+// One color per way to share (same blocks as the live game); none is lime, which belongs to the screen's start button.
 const CHIP = {
-  copy: cn(CHIP_BASE, 'bg-neo-lime text-neo-black'),
+  copy: cn(CHIP_BASE, 'bg-neo-pink text-neo-black'),
   whatsapp: cn(CHIP_BASE, 'bg-neo-cyan text-neo-black'),
   google: cn(CHIP_BASE, 'bg-neo-yellow text-neo-black'),
-  native: cn(CHIP_BASE, 'bg-neo-cream text-neo-black'),
+  native: cn(CHIP_BASE, 'bg-neo-white text-neo-black'),
 };
 
 function googleHref(joinUrl: string, name: string, t: T): string | null {
@@ -62,8 +62,11 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
   const payload = { url: joinUrl, text };
 
   return (
-    <div data-testid="invite-code-card" className="flex flex-col gap-3">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-start text-neo-black shadow-hard-lime-xl sm:gap-5 sm:p-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-6 lg:p-7 lg:text-center">
+    <div
+      data-testid="invite-code-card"
+      className="flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-neo-black shadow-hard-lime-xl sm:p-4 lg:p-5"
+    >
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-start sm:gap-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-5 lg:py-2 lg:text-center">
         <div className="@container flex w-full min-w-0 flex-col gap-1 lg:items-center">
           <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">{t('eduShell.setup.joinCode')}</span>
           <span
@@ -103,7 +106,7 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
       </div>
 
       {joinUrl ? (
-        <div data-testid="setup-share-row" className="grid grid-cols-4 gap-2">
+        <div data-testid="setup-share-row" className="grid grid-cols-4 gap-2 border-t-2 border-dashed border-neo-black/25 pt-3">
           <button type="button" data-testid="setup-copy-link" onClick={() => onShare('copy', payload)} className={CHIP.copy}>
             <ChipBody icon={Copy} label={t('eduShell.setup.copyLink')} />
           </button>

@@ -51,6 +51,56 @@ describe('buildStudentPulses', () => {
   });
 });
 
+describe('buildStudentPulses on a board game class (three rounds, eight lesson words)', () => {
+  const at = `${TODAY}T07:39:11.540Z`;
+  const words = (found: Record<string, number>, attempts = 3) =>
+    Object.fromEntries(['cat', 'dog', 'sun', 'red', 'hat', 'pen', 'map', 'cup'].map((w) => [w, { attempts, correct: found[w] ?? 0, lastAttemptAt: at }]));
+  const rows: PulseRow[] = [
+    row('winner', TODAY, words({ cat: 2, dog: 1, red: 2, hat: 1 }), 30),
+    row('middle', TODAY, words({ dog: 1, sun: 1 }), 10),
+    row('third', TODAY, words({ cat: 2, sun: 1 }), 20),
+    row('zero', null, words({}, 1), 0),
+  ];
+  const pulses = buildStudentPulses(rows, ['winner', 'middle', 'third', 'zero'], TODAY);
+  const status = (id: string) => pulses.find((p) => p.id === id)?.status;
+
+  it('Given the round winner found the most lesson words, Then they are not flagged as needing help', () => {
+    expect(status('winner')).toBe('steady');
+  });
+
+  it('Given a student who played every round and scored 0, Then they need help, not "not started"', () => {
+    expect(status('zero')).toBe('needsHelp');
+    expect(pulses.find((p) => p.id === 'zero')?.lastPractice).toBe(TODAY);
+  });
+
+  it('Given students close to the class rate, Then they are steady', () => {
+    expect(status('middle')).toBe('steady');
+    expect(status('third')).toBe('steady');
+  });
+
+  it('Given the full playtest class (8 students), Then only the zero-scorers and the one who scored in 1 of 3 rounds are flagged', () => {
+    const tally = (id: string, correct: number, attempts: number, last: string | null) =>
+      row(id, last, { w: { attempts, correct, lastAttemptAt: at } } as never);
+    const full = [
+      tally('r1Winner', 6, 24, TODAY), tally('r1Second', 2, 24, TODAY), tally('r3Winner', 3, 24, TODAY), tally('zeroA', 0, 8, null),
+      tally('zeroB', 0, 8, null), tally('lateWinner', 3, 8, TODAY), tally('lateSecond', 2, 8, TODAY), tally('lateThird', 1, 8, TODAY),
+    ];
+    const out = buildStudentPulses(full, full.map((r) => r.student_id), TODAY);
+    expect(out.filter((p) => p.status === 'needsHelp').map((p) => p.id).sort()).toEqual(['r1Second', 'zeroA', 'zeroB']);
+  });
+
+  it('Given a quiz class near 90%, Then a student at 50% still needs help', () => {
+    const quiz = [row('a', TODAY, { x: { attempts: 10, correct: 9 } }), row('b', TODAY, { x: { attempts: 10, correct: 9 } }), row('c', TODAY, { x: { attempts: 10, correct: 5 } })];
+    const out = buildStudentPulses(quiz, ['a', 'b', 'c'], TODAY);
+    expect(out.find((p) => p.id === 'c')?.status).toBe('needsHelp');
+  });
+
+  it('Given a whole class that found nothing, Then every player is flagged', () => {
+    const out = buildStudentPulses([row('a', TODAY, words({})), row('b', TODAY, words({}))], ['a', 'b'], TODAY);
+    expect(out.map((p) => p.status)).toEqual(['needsHelp', 'needsHelp']);
+  });
+});
+
 describe('buildDailyActive', () => {
   it('Counts distinct students per day, oldest first, 7 slots ending today', () => {
     const rows = [

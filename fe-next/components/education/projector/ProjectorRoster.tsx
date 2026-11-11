@@ -177,7 +177,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                 <span aria-hidden="true" className="inline-flex size-[1.5em] shrink-0 overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-cream">
                   <Avatar userId={student.username} customAvatar={student.avatar?.customAvatar ?? undefined} size="xl" disableEffects className="!h-full !w-full" />
                 </span>
-                <span dir="auto" title={student.username} className="min-w-0 flex-1 truncate">
+                <span dir="auto" title={student.username} className={cn('min-w-0 flex-1 leading-[1.05] [overflow-wrap:anywhere]', Array.from(student.username).length > 11 && 'text-[0.7em]')}>
                   {student.username}
                 </span>
                 {editing && !student.isBot && status === 'failed' && (

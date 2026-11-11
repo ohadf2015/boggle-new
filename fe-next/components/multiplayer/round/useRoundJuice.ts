@@ -80,9 +80,11 @@ interface Params {
   remainingTime: number | null | undefined;
   /** Live room socket: server-only moments (special word) that mpFeedback does not carry. */
   socket?: RoundSocket | null;
+  /** Classroom duel owns the voice: no overall-rank callouts, lead banners or lead sound (the rank chip still flips). */
+  quietRank?: boolean;
 }
 
-export function useRoundJuice({ meId, standings, remainingTime, socket }: Params): RoundJuice {
+export function useRoundJuice({ meId, standings, remainingTime, socket, quietRank = false }: Params): RoundJuice {
   const { t } = useLanguage();
   const { playComboSound, playLeadChangeSound, playTimerHeartbeatSound } = useSoundEffects();
   const freshWord = useFreshLastWord();
@@ -144,6 +146,7 @@ export function useRoundJuice({ meId, standings, remainingTime, socket }: Params
     const prevRank = prev.findIndex((p) => p.username === meId) + 1;
     const rank = next.findIndex((p) => p.username === meId) + 1;
     if (rank > 0 && prevRank > 0 && rank !== prevRank) setRankFlipKey(`r${rank}-${++seq.current}`);
+    if (quietRank) return;
     if (passed.length > 0) {
       setCallout({ id: nextId('pass'), text: t('mpUi.round.youPassed', { name: calloutName(passed[0]) }), tone: 'loud', color: 'lime' });
     } else if (overtakenBy.length > 0) {

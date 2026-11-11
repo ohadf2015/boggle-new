@@ -53,6 +53,7 @@ vi.mock('@/utils/supabase/client', () => ({
 
 import { catalogueModes } from '../ClassroomModeCatalogueData';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { gameTile, modeGrid, showGames } from '../lobby/__tests__/lobbyGamesFold';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
 const mockSocket = {
@@ -114,19 +115,23 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     expect(screen.getByTestId('lobby-go-live')).not.toBeDisabled();
   });
 
-  it('shows the whole catalogue at once, the quiz selected and nothing folded away', async () => {
+  it('folds the catalogue behind More games, with the quiz already selected', async () => {
     await renderLobby();
+    expect(screen.queryAllByTestId(/^mode-tile-/)).toHaveLength(0);
+    expect(screen.getByTestId('lobby-go-live')).toHaveTextContent(/vocab/i);
+    showGames();
     expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(catalogueModes().length);
-    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'true');
-    expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('data-selected', 'false');
-    expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'false');
-    expect(screen.getByTestId('mode-tile-word-hunt')).toHaveAttribute('data-selected', 'false');
-    expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'false');
+    expect(gameTile('vocab-quiz')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('classic')).toHaveAttribute('data-selected', 'false');
+    expect(gameTile('blast')).toHaveAttribute('data-selected', 'false');
+    expect(gameTile('word-hunt')).toHaveAttribute('data-selected', 'false');
+    expect(gameTile('wheel-rush')).toHaveAttribute('data-selected', 'false');
     expect(screen.queryByTestId('more-modes-toggle')).not.toBeInTheDocument();
   });
 
-  it('keeps every alternate one tap away', async () => {
+  it('keeps every alternate one tap behind More games', async () => {
     await renderLobby();
+    showGames();
     for (const id of ALTERNATES) {
       expect(screen.getByTestId(`mode-tile-${id}`)).toBeInTheDocument();
     }
@@ -134,11 +139,11 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
 
   it('selects any mode in place and keeps the whole catalogue on screen', async () => {
     await renderLobby();
-    fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
+    fireEvent.click(gameTile('wheel-rush'));
 
     await waitFor(() => expect(screen.getAllByTestId(/^mode-tile-/)).toHaveLength(catalogueModes().length));
-    expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'true');
-    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'false');
+    expect(gameTile('wheel-rush')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('vocab-quiz')).toHaveAttribute('data-selected', 'false');
     expect(screen.getByTestId('lobby-go-live')).toHaveTextContent(/wheel/i);
     // Still nothing on the wire — the card chooses, GO LIVE commits.
     expect(emitted()).toBeUndefined();
@@ -151,7 +156,7 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
    */
   it('never describes a mode that is not the one on the hero', async () => {
     await renderLobby();
-    fireEvent.click(screen.getByTestId('mode-tile-word-hunt'));
+    fireEvent.click(gameTile('word-hunt'));
 
     const panel = screen.getByTestId('lobby-go-live-panel');
     expect(panel).toHaveTextContent('education.modePicker.how.wordHunt');
@@ -160,13 +165,14 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     }
   });
 
-  it('orders the setup list, then mode, then one closed Game options door that says what it holds', async () => {
+  it('orders the word list, then the presets, then one closed Game options door that says what it holds, then the folded games', async () => {
     await renderLobby();
     const step = screen.getByTestId('lobby-lesson-step');
-    const grid = screen.getByTestId('lobby-mode-grid');
+    const preset = screen.getByTestId('preset-standard');
     const summary = screen.getByTestId('lobby-setup-summary');
-    expect(step.compareDocumentPosition(grid) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(grid.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(step.compareDocumentPosition(preset) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(preset.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(summary.compareDocumentPosition(modeGrid()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(summary).toHaveAttribute('aria-expanded', 'false');
     expect(summary).toHaveTextContent('eduShell.host.gameOptions');
     expect(screen.getByTestId('lobby-setup-line').textContent).toContain('teacher.classroom.playStyle.ffa');

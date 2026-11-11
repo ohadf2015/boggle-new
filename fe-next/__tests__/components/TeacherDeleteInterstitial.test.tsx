@@ -154,7 +154,7 @@ describe('TeacherDeleteInterstitial', () => {
       '1 class, 19 students, 15 rounds and their reports will be permanently deleted.'
     );
     expect(screen.getByText('The free plan stays free')).toBeInTheDocument();
-    expect(screen.getByTestId('teacher-delete-one-class')).toHaveAttribute('href', '/en/teacher/classroom/c1');
+    expect(screen.getByTestId('teacher-delete-one-class')).toHaveAttribute('href', '/en/teacher/classroom/c1#delete');
   });
 
   it('hides free-stays-free when Pro renews and shows the billing note instead', () => {

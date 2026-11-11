@@ -125,3 +125,55 @@ describe('rivalOutcomeOf', () => {
     expect(rivalOutcomeOf(null)).toBeNull();
   });
 });
+
+function idSocket(id: string) {
+  const s = fakeSocket();
+  return { ...s, socket: { ...s.socket, id } };
+}
+
+describe('useRival: one rivalSync per round, not one per mount', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('Given the chip remounts as the round frame settles (in place, then into the tray, StrictMode twice), When it mounts again on the same connection, Then the server is asked once', () => {
+    const s = idSocket('sock-a');
+    for (let i = 0; i < 6; i++) renderHook(() => useRival(s.socket)).unmount();
+    expect(s.emitted).toEqual(['rivalSync']);
+  });
+
+  it('Given the reply landed before a remount, When the chip mounts again, Then it shows the rival at once without asking', () => {
+    const s = idSocket('sock-b');
+    const first = renderHook(() => useRival(s.socket));
+    s.fire('rivalUpdate', { gameSessionId: 4, rival: view(5, 3) });
+    first.unmount();
+    const { result } = renderHook(() => useRival(s.socket));
+    expect(result.current.rival?.rivalName).toBe('Dana');
+    expect(result.current.diff).toBe(2);
+    expect(s.emitted).toEqual(['rivalSync']);
+  });
+
+  it('Given a rerender with a new socket wrapper on the same connection, Then it does not ask again', () => {
+    const s = idSocket('sock-c');
+    const { rerender } = renderHook(({ sock }) => useRival(sock), { initialProps: { sock: s.socket } });
+    rerender({ sock: { ...s.socket } });
+    expect(s.emitted).toEqual(['rivalSync']);
+  });
+
+  it('Given a reconnect (new connection id), When the chip mounts, Then it asks again', () => {
+    const a = idSocket('sock-d1');
+    renderHook(() => useRival(a.socket)).unmount();
+    const b = idSocket('sock-d2');
+    renderHook(() => useRival(b.socket));
+    expect(a.emitted).toEqual(['rivalSync']);
+    expect(b.emitted).toEqual(['rivalSync']);
+  });
+
+  it('Given the next round mounts the chip later on the same connection, Then it asks again', () => {
+    const s = idSocket('sock-e');
+    renderHook(() => useRival(s.socket)).unmount();
+    act(() => { vi.advanceTimersByTime(30_000); });
+    renderHook(() => useRival(s.socket));
+    expect(s.emitted).toEqual(['rivalSync', 'rivalSync']);
+  });
+});
+

@@ -59,7 +59,7 @@ describe('LessonBuilder: calm My lists', () => {
   it('Given two lists, Then New list is the only colored fill and every card start button is outlined', () => {
     const { container } = render(<LessonBuilder />);
     expect(fills(container)).toEqual([screen.getByTestId('lessons-create')]);
-    expect(screen.getByTestId('lesson-host-lesson-1')).toHaveTextContent('education.template.startGame');
+    expect(screen.getByTestId('lesson-host-lesson-1')).toHaveTextContent('eduShell.home.startLive');
   });
 
   it('Given the cards, Then no label shouts in uppercase and the language reads as a name', () => {

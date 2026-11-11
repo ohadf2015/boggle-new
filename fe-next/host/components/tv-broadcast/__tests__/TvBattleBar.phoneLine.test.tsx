@@ -18,3 +18,13 @@ describe('TvBattleBar — one line on a teacher phone', () => {
     expect(screen.getByText('Common English').className).toContain('truncate');
   });
 });
+
+describe('TvRoundLabel — the class name on the wall', () => {
+  it('Given a projector-wide header, Then the lesson name wraps to two lines before it is ever cut', async () => {
+    const { TvRoundLabel } = await import('../TvBattleBar');
+    render(<TvRoundLabel classroom={{ round: 2, lessonName: '7B Science - Physics unit', playStyle: 'ffa' }} t={(k) => k} />);
+    const name = screen.getByText('7B Science - Physics unit');
+    expect(name.className).toMatch(/md:whitespace-normal/);
+    expect(name.className).toMatch(/md:line-clamp-2/);
+  });
+});

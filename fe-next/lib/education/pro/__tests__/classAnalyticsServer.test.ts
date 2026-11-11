@@ -48,6 +48,39 @@ describe('readClassAnalytics', () => {
     expect(data?.dailyActive.at(-1)).toEqual({ day: today, count: 1 });
   });
 
+  it('Given a board game where the winner found 3 of 8 lesson words, Then the headline count flags only the student who found none', async () => {
+    const board = (found: number) => ({ cat: { attempts: 1, correct: found > 0 ? 1 : 0 }, dog: { attempts: 1, correct: found > 1 ? 1 : 0 }, sun: { attempts: 1, correct: found > 2 ? 1 : 0 }, pen: { attempts: 5, correct: 0 } });
+    const sb = client({
+      classroom_memberships: { data: [{ student_id: 'win' }, { student_id: 'zero' }], error: null },
+      vocabulary_lessons: { data: [{ id: 'l1' }], error: null },
+      lesson_assignments: { data: [], error: null },
+      student_lesson_progress: {
+        data: [
+          { id: 'p1', lesson_id: 'l1', student_id: 'win', total_xp: 30, last_practice_date: today, words_attempted: board(3) },
+          { id: 'p2', lesson_id: 'l1', student_id: 'zero', total_xp: 0, last_practice_date: today, words_attempted: board(0) },
+        ],
+        error: null,
+      },
+    });
+    const { data } = await readClassAnalytics(sb as never, 'c1', 'teacher-1');
+    expect(data?.students.map((s) => [s.id, s.status])).toEqual([['zero', 'needsHelp'], ['win', 'steady']]);
+    expect(data?.studentsNeedingHelp).toBe(1);
+  });
+
+  it('Given a student who played today and scored 0 (no XP, so no last_practice_date), Then they count as active today', async () => {
+    const sb = client({
+      classroom_memberships: { data: [{ student_id: 'zero' }], error: null },
+      vocabulary_lessons: { data: [{ id: 'l1' }], error: null },
+      lesson_assignments: { data: [], error: null },
+      student_lesson_progress: {
+        data: [{ id: 'p1', lesson_id: 'l1', student_id: 'zero', total_xp: 0, last_practice_date: null, words_attempted: { cat: { attempts: 1, correct: 0, lastAttemptAt: `${today}T08:00:00.000Z` } } }],
+        error: null,
+      },
+    });
+    const { data } = await readClassAnalytics(sb as never, 'c1', 'teacher-1');
+    expect(data?.activeStudentsToday).toBe(1);
+  });
+
   it('surfaces a read error instead of empty metrics', async () => {
     const sb = client({ classroom_memberships: { data: null, error: { message: 'rls' } } });
     const { data, error } = await readClassAnalytics(sb as never, 'c1', 'teacher-1');

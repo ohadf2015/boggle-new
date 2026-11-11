@@ -94,7 +94,7 @@ describe('Teacher Home week-two loop', () => {
     await settle();
     const chip = screen.getByTestId('home-ready-chip');
     expect(chip).toHaveTextContent('eduShell.home.loop.ready:{"ready":2,"total":3}');
-    expect(chip).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
+    expect(screen.getByTestId('home-weekly-reports')).toContainElement(chip);
     expect(screen.queryByTestId('home-ready-lock')).toBeNull();
   });
 

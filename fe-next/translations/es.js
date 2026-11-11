@@ -1015,7 +1015,7 @@ const es = {
       "createTitle": "Nueva lista de palabras",
       "editTitle": "Editar lista",
       "description": "Pega palabras, añade significados y guarda.",
-      "newList": "Nueva lista",
+      "newList": "Nueva lista de palabras",
       "moreOptions": "Idioma, curso, tema y compartir",
       "titleLabel": "Nombre de la lista",
       "titlePlaceholder": "Ponle nombre a tu lista…",
@@ -1095,7 +1095,6 @@ const es = {
       "emptyHint": "Pega una lista, empieza con un pack inicial o toma una de Descubrir."
     },
     "card": {
-      "practice": "Practicar",
       "words": "{count} palabras",
       "by": "de {author}",
       "aTeacher": "un docente",
@@ -1223,7 +1222,6 @@ const es = {
       "firstAssignmentCta": "Crear primera tarea",
       "startLiveTitle": "Juega una clase en vivo",
       "startLiveBody": "La tarea ya está. Empieza un juego en vivo para que la clase juegue junta.",
-      "startLiveCta": "Empezar en vivo",
       "copyJoinCode": "Copiar enlace",
       "joinCodeCopied": "Enlace copiado",
       "endedCodeTries": "Alumnos que intentaron unirse después de que terminara tu juego: {count}.",
@@ -1327,6 +1325,9 @@ const es = {
       "openForXp": "Abre el cofre para llevarte tu XP."
     },
     "student": {
+      "noClass": {
+        "title": "Escribe el código de tu clase"
+      },
       "liveNow": "En vivo",
       "ctaReview": "Repaso",
       "ctaBoss": "Jefe desbloqueado",
@@ -14369,8 +14370,7 @@ const es = {
     "assignments": {
       "dueInHours": "Vence en {hours}h",
       "dueInMinutes": "Vence en {minutes}m",
-      "overdueBy": "Atrasada {days}d",
-      "doIt": "Hacerlo"
+      "overdueBy": "Atrasada {days}d"
     },
     "classView": {
       "playAssignment": "Jugar {title}",
@@ -14528,6 +14528,10 @@ const es = {
     }
   },
   "teacher": {
+    "classPage": {
+      "noLists": "Esta clase aún no tiene listas de palabras.",
+      "coverage": "Encontraron el {pct} % de la lista"
+    },
     "nav": {
       "play": "Jugar",
       "classes": "Clases",
@@ -14694,7 +14698,6 @@ const es = {
       "error": "No pudimos cargar los resultados de la última partida.",
       "retry": "Reintentar",
       "emptyTitle": "Aún no hay partidas de clase",
-      "emptyHint": "Inicia una desde Jugar ya, arriba: aquí verás qué palabras encontró y cuáles se le escaparon a la clase.",
       "previousGames": "Partidas anteriores",
       "playersPlayed": "{{count}} estudiantes jugaron",
       "studentFallback": "Estudiante",
@@ -15063,7 +15066,6 @@ const es = {
       "studentCountPro": "{{count}} alumnos",
       "cardSeeAllStudents": "Ver los {{count}} alumnos",
       "cardRosterTitle": "Alumnos de {{name}}",
-      "cardAssignHomework": "Poner tarea",
       "cardClassReport": "Informe de la clase",
       "presets": {
         "title": "Ajustes rápidos",
@@ -15406,6 +15408,7 @@ const es = {
       "failedToSaveLesson": "No se pudo guardar la lección"
     },
     "reports": {
+      "freeOtherClasses": "El plan gratuito incluye tu primera clase. Con Pro ves también estas:",
       "valueLine": "Después de cada partida, ves qué palabras falló cada clase, quién necesita ayuda y qué practicar a continuación.",
       "homeworkShortcut": "Resultados de las tareas",
       "freeSummary": {
@@ -15941,12 +15944,12 @@ const es = {
       "invalid": "A esta página le falta el código de la clase. Ábrela de nuevo desde tu inicio de docente."
     },
     "weekInsight": {
+      "emptyHeadline": "Una partida y verás quién necesita ayuda",
       "title": "Quién necesita ayuda esta semana",
       "nobodyStuck": "Esta semana nadie se ha atascado.",
       "more": "+{{count}} más",
       "hardestTitle": "Las palabras más difíciles de la semana",
       "missed": "falló el {{pct}}%",
-      "emptyTitle": "Aún no hay partidas esta semana",
       "emptyBody": "Juega una partida con esta clase y verás quién necesita ayuda.",
       "startGame": "Empezar una partida",
       "proLine": "Con Pro ves todas las semanas y a cada estudiante",
@@ -16069,7 +16072,7 @@ const es = {
       "settings": "Ajuste fino",
       "settingsHide": "Ocultar ajuste fino",
       "needsLesson": "Elige primero una lista de palabras",
-      "launch": "Empezar en vivo: {{mode}}",
+      "launch": "Empezar un juego: {{mode}}",
       "tapAgain": "Toca otra vez para empezar",
       "moreModes": "Más juegos ({{count}})",
       "fewerModes": "Menos juegos",
@@ -17825,7 +17828,7 @@ const es = {
           "label": "Te unes a:",
           "confirm": "Este es tu aula",
           "gameLabel": "Partida en vivo:",
-          "classroomNext": "Ahora no hay ninguna partida. Entrarás en la clase y verás lo que ha preparado tu profe.",
+          "classroomNext": "Entrarás en tu clase y verás lo que ha preparado tu profe.",
           "gameConfirm": "Tu clase está jugando ahora: entrarás directamente"
         },
         "success": "¡Ya estás dentro!",
@@ -17945,8 +17948,7 @@ const es = {
       "setDefaultDesc": "Usar esta config por defecto para esta lección",
       "save": "Guardar",
       "saving": "Guardando...",
-      "saved": "¡Guardada!",
-      "startGame": "Iniciar juego"
+      "saved": "¡Guardada!"
     },
     "xp": {
       "level": "Nivel",
@@ -21548,7 +21550,6 @@ const es = {
       "wordsFound": "palabras encontradas",
       "lessonFound": "Palabras de la lección: {{found}}/{{total}}",
       "wordOfRound": "Palabra de la ronda",
-      "wordOfRoundEmpty": "La primera palabra larga se queda con este sitio",
       "bestWordBy": "{{count}} letras · de {{name}}",
       "exitLabel": "Salir del juego"
     },
@@ -22123,6 +22124,7 @@ const es = {
       "removeFailed": "No se quitó. Inténtalo de nuevo."
     },
     "student": {
+      "joined": "¡{name} ya está aquí!",
       "youreIn": "¡Ya estás dentro!",
       "watchBoard": "Mira la pantalla. Tu profe empieza el juego.",
       "inClass": "{count} en clase",
@@ -22130,6 +22132,9 @@ const es = {
       "leave": "Salir"
     },
     "entry": {
+      "hostRetry": "Reintentar",
+      "hostRefusedHint": "Comprueba que has entrado con la cuenta que abrió esta partida y vuelve a intentarlo.",
+      "hostRefusedTitle": "No pudimos volver a abrir tu sala",
       "roomFullTitle": "La sala está llena: estás mirando",
       "roomFullHint": "Los {max} puestos están ocupados. Tu docente ve que estás esperando.",
       "connecting": "Conectando con tu clase…",
@@ -22286,9 +22291,8 @@ const es = {
         "pickGame": "Elegir otro juego",
         "loading": "Revisando tu última partida",
         "ready": "{ready} de {total} listos para el examen",
-        "readyHint": "Ver qué palabras falló cada estudiante",
         "readyEmpty": "Los resultados por palabra aparecen después de tu próxima partida",
-        "missed": "Faltaron: {count} · asignar tarea"
+        "missed": "Faltaron: {count} · asignar práctica"
       },
       "greetMorning": "Buenos días, {name}",
       "greetAfternoon": "Buenas tardes, {name}",
@@ -22306,6 +22310,8 @@ const es = {
       "studentsOne": "1 alumno",
       "notPlayedRecently": "Sin partidas en 30 días",
       "roster": {
+        "hide": "Ocultar la lista de alumnos",
+        "seeAll": "Ver todos los alumnos ({count})",
         "title": "Alumnos",
         "colName": "Nombre",
         "colXp": "XP",
@@ -22460,6 +22466,13 @@ const es = {
       }
     },
     "setup": {
+      "strip": {
+        "share": "Compartir el código",
+        "name": "Nombra tu clase"
+      },
+      "savedList": {
+        "change": "Cambiar palabras"
+      },
       "title": "Nueva clase",
       "subtitle": "Tres elecciones rápidas. Puedes cambiarlas después.",
       "step1": "Datos de la clase",
@@ -22520,14 +22533,10 @@ const es = {
       "packLabel": "Palabras para tu primera partida",
       "advancedOpen": "Cambiar curso, idioma o palabras",
       "advancedClose": "Ocultar opciones",
-      "bubble": "Solo un nombre. Lo demás ya lo elegí yo, cámbialo si quieres.",
       "createClass": "Crear clase",
       "anyGrade": "Cualquier curso",
       "side": {
-        "title": "Qué pasa ahora",
-        "step1": "Recibes un código para unirse",
-        "step2": "Tus estudiantes lo escriben en cualquier móvil. Sin cuentas.",
-        "step3": "Pulsa Empezar en el tablero. La primera ronda dura 3 minutos."
+        "step2": "Tus estudiantes lo escriben en cualquier móvil. Sin cuentas."
       },
       "packWords": "{count} palabras",
       "packRecommended": "Te lo recomendamos",
@@ -22545,14 +22554,12 @@ const es = {
         "tooFew": "Añade al menos {min} palabras, o vacía el cuadro para jugar con una lista de palabras inicial.",
         "phrasesOnly": "Las frases de varias palabras no caben en el tablero. Añade palabras sueltas, o vacía el cuadro para jugar con una lista de palabras inicial.",
         "skipped": "Frases que se quedan fuera: {count}. En el tablero solo caben palabras sueltas.",
-        "playFailed": "El juego no se abrió. Pulsa Jugar ahora otra vez.",
+        "playFailed": "El juego no se abrió. Pulsa «Empezar un juego» otra vez.",
         "yours": "La ronda usará tus palabras, y también se guardan en esta clase.",
         "packLabel": "¿Aún sin lista de palabras? Juega con una inicial",
         "packHint": "Se guarda en esta clase para que tus alumnos lo practiquen después.",
         "listName": "Palabras del {date}",
-        "playNow": "Jugar ahora",
         "saved": "Ya en tu clase",
-        "createHint": "Después: tu código para unirse y un cuadro para las palabras de la semana. Luego pulsa Jugar ahora.",
         "listMissing": "No encontramos tu lista guardada, así que jugaremos con una lista inicial."
       },
       "ownWords": {
@@ -22563,6 +22570,10 @@ const es = {
       }
     },
     "host": {
+      "roundGroup": "Ronda",
+      "moreGames": "Más juegos",
+      "rivalsOff": "sin duelos",
+      "rivalsOn": "con duelos",
       "classLabel": "Clase",
       "lateJoin": "Unirse tarde",
       "lateJoinHint": "Los alumnos pueden entrar aunque la ronda ya haya empezado.",

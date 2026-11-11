@@ -40,3 +40,16 @@ describe('TvGameHeader — toast slot beside the timer', () => {
     expect(screen.getByTestId('trail')).toBeInTheDocument();
   });
 });
+
+describe('TvGameHeader — classroom header stays short and wide', () => {
+  it('Given the compact classroom header, Then the timer never zooms past its natural size and the row spans the wall', () => {
+    const { container } = render(<TvGameHeader compact remainingTime={60} timerValue={3} t={(k: string) => k} />);
+    expect(screen.getByTestId('tv-timer-slot').className).not.toMatch(/zoom:1\.2/);
+    expect((container.firstElementChild!.firstElementChild as HTMLElement).className).toMatch(/max-w-\[2000px\]/);
+  });
+
+  it('Given an arcade header, Then the row keeps its centred 7xl width', () => {
+    const { container } = render(<TvGameHeader remainingTime={60} timerValue={3} t={(k: string) => k} />);
+    expect((container.firstElementChild!.firstElementChild as HTMLElement).className).toMatch(/max-w-7xl/);
+  });
+});

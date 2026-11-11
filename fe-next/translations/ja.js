@@ -1015,7 +1015,7 @@ const ja = {
       "createTitle": "新しい単語リスト",
       "editTitle": "単語リストを編集",
       "description": "単語を貼り付けて、意味を足して、保存。",
-      "newList": "新しいリスト",
+      "newList": "新しい単語リスト",
       "moreOptions": "言語・学年・テーマ・共有",
       "titleLabel": "リスト名",
       "titlePlaceholder": "リストに名前をつけよう…",
@@ -1095,7 +1095,6 @@ const ja = {
       "emptyHint": "リストを貼り付けるか、スターターパックから始めるか、「みつける」から選びましょう。"
     },
     "card": {
-      "practice": "練習",
       "words": "{count}語",
       "by": "作成：{author}",
       "aTeacher": "先生",
@@ -1223,7 +1222,6 @@ const ja = {
       "firstAssignmentCta": "最初の課題を作成",
       "startLiveTitle": "ライブ授業を始める",
       "startLiveBody": "課題は出しています。ライブゲームを始めてクラスで一緒に遊びましょう。",
-      "startLiveCta": "ライブ開始",
       "copyJoinCode": "参加リンクをコピー",
       "joinCodeCopied": "参加リンクをコピーしました",
       "endedCodeTries": "ゲーム終了後に参加しようとした生徒：{count}人。",
@@ -1327,6 +1325,9 @@ const ja = {
       "openForXp": "宝箱を開けてXPをゲット！"
     },
     "student": {
+      "noClass": {
+        "title": "クラスコードを入力しよう"
+      },
       "liveNow": "ライブ中",
       "ctaReview": "復習",
       "ctaBoss": "ボス解放",
@@ -14417,8 +14418,7 @@ const ja = {
     "assignments": {
       "dueInHours": "残り{hours}時間",
       "dueInMinutes": "残り{minutes}分",
-      "overdueBy": "{days}日遅れ",
-      "doIt": "やる"
+      "overdueBy": "{days}日遅れ"
     },
     "classView": {
       "playAssignment": "{title}をプレイ",
@@ -14581,6 +14581,10 @@ const ja = {
     }
   },
   "teacher": {
+    "classPage": {
+      "noLists": "このクラスにはまだ単語リストがありません。",
+      "coverage": "リストの単語を{pct}%発見"
+    },
     "nav": {
       "play": "プレイ",
       "classes": "クラス",
@@ -14747,7 +14751,6 @@ const ja = {
       "error": "前回の対戦結果を読み込めませんでした。",
       "retry": "再試行",
       "emptyTitle": "まだクラス対戦がありません",
-      "emptyHint": "上の「いますぐプレイ」から対戦を始めると、クラスが見つけた単語・見つけられなかった単語がここに表示されます。",
       "previousGames": "過去の対戦",
       "playersPlayed": "{{count}}人の生徒が参加",
       "studentFallback": "生徒",
@@ -15136,7 +15139,6 @@ const ja = {
       "studentCountPro": "生徒 {{count}} 人",
       "cardSeeAllStudents": "生徒 {{count}} 人をすべて見る",
       "cardRosterTitle": "{{name}} の生徒",
-      "cardAssignHomework": "宿題を出す",
       "cardClassReport": "クラスのレポート",
       "presets": {
         "title": "クイック設定",
@@ -15631,6 +15633,7 @@ const ja = {
       "failedToSaveLesson": "レッスンの保存に失敗しました"
     },
     "reports": {
+      "freeOtherClasses": "無料プランで見られるのは最初のクラスです。Proならこちらも見られます：",
       "valueLine": "毎回のゲームのあとに、各クラスが見逃した単語、手助けが必要な生徒、次に練習することがわかります。",
       "homeworkShortcut": "宿題の結果",
       "freeSummary": {
@@ -15993,12 +15996,12 @@ const ja = {
       "invalid": "このページにはクラスコードがありません。先生ホームからもう一度開いてください。"
     },
     "weekInsight": {
+      "emptyHeadline": "1回遊べば、サポートが必要な生徒がわかります",
       "title": "今週サポートが必要な生徒",
       "nobodyStuck": "今週つまずいている生徒はいません。",
       "more": "ほか{{count}}人",
       "hardestTitle": "今週いちばん難しかった単語",
       "missed": "{{pct}}%がミス",
-      "emptyTitle": "今週はまだゲームがありません",
       "emptyBody": "このクラスで1回ゲームをすると、サポートが必要な生徒がわかります。",
       "startGame": "ゲームを始める",
       "proLine": "Proなら毎週の記録と生徒一人ひとりを確認できます",
@@ -16121,7 +16124,7 @@ const ja = {
       "settings": "こまかい設定",
       "settingsHide": "設定を閉じる",
       "needsLesson": "先に単語リストを選んでください",
-      "launch": "ライブ開始：{{mode}}",
+      "launch": "ゲームを始める：{{mode}}",
       "tapAgain": "もう一度タップで開始",
       "moreModes": "ほかのゲーム（{{count}}）",
       "fewerModes": "とじる",
@@ -17822,7 +17825,7 @@ const ja = {
           "label": "参加先:",
           "confirm": "このクラスへ参加します",
           "gameLabel": "ライブゲーム:",
-          "classroomNext": "いまはゲームをしていません。クラスに参加して、先生が出した課題を見られます。",
+          "classroomNext": "クラスに参加して、先生が出した課題を見られます。",
           "gameConfirm": "クラスがプレイ中です。そのまま参加します"
         },
         "subtitle": "先生からもらったコードを入力してね",
@@ -17888,7 +17891,6 @@ const ja = {
       "setDefault": "デフォルトに設定",
       "setDefaultDesc": "このレッスンのデフォルトとして使用",
       "settings": "設定",
-      "startGame": "ゲーム開始",
       "timer": "制限時間"
     },
     "xp": {
@@ -21536,7 +21538,6 @@ const ja = {
       "wordsFound": "語みつけた",
       "lessonFound": "授業の単語：{{found}}/{{total}}",
       "wordOfRound": "今回のベストワード",
-      "wordOfRoundEmpty": "最初の長い単語がここに入ります",
       "bestWordBy": "{{count}}文字・{{name}}さん",
       "exitLabel": "ゲームを終了"
     },
@@ -22111,6 +22112,7 @@ const ja = {
       "removeFailed": "外せませんでした。もう一度お試しください。"
     },
     "student": {
+      "joined": "{name}が参加！",
       "youreIn": "参加できました！",
       "watchBoard": "大きな画面を見てね。先生がゲームを始めます。",
       "inClass": "クラス{count}人",
@@ -22118,6 +22120,9 @@ const ja = {
       "leave": "退出"
     },
     "entry": {
+      "hostRetry": "もう一度試す",
+      "hostRefusedHint": "このゲームを始めたアカウントでログインしているか確認して、もう一度試してください。",
+      "hostRefusedTitle": "ルームをもう一度開けませんでした",
       "roomFullTitle": "満員です：観戦モードで参加中",
       "roomFullHint": "{max}席すべて埋まっています。先生はあなたが待っていることを確認できます。",
       "connecting": "クラスに接続中…",
@@ -22274,9 +22279,8 @@ const ja = {
         "pickGame": "別のゲームを選ぶ",
         "loading": "前回のゲームを確認中",
         "ready": "テストの準備OK {ready}/{total}人",
-        "readyHint": "生徒ごとに間違えた単語を見る",
         "readyEmpty": "単語ごとの結果は次のゲームのあとに表示されます",
-        "missed": "欠席 {count}人 · 宿題を出す"
+        "missed": "欠席 {count}人 · 練習を割り当てる"
       },
       "greetMorning": "おはようございます、{name}さん",
       "greetAfternoon": "こんにちは、{name}さん",
@@ -22294,6 +22298,8 @@ const ja = {
       "studentsOne": "生徒 1人",
       "notPlayedRecently": "30日間プレイなし",
       "roster": {
+        "hide": "生徒リストを閉じる",
+        "seeAll": "生徒全員を見る（{count}人）",
         "title": "生徒",
         "colName": "名前",
         "colXp": "XP",
@@ -22448,6 +22454,13 @@ const ja = {
       }
     },
     "setup": {
+      "strip": {
+        "share": "コードを共有",
+        "name": "クラス名を決める"
+      },
+      "savedList": {
+        "change": "単語を変更"
+      },
       "title": "新しいクラス",
       "subtitle": "選ぶのは3つだけ。あとから変更できます。",
       "step1": "クラスの情報",
@@ -22508,14 +22521,10 @@ const ja = {
       "packLabel": "最初のゲームで使う単語",
       "advancedOpen": "学年・言語・単語を変更",
       "advancedClose": "オプションを閉じる",
-      "bubble": "名前だけでOK。ほかは選んでおいたので、必要なら変えてね。",
       "createClass": "クラスを作成",
       "anyGrade": "全学年",
       "side": {
-        "title": "このあとの流れ",
-        "step1": "参加コードが発行されます",
-        "step2": "生徒はどのスマホからでもコードを入力。アカウント不要。",
-        "step3": "ボードで「スタート」を押します。最初のラウンドは3分です。"
+        "step2": "生徒はどのスマホからでもコードを入力。アカウント不要。"
       },
       "packWords": "{count}語",
       "packRecommended": "おすすめ",
@@ -22533,14 +22542,12 @@ const ja = {
         "tooFew": "{min}語以上入れてください。空にすると、最初の単語リストで遊べます。",
         "phrasesOnly": "複数の語でできたフレーズはボードに置けません。1語ずつ入れるか、空にして最初の単語リストで遊びましょう。",
         "skipped": "外したフレーズ：{count}件。ボードに置けるのは1語だけです。",
-        "playFailed": "ゲームを開けませんでした。もう一度「今すぐプレイ」を押してください。",
+        "playFailed": "ゲームを開けませんでした。もう一度「ゲームを始める」を押してください。",
         "yours": "この単語でラウンドを始めます。単語はこのクラスにも保存されます。",
         "packLabel": "単語リストがまだない場合は、最初のリストで",
         "packHint": "このクラスに保存されるので、生徒はあとで練習できます。",
         "listName": "{date}の単語",
-        "playNow": "今すぐプレイ",
         "saved": "クラスに保存済み",
-        "createHint": "次に参加コードと今週の単語を入れる欄が出ます。あとは「今すぐプレイ」を押すだけ。",
         "listMissing": "保存した単語リストが見つからなかったため、最初の単語リストで遊びます。"
       },
       "ownWords": {
@@ -22551,6 +22558,10 @@ const ja = {
       }
     },
     "host": {
+      "roundGroup": "ラウンド",
+      "moreGames": "ほかのゲーム",
+      "rivalsOff": "ライバル対決なし",
+      "rivalsOn": "ライバル対決あり",
       "classLabel": "クラス",
       "lateJoin": "途中参加",
       "lateJoinHint": "ラウンド開始後も生徒が参加できます。",

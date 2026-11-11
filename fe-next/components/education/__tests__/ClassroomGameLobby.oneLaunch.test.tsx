@@ -70,6 +70,7 @@ vi.mock('@/hooks/useRecentGameSettings', () => ({
 }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { gameTile, findGameTile } from '../lobby/__tests__/lobbyGamesFold';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
 const mockSocket = {
@@ -114,12 +115,12 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
     await screen.findByTestId('lobby-go-live');
     await waitFor(() => expect(socketHandlers['classroomGameError']).toBeDefined());
 
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(gameTile('blast'));
     // A second and third tap, on a selected card too, must still not mint a room.
-    fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
-    fireEvent.click(screen.getByTestId('mode-tile-wheel-rush'));
+    fireEvent.click(gameTile('wheel-rush'));
+    fireEvent.click(gameTile('wheel-rush'));
 
-    expect(screen.getByTestId('mode-tile-wheel-rush')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('wheel-rush')).toHaveAttribute('data-selected', 'true');
     expect(emitted()).toBeUndefined();
   });
 
@@ -127,7 +128,7 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
     render(<ClassroomGameLobby initialLessonId="lesson-defs" onBack={vi.fn()} />);
     await screen.findByTestId('lobby-go-live');
 
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(gameTile('blast'));
     const go = screen.getByTestId('lobby-go-live');
     expect(go).toHaveTextContent('blast');
 
@@ -176,7 +177,7 @@ describe('ClassroomGameLobby — posters choose, GO LIVE launches', () => {
 
     // The FIRST painted hero is already the restored lesson's mode — it never
     // shows Classic and then jumps.
-    const hero = await screen.findByTestId('mode-tile-vocab-quiz');
+    const hero = await findGameTile('vocab-quiz');
     expect(hero).toHaveAttribute('data-selected', 'true');
     expect(screen.getAllByTestId(/^mode-tile-/).filter((el) => el.dataset.selected === 'true')).toHaveLength(1);
   });

@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { BarChart3, Check, ChevronDown, Loader2, Play, RotateCcw, Share2 } from 'lucide-react';
+import { Check, ChevronDown, Loader2, Play, RotateCcw, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -39,11 +39,7 @@ export interface HomeHeroProps {
   t: T;
   /** Quiet secondary action beside Start: a private practice round with bots. */
   rehearse?: ReactNode;
-  /** The next setup step, inline under the actions instead of a row above the hero. */
-  nudge?: ReactNode;
   meta?: ReactNode;
-  /** The reason to play today ("19 days since the last game"), next to the button that answers it. */
-  insight?: ReactNode;
   corner?: ReactNode;
   /** False while the Get students in card owns the code, so it never shows twice. */
   showCode?: boolean;
@@ -53,14 +49,12 @@ export interface HomeHeroProps {
   capLabel?: string;
   /** A class that already played: Play again (last mode, this week's list) takes the primary slot. */
   replay?: HomeReplay;
-  /** The one results entry on Home: free summary first, Pro detail behind it. */
-  resultsHref?: string;
 }
 
 export type HomeReplay = { kind: 'pending' } | { kind: 'ready'; href: string; detail: string };
 
-/** The class desk: Start game, Share code and See results, with the join code at a glance. */
-export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, nudge, meta, insight, corner, showCode = true, codeSlot, capLabel, replay, resultsHref }: HomeHeroProps) {
+/** The class desk: the class, its join code large with Share beside it, and one Start button. */
+export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, corner, showCode = true, codeSlot, capLabel, replay }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -70,7 +64,7 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
     <section data-testid="home-hero" aria-labelledby="home-hero-title" className={cn(NB_PANEL, NB_BLOCK.pink, 'relative @container/hero')}>
       <div
         data-testid="home-hero-grid"
-        className="grid grid-cols-[minmax(0,1fr)] gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
+        className="grid grid-cols-[minmax(0,1fr)] gap-3 p-3 sm:gap-4 sm:p-5 @3xl/hero:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] @3xl/hero:grid-rows-[auto_1fr] @3xl/hero:gap-x-6 [@media(max-height:820px)]:gap-2.5 [@media(max-height:820px)]:p-3.5"
       >
         <div className="flex min-w-0 flex-col gap-1 sm:gap-1.5 @3xl/hero:col-start-1 @3xl/hero:row-start-1">
           <div className="flex flex-wrap items-center justify-between gap-x-3">
@@ -90,9 +84,21 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
         ) : code ? (
           <div
             data-testid="home-desk-code-panel"
-            className="flex flex-wrap items-center gap-x-2 gap-y-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-yellow p-2.5 text-neo-black shadow-hard-lg sm:gap-x-3 sm:p-3.5 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
+            className="flex flex-col items-center gap-2.5 rounded-neo-lg border-[3px] border-neo-black bg-neo-yellow p-2.5 text-neo-black shadow-hard-lg sm:p-4 @3xl/hero:col-start-2 @3xl/hero:row-span-2 @3xl/hero:row-start-1 @3xl/hero:self-center"
           >
-            <span className="w-full font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/75 max-sm:sr-only">{t('academy.hq.classCode')}</span>
+            <div className="flex w-full items-center justify-between gap-2">
+              <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/75">{t('academy.hq.classCode')}</span>
+              <NeoButton
+                variant="small"
+                tone="navy"
+                data-testid="home-share-code"
+                aria-haspopup="dialog"
+                onClick={() => setShareOpen(true)}
+              >
+                <Share2 className="size-5" aria-hidden="true" />
+                {t('eduShell.home.shareCode')}
+              </NeoButton>
+            </div>
             <p data-testid="home-desk-code" className="flex gap-1 sm:gap-1.5" dir="ltr">
               <span className="sr-only">{code}</span>
               {Array.from(code).map((ch, i, all) => (
@@ -102,20 +108,10 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
                   index={i}
                   count={all.length}
                   data-testid="home-desk-code-tile"
-                  className="size-9 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black uppercase text-neo-black shadow-hard max-[379px]:size-8 max-[379px]:text-lg sm:size-12 sm:text-2xl [@media(max-height:820px)]:sm:size-10 [@media(max-height:820px)]:text-xl"
+                  className="size-11 rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-2xl font-black uppercase text-neo-black shadow-hard max-[379px]:size-9 max-[379px]:text-xl sm:size-14 sm:text-3xl @3xl/hero:text-4xl @5xl/hero:size-16 @5xl/hero:text-5xl [@media(max-height:820px)]:sm:size-12 [@media(max-height:820px)]:sm:text-2xl"
                 />
               ))}
             </p>
-            <NeoButton
-              variant="small"
-              tone="navy"
-              data-testid="home-share-code"
-              aria-haspopup="dialog"
-              onClick={() => setShareOpen(true)}
-            >
-              <Share2 className="size-5" aria-hidden="true" />
-              {t('eduShell.home.shareCode')}
-            </NeoButton>
           </div>
         ) : null}
 
@@ -172,16 +168,8 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
               {t('eduShell.home.startLive')}
             </Link>
           )}
-          {resultsHref || rehearse || replay?.kind === 'ready' ? (
-            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 sm:justify-start @3xl/hero:justify-center">
-              {resultsHref ? (
-                <NeoButton asChild variant="small" tone="navy">
-                  <Link href={resultsHref} data-testid="home-see-results">
-                    <BarChart3 className="size-4" strokeWidth={2.5} aria-hidden="true" />
-                    {t('eduShell.home.seeResults')}
-                  </Link>
-                </NeoButton>
-              ) : null}
+          {rehearse || replay?.kind === 'ready' ? (
+            <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0 sm:justify-start @3xl/hero:justify-center">
               {replay?.kind === 'ready' ? (
                 <Link href={teacherHostHref(language, { classroomId: selected?.id })} data-testid="home-pick-game" className={cn(QUIET_LINK, 'text-white/90 hover:text-white')}>
                   {t('eduShell.home.loop.pickGame')}
@@ -192,8 +180,6 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           ) : null}
         </div>
 
-        {codeSlot || !insight ? null : <div className="max-sm:hidden @3xl/hero:col-span-2 [@media(max-height:780px)]:hidden">{insight}</div>}
-        {nudge ? <div className="min-w-0 @3xl/hero:col-span-2">{nudge}</div> : null}
       </div>
 
       {selected && code ? (

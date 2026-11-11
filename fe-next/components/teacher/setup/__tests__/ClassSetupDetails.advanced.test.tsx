@@ -73,11 +73,28 @@ describe('ClassSetupDetails advanced options', () => {
 });
 
 describe('ClassSetupDetails explains the two ways out', () => {
-  it('Then "Create and play" says what it opens, and the word list sticker says it is the word list', () => {
+  it('Then the three steps sit in one thin numbered strip with naming the class current, and the word list sticker says it is the word list', () => {
     renderDetails();
-    expect(screen.getByTestId('setup-start-live')).toHaveAttribute('aria-describedby', 'setup-start-live-hint');
-    expect(screen.getByTestId('setup-start-live-hint')).toHaveTextContent('eduShell.setup.words.createHint');
+    const steps = screen.getAllByTestId('setup-step');
+    expect(steps.map((s) => s.textContent)).toEqual(['1eduShell.setup.strip.name', '2eduShell.setup.strip.share', '3eduShell.home.startLive']);
+    expect(steps[0]).toHaveAttribute('aria-current', 'step');
     expect(screen.getByTestId('setup-advanced-summary').textContent).toContain('eduShell.setup.packSticker');
+  });
+
+  it('Given a name typed, Then the join-code card shows that name over placeholder tiles, never a code a teacher could copy', () => {
+    renderDetails({ name: '5B English' });
+    const card = screen.getByTestId('setup-code-preview');
+    expect(card).toHaveTextContent('5B English');
+    expect(card.textContent).not.toMatch(/[A-Z0-9]{6}/);
+    expect(screen.getAllByTestId('setup-code-placeholder')).toHaveLength(6);
+  });
+
+  it('Given no name yet, Then the card shows the suggested name, and no mascot bubble or fine print sits around the one create button', () => {
+    renderDetails();
+    expect(screen.getByTestId('setup-code-preview')).toHaveTextContent('eduShell.setup.namePlaceholder');
+    expect(screen.queryByText('eduShell.setup.bubble')).toBeNull();
+    expect(screen.queryByTestId('setup-start-live-hint')).toBeNull();
+    expect(document.querySelectorAll('[data-hero="true"]')).toHaveLength(1);
   });
 
   it('Then the main button says it creates the class, with no play icon, since the game starts on the next screen', () => {
@@ -94,7 +111,7 @@ describe('ClassSetupDetails explains the two ways out', () => {
 });
 
 describe('ClassSetupDetails own words field', () => {
-  const own = (count: number, dropped = 0) => ({ text: 'x', onTextChange: vi.fn(), count, dropped, min: 4 });
+  const own = (count: number, dropped = 0, droppedWords: string[] = []) => ({ text: 'x', onTextChange: vi.fn(), count, dropped, droppedWords, min: 4 });
 
   it('Given the screen, Then one optional words box shows in the first panel, and the starter list is announced', () => {
     renderDetails({ ownWords: own(0) });
@@ -117,8 +134,11 @@ describe('ClassSetupDetails own words field', () => {
     expect(screen.getByTestId('setup-starter-list-hint')).toBeInTheDocument();
   });
 
-  it('Given words that cannot be played, Then it says how many were left out', () => {
-    renderDetails({ ownWords: own(4, 3) });
-    expect(screen.getByTestId('setup-own-words-dropped')).toHaveTextContent('eduShell.setup.ownWords.dropped:{"count":3}');
+  it('Given words that cannot be played, Then a yellow chip says how many were left out and names each one', () => {
+    renderDetails({ ownWords: own(4, 3, ['electromagnetism-induction', 'x', '42']) });
+    const chip = screen.getByTestId('setup-own-words-dropped');
+    expect(chip).toHaveTextContent('eduShell.setup.ownWords.dropped:{"count":3}');
+    expect(chip.className).toMatch(/bg-neo-yellow/);
+    expect(screen.getAllByTestId('setup-dropped-word').map((w) => w.textContent)).toEqual(['electromagnetism-induction', 'x', '42']);
   });
 });

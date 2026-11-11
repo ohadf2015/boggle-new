@@ -117,8 +117,8 @@ describe('resetRivalsForNewRound + rivalStartExtras', () => {
     expect(rivalOf(r, 'prac')).toBeNull();
   });
 
-  it('Given 1 human, When the round starts, Then nobody has a rival', () => {
-    const r = room(['ana', 'robo'], { robo: { isBot: true } });
+  it('Given 1 human and no bots, When the round starts, Then nobody has a rival', () => {
+    const r = room(['teach', 'ana'], { teach: { isHost: true } });
     expect(start(r)).toEqual([]);
     expect(rivalOf(r, 'ana')).toBeNull();
   });
@@ -374,5 +374,69 @@ describe('round start before scores exist', () => {
     const events = resetRivalsForNewRound(room, { enabled: true, leaderboardHidden: false, mode: 'classic', seed: 's', abilities: {}, teams: [] });
     expect(events).toHaveLength(2);
     expect(events[0]).toMatchObject({ payload: { rival: { myScore: 0, rivalScore: 0 } } });
+  });
+});
+
+describe('teacher previewing with bots', () => {
+  const bots = { robo: { isBot: true }, zap: { isBot: true } };
+
+  it('Given 1 real student and bots, When the round starts, Then the student gets a bot rival', () => {
+    const r = room(['teach', 'ana', 'robo'], { teach: { isHost: true }, robo: { isBot: true } });
+    start(r);
+    expect(rivalOf(r, 'ana')).toBe('robo');
+    expect(rivalOf(r, 'robo')).toBe('ana');
+    expect(rivalOf(r, 'teach')).toBeNull();
+  });
+
+  it('Given only bots and the watching teacher, When the round starts, Then the bots are paired so the projector has a duel', () => {
+    const r = room(['teach', 'robo', 'zap'], { teach: { isHost: true }, ...bots });
+    start(r);
+    expect(rivalOf(r, 'robo')).toBe('zap');
+    r.playerScores.zap = 4;
+    score(r, 'zap', 4);
+    expect(flips(score(r, 'robo', 9, 20_000))).toEqual([expect.objectContaining({ payload: expect.objectContaining({ winnerName: 'robo' }) })]);
+  });
+
+  it('Given the teacher practice seat and bots, When the round starts, Then the practice seat gets a bot rival', () => {
+    const r = room(['teach', 'prac', 'robo'], { teach: { isHost: true }, prac: { isPractice: true }, robo: { isBot: true } });
+    start(r);
+    expect(rivalOf(r, 'prac')).toBe('robo');
+  });
+
+  it('Given 2 real students and bots, When the round starts, Then bots are never paired', () => {
+    const r = room(['ana', 'bo', 'robo', 'zap'], bots);
+    start(r);
+    expect(rivalOf(r, 'ana')).toBe('bo');
+    expect(rivalOf(r, 'robo')).toBeNull();
+    expect(rivalOf(r, 'zap')).toBeNull();
+  });
+
+  it('Given 2 real students and bots, When a bot is seated mid-round, Then it gets no rival', () => {
+    const r = room(['ana', 'bo', 'robo'], { robo: { isBot: true } });
+    start(r);
+    expect(seatRivalPlayer(r, 'robo')).toEqual([]);
+    expect(rivalOf(r, 'robo')).toBeNull();
+  });
+
+  it('Given a bots-only preview, When a student joins mid-round, Then the student is placed among the bots', () => {
+    const r = room(['teach', 'robo', 'zap'], { teach: { isHost: true }, ...bots });
+    start(r);
+    r.users.ana = { avatar: { emoji: 'a' } };
+    r.playerScores.ana = 0;
+    seatRivalPlayer(r, 'ana');
+    expect(['robo', 'zap']).toContain(rivalOf(r, 'ana'));
+  });
+
+  it('Given a bots-only preview round, When the next round starts with 2 real students, Then bots drop out of the pairs', () => {
+    const r = room(['teach', 'robo', 'zap'], { teach: { isHost: true }, ...bots });
+    start(r);
+    r.users.ana = { avatar: { emoji: 'a' } };
+    r.users.bo = { avatar: { emoji: 'b' } };
+    r.playerScores.ana = 0;
+    r.playerScores.bo = 0;
+    start(r);
+    expect(rivalOf(r, 'ana')).toBe('bo');
+    expect(rivalOf(r, 'robo')).toBeNull();
+    expect(seatRivalPlayer(r, 'zap')).toEqual([]);
   });
 });

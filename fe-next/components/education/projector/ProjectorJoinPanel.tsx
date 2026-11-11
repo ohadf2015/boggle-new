@@ -12,6 +12,8 @@ import { CREAM_STICKER } from './projectorNbStyles';
 
 interface ProjectorJoinPanelProps {
   gameCode: string;
+  /** The class's own code: it also walks a student into the live game, so it is the one to type. The QR keeps the room code. */
+  classCode?: string | null;
   /** Locale segment of the join route: only `/[locale]/join/[code]` resolves. */
   language: string;
   baseUrl: string;
@@ -23,10 +25,11 @@ interface ProjectorJoinPanelProps {
 }
 
 /** The only code and QR on the wall, on the room's one yellow block so every eye finds the way in. Code and address are ASCII, so they stay LTR inside an RTL page. */
-export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function ProjectorJoinPanel({ gameCode, language, baseUrl, t, waiting = false, compact = false }) {
+export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function ProjectorJoinPanel({ gameCode, classCode, language, baseUrl, t, waiting = false, compact = false }) {
   const joinUrl = `${baseUrl}/${language}/join/${gameCode}`;
   const address = `${tvJoinAddress(baseUrl, language, '')}/join`;
-  const chars = codeCharacters(gameCode);
+  const chars = codeCharacters(classCode || gameCode);
+  const codeLabel = t(classCode ? 'education.projectorLobby.gameCode' : 'tvBroadcast.gameCode');
   const dropOrder = useShuffledOrder(chars.length);
   const [copied, setCopied] = useState(false);
 
@@ -68,13 +71,13 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
       <div className={cn('flex max-w-full flex-col items-center gap-[clamp(0.5rem,1.6cqh,1.75rem)]', compact && '@5xl:flex-row @5xl:gap-[clamp(1rem,2cqw,3rem)]')}>
       <div className="flex max-w-full flex-col items-center gap-[clamp(0.5rem,1.4cqh,1.25rem)]">
       <span data-testid="projector-code-sticker" aria-hidden="true" className={cn(CREAM_STICKER, 'text-[clamp(1rem,min(1.6cqw,3cqh),2.5rem)]')}>
-        {t('education.projectorLobby.gameCode')}
+        {codeLabel}
       </span>
       <div
         data-testid="projector-code"
         dir="ltr"
         role="status"
-        aria-label={`${t('education.projectorLobby.gameCode')}: ${chars.join(' ')}`}
+        aria-label={`${codeLabel}: ${chars.join(' ')}`}
         className={cn('flex max-w-full items-center gap-[0.06em] font-neo-display font-black leading-none tabular-nums [unicode-bidi:isolate]', compact ? HERO_CODE_TEXT_COMPACT : HERO_CODE_TEXT)}
       >
         {chars.map((char, index) => (

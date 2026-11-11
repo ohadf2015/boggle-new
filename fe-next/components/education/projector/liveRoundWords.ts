@@ -6,14 +6,26 @@ export interface LiveWordItem {
   word: string;
 }
 
+export interface LiveFeedEntry {
+  id: number;
+  username: string;
+  word: string;
+  lesson: boolean;
+}
+
+export const LIVE_FEED_MAX = 10;
+
 export interface LiveRoundWords {
   best: { word: string; username: string } | null;
   /** Lesson words found so far this round, as lowercased lesson keys, first-found order. */
   lessonFound: string[];
+  /** Newest first. */
+  recent: LiveFeedEntry[];
+  seq: number;
 }
 
 export function emptyLiveRoundWords(): LiveRoundWords {
-  return { best: null, lessonFound: [] };
+  return { best: null, lessonFound: [], recent: [], seq: 0 };
 }
 
 const liveKey = (word: string, language: Language) => lessonWordKey(word, language).toLowerCase();
@@ -33,14 +45,20 @@ export function foldLiveWords(
 ): LiveRoundWords {
   let best = state.best;
   let lessonFound = state.lessonFound;
+  let seq = state.seq;
+  const added: LiveFeedEntry[] = [];
   for (const item of items) {
     if (!item?.word || (hostUsername && item.username === hostUsername)) continue;
     const word = item.word.toLowerCase();
     if (!best || word.length > best.word.length) best = { word, username: item.username };
     const key = liveKey(item.word, language);
-    if (lessonWords.has(key) && !lessonFound.includes(key)) lessonFound = [...lessonFound, key];
+    const lesson = lessonWords.has(key);
+    if (lesson && !lessonFound.includes(key)) lessonFound = [...lessonFound, key];
+    seq += 1;
+    added.unshift({ id: seq, username: item.username, word, lesson });
   }
-  return best === state.best && lessonFound === state.lessonFound ? state : { best, lessonFound };
+  if (!added.length) return state;
+  return { best, lessonFound, seq, recent: [...added, ...state.recent].slice(0, LIVE_FEED_MAX) };
 }
 
 /** First letter plus blank tiles: shows the length without handing the class the word. */

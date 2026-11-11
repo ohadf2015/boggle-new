@@ -250,4 +250,13 @@ describe('<HomeClassRoster>', () => {
     expect(screen.getByTestId('home-roster-error')).toHaveTextContent('eduShell.home.roster.error');
     expect(screen.queryByTestId('home-roster-empty')).not.toBeInTheDocument();
   });
+
+  it('Given a status filter, Then only those rows list while the summary still counts the whole class', () => {
+    const onClearFilter = vi.fn();
+    render(<HomeClassRoster rows={ROWS} failed={false} language="en" nowMs={NOW} t={t} filter="late" onClearFilter={onClearFilter} />);
+    expect(screen.getAllByTestId('home-roster-row')).toHaveLength(1);
+    expect(screen.getByTestId('home-roster-summary')).toHaveTextContent('eduShell.home.roster.count.done:{"count":1}');
+    fireEvent.click(screen.getByTestId('home-roster-show-all'));
+    expect(onClearFilter).toHaveBeenCalledTimes(1);
+  });
 });

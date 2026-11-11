@@ -30,6 +30,7 @@ export const NEEDS_HELP_ACCURACY = 0.6;
 const THRIVING_ACCURACY = 0.8;
 const THRIVING_DAYS = 3;
 const WINDOW_DAYS = 7;
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 const ORDER: Record<StudentStatus, number> = { needsHelp: 0, inactive: 1, notStarted: 2, steady: 3, thriving: 4 };
 
@@ -37,6 +38,17 @@ function daysBefore(today: string, n: number): string {
   const d = new Date(`${today}T00:00:00Z`);
   d.setUTCDate(d.getUTCDate() - n);
   return d.toISOString().split('T')[0];
+}
+
+/** A score-0 classroom game never sets last_practice_date (no XP), but each word attempt is stamped. */
+export function lastActivityDay(r: Pick<PulseRow, 'last_practice_date' | 'words_attempted'>): string | null {
+  let last = r.last_practice_date;
+  for (const w of Object.values(r.words_attempted ?? {})) {
+    const stamp = (w as { lastAttemptAt?: unknown } | null)?.lastAttemptAt;
+    const day = typeof stamp === 'string' ? stamp.slice(0, 10) : null;
+    if (day && DAY_RE.test(day) && (!last || day > last)) last = day;
+  }
+  return last;
 }
 
 /** Rows of ALL time per student: recency needs the full history, accuracy only the week. */
@@ -49,7 +61,7 @@ export function buildStudentPulses(rows: PulseRow[], studentIds: string[], today
     else byStudent.set(r.student_id, [r]);
   }
 
-  const pulses = studentIds.map((id): StudentPulse => {
+  const tallies = studentIds.map((id) => {
     const mine = byStudent.get(id) ?? [];
     let xp = 0;
     let correct = 0;
@@ -58,7 +70,7 @@ export function buildStudentPulses(rows: PulseRow[], studentIds: string[], today
     const days = new Set<string>();
     for (const r of mine) {
       xp += r.total_xp || 0;
-      const d = r.last_practice_date;
+      const d = lastActivityDay(r);
       if (d && (!lastPractice || d > lastPractice)) lastPractice = d;
       if (!d || d < since) continue;
       days.add(d);
@@ -68,13 +80,22 @@ export function buildStudentPulses(rows: PulseRow[], studentIds: string[], today
         attempts += w.attempts || 0;
       }
     }
+    return { id, xp, correct, attempts, lastPractice, activeDays: days.size };
+  });
+
+  const classCorrect = tallies.reduce((n, s) => n + s.correct, 0);
+  const classAttempts = tallies.reduce((n, s) => n + s.attempts, 0);
+
+  const pulses = tallies.map(({ id, xp, correct, attempts, lastPractice, activeDays }): StudentPulse => {
     const accuracy = attempts > 0 ? correct / attempts : null;
-    const activeDays = days.size;
+    const othersAttempts = classAttempts - attempts;
+    const othersRate = othersAttempts > 0 ? (classCorrect - correct) / othersAttempts : null;
+    const helpBar = othersRate !== null && othersRate < NEEDS_HELP_ACCURACY ? othersRate / 2 : NEEDS_HELP_ACCURACY;
 
     let status: StudentStatus;
     if (!lastPractice) status = 'notStarted';
     else if (lastPractice < since) status = 'inactive';
-    else if (accuracy !== null && accuracy < NEEDS_HELP_ACCURACY) status = 'needsHelp';
+    else if (accuracy !== null && (accuracy === 0 || accuracy < helpBar)) status = 'needsHelp';
     else if (accuracy !== null && accuracy >= THRIVING_ACCURACY && activeDays >= THRIVING_DAYS) status = 'thriving';
     else status = 'steady';
 
@@ -89,7 +110,8 @@ export function buildDailyActive(rows: PulseRow[], today: string): DailyActive[]
   const slots = Array.from({ length: WINDOW_DAYS }, (_, i) => daysBefore(today, WINDOW_DAYS - 1 - i));
   const seen = new Map<string, Set<string>>(slots.map((d) => [d, new Set<string>()]));
   for (const r of rows) {
-    if (r.last_practice_date) seen.get(r.last_practice_date)?.add(r.student_id);
+    const d = lastActivityDay(r);
+    if (d) seen.get(d)?.add(r.student_id);
   }
   return slots.map((day) => ({ day, count: seen.get(day)?.size ?? 0 }));
 }

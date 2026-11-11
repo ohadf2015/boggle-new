@@ -22,7 +22,7 @@ import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
 import { StudentCapMeter } from './StudentCapMeter';
 import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
-import { HomeClassRoster } from './home/HomeClassRoster';
+import { HomeDeskBoard } from './home/HomeDeskBoard';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeClassInsightCard } from './home/HomeClassInsightCard';
@@ -34,7 +34,6 @@ import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
 import { HomeWeekClasses } from './home/HomeWeekClasses';
-import { HomeWeekLoop } from './home/HomeWeekLoop';
 import { useHomeWeekLoop } from './home/useHomeWeekLoop';
 import { weekClassRows } from './home/weekClassRows';
 import { useClassrooms } from '@/hooks/useClassroom';
@@ -199,8 +198,8 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
   const rosterShown = hasPro && selectedClassroom !== null && (selectedClassroom.member_count ?? 0) > 0;
   const roster = useHomeRoster(rosterShown && selectedClassroom ? selectedClassroom.id : '', nowMs);
-  const openAssign = () => {
-    setAssignLessonId(undefined);
+  const openAssign = (listId?: string | null) => {
+    setAssignLessonId(listId ?? undefined);
     setShowAssignmentCreator(true);
   };
   const overFreeTierCaps = isDigestOverFreeTierCaps({
@@ -236,7 +235,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     trackFirstRoundGuideClicked({ surface: 'home', locale: language, step });
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpen, setReportsOpen] = useState(false);
-  const hasRail = !ready || proCard !== null || showWeek || Boolean(selectedClassroom);
+  const hasRail = !ready || proCard !== null || (showWeek && classrooms.length > 1);
   const showSessions = ready && !classroomsError && hasClasses && Boolean(effectiveId);
   const rawClassLanguage = selectedClassroom?.language;
   const classLanguage = isPackLanguage(rawClassLanguage) ? rawClassLanguage : isPackLanguage(language) ? language : 'en';
@@ -313,7 +312,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               language={language}
               t={t}
               rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} />}
-              resultsHref={resultsHref}
               corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={null} t={t} />}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
               meta={selectedClassroom ? (
@@ -330,31 +328,25 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               ) : null}
               showCode={!shareCardShown}
               replay={loop.replay}
-              nudge={loop.ready || loop.missed.length > 0 ? (
-                <HomeWeekLoop
-                  ready={loop.ready}
-                  missed={loop.missed}
-                  reportsHref={resultsHref}
-                  onHomework={() => {
-                    setAssignLessonId(loop.listId);
-                    setShowAssignmentCreator(true);
-                  }}
-                  t={t}
-                />
-              ) : undefined}
               codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
             />
           </div>
-          {classrooms.length > 0 ? (
-            <div data-testid="dashboard-student-cap-meters" data-tm className="flex flex-col gap-2">
-              {classrooms.map((c) => (
-                <StudentCapMeter
-                  key={c.id}
-                  classroomName={classrooms.length > 1 ? c.name : undefined}
-                  studentCount={c.member_count ?? 0}
-                  source="dashboard"
-                />
-              ))}
+          {selectedClassroom ? (
+            <div data-tm>
+              <HomeDeskBoard
+                key={selectedClassroom.id}
+                roster={rosterShown ? roster : null}
+                memberCount={selectedClassroom.member_count ?? 0}
+                onOpenResults={() => setReportsOpen(true)}
+                readyLabel={loop.ready?.kind === 'counts' ? t('eduShell.home.loop.ready', { ready: loop.ready.ready, total: loop.ready.rated }) : null}
+                readyEmpty={loop.ready?.kind === 'noResults' ? t('eduShell.home.loop.readyEmpty') : null}
+                missed={loop.missed.length > 0 ? { count: loop.missed.length, onHomework: () => openAssign(loop.listId) } : null}
+                onAssign={() => openAssign(loop.listId)}
+                onAssignAll={() => openAssign(loop.listId)}
+                language={language}
+                nowMs={nowMs}
+                t={t}
+              />
             </div>
           ) : null}
           {selectedClassroom ? (
@@ -366,15 +358,10 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 lessons={lessons.lessons}
                 preferredLessonId={loop.listId ?? null}
                 resultsHref={resultsHref}
-                onPickList={openAssign}
+                onPickList={() => openAssign()}
                 language={language}
                 t={t}
               />
-            </div>
-          ) : null}
-          {rosterShown && selectedClassroom ? (
-            <div data-tm>
-              <HomeClassRoster key={selectedClassroom.id} rows={roster.rows} failed={roster.failed} language={language} nowMs={nowMs} t={t} onAssign={openAssign} onAssignAll={openAssign} />
             </div>
           ) : null}
         </>
@@ -383,6 +370,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
         <HomeSessionRail
           key={effectiveId}
           className={hasRail ? SESSIONS_BESIDE_RAIL : undefined}
+          compact={!rosterShown}
           classroomId={effectiveId}
           languages={railLanguages(classLanguage, lessonProfile.languages)}
           gradeBand={lessonProfile.gradeBand}
@@ -403,8 +391,13 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
           <HomeWeekClasses {...weekClassRows(classrooms, week.summary.lastPlayedAt, nowMs, WEEK_ROWS, effectiveId)} selectedId={effectiveId} onSelect={setSelectedId} moreHref={`/${language}/teacher/classroom`} language={language} nowMs={nowMs} t={t} />
         ) : null,
       } : null}
-      onOpenReports={selectedClassroom ? () => setReportsOpen(true) : null}
       proCard={proCard}
+      fillHeight={rosterShown}
+      footer={selectedClassroom ? (
+        <div data-testid="dashboard-student-cap-meters">
+          <StudentCapMeter key={selectedClassroom.id} classroomName={classrooms.length > 1 ? selectedClassroom.name : undefined} studentCount={selectedClassroom.member_count ?? 0} source="dashboard" />
+        </div>
+      ) : null}
     >
       {selectedClassroom ? (
         <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>

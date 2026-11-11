@@ -50,7 +50,7 @@ describe('ProjectorLobby: neo-brutalist wall', () => {
   it('the join code leads with a cream sticker naming it', () => {
     render(<ProjectorLobby {...props} />);
     const sticker = screen.getByTestId('projector-code-sticker');
-    expect(sticker).toHaveTextContent('education.projectorLobby.gameCode');
+    expect(sticker).toHaveTextContent('tvBroadcast.gameCode');
     expect(tokens(sticker)).toEqual(expect.arrayContaining(['bg-neo-cream', 'border-neo-black']));
   });
 

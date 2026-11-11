@@ -17,6 +17,8 @@ import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { trackEduJoinCodeCopied, trackEduJoinCodeShared } from '@/lib/education/telemetry';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { isEligibleForTeacherProUpgradeCta } from '@/lib/education/trial';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
+import { freeInsightClassId } from '@/lib/education/pro/freeClassInsight';
 import { type Language, type LeaderboardVisibility } from '@/lib/supabase/education/types';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -59,7 +61,10 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const { t, language } = useLanguage();
   const { classrooms, isLoading, updateClassroom, deleteClassroom } = useClassrooms();
   const { trial, isLoading: accessLoading } = useTeacherAccess();
-  const { hasPro, loading: proLoading } = useTeacherPro();
+  const pro = useTeacherPro();
+  const { hasPro, loading: proLoading } = pro;
+  const [nowMs] = useState(() => Date.now());
+  const insightClassId = !proLoading && pro.known && !hasProAccess(pro, nowMs) ? freeInsightClassId(classrooms) : null;
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -223,6 +228,8 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} />}
                   assignHref={teacherAssignHref(language, classroom.id)}
                   reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+                  classHref={`/${language}/teacher/classroom/${classroom.id}`}
+                  insightHref={insightClassId === classroom.id ? `/${language}/teacher/classroom/${classroom.id}/analytics` : undefined}
                   onOpenProjector={
                     classroom.join_code
                       ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })

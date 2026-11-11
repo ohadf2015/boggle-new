@@ -11,14 +11,15 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './TeacherHomeView';
 import { HomeHero } from './HomeHero';
 import { HomeClassMeta, HomeNewClass } from './HomeClassList';
-import { HomeClassRoster } from './HomeClassRoster';
+import { HomeDeskBoard } from './HomeDeskBoard';
+import { StudentCapMeter } from '../StudentCapMeter';
 import { rosterRows } from './rosterModel';
 import { rosterFixture } from './rosterFixture';
 import { HomeOnboardingCard } from './HomeOnboardingCard';
+import { HomeHowItWorks } from './HomeHowItWorks';
 import { HomeSessionRail } from './HomeSessionRail';
 import { HomeWeekClasses } from './HomeWeekClasses';
 import { weekClassRows } from './weekClassRows';
-import { HomeWeekLoop } from './HomeWeekLoop';
 import { weekLoopFixture } from './weekLoopFixture';
 import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
 import { previewBanner } from './TeacherProBannersPreview';
@@ -47,7 +48,7 @@ function activity(nowMs: number): TeacherActivityRow[] {
 }
 
 /** Dev-only: the real Home grid on fixture data, so the signed-in screen can be captured without an account. */
-export function TeacherHomePreview({ state, banner, insight = false }: { state: TeacherHomePreviewState; banner?: string; insight?: boolean }) {
+export function TeacherHomePreview({ state, banner, insight = false, pro = !insight }: { state: TeacherHomePreviewState; banner?: string; insight?: boolean; pro?: boolean }) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const [nowMs] = useState(() => Date.now());
@@ -63,6 +64,8 @@ export function TeacherHomePreview({ state, banner, insight = false }: { state: 
   const rosterInput = selected ? rosterFixture(selected.id, selected.member_count, nowMs) : null;
   const roster = rosterInput ? rosterRows(rosterInput, nowMs) : null;
   const loop = selected && rosterInput ? weekLoopFixture(selected.id, rosterInput, language, nowMs) : null;
+  const readyCount = loop ? readyForTest(loop.game) : null;
+  const missed = loop ? missedLastGame(loop.game) : [];
   const replay = loop && selected ? playAgainTarget({ game: loop.game, lessons: loop.lessons, classroomId: selected.id, locale: language }) : null;
 
   const lastPlayedIso = selected ? summary.lastPlayedAt[selected.id] : undefined;
@@ -85,7 +88,7 @@ export function TeacherHomePreview({ state, banner, insight = false }: { state: 
       error={false}
       onRetry={() => undefined}
       hasClasses={hasClasses}
-      onboarding={<HomeOnboardingCard onboarding={onboarding} hrefs={hrefs} variant="full" t={t} />}
+      onboarding={<div className="flex min-w-0 flex-col gap-4"><HomeOnboardingCard onboarding={onboarding} hrefs={hrefs} variant="full" t={t} /><HomeHowItWorks t={t} /></div>}
       desk={selected ? (
         <>
         <div data-tm>
@@ -102,13 +105,22 @@ export function TeacherHomePreview({ state, banner, insight = false }: { state: 
             }
             showCode
             replay={replay ? { kind: 'ready', href: replay.href, detail: replayDetail(replay, t) } : undefined}
-            nudge={loop ? (
-              <HomeWeekLoop ready={readyForTest(loop.game)} missed={missedLastGame(loop.game)} reportsHref={`/${language}/teacher/reports`} onHomework={() => undefined} t={t} />
-            ) : undefined}
           />
         </div>
         <div data-tm>
-          <HomeClassRoster key={selected.id} rows={roster} failed={false} language={language} nowMs={nowMs} t={t} onAssign={() => undefined} onAssignAll={() => undefined} />
+          <HomeDeskBoard
+            key={selected.id}
+            roster={pro ? { rows: roster, failed: false } : null}
+            memberCount={selected.member_count}
+            onOpenResults={() => undefined}
+            readyLabel={readyCount?.kind === 'counts' ? t('eduShell.home.loop.ready', { ready: readyCount.ready, total: readyCount.rated }) : null}
+            missed={missed.length > 0 ? { count: missed.length, onHomework: () => undefined } : null}
+            onAssign={() => undefined}
+            onAssignAll={() => undefined}
+            language={language}
+            nowMs={nowMs}
+            t={t}
+          />
         </div>
         </>
       ) : null}
@@ -116,6 +128,7 @@ export function TeacherHomePreview({ state, banner, insight = false }: { state: 
         <HomeSessionRail
           key={selected.id}
           className={SESSIONS_BESIDE_RAIL}
+          compact={!pro}
           classroomId={selected.id}
           languages={[railLanguage]}
           gradeBand={null}
@@ -137,7 +150,12 @@ export function TeacherHomePreview({ state, banner, insight = false }: { state: 
           <HomeWeekClasses {...weekClassRows(classes, summary.lastPlayedAt, nowMs, WEEK_ROWS, selectedId)} selectedId={selectedId} onSelect={setSelectedId} moreHref={`/${language}/teacher/classroom`} language={language} nowMs={nowMs} t={t} />
         ) : null,
       } : null}
-      onOpenReports={selected ? () => undefined : null}
+      fillHeight={pro}
+      footer={pro || !selected ? null : (
+        <div data-testid="dashboard-student-cap-meters">
+          <StudentCapMeter key={selected.id} classroomName={selected.name} studentCount={selected.member_count} source="dashboard" />
+        </div>
+      )}
       proCard={insight && selected ? <HomeClassInsightCard classroomId={CLASSES[0].id} className={CLASSES[0].name} language={language} t={t} /> : null}
     />
     </PreviewTeacherAuth>

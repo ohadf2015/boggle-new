@@ -23,7 +23,7 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
     <section
       data-testid="academy-today"
       aria-label={t('student.today.title', 'Today')}
-      className="pointer-events-auto flex flex-col gap-1.5 rounded-[14px] border-2 border-neo-cream/40 bg-neo-navy/90 p-1.5 text-neo-white shadow-hard-sm"
+      className="pointer-events-auto flex flex-col gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/90 p-1.5 text-neo-white shadow-hard-sm"
     >
       {warmup && <WarmupCta warmup={warmup} />}
       <ul className="grid grid-cols-3 gap-1">
@@ -35,12 +35,12 @@ export function TodayCard({ items, warmup }: { items: TodayItem[]; warmup: Stude
               data-testid={`academy-today-${item.id}`}
               data-done={item.done ? 'true' : 'false'}
               className={cn(
-                'flex min-w-0 items-center gap-1 rounded-neo border-2 border-neo-black px-1.5 py-1 font-neo-body text-xs font-bold leading-tight',
+                'flex min-w-0 flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-black px-1 py-1 text-center font-neo-body text-xs font-bold leading-tight',
                 item.done ? 'bg-neo-lime text-neo-black' : 'bg-neo-white/10 text-neo-white'
               )}
             >
               <Icon aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={3} />
-              <span className="min-w-0 line-clamp-2 break-words">{label(item)}</span>
+              <span className="min-w-0 hyphens-auto">{label(item)}</span>
             </li>
           );
         })}
@@ -56,7 +56,7 @@ export function WarmupCta({ warmup }: { warmup: StudentWarmup }) {
     <Link
       href={warmup.href}
       data-testid="academy-warmup-cta"
-      className="flex min-h-12 items-center gap-2 rounded-[12px] border-2 border-neo-black bg-neo-lime px-2 py-1.5 text-neo-black shadow-hard-sm transition-transform duration-150 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+      className="flex min-h-12 items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-2 py-1.5 text-neo-black shadow-hard-sm transition-transform duration-150 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
     >
       <Zap aria-hidden="true" className="size-5 shrink-0" strokeWidth={3} />
       <span className="min-w-0 flex-1">

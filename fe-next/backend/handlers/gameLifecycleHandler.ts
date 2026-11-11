@@ -249,12 +249,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       }
 
       const hostAvatar = avatar || generateRandomAvatar();
-      logger.info('HOST_JOIN', `Adding host ${hostUsername || 'Host'} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
+      const hostAuthUserId = isClassroom ? getAuthUserId(socket) : authUserId || null;
+      logger.info('HOST_JOIN', `Adding host ${hostUsername || 'Host'} to game ${gameCode} with authUserId=${hostAuthUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
         avatar: hostAvatar,
         isHost: true,
         playerId: sanitizedPlayerId,
-        authUserId: authUserId || null,
+        authUserId: hostAuthUserId,
         guestTokenHash: guestTokenHash || null,
         guestSessionId: guestSessionId || null
       });

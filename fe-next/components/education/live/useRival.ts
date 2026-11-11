@@ -5,6 +5,16 @@ import type { Socket } from 'socket.io-client';
 import { RIVAL_EVENTS, type RivalUpdatePayload, type RivalView } from '@/shared/types/rivalry';
 
 export const RIVAL_PULSE_MS = 900;
+const SYNC_WINDOW_MS = 5000;
+
+interface SyncEntry {
+  at: number;
+  view: RivalView | null | undefined;
+  session: number | null;
+}
+
+/** Per connection: the round frame remounts the chip several times in its first second; ask the server once. */
+const syncLedger = new Map<string, SyncEntry>();
 
 export type RivalStatus = 'ahead' | 'behind' | 'level';
 
@@ -40,6 +50,12 @@ export function useRival(socket: RivalSocket | null | undefined) {
 
   useEffect(() => {
     if (!socket) return;
+    const connId = (socket as { id?: unknown }).id;
+    const key = typeof connId === 'string' && connId ? connId : null;
+    const remember = (next: RivalView | null) => {
+      const entry = key ? syncLedger.get(key) : undefined;
+      if (entry) Object.assign(entry, { view: next, session: session.current });
+    };
 
     const current = (id: number | null | undefined) => {
       if (typeof id !== 'number') return true;
@@ -50,6 +66,7 @@ export function useRival(socket: RivalSocket | null | undefined) {
 
     const show = (next: RivalView | null, tookLead = false) => {
       setRival(next);
+      remember(next);
       if (!next) {
         lastStatus.current = null;
         return;
@@ -85,7 +102,16 @@ export function useRival(socket: RivalSocket | null | undefined) {
 
     socket.on(RIVAL_EVENTS.update, onUpdate);
     socket.on('startGame', onStart);
-    socket.emit(RIVAL_EVENTS.sync);
+    const entry = key ? syncLedger.get(key) : undefined;
+    if (entry && Date.now() - entry.at < SYNC_WINDOW_MS) {
+      if (entry.view !== undefined) {
+        session.current = entry.session;
+        show(entry.view);
+      }
+    } else {
+      if (key) syncLedger.set(key, { at: Date.now(), view: undefined, session: null });
+      socket.emit(RIVAL_EVENTS.sync);
+    }
     return () => {
       socket.off(RIVAL_EVENTS.update, onUpdate);
       socket.off('startGame', onStart);

@@ -32,6 +32,6 @@ describe('student hub and celebrations read reduced motion from one place', () =
   });
 
   it('the hub decides once with useEduReducedMotion and hands it down', () => {
-    expect(read('components/student/academy/AcademyHub.tsx')).toMatch(/useEduReducedMotion\(\)/);
+    expect(read('components/student/academy/AcademyHubView.tsx')).toMatch(/useEduReducedMotion\(\)/);
   });
 });

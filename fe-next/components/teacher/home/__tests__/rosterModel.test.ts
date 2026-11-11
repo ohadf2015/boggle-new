@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rosterAccuracy, rosterCounts, rosterRows, rosterStatus } from '../rosterModel';
+import { rosterAccuracy, rosterCounts, rosterFilter, rosterRows, rosterStatus } from '../rosterModel';
 
 const NOW = Date.parse('2026-11-04T12:00:00Z');
 const DAY = 86_400_000;
@@ -80,5 +80,17 @@ describe('rosterAccuracy', () => {
   it('Given an out-of-range percent, Then it is clamped to the meter', () => {
     expect(rosterAccuracy(row(140, 3))).toBe(1);
     expect(rosterAccuracy(row(-5, 3))).toBe(0);
+  });
+});
+
+describe('rosterFilter', () => {
+  const rows = rosterRows([student('a', 3, iso(0)), student('b', 2, iso(9)), student('c', 1, null)], NOW);
+
+  it('Given a status, Then only those students stay, in roster order', () => {
+    expect(rosterFilter(rows, 'late').map((r) => r.id)).toEqual(['b']);
+  });
+
+  it('Given no status, Then every student stays', () => {
+    expect(rosterFilter(rows, null)).toHaveLength(3);
   });
 });

@@ -89,7 +89,7 @@ describe('TeacherLibrary', () => {
 
   it('lands a Discover copy in My lists without routing anywhere', async () => {
     const onImportSuccess = vi.fn();
-    render(<TeacherLibrary teacherId="teacher-1" onImportSuccess={onImportSuccess} />);
+    const { rerender } = render(<TeacherLibrary teacherId="teacher-1" onImportSuccess={onImportSuccess} />);
 
     fireEvent.click(screen.getByTestId('library-card'));
     fireEvent.click(await screen.findByTestId('preview-copy'));
@@ -99,6 +99,7 @@ describe('TeacherLibrary', () => {
     expect(onImportSuccess).toHaveBeenCalledWith(expect.objectContaining({ id: 'copy-1' }));
 
     fireEvent.click(copied);
+    rerender(<TeacherLibrary teacherId="teacher-1" onImportSuccess={onImportSuccess} />);
 
     await waitFor(() => expect(screen.getByTestId('my-lists')).toHaveTextContent('Ocean Animals'));
     expect(mockPush).not.toHaveBeenCalled();
@@ -106,4 +107,14 @@ describe('TeacherLibrary', () => {
     expect(mockReplace).toHaveBeenCalledWith(expect.stringContaining('tab=mine'), { scroll: false });
     expect(mockReplace).not.toHaveBeenCalledWith(expect.stringContaining('/lesson/'), expect.anything());
   });
+
+  it('Given the library, Then the teacher\'s own lists come first and Discover sits below them, with no tabs to switch', () => {
+    render(<TeacherLibrary teacherId="teacher-1" />);
+    const mine = screen.getByTestId('my-lists');
+    const discover = screen.getByTestId('library-card');
+    expect(mine.compareDocumentPosition(discover) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryAllByRole('tab')).toHaveLength(0);
+    expect(screen.getByRole('heading', { level: 2, name: 'eduLibrary.tabs.discover' })).toBeInTheDocument();
+  });
 });
+

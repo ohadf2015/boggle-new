@@ -51,3 +51,19 @@ describe('TvNotificationQueue — floating overlay above the teacher strip', () 
     expect((container.firstElementChild as HTMLElement).className).not.toContain('bottom-8');
   });
 });
+
+describe('TvNotificationQueue — classroom header pill keeps long names whole', () => {
+  const longName = { ...monsterWord, id: 'n2', player: 'Maximiliana-Josefina', headline: 'pulls away from the pack' } as TvNotificationData;
+
+  it('Given the inline placement and a 20-character name, Then neither the name nor the headline is cut with an ellipsis', () => {
+    const { container } = render(<TvNotificationQueue notifications={[longName]} onDismiss={() => {}} placement="inline" />);
+    expect(container.querySelector('.truncate')).toBeNull();
+    expect(screen.getByText('Maximiliana-Josefina').tagName).toBe('BDI');
+  });
+
+  it('Given the arcade overlay toast layout, Then its compact single-line pill is unchanged', () => {
+    const snipe = { ...longName, id: 'n3', type: 'word_snipe', layout: 'toast' } as TvNotificationData;
+    const { container } = render(<TvNotificationQueue notifications={[snipe]} onDismiss={() => {}} />);
+    expect(container.querySelectorAll('.truncate').length).toBe(2);
+  });
+});

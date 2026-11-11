@@ -13,6 +13,7 @@ import type { FreeClassInsight } from '@/lib/education/pro/freeClassInsight';
 import { FREE_PREVIEW_WORDS } from '@/lib/education/wordMasteryReport';
 import { FreeGameHeadlineCard } from '@/components/teacher/rounds/FreeGameHeadlineCard';
 import { ProInsightLink } from '@/components/teacher/pro/ProInsightLink';
+import { ProFeaturePreview } from '@/components/teacher/pro/ProFeaturePreview';
 import { STATUS_VIEW } from '../overview/overviewModel';
 import { PANEL, PANEL_TITLE } from '../overview/overviewParts';
 import { useFreeClassInsight, type FreeClassInsightState } from './useFreeClassInsight';
@@ -39,7 +40,7 @@ function weekStatus(entitlementLoading: boolean, free: boolean, state: FreeClass
 }
 
 /** A free teacher's proof for their one free class: this week's who-needs-help and hardest words. Pro sees the full page instead. */
-export function FreeWeekInsight({ classroomId, locale, onStatus }: { classroomId: string; locale: string; onStatus?: (status: FreeWeekStatus) => void }) {
+export function FreeWeekInsight({ classroomId, locale, onStatus, proLine = true }: { classroomId: string; locale: string; onStatus?: (status: FreeWeekStatus) => void; proLine?: boolean }) {
   const { t: rawT } = useLanguage();
   const t = rawT as T;
   const entitlement = useTeacherPro();
@@ -66,26 +67,31 @@ export function FreeWeekInsight({ classroomId, locale, onStatus }: { classroomId
       </div>
     );
   }
-  return <WeekCard classroomId={classroomId} locale={locale} insight={state.insight} t={t} />;
+  return <WeekCard classroomId={classroomId} locale={locale} insight={state.insight} t={t} proLine={proLine} />;
 }
 
-function WeekCard({ classroomId, locale, insight, t }: { classroomId: string; locale: string; insight: FreeClassInsight; t: T }) {
+function WeekCard({ classroomId, locale, insight, t, proLine }: { classroomId: string; locale: string; insight: FreeClassInsight; t: T; proLine: boolean }) {
   const names = useRosterNames(classroomId);
-  return <FreeWeekCard classroomId={classroomId} locale={locale} insight={insight} names={names} t={t} />;
+  return <FreeWeekCard classroomId={classroomId} locale={locale} insight={insight} names={names} t={t} proLine={proLine} />;
 }
 
-export function FreeWeekCard({ classroomId, locale, insight, names, t }: { classroomId: string; locale: string; insight: FreeClassInsight; names: Map<string, string>; t: T }) {
+export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine = true }: { classroomId: string; locale: string; insight: FreeClassInsight; names: Map<string, string>; t: T; proLine?: boolean }) {
   const { needsHelp } = insight.pulse;
 
   if (isEmptyWeek(insight)) {
     return (
-      <section data-testid="free-week-insight" data-state="empty" aria-labelledby="free-week-title" className={PANEL}>
-        <h2 id="free-week-title" className={PANEL_TITLE}>{t('teacher.weekInsight.emptyTitle')}</h2>
-        <p className="mb-3 mt-1 font-neo-body text-sm text-neo-cream/90">{t('teacher.weekInsight.emptyBody')}</p>
-        <Link href={teacherHostHref(locale, { classroomId })} data-testid="free-week-start-game" className={START_BUTTON}>
-          <Play className="size-4" aria-hidden="true" />
-          {t('teacher.weekInsight.startGame')}
-        </Link>
+      <section data-testid="free-week-insight" data-state="empty" aria-labelledby="free-week-title" className={`${PANEL} grid items-center gap-4 md:grid-cols-2`}>
+        <div className="flex min-w-0 flex-col gap-2">
+          <h2 id="free-week-title" className="break-words font-neo-display text-xl font-black leading-tight text-neo-cream sm:text-2xl">{t('teacher.weekInsight.emptyHeadline')}</h2>
+          <p className="font-neo-body text-sm text-neo-cream/90">{t('teacher.weekInsight.emptyBody')}</p>
+          <Link href={teacherHostHref(locale, { classroomId })} data-testid="free-week-start-game" className={`${START_BUTTON} mt-1 max-sm:w-full max-sm:justify-center`}>
+            <Play className="size-4" aria-hidden="true" />
+            {t('teacher.weekInsight.startGame')}
+          </Link>
+        </div>
+        <div data-testid="free-week-sample" aria-hidden="true" className="pointer-events-none min-w-0 select-none">
+          <ProFeaturePreview feature="analytics" calm />
+        </div>
       </section>
     );
   }
@@ -127,14 +133,16 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t }: { class
               {insight.hardestWords.slice(0, FREE_PREVIEW_WORDS).map((w) => (
                 <li key={w.word} data-testid="free-week-hard-word" className="flex items-center justify-between gap-2 rounded-neo border-2 border-neo-cream/40 px-2.5 py-1.5">
                   <bdi className="font-neo-display font-bold text-neo-cream">{w.display}</bdi>
-                  <span className="font-neo-body text-xs text-neo-cream/80">{t('teacher.weekInsight.missed', { pct: w.missRate })}</span>
+                  <span className={`font-neo-body text-xs ${w.missed >= w.attempts ? 'font-bold text-neo-pink' : 'text-neo-cream/80'}`}>
+                    {w.missed >= w.attempts ? t('teacher.classReport.notes.nobodyFound') : t('teacher.weekInsight.missed', { pct: w.missRate })}
+                  </span>
                 </li>
               ))}
             </ul>
           )}
         </div>
       </div>
-      <ProInsightLink placement="analytics_week_insight" language={locale} label={t('teacher.weekInsight.proLine')} proLabel={t('eduShell.nav.pro')} />
+      {proLine ? <ProInsightLink placement="analytics_week_insight" language={locale} label={t('teacher.weekInsight.proLine')} proLabel={t('eduShell.nav.pro')} /> : null}
     </section>
   );
 }

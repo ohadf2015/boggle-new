@@ -188,9 +188,20 @@ describe('TvBroadcastView — the classroom host screen', () => {
   });
   it('Given a classroom round, Then toasts render in the header slot beside the timer, never floating over the leaderboard', () => {
     render(<TvBroadcastView {...props()} />);
-    const slot = headerProps.current?.toastSlot as React.ReactElement<{ placement?: string }> | undefined;
-    expect(slot?.props.placement).toBe('inline');
     expect(screen.queryByTestId('tv-toast-queue')).toBeNull();
+    cleanup();
+    render(<>{headerProps.current?.toastSlot as React.ReactNode}</>);
+    expect(screen.getByTestId('tv-toast-queue')).toHaveAttribute('data-placement', 'inline');
+  });
+
+  it('Given a classroom round, Then the format chip stacks over the toast so a long name gets the whole column', () => {
+    render(<TvBroadcastView {...props()} />);
+    expect(headerProps.current?.trailing).toBeUndefined();
+    cleanup();
+    render(<>{headerProps.current?.toastSlot as React.ReactNode}</>);
+    const stack = screen.getByTestId('tv-classroom-header-end');
+    expect(stack.className).toMatch(/flex-col/);
+    expect(stack).toContainElement(screen.getByTestId('tv-toast-queue'));
   });
 
   it('Given an arcade room, Then toasts keep their floating overlay', () => {

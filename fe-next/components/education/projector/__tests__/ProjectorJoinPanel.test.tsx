@@ -31,6 +31,19 @@ describe('ProjectorJoinPanel — one hero: address, code and QR', () => {
     expect(screen.getByTestId('join-qr')).toHaveAttribute('data-value', 'https://www.lexiclash.live/he/join/ab12cd');
   });
 
+  it('Given the class code is known, Then the wall shows the class code under a class-code label and the QR still opens the live room', () => {
+    render(<ProjectorJoinPanel {...props} classCode="8DAH7M" />);
+    expect(screen.getByTestId('projector-code')).toHaveAttribute('aria-label', 'education.projectorLobby.gameCode: 8 D A H 7 M');
+    expect(screen.getByTestId('projector-code-sticker')).toHaveTextContent('education.projectorLobby.gameCode');
+    expect(screen.getByTestId('join-qr')).toHaveAttribute('data-value', 'https://www.lexiclash.live/he/join/ab12cd');
+  });
+
+  it('Given no class code, Then the room code is labelled as the game code, never as a class code', () => {
+    render(<ProjectorJoinPanel {...props} />);
+    expect(screen.getByTestId('projector-code-sticker')).toHaveTextContent('tvBroadcast.gameCode');
+    expect(screen.getByTestId('projector-code')).toHaveAttribute('aria-label', expect.stringMatching(/^tvBroadcast\.gameCode: /));
+  });
+
   it('Given an RTL page, Then the code and the address stay left-to-right and isolated', () => {
     render(<ProjectorJoinPanel {...props} />);
     for (const id of ['projector-code', 'projector-join-address']) {
@@ -45,7 +58,7 @@ describe('ProjectorJoinPanel — one hero: address, code and QR', () => {
     const code = screen.getByTestId('projector-code');
     expect(screen.getAllByTestId('projector-code-char').map((c) => c.textContent)).toEqual(['A', 'B', '1', '2', 'C', 'D']);
     expect(code).toHaveAttribute('role', 'status');
-    expect(code).toHaveAttribute('aria-label', 'education.projectorLobby.gameCode: A B 1 2 C D');
+    expect(code).toHaveAttribute('aria-label', 'tvBroadcast.gameCode: A B 1 2 C D');
     expect(code.className).toContain('tabular-nums');
   });
 

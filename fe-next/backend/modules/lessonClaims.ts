@@ -34,12 +34,14 @@ export interface StartLessonClaimsInput {
   language: Language;
   gameMode: string;
   playingHumans: number;
+  bots?: number;
   roundId: number;
   teams: ClassroomTeam[] | null | undefined;
 }
 
 export function startLessonClaims(input: StartLessonClaimsInput): LessonClaimsState | null {
-  if (!LESSON_RACE_MODES.has(input.gameMode) || input.playingHumans < LESSON_RACE_MIN_HUMANS) return null;
+  if (!LESSON_RACE_MODES.has(input.gameMode)) return null;
+  if (input.playingHumans < LESSON_RACE_MIN_HUMANS && !input.bots) return null;
   const slots: LessonClaimsState['slots'] = [];
   const seen = new Set<string>();
   for (const word of input.placedWords) {
@@ -62,7 +64,7 @@ export interface ArmLessonClaimsInput {
   placedWords: readonly string[];
   language: Language;
   gameMode: string;
-  users: ReadonlyArray<{ isBot?: boolean; isHost?: boolean }>;
+  users: ReadonlyArray<{ isBot?: boolean; isHost?: boolean; isPractice?: boolean }>;
   hostWatches: boolean;
   extras: Record<string, unknown>;
 }
@@ -75,6 +77,7 @@ export function armLessonClaims(game: { gameSessionId?: number; lessonClaims?: L
     language: input.language,
     gameMode: input.gameMode,
     playingHumans: countPlayingHumans(input.users, input.hostWatches),
+    bots: input.users.filter((u) => u.isBot).length,
     roundId: game.gameSessionId ?? 0,
     teams,
   });
@@ -97,13 +100,14 @@ export interface ClaimInput {
   username: string;
   fromLesson: boolean;
   isBot?: boolean;
+  botsMayClaim?: boolean;
   avatar?: AvatarLike | null;
   roundId: number;
   inProgress: boolean;
 }
 
 export function claimLessonWord(state: LessonClaimsState, input: ClaimInput): LessonWordClaimedEvent | null {
-  if (!input.fromLesson || input.isBot || !input.inProgress || input.roundId !== state.roundId) return null;
+  if (!input.fromLesson || (input.isBot && !input.botsMayClaim) || !input.inProgress || input.roundId !== state.roundId) return null;
   const key = lessonWordKey(input.word, state.language);
   const index = state.slots.findIndex((s) => s.key === key);
   if (index < 0) return null;
@@ -138,7 +142,28 @@ interface RaceGame {
   lessonClaims?: LessonClaimsState | null;
   gameSessionId?: number;
   gameState?: string;
-  users?: Record<string, { avatar?: AvatarLike | null; isBot?: boolean } | undefined>;
+  users?: Record<string, { avatar?: AvatarLike | null; isBot?: boolean; isHost?: boolean; isPractice?: boolean } | undefined>;
+}
+
+function hasRealStudent(game: RaceGame): boolean {
+  return Object.values(game.users ?? {}).some((u) => !!u && !u.isBot && !u.isHost && !u.isPractice);
+}
+
+function claimAndAnnounce(io: Server, gameCode: string, game: RaceGame & { lessonClaims: LessonClaimsState }, input: { word: string; username: string; botsMayClaim: boolean }): number {
+  const user = game.users?.[input.username];
+  const event = claimLessonWord(game.lessonClaims, {
+    word: input.word,
+    username: input.username,
+    fromLesson: true,
+    isBot: !!user?.isBot,
+    botsMayClaim: input.botsMayClaim,
+    avatar: user?.avatar ?? null,
+    roundId: game.gameSessionId ?? 0,
+    inProgress: game.gameState === 'in-progress',
+  });
+  if (!event) return 0;
+  broadcastToRoom(io, getGameRoom(gameCode), LESSON_WORD_CLAIMED_EVENT, event);
+  return event.bonus;
 }
 
 /** Hook-in for the accepted-word path: records the claim, tells the room, returns the bonus to add. */
@@ -149,15 +174,11 @@ export function onLessonWordAccepted(
   input: { word: string; username: string; fromLesson: boolean },
 ): number {
   if (!game.lessonClaims || !input.fromLesson) return 0;
-  const user = game.users?.[input.username];
-  const event = claimLessonWord(game.lessonClaims, {
-    ...input,
-    isBot: !!user?.isBot,
-    avatar: user?.avatar ?? null,
-    roundId: game.gameSessionId ?? 0,
-    inProgress: game.gameState === 'in-progress',
-  });
-  if (!event) return 0;
-  broadcastToRoom(io, getGameRoom(gameCode), LESSON_WORD_CLAIMED_EVENT, event);
-  return event.bonus;
+  return claimAndAnnounce(io, gameCode, game as RaceGame & { lessonClaims: LessonClaimsState }, { ...input, botsMayClaim: false });
+}
+
+/** Bot words skip the word handler. A bot claims only while no real student is seated, so it never takes a student's bonus. */
+export function onBotWordPlayed(io: Server, gameCode: string, game: RaceGame, input: { word: string; username: string }): number {
+  if (!game.lessonClaims || !game.users?.[input.username]?.isBot || hasRealStudent(game)) return 0;
+  return claimAndAnnounce(io, gameCode, game as RaceGame & { lessonClaims: LessonClaimsState }, { ...input, botsMayClaim: true });
 }

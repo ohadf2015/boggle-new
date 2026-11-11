@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord } from '../liveRoundWords';
+import { LIVE_FEED_MAX, emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord } from '../liveRoundWords';
 
 const lesson = new Set(['house', 'water', 'light']);
 
@@ -39,6 +39,33 @@ describe('foldLiveWords — the host panel reads the room without spoiling it', 
     foldLiveWords(start, [{ username: 'Maya', word: 'house' }], lesson);
     expect(start.lessonFound).toEqual([]);
     expect(start.best).toBeNull();
+  });
+});
+
+describe('foldLiveWords — the live feed', () => {
+  it('Given words arrive, Then the feed lists them newest first with their finder and a stable id', () => {
+    let s = foldLiveWords(emptyLiveRoundWords(), [{ username: 'Maya', word: 'cat' }, { username: 'Leo', word: 'house' }], lesson);
+    s = foldLiveWords(s, [{ username: 'Noa', word: 'dog' }], lesson);
+    expect(s.recent.map((r) => r.username)).toEqual(['Noa', 'Leo', 'Maya']);
+    expect(new Set(s.recent.map((r) => r.id)).size).toBe(3);
+  });
+
+  it('Given a lesson word, Then its feed entry is marked as a lesson word', () => {
+    const s = foldLiveWords(emptyLiveRoundWords(), [{ username: 'Leo', word: 'House' }, { username: 'Maya', word: 'cat' }], lesson);
+    expect(s.recent.find((r) => r.username === 'Leo')?.lesson).toBe(true);
+    expect(s.recent.find((r) => r.username === 'Maya')?.lesson).toBe(false);
+  });
+
+  it('Given more words than the feed holds, Then only the newest are kept', () => {
+    const many = Array.from({ length: LIVE_FEED_MAX + 5 }, (_, i) => ({ username: `P${i}`, word: 'cat' }));
+    const s = foldLiveWords(emptyLiveRoundWords(), many, lesson);
+    expect(s.recent).toHaveLength(LIVE_FEED_MAX);
+    expect(s.recent[0].username).toBe(`P${LIVE_FEED_MAX + 4}`);
+  });
+
+  it('Given the host plays, Then the host never shows in the feed', () => {
+    const s = foldLiveWords(emptyLiveRoundWords(), [{ username: 'Ms', word: 'cat' }], lesson, 'Ms');
+    expect(s.recent).toEqual([]);
   });
 });
 

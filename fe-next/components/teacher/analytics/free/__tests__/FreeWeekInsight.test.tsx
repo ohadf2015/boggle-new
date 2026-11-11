@@ -80,6 +80,19 @@ describe('FreeWeekInsight', () => {
     expect(start.getAttribute('href')).toBe('/en/education/classroom-game?classroomId=c1');
     expect(screen.queryByTestId('free-week-hard-word')).toBeNull();
     expect(screen.queryByTestId(/pro-insight-link-/)).toBeNull();
+    expect(screen.getByRole('heading', { name: 'teacher.weekInsight.emptyHeadline' })).toBeInTheDocument();
+    expect(screen.getByTestId('free-week-sample')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('given a word nobody found all week, when rendered, then it says so instead of a percentage', () => {
+    insight.state = {
+      kind: 'free',
+      insight: { pulse: { needsHelp: [], counts, totalStudents: 3 }, hardestWords: [{ ...hard('cup', 100), missed: 4 }, hard('cat', 60)], sessionsThisWeek: 3 },
+    };
+    render(<FreeWeekInsight classroomId="c1" locale="en" />);
+    const [cup, cat] = screen.getAllByTestId('free-week-hard-word');
+    expect(cup).toHaveTextContent('teacher.classReport.notes.nobodyFound');
+    expect(cat).toHaveTextContent('teacher.weekInsight.missed');
   });
 
   it('given the free teacher\'s second class (402), when rendered, then it falls back to the last-game headline, no weekly data', () => {

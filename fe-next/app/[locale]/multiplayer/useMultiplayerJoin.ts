@@ -21,6 +21,8 @@ import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { setRejoinIntent } from '@/utils/socketRejoin';
 import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
+import { clearHostCreateRefusal, setHostCreateRefusal } from './hostCreateRefusal';
+import { waitForSignedInUser } from './classroomHostSignIn';
 import type { Language, Avatar } from '@/shared/types/game';
 
 // Hex color validation pattern (must match backend schema)
@@ -166,6 +168,10 @@ export function useMultiplayerJoin({
       const socket = socketFromProps ?? getSharedSocketIfExists();
 
       const joinStartedAt = Date.now();
+      const isClassroomHost = isHostMode && !!options?.isClassroom;
+      // Every entry path (typed, pasted, ?room=, auto-join) meets the backend's alphanumeric-only GameCodeSchema.
+      const attemptCode = sanitizeGameCode(overrideGameCode || gameCode);
+      if (isClassroomHost) clearHostCreateRefusal();
 
       // One terminal outcome per attempt, emitted from the points where the
       // attempt actually ENDS — the server's ack, the safety timeout, or a dead
@@ -182,6 +188,7 @@ export function useMultiplayerJoin({
         isFirstOutcome = !joinOutcomeEmitted;
         if (joinOutcomeEmitted) return;
         joinOutcomeEmitted = true;
+        if (isClassroomHost && outcome !== 'joined') setHostCreateRefusal({ code: attemptCode, reason: reason || outcome });
         trackGrowthEvent('mp_join_outcome', {
           outcome,
           wait_ms: Date.now() - joinStartedAt,
@@ -258,6 +265,11 @@ export function useMultiplayerJoin({
       }
       if (latestAuthRef.current.loading) {
         logger.info('[AUTH] Auth still loading after timeout, proceeding without profile');
+      }
+      if (isClassroomHost && !(await waitForSignedInUser(() => latestAuthRef.current.user))) {
+        releaseInFlight(); setIsJoining(false);
+        emitJoinOutcome('error', 'AUTH_REQUIRED');
+        return;
       }
 
       // Live auth values — the closure's copies predate the await above.
@@ -384,11 +396,6 @@ export function useMultiplayerJoin({
       socket.on('rateLimited', onRateLimited);
       socket.on('rate-limited', onRoomCreateLimited);
 
-      // Sanitize at the emit chokepoint so EVERY entry path (typed input,
-      // paste, ?room= URL param, auto-join) is covered before it hits the
-      // backend's alphanumeric-only GameCodeSchema. Fixes Sentry
-      // JAVASCRIPT-NEXTJS-1NE ("JPX9SL\" — stray backslash failed the join).
-      const codeToUse = sanitizeGameCode(overrideGameCode || gameCode);
 
       // Build auth context
       let authUserId = null;
@@ -413,7 +420,7 @@ export function useMultiplayerJoin({
         const hostAvatar = buildAvatar(liveProfile, hostFallbackAvatar, avatarImageId, isGuest);
 
         socket.emit('createGame', {
-          gameCode: codeToUse,
+          gameCode: attemptCode,
           roomName: finalRoomName,
           hostUsername: finalHostUsername,
           language: roomLang || language,
@@ -435,7 +442,7 @@ export function useMultiplayerJoin({
         // socket→game map). The host reconnects via the SAME `join` path — the
         // server's reconnection branch rebinds the host by username.
         setRejoinIntent({
-          gameCode: codeToUse,
+          gameCode: attemptCode,
           username: finalHostUsername,
           authUserId,
           guestTokenHash,
@@ -448,14 +455,14 @@ export function useMultiplayerJoin({
         }
       } else {
         logger.log('[JOIN] Emitting join event:', {
-          gameCode: codeToUse,
+          gameCode: attemptCode,
           username: effectiveUsername,
           hasAuth: !!authUserId,
           socketConnected: socket.connected,
         });
 
         socket.emit('join', {
-          gameCode: codeToUse,
+          gameCode: attemptCode,
           username: effectiveUsername,
           authUserId,
           guestTokenHash,
@@ -468,7 +475,7 @@ export function useMultiplayerJoin({
         // restart/deploy that wiped the server's in-memory socket→game map).
         // SocketContext re-emits this exact `join` on reconnect.
         setRejoinIntent({
-          gameCode: codeToUse,
+          gameCode: attemptCode,
           username: effectiveUsername,
           authUserId,
           guestTokenHash,

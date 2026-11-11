@@ -151,6 +151,14 @@ const proState: { hasPro: boolean; loading: boolean; accessTrialExpires: string 
   hasPro: true, loading: false, accessTrialExpires: null, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: async () => {},
 };
 const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
+const freeWeek = vi.hoisted(() => ({ mounted: [] as { classroomId: string; proLine?: boolean }[] }));
+vi.mock('@/components/teacher/analytics/free/FreeWeekInsight', () => ({
+  FreeWeekInsight: (props: { classroomId: string; proLine?: boolean }) => {
+    freeWeek.mounted.push(props);
+    return <section data-testid={`free-week-${props.classroomId}`} />;
+  },
+}));
+
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
@@ -303,7 +311,7 @@ describe('ReportsPageClient', () => {
     ];
     const expectNoReportData = () => {
       for (const id of REPORT_SURFACES) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
-      expect(screen.queryByText('English 101')).not.toBeInTheDocument();
+      expect(screen.queryAllByText('English 101').every((n) => n.closest('[data-testid=reports-free-insights]'))).toBe(true);
       expect(getClassroomStudents).not.toHaveBeenCalled();
       expect(getRecentClassroomGames).not.toHaveBeenCalled();
     };
@@ -324,21 +332,25 @@ describe('ReportsPageClient', () => {
       expectNoReportData();
     });
 
-    it('shows a free teacher a free summary of their games before the Pro lock, not a bare wall', () => {
+    it('shows a free teacher this week for their oldest class first, names the classes free does not cover, and puts the Pro lock after', () => {
       proState.hasPro = false;
+      freeWeek.mounted = [];
       render(<ReportsPageClient />);
-      const summary = screen.getByTestId('reports-free-summary');
-      expect(summary).toHaveTextContent('teacher.reports.freeSummary.games');
-      expect(within(summary).getByTestId('reports-free-games')).toHaveTextContent('7');
-      expect(within(summary).getByTestId('reports-free-students')).toHaveTextContent('24');
-      expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
-      expect(summary.compareDocumentPosition(screen.getByTestId('pro-gate-preview')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      const insights = screen.getByTestId('reports-free-insights');
+      expect(within(insights).getByText('English 101')).toBeInTheDocument();
+      expect(within(insights).getByTestId('free-week-classroom-1')).toBeInTheDocument();
+      expect(freeWeek.mounted.every((p) => p.classroomId === 'classroom-1' && p.proLine === false)).toBe(true);
+      const others = screen.getByTestId('reports-free-other-classes');
+      expect(others).toHaveTextContent('teacher.reports.freeOtherClasses');
+      expect(others).toHaveTextContent('English 102');
+      expect(insights.compareDocumentPosition(screen.getByTestId('pro-gate-lock')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(screen.queryByTestId('reports-free-summary')).toBeNull();
     });
 
-    it('shows a Pro teacher no free summary', () => {
+    it('shows a Pro teacher no free insight', () => {
       proState.hasPro = true;
       render(<ReportsPageClient />);
-      expect(screen.queryByTestId('reports-free-summary')).toBeNull();
+      expect(screen.queryByTestId('reports-free-insights')).toBeNull();
     });
 
     it('offers a never-trialed free teacher the Polar trial as the lock\'s one action', () => {

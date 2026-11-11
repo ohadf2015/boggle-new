@@ -2,13 +2,12 @@
 
 import { memo, useEffect, useMemo, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { BookOpen, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
-import { cn } from '@/lib/utils';
-import type { Language } from '@/shared/types';
+import type { Avatar as PlayerAvatar, Language } from '@/shared/types';
 import { emptyLiveRoundWords, foldLiveWords, lessonWordSet, maskWord, type LiveWordItem } from './liveRoundWords';
-
-const GHOST_TILES = [0, 1, 2, 3];
+import { LiveWordFeed } from './LiveWordFeed';
+import { LessonRing } from './LessonRing';
 
 interface FeedSocket {
   on(event: string, fn: (payload: unknown) => void): void;
@@ -23,23 +22,23 @@ export interface ClassroomLivePanelProps {
   /** The room's board language: lesson keys fold its alternate spellings. */
   language?: Language;
   hostUsername?: string;
+  players?: readonly { username: string; avatar?: PlayerAvatar | null }[];
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
-/**
- * The teacher's read on a live round: how busy the room is, the longest word so
- * far as a masked teaser, and how many lesson words have surfaced.
- */
+/** The teacher's read on a live round: how busy the room is, who is finding words right now, and the lesson words found. */
 export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function ClassroomLivePanel({
   socket,
   totalWords,
   lessonWords,
   language = 'en',
   hostUsername,
+  players,
   t,
 }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = !!useReducedMotion();
   const lessonSet = useMemo(() => lessonWordSet(lessonWords, language), [lessonWords, language]);
+  const avatars = useMemo(() => new Map((players ?? []).map((p) => [p.username, p.avatar])), [players]);
   const [state, setState] = useState(emptyLiveRoundWords);
 
   useEffect(() => {
@@ -53,111 +52,66 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
     return () => socket.off('playerFoundWordBatch', onBatch);
   }, [socket, lessonSet, hostUsername, language]);
 
-  const shownTotal = useCountUp({ target: totalWords, duration: 500, immediate: !!reduceMotion });
-  const tiles = state.best ? maskWord(state.best.word) : [];
+  const shownTotal = useCountUp({ target: totalWords, duration: 500, immediate: reduceMotion });
   const lessonTotal = lessonSet.size;
-  const lessonFound = state.lessonFound.length;
-  const lessonPct = lessonTotal > 0 ? Math.round((lessonFound / lessonTotal) * 100) : 0;
 
   return (
     <section
       data-testid="classroom-live-panel"
       aria-label={t('eduLive.live.panelTitle')}
-      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.6cqh,20px)] overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated md:[container-type:size] p-[clamp(10px,2cqh,28px)] text-neo-cream shadow-hard-lg"
+      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.4cqh,18px)] overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated md:[container-type:size] p-[clamp(10px,1.8cqh,24px)] text-neo-cream shadow-hard-lg"
     >
-      <div className="flex shrink-0 flex-wrap items-end justify-between gap-3">
-        <div className="flex items-baseline gap-2 max-md:flex-col max-md:items-start max-md:gap-1">
+      <div className="flex shrink-0 items-center justify-between gap-3">
+        <div className="flex min-w-0 items-baseline gap-2 max-md:flex-col max-md:items-start max-md:gap-1 md:flex-col md:items-start md:gap-0">
           <m.span
             key={totalWords}
             data-testid="live-total-words"
             initial={reduceMotion ? false : { scale: 1.25 }}
             animate={{ scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 16 }}
-            className="inline-block font-neo-display font-black leading-none tabular-nums text-neo-lime text-[44px] md:text-[clamp(32px,min(15cqh,24cqw),110px)]"
+            className="inline-block origin-[0%_80%] font-neo-display font-black leading-none tabular-nums text-neo-lime text-[44px] md:text-[clamp(36px,min(11cqh,24cqw),120px)]"
           >
             {shownTotal}
           </m.span>
-          <span className="font-neo-display font-black uppercase tracking-wide text-[13px] md:text-[clamp(13px,min(4.5cqh,6.5cqw),30px)]">
+          <span className="font-neo-display font-black uppercase tracking-wide text-[13px] md:text-[clamp(14px,min(2.8cqh,5.6cqw),30px)]">
             {t('eduLive.live.wordsFound')}
           </span>
         </div>
-
-        {lessonTotal > 0 && (
-          <div data-testid="live-lesson-meter" className="flex min-w-[9rem] flex-1 flex-col gap-1 md:min-w-[min(100%,14rem)] sm:max-w-[24rem]">
-            <span className="flex items-center gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(12px,1.8cqh,24px)] md:text-[clamp(12px,min(3.6cqh,5.5cqw),24px)]">
-              <BookOpen className="size-[1.1em] shrink-0 text-neo-cyan" aria-hidden />
-              {t('eduLive.live.lessonFound', { found: lessonFound, total: lessonTotal })}
-            </span>
-            <span aria-hidden="true" className="relative h-[clamp(10px,1.6cqh,20px)] overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy">
-              <span
-                className="absolute inset-y-0 start-0 rounded-full bg-neo-cyan transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${lessonPct}%` }}
-              />
-            </span>
-          </div>
-        )}
+        {lessonTotal > 0 && <LessonRing found={state.lessonFound.length} total={lessonTotal} t={t} />}
       </div>
 
-      <div
-        data-testid="live-word-of-round"
-        data-empty={state.best ? 'false' : 'true'}
-        // A phone has room for the count and the meter; the teaser is a projector moment.
-        className="hidden min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.4cqh,18px)] rounded-neo border-[3px] border-dashed border-neo-cream/50 bg-neo-navy px-3 py-2 text-center md:flex"
-      >
-        <span className="inline-flex items-center gap-2 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display font-black uppercase tracking-widest text-neo-black text-[clamp(11px,min(3.4cqh,5cqw),22px)] shadow-hard-sm">
-          <Sparkles className="size-[1em] shrink-0" aria-hidden />
-          {t('eduLive.live.wordOfRound')}
-        </span>
-
-        {state.best ? (
-          <m.div
-            key={state.best.word}
-            initial={reduceMotion ? false : { scale: 0.6, rotate: -4 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 420, damping: 14 }}
-            className="flex flex-col items-center gap-[clamp(4px,1cqh,12px)]"
-          >
-            <span dir="auto" className="flex max-w-full flex-wrap justify-center gap-[clamp(3px,0.6cqw,10px)]">
-              {tiles.map((letter, i) => (
-                <span
-                  key={i}
-                  data-testid="live-word-tile"
-                  className={cn(
-                    'grid place-items-center rounded-neo border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_rgb(var(--neo-black))]',
-                    'size-[clamp(22px,min(11cqh,13cqw),76px)] text-[clamp(13px,min(7.5cqh,9cqw),52px)]',
-                    letter ? 'bg-neo-cream text-neo-black' : 'bg-neo-purple/80 text-neo-cream'
-                  )}
-                >
-                  {letter || '?'}
-                </span>
-              ))}
-            </span>
-            <span className="font-neo-body font-bold text-[clamp(12px,min(4cqh,6.5cqw),26px)]">
-              {t('eduLive.live.bestWordBy', { count: tiles.length, name: state.best.username })}
-            </span>
-          </m.div>
-        ) : (
-          <>
-            <span aria-hidden className="flex gap-[clamp(3px,0.6cqw,10px)]">
-              {GHOST_TILES.map((i) => (
-                <span
-                  key={i}
-                  data-testid="live-word-ghost"
-                  style={{ animationDelay: `${i * 140}ms` }}
-                  className="grid size-[clamp(22px,min(11cqh,13cqw),76px)] place-items-center rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(13px,min(7.5cqh,9cqw),52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
-                >
-                  ?
-                </span>
-              ))}
-            </span>
-            <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(12px,min(4cqh,6.5cqw),26px)]">
-              {t('eduLive.live.wordOfRoundEmpty')}
-            </p>
-          </>
-        )}
+      {/* A phone has room for the count and the ring; the feed is a projector moment. */}
+      <div className="hidden min-h-0 flex-1 flex-col gap-[clamp(6px,1.2cqh,14px)] md:flex">
+        <LiveWordFeed entries={state.recent} avatars={avatars} reduceMotion={reduceMotion} t={t} />
+        {state.best && <BestWord word={state.best.word} username={state.best.username} t={t} />}
       </div>
     </section>
   );
 });
+
+function BestWord({ word, username, t }: { word: string; username: string; t: ClassroomLivePanelProps['t'] }) {
+  const tiles = maskWord(word);
+  return (
+    <div
+      data-testid="live-word-of-round"
+      className="flex shrink-0 flex-wrap items-center gap-x-[clamp(6px,1.6cqw,14px)] gap-y-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-[clamp(6px,2cqw,16px)] py-[clamp(4px,0.8cqh,10px)] text-neo-black shadow-hard-sm"
+    >
+      <span className="inline-flex items-center gap-1 font-neo-display font-black uppercase tracking-wide text-[clamp(13px,min(4.2cqw,2.6cqh),26px)]">
+        <Sparkles className="size-[1em] shrink-0" aria-hidden />
+        {t('eduLive.live.wordOfRound')}
+      </span>
+      <span dir="auto" className="flex gap-[2px]" aria-hidden>
+        {tiles.map((letter, i) => (
+          <span key={i} className="grid size-[clamp(16px,min(5.6cqw,3.4cqh),40px)] place-items-center rounded-[3px] border-2 border-neo-black bg-neo-cream font-neo-display font-black leading-none text-[clamp(11px,min(3.8cqw,2.4cqh),28px)]">
+            {letter}
+          </span>
+        ))}
+      </span>
+      <span className="font-neo-body font-bold text-[clamp(13px,min(4.2cqw,2.6cqh),26px)]">
+        {t('eduLive.live.bestWordBy', { count: tiles.length, name: username })}
+      </span>
+    </div>
+  );
+}
 
 export default ClassroomLivePanel;

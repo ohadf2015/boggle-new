@@ -167,9 +167,9 @@ export function TeacherLiveControls({
           // max-w-3xl they wrapped to two rows and the strip reserved a third of a
           // 1280x630 screen — space taken straight off the board.
           'pointer-events-auto mx-auto flex w-full max-w-6xl tv:max-w-[100rem] flex-wrap lg:flex-nowrap items-stretch justify-center',
-          'gap-2 sm:gap-3 tv:gap-5 rounded-neo border-3 tv:border-4 border-neo-black shadow-hard-lg',
+          'gap-2 sm:gap-3 tv:gap-5 rounded-neo border-3 tv:border-4 shadow-hard-lg',
           compact ? 'p-1.5' : 'p-2 tv:p-4',
-          isPaused ? 'bg-neo-lime' : 'bg-neo-cream',
+          isPaused ? 'border-neo-black bg-neo-lime' : 'border-neo-cream/60 bg-neo-navy-light',
         )}
       >
         {isPaused && (

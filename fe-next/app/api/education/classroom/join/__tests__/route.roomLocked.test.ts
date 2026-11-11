@@ -116,7 +116,7 @@ describe('join route — a locked live game typed from the projector', () => {
 });
 
 describe('join route — roster code while the live game is locked', () => {
-  it('still enrols the student but hands back no game code', async () => {
+  it('still enrols the student, then says the game is locked exactly as the room code does', async () => {
     mockDb(true);
     as('stranger-1');
     asMock(lookupLiveGameForClassroom).mockResolvedValue('TZCOQ7');
@@ -125,10 +125,30 @@ describe('join route — roster code while the live game is locked', () => {
     const res = await POST(post({ joinCode: '9GA8WV' }));
     const body = await res.json();
 
-    expect(res.status).toBe(200);
-    expect(body.classroomId).toBe('c1');
+    expect(res.status).toBe(423);
+    expect(body).toMatchObject({ code: 'ROOM_LOCKED', classroomId: 'c1' });
     expect(body.gameCode).toBeUndefined();
     expect(insert).toHaveBeenCalled();
+  });
+
+  it('tells a returning member the game is locked instead of a silent hub landing', async () => {
+    mockDb(true);
+    as('stranger-1');
+    asMock(createClient).mockResolvedValue({
+      auth: { signInAnonymously },
+      rpc: vi.fn(async () => ({ data: [{ id: 'c1' }], error: null })),
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle: vi.fn(async () => ({ data: { id: 'm1' } })) })) })),
+        })),
+      })),
+    });
+    asMock(lookupLiveGameForClassroom).mockResolvedValue('TZCOQ7');
+    asMock(lookupLiveClassroomGame).mockResolvedValue(lockedGame());
+
+    const res = await POST(post({ joinCode: '9GA8WV' }));
+    expect(res.status).toBe(423);
+    expect(await res.json()).toMatchObject({ code: 'ROOM_LOCKED' });
   });
 
   it('keeps the game code for a student already seated', async () => {

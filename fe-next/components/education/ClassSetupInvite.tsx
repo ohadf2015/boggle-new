@@ -30,7 +30,9 @@ import { MIN_PASTED_WORDS, QUICK_LAUNCH_FLOW, writeQuickLaunchIntent } from '@/c
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { packsForLanguage, recommendedPack } from '@/components/teacher/setup/starterPackPick';
 import { FirstGameWords, PlayNowButton, type FirstGameError } from '@/components/teacher/setup/FirstGameWords';
-import { firstGameIntent, readPasted, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
+import { SavedListCard } from '@/components/teacher/setup/SavedListCard';
+import { useSavedList } from '@/components/teacher/setup/useSavedList';
+import { firstGameIntent, readPasted, sameWords, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import { FirstGamePlanCard } from '@/components/education/FirstGamePlanCard';
 import { useInviteShare } from './useInviteShare';
@@ -259,6 +261,8 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
   const { words, skipped } = readPasted(text);
   const pack = packs.find((p) => p.nameKey === picked) ?? packs[0];
   const ownLessonId = lessonId && !packKey ? lessonId : null;
+  const saved = useSavedList(ownLessonId, t('eduShell.setup.words.title'));
+  const [changing, setChanging] = useState(false);
 
   useEffect(() => {
     const onPageShow = (e: PageTransitionEvent) => {
@@ -282,8 +286,9 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
     setBusy(true);
     trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
     const ownTitle = t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) });
+    const untouched = saved.status === 'ready' && sameWords(words, saved.words);
     const choice: FirstGameChoice =
-      words.length > 0
+      words.length > 0 && !untouched
         ? { kind: 'paste', words }
         : ownLessonId
           ? { kind: 'saved', lessonId: ownLessonId, fallback: pack, fallbackTitle: t(pack.nameKey) }
@@ -302,8 +307,19 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
     }
   };
 
+  const savedList = !changing && (saved.status === 'loading' || saved.status === 'ready') ? saved : null;
   return {
-    words: (
+    words: savedList ? (
+      <SavedListCard
+        list={savedList}
+        onChangeWords={() => {
+          if (saved.status === 'ready') setText(saved.words.join(', '));
+          setChanging(true);
+          requestAnimationFrame(() => box.current?.focus());
+        }}
+        t={t}
+      />
+    ) : (
       <FirstGameWords
         text={text}
         onTextChange={(next) => {

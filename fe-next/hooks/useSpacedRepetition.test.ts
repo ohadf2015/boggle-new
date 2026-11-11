@@ -60,6 +60,19 @@ describe('useSpacedRepetition', () => {
       expect(Object.keys(result.current.reviewSchedule)).toContain('cherry');
     });
 
+    it('never fetches the DB schedule without a lesson id', async () => {
+      const fetchSpy = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ reviews: [] }) }));
+      vi.stubGlobal('fetch', fetchSpy);
+      try {
+        const { result } = renderHook(() => useSpacedRepetition(['apple'], ''), { wrapper: createWrapper() });
+
+        await waitFor(() => expect(result.current.isLoading).toBe(false));
+        expect(fetchSpy).not.toHaveBeenCalled();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+
     it('creates initial review data with correct word', () => {
       const { result } = renderHook(() =>
         useSpacedRepetition(['apple'], 'lesson-1')

@@ -46,6 +46,10 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('Teacher Home ready-to-run rail', () => {
+  beforeEach(() => {
+    proState = { ...FREE, hasPro: true };
+  });
+
   it('Given a class, Then one row of three session cards sits right after the hero in the main column, each running for that class', () => {
     render(<TeacherDashboard />);
     const rail = screen.getByTestId('home-session-rail');
@@ -123,23 +127,19 @@ describe('Teacher Home ready-to-run rail', () => {
     fireEvent.click(screen.getByTestId('home-session-see-all'));
     expect(screen.getByTestId('home-session-all')).toBeInTheDocument();
   });
+
+  it('Given a Pro desk with the roster, Then on desktop the sessions row takes the leftover height instead of leaving an empty band', () => {
+    render(<TeacherDashboard />);
+    const home = screen.getByTestId('teacher-home');
+    expect(home.className).toContain('lg:min-h-full');
+    expect(home.className).toMatch(/lg:grid-rows-\[auto_1fr(_auto)?\]/);
+  });
 });
 
 describe('Teacher Home greeting cue, week mascot and Pro strip', () => {
   it('Given an earlier game, Then the greeting carries one coach cue from real data', () => {
     render(<TeacherDashboard />);
     expect(screen.getByTestId('home-coach-cue').textContent).toMatch(/^eduShell\.home\.cue\.season\./);
-  });
-
-  it('Given games this week, Then the week row shows the cheering mascot', () => {
-    render(<TeacherDashboard />);
-    expect(within(screen.getByTestId('home-week')).getByTestId('edu-mascot-success')).toBeInTheDocument();
-  });
-
-  it('Given a quiet week after earlier games, Then the mascot nudges', () => {
-    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 28, activeClasses: 0, lastPlayedAt: { c5b: '2026-09-01T10:00:00Z' } } };
-    render(<TeacherDashboard />);
-    expect(within(screen.getByTestId('home-week')).getByTestId('edu-mascot-tip')).toBeInTheDocument();
   });
 
   it('Given a free teacher, Then the class-insight Pro entry is one compact strip at the bottom of the rail with no bullet list', () => {

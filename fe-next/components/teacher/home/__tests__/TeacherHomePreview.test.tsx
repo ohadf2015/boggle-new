@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, cleanup, within } from '@testing-library/react';
+import { render, screen, cleanup, within, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { renderToString } from 'react-dom/server';
 
@@ -41,18 +41,27 @@ describe('TeacherHomePreview', () => {
     expect(play.getAttribute('href')).toContain('mode=word-hunt');
     expect(screen.queryByTestId('home-start-live')).toBeNull();
     expect(screen.getByTestId('home-ready-chip')).toBeInTheDocument();
+    expect(screen.getAllByTestId('home-status-tile')).toHaveLength(3);
+  });
+
+  it('Given the free-teacher desk, Then absentees get practice in one tap and no per-student tiles show', () => {
+    render(<TeacherHomePreview state="classes" insight />);
     expect(screen.getByTestId('home-homework')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-status-tile')).toBeNull();
+    expect(screen.getAllByTestId('home-class-insight')).toHaveLength(1);
   });
 
   it('Given the class desk state, Then This week lists every class with the desk class pressed', () => {
     render(<TeacherHomePreview state="classes" />);
-    const roster = within(screen.getByTestId('home-week')).getByTestId('home-week-classes');
+    const roster = screen.getByTestId('home-week-classes');
     expect(within(roster).getAllByRole('button')).toHaveLength(3);
     expect(within(roster).getByRole('button', { name: /5B - English/ })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('Given the class desk state, Then a roster lists every student of the desk class with a status', () => {
     render(<TeacherHomePreview state="classes" />);
+    expect(screen.queryByTestId('home-roster')).toBeNull();
+    fireEvent.click(screen.getByTestId('home-roster-see-all'));
     const roster = screen.getByTestId('home-roster');
     expect(within(roster).getAllByTestId('home-roster-row')).toHaveLength(28);
     expect(within(roster).getByTestId('home-roster-summary')).toBeInTheDocument();
@@ -61,6 +70,7 @@ describe('TeacherHomePreview', () => {
   it('Given the class desk state, Then Pick a game is the only filled action and no rail list repeats the Behind students', () => {
     render(<TeacherHomePreview state="classes" />);
     expect(screen.queryByTestId('home-focus')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('home-roster-see-all'));
     expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-assign-all')).toHaveLength(1);
     for (const a of screen.getAllByTestId('home-roster-assign')) expect(a).not.toHaveClass('bg-neo-yellow');
   });

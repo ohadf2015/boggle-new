@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, type ReactNode } from 'react';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MpBackButton, MpHudBar, MpRankChip, MpScoreChip, MpTimer, type MpScoreGain, type MpTimerColor } from '../shell';
@@ -23,6 +23,8 @@ export interface MpRoundHudProps {
   total: number;
   rankFlipKey?: string;
   comboLevel: number;
+  /** Replaces the combo meter beside the score (classroom: the class streak flame). */
+  hudBadge?: ReactNode;
   timerColor: MpTimerColor;
   onExit: () => void;
 }
@@ -32,7 +34,7 @@ export interface MpRoundHudProps {
  * Structure is CSS; only the ring/chip SIZE tier reads a media query — the
  * round mounts behind the solid countdown, so it has resolved long before GO.
  */
-function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, rankFlipKey, comboLevel, timerColor, onExit }: MpRoundHudProps) {
+function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, rankFlipKey, comboLevel, hudBadge, timerColor, onExit }: MpRoundHudProps) {
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const isTv = useMediaQuery('(min-width: 1800px) and (min-height: 1000px)');
   const timerSize = isTv ? 'xl' : isDesktop ? 'lg' : 'md';
@@ -94,7 +96,7 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
       }
       end={
         <>
-          <MpComboMeter level={comboLevel} />
+          {hudBadge ?? <MpComboMeter level={comboLevel} />}
           <MpScoreChip value={score} gain={gain} size={isDesktop ? 'lg' : 'md'} />
           <QuietBoundary>
             <MpRoundMute />

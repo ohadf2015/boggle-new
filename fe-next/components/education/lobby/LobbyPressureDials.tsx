@@ -35,11 +35,14 @@ const TIMER_CHOICES = ['full', 'gentle', 'off'] as const;
 export interface LobbyPressureDialsProps {
   pressure: ClassroomPressure;
   onChange: (next: ClassroomPressure) => void;
+  /** Overrides the live entitlement read (preview fixtures only). */
+  access?: Pick<ReturnType<typeof useTeacherPro>, 'hasPro' | 'loading' | 'accessTrialExpires'>;
 }
 
-export function LobbyPressureDials({ pressure, onChange }: LobbyPressureDialsProps) {
+export function LobbyPressureDials({ pressure, onChange, access }: LobbyPressureDialsProps) {
   const { t } = useLanguage();
-  const { hasPro, loading, accessTrialExpires } = useTeacherPro();
+  const live = useTeacherPro();
+  const { hasPro, loading, accessTrialExpires } = access ?? live;
   const [nowMs] = useState(() => Date.now());
   const locked = !pressureDialsUnlocked({ hasPro, loading, accessTrialExpires: accessTrialExpires ?? null }, nowMs);
 

@@ -72,26 +72,63 @@ describe('EduStudentLobby', () => {
     expect(base.onExit).toHaveBeenCalledTimes(1);
   });
 
-  it('given the wait, when the lobby shows, then the tap-your-letter warm-up is there to play, hidden only by the lobby box height', () => {
+  it('given the wait, when the lobby shows, then the warm-up is the full-width hero and never hides on a short box', () => {
     render(<EduStudentLobby {...base} />);
     const warm = screen.getByTestId('waiting-warmup');
-    const slot = warm.parentElement!;
-    expect(slot.className).toMatch(/\[@container\(max-height:\d+px\)\]:hidden/);
-    expect(screen.getByTestId('edu-student-lobby').querySelector('main')!.className).toContain('[container-type:size]');
+    expect(warm).toHaveAttribute('data-variant', 'hero');
+    expect(warm.parentElement!.className).not.toMatch(/:hidden/);
+    expect(screen.getByTestId('warmup-combo-hero')).toBeInTheDocument();
   });
 
-  it('given classmates arrive, then each one pops in as a face chip and I am not listed twice', () => {
+  it('given classmates arrive, then each one pops in on the wall with their name and I am not listed twice', () => {
     render(<EduStudentLobby {...base} />);
     expect(screen.getAllByTestId('edu-student-mate')).toHaveLength(2);
     expect(screen.getByTestId('mate-avatar-Noa')).toBeInTheDocument();
+    expect(screen.getAllByTestId('edu-student-mate')[0]).toHaveTextContent('Noa');
     expect(screen.queryByTestId('mate-avatar-Maya')).toBeNull();
   });
 
-  it('given a big class, then the faces stop at eight and the rest fold into +N', () => {
-    const many = Array.from({ length: 12 }, (_, i) => ({ username: `S${i}` }));
+  it('given a small class so far, then empty seats only finish the current row, so the wall stays as small as its content', () => {
+    render(<EduStudentLobby {...base} />);
+    expect(screen.getAllByTestId('edu-student-seat')).toHaveLength(2);
+    expect(screen.getByTestId('edu-student-crowd').className).not.toMatch(/\bflex-1\b/);
+  });
+
+  it('given a full row of classmates, then no empty seats are added', () => {
+    render(<EduStudentLobby {...base} classmates={['Maya', 'A', 'B', 'C', 'D'].map((username) => ({ username }))} />);
+    expect(screen.queryByTestId('edu-student-seat')).toBeNull();
+  });
+
+  it('given an avatar that has not loaded, then each classmate circle still shows their initial', () => {
+    render(<EduStudentLobby {...base} />);
+    expect(screen.getAllByTestId('edu-student-mate-initial').map((n) => n.textContent)).toEqual(['N', 'I']);
+  });
+
+  it('given a big class, then the wall shows eleven faces and folds the rest into +N', () => {
+    const many = Array.from({ length: 15 }, (_, i) => ({ username: `S${i}` }));
     render(<EduStudentLobby {...base} classmates={many} />);
-    expect(screen.getAllByTestId('edu-student-mate')).toHaveLength(8);
+    expect(screen.getAllByTestId('edu-student-mate')).toHaveLength(11);
     expect(screen.getByTestId('edu-student-mates-more')).toHaveTextContent('+4');
+    expect(screen.queryByTestId('edu-student-seat')).toBeNull();
+  });
+
+  it('given a classmate walks in while I wait, then the wall announces them and only their face is marked new', () => {
+    const { rerender } = render(<EduStudentLobby {...base} />);
+    expect(screen.queryByTestId('edu-student-arrival')).toBeNull();
+    rerender(<EduStudentLobby {...base} classmates={[...base.classmates, { username: 'Dana' }]} />);
+    expect(screen.getByTestId('edu-student-arrival')).toHaveTextContent('eduLiveRoom.student.joined:{"name":"Dana"}');
+    const fresh = screen.getAllByTestId('edu-student-mate').filter((li) => li.getAttribute('data-new') === 'true');
+    expect(fresh).toHaveLength(1);
+    expect(fresh[0]).toHaveTextContent('Dana');
+  });
+
+  it('given a daily chest, then it sits on its own beside my name, never on top of my face', () => {
+    Object.assign(auth, { isAuthenticated: true, user: { id: 'u1' }, profile: { total_xp: 0 } });
+    render(<EduStudentLobby {...base} />);
+    const chest = screen.getByTestId('daily-chest');
+    const face = screen.getByTestId('edu-student-edit-avatar').parentElement!;
+    expect(face).not.toContainElement(chest);
+    expect(screen.getByTestId('edu-student-chest-slot')).toContainElement(chest);
   });
 
   it('given I am first in, then the crowd says classmates will pop in here', () => {

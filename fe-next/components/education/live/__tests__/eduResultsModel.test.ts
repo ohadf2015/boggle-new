@@ -32,6 +32,11 @@ describe('classStats', () => {
     expect(classStats(summary(), rehearsal).students).toBe(0);
   });
 
+  it('given rejected attempts in a word list, when summarised, then only accepted words count as found', () => {
+    const tried = [{ username: 'Ido', score: 2, allWords: [{ word: 'cat', validated: true }, { word: 'xq', validated: false }, { word: 'dog' }] as PlayerResult['allWords'] }];
+    expect(classStats(summary(), tried).words).toBe(2);
+  });
+
   it('given an empty room, when summarised, then nothing divides by zero', () => {
     expect(classStats(summary(), [])).toEqual({ students: 0, words: 0, avgScore: 0, lesson: { found: 4, total: 10 } });
   });

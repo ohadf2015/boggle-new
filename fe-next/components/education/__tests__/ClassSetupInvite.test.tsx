@@ -299,7 +299,7 @@ describe('ClassSetupInvite', () => {
 
     it('Given the teacher pasted words at setup (lessonId, no pack), Then their list is named as theirs, no pack is offered, and Play now runs that list with no new write', async () => {
       render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
-      expect(screen.getByText('eduShell.setup.words.yours')).toBeInTheDocument();
+      expect(await screen.findByText('eduShell.setup.words.yours')).toBeInTheDocument();
       expect(screen.queryAllByRole('radio')).toHaveLength(0);
       fireEvent.click(screen.getByTestId('setup-play-now'));
       await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
@@ -319,8 +319,37 @@ describe('ClassSetupInvite', () => {
       expect(toastMock.error).toHaveBeenCalledWith('eduShell.setup.words.listMissing');
     });
 
+    it('Given the teacher pasted words at setup, Then the step shows that saved list as chips with its count, and no empty paste box', async () => {
+      lessons.get.mockResolvedValue({ data: { id: 'L-own', name: 'Words for Nov 11', words: [{ word: 'photon' }, { word: 'gravity' }, { word: 'magnet' }] }, error: null });
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      expect(screen.queryByTestId('first-game-words')).toBeNull();
+      await waitFor(() => expect(screen.getByTestId('saved-list-name')).toHaveTextContent('Words for Nov 11'));
+      expect(screen.getAllByTestId('saved-list-chip').map((c) => c.textContent)).toEqual(['photon', 'gravity', 'magnet']);
+      expect(screen.queryByTestId('first-game-words')).toBeNull();
+      fireEvent.click(screen.getByTestId('saved-list-change'));
+      expect(screen.getByTestId('first-game-words')).toHaveValue('photon, gravity, magnet');
+    });
+
+    it('Given the teacher opens change words and plays without editing, Then the saved list plays and no second list is written', async () => {
+      lessons.get.mockResolvedValue({ data: { id: 'L-own', name: 'Words for Nov 11', words: [{ word: 'photon' }, { word: 'gravity' }, { word: 'magnet' }] }, error: null });
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      fireEvent.click(await screen.findByTestId('saved-list-change'));
+      fireEvent.click(screen.getByTestId('setup-play-now'));
+      await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
+      expect(lessons.createLesson).not.toHaveBeenCalled();
+      expect(storedIntent()).toMatchObject({ source: 'lesson', lessonId: 'L-own' });
+    });
+
+    it('Given the saved list cannot be read, Then the paste box shows with the "your words" line, not a blank step', async () => {
+      lessons.get.mockRejectedValue(new Error('offline'));
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      await waitFor(() => expect(screen.getByTestId('first-game-words')).toBeInTheDocument());
+      expect(screen.getByText('eduShell.setup.words.yours')).toBeInTheDocument();
+    });
+
     it('Given the setup list and new words typed over it, Then the typed words win', async () => {
       render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      fireEvent.click(await screen.findByTestId('saved-list-change'));
       fireEvent.change(screen.getByTestId('first-game-words'), { target: { value: TEN } });
       fireEvent.click(screen.getByTestId('setup-play-now'));
       await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));

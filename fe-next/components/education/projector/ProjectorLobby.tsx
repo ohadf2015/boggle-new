@@ -17,6 +17,7 @@ import { ProjectorWordPanel } from './ProjectorWordPanel';
 import { studentsNotReady } from './projectorLobbyModel';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
 import { useProjectorLobbyMode } from './useProjectorLobbyMode';
+import { useProjectorClassCode } from './useProjectorClassCode';
 import { WALL_SQUARE, WALL_STICKER } from './projectorNbStyles';
 import { markRoomPlayed, roomPlayed } from './roomPlayed';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
@@ -82,6 +83,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   practiceRoundFailed = false,
 }) {
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
+  const classCode = useProjectorClassCode(lobby.classroomId);
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
   const studentCount = realStudentCount(students);
   // Lesson words mean students study them before READY unlocks, so READY now means "learned".
@@ -149,7 +151,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
           </header>
 
           <div style={delay(1)} className={cn('@5xl:row-start-2 @5xl:min-h-0', RISE)}>
-            <ProjectorJoinPanel gameCode={gameCode} language={language} baseUrl={baseUrl} t={t} waiting={students.length === 0} compact={hasWords} />
+            <ProjectorJoinPanel key={classCode ?? gameCode} gameCode={gameCode} classCode={classCode} language={language} baseUrl={baseUrl} t={t} waiting={students.length === 0} compact={hasWords} />
           </div>
 
           <div style={delay(2)} className={cn('flex flex-col @5xl:row-start-2 @5xl:min-h-0', RISE)}>

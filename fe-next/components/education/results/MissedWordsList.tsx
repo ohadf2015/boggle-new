@@ -16,11 +16,15 @@ interface MissedWordsListProps {
   t: Translate;
   /** The action that practices exactly these words, drawn inside the panel so it reads as acting on them. */
   children?: ReactNode;
+  /** On a wide wall, grow to the column's height and pin the action to the panel's foot. */
+  fill?: boolean;
+  /** Drawn under the heading, above the chips: the round's hardest words. */
+  lead?: ReactNode;
 }
 
 /** "Words your class missed": the free reteach insight, sized off the results container so the back row can read it. */
-export function MissedWordsList({ words, maxChips = 8, title, t, children }: MissedWordsListProps) {
-  if (words.length === 0) return null;
+export function MissedWordsList({ words, maxChips = 8, title, t, children, fill = false, lead }: MissedWordsListProps) {
+  if (words.length === 0 && !lead) return null;
   const shown = words.slice(0, maxChips);
   const rest = words.length - shown.length;
 
@@ -28,7 +32,8 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children }: Mis
     <section
       data-testid="edu-reteach-words"
       aria-labelledby="edu-reteach-words-title"
-      className={cn(NB_PANEL, 'flex shrink-0 flex-col gap-2.5 px-3 py-3 @5xl/results:gap-3 @5xl/results:px-4 @5xl/results:py-4')}
+      data-fill={fill ? '' : undefined}
+      className={cn(NB_PANEL, 'flex shrink-0 flex-col gap-2.5 px-3 py-3 @5xl/results:gap-3 @5xl/results:px-4 @5xl/results:py-4', fill && '@5xl/results:flex-1')}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2
@@ -39,13 +44,18 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children }: Mis
           {title}
         </h2>
       </div>
-      <ul className="flex flex-wrap gap-1.5 @5xl/results:gap-2.5">
+      {lead}
+      {(shown.length > 0 || rest > 0) && (
+      <ul className={cn('flex flex-wrap gap-1.5 @5xl/results:gap-2.5', fill && '@5xl/results:gap-3')}>
         {shown.map((w) => (
           <li
             key={w.word}
             data-testid="edu-most-missed-word"
             dir="auto"
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-cream shadow-hard-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl"
+            className={cn(
+              'inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-cream shadow-hard-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
+              fill && '@5xl/results:px-4 @5xl/results:py-1.5 @5xl/results:text-2xl'
+            )}
           >
             {w.word}
             {w.notOnBoard ? (
@@ -66,7 +76,8 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children }: Mis
           </li>
         )}
       </ul>
-      {children}
+      )}
+      {children && <div className={cn('flex flex-col gap-2', fill && '@5xl/results:mt-auto')}>{children}</div>}
     </section>
   );
 }

@@ -94,7 +94,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
     <div data-testid="rival-ticker" className={cn('@container w-full min-w-0', className)} aria-label={t('education.rivals.ticker.label')}>
       <ul
         data-testid="rival-ticker-list"
-        className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(0.875rem,1.9cqi,2.25rem)] font-bold text-neo-cream"
+        className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(1.125rem,2.1cqi,2.5rem)] font-bold text-neo-cream"
       >
         {lead && (
           <li
@@ -111,14 +111,14 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
         {older.length > 0 && (
           <li className="min-w-0 flex-1">
             {/* One row tall and wrapping: a chip that does not fit drops whole instead of being cut. */}
-            <ul data-testid="rival-ticker-older" className="flex h-[1.9em] min-w-0 flex-wrap items-center gap-[0.8cqi] overflow-hidden text-[0.8em]">
+            <ul data-testid="rival-ticker-older" className="flex h-[1.9em] min-w-0 flex-wrap items-center gap-[0.8cqi] overflow-hidden text-[0.85em]">
               {older.map((item) => (
                 <li
                   key={item.id}
                   data-testid="rival-ticker-item"
                   data-kind="chip"
                   aria-label={t('education.rivals.ticker.flip', { name: item.name })}
-                  className={cn(ITEM, 'h-[1.9em] shrink-0 px-[0.7cqi] text-neo-cream/80', item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
+                  className={cn(ITEM, 'h-[1.9em] shrink-0 px-[0.7cqi] text-neo-cream', item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
                 >
                   <TickerAvatar item={item} />
                   <bdi aria-hidden="true">{item.name}</bdi>

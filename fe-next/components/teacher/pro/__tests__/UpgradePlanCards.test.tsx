@@ -181,3 +181,19 @@ describe('UpgradePlanCards on a tablet', () => {
     expect(grid.className).not.toMatch(/(^|\s)md:grid-cols-3(\s|$)/);
   });
 });
+
+describe('UpgradePlanCards: one Pro button', () => {
+  it('given the trial is on offer, when the Pro card renders, then the trial is the only filled button and buying now is a text link', () => {
+    setup('free', { showTrial: true });
+    const card = screen.getByTestId('plan-card-pro');
+    const filled = [...card.querySelectorAll('button')].filter((b) => /\bshadow-hard\b/.test(b.className));
+    expect(filled.map((b) => b.dataset.testid)).toEqual(['pricing-trial-cta']);
+    expect(screen.getByTestId('pricing-paid-cta').className).toMatch(/\bunderline\b/);
+  });
+
+  it('given the plans sit side by side, when the Schools card is short, then it is not stretched to the tallest card', () => {
+    setup('free');
+    expect(screen.getByTestId('pricing-cards').className).toMatch(/(^|\s)lg:items-start(\s|$)/);
+    expect(screen.getByTestId('plan-card-school').innerHTML).not.toMatch(/\bmt-auto\b/);
+  });
+});

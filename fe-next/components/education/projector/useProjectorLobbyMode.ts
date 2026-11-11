@@ -85,6 +85,7 @@ export function useProjectorLobbyMode({ gameCode, classroomGameMode, templateSet
     blockedReasonKey: crosswordBlocked ? CROSSWORD_REFUSED_KEY : undefined,
     facts,
     className: liveGame?.classroomName ?? null,
+    classroomId: liveGame?.classroomId ?? null,
     lessonNames: liveGame?.lessonNames ?? [],
     studyWordCount: liveGame?.studyWordCount ?? 0,
     studyCards,

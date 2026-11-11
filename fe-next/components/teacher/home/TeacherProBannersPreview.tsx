@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherTrialStatus } from '@/lib/education/trial';
 import { TeacherTrialReminderBanner } from '@/components/education/TeacherTrialReminderBanner';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
+import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingCard';
 import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrialEndedBanner';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
@@ -90,6 +91,7 @@ export function previewBanner(name: string | undefined): ReactNode {
   if (name === 'pastDue') return <PaymentFailedBanner portalUrl="#" stillPro />;
   if (name === 'reminder') return <TeacherTrialReminderBanner trial={teacherTrialStatus(iso(2), Date.now())} onDismiss={() => undefined} />;
   if (name === 'lifecycle') return <TeacherProTrialLifecycleBanner trialExpires={iso(8)} />;
+  if (name === 'trialEnding') return <TeacherTrialEndingCard trial={teacherTrialStatus(iso(3), Date.now())} />;
   if (name === 'expired') return <TrialUrgencyBanner trial={teacherTrialStatus(iso(-1), Date.now())} href="#" />;
   return null;
 }

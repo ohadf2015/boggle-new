@@ -143,7 +143,7 @@ describe('teacher delete confirm — 1 class / 19 members / 15 rounds', () => {
       expect(screen.getByText(copy.oneClass)).toBeInTheDocument();
       expect(screen.getByTestId('teacher-delete-one-class')).toHaveAttribute(
         'href',
-        `/${locale}/teacher/classroom/c4efdd30`,
+        `/${locale}/teacher/classroom/c4efdd30#delete`,
       );
       expect(screen.getByTestId('delete-reason-picker')).toBeInTheDocument();
       expect(screen.getByText(copy.reasonTitle)).toBeInTheDocument();

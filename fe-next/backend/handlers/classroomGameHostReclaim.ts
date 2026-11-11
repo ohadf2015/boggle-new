@@ -18,10 +18,10 @@
  * board state and leaderboard from one payload.
  *
  * Security: the seat is returned ONLY to a socket whose *server-verified* auth
- * id is already the room's host. A student's socket, an unauthenticated socket,
- * and a payload claiming an id the socket has not verified all fall through to
- * the caller's existing error. Guest-hosted rooms have no auth id to match and
- * are refused too.
+ * id is already the room's host. A student's socket, another teacher's socket
+ * and an unauthenticated socket fall through to the caller's existing error;
+ * the payload's auth id is never read. Guest-hosted rooms have no auth id to
+ * match and are refused too.
  */
 
 import type { Server, Socket } from 'socket.io';
@@ -32,7 +32,7 @@ import logger from '../utils/logger.js';
 
 export interface HostReclaimRequest {
   gameCode: string;
-  /** Auth id as claimed by the client payload — cross-checked, never trusted. */
+  /** Auth id as claimed by the client payload. Ignored: only the socket's verified id counts. */
   authUserId?: string | null;
   /** Display name from the payload. Ignored for seating; kept for logs. */
   hostUsername?: string | null;
@@ -60,12 +60,9 @@ export function tryReclaimClassroomHostSeat(
   // boot-path-only re-entry.
   if (!game.isClassroom) return false;
 
-  // socket.data.verifiedUserId is set by the socket auth middleware from a
-  // validated token. The payload's authUserId is client-supplied; requiring
-  // both to agree means a forged payload proves nothing.
+  // A reload emits before client sign-in resolves (payload authUserId null), so only the middleware-verified id decides.
   const verifiedUserId = socket.data?.verifiedUserId as string | undefined;
   if (!verifiedUserId) return false;
-  if (!request.authUserId || request.authUserId !== verifiedUserId) return false;
 
   const hostUsername = game.hostUsername;
   if (!hostUsername) return false;

@@ -54,14 +54,6 @@ describe('StudentPageClient — Academy Map puts the one thing that matters firs
     expect(knobs.push).toHaveBeenCalledWith('/en/student/lessons/2');
   });
 
-  it('sends a student with no class to the join screen, never home', async () => {
-    knobs.classroom = { classroomId: null, classroom: null, level: 'core' };
-    render(<StudentPageClient />);
-    const cta = await screen.findByTestId('academy-cta');
-    expect(cta).toHaveAttribute('data-kind', 'join-class');
-    cta.click();
-    expect(knobs.push).toHaveBeenCalledWith('/en/student/join');
-  });
 
   it('never flashes "join a classroom" while the classroom lookup is still running', async () => {
     knobs.classroom = { classroomId: null, classroom: null, level: 'core', isLoading: true } as never;

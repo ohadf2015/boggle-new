@@ -3,7 +3,8 @@ import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/components/education/live/ProjectorRoundStage', () => ({ ProjectorRoundStage: () => <div data-testid="round-stage" /> }));
-vi.mock('@/components/education/projector/ClassroomLivePanel', () => ({ ClassroomLivePanel: () => <div data-testid="live-panel" /> }));
+vi.mock('@/components/education/projector/ClassroomLivePanel', () => ({ ClassroomLivePanel: ({ players }: { players?: { username: string }[] }) => <div data-testid="live-panel" data-players={players?.length ?? 0} /> }));
+vi.mock('@/components/education/projector/ProjectorClaimFlash', () => ({ ProjectorClaimFlash: () => <div data-testid="claim-flash" /> }));
 vi.mock('@/components/education/projector/ProjectorLessonClaims', () => ({ ProjectorLessonClaims: ({ className }: { className?: string }) => <div data-testid="race-board" className={className} /> }));
 
 import { TvClassroomStage } from '../TvClassroomStage';
@@ -37,6 +38,27 @@ describe('TvClassroomStage: the projector column', () => {
     expect(column).not.toContainElement(panelRegion);
     expect(panelRegion.className).toMatch(/flex-1/);
     expect(panelRegion.className).toMatch(/min-h-0/);
+  });
+
+  it('Given a race, Then the wall can flash each claim; without one it never mounts', () => {
+    const { unmount } = render(<TvClassroomStage {...base} />);
+    expect(screen.queryByTestId('claim-flash')).toBeNull();
+    unmount();
+    act(() => ingestLessonClaimsRound({ lessonClaims: race }));
+    render(<TvClassroomStage {...base} />);
+    expect(screen.getByTestId('claim-flash')).toBeInTheDocument();
+  });
+
+  it('Given a race, Then the letter board takes the larger share of its column and the race board gets the rest', () => {
+    act(() => ingestLessonClaimsRound({ lessonClaims: race }));
+    render(<TvClassroomStage {...base} />);
+    const boardBox = screen.getByTestId('tv-board-column').firstElementChild as HTMLElement;
+    expect(boardBox.className).toMatch(/md:h-\[min\(100cqw,59cqh\)\]/);
+  });
+
+  it('Given the room roster, Then the live panel gets it for the feed avatars', () => {
+    render(<TvClassroomStage {...base} players={[{ username: 'Noa' }, { username: 'Leo' }]} />);
+    expect(screen.getByTestId('live-panel')).toHaveAttribute('data-players', '2');
   });
 
   it('Given a Word Hunt round, When rendered, Then the activity panel replaces the live panel', () => {

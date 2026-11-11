@@ -44,6 +44,7 @@ vi.mock('../useClassroomLaunchSocket', () => ({
 }));
 
 import { ClassroomGameLobby } from '../../ClassroomGameLobby';
+import { gameTile } from './lobbyGamesFold';
 
 const LONG = [
   { word: 'photosynthesis', definition: 'how plants make food from light' },
@@ -62,7 +63,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
   it('GIVEN no lesson word fits the rack THEN the Wordcraft card is disabled with the reason and a tap keeps the current game', () => {
     lessonWords = LONG;
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    const card = screen.getByTestId('mode-tile-wordcraft');
+    const card = gameTile('wordcraft');
     expect(card).toHaveAttribute('aria-disabled', 'true');
     expect(card).toHaveTextContent('eg2Modes.blocked.wordcraftRack');
     fireEvent.click(card);
@@ -90,7 +91,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
     lessonWords = [{ word: 'кошка' }, { word: 'собака' }];
     lessonLanguage = 'ru';
     const { unmount } = render(<ClassroomGameLobby onBack={vi.fn()} />);
-    expect(screen.getByTestId('mode-tile-wordcraft')).toHaveTextContent('eg2Modes.blocked.wordcraftLanguage');
+    expect(gameTile('wordcraft')).toHaveTextContent('eg2Modes.blocked.wordcraftLanguage');
     unmount();
     render(<ClassroomGameLobby onBack={vi.fn()} initialMode="wordcraft" />);
     expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('education.modePicker.wordcraftNoTiles');
@@ -99,7 +100,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
   it('GIVEN a lesson with short words WHEN the teacher picks Wordcraft THEN it launches as Wordcraft', () => {
     lessonWords = [{ word: 'cat' }, { word: 'star' }, ...LONG];
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-wordcraft'));
+    fireEvent.click(gameTile('wordcraft'));
     expect(screen.queryByTestId('go-live-blocked')).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId('lobby-go-live'));
     expect(launch.mock.calls[0][0].settings.gameMode).toBe('wordcraft');
@@ -108,7 +109,7 @@ describe('ClassroomGameLobby — Wordcraft gate', () => {
   it('GIVEN a long-word lesson WHEN the teacher keeps a board mode THEN Go Live is not blocked by the Wordcraft rule', () => {
     lessonWords = LONG;
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-classic'));
+    fireEvent.click(gameTile('classic'));
     expect(screen.queryByTestId('go-live-blocked')).not.toBeInTheDocument();
   });
 

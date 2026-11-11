@@ -1,7 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ClassroomMetrics, CommonMistake, WordsAttemptedRecord } from '@/lib/supabase/analyticsTypes';
 import { fetchInChunks } from './fetchAll';
-import { buildDailyActive, buildStudentPulses, type DailyActive, type StudentPulse } from './classInsights';
+import { buildDailyActive, buildStudentPulses, lastActivityDay, type DailyActive, type StudentPulse } from './classInsights';
 
 export type ClassAnalytics = ClassroomMetrics & {
   commonMistakes: CommonMistake[];
@@ -18,46 +18,30 @@ interface ProgressRow {
 }
 
 const MISTAKES_SHOWN = 5;
-const NEEDS_HELP_ACCURACY = 0.6;
 const MISTAKE_ERROR_RATE = 0.5;
 
 function isoDay(d: Date): string {
   return d.toISOString().split('T')[0];
 }
 
-function tally(words: WordsAttemptedRecord | null): { correct: number; attempts: number } {
-  let correct = 0;
-  let attempts = 0;
-  for (const w of Object.values(words ?? {})) {
-    if (!w) continue;
-    correct += w.correct || 0;
-    attempts += w.attempts || 0;
-  }
-  return { correct, attempts };
-}
-
 function weekMetrics(rows: ProgressRow[], totalStudents: number): ClassroomMetrics {
   const today = isoDay(new Date());
-  const perStudent = new Map<string, { xp: number; correct: number; attempts: number; last: string | null }>();
+  const perStudent = new Map<string, { xp: number; last: string | null }>();
   for (const row of rows) {
-    const { correct, attempts } = tally(row.words_attempted);
-    const s = perStudent.get(row.student_id) ?? { xp: 0, correct: 0, attempts: 0, last: null };
+    const s = perStudent.get(row.student_id) ?? { xp: 0, last: null };
     s.xp += row.total_xp || 0;
-    s.correct += correct;
-    s.attempts += attempts;
-    if (row.last_practice_date && (!s.last || row.last_practice_date > s.last)) s.last = row.last_practice_date;
+    const day = lastActivityDay(row);
+    if (day && (!s.last || day > s.last)) s.last = day;
     perStudent.set(row.student_id, s);
   }
   let xp = 0;
-  let needsHelp = 0;
   let activeToday = 0;
   for (const s of perStudent.values()) {
     xp += s.xp;
-    if (s.attempts > 0 && s.correct / s.attempts < NEEDS_HELP_ACCURACY) needsHelp++;
     if (s.last === today) activeToday++;
   }
   return {
-    studentsNeedingHelp: needsHelp,
+    studentsNeedingHelp: 0,
     classAverageXp: perStudent.size > 0 ? Math.round(xp / perStudent.size) : 0,
     activeStudentsToday: activeToday,
     weeklyEngagement: 0,
@@ -119,13 +103,18 @@ export async function readClassAnalytics(
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - 7);
   const since = isoDay(weekStart);
-  const thisWeek = rows.filter((r) => r.last_practice_date !== null && r.last_practice_date >= since);
+  const thisWeek = rows.filter((r) => {
+    const day = lastActivityDay(r);
+    return day !== null && day >= since;
+  });
   const today = isoDay(new Date());
+  const students = buildStudentPulses(rows, ids, today);
   return {
     data: {
       ...weekMetrics(thisWeek, ids.length),
+      studentsNeedingHelp: students.filter((s) => s.status === 'needsHelp').length,
       commonMistakes: commonMistakes(rows),
-      students: buildStudentPulses(rows, ids, today),
+      students,
       dailyActive: buildDailyActive(rows, today),
     },
     error: null,

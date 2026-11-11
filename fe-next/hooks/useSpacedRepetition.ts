@@ -115,6 +115,7 @@ export function useSpacedRepetition(
   const dbQuery = useQuery({
     queryKey: queryKeys.spacedRepetition.byLesson(lessonId, wordsKey),
     queryFn: () => fetchDbSchedule(lessonId),
+    enabled: !!lessonId,
     staleTime: 5 * 60 * 1000,
   });
 

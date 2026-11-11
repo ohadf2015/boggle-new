@@ -48,23 +48,28 @@ describe('ProjectorLessonClaims', () => {
     expect(board.outerHTML).not.toMatch(/\b(sm|md|lg|xl):/);
   });
 
-  it('Given a long and a short word, When the tiles size their text, Then each tile is its own size container and the longer word gets the smaller width share, so neither spills out of its tile', () => {
-    const words = [{ index: 0, first: 'T', length: 11, claim: null }, { index: 1, first: 'A', length: 4, claim: null }];
-    act(() => ingestLessonClaimsRound({ lessonClaims: { roundId: 4, total: 2, claimedCount: 0, slots: words } }));
-    render(<ProjectorLessonClaims t={t} />);
-    const faces = screen.getAllByTestId('claim-tile-face');
-    expect(faces.every((f) => /\[container-type:size\]/.test(f.className))).toBe(true);
-    const share = (el: HTMLElement) => Number(/([\d.]+)cqw/.exec(el.querySelector('[data-testid=claim-tile-text]')!.getAttribute('style') ?? '')?.[1]);
-    expect(share(faces[0])).toBeLessThan(share(faces[1]));
-  });
-
-  it('Given a long claimed word, When it lands, Then it scales inside its tile and is never cut, and the name keeps a 14px floor for the back row', () => {
+  it('Given a claimed word, When it lands, Then word and claimer share ONE line: the word never shrinks or truncates, only the name truncates', () => {
     act(() => ingestLessonClaimsRound({ lessonClaims: { roundId: 4, total: 1, claimedCount: 0, slots: [{ index: 0, first: 'T', length: 11, claim: null }] } }));
     render(<ProjectorLessonClaims t={t} />);
-    act(() => ingestLessonClaim({ roundId: 4, index: 0, word: 'THERMOMETER', username: 'Maya', avatar: null, teamId: null, claimedCount: 1, total: 1, bonus: 3 }));
+    act(() => ingestLessonClaim({ roundId: 4, index: 0, word: 'THERMOMETER', username: 'Maximiliana-Josefina', avatar: { emoji: '🦊' }, teamId: null, claimedCount: 1, total: 1, bonus: 3 }));
+    const face = screen.getByTestId('claim-tile-face');
+    expect(face.className).toMatch(/\bflex-row\b/);
+    expect(face.className).not.toMatch(/flex-col/);
     const word = screen.getByTestId('claim-tile-text');
-    expect(word.className).not.toMatch(/\btruncate\b/);
     expect(word.className).toMatch(/whitespace-nowrap/);
-    expect(screen.getByTestId('claim-tile-name').className).toMatch(/text-\[clamp\(14px,/);
+    expect(word.className).toMatch(/\bshrink-0\b/);
+    expect(word.className).not.toMatch(/\btruncate\b/);
+    const name = screen.getByTestId('claim-tile-name');
+    expect(name.className).toMatch(/\btruncate\b/);
+    expect(name.className).toMatch(/\bmin-w-0\b/);
+  });
+
+  it('Given any tile, Then it has a minimum height that fits one line of its text and rows never stretch or squash to fill the board', () => {
+    act(() => ingestLessonClaimsRound({ lessonClaims: { roundId: 4, total: 12, claimedCount: 0, slots: slots(12) } }));
+    render(<ProjectorLessonClaims t={t} />);
+    expect(screen.getAllByTestId('claim-tile-face').every((f) => /min-h-\[2em\]/.test(f.className))).toBe(true);
+    const list = within(screen.getByTestId('projector-lesson-claims')).getByRole('list');
+    expect(list.className).not.toMatch(/auto-rows-fr/);
+    expect(list.className).toMatch(/content-start/);
   });
 });

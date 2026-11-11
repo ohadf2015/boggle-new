@@ -6,6 +6,7 @@ import ClassroomJoinNamePrompt from '@/components/multiplayer/ClassroomJoinNameP
 import { useMultiplayerFlowState } from '@/components/multiplayer/useMultiplayerFlowState';
 import type { MultiplayerFlowProps } from '@/components/multiplayer/MultiplayerFlow';
 import { getStoredUsername } from '@/utils/profileStorage';
+import { useHostCreateRefusal } from '@/app/[locale]/multiplayer/hostCreateRefusal';
 import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
@@ -38,12 +39,26 @@ function Frame({ testId, mascot, children }: { testId: string; mascot: string; c
 function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | 'language' | 'isSpectator'>) {
   const flow = useMultiplayerFlowState(entry);
   const room = entry.prefilledRoom ?? '';
+  const refusal = useHostCreateRefusal();
 
   if (flow.entryView === 'classroom-name' && room) {
     return (
       <div data-testid="edu-live-name" className="flex min-h-0 flex-1 flex-col bg-neo-navy">
         <ClassroomJoinNamePrompt roomCode={room} onSubmit={flow.handleClassroomNameSubmit} initialName={getStoredUsername() || ''} disabled={entry.isJoining} />
       </div>
+    );
+  }
+
+  if (isHost && refusal && !entry.isJoining && refusal.code.toUpperCase() === room.toUpperCase()) {
+    const name = entry.displayName || getStoredUsername() || '';
+    return (
+      <Frame testId="edu-live-host-refused" mascot={EDU_MASCOT.tip}>
+        <h1 role="alert" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.hostRefusedTitle')}</h1>
+        <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.hostRefusedHint')}</p>
+        <button type="button" data-testid="edu-live-host-retry" onClick={() => entry.handleJoin(true, entry.defaultLanguage, room, `${name} Room`, name, { isPrivate: true, isClassroom: true })} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}>
+          {t('eduLiveRoom.entry.hostRetry')}
+        </button>
+      </Frame>
     );
   }
 

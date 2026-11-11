@@ -24,13 +24,10 @@ import { ReportsHomeworkTab } from '@/components/teacher/reports/ReportsHomework
 import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomRosterProgress';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
-import { EducationShell } from '@/components/education/shell/EducationShell';
-import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
-import { ProGate } from '@/components/teacher/ProGate';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
@@ -44,8 +41,7 @@ import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
 import { ReportsClassEmpty } from './ReportsClassEmpty';
 import { ReportsReteachPanel } from './ReportsReteachPanel';
-import { ReportsLockedTitle } from './ReportsLockedTitle';
-import { ReportsFreeSummary } from './ReportsFreeSummary';
+import { ReportsProGate, ReportsShell } from './ReportsGate';
 import { NeoButton } from '@/components/ui/button';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
@@ -418,66 +414,10 @@ export default function TeacherReportsPage({ gradePassbackEnabled = false }: { g
   return (
     <ReportsShell>
       <TeacherGate>
-        <ReportsFreeSummary />
         <ReportsProGate>
           <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
         </ReportsProGate>
       </TeacherGate>
     </ReportsShell>
-  );
-}
-
-export function ReportsProGate({ children }: { children: React.ReactNode }) {
-  return (
-    <ProGate
-      feature="reports"
-      ctaKey="teacher.proGate.reports.cta"
-      polarTrialPlacement="reports_teaser"
-      tone="arcade"
-      whileChecking={<ReportsChecking />}
-      lockedTitle={<ReportsLockedTitle />}
-    >
-      {children}
-    </ProGate>
-  );
-}
-
-function ReportsChecking() {
-  const { t } = useLanguage();
-  return (
-    <div data-testid="reports-checking" aria-busy="true" className="grid gap-3 sm:grid-cols-2">
-      <span className="sr-only" role="status">
-        {t('teacher.reports.loadingClassrooms')}
-      </span>
-      {[0, 1, 2, 3].map((i) => (
-        <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
-      ))}
-    </div>
-  );
-}
-
-/**
- * The shell wraps BOTH gates. Reports has five states a teacher can land on —
- * the role loader, the role denial, the Pro upsell, the class picker, a report —
- * and only the last two are this file's own markup. Measured live as a free
- * teacher on `/en/teacher/reports`: the upsell rendered with no shell at all and
- * `body` back to plain `.screen-fit`, i.e. the page scrolling again on the one
- * screen we sell Pro from. One shell, above everything, so all five are held.
- */
-function ReportsShell({ children }: { children: React.ReactNode }) {
-  const { t } = useLanguage();
-  return (
-    <EducationShell
-      className={TEACHER_TV_SCALE}
-      scrollRegionLabel={t('teacher.reports.title')}
-      contentClassName="relative p-4 sm:p-6 lg:p-8"
-    >
-      {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
-          behind a working deck. Dark-only surface (pitfall 5). */}
-      {/* On a phone the trial strip's full-width button would be the first tap and push the reteach action below the fold. */}
-      <div className="relative max-sm:flex max-sm:flex-col [&>[data-testid=pro-trial-preview]]:mx-auto [&>[data-testid=pro-trial-preview]]:max-w-5xl max-sm:[&>[data-testid=pro-trial-preview]]:order-last max-sm:[&>[data-testid=pro-trial-preview]]:mb-0 max-sm:[&>[data-testid=pro-trial-preview]]:mt-4">
-        {children}
-      </div>
-    </EducationShell>
   );
 }
