@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -25,6 +25,7 @@ import { AdminNotificationBell } from '@/components/admin/AdminNotificationBell'
 import { useOverviewPulse } from '@/hooks/useOverviewPulse';
 import { TeacherHealthCard } from '@/components/admin/overview/TeacherHealthCard';
 import { SystemHealth } from '@/components/admin/overview/SystemHealth';
+import { DrillSection } from '@/components/admin/shared/DrillSection';
 import { ModeMixPanel } from '@/components/admin/overview/ModeMixPanel';
 const DailyActivityChart = dynamic(
   () => import('@/components/admin/overview/DailyActivityChart').then((m) => m.DailyActivityChart),
@@ -57,6 +58,20 @@ export default function AdminPageClient() {
   const { authToken, refreshToken, isLoading: tokenLoading, error: tokenError } = useAdminAuth();
   const { stats, health } = useAdminDashboard(authToken);
   const { pulse, windowDays, setWindowDays, failed, retry, revenue } = useOverviewPulse(authToken, stats, health);
+
+  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
+  const isOpen = (id: string) => openIds.has(id);
+  const setSection = (id: string) => (open: boolean) =>
+    setOpenIds((prev) => {
+      const next = new Set(prev);
+      if (open) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  const openSection = useCallback((id: string) => {
+    setOpenIds((prev) => new Set(prev).add(id));
+    requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }));
+  }, []);
 
   const isProfileLoading = !authLoading && user && !profile;
 
@@ -129,21 +144,20 @@ export default function AdminPageClient() {
             }
           />
 
-          {/* Insight first: trend tiles, then what is working / not / about to break */}
+          {/* Insight first: today against yesterday, then what is working / not / about to break */}
           <PulseSection
             pulse={pulse}
             windowDays={windowDays}
             onWindowChange={setWindowDays}
             failed={failed}
             onRetry={retry}
+            onOpenSection={openSection}
             stats={stats}
             revenue={revenue}
           />
 
-          {/* Teacher health summary — actionable, glanceable, links to full funnel */}
-          <TeacherHealthCard />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <TeacherHealthCard />
             <div className="flex flex-col gap-2">
               <SystemHealth health={health} />
               <button
@@ -155,21 +169,33 @@ export default function AdminPageClient() {
             </div>
           </div>
 
-          <ModeMixPanel />
-
-          {/* Dashboard content */}
+          {/* Everything heavy sits behind a drill-down and loads only when opened */}
           {authToken ? (
             <>
-              <div id="overview-signups"><SignupGrowthChart authToken={authToken} /></div>
-              <div id="overview-revenue"><RevenuePanel authToken={authToken} /></div>
-              <div id="overview-daily"><DailyActivityChart authToken={authToken} /></div>
-              <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
-              <TodayGamesHistory authToken={authToken} />
-              <DeploymentInfoPanel authToken={authToken} />
-
-              <div id="indexnow" className="mt-8">
-                <IndexNowPanel />
-              </div>
+              <DrillSection id="overview-live" title={t('admin.overview.section.live', 'Live right now')} summary={t('admin.overview.section.liveHint', 'Who is online and which games are running')} open={isOpen('overview-live')} onOpenChange={setSection('overview-live')}>
+                <LiveMonitor authToken={authToken} onTokenExpired={refreshToken} />
+              </DrillSection>
+              <DrillSection id="overview-today" title={t('admin.overview.section.today', 'Games today')} summary={stats ? t('admin.overview.section.todayHint', '{games} games so far today', { games: stats.activity.gamesToday }) : undefined} open={isOpen('overview-today')} onOpenChange={setSection('overview-today')}>
+                <TodayGamesHistory authToken={authToken} />
+              </DrillSection>
+              <DrillSection id="overview-daily" title={t('admin.overview.section.daily', 'Daily activity')} summary={t('admin.overview.section.dailyHint', 'Games and players, day by day')} open={isOpen('overview-daily')} onOpenChange={setSection('overview-daily')}>
+                <DailyActivityChart authToken={authToken} />
+              </DrillSection>
+              <DrillSection id="overview-modes" title={t('admin.overview.section.modes', 'Game modes')} summary={t('admin.overview.section.modesHint', 'What people choose to play')} open={isOpen('overview-modes')} onOpenChange={setSection('overview-modes')}>
+                <ModeMixPanel />
+              </DrillSection>
+              <DrillSection id="overview-signups" title={t('admin.overview.section.signups', 'Signups')} summary={stats ? t('admin.overview.section.signupsHint', '{today} today, {week} this week', { today: stats.activity.signupsToday, week: stats.activity.signupsWeek }) : undefined} open={isOpen('overview-signups')} onOpenChange={setSection('overview-signups')}>
+                <SignupGrowthChart authToken={authToken} />
+              </DrillSection>
+              <DrillSection id="overview-revenue" title={t('admin.overview.section.revenue', 'Revenue')} summary={revenue ? t('admin.overview.section.revenueHint', '{paying} paying, {trialing} in a trial', { paying: revenue.paying, trialing: revenue.trialing }) : undefined} open={isOpen('overview-revenue')} onOpenChange={setSection('overview-revenue')}>
+                <RevenuePanel authToken={authToken} />
+              </DrillSection>
+              <DrillSection id="overview-tech" title={t('admin.overview.section.tech', 'Deploy and indexing')} summary={t('admin.overview.section.techHint', 'Current build and search-engine pings')} open={isOpen('overview-tech')} onOpenChange={setSection('overview-tech')}>
+                <DeploymentInfoPanel authToken={authToken} />
+                <div id="indexnow" className="mt-6">
+                  <IndexNowPanel />
+                </div>
+              </DrillSection>
             </>
           ) : (
             <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-12 text-center">

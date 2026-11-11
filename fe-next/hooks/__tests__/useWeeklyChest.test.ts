@@ -24,6 +24,24 @@ describe('useWeeklyChest', () => {
     authState.loading = false
   })
 
+  it('sends this device\'s guest ids so the server can carry a guest streak onto a new account', async () => {
+    localStorage.setItem('lexiclash_guest_fingerprint', 'fp1')
+    localStorage.setItem('boggle_guest_session_id', 'gs1')
+    global.fetch = makeFetch({ daysCompleted: 0, isClaimable: false, completedDates: [], cycleStart: '2026-05-10', cycleNumber: 1, pendingChest: null })
+    renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled())
+    const headers = new Headers((vi.mocked(global.fetch).mock.calls[0][1] as RequestInit).headers)
+    expect(headers.get('x-lc-guest-ids')).toBe('fp1,gs1')
+    localStorage.clear()
+  })
+
+  it('Given the status request fails right after sign-in, stays awaiting the account answer instead of showing 0', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500, json: async () => ({}) })
+    const { result } = renderHook(() => useWeeklyChest())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.awaitingFirstLoad).toBe(true)
+  })
+
   it('is loading initially', () => {
     global.fetch = makeFetch({ daysCompleted: 3, isClaimable: false, completedDates: [], cycleStart: '2026-05-10', cycleNumber: 1, pendingChest: null })
     const { result } = renderHook(() => useWeeklyChest())

@@ -1,9 +1,11 @@
 'use client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth, postWithAuth } from '@/utils/authFetch'
+import { CARRYOVER_GUEST_SESSION_KEY, GUEST_FINGERPRINT_KEY } from '@/utils/dailyChallenge/constants'
 import { useAuth } from '@/contexts/AuthContext'
 import posthog from '@/lib/analytics/lazyPosthog'
 import type { ChestPartDrop } from '@/lib/avatar/chestDrops'
+import type { NextMilestone, StreakMilestone, WeekDay } from '@/lib/daily/streakRewards'
 
 export interface PendingChest {
   tier: 'bronze' | 'silver' | 'gold'
@@ -36,15 +38,59 @@ export interface WeeklyChestState {
   weekScore: number
   /** Streak freezes banked on the account (each covers one missed day). */
   freezesAvailable: number
+  /** Streak risk, week strip, milestone and freeze-saved news; null on an older server. */
+  streak: ServerStreakBlock | null
   /** True while a claim request is in flight (disable the claim button). */
   claiming: boolean
   /** True when the last claim attempt failed (network / server error). */
   claimError: boolean
   claim: () => Promise<PendingChest | null>
-  refresh: () => void
+  refresh: (force?: boolean) => void
+  /** Signed in but no account answer yet (first load pending or failed): show a skeleton, never the defaults. */
+  awaitingFirstLoad: boolean
+}
+
+export interface ServerStreakBlock {
+  current: number
+  playedToday: boolean
+  atRisk: boolean
+  week: WeekDay[]
+  freezeSaved: { date: string; freezesRemaining: number } | null
+  milestone: { claimable: StreakMilestone | null; next: NextMilestone | null } | null
+}
+
+const isRecord = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object'
+
+const WEEK_STATES = new Set(['played', 'frozen', 'missed', 'today', 'future'])
+
+// Anything malformed drops the whole block, so the UI falls back to the chest numbers.
+function normalizeStreakBlock(raw: unknown): ServerStreakBlock | null {
+  if (!isRecord(raw) || !Array.isArray(raw.week)) return null
+  const week = raw.week.filter(
+    (d): d is WeekDay => isRecord(d) && typeof d.date === 'string' && WEEK_STATES.has(String(d.state)) && typeof d.weekday === 'number',
+  )
+  if (week.length !== 7) return null
+  const milestone = isRecord(raw.milestone)
+    ? {
+        claimable: isRecord(raw.milestone.claimable) ? (raw.milestone.claimable as unknown as StreakMilestone) : null,
+        next: isRecord(raw.milestone.next) ? (raw.milestone.next as unknown as NextMilestone) : null,
+      }
+    : null
+  const saved = isRecord(raw.freezeSaved) && typeof raw.freezeSaved.date === 'string'
+    ? { date: raw.freezeSaved.date, freezesRemaining: Math.max(0, Number(raw.freezeSaved.freezesRemaining) || 0) }
+    : null
+  return {
+    current: Math.max(0, Math.trunc(Number(raw.current) || 0)),
+    playedToday: raw.playedToday === true,
+    atRisk: raw.atRisk === true,
+    week,
+    freezeSaved: saved,
+    milestone,
+  }
 }
 
 const DEFAULTS = {
+  streak: null as ServerStreakBlock | null,
   daysCompleted: 0,
   currentStreak: 0,
   completedDates: [] as string[],
@@ -90,6 +136,7 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   const rawFreezes = Number(obj.freezesAvailable)
   const freezesAvailable = Number.isFinite(rawFreezes) ? Math.max(0, Math.trunc(rawFreezes)) : 0
   return {
+    streak: normalizeStreakBlock(obj.streak),
     freezesAvailable,
     daysCompleted,
     currentStreak,
@@ -122,6 +169,18 @@ export function _resetWeeklyChestCache() {
   cachedAt = 0
 }
 
+// The ids this device played under as a guest, so a new account keeps its streak (server-validated).
+const GUEST_ID_KEYS = [GUEST_FINGERPRINT_KEY, 'boggle_guest_session_id', CARRYOVER_GUEST_SESSION_KEY]
+
+function guestIdHeaders(): { headers?: Record<string, string> } {
+  try {
+    const ids = [...new Set(GUEST_ID_KEYS.map((k) => localStorage.getItem(k)).filter((v): v is string => !!v))]
+    return ids.length > 0 ? { headers: { 'x-lc-guest-ids': ids.join(',') } } : {}
+  } catch {
+    return {}
+  }
+}
+
 function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null> {
   if (!force) {
     if (inflightStatus) return inflightStatus
@@ -129,7 +188,7 @@ function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null>
       return Promise.resolve(cachedStatus)
     }
   }
-  inflightStatus = getWithAuth('/api/daily/weekly-chest/status')
+  inflightStatus = getWithAuth('/api/daily/weekly-chest/status', guestIdHeaders())
     .then(async r => {
       // 429/5xx return error JSON; normalize coerces but we still skip the write
       // entirely so a rate-limited refresh doesn't blank out previously-good data.
@@ -154,6 +213,7 @@ export function useWeeklyChest(): WeeklyChestState {
   const [claimError, setClaimError] = useState(false)
   const mountedRef = useRef(true)
   const hasLoadedRef = useRef(false)
+  const [loadedOnce, setLoadedOnce] = useState(false)
   const claimInFlightRef = useRef(false)
 
   const refresh = useCallback((force = false) => {
@@ -166,6 +226,7 @@ export function useWeeklyChest(): WeeklyChestState {
         if (!mountedRef.current) return
         if (status !== null) {
           hasLoadedRef.current = true
+          setLoadedOnce(true)
           setData(status)
         }
         setLoading(false)
@@ -241,5 +302,6 @@ export function useWeeklyChest(): WeeklyChestState {
     }
   }, [refresh, data.cycleNumber])
 
-  return { loading, ...data, claiming, claimError, claim, refresh }
+  const awaitingFirstLoad = isAuthenticated && !loadedOnce
+  return { loading, ...data, claiming, claimError, claim, refresh, awaitingFirstLoad }
 }

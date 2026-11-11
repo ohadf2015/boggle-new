@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Flame, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useTodayLabel } from './useTodayLabel';
 import type { ReactNode } from 'react';
@@ -11,6 +12,7 @@ interface HeroQuickLinksProps {
   t: (key: string, params?: Record<string, string | number>) => string;
   streak: number;
   streakLoading: boolean;
+  atRisk?: boolean;
   /** Banked streak freezes (signed-in only); shown on the chip when > 0. */
   freezes?: number;
 }
@@ -46,9 +48,10 @@ function Chip({ href, testId, icon, iconBg, title, sub, trailing, onClick }: {
   );
 }
 
-export function HeroQuickLinks({ lang, t, streak, streakLoading, freezes = 0 }: HeroQuickLinksProps) {
+export function HeroQuickLinks({ lang, t, streak, streakLoading, atRisk = false, freezes = 0 }: HeroQuickLinksProps) {
   const date = useTodayLabel(lang, { weekday: 'short', day: 'numeric', month: 'short' });
-  const dailySub = !streakLoading && streak > 0 ? t('homePlay.chipStreak', { n: streak }) : date;
+  const known = !streakLoading && streak > 0;
+  const dailySub = known ? (atRisk ? t('dailyStreak.flame.atRisk', { n: streak }) : t('homePlay.chipStreak', { n: streak })) : date;
   return (
     <ul className="grid grid-cols-1 gap-2.5 lg:gap-4" data-testid="hp-quick-links">
       <Chip
@@ -75,7 +78,7 @@ export function HeroQuickLinks({ lang, t, streak, streakLoading, freezes = 0 }: 
         }
         testId="hp-chip-daily"
         iconBg="bg-neo-orange"
-        icon={<Flame className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.75} aria-hidden="true" />}
+        icon={<StreakFlame days={known ? streak : 0} size={30} mood={known && atRisk ? 'worried' : 'happy'} animated={known} />}
         title={t('homePlay.chipDaily')}
         sub={dailySub}
       />

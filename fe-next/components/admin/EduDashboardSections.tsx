@@ -12,6 +12,7 @@ import { EduKpiGrid } from './edu-dashboard/EduKpiGrid';
 import { EduProTab } from './edu-dashboard/EduProTab';
 import { EduTeacherTable } from './edu-dashboard/EduTeacherTable';
 import { EduUsageTab } from './edu-dashboard/EduUsageTab';
+import { EduTodayStrip } from './edu-dashboard/EduTodayStrip';
 import { EduVerdictHero } from './edu-dashboard/EduVerdictHero';
 import type { ActiveDrill, EduDashboardView } from './edu-dashboard/eduDashboardShared';
 
@@ -53,6 +54,7 @@ export function EduDashboardSections({ data }: { data: EduDashboardView }) {
       </TabsList>
 
       <TabsContent value="overview" className="space-y-4">
+        <EduTodayStrip today={data.today} />
         <EduVerdictHero verdict={data.verdict} drill={data.drill.funnel} onDrill={openDrill} />
         <EduFindings data={data} onDrill={openDrill} />
         <div className="grid gap-4 lg:grid-cols-2">
@@ -66,7 +68,7 @@ export function EduDashboardSections({ data }: { data: EduDashboardView }) {
       </TabsContent>
       <TabsContent value="usage"><EduUsageTab data={data} onDrill={openDrill} /></TabsContent>
       <TabsContent value="teachers">
-        <EduTeacherTable rows={data.teachers} drill={drill?.kind === 'teachers' ? drill : null} onClearDrill={clear} />
+        <EduTeacherTable rows={data.teachers} classes={data.classes} drill={drill?.kind === 'teachers' ? drill : null} onClearDrill={clear} />
       </TabsContent>
       <TabsContent value="classes">
         <ClassTableCard rows={data.classes} drill={drill?.kind === 'classes' ? drill : null} onClearDrill={clear} />

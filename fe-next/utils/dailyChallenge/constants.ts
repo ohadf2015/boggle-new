@@ -74,6 +74,8 @@ export const WORD_WHEEL_STORAGE_KEY = 'lexiclash_word_wheel';
 export const DAILY_STREAK_KEY = 'lexiclash_daily_streak';
 export const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';
 export const GUEST_FINGERPRINT_KEY = 'lexiclash_guest_fingerprint';
+/** The guest session id, kept after sign-in clears it, so the server can still carry that guest's Tower days. */
+export const CARRYOVER_GUEST_SESSION_KEY = 'lexiclash_carryover_guest_session';
 export const SIGNUP_MODAL_DISMISSED_KEY = 'lexiclash_signup_dismissed';
 export const PENDING_DAILY_RESULT_KEY = 'lexiclash_pending_daily_result';
 export const FIRST_COMPLETION_KEY = 'lexiclash_first_daily_completion';

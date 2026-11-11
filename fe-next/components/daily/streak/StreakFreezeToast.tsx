@@ -6,7 +6,7 @@
  * Shows when a player plays today after missing yesterday, and a freeze bridges the gap.
  * Copy is honest: names what it cost (1 freeze) and what it protected (the saved day).
  *
- * Renders as a translucent toast with snowflake icon, clear messaging, and auto-dismiss.
+ * Solid cyan toast with a snowflake, clear messaging, and auto-dismiss.
  */
 
 import { Snowflake } from 'lucide-react';
@@ -47,9 +47,9 @@ export function StreakFreezeToast({ freezeApplied }: StreakFreezeToastProps) {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5 px-4 py-3 rounded-lg bg-neo-cyan/90 backdrop-blur-sm border border-neo-cyan text-neo-navy font-rubik text-sm font-semibold shadow-hard-lg z-50 animate-in fade-in slide-in-from-bottom-4 duration-300"
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2.5 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-sm font-bold text-neo-black shadow-hard-lg animate-in slide-in-from-bottom-4 duration-300"
     >
-      <Snowflake className="w-4 h-4 flex-shrink-0" strokeWidth={2.5} aria-hidden />
+      <Snowflake className="w-5 h-5 flex-shrink-0" strokeWidth={2.5} aria-hidden />
       <span>{message}</span>
     </div>
   );

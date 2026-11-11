@@ -7,6 +7,8 @@ export interface ChestActivity {
   puzzleRows: PuzzleScoreRow[]
   /** Every date that counts toward the chest streak (all modes + freezes). */
   allDates: string[]
+  /** The subset of allDates that a streak freeze covered. */
+  frozenDates: string[]
 }
 
 type Res<T> = { data: T[] | null; error: { message: string } | null }
@@ -61,5 +63,5 @@ export async function loadChestActivity(db: SupabaseClient, userId: string): Pro
     ...connRows.map(r => r.puzzle_date),
     ...freezeRows.map(r => r.frozen_date),
   ]
-  return { huntRows, wheelRows, puzzleRows, allDates }
+  return { huntRows, wheelRows, puzzleRows, allDates, frozenDates: freezeRows.map(r => r.frozen_date) }
 }

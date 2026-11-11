@@ -28,6 +28,8 @@ interface PlayHeroProps {
   greeting: string;
   streak: number;
   streakLoading: boolean;
+  /** Streak alive but today not played: the daily chip warns. */
+  atRisk?: boolean;
   /** Banked streak freezes, shown on the daily chip. */
   freezes?: number;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
@@ -121,7 +123,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, freezes = 0, onAvatarSaved, onPlay }: PlayHeroProps) {
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, onAvatarSaved, onPlay }: PlayHeroProps) {
   // Funnel numerator for the landing PLAY→onboarding leak, restored: the
   // play-first redesign (#1706) replaced FreshHero — which fired
   // `fresh_hero_play` on this CTA — with this hero, and the event's main
@@ -218,7 +220,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           </Link>
 
           {/* Daily puzzle: one tap, right under the two ways to play. */}
-          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} freezes={freezes} />
+          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} />
 
           <div>
             <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>

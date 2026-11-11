@@ -150,7 +150,31 @@ describe('GET /api/daily/status — authed', () => {
     expect((await res.json()).freezeCount).toBe(0);
   });
 
-  it.each(['daily_word_hunt_attempts', 'daily_word_wheel_attempts', 'daily_word_tower_attempts', 'connections_daily_scores', 'profiles'])(
+  it('given a freeze already spent on yesterday, keeps the streak bridged and counts both freeze pools', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-19' }, { puzzle_date: '2026-09-21' }];
+    tables.daily_streak_freezes = [{ frozen_date: '2026-09-20' }];
+    tables.player_engagement = { streak_freezes_available: 1 };
+    tables.profiles = { streak_freeze_count: 0 };
+
+    const { GET } = await import('../route');
+    const body = await (await GET(req(`userId=${USER}`))).json();
+    expect(body.streak.current).toBe(3);
+    expect(body.freezeCount).toBe(1);
+  });
+
+  it('given guest days carried over at signup, counts them in the streak like the hub does', async () => {
+    getAuthedUser.mockResolvedValue({ id: USER });
+    tables.daily_word_hunt_attempts = [{ puzzle_date: '2026-09-21' }];
+    tables.daily_streak_carryover = [{ carried_date: '2026-09-19' }, { carried_date: '2026-09-20' }];
+    tables.profiles = { streak_freeze_count: 0 };
+
+    const { GET } = await import('../route');
+    const body = await (await GET(req(`userId=${USER}`))).json();
+    expect(body.streak.current).toBe(3);
+  });
+
+  it.each(['daily_word_hunt_attempts', 'daily_word_wheel_attempts', 'daily_word_tower_attempts', 'connections_daily_scores', 'profiles', 'player_engagement', 'daily_streak_freezes'])(
     'given the %s read fails, answers 500 rather than a fake "nothing played, streak 0"',
     async (table) => {
       getAuthedUser.mockResolvedValue({ id: USER });

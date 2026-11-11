@@ -20,7 +20,7 @@ import { weeklySeed } from '@/shared/utils/weeklyTheme';
 import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { useQuickResultsCalmBridge } from '@/lib/quickPlay/resultsCalm';
-import { shareChallenge } from './challengeShare';
+import { shareQuickResult } from './challengeShare';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
@@ -404,9 +404,10 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
   const handlePlayRef = useRef<typeof handlePlay | null>(null);
   handlePlayRef.current = handlePlay;
 
-  const handleChallenge = useCallback(() => {
-    if (result) void shareChallenge(result, language, t);
-  }, [result, language, t]);
+  const handleChallenge = useCallback(
+    () => (result ? shareQuickResult({ result, locale: language, t, isGuest: !user?.id, dayStreak }) : undefined),
+    [result, language, t, user?.id, dayStreak],
+  );
 
   if (phase === 'playing' && config) {
     /* A throw inside a mode adapter used to unmount the whole page: the round
