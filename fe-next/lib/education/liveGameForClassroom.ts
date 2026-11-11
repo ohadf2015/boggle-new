@@ -22,12 +22,16 @@ import { classroomGameKey } from './classroomGameLookup';
  *
  * Never throws. A join that would otherwise succeed must not be blocked by this
  * lookup — the caller falls through to enrolling the student, which is exactly
- * what it did before this function existed.
+ * what it did before this function existed. A failure is logged as an error so
+ * it reaches monitoring instead of reading as "no live game".
  */
 export async function lookupLiveGameForClassroom(classroomId: string): Promise<string | null> {
   try {
     const redis = getCacheClient();
-    if (!redis) return null;
+    if (!redis) {
+      logger.error(`lookupLiveGameForClassroom: Redis client missing (classroom ${classroomId})`);
+      return null;
+    }
 
     const gameCodes: string[] = await redis.smembers(`classroom_games:${classroomId}`);
     if (!gameCodes?.length) return null;
@@ -58,7 +62,8 @@ export async function lookupLiveGameForClassroom(classroomId: string): Promise<s
 
     return best?.gameCode ?? null;
   } catch (err) {
-    logger.error('lookupLiveGameForClassroom failed:', err);
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error(`lookupLiveGameForClassroom: lookup threw (classroom ${classroomId}): ${message}`, err);
     return null;
   }
 }

@@ -17,7 +17,7 @@ import {
   updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
-import { bindSocketToGame, getGameUsers } from '../modules/gameStateManager.js';
+import { bindSocketToGame, gameExists, getGameUsers } from '../modules/gameStateManager.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import {
   resolveClassroomTeacher,
@@ -82,7 +82,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         playStyle?: 'ffa' | 'teams'; teamCount?: number;
         accessibility?: { largeText?: boolean; audioCues?: boolean; participationPoints?: boolean };
         economy?: { wrongAnswerCost?: boolean; powerUps?: boolean };
-        rivalry?: boolean;
+        rivalry?: boolean; rehearsal?: boolean;
       };
     };
 
@@ -147,6 +147,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           accessibility: payload.settings?.accessibility,
           economy: payload.settings?.economy,
           rivalry: payload.settings?.rivalry,
+          ...(payload.settings?.rehearsal ? { rehearsal: true } : {}),
         },
       };
 
@@ -171,6 +172,7 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
         classroomName: createdClassroomName,
         teacherName: payload.teacherName,
         lessonNames: payload.lessonNames,
+        ...(payload.settings?.rehearsal ? { rehearsal: true } : {}),
       });
 
       // Confirm creation to teacher
@@ -234,7 +236,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
       // says which classroom a game belongs to. Re-check it here so a stale or
       // mis-written index entry cannot put another class's game, and another
       // class's lesson names, in front of this student.
-      const scoped = games.filter((g) => g.classroomId === gamesPayload.classroomId);
+      const scoped = games
+        .filter((g) => g.classroomId === gamesPayload.classroomId)
+        .map((g) => ({ ...g, roomOpen: gameExists(g.gameCode) }));
 
       // Join classroom room to receive future notifications
       socket.join(`classroom:${gamesPayload.classroomId}`);

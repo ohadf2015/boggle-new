@@ -430,6 +430,7 @@ export function useMpPageState() {
       prefilledRoom: practiceSeat && !practiceSeatName ? '' : prefilledRoomCode, defaultLanguage: language as Language,
       host: isClassroomHost,
       isClassroomMode, waitingForTeacher: !!roomWait.waitingCode && !isClassroomHost,
+      waitStalled: roomWait.stalled && !isClassroomHost, onWaitRetry: roomWait.retryNow,
       roomEndedOffer, onRoomEndedOfferShown: clearRoomEndedOffer, joinRoomGone,
       setGameCode, setUsername, setRoomName, setHostUsername,
     },

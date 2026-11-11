@@ -13,7 +13,7 @@ import { useJoinTargetLookup } from './useJoinTargetLookup';
 import { joinFailure } from './joinFailure';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
-import type { JoinFlowState, JoinStep, JoinedClassroom } from './joinFlowState';
+import type { JoinFlowState, JoinStep, JoinedClassroom, OwnClassRefusal } from './joinFlowState';
 
 export type { JoinFlowState, JoinStep, JoinedClassroom } from './joinFlowState';
 
@@ -106,6 +106,7 @@ export function useJoinFlow(
   const [joined, setJoined] = useState<JoinedClassroom | null>(null);
   const [ended, setEnded] = useState(false);
   const [endedClassroomId, setEndedClassroomId] = useState<string | null>(null);
+  const [ownClass, setOwnClass] = useState<OwnClassRefusal | null>(null);
   /** Synchronous: two taps in one frame must not send two joins. */
   const inFlight = useRef(false);
   /** Any real POST is the one automatic attempt: a failed or game-code join must not auto-retry. */
@@ -324,6 +325,8 @@ export function useJoinFlow(
             // A problem the student can fix in a single tap should cost them a single tap.
             setSuggestedName(result.suggestedName ?? null);
             setNameError(true); setFormErrorKey(failure.formErrorKey ?? null);
+          } else if (failure.effect === 'own_class' && result.classroomId) {
+            setOwnClass({ classroomId: result.classroomId, liveGameCode: result.gameCode ?? null });
           } else if (failure.formErrorKey) {
             setFormErrorKey(failure.formErrorKey);
           } else if (failure.effect === 'ended') {
@@ -440,6 +443,7 @@ export function useJoinFlow(
     joined,
     ended,
     endedClassroomId,
+    ownClass,
     // Live unless a join is genuinely in flight. Disabling GO for a missing
     // nickname looked tidy and behaved as a silent no-op: the student taps a
     // grey button, nothing happens, and nothing on screen says why. `submit`

@@ -16,7 +16,8 @@ const get = vi.fn();
 const smembers = vi.fn();
 let redisFactory: () => { get: typeof get; smembers: typeof smembers } = () => ({ get, smembers });
 vi.mock('@/backend/cache/redisCache', () => ({ getCacheClient: () => redisFactory() }));
-vi.mock('@/utils/logger', () => ({ default: { error: vi.fn() } }));
+const logError = vi.fn();
+vi.mock('@/utils/logger', () => ({ default: { error: (...a: unknown[]) => logError(...a) } }));
 
 import { lookupLiveGameForClassroom } from '../liveGameForClassroom';
 
@@ -26,6 +27,7 @@ const live = (over: Record<string, unknown> = {}) =>
 beforeEach(() => {
   get.mockReset();
   smembers.mockReset();
+  logError.mockReset();
   redisFactory = () => ({ get, smembers });
 });
 
@@ -79,5 +81,31 @@ describe('lookupLiveGameForClassroom', () => {
   it('returns null rather than throwing when Redis fails', async () => {
     redisFactory = () => { throw new Error('ECONNREFUSED'); };
     await expect(lookupLiveGameForClassroom('c1')).resolves.toBeNull();
+  });
+
+  it('given no Redis client, when looked up, then it reports the missing client with the classroom id and returns null', async () => {
+    redisFactory = () => null as unknown as { get: typeof get; smembers: typeof smembers };
+    await expect(lookupLiveGameForClassroom('c1')).resolves.toBeNull();
+    expect(logError).toHaveBeenCalledTimes(1);
+    const line = logError.mock.calls[0].map(String).join(' ');
+    expect(line).toMatch(/redis client missing/i);
+    expect(line).toContain('c1');
+  });
+
+  it('given the lookup throws, when looked up, then it logs the classroom id and error message and returns null', async () => {
+    smembers.mockRejectedValue(new Error('ETIMEDOUT'));
+    await expect(lookupLiveGameForClassroom('c1')).resolves.toBeNull();
+    expect(logError).toHaveBeenCalledTimes(1);
+    const line = logError.mock.calls[0].map((a: unknown) => (a instanceof Error ? a.message : String(a))).join(' ');
+    expect(line).toMatch(/lookup threw/i);
+    expect(line).toContain('c1');
+    expect(line).toContain('ETIMEDOUT');
+    expect(line).not.toMatch(/redis client missing/i);
+  });
+
+  it('given no live game, when looked up, then nothing is logged', async () => {
+    smembers.mockResolvedValue([]);
+    await lookupLiveGameForClassroom('c1');
+    expect(logError).not.toHaveBeenCalled();
   });
 });

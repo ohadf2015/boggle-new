@@ -63,6 +63,7 @@ import {
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { classroomSeatName, cleanClassroomSeatName } from './classroomSeatName';
+import { recordClassroomRosterEntry } from '../modules/classroomRoster';
 import { practiceSeatToken } from './practiceSeat';
 import { isLockedOut } from '../modules/classroomLobbyLock.js';
 import { removeMidRoundLeaver } from './midRoundLeave.js';
@@ -318,6 +319,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // broadcast and cannot carry a per-socket value (pitfalls class 3).
     // Fire-and-forget: it must never delay or fail the join.
     void emitClassroomContext(socket, gameCode, authUserId, seat);
+    if (seat.game && authUserId) void recordClassroomRosterEntry(gameCode, seat.game, authUserId);
 
     // Handle reconnection
     if (existingSocketId || game.users[username]) {

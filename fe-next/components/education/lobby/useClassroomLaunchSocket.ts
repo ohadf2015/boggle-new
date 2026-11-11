@@ -16,6 +16,7 @@ import { recordLessonPlays } from '@/lib/education/lessonPlayStat';
 import { trackEduLiveGameStarted } from '@/lib/education/telemetry';
 import type { ClassroomPressure } from '@/shared/types/classroom';
 import { splitLaunchPayload, type ClassroomLaunchPayload } from './classroomLaunchPayload';
+import { peekRehearseIntent } from '@/lib/education/rehearsal';
 import { isClassroomIdentityRefusal } from '@/shared/constants/classroomIdentityRefusal';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
@@ -170,7 +171,11 @@ export function useClassroomLaunchSocket(t: Translate) {
     (payload: ClassroomLaunchPayload, source: LaunchSource = 'create_room') => {
       setStartError(null);
       setIsStarting(true);
-      const { createPayload, pressure } = splitLaunchPayload(payload);
+      const split = splitLaunchPayload(payload);
+      const { pressure } = split;
+      const createPayload = peekRehearseIntent()
+        ? { ...split.createPayload, settings: { ...split.createPayload.settings, rehearsal: true } }
+        : split.createPayload;
       inFlightRef.current = { classroomId: payload.classroomId, lessonIds: payload.lessonIds, source, pressure };
       clearAckTimer();
       ackTimerRef.current = setTimeout(() => {

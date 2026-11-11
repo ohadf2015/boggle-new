@@ -12,8 +12,9 @@ import { Server, Socket } from 'socket.io';
 
 const {
   mockGetGame, mockGetSocketIdByUsername, mockAddUserToGame, mockGetGameUsers,
-  mockGetActiveRooms, mockRestoreGameFromRedis, mockShouldSendGameState, mockCheckSeat,
+  mockGetActiveRooms, mockRestoreGameFromRedis, mockShouldSendGameState, mockCheckSeat, mockRecordRoster,
 } = vi.hoisted(() => ({
+  mockRecordRoster: vi.fn(),
   mockCheckSeat: vi.fn(),
   mockGetGame: vi.fn(),
   mockGetSocketIdByUsername: vi.fn(),
@@ -120,6 +121,7 @@ vi.mock('../playerReconnectHandler', () => ({
 }));
 
 vi.mock('../classroomSeatGate', () => ({ checkClassroomSeat: mockCheckSeat }));
+vi.mock('../../modules/classroomRoster', () => ({ recordClassroomRosterEntry: mockRecordRoster }));
 vi.mock('../playerDataInit', () => ({ ensurePlayerState: vi.fn().mockResolvedValue(undefined) }));
 
 import { registerPlayerJoinHandlers } from '../playerJoinHandler';
@@ -243,5 +245,33 @@ describe('PlayerJoinHandler — practice seat in a classroom room', () => {
     const opts = vi.mocked(mockAddUserToGame).mock.calls[0][3];
     expect(opts).toEqual(expect.objectContaining({ authUserId: null, isPractice: true }));
     expect(opts.guestTokenHash).not.toBe('a'.repeat(64));
+  });
+
+  it('Given a student who came in by the join link, When they join the classroom room, Then they are recorded on the room roster', async () => {
+    const STUDENT = '22222222-2222-4222-8222-222222222222';
+    const record = { teacherId: TEACHER, settings: {} };
+    mockCheckSeat.mockResolvedValue({ game: record, refused: false });
+    mockGetGame.mockReturnValue(lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } }));
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = STUDENT;
+    await join({ gameCode: 'ABC123', username: 'Noa' });
+    expect(mockRecordRoster).toHaveBeenCalledWith('ABC123', record, STUDENT);
+  });
+
+  it('Given the teacher practice seat, When it joins, Then nothing is recorded on the room roster', async () => {
+    mockGetGame.mockReturnValue(lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } }));
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
+    await join({ gameCode: 'ABC123', username: 'Dana (practice)', practiceSeat: true });
+    expect(mockRecordRoster).not.toHaveBeenCalled();
+  });
+
+  it('Given an ordinary multiplayer room, When a player joins, Then nothing is recorded on a roster', async () => {
+    mockCheckSeat.mockResolvedValue({ game: null, refused: false });
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'waiting', users: {} }));
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
+    await join({ gameCode: 'ABC123', username: 'Dana' });
+    expect(mockRecordRoster).not.toHaveBeenCalled();
   });
 });

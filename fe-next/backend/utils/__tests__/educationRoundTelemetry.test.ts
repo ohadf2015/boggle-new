@@ -213,6 +213,24 @@ describe('server-side join and end events', () => {
     });
   });
 
+  it('Given a room entered only by the join link, When the end event is built, Then roster_count counts those students', () => {
+    const ev = buildLiveGameEndedEvent(makeGame({ players: [], rosterUserIds: ['s1', 's2', 's3'] } as never), { isTestAccount: false, now: NOW, roundsRecorded: 0 });
+    expect(ev!.properties).toMatchObject({ roster_count: 3 });
+  });
+
+  it('Given the host and a student who used both doors, When the end event is built, Then the host is excluded and the student counts once', () => {
+    const ev = buildLiveGameEndedEvent(
+      makeGame({ players: [{ userId: 's1' }, { userId: 'teacher-1' }], rosterUserIds: ['s1', 'teacher-1', 's2'] } as never),
+      { isTestAccount: false, now: NOW, roundsRecorded: 0 },
+    );
+    expect(ev!.properties).toMatchObject({ roster_count: 2 });
+  });
+
+  it('Given a room entered only by the join link, When a round starts, Then player_count counts those students', () => {
+    const ev = buildLiveRoundStartedEvent(makeGame({ players: [], rosterUserIds: ['s1', 's2'] } as never), { isTestAccount: false });
+    expect(ev!.properties).toMatchObject({ player_count: 2 });
+  });
+
   it('Given an empty socket roster but recorded rounds, When built, Then roster_count uses the peak recorded players', () => {
     const ev = buildLiveGameEndedEvent(makeGame({ players: [] }), { isTestAccount: false, now: NOW, roundsRecorded: 2, peakPlayers: 16 });
     expect(ev!.properties).toMatchObject({ roster_count: 16 });

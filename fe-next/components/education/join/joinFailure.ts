@@ -2,7 +2,7 @@ import type { JoinClassroomErrorCode } from '@/hooks/useJoinClassroom';
 import type { ClassroomJoinResult } from '@/lib/education/telemetry';
 import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 
-export type JoinFailureEffect = 'name_taken' | 'full' | 'locked' | 'invalid_code' | 'ended' | 'error';
+export type JoinFailureEffect = 'name_taken' | 'full' | 'locked' | 'invalid_code' | 'ended' | 'own_class' | 'error';
 
 export const ROOM_LOCKED_KEY = 'education.student.join.roomLocked.title';
 export const NAME_NOT_ALLOWED_KEY = 'education.student.join.nameNotAllowed';
@@ -22,7 +22,7 @@ const BY_CODE: Record<JoinClassroomErrorCode | typeof ROOM_LOCKED, JoinFailure> 
   NAME_TAKEN: { outcome: 'name_taken', effect: 'name_taken' },
   NAME_NOT_ALLOWED: { outcome: 'name_taken', effect: 'name_taken', formErrorKey: NAME_NOT_ALLOWED_KEY },
   SESSION_ENDED: { outcome: 'invalid_code', effect: 'ended' },
-  TEACHER_OWN_CLASS: { outcome: 'teacher_own_class', effect: 'error', formErrorKey: 'education.student.join.teacherOwnClass' },
+  TEACHER_OWN_CLASS: { outcome: 'teacher_own_class', effect: 'own_class', formErrorKey: 'education.student.join.teacherOwnClass' },
 };
 
 export function joinFailure(code: JoinClassroomErrorCode | typeof ROOM_LOCKED | undefined): JoinFailure {

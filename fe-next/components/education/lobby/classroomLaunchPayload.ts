@@ -31,6 +31,8 @@ export interface ClassroomLaunchPayload {
     playStyle: PlayStyle;
     teamCount?: number;
     accessibility?: ClassroomAccessibility;
+    /** Set at launch when the teacher is rehearsing; class pages never auto-join it. */
+    rehearsal?: boolean;
     /**
      * The Pro pressure dials. NOT sent inside `createClassroomGame` — that
      * handler whitelists its settings keys — but held and emitted as

@@ -177,9 +177,12 @@ export async function POST(request: NextRequest) {
     // branch below returns early, and returning students are the majority of any
     // second lesson.
     let lockedOutOfLiveGame = false;
+    // Kept past the lobby-lock check below: a locked lobby never locks out its own teacher's board.
+    let ownLiveGameCode = liveGameCode;
     if (!liveGameCode) {
       try {
         liveGameCode = await lookupLiveGameForClassroom(classroom.id);
+        ownLiveGameCode = liveGameCode;
         // Enrolment is not a seat: a locked lobby still takes the student onto the roster, then says it is locked.
         const live = liveGameCode ? await lookupLiveClassroomGame(liveGameCode) : null;
         if (live && isLockedOut(live, userId)) {
@@ -230,9 +233,11 @@ export async function POST(request: NextRequest) {
     if (user) {
       // A rehearsal link is the teacher testing the room on their own phone.
       if (rehearsal !== true && (await teachesClassroom(classroom, userId!))) {
-        // The host may still walk into their own live room; they are never put on their own roster.
-        if (liveGameCode) return NextResponse.json({ classroomId: classroom.id, alreadyMember: true, gameCode: liveGameCode });
-        return NextResponse.json({ error: 'Teachers cannot join their own class as a student', code: TEACHER_OWN_CLASS }, { status: 409 });
+        // Never on their own roster; the page offers the host board (live room) or a new game instead.
+        return NextResponse.json(
+          { error: 'Teachers cannot join their own class as a student', code: TEACHER_OWN_CLASS, classroomId: classroom.id, ...(ownLiveGameCode ? { gameCode: ownLiveGameCode } : {}) },
+          { status: 409 }
+        );
       }
       const { data: existing } = await supabase
         .from('classroom_memberships')

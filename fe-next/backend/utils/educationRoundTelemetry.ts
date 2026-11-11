@@ -8,6 +8,7 @@ import { createHash } from 'node:crypto';
 import { EDU_EVENTS } from '@/lib/analytics/eduEvents';
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import type { EduServerEvent } from './educationTelemetry';
+import { classroomRosterCount } from '../modules/classroomRosterCount';
 
 const DAY_MS = 86_400_000;
 
@@ -98,7 +99,7 @@ export function buildLiveRoundStartedEvent(
     event: EDU_EVENTS.liveRoundStarted,
     properties: {
       ...roundProps(game),
-      player_count: game.players?.length ?? 0,
+      player_count: classroomRosterCount(game),
       is_test_account: ctx.isTestAccount,
     },
   };
@@ -136,7 +137,7 @@ export function buildLiveGameEndedEvent(
     properties: {
       ...roundProps(game),
       // The Redis copy of a finished game has no live roster, so the recorded rounds' peak backs it up.
-      roster_count: Math.max(game.players?.length ?? 0, ctx.peakPlayers ?? 0),
+      roster_count: Math.max(classroomRosterCount(game), ctx.peakPlayers ?? 0),
       rounds_recorded: ctx.roundsRecorded,
       had_started: Number.isFinite(startedMs),
       duration_seconds: Number.isFinite(startedMs)

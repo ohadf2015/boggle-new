@@ -19,12 +19,20 @@ describe('useJoinClassroom — join hardening', () => {
   beforeEach(() => mockUseAuth.mockReturnValue({ user: { id: 'u1' } }));
   afterEach(() => vi.unstubAllGlobals());
 
-  it('Given the teacher opens their own class code, Then TEACHER_OWN_CLASS comes back and maps to a friendly inline line', async () => {
-    vi.stubGlobal('fetch', reply(409, { code: 'TEACHER_OWN_CLASS', error: 'x' }));
+  it('Given the teacher opens their own class code, Then TEACHER_OWN_CLASS comes back with the class and live room, and maps to the own-class screen', async () => {
+    vi.stubGlobal('fetch', reply(409, { code: 'TEACHER_OWN_CLASS', error: 'x', classroomId: 'c1', gameCode: 'LIVE01' }));
     const { result } = renderHook(() => useJoinClassroom());
     const res = await result.current.joinClassroom('ABC123');
-    expect(res).toMatchObject({ success: false, code: 'TEACHER_OWN_CLASS' });
-    expect(joinFailure(res.code).formErrorKey).toBe('education.student.join.teacherOwnClass');
+    expect(res).toMatchObject({ success: false, code: 'TEACHER_OWN_CLASS', classroomId: 'c1', gameCode: 'LIVE01' });
+    expect(joinFailure(res.code).effect).toBe('own_class');
+    expect(joinFailure(res.code).outcome).toBe('teacher_own_class');
+  });
+
+  it('Given a room-locked refusal, Then no class or room is handed back', async () => {
+    vi.stubGlobal('fetch', reply(423, { code: 'ROOM_LOCKED', error: 'x', classroomId: 'c1' }));
+    const { result } = renderHook(() => useJoinClassroom());
+    const res = await result.current.joinClassroom('ABC123');
+    expect(res).toEqual({ success: false, code: 'ROOM_LOCKED', error: 'x' });
   });
 
   it('Given the server replaced a profane name, Then the replacement is handed back so the device stores it', async () => {

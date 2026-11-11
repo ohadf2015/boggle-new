@@ -67,6 +67,11 @@ describe('buildClassroomGameStartedEvent', () => {
     expect(ev!.properties.game_code).toBe('ABC123');
   });
 
+  it('Given students who came in by the join link only, When built, Then player_count counts them', () => {
+    const ev = buildClassroomGameStartedEvent(makeGame({ players: [], rosterUserIds: ['s1', 's2', 's3'] }), { isTestAccount: false });
+    expect(ev!.properties).toMatchObject({ player_count: 3 });
+  });
+
   it('Given settings with no gameMode, When built, Then game_mode falls back to classic rather than undefined', () => {
     const ev = buildClassroomGameStartedEvent(makeGame({ settings: {} }), {
       isTestAccount: false,

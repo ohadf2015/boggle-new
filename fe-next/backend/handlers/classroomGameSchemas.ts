@@ -43,6 +43,8 @@ export const createClassroomGameSchema = z.object({
     vocabQuizQuestionCount: z.number().int().min(4).max(30).optional(),
     vocabQuizSeconds: z.number().int().min(5).max(90).optional(),
     treasureChestsEnabled: z.boolean().optional(),
+    // The teacher trying the room alone; students' class pages never auto-join it.
+    rehearsal: z.boolean().optional(),
     // Team battle (weekly teams / juegos en equipo).
     playStyle: z.enum(['ffa', 'teams']).optional(),
     teamCount: z.number().int().min(2).max(4).optional(),

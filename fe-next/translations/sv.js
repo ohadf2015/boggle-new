@@ -1335,6 +1335,10 @@ const sv = {
       "ctaSoloOver": "Värm upp",
       "ctaPlay": "Spela",
       "ctaLive": "Gå med live",
+      "autoJoin": {
+        "title": "Läraren har startat ett spel. Du går med…",
+        "stay": "Stanna här"
+      },
       "ctaReviewTitle": "{count} missade ord",
       "ctaBossTitle": "Utmana bossen",
       "ctaJoinSub": "Skriv koden från din lärare",
@@ -18182,6 +18186,14 @@ const sv = {
         "codeHint": "6 bokstäver från din lärare",
         "codeStripped": "Några av de tecknen finns inte i klasskoder. Byt tangentbordet till engelska bokstäver och försök igen.",
         "teacherOwnClass": "Det här är din egen klass, så du kan inte gå med som elev. Öppna den från din lärarpanel i stället.",
+        "ownClass": {
+          "title": "Det här är din klass",
+          "hint": "Eleverna går med med den här koden. Starta ett spel härifrån när ni ska spela.",
+          "liveHint": "Ditt spel är öppet och eleverna kan gå med nu. Öppna spelplanen för att leda det.",
+          "startGame": "Starta ett spel för klassen",
+          "openBoard": "Öppna spelplanen",
+          "openClass": "Öppna min klass"
+        },
         "returning": {
           "title": "Fortsätta som {name}?",
           "titleNoName": "Är det du?",
@@ -22126,6 +22138,10 @@ const sv = {
       "openingRoom": "Öppnar ditt rum…",
       "waitingTeacher": "Läraren har inte öppnat spelet än",
       "waitingTeacherHint": "Stanna kvar. Du kommer in så fort det börjar.",
+      "waitStalledTitle": "Spelet har inte öppnats än",
+      "waitStalledHint": "Läraren håller kanske fortfarande på att förbereda det. Försök igen eller vänta på klassens sida, så kommer du in så fort det börjar.",
+      "waitStalledRetry": "Försök igen",
+      "waitStalledToClass": "Till min klass",
       "noRoomTitle": "Inget spel här",
       "noRoomStudent": "Be läraren om koden och gå med.",
       "noRoomHost": "Starta ett spel från lärarstarten.",

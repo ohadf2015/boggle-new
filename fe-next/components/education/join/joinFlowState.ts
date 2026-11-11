@@ -8,6 +8,11 @@ export interface JoinedClassroom {
   alreadyMember: boolean;
 }
 
+export interface OwnClassRefusal {
+  classroomId: string;
+  liveGameCode: string | null;
+}
+
 export interface JoinFlowState {
   step: JoinStep;
   code: string;
@@ -34,6 +39,8 @@ export interface JoinFlowState {
   ended: boolean;
   /** The class the server enrolled them in off an ended game code, if any. */
   endedClassroomId: string | null;
+  /** A signed-in teacher submitted their own class: show them how to host instead of a refusal. */
+  ownClass: OwnClassRefusal | null;
   canSubmit: boolean;
   setCode: (next: string) => void;
   setName: (next: string) => void;

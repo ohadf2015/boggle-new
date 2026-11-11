@@ -15,6 +15,7 @@ vi.mock('../../modules/gameStateManager', () => ({
   bindSocketToGame: vi.fn(),
   unbindSocketFromGame: vi.fn(),
   getGameUsers: vi.fn(() => []),
+  gameExists: vi.fn((code: string) => code === 'OPEN01'),
 }));
 vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),
@@ -170,6 +171,28 @@ describe('ClassroomGameHandler', () => {
       });
     });
 
+    it('Given a teacher rehearsal, When the room is created, Then it is marked rehearsal on the record and in the class broadcast', async () => {
+      (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const createHandler = mockSocket.on.mock.calls.find((call: any[]) => call[0] === 'createClassroomGame')[1];
+      const base = {
+        classroomId: '00000000-0000-4000-8000-000000000002',
+        teacherId: '00000000-0000-4000-8000-000000000001',
+        teacherName: 'Mr Smith',
+        lessonIds: ['00000000-0000-4000-8000-000000000003'],
+      };
+
+      await createHandler({ ...base, gameCode: 'REH123', settings: { gameMode: 'classic', rehearsal: true } });
+      await createHandler({ ...base, gameCode: 'REA123', settings: { gameMode: 'classic' } });
+
+      const settings = (classroomGameManager.createClassroomGame as Mock).mock.calls.map((c) => c[0].settings);
+      expect(settings[0].rehearsal).toBe(true);
+      expect(settings[1].rehearsal).toBeUndefined();
+      expect(mockIo.emit).toHaveBeenCalledWith('classroomGameCreated', expect.objectContaining({ gameCode: 'REH123', rehearsal: true }));
+      const real = (mockIo.emit as Mock).mock.calls.find((c: any[]) => c[0] === 'classroomGameCreated' && c[1].gameCode === 'REA123');
+      expect(real[1].rehearsal).toBeUndefined();
+    });
+
     it('keeps the Boss Battle variant on a vocab quiz room, and only there', async () => {
       (classroomGameManager.createClassroomGame as Mock).mockResolvedValue(undefined);
       registerClassroomGameHandlers(mockIo, mockSocket);
@@ -280,6 +303,21 @@ describe('ClassroomGameHandler', () => {
           games: [expect.objectContaining({ gameCode: 'GAME1', classroomId })],
         })
       );
+    });
+  });
+
+  describe('getActiveClassroomGames — is the room open', () => {
+    it('Given one game whose projector room is open and one that is not, When listed, Then each says whether students can get in yet', async () => {
+      const classroomId = '00000000-0000-4000-8000-000000000002';
+      (classroomGameManager.getActiveClassroomGames as Mock).mockResolvedValue([
+        { gameCode: 'OPEN01', classroomId, teacherName: 'T', lessonNames: [], status: 'waiting' },
+        { gameCode: 'SHUT01', classroomId, teacherName: 'T', lessonNames: [], status: 'waiting' },
+      ]);
+      registerClassroomGameHandlers(mockIo, mockSocket);
+      const getHandler = mockSocket.on.mock.calls.find((call: any[]) => call[0] === 'getActiveClassroomGames')[1];
+      await getHandler({ classroomId });
+      const payload = (mockSocket.emit as Mock).mock.calls.find((c: any[]) => c[0] === 'activeClassroomGames')?.[1];
+      expect(payload.games.map((g: { gameCode: string; roomOpen: boolean }) => [g.gameCode, g.roomOpen])).toEqual([['OPEN01', true], ['SHUT01', false]]);
     });
   });
 

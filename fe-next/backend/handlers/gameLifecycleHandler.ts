@@ -282,7 +282,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode)
       });
-      announceClassroomRoomOpened(io, gameCode); // students parked on "waiting for your teacher" walk in now
+      announceClassroomRoomOpened(io, gameCode, isClassroom ? classroomGate.classroomId : undefined); // students parked on "waiting for your teacher" walk in now
 
       try {
         await saveGameState(gameCode, game as unknown as Parameters<typeof saveGameState>[1]);

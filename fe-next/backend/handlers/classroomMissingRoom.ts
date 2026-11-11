@@ -66,12 +66,14 @@ export function classroomWaitRoom(gameCode: string): string {
  * announcement (another instance, a reconnect) costs seconds, never the round.
  * Never throws — room creation must not fail on a courtesy broadcast.
  */
-export function announceClassroomRoomOpened(io: Server, gameCode: string): void {
+export function announceClassroomRoomOpened(io: Server, gameCode: string, classroomId?: string): void {
   try {
     clearWaitingClassroomStudents(gameCode);
     const room = classroomWaitRoom(gameCode);
     io.to(room).emit('classroomRoomOpened', { gameCode });
     io.in(room).socketsLeave(room);
+    // Class pages auto-join only an open room; this is their signal that it now is.
+    if (classroomId) io.to(`classroom:${classroomId}`).emit('classroomRoomOpened', { gameCode, classroomId });
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `Could not announce room open for ${gameCode}: ${(err as Error)?.message ?? err}`);
   }

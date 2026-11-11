@@ -19,6 +19,8 @@ export const EDU_EVENTS = {
   classroomJoinRefused: 'edu_classroom_join_refused',
   // A student who reached an ended classroom game started today's practice round instead.
   latePracticeStarted: 'edu_late_join_practice_started',
+  // A teacher refused on their own class code tapped the next step the join page offered.
+  teacherOwnClassAction: 'edu_teacher_own_class_action',
 } as const;
 
 export type EduEventName = (typeof EDU_EVENTS)[keyof typeof EDU_EVENTS];

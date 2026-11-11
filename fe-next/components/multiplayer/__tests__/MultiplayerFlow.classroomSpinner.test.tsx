@@ -138,6 +138,15 @@ describe('MultiplayerFlow — classroom mode must never dead-end on a spinner', 
     expect(screen.getByTestId('classroom-waiting').textContent).toContain('education.studentPreview.waiting.title');
   });
 
+  it('Given the wait stalled past a minute, When the student looks, Then they get try-again and go-to-class instead of a bare spinner', () => {
+    const onWaitRetry = vi.fn();
+    render(<MultiplayerFlow {...baseProps} isClassroomMode prefilledRoom="ABC123" waitingForTeacher waitStalled onWaitRetry={onWaitRetry} />);
+    expect(screen.getByTestId('classroom-waiting').textContent).toContain('eduLiveRoom.entry.waitStalledTitle');
+    fireEvent.click(screen.getByTestId('classroom-wait-retry'));
+    expect(onWaitRetry).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('classroom-wait-to-class').getAttribute('href')).toBe('/en/student');
+  });
+
   it('does NOT strand a student on the spinner when there is no room to join', () => {
     render(<MultiplayerFlow {...baseProps} isClassroomMode prefilledRoom={undefined} />);
     expect(screen.queryByTestId('classroom-waiting')).toBeNull();

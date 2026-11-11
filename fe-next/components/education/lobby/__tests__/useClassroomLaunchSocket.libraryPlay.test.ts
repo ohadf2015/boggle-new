@@ -24,6 +24,7 @@ vi.mock('@/lib/education/lessonPlayStat', () => ({
 }));
 
 import { useClassroomLaunchSocket, type ClassroomLaunchPayload } from '../useClassroomLaunchSocket';
+import { writeRehearseIntent, clearRehearseIntent } from '@/lib/education/rehearsal';
 
 const t = (k: string) => k;
 
@@ -63,5 +64,31 @@ describe('useClassroomLaunchSocket — library plays', () => {
     act(() => result.current.launch(payload(result.current.gameCode)));
     act(() => fire('classroomGameError', { error: 'nope' }));
     expect(recordLessonPlays).not.toHaveBeenCalled();
+  });
+});
+
+describe('useClassroomLaunchSocket — rehearsal rooms', () => {
+  beforeEach(() => {
+    handlers.clear();
+    emit.mockClear();
+    clearRehearseIntent();
+  });
+
+  const createdSettings = () => emit.mock.calls.find((c) => c[0] === 'createClassroomGame')?.[1]?.settings;
+
+  it('Given the teacher chose to rehearse, When the room is launched, Then it is marked as a rehearsal', async () => {
+    writeRehearseIntent({ source: 'class', classExists: true, withSeat: true });
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
+    await waitFor(() => expect(result.current.socket).not.toBeNull());
+    act(() => result.current.launch(payload(result.current.gameCode)));
+    expect(createdSettings()).toMatchObject({ rehearsal: true });
+  });
+
+  it('Given a real lesson, When the room is launched, Then it is not marked as a rehearsal', async () => {
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
+    await waitFor(() => expect(result.current.socket).not.toBeNull());
+    act(() => result.current.launch(payload(result.current.gameCode)));
+    expect(createdSettings()).toBeDefined();
+    expect(createdSettings().rehearsal).toBeUndefined();
   });
 });

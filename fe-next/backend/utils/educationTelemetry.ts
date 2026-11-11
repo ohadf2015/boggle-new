@@ -35,6 +35,7 @@ import { getPostHogServer } from '@/lib/posthog';
 // ONLY `npm run build` — the slowest possible place to find out.
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import logger from './logger';
+import { classroomRosterCount } from '../modules/classroomRosterCount';
 
 /**
  * The host every LexiClash dashboard filters on. Derived from the deployed app
@@ -119,7 +120,7 @@ export function buildClassroomGameStartedEvent(
       classroom_id: game.classroomId,
       game_code: game.gameCode,
       game_mode: gameModeOf(game),
-      player_count: game.players?.length ?? 0,
+      player_count: classroomRosterCount(game),
       lesson_count: game.lessonIds?.length ?? 0,
       is_test_account: ctx.isTestAccount,
     },

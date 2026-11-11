@@ -21,6 +21,7 @@ import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeeki
 import { MpScreen } from './shell/MpScreen';
 import { useMultiplayerFlowState } from './useMultiplayerFlowState';
 import { useRoomEndedOffer } from './useRoomEndedOffer';
+import ClassroomWaitStalled from '@/components/education/live/ClassroomWaitStalled';
 
 export interface MultiplayerFlowProps {
   // Callbacks
@@ -55,6 +56,10 @@ export interface MultiplayerFlowProps {
   isClassroomMode?: boolean;
   /** An early classroom joiner held until the teacher opens the room. */
   waitingForTeacher?: boolean;
+  /** That wait has run a minute without the room opening. */
+  waitStalled?: boolean;
+  /** Re-ask for the room now. */
+  onWaitRetry?: () => void;
 
   // Auto-create room on mount (e.g., from Word Hunt banner)
   autoCreate?: boolean;
@@ -145,8 +150,16 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
         body={
           <div className="flex-1 flex items-center justify-center px-4 py-8" data-testid="classroom-waiting">
             <div className="flex flex-col items-center gap-3 text-neo-white font-neo-body">
-              <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
-              <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
+              {waitingForTeacher && props.waitStalled ? (
+                <div className="w-full max-w-sm text-center text-neo-cream">
+                  <ClassroomWaitStalled language={defaultLanguage} onRetry={props.onWaitRetry} t={t} />
+                </div>
+              ) : (
+                <>
+                  <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
+                  <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
+                </>
+              )}
             </div>
           </div>
         }

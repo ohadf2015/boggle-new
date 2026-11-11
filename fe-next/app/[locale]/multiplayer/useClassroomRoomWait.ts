@@ -12,6 +12,8 @@
  *
  * Capped: a teacher who never starts must not leave a child on a spinner
  * forever with nothing said (recurring pitfall class 4) — `onGiveUp` fires.
+ * Long before that, `stalled` turns true so the screen can say the game has not
+ * opened and offer "Try again" (`retryNow`) and a way back to the class page.
  */
 
 'use client';
@@ -24,6 +26,8 @@ import type { HandleJoinFn } from './useMultiplayerJoin';
 export const ROOM_WAIT_RETRY_MS = 8_000;
 /** Longest a child waits on the teacher before being told what happened. */
 export const ROOM_WAIT_MAX_MS = 20 * 60_000;
+/** Quiet wait before the screen admits the room has not opened. */
+export const ROOM_WAIT_STALL_MS = 60_000;
 
 interface Options {
   socketRef: MutableRefObject<Socket | null>;
@@ -39,6 +43,9 @@ export function useClassroomRoomWait({ socketRef, isActive, rejoin, onGiveUp }: 
   const [waitingCode, setWaitingCode] = useState<string | null>(null);
   // Bumped by every `hold`, so each fresh CLASSROOM_NOT_OPEN re-arms the timer.
   const [attempt, setAttempt] = useState(0);
+  const [stalled, setStalled] = useState(false);
+  // Bumped by `retryNow`, so the student gets a fresh quiet minute after tapping.
+  const [stallEpoch, setStallEpoch] = useState(0);
   const startedAtRef = useRef<number | null>(null);
   const rejoinRef = useRef(rejoin);
   const giveUpRef = useRef(onGiveUp);
@@ -50,6 +57,7 @@ export function useClassroomRoomWait({ socketRef, isActive, rejoin, onGiveUp }: 
   const release = useCallback(() => {
     startedAtRef.current = null;
     setWaitingCode(null);
+    setStalled(false);
   }, []);
 
   const hold = useCallback((code: string) => {
@@ -89,7 +97,20 @@ export function useClassroomRoomWait({ socketRef, isActive, rejoin, onGiveUp }: 
     };
   }, [waitingCode, attempt, isActive, socketRef]);
 
-  return { waitingCode, hold, release };
+  useEffect(() => {
+    if (!waitingCode || isActive) return;
+    const timer = setTimeout(() => setStalled(true), ROOM_WAIT_STALL_MS);
+    return () => clearTimeout(timer);
+  }, [waitingCode, stallEpoch, isActive]);
+
+  const retryNow = useCallback(() => {
+    if (!waitingCode) return;
+    setStalled(false);
+    setStallEpoch((n) => n + 1);
+    rejoinRef.current(waitingCode);
+  }, [waitingCode]);
+
+  return { waitingCode, hold, release, stalled, retryNow };
 }
 
 export default useClassroomRoomWait;
