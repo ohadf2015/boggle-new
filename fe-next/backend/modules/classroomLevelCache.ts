@@ -6,7 +6,7 @@
  */
 
 import type { TeamAbilities } from '@/shared/utils/teamBattle';
-import { getClassroomMembershipLevel, type ClassroomLevel } from './supabase/classroomMembership.js';
+import { getClassroomMembershipLevel, type ClassroomLevel } from './supabase/classroomMembership';
 
 export const CLASSROOM_LEVEL_TTL_MS = 60_000;
 const MAX_ENTRIES = 5_000;

@@ -3,8 +3,8 @@ import type { Server } from 'socket.io';
 import type { GameState } from './gameState/types.js';
 import type { ClassroomGame } from './classroomGameManager.js';
 import type { RivalView } from '@/shared/types/rivalry';
-import { classroomTeamAbilities } from './classroomLevelCache.js';
-import { getGameRoom } from '../utils/socketHelpers.js';
+import { classroomTeamAbilities } from './classroomLevelCache';
+import { getGameRoom } from '../utils/socketHelpers';
 import {
   onPlayerLeft,
   onScoreChanged,
@@ -13,7 +13,7 @@ import {
   seatRivalPlayer,
   type RivalEmit,
   type RivalRoom,
-} from './rivalPairs.js';
+} from './rivalPairs';
 
 let rivalIo: Server | null = null;
 
