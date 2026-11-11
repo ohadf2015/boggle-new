@@ -6,6 +6,8 @@ import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
+const EN_ABOUT_URL = 'https://www.lexiclash.live/en/about';
+
 interface PageProps {
   params: Promise<{ locale: string }>;
 }
@@ -48,35 +50,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       images: ['https://www.lexiclash.live/og-image-en.webp'],
     },
+    // The body is English only (see lib/seo/englishOnlyBodyPages): non-en
+    // copies are noindexed and point at /en so they don't read as duplicates.
     alternates: {
-      canonical: `https://www.lexiclash.live/${locale}/about`,
-      languages: {
-        'x-default': 'https://www.lexiclash.live/en/about',
-        he: 'https://www.lexiclash.live/he/about',
-        en: 'https://www.lexiclash.live/en/about',
-        sv: 'https://www.lexiclash.live/sv/about',
-        ja: 'https://www.lexiclash.live/ja/about',
-        es: 'https://www.lexiclash.live/es/about',
-        ru: 'https://www.lexiclash.live/ru/about',
-        'en-IL': 'https://www.lexiclash.live/en/about',
-        'he-IL': 'https://www.lexiclash.live/he/about',
-        'en-US': 'https://www.lexiclash.live/en/about',
-        'es-US': 'https://www.lexiclash.live/es/about',
-        'en-GB': 'https://www.lexiclash.live/en/about',
-        'en-SE': 'https://www.lexiclash.live/en/about',
-        'sv-SE': 'https://www.lexiclash.live/sv/about',
-        'en-JP': 'https://www.lexiclash.live/en/about',
-        'ja-JP': 'https://www.lexiclash.live/ja/about',
-        'en-ES': 'https://www.lexiclash.live/en/about',
-        'es-ES': 'https://www.lexiclash.live/es/about',
-        'en-MX': 'https://www.lexiclash.live/en/about',
-        'es-MX': 'https://www.lexiclash.live/es/about',
-        'en-AU': 'https://www.lexiclash.live/en/about',
-        'es-AR': 'https://www.lexiclash.live/es/about',
-        'es-CO': 'https://www.lexiclash.live/es/about',
-        'ru-RU': 'https://www.lexiclash.live/ru/about',
-      },
+      canonical: EN_ABOUT_URL,
+      languages: { 'x-default': EN_ABOUT_URL, en: EN_ABOUT_URL },
     },
+    robots: { index: locale === 'en', follow: true },
   };
 }
 

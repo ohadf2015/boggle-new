@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'terms', path: '/legal/terms', locale });
+  return generatePageMetadata({ seoKey: 'terms', path: '/legal/terms', locale, englishOnly: true });
 }
 
 import TermsOfServicePageClient from './PageClient';

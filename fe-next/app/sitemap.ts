@@ -518,7 +518,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Info pages ───
   addForAllLocales(routes, '/faq', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.8 });
-  addForAllLocales(routes, '/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
+  // English-only body (lib/seo/englishOnlyBodyPages): only /en is indexable.
+  addForLocaleOnly(routes, '/about', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.6 });
   addForAllLocales(routes, '/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
   // /profile is noindexed — excluded from sitemap to avoid wasting crawl budget
   addForAllLocales(routes, '/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
@@ -526,10 +527,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Legal pages ───
   addForAllLocales(routes, '/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
-  addForAllLocales(routes, '/legal/terms', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
   addForAllLocales(routes, '/legal/privacy', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
-  addForAllLocales(routes, '/legal/disclaimer', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
-  addForAllLocales(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  // English-only body (lib/seo/englishOnlyBodyPages): only /en is indexable.
+  addForLocaleOnly(routes, '/legal/terms', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForLocaleOnly(routes, '/legal/disclaimer', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
+  addForLocaleOnly(routes, '/legal/cookies', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.3 });
 
   // ─── SEO landing pages (market-specific, single locale) ───
   // English commercial-intent doorways targeting AI grounding queries like
