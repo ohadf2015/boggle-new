@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useMemo, type ReactNode, type RefObject } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
 import { CLEAR_HOLD_MS, useHoldToClear } from '@/hooks/useHoldToClear';
 import { LetterRow, WordBox } from './LetterRow';
@@ -58,8 +58,23 @@ export const V2Dock = memo(function V2Dock(p: Props) {
   // (PostHog, Oct 2026): players hammer it to undo a long wrong word. Holding
   // it now clears the word in one go; the click that ends the hold is eaten so
   // it can't also rub out a letter of the NEXT word.
+  // Nothing to delete: the button used to just be `disabled`, so a tap on it
+  // vanished with zero feedback -> rageclick (#1 Word Tower rageclick target,
+  // PostHog Oct 2026). Keep it enabled and shake instead of silently eating the tap.
+  const [emptyTapShake, setEmptyTapShake] = useState(false);
+  const emptyTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (emptyTapTimer.current) clearTimeout(emptyTapTimer.current); }, []);
   const backspaceHold = useHoldToClear({
-    onTap: () => (p.swinging ? p.onPutBack() : p.onBackspace()),
+    onTap: () => {
+      if (p.swinging) { p.onPutBack(); return; }
+      if (p.selected.length === 0) {
+        setEmptyTapShake(true);
+        if (emptyTapTimer.current) clearTimeout(emptyTapTimer.current);
+        emptyTapTimer.current = setTimeout(() => setEmptyTapShake(false), 300);
+        return;
+      }
+      p.onBackspace();
+    },
     onHold: p.swinging ? undefined : p.onClearWord,
   });
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
@@ -96,11 +111,11 @@ export const V2Dock = memo(function V2Dock(p: Props) {
     <button
       type="button"
       {...backspaceHold}
-      disabled={p.swinging ? !p.canPutBack : p.selected.length === 0 || !p.composing}
+      disabled={p.swinging ? !p.canPutBack : !p.composing}
       aria-label={t(p.swinging ? 'wordTowerV2.changeWord' : 'wordTower.hud.backspace')}
       className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black text-neo-navy shadow-hard transition-colors lg:h-14 lg:w-14 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-40 disabled:shadow-none ${
         p.swinging ? 'bg-neo-pink' : 'bg-neo-cream'
-      }`}
+      } ${emptyTapShake ? 'animate-neo-shake' : ''}`}
     >
       {p.swinging ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
     </button>

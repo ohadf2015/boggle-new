@@ -64,3 +64,21 @@ describe('V2Dock backspace', () => {
     expect(onBackspace).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('V2Dock backspace with nothing to delete', () => {
+  it('stays enabled so a tap on an empty word is felt, not swallowed', () => {
+    const { btn } = renderDock({ selected: [] });
+    expect(btn).not.toBeDisabled();
+  });
+
+  it('tapping with an empty word shakes the button instead of calling backspace', () => {
+    vi.useFakeTimers();
+    const { btn, onBackspace } = renderDock({ selected: [] });
+    fireEvent.pointerDown(btn);
+    fireEvent.click(btn);
+    expect(onBackspace).not.toHaveBeenCalled();
+    expect(btn.className).toContain('animate-neo-shake');
+    act(() => { vi.advanceTimersByTime(400); });
+    expect(btn.className).not.toContain('animate-neo-shake');
+  });
+});
