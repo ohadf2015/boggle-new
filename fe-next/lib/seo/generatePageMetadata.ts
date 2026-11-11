@@ -15,6 +15,11 @@ interface PageMetadataOptions {
   locale: string;
   /** Whether to noindex this page (default: false) */
   noIndex?: boolean;
+  /**
+   * The body exists only in English (see englishOnlyBodyPages). Non-en copies
+   * are noindexed, and canonical + hreflang name the /en page alone.
+   */
+  englishOnly?: boolean;
   /** OpenGraph type override (default: 'website') */
   ogType?: 'website' | 'article' | 'profile';
 }
@@ -36,8 +41,14 @@ export async function generatePageMetadata({
   path,
   locale,
   noIndex = false,
+  englishOnly = false,
   ogType = 'website',
 }: PageMetadataOptions): Promise<Metadata> {
+  if (englishOnly) {
+    const meta = await generatePageMetadata({ seoKey, path, locale, noIndex: noIndex || locale !== 'en', ogType });
+    const enUrl = `${BASE_URL}/en${path}`;
+    return { ...meta, alternates: { canonical: enUrl, languages: { 'x-default': enUrl, en: enUrl } } };
+  }
   const validLocale = (LOCALES.includes(locale as Locale) ? locale : 'en') as Locale;
   const t = (await loadTranslation(validLocale)) as Record<string, any>;
   const enT = (await loadTranslation('en')) as Record<string, any>;
