@@ -1,5 +1,6 @@
 'use client';
 
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { WordFeedback } from '../../WordFormingArea';
@@ -59,6 +60,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       // A valid word landed — let the stuck-player coach mark success / "helped".
       onWordAccepted?.();
       const wordLen = data.word.length;
+      emitMascotEvent({ kind: 'word-submitted', wordLength: wordLen, gemLetterUsed: false });
       const longWordLabel = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
       setCurrentFeedback({
         id: `accepted-${Date.now()}`,

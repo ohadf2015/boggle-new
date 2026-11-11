@@ -59,6 +59,7 @@ const WORD_LEN_AWE_MIN = 7;
 const CASCADE_AWE_MIN = 3;
 const STREAK_DANCE_MIN = 3;
 const NERVOUS_MOVES_MAX = 2;
+const COMBO_DANCE_MIN = 5;
 
 // ─── Pure event mappers ────────────────────────────────────────────────────────
 
@@ -115,7 +116,8 @@ export type MascotEvent =
   | { kind: 'wave-clear' }
   | { kind: 'wave-fail' }
   | { kind: 'wave-streak'; streakCount: number }
-  | { kind: 'low-moves'; movesRemaining: number };
+  | { kind: 'low-moves'; movesRemaining: number }
+  | { kind: 'combo-milestone'; level: number };
 
 /**
  * Lifecycle events that bypass cooldown (always show — empathy/acknowledgement).
@@ -136,6 +138,8 @@ function pickStateForEvent(event: MascotEvent): MascotState | null {
     case 'wave-streak':
     case 'low-moves':
       return pickMascotStateForLifecycle(event);
+    case 'combo-milestone':
+      return event.level >= COMBO_DANCE_MIN ? 'dancing' : null;
   }
 }
 

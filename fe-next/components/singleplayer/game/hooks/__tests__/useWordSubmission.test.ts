@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useWordSubmission } from '../useWordSubmission';
+import { subscribeMascotEvents, _resetMascotBus } from '@/lib/blast/mascotBus';
 import type { Language, LetterGrid } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
 import type { UseSpamDetectionReturn } from '../useSpamDetection';
@@ -313,6 +314,25 @@ describe('useWordSubmission', () => {
       );
 
       // Reset mock state for other tests
+      mockDictionaryCacheState.isLoaded = false;
+      mockCheckWord.mockReturnValue(false);
+    });
+
+    it('tells the mascot the length of an accepted word', () => {
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(true);
+      mockDictionaryCacheState.isLoaded = true;
+      mockCheckWord.mockImplementation((word: string) => word === 'hello');
+      _resetMascotBus();
+      const events: unknown[] = [];
+      subscribeMascotEvents((e) => events.push(e));
+
+      const { result } = renderHook(() => useWordSubmission(createDefaultOptions()));
+      act(() => {
+        result.current.handleWordSubmit('hello');
+      });
+
+      expect(events).toEqual([{ kind: 'word-submitted', wordLength: 5, gemLetterUsed: false }]);
       mockDictionaryCacheState.isLoaded = false;
       mockCheckWord.mockReturnValue(false);
     });

@@ -25,6 +25,7 @@
  *    found words right, the board column sized from the viewport height.
  *  All media queries, never a JS breakpoint: CSS is right at first paint.
  */
+import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
 import { Pause, Play, Timer, X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
@@ -187,6 +188,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       )}
 
       {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
+      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} />}
       {playing && !soloLessonActive && (
         <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}

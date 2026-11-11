@@ -252,3 +252,19 @@ describe('mascotState — cooldown constants', () => {
     expect(STATE_COOLDOWN_MS).toBe(10000);
   });
 });
+
+describe('mascotState — combo milestones (shared across modes)', () => {
+  it('dances when a combo reaches 5 or more', () => {
+    const next = reduceMascotEvent(
+      { current: 'idle', lastTransitionAt: 0, perStateLastFiredAt: {} },
+      { kind: 'combo-milestone', level: 5 },
+      1000,
+    );
+    expect(next.current).toBe('dancing');
+  });
+
+  it('ignores combos below 5', () => {
+    const prev: MascotReducerState = { current: 'idle', lastTransitionAt: 0, perStateLastFiredAt: {} };
+    expect(reduceMascotEvent(prev, { kind: 'combo-milestone', level: 4 }, 1000)).toBe(prev);
+  });
+});
