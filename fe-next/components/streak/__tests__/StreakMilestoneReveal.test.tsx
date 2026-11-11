@@ -14,13 +14,39 @@ vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireFire
 vi.mock('@/utils/hapticFeedback', () => ({ triggerHaptic: vi.fn() }));
 vi.mock('@/utils/coinEarnedFx', () => ({ emitCoinEarned: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+let mockReducedEffects = false;
+vi.mock('@/hooks/useReducedEffects', () => ({ useReducedEffects: () => [mockReducedEffects, vi.fn()] }));
 
 import { claimStreakMilestoneRequest } from '@/lib/daily/streakClient';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
+import { fireVictoryConfetti } from '@/utils/confettiUtils';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { StreakMilestoneReveal } from '../StreakMilestoneReveal';
 
 describe('StreakMilestoneReveal', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockReducedEffects = false;
+  });
+
+  it('Given cheer mode, the mascot acts out the milestone with confetti and no coin claim', () => {
+    const onClose = vi.fn();
+    render(<StreakMilestoneReveal mode="cheer" milestone={{ days: 14, coins: 120 }} source="home" onClose={onClose} />);
+    expect(screen.getByRole('dialog')).toHaveTextContent('dailyStreak.flame.cheerBody:14');
+    expect(screen.getByTestId('streak-mascot-act')).toHaveAttribute('data-act', 'launch');
+    expect(screen.queryByTestId('streak-milestone-claim')).toBeNull();
+    expect(fireVictoryConfetti).toHaveBeenCalledTimes(1);
+    expect(trackGrowthEvent).toHaveBeenCalledWith('streak_milestone_shown', { days: 14, source: 'home', mode: 'cheer' });
+    fireEvent.click(screen.getByTestId('streak-milestone-cheer-close'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('Given reduce effects, cheer mode holds a still mascot and fires no confetti', () => {
+    mockReducedEffects = true;
+    render(<StreakMilestoneReveal mode="cheer" milestone={{ days: 7, coins: 60 }} source="home" onClose={vi.fn()} />);
+    expect(screen.getByTestId('streak-mascot-act')).toHaveAttribute('data-still', 'true');
+    expect(fireVictoryConfetti).not.toHaveBeenCalled();
+  });
 
   it('celebrates the milestone with the flame of its tier and the coins on offer', () => {
     render(<StreakMilestoneReveal milestone={{ days: 7, coins: 60 }} source="test" onClose={vi.fn()} />);

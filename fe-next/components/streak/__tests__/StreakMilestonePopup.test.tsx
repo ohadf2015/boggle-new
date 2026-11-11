@@ -48,6 +48,17 @@ describe('StreakMilestonePopup', () => {
     vi.useRealTimers();
   });
 
+  it('Given the claim moment opened, the home cheer for that streak run stays quiet', async () => {
+    vi.useFakeTimers();
+    mockView = { ...ready, current: 7, playedToday: true };
+    render(<StreakMilestonePopup source="test" blocked={false} />);
+    act(() => { vi.advanceTimersByTime(2000); });
+    const { cheerMilestone } = await import('../milestoneCheer');
+    const { getDailyChallengeDate } = await import('@/utils/dailyChallenge/dateUtils');
+    expect(localStorage.getItem(cheerMilestone(7, true, getDailyChallengeDate())!.key)).toBe('1');
+    vi.useRealTimers();
+  });
+
   it('waits while another popup (the day prize) holds the screen', () => {
     vi.useFakeTimers();
     render(<StreakMilestonePopup source="test" blocked />);

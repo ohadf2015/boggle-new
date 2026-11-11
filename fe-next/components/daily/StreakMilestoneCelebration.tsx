@@ -6,6 +6,8 @@ import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
+import { markMilestoneCheered } from '@/components/streak/milestoneCheer';
+import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface StreakMilestoneCelebrationProps {
   isOpen: boolean;
@@ -134,6 +136,10 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
       cleanupAnimations();
     };
   }, [streak, skipConfetti, cleanupAnimations]);
+
+  useEffect(() => {
+    if (isOpen) markMilestoneCheered(streak, streak, true, getDailyChallengeDate());
+  }, [isOpen, streak]);
 
   useEffect(() => {
     if (isOpen) {
