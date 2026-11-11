@@ -43,6 +43,7 @@ export function toFreeClassPulse(metrics: ClassAnalytics): FreeClassPulse {
 
 interface WeekRow {
   studentId: string;
+  startedAt?: string;
   results: unknown;
 }
 
@@ -65,7 +66,7 @@ export function rankWeekHardestWords(rows: readonly WeekRow[], limit: number): {
     const inPlay = askedList.length > 0 ? askedList : [...found, ...strings(blob.lessonWordsMissed)];
     if (inPlay.length === 0) continue;
     const code = typeof blob.gameCode === 'string' ? blob.gameCode : '';
-    const key = `${code}|${row.studentId}`;
+    const key = `${code}|${row.studentId}|${row.startedAt ?? ''}`;
     if (code && seen.has(key)) continue;
     seen.add(key);
     sessions++;

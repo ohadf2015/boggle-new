@@ -55,4 +55,13 @@ describe('botHandler — classroom practice round fill', () => {
     handlers.setAutoFill({ enabled: true, targetCount: 3 });
     for (const c of (botManager.addBot as Mock).mock.calls) expect(c[4]).toEqual({ celebrities: true });
   });
+
+  it('Given a student whose phone dropped in the lobby, When the teacher previews with bots, Then the empty seat does not stand in for a bot', () => {
+    const room = { ...game(true), users: { Host: { isHost: true }, Ana: { disconnected: true } } };
+    (getGame as Mock).mockReturnValue(room);
+    const { socket, handlers } = hostSocket();
+    registerBotHandlers({ to: () => ({ emit: vi.fn() }) } as never, socket as never);
+    handlers.setAutoFill({ enabled: true, targetCount: 3 });
+    expect((botManager.addBot as Mock).mock.calls).toHaveLength(2);
+  });
 });

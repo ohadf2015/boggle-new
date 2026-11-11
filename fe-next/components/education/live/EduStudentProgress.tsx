@@ -2,7 +2,6 @@
 
 import { Users } from 'lucide-react';
 import XpProgressBar from '@/components/education/XpProgressBar';
-import { WaitingWarmUp } from '@/components/education/lobby/WaitingWarmUp';
 import type { Translate } from './eduLiveStyles';
 
 const CARD = 'rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard';
@@ -24,14 +23,5 @@ export function EduStudentClassGoal({ found, total, t }: { found: number; total:
       <Users className="size-4 shrink-0" aria-hidden="true" />
       {t('eduLiveRoom.studentResults.classGoal', { found, total })}
     </p>
-  );
-}
-
-/** The lime "wait for your teacher" card above already says it; this is only the game to play meanwhile. */
-export function EduStudentWaitNext({ username, t }: { username: string; t: Translate }) {
-  return (
-    <section data-testid="edu-student-wait-next" className={`${CARD} !p-2`}>
-      <WaitingWarmUp username={username} t={t} />
-    </section>
   );
 }

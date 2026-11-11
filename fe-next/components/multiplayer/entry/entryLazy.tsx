@@ -9,7 +9,7 @@
  * pre-hydration chunk guard (utils/chunkBootGuard.ts) hard-reloads the page.
  * entryChrome.ts, which the page imports, pulls this module into the route's
  * chunk group, so these loaders are already present when the entry chunk
- * arrives. Pinned by entry/__tests__/entryChunkGroup.test.ts.
+ * arrives. Pinned by entry/__tests__/entryChunkGroup.guard.test.ts.
  */
 import dynamic from 'next/dynamic';
 
@@ -18,3 +18,6 @@ export const LazyHowToPlay = dynamic(() => import('@/components/HowToPlay'), { s
 
 /** The avatar editor (a large SVG part library), only fetched when the pencil opens it. */
 export const LazyEntryAvatarBuilder = dynamic(() => import('./EntryAvatarBuilder'), { ssr: false });
+
+/** Sign-in sheet for the ranked CTA, only fetched when a guest taps Ranked. */
+export const LazyAuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });

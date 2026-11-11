@@ -26,8 +26,9 @@ export interface EducationBackHrefParams {
 export function educationBackHref({ pathname, locale, role }: EducationBackHrefParams): string {
   const segs = (pathname || '').split('?')[0].split('#')[0].split('/').filter(Boolean);
   const rest = segs.length > 0 && LOCALES.includes(segs[0]) ? segs.slice(1) : segs;
-  const [section, sub] = rest;
+  const [section, sub, classId, child] = rest;
 
+  if (section === 'teacher' && sub === 'classroom' && classId && child) return `/${locale}/teacher/classroom/${classId}`;
   if (section === 'teacher' && sub) return `/${locale}/teacher`;
   // `/student` sends a signed-out visitor straight back to `/student/join`.
   if (section === 'student' && sub === 'join') return `/${locale}/join`;

@@ -48,8 +48,7 @@ const EXPECTED_EN: Record<string, string> = {
   'eg2Modes.complexity.medium': 'Some rules',
   'eg2Modes.complexity.tricky': 'Tricky rules',
   'teacher.classroom.playStyle.ffa': 'Everyone vs everyone',
-  'eduShell.host.lateJoinOn': 'Latecomers can join',
-  'eduShell.host.lateJoinOff': 'No latecomers',
+  'eduShell.host.lateJoinHint': 'Students can still join after the round starts.',
   'teacher.classroom.presets.title': 'Quick setups',
 };
 

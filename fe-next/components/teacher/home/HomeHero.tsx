@@ -74,7 +74,21 @@ export function HomeHero({ classrooms, selectedId, onSelect, onStart, language, 
           <h2 id="home-hero-title" className="min-w-0 font-neo-display text-3xl font-black leading-tight text-white sm:text-4xl [@media(max-height:820px)]:text-3xl">
             <ClassPicker classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} t={t} />
           </h2>
-          {meta}
+          {selected ? (
+            <div
+              data-testid="home-hero-meta-row"
+              className="flex flex-wrap items-center gap-x-4 gap-y-0 [&>[data-testid=home-desk-meta]]:contents [&_[data-testid=home-desk-last-game]]:order-2"
+            >
+              {meta}
+              <Link
+                href={`/${language}/teacher/classroom/${selected.id}`}
+                data-testid="home-class-page"
+                className={cn(QUIET_LINK, 'order-1 -mx-1 whitespace-nowrap px-1 text-white/85 hover:text-white')}
+              >
+                {t('eduShell.home.classPage')}
+              </Link>
+            </div>
+          ) : meta}
         </div>
 
         {codeSlot ? (

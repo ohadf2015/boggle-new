@@ -383,6 +383,12 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
         username,
         message: `${username} disconnected. Waiting for reconnection...`
       });
+      // The lobby counts heads from updateUsers; without it a dropped phone stays "joined" for the whole grace.
+      if (game.gameState === 'waiting') {
+        broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
+          users: getGameUsers(gameCode) as GameUser[]
+        });
+      }
     }
 
     // Start player reconnection grace period

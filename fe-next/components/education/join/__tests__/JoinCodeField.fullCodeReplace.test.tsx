@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 /**
- * A full field cannot be typed into: `maxLength` drops the seventh key and the
+ * A full field cannot be typed into: the seventh key is dropped and the
  * caret is transparent, so a student whose six characters were refused taps the
  * cells, types, and nothing happens (rage clicks on join-code-input and on NEXT,
  * /en/join, 2026-11-03). Selecting the whole code when a full field is focused

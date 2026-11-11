@@ -3,33 +3,11 @@
 import { Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
-import { StudentNextActions } from '@/components/education/results/StudentNextActions';
 import { shareOrCopy } from '@/lib/education/shareOrCopy';
 import { trackEduStudentResultShared } from '@/lib/education/shareTelemetry';
 import { PRESS, type Translate } from './eduLiveStyles';
 
 type Placing = { rank: number; total: number; score: number } | null;
-
-interface EduStudentNextStepProps {
-  t: Translate;
-  placing: Placing;
-  onPractice?: () => void;
-  /** Round one only: from round two the momentum chips already say what to beat. */
-  showTomorrow?: boolean;
-}
-
-export function EduStudentNextStep({ t, placing, onPractice, showTomorrow = true }: EduStudentNextStepProps) {
-  return (
-    <div data-testid="edu-student-next-step" className="flex w-full flex-col gap-1.5">
-      <StudentNextActions onPractice={onPractice} t={t} compact />
-      {placing && showTomorrow && (
-        <p data-testid="edu-student-tomorrow" className="min-w-0 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
-          {t('eduLiveRoom.studentResults.tomorrowHook', { score: placing.score })}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /** The share carries rank and score only: a child's name, class and room code never leave the phone. The link lands on the ad-free class join page, never the consumer game. */
 export function EduStudentShareButton({ t, language, placing }: { t: Translate; language: string; placing: Placing }) {

@@ -69,17 +69,19 @@ export function JoinCodeField({
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      const next = sanitizeJoinCode(e.target.value);
-      onStripped?.(joinCodeStripped(e.target.value));
+      const raw = e.target.value;
+      if (value.length === JOIN_CODE_LENGTH && joinCodeOverflows(raw)) return;
+      const next = sanitizeJoinCode(raw);
+      onStripped?.(joinCodeStripped(raw));
       onChange(next);
       // Fires on the sixth character AND on a six-character paste, so the two
       // ways in behave identically (recurring pitfall class 3).
-      if (next.length === JOIN_CODE_LENGTH) onComplete?.(next);
+      if (next.length === JOIN_CODE_LENGTH && next !== value) onComplete?.(next);
     },
-    [onChange, onComplete, onStripped]
+    [value, onChange, onComplete, onStripped]
   );
 
-  // `maxLength` cuts the RAW paste, so "P45 KRT" would land as "P45 KR": sanitize first.
+  // A paste longer than a code is refused out loud instead of being cut to six.
   const handleNativePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const raw = e.clipboardData.getData('text');
@@ -153,7 +155,6 @@ export function JoinCodeField({
             aria-label={label}
             aria-describedby={describedBy}
             aria-invalid={invalid || undefined}
-            maxLength={JOIN_CODE_LENGTH}
             inputMode="text"
             enterKeyHint="next"
             // `one-time-code` would summon the iOS SMS-autofill bar over a code that

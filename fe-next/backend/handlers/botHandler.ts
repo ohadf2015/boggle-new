@@ -364,7 +364,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
 
     // Fill room with bots up to targetCount. The teacher's practice seat is a
     // spectator of sorts, so it does not take the place of a bot opponent.
-    const currentPlayerCount = Object.values(game.users).filter((u) => !(u as { isPractice?: boolean }).isPractice).length;
+    const currentPlayerCount = Object.values(game.users).filter((u) => !(u as { isPractice?: boolean }).isPractice && !u.disconnected).length;
     const botsToAdd = Math.min(targetCount - currentPlayerCount, MAX_PLAYERS_PER_ROOM - currentPlayerCount);
     let botsAdded = 0;
 

@@ -85,9 +85,10 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
   const classCode = useProjectorClassCode(lobby.classroomId);
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
-  const studentCount = realStudentCount(students);
+  const present = students.filter((s) => !s.reconnecting);
+  const studentCount = realStudentCount(present);
   // Lesson words mean students study them before READY unlocks, so READY now means "learned".
-  const stillLearning = Math.max(wordCount, lobby.studyWordCount) > 0 ? studentsNotReady(students, readyUsernames).length : 0;
+  const stillLearning = Math.max(wordCount, lobby.studyWordCount) > 0 ? studentsNotReady(present, readyUsernames).length : 0;
   const delay = useEnterStyle();
   const lesson = lessonName || lobby.lessonNames.join(' · ');
   // Read every render, not once: the lobby may stay mounted under the results layer between rounds.

@@ -45,6 +45,21 @@ describe('ProjectorRoster — who is in the room', () => {
     expect(name.className).toMatch(/text-\[0\.7em\]/);
   });
 
+  it('Given a student whose phone dropped, Then the chip stays greyed as reconnecting and the counts leave them out', () => {
+    render(<ProjectorRoster students={[{ username: 'Ana' }, { username: 'Ben', reconnecting: true }]} readyUsernames={['Ana']} t={t} />);
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":1}');
+    expect(screen.getByTestId('projector-ready-count')).toHaveAttribute('aria-valuemax', '1');
+    const ben = screen.getAllByTestId('projector-student')[1];
+    expect(ben).toHaveAttribute('data-reconnecting', 'true');
+    expect(ben).toHaveTextContent('common.playerReconnecting');
+  });
+
+  it('Given only a dropped student, Then the wall reads as nobody joined yet while still naming them', () => {
+    render(<ProjectorRoster students={[{ username: 'Ben', reconnecting: true }]} t={t} />);
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":0}');
+    expect(screen.getByTestId('projector-student')).toHaveAttribute('data-reconnecting', 'true');
+  });
+
   it('Given nobody yet, Then the mascot shows the class how to join and no ready bar shows', () => {
     render(<ProjectorRoster students={[]} t={t} />);
     expect(screen.getByTestId('projector-roster-empty').querySelector('img')?.getAttribute('src')).toContain('edu-scanJoin');

@@ -264,6 +264,7 @@ const TvLeaderboard = memo<TvLeaderboardProps>(({
                   gameMode={gameMode}
                   lives={wordHuntPlayerLives[player.username]}
                   isEliminated={wordHuntEliminatedPlayers.includes(player.username)}
+                  singleLineName
                   t={t}
                 />
               </div>

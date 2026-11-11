@@ -48,7 +48,7 @@ function SessionCard({ session, language, packs, classroomId, onRunSession }: Se
   const runLabel = (
     <>
       <Play className="size-4" aria-hidden />
-      {t('education.starterPacks.sessions.runThis')}
+      {t('eduShell.home.startLive')}
     </>
   );
 
@@ -98,12 +98,12 @@ function SessionCard({ session, language, packs, classroomId, onRunSession }: Se
           type="button"
           disabled={!!packCode && !pack}
           onClick={() => onRunSession({ session, packCode, pack: pack ? packLessonInput(pack) : null, href })}
-          className={cn(actionClass, 'bg-neo-lime')}
+          className={cn(actionClass, 'bg-neo-cream')}
         >
           {runLabel}
         </button>
       ) : (
-        <Link href={href} className={cn(actionClass, 'bg-neo-lime')}>
+        <Link href={href} className={cn(actionClass, 'bg-neo-cream')}>
           {runLabel}
         </Link>
       )}

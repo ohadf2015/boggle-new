@@ -20,3 +20,22 @@ describe('LiveClassroomLeaderboard — projector rows on a 1080p wall', () => {
     expect(screen.getByText('Ada').className).not.toContain('min-height:851px');
   });
 });
+
+describe('LiveClassroomLeaderboard — long names on the projector', () => {
+  it('Given a 20-character name, Then it steps down a size and wraps to two lines inside the row instead of cutting to "Maximi…"', () => {
+    render(<LiveClassroomLeaderboard variant="projector" leaderboard={[{ username: 'Maximiliana-Josefina', score: 51 }, { username: 'Ada', score: 3 }]} />);
+    const long = screen.getByText('Maximiliana-Josefina');
+    expect(long.className).not.toMatch(/\btruncate\b/);
+    expect(long.className).toContain('line-clamp-2');
+    expect(long.className).toContain('lg:[@media(min-height:1001px)]:text-2xl');
+    expect(long).toHaveAttribute('title', 'Maximiliana-Josefina');
+    expect(screen.getByText('Ada').className).toContain('lg:[@media(min-height:1001px)]:text-4xl');
+  });
+});
+
+describe('LiveClassroomLeaderboard — long-name line height', () => {
+  it('Given a wrapped name, Then its tight leading survives the size classes, so two lines stay inside the badge height', () => {
+    render(<LiveClassroomLeaderboard variant="projector" leaderboard={[{ username: 'Maximiliana-Josefina', score: 51 }]} />);
+    expect(screen.getByText('Maximiliana-Josefina').className).toContain('leading-[1.05]');
+  });
+});

@@ -122,12 +122,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   // ==================== NAVIGATION HANDLERS ====================
 
   const handleBackToClassroom = () => {
-    // `/teacher/classroom/{id}` has no page of its own (only its `/analytics`
-    // child does) — it 404s, and the 404 boundary used to bounce the teacher
-    // to the main app homepage. `ClassroomManager` (mounted at the list route)
-    // doesn't support selecting a classroom by id, so the list itself is the
-    // real destination.
-    router.push(`/${locale}/teacher/classroom`);
+    router.push(`/${locale}/teacher/classroom/${classroomId}`);
   };
 
 
@@ -145,11 +140,11 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           <button
             type="button"
             onClick={handleBackToClassroom}
-            title={t('education.analytics.backToClassroom')}
+            title={t('eduShell.home.classPage')}
             className={cn(OUTLINE_BUTTON, 'shrink-0 max-sm:size-11 max-sm:px-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan')}
           >
             <DirectionalIcon icon={ArrowLeft} className="size-4" />
-            <span className="max-sm:sr-only">{t('education.analytics.backToClassroom')}</span>
+            <span className="max-sm:sr-only">{t('eduShell.home.classPage')}</span>
           </button>
           <div className="min-w-0 flex-1">
             <p className="font-neo-body text-sm font-bold text-neo-cream/70">{t('teacher.classroom.cardClassReport', 'Class report')}</p>

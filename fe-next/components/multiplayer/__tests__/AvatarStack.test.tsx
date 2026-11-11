@@ -9,7 +9,7 @@ import { getSeededAvatarConfig, getRandomAvatarConfig, hashString } from '@/shar
 
 // The stack renders the (static) renderer directly: the lazy components/Avatar
 // wrapper would put an async loader in EntryScreen's SSR'd chunk group
-// (see entry/__tests__/entryChunkGroup.test.ts). Mock it to avoid SVG rendering.
+// (see entry/__tests__/entryChunkGroup.guard.test.ts). Mock it to avoid SVG rendering.
 vi.mock('@/components/avatar/AvatarRenderer', () => ({
   default: function MockAvatarRenderer({ config, size }: { config: unknown; size?: number }) {
     return <div data-testid="avatar" data-config={JSON.stringify(config)} data-size={size} />;

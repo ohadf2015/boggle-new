@@ -19,7 +19,7 @@ const props = {
   gameCode: 'GHYRVS',
   language: 'en',
   baseUrl: 'https://www.lexiclash.live',
-  students: [] as { username: string; isBot?: boolean }[],
+  students: [] as { username: string; isBot?: boolean; reconnecting?: boolean }[],
   t,
   onStartGame: vi.fn(),
   onStartPracticeRound: vi.fn(),
@@ -50,6 +50,12 @@ describe('ProjectorLobby — rehearsing before the class arrives', () => {
     render(<ProjectorLobby {...props} students={[...bots, { username: 'Noa' }]} />);
     expect(screen.queryByTestId('projector-practice-round')).toBeNull();
     expect(screen.getByTestId('projector-start')).toBeEnabled();
+  });
+
+  it('Given the only student dropped and is reconnecting, Then the room counts as empty and the bots preview is offered again', () => {
+    render(<ProjectorLobby {...props} students={[{ username: 'Ben', reconnecting: true }]} />);
+    expect(screen.getByTestId('projector-practice-round')).toBeEnabled();
+    expect(screen.queryByTestId('projector-start-count')).toBeNull();
   });
 
   it('Given a mode bots cannot play, Then the lobby says so instead of offering a practice that never runs', () => {

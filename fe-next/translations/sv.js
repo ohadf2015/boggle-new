@@ -15945,13 +15945,6 @@ const sv = {
       "freeOtherClasses": "Gratisplanen gäller din första klass. Med Pro ser du även de här:",
       "valueLine": "Efter varje spel ser du vilka ord varje klass missade, vem som behöver hjälp och vad ni ska öva på härnäst.",
       "homeworkShortcut": "Läxresultat",
-      "freeSummary": {
-        "title": "Dina klasser hittills",
-        "games": "Spel de senaste 30 dagarna",
-        "students": "Elever i dina klasser",
-        "classes": "Klasser som spelat den här veckan",
-        "hint": "Pro visar resultat ord för ord för varje elev och varje spel."
-      },
       "lockedValue": "Orden som klassen missade visas gratis på resultatskärmen efter varje spel. Rapporterna visar dessutom vem som behöver hjälp, elev för elev, i alla dina spel.",
       "emptyClass": {
         "title": "Inga spel i den här klassen än",
@@ -16305,13 +16298,13 @@ const sv = {
       "invalid": "Den här sidan saknar klasskod. Öppna den igen från din lärarstart."
     },
     "weekInsight": {
-      "emptyHeadline": "Spela ett spel så ser du vem som behöver hjälp",
+      "emptyHeadline": "Spela ett spel för att se vem som behöver hjälp",
       "title": "Vem behöver hjälp den här veckan",
       "nobodyStuck": "Ingen har kört fast den här veckan.",
       "more": "+{{count}} till",
       "hardestTitle": "Veckans svåraste ord",
       "missed": "{{pct}} % missade",
-      "emptyBody": "Spela ett spel med klassen så ser du vem som behöver hjälp.",
+      "emptyBody": "Efteråt dyker orden som klassen tyckte var svårast upp här.",
       "startGame": "Starta ett spel",
       "proLine": "Med Pro ser du varje vecka och varje elev",
       "homeTitle": "Vem i {{name}} behöver hjälp den här veckan?",
@@ -18087,7 +18080,6 @@ const sv = {
       "sessions": {
         "title": "Färdiga klasspel",
         "subtitle": "Välj ett läge i lektionen. Spel, lista och timer är redan inställda.",
-        "runThis": "Kör det här",
         "noList": "Ingen lista behövs",
         "pickList": "Välj lista",
         "gradeAndUp": "{{grade}} och uppåt"
@@ -21314,8 +21306,6 @@ const sv = {
       "tiedWith": "Lika med {name}!",
       "tiedWithMore": "Lika med {name} +{more}!",
       "bestWord": "Bästa ordet",
-      "xp": "+{xp} XP",
-      "coins": "+{coins}",
       "seriesTotal": "Totalt {total}",
       "moreHidden": "+{count} till",
       "allStandings": "Alla {count} spelare",
@@ -21599,6 +21589,12 @@ const sv = {
       "missedOf": "missat {missed} av {attempts}",
       "studentsMissing": "{count} av {total} elever",
       "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt.",
+      "notFound": {
+        "title": "Hittades inte i spelen",
+        "note": "Ord från lektionen som ingen hittade i brädspelen. Ordet kanske inte fick plats på brädet, så se det som en ledtråd, inte ett fel svar.",
+        "of": "hittades inte {missed} av {attempts}",
+        "rate": "{pct}% hittades inte"
+      },
       "empty": "Behärskning räknas på orden i dina ordlistor. Spela ett ordquiz, en Wordcraft-runda eller ett liveläge med en av dina listor, så fylls den i efter spelet.",
       "loading": "Laddar ordbehärskning…",
       "error": "Kunde inte ladda ordbehärskningen. Ladda om och försök igen.",
@@ -22179,7 +22175,6 @@ const sv = {
       "fullListFailed": "Det gick inte att byta tillbaka till hela listan. Försök igen."
     },
     "studentResults": {
-      "tomorrowHook": "Kom tillbaka i morgon och slå ditt resultat: {score}.",
       "share": "Dela",
       "shareText": "Jag kom på plats {rank} av {total} med {score} poäng i ett klasspel i LexiClash. Kan du slå det?",
       "placed": "Din placering",
@@ -22297,6 +22292,7 @@ const sv = {
       "colLastPlayed": "Senast spelat",
       "students": "{count} elever",
       "studentsOne": "1 elev",
+      "classPage": "Klassens sida",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "roster": {
         "hide": "Dölj elevlistan",
@@ -22577,8 +22573,6 @@ const sv = {
       "homeworkHint": "Skicka listan så att eleverna övar på den före spelet.",
       "moreOptions": "Fler val",
       "proBadge": "Pro",
-      "lateJoinOn": "Sena får gå med",
-      "lateJoinOff": "Ingen sen anslutning",
       "changeList": "Byt lista",
       "listDone": "Klar",
       "bestForList": "Bäst",

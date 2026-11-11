@@ -68,10 +68,10 @@ describe('EducationHeader — default back target', () => {
     expect(mockPush).toHaveBeenCalledWith('/en/student');
   });
 
-  it('classroom analytics goes back to Teacher HQ, not the nonexistent /teacher/classroom/[id]', () => {
+  it('classroom analytics goes back to its class page', () => {
     mockPathname = '/en/teacher/classroom/abc/analytics';
     mockProfile = { user_role: 'teacher' };
     clickBack();
-    expect(mockPush).toHaveBeenCalledWith('/en/teacher');
+    expect(mockPush).toHaveBeenCalledWith('/en/teacher/classroom/abc');
   });
 });

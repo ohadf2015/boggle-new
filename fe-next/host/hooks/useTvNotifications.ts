@@ -9,6 +9,7 @@ import {
   type NotificationTier,
   type NotificationLayout,
 } from '../components/tv-broadcast/TvNotification';
+import { dropBrokenPhotoFinish, dropWaitedTooLong, photoFinishPair, rankByScore } from '../components/tv-broadcast/standingsCallouts';
 import type { MascotVariant } from '../../components/ui/Mascot';
 
 interface PlayerFoundWordPayload {
@@ -58,7 +59,6 @@ const MAX_MEGA_PER_WINDOW = 1;
 
 // Photo finish cooldown (ms)
 const PHOTO_FINISH_COOLDOWN_MS = 30000;
-const PHOTO_FINISH_POINT_THRESHOLD = 15;
 
 // Max pending before dropping subtle notifications
 const MAX_PENDING_FOR_SUBTLE = 3;
@@ -97,6 +97,7 @@ export function useTvNotifications({
     headline: string,
     subtext?: string,
     player?: string,
+    pair?: [string, string],
   ) => {
     const now = Date.now();
 
@@ -136,6 +137,7 @@ export function useTvNotifications({
       player,
       duration: NOTIFICATION_DURATION[tier],
       timestamp: now,
+      ...(pair ? { pair } : {}),
     };
 
     // Priority queue: mega notifications go to the front
@@ -155,7 +157,7 @@ export function useTvNotifications({
 
   // Dismiss a notification
   const dismissNotification = useCallback((id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications(prev => dropWaitedTooLong(prev.filter(n => n.id !== id), Date.now()));
   }, []);
 
   // Clear all notifications
@@ -275,8 +277,9 @@ export function useTvNotifications({
     if (!socket || !enabled) return;
 
     const handleLeaderboardUpdate = (data: { leaderboard: LeaderboardEntry[] }) => {
-      const { leaderboard } = data;
-      if (!leaderboard || leaderboard.length === 0) return;
+      if (!data?.leaderboard || data.leaderboard.length === 0) return;
+      const leaderboard = rankByScore(data.leaderboard);
+      setNotifications(prev => dropBrokenPhotoFinish(prev, leaderboard));
 
       const previousRankings = previousRankingsRef.current;
       const totalPlayers = leaderboard.length;
@@ -299,19 +302,11 @@ export function useTvNotifications({
         }
       });
 
-      // Photo finish detection (top 2 within threshold, with cooldown)
-      if (leaderboard.length >= 2) {
-        const [first, second] = leaderboard;
-        const now = Date.now();
-        if (
-          first && second &&
-          Math.abs(first.score - second.score) <= PHOTO_FINISH_POINT_THRESHOLD &&
-          first.score > 0 &&
-          now - lastPhotoFinishTimeRef.current >= PHOTO_FINISH_COOLDOWN_MS
-        ) {
-          lastPhotoFinishTimeRef.current = now;
-          addNotification('photo_finish', 'mega', t('tvBroadcast.notifications.photoFinish'), `${Math.abs(first.score - second.score)} ${t('tvBroadcast.notifications.ptsApart')}`, `${first.username} vs ${second.username}`);
-        }
+      const race = photoFinishPair(leaderboard);
+      const now = Date.now();
+      if (race && now - lastPhotoFinishTimeRef.current >= PHOTO_FINISH_COOLDOWN_MS) {
+        lastPhotoFinishTimeRef.current = now;
+        addNotification('photo_finish', 'mega', t('tvBroadcast.notifications.photoFinish'), `${race.gap} ${t('tvBroadcast.notifications.ptsApart')}`, `${race.first} vs ${race.second}`, [race.first, race.second]);
       }
 
       // Update previous rankings

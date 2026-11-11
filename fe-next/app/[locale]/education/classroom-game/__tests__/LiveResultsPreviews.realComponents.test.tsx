@@ -9,8 +9,6 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: '
 vi.mock('@/components/education/live/EduHostResults', () => ({ default: () => null }));
 vi.mock('@/components/education/live/EduStudentResults', () => ({ default: () => <div data-testid="real-student-results" /> }));
 vi.mock('@/components/education/ClassroomResultsCard', () => ({ ClassroomResultsCard: () => <div data-testid="legacy-results-card" /> }));
-vi.mock('@/components/education/live/EduStudentHero', () => ({ EduStudentHero: () => null }));
-vi.mock('@/components/education/economy/LockerGrid', () => ({ default: () => null }));
 
 import { PhoneResultsPreview } from '../LiveResultsPreviews';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';

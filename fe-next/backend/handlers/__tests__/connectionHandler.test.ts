@@ -208,6 +208,41 @@ describe('connectionHandler', () => {
       );
     });
 
+    it('tells the lobby roster a student dropped, so the room count stops counting them', () => {
+      const game = { ...makeGame(), isClassroom: true };
+      const { socket, handlers } = createMockSocket('socket-p1');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Player1');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+      mockGetGameUsers.mockReturnValue([{ username: 'Player1', disconnected: true }]);
+
+      handlers['disconnect']('transport close');
+
+      expect(mockBroadcastToRoom).toHaveBeenCalledWith(
+        mockIo, 'game:GAME1', 'updateUsers',
+        { users: [{ username: 'Player1', disconnected: true }] }
+      );
+      expect(mockRemoveUserFromGame).not.toHaveBeenCalled();
+    });
+
+    it('leaves the mid-round roster alone when a player drops (the seat hold is unchanged)', () => {
+      const game = { ...makeGame({ gameState: 'in-progress' }), isClassroom: true };
+      const { socket, handlers } = createMockSocket('socket-p1');
+      registerConnectionHandlers(mockIo, socket);
+
+      mockGetGameBySocketId.mockReturnValue('GAME1');
+      mockGetUsernameBySocketId.mockReturnValue('Player1');
+      mockGetGame.mockReturnValue(game);
+      mockIsRoomEmpty.mockReturnValue(false);
+
+      handlers['disconnect']('transport close');
+
+      expect(mockBroadcastToRoom).not.toHaveBeenCalledWith(mockIo, 'game:GAME1', 'updateUsers', expect.anything());
+    });
+
     it('removes player after reconnection timeout expires', () => {
       const game = makeGame();
       const { socket, handlers } = createMockSocket('socket-p1');

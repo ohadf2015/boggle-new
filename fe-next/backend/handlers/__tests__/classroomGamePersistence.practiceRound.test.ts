@@ -143,6 +143,16 @@ describe('roundHasStudents', () => {
     const results = [{ username: 'Guest', totalScore: 30 }];
     expect(roundHasStudents(results, users, TEACHER_ID)).toBe(true);
   });
+
+  it('given a student whose phone dropped in the lobby sat out a bots preview, then the preview stays a practice round', () => {
+    const away = { ...users, Ana: { authUserId: 'student-b', disconnected: true } };
+    expect(roundHasStudents([{ username: 'Taylor Bot', totalScore: 90 }, { username: 'Ana', totalScore: 0, wordDetails: [] }], away, TEACHER_ID)).toBe(false);
+  });
+
+  it('given a student dropped after finding words, then the round still has students', () => {
+    const away = { ...users, Ana: { authUserId: 'student-b', disconnected: true } };
+    expect(roundHasStudents([{ username: 'Ana', totalScore: 12, wordDetails: [{ word: 'cat', validated: true }] }], away, TEACHER_ID)).toBe(true);
+  });
 });
 
 describe('playerScoresFromGameResults - students without an account are reported, not silently dropped', () => {

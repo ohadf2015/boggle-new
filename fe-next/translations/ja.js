@@ -15637,13 +15637,6 @@ const ja = {
       "freeOtherClasses": "無料プランで見られるのは最初のクラスです。Proならこちらも見られます：",
       "valueLine": "毎回のゲームのあとに、各クラスが見逃した単語、手助けが必要な生徒、次に練習することがわかります。",
       "homeworkShortcut": "宿題の結果",
-      "freeSummary": {
-        "title": "これまでのクラスの様子",
-        "games": "過去30日のゲーム数",
-        "students": "クラスの生徒数",
-        "classes": "今週プレイしたクラス",
-        "hint": "Pro では、生徒ごと・ゲームごとの単語別の結果が見られます。"
-      },
       "lockedValue": "クラスが見逃した単語は、毎回のゲーム結果画面で無料で見られます。レポートでは、すべてのゲームを通して、手助けが必要な生徒を一人ずつ確認できます。",
       "emptyClass": {
         "title": "このクラスはまだゲームをしていません",
@@ -15997,13 +15990,13 @@ const ja = {
       "invalid": "このページにはクラスコードがありません。先生ホームからもう一度開いてください。"
     },
     "weekInsight": {
-      "emptyHeadline": "1回遊べば、サポートが必要な生徒がわかります",
+      "emptyHeadline": "1回ゲームをして、サポートが必要な生徒を確かめましょう",
       "title": "今週サポートが必要な生徒",
       "nobodyStuck": "今週つまずいている生徒はいません。",
       "more": "ほか{{count}}人",
       "hardestTitle": "今週いちばん難しかった単語",
       "missed": "{{pct}}%がミス",
-      "emptyBody": "このクラスで1回ゲームをすると、サポートが必要な生徒がわかります。",
+      "emptyBody": "ゲームのあと、クラスが一番苦戦した単語がここに表示されます。",
       "startGame": "ゲームを始める",
       "proLine": "Proなら毎週の記録と生徒一人ひとりを確認できます",
       "homeTitle": "今週、{{name}}でサポートが必要なのは？",
@@ -17943,7 +17936,6 @@ const ja = {
       "sessions": {
         "title": "すぐ遊べるクラスゲーム",
         "subtitle": "授業の場面を選ぶだけ。ゲーム・単語リスト・タイマーはセット済みです。",
-        "runThis": "これで始める",
         "noList": "リスト不要",
         "pickList": "リストを選ぶ",
         "gradeAndUp": "{{grade}}以上"
@@ -21314,8 +21306,6 @@ const ja = {
       "tiedWith": "{name}と同点！",
       "tiedWithMore": "{name}ほか{more}人と同点！",
       "bestWord": "ベストワード",
-      "xp": "+{xp} XP",
-      "coins": "+{coins}",
       "seriesTotal": "合計 {total}",
       "moreHidden": "ほか{count}人",
       "allStandings": "全{count}人の順位",
@@ -21599,6 +21589,12 @@ const ja = {
       "missedOf": "{attempts}回中{missed}回ミス",
       "studentsMissing": "{total}人中{count}人",
       "noneMissed": "まだ2回ミスした単語はありません。いい調子です。",
+      "notFound": {
+        "title": "ゲームで見つからなかった単語",
+        "note": "ボードゲームで誰も見つけなかったレッスンの単語です。ボードに入らなかった可能性もあるので、誤答ではなくヒントとして見てください。",
+        "of": "{attempts}回中{missed}回見つからず",
+        "rate": "{pct}%見つからず"
+      },
       "empty": "習熟度は単語リストの単語で数えます。リストを使って単語クイズ、Wordcraft、またはライブゲームを1回遊ぶと表示されます。",
       "loading": "定着度を読み込み中…",
       "error": "定着度を読み込めませんでした。再読み込みしてください。",
@@ -22179,7 +22175,6 @@ const ja = {
       "fullListFailed": "全部の単語に戻せませんでした。もう一度お試しください。"
     },
     "studentResults": {
-      "tomorrowHook": "明日また来て、今日のスコア{score}を超えよう。",
       "share": "シェア",
       "shareText": "LexiClashのクラス対戦で{total}人中{rank}位、{score}点だったよ。超えられる？",
       "placed": "あなたの順位",
@@ -22297,6 +22292,7 @@ const ja = {
       "colLastPlayed": "最後のプレイ",
       "students": "生徒 {count}人",
       "studentsOne": "生徒 1人",
+      "classPage": "クラスページ",
       "notPlayedRecently": "30日間プレイなし",
       "roster": {
         "hide": "生徒リストを閉じる",
@@ -22577,8 +22573,6 @@ const ja = {
       "homeworkHint": "ゲームの前に練習できるよう、このリストを生徒に送ります。",
       "moreOptions": "その他の設定",
       "proBadge": "Pro",
-      "lateJoinOn": "途中参加あり",
-      "lateJoinOff": "途中参加なし",
       "changeList": "リストを変更",
       "listDone": "決定",
       "bestForList": "おすすめ",

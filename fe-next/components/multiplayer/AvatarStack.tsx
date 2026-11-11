@@ -42,7 +42,7 @@ const STACK_SIZES = {
  * avatar components/Avatar would seed from their username. It uses the renderer
  * directly because the entry already ships it statically (EntryIdentity), and
  * Avatar's lazy renderer would put an async loader in EntryScreen's SSR'd chunk
- * group (entry/__tests__/entryChunkGroup.test.ts).
+ * group (entry/__tests__/entryChunkGroup.guard.test.ts).
  */
 function StackFace({ customAvatar, seed, px }: { customAvatar?: CustomAvatarConfig; seed: string; px: number }) {
   const config = useMemo(
