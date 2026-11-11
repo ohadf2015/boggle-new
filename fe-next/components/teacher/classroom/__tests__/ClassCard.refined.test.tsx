@@ -29,7 +29,9 @@ vi.mock('@/components/teacher/ClassroomStudentList', () => ({
 }));
 
 vi.mock('@/components/teacher/StudentCapMeter', () => ({
-  StudentCapMeter: () => <div data-testid="student-cap-meter" />,
+  StudentCapMeter: ({ studentCount, source }: { studentCount: number; source?: string }) => (
+    <div data-testid="student-cap-meter" data-source={source} data-count={studentCount} />
+  ),
 }));
 
 let hasPro = false;
@@ -65,7 +67,10 @@ describe('ClassCard — refined surfaces', () => {
 
   it('Given a free teacher, Then the card shows the student cap meter', () => {
     render(<ClassCard {...baseProps} />);
-    expect(screen.getByTestId('student-cap-meter')).toBeInTheDocument();
+    const meter = screen.getByTestId('student-cap-meter');
+    expect(meter).toBeInTheDocument();
+    expect(meter).toHaveAttribute('data-source', 'classroom_card');
+    expect(meter).toHaveAttribute('data-count', '12');
   });
 
   it('Given a Pro teacher, Then no cap meter repeats the student count the roster toggle already shows', () => {

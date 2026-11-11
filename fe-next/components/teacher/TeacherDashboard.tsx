@@ -19,6 +19,7 @@ import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
 import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
+import { StudentCapMeter } from './StudentCapMeter';
 import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
 import { HomeClassRoster } from './home/HomeClassRoster';
@@ -344,6 +345,18 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
             />
           </div>
+          {classrooms.length > 0 ? (
+            <div data-testid="dashboard-student-cap-meters" data-tm className="flex flex-col gap-2">
+              {classrooms.map((c) => (
+                <StudentCapMeter
+                  key={c.id}
+                  classroomName={classrooms.length > 1 ? c.name : undefined}
+                  studentCount={c.member_count ?? 0}
+                  source="dashboard"
+                />
+              ))}
+            </div>
+          ) : null}
           {selectedClassroom ? (
             <div data-tm>
               <HomeWeekChallenge

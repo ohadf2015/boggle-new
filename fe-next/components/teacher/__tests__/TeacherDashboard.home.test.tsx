@@ -3,7 +3,14 @@ import { render, screen, within, cleanup, act, fireEvent, waitFor } from '@testi
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k), language: 'en', dir: 'ltr' }),
+  useLanguage: () => ({
+    t: (k: string, a?: unknown, b?: unknown) => {
+      const p = (typeof a === 'object' && a !== null ? a : typeof b === 'object' && b !== null ? b : null) as Record<string, unknown> | null;
+      return p ? `${k}:${JSON.stringify(p)}` : k;
+    },
+    language: 'en',
+    dir: 'ltr',
+  }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' }, profile: { user_role: 'teacher', display_name: 'Dana Levi' }, loading: false }),
@@ -325,5 +332,21 @@ describe('Teacher Home', () => {
     classroomsState = { ...classroomsState, classrooms: [], isLoading: true };
     render(<TeacherDashboard />);
     expect(viewed).not.toHaveBeenCalled();
+  });
+
+  it('renders StudentCapMeter for each classroom with real student counts on dashboard path', () => {
+    render(<TeacherDashboard />);
+    const metersContainer = screen.getByTestId('dashboard-student-cap-meters');
+    const meters = within(metersContainer).getAllByTestId('student-cap-meter');
+    expect(meters).toHaveLength(2);
+
+    const counts = within(metersContainer).getAllByTestId('student-cap-count');
+    expect(counts[0].textContent).toContain('28');
+    expect(counts[0].textContent).toContain('50');
+    expect(counts[1].textContent).toContain('26');
+    expect(counts[1].textContent).toContain('50');
+
+    const ctas = within(metersContainer).getAllByTestId('student-cap-upgrade-cta');
+    expect(ctas).toHaveLength(2);
   });
 });
