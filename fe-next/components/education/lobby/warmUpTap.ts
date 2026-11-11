@@ -8,7 +8,7 @@
 import { hebrewLetters, japaneseLetters, russianLetters } from '@/utils/consts';
 
 export const WARM_UP_TILES = 6;
-const LATIN_PAD = Array.from('LEXICLASH');
+const LATIN_PAD = [...'LEXICLASH'];
 
 const SCRIPT_ALPHABETS: [RegExp, readonly string[]][] = [
   [/\p{Script=Hebrew}/u, hebrewLetters],
