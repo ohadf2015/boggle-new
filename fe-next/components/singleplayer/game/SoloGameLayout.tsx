@@ -188,7 +188,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       )}
 
       {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
-      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} />}
+      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" />}
       {playing && !soloLessonActive && (
         <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}

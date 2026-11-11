@@ -13,6 +13,9 @@ import {
   type MascotReducerState,
   GLOBAL_COOLDOWN_MS,
   STATE_COOLDOWN_MS,
+  createInitialMascotState,
+  comboTier,
+  escalationMotion,
 } from '../mascotState';
 
 describe('mascotState — pure word event mapper', () => {
@@ -266,5 +269,42 @@ describe('mascotState — combo milestones (shared across modes)', () => {
   it('ignores combos below 5', () => {
     const prev: MascotReducerState = { current: 'idle', lastTransitionAt: 0, perStateLastFiredAt: {} };
     expect(reduceMascotEvent(prev, { kind: 'combo-milestone', level: 4 }, 1000)).toBe(prev);
+  });
+});
+
+describe('mascotState — combo escalation', () => {
+  it('climbs calm → hyped → wild → unhinged as the combo grows', () => {
+    expect(comboTier(0)).toBe(0);
+    expect(comboTier(2)).toBe(0);
+    expect(comboTier(3)).toBe(1);
+    expect(comboTier(5)).toBe(2);
+    expect(comboTier(7)).toBe(3);
+    expect(comboTier(20)).toBe(3);
+  });
+
+  it('wiggles harder and faster at each tier', () => {
+    const [t0, t1, t2, t3] = [0, 1, 2, 3].map((t) => escalationMotion(t as 0 | 1 | 2 | 3));
+    expect(t0.wiggleDeg).toBe(0);
+    expect(t1.wiggleDeg).toBeLessThan(t2.wiggleDeg);
+    expect(t2.wiggleDeg).toBeLessThan(t3.wiggleDeg);
+    expect(t3.periodMs).toBeLessThan(t1.periodMs);
+  });
+
+  it('a 7+ combo goes unhinged, 5-6 dances', () => {
+    const s = createInitialMascotState();
+    expect(reduceMascotEvent(s, { kind: 'combo-milestone', level: 5 }, 1000).current).toBe('dancing');
+    expect(reduceMascotEvent(s, { kind: 'combo-milestone', level: 7 }, 1000).current).toBe('unhinged');
+  });
+
+  it('collapses exhausted when a 3+ combo breaks, even inside the cooldown', () => {
+    const s = reduceMascotEvent(createInitialMascotState(), { kind: 'combo-milestone', level: 7 }, 1000);
+    const next = reduceMascotEvent(s, { kind: 'combo-break', fromLevel: 7 }, 1500);
+    expect(next.current).toBe('exhausted');
+    expect(MASCOT_GIF_PATHS.exhausted).toContain('-nobg.webp');
+  });
+
+  it('a tiny combo breaking is not worth a reaction', () => {
+    const s = createInitialMascotState();
+    expect(reduceMascotEvent(s, { kind: 'combo-break', fromLevel: 2 }, 1000)).toBe(s);
   });
 });

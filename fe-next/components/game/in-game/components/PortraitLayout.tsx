@@ -416,7 +416,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         </>
       )}
 
-      {isPlaying && <GameMascotReactions mode={gameMode ?? 'classic'} comboLevel={comboLevel} />}
+      {isPlaying && <GameMascotReactions mode={gameMode ?? 'classic'} comboLevel={comboLevel} personality="quiet" />}
 
       {/* Floating Score Animation - renders above everything */}
       {isPlaying && !mpChrome && (

@@ -26,7 +26,9 @@ export type MascotState =
   | 'nervous'          // <3 moves left
   | 'sad-supportive'   // wave failed (NEVER mocking)
   | 'proud'            // wave cleared
-  | 'dancing';         // 3+ wave streak
+  | 'dancing'          // 3+ wave streak
+  | 'unhinged'         // 7+ combo
+  | 'exhausted';       // a 3+ combo just broke
 
 /** Asset map. Animated → -nobg.webp (~50% lighter than the .gif twins, plain
  *  <img> so the animation plays); circular clip stays clean. */
@@ -41,6 +43,8 @@ export const MASCOT_GIF_PATHS: Record<MascotState, string> = {
   'sad-supportive': '/mascot/crying-nobg.webp',
   proud: '/mascot/trophy-nobg.webp',
   dancing: '/mascot/flexing.webp',
+  unhinged: '/mascot/streak-inferno-nobg.webp',
+  exhausted: '/mascot/sleepy-nobg.webp',
 };
 
 export const GLOBAL_COOLDOWN_MS = 4000;
@@ -60,6 +64,34 @@ const CASCADE_AWE_MIN = 3;
 const STREAK_DANCE_MIN = 3;
 const NERVOUS_MOVES_MAX = 2;
 const COMBO_DANCE_MIN = 5;
+const COMBO_UNHINGED_MIN = 7;
+const COMBO_EXHAUST_MIN = 3;
+
+export type ComboTier = 0 | 1 | 2 | 3;
+
+export function comboTier(level: number): ComboTier {
+  if (level >= COMBO_UNHINGED_MIN) return 3;
+  if (level >= COMBO_DANCE_MIN) return 2;
+  if (level >= COMBO_EXHAUST_MIN) return 1;
+  return 0;
+}
+
+export interface EscalationMotion {
+  wiggleDeg: number;
+  bounceScale: number;
+  periodMs: number;
+}
+
+const ESCALATION: Record<ComboTier, EscalationMotion> = {
+  0: { wiggleDeg: 0, bounceScale: 1, periodMs: 0 },
+  1: { wiggleDeg: 4, bounceScale: 1.04, periodMs: 520 },
+  2: { wiggleDeg: 9, bounceScale: 1.08, periodMs: 360 },
+  3: { wiggleDeg: 16, bounceScale: 1.14, periodMs: 220 },
+};
+
+export function escalationMotion(tier: ComboTier): EscalationMotion {
+  return ESCALATION[tier];
+}
 
 // ─── Pure event mappers ────────────────────────────────────────────────────────
 
@@ -117,7 +149,8 @@ export type MascotEvent =
   | { kind: 'wave-fail' }
   | { kind: 'wave-streak'; streakCount: number }
   | { kind: 'low-moves'; movesRemaining: number }
-  | { kind: 'combo-milestone'; level: number };
+  | { kind: 'combo-milestone'; level: number }
+  | { kind: 'combo-break'; fromLevel: number };
 
 /**
  * Lifecycle events that bypass cooldown (always show — empathy/acknowledgement).
@@ -125,6 +158,7 @@ export type MascotEvent =
 const BYPASS_COOLDOWN_KINDS: ReadonlySet<MascotEvent['kind']> = new Set([
   'wave-clear',
   'wave-fail',
+  'combo-break',
 ]);
 
 function pickStateForEvent(event: MascotEvent): MascotState | null {
@@ -139,7 +173,10 @@ function pickStateForEvent(event: MascotEvent): MascotState | null {
     case 'low-moves':
       return pickMascotStateForLifecycle(event);
     case 'combo-milestone':
+      if (event.level >= COMBO_UNHINGED_MIN) return 'unhinged';
       return event.level >= COMBO_DANCE_MIN ? 'dancing' : null;
+    case 'combo-break':
+      return event.fromLevel >= COMBO_EXHAUST_MIN ? 'exhausted' : null;
   }
 }
 

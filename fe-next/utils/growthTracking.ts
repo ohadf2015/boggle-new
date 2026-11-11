@@ -101,6 +101,7 @@ export type GrowthEvent =
   | 'return_visit'
   | 'streak_continued'
   | 'mascot_reaction_shown'
+  | 'mascot_gag_shown'
   | 'streak_milestone'
   | 'streak_broken'
   | 'streak_freeze_used'

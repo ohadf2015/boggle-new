@@ -22,6 +22,8 @@ export interface BlastMascotApi {
   state: MascotReducerState['current'];
   /** True only during the brief celebration window after a real reaction. */
   visible: boolean;
+  /** Changes on every real reaction, even a repeat of the same pose. */
+  transitionAt: number;
   /** Direct fire — usually use the bus via emitMascotEvent. */
   fire: (event: MascotEvent) => void;
 }
@@ -62,5 +64,5 @@ export function useBlastMascot(): BlastMascotApi {
     [],
   );
 
-  return { state: reducerState.current, visible, fire };
+  return { state: reducerState.current, visible, transitionAt: reducerState.lastTransitionAt, fire };
 }
