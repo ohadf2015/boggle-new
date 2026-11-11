@@ -71,24 +71,26 @@ describe('RivalTicker', () => {
     expect(item.textContent).not.toMatch(/\d|Dana/);
   });
 
-  it('Given a flip, When a few seconds pass, Then it fades and then leaves', () => {
+  it('Given older flips, When a few seconds pass, Then the older chips fade and leave while the newest flip stays', () => {
     const s = fakeSocket();
     render(<RivalTicker socket={s.socket} />);
     s.fire('rivalFlip', flip('Ana'));
+    s.fire('rivalFlip', flip('Bo'));
     act(() => { vi.advanceTimersByTime(RIVAL_TICKER_SHOW_MS); });
-    expect(screen.getByTestId('rival-ticker-item').className).toMatch(/opacity-0/);
+    const [lead, chip] = screen.getAllByTestId('rival-ticker-item');
+    expect(lead.className).not.toMatch(/opacity-0/);
+    expect(chip.className).toMatch(/opacity-0/);
     act(() => { vi.advanceTimersByTime(RIVAL_TICKER_FADE_MS); });
-    expect(screen.queryByTestId('rival-ticker-item')).toBeNull();
+    expect(screen.getAllByTestId('rival-ticker-item').map((i) => i.textContent)).toEqual(['education.rivals.ticker.flip:Bo']);
   });
 
-  it('Given the last flip faded, When the round goes on, Then the ticker keeps its row so the panels below never jump', () => {
+  it('Given the last flip, When the round goes on, Then its row keeps showing it, never an empty band, until the next round clears it', () => {
     const s = fakeSocket();
     render(<RivalTicker socket={s.socket} />);
     s.fire('rivalFlip', flip('Ana'));
-    act(() => { vi.advanceTimersByTime(RIVAL_TICKER_SHOW_MS + RIVAL_TICKER_FADE_MS); });
-    expect(screen.getByTestId('rival-ticker')).toBeInTheDocument();
-    expect(screen.queryByTestId('rival-ticker-item')).toBeNull();
-    expect(screen.getByTestId('rival-ticker-list').className).toMatch(/min-h-/);
+    act(() => { vi.advanceTimersByTime(60_000); });
+    expect(screen.getByTestId('rival-ticker-item')).toHaveTextContent('Ana');
+    expect(screen.getByTestId('rival-ticker-item').className).not.toMatch(/opacity-0/);
     s.fire('startGame', { gameSessionId: 2 });
     expect(screen.queryByTestId('rival-ticker')).toBeNull();
   });

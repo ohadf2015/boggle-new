@@ -136,6 +136,12 @@ describe('MpRoundLayout', () => {
     expect(strip.querySelector('[data-testid="mp-roster-overflow"]')).toHaveTextContent('+2');
   });
 
+  it('phone strip steps aside (keeping its space) while a burst that covers it is on screen, so chips never peek out around the burst', () => {
+    render(<MpRoundLayout {...props({})} />);
+    const row = (document.querySelector('[data-testid="mp-roster-strip"][data-layout="row"]') as HTMLElement).parentElement!;
+    expect(row.className).toContain('[body:has([data-covers-roster])_&]:invisible');
+  });
+
   it('phone strip with 4+ seats: avatars + scores, names for screen readers only (they truncated to "P…")', () => {
     const four = ['a', 'b', 'c', 'me'].map((username, i) => ({ username, score: 40 - i * 10 }));
     const { unmount } = render(<MpRoundLayout {...props({ leaderboard: four, users: four.map(({ username }) => ({ username })) })} />);

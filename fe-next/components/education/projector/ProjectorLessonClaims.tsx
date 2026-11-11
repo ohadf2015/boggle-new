@@ -37,7 +37,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
         className,
       )}
     >
-      <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(18px,min(8cqh,4.6cqw),40px)]">
+      <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(18px,min(8cqh,4.6cqw),40px)] @max-[15rem]:flex-col @max-[15rem]:items-start @max-[15rem]:gap-1 @max-[15rem]:text-base">
         <span className="flex min-w-0 items-center gap-2">
           <Target className="size-[1em] shrink-0 text-neo-cyan" aria-hidden />
           <span className="truncate">{t('education.race.projectorTitle')}</span>
@@ -46,7 +46,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
           {t('education.race.claimedCount', { claimed: race.claimedCount, total: race.total })}
         </Pop>
       </header>
-      <ul ref={listRef} className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2 overflow-hidden @min-[24rem]:grid-cols-3">
+      <ul ref={listRef} className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2 overflow-hidden @max-[15rem]:grid-cols-1 @min-[24rem]:grid-cols-3">
         {shown.map((slot) => <ClaimTile key={slot.index} slot={slot} reduced={reduced} t={t} />)}
         {hidden > 0 && (
           <li data-testid="claim-tiles-more" className={cn(TILE, 'justify-center border-dashed border-neo-cream/60 bg-neo-navy text-neo-cream')}>

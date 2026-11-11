@@ -129,7 +129,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       {scores.length === 0 ? (
         <ResultsSkeleton />
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-4 pb-3 pt-1.5">
+        <main
+          data-testid="edu-student-results-scroll"
+          className="flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-4 pb-6 pt-1.5"
+        >
           {placing && (
             <div className={COLUMN}>
               <StudentRevealHero
@@ -218,7 +221,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       )}
 
       {scores.length > 0 && (
-        <footer className="flex shrink-0 justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">
+        <footer data-testid="edu-student-results-bar" className="flex shrink-0 justify-center border-t-2 border-neo-cream/50 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2.5">
           <div className={COLUMN}>
             <StudentWaitBar onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined} t={t} />
           </div>

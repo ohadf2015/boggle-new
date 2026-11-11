@@ -72,4 +72,13 @@ describe('ProjectorLessonClaims', () => {
     expect(list.className).not.toMatch(/auto-rows-fr/);
     expect(list.className).toMatch(/content-start/);
   });
+
+  it('Given a narrow race beside the board on a short wall, Then tiles stack one per row so a word and its claimer stay legible', () => {
+    act(() => ingestLessonClaimsRound({ lessonClaims: { roundId: 4, total: 12, claimedCount: 0, slots: slots(12) } }));
+    render(<ProjectorLessonClaims t={t} />);
+    const list = within(screen.getByTestId('projector-lesson-claims')).getByRole('list');
+    expect(list.className).toContain('@max-[15rem]:grid-cols-1');
+    expect(list.className).toContain('@min-[24rem]:grid-cols-3');
+    expect(screen.getByTestId('projector-lesson-claims').querySelector('header')!.className).toContain('@max-[15rem]:flex-col');
+  });
 });

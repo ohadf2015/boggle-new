@@ -23,9 +23,21 @@ describe('raceTilesToShow — legible tiles only, never a squashed grid', () => 
     expect(raceTilesToShow(board([]), Infinity).hidden).toBe(0);
   });
 
-  it('Given more claimed tiles than room, Then the newest room-worth of claimed tiles show and the rest count as hidden', () => {
+  it('Given 4 of 8 claimed and room for only 3 cells, Then every claimed word still shows and "+N" counts only the unclaimed words left out', () => {
+    const r = raceTilesToShow(board([1, 3, 5, 6], 8), 3);
+    expect(r.shown.map((s) => s.index)).toEqual([1, 3, 5, 6]);
+    expect(r.hidden).toBe(4);
+  });
+
+  it('Given more claimed tiles than room, Then all claimed tiles show and N never counts a claimed word', () => {
     const r = raceTilesToShow(board([0, 1, 2, 3, 4, 5]), 4);
-    expect(r.shown).toHaveLength(3);
-    expect(r.hidden).toBe(9);
+    expect(r.shown.map((s) => s.index)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(r.hidden).toBe(6);
+  });
+
+  it('Given room for the claimed tiles plus some unclaimed, Then unclaimed fill the rest in order', () => {
+    const r = raceTilesToShow(board([4], 8), 4);
+    expect(r.shown.map((s) => s.index)).toEqual([4, 0, 1]);
+    expect(r.hidden).toBe(5);
   });
 });

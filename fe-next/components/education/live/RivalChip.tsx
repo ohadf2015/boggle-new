@@ -97,10 +97,11 @@ export default function RivalChip({ socket, className }: RivalChipProps) {
         <bdi
           aria-hidden="true"
           dir="auto"
-          data-testid="rival-chip-first"
-          className="hidden max-w-[10ch] truncate text-sm leading-none text-neo-cream [@container(min-height:300px)]:block lg:hidden"
+          title={rival.rivalName}
+          data-testid="rival-chip-short-name"
+          className="hidden max-w-[12ch] truncate text-sm leading-none text-neo-cream [@container(min-height:300px)]:block lg:hidden"
         >
-          {rival.rivalName.trim().split(/[\s-]+/)[0]}
+          {rival.rivalName.trim()}
         </bdi>
         <span aria-hidden="true" data-testid="rival-tug" className="relative h-4 w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-pink [@container(min-height:300px)]:h-6">
           <span

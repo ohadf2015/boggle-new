@@ -70,7 +70,10 @@ export function StudentWaitBar({ onPractice, t }: { onPractice?: () => void; t: 
         data-results-primary={onPractice ? undefined : ''}
         role="status"
         aria-live="polite"
-        className="flex min-h-11 w-full items-center gap-2.5 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2 font-neo-body text-sm font-bold text-neo-cream"
+        className={cn(
+          'flex w-full items-center gap-2.5 font-neo-body text-sm font-bold text-neo-cream',
+          onPractice ? 'justify-center px-1 text-xs text-neo-cream/80' : 'min-h-11 rounded-neo border-2 border-neo-cream/50 bg-neo-navy-light px-3 py-2',
+        )}
       >
         <span className="relative flex size-2.5 shrink-0" aria-hidden="true">
           <span className="absolute inset-0 animate-ping rounded-full bg-neo-lime motion-reduce:animate-none" />

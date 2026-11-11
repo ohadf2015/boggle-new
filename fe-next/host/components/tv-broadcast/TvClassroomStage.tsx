@@ -45,12 +45,14 @@ export function TvClassroomStage({ gameMode, grid, wheelPuzzle, activityPanel, s
   }
   return (
     <div className="flex h-full min-h-0 flex-col gap-2 md:flex-row md:gap-4">
-      <div data-testid="tv-board-column" className="flex min-h-0 w-full shrink-0 flex-col gap-2 md:w-[60%] md:gap-4 md:[container-type:size]">
-        <div className="hidden shrink-0 md:block md:h-[min(100cqw,59cqh)]">
-          <ProjectorRoundStage gameMode={gameMode} grid={grid} wheelPuzzle={wheelPuzzle} boardClassName="w-full md:flex md:justify-center" t={t} />
-        </div>
-        <div data-testid="tv-race-region" className="min-h-[12rem] flex-1 md:min-h-0">
-          <ProjectorLessonClaims t={t} />
+      <div data-testid="tv-board-column" className="flex min-h-0 w-full shrink-0 flex-col md:w-[60%] md:[container-type:size]">
+        <div data-testid="tv-board-split" className="flex min-h-0 flex-1 flex-col gap-2 md:gap-4 md:[@container(max-height:460px)_and_(min-width:400px)]:flex-row">
+          <div data-testid="tv-board-box" className="hidden shrink-0 md:block md:h-[min(100cqw,59cqh)] md:[@container(max-height:460px)_and_(min-width:400px)]:h-full md:[@container(max-height:460px)_and_(min-width:400px)]:w-[min(100cqh,56cqw)]">
+            <ProjectorRoundStage gameMode={gameMode} grid={grid} wheelPuzzle={wheelPuzzle} boardClassName="w-full md:flex md:justify-center" t={t} />
+          </div>
+          <div data-testid="tv-race-region" className="min-h-[12rem] min-w-0 flex-1 md:min-h-0">
+            <ProjectorLessonClaims t={t} />
+          </div>
         </div>
       </div>
       <div className="flex min-w-0 flex-1 flex-col max-md:order-first">{livePanel}</div>

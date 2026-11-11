@@ -29,8 +29,8 @@ export interface LessonClaimToastProps {
 
 /**
  * Claim moments: a full-width burst for the claimer, a toast with three fixed emotes for everyone else.
- * Both slide in right under the HUD bar (over the roster strip), never over rank, timer or the grid;
- * only the emote buttons take touches.
+ * Both slide in right under the HUD bar, never over rank, timer or the grid; the burst hides the roster strip
+ * while it shows. Only the emote buttons take touches.
  */
 export function LessonClaimToast({ socket, me, t, dir }: LessonClaimToastProps) {
   const race = useLessonClaims();
@@ -68,6 +68,7 @@ export function LessonClaimToast({ socket, me, t, dir }: LessonClaimToastProps) 
         <m.div
           key={claim.seq}
           data-testid="lesson-claim-burst"
+          data-covers-roster=""
           role="status"
           initial={reduced ? false : { y: -24, scaleX: 0.6 }}
           animate={{ y: 0, scaleX: 1 }}

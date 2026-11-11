@@ -15869,7 +15869,7 @@ const he = {
     "race": {
       "claimedCount": "{claimed}/{total} נתפסו",
       "takenBy": "{word} כבר של {name}",
-      "youClaimed": "{word} שלך! +{bonus}",
+      "youClaimed": "{word} שלך! \u2066+{bonus}\u2069",
       "claimedBy": "נתפסה! {word} אצל {name}",
       "projectorTitle": "מרוץ מילים"
     },
