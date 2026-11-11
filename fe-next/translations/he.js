@@ -9978,6 +9978,7 @@ const he = {
       "dayProgress": "{day} מתוך 5 ימים השבוע",
       "daysRemaining": "עוד {n} ימים לתיבת {tier}!",
       "claimReady": "תיבת ה{tier} שלך מוכנה!",
+      "openedTitle": "התיבה נפתחה: הפרס של השבוע",
       "claimButton": "פתחו תיבה",
       "claimError": "לא הצלחנו לפתוח את התיבה. נסו שוב.",
       "tierBronze": "ברונזה",

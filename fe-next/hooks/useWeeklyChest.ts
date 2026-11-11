@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { getWithAuth, postWithAuth } from '@/utils/authFetch'
 import { CARRYOVER_GUEST_SESSION_KEY, GUEST_FINGERPRINT_KEY } from '@/utils/dailyChallenge/constants'
 import { useAuth } from '@/contexts/AuthContext'
+import { subscribeRetentionStreak } from '@/lib/retention/streak'
 import posthog from '@/lib/analytics/lazyPosthog'
-import type { ChestPartDrop } from '@/lib/avatar/chestDrops'
+import { isChestPartDrop, type ChestPartDrop } from '@/lib/avatar/chestDrops'
 import type { NextMilestone, StreakMilestone, WeekDay } from '@/lib/daily/streakRewards'
 
 export interface PendingChest {
@@ -38,6 +39,8 @@ export interface WeeklyChestState {
   weekScore: number
   /** Streak freezes banked on the account (each covers one missed day). */
   freezesAvailable: number
+  /** This cycle's chest once opened, with the avatar part it held; null until then. */
+  openedChest: PendingChest | null
   /** Streak risk, week strip, milestone and freeze-saved news; null on an older server. */
   streak: ServerStreakBlock | null
   /** True while a claim request is in flight (disable the claim button). */
@@ -89,7 +92,23 @@ function normalizeStreakBlock(raw: unknown): ServerStreakBlock | null {
   }
 }
 
+function normalizeOpenedChest(raw: unknown): PendingChest | null {
+  if (!isRecord(raw)) return null
+  const tier = raw.tier
+  if (tier !== 'bronze' && tier !== 'silver' && tier !== 'gold') return null
+  return {
+    tier,
+    coins: Math.max(0, Number(raw.coins) || 0),
+    badgeId: typeof raw.badgeId === 'string' ? raw.badgeId : '',
+    freezes: Math.max(0, Number(raw.freezes) || 0),
+    ...(typeof raw.variantId === 'string' ? { variantId: raw.variantId } : {}),
+    ...(typeof raw.labelKey === 'string' ? { labelKey: raw.labelKey } : {}),
+    ...(isChestPartDrop(raw.part) ? { part: raw.part } : {}),
+  }
+}
+
 const DEFAULTS = {
+  openedChest: null as PendingChest | null,
   streak: null as ServerStreakBlock | null,
   daysCompleted: 0,
   currentStreak: 0,
@@ -136,6 +155,7 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   const rawFreezes = Number(obj.freezesAvailable)
   const freezesAvailable = Number.isFinite(rawFreezes) ? Math.max(0, Math.trunc(rawFreezes)) : 0
   return {
+    openedChest: normalizeOpenedChest(obj.openedChest),
     streak: normalizeStreakBlock(obj.streak),
     freezesAvailable,
     daysCompleted,
@@ -160,6 +180,9 @@ const DEDUP_TTL_MS = 4000
 let inflightStatus: Promise<typeof DEFAULTS | null> | null = null
 let cachedStatus: typeof DEFAULTS | null = null
 let cachedAt = 0
+
+// Every mounted instance shows the same account: a claim in one place must reach the rest.
+const listeners = new Set<(status: typeof DEFAULTS) => void>()
 
 /** @internal Reset the module-level dedup cache. For test isolation only —
  * the cache persists for the page lifetime in production by design. */
@@ -199,6 +222,7 @@ function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null>
       if (json === null) return null
       cachedStatus = normalizeStatus(json)
       cachedAt = Date.now()
+      listeners.forEach((fn) => fn(cachedStatus as typeof DEFAULTS))
       return cachedStatus
     })
     .finally(() => { inflightStatus = null })
@@ -215,6 +239,11 @@ export function useWeeklyChest(): WeeklyChestState {
   const hasLoadedRef = useRef(false)
   const [loadedOnce, setLoadedOnce] = useState(false)
   const claimInFlightRef = useRef(false)
+
+  useEffect(() => {
+    listeners.add(setData)
+    return () => { listeners.delete(setData) }
+  }, [])
 
   const refresh = useCallback((force = false) => {
     // Only show the loading state for the first load. Background refreshes
@@ -247,6 +276,27 @@ export function useWeeklyChest(): WeeklyChestState {
     }
     refresh()
     return () => { mountedRef.current = false }
+  }, [refresh, isAuthenticated, authLoading])
+
+  // The account streak lives on the server: refetch when a daily is played or the tab comes back,
+  // else the home card keeps showing the pre-play week until a full reload.
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) return
+    const resync = () => {
+      if (document.visibilityState === 'hidden') return
+      cachedStatus = null
+      refresh(true)
+    }
+    const offPlay = subscribeRetentionStreak(resync)
+    document.addEventListener('visibilitychange', resync)
+    window.addEventListener('focus', resync)
+    window.addEventListener('pageshow', resync)
+    return () => {
+      offPlay()
+      document.removeEventListener('visibilitychange', resync)
+      window.removeEventListener('focus', resync)
+      window.removeEventListener('pageshow', resync)
+    }
   }, [refresh, isAuthenticated, authLoading])
 
   const claim = useCallback(async (): Promise<PendingChest | null> => {

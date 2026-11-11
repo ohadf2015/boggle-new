@@ -13,6 +13,7 @@ import { CHEST_DAYS_REQUIRED } from '@/lib/daily/weeklyChest'
 import { WeeklyChestPlaceholder } from './WeeklyChestPlaceholder'
 import { CHEST_DROP_ODDS, weeklyChestSource } from '@/lib/avatar/chestDrops'
 import { RARITY_TOKENS } from '@/lib/avatar/rarity'
+import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize'
 
 const WeeklyChestInfoModal = dynamic(() => import('./WeeklyChestInfoModal'), { ssr: false })
 
@@ -40,6 +41,7 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
     cycleStart,
     isClaimable,
     pendingChest,
+    openedChest,
     projectedTier,
     weekScore,
     claiming,
@@ -257,6 +259,16 @@ export default function WeeklyChestCard({ onChestClaimed }: Props) {
           )}
         </div>
       </div>
+
+      {/* The opened chest stays here (and after a reload) with the part it held. */}
+      {!isClaimable && openedChest && (
+        <div data-testid="chest-opened" className="mt-3 flex flex-col items-center gap-1.5 relative">
+          <p className="text-xs font-black text-neo-yellow">{t('daily.weeklyChest.openedTitle')}</p>
+          {openedChest.part && (
+            <ChestPartPrize drop={openedChest.part} source={weeklyChestSource(openedChest.tier)} />
+          )}
+        </div>
+      )}
 
       <AnimatePresence>
         {isClaimable && (

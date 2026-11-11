@@ -82,6 +82,17 @@ async function appendPart(supabase: SupabaseClient, playerId: string, key: strin
   return false;
 }
 
+/** The part a chest already granted, for showing it again; null when none (never throws). */
+export async function readChestPart(supabase: SupabaseClient, playerId: string, source: ChestDropSource, sourceKey: string): Promise<ChestPartDrop | null> {
+  try {
+    const row = await readLedger(supabase, playerId, source, sourceKey);
+    return row ? fromRow(row) : null;
+  } catch (error) {
+    logger.error('AVATAR_CHEST', `read ${source}/${sourceKey} for ${playerId} failed: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
 export interface GrantChestPartArgs {
   supabase: SupabaseClient;
   playerId: string;

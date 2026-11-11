@@ -11,6 +11,8 @@ import { buildStreakBlock, loadOwnedFreezes } from '@/lib/daily/streakExtras.ser
 import { carryOverGuestStreak, loadCarriedDates, parseGuestIds } from '@/lib/daily/streakCarryover.server'
 import { readGuestId } from '@/lib/auth/guestCookie'
 import logger from '@/utils/logger'
+import { grantChestPart, readChestPart } from '@/lib/avatar/grantChestPart.server'
+import { weeklyChestSource } from '@/lib/avatar/chestDrops'
 
 /**
  * GET /api/daily/weekly-chest/status
@@ -131,6 +133,41 @@ export async function GET(request: NextRequest) {
         }
       : null
 
+    // The latest opened chest stays visible (with its avatar part) on every surface for a week,
+    // even after the card has moved on to the next cycle.
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+    const shown = (chestRows ?? [])
+      .filter((c: any) => c.opened_at && new Date(c.opened_at).getTime() >= weekAgo)
+      .sort((a: any, b: any) => String(b.opened_at).localeCompare(String(a.opened_at)))[0] as any
+    let openedChest: Record<string, unknown> | null = null
+    if (shown) {
+      const source = weeklyChestSource(shown.tier)
+      let part = null
+      if (shown.contents?.part_pending) {
+        const healed = await grantChestPart({ supabase, playerId: user.id, source, sourceKey: shown.cycle_start })
+        part = healed?.drop ?? null
+        if (healed) {
+          const { part_pending: _done, ...rest } = shown.contents
+          await supabase
+            .from('daily_weekly_chests')
+            .update({ contents: rest })
+            .eq('player_id', user.id)
+            .eq('cycle_start', shown.cycle_start)
+        }
+      } else {
+        part = await readChestPart(supabase, user.id, source, shown.cycle_start)
+      }
+      openedChest = {
+        tier: shown.tier,
+        coins: shown.contents?.coins,
+        freezes: shown.contents?.freezes,
+        badgeId: shown.contents?.badge_id,
+        variantId: shown.contents?.variant_id,
+        labelKey: shown.contents?.label_key,
+        ...(part ? { part } : {}),
+      }
+    }
+
     return NextResponse.json({
       freezesAvailable,
       streak,
@@ -141,6 +178,7 @@ export async function GET(request: NextRequest) {
       currentStreak,
       isClaimable,
       pendingChest,
+      openedChest,
       weekScore,
       projectedTier,
     })

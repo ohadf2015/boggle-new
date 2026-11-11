@@ -166,6 +166,16 @@ async function claim(request: NextRequest) {
     sourceKey: progress.cycleStart,
   })
 
+  if (!granted) {
+    // Chest is already opened: flag it so /status grants the part on the next read.
+    const { error: flagErr } = await supabase
+      .from('daily_weekly_chests')
+      .update({ contents: { ...contents, part_pending: true } })
+      .eq('player_id', user.id)
+      .eq('cycle_start', progress.cycleStart)
+    if (flagErr) logger.error('Weekly chest claim: could not flag pending part:', flagErr.message)
+  }
+
   return NextResponse.json({
     tier,
     ...(granted ? { part: granted.drop } : {}),
