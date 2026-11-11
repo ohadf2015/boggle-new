@@ -30,6 +30,12 @@ describe('fromMergedEntries', () => {
     expect(rows[0].display_name).toBe('Ann');
     expect(rows[0].by_mode?.['word-hunt']).toBe(10);
   });
+
+  it('carries the server\'s "pick a name to appear" flag on the viewer\'s hidden row', () => {
+    const rows = fromMergedEntries([entry({ rank: 1, key: 'a', isYou: true, needsPublicName: true }), entry({ rank: 2, key: 'b' })]);
+    expect(rows[0].needs_public_name).toBe(true);
+    expect(rows[1].needs_public_name).toBeUndefined();
+  });
 });
 
 describe('isViewer', () => {
@@ -97,5 +103,12 @@ describe('youReadout', () => {
   it('never reads "top 0%", and stays quiet on a board of one', () => {
     expect(youReadout(1, 500)?.topPercent).toBe(1);
     expect(youReadout(1, 1)).toBeNull();
+  });
+});
+
+describe('fromMergedEntries titles', () => {
+  it('Given a ranked entry with a title, Then the board row carries it for the title badge', () => {
+    const [r] = fromMergedEntries([entry({ rank: 1, key: 'a', name: 'Ann', title: 'NEMESIS' })]);
+    expect(r.title).toBe('NEMESIS');
   });
 });

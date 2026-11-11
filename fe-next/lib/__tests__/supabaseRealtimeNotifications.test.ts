@@ -77,6 +77,12 @@ describe('supabaseRealtimeNotifications', () => {
       expect(mockSupabase.channel).toHaveBeenCalledWith(`notifications:${userId}`);
     });
 
+    it('opens its own channel when given a prefix, so a second subscriber never reuses the bell channel', async () => {
+      subscribeToNotifications('user-123', vi.fn(), undefined, 'rival-pings');
+      await vi.waitFor(() => expect(mockSupabase.channel).toHaveBeenCalled());
+      expect(mockSupabase.channel).toHaveBeenCalledWith('rival-pings:user-123');
+    });
+
     it('should subscribe to postgres_changes for user_notifications', async () => {
       const userId = 'user-456';
       await arm(userId);

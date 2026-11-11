@@ -8,6 +8,7 @@ import { getCurrentSeasonDynamic, getSeasonRewards } from '@/lib/seasons';
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
 import { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } from '../../redisClient';
 import { coalesce } from '../../utils/requestCoalescing';
+import { toPublicBoardRows } from '@/lib/names/publicName';
 
 export const leaderboardRouter = router({
   getTop: loggedProcedure
@@ -28,7 +29,7 @@ export const leaderboardRouter = router({
       // Try cache first (season-namespaced when applicable)
       const cached = await getCachedLeaderboardTop100(targetSeasonId);
       if (cached) {
-        return { data: cached, cached: true };
+        return { data: toPublicBoardRows(cached), cached: true };
       }
 
       const coalesceKey = targetSeasonId
@@ -92,7 +93,7 @@ export const leaderboardRouter = router({
         return { data: entries, cached: false };
       });
 
-      return result;
+      return { ...result, data: toPublicBoardRows(result.data) };
     }),
 
   claimSeasonRewards: loggedProcedure
@@ -320,7 +321,7 @@ export const leaderboardRouter = router({
       }
       try {
         const entries = await getTopPlayersByMmr(input.limit);
-        return { data: entries, cached: false };
+        return { data: toPublicBoardRows(entries), cached: false };
       } catch (err) {
         logger.error('TRPC', 'Ranked leaderboard fetch error', { error: (err as Error).message });
         throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to fetch ranked leaderboard' });

@@ -20,17 +20,14 @@ import toast from 'react-hot-toast';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Cosmetic, CosmeticRarity } from '@/lib/cosmetics';
+import { RARITY_TOKENS } from '@/lib/avatar/rarity';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
-// Rarity → neo accent palette. `accent` drives border + glow; `chip` is the
-// rarity-badge fill. Kept inline (not CSS vars) so the glow boxShadow can use it.
-const RARITY_ACCENT: Record<CosmeticRarity, { accent: string; glow: string }> = {
-  common: { accent: '#9aa0b4', glow: 'rgba(154,160,180,0.55)' },
-  rare: { accent: '#00FFFF', glow: 'rgba(0,255,255,0.55)' },
-  epic: { accent: '#9370DB', glow: 'rgba(147,112,219,0.6)' },
-  legendary: { accent: '#BFFF00', glow: 'rgba(191,255,0,0.6)' },
-};
+function rarityAccent(rarity: CosmeticRarity): { accent: string; glow: string } {
+  const hex = RARITY_TOKENS[rarity].hex;
+  return { accent: hex, glow: `${hex}8c` };
+}
 
 interface CosmeticUnlockToastContentProps {
   cosmetic: Cosmetic;
@@ -49,9 +46,9 @@ function CosmeticUnlockToastContent({
   t,
   onDismiss,
 }: CosmeticUnlockToastContentProps) {
-  const { accent, glow } = RARITY_ACCENT[cosmetic.rarity];
+  const { accent, glow } = rarityAccent(cosmetic.rarity);
   const name = t(cosmetic.name);
-  const rarityLabel = t(`cosmetics.rarity.${cosmetic.rarity}`);
+  const rarityLabel = t(RARITY_TOKENS[cosmetic.rarity].labelKey);
 
   return (
     <m.a

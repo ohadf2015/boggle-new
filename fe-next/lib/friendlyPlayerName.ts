@@ -10,6 +10,7 @@
  * Server-side only: it reads the bot/guest name pools.
  */
 import { BOT_CONFIG } from '@/backend/modules/botConfig';
+import { isProfane } from '@/backend/utils/profanityFilter';
 import { resolveDisplayName } from './displayName';
 
 function hash(s: string): number {
@@ -46,7 +47,8 @@ export interface NamedProfile {
 
 /** A profile's shown name: its chosen name, else a stable friendly one. */
 export function shownPlayerName(profile: NamedProfile, language: string = 'en', taken?: Set<string>): string {
-  const real = resolveDisplayName([profile.display_name, profile.username], '');
+  const clean = (n: string | null | undefined) => (isProfane(n) ? null : n);
+  const real = resolveDisplayName([clean(profile.display_name), clean(profile.username)], '');
   if (real) {
     taken?.add(real);
     return real;

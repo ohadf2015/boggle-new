@@ -175,6 +175,6 @@ describe('DailyChallenge — level-up from the daily fires the avatar unlock rev
     fireEvent.click(screen.getByTestId('finish'));
 
     await waitFor(() => expect(levelUpFromRecordGame).toHaveBeenCalledWith(LEVEL_UP));
-    expect(publishLevelUp).toHaveBeenCalledWith({ from: 'record-game', d: LEVEL_UP });
+    expect(publishLevelUp).toHaveBeenCalledWith({ from: 'record-game', d: LEVEL_UP }, 'daily');
   });
 });

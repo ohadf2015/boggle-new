@@ -33,6 +33,7 @@ import { QuickResultsStats } from './QuickResultsStats';
 import { QuickResultsCtaBar } from './QuickResultsNextActions';
 import { QuickPlayRankCard } from './QuickPlayRankCard';
 import { QuickRivalsPassed } from './QuickRivalsPassed';
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import { QuickWordsCollected, type CollectedWord } from './QuickWordsCollected';
 import { QuickLeaderboardCard } from './QuickLeaderboardCard';
 import { celebrationTier } from './celebrationTier';
@@ -395,6 +396,7 @@ export function QuickPlayResults({
           data-testid="quick-results-details"
         >
           <div className="flex flex-col gap-3">
+            <ResultsSocialSlot mode="quickPlay" score={result.score} previousBest={prevBestScore} rivalScore={result.scorePct} subMode={result.mode} />
             <QuickPlayRankCard totalPoints={outcome.totalPoints} percentileToday={percentileToday} scorePct={result.scorePct} />
             <QuickRivalsPassed
               rivals={rivals}

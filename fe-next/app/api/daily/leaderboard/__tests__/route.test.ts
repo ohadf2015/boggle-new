@@ -40,7 +40,7 @@ import { __resetDailyBoardCache } from '@/lib/daily/loadDailyBoard';
 
 const req = (qs: string) => new NextRequest(`http://localhost/api/daily/leaderboard?${qs}`);
 const hunt = (id: string | null, fp: string | null, v: number) =>
-  ({ player_id: id, guest_fingerprint: fp, display_name: 'Player', efficiency_score: v });
+  ({ player_id: id, guest_fingerprint: fp, display_name: `Racer ${v}`, efficiency_score: v });
 
 describe('GET /api/daily/leaderboard', () => {
   beforeEach(() => {
@@ -96,7 +96,7 @@ describe('GET /api/daily/leaderboard', () => {
 
   it('leaves test accounts and 0-point rows off the board and counts only real players', async () => {
     rows.daily_word_hunt_leaderboard = [hunt('qa', null, 999), hunt('real', null, 10), hunt('zero', null, 0)];
-    rows.profiles = [{ id: 'qa' }];
+    rows.profiles = [{ id: 'qa', is_test_account: true }];
     const { GET } = await import('../route');
     const body = await (await GET(req('date=2026-09-21&lang=all'))).json();
     expect(body.data).toHaveLength(1);

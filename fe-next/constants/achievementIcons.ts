@@ -1,3 +1,5 @@
+import { PROGRESSION_ACHIEVEMENT_ICONS } from '@/backend/modules/achievements/progressionAchievements';
+
 /**
  * Achievement icons mapping (matches backend achievementManager.js)
  * COMPLETE list of all achievements including elite, competitive/style, and lifetime achievements
@@ -52,6 +54,8 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   POINT_KING: '💎',
   DEDICATION: '🔥',
   LOYAL_PLAYER: '⭐',
+
+  ...PROGRESSION_ACHIEVEMENT_ICONS,
 };
 
 /**

@@ -35,7 +35,8 @@ export type NotificationCallback = (notification: RealtimeNotification) => void;
 export function subscribeToNotifications(
   userId: string,
   onNewNotification: NotificationCallback,
-  onSubscriptionError?: (error: string) => void
+  onSubscriptionError?: (error: string) => void,
+  channelPrefix = 'notifications'
 ): () => void {
   if (!userId) {
     console.warn('Cannot subscribe to notifications: no userId provided');
@@ -54,7 +55,7 @@ export function subscribeToNotifications(
     supabase = await loadSupabaseClient();
     if (cancelled || !supabase) return;
 
-    const channelName = `notifications:${userId}`;
+    const channelName = `${channelPrefix}:${userId}`;
     channel = supabase
       .channel(channelName)
       .on(

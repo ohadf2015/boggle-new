@@ -24,6 +24,8 @@ vi.mock('@/utils/growthTracking', () => ({
 import { useBlastBadgeUnlocks } from '../hooks/useBlastBadgeUnlocks';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 const t = (key: string, fallbackOrVars?: string | Record<string, string | number>, extra?: Record<string, string | number>) => {
   const vars = typeof fallbackOrVars === 'string' ? extra : fallbackOrVars;
   if (!vars) return key;

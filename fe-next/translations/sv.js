@@ -3238,7 +3238,7 @@ const sv = {
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "goalA11y": "Våning {n}. Nästa mål: våning {goal}", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
     "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Sikta mitt!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",
@@ -7165,6 +7165,27 @@ const sv = {
     "viewProgress": "Se framsteg"
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"Världsrekord","description":"Håll ett världsrekord i valfritt spelläge"},
+    "RIVALRY_FIRST_WIN": {"name":"Revansch","description":"Slå din rival för första gången"},
+    "RIVALRY_5_WINS": {"name":"Rivaljägare","description":"Slå din rival 5 gånger"},
+    "RIVALRY_25_WINS": {"name":"Ärkefiende","description":"Slå din rival 25 gånger"},
+    "PING_FIRST": {"name":"Nu kör vi","description":"Skicka din första utmaning till en rival"},
+    "PING_25": {"name":"Gaphals","description":"Skicka 25 utmaningar till rivaler"},
+    "REMATCH_10": {"name":"En gång till","description":"Möt samma rival 10 gånger till"},
+    "RECORD_FIRST": {"name":"Personbästa","description":"Slå ditt bästa Blast-resultat eller ditt längsta ord"},
+    "RECORD_10": {"name":"Rekordkrossare","description":"Slå ditt eget rekord 10 gånger"},
+    "FIRST_FRIEND": {"name":"Första vännen","description":"Lägg till din första vän"},
+    "FRIENDS_5": {"name":"Sällskapsfjäril","description":"Ha 5 vänner"},
+    "LEVEL_5": {"name":"Grodd","description":"Nå nivå 5"},
+    "LEVEL_10": {"name":"Växer sig stark","description":"Nå nivå 10"},
+    "LEVEL_25": {"name":"Djupa rötter","description":"Nå nivå 25"},
+    "LEVEL_50": {"name":"Toppen","description":"Nå nivå 50"},
+    "LEVEL_75": {"name":"Smält kärna","description":"Nå nivå 75"},
+    "LEVEL_100": {"name":"Stjärnfall","description":"Nå nivå 100"},
+    "TITLE_PICKED": {"name":"Namnbricka","description":"Välj en titel till din profil"},
+    "DAILY_TOP3": {"name":"Pallplats","description":"Hamna topp 3 på dagens topplista"},
+    "DAILY_BOARD_STREAK_7": {"name":"En vecka på listan","description":"Kom med på dagens lista 7 dagar i rad"},
+    "DAILY_BOARD_STREAK_30": {"name":"Dagens stamgäst","description":"Kom med på dagens lista 30 dagar i rad"},
     "wordcraft_first_word": {
       "name": "Första ordet",
       "description": "Lägg ditt första ord i Word Craft"
@@ -22791,8 +22812,178 @@ const sv = {
     "proDepth": "Utveckling vecka för vecka · Exportera alla klasser · Rapporter till vårdnadshavare",
     "schoolQuote": "Köper du till hela skolan? Begär en offert",
     "noWords": "Den här rundan hade inga lektionsord att kontrollera."
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "Din vän",
+      "playedTogether": "Spelat ihop {count} gånger",
+      "friendOfFriend": "Vän till en vän",
+      "sameCountry": "Också från {country}",
+      "closeScore": "Spelar på din nivå",
+      "closeRecord": "Dött lopp"
+    },
+    "beatBy": "Slå {name} med {gap}",
+    "youBeat": "Du slog {name}!",
+    "yourRival": "Din rival: {name}",
+    "selfChase": "{gap} till så slår du ditt rekord",
+    "selfBeat": "Nytt personbästa!",
+    "yourBest": "Ditt bästa",
+    "pingedYou": "Pingade dig",
+    "wins": "{count} V",
+    "losses": "{count} F",
+    "draws": "{count} O"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "Välj ett namn för att synas på topplistan och få en rival",
+    "tryThis": "Testa:",
+    "placeholder": "Ditt namn",
+    "save": "Spara",
+    "saveFailed": "Kunde inte spara namnet. Försök igen.",
+    "onlyYouSeeRow": "Bara du ser det här. Välj ett namn för att synas",
+    "error": {
+      "empty": "Skriv ett namn först",
+      "placeholder": "Det är ett automatiskt namn. Välj ett eget",
+      "default": "Många spelare heter så. Välj ett eget",
+      "profane": "Det namnet är inte tillåtet. Testa ett annat"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "Kom igen då",
+      "beat_you": "Slog dig den här gången",
+      "rematch": "Revansch?",
+      "gg": "GG, snyggt spelat",
+      "close_one": "Det var nära!",
+      "your_turn": "Din tur",
+      "nice_word": "Snyggt ord, respekt",
+      "see_you_tomorrow": "Vi ses imorgon"
+    },
+    "button": "Pinga",
+    "buttonLabel": "Skicka en ping till {name}",
+    "pickerTitle": "Pinga {name}",
+    "sent": "Skickat!",
+    "more": "Fler val",
+    "block": "Blockera {name}",
+    "report": "Rapportera",
+    "reported": "Tack, vi kollar på det",
+    "signIn": "Skapa konto",
+    "error": {
+      "sign_in_required": "Skapa ett konto för att pinga dina rivaler",
+      "not_allowed": "Du kan inte pinga den här spelaren",
+      "blocked": "Du har blockerat den här spelaren",
+      "name_required": "Välj ett spelarnamn först, så de vet vem som utmanar dem",
+      "daily_limit": "Du har använt dina 3 pingar idag. Fler imorgon",
+      "target_cooldown": "Du har redan pingat dem. Vänta några timmar",
+      "not_found": "Den här spelaren finns inte kvar",
+      "unavailable": "Det gick inte att skicka. Försök igen"
+    },
+    "toast": {
+      "title": "{name} pingade dig",
+      "pingBack": "Pinga tillbaka",
+      "play": "Spela",
+      "close": "Stäng",
+      "region": "Ping från en rival"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "Nytt rekord!",
+      "beatPrevious": "{value} — förra rekordet var {previous}",
+      "title": "Dina rekord",
+      "empty": "Inga rekord än. Spela en runda och sätt ditt första.",
+      "upFrom": "upp från {previous}",
+      "keys": {
+        "longestWord": "Längsta ordet",
+        "singleBest": "Bästa solo",
+        "quickPlayBest": "Bästa snabbspel",
+        "blastBest": "Bästa Blast",
+        "towerBestM": "Högsta tornet (m)",
+        "wordCraftBest": "Bästa Word Craft",
+        "dailyStreakBest": "Längsta dagliga svit",
+        "mpBestStreak": "Flest vinster i rad",
+        "multiplayerBest": "Bästa poäng i multiplayer"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "Logga in för att börja låsa upp avatarprylar",
+      "levelPath": "Nv {from} → Nv {to}",
+      "unlocksItem": "låser upp {item}",
+      "xpToGo": "{xp} XP kvar",
+      "upNext": "Näst på tur",
+      "atLevel": "Nv {level}"
+    },
+    "titles": {
+      "newTitle": "Ny titel",
+      "pickerTitle": "Din titel",
+      "auto": "Auto",
+      "saveFailed": "Kunde inte spara titeln. Försök igen.",
+      "loadFailed": "Kunde inte ladda titlar. Tryck för att försöka igen.",
+      "nextAt": "Nv {level} låser upp {title}",
+      "NEMESIS": "Ärkefiende",
+      "RECORD_BREAKER": "Rekordkrossare",
+      "SOCIAL_BUTTERFLY": "Sällskapsfjäril",
+      "DAILY_REGULAR": "Dagens stamgäst",
+      "ASCENDED_ONE": "Den uppstigne",
+      "TWICE_RISEN": "Två gånger uppstånden",
+      "THRICE_BLESSED": "Tre gånger välsignad",
+      "ETERNAL_WARRIOR": "Evig krigare",
+      "LEXICON_IMMORTAL": "Lexikonets odödlige"
+    },
+    "achievements": {
+      "holders": "{percent}% av spelarna har den"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "Rekord",
+    "metres": "{value} m",
+    "chip": {
+      "holder": "Världsrekord: {name} · {score}",
+      "gap": "{gap} till så slår du det",
+      "newRecord": "Nytt världsrekord!",
+      "youHold": "Världsrekordet är ditt · {score}",
+      "claimSignIn": "Logga in för att ta rekordet.",
+      "claimName": "Välj ett riktigt namn för att ta rekordet."
+    },
+    "crown": {
+      "label": "Världsrekord: {count}"
+    },
+    "hallOfFame": {
+      "title": "Hall of Fame",
+      "subtitle": "Bästa resultatet någonsin i varje spel",
+      "since": "Sedan {date}",
+      "yours": "Ditt",
+      "empty": "Inga rekord än. Det första är ditt att ta.",
+      "error": "Kunde inte ladda rekorden.",
+      "retry": "Försök igen"
+    },
+    "modes": {
+      "mp_classic": "Multiplayer · Klassiskt",
+      "mp_word_hunt": "Multiplayer · Ordjakt",
+      "mp_wheel_rush": "Multiplayer · Hjulrush",
+      "mp_blast": "Multiplayer · Blast",
+      "qp_classic": "Snabbmatch · Klassiskt",
+      "qp_word_hunt": "Snabbmatch · Ordjakt",
+      "qp_wheel_rush": "Snabbmatch · Hjulrush",
+      "qp_blast": "Snabbmatch · Blast",
+      "daily_word_hunt": "Dagens Ordjakt",
+      "daily_word_wheel": "Dagens Ordhjulet",
+      "daily_connections": "Dagens Ordbro",
+      "blast": "Blast",
+      "tower": "Ordtorn",
+      "single": "Solo"
+    }
+  }
+  // @worldRecords:end
 };
 
 export { sv };

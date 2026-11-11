@@ -13,6 +13,7 @@ import { getSupabase, isSupabaseConfigured } from './supabase';
 import { shouldSendDirectMessagePush } from './pushDedup';
 import { getCachedTranslation } from '../../translations/loadTranslation';
 import type { Language } from '@/types';
+import { pingEntityType, type RivalPingId } from '@/lib/rivals/pings';
 
 /**
  * Resolve a single achievement key (e.g. 'WORD_MASTER') to a display name in
@@ -46,7 +47,9 @@ export type PushNotificationType =
   | 'season_start'
   | 'curator_assigned'
   | 'word_tower_wreck'
-  | 'word_tower_pass';
+  | 'word_tower_pass'
+  | 'rival_ping'
+  | 'world_record_broken';
 
 /**
  * Map push types to notification_type for user_notifications table (N-7)
@@ -65,6 +68,8 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   turn_reminder: 'social',
   word_tower_wreck: 'social',
   word_tower_pass: 'social',
+  rival_ping: 'social',
+  world_record_broken: 'social',
   achievement: 'achievement',
   daily_challenge: 'system',
   level_up: 'achievement',
@@ -180,7 +185,8 @@ async function saveNotificationHistory(
   type: string,
   payload: FCMPayload,
   deepLink?: string,
-  senderId?: string
+  senderId?: string,
+  relatedEntityType?: string
 ): Promise<void> {
   try {
     if (!isSupabaseConfigured()) return;
@@ -197,6 +203,7 @@ async function saveNotificationHistory(
       push_sent: true,
       push_sent_at: new Date().toISOString(),
       ...(senderId && { sender_id: senderId }),
+      ...(relatedEntityType && { related_entity_type: relatedEntityType }),
     });
 
     if (error) {
@@ -235,6 +242,7 @@ const CATEGORY_MAP: Partial<Record<PushNotificationType, PreferenceCategory>> = 
   gift_received: 'friend_invites',
   direct_message: 'friend_invites',
   turn_reminder: 'friend_invites',
+  rival_ping: 'friend_invites',
 };
 
 /**
@@ -281,7 +289,8 @@ async function triggerPush(
   type: PushNotificationType,
   payload: FCMPayload,
   mode: DeliveryMode = 'both',
-  senderId?: string
+  senderId?: string,
+  relatedEntityType?: string
 ): Promise<void> {
   try {
     const jobs: Promise<unknown>[] = [];
@@ -290,7 +299,7 @@ async function triggerPush(
       if (allowed) jobs.push(sendToUser(userId, payload));
     }
     if (mode !== 'push_only') {
-      jobs.push(saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId));
+      jobs.push(saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId, relatedEntityType));
     }
     await Promise.allSettled(jobs);
   } catch (error) {
@@ -840,4 +849,46 @@ export async function notifyWordTowerPass(
       deepLink: '/word-tower',
     },
   }, 'both', passerUserId);
+}
+
+/** A canned taunt from one rival to another. The route has already checked blocks, students and limits. */
+export async function notifyRivalPing(
+  targetUserId: string,
+  senderName: string,
+  senderUserId: string,
+  pingId: RivalPingId
+): Promise<void> {
+  const locale = await getUserLocale(targetUserId);
+  return triggerPush(targetUserId, 'rival_ping', {
+    title: translatePush(locale, 'rivalPing.title', { sender: senderName }),
+    body: translatePush(locale, `rivalPing.body.${pingId}`),
+    imageUrl: mascotImageUrl('celebration'),
+    data: {
+      type: 'rival_ping',
+      deepLink: `/player/${senderUserId}`,
+      pingId,
+    },
+  }, 'both', senderUserId, pingEntityType(pingId));
+}
+
+export async function notifyRecordBroken(
+  previousHolderId: string,
+  newHolderName: string,
+  recordKey: string,
+  newHolderId?: string
+): Promise<void> {
+  const locale = await getUserLocale(previousHolderId);
+  return triggerPush(previousHolderId, 'world_record_broken', {
+    title: translatePush(locale, 'worldRecord.title'),
+    body: translatePush(locale, 'worldRecord.body', {
+      name: newHolderName,
+      mode: translatePush(locale, `worldRecord.mode.${recordKey}`),
+    }),
+    imageUrl: mascotImageUrl('crying'),
+    data: {
+      type: 'world_record_broken',
+      deepLink: '/leaderboard?tab=records',
+      recordKey,
+    },
+  }, 'both', newHolderId);
 }

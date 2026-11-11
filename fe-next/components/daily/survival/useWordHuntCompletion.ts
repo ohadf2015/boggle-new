@@ -46,7 +46,7 @@ function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
   })
     .then(r => r.json())
     .then(data => {
-      publishLevelUp(levelUpFromRecordGame(data));
+      publishLevelUp(levelUpFromRecordGame(data), 'daily');
       if (data.questUpdate?.completed) {
         import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
           showQuestCompletionToast({

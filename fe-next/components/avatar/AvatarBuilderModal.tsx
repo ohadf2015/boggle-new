@@ -33,6 +33,7 @@ import EditorStage from './editor/EditorStage';
 import EditorTabBar from './editor/EditorTabBar';
 import EditorPanel from './editor/EditorPanel';
 import UnlockPanel from './editor/UnlockPanel';
+import { UpNextRail } from '@/components/progression/UpNextRail';
 import EditorActionBar from './editor/EditorActionBar';
 import { useAvatarEditor } from './editor/useAvatarEditor';
 import { getEditorTabs, describeSlot, type ColorSection, type PartsSection, type EditorTab } from './editor/editorTabs';
@@ -249,9 +250,16 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
               t={t}
               language={language}
               footer={
-                <div className="flex justify-center pt-2 empty:hidden">
-                  <GlowUpButton previewRef={stageRef} config={committed} />
-                </div>
+                <>
+                  {typeof premium?.level === 'number' && (
+                    <div className="pt-2">
+                      <UpNextRail level={premium.level} config={committed} />
+                    </div>
+                  )}
+                  <div className="flex justify-center pt-2 empty:hidden">
+                    <GlowUpButton previewRef={stageRef} config={committed} />
+                  </div>
+                </>
               }
             />
             {premium && tryOn && slot && tryInfo && (

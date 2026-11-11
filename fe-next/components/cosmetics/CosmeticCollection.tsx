@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useCosmetics } from '@/hooks/useCosmetics';
+import { RarityChip } from '@/components/progression/RarityChip';
 import { type CosmeticCategory, RARITY_COLORS, type Cosmetic, formatUnlockHint, formatUnlockProgress, localizeTierParams } from '@/lib/cosmetics';
 import { Lock } from 'lucide-react';
 import { CosmeticPreview } from './CosmeticPreview';
@@ -85,8 +86,8 @@ export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0
               <p className="text-sm font-neo-body text-neo-white truncate">{t(item.name)}</p>
 
               {/* Rarity */}
-              <p className={`text-xs ${rarityClass}`}>
-                {t(`cosmetics.rarity.${item.rarity}`)}
+              <p>
+                <RarityChip rarity={item.rarity} size="xs" />
               </p>
 
               {/* Status badges */}

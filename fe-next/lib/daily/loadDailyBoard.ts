@@ -1,4 +1,5 @@
 import { createHmac, randomBytes } from 'node:crypto';
+import { attachTitles, type TitleMeta } from './attachTitles';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { scopeDailyBoard } from '@/lib/connections/dailyBoard';
 import { rankDailyBoard, type MergeInput, type RankedBoardRow } from './mergeDailyLeaderboard';
@@ -79,19 +80,31 @@ export async function loadRankedDailyBoard(
     };
   });
 
-  const ranked = rankDailyBoard(inputs, { excludePlayerIds: await testAccountIds(admin, inputs) });
+  const meta = await profileMeta(admin, inputs);
+  const ranked = rankDailyBoard(inputs, { excludePlayerIds: meta.testIds });
+  attachTitles(ranked, meta.titles);
   cache.set(cacheKey, { at: Date.now(), ranked });
   return ranked;
 }
 
-async function testAccountIds(admin: SupabaseClient, inputs: MergeInput[]): Promise<Set<string>> {
+/** Test accounts to leave off the board, and every signed-in player's title, in one profiles read. */
+async function profileMeta(admin: SupabaseClient, inputs: MergeInput[]): Promise<{ testIds: Set<string>; titles: Map<string, TitleMeta> }> {
+  const empty = { testIds: new Set<string>(), titles: new Map<string, TitleMeta>() };
   const ids = new Set<string>();
   for (const { rows } of inputs) for (const r of rows) if (r.player_id) ids.add(r.player_id);
-  if (ids.size === 0) return new Set();
+  if (ids.size === 0) return empty;
+  type Meta = TitleMeta & { id: string; is_test_account: boolean | null };
   return failOpen(
-    admin.from('profiles').select('id').in('id', Array.from(ids)).eq('is_test_account', true)
-      .then(({ data }) => new Set((data ?? []).map((p: { id: string }) => p.id))),
-    new Set<string>(),
+    admin.from('profiles').select('id, is_test_account, chosen_title, current_level').in('id', Array.from(ids))
+      .then(({ data }) => {
+        const out = { testIds: new Set<string>(), titles: new Map<string, TitleMeta>() };
+        for (const p of (data ?? []) as Meta[]) {
+          if (p.is_test_account) out.testIds.add(p.id);
+          else out.titles.set(p.id, p);
+        }
+        return out;
+      }),
+    empty,
   );
 }
 

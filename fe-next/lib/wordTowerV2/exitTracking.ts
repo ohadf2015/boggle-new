@@ -5,6 +5,7 @@
 
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { emitAbandonOnExit } from '@/utils/abandonOnPagehide';
+import { WORD_TOWER_MODE } from './telemetry';
 
 export type Wt2Screen = 'home' | 'run' | 'results' | 'estate' | 'raid' | 'wreck' | 'loading' | 'error';
 
@@ -53,7 +54,7 @@ export function resolveWt2Screen(state: Wt2State): Wt2Screen {
  * before any async navigation.
  */
 export function trackWt2Exit(from: Wt2Screen): void {
-  trackGrowthEvent('wt2_exit', { from });
+  trackGrowthEvent('wt2_exit', { from, mode: WORD_TOWER_MODE });
   // An exit with an unfinished run used to be the end of the trail: no
   // game_completed, no game_abandoned — an orphan start that made Word Tower
   // completion look near-zero (mobile 1 of 18 starts with a terminal event).

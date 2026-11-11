@@ -246,6 +246,8 @@ vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: (
 
 import ResultsPage from '../MpResultsScreen';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 const renderResultsPage = (props: {
   finalScores: Array<{ username: string; score: number; allWords?: any[] }>;
   username: string;

@@ -277,7 +277,7 @@ const SinglePlayerView: React.FC = () => {
           .then(r => r.json())
           .then(data => {
             // Level-up → avatar unlock reveal (in memory; SessionRevealHost shows it).
-            publishLevelUp(levelUpFromRecordGame(data));
+            publishLevelUp(levelUpFromRecordGame(data), 'single');
             if (Array.isArray(data.lifetimeAchievements)) {
               for (const achievement of data.lifetimeAchievements) {
                 if (achievement?.key) queueAchievement(achievement);

@@ -11,6 +11,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import SinglePlayerResults from '../SinglePlayerResults';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));

@@ -156,4 +156,16 @@ describe('V2TopBar', () => {
     expect(screen.queryByText('520')).toBeNull();
     expect(document.querySelector('[data-wt2-daily-target]')).toBeTruthy();
   });
+
+  it('given a free run, when rendered, then a goal chip names the next floor to reach', () => {
+    const { container } = render(bar());
+    const goal = container.querySelector('[data-wt2-goal]');
+    expect(goal?.getAttribute('aria-label')).toBe('wordTowerV2.hud.goalA11y:3,5');
+    expect(goal?.textContent).toContain('3/5');
+  });
+
+  it('given the daily, when rendered, then no free-run goal chip (the daily has its own target)', () => {
+    const { container } = render(bar({ daily: true }));
+    expect(container.querySelector('[data-wt2-goal]')).toBeNull();
+  });
 });

@@ -11,6 +11,8 @@ import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/c
 import AvatarSelectorButton from '@/components/join/AvatarSelectorButton';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
 import { cn } from '@/lib/utils';
+import { checkPublicName } from '@/lib/names/checkPublicName';
+import type { PublicNameIssue } from '@/lib/names/publicName';
 
 interface ProfileCustomizationModalProps {
   isOpen: boolean;
@@ -49,6 +51,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   const [saveError, setSaveError] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
   const [showShake, setShowShake] = useState(false);
+  const [publicIssue, setPublicIssue] = useState<PublicNameIssue | null>(null);
 
   // Reset state only when modal first opens (not on prop changes while open)
   const prevOpenRef = useRef(false);
@@ -72,9 +75,10 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   const isValidLength = trimmedName.length >= minLength && displayName.length <= maxLength;
   const isNameValid = isValidFormat && isValidLength;
   const isEmpty = trimmedName.length === 0;
-  const showNameError = nameTouched && displayName.length > 0 && !isNameValid;
+  const showNameError = nameTouched && displayName.length > 0 && (!isNameValid || publicIssue !== null);
 
   const getErrorMessage = () => {
+    if (publicIssue) return t(`publicName.error.${publicIssue}`);
     if (!isValidFormat) return t('validation.invalidCharacters');
     if (trimmedName.length < minLength) return t('validation.usernameTooShort');
     if (displayName.length > maxLength) return t('validation.usernameTooLong');
@@ -93,6 +97,16 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
 
     setIsSaving(true);
     setSaveError(false);
+    // Generated defaults may still be saved; they only stay off public boards.
+    const issue = await checkPublicName(trimmedName);
+    if (issue === 'profane' || issue === 'placeholder') {
+      setPublicIssue(issue);
+      setIsSaving(false);
+      setShowShake(true);
+      setTimeout(() => setShowShake(false), 500);
+      inputRef.current?.focus();
+      return;
+    }
     try {
       await onSave(trimmedName, selectedAvatar);
       onClose();
@@ -166,6 +180,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   value={displayName}
                   onChange={(e) => {
                     setNameTouched(true);
+                    setPublicIssue(null);
                     setDisplayName(e.target.value);
                   }}
                   onBlur={() => setNameTouched(true)}
@@ -250,6 +265,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
           <button
             onClick={handleSave}
             disabled={isSaving}
+            data-testid="profile-save"
             className={cn(
               'w-full py-3.5 font-black text-lg uppercase rounded-neo border-3 border-neo-black transition-all',
               isNameValid && !isEmpty

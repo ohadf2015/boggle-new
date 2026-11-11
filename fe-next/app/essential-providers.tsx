@@ -73,6 +73,7 @@ const SignupPromptHost = dynamic(() => import(/* webpackChunkName: "app-root-mou
 const PlayerStyleOnboardingWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/PlayerStyleOnboardingWrapper'), { ssr: false });
 const AgeGatePromptWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/AgeGatePromptWrapper'), { ssr: false });
 const UnlockNotifierMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
+const IncomingPingToast = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/rivals/IncomingPingToast'), { ssr: false });
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -330,6 +331,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                 {/* Cosmetic unlock toast — global so rank-up/streak unlocks surface a
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
                                                 {gameSurface && <UnlockNotifierMount />}
+                                                {gameSurface && <IncomingPingToast />}
                                                 {/* Native AdMob banner — single global mount, route-aware.
                                                     BannerCoordinatorMount hosts the single banner coordinator
                                                     (ops + load/fail/foreground signals) the two banner owners

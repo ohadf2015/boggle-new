@@ -27,3 +27,14 @@ describe('useTowerRun — best height has one source of truth', () => {
     expect(result.current.bestM).toBe(12);
   });
 });
+
+describe('useTowerRun — the best before this run', () => {
+  beforeEach(() => window.localStorage.clear());
+
+  it('given a stored best, when a run ends, then the pre-run best is kept for the results screen', () => {
+    window.localStorage.setItem('wordTowerV2.bestM', '9.00');
+    const { result } = renderHook(() => useTowerRun());
+    act(() => result.current.finish());
+    expect(result.current.prevBestRef.current).toBe(9);
+  });
+});

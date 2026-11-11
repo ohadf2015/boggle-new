@@ -13,6 +13,8 @@ import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from 
 import { checkLifetimeAchievements, type UserStats } from '@/backend/modules/achievementManager';
 import { isDailyMode, awardsLeaderboardPoints, leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 import { captureApiError } from '@/utils/sentry';
+import { getSupabaseAdmin } from '@/lib/email';
+import { recordPersonalBest } from '@/backend/modules/achievements/grantAchievements';
 
 interface RecordGameRequest {
   score: number;
@@ -221,6 +223,7 @@ export async function POST(request: NextRequest) {
         totalWordsFound: (updates.total_words as number | undefined) ?? profile?.total_words ?? 0,
         totalScore: (updates.total_score as number | undefined) ?? profile?.total_score ?? 0,
         uniqueDaysPlayed: (updates.unique_days_played as number | undefined) ?? profile?.unique_days_played ?? 0,
+        currentLevel: newLevel,
       };
       newLifetimeAchievements = checkLifetimeAchievements(
         userStats,
@@ -239,6 +242,11 @@ export async function POST(request: NextRequest) {
       }
     } catch (err) {
       console.error('[STATS RECORD-GAME] Lifetime achievement check failed:', err);
+    }
+
+    // After the lifetime block: it rewrites achievement_counts from the snapshot read at the start.
+    if (updates.longest_word && (profile?.longest_word_length || 0) > 0) {
+      await recordPersonalBest(getSupabaseAdmin(), userId);
     }
 
     // Update weekly quest progress for singleplayer games

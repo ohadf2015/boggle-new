@@ -11,6 +11,8 @@ import {
   coinDelta,
   coinTickRate,
   milestoneFor,
+  MILESTONE_EVERY,
+  nextFloorGoal,
   payoutFor,
   revealBeats,
   revealTotalMs,
@@ -378,5 +380,17 @@ describe('chipAnchor', () => {
 
   it('given no box yet, when anchored, then the point is left alone', () => {
     expect(chipAnchor({ x: 999, y: 999 }, { w: 0, h: 0 })).toEqual({ x: 999, y: 999 });
+  });
+});
+
+describe('nextFloorGoal', () => {
+  it('given a fresh run, when asked, then the first goal is the first milestone, close enough to reach fast', () => {
+    expect(nextFloorGoal(0)).toBe(MILESTONE_EVERY);
+  });
+
+  it('given a goal just reached, when asked, then the next milestone is the new goal', () => {
+    expect(nextFloorGoal(MILESTONE_EVERY - 1)).toBe(MILESTONE_EVERY);
+    expect(nextFloorGoal(MILESTONE_EVERY)).toBe(MILESTONE_EVERY * 2);
+    expect(nextFloorGoal(12)).toBe(15);
   });
 });

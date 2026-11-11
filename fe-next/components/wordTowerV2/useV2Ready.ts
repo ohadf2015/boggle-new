@@ -50,7 +50,7 @@ export function useV2Ready({
   seedDemo,
   setForceResults,
   setSmashing,
-}: Args): { dailyRank: number | null; dailyBoard: DailyBoardRow[] | null; refreshRank: () => void } {
+}: Args): { dailyRank: number | null; dailyBoard: DailyBoardRow[] | null; refreshRank: () => void; closeSession: () => void } {
   const [dailyRank, setDailyRank] = useState<number | null>(null);
   const [dailyBoard, setDailyBoard] = useState<DailyBoardRow[] | null>(null);
 
@@ -93,7 +93,7 @@ export function useV2Ready({
     extras: { v2: true, daily, heightM: Math.round(peakM) },
   });
   // After the start hook so this cleanup runs first and cancels its SPA abandon.
-  useDailyTowerLifecycle({ daily, floors, peakM, heightM, score });
+  const closeSession = useDailyTowerLifecycle({ daily, floors, peakM, heightM, score });
 
   useEffect(() => {
     const onLeave = (e: BeforeUnloadEvent) => {
@@ -106,5 +106,5 @@ export function useV2Ready({
     return () => window.removeEventListener('beforeunload', onLeave);
   }, [daily, phase, floors]);
 
-  return { dailyRank, dailyBoard, refreshRank: () => setRankTick((n) => n + 1) };
+  return { dailyRank, dailyBoard, refreshRank: () => setRankTick((n) => n + 1), closeSession };
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
+import { mpH2hRival } from '@/lib/rivals/pickers';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
@@ -32,7 +34,6 @@ import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import { WordShowdownPanel } from './WordShowdownPanel';
-import { MpH2HStrip } from './MpH2HStrip';
 import { MpBragStrip } from './MpBragStrip';
 import MpResultsDetails from './MpResultsDetails';
 import { ChallengeInviteDialog } from '@/components/friends/ChallengeInviteDialog';
@@ -225,7 +226,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
   const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
   const h2h = useFrozenAfter(h2hLive, seen('card'));
-  // One H2H source: footer strip owns the record when meetings >= 2 so MpMyCard
+  // One H2H source: the shared rival card owns the record when meetings >= 2 so MpMyCard
   // callout does not reprint the same line.
   const showH2hStrip = !!h2h && h2h.meetings >= 2 && !hideOutcome && !c.isClassroom;
   const callout = useMemo(
@@ -405,8 +406,14 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             t={t}
           />
         )}
-        {seen('card') && showH2hStrip && (
-          <MpH2HStrip h2h={h2h!} onRematch={rematch} className={fx.cardIn} t={t} />
+        {seen('card') && !c.isClassroom && (
+          <ResultsSocialSlot
+            mode="multiplayer"
+            subMode={c.resolvedGameMode}
+            score={myScore}
+            opponentUserIds={boardRows.flatMap((r) => (!r.isMe && !r.isBot && r.userId ? [r.userId] : []))}
+            {...(showH2hStrip ? { rival: mpH2hRival(rival, h2h), onRematch: rematch } : {})}
+          />
         )}
         {branch === 'final' && seen('card') && !c.isClassroom && !hideOutcome && me && username && data.sortedScores.length >= 2 && (
           <MpBragStrip

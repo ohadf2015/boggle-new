@@ -36,6 +36,9 @@ export interface DailyParticipant {
   is_friend?: boolean;
   /** Signed-in player on the id-free combined board (row_key resolves on tap). */
   is_member?: boolean;
+  /** The viewer's own row, hidden from everyone else until they pick a public name. */
+  needs_public_name?: boolean;
+  title?: string | null;
 }
 
 export interface AllTimeParticipant {

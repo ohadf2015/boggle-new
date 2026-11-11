@@ -35,6 +35,7 @@ export interface QuickSubmitOutcome {
   history: number[];
   /** All-time sum of score_pct across every quick round — Quick Rank points */
   totalPoints: number;
+  levelUp: { oldLevel: number; newLevel: number } | null;
 }
 
 const QUICK_XP_BASE = 20;
@@ -98,11 +99,16 @@ export async function processQuickSubmit(
   await awardCoinsServer(userId, coins, 'quick_play_round', { mode, seed, scorePct });
 
   const xp = Math.round(QUICK_XP_BASE + scorePct * QUICK_XP_PCT_FACTOR);
-  const { error: xpError } = await db.rpc('increment_player_xp', {
+  const levelBefore = await readLevel(db, userId);
+  const { data: xpRows, error: xpError } = await db.rpc('increment_player_xp', {
     p_player_id: userId,
     p_xp_amount: xp,
   });
   if (xpError) logger.error('QUICK_PLAY', `XP grant failed for ${userId}: ${xpError.message}`);
+  const newLevel = Array.isArray(xpRows) && typeof xpRows[0]?.new_level === 'number' ? xpRows[0].new_level : null;
+  const levelUp = levelBefore !== null && newLevel !== null && newLevel > levelBefore
+    ? { oldLevel: levelBefore, newLevel }
+    : null;
 
   // Weekly ghost rival keeps ticking from quick rounds too (best-effort)
   try {
@@ -139,7 +145,18 @@ export async function processQuickSubmit(
     .limit(10);
   const history = (historyRows ?? []).map((r: { score_pct: number }) => Number(r.score_pct));
 
-  return { scorePct, coins, xp, percentileToday, history, totalPoints };
+  return { scorePct, coins, xp, percentileToday, history, totalPoints, levelUp };
+}
+
+// The level only drives the level-up celebration, so a failed read skips it rather than the submit.
+async function readLevel(db: SupabaseLike, userId: string): Promise<number | null> {
+  try {
+    const { data } = await db.from('profiles').select('current_level').eq('id', userId).maybeSingle();
+    return typeof data?.current_level === 'number' ? data.current_level : null;
+  } catch (err) {
+    logger.error('QUICK_PLAY', `Level read failed for ${userId}: ${(err as Error).message}`);
+    return null;
+  }
 }
 
 export async function createQuickChallenge(

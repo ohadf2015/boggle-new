@@ -2812,7 +2812,7 @@ const en = {
     "cardDesc": "Real physics. Beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "goalA11y": "Floor {n}. Next goal: floor {goal}", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
     "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Aim center!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",
@@ -6345,6 +6345,27 @@ const en = {
     "viewProgress": "View progress"
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"World Record","description":"Hold a world record in any mode"},
+    "RIVALRY_FIRST_WIN": {"name":"Got One Back","description":"Beat your rival for the first time"},
+    "RIVALRY_5_WINS": {"name":"Rival Hunter","description":"Beat your rival 5 times"},
+    "RIVALRY_25_WINS": {"name":"Nemesis","description":"Beat your rival 25 times"},
+    "PING_FIRST": {"name":"Game On","description":"Send your first ping to a rival"},
+    "PING_25": {"name":"Trash Talker","description":"Send 25 pings to rivals"},
+    "REMATCH_10": {"name":"Run It Back","description":"Play the same rival 10 more times"},
+    "RECORD_FIRST": {"name":"Personal Best","description":"Beat your best Blast score or your longest word"},
+    "RECORD_10": {"name":"Record Breaker","description":"Beat your own best 10 times"},
+    "FIRST_FRIEND": {"name":"Plus One","description":"Add your first friend"},
+    "FRIENDS_5": {"name":"Social Butterfly","description":"Have 5 friends"},
+    "LEVEL_5": {"name":"Sprout","description":"Reach level 5"},
+    "LEVEL_10": {"name":"Growing Strong","description":"Reach level 10"},
+    "LEVEL_25": {"name":"Deep Roots","description":"Reach level 25"},
+    "LEVEL_50": {"name":"Summit","description":"Reach level 50"},
+    "LEVEL_75": {"name":"Molten Core","description":"Reach level 75"},
+    "LEVEL_100": {"name":"Shooting Star","description":"Reach level 100"},
+    "TITLE_PICKED": {"name":"Name Tag","description":"Pick a title for your profile"},
+    "DAILY_TOP3": {"name":"Podium","description":"Finish top 3 on the daily board"},
+    "DAILY_BOARD_STREAK_7": {"name":"Week on the Board","description":"Make the daily board 7 days in a row"},
+    "DAILY_BOARD_STREAK_30": {"name":"Daily Regular","description":"Make the daily board 30 days in a row"},
     "wordcraft_first_word": {
       "name": "First Word Down",
       "description": "Play your first word in Word Craft"
@@ -21836,8 +21857,178 @@ const en = {
     "proDepth": "Progress across weeks · Export every class · Reports for parents",
     "schoolQuote": "Buying for your school? Get a quote",
     "noWords": "This round had no lesson words to check."
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "Your friend",
+      "playedTogether": "Played together {count}x",
+      "friendOfFriend": "Friend of a friend",
+      "sameCountry": "Also from {country}",
+      "closeScore": "Plays at your level",
+      "closeRecord": "Neck and neck"
+    },
+    "beatBy": "Beat {name} by {gap}",
+    "youBeat": "You beat {name}!",
+    "yourRival": "Your rival: {name}",
+    "selfChase": "{gap} more and you beat your best",
+    "selfBeat": "New personal best!",
+    "yourBest": "Your best",
+    "pingedYou": "Pinged you",
+    "wins": "{count} W",
+    "losses": "{count} L",
+    "draws": "{count} D"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "Pick a name to show up on the board and get a rival",
+    "tryThis": "Try this:",
+    "placeholder": "Your name",
+    "save": "Save",
+    "saveFailed": "Couldn't save your name. Try again.",
+    "onlyYouSeeRow": "Only you see this. Pick a name to appear",
+    "error": {
+      "empty": "Type a name first",
+      "placeholder": "That one's taken by the system. Pick your own",
+      "default": "Lots of players have that name. Pick your own",
+      "profane": "That name isn't allowed. Try another"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "Come at me",
+      "beat_you": "Beat you this time",
+      "rematch": "Rematch?",
+      "gg": "GG, well played",
+      "close_one": "That was a close one",
+      "your_turn": "Your move",
+      "nice_word": "Nice word, respect",
+      "see_you_tomorrow": "See you tomorrow"
+    },
+    "button": "Ping",
+    "buttonLabel": "Send {name} a ping",
+    "pickerTitle": "Ping {name}",
+    "sent": "Sent!",
+    "more": "More options",
+    "block": "Block {name}",
+    "report": "Report",
+    "reported": "Thanks, we'll take a look",
+    "signIn": "Sign up",
+    "error": {
+      "sign_in_required": "Sign up to ping your rivals",
+      "not_allowed": "You can't ping this player",
+      "blocked": "You blocked this player",
+      "name_required": "Pick a player name first so they know who's calling them out",
+      "daily_limit": "That's your 3 pings for today. More tomorrow",
+      "target_cooldown": "You already pinged them. Give it a few hours",
+      "not_found": "This player isn't around anymore",
+      "unavailable": "Couldn't send that. Try again"
+    },
+    "toast": {
+      "title": "{name} pinged you",
+      "pingBack": "Ping back",
+      "play": "Play",
+      "close": "Close",
+      "region": "Ping from a rival"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "New record!",
+      "beatPrevious": "{value} — your old best was {previous}",
+      "title": "Your records",
+      "empty": "No records yet. Play a round and set your first one.",
+      "upFrom": "up from {previous}",
+      "keys": {
+        "longestWord": "Longest word",
+        "singleBest": "Solo best",
+        "quickPlayBest": "Quick Play best",
+        "blastBest": "Blast best",
+        "towerBestM": "Tallest tower (m)",
+        "wordCraftBest": "Word Craft best",
+        "dailyStreakBest": "Longest daily streak",
+        "mpBestStreak": "Most wins in a row",
+        "multiplayerBest": "Multiplayer best score"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "Sign in to start unlocking avatar gear",
+      "levelPath": "Lv {from} → Lv {to}",
+      "unlocksItem": "unlocks {item}",
+      "xpToGo": "{xp} XP to go",
+      "upNext": "Up next",
+      "atLevel": "Lv {level}"
+    },
+    "titles": {
+      "newTitle": "New title",
+      "pickerTitle": "Your title",
+      "auto": "Auto",
+      "saveFailed": "Couldn't save your title. Try again.",
+      "loadFailed": "Couldn't load titles. Tap to retry.",
+      "nextAt": "Lv {level} unlocks {title}",
+      "NEMESIS": "Nemesis",
+      "RECORD_BREAKER": "Record Breaker",
+      "SOCIAL_BUTTERFLY": "Social Butterfly",
+      "DAILY_REGULAR": "Daily Regular",
+      "ASCENDED_ONE": "Ascended One",
+      "TWICE_RISEN": "Twice Risen",
+      "THRICE_BLESSED": "Thrice Blessed",
+      "ETERNAL_WARRIOR": "Eternal Warrior",
+      "LEXICON_IMMORTAL": "Lexicon Immortal"
+    },
+    "achievements": {
+      "holders": "{percent}% of players have this"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "Records",
+    "metres": "{value} m",
+    "chip": {
+      "holder": "World record: {name} · {score}",
+      "gap": "{gap} more beats it",
+      "newRecord": "New world record!",
+      "youHold": "The world record is yours · {score}",
+      "claimSignIn": "Sign in to claim it.",
+      "claimName": "Pick a real name to claim it."
+    },
+    "crown": {
+      "label": "World records held: {count}"
+    },
+    "hallOfFame": {
+      "title": "Hall of Fame",
+      "subtitle": "The best score ever set in every game",
+      "since": "Held since {date}",
+      "yours": "Yours",
+      "empty": "No records yet. The first one is up for grabs.",
+      "error": "Couldn't load the records.",
+      "retry": "Try again"
+    },
+    "modes": {
+      "mp_classic": "Multiplayer · Classic",
+      "mp_word_hunt": "Multiplayer · Word Hunt",
+      "mp_wheel_rush": "Multiplayer · Wheel Rush",
+      "mp_blast": "Multiplayer · Blast",
+      "qp_classic": "Quick Play · Classic",
+      "qp_word_hunt": "Quick Play · Word Hunt",
+      "qp_wheel_rush": "Quick Play · Wheel Rush",
+      "qp_blast": "Quick Play · Blast",
+      "daily_word_hunt": "Daily Word Hunt",
+      "daily_word_wheel": "Daily Word Wheel",
+      "daily_connections": "Daily Word Bridge",
+      "blast": "Blast",
+      "tower": "Word Tower",
+      "single": "Solo"
+    }
+  }
+  // @worldRecords:end
 };
 
 export { en };

@@ -26,7 +26,7 @@ interface Args {
  * floors > 0 emits one `game_completed` via `trackGameEnd` — retention streak
  * credit, and `markGameInactive` so the generic abandon does not also fire.
  * floors == 0 leaves that abandon in place; `words_found` / `floors` are
- * patched onto it as the tower grows.
+ * patched onto it as the tower grows (free tower too).
  *
  * SPA leave: the start hook's abandon is deferred a tick and re-checks the
  * active game, so the completion here cancels it.
@@ -34,7 +34,7 @@ interface Args {
  * runs `window` listeners in registration order (capture does not jump the
  * app-mount abandon listener). The own listener stays as a fallback.
  */
-export function useDailyTowerLifecycle({ daily, floors, peakM, heightM = 0, score }: Args): void {
+export function useDailyTowerLifecycle({ daily, floors, peakM, heightM = 0, score }: Args): () => void {
   const peakSeen = useRef(0);
   peakSeen.current = Math.max(peakSeen.current, peakM, heightM);
   const latest = useRef({ daily, floors, peakM: peakSeen.current, score });
@@ -58,8 +58,7 @@ export function useDailyTowerLifecycle({ daily, floors, peakM, heightM = 0, scor
   }, []);
 
   useEffect(() => {
-    if (!daily) return;
-    if (startedAt.current == null) startedAt.current = Date.now();
+    if (daily && startedAt.current == null) startedAt.current = Date.now();
     const n = Math.max(0, Math.floor(floors));
     updateActiveGameExtras({ words_found: n, floors: n });
   }, [daily, floors]);
@@ -75,4 +74,6 @@ export function useDailyTowerLifecycle({ daily, floors, peakM, heightM = 0, scor
       close();
     };
   }, [daily, close]);
+
+  return close;
 }

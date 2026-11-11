@@ -1,5 +1,6 @@
 "use client";
 
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import { useEffect, useState } from "react";
 import type { Language } from "@/types";
 import type { BiomeId } from "@/lib/wordTowerV2/biomes";
@@ -136,6 +137,7 @@ export function V2RunResults({
           onRaidOpen: p.onRaidOpen,
         dailyLanguage: daily ? language : undefined,
         }}
+        socialSlot={daily ? undefined : <ResultsSocialSlot mode="tower" score={peakM} previousBest={game.prevBestRef.current} />}
         extra={
           <EstateButton
             t={t}

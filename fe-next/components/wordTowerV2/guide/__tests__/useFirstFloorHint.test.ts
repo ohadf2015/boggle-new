@@ -17,6 +17,13 @@ const base = {
 };
 
 describe('useFirstFloorHint', () => {
+  it('given half of the empty-tower leaves come within ~20s, when a new player stalls, then the word lights up within 5s', () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useFirstFloorHint(base));
+    act(() => vi.advanceTimersByTime(5000));
+    expect(result.current).not.toBeNull();
+  });
+
   it('given a new player stuck on the first floor, when the wait passes, then a real word lights up', () => {
     vi.useFakeTimers();
     const { result } = renderHook(() => useFirstFloorHint(base));

@@ -93,7 +93,7 @@ describe('wt2_exit tracking', () => {
 
       trackWt2Exit('run');
 
-      expect(mockTrack).toHaveBeenCalledWith('wt2_exit', { from: 'run' });
+      expect(mockTrack).toHaveBeenCalledWith('wt2_exit', { from: 'run', mode: 'word-tower' });
     });
 
     it('should fire exactly once per call', () => {
@@ -104,8 +104,8 @@ describe('wt2_exit tracking', () => {
 
       const exitCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_exit');
       expect(exitCalls.length).toBe(2);
-      expect(exitCalls[0]?.[1]).toEqual({ from: 'run' });
-      expect(exitCalls[1]?.[1]).toEqual({ from: 'results' });
+      expect(exitCalls[0]?.[1]).toEqual({ from: 'run', mode: 'word-tower' });
+      expect(exitCalls[1]?.[1]).toEqual({ from: 'results', mode: 'word-tower' });
     });
 
     it('should fire for all screen types', () => {
@@ -118,7 +118,7 @@ describe('wt2_exit tracking', () => {
       expect(exitCalls.length).toBe(screens.length);
 
       screens.forEach((screen, i) => {
-        expect(exitCalls[i]?.[1]).toEqual({ from: screen });
+        expect(exitCalls[i]?.[1]).toEqual({ from: screen, mode: 'word-tower' });
       });
     });
   });
@@ -132,7 +132,7 @@ describe('wt2_exit tracking', () => {
 
       const exitCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_exit');
       expect(exitCalls.length).toBe(1);
-      expect(exitCalls[0]?.[1]).toEqual({ from: 'run' });
+      expect(exitCalls[0]?.[1]).toEqual({ from: 'run', mode: 'word-tower' });
     });
 
     it('should not fire on second call', () => {
@@ -144,7 +144,7 @@ describe('wt2_exit tracking', () => {
 
       const exitCalls = mockTrack.mock.calls.filter(([name]) => name === 'wt2_exit');
       expect(exitCalls.length).toBe(1);
-      expect(exitCalls[0]?.[1]).toEqual({ from: 'run' });
+      expect(exitCalls[0]?.[1]).toEqual({ from: 'run', mode: 'word-tower' });
     });
   });
 });

@@ -11,6 +11,8 @@ import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SinglePlayerResults from '../SinglePlayerResults';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 // ---------------------------------------------------------------------------
 // Core framework mocks
 // ---------------------------------------------------------------------------

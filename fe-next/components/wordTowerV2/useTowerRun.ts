@@ -73,6 +73,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
   /** Everything a hoist spent, so putting the word back costs the player nothing. */
   const preHoistRef = useRef<{ run: RunState; longestWord: number } | null>(null);
   const bestRef = useRef(0);
+  const prevBestRef = useRef(0);
   const beatBestRef = useRef(false);
   const statsRef = useRef<RunStats>(emptyStats());
   const unlockedRef = useRef<Set<string>>(new Set());
@@ -185,6 +186,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     hangingRef.current = null;
     const peak = worldRef.current.runPeakPx / PX_PER_M;
     setPeakM(peak);
+    prevBestRef.current = bestRef.current;
     if (peak > bestRef.current) {
       bestRef.current = peak;
       setBestM(peak);
@@ -489,11 +491,10 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     adoptSeededTower();
     return dropCountRef.current;
   }, [adoptSeededTower]);
-
   return {
     worldRef, labelsRef, fxRef, hangingRef,
     phase, heightM, risk, peakM, bestM, run, callout, banners, shiftBanner, newBest, runBadges, unlockedRef, statsRef,
     onBeforeStep, getHangVx, getCraneX, previewWidth, hoist, cancelHoist, drop, restart, setScrambles, seedDemo, restoreTower, setPerks, perksRef, adoptBest,
-    brace, finish, bracesRef, pickPerk, getPerfectWindowMult, getTrait, traitRef,
+    brace, finish, bracesRef, pickPerk, getPerfectWindowMult, getTrait, traitRef, prevBestRef,
   };
 }

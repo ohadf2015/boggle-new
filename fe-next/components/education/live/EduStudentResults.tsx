@@ -1,6 +1,8 @@
 'use client';
 
 /** Behaviour (XP, coins, game record, exit) stays in the shared results controller so it cannot drift from /multiplayer. */
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
+import { classroomRival } from '@/lib/rivals/pickers';
 import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
@@ -149,6 +151,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
               />
             </div>
           )}
+
+          <div className={COLUMN}><ResultsSocialSlot mode="edu" score={placing?.score} rival={classroomRival(scores.filter((s) => s.username !== teacher), props.username)} /></div>
 
           <div className={COLUMN}>
             <StudentRoundPair bestWord={best} lesson={lesson} t={t} />
