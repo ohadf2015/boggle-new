@@ -10,6 +10,7 @@ import { JoinAlert } from './JoinAlert';
 import { JoinRoomLocked } from './JoinRoomLocked';
 import { NAME_NOT_ALLOWED_KEY, ROOM_LOCKED_KEY } from './joinFailure';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
+import { JoinTargetCard } from './JoinTargetCard';
 import { useKeepInView } from './useKeepInView';
 import type { JoinFlowState } from './joinFlowState';
 
@@ -31,8 +32,9 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
   const formRef = useRef<HTMLFormElement>(null);
   useKeepInView(formRef, goRef);
   const [diceSpin, setDiceSpin] = useState(0);
-  const verdict = flow.target?.verdict;
   const formError = studentFormErrorKey(flow.formErrorKey);
+  // A refused name has one way forward: the suggestion. GO comes back the moment they type.
+  const suggestionLeads = flow.nameError && !!flow.suggestedName;
 
   return (
     <form
@@ -65,18 +67,8 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
         <div data-testid="join-confirm-slot" className="min-h-[124px]">
           {flow.codeRejected ? (
             <JoinAlert>{t(`${K}.invalidCode`)}</JoinAlert>
-          ) : flow.target?.label ? (
-            <div className="rounded-neo border-3 border-neo-lime bg-neo-navy-light p-3 shadow-hard">
-              <p className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-lime">
-                {t(verdict === 'game' ? `${K}.preview.gameLabel` : `${K}.preview.label`)}
-              </p>
-              <p title={flow.target.label} className="truncate font-neo-display text-xl font-black leading-tight text-neo-cream lg:text-2xl">
-                {flow.target.label}
-              </p>
-              <p className="mt-1 line-clamp-2 font-neo-body text-sm font-bold leading-snug text-neo-cream/80">
-                {t(verdict === 'game' ? `${K}.preview.gameConfirm` : `${K}.preview.classroomNext`)}
-              </p>
-            </div>
+          ) : flow.target && (flow.target.label || flow.target.verdict === 'game') ? (
+            <JoinTargetCard target={flow.target} />
           ) : flow.isChecking ? (
             <div className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 shadow-hard">
               <div className="h-3 w-24 rounded-full bg-neo-cyan/40 motion-safe:animate-pulse" />
@@ -124,7 +116,10 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
                   setDiceSpin((n) => n + 1);
                   nameRef.current?.focus();
                 }}
-                className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-cyan bg-neo-navy-light px-4 py-2 font-neo-display text-base font-black text-neo-white shadow-hard-sm transition-transform motion-safe:active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
+                className={cn(
+                  'inline-flex min-h-11 items-center gap-2 rounded-neo px-4 py-2 font-neo-display text-base font-black text-neo-white transition-transform motion-safe:active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan',
+                  suggestionLeads ? 'border-2 border-neo-cream/60 bg-transparent px-3 text-sm text-neo-cream/80' : 'border-3 border-neo-cyan bg-neo-navy-light shadow-hard-sm'
+                )}
               >
                 <Dices
                   key={diceSpin}
@@ -145,18 +140,23 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
         )}
 
         {flow.suggestedName && (
-          <div role="alert" className="flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard">
+          <>
+          <div role="alert" className="rounded-neo border-3 border-neo-black bg-neo-yellow p-3 shadow-hard">
             <p className="font-neo-body text-sm font-bold text-neo-navy">
               {t(formError === NAME_NOT_ALLOWED_KEY ? NAME_NOT_ALLOWED_KEY : `${K}.nameTaken`, { suggestedName: flow.suggestedName })}
             </p>
-            <button
-              type="button"
-              onClick={() => flow.submit(flow.suggestedName ?? undefined)}
-              className="min-h-11 rounded-neo border-3 border-neo-cream bg-neo-navy px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-lime shadow-hard-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
-            >
-              {t(`${K}.useSuggestedName`, { suggestedName: flow.suggestedName })}
-            </button>
           </div>
+            <JoinPrimaryButton
+              type="button"
+              data-primary={suggestionLeads ? 'true' : undefined}
+              disabled={flow.isSubmitting}
+              onClick={() => flow.submit(flow.suggestedName ?? undefined)}
+              className="normal-case"
+            >
+              <Sparkles aria-hidden="true" className="size-6 shrink-0" />
+              <span dir="auto" className="min-w-0 truncate">{t(`${K}.useSuggestedName`, { suggestedName: flow.suggestedName })}</span>
+            </JoinPrimaryButton>
+          </>
         )}
 
         {formError === ROOM_LOCKED_KEY ? (
@@ -165,7 +165,12 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           formError && !flow.suggestedName && <JoinAlert>{t(formError)}</JoinAlert>
         )}
 
-        <JoinPrimaryButton ref={goRef} disabled={!flow.canSubmit} className="text-2xl lg:text-3xl">
+        <JoinPrimaryButton
+          ref={goRef}
+          data-primary={suggestionLeads ? undefined : 'true'}
+          disabled={!flow.canSubmit || suggestionLeads}
+          className={cn('text-2xl lg:text-3xl', suggestionLeads && 'border-neo-cream/60 bg-neo-navy-light text-neo-cream shadow-none')}
+        >
           <Sparkles aria-hidden="true" className="size-6" />
           {flow.isSubmitting ? t(`${K}.joining`) : t(`${K}.flow.go`)}
         </JoinPrimaryButton>

@@ -53,6 +53,7 @@ vi.mock('@/utils/supabase/client', () => ({
 }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { gameTile, modeGrid } from '../lobby/__tests__/lobbyGamesFold';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
 const mockSocket = {
@@ -114,7 +115,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     await renderLobby('lesson-defs');
     // Round 2: the recommended game is the selected card; the less-played
     // modes live behind the fold.
-    expect(screen.getByTestId('mode-tile-vocab-quiz')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('vocab-quiz')).toHaveAttribute('data-selected', 'true');
     openModes();
     for (const id of ['classic', 'word-hunt', 'blast', 'wheel-rush']) {
       expect(screen.getByTestId(`mode-tile-${id}`)).toBeInTheDocument();
@@ -132,9 +133,9 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     await waitFor(() => expect(socketHandlers['classroomGameError']).toBeDefined());
 
     openModes();
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(gameTile('blast'));
 
-    expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('blast')).toHaveAttribute('data-selected', 'true');
     expect(emitted()).toBeUndefined();
   });
 
@@ -143,7 +144,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     await waitFor(() => expect(socketHandlers['classroomGameError']).toBeDefined());
 
     openModes();
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(gameTile('blast'));
     fireEvent.click(screen.getByTestId('lobby-go-live'));
 
     await waitFor(() => expect(emitted()).toBeDefined());
@@ -161,13 +162,13 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     expect(screen.queryByText('teacher.classroom.huntTarget.title')).not.toBeInTheDocument();
 
     openModes();
-    fireEvent.click(screen.getByTestId('mode-tile-word-hunt'));
+    fireEvent.click(gameTile('word-hunt'));
     // Open the fine-tuning; Word Hunt's target picker is a control only that
     // mode has, and it must be there under a picker still on screen.
     fireEvent.click(screen.getByTestId('lobby-setup-summary'));
 
     expect(screen.getByTestId('lobby-go-live-panel')).toBeInTheDocument();
-    expect(screen.getByTestId('mode-tile-word-hunt')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('word-hunt')).toHaveAttribute('data-selected', 'true');
     expect(screen.getByText('teacher.classroom.huntTarget.title')).toBeInTheDocument();
     expect(emitted()).toBeUndefined();
   });
@@ -187,7 +188,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
   it('flags the quiz when the chosen words carry definitions', async () => {
     await renderLobby('lesson-defs');
     await waitFor(() =>
-      expect(screen.getByTestId('mode-tile-vocab-quiz')).toContainElement(
+      expect(gameTile('vocab-quiz')).toContainElement(
         screen.getByTestId('mode-recommended')
       )
     );
@@ -205,7 +206,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     expect(screen.queryByTestId('mode-recommended')).not.toBeInTheDocument();
     // ...and not hiding in the fold either.
     openModes();
-    await waitFor(() => expect(screen.getByTestId('mode-tile-classic')).toBeInTheDocument());
+    await waitFor(() => expect(gameTile('classic')).toBeInTheDocument());
     expect(screen.queryByTestId('mode-recommended')).not.toBeInTheDocument();
   });
 
@@ -217,7 +218,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     });
     await renderLobby('');
     openModes();
-    fireEvent.click(screen.getByTestId('mode-tile-blast')); // choose
+    fireEvent.click(gameTile('blast')); // choose
 
     expect(screen.getByTestId('lobby-go-live')).toBeDisabled();
     expect(emitted()).toBeUndefined();
@@ -225,7 +226,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
       'education.modePicker.needsLesson'
     );
     // The tap still registered the teacher's choice — they only have to add words.
-    expect(screen.getByTestId('mode-tile-blast')).toHaveAttribute('data-selected', 'true');
+    expect(gameTile('blast')).toHaveAttribute('data-selected', 'true');
   });
 
   it('keeps GO LIVE as the one create button, and it is not inside the scroller', async () => {
@@ -238,7 +239,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
   it('GIVEN a tall spotlight (Boss Battle on a laptop) WHEN the lobby lays out THEN GO LIVE and the poster sit in the ready panel; the mode grid and options share the one scroller', async () => {
     await renderLobby('lesson-defs');
     const scroller = screen.getByTestId('lobby-scroll');
-    expect(scroller).toContainElement(screen.getByTestId('lobby-mode-grid'));
+    expect(scroller).toContainElement(modeGrid());
     expect(scroller).toContainElement(screen.getByTestId('lobby-setup-summary'));
     expect(scroller).not.toContainElement(screen.getByTestId('lobby-go-live'));
   });
@@ -255,7 +256,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
   it('still recovers the launch when the server rate-limits a poster tap', async () => {
     await renderLobby('lesson-defs');
     openModes();
-    fireEvent.click(screen.getByTestId('mode-tile-blast'));
+    fireEvent.click(gameTile('blast'));
     fireEvent.click(screen.getByTestId('lobby-go-live'));
     await waitFor(() => expect(socketHandlers['rateLimited']).toBeDefined());
     act(() => {

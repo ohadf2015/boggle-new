@@ -48,7 +48,7 @@ const KEEP_IN_ENGLISH =
   /LexiClash|Teacher Pro|Google Classroom|Google Workspace for Education|Education Plus|Google|Slack|Marketplace|WhatsApp|Word ?[Cc]raft|Blast|Blitz|CSV|TSV|ESL|SPED|CEFR|PDF|QR|email|Dolch|Fry|Kahoot|Gimkit|Blooket|Quizlet|Wordwall|Pro Exclusive|\b(?:Pro|XP|HP|MAX|VS|vs)\b/g;
 
 const SAME_WORD_AS_ENGLISH: Record<string, Set<string>> = {
-  es: new Set(['min', 'pts', 'Top', 'Tutorial', 'Solo', 'Supernova']),
+  es: new Set(['min', 'pts', 'Top', 'Tutorial', 'Solo', 'Supernova', 'Combo']),
   sv: new Set(['min', 'Silver', 'Boss', 'Live', 'Online', 'Offline', 'Guide', 'Timer', 'timer', 'Status', 'Power', 'ups', 'Solo', 'Supernova', 'Inferno']),
   he: new Set(),
   ja: new Set(['NEW']),

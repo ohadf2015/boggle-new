@@ -168,6 +168,42 @@ describe('tryReclaimClassroomHostSeat', () => {
     expect(reclaimed).toBe(false);
   });
 
+  it('hands the room back on a reload whose payload has no auth id yet (sign-in still resolving)', () => {
+    mockGetGame.mockReturnValue(makeClassroomGame());
+
+    const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+      gameCode: 'VHT76G',
+      authUserId: null,
+    });
+
+    expect(reclaimed).toBe(true);
+    expect(mockHandleReconnection.mock.calls[0][4]).toBe('Mr. Gauntlet B');
+  });
+
+  it('refuses another verified teacher who sends the same code', () => {
+    mockGetGame.mockReturnValue(makeClassroomGame());
+
+    const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket('teacher-other-1'), {
+      gameCode: 'VHT76G',
+      authUserId: null,
+    });
+
+    expect(reclaimed).toBe(false);
+    expect(mockHandleReconnection).not.toHaveBeenCalled();
+  });
+
+  it('refuses a guest socket with no auth id in the payload either', () => {
+    mockGetGame.mockReturnValue(makeClassroomGame());
+
+    const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(), {
+      gameCode: 'VHT76G',
+      authUserId: null,
+    });
+
+    expect(reclaimed).toBe(false);
+    expect(mockHandleReconnection).not.toHaveBeenCalled();
+  });
+
   it('refuses when the room does not exist', () => {
     mockGetGame.mockReturnValue(null);
 

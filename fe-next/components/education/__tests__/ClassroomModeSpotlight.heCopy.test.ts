@@ -24,6 +24,6 @@ describe('Hebrew launch-screen copy for Vocab Quiz', () => {
       'כל אחד בוחר בטלפון את התשובה הנכונה מתוך ארבע אפשרויות.',
       'עונים נכון ומהר כדי לצבור יותר נקודות. רצפים ותיבות בונוס מוסיפים לאתגר!',
     ]);
-    expect(lookup('education.modePicker.launch')).toBe('מתחילים משחק חי: {{mode}}');
+    expect(lookup('education.modePicker.launch')).toBe('מתחילים משחק: {{mode}}');
   });
 });

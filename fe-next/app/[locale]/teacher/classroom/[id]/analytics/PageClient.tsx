@@ -176,11 +176,10 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             being sold; gating only the summary card left them open to free teachers. */}
         <div data-tm className="space-y-4 md:space-y-5 [&_[data-testid=pro-gate-preview]]:max-md:hidden">
         <FreeWeekInsight classroomId={classroomId} locale={locale} onStatus={setWeekStatus} />
-        {weekStatus === 'pending' ? proPending : (
+        {weekStatus === 'pending' ? proPending : weekStatus === 'data' || weekStatus === 'empty' ? null : (
         <ProGate
           feature="analytics"
           tone="calm"
-          quiet={weekStatus === 'empty'}
           whileChecking={proPending}
         >
           <div data-testid="analytics-pro-body" className="space-y-3">

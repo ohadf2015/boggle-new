@@ -146,7 +146,7 @@ export function StartLiveClassCta({
           'focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         )}
       >
-        {t('academy.hq.startLiveCta', 'Start live classroom game')}
+        {t('eduShell.home.startLive')}
       </button>
     </section>
   );

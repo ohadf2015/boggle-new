@@ -8,7 +8,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { GAME_CARD, GHOST_BUTTON, OUTLINE_BUTTON, SKELETON, STICKER } from './homeStyles';
 import { RosterDrawer, RosterSheet, STATUS_RING, StatusDot, StatusPill } from './HomeRosterDetail';
 import { HomeRosterMeter } from './HomeRosterMeter';
-import { rosterAccuracy, rosterCounts, type RosterRow, type RosterStatus } from './rosterModel';
+import { rosterAccuracy, rosterCounts, rosterFilter, type RosterRow, type RosterStatus } from './rosterModel';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -39,14 +39,18 @@ export interface HomeClassRosterProps {
   onAssign?: (row: RosterRow) => void;
   /** Opens the assign flow for everyone who still needs to play; shown once, beside the Behind count. */
   onAssignAll?: () => void;
+  /** Show only one status; the counts still cover the whole class. */
+  filter?: RosterStatus | null;
+  onClearFilter?: () => void;
 }
 
 /** The class desk roster: who played this week, who is behind, who has not started; a row opens that student. */
-export function HomeClassRoster({ rows, failed, language, nowMs, t, className, onAssign, onAssignAll }: HomeClassRosterProps) {
+export function HomeClassRoster({ rows, failed, language, nowMs, t, className, onAssign, onAssignAll, filter = null, onClearFilter }: HomeClassRosterProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   const wide = useMediaQuery('(min-width: 1024px)');
   const open = rows?.find((r) => r.id === openId) ?? null;
   const counts = rows ? rosterCounts(rows) : null;
+  const shown = rows ? rosterFilter(rows, filter) : null;
   const bulk = onAssignAll && counts && counts.late + counts.idle > 0;
   const close = () => setOpenId(null);
 
@@ -79,11 +83,16 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
             ))}
           </p>
         ) : null}
+        {filter && onClearFilter ? (
+          <button type="button" data-testid="home-roster-show-all" onClick={onClearFilter} className={cn(GHOST_BUTTON, 'min-h-11 px-2.5 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8')}>
+            {t('eduShell.home.rail.seeAll')}
+          </button>
+        ) : null}
       </header>
 
       {failed ? (
         <p data-testid="home-roster-error" className="px-4 py-6 font-neo-body text-sm font-semibold text-neo-cream/75">{t('eduShell.home.roster.error')}</p>
-      ) : rows === null ? (
+      ) : rows === null || shown === null ? (
         <div data-testid="home-roster-loading" aria-hidden="true" className="flex flex-col gap-2 p-3 sm:p-4">
           {[0, 1, 2, 3].map((i) => (
             <span key={i} className={cn(SKELETON, 'h-9 w-full')} />
@@ -105,7 +114,7 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
               {onAssign ? <span className={ACTION_SLOT} /> : null}
             </div>
             <ul className="divide-y divide-neo-cream/10">
-              {rows.map((r, i) => {
+              {shown.map((r, i) => {
                 const selected = r.id === openId;
                 const share = rosterAccuracy(r);
                 return (

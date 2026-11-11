@@ -11,10 +11,9 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: stri
 vi.mock('../LobbySetupPanel', () => ({ LobbySetupPanel: () => null }));
 vi.mock('../LobbyPressureDials', () => ({ LobbyPressureDials: () => <div data-testid="pressure-dials" /> }));
 vi.mock('../LobbyRoundSettings', () => ({ LobbyRoundSettings: () => null }));
-vi.mock('../LobbyLateJoinToggle', () => ({ LobbyLateJoinToggle: () => null }));
 vi.mock('../LobbyEconomyToggles', () => ({ LobbyEconomyToggles: () => null }));
 
-const opts = { playStyle: 'ffa', allowLateJoin: true } as unknown as LobbyRoundOptions;
+const opts = { playStyle: 'ffa', teamCount: 2, rivalry: true, allowLateJoin: true } as unknown as LobbyRoundOptions;
 
 function renderOptions(homework?: React.ReactNode) {
   render(
@@ -53,5 +52,10 @@ describe('LobbyGameOptions homework section', () => {
     const group = within(screen.getByTestId('lobby-setup-body')).getByTestId('lobby-options-pro');
     expect(within(group).getByRole('heading', { name: 'eduShell.host.proOptions' })).toBeInTheDocument();
     expect(within(group).getByTestId('pressure-dials')).toBeInTheDocument();
+  });
+
+  it('Given the closed sheet, Then its button carries the one-line setup summary', () => {
+    renderOptions();
+    expect(screen.getByTestId('lobby-setup-summary')).toHaveTextContent('teacher.classroom.playStyle.ffa · eduShell.host.rivalsOn · education.modePicker.minutes');
   });
 });

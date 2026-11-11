@@ -10,7 +10,7 @@ vi.mock('@/components/education/economy/ClassroomStudentDock', () => ({
 }));
 
 import { ClassroomRoundDock } from '../ClassroomRoundDock';
-import { ingestLessonClaimsRound } from '../useLessonClaims';
+import { ingestLessonClaim, ingestLessonClaimsRound } from '../useLessonClaims';
 import { useClassroomContextStore } from '@/hooks/gameState/classroomContextStore';
 import { MpRoundTrayContext } from '@/components/multiplayer/round/MpRoundTray';
 
@@ -46,11 +46,11 @@ describe('ClassroomRoundDock: the one row under the grid', () => {
     });
   });
 
-  it('Given a race and a rival, When the round runs, Then chip and race strip share one row above the economy dock and nothing is pinned over the screen', () => {
+  it('Given a race and a rival, When the round runs, Then the tug bar and the compact race share one row above the economy dock and nothing is pinned over the screen', () => {
     const dock = renderDock();
     const row = screen.getByTestId('classroom-round-row');
     const chip = screen.getByTestId('rival-chip');
-    const strip = screen.getByTestId('lesson-target-strip');
+    const strip = screen.getByTestId('race-mini');
     expect(row).toContainElement(chip);
     expect(row).toContainElement(strip);
     expect(isBefore(chip, strip)).toBe(true);
@@ -62,7 +62,7 @@ describe('ClassroomRoundDock: the one row under the grid', () => {
   it('Given a support student holding the word bank, When a race round runs, Then the race strip is left out, the bank keeps the bottom, and the dock clears it', () => {
     act(() => { useClassroomContextStore.setState({ level: 'support', wordBank: ['storm', 'cell'] }); });
     const dock = renderDock();
-    expect(screen.queryByTestId('lesson-target-strip')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('race-mini')).not.toBeInTheDocument();
     expect(screen.getByTestId('rival-chip')).toBeInTheDocument();
     expect(dock.className).toMatch(/pb-\[calc\(3\.5rem\+env\(safe-area-inset-bottom\)\)\]/);
   });
@@ -81,6 +81,31 @@ describe('ClassroomRoundDock: the one row under the grid', () => {
     expect(screen.getByTestId('classroom-round-dock')).toContainElement(screen.getByTestId('economy-dock'));
     expect(screen.getByTestId('classroom-round-dock')).not.toContainElement(screen.getByTestId('rival-chip'));
     lead.remove();
+  });
+
+  it('Given a race with nothing claimed, When the round runs, Then the race reads as a count with the next word still to grab as its clue', () => {
+    renderDock();
+    expect(screen.getByTestId('lesson-target-count')).toHaveTextContent('0/2');
+    const chip = screen.getByTestId('race-mini-chip');
+    expect(chip).toHaveAttribute('data-state', 'hidden');
+    expect(chip).toHaveTextContent('S');
+  });
+
+  it('Given a classmate claims a word, When it lands, Then the race chip shows that claim and the count goes up', () => {
+    renderDock();
+    act(() => { ingestLessonClaim({ roundId: 2, index: 1, word: 'CELL', username: 'Dana', avatar: null, teamId: null, claimedCount: 1, total: 2, bonus: 3 }); });
+    expect(screen.getByTestId('lesson-target-count')).toHaveTextContent('1/2');
+    const chip = screen.getByTestId('race-mini-chip');
+    expect(chip).toHaveAttribute('data-state', 'taken');
+    expect(chip).toHaveTextContent('CELL');
+  });
+
+  it('Given I claim a word, When later claims land, Then my word stays on screen in the race row', () => {
+    renderDock();
+    act(() => { ingestLessonClaim({ roundId: 2, index: 0, word: 'STORM', username: 'Noa', avatar: null, teamId: null, claimedCount: 1, total: 2, bonus: 3 }); });
+    act(() => { ingestLessonClaim({ roundId: 2, index: 1, word: 'CELL', username: 'Dana', avatar: null, teamId: null, claimedCount: 2, total: 2, bonus: 3 }); });
+    expect(screen.getByTestId('race-mini-mine')).toHaveTextContent('STORM');
+    expect(screen.getByTestId('race-mini-chip')).toHaveTextContent('CELL');
   });
 
   it('Given no race and no rival, When rendered, Then only the economy dock shows', () => {

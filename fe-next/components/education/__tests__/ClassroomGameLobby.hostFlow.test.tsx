@@ -25,6 +25,7 @@ let socketState: Record<string, unknown>;
 vi.mock('../lobby/useClassroomLaunchSocket', () => ({ useClassroomLaunchSocket: () => socketState }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { gameTile } from '../lobby/__tests__/lobbyGamesFold';
 
 const LESSON = { id: 'l1', name: 'Animals', language: 'en', words: [{ word: 'tiger' }, { word: 'zebra' }] };
 
@@ -62,14 +63,14 @@ describe('host flow', () => {
 
   it('Then every mode card carries its delivery tag', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    expect(within(screen.getByTestId('mode-tile-word-hunt')).getByTestId('delivery-tag-phones')).toBeInTheDocument();
-    expect(within(screen.getByTestId('mode-tile-vocab-quiz')).getByTestId('delivery-tag-projector')).toBeInTheDocument();
-    expect(within(screen.getByTestId('mode-tile-classic')).getByTestId('delivery-tag-both')).toBeInTheDocument();
+    expect(within(gameTile('word-hunt')).getByTestId('delivery-tag-phones')).toBeInTheDocument();
+    expect(within(gameTile('vocab-quiz')).getByTestId('delivery-tag-projector')).toBeInTheDocument();
+    expect(within(gameTile('classic')).getByTestId('delivery-tag-both')).toBeInTheDocument();
   });
 
   it('Given ?mode= from Home, Then that mode is already chosen', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} initialMode="word-hunt" />);
-    expect(screen.getByTestId('mode-tile-word-hunt')).toHaveAttribute('aria-checked', 'true');
+    expect(gameTile('word-hunt')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('Given ?minutes=2 (onboarding demo), Then the round launches at 2 minutes with late join on by default', async () => {

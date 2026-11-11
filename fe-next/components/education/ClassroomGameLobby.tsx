@@ -39,6 +39,7 @@ import { useLobbyWarmup, LobbyWarmupButton, LobbyWarmupStatus } from './lobby/Lo
 import { LobbyFlowStrip } from './lobby/LobbyFlowStrip';
 import { catalogueEntry } from './ClassroomModeCatalogueData';
 import { LobbyGameOptions } from './lobby/LobbyGameOptions';
+import { LobbyHostSetup } from './lobby/LobbyHostSetup';
 import { LobbyQuickSummary } from './lobby/LobbyQuickSummary';
 import { useLobbyRoundOptions } from './lobby/useLobbyRoundOptions';
 import { useTeacherLobbyData } from './lobby/useTeacherLobbyData';
@@ -167,7 +168,9 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
     [quizPlayable, wordcraftOk]
   );
   const settled = !isLoading && !repeatPending && !sessionPending && !(showQuick && !cannotStart);
-  const suggestion = useModeSuggestion({ selected: pickedId, isBlocked, ready: settled });
+  const [gamesOpen, setGamesOpen] = useState(false);
+  // Decided only once the grid is open, so a suggestion counts as shown only when the teacher can see it.
+  const suggestion = useModeSuggestion({ selected: pickedId, isBlocked, ready: settled && gamesOpen });
   const pickMode = useCallback(
     (id: ClassroomCatalogueId) => {
       suggestion.onPicked(id);
@@ -333,45 +336,54 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           onMoreOptions={() => setShowQuick(false)}
         />
       ) : (
-        <div className="flex flex-col gap-2 @4xl/lobby:gap-3">
-          {sessionPack ? <LobbyFlowStrip warmup={warmup} modeName={t(catalogueEntry(pickedId)?.nameKey ?? '')} /> : null}
-          <div data-testid="lobby-setup-row" className="flex flex-wrap items-start gap-2">
-          <LobbyLessonStep
-            className="min-w-0 flex-[1_1_18rem]"
-            lessons={lessons}
-            selectedLessonIds={selectedLessonIds}
-            onChange={setSelectedLessonIds}
-            classLanguage={classroom?.language}
-            createHref={libraryHref(language, selectedClassroomId)}
-            wordCount={allPlayableWords.length}
-            boardLanguage={lessonLanguage}
-            activePreset={opts.activePreset}
-          />
-          </div>
-          <LobbyModeGrid
-            selected={pickedId}
-            recommended={recommended}
-            suggested={suggestion.suggested}
-            selectedMinutes={roundMinutes}
-            minutesFor={minutesFor}
-            busy={isStarting}
-            dense={!!sessionPack}
-            blocked={blockedTiles}
-            onPick={pickMode}
-            t={tt}
-          />
-          <LobbyGameOptions
-            opts={opts}
-            roundMinutes={roundMinutes}
-            gameMode={gameMode}
-            vocabQuizVariant={vocabQuizVariant}
-            classroomBossId={classroomBossId}
-            allPlayableWords={allPlayableWords}
-            lessonWords={lessonWords}
-            lessonLanguage={lessonLanguage}
-            homework={sessionPack ? undefined : <LobbyWarmupButton warmup={warmup} />}
-          />
-        </div>
+        <LobbyHostSetup
+          flowStrip={sessionPack ? <LobbyFlowStrip warmup={warmup} modeName={t(catalogueEntry(pickedId)?.nameKey ?? '')} /> : null}
+          lessonStep={
+            <div data-testid="lobby-setup-row">
+            <LobbyLessonStep
+              lessons={lessons}
+              selectedLessonIds={selectedLessonIds}
+              onChange={setSelectedLessonIds}
+              classLanguage={classroom?.language}
+              createHref={libraryHref(language, selectedClassroomId)}
+              wordCount={allPlayableWords.length}
+              boardLanguage={lessonLanguage}
+              activePreset={opts.activePreset}
+            />
+            </div>
+          }
+          activePreset={opts.activePreset}
+          onApplyPreset={opts.applyPreset}
+          options={
+            <LobbyGameOptions
+              opts={opts}
+              roundMinutes={roundMinutes}
+              gameMode={gameMode}
+              vocabQuizVariant={vocabQuizVariant}
+              classroomBossId={classroomBossId}
+              allPlayableWords={allPlayableWords}
+              lessonWords={lessonWords}
+              lessonLanguage={lessonLanguage}
+              homework={sessionPack ? undefined : <LobbyWarmupButton warmup={warmup} />}
+            />
+          }
+          gamesOpen={gamesOpen}
+          onGamesOpenChange={setGamesOpen}
+          modeGrid={
+            <LobbyModeGrid
+              selected={pickedId}
+              recommended={recommended}
+              suggested={suggestion.suggested}
+              selectedMinutes={roundMinutes}
+              minutesFor={minutesFor}
+              busy={isStarting}
+              dense={!!sessionPack}
+              blocked={blockedTiles}
+              onPick={pickMode}
+              t={tt}
+            />
+          }
+        />
       )}
     </ClassroomLobbyShell>
   );

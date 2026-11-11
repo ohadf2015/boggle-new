@@ -20,6 +20,7 @@ const trackEduLiveGameStarted = vi.fn();
 vi.mock('@/lib/education/telemetry', () => ({ trackEduLiveGameStarted: (...a: unknown[]) => trackEduLiveGameStarted(...a) }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { modeGrid } from '../lobby/__tests__/lobbyGamesFold';
 
 const handlers: Record<string, (data?: unknown) => void> = {};
 const socket = {
@@ -63,7 +64,7 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
   it('Given the plain lobby, When GO LIVE is tapped, Then one room is created and counted as create_room', async () => {
     render(<ClassroomGameLobby initialLessonId="lesson-1" onBack={vi.fn()} />);
     await screen.findByTestId('lobby-go-live');
-    expect(screen.getByTestId('lobby-mode-grid')).toBeInTheDocument();
+    expect(modeGrid()).toBeInTheDocument();
 
     const payload = await tapGoLiveAndConfirm();
 
@@ -78,7 +79,7 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
 
     expect(screen.getByTestId('lobby-quick-summary')).toHaveTextContent('5B');
     expect(screen.getByTestId('lobby-quick-summary')).toHaveTextContent('Unit 4');
-    expect(screen.queryByTestId('lobby-mode-grid')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('lobby-more-games')).not.toBeInTheDocument();
     expect(screen.queryByTestId('lobby-class-picker')).not.toBeInTheDocument();
     expect(creates()).toHaveLength(0);
   });
@@ -102,7 +103,7 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
 
     fireEvent.click(screen.getByTestId('lobby-more-options'));
 
-    expect(screen.getByTestId('lobby-mode-grid')).toBeInTheDocument();
+    expect(modeGrid()).toBeInTheDocument();
     expect(screen.getByTestId('lobby-class-picker')).toBeInTheDocument();
     expect(screen.getByTestId('lobby-lesson-step')).toBeInTheDocument();
     await tapGoLiveAndConfirm();

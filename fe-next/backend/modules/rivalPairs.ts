@@ -21,6 +21,7 @@ export interface RivalryState {
   lastRival: Record<string, string>;
   abilities: Record<string, number>;
   teamOf: Record<string, number>;
+  withBots: boolean;
 }
 
 type RoomSeat = { avatar?: RivalAvatar; isBot?: boolean; isHost?: boolean; isPractice?: boolean } | undefined;
@@ -87,9 +88,21 @@ export function pairRivals(
   return groups;
 }
 
-const isEligible = (room: RivalRoom, name: string) => {
+const isRealStudent = (room: RivalRoom, name: string) => {
   const seat = room.users[name];
   return !!seat && !seat.isBot && !seat.isHost && !seat.isPractice;
+};
+
+// A real class never duels a bot; a teacher previewing alone needs bots (and their practice seat) to see a duel at all.
+function previewWithBots(room: RivalRoom): boolean {
+  const seats = Object.keys(room.users);
+  return seats.filter((name) => isRealStudent(room, name)).length < 2 && seats.some((name) => !!room.users[name]?.isBot);
+}
+
+const isEligible = (room: RivalRoom, name: string, withBots: boolean) => {
+  if (isRealStudent(room, name)) return true;
+  const seat = room.users[name];
+  return withBots && !!seat && !seat.isHost && (!!seat.isBot || !!seat.isPractice);
 };
 
 const scoreOf = (room: RivalRoom, name: string) => room.playerScores?.[name] ?? 0;
@@ -132,7 +145,8 @@ export function resetRivalsForNewRound(room: RivalRoom, input: RivalRoundInput):
   const enabled = input.enabled !== false && !input.leaderboardHidden && !RIVALRY_OFF_MODES.has(input.mode);
   const teamOf: Record<string, number> = {};
   for (const team of input.teams ?? []) for (const name of team.memberNames) teamOf[name] = team.id;
-  const eligible = enabled ? Object.keys(room.users).filter((name) => isEligible(room, name)) : [];
+  const withBots = enabled && previewWithBots(room);
+  const eligible = enabled ? Object.keys(room.users).filter((name) => isEligible(room, name, withBots)) : [];
   const groups = pairRivals(eligible, input.abilities, { seed: input.seed, teamOf });
   const state: RivalryState = {
     enabled,
@@ -143,6 +157,7 @@ export function resetRivalsForNewRound(room: RivalRoom, input: RivalRoundInput):
     lastRival: {},
     abilities: { ...input.abilities },
     teamOf,
+    withBots,
   };
   room.rivalry = state;
   return state.groups.flatMap((g) => g.members.map((name) => updateFor(room, state, name)));
@@ -245,7 +260,7 @@ export function onPlayerLeft(room: RivalRoom, username: string): RivalEmit[] {
 
 export function seatRivalPlayer(room: RivalRoom, username: string): RivalEmit[] {
   const state = liveState(room);
-  if (!state || !isEligible(room, username) || groupOf(state, username) || state.waiting.includes(username)) return [];
+  if (!state || !isEligible(room, username, state.withBots) || groupOf(state, username) || state.waiting.includes(username)) return [];
   const old = state.lastRival[username];
   delete state.lastRival[username];
   if (old && state.waiting.includes(old)) {

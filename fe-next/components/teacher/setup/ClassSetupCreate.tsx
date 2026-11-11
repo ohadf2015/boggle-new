@@ -20,7 +20,6 @@ import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { inviteHref } from '@/components/education/lobby/inviteLinks';
 import { rememberCreatedClassroom } from '@/lib/education/createdClassroomHandoff';
 import { ClassSetupDetails, type SetupBusy } from './ClassSetupDetails';
-import { ClassSetupSide } from './ClassSetupSide';
 import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from './classSetupDefaults';
 import { packsForLanguage, recommendedPack } from './starterPackPick';
 import { readSetupWords, SETUP_MIN_OWN_WORDS, usesOwnWords } from './setupOwnWords';
@@ -119,8 +118,7 @@ export function ClassSetupCreate() {
   );
 
   return (
-    <div className="mx-auto grid w-full max-w-xl grid-cols-1 gap-3 px-3 py-3 sm:max-w-2xl sm:gap-4 sm:px-4 sm:py-5 lg:max-w-6xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-8 lg:py-8">
-      <ClassSetupSide t={t} />
+    <div className="mx-auto w-full max-w-xl px-3 py-3 sm:px-4 sm:py-5 lg:py-8">
       <ClassSetupDetails
         name={name}
         onNameChange={setName}
@@ -137,7 +135,7 @@ export function ClassSetupCreate() {
         errorKey={errorKey}
         onStartLive={() => void create('live')}
         skipHref={`/${language}/teacher`}
-        ownWords={{ text: ownText, onTextChange: setOwnText, count: own.words.length, dropped: own.dropped, min: SETUP_MIN_OWN_WORDS }}
+        ownWords={{ text: ownText, onTextChange: setOwnText, count: own.words.length, dropped: own.dropped, droppedWords: own.droppedWords, min: SETUP_MIN_OWN_WORDS }}
         t={t}
       />
       {limitHit ? <ClassLimitUpsellModal isOpen onClose={() => setLimitHit(null)} currentCount={limitHit.currentCount} limit={limitHit.limit} /> : null}

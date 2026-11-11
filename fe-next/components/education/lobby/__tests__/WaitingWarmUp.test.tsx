@@ -62,4 +62,39 @@ describe('WaitingWarmUp', () => {
     render(<WaitingWarmUp username="Maya" t={t} />);
     expect(screen.getByTestId('waiting-warmup').className).not.toMatch(/@media/);
   });
+
+  it('given the default card (results page, marketing), then it stays the compact card with no hero counter', () => {
+    render(<WaitingWarmUp username="Maya" t={t} />);
+    expect(screen.getByTestId('waiting-warmup')).not.toHaveAttribute('data-variant', 'hero');
+    expect(screen.queryByTestId('warmup-combo-hero')).toBeNull();
+  });
+
+  it('given the lobby hero, then the combo counter is on screen from the first frame and big tiles fill the width', () => {
+    render(<WaitingWarmUp username="Maya" t={t} hero />);
+    const card = screen.getByTestId('waiting-warmup');
+    expect(card).toHaveAttribute('data-variant', 'hero');
+    expect(card.className).toMatch(/\bw-full\b/);
+    expect(screen.getByTestId('warmup-combo-hero')).toHaveTextContent('0');
+    for (const tile of screen.getAllByRole('button')) expect(tile.className).toMatch(/\bh-16\b/);
+  });
+
+  it('given the hero, when the lit letter is hit, then that tile bursts and the combo counter climbs', () => {
+    render(<WaitingWarmUp username="Maya" t={t} hero />);
+    const hot = screen.getAllByRole('button').find((b) => b.getAttribute('data-hot') === 'true')!;
+    fireEvent.click(hot);
+    expect(hot).toHaveAttribute('data-fx', 'hit');
+    expect(screen.getByTestId('warmup-burst')).toBeInTheDocument();
+    tapHot();
+    expect(screen.getByTestId('warmup-combo-hero')).toHaveTextContent('2');
+  });
+
+  it('given the hero, when a dark letter is tapped, then that tile shakes and the combo drops to zero', () => {
+    render(<WaitingWarmUp username="Maya" t={t} hero />);
+    tapHot();
+    const cold = screen.getAllByRole('button').find((b) => b.getAttribute('data-hot') === 'false')!;
+    fireEvent.click(cold);
+    expect(cold).toHaveAttribute('data-fx', 'miss');
+    expect(cold.className).toMatch(/motion-safe:animate-\[lc-tile-shake/);
+    expect(screen.getByTestId('warmup-combo-hero')).toHaveTextContent('0');
+  });
 });

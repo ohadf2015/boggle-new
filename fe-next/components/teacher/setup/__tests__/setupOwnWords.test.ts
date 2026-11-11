@@ -13,7 +13,7 @@ describe('readSetupWords', () => {
   });
 
   it('Given an empty box, Then there are no words and nothing dropped', () => {
-    expect(readSetupWords('   \n ', 'en')).toEqual({ words: [], dropped: 0 });
+    expect(readSetupWords('   \n ', 'en')).toEqual({ words: [], dropped: 0, droppedWords: [] });
   });
 
   it('Given Hebrew words with and without niqqud, When read for a Hebrew class, Then they are kept', () => {
@@ -34,6 +34,7 @@ describe('readSetupWords', () => {
     const out = readSetupWords('rely on, cat3, שלום, dog', 'en');
     expect(out.words.map((w) => w.word)).toEqual(['dog']);
     expect(out.dropped).toBe(3);
+    expect(out.droppedWords).toEqual(['rely on', 'cat3', 'שלום']);
   });
 
   it('Given English words in a Hebrew class, Then none count, so the starter list is used', () => {

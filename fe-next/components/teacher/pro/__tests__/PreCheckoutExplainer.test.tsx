@@ -61,3 +61,15 @@ describe('PreCheckoutExplainer', () => {
     expect(screen.getByTestId('pre-checkout-back')).toBeDisabled();
   });
 });
+
+describe('PreCheckoutExplainer over the upgrade page', () => {
+  it('given a phone, when it opens, then it is a centered card over a see-through scrim, not a bottom sheet under a black half-screen', () => {
+    setup('trial');
+    const layer = screen.getByTestId('pre-checkout-explainer');
+    expect(layer.className).not.toMatch(/bg-neo-black\/85/);
+    expect(layer.className).toMatch(/(^|\s)bg-neo-navy\/60(\s|$)/);
+    expect(layer.className).toMatch(/(^|\s)items-center(\s|$)/);
+    expect(layer.className).not.toMatch(/(^|\s)items-end(\s|$)/);
+    expect(layer.firstElementChild?.className).toMatch(/(^|\s)rounded-neo-xl(\s|$)/);
+  });
+});

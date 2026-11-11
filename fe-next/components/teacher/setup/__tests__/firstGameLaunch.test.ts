@@ -6,7 +6,7 @@ import { convertPackWordsToLessonWords } from '@/lib/education/createLessonFromP
 const assign = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/supabase/education/assignments', () => ({ createAssignment: assign }));
 
-import { firstGameIntent, readPasted } from '../firstGameLaunch';
+import { firstGameIntent, readPasted, sameWords } from '../firstGameLaunch';
 
 const pack = STARTER_LESSON_PACKS.find((p) => p.language === 'en')!;
 const createLesson = vi.fn();
@@ -144,3 +144,15 @@ describe('firstGameIntent for the teacher list saved at class setup', () => {
     expect(launch.listMissing).toBeUndefined();
   });
 });
+
+describe('sameWords', () => {
+  it('Given the same words in another order or case, Then they are the same list', () => {
+    expect(sameWords(['Photon', 'orbit'], ['orbit', 'photon'])).toBe(true);
+  });
+
+  it('Given one word changed, added or removed, Then the lists differ', () => {
+    expect(sameWords(['photon', 'orbit'], ['photon', 'orbits'])).toBe(false);
+    expect(sameWords(['photon'], ['photon', 'orbit'])).toBe(false);
+  });
+});
+

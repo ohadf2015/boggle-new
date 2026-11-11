@@ -55,12 +55,24 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
 
+const week = vi.hoisted(() => ({ status: 'none' as string }));
+vi.mock('@/components/teacher/analytics/free/FreeWeekInsight', async () => {
+  const { useEffect } = await import('react');
+  return {
+    FreeWeekInsight: ({ onStatus }: { onStatus?: (s: string) => void }) => {
+      useEffect(() => onStatus?.(week.status), [onStatus]);
+      return week.status === 'none' ? null : <section data-testid="free-week-insight" data-state={week.status} />;
+    },
+  };
+});
+
 const push = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
   teacherPro.hasPro = true;
   teacherPro.loading = false;
+  week.status = 'none';
   (useRouter as ReturnType<typeof vi.fn>).mockReturnValue({ push });
   (useAuth as ReturnType<typeof vi.fn>).mockReturnValue({ user: { id: 't1' }, loading: false });
   (useRealtimeClassroomProgress as ReturnType<typeof vi.fn>).mockReturnValue({
@@ -126,6 +138,16 @@ describe('analytics page: summary first, every control does something', () => {
 
     expect(await screen.findAllByText('teacher.proGate.analytics.title')).toHaveLength(1);
     expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument();
+  });
+
+  it.each(['data', 'empty'])('given a free teacher whose class has a %s week, then the free card stands alone with no second Pro pitch', async (status) => {
+    teacherPro.hasPro = false;
+    week.status = status;
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+    expect(await screen.findByTestId('free-week-insight')).toBeInTheDocument();
+    expect(screen.queryByTestId('pro-gate-lock')).toBeNull();
+    expect(screen.queryByTestId('analytics-pro-pending')).toBeNull();
   });
 
   it('shows a busy placeholder while the Pro check resolves, so a slow load never reads as an empty page', () => {

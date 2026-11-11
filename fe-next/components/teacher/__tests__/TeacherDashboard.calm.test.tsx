@@ -52,12 +52,10 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe('Teacher Home: one primary, chunky blocks', () => {
-  it('Then color comes back as decoration only: accent pieces hold no buttons or links, and the week numbers each get their own accent', () => {
+  it('Then color comes back as decoration only: accent pieces hold no buttons or links', () => {
     render(<TeacherDashboard />);
     const home = screen.getByTestId('teacher-home');
     for (const decor of home.querySelectorAll('[data-accent-decor]')) expect(decor.querySelector('a,button')).toBeNull();
-    const colors = ['games', 'students', 'active'].map((id) => screen.getByTestId(`home-week-${id}`).className.match(/text-neo-(cyan|pink|purple|yellow|orange)/)?.[1]);
-    expect(new Set(colors).size).toBe(3);
   });
 
   it('Given one class and the free Pro entry, Then Start a game is the only lime fill on the page', () => {
@@ -79,7 +77,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(within(screen.getByTestId('home-hero')).getByRole('button', { name: 'eduShell.home.switchClass' })).toBeInTheDocument();
     const rail = screen.getByTestId('home-session-rail');
     const after = Array.from(home.children).slice(Array.from(home.children).indexOf(rail) + 1);
-    expect(after.every((el) => el.tagName === 'ASIDE')).toBe(true);
+    expect(after.every((el) => el.tagName === 'ASIDE' || el.getAttribute('data-testid') === 'home-footer')).toBe(true);
     expect(limeFills(home)).toEqual([screen.getByTestId('home-start-live')]);
   });
 
@@ -110,29 +108,25 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(within(hero).queryByTestId('home-class-cap')).toBeNull();
   });
 
-  it('Then the ready-made games are one row of three cards that each say when to use them and show their steps', () => {
+  it('Given a free desk with no roster, Then the ready-made games are one slim row of three links, not big cards', () => {
     render(<TeacherDashboard />);
     const rail = screen.getByTestId('home-session-rail');
-    const cards = within(rail).getAllByTestId('home-session-card');
-    expect(cards).toHaveLength(3);
-    for (const card of cards) {
-      expect(within(card).getByTestId('home-session-when').textContent).toMatch(/\.when/);
-      expect(within(card).getAllByTestId('home-session-step').length).toBeGreaterThan(0);
-    }
+    expect(within(rail).getAllByTestId('home-session-chip')).toHaveLength(3);
+    expect(within(rail).queryByTestId('home-session-card')).toBeNull();
   });
 
-  it('Then on desktop the sessions row takes the leftover height, so a tall screen fills it instead of leaving an empty band', () => {
+  it('Given a free desk with the slim games strip, Then nothing stretches, so the seat meter sits right under the strip with no empty band', () => {
     render(<TeacherDashboard />);
     const home = screen.getByTestId('teacher-home');
-    expect(home.className).toContain('lg:min-h-full');
-    expect(home.className).toMatch(/lg:grid-rows-\[auto_1fr(_auto)?\]/);
-    expect(home.className).not.toMatch(/minmax\(0,1fr\)\]/);
+    expect(home.className).not.toContain('lg:min-h-full');
+    expect(home.className).not.toMatch(/lg:grid-rows-\[auto_1fr/);
   });
 
-  it('Then week stats and weekly reports stay off the phone first frame while the Pro entry stays', () => {
+  it('Then the rail carries no week stats block, while the one Results tile sits under the desk on every screen', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-week').closest('.max-lg\\:hidden')).not.toBeNull();
-    expect(screen.getByTestId('home-weekly-reports').closest('.max-lg\\:hidden')).not.toBeNull();
+    expect(screen.queryByTestId('home-week-games')).toBeNull();
+    expect(screen.getByTestId('home-weekly-reports').closest('.max-lg\\:hidden')).toBeNull();
+    expect(screen.getByTestId('home-desk-board')).toContainElement(screen.getByTestId('home-weekly-reports'));
     expect(screen.getByTestId('home-class-insight').closest('.max-lg\\:hidden')).toBeNull();
   });
 });

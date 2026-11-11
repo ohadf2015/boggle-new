@@ -66,6 +66,10 @@ export interface MpRoundLayoutProps {
   bossStrip?: ReactNode;
   /** Classroom student economy strip: the phone tray's foot (thumb zone); desktop: the left rail. */
   dock?: ReactNode;
+  /** Replaces the HUD combo meter (classroom: the class streak flame). */
+  hudBadge?: ReactNode;
+  /** Classroom duel owns the voice: overall-rank callouts and lead banners stay quiet. */
+  quietRank?: boolean;
 }
 
 /**
@@ -89,6 +93,8 @@ function MpRoundLayoutImpl({
   socket,
   bossStrip,
   dock,
+  hudBadge,
+  quietRank,
 }: MpRoundLayoutProps) {
   const wide = useMediaQuery('(min-width: 1024px)');
   const { t } = useLanguage();
@@ -117,7 +123,7 @@ function MpRoundLayoutImpl({
     [roster, hideStandings],
   );
 
-  const juice = useRoundJuice({ meId, standings, remainingTime, socket });
+  const juice = useRoundJuice({ meId, standings, remainingTime, socket, quietRank });
   // react-hot-toast leaves the HUD row for this frame's lane (phone: under the roster strip; desktop/TV: start rail).
   useRoundFrameToastLane();
 
@@ -164,6 +170,7 @@ function MpRoundLayoutImpl({
           total={total}
           rankFlipKey={juice.rankFlipKey}
           comboLevel={comboLevel}
+          hudBadge={hudBadge}
           timerColor={timerColor(mode.color)}
           onExit={onExit}
         />

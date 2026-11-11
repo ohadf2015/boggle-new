@@ -42,6 +42,9 @@ export const PRO_FEATURES_SHOWN = 4;
 const BTN =
   'inline-flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black px-4 font-neo-display text-base font-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait disabled:opacity-70 motion-reduce:transition-none';
 
+const BUY_LINK =
+  'inline-flex min-h-11 items-center justify-center gap-2 self-center rounded-neo px-2 font-neo-body text-sm font-black text-neo-black underline decoration-2 underline-offset-4 hover:decoration-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait disabled:opacity-70';
+
 function Price({ amount, per, testId, dark }: { amount: string; per: string; testId?: string; dark?: boolean }) {
   return (
     <p className={cn('flex items-baseline gap-1.5 font-neo-display font-black leading-none', dark ? 'text-neo-black' : 'text-neo-white')}>
@@ -148,7 +151,7 @@ export function UpgradePlanCards({
   };
 
   return (
-    <div data-testid="pricing-cards" className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5">
+    <div data-testid="pricing-cards" className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:items-start lg:gap-5">
       <article
         data-testid="plan-card-free"
         data-tilt
@@ -201,7 +204,7 @@ export function UpgradePlanCards({
         <p className="mt-1.5 text-xs font-bold text-neo-black/75">
           {t('teacher.subscription.pricePerDay')} · {t('teacher.subscription.priceTaxNote')}
         </p>
-        <div className="mt-4 flex flex-col gap-2">
+        <div className="mt-4 flex flex-col gap-1.5">
           {viewer === 'pro' ? (
             <>
               <p data-testid="pricing-pro-current" className={cn(BTN, 'cursor-default bg-neo-black text-neo-lime hover:translate-y-0')}>
@@ -227,7 +230,7 @@ export function UpgradePlanCards({
                 disabled={busy}
                 data-testid="pricing-paid-cta"
                 aria-busy={pending === 'paid' || undefined}
-                className={cn(BTN, 'gap-2', showTrial ? 'min-h-11 bg-neo-cream text-neo-black text-sm' : 'bg-neo-black text-neo-white')}
+                className={showTrial ? BUY_LINK : cn(BTN, 'gap-2 bg-neo-black text-neo-white')}
               >
                 {pending === 'paid' ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : null}
                 {pending === 'paid' ? t('common.loading') : ended ? ended.cta : showTrial ? t('eg2Pro.plans.buyNowInstead', { price }) : t('eg2Pro.plans.buyCta', { price })}
@@ -265,7 +268,7 @@ export function UpgradePlanCards({
         <FeatureList
           items={['schoolF1', 'schoolF2', 'schoolF3'].map((k) => ({ label: t(`eg2Pro.plans.${k}`) }))}
         />
-        <div className="mt-auto pt-5">
+        <div className="pt-4">
           <p className="text-[11px] font-black uppercase tracking-widest text-neo-white/60">{t('eg2Pro.plans.howItWorks')}</p>
           <ol className="mt-2 space-y-2">
             {(['step1', 'step2', 'step3'] as const).map((step, i) => (

@@ -1,13 +1,20 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const controller = vi.hoisted(() => ({ current: null as unknown }));
 vi.mock('@/components/multiplayer/results/useMpResultsController', () => ({ useMpResultsController: () => controller.current }));
 vi.mock('@/components/results/ResultsFriendStatus', () => ({ ResultsFriendStatusProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock('@/components/education/economy/ChestRewardCta', () => ({
-  default: ({ gameCode, roundId }: { gameCode: string; roundId: string | null }) => <div data-testid="chest-cta" data-code={gameCode} data-round={roundId ?? ''} />,
+const reward = vi.hoisted(() => ({ args: [] as unknown[] }));
+vi.mock('@/components/education/economy/useRoundReward', () => ({
+  useRoundReward: (gameCode: string | null, roundId: string | null) => {
+    reward.args = [gameCode, roundId];
+    return gameCode && roundId ? { gameCode, roundId, rarity: 'rare', xp: 35, itemId: 'hat', roundCash: 0, rank: 1, size: 2 } : null;
+  },
+}));
+vi.mock('@/components/education/results/StudentChestBeat', () => ({
+  StudentChestBeat: ({ reveal }: { reveal: { gameCode: string; roundId: string } }) => <div data-testid="chest-cta" data-code={reveal.gameCode} data-round={reveal.roundId} />,
 }));
 vi.mock('@/components/education/economy/RoundShop', () => ({ default: () => <div data-testid="round-shop" /> }));
 vi.mock('@/components/student/live/StudentMissedWords', () => ({ StudentMissedWords: ({ words }: { words: string[] }) => <div data-testid="missed" data-words={words.join(',')} /> }));
@@ -75,10 +82,10 @@ describe('EduStudentResults', () => {
     expect(screen.getAllByTestId('edu-student-word').map((el) => el.textContent)).toEqual(['tame', 'cat']);
   });
 
-  it('given a classroom round, when results show, then the server chest gets the code and round id, plus shop', () => {
+  it('given a classroom round, when results show, then the server chest is asked for by code and round id and opens inside my reveal, plus shop', () => {
     render(<EduStudentResults {...(props as object)} />);
-    expect(screen.getByTestId('chest-cta')).toHaveAttribute('data-code', 'AB12CD');
-    expect(screen.getByTestId('chest-cta')).toHaveAttribute('data-round', '77');
+    expect(reward.args).toEqual(['AB12CD', '77']);
+    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('chest-cta'));
     expect(screen.getByTestId('round-shop')).toBeInTheDocument();
   });
 
@@ -103,26 +110,25 @@ describe('EduStudentResults', () => {
     expect(c.confirmExitRoom).toHaveBeenCalled();
   });
 
-  it('given my round, when results show, then my best word, what I earned and the gap to the next place are on my card', () => {
+  it('given my round, when results show, then the gap line is my verdict and the chips collapse to best word beside lesson words', () => {
     controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 45 } }, sideEffects: { coinReward: { awarded: 12 } } });
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.getByTestId('edu-student-best-word')).toHaveTextContent('tame');
     expect(screen.getByTestId('edu-student-best-word')).toHaveTextContent('+4');
-    expect(screen.getByTestId('edu-student-xp')).toHaveTextContent('mpUi.results.xp:{"xp":45}');
-    expect(screen.getByTestId('edu-student-coins')).toHaveTextContent('mpUi.results.coins:{"coins":12}');
+    expect(screen.queryByTestId('edu-student-xp')).toBeNull();
+    expect(screen.queryByTestId('edu-student-coins')).toBeNull();
     expect(screen.getByTestId('edu-student-gap')).toHaveTextContent('mpUi.results.behind:{"points":10,"name":"Noa"}');
   });
 
-  it('given a guest with no XP or coins, when results show, then no empty reward chips appear', () => {
+  it('given I came last of two with no rival, when the reveal settles, then the card reads as a loss', async () => {
     render(<EduStudentResults {...(props as object)} />);
-    expect(screen.queryByTestId('edu-student-xp')).toBeNull();
-    expect(screen.queryByTestId('edu-student-coins')).toBeNull();
+    await waitFor(() => expect(screen.getByTestId('edu-student-hero')).toHaveAttribute('data-verdict', 'lost'), { timeout: 2500 });
   });
 
-  it('given my lesson-word tally, when results show, then it sits on my card', () => {
+  it('given my lesson-word tally, when results show, then it is the second tile of the pair', () => {
     const withMastery = { ...(props as object), classroomSummary: { teacherName: 'Ms Cohen', missedWords: [], lessonIds: [], masteryByPlayer: { Maya: { found: 3, total: 8 } } } };
     render(<EduStudentResults {...(withMastery as never)} />);
-    expect(screen.getByTestId('edu-student-lesson')).toHaveTextContent('education.results.you.words:{"found":3,"total":8}');
+    expect(screen.getByTestId('edu-student-lesson')).toHaveTextContent('3/8');
   });
 
   it('given a boss round that ended, when my phone shows results, then the boss verdict is on it too', () => {
@@ -136,7 +142,7 @@ describe('EduStudentResults', () => {
     render(<EduStudentResults {...(props as object)} />);
     const hero = screen.getByTestId('edu-student-hero');
     expect(hero.compareDocumentPosition(screen.getByTestId('boss-outcome')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(hero.compareDocumentPosition(screen.getByTestId('edu-student-next-step')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hero.compareDocumentPosition(screen.getByTestId('wait-for-teacher-message')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('given a student phone, when results show, then none of the teacher-only results pieces mount', () => {
@@ -155,6 +161,7 @@ describe('EduStudentResults', () => {
     const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: ['l1'], lessonNames: ['Animals'], totalWords: 4, classFoundCount: 1, coverage: [], masteryByPlayer: { Maya: { found: 1, total: 4 } } };
     window.sessionStorage.setItem(sessionKeyFor(summary as never), JSON.stringify([{ score: 12, rank: 2, players: 2, sweep: false, at: 1 }]));
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    openMore();
     expect(screen.getByTestId('student-outcome-delta')).toHaveTextContent('education.results.moment.deltaUp:{"points":8}');
     expect(screen.getByTestId('student-outcome-round')).toHaveTextContent('"round":2');
   });
@@ -173,7 +180,7 @@ describe('EduStudentResults', () => {
     expect(screen.queryByTestId('edu-student-xp-bar')).toBeNull();
   });
 
-  it('given the round levelled me up, when my card has landed, then the level-up beat plays and closing it keeps the data', async () => {
+  it('given the round levelled me up, when the chest has settled, then the level-up beat plays and closing it keeps the data', async () => {
     const setShow = vi.fn();
     const setData = vi.fn();
     controller.current = makeController({
@@ -181,7 +188,7 @@ describe('EduStudentResults', () => {
     });
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.queryByTestId('level-up')).toBeNull();
-    fireEvent.click(await screen.findByTestId('level-up'));
+    fireEvent.click(await screen.findByTestId('level-up', {}, { timeout: 4500 }));
     expect(setShow).toHaveBeenCalledWith(false);
     expect(setData).not.toHaveBeenCalled();
   });
@@ -195,6 +202,7 @@ describe('EduStudentResults', () => {
   it('given the class found words together, when results show, then a class haul chip shows found of total', () => {
     const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: [], totalWords: 30, classFoundCount: 18 };
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    openMore();
     expect(screen.getByTestId('edu-student-class-goal')).toHaveTextContent('eduLiveRoom.studentResults.classGoal:{"found":18,"total":30}');
   });
 
@@ -209,15 +217,33 @@ describe('EduStudentResults', () => {
     expect(screen.queryByTestId('edu-student-class-goal')).toBeNull();
   });
 
-  it('given results are up, then the phone says once that the teacher starts the next round and offers the warm-up while waiting', () => {
+  it('given results are up, then a slim bar says once that the teacher starts the next round, with no warm-up or tomorrow line in class', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.getAllByRole('status')).toHaveLength(1);
     expect(screen.getByTestId('wait-for-teacher-message')).toHaveTextContent('education.results.waitingForTeacher');
-    expect(screen.getByTestId('edu-student-wait-next').querySelector('[data-testid="waiting-warmup"]')).not.toBeNull();
+    expect(screen.getByTestId('wait-for-teacher-message').closest('footer')).not.toBeNull();
+    expect(screen.queryByTestId('waiting-warmup')).toBeNull();
+    expect(screen.queryByTestId('edu-student-tomorrow')).toBeNull();
   });
 
   it('given the first round of a session, when results show, then no momentum chips appear', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.queryByTestId('student-outcome-delta')).toBeNull();
+  });
+
+  it('given a lesson round, when results show, then the class\'s hardest words show without any Pro ask', () => {
+    const summary = {
+      teacherName: 'Ms Cohen', missedWords: ['fog'], lessonIds: ['l1'], totalWords: 3, classFoundCount: 2,
+      coverage: [{ word: 'rain', foundBy: ['Noa', 'Maya'] }, { word: 'storm', foundBy: ['Noa'] }, { word: 'fog', foundBy: [] }],
+      masteryByPlayer: { Noa: { found: 2, total: 3 }, Maya: { found: 1, total: 3 } },
+    };
+    render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    expect(screen.getAllByTestId('round-hardest-word').map((el) => el.querySelector('bdi')?.textContent)).toContain('fog');
+    expect(screen.queryByTestId('pro-insight-link-results_hardest_words')).toBeNull();
+  });
+
+  it('given a round where no lesson word landed, then no hardest-words list appears', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    expect(screen.queryByTestId('round-hardest-words')).toBeNull();
   });
 });

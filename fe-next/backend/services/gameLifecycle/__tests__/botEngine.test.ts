@@ -35,7 +35,9 @@ vi.mock('../../../utils/playerFoundWordBatcher', () => ({ queuePlayerFoundWord: 
 vi.mock('../../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() } }));
 
 import { addPlayerWord, addPlayerEventBonus, updatePlayerScore, getLeaderboard } from '../../../modules/gameStateManager';
-import { volatileBroadcastToRoom } from '../../../utils/socketHelpers';
+import { broadcastToRoom, volatileBroadcastToRoom } from '../../../utils/socketHelpers';
+import { armLessonClaims } from '../../../modules/lessonClaims';
+import { LESSON_CLAIM_BONUS } from '@/shared/constants/lessonScoring';
 import { clearBotRoundState } from '../../../modules/botRoundState';
 import { playBotWord, runBotLoop, creditBotBonus, type BotPlayRules, type BotRoundContext } from '../botEngine';
 import { boardWordSource } from '../botClassic';
@@ -230,5 +232,35 @@ describe('boardWordSource (classic word pick)', () => {
   it('reports exhaustion (undefined) when every word was tried', () => {
     const bot = makeBot({ currentWordIndex: 3 });
     expect(boardWordSource(bot).pick()).toBeUndefined();
+  });
+});
+
+describe('playBotWord lesson word race', () => {
+  const armRace = (users: Record<string, Record<string, unknown>>) => {
+    mocks.game = { gameState: 'in-progress', isPaused: false, playerScores: {}, playerWords: {}, playerCombos: {}, gameSessionId: 9, users };
+    armLessonClaims(mocks.game as never, {
+      placedWords: ['hello'], language: 'en', gameMode: 'classic', hostWatches: true, extras: {},
+      users: Object.entries(users).map(([username, u]) => ({ username, ...u })),
+    });
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    clearBotRoundState(GAME);
+  });
+
+  it('Given a bots-only preview, When a bot plays a lesson word, Then it claims it and is paid the claim bonus', () => {
+    armRace({ Teacher: { isHost: true }, TestBot: { isBot: true } });
+    expect(playBotWord(ctx, makeBot(), flat(4), 'hello')).toBe(4);
+    expect(broadcastToRoom).toHaveBeenCalledWith(ctx.io, `room:${GAME}`, 'lessonWordClaimed', expect.objectContaining({ word: 'hello', username: 'TestBot' }));
+    expect(addPlayerEventBonus).toHaveBeenCalledWith(GAME, 'TestBot', LESSON_CLAIM_BONUS);
+    expect(mocks.game!.playerScores.TestBot).toBe(4 + LESSON_CLAIM_BONUS);
+  });
+
+  it('Given one real student is seated, When a bot plays a lesson word, Then nothing is claimed', () => {
+    armRace({ Teacher: { isHost: true }, Noa: {}, TestBot: { isBot: true } });
+    expect(playBotWord(ctx, makeBot(), flat(4), 'hello')).toBe(4);
+    expect(broadcastToRoom).not.toHaveBeenCalledWith(expect.anything(), expect.anything(), 'lessonWordClaimed', expect.anything());
+    expect(mocks.game!.playerScores.TestBot).toBe(4);
   });
 });

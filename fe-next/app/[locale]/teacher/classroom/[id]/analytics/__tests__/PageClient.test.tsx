@@ -188,15 +188,13 @@ describe('AnalyticsPageClient', () => {
       week.status = 'none';
     });
 
-    it('given a free class with no games yet, when the lock shows, then "Start a game" stays the one loud action and the upgrade is a quiet link', () => {
+    it('given a free class with no games yet, when rendered, then "Start a game" is the only action and no Pro lock follows it', () => {
       teacherPro.hasPro = false;
       week.status = 'empty';
 
       render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-      const cta = screen.getByTestId('pro-gate-upgrade-analytics');
-      expect(cta.className).not.toMatch(/\bbg-neo-lime\b/);
-      expect(cta.className).toMatch(/\bunderline\b/);
+      expect(screen.queryByTestId('pro-gate-upgrade-analytics')).not.toBeInTheDocument();
     });
 
     it('given a free class whose week is still loading, when rendered, then the lock waits instead of painting a loud button it may take back', () => {

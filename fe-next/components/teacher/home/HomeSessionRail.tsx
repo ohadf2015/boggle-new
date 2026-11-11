@@ -1,14 +1,15 @@
 'use client';
 
 import { useId, useState } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Check, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education/types';
 import type { GradeBand } from '@/lib/education/library';
 import { homeSessionRail, railRunHref } from '@/lib/education/homeSessionRail';
 import { HomeSessionAll } from './HomeSessionAll';
 import { CARD_ACCENTS, HomeSessionFlowCard, LANGUAGE_NAME_KEY } from './HomeSessionFlowCard';
-import { QUIET_LINK } from './homeStyles';
+import { GAME_CARD, GAME_CARD_HOVER, QUIET_LINK } from './homeStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -26,10 +27,12 @@ export interface HomeSessionRailProps {
   ready: boolean;
   locale: string;
   className?: string;
+  /** One row of small links instead of big cards, for a desk with nothing else under it. */
+  compact?: boolean;
   t: T;
 }
 
-export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, lastPlayedMs, ready, locale, className, t }: HomeSessionRailProps) {
+export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, lastPlayedMs, ready, locale, className, compact = false, t }: HomeSessionRailProps) {
   const headingId = useId();
   const [picked, setPicked] = useState<Language | null>(null);
   const [allOpen, setAllOpen] = useState(false);
@@ -46,7 +49,7 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
           <h2 id={headingId} className="font-neo-display text-lg font-bold text-neo-cream">
             {t('education.starterPacks.sessions.title')}
           </h2>
-          <p className="font-neo-body text-sm text-neo-cream/75 [@media(max-height:960px),(max-width:639px)]:sr-only">{t('eduShell.home.flow.subtitle')}</p>
+          <p className={cn('font-neo-body text-sm text-neo-cream/75 [@media(max-height:960px),(max-width:639px)]:sr-only', compact && 'sr-only')}>{t('eduShell.home.flow.subtitle')}</p>
         </div>
         <button type="button" data-testid="home-session-see-all" onClick={() => setAllOpen(true)} className={cn(QUIET_LINK, 'shrink-0')}>
           {t('eduShell.home.rail.seeAll')}
@@ -73,16 +76,32 @@ export function HomeSessionRail({ classroomId, languages, gradeBand, nowMs, last
           ))}
         </div>
       ) : null}
-      {ready && language ? (
+      {ready && language && compact ? (
+        <ul className="grid gap-2 sm:grid-cols-3">
+          {rail.map((item) => (
+            <li key={item.session.id} className="min-w-0">
+              <Link
+                href={railRunHref(locale, item, classroomId)}
+                data-testid="home-session-chip"
+                className={cn(GAME_CARD, GAME_CARD_HOVER, 'flex min-h-12 items-center gap-2.5 px-3 py-2 text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream')}
+              >
+                <Play className="size-4 shrink-0 fill-current text-neo-cyan" aria-hidden="true" />
+                <span className="min-w-0 flex-1 truncate font-neo-display text-sm font-black">{t(item.session.nameKey)}</span>
+                <span className="shrink-0 font-neo-body text-xs font-bold text-neo-cream/70">{t('education.modePicker.minutes', { count: item.minutes })}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : ready && language ? (
         <ul className="grid grid-cols-3 gap-2 @2xl:gap-3">
           {rail.map((item, i) => (
             <HomeSessionFlowCard key={item.session.id} accent={CARD_ACCENTS[i % CARD_ACCENTS.length]} tilt={i % 2 === 0 ? 'left' : 'right'} item={item} language={language} gradeBand={gradeBand} href={railRunHref(locale, item, classroomId)} t={t} />
           ))}
         </ul>
       ) : (
-        <div aria-busy="true" className="min-h-[9rem]" />
+        <div aria-busy="true" className={compact ? 'min-h-12' : 'min-h-[9rem]'} />
       )}
-      {ready && language && more.length > 0 ? (
+      {ready && language && !compact && more.length > 0 ? (
         <div data-testid="home-session-more" className="hidden @2xl:block min-h-0 flex-1 [container:session-more/size]">
           <ul className="hidden grid-cols-3 gap-3 pt-1 [@container_session-more_(min-height:12.5rem)]:grid">
             {more.map((item, i) => (

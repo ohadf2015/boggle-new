@@ -28,6 +28,12 @@ export function readPasted(raw: string): { words: string[]; skipped: number } {
   return { words, skipped: entries.length - words.length };
 }
 
+/** Same words regardless of order or case: an untouched saved list should replay, not be saved again. */
+export function sameWords(a: readonly string[], b: readonly string[]): boolean {
+  const norm = (list: readonly string[]) => [...new Set(list.map((w) => w.trim().toLocaleLowerCase()))].sort().join('\n');
+  return norm(a) === norm(b);
+}
+
 function listKey(classroomId: string, choice: Exclude<FirstGameChoice, { kind: 'saved' }>): string {
   const content = choice.kind === 'paste' ? `paste:${choice.words.map((w) => w.toLocaleLowerCase()).join('\n')}` : `pack:${choice.pack.nameKey}`;
   return `${classroomId}|${content}`;

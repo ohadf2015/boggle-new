@@ -14,6 +14,8 @@ const SETUP_SURFACES = [
   'components/education/lobby/LobbyWarmup.tsx',
   'components/education/lobby/LobbySetupDisclosure.tsx',
   'components/education/lobby/ModeSuggestion.tsx',
+  'components/education/lobby/LobbyPresetCards.tsx',
+  'components/education/lobby/LobbyHostSetup.tsx',
   'components/education/ClassroomModeSpotlight.tsx',
 ];
 

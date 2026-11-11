@@ -1,7 +1,8 @@
 'use client';
 
+import { TriangleAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NB_INPUT } from '../nb/nbStyles';
+import { NB_BLOCK, NB_INPUT } from '../nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -12,6 +13,7 @@ export interface SetupOwnWords {
   onTextChange: (text: string) => void;
   count: number;
   dropped: number;
+  droppedWords?: readonly string[];
   min: number;
 }
 
@@ -41,9 +43,29 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
         </p>
       ) : null}
       {own.dropped > 0 ? (
-        <p data-testid="setup-own-words-dropped" className="font-neo-body text-sm font-semibold text-neo-cream/80">
-          {t('eduShell.setup.ownWords.dropped', { count: own.dropped })}
-        </p>
+        <div
+          data-testid="setup-own-words-dropped"
+          role="status"
+          className={cn(NB_BLOCK.yellow, 'flex flex-col gap-1.5 rounded-neo-lg border-[3px] border-neo-black px-3 py-2 shadow-hard')}
+        >
+          <p className="inline-flex items-start gap-1.5 font-neo-body text-sm font-black leading-snug">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            {t('eduShell.setup.ownWords.dropped', { count: own.dropped })}
+          </p>
+          {own.droppedWords && own.droppedWords.length > 0 ? (
+            <ul dir="auto" className="flex flex-wrap gap-1">
+              {own.droppedWords.slice(0, 8).map((word, i) => (
+                <li
+                  key={`${word}-${i}`}
+                  data-testid="setup-dropped-word"
+                  className="max-w-full truncate rounded-neo-pill border-2 border-neo-black bg-neo-white px-2 font-neo-body text-xs font-black text-neo-black line-through decoration-2"
+                >
+                  {word}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       ) : null}
     </div>
   );

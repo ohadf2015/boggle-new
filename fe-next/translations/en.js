@@ -1015,7 +1015,7 @@ const en = {
       "createTitle": "New word list",
       "editTitle": "Edit word list",
       "description": "Paste words, add definitions, save.",
-      "newList": "New list",
+      "newList": "New word list",
       "moreOptions": "Language, grade, topic and sharing",
       "titleLabel": "List title",
       "titlePlaceholder": "Name your list…",
@@ -1095,7 +1095,6 @@ const en = {
       "emptyHint": "Paste a list, start from a starter pack, or grab one from Discover."
     },
     "card": {
-      "practice": "Practice",
       "words": "{count} words",
       "by": "by {author}",
       "aTeacher": "a teacher",
@@ -1223,7 +1222,6 @@ const en = {
       "firstAssignmentCta": "Create assignment",
       "startLiveTitle": "Play a live class",
       "startLiveBody": "The assignment is out. Start a live game so the class plays together.",
-      "startLiveCta": "Start live",
       "copyJoinCode": "Copy join link",
       "joinCodeCopied": "Join link copied",
       "endedCodeTries": "{count} students tried to join after your game ended.",
@@ -1327,6 +1325,9 @@ const en = {
       "openForXp": "Open the chest for your XP"
     },
     "student": {
+      "noClass": {
+        "title": "Enter your class code"
+      },
       "liveNow": "Live now",
       "ctaReview": "Review",
       "ctaBoss": "Boss unlocked",
@@ -12709,8 +12710,7 @@ const en = {
     "assignments": {
       "dueInHours": "Due in {hours}h",
       "dueInMinutes": "Due in {minutes}m",
-      "overdueBy": "Overdue by {days}d",
-      "doIt": "Start"
+      "overdueBy": "Overdue by {days}d"
     },
     "classView": {
       "playAssignment": "Play {title}",
@@ -12868,6 +12868,10 @@ const en = {
     }
   },
   "teacher": {
+    "classPage": {
+      "noLists": "No word lists in this class yet.",
+      "coverage": "{pct}% of list words found"
+    },
     "nav": {
       "play": "Play",
       "classes": "Classes",
@@ -13034,7 +13038,6 @@ const en = {
       "error": "We couldn't load the last game's results.",
       "retry": "Try again",
       "emptyTitle": "No class game yet",
-      "emptyHint": "Start one from Play now above. The words your class finds and misses will show up here.",
       "previousGames": "Previous games",
       "playersPlayed": "{{count}} students played",
       "studentFallback": "Student",
@@ -13214,7 +13217,6 @@ const en = {
       "studentCountPro": "{{count}} students",
       "cardSeeAllStudents": "See all {{count}} students",
       "cardRosterTitle": "Students in {{name}}",
-      "cardAssignHomework": "Assign homework",
       "cardClassReport": "Class report",
       "presets": {
         "title": "Quick setups",
@@ -13709,6 +13711,7 @@ const en = {
       "failedToSaveLesson": "Couldn't save lesson"
     },
     "reports": {
+      "freeOtherClasses": "The free plan covers your first class. Pro shows these too:",
       "valueLine": "After every game, see which words each class missed, who needs help, and what to practice next.",
       "homeworkShortcut": "Homework results",
       "freeSummary": {
@@ -14280,12 +14283,12 @@ const en = {
       "invalid": "This page is missing a class code. Open it again from your teacher home."
     },
     "weekInsight": {
+      "emptyHeadline": "Play one game to see who needs help",
       "title": "Who needs help this week",
       "nobodyStuck": "Nobody is stuck this week.",
       "more": "+{{count}} more",
       "hardestTitle": "Hardest words this week",
       "missed": "{{pct}}% missed",
-      "emptyTitle": "No games this week yet",
       "emptyBody": "Play one game with this class and you'll see who needs help.",
       "startGame": "Start a game",
       "proLine": "See every week and each student with Pro",
@@ -14408,7 +14411,7 @@ const en = {
       "settings": "Fine-tune",
       "settingsHide": "Hide fine-tuning",
       "needsLesson": "Pick a word list first",
-      "launch": "Start live: {{mode}}",
+      "launch": "Start a game: {{mode}}",
       "tapAgain": "Tap again to start",
       "moreModes": "More games ({{count}})",
       "fewerModes": "Fewer games",
@@ -16209,7 +16212,7 @@ const en = {
           "label": "Joining:",
           "confirm": "This is your classroom",
           "gameLabel": "Live game:",
-          "classroomNext": "No game running right now. You'll join the class and see what your teacher set.",
+          "classroomNext": "You'll join your class and see what your teacher set.",
           "gameConfirm": "Your class is playing now. You'll join straight in"
         },
         "subtitle": "Enter your teacher's code",
@@ -16276,7 +16279,6 @@ const en = {
       "setDefault": "Set as default",
       "setDefaultDesc": "Use these settings by default",
       "settings": "Settings",
-      "startGame": "Start game",
       "timer": "Timer"
     },
     "xp": {
@@ -20582,7 +20584,6 @@ const en = {
       "wordsFound": "words found",
       "lessonFound": "Lesson words: {{found}}/{{total}}",
       "wordOfRound": "Word of the round",
-      "wordOfRoundEmpty": "The first long word grabs this spot",
       "bestWordBy": "{{count}} letters · found by {{name}}",
       "exitLabel": "Leave the game"
     },
@@ -21157,6 +21158,7 @@ const en = {
       "removeFailed": "Didn't remove. Try again."
     },
     "student": {
+      "joined": "{name} joined!",
       "youreIn": "You're in!",
       "watchBoard": "Watch the board. Your teacher starts the game.",
       "inClass": "{count} in class",
@@ -21164,6 +21166,9 @@ const en = {
       "leave": "Leave"
     },
     "entry": {
+      "hostRetry": "Try again",
+      "hostRefusedHint": "Check you're signed in to the account that started this game, then try again.",
+      "hostRefusedTitle": "We couldn't reopen your room",
       "roomFullTitle": "The room is full. You're watching",
       "roomFullHint": "All {max} seats are taken. Your teacher can see you are waiting.",
       "connecting": "Connecting to your class…",
@@ -21320,9 +21325,8 @@ const en = {
         "pickGame": "Pick a different game",
         "loading": "Checking your last game",
         "ready": "{ready} of {total} ready for the test",
-        "readyHint": "See which words each student missed",
         "readyEmpty": "Word results show up after your next game",
-        "missed": "{count} missed it · assign homework"
+        "missed": "{count} missed it · assign practice"
       },
       "greetMorning": "Good morning, {name}",
       "greetAfternoon": "Good afternoon, {name}",
@@ -21340,6 +21344,8 @@ const en = {
       "studentsOne": "1 student",
       "notPlayedRecently": "No games in 30 days",
       "roster": {
+        "hide": "Hide the student list",
+        "seeAll": "See all students ({count})",
         "title": "Students",
         "colName": "Name",
         "colXp": "XP",
@@ -21494,6 +21500,13 @@ const en = {
       }
     },
     "setup": {
+      "strip": {
+        "share": "Share the code",
+        "name": "Name your class"
+      },
+      "savedList": {
+        "change": "Change words"
+      },
       "title": "New class",
       "subtitle": "Three quick choices. You can change them later.",
       "step1": "Class details",
@@ -21554,14 +21567,10 @@ const en = {
       "packLabel": "Words for your first game",
       "advancedOpen": "Change grade, language or words",
       "advancedClose": "Hide options",
-      "bubble": "Just a name. I picked the rest for you, change it if you like.",
       "createClass": "Create class",
       "anyGrade": "Any grade",
       "side": {
-        "title": "What happens next",
-        "step1": "You get a join code",
-        "step2": "Students type it on any phone. No accounts.",
-        "step3": "Press Start on the board. The first round takes 3 minutes."
+        "step2": "Students type it on any phone. No accounts."
       },
       "packWords": "{count} words",
       "packRecommended": "Our pick",
@@ -21579,14 +21588,12 @@ const en = {
         "tooFew": "Add at least {min} words, or clear the box to play a starter word list.",
         "phrasesOnly": "Phrases with more than one word can't go on the board. Add single words, or clear the box to play a starter word list.",
         "skipped": "Phrases left out: {count}. The board only takes single words.",
-        "playFailed": "The game didn't open. Tap Play now again.",
+        "playFailed": "The game didn't open. Tap Start a game again.",
         "yours": "The round uses your words, and they're saved to this class too.",
         "packLabel": "No word list yet? Play a starter one",
         "packHint": "It's saved to this class, so students can practice it later.",
         "listName": "Words for {date}",
-        "playNow": "Play now",
         "saved": "In your class",
-        "createHint": "Next: your join code and a box for this week's words. Then tap Play now.",
         "listMissing": "Your saved word list wasn't found, so we're playing a starter list."
       },
       "ownWords": {
@@ -21597,6 +21604,10 @@ const en = {
       }
     },
     "host": {
+      "roundGroup": "Round",
+      "moreGames": "More games",
+      "rivalsOff": "rivals off",
+      "rivalsOn": "rivals on",
       "classLabel": "Class",
       "lateJoin": "Late join",
       "lateJoinHint": "Students can still join after the round starts.",

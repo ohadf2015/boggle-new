@@ -1,18 +1,15 @@
 'use client';
 
 import type { ReactNode, Ref } from 'react';
-import { BarChart3, ChevronRight } from 'lucide-react';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { cn } from '@/lib/utils';
 import type { TeacherWeekSummary } from '@/lib/education/teacherWeekStats';
 import type { TeacherWeekStatus } from '@/hooks/useTeacherWeekStats';
 import { TeacherPlanBadge } from '../TeacherPlanBadge';
 import { HqLoadError } from '../hq/HqLoadError';
-import { HomeWeekCard } from './HomeWeekCard';
-import { HomeWeekChips } from './HomeWeekChips';
+import { GAME_CARD, STICKER } from './homeStyles';
 import { HomeRailSkeleton, HomeSkeleton } from './HomeSkeleton';
 import { MascotBubble } from '../nb/MascotBubble';
-import { NB_BLOCK, NB_PANEL } from '../nb/nbStyles';
 
 // From xl the rail runs beside the sessions too, so its class rows never push the sessions down.
 const RAIL_SPAN = 'xl:row-[1/span_2]';
@@ -40,19 +37,23 @@ export interface TeacherHomeViewProps {
   alert?: ReactNode | null;
   hasRail: boolean;
   week: { summary: TeacherWeekSummary | null; status: TeacherWeekStatus; classCount: number; classes?: ReactNode } | null;
-  onOpenReports: (() => void) | null;
   proCard: ReactNode | null;
   /** Wide screens: the private practice round, in the rail so the desk keeps one Start button. */
   practice?: ReactNode;
+  /** Below the ready-made games: per-class seat counts and other things a teacher checks now and then. */
+  footer?: ReactNode;
+  /** Desktop: the games row fills the leftover height. Off for a short desk, so what follows sits right under it. */
+  fillHeight?: boolean;
   welcome?: ReactNode;
   children?: ReactNode;
 }
 
 export function TeacherHomeView({
   t, isRTL, revealRef, greeting, cue, hasPro, ready, error, onRetry, hasClasses, onboarding, desk,
-  sessions, accountBanner, alert = null, hasRail, week, onOpenReports, proCard, practice, welcome, children,
+  sessions, accountBanner, alert = null, hasRail, week, proCard, practice, footer, fillHeight = true, welcome, children,
 }: TeacherHomeViewProps) {
   const showSessions = sessions !== null;
+  const stretch = showSessions && fillHeight;
   return (
     <EducationShell
       className={cn(isRTL && 'rtl')}
@@ -67,8 +68,8 @@ export function TeacherHomeView({
         className={cn(
           'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
           hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
-          showSessions && 'lg:min-h-full',
-          showSessions && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
+          stretch && 'lg:min-h-full',
+          stretch && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
         )}
       >
         <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
@@ -85,9 +86,6 @@ export function TeacherHomeView({
               ) : null}
             </MascotBubble>
             <div data-testid="home-greeting-stats" className="mt-0.5 flex shrink-0 items-center gap-1.5 empty:hidden max-sm:mt-0 max-sm:ps-20 lg:hidden">
-              {ready && !error && hasClasses && week?.summary && week.status === 'ready' ? (
-                <HomeWeekChips summary={week.summary} classCount={week.classCount} t={t} />
-              ) : null}
               {hasPro ? <TeacherPlanBadge quiet className="shrink-0" /> : null}
             </div>
           </header>
@@ -101,31 +99,18 @@ export function TeacherHomeView({
         {ready && !error && hasClasses && accountBanner ? (
           <div data-testid="home-account-banner" className={cn('min-w-0', hasRail && 'lg:col-span-2')}>{accountBanner}</div>
         ) : null}
+        {ready && !error && hasClasses && footer ? (
+          <div data-testid="home-footer" className={cn('min-w-0', hasRail && SESSIONS_BESIDE_RAIL)}>{footer}</div>
+        ) : null}
 
         {hasRail ? (
           <aside aria-label={t('eduShell.home.railLabel')} className={cn('flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1', showSessions && RAIL_SPAN)}>
-            {!ready ? <HomeRailSkeleton /> : week ? (
-              <div data-tm className="max-lg:hidden">
-                <HomeWeekCard summary={week.summary} status={week.status} classCount={week.classCount} t={t} childrenClassName="max-xl:hidden">{week.classes}</HomeWeekCard>
-              </div>
+            {!ready ? <HomeRailSkeleton /> : week?.classes ? (
+              <section data-tm data-testid="home-week" aria-labelledby="home-week-title" className={cn(GAME_CARD, 'flex flex-col gap-2.5 p-3 max-lg:hidden')}>
+                <h2 id="home-week-title" data-accent-decor className={cn(STICKER, 'self-start bg-neo-pink text-neo-cream')}>{t('eduShell.home.yourClasses')}</h2>
+                {week.classes}
+              </section>
             ) : null}
-            {!ready || !onOpenReports ? null : (
-              <div data-testid="home-weekly-reports" data-tm className="max-lg:hidden">
-                <button
-                  type="button"
-                  aria-haspopup="dialog"
-                  onClick={onOpenReports}
-                  className={cn(NB_PANEL, NB_BLOCK.orange, 'group flex w-full items-center gap-3 px-3 py-3 text-start transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream motion-reduce:transition-none')}
-                >
-                  <BarChart3 className="size-6 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-neo-display text-base font-black">{t('eduShell.home.weeklyReports')}</span>
-                    <span className="block font-neo-body text-xs font-semibold leading-snug text-neo-black/80 [@media(max-height:820px)]:sr-only">{t('eduShell.home.weeklyReportsHint')}</span>
-                  </span>
-                  <ChevronRight className="size-5 shrink-0 transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 motion-reduce:transition-none" aria-hidden="true" />
-                </button>
-              </div>
-            )}
             {ready && !error && hasClasses && practice ? <div data-tm className="max-lg:hidden">{practice}</div> : null}
             {proCard ? <div data-tm>{proCard}</div> : null}
           </aside>

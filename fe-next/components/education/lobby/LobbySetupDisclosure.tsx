@@ -35,9 +35,11 @@ export function LobbySetupDisclosure({ label, summary, open, onToggle, children 
           focusRing,
         )}
       >
-        <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-        <span className="shrink-0 font-bold text-neo-cream">{label}</span>
-        <span data-testid="lobby-setup-line" className="hidden min-w-0 flex-1 leading-snug @lg/lobby:block">{summary}</span>
+        <SlidersHorizontal className="size-5 shrink-0" strokeWidth={3} aria-hidden="true" />
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="font-bold text-neo-cream">{label}</span>
+          <span data-testid="lobby-setup-line" className="text-xs leading-snug @lg/lobby:text-sm">{summary}</span>
+        </span>
         <span className={cn(NB_STICKER, NB_BLOCK.cyan, 'ms-auto shrink-0 text-sm')}>
           {t('eduShell.host.gameOptionsChange')}
         </span>

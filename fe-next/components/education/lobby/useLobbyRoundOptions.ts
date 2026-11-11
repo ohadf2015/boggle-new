@@ -12,6 +12,7 @@ import { useRotatingBoss } from '../boss/useRotatingBoss';
 import type { ClassroomEconomyConfig } from './LobbyEconomyToggles';
 import { readRememberedRoundDefaults } from './rememberedRoundDefaults';
 import { defaultLessonIdsFor } from './useTeacherLobbyData';
+import { matchingPreset } from './lobbySetupModel';
 
 type BoardSize = 'small' | 'medium' | 'large';
 
@@ -44,7 +45,6 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
   const [accessibility, setAccessibilityState] = useState<ClassroomAccessibility>({});
   // Loud defaults; the launch carries them only for a Pro teacher.
   const [pressure, setPressure] = useState<ClassroomPressure>(DEFAULT_CLASSROOM_PRESSURE);
-  const [activePreset, setActivePreset] = useState<ClassroomPresetId | null>(null);
 
   const applyPreset = useCallback(
     (id: ClassroomPresetId) => {
@@ -55,7 +55,6 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
       setPlayStyleState(preset.playStyle);
       setTeamCountState(preset.teamCount);
       setAccessibilityState(preset.accessibility);
-      setActivePreset(id);
       if (id === 'friday-battle') {
         setSelectedLessonIds((prev) => (prev.length > 0 ? prev : defaultLessonIdsFor(lessons, selectedClassroomId)));
       }
@@ -63,9 +62,7 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
     [lessons, selectedClassroomId, setSelectedLessonIds]
   );
 
-  const setPlayStyle = useCallback((v: PlayStyle) => { setPlayStyleState(v); setActivePreset(null); }, []);
-  const setTeamCount = useCallback((v: number) => { setTeamCountState(v); setActivePreset(null); }, []);
-  const setAccessibility = useCallback((v: ClassroomAccessibility) => { setAccessibilityState(v); setActivePreset(null); }, []);
+  const activePreset = matchingPreset({ timerMinutes, boardSize, minWordLength, playStyle, teamCount, accessibility });
 
   return {
     bossId, setBossId,
@@ -80,9 +77,9 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
     economy, setEconomy,
     rivalry, setRivalry,
     boardSize, setBoardSize,
-    playStyle, setPlayStyle,
-    teamCount, setTeamCount,
-    accessibility, setAccessibility,
+    playStyle, setPlayStyle: setPlayStyleState,
+    teamCount, setTeamCount: setTeamCountState,
+    accessibility, setAccessibility: setAccessibilityState,
     pressure, setPressure,
     activePreset, applyPreset,
   };

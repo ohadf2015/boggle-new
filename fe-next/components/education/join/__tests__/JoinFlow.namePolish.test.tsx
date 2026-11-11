@@ -54,6 +54,7 @@ describe('<JoinFlow> nickname step polish', () => {
   });
 
   it('Given the class is found, Then its confirmation is a lime-edged panel, not a second lime slab beside LET\'S GO', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Ms Levy', classroomId: 'c1' });
     render(<JoinFlow initialCode="P45KRT" />);
     const label = await screen.findByText('Ms Levy');
     const card = label.parentElement!;

@@ -61,6 +61,10 @@ export interface ClassCardProps {
   assignHref?: string;
   reportHref?: string;
   onOpenProjector?: () => void;
+  /** The class page; the name links there. */
+  classHref?: string;
+  /** Free teacher's one class with this week's insight: "Who needs help this week" replaces a bare Pro ask. */
+  insightHref?: string;
   /** The color block on the card's header band; the list rotates it so each class has its own. */
   color?: NbColor;
 }
@@ -96,6 +100,8 @@ export function ClassCard({
   assignHref,
   reportHref,
   onOpenProjector,
+  classHref,
+  insightHref,
   color = 'pink',
 }: ClassCardProps) {
   const { t } = useLanguage();
@@ -147,7 +153,14 @@ export function ClassCard({
           title={classroom.name}
           className="min-w-0 flex-1 line-clamp-2 font-neo-display text-xl font-black leading-tight @[24rem]:text-2xl"
         >
-          <bdi>{classroom.name}</bdi>
+          {classHref ? (
+            <Link href={classHref} data-testid="classroom-card-open" className="-my-1 inline-flex min-h-11 items-center gap-1 rounded-neo decoration-2 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
+              <bdi className="line-clamp-2">{classroom.name}</bdi>
+              <DirectionalIcon icon={ChevronRight} className="size-5 shrink-0" />
+            </Link>
+          ) : (
+            <bdi>{classroom.name}</bdi>
+          )}
         </h3>
         <span data-testid="classroom-card-language" className={cn(NB_STICKER, NB_BLOCK.cream, 'shrink-0')}>
           {languageKey ? t(languageKey) : classroom.language}
@@ -186,7 +199,7 @@ export function ClassCard({
                 {assignHref ? (
                   <Link href={assignHref} role="menuitem" data-testid="classroom-card-assign" onClick={() => setMenuOpen(false)} className={MENU_ITEM}>
                     <span className={cn(MENU_ICON, NB_BLOCK.lime)}><ClipboardList className="size-4" aria-hidden="true" /></span>
-                    {t('teacher.classroom.cardAssignHomework', 'Assign homework')}
+                    {t('eduShell.home.focus.assign')}
                   </Link>
                 ) : null}
                 {reportHref ? (
@@ -275,6 +288,16 @@ export function ClassCard({
         </section>
 
         {hasPro || proLoading ? null : <StudentCapMeter studentCount={count} source="classroom_card" />}
+
+        {insightHref ? (
+          <Link href={insightHref} data-testid="classroom-card-insight" className={cn(NB_SMALL, NB_BLOCK.navy, 'min-h-11 w-full justify-between border-neo-cream/60 px-3 text-sm')}>
+            <span className="inline-flex min-w-0 items-center gap-2">
+              <Users className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
+              <span className="truncate">{t('teacher.weekInsight.title')}</span>
+            </span>
+            <DirectionalIcon icon={ChevronRight} className="size-4 shrink-0" />
+          </Link>
+        ) : null}
 
         {startGameHref ? (
           <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(NB_PRIMARY, 'mt-auto w-full')}>

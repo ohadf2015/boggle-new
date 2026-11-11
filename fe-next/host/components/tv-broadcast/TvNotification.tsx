@@ -301,6 +301,7 @@ const TvNotification = memo<TvNotificationProps>(({
         bgGradient={layoutProps.bgGradient}
         textColor={layoutProps.textColor}
         borderColor={layoutProps.borderColor}
+        wrap
       />
     );
   }

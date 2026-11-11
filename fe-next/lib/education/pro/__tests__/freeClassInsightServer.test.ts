@@ -55,6 +55,37 @@ describe('readWeekHardestWords', () => {
     expect(out.data?.hardestWords).toEqual([]);
   });
 
+  it('given three board rounds where nobody found three lesson words, when read, then those three are the hardest words', async () => {
+    const lesson = ['cat', 'dog', 'sun', 'red', 'hat', 'pen', 'map', 'cup'];
+    const board = (studentId: string, code: string, found: string[]) => ({
+      student_id: studentId,
+      started_at: '2026-11-11T07:32:35Z',
+      results: { gameCode: code, gameMode: 'classic', lessonWordsFound: found, lessonWordsMissed: lesson.filter((w) => !found.includes(w)) },
+    });
+    const rows = [
+      board('s1', 'R1', ['cat', 'red', 'hat']), board('s2', 'R1', ['dog', 'sun']), board('s3', 'R1', ['cat']), board('s4', 'R1', []),
+      board('s1', 'R2', ['cat']), board('s3', 'R2', []), board('s2', 'R2', []),
+      board('s3', 'R3', ['cat', 'sun']), board('s1', 'R3', ['dog', 'red']), board('s2', 'R3', []),
+    ];
+    const { sb, calls } = chain({ data: rows, error: null });
+    const out = await readWeekHardestWords(sb as never, 'c1', '2026-11-04T00:00:00.000Z');
+    expect(out.data?.hardestWords.map((w) => w.word).sort()).toEqual(['cup', 'map', 'pen']);
+    expect(out.data?.hardestWords.every((w) => w.missed === w.attempts && w.studentsMissing === 4)).toBe(true);
+    expect(out.data?.sessions).toBe(10);
+    expect(calls).not.toContainEqual({ method: 'not', args: ['results->>lessonWordsAsked', 'is', null] });
+  });
+
+  it('given a word some students found, when ranked against words nobody found, then nobody-found words come first', async () => {
+    const rows = [
+      asked('s1', '2026-11-09T10:00:00Z', 'A1', ['apple', 'pear'], ['pear']),
+      asked('s2', '2026-11-09T10:00:00Z', 'A1', ['apple', 'pear'], []),
+      asked('s3', '2026-11-09T10:00:00Z', 'A1', ['apple', 'pear'], []),
+    ];
+    const { sb } = chain({ data: rows, error: null });
+    const out = await readWeekHardestWords(sb as never, 'c1', '2026-11-03T00:00:00.000Z');
+    expect(out.data?.hardestWords.map((w) => w.word)).toEqual(['apple', 'pear']);
+  });
+
   it('given the read fails, when read, then the error is returned', async () => {
     const { sb } = chain({ data: null, error: { message: 'down' } });
     await expect(readWeekHardestWords(sb as never, 'c1', '2026-11-03T00:00:00.000Z')).resolves.toEqual({ data: null, error: { message: 'down' } });

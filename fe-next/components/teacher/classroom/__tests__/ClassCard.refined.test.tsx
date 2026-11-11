@@ -234,7 +234,7 @@ describe('ClassCard — refined surfaces', () => {
     render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" />);
     await user.click(screen.getByTestId('classroom-card-menu'));
     expect(screen.getByTestId('classroom-card-report')).toHaveTextContent('teacher.classroom.cardClassReport');
-    expect(screen.getByTestId('classroom-card-assign')).toHaveTextContent('teacher.classroom.cardAssignHomework');
+    expect(screen.getByTestId('classroom-card-assign')).toHaveTextContent('eduShell.home.focus.assign');
   });
 
   it('gives the icon-only menu button a name and a tooltip', () => {

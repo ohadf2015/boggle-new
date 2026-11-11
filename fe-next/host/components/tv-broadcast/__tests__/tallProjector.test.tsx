@@ -17,9 +17,9 @@ vi.mock('../../../../components/CircularTimer', () => ({ __esModule: true, defau
 const t = (k: string) => k;
 
 describe('Classroom host on a tall projector (1440x900 and up)', () => {
-  it('Given the compact classroom header on a tall wall, Then the timer grows for the back row', () => {
+  it('Given the compact classroom header on a tall wall, Then the timer keeps its natural size so the board gets the height', () => {
     render(<TvGameHeader compact remainingTime={60} timerValue={3} gameMode="classic" t={t} />);
-    expect(screen.getByTestId('tv-timer-slot').className).toContain('lg:[@media(min-height:851px)]:[zoom:1.2]');
+    expect(screen.getByTestId('tv-timer-slot').className).not.toContain('[zoom:1.2]');
   });
 
   it('Given the dense classroom join bar on a desktop, Then the address never wraps mid-code', () => {

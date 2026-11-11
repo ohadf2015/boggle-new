@@ -50,7 +50,7 @@ export default function TeacherDeleteAlternatives({
   const showProNote = impact.billing?.renews === true;
   const showDeleteClass = impact.perClassDeleteAvailable === true && impact.classrooms.length >= 1;
   const deleteHref = oneClass
-    ? `/${language}/teacher/classroom/${impact.classrooms[0].id}`
+    ? `/${language}/teacher/classroom/${impact.classrooms[0].id}#delete`
     : `/${language}/teacher/classroom`;
   const portalHref = impact.billing?.portalUrl || `/${language}/teacher/upgrade`;
 

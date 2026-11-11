@@ -109,10 +109,12 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('hq-projector-qr')).toBeInTheDocument();
   });
 
-  it('Then Home has one See results entry and one Try it as a student link', () => {
+  it('Then Home has one results entry, the tile under the desk, and one Try it as a student link', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
-    expect(within(hero).getByTestId('home-see-results')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
+    expect(screen.queryByTestId('home-see-results')).toBeNull();
+    expect(screen.getAllByTestId('home-weekly-reports')).toHaveLength(1);
+    expect(hero).not.toContainElement(screen.getByTestId('home-weekly-reports'));
     expect(screen.getAllByTestId('rehearse-with-bots')).toHaveLength(1);
     expect(within(hero).getByTestId('rehearse-with-bots')).toHaveTextContent('eduShell.home.practice.cta');
     expect(screen.queryByTestId('home-practice-card')).toBeNull();
@@ -143,7 +145,7 @@ describe('Teacher Home', () => {
 
   it('Given several classes, Then This week breaks down by class and picking a row puts that class on the desk', () => {
     render(<TeacherDashboard />);
-    const roster = within(screen.getByTestId('home-week')).getByTestId('home-week-classes');
+    const roster = screen.getByTestId('home-week-classes');
     expect(within(roster).getByRole('button', { name: /5B - English/ })).toHaveAttribute('aria-pressed', 'true');
     fireEvent.click(within(roster).getByRole('button', { name: /4A - Reading/ }));
     expect(within(screen.getByTestId('home-hero')).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
@@ -155,35 +157,37 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-week-classes')).toBeNull();
   });
 
-  it('Then This week counts up to the three real numbers', async () => {
-    render(<TeacherDashboard />);
-    const card = screen.getByTestId('home-week');
-    await waitFor(() => expect(within(card).getByTestId('home-week-games')).toHaveTextContent('12'));
-    await waitFor(() => expect(within(card).getByTestId('home-week-students')).toHaveTextContent('54'));
-    await waitFor(() => expect(within(card).getByTestId('home-week-active')).toHaveTextContent('2'));
-  });
-
   it('Given an insight, Then the hero stays on the class and its Start button, with no filler line', () => {
     week = { ...week, insights: [{ id: 'momentum', value: 3 }] };
     render(<TeacherDashboard />);
     expect(within(screen.getByTestId('home-hero')).queryByTestId('home-insight')).toBeNull();
   });
 
-  it('Given a Pro teacher, Then the class desk shows the student roster under the hero', () => {
+  it('Given a Pro teacher, Then the desk holds three status tiles while the students load, with the roster folded', () => {
     proState = PRO;
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-roster')).toBeInTheDocument();
+    expect(screen.getAllByTestId('home-status-tile-loading')).toHaveLength(3);
+    expect(screen.queryByTestId('home-roster')).toBeNull();
+  });
+
+  it('Given a free teacher, Then the desk has one lime button, one class-insight offer, and the seat meters wait below the games', () => {
+    render(<TeacherDashboard />);
+    const desk = screen.getByTestId('home-hero');
+    expect(desk.querySelectorAll('[class*="bg-neo-lime"]')).toHaveLength(1);
+    expect(screen.getAllByTestId('home-class-insight')).toHaveLength(1);
+    expect(screen.getByTestId('home-footer')).toContainElement(screen.getByTestId('dashboard-student-cap-meters'));
+  });
+
+  it('Given a desk with no roster under it, Then the ready-made games are a slim strip, not three big cards', () => {
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-session-card')).toBeNull();
+    expect(screen.getAllByTestId('home-session-chip').length).toBeGreaterThan(0);
   });
 
   it('Given a free teacher, Then the per-student roster stays behind Pro like the class analytics page', () => {
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('home-roster')).toBeNull();
-  });
-
-  it('Given the stats read failed, Then the numbers read "—", never a false zero', () => {
-    week = { status: 'error', summary: null };
-    render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-week-games')).toHaveTextContent('—');
+    expect(screen.queryByTestId('home-status-tile-loading')).toBeNull();
   });
 
   it('Given a free teacher with classes, Then exactly one Pro entry shows: the oldest class\'s weekly insight, in the rail', () => {
@@ -265,11 +269,10 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-week')).not.toBeInTheDocument();
   });
 
-  it('Given a Pro teacher with no games yet, Then the weekly digest still sits in the rail', () => {
+  it('Given a Pro teacher with no games yet, Then the weekly digest still opens from the Results tile', () => {
     proState = PRO;
     week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
     render(<TeacherDashboard />);
-    expect(screen.getByRole('complementary')).toBeInTheDocument();
     openWeeklyReports();
     expect(screen.getByTestId('weekly-progress-digest')).toBeInTheDocument();
   });
@@ -334,19 +337,19 @@ describe('Teacher Home', () => {
     expect(viewed).not.toHaveBeenCalled();
   });
 
-  it('renders StudentCapMeter for each classroom with real student counts on dashboard path', () => {
+  it('renders one StudentCapMeter on Home, for the class on the desk, with its real student count', () => {
     render(<TeacherDashboard />);
     const metersContainer = screen.getByTestId('dashboard-student-cap-meters');
-    const meters = within(metersContainer).getAllByTestId('student-cap-meter');
-    expect(meters).toHaveLength(2);
+    expect(within(metersContainer).getAllByTestId('student-cap-meter')).toHaveLength(1);
+    const count = within(metersContainer).getByTestId('student-cap-count');
+    expect(count.textContent).toContain('28');
+    expect(count.textContent).toContain('50');
+    expect(within(metersContainer).getAllByTestId('student-cap-upgrade-cta')).toHaveLength(1);
+  });
 
-    const counts = within(metersContainer).getAllByTestId('student-cap-count');
-    expect(counts[0].textContent).toContain('28');
-    expect(counts[0].textContent).toContain('50');
-    expect(counts[1].textContent).toContain('26');
-    expect(counts[1].textContent).toContain('50');
-
-    const ctas = within(metersContainer).getAllByTestId('student-cap-upgrade-cta');
-    expect(ctas).toHaveLength(2);
+  it('When the teacher switches class, Then the one cap meter follows the desk', () => {
+    search = 'classroomId=c4a';
+    render(<TeacherDashboard />);
+    expect(within(screen.getByTestId('dashboard-student-cap-meters')).getByTestId('student-cap-count').textContent).toContain('26');
   });
 });

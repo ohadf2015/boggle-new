@@ -34,6 +34,8 @@ import type { BoardTheme } from '@/shared/types/socket';
 import { PhoneBossStrip } from '@/components/education/boss/PhoneBossStrip';
 import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
 import { ClassroomRoundDock } from '@/components/education/live/ClassroomRoundDock';
+import { ClassroomStreakFlame } from '@/components/education/economy/ClassroomStreakFlame';
+import { useRivalPresent } from '@/components/education/live/rivalPresence';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { getMpInGameContainerClass, getMpInGamePlaceholderClass } from '@/lib/multiplayer/inGameContainerClass';
 import { useDesktopShellEnabled } from '@/hooks/useDesktopShellEnabled';
@@ -211,6 +213,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Wait for server to confirm mode before rendering — prevents one-frame classic flash
   // caused by the host handler setting tableData (React state) and gameMode (Zustand)
   // in separate calls, producing two render cycles.
+  const duelOn = useRivalPresent();
   if (!gameModeConfirmed) return null;
 
   // Live Vocab Quiz — a classroom question round with no letter grid at all, so
@@ -448,6 +451,8 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             socket={socket}
             bossStrip={bossActive ? <PhoneBossStrip /> : undefined}
             dock={<ClassroomRoundDock gameCode={gameCode} socket={socket} me={username} />}
+            hudBadge={<ClassroomStreakFlame comboLevel={comboLevel} />}
+            quietRank={duelOn}
           />
         )}</RoundClock>
       ) : (

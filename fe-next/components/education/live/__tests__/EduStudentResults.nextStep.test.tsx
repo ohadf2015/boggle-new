@@ -12,8 +12,11 @@ const missedProps = vi.hoisted(() => ({ current: null as Record<string, unknown>
 const capture = vi.hoisted(() => vi.fn());
 vi.mock('@/components/multiplayer/results/useMpResultsController', () => ({ useMpResultsController: () => controller.current }));
 vi.mock('@/components/results/ResultsFriendStatus', () => ({ ResultsFriendStatusProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock('@/components/education/economy/ChestRewardCta', () => ({
-  default: (p: Record<string, unknown>) => {
+vi.mock('@/components/education/economy/useRoundReward', () => ({
+  useRoundReward: (gameCode: string | null, roundId: string | null) => (gameCode && roundId ? { gameCode, roundId, rarity: 'rare', xp: 35, itemId: 'hat', roundCash: 0, rank: 1, size: 2 } : null),
+}));
+vi.mock('@/components/education/results/StudentChestBeat', () => ({
+  StudentChestBeat: (p: Record<string, unknown>) => {
     chestProps.current = p;
     return <div data-testid="chest-cta" />;
   },
@@ -80,24 +83,25 @@ describe('EduStudentResults — one next step', () => {
   ])('Given %s, When results show, Then exactly one primary action is on the screen', (_label, props) => {
     const { container } = render(<EduStudentResults {...(props as never)} />);
     expect(container.querySelectorAll('[data-results-primary]')).toHaveLength(1);
-    expect(screen.getByTestId('wait-for-teacher-message')).toHaveAttribute('data-results-primary');
+    const primary = props === withMissed ? 'practice-missed-button' : 'wait-for-teacher-message';
+    expect(screen.getByTestId(primary)).toHaveAttribute('data-results-primary');
   });
 
-  it('Given missed lesson words, When results show, Then practice is one quieter action below the primary, not a second chip on the word list', () => {
+  it('Given missed lesson words, When results show, Then practice is the one action, never a second chip on the word list', () => {
     render(<EduStudentResults {...(withMissed as never)} />);
     expect(missedProps.current?.onPractice).toBeUndefined();
     fireEvent.click(screen.getByTestId('practice-missed-button'));
     expect(openPractice).toHaveBeenCalledWith('l1');
   });
 
-  it('Given my score, When results show, Then a tomorrow hook names the score to beat', () => {
+  it('Given a class round, When results show, Then no "come back tomorrow" line competes with the teacher-paced next round', () => {
     render(<EduStudentResults {...(allFound as never)} />);
-    expect(screen.getByTestId('edu-student-tomorrow')).toHaveTextContent('eduLiveRoom.studentResults.tomorrowHook:{"score":20}');
+    expect(screen.queryByTestId('edu-student-tomorrow')).toBeNull();
   });
 
-  it('Given the chest and the shop, When results show, Then the chest is its full-width beat and the shop its slim row', () => {
+  it('Given the chest and the shop, When results show, Then the chest is a beat of the reveal and the shop its slim row', () => {
     render(<EduStudentResults {...(withMissed as never)} />);
-    expect(chestProps.current?.quiet).toBeFalsy();
+    expect(chestProps.current?.beat).toBeDefined();
     expect(shopProps.current?.compact).toBe(true);
     expect(screen.queryByText('eduLiveRoom.studentResults.nextRound')).toBeNull();
   });

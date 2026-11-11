@@ -63,6 +63,10 @@ export function rosterCounts(rows: readonly RosterRow[]): Record<RosterStatus, n
   return out;
 }
 
+export function rosterFilter(rows: readonly RosterRow[], status: RosterStatus | null): readonly RosterRow[] {
+  return status ? rows.filter((r) => r.status === status) : rows;
+}
+
 /** Share of answers right, 0..1; null before the student has answered anything, so the meter never shows a fake 0%. */
 export function rosterAccuracy(row: Pick<RosterRow, 'accuracy' | 'wordsAttempted'>): number | null {
   if (row.wordsAttempted <= 0) return null;

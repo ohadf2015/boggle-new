@@ -49,6 +49,7 @@ vi.mock('../lobby/useClassroomLaunchSocket', () => ({
 }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
+import { gameTile } from '../lobby/__tests__/lobbyGamesFold';
 
 describe('ClassroomGameLobby — launching from the catalogue', () => {
   beforeEach(() => {
@@ -60,7 +61,7 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
 
   it('launches Boss Battle as a classic board carrying the boss, and stores it for the host', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(gameTile('boss-battle'));
     fireEvent.click(screen.getByTestId('lobby-go-live'));
 
     expect(launch).toHaveBeenCalledTimes(1);
@@ -79,13 +80,13 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
   it('opens on a board game when the list has no meanings to quiz on', () => {
     lessonWords = [{ word: 'horse' }, { word: 'sheep' }, { word: 'goat' }, { word: 'duck' }, { word: 'cow' }];
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    expect(screen.getByTestId('mode-tile-classic')).toHaveAttribute('aria-checked', 'true');
+    expect(gameTile('classic')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('says why before the tap when a meaning mode cannot run on this list, and never launches it', () => {
     lessonWords = [{ word: 'horse' }, { word: 'sheep' }, { word: 'goat' }, { word: 'duck' }, { word: 'cow' }];
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-vocab-quiz'));
+    fireEvent.click(gameTile('vocab-quiz'));
     expect(screen.getByTestId('go-live-blocked')).toHaveTextContent('eg2Modes.needsMeanings');
     expect(screen.getByTestId('lobby-go-live')).toBeDisabled();
     fireEvent.click(screen.getByTestId('lobby-go-live'));
@@ -95,23 +96,23 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
   it('launches Boss Battle on a list with no meanings, because the boss is fought on the board', () => {
     lessonWords = [{ word: 'horse' }, { word: 'sheep' }, { word: 'goat' }, { word: 'duck' }, { word: 'cow' }];
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(gameTile('boss-battle'));
     fireEvent.click(screen.getByTestId('lobby-go-live'));
     expect(launch.mock.calls[0][0].settings.gameMode).toBe('classic');
   });
 
   it('hides the treasure-chest switch for Boss Battle, which never deals chests', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-vocab-quiz'));
+    fireEvent.click(gameTile('vocab-quiz'));
     fireEvent.click(screen.getByTestId('lobby-setup-summary'));
     expect(screen.getByText('vocabQuiz.setup.treasureChests')).toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(gameTile('boss-battle'));
     expect(screen.queryByText('vocabQuiz.setup.treasureChests')).not.toBeInTheDocument();
   });
   it('GIVEN a Boss Battle launch failed WHEN the teacher taps retry THEN the retry still carries the boss', () => {
     startError = 'errors.network';
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('mode-tile-boss-battle'));
+    fireEvent.click(gameTile('boss-battle'));
     fireEvent.click(screen.getByTestId('create-room-retry'));
 
     expect(launch).toHaveBeenCalledTimes(1);

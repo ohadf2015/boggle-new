@@ -26,6 +26,9 @@ import { TvCoveragePanel } from '@/components/education/results/TvCoveragePanel'
 import { TvRecapHeader } from '@/components/education/results/TvRecapHeader';
 import { StrugglePreview } from '@/components/education/results/StrugglePreview';
 import { MissedWordsList } from '@/components/education/results/MissedWordsList';
+import { HardestWordsInsight } from '@/components/education/results/HardestWordsInsight';
+import { roundHardestWords } from '@/components/education/results/roundHardestWords';
+import { ProInsightLink } from '@/components/teacher/pro/ProInsightLink';
 import { ParentShareLink } from '@/components/education/results/ParentShareLink';
 import { reteachPanelWords } from '@/components/education/results/reteachPanelModel';
 import { ClassReportButton } from '@/components/education/results/ClassReportButton';
@@ -192,6 +195,23 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     : pulseBesideStage
       ? '@5xl/results:w-[min(100%,calc((100cqh-21rem)*1.768))] @[96rem]/results:w-[min(100%,calc((100cqh-25rem)*1.768))]'
       : '@5xl/results:w-[min(100%,calc((100cqh-16rem)*1.768))]';
+  // Only a round where lesson words landed can name its hardest ones honestly.
+  const hardest = landed ? roundHardestWords(summary) : [];
+  const insight = hardest.length > 0 ? (
+    <div data-testid="edu-results-hardest" className="flex flex-col gap-2">
+      <HardestWordsInsight words={hardest} t={t} />
+      {!proLoading && !hasPro && !isPracticeRound(players) && (
+        <ProInsightLink
+          placement="results_hardest_words"
+          language={language}
+          label={tf('education.results.freeInsight.proLine', 'Full report for every student with Pro')}
+          proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
+        />
+      )}
+    </div>
+  ) : null;
+  // The missed words grow to the podium's height on a wide wall, so the side column never ends in a blank half.
+  const fillSide = hasStage && !phone && !bossOver && practiceLeads;
   const pulse = stats ? (
     <div className={cn(shortWall && '[@container_results_(height<56.25rem)]:hidden')}>
       <ClassPulse stats={stats} active={winnerBeat} size={phone ? 'card' : 'projector'} t={t} />
@@ -232,7 +252,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   t={t}
                   className={cn(phone && 'w-[min(100%,14rem)] @xl/results:w-[min(100%,24rem)]', podiumWidth)}
                 >
-                  {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={winnerBeat} tone="calm" t={t} />}
+                  {landed && <ClassChest found={summary.classFoundCount} total={summary.totalWords} open={isRevealed(1, stage)} tone="calm" t={t} />}
                   {!outcome.celebrate && <ZeroRoundNote t={t} />}
                 </PodiumStage>
               )}
@@ -269,10 +289,13 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               />
             )}
             {/* The free insight leads: the words the class missed, with the one primary that practices exactly them. */}
-            <div className="flex flex-col gap-2 @max-[64rem]/results:order-first @5xl/results:gap-3 [&>*]:shrink-0">
+            <div className={cn('flex flex-col gap-2 @max-[64rem]/results:order-first @5xl/results:gap-3 [&>*]:shrink-0', fillSide && '@5xl/results:flex-1')}>
+              {missed.length === 0 && insight}
               <MissedWordsList
                 words={missed}
-                maxChips={bossOver ? 6 : 8}
+                lead={missed.length > 0 ? insight : null}
+                maxChips={bossOver ? 6 : fillSide ? 14 : 8}
+                fill={fillSide}
                 title={tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}
                 t={t}
               >

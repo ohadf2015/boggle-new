@@ -13,6 +13,7 @@ import {
   countPlayingHumans,
   onLessonWordAccepted,
   armLessonClaims,
+  onBotWordPlayed,
   type LessonClaimsState,
 } from '../lessonClaims';
 import { LESSON_CLAIM_BONUS, LESSON_RACE_MAX_SLOTS } from '@/shared/constants/lessonScoring';
@@ -213,5 +214,86 @@ describe('onLessonWordAccepted', () => {
   it('Given a room with no race, When a word is accepted, Then nothing is sent and nothing paid', () => {
     expect(onLessonWordAccepted({} as never, 'ABCD', game(null) as never, { word: 'storm', username: 'Noa', fromLesson: true })).toBe(0);
     expect(broadcastToRoom).not.toHaveBeenCalled();
+  });
+});
+
+describe('teacher previewing with bots', () => {
+  beforeEach(() => vi.mocked(broadcastToRoom).mockClear());
+
+  const teacher = { username: 'Teacher', isHost: true };
+  const bots = [{ username: 'Bolt', isBot: true }, { username: 'Pip', isBot: true }];
+  const armWith = (users: Array<Record<string, unknown>>) => {
+    const game: Record<string, unknown> = { gameSessionId: 4 };
+    armLessonClaims(game as never, { placedWords: ['storm', 'shad'], language: 'en', gameMode: 'classic', users, hostWatches: true, extras: {} });
+    return game.lessonClaims as LessonClaimsState | null;
+  };
+  const room = (state: LessonClaimsState | null, users: Record<string, Record<string, unknown>>) => ({
+    lessonClaims: state, gameSessionId: 4, gameState: 'in-progress', users,
+  });
+  const botsOnly = () => ({ Teacher: { isHost: true }, Bolt: { isBot: true, avatar: { emoji: '🤖' } }, Pip: { isBot: true } });
+  const botPlays = (g: ReturnType<typeof room>, username = 'Bolt', word = 'storm') =>
+    onBotWordPlayed({} as never, 'ABCD', g as never, { word, username });
+
+  it('Given only bots and the watching teacher, When the round deals, Then the race is on', () => {
+    expect(armWith([teacher, ...bots])).not.toBeNull();
+  });
+
+  it('Given the watching teacher alone with no bots, When the round deals, Then there is no race', () => {
+    expect(armWith([teacher])).toBeNull();
+  });
+
+  it('Given a bots-only preview, When a bot plays a lesson word, Then it claims the slot and the room hears it', () => {
+    const g = room(armWith([teacher, ...bots]), botsOnly());
+    expect(botPlays(g)).toBe(LESSON_CLAIM_BONUS);
+    expect(broadcastToRoom).toHaveBeenCalledWith({}, 'game:ABCD', 'lessonWordClaimed', expect.objectContaining({ word: 'storm', username: 'Bolt', avatar: { emoji: '🤖' } }));
+  });
+
+  it('Given a bots-only preview, When a bot plays a word that is not on the list, Then nothing is claimed', () => {
+    expect(botPlays(room(armWith([teacher, ...bots]), botsOnly()), 'Bolt', 'tram')).toBe(0);
+    expect(broadcastToRoom).not.toHaveBeenCalled();
+  });
+
+  it('Given the teacher practice seat plays with bots, When a bot plays a lesson word, Then the bot may claim it (the seat is not a student)', () => {
+    const g = room(armWith([teacher, { username: 'Ms K', isPractice: true }, ...bots]), { ...botsOnly(), 'Ms K': { isPractice: true } });
+    expect(botPlays(g)).toBe(LESSON_CLAIM_BONUS);
+  });
+
+  it('Given a real class of 2 students plus a bot, When the bot plays a lesson word, Then the bot never claims', () => {
+    const users = [teacher, { username: 'Noa' }, { username: 'Dana' }, bots[0]];
+    const g = room(armWith(users), { Teacher: { isHost: true }, Noa: {}, Dana: {}, Bolt: { isBot: true } });
+    expect(botPlays(g)).toBe(0);
+    expect(onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'storm', username: 'Noa', fromLesson: true })).toBe(LESSON_CLAIM_BONUS);
+  });
+
+  it('Given one real student with bots, When a bot plays a lesson word, Then the bot never claims', () => {
+    const g = room(armWith([teacher, { username: 'Noa' }, ...bots]), { ...botsOnly(), Noa: {} });
+    expect(botPlays(g)).toBe(0);
+  });
+
+  it('Given a bots-only preview where a bot already claimed, When a student joins mid-round, Then bots stop claiming, the earlier claim stays, and the student can still claim', () => {
+    const g = room(armWith([teacher, ...bots]), botsOnly());
+    botPlays(g, 'Bolt', 'storm');
+    g.users = { ...g.users, Noa: {} };
+    expect(botPlays(g, 'Pip', 'shad')).toBe(0);
+    expect(lessonClaimsView(g.lessonClaims!).slots[0].claim?.username).toBe('Bolt');
+    expect(onLessonWordAccepted({} as never, 'ABCD', g as never, { word: 'shad', username: 'Noa', fromLesson: true })).toBe(LESSON_CLAIM_BONUS);
+  });
+
+  it('Given a non-bot calls the bot path, When it plays a lesson word, Then nothing is claimed', () => {
+    const g = room(armWith([teacher, ...bots]), { ...botsOnly(), Fake: {} });
+    expect(botPlays(g, 'Fake')).toBe(0);
+  });
+
+  it('Given a bots-only preview round, When the next round deals with 2 students, Then bot claims are off again', () => {
+    const game: Record<string, unknown> = { gameSessionId: 4 };
+    const arm = (users: Array<Record<string, unknown>>, id: number) => {
+      game.gameSessionId = id;
+      armLessonClaims(game as never, { placedWords: ['storm'], language: 'en', gameMode: 'classic', users, hostWatches: true, extras: {} });
+    };
+    arm([teacher, ...bots], 4);
+    arm([teacher, { username: 'Noa' }, { username: 'Dana' }, bots[0]], 5);
+    const g = { ...room(game.lessonClaims as LessonClaimsState, { Teacher: { isHost: true }, Noa: {}, Dana: {}, Bolt: { isBot: true } }), gameSessionId: 5 };
+    expect(lessonClaimsView(g.lessonClaims!).claimedCount).toBe(0);
+    expect(botPlays(g)).toBe(0);
   });
 });

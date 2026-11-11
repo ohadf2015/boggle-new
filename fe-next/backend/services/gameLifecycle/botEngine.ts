@@ -24,6 +24,7 @@ import {
   updatePlayerScore,
 } from '../../modules/gameStateManager';
 import { setBotTimeout, stopBot } from '../../modules/botLifecycle';
+import { onBotWordPlayed } from '../../modules/lessonClaims';
 import { incrementBotWordUsage } from '../../modules/supabaseServer';
 import { volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { queuePlayerFoundWord } from '../../utils/playerFoundWordBatcher';
@@ -169,6 +170,8 @@ export function playBotWord(ctx: BotRoundContext, bot: Bot, rules: BotPlayRules,
   if (eventBonus !== 0) addPlayerEventBonus(gameCode, bot.username, eventBonus);
 
   bot.wordsFound.push(word);
+  const claimBonus = onBotWordPlayed(ctx.io, gameCode, game, { word, username: bot.username });
+  if (claimBonus > 0) creditBotBonus(ctx, bot, claimBonus);
   bot.score = game.playerScores?.[bot.username] ?? bot.score + credited;
   bot.comboLevel = comboLevel + 1;
   void incrementBotWordUsage(word, ctx.language);

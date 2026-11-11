@@ -1015,7 +1015,7 @@ const sv = {
       "createTitle": "Ny ordlista",
       "editTitle": "Redigera ordlista",
       "description": "Klistra in ord, lägg till betydelser, spara.",
-      "newList": "Ny lista",
+      "newList": "Ny ordlista",
       "moreOptions": "Språk, årskurs, ämne och delning",
       "titleLabel": "Listans namn",
       "titlePlaceholder": "Döp din lista…",
@@ -1095,7 +1095,6 @@ const sv = {
       "emptyHint": "Klistra in en lista, börja från ett startpaket eller hämta en från Upptäck."
     },
     "card": {
-      "practice": "Öva",
       "words": "{count} ord",
       "by": "av {author}",
       "aTeacher": "en lärare",
@@ -1223,7 +1222,6 @@ const sv = {
       "firstAssignmentCta": "Skapa första uppgiften",
       "startLiveTitle": "Spela en livelektion",
       "startLiveBody": "Uppgiften är ute. Starta ett livespel så klassen spelar tillsammans.",
-      "startLiveCta": "Starta live",
       "copyJoinCode": "Kopiera länk",
       "joinCodeCopied": "Länken kopierades",
       "endedCodeTries": "Elever som försökte gå med efter att ditt spel tog slut: {count}.",
@@ -1327,6 +1325,9 @@ const sv = {
       "openForXp": "Öppna kistan och hämta din XP"
     },
     "student": {
+      "noClass": {
+        "title": "Skriv in klasskoden"
+      },
       "liveNow": "Live nu",
       "ctaReview": "Repetera",
       "ctaBoss": "Bossen upplåst",
@@ -14726,8 +14727,7 @@ const sv = {
     "assignments": {
       "dueInHours": "Förfaller om {hours}t",
       "dueInMinutes": "Förfaller om {minutes}m",
-      "overdueBy": "{days}d försenad",
-      "doIt": "Gör det"
+      "overdueBy": "{days}d försenad"
     },
     "classView": {
       "playAssignment": "Spela {title}",
@@ -14890,6 +14890,10 @@ const sv = {
     }
   },
   "teacher": {
+    "classPage": {
+      "noLists": "Klassen har inga ordlistor än.",
+      "coverage": "{pct} % av listans ord hittade"
+    },
     "nav": {
       "play": "Spela",
       "classes": "Klasser",
@@ -15056,7 +15060,6 @@ const sv = {
       "error": "Vi kunde inte ladda resultaten från senaste spelet.",
       "retry": "Försök igen",
       "emptyTitle": "Inget klasspel ännu",
-      "emptyHint": "Starta ett från Spela nu ovan – orden klassen hittar och missar visas här.",
       "previousGames": "Tidigare spel",
       "playersPlayed": "{{count}} elever spelade",
       "studentFallback": "Elev",
@@ -15445,7 +15448,6 @@ const sv = {
       "studentCountPro": "{{count}} elever",
       "cardSeeAllStudents": "Visa alla {{count}} elever",
       "cardRosterTitle": "Elever i {{name}}",
-      "cardAssignHomework": "Ge läxa",
       "cardClassReport": "Klassrapport",
       "presets": {
         "title": "Snabbinställningar",
@@ -15940,6 +15942,7 @@ const sv = {
       "failedToSaveLesson": "Kunde inte spara lektionen"
     },
     "reports": {
+      "freeOtherClasses": "Gratisplanen gäller din första klass. Med Pro ser du även de här:",
       "valueLine": "Efter varje spel ser du vilka ord varje klass missade, vem som behöver hjälp och vad ni ska öva på härnäst.",
       "homeworkShortcut": "Läxresultat",
       "freeSummary": {
@@ -16302,12 +16305,12 @@ const sv = {
       "invalid": "Den här sidan saknar klasskod. Öppna den igen från din lärarstart."
     },
     "weekInsight": {
+      "emptyHeadline": "Spela ett spel så ser du vem som behöver hjälp",
       "title": "Vem behöver hjälp den här veckan",
       "nobodyStuck": "Ingen har kört fast den här veckan.",
       "more": "+{{count}} till",
       "hardestTitle": "Veckans svåraste ord",
       "missed": "{{pct}} % missade",
-      "emptyTitle": "Inga spel den här veckan än",
       "emptyBody": "Spela ett spel med klassen så ser du vem som behöver hjälp.",
       "startGame": "Starta ett spel",
       "proLine": "Med Pro ser du varje vecka och varje elev",
@@ -16430,7 +16433,7 @@ const sv = {
       "settings": "Finjustera",
       "settingsHide": "Dölj finjustering",
       "needsLesson": "Välj en ordlista först",
-      "launch": "Starta live: {{mode}}",
+      "launch": "Starta ett spel: {{mode}}",
       "tapAgain": "Tryck igen för att starta",
       "moreModes": "Fler spel ({{count}})",
       "fewerModes": "Färre spel",
@@ -18242,7 +18245,7 @@ const sv = {
           "label": "Går med i:",
           "confirm": "Det här är ditt klassrum",
           "gameLabel": "Live-spel:",
-          "classroomNext": "Inget spel pågår just nu. Du går med i klassen och ser vad din lärare har lagt upp.",
+          "classroomNext": "Du går med i klassen och ser vad din lärare har lagt upp.",
           "gameConfirm": "Din klass spelar nu – du hoppar in direkt"
         },
         "subtitle": "Skriv in din lärares kod",
@@ -18309,7 +18312,6 @@ const sv = {
       "setDefault": "Använd som standard",
       "setDefaultDesc": "Dessa inställningar används nästa gång",
       "settings": "Inställningar",
-      "startGame": "Starta",
       "timer": "Tid"
     },
     "xp": {
@@ -21537,7 +21539,6 @@ const sv = {
       "wordsFound": "ord hittade",
       "lessonFound": "Lektionsord: {{found}}/{{total}}",
       "wordOfRound": "Rundans ord",
-      "wordOfRoundEmpty": "Första långa ordet tar den här platsen",
       "bestWordBy": "{{count}} bokstäver · av {{name}}",
       "exitLabel": "Lämna spelet"
     },
@@ -22112,6 +22113,7 @@ const sv = {
       "removeFailed": "Det gick inte att ta bort. Försök igen."
     },
     "student": {
+      "joined": "{name} är med!",
       "youreIn": "Du är med!",
       "watchBoard": "Titta på tavlan. Läraren startar spelet.",
       "inClass": "{count} i klassen",
@@ -22119,6 +22121,9 @@ const sv = {
       "leave": "Lämna"
     },
     "entry": {
+      "hostRetry": "Försök igen",
+      "hostRefusedHint": "Kolla att du är inloggad med kontot som startade spelet och försök igen.",
+      "hostRefusedTitle": "Vi kunde inte öppna ditt rum igen",
       "roomFullTitle": "Rummet är fullt: du tittar på",
       "roomFullHint": "Alla {max} platser är tagna. Din lärare ser att du väntar.",
       "connecting": "Ansluter till klassen…",
@@ -22275,9 +22280,8 @@ const sv = {
         "pickGame": "Välj ett annat spel",
         "loading": "Kollar ert senaste spel",
         "ready": "{ready} av {total} redo för provet",
-        "readyHint": "Se vilka ord varje elev missade",
         "readyEmpty": "Resultat per ord visas efter nästa spel",
-        "missed": "{count} missade det · ge läxa"
+        "missed": "{count} missade det · tilldela övning"
       },
       "greetMorning": "God morgon, {name}",
       "greetAfternoon": "God eftermiddag, {name}",
@@ -22295,6 +22299,8 @@ const sv = {
       "studentsOne": "1 elev",
       "notPlayedRecently": "Inga spel på 30 dagar",
       "roster": {
+        "hide": "Dölj elevlistan",
+        "seeAll": "Visa alla elever ({count})",
         "title": "Elever",
         "colName": "Namn",
         "colXp": "XP",
@@ -22449,6 +22455,13 @@ const sv = {
       }
     },
     "setup": {
+      "strip": {
+        "share": "Dela koden",
+        "name": "Namnge klassen"
+      },
+      "savedList": {
+        "change": "Byt ord"
+      },
       "title": "Ny klass",
       "subtitle": "Tre snabba val. Du kan ändra dem senare.",
       "step1": "Klassuppgifter",
@@ -22509,14 +22522,10 @@ const sv = {
       "packLabel": "Ord till ert första spel",
       "advancedOpen": "Ändra årskurs, språk eller ord",
       "advancedClose": "Dölj alternativ",
-      "bubble": "Bara ett namn. Resten har jag valt åt dig, ändra om du vill.",
       "createClass": "Skapa klass",
       "anyGrade": "Alla årskurser",
       "side": {
-        "title": "Det här händer sen",
-        "step1": "Du får en anslutningskod",
-        "step2": "Eleverna skriver in den på valfri mobil. Inga konton.",
-        "step3": "Tryck på Starta på brädet. Första rundan tar 3 minuter."
+        "step2": "Eleverna skriver in den på valfri mobil. Inga konton."
       },
       "packWords": "{count} ord",
       "packRecommended": "Vårt tips",
@@ -22534,14 +22543,12 @@ const sv = {
         "tooFew": "Lägg till minst {min} ord, eller töm rutan och spela en första ordlista.",
         "phrasesOnly": "Fraser med flera ord får inte plats på brädet. Lägg till enstaka ord, eller töm rutan och spela en första ordlista.",
         "skipped": "Fraser som utelämnades: {count}. Brädet tar bara enstaka ord.",
-        "playFailed": "Spelet öppnades inte. Tryck på Spela nu igen.",
+        "playFailed": "Spelet öppnades inte. Tryck på ”Starta ett spel” igen.",
         "yours": "Rundan körs med dina ord, och de sparas i klassen också.",
         "packLabel": "Ingen ordlista än? Spela en första",
         "packHint": "Det sparas i klassen så att eleverna kan öva på det senare.",
         "listName": "Ord för {date}",
-        "playNow": "Spela nu",
         "saved": "Redan i klassen",
-        "createHint": "Därefter: klasskoden och en ruta för veckans ord. Tryck sedan på Spela nu.",
         "listMissing": "Vi hittade inte din sparade ordlista, så vi spelar med en startlista."
       },
       "ownWords": {
@@ -22552,6 +22559,10 @@ const sv = {
       }
     },
     "host": {
+      "roundGroup": "Omgång",
+      "moreGames": "Fler spel",
+      "rivalsOff": "utan dueller",
+      "rivalsOn": "med dueller",
       "classLabel": "Klass",
       "lateJoin": "Sen anslutning",
       "lateJoinHint": "Elever kan ansluta även efter att rundan har börjat.",

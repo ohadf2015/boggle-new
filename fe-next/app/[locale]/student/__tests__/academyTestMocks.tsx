@@ -17,6 +17,8 @@ const knobs = vi.hoisted(() => ({
   lessons: [] as unknown[],
   reviewLessonId: '',
   reviewCount: 0,
+  /** The review bridge never answers (a slow schedule read). */
+  reviewSilent: false,
   streakAtRisk: false,
   /** Classroom round payout; drives the post-play feedback bubble. */
   reward: null as null | { userId: string; xpEarned: number; lessonIds: string[]; gameCode: string },
@@ -63,6 +65,12 @@ vi.mock('@/components/student/academy/useAcademyData', () => ({
     stars: 2,
   }),
 }));
+vi.mock('@/components/student/academy/ReviewCountBridge', () => ({
+  ReviewCountBridge: ({ onCount }: { onCount: (n: number) => void }) => {
+    React.useEffect(() => { if (!knobs.reviewSilent) onCount(knobs.reviewCount); }, [onCount]);
+    return null;
+  },
+}));
 vi.mock('@/hooks/useActiveClassroomGame', () => ({
   useActiveClassroomGame: () => ({ activeGame: knobs.activeGame, socket: null, isConnected: true }),
 }));
@@ -85,6 +93,7 @@ export function resetKnobs() {
   knobs.lessons = [];
   knobs.reviewLessonId = '';
   knobs.reviewCount = 0;
+  knobs.reviewSilent = false;
   knobs.streakAtRisk = false;
   knobs.reward = null;
   knobs.landscape = false;

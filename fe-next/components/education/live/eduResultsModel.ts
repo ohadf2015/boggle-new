@@ -17,7 +17,7 @@ function studentsOnly(players: PlayerResult[] | undefined, teacherName: string):
 }
 
 function wordsOf(p: PlayerResult): number {
-  return p.wordsFoundCount ?? p.allWords?.length ?? 0;
+  return p.wordsFoundCount ?? p.allWords?.filter((w) => w.validated !== false).length ?? 0;
 }
 
 export function classStats(summary: ClassroomSummary, players: PlayerResult[] | undefined): ClassStats {

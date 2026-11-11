@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
+import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 import logger from '@/utils/logger';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
 
@@ -73,11 +75,14 @@ export async function GET(request: Request) {
     if (!error) {
       const classroom = Array.isArray(data) ? data[0] : data;
       if (classroom) {
+        // The join route walks a class-code student into the running game; say so before they tap.
+        const liveGameCode = await lookupLiveGameForClassroom(classroom.id);
         return NextResponse.json({
           kind: 'classroom',
           id: classroom.id,
           name: classroom.name,
           language: classroom.language,
+          ...(liveGameCode ? { liveGameCode } : {}),
         });
       }
     } else {
@@ -93,27 +98,22 @@ export async function GET(request: Request) {
   try {
     const game = await lookupLiveClassroomGame(code);
     if (game) {
-      // Query the classroom name to show students a friendly label.
+      // Service read: RLS hides the class from a student who is not on its roster yet.
+      // Only the display name, only for a code that already matched a live game.
       let classroomName: string | undefined;
       try {
-        const supabase = await createClient();
-        const { data } = await supabase
-          .from('classrooms')
-          .select('name')
-          .eq('id', game.classroomId)
-          .single();
-        classroomName = data?.name;
+        const db = createAdminClient() ?? (await createClient());
+        const { data } = await db.from('classrooms').select('name').eq('id', game.classroomId).maybeSingle();
+        classroomName = data?.name ?? undefined;
       } catch (err) {
         logger.error('join-code resolve: classroom name lookup failed:', err);
-        // Degrade to teacherName if classroom lookup fails
       }
 
       return NextResponse.json({
         kind: 'game',
         gameCode: code,
         classroomId: game.classroomId,
-        classroomName: classroomName,
-        teacherName: game.teacherName,
+        classroomName,
         lessonIds: game.lessonIds,
       });
     }

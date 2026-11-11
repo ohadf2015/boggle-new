@@ -87,7 +87,7 @@ export function PlayNowButton({ busy = false, onClick, t }: { busy?: boolean; on
   return (
     <button type="button" data-testid="setup-play-now" data-hero="true" aria-busy={busy || undefined} onClick={onClick} className={cn(NB_PRIMARY, 'min-h-[60px] w-full text-2xl')}>
       {busy ? <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-6 fill-current" aria-hidden="true" />}
-      {t('eduShell.setup.words.playNow')}
+      {t('eduShell.home.startLive')}
     </button>
   );
 }

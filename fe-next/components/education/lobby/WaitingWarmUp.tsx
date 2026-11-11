@@ -22,6 +22,7 @@ import { useGameLanguage } from '@/hooks/gameState/selectors';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { spellableWords } from './warmUpSpell';
 import { WARM_UP_KEYFRAMES, WarmUpSpellTiles } from './WarmUpSpellTiles';
+import { WaitingWarmUpHero } from './WaitingWarmUpHero';
 
 const MILESTONE = 5;
 
@@ -31,11 +32,12 @@ function seedFor(name: string): number {
   return h;
 }
 
-/** With list words (passed, or this room's deck) it is a spelling-tiles warm-up; without (or only kanji) it stays the name tap game. */
-export function WaitingWarmUp({ username, words, t }: { username: string; words?: readonly string[]; t: EduT }) {
+/** With list words (passed, or this room's deck) it is a spelling-tiles warm-up; without (or only kanji) it stays the name tap game. `hero` is the lobby's full-width version. */
+export function WaitingWarmUp({ username, words, t, hero = false }: { username: string; words?: readonly string[]; t: EduT; hero?: boolean }) {
   const deck = useStudyDeck((s) => s.cards);
   const spellable = useMemo(() => spellableWords(words ?? deck.map((c) => c.word)), [words, deck]);
   if (spellable.length > 0) return <WarmUpSpellTiles key={spellable.map((w) => w.join('')).join('|')} words={spellable} seed={seedFor(username)} t={t} />;
+  if (hero) return <WaitingWarmUpHero username={username} seed={seedFor(username)} t={t} />;
   return <NameTapWarmUp username={username} t={t} />;
 }
 

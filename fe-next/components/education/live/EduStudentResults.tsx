@@ -1,7 +1,7 @@
 'use client';
 
 /** Behaviour (XP, coins, game record, exit) stays in the shared results controller so it cannot drift from /multiplayer. */
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
 import { ChevronDown, LogOut, Star } from 'lucide-react';
@@ -9,9 +9,17 @@ import { cn } from '@/lib/utils';
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { useMpResultsController, type MpResultsProps } from '@/components/multiplayer/results/useMpResultsController';
 import { useOpenLessonPractice } from '@/components/multiplayer/results/useOpenLessonPractice';
-import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
+import { useRoundReward } from '@/components/education/economy/useRoundReward';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
+import { StudentRevealHero } from '@/components/education/results/StudentRevealHero';
+import { StudentChestBeat } from '@/components/education/results/StudentChestBeat';
+import { StudentRoundPair, StudentWaitBar } from '@/components/education/results/StudentRoundPair';
+import { useStudentReveal } from '@/components/education/results/useStudentReveal';
+import { STUDENT_REVEAL_FINAL, studentVerdict } from '@/components/education/results/studentReveal';
+import { HardestWordsInsight } from '@/components/education/results/HardestWordsInsight';
+import { roundHardestWords } from '@/components/education/results/roundHardestWords';
+import { lessonWordsLanded } from '@/components/education/results/lessonTally';
 import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { deckCardsFor, useStudyDeck } from '@/lib/education/studyDeckStore';
@@ -25,10 +33,9 @@ import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduMissedRecall, missedDefinitions } from './EduMissedRecall';
-import { EduStudentHero } from './EduStudentHero';
 import { useRival } from './useRival';
-import { EduStudentNextStep, EduStudentShareButton } from './EduStudentNextStep';
-import { EduStudentClassGoal, EduStudentWaitNext, EduStudentXpBar } from './EduStudentProgress';
+import { EduStudentShareButton } from './EduStudentNextStep';
+import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 
 const LevelUpCelebration = dynamic(() => import('@/components/education/LevelUpCelebration'), { ssr: false });
@@ -53,30 +60,7 @@ function ResultsSkeleton() {
   );
 }
 
-/** Each block arrives a beat after the one above it: a short transform-only pop, never an opacity fade (Class 5). */
-function Beat({ index, children, className }: { index: number; children: ReactNode; className?: string }) {
-  return (
-    <div
-      className={cn('w-full max-w-sm motion-safe:animate-[edu-live-pop_240ms_cubic-bezier(0.23,1,0.32,1)_both]', className)}
-      style={{ animationDelay: `${index * 80}ms` }}
-    >
-      {children}
-    </div>
-  );
-}
-
-/** The level-up beat waits for my own card to land first, so it reads as the payoff, not an interruption. */
-const HERO_LAND_MS = 700;
-
-function useHeroLanded(reduceMotion: boolean): boolean {
-  const [landed, setLanded] = useState(reduceMotion);
-  useEffect(() => {
-    if (landed) return;
-    const id = setTimeout(() => setLanded(true), HERO_LAND_MS);
-    return () => clearTimeout(id);
-  }, [landed]);
-  return landed;
-}
+const COLUMN = 'w-full max-w-md';
 
 function EduStudentResultsInner(props: EduStudentResultsProps) {
   const c = useMpResultsController(props);
@@ -114,12 +98,15 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     ready: !!summary && !!placing,
   });
   const xpGained = c.socketEvents?.xpGainedData ?? null;
-  const heroLanded = useHeroLanded(reduceMotion);
-  const levelUp = heroLanded && c.socketEvents?.showLevelUpCelebration ? c.socketEvents.levelUpData : null;
+  const beat = useStudentReveal(reduceMotion);
+  const reveal = useRoundReward(props.gameCode || null, rewardRoundId(props.gameSessionId, props.gameCode));
+  // The level-up overlay waits for the chest to settle, so it reads as the last payoff, not an interruption.
+  const levelUp = beat === STUDENT_REVEAL_FINAL && c.socketEvents?.showLevelUpCelebration ? c.socketEvents.levelUpData : null;
+  const verdict = placing ? studentVerdict({ ...placing, rivalDiff: rivalOutcome?.diff ?? null, gapKind: gap?.kind ?? null }) : 'lost';
   const classFound = summary?.classFoundCount;
   const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
   const [moreOpened, setMoreOpened] = useState(false);
-  let beat = 0;
+  const hardest = useMemo(() => (summary && lessonWordsLanded(summary) ? roundHardestWords(summary) : []), [summary]);
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
 
@@ -142,60 +129,43 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       {scores.length === 0 ? (
         <ResultsSkeleton />
       ) : (
-        <main className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto px-4 pb-2 pt-1.5">
+        <main className="flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-4 pb-3 pt-1.5">
           {placing && (
-            <Beat index={beat++}>
-              <EduStudentHero
+            <div className={COLUMN}>
+              <StudentRevealHero
                 rank={placing.rank}
                 total={placing.total}
                 score={placing.score}
-                bestWord={best}
-                lesson={lesson}
-                xp={xpGained?.xpEarned ?? null}
-                coins={c.sideEffects?.coinReward?.awarded ?? null}
-                gap={gap}
+                verdict={verdict}
+                beat={beat}
                 rival={rivalOutcome}
+                gap={gap}
                 reduceMotion={reduceMotion}
+                chest={reveal ? <StudentChestBeat reveal={reveal} beat={beat} reduceMotion={reduceMotion} t={t} /> : null}
                 t={t}
-                extra={
-                  (classTotal > 0 || momentum) && (
-                  <>
-                    {classTotal > 0 && <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />}
-                    {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
-                  </>
-                  )
-                }
               />
-            </Beat>
+            </div>
+          )}
+
+          <div className={COLUMN}>
+            <StudentRoundPair bestWord={best} lesson={lesson} t={t} />
+          </div>
+
+          {hardest.length > 0 && (
+            <div className={COLUMN}>
+              <HardestWordsInsight words={hardest} t={t} />
+            </div>
           )}
 
           {props.gameCode && (
-            <>
-              <Beat index={beat++}>
-                <ChestRewardCta gameCode={props.gameCode} roundId={rewardRoundId(props.gameSessionId, props.gameCode)} />
-              </Beat>
-              <Beat index={beat++}>
-                <RoundShop compact gameCode={props.gameCode} />
-              </Beat>
-            </>
+            <div className={COLUMN}>
+              <RoundShop compact gameCode={props.gameCode} />
+            </div>
           )}
 
-          <BossOutcomeCard size="phone" density="compact" className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg" />
+          <BossOutcomeCard size="phone" density="compact" className={cn(COLUMN, 'rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg')} />
 
-          <Beat index={beat++}>
-            <EduStudentNextStep
-              t={t}
-              placing={placing}
-              showTomorrow={!momentum}
-              onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined}
-            />
-          </Beat>
-
-          <Beat index={beat++}>
-            <EduStudentWaitNext username={props.username} t={t} />
-          </Beat>
-
-          <Beat index={beat++}>
+          <div className={COLUMN}>
             <details
               data-testid="edu-student-more"
               onToggle={(e) => e.currentTarget.open && setMoreOpened(true)}
@@ -209,6 +179,12 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
               </summary>
               {moreOpened && <div className="flex flex-col gap-3 px-3 pb-3">
                 {xpGained && xpGained.newTotalXp > 0 && <EduStudentXpBar totalXp={xpGained.newTotalXp} />}
+                {(classTotal > 0 || momentum) && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {classTotal > 0 && <EduStudentClassGoal found={classFound ?? 0} total={classTotal} t={t} />}
+                    {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
+                  </div>
+                )}
                 <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
                   {t('eduLiveRoom.studentResults.yourWords')}
                   {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
@@ -237,8 +213,16 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 <EduMissedRecall missed={missed} deck={deck} t={t} />
               </div>}
             </details>
-          </Beat>
+          </div>
         </main>
+      )}
+
+      {scores.length > 0 && (
+        <footer className="flex shrink-0 justify-center px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">
+          <div className={COLUMN}>
+            <StudentWaitBar onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined} t={t} />
+          </div>
+        </footer>
       )}
 
       <LevelUpCelebration levelUpData={levelUp} onClose={() => c.socketEvents?.setShowLevelUpCelebration(false)} />

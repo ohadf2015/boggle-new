@@ -9,7 +9,10 @@ vi.mock('../utils/logger', () => ({
 }));
 vi.mock('../modules/notificationService', () => ({ sendOpsAlert: vi.fn() }));
 
+import logger from '../utils/logger';
+import { sendOpsAlert } from '../modules/notificationService';
 import {
+  startMemoryWatchdog,
   evaluateMemoryAlert,
   evaluateDualMemoryAlert,
   getContainerMemoryLimitBytes,
@@ -186,5 +189,34 @@ describe('evaluateDualMemoryAlert', () => {
   it('heapPressureBytes is max(used, total)', () => {
     expect(heapPressureBytes(100, 200)).toBe(200);
     expect(heapPressureBytes(200, 100)).toBe(200);
+  });
+});
+
+describe('startMemoryWatchdog ops alerts', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllEnvs();
+    vi.mocked(sendOpsAlert).mockClear();
+    vi.mocked(logger.error).mockClear();
+  });
+
+  const runOverLimit = () => {
+    vi.useFakeTimers();
+    const stop = startMemoryWatchdog({ intervalMs: 1000, limitBytes: 1 * MB });
+    vi.advanceTimersByTime(1000);
+    stop();
+  };
+
+  it('Given production, When memory is over the limit, Then the ops alert is sent', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    runOverLimit();
+    expect(sendOpsAlert).toHaveBeenCalledWith(expect.stringContaining('memory CRITICAL'));
+  });
+
+  it.each(['development', 'test'])('Given NODE_ENV=%s, When memory is over the limit, Then it only logs and pages nobody', (env) => {
+    vi.stubEnv('NODE_ENV', env);
+    runOverLimit();
+    expect(sendOpsAlert).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith('MEMWATCH', expect.stringContaining('memory CRITICAL'));
   });
 });

@@ -37,9 +37,12 @@ describe('ProjectorRoster — who is in the room', () => {
     expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":3}');
   });
 
-  it('Given a long name, Then the chip truncates but the full name stays on its title', () => {
-    render(<ProjectorRoster students={[{ username: 'Maximiliana-Alexandrova' }]} t={t} />);
-    expect(screen.getByTestId('projector-student').querySelector('[title]')).toHaveAttribute('title', 'Maximiliana-Alexandrova');
+  it('Given a 20-character name, Then the chip shrinks and wraps it instead of cutting it, and keeps it on its title', () => {
+    render(<ProjectorRoster students={[{ username: 'Maximiliana-Josefina' }]} t={t} />);
+    const name = screen.getByTestId('projector-student').querySelector('[title]') as HTMLElement;
+    expect(name).toHaveAttribute('title', 'Maximiliana-Josefina');
+    expect(name.className).not.toMatch(/\btruncate\b/);
+    expect(name.className).toMatch(/text-\[0\.7em\]/);
   });
 
   it('Given nobody yet, Then the mascot shows the class how to join and no ready bar shows', () => {

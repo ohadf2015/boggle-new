@@ -41,14 +41,35 @@ describe('resolveJoinTarget', () => {
     });
   });
 
-  it('names the teacher behind a live game code', async () => {
+  it('a class code while that class is playing resolves to the live game, named for the class', async () => {
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      ok({ kind: 'classroom', id: 'c1', name: 'Year 9 English', liveGameCode: 'P45KRT' })
+    );
+
+    await expect(resolveJoinTarget('k7q2wm')).resolves.toEqual({
+      verdict: 'game',
+      label: 'Year 9 English',
+      classroomId: 'c1',
+      gameCode: 'P45KRT',
+    });
+  });
+
+  it('names the class behind a live game code when the server knows it', async () => {
+    (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      ok({ kind: 'game', gameCode: 'P45KRT', classroomId: 'c1', classroomName: '7B', teacherName: 'Ms Levy' })
+    );
+
+    await expect(resolveJoinTarget('p45krt')).resolves.toMatchObject({ verdict: 'game', label: '7B' });
+  });
+
+  it('never shows the teacher account name as the class behind a live game code', async () => {
     (fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       ok({ kind: 'game', gameCode: 'P45KRT', classroomId: 'c1', teacherName: 'Ms Levy' })
     );
 
     await expect(resolveJoinTarget('p45krt')).resolves.toEqual({
       verdict: 'game',
-      label: 'Ms Levy',
+      label: undefined,
       classroomId: 'c1',
       gameCode: 'P45KRT',
     });

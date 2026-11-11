@@ -176,12 +176,16 @@ export async function POST(request: NextRequest) {
     // Runs for BOTH the new student and the returning one — the "already a member"
     // branch below returns early, and returning students are the majority of any
     // second lesson.
+    let lockedOutOfLiveGame = false;
     if (!liveGameCode) {
       try {
         liveGameCode = await lookupLiveGameForClassroom(classroom.id);
-        // Enrolment is not a seat: a locked lobby still takes the student onto the roster, just not into the room.
+        // Enrolment is not a seat: a locked lobby still takes the student onto the roster, then says it is locked.
         const live = liveGameCode ? await lookupLiveClassroomGame(liveGameCode) : null;
-        if (live && isLockedOut(live, userId)) liveGameCode = null;
+        if (live && isLockedOut(live, userId)) {
+          liveGameCode = null;
+          lockedOutOfLiveGame = true;
+        }
       } catch (liveGameError) {
         // Enrolment is the thing that must not be lost. A student on the roster with
         // no room can be walked in by the banner; a student refused outright cannot.
@@ -211,7 +215,8 @@ export async function POST(request: NextRequest) {
       await recordEndedCodeTry(classroom.id, userId);
     }
     const endedVerdict = endedSessionCode ? { verdict: 'class-join', endedSessionCode: true } : {};
-    const alreadyMember = () => NextResponse.json(
+    const lockedOut = () => NextResponse.json({ error: 'Room locked', code: ROOM_LOCKED, classroomId: classroom.id }, { status: 423 });
+    const alreadyMember = () => lockedOutOfLiveGame ? lockedOut() : NextResponse.json(
       {
         message: 'Already a member of this classroom',
         classroomId: classroom.id,
@@ -278,6 +283,7 @@ export async function POST(request: NextRequest) {
     if (!isRehearsal) {
       await captureStudentJoinEvents(createAdminClient(), { classroomId: classroom.id, studentId: userId });
     }
+    if (lockedOutOfLiveGame) return lockedOut();
 
     return NextResponse.json(
       {

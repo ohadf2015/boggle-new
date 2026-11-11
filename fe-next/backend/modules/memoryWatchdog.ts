@@ -253,7 +253,9 @@ export function startMemoryWatchdog(
   if (timer) clearInterval(timer);
   const intervalMs = opts.intervalMs ?? 30_000;
   const limitBytes = opts.limitBytes ?? getContainerMemoryLimitBytes();
-  const send = opts.send ?? sendOpsAlert;
+  const sender = opts.send ?? sendOpsAlert;
+  // Local `next dev` has no cgroup limit and trips the fallback cap; only production pages anyone.
+  const send = (m: string) => (process.env.NODE_ENV === 'production' ? sender(m) : undefined);
   const getCounts = opts.getCounts;
   let state: DualMemWatchState = {
     rss: { band: 'ok', lastAlertAt: 0 },

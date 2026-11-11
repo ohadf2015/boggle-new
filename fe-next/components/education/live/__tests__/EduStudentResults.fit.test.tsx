@@ -6,9 +6,10 @@ import '@testing-library/jest-dom';
 const controller = vi.hoisted(() => ({ current: null as unknown }));
 vi.mock('@/components/multiplayer/results/useMpResultsController', () => ({ useMpResultsController: () => controller.current }));
 vi.mock('@/components/results/ResultsFriendStatus', () => ({ ResultsFriendStatusProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
-vi.mock('@/components/education/economy/ChestRewardCta', () => ({
-  default: ({ gameCode, roundId }: { gameCode: string; roundId: string | null }) => <div data-testid="chest-cta" data-code={gameCode} data-round={roundId ?? ''} />,
+vi.mock('@/components/education/economy/useRoundReward', () => ({
+  useRoundReward: (gameCode: string | null, roundId: string | null) => (gameCode && roundId ? { gameCode, roundId, rarity: 'rare', xp: 35, itemId: 'hat', roundCash: 0, rank: 1, size: 2 } : null),
 }));
+vi.mock('@/components/education/results/StudentChestBeat', () => ({ StudentChestBeat: () => <div data-testid="chest-cta" /> }));
 vi.mock('@/components/education/economy/RoundShop', () => ({ default: () => <div data-testid="round-shop" /> }));
 vi.mock('@/components/student/live/StudentMissedWords', () => ({ StudentMissedWords: ({ words }: { words: string[] }) => <div data-testid="missed" data-words={words.join(',')} /> }));
 vi.mock('@/components/multiplayer/results/useOpenLessonPractice', () => ({ useOpenLessonPractice: () => vi.fn() }));
@@ -73,33 +74,36 @@ describe('EduStudentResults on a 390x844 phone', () => {
     openMore();
     expect(more).toContainElement(screen.getAllByTestId('edu-student-word')[0]);
     expect(more).toContainElement(screen.getByTestId('missed'));
-    for (const id of ['edu-student-hero', 'edu-student-next-step', 'waiting-warmup', 'chest-cta', 'round-shop']) {
+    for (const id of ['edu-student-hero', 'wait-for-teacher-message', 'chest-cta', 'round-shop']) {
       expect(more).not.toContainElement(screen.getByTestId(id));
     }
     expect(screen.getByTestId('edu-student-more-summary')).toHaveTextContent('eduLiveRoom.studentResults.moreFromRound');
   });
 
-  it('given a round reward, when results show, then the order is hero, chest, shop, then the next step, and the chest is not in the header', () => {
+  it('given a round reward, when results show, then the order is the reveal (with its chest), the best-word pair, the shop, then the wait bar, and the chest is not in the header', () => {
     render(<EduStudentResults {...(props as object)} />);
-    const order = ['edu-student-hero', 'chest-cta', 'round-shop', 'edu-student-next-step'].map((id) => screen.getByTestId(id));
+    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('chest-cta'));
+    const order = ['edu-student-hero', 'edu-student-best-word', 'round-shop', 'wait-for-teacher-message'].map((id) => screen.getByTestId(id));
     for (let i = 1; i < order.length; i++) {
       expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
     expect(screen.getByTestId('edu-student-results-leave').closest('header')).not.toContainElement(screen.getByTestId('chest-cta'));
   });
 
-  it('given a signed-in student, when results show, then the XP bar folds away and the earned XP chip stays on the card', () => {
+  it('given a signed-in student, when results show, then the XP bar folds away and no XP chip crowds the card (the chest pays the XP)', () => {
     controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 30, newTotalXp: 400 } } });
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.queryByTestId('edu-student-xp-bar')).toBeNull();
     openMore();
     expect(screen.getByTestId('edu-student-more')).toContainElement(screen.getByTestId('edu-student-xp-bar'));
-    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('edu-student-xp'));
+    expect(screen.queryByTestId('edu-student-xp')).toBeNull();
   });
 
-  it('given my round, when the class goal shows, then it rides inside my card instead of its own row', () => {
+  it('given my round, when the class goal exists, then it folds under More instead of crowding the reveal', () => {
     render(<EduStudentResults {...(props as object)} classroomSummary={{ teacherName: 'Ms Cohen', classFoundCount: 3, totalWords: 5, lessonIds: ['l1'] }} />);
-    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('edu-student-class-goal'));
+    expect(screen.queryByTestId('edu-student-class-goal')).toBeNull();
+    openMore();
+    expect(screen.getByTestId('edu-student-more')).toContainElement(screen.getByTestId('edu-student-class-goal'));
   });
 
   it('given my round, when results show, then Share is an icon beside Leave, not a row of its own', () => {
@@ -108,15 +112,16 @@ describe('EduStudentResults on a 390x844 phone', () => {
     expect(screen.getByTestId('edu-student-share')).toHaveAccessibleName('eduLiveRoom.studentResults.share');
   });
 
-  it('given a later round this session, when results show, then momentum chips replace the tomorrow line and ride in my card', () => {
+  it('given a later round this session, when results show, then momentum chips fold under More and no tomorrow line shows', () => {
     const summary = { teacherName: 'Ms Cohen', missedWords: [], lessonIds: ['l1'], lessonNames: ['Animals'], totalWords: 4, classFoundCount: 1, coverage: [], masteryByPlayer: { Maya: { found: 1, total: 4 } } };
     window.sessionStorage.setItem(sessionKeyFor(summary as never), JSON.stringify([{ score: 12, rank: 2, players: 2, sweep: false, at: 1 }]));
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
-    expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('student-outcome-delta'));
+    openMore();
+    expect(screen.getByTestId('edu-student-more')).toContainElement(screen.getByTestId('student-outcome-delta'));
     expect(screen.queryByTestId('edu-student-tomorrow')).toBeNull();
   });
 
-  it('given the lime wait card on this screen, then it says it once, without the second "stay here" line', () => {
+  it('given the slim wait bar on this screen, then it says it once, without the second "stay here" line', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.getByTestId('wait-for-teacher-message')).not.toHaveTextContent('education.results.stayInClass');
   });

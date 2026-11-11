@@ -24,7 +24,7 @@ export type JoinTargetVerdict = 'classroom' | 'game' | 'ended' | 'invalid' | 'un
 
 export interface JoinTarget {
   verdict: JoinTargetVerdict;
-  /** Classroom name, or the teacher's name for a live game. Never invented. */
+  /** The class name. Never the teacher's account name, never invented. */
   label?: string;
   classroomId?: string;
   /** Present only for a live game — the room the student walks into. */
@@ -52,20 +52,22 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
           name?: string;
           classroomId?: string;
           classroomName?: string;
-          teacherName?: string;
           gameCode?: string;
+          liveGameCode?: string | null;
         }
       | null;
 
     if (data?.kind === 'classroom') {
+      // The join route walks a class-code student into the class's running game; say so up front.
+      if (data.liveGameCode) {
+        return { verdict: 'game', label: data.name, classroomId: data.id, gameCode: data.liveGameCode };
+      }
       return { verdict: 'classroom', label: data.name, classroomId: data.id };
     }
     if (data?.kind === 'game') {
-      // A live game: prefer classroom name to show students a friendly preview,
-      // fall back to teacher name if classroom name is unavailable.
       return {
         verdict: 'game',
-        label: data.classroomName || data.teacherName,
+        label: data.classroomName || undefined,
         classroomId: data.classroomId,
         gameCode: data.gameCode ?? normalized,
       };

@@ -5,10 +5,12 @@ import { MIN_PASTED_WORDS } from '@/components/teacher/dashboard/quickLaunchInte
 export const SETUP_MIN_OWN_WORDS = MIN_PASTED_WORDS;
 
 /** The teacher's pasted words that can go on a board in the class language; duplicates are not "dropped". */
-export function readSetupWords(text: string, language: Language): { words: VocabularyWord[]; dropped: number } {
+export function readSetupWords(text: string, language: Language): { words: VocabularyWord[]; dropped: number; droppedWords: string[] } {
   const { words, rejected } = mergeWords([], parseWordPaste(text), language);
   const playable = words.filter((w) => wordIssue(w.word, language) === null);
-  return { words: playable, dropped: rejected.length + words.length - playable.length };
+  const unplayable = words.filter((w) => wordIssue(w.word, language) !== null).map((w) => w.word);
+  const droppedWords = [...rejected, ...unplayable];
+  return { words: playable, dropped: droppedWords.length, droppedWords };
 }
 
 export function usesOwnWords(words: readonly VocabularyWord[]): boolean {

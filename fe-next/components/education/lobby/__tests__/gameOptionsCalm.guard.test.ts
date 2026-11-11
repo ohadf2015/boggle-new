@@ -11,8 +11,8 @@ const OPTION_SURFACES = [
   'components/education/lobby/LobbyChoiceRow.tsx',
   'components/education/lobby/LobbyPressureDials.tsx',
   'components/education/lobby/LobbyEconomyToggles.tsx',
-  'components/education/lobby/LobbyLateJoinToggle.tsx',
-  'components/education/ClassroomBattleSettings.tsx',
+  'components/education/lobby/LobbyOptionParts.tsx',
+  'components/education/lobby/LobbyGameOptions.tsx',
   'components/education/vocabQuiz/VocabQuizFocusPicker.tsx',
   'components/education/boss/ClassroomBossPicker.tsx',
 ];

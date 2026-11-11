@@ -395,14 +395,16 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       <TvGameHeader
         compact={isClassroom}
         leading={isClassroom ? <TvRoundLabel classroom={classroomLive} t={t} /> : undefined}
-        trailing={isClassroom ? <span className="max-md:hidden"><TvFormatChip classroom={classroomLive} t={t} /></span> : undefined}
         toastSlot={isClassroom ? (
-          <TvNotificationQueue
-            notifications={notifications}
-            onDismiss={dismissNotification}
-            maxVisible={1}
-            placement="inline"
-          />
+          <div data-testid="tv-classroom-header-end" className="flex min-w-0 flex-col items-end gap-2">
+            <span className="whitespace-nowrap max-md:hidden"><TvFormatChip classroom={classroomLive} t={t} /></span>
+            <TvNotificationQueue
+              notifications={notifications}
+              onDismiss={dismissNotification}
+              maxVisible={1}
+              placement="inline"
+            />
+          </div>
         ) : undefined}
         remainingTime={remainingTime}
         timerValue={timerValue}
@@ -435,7 +437,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         <div className={isClassroom ? 'md:min-h-0 md:overflow-hidden' : 'min-h-[180px] md:min-h-0 overflow-hidden'}>
           {isClassroom ? (
             <TvClassroomStage gameMode={gameMode} grid={tableData} wheelPuzzle={wheelPuzzle} activityPanel={activityPanel} socket={socket}
-              totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} t={t} />
+              totalWords={roomWordTotal} lessonWords={lessonWords} language={roomLanguage} hostUsername={username} players={leaderboardData} t={t} />
           ) : activityPanel}
         </div>
         <div

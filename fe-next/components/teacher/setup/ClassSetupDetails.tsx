@@ -9,11 +9,12 @@ import type { StarterLessonPack } from '@/lib/education/starterLessonPacks';
 import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { languageFlag } from '@/lib/i18n/languageLabels';
-import { MascotBubble } from '../nb/MascotBubble';
 import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
 import { StarterPackRow } from './StarterPackRow';
 import { SETUP_FIELD_LABEL, SetupOwnWordsField, type SetupOwnWords } from './SetupOwnWordsField';
+import { SetupStepStrip } from './SetupStepStrip';
+import { SetupCodePreview } from './SetupCodePreview';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -42,11 +43,7 @@ export interface ClassSetupDetailsProps {
 
 const FIELD_LABEL = SETUP_FIELD_LABEL;
 
-/**
- * Name, then "Create and play". Grade, language and the first pack all have defaults, so they
- * show as stickers and open behind one dashed "Change" row instead of standing in front of the
- * teacher's first tap.
- */
+/** Name, then Create class. Grade, language and the first list have defaults, shown as stickers behind one "Change" row. */
 export function ClassSetupDetails(props: ClassSetupDetailsProps) {
   const { name, onNameChange, grade, onGradeChange, language, onLanguageChange, cap, busy, errorKey, t } = props;
   const placeholder = t(grade ? `eduShell.setup.gradeName.${grade}` : 'eduShell.setup.namePlaceholder');
@@ -62,16 +59,16 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       }}
       className="flex flex-col gap-3 sm:gap-4"
     >
-      <MascotBubble pose="setup" size={76}>{t('eduShell.setup.bubble')}</MascotBubble>
+      <div className="flex items-center justify-between gap-3">
+        <h1 data-wipe className="font-neo-display text-3xl font-black leading-none text-neo-cream sm:text-4xl">{t('eduShell.setup.title')}</h1>
+        <Link href={props.skipHref} data-testid="setup-skip" className={cn(NB_LINK, 'shrink-0')}>
+          {t('eduShell.setup.skip')}
+        </Link>
+      </div>
+      <SetupStepStrip current={0} t={t} />
+      <SetupCodePreview name={name} placeholder={placeholder} t={t} />
 
       <div className={cn(NB_PANEL, 'flex flex-col gap-3 p-3.5 sm:p-5')}>
-        <div className="flex items-center justify-between gap-3">
-          <h1 data-wipe className="font-neo-display text-3xl font-black leading-none text-neo-cream">{t('eduShell.setup.title')}</h1>
-          <Link href={props.skipHref} data-testid="setup-skip" className={cn(NB_LINK, 'shrink-0')}>
-            {t('eduShell.setup.skip')}
-          </Link>
-        </div>
-
         <div className="flex flex-col gap-1.5">
           <label htmlFor="setup-name" className={FIELD_LABEL}>
             {t('eduShell.setup.nameLabel')}
@@ -176,7 +173,6 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       <button
         type="submit"
         data-testid="setup-start-live"
-        aria-describedby="setup-start-live-hint"
         data-hero="true"
         disabled={busy !== null}
         aria-busy={busy === 'live' || undefined}
@@ -185,9 +181,6 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         {busy === 'live' ? <Loader2 className="size-6 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
         {t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createClass')}
       </button>
-      <p id="setup-start-live-hint" data-testid="setup-start-live-hint" className="-mt-1 text-center font-neo-body text-sm font-semibold text-neo-cream/80">
-        {t('eduShell.setup.words.createHint')}
-      </p>
       {props.onCreateOnly ? (
         <button
           type="button"

@@ -7,8 +7,8 @@ import { MpTrayLead } from '@/components/multiplayer/round/MpRoundTray';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHoldsWordBank } from '@/hooks/gameState/classroomContextStore';
 import { cn } from '@/lib/utils';
-import { LessonTargetStrip } from './LessonTargetStrip';
 import { buildRaceSlots } from './lessonTargets';
+import { RaceMini } from './RaceMini';
 import RivalChip from './RivalChip';
 import { useLessonClaims } from './useLessonClaims';
 
@@ -18,7 +18,7 @@ export interface ClassroomRoundDockProps {
   me: string;
 }
 
-/** Phone: duel chip + word race lead the tray under the grid; the economy keeps the tray's foot (thumb zone). */
+/** Phone: one row under the grid (rival tug + race count), the economy buttons in the thumb zone below. */
 export function ClassroomRoundDock({ gameCode, socket, me }: ClassroomRoundDockProps) {
   const { t, language } = useLanguage();
   const race = useLessonClaims();
@@ -30,10 +30,10 @@ export function ClassroomRoundDock({ gameCode, socket, me }: ClassroomRoundDockP
       <MpTrayLead>
         <div
           data-testid="classroom-round-row"
-          className="pointer-events-none flex min-w-0 items-stretch gap-1.5 px-3 empty:hidden [@container(min-height:300px)]:flex-col"
+          className="pointer-events-none flex min-w-0 items-stretch gap-1.5 px-3 empty:hidden lg:flex-col"
         >
-          <RivalChip socket={socket} className="max-w-[55%] shrink-0 [@container(min-height:300px)]:min-h-11 [@container(min-height:300px)]:max-w-full" />
-          {slots && <LessonTargetStrip slots={slots} race inline t={t} dir={language === 'he' ? 'rtl' : 'ltr'} className="min-w-0 flex-1 [@container(min-height:300px)]:min-h-11 [@container(min-height:300px)]:[&_li]:h-8 [@container(min-height:300px)]:[&_li]:text-sm" />}
+          <RivalChip socket={socket} className="flex-1" />
+          {slots && <RaceMini slots={slots} t={t} dir={language === 'he' ? 'rtl' : 'ltr'} className="overflow-hidden [@container(min-height:300px)]:min-h-14 [@container(min-height:300px)]:[&_[data-testid=lesson-target-count]]:text-base" />}
         </div>
       </MpTrayLead>
       <ClassroomStudentDock gameCode={gameCode} />

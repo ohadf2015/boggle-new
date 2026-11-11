@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, act, fireEvent, cleanup } from '@testing-library/react';
+
+const sfx = { playRareWordSound: vi.fn() };
+vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => sfx }));
 import { ingestLessonClaimsRound, ingestLessonClaim } from '../useLessonClaims';
 import { LessonClaimToast, CLAIM_TOAST_MS } from '../LessonClaimToast';
 
@@ -53,11 +56,14 @@ describe('LessonClaimToast', () => {
     expect(socket.emit).toHaveBeenCalledWith('quickReaction', { reactionId: 'fire', username: 'Dana' });
   });
 
-  it('Given a classmate claimed a word, When the toast shows, Then it sits on the HUD at the top and only its emote buttons take touches', () => {
+  it('Given a classmate claimed a word, When the toast shows, Then it slides in right under the HUD bar, never over rank or timer, and only its emote buttons take touches', () => {
     render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
     act(() => ingestLessonClaim(claim('Noa')));
     const wrapper = screen.getByTestId('lesson-claim-toast').parentElement!;
-    expect(wrapper.className).toMatch(/\bfixed\b.*\btop-0\b|\btop-0\b.*\bfixed\b/);
+    expect(wrapper.className).toMatch(/\bfixed\b/);
+    expect(wrapper.className).not.toMatch(/\btop-0\b/);
+    expect(wrapper.className).toContain('top-[calc(3.5rem+env(safe-area-inset-top))]');
+    expect(wrapper.className).toContain('lg:top-[5.5rem]');
     expect(wrapper.className).toMatch(/pointer-events-none/);
     const touchable = [...wrapper.querySelectorAll('*')].filter((el) => /pointer-events-auto/.test(el.className.toString()));
     expect(touchable).toEqual([screen.getByTestId('lesson-claim-reactions')]);
@@ -91,6 +97,18 @@ describe('LessonClaimToast', () => {
     expect(screen.queryByTestId('lesson-claim-toast')).not.toBeInTheDocument();
     act(() => ingestLessonClaim({ ...claim('Eli'), index: 1, word: 'cell' }));
     expect(screen.getByTestId('lesson-claim-toast')).toHaveTextContent('cell');
+  });
+
+  it('Given I claimed a word, When the burst shows, Then it spans the screen width under the HUD, bursts confetti, plays the rare-word sound and takes no touches', () => {
+    sfx.playRareWordSound.mockClear();
+    render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
+    act(() => ingestLessonClaim(claim('Dana')));
+    const burst = screen.getByTestId('lesson-claim-burst');
+    expect(burst.className).toMatch(/\bw-full\b/);
+    expect(burst.className).not.toMatch(/pointer-events-auto/);
+    expect(burst.querySelectorAll('[data-testid="claim-burst-piece"]').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('lesson-claim-burst-text').className).toMatch(/text-2xl/);
+    expect(sfx.playRareWordSound).toHaveBeenCalledTimes(1);
   });
 
   it('Given no race this round, When mounted, Then nothing renders', () => {
