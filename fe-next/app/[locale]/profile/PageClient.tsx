@@ -53,6 +53,10 @@ import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
 import { ProfileStyleCard } from '@/components/playerStyle/ProfileStyleCard';
 import { PlayGamesCard } from '@/components/playGames/PlayGamesCard';
 import { WordMasteryCard } from '@/components/profile/WordMasteryCard';
+import { UpNextRail } from '@/components/progression/UpNextRail';
+import { TitlePicker } from '@/components/progression/TitlePicker';
+import { RecordsGrid } from '@/components/progression/RecordsGrid';
+import { HallOfFame } from '@/components/records/HallOfFame';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
@@ -314,6 +318,15 @@ export default function ProfilePageClient(): React.JSX.Element {
       >
         {activeSection === 'overview' && (
           <>
+            <UpNextRail level={profile?.current_level} config={profile?.avatar_config} />
+            {user?.id && (
+              <TitlePicker
+                userId={user.id}
+                level={profile?.current_level ?? 1}
+                prestigeLevel={profile?.prestige_level}
+                achievementKeys={Object.keys(profile?.achievement_counts ?? {})}
+              />
+            )}
             <PinnedHighlights counts={profile?.achievement_counts} onSeeAll={() => setActiveSection('achievements')} />
             {user?.id && <SeasonRankCard playerId={user.id} />}
             {isAuthenticated && <LeagueRivalsCard />}
@@ -327,6 +340,8 @@ export default function ProfilePageClient(): React.JSX.Element {
 
         {activeSection === 'stats' && (
           <>
+            <RecordsGrid profile={profile} userId={user?.id} />
+            <HallOfFame viewerId={user?.id} />
             <ProfileStatsGrid profile={profile} isDarkMode={isDarkMode} />
             <XpByModeBreakdown xpByMode={xpByMode} delay={0.12} />
             {isAuthenticated && <ProfileRankedProgress profile={profile} isDarkMode={isDarkMode} canPlayRanked={canPlayRanked} gamesUntilRanked={gamesUntilRanked} />}

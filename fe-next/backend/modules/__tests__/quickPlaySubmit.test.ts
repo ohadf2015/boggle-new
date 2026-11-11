@@ -30,6 +30,7 @@ function makeDb() {
   chain.insert = vi.fn().mockResolvedValue({ error: null });
   chain.limit = vi.fn().mockResolvedValue({ data: historyRows, error: null });
   chain.single = vi.fn().mockResolvedValue({ data: { sum: 468 }, error: null });
+  chain.maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null });
   const rpc = vi.fn((name: string) => {
     if (name === 'quick_play_percentile_today') return Promise.resolve({ data: 73, error: null });
     return Promise.resolve({ data: null, error: null });
@@ -161,5 +162,30 @@ describe('quickPlayCoinsFor', () => {
     expect(quickPlayCoinsFor(0)).toBe(25);
     expect(quickPlayCoinsFor(68)).toBe(93);
     expect(quickPlayCoinsFor(100)).toBe(125);
+  });
+});
+
+describe('processQuickSubmit — level-ups', () => {
+  function levelDb(currentLevel: number, newLevel: number) {
+    const made = makeDb();
+    made.chain.maybeSingle = vi.fn().mockResolvedValue({ data: { current_level: currentLevel }, error: null });
+    made.rpc.mockImplementation((name: string) => {
+      if (name === 'quick_play_percentile_today') return Promise.resolve({ data: 73, error: null });
+      if (name === 'increment_player_xp') return Promise.resolve({ data: [{ new_level: newLevel, xp_granted: 40 }], error: null });
+      return Promise.resolve({ data: null, error: null });
+    });
+    return made;
+  }
+
+  it('returns the level-up when the XP crossed a level', async () => {
+    const { db } = levelDb(4, 5);
+    const out = await processQuickSubmit(db, baseInput);
+    expect(out.levelUp).toEqual({ oldLevel: 4, newLevel: 5 });
+  });
+
+  it('returns null when the level did not change', async () => {
+    const { db } = levelDb(5, 5);
+    const out = await processQuickSubmit(db, baseInput);
+    expect(out.levelUp).toBeNull();
   });
 });

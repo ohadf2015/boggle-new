@@ -10,6 +10,7 @@ import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { DEFAULT_AVATAR_CONFIG, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getStoredCustomAvatar } from '@/utils/profileStorage';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
+import { RarityChip } from '@/components/progression/RarityChip';
 import { queryKeys } from '@/lib/queryKeys';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -85,8 +86,7 @@ export default function ChestPartPrize({ drop, source, autoReveal = false }: Che
       </div>
       <div className="min-w-0 flex-1">
         <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] leading-none">
-          <span className="inline-block w-2.5 h-2.5 rotate-45 border-2 border-black" style={{ background: token.hex }} aria-hidden="true" />
-          <span style={{ color: token.hex }}>{t(token.labelKey)}</span>
+          <RarityChip rarity={drop.rarity} size="xs" />
           <span className="text-neo-white/60 truncate">· {t('avatarChest.avatarPart')}</span>
         </p>
         <p data-testid="chest-part-name" className="mt-1 font-neo-display font-black text-lg leading-tight text-neo-white truncate">

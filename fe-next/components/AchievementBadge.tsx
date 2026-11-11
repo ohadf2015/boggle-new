@@ -4,6 +4,10 @@ import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { calculateTier, getTierProgress, TIER_COLORS, TIER_ICONS, TierName, TierColors } from '../utils/achievementTiers';
 import { useLanguage } from '../contexts/LanguageContext';
+import type { VisualTier } from '@/lib/avatar/rarity';
+import { AchievementIcon } from '@/components/progression/AchievementIcon';
+import { RarityChip } from '@/components/progression/RarityChip';
+import { formatHolderPercent } from '@/components/progression/useAchievementGlobalStats';
 
 /**
  * Achievement type - supports both localized and unlocalized formats
@@ -26,6 +30,11 @@ interface AchievementBadgeProps {
   count?: number;
   showTier?: boolean;
   locked?: boolean; // If true, shows achievement as locked/not yet earned
+  /** Achievement id for its badge art when `achievement` is already localized. */
+  achievementKey?: string;
+  rarity?: VisualTier;
+  /** Share of players holding it (0-100), from the daily snapshot. */
+  globalPercent?: number;
 }
 
 /**
@@ -35,7 +44,8 @@ interface AchievementBadgeProps {
  * Memoized to prevent unnecessary re-renders in lists
  * Note: Achievements always use the user's UI language preference, not game language
  */
-export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false, locked = false }) => {
+export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, index = 0, count = 0, showTier = false, locked = false, achievementKey: keyProp, rarity, globalPercent }) => {
+  const achievementKey = keyProp ?? achievement.key;
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
@@ -131,7 +141,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 filter: locked ? 'grayscale(100%)' : undefined,
               }}
             >
-              <span className="me-1">{localizedAchievement.icon}</span>
+              <AchievementIcon achievementKey={achievementKey} emoji={localizedAchievement.icon} className="me-1" />
               {localizedAchievement.name}
             </Badge>
             {/* Lock icon for locked achievements */}
@@ -176,6 +186,16 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             )}
             <p className="font-black uppercase text-neo-white tracking-wide">{localizedAchievement.name}</p>
             <p className="text-xs font-bold text-neo-cyan mt-1">{localizedAchievement.description}</p>
+            {(rarity || globalPercent !== undefined) && (
+              <div data-testid="achievement-rarity" className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {rarity && <RarityChip rarity={rarity} size="xs" />}
+                {globalPercent !== undefined && (
+                  <span className="text-[11px] font-bold text-neo-white/80">
+                    {t('progression.achievements.holders', { percent: formatHolderPercent(globalPercent) })}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Tier progress section (only for earned achievements) */}
             {showTier && count > 0 && !locked && (

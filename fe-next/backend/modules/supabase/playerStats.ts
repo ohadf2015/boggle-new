@@ -396,6 +396,7 @@ export async function updatePlayerStats(
       totalWordsFound: updates.total_words as number,
       totalScore: updates.total_score as number,
       uniqueDaysPlayed: (updates.unique_days_played as number | undefined) || (profile.unique_days_played || 0),
+      currentLevel: newLevel,
     };
 
     // Return XP info only when database update succeeded

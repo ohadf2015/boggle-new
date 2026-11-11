@@ -1,5 +1,6 @@
 'use client';
 
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -212,7 +213,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
     wordsByPoints, sortedPointGroups, invalidWords,
     totalComboBonus, totalFireRoundBonus, botWordDetails,
     playerArchetype, missedWords,
-    soloGamesPlayed, dailyDoneEver, recordFlags,
+    soloGamesPlayed, dailyDoneEver, recordFlags, previousBestScore,
   } = useResultsData(results, t, playerAvatar, {
     difficulty,
     trackSoloRound: mode === 'solo-bots',
@@ -332,7 +333,12 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // Same components, different layout: desktop uses two-column grid via isDesktop hook.
 
   // "How am I doing?" — every game, right under the hero.
-  const progressBlock = <ProgressPulseCard snapshot={progressSnapshot} />;
+  const progressBlock = (
+    <div className="flex flex-col gap-4">
+      <ResultsSocialSlot mode="single" score={results.playerScore} previousBest={previousBestScore} />
+      <ProgressPulseCard snapshot={progressSnapshot} />
+    </div>
+  );
 
   // "What's next?" — the mode choice single player lost with its lobby.
   // "Run it back" IS the picker's same-setup option (incl. the new-player

@@ -28,8 +28,14 @@ const data: BlastResultData = {
 function makeSupabase({
   insertError = null as { code?: string; message?: string } | null,
   existingBests = null as Record<string, number> | null,
+  currentLevel = 1,
+  newLevel = 1,
 } = {}) {
-  const rpc = vi.fn().mockResolvedValue({ data: [{ xp_granted: 40 }], error: null });
+  const rpc = vi.fn(async (fn: string) =>
+    fn === 'increment_player_xp'
+      ? { data: [{ xp_granted: 40, new_level: newLevel }], error: null }
+      : { data: [], error: null },
+  );
   const from = vi.fn((table: string) => {
     if (table === 'blast_results') {
       return { insert: vi.fn().mockResolvedValue({ error: insertError }) };
@@ -43,7 +49,7 @@ function makeSupabase({
     if (table === 'profiles') {
       return {
         select: () => ({
-          eq: () => ({ single: () => Promise.resolve({ data: { total_score: 0, total_games: 0, total_words: 0 }, error: null }) }),
+          eq: () => ({ single: () => Promise.resolve({ data: { total_score: 0, total_games: 0, total_words: 0, current_level: currentLevel }, error: null }) }),
           in: () => Promise.resolve({ data: [{ id: 'rival-1', username: 'zoe', display_name: 'Zoe' }], error: null }),
         }),
         update: () => ({ eq: () => Promise.resolve({ error: null }) }),
@@ -66,6 +72,30 @@ describe('processBlastCompletion', () => {
       expect(result.body.xpAwarded).toBe(40);
       expect(result.body.percentile).toBe(42);
     }
+  });
+
+  it('beating a previous best counts a personal record server-side', async () => {
+    // Given a stored best of 300 and a run of 500
+    const supabase = makeSupabase({ existingBests: { best_score: 300, best_clear_percentage: 50, best_max_combo: 2, total_games: 3, total_words: 9 } });
+    await processBlastCompletion(data, 'u1', { supabase });
+    // Then the record counter RPC runs for the player
+    expect(supabase.rpc).toHaveBeenCalledWith('record_personal_best', { p_user_id: 'u1' });
+  });
+
+  it('a first-ever run is not a record', async () => {
+    const supabase = makeSupabase();
+    await processBlastCompletion(data, 'u1', { supabase });
+    expect(supabase.rpc).not.toHaveBeenCalledWith('record_personal_best', expect.anything());
+  });
+
+  it('returns the level-up when the XP grant crossed a level', async () => {
+    const result = await processBlastCompletion(data, 'u1', { supabase: makeSupabase({ currentLevel: 4, newLevel: 5 }) });
+    expect(result.ok && result.body.levelUp).toEqual({ oldLevel: 4, newLevel: 5 });
+  });
+
+  it('no level-up when the level did not change', async () => {
+    const result = await processBlastCompletion(data, 'u1', { supabase: makeSupabase({ currentLevel: 4, newLevel: 4 }) });
+    expect(result.ok && result.body.levelUp).toBeNull();
   });
 
   it('returns a RETRYABLE failure (status 500) on a real insert error', async () => {

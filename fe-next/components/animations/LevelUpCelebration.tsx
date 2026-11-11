@@ -9,6 +9,7 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { Star, Trophy, Crown, Sparkles } from 'lucide-react';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { TitleBadge } from '@/components/progression/TitleBadge';
 
 interface LevelUpCelebrationProps {
   /** New level reached */
@@ -24,6 +25,8 @@ interface LevelUpCelebrationProps {
     coins?: number;
     unlocks?: string[];
   };
+  /** Title unlocked by this level-up, announced under the level */
+  title?: string | null;
   /** Additional className */
   className?: string;
 }
@@ -63,6 +66,7 @@ export function LevelUpCelebration({
   onDismiss,
   autoDismissAfter = 4000,
   rewards,
+  title,
   className,
 }: LevelUpCelebrationProps) {
   const { t } = useLanguage();
@@ -221,9 +225,14 @@ export function LevelUpCelebration({
           <h2 className="text-2xl font-black text-neo-lime">
             {t('levelUp.title')}
           </h2>
-          {rewards?.coins && (
-            <p className="text-neo-white mt-2">+{rewards.coins} coins</p>
+          {title && (
+            <div className="mt-2 flex justify-center">
+              <TitleBadge title={title} size="lg" announce />
+            </div>
           )}
+          {rewards?.coins ? (
+            <p className="text-neo-white mt-2">+{rewards.coins} {t('common.coins')}</p>
+          ) : null}
         </div>
       </div>
     );
@@ -310,13 +319,19 @@ export function LevelUpCelebration({
             </h2>
 
             <p className="level-title text-neo-white text-lg mb-4">
-              {t('levelUp.reached', { level }) || `You reached level ${level}!`}
+              {t('levelUp.reached', { level })}
             </p>
+
+            {title && (
+              <div data-testid="level-up-title" className="level-title mb-4 flex justify-center">
+                <TitleBadge title={title} size="lg" announce />
+              </div>
+            )}
 
             {/* Rewards */}
             {rewards && (rewards.coins || rewards.unlocks?.length) && (
               <div className="level-rewards space-y-2">
-                {rewards.coins && (
+                {!!rewards.coins && (
                   <m.div
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-linear-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
                     animate={
@@ -365,7 +380,7 @@ export function LevelUpCelebration({
 
             {/* Celebration Mascot - appears after reveal */}
             {phase !== 'flash' && phase !== 'badge' && (
-              <div className="absolute bottom-8 right-8 sm:bottom-12 sm:right-12 pointer-events-none">
+              <div className="absolute bottom-8 end-8 sm:bottom-12 sm:end-12 pointer-events-none">
                 <CelebrationMascotWithEntrance
                   variant="celebration"
                   size="md"

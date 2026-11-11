@@ -9,12 +9,14 @@ import type { DifficultyLevel } from '@/shared/types/game';
 import { incrementSoloGamesPlayed, getSoloGamesPlayed } from '@/lib/soloGamesPlayed';
 import { getDailyDoneEver } from '@/lib/soloRotation';
 import { getHighScores, recordGameResult, rememberLongestWord } from '../highScoreManager';
-import { evaluateRoundRecords, type RoundRecordFlags } from './roundRecords';
+import { bestScoreInHistory, evaluateRoundRecords, type RoundRecordFlags } from './roundRecords';
 
 export interface SoloResultsSnapshot {
   gamesPlayed: number;
   dailyDoneEver: boolean;
   records: RoundRecordFlags;
+  /** Best score before this round was written; null when there was none. */
+  previousBestScore: number | null;
 }
 
 const SNAP_PREFIX = 'lexiclash:soloResultsSnap:v1:';
@@ -25,6 +27,7 @@ function emptySnapshot(): SoloResultsSnapshot {
     gamesPlayed: 0,
     dailyDoneEver: false,
     records: { scoreIsRecord: false, wordIsRecord: false },
+    previousBestScore: null,
   };
 }
 
@@ -41,10 +44,12 @@ export function readSoloResultsSnapshot(
   } catch {
     /* unreadable cache — recompute */
   }
+  const history = getHighScores();
   const snap: SoloResultsSnapshot = {
     gamesPlayed: getSoloGamesPlayed(),
     dailyDoneEver: getDailyDoneEver(),
-    records: evaluateRoundRecords(score, longestWord, getHighScores()),
+    records: evaluateRoundRecords(score, longestWord, history),
+    previousBestScore: bestScoreInHistory(history),
   };
   try {
     window.sessionStorage.setItem(key, JSON.stringify(snap));

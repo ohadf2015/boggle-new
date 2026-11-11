@@ -309,5 +309,6 @@ export function useResultsData(
     soloGamesPlayed: snapshot.gamesPlayed,
     dailyDoneEver: snapshot.dailyDoneEver,
     recordFlags: snapshot.records,
+    previousBestScore: snapshot.previousBestScore ?? null,
   };
 }

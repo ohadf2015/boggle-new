@@ -85,6 +85,8 @@ import MpResultsScreen from '../MpResultsScreen';
 import { useGameStore } from '@/hooks/gameState/store';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 type Socket = { emit: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; off: ReturnType<typeof vi.fn> };
 
 const SCORES = [

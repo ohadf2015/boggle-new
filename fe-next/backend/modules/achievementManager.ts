@@ -7,6 +7,7 @@ import type { Game, WordDetail } from '@/shared/types/game';
 import type { Language } from '@/types';
 import { getCachedTranslation } from '../../translations/loadTranslation';
 import logger from '../utils/logger';
+import { PROGRESSION_ACHIEVEMENT_ICONS, progressionAchievementsFor } from './achievements/progressionAchievements';
 import { hasNoVowels, hasAllVowels, isQWithoutU, isLongIsogram, LEVIATHAN_MIN_LENGTH } from './achievements/wordFeats';
 
 // Achievement icons (language-independent)
@@ -71,6 +72,8 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   LEVIATHAN: '🐋',            // A monster 12+ letter word
   NO_REPEATS: '🔷',           // An 8+ letter isogram (every letter distinct)
   FLAWLESS_VICTORY: '🛡️',     // Won a game without a single invalid submission
+
+  ...PROGRESSION_ACHIEVEMENT_ICONS,
 };
 
 export interface Achievement {
@@ -90,6 +93,7 @@ export interface UserStats {
   totalWordsFound?: number;
   totalScore?: number;
   uniqueDaysPlayed?: number;
+  currentLevel?: number;
 }
 
 export interface LifetimeThreshold {
@@ -726,6 +730,8 @@ export function checkLifetimeAchievements(
       addIfNew('LOYAL_PLAYER');
     }
   }
+
+  for (const key of progressionAchievementsFor(userStats, existing)) addIfNew(key);
 
   if (newAchievements.length > 0) {
     logger.debug('ACHIEVEMENT', `Lifetime achievements earned: ${newAchievements.map(a => a.key).join(', ')}`);

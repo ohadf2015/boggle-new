@@ -54,6 +54,10 @@ vi.mock('@/utils/supabase/server', () => ({
   }),
 }));
 
+const recordPersonalBest = vi.hoisted(() => vi.fn(async () => []));
+vi.mock('@/backend/modules/achievements/grantAchievements', () => ({ recordPersonalBest }));
+vi.mock('@/lib/email', () => ({ getSupabaseAdmin: () => ({ rpc: vi.fn() }) }));
+
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
@@ -183,5 +187,41 @@ describe('POST /api/stats/record-game', () => {
 
     const result = await POST(makeRequest(validBody));
     expect(result.status).toBe(429);
+  });
+});
+
+describe('POST /api/stats/record-game — personal records', () => {
+  it('a longer longest word than the stored one counts a record', async () => {
+    // Given a stored longest word of 5 letters and a 7-letter word this game
+    await POST(makeRequest(validBody));
+    // Then the record counter runs for the player
+    expect(recordPersonalBest).toHaveBeenCalledWith(expect.anything(), 'user-123');
+  });
+
+  it('a first-ever longest word is not a record', async () => {
+    mockSingle.mockResolvedValue({ data: { ...mockProfile, longest_word: null, longest_word_length: 0 }, error: null });
+    await POST(makeRequest(validBody));
+    expect(recordPersonalBest).not.toHaveBeenCalled();
+  });
+
+  it('counts the record after the lifetime achievements write, so that write cannot erase it', async () => {
+    // Given a game that both beats the longest word and earns a lifetime milestone
+    mockSingle.mockResolvedValue({ data: { ...mockProfile, total_games: 49, achievement_counts: {} }, error: null });
+    const order: string[] = [];
+    mockUpdate.mockImplementation((u: Record<string, unknown>) => {
+      if (u.achievement_counts) order.push('achievement_counts');
+    });
+    recordPersonalBest.mockImplementation(async () => {
+      order.push('record');
+      return [];
+    });
+    await POST(makeRequest(validBody));
+    // Then the record RPC runs last
+    expect(order).toEqual(['achievement_counts', 'record']);
+  });
+
+  it('a shorter word is not a record', async () => {
+    await POST(makeRequest({ ...validBody, longestWord: 'CAT' }));
+    expect(recordPersonalBest).not.toHaveBeenCalled();
   });
 });

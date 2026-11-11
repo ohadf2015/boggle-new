@@ -6395,6 +6395,27 @@ const es = {
     }
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"Récord mundial","description":"Ten un récord mundial en cualquier modo"},
+    "RIVALRY_FIRST_WIN": {"name":"Primera revancha","description":"Vence a tu rival por primera vez"},
+    "RIVALRY_5_WINS": {"name":"Cazador de rivales","description":"Vence a tu rival 5 veces"},
+    "RIVALRY_25_WINS": {"name":"Némesis","description":"Vence a tu rival 25 veces"},
+    "PING_FIRST": {"name":"Que empiece el juego","description":"Envía tu primer aviso a un rival"},
+    "PING_25": {"name":"Picante","description":"Envía 25 avisos a rivales"},
+    "REMATCH_10": {"name":"Otra más","description":"Juega contra el mismo rival 10 veces más"},
+    "RECORD_FIRST": {"name":"Marca personal","description":"Supera tu mejor puntuación en Blast o tu palabra más larga"},
+    "RECORD_10": {"name":"Rompe-récords","description":"Supera tu propio récord 10 veces"},
+    "FIRST_FRIEND": {"name":"Primer amigo","description":"Añade a tu primer amigo"},
+    "FRIENDS_5": {"name":"Alma de la fiesta","description":"Ten 5 amigos"},
+    "LEVEL_5": {"name":"Brote","description":"Llega al nivel 5"},
+    "LEVEL_10": {"name":"Creciendo","description":"Llega al nivel 10"},
+    "LEVEL_25": {"name":"Raíces profundas","description":"Llega al nivel 25"},
+    "LEVEL_50": {"name":"La cima","description":"Llega al nivel 50"},
+    "LEVEL_75": {"name":"Núcleo fundido","description":"Llega al nivel 75"},
+    "LEVEL_100": {"name":"Estrella fugaz","description":"Llega al nivel 100"},
+    "TITLE_PICKED": {"name":"Etiqueta","description":"Elige un título para tu perfil"},
+    "DAILY_TOP3": {"name":"Podio","description":"Termina entre los 3 primeros del diario"},
+    "DAILY_BOARD_STREAK_7": {"name":"Una semana en la tabla","description":"Entra en la tabla diaria 7 días seguidos"},
+    "DAILY_BOARD_STREAK_30": {"name":"Fijo del diario","description":"Entra en la tabla diaria 30 días seguidos"},
     "wordcraft_first_word": {
       "name": "Primera palabra",
       "description": "Juega tu primera palabra en Word Craft"
@@ -22791,8 +22812,178 @@ const es = {
     "proDepth": "Progreso semana a semana · Exportar todas las clases · Informes para familias",
     "schoolQuote": "¿Compras para tu colegio? Pide un presupuesto",
     "noWords": "En esta ronda no había palabras de la lección que revisar."
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "De tus amigos",
+      "playedTogether": "Jugaron juntos {count} veces",
+      "friendOfFriend": "Amigo de un amigo",
+      "sameCountry": "También de {country}",
+      "closeScore": "Juega a tu nivel",
+      "closeRecord": "Mano a mano"
+    },
+    "beatBy": "Supera a {name} por {gap}",
+    "youBeat": "¡Le ganaste a {name}!",
+    "yourRival": "Tu rival: {name}",
+    "selfChase": "{gap} más y superas tu récord",
+    "selfBeat": "¡Nuevo récord personal!",
+    "yourBest": "Tu récord",
+    "pingedYou": "Te retó",
+    "wins": "{count} G",
+    "losses": "{count} P",
+    "draws": "{count} E"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "Elige un nombre para salir en la tabla y tener un rival",
+    "tryThis": "Prueba con:",
+    "placeholder": "Tu nombre",
+    "save": "Guardar",
+    "saveFailed": "No pudimos guardar tu nombre. Inténtalo otra vez.",
+    "onlyYouSeeRow": "Solo tú ves esto. Elige un nombre para aparecer",
+    "error": {
+      "empty": "Primero escribe un nombre",
+      "placeholder": "Ese nombre es automático. Elige uno tuyo",
+      "default": "Muchos jugadores tienen ese nombre. Elige uno tuyo",
+      "profane": "Ese nombre no está permitido. Prueba otro"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "A ver qué tienes",
+      "beat_you": "Esta vez te gané",
+      "rematch": "¿Revancha?",
+      "gg": "GG, bien jugado",
+      "close_one": "¡Estuvo reñido!",
+      "your_turn": "Te toca",
+      "nice_word": "Qué palabra, respeto",
+      "see_you_tomorrow": "Nos vemos mañana"
+    },
+    "button": "Toque",
+    "buttonLabel": "Mandarle un toque a {name}",
+    "pickerTitle": "Toque para {name}",
+    "sent": "¡Enviado!",
+    "more": "Más opciones",
+    "block": "Bloquear a {name}",
+    "report": "Denunciar",
+    "reported": "Gracias, lo revisaremos",
+    "signIn": "Crear cuenta",
+    "error": {
+      "sign_in_required": "Crea una cuenta para mandar toques a tus rivales",
+      "not_allowed": "No puedes mandarle un toque a este jugador",
+      "blocked": "Bloqueaste a este jugador",
+      "name_required": "Elige primero un nombre de jugador, así sabrán quién los reta",
+      "daily_limit": "Ya usaste tus 3 toques de hoy. Mañana hay más",
+      "target_cooldown": "Ya le mandaste un toque. Espera unas horas",
+      "not_found": "Este jugador ya no está",
+      "unavailable": "No se pudo enviar. Inténtalo de nuevo"
+    },
+    "toast": {
+      "title": "{name} te mandó un toque",
+      "pingBack": "Devolver toque",
+      "play": "Jugar",
+      "close": "Cerrar",
+      "region": "Toque de un rival"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "¡Nuevo récord!",
+      "beatPrevious": "{value} — tu mejor marca era {previous}",
+      "title": "Tus récords",
+      "empty": "Aún no tienes récords. Juega una partida y marca el primero.",
+      "upFrom": "antes {previous}",
+      "keys": {
+        "longestWord": "Palabra más larga",
+        "singleBest": "Mejor en solitario",
+        "quickPlayBest": "Mejor en Partida rápida",
+        "blastBest": "Mejor en Blast",
+        "towerBestM": "Torre más alta (m)",
+        "wordCraftBest": "Mejor en Word Craft",
+        "dailyStreakBest": "Racha diaria más larga",
+        "mpBestStreak": "Más victorias seguidas",
+        "multiplayerBest": "Mejor puntuación multijugador"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "Inicia sesión para empezar a desbloquear objetos de avatar",
+      "levelPath": "Nv {from} → Nv {to}",
+      "unlocksItem": "desbloquea {item}",
+      "xpToGo": "faltan {xp} XP",
+      "upNext": "Lo próximo",
+      "atLevel": "Nv {level}"
+    },
+    "titles": {
+      "newTitle": "Nuevo título",
+      "pickerTitle": "Tu título",
+      "auto": "Auto",
+      "saveFailed": "No se pudo guardar tu título. Inténtalo de nuevo.",
+      "loadFailed": "No se pudieron cargar los títulos. Toca para reintentar.",
+      "nextAt": "El Nv {level} desbloquea {title}",
+      "NEMESIS": "Némesis",
+      "RECORD_BREAKER": "Rompe-récords",
+      "SOCIAL_BUTTERFLY": "Alma de la fiesta",
+      "DAILY_REGULAR": "Fijo del diario",
+      "ASCENDED_ONE": "El Ascendido",
+      "TWICE_RISEN": "Dos veces alzado",
+      "THRICE_BLESSED": "Tres veces bendecido",
+      "ETERNAL_WARRIOR": "Guerrero eterno",
+      "LEXICON_IMMORTAL": "Inmortal del léxico"
+    },
+    "achievements": {
+      "holders": "Lo tiene el {percent}% de los jugadores"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "Récords",
+    "metres": "{value} m",
+    "chip": {
+      "holder": "Récord mundial: {name} · {score}",
+      "gap": "Te faltan {gap} para batirlo",
+      "newRecord": "¡Nuevo récord mundial!",
+      "youHold": "El récord mundial es tuyo · {score}",
+      "claimSignIn": "Inicia sesión para quedarte con el récord.",
+      "claimName": "Elige un nombre de verdad para quedarte con el récord."
+    },
+    "crown": {
+      "label": "Récords mundiales: {count}"
+    },
+    "hallOfFame": {
+      "title": "Salón de la Fama",
+      "subtitle": "La mejor puntuación de la historia en cada juego",
+      "since": "Desde el {date}",
+      "yours": "Tuyo",
+      "empty": "Aún no hay récords. El primero está libre.",
+      "error": "No pudimos cargar los récords.",
+      "retry": "Reintentar"
+    },
+    "modes": {
+      "mp_classic": "Multijugador · Clásico",
+      "mp_word_hunt": "Multijugador · Caza de Palabras",
+      "mp_wheel_rush": "Multijugador · Carrera de Ruleta",
+      "mp_blast": "Multijugador · Blast",
+      "qp_classic": "Partida rápida · Clásico",
+      "qp_word_hunt": "Partida rápida · Caza de Palabras",
+      "qp_wheel_rush": "Partida rápida · Carrera de Ruleta",
+      "qp_blast": "Partida rápida · Blast",
+      "daily_word_hunt": "Caza de Palabras diaria",
+      "daily_word_wheel": "Rueda de palabras diaria",
+      "daily_connections": "Puente de palabras diario",
+      "blast": "Blast",
+      "tower": "Torre de Palabras",
+      "single": "Solo"
+    }
+  }
+  // @worldRecords:end
 };
 
 export { es };

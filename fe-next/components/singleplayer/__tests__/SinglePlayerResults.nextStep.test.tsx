@@ -4,6 +4,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import SinglePlayerResults from '../SinglePlayerResults';
 
+vi.mock('@/components/results/ResultsSocialSlot', () => ({ ResultsSocialSlot: () => null }));
+
 // Track navigation
 const mockRouterPush = vi.fn();
 

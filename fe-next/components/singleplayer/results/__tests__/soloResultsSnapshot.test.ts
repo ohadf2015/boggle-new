@@ -38,6 +38,8 @@ describe('solo results snapshot', () => {
     });
     const next = readSoloResultsSnapshot('s2', 40, 'planet');
     expect(next.gamesPlayed).toBe(1);
+    expect(next.previousBestScore).toBe(40);
+    expect(readSoloResultsSnapshot('s1', 40, 'planet').previousBestScore).toBeNull();
     expect(next.records).toEqual({ scoreIsRecord: false, wordIsRecord: false });
     const better = readSoloResultsSnapshot('s3', 50, 'planets');
     expect(better.records).toEqual({ scoreIsRecord: true, wordIsRecord: true });

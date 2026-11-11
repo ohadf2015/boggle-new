@@ -14,6 +14,7 @@ import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { neoInfoToast } from '@/components/NeoToast';
+import { announceLevelUp } from '@/lib/levelUp/levelUpBus';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
 import type { OneMoreGamePrompt } from '@/shared/types/engagement';
@@ -154,6 +155,7 @@ export function useResultsSocketEvents({
       if (hasShownLevelUpRef.current) return;
       hasShownLevelUpRef.current = true;
       logger.log('[RESULTS] Level up!', data);
+      announceLevelUp(data, 'multiplayer');
       setLevelUpData(data);
       setShowLevelUpCelebration(true);
     };

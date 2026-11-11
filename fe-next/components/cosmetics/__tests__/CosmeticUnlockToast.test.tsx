@@ -35,9 +35,9 @@ describe('CosmeticUnlockToast', () => {
     expect(screen.getByText('cosmetics.equipCta')).toBeInTheDocument();
   });
 
-  it('renders a rarity badge for the cosmetic', () => {
+  it('renders the shared rarity label for the cosmetic', () => {
     renderToast();
-    expect(screen.getByText(`cosmetics.rarity.${cosmetic.rarity}`)).toBeInTheDocument();
+    expect(screen.getByText(`avatarBuilder.tiers.${cosmetic.rarity}`)).toBeInTheDocument();
   });
 
   it('deep-links the whole capsule to the cosmetics collection', () => {

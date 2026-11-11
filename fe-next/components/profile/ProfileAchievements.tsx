@@ -11,6 +11,8 @@ import {
 } from '@/utils/achievementTiers';
 import { ACHIEVEMENT_ICONS, getAchievementIcon } from '@/constants/achievementIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getAchievementRarity } from '@/lib/progression/artManifest';
+import { useAchievementGlobalStats } from '@/components/progression/useAchievementGlobalStats';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 interface Achievement {
@@ -31,6 +33,7 @@ export function ProfileAchievements({
   delay = 0.3
 }: ProfileAchievementsProps): React.ReactNode {
   const { t } = useLanguage();
+  const holderPercents = useAchievementGlobalStats();
 
   const earnedCounts = profile?.achievement_counts || {};
   const allAchievementKeys = Object.keys(ACHIEVEMENT_ICONS);
@@ -79,6 +82,9 @@ export function ProfileAchievements({
         count={count}
         showTier={true}
         locked={locked}
+        achievementKey={key}
+        rarity={getAchievementRarity(key)}
+        globalPercent={holderPercents[key]}
       />
     );
   };

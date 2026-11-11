@@ -72,21 +72,42 @@ describe('mergeDailyLeaderboard', () => {
     expect(entries.map((e) => e.name)).toEqual(['Signed in', 'Zigzag']);
   });
 
-  it('never shows a Player_<hex> placeholder: unnamed players get a readable, localized stand-in', () => {
-    const entries = mergeDailyLeaderboard([
+  describe('names that are not public', () => {
+    const board: MergeInput[] = [
       { mode: 'word-hunt', rows: [
         { player_id: 'p1', display_name: 'Player_9ed33e25', language: 'he', value: 700 },
-        { guest_fingerprint: 'g1', display_name: 'Guest', value: 650 },
-        { player_id: 'p2', display_name: null, value: 600 },
+        { guest_fingerprint: 'g1', display_name: 'Sneaky Potato', value: 650 },
+        { player_id: 'p2', display_name: 'shit', value: 620 },
+        { player_id: 'p3', display_name: 'Zigzag', value: 600 },
       ] },
-    ]);
-    const names = entries.map((e) => e.name);
-    for (const n of names) {
-      expect(n).not.toMatch(/^(player[_-]|guest$)/i);
-      expect(n.length).toBeGreaterThan(1);
-    }
-    expect(names[0]).toMatch(/[\u0590-\u05FF]/);
-    expect(new Set(names).size).toBe(3);
+    ];
+
+    it('hides placeholder, default and profane names from other viewers and ranks the rest without a gap', () => {
+      const rows = mergeDailyLeaderboard(board, 10);
+      expect(rows.map((r) => [r.rank, r.name])).toEqual([[1, 'Zigzag']]);
+      expect(viewDailyBoard(rankDailyBoard(board)).total).toBe(1);
+    });
+
+    it('still shows the owner their own hidden row at its rank, with a readable stand-in and a name prompt', () => {
+      const rows = mergeDailyLeaderboard(board, 10, { you: 'u:p1' });
+      expect(rows).toHaveLength(2);
+      const mine = rows.find((r) => r.isYou)!;
+      expect(mine.rank).toBe(1);
+      expect(mine.needsPublicName).toBe(true);
+      expect(mine.name).not.toMatch(/^player[_-]/i);
+      expect(mine.name).toMatch(/[\u0590-\u05FF]/);
+      expect(rows.find((r) => r.name === 'Zigzag')!.rank).toBe(2);
+    });
+
+    it('does not flag a public row as needing a name', () => {
+      const rows = mergeDailyLeaderboard(board, 10, { you: 'u:p3' });
+      expect(rows.find((r) => r.isYou)!.needsPublicName).toBeUndefined();
+    });
+
+    it('hides a friend whose name is not public', () => {
+      const view = viewDailyBoard(rankDailyBoard(board), { friendIds: new Set(['u:p2']) });
+      expect(view.data.map((r) => r.name)).toEqual(['Zigzag']);
+    });
   });
 
   it('drops a row with no identity rather than inventing a shared player', () => {

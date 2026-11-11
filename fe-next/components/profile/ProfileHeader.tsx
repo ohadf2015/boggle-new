@@ -22,6 +22,10 @@ import { scoreTier } from '@/lib/seasons/scoreTier';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import { getCollectionProgress } from '@/lib/avatar/unlocks';
 import { cn } from '@/lib/utils';
+import { TitleBadge } from '@/components/progression/TitleBadge';
+import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
+import { useChosenTitle } from '@/components/progression/useChosenTitle';
+import { resolveDisplayTitle } from '@/lib/titles/playerTitles';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { ShowcaseStage } from '@/components/profile/showcase/ShowcaseStage';
@@ -84,6 +88,7 @@ export function ProfileHeader({
   const { streak: streakDays } = useEngagementStatus();
 
   const { name, isPlaceholder } = friendlyDisplayName(profile?.display_name, profile?.username);
+  const chosenTitle = useChosenTitle(profile?.id);
   const share = useShareProfile({ username: profile?.username, name, isOwn: true });
 
   // updateProfile RETURNS { error } (never throws); surface it so the catch runs.
@@ -240,7 +245,15 @@ export function ProfileHeader({
         config={profile?.avatar_config}
         name={name}
         isPlaceholderName={isPlaceholder}
-        countryNode={countryNode}
+        countryNode={
+          <span className="inline-flex min-w-0 items-center gap-1.5">
+            <RecordHolderCrown userId={profile?.id} />
+            {(chosenTitle.status === 'ready' || chosenTitle.status === 'error') && (
+              <TitleBadge title={resolveDisplayTitle({ chosenTitle: chosenTitle.title, level })} />
+            )}
+            {countryNode}
+          </span>
+        }
         nameEditor={nameEditor}
         level={level}
         levelPercent={xp.progressPercent}

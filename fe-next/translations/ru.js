@@ -13187,6 +13187,27 @@ const ru = {
     }
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"Мировой рекорд","description":"Держи мировой рекорд в любом режиме"},
+    "RIVALRY_FIRST_WIN": {"name":"Первая победа","description":"Обыграй соперника в первый раз"},
+    "RIVALRY_5_WINS": {"name":"Охотник на соперников","description":"Обыграй соперника 5 раз"},
+    "RIVALRY_25_WINS": {"name":"Немезида","description":"Обыграй соперника 25 раз"},
+    "PING_FIRST": {"name":"Вызов брошен","description":"Отправь сопернику первый вызов"},
+    "PING_25": {"name":"Мастер подколов","description":"Отправь соперникам 25 вызовов"},
+    "REMATCH_10": {"name":"Ещё разок","description":"Сыграй с тем же соперником ещё 10 раз"},
+    "RECORD_FIRST": {"name":"Личный рекорд","description":"Побей свой рекорд в Blast или самое длинное слово"},
+    "RECORD_10": {"name":"Рекордсмен","description":"Побей собственный рекорд 10 раз"},
+    "FIRST_FRIEND": {"name":"Первый друг","description":"Добавь первого друга"},
+    "FRIENDS_5": {"name":"Душа компании","description":"Заведи 5 друзей"},
+    "LEVEL_5": {"name":"Росток","description":"Достигни 5-го уровня"},
+    "LEVEL_10": {"name":"Набираю силу","description":"Достигни 10-го уровня"},
+    "LEVEL_25": {"name":"Глубокие корни","description":"Достигни 25-го уровня"},
+    "LEVEL_50": {"name":"Вершина","description":"Достигни 50-го уровня"},
+    "LEVEL_75": {"name":"Раскалённое ядро","description":"Достигни 75-го уровня"},
+    "LEVEL_100": {"name":"Падающая звезда","description":"Достигни 100-го уровня"},
+    "TITLE_PICKED": {"name":"Бейджик","description":"Выбери титул для профиля"},
+    "DAILY_TOP3": {"name":"Пьедестал","description":"Войди в топ-3 дневной таблицы"},
+    "DAILY_BOARD_STREAK_7": {"name":"Неделя в таблице","description":"Попадай в дневную таблицу 7 дней подряд"},
+    "DAILY_BOARD_STREAK_30": {"name":"Завсегдатай дня","description":"Попадай в дневную таблицу 30 дней подряд"},
     "wordcraft_first_word": {
       "name": "Первое слово",
       "description": "Выложи первое слово в Word Craft"
@@ -22479,8 +22500,178 @@ const ru = {
     "proDepth": "Прогресс по неделям · Экспорт всех классов · Отчёты для родителей",
     "schoolQuote": "Покупаете для всей школы? Запросите цену",
     "noWords": "В этом раунде не было слов из урока для проверки."
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "Твой друг",
+      "playedTogether": "Играли вместе {count} раз",
+      "friendOfFriend": "Друг твоего друга",
+      "sameCountry": "Тоже из страны {country}",
+      "closeScore": "Играет на твоём уровне",
+      "closeRecord": "Ноздря в ноздрю"
+    },
+    "beatBy": "Обгони {name} на {gap}",
+    "youBeat": "Ты обыграл {name}!",
+    "yourRival": "Твой соперник: {name}",
+    "selfChase": "Ещё {gap} до личного рекорда",
+    "selfBeat": "Новый личный рекорд!",
+    "yourBest": "Твой рекорд",
+    "pingedYou": "Бросил тебе вызов",
+    "wins": "{count} В",
+    "losses": "{count} П",
+    "draws": "{count} Н"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "Выбери имя, чтобы попасть в таблицу и получить соперника",
+    "tryThis": "Как насчёт:",
+    "placeholder": "Твоё имя",
+    "save": "Сохранить",
+    "saveFailed": "Не удалось сохранить имя. Попробуй ещё раз.",
+    "onlyYouSeeRow": "Это видишь только ты. Выбери имя, чтобы появиться",
+    "error": {
+      "empty": "Сначала введи имя",
+      "placeholder": "Это автоматическое имя. Выбери своё",
+      "default": "Так зовут много игроков. Выбери своё",
+      "profane": "Это имя нельзя использовать. Попробуй другое"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "Ну давай, покажи, что умеешь",
+      "beat_you": "В этот раз победа моя",
+      "rematch": "Реванш?",
+      "gg": "GG, хорошая игра",
+      "close_one": "Было близко!",
+      "your_turn": "Твой ход",
+      "nice_word": "Классное слово, уважаю",
+      "see_you_tomorrow": "До завтра"
+    },
+    "button": "Пинг",
+    "buttonLabel": "Отправить пинг игроку {name}",
+    "pickerTitle": "Пинг для {name}",
+    "sent": "Отправлено!",
+    "more": "Ещё",
+    "block": "Заблокировать {name}",
+    "report": "Пожаловаться",
+    "reported": "Спасибо, мы проверим",
+    "signIn": "Зарегистрироваться",
+    "error": {
+      "sign_in_required": "Зарегистрируйся, чтобы пинговать соперников",
+      "not_allowed": "Этому игроку нельзя отправить пинг",
+      "blocked": "Этот игрок у тебя в блоке",
+      "name_required": "Сначала выбери имя игрока, чтобы было понятно, кто бросает вызов",
+      "daily_limit": "На сегодня 3 пинга уже отправлены. Завтра будут новые",
+      "target_cooldown": "Пинг уже отправлен. Попробуй через несколько часов",
+      "not_found": "Этого игрока больше нет",
+      "unavailable": "Не получилось отправить. Попробуй ещё раз"
+    },
+    "toast": {
+      "title": "{name} шлёт тебе пинг",
+      "pingBack": "Ответить пингом",
+      "play": "Играть",
+      "close": "Закрыть",
+      "region": "Пинг от соперника"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "Новый рекорд!",
+      "beatPrevious": "{value} — прошлый рекорд был {previous}",
+      "title": "Твои рекорды",
+      "empty": "Рекордов пока нет. Сыграй раунд и поставь первый.",
+      "upFrom": "было {previous}",
+      "keys": {
+        "longestWord": "Самое длинное слово",
+        "singleBest": "Лучшее соло",
+        "quickPlayBest": "Лучшее в быстрой игре",
+        "blastBest": "Лучшее в Blast",
+        "towerBestM": "Самая высокая башня (м)",
+        "wordCraftBest": "Лучшее в Word Craft",
+        "dailyStreakBest": "Самая длинная серия дней",
+        "mpBestStreak": "Больше всего побед подряд",
+        "multiplayerBest": "Лучший счёт в мультиплеере"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "Войди, чтобы открывать вещи для аватара",
+      "levelPath": "Ур. {from} → Ур. {to}",
+      "unlocksItem": "откроет: {item}",
+      "xpToGo": "ещё {xp} XP",
+      "upNext": "Дальше",
+      "atLevel": "Ур. {level}"
+    },
+    "titles": {
+      "newTitle": "Новый титул",
+      "pickerTitle": "Твой титул",
+      "auto": "Авто",
+      "saveFailed": "Не удалось сохранить титул. Попробуй ещё раз.",
+      "loadFailed": "Не удалось загрузить титулы. Нажми, чтобы повторить.",
+      "nextAt": "Ур. {level} откроет «{title}»",
+      "NEMESIS": "Немезида",
+      "RECORD_BREAKER": "Рекордсмен",
+      "SOCIAL_BUTTERFLY": "Душа компании",
+      "DAILY_REGULAR": "Завсегдатай дня",
+      "ASCENDED_ONE": "Вознёсшийся",
+      "TWICE_RISEN": "Дважды восставший",
+      "THRICE_BLESSED": "Трижды благословлённый",
+      "ETERNAL_WARRIOR": "Вечный воин",
+      "LEXICON_IMMORTAL": "Бессмертный лексикона"
+    },
+    "achievements": {
+      "holders": "Есть у {percent}% игроков"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "Рекорды",
+    "metres": "{value} м",
+    "chip": {
+      "holder": "Мировой рекорд: {name} · {score}",
+      "gap": "Ещё {gap}, и рекорд твой",
+      "newRecord": "Новый мировой рекорд!",
+      "youHold": "Мировой рекорд у тебя · {score}",
+      "claimSignIn": "Войди, чтобы рекорд стал твоим.",
+      "claimName": "Выбери настоящее имя, чтобы рекорд стал твоим."
+    },
+    "crown": {
+      "label": "Мировых рекордов: {count}"
+    },
+    "hallOfFame": {
+      "title": "Зал славы",
+      "subtitle": "Лучший результат за всё время в каждой игре",
+      "since": "Держится с {date}",
+      "yours": "Твой",
+      "empty": "Рекордов пока нет. Первый может стать твоим.",
+      "error": "Не удалось загрузить рекорды.",
+      "retry": "Ещё раз"
+    },
+    "modes": {
+      "mp_classic": "Мультиплеер · Классика",
+      "mp_word_hunt": "Мультиплеер · Охота за словами",
+      "mp_wheel_rush": "Мультиплеер · Гонка колеса",
+      "mp_blast": "Мультиплеер · Молния",
+      "qp_classic": "Быстрая игра · Классика",
+      "qp_word_hunt": "Быстрая игра · Охота за словами",
+      "qp_wheel_rush": "Быстрая игра · Гонка колеса",
+      "qp_blast": "Быстрая игра · Молния",
+      "daily_word_hunt": "Ежедневная охота за словами",
+      "daily_word_wheel": "Ежедневное колесо слов",
+      "daily_connections": "Ежедневный мост слов",
+      "blast": "Молния",
+      "tower": "Башня слов",
+      "single": "Соло"
+    }
+  }
+  // @worldRecords:end
 };
 
 export { ru };

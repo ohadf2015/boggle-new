@@ -13,6 +13,7 @@ describe('consumer-only mounts stay off the classroom product', () => {
     'UnlockNotifierMount',
     'GlobalCoinEarnFx',
     'HiddenAchievementListener',
+    'IncomingPingToast',
   ])('%s mounts only on game pages', (widget) => {
     expect(providers).toMatch(new RegExp(`\\{gameSurface && <${widget} />\\}`));
     expect(providers.match(new RegExp(`<${widget}\\b`, 'g'))).toHaveLength(1);

@@ -15,6 +15,8 @@ import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
 import { getDailyLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import type { RankMovement } from './leaderboardLive';
 import { MODE_DOT } from './leaderboardRows';
+import { TitleBadge } from '@/components/progression/TitleBadge';
+import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
 import type { DailyParticipant, AllTimeParticipant, SeasonParticipant, T } from './leaderboardTypes';
 
 /* The board card is always navy, so rows are dark-only (no light/dark pairs that
@@ -88,6 +90,8 @@ interface ShellPerson {
   country_code?: string | null;
   is_friend?: boolean;
   is_member?: boolean;
+  needs_public_name?: boolean;
+  title?: string | null;
 }
 
 /**
@@ -167,9 +171,16 @@ function RowShell({
               {name}
             </span>
           </PlayerProfileTooltip>
+          {person.player_id && <RecordHolderCrown userId={person.player_id} />}
+          <TitleBadge title={person.title} className="min-w-0 max-w-[40%] shrink" />
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black border border-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
               {t('wordHunt.leaderboard.you')}
+            </span>
+          )}
+          {isCurrentUser && person.needs_public_name && (
+            <span data-testid="needs-public-name" className="text-[10px] sm:text-xs bg-neo-yellow text-neo-black border border-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
+              {t('publicName.onlyYouSeeRow')}
             </span>
           )}
           {badges}

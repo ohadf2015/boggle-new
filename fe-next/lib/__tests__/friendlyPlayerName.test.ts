@@ -32,3 +32,17 @@ describe('shownPlayerName', () => {
     expect(new Set(names).size).toBe(10);
   });
 });
+
+describe('shownPlayerName never shows a profane chosen name', () => {
+  it('Given a profane display name and username, Then the stand-in is shown', async () => {
+    const { shownPlayerName } = await import('../friendlyPlayerName');
+    const name = shownPlayerName({ id: 'u1', display_name: 'shit', username: 'shit' });
+    expect(name).not.toBe('shit');
+    expect(name.length).toBeGreaterThan(1);
+  });
+
+  it('Given a profane display name but a clean username, Then the username is shown', async () => {
+    const { shownPlayerName } = await import('../friendlyPlayerName');
+    expect(shownPlayerName({ id: 'u1', display_name: 'shit', username: 'Zigzag' })).toBe('Zigzag');
+  });
+});

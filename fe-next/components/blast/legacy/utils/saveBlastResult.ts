@@ -1,5 +1,6 @@
 import type { BlastResultsData } from '../types';
 import { postWithAuth } from '@/utils/authFetch';
+import { announceLevelUp } from '@/lib/levelUp/levelUpBus';
 
 /**
  * Subset of the /api/blast/result response the UI cares about for result-screen enrichment.
@@ -96,7 +97,9 @@ export async function saveBlastResult(
       previousRank?: number | null;
       totalPlayers?: number | null;
       rival?: { name: string; score: number } | null;
+      levelUp?: { oldLevel: number; newLevel: number } | null;
     };
+    if (body.levelUp) announceLevelUp(body.levelUp, 'blast');
 
     return {
       percentile: body.percentile ?? undefined,

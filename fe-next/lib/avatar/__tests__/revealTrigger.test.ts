@@ -176,3 +176,20 @@ describe('part names', () => {
     expect(new Set(vals).size).toBeGreaterThanOrEqual(5);
   });
 });
+
+describe('publishLevelUp announces every level-up, not only ones that grant parts', () => {
+  it('a level with no new part still reaches the level-up bus', async () => {
+    const { getPendingLevelUp, __resetLevelUpBusForTests } = await import('@/lib/levelUp/levelUpBus');
+    __resetLevelUpBusForTests();
+    __resetRevealSessionForTests();
+    // Given a jump that crosses no ladder rung
+    const ladderLevels = new Set(LEVEL_UNLOCK_LADDER.map(u => u.level));
+    let lvl = 3;
+    while (ladderLevels.has(lvl)) lvl++;
+    // When it is published
+    const reveal = publishLevelUp({ oldLevel: lvl - 1, newLevel: lvl }, 'single');
+    // Then no reveal, but the level-up is announced
+    expect(reveal).toBeNull();
+    expect(getPendingLevelUp()).toMatchObject({ newLevel: lvl, source: 'single' });
+  });
+});
