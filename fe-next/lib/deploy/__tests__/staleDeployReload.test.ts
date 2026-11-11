@@ -255,8 +255,7 @@ describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)',
     clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
   });
-  it('Given sessionStorage throws, When the guard is claimed twice in one page load, Then only the first claim wins', async () => {
-    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard } = await import('../staleDeployReload');
+  function blockStorage(): () => void {
     const real = window.sessionStorage;
     Object.defineProperty(window, 'sessionStorage', {
       configurable: true,
@@ -264,14 +263,49 @@ describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)',
         throw new Error('blocked');
       },
     });
+    return () => Object.defineProperty(window, 'sessionStorage', { configurable: true, value: real });
+  }
+
+  it('Given sessionStorage throws, When the page reloads after the first claim, Then the fresh page cannot claim again', async () => {
+    (await import('../staleDeployReload')).clearChunkRecoveryGuard();
+    const restore = blockStorage();
     try {
-      expect(claimChunkRecoveryGuard()).toBe(true);
+      const first = await import('../staleDeployReload');
+      expect(first.claimChunkRecoveryGuard()).toBe(true);
+      vi.resetModules();
+      const afterReload = await import('../staleDeployReload');
+      expect(afterReload.claimChunkRecoveryGuard()).toBe(false);
+      expect(afterReload.chunkReloadAlreadyHappened()).toBe(true);
+    } finally {
+      restore();
+      (await import('../staleDeployReload')).clearChunkRecoveryGuard();
+    }
+  });
+
+  it('Given the address already carries the recovery param, When the guard is claimed, Then it reports the reload already happened', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, CHUNK_RELOAD_PARAM } = await import('../staleDeployReload');
+    clearChunkRecoveryGuard();
+    window.history.replaceState(null, '', `/en/join/AB12?${CHUNK_RELOAD_PARAM}=1`);
+    try {
       expect(claimChunkRecoveryGuard()).toBe(false);
     } finally {
-      Object.defineProperty(window, 'sessionStorage', { configurable: true, value: real });
-      clearChunkRecoveryGuard();
+      window.history.replaceState(null, '', '/');
     }
+  });
+
+  it('Given the boot guard, Then it marks window.name with the same shared mark', async () => {
+    const { CHUNK_RELOAD_WINDOW_MARK } = await import('../staleDeployReload');
+    const { CHUNK_BOOT_GUARD_SCRIPT } = await import('@/utils/chunkBootGuard');
+    expect(CHUNK_BOOT_GUARD_SCRIPT).toContain(`'${CHUNK_RELOAD_WINDOW_MARK}'`);
+  });
+
+  it('Given a cleared guard, Then the window.name mark is gone too', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, CHUNK_RELOAD_WINDOW_MARK } = await import('../staleDeployReload');
+    clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
+    expect(window.name).toContain(CHUNK_RELOAD_WINDOW_MARK);
+    clearChunkRecoveryGuard();
+    expect(window.name).not.toContain(CHUNK_RELOAD_WINDOW_MARK);
   });
 });
 

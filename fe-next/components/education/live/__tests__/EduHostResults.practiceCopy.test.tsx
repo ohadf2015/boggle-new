@@ -20,6 +20,9 @@ const capture = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture } }));
 vi.mock('@/lib/education/reportProCtaClick', () => ({ reportProOfferImpression: vi.fn(), reportProOfferClick: vi.fn(), reportProCtaClick: vi.fn() }));
 
+const nav = vi.hoisted(() => ({ path: '/en/education/live/host', search: '' }));
+vi.mock('next/navigation', () => ({ usePathname: () => nav.path, useSearchParams: () => new URLSearchParams(nav.search) }));
+
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 const TEACHER = 'Ms. Cohen';
 
@@ -85,6 +88,14 @@ describe('EduHostResults copy: a rehearsal is not a class that failed', () => {
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
+    nav.search = '';
+  });
+
+  it('Given a practice-run room whose practice seat is missing from the scores, When results show, Then it still reads as a rehearsal', () => {
+    nav.search = 'room=AB12&practice=1';
+    const text = wallText([host] as unknown as PlayerResult[]);
+    expect(text).toContain('eduLive.results.practice.zeroTitle');
+    expect(text).not.toContain('eduLive.results.zeroBody');
   });
 
   it('Given a real class round where nobody scored or found a lesson word, When results show, Then the class-performance copy is unchanged', () => {

@@ -14,7 +14,7 @@ vi.mock('@/lib/deploy/staleDeployReload', async (importOriginal) => ({
 }));
 
 import { EduRouteError } from '../EduRouteError';
-import { CHUNK_RECOVERY_GUARD_KEY, clearChunkRecoveryGuard } from '@/lib/deploy/staleDeployReload';
+import { CHUNK_RECOVERY_GUARD_KEY, CHUNK_RELOAD_WINDOW_MARK, clearChunkRecoveryGuard } from '@/lib/deploy/staleDeployReload';
 
 function chunkError(): Error {
   return Object.assign(new Error('Loading chunk 4821 failed.'), { name: 'ChunkLoadError' });
@@ -56,6 +56,28 @@ describe('<EduRouteError> after a deploy left the page with stale chunks', () =>
     sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
     render(<EduRouteError error={chunkError()} reset={vi.fn()} boundary="join" area="join" />);
     expect(sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY)).toBe('true');
+  });
+
+  it('Given sessionStorage is blocked and the page already reloaded once, When the chunk fails again, Then it does not reload and offers the update action', () => {
+    const real = window.sessionStorage;
+    Object.defineProperty(window, 'sessionStorage', { configurable: true, get: () => { throw new Error('blocked'); } });
+    window.name = CHUNK_RELOAD_WINDOW_MARK;
+    try {
+      render(<EduRouteError error={chunkError()} reset={vi.fn()} boundary="join" area="join" />);
+      expect(clearCachesAndReload).not.toHaveBeenCalled();
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Update ready');
+    } finally {
+      Object.defineProperty(window, 'sessionStorage', { configurable: true, value: real });
+      window.name = '';
+    }
+  });
+
+  it('Given the live game room, When a chunk fails for the first time, Then it never reloads by itself and shows the update action', () => {
+    render(<EduRouteError error={chunkError()} reset={vi.fn()} boundary="edu-live" area="live" />);
+    expect(clearCachesAndReload).not.toHaveBeenCalled();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Update ready');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+    expect(clearCachesAndReload).toHaveBeenCalledTimes(1);
   });
 
   it('Given an ordinary crash, When the boundary renders, Then nothing reloads, the crash is reported and Try again resets', () => {

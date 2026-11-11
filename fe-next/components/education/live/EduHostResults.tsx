@@ -41,7 +41,7 @@ import { useRoundEndReveal } from '@/components/education/results/useRoundEndRev
 import { useIsPhoneRecap } from '@/components/education/results/useIsPhoneRecap';
 import { buildTvRecap } from '@/components/education/results/tvRecapModel';
 import { trackReteachStarted, trackResultsAction } from '@/components/education/results/trackResultsAction';
-import { isPracticeRound } from '@/components/education/results/isPracticeRound';
+import { isRehearsalRound } from '@/components/education/results/isPracticeRound';
 import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { isRevealed } from '@/lib/education/roundEndStage';
 import { classSwept } from '@/lib/education/roundEndSweep';
@@ -169,7 +169,8 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     classFoundCount: summary.classFoundCount,
     neverPlacedCount: summary.neverPlacedWords ? neverPlaced.size : undefined,
   });
-  const roomParam = useSearchParams()?.get('room') ?? null;
+  const searchParams = useSearchParams();
+  const roomParam = searchParams?.get('room') ?? null;
   const gameCode = roomCode || roomParam;
   const { hasPro, loading: proLoading } = useTeacherPro();
   const missed = reteachPanelWords(summary);
@@ -184,7 +185,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
     reteach.replay(missed.map((w) => w.word));
   };
   const students = stats?.students ?? 0;
-  const practice = isPracticeRound(players);
+  const practice = isRehearsalRound(players, searchParams?.get('practice') === '1' || undefined);
   const shortWall = bossOver;
   const proCard = !proLoading && !hasPro && !practice && summary.totalWords > 0;
   const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };

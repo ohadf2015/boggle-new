@@ -33,7 +33,8 @@ import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen'
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
-import { countClassStudents } from './components/exitConfirmModel';
+import { classroomLobbyExitSkipsConfirm } from './components/exitConfirmModel';
+import { useRosterReceived } from './hooks/useRosterReceived';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
 import { readLocalQuizVariant } from '@/lib/education/classroomCatalogueId';
 import type { HostViewProps } from './hostViewTypes';
@@ -64,8 +65,8 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
   });
 
   const inLobby = !runtime.gameStarted && !hasActiveGameData && !tournament.finalScores;
-  // An empty classroom lobby has nothing to lose: exit leaves without asking.
-  const lobbyExit = isClassroomMode && countClassStudents(players.playersReady, username) === 0
+  const rosterKnown = useRosterReceived(socket, gameCode);
+  const lobbyExit = classroomLobbyExitSkipsConfirm({ classroom: isClassroomMode, rosterKnown, players: players.playersReady })
     ? actions.confirmExitRoom
     : actions.handleExitRoom;
 

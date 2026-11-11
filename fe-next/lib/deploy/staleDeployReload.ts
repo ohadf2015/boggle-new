@@ -252,30 +252,65 @@ export function stripChunkReloadParam(): void {
   }
 }
 
+/** Survives the reload itself (unlike module state), so a storage-blocked browser still stops after one. Same mark as utils/chunkBootGuard.ts. */
+export const CHUNK_RELOAD_WINDOW_MARK = '__lc_cbr1';
+
+function windowNameHasMark(): boolean {
+  try {
+    return String(window.name || '').includes(CHUNK_RELOAD_WINDOW_MARK);
+  } catch {
+    return false;
+  }
+}
+
+/** True once any recovery reload ran in this tab: sessionStorage, the window.name mark, or the cache-bust param on the address. */
+export function chunkReloadAlreadyHappened(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    if (sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true') return true;
+  } catch {
+    /* storage blocked: the two markers below still hold */
+  }
+  if (windowNameHasMark()) return true;
+  try {
+    return new URLSearchParams(window.location.search).has(CHUNK_RELOAD_PARAM);
+  } catch {
+    return false;
+  }
+}
+
+function markChunkReload(): void {
+  try {
+    sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
+  } catch {
+    /* storage blocked */
+  }
+  try {
+    if (!windowNameHasMark()) window.name = String(window.name || '') + CHUNK_RELOAD_WINDOW_MARK;
+  } catch {
+    /* window.name unwritable */
+  }
+}
+
 /**
  * Shared one-shot guard helper for React error boundaries that cannot easily
  * wire the full RecoveryDeps object. Returns true iff this call claimed the
  * reload slot (caller should then invoke clearCachesAndReload).
  */
-// Consulted only when sessionStorage throws, so one page load still gets at most one automatic reload.
-let memoryChunkGuard = false;
-
 export function claimChunkRecoveryGuard(): boolean {
   if (typeof window === 'undefined') return false;
-  try {
-    if (sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true') return false;
-    sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
-    return true;
-  } catch {
-    if (memoryChunkGuard) return false;
-    memoryChunkGuard = true;
-    return true;
-  }
+  if (chunkReloadAlreadyHappened()) return false;
+  markChunkReload();
+  return true;
 }
 
 export function clearChunkRecoveryGuard(): void {
   if (typeof window === 'undefined') return;
-  memoryChunkGuard = false;
+  try {
+    window.name = String(window.name || '').split(CHUNK_RELOAD_WINDOW_MARK).join('');
+  } catch {
+    /* window.name unwritable */
+  }
   try {
     sessionStorage.removeItem(CHUNK_RECOVERY_GUARD_KEY);
   } catch {

@@ -4,8 +4,9 @@ import { readHostViewSource } from './hostViewSource';
 const source = readHostViewSource();
 
 describe('HostView — classroom exit wiring', () => {
-  it('Given a classroom lobby with no students, When the host presses exit, Then both lobbies leave without the confirm', () => {
-    expect(source).toMatch(/const lobbyExit = isClassroomMode && countClassStudents\(players\.playersReady, username\) === 0\s*\?\s*actions\.confirmExitRoom\s*:\s*actions\.handleExitRoom/);
+  it('Given a classroom lobby whose roster arrived empty, When the host presses exit, Then both lobbies leave without the confirm', () => {
+    expect(source).toMatch(/const rosterKnown = useRosterReceived\(socket, gameCode\)/);
+    expect(source).toMatch(/const lobbyExit = classroomLobbyExitSkipsConfirm\(\{ classroom: isClassroomMode, rosterKnown, players: players\.playersReady \}\)\s*\?\s*actions\.confirmExitRoom\s*:\s*actions\.handleExitRoom/);
     expect(source.match(/onExitRoom=\{lobbyExit\}/g)).toHaveLength(2);
   });
 

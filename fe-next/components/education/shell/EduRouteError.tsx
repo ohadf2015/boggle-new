@@ -77,8 +77,9 @@ export function EduRouteError({
 
   useEffect(() => {
     captureError(error, { errorBoundary: { type: boundary, digest: error.digest } });
-    if (staleChunk && claimChunkRecoveryGuard()) void clearCachesAndReload();
-  }, [error, boundary, staleChunk]);
+    // A reload inside the live room drops the room session, so there the player chooses when to refresh.
+    if (staleChunk && area !== 'live' && claimChunkRecoveryGuard()) void clearCachesAndReload();
+  }, [error, boundary, staleChunk, area]);
 
   const retry = () => {
     if (staleChunk) void clearCachesAndReload();

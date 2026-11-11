@@ -3,7 +3,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ExitConfirmDialog } from '../HostDialogs';
-import { countClassStudents } from '../exitConfirmModel';
+import { classroomLobbyExitSkipsConfirm, countClassStudents } from '../exitConfirmModel';
 import { PlayerRoundDialogs } from '@/player/components/in-game/PlayerRoundDialogs';
 
 const t = (key: string) => key;
@@ -78,21 +78,46 @@ describe('ExitConfirmDialog — a classroom host in the lobby with students wait
 describe('countClassStudents — whether an empty lobby needs a confirm at all', () => {
   it('Given only the teacher, bots and the practice seat, When counted, Then there are no students', () => {
     const players = [
-      { username: 'Ms K', isHost: true },
-      { username: 'Practice', isPractice: true },
+      { username: 'Ms K', isHost: true, playerId: 'h' },
+      { username: 'Practice', isPractice: true, playerId: 'p' },
       { username: 'Bot 1', isBot: true },
-      'Ms K',
     ];
-    expect(countClassStudents(players, 'Ms K')).toBe(0);
+    expect(countClassStudents(players)).toBe(0);
   });
 
-  it('Given one real student (object or bare name), When counted, Then each counts once', () => {
-    expect(countClassStudents([{ username: 'Ms K', isHost: true }, { username: 'Dana' }], 'Ms K')).toBe(1);
-    expect(countClassStudents(['Ms K', 'Noa'], 'Ms K')).toBe(1);
+  it('Given a student who shares the teacher display name, When counted, Then the student still counts', () => {
+    const players = [
+      { username: 'Ms K', isHost: true, playerId: 'host-1' },
+      { username: 'Ms K', playerId: 'student-1' },
+    ];
+    expect(countClassStudents(players)).toBe(1);
+  });
+
+  it('Given the same student listed twice, When counted, Then the stable id counts them once', () => {
+    expect(countClassStudents([{ username: 'Dana', playerId: 's1' }, { username: 'Dana', playerId: 's1' }])).toBe(1);
   });
 
   it('Given no roster yet, When counted, Then zero', () => {
-    expect(countClassStudents(undefined, 'Ms K')).toBe(0);
+    expect(countClassStudents(undefined)).toBe(0);
+  });
+});
+
+describe('classroomLobbyExitSkipsConfirm — leaving silently needs a known, empty roster', () => {
+  it('Given no roster update has arrived for this room, When the host presses exit, Then the dialog is asked', () => {
+    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: false, players: [] })).toBe(false);
+  });
+
+  it('Given a roster update showed only the teacher, When the host presses exit, Then it exits without asking', () => {
+    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: true, players: [{ username: 'Ms K', isHost: true }] })).toBe(true);
+  });
+
+  it('Given a roster with a student named like the teacher, When the host presses exit, Then the dialog is asked', () => {
+    const players = [{ username: 'Ms K', isHost: true, playerId: 'h' }, { username: 'Ms K', playerId: 's' }];
+    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: true, players })).toBe(false);
+  });
+
+  it('Given an arcade room, When the host presses exit, Then the dialog is always asked', () => {
+    expect(classroomLobbyExitSkipsConfirm({ classroom: false, rosterKnown: true, players: [] })).toBe(false);
   });
 });
 
