@@ -24,7 +24,7 @@ vi.mock('@/lib/education/lessonPlayStat', () => ({
 }));
 
 import { useClassroomLaunchSocket, type ClassroomLaunchPayload } from '../useClassroomLaunchSocket';
-import { writeRehearseIntent, clearRehearseIntent } from '@/lib/education/rehearsal';
+import { writeRehearseIntent, clearRehearseIntent, peekRehearseIntent } from '@/lib/education/rehearsal';
 
 const t = (k: string) => k;
 
@@ -90,5 +90,26 @@ describe('useClassroomLaunchSocket — rehearsal rooms', () => {
     act(() => result.current.launch(payload(result.current.gameCode)));
     expect(createdSettings()).toBeDefined();
     expect(createdSettings().rehearsal).toBeUndefined();
+  });
+
+  it('Given a rehearsal launched and abandoned, When the teacher launches a real lesson in the same tab, Then the real room is not marked and the stale intent is gone', async () => {
+    writeRehearseIntent({ source: 'class', classExists: true });
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
+    await waitFor(() => expect(result.current.socket).not.toBeNull());
+    act(() => result.current.launch(payload('REH001')));
+    expect(peekRehearseIntent()).not.toBeNull();
+    emit.mockClear();
+    act(() => result.current.launch(payload('REAL01')));
+    expect(createdSettings().rehearsal).toBeUndefined();
+    expect(peekRehearseIntent()).toBeNull();
+  });
+
+  it('Given a rehearsal launch, When the host board reads the intent afterwards, Then it is still there so the bots auto-start', async () => {
+    writeRehearseIntent({ source: 'hq', classExists: false });
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
+    await waitFor(() => expect(result.current.socket).not.toBeNull());
+    act(() => result.current.launch(payload('REH002')));
+    expect(createdSettings()).toMatchObject({ rehearsal: true });
+    expect(peekRehearseIntent()).toMatchObject({ source: 'hq' });
   });
 });

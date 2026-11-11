@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useClassroomAutoJoin, AUTO_JOIN_DELAY_MS, AUTO_JOIN_HANDLED_KEY } from '../useClassroomAutoJoin';
+import { useClassroomAutoJoin, AUTO_JOIN_DELAY_MS, AUTO_JOIN_HANDLED_KEY, markClassroomGameHandled, resetAutoJoinMemoryForTest } from '../useClassroomAutoJoin';
 import type { ActiveGame } from '@/hooks/useActiveClassroomGame';
 
 const game = (over: Partial<ActiveGame> & Record<string, unknown> = {}) =>
@@ -18,6 +18,7 @@ describe('useClassroomAutoJoin', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     sessionStorage.clear();
+    resetAutoJoinMemoryForTest();
   });
   afterEach(() => vi.useRealTimers());
 
@@ -56,6 +57,7 @@ describe('useClassroomAutoJoin', () => {
   it('Given a student who was auto-joined and came back to the class page, Then the same game does not pull them in again', () => {
     const first = setup(game());
     act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS); });
+    markClassroomGameHandled('LIVE01');
     first.hook.unmount();
     const back = setup(game());
     act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 2); });
@@ -67,6 +69,7 @@ describe('useClassroomAutoJoin', () => {
     act(() => hook.result.current.joinNow());
     act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 2); });
     expect(join).toHaveBeenCalledTimes(1);
+    act(() => markClassroomGameHandled('LIVE01'));
     expect(JSON.parse(sessionStorage.getItem(AUTO_JOIN_HANDLED_KEY) ?? '[]')).toContain('LIVE01');
   });
 
@@ -133,5 +136,48 @@ describe('useClassroomAutoJoin', () => {
     hook.rerender({ g: game({ roomOpen: true }), j: false });
     act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS); });
     expect(join).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given storage throws, When the student was joined, left and came back (remount), Then the same game does not pull them in again', () => {
+    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
+    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    const first = setup(game());
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS); });
+    expect(first.join).toHaveBeenCalledTimes(1);
+    markClassroomGameHandled('LIVE01');
+    first.hook.unmount();
+    const back = setup(game());
+    expect(back.hook.result.current.pendingCode).toBeNull();
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 2); });
+    expect(back.join).not.toHaveBeenCalled();
+    get.mockRestore();
+    set.mockRestore();
+  });
+
+  it('Given storage throws, When the student taps Stay here and the page remounts, Then they are still not pulled in', () => {
+    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
+    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    const first = setup(game());
+    act(() => first.hook.result.current.stay());
+    first.hook.unmount();
+    const back = setup(game());
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 2); });
+    expect(back.join).not.toHaveBeenCalled();
+    get.mockRestore();
+    set.mockRestore();
+  });
+
+  it('Given the automatic join fails (no ack), Then the game is not marked handled and is never auto-retried, even after a remount', () => {
+    const first = setup(game());
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS); });
+    expect(first.join).toHaveBeenCalledTimes(1);
+    expect(JSON.parse(sessionStorage.getItem(AUTO_JOIN_HANDLED_KEY) ?? '[]')).not.toContain('LIVE01');
+    first.hook.rerender({ g: game(), j: false });
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 3); });
+    expect(first.join).toHaveBeenCalledTimes(1);
+    first.hook.unmount();
+    const back = setup(game());
+    act(() => { vi.advanceTimersByTime(AUTO_JOIN_DELAY_MS * 3); });
+    expect(back.join).not.toHaveBeenCalled();
   });
 });
