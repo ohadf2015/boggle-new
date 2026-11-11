@@ -6,6 +6,7 @@ import { ArrowLeft, Flag, Menu, Target, Trophy } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { standingFloors } from './dailyRails';
 import type { RunState } from '@/lib/wordTowerV2/run';
+import { nextFloorGoal } from '@/lib/wordTowerV2/rewards';
 import { ITEM } from './estate/estateArt';
 import { useFloorPop } from './useFloorPop';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
@@ -181,6 +182,18 @@ export const V2TopBar = memo(function V2TopBar({
                 <AnimatedCounter value={score} formatValue={formatScore} size="xs" className="font-bold text-neo-cream lg:text-base" />
                 <span className="ms-1 text-[9px] font-bold uppercase text-neo-cream opacity-70 lg:text-xs" aria-hidden>
                   {t('common.pts')}
+                </span>
+              </div>
+            ) : null}
+            {!daily ? (
+              <div
+                data-wt2-goal
+                className="flex items-center gap-0.5 rounded-neo border-neo border-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-xs font-black leading-tight text-neo-navy shadow-hard-sm lg:text-base"
+                aria-label={t('wordTowerV2.hud.goalA11y', { n: floors, goal: nextFloorGoal(floors) })}
+              >
+                <Target className="h-2.5 w-2.5 lg:h-3 lg:w-3" aria-hidden />
+                <span aria-hidden className="tabular-nums">
+                  {floors}/{nextFloorGoal(floors)}
                 </span>
               </div>
             ) : null}

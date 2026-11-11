@@ -40,7 +40,7 @@ describe('trackWt2Exit — unfinished run maps to game_abandoned', () => {
 
   it('still emits growth:wt2_exit with the from screen', () => {
     trackWt2Exit('run');
-    expect(trackGrowthEventMock).toHaveBeenCalledWith('wt2_exit', { from: 'run' });
+    expect(trackGrowthEventMock).toHaveBeenCalledWith('wt2_exit', { from: 'run', mode: 'word-tower' });
   });
 
   it('emits growth:game_abandoned {reason: exit} when a run is active', async () => {

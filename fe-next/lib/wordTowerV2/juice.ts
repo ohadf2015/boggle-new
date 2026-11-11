@@ -17,3 +17,17 @@ export function squashScale(amount: number): { sx: number; sy: number } {
   const sy = 1 - 0.16 * amount;
   return { sx: 1 / sy, sy };
 }
+
+/**
+ * Landing beat on a 1 -> 0 decay: squash, overshoot into a stretch, hold it,
+ * then settle. Positive squashes, negative stretches (feeds `squashScale`).
+ */
+export function landingBounce(t: number): number {
+  if (t <= 0) return 0;
+  const u = 1 - Math.min(1, t);
+  const STRETCH = -0.4;
+  if (u < 0.2) return Math.sin((u / 0.2) * (Math.PI / 2));
+  if (u < 0.4) return STRETCH + (1 - STRETCH) * (0.5 + 0.5 * Math.cos(((u - 0.2) / 0.2) * Math.PI));
+  if (u < 0.6) return STRETCH;
+  return STRETCH * (0.5 + 0.5 * Math.cos(((u - 0.6) / 0.4) * Math.PI));
+}

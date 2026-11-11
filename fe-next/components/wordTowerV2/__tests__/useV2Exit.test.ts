@@ -520,4 +520,32 @@ describe('useV2Exit — daily tower', () => {
     });
     expect(push).toHaveBeenCalledWith('/en');
   });
+
+  it('daily exit closes the climb before the exit is tracked, so the deferred abandon finds no active game', async () => {
+    const order: string[] = [];
+    vi.mocked(exitTracking.trackWt2Exit).mockImplementation(() => {
+      order.push('exit');
+    });
+    const closeSession = vi.fn(() => {
+      order.push('close');
+    });
+    const { result } = renderHook(() =>
+      useV2Exit({
+        phase: 'composing',
+        floors: 5,
+        daily: true,
+        finish: vi.fn(),
+        bankRun: vi.fn().mockResolvedValue(undefined),
+        router: { push: vi.fn() } as any,
+        language: 'en',
+        getScreen: () => 'run',
+        t: mockT,
+        closeSession,
+      }),
+    );
+    await act(async () => {
+      await result.current.requestExit();
+    });
+    expect(order).toEqual(['close', 'exit']);
+  });
 });

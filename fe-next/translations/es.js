@@ -2875,7 +2875,7 @@ const es = {
     "cardDesc": "Física real: versión beta",
     "collapsed": "¡Se cayó la torre!",
     "newBest": "¡Nuevo récord!",
-    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}", "menu": "Menú", "banked": "Acumulado"},
+    "hud": {"floor": "Piso", "floorA11y": "Piso {n}, {m} metros", "goalA11y": "Piso {n}. Próxima meta: piso {goal}", "effect": "{name}: quedan {n}", "exit": "Terminar y cobrar", "daily": "DIARIO", "dailyBadge": "Diario {date}", "menu": "Menú", "banked": "Acumulado"},
     "stability": {"label": "Estabilidad", "a11y": "Estabilidad: {band}, {pct}% de riesgo", "steady": "Firme", "wobbly": "Tambaleante", "danger": "¡Al centro!"},
     "biome": {"downtown": "Centro", "sunset": "Azoteas al atardecer", "clouds": "Mar de nubes", "jetstream": "Corriente en chorro", "aurora": "Aurora", "orbit": "Órbita", "cosmos": "Cosmos profundo"},
     "newSky": "Cielo nuevo",

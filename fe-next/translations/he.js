@@ -2876,7 +2876,7 @@ const he = {
     "cardDesc": "פיזיקה אמיתית, גרסת בטא",
     "collapsed": "המגדל קרס!",
     "newBest": "שיא חדש!",
-    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}", "menu": "תפריט", "banked": "צבור"},
+    "hud": {"floor": "קומה", "floorA11y": "קומה {n}, {m} מטר", "goalA11y": "קומה {n}. היעד הבא: קומה {goal}", "effect": "{name}: נשארו {n}", "exit": "לסיים ולאסוף", "daily": "יומי", "dailyBadge": "יומי {date}", "menu": "תפריט", "banked": "צבור"},
     "stability": {"label": "יציבות", "a11y": "יציבות: {band}, סיכון {pct}%", "steady": "יציב", "wobbly": "מתנדנד", "danger": "כוונו למרכז!"},
     "biome": {"downtown": "מרכז העיר", "sunset": "גגות בשקיעה", "clouds": "ים של עננים", "jetstream": "זרם סילון", "aurora": "זוהר קוטבי", "orbit": "מסלול", "cosmos": "חלל עמוק"},
     "newSky": "שמיים חדשים",

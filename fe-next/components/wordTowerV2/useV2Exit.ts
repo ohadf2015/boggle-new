@@ -16,6 +16,8 @@ export interface UseV2ExitArgs {
   t: (key: string) => string;
   /** Daily: save the tower and score before leaving. */
   flushDaily?: () => void;
+  /** Ends a standing daily climb as complete before the exit's deferred abandon can fire. */
+  closeSession?: () => void;
 }
 
 export interface LeaveDialogProps {
@@ -42,6 +44,7 @@ export function useV2Exit({
   getScreen,
   t,
   flushDaily,
+  closeSession,
 }: UseV2ExitArgs) {
   const [leaveOpen, setLeaveOpen] = useState(false);
   const exitingRef = useRef(false);
@@ -82,12 +85,13 @@ export function useV2Exit({
     if (!exitingRef.current) {
       exitingRef.current = true;
       const screen = getScreen();
+      closeSession?.();
       trackWt2Exit(screen);
       flushDaily?.();
       await Promise.race([bankRun(), new Promise((r) => window.setTimeout(r, 1500))]);
       router.push(destination);
     }
-  }, [daily, phase, floors, bankRun, router, destination, getScreen, flushDaily]);
+  }, [daily, phase, floors, bankRun, router, destination, getScreen, flushDaily, closeSession]);
 
   const confirmLeave = useCallback(() => {
     setLeaveOpen(false);
