@@ -76,15 +76,21 @@ describe('RivalChip: a live tug bar against my rival', () => {
     expect(screen.getByTestId('rival-chip')).toHaveAttribute('aria-label', expect.stringContaining('Maximiliana-Alexandra-Fitzgerald'));
   });
 
-  it('Given a tall phone tray, Then the rival\'s first name rides above the rope, direction-isolated, cut with an ellipsis only past about ten characters', () => {
-    mount(1, 2, 'Maximiliana-Josefina');
-    const first = screen.getByTestId('rival-chip-first');
-    expect(first).toHaveTextContent(/^Maximiliana$/);
-    expect(first).toHaveAttribute('dir', 'auto');
-    expect(first.className).toMatch(/\bmax-w-\[10ch\]/);
-    expect(first.className).toMatch(/\btruncate\b/);
-    expect(first.className).toMatch(/\[@container\(min-height:300px\)\]:block/);
-    expect(first.className).toMatch(/\blg:hidden\b/);
+  it.each([
+    ['QA R2 3', 'QA R2 3'],
+    ['Noa K', 'Noa K'],
+    ['Noa B', 'Noa B'],
+    ['Maximiliana-Josefina', 'Maximiliana-Josefina'],
+  ])('Given a tall phone tray and rival %s, Then the whole name rides above the rope, direction-isolated, cut with an ellipsis only past about twelve characters', (name, shown) => {
+    mount(1, 2, name);
+    const label = screen.getByTestId('rival-chip-short-name');
+    expect(label.textContent).toBe(shown);
+    expect(label).toHaveAttribute('dir', 'auto');
+    expect(label).toHaveAttribute('title', name);
+    expect(label.className).toMatch(/\bmax-w-\[12ch\]/);
+    expect(label.className).toMatch(/\btruncate\b/);
+    expect(label.className).toMatch(/\[@container\(min-height:300px\)\]:block/);
+    expect(label.className).toMatch(/\blg:hidden\b/);
   });
 
   it('Given the bar, When rendered, Then it never takes pointer or touch input and is a full-size row', () => {

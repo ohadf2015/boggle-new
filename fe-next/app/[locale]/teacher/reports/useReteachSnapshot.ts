@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { getWithAuth } from '@/utils/authFetch';
+import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import type { HardWord, MasteryTotals } from '@/lib/education/wordMasteryReport';
 import type { ClassInsights } from '@/components/teacher/reports/classInsights';
 import { classesToFetch, pickSnapshot, type ClassEvidence } from './reteachSnapshotModel';
@@ -59,10 +61,14 @@ export function useReteachSnapshot(classrooms: readonly PickerClass[] | null | u
   const targets = useMemo(() => classesToFetch(classrooms ?? []), [classrooms]);
   const key = targets.map((c) => c.id).join(',');
   const [state, setState] = useState<SnapshotState>({ status: 'loading' });
+  const plan = useTeacherPro();
+  const [nowMs] = useState(() => Date.now());
+  const planLoading = plan.loading;
+  const pro = !planLoading && hasProAccess(plan, nowMs);
 
   useEffect(() => {
-    if (!classrooms) return;
-    if (targets.length === 0) {
+    if (!classrooms || planLoading) return;
+    if (!pro || targets.length === 0) {
       setState({ status: 'ready', snapshot: null });
       return;
     }
@@ -78,7 +84,7 @@ export function useReteachSnapshot(classrooms: readonly PickerClass[] | null | u
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, !!classrooms]);
+  }, [key, !!classrooms, planLoading, pro]);
 
   return state;
 }

@@ -184,10 +184,4 @@ describe('ReportsReteachPanel', () => {
     expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
     expect(screen.queryByTestId('reteach-example-pill')).toBeNull();
   });
-
-  it('given the locked reports page, when no class has missed words, then no example competes with the Pro sample', () => {
-    snapshotState.value = { status: 'ready', snapshot: null };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} hideExample />);
-    expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
-  });
 });

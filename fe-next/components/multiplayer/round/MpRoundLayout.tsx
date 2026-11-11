@@ -177,7 +177,7 @@ function MpRoundLayoutImpl({
       </div>
 
       {/* Phone: live roster strip under the HUD */}
-      <div className={cn(styles.areaRoster, 'min-w-0 px-3 pb-1')}>
+      <div className={cn(styles.areaRoster, 'min-w-0 px-3 pb-1 [body:has([data-covers-roster])_&]:invisible')}>
         {/* At most four seats (the rest fold into "+N"; I always stay visible). From
             four seats a name only fits as "P…", so names go screen-reader-only and
             the avatars + scores carry the strip. */}

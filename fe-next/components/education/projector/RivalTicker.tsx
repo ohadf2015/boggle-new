@@ -33,6 +33,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
   const [reserved, setReserved] = useState(false);
   const nextId = useRef(0);
   const session = useRef<number | null>(null);
+  const leadId = useRef<number | null>(null);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>[]>());
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
     };
     const clearAll = () => {
       for (const id of [...live.keys()]) drop(id);
+      leadId.current = null;
       setItems([]);
       setReserved(false);
     };
@@ -54,16 +56,25 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
       return true;
     };
 
-    const onFlip = (data: RivalFlipPayload) => {
-      if (!data?.winnerName || !current(data.gameSessionId)) return;
-      const id = ++nextId.current;
+    const fadeOut = (id: number) => {
+      live.delete(id);
+      if (leadId.current === id) return;
+      setItems((all) => all.map((i) => (i.id === id ? { ...i, fading: true } : i)));
       live.set(id, [
-        setTimeout(() => setItems((all) => all.map((i) => (i.id === id ? { ...i, fading: true } : i))), RIVAL_TICKER_SHOW_MS),
         setTimeout(() => {
           drop(id);
           setItems((all) => all.filter((i) => i.id !== id));
-        }, RIVAL_TICKER_SHOW_MS + RIVAL_TICKER_FADE_MS),
+        }, RIVAL_TICKER_FADE_MS),
       ]);
+    };
+
+    const onFlip = (data: RivalFlipPayload) => {
+      if (!data?.winnerName || !current(data.gameSessionId)) return;
+      const id = ++nextId.current;
+      const previous = leadId.current;
+      leadId.current = id;
+      if (previous !== null && !live.has(previous)) live.set(previous, [setTimeout(() => fadeOut(previous), RIVAL_TICKER_SHOW_MS)]);
+      live.set(id, [setTimeout(() => fadeOut(id), RIVAL_TICKER_SHOW_MS)]);
       setReserved(true);
       setItems((all) => {
         const next = [{ id, name: data.winnerName, avatar: data.winnerAvatar ?? null, fading: false }, ...all];

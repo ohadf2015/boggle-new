@@ -111,6 +111,12 @@ describe('LessonClaimToast', () => {
     expect(sfx.playRareWordSound).toHaveBeenCalledTimes(1);
   });
 
+  it('Given I claimed a word, When the burst shows, Then it marks itself as covering the player-chip row so that row hides instead of peeking out around it', () => {
+    render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);
+    act(() => ingestLessonClaim(claim('Dana')));
+    expect(screen.getByTestId('lesson-claim-burst')).toHaveAttribute('data-covers-roster');
+  });
+
   it('Given no race this round, When mounted, Then nothing renders', () => {
     act(() => ingestLessonClaimsRound({}));
     const { container } = render(<LessonClaimToast socket={fakeSocket() as never} me="Dana" t={t} dir="ltr" />);

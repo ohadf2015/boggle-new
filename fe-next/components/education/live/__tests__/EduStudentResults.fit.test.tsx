@@ -49,6 +49,8 @@ function makeController(over: Record<string, unknown> = {}) {
   };
 }
 
+const missedSummary = { teacherName: 'Ms Cohen', lessonIds: ['l1'], coverage: [{ word: 'apple', foundBy: ['Noa'] }] };
+
 const props = {
   finalScores: [{ username: 'Noa', score: 30 }, { username: 'Maya', score: 20 }],
   username: 'Maya',
@@ -124,6 +126,26 @@ describe('EduStudentResults on a 390x844 phone', () => {
   it('given the slim wait bar on this screen, then it says it once, without the second "stay here" line', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.getByTestId('wait-for-teacher-message')).not.toHaveTextContent('education.results.stayInClass');
+  });
+
+  it('given missed words, when results show, then the pinned practice bar sits below the scroll area, which reserves room at its end behind a hard edge so no row hides under the bar', () => {
+    render(<EduStudentResults {...(props as object)} classroomSummary={missedSummary as never} />);
+    const scroll = screen.getByTestId('edu-student-results-scroll');
+    const bar = screen.getByTestId('edu-student-results-bar');
+    expect(bar).toContainElement(screen.getByTestId('practice-missed-button'));
+    expect(scroll).not.toContainElement(bar);
+    expect(scroll.compareDocumentPosition(bar) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(bar.className).not.toMatch(/\b(fixed|absolute|sticky)\b/);
+    expect(scroll.className).toMatch(/\boverflow-y-auto\b/);
+    expect(scroll.className).toMatch(/\bpb-6\b/);
+    expect(bar.className).toMatch(/\bborder-t-2\b/);
+  });
+
+  it('given a practice button in the bar, then the wait line under it is slim text, not a second card stealing the first frame', () => {
+    render(<EduStudentResults {...(props as object)} classroomSummary={missedSummary as never} />);
+    const wait = screen.getByTestId('wait-for-teacher-message');
+    expect(wait.className).not.toMatch(/\bborder-2\b/);
+    expect(wait.className).not.toMatch(/\bmin-h-11\b/);
   });
 
   it('given a Boss round, when results show, then the boss verdict is the slim strip', () => {

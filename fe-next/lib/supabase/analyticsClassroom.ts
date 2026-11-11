@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import logger from '@/utils/logger';
 import { teacherFacingName } from '@/lib/education/rosterName';
 import { summarizeStudentWords, wordKey } from '@/lib/education/wordTally';
+import { lastActivityDay } from '@/lib/education/pro/classInsights';
 import type {
   WordsAttemptedRecord,
   StudentProgressSummary,
@@ -121,11 +122,8 @@ export async function getStudentsProgressSummary(
         currentStreak = Math.max(currentStreak, progress.current_streak || 0);
         for (const word of lessonWordsMap.get(progress.lesson_id) ?? []) lessonWords.add(wordKey(word));
 
-        if (progress.last_practice_date) {
-          if (!lastPracticeDate || progress.last_practice_date > lastPracticeDate) {
-            lastPracticeDate = progress.last_practice_date;
-          }
-        }
+        const day = lastActivityDay(progress);
+        if (day && (!lastPracticeDate || day > lastPracticeDate)) lastPracticeDate = day;
       });
 
       const words = summarizeStudentWords(studentProgress);

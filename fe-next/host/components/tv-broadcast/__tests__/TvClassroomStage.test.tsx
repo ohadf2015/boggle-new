@@ -52,8 +52,22 @@ describe('TvClassroomStage: the projector column', () => {
   it('Given a race, Then the letter board takes the larger share of its column and the race board gets the rest', () => {
     act(() => ingestLessonClaimsRound({ lessonClaims: race }));
     render(<TvClassroomStage {...base} />);
-    const boardBox = screen.getByTestId('tv-board-column').firstElementChild as HTMLElement;
+    const boardBox = screen.getByTestId('tv-board-box');
     expect(boardBox.className).toMatch(/md:h-\[min\(100cqw,59cqh\)\]/);
+  });
+
+  it('Given a short, wide board column (a 1366x768 wall under the teacher bar), Then the race sits beside a board of at least 220px instead of under a shrunken one', () => {
+    act(() => ingestLessonClaimsRound({ lessonClaims: race }));
+    render(<TvClassroomStage {...base} />);
+    const SHORT = '[@container(max-height:460px)_and_(min-width:400px)]';
+    const split = screen.getByTestId('tv-board-split');
+    expect(screen.getByTestId('tv-board-column')).toContainElement(split);
+    expect(split).toContainElement(screen.getByTestId('tv-board-box'));
+    expect(split).toContainElement(screen.getByTestId('tv-race-region'));
+    expect(split.className).toContain(`md:${SHORT}:flex-row`);
+    expect(screen.getByTestId('tv-board-box').className).toContain(`md:${SHORT}:w-[min(100cqh,56cqw)]`);
+    expect(screen.getByTestId('tv-board-box').className).toContain(`md:${SHORT}:h-full`);
+    expect(screen.getByTestId('tv-race-region').className).toMatch(/\bmin-w-0\b/);
   });
 
   it('Given the room roster, Then the live panel gets it for the feed avatars', () => {

@@ -22,6 +22,11 @@ describe('rosterStatus', () => {
     expect(rosterStatus(iso(6.9), NOW)).toBe('done');
   });
 
+  it('Given a bare practice day exactly 7 days back, Then it still counts as this week, like class analytics', () => {
+    expect(rosterStatus('2026-10-28', NOW)).toBe('done');
+    expect(rosterStatus('2026-10-27', NOW)).toBe('late');
+  });
+
   it('Given practice only before this week, Then the student is late', () => {
     expect(rosterStatus(iso(8), NOW)).toBe('late');
   });

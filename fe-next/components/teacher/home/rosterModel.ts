@@ -30,13 +30,15 @@ export interface RosterRow {
   status: RosterStatus;
 }
 
-const WEEK_MS = 7 * 86_400_000;
+const WEEK_DAYS = 7;
 
+/** Whole UTC days, the same window class analytics uses, so a bare practice day 7 days back is still this week. */
 export function rosterStatus(lastPracticeDate: string | null, nowMs: number): RosterStatus {
   if (!lastPracticeDate) return 'idle';
   const at = Date.parse(lastPracticeDate);
   if (Number.isNaN(at)) return 'idle';
-  return nowMs - at < WEEK_MS ? 'done' : 'late';
+  const since = new Date(nowMs - WEEK_DAYS * 86_400_000).toISOString().slice(0, 10);
+  return new Date(at).toISOString().slice(0, 10) >= since ? 'done' : 'late';
 }
 
 export function rosterRows(students: readonly RosterStudentInput[], nowMs: number): RosterRow[] {

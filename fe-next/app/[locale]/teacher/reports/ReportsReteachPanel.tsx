@@ -30,14 +30,11 @@ export function ReportsReteachPanel({
   classrooms,
   onOpenClass,
   focusClassroomId,
-  hideExample = false,
 }: {
   classrooms: readonly PickerClass[];
   onOpenClass: (classroomId: string) => void;
   /** Inside one class's report: read only that class and drop the way into it. */
   focusClassroomId?: string;
-  /** The locked page already shows a Pro sample; only real evidence belongs above it. */
-  hideExample?: boolean;
 }) {
   const { t } = useLanguage();
   const scoped = useMemo(
@@ -45,8 +42,6 @@ export function ReportsReteachPanel({
     [classrooms, focusClassroomId]
   );
   const state = useReteachSnapshot(scoped);
-
-  if (hideExample && (state.status === 'loading' || (state.status === 'ready' && state.snapshot === null))) return null;
 
   if (state.status === 'loading') {
     return (
