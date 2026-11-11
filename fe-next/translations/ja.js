@@ -10051,6 +10051,7 @@ const ja = {
       "dayProgress": "今週 {day}/5日",
       "daysRemaining": "{tier}チェストまであと{n}日！",
       "claimReady": "{tier}チェストの準備ができました！",
+      "openedTitle": "チェストを開けました：今週の賞品",
       "claimButton": "チェストを開ける",
       "claimError": "チェストを開けられませんでした。もう一度お試しください。",
       "tierBronze": "ブロンズ",

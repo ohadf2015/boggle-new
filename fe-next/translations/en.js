@@ -9436,6 +9436,7 @@ const en = {
       "dayProgress": "{day} of 5 days this week",
       "daysRemaining": "Days to your {tier} Chest: {n}",
       "claimReady": "Your {tier} Chest is ready!",
+      "openedTitle": "Chest opened: this week's prize",
       "claimButton": "Claim chest",
       "claimError": "Couldn't open your chest. Try again.",
       "tierBronze": "Bronze",

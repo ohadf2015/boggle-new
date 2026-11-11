@@ -10359,6 +10359,7 @@ const sv = {
       "dayProgress": "{day} av 5 dagar den här veckan",
       "daysRemaining": "{n} dagar kvar för din {tier}-kista!",
       "claimReady": "Din {tier}-kista är klar!",
+      "openedTitle": "Kistan är öppnad: veckans pris",
       "claimButton": "Öppna kista",
       "claimError": "Kunde inte öppna kistan. Försök igen.",
       "tierBronze": "Brons",

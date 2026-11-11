@@ -11457,6 +11457,7 @@ const ru = {
       "dayProgress": "{day} из 5 дней на этой неделе",
       "daysRemaining": "Ещё {n} дн. до сундука ({tier})",
       "claimReady": "Сундук готов: {tier}",
+      "openedTitle": "Сундук открыт: приз недели",
       "claimButton": "Забрать сундук",
       "claimError": "Не удалось открыть сундук. Попробуй ещё раз.",
       "tierBronze": "Бронза",

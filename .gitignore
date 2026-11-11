@@ -103,3 +103,6 @@ fe-next/LexiClash-release.apk
 fe-next/LexiClash-release.apk.idsig
 *.apk
 *.idsig
+
+# Serena code-search tool rewrites its own config
+.serena/
