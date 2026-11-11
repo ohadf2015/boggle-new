@@ -13714,13 +13714,6 @@ const en = {
       "freeOtherClasses": "The free plan covers your first class. Pro shows these too:",
       "valueLine": "After every game, see which words each class missed, who needs help, and what to practice next.",
       "homeworkShortcut": "Homework results",
-      "freeSummary": {
-        "title": "Your classes so far",
-        "games": "Games in the last 30 days",
-        "students": "Students in your classes",
-        "classes": "Classes that played this week",
-        "hint": "Pro adds the word-by-word results for every student and every game."
-      },
       "lockedValue": "The words your class missed are free on every game's results screen. Reports add who needs help, student by student, across all your games.",
       "emptyClass": {
         "title": "No games in this class yet",
@@ -14289,7 +14282,7 @@ const en = {
       "more": "+{{count}} more",
       "hardestTitle": "Hardest words this week",
       "missed": "{{pct}}% missed",
-      "emptyBody": "Play one game with this class and you'll see who needs help.",
+      "emptyBody": "Afterwards, the words your class found hardest show up here.",
       "startGame": "Start a game",
       "proLine": "See every week and each student with Pro",
       "homeTitle": "Who needs help in {{name}} this week?",
@@ -16057,7 +16050,6 @@ const en = {
       "sessions": {
         "title": "Ready-made class games",
         "subtitle": "Pick a slot in your lesson. The game, list and timer are set for you.",
-        "runThis": "Run this",
         "noList": "No list needed",
         "pickList": "Choose a list",
         "gradeAndUp": "{{grade}} and up"
@@ -20359,8 +20351,6 @@ const en = {
       "tiedWith": "Tied with {name}!",
       "tiedWithMore": "Tied with {name} +{more}!",
       "bestWord": "Best word",
-      "xp": "+{xp} XP",
-      "coins": "+{coins}",
       "seriesTotal": "Total {total}",
       "moreHidden": "+{count} more",
       "allStandings": "All {count} players",
@@ -20644,6 +20634,12 @@ const en = {
       "missedOf": "missed {missed} of {attempts}",
       "studentsMissing": "{count} of {total} students",
       "noneMissed": "Nobody has missed a word twice yet. Nice.",
+      "notFound": {
+        "title": "Not found in games",
+        "note": "Lesson words nobody found in board games. A word may not have fit the board, so treat it as a hint, not a wrong answer.",
+        "of": "not found {missed} of {attempts}",
+        "rate": "{pct}% not found"
+      },
       "empty": "Mastery counts the words from your word lists. Play a vocab quiz, a Wordcraft round or a live game with one of your lists, and it fills in after that game.",
       "loading": "Loading word mastery…",
       "error": "Couldn't load word mastery. Refresh to try again.",
@@ -21224,7 +21220,6 @@ const en = {
       "fullListFailed": "Couldn't switch back to the full list. Try again."
     },
     "studentResults": {
-      "tomorrowHook": "Come back tomorrow and beat your score of {score}.",
       "share": "Share",
       "shareText": "I came #{rank} of {total} with {score} points in a LexiClash class game. Can you beat it?",
       "placed": "You placed",
@@ -21342,6 +21337,7 @@ const en = {
       "colLastPlayed": "Last played",
       "students": "{count} students",
       "studentsOne": "1 student",
+      "classPage": "Class page",
       "notPlayedRecently": "No games in 30 days",
       "roster": {
         "hide": "Hide the student list",
@@ -21622,8 +21618,6 @@ const en = {
       "homeworkHint": "Send this list so students practice it before the game.",
       "moreOptions": "More options",
       "proBadge": "Pro",
-      "lateJoinOn": "Latecomers can join",
-      "lateJoinOff": "No latecomers",
       "changeList": "Change list",
       "listDone": "Done",
       "bestForList": "Best match",

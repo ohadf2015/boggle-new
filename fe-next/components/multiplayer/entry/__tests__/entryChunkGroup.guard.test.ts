@@ -113,6 +113,7 @@ describe("EntryScreen's chunk group (SSR'd next/dynamic entry)", () => {
     expect(src.startsWith("'use client';")).toBe(true);
     expect(src).toMatch(/import\(\s*['"]@\/components\/HowToPlay['"]\s*\)/);
     expect(src).toMatch(/import\(\s*['"]\.\/EntryAvatarBuilder['"]\s*\)/);
-    expect(src.match(/ssr:\s*false/g)?.length).toBe(2);
+    expect(src).toMatch(/import\(\s*['"]@\/components\/auth\/AuthModal['"]\s*\)/);
+    expect(src.match(/ssr:\s*false/g)?.length).toBe(3);
   });
 });

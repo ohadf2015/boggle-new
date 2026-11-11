@@ -28,10 +28,12 @@ export function HardestWordsList({
   words,
   trailing,
   states,
+  notFound = false,
 }: {
   words: HardWord[];
   trailing?: React.ReactNode;
   states?: Record<string, WordState>;
+  notFound?: boolean;
 }) {
   const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -83,7 +85,7 @@ export function HardestWordsList({
                 />
               </span>
               <span className="mt-0.5 block truncate text-[11px] font-bold text-neo-cream/70 tabular-nums">
-                {t('eduPro.mastery.missedOf', { missed: w.missed, attempts: w.attempts })}
+                {t(notFound ? 'eduPro.mastery.notFound.of' : 'eduPro.mastery.missedOf', { missed: w.missed, attempts: w.attempts })}
                 {' · '}
                 {t('eduPro.mastery.studentsMissing', { count: w.studentsMissing, total: w.studentsAsked })}
               </span>
@@ -92,7 +94,7 @@ export function HardestWordsList({
               data-testid="report-word-missrate"
               className="text-end font-neo-display text-sm font-black leading-tight text-neo-white tabular-nums"
             >
-              {t('eg2Polish.words.missRate', { pct: w.missRate })}
+              {t(notFound ? 'eduPro.mastery.notFound.rate' : 'eg2Polish.words.missRate', { pct: w.missRate })}
             </span>
           </m.li>
         ))}

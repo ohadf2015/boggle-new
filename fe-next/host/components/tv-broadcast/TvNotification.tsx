@@ -122,6 +122,7 @@ export interface TvNotificationData {
   subtext?: string;
   duration: number;
   timestamp: number;
+  pair?: [string, string];
 }
 
 interface TvNotificationProps {

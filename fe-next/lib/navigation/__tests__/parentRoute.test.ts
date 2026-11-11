@@ -90,9 +90,9 @@ describe('parentRoute', () => {
       expect(parentRoute('/en/student/achievements')).toBe('/en/student');
     });
 
-    it('never targets a page that does not exist: /teacher/classroom/[id] has no page', () => {
-      expect(parentRoute('/en/teacher/classroom/abc/analytics')).toBe('/en/teacher');
-      expect(parentRoute('/he/teacher/classroom/abc/analytics/')).toBe('/he/teacher');
+    it('class analytics goes back to its class page', () => {
+      expect(parentRoute('/en/teacher/classroom/abc/analytics')).toBe('/en/teacher/classroom/abc');
+      expect(parentRoute('/he/teacher/classroom/abc/analytics/')).toBe('/he/teacher/classroom/abc');
     });
 
     it('does not send /student/join to /student (signed-out users are pushed straight back to join)', () => {

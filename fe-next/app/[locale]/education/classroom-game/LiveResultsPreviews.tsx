@@ -4,8 +4,7 @@
  * DEV-ONLY previews of the round-end surfaces (see LiveSurfacePreview):
  *
  *   ?preview=hostresults — the /education/live projector (EduHostResults)
- *   ?preview=phone       — a student's phone on /education/live (`&hero=1` = a signed-in student's card with
- *                          XP and coins, plus the chest locker)
+ *   ?preview=phone       — a student's phone on /education/live
  *   ?preview=quiz        — the Vocab Quiz finale on the wall (`&own=1` = the student's phone finale,
  *                          `&qboss=defeated|escaped` = with the quiz boss verdict above it)
  *   ?preview=duel        — a duel reveal (`&duel=win|loss|draw`)
@@ -27,11 +26,8 @@ import { VocabQuizStandings } from '@/components/education/vocabQuiz/VocabQuizSt
 import { DuelRevealScreen, type DuelOutcome } from '@/components/education/duels/DuelRevealScreen';
 import { ClassroomGameEndedState } from '@/components/education/ClassroomGameEndedState';
 import { ClassroomBossOutcome } from '@/components/education/ClassroomBossOutcome';
-import { EduStudentHero } from '@/components/education/live/EduStudentHero';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
 import { WARM_UP_SAMPLE } from './WarmUpPreview';
-import LockerGrid from '@/components/education/economy/LockerGrid';
-import { LIVE_KEYFRAMES } from '@/components/education/live/eduLiveStyles';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { quizBossView } from '@/components/education/boss/useQuizBossVerdict';
 import { CLASSROOM_ROOM_GONE_KEY } from '@/lib/education/classroomRoomGone';
@@ -88,7 +84,7 @@ export function HostResultsPreview() {
 }
 
 export function PhoneResultsPreview() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const params = useSearchParams();
   const { summary, players } = usePreviewRound();
   useSeededBoss();
@@ -98,36 +94,6 @@ export function PhoneResultsPreview() {
     if (seedDeck) useStudyDeck.getState().setDeck('PREVIEW', (WARM_UP_SAMPLE[language] ?? WARM_UP_SAMPLE.en).map((word) => ({ word })));
   }, [seedDeck, language]);
   const me = params?.get('me') ?? players[1]?.username ?? players[0]?.username ?? 'Maya';
-  if (params?.get('hero') === '1') {
-    return (
-      <div className="fixed inset-0 z-[80] flex flex-col items-center gap-4 overflow-y-auto bg-neo-navy p-4">
-        <style>{LIVE_KEYFRAMES}</style>
-        <div className="w-full max-w-sm">
-          <EduStudentHero
-            rank={2}
-            total={28}
-            score={1240}
-            bestWord={{ word: 'whispering', score: 34 }}
-            lesson={{ found: 6, total: 14 }}
-            xp={45}
-            coins={12}
-            gap={{ kind: 'behind', name: 'Maximiliana Castellanos-Ruiz', points: 36 }}
-            reduceMotion={false}
-            t={t}
-          />
-        </div>
-        <div className="w-full max-w-sm rounded-neo border-3 border-neo-cream bg-neo-navy p-3 text-white shadow-hard-xl">
-          <LockerGrid
-            items={[
-            { gameCode: 'YHNCF4', roundId: '1', rarity: 'epic', xp: 60, itemId: 'tile-neon', createdAt: '' },
-            { gameCode: 'YHNCF4', roundId: '2', rarity: 'rare', xp: 30, itemId: 'tile-neon', createdAt: '' },
-            { gameCode: 'YHNCF4', roundId: '3', rarity: 'common', xp: 10, itemId: 'tile-neon', createdAt: '' },
-          ]}
-          />
-        </div>
-      </div>
-    );
-  }
   return (
     <div className="fixed inset-0 z-[80] flex flex-col bg-neo-navy">
       <EduStudentResults finalScores={players} username={me} socket={null} classroomSummary={summary} />

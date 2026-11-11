@@ -15412,13 +15412,6 @@ const es = {
       "freeOtherClasses": "El plan gratuito incluye tu primera clase. Con Pro ves también estas:",
       "valueLine": "Después de cada partida, ves qué palabras falló cada clase, quién necesita ayuda y qué practicar a continuación.",
       "homeworkShortcut": "Resultados de las tareas",
-      "freeSummary": {
-        "title": "Tus clases hasta ahora",
-        "games": "Partidas en los últimos 30 días",
-        "students": "Estudiantes en tus clases",
-        "classes": "Clases que jugaron esta semana",
-        "hint": "Pro añade los resultados palabra por palabra de cada estudiante y cada partida."
-      },
       "lockedValue": "Las palabras que falló tu clase aparecen gratis en la pantalla de resultados de cada partida. Los informes añaden quién necesita ayuda, alumno por alumno, en todas tus partidas.",
       "emptyClass": {
         "title": "Esta clase aún no ha jugado",
@@ -15945,13 +15938,13 @@ const es = {
       "invalid": "A esta página le falta el código de la clase. Ábrela de nuevo desde tu inicio de docente."
     },
     "weekInsight": {
-      "emptyHeadline": "Una partida y verás quién necesita ayuda",
+      "emptyHeadline": "Juega una partida para ver quién necesita ayuda",
       "title": "Quién necesita ayuda esta semana",
       "nobodyStuck": "Esta semana nadie se ha atascado.",
       "more": "+{{count}} más",
       "hardestTitle": "Las palabras más difíciles de la semana",
       "missed": "falló el {{pct}}%",
-      "emptyBody": "Juega una partida con esta clase y verás quién necesita ayuda.",
+      "emptyBody": "Después, aquí verás las palabras que más le costaron a la clase.",
       "startGame": "Empezar una partida",
       "proLine": "Con Pro ves todas las semanas y a cada estudiante",
       "homeTitle": "¿Quién necesita ayuda en {{name}} esta semana?",
@@ -17727,7 +17720,6 @@ const es = {
       "sessions": {
         "title": "Juegos listos para clase",
         "subtitle": "Elige un momento de la clase. El juego, la lista y el tiempo ya están puestos.",
-        "runThis": "Jugar esta",
         "noList": "Sin lista",
         "pickList": "Elige una lista",
         "gradeAndUp": "{{grade}} en adelante"
@@ -21326,8 +21318,6 @@ const es = {
       "tiedWith": "¡Empate con {name}!",
       "tiedWithMore": "¡Empate con {name} +{more}!",
       "bestWord": "Mejor palabra",
-      "xp": "+{xp} XP",
-      "coins": "+{coins}",
       "seriesTotal": "Total {total}",
       "moreHidden": "+{count} más",
       "allStandings": "Los {count} jugadores",
@@ -21611,6 +21601,12 @@ const es = {
       "missedOf": "falló {missed} de {attempts}",
       "studentsMissing": "{count} de {total} alumnos",
       "noneMissed": "Nadie ha fallado una palabra dos veces todavía. Bien.",
+      "notFound": {
+        "title": "No encontradas en los juegos",
+        "note": "Palabras de la lección que nadie encontró en los juegos de tablero. Puede que no cupieran en el tablero: tómalo como una pista, no como una respuesta incorrecta.",
+        "of": "no encontrada {missed} de {attempts}",
+        "rate": "{pct}% sin encontrar"
+      },
       "empty": "El dominio se mide con las palabras de tus listas. Juega un quiz de vocabulario, una ronda de Wordcraft o una partida en vivo con una de tus listas y se completará después.",
       "loading": "Cargando dominio de palabras…",
       "error": "No pudimos cargar el dominio de palabras. Recarga para intentarlo de nuevo.",
@@ -22191,7 +22187,6 @@ const es = {
       "fullListFailed": "No se pudo volver a la lista completa. Inténtalo de nuevo."
     },
     "studentResults": {
-      "tomorrowHook": "Vuelve mañana y supera tu puntuación: {score}.",
       "share": "Compartir",
       "shareText": "Quedé #{rank} de {total} con {score} puntos en un juego de clase de LexiClash. ¿Me superas?",
       "placed": "Tu puesto",
@@ -22309,6 +22304,7 @@ const es = {
       "colLastPlayed": "Última partida",
       "students": "{count} alumnos",
       "studentsOne": "1 alumno",
+      "classPage": "Página de la clase",
       "notPlayedRecently": "Sin partidas en 30 días",
       "roster": {
         "hide": "Ocultar la lista de alumnos",
@@ -22589,8 +22585,6 @@ const es = {
       "homeworkHint": "Envía esta lista para que la practiquen antes del juego.",
       "moreOptions": "Más opciones",
       "proBadge": "Pro",
-      "lateJoinOn": "Se puede entrar tarde",
-      "lateJoinOff": "Sin entrar tarde",
       "changeList": "Cambiar lista",
       "listDone": "Listo",
       "bestForList": "Ideal",

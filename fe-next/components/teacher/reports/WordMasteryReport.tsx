@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, SearchX } from 'lucide-react';
 import { SegmentedTabs } from '@/components/education/shell/SegmentedTabs';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -16,6 +16,7 @@ import { StudentInsightList } from './StudentInsightList';
 import { ReportShareActions, ReportPrintStyles, buildReportSummary } from './ReportShareActions';
 import { ReportEmptyState } from './ReportEmptyState';
 import type { ClassInsights, WordState } from './classInsights';
+import type { HardWord } from '@/lib/education/wordMasteryReport';
 
 export interface WordMasteryReportProps {
   classroomId: string;
@@ -67,10 +68,12 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   }
 
   const totals = state.status === 'ready' ? state.report.totals : state.preview.totals;
+  const notFoundWords = (state.status === 'ready' ? state.report.notFoundInGames : state.preview.notFoundInGames)?.words ?? [];
+  const notFound = notFoundWords.length > 0 ? <NotFoundBlock words={notFoundWords} /> : null;
   if (totals.sessions === 0) {
     return (
-      <Shell>
-        <ReportEmptyState classroomId={classroomId} />
+      <Shell pro={state.status === 'ready' && notFound !== null}>
+        {notFound ?? <ReportEmptyState classroomId={classroomId} />}
       </Shell>
     );
   }
@@ -84,6 +87,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
           <HardestBlock>
             <MasteryLockedTeaser words={preview.hardestWords} hidden={preview.hiddenWords} />
           </HardestBlock>
+          {notFound}
         </div>
       </Shell>
     );
@@ -97,13 +101,16 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
     </div>
   );
   const hardest = (
-    <HardestBlock>
-      {report.hardestWords.length > 0 ? (
-        <HardestWordsList words={report.hardestWords} states={insights ? statesOf(insights) : undefined} />
-      ) : (
-        <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
-      )}
-    </HardestBlock>
+    <div className="space-y-4">
+      <HardestBlock>
+        {report.hardestWords.length > 0 ? (
+          <HardestWordsList words={report.hardestWords} states={insights ? statesOf(insights) : undefined} />
+        ) : (
+          <p className="text-sm font-bold text-neo-cream/70">{t('eduPro.mastery.noneMissed')}</p>
+        )}
+      </HardestBlock>
+      {notFound}
+    </div>
   );
   const summary = () => buildReportSummary({ t, classroomName, report, insights, names });
 
@@ -209,6 +216,20 @@ function HardestBlock({ children }: { children: React.ReactNode }) {
         {t('eduPro.mastery.hardestTitle')}
       </h3>
       {children}
+    </div>
+  );
+}
+
+function NotFoundBlock({ words }: { words: HardWord[] }) {
+  const { t } = useLanguage();
+  return (
+    <div data-testid="mastery-not-found">
+      <h3 className="flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
+        <SearchX className="size-4 text-neo-cream/70" aria-hidden="true" />
+        {t('eduPro.mastery.notFound.title')}
+      </h3>
+      <p className="mb-2 mt-0.5 text-xs font-bold text-neo-cream/65">{t('eduPro.mastery.notFound.note')}</p>
+      <HardestWordsList words={words} notFound />
     </div>
   );
 }

@@ -38,6 +38,8 @@ interface TvPlayerCardProps {
    * and for anyone the round's deal has not met yet.
    */
   teamId?: number | null;
+  /** Virtualised rows have a fixed height, so the name may not wrap there. */
+  singleLineName?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
 }
 
@@ -68,6 +70,7 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
   comboLevel = 0,
   isHost = false,
   isBot = false,
+  singleLineName = false,
   presenceStatus = 'active',
   disconnected = false,
   index: _index,
@@ -240,8 +243,10 @@ const TvPlayerCard = memo<TvPlayerCardProps>(({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <p
+            title={username}
             className={cn(
-              'font-neo-display font-black text-lg 2xl:text-2xl uppercase truncate',
+              'font-neo-display font-black text-lg 2xl:text-2xl uppercase',
+              singleLineName ? 'truncate' : 'line-clamp-2 leading-tight [overflow-wrap:anywhere]',
               isEliminated && 'line-through',
               isTopThree ? rankConfig?.textColor : 'text-neo-cream'
             )}

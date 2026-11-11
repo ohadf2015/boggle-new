@@ -42,10 +42,14 @@ describe('educationBackHref', () => {
     expect(educationBackHref({ pathname, locale: 'en', role: 'teacher' })).toBe('/en/teacher');
   });
 
-  it('classroom analytics agrees with parentRoute: Teacher HQ (no page exists at /teacher/classroom/[id])', () => {
+  it('classroom analytics agrees with parentRoute: its class page', () => {
     const pathname = '/en/teacher/classroom/abc123/analytics';
     expect(educationBackHref({ pathname, locale: 'en', role: 'teacher' })).toBe(parentRoute(pathname));
-    expect(parentRoute(pathname)).toBe('/en/teacher');
+    expect(parentRoute(pathname)).toBe('/en/teacher/classroom/abc123');
+  });
+
+  it('the class page itself goes back to the teacher hub', () => {
+    expect(educationBackHref({ pathname: '/he/teacher/classroom/abc123', locale: 'he', role: 'teacher' })).toBe('/he/teacher');
   });
 
   it('other education pages fall back to the viewer-appropriate education home', () => {

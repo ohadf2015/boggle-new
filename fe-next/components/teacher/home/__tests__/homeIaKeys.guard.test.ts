@@ -18,11 +18,6 @@ const KEYS = [
   'eduShell.setup.starterListHint',
   'eduShell.host.proOptions',
   'teacher.reports.homeworkShortcut',
-  'teacher.reports.freeSummary.title',
-  'teacher.reports.freeSummary.games',
-  'teacher.reports.freeSummary.students',
-  'teacher.reports.freeSummary.classes',
-  'teacher.reports.freeSummary.hint',
 ];
 
 const placeholders = (s: string) => [...s.matchAll(/\{\{?\s*(\w+)\s*\}?\}/g)].map((m) => m[1]).sort();

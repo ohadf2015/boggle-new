@@ -33,8 +33,6 @@ const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [
   { test: /^\/student\/?$/, parent: '/education' },
   { test: /^\/join\/?$/, parent: '/education' },
   { test: /^\/classroom\/?$/, parent: '/education' },
-  // No page at /teacher/classroom/[id]; its children go back to Teacher HQ.
-  { test: /^\/teacher\/classroom\/[^/]+\/.+$/, parent: '/teacher' },
   // /student bounces a signed-out visitor straight back to /student/join.
   { test: /^\/student\/join\/?$/, parent: '/education' },
 ];

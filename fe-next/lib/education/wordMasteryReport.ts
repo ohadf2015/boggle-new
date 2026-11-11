@@ -5,7 +5,7 @@
  * Pure: the API route owns auth, the Pro check and the DB read.
  */
 
-import type { ClassMastery } from '@/lib/education/wordMasteryTrend';
+import type { ClassMastery, NotFoundInGames } from '@/lib/education/wordMasteryTrend';
 
 export const HARDEST_WORDS_LIMIT = 10;
 export const FREE_PREVIEW_WORDS = 3;
@@ -54,6 +54,7 @@ export interface WordMasteryReport {
     words: { word: string; display: string }[];
     cells: Record<string, Record<string, MasteryCell>>;
   };
+  notFoundInGames?: NotFoundInGames;
 }
 
 export interface WordMasteryPreview {
@@ -61,6 +62,7 @@ export interface WordMasteryPreview {
   hardestWords: HardWord[];
   /** How many more ranked words the full report holds. */
   hiddenWords: number;
+  notFoundInGames?: NotFoundInGames;
 }
 
 const pct = (part: number, whole: number) => (whole > 0 ? Math.round((part / whole) * 100) : 0);
@@ -132,6 +134,7 @@ export function buildWordMasteryReport(mastery: ClassMastery): WordMasteryReport
     hardestWords,
     students,
     heatmap: { words: heatmapWords, cells },
+    notFoundInGames: mastery.notFoundInGames ?? { words: [], sessions: 0 },
   };
 }
 
@@ -140,6 +143,10 @@ export function toFreePreview(report: WordMasteryReport): WordMasteryPreview {
     totals: report.totals,
     hardestWords: report.hardestWords.slice(0, FREE_PREVIEW_WORDS),
     hiddenWords: Math.max(0, report.hardestWords.length - FREE_PREVIEW_WORDS),
+    notFoundInGames: report.notFoundInGames && {
+      words: report.notFoundInGames.words.slice(0, FREE_PREVIEW_WORDS),
+      sessions: report.notFoundInGames.sessions,
+    },
   };
 }
 

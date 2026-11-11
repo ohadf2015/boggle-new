@@ -34,7 +34,7 @@ import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
 import { EduMissedRecall, missedDefinitions } from './EduMissedRecall';
 import { useRival } from './useRival';
-import { EduStudentShareButton } from './EduStudentNextStep';
+import { EduStudentShareButton } from './EduStudentShareButton';
 import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 

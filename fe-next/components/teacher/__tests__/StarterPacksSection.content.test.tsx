@@ -17,7 +17,7 @@ describe('starter content: ready-to-run sessions and themed packs', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('Given a Hebrew class, Then every Hebrew session is a card with its length, grade and a Run this link to the lobby in the teacher UI locale', () => {
+  it('Given a Hebrew class, Then every Hebrew session is a card with its length, grade and a Start a game link to the lobby in the teacher UI locale', () => {
     render(<StarterPacksSection onSelectPack={vi.fn()} language="he" classroomId="c1" />);
     const region = screen.getByRole('region', { name: 'education.starterPacks.sessions.title' });
     const cards = within(region).getAllByRole('article');
@@ -31,19 +31,19 @@ describe('starter content: ready-to-run sessions and themed packs', () => {
     const art = card.querySelector('img');
     expect(art).toHaveAttribute('alt', '');
     expect(decodeURIComponent(art!.getAttribute('src')!)).toContain('edu-warmup-512.webp');
-    expect(within(card).getByRole('link', { name: /education.starterPacks.sessions.runThis/ })).toHaveAttribute(
+    expect(within(card).getByRole('link', { name: /eduShell.home.startLive/ })).toHaveAttribute(
       'href',
       sessionHostHref('en', warmUp, themedPackCode('he', 'autumn'), 'c1'),
     );
   });
 
-  it('Given the lobby handles the run itself, Then Run this hands over the session and its list instead of navigating', async () => {
+  it('Given the lobby handles the run itself, Then Start a game hands over the session and its list instead of navigating', async () => {
     const onRunSession = vi.fn();
     render(<StarterPacksSection onSelectPack={vi.fn()} language="sv" onRunSession={onRunSession} />);
     const region = screen.getByRole('region', { name: 'education.starterPacks.sessions.title' });
     const card = within(region).getByText('education.starterPacks.session.icebreaker.name').closest('article')!;
     const packs = await loadThemedPacks('sv');
-    const button = await within(card).findByRole('button', { name: /education.starterPacks.sessions.runThis/ });
+    const button = await within(card).findByRole('button', { name: /eduShell.home.startLive/ });
     await waitFor(() => expect(button).toBeEnabled());
     fireEvent.click(button);
     const classPack = packs.find((p) => p.theme === 'class')!;
@@ -56,12 +56,20 @@ describe('starter content: ready-to-run sessions and themed packs', () => {
     );
   });
 
+  it('Given many ready-made games on one screen, Then none of their Start a game buttons is a lime primary', () => {
+    render(<StarterPacksSection onSelectPack={vi.fn()} language="en" />);
+    const region = screen.getByRole('region', { name: 'education.starterPacks.sessions.title' });
+    const starts = within(region).getAllByRole('link', { name: /eduShell.home.startLive/ });
+    expect(starts.length).toBeGreaterThan(1);
+    for (const start of starts) expect(start.className).not.toMatch(/\bbg-neo-lime\b/);
+  });
+
   it('Given an English class, Then the ESL starter offers A1-B2 and the chosen level goes on the link', () => {
     render(<StarterPacksSection onSelectPack={vi.fn()} language="en" />);
     const card = screen.getByText('education.starterPacks.session.eslStarter.name').closest('article')!;
     for (const level of ['A1', 'A2', 'B1', 'B2']) expect(within(card).getByRole('radio', { name: level })).toBeInTheDocument();
     fireEvent.click(within(card).getByRole('radio', { name: 'B2' }));
-    const href = within(card).getByRole('link', { name: /education.starterPacks.sessions.runThis/ }).getAttribute('href')!;
+    const href = within(card).getByRole('link', { name: /eduShell.home.startLive/ }).getAttribute('href')!;
     expect(new URL(href, 'https://x.test').searchParams.get('pack')).toBe('LC-EN-PK-ESL-B2');
   });
 

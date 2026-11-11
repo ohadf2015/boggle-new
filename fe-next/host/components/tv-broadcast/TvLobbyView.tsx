@@ -9,6 +9,7 @@ import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
 import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
+import { useLobbyRoster } from './lobbyPresence';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
 import { useGameActions } from '@/hooks/gameState';
@@ -142,17 +143,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;
-  // The projector prints names, so it needs the roster in one shape — the
-  // arcade lobby accepts bare strings as well as records.
-  const projectorStudents = useMemo(
-    () =>
-      filteredPlayers.map((player) =>
-        typeof player === 'string'
-          ? { username: player }
-          : { username: player.username, isBot: player.isBot, avatar: player.avatar }
-      ),
-    [filteredPlayers]
-  );
+  const projectorStudents = useLobbyRoster(playersReady, username);
   const hostSelectedGameMode = useHostSelectedGameMode();
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
   const [localGameMode, setLocalGameMode] = useState<GameModeOption>(hostSelectedGameMode || 'random');

@@ -42,15 +42,32 @@ describe('getClassMastery', () => {
     vi.clearAllMocks();
   });
 
-  it('filters to this classroom, asked-word rows only, oldest first', async () => {
+  it('filters to this classroom, every lesson-word row (asked and board), newest first so the cap drops the oldest', async () => {
     const q = mockTable({ data: [] });
 
     await getClassMastery('class-1');
 
     expect(q.eq).toHaveBeenCalledWith('classroom_id', 'class-1');
-    expect(q.not).toHaveBeenCalledWith('results->>lessonWordsAsked', 'is', null);
+    expect(q.not).toHaveBeenCalledWith('results->lessonWordsFound', 'is', null);
+    expect(q.not).not.toHaveBeenCalledWith('results->>lessonWordsAsked', 'is', null);
     expect(q.not).toHaveBeenCalledWith('completed_at', 'is', null);
-    expect(q.order).toHaveBeenCalledWith('started_at', { ascending: true });
+    expect(q.order).toHaveBeenCalledWith('started_at', { ascending: false });
+  });
+
+  it('keeps board rounds out of the verdicts and returns them as a separate not-found signal', async () => {
+    mockTable({
+      data: [
+        { student_id: 'a', started_at: '2026-09-02T10:00:00Z', results: { gameCode: 'b1', lessonWordsFound: [], lessonWordsMissed: ['owl'] } },
+        { student_id: 'b', started_at: '2026-09-02T10:00:00Z', results: { gameCode: 'b1', lessonWordsFound: [], lessonWordsMissed: ['owl'] } },
+      ],
+    });
+
+    const { data } = await getClassMastery('class-1');
+
+    expect(data?.sessionsAnalyzed).toBe(0);
+    expect(data?.students).toEqual([]);
+    expect(data?.notFoundInGames?.sessions).toBe(2);
+    expect(data?.notFoundInGames?.words.map((w) => w.word)).toEqual(['owl']);
   });
 
   it('returns empty class mastery when the class has no evidence rows', async () => {
@@ -64,6 +81,7 @@ describe('getClassMastery', () => {
       classStuckWords: [],
       sessionsAnalyzed: 0,
       rowsSkipped: 0,
+      notFoundInGames: { words: [], sessions: 0 },
     });
   });
 

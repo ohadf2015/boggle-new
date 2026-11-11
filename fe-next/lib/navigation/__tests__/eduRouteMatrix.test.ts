@@ -22,7 +22,7 @@ const BACK: Array<[string, string]> = [
   ['teacher/reports', 'teacher'],
   ['teacher/curriculum', 'teacher'],
   ['teacher/profile', 'teacher'],
-  ['teacher/classroom/abc123/analytics', 'teacher'],
+  ['teacher/classroom/abc123/analytics', 'teacher/classroom/abc123'],
   ['student/join', 'join'],
   ['student/lessons/x', 'student'],
   ['student/achievements', 'student'],

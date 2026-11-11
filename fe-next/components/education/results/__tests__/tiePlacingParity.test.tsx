@@ -1,5 +1,5 @@
 /**
- * Two phone routes, one tie: /education/live (EduStudentHero) and /multiplayer (StudentRoundOutcome)
+ * Two phone routes, one tie: /education/live (StudentRevealHero) and /multiplayer (StudentRoundOutcome)
  * must both tell a student who shares first place that they are first, tied with the other leader.
  */
 import React from 'react';
@@ -10,7 +10,8 @@ import '@testing-library/jest-dom';
 vi.mock('next/image', () => ({ default: () => <span data-testid="img" /> }));
 
 import { StudentRoundOutcome } from '../StudentRoundOutcome';
-import { EduStudentHero } from '@/components/education/live/EduStudentHero';
+import { StudentRevealHero } from '../StudentRevealHero';
+import { studentVerdict } from '../studentReveal';
 import { studentGap, studentPlacing } from '@/components/education/live/eduResultsModel';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
@@ -34,16 +35,18 @@ describe('a tie reads the same on both phone routes', () => {
   it('on /education/live, the same student reads #1 of 3, tied with Maya', () => {
     const placing = studentPlacing(standings, 'Leo', 'Ms Cohen')!;
     expect(placing).toEqual({ rank: 1, total: 3, score: 96 });
+    const gap = studentGap(standings, 'Leo', 'Ms Cohen');
+    const verdict = studentVerdict({ ...placing, rivalDiff: null, gapKind: gap?.kind ?? null });
+    expect(verdict).toBe('tied');
     render(
-      <EduStudentHero
+      <StudentRevealHero
         rank={placing.rank}
         total={placing.total}
         score={placing.score}
-        bestWord={null}
-        lesson={null}
-        xp={null}
-        coins={null}
-        gap={studentGap(standings, 'Leo', 'Ms Cohen')}
+        verdict={verdict}
+        beat="done"
+        rival={null}
+        gap={gap}
         reduceMotion
         t={t}
       />

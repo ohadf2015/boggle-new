@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { LogOut } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AuthContext, useAuth, type AuthContextValue } from '@/contexts/AuthContext';
 import { SocketContext } from '@/utils/SocketContext';
-import { cn } from '@/lib/utils';
 import GridComponent from '@/components/GridComponent';
 import { MpRoundLayout } from '@/components/multiplayer/round/MpRoundLayout';
 import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
@@ -13,13 +11,7 @@ import { MP_ROUND_CONTAINER_CLASS } from '@/components/multiplayer/round/roundCo
 import { ClassroomRoundDock } from '@/components/education/live/ClassroomRoundDock';
 import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
 import { ingestLessonClaim, ingestLessonClaimsRound } from '@/components/education/live/useLessonClaims';
-import { EduStudentHero } from '@/components/education/live/EduStudentHero';
-import { EduStudentClassGoal, EduStudentWaitNext } from '@/components/education/live/EduStudentProgress';
-import { EduStudentNextStep, EduStudentShareButton } from '@/components/education/live/EduStudentNextStep';
-import { LIVE_KEYFRAMES, PRESS } from '@/components/education/live/eduLiveStyles';
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
-import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
-import RoundShop from '@/components/education/economy/RoundShop';
 import { JoinNameStep } from '@/components/education/join/JoinNameStep';
 import { NAME_NOT_ALLOWED_KEY } from '@/components/education/join/joinFailure';
 import type { JoinFlowState } from '@/components/education/join/useJoinFlow';
@@ -139,55 +131,6 @@ export function DockPreview({ v }: { v?: string }) {
             dock={<ClassroomRoundDock gameCode={GAME} socket={socket.asSocket()} me={f.me} />}
           />
           <LessonClaimToast socket={socket.asSocket()} me={f.me} t={t as T} dir={language === 'he' ? 'rtl' : 'ltr'} />
-        </div>
-      </div>
-    </SocketScope>
-  );
-}
-
-/** Surface 3: the top of EduStudentResults (header, hero, chest, shop) in its own outer box. */
-export function ResultsPreview({ v }: { v?: string }) {
-  const { t: rawT, language } = useLanguage();
-  const t = rawT as T;
-  const f = fixtureFor(language);
-  const underdog = v === 'lost';
-  const socket = useStudentSocket(f, v, underdog);
-  const diff = rivalDiff(v);
-  const placing = underdog ? { rank: 22, total: 26, score: 9 } : { rank: 4, total: 26, score: 37 };
-  return (
-    <SocketScope socket={socket}>
-      <div className="flex h-dvh flex-col">
-        <div data-testid="edu-student-results" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
-          <style>{LIVE_KEYFRAMES}</style>
-          <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
-            <EduStudentShareButton t={t} language={language} placing={placing} />
-            <button type="button" className={cn('inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated px-3 font-neo-display text-sm font-black uppercase shadow-hard-sm hover:bg-neo-navy-light', PRESS)}>
-              <LogOut className="size-4" aria-hidden="true" />
-              {t('eduLiveRoom.studentResults.leave')}
-            </button>
-          </header>
-          <main className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto px-4 pb-2 pt-1.5">
-            <div className="w-full max-w-sm">
-              <EduStudentHero
-                rank={placing.rank}
-                total={placing.total}
-                score={placing.score}
-                bestWord={{ word: f.words[6], score: 12 }}
-                lesson={{ found: underdog ? 1 : 3, total: 12 }}
-                xp={45}
-                coins={12}
-                gap={null}
-                rival={{ rivalName: f.rival, diff, won: diff > 0 }}
-                reduceMotion={false}
-                t={t}
-                extra={<EduStudentClassGoal found={9} total={12} t={t} />}
-              />
-            </div>
-            <div className="w-full max-w-sm"><ChestRewardCta gameCode={GAME} roundId="1" /></div>
-            <div className="w-full max-w-sm"><RoundShop compact gameCode={GAME} /></div>
-            <div className="w-full max-w-sm"><EduStudentNextStep t={t} placing={placing} showTomorrow /></div>
-            <div className="w-full max-w-sm"><EduStudentWaitNext username={f.me} t={t} /></div>
-          </main>
         </div>
       </div>
     </SocketScope>

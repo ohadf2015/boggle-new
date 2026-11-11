@@ -57,12 +57,11 @@ export async function getClassMastery(
     const { data: rows, error } = await db
       .from('practice_sessions')
       .select('student_id, started_at, results')
-      // Board-mode rows never set `lessonWordsAsked` — skip them here rather
-      // than scan and discard in buildClassMastery.
       .eq('classroom_id', classroomId)
-      .not('results->>lessonWordsAsked', 'is', null)
+      .not('results->lessonWordsFound', 'is', null)
       .not('completed_at', 'is', null)
-      .order('started_at', { ascending: true })
+      // Newest first so the row cap drops the oldest games; the fold sorts by time itself.
+      .order('started_at', { ascending: false })
       .limit(MAX_ROWS);
 
     if (error) {

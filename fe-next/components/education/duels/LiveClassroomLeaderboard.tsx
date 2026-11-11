@@ -58,6 +58,11 @@ export interface LiveClassroomLeaderboardProps {
 
 /** How long a burst / "+N" stays up. */
 const POP_MS = 900;
+const LONG_NAME = 10;
+const NAME_SIZE = 'text-3xl max-md:text-xl md:[@media(max-height:1000px)]:text-2xl lg:[@media(min-height:1001px)]:text-4xl';
+// Two lines at this size fit inside the rank badge's height, so a long name never grows the row and shifts the row fit.
+const LONG_NAME_SIZE = 'text-xl max-md:text-base md:[@media(max-height:1000px)]:text-lg lg:[@media(min-height:1001px)]:text-2xl leading-[1.05]';
+
 /** The projector stings at most once per window — 30 phones scoring at once is one cheer, not 30. */
 const STING_WINDOW_MS = 1200;
 
@@ -265,7 +270,7 @@ function ProjectorBoard({
                   >
                     {rank}
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-neo-display text-3xl font-black max-md:text-xl md:[@media(max-height:1000px)]:text-2xl lg:[@media(min-height:1001px)]:text-4xl">{row.username}</span>
+                  <span title={row.username} className={cn('min-w-0 flex-1 line-clamp-2 font-neo-display font-black [overflow-wrap:anywhere]', Array.from(row.username).length > LONG_NAME ? LONG_NAME_SIZE : NAME_SIZE)}>{row.username}</span>
                   <span className="relative flex shrink-0 items-baseline gap-2">
                     <AdaptiveMotion.span
                       animate={{ scale: pop ? [1, 1.35, 1] : 1 }}

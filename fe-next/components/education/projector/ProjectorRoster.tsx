@@ -18,6 +18,8 @@ export interface ProjectorStudent {
   isBot?: boolean;
   /** Stored avatar when the room carries it; absent = a face seeded from the name. */
   avatar?: AvatarType | null;
+  /** Phone dropped in the lobby: still named, not counted. */
+  reconnecting?: boolean;
 }
 
 interface ProjectorRosterProps {
@@ -75,7 +77,9 @@ function useArrivals(names: string[], onArrive?: () => void): ArrivalLog {
 export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRoster({ students, readyUsernames = [], t, onRemove, removeStatusOf, emptyActions }) {
   const { playPlayerJoinedSound } = useSoundEffects();
   const ready = useMemo(() => new Set(readyUsernames), [readyUsernames]);
-  const readyCount = students.filter((s) => ready.has(s.username)).length;
+  const present = students.filter((s) => !s.reconnecting);
+  const joined = present.length;
+  const readyCount = present.filter((s) => ready.has(s.username)).length;
   const tier = rosterTier(students.length);
   const names = useMemo(() => students.map((s) => s.username), [students]);
   const arrivals = useArrivals(names, playPlayerJoinedSound);
@@ -92,25 +96,25 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
       <header className="flex flex-wrap items-center gap-x-[clamp(0.5rem,1.5cqw,1.5rem)] gap-y-2">
         <h2 data-testid="projector-count" className="inline-flex items-center gap-[0.3em] font-neo-display font-black leading-none text-neo-cream text-[clamp(1.25rem,min(3.6cqw,4cqh),3.25rem)]">
           <Users className="size-[1em] shrink-0 text-neo-cream/80" aria-hidden="true" />
-          <span key={students.length} className="inline-block tabular-nums motion-safe:animate-[edu-live-tick_260ms_cubic-bezier(0.23,1,0.32,1)]">
-            {t('eduLiveRoom.lobby.joined', { count: students.length })}
+          <span key={joined} className="inline-block tabular-nums motion-safe:animate-[edu-live-tick_260ms_cubic-bezier(0.23,1,0.32,1)]">
+            {t('eduLiveRoom.lobby.joined', { count: joined })}
           </span>
         </h2>
-        {students.length > 0 && (
+        {joined > 0 && (
           <div
             data-testid="projector-ready-count"
             role="progressbar"
             aria-valuenow={readyCount}
             aria-valuemin={0}
-            aria-valuemax={students.length}
-            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: students.length })}
+            aria-valuemax={joined}
+            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: joined })}
             className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
-            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: students.length })}</span>
+            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: joined })}</span>
             <span className="relative h-[0.8em] min-w-0 flex-1 overflow-hidden rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy">
               <span
                 className="absolute inset-y-0 start-0 bg-neo-cream transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${Math.round((readyCount / students.length) * 100)}%` }}
+                style={{ width: `${Math.round((readyCount / joined) * 100)}%` }}
               />
             </span>
           </div>
@@ -156,18 +160,20 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         >
           {students.map((student, index) => {
             const status = removeStatusOf?.(student.username) ?? 'idle';
-            const isReady = ready.has(student.username);
+            const isReady = !student.reconnecting && ready.has(student.username);
             return (
               <li
                 key={student.username}
                 data-testid="projector-student"
                 data-ready={isReady ? 'true' : 'false'}
                 data-dim={readyCount > 0 && !isReady ? 'true' : 'false'}
+                data-reconnecting={student.reconnecting ? 'true' : undefined}
                 style={{ '--tilt': tiltOf(student.username) } as CSSProperties}
                 className={cn(
                   'relative flex min-w-0 items-center gap-[0.35em] rounded-full py-[0.15em] pe-[0.6em] ps-[0.15em] font-neo-display font-black leading-none',
                   isReady ? 'shadow-[0_0_0_3px_var(--neo-lime),4px_4px_0_rgb(var(--neo-black))]' : 'shadow-hard-sm',
-                  readyCount > 0 && !isReady && 'brightness-[0.65] saturate-[0.6]',
+                  readyCount > 0 && !isReady && !student.reconnecting && 'brightness-[0.65] saturate-[0.6]',
+                  student.reconnecting && 'opacity-60 grayscale',
                   !arrivals.still.has(student.username) && 'motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
                   tier.chip,
                   STUDENT_CHIP,
@@ -179,6 +185,9 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                 </span>
                 <span dir="auto" title={student.username} className={cn('min-w-0 flex-1 leading-[1.05] [overflow-wrap:anywhere]', Array.from(student.username).length > 11 && 'text-[0.7em]')}>
                   {student.username}
+                  {student.reconnecting && (
+                    <span className="block font-neo-body text-[0.55em] font-bold normal-case leading-tight text-neo-cream/80">{t('common.playerReconnecting')}</span>
+                  )}
                 </span>
                 {editing && !student.isBot && status === 'failed' && (
                   <span data-testid="projector-remove-failed" role="status" className="shrink-0 rounded-full bg-neo-navy px-1.5 font-neo-body text-[0.6em] font-bold text-neo-pink">

@@ -206,3 +206,18 @@ describe('TvPlayerCard score bar', () => {
     expect(bar.style.transform).toBe('scaleX(0)');
   });
 });
+
+describe('TvPlayerCard long names', () => {
+  it('wraps a long name onto two lines before cutting it, and keeps the full name on hover', () => {
+    render(<TvPlayerCard {...defaultProps} username="Maximiliana-Josefina" />);
+    const name = screen.getByText('Maximiliana-Josefina');
+    expect(name.className).not.toMatch(/\btruncate\b/);
+    expect(name.className).toContain('line-clamp-2');
+    expect(name).toHaveAttribute('title', 'Maximiliana-Josefina');
+  });
+
+  it('stays on one line in the virtualised list, whose rows have a fixed height', () => {
+    render(<TvPlayerCard {...defaultProps} username="Maximiliana-Josefina" singleLineName />);
+    expect(screen.getByText('Maximiliana-Josefina').className).toMatch(/\btruncate\b/);
+  });
+});

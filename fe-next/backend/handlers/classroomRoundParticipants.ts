@@ -8,7 +8,7 @@ type RoundResult = {
   wordDetails?: Array<{ word: string; validated: boolean; isDuplicate?: boolean }>;
 };
 
-type RoomUsers = Record<string, { authUserId?: string | null; isBot?: boolean; isPractice?: boolean } | undefined>;
+type RoomUsers = Record<string, { authUserId?: string | null; isBot?: boolean; isPractice?: boolean; disconnected?: boolean } | undefined>;
 
 /**
  * Adapter for the server-side game-end path (gameLifecycle/gameScores.ts):
@@ -50,6 +50,7 @@ export function roundHasStudents(results: RoundResult[], users: RoomUsers, teach
   return results.some((result) => {
     const user = users[result.username];
     if (user?.isBot || user?.isPractice) return false;
+    if (user?.disconnected && !result.totalScore && !result.wordDetails?.length) return false;
     return user?.authUserId !== teacherId;
   });
 }
