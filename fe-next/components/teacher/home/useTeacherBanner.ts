@@ -33,6 +33,7 @@ export function useTeacherBanner() {
     isAdmin: isAdmin === true,
     accessLoading: access.isLoading === true,
     accessTrialExpired: access.trial?.isExpired === true,
+    accessTrialLive: Boolean(access.trial && !access.trial.isExpired),
     trialReminderOpen: isTrialReminderWindow(access.trial) && !reminder.dismissed,
     trialEndedDismissed: ended.dismissed,
     polarTrialExpiring: isPolarTrialDay10Expiring(polarTrialDaysLeft(trialExpires, nowMs)),

@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const pro = vi.hoisted(() => ({ hasPro: false, loading: false, known: true, trialUsed: false, accessTrialExpires: null as string | null, accessTrialEnded: false }));
@@ -70,6 +70,7 @@ describe('ReportPdfExportButton', () => {
     expect(REPORT_PDF_PLACEMENT).toBe('results_report_pdf');
     expect(PRO_OFFER_PLACEMENTS.has('results_report_pdf')).toBe(true);
     expect(PRO_OFFER_PLACEMENTS.has('dashboard')).toBe(true);
+    expect(PRO_OFFER_PLACEMENTS.has('trial_ending_card')).toBe(true);
   });
 
   it.each(['en', 'he', 'es', 'sv', 'ja', 'ru'])('is translated in %s', (language) => {
@@ -154,5 +155,38 @@ describe('ReportPdfExportButton', () => {
     pro.loading = true;
     const { container } = render(<ReportPdfExportButton language="en" summary={summary} players={players} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('reports viewed once half of the locked button is on screen', () => {
+    type Cb = (entries: Array<{ isIntersecting: boolean; intersectionRatio: number }>) => void;
+    const observers: Array<{ cb: Cb }> = [];
+    const original = globalThis.IntersectionObserver;
+    class FakeIO {
+      constructor(cb: Cb) {
+        observers.push({ cb });
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+      takeRecords() {
+        return [];
+      }
+    }
+    globalThis.IntersectionObserver = FakeIO as unknown as typeof IntersectionObserver;
+    try {
+      render(<ReportPdfExportButton language="en" summary={summary} players={players} />);
+      expect(reports.reportProOfferImpression).toHaveBeenCalledWith(
+        expect.objectContaining({ placement: 'results_report_pdf', format: 'report_button', stage: 'rendered' }),
+        { userId: 'teacher-1' },
+      );
+      expect(reports.reportProOfferImpression).not.toHaveBeenCalledWith(expect.objectContaining({ stage: 'viewed' }), expect.anything());
+      act(() => observers.forEach((o) => o.cb([{ isIntersecting: true, intersectionRatio: 1 }])));
+      expect(reports.reportProOfferImpression).toHaveBeenCalledWith(
+        expect.objectContaining({ placement: 'results_report_pdf', format: 'report_button', stage: 'viewed' }),
+        { userId: 'teacher-1' },
+      );
+    } finally {
+      globalThis.IntersectionObserver = original;
+    }
   });
 });
