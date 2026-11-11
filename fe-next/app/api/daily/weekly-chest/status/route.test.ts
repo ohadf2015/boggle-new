@@ -34,6 +34,7 @@ function makeMockSupabase(opts: {
   connectionsAttempts?: Array<{ puzzle_date: string }>
   frozenDates?: Array<{ frozen_date: string }>
   existingChests?: Array<{ cycle_start?: string; tier: string; contents: any; opened_at: string | null }>
+  partDrops?: Array<Record<string, unknown>>
 } = {}) {
   const user = opts.user !== undefined ? opts.user : { id: 'user-1' }
   vi.mocked(getAuthedUser).mockResolvedValue(user as any)
@@ -45,6 +46,7 @@ function makeMockSupabase(opts: {
     connections_daily_scores: opts.connectionsAttempts ?? [],
     daily_streak_freezes: opts.frozenDates ?? [],
     daily_weekly_chests: opts.existingChests ?? [],
+    avatar_part_drops: opts.partDrops ?? [],
   }
   const admin = {
     from: vi.fn((table: string) => {
@@ -52,6 +54,7 @@ function makeMockSupabase(opts: {
         select: vi.fn(() => chain),
         eq: vi.fn((c: string, v: unknown) => { eqCalls.push([table, c, v]); return chain }),
         gt: vi.fn(() => chain),
+        limit: vi.fn(() => chain),
         then: (ok: any) => Promise.resolve({ data: rows[table] ?? [], error: null }).then(ok),
       }
       return chain
@@ -331,5 +334,30 @@ describe('GET /api/daily/weekly-chest/status', () => {
     const body = await (await GET(req())).json()
     expect(body.isClaimable).toBe(true)
     expect(body.weekScore).toBe(90)
+  })
+
+  it('keeps an opened chest visible with the avatar part it held', async () => {
+    const cycleStart = '2026-05-06'
+    const dates = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(cycleStart)
+      d.setDate(d.getDate() + i)
+      return d.toISOString().split('T')[0]
+    })
+    makeMockSupabase({
+      huntAttempts: dates.map((d) => ({ puzzle_date: d })),
+      existingChests: [
+        { cycle_start: cycleStart, tier: 'silver', contents: { coins: 300, freezes: 1, badge_id: 'b', label_key: 'k' }, opened_at: '2026-05-11T08:00:00Z' },
+      ],
+      partDrops: [{ part_key: 'hair:flame', rarity: 'epic', duplicate: false, refund_coins: 0 }],
+    })
+    const body = await (await GET(req())).json()
+    expect(body.isClaimable).toBe(false)
+    expect(body.openedChest).toMatchObject({ tier: 'silver', coins: 300, freezes: 1, part: { key: 'hair:flame', rarity: 'epic', partId: 'flame' } })
+  })
+
+  it('has no openedChest before the chest is claimed', async () => {
+    makeMockSupabase({ huntAttempts: [{ puzzle_date: '2026-05-12' }] })
+    const body = await (await GET(req())).json()
+    expect(body.openedChest).toBeNull()
   })
 })

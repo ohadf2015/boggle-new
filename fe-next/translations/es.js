@@ -10010,6 +10010,7 @@ const es = {
       "dayProgress": "{day} de 5 días esta semana",
       "daysRemaining": "¡{n} días más para tu cofre {tier}!",
       "claimReady": "¡Tu cofre {tier} está listo!",
+      "openedTitle": "Cofre abierto: el premio de la semana",
       "claimButton": "Abrir cofre",
       "claimError": "No se pudo abrir el cofre. Inténtalo de nuevo.",
       "tierBronze": "Bronce",

@@ -48,6 +48,11 @@ vi.mock('@/components/daily/ChestProgressDots', () => ({
   default: () => <div data-testid="chest-dots" />,
 }))
 
+vi.mock('@/components/avatar/chest/ChestPartPrize', () => ({
+  __esModule: true,
+  default: ({ drop }: { drop: { key: string } }) => <div data-testid="part-prize">{drop.key}</div>,
+}))
+
 import WeeklyChestCard from '../WeeklyChestCard'
 
 const defaultMockData = {
@@ -258,5 +263,21 @@ describe('WeeklyChestCard', () => {
       expect(capture).toHaveBeenCalledTimes(1)
       expect(capture).toHaveBeenCalledWith('growth:weekly_chest_card_seen', expect.objectContaining({ daysCompleted: 4, projectedTier: 'silver' }))
     })
+  })
+
+  it('shows the opened chest and its avatar part after claiming', () => {
+    mockUseWeeklyChest.mockReturnValue({
+      ...defaultMockData,
+      openedChest: { tier: 'silver', coins: 300, badgeId: 'b', part: { key: 'hair:flame', category: 'hair', partId: 'flame', rarity: 'epic', duplicate: false, refundCoins: 0 } },
+    })
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.getByTestId('chest-opened')).toBeTruthy()
+    expect(screen.getByTestId('part-prize').textContent).toBe('hair:flame')
+  })
+
+  it('hides the opened state while a chest is still claimable', () => {
+    mockUseWeeklyChest.mockReturnValue({ ...defaultMockData, isClaimable: true, openedChest: null })
+    render(<WeeklyChestCard onChestClaimed={vi.fn()} />)
+    expect(screen.queryByTestId('chest-opened')).toBeNull()
   })
 })
