@@ -2445,6 +2445,7 @@ const en = {
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
     "gridLabel": "Crossword grid",
+    "combo": "Combo ×{count}",
     "cellLabel": "Row {row}, column {col}",
     "dir": { "across": "Across", "down": "Down" },
     "switchDir": "Switch direction",

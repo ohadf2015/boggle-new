@@ -2464,6 +2464,7 @@ const es = {
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
     "gridLabel": "Cuadrícula del crucigrama",
+    "combo": "Racha ×{count}",
     "cellLabel": "Fila {row}, columna {col}",
     "dir": {
       "across": "Horizontal",

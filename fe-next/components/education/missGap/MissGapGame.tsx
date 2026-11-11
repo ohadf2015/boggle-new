@@ -37,6 +37,8 @@ import { MissGapRoundView, type RoundOutcome } from './MissGapRoundView';
 import { MissGapCompletion, type SaveState } from './MissGapCompletion';
 import { MissGapStreakFlame } from './MissGapStreakFlame';
 import { useMissGapSound } from './missGapSound';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { EduMascotReactions } from '@/components/education/EduMascotReactions';
 import { buildMissGapProgressUrl } from './useMissGapProgress';
 
 const REVEAL_MS = 950;
@@ -89,6 +91,7 @@ export function MissGapGame({
   const [picked, setPicked] = useState<string | null>(null);
   const [answers, setAnswers] = useState<MissGapAnswer[]>([]);
   const [runStreak, setRunStreak] = useState(0);
+  const mascotStreakRef = useRef(0);
   const [classStreak, setClassStreak] = useState(initialStreak);
   const [classmates, setClassmates] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>('saving');
@@ -172,6 +175,11 @@ export function MissGapGame({
         ...prev,
         { roundId: round.id, correct, msTaken: Date.now() - roundStartedAt.current },
       ]);
+      mascotStreakRef.current = correct ? mascotStreakRef.current + 1 : 0;
+      if (correct && mascotStreakRef.current >= STREAK_SOUND_AT) {
+        emitMascotEvent({ kind: 'wave-streak', streakCount: mascotStreakRef.current });
+      }
+      if (correct) emitMascotEvent({ kind: 'word-submitted', wordLength: round.word.length, gemLetterUsed: false });
       setRunStreak((prev) => {
         const next = correct ? prev + 1 : 0;
         if (correct && next >= STREAK_SOUND_AT && next % STREAK_SOUND_AT === 0) {
@@ -292,6 +300,7 @@ export function MissGapGame({
     setAnswers([]);
     setIndex(0);
     setRunStreak(0);
+    mascotStreakRef.current = 0;
     setOutcome(null);
     setPicked(null);
     setSaveState('saving');
@@ -394,6 +403,7 @@ export function MissGapGame({
             {finishActions}
           </MissGapCompletion>
         )}
+        {phase === 'play' && <EduMascotReactions mode="edu-missgap" />}
       </div>
     </div>
   );

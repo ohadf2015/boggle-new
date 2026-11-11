@@ -14,6 +14,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => ({
   AdaptiveMotion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
+  AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
 }));
 
 // Mock GridComponent

@@ -1,5 +1,6 @@
 'use client';
 
+import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
@@ -414,6 +415,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           {!reduceMotion && <ScreenFlashOverlay trigger={foundWords.length} />}
         </>
       )}
+
+      {isPlaying && <GameMascotReactions mode={gameMode ?? 'classic'} comboLevel={comboLevel} />}
 
       {/* Floating Score Animation - renders above everything */}
       {isPlaying && !mpChrome && (

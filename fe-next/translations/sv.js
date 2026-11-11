@@ -2577,6 +2577,7 @@ const sv = {
     "zoomIn": "Zooma in",
     "zoomOut": "Zooma ut",
     "gridLabel": "Korsordsrutnät",
+    "combo": "Kombo ×{count}",
     "cellLabel": "Rad {row}, kolumn {col}",
     "dir": {
       "across": "Vågrätt",
