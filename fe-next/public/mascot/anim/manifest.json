@@ -1,0 +1,167 @@
+[
+  {
+    "id": "bonk-dizzy",
+    "file": "/mascot/anim/bonk-dizzy.webp",
+    "poster": "/mascot/anim/bonk-dizzy-poster.webp",
+    "durationMs": 2822,
+    "loop": false,
+    "beats": {
+      "windupMs": 350,
+      "actionMs": 400,
+      "holdMs": 850
+    },
+    "width": 266,
+    "height": 288,
+    "tags": [
+      "gag",
+      "slapstick",
+      "bonk",
+      "big",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "glass-peek",
+    "file": "/mascot/anim/glass-peek.webp",
+    "poster": "/mascot/anim/glass-peek-poster.webp",
+    "durationMs": 3652,
+    "loop": false,
+    "beats": {
+      "windupMs": 850,
+      "actionMs": 250,
+      "holdMs": 800
+    },
+    "width": 217,
+    "height": 288,
+    "tags": [
+      "gag",
+      "fourth-wall",
+      "peek",
+      "big",
+      "one-shot",
+      "exits-bottom"
+    ]
+  },
+  {
+    "id": "faceplant-thumbsup",
+    "file": "/mascot/anim/faceplant-thumbsup.webp",
+    "poster": "/mascot/anim/faceplant-thumbsup-poster.webp",
+    "durationMs": 2905,
+    "loop": false,
+    "beats": {
+      "windupMs": 450,
+      "actionMs": 400,
+      "holdMs": 850
+    },
+    "width": 280,
+    "height": 288,
+    "tags": [
+      "gag",
+      "slapstick",
+      "faceplant",
+      "recover",
+      "big",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "joy-jump",
+    "file": "/mascot/anim/joy-jump.webp",
+    "poster": "/mascot/anim/joy-jump-poster.webp",
+    "durationMs": 2656,
+    "loop": false,
+    "beats": {
+      "windupMs": 650,
+      "actionMs": 350,
+      "holdMs": 1000
+    },
+    "width": 288,
+    "height": 244,
+    "tags": [
+      "reaction",
+      "long-word",
+      "joy",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "smug-knew-it",
+    "file": "/mascot/anim/smug-knew-it.webp",
+    "poster": "/mascot/anim/smug-knew-it-poster.webp",
+    "durationMs": 2656,
+    "loop": false,
+    "beats": {
+      "windupMs": 300,
+      "actionMs": 200,
+      "holdMs": 1700
+    },
+    "width": 232,
+    "height": 288,
+    "tags": [
+      "reaction",
+      "rare-letter",
+      "smug",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "combo-collapse",
+    "file": "/mascot/anim/combo-collapse.webp",
+    "poster": "/mascot/anim/combo-collapse-poster.webp",
+    "durationMs": 2905,
+    "loop": false,
+    "beats": {
+      "windupMs": 700,
+      "actionMs": 200,
+      "holdMs": 200
+    },
+    "width": 288,
+    "height": 260,
+    "tags": [
+      "reaction",
+      "combo-break",
+      "exhausted",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "idle-doze",
+    "file": "/mascot/anim/idle-doze.webp",
+    "poster": "/mascot/anim/idle-doze-poster.webp",
+    "durationMs": 4000,
+    "loop": true,
+    "beats": {
+      "windupMs": 0,
+      "actionMs": 0,
+      "holdMs": 0
+    },
+    "width": 224,
+    "height": 288,
+    "tags": [
+      "reaction",
+      "idle",
+      "sleep",
+      "loop"
+    ]
+  },
+  {
+    "id": "panic-sweat",
+    "file": "/mascot/anim/panic-sweat.webp",
+    "poster": "/mascot/anim/panic-sweat-poster.webp",
+    "durationMs": 2988,
+    "loop": true,
+    "beats": {
+      "windupMs": 0,
+      "actionMs": 0,
+      "holdMs": 0
+    },
+    "width": 248,
+    "height": 272,
+    "tags": [
+      "reaction",
+      "low-time",
+      "panic",
+      "loop"
+    ]
+  }
+]
