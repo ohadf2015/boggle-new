@@ -99,8 +99,7 @@ export async function processQuickSubmit(
   await awardCoinsServer(userId, coins, 'quick_play_round', { mode, seed, scorePct });
 
   const xp = Math.round(QUICK_XP_BASE + scorePct * QUICK_XP_PCT_FACTOR);
-  const { data: levelRow } = await db.from('profiles').select('current_level').eq('id', userId).maybeSingle();
-  const levelBefore = typeof levelRow?.current_level === 'number' ? levelRow.current_level : null;
+  const levelBefore = await readLevel(db, userId);
   const { data: xpRows, error: xpError } = await db.rpc('increment_player_xp', {
     p_player_id: userId,
     p_xp_amount: xp,
@@ -147,6 +146,17 @@ export async function processQuickSubmit(
   const history = (historyRows ?? []).map((r: { score_pct: number }) => Number(r.score_pct));
 
   return { scorePct, coins, xp, percentileToday, history, totalPoints, levelUp };
+}
+
+// The level only drives the level-up celebration, so a failed read skips it rather than the submit.
+async function readLevel(db: SupabaseLike, userId: string): Promise<number | null> {
+  try {
+    const { data } = await db.from('profiles').select('current_level').eq('id', userId).maybeSingle();
+    return typeof data?.current_level === 'number' ? data.current_level : null;
+  } catch (err) {
+    logger.error('QUICK_PLAY', `Level read failed for ${userId}: ${(err as Error).message}`);
+    return null;
+  }
 }
 
 export async function createQuickChallenge(
