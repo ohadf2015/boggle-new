@@ -10,7 +10,3 @@ export function idlePhase(lastWordAt: number, now: number): IdlePhase {
   return 'awake';
 }
 
-export const IDLE_POSES: Record<Exclude<IdlePhase, 'awake'>, string> = {
-  peek: '/mascot/bored-nobg.webp',
-  doze: '/mascot/sleepy-nobg.webp',
-};

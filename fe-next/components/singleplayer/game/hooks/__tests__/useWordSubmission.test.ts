@@ -332,9 +332,25 @@ describe('useWordSubmission', () => {
         result.current.handleWordSubmit('hello');
       });
 
-      expect(events).toEqual([{ kind: 'word-submitted', wordLength: 5, gemLetterUsed: false }]);
+      expect(events).toEqual([{ kind: 'word-submitted', wordLength: 5, gemLetterUsed: false, word: 'hello' }]);
       mockDictionaryCacheState.isLoaded = false;
       mockCheckWord.mockReturnValue(false);
+    });
+
+    it('tells the mascot about a rejected word and a repeat', () => {
+      _resetMascotBus();
+      const events: { kind: string }[] = [];
+      subscribeMascotEvents((e) => events.push(e));
+      const { result } = renderHook(() => useWordSubmission(createDefaultOptions()));
+
+      mockValidateWordLocally.mockReturnValue({ isValid: false, errorKey: 'playerView.wordAlreadyFound' });
+      act(() => { result.current.handleWordSubmit('hello'); });
+      mockValidateWordLocally.mockReturnValue({ isValid: true });
+      mockIsWordOnBoard.mockReturnValue(false);
+      act(() => { result.current.handleWordSubmit('zzzz'); });
+
+      expect(events.map((e) => e.kind)).toEqual(['duplicate-word', 'word-rejected']);
+      mockIsWordOnBoard.mockReturnValue(true);
     });
 
     it('should fall back to API when word not in cache', async () => {

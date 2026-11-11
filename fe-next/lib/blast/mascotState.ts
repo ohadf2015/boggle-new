@@ -143,14 +143,19 @@ export interface MascotReducerState {
 }
 
 export type MascotEvent =
-  | { kind: 'word-submitted'; wordLength: number; gemLetterUsed: boolean }
+  | { kind: 'word-submitted'; wordLength: number; gemLetterUsed: boolean; word?: string }
   | { kind: 'cascade-detected'; chainDepth: number }
   | { kind: 'wave-clear' }
   | { kind: 'wave-fail' }
   | { kind: 'wave-streak'; streakCount: number }
   | { kind: 'low-moves'; movesRemaining: number }
   | { kind: 'combo-milestone'; level: number }
-  | { kind: 'combo-break'; fromLevel: number };
+  | { kind: 'combo-broken'; fromLevel: number }
+  | { kind: 'word-rejected' }
+  | { kind: 'duplicate-word' }
+  | { kind: 'rare-letter'; letter: string }
+  | { kind: 'timer-final-10s'; secondsLeft: number }
+  | { kind: 'personal-best' };
 
 /**
  * Lifecycle events that bypass cooldown (always show — empathy/acknowledgement).
@@ -158,7 +163,7 @@ export type MascotEvent =
 const BYPASS_COOLDOWN_KINDS: ReadonlySet<MascotEvent['kind']> = new Set([
   'wave-clear',
   'wave-fail',
-  'combo-break',
+  'combo-broken',
 ]);
 
 function pickStateForEvent(event: MascotEvent): MascotState | null {
@@ -175,8 +180,14 @@ function pickStateForEvent(event: MascotEvent): MascotState | null {
     case 'combo-milestone':
       if (event.level >= COMBO_UNHINGED_MIN) return 'unhinged';
       return event.level >= COMBO_DANCE_MIN ? 'dancing' : null;
-    case 'combo-break':
+    case 'combo-broken':
       return event.fromLevel >= COMBO_EXHAUST_MIN ? 'exhausted' : null;
+    case 'word-rejected':
+    case 'duplicate-word':
+    case 'rare-letter':
+    case 'timer-final-10s':
+    case 'personal-best':
+      return null;
   }
 }
 

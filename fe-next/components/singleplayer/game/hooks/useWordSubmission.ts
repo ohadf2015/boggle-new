@@ -207,6 +207,7 @@ export function useWordSubmission({
       hapticError();
       announceWordResult(normalizedWord, false, undefined, msg);
       combo.resetCombo();
+      emitMascotEvent({ kind: errorKey === 'playerView.wordAlreadyFound' ? 'duplicate-word' : 'word-rejected' });
       return;
     }
 
@@ -225,6 +226,7 @@ export function useWordSubmission({
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
       combo.resetCombo();
       recordNotOnBoard(normalizedWord, language, 'single_player');
+      emitMascotEvent({ kind: 'word-rejected' });
       return;
     }
 
@@ -241,6 +243,7 @@ export function useWordSubmission({
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notAWordMsg);
       combo.resetCombo();
+      emitMascotEvent({ kind: 'word-rejected' });
       return;
     }
 
@@ -257,6 +260,7 @@ export function useWordSubmission({
       hapticError();
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
       combo.resetCombo();
+      emitMascotEvent({ kind: 'duplicate-word' });
       return;
     }
 
@@ -298,7 +302,7 @@ export function useWordSubmission({
       setScore(prev => prev + fullScore);
       playWordAcceptedSound();
       hapticForWordScore(normalizedWord.length);
-      emitMascotEvent({ kind: 'word-submitted', wordLength: normalizedWord.length, gemLetterUsed: false });
+      emitMascotEvent({ kind: 'word-submitted', wordLength: normalizedWord.length, gemLetterUsed: false, word: normalizedWord });
 
       // Notify consumers with full context (used by Blast mode for tile clearing)
       onWordAccepted?.({ word: normalizedWord, score: fullScore, comboBonus, fireRoundBonus });
@@ -362,6 +366,7 @@ export function useWordSubmission({
       hapticError();
       announceWordResult(normalizedWord, false, undefined, invalidMsg);
       recordNotInDictionary(normalizedWord, language, 'single_player');
+      emitMascotEvent({ kind: 'word-rejected' });
     };
 
     // Step 4.5: Try client-side dictionary cache for INSTANT validation

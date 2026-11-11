@@ -298,13 +298,33 @@ describe('mascotState — combo escalation', () => {
 
   it('collapses exhausted when a 3+ combo breaks, even inside the cooldown', () => {
     const s = reduceMascotEvent(createInitialMascotState(), { kind: 'combo-milestone', level: 7 }, 1000);
-    const next = reduceMascotEvent(s, { kind: 'combo-break', fromLevel: 7 }, 1500);
+    const next = reduceMascotEvent(s, { kind: 'combo-broken', fromLevel: 7 }, 1500);
     expect(next.current).toBe('exhausted');
     expect(MASCOT_GIF_PATHS.exhausted).toContain('-nobg.webp');
   });
 
   it('a tiny combo breaking is not worth a reaction', () => {
     const s = createInitialMascotState();
-    expect(reduceMascotEvent(s, { kind: 'combo-break', fromLevel: 2 }, 1000)).toBe(s);
+    expect(reduceMascotEvent(s, { kind: 'combo-broken', fromLevel: 2 }, 1000)).toBe(s);
+  });
+});
+
+describe('mascotState — gag-only events leave the HUD alone', () => {
+  it('rejections, rare letters, duplicates, the last 10s and records pick no HUD pose', () => {
+    const s = createInitialMascotState();
+    for (const e of [
+      { kind: 'word-rejected' as const },
+      { kind: 'duplicate-word' as const },
+      { kind: 'rare-letter' as const, letter: 'Q' },
+      { kind: 'timer-final-10s' as const, secondsLeft: 10 },
+      { kind: 'personal-best' as const },
+    ]) {
+      expect(reduceMascotEvent(s, e, 1000)).toBe(s);
+    }
+  });
+
+  it('word-submitted may carry the word itself', () => {
+    const s = createInitialMascotState();
+    expect(reduceMascotEvent(s, { kind: 'word-submitted', wordLength: 6, gemLetterUsed: false, word: 'planet' }, 1000).current).toBe('wow');
   });
 });

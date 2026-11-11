@@ -8,17 +8,17 @@ import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { comboTier, escalationMotion } from '@/lib/blast/mascotState';
 import { createVoiceHistory, pickVoice, SIGNATURE_CRY, type MascotVoice } from '@/lib/mascot/voice';
-import type { GagBeat, LegendaryGag } from '@/lib/mascot/legendary';
+import type { GagBeat, GagDef, GagVariant } from '@/lib/mascot/gagTypes';
+import type { Language } from '@/shared/types/game';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { MascotEdgeStage } from './MascotEdgeStage';
-import { MascotIdlePeek } from './MascotIdlePeek';
-import { MascotLegendaryGag } from './MascotLegendaryGag';
-import { useMascotIdle } from './useMascotIdle';
-import { useLegendaryGag } from './useLegendaryGag';
+import { MascotGagPlayer } from './MascotGagPlayer';
+import { MascotTileStack } from './MascotTileStack';
+import { useGagDirector } from './useGagDirector';
 
 export type MascotPersonality = 'full' | 'quiet';
 
@@ -27,18 +27,21 @@ interface GameMascotReactionsProps {
   comboLevel: number;
   /** 'quiet' (multiplayer, classrooms): reactions only, no voice, idle or gags. */
   personality?: MascotPersonality;
+  language?: Language;
+  remainingTime?: number | null;
   seed?: number;
-  legendaryChance?: number;
 }
 
 const COMBO_BREAK_MIN = 3;
+const FINAL_SECONDS = 10;
 
 export function GameMascotReactions({
   mode,
   comboLevel,
   personality = 'quiet',
+  language,
+  remainingTime = null,
   seed,
-  legendaryChance,
 }: GameMascotReactionsProps) {
   const mascot = useBlastMascot();
   const pref = useMascotEnabled();
@@ -59,16 +62,37 @@ export function GameMascotReactions({
   useEffect(() => {
     const prev = prevCombo.current;
     if (comboLevel > prev) emitMascotEvent({ kind: 'combo-milestone', level: comboLevel });
-    else if (comboLevel === 0 && prev >= COMBO_BREAK_MIN) emitMascotEvent({ kind: 'combo-break', fromLevel: prev });
+    else if (comboLevel === 0 && prev >= COMBO_BREAK_MIN) emitMascotEvent({ kind: 'combo-broken', fromLevel: prev });
     prevCombo.current = comboLevel;
   }, [comboLevel]);
 
-  const show = mascot.visible && allowed;
+  const finalCountdownSent = useRef(false);
+  useEffect(() => {
+    if (remainingTime === null || remainingTime <= 0 || remainingTime > FINAL_SECONDS || finalCountdownSent.current) return;
+    finalCountdownSent.current = true;
+    emitMascotEvent({ kind: 'timer-final-10s', secondsLeft: remainingTime });
+  }, [remainingTime]);
+
+  const voiceHistory = useRef(createVoiceHistory());
+  const onGag = useCallback(
+    (gag: GagDef, variant: GagVariant) => trackGrowthEvent('mascot_gag_shown', { gag: gag.id, variant: variant.id, mode }),
+    [mode],
+  );
+  const gag = useGagDirector({ enabled: full && !isLowEnd && !reducedMotion, language, seed, onShow: onGag });
+  const onBeat = useCallback(
+    (beat: GagBeat) => {
+      if (beat.sound) say({ sound: beat.sound, rate: beat.soundRate ?? 1 });
+      if (beat.cry) say(SIGNATURE_CRY);
+      if (beat.sound || beat.cry) voiceHistory.current = { lastVoiced: true };
+    },
+    [say],
+  );
+
+  const show = mascot.visible && allowed && !gag;
   useEffect(() => {
     if (show) trackGrowthEvent('mascot_reaction_shown', { state: mascot.state, mode });
   }, [show, mascot.state, mode]);
 
-  const voiceHistory = useRef(createVoiceHistory());
   const lastVoicedAt = useRef(0);
   useEffect(() => {
     if (!show || !full || mascot.transitionAt === lastVoicedAt.current) return;
@@ -77,27 +101,6 @@ export function GameMascotReactions({
     voiceHistory.current = history;
     if (voice) say(voice);
   }, [show, full, mascot.state, mascot.transitionAt, say]);
-
-  const onGag = useCallback(
-    (gag: LegendaryGag) => trackGrowthEvent('mascot_gag_shown', { gag: gag.id, mode }),
-    [mode],
-  );
-  const legendary = useLegendaryGag({
-    enabled: full && !isLowEnd && !reducedMotion,
-    seed,
-    chance: legendaryChance,
-    onShow: onGag,
-  });
-  const onBeat = useCallback(
-    (beat: GagBeat) => {
-      if (beat.sound) say({ sound: beat.sound, rate: 1 });
-      if (beat.cry) say(SIGNATURE_CRY);
-    },
-    [say],
-  );
-
-  const onDoze = useCallback(() => trackGrowthEvent('mascot_gag_shown', { gag: 'idle-doze', mode }), [mode]);
-  const idle = useMascotIdle(full, onDoze);
 
   const tier = comboTier(comboLevel);
   const motion = escalationMotion(tier);
@@ -117,6 +120,7 @@ export function GameMascotReactions({
           >
             <AdaptiveMotion.div
               data-testid="mascot-escalation"
+              className="relative"
               data-tier={tier}
               animate={
                 wiggle
@@ -125,18 +129,15 @@ export function GameMascotReactions({
               }
               transition={wiggle ? { duration: motion.periodMs / 1000, repeat: Infinity } : { duration: 0.15 }}
             >
+              {full && <MascotTileStack count={comboLevel} />}
               <BlastMascotHud state={mascot.state} />
             </AdaptiveMotion.div>
           </AdaptiveMotion.div>
         )}
       </AdaptiveAnimatePresence>
-      {full && (legendary || idle !== 'awake') && (
+      {gag && (
         <MascotEdgeStage>
-          {legendary ? (
-            <MascotLegendaryGag gag={legendary} onBeat={onBeat} />
-          ) : (
-            idle !== 'awake' && <MascotIdlePeek phase={idle} />
-          )}
+          <MascotGagPlayer key={gag.key} playKey={gag.key} gagId={gag.gag.id} variant={gag.variant} onBeat={onBeat} />
         </MascotEdgeStage>
       )}
     </>

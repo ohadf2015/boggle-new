@@ -1,4 +1,4 @@
-import type { BeatPhase, GagBeat, LegendaryGag } from './legendary';
+import type { BeatPhase, GagBeat, GagVariant } from './gagTypes';
 
 export const CLIP_DIR = '/mascot/anim';
 export const CLIP_MANIFEST_URL = `${CLIP_DIR}/manifest.json`;
@@ -43,8 +43,8 @@ function spread(beats: GagBeat[], phase: BeatPhase, totalMs: number): number[] {
   return Array.from({ length: count }, (_, i) => (i === count - 1 ? totalMs - each * (count - 1) : each));
 }
 
-/** Swaps a gag's poses for its clip and times every beat to the clip's own beats. */
-export function withClip(gag: LegendaryGag, clips: Map<string, ClipEntry>): LegendaryGag {
+/** Swaps a variant's poses for its clip and times every beat to the clip's own beats. */
+export function withClip(gag: GagVariant, clips: Map<string, ClipEntry>): GagVariant {
   const entry = gag.clip ? clips.get(gag.clip) : undefined;
   if (!entry) return gag;
   const { windupMs, actionMs, holdMs } = entry.beats;
