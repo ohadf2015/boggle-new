@@ -182,6 +182,8 @@ export const JoinGameSchema = z.object({
   guestTokenHash: GuestTokenHashSchema,
   /** The teacher's practice seat in their own classroom room (honoured for classroom rooms only). */
   practiceSeat: z.boolean().optional(),
+  /** Sent only by the classroom host board, so its own rejoin is never seated as a practice seat. */
+  hostSeat: z.boolean().optional(),
 });
 
 /**

@@ -82,3 +82,9 @@ export function legacyClassroomLiveRedirect(pathname: string, search: string): s
   const query = next.toString();
   return `${prefix}/education/live${host ? '/host' : ''}${query ? `?${query}` : ''}`;
 }
+
+/** The classroom host board's joins claim the host seat; any other page of the teacher's account gets a practice seat while the board is live. */
+export function classroomHostJoinFlag(): { hostSeat?: true } {
+  if (typeof window === 'undefined') return {};
+  return HOST_LIVE_PATH_RE.test(window.location.pathname) ? { hostSeat: true } : {};
+}

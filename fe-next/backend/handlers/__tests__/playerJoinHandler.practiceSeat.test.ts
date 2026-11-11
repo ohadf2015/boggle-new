@@ -156,6 +156,7 @@ function inProgressGame(overrides: Record<string, unknown> = {}) {
 }
 
 import { emitError } from '../../utils/errorHandler';
+import { getSocketById } from '../../utils/socketHelpers';
 
 
 const TEACHER = '11111111-1111-4111-8111-111111111111';
@@ -273,5 +274,53 @@ describe('PlayerJoinHandler — practice seat in a classroom room', () => {
     (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
     await join({ gameCode: 'ABC123', username: 'Dana' });
     expect(mockRecordRoster).not.toHaveBeenCalled();
+  });
+});
+
+describe('PlayerJoinHandler — the teacher opens their own room on a second page', () => {
+  const liveHost = () => lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } });
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGameUsers.mockReturnValue([]);
+    mockGetActiveRooms.mockReturnValue([]);
+    mockGetSocketIdByUsername.mockImplementation((_c: string, name: string) => (name === 'Dana' ? 'host-socket' : undefined));
+    mockShouldSendGameState.mockReturnValue(false);
+    mockCheckSeat.mockResolvedValue({ game: { settings: {}, teacherId: TEACHER }, refused: false });
+    vi.mocked(getSocketById).mockImplementation(((_io: unknown, id: string) => (id === 'host-socket' ? { connected: true } : undefined)) as never);
+  });
+
+  it('Given the host board is live, When the same account joins from a student page, Then it gets a practice seat and the host socket is never taken over', async () => {
+    mockGetGame.mockReturnValue({ ...liveHost(), hostSocketId: 'host-socket' });
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
+    await join({ gameCode: 'ABC123', username: 'Dana' });
+
+    expect(handleExistingAuthConnectionJoin).not.toHaveBeenCalled();
+    expect(handleReconnection).not.toHaveBeenCalled();
+    expect(emitError).not.toHaveBeenCalled();
+    const [, name, socketId, opts] = vi.mocked(mockAddUserToGame).mock.calls[0];
+    expect(name).not.toBe('Dana');
+    expect(socketId).toBe('late-socket-1');
+    expect(opts).toEqual(expect.objectContaining({ authUserId: null, isPractice: true }));
+  });
+
+  it('Given the host board is live, When the host page itself rejoins, Then the account reconnect still rebinds the host seat', async () => {
+    mockGetGame.mockReturnValue({ ...liveHost(), hostSocketId: 'host-socket' });
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
+    await join({ gameCode: 'ABC123', username: 'Dana', hostSeat: true });
+
+    expect(handleExistingAuthConnectionJoin).toHaveBeenCalled();
+    expect(mockAddUserToGame).not.toHaveBeenCalledWith(expect.anything(), expect.anything(), expect.anything(), expect.objectContaining({ isPractice: true }));
+  });
+
+  it('Given the host socket is gone, When the same account joins, Then the account reconnect runs as before', async () => {
+    mockGetGame.mockReturnValue({ ...liveHost(), hostSocketId: 'dead-socket' });
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = TEACHER;
+    await join({ gameCode: 'ABC123', username: 'Dana' });
+
+    expect(handleExistingAuthConnectionJoin).toHaveBeenCalled();
   });
 });
