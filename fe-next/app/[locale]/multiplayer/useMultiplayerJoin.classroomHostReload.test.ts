@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { error: vi.fn(), success: vi.fn() } }));
@@ -113,6 +113,7 @@ describe('classroom host reload: no create before sign-in resolves, and a refusa
     const { result } = renderHook(() => useMultiplayerJoin(makeOptions(socket, null) as never));
 
     await act(async () => { void result.current(true, 'en', 'PUB123', 'Room', 'Guest'); });
+    await waitFor(() => expect(creates(socket)).toHaveLength(1));
     await act(async () => { socket.fire('error', { code: 'GAME_ALREADY_EXISTS' }); });
 
     expect(creates(socket)).toHaveLength(1);
