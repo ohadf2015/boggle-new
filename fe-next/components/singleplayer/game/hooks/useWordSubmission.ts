@@ -1,5 +1,6 @@
 'use client';
 
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { getComboBonus as calculateComboBonus, calculateWordScore as canonicalWordScore } from '@/shared/utils/scoring';
@@ -297,6 +298,7 @@ export function useWordSubmission({
       setScore(prev => prev + fullScore);
       playWordAcceptedSound();
       hapticForWordScore(normalizedWord.length);
+      emitMascotEvent({ kind: 'word-submitted', wordLength: normalizedWord.length, gemLetterUsed: false });
 
       // Notify consumers with full context (used by Blast mode for tile clearing)
       onWordAccepted?.({ word: normalizedWord, score: fullScore, comboBonus, fireRoundBonus });

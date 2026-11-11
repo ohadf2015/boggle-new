@@ -100,6 +100,7 @@ export type GrowthEvent =
   // Retention
   | 'return_visit'
   | 'streak_continued'
+  | 'mascot_reaction_shown'
   | 'streak_milestone'
   | 'streak_broken'
   | 'streak_freeze_used'
