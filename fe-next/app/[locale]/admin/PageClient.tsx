@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { prefetchDrillSections } from '@/lib/admin/adminJsonCache';
 import dynamic from 'next/dynamic';
 import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -58,6 +59,16 @@ export default function AdminPageClient() {
   const { authToken, refreshToken, isLoading: tokenLoading, error: tokenError } = useAdminAuth();
   const { stats, health } = useAdminDashboard(authToken);
   const { pulse, windowDays, setWindowDays, failed, retry, revenue } = useOverviewPulse(authToken, stats, health);
+
+  const pulseReady = pulse != null;
+  useEffect(() => {
+    if (!authToken || !pulseReady) return;
+    const id = setTimeout(() => {
+      prefetchDrillSections(authToken);
+      void import('@/components/admin/overview/DailyActivityChart');
+    }, 400);
+    return () => clearTimeout(id);
+  }, [authToken, pulseReady]);
 
   const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
   const isOpen = (id: string) => openIds.has(id);

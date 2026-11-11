@@ -1,4 +1,5 @@
 import React from 'react';
+import { clearAdminJsonCache } from '@/lib/admin/adminJsonCache';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -17,6 +18,8 @@ function mockFetch(rows: unknown[] = []) {
     }),
   ));
 }
+
+afterEach(() => clearAdminJsonCache());
 
 describe('RevenuePanel', () => {
   afterEach(() => vi.restoreAllMocks());

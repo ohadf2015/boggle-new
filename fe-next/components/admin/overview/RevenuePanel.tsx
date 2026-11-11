@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { cachedAdminJson } from '@/lib/admin/adminJsonCache';
 import { DollarSign } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -28,12 +29,8 @@ export function RevenuePanel({ authToken }: { authToken: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch('/api/admin/analytics/revenue', { headers: { Authorization: `Bearer ${authToken}` } })
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((json: { data?: { revenue?: Revenue } }) => {
+    cachedAdminJson<{ data?: { revenue?: Revenue } }>('/api/admin/analytics/revenue', authToken)
+      .then((json) => {
         if (!cancelled) setRev(json.data?.revenue ?? {});
       })
       .catch(() => {
