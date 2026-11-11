@@ -6,7 +6,8 @@
  */
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type Ref } from 'react';
+import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -34,9 +35,16 @@ const CLASS =
 export function ProOfferCompactLink({ label, placement, language, cta, offer, userId, variant, href, onActivate, pending, className }: ProOfferCompactLinkProps) {
   const argsRef = useRef({ placement, locale: language, cta, offer, format: 'link' as const });
   argsRef.current = { placement, locale: language, cta, offer, format: 'link' as const };
+  const linkRef = useRef<Element | null>(null);
   useEffect(() => {
     reportProOfferImpression({ ...argsRef.current, stage: 'rendered' }, { userId });
   }, [userId]);
+  useUpsellImpression(
+    linkRef,
+    { cta, placement },
+    { locale: language, format: 'link' },
+    () => reportProOfferImpression({ ...argsRef.current, stage: 'viewed' }, { userId }),
+  );
 
   const onClick = () => {
     try {
@@ -62,11 +70,11 @@ export function ProOfferCompactLink({ label, placement, language, cta, offer, us
     className: cn(CLASS, className),
   };
   return href ? (
-    <Link href={href} onClick={onClick} {...common}>
+    <Link href={href} ref={linkRef as Ref<HTMLAnchorElement>} onClick={onClick} {...common}>
       {content}
     </Link>
   ) : (
-    <button type="button" onClick={onClick} disabled={pending} aria-busy={pending || undefined} {...common}>
+    <button type="button" ref={linkRef as Ref<HTMLButtonElement>} onClick={onClick} disabled={pending} aria-busy={pending || undefined} {...common}>
       {content}
     </button>
   );

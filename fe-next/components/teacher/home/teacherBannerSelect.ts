@@ -2,11 +2,12 @@ import { polarTrialUx } from '@/lib/education/polarTrial';
 import type { SubscriptionSource } from '@/lib/education/proGrant';
 import type { TeacherProStatus } from '@/hooks/useTeacherPro';
 
-/** Account-state banners only. Pro upsells live in Home's one class-insight slot, never here. */
+/** Account-state banners, plus the time-sensitive access-trial ending card. Other Pro upsells stay in Home's class-insight slot. */
 export type TeacherBillingBanner =
   | 'paymentFailed'
   | 'pendingCheckout'
   | 'trialReminder'
+  | 'trialEnding'
   | 'trialExpired'
   | 'reactivate'
   | 'trialing'
@@ -30,6 +31,8 @@ export interface TeacherBannerInput {
   isAdmin: boolean;
   accessLoading: boolean;
   accessTrialExpired: boolean;
+  /** Live free access trial, any days left (not only the last 3). */
+  accessTrialLive: boolean;
   trialReminderOpen: boolean;
   trialEndedDismissed: boolean;
   polarTrialExpiring: boolean;
@@ -50,6 +53,8 @@ export function selectTeacherBanner(s: TeacherBannerInput): TeacherBannerSelecti
   if (s.hasPro) return { kind: 'none' };
   if (s.pendingCheckout && !s.isAdmin) return show('pendingCheckout');
   if (polar.showReactivation && !s.trialEndedDismissed) return show('reactivate');
+  // The ending card covers the whole access trial, not only the last 3 days.
+  if (s.accessTrialLive) return show('trialEnding');
   if (s.trialReminderOpen) return show('trialReminder');
   if (s.accessTrialExpired) return show('trialExpired');
   return { kind: 'none' };

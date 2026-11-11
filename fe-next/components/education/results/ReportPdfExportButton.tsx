@@ -12,8 +12,8 @@
  *                 Checkout opens in a new tab so the projector keeps the live room.
  *
  * Analytics (cookie-free server twins, placement `results_report_pdf`, format `report_button`):
- * the locked button rendering -> rendered (once per session, proOfferSession.ts), a locked tap ->
- * edu_pro_offer_clicked. Compare against the `dashboard` placement.
+ * the locked button rendering -> rendered (once per session, proOfferSession.ts), viewed once half
+ * is on screen, a locked tap -> edu_pro_offer_clicked. Compare against the `dashboard` placement.
  *
  * A free teacher with 3+ classes also gets "Get a school quote" under it (ResultsSchoolQuoteLink).
  */
@@ -30,6 +30,7 @@ import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { resultsTrialCopy, trialCopyBase, TRIAL_COPY_RTL } from '@/lib/education/pro/trialCtaCopy';
 import { reportPdfButtonCopy } from '@/lib/education/pro/reportPdfButtonCopy';
 import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { checkoutFailureKey, goToPolarCheckout, postTeacherProCheckout } from '@/lib/education/postTeacherProCheckout';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -88,10 +89,17 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
   const baseRef = useRef(base);
   baseRef.current = base;
 
+  const offerElRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!locked) return;
     reportProOfferImpression({ ...baseRef.current, stage: 'rendered' }, { userId });
   }, [locked, userId]);
+  useUpsellImpression(
+    offerElRef,
+    locked ? { cta: proOffer.cta, placement: REPORT_PDF_PLACEMENT } : null,
+    { locale: language },
+    () => reportProOfferImpression({ ...baseRef.current, stage: 'viewed' }, { userId }),
+  );
 
   if (loading) return null;
 
@@ -172,7 +180,7 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
   }
 
   return (
-    <div className={cn('flex shrink-0 flex-col gap-1', className)} dir={dir === 'rtl' ? 'rtl' : undefined} data-offer={proOffer.offer} data-testid="report-pdf-locked">
+    <div ref={offerElRef} className={cn('flex shrink-0 flex-col gap-1', className)} dir={dir === 'rtl' ? 'rtl' : undefined} data-offer={proOffer.offer} data-testid="report-pdf-locked">
       <button
         type="button"
         data-testid="report-pdf-export"

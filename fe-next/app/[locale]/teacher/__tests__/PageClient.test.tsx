@@ -35,7 +35,9 @@ vi.mock('@/components/education/TeacherGate', () => ({
   TeacherGate: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 vi.mock('next/link', () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => <a href={href}>{children}</a>,
+  default: ({ children, href, ...rest }: { children: React.ReactNode; href: string }) => (
+    <a href={href} {...rest}>{children}</a>
+  ),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 let trialEndedState = { dismissed: false, dismiss: vi.fn() };
@@ -84,10 +86,10 @@ describe('TeacherPage: Home carries billing banners only', () => {
     expect(upsellImpressions()).toHaveLength(0);
   });
 
-  it('given a free teacher inside the 7-day access-trial window, when Home renders, then no upsell card replaces the class insight', () => {
+  it('given a free teacher inside the 7-day access-trial window, when Home renders, then the trial-ending card shows and no upsell card replaces the class insight', () => {
     accessState = { trial: mkTrial({ daysLeft: 5 }) };
     render(<TeacherPage />);
-    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
+    expect(screen.getByTestId('teacher-trial-ending-card')).toBeInTheDocument();
     expect(dashboardProps.last.proOffer).toBeUndefined();
   });
 
@@ -137,12 +139,24 @@ describe('TeacherPage: Home carries billing banners only', () => {
     expect(screen.queryByTestId('teacher-pro-trial-ended')).toBeNull();
   });
 
-  it('given an expired access trial, when Home renders, then the renewal card shows without a dismiss control', () => {
-    accessState = { trial: mkTrial({ isExpired: true, daysLeft: 0, hoursLeft: 0, msLeft: 0 }) };
+  it('given an expired access trial, when Home renders, then the trial-ending card shows without a dismiss control', () => {
+    accessState = {
+      trial: mkTrial({
+        isExpired: true,
+        daysLeft: 0,
+        hoursLeft: 0,
+        msLeft: 0,
+        expiresAt: new Date(Date.now() - 60 * 1000).toISOString(),
+      }),
+    };
     render(<TeacherPage />);
-    const banner = screen.getByTestId('trial-urgency-banner');
-    expect(banner).toHaveAttribute('data-href', '/en/teacher/upgrade');
-    expect(banner).toHaveAttribute('data-dismissible', '0');
+    expect(screen.getByTestId('teacher-trial-ending-card')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-trial-ending-cta')).toHaveAttribute(
+      'href',
+      '/en/teacher/upgrade?source=trial_ending_card',
+    );
+    expect(screen.queryByRole('button', { name: /dismiss/i })).toBeNull();
+    expect(screen.queryByTestId('trial-urgency-banner')).toBeNull();
   });
 
   it('given an unfinished checkout, when Home renders, then the resume banner shows (never for an admin)', () => {

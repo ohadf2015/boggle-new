@@ -12,6 +12,7 @@ const base: TeacherBannerInput = {
   isAdmin: false,
   accessLoading: false,
   accessTrialExpired: false,
+  accessTrialLive: false,
   trialReminderOpen: false,
   trialEndedDismissed: false,
   polarTrialExpiring: false,
@@ -65,5 +66,11 @@ describe('selectTeacherBanner', () => {
     expect(pick({ trialReminderOpen: true })).toEqual({ kind: 'show', banner: 'trialReminder' });
     expect(pick({ accessTrialExpired: true })).toEqual({ kind: 'show', banner: 'trialExpired' });
     expect(pick({ accessTrialExpired: true, isAdmin: true })).toEqual({ kind: 'show', banner: 'trialExpired' });
+  });
+
+  it('given a live access trial with days left, when picking, then the trial-ending card shows (not only the last 3 days)', () => {
+    expect(pick({ accessTrialLive: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
+    expect(pick({ accessTrialLive: true, trialReminderOpen: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
+    expect(pick({ accessTrialLive: true, isAdmin: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
   });
 });

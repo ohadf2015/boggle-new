@@ -5,11 +5,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherGate } from '@/components/education/TeacherGate';
-import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
-import { TrialEndedBannerWithRecap, TrialUrgencyBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
+import { TrialEndedBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
-import { TeacherTrialReminderBanner } from '@/components/education/TeacherTrialReminderBanner';
+import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingCard';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
 import { useTeacherBanner } from '@/components/teacher/home/useTeacherBanner';
@@ -25,6 +24,9 @@ const IMPRESSION_SOURCE: Partial<Record<TeacherBillingBanner, string>> = {
   reactivate: 'dashboard_trial_ended',
   trialing: 'dashboard_trial_lifecycle',
   trialExpiring: 'dashboard_trial_lifecycle',
+  trialEnding: 'trial_ending_card',
+  trialExpired: 'trial_ending_card',
+  trialReminder: 'trial_ending_card',
 };
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the redirect.
@@ -53,10 +55,8 @@ function TeacherDashboardInner() {
       banner={
         banner === 'pendingCheckout' ? (
           <PendingCheckoutBanner />
-        ) : banner === 'trialReminder' ? (
-          <TeacherTrialReminderBanner trial={b.trial} onDismiss={b.dismissReminder} />
-        ) : banner === 'trialExpired' ? (
-          <TrialUrgencyBannerWithRecap trial={b.trial} href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`} />
+        ) : banner === 'trialEnding' || banner === 'trialExpired' || banner === 'trialReminder' ? (
+          <TeacherTrialEndingCard trial={b.trial} />
         ) : banner === 'reactivate' ? (
           <TrialEndedBannerWithRecap onDismiss={b.dismissEnded} />
         ) : banner === 'trialExpiring' ? (

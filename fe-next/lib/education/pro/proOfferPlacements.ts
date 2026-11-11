@@ -13,4 +13,6 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'late_join_notice',
   // Locked "Export class report (PDF)" on the classroom round-results screen (ReportPdfExportButton).
   'results_report_pdf',
+  // Teacher Home card for a live or ended free access trial.
+  'trial_ending_card',
 ]);

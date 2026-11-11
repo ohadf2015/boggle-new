@@ -116,3 +116,17 @@ describe('POST /api/education/pro-offer-impression — format + class report but
     ])
   })
 })
+
+describe('POST /api/education/pro-offer-impression — trial_ending_card', () => {
+  it('accepts placement=trial_ending_card for rendered and viewed', async () => {
+    getAuthedUser.mockReset()
+    capture.mockReset()
+    getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
+    await POST(req({ placement: 'trial_ending_card', stage: 'rendered', locale: 'en', cta: 'teacher_pro_trial', offer: 'keep_after_trial' }))
+    await POST(req({ placement: 'trial_ending_card', stage: 'viewed', locale: 'en', cta: 'teacher_pro_trial', offer: 'keep_after_trial' }))
+    expect(capture.mock.calls.map((c) => [c[0].event, c[0].properties.placement, c[0].properties.source])).toEqual([
+      ['edu_pro_offer_rendered', 'trial_ending_card', 'trial_ending_card'],
+      ['edu_pro_offer_impression', 'trial_ending_card', 'trial_ending_card'],
+    ])
+  })
+})

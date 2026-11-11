@@ -16,7 +16,7 @@ describe('POST /api/education/pro-offer-click', () => {
     capture.mockReset()
   })
 
-  it.each(['class_created', 'classroom_results', 'access_success', 'dashboard'])('records edu_pro_offer_clicked with source=%s', async (placement) => {
+  it.each(['class_created', 'classroom_results', 'access_success', 'dashboard', 'trial_ending_card'])('records edu_pro_offer_clicked with source=%s', async (placement) => {
     getAuthedUser.mockResolvedValue({ id: 't1', email: 'teacher@school.org' })
     const res = await POST(req({ placement, locale: 'sv', cta: 'teacher_pro_trial', offer: 'keep_after_trial' }, { 'sec-fetch-mode': 'cors' }))
     expect(res.status).toBe(204)
