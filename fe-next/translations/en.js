@@ -21180,6 +21180,19 @@ const en = {
       "soloPractice": "Practice on your own"
     },
     "hostResults": {
+      "lessonPlan": {
+        "title": "That was the rehearsal. When is the real lesson?",
+        "body": "Tell us and we'll email you this game an hour before, ready to open.",
+        "tomorrow": "Tomorrow at 9:00",
+        "pickLabel": "Or pick the time",
+        "remind": "Remind me",
+        "saved": "We'll email you the game an hour before {when}.",
+        "change": "Change",
+        "error": "That didn't save. Check your connection and try again.",
+        "retry": "Try again",
+        "tooSoon": "Pick a time at least 30 minutes from now.",
+        "tooFar": "Pick a time within the next 60 days."
+      },
       "keepOpen": {
         "cta": "Keep it open as homework for a week",
         "hint": "Students can play these words again from the class link, any time, until {date}.",

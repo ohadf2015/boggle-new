@@ -22135,6 +22135,19 @@ const sv = {
       "soloPractice": "Öva på egen hand"
     },
     "hostResults": {
+      "lessonPlan": {
+        "title": "Det där var generalrepetitionen. När är den riktiga lektionen?",
+        "body": "Säg till, så mejlar vi dig spelet en timme innan, redo att öppna.",
+        "tomorrow": "I morgon kl. 9.00",
+        "pickLabel": "Eller välj en tid",
+        "remind": "Påminn mig",
+        "saved": "Vi mejlar dig spelet en timme innan lektionen, {when}.",
+        "change": "Ändra",
+        "error": "Det gick inte att spara. Kolla anslutningen och försök igen.",
+        "retry": "Försök igen",
+        "tooSoon": "Välj en tid minst 30 minuter fram.",
+        "tooFar": "Välj en tid inom de närmaste 60 dagarna."
+      },
       "keepOpen": {
         "cta": "Håll den öppen som läxa i en vecka",
         "hint": "Eleverna kan spela orden igen från klasslänken, när som helst, till och med {date}.",

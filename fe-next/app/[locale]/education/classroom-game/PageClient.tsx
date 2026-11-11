@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -104,7 +104,7 @@ function ClassroomGameInner() {
     if (authLoading) return;
 
     if (!user) {
-      router.push(`/${language}/education`);
+      router.replace(teacherAccessHref(language, `${window.location.pathname}${window.location.search}`));
       return;
     }
 
@@ -191,6 +191,22 @@ function ClassroomGameInner() {
   );
 }
 
+function teacherAccessHref(locale: string, from: string): string {
+  return `/${locale}/education/access?from=${encodeURIComponent(from)}`;
+}
+
+/** A link that names a class is a teacher's own (an email, a calendar event): sign in and come straight back to it. */
+function SignInToClassGame() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { language } = useLanguage();
+  useEffect(() => {
+    const search = typeof window !== 'undefined' ? window.location.search : '';
+    router.replace(teacherAccessHref(language, `${pathname ?? `/${language}/education/classroom-game`}${search}`));
+  }, [router, pathname, language]);
+  return <ClassroomGameLoadingShell />;
+}
+
 /**
  * Guests land here from NoAccountCta ("Play now — no sign-up"). TeacherGate
  * would bounce them to the access signup wall — a signup wall behind a
@@ -214,7 +230,7 @@ export default function ClassroomGamePage() {
 
   // `isAuthenticated` also needs the profile, which lands after the user: a signed-in teacher is not a guest.
   if (!user) {
-    return <ClassroomGuestDemo />;
+    return searchParams?.get('classroomId') ? <SignInToClassGame /> : <ClassroomGuestDemo />;
   }
 
   return (

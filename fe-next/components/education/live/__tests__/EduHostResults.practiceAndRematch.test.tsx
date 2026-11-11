@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import EduHostResults from '@/components/education/live/EduHostResults';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -116,5 +116,24 @@ describe('EduHostResults practice rounds, rematch and lesson honesty', () => {
     expect(screen.queryByTestId(/^podium-detail-/)).toBeNull();
     expect(wall.textContent).not.toContain('"found":0');
     expect(wall).toHaveAttribute('data-outcome', 'winner');
+  });
+
+  it('given a bots-only practice round in a class, when results show, then the teacher is asked when the real lesson is', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, lessonAt: null }) })));
+    render(<EduHostResults summary={summary({ classroomId: 'class-1' })} players={bots} t={t} onRematch={vi.fn()} />);
+    await act(async () => {});
+    vi.unstubAllGlobals();
+    expect(screen.getByTestId('lesson-plan')).toBeInTheDocument();
+    expect(screen.queryByTestId('keep-open-homework')).toBeNull();
+  });
+
+  it('given a real class round, when results show, then no lesson-plan prompt', () => {
+    render(<EduHostResults summary={summary({ classroomId: 'class-1' })} players={students} t={t} onRematch={vi.fn()} />);
+    expect(screen.queryByTestId('lesson-plan')).toBeNull();
+  });
+
+  it('given a practice round with no class, when results show, then no lesson-plan prompt', () => {
+    render(<EduHostResults summary={summary()} players={bots} t={t} onRematch={vi.fn()} />);
+    expect(screen.queryByTestId('lesson-plan')).toBeNull();
   });
 });

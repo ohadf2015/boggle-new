@@ -54,6 +54,7 @@ import { reteachVerdict, studentsUnderHalf } from './eduReteachModel';
 import { useReteachRound } from './useReteachRound';
 import { NeoButton } from '@/components/ui/button';
 import { KeepOpenHomework } from './KeepOpenHomework';
+import { LessonPlanPrompt } from '@/components/education/LessonPlanPrompt';
 
 /** Play again, Next mode and End game: room controls, drawn as a quiet row so they never compete with the one primary. */
 const TERTIARY = cn(
@@ -348,6 +349,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               {summary.classroomId && summary.lessonIds?.[0] && students > 0 && !isPracticeRound(players) ? (
                 <KeepOpenHomework classroomId={summary.classroomId} lessonId={summary.lessonIds[0]} />
               ) : null}
+              {summary.classroomId && isPracticeRound(players) ? <LessonPlanPrompt classroomId={summary.classroomId} /> : null}
             </div>
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
