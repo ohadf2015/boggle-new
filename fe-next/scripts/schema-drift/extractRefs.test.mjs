@@ -32,3 +32,12 @@ test('ignores dynamic names', () => {
   assert.equal(tables.size, 0);
   assert.equal(rpcs.size, 0);
 });
+
+test('ignores Array.from and Buffer.from on a string literal', () => {
+  const { tables } = extractRefs(`
+    const pad = Array.from('LEXICLASH');
+    const raw = Buffer.from("payload");
+    await supabase.from('profiles').select('id');
+  `);
+  assert.deepEqual([...tables], ['profiles']);
+});
