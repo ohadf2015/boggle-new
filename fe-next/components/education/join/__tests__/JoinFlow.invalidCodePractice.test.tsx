@@ -45,7 +45,8 @@ describe('<JoinFlow> — a wrong code still leaves a way to play', () => {
     expect(codeField()).toHaveValue('ZZZZZQ');
     const practice = screen.getByTestId('dead-end-practice');
     expect(practice).toHaveAttribute('href', '/en/join/practice');
-    expect(mockCapture).toHaveBeenCalledWith('edu_dead_end_shown', { state: 'invalid_code' });
+    // Fired from the link's mount effect, which can flush a tick after the DOM commit on a slow runner.
+    await waitFor(() => expect(mockCapture).toHaveBeenCalledWith('edu_dead_end_shown', { state: 'invalid_code' }));
   });
 
   it('GIVEN the lookup could not be performed (`unverified`) THEN no wrong-code practice offer appears', async () => {

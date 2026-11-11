@@ -66,6 +66,18 @@ describe('useJoinFlow destinations', () => {
     expect(hook.result.current.formErrorKey).toBe('education.student.join.classroomFull');
   });
 
+  it('Given the teacher submits their own class code, When refused, Then the flow holds the class and live room for the own-class screen and never navigates', async () => {
+    const hook = await submitWith({ success: false, code: 'TEACHER_OWN_CLASS', classroomId: 'c1', gameCode: 'LIVE01' });
+    expect(pushMock).not.toHaveBeenCalled();
+    expect(hook.result.current.ownClass).toEqual({ classroomId: 'c1', liveGameCode: 'LIVE01' });
+    expect(hook.result.current.formErrorKey).toBeNull();
+  });
+
+  it('Given the teacher submits their own class code with no room open, Then the own-class state has no live room', async () => {
+    const hook = await submitWith({ success: false, code: 'TEACHER_OWN_CLASS', classroomId: 'c1' });
+    expect(hook.result.current.ownClass).toEqual({ classroomId: 'c1', liveGameCode: null });
+  });
+
   it('a rejected code sends the student back to the code field and never navigates', async () => {
     const hook = await submitWith({ success: false, code: 'INVALID_CODE' });
     expect(pushMock).not.toHaveBeenCalled();

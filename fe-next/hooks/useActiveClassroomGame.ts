@@ -14,6 +14,10 @@ export interface ActiveGame {
   classroomId?: string;
   /** That classroom's display name, resolved server-side. Absent from an older server. */
   classroomName?: string | null;
+  /** The teacher trying the room alone: shown, never auto-joined. */
+  rehearsal?: boolean;
+  /** False while the record exists but the projector room has not opened; absent from an older server. */
+  roomOpen?: boolean;
 }
 
 const POLL_INTERVAL = 15_000;
@@ -153,6 +157,7 @@ export function useActiveClassroomGame(classroomId: string) {
         classroomName?: string | null;
         teacherName: string;
         lessonNames: string[];
+        rehearsal?: boolean;
       }) => {
         // Trust the payload's own scope, not just the room we think we are in.
         // The server sends classroomId and this ignored it, so any path that
@@ -168,13 +173,21 @@ export function useActiveClassroomGame(classroomId: string) {
           classroomName: data.classroomName,
           teacherName: data.teacherName,
           lessonNames: data.lessonNames,
+          ...(data.rehearsal ? { rehearsal: true } : {}),
+          // Announced when the teacher picks the game, before the board opens its room.
+          roomOpen: false,
         });
+      });
+
+      sock.on('classroomRoomOpened', (data: { gameCode?: string; classroomId?: string }) => {
+        if (data?.classroomId && data.classroomId !== classroomId) return;
+        setActiveGame((current) => (current && current.gameCode === data?.gameCode ? { ...current, roomOpen: true } : current));
       });
 
       // The list is authoritative in BOTH directions. An empty list means the
       // game is over (or its Redis key expired); leaving the old one on screen
       // is what kept "JOIN NOW" pointing at a dead room.
-      sock.on('activeClassroomGames', (data: { classroomId?: string; games: ActiveGame[] }) => {
+      sock.on('activeClassroomGames', (data: { classroomId?: string; games: Array<ActiveGame & { settings?: { rehearsal?: boolean } }> }) => {
         // Whose answer is this? The payload used to say nothing, so the client
         // had no way to tell and trusted every one of them. A response for a
         // classroom this hook is not watching is not evidence about this
@@ -192,7 +205,7 @@ export function useActiveClassroomGame(classroomId: string) {
         const joinable = (data?.games ?? []).find(
           (g) => !!g?.gameCode && (!g.classroomId || g.classroomId === classroomId)
         ) ?? null;
-        setActiveGame(joinable);
+        setActiveGame(joinable?.settings?.rehearsal ? { ...joinable, rehearsal: true } : joinable);
         // Second analytics clear path. The student who plays in class, walks
         // away mid-game and later plays solo never receives `classroomGameEnded`
         // (this hook's socket is gone by then), so without this their solo games

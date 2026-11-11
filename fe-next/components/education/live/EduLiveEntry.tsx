@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { LIVE_KEYFRAMES, PRESS, PRIMARY_BUTTON, type Translate } from './eduLiveStyles';
+import ClassroomWaitStalled from './ClassroomWaitStalled';
 
 interface EduLiveEntryProps {
   entry: MultiplayerFlowProps;
@@ -36,7 +37,7 @@ function Frame({ testId, mascot, children }: { testId: string; mascot: string; c
   );
 }
 
-function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | 'language' | 'isSpectator'>) {
+function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'urlRoom' | 'isSpectator'>) {
   const flow = useMultiplayerFlowState(entry);
   const room = entry.prefilledRoom ?? '';
   const refusal = useHostCreateRefusal();
@@ -58,6 +59,14 @@ function ActiveEntry({ entry, isHost, t }: Omit<EduLiveEntryProps, 'urlRoom' | '
         <button type="button" data-testid="edu-live-host-retry" onClick={() => entry.handleJoin(true, entry.defaultLanguage, room, `${name} Room`, name, { isPrivate: true, isClassroom: true })} className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}>
           {t('eduLiveRoom.entry.hostRetry')}
         </button>
+      </Frame>
+    );
+  }
+
+  if (entry.waitingForTeacher && entry.waitStalled) {
+    return (
+      <Frame testId="edu-live-waiting-teacher" mascot={EDU_MASCOT.tip}>
+        <ClassroomWaitStalled language={language} onRetry={entry.onWaitRetry} t={t} />
       </Frame>
     );
   }
@@ -110,5 +119,5 @@ export default function EduLiveEntry({ entry, urlRoom, isHost, isSpectator = fal
       </Frame>
     );
   }
-  return <ActiveEntry entry={entry} isHost={isHost} t={t} />;
+  return <ActiveEntry entry={entry} isHost={isHost} language={language} t={t} />;
 }

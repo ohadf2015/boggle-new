@@ -20,6 +20,7 @@ import { sanitizeGameCode } from '@/lib/multiplayer/sanitizeGameCode';
 import { getGuestSessionId, hashToken } from '@/utils/guestManager';
 import { setRejoinIntent } from '@/utils/socketRejoin';
 import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
+import { classroomHostJoinFlag } from '@/lib/education/classroomLivePath';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { clearHostCreateRefusal, setHostCreateRefusal } from './hostCreateRefusal';
 import { waitForSignedInUser } from './classroomHostSignIn';
@@ -448,6 +449,7 @@ export function useMultiplayerJoin({
           guestTokenHash,
           guestSessionId,
           avatar: hostAvatar,
+          ...classroomHostJoinFlag(),
         });
 
         if (options?.quickPlay) {

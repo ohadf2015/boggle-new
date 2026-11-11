@@ -6,7 +6,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useClassroomRoomWait, rejoinWaitingRoom, ROOM_WAIT_RETRY_MS, ROOM_WAIT_MAX_MS } from '../useClassroomRoomWait';
+import { useClassroomRoomWait, rejoinWaitingRoom, ROOM_WAIT_RETRY_MS, ROOM_WAIT_MAX_MS, ROOM_WAIT_STALL_MS } from '../useClassroomRoomWait';
 
 function fakeSocket() {
   const listeners: Record<string, Array<(d: unknown) => void>> = {};
@@ -76,6 +76,64 @@ describe('useClassroomRoomWait', () => {
     expect(onGiveUp).toHaveBeenCalledWith('ABC123');
     expect(hook.result.current.waitingCode).toBeNull();
     expect(rejoin.mock.calls.length).toBeGreaterThan(0);
+  });
+});
+
+describe('useClassroomRoomWait — a wait that has stalled', () => {
+  beforeEach(() => { vi.useFakeTimers(); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  function setup() {
+    const socket = fakeSocket();
+    const rejoin = vi.fn();
+    const hook = renderHook((props: { isActive: boolean }) =>
+      useClassroomRoomWait({ socketRef: { current: socket as never }, isActive: props.isActive, rejoin, onGiveUp: vi.fn() }), { initialProps: { isActive: false } });
+    return { rejoin, hook };
+  }
+
+  it('Given a waiting student, When less than a minute passes, Then the wait stays quiet', () => {
+    const { hook } = setup();
+    act(() => hook.result.current.hold('ABC123'));
+    act(() => { vi.advanceTimersByTime(ROOM_WAIT_STALL_MS - 1); });
+    expect(hook.result.current.stalled).toBe(false);
+  });
+
+  it('Given a waiting student, When a minute passes with re-asks still refused, Then the wait reports it has stalled', () => {
+    const { hook } = setup();
+    act(() => hook.result.current.hold('ABC123'));
+    for (let elapsed = 0; elapsed < ROOM_WAIT_STALL_MS; elapsed += ROOM_WAIT_RETRY_MS) {
+      act(() => { vi.advanceTimersByTime(ROOM_WAIT_RETRY_MS); });
+      act(() => hook.result.current.hold('ABC123'));
+    }
+    expect(ROOM_WAIT_STALL_MS).toBe(60_000);
+    expect(hook.result.current.stalled).toBe(true);
+    expect(hook.result.current.waitingCode).toBe('ABC123');
+  });
+
+  it('Given a stalled wait, When the student taps Try again, Then the join is re-asked now and the notice resets', () => {
+    const { rejoin, hook } = setup();
+    act(() => hook.result.current.hold('ABC123'));
+    act(() => { vi.advanceTimersByTime(ROOM_WAIT_STALL_MS); });
+    rejoin.mockClear();
+    act(() => hook.result.current.retryNow());
+    expect(rejoin).toHaveBeenCalledWith('ABC123');
+    expect(hook.result.current.stalled).toBe(false);
+    act(() => { vi.advanceTimersByTime(ROOM_WAIT_STALL_MS); });
+    expect(hook.result.current.stalled).toBe(true);
+  });
+
+  it('Given a stalled wait, When the student gets seated, Then the stalled notice clears', () => {
+    const { hook } = setup();
+    act(() => hook.result.current.hold('ABC123'));
+    act(() => { vi.advanceTimersByTime(ROOM_WAIT_STALL_MS); });
+    hook.rerender({ isActive: true });
+    expect(hook.result.current.stalled).toBe(false);
+  });
+
+  it('Given no wait, When Try again is tapped, Then nothing is sent', () => {
+    const { rejoin, hook } = setup();
+    act(() => hook.result.current.retryNow());
+    expect(rejoin).not.toHaveBeenCalled();
   });
 });
 

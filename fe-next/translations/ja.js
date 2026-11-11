@@ -1335,6 +1335,10 @@ const ja = {
       "ctaSoloOver": "ウォームアップ",
       "ctaPlay": "プレイ",
       "ctaLive": "ライブに参加",
+      "autoJoin": {
+        "title": "先生がゲームを始めました。参加しています…",
+        "stay": "ここにいる"
+      },
       "ctaReviewTitle": "ミスした単語 {count}個",
       "ctaBossTitle": "ボスに挑む",
       "ctaJoinSub": "先生からもらったコードを入力",
@@ -17771,6 +17775,14 @@ const ja = {
         "codeHint": "6文字のクラスコードを先生に聞いてね",
         "codeStripped": "クラスコードに使えない文字が入っています。キーボードを英字に切り替えて、もう一度入力してね。",
         "teacherOwnClass": "これはあなたのクラスなので、生徒として参加することはできません。先生用ダッシュボードから開いてください。",
+        "ownClass": {
+          "title": "これはあなたのクラスです",
+          "hint": "生徒はこのコードで参加します。ゲームはここから始められます。",
+          "liveHint": "ゲームはもう開いていて、生徒は今すぐ参加できます。ボードを開いて進めましょう。",
+          "startGame": "このクラスでゲームを始める",
+          "openBoard": "ゲームボードを開く",
+          "openClass": "クラスを開く"
+        },
         "returning": {
           "title": "{name}として続ける？",
           "titleNoName": "これはあなた？",
@@ -22136,6 +22148,10 @@ const ja = {
       "openingRoom": "ルームを準備中…",
       "waitingTeacher": "先生がまだゲームを開いていません",
       "waitingTeacherHint": "このまま待っていてね。始まったらすぐ参加できます。",
+      "waitStalledTitle": "ゲームはまだ開いていません",
+      "waitStalledHint": "先生がまだ準備中かもしれません。もう一度試すか、クラスのページで待っていてね。始まったらすぐ参加できます。",
+      "waitStalledRetry": "もう一度試す",
+      "waitStalledToClass": "クラスのページへ",
       "noRoomTitle": "ここにゲームはありません",
       "noRoomStudent": "先生にコードを聞いて参加しよう。",
       "noRoomHost": "先生ホームからゲームを始めましょう。",

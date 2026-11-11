@@ -33,6 +33,7 @@ import {
   leaveRoom,
   LOBBY_ROOM,
   safeEmit,
+  getSocketById,
 } from '../utils/socketHelpers.js';
 
 import { cancelAutoStartCountdown } from '../modules/lobbyAutoStart.js';
@@ -63,7 +64,9 @@ import {
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { classroomSeatName, cleanClassroomSeatName } from './classroomSeatName';
+import { recordClassroomRosterEntry } from '../modules/classroomRoster';
 import { practiceSeatToken } from './practiceSeat';
+import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
 import { isLockedOut } from '../modules/classroomLobbyLock.js';
 import { removeMidRoundLeaver } from './midRoundLeave.js';
 
@@ -77,6 +80,7 @@ interface JoinGamePayload {
   guestTokenHash?: string;
   guestSessionId?: string;
   practiceSeat?: boolean;
+  hostSeat?: boolean;
 }
 
 interface LeaveRoomPayload {
@@ -167,7 +171,17 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // token, so it never reaches the account reconnect below (which would take over
     // the host seat), never registers as that account's connection, and is left out
     // of the class's students. Ordinary multiplayer rooms ignore the flag.
-    const practiceSeat = wantsPracticeSeat && !!seat.game;
+    // The teacher's own account arriving from a non-host page (the invite link opened
+    // in another tab, their phone) while the board is live would otherwise take the
+    // host seat over and leave the board dead: seat it as the practice seat instead.
+    const payload = validation.data as JoinGamePayload;
+    const isOwnClassroomTeacher = !!seat.game && !!verifiedUserId && verifiedUserId === seat.game.teacherId && payload.hostSeat !== true;
+    const teacherSecondPage = isOwnClassroomTeacher && !!game.hostSocketId && game.hostSocketId !== socket.id && !!getSocketById(io, game.hostSocketId)?.connected;
+    const practiceSeat = (wantsPracticeSeat || teacherSecondPage) && !!seat.game;
+    if (teacherSecondPage && !wantsPracticeSeat && game.users[username]) {
+      username = suggestAvailableGuestName(username, new Set(Object.keys(game.users))).name;
+    }
+    if (teacherSecondPage) logger.info('SOCKET', `Teacher ${verifiedUserId} opened ${gameCode} on a second page while hosting; seating it as the practice seat`);
     if (practiceSeat) {
       guestTokenHash = practiceSeatToken(verifiedUserId, guestTokenHash, socket.id);
       authUserId = undefined;
@@ -318,6 +332,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // broadcast and cannot carry a per-socket value (pitfalls class 3).
     // Fire-and-forget: it must never delay or fail the join.
     void emitClassroomContext(socket, gameCode, authUserId, seat);
+    if (seat.game && authUserId) void recordClassroomRosterEntry(gameCode, seat.game, authUserId);
 
     // Handle reconnection
     if (existingSocketId || game.users[username]) {

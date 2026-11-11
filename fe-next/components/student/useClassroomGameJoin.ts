@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { ActiveGame } from '@/hooks/useActiveClassroomGame';
 import { classifyClassroomJoinRefusal } from './classroomJoinRefusal';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
+import { markClassroomGameHandled } from './useClassroomAutoJoin';
 
 /** Long enough for a slow phone on school wifi, short enough to not be a hang. */
 export const JOIN_TIMEOUT_MS = 12_000;
@@ -59,6 +60,7 @@ export function useClassroomGameJoin({ activeGame, socket, userId, username }: A
       if (data?.gameCode && data.gameCode !== gameCode) return;
       settle();
       setIsJoining(false);
+      markClassroomGameHandled(gameCode);
       router.push(classroomLivePath(language, gameCode));
     };
 

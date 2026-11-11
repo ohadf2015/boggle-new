@@ -18,6 +18,8 @@ import { POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
+import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
+import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 
 const mocked = (fn: unknown) => fn as ReturnType<typeof vi.fn>;
 let ip = 0;
@@ -105,6 +107,23 @@ describe('join route: a teacher cannot enrol in their own class', () => {
     const res = await POST(req({ joinCode: 'ABC123' }));
     expect(res.status).toBe(409);
     expect((await res.json()).code).toBe('TEACHER_OWN_CLASS');
+    expect(adminInsert).not.toHaveBeenCalled();
+  });
+
+  it('Given the class teacher opens their own code and no room is open, Then the refusal carries the class id so the page can offer to start a game', async () => {
+    mocked(getAuthedUser).mockResolvedValue({ id: 'teacher-1', email: 't@school.edu' });
+    const body = await (await POST(req({ joinCode: 'ABC123' }))).json();
+    expect(body).toMatchObject({ code: 'TEACHER_OWN_CLASS', classroomId: 'c-1' });
+    expect(body.gameCode).toBeUndefined();
+  });
+
+  it('Given the class teacher opens their own code while their room is live, Then they are refused as a student but told the live room code, and enrolled nowhere', async () => {
+    mocked(getAuthedUser).mockResolvedValue({ id: 'teacher-1', email: 't@school.edu' });
+    mocked(lookupLiveGameForClassroom).mockResolvedValueOnce('LIVE01');
+    mocked(lookupLiveClassroomGame).mockResolvedValueOnce({ classroomId: 'c-1', teacherId: 'teacher-1', settings: {} });
+    const res = await POST(req({ joinCode: 'ABC123' }));
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: 'TEACHER_OWN_CLASS', classroomId: 'c-1', gameCode: 'LIVE01' });
     expect(adminInsert).not.toHaveBeenCalled();
   });
 

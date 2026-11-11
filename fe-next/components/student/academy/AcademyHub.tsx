@@ -5,6 +5,7 @@ import type { Socket } from 'socket.io-client';
 import { useActiveClassroomGame, type ActiveGame } from '@/hooks/useActiveClassroomGame';
 import { useClassroomRewardListener } from '@/hooks/useClassroomRewardListener';
 import { useClassroomGameJoin } from '@/components/student/useClassroomGameJoin';
+import { useClassroomAutoJoin } from '@/components/student/useClassroomAutoJoin';
 import { useAcademyData } from './useAcademyData';
 import { ReviewCountBridge } from './ReviewCountBridge';
 import { AcademyHubView, type AcademyHubProps } from './AcademyHubView';
@@ -36,6 +37,7 @@ export function AcademyHub(props: AcademyHubProps) {
     [base, reviewCount, reviewPending],
   );
   const { join, isJoining, joinError } = useClassroomGameJoin({ activeGame: liveGame, socket, userId, username: studentName });
+  const autoJoin = useClassroomAutoJoin({ activeGame: liveGame, join, isJoining });
   const { reward, clearReward } = useClassroomRewardListener(userId);
 
   return (
@@ -46,7 +48,9 @@ export function AcademyHub(props: AcademyHubProps) {
         {...props}
         data={data}
         liveGame={liveGame}
-        join={join}
+        join={autoJoin.joinNow}
+        autoJoinPending={!!autoJoin.pendingCode}
+        onStayHere={autoJoin.stay}
         isJoining={isJoining}
         joinError={joinError}
         reward={reward}

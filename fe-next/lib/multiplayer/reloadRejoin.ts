@@ -1,4 +1,5 @@
 import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
+import { classroomHostJoinFlag } from '@/lib/education/classroomLivePath';
 
 /**
  * The `join` payload that puts a seated player back in their room — used by
@@ -20,11 +21,12 @@ export interface RejoinPayload {
   username: string;
   authToken?: string;
   practiceSeat?: true;
+  hostSeat?: true;
 }
 
 export function buildRejoinPayload(session: RejoinSessionLike | null | undefined, authToken: unknown): RejoinPayload | null {
   if (!session?.gameCode || !session.username) return null;
   const payload: RejoinPayload = { gameCode: session.gameCode, username: session.username };
   if (typeof authToken === 'string' && authToken) payload.authToken = authToken;
-  return { ...payload, ...practiceSeatJoinFlag() };
+  return { ...payload, ...practiceSeatJoinFlag(), ...classroomHostJoinFlag() };
 }

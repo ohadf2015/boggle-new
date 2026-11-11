@@ -51,6 +51,8 @@ export interface ClassroomGameSettings {
   vocabQuizSeconds?: number;
   /** Vocab Quiz only: whether to enable treasure chests (Gold-Quest-style rewards). */
   treasureChestsEnabled?: boolean;
+  /** A teacher rehearsal; never auto-joined from a student's class page. */
+  rehearsal?: boolean;
   /** Free-for-all or team battle (weekly teams / juegos en equipo). */
   playStyle?: 'ffa' | 'teams';
   /** Team count when playStyle === 'teams' (server clamps to 2-4). */
@@ -92,6 +94,8 @@ export interface ClassroomGame {
   reteach?: { fullVocabularyWords: string[]; fullTargetWord?: string; pending: boolean };
   settings: ClassroomGameSettings;
   players: ClassroomGamePlayer[];
+  /** Account ids of every student seated in the room by any door; `players` only sees the class-page join. */
+  rosterUserIds?: string[];
   createdAt: string;
   startedAt?: string;
   /**

@@ -1335,6 +1335,10 @@ const en = {
       "ctaSoloOver": "Warm up",
       "ctaPlay": "Play",
       "ctaLive": "Join live game",
+      "autoJoin": {
+        "title": "Your teacher started a game. Joining…",
+        "stay": "Stay here"
+      },
       "ctaReviewTitle": "{count} missed words",
       "ctaBossTitle": "Fight the boss",
       "ctaJoinSub": "Type the code from your teacher",
@@ -16159,6 +16163,14 @@ const en = {
         "codeHint": "6 characters from your teacher",
         "codeStripped": "Some of those characters aren't in class codes. Switch your keyboard to English letters and try again.",
         "teacherOwnClass": "This is your own class, so you can't join it as a student. Open it from your teacher dashboard instead.",
+        "ownClass": {
+          "title": "This is your class",
+          "hint": "Students join with this code. To run a game, start it from here.",
+          "liveHint": "Your game is open and students can join now. Open the board to run it.",
+          "startGame": "Start a game for this class",
+          "openBoard": "Open the game board",
+          "openClass": "Open my class"
+        },
         "returning": {
           "title": "Continue as {name}?",
           "titleNoName": "Is this you?",
@@ -21181,6 +21193,10 @@ const en = {
       "openingRoom": "Opening your room…",
       "waitingTeacher": "Your teacher hasn't opened the game yet",
       "waitingTeacherHint": "Stay here. You'll join the moment it starts.",
+      "waitStalledTitle": "The game hasn't opened yet",
+      "waitStalledHint": "Your teacher may still be setting it up. Try again, or wait on your class page. You'll be taken in when it starts.",
+      "waitStalledRetry": "Try again",
+      "waitStalledToClass": "Go to my class",
       "noRoomTitle": "No game here",
       "noRoomStudent": "Ask your teacher for the code, then join.",
       "noRoomHost": "Start a game from your teacher home.",

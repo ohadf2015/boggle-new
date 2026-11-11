@@ -187,4 +187,47 @@ describe('useActiveClassroomGame — classroom scoping', () => {
     // against an older server (recurring pitfall class 4).
     expect(result.current.activeGame?.gameCode).toBe('R438D5');
   });
+
+  it('Given a rehearsal room in the poll, When shown, Then it is marked rehearsal so the class page never auto-joins it', async () => {
+    const { result } = await mountReady('flow-check');
+    act(() => {
+      socketHandlers.activeClassroomGames({
+        classroomId: 'flow-check',
+        games: [{ gameCode: 'REH123', classroomId: 'flow-check', teacherName: 'Ms Plant', lessonNames: [], settings: { rehearsal: true } }],
+      });
+    });
+    expect(result.current.activeGame).toMatchObject({ gameCode: 'REH123', rehearsal: true });
+  });
+
+  it('Given a rehearsal room announced live, When shown, Then it is marked rehearsal; a real one is not', async () => {
+    const { result } = await mountReady('flow-check');
+    act(() => {
+      socketHandlers.classroomGameCreated({ gameCode: 'REH123', classroomId: 'flow-check', teacherName: 'Ms Plant', lessonNames: [], rehearsal: true });
+    });
+    expect(result.current.activeGame?.rehearsal).toBe(true);
+    act(() => {
+      socketHandlers.classroomGameCreated({ gameCode: 'REA123', classroomId: 'flow-check', teacherName: 'Ms Plant', lessonNames: [] });
+    });
+    expect(result.current.activeGame?.rehearsal).toBeFalsy();
+  });
+
+  it('Given a game announced before its projector room opens, When the room opens, Then the game reads as open', async () => {
+    const { result } = await mountReady('flow-check');
+    act(() => {
+      socketHandlers.classroomGameCreated({ gameCode: 'R438D5', classroomId: 'flow-check', teacherName: 'Ms Plant', lessonNames: [] });
+    });
+    expect(result.current.activeGame?.roomOpen).toBe(false);
+    act(() => { socketHandlers.classroomRoomOpened({ gameCode: 'OTHER1', classroomId: 'flow-check' }); });
+    expect(result.current.activeGame?.roomOpen).toBe(false);
+    act(() => { socketHandlers.classroomRoomOpened({ gameCode: 'R438D5', classroomId: 'flow-check' }); });
+    expect(result.current.activeGame?.roomOpen).toBe(true);
+  });
+
+  it('Given the poll says whether the room is open, Then that is kept on the game', async () => {
+    const { result } = await mountReady('flow-check');
+    act(() => {
+      socketHandlers.activeClassroomGames({ classroomId: 'flow-check', games: [{ gameCode: 'R438D5', classroomId: 'flow-check', teacherName: 'T', lessonNames: [], roomOpen: false }] });
+    });
+    expect(result.current.activeGame?.roomOpen).toBe(false);
+  });
 });

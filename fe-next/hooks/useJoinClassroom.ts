@@ -19,7 +19,7 @@ export type JoinClassroomErrorCode = 'STUDENT_LIMIT_REACHED' | 'INVALID_CODE' | 
 export interface JoinClassroomResult {
   success: boolean;
   classroomId?: string;
-  /** Set when the code the student typed was a LIVE GAME code — the room to enter now. */
+  /** Set when the code the student typed was a LIVE GAME code — the room to enter now (for TEACHER_OWN_CLASS: the teacher's own live room). */
   gameCode?: string;
   code?: JoinClassroomErrorCode;
   /** For NAME_TAKEN: a nickname that is actually free, for one-tap acceptance. */
@@ -97,7 +97,16 @@ export function useJoinClassroom() {
 
       if (!response.ok) {
         const data = await response.json();
-        if (data?.code === 'ROOM_LOCKED' || data?.code === 'TEACHER_OWN_CLASS') {
+        if (data?.code === 'TEACHER_OWN_CLASS') {
+          return {
+            success: false,
+            code: data.code,
+            error: data.error,
+            ...(typeof data.classroomId === 'string' ? { classroomId: data.classroomId } : {}),
+            ...(typeof data.gameCode === 'string' ? { gameCode: data.gameCode } : {}),
+          };
+        }
+        if (data?.code === 'ROOM_LOCKED') {
           return { success: false, code: data.code, error: data.error };
         }
         if (response.status === 410 || data?.code === 'SESSION_ENDED') {

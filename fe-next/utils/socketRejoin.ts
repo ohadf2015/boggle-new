@@ -33,6 +33,8 @@ export interface RejoinIntent {
   avatar?: unknown;
   /** Teacher practice seat (see utils/practiceSeatStorage). */
   practiceSeat?: true;
+  /** Classroom host board (see lib/education/classroomLivePath). */
+  hostSeat?: true;
 }
 
 let currentIntent: RejoinIntent | null = null;

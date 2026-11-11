@@ -47,6 +47,26 @@ export function peekRehearseIntent(now = Date.now()): RehearseIntent | null {
   }
 }
 
+/**
+ * Bind the intent to the room it launches. A second launch in the same tab finds it
+ * bound to another room: that intent was abandoned, so it is cleared and this room is real.
+ */
+export function claimRehearseIntentForLaunch(gameCode: string, now = Date.now()): boolean {
+  try {
+    const raw = sessionStorage.getItem(INTENT_KEY);
+    if (!raw || !peekRehearseIntent(now)) return false;
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    if (typeof parsed.gameCode === 'string' && parsed.gameCode !== gameCode) {
+      sessionStorage.removeItem(INTENT_KEY);
+      return false;
+    }
+    sessionStorage.setItem(INTENT_KEY, JSON.stringify({ ...parsed, gameCode }));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function clearRehearseIntent(): void {
   try {
     sessionStorage.removeItem(INTENT_KEY);

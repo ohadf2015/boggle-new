@@ -32,6 +32,19 @@ describe('announceClassroomRoomOpened', () => {
     expect(socketsLeave).toHaveBeenCalledWith('classroomRoomWait:ABC123');
   });
 
+  it('Given the classroom is known, When the room opens, Then students on the class page are told too', () => {
+    const emit = vi.fn();
+    const io = {
+      to: vi.fn().mockReturnValue({ emit }),
+      in: vi.fn().mockReturnValue({ socketsLeave: vi.fn() }),
+    } as unknown as Server;
+
+    announceClassroomRoomOpened(io, 'ABC123', 'class-1');
+
+    expect(io.to).toHaveBeenCalledWith('classroom:class-1');
+    expect(emit).toHaveBeenCalledWith('classroomRoomOpened', { gameCode: 'ABC123', classroomId: 'class-1' });
+  });
+
   it('never throws into createGame', () => {
     const io = { to: vi.fn(() => { throw new Error('adapter down'); }) } as unknown as Server;
     expect(() => announceClassroomRoomOpened(io, 'ABC123')).not.toThrow();

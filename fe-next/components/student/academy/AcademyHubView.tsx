@@ -38,6 +38,7 @@ import {
 } from '@/lib/education/assignmentDueReminder';
 import { HubToast, type HubNote as Note } from './HubToast';
 import { NoClassPanel } from './NoClassPanel';
+import { ClassroomAutoJoinNotice } from './ClassroomAutoJoinNotice';
 import { useNodeLabel } from './AcademyNodeButton';
 import { cn } from '@/lib/utils';
 import { studentPracticeHref } from '@/lib/navigation/eduExitTargets';
@@ -62,6 +63,9 @@ export interface AcademyHubViewProps extends AcademyHubProps {
   data: AcademyData;
   liveGame: ActiveGame | null;
   join: () => void;
+  /** Counting down to joining the class's live game; the live button still joins now. */
+  autoJoinPending?: boolean;
+  onStayHere?: () => void;
   isJoining: boolean;
   joinError: string | null;
   reward: ClassroomReward | null;
@@ -372,6 +376,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
             {!noClass && showMascot(hub.chrome, hubSize.height) && (ready
               ? <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />
               : <div aria-hidden="true" data-testid="academy-mascot-slot" className="h-16" />)}
+            {ready && isLive && props.autoJoinPending && props.onStayHere && <ClassroomAutoJoinNotice onStay={props.onStayHere} />}
             {noClass ? null : ready ? (
               <AcademyCta
                 kind={action.kind}

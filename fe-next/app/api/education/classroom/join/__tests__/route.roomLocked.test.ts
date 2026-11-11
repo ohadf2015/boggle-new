@@ -83,8 +83,18 @@ describe('join route — a locked live game typed from the projector', () => {
     expect(signInAnonymously).not.toHaveBeenCalled();
   });
 
+  it('Given the teacher types their own live game code, When the lobby is locked, Then they are pointed at their board, not seated as a student', async () => {
+    mockDb(false);
+    as('teacher-1');
+    asMock(lookupLiveClassroomGame).mockResolvedValue(lockedGame());
+
+    const res = await POST(post({ joinCode: 'TZCOQ7' }));
+
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: 'TEACHER_OWN_CLASS', gameCode: 'TZCOQ7' });
+  });
+
   it.each([
-    ['the teacher', 'teacher-1'],
     ['a student already on the record', 'seated-1'],
     ['a student seated when the lock went on', 'early-1'],
   ])('lets %s in with the game code', async (_who, id) => {

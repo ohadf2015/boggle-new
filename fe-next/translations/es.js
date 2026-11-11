@@ -1335,6 +1335,10 @@ const es = {
       "ctaSoloOver": "Calentar",
       "ctaPlay": "Jugar",
       "ctaLive": "Unirse a la partida",
+      "autoJoin": {
+        "title": "Tu profe ha empezado una partida. Entrando…",
+        "stay": "Quedarme aquí"
+      },
       "ctaReviewTitle": "Palabras falladas: {count}",
       "ctaBossTitle": "Enfrenta al jefe",
       "ctaJoinSub": "Escribe el código de tu profe",
@@ -17812,6 +17816,14 @@ const es = {
         "codeHint": "Pide el código de 6 caracteres a tu profe",
         "codeStripped": "Algunos de esos caracteres no existen en los códigos de clase. Cambia el teclado a letras latinas y vuelve a intentarlo.",
         "teacherOwnClass": "Esta es tu propia clase, así que no puedes unirte como alumno. Ábrela desde tu panel de profe.",
+        "ownClass": {
+          "title": "Esta es tu clase",
+          "hint": "Tus alumnos entran con este código. Para jugar, empieza una partida desde aquí.",
+          "liveHint": "Tu partida está abierta y los alumnos ya pueden entrar. Abre el tablero para dirigirla.",
+          "startGame": "Empezar una partida con esta clase",
+          "openBoard": "Abrir el tablero",
+          "openClass": "Abrir mi clase"
+        },
         "returning": {
           "title": "¿Sigues como {name}?",
           "titleNoName": "¿Eres tú?",
@@ -22148,6 +22160,10 @@ const es = {
       "openingRoom": "Abriendo tu sala…",
       "waitingTeacher": "Tu profe todavía no ha abierto el juego",
       "waitingTeacherHint": "Quédate aquí. Entrarás en cuanto empiece.",
+      "waitStalledTitle": "El juego todavía no se ha abierto",
+      "waitStalledHint": "Puede que tu profe aún lo esté preparando. Vuelve a intentarlo o espera en la página de tu clase: entrarás en cuanto empiece.",
+      "waitStalledRetry": "Reintentar",
+      "waitStalledToClass": "Ir a mi clase",
       "noRoomTitle": "Aquí no hay ningún juego",
       "noRoomStudent": "Pídele el código a tu profe y únete.",
       "noRoomHost": "Empieza un juego desde tu inicio de profe.",

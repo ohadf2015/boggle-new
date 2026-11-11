@@ -14,6 +14,7 @@ import { JoinSuccessPanel } from './JoinSuccessPanel';
 import { JoinCodeStep } from './JoinCodeStep';
 import { JoinNameStep } from './JoinNameStep';
 import { JoinEndedPanel } from './JoinEndedPanel';
+import { TeacherOwnClassPanel } from './TeacherOwnClassPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { UnconfirmedJoinEmail } from './UnconfirmedJoinEmail';
 import { JoinReturningStep } from './JoinReturningStep';
@@ -187,7 +188,7 @@ export function JoinFlow({
               LexiClash
             </span>
             <div className="flex items-center gap-3">
-            {!flow.joined && !showSuccessCelebration && !flow.ended && (
+            {!flow.joined && !showSuccessCelebration && !flow.ended && !flow.ownClass && (
               <ol className="flex items-center gap-1.5" aria-label={t(`${K}.flow.steps`)}>
                 {STEPS.map((s) => (
                   <li
@@ -218,6 +219,8 @@ export function JoinFlow({
             />
           ) : showSuccessCelebration ? (
             <JoinSuccessPanel mode="game" label={flow.target?.label} name={flow.name.trim() || undefined} />
+          ) : flow.ownClass ? (
+            <TeacherOwnClassPanel classroomId={flow.ownClass.classroomId} liveGameCode={flow.ownClass.liveGameCode} />
           ) : flow.ended ? (
             <JoinEndedPanel
               code={flow.code}

@@ -309,15 +309,12 @@ async function updateClassroomGameStatusUnlocked(
  */
 async function reopenClassroomGameForRoundUnlocked(
   gameCode: string,
-  /**
-   * The record when the caller already read it this tick (the vocab-quiz start
-   * does). Passing it makes this the zero-read variant of `beginClassroomRound`
-   * below for callers that must not await the write.
-   */
+  /** The caller's earlier read: it only short-circuits a no-op; a write re-reads so it cannot drop newer fields. */
   preloaded?: ClassroomGame | null
 ): Promise<void> {
   try {
-    const game = preloaded ?? (await getClassroomGame(gameCode));
+    if (preloaded === null || (preloaded && (preloaded.status === 'playing' || isClassroomSessionEnded(preloaded)))) return;
+    const game = await getClassroomGame(gameCode);
     if (!game) return;
     await markRoundLive(game);
   } catch (error) {

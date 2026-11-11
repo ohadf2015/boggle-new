@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const flow = vi.hoisted(() => ({ entryView: 'classroom-waiting' as string, handleClassroomNameSubmit: vi.fn() }));
@@ -38,6 +38,22 @@ describe('EduLiveEntry', () => {
   it('given the teacher has not opened the room, when the student waits, then they are told to stay', () => {
     render(<EduLiveEntry entry={{ ...(entry as object), waitingForTeacher: true } as never} urlRoom="AB12CD" isHost={false} language="en" t={t} />);
     expect(screen.getByTestId('edu-live-waiting-teacher')).toHaveTextContent('eduLiveRoom.entry.waitingTeacher');
+  });
+
+  it('Given the wait has stalled, When the student looks, Then they are told plainly and can try again or go to their class', () => {
+    const onWaitRetry = vi.fn();
+    render(<EduLiveEntry entry={{ ...(entry as object), waitingForTeacher: true, waitStalled: true, onWaitRetry } as never} urlRoom="AB12CD" isHost={false} language="he" t={t} />);
+    const box = screen.getByTestId('edu-live-waiting-teacher');
+    expect(box).toHaveTextContent('eduLiveRoom.entry.waitStalledTitle');
+    expect(box).toHaveTextContent('eduLiveRoom.entry.waitStalledHint');
+    fireEvent.click(screen.getByTestId('classroom-wait-retry'));
+    expect(onWaitRetry).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('classroom-wait-to-class')).toHaveAttribute('href', '/he/student');
+  });
+
+  it('Given the wait has not stalled, When the student waits, Then no retry actions are shown yet', () => {
+    render(<EduLiveEntry entry={{ ...(entry as object), waitingForTeacher: true, waitStalled: false } as never} urlRoom="AB12CD" isHost={false} language="en" t={t} />);
+    expect(screen.queryByTestId('classroom-wait-retry')).not.toBeInTheDocument();
   });
 
   it('given every seat is taken, when the student was sent to watch, then the room-full state replaces the spinner', () => {
