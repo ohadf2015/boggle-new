@@ -117,6 +117,27 @@ describe('TeacherTrialEndingCard', () => {
     expect(screen.queryByTestId('teacher-trial-ending-card')).toBeNull();
   });
 
+  it('an expired trial prop wins over a future expiresAt and stays on straight $9/mo wording', () => {
+    const past = new Date(Date.now() - 60 * 1000).toISOString();
+    const future = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+    pro.accessTrialExpires = future;
+    pro.accessTrialEnded = false;
+    const trial = { ...teacherTrialStatus(past, Date.now()), isExpired: true, daysLeft: 0, expiresAt: future };
+    render(<TeacherTrialEndingCard trial={trial} />);
+    const card = screen.getByTestId('teacher-trial-ending-card');
+    expect(card).toHaveTextContent(/continue with Teacher Pro for \$9\/mo/i);
+    expect(card).not.toHaveTextContent(/after your free trial/i);
+  });
+
+  it('stays visible from the Home trial prop when useTeacherPro has not yet stamped access trial fields', () => {
+    const ends = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString();
+    pro.accessTrialExpires = null;
+    pro.accessTrialEnded = false;
+    render(<TeacherTrialEndingCard trial={teacherTrialStatus(ends, Date.now())} />);
+    expect(screen.getByTestId('teacher-trial-ending-card')).toBeInTheDocument();
+    expect(screen.getByRole('link')).toHaveAttribute('href', '/en/teacher/upgrade?source=trial_ending_card');
+  });
+
   it('reports rendered on mount and viewed once half is on screen, and click with placement=trial_ending_card', () => {
     const ends = new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString();
     pro.accessTrialExpires = ends;

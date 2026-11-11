@@ -34,11 +34,16 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
   const { user } = useAuth();
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const userId = user?.id ?? null;
-  const live = accessTrialLive(accessTrialExpires);
-  const ended = accessTrialEnded === true && !live;
+  // Prefer the Home trial prop (useTeacherAccess) so the card stays visible when
+  // the parent already chose this banner, even if useTeacherPro has not yet
+  // stamped accessTrialExpires / accessTrialEnded. Trust trial.isExpired over
+  // a mismatched expiresAt so ended trials never get "keep after your trial".
+  const expiresAt = accessTrialExpires ?? trial?.expiresAt ?? null;
+  const live = trial ? !trial.isExpired : accessTrialLive(expiresAt);
+  const ended = trial ? trial.isExpired === true : accessTrialEnded === true && !live;
   const copy =
-    live && accessTrialExpires
-      ? trialEndingLiveCopy(language, trial?.daysLeft ?? 0, accessTrialExpires)
+    live && expiresAt
+      ? trialEndingLiveCopy(language, trial?.daysLeft ?? 0, expiresAt)
       : ended
         ? trialEndingEndedCopy(language)
         : trialEndingNeverCopy(language);

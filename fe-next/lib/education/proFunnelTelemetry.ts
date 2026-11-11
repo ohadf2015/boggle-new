@@ -328,6 +328,7 @@ export type TeacherProUpgradePlacement =
   | 'class_report_button'
   | 'results_report_pdf'
   | 'education_landing'
+  | 'trial_ending_card'
   | 'other';
 
 /**
