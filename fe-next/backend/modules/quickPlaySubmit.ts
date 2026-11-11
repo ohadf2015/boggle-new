@@ -35,6 +35,7 @@ export interface QuickSubmitOutcome {
   history: number[];
   /** All-time sum of score_pct across every quick round — Quick Rank points */
   totalPoints: number;
+  levelUp: { oldLevel: number; newLevel: number } | null;
 }
 
 const QUICK_XP_BASE = 20;

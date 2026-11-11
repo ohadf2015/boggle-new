@@ -30,13 +30,14 @@ interface NamedBoardRow {
 }
 
 /** Public board rows only: a row shows when its display name or username is public; a non-public display name is cleared. */
-export function toPublicBoardRows<T extends NamedBoardRow>(rows: T[] | null | undefined): T[] {
+export function toPublicBoardRows<T>(rows: readonly T[] | null | undefined): T[] {
   if (!Array.isArray(rows)) return [];
   const out: T[] = [];
-  for (const row of rows) {
-    const displayOk = isPublicName(row.display_name);
-    if (!displayOk && !isPublicName(row.username)) continue;
-    out.push(displayOk || row.display_name == null ? row : { ...row, display_name: null });
+  for (const row of rows as readonly T[]) {
+    const named = row as NamedBoardRow;
+    const displayOk = isPublicName(named.display_name);
+    if (!displayOk && !isPublicName(named.username)) continue;
+    out.push(displayOk || named.display_name == null ? row : ({ ...(row as object), display_name: null } as T));
   }
   return out;
 }

@@ -17,12 +17,12 @@ export function rivalWindow(myScore: number): number {
 export interface StandingRow {
   username: string;
   score: number;
-  rank: number;
+  rank?: number;
 }
 
 /** Classroom rival from the standings already on screen: the student just above, or the runner-up when I lead. */
 export function classroomRival(standings: StandingRow[], myName: string): RivalSummary | null {
-  const sorted = [...standings].sort((a, b) => a.rank - b.rank || b.score - a.score);
+  const sorted = [...standings].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0) || b.score - a.score);
   const idx = sorted.findIndex((s) => s.username === myName);
   if (idx === -1) return null;
   const other = sorted[idx > 0 ? idx - 1 : idx + 1];

@@ -41,3 +41,10 @@ describe('rivalWindow', () => {
     expect(rivalWindow(1000)).toBe(100);
   });
 });
+
+describe('classroomRival without ranks', () => {
+  it('Given live scores with no rank field, Then standings order by score', () => {
+    expect(classroomRival([{ username: 'A', score: 10 }, { username: 'B', score: 30 }, { username: 'Me', score: 20 }], 'Me'))
+      .toMatchObject({ name: 'B', gap: 10 });
+  });
+});
