@@ -1,6 +1,7 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { LifecycleStage, NudgeClassroom } from '@/lib/education/lifecycleNudges';
 import { translateKey } from '@/lib/i18n/serverTranslate';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 export type LifecycleEmailStage = LifecycleStage | 'reactivate';
 
@@ -22,14 +23,10 @@ function escape(s: string): string {
 const SITE_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 function ctaUrl(locale: TeacherLocale, stage: LifecycleEmailStage, classroom?: NudgeClassroom | null): string {
-  if (stage === 'reactivate') return `${SITE}/${locale}/teacher/classroom/new`;
-  if (!classroom) return `${SITE}/${locale}/teacher`;
-  const url = new URL(`${SITE}/${locale}/teacher/classroom/new`);
-  url.searchParams.set('classroomId', classroom.id);
-  url.searchParams.set('utm_source', 'email');
-  url.searchParams.set('utm_medium', 'lifecycle');
-  url.searchParams.set('utm_campaign', `edu_${stage}`);
-  return url.toString().replace(/\+/g, '%20');
+  const campaign = `edu_${stage}`;
+  if (stage === 'reactivate') return teacherEmailUrl(locale, '/teacher/classroom/new', campaign);
+  if (!classroom) return teacherEmailUrl(locale, '/teacher', campaign);
+  return teacherEmailUrl(locale, '/teacher/classroom/new', campaign, { classroomId: classroom.id });
 }
 
 /** Students land in the class's language, the teacher's as fallback (same rule as the in-app invite). */

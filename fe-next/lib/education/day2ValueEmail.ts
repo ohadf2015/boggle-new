@@ -6,9 +6,9 @@ import { testEmailReason } from './checkoutTrafficTags';
 import { normalizeGrantEmail } from './proGrant';
 import { isMachineRequest } from './teacherFunnel';
 import type { TeacherLocale } from './types';
+import { teacherEmailUrl } from '@/lib/email/templates/teacherEmailLayout';
 
 const HOUR_MS = 60 * 60 * 1000;
-const SITE = 'https://www.lexiclash.live';
 
 /** Claimed in teacher_lifecycle_sends before the send, so a retry cannot double-send. */
 export const DAY2_KIND = 'day2_value';
@@ -27,12 +27,12 @@ export function asTeacherLocale(...candidates: Array<string | null | undefined>)
 
 export function day2ReportUrl(locale: string): string {
   const loc = LOCALES.includes(locale as TeacherLocale) ? locale : 'en';
-  return `${SITE}/${loc}/teacher/reports?utm_source=email&utm_campaign=day2_value`;
+  return teacherEmailUrl(loc, '/teacher/reports', 'day2_value');
 }
 
 export function day2UpgradeUrl(locale: string): string {
   const loc = LOCALES.includes(locale as TeacherLocale) ? locale : 'en';
-  return `${SITE}/${loc}/teacher/upgrade?utm_source=email&utm_campaign=day2_value`;
+  return teacherEmailUrl(loc, '/teacher/upgrade', 'day2_value');
 }
 
 export interface Day2Classroom {

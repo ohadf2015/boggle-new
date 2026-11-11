@@ -27,7 +27,7 @@ describe('teacherLifecycleNudge', () => {
   it('Given a Hebrew teacher, Then the email is right-to-left and links to the Hebrew dashboard', () => {
     const { html, subject } = teacherLifecycleNudge({ fullName: 'דנה', locale: 'he', stage: 'start_live' });
     expect(html).toContain('dir="rtl"');
-    expect(html).toContain('https://www.lexiclash.live/he/teacher"');
+    expect(html).toContain('https://www.lexiclash.live/he/teacher?utm_source=email&amp;utm_medium=lifecycle&amp;utm_campaign=edu_start_live"');
     expect(subject).toBe(he.teacherLifecycleEmail.start_live.subject);
     expect(html).toContain('דנה');
   });

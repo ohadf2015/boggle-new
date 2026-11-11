@@ -57,7 +57,7 @@ describe('checkoutStartedPayload', () => {
 describe('abandonedCheckoutUpgradeUrl', () => {
   it('links to the upgrade page, which starts a fresh checkout', () => {
     expect(abandonedCheckoutUpgradeUrl('he')).toBe(
-      'https://www.lexiclash.live/he/teacher/upgrade?utm_source=email&utm_campaign=abandoned_checkout',
+      'https://www.lexiclash.live/he/teacher/upgrade?utm_source=email&utm_medium=lifecycle&utm_campaign=abandoned_checkout',
     );
   });
 });
