@@ -10,7 +10,7 @@
       "actionMs": 400,
       "holdMs": 850
     },
-    "width": 266,
+    "width": 233,
     "height": 288,
     "tags": [
       "gag",
@@ -65,46 +65,6 @@
     ]
   },
   {
-    "id": "joy-jump",
-    "file": "/mascot/anim/joy-jump.webp",
-    "poster": "/mascot/anim/joy-jump-poster.webp",
-    "durationMs": 2656,
-    "loop": false,
-    "beats": {
-      "windupMs": 650,
-      "actionMs": 350,
-      "holdMs": 1000
-    },
-    "width": 288,
-    "height": 244,
-    "tags": [
-      "reaction",
-      "long-word",
-      "joy",
-      "one-shot"
-    ]
-  },
-  {
-    "id": "smug-knew-it",
-    "file": "/mascot/anim/smug-knew-it.webp",
-    "poster": "/mascot/anim/smug-knew-it-poster.webp",
-    "durationMs": 2656,
-    "loop": false,
-    "beats": {
-      "windupMs": 300,
-      "actionMs": 200,
-      "holdMs": 1700
-    },
-    "width": 232,
-    "height": 288,
-    "tags": [
-      "reaction",
-      "rare-letter",
-      "smug",
-      "one-shot"
-    ]
-  },
-  {
     "id": "combo-collapse",
     "file": "/mascot/anim/combo-collapse.webp",
     "poster": "/mascot/anim/combo-collapse-poster.webp",
@@ -125,26 +85,6 @@
     ]
   },
   {
-    "id": "idle-doze",
-    "file": "/mascot/anim/idle-doze.webp",
-    "poster": "/mascot/anim/idle-doze-poster.webp",
-    "durationMs": 4000,
-    "loop": true,
-    "beats": {
-      "windupMs": 0,
-      "actionMs": 0,
-      "holdMs": 0
-    },
-    "width": 224,
-    "height": 288,
-    "tags": [
-      "reaction",
-      "idle",
-      "sleep",
-      "loop"
-    ]
-  },
-  {
     "id": "panic-sweat",
     "file": "/mascot/anim/panic-sweat.webp",
     "poster": "/mascot/anim/panic-sweat-poster.webp",
@@ -162,6 +102,70 @@
       "low-time",
       "panic",
       "loop"
+    ]
+  },
+  {
+    "id": "slow-burn-stare",
+    "file": "/mascot/anim/slow-burn-stare.webp",
+    "poster": "/mascot/anim/slow-burn-stare-poster.webp",
+    "durationMs": 3403,
+    "loop": false,
+    "beats": {
+      "windupMs": 300,
+      "actionMs": 1000,
+      "holdMs": 2100
+    },
+    "width": 229,
+    "height": 288,
+    "tags": [
+      "gag",
+      "slow-burn",
+      "deadpan",
+      "rejected-word",
+      "tiny-word",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "double-take",
+    "file": "/mascot/anim/double-take.webp",
+    "poster": "/mascot/anim/double-take-poster.webp",
+    "durationMs": 3237,
+    "loop": false,
+    "beats": {
+      "windupMs": 1700,
+      "actionMs": 250,
+      "holdMs": 1287
+    },
+    "width": 213,
+    "height": 288,
+    "tags": [
+      "gag",
+      "double-take",
+      "idle",
+      "welcome-back",
+      "one-shot"
+    ]
+  },
+  {
+    "id": "puffed-chest-smug",
+    "file": "/mascot/anim/puffed-chest-smug.webp",
+    "poster": "/mascot/anim/puffed-chest-smug-poster.webp",
+    "durationMs": 2905,
+    "loop": false,
+    "beats": {
+      "windupMs": 450,
+      "actionMs": 450,
+      "holdMs": 2000
+    },
+    "width": 255,
+    "height": 288,
+    "tags": [
+      "gag",
+      "smug",
+      "rare-letter",
+      "word-stolen",
+      "one-shot"
     ]
   }
 ]
