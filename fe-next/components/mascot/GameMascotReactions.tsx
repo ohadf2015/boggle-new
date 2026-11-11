@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { AdaptiveAnimatePresence, AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { BlastMascotHud, BLAST_MASCOT_SLOT_CLASS } from '@/components/blast/legacy/BlastMascotHud';
+import { BlastMascotHud } from '@/components/blast/legacy/BlastMascotHud';
 import { useBlastMascot } from '@/lib/blast/useBlastMascot';
 import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
@@ -39,7 +39,7 @@ export function GameMascotReactions({ mode, comboLevel }: GameMascotReactionsPro
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.6 }}
           transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-          className={`${BLAST_MASCOT_SLOT_CLASS} pointer-events-none [&_*]:pointer-events-none`}
+          className="absolute top-[calc(env(safe-area-inset-top,0px)+2.75rem)] end-[4.25rem] sm:top-3 sm:end-3 z-50 pointer-events-none [&_*]:pointer-events-none"
         >
           <BlastMascotHud state={mascot.state} />
         </AdaptiveMotion.div>
