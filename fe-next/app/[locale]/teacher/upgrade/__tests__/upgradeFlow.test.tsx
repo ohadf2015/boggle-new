@@ -236,3 +236,72 @@ describe('upgrade page — school tab', () => {
     expect(screen.getByLabelText('eg2Pro.school.fieldSchool')).toBeInTheDocument();
   });
 });
+
+describe('upgrade page — arriving from an in-product Pro offer', () => {
+  const freeTeacher = () => {
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true });
+  };
+
+  it('opens the checkout step straight away, without a second tap, and does not POST yet', () => {
+    freeTeacher();
+    search = 'source=class_report_button';
+    render(<PageClient />);
+    expect(screen.getByTestId('pre-checkout-explainer')).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('carries the offer the teacher tapped into the checkout request', async () => {
+    freeTeacher();
+    search = 'source=class_report_button';
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: async () => ({}) });
+    render(<PageClient />);
+    fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', source: 'class_report_button' });
+  });
+
+  it('stays closed once the teacher backs out', () => {
+    freeTeacher();
+    search = 'source=class_report_button';
+    const { rerender } = render(<PageClient />);
+    fireEvent.click(screen.getByTestId('pre-checkout-back'));
+    rerender(<PageClient />);
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+  });
+
+  it('waits for the plan to be read, so a Pro teacher is never walked to the till', () => {
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true, loading: true });
+    search = 'source=class_report_button';
+    const { rerender } = render(<PageClient />);
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+    Object.assign(pro, { loading: false, hasPro: true });
+    rerender(<PageClient />);
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+  });
+
+  it('an email link is attributed but does not open the checkout step by itself', async () => {
+    freeTeacher();
+    search = 'source=approval_email';
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: async () => ({}) });
+    render(<PageClient />);
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('pricing-trial-cta'));
+    fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).source).toBe('approval_email');
+  });
+
+  it('ignores a source that is not a plain tag', async () => {
+    freeTeacher();
+    search = 'source=' + encodeURIComponent('<script>x</script>');
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: async () => ({}) });
+    render(<PageClient />);
+    expect(screen.queryByTestId('pre-checkout-explainer')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('pricing-trial-cta'));
+    fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en' });
+  });
+});

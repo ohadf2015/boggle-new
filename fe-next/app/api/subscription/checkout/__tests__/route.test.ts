@@ -32,6 +32,9 @@ vi.mock('@/lib/subscriptions', () => ({ logSubscriptionEvent }))
 const { accessTrialExpiryAny } = vi.hoisted(() => ({ accessTrialExpiryAny: vi.fn(async (): Promise<string | null> => null) }))
 vi.mock('@/lib/education/accessTrialServer', () => ({ accessTrialExpiryAny }))
 
+const { captureEduServerEvents } = vi.hoisted(() => ({ captureEduServerEvents: vi.fn(async () => undefined) }))
+vi.mock('@/backend/utils/educationTelemetry', () => ({ captureEduServerEvents }))
+
 const getAuthedUser = vi.fn()
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: (...args: unknown[]) => getAuthedUser(...args),
@@ -42,6 +45,7 @@ import { POST } from '../route'
 describe('POST /api/subscription/checkout', () => {
   beforeEach(() => {
     createCheckout.mockReset()
+    captureEduServerEvents.mockClear()
     getAuthedUser.mockReset()
     logSubscriptionEvent.mockReset()
     logSubscriptionEvent.mockResolvedValue(undefined)
@@ -170,6 +174,32 @@ describe('POST /api/subscription/checkout', () => {
       locale: 'en',
       analyticsDistinctId: 'u1',
     })
+  })
+
+  it('tags the checkout-started events with the offer the teacher came from', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: 'c1' })
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true, source: 'class_report_button' }),
+    }))
+    expect(res.status).toBe(200)
+    const started = captureEduServerEvents.mock.calls.flatMap((c) => c[0] as Array<{ event: string; properties: Record<string, unknown> }>)
+      .filter((e) => e.event === 'checkout_started' || e.event === 'edu_pro_trial_started')
+    expect(started.length).toBe(2)
+    for (const e of started) expect(e.properties.entry_source).toBe('class_report_button')
+  })
+
+  it('drops an entry source that is not a plain tag', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: 'c1' })
+    await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ source: '<script>' }),
+    }))
+    const events = captureEduServerEvents.mock.calls.flatMap((c) => c[0] as Array<{ properties: Record<string, unknown> }>)
+    expect(events.length).toBeGreaterThan(0)
+    for (const e of events) expect(e.properties).not.toHaveProperty('entry_source')
   })
 
   it('prefills the hosted checkout with the teacher display name from profiles', async () => {

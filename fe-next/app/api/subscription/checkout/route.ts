@@ -13,6 +13,7 @@ import { withTimeout } from '@/lib/server/routeTimeout';
 import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
 import { polarTrialPlan } from '@/lib/education/pro/accessTrialCheckout';
 import { buildCheckoutTrafficTags } from '@/lib/education/checkoutTrafficTags';
+import { entrySourceTag } from '@/lib/education/pro/upgradeEntry';
 import {
   resolveCheckoutAnalyticsIdentity,
   withAnalyticsIdentity,
@@ -103,18 +104,19 @@ async function polarTrialBlocked(userId: string): Promise<boolean> {
  */
 async function parseCheckoutBody(
   request: NextRequest,
-): Promise<{ trial: boolean; locale: string; returnTo: string }> {
+): Promise<{ trial: boolean; locale: string; returnTo: string; source: string | null }> {
   const raw = await request.text();
-  if (!raw.trim()) return { trial: false, locale: '', returnTo: '' };
+  if (!raw.trim()) return { trial: false, locale: '', returnTo: '', source: null };
   try {
-    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown; returnTo?: unknown };
+    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown; returnTo?: unknown; source?: unknown };
     return {
       trial: parsed?.trial === true,
       locale: typeof parsed?.locale === 'string' ? parsed.locale : '',
       returnTo: typeof parsed?.returnTo === 'string' ? parsed.returnTo : '',
+      source: entrySourceTag(parsed?.source),
     };
   } catch {
-    return { trial: false, locale: '', returnTo: '' };
+    return { trial: false, locale: '', returnTo: '', source: null };
   }
 }
 
@@ -282,7 +284,11 @@ export async function POST(request: NextRequest) {
     // fires from the Polar webhook on paid `subscription.active` — not here.
     // checkout_id is the join key to the return beacon, which echoes the same id.
     try {
-      const startTags: Record<string, unknown> = { ...tags, ...(checkoutId ? { checkout_id: checkoutId } : {}) };
+      const startTags: Record<string, unknown> = {
+        ...tags,
+        ...(checkoutId ? { checkout_id: checkoutId } : {}),
+        ...(body.source ? { entry_source: body.source } : {}),
+      };
       if (trial) {
         emit(buildProTrialStartedEvent(user.id, startTags));
         emit(buildCheckoutStartedEvent(user.id, startTags));
