@@ -8001,6 +8001,7 @@ const ru = {
     "zoomIn": "Увеличить",
     "zoomOut": "Уменьшить",
     "gridLabel": "Сетка кроссворда",
+    "combo": "Комбо ×{count}",
     "cellLabel": "Строка {row}, столбец {col}",
     "dir": {
       "across": "По горизонтали",

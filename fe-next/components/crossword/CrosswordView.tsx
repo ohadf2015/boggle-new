@@ -20,6 +20,8 @@ import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CrosswordFx } from './CrosswordFx';
+import { CrosswordComboChip } from './CrosswordComboChip';
+import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import {
   awardSoloDaily,
@@ -62,6 +64,7 @@ export function CrosswordView({
   const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
+  const [comboLevel, setComboLevel] = useState(0);
   const game = useCrosswordGame(puzzle, {
     onSolved: () => {
       setBurst((n) => n + 1);
@@ -69,9 +72,6 @@ export function CrosswordView({
       playSound('victoryFanfare');
       if (isDaily) onDailySolved?.();
     },
-    // A light confirmation each time a word is filled in correctly — the
-    // newspaper-solve "tick" of progress before the final fanfare.
-    onWordSolved: () => playSound('wordAccepted'),
   });
 
   // Full-screen game: hide global header / bottom-nav / footer so the board
@@ -182,7 +182,7 @@ export function CrosswordView({
 
   return (
     <div
-      className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col gap-2 overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:flex lg:h-auto lg:max-w-6xl lg:gap-3 lg:overflow-visible lg:bg-transparent lg:pt-8 lg:pb-10"
+      className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col gap-2 overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:relative lg:z-auto lg:mx-auto lg:flex lg:h-auto lg:max-w-6xl lg:gap-3 lg:overflow-visible lg:bg-transparent lg:pt-8 lg:pb-10"
       translate="no"
       dir={dir}
     >
@@ -243,7 +243,14 @@ export function CrosswordView({
                 declares itself a size-query container, so the grid's `100cqmin` resolves to the
                 real free space and can never clip. Nothing here scrolls. */}
             <div className="flex min-h-0 flex-1 max-h-[min(calc(100vw-1.5rem),28rem)] [container-type:size] lg:block lg:max-h-none lg:flex-none lg:[container-type:normal]">
-              <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
+              <CrosswordGrid
+                state={state}
+                onSelect={focusCell}
+                t={t}
+                solved={solved}
+                juice="full"
+                onComboChange={setComboLevel}
+              />
             </div>
 
             <div className="mx-auto w-full max-w-[28rem] shrink-0 lg:max-w-none">
@@ -327,6 +334,9 @@ export function CrosswordView({
           onNext={handleNext}
         />
       )}
+
+      <CrosswordComboChip level={comboLevel} t={t} />
+      <GameMascotReactions mode="crossword" comboLevel={comboLevel} />
 
       <CrosswordFx burstKey={burst} />
     </div>
