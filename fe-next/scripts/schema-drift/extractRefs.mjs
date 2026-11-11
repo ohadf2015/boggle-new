@@ -15,7 +15,7 @@ export function extractRefs(source) {
   const tables = new Set();
   const rpcs = new Set();
   for (const match of source.matchAll(TABLE_RE)) {
-    if (/storage\s*$/.test(preceding(source, match.index))) continue;
+    if (/(storage|\bArray|\bBuffer)\s*$/.test(preceding(source, match.index))) continue;
     tables.add(match[1]);
   }
   for (const match of source.matchAll(RPC_RE)) {
