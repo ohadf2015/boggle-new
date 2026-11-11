@@ -18,6 +18,8 @@ import { BossExposedChip } from './BossExposedChip';
 import { BossFxLayer } from './fx/BossFxLayer';
 import { useBossCues } from './useBossCues';
 import { useBossStageSounds } from './useBossStageSounds';
+import { useBossMascotFeed } from './useBossMascotFeed';
+import { EduMascotReactions } from '@/components/education/EduMascotReactions';
 
 const ARENA = '/images/education/v2/boss-arena-bg.webp';
 const PHASE_TINT = ['', 'bg-neo-pink/10', 'bg-neo-red/20'];
@@ -39,6 +41,7 @@ export function ProjectorBossStage({ remainingTime, trailing, style }: Projector
   const cue = useBossCues(view);
   const shakeRef = useRef<HTMLDivElement>(null);
   useBossStageSounds(view, cue);
+  useBossMascotFeed(view?.status ?? null, cue);
   if (!view) return null;
   const bossName = t(bossNameKey(view.bossId));
   // Once the fight is over the outcome stamp is the hero: the live HUD steps back.
@@ -86,6 +89,7 @@ export function ProjectorBossStage({ remainingTime, trailing, style }: Projector
           </div>
 
           <BossStageOverlays view={view} cue={cue} bossName={bossName} reducedMotion={reducedMotion} />
+          <EduMascotReactions mode="edu-boss" placement="stage" />
         </div>
       </div>
     </div>

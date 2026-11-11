@@ -32,6 +32,7 @@ import {
 } from '@/components/practice';
 import WordTowerPractice from '@/components/education/practicePicker/WordTowerPractice';
 import dynamic from 'next/dynamic';
+import { EduMascotReactions } from '@/components/education/EduMascotReactions';
 
 // Word Craft carries the Pixi board; only a Word Craft assignment pays for it.
 const WordCraftPractice = dynamic(() => import('@/components/education/practicePicker/WordCraftPractice'), {
@@ -84,7 +85,17 @@ export interface PracticeModeStageProps {
   wordCraftRunKey?: string;
 }
 
-export default function PracticeModeStage({
+export default function PracticeModeStage(props: PracticeModeStageProps) {
+  if (props.words.length === 0) return null;
+  return (
+    <>
+      <PracticeModeScreen {...props} />
+      <EduMascotReactions mode="edu-practice" />
+    </>
+  );
+}
+
+function PracticeModeScreen({
   mode,
   variant,
   focus,
