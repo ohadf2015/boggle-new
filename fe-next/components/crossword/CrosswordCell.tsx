@@ -100,6 +100,7 @@ function CrosswordCellBase({
       type="button"
       role="gridcell"
       data-cell
+      data-cw-cell={`${cell.row},${cell.col}`}
       aria-label={label}
       aria-selected={isActive}
       onClick={() => onSelect(cell.row, cell.col)}

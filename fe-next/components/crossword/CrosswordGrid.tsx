@@ -6,19 +6,27 @@ import { solvedSlotIds } from '@/lib/crossword/stats';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { CrosswordCell } from './CrosswordCell';
 import { useBoardPanZoom, ZOOM_STEP } from './useBoardPanZoom';
+import { useCrosswordWordJuice, type JuiceIntensity } from './useCrosswordWordJuice';
 
 export interface CrosswordGridProps {
   state: GameState;
   onSelect: (row: number, col: number) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   solved?: boolean;
+  /** Races and classrooms keep the default `small`; solo passes `full` for combo and sparks. */
+  juice?: JuiceIntensity;
+  onComboChange?: (level: number) => void;
 }
 
-export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordGridProps) {
+export function CrosswordGrid({ state, onSelect, t, solved = false, juice = 'small', onComboChange }: CrosswordGridProps) {
   const { puzzle, active, checks, revealed, warmths } = state;
   const size = puzzle.size;
   const reduced = useReducedMotion();
   const gridRef = useRef<HTMLDivElement>(null);
+  const { comboLevel } = useCrosswordWordJuice({ state, gridRef, intensity: juice });
+  useEffect(() => {
+    onComboChange?.(comboLevel);
+  }, [comboLevel, onComboChange]);
 
   // Difficulty reads at a glance from the grid's hard drop-shadow colour — same family as the
   // masthead difficulty chip (easy lime · medium cyan · hard pink). Black border stays (neo rule);

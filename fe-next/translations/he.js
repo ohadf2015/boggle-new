@@ -2460,6 +2460,7 @@ const he = {
     "zoomIn": "הגדלה",
     "zoomOut": "הקטנה",
     "gridLabel": "לוח תשבץ",
+    "combo": "רצף ×{count}",
     "cellLabel": "שורה {row}, עמודה {col}",
     "dir": {
       "across": "מאוזן",

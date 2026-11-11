@@ -2460,6 +2460,7 @@ const ja = {
     "zoomIn": "拡大",
     "zoomOut": "縮小",
     "gridLabel": "クロスワードの盤面",
+    "combo": "{count}連続！",
     "cellLabel": "{row}行 {col}列",
     "dir": {
       "across": "ヨコ",
