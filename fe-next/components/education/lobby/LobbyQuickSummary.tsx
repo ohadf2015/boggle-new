@@ -3,17 +3,18 @@
 import { BookOpen, SlidersHorizontal, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
+import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 
 export interface LobbyQuickSummaryProps {
   classroomName: string;
-  lessonNames: string[];
+  lessons: ReadonlyArray<{ id: string; name: string }>;
   wordCount: number;
   boardLanguage?: string | null;
   onMoreOptions: () => void;
 }
 
 /** A quick launch arrives decided: say what is about to go live, and keep every other choice one tap away. */
-export function LobbyQuickSummary({ classroomName, lessonNames, wordCount, boardLanguage, onMoreOptions }: LobbyQuickSummaryProps) {
+export function LobbyQuickSummary({ classroomName, lessons, wordCount, boardLanguage, onMoreOptions }: LobbyQuickSummaryProps) {
   const { t } = useLanguage();
   return (
     <section
@@ -26,7 +27,9 @@ export function LobbyQuickSummary({ classroomName, lessonNames, wordCount, board
       </p>
       <p className="flex min-w-0 flex-wrap items-center gap-2 font-neo-body text-sm font-bold text-neo-cream/90">
         <BookOpen className="size-5 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
-        <span className="min-w-0 truncate" dir="auto">{lessonNames.join(', ')}</span>
+        <span className="flex min-w-0 flex-wrap gap-x-2" dir="auto">
+          {lessons.map((l) => <ListNameButton key={l.id} lessonId={l.id} name={l.name} />)}
+        </span>
         <span className="shrink-0 text-neo-cream/70">· {t('education.classroomGame.words', { count: wordCount })}</span>
         {boardLanguage && <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />}
       </p>

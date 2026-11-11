@@ -35,3 +35,27 @@ describe('MyListCard actions', () => {
     }
   });
 });
+
+describe('MyListCard look', () => {
+  it('Given neighbouring cards, Then each gets its own accent color', () => {
+    const { rerender } = render(<MyListCard lesson={lesson} index={0} sharing={false} {...handlers} />);
+    const first = screen.getByTestId('my-list-L1').getAttribute('data-accent');
+    rerender(<MyListCard lesson={lesson} index={1} sharing={false} {...handlers} />);
+    expect(screen.getByTestId('my-list-L1').getAttribute('data-accent')).not.toBe(first);
+  });
+
+  it('Given a list, Then its words show as separate tiles', () => {
+    render(<MyListCard lesson={lesson} index={0} sharing={false} {...handlers} />);
+    expect(screen.getAllByTestId('word-tile').map((n) => n.textContent)).toEqual(['photon', 'orbit']);
+  });
+});
+
+describe('MyListCard open list', () => {
+  it('When the list name or its words are tapped, Then the list opens', () => {
+    const onEdit = vi.fn();
+    render(<MyListCard lesson={lesson} index={0} sharing={false} {...handlers} onEdit={onEdit} />);
+    fireEvent.click(screen.getByTestId('lesson-open-L1'));
+    fireEvent.click(screen.getByTestId('lesson-words-L1'));
+    expect(onEdit).toHaveBeenCalledTimes(2);
+  });
+});

@@ -7,6 +7,7 @@ import { NeoButton } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { NB_BLOCK, NB_ICON_TILE, NB_PANEL, NB_SMALL, NB_STICKER } from '../../nb/nbStyles';
 import type { ClassWordList } from './classWordLists';
+import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -79,7 +80,7 @@ export function ClassWordLists({ lists, loading, libraryHref, t }: { lists: read
         <ul className="flex flex-col gap-2">
           {lists.slice(0, 5).map((l) => (
             <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 rounded-neo-lg border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
-              <span dir="auto" className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream">{l.name}</span>
+              <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream" />
               <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t('eduLibrary.card.words', { count: l.wordCount })}</span>
             </li>
           ))}
