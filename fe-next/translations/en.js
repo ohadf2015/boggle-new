@@ -2812,7 +2812,7 @@ const en = {
     "cardDesc": "Real physics. Beta preview",
     "collapsed": "Tower down!",
     "newBest": "New best!",
-    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
+    "hud": {"floor": "Floor", "floorA11y": "Floor {n}, {m} metres", "goalA11y": "Floor {n}. Next goal: floor {goal}", "effect": "{name}: {n} left", "exit": "Finish run & collect", "daily": "DAILY", "dailyBadge": "Daily {date}", "menu": "Menu", "banked": "Banked"},
     "stability": {"label": "Stability", "a11y": "Stability: {band}, {pct}% risk", "steady": "Steady", "wobbly": "Wobbly", "danger": "Aim center!"},
     "biome": {"downtown": "Downtown", "sunset": "Sunset Rooftops", "clouds": "Cloud Deck", "jetstream": "Jet Stream", "aurora": "Aurora", "orbit": "Orbit", "cosmos": "Deep Cosmos"},
     "newSky": "New sky",

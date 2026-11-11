@@ -1,7 +1,7 @@
 import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { apartmentLayout, litWindows, type Rect } from '@/lib/wordTowerV2/apartment';
 import { blockLabel, labelTracking } from '@/lib/wordTowerV2/label';
-import { squashScale } from '@/lib/wordTowerV2/juice';
+import { landingBounce, squashScale } from '@/lib/wordTowerV2/juice';
 import { traitTint } from '@/lib/wordTowerV2/rush/landingFeel';
 import type { BlockTrait } from '@/lib/wordTowerV2/rush/types';
 
@@ -227,10 +227,8 @@ export function tickBlock(view: BlockView, dt: number): void {
     view.glow.alpha = view.flash * 0.85;
   }
   if (view.squash > 0) {
-    view.squash = Math.max(0, view.squash - dt * 6);
-    // Ease-out bounce: squash, then a small overshoot as it springs back.
-    const t = view.squash;
-    const { sx, sy } = squashScale(Math.sin(t * Math.PI * 1.5) * t);
+    view.squash = Math.max(0, view.squash - dt * 3);
+    const { sx, sy } = squashScale(landingBounce(view.squash));
     view.inner.scale.set(sx, sy);
     view.inner.y = (view.h / 2) * (1 - sy);
   }

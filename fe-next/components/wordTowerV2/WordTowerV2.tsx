@@ -43,6 +43,8 @@ import { WreckScene } from './WreckScene';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { useV2Exit } from './useV2Exit';
+import { useBankOnLeave } from './useBankOnLeave';
+import { TowerFeel } from './TowerFeel';
 import { useOverHold } from './useOverHold';
 import { dailyDateLabel } from './dailyDateLabel';
 import { GuidedWordCoach } from './guide/GuidedWordCoach';
@@ -147,26 +149,36 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     if (estateApi.status === 'ready') adoptBest(estateApi.estate.bestM);
   }, [estateApi.status, estateApi.estate.bestM, adoptBest]);
 
-  // Leaving with a tower standing banks it (once per run, keepalive so the POST outlives the page).
   const bankRun = rewardsFlow.bank;
   const flushDaily = dailyTower.flush;
-  useEffect(() => {
-    const onHide = () => {
-      flushDaily({ keepalive: true });
-      void bankRun(true);
-    };
-    window.addEventListener('pagehide', onHide);
-    return () => {
-      window.removeEventListener('pagehide', onHide);
-      void bankRun(true);
-    };
-  }, [bankRun, flushDaily]);
+  useBankOnLeave(bankRun, flushDaily);
   // Only a total collapse is game over, so the exit is the cash-out: it ends the run on purpose.
   const { finish } = game;
 
   const getScreen = useCallback(() => {
     return resolveWt2Screen({ dictError, dictReady, phase, showOver: phase === 'over', resultsReady, forceResults, district, raiding, smashing, floors: towerFloors });
   }, [dictError, dictReady, phase, resultsReady, forceResults, district, raiding, smashing, towerFloors]);
+
+  const overHold = useOverHold(phase, daily);
+  const { showOver, resultsDismissed } = overHold;
+
+  // Landmark perk: the district multiplies what the run is worth.
+  const score = Math.round(totalScore(heightM, run.bonus) * estateApi.perks.scoreMult);
+  const { dailyRank, dailyBoard, refreshRank, closeSession } = useV2Ready({
+    daily,
+    isAdmin: !!isAdmin,
+    canSeeInWorkModes: !!canSeeInWorkModes,
+    language,
+    phase,
+    floors: run.floors,
+    peakM: game.peakM,
+    heightM: game.heightM,
+    score,
+    resultsShown: showOver || forceResults,
+    seedDemo,
+    setForceResults,
+    setSmashing,
+  });
 
   const exitFlow = useV2Exit({
     phase,
@@ -179,6 +191,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     getScreen,
     t,
     flushDaily: () => flushDaily({ keepalive: false }),
+    closeSession,
   });
 
   const [stats, setStats] = useState<FrameStats | null>(null);
@@ -199,29 +212,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const feeds = useCanvasFeeds({ game, estateApi, word, valid, playSound });
   const { tenantsShown, onTenantArrive } = useTenantArrivals(run.tenants, playSound);
 
-  const overHold = useOverHold(phase, daily);
-  const { showOver, resultsDismissed } = overHold;
-
   const builtWords = placedWords(game.labelsRef.current, game.hangingRef.current?.id ?? null);
   const myWords = builtWords.slice(0, 30);
   const longestWord = myWords.reduce((a, w) => (w.length > a.length ? w : a), '');
-  // Landmark perk: the district multiplies what the run is worth.
-  const score = Math.round(totalScore(heightM, run.bonus) * estateApi.perks.scoreMult);
-  const { dailyRank, dailyBoard, refreshRank } = useV2Ready({
-    daily,
-    isAdmin: !!isAdmin,
-    canSeeInWorkModes: !!canSeeInWorkModes,
-    language,
-    phase,
-    floors: run.floors,
-    peakM: game.peakM,
-    heightM: game.heightM,
-    score,
-    resultsShown: showOver || forceResults,
-    seedDemo,
-    setForceResults,
-    setSmashing,
-  });
 
   const inRun = phase !== 'over' && !smashing && !district;
   const rushUi = useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBaseM: dailyTower.totalM - dailyTower.growthM, reducedMotion, canvasClass, getHudPx: layout.getHudPx, inRun });
@@ -334,6 +327,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           menuSlot={rushUi.menuSlot}
         />
       ) : null}
+      <TowerFeel run={run} risk={game.risk} over={phase === 'over'} collapsed={game.worldRef.current.collapsed} lastWord={builtWords[builtWords.length - 1] ?? ''} hidden={smashing || raiding || district || showOver || forceResults} />
       <RunRewards
         t={t}
         flow={rewardsFlow}

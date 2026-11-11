@@ -193,6 +193,11 @@ export function coinDelta(before: RunSummary, after: RunSummary, opts: { distric
 /** Floors between milestone bursts. */
 export const MILESTONE_EVERY = 5;
 
+/** The free run's visible goal: the next milestone floor above the ones standing. */
+export function nextFloorGoal(floors: number): number {
+  return (Math.floor(Math.max(0, floors) / MILESTONE_EVERY) + 1) * MILESTONE_EVERY;
+}
+
 /** The milestone just crossed (the highest one, on a jump), or null. */
 export function milestoneFor(prevFloors: number, floors: number): number | null {
   if (floors < MILESTONE_EVERY) return null;

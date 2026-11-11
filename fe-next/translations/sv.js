@@ -3238,7 +3238,7 @@ const sv = {
     "cardDesc": "Äkta fysik – betaversion",
     "collapsed": "Tornet rasade!",
     "newBest": "Nytt rekord!",
-    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
+    "hud": {"floor": "Våning", "floorA11y": "Våning {n}, {m} meter", "goalA11y": "Våning {n}. Nästa mål: våning {goal}", "effect": "{name}: {n} kvar", "exit": "Avsluta och hämta", "daily": "DAGLIG", "dailyBadge": "Daglig {date}", "menu": "Meny", "banked": "Insamlat"},
     "stability": {"label": "Stabilitet", "a11y": "Stabilitet: {band}, {pct} % risk", "steady": "Stadig", "wobbly": "Vinglig", "danger": "Sikta mitt!"},
     "biome": {"downtown": "Centrum", "sunset": "Tak i solnedgång", "clouds": "Molnhavet", "jetstream": "Jetströmmen", "aurora": "Norrsken", "orbit": "Omloppsbana", "cosmos": "Djupa rymden"},
     "newSky": "Ny himmel",

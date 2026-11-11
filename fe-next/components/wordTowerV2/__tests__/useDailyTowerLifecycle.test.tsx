@@ -109,4 +109,25 @@ describe('useDailyTowerLifecycle', () => {
     unmount();
     expect(trackGameEnd).not.toHaveBeenCalled();
   });
+
+  it('patches standing floors onto the free tower abandon too, so a mid-run leave is not read as a bounce', () => {
+    const { rerender } = renderHook(
+      ({ floors }: { floors: number }) =>
+        useDailyTowerLifecycle({ daily: false, floors, peakM: 0, score: 0 }),
+      { initialProps: { floors: 0 } },
+    );
+    rerender({ floors: 4 });
+    expect(updateActiveGameExtras).toHaveBeenLastCalledWith({ words_found: 4, floors: 4 });
+  });
+
+  it('returns a close that completes a daily climb on demand, before the exit button navigates', () => {
+    const { result, unmount } = renderHook(() =>
+      useDailyTowerLifecycle({ daily: true, floors: 7, peakM: 0, heightM: 21, score: 30 }),
+    );
+    result.current();
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+    expect(trackGameEnd.mock.calls[0][3]).toBe(true);
+    unmount();
+    expect(trackGameEnd).toHaveBeenCalledTimes(1);
+  });
 });

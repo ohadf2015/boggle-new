@@ -5,7 +5,7 @@ import type { Phase } from '../useTowerRun';
 import { findGuidePath } from './useGuidedFirstWord';
 
 /** How long a brand-new player can sit on an empty first floor before a word lights up. */
-export const FIRST_FLOOR_HINT_MS = 8000;
+export const FIRST_FLOOR_HINT_MS = 4500;
 
 interface Args {
   dict: Set<string> | null;

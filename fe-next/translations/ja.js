@@ -2880,7 +2880,7 @@ const ja = {
     "cardDesc": "本物の物理演算。ベータ版",
     "collapsed": "タワー崩壊！",
     "newBest": "自己ベスト更新！",
-    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}", "menu": "メニュー", "banked": "獲得済み"},
+    "hud": {"floor": "階", "floorA11y": "{n}階、{m}メートル", "goalA11y": "いま{n}階。次の目標は{goal}階", "effect": "{name}：残り{n}", "exit": "終了して受け取る", "daily": "デイリー", "dailyBadge": "デイリー {date}", "menu": "メニュー", "banked": "獲得済み"},
     "stability": {"label": "安定度", "a11y": "安定度：{band}、リスク{pct}%", "steady": "安定", "wobbly": "グラグラ", "danger": "中央を狙え！"},
     "biome": {"downtown": "ダウンタウン", "sunset": "夕焼けの屋上", "clouds": "雲海", "jetstream": "ジェット気流", "aurora": "オーロラ", "orbit": "軌道", "cosmos": "深宇宙"},
     "newSky": "新しい空",
