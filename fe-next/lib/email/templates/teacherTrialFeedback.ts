@@ -1,9 +1,8 @@
 import type { TeacherLocale } from '@/lib/education/types';
-import { firstName, renderTeacherEmail, teacherEmailUrl } from './teacherEmailLayout';
+import { renderNeoEmail } from '@/lib/email/kit/neoEmail';
+import { firstName, teacherEmailUrl } from './teacherEmailLayout';
 
-// One soft check-in a few days into the free teacher access. It asks how it is
-// going and nothing else: no price, no upgrade button. The trial-ending emails
-// (teacherTrialReminder) carry the Teacher Pro offer later.
+// A soft check-in with no price and no upgrade button; the trial-ending emails carry the offer later.
 
 interface Args {
   full_name: string;
@@ -19,51 +18,63 @@ const DATE_LOCALE: Record<TeacherLocale, string> = {
 interface Copy {
   subject: string;
   preheader: string;
-  tagline: string;
+  kicker: string;
+  headline: string;
   greeting: (n: string) => string;
   lead: string;
+  askTitle: string;
   ask: string;
   access: (date: string) => string;
   cta: string;
   signoff: string;
+  footnote: string;
   dir: 'ltr' | 'rtl';
 }
 
 const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
   en: {
     subject: 'How is LexiClash going with your class?',
-    preheader: 'Checking in. Reply if something is off.',
-    tagline: 'For teachers',
+    preheader: "A quick check-in from the person who built it.",
+    kicker: 'For teachers',
+    headline: 'How is it going so far?',
     greeting: (n) => (n ? `Hi ${n},` : 'Hi there,'),
-    lead: 'You have had LexiClash for a few days now, and I wanted to check in.',
-    ask: 'How is it going? If something broke or does not fit your class, I want to know. Just reply to this email; it comes straight to me.',
-    access: (date) => `Your free access runs until ${date}. No card needed.`,
+    lead: "You've had LexiClash for a few days now, and I wanted to check in.",
+    askTitle: 'Tell me straight',
+    ask: "If something broke, confused your students or just doesn't fit your class, I want to know. Just reply to this email; it comes straight to me.",
+    access: (date) => `Your free access runs until ${date}, and no card is needed.`,
     cta: 'Open my classroom',
     signoff: 'Thanks, Ohad (I build LexiClash)',
+    footnote: 'You get this because you started free teacher access on LexiClash.',
     dir: 'ltr',
   },
   he: {
     subject: 'איך הולך עם LexiClash בכיתה?',
-    preheader: 'בדיקה קצרה, ושאלה כנה.',
-    tagline: 'למורים',
+    preheader: 'בדיקה קצרה ממי שבנה את המשחק.',
+    kicker: 'למורים',
+    headline: 'איך הולך עד עכשיו?',
     greeting: (n) => (n ? `שלום ${n},` : 'שלום,'),
     lead: 'עברו כמה ימים מאז שהתחלת להשתמש ב-LexiClash, ורציתי לשאול איך הולך.',
-    ask: 'אם משהו לא עבד או לא מתאים לכיתה שלך, אשמח לשמוע. אפשר פשוט להשיב למייל הזה, הוא מגיע ישירות אליי.',
+    askTitle: 'אפשר לכתוב בגלוי',
+    ask: 'אם משהו לא עבד, בלבל את התלמידים או פשוט לא מתאים לכיתה שלך, אשמח לשמוע. אפשר להשיב למייל הזה, הוא מגיע ישירות אליי.',
     access: (date) => `הגישה החינמית שלך פעילה עד ${date}, ולא צריך כרטיס אשראי.`,
     cta: 'לכיתה שלי',
     signoff: 'תודה, אוהד (אני בונה את LexiClash)',
+    footnote: 'המייל הזה נשלח כי התחלת גישת מורים חינמית ב-LexiClash.',
     dir: 'rtl',
   },
   sv: {
     subject: 'Hur går det med LexiClash i klassen?',
-    preheader: 'En kort avstämning, och en ärlig fråga.',
-    tagline: 'För lärare',
+    preheader: 'En kort avstämning från den som byggde det.',
+    kicker: 'För lärare',
+    headline: 'Hur har det gått hittills?',
     greeting: (n) => (n ? `Hej ${n},` : 'Hej,'),
     lead: 'Du har haft LexiClash i några dagar nu, och jag ville höra hur det går.',
-    ask: 'Om något inte fungerade eller inte passar din klass vill jag veta det. Svara bara på det här mejlet, det kommer direkt till mig.',
+    askTitle: 'Säg som det är',
+    ask: 'Om något inte fungerade, förvirrade eleverna eller helt enkelt inte passar din klass vill jag veta det. Svara bara på det här mejlet, det kommer direkt till mig.',
     access: (date) => `Din kostnadsfria tillgång gäller till ${date}, och inget kort behövs.`,
     cta: 'Öppna mitt klassrum',
     signoff: 'Tack, Ohad (jag bygger LexiClash)',
+    footnote: 'Du får det här för att du startade kostnadsfri lärartillgång på LexiClash.',
     dir: 'ltr',
   },
 };
@@ -75,17 +86,23 @@ export function teacherTrialFeedback({ full_name, locale, trialExpiresAt }: Args
     month: 'long', day: 'numeric',
   });
 
-  const html = renderTeacherEmail({
+  const html = renderNeoEmail({
     lang,
     dir: c.dir,
     preheader: c.preheader,
-    tagline: c.tagline,
+    accent: 'cyan',
+    art: 'report',
+    kicker: c.kicker,
+    headline: c.headline,
     greeting: c.greeting(firstName(full_name)),
-    lead: c.lead,
-    paragraphs: [c.access(dateStr)],
-    callout: c.ask,
+    blocks: [
+      { type: 'p', text: c.lead, strong: true },
+      { type: 'callout', title: c.askTitle, text: c.ask },
+      { type: 'p', text: c.access(dateStr) },
+    ],
     cta: { label: c.cta, href: teacherEmailUrl(lang, '/teacher', 'trial_feedback') },
     signoff: c.signoff,
+    footnote: c.footnote,
   });
 
   return { subject: c.subject, html };

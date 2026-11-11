@@ -132,7 +132,22 @@ describe('teacherWeeklyProgressDigest', () => {
       polarTrialActiveLineKey: 'teacher.digest.polarTrialActiveLine',
     });
     expect(html).toContain('6 days left in your Teacher Pro trial');
-    expect(html).toContain('Keep Pro — $9/mo');
+    expect(html).toContain('Keep Pro for $9/mo');
     expect(html).toContain('https://www.lexiclash.live/en/teacher/upgrade');
+  });
+
+  it.each(['en', 'he'] as const)('%s: neo layout with mascot art, class stats and a hard-shadow button', (locale) => {
+    const { html } = teacherWeeklyProgressDigest({ ...digest, locale });
+    expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+    expect(html).toMatch(/border-(right|left)-width:6px/);
+    expect(html).toContain('1/2');
+    expect(html).not.toMatch(/undefined|\[object|NaN/);
+    expect(html).not.toContain(' — ');
+  });
+
+  it('a Pro teacher gets the dashboard as the button', () => {
+    const { html } = teacherWeeklyProgressDigest({ ...digest, hasPro: true });
+    const dash = html.indexOf('https://www.lexiclash.live/en/teacher?');
+    expect(html.slice(html.lastIndexOf('<td', dash), dash)).toMatch(/border-(right|left)-width:6px/);
   });
 });

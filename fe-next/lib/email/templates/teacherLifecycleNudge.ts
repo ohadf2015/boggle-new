@@ -1,7 +1,9 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { LifecycleStage, NudgeClassroom } from '@/lib/education/lifecycleNudges';
 import { translateKey } from '@/lib/i18n/serverTranslate';
-import { teacherEmailUrl } from './teacherEmailLayout';
+import { EMAIL_SITE, renderNeoEmail, type NeoBlock } from '@/lib/email/kit/neoEmail';
+import { TEACHER_EMAIL_REPLY_TO, firstName, teacherEmailUrl } from './teacherEmailLayout';
+import { LIFECYCLE_COPY, LIFECYCLE_LOOK } from './teacherLifecycleNudge.copy';
 
 export type LifecycleEmailStage = LifecycleStage | 'reactivate';
 
@@ -11,13 +13,6 @@ interface Args {
   stage: LifecycleEmailStage;
   /** The class to open (share_code, start_live). Without it the button goes to teacher home. */
   classroom?: NudgeClassroom | null;
-}
-
-const SITE = 'https://www.lexiclash.live';
-const CONTACT = 'ohadf2015@gmail.com';
-
-function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
 const SITE_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -32,49 +27,39 @@ function ctaUrl(locale: TeacherLocale, stage: LifecycleEmailStage, classroom?: N
 /** Students land in the class's language, the teacher's as fallback (same rule as the in-app invite). */
 function joinUrl(locale: TeacherLocale, classroom: NudgeClassroom): string {
   const lang = classroom.language && SITE_LOCALES.includes(classroom.language) ? classroom.language : locale;
-  return `${SITE}/${lang}/join/${encodeURIComponent(classroom.joinCode)}`;
+  return `${EMAIL_SITE}/${lang}/join/${encodeURIComponent(classroom.joinCode)}`;
 }
 
 export function teacherLifecycleNudge({ fullName, locale, stage, classroom }: Args) {
   const copy = (key: string) => translateKey(`teacherLifecycleEmail.${key}`, locale);
-  const dir = locale === 'he' ? 'rtl' : 'ltr';
-  const align = dir === 'rtl' ? 'right' : 'left';
-  const greeting = escape(copy('greeting')).replace('{name}', escape(fullName));
-  const codeBox = stage === 'share_code' && classroom
-    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px 0;border:2px solid #1a1a2e;border-radius:8px;background:#f4f6ff;">
-            <tr><td dir="${dir}" align="${align}" style="padding:14px 16px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:${align};">
-              <p style="margin:0 0 4px 0;font-size:13px;font-weight:700;">${escape(copy('codeLabel'))}</p>
-              <p style="margin:0 0 12px 0;font-size:28px;font-weight:800;letter-spacing:4px;font-family:'Courier New',monospace;" dir="ltr">${escape(classroom.joinCode)}</p>
-              <p style="margin:0 0 4px 0;font-size:13px;font-weight:700;">${escape(copy('linkLabel'))}</p>
-              <p style="margin:0;font-size:14px;word-break:break-all;" dir="ltr"><a href="${escape(joinUrl(locale, classroom))}" style="color:#1a1a2e;">${escape(joinUrl(locale, classroom))}</a></p>
-            </td></tr>
-          </table>`
-    : '';
+  const look = LIFECYCLE_COPY[locale] ?? LIFECYCLE_COPY.en;
+  const showCode = stage === 'share_code' && classroom;
+  const blocks: NeoBlock[] = [
+    { type: 'p', text: copy(`${stage}.lead`), strong: true },
+    { type: 'p', text: copy(`${stage}.body`) },
+    ...(showCode
+      ? [
+          { type: 'p' as const, text: copy('codeLabel'), strong: true },
+          { type: 'tiles' as const, word: classroom.joinCode },
+          { type: 'callout' as const, title: copy('linkLabel'), text: joinUrl(locale, classroom) },
+        ]
+      : []),
+    { type: 'p', text: copy('ask') },
+  ];
 
-  const html = `<!doctype html>
-<html dir="${dir}" lang="${locale}">
-<body style="margin:0;padding:0;background:#0e1430;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e1430;padding:24px 0;">
-    <tr><td align="center">
-      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:3px solid #1a1a2e;">
-        <tr><td dir="${dir}" align="${align}" style="padding:28px 28px 8px 28px;font-family:Arial,Helvetica,sans-serif;color:#1a1a2e;text-align:${align};">
-          <p style="font-size:18px;font-weight:700;margin:0 0 12px 0;">${greeting}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 16px 0;font-weight:700;">${escape(copy(`${stage}.lead`))}</p>
-          <p style="font-size:15px;line-height:1.6;margin:0 0 20px 0;">${escape(copy(`${stage}.body`))}</p>
-          ${codeBox}
-        </td></tr>
-        <tr><td align="center" style="padding:8px 28px 20px 28px;">
-          <a href="${escape(ctaUrl(locale, stage, classroom))}" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(copy(`${stage}.cta`))}</a>
-        </td></tr>
-        <tr><td dir="${dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">
-          <p style="margin:0 0 8px 0;">${escape(copy('ask'))}</p>
-          <p style="margin:0;">${escape(copy('signoff'))}</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
+  const html = renderNeoEmail({
+    lang: locale,
+    dir: locale === 'he' ? 'rtl' : 'ltr',
+    preheader: look.stages[stage].preheader,
+    ...LIFECYCLE_LOOK[stage],
+    kicker: look.kicker,
+    headline: look.stages[stage].headline,
+    greeting: copy('greeting').replace('{name}', firstName(fullName) || fullName),
+    blocks,
+    cta: { label: copy(`${stage}.cta`), href: ctaUrl(locale, stage, classroom) },
+    signoff: look.signoff,
+    footnote: look.footnote,
+  });
 
-  return { subject: copy(`${stage}.subject`), html, replyTo: CONTACT };
+  return { subject: copy(`${stage}.subject`), html, replyTo: TEACHER_EMAIL_REPLY_TO };
 }

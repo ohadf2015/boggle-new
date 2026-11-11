@@ -6,7 +6,6 @@
  */
 
 import { Resend } from 'resend';
-import { render } from '@react-email/components';
 
 import logger from '@/backend/utils/logger';
 import {
@@ -16,7 +15,7 @@ import {
   getLocaleFromCountry,
   withTimeout,
 } from '@/lib/email';
-import WelcomeEmail, { getWelcomeSubject } from '@/emails/welcome';
+import { playerWelcome } from '@/lib/email/templates/playerWelcome';
 import { getWelcomeEmailModes } from '@/lib/email/welcomeModes';
 
 /**
@@ -152,34 +151,17 @@ export async function sendWelcomeEmailToUser(
     const recipientName =
       profile.display_name || profile.username || 'there';
 
-    // Step 9: Render email
-    const subject = getWelcomeSubject(language, recipientName);
-    // Dynamic public-mode grid — derived from the shared MODE_META registry so
-    // the email lists every all-players mode with its cube art and link.
+    // Step 9: Render email (mode grid comes from the shared MODE_META registry)
     const modes = getWelcomeEmailModes(language, baseUrl);
-    const html = await render(
-      WelcomeEmail({
-        recipientName,
-        language,
-        unsubscribeUrl,
-        playUrl,
-        videoUrl,
-        baseUrl,
-        modes,
-      })
-    );
-    const text = await render(
-      WelcomeEmail({
-        recipientName,
-        language,
-        unsubscribeUrl,
-        playUrl,
-        videoUrl,
-        baseUrl,
-        modes,
-      }),
-      { plainText: true }
-    );
+    const { subject, html, text } = playerWelcome({
+      recipientName,
+      language,
+      unsubscribeUrl,
+      playUrl,
+      videoUrl,
+      baseUrl,
+      modes,
+    });
 
     // Step 10: Send via Resend with timeout
     const resendClient = getResendClient();
@@ -281,22 +263,15 @@ export async function sendTestWelcomeEmail(
   const locale = ['he', 'sv', 'ja', 'es', 'ru'].includes(language) ? language : 'en';
 
   try {
-    const subject = getWelcomeSubject(language, recipientName);
-    const html = await withTimeout(
-      render(
-        WelcomeEmail({
-          recipientName,
-          language,
-          unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
-          playUrl: `${baseUrl}/${locale}`,
-          videoUrl: `${baseUrl}/${locale}`,
-          baseUrl,
-          modes: getWelcomeEmailModes(language, baseUrl),
-        }),
-      ),
-      30000,
-      'Welcome email render timed out after 30 seconds',
-    );
+    const { subject, html } = playerWelcome({
+      recipientName,
+      language,
+      unsubscribeUrl: `${baseUrl}/api/email/unsubscribe?token=${'0'.repeat(64)}`,
+      playUrl: `${baseUrl}/${locale}`,
+      videoUrl: `${baseUrl}/${locale}`,
+      baseUrl,
+      modes: getWelcomeEmailModes(language, baseUrl),
+    });
 
     const result = await withTimeout(
       resend.emails.send({

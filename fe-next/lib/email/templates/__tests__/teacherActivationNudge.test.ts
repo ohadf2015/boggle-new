@@ -39,13 +39,22 @@ describe('teacherActivationNudge', () => {
     const { html } = teacherActivationNudge({ full_name: 'Ada', locale, bucket: 'd3' });
     expect(html).toMatch(/3/);
     const d1 = teacherActivationNudge({ full_name: 'Ada', locale, bucket: 'd1' }).html;
-    expect(d1).not.toMatch(/\b3\b/);
+    expect(d1).not.toContain(LOBBY_LABEL[locale]);
   });
 
   it.each(LOCALES)('day 3 quotes the %s lobby button label exactly as the app shows it', (locale) => {
     const { html } = teacherActivationNudge({ full_name: 'Ada', locale, bucket: 'd3' });
     expect(LOBBY_LABEL[locale]).toBeTruthy();
     expect(html).toContain(LOBBY_LABEL[locale]);
+  });
+
+  it.each(LOCALES)('%s uses the shared neo layout with mascot art and a hard-shadow button', (locale) => {
+    for (const bucket of ['d1', 'd3', 'd7'] as const) {
+      const { html } = teacherActivationNudge({ full_name: 'Ada', locale, bucket });
+      expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+      expect(html).toMatch(/border-(right|left)-width:6px/);
+      expect(html).not.toMatch(/undefined|\[object/);
+    }
   });
 
   it('renders Hebrew right-to-left', () => {
