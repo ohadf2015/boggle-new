@@ -26,6 +26,8 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDuelSocket } from '@/hooks/useDuelSocket';
 import { useImeText } from '@/hooks/useImeText';
 import { useDuelCombo } from '@/hooks/useDuelCombo';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { EduMascotReactions } from '@/components/education/EduMascotReactions';
 import { useDuelRematch } from '@/hooks/useDuelRematch';
 import { useDuelGameJoin } from '@/hooks/useDuelGameJoin';
 import type {
@@ -237,6 +239,7 @@ export function RealTimeDuelGame({
       // Streak + bonus are the SERVER's numbers; the meter only renders them.
       combo.registerAccepted(data.comboStreak ?? 0, data.comboBonus ?? 0);
       playWordAcceptedSound();
+      emitMascotEvent({ kind: 'word-submitted', wordLength: data.word.length, gemLetterUsed: false });
     });
 
     const cleanupWordRejected = onWordRejected((data: WordRejectedData) => {
@@ -434,6 +437,8 @@ export function RealTimeDuelGame({
         onKeyDown={handleKeyPress}
         onForfeit={() => setShowForfeitDialog(true)}
       />
+
+      <EduMascotReactions mode="edu-duel" comboLevel={combo.streak} />
 
       {isDisconnected && (
         <DuelDisconnectOverlay

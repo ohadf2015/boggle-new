@@ -23,8 +23,13 @@
  * mute and SFX volume still apply on top — `playSound` checks them first.
  */
 
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+
+// Drills don't report the word, so a right answer reads as a mid-length word: a cheer, not an awe.
+const CHEER_WORD_LENGTH = 5;
+const STREAK_DANCE_AT = 3;
 
 export interface PracticeSfx {
   /** A right answer. */
@@ -47,20 +52,36 @@ export interface PracticeSfx {
 
 export function usePracticeSfx(): PracticeSfx {
   const { playSound } = useSoundEffects();
+  const streakRef = useRef(0);
 
-  return useMemo<PracticeSfx>(
-    () => ({
-      correct: () => playSound('wordAccepted', { requiresGameActive: false, volume: 0.5 }),
-      wrong: () => playSound('wordRejected', { requiresGameActive: false, volume: 0.35 }),
-      match: () => playSound('matchFound', { requiresGameActive: false, volume: 0.5 }),
+  return useMemo<PracticeSfx>(() => {
+    const cheer = () => {
+      streakRef.current += 1;
+      if (streakRef.current >= STREAK_DANCE_AT) {
+        emitMascotEvent({ kind: 'wave-streak', streakCount: streakRef.current });
+      }
+      emitMascotEvent({ kind: 'word-submitted', wordLength: CHEER_WORD_LENGTH, gemLetterUsed: false });
+    };
+    return {
+      correct: () => {
+        playSound('wordAccepted', { requiresGameActive: false, volume: 0.5 });
+        cheer();
+      },
+      wrong: () => {
+        streakRef.current = 0;
+        playSound('wordRejected', { requiresGameActive: false, volume: 0.35 });
+      },
+      match: () => {
+        playSound('matchFound', { requiresGameActive: false, volume: 0.5 });
+        cheer();
+      },
       start: () => playSound('roundStart', { requiresGameActive: false, volume: 0.45 }),
       urgent: () => playSound('timerUrgent', { requiresGameActive: false, volume: 0.45 }),
       timesUp: () => playSound('drillComplete', { requiresGameActive: false, volume: 0.55 }),
       hint: () => playSound('hintReveal', { requiresGameActive: false, volume: 0.4 }),
       advance: () => playSound('tileSelect', { requiresGameActive: false, volume: 0.3 }),
-    }),
-    [playSound]
-  );
+    };
+  }, [playSound]);
 }
 
 export default usePracticeSfx;

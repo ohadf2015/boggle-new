@@ -24,6 +24,8 @@ vi.mock('@/utils/confettiUtils', () => ({
   fireRankConfetti: vi.fn(),
 }));
 
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+
 const play = vi.fn();
 vi.mock('../missGapSound', () => ({
   useMissGapSound: () => play,
