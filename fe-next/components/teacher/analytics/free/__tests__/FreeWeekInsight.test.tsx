@@ -96,4 +96,26 @@ describe('FreeWeekInsight', () => {
     fireEvent.click(screen.getByRole('button', { name: 'education.analytics.retry' }));
     expect(insight.retry).toHaveBeenCalled();
   });
+
+  it.each([
+    ['empty', { kind: 'free', insight: { pulse: { needsHelp: [], counts: { ...counts, needsHelp: 0, inactive: 0 }, totalStudents: 0 }, hardestWords: [], sessionsThisWeek: 0 } }],
+    ['data', { kind: 'free', insight: { pulse: { needsHelp: [], counts, totalStudents: 3 }, hardestWords: [hard('storm', 75)], sessionsThisWeek: 2 } }],
+    ['pending', { kind: 'loading' }],
+    ['none', { kind: 'locked' }],
+  ] as const)('given the week is %s, when rendered, then the page hears that status so the Pro lock can match it', (status, state) => {
+    insight.state = state as FreeClassInsightState;
+    const onStatus = vi.fn();
+    render(<FreeWeekInsight classroomId="c1" locale="en" onStatus={onStatus} />);
+    expect(onStatus).toHaveBeenLastCalledWith(status);
+  });
+
+  it('given a Pro teacher, when rendered, then the status is none and the entitlement load reads as pending', () => {
+    const onStatus = vi.fn();
+    pro.value = { hasPro: false, loading: true, accessTrialExpires: null };
+    const { rerender } = render(<FreeWeekInsight classroomId="c1" locale="en" onStatus={onStatus} />);
+    expect(onStatus).toHaveBeenLastCalledWith('pending');
+    pro.value = { hasPro: true, loading: false, accessTrialExpires: null };
+    rerender(<FreeWeekInsight classroomId="c1" locale="en" onStatus={onStatus} />);
+    expect(onStatus).toHaveBeenLastCalledWith('none');
+  });
 });

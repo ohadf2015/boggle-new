@@ -21,19 +21,22 @@ describe('TvClassroomStage: the projector column', () => {
     expect(screen.queryByTestId('tv-race-region')).not.toBeInTheDocument();
   });
 
-  it('Given a race, When rendered, Then the board sits in its own capped min-h-0 region after the live panel, which keeps flex-1', () => {
+  it('Given a race, When rendered, Then the race board fills the board column under the letter grid and the live panel keeps the other column whole', () => {
     act(() => ingestLessonClaimsRound({ lessonClaims: race }));
     render(<TvClassroomStage {...base} />);
+    const column = screen.getByTestId('tv-board-column');
     const region = screen.getByTestId('tv-race-region');
-    expect(region.className).toMatch(/min-h-0/);
-    expect(region.className).toMatch(/basis-2\/5/);
-    expect(region.className).toMatch(/shrink-0/);
-    expect(region.className).toMatch(/(^| )min-h-\[12rem\] md:min-h-0( |$)/);
+    expect(column).toContainElement(screen.getByTestId('round-stage'));
+    expect(column).toContainElement(region);
+    expect(screen.getByTestId('round-stage').compareDocumentPosition(region) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(column.className).toMatch(/\bmin-h-0\b/);
+    expect(region.className).toMatch(/\bmin-h-0\b/);
+    expect(region.className).toMatch(/\bflex-1\b/);
     expect(region).toContainElement(screen.getByTestId('race-board'));
     const panelRegion = screen.getByTestId('live-panel').parentElement!;
+    expect(column).not.toContainElement(panelRegion);
     expect(panelRegion.className).toMatch(/flex-1/);
     expect(panelRegion.className).toMatch(/min-h-0/);
-    expect(panelRegion.compareDocumentPosition(region) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('Given a Word Hunt round, When rendered, Then the activity panel replaces the live panel', () => {

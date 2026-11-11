@@ -106,14 +106,11 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
             {t(headlineKey(rank, total, score))}
           </p>
           {/* "#1 of 1" on zero points is not a placing. */}
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <div className="mt-1.5 flex flex-col items-start gap-1">
             {score > 0 && total > 1 && (
-              <>
-                <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
-                  {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
-                </p>
-                <span data-testid="edu-student-rank-divider" aria-hidden="true" className="self-center font-neo-display text-2xl font-black leading-none text-neo-black/40">·</span>
-              </>
+              <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
+                {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
+              </p>
             )}
             <p className="flex items-baseline gap-1.5 font-neo-body text-lg font-bold">
               <span data-testid="edu-student-score" className="font-neo-display text-3xl font-black tabular-nums">

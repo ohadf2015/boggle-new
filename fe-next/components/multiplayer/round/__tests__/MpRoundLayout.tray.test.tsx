@@ -41,7 +41,7 @@ const { wide } = vi.hoisted(() => ({ wide: { value: false } }));
 vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => wide.value }));
 
 import { MpRoundLayout, type MpRoundLayoutProps } from '../MpRoundLayout';
-import { MpRoundTraySlot, MpTrayNudge } from '../MpRoundTray';
+import { MpRoundTraySlot, MpTrayLead, MpTrayNudge } from '../MpRoundTray';
 import { resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
 
 const Canvas = memo(function Canvas() {
@@ -115,6 +115,37 @@ describe('MpRoundLayout phone tray', () => {
     render(<MpRoundLayout {...props()} />);
     expect(screen.getByTestId('mp-round-tray')).toContainElement(screen.getByTestId('stuck-coach'));
     expect(screen.getByTestId('stuck-coach').parentElement?.className).not.toContain('fixed');
+  });
+
+  it('GIVEN a class race row in the dock WHEN the phone tray renders THEN the row leads the tray, before my words and the economy', () => {
+    const dock = (
+      <>
+        <MpTrayLead><div data-testid="race-row">race</div></MpTrayLead>
+        <div data-testid="economy-dock">cash</div>
+      </>
+    );
+    render(<MpRoundLayout {...props({ dock })} />);
+    const tray = screen.getByTestId('mp-round-tray');
+    const row = screen.getByTestId('race-row');
+    expect(tray).toContainElement(row);
+    expect(tray.firstElementChild).toContainElement(row);
+    expect(row.compareDocumentPosition(screen.getByTestId('mp-recent-words')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId('mp-recent-words').compareDocumentPosition(screen.getByTestId('economy-dock')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('GIVEN a short phone tray WHEN my words do not fit THEN the pills fold away by the tray height and the count stays', () => {
+    render(<MpRoundLayout {...props()} />);
+    const stage = screen.getByTestId('mp-callout-stage');
+    expect(stage.className).toMatch(/\[container-type:size\]/);
+    expect(screen.getByTestId('mp-tray-words').className).toMatch(/\[@container\(max-height:\d+px\)\]:hidden/);
+    expect(stage).toHaveTextContent('mpUi.round.found:{"count":2}');
+  });
+
+  it('GIVEN a class race row WHEN the round is on a desktop THEN it stays in the left rail with the dock', () => {
+    wide.value = true;
+    const dock = <MpTrayLead><div data-testid="race-row">race</div></MpTrayLead>;
+    render(<MpRoundLayout {...props({ dock })} />);
+    expect(screen.getByRole('complementary', { name: 'mpUi.round.players' })).toContainElement(screen.getByTestId('race-row'));
   });
 
   it('GIVEN a phone board view with no tray (Blast) WHEN a classroom student plays THEN the class strip still shows, in its own row under the board', () => {

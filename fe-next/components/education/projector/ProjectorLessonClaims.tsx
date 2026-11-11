@@ -34,7 +34,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
         className,
       )}
     >
-      <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(14px,6.5cqh,34px)]">
+      <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(14px,min(5.5cqh,4.6cqw),34px)]">
         <span className="flex min-w-0 items-center gap-2">
           <Target className="size-[1em] shrink-0 text-neo-cyan" aria-hidden />
           <span className="truncate">{t('education.race.projectorTitle')}</span>
@@ -53,7 +53,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
 /** Font that fits `chars` glyphs across the tile (Fredoka caps run about 0.62em each), capped by the tile height. */
 function fitText(chars: number, perChar: number, heightShare: number): string {
   const share = Math.round((90 / Math.max(1, chars * perChar)) * 10) / 10;
-  return `clamp(11px, min(${heightShare}cqh, ${share}cqw), 72px)`;
+  return `clamp(12px, min(${heightShare}cqh, ${share}cqw), 72px)`;
 }
 
 function ClaimTile({ slot, reduced, t }: { slot: LessonClaimSlot; reduced: boolean; t: ProjectorLessonClaimsProps['t'] }) {
@@ -72,16 +72,16 @@ function ClaimTile({ slot, reduced, t }: { slot: LessonClaimSlot; reduced: boole
         animate={{ rotateX: 0 }}
         transition={reduced ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 18 }}
         className={cn(
-          'flex h-full min-h-0 flex-col items-center justify-center gap-[4cqh] overflow-hidden rounded-neo border-[3px] border-neo-black px-[5cqw] text-center font-neo-display font-black leading-none shadow-hard-sm [container-type:size]',
+          'flex h-full min-h-0 flex-col items-center justify-center gap-[4cqh] overflow-hidden rounded-neo border-[3px] border-neo-black px-1 text-center font-neo-display font-black leading-none shadow-hard-sm [container-type:size]',
           claim ? 'bg-neo-lime text-neo-black' : 'bg-neo-cream text-neo-black',
         )}
       >
         {claim ? (
           <>
-            <span data-testid="claim-tile-text" dir="auto" className="max-w-full truncate text-[length:var(--fit)] uppercase" style={{ '--fit': fitText(chars, 0.62, 38) } as CSSProperties}>{claim.word}</span>
-            <span className="flex max-w-full items-center gap-[0.3em] font-neo-body text-[clamp(10px,min(22cqh,11cqw),30px)] font-bold">
+            <span data-testid="claim-tile-text" dir="auto" className="whitespace-nowrap text-[length:var(--fit)] uppercase" style={{ '--fit': fitText(chars, 0.7, 46) } as CSSProperties}>{claim.word}</span>
+            <span data-testid="claim-tile-name" className="flex max-w-full items-center gap-[0.3em] font-neo-body text-[clamp(14px,min(26cqh,12cqw),30px)] font-bold">
               {claim.avatar?.emoji && <span aria-hidden="true">{claim.avatar.emoji}</span>}
-              <span dir="auto" className="truncate">{claim.username}</span>
+              <bdi className="min-w-0 truncate">{claim.username}</bdi>
             </span>
           </>
         ) : (

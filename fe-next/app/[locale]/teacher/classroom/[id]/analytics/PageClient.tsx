@@ -21,7 +21,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { ClassOverview } from '@/components/teacher/analytics/overview/ClassOverview';
 import { ProGate } from '@/components/teacher/ProGate';
-import { FreeWeekInsight } from '@/components/teacher/analytics/free/FreeWeekInsight';
+import { FreeWeekInsight, type FreeWeekStatus } from '@/components/teacher/analytics/free/FreeWeekInsight';
 import { StudentProgressTable } from '@/components/teacher/analytics/StudentProgressTable';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
 import { getClassroom } from '@/lib/supabase/education/classrooms';
@@ -66,6 +66,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const revealRef = useTeacherReveal<HTMLDivElement>();
   const [classroomName, setClassroomName] = useState('');
   const [openStudentId, setOpenStudentId] = useState<string | null>(null);
+  const [weekStatus, setWeekStatus] = useState<FreeWeekStatus>('pending');
 
   useEffect(() => {
     let cancelled = false;
@@ -132,6 +133,12 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
   // ==================== RENDER ====================
 
+  const proPending = (
+    <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg">
+      <PageLoader size="md" text={t('common.loading')} />
+    </div>
+  );
+
   return (
     <div ref={revealRef} className="mx-auto max-w-7xl space-y-4 md:space-y-5">
         <div data-tm className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
@@ -168,15 +175,13 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
             being sold; gating only the summary card left them open to free teachers. */}
         <div data-tm className="space-y-4 md:space-y-5 [&_[data-testid=pro-gate-preview]]:max-md:hidden">
-        <FreeWeekInsight classroomId={classroomId} locale={locale} />
+        <FreeWeekInsight classroomId={classroomId} locale={locale} onStatus={setWeekStatus} />
+        {weekStatus === 'pending' ? proPending : (
         <ProGate
           feature="analytics"
           tone="calm"
-          whileChecking={
-            <div data-testid="analytics-pro-pending" aria-busy="true" className="flex min-h-60 items-center justify-center rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg">
-              <PageLoader size="md" text={t('common.loading')} />
-            </div>
-          }
+          quiet={weekStatus === 'empty'}
+          whileChecking={proPending}
         >
           <div data-testid="analytics-pro-body" className="space-y-3">
             <ClassOverview classroomId={classroomId} openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
@@ -224,6 +229,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             </Tabs>
           </div>
         </ProGate>
+        )}
         </div>
 
         {/* Recent Activity Feed (if any) */}

@@ -16,8 +16,10 @@ describe('EduStudentHero on a right-to-left page', () => {
     expect(screen.getByText('mpUi.results.coins').tagName).toBe('BDI');
   });
 
-  it('Given a placing and points, When shown side by side, Then a divider keeps "of 26" and "37" from reading as one number', () => {
+  it('Given a placing and points, When shown, Then the points sit on their own line so "of 26" and "37" never read as one number', () => {
     render(<EduStudentHero {...base} />);
-    expect(screen.getByTestId('edu-student-rank-divider')).toBeInTheDocument();
+    const rank = screen.getByTestId('edu-student-rank');
+    expect(rank.parentElement!.className).toMatch(/\bflex-col\b/);
+    expect(screen.queryByTestId('edu-student-rank-divider')).toBeNull();
   });
 });

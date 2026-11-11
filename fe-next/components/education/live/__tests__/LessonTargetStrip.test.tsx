@@ -78,4 +78,17 @@ describe('LessonTargetStrip inline (round dock under the grid)', () => {
     expect(within(strip).getByTestId('lesson-target-count')).toHaveTextContent(/^1\/2$/);
     expect(strip).toHaveTextContent('education.race.claimedCount:{"claimed":1,"total":2}');
   });
+
+  it('Given an inline race, When rendered, Then it is a full-size row: the count is a badge and the masks are readable tiles that scroll sideways', () => {
+    render(<LessonTargetStrip slots={slots} race inline t={t} dir="ltr" />);
+    const strip = screen.getByTestId('lesson-target-strip');
+    expect(strip.className).toMatch(/\bmin-h-9\b/);
+    const badge = within(strip).getByTestId('lesson-target-count');
+    expect(badge.className).toMatch(/\bbg-neo-cyan\b/);
+    expect(badge.className).toMatch(/\brounded-full\b/);
+    const list = within(strip).getByRole('list');
+    expect(list.className).toMatch(/overflow-x-auto/);
+    expect(list.className).toMatch(/pointer-events-auto/);
+    for (const chip of within(strip).getAllByRole('listitem')) expect(chip.className).toMatch(/text-\[13px\]|text-sm/);
+  });
 });

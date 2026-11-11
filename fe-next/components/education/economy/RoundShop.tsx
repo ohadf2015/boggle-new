@@ -33,7 +33,7 @@ export default function RoundShop({ gameCode, compact = false }: { gameCode: str
             className="flex min-h-11 w-full items-center justify-between gap-2 rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy-elevated px-3 font-neo-display text-sm font-black text-neo-cream shadow-hard-sm disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <span className="min-w-0 truncate text-start">{t('economy.shop.title')}</span>
-            <span className="shrink-0 tabular-nums text-neo-lime">{t('economy.shop.open', { cash: shop.cash })}</span>
+            <span className="shrink-0 text-neo-lime">{t('economy.shop.open', { cash: shop.cash })}</span>
           </button>
         )
       ) : (

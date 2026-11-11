@@ -431,7 +431,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         />
       </div>
 
-      <div className={`${isClassroom ? 'shrink-0 md:shrink md:flex-1 md:min-h-0 grid-rows-[auto_auto]' : 'flex-1 min-h-0 grid-rows-[1fr_1fr]'} grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
+      <div className={`${isClassroom ? 'shrink-0 md:shrink md:flex-1 md:min-h-0 grid-rows-[auto_auto] md:grid-cols-[minmax(0,8fr)_minmax(0,7fr)]' : 'flex-1 min-h-0 grid-rows-[1fr_1fr] md:grid-cols-2'} grid grid-cols-1 md:grid-rows-[1fr] gap-2 md:gap-4 mx-auto w-full ${isFullscreen ? 'p-4' : 'p-2 md:p-4 max-w-[2000px]'}`}>
         <div className={isClassroom ? 'md:min-h-0 md:overflow-hidden' : 'min-h-[180px] md:min-h-0 overflow-hidden'}>
           {isClassroom ? (
             <TvClassroomStage gameMode={gameMode} grid={tableData} wheelPuzzle={wheelPuzzle} activityPanel={activityPanel} socket={socket}

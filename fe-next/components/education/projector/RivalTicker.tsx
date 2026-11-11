@@ -88,6 +88,7 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
   }, [socket]);
 
   if (!reserved) return null;
+  const [lead, ...older] = items;
 
   return (
     <div data-testid="rival-ticker" className={cn('@container w-full min-w-0', className)} aria-label={t('education.rivals.ticker.label')}>
@@ -95,29 +96,53 @@ export default function RivalTicker({ socket, className }: RivalTickerProps) {
         data-testid="rival-ticker-list"
         className="flex min-h-[2.2em] min-w-0 items-center gap-[1.5cqi] overflow-hidden whitespace-nowrap font-neo-display text-[clamp(0.875rem,1.9cqi,2.25rem)] font-bold text-neo-cream"
       >
-        {items.map((item, index) => (
+        {lead && (
           <li
-            key={item.id}
+            key={lead.id}
             data-testid="rival-ticker-item"
-            className={cn(
-              index === 0 ? 'max-w-full shrink-0' : 'shrink',
-              'flex min-w-0 items-center gap-[0.6cqi] rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-[1cqi] py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none',
-              item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in'
-            )}
+            data-kind="lead"
+            className={cn(ITEM, 'max-w-full shrink-0 px-[1cqi]', lead.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
           >
             <Zap className="size-[1.1em] shrink-0 text-neo-lime" aria-hidden="true" />
-            <span className="size-[1.4em] shrink-0 overflow-hidden rounded-full" aria-hidden="true">
-              <Avatar
-                userId={item.name}
-                customAvatar={(item.avatar?.customAvatar as CustomAvatarConfig | undefined) ?? undefined}
-                disableEffects
-                className="!h-full !w-full"
-              />
-            </span>
-            <span className="min-w-0 truncate">{t('education.rivals.ticker.flip', { name: item.name })}</span>
+            <TickerAvatar item={lead} />
+            <span>{t('education.rivals.ticker.flip', { name: lead.name })}</span>
           </li>
-        ))}
+        )}
+        {older.length > 0 && (
+          <li className="min-w-0 flex-1">
+            {/* One row tall and wrapping: a chip that does not fit drops whole instead of being cut. */}
+            <ul data-testid="rival-ticker-older" className="flex h-[1.9em] min-w-0 flex-wrap items-center gap-[0.8cqi] overflow-hidden text-[0.8em]">
+              {older.map((item) => (
+                <li
+                  key={item.id}
+                  data-testid="rival-ticker-item"
+                  data-kind="chip"
+                  aria-label={t('education.rivals.ticker.flip', { name: item.name })}
+                  className={cn(ITEM, 'h-[1.9em] shrink-0 px-[0.7cqi] text-neo-cream/80', item.fading ? 'opacity-0' : 'motion-safe:animate-pop-in')}
+                >
+                  <TickerAvatar item={item} />
+                  <bdi aria-hidden="true">{item.name}</bdi>
+                </li>
+              ))}
+            </ul>
+          </li>
+        )}
       </ul>
     </div>
+  );
+}
+
+const ITEM = 'flex items-center gap-[0.6cqi] rounded-neo border-2 border-neo-cream/40 bg-neo-navy py-[0.4cqi] shadow-hard-sm transition-opacity duration-700 motion-reduce:transition-none';
+
+function TickerAvatar({ item }: { item: TickerItem }) {
+  return (
+    <span className="size-[1.4em] shrink-0 overflow-hidden rounded-full" aria-hidden="true">
+      <Avatar
+        userId={item.name}
+        customAvatar={(item.avatar?.customAvatar as CustomAvatarConfig | undefined) ?? undefined}
+        disableEffects
+        className="!h-full !w-full"
+      />
+    </span>
   );
 }

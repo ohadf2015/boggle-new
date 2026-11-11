@@ -35,7 +35,7 @@ export default function ClassroomEconomyDock({ gameCode }: ClassroomEconomyDockP
 
   return (
     <>
-      <div data-testid="economy-dock" className="relative z-40 mx-2 mb-1 flex shrink-0 flex-col gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard">
+      <div data-testid="economy-dock" className="relative z-40 mx-2 mb-1 flex shrink-0 flex-col gap-2 rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard [@container(max-height:200px)]:gap-1.5 [@container(max-height:200px)]:py-1.5">
         <EconomyHud snapshot={econ.snapshot ?? ZERO_ECONOMY_SNAPSHOT} />
         <div className={econ.snapshot?.config.powerUps ? 'grid grid-cols-2 gap-2' : 'grid grid-cols-1'}>
           {econ.snapshot?.config.powerUps && (

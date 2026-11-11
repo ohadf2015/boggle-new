@@ -51,17 +51,17 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
       className={cn(
         'pointer-events-none bg-neo-navy text-white',
         inline
-          ? 'min-w-0 overflow-hidden rounded-neo border-2 border-neo-cream/40 px-2 py-1 shadow-hard-sm'
+          ? 'flex min-h-9 min-w-0 items-center overflow-hidden rounded-neo border-2 border-neo-cream/40 px-1.5 shadow-hard-sm'
           : 'fixed bottom-0 inset-x-0 z-40 mx-auto w-full max-w-lg border-3 border-b-0 border-neo-cream rounded-t-neo shadow-hard px-3 pt-1.5 pb-[calc(0.375rem+env(safe-area-inset-bottom))]',
         className,
       )}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         <span className="flex shrink-0 items-center gap-1 font-neo-display text-xs font-black uppercase tracking-wide text-neo-cyan">
-          <Target className="h-3.5 w-3.5" aria-hidden="true" />
+          <Target className={compact ? 'size-4' : 'h-3.5 w-3.5'} aria-hidden="true" />
           {compact ? (
             <Pop pulseKey={done}>
-              <span data-testid="lesson-target-count" aria-hidden="true" dir="ltr" className="tabular-nums">{`${done}/${slots.length}`}</span>
+              <span data-testid="lesson-target-count" aria-hidden="true" dir="ltr" className="inline-block rounded-full border-2 border-neo-black bg-neo-cyan px-1.5 py-0.5 text-[13px] leading-none text-neo-black tabular-nums">{`${done}/${slots.length}`}</span>
               <span className="sr-only">{title}</span>
             </Pop>
           ) : (
@@ -73,7 +73,7 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
             'flex min-w-0 flex-1 items-center gap-1',
             !inline && 'flex-wrap',
             inline && !compact && 'flex-nowrap overflow-hidden',
-            compact && 'pointer-events-auto flex-nowrap overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+            compact && 'pointer-events-auto flex-nowrap gap-1.5 overflow-x-auto overscroll-x-contain py-0.5 pe-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
           )}
         >
           {slots.map((slot) => (
@@ -84,7 +84,7 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
               aria-label={chipLabel(slot, t)}
               className={cn(
                 'flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-black px-1.5 py-0.5 font-neo-display font-black uppercase leading-none shadow-hard-sm',
-                compact ? 'text-xs' : 'text-sm',
+                compact ? 'h-7 text-[13px]' : 'text-sm',
                 CHIP_BY_STATE[slot.state],
               )}
             >
@@ -99,7 +99,7 @@ export function LessonTargetStrip(props: LessonTargetStripProps) {
                     {slot.state === 'taken' && slot.avatar?.emoji && <span className="normal-case">{slot.avatar.emoji}</span>}
                     <span dir="auto" className={slot.state === 'taken' ? 'line-through decoration-2' : undefined}>{slot.word}</span>
                     {slot.state === 'taken' && slot.by && (
-                      <span dir="auto" className="max-w-[5rem] truncate font-neo-body text-[10px] font-bold normal-case">{slot.by}</span>
+                      <span dir="auto" className={cn('max-w-[5rem] truncate font-neo-body font-bold normal-case', compact ? 'text-[11px]' : 'text-[10px]')}>{slot.by}</span>
                     )}
                   </span>
                 </Pop>

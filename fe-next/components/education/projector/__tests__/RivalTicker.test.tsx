@@ -38,20 +38,28 @@ describe('RivalTicker', () => {
     for (const name of ['Ana', 'Bo', 'Cy', 'Di']) s.fire('rivalFlip', flip(name));
     const items = screen.getAllByTestId('rival-ticker-item');
     expect(items).toHaveLength(RIVAL_TICKER_MAX);
-    expect(items.map((i) => i.textContent)).toEqual([
-      'education.rivals.ticker.flip:Di',
-      'education.rivals.ticker.flip:Cy',
-      'education.rivals.ticker.flip:Bo',
-    ]);
+    expect(items.map((i) => i.textContent)).toEqual(['education.rivals.ticker.flip:Di', 'Cy', 'Bo']);
   });
 
-  it('Given three long flips on one line, When they share the row, Then the newest keeps its whole sentence and the older ones give up the room', () => {
+  it('Given three long flips, When they share the row, Then the newest is the whole sentence and the older ones are name chips that drop whole, never cut mid-sentence', () => {
     const s = fakeSocket();
     render(<RivalTicker socket={s.socket} />);
     for (const name of ['Maximiliana-Josefina', 'Bartholomew-Alexander', 'Konstantina-Evangelia']) s.fire('rivalFlip', flip(name));
-    const items = screen.getAllByTestId('rival-ticker-item');
-    expect(items[0].className).toMatch(/\bshrink-0\b/);
-    expect(items[1].className).not.toMatch(/\bshrink-0\b/);
+    const [lead, ...older] = screen.getAllByTestId('rival-ticker-item');
+    expect(lead).toHaveAttribute('data-kind', 'lead');
+    expect(lead.className).toMatch(/\bshrink-0\b/);
+    expect(lead.outerHTML).not.toMatch(/\btruncate\b/);
+    for (const chip of older) {
+      expect(chip).toHaveAttribute('data-kind', 'chip');
+      expect(chip.className).toMatch(/\bshrink-0\b/);
+      expect(chip.textContent).not.toMatch(/education\.rivals\.ticker\.flip/);
+      expect(chip).toHaveAttribute('aria-label', expect.stringMatching(/^education\.rivals\.ticker\.flip:/));
+      expect(chip.outerHTML).not.toMatch(/\btruncate\b/);
+      expect(screen.getAllByTestId('avatar').length).toBeGreaterThanOrEqual(3);
+    }
+    const chips = screen.getByTestId('rival-ticker-older');
+    expect(chips.className).toMatch(/\bflex-wrap\b/);
+    expect(chips.className).toMatch(/\boverflow-hidden\b/);
   });
 
   it('Given a flip, When it is shown, Then the text names only the winner and carries no score', () => {

@@ -8,6 +8,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+vi.mock('@/components/Avatar', () => ({ default: () => <i data-testid="avatar" /> }));
+
 import RivalChip from '../RivalChip';
 
 function fakeSocket() {
@@ -87,5 +89,29 @@ describe('RivalChip', () => {
     expect(live).toHaveAttribute('aria-live', 'polite');
     expect(live).toHaveTextContent('education.rivals.announce.lead:{"name":"Dana"}');
     expect(screen.getByTestId('rival-chip-diff').className).toMatch(/motion-safe:animate-neo-pop/);
+  });
+
+  it.each([
+    [9, 5, 'bg-neo-lime', '+4'],
+    [3, 7, 'bg-neo-pink', '−4'],
+    [5, 5, 'bg-neo-cream', 'education.rivals.level'],
+  ])('Given my %i vs their %i, When rendered, Then the gap badge is %s and still carries its sign', (mine, theirs, tone, text) => {
+    const s = fakeSocket();
+    render(<RivalChip socket={s.socket} />);
+    s.fire('rivalUpdate', update(mine, theirs));
+    const diff = screen.getByTestId('rival-chip-diff');
+    expect(diff.className).toContain(tone);
+    expect(diff).toHaveTextContent(text);
+  });
+
+  it('Given a rival, When rendered, Then the chip shows their avatar and is a full-size row (36px+, 14px bold text)', () => {
+    const s = fakeSocket();
+    render(<RivalChip socket={s.socket} />);
+    s.fire('rivalUpdate', update(1, 2));
+    expect(screen.getByTestId('rival-chip-avatar')).toBeInTheDocument();
+    const chip = screen.getByTestId('rival-chip');
+    expect(chip.className).toMatch(/\bmin-h-9\b/);
+    expect(chip.className).toMatch(/\btext-sm\b/);
+    expect(chip.className).toMatch(/\bfont-bold\b|\bfont-black\b/);
   });
 });

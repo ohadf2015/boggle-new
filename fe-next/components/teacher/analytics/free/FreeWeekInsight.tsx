@@ -15,7 +15,7 @@ import { FreeGameHeadlineCard } from '@/components/teacher/rounds/FreeGameHeadli
 import { ProInsightLink } from '@/components/teacher/pro/ProInsightLink';
 import { STATUS_VIEW } from '../overview/overviewModel';
 import { PANEL, PANEL_TITLE } from '../overview/overviewParts';
-import { useFreeClassInsight } from './useFreeClassInsight';
+import { useFreeClassInsight, type FreeClassInsightState } from './useFreeClassInsight';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -23,14 +23,33 @@ const NEEDS_HELP_SHOWN = 6;
 const START_BUTTON =
   'inline-flex min-h-12 items-center gap-2 self-start rounded-neo border-[3px] border-neo-black bg-neo-lime px-5 font-neo-display text-base font-black text-neo-black shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
+/** What the week card resolved to, so the page's Pro lock can wait for it and stay quiet beside an empty class. */
+export type FreeWeekStatus = 'pending' | 'empty' | 'data' | 'none';
+
+export function isEmptyWeek(insight: FreeClassInsight): boolean {
+  return insight.sessionsThisWeek === 0 && insight.hardestWords.length === 0 && insight.pulse.needsHelp.length === 0;
+}
+
+function weekStatus(entitlementLoading: boolean, free: boolean, state: FreeClassInsightState): FreeWeekStatus {
+  if (entitlementLoading) return 'pending';
+  if (!free) return 'none';
+  if (state.kind === 'loading' || state.kind === 'idle') return 'pending';
+  if (state.kind === 'free') return isEmptyWeek(state.insight) ? 'empty' : 'data';
+  return 'none';
+}
+
 /** A free teacher's proof for their one free class: this week's who-needs-help and hardest words. Pro sees the full page instead. */
-export function FreeWeekInsight({ classroomId, locale }: { classroomId: string; locale: string }) {
+export function FreeWeekInsight({ classroomId, locale, onStatus }: { classroomId: string; locale: string; onStatus?: (status: FreeWeekStatus) => void }) {
   const { t: rawT } = useLanguage();
   const t = rawT as T;
   const entitlement = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
   const free = !entitlement.loading && !hasProAccess(entitlement, nowMs);
   const state = useFreeClassInsight(classroomId, free);
+  const status = weekStatus(entitlement.loading, free, state);
+  useEffect(() => {
+    onStatus?.(status);
+  }, [onStatus, status]);
 
   if (!free || state.kind === 'idle') return null;
   if (state.kind === 'loading') {
@@ -57,9 +76,8 @@ function WeekCard({ classroomId, locale, insight, t }: { classroomId: string; lo
 
 export function FreeWeekCard({ classroomId, locale, insight, names, t }: { classroomId: string; locale: string; insight: FreeClassInsight; names: Map<string, string>; t: T }) {
   const { needsHelp } = insight.pulse;
-  const empty = insight.sessionsThisWeek === 0 && insight.hardestWords.length === 0 && needsHelp.length === 0;
 
-  if (empty) {
+  if (isEmptyWeek(insight)) {
     return (
       <section data-testid="free-week-insight" data-state="empty" aria-labelledby="free-week-title" className={PANEL}>
         <h2 id="free-week-title" className={PANEL_TITLE}>{t('teacher.weekInsight.emptyTitle')}</h2>

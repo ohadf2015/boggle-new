@@ -13,6 +13,8 @@ import { createPortal } from 'react-dom';
 export interface MpRoundTrayValue {
   registerSlot: (node: HTMLElement | null) => void;
   dockNode: HTMLElement | null;
+  /** The tray's first row, right under the grid. */
+  leadNode?: HTMLElement | null;
 }
 
 export const MpRoundTrayContext = createContext<MpRoundTrayValue | null>(null);
@@ -32,4 +34,10 @@ export function MpTrayNudge({ children }: { children: ReactNode }) {
   const dockNode = useContext(MpRoundTrayContext)?.dockNode;
   if (dockNode) return createPortal(<div className="flex justify-center px-3 pb-1">{children}</div>, dockNode);
   return <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">{children}</div>;
+}
+
+/** A row that belongs right under the grid: the tray's head on a phone, in place elsewhere (desktop rail, trayless boards). */
+export function MpTrayLead({ children }: { children: ReactNode }) {
+  const leadNode = useContext(MpRoundTrayContext)?.leadNode;
+  return leadNode ? createPortal(children, leadNode) : <>{children}</>;
 }

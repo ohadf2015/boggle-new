@@ -5,13 +5,32 @@
  * Math.random during render.
  */
 
-export const WARM_UP_TILES = 6;
-const PAD = 'LEXICLASH';
+import { hebrewLetters, japaneseLetters, russianLetters } from '@/utils/consts';
 
-export function warmUpLetters(name: string): string[] {
+export const WARM_UP_TILES = 6;
+const LATIN_PAD = Array.from('LEXICLASH');
+
+const SCRIPT_ALPHABETS: [RegExp, readonly string[]][] = [
+  [/\p{Script=Hebrew}/u, hebrewLetters],
+  [/\p{Script=Cyrillic}/u, russianLetters],
+  [/[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}]/u, japaneseLetters],
+];
+
+const LANGUAGE_ALPHABETS: Record<string, readonly string[]> = { he: hebrewLetters, ru: russianLetters, ja: japaneseLetters };
+
+/** The name's own script wins (a Hebrew name in an English room still pads in Hebrew); otherwise the class language. */
+function padAlphabet(own: string[], language?: string): readonly string[] {
+  for (const [script, alphabet] of SCRIPT_ALPHABETS) if (own.some((c) => script.test(c))) return alphabet;
+  if (own.length > 0) return LATIN_PAD;
+  return (language && LANGUAGE_ALPHABETS[language]) || LATIN_PAD;
+}
+
+export function warmUpLetters(name: string, language?: string): string[] {
   const own = Array.from(name.toLocaleUpperCase()).filter((c) => /\p{L}/u.test(c));
   const out = own.slice(0, WARM_UP_TILES);
-  for (let i = 0; out.length < WARM_UP_TILES; i++) out.push(PAD[i % PAD.length]);
+  const pad = padAlphabet(own, language);
+  const stride = pad === LATIN_PAD ? 1 : 5;
+  for (let i = 0; out.length < WARM_UP_TILES; i++) out.push(pad[(i * stride) % pad.length]);
   return out;
 }
 

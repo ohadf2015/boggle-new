@@ -237,7 +237,7 @@ function ProjectorBoard({
     <div dir={dir} className={cn('@container', className)}>
       <LeaderboardRowReorder
         rows={reorderRows}
-        className="flex flex-col gap-0 @[52rem]:grid @[52rem]:grid-flow-col @[52rem]:gap-x-4 @[52rem]:[grid-template-rows:repeat(var(--board-rows),auto)]"
+        className="flex flex-col gap-0 @[52rem]:grid @[52rem]:auto-cols-fr @[52rem]:grid-flow-col @[52rem]:gap-x-4 @[52rem]:[grid-template-rows:repeat(var(--board-rows),auto)]"
         style={{ '--board-rows': Math.ceil(rows.length / 2) } as CSSProperties}
         renderRow={(row, index) => {
           const rank = index + 1;

@@ -53,4 +53,12 @@ describe('RoundShop spend button', () => {
     expect(btn.disabled).toBe(false);
     expect(btn.className).toContain('bg-neo-lime');
   });
+
+  it.each([false, true])('Given cash (compact %s), When the spend label renders, Then the number sits inside the translated sentence with no tabular padding around it', (compact) => {
+    hook.snapshot = snap(140);
+    render(<RoundShop gameCode="ABC" compact={compact} />);
+    const btn = screen.getByTestId('round-shop-open');
+    expect(btn).toHaveTextContent('economy.shop.open');
+    for (const el of [btn, ...btn.querySelectorAll('*')]) expect(el.className).not.toMatch(/tabular-nums/);
+  });
 });

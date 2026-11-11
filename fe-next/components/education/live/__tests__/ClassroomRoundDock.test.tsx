@@ -12,6 +12,7 @@ vi.mock('@/components/education/economy/ClassroomStudentDock', () => ({
 import { ClassroomRoundDock } from '../ClassroomRoundDock';
 import { ingestLessonClaimsRound } from '../useLessonClaims';
 import { useClassroomContextStore } from '@/hooks/gameState/classroomContextStore';
+import { MpRoundTrayContext } from '@/components/multiplayer/round/MpRoundTray';
 
 function fakeSocket() {
   const handlers: Record<string, Array<(d: unknown) => void>> = {};
@@ -64,6 +65,22 @@ describe('ClassroomRoundDock: the one row under the grid', () => {
     expect(screen.queryByTestId('lesson-target-strip')).not.toBeInTheDocument();
     expect(screen.getByTestId('rival-chip')).toBeInTheDocument();
     expect(dock.className).toMatch(/pb-\[calc\(3\.5rem\+env\(safe-area-inset-bottom\)\)\]/);
+  });
+
+  it('Given a phone tray with a lead slot, When the round runs, Then the chip and race row move to that slot and the economy stays in the dock', () => {
+    const lead = document.createElement('div');
+    document.body.appendChild(lead);
+    const s = fakeSocket();
+    render(
+      <MpRoundTrayContext.Provider value={{ registerSlot: () => undefined, dockNode: null, leadNode: lead }}>
+        <ClassroomRoundDock gameCode="ABC" socket={s.socket as never} me="Noa" />
+      </MpRoundTrayContext.Provider>,
+    );
+    s.fire('rivalUpdate', duel);
+    expect(lead).toContainElement(screen.getByTestId('classroom-round-row'));
+    expect(screen.getByTestId('classroom-round-dock')).toContainElement(screen.getByTestId('economy-dock'));
+    expect(screen.getByTestId('classroom-round-dock')).not.toContainElement(screen.getByTestId('rival-chip'));
+    lead.remove();
   });
 
   it('Given no race and no rival, When rendered, Then only the economy dock shows', () => {

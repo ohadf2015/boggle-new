@@ -95,11 +95,16 @@ interface ProGateProps {
   polarTrialPlacement?: TrialCtaSource;
   /** Every tone wears the chunky panel, PRO sticker and lime CTA; `calm`/`arcade` pick the trial copy, `arcade` adds the game card and mascot. */
   tone?: 'default' | 'calm' | 'arcade';
+  /** The page already has its one loud action (e.g. "Start a game" on an empty class): the upgrade becomes a plain link. */
+  quiet?: boolean;
 }
 
 const OpenGate = createContext(false);
 
-export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement, tone = 'default' }: ProGateProps) {
+const QUIET_CTA =
+  'inline-flex min-h-11 items-center px-1 font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white disabled:opacity-60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+
+export function ProGate({ feature, children, active = true, whileChecking = null, lockedTitle = null, ctaKey = 'teacher.proGate.cta', polarTrialPlacement, tone = 'default', quiet = false }: ProGateProps) {
   const arcade = tone === 'arcade';
   const calm = tone !== 'default';
   const insideOpenGate = useContext(OpenGate);
@@ -226,7 +231,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               if (!offerTrial) trackProUpgradeClicked({ feature });
               startFromHere(lockAction.start);
             }}
-            className={cn(
+            className={quiet ? QUIET_CTA : cn(
               'inline-block rounded-neo border-neo px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg disabled:opacity-60 max-sm:w-full',
               'bg-neo-lime',
               arcade && 'animate-edu-shine font-neo-display sm:text-lg hover:-translate-y-0.5 motion-reduce:hover:translate-y-0',

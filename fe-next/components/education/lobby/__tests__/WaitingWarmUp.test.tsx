@@ -28,6 +28,14 @@ describe('WaitingWarmUp', () => {
     pulseLive.mockClear();
   });
 
+  it('given a Hebrew name, then the tiles run right to left so the name reads in order, and a Latin name stays left to right', () => {
+    const { unmount } = render(<WaitingWarmUp username="נועה" t={t} />);
+    expect(screen.getAllByRole('button')[0].parentElement).toHaveAttribute('dir', 'rtl');
+    unmount();
+    render(<WaitingWarmUp username="Maya" t={t} />);
+    expect(screen.getAllByRole('button')[0].parentElement).toHaveAttribute('dir', 'ltr');
+  });
+
   it('given the lit letter is tapped, then it clicks and buzzes lightly', () => {
     render(<WaitingWarmUp username="Maya" t={t} />);
     tapHot();
