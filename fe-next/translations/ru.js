@@ -7646,6 +7646,12 @@ const ru = {
     }
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "Почти! До рекорда: {gap}",
+      "rival": "{name} впереди всего на {gap}. Ещё раз?",
+      "newBest": "Новый личный рекорд! Побьёшь его?",
+      "mascotAlt": "Маскот Лекси реагирует"
+    },
     "startCard": {
       "demo": "КОТ",
       "titleOne": "Обыграй {bot}!",

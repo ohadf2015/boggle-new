@@ -102,7 +102,7 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
     expect(body).toMatchObject({ success: true, sent: 1, failed: 0 });
     const mail = h.sendEmailSpy.mock.calls[0][0];
     expect(mail.to).toBe('ada@school.edu');
-    expect(mail.html).toContain('/he/teacher/upgrade?utm_source=email&utm_medium=lifecycle&utm_campaign=abandoned_checkout');
+    expect(mail.html).toContain('/he/teacher/upgrade?utm_source=email&amp;utm_medium=lifecycle&amp;utm_campaign=abandoned_checkout');
     expect(mail.headers['List-Unsubscribe']).toBe(`<https://www.lexiclash.live/api/email/unsubscribe?token=${TOKEN}>`);
     expect(h.inserts).toEqual([
       {
@@ -149,7 +149,7 @@ describe('/api/cron/teacher-abandoned-checkout', () => {
       trial_expires_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
     };
     await POST(makeRequest());
-    expect(h.sendEmailSpy.mock.calls[0][0].subject).toBe('תקופת הניסיון החינמית הסתיימה: ממשיכים עם פרו למורים');
+    expect(h.sendEmailSpy.mock.calls[0][0].subject).toBe('תקופת הניסיון הסתיימה: ממשיכים עם Teacher Pro');
   });
 
   it('no access trial on record keeps the normal trial email', async () => {

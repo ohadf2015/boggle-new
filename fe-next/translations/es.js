@@ -9168,6 +9168,12 @@ const es = {
     "maybeLater": "Quizás después"
   },
   "singlePlayer": {
+    "nearMiss": {
+      "best": "¡Casi! A solo {gap} pts de tu récord",
+      "rival": "¡A solo {gap} pts de {name}! ¿Revancha?",
+      "newBest": "¡Nuevo récord personal! ¿Lo superas?",
+      "mascotAlt": "Lexi, la mascota, reaccionando"
+    },
     "startCard": {
       "demo": "SOL",
       "titleOne": "¡Gánale a {bot}!",

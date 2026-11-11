@@ -64,6 +64,6 @@ describe('TeacherProGrantPanel', () => {
     fireEvent.change(screen.getByLabelText('admin.teacherPro.form.fullName'), { target: { value: 'Tori Plant' } });
     fireEvent.click(screen.getByRole('button', { name: 'admin.teacherPro.form.preview' }));
     const frame = await screen.findByTitle('admin.teacherPro.form.previewTitle');
-    expect(frame.getAttribute('srcdoc')).toContain('Tori Plant');
+    expect(frame.getAttribute('srcdoc')).toContain('Hi Tori,');
   });
 });

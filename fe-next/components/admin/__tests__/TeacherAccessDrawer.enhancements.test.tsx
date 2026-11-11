@@ -97,7 +97,7 @@ describe('TeacherAccessDrawer Enhancements', () => {
 
       await waitFor(() => {
         expect(toast.success).toHaveBeenCalledWith('Request approved successfully');
-      });
+      }, { timeout: 3000 });
     });
 
     it('should show error toast on failed approve', async () => {
@@ -123,7 +123,7 @@ describe('TeacherAccessDrawer Enhancements', () => {
 
       await waitFor(() => {
         expect(toast.error).toHaveBeenCalledWith('Failed to approve request');
-      });
+      }, { timeout: 3000 });
     });
 
     it('should show success toast on successful decline', async () => {

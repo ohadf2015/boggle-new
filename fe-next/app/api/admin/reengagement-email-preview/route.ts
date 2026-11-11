@@ -6,7 +6,7 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
  * GET /api/admin/reengagement-email-preview?language=en
  * Returns rendered HTML preview of the re-engagement email template
  */
-const SUPPORTED_LOCALES = ['he', 'sv', 'ja', 'es', 'en'];
+const SUPPORTED_LOCALES = ['he', 'sv', 'ja', 'es', 'ru', 'en'];
 const escapeHtml = (s: string): string =>
   s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 
@@ -22,10 +22,10 @@ export async function GET(request: NextRequest) {
   const locale = language;
 
   const previewNames: Record<string, string> = {
-    he: 'Fish', sv: 'Erik', ja: 'Yuki', es: 'Carlos',
+    he: 'Fish', sv: 'Erik', ja: 'Yuki', es: 'Carlos', ru: 'Саша',
   };
   const previewLetters: Record<string, string> = {
-    he: 'צ', ja: 'あ', sv: 'S', es: 'P',
+    he: 'צ', ja: 'あ', sv: 'S', es: 'P', ru: 'К',
   };
 
   // Override sample personalization data via query string so the preview
@@ -53,8 +53,8 @@ export async function GET(request: NextRequest) {
 
   // Wrap with preview banner
   const previewHtml = html.replace(
-    '<body>',
-    `<body>
+    /<body[^>]*>/,
+    (body) => `${body}
   <div style="background: linear-gradient(90deg, #FF1493, #00FFFF); color: #000; text-align: center; padding: 10px; font-weight: bold; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">
     RE-ENGAGEMENT EMAIL PREVIEW — Language: ${escapeHtml(language.toUpperCase())}
   </div>`

@@ -22,17 +22,6 @@ vi.mock('@/lib/email', async (orig) => {
   };
 });
 
-// Mock @react-email/components
-vi.mock('@react-email/components', () => ({
-  render: vi.fn().mockResolvedValue('<html>rendered</html>'),
-}));
-
-// Mock the welcome email template
-vi.mock('@/emails/welcome', () => ({
-  default: vi.fn(() => 'mock-template'),
-  getWelcomeSubject: vi.fn((lang: string, name: string) => `Welcome, ${name}!`),
-}));
-
 // Mock logger
 vi.mock('@/backend/utils/logger', () => ({
   default: {
@@ -521,6 +510,14 @@ describe('sendWelcomeEmailToUser', () => {
           }),
         })
       );
+    });
+
+    it('sends the neo welcome layout with a plain-text twin carrying the unsubscribe link', async () => {
+      await sendWelcomeEmailToUser('user-123');
+
+      const arg = mockResendSend.mock.calls[0][0];
+      expect(arg.html).toContain('/email/art/welcome.png');
+      expect(arg.text).toMatch(/api\/email\/unsubscribe\?token=/);
     });
   });
 });

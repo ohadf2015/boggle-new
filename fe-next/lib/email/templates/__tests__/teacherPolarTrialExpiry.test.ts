@@ -1,3 +1,4 @@
+import { escapeHtml } from '@/lib/email/kit/neoEmail';
 import { describe, it, expect } from 'vitest';
 import { teacherPolarTrialExpiry } from '../teacherPolarTrialExpiry';
 import { polarTrialExpiryUpgradeUrl } from '@/lib/education/polarTrialExpiryJourney';
@@ -11,7 +12,7 @@ describe('teacherPolarTrialExpiry', () => {
       trialExpiresAt: '2026-10-15T00:00:00.000Z',
     });
     expect(subject.toLowerCase()).toContain('today');
-    expect(html).toContain(polarTrialExpiryUpgradeUrl('en', 't-0'));
+    expect(html).toContain(escapeHtml(polarTrialExpiryUpgradeUrl('en', 't-0')));
     expect(html).toContain('Maya');
     expect(html).toContain('$9');
   });
@@ -24,7 +25,7 @@ describe('teacherPolarTrialExpiry', () => {
       trialExpiresAt: '2026-10-12T00:00:00.000Z',
     });
     expect(html).toContain('dir="rtl"');
-    expect(html).toContain(polarTrialExpiryUpgradeUrl('he', 't+3'));
+    expect(html).toContain(escapeHtml(polarTrialExpiryUpgradeUrl('he', 't+3')));
     expect(html).not.toContain('Keep Teacher Pro');
   });
 
@@ -50,7 +51,7 @@ describe('teacherPolarTrialExpiry', () => {
     expect(subject).toBe('Your classes are still here');
     expect(html).toContain('Your 3 classes are still on LexiClash');
     expect(html).toContain('7 live games in the last 30 days');
-    expect(html).toContain(polarTrialExpiryUpgradeUrl('en', 't+14'));
+    expect(html).toContain(escapeHtml(polarTrialExpiryUpgradeUrl('en', 't+14')));
   });
 
   it('uses singular copy for one class and one game', () => {
@@ -63,7 +64,7 @@ describe('teacherPolarTrialExpiry', () => {
     });
     expect(html).toContain('Your class is still on LexiClash');
     expect(html).toContain('1 live game in the last 30 days');
-    expect(html).toContain(polarTrialExpiryUpgradeUrl('en', 't+30'));
+    expect(html).toContain(escapeHtml(polarTrialExpiryUpgradeUrl('en', 't+30')));
   });
 
   it('omits the games line when no games were played', () => {
@@ -106,5 +107,26 @@ describe('teacherPolarTrialExpiry', () => {
     expect(subject).toBe('הכיתות שלך עדיין מחכות');
     expect(html).toContain('2 הכיתות שלך');
     expect(html).toContain('5 משחקים חיים');
+  });
+});
+
+describe('teacherPolarTrialExpiry neo layout', () => {
+  const buckets = ['t-0', 't+3', 't+14', 't+30'] as const;
+  it.each(['en', 'he'] as const)('%s renders every bucket on the neo layout without em-dashes', (locale) => {
+    for (const bucket of buckets) {
+      const { subject, html } = teacherPolarTrialExpiry({
+        full_name: 'Maya', locale, bucket, trialExpiresAt: '2026-10-01T00:00:00.000Z', stats: { classrooms: 2, gamesLast30d: 3 },
+      });
+      expect(html).toMatch(/\/email\/art\/[a-z-]+\.png/);
+      expect(html).toMatch(/border-(right|left)-width:6px/);
+      expect(html).not.toMatch(/undefined|\[object|NaN/);
+      expect(`${subject}${html}`).not.toContain('—');
+      expect(html).toContain(escapeHtml(polarTrialExpiryUpgradeUrl(locale, bucket)));
+    }
+  });
+
+  it('the last-day email shows the hourglass', () => {
+    const { html } = teacherPolarTrialExpiry({ full_name: 'Maya', locale: 'en', bucket: 't-0', trialExpiresAt: '2026-10-15T00:00:00.000Z' });
+    expect(html).toContain('/email/art/hourglass.png');
   });
 });

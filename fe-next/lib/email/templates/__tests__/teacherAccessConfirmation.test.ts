@@ -4,10 +4,12 @@ import { teacherAccessConfirmation } from '../teacherAccessConfirmation';
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 describe('teacherAccessConfirmation email', () => {
-  it('includes the welcome hero image', () => {
-    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
-    expect(html).toContain('/email/teacher-welcome.jpg');
-    expect(html).toMatch(/<img[^>]+src=/i);
+  it.each(LOCALES)('%s: neo layout with the welcome mascot and a hard-shadow button', (locale) => {
+    const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale });
+    expect(html).toContain('/email/art/welcome.png');
+    expect(html).toMatch(/border-(right|left)-width:6px/);
+    expect(html).not.toMatch(/undefined|\[object|NaN/);
+    expect(html).not.toContain('/י');
   });
 
   it('links the CTA to the locale teacher dashboard on the live domain', () => {
@@ -20,7 +22,7 @@ describe('teacherAccessConfirmation email', () => {
     // The template HTML-escapes apostrophes (I&#39;m) — assert the escaped form.
     expect(html).toContain('I&#39;m Ohad, the creator of LexiClash');
     expect(html).toContain('ohadf2015@gmail.com');
-    expect(html).toContain('— Ohad');
+    expect(html).toMatch(/>Ohad[ ,]/);
     expect(html).not.toContain('The LexiClash Team');
   });
 
@@ -136,10 +138,9 @@ describe('teacherAccessConfirmation email', () => {
 
     it.each(LOCALES)('%s: in the free access trial asks to keep Pro, with the date and $9, tracked link', (locale) => {
       const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale, trialExpiresAt: inTrial() });
-      expect(html).toContain('id="teacher-pro-line"');
       expect(html).toContain(KEEP[locale]);
       expect(html).toContain('$9');
-      expect(html).toContain(`https://www.lexiclash.live/api/education/email-click?c=approval_email&amp;l=${locale}`.replace('&amp;', '&'));
+      expect(html).toContain(`https://www.lexiclash.live/api/education/email-click?c=approval_email&amp;l=${locale}`);
       // 14日間 is "14 days"; a bare 14日 is also the 14th of a month, as in a trial ending 11月14日.
       expect(html).not.toMatch(/14[- ]day|14 días|14 dagars|14 дней|14日間/);
     });
@@ -147,10 +148,10 @@ describe('teacherAccessConfirmation email', () => {
     it('sits under the main dashboard button, which stays the primary action', () => {
       const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt: inTrial() });
       const main = html.indexOf('Open Teacher Dashboard');
-      const pro = html.indexOf('id="teacher-pro-line"');
+      const pro = html.indexOf('/api/education/email-click?c=approval_email');
       expect(main).toBeGreaterThan(-1);
       expect(pro).toBeGreaterThan(main);
-      expect(html).toContain('href="https://www.lexiclash.live/en/teacher?utm_source=email&utm_medium=lifecycle&utm_campaign=access_approved"');
+      expect(html).toContain('href="https://www.lexiclash.live/en/teacher?utm_source=email&amp;utm_medium=lifecycle&amp;utm_campaign=access_approved"');
     });
 
     it('an ended trial goes straight to $9/mo; no date falls back to the 14-day trial', () => {

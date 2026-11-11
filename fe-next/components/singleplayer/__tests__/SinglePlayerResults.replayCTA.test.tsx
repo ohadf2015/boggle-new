@@ -322,4 +322,46 @@ describe('SinglePlayerResults — replay CTA', () => {
       );
     });
   });
+
+  describe('near-miss line and Again', () => {
+    it('Given a score 5 under the best, When results show, Then the near-miss line sits above Again and is tracked', async () => {
+      await act(async () => {
+        render(
+          <SinglePlayerResults
+            results={{ ...baseResults, previousHighScore: 125 }}
+            mode="practice"
+            onPlayAgain={mockOnPlayAgain}
+            onBackToLobby={mockOnBackToLobby}
+          />,
+        );
+      });
+      const bar = screen.getByTestId('results-next-bar');
+      expect(bar).toContainElement(screen.getByTestId('sp-near-miss'));
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('sp_near_miss_shown', expect.objectContaining({ kind: 'best', gap: 5 }));
+    });
+
+    it('Given the near-miss line, When Again is tapped, Then sp_again_tapped carries the near-miss kind', async () => {
+      const user = userEvent.setup();
+      await act(async () => {
+        render(
+          <SinglePlayerResults
+            results={{ ...baseResults, previousHighScore: 125 }}
+            mode="practice"
+            onPlayAgain={mockOnPlayAgain}
+            onBackToLobby={mockOnBackToLobby}
+          />,
+        );
+      });
+      await user.click(screen.getByTestId('quick-replay-btn'));
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('sp_again_tapped', expect.objectContaining({ mode: 'practice', near_miss: 'best' }));
+    });
+
+    it('Given no prior best, When Again is tapped, Then sp_again_tapped says there was no near-miss', async () => {
+      const user = userEvent.setup();
+      await act(async () => { renderResults(); });
+      expect(screen.queryByTestId('sp-near-miss')).toBeNull();
+      await user.click(screen.getByTestId('quick-replay-btn'));
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('sp_again_tapped', expect.objectContaining({ near_miss: 'none' }));
+    });
+  });
 });

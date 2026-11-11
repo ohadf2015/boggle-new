@@ -57,3 +57,14 @@ describe('teacherGoodwillExtension', () => {
     expect(html).not.toMatch(/survey|typeform|forms\.gle/i);
   });
 });
+
+describe('teacherGoodwillExtension neo layout', () => {
+  it.each(['en', 'he', 'es'] as const)('%s shows the gift art, a hard-shadow button, no emoji subject or em-dashes', (locale) => {
+    const { subject, html } = teacherGoodwillExtension({ full_name: 'Dana', locale, newExpiresAt: NEW_EXPIRY });
+    expect(html).toContain('/email/art/gift.png');
+    expect(html).toMatch(/border-(right|left)-width:6px/);
+    expect(html).not.toMatch(/undefined|\[object|NaN/);
+    expect(`${subject}${html}`).not.toContain('—');
+    expect(subject).not.toMatch(/\p{Extended_Pictographic}/u);
+  });
+});
