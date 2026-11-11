@@ -2,9 +2,9 @@
 // Pure so the window, dedupe and exclusions are testable without a DB or an email provider.
 
 import { testEmailReason } from './checkoutTrafficTags';
+import { teacherEmailUrl } from '@/lib/email/templates/teacherEmailLayout';
 
 const HOUR_MS = 60 * 60 * 1000;
-const SITE = 'https://www.lexiclash.live';
 
 // Neither name nor payload may mention "trial": several readers treat any such event as a used trial.
 export const CHECKOUT_STARTED_EVENT = 'checkout_started';
@@ -77,7 +77,7 @@ export function abandonedCheckoutExcludedUserIds(args: {
 }
 
 export function abandonedCheckoutUpgradeUrl(locale: string): string {
-  return `${SITE}/${locale || 'en'}/teacher/upgrade?utm_source=email&utm_campaign=abandoned_checkout`;
+  return teacherEmailUrl(locale || 'en', '/teacher/upgrade', 'abandoned_checkout');
 }
 
 function isCompletion(eventType: string): boolean {

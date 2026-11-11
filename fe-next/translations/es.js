@@ -22147,6 +22147,19 @@ const es = {
       "soloPractice": "Practicar por tu cuenta"
     },
     "hostResults": {
+      "lessonPlan": {
+        "title": "Esto fue el ensayo. ¿Cuándo es la clase de verdad?",
+        "body": "Dínoslo y te mandamos este juego por correo una hora antes, listo para abrir.",
+        "tomorrow": "Mañana a las 9:00",
+        "pickLabel": "O elige la hora",
+        "remind": "Avísame",
+        "saved": "Te mandaremos el juego por correo una hora antes del {when}.",
+        "change": "Cambiar",
+        "error": "No se ha guardado. Revisa la conexión e inténtalo de nuevo.",
+        "retry": "Reintentar",
+        "tooSoon": "Elige una hora dentro de al menos 30 minutos.",
+        "tooFar": "Elige una fecha dentro de los próximos 60 días."
+      },
       "keepOpen": {
         "cta": "Dejarlo abierto como tarea una semana",
         "hint": "El alumnado puede volver a jugar estas palabras desde el enlace de la clase, cuando quiera, hasta el {date}.",

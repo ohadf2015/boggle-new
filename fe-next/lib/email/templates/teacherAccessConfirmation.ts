@@ -2,6 +2,7 @@ import type { TeacherLocale } from '@/lib/education/types';
 import { teacherTrialStatus } from '@/lib/education/trial';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 interface Args {
   full_name: string;
@@ -232,7 +233,7 @@ export function teacherAccessConfirmation({ full_name, locale, message, trialExp
         </td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px;text-align:${align};">${messageBlock}</td></tr>
         <tr><td align="center" style="padding:8px 28px 28px 28px;">
-          <a href="${SITE}/${locale}/teacher" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
+          <a href="${teacherEmailUrl(locale, '/teacher', 'access_approved')}" style="background:#BFFF00;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
         </td></tr>
         ${proBlock}
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#6b7280;font-size:13px;text-align:${align};">

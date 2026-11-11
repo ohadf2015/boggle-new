@@ -6,6 +6,16 @@ export const TEACHER_EMAIL_SITE = 'https://www.lexiclash.live';
 /** Replies to trial emails go to Ohad, who reads them. */
 export const TEACHER_EMAIL_REPLY_TO = 'ohadf2015@gmail.com';
 
+/** Every teacher-page link in an email goes through here, so the visit it brings is attributed to that email. */
+export function teacherEmailUrl(locale: string, path: string, campaign: string, params: Record<string, string> = {}): string {
+  const url = new URL(`${TEACHER_EMAIL_SITE}/${locale}${path}`);
+  for (const [key, value] of Object.entries(params)) url.searchParams.set(key, value);
+  url.searchParams.set('utm_source', 'email');
+  url.searchParams.set('utm_medium', 'lifecycle');
+  url.searchParams.set('utm_campaign', campaign);
+  return url.toString().replace(/\+/g, '%20');
+}
+
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
@@ -27,6 +37,7 @@ export interface TeacherEmailLayout {
   /** Bold first paragraph. */
   lead: string;
   paragraphs: string[];
+  code?: string;
   /** Pale panel for the feedback ask, so it reads as the point of the email. */
   callout?: string;
   cta: { label: string; href: string };
@@ -48,6 +59,9 @@ export function renderTeacherEmail(l: TeacherEmailLayout): string {
             <tr><td dir="${l.dir}" align="${align}" style="padding:16px 18px;font-family:${FONT};color:${NAVY};font-size:16px;line-height:1.6;text-align:${align};">${escapeHtml(l.callout)}</td></tr>
           </table>
         </td></tr>`
+    : '';
+  const code = l.code
+    ? `<p dir="ltr" style="margin:0 0 16px 0;text-align:center;font-size:30px;font-weight:800;letter-spacing:6px;font-family:'Courier New',monospace;">${escapeHtml(l.code)}</p>`
     : '';
   const secondary = l.secondary
     ? `<p style="margin:14px 0 0 0;font-family:${FONT};font-size:14px;"><a href="${l.secondary.href}" style="color:${NAVY};text-decoration:underline;font-weight:700;">${escapeHtml(l.secondary.label)}</a></p>`
@@ -74,6 +88,7 @@ export function renderTeacherEmail(l: TeacherEmailLayout): string {
           <p style="font-size:20px;font-weight:800;margin:0 0 14px 0;">${escapeHtml(l.greeting)}</p>
           ${p(l.lead, 'font-weight:700;')}
           ${l.paragraphs.map((text) => p(text)).join('\n          ')}
+          ${code}
         </td></tr>
         ${callout}
         <tr><td align="center" style="padding:16px 32px 28px 32px;">

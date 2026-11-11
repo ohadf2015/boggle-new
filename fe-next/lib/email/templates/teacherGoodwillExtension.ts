@@ -1,4 +1,5 @@
 import type { TeacherLocale } from '@/lib/education/types';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 /**
  * The apology-and-extension email: the dashboard button reloaded the page
@@ -21,7 +22,6 @@ function escape(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
-const SITE = 'https://www.lexiclash.live';
 const CONTACT = 'ohadf2015@gmail.com';
 
 const DATE_LOCALE: Record<TeacherLocale, string> = {
@@ -115,7 +115,7 @@ export function teacherGoodwillExtension({ full_name, locale, newExpiresAt }: Ar
           </table>
         </td></tr>
         <tr><td align="center" style="padding:20px 28px;">
-          <a href="${SITE}/${locale}/teacher" style="background:#1a1a2e;color:#BFFF00;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
+          <a href="${teacherEmailUrl(locale, '/teacher', 'goodwill_extension')}" style="background:#1a1a2e;color:#BFFF00;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:16px;padding:14px 28px;border-radius:8px;text-decoration:none;display:inline-block;border:2px solid #1a1a2e;">${escape(c.cta)}</a>
         </td></tr>
         <tr><td dir="${c.dir}" align="${align}" style="padding:0 28px 28px 28px;font-family:Arial,Helvetica,sans-serif;color:#4b5563;font-size:14px;text-align:${align};line-height:1.6;">
           <p style="margin:0 0 12px 0;">${escape(c.ask)}</p>

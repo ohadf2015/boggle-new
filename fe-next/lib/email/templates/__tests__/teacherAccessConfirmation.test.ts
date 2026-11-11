@@ -150,7 +150,7 @@ describe('teacherAccessConfirmation email', () => {
       const pro = html.indexOf('id="teacher-pro-line"');
       expect(main).toBeGreaterThan(-1);
       expect(pro).toBeGreaterThan(main);
-      expect(html).toContain('href="https://www.lexiclash.live/en/teacher"');
+      expect(html).toContain('href="https://www.lexiclash.live/en/teacher?utm_source=email&utm_medium=lifecycle&utm_campaign=access_approved"');
     });
 
     it('an ended trial goes straight to $9/mo; no date falls back to the 14-day trial', () => {

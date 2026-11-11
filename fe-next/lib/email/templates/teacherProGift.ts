@@ -1,4 +1,5 @@
 import type { TeacherLocale } from '@/lib/education/types';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 /**
  * "You're on Teacher Pro — on me." Sent when an admin grants a teacher a
@@ -125,7 +126,7 @@ export function teacherProGift({ full_name, locale, note, expiresAt, pending }: 
   const dateStr = new Date(expiresAt).toLocaleDateString(DATE_LOCALE[locale] || 'en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   });
-  const ctaHref = pending ? `${SITE}/${locale}/education/access` : `${SITE}/${locale}/teacher`;
+  const ctaHref = pending ? `${SITE}/${locale}/education/access` : teacherEmailUrl(locale, '/teacher', 'pro_gift');
   const ctaLabel = pending ? c.pendingCta : c.cta;
   const trimmedNote = (note || '').trim();
 

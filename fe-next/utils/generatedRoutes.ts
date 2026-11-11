@@ -77,6 +77,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/dev/results",
   "/dev/results-stage",
   "/dev/reward-chest",
+  "/dev/streak",
   "/download-word-game-android",
   "/editorial-policy",
   "/education",

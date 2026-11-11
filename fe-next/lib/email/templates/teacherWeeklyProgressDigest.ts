@@ -1,21 +1,21 @@
 import type { TeacherLocale } from '@/lib/education/types';
 import type { WeeklyTeacherDigest } from '@/lib/education/weeklyTeacherDigest';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { teacherEmailUrl } from './teacherEmailLayout';
 
 function escape(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 }
 
-const SITE = 'https://www.lexiclash.live';
 
 function upgradeUrl(locale: string): string {
   const loc = locale.toLowerCase().split('-')[0] || 'en';
-  return `${SITE}/${loc}/teacher/upgrade`;
+  return teacherEmailUrl(loc, '/teacher/upgrade', 'weekly_digest');
 }
 
 function dashboardUrl(locale: string): string {
   const loc = locale.toLowerCase().split('-')[0] || 'en';
-  return `${SITE}/${loc}/teacher`;
+  return teacherEmailUrl(loc, '/teacher', 'weekly_digest');
 }
 
 interface Copy {

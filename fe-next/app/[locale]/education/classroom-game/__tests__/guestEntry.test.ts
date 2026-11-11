@@ -20,8 +20,8 @@ describe('classroom-game guest entry', () => {
     expect(SRC).toMatch(/ClassroomGuestDemo/);
   });
 
-  it('does not send anonymous visitors to /education/access', () => {
-    expect(SRC).not.toMatch(/education\/access/);
+  it('sends only a signed-out visitor holding a class link to /education/access; a guest gets the demo', () => {
+    expect(SRC).toMatch(/searchParams\?\.get\('classroomId'\) \? <SignInToClassGame \/> : <ClassroomGuestDemo \/>/);
   });
 
   it('does not bounce anonymous visitors to consumer quick-play', () => {
