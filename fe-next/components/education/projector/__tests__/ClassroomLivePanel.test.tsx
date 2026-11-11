@@ -61,6 +61,11 @@ describe('ClassroomLivePanel — the host sees the round, the class is not hande
     expect(countBlock.className).toContain('max-md:flex-col');
   });
 
+  it('Given the projector gives the panel less height (a race board under it), Then its type scales to the panel itself, not the screen', () => {
+    render(<ClassroomLivePanel socket={fakeSocket()} totalWords={3} lessonWords={['House']} t={t} />);
+    expect(screen.getByTestId('classroom-live-panel').className).toContain('md:[container-type:size]');
+  });
+
   it('unsubscribes on unmount', () => {
     const socket = fakeSocket();
     const { unmount } = render(<ClassroomLivePanel socket={socket} totalWords={0} lessonWords={[]} t={t} />);

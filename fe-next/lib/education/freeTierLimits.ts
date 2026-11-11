@@ -1,3 +1,5 @@
+import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
+
 /**
  * The free-tier caps and Teacher Pro pricing — the paywall, in one place.
  *
@@ -40,9 +42,7 @@
  * `__tests__/freeTierLimits.test.ts` pins the intent so neither half drifts by accident.
  *
  * 2026-09-21  `assignmentsPerClass: 3` — the usage-triggered paywall's teeth.
- *             The card (components/teacher/TeacherProUsagePromptCard.tsx) asks
- *             at 3+ created assignments; the soft cap in AssignmentCreator is
- *             what makes the ask honest. 3 keeps a real week of assignments
+ *             The soft cap in AssignmentCreator binds at 3+ created assignments. 3 keeps a real week of assignments
  *             free — the same reasoning as the class cap: a paywall that
  *             binds before the teacher has run the loop removes them instead
  *             of converting them. Deleting an old assignment frees a slot, so
@@ -63,6 +63,18 @@ export const FREE_TIER_LIMITS = {
    * the enforce_free_assignment_cap insert trigger refuses the same rows server-side.
    */
   assignmentsPerClass: 3,
+} as const;
+
+/**
+ * What Teacher Pro changes. `null` = no cap. `studentsPerLiveGame` is the figure every
+ * surface states for Pro students: a roster is uncapped for Pro (canAddStudent in
+ * lib/subscriptions.ts) but a live game seats MAX_PLAYERS_PER_ROOM on every plan.
+ */
+export const PRO_LIMITS = {
+  classes: null,
+  assignmentsPerClass: null,
+  studentsPerRoster: null,
+  studentsPerLiveGame: MAX_PLAYERS_PER_ROOM,
 } as const;
 
 /** Teacher Pro monthly price in USD. Used by client-side upgrade/landing pages. */

@@ -9,7 +9,7 @@ import styles from './MpBonusPill.module.css';
 export const BONUS_PILL_MS = 1400;
 
 export type MpWordBonus =
-  | { kind: 'comeback'; pct: number; points: number }
+  | { kind: 'comeback'; points: number }
   | { kind: 'meteor'; points: number };
 
 interface StoredBonus { id: number; bonus: MpWordBonus; ts: number }
@@ -20,7 +20,7 @@ const positive = (n: unknown): n is number => typeof n === 'number' && Number.is
 
 export function bonusFromAccepted(data: { catchUp?: { bonus?: number; pct?: number } | null; meteorBonus?: number }): MpWordBonus | null {
   const c = data.catchUp;
-  if (c && positive(c.bonus) && positive(c.pct)) return { kind: 'comeback', pct: Math.round(c.pct), points: c.bonus };
+  if (c && positive(c.bonus)) return { kind: 'comeback', points: c.bonus };
   if (positive(data.meteorBonus)) return { kind: 'meteor', points: data.meteorBonus };
   return null;
 }
@@ -49,7 +49,7 @@ function MpBonusPillImpl({ className }: { className?: string }) {
   if (!fresh || shownId !== fresh.id) return null;
   const { bonus } = fresh;
   const text = bonus.kind === 'comeback'
-    ? t('mpUi.round.bonusComeback', { pct: bonus.pct })
+    ? t('mpUi.round.bonusComebackPoints', { points: bonus.points })
     : t('mpUi.round.bonusMeteor', { points: bonus.points });
 
   return (

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { Language } from '@/types';
+import toast from 'react-hot-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface UsePlayerLobbyParams {
   socket: Socket | null;
@@ -26,6 +28,7 @@ export function usePlayerLobby({
   username,
   onUsernameChange,
 }: UsePlayerLobbyParams) {
+  const { t } = useLanguage();
   const [isGameLoading, setIsGameLoading] = useState(false);
   const [gameLanguage, setGameLanguage] = useState<Language | null>(null);
   const [readyUsernames, setReadyUsernames] = useState<string[]>([]);
@@ -102,9 +105,18 @@ export function usePlayerLobby({
         onUsernameChange?.(data.newName);
       }
     };
+    const handleNameRefused = (data?: { error?: string; suggestedName?: string }) => {
+      if (data?.error !== 'NAME_NOT_ALLOWED') return;
+      toast.error(t('education.student.join.nameNotAllowed', { suggestedName: data.suggestedName ?? '' }));
+      if (username) import('@/utils/profileStorage').then(({ setStoredUsername }) => setStoredUsername(username));
+    };
     socket.on('guestNameUpdated', handleNameUpdated);
-    return () => { socket.off('guestNameUpdated', handleNameUpdated); };
-  }, [socket, onUsernameChange]);
+    socket.on('error', handleNameRefused);
+    return () => {
+      socket.off('guestNameUpdated', handleNameUpdated);
+      socket.off('error', handleNameRefused);
+    };
+  }, [socket, onUsernameChange, t, username]);
 
   return { isGameLoading, gameLanguage, setGameLanguage, handleNameChange, readyUsernames, isReady, toggleReady, readyInFlight };
 }

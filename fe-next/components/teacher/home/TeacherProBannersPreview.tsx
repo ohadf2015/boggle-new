@@ -10,11 +10,9 @@ import { TeacherProTrialEndedBanner } from '@/components/teacher/TeacherProTrial
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
-import { HomeProCard } from './HomeProCard';
 import { ProGate } from '@/components/teacher/ProGate';
 import { ProInlineLock } from '@/components/teacher/pro/ProInlineLock';
 import { MasteryLockedTeaser } from '@/components/teacher/reports/MasteryLockedTeaser';
-import { UnlockReportUpgradeCta } from '@/components/education/results/UnlockReportUpgradeCta';
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
@@ -32,7 +30,7 @@ function Slot({ name, children }: { name: string; children: ReactNode }) {
 
 /** Dev-only: every Pro ask a teacher can see on Home, on fixture dates, for visual review. */
 export function TeacherProBannersPreview() {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [nowMs] = useState(() => Date.now());
   const iso = (days: number) => new Date(nowMs + days * DAY).toISOString();
   const noop = () => undefined;
@@ -60,11 +58,6 @@ export function TeacherProBannersPreview() {
         <Slot name="PendingCheckoutBanner">
           <PendingCheckoutBanner />
         </Slot>
-        <Slot name="HomeProCard (rail, 320px)">
-          <div className="w-80">
-            <HomeProCard kind="upgrade" onDismiss={noop} trackImpression={false} language={language} t={t as never} />
-          </div>
-        </Slot>
         <Slot name="ProGate reports (default)">
           <ProGate feature="reports"><p>locked content</p></ProGate>
         </Slot>
@@ -76,9 +69,6 @@ export function TeacherProBannersPreview() {
         </Slot>
         <Slot name="MasteryLockedTeaser">
           <MasteryLockedTeaser words={[]} hidden={4} />
-        </Slot>
-        <Slot name="UnlockReportUpgradeCta">
-          <UnlockReportUpgradeCta language={language} t={t as never} missedCount={6} />
         </Slot>
         <Slot name="ResultsTeacherProTrialCard">
           <ResultsTeacherProTrialCard language={language} />

@@ -10,7 +10,7 @@
 
 'use client';
 
-import { Users, User, Accessibility, Check } from 'lucide-react';
+import { Users, User, Accessibility, Check, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from './lobby/LobbyChoiceRow';
@@ -25,6 +25,8 @@ interface ClassroomBattleSettingsProps {
   onPlayStyleChange: (style: PlayStyle) => void;
   onTeamCountChange: (count: number) => void;
   onAccessibilityChange: (next: ClassroomAccessibility) => void;
+  rivalry?: boolean;
+  onRivalryChange?: (on: boolean) => void;
 }
 
 const TEAM_COUNTS = Array.from(
@@ -39,6 +41,8 @@ export function ClassroomBattleSettings({
   onPlayStyleChange,
   onTeamCountChange,
   onAccessibilityChange,
+  rivalry = true,
+  onRivalryChange,
 }: ClassroomBattleSettingsProps) {
   const { t } = useLanguage();
 
@@ -54,7 +58,7 @@ export function ClassroomBattleSettings({
   return (
     <div className="space-y-6">
       {/* Play style */}
-      <div>
+      <div data-testid="battle-playstyle-group">
         <div id="classroom-playstyle-label" className="mb-3 block font-neo-display text-sm font-bold text-neo-cream">
           <Users className="me-2 inline size-4 text-neo-cream/70" />
           {t('teacher.classroom.playStyle.title')}
@@ -129,6 +133,25 @@ export function ClassroomBattleSettings({
             <p className="mt-2 font-neo-body text-xs text-neo-cream/70">
               {t('teacher.classroom.playStyle.autoAssignNote')}
             </p>
+          </div>
+        )}
+        {onRivalryChange && (
+          <div className="mt-3">
+            <button
+              type="button"
+              aria-pressed={rivalry}
+              data-testid="battle-rivalry"
+              onClick={() => onRivalryChange(!rivalry)}
+              className={cn(
+                'inline-flex min-h-[44px] items-center gap-1.5 rounded-neo border-2 px-4 py-2 font-neo-display text-sm font-bold transition-colors',
+                CALM_FOCUS,
+                rivalry ? CALM_SELECTED : CALM_IDLE
+              )}
+            >
+              {rivalry ? <Check className="size-3.5 shrink-0" strokeWidth={3} aria-hidden="true" /> : <Swords className="size-3.5 shrink-0" aria-hidden="true" />}
+              {t('teacher.classroom.rivalry.toggle')}
+            </button>
+            <p className="mt-2 font-neo-body text-xs text-neo-cream/70">{t('teacher.classroom.rivalry.hint')}</p>
           </div>
         )}
       </div>

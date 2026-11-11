@@ -67,7 +67,7 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     unlocked: [
       'Analytics after every game — which words the class struggled with, and who',
       'Printable class and student reports',
-      'Unlimited classes and unlimited students',
+      'Unlimited classes',
     ],
     noCard: 'When it ends, you simply go back to the free plan. We will never charge you without you choosing to.',
     pendingLead: 'There is no LexiClash account with this address yet. Sign up with this exact email and Pro switches on by itself the moment you log in.',

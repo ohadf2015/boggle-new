@@ -38,6 +38,6 @@ export function catchUpForPlayer(game: CatchUpGame, username: string, preScore: 
   const leaderScore = Math.max(...humans.map(scoreOf));
   const rank = 1 + humans.filter((name) => scoreOf(name) > preScore).length;
   const pct = computeCatchUpBonus(rank, humans.length, leaderScore - preScore);
-  const bonus = Math.round(wordScore * pct);
-  return bonus > 0 ? { bonus, pct, rank } : null;
+  if (pct <= 0 || wordScore <= 0) return null;
+  return { bonus: Math.max(1, Math.round(wordScore * pct)), pct, rank };
 }

@@ -83,3 +83,18 @@ describe('classroom launch payload', () => {
     expect(fs.existsSync(path.join(root, 'ClassroomGameLobbyExpress.tsx'))).toBe(false);
   });
 });
+
+describe('rivalry toggle on the wire', () => {
+  const settingsOf = (rivalry: boolean | undefined) =>
+    (wire(splitLaunchPayload(buildClassroomLaunchPayload({ ...LOBBY_DEFAULTS, rivalry })).createPayload) as { settings: Record<string, unknown> }).settings;
+
+  it('Given the teacher turns duels off, Then the server schema keeps rivalry false', () => {
+    const payload = wire(splitLaunchPayload(buildClassroomLaunchPayload({ ...LOBBY_DEFAULTS, rivalry: false })).createPayload);
+    expect(settingsOf(false).rivalry).toBe(false);
+    expect((createClassroomGameSchema.parse(payload) as { settings: { rivalry?: boolean } }).settings.rivalry).toBe(false);
+  });
+
+  it('Given duels left on, Then no rivalry key is sent (absent means on)', () => {
+    expect(settingsOf(true)).not.toHaveProperty('rivalry');
+  });
+});

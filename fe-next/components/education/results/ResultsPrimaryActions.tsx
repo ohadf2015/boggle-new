@@ -26,7 +26,9 @@ import { RotateCcw, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackResultsAction, type ResultsSurface } from './trackResultsAction';
-import { UnlockReportUpgradeCta } from './UnlockReportUpgradeCta';
+import { ProInsightLink } from '@/components/teacher/pro/ProInsightLink';
+import type { MissedWord } from '@/components/education/live/eduReteachModel';
+import { HardestWordsInsight } from './HardestWordsInsight';
 
 /**
  * Two whole class strings (one per tone), held apart so neither can inherit the
@@ -50,10 +52,10 @@ export interface ResultsPrimaryActionsProps {
    * its own Rematch button.
    */
   surface?: ResultsSurface;
-  /** Presentation only — see `UnlockReportUpgradeCta`'s `tone`. */
+  /** Presentation only: `quiet` is the projector's unfilled report link. */
   tone?: 'default' | 'quiet';
-  /** Passed through to the upgrade CTA so it can name the missed words. */
-  missedCount?: number;
+  /** This round's hardest words (roundHardestWords): the free teacher's insight in place of a locked report. */
+  hardestWords?: MissedWord[];
 }
 
 export function ResultsPrimaryActions({
@@ -62,7 +64,7 @@ export function ResultsPrimaryActions({
   t,
   surface = 'teacher_card',
   tone = 'default',
-  missedCount = 0,
+  hardestWords = [],
 }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
@@ -112,7 +114,16 @@ export function ResultsPrimaryActions({
       )}
 
       {showUpgrade ? (
-        <UnlockReportUpgradeCta language={language} t={t} surface={surface} tone={tone} missedCount={missedCount} />
+        <>
+          <HardestWordsInsight words={hardestWords} t={t} />
+          <ProInsightLink
+            placement="results_hardest_words"
+            language={language}
+            label={t('education.results.freeInsight.proLine')}
+            proLabel={t('eduShell.nav.pro')}
+            className="self-center"
+          />
+        </>
       ) : null}
     </div>
   );

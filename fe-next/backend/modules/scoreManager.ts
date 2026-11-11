@@ -26,6 +26,7 @@ export interface ScoreGameBase {
   startTime?: number;
   /** Maps word to the first player who found it (for first-to-find scoring) */
   firstFinderMap?: Record<string, FirstFinderEntry>;
+  lessonClaims?: import('./lessonClaims').LessonClaimsState | null;
   /** Teacher-run room: the host is a spectator, never a contestant. */
   isClassroom?: boolean;
   /** Blast only: per-player coins/diamonds collected */
@@ -397,6 +398,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
   game.playerCombos = {}; // Reset combo tracking for new round
   game.firstWordFound = false; // Reset FIRST_BLOOD achievement flag
   game.firstFinderMap = {}; // Reset first-finder tracking for new round
+  game.lessonClaims = null;
 
   // Re-initialize scores/words only for CURRENT players in the room
   for (const username of Object.keys(game.users)) {

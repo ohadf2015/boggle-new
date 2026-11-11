@@ -15,7 +15,7 @@ export function teacherAccessAdminNotify(req: TeacherAccessFormPayload) {
 <p><strong>Country:</strong> ${escape(req.country || '—')}</p>
 <p><strong>Locale:</strong> ${req.locale}</p>
 <p><strong>Use case:</strong></p>
-<blockquote>${escape(req.use_case)}</blockquote>
+<blockquote>${escape(req.use_case || '—')}</blockquote>
 <p><a href="https://www.lexiclash.live/admin/teacher-access">Review in admin panel</a></p>`,
   };
 }

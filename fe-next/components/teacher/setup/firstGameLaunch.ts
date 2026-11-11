@@ -7,13 +7,16 @@ import { parsePastedWords, type QuickLaunchIntent } from '@/components/teacher/d
 
 export type FirstGameChoice =
   | { kind: 'paste'; words: string[] }
-  | { kind: 'pack'; pack: StarterLessonPack; lessonId: string | null };
+  | { kind: 'pack'; pack: StarterLessonPack; lessonId: string | null }
+  | { kind: 'saved'; lessonId: string; fallback: StarterLessonPack; fallbackTitle: string };
 
 export type FirstGameIntent = Omit<QuickLaunchIntent, 'createdAt'>;
 
 export interface FirstGameLaunch {
   intent: FirstGameIntent;
   assignFailed: boolean;
+  /** The teacher's saved list was not found, so the fallback pack ran instead. */
+  listMissing?: boolean;
 }
 
 const SAVED_LISTS_KEY = 'lexiclash:firstGameSavedLists';
@@ -25,7 +28,7 @@ export function readPasted(raw: string): { words: string[]; skipped: number } {
   return { words, skipped: entries.length - words.length };
 }
 
-function listKey(classroomId: string, choice: FirstGameChoice): string {
+function listKey(classroomId: string, choice: Exclude<FirstGameChoice, { kind: 'saved' }>): string {
   const content = choice.kind === 'paste' ? `paste:${choice.words.map((w) => w.toLocaleLowerCase()).join('\n')}` : `pack:${choice.pack.nameKey}`;
   return `${classroomId}|${content}`;
 }
@@ -70,6 +73,13 @@ export async function firstGameIntent({
   createLesson: CreateLessonFn;
   lessonExists: (id: string) => Promise<boolean>;
 }): Promise<FirstGameLaunch> {
+  if (choice.kind === 'saved') {
+    if (await stillThere(choice.lessonId, lessonExists)) {
+      return { intent: { classroomId, mode: 'classic', title, language, source: 'lesson', lessonId: choice.lessonId }, assignFailed: false };
+    }
+    const fallback = await firstGameIntent({ choice: { kind: 'pack', pack: choice.fallback, lessonId: null }, classroomId, language, title: choice.fallbackTitle, teacherId, createLesson, lessonExists });
+    return { ...fallback, listMissing: true };
+  }
   const listLanguage = choice.kind === 'pack' ? choice.pack.language : language;
   const base = { classroomId, mode: 'classic' as const, title, language: listLanguage };
   const key = listKey(classroomId, choice);

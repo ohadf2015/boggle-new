@@ -33,9 +33,6 @@ let week: Record<string, unknown>;
 vi.mock('@/hooks/useTeacherWeekStats', () => ({ useTeacherWeekStats: () => week }));
 vi.mock('@/hooks/useClassStudentPreview', () => ({ useClassStudentPreview: () => null }));
 vi.mock('@/hooks/useStudentProgressMetrics', () => ({ useStudentProgressMetrics: () => ({ students: [], isLoading: true, error: null, refresh: vi.fn() }) }));
-vi.mock('@/hooks/useTeacherTrialChecklist', () => ({
-  useTeacherTrialChecklist: () => ({ checklist: null, dismiss: vi.fn(), refreshAssignments: vi.fn() }),
-}));
 let lessons: Record<string, unknown>;
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => lessons }));
 

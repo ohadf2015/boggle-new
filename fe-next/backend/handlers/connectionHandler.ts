@@ -38,6 +38,7 @@ import { buildMpDropEvent, buildHostLeftDropEvents } from '../utils/mpDropTeleme
 import { wasRecentAdWatcher } from './lobbyAdGateHandler.js';
 import { getPostHogServer } from '@/lib/posthog';
 import logger from '../utils/logger.js';
+import { notifyRivalLeft } from '../modules/rivalSocket.js';
 
 // Configuration
 // Host grace defaults to 5 minutes so a backgrounded Chrome tab / locked phone
@@ -413,6 +414,7 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
           }
 
           // Clean up player data
+          notifyRivalLeft(gameCode, currentGame, username);
           cleanupPlayerData(currentGame, username);
           removeUserFromGame(gameCode, username);
 

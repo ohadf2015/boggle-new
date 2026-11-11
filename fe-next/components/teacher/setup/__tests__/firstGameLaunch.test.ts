@@ -118,3 +118,29 @@ describe('firstGameIntent', () => {
     expect(resolveIntentMode('classic', convertPackWordsToLessonWords(pack.words))).toBe('classic');
   });
 });
+
+describe('firstGameIntent for the teacher list saved at class setup', () => {
+  const base = { classroomId: 'c1', language: 'he', title: 'Words', teacherId: 't1', createLesson, lessonExists };
+
+  it('Given the saved list exists, Then the launch is Classic on that list in the class language and nothing new is written', async () => {
+    const launch = await firstGameIntent({ ...base, choice: { kind: 'saved', lessonId: 'L-own', fallback: pack, fallbackTitle: 'Pack' } });
+    expect(lessonExists).toHaveBeenCalledWith('L-own');
+    expect(createLesson).not.toHaveBeenCalled();
+    expect(launch).toEqual({ intent: { source: 'lesson', lessonId: 'L-own', mode: 'classic', classroomId: 'c1', language: 'he', title: 'Words' }, assignFailed: false });
+  });
+
+  it('Given the saved list is gone or is not this teacher\'s, Then the starter pack is saved and played instead, and the launch says the list was missing', async () => {
+    lessonExists.mockResolvedValue(false);
+    const launch = await firstGameIntent({ ...base, choice: { kind: 'saved', lessonId: 'L-gone', fallback: pack, fallbackTitle: 'Pack' } });
+    expect(createLesson).toHaveBeenCalledWith(expect.objectContaining({ classroomId: 'c1', language: pack.language, words: convertPackWordsToLessonWords(pack.words) }));
+    expect(launch).toMatchObject({ intent: { source: 'lesson', lessonId: 'L-new', language: pack.language, title: 'Pack' }, listMissing: true });
+  });
+
+  it('Given the lookup fails, Then the saved list is still used, like every other remembered list', async () => {
+    lessonExists.mockRejectedValue(new Error('offline'));
+    const launch = await firstGameIntent({ ...base, choice: { kind: 'saved', lessonId: 'L-own', fallback: pack, fallbackTitle: 'Pack' } });
+    expect(createLesson).not.toHaveBeenCalled();
+    expect(launch.intent).toMatchObject({ lessonId: 'L-own' });
+    expect(launch.listMissing).toBeUndefined();
+  });
+});

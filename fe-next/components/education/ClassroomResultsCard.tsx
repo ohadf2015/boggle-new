@@ -42,6 +42,7 @@ import { classSwept as isClassSwept } from '@/lib/education/roundEndSweep';
 import { ClassNeedsHelp } from './results/ClassNeedsHelp';
 import { ClassroomReteachBox } from './results/ClassroomReteachBox';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
+import { roundHardestWords } from './results/roundHardestWords';
 import { StudentNextActions } from './results/StudentNextActions';
 import { useReteachLinks } from './results/useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
@@ -260,7 +261,7 @@ export function ClassroomResultsCard({
         <ResultsPrimaryActions
           language={language}
           onRematch={onRematch}
-          missedCount={summary.missedWords.length}
+          hardestWords={roundHardestWords(summary)}
           t={t}
         />
       )}

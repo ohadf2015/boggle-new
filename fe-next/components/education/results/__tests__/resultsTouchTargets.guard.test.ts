@@ -10,7 +10,6 @@ const FILES = [
   'components/education/results/StrugglePreview.tsx',
   'components/education/results/ProOfferCompactLink.tsx',
   'components/education/results/ResultsPrimaryActions.tsx',
-  'components/education/results/UnlockReportUpgradeCta.tsx',
   'components/education/results/StudentNextActions.tsx',
   'components/education/results/MissedWordsList.tsx',
   'components/education/results/ParentShareLink.tsx',
@@ -51,7 +50,7 @@ describe('round-end and reports controls meet the motion and focus rules', () =>
     }
   });
 
-  it.each(['components/education/results/ResultsPrimaryActions.tsx', 'components/education/results/UnlockReportUpgradeCta.tsx'])(
+  it.each(['components/education/results/ResultsPrimaryActions.tsx'])(
     '%s: both link tones are 44px tall and show a focus ring',
     (f) => {
       for (const name of ['QUIET_LINK', 'LOUD_LINK']) {

@@ -139,17 +139,17 @@ function MpRoundLayoutImpl({
   // Phone: a board view that marks a tray slot under its grid gets my words, the callouts and its dock there.
   const [slotNode, setSlotNode] = useState<HTMLElement | null>(null);
   const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
-  const trayValue = useMemo<MpRoundTrayValue | null>(() => (wide ? null : { registerSlot: setSlotNode, dockNode }), [wide, dockNode]);
+  const [leadNode, setLeadNode] = useState<HTMLElement | null>(null);
+  const trayValue = useMemo<MpRoundTrayValue | null>(() => (wide ? null : { registerSlot: setSlotNode, dockNode, leadNode }), [wide, dockNode, leadNode]);
   const inTray = !wide && slotNode !== null;
-  const lanes = (
-    <>
-      {/* Word-hunt's clue strip already teaches; its rule stays on the countdown. */}
-      <MpRecentWords words={ladder} label={inTray ? undefined : t('mpUi.round.yourWords')} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />
-      <div className="relative">
-        <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
-      </div>
-    </>
+  /* Word-hunt's clue strip already teaches; its rule stays on the countdown. */
+  const recentWords = <MpRecentWords words={ladder} label={inTray ? undefined : t('mpUi.round.yourWords')} emptyHint={mode.slug === 'wordHunt' ? undefined : t(mode.ruleKey)} />;
+  const callouts = (
+    <div className="relative">
+      <MpCallouts callout={juice.callout} banners={juice.banners} onBannerDone={juice.dropBanner} />
+    </div>
   );
+  const lanes = <>{recentWords}{callouts}</>;
 
   return (
     <MpRoundTrayContext.Provider value={trayValue}>
@@ -303,15 +303,18 @@ function MpRoundLayoutImpl({
       )}
       {!wide && !inTray && dock && <div className={cn(styles.areaDock, 'min-w-0 pt-1')}>{dock}</div>}
       {inTray && slotNode && createPortal(
-        <div data-testid="mp-round-tray" className="pointer-events-none flex min-h-0 flex-1 flex-col gap-1 pt-1">
-          <div data-testid="mp-callout-stage" className="min-h-0 overflow-hidden">
-            <p className="flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase tracking-wider text-neo-white/50">
+        <div data-testid="mp-round-tray" className="pointer-events-none flex min-h-0 flex-1 flex-col gap-1 pt-1 [container-type:size]">
+          <div ref={setLeadNode} data-testid="mp-round-tray-lead" className="shrink-0 empty:hidden" />
+          {/* Short tray: the pills fold to the count line before anything touches the grid. */}
+          <div data-testid="mp-callout-stage" className="min-h-0 flex-1 overflow-hidden [container-type:size]">
+            <p className="flex items-center justify-between px-3 font-neo-display text-[11px] font-bold uppercase leading-[14px] tracking-wider text-neo-white/50">
               <span dir="auto">{t('mpUi.round.yourWords')}</span>
               <span className="tabular-nums">{t('mpUi.round.found', { count: ladder.length })}</span>
             </p>
-            {lanes}
+            <div data-testid="mp-tray-words" className="[@container(max-height:44px)]:hidden">{recentWords}</div>
+            {callouts}
           </div>
-          <div ref={setDockNode} className="pointer-events-auto mt-auto">{dock}</div>
+          <div ref={setDockNode} className="pointer-events-auto shrink-0">{dock}</div>
         </div>,
         slotNode,
       )}

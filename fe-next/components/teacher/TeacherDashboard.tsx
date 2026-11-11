@@ -1,4 +1,4 @@
-/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + one Pro strip. */
+/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + one Pro entry. */
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
@@ -24,7 +24,7 @@ import { useHomeRoster } from './home/HomeRosterLive';
 import { HomeClassRoster } from './home/HomeClassRoster';
 import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
 import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
-import { HomeProCard, type HomeProOfferKind } from './home/HomeProCard';
+import { HomeClassInsightCard } from './home/HomeClassInsightCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { HomeHowItWorks } from './home/HomeHowItWorks';
 import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
@@ -52,18 +52,13 @@ import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
-import { isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
+import { hasProAccess, isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
+import { freeInsightClassId } from '@/lib/education/pro/freeClassInsight';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
   banner?: ReactNode;
-  /** The one free-teacher Pro ask, picked by the route client. Rendered as the rail card. */
-  proOffer?: { kind: HomeProOfferKind; onDismiss: () => void; tracked: boolean; onShown?: () => void } | null;
-  /** Kept for the route client's contract: a pinned banner also lives in the Pro slot. */
-  pinBanner?: boolean;
-  /** The usage-triggered Pro card (10+ students / 3+ assignments). Same slot. */
-  usagePrompt?: ReactNode;
   /** Billing trouble on a paid plan (declined renewal). Sits right under the greeting, above the desk, with or without classes. */
   alert?: ReactNode;
 }
@@ -78,7 +73,7 @@ function greetingKey(hour: number): string {
   return 'eduShell.home.greetEvening';
 }
 
-export default function TeacherDashboard({ banner, proOffer, usagePrompt, alert }: TeacherDashboardProps = {}) {
+export default function TeacherDashboard({ banner, alert }: TeacherDashboardProps = {}) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const { profile } = useAuth();
@@ -219,23 +214,16 @@ export default function TeacherDashboard({ banner, proOffer, usagePrompt, alert 
   const onboardingCardShown = nextStepShown && !hasClasses;
   // One ask per screen: the rail Pro card waits until onboarding is known, and yields to it and to account state.
   const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
+  const freeTeacher = !proLoading && pro.known && !hasProAccess(pro, nowMs);
+  const insightClass = classrooms.find((c) => c.id === freeInsightClassId(classrooms)) ?? null;
   const railAsk = pickHomeAsk({
     account: Boolean(accountBanner),
     onboarding: !hasClasses || nextStepShown,
-    trial: false,
-    usage: Boolean(usagePrompt) && hasClasses,
-    pro: Boolean(proOffer),
+    pro: freeTeacher && insightClass !== null,
   });
-  const proCard = proLoading || hasPro || !askSettled ? null : railAsk === 'usage' ? (
-    <div data-testid="home-pro-slot">{usagePrompt}</div>
-  ) : railAsk === 'pro' && proOffer ? (
-    <HomeProCard kind={proOffer.kind} onDismiss={proOffer.onDismiss} trackImpression={!proOffer.tracked} language={language} t={t} />
+  const proCard = askSettled && railAsk === 'pro' && insightClass ? (
+    <HomeClassInsightCard classroomId={insightClass.id} className={insightClass.name} language={language} t={t} />
   ) : null;
-  const proOfferShown = proCard !== null && railAsk === 'pro';
-  const onProOfferShown = proOffer?.onShown;
-  useEffect(() => {
-    if (proOfferShown) onProOfferShown?.();
-  }, [proOfferShown, onProOfferShown]);
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);
   useEffect(() => {

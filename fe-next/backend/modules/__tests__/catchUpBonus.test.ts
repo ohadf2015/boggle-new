@@ -43,6 +43,19 @@ describe('catchUpForPlayer', () => {
     expect(r!.rank).toBe(3);
   });
 
+  it('Given a short word whose percent rounds to nothing, When the bonus applies, Then it pays at least 1 point', () => {
+    const r = catchUpForPlayer(room({ lead: 400, mid: 200, tail: 50 }), 'tail', 50, 1);
+    expect(r).toMatchObject({ bonus: 1, rank: 3 });
+  });
+
+  it('Given a 0-point word, When trailing, Then no bonus is paid', () => {
+    expect(catchUpForPlayer(room({ lead: 400, mid: 200, tail: 50 }), 'tail', 50, 0)).toBeNull();
+  });
+
+  it('Given a tiny gap that gives a 0% bonus, Then the floor does not apply', () => {
+    expect(catchUpForPlayer(room({ lead: 51, mid: 51, tail: 50 }), 'tail', 50, 3)).toBeNull();
+  });
+
   it('never pays the leader', () => {
     expect(catchUpForPlayer(room({ lead: 400, mid: 200, tail: 50 }), 'lead', 400, 100)).toBeNull();
   });

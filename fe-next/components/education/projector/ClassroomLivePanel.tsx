@@ -63,7 +63,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
     <section
       data-testid="classroom-live-panel"
       aria-label={t('eduLive.live.panelTitle')}
-      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.6cqh,20px)] overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated p-[clamp(10px,2cqh,28px)] text-neo-cream shadow-hard-lg"
+      className="flex h-full min-h-0 flex-col gap-[clamp(8px,1.6cqh,20px)] overflow-hidden rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated md:[container-type:size] p-[clamp(10px,2cqh,28px)] text-neo-cream shadow-hard-lg"
     >
       <div className="flex shrink-0 flex-wrap items-end justify-between gap-3">
         <div className="flex items-baseline gap-2 max-md:flex-col max-md:items-start max-md:gap-1">
@@ -73,18 +73,18 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
             initial={reduceMotion ? false : { scale: 1.25 }}
             animate={{ scale: 1 }}
             transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 520, damping: 16 }}
-            className="inline-block font-neo-display font-black leading-none tabular-nums text-neo-lime text-[44px] md:text-[clamp(36px,8cqh,110px)]"
+            className="inline-block font-neo-display font-black leading-none tabular-nums text-neo-lime text-[44px] md:text-[clamp(32px,min(15cqh,24cqw),110px)]"
           >
             {shownTotal}
           </m.span>
-          <span className="font-neo-display font-black uppercase tracking-wide text-[13px] md:text-[clamp(13px,2.2cqh,30px)]">
+          <span className="font-neo-display font-black uppercase tracking-wide text-[13px] md:text-[clamp(13px,min(4.5cqh,6.5cqw),30px)]">
             {t('eduLive.live.wordsFound')}
           </span>
         </div>
 
         {lessonTotal > 0 && (
           <div data-testid="live-lesson-meter" className="flex min-w-[9rem] flex-1 flex-col gap-1 md:min-w-[min(100%,14rem)] sm:max-w-[24rem]">
-            <span className="flex items-center gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(12px,1.8cqh,24px)]">
+            <span className="flex items-center gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(12px,1.8cqh,24px)] md:text-[clamp(12px,min(3.6cqh,5.5cqw),24px)]">
               <BookOpen className="size-[1.1em] shrink-0 text-neo-cyan" aria-hidden />
               {t('eduLive.live.lessonFound', { found: lessonFound, total: lessonTotal })}
             </span>
@@ -104,7 +104,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
         // A phone has room for the count and the meter; the teaser is a projector moment.
         className="hidden min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(6px,1.4cqh,18px)] rounded-neo border-[3px] border-dashed border-neo-cream/50 bg-neo-navy px-3 py-2 text-center md:flex"
       >
-        <span className="inline-flex items-center gap-2 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display font-black uppercase tracking-widest text-neo-black text-[clamp(11px,1.7cqh,22px)] shadow-hard-sm">
+        <span className="inline-flex items-center gap-2 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 font-neo-display font-black uppercase tracking-widest text-neo-black text-[clamp(11px,min(3.4cqh,5cqw),22px)] shadow-hard-sm">
           <Sparkles className="size-[1em] shrink-0" aria-hidden />
           {t('eduLive.live.wordOfRound')}
         </span>
@@ -124,7 +124,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   data-testid="live-word-tile"
                   className={cn(
                     'grid place-items-center rounded-neo border-[3px] border-neo-black font-neo-display font-black leading-none shadow-[3px_3px_0_rgb(var(--neo-black))]',
-                    'size-[clamp(26px,6cqh,76px)] text-[clamp(16px,4cqh,52px)]',
+                    'size-[clamp(22px,min(11cqh,13cqw),76px)] text-[clamp(13px,min(7.5cqh,9cqw),52px)]',
                     letter ? 'bg-neo-cream text-neo-black' : 'bg-neo-purple/80 text-neo-cream'
                   )}
                 >
@@ -132,7 +132,7 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                 </span>
               ))}
             </span>
-            <span className="font-neo-body font-bold text-[clamp(12px,2cqh,26px)]">
+            <span className="font-neo-body font-bold text-[clamp(12px,min(4cqh,6.5cqw),26px)]">
               {t('eduLive.live.bestWordBy', { count: tiles.length, name: state.best.username })}
             </span>
           </m.div>
@@ -144,13 +144,13 @@ export const ClassroomLivePanel = memo<ClassroomLivePanelProps>(function Classro
                   key={i}
                   data-testid="live-word-ghost"
                   style={{ animationDelay: `${i * 140}ms` }}
-                  className="grid size-[clamp(26px,6cqh,76px)] place-items-center rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(16px,4cqh,52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
+                  className="grid size-[clamp(22px,min(11cqh,13cqw),76px)] place-items-center rounded-neo border-[3px] border-dashed border-neo-cream/60 bg-neo-purple/25 font-neo-display text-[clamp(13px,min(7.5cqh,9cqw),52px)] font-black leading-none text-neo-cream/40 motion-safe:animate-[edu-ghost-wave_2.4s_cubic-bezier(0.45,0,0.55,1)_infinite]"
                 >
                   ?
                 </span>
               ))}
             </span>
-            <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(12px,2cqh,26px)]">
+            <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(12px,min(4cqh,6.5cqw),26px)]">
               {t('eduLive.live.wordOfRoundEmpty')}
             </p>
           </>

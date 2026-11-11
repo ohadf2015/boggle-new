@@ -5,7 +5,7 @@ import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { LOBBY_LOCK_EVENTS, lockSeatsOf, setClassroomLobbyLocked } from '../modules/classroomLobbyLock.js';
 import { getGameUsers } from '../modules/gameStateManager.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -32,7 +32,7 @@ export function registerClassroomLobbyLockHandlers(io: Server, socket: Socket): 
     const { gameCode, locked } = parsed.data as { gameCode: string; locked: boolean };
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      refuse(gameCode);
+      refuseUnidentified(socket, 'setLobbyLock', { gameCode });
       return;
     }
 

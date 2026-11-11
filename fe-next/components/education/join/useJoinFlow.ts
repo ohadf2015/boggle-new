@@ -8,22 +8,16 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useJoinClassroom } from '@/hooks/useJoinClassroom';
 import { trackEduClassroomJoin, trackJoinCodeStepRefused, trackStudentJoinStarted } from '@/lib/education/telemetry';
 import logger from '@/utils/logger';
-import type { JoinTarget } from './joinTarget';
 import { sanitizeJoinCode, joinCodeOverflows, JOIN_CODE_LENGTH } from './JoinCodeField';
 import { useJoinTargetLookup } from './useJoinTargetLookup';
 import { joinFailure } from './joinFailure';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
+import type { JoinFlowState, JoinStep, JoinedClassroom } from './joinFlowState';
+
+export type { JoinFlowState, JoinStep, JoinedClassroom } from './joinFlowState';
 
 const CODE_TOO_LONG = 'eg2Fix.join.codeTooLong';
-
-export type JoinStep = 'code' | 'name';
-
-/** A roster join that stayed on this screen instead of leaving for the hub. */
-export interface JoinedClassroom {
-  classroomId: string;
-  alreadyMember: boolean;
-}
 
 /**
  * How long a held tap waits for the session before going anyway.
@@ -63,43 +57,6 @@ const NAME_REQUIRED_KEY = 'education.student.join.flow.nameRequired';
  * inside `useJoinClassroom` refuses a confidently-invalid code before any
  * anonymous account is minted, so being optimistic in the UI costs nothing.
  */
-export interface JoinFlowState {
-  step: JoinStep;
-  code: string;
-  name: string;
-  /** Resolved class/teacher behind the code, or null while unknown. */
-  target: JoinTarget | null;
-  isChecking: boolean;
-  isSubmitting: boolean;
-  /** Held tap waiting on an unresolved session. */
-  isHolding: boolean;
-  /** Guests type a nickname; so does anyone who already typed one. */
-  showNameField: boolean;
-  /** True once we are SURE the code is wrong. `unverified` never sets this. */
-  codeRejected: boolean;
-  codeErrorKey: string | null;
-  /** Bumps on every refused tap, so the same refusal shown twice still replays its alert. */
-  refusalTick: number;
-  formErrorKey: string | null;
-  nameError: boolean;
-  suggestedName: string | null;
-  /** After a roster join: the fallback success panel while the push to the class view is in flight. */
-  joined: JoinedClassroom | null;
-  /** The game behind this code is over: retrying it can only fail. */
-  ended: boolean;
-  /** The class the server enrolled them in off an ended game code, if any. */
-  endedClassroomId: string | null;
-  canSubmit: boolean;
-  setCode: (next: string) => void;
-  setName: (next: string) => void;
-  /** Pass the freshest code when the caller has it (the sixth keystroke). */
-  advance: (codeArg?: string) => void;
-  refuseTooLong: () => void;
-  backToCode: () => void;
-  typeNewCode: () => void;
-  submit: (overrideName?: string) => void;
-}
-
 export function useJoinFlow(
   initialCode = '',
   onSuccessBeforeNavigation?: () => Promise<void> | void,
@@ -366,7 +323,7 @@ export function useJoinFlow(
           if (failure.effect === 'name_taken') {
             // A problem the student can fix in a single tap should cost them a single tap.
             setSuggestedName(result.suggestedName ?? null);
-            setNameError(true);
+            setNameError(true); setFormErrorKey(failure.formErrorKey ?? null);
           } else if (failure.formErrorKey) {
             setFormErrorKey(failure.formErrorKey);
           } else if (failure.effect === 'ended') {

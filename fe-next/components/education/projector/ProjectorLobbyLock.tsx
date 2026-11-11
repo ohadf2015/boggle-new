@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { PRESS, type Translate } from '@/components/education/live/eduLiveStyles';
 import { LOBBY_LOCK_EVENTS, LOBBY_LOCK_FAILED, type LobbyLockChange } from '@/shared/types/classroomLobbyLock';
+import { isClassroomIdentityRefusal } from '@/shared/constants/classroomIdentityRefusal';
 
 const K = 'education.projectorLobby.lock';
 const ACK_TIMEOUT_MS = 5000;
@@ -32,7 +33,7 @@ export function useProjectorLobbyLock(gameCode: string) {
       setFailed(false);
     };
     const onError = (data: { code?: string; gameCode?: string }) => {
-      if (data?.code !== LOBBY_LOCK_FAILED || (data.gameCode && data.gameCode !== gameCode)) return;
+      if ((data?.code !== LOBBY_LOCK_FAILED && !isClassroomIdentityRefusal(data)) || (data.gameCode && data.gameCode !== gameCode)) return;
       settle();
       setFailed(true);
     };

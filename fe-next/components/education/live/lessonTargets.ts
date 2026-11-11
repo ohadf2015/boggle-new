@@ -1,6 +1,7 @@
 import { isWordOnBoard } from '@/utils/utils';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import type { Language, LetterGrid } from '@/shared/types/game';
+import type { LessonClaimAvatar, LessonClaimsView } from '@/shared/types/lessonClaims';
 
 export interface LessonTarget {
   word: string;
@@ -44,4 +45,37 @@ export function buildLessonTargets(input: LessonTargetsInput): LessonTarget[] | 
 export function maskLessonWord(word: string): { first: string; rest: number } {
   const chars = Array.from(word.trim());
   return { first: (chars[0] ?? '').toUpperCase(), rest: Math.max(0, chars.length - 1) };
+}
+
+export type StripSlotState = 'hidden' | 'mine' | 'taken';
+
+export interface StripSlot {
+  key: string;
+  first: string;
+  rest: number;
+  state: StripSlotState;
+  word?: string;
+  by?: string;
+  avatar?: LessonClaimAvatar | null;
+}
+
+export function targetsToSlots(targets: readonly LessonTarget[]): StripSlot[] {
+  return targets.map(({ word, found }): StripSlot => {
+    const { first, rest } = maskLessonWord(word);
+    return found ? { key: word, first, rest, state: 'mine', word } : { key: word, first, rest, state: 'hidden' };
+  });
+}
+
+/** The server's race list as strip slots; claims are matched to me case-insensitively, like seat names. */
+export function buildRaceSlots(view: LessonClaimsView, me: string): StripSlot[] {
+  const mine = me.toLowerCase();
+  return view.slots.map(({ index, first, length, claim }): StripSlot => {
+    const base = { key: String(index), first, rest: Math.max(0, length - 1) };
+    if (claim) {
+      return claim.username.toLowerCase() === mine
+        ? { ...base, state: 'mine', word: claim.word }
+        : { ...base, state: 'taken', word: claim.word, by: claim.username, avatar: claim.avatar };
+    }
+    return { ...base, state: 'hidden' };
+  });
 }

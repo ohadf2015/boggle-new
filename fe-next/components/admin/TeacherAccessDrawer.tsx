@@ -112,7 +112,7 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
         </dl>
         <div className="mt-4">
           <h3 className="font-semibold">{t('admin.teacherAccess.field.use_case')}</h3>
-          <p className="mt-1 whitespace-pre-wrap rounded bg-slate-100 p-3 text-sm text-neo-navy">{row.use_case}</p>
+          <p data-testid="tar-drawer-use-case" className="mt-1 whitespace-pre-wrap rounded bg-slate-100 p-3 text-sm text-neo-navy">{row.use_case || '—'}</p>
         </div>
         <div className="mt-4">
           <label htmlFor="admin-note" className="font-semibold">{t('admin.teacherAccess.admin_note')}</label>

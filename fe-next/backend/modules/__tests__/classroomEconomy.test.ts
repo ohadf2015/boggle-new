@@ -188,6 +188,19 @@ describe('chest odds and roll', () => {
     expect(total).toBeCloseTo(1, 10);
   });
 
+  it('Given an underdog finish, When the chest rolls, Then its rarity is one tier up from the same seed', () => {
+    const up = { common: 'rare', rare: 'epic', epic: 'epic' } as const;
+    for (let i = 0; i < 300; i++) {
+      expect(rollChest(`seed-${i}`, { underdog: true }).rarity).toBe(up[rollChest(`seed-${i}`).rarity]);
+    }
+  });
+
+  it('Given a boss win and an underdog finish, When the chest rolls, Then it stacks two tiers and never passes epic', () => {
+    for (let i = 0; i < 300; i++) {
+      expect(rollChest(`seed-${i}`, { bossWin: true, underdog: true }).rarity).toBe('epic');
+    }
+  });
+
   it('Given the same seed, Then the roll is deterministic', () => {
     expect(rollChest('ABC:r1:u1')).toEqual(rollChest('ABC:r1:u1'));
   });

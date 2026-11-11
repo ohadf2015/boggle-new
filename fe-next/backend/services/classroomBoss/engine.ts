@@ -110,6 +110,7 @@ export interface WordInput {
   word: string;
   score: number;
   now: number;
+  fromLesson?: boolean;
 }
 
 export interface WordResult {
@@ -124,13 +125,14 @@ export function applyWord(s: BossState, w: WordInput): WordResult {
   const len = [...w.word].length;
   const count = w.now - s.combo.lastAt <= R.comboWindowMs ? s.combo.count + 1 : 1;
   const multiplier = comboMultiplier(count);
-  const crit = len >= R.critLen;
   const exposed = w.now < s.exposedUntil;
+  const lesson = !!w.fromLesson && exposed;
+  const crit = len >= R.critLen || lesson;
   const raw = Math.max(1, Math.round(w.score * (crit ? 2 : 1) * multiplier * (exposed ? R.exposedMult : 1)));
   // Armor: word scores are exponential, so one long crit at x4 would otherwise one-shot a small class's boss.
   const dmg = Math.min(raw, Math.ceil(s.maxHp * R.maxHitPct));
   const hp = Math.max(0, s.hp - dmg);
-  const hit = { username: w.username, word: w.word, dmg, crit, multiplier };
+  const hit = { username: w.username, word: w.word, dmg, crit, multiplier, ...(lesson && { lesson }) };
 
   let next: BossState = {
     ...s,
@@ -139,7 +141,7 @@ export function applyWord(s: BossState, w: WordInput): WordResult {
     shield: len >= R.shieldLen ? Math.min(R.shieldMax, s.shield + 1) : s.shield,
     damageBy: { ...s.damageBy, [w.username]: (s.damageBy[w.username] ?? 0) + dmg },
     hitSeq: s.hitSeq + 1,
-    lastHits: [{ id: s.hitSeq + 1, username: w.username, word: w.word, dmg, crit, ...(exposed && { exposed }) }, ...s.lastHits].slice(0, R.lastHits),
+    lastHits: [{ id: s.hitSeq + 1, username: w.username, word: w.word, dmg, crit, ...(exposed && { exposed }), ...(lesson && { lesson }) }, ...s.lastHits].slice(0, R.lastHits),
   };
 
   if (next.telegraph && len >= R.staggerLen) {

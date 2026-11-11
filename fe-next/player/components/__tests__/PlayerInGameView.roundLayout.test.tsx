@@ -198,6 +198,15 @@ describe('PlayerInGameView — round frame', () => {
     expect(screen.getByTestId('mp-round-canvas')).toContainElement(screen.getByTestId('blast-game'));
   });
 
+  it('classroom tray: the duel chip, word race and economy share one dock after the board, never inside it or pinned over it', () => {
+    render(<PlayerInGameView {...baseProps} />);
+    const dock = screen.getByTestId('classroom-round-dock');
+    const canvas = screen.getByTestId('mp-round-canvas');
+    expect(canvas).not.toContainElement(dock);
+    expect(canvas.compareDocumentPosition(dock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(dock.closest('.fixed')).toBeNull();
+  });
+
   it('continue-solo leaves through useMpExit, not router.push', () => {
     abort.value = true;
     const exit = vi.fn();

@@ -5,7 +5,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, classroomIdentityRefusal } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { getRedisClient } from '../redisClient.js';
 import { getGameAsync } from '../modules/gameStateManager.js';
@@ -24,6 +24,7 @@ import {
 import { loadConfig, saveEconomyConfig, readEconomy } from '../modules/classroomEconomyStore.js';
 import { grantRoundChest } from '../modules/classroomEconomyChest.js';
 import { roomBossWon } from '../services/classroomBoss/roomBoss.js';
+import { underdogFor } from '../modules/classroomUnderdog.js';
 import { readLocker } from '../modules/classroomEconomyLocker.js';
 import logger from '../utils/logger.js';
 
@@ -165,7 +166,7 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
       return refusedTo(socket, 'requestReward', gameCode, reason, E.reward, null);
     }
     const summary = await roundSummaryFor(gameCode, roundId, userId);
-    const reveal = await grantRoundChest({ gameCode, roundId, userId, summary, bossWin: roomBossWon(gameCode, roundId) });
+    const reveal = await grantRoundChest({ gameCode, roundId, userId, summary, bossWin: roomBossWon(gameCode, roundId), underdog: underdogFor(game, userId) });
     socket.emit(E.reward, reveal);
   });
 
@@ -209,7 +210,8 @@ export function registerClassroomEconomyHandlers(_io: Server, socket: Socket): v
   socket.on(E.setConfig, async (data: { gameCode?: unknown; economy?: { wrongAnswerCost?: unknown; powerUps?: unknown } }) => {
     const userId = getAuthUserId(socket);
     const gameCode = typeof data?.gameCode === 'string' ? data.gameCode : null;
-    if (!userId || !gameCode || !checkRateLimit(socket.id)) return;
+    if (!gameCode || !checkRateLimit(socket.id)) return;
+    if (!userId) { socket.emit(E.error, { reason: classroomIdentityRefusal(socket).code === 'AUTH_UNVERIFIED' ? 'auth_unverified' : 'not_signed_in' }); return; }
     const game = await getClassroomGame(gameCode);
     if (!game || game.teacherId !== userId) { socket.emit(E.error, { reason: 'not_teacher' }); return; }
     if (!getRedisClient()) { socket.emit(E.error, { reason: 'unavailable' }); return; }

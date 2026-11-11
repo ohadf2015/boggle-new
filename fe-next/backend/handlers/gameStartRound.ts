@@ -139,7 +139,7 @@ export function scheduleSpecialWords(gameCode: string, letterGrid: LetterGrid, g
  * and re-send each student their own word bank. Per-socket, not a broadcast:
  * `classroomLevel` differs per student (pitfall class 3).
  */
-export function recordClassroomWordBank(io: Server, gameCode: string, game: GameState, letterGrid: LetterGrid, gameLang: Language, vocabToEmbed: string[], teacherId?: string): void {
+export function recordClassroomWordBank(io: Server, gameCode: string, game: GameState, letterGrid: LetterGrid, gameLang: Language, vocabToEmbed: string[], teacherId?: string): string[] {
   const finalPositions = makePositionsMap(letterGrid, gameLang);
   const placedVocabulary = vocabToEmbed
     .filter((word) => isWordOnBoard(word, letterGrid, finalPositions, gameLang))
@@ -161,6 +161,7 @@ export function recordClassroomWordBank(io: Server, gameCode: string, game: Game
     // Never silent: a word bank degrading to the full lesson list must leave a trace (class 4).
     logger.warn('CLASSROOM_GAME', `Word-bank refresh failed for ${gameCode}: ${err}`);
   });
+  return placedVocabulary;
 }
 
 /**

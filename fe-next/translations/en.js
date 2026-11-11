@@ -245,6 +245,7 @@ const en = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "LESSON HIT!",
     "chestUpgraded": "Boss defeated: your chest was upgraded!",
     "topHitter": "Top hitter",
     "cardHow": "The whole class vs one boss. Every word you find is a hit.",
@@ -455,7 +456,8 @@ const en = {
         "ready": "Treasure chest ready",
         "collected": "Chest collected",
         "round": "This round: {cash} cash",
-        "rank": "#{rank} of {size} this round"
+        "rank": "#{rank} of {size} this round",
+        "comeback": "Comeback chest! It got an upgrade"
       },
       "locker": {
         "title": "Your locker",
@@ -13099,7 +13101,7 @@ const en = {
       "perk": {
         "analytics": "See which words the class struggled with, after every game",
         "reports": "Printable class and student reports",
-        "unlimited": "Unlimited classes and students"
+        "unlimited": "Unlimited classes, no class size limit"
       },
       "noCard": "When it ends you simply go back to the free plan. We'll never charge you unless you choose to subscribe.",
       "paidBody": "Your Teacher Pro subscription is active. Manage or cancel it anytime from your teacher profile.",
@@ -13150,7 +13152,7 @@ const en = {
     },
     "upgradePro": {
       "cta": "Upgrade to Teacher Pro",
-      "body": "Get unlimited classes and students"
+      "body": "Get unlimited classes and no class size limit"
     },
     "dashboard": {
       "title": "Teacher dashboard",
@@ -13203,6 +13205,10 @@ const en = {
       "scanToJoin": "Scan to join"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Rival duels",
+        "hint": "Each student gets one rival close to their level for the round."
+      },
       "studentCap": "{{count}} / {{limit}} students",
       "studentCountPro": "{{count}} students",
       "cardSeeAllStudents": "See all {{count}} students",
@@ -14156,15 +14162,15 @@ const en = {
       "giftedUntil": "Complimentary Pro until",
       "giftedBadge": "Gift",
       "classLimitTitle": "You've reached your class limit",
-      "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
+      "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes.",
       "studentLimitTitle": "You've reached your student limit",
-      "studentLimitMessage": "This class has {{current}} of {{limit}} free students. Upgrade to Pro for unlimited students.",
+      "studentLimitMessage": "This class has {{current}} of {{limit}} students, the free limit. Teacher Pro removes the class size limit. A live game has the same size on every plan.",
       "usagePromptTitle": "Your class is ready for Teacher Pro",
-      "usagePromptStudentsBody": "You now have {{count}} students in a classroom. Teacher Pro lifts the cap: unlimited classes and students, plus progress analytics and printable reports.",
+      "usagePromptStudentsBody": "You now have {{count}} students in a classroom. Teacher Pro removes the class size limit and adds unlimited classes, progress analytics and printable reports. A live game has the same size on every plan.",
       "usagePromptAssignmentsBody": "You've created {{count}} assignments for a classroom. Teacher Pro lifts the cap: unlimited assignments, plus progress analytics and printable reports.",
       "assignmentLimitTitle": "Assignment limit reached",
       "assignmentLimitMessage": "You've created {{current}} of {{limit}} free assignments for this class. Upgrade to Pro for unlimited assignments.",
-      "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class.",
+      "upgradeProDescription": "Pro gives you unlimited classes, no class size limit, progress analytics and printable reports.",
       "trialExpiredTitle": "Want more than the free plan?",
       "trialExpiredMessage": "The free plan keeps working with no time limit. Pro adds unlimited classes and progress reports, and new accounts get 14 days free.",
       "continueFree": "Stay on the free plan",
@@ -14271,9 +14277,52 @@ const en = {
       "slipType": "and type the code",
       "slipNoAccount": "No account or email needed.",
       "invalid": "This page is missing a class code. Open it again from your teacher home."
+    },
+    "weekInsight": {
+      "title": "Who needs help this week",
+      "nobodyStuck": "Nobody is stuck this week.",
+      "more": "+{{count}} more",
+      "hardestTitle": "Hardest words this week",
+      "missed": "{{pct}}% missed",
+      "emptyTitle": "No games this week yet",
+      "emptyBody": "Play one game with this class and you'll see who needs help.",
+      "startGame": "Start a game",
+      "proLine": "See every week and each student with Pro",
+      "homeTitle": "Who needs help in {{name}} this week?",
+      "homeBody": "Free for one class. Pro adds past weeks, a report for each student and all your classes.",
+      "homeCta": "See this week"
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} claimed",
+      "takenBy": "{name} got {word} first",
+      "youClaimed": "{word} is yours! +{bonus}",
+      "claimedBy": "{name} grabbed {word}!",
+      "projectorTitle": "Word race"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Tied",
+      "aria": {
+        "ahead": "Your rival is {{name}}. You're ahead by {{points}}!",
+        "behind": "Your rival is {{name}}. {{points}} points to catch up!",
+        "level": "Your rival is {{name}}. You're tied!"
+      },
+      "announce": {
+        "lead": "You took the lead over {{name}}!",
+        "passed": "{{name}} just moved ahead. You can catch up!"
+      },
+      "ticker": {
+        "flip": "{{name}} took the lead in their duel",
+        "label": "Duel moments"
+      },
+      "outcome": {
+        "won": "You beat your rival {{name}} by {{points}}!",
+        "lost": "{{name}} won your duel by {{points}}. Rematch next round!",
+        "tied": "You and {{name}} tied your duel!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {
@@ -14409,7 +14458,9 @@ const en = {
       }
     },
     "errors": {
-      "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours. Try again in a moment."
+      "serverUnavailable": "We can't reach the class list right now. This is on our side, not yours. Try again in a moment.",
+      "signInCheckFailed": "We couldn't confirm your sign-in just now. That's on our side. Try again in a moment.",
+      "signInRequired": "Please sign in again to keep running this class."
     },
     "intentCta": {
       "forTeachers": "For teachers / learn English",
@@ -14966,7 +15017,12 @@ const en = {
       "unpluggedReteachPackQrHint": "Scan to open Unplugged reteach Live",
       "unpluggedReteachPackHowTo": "1) Print this pack 2) Hand practice pages to students 3) Scan the QR on the teacher screen",
       "unpluggedReteachPackPracticeHeading": "Student practice pages",
-      "unpluggedReteachPackFooter": "LexiClash · unplugged reteach pack"
+      "unpluggedReteachPackFooter": "LexiClash · unplugged reteach pack",
+      "freeInsight": {
+        "title": "Hardest words this round",
+        "foundBy": "{{found}} of {{of}} found it",
+        "proLine": "Full report for every student with Pro"
+      }
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -15429,7 +15485,7 @@ const en = {
         "proTier": "Teacher Pro",
         "everythingInFree": "Everything in Free",
         "classLimitPro": "Unlimited classrooms",
-        "studentLimitPro": "Unlimited students",
+        "studentLimitPro": "No class size limit",
         "analytics": "Per-student progress analytics",
         "chooseNow": "Get Teacher Pro",
         "whyNow": "Start free. Pro is for when {count} students in one class isn't enough."
@@ -15575,7 +15631,7 @@ const en = {
         },
         "q2": {
           "q": "Is there a free plan?",
-          "a": "Yes. A free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) gives you unlimited classes and students."
+          "a": "Yes. A free basic plan for verified teachers: up to 3 classes of 50 students each, no ads on student-facing routes. Teacher Pro ($9/month) gives you unlimited classes with no class size limit. A live game seats up to 50 on every plan."
         },
         "q3": {
           "q": "Does it work in Hebrew, Japanese, Swedish, Spanish and Russian?",
@@ -16162,7 +16218,8 @@ const en = {
           "title": "This room is locked",
           "hint": "Ask your teacher to unlock it, then try again.",
           "retry": "Try again"
-        }
+        },
+        "nameNotAllowed": "That name can't go on the class screen. How about {{suggestedName}}?"
       },
       "classroomRoomGone": "Your class game ended. Ask your teacher to start a new one.",
       "deadEnd": {
@@ -20110,7 +20167,7 @@ const en = {
     "free_1": "Up to 50 students per class",
     "free_2": "Up to 3 classrooms",
     "free_3": "Basic game modes",
-    "pro_1": "Unlimited students per class",
+    "pro_1": "No class size limit",
     "pro_2": "Unlimited classrooms",
     "pro_3": "Advanced game modes + custom words",
     "pro_4": "Student progress reports & analytics",
@@ -20280,7 +20337,8 @@ const en = {
       "bonusMeteor": "Meteor +{points}",
       "rejectFrozen": "Frozen! Hang on a sec",
       "rejectRateLimited": "Whoa, too fast. Slow down",
-      "rejectError": "Couldn't check that word. Try again"
+      "rejectError": "Couldn't check that word. Try again",
+      "bonusComebackPoints": "Comeback +{points}"
     },
     "results": {
       "time": "Time!",
@@ -21527,7 +21585,14 @@ const en = {
         "listName": "Words for {date}",
         "playNow": "Play now",
         "saved": "In your class",
-        "createHint": "Next: your join code and a box for this week's words. Then tap Play now."
+        "createHint": "Next: your join code and a box for this week's words. Then tap Play now.",
+        "listMissing": "Your saved word list wasn't found, so we're playing a starter list."
+      },
+      "ownWords": {
+        "listHint": "Your {count} words become this class's first word list.",
+        "sticker": "Your words · {count}",
+        "needMore": "Add {count} more to use your own words.",
+        "dropped": "Left out: {count}. Only single words in the class language count."
       }
     },
     "host": {

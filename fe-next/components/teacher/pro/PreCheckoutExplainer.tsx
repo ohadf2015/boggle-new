@@ -28,10 +28,11 @@ export interface PreCheckoutExplainerProps {
   onBack: () => void;
 }
 
-const INCLUDED_KEYS = [
+export const PRE_CHECKOUT_INCLUDED_KEYS = [
   'teacher.subscription.unlimitedClasses',
-  'teacher.subscription.unlimitedStudents',
-  'education.landing.pro.noAds',
+  'education.landing.pro.analytics',
+  'eduPro.upgrade.featureMastery',
+  'eduPro.upgrade.featureMissedPractice',
 ] as const;
 
 export function PreCheckoutExplainer({ mode, pending, onConfirm, onBack }: PreCheckoutExplainerProps) {
@@ -62,7 +63,7 @@ export function PreCheckoutExplainer({ mode, pending, onConfirm, onBack }: PreCh
         <div className={NB_DIALOG_BODY}>
           <p className="font-neo-display text-base font-black text-neo-cream">{t('eg2Pro.preCheckout.includesTitle')}</p>
           <ul className="mt-2 space-y-2">
-            {INCLUDED_KEYS.map((key) => (
+            {PRE_CHECKOUT_INCLUDED_KEYS.map((key) => (
               <li key={key} className="flex items-start gap-2">
                 <ShieldCheck className="mt-0.5 size-5 shrink-0 text-neo-lime" strokeWidth={2.5} aria-hidden />
                 <span className="font-neo-body text-sm font-bold leading-snug text-neo-cream">{t(key)}</span>

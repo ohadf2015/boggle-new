@@ -297,6 +297,37 @@ describe('ClassSetupInvite', () => {
       expect(storedIntent()).toMatchObject({ source: 'lesson', lessonId: 'L-new' });
     });
 
+    it('Given the teacher pasted words at setup (lessonId, no pack), Then their list is named as theirs, no pack is offered, and Play now runs that list with no new write', async () => {
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      expect(screen.getByText('eduShell.setup.words.yours')).toBeInTheDocument();
+      expect(screen.queryAllByRole('radio')).toHaveLength(0);
+      fireEvent.click(screen.getByTestId('setup-play-now'));
+      await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
+      expect(lessons.get).toHaveBeenCalledWith('L-own');
+      expect(lessons.createLesson).not.toHaveBeenCalled();
+      expect(storedIntent()).toMatchObject({ source: 'lesson', lessonId: 'L-own', mode: 'classic', classroomId: 'c1', language: 'en' });
+      expect(toastMock.error).not.toHaveBeenCalled();
+    });
+
+    it('Given the setup list is gone or belongs to someone else, Then Play now saves and plays the starter pack and says the list was not found', async () => {
+      lessons.get.mockResolvedValue({ data: null, error: null });
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-other" />);
+      fireEvent.click(screen.getByTestId('setup-play-now'));
+      await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
+      expect(lessons.createLesson).toHaveBeenCalledTimes(1);
+      expect(storedIntent()).toMatchObject({ source: 'lesson', lessonId: 'L-new', mode: 'classic' });
+      expect(toastMock.error).toHaveBeenCalledWith('eduShell.setup.words.listMissing');
+    });
+
+    it('Given the setup list and new words typed over it, Then the typed words win', async () => {
+      render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
+      fireEvent.change(screen.getByTestId('first-game-words'), { target: { value: TEN } });
+      fireEvent.click(screen.getByTestId('setup-play-now'));
+      await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
+      expect(lessons.createLesson.mock.calls[0][0].words).toHaveLength(10);
+      expect(storedIntent()).toMatchObject({ source: 'lesson', lessonId: 'L-new' });
+    });
+
     it('Given the list saves but the homework assignment fails, Then the teacher is told, and still reaches the lobby', async () => {
       lessons.assign.mockResolvedValue({ data: null, error: { message: 'boom' } });
       render(<ClassSetupInvite classroomId="c1" />);

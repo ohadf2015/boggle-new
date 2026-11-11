@@ -23,6 +23,11 @@ describe('teacher access email templates', () => {
     expect(out.html).toContain('Riverdale High');
   });
 
+  it('Given no reason was given, When the admin notify is built, Then the reason shows a dash instead of an empty quote', () => {
+    const out = teacherAccessAdminNotify({ ...baseReq, use_case: '' });
+    expect(out.html).toContain('<blockquote>—</blockquote>');
+  });
+
   it('confirmation greets applicant + says access is live, from Ohad personally', () => {
     const out = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
     expect(out.subject.toLowerCase()).toContain('live');

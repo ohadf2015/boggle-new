@@ -53,6 +53,27 @@ describe('grantRoundChest', () => {
     expect(inserted[0]).toMatchObject({ rarity: expected.rarity });
   });
 
+  it('Given an underdog finish, When granted, Then the stored and revealed chest is the bumped roll and says so', async () => {
+    const { deps, inserted } = fakeDeps('claimed');
+    const chest = await grantRoundChest({ ...input, underdog: true }, deps);
+    const expected = rollChest('ABC:sess-1:u1', { underdog: true });
+    expect(chest).toMatchObject({ rarity: expected.rarity, itemId: expected.itemId, underdog: true });
+    expect(inserted[0]).toMatchObject({ rarity: expected.rarity });
+  });
+
+  it('Given no underdog finish, When granted, Then the reveal carries no comeback label', async () => {
+    const { deps } = fakeDeps('claimed');
+    const chest = await grantRoundChest({ ...input, underdog: false }, deps);
+    expect(chest).not.toHaveProperty('underdog');
+  });
+
+  it('Given an underdog chest was granted, When the student reconnects and asks again, Then the replayed reveal still says comeback', async () => {
+    const { deps } = fakeDeps('claimed');
+    await grantRoundChest({ ...input, underdog: true }, deps);
+    (deps.claim as ReturnType<typeof vi.fn>).mockResolvedValue('taken');
+    expect(await grantRoundChest({ ...input, underdog: false }, deps)).toMatchObject({ underdog: true });
+  });
+
   it('Given a first claim, When granted, Then the row is written before the chest part is owned', async () => {
     const { deps, parts, inserted } = fakeDeps('claimed');
     const chest = await grantRoundChest(input, deps);

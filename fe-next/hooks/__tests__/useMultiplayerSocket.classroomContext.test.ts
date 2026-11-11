@@ -9,15 +9,17 @@ import { resolve } from 'node:path';
  * values in state, expose them, and reset them on a fresh `joined` so a value from a
  * previous (classroom) room never leaks into the next (non-classroom) one.
  */
+import { ingestClassroomContext, resetClassroomContext, useClassroomContextStore } from '../gameState/classroomContextStore';
+
 const source = readFileSync(resolve(__dirname, '../useMultiplayerSocket.ts'), 'utf8');
 
 describe('useMultiplayerSocket — classroomContext', () => {
   it('listens for classroomContext and stores level + word bank', () => {
     const start = source.indexOf("listen('classroomContext'");
     expect(start).toBeGreaterThan(-1);
-    const body = source.slice(start, start + 900);
-    expect(body).toMatch(/setClassroomLevel\(/);
-    expect(body).toMatch(/setClassroomWordBank\(/);
+    expect(source.slice(start, start + 80)).toMatch(/listen\('classroomContext', ingestClassroomContext\)/);
+    expect(source).toMatch(/const classroomLevel = useClassroomContextStore\(\(s\) => s\.level\)/);
+    expect(source).toMatch(/const classroomWordBank = useClassroomContextStore\(\(s\) => s\.wordBank\)/);
   });
 
   it('exposes classroomLevel and classroomWordBank from the hook', () => {
@@ -31,8 +33,7 @@ describe('useMultiplayerSocket — classroomContext', () => {
   it("resets to core / [] when a new room is joined (no stale value from the previous room)", () => {
     const joinedStart = source.indexOf("listen('joined'");
     const joinedBody = source.slice(joinedStart, joinedStart + 700);
-    expect(joinedBody).toMatch(/setClassroomLevel\('core'\)/);
-    expect(joinedBody).toMatch(/setClassroomWordBank\(\[\]\)/);
+    expect(joinedBody).toMatch(/resetClassroomContext\(\)/);
   });
 
   it('is registered through the by-reference listener so cleanup removes only this hook\'s handler', () => {
@@ -41,8 +42,12 @@ describe('useMultiplayerSocket — classroomContext', () => {
   });
 
   it("only accepts a known level; anything else degrades to 'core'", () => {
-    const start = source.indexOf("listen('classroomContext'");
-    const body = source.slice(start, start + 900);
-    expect(body).toMatch(/isVocabularyLevel\(/);
+    ingestClassroomContext({ classroomLevel: 'support', classroomWordBank: ['storm', 7, 'cell'] });
+    expect(useClassroomContextStore.getState()).toEqual({ level: 'support', wordBank: ['storm', 'cell'] });
+    ingestClassroomContext({ classroomLevel: 'wizard', classroomWordBank: 'nope' });
+    expect(useClassroomContextStore.getState()).toEqual({ level: 'core', wordBank: [] });
+    ingestClassroomContext({ classroomLevel: 'challenge', classroomWordBank: ['x'] });
+    resetClassroomContext();
+    expect(useClassroomContextStore.getState()).toEqual({ level: 'core', wordBank: [] });
   });
 });

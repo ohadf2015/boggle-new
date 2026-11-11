@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,7 @@ import { hasProAccess, isFreePlanUsageBlocked } from '@/lib/education/teacherPla
 import { trackEduClassroomCreated, trackEduFirstAssignmentCreated } from '@/lib/education/telemetry';
 import { captureTeacherOnboardingFunnel, TEACHER_ONBOARDING_FUNNEL_EVENTS, teacherFunnelPlan } from '@/lib/education/teacherOnboardingFunnel';
 import { assignStarterPack } from '@/lib/education/createLessonFromPack';
+import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 import type { Language } from '@/lib/supabase/education/types';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 import { inviteHref } from '@/components/education/lobby/inviteLinks';
@@ -22,6 +23,7 @@ import { ClassSetupDetails, type SetupBusy } from './ClassSetupDetails';
 import { ClassSetupSide } from './ClassSetupSide';
 import { classCap, defaultClassLanguage, resolveClassName, type GradeBand } from './classSetupDefaults';
 import { packsForLanguage, recommendedPack } from './starterPackPick';
+import { readSetupWords, SETUP_MIN_OWN_WORDS, usesOwnWords } from './setupOwnWords';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -40,6 +42,7 @@ export function ClassSetupCreate() {
   const [grade, setGrade] = useState<GradeBand | null>(null);
   const [classLanguage, setClassLanguage] = useState<Language>(() => defaultClassLanguage(language));
   const [packKey, setPackKey] = useState<string | null>(null);
+  const [ownText, setOwnText] = useState('');
   const [busy, setBusy] = useState<SetupBusy>(null);
   const inFlight = useRef(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
@@ -55,6 +58,8 @@ export function ClassSetupCreate() {
   const packs = packsForLanguage(classLanguage);
   const recommended = recommendedPack(classLanguage, grade);
   const pack = packs.find((p) => p.nameKey === packKey) ?? recommended;
+  const own = useMemo(() => readSetupWords(ownText, classLanguage), [ownText, classLanguage]);
+  const ownList = usesOwnWords(own.words);
 
   const create = useCallback(
     async (mode: Exclude<SetupBusy, null>) => {
@@ -77,7 +82,19 @@ export function ClassSetupCreate() {
           locale: language,
           plan: teacherFunnelPlan({ hasPro, status, loading: proLoading }),
         });
-        const assigned = await assignStarterPack({ pack, title: t(pack.nameKey), classroomId, teacherId: user?.id ?? '', createLesson });
+        const teacherId = user?.id ?? '';
+        const assigned = ownList
+          ? await createLessonAndAssign({
+              lesson: {
+                name: t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) }),
+                language: classLanguage,
+                words: own.words,
+                classroomId,
+              },
+              teacherId,
+              createLesson,
+            })
+          : await assignStarterPack({ pack, title: t(pack.nameKey), classroomId, teacherId, createLesson });
         if (assigned.assigned) {
           toast.success(t('teacher.assignment.created'));
           trackEduFirstAssignmentCreated({ classroomId });
@@ -85,7 +102,7 @@ export function ClassSetupCreate() {
           toast.error(t('eduShell.setup.assignFailed'));
         }
         const savedLessonId = assigned.success ? assigned.lesson?.id : null;
-        const href = inviteHref(language, classroomId, pack.nameKey);
+        const href = inviteHref(language, classroomId, ownList ? null : pack.nameKey);
         router.replace(savedLessonId ? `${href}&lessonId=${encodeURIComponent(savedLessonId)}` : href, { scroll: false });
         return;
       }
@@ -98,7 +115,7 @@ export function ClassSetupCreate() {
       setErrorKey('eduShell.setup.createFailed');
       toast.error(t('eduShell.setup.createFailed'));
     },
-    [proAccess, classrooms, name, grade, t, createClassroom, classLanguage, language, hasPro, status, proLoading, router, pack, user?.id, createLesson],
+    [proAccess, classrooms, name, grade, t, createClassroom, classLanguage, language, hasPro, status, proLoading, router, pack, ownList, own.words, user?.id, createLesson],
   );
 
   return (
@@ -120,6 +137,7 @@ export function ClassSetupCreate() {
         errorKey={errorKey}
         onStartLive={() => void create('live')}
         skipHref={`/${language}/teacher`}
+        ownWords={{ text: ownText, onTextChange: setOwnText, count: own.words.length, dropped: own.dropped, min: SETUP_MIN_OWN_WORDS }}
         t={t}
       />
       {limitHit ? <ClassLimitUpsellModal isOpen onClose={() => setLimitHit(null)} currentCount={limitHit.currentCount} limit={limitHit.limit} /> : null}

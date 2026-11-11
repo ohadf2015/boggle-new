@@ -13,6 +13,8 @@
  * mapping is NOT touched here (it needs the socket id) — the handler owns that.
  */
 import type { GameState } from './gameState/types';
+import { isProfaneJoinName } from '@/lib/education/joinNameModeration';
+import { suggestPlayerName } from '@/utils/onboardingNameSuggestions';
 
 /** Move `rec[oldName]` → `rec[newName]` if present. No-op for absent maps. */
 function rekeyRecord<T>(rec: Record<string, T> | undefined, oldName: string, newName: string): void {
@@ -60,4 +62,18 @@ export function renamePlayerInGame(game: GameState, oldName: string, newName: st
       if (entry.username === oldName) entry.username = newName;
     }
   }
+}
+
+export type GuestRenameCheck = { name: string } | { refusal: { error: string; message: string; suggestedName?: string } } | null;
+
+/** The lobby rename rules: null = ignore silently, refusal = tell the player why, name = go ahead. */
+export function checkGuestRename(game: GameState, username: string, newName: string): GuestRenameCheck {
+  const name = newName.trim().slice(0, 20);
+  if (!name || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(name)) return null;
+  if (game.isClassroom && isProfaneJoinName(name)) {
+    return { refusal: { error: 'NAME_NOT_ALLOWED', message: 'Pick a different name', suggestedName: suggestPlayerName(game.language) } };
+  }
+  if (!game.users[username]) return null;
+  if (name !== username && game.users[name]) return { refusal: { error: 'NAME_TAKEN', message: 'That name is already in use' } };
+  return { name };
 }

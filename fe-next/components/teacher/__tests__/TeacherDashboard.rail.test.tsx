@@ -32,7 +32,7 @@ vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => lessonsState }
 
 import TeacherDashboard from '../TeacherDashboard';
 
-const FREE = { hasPro: false, loading: false, source: null, refresh: vi.fn() };
+const FREE = { hasPro: false, loading: false, known: true, source: null, refresh: vi.fn() };
 const ONE_CLASS = [{ id: 'c5b', name: '5B - English', member_count: 28, join_code: 'K7Q2', language: 'en' }];
 
 beforeEach(() => {
@@ -142,13 +142,13 @@ describe('Teacher Home greeting cue, week mascot and Pro strip', () => {
     expect(within(screen.getByTestId('home-week')).getByTestId('edu-mascot-tip')).toBeInTheDocument();
   });
 
-  it('Given a Pro offer, Then it is one compact strip at the bottom of the rail with no bullet list', () => {
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
-    const strip = screen.getByTestId('home-pro-card');
-    const aside = strip.closest('aside');
+  it('Given a free teacher, Then the class-insight Pro entry is one compact strip at the bottom of the rail with no bullet list', () => {
+    render(<TeacherDashboard />);
+    const strip = screen.getByTestId('home-class-insight');
+    const aside = strip.parentElement?.closest('aside');
     expect(aside).not.toBeNull();
     expect(aside?.lastElementChild?.contains(strip)).toBe(true);
     expect(within(strip).queryAllByRole('listitem')).toHaveLength(0);
-    expect(within(strip).getByTestId('home-pro-cta')).toBeInTheDocument();
+    expect(within(strip).getByTestId('home-class-insight-cta')).toBeInTheDocument();
   });
 });

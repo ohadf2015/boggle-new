@@ -55,9 +55,6 @@ describe('FREE_TIER_LIMITS', () => {
   });
 
   it('keeps the assignment cap finite, so Pro has something to lift', () => {
-    // An infinite free cap makes the usage-triggered ask (teacherUsagePrompt.ts) a
-    // bluff: the prompt fires at 3+ created assignments and the cap must be there
-    // to make the copy honest.
     expect(FREE_TIER_LIMITS.assignmentsPerClass).toBeLessThan(10);
   });
 });

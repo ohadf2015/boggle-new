@@ -120,12 +120,12 @@ describe('analytics page: summary first, every control does something', () => {
     expect(screen.queryByTestId('student-progress-table')).toBeNull();
   });
 
-  it('keeps the mastery report behind the same single Pro gate for free teachers', () => {
+  it('keeps the mastery report behind the same single Pro gate for free teachers', async () => {
     teacherPro.hasPro = false;
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
+    expect(await screen.findAllByText('teacher.proGate.analytics.title')).toHaveLength(1);
     expect(screen.queryByTestId('word-mastery-report')).not.toBeInTheDocument();
-    expect(screen.getAllByText('teacher.proGate.analytics.title')).toHaveLength(1);
   });
 
   it('shows a busy placeholder while the Pro check resolves, so a slow load never reads as an empty page', () => {

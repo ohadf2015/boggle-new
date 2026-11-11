@@ -18,7 +18,7 @@ import type { Server, Socket } from 'socket.io';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { setClassroomPressureSettings } from '../modules/classroomGameSettings.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -67,7 +67,7 @@ export function registerClassroomPressureHandlers(io: Server, socket: Socket): v
 
     const validation = pressureSchema.safeParse(data);
     if (!validation.success) {
-      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' , code: 'INVALID_PAYLOAD' });
       return;
     }
     const payload = validation.data as {
@@ -77,25 +77,25 @@ export function registerClassroomPressureHandlers(io: Server, socket: Socket): v
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+      refuseUnidentified(socket, 'updateClassroomGamePressure', { gameCode: payload.gameCode });
       return;
     }
 
     try {
       const game = await getClassroomGame(payload.gameCode);
       if (!game || authUserId !== game.teacherId) {
-        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' , code: 'PRESSURE_FAILED' });
         return;
       }
 
       if (deviatesFromDefaults(payload.pressure) && !(await teacherIsPro(authUserId))) {
-        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureNeedsPro' });
+        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureNeedsPro' , code: 'PRESSURE_NEEDS_PRO' });
         return;
       }
 
       const applied = await setClassroomPressureSettings(payload.gameCode, payload.pressure);
       if (!applied) {
-        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+        socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' , code: 'PRESSURE_FAILED' });
         return;
       }
 
@@ -110,7 +110,7 @@ export function registerClassroomPressureHandlers(io: Server, socket: Socket): v
       logger.info('CLASSROOM_GAME', `Teacher ${authUserId} updated pressure dials on ${payload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to update pressure dials: ${error}`);
-      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' });
+      socket.emit('classroomGameError', { error: 'education.classroomGame.pressureFailed' , code: 'PRESSURE_FAILED' });
     }
   });
 }

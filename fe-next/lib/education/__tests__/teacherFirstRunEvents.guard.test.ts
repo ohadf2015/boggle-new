@@ -30,7 +30,7 @@ describe('teacher first-run funnel event names (dashboards query these strings)'
   });
 
   it('still fires them from the one first-run path', () => {
-    const start = src('components/education/ClassSetupStart.tsx');
+    const start = src('components/teacher/setup/ClassSetupCreate.tsx');
     for (const call of ['trackEduClassroomCreated(', 'TEACHER_ONBOARDING_FUNNEL_EVENTS.classroomCreated']) {
       expect(start).toContain(call);
     }

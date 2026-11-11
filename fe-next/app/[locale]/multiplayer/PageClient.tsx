@@ -169,7 +169,7 @@ function MultiplayerPageFrame(): React.JSX.Element {
               longer-word target for challenge-level ones, nothing for everyone
               else — the component decides, so the mount is unconditional. */}
           {isActive && gameActive && !showResults && (
-            <StudentWordBank level={classroomLevel} words={classroomWordBank} />
+            <StudentWordBank level={classroomLevel} words={classroomWordBank} me={isHost || isClassroomHost ? undefined : username} />
           )}
           {teacherStrip.visible && (
             <TeacherLiveControls

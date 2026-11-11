@@ -24,8 +24,6 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
   },
   borderBlack: {
     'components/teacher/TeacherPlanBadge.tsx': 1,
-    'components/teacher/TeacherProUsagePromptCard.tsx': 2,
-    'components/teacher/analytics/AnalyticsDashboard.tsx': 1,
     'components/teacher/assignments/AssignmentCreatorDueDate.tsx': 1,
     'components/teacher/assignments/AssignmentResultsView.tsx': 1,
     'components/teacher/assignments/AssignmentStep.tsx': 1,
@@ -67,6 +65,8 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
     'components/education/EducationHeader.tsx': 2,
     'components/education/academyModes/AcademyChrome.tsx': 1,
     'components/education/economy/RewardChest.tsx': 1,
+    // Viewport-pinned claim toast over the round HUD (fixed, so body.screen-fit padding does not reach it).
+    'components/education/live/LessonClaimToast.tsx': 1,
     'components/teacher/hq/HqProjectorSheet.tsx': 1,
     'components/teacher/nb/nbDialogStyles.ts': 1,
     'components/student/academy/AcademyHub.tsx': 2,

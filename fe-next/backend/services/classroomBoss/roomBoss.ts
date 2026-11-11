@@ -9,6 +9,8 @@ import { clearGameTimer } from '../../utils/timerManager';
 import { isWordOnBoardAsync } from '../../modules/wordValidatorPool.js';
 import { makePositionsMap } from '../../modules/wordValidator.js';
 import logger from '../../utils/logger.js';
+import { isLessonWord } from '../../utils/lessonVocabulary.js';
+import type { Language } from '@/shared/types';
 import {
   CLASSROOM_BOSS_EVENTS,
   isClassroomBossId,
@@ -17,7 +19,7 @@ import {
   type ClassroomBossView,
 } from '@/shared/types/classroomBoss';
 import { BOSS_RULES } from './rules';
-import { applyWord, createBoss, endBossRound, frozenTiles, shiftBoss, tick, toView, type BossState } from './engine';
+import { applyWord, createBoss, endBossRound, frozenTiles, shiftBoss, tick, toView, type BossState, type WordInput } from './engine';
 
 /** Long enough for the defeat cinematic on the projector before results take over. */
 export const DEFEAT_END_DELAY_MS = 4500;
@@ -122,17 +124,23 @@ export interface BossHitInput {
   now?: number;
 }
 
+/** Read here, not passed in, so the vote-validated path cracks the boss the same way as the auto-validated one. */
+export function bossWordInput(game: Pick<GameState, 'lessonVocabulary' | 'language'>, input: BossHitInput, now: number): WordInput {
+  const fromLesson = isLessonWord(game.lessonVocabulary, input.word, (game.language || 'en') as Language);
+  return { username: input.username, word: input.word, score: input.score, now, fromLesson };
+}
+
 /** Every accepted word path calls this; returns the private hit for the finder (or null outside a boss round). */
 export function hitRoomBoss(io: Server, gameCode: string, game: GameState, input: BossHitInput): ClassroomBossPlayerHit | null {
   const boss = BOSSES.get(game);
   if (!boss) return null;
   const now = input.now ?? Date.now();
-  const r = applyWord(boss.state, { username: input.username, word: input.word, score: input.score, now });
+  const r = applyWord(boss.state, bossWordInput(game, input, now));
   boss.state = r.state;
   if (!r.hit) return null;
   send(io, gameCode, toView(r.state, now));
   if (r.events.includes('defeated')) scheduleDefeatEnd(io, gameCode, game, boss.sessionId);
-  return { dmg: r.hit.dmg, crit: r.hit.crit, multiplier: r.hit.multiplier, totalDmg: r.state.damageBy[input.username] ?? 0 };
+  return { dmg: r.hit.dmg, crit: r.hit.crit, multiplier: r.hit.multiplier, totalDmg: r.state.damageBy[input.username] ?? 0, ...(r.hit.lesson && { lesson: true }) };
 }
 
 function scheduleDefeatEnd(io: Server, gameCode: string, game: GameState, sessionId: unknown): void {

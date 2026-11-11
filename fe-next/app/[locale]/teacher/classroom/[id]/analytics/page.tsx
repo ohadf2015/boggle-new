@@ -2,7 +2,7 @@
  * Analytics Page - Teacher Classroom Analytics Dashboard
  *
  * Integrates all Phase 20 analytics components:
- * - AnalyticsDashboard (metrics overview)
+ * - ClassOverview (metrics overview)
  * - StudentProgressTable (detailed student data)
  * - LessonEffectivenessChart (lesson performance)
  * - VocabularyHeatmap (word mastery grid)

@@ -245,6 +245,7 @@ const es = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "¡GOLPE DE LECCIÓN!",
     "chestUpgraded": "¡Jefe derrotado: tu cofre subió de nivel!",
     "topHitter": "Más daño",
     "cardHow": "Toda la clase contra un jefe. Cada palabra que encuentras es un golpe.",
@@ -455,7 +456,8 @@ const es = {
         "ready": "Cofre listo",
         "collected": "Cofre recogido",
         "round": "Esta ronda: {cash} dinero",
-        "rank": "#{rank} de {size} en esta ronda"
+        "rank": "#{rank} de {size} en esta ronda",
+        "comeback": "¡Cofre de remontada! Ha subido de nivel"
       },
       "locker": {
         "title": "Tu cofre",
@@ -2355,7 +2357,7 @@ const es = {
     "free_1": "Hasta 50 alumnos por clase",
     "free_2": "Hasta 3 aulas",
     "free_3": "Modos de juego básicos",
-    "pro_1": "Alumnos ilimitados por clase",
+    "pro_1": "Sin límite de alumnos por clase",
     "pro_2": "Aulas ilimitadas",
     "pro_3": "Modos avanzados + palabras propias",
     "pro_4": "Informes de progreso y analíticas del alumnado",
@@ -14760,7 +14762,7 @@ const es = {
       "perk": {
         "analytics": "Ver qué palabras costaron a la clase, después de cada partida",
         "reports": "Informes imprimibles de clase y de alumno",
-        "unlimited": "Clases y alumnos ilimitados"
+        "unlimited": "Clases ilimitadas, sin límite de alumnos por clase"
       },
       "noCard": "Cuando termine, vuelves al plan gratuito sin más. Nunca te cobraremos sin que tú lo elijas.",
       "paidBody": "Tu suscripción a Teacher Pro está activa. Puedes gestionarla o cancelarla cuando quieras desde tu perfil de docente.",
@@ -14898,15 +14900,15 @@ const es = {
       "giftedBadge": "Regalo",
       "classLimitTitle": "Has alcanzado el límite de clases",
       "classLimitReached": "Límite de clases alcanzado. Pásate a Teacher Pro para tener clases ilimitadas.",
-      "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Mejora a Pro para tener clases y estudiantes ilimitados.",
+      "classLimitMessage": "Has creado {{current}} de {{limit}} clases gratuitas. Con Pro puedes tener clases ilimitadas.",
       "studentLimitTitle": "Has alcanzado el límite de estudiantes",
-      "studentLimitMessage": "Esta clase tiene {{current}} de {{limit}} estudiantes en el plan gratuito. Mejora a Pro para tener estudiantes ilimitados.",
+      "studentLimitMessage": "Esta clase tiene {{current}} de {{limit}} estudiantes, el límite del plan gratis. Teacher Pro quita el límite de alumnos por clase. Una partida en vivo tiene el mismo tamaño en todos los planes.",
       "usagePromptTitle": "Tu clase está lista para Teacher Pro",
-      "usagePromptStudentsBody": "Ya tienes {{count}} estudiantes en tu clase. Teacher Pro los cubre a todos: clases y estudiantes ilimitados, más análisis de progreso e informes imprimibles.",
+      "usagePromptStudentsBody": "Ya tienes {{count}} estudiantes en una clase. Teacher Pro quita el límite de alumnos por clase y añade clases ilimitadas, análisis de progreso e informes imprimibles. Una partida en vivo tiene el mismo tamaño en todos los planes.",
       "usagePromptAssignmentsBody": "Creaste {{count}} tareas para tu clase. Teacher Pro quita el límite: tareas ilimitadas, más análisis de progreso e informes.",
       "assignmentLimitTitle": "Límite de tareas alcanzado",
       "assignmentLimitMessage": "Creaste {{current}} de {{limit}} tareas gratuitas para esta clase. Mejora a Pro para tener tareas ilimitadas.",
-      "upgradeProDescription": "Pro te da aulas ilimitadas y estudiantes ilimitados por clase, sin límites.",
+      "upgradeProDescription": "Pro te da clases ilimitadas, sin límite de alumnos por clase, análisis de progreso e informes imprimibles.",
       "trialExpiredTitle": "¿Quieres más que el plan gratis?",
       "trialExpiredMessage": "El plan gratis sigue funcionando sin límite de tiempo. Pro añade clases ilimitadas e informes de progreso, y las cuentas nuevas tienen 14 días gratis.",
       "continueFree": "Continuar con el plan gratuito",
@@ -15053,6 +15055,10 @@ const es = {
       "scanToJoin": "Escanea para unirte"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "Duelos de rivales",
+        "hint": "Cada estudiante tiene un rival de nivel parecido durante la ronda."
+      },
       "studentCap": "{{count}} / {{limit}} alumnos",
       "studentCountPro": "{{count}} alumnos",
       "cardSeeAllStudents": "Ver los {{count}} alumnos",
@@ -15767,7 +15773,7 @@ const es = {
     },
     "upgradePro": {
       "cta": "Mejorar a Pro",
-      "body": "Desbloquea clases y alumnos ilimitados"
+      "body": "Clases ilimitadas y sin límite de alumnos por clase"
     },
     "assignment": {
       "focus": {
@@ -15933,9 +15939,52 @@ const es = {
       "slipType": "y escribe el código",
       "slipNoAccount": "No hace falta cuenta ni correo.",
       "invalid": "A esta página le falta el código de la clase. Ábrela de nuevo desde tu inicio de docente."
+    },
+    "weekInsight": {
+      "title": "Quién necesita ayuda esta semana",
+      "nobodyStuck": "Esta semana nadie se ha atascado.",
+      "more": "+{{count}} más",
+      "hardestTitle": "Las palabras más difíciles de la semana",
+      "missed": "falló el {{pct}}%",
+      "emptyTitle": "Aún no hay partidas esta semana",
+      "emptyBody": "Juega una partida con esta clase y verás quién necesita ayuda.",
+      "startGame": "Empezar una partida",
+      "proLine": "Con Pro ves todas las semanas y a cada estudiante",
+      "homeTitle": "¿Quién necesita ayuda en {{name}} esta semana?",
+      "homeBody": "Gratis para una clase. Pro añade las semanas anteriores, un informe por estudiante y todas tus clases.",
+      "homeCta": "Ver esta semana"
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} atrapadas",
+      "takenBy": "{name} encontró {word} primero",
+      "youClaimed": "¡{word} es tuya! +{bonus}",
+      "claimedBy": "¡{name} se llevó {word}!",
+      "projectorTitle": "Carrera de palabras"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "Empate",
+      "aria": {
+        "ahead": "Tu rival es {{name}}. ¡Vas {{points}} por delante!",
+        "behind": "Tu rival es {{name}}. ¡Te faltan {{points}} puntos para remontar!",
+        "level": "Tu rival es {{name}}. ¡Van empatados!"
+      },
+      "announce": {
+        "lead": "¡Ya vas por delante de {{name}}!",
+        "passed": "{{name}} se puso por delante. ¡Todavía puedes remontar!"
+      },
+      "ticker": {
+        "flip": "{{name}} toma la delantera en su duelo",
+        "label": "Momentos del duelo"
+      },
+      "outcome": {
+        "won": "¡Le ganaste el duelo a {{name}} por {{points}}!",
+        "lost": "{{name}} se llevó el duelo por {{points}}. ¡Revancha en la próxima ronda!",
+        "tied": "¡Empate en tu duelo con {{name}}!"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {
@@ -16071,7 +16120,9 @@ const es = {
       }
     },
     "errors": {
-      "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento."
+      "serverUnavailable": "Ahora mismo no podemos acceder a la lista de la clase. Es un problema nuestro, no tuyo: inténtalo de nuevo en un momento.",
+      "signInCheckFailed": "No hemos podido confirmar tu sesión ahora mismo. Es un problema nuestro. Inténtalo de nuevo en un momento.",
+      "signInRequired": "Vuelve a iniciar sesión para seguir con esta clase."
     },
     "intentCta": {
       "forTeachers": "Para profesores / para aprender inglés",
@@ -16628,7 +16679,12 @@ const es = {
       "unpluggedReteachPackQrHint": "Escanea para abrir el repaso en el proyector",
       "unpluggedReteachPackHowTo": "1) Imprime este pack 2) Entrega las páginas de práctica 3) Escanea el QR en la pantalla del docente",
       "unpluggedReteachPackPracticeHeading": "Páginas de práctica del alumno",
-      "unpluggedReteachPackFooter": "LexiClash · hoja de repaso sin dispositivos"
+      "unpluggedReteachPackFooter": "LexiClash · hoja de repaso sin dispositivos",
+      "freeInsight": {
+        "title": "Las palabras más difíciles de esta ronda",
+        "foundBy": "{{found}} de {{of}} la encontraron",
+        "proLine": "Informe completo de cada estudiante con Pro"
+      }
     },
     "classroomAddon": {
       "eyebrow": "Marketplace de Google Classroom",
@@ -17100,7 +17156,7 @@ const es = {
         "proTier": "Teacher Pro",
         "everythingInFree": "Todo lo del plan Gratis",
         "classLimitPro": "Clases ilimitadas",
-        "studentLimitPro": "Estudiantes ilimitados",
+        "studentLimitPro": "Sin límite de alumnos por clase",
         "analytics": "Analíticas de progreso por estudiante",
         "chooseNow": "Obtener Teacher Pro",
         "whyNow": "Empieza gratis, en serio. Pro es para cuando {count} estudiantes en una clase se te quedan cortos."
@@ -17246,7 +17302,7 @@ const es = {
         },
         "q2": {
           "q": "¿Hay un plan gratis?",
-          "a": "Sí. Un plan básico gratis para docentes verificados: hasta 3 clases de 50 estudiantes cada una, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
+          "a": "Sí. Un plan básico gratis para docentes verificados: hasta 3 clases de 50 estudiantes cada una, sin anuncios para estudiantes. Teacher Pro ($9/mes) te da clases ilimitadas y sin límite de alumnos por clase. Una partida en vivo admite hasta 50 jugadores en todos los planes."
         },
         "q3": {
           "q": "¿Soporta hebreo, japonés, sueco y español?",
@@ -17833,7 +17889,8 @@ const es = {
           "title": "Esta sala está bloqueada",
           "hint": "Pide a tu profe que la desbloquee y vuelve a intentarlo.",
           "retry": "Reintentar"
-        }
+        },
+        "nameNotAllowed": "Ese nombre no puede salir en la pantalla de la clase. ¿Qué tal {{suggestedName}}?"
       },
       "classroomRoomGone": "El juego de tu clase terminó. Pídele a tu profe que empiece otro.",
       "deadEnd": {
@@ -21247,7 +21304,8 @@ const es = {
       "bonusMeteor": "Meteoro +{points}",
       "rejectFrozen": "¡Congelado! Espera un momento",
       "rejectRateLimited": "Muy rápido. Más despacio",
-      "rejectError": "No pudimos comprobar esa palabra. Inténtalo de nuevo"
+      "rejectError": "No pudimos comprobar esa palabra. Inténtalo de nuevo",
+      "bonusComebackPoints": "Remontada +{points}"
     },
     "results": {
       "time": "¡Tiempo!",
@@ -22494,7 +22552,14 @@ const es = {
         "listName": "Palabras del {date}",
         "playNow": "Jugar ahora",
         "saved": "Ya en tu clase",
-        "createHint": "Después: tu código para unirse y un cuadro para las palabras de la semana. Luego pulsa Jugar ahora."
+        "createHint": "Después: tu código para unirse y un cuadro para las palabras de la semana. Luego pulsa Jugar ahora.",
+        "listMissing": "No encontramos tu lista guardada, así que jugaremos con una lista inicial."
+      },
+      "ownWords": {
+        "listHint": "Tus {count} palabras serán la primera lista de esta clase.",
+        "sticker": "Tus palabras · {count}",
+        "needMore": "Añade {count} más para usar tus propias palabras.",
+        "dropped": "Se quedaron fuera: {count}. Solo cuentan palabras sueltas en el idioma de la clase."
       }
     },
     "host": {

@@ -14,7 +14,7 @@
  * (`backend/modules/classroomGameSession.ts`).
  *
  * Both halves of that were a dead end. Reading nothing at all left this door —
- * the one `components/student/ClassroomGameBanner.tsx:117` taps — wide open
+ * the one a student's "Join live game" button taps — wide open
  * long after the playable room (`gameStateManager`, an entirely separate
  * lifecycle) was gone; the banner polls every 15 seconds, so a student tapping
  * JOIN on a stale card walked into a dead room. Reading `'finished'` instead
@@ -24,8 +24,8 @@
  * The rejection is deliberately INDISTINGUISHABLE from "no such game". An ended
  * PIN and a wrong PIN are one state to the student — Kahoot answers both with
  * "We didn't recognize that game PIN" — so there is no new copy and nothing new
- * to translate. The `code` field is for our logs; `ClassroomGameBanner` renders
- * its own localized line either way.
+ * to translate. The `code` field is for our logs; the student's screen shows
+ * the same localized line either way.
  *
  * Two guard rails inside the rule:
  *   - Callers must run this BEFORE any classroom-membership probe, so it cannot

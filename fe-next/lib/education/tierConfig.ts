@@ -3,7 +3,7 @@
  * Provider-neutral (Polar bills Teacher Pro); the numbers come from freeTierLimits.
  */
 
-import { FREE_TIER_LIMITS } from './freeTierLimits'
+import { FREE_TIER_LIMITS, PRO_LIMITS, TEACHER_PRO_PRICE_USD } from './freeTierLimits'
 
 export type TierId = 'free' | 'pro'
 
@@ -47,13 +47,12 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
   pro: {
     id: 'pro',
     name: 'Teacher Pro',
-    price_monthly_usd: 9,
-    classes_limit: null,
-    students_limit_per_class: null,
+    price_monthly_usd: TEACHER_PRO_PRICE_USD,
+    classes_limit: PRO_LIMITS.classes,
+    students_limit_per_class: PRO_LIMITS.studentsPerRoster,
     features: [
       'Everything in Free',
       'Unlimited classes',
-      'Unlimited students',
       'Analytics & printable reports',
       // First word ("pressure") must stay: tierLimits.parity.test.ts and
       // proGating.test.ts match this bullet against the `pressureDials` key

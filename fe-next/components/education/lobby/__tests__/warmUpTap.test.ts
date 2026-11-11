@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { WARM_UP_TILES, initialWarmUp, warmUpLetters, warmUpReducer } from '../warmUpTap';
+import { hebrewLetters, japaneseLetters, russianLetters, spanishLetters, swedishLetters } from '@/utils/consts';
 
 describe('warmUpLetters — the warm-up board is made of the student’s own name', () => {
   it('Given a name, Then the tiles spell it (uppercased), padded from LEXICLASH', () => {
@@ -17,6 +18,27 @@ describe('warmUpLetters — the warm-up board is made of the student’s own nam
 
   it('Given an empty name, Then it still deals a full board', () => {
     expect(warmUpLetters('')).toHaveLength(WARM_UP_TILES);
+  });
+
+  it('Given a Hebrew name, Then the padding comes from the Hebrew alphabet, never Latin letters', () => {
+    const letters = warmUpLetters('נועה', 'en');
+    expect(letters).toHaveLength(WARM_UP_TILES);
+    expect(letters.slice(0, 4).join('')).toBe('נועה');
+    for (const l of letters.slice(4)) expect(hebrewLetters).toContain(l);
+  });
+
+  it.each([
+    ['he', hebrewLetters],
+    ['ru', russianLetters],
+    ['ja', japaneseLetters],
+    ['sv', swedishLetters],
+    ['es', spanishLetters],
+  ] as const)('Given an empty name in a %s class, Then every tile is from that language alphabet', (language, alphabet) => {
+    for (const l of warmUpLetters('', language)) expect(alphabet).toContain(l);
+  });
+
+  it('Given a Russian name in an English room, Then the name script wins and the padding is Cyrillic', () => {
+    for (const l of warmUpLetters('Ян', 'en').slice(2)) expect(russianLetters).toContain(l);
   });
 });
 

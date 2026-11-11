@@ -98,6 +98,12 @@ describe('useClassroomLaunchSocket: one launcher for every entry path', () => {
     expect(hook.result.current.roomCreatedGameCode).toBe(hook.result.current.gameCode);
   });
 
+  it('Given the server could not verify the teacher sign-in, Then the launch fails with that reason, not a generic one', async () => {
+    const hook = await launched();
+    act(() => fire('classroomGameError', { code: 'AUTH_UNVERIFIED', error: 'education.errors.signInCheckFailed', gameCode: hook.result.current.gameCode }));
+    expect(hook.result.current.startError).toBe('education.errors.signInCheckFailed');
+  });
+
   it('Given the server rejects the room, Then nothing is counted', async () => {
     await launched();
     act(() => fire('classroomGameError', { error: 'nope' }));

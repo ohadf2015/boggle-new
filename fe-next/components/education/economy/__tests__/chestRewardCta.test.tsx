@@ -38,6 +38,30 @@ describe('ChestRewardCta', () => {
     expect(screen.queryByText('classroomBoss.chestUpgraded')).toBeNull();
   });
 
+  it('Given a reward on a Hebrew page, Then the "+N XP" line is isolated so its plus sign stays in front of the number', () => {
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 1, rank: 6, size: 6 };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.getByText('economy.chest.xp').tagName).toBe('BDI');
+  });
+
+  it('Given an underdog finish, Then the chest says it is a comeback chest; a normal chest does not', () => {
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 1, rank: 6, size: 6, underdog: true };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.getByTestId('chest-comeback')).toHaveTextContent('economy.reward.comeback');
+    cleanup();
+    reward.value = { ...reward.value, underdog: undefined };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    expect(screen.queryByTestId('chest-comeback')).toBeNull();
+  });
+
+  it('Given a reward, When the results screen shows it, Then it is a full-width beat with a 44px+ target', () => {
+    reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 9, rank: 1, size: 3 };
+    render(<ChestRewardCta gameCode="ABC" roundId="7" />);
+    const button = screen.getByTestId('chest-reward-cta');
+    expect(button.className).toContain('w-full');
+    expect(button.className).toMatch(/min-h-(1[4-9]|[2-9]\d)/);
+  });
+
   it('Given a reward, When the student taps it, Then the chest opens and closing collects it', () => {
     reward.value = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'eyes:starEye', roundCash: 9, rank: 1, size: 3 };
     render(<ChestRewardCta gameCode="ABC" roundId="7" />);

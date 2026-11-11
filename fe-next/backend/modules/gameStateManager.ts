@@ -66,6 +66,8 @@ import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
 import { clearOpponentWordFeed } from '../utils/opponentWordFeedBatcher';
 import { clearPlayerFoundWords } from '../utils/playerFoundWordBatcher';
+import { notifyRivalScore } from './rivalSocket';
+import { restoreGameOnce } from './gameState/restoreOnce';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
 import { LRUCache } from 'lru-cache';
 import { publishCacheInvalidation, startCacheInvalidationListener, stopCacheInvalidationListener } from '../redis/cacheInvalidation';
@@ -110,22 +112,7 @@ const refreshRestoredGameFromRedis = async (gameCode: string): Promise<GameState
   return game;
 };
 
-// Per-game restoration lock to prevent duplicate concurrent restores
-const restoreLocks = new Map<string, Promise<GameState | null>>();
-const restoreGameFromRedis = (gameCode: string): Promise<GameState | null> => {
-  // If game already exists in memory, no need to restore
-  if (games[gameCode]) return Promise.resolve(games[gameCode]);
-
-  // If a restore is already in-flight for this game, return the same promise
-  const existing = restoreLocks.get(gameCode);
-  if (existing) return existing;
-
-  const promise = doRestore(gameCode, games).finally(() => {
-    restoreLocks.delete(gameCode);
-  });
-  restoreLocks.set(gameCode, promise);
-  return promise;
-};
+const restoreGameFromRedis = (gameCode: string): Promise<GameState | null> => restoreGameOnce(gameCode, games, doRestore);
 
 // Type casting helper for sub-module calls
 const asBase = <T>(game: GameState | null | undefined): T => game as unknown as T;
@@ -581,6 +568,7 @@ const playerHasWord = (gameCode: string, username: string, word: string): boolea
 
 function updatePlayerScore(gameCode: string, username: string, score: number, isDelta = false): void {
   scoreManager.updatePlayerScore(asBase<ScoreGameBase>(games[gameCode]), username, score, isDelta);
+  notifyRivalScore(gameCode, games[gameCode], username);
   persistGameState(gameCode);
 }
 
@@ -632,8 +620,11 @@ const recordPeerValidationVote = (gameCode: string, username: string, isValid: b
 const getPeerValidationWord = (gameCode: string) =>
   peerValidationManager.getPeerValidationWord(asBase<PeerValidationGameBase>(games[gameCode]));
 
-const removePeerRejectedWordScore = (gameCode: string, word: string, submitter: string): number =>
-  peerValidationManager.removePeerRejectedWordScore(asBase<PeerValidationGameBase>(games[gameCode]), word, submitter);
+function removePeerRejectedWordScore(gameCode: string, word: string, submitter: string): number {
+  const removed = peerValidationManager.removePeerRejectedWordScore(asBase<PeerValidationGameBase>(games[gameCode]), word, submitter);
+  notifyRivalScore(gameCode, games[gameCode], submitter);
+  return removed;
+}
 
 // Spectator Management Delegation
 function addSpectatorToGame(gameCode: string, username: string, socketId: string, options: SpectatorOptions = {}): void {

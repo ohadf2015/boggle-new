@@ -43,8 +43,8 @@ function makeSocket() {
     emit: vi.fn(),
     join: vi.fn(),
     leave: vi.fn(),
-    data: {},
-    handshake: { auth: { authUserId: STUDENT_ID } },
+    data: { verifiedUserId: STUDENT_ID },
+    handshake: { auth: {} },
   } as never as { on: Mock; emit: Mock };
 }
 

@@ -18,6 +18,8 @@ import { pulseLive } from '@/lib/education/liveHaptics';
 import { tr, type EduT } from './eduText';
 import { initialWarmUp, warmUpLetters, warmUpReducer } from './warmUpTap';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
+import { useGameLanguage } from '@/hooks/gameState/selectors';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { spellableWords } from './warmUpSpell';
 import { WARM_UP_KEYFRAMES, WarmUpSpellTiles } from './WarmUpSpellTiles';
 
@@ -38,7 +40,9 @@ export function WaitingWarmUp({ username, words, t }: { username: string; words?
 }
 
 function NameTapWarmUp({ username, t }: { username: string; t: EduT }) {
-  const letters = useMemo(() => warmUpLetters(username), [username]);
+  const roomLanguage = useGameLanguage();
+  const { language } = useLanguage();
+  const letters = useMemo(() => warmUpLetters(username, roomLanguage ?? language), [username, roomLanguage, language]);
   const [state, setState] = useState(() => initialWarmUp(seedFor(username)));
   const sfx = useSoundEffects();
   const [reducedEffects] = useReducedEffects();
@@ -84,7 +88,7 @@ function NameTapWarmUp({ username, t }: { username: string; t: EduT }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-6 gap-1.5" dir="ltr">
+      <div className="grid grid-cols-6 gap-1.5" dir={letters.some((c) => /\p{Script=Hebrew}/u.test(c)) ? 'rtl' : 'ltr'}>
         {letters.map((letter, i) => {
           const hot = i === state.hot;
           return (

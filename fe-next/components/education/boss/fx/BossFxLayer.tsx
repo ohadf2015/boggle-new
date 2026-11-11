@@ -20,6 +20,7 @@ export const BossFxLayer = memo(function BossFxLayer({ reducedMotion, shakeRef }
   const hits = useClassroomBossStore((s) => (failed || reducedMotion ? s.view?.lastHits : undefined));
   const critText = t('classroomBoss.crit');
   const exposedText = t('classroomBoss.exposedTag');
+  const lessonText = t('classroomBoss.lessonHit');
 
   useEffect(() => {
     if (reducedMotion || failed) return undefined;
@@ -50,6 +51,7 @@ export const BossFxLayer = memo(function BossFxLayer({ reducedMotion, shakeRef }
               critDmgClass: `${DMG} text-[3.6cqw] text-neo-pink ${styles.pop}`,
               critText,
               exposedText,
+              lessonText,
             },
             () => layer.getBoundingClientRect(),
             (x, y) => {
@@ -73,7 +75,7 @@ export const BossFxLayer = memo(function BossFxLayer({ reducedMotion, shakeRef }
       detach?.();
       if (shakeEl) shakeEl.style.transform = '';
     };
-  }, [reducedMotion, failed, shakeRef, critText, exposedText]);
+  }, [reducedMotion, failed, shakeRef, critText, exposedText, lessonText]);
 
   if (reducedMotion || failed) return <BossProjectiles hits={hits ?? []} />;
   return <div ref={labelsRef} className="pointer-events-none absolute inset-0 z-30 overflow-hidden" aria-hidden="true" />;
@@ -95,7 +97,7 @@ function wire(scene: BossFxScene): () => void {
     if (prev === null) seen = Math.max(0, ...view.lastHits.map((h) => h.id));
     else for (const h of fresh) {
       seen = Math.max(seen, h.id);
-      scene.hit({ word: h.word, dmg: h.dmg, crit: h.crit, exposed: !!h.exposed, slot: h.id });
+      scene.hit({ word: h.word, dmg: h.dmg, crit: h.crit, exposed: !!h.exposed, lesson: !!h.lesson, slot: h.id });
     }
     if ((view.telegraph?.kind ?? null) !== (prev?.telegraph?.kind ?? null)) scene.telegraph(view.telegraph?.kind ?? null);
     if (!!view.exposed !== !!prev?.exposed) scene.exposed(!!view.exposed);

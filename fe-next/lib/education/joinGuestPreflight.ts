@@ -33,7 +33,7 @@ import { ROOM_LOCKED } from '@/shared/types/classroomLobbyLock';
 
 /** A refusal the caller can hand straight back as a `JoinClassroomResult`. */
 export interface GuestJoinRefusal {
-  code: 'INVALID_CODE' | 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED;
+  code: 'INVALID_CODE' | 'NAME_TAKEN' | 'NAME_NOT_ALLOWED' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED;
   /** For NAME_TAKEN: a nickname that is actually free, for one-tap acceptance. */
   suggestedName?: string;
   /** Log/fallback prose. Never rendered on its own — the caller localizes `code`. */
@@ -50,7 +50,7 @@ export interface GuestJoinRefusal {
 export async function checkGuestNameAvailable(
   name: string,
   joinCode: string
-): Promise<{ code?: 'NAME_TAKEN' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED; suggestedName?: string } | null> {
+): Promise<{ code?: 'NAME_TAKEN' | 'NAME_NOT_ALLOWED' | 'STUDENT_LIMIT_REACHED' | typeof ROOM_LOCKED; suggestedName?: string } | null> {
   try {
     const res = await fetch('/api/education/guest-name', {
       method: 'POST',
@@ -62,9 +62,9 @@ export async function checkGuestNameAvailable(
     });
     if (res.status === 403) return { code: 'STUDENT_LIMIT_REACHED' };
     if (res.status === 423) return { code: ROOM_LOCKED };
-    if (res.status !== 409) return null;
+    if (res.status !== 409 && res.status !== 422) return null;
     const data = await res.json();
-    return { code: 'NAME_TAKEN', suggestedName: data?.suggestedName };
+    return { code: res.status === 422 ? 'NAME_NOT_ALLOWED' : 'NAME_TAKEN', suggestedName: data?.suggestedName };
   } catch {
     return null;
   }
@@ -92,8 +92,8 @@ export async function runGuestJoinPreflight(
   if (nameCheck?.code === 'STUDENT_LIMIT_REACHED') {
     return { code: 'STUDENT_LIMIT_REACHED', error: 'STUDENT_LIMIT_REACHED' };
   }
-  if (nameCheck?.code === 'NAME_TAKEN') {
-    return { code: 'NAME_TAKEN', suggestedName: nameCheck.suggestedName, error: 'NAME_TAKEN' };
+  if (nameCheck?.code === 'NAME_TAKEN' || nameCheck?.code === 'NAME_NOT_ALLOWED') {
+    return { code: nameCheck.code, suggestedName: nameCheck.suggestedName, error: nameCheck.code };
   }
   return null;
 }

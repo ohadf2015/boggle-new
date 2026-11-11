@@ -1,8 +1,7 @@
-import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from './freeTierLimits';
+import { FREE_TIER_LIMITS, PRO_LIMITS, TEACHER_PRO_PRICE_USD } from './freeTierLimits';
 import { TEACHER_PRO_TRIAL_DAYS } from './pro/trialDays';
 import { SCHOOL_PRICING } from './pro/schoolPricing';
 import { catalogueModes } from '@/components/education/ClassroomModeCatalogueData';
-import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { locales } from '@/lib/i18n';
 
 /**
@@ -34,9 +33,9 @@ export interface PlanTableRow {
 
 /** Named limits first (what a growing teacher hits), shared ticks, then what $ buys. */
 export const PLAN_TABLE_ROWS: readonly PlanTableRow[] = [
-  { id: 'classes', labelKey: 'teacher.subscription.matrix.classes', fallback: 'Classrooms', free: FREE_TIER_LIMITS.classes, pro: null },
-  { id: 'students', labelKey: 'teacher.subscription.matrix.studentsPerClass', fallback: 'Students on each class roster', free: FREE_TIER_LIMITS.studentsPerClass, pro: MAX_PLAYERS_PER_ROOM },
-  { id: 'assignments', labelKey: 'eduPro.table.assignments', fallbackKey: 'teacher.dashboard.assignments', fallback: 'Assignments per class', free: FREE_TIER_LIMITS.assignmentsPerClass, pro: null },
+  { id: 'classes', labelKey: 'teacher.subscription.matrix.classes', fallback: 'Classrooms', free: FREE_TIER_LIMITS.classes, pro: PRO_LIMITS.classes },
+  { id: 'students', labelKey: 'teacher.subscription.matrix.studentsPerClass', fallback: 'Students on each class roster', free: FREE_TIER_LIMITS.studentsPerClass, pro: PRO_LIMITS.studentsPerLiveGame },
+  { id: 'assignments', labelKey: 'eduPro.table.assignments', fallbackKey: 'teacher.dashboard.assignments', fallback: 'Assignments per class', free: FREE_TIER_LIMITS.assignmentsPerClass, pro: PRO_LIMITS.assignmentsPerClass },
   { id: 'modes', labelKey: 'eduPro.table.modes', fallbackKey: 'landing.home.gameModes', fallback: 'Live game modes', free: CLASSROOM_MODE_COUNT, pro: CLASSROOM_MODE_COUNT },
   { id: 'customLists', labelKey: 'teacher.subscription.matrix.customLists', fallback: 'Your own word lists', free: true, pro: true },
   { id: 'noAds', labelKey: 'teacher.subscription.matrix.noAds', fallback: 'Ad-free for students', free: true, pro: true },

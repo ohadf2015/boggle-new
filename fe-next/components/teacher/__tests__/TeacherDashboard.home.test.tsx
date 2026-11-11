@@ -38,8 +38,8 @@ vi.mock('@/hooks/useStudentProgressMetrics', () => ({ useStudentProgressMetrics:
 
 import TeacherDashboard from '../TeacherDashboard';
 
-const FREE = { hasPro: false, loading: false, source: null, refresh: vi.fn() };
-const PRO = { hasPro: true, loading: false, source: 'polar', status: 'active', refresh: vi.fn() };
+const FREE = { hasPro: false, loading: false, known: true, source: null, accessTrialExpires: null, refresh: vi.fn() };
+const PRO = { hasPro: true, loading: false, known: true, source: 'polar', status: 'active', refresh: vi.fn() };
 const CLASSES = [
   { id: 'c5b', name: '5B - English', member_count: 28, join_code: 'K7Q2' },
   { id: 'c4a', name: '4A - Reading', member_count: 26, join_code: 'ZZ11' },
@@ -179,76 +179,54 @@ describe('Teacher Home', () => {
     expect(screen.getByTestId('home-week-games')).toHaveTextContent('—');
   });
 
-  it('Given a free teacher with a trial offer, Then exactly one compact Pro strip sits in the rail, and the plan pill is quiet', async () => {
-    const onDismiss = vi.fn();
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss, tracked: true }} />);
-    const card = screen.getByTestId('home-pro-card');
-    expect(screen.getAllByTestId('home-pro-card')).toHaveLength(1);
-    expect(card.closest('aside')).not.toBeNull();
-    expect(within(card).getByTestId('home-pro-cta')).toHaveTextContent('Start your 14-day Teacher Pro trial');
-    expect(within(card).queryAllByRole('listitem')).toHaveLength(0);
-    within(card).getByTestId('home-pro-dismiss').click();
-    expect(onDismiss).toHaveBeenCalled();
-  });
-
-  it('Given a free teacher with no class yet, Then the onboarding guide is the one ask and no Pro card shows', () => {
-    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
-    expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
-  });
-
-  it('Given the onboarding guide is showing, Then no Pro card or usage card stacks beside it', () => {
-    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
-    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
-    week = { status: 'ready', summary: { gamesPlayed: 0, totalStudents: 0, activeClasses: 0, lastPlayedAt: {} } };
-    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }} usagePrompt={<div data-testid="usage-card" />} />);
-    expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('usage-card')).not.toBeInTheDocument();
-  });
-
-  it('Given a picked Pro offer, Then its impression fires only when Home actually renders the card', () => {
-    const shown = vi.fn();
-    const offer = { kind: 'upgrade' as const, onDismiss: vi.fn(), tracked: true, onShown: shown };
-    const { unmount } = render(<TeacherDashboard proOffer={offer} />);
-    expect(shown).toHaveBeenCalledTimes(1);
-    unmount();
-
-    shown.mockClear();
-    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
-    render(<TeacherDashboard proOffer={offer} />);
-    expect(shown).not.toHaveBeenCalled();
-  });
-
-  it('Given the week read is still loading, Then the rail Pro card waits instead of flashing', () => {
-    week = { status: 'loading', summary: null };
-    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }} />);
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
-  });
-
-  it('Given an account banner, Then no Pro card or usage card stacks under it', () => {
-    render(
-      <TeacherDashboard
-        banner={<div data-testid="trial-banner" />}
-        proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: true }}
-        usagePrompt={<div data-testid="usage-card" />}
-      />,
-    );
-    expect(screen.getByTestId('trial-banner')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('usage-card')).not.toBeInTheDocument();
-  });
-
-  it('Given no ask was picked, Then Home shows no Pro card at all', () => {
+  it('Given a free teacher with classes, Then exactly one Pro entry shows: the oldest class\'s weekly insight, in the rail', () => {
+    classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], created_at: '2026-10-02T00:00:00Z' }, { ...CLASSES[1], created_at: '2026-09-01T00:00:00Z' }] };
     render(<TeacherDashboard />);
+    const cards = screen.getAllByTestId('home-class-insight');
+    expect(cards).toHaveLength(1);
+    expect(cards[0].parentElement?.closest('aside')).not.toBeNull();
+    expect(cards[0]).toHaveTextContent('4A - Reading');
+    expect(screen.getByTestId('home-class-insight-cta')).toHaveAttribute('href', '/en/teacher/classroom/c4a/analytics');
     expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('home-pro-slot')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-pro-usage-prompt')).not.toBeInTheDocument();
   });
 
-  it('Given a Pro teacher, Then there is no Pro card', () => {
+  it('Given a free teacher with no class yet, Then the onboarding guide is the one ask and no Pro entry shows', () => {
+    classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
+    render(<TeacherDashboard />);
+    expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+  });
+
+  it('Given the week read is still loading, Then the Pro entry waits instead of flashing', () => {
+    week = { status: 'loading', summary: null };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+  });
+
+  it('Given an account banner, Then no Pro entry stacks under it', () => {
+    render(<TeacherDashboard banner={<div data-testid="trial-banner" />} />);
+    expect(screen.getByTestId('trial-banner')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+  });
+
+  it('Given a Pro teacher, Then there is no Pro entry', () => {
     proState = PRO;
-    render(<TeacherDashboard proOffer={{ kind: 'upgrade', onDismiss: vi.fn(), tracked: false }} />);
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+  });
+
+  it('Given a teacher inside a live access trial, Then there is no Pro entry (everything is open)', () => {
+    proState = { ...FREE, accessTrialExpires: new Date(Date.now() + 3 * 86_400_000).toISOString() };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+  });
+
+  it('Given the plan read failed, Then no Pro entry is guessed', () => {
+    proState = { ...FREE, known: false };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
   });
 
   it('Given a brand-new teacher, Then Home is the 3-step onboarding card, not a page of zeros', () => {
@@ -301,11 +279,6 @@ describe('Teacher Home', () => {
     expect(dialog).toContainElement(screen.getByTestId('weekly-progress-digest'));
     expect(dialog).toContainElement(screen.getByTestId('home-weekly-reports-grid'));
     expect(screen.getByTestId('home-weekly-reports-all')).toHaveAttribute('href', '/en/teacher/reports?classroomId=c5b');
-  });
-
-  it('Given a Pro offer, Then the card is words and a button, no blurred fake chart', () => {
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
-    expect(screen.getByTestId('home-pro-card').querySelector('.blur-\\[3px\\]')).toBeNull();
   });
 
   it('Given setup half done, Then no setup strip stacks on the class: the hero carries the next step', () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, cleanup, fireEvent } from '@testing-library/react';
+import { act, render, screen, cleanup, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TvBroadcastView from '@/host/components/TvBroadcastView';
 import type { Language } from '@/shared/types/game';
@@ -197,5 +197,25 @@ describe('TvBroadcastView — the classroom host screen', () => {
     render(<TvBroadcastView {...props({ classroomLive: null })} />);
     expect(headerProps.current?.toastSlot).toBeUndefined();
     expect(screen.getByTestId('tv-toast-queue')).toHaveAttribute('data-placement', 'overlay');
+  });
+
+  it('Given a classroom round, When a student takes the lead in their duel, Then the projector ticker names only the winner', () => {
+    const handlers: Record<string, Array<(d: unknown) => void>> = {};
+    const socket = {
+      on: (e: string, fn: (d: unknown) => void) => { (handlers[e] ??= []).push(fn); },
+      off: vi.fn(),
+      emit: vi.fn(),
+    };
+    render(<TvBroadcastView {...props({ socket: socket as never })} />);
+    expect(handlers.rivalFlip?.length ?? 0).toBeGreaterThan(0);
+    act(() => { handlers.rivalFlip.forEach((h) => h({ gameSessionId: 1, winnerName: 'Maya', winnerAvatar: null })); });
+    expect(screen.getByTestId('rival-ticker')).toHaveTextContent('education.rivals.ticker.flip');
+  });
+
+  it('Given a casual room, Then no duel ticker listens', () => {
+    const handlers: Record<string, unknown[]> = {};
+    const socket = { on: (e: string, fn: unknown) => { (handlers[e] ??= []).push(fn); }, off: vi.fn(), emit: vi.fn() };
+    render(<TvBroadcastView {...props({ socket: socket as never, classroomLive: undefined })} />);
+    expect(handlers.rivalFlip).toBeUndefined();
   });
 });

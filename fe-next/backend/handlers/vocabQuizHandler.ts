@@ -247,9 +247,10 @@ export async function startVocabQuizForClassroom(io: Server, gameCode: string): 
     );
     io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameError', {
       error: 'vocabQuiz.errors.noQuestions',
+      code: 'NO_QUIZ_QUESTIONS',
       gameCode,
     });
-    toRoom(io, gameCode, 'classroomGameError', { error: 'vocabQuiz.errors.noQuestions', gameCode });
+    toRoom(io, gameCode, 'classroomGameError', { error: 'vocabQuiz.errors.noQuestions', code: 'NO_QUIZ_QUESTIONS', gameCode });
     toRoom(io, gameCode, VOCAB_QUIZ_EVENTS.startRefused, { gameCode, reason: 'noQuestions' });
     return 'refused';
   }

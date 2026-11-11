@@ -139,10 +139,11 @@ function hash01(seed: string): number {
 /** Deterministic in its seed, so a replayed claim cannot re-roll a better chest. */
 const TIER_UP: Record<ChestRarity, ChestRarity> = { common: 'rare', rare: 'epic', epic: 'epic' };
 
-export function rollChest(seed: string, opts: { bossWin?: boolean } = {}): ChestRoll {
+export function rollChest(seed: string, opts: { bossWin?: boolean; underdog?: boolean } = {}): ChestRoll {
   const u = hash01(`rarity:${seed}`);
   const rolled: ChestRarity = u < CHEST_ODDS.epic ? 'epic' : u < CHEST_ODDS.epic + CHEST_ODDS.rare ? 'rare' : 'common';
-  const rarity = opts.bossWin ? TIER_UP[rolled] : rolled;
+  const bossed = opts.bossWin ? TIER_UP[rolled] : rolled;
+  const rarity = opts.underdog ? TIER_UP[bossed] : bossed;
   const pool = chestPartPool(rarity);
   const pick = Math.floor(hash01(`item:${seed}`) * pool.length) % pool.length;
   return { rarity, xp: CHEST_XP[rarity], itemId: pool[pick] };

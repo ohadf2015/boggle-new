@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * A Pro teacher (paid or gifted) keeps the trial deadline she was granted Pro
  * to replace — `teacher_access_requests.trial_expires_at` is never cleared.
- * `/teacher` already gates its banner on the entitlement (pickTeacherBanner);
+ * `/teacher` already gates its banner on the entitlement (selectTeacherBanner);
  * this page did not, so a paying teacher landing on /education/access saw
  * "trial expired — Upgrade Now". Same rule here: Pro (or still loading) hides
  * the trial urgency banner. Recurring pitfall class 1: never paint an upsell a

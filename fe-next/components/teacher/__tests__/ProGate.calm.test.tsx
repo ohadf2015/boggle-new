@@ -77,5 +77,19 @@ describe('ProGate calm tone (reports)', () => {
     expect(lock.className).toMatch(/border-\[3px\]/);
     expect(lock.className).toMatch(/(^|\s)shadow-hard-xl(\s|$)/);
   });
-});
 
+  it('Given a quiet lock (the class has no games yet), Then the upgrade is a plain secondary link with no fill, still 44px tall, so the page keeps one loud primary', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, status: 'active', trialUsed: false });
+    render(
+      <ProGate feature="analytics" tone="calm" quiet>
+        <div>paid</div>
+      </ProGate>,
+    );
+    const cta = screen.getByTestId('pro-gate-upgrade-analytics');
+    expect(cta.className).not.toMatch(COLOR_FILL);
+    expect(cta.className).toMatch(/\bunderline\b/);
+    expect(cta.className).toMatch(/\bmin-h-11\b/);
+    expect(cta.className).not.toMatch(/shadow-hard/);
+    expect(fills(screen.getByTestId('pro-gate-pitch')).filter((el) => el !== screen.getByTestId('pro-gate-pill'))).toEqual([]);
+  });
+});

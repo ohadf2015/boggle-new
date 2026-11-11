@@ -7,16 +7,14 @@ import { useRoundReward } from './useRoundReward';
 import { useStudentAvatar } from './useStudentAvatar';
 import RewardChest from './RewardChest';
 import { chestArtSrc } from './chestPhase';
-import { cn } from '@/lib/utils';
 
 interface ChestRewardCtaProps {
   gameCode: string;
   roundId: string | null;
-  quiet?: boolean;
 }
 
 /** The round's chest on the student results card. Renders only what the server sent. */
-export default function ChestRewardCta({ gameCode, roundId, quiet = false }: ChestRewardCtaProps) {
+export default function ChestRewardCta({ gameCode, roundId }: ChestRewardCtaProps) {
   const { t } = useLanguage();
   const reveal = useRoundReward(gameCode, roundId);
   const locker = useChestLocker();
@@ -29,20 +27,17 @@ export default function ChestRewardCta({ gameCode, roundId, quiet = false }: Che
     <>
       <button
         type="button"
+        data-testid="chest-reward-cta"
         onClick={() => setOpening(true)}
-        className={cn(
-          'flex w-full items-center gap-3 text-start font-bold active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
-          quiet
-            ? 'rounded-neo border-[3px] border-neo-lime bg-neo-navy-elevated px-3 py-2 text-neo-cream shadow-hard-sm'
-            : 'rounded-neo-lg border-4 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-hard-lg'
-        )}
+        className="flex min-h-14 w-full items-center gap-3 rounded-neo-lg border-4 border-neo-black bg-neo-lime p-3 text-start font-bold text-neo-navy shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- small transparent chest sprite */}
-        <img src={chestArtSrc(reveal.rarity, false)} alt="" className={cn('shrink-0 object-contain', quiet ? 'size-10' : 'h-14 w-14')} />
+        <img src={chestArtSrc(reveal.rarity, false)} alt="" className="h-14 w-14 shrink-0 object-contain" />
         <span className="flex flex-col">
-          <span className={quiet ? 'text-base' : 'text-lg'}>{collected ? t('economy.reward.collected') : t('economy.reward.ready')}</span>
-          <span className="text-sm">{t('economy.chest.xp', { xp: reveal.xp })}</span>
+          <span className="text-lg">{collected ? t('economy.reward.collected') : t('economy.reward.ready')}</span>
+          <bdi className="text-sm">{t('economy.chest.xp', { xp: reveal.xp })}</bdi>
           {reveal.bossWin && <span className="text-sm">{t('classroomBoss.chestUpgraded')}</span>}
+          {reveal.underdog && <span data-testid="chest-comeback" className="text-sm">{t('economy.reward.comeback')}</span>}
         </span>
       </button>
       {opening && (

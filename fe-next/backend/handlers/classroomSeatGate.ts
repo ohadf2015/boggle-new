@@ -58,7 +58,7 @@ import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js
  *
  * `multiplayer` — `socket.on('join')`, answered by the multiplayer page's
  * `onError` branch, which already renders a line for `GAME_NOT_FOUND`.
- * `classroom`   — `joinClassroomGame`, answered by `ClassroomGameBanner`'s own
+ * `classroom`   — `joinClassroomGame`, answered by the student's
  * `classroomGameError` listener.
  */
 export type SeatDialect = 'multiplayer' | 'classroom';
@@ -116,8 +116,7 @@ export function refuseSeat(
 
   socket.emit('classroomGameError', {
     error: 'Game not found',
-    // For our logs only — the student's screen says the same thing either way.
-    ...(refusal === 'ended' ? { code: 'GAME_ENDED' } : {}),
+    code: refusal === 'ended' ? 'GAME_ENDED' : 'GAME_NOT_FOUND',
     gameCode,
   });
 }

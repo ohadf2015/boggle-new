@@ -57,6 +57,17 @@ vi.mock('@/hooks/useTeacherProCheckout', () => ({
   useTeacherProCheckout: () => ({ pending: false, start: vi.fn() }),
 }));
 
+const week = vi.hoisted(() => ({ status: 'none' as 'pending' | 'empty' | 'data' | 'none' }));
+vi.mock('@/components/teacher/analytics/free/FreeWeekInsight', async () => {
+  const { useEffect } = await import('react');
+  return {
+    FreeWeekInsight: ({ classroomId, locale, onStatus }: any) => {
+      useEffect(() => { onStatus?.(week.status); }, [onStatus]);
+      return <div data-testid="free-week-insight-slot">{`${locale}:${classroomId}`}</div>;
+    },
+  };
+});
+
 // Mock all analytics components
 vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
   ClassOverview: ({ classroomId }: any) => (
@@ -174,6 +185,28 @@ describe('AnalyticsPageClient', () => {
     afterEach(() => {
       teacherPro.hasPro = true;
       teacherPro.loading = false;
+      week.status = 'none';
+    });
+
+    it('given a free class with no games yet, when the lock shows, then "Start a game" stays the one loud action and the upgrade is a quiet link', () => {
+      teacherPro.hasPro = false;
+      week.status = 'empty';
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      const cta = screen.getByTestId('pro-gate-upgrade-analytics');
+      expect(cta.className).not.toMatch(/\bbg-neo-lime\b/);
+      expect(cta.className).toMatch(/\bunderline\b/);
+    });
+
+    it('given a free class whose week is still loading, when rendered, then the lock waits instead of painting a loud button it may take back', () => {
+      teacherPro.hasPro = false;
+      week.status = 'pending';
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      expect(screen.queryByTestId('pro-gate-upgrade-analytics')).not.toBeInTheDocument();
+      expect(screen.getByTestId('analytics-pro-pending')).toBeInTheDocument();
     });
 
     it('withholds the dashboard from a teacher without Pro, and offers the upgrade', () => {
@@ -203,6 +236,18 @@ describe('AnalyticsPageClient', () => {
       expect(screen.getByTestId('pro-gate-upgrade-analytics').className).not.toMatch(/\bbg-neo-cyan\b/);
       expect(screen.getByTestId('pro-gate-pill')).toHaveTextContent('eduShell.nav.pro');
       expect(screen.getByTestId('pro-gate-pill').className).not.toMatch(/\bbg-neo-lime\b/);
+    });
+
+    it('given a free teacher, when the page renders, then the free weekly insight sits above the depth lock', () => {
+      teacherPro.hasPro = false;
+
+      render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+
+      const slot = screen.getByTestId('free-week-insight-slot');
+      expect(slot).toHaveTextContent('en:classroom-1');
+      const lock = screen.getByTestId('pro-gate-lock');
+      expect(slot.compareDocumentPosition(lock) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(screen.queryByTestId('free-game-headline')).not.toBeInTheDocument();
     });
 
     it('shows neither the dashboard nor the upsell until Pro state resolves', () => {

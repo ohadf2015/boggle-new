@@ -18,6 +18,7 @@ import type {
 } from './game';
 
 import type { BlastTileType } from './blast';
+import type { RoundBroadcastEvents } from './socketRoundEvents';
 
 import type {
   SpamWarningPayload,
@@ -43,6 +44,7 @@ export interface ClientToServerEvents {
   'lobby:adWatching': (data: { active: boolean }) => void;
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
+  rivalSync: () => void;
   countdownComplete: (data: { messageId: string }) => void;
   lobbyAutoStartCancel: () => void;
   endGame: () => void;
@@ -128,7 +130,7 @@ export interface HintPayload {
 
 // ==================== Server → Client Events ====================
 
-export interface ServerToClientEvents {
+export interface ServerToClientEvents extends RoundBroadcastEvents {
   // Connection events
   pong: () => void;
   rateLimited: () => void;
@@ -223,7 +225,6 @@ export interface ServerToClientEvents {
   }) => void;
   /** The teacher opened a new game for the same class: re-join `toCode` (backend/handlers/classroomGameMove.ts). */
   classroomGameMoved: (data: { fromCode: string; toCode: string; reason: 'host_new_game' | 'old_code_rejoin' }) => void;
-  hostReactivated: (data: { success: boolean }) => void;
   // Audit T3 (2026-05-10): typed payload + i18n envelope. Server-side
   // `message` was English-only; clients now prefer `i18nKey`+`i18nParams`
   // via `resolveHostLeftMessage`, falling back to `message` for back-compat.
@@ -320,24 +321,6 @@ export interface ServerToClientEvents {
   wordSubmit: (data: { word: string; username: string }) => void;
   roomCreate: (data: { gameCode: string; roomName: string }) => void;
   avatarUpdated: (data: { username: string; avatarImage?: unknown; customAvatar?: unknown }) => void;
-
-  // Round events (monotonic breakers)
-  roundEventWarning: (data: { eventType: string; gameSessionId?: number; timestamp: number }) => void;
-  roundEventStart: (data: { eventType: string; gameSessionId?: number; duration: number; data?: Record<string, unknown> }) => void;
-  roundEventEnd: (data: { eventType: string; gameSessionId?: number }) => void;
-
-  // Rush tiles (recurring transient bonus tiles, ~10s each, all players)
-  rushTilesSpawn: (data: { tiles: Array<{ row: number; col: number }>; durationMs: number; gameSessionId?: number }) => void;
-  rushTilesClear: (data: { gameSessionId?: number }) => void;
-
-  // Special word found
-  specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
-
-  // Earthquake / Fire Round events
-  fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
-  fireRoundEnd: (data: { gameSessionId?: string }) => void;
-  earthquakeShake: (data: { gameSessionId?: string }) => void;
-  earthquakeWarning: (data: { gameSessionId?: string; timestamp: number }) => void;
 
   // Engagement — daily missions & grand slam
   'engagement:dailyMissions': (data: { missions: unknown[] }) => void;

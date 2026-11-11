@@ -77,7 +77,7 @@ import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
-import { renamePlayerInGame } from '../modules/playerRename.js';
+import { checkGuestRename, renamePlayerInGame } from '../modules/playerRename.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -758,16 +758,13 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game || game.gameState !== 'waiting') return;
 
-    const trimmedName = data.newName.trim().slice(0, 20);
-    if (!trimmedName || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(trimmedName)) return;
-
-    const user = game.users[username];
-    if (!user) return;
-
-    if (trimmedName !== username && game.users[trimmedName]) {
-      socket.emit('error', { error: 'NAME_TAKEN', message: 'That name is already in use' });
+    const check = checkGuestRename(game, username, data.newName);
+    if (!check) return;
+    if ('refusal' in check) {
+      socket.emit('error', check.refusal);
       return;
     }
+    const trimmedName = check.name;
 
     if (trimmedName !== username) {
       // Re-key every username-keyed structure (users record, host identity,

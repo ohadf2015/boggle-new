@@ -19,7 +19,6 @@ import {
   addSpectatorToGame,
   getGameSpectators,
   upgradeSpectatorToPlayer,
-  clearSocketMappingsForLeave,
   restoreGameFromRedis,
   refreshRestoredGameFromRedis,
   getNextEligibleHost,
@@ -43,7 +42,7 @@ import { isBlocked } from '../modules/blockListManager.js';
 import timerManager, { clearGameTimer } from '../utils/timerManager.js';
 import { cleanupGameBots } from '../modules/botManager.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
-import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecycle/gameTimer.js';
+import { resumeGameTimerIfMissing } from '../services/gameLifecycle/gameTimer.js';
 import { generateRandomAvatar } from '../utils/gameUtils.js';
 import { answerMissingRoom } from './classroomMissingRoom.js';
 import logger from '../utils/logger.js';
@@ -63,9 +62,10 @@ import {
   handleExistingAuthConnectionJoin
 } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
-import { classroomSeatName } from './classroomSeatName';
+import { classroomSeatName, cleanClassroomSeatName } from './classroomSeatName';
 import { practiceSeatToken } from './practiceSeat';
 import { isLockedOut } from '../modules/classroomLobbyLock.js';
+import { removeMidRoundLeaver } from './midRoundLeave.js';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -195,6 +195,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       }
     }
     if (seat.game && authUserId) username = classroomSeatName(game.users, username, authUserId);
+    if (seat.game && !practiceSeat && authUserId !== seat.game.teacherId) username = cleanClassroomSeatName(game.users, username, { authUserId, guestTokenHash }, game.language);
 
     // Block kicked players from re-joining
     if (game.kickedPlayers?.has(username)) {
@@ -424,17 +425,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // pending a reconnect grace window. If we kept the in-progress slot open
     // here, the user would silently auto-resume on next visit — surprising.
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
-      // Cancel any pending reconnection timer from a prior network drop.
-      timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
-
-      // Notify game start coordinator so ack sequence adjusts.
-      const leaveCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
-      if (leaveCoordResult && leaveCoordResult.startTimer) {
-        startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
-      }
-
-      clearSocketMappingsForLeave(socket.id, gameCode, username);
-      removeUserFromGame(gameCode, username);
+      removeMidRoundLeaver(io, gameCode, game, socket.id, username);
 
       logger.info('SOCKET', `${username} left room ${gameCode} (in-progress — fully removed on explicit exit)`);
 

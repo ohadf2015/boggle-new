@@ -36,7 +36,7 @@ import { CLASSROOM_GAME_MODES, VOCAB_QUIZ_VARIANTS, type ClassroomGameMode, type
 import { CLASSROOM_BOSS_IDS, type ClassroomBossId } from '@/shared/types/classroomBoss';
 import { resolveBossForTeacher } from '../services/classroomBoss/bossEntitlement.js';
 import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
-import { getAuthUserId } from './classroomSocketAuth.js';
+import { getAuthUserId, refuseUnidentified } from './classroomSocketAuth.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { gameCodeSchema } from '../utils/socketValidation.js';
 import logger from '../utils/logger.js';
@@ -67,6 +67,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
     if (!validation.success) {
       socket.emit('classroomGameError', {
         error: 'education.modePicker.switchFailed',
+        code: 'INVALID_PAYLOAD',
         detail: validation.error.issues[0]?.message,
       });
       return;
@@ -77,18 +78,18 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
 
     const authUserId = getAuthUserId(socket);
     if (!authUserId) {
-      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+      refuseUnidentified(socket, 'updateClassroomGameMode', { gameCode: payload.gameCode });
       return;
     }
 
     try {
       const game = await getClassroomGame(payload.gameCode);
       if (!game) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'GAME_NOT_FOUND' });
         return;
       }
       if (authUserId !== game.teacherId) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'NOT_TEACHER' });
         return;
       }
       // The one refusal with a reason the teacher can act on. Swapping the
@@ -96,7 +97,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       // everyone, so say so rather than doing it or doing nothing.
       const bossId = payload.gameMode === 'classic' ? await resolveBossForTeacher(game.teacherId, payload.classroomBossId) : undefined;
       if (game.status === 'playing') {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchMidRound' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchMidRound' , code: 'MODE_SWITCH_MID_ROUND' });
         return;
       }
 
@@ -106,7 +107,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
           ? await setClassroomGameMode(payload.gameCode, payload.gameMode, undefined, bossId)
           : await setClassroomGameMode(payload.gameCode, payload.gameMode);
       if (!applied) {
-        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+        socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'MODE_SWITCH_FAILED' });
         return;
       }
 
@@ -132,7 +133,7 @@ export function registerClassroomGameModeHandlers(io: Server, socket: Socket): v
       );
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to switch mode: ${error}`);
-      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' });
+      socket.emit('classroomGameError', { error: 'education.modePicker.switchFailed' , code: 'MODE_SWITCH_FAILED' });
     }
   });
 }

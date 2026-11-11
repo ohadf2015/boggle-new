@@ -31,6 +31,7 @@ import { isClassroomBossId } from '@/shared/types/classroomBoss';
 import { catalogueIdOf, launchOf, readLocalBossId, writeLocalBossId, writeLocalQuizVariant, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { catalogueEntry } from '../ClassroomModeCatalogueData';
 import type { GameMode } from '@/shared/types/game';
+import { isClassroomIdentityRefusal } from '@/shared/constants/classroomIdentityRefusal';
 
 type Translate = (key: string, params?: Record<string, string | number>) => string;
 
@@ -131,7 +132,7 @@ export function useClassroomModeSwitch({
       const key = (data as { error?: string } | undefined)?.error;
       setPendingMode(null);
       toast.error(
-        t(key === 'education.modePicker.switchMidRound' ? key : 'education.modePicker.switchFailed')
+        t(key && (key === 'education.modePicker.switchMidRound' || isClassroomIdentityRefusal(data)) ? key : 'education.modePicker.switchFailed')
       );
     };
 

@@ -92,3 +92,33 @@ describe('ClassSetupDetails explains the two ways out', () => {
     expect(screen.queryByTestId('setup-create')).toBeNull();
   });
 });
+
+describe('ClassSetupDetails own words field', () => {
+  const own = (count: number, dropped = 0) => ({ text: 'x', onTextChange: vi.fn(), count, dropped, min: 4 });
+
+  it('Given the screen, Then one optional words box shows in the first panel, and the starter list is announced', () => {
+    renderDetails({ ownWords: own(0) });
+    expect(screen.getByTestId('setup-own-words')).toBeInTheDocument();
+    expect(screen.getByText(/common\.optional/)).toBeInTheDocument();
+    expect(screen.getByTestId('setup-starter-list-hint')).toBeInTheDocument();
+    expect(screen.getAllByRole('button').filter((b) => b.getAttribute('type') === 'submit')).toHaveLength(1);
+  });
+
+  it('Given 4 valid words, Then the hint says the class gets the teacher words, not a starter list', () => {
+    renderDetails({ ownWords: own(4) });
+    expect(screen.queryByTestId('setup-starter-list-hint')).toBeNull();
+    expect(screen.getByTestId('setup-own-list-hint')).toHaveTextContent('eduShell.setup.ownWords.listHint:{"count":4}');
+    expect(screen.getByTestId('setup-advanced-summary')).toHaveTextContent('eduShell.setup.ownWords.sticker:{"count":4}');
+  });
+
+  it('Given 2 valid words, Then it says how many more are needed and the starter list still applies', () => {
+    renderDetails({ ownWords: own(2) });
+    expect(screen.getByTestId('setup-own-words-status')).toHaveTextContent('eduShell.setup.ownWords.needMore:{"count":2}');
+    expect(screen.getByTestId('setup-starter-list-hint')).toBeInTheDocument();
+  });
+
+  it('Given words that cannot be played, Then it says how many were left out', () => {
+    renderDetails({ ownWords: own(4, 3) });
+    expect(screen.getByTestId('setup-own-words-dropped')).toHaveTextContent('eduShell.setup.ownWords.dropped:{"count":3}');
+  });
+});

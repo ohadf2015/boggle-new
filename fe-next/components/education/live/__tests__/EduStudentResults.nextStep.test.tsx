@@ -95,9 +95,9 @@ describe('EduStudentResults — one next step', () => {
     expect(screen.getByTestId('edu-student-tomorrow')).toHaveTextContent('eduLiveRoom.studentResults.tomorrowHook:{"score":20}');
   });
 
-  it('Given the chest and the shop, When results show, Then both render in their quiet form', () => {
+  it('Given the chest and the shop, When results show, Then the chest is its full-width beat and the shop its slim row', () => {
     render(<EduStudentResults {...(withMissed as never)} />);
-    expect(chestProps.current?.quiet).toBe(true);
+    expect(chestProps.current?.quiet).toBeFalsy();
     expect(shopProps.current?.compact).toBe(true);
     expect(screen.queryByText('eduLiveRoom.studentResults.nextRound')).toBeNull();
   });

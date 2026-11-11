@@ -10,19 +10,20 @@ import { DailyChest } from '@/components/student/academy/DailyChest';
 import { canOpenChest } from '@/components/student/academy/dailyChestStore';
 import type { EduT } from '@/components/education/lobby/eduText';
 
-/** Signed-in students only: a guest has no level, and auth resolving late must never flip a shown HUD away. */
+/** Guests too: an anonymous account keeps its own XP and chest; with no account at all the HUD shows the starting level. */
 export function EduStudentLobbyHud({ t }: { t: EduT }) {
   const { loading, isAuthenticated, user, profile } = useAuth();
-  if (loading || !isAuthenticated || !user || user.is_anonymous) return null;
+  if (loading) return null;
   const xp = Number((profile as { total_xp?: number | null } | null)?.total_xp) || 0;
-  return <SignedInHud userId={user.id} profileXp={xp} t={t} />;
+  const userId = isAuthenticated && user ? user.id : null;
+  return <StudentHud key={userId ?? 'none'} userId={userId} profileXp={xp} t={t} />;
 }
 
-function SignedInHud({ userId, profileXp, t }: { userId: string; profileXp: number; t: EduT }) {
+function StudentHud({ userId, profileXp, t }: { userId: string | null; profileXp: number; t: EduT }) {
   const { currentStreak } = useWinStreak();
   const reduceMotion = useShouldReduceMotion();
   const [grantedXp, setGrantedXp] = useState<number | null>(null);
-  const [chestOffered] = useState(() => canOpenChest(userId, new Date()));
+  const [chestOffered] = useState(() => userId !== null && canOpenChest(userId, new Date()));
   const level = getXpProgress(Math.max(profileXp, grantedXp ?? 0)).currentLevel;
 
   return (
@@ -34,7 +35,7 @@ function SignedInHud({ userId, profileXp, t }: { userId: string; profileXp: numb
         {t('academy.student.level', { level })}
       </span>
       {currentStreak > 0 && <StreakBonusIndicator currentStreak={currentStreak} showBonus={false} variant="badge" size="sm" />}
-      {chestOffered && (
+      {chestOffered && userId && (
         <DailyChest userId={userId} reducedMotion={reduceMotion} onGranted={(next) => next != null && setGrantedXp(next)} />
       )}
     </div>

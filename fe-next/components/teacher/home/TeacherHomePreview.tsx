@@ -22,6 +22,7 @@ import { HomeWeekLoop } from './HomeWeekLoop';
 import { weekLoopFixture } from './weekLoopFixture';
 import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
 import { previewBanner } from './TeacherProBannersPreview';
+import { HomeClassInsightCard } from './HomeClassInsightCard';
 
 export type TeacherHomePreviewState = 'classes' | 'empty' | 'loading';
 
@@ -46,7 +47,7 @@ function activity(nowMs: number): TeacherActivityRow[] {
 }
 
 /** Dev-only: the real Home grid on fixture data, so the signed-in screen can be captured without an account. */
-export function TeacherHomePreview({ state, banner }: { state: TeacherHomePreviewState; banner?: string }) {
+export function TeacherHomePreview({ state, banner, insight = false }: { state: TeacherHomePreviewState; banner?: string; insight?: boolean }) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const [nowMs] = useState(() => Date.now());
@@ -137,7 +138,7 @@ export function TeacherHomePreview({ state, banner }: { state: TeacherHomePrevie
         ) : null,
       } : null}
       onOpenReports={selected ? () => undefined : null}
-      proCard={null}
+      proCard={insight && selected ? <HomeClassInsightCard classroomId={CLASSES[0].id} className={CLASSES[0].name} language={language} t={t} /> : null}
     />
     </PreviewTeacherAuth>
   );

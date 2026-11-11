@@ -45,3 +45,15 @@ export const LESSON_WORD_BONUS = 5;
 export function lessonWordBonus(fromLesson: boolean): number {
   return fromLesson ? LESSON_WORD_BONUS : 0;
 }
+
+/** Paid once, to the first student who finds a placed lesson word; later finders keep LESSON_WORD_BONUS. */
+export const LESSON_CLAIM_BONUS = 3;
+
+/** The projector must stay readable from the back of a room. */
+export const LESSON_RACE_MAX_SLOTS = 12;
+
+/** A race needs a rival: practice, solo and bots-only rounds keep the private strip. */
+export const LESSON_RACE_MIN_HUMANS = 2;
+
+/** Board modes whose accepted words reach the shared word handler (the only place a claim is decided). */
+export const LESSON_RACE_MODES: ReadonlySet<string> = new Set(['classic', 'blast', 'word-hunt']);

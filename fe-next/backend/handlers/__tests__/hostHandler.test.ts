@@ -120,7 +120,7 @@ describe('hostHandler', () => {
 
   // ─── hostReactivate ───
   describe('hostReactivate', () => {
-    it('reactivates host and emits success when sender is host', () => {
+    it('reactivates host when sender is host, with no ack nobody listens for', () => {
       const { socket, handlers } = createMockSocket();
       registerHostHandlers(mockIo, socket);
 
@@ -131,7 +131,7 @@ describe('hostHandler', () => {
       handlers['hostReactivate']();
 
       expect(mockReactivateHost).toHaveBeenCalledWith('GAME1');
-      expect(socket.emit).toHaveBeenCalledWith('hostReactivated', { success: true });
+      expect(socket.emit).not.toHaveBeenCalled();
     });
 
     it('does nothing when socket has no game', () => {
@@ -171,21 +171,6 @@ describe('hostHandler', () => {
 
       expect(mockReactivateHost).not.toHaveBeenCalled();
       expect(socket.emit).not.toHaveBeenCalled();
-    });
-
-    it('emits success even when reactivateHost returns false', () => {
-      const { socket, handlers } = createMockSocket();
-      registerHostHandlers(mockIo, socket);
-
-      mockGetGameBySocketId.mockReturnValue('GAME1');
-      mockGetGame.mockReturnValue(makeGame());
-      mockReactivateHost.mockReturnValue(false);
-
-      handlers['hostReactivate']();
-
-      expect(mockReactivateHost).toHaveBeenCalledWith('GAME1');
-      // The handler always emits success:true regardless of reactivateHost return
-      expect(socket.emit).toHaveBeenCalledWith('hostReactivated', { success: true });
     });
   });
 

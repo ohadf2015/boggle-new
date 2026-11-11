@@ -5,6 +5,7 @@
 
 import { Server } from 'socket.io';
 import { socketLogger } from './logger';
+import { markSocketIdentity } from './socketAuth';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { initializeSocketHandlers } from '../backend/socketHandlers';
 import { cleanupStaleGames, cleanupEmptyRooms, getActiveRooms } from '../backend/modules/gameStateManager';
@@ -110,12 +111,10 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     const crazyGamesToken = socket.handshake.auth?.crazyGamesToken as string | undefined;
 
     // Verify Supabase auth token
-    if (!token) {
-      socket.data.verifiedUserId = null;
-    } else if (!supabase) {
+    let verifiedUser: { userId: string; email?: string } | null = null;
+    if (token && !supabase) {
       socketLogger.warn('Auth middleware: Supabase not configured, skipping verification');
-      socket.data.verifiedUserId = null;
-    } else {
+    } else if (token && supabase) {
       try {
         const authResult = await Promise.race([
           supabase.auth.getUser(token),
@@ -128,16 +127,14 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
 
         if (error || !user) {
           socketLogger.warn({ socketId: socket.id, err: error?.message || 'no user' }, 'Invalid auth token');
-          socket.data.verifiedUserId = null;
         } else {
-          socket.data.verifiedUserId = user.id;
-          socket.data.verifiedEmail = user.email;
+          verifiedUser = { userId: user.id, email: user.email ?? undefined };
         }
       } catch (err) {
         socketLogger.error({ err }, 'Auth verification error');
-        socket.data.verifiedUserId = null;
       }
     }
+    markSocketIdentity(socket.data as Record<string, unknown>, token, verifiedUser);
 
     // Store CrazyGames token for downstream handlers (verified lazily on demand).
     // Full JWT verification requires jose + JWKS fetch — handlers that need

@@ -59,6 +59,16 @@ describe('TeacherAccessDrawer Enhancements', () => {
     global.fetch = vi.fn();
   });
 
+  it('Given an old request stored with an empty reason, Then the reason reads as a dash, not an empty box', () => {
+    render(<TeacherAccessDrawer row={{ ...mockRequest, use_case: '' }} onClose={vi.fn()} onActioned={vi.fn()} />);
+    expect(screen.getByTestId('tar-drawer-use-case')).toHaveTextContent(/^—$/);
+  });
+
+  it('Given a reason, Then it shows as written', () => {
+    render(<TeacherAccessDrawer row={mockRequest} onClose={vi.fn()} onActioned={vi.fn()} />);
+    expect(screen.getByTestId('tar-drawer-use-case')).toHaveTextContent('We want to use this for our ESL program.');
+  });
+
   afterEach(() => {
     vi.resetAllMocks();
   });

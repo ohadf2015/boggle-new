@@ -140,7 +140,7 @@ export const enB: HelpLocaleContent = {
         t: 'list',
         items: [
           '**Free, forever**: {classes} classes of up to {students} students, live games with up to {players} players, word lists, homework ({assignments} per class) and the basic class report.',
-          '**Teacher Pro**: unlimited classes, students and homework, word mastery reports, the full printable report, spaced review of missed words, calm mode and parent report links.',
+          '**Teacher Pro**: unlimited classes and homework, word mastery reports, the full printable report, spaced review of missed words, calm mode and parent report links.',
           '**Students**: always free, on both plans, with no ads.',
         ],
       },

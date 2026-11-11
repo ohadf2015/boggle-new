@@ -1,9 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AlertTriangle } from 'lucide-react';
 import type { MockedFunction } from 'vitest';
-import { MetricCard } from '../MetricCard';
 import { StudentProgressTable } from '../StudentProgressTable';
 import { ReportEmptyState } from '@/components/teacher/reports/ReportEmptyState';
 import { useStudentProgressMetrics } from '@/hooks/useStudentProgressMetrics';
@@ -21,8 +19,6 @@ vi.mock('../ShareParentReportButton', () => ({
 }));
 
 const tokens = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
-const LOUD_FILL = /^bg-neo-(lime|yellow|cyan|pink|orange|cream)$/;
-const loudIn = (root: Element) => [root, ...root.querySelectorAll('[class]')].filter((el) => tokens(el).some((c) => LOUD_FILL.test(c)));
 
 const student = (i: number, over: Partial<StudentProgressSummary> = {}): StudentProgressSummary =>
   ({
@@ -40,16 +36,6 @@ const student = (i: number, over: Partial<StudentProgressSummary> = {}): Student
   }) as unknown as StudentProgressSummary;
 
 describe('Pro class report: calm surfaces', () => {
-  it('given a calm metric, then it is a navy tile with no colored fills and an outlined action', () => {
-    const onClick = vi.fn();
-    render(<MetricCard tone="calm" title="Needing help" value={3} icon={<AlertTriangle />} severity="urgent" compact actionable={{ label: 'See students', onClick }} />);
-    const card = screen.getByTestId('metric-card');
-    expect(loudIn(card)).toEqual([]);
-    expect(tokens(card)).toContain('bg-neo-navy-light');
-    fireEvent.click(screen.getByRole('button', { name: 'See students' }));
-    expect(onClick).toHaveBeenCalled();
-  });
-
   it('given a full class, then the student table shows one page at a time with a pager', () => {
     (useStudentProgressMetrics as MockedFunction<typeof useStudentProgressMetrics>).mockReturnValue({
       students: Array.from({ length: 40 }, (_, i) => student(i)),

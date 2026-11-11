@@ -88,10 +88,10 @@ const accepted = { word: 'planet', score: 9, baseScore: 5, comboBonus: 0, comboL
 describe('wordAccepted bonuses → bonus pill (both paths)', () => {
   beforeEach(() => useMpBonusStore.setState({ last: null }));
 
-  it.each([['player', mountPlayer], ['host', () => mountHost()]] as const)('%s path records a comeback bonus with its percent', async (_n, mount) => {
+  it.each([['player', mountPlayer], ['host', () => mountHost()]] as const)('%s path records a comeback bonus with its points', async (_n, mount) => {
     const socket = mount();
-    await act(async () => { await socket.fire('wordAccepted', { ...accepted, catchUp: { bonus: 2, pct: 15 } }); });
-    expect(useMpBonusStore.getState().last?.bonus).toMatchObject({ kind: 'comeback', pct: 15, points: 2 });
+    await act(async () => { await socket.fire('wordAccepted', { ...accepted, catchUp: { bonus: 2, pct: 0.15 } }); });
+    expect(useMpBonusStore.getState().last?.bonus).toEqual({ kind: 'comeback', points: 2 });
   });
 
   it.each([['player', mountPlayer], ['host', () => mountHost()]] as const)('%s path records a meteor bonus', async (_n, mount) => {

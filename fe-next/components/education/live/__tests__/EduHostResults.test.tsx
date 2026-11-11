@@ -134,6 +134,14 @@ describe('EduHostResults', () => {
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
   });
 
+  it('given a free teacher on the live projector, when results show, then the hardest words are the free insight on the wall before any Pro ask', () => {
+    pro.hasPro = false;
+    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    expect(screen.getAllByTestId('edu-most-missed-word').length).toBeGreaterThan(0);
+    expect(screen.getByTestId('edu-results-more')).toHaveAttribute('data-open', 'false');
+    expect(screen.queryByTestId('class-report-teaser')).toBeNull();
+  });
+
   it('given lesson words, when results show, then the words still to teach are on the wall', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} />);
     expect(screen.getAllByTestId('edu-most-missed-word').map((el) => el.textContent)).toEqual(['dog']);

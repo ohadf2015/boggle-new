@@ -66,7 +66,7 @@ export const BossProjectiles = memo(function BossProjectiles({ hits }: { hits: C
               style={{ animationDelay: '600ms', animationFillMode: 'both', marginInlineStart: `${(f.slot % 2 ? 1 : -1) * 5}cqw` }}
             >
               -{f.dmg}
-              {f.crit && <span className="block text-[2.2cqw] text-neo-yellow">{t('classroomBoss.crit')}</span>}
+              {f.crit && <span className="block text-[2.2cqw] text-neo-yellow">{t(f.lesson ? 'classroomBoss.lessonHit' : 'classroomBoss.crit')}</span>}
             </span>
           </div>
         );

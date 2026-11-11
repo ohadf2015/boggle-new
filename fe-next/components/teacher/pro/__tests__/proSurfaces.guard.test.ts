@@ -13,7 +13,6 @@ const PRO_SURFACES = [
   'components/teacher/CheckoutReturnCapture.tsx',
   'components/teacher/ProGate.tsx',
   'components/teacher/reports/MasteryLockedTeaser.tsx',
-  'components/teacher/home/HomeProCard.tsx',
   'components/education/TeacherTrialReminderBanner.tsx',
   'components/education/TrialUrgencyBanner.tsx',
   'components/education/TeacherProCompareCheckoutStrip.tsx',

@@ -11,6 +11,7 @@ import { checkSocketRateLimit } from '../middleware/rateLimiterRedis';
 import { inc } from '../utils/metrics';
 import logger from '../utils/logger';
 import { isSocketMigrating } from './shared';
+import { takeRoomReaction } from '../modules/roomReactionBudget';
 
 const VALID_REACTION_IDS = new Set(['fire', 'clap', 'wow', 'dead', 'crown', 'zap', 'love']);
 const REACTION_WEIGHT = 1;
@@ -43,6 +44,10 @@ function registerReactionHandlers(_io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
     if (!gameCode || !username) return;
+    if (!takeRoomReaction(gameCode)) {
+      inc('rateLimited');
+      return;
+    }
 
     // Broadcast to all other players in the room (sender already shows locally)
     socket.to(getGameRoom(gameCode)).emit('quickReaction', { reactionId, username });

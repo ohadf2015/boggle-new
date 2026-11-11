@@ -2,11 +2,12 @@
 
 import { memo, type ReactNode } from 'react';
 import Image from 'next/image';
-import { BookOpenCheck, Coins, Crown, Sparkles, Star, TrendingUp, Users } from 'lucide-react';
+import { BookOpenCheck, Coins, Crown, Sparkles, Star, Swords, TrendingUp, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCountUp } from '@/hooks/useCountUp';
 import { MASCOT_SRC, mascotFor, type RivalGap } from '@/components/multiplayer/results/mpResultsView';
 import type { Translate } from './eduLiveStyles';
+import type { RivalOutcome } from './useRival';
 
 export interface EduStudentHeroProps {
   rank: number;
@@ -18,6 +19,8 @@ export interface EduStudentHeroProps {
   xp: number | null;
   coins: number | null;
   gap: RivalGap | null;
+  /** The round's duel, when rivalry was on: it replaces the next-place gap line. */
+  rival?: RivalOutcome | null;
   reduceMotion: boolean;
   t: Translate;
   /** Rides at the end of the chip row, so a class-wide line costs no row of its own. */
@@ -44,10 +47,15 @@ function gapLine(gap: RivalGap, t: Translate): string {
   return gap.kind === 'ahead' ? t('mpUi.results.ahead', { points: gap.points, name: gap.name }) : t('mpUi.results.behind', { points: gap.points, name: gap.name });
 }
 
+function rivalLine({ rivalName: name, diff }: RivalOutcome, t: Translate): string {
+  if (diff > 0) return t('education.rivals.outcome.won', { name, points: diff });
+  return diff < 0 ? t('education.rivals.outcome.lost', { name, points: -diff }) : t('education.rivals.outcome.tied', { name });
+}
+
 const CHIP = 'inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-full border-[3px] border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black shadow-hard-sm motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.34,1.56,0.64,1)_both]';
 
 /** "Where did I land": my placing, my points counting up, my best word and what I earned, on one card I can read at arm's length. */
-function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, gap, reduceMotion, t, extra }: EduStudentHeroProps) {
+function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, gap, rival, reduceMotion, t, extra }: EduStudentHeroProps) {
   const shown = useCountUp({ target: score, duration: 1100, startDelay: 200, immediate: reduceMotion });
   const mood = score <= 0 ? 'cheer' : mascotFor(rank, total, score);
   const chips: { id: string; fill: string; body: ReactNode }[] = [];
@@ -78,10 +86,10 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
     });
   }
   if (xp != null && xp > 0) {
-    chips.push({ id: 'edu-student-xp', fill: 'bg-neo-purple', body: <><Sparkles className="size-4 shrink-0" aria-hidden="true" />{t('mpUi.results.xp', { xp })}</> });
+    chips.push({ id: 'edu-student-xp', fill: 'bg-neo-purple', body: <><Sparkles className="size-4 shrink-0" aria-hidden="true" /><bdi>{t('mpUi.results.xp', { xp })}</bdi></> });
   }
   if (coins != null && coins > 0) {
-    chips.push({ id: 'edu-student-coins', fill: 'bg-neo-orange', body: <><Coins className="size-4 shrink-0" aria-hidden="true" />{t('mpUi.results.coins', { coins })}</> });
+    chips.push({ id: 'edu-student-coins', fill: 'bg-neo-orange', body: <><Coins className="size-4 shrink-0" aria-hidden="true" /><bdi>{t('mpUi.results.coins', { coins })}</bdi></> });
   }
 
   return (
@@ -98,7 +106,7 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
             {t(headlineKey(rank, total, score))}
           </p>
           {/* "#1 of 1" on zero points is not a placing. */}
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <div className="mt-1.5 flex flex-col items-start gap-1">
             {score > 0 && total > 1 && (
               <p data-testid="edu-student-rank" className="font-neo-display text-3xl font-black leading-none tabular-nums sm:text-5xl">
                 {t('eduLiveRoom.studentResults.rankOf', { rank, total })}
@@ -122,7 +130,12 @@ function EduStudentHeroImpl({ rank, total, score, bestWord, lesson, xp, coins, g
         />
       </div>
 
-      {gap && (
+      {rival ? (
+        <p data-testid="edu-student-rival" dir="auto" className="mt-1.5 flex items-center gap-1.5 font-neo-body text-sm font-bold">
+          {rival.won ? <Crown className="size-4 shrink-0" aria-hidden="true" /> : <Swords className="size-4 shrink-0" aria-hidden="true" />}
+          <span className="min-w-0">{rivalLine(rival, t)}</span>
+        </p>
+      ) : gap && (
         <p data-testid="edu-student-gap" dir="auto" className="mt-1.5 flex items-center gap-1.5 font-neo-body text-sm font-bold">
           {gap.kind === 'behind' ? (
             <TrendingUp className="size-4 shrink-0" aria-hidden="true" />

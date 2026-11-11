@@ -114,7 +114,6 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
     { label: t('education.landing.pro.customLists'), included: true },
     { label: t('education.landing.pro.noAds'), included: true },
     { label: t('teacher.subscription.unlimitedClasses'), included: false },
-    { label: t('teacher.subscription.unlimitedStudents'), included: false },
     { label: t('education.landing.pro.analytics'), included: false },
     { label: t('eduPro.upgrade.freeMastery'), included: false },
     { label: t('eduPro.upgrade.freePractice'), included: false },

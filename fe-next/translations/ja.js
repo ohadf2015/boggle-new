@@ -245,6 +245,7 @@ const ja = {
   // @eduPickers:end
   // @eduBoss:start
   "classroomBoss": {
+    "lessonHit": "レッスンヒット！",
     "chestUpgraded": "ボス撃破! 宝箱がランクアップ!",
     "topHitter": "ダメージ王",
     "cardHow": "クラス全員で1体のボスに挑む。見つけた単語がそのまま攻撃に。",
@@ -455,7 +456,8 @@ const ja = {
         "ready": "宝箱が準備できました",
         "collected": "宝箱を獲得",
         "round": "このラウンド: {cash} 所持金",
-        "rank": "このラウンド {size}人中 {rank}位"
+        "rank": "このラウンド {size}人中 {rank}位",
+        "comeback": "逆転チェスト！中身がパワーアップ"
       },
       "locker": {
         "title": "ロッカー",
@@ -2355,7 +2357,7 @@ const ja = {
     "free_1": "1クラス最大50人まで",
     "free_2": "クラス3つまで",
     "free_3": "基本のゲームモード",
-    "pro_1": "1クラスの人数は無制限",
+    "pro_1": "クラスの人数制限なし",
     "pro_2": "クラス数は無制限",
     "pro_3": "上級ゲームモード＋オリジナル単語",
     "pro_4": "生徒の学習レポートと分析",
@@ -14813,7 +14815,7 @@ const ja = {
       "perk": {
         "analytics": "毎回のゲーム後に、クラスが苦手だった単語がわかる",
         "reports": "印刷できるクラス・生徒レポート",
-        "unlimited": "クラスも生徒も無制限"
+        "unlimited": "クラス数無制限・クラスの人数制限なし"
       },
       "noCard": "終了後は無料プランに戻るだけです。あなたが選ばない限り、請求することはありません。",
       "paidBody": "Teacher Pro のサブスクリプションが有効になりました。教師プロフィールからいつでも管理・解約できます。",
@@ -14950,15 +14952,15 @@ const ja = {
       "giftedBadge": "ギフト",
       "classLimitTitle": "クラスの上限に達しました",
       "classLimitReached": "クラス数の上限に達しました。無制限にするには Teacher Pro にアップグレードしてください。",
-      "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
+      "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスを無制限に作れます。",
       "studentLimitTitle": "生徒数の上限に達しました",
-      "studentLimitMessage": "このクラスは無料プランの{{limit}}人中{{current}}人です。Proにアップグレードすると生徒数が無制限になります。",
+      "studentLimitMessage": "このクラスの生徒は{{limit}}人中{{current}}人で、無料プランの上限です。Teacher Proならクラスの人数制限がなくなります。ライブゲームの参加人数はどのプランでも同じです。",
       "usagePromptTitle": "クラスがTeacher Proの出番です",
-      "usagePromptStudentsBody": "クラスに{{count}}人の生徒がいます。Teacher Proなら全員をカバーできます。クラスも生徒数も無制限で、進捗分析と印刷できるレポートも使えます。",
+      "usagePromptStudentsBody": "クラスの生徒が{{count}}人になりました。Teacher Proならクラスの人数制限がなくなり、クラス数無制限、進捗分析、印刷できるレポートも使えます。ライブゲームの参加人数はどのプランでも同じです。",
       "usagePromptAssignmentsBody": "クラスに{{count}}件の課題を作成しました。Teacher Proなら上限なし。課題は無制限で、進捗分析とレポートも使えます。",
       "assignmentLimitTitle": "課題の上限に達しました",
       "assignmentLimitMessage": "このクラスの無料課題を{{limit}}件中{{current}}件作成しました。Proにアップグレードすると課題は無制限。",
-      "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
+      "upgradeProDescription": "Proなら、クラス数無制限、クラスの人数制限なし、進捗分析、印刷できるレポートが使えます。",
       "trialExpiredTitle": "無料プラン以上の機能が必要ですか？",
       "trialExpiredMessage": "無料プランは期限なしで使い続けられます。Proならクラス数無制限と進捗レポートが加わり、新しいアカウントは14日間無料です。",
       "continueFree": "無料プランで続ける",
@@ -15073,7 +15075,7 @@ const ja = {
     },
     "upgradePro": {
       "cta": "Proにアップグレード",
-      "body": "クラスと生徒数の上限を解除"
+      "body": "クラス数もクラスあたりの人数も上限なし"
     },
     "dashboard": {
       "title": "教師ダッシュボード",
@@ -15126,6 +15128,10 @@ const ja = {
       "scanToJoin": "スキャンして参加"
     },
     "classroom": {
+      "rivalry": {
+        "toggle": "ライバル対決",
+        "hint": "生徒一人ひとりに、そのラウンドの間、実力の近いライバルが一人つきます。"
+      },
       "studentCap": "生徒 {{count}} / {{limit}} 人",
       "studentCountPro": "生徒 {{count}} 人",
       "cardSeeAllStudents": "生徒 {{count}} 人をすべて見る",
@@ -15985,9 +15991,52 @@ const ja = {
       "slipType": "を開いてコードを入力",
       "slipNoAccount": "アカウントやメールは不要です。",
       "invalid": "このページにはクラスコードがありません。先生ホームからもう一度開いてください。"
+    },
+    "weekInsight": {
+      "title": "今週サポートが必要な生徒",
+      "nobodyStuck": "今週つまずいている生徒はいません。",
+      "more": "ほか{{count}}人",
+      "hardestTitle": "今週いちばん難しかった単語",
+      "missed": "{{pct}}%がミス",
+      "emptyTitle": "今週はまだゲームがありません",
+      "emptyBody": "このクラスで1回ゲームをすると、サポートが必要な生徒がわかります。",
+      "startGame": "ゲームを始める",
+      "proLine": "Proなら毎週の記録と生徒一人ひとりを確認できます",
+      "homeTitle": "今週、{{name}}でサポートが必要なのは？",
+      "homeBody": "1クラスは無料。Proなら過去の週、生徒ごとのレポート、すべてのクラスが見られます。",
+      "homeCta": "今週を見る"
     }
   },
   "education": {
+    "race": {
+      "claimedCount": "{claimed}/{total} ゲット済み",
+      "takenBy": "{word}は{name}が先にゲット",
+      "youClaimed": "{word}ゲット！+{bonus}",
+      "claimedBy": "{name}が{word}をゲット！",
+      "projectorTitle": "ワードレース"
+    },
+    "rivals": {
+      "vs": "vs",
+      "level": "同点",
+      "aria": {
+        "ahead": "ライバルは{{name}}。{{points}}点リード中です！",
+        "behind": "ライバルは{{name}}。あと{{points}}点で追いつけます！",
+        "level": "ライバルは{{name}}。いま同点です！"
+      },
+      "announce": {
+        "lead": "{{name}}を追い抜きました！",
+        "passed": "{{name}}が前に出ました。まだ追いつけます！"
+      },
+      "ticker": {
+        "flip": "{{name}}がライバル対決でリード！",
+        "label": "対決ハイライト"
+      },
+      "outcome": {
+        "won": "ライバルの{{name}}に{{points}}点差で勝ちました！",
+        "lost": "今回は{{name}}が{{points}}点差で勝利。次のラウンドでリベンジ！",
+        "tied": "{{name}}との対決は引き分けでした！"
+      }
+    },
     "whatsNew": {
       "entries": {
         "sep2026": {
@@ -16123,7 +16172,9 @@ const ja = {
       }
     },
     "errors": {
-      "serverUnavailable": "現在、クラス名簿にアクセスできません。こちら側の問題です。少し待ってからもう一度お試しください。"
+      "serverUnavailable": "現在、クラス名簿にアクセスできません。こちら側の問題です。少し待ってからもう一度お試しください。",
+      "signInCheckFailed": "今はサインインを確認できませんでした。こちら側の問題です。少し待ってからもう一度お試しください。",
+      "signInRequired": "このクラスを続けるには、もう一度サインインしてください。"
     },
     "intentCta": {
       "forTeachers": "先生向け / 英語を学ぶ",
@@ -16680,7 +16731,12 @@ const ja = {
       "unpluggedReteachPackQrHint": "スキャンしてプロジェクターで復習を開く",
       "unpluggedReteachPackHowTo": "1) このパックを印刷 2) 練習ページを生徒に渡す 3) 教師画面でQRをスキャン",
       "unpluggedReteachPackPracticeHeading": "生徒用練習ページ",
-      "unpluggedReteachPackFooter": "LexiClash · デバイスなしの復習シート"
+      "unpluggedReteachPackFooter": "LexiClash · デバイスなしの復習シート",
+      "freeInsight": {
+        "title": "このラウンドで難しかった単語",
+        "foundBy": "{{of}}人中{{found}}人が見つけた",
+        "proLine": "Proなら生徒全員の詳しいレポート"
+      }
     },
     "classroomAddon": {
       "eyebrow": "Google Classroom Marketplace",
@@ -17152,7 +17208,7 @@ const ja = {
         "proTier": "Teacher Pro",
         "everythingInFree": "無料プランの全機能",
         "classLimitPro": "クラス数は無制限",
-        "studentLimitPro": "生徒数は無制限",
+        "studentLimitPro": "クラスの人数制限なし",
         "analytics": "生徒ごとの学習進捗分析",
         "chooseNow": "Teacher Pro を始める",
         "whyNow": "まずは無料で。1クラス {count} 人では足りなくなったときが Pro の出番です。"
@@ -17298,7 +17354,7 @@ const ja = {
         },
         "q2": {
           "q": "無料プランはありますか？",
-          "a": "はい。認定教師向けの無料基本プランがあります：最大3クラス、各クラス50人まで、生徒への広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
+          "a": "はい。認定教師向けの無料基本プランがあります：最大3クラス、各クラス50人まで、生徒への広告なし。Teacher Pro（月$9）ではクラス数もクラスあたりの人数も無制限になります。ライブゲームはどのプランでも最大50人まで参加できます。"
         },
         "q3": {
           "q": "本当にヘブライ語・日本語・スウェーデン語・スペイン語に対応していますか？",
@@ -17776,7 +17832,8 @@ const ja = {
           "title": "このルームはロックされています",
           "hint": "先生にロックを解除してもらってから、もう一度試してね。",
           "retry": "もう一度試す"
-        }
+        },
+        "nameNotAllowed": "その名前はクラスの画面に出せません。{{suggestedName}} はどう？"
       },
       "classroomRoomGone": "クラスのゲームが終了しました。先生に新しいゲームを始めてもらってね。",
       "deadEnd": {
@@ -21235,7 +21292,8 @@ const ja = {
       "bonusMeteor": "メテオ +{points}",
       "rejectFrozen": "凍結中！少し待ってね",
       "rejectRateLimited": "速すぎ！ゆっくりね",
-      "rejectError": "単語を確認できませんでした。もう一度どうぞ"
+      "rejectError": "単語を確認できませんでした。もう一度どうぞ",
+      "bonusComebackPoints": "逆転ボーナス +{points}"
     },
     "results": {
       "time": "タイムアップ！",
@@ -22482,7 +22540,14 @@ const ja = {
         "listName": "{date}の単語",
         "playNow": "今すぐプレイ",
         "saved": "クラスに保存済み",
-        "createHint": "次に参加コードと今週の単語を入れる欄が出ます。あとは「今すぐプレイ」を押すだけ。"
+        "createHint": "次に参加コードと今週の単語を入れる欄が出ます。あとは「今すぐプレイ」を押すだけ。",
+        "listMissing": "保存した単語リストが見つからなかったため、最初の単語リストで遊びます。"
+      },
+      "ownWords": {
+        "listHint": "入力した{count}語が、このクラスの最初の単語リストになります。",
+        "sticker": "自分の単語 · {count}",
+        "needMore": "自分の単語を使うには、あと{count}語追加してください。",
+        "dropped": "除外：{count}件。使えるのはクラスの言語の1語だけの単語です。"
       }
     },
     "host": {

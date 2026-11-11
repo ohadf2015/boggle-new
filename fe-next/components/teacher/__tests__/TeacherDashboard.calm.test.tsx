@@ -53,15 +53,15 @@ afterEach(cleanup);
 
 describe('Teacher Home: one primary, chunky blocks', () => {
   it('Then color comes back as decoration only: accent pieces hold no buttons or links, and the week numbers each get their own accent', () => {
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+    render(<TeacherDashboard />);
     const home = screen.getByTestId('teacher-home');
     for (const decor of home.querySelectorAll('[data-accent-decor]')) expect(decor.querySelector('a,button')).toBeNull();
     const colors = ['games', 'students', 'active'].map((id) => screen.getByTestId(`home-week-${id}`).className.match(/text-neo-(cyan|pink|purple|yellow|orange)/)?.[1]);
     expect(new Set(colors).size).toBe(3);
   });
 
-  it('Given one class and a Pro offer, Then Start a game is the only lime fill on the page', () => {
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+  it('Given one class and the free Pro entry, Then Start a game is the only lime fill on the page', () => {
+    render(<TeacherDashboard />);
     expect(limeFills(screen.getByTestId('teacher-home'))).toEqual([screen.getByTestId('home-start-live')]);
   });
 
@@ -129,10 +129,10 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(home.className).not.toMatch(/minmax\(0,1fr\)\]/);
   });
 
-  it('Then week stats and weekly reports stay off the phone first frame while the Pro card stays', () => {
-    render(<TeacherDashboard proOffer={{ kind: 'trial', onDismiss: vi.fn(), tracked: true }} />);
+  it('Then week stats and weekly reports stay off the phone first frame while the Pro entry stays', () => {
+    render(<TeacherDashboard />);
     expect(screen.getByTestId('home-week').closest('.max-lg\\:hidden')).not.toBeNull();
     expect(screen.getByTestId('home-weekly-reports').closest('.max-lg\\:hidden')).not.toBeNull();
-    expect(screen.getByTestId('home-pro-card').closest('.max-lg\\:hidden')).toBeNull();
+    expect(screen.getByTestId('home-class-insight').closest('.max-lg\\:hidden')).toBeNull();
   });
 });

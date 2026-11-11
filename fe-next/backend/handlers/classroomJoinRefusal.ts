@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io';
 import { getAuthUserId } from './classroomSocketAuth.js';
 import { captureJoinRefusal } from '../utils/eduLiveEvents';
+import type { ClassroomGameErrorCode } from '@/shared/constants/classroomGameErrors';
 
 /**
  * Turn a student away from a live classroom game, and leave a record that they
@@ -15,7 +16,7 @@ import { captureJoinRefusal } from '../utils/eduLiveEvents';
 export function refuseClassroomJoin(
   socket: Socket,
   gameCode: string,
-  reason: string,
+  reason: ClassroomGameErrorCode,
   payload: Record<string, unknown>,
   classroomId: string | null
 ): void {

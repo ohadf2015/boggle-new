@@ -43,6 +43,8 @@ export interface LobbySetupPanelProps {
   onPlayStyleChange: (style: PlayStyle) => void;
   onTeamCountChange: (count: number) => void;
   onAccessibilityChange: (next: ClassroomAccessibility) => void;
+  rivalry?: boolean;
+  onRivalryChange?: (on: boolean) => void;
 }
 
 export function LobbySetupPanel({
@@ -54,6 +56,8 @@ export function LobbySetupPanel({
   onPlayStyleChange,
   onTeamCountChange,
   onAccessibilityChange,
+  rivalry,
+  onRivalryChange,
 }: LobbySetupPanelProps) {
   const { t } = useLanguage();
 
@@ -103,6 +107,8 @@ export function LobbySetupPanel({
         onPlayStyleChange={onPlayStyleChange}
         onTeamCountChange={onTeamCountChange}
         onAccessibilityChange={onAccessibilityChange}
+        rivalry={rivalry}
+        onRivalryChange={onRivalryChange}
       />
     </div>
   );

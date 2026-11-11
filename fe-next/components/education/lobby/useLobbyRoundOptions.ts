@@ -37,6 +37,7 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
   const [timerMinutes, setTimerMinutes] = useState(initialMinutes ?? remembered?.timerMinutes ?? 3);
   const [allowLateJoin, setAllowLateJoin] = useState(remembered?.allowLateJoin ?? true);
   const [economy, setEconomy] = useState<ClassroomEconomyConfig>(ZERO_ECONOMY_SNAPSHOT.config);
+  const [rivalry, setRivalry] = useState(true);
   const [boardSize, setBoardSize] = useState<BoardSize>(remembered?.boardSize ?? 'medium');
   const [playStyle, setPlayStyleState] = useState<PlayStyle>('ffa');
   const [teamCount, setTeamCountState] = useState(2);
@@ -77,6 +78,7 @@ export function useLobbyRoundOptions({ initialMinutes, initialQuestions, initial
     timerMinutes, setTimerMinutes,
     allowLateJoin, setAllowLateJoin,
     economy, setEconomy,
+    rivalry, setRivalry,
     boardSize, setBoardSize,
     playStyle, setPlayStyle,
     teamCount, setTeamCount,

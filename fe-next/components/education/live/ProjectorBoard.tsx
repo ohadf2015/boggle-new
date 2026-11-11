@@ -1,6 +1,7 @@
 'use client';
 
 import type { CSSProperties } from 'react';
+import { cn } from '@/lib/utils';
 import type { LetterGrid } from '@/shared/types/game';
 
 /** Modes where every student plays the SAME grid, so the wall can show it. */
@@ -15,11 +16,11 @@ function tileText(letter: string): string {
 }
 
 /** The class board, read-only and sized to its cell, for the projector during a round. */
-export default function ProjectorBoard({ grid, label }: { grid: LetterGrid; label: string }) {
+export default function ProjectorBoard({ grid, label, className }: { grid: LetterGrid; label: string; className?: string }) {
   const cols = grid[0]?.length ?? 0;
   // A 4:3 wall makes the column taller than it is wide; the square must fit both, and the live panel keeps the rest.
   return (
-    <div data-testid="projector-board-box" className="hidden h-full w-[58%] shrink-0 [container-type:size] md:block">
+    <div data-testid="projector-board-box" className={cn('hidden h-full w-[58%] shrink-0 [container-type:size] md:block', className)}>
     <div
       role="img"
       aria-label={label}

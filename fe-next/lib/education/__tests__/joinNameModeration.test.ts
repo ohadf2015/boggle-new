@@ -14,6 +14,22 @@ describe('isProfaneJoinName', () => {
   );
 });
 
+describe('isProfaneJoinName in every class language', () => {
+  it.each(['זונה', 'כוסאמק', 'pendejo', 'Puta madre', 'Jävla idiot', 'fitta', 'сука', 'Хуйло', 'ちんこマン', 'p.e.n.d.e.j.o'])(
+    'Given %s, Then it is caught',
+    (name) => {
+      expect(isProfaneJoinName(name)).toBe(true);
+    },
+  );
+
+  it.each(['Dickson', 'Analise', 'Shitaki', 'Kukuruza', 'Hassan', 'Употребляю', 'やくそく', 'Putin', 'Fittness', 'נועה זילברמן', 'José Puttanesca', 'Koko'])(
+    'Given the ordinary name %s that contains a banned piece, Then it passes',
+    (name) => {
+      expect(isProfaneJoinName(name)).toBe(false);
+    },
+  );
+});
+
 describe('moderateJoinName', () => {
   it('Given a clean name, Then it is returned untouched', () => {
     const pick = vi.fn(() => 'Turbo Salmon');

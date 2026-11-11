@@ -25,6 +25,7 @@ import { useGameStore } from '@/hooks/gameState';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { LessonTargetStrip } from '@/components/education/live/LessonTargetStrip';
 import { buildLessonTargets } from '@/components/education/live/lessonTargets';
+import { useLessonClaims } from '@/components/education/live/useLessonClaims';
 
 export interface StudentWordBankProps {
   level: VocabularyLevel;
@@ -33,6 +34,8 @@ export interface StudentWordBankProps {
   /** Longer-word target shown to challenge students. */
   challengeMinLength?: number;
   className?: string;
+  /** The local student's seat name; omitted for the watching teacher, who keeps their scaffold view. */
+  me?: string;
 }
 
 export const DEFAULT_CHALLENGE_MIN_LENGTH = 5;
@@ -42,6 +45,7 @@ export function StudentWordBank({
   words,
   challengeMinLength = DEFAULT_CHALLENGE_MIN_LENGTH,
   className,
+  me,
 }: StudentWordBankProps) {
   const { t, language } = useLanguage();
   const [open, setOpen] = useState(false);
@@ -58,6 +62,10 @@ export function StudentWordBank({
     [level, words, foundWords, grid, gameLanguage, language, gameMode, gameModeConfirmed],
   );
 
+  const race = useLessonClaims();
+
+  // The race strip sits in the round dock under the grid; a support student's bank is an accommodation and keeps the bottom.
+  if (race && me && level !== 'support') return null;
   if (targets) return <LessonTargetStrip targets={targets} t={t} dir={isRTL ? 'rtl' : 'ltr'} className={className} />;
 
   if (level === 'challenge') {

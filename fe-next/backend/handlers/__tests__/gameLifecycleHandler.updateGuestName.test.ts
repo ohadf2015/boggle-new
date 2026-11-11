@@ -234,3 +234,44 @@ describe('updateGuestName — rejects outside the lobby', () => {
     expect(mockBroadcastToRoom).not.toHaveBeenCalled();
   });
 });
+
+describe('updateGuestName — a classroom name the projector cannot show', () => {
+  it('Given a classroom lobby, When a student renames to a profane name, Then the rename is refused with NAME_NOT_ALLOWED and nothing moves', () => {
+    const socket = createSocket('sock-student');
+    mockGetUsernameBySocketId.mockReturnValue('Alice');
+    const game = {
+      gameState: 'waiting',
+      isClassroom: true,
+      language: 'es',
+      hostUsername: 'Teacher',
+      users: { Teacher: { username: 'Teacher', isHost: true }, Alice: { username: 'Alice', isHost: false } },
+      playersReadyForNextGame: {},
+    };
+    mockGetGame.mockReturnValue(game);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['updateGuestName']({ newName: 'pendejo' });
+
+    expect(game.users.Alice).toBeDefined();
+    expect(socket.emit).toHaveBeenCalledWith('error', expect.objectContaining({ error: 'NAME_NOT_ALLOWED' }));
+    expect(mockUpdateUsernameMapping).not.toHaveBeenCalled();
+  });
+
+  it('Given a classroom lobby, When a student renames to an ordinary name, Then the rename goes through', () => {
+    const socket = createSocket('sock-student');
+    mockGetUsernameBySocketId.mockReturnValue('Alice');
+    const game = {
+      gameState: 'waiting',
+      isClassroom: true,
+      hostUsername: 'Teacher',
+      users: { Teacher: { username: 'Teacher', isHost: true }, Alice: { username: 'Alice', isHost: false } },
+      playersReadyForNextGame: {},
+    };
+    mockGetGame.mockReturnValue(game);
+
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['updateGuestName']({ newName: 'Dickson' });
+
+    expect((game.users as Record<string, unknown>).Dickson).toBeDefined();
+  });
+});

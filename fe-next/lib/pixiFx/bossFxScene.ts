@@ -17,6 +17,7 @@ export interface BossFxLabels {
   critDmgClass: string;
   critText: string;
   exposedText: string;
+  lessonText?: string;
 }
 
 export interface BossFxHit {
@@ -24,7 +25,13 @@ export interface BossFxHit {
   dmg: number;
   crit: boolean;
   exposed: boolean;
+  lesson?: boolean;
   slot: number;
+}
+
+export function bossHitTag(hit: Pick<BossFxHit, 'crit' | 'exposed' | 'lesson'>, labels: Pick<BossFxLabels, 'critText' | 'exposedText' | 'lessonText'>): string {
+  if (hit.lesson && labels.lessonText) return labels.lessonText;
+  return hit.crit ? labels.critText : hit.exposed ? labels.exposedText : '';
 }
 
 /** Fractions of the stage: the class throws from the bottom and sides at the boss's chest. */
@@ -186,7 +193,7 @@ export class BossFxScene implements FxLayer {
     el.style.left = `${x + Math.cos(angle) * this.w * 0.12}px`;
     el.style.top = `${y + Math.sin(angle) * this.h * 0.2}px`;
     el.textContent = `-${hit.dmg}`;
-    const tag = hit.crit ? this.labels.critText : hit.exposed ? this.labels.exposedText : '';
+    const tag = bossHitTag(hit, this.labels);
     if (tag) {
       const sub = document.createElement('span');
       sub.className = 'block text-[0.55em] text-neo-yellow';
