@@ -23,6 +23,7 @@ import {
 } from '@/lib/blastLeaderboard';
 import { nameBoardEntries, type NamedBlastScore } from '@/lib/blastLeaderboardNames';
 import { leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
+import { recordPersonalBest } from '@/backend/modules/achievements/grantAchievements';
 
 // Minimal structural type for the service-role client (matches the route's use).
 type SupabaseLike = any;
@@ -46,6 +47,7 @@ export interface BlastCompletionBody {
   isNewBestScore: boolean;
   isNewBestCombo: boolean;
   xpAwarded: number;
+  levelUp?: { oldLevel: number; newLevel: number } | null;
   percentile: number | null;
   /** This week's board (the only Blast board). */
   rank?: number | null;
@@ -165,17 +167,22 @@ export async function processBlastCompletion(
   }
 
   const isNewBestScore = !existing || data.score > existing.bestScore;
+  if (!upsertError && existing && existing.bestScore > 0 && data.score > existing.bestScore) {
+    await recordPersonalBest(supabase, userId);
+  }
   const isNewBestCombo = !existing || data.maxCombo > existing.bestMaxCombo;
 
   // Update profile stats so blast scores contribute to the main leaderboard.
+  let levelBefore: number | null = null;
   try {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('total_score, total_games, total_words')
+      .select('total_score, total_games, total_words, current_level')
       .eq('id', userId)
       .single();
 
     if (profile) {
+      levelBefore = typeof profile.current_level === 'number' ? profile.current_level : null;
       await supabase
         .from('profiles')
         .update({
@@ -196,6 +203,7 @@ export async function processBlastCompletion(
   const scoreBonus = Math.min(cap - baseXp, Math.floor(data.score / 100));
   const xpToAward = Math.min(Math.round(baseXp + scoreBonus), cap);
   let xpAwarded = 0;
+  let levelUp: { oldLevel: number; newLevel: number } | null = null;
 
   if (xpToAward > 0) {
     const { data: xpData, error: xpError } = await supabase.rpc('increment_player_xp', {
@@ -205,7 +213,12 @@ export async function processBlastCompletion(
     if (xpError) {
       console.error('[BLAST API] XP award error (non-fatal):', xpError);
     } else if (xpData && (xpData as unknown[]).length > 0) {
-      xpAwarded = ((xpData as Record<string, unknown>[])[0].xp_granted as number) ?? xpToAward;
+      const row = (xpData as Record<string, unknown>[])[0];
+      xpAwarded = (row.xp_granted as number) ?? xpToAward;
+      const newLevel = typeof row.new_level === 'number' ? row.new_level : null;
+      if (levelBefore !== null && newLevel !== null && newLevel > levelBefore) {
+        levelUp = { oldLevel: levelBefore, newLevel };
+      }
     } else {
       xpAwarded = xpToAward;
     }
@@ -244,6 +257,7 @@ export async function processBlastCompletion(
       isNewBestScore,
       isNewBestCombo,
       xpAwarded,
+      levelUp,
       percentile,
       rank: after?.rank ?? null,
       previousRank: before?.rank ?? null,

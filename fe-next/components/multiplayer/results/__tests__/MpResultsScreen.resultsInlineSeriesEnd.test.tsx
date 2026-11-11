@@ -91,6 +91,11 @@ import MpResultsScreen from '../MpResultsScreen';
 import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
 import { __resetRivalHeadToHeadCache } from '../useRivalHeadToHead';
 
+const slotProps = vi.hoisted(() => ({ last: null as null | { rival?: { kind: string; name: string; record?: unknown } | null; onRematch?: unknown } }));
+vi.mock('@/components/results/ResultsSocialSlot', () => ({
+  ResultsSocialSlot: (p: never) => { slotProps.last = p; return null; },
+}));
+
 type Socket = { emit: ReturnType<typeof vi.fn>; on: ReturnType<typeof vi.fn>; off: ReturnType<typeof vi.fn> };
 
 const SCORES = [
@@ -178,12 +183,10 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     await waitFor(() => expect(h.getHeadToHead).toHaveBeenCalledWith('u-maya'));
     await Promise.resolve();
     skipReveal();
-    // Single source: strip owns the record (correct rival + W–L), card callout must not reprint h2h.
+    // Single source: the shared rival card owns the record (correct rival + W–L) and the rematch.
     await waitFor(() => {
-      const strip = screen.getByTestId('mp-h2h-strip');
-      expect(strip.textContent).toContain('Maya');
-      expect(strip.textContent).toContain('"mine":2');
-      expect(strip.textContent).toContain('"theirs":4');
+      expect(slotProps.last?.rival).toMatchObject({ kind: 'h2h', name: 'Maya', record: { wins: 2, losses: 4, draws: 0 } });
+      expect(typeof slotProps.last?.onRematch).toBe('function');
     });
     expect(screen.getByTestId('mp-my-callout').getAttribute('data-kind')).not.toBe('h2h');
   });

@@ -8,6 +8,7 @@
  */
 import { Coins, Lock, X } from 'lucide-react';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
+import { RarityChip } from '@/components/progression/RarityChip';
 import { getSetProgress, getSetsForPart } from '@/lib/avatar/avatarSets';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { PartLockInfo, LockPremium } from './partLock';
@@ -78,8 +79,7 @@ export default function UnlockPanel({
       <div className="relative flex items-center gap-2">
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider leading-none">
-            <span className="shrink-0 inline-block w-2.5 h-2.5 rotate-45 border-2 border-black" style={{ background: tok.hex }} aria-hidden="true" />
-            <span style={{ color: tok.hex }}>{t(tok.labelKey)}</span>
+            <RarityChip rarity={info.rarity} size="xs" />
             <span className="text-neo-white/60 truncate">· {categoryLabel}</span>
           </p>
           <p className="mt-1 font-neo-display text-neo-white text-[15px] font-bold leading-tight truncate">

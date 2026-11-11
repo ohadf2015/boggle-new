@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import dynamic from 'next/dynamic';
-import { Trophy, ArrowLeft, PencilRuler } from 'lucide-react';
+import { Trophy, ArrowLeft, PencilRuler, Crown } from 'lucide-react';
 
 const CreatorLeaderboard = dynamic(() => import('@/components/ugc/CreatorLeaderboard'), { ssr: false });
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
@@ -18,6 +18,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useLeaderboard, useUserRank } from '@/hooks/useSupabaseRealtime';
 import { cn } from '@/lib/utils';
+import { TitleBadge } from '@/components/progression/TitleBadge';
+import { HallOfFame } from '@/components/records/HallOfFame';
+import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
@@ -36,6 +39,7 @@ const PastSeasonsLeaderboard = dynamic(() => import('@/components/seasons/PastSe
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { toBoardEntries } from '@/lib/leaderboard/boardEntries';
 
 interface LeaderboardEntry {
   player_id: string;
@@ -45,13 +49,19 @@ interface LeaderboardEntry {
   avatar_config?: CustomAvatarConfig | null;
   total_score?: number;
   games_played?: number;
+  chosen_title?: string | null;
+  player_level?: number | null;
+  title?: string | null;
 }
 
 export default function LeaderboardPageClient(): React.JSX.Element {
   const { t, language } = useLanguage();
   const { user, profile, loading: authLoading, isSupabaseEnabled } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'players' | 'creators'>('players');
+  const [activeTab, setActiveTab] = useState<'players' | 'creators' | 'records'>('players');
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('tab') === 'records') setActiveTab('records');
+  }, []);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [seasonScope, setSeasonScope] = useState<SeasonTabKey>(
     isOnCrazyGamesPlatform ? 'allTime' : 'season',
@@ -98,7 +108,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
   }, [isSupabaseEnabled, fetchStaticLeaderboard]);
 
   const leaderboard = useMemo(
-    () => (isSupabaseEnabled ? realtimeLeaderboard : (staticEntries ?? [])),
+    () => toBoardEntries(isSupabaseEnabled ? realtimeLeaderboard : (staticEntries ?? [])),
     [isSupabaseEnabled, realtimeLeaderboard, staticEntries],
   );
   const listLoading = isSupabaseEnabled ? loading : staticEntries === null && staticError === null;
@@ -190,12 +200,18 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 <PencilRuler className="h-4 w-4" aria-hidden="true" />
                 {t('ugc.creator.stats')}
               </button>
+              <button type="button" role="tab" aria-selected={activeTab === 'records'} onClick={() => setActiveTab('records')} className={tabClass(activeTab === 'records', 'bg-neo-cyan')}>
+                <Crown className="h-4 w-4" aria-hidden="true" />
+                {t('worldRecords.tab')}
+              </button>
             </div>
           )}
         </header>
 
         {activeTab === 'creators' ? (
           <CreatorLeaderboard />
+        ) : activeTab === 'records' ? (
+          <HallOfFame viewerId={user?.id} />
         ) : (
         <>
         {!isOnCrazyGamesPlatform && isSupabaseEnabled && (
@@ -296,6 +312,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       >
                         {entry.display_name || entry.username}
                       </Link>
+                      <RecordHolderCrown userId={entry.player_id} />
+                      <TitleBadge title={entry.title} className="min-w-0 max-w-[40%] shrink" />
                       <TierBadge
                         tier={leaderboardTiers.get(entry.player_id) ?? getGlobalLeaderboardTier(entry.total_score ?? 0)}
                         size="xs"

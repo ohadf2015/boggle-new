@@ -58,3 +58,20 @@ describe('suggestPlayerName', () => {
     expect(samples.size).toBeGreaterThan(3);
   });
 });
+
+describe('suggestPublicPlayerName', () => {
+  it('Given any language, Then the suggestion is never a generated default or a placeholder', async () => {
+    const { suggestPublicPlayerName } = await import('../onboardingNameSuggestions');
+    const { isDefaultPlayerName } = await import('../defaultPlayerNames');
+    const { isPlaceholderName } = await import('@/lib/displayName');
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es', 'ru', 'xx']) {
+      for (let i = 0; i < 40; i++) {
+        const name = suggestPublicPlayerName(lang);
+        expect(isDefaultPlayerName(name), `${lang}: ${name}`).toBe(false);
+        expect(isPlaceholderName(name)).toBe(false);
+        expect(name.length).toBeGreaterThan(1);
+        expect(name.length).toBeLessThanOrEqual(20);
+      }
+    }
+  });
+});

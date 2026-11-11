@@ -1,5 +1,6 @@
 'use client';
 
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import React, { useEffect, useRef, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
 import { Check, Flame } from 'lucide-react';
@@ -268,6 +269,7 @@ export function DailyResultsHero({
           <m.div {...beat(REVEAL.details, { y: 16, scale: 0.94 })}>{children}</m.div>
         </div>
       )}
+      <div className="border-t-3 border-neo-black p-3"><ResultsSocialSlot mode="daily" score={score} subMode={mode} /></div>
     </section>
   );
 }

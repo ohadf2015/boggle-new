@@ -98,11 +98,17 @@ export async function processQuickSubmit(
   await awardCoinsServer(userId, coins, 'quick_play_round', { mode, seed, scorePct });
 
   const xp = Math.round(QUICK_XP_BASE + scorePct * QUICK_XP_PCT_FACTOR);
-  const { error: xpError } = await db.rpc('increment_player_xp', {
+  const { data: levelRow } = await db.from('profiles').select('current_level').eq('id', userId).maybeSingle();
+  const levelBefore = typeof levelRow?.current_level === 'number' ? levelRow.current_level : null;
+  const { data: xpRows, error: xpError } = await db.rpc('increment_player_xp', {
     p_player_id: userId,
     p_xp_amount: xp,
   });
   if (xpError) logger.error('QUICK_PLAY', `XP grant failed for ${userId}: ${xpError.message}`);
+  const newLevel = Array.isArray(xpRows) && typeof xpRows[0]?.new_level === 'number' ? xpRows[0].new_level : null;
+  const levelUp = levelBefore !== null && newLevel !== null && newLevel > levelBefore
+    ? { oldLevel: levelBefore, newLevel }
+    : null;
 
   // Weekly ghost rival keeps ticking from quick rounds too (best-effort)
   try {
@@ -139,7 +145,7 @@ export async function processQuickSubmit(
     .limit(10);
   const history = (historyRows ?? []).map((r: { score_pct: number }) => Number(r.score_pct));
 
-  return { scorePct, coins, xp, percentileToday, history, totalPoints };
+  return { scorePct, coins, xp, percentileToday, history, totalPoints, levelUp };
 }
 
 export async function createQuickChallenge(

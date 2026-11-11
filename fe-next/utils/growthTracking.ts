@@ -384,6 +384,8 @@ export type GrowthEvent =
   | 'streak_freeze_saved'
   // Avatar part out of a reward chest (components/avatar/chest).
   | 'avatar_chest_part_shown'
+  | 'level_up'
+  | 'title_picked'
   | 'avatar_chest_part_reveal_open'
   // Cross-promo CTA exposure — fires once when a cross-promo card is rendered, so
   // PostHog can compute click-through rate (clicks / impressions). Props mirror
@@ -704,6 +706,7 @@ const endEmittedUnkeyedMpModes = new Set<string>();
 const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'game_completed',
   'game_abandoned',
+  'level_up',
   'first_game_played',
   'first_game_won',
   'first_word_found',

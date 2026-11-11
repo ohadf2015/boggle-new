@@ -251,6 +251,7 @@ export interface UpdatedUserStats {
   totalWordsFound: number;
   totalScore: number;
   uniqueDaysPlayed: number;
+  currentLevel?: number;
 }
 
 export interface LifetimeAchievement {

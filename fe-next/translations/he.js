@@ -6845,6 +6845,27 @@ const he = {
     "viewProgress": "צפו בהתקדמות"
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"שיא עולם","description":"החזיקו שיא עולם במצב משחק כלשהו"},
+    "RIVALRY_FIRST_WIN": {"name":"החזרתי לו","description":"ניצחתם את היריב שלכם בפעם הראשונה"},
+    "RIVALRY_5_WINS": {"name":"צייד יריבים","description":"ניצחתם את היריב 5 פעמים"},
+    "RIVALRY_25_WINS": {"name":"האויב המושבע","description":"ניצחתם את היריב 25 פעמים"},
+    "PING_FIRST": {"name":"יאללה, משחק","description":"שלחתם פינג ראשון ליריב"},
+    "PING_25": {"name":"מלך העקיצות","description":"שלחתם 25 פינגים ליריבים"},
+    "REMATCH_10": {"name":"עוד סיבוב","description":"שחקו נגד אותו יריב עוד 10 פעמים"},
+    "RECORD_FIRST": {"name":"שיא אישי","description":"שברתם את שיא ה-Blast או את המילה הכי ארוכה שלכם"},
+    "RECORD_10": {"name":"שובר השיאים","description":"שברתם שיא אישי 10 פעמים"},
+    "FIRST_FRIEND": {"name":"חבר ראשון","description":"הוספתם חבר ראשון"},
+    "FRIENDS_5": {"name":"פרפר חברתי","description":"יש לכם 5 חברים"},
+    "LEVEL_5": {"name":"נבט","description":"הגעתם לרמה 5"},
+    "LEVEL_10": {"name":"מתחזקים","description":"הגעתם לרמה 10"},
+    "LEVEL_25": {"name":"שורשים עמוקים","description":"הגעתם לרמה 25"},
+    "LEVEL_50": {"name":"הפסגה","description":"הגעתם לרמה 50"},
+    "LEVEL_75": {"name":"לב הלבה","description":"הגעתם לרמה 75"},
+    "LEVEL_100": {"name":"כוכב נופל","description":"הגעתם לרמה 100"},
+    "TITLE_PICKED": {"name":"תג שם","description":"בחרתם תואר לפרופיל"},
+    "DAILY_TOP3": {"name":"על הפודיום","description":"סיימתם בטופ 3 בלוח היומי"},
+    "DAILY_BOARD_STREAK_7": {"name":"שבוע על הלוח","description":"הופעתם בלוח היומי 7 ימים ברצף"},
+    "DAILY_BOARD_STREAK_30": {"name":"קבוע של היומי","description":"הופעתם בלוח היומי 30 ימים ברצף"},
     "wordcraft_first_word": {
       "name": "מילה ראשונה על הלוח",
       "description": "הניחו את המילה הראשונה ב-Word Craft"
@@ -22693,8 +22714,178 @@ const he = {
     "proDepth": "התקדמות לאורך שבועות · ייצוא של כל הכיתות · דוחות להורים",
     "schoolQuote": "קונים לכל בית הספר? קבלו הצעת מחיר",
     "noWords": "בסבב הזה לא היו מילים מהשיעור לבדוק."
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "מהחברים שלך",
+      "playedTogether": "שיחקתם יחד {count} פעמים",
+      "friendOfFriend": "יש לכם חברים משותפים",
+      "sameCountry": "גם מ{country}",
+      "closeScore": "משחקים ברמה שלך",
+      "closeRecord": "ראש בראש"
+    },
+    "beatBy": "עוד {gap} ועקפת את {name}",
+    "youBeat": "ניצחת את {name}!",
+    "yourRival": "היריב שלך: {name}",
+    "selfChase": "עוד {gap} ושברת את השיא שלך",
+    "selfBeat": "שיא אישי חדש!",
+    "yourBest": "השיא שלך",
+    "pingedYou": "עקץ אותך",
+    "wins": "{count} נצ׳",
+    "losses": "{count} הפ׳",
+    "draws": "{count} תיקו"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "בחרו שם כדי להופיע בטבלה ולקבל יריב",
+    "tryThis": "מה דעתכם על:",
+    "placeholder": "השם שלך",
+    "save": "שמירה",
+    "saveFailed": "לא הצלחנו לשמור את השם. נסו שוב.",
+    "onlyYouSeeRow": "רק אתם רואים את זה. בחרו שם כדי להופיע",
+    "error": {
+      "empty": "קודם תכתבו שם",
+      "placeholder": "זה שם אוטומטי. בחרו שם משלכם",
+      "default": "להמון שחקנים יש את השם הזה. בחרו שם משלכם",
+      "profane": "השם הזה לא מותר. נסו שם אחר"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "יאללה, מי מנצח?",
+      "beat_you": "הפעם ניצחתי",
+      "rematch": "עוד סיבוב?",
+      "gg": "GG, משחק יפה",
+      "close_one": "היה צמוד!",
+      "your_turn": "התור שלך",
+      "nice_word": "איזו מילה, כל הכבוד",
+      "see_you_tomorrow": "נתראה מחר"
+    },
+    "button": "פינג",
+    "buttonLabel": "לשלוח פינג ל{name}",
+    "pickerTitle": "פינג ל{name}",
+    "sent": "נשלח!",
+    "more": "עוד אפשרויות",
+    "block": "לחסום את {name}",
+    "report": "דיווח",
+    "reported": "תודה, נבדוק את זה",
+    "signIn": "להרשמה",
+    "error": {
+      "sign_in_required": "צריך להירשם כדי לשלוח פינג ליריבים",
+      "not_allowed": "אי אפשר לשלוח פינג לשחקן הזה",
+      "blocked": "חסמת את השחקן הזה",
+      "name_required": "קודם בוחרים שם שחקן, שידעו מי מאתגר אותם",
+      "daily_limit": "נגמרו 3 הפינגים של היום. מחר יש עוד",
+      "target_cooldown": "כבר שלחת להם פינג. אפשר שוב בעוד כמה שעות",
+      "not_found": "השחקן הזה כבר לא כאן",
+      "unavailable": "לא הצלחנו לשלוח. אפשר לנסות שוב"
+    },
+    "toast": {
+      "title": "קיבלת פינג מ{name}",
+      "pingBack": "להחזיר פינג",
+      "play": "לשחק",
+      "close": "סגירה",
+      "region": "פינג מיריב"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "שיא חדש!",
+      "beatPrevious": "{value} — השיא הקודם היה {previous}",
+      "title": "השיאים שלך",
+      "empty": "עוד אין שיאים. שחקו סיבוב וקבעו את הראשון.",
+      "upFrom": "עלה מ-{previous}",
+      "keys": {
+        "longestWord": "המילה הכי ארוכה",
+        "singleBest": "שיא סולו",
+        "quickPlayBest": "שיא משחק מהיר",
+        "blastBest": "שיא Blast",
+        "towerBestM": "המגדל הכי גבוה (מ׳)",
+        "wordCraftBest": "שיא Word Craft",
+        "dailyStreakBest": "רצף יומי הכי ארוך",
+        "mpBestStreak": "הכי הרבה ניצחונות ברצף",
+        "multiplayerBest": "שיא במשחק מרובה משתתפים"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "התחברו כדי להתחיל לפתוח פריטים לאווטאר",
+      "levelPath": "רמה {from} ← רמה {to}",
+      "unlocksItem": "פותחת: {item}",
+      "xpToGo": "עוד {xp} XP",
+      "upNext": "בקרוב אצלך",
+      "atLevel": "רמה {level}"
+    },
+    "titles": {
+      "newTitle": "תואר חדש",
+      "pickerTitle": "התואר שלך",
+      "auto": "אוטומטי",
+      "saveFailed": "לא הצלחנו לשמור את התואר. נסו שוב.",
+      "loadFailed": "לא הצלחנו לטעון תארים. הקישו לנסות שוב.",
+      "nextAt": "ברמה {level} נפתח: {title}",
+      "NEMESIS": "האויב המושבע",
+      "RECORD_BREAKER": "שובר השיאים",
+      "SOCIAL_BUTTERFLY": "פרפר חברתי",
+      "DAILY_REGULAR": "קבוע של היומי",
+      "ASCENDED_ONE": "המתעלה",
+      "TWICE_RISEN": "קם פעמיים",
+      "THRICE_BLESSED": "מבורך שלוש פעמים",
+      "ETERNAL_WARRIOR": "לוחם נצחי",
+      "LEXICON_IMMORTAL": "בן האלמוות של המילון"
+    },
+    "achievements": {
+      "holders": "ל-{percent}% מהשחקנים יש את זה"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "שיאים",
+    "metres": "{value} מ׳",
+    "chip": {
+      "holder": "שיא עולמי: {name} · {score}",
+      "gap": "עוד {gap} ושברת אותו",
+      "newRecord": "שיא עולמי חדש!",
+      "youHold": "השיא העולמי שלך · {score}",
+      "claimSignIn": "התחברו כדי לקבל את השיא.",
+      "claimName": "בחרו שם אמיתי כדי לקבל את השיא."
+    },
+    "crown": {
+      "label": "שיאים עולמיים: {count}"
+    },
+    "hallOfFame": {
+      "title": "היכל התהילה",
+      "subtitle": "התוצאה הכי גבוהה אי פעם בכל משחק",
+      "since": "שיא מאז {date}",
+      "yours": "שלך",
+      "empty": "עוד אין שיאים. הראשון מחכה לך.",
+      "error": "לא הצלחנו לטעון את השיאים.",
+      "retry": "לנסות שוב"
+    },
+    "modes": {
+      "mp_classic": "קלאסי · מרובה משתתפים",
+      "mp_word_hunt": "ציד מילים · מרובה משתתפים",
+      "mp_wheel_rush": "מרוץ הגלגל · מרובה משתתפים",
+      "mp_blast": "בלאסט · מרובה משתתפים",
+      "qp_classic": "קלאסי · משחק מהיר",
+      "qp_word_hunt": "ציד מילים · משחק מהיר",
+      "qp_wheel_rush": "מרוץ הגלגל · משחק מהיר",
+      "qp_blast": "בלאסט · משחק מהיר",
+      "daily_word_hunt": "ציד המילים היומי",
+      "daily_word_wheel": "גלגל המילים היומי",
+      "daily_connections": "גשר המילים היומי",
+      "blast": "בלאסט",
+      "tower": "מגדל מילים",
+      "single": "סולו"
+    }
+  }
+  // @worldRecords:end
 };
 
 // @adminDashboard:start

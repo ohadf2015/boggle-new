@@ -4,8 +4,10 @@
  * unlocked via rank milestones, streaks, purchases, and season rewards.
  */
 
+import { RARITY_TOKENS, type VisualTier } from '@/lib/avatar/rarity';
+
 export type CosmeticCategory = 'tileSkin' | 'boardTheme' | 'victoryEffect' | 'profileFrame';
-export type CosmeticRarity = 'common' | 'rare' | 'epic' | 'legendary';
+export type CosmeticRarity = VisualTier;
 
 export type UnlockCondition =
   | { type: 'rank'; tier: string }
@@ -361,12 +363,10 @@ export function diffNewlyUnlocked(
   return COSMETICS.filter((c) => !isUnlocked(c.id, before) && isUnlocked(c.id, after));
 }
 
-/**
- * Rarity color mapping for UI.
- */
+/** Rarity classes for UI, read from the one shared avatar rarity scheme. */
 export const RARITY_COLORS: Record<CosmeticRarity, string> = {
-  common: 'text-neo-cream/60 border-neo-cream/30',
-  rare: 'text-neo-cyan border-neo-cyan',
-  epic: 'text-neo-purple border-neo-purple',
-  legendary: 'text-neo-lime border-neo-lime',
+  common: `${RARITY_TOKENS.common.text} ${RARITY_TOKENS.common.border}`,
+  rare: `${RARITY_TOKENS.rare.text} ${RARITY_TOKENS.rare.border}`,
+  epic: `${RARITY_TOKENS.epic.text} ${RARITY_TOKENS.epic.border}`,
+  legendary: `${RARITY_TOKENS.legendary.text} ${RARITY_TOKENS.legendary.border}`,
 };

@@ -43,6 +43,8 @@ export function fromMergedEntries(entries: MergedLeaderboardEntry[]): DailyParti
     is_you: e.isYou || undefined,
     is_friend: e.isFriend || undefined,
     is_member: e.member || undefined,
+    needs_public_name: e.needsPublicName || undefined,
+    title: e.title ?? null,
   }));
 }
 

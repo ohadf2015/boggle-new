@@ -1,5 +1,6 @@
 'use client';
 
+import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
@@ -88,6 +89,7 @@ export function BlastResultsSummary({ results, t, onPlayAgain, onQuit, onOpenSto
         </div>
 
         <div className="w-full flex flex-col items-center gap-4 lg:flex-1">
+          <ResultsSocialSlot mode="blast" score={view.score} previousBest={fromSpResults(results).personalBest} />
           <BlastGemHaul gems={view.gems.byKind ?? undefined} total={view.gems.total} t={t} />
           <BlastLootRow view={view} t={t} locale={language} />
           <BlastBestWordTiles word={view.bestWord} longestWord={view.longestWord} t={t} />

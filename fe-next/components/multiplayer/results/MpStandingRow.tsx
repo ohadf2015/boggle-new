@@ -4,6 +4,7 @@ import { forwardRef } from 'react';
 import { Bot, ChevronDown, ChevronUp, Crown, Star } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
+import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
 import { cn } from '@/lib/utils';
 import { podiumTier, type MpStandingRow } from './mpStandings';
 import fx from './mpResults.module.css';
@@ -103,6 +104,7 @@ export const MpStandingRowItem = forwardRef<HTMLLIElement, MpStandingRowItemProp
           <span dir="auto" className={cn('truncate font-neo-display font-bold', 'text-[calc(17px*var(--mp-u,1))]')}>
             {r.username}
           </span>
+          {r.userId && !r.isBot && <RecordHolderCrown userId={r.userId} />}
           {r.isMe && (
             <span className={cn('shrink-0 rounded-full border-2 border-neo-black px-1.5 text-[calc(10px*var(--mp-u,1))] font-bold uppercase', first ? 'bg-neo-black text-neo-lime' : 'bg-neo-lime text-neo-black')}>
               {t('mpUi.results.you')}

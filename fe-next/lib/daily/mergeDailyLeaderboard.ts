@@ -1,6 +1,6 @@
 import type { DailyModeId } from '@/lib/dailyModes';
-import { isPlaceholderName } from '@/lib/displayName';
 import { friendlyPlayerName } from '@/lib/friendlyPlayerName';
+import { isPublicName } from '@/lib/names/publicName';
 
 /**
  * Merge one day's per-mode results into a single per-player board.
@@ -54,11 +54,16 @@ export interface MergedLeaderboardEntry {
   isFriend?: boolean;
   /** A signed-in player (not a guest). Carries no id; the friend button resolves the key on tap. */
   member?: boolean;
+  /** The caller's own row is hidden from everyone else until they pick a public name. */
+  needsPublicName?: boolean;  /** The title the player shows (picked, else their level title); guests have none. */
+  title?: string | null;
 }
 
 /** Server-only ranked row: still carries the group key, so it must never be serialized. */
-export interface RankedBoardRow extends Omit<MergedLeaderboardEntry, 'key' | 'isYou' | 'isFriend' | 'member'> {
+export interface RankedBoardRow extends Omit<MergedLeaderboardEntry, 'key' | 'isYou' | 'isFriend' | 'member' | 'needsPublicName'> {
   identity: string;
+  /** False when the name is a placeholder, a generated default or profane: only its owner sees the row. */
+  publicName: boolean;
   /** When the player's latest counted result landed — the tiebreak. */
   reachedAt: string;
 }
@@ -142,6 +147,7 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
           towerHeightM: null,
           playedModes: [],
           reachedAt: '',
+          publicName: false,
         };
         byIdentity.set(identity, entry);
       }
@@ -169,10 +175,12 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
     }
   }
 
-  // Unnamed players (the `Player_<hex>` default, or nothing) get a stable,
-  // readable stand-in rather than an id or a blank row.
+  // A hidden row is still shown to its owner, under a readable stand-in rather than an id.
   const taken = new Set<string>();
-  for (const e of byIdentity.values()) if (e.name) taken.add(e.name);
+  for (const e of byIdentity.values()) {
+    e.publicName = !!e.name;
+    if (e.name) taken.add(e.name);
+  }
   for (const e of byIdentity.values()) {
     if (!e.name) e.name = friendlyPlayerName(e.identity, fallbackLang.get(e.identity) ?? 'en', taken);
   }
@@ -187,9 +195,9 @@ export function rankDailyBoard(inputs: MergeInput[], opts: RankOptions = {}): Ra
     .map((e, i) => ({ ...e, rank: i + 1 }));
 }
 
-/** A name the player chose, or '' for a system placeholder. */
+/** A name fit for the public board, or ''. */
 function chosenName(name: string | null | undefined): string {
-  return isPlaceholderName(name) ? '' : (name as string).trim();
+  return isPublicName(name) ? (name as string).trim() : '';
 }
 
 /** Earlier wins; a row with no time sorts after one that has it. */
@@ -219,32 +227,40 @@ export interface DailyBoardView {
 /**
  * The public slice of a ranked board: top `limit`, plus the caller and their
  * friends at their TRUE rank when they sit below it. The group key is dropped.
+ * Rows without a public name are left out, except the caller's own; ranks and
+ * `total` count only the rows this viewer can see, so there is never a gap.
  */
 export function viewDailyBoard(ranked: RankedBoardRow[], opts: ViewOptions = {}): DailyBoardView {
   const limit = Math.max(0, opts.limit ?? 10);
   const data: MergedLeaderboardEntry[] = [];
   const counts = new Map<string, number>();
 
+  let visible = 0;
   for (const row of ranked) {
+    const isYou = !!opts.you && row.identity === opts.you;
+    if (!row.publicName && !isYou) continue;
+    const rank = ++visible;
+
     const code = (row.countryCode ?? '').trim().toUpperCase();
     if (code.length === 2) counts.set(code, (counts.get(code) ?? 0) + 1);
 
-    const isYou = !!opts.you && row.identity === opts.you;
     const isFriend = !isYou && !!opts.friendIds?.has(row.identity);
-    if (row.rank > limit && !isYou && !isFriend) continue;
+    if (rank > limit && !isYou && !isFriend) continue;
 
-    const { identity, reachedAt: _reachedAt, ...pub } = row;
+    const { identity, reachedAt: _reachedAt, publicName, ...pub } = row;
     data.push({
       ...pub,
+      rank,
       ...(opts.keyOf ? { key: opts.keyOf(identity) } : {}),
       ...(isYou ? { isYou: true } : {}),
+      ...(!publicName ? { needsPublicName: true } : {}),
       ...(isFriend ? { isFriend: true } : {}),
       ...(identity.startsWith('u:') ? { member: true } : {}),
     });
   }
 
   const countries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]).map(([c]) => c);
-  return { data, total: ranked.length, countries };
+  return { data, total: visible, countries };
 }
 
 /**

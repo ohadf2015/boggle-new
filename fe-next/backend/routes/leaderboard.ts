@@ -12,6 +12,7 @@ const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../redisClient');
 const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
+import { toPublicBoardRows } from '@/lib/names/publicName';
 
 const router: Router = express.Router();
 
@@ -105,7 +106,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
     // Try cache first
     const cached = await getCachedLeaderboardTop100();
     if (cached) {
-      res.json({ data: cached, cached: true } as LeaderboardResponse);
+      res.json({ data: toPublicBoardRows(cached), cached: true } as LeaderboardResponse);
       return;
     }
 
@@ -120,11 +121,13 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
 
       // Fetch from Supabase
       const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from('leaderboard')
-        .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
-        .order('total_score', { ascending: false })
-        .limit(100);
+      // Same RPC the live board reads, so both paths list the same players with the same titles.
+      const { data, error } = await supabase.rpc('get_leaderboard', {
+        p_limit: 100,
+        p_offset: 0,
+        p_order_by: 'total_score',
+        p_season_id: null,
+      });
 
       if (error) {
         throw new Error(`Leaderboard fetch error: ${error.message}`);
@@ -138,7 +141,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       return { data: data || [], cached: false };
     });
 
-    res.json(result);
+    res.json({ ...result, data: toPublicBoardRows(result.data) });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Leaderboard error: ${err.message}`);

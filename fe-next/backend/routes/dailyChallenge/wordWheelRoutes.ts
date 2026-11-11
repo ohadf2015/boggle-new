@@ -20,6 +20,7 @@ import { isSubmittableDate } from '../../../utils/dailyChallenge/catchUp';
 import { goldCoinsFor } from '../../../utils/dailyChallenge/wordWheelScoring';
 import { awardCoinsServer } from '../../services/economy/awardCoins';
 import { resolveDailyPlayer } from './resolveDailyPlayer';
+import { grantDailyAchievements } from './dailyAchievements';
 import wordWheelLeaderboardRoutes from './wordWheelLeaderboardRoutes';
 import { sanitizeWheelSubmission, isWheelCatchup } from './wordWheelSubmission';
 import { handleGoldenWordKey, payGoldenWord } from './wheelGoldenWord';
@@ -197,6 +198,7 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
         .gt('score', score);
 
       rank = (playersAbove ?? 0) + 1;
+      void grantDailyAchievements(supabase, playerId, rank, { isToday: puzzleDate === serverDate });
     }
 
     // Bump authenticated players' lifetime stats + unique_days_played so

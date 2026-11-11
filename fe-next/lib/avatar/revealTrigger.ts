@@ -16,6 +16,7 @@
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getLevelFromXp } from '@/backend/modules/xpManager';
 import { LEVEL_UNLOCK_LADDER, getNewUnlocksBetween, normalizeLevel, type LevelUnlock } from './unlocks';
+import { announceLevelUp } from '@/lib/levelUp/levelUpBus';
 import { maxRarity, type VisualTier } from './rarity';
 
 export interface LevelUpLike {
@@ -95,7 +96,8 @@ export function clearUnseenUnlock(): void {
 
 // ── publish / subscribe (singleplayer + any surface without a queue) ──
 
-export function publishLevelUp(payload: LevelUpLike | null | undefined): UnlockReveal | null {
+export function publishLevelUp(payload: LevelUpLike | null | undefined, source = 'game'): UnlockReveal | null {
+  announceLevelUp(payload, source);
   const reveal = buildUnlockReveal(payload);
   if (!reveal) return null;
   published = reveal;

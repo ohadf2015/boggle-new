@@ -41,6 +41,8 @@ export interface V2ResultsProps {
   extra?: ReactNode;
   /** Daily: what to play next (the shared next-quest CTA). */
   nextSlot?: ReactNode;
+  /** The shared results social block (name prompt, record, rival, next unlock). */
+  socialSlot?: ReactNode;
   /** Daily: today's climbers board. */
   boardSlot?: ReactNode;
   /** Graphic recap PNG (doctrine: recap is a picture, not emoji text). */
@@ -90,7 +92,7 @@ export function V2Results(props: V2ResultsProps) {
   return props.daily ? <DailyTowerResults {...props} daily={props.daily} /> : <EndlessResults {...props} />;
 }
 
-function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc }: V2ResultsProps) {
+function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked, stats: runStats, payoutStatus, onRestart, onHome, onClose, smashLabel, onSmash, onShare, extra, rivals, recapSrc, socialSlot }: V2ResultsProps) {
   // Own mute in the card header → the global FAB stands down (no end-14 race
   // against the FAB's 2.5s/5s re-probes).
   useRegisterHeaderAudioControl();
@@ -247,6 +249,7 @@ function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked,
         ) : null}
         </div>
         <div className={rivals ? 'md:min-w-0 md:flex-1' : 'contents'}>
+        {socialSlot ? <div className="mt-3">{socialSlot}</div> : null}
         {rivals ? (
           <RivalBoard
             t={t}

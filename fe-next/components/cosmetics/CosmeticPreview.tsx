@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { RarityChip } from '@/components/progression/RarityChip';
 import { type Cosmetic, RARITY_COLORS, formatUnlockHint, localizeTierParams } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
 
@@ -47,8 +48,8 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
         {/* Info */}
         <h3 className="text-lg font-neo-display font-bold text-neo-white">{t(cosmetic.name)}</h3>
         <p className="text-sm text-gray-400 mb-2">{t(cosmetic.description)}</p>
-        <p className={`text-xs font-bold mb-4 ${rarityClass}`}>
-          {t(`cosmetics.rarity.${cosmetic.rarity}`)}
+        <p className="mb-4">
+          <RarityChip rarity={cosmetic.rarity} />
         </p>
 
         {/* Actions */}

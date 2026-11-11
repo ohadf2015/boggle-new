@@ -6803,6 +6803,27 @@ const ja = {
     "viewProgress": "進捗を見る"
   },
   "achievements": {
+    "WORLD_RECORD": {"name":"世界記録","description":"いずれかのモードで世界記録を持つ"},
+    "RIVALRY_FIRST_WIN": {"name":"一矢報いた","description":"ライバルに初めて勝つ"},
+    "RIVALRY_5_WINS": {"name":"ライバルハンター","description":"ライバルに5回勝つ"},
+    "RIVALRY_25_WINS": {"name":"宿敵","description":"ライバルに25回勝つ"},
+    "PING_FIRST": {"name":"勝負だ","description":"ライバルに初めてピンを送る"},
+    "PING_25": {"name":"挑発の達人","description":"ライバルにピンを25回送る"},
+    "REMATCH_10": {"name":"もう一回!","description":"同じライバルとさらに10回対戦する"},
+    "RECORD_FIRST": {"name":"自己ベスト","description":"Blastのベストスコアか最長の単語を更新する"},
+    "RECORD_10": {"name":"記録破り","description":"自己ベストを10回更新する"},
+    "FIRST_FRIEND": {"name":"はじめての友達","description":"初めて友達を追加する"},
+    "FRIENDS_5": {"name":"人気者","description":"友達を5人にする"},
+    "LEVEL_5": {"name":"芽生え","description":"レベル5に到達"},
+    "LEVEL_10": {"name":"ぐんぐん成長","description":"レベル10に到達"},
+    "LEVEL_25": {"name":"深い根","description":"レベル25に到達"},
+    "LEVEL_50": {"name":"頂上","description":"レベル50に到達"},
+    "LEVEL_75": {"name":"灼熱の核","description":"レベル75に到達"},
+    "LEVEL_100": {"name":"流れ星","description":"レベル100に到達"},
+    "TITLE_PICKED": {"name":"名札","description":"プロフィールの称号を選ぶ"},
+    "DAILY_TOP3": {"name":"表彰台","description":"デイリーランキングで3位以内に入る"},
+    "DAILY_BOARD_STREAK_7": {"name":"1週間ランクイン","description":"7日連続でデイリーランキングに載る"},
+    "DAILY_BOARD_STREAK_30": {"name":"デイリーの常連","description":"30日連続でデイリーランキングに載る"},
     "wordcraft_first_word": {
       "name": "はじめの一語",
       "description": "Word Craftで最初の単語を置こう"
@@ -22763,8 +22784,178 @@ const ja = {
     "proDepth": "週ごとの伸び · 全クラスの書き出し · 保護者向けレポート",
     "schoolQuote": "学校でまとめて導入しますか？見積もりを依頼",
     "noWords": "このラウンドには確認するレッスンの単語がありませんでした。"
-  }
+  },
   // @eduProResults:end
+  // @rivals:start
+  "rivals": {
+    "why": {
+      "friend": "フレンド",
+      "playedTogether": "{count}回一緒にプレイ",
+      "friendOfFriend": "フレンドのフレンド",
+      "sameCountry": "同じ{country}のプレイヤー",
+      "closeScore": "実力が近い",
+      "closeRecord": "互角の勝負"
+    },
+    "beatBy": "あと{gap}で{name}を抜ける",
+    "youBeat": "{name}に勝った！",
+    "yourRival": "ライバル：{name}",
+    "selfChase": "あと{gap}で自己ベスト更新",
+    "selfBeat": "自己ベスト更新！",
+    "yourBest": "自己ベスト",
+    "pingedYou": "挑戦状が届いた",
+    "wins": "{count}勝",
+    "losses": "{count}敗",
+    "draws": "{count}分"
+  },
+  // @rivals:end
+  // @publicName:start
+  "publicName": {
+    "promptTitle": "名前を決めてランキングに載ろう。ライバルも見つかるよ",
+    "tryThis": "これはどう？",
+    "placeholder": "あなたの名前",
+    "save": "保存",
+    "saveFailed": "名前を保存できませんでした。もう一度お試しください。",
+    "onlyYouSeeRow": "これはあなたにしか見えません。名前を決めて載ろう",
+    "error": {
+      "empty": "まず名前を入力してね",
+      "placeholder": "自動でついた名前です。自分の名前にしよう",
+      "default": "たくさんの人が使っている名前です。自分だけの名前にしよう",
+      "profane": "その名前は使えません。別の名前にしてね"
+    }
+  },
+  // @publicName:end
+  // @rivalPings:start
+  "rivalPings": {
+    "ping": {
+      "come_at_me": "かかってこい",
+      "beat_you": "今回は勝ったよ",
+      "rematch": "もう一回やる？",
+      "gg": "GG、ナイスゲーム",
+      "close_one": "接戦だったね",
+      "your_turn": "次はそっちの番",
+      "nice_word": "いい単語、さすが",
+      "see_you_tomorrow": "また明日ね"
+    },
+    "button": "ピン",
+    "buttonLabel": "{name}さんにピンを送る",
+    "pickerTitle": "{name}さんにピン",
+    "sent": "送ったよ！",
+    "more": "その他",
+    "block": "{name}さんをブロック",
+    "report": "報告する",
+    "reported": "ありがとう、確認するね",
+    "signIn": "登録する",
+    "error": {
+      "sign_in_required": "ライバルにピンを送るには登録してね",
+      "not_allowed": "このプレイヤーにはピンを送れません",
+      "blocked": "このプレイヤーはブロック中です",
+      "name_required": "先にプレイヤー名を決めよう。誰からの挑戦かわかるように",
+      "daily_limit": "今日のピン3回を使い切ったよ。また明日",
+      "target_cooldown": "もうピンを送ったよ。数時間後にまたどうぞ",
+      "not_found": "このプレイヤーはもういません",
+      "unavailable": "送れませんでした。もう一度試してね"
+    },
+    "toast": {
+      "title": "{name}さんからピンが届いたよ",
+      "pingBack": "ピンを返す",
+      "play": "遊ぶ",
+      "close": "閉じる",
+      "region": "ライバルからのピン"
+    }
+  },
+  // @rivalPings:end
+  // @progression:start
+  "progression": {
+    "records": {
+      "newRecord": "自己ベスト更新!",
+      "beatPrevious": "{value} — これまでのベストは{previous}",
+      "title": "あなたの記録",
+      "empty": "まだ記録はありません。1回遊んで最初の記録を作ろう。",
+      "upFrom": "{previous}から更新",
+      "keys": {
+        "longestWord": "最長の単語",
+        "singleBest": "ソロのベスト",
+        "quickPlayBest": "クイックプレイのベスト",
+        "blastBest": "Blastのベスト",
+        "towerBestM": "最高の塔 (m)",
+        "wordCraftBest": "Word Craftのベスト",
+        "dailyStreakBest": "最長の連続デイリー",
+        "mpBestStreak": "最多連勝",
+        "multiplayerBest": "マルチプレイのベストスコア"
+      }
+    },
+    "unlock": {
+      "signInToUnlock": "ログインしてアバターのアイテムを解放しよう",
+      "levelPath": "Lv {from} → Lv {to}",
+      "unlocksItem": "{item}を解放",
+      "xpToGo": "あと{xp} XP",
+      "upNext": "次の解放",
+      "atLevel": "Lv {level}"
+    },
+    "titles": {
+      "newTitle": "新しい称号",
+      "pickerTitle": "あなたの称号",
+      "auto": "自動",
+      "saveFailed": "称号を保存できませんでした。もう一度試してね。",
+      "loadFailed": "称号を読み込めませんでした。タップして再試行。",
+      "nextAt": "Lv {level}で「{title}」を解放",
+      "NEMESIS": "宿敵",
+      "RECORD_BREAKER": "記録破り",
+      "SOCIAL_BUTTERFLY": "人気者",
+      "DAILY_REGULAR": "デイリーの常連",
+      "ASCENDED_ONE": "昇りし者",
+      "TWICE_RISEN": "二度昇りし者",
+      "THRICE_BLESSED": "三度祝福されし者",
+      "ETERNAL_WARRIOR": "永遠の戦士",
+      "LEXICON_IMMORTAL": "不滅の辞書"
+    },
+    "achievements": {
+      "holders": "プレイヤーの{percent}%が獲得"
+    }
+  },
+  // @progression:end
+  // @worldRecords:start
+  "worldRecords": {
+    "tab": "記録",
+    "metres": "{value}m",
+    "chip": {
+      "holder": "世界記録：{name}・{score}",
+      "gap": "あと{gap}で更新",
+      "newRecord": "世界記録更新！",
+      "youHold": "世界記録はあなた・{score}",
+      "claimSignIn": "ログインして記録を手に入れよう。",
+      "claimName": "名前を決めて記録を手に入れよう。"
+    },
+    "crown": {
+      "label": "世界記録：{count}"
+    },
+    "hallOfFame": {
+      "title": "殿堂入り",
+      "subtitle": "全ゲームの歴代最高スコア",
+      "since": "{date}から保持",
+      "yours": "あなた",
+      "empty": "まだ記録はありません。最初の記録を狙おう！",
+      "error": "記録を読み込めませんでした。",
+      "retry": "もう一度"
+    },
+    "modes": {
+      "mp_classic": "マルチプレイ・クラシック",
+      "mp_word_hunt": "マルチプレイ・ワードハント",
+      "mp_wheel_rush": "マルチプレイ・ホイールラッシュ",
+      "mp_blast": "マルチプレイ・ブラスト",
+      "qp_classic": "クイックマッチ・クラシック",
+      "qp_word_hunt": "クイックマッチ・ワードハント",
+      "qp_wheel_rush": "クイックマッチ・ホイールラッシュ",
+      "qp_blast": "クイックマッチ・ブラスト",
+      "daily_word_hunt": "デイリーワードハント",
+      "daily_word_wheel": "デイリーワードホイール",
+      "daily_connections": "デイリーワードブリッジ",
+      "blast": "ブラスト",
+      "tower": "ワードタワー",
+      "single": "ソロ"
+    }
+  }
+  // @worldRecords:end
 };
 
 export { ja };
