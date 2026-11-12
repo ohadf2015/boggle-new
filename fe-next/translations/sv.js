@@ -21254,7 +21254,6 @@ const sv = {
       "moreArenas": "+{{count}} till",
       "allArenas": "Alla öppna spel",
       "emptyInLanguage": "Inga öppna spel på {{language}} just nu",
-      "startOne": "Starta ett",
       "openElsewhere": "{{count}} öppna på {{language}}",
       "joinRow": "Gå med",
       "roomLanguage": "Rummets språk",

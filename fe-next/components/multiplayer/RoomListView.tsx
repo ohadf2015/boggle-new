@@ -32,13 +32,14 @@ export interface RoomListViewProps {
   rankedSlot?: ReactNode;
   roomLanguage: Language;
   onRoomLanguageChange: (language: Language) => void;
-  /** Empty list's START ONE (CREATE in roomLanguage). */
-  onStartRoom: () => void;
 }
 
 /**
  * The MP entry body (DESIGN §b.1) — one screen, zero page scroll.
- * Phone: identity → join by code → open arenas (4 rows + "+N more").
+ * Phone: identity → join by code → open arenas (4 rows + "+N more"). Sized to
+ * its content, never squeezed: on a short phone (or under an ad banner) the
+ * body region scrolls (MpScreen bodyScroll="inner") instead of clipping the
+ * bottom of the list behind the footer.
  * Desktop/TV: left column identity, code and CREATE; right column arenas (8 rows).
  * QUICK START lives in the MpScreen footer (ArenaCTAStrip). The module path is
  * kept because the MultiplayerFlow.* guard tests mock it.
@@ -59,7 +60,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   rankedSlot,
   roomLanguage,
   onRoomLanguageChange,
-  onStartRoom,
 }) => {
   const { t, dir } = useLanguage();
   // Same offline guard as the footer CTAs (ArenaCTAStrip): a tap that cannot work stays inert.
@@ -69,7 +69,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
     <div
       dir={dir}
       data-testid="entry-body"
-      className="mx-auto flex h-full min-h-0 w-full max-w-6xl tv:max-w-[1640px] flex-col gap-3 px-4 py-3 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-8 lg:px-8 lg:py-6 desktop-short:py-3 tv:gap-12"
+      className="mx-auto flex flex-1 w-full max-w-6xl tv:max-w-[1640px] flex-col gap-3 px-4 py-3 lg:h-full lg:min-h-0 lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-8 lg:px-8 lg:py-6 desktop-short:py-3 tv:gap-12"
     >
       <div className="flex shrink-0 flex-col gap-3 lg:min-h-0 lg:gap-4 lg:justify-center desktop-short:gap-3">
         <EntryIdentity isAuthenticated={isAuthenticated} displayName={displayName} profileAvatar={profileAvatar} />
@@ -98,7 +98,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
         fetchTimedOut={roomFetchTimedOut}
         language={roomLanguage}
         onLanguageChange={onRoomLanguageChange}
-        onStartRoom={onStartRoom}
       />
     </div>
   );

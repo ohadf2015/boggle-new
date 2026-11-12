@@ -21,7 +21,7 @@ export function ArenaLanguageFilter({ languages, counts, value, onChange }: Aren
     <div
       role="group"
       aria-label={t('mpUi.entry.roomLanguage')}
-      className="mp-arena-langs -mx-0.5 flex shrink-0 gap-1.5 overflow-x-auto overscroll-x-contain px-0.5 pb-1 pt-0.5 tv:gap-3"
+      className="mp-arena-langs -mx-0.5 flex shrink-0 gap-1.5 overflow-x-auto overscroll-x-contain ps-0.5 pe-6 pb-1 pt-0.5 tv:gap-3"
     >
       {languages.map((code) => {
         const active = code === value;

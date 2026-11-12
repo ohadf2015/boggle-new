@@ -20299,7 +20299,6 @@ const en = {
       "moreArenas": "+{{count}} more",
       "allArenas": "All open games",
       "emptyInLanguage": "No open games in {{language}} right now",
-      "startOne": "Start one",
       "openElsewhere": "{{count}} open in {{language}}",
       "joinRow": "Join",
       "roomLanguage": "Room language",

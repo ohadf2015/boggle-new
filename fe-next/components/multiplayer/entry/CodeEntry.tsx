@@ -162,7 +162,11 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
           />
         ))}
       </div>
-      <p id={hintId} className="mt-2 text-xs tv:text-base font-bold text-neo-white/70">{t('mpUi.entry.codeHint')}</p>
+      {/* Phones have QUICK START right under the list, so the hint is read out
+          (aria-describedby) but not drawn: the row stays one label + six boxes. */}
+      <p id={hintId} className="sr-only lg:not-sr-only lg:mt-2 lg:block text-xs tv:text-base font-bold text-neo-white/70">
+        {t('mpUi.entry.codeHint')}
+      </p>
     </div>
   );
 }

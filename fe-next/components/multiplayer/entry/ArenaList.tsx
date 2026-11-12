@@ -30,8 +30,6 @@ interface ArenaListProps {
   /** Board language the list shows; rooms in other languages wait behind the chips. */
   language: Language;
   onLanguageChange: (language: Language) => void;
-  /** Empty state's START ONE: opens CREATE in the filtered language. */
-  onStartRoom: () => void;
 }
 
 /** Joinable first (waiting, seats free), then live, then full; server order within each (stable sort). */
@@ -46,7 +44,7 @@ function rank(r: ArenaRoom): number {
  * rows, desktop/TV 8, and a "+N more" chip opens every room in an MpSheet.
  */
 export function ArenaList({
-  rooms, loading, joiningRoomCode, onRoomClick, onRefresh, fetchTimedOut, className, language, onLanguageChange, onStartRoom,
+  rooms, loading, joiningRoomCode, onRoomClick, onRefresh, fetchTimedOut, className, language, onLanguageChange,
 }: ArenaListProps) {
   const { t, language: uiLocale } = useLanguage();
   const [showAll, setShowAll] = useState(false);
@@ -95,7 +93,7 @@ export function ArenaList({
     'inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs tv:text-lg font-bold uppercase text-neo-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime';
 
   return (
-    <section aria-busy={loading} className={cn('flex min-h-0 flex-col gap-2', className)}>
+    <section aria-busy={loading} className={cn('flex flex-col gap-2 lg:min-h-0', className)}>
       <div className="flex items-center gap-2 px-0.5">
         <h2 className="font-neo-display text-sm tv:text-2xl font-bold uppercase tracking-[0.12em] text-neo-white">
           {t('mpUi.entry.openArenas')}
@@ -150,7 +148,6 @@ export function ArenaList({
       ) : sorted.length === 0 ? (
         <ArenaEmptyState
           languageName={languageDisplayName(language, uiLocale)}
-          onStart={onStartRoom}
           elsewhere={
             elsewhere
               ? {

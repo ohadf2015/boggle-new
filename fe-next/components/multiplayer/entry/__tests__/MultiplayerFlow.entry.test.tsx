@@ -64,6 +64,16 @@ describe('MultiplayerFlow entry frame', () => {
     expect(screen.getByTestId('mp-entry-footer')).toContainElement(screen.getByTestId('arena-quick-start'));
   });
 
+  // Phone screenshot 2026-11-12: on a short phone under the app's ad banner the
+  // empty state's bottom was clipped behind the footer. The arenas body now
+  // scrolls inside its own region instead of clipping; the page never scrolls.
+  it('lets the arenas body scroll on its own instead of clipping behind the footer', () => {
+    render(<MultiplayerFlow {...props} />);
+    const body = screen.getByTestId('mp-entry-body');
+    expect(body.className).toMatch(/\boverflow-y-auto\b/);
+    expect(body.className).not.toMatch(/\boverflow-hidden\b/);
+  });
+
   it('QUICK START in the footer fires quick play', () => {
     render(<MultiplayerFlow {...props} />);
     fireEvent.click(screen.getByTestId('arena-quick-start'));

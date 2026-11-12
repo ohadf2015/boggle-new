@@ -14,6 +14,17 @@
   .mp-arena-tail-inner { display: none; }
 }
 
-/* The language chips scroll sideways on narrow phones without a visible bar. */
-.mp-arena-langs { scrollbar-width: none; }
+/* The language chips scroll sideways on narrow phones without a visible bar;
+   the row fades out at its inline end, so a chip cut by the edge reads as
+   "more this way" rather than as a clipped button. */
+.mp-arena-langs {
+  scrollbar-width: none;
+  scroll-padding-inline: 2px;
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 24px), transparent);
+}
+[dir='rtl'] .mp-arena-langs {
+  -webkit-mask-image: linear-gradient(to left, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to left, #000 calc(100% - 24px), transparent);
+}
 .mp-arena-langs::-webkit-scrollbar { display: none; }
