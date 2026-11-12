@@ -3,7 +3,7 @@
 import { HourglassGlyph } from './resultsGlyphs';
 
 /** Nobody scored: the winner bar below says so, this says what to change for the next round. */
-export function ZeroRoundNote({ t }: { t: (key: string) => string }) {
+export function ZeroRoundNote({ t, practice = false }: { t: (key: string) => string; practice?: boolean }) {
   return (
     <div
       data-testid="podium-zero-note"
@@ -11,7 +11,7 @@ export function ZeroRoundNote({ t }: { t: (key: string) => string }) {
     >
       <HourglassGlyph className="shrink-0 text-neo-cream/80" style={{ width: '4cqw', height: '4cqw' }} />
       <span dir="auto" className="min-w-0 font-neo-body font-bold leading-snug text-neo-cream" style={{ fontSize: '2cqw' }}>
-        {t('eduLive.results.zeroNoteHint')}
+        {t(practice ? 'eduLive.results.practice.zeroNote' : 'eduLive.results.zeroNoteHint')}
       </span>
     </div>
   );

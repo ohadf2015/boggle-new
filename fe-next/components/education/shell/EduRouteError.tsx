@@ -8,6 +8,7 @@ import type { Language } from '@/types';
 import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { EduMascot } from '@/components/education/EduMascot';
+import { claimChunkRecoveryGuard, clearCachesAndReload, isChunkLoadError } from '@/lib/deploy/staleDeployReload';
 
 export type EduErrorArea = 'live' | 'student' | 'teacher' | 'join';
 
@@ -71,15 +72,17 @@ export function EduRouteError({
     }
   };
 
+  // A stale chunk after a deploy recovers only with a fresh, cache-busted load.
+  const staleChunk = isChunkLoadError(error.name, error.message);
+
   useEffect(() => {
     captureError(error, { errorBoundary: { type: boundary, digest: error.digest } });
-  }, [error, boundary]);
-
-  // A stale chunk after a deploy recovers only with a real load.
-  const staleChunk = error.name === 'ChunkLoadError';
+    // A reload inside the live room drops the room session, so there the player chooses when to refresh.
+    if (staleChunk && area !== 'live' && claimChunkRecoveryGuard()) void clearCachesAndReload();
+  }, [error, boundary, staleChunk, area]);
 
   const retry = () => {
-    if (staleChunk) window.location.reload();
+    if (staleChunk) void clearCachesAndReload();
     else reset();
   };
 
@@ -99,10 +102,12 @@ export function EduRouteError({
       <div className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-light p-6 text-center shadow-hard-lg">
         <EduMascot moment="error" size={112} className="mx-auto mb-3 size-28" />
         <h1 className="mb-2 font-neo-display text-2xl font-black text-neo-cream">
-          {t('eduShell.error.title', 'This screen hit a snag')}
+          {staleChunk ? t('errors.updateHeading', 'Update ready') : t('eduShell.error.title', 'This screen hit a snag')}
         </h1>
         <p className="mb-6 font-neo-body text-base font-semibold text-neo-cream/85">
-          {t('eduShell.error.body', 'Try again. If it keeps happening, head back to your class and start from there.')}
+          {staleChunk
+            ? t('errors.updateMessage', 'New version available. Refresh to update.')
+            : t('eduShell.error.body', 'Try again. If it keeps happening, head back to your class and start from there.')}
         </p>
         <div className="flex flex-col gap-3">
           <button
@@ -111,7 +116,7 @@ export function EduRouteError({
             onClick={retry}
             className={`flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black text-neo-black shadow-hard ${PRESS}`}
           >
-            {t('common.retry', 'Try again')}
+            {staleChunk ? t('errors.refreshPage', 'Refresh') : t('common.retry', 'Try again')}
           </button>
           <button
             type="button"

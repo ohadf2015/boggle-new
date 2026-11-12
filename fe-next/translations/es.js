@@ -21577,7 +21577,11 @@ const es = {
       "title": "¿Terminar el juego de la clase?",
       "body": "La sala se cierra para todo el alumnado y vuelves a Inicio.",
       "stay": "Seguir jugando",
-      "confirm": "Terminar juego"
+      "confirm": "Terminar juego",
+      "lobbyTitle": "¿Cerrar la sala?",
+      "lobbyBody": "El alumnado que ya entró saldrá de la sala.",
+      "lobbyConfirm": "Cerrar sala",
+      "lobbyStay": "Dejarla abierta"
     },
     "live": {
       "panelTitle": "Ronda en vivo",
@@ -21605,7 +21609,15 @@ const es = {
       "noLessonBody": "Los puntos vinieron de otras palabras del tablero. Los mejores hallazgos de la clase:",
       "noLessonBodyEmpty": "Los puntos vinieron de otras palabras del tablero.",
       "noLessonHint": "Con un tablero más grande o más tiempo, las palabras de la lección tienen más sitio.",
-      "noLessonReteach": "Palabras de la lección por repasar"
+      "noLessonReteach": "Palabras de la lección por repasar",
+      "practice": {
+        "coverageNote": "Esto fue un ensayo con un alumno de práctica. Cuando juegue tu clase, aquí verás qué palabras de la lección encontraron y cuáles conviene repasar.",
+        "coverageHeading": "Palabras de la lección en esta partida",
+        "missedTitle": "Palabras de la lección que no salieron en el ensayo",
+        "zeroTitle": "Ensayo terminado",
+        "zeroBody": "Acabas de probar la partida con un alumno de práctica. Con tu clase aquí, en esta tarjeta aparece quién gana la ronda.",
+        "zeroNote": "En la clase de verdad, los puntos de tu alumnado llenan este podio."
+      }
     },
     "reteach": {
       "playNow": "Jugar ahora",

@@ -11,6 +11,7 @@ beforeEach(() => {
   replaceSpy.mockClear();
   reloadSpy.mockClear();
   sessionStorage.clear();
+  window.name = '';
   Object.defineProperty(window, 'location', {
     value: {
       href: 'https://lexiclash.live/en',
