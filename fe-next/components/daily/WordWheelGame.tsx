@@ -42,6 +42,8 @@ import WordWheelLiveRanks from './WordWheelLiveRanks';
 import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { wheelRankLadder } from '@/lib/wordWheel/rankLadder';
+import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
+import { emitFinalSeconds, emitWheelVerdict } from './mascot/dailyMascotEvents';
 
 export type { WordWheelGameResult } from './wheel/wordWheelGameProps';
 
@@ -204,7 +206,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const { clock } = useWheelTimer({
     duration,
     running: !paused && !practice,
-    onWarning: () => onEffect({ type: 'timeWarning' }),
+    onWarning: () => { onEffect({ type: 'timeWarning' }); emitFinalSeconds(10); },
     onTick: (secondsLeft) => {
       playCountdownBeep(secondsLeft);
       onEffect({ type: 'timeTick', secondsLeft });
@@ -234,9 +236,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   // ── Accept a word (score, list, effects) ──
   const acceptWord = useCallback((word: string, spelled: { letter: string; wheelIndex: number }[]) => {
-    const cx = gameContainerRef.current
-      ? gameContainerRef.current.getBoundingClientRect().width / 2
-      : 200;
+    const cx = gameContainerRef.current ? gameContainerRef.current.getBoundingClientRect().width / 2 : 200;
     const step = registerCombo();
     const gold = bonuses && usesGold(word, goldLetter);
     const points = bonuses ? wordPoints(word, { gold: goldLetter, multiplier: step.multiplier }) : scoreWord(word);
@@ -247,6 +247,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     setWordsFound(nextWordsFound);
     setScore(scoreRef.current);
     onWordFound?.(word, nextWordsFound, scoreRef.current);
+    emitWheelVerdict('accepted', word);
     // 'all' = every distinct wheel letter used (a wheel pangram); 'almost' = all but one.
     const wheelLetters = puzzle.allLetters ?? [puzzle.centerLetter, ...puzzle.outerLetters];
     const coverage = classifyLetterCoverage(word, wheelLetters);
@@ -284,10 +285,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   }, [puzzle, bonuses, goldLetter, registerCombo, builtLettersRef, showSuccess, onEffect, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx, timers]);
 
   const rejectWord = useCallback((message: string, clear: LetterClear, spelled: { letter: string; wheelIndex: number }[], kind: RejectKind) => {
-    const cx = gameContainerRef.current
-      ? gameContainerRef.current.getBoundingClientRect().width / 2
-      : 200;
+    const cx = gameContainerRef.current ? gameContainerRef.current.getBoundingClientRect().width / 2 : 200;
     showRejection(message, kind, clear, spelled);
+    emitWheelVerdict(kind, spelled.map(bl => bl.letter).join(''));
     if (kind === 'invalid') breakCombo();
     if (kind === 'found' || kind === 'unknown') return;
     afterPaint(() => {
@@ -372,7 +372,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // Wheel cluster JSX (word line + wheel + action-bar; phone adds the HUD, ladder and words above)
   const wheelCluster = (
     <>
-
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
       <div className="w-full flex flex-col gap-3 shell:gap-4 shrink-0">
@@ -491,6 +490,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
+        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} />}
       </div>
     </GameShell>
   );

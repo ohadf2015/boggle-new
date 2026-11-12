@@ -14,6 +14,7 @@ vi.mock('@/contexts/SoundEffectsContext', () => ({
 vi.mock('@/hooks/useEquippedCosmetic', () => ({ useEquippedCosmetic: () => null }));
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => <div /> }));
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 

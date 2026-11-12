@@ -32,6 +32,7 @@ import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
+import { claimFreezeSaved } from '@/components/streak/freezeSavedOnce';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
@@ -182,7 +183,9 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       setStreakSavedFreezesLeft(freezesRemaining);
       // Let the hero's entrance settle, then reveal the save.
       if (streakSavedTimer.current) clearTimeout(streakSavedTimer.current);
-      streakSavedTimer.current = setTimeout(() => setShowStreakSaved(true), 1800);
+      streakSavedTimer.current = setTimeout(() => {
+        if (claimFreezeSaved(user?.id)) setShowStreakSaved(true);
+      }, 1800);
     },
     extraTries: result.extraTries,
     t,

@@ -43,6 +43,7 @@ vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => <div dat
 vi.mock('@/utils/dailyChallenge/wordWheelGeneration', () => ({ isValidWordWheelWord: () => true }));
 vi.mock('@/utils/dailyChallenge/wordWheelScoring', () => ({ scoreWord: () => 5 }));
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 

@@ -54,6 +54,7 @@ import { useStarterGuide } from './survival/hunt/useStarterGuide';
 import { isNewDailyPlayer } from '@/utils/trainingProgressStorage';
 import { NEW_PLAYER_THRESHOLD } from './survival/constants';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { HuntMascot } from './mascot/HuntMascot';
 
 export type { WordDiscovery, TargetAttempt, SurvivalGameResult } from './survival/types';
 
@@ -145,7 +146,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // life, a word to trace when stuck. Read once: finishing this run must not flip it mid-game.
   const [gentle] = useState(() => !timed && isNewDailyPlayer(NEW_PLAYER_THRESHOLD));
 
-  // Game logic hook
   const [state, actions] = useSurvivalGameLogic({
     grid,
     puzzleNumber,
@@ -174,7 +174,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // beforeunload/popstate handlers don't fire during the exit nav (black-screen race).
   const [quitting, setQuitting] = useState(false);
 
-  // Navigation guard
   useNavigationGuard({
     enabled: !state.isGameOver && !quitting,
     // `leaving` tells the guard's teardown NOT to pop its phantom history entry:
@@ -524,6 +523,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         {state.discoveredWords.length > 0 && <DiscoveredWordsList words={state.discoveredWords} t={t} />}
       </div>
 
+      {!state.isGameOver && <HuntMascot feed={state} language={language} remainingTime={timed ? roundClock.remainingTime : null} />}
       {notifications}
       {quitConfirm('portrait')}
       {extraLifeModal}

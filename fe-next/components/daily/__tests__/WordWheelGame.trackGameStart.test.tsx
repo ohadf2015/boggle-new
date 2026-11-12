@@ -62,6 +62,7 @@ beforeEach(() => {
   global.fetch = vi.fn().mockResolvedValue({ ok: false }) as unknown as typeof fetch;
 });
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 
