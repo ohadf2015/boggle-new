@@ -33,8 +33,9 @@ import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen'
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
-import { classroomLobbyExitSkipsConfirm } from './components/exitConfirmModel';
+import { classroomExitPhase, classroomLobbyExitSkipsConfirm } from './components/exitConfirmModel';
 import { useRosterReceived } from './hooks/useRosterReceived';
+import { useEndRoundNow } from './hooks/useEndRoundNow';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
 import { readLocalQuizVariant } from '@/lib/education/classroomCatalogueId';
 import type { HostViewProps } from './hostViewTypes';
@@ -65,7 +66,9 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
   });
 
   const inLobby = !runtime.gameStarted && !hasActiveGameData && !tournament.finalScores;
-  const rosterKnown = useRosterReceived(socket, gameCode);
+  const roundRunning = (runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !tournament.finalScores && !recapShown;
+  const endRoundNow = useEndRoundNow(socket);
+  const rosterKnown = useRosterReceived(socket, gameCode, (props.initialPlayers?.length ?? 0) > 0);
   const lobbyExit = classroomLobbyExitSkipsConfirm({ classroom: isClassroomMode, rosterKnown, players: players.playersReady })
     ? actions.confirmExitRoom
     : actions.handleExitRoom;
@@ -163,7 +166,8 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         onConfirm={actions.confirmExitRoom}
         t={t}
         classroom={isClassroomMode}
-        phase={inLobby ? 'lobby' : 'game'}
+        phase={classroomExitPhase({ inLobby, roundRunning: !!roundRunning })}
+        onEndRound={endRoundNow}
       />
 
       <SoloStartConfirmDialog

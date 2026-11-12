@@ -21569,7 +21569,11 @@ const ja = {
       "lobbyTitle": "ルームを閉じますか？",
       "lobbyBody": "参加済みの生徒はルームから退出します。",
       "lobbyConfirm": "ルームを閉じる",
-      "lobbyStay": "開いたままにする"
+      "lobbyStay": "開いたままにする",
+      "roundTitle": "このラウンドを終了しますか？",
+      "roundBody": "全員にいますぐ結果が表示されます。",
+      "roundConfirm": "ラウンドを終了",
+      "closeRoom": "ルームを閉じる"
     },
     "live": {
       "panelTitle": "ライブラウンド",

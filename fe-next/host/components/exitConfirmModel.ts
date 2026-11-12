@@ -20,3 +20,11 @@ export function classroomLobbyExitSkipsConfirm(args: {
 }): boolean {
   return args.classroom && args.rosterKnown && countClassStudents(args.players) === 0;
 }
+
+export type ClassroomExitPhase = 'lobby' | 'round' | 'game';
+
+/** Mid-round, a teacher pressing exit means "stop the round"; only the lobby and results ask about closing the room. */
+export function classroomExitPhase(args: { inLobby: boolean; roundRunning: boolean }): ClassroomExitPhase {
+  if (args.inLobby) return 'lobby';
+  return args.roundRunning ? 'round' : 'game';
+}

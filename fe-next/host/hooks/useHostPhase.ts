@@ -94,7 +94,7 @@ export function useHostPhase({
     initialPlayers,
     roomLanguage: roomLanguageProp,
     defaultLanguage: language as Language,
-    hasLessonData: !!lessonData,
+    classroomHost: !!lessonData || !!isClassroomMode,
   });
 
   useBroadcastLobbySettings({

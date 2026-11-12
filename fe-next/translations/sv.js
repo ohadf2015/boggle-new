@@ -21569,7 +21569,11 @@ const sv = {
       "lobbyTitle": "Stänga rummet?",
       "lobbyBody": "Elever som redan har gått med lämnar rummet.",
       "lobbyConfirm": "Stäng rummet",
-      "lobbyStay": "Låt det vara öppet"
+      "lobbyStay": "Låt det vara öppet",
+      "roundTitle": "Avsluta den här rundan?",
+      "roundBody": "Alla ser resultatet nu.",
+      "roundConfirm": "Avsluta rundan",
+      "closeRoom": "Stäng rummet"
     },
     "live": {
       "panelTitle": "Liverunda",

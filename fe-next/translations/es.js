@@ -21581,7 +21581,11 @@ const es = {
       "lobbyTitle": "¿Cerrar la sala?",
       "lobbyBody": "El alumnado que ya entró saldrá de la sala.",
       "lobbyConfirm": "Cerrar sala",
-      "lobbyStay": "Dejarla abierta"
+      "lobbyStay": "Dejarla abierta",
+      "roundTitle": "¿Terminar esta ronda?",
+      "roundBody": "Todo el mundo verá los resultados ahora.",
+      "roundConfirm": "Terminar esta ronda",
+      "closeRoom": "Cerrar la sala"
     },
     "live": {
       "panelTitle": "Ronda en vivo",

@@ -21499,7 +21499,11 @@ const he = {
       "lobbyTitle": "לסגור את החדר?",
       "lobbyBody": "תלמידים שכבר הצטרפו ייצאו מהחדר.",
       "lobbyConfirm": "סגירת החדר",
-      "lobbyStay": "להשאיר פתוח"
+      "lobbyStay": "להשאיר פתוח",
+      "roundTitle": "לסיים את הסיבוב?",
+      "roundBody": "כולם יראו עכשיו את התוצאות.",
+      "roundConfirm": "סיום הסיבוב",
+      "closeRoom": "סגירת החדר"
     },
     "live": {
       "panelTitle": "סבב חי",

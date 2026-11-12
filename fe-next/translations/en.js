@@ -20614,7 +20614,11 @@ const en = {
       "lobbyTitle": "Close the room?",
       "lobbyBody": "Students who already joined will be sent out of the room.",
       "lobbyConfirm": "Close room",
-      "lobbyStay": "Keep it open"
+      "lobbyStay": "Keep it open",
+      "roundTitle": "End this round?",
+      "roundBody": "Everyone sees the results now.",
+      "roundConfirm": "End this round",
+      "closeRoom": "Close the room"
     },
     "live": {
       "panelTitle": "Live round",
