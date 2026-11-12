@@ -26,7 +26,7 @@ const mixed = [room('EN1', 'en'), room('HE1', 'he', { playerCount: 3 }), room('E
 function renderList(over: Partial<React.ComponentProps<typeof ArenaList>> = {}) {
   const props = {
     rooms: mixed, loading: false, joiningRoomCode: null, language: 'en' as Language,
-    onRoomClick: vi.fn(), onRefresh: vi.fn(), onLanguageChange: vi.fn(), onStartRoom: vi.fn(), ...over,
+    onRoomClick: vi.fn(), onRefresh: vi.fn(), onLanguageChange: vi.fn(), ...over,
   };
   render(<ArenaList {...props} />);
   return props;
@@ -65,13 +65,11 @@ describe('ArenaList language filter', () => {
     expect(screen.getByTestId('arena-online').textContent).toContain('"count":3');
   });
 
-  it('Given no Swedish rooms but English ones, When filtered to Swedish, Then the empty state names Swedish, offers Start one and points to English', () => {
+  it('Given no Swedish rooms but English ones, When filtered to Swedish, Then the empty state names Swedish and points to English', () => {
     const p = renderList({ language: 'sv' });
     const empty = screen.getByTestId('arena-empty-state');
     expect(empty.textContent).toContain('mpUi.entry.emptyInLanguage');
     expect(empty.textContent).toContain('Swedish');
-    fireEvent.click(within(empty).getByTestId('arena-empty-start'));
-    expect(p.onStartRoom).toHaveBeenCalled();
     const elsewhere = within(empty).getByTestId('arena-empty-elsewhere');
     expect(elsewhere.textContent).toContain('"count":2');
     expect(elsewhere.textContent).toContain('English');
@@ -79,10 +77,12 @@ describe('ArenaList language filter', () => {
     expect(p.onLanguageChange).toHaveBeenCalledWith('en');
   });
 
-  it('Given no rooms at all, When empty, Then Start one is the only action and nothing links out of MP', () => {
+  // One CREATE per entry (the footer on phones, the side column on desktop): the
+  // empty state used to add a second one that opened the same sheet.
+  it('Given no rooms at all, When empty, Then it has no action of its own and nothing links out of MP', () => {
     renderList({ rooms: [] });
     const empty = screen.getByTestId('arena-empty-state');
-    expect(within(empty).getAllByRole('button').map((b) => b.dataset.testid)).toEqual(['arena-empty-start']);
+    expect(within(empty).queryAllByRole('button')).toHaveLength(0);
     expect(empty.querySelector('a')).toBeNull();
   });
 

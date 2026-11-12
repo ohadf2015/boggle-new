@@ -41,7 +41,7 @@ const rooms = (n: number) => Array.from({ length: n }, (_, i) => room(i + 1));
 
 const base = {
   loading: false, onRoomClick: vi.fn(), onRefresh: vi.fn(), joiningRoomCode: null as string | null,
-  language: 'en' as const, onLanguageChange: vi.fn(), onStartRoom: vi.fn(),
+  language: 'en' as const, onLanguageChange: vi.fn(),
 };
 
 describe('ArenaList', () => {
@@ -215,11 +215,11 @@ describe('ArenaList', () => {
     expect(screen.queryByTestId('arena-list-tail')).toBeNull();
   });
 
-  it('empty: one mascot line naming the language and a single START ONE', () => {
+  it('empty: one mascot line naming the language and no second CREATE', () => {
     render(<ArenaList {...base} rooms={[]} />);
     const empty = screen.getByTestId('arena-empty-state');
     expect(empty.textContent).toContain('mpUi.entry.emptyInLanguage');
-    expect(within(empty).getAllByRole('button')).toHaveLength(1);
+    expect(within(empty).queryAllByRole('button')).toHaveLength(0);
   });
 
   it('loading with nothing yet: skeleton rows', () => {

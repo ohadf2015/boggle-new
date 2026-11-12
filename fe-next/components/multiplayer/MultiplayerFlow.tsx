@@ -220,6 +220,9 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
       <MpScreen
         testId={TEST_ID}
         header={header}
+        // The arenas body scrolls inside its region on short phones rather than
+        // clipping behind the QUICK START footer; the page itself never scrolls.
+        bodyScroll={heroOwnsScreen ? 'none' : 'inner'}
         body={
           heroOwnsScreen ? (
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -249,7 +252,6 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
               rankedSlot={rankedSlot}
               roomLanguage={roomLanguage}
               onRoomLanguageChange={setRoomLanguage}
-              onStartRoom={s.openCreate}
             />
           )
         }

@@ -21266,7 +21266,6 @@ const es = {
       "moreArenas": "+{{count}} más",
       "allArenas": "Todas las partidas abiertas",
       "emptyInLanguage": "Ahora mismo no hay partidas abiertas en {{language}}",
-      "startOne": "Crea una",
       "openElsewhere": "{{count}} abiertas en {{language}}",
       "joinRow": "Entrar",
       "roomLanguage": "Idioma de la sala",

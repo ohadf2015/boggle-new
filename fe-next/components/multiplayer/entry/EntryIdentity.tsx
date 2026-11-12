@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Dices, Pencil } from 'lucide-react';
+import { Check, Dices, Pencil, Trophy } from 'lucide-react';
 import AvatarRenderer from '@/components/avatar/AvatarRenderer';
 import { EloRankBadge } from '@/components/multiplayer/EloRankBadge';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,7 +33,7 @@ const TAGLINE =
   'hidden desktop-tall:block mb-1 font-neo-display text-3xl tv:text-5xl font-bold uppercase tracking-tight text-neo-lime';
 const LABEL = 'block text-[11px] tv:text-base font-bold uppercase tracking-[0.15em] text-neo-cyan';
 const NAME_ROW =
-  'w-full pe-8 font-neo-display! desktop-tall:text-3xl! desktop-tall:tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-3 pb-0.5';
+  'w-full pe-8 font-neo-display! desktop-tall:text-3xl! desktop-tall:tv:text-5xl! font-bold desktop-tall:ps-8 desktop-tall:text-center border-b-2 border-dashed pb-0.5';
 // One line height per breakpoint whatever the phone font size, so a long name
 // (smaller type) never changes the row — or the card — height. Listed AFTER
 // the size in cn(): tailwind-merge drops a leading-* that precedes a text-*.
@@ -159,7 +159,7 @@ export function EntryIdentity(props: EntryIdentityInput) {
               nameSizeClass(id.name),
               NAME_LEADING,
               'bg-transparent text-neo-white outline-hidden transition-colors placeholder:text-neo-white/50',
-              id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/25 focus:border-neo-lime',
+              id.error ? 'border-neo-red motion-safe:animate-neo-shake' : 'border-neo-white/30 focus:border-solid focus:border-neo-lime',
             )}
           />
           {id.saved && (
@@ -180,7 +180,13 @@ export function EntryIdentity(props: EntryIdentityInput) {
       </div>
 
       {id.rating != null && (
-        <div className="shrink-0 self-start desktop-tall:absolute desktop-tall:top-3 desktop-tall:end-3">
+        // Pinned to the label row's end (out of the flow), so the name field keeps
+        // the full width and the rating reads as a rank chip, not a coin count.
+        <div
+          data-testid="entry-rank-chip"
+          className="absolute top-2.5 end-3 inline-flex h-6 items-center gap-1 rounded-full border-2 border-neo-cream/40 bg-neo-navy px-2 desktop-tall:top-3"
+        >
+          <Trophy aria-hidden="true" className="h-3 w-3 text-neo-yellow" />
           <EloRankBadge rating={id.rating} size="compact" />
         </div>
       )}

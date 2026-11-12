@@ -22,12 +22,12 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: stri
 vi.mock('@/hooks/useNetworkState', () => ({ useNetworkState: () => ({ online: true, rttMs: 20 }) }));
 vi.mock('../../RoomListView', () => ({
   __esModule: true,
-  default: ({ roomLanguage, onRoomLanguageChange, onStartRoom }: {
-    roomLanguage: string; onRoomLanguageChange: (l: string) => void; onStartRoom: () => void;
+  default: ({ roomLanguage, onRoomLanguageChange, onCreateRoom }: {
+    roomLanguage: string; onRoomLanguageChange: (l: string) => void; onCreateRoom: () => void;
   }) => (
     <div data-testid="room-list-view" data-language={roomLanguage}>
       <button type="button" onClick={() => onRoomLanguageChange('he')}>to-he</button>
-      <button type="button" onClick={onStartRoom}>start-one</button>
+      <button type="button" onClick={onCreateRoom}>create-side</button>
     </div>
   ),
 }));
@@ -55,11 +55,11 @@ describe('MultiplayerFlow room language', () => {
     expect(screen.getByTestId('room-list-view')).toHaveAttribute('data-language', 'en');
   });
 
-  it('Given the viewer switched the list to Hebrew, When START ONE is pressed, Then CREATE opens in Hebrew', () => {
+  it('Given the viewer switched the list to Hebrew, When the side CREATE is pressed, Then CREATE opens in Hebrew', () => {
     render(<MultiplayerFlow {...props} />);
     fireEvent.click(screen.getByText('to-he'));
     expect(screen.getByTestId('room-list-view')).toHaveAttribute('data-language', 'he');
-    fireEvent.click(screen.getByText('start-one'));
+    fireEvent.click(screen.getByText('create-side'));
     expect(screen.getByTestId('create-sheet-mock').textContent).toBe('he');
   });
 

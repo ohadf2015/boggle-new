@@ -21254,7 +21254,6 @@ const ja = {
       "moreArenas": "ほか{{count}}件",
       "allArenas": "参加できるゲーム一覧",
       "emptyInLanguage": "いま{{language}}で参加できるゲームはありません",
-      "startOne": "自分で始める",
       "openElsewhere": "{{language}}なら{{count}}件あります",
       "joinRow": "参加",
       "roomLanguage": "ルームの言語",
