@@ -172,7 +172,6 @@ function RowShell({
             </span>
           </PlayerProfileTooltip>
           {person.player_id && <RecordHolderCrown userId={person.player_id} />}
-          <TitleBadge title={person.title} className="min-w-0 max-w-[40%] shrink" />
           {isCurrentUser && (
             <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black border border-neo-black px-2 py-0.5 rounded-full font-black shrink-0">
               {t('wordHunt.leaderboard.you')}
@@ -185,7 +184,17 @@ function RowShell({
           )}
           {badges}
         </div>
-        {stats && <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5 flex-wrap">{stats}</div>}
+        {/* The title gets the second line, before the stats: squeezed in beside the
+            name it truncated to a bare crown and cut the name itself to "F…". */}
+        {(person.title || stats) && (
+          <div className="text-xs sm:text-sm flex items-center gap-x-2 gap-y-1 mt-1 flex-wrap min-w-0">
+            <TitleBadge
+              title={person.title}
+              className="max-w-full border-neo-purple-light shadow-none"
+            />
+            {stats}
+          </div>
+        )}
       </div>
 
       {!isCurrentUser && (

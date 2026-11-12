@@ -10242,6 +10242,7 @@ const sv = {
     "totalAttempts": "försök",
     "yourPosition": "Din position",
     "showMore": "Visa mer",
+    "showAllPlayers": "Visa alla {count} spelare",
     "showLess": "Visa mindre",
     "more": "mer",
     "shareImage": "Dela som bild",

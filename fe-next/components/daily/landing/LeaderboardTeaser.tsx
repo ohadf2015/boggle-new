@@ -20,6 +20,10 @@ interface LeaderboardTeaserProps {
   onViewFull?: () => void;
 }
 
+/** Every player today (the API's cap); rows past the first VISIBLE_ROWS fold behind "show more". */
+const FETCH_LIMIT = 100;
+const VISIBLE_ROWS = 10;
+
 const RANK_STYLES = [
   { text: 'text-neo-lime', medal: '🥇' },
   { text: 'text-neo-white', medal: '🥈' },
@@ -44,6 +48,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
   const [entries, setEntries] = useState<MergedLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -57,7 +62,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
         // viewer's own row (a signed-in viewer is found by their session).
         const fp = await getGuestFingerprint().catch(() => '');
         const res = await getWithAuth(
-          `/api/daily/leaderboard?date=${today}&lang=all&limit=3${fp ? `&fp=${encodeURIComponent(fp)}` : ''}`,
+          `/api/daily/leaderboard?date=${today}&lang=all&limit=${FETCH_LIMIT}${fp ? `&fp=${encodeURIComponent(fp)}` : ''}`,
           { cache: 'no-store' },
         );
         const json = res.ok ? await res.json() : null;
@@ -111,7 +116,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
             {t('daily.beFirstToPlay')}
           </div>
         ) : (
-          entries.map((entry) => {
+          (showAll ? entries : entries.filter((e, i) => i < VISIBLE_ROWS || e.isYou)).map((entry) => {
             const style = RANK_STYLES[entry.rank - 1] || { text: 'text-neo-white', medal: '' };
             const rowId = entry.key ?? String(entry.rank);
             const isOpen = expanded === rowId;
@@ -135,8 +140,10 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
                     {style.medal ? (
                       <span className="text-base leading-none" aria-hidden="true">{style.medal}</span>
                     ) : (
-                      // Outside the podium (the viewer's own row): the real rank.
-                      <span className="min-w-5 text-xs font-black tabular-nums text-neo-cyan">#{entry.rank}</span>
+                      // Outside the podium: the real rank, cyan on the viewer's own row.
+                      <span className={cn('min-w-5 text-xs font-black tabular-nums', entry.isYou ? 'text-neo-cyan' : 'text-neo-white/70')}>
+                        #{entry.rank}
+                      </span>
                     )}
                     <div className={cn(
                       'rounded-full border-2 border-neo-black shrink-0 overflow-hidden',
@@ -215,6 +222,17 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
               </div>
             );
           })
+        )}
+        {!loading && !showAll && entries.length > VISIBLE_ROWS && (
+          <button
+            type="button"
+            data-testid="leaderboard-show-all"
+            onClick={() => setShowAll(true)}
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2.5 text-xs font-bold text-neo-cyan hover:text-neo-lime hover:bg-neo-navy-light transition-colors"
+          >
+            <ChevronDown aria-hidden="true" className="w-4 h-4" />
+            {t('daily.showAllPlayers', { count: entries.length })}
+          </button>
         )}
       </div>
     </div>

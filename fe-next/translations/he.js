@@ -9808,6 +9808,7 @@ const he = {
     "totalAttempts": "ניסיונות",
     "yourPosition": "המיקום שלך",
     "showMore": "עוד",
+    "showAllPlayers": "הצגת כל {count} השחקנים",
     "showLess": "פחות",
     "more": "עוד",
     "shareImage": "שתפו כתמונה",
