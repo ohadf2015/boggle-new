@@ -43,7 +43,8 @@ export function resetAutoJoinMemoryForTest(): void {
   attemptedMemory.clear();
 }
 
-function autoJoinableCode(game: ActiveGame | null): string | null {
+/** The game's code when its room is open to the class (not a rehearsal, not locked); otherwise null. */
+export function autoJoinableCode(game: ActiveGame | null): string | null {
   const g = game as LiveRecord | null;
   if (!g?.gameCode || g.roomOpen === false || g.rehearsal || g.settings?.rehearsal || g.settings?.lobbyLocked) return null;
   return g.gameCode;

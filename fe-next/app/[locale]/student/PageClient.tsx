@@ -67,11 +67,13 @@ export default function StudentPageClient() {
 
   // Instrumentation gap: the play/learn zones only render once classroomId
   // resolves, so we had zero visibility into how many students land here
-  // with none. Fires once per settled classroom state.
+  // with none. Fires once per settled classroom state — only after the class
+  // read has answered: before that every student, class or not, has a null id
+  // (Nov 9: all 26 students who joined a class fired it, then saw the class).
   useEffect(() => {
-    if (isChecking || loading) return;
+    if (isChecking || loading || classroomLoading) return;
     if (!classroomId) posthog.capture('student_no_classroom_prompt_viewed');
-  }, [isChecking, loading, classroomId]);
+  }, [isChecking, loading, classroomLoading, classroomId]);
 
   // The wait above is correct but it had no floor. A profile read that fails any
   // way other than PGRST116 never resolves and never logs, and the guest join

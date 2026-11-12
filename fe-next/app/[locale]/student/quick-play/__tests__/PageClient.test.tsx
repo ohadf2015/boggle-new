@@ -14,6 +14,9 @@ vi.mock('@/components/quick-play/QuickPlayHub', () => ({
   },
 }));
 
+// The live-class banner has its own tests; here it only must not need auth or a socket.
+vi.mock('@/components/student/ClassLiveGameBanner', () => ({ ClassLiveGameBanner: () => null }));
+
 import StudentQuickPlayPageClient from '../PageClient';
 import { isEduAppSurface } from '@/lib/navigation/eduAppSurface';
 import { isAdFreeRoute, isAllowedAdBannerRoute } from '@/lib/admob-routes';
