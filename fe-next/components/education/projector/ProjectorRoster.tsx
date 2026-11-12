@@ -155,6 +155,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         </div>
       ) : (
         <ul
+          id="projector-roster-list"
           data-testid="projector-roster-list"
           data-burst={arrivals.still.size > 0 ? 'true' : 'false'}
           className={cn('grid min-h-0 flex-1 auto-rows-min content-start pe-1 pt-1', tier.grid, tier.scrolls ? 'overflow-y-auto' : 'overflow-visible')}
@@ -217,15 +218,16 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
               </li>
             );
           })}
-          {students.length > PHONE_VISIBLE && !showAll && (
+          {students.length > PHONE_VISIBLE && (
             <li data-testid="projector-more-joined" className="hidden @max-md:flex">
               <button
                 type="button"
-                aria-expanded={false}
-                onClick={() => setShowAll(true)}
+                aria-expanded={showAll}
+                aria-controls="projector-roster-list"
+                onClick={() => setShowAll((v) => !v)}
                 className={cn('flex w-full items-center justify-center rounded-full font-neo-display font-bold leading-none', tier.chip, STUDENT_CHIP, PRESS)}
               >
-                {t('eduLiveRoom.lobby.moreJoined', { count: students.length - PHONE_VISIBLE })}
+                {showAll ? t('eduLiveRoom.lobby.showFewer') : t('eduLiveRoom.lobby.moreJoined', { count: students.length - PHONE_VISIBLE })}
               </button>
             </li>
           )}

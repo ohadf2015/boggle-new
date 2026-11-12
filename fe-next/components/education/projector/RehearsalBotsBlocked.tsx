@@ -15,10 +15,12 @@ interface RehearsalBotsBlockedProps {
   t: Translate;
   onApplied: (mode: ClassroomCatalogueId) => void;
   onRehearse: () => void;
+  /** Off when the Start bar already explains the wait, so the lobby shows one reason. */
+  showNote?: boolean;
   className?: string;
 }
 
-export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRehearse, className }: RehearsalBotsBlockedProps) {
+export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRehearse, showNote = true, className }: RehearsalBotsBlockedProps) {
   const asked = useRef(false);
   const { pendingMode, switchTo } = useClassroomModeSwitch({
     gameCode,
@@ -49,9 +51,11 @@ export function RehearsalBotsBlocked({ gameCode, currentMode, t, onApplied, onRe
       >
         {t('education.projectorLobby.rehearseUseClassic')}
       </button>
-      <p role="status" className="font-neo-body leading-snug text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
-        {t('education.projectorLobby.rehearseBotsBlocked')}
-      </p>
+      {showNote && (
+        <p role="status" className="font-neo-body leading-snug text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+          {t('education.projectorLobby.rehearseBotsBlocked')}
+        </p>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import {
   AlertDialogTitle,
 } from '../../components/ui/alert-dialog';
 import type { ClassroomExitPhase } from './exitConfirmModel';
+import type { EndRoundRequest } from '../hooks/useEndRoundRequest';
+import { CLASSROOM_FOOTER, DESTRUCTIVE, QUIET, RoundExitConfirm } from './RoundExitConfirm';
 
 interface ExitConfirmDialogProps {
   open: boolean;
@@ -21,7 +23,7 @@ interface ExitConfirmDialogProps {
   /** Classroom only: `lobby` before any round, `round` while one runs, `game` on results. */
   phase?: ClassroomExitPhase;
   /** Classroom `round` phase: ends the round for everyone instead of closing the room. */
-  onEndRound?: () => void;
+  endRound?: EndRoundRequest;
 }
 
 const CLASSROOM_KEYS = {
@@ -29,13 +31,7 @@ const CLASSROOM_KEYS = {
   lobby: { title: 'eduLive.exit.lobbyTitle', body: 'eduLive.exit.lobbyBody', stay: 'eduLive.exit.lobbyStay', confirm: 'eduLive.exit.lobbyConfirm' },
 } as const;
 
-const ROUND_KEYS = { title: 'eduLive.exit.roundTitle', body: 'eduLive.exit.roundBody', stay: 'eduLive.exit.stay', confirm: 'eduLive.exit.roundConfirm', close: 'eduLive.exit.closeRoom' } as const;
-
-const DESTRUCTIVE = 'bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed';
-const ROUND_PRIMARY = 'bg-neo-lime text-neo-black font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed';
-const QUIET = 'border-2 border-neo-cream/60 bg-transparent font-bold text-neo-cream shadow-none! hover:translate-x-0 hover:translate-y-0 hover:bg-neo-navy-light hover:text-neo-cream hover:shadow-none! active:shadow-none!';
 const CLASSROOM_CONTENT = 'bg-neo-navy text-neo-cream border-[3px] border-neo-cream shadow-hard-lg';
-const CLASSROOM_FOOTER = 'flex-col gap-3 sm:flex-row sm:justify-start sm:space-x-0';
 
 export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function ExitConfirmDialog({
   open,
@@ -44,7 +40,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
   t,
   classroom = false,
   phase = 'game',
-  onEndRound,
+  endRound,
 }) {
   if (!classroom) {
     return (
@@ -67,27 +63,12 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
     );
   }
 
-  if (phase === 'round' && onEndRound) {
+  if (phase === 'round' && endRound) {
     return (
       <AlertDialog open={open} onOpenChange={onOpenChange}>
         <AlertDialogContent data-testid="classroom-exit-confirm" data-phase="round" className={CLASSROOM_CONTENT}>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-neo-display font-black uppercase text-neo-cream">{t(ROUND_KEYS.title)}</AlertDialogTitle>
-            <AlertDialogDescription className="font-bold text-neo-cream/90">{t(ROUND_KEYS.body)}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className={CLASSROOM_FOOTER}>
-            <AlertDialogAction onClick={onEndRound} className={`min-h-12 font-neo-display text-base font-black ${ROUND_PRIMARY}`}>
-              {t(ROUND_KEYS.confirm)}
-            </AlertDialogAction>
-            <AlertDialogCancel className={`mt-0 min-h-12 ${QUIET}`}>{t(ROUND_KEYS.stay)}</AlertDialogCancel>
-            <AlertDialogAction
-              data-testid="classroom-exit-close-room"
-              onClick={onConfirm}
-              className="min-h-12 border-2 border-neo-red/70 bg-transparent font-bold text-neo-cream shadow-none! hover:translate-x-0 hover:translate-y-0 hover:bg-neo-navy-light hover:shadow-none! active:shadow-none! sm:ms-auto"
-            >
-              {t(ROUND_KEYS.close)}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          {/* Keyed on open so a reopened dialog starts on the first question. */}
+          <RoundExitConfirm key={String(open)} t={t} endRound={endRound} onCloseRoom={onConfirm} />
         </AlertDialogContent>
       </AlertDialog>
     );

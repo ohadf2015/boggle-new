@@ -2,7 +2,13 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-vi.mock('../RehearsalBotsBlocked', () => ({ RehearsalBotsBlocked: () => <div data-testid="bots-blocked">peek-in-classic</div> }));
+const botsBlockedProps = vi.hoisted(() => ({ last: null as null | Record<string, unknown> }));
+vi.mock('../RehearsalBotsBlocked', () => ({
+  RehearsalBotsBlocked: (props: Record<string, unknown>) => {
+    botsBlockedProps.last = props;
+    return <div data-testid="bots-blocked">peek-in-classic</div>;
+  },
+}));
 vi.mock('../ProjectorQuizBlocked', () => ({ ProjectorQuizBlocked: () => <div data-testid="quiz-blocked">quiz-blocked</div> }));
 
 import { ProjectorStartBar } from '../ProjectorStartBar';
@@ -21,7 +27,7 @@ function lobbyFor(mode: string, quizBlocked = false) {
   } as unknown as Parameters<typeof ProjectorStartBar>[0]['lobby'];
 }
 
-function renderBar(mode: string, studentCount = 0, onStartPracticeRound: (() => void) | undefined = vi.fn(), quizBlocked = false) {
+function renderBar(mode: string, studentCount = 0, onStartPracticeRound: (() => void) | undefined = vi.fn(), quizBlocked = false, lessonWordsBlock?: Parameters<typeof ProjectorStartBar>[0]['lessonWordsBlock']) {
   render(
     <ProjectorStartBar
       gameCode="ROOM01"
@@ -35,6 +41,7 @@ function renderBar(mode: string, studentCount = 0, onStartPracticeRound: (() => 
       onStartPracticeRound={onStartPracticeRound}
       practiceRoundPending={false}
       practiceRoundFailed={false}
+      lessonWordsBlock={lessonWordsBlock}
     />,
   );
 }
@@ -64,6 +71,12 @@ describe('ProjectorStartBar — a teacher waiting for the first student always s
     expect(start.compareDocumentPosition(alt) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it('Given a vocabulary-quiz room with nobody in, Then one explanation shows: the Start reason, not a second bots note', () => {
+    renderBar('vocab-quiz');
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+    expect(botsBlockedProps.last?.showNote).toBe(false);
+  });
+
   it('Given a classic room with nobody in, Then Preview with bots sits below Start', () => {
     renderBar('classic');
     const start = screen.getByTestId('projector-start');
@@ -74,5 +87,21 @@ describe('ProjectorStartBar — a teacher waiting for the first student always s
   it('Given a student joined, Then Start is enabled exactly as before', () => {
     renderBar('vocab-quiz', 1);
     expect(screen.getByTestId('projector-start')).toBeEnabled();
+  });
+
+  it('Given the lesson words could not be loaded, Then Start stays disabled with students in, says why and offers a retry', () => {
+    const onRetry = vi.fn();
+    renderBar('classic', 3, vi.fn(), false, { status: 'error', onRetry });
+    expect(screen.getByTestId('projector-start')).toBeDisabled();
+    expect(screen.getByTestId('projector-lesson-words')).toHaveTextContent('education.projectorLobby.lessonWordsFailed');
+    screen.getByTestId('projector-lesson-words-retry').click();
+    expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given the lesson words are still loading, Then Start waits and no retry is offered yet', () => {
+    renderBar('classic', 3, vi.fn(), false, { status: 'loading', onRetry: vi.fn() });
+    expect(screen.getByTestId('projector-start')).toBeDisabled();
+    expect(screen.getByTestId('projector-lesson-words')).toHaveTextContent('education.projectorLobby.lessonWordsLoading');
+    expect(screen.queryByTestId('projector-lesson-words-retry')).toBeNull();
   });
 });

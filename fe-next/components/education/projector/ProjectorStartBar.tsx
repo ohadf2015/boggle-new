@@ -11,6 +11,12 @@ import { RehearsalBotsBlocked } from './RehearsalBotsBlocked';
 import { canStartProjectorRound, projectorStartLabel } from './projectorLobbyModel';
 import type { useProjectorLobbyMode } from './useProjectorLobbyMode';
 
+/** The lesson's words are not loaded yet (no local copy on this device): Start waits for them. */
+export interface LessonWordsBlock {
+  status: 'loading' | 'error';
+  onRetry: () => void;
+}
+
 interface ProjectorStartBarProps {
   gameCode: string;
   t: Translate;
@@ -29,6 +35,7 @@ interface ProjectorStartBarProps {
   practiceRoundFailed: boolean;
   /** Sits beside Start in the same row. */
   lockSlot?: ReactNode;
+  lessonWordsBlock?: LessonWordsBlock;
   className?: string;
   style?: CSSProperties;
 }
@@ -48,12 +55,13 @@ export function ProjectorStartBar({
   practiceRoundPending,
   practiceRoundFailed,
   lockSlot,
+  lessonWordsBlock,
   className,
   style,
 }: ProjectorStartBarProps) {
   const canStart = canStartProjectorRound(studentCount);
   const botsCanRehearse = modeAllowsRehearsalBots(lobby.mode);
-  const startLocked = !canStart || starting || lobby.quizBlocked;
+  const startLocked = !canStart || starting || lobby.quizBlocked || !!lessonWordsBlock;
   // Empty room: the locked Start stays on screen with its reason, and the rehearsal option sits under it.
   const rehearseHere = !canStart && !!onStartPracticeRound && botsCanRehearse;
   const botsBlocked = !canStart && !!onStartPracticeRound && !botsCanRehearse && !lobby.quizBlocked;
@@ -130,7 +138,7 @@ export function ProjectorStartBar({
           </div>
         )}
         {botsBlocked && onStartPracticeRound && (
-          <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} onRehearse={onStartPracticeRound} className="flex-[1_1_12rem]" />
+          <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} onRehearse={onStartPracticeRound} showNote={false} className="flex-[1_1_12rem]" />
         )}
         {lockSlot}
       </div>
@@ -146,6 +154,16 @@ export function ProjectorStartBar({
             <span data-testid="rehearsal-private-note" className="block">
               {t('education.projectorLobby.rehearsePrivate')}
             </span>
+          )}
+        </p>
+      )}
+      {lessonWordsBlock && (
+        <p data-testid="projector-lesson-words" role="alert" className="flex flex-wrap items-center gap-2 font-neo-body font-bold text-neo-yellow text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+          {t(lessonWordsBlock.status === 'loading' ? 'education.projectorLobby.lessonWordsLoading' : 'education.projectorLobby.lessonWordsFailed')}
+          {lessonWordsBlock.status === 'error' && (
+            <button type="button" data-testid="projector-lesson-words-retry" onClick={lessonWordsBlock.onRetry} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 text-sm font-black text-neo-black shadow-hard-sm', PRESS)}>
+              {t('education.projectorLobby.lessonWordsRetry')}
+            </button>
           )}
         </p>
       )}

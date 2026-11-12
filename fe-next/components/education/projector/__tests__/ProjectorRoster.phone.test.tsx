@@ -20,14 +20,24 @@ describe('ProjectorRoster — hosting from a phone', () => {
     expect(tokens(hint).some((c) => c === 'hidden' || c.endsWith(':hidden'))).toBe(false);
   });
 
-  it('Given more students than fit a phone, When the teacher taps the +N chip, Then every name is listed', () => {
+  it('Given more students than fit a phone, When the teacher taps the +N chip, Then every name is listed and the chip offers to show fewer', () => {
     render(<ProjectorRoster students={classOf(12)} t={t} />);
     const toggle = screen.getByRole('button', { name: 'eduLiveRoom.lobby.moreJoined:{"count":4}' });
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
     fireEvent.click(toggle);
     const chips = screen.getAllByTestId('projector-student');
     expect(chips.every((c) => !tokens(c).includes('@max-md:hidden'))).toBe(true);
-    expect(screen.queryByTestId('projector-more-joined')).toBeNull();
+    const fewer = screen.getByRole('button', { name: 'eduLiveRoom.lobby.showFewer' });
+    expect(fewer).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('Given the full list is open, When Show fewer is tapped, Then it collapses back to the first names and the +N chip', () => {
+    render(<ProjectorRoster students={classOf(12)} t={t} />);
+    fireEvent.click(screen.getByRole('button', { name: 'eduLiveRoom.lobby.moreJoined:{"count":4}' }));
+    fireEvent.click(screen.getByRole('button', { name: 'eduLiveRoom.lobby.showFewer' }));
+    const chips = screen.getAllByTestId('projector-student');
+    expect(chips.slice(8).every((c) => tokens(c).includes('@max-md:hidden'))).toBe(true);
+    expect(screen.getByRole('button', { name: 'eduLiveRoom.lobby.moreJoined:{"count":4}' })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('Given more students than fit a phone, When nothing is tapped, Then the TV layout keeps the chip hidden at large sizes', () => {

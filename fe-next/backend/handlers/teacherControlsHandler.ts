@@ -77,8 +77,8 @@ function resolveTeacherGame(socket: Socket, action: TeacherAction): { gameCode: 
   return { gameCode, game };
 }
 
-function rejected(socket: Socket, action: TeacherAction): void {
-  socket.emit('teacherControlRejected', { action });
+function rejected(socket: Socket, action: TeacherAction, reason?: 'not_in_room'): void {
+  socket.emit('teacherControlRejected', reason ? { action, reason } : { action });
 }
 
 export function registerTeacherControlsHandlers(io: Server, socket: Socket): void {
@@ -112,7 +112,16 @@ export function registerTeacherControlsHandlers(io: Server, socket: Socket): voi
   });
 
   socket.on('endRoundNow', () => {
-    const ctx = guard('endRoundNow');
+    if (!checkRateLimit(socket.id)) {
+      socket.emit('rateLimited');
+      return;
+    }
+    // After a restart the socket is in no room: say so, or the teacher's "End this round" waits forever.
+    if (!getGameBySocketId(socket.id)) {
+      rejected(socket, 'endRoundNow', 'not_in_room');
+      return;
+    }
+    const ctx = resolveTeacherGame(socket, 'endRoundNow');
     if (!ctx) return;
     // endGame is idempotent (state-machine guarded) — a double tap is harmless.
     endGame(io, ctx.gameCode).catch((err: unknown) => {

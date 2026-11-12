@@ -35,7 +35,8 @@ import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
 import { classroomExitPhase, classroomLobbyExitSkipsConfirm } from './components/exitConfirmModel';
 import { useRosterReceived } from './hooks/useRosterReceived';
-import { useEndRoundNow } from './hooks/useEndRoundNow';
+import { useEndRoundRequest } from './hooks/useEndRoundRequest';
+import { useSocket } from '@/utils/SocketContext';
 import { useClassroomSettingsSeed } from './hooks/useClassroomSettingsSeed';
 import { readLocalQuizVariant } from '@/lib/education/classroomCatalogueId';
 import type { HostViewProps } from './hostViewTypes';
@@ -51,7 +52,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
     t, language, socket, state, runtime, settings, players, tournament, animation, ui, hostPlayingState, combo,
     actions, lobbyAutoStart, playersReadyData, currentGameMode, earthquakeState, fireRoundActive,
     fireRoundRemaining, hasActiveGameData, resolvedClassroomGameMode, isVocabQuizRoom,
-    handleHostNameChange, handleHostAvatarChange,
+    handleHostNameChange, handleHostAvatarChange, startGame, boardWords,
   } = useHostPhase(props);
   useClassroomBossSocket(isClassroomMode ? socket : null, gameCode);
   const recapShown = useRecapShownLatch(socket, !!tournament.finalScores?.classroomSummary);
@@ -67,7 +68,8 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
 
   const inLobby = !runtime.gameStarted && !hasActiveGameData && !tournament.finalScores;
   const roundRunning = (runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !tournament.finalScores && !recapShown;
-  const endRoundNow = useEndRoundNow(socket);
+  const { manualReconnect } = useSocket();
+  const endRound = useEndRoundRequest({ socket, roundRunning: !!roundRunning, onEnded: () => state.setShowExitConfirm(false), reconnect: manualReconnect });
   const rosterKnown = useRosterReceived(socket, gameCode, (props.initialPlayers?.length ?? 0) > 0);
   const lobbyExit = classroomLobbyExitSkipsConfirm({ classroom: isClassroomMode, rosterKnown, players: players.playersReady })
     ? actions.confirmExitRoom
@@ -162,12 +164,15 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
 
       <ExitConfirmDialog
         open={ui.showExitConfirm}
-        onOpenChange={state.setShowExitConfirm}
+        onOpenChange={(open) => {
+          state.setShowExitConfirm(open);
+          if (!open) endRound.reset();
+        }}
         onConfirm={actions.confirmExitRoom}
         t={t}
         classroom={isClassroomMode}
-        phase={classroomExitPhase({ inLobby, roundRunning: !!roundRunning })}
-        onEndRound={endRoundNow}
+        phase={classroomExitPhase({ inLobby, roundRunning: !!roundRunning || endRound.status === 'pending' })}
+        endRound={endRound}
       />
 
       <SoloStartConfirmDialog
@@ -213,7 +218,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           shufflingGrid={animation.shufflingGrid}
           highlightedCells={animation.highlightedCells}
           tableData={runtime.tableData}
-          onStartGame={actions.startGame}
+          onStartGame={startGame}
           onAutoStartWithBots={actions.confirmSoloStart}
           onExitRoom={lobbyExit}
           onCancelTournament={actions.handleCancelTournamentDialog}
@@ -239,7 +244,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           readyUsernames={playersReadyData?.readyUsernames ?? []}
           timerValue={settings.timerValue}
           difficulty={settings.difficulty}
-          onStartGame={actions.startGame}
+          onStartGame={startGame}
           onExitRoom={lobbyExit}
           tournamentCreating={tournament.tournamentCreating}
           setHostPlaying={state.setHostPlaying}
@@ -252,6 +257,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           lessonName={lessonData?.lessonName}
           wordCount={lessonData?.vocabularyWords?.length}
           classroomTemplateSettings={lessonData?.templateSettings ?? null}
+          lessonWordsBlock={boardWords.blocksStart ? { status: boardWords.lessonWordsStatus === 'error' ? 'error' : 'loading', onRetry: boardWords.retryLessonWords } : undefined}
         />
       )}
 

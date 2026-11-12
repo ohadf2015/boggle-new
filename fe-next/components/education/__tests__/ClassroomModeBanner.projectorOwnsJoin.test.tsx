@@ -8,8 +8,8 @@
  * projector that is two codes on one wall.
  *
  * A classroom room can only ever be in TV mode (`useHostViewState` hard-forces
- * `hostPlaying=false` whenever `hasLessonData`, and never writes that back to
- * localStorage), so "host + expanded" IS "the projector lobby is mounted" —
+ * `hostPlaying=false` for every classroom host, with or without lesson data, and
+ * never writes that back to localStorage), so "host + expanded" IS "the projector lobby is mounted" —
  * derived, not signalled, so there is no late flip to flash (pitfall class 1).
  *
  * `expanded` is `!gameActive`, and `gameActive` stays true through the results
@@ -85,13 +85,10 @@ describe('ClassroomModeBanner — the projector owns the classroom lobby', () =>
     expect(screen.getByText('ELA Period 3')).toBeInTheDocument();
   });
 
-  it('keeps carrying the code for a host with no lesson copy in this tab', () => {
-    // Second window / mirrored device: no `lessonGameData`, so `hasLessonData`
-    // is false, `HostPreGameView` renders instead of the projector, and this
-    // banner is the only surface with the code. It must NOT stand down.
-    renderBanner({ isHost: true, liveGame, lessonData: null });
-    expect(screen.getByText('education.classroomGame.shareCode')).toBeInTheDocument();
-    expect(screen.getByText('JATS5Z')).toBeInTheDocument();
+  it('Given a host with no lesson copy in this tab, When the lobby is up, Then it still stands down: the host board is forced and owns the code', () => {
+    // Second window / reopened link: no `lessonGameData`, but a classroom host always gets the projector board.
+    const { container } = renderBanner({ isHost: true, liveGame, lessonData: null });
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('leaves the student lobby alone — they have no projector of their own', () => {

@@ -14,7 +14,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useAchievementQueue } from '@/components/achievements';
-import { DIFFICULTIES } from '@/utils/consts';
 import { usePresence } from '@/hooks/usePresence';
 import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -34,6 +33,7 @@ import { useTeacherPaused } from '@/hooks/useTeacherPause';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import { useHostRoundLifecycle } from './useHostRoundLifecycle';
 import { useBroadcastLobbySettings } from './useBroadcastLobbySettings';
+import { useBoardWords } from './useBoardWords';
 import { isDuoRoster, useDuoBotRequest } from '@/components/multiplayer/duoBotRequest';
 import type { HostViewProps } from '../hostViewTypes';
 
@@ -309,29 +309,15 @@ export function useHostPhase({
   const roomLanguage = state.roomLanguage;
   const difficulty = state.settings.difficulty;
 
-  // Request words for board embedding
-  // If lesson data is available, use vocabulary words from the lesson instead of random server words
-  useEffect(() => {
-    if (!socket) return;
-    if (roomLanguage === 'ja') return;
-
-    // If we have lesson vocabulary, use those words instead of requesting random ones
-    if (lessonData?.vocabularyWords && lessonData.vocabularyWords.length > 0) {
-      // Use lesson vocabulary for board embedding
-      setWordsForBoard(lessonData.vocabularyWords.map(w => w.toUpperCase()));
-      return;
-    }
-
-    // Otherwise request random themed words from server
-    const difficultyConfig = DIFFICULTIES[difficulty];
-    socket.emit('getWordsForBoard', {
-      language: roomLanguage,
-      boardSize: {
-        rows: difficultyConfig.rows,
-        cols: difficultyConfig.cols,
-      },
-    });
-  }, [socket, difficulty, roomLanguage, lessonData, setWordsForBoard]);
+  const boardWords = useBoardWords({
+    socket, gameCode, roomLanguage, difficulty, lessonWords: lessonData?.vocabularyWords,
+    isClassroomMode: !!isClassroomMode, setWordsForBoard,
+  });
+  const { blocksStart } = boardWords;
+  const startGame = useCallback(() => {
+    if (blocksStart) return;
+    actions.startGame();
+  }, [blocksStart, actions]);
 
   // Two sources, either of which can be the only one present: the live-game
   // record (every client, but 404s until Redis has the room) and the teacher's
@@ -367,7 +353,7 @@ export function useHostPhase({
   // Server-owned lobby auto-start: when every guest is ready, the server runs a
   // short synced countdown and then tells the host to fire the normal start —
   // so a host who never clicks "Start" no longer strands a ready lobby.
-  const lobbyAutoStart = useLobbyAutoStart({ socket, onFire: actions.startGame });
+  const lobbyAutoStart = useLobbyAutoStart({ socket, onFire: startGame });
 
   useHostRoundLifecycle({
     pendingGameStart, onGameStartConsumed, state, actions, fadeToTrack, TRACKS, username, gameCode,
@@ -385,6 +371,6 @@ export function useHostPhase({
     t, language, socket, state, runtime, settings, players, tournament, animation, ui, hostPlayingState, combo,
     actions, lobbyAutoStart, playersReadyData, currentGameMode, earthquakeState, fireRoundActive,
     fireRoundRemaining, hasActiveGameData, resolvedClassroomGameMode, isVocabQuizRoom,
-    handleHostNameChange, handleHostAvatarChange,
+    handleHostNameChange, handleHostAvatarChange, startGame, boardWords,
   };
 }
