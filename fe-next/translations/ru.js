@@ -138,6 +138,8 @@ const ru = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "Ещё друзей онлайн: {count}",
+    "onlineNowLabel": "Друзья онлайн",
     "today": {
       "title": "Задание дня с друзьями",
       "share": "Поделиться",
@@ -1518,6 +1520,24 @@ const ru = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "Твоя команда",
+      "inLobby": "В лобби",
+      "playingNow": "Играет сейчас",
+      "seen": "Активность: {when}",
+      "youLead": "Ты ведёшь {score}",
+      "theyLead": "Соперник ведёт {score}",
+      "tied": "Ничья {score}",
+      "firstMatch": "Первая игра?",
+      "join": "Войти",
+      "invite": "Позвать",
+      "retry": "Ещё раз",
+      "error": "Не удалось загрузить команду.",
+      "wantsToBeFriends": "{name} хочет дружить",
+      "moreRequests": "Ещё заявок: {count}",
+      "empty": "Пока нет друзей. Сыграй матч и добавь соперников.",
+      "allFriends": "Все друзья"
+    },
     "heroLine": "60 секунд. Новое поле. Три соперника.",
     "intro": "LexiClash — бесплатная игра в слова в браузере, на шести языках.",
     "playSub": "Соло · случайный режим",
@@ -11797,6 +11817,12 @@ const ru = {
     "languageChangedNotification": "{{name}} изменил язык игры на {{language}}"
   },
   "friends": {
+    "recent": {
+      "title": "Недавние соперники. Добавь их в друзья!",
+      "add": "Добавить",
+      "addName": "Добавить {name} в друзья",
+      "sent": "Заявка отправлена"
+    },
     "title": "Друзья",
     "add": "Добавить",
     "addFriend": "Добавить друга",
@@ -11834,6 +11860,12 @@ const ru = {
     "typeMessage": "Скажи что-нибудь...",
     "sendMessage": "Отправить",
     "challenges": {
+      "toast": {
+        "title": "{name} вызывает тебя на игру",
+        "notNow": "Не сейчас",
+        "close": "Закрыть",
+        "join": "Присоединиться"
+      },
       "resultWin": "Победа {mine}–{theirs}! 🏆",
       "resultLoss": "Поражение {mine}–{theirs}.",
       "resultTie": "Ничья, {mine}–{theirs}!",

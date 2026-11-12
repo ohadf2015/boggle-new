@@ -26,6 +26,7 @@ import { BattleModeCard } from './pre-game/BattleModeCard';
 import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
 import { LobbyAudioButton } from './pre-game/LobbyAudioButton';
 import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
+import { LobbyOnlineFriends } from '@/components/multiplayer/lobby/LobbyOnlineFriends';
 import TvTutorialOverlay from './tv-broadcast/TvTutorialOverlay';
 import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/components/multiplayer/lobby/useHostLobby';
 import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
@@ -156,6 +157,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
 
   // A classroom room's mode was fixed in the setup wizard: no picker here.
   const isClassroomRoom = Boolean(lessonData);
+  const onlineFriends = !isPrivate && !isClassroomRoom && <LobbyOnlineFriends gameCode={gameCode} onMore={() => setSheet('invite')} />;
   const seats = lobbySeats(lobby.seatedPlayers, username, readyUsernames);
   // "Everyone's in" is the server's call (playersReadyUpdate totals), not a
   // client recount — one source of truth (pitfall class 3).
@@ -317,6 +319,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
               rightContent={
                 <div data-testid="desktop-chat-area" className="flex-1 min-h-0 flex flex-col gap-4">
                   {statusLane}
+                  {onlineFriends}
                   {!isPrivate && <InviteCard gameCode={gameCode} t={props.t} showHint={lobby.humanGuestCount === 0} className="flex-1 justify-center" />}
                   {settingsSummary}
                   <LobbyChatLauncher onPress={() => setSheet('chat')} unread={unread} t={t} className={isPrivate ? 'mt-auto' : undefined} />
@@ -331,6 +334,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           <div data-testid="lobby-phone" className="flex flex-col">
             <div className="flex-1 flex flex-col gap-2 px-3 py-2 w-full max-w-[600px] mx-auto">
               {statusLane}
+              {onlineFriends}
               {roster()}
               {modePicker}
               {settingsSummary}

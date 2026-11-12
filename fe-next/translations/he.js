@@ -138,6 +138,8 @@ const he = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "עוד {count} חברים מחוברים",
+    "onlineNowLabel": "חברים מחוברים עכשיו",
     "today": {
       "title": "היומי של היום עם חברים",
       "share": "שיתוף",
@@ -1516,6 +1518,24 @@ const he = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "החבר'ה שלך",
+      "inLobby": "בלובי",
+      "playingNow": "במשחק עכשיו",
+      "seen": "פעילות אחרונה: {when}",
+      "youLead": "יתרון לך {score}",
+      "theyLead": "יתרון להם {score}",
+      "tied": "תיקו {score}",
+      "firstMatch": "משחק ראשון?",
+      "join": "הצטרפות",
+      "invite": "הזמנה",
+      "retry": "לנסות שוב",
+      "error": "לא הצלחנו לטעון את החבר'ה שלך.",
+      "wantsToBeFriends": "{name} רוצה להיות חברים",
+      "moreRequests": "עוד {count} בקשות",
+      "empty": "עדיין אין חברים. שחקו משחק והוסיפו את מי שפגשתם.",
+      "allFriends": "כל החברים"
+    },
     "heroLine": "60 שניות. לוח חדש. שלושה יריבים.",
     "intro": "LexiClash הוא משחק מילים חינמי בדפדפן, בשש שפות.",
     "playSub": "סולו · מצב אקראי",
@@ -10848,6 +10868,12 @@ const he = {
     "multiplayer": "מרובה משתתפים"
   },
   "friends": {
+    "recent": {
+      "title": "שיחקת מול השחקנים האלה לאחרונה. אפשר להוסיף אותם!",
+      "add": "הוספה",
+      "addName": "להוסיף את {name} כחבר",
+      "sent": "הבקשה נשלחה"
+    },
     "title": "חברים",
     "messages": "הודעות",
     "newMessage": "הודעה חדשה",
@@ -10885,6 +10911,12 @@ const he = {
     "blockedUsers": "משתמשים חסומים",
     "unblock": "בטל חסימה",
     "challenges": {
+      "toast": {
+        "title": "אתגר חדש מ-{name}",
+        "notNow": "לא עכשיו",
+        "close": "סגירה",
+        "join": "הצטרפות למשחק"
+      },
       "resultWin": "ניצחת {mine}–{theirs}! 🏆",
       "resultLoss": "הפסדת {mine}–{theirs}.",
       "resultTie": "תיקו, {mine}–{theirs}!",

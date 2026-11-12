@@ -15,7 +15,7 @@ import { useHeroAvatarBridge } from './heroAvatarBridge';
  * components published on heroAvatarBridge.
  */
 export default function HeroAvatarIsland() {
-  const { slots, heroProps, friendsAvatars } = useHeroAvatarBridge();
+  const { slots, heroProps, friendsAvatars, crew } = useHeroAvatarBridge();
 
   return (
     <>
@@ -61,6 +61,18 @@ export default function HeroAvatarIsland() {
             slots.friendsRival,
           )
         : null}
+      {Object.entries(crew).map(([key, slot]) =>
+        createPortal(
+          <Avatar
+            userId={slot.userId}
+            customAvatar={slot.customAvatar ?? undefined}
+            avatarImage={slot.avatarImage ?? undefined}
+            pixelSize={slot.pixelSize}
+          />,
+          slot.el,
+          key,
+        ),
+      )}
     </>
   );
 }

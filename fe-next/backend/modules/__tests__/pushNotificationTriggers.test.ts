@@ -334,6 +334,17 @@ describe('pushNotificationTriggers', () => {
         },
       }));
     });
+
+    it('writes an in-app row tagged as a friend challenge so open pages can show it live', async () => {
+      await notifyGameInvite('target-user-id', 'Ohad', 'ABC123', 'sender-id');
+      await vi.waitFor(() => expect(mockInsert).toHaveBeenCalled());
+      expect(mockInsert).toHaveBeenCalledWith(expect.objectContaining({
+        user_id: 'target-user-id',
+        sender_id: 'sender-id',
+        action_url: '/multiplayer?room=ABC123',
+        related_entity_type: 'friend_challenge',
+      }));
+    });
   });
 
   describe('notifySeasonStart', () => {

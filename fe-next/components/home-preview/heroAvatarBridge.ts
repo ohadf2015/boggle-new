@@ -30,9 +30,19 @@ export interface HeroAvatarBridgeState {
   heroProps: HeroAvatarBridgeProps | null;
   /** FriendsBlock's `showAvatars` gate (post-mount), so SSR/hydration match. */
   friendsAvatars: boolean;
+  /** Real players' faces in the home crew card, keyed by row. */
+  crew: Readonly<Record<string, CrewAvatarSlotState>>;
 }
 
-const EMPTY: HeroAvatarBridgeState = { slots: {}, heroProps: null, friendsAvatars: false };
+export interface CrewAvatarSlotState {
+  el: HTMLElement;
+  userId: string;
+  customAvatar: CustomAvatarConfig | null;
+  avatarImage: string | null;
+  pixelSize: number;
+}
+
+const EMPTY: HeroAvatarBridgeState = { slots: {}, heroProps: null, friendsAvatars: false, crew: {} };
 
 let current: HeroAvatarBridgeState = EMPTY;
 const listeners = new Set<() => void>();
@@ -50,6 +60,16 @@ export function setHeroAvatarSlot(name: HeroAvatarSlotName, el: HTMLElement | nu
 export function setHeroAvatarProps(heroProps: HeroAvatarBridgeProps | null): void {
   if (current.heroProps === heroProps) return;
   emit({ heroProps });
+}
+
+export function setCrewAvatarSlot(key: string, slot: CrewAvatarSlotState | null): void {
+  const prev = current.crew[key];
+  if (!slot && !prev) return;
+  if (slot && prev && prev.el === slot.el && prev.userId === slot.userId && prev.customAvatar === slot.customAvatar && prev.avatarImage === slot.avatarImage && prev.pixelSize === slot.pixelSize) return;
+  const crew = { ...current.crew };
+  if (slot) crew[key] = slot;
+  else delete crew[key];
+  emit({ crew });
 }
 
 export function setFriendsAvatarsEnabled(friendsAvatars: boolean): void {

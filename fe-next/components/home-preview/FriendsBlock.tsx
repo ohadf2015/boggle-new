@@ -1,21 +1,40 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useState } from 'react';
 import { Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { setFriendsAvatarsEnabled, setHeroAvatarSlot } from './heroAvatarBridge';
+
+const HomeCrewCard = dynamic(() => import('./HomeCrewCard').then((m) => m.HomeCrewCard), {
+  ssr: false,
+  loading: () => (
+    <div aria-hidden="true" className="h-full min-h-[22rem] rounded-3xl border-[3px] border-black bg-neo-pink shadow-hard-lg lg:min-h-[26rem]" />
+  ),
+});
 
 const ROOM_CODE = ['K', '7', 'Q', 'B'];
 const TILE_TILT = ['-rotate-3', 'rotate-2', '-rotate-1', 'rotate-3'];
 
 interface FriendsBlockProps {
   lang: string;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
   showAvatars: boolean;
 }
 
+/** Signed-in players get their real crew; guests (and first paint) get the demo room. */
+export function FriendsBlock(props: FriendsBlockProps) {
+  const { user, loading } = useAuth();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const signedIn = mounted && (!!user || (loading && hasSupabaseSession()));
+  return signedIn ? <HomeCrewCard lang={props.lang} t={props.t} /> : <FriendsDemo {...props} />;
+}
+
 /** A live room in miniature: two players squaring off over a room code. */
-export function FriendsBlock({ lang, t, showAvatars }: FriendsBlockProps) {
+function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
   // The demo faces stay OUT of the landing module graph: this block publishes
   // two empty boxes on heroAvatarBridge and HeroAvatarIsland (runtime import()
   // from HeroAvatarMount) portals the seeded Avatars in after first paint —

@@ -48,6 +48,7 @@ import { useClassroomGameMove } from './useClassroomGameMove';
 import { useMpRoomSocket, type MpRoomPlayer, type MpHostLeftState } from './useMpRoomSocket';
 import { useMpPageEffects } from './useMpPageEffects';
 import { applyMpPreselectMode } from './preselectMode';
+import { useMpFriendInvite } from './useMpFriendInvite';
 import type { MpPhaseRouterProps } from './MpPhaseRouter';
 import { isPracticeSeatPage, resolvePracticeSeatName } from '@/utils/practiceSeatStorage';
 
@@ -58,6 +59,8 @@ export function useMpPageState() {
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
   const quickPlay = searchParams?.get('quickPlay') === 'true';
+  const inviteUserId = searchParams?.get('invite') ?? null;
+  const roomParam = searchParams?.get('room') ?? null;
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
 
   const [gameCode, setGameCode] = useState<string>('');
@@ -353,6 +356,12 @@ export function useMpPageState() {
     user, profile, loading, authLoadingStartTime,
     guestAvatar, setGuestAvatar,
     setUsername, setError, setIsJoining,
+  });
+
+  useMpFriendInvite({
+    inviteUserId, roomParam, isAuthenticated, socket, isConnected, isActive, isHost, gameCode,
+    hostName: profile?.display_name || username, language: language as Language, t, handleJoin,
+    setGameCode, setRoomName, setHostUsername, setUsername,
   });
 
   const retryClassroomRoom = useCallback((code: string) => {

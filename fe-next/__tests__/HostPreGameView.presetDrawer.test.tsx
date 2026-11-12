@@ -43,6 +43,7 @@ vi.mock('framer-motion', () => {
 
 vi.mock('../utils/SocketContext', () => ({
   useSocket: () => ({ socket: null }),
+  useSocketOptional: () => null,
 }));
 
 vi.mock('../contexts/AuthContext', () => ({

@@ -1,17 +1,14 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
-import toast from 'react-hot-toast';
 import { Check, Loader2, Send, UserPlus } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFriends } from '@/hooks/useFriends';
-import { useSocketOptional } from '@/utils/SocketContext';
-import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
-import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useFriendRoomInvite } from './useFriendRoomInvite';
 import type { Friend } from '@/utils/friendsTypes';
 
 const MAX_SHOWN = 6;
@@ -24,8 +21,6 @@ export function orderForInvite(friends: Friend[]): Friend[] {
   });
 }
 
-type InviteState = 'idle' | 'busy' | 'sent';
-
 /**
  * "Invite friends" inside a room's invite sheet: one tap sends the friend a
  * game invite to THIS room (live toast if they are online, push if not).
@@ -35,8 +30,7 @@ export function FriendInviteList({ gameCode, className }: { gameCode: string; cl
   const { isAuthenticated } = useAuth();
   const { t, language } = useLanguage();
   const { friends, isLoading } = useFriends();
-  const socketContext = useSocketOptional();
-  const [states, setStates] = useState<Record<string, InviteState>>({});
+  const { states, invite } = useFriendRoomInvite(gameCode, 'room_invite_sheet');
 
   const shown = useMemo(() => orderForInvite(friends).slice(0, MAX_SHOWN), [friends]);
   const onlineCount = useMemo(() => friends.filter((f) => f.isOnline).length, [friends]);
@@ -55,28 +49,6 @@ export function FriendInviteList({ gameCode, className }: { gameCode: string; cl
       </Link>
     );
   }
-
-  const invite = async (friend: Friend) => {
-    const socket = socketContext?.socket;
-    if (!socket || !socketContext?.isConnected) {
-      toast.error(t('friendSocial.inviteFailed'));
-      return;
-    }
-    setStates((s) => ({ ...s, [friend.odUserId]: 'busy' }));
-    const res = await sendChallengeWithAck(socket, {
-      friendUserId: friend.odUserId,
-      challengeType: 'join_room',
-      roomCode: gameCode,
-    });
-    if (res.ok) {
-      setStates((s) => ({ ...s, [friend.odUserId]: 'sent' }));
-      trackGrowthEvent('friend_invite_sent', { surface: 'room_invite_sheet', online: friend.isOnline });
-      toast.success(t('friendSocial.invitedName').replace('{name}', friend.displayName || friend.username));
-    } else {
-      setStates((s) => ({ ...s, [friend.odUserId]: res.code === 'CHALLENGE_ALREADY_SENT' ? 'sent' : 'idle' }));
-      if (res.code !== 'CHALLENGE_ALREADY_SENT') toast.error(t('friendSocial.inviteFailed'));
-    }
-  };
 
   return (
     <section data-testid="friend-invite-list" aria-labelledby="friend-invite-title" className={cn('w-full', className)}>

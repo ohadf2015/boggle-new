@@ -138,6 +138,8 @@ const ja = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "ほか{count}人のフレンドがオンライン",
+    "onlineNowLabel": "オンラインのフレンド",
     "today": {
       "title": "フレンドと今日のデイリー",
       "share": "シェア",
@@ -1516,6 +1518,24 @@ const ja = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "あなたの仲間",
+      "inLobby": "ロビーにいます",
+      "playingNow": "プレイ中",
+      "seen": "{when}にオンライン",
+      "youLead": "あなたがリード {score}",
+      "theyLead": "相手がリード {score}",
+      "tied": "互角 {score}",
+      "firstMatch": "初対戦?",
+      "join": "参加",
+      "invite": "招待",
+      "retry": "再試行",
+      "error": "仲間を読み込めませんでした。",
+      "wantsToBeFriends": "{name}さんがフレンド申請しています",
+      "moreRequests": "ほか{count}件の申請",
+      "empty": "まだフレンドがいません。対戦して出会った人を追加しよう。",
+      "allFriends": "すべてのフレンド"
+    },
     "heroLine": "60秒。新しい盤面。ライバル3人。",
     "intro": "LexiClashはブラウザで遊べる無料の単語ゲーム。6言語対応。",
     "playSub": "ソロ・ランダムモード",
@@ -10955,6 +10975,12 @@ const ja = {
     "level": "レベル"
   },
   "friends": {
+    "recent": {
+      "title": "最近対戦したプレイヤーです。フレンドに追加しよう!",
+      "add": "追加",
+      "addName": "{name}さんをフレンドに追加",
+      "sent": "申請済み"
+    },
     "title": "フレンド",
     "add": "追加",
     "addFriend": "フレンドを追加",
@@ -10992,6 +11018,12 @@ const ja = {
     "typeMessage": "メッセージを入力...",
     "sendMessage": "送信",
     "challenges": {
+      "toast": {
+        "title": "{name}さんから対戦の挑戦状が届きました",
+        "notNow": "あとで",
+        "close": "閉じる",
+        "join": "ゲームに参加"
+      },
       "resultWin": "{mine}–{theirs} で勝利！🏆",
       "resultLoss": "{mine}–{theirs} で敗北…",
       "resultTie": "{mine}–{theirs} で引き分け！",

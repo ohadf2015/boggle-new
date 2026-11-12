@@ -138,6 +138,8 @@ const es = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "Ver {count} amigos más en línea",
+    "onlineNowLabel": "Amigos en línea ahora",
     "today": {
       "title": "El reto diario de hoy con amigos",
       "share": "Compartir",
@@ -1516,6 +1518,24 @@ const es = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "Tu grupo",
+      "inLobby": "En una sala",
+      "playingNow": "Jugando ahora",
+      "seen": "Visto {when}",
+      "youLead": "Vas ganando {score}",
+      "theyLead": "Te gana {score}",
+      "tied": "Empate {score}",
+      "firstMatch": "¿Primera partida?",
+      "join": "Unirse",
+      "invite": "Invitar",
+      "retry": "Reintentar",
+      "error": "No pudimos cargar tu grupo.",
+      "wantsToBeFriends": "{name} quiere ser tu amigo",
+      "moreRequests": "+{count} solicitudes más",
+      "empty": "Aún no tienes amigos. Juega una partida y agrega a quien conozcas.",
+      "allFriends": "Todos los amigos"
+    },
     "heroLine": "60 segundos. Tablero nuevo. Tres rivales.",
     "intro": "LexiClash es un juego de palabras gratis en el navegador, en seis idiomas.",
     "playSub": "En solitario · modo aleatorio",
@@ -10880,6 +10900,12 @@ const es = {
     "multiplayer": "Multijugador"
   },
   "friends": {
+    "recent": {
+      "title": "Jugaste con estas personas hace poco. ¡Agrégalas!",
+      "add": "Agregar",
+      "addName": "Agregar a {name} como amigo",
+      "sent": "Solicitud enviada"
+    },
     "title": "Amigos",
     "add": "Agregar",
     "addFriend": "Agregar amigo",
@@ -10917,6 +10943,12 @@ const es = {
     "typeMessage": "Escribe un mensaje...",
     "sendMessage": "Enviar",
     "challenges": {
+      "toast": {
+        "title": "{name} te retó a una partida",
+        "notNow": "Ahora no",
+        "close": "Cerrar",
+        "join": "Unirse a la partida"
+      },
       "resultWin": "¡Ganaste {mine}–{theirs}! 🏆",
       "resultLoss": "Perdiste {mine}–{theirs}.",
       "resultTie": "¡Empate, {mine}–{theirs}!",
