@@ -77,10 +77,10 @@ export function DayPrizeHubCard({ kind, className, guestNudge = true }: DayPrize
           className="shrink-0 w-11 h-11 rounded-lg border-2 border-neo-black bg-cover bg-center animate-zap-wiggle motion-reduce:animate-none"
           style={{ backgroundImage: 'url(/daily/chests/chest-silver.jpg)' }}
         />
-        <span className="flex-1 min-w-0 text-sm font-black text-neo-black">
+        <span className="flex-1 min-w-0 text-sm font-black leading-tight text-neo-black">
           {t(kind === 'perfect' ? 'daily.dayPrize.hubReadyPerfect' : 'daily.dayPrize.hubReady')}
         </span>
-        <span className="shrink-0 rounded-full border-2 border-neo-black bg-neo-black px-3 py-1 text-xs font-black uppercase text-neo-yellow">
+        <span className="shrink-0 whitespace-nowrap rounded-full border-2 border-neo-black bg-neo-black px-3 py-1 text-xs font-black uppercase text-neo-yellow">
           {t('daily.dayPrize.open')}
         </span>
       </button>
