@@ -756,9 +756,12 @@ const gameStateManager = {
 };
 export default gameStateManager;
 
+// Read-only room lookup for the Next route bundle (its own module copy has no games); the socket process sets it first.
+(globalThis as typeof globalThis & { __lcGameLookup?: typeof getGame }).__lcGameLookup ??= getGame;
+
 // Expose game query helpers on globalThis so integration tests can access
 // the same module instance used by handlers (avoids Vitest dual-specifier issues).
-// Test-only — production bundles must not leak game-state surface.
+// Test-only: the full helper set. Production gets only the read-only __lcGameLookup above.
 if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
   (globalThis as any).__gameStateManager = { gameExists, getGame, clearAllGames };
 }

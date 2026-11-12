@@ -284,6 +284,9 @@ export async function isPushAllowed(
   }
 }
 
+/** Lets the open app tell a friend's game invite apart from other social rows. */
+export const FRIEND_CHALLENGE_ENTITY = 'friend_challenge';
+
 async function triggerPush(
   userId: string,
   type: PushNotificationType,
@@ -368,7 +371,7 @@ export async function notifyGameInvite(
       type: 'game_invite',
       deepLink: `/multiplayer?room=${roomCode}`,
     },
-  }, 'both', inviterUserId);
+  }, 'both', inviterUserId, FRIEND_CHALLENGE_ENTITY);
 }
 
 /**

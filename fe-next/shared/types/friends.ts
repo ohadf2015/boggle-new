@@ -299,3 +299,14 @@ export const FriendErrorCodes = {
 } as const;
 
 export type FriendErrorCode = typeof FriendErrorCodes[keyof typeof FriendErrorCodes];
+
+// ==================== Friend Presence ====================
+
+export type FriendPresenceStatus = 'in_lobby' | 'playing' | 'private' | null;
+
+/** One accepted friend's room presence; `gameCode` only when the room is open to them. */
+export interface FriendPresence {
+  userId: string;
+  status: FriendPresenceStatus;
+  gameCode?: string;
+}

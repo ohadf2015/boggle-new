@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/components/Avatar', () => ({
-  default: ({ userId }: { userId?: string }) => <div data-testid={`avatar-${userId}`} />,
+  default: ({ userId, avatarImage }: { userId?: string; avatarImage?: string }) => (
+    <div data-testid={`avatar-${userId}`} data-image={avatarImage ?? ''} />
+  ),
 }));
 vi.mock('@/components/quick-play/QuickResultsFx', () => ({ QuickResultsRays: () => null, SparkleLoop: () => null }));
 vi.mock('@/contexts/AuthContext', () => ({
@@ -20,6 +22,7 @@ vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
 import { PlayHero } from '../PlayHero';
 import { FriendsBlock } from '../FriendsBlock';
 import HeroAvatarIsland from '../HeroAvatarIsland';
+import { CrewAvatarSlot } from '../CrewAvatarSlot';
 
 import { en } from '@/translations/en';
 
@@ -96,5 +99,21 @@ describe('HeroAvatarIsland', () => {
     );
     expect(screen.queryByTestId('avatar-hp-friend-you')).toBeNull();
     expect(screen.queryByTestId('avatar-hp-friend-maya')).toBeNull();
+  });
+
+  it('given crew rows publish avatar slots, then the island portals each friend\'s avatar into its own box and drops it on unmount', () => {
+    const { unmount } = render(
+      <>
+        <CrewAvatarSlot slotKey="crew-bea" userId="bea" customAvatar={null} avatarImage="https://img/bea.png" />
+        <CrewAvatarSlot slotKey="crew-cal" userId="cal" customAvatar={null} />
+        <HeroAvatarIsland />
+      </>,
+    );
+    expect(screen.getByTestId('crew-avatar-crew-bea').querySelector('[data-testid="avatar-bea"]')).not.toBeNull();
+    expect(screen.getByTestId('crew-avatar-crew-cal').querySelector('[data-testid="avatar-cal"]')).not.toBeNull();
+    expect(screen.getByTestId('avatar-bea').getAttribute('data-image')).toBe('https://img/bea.png');
+    unmount();
+    render(<HeroAvatarIsland />);
+    expect(screen.queryByTestId('avatar-bea')).toBeNull();
   });
 });

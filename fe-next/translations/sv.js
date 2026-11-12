@@ -138,6 +138,8 @@ const sv = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "Se {count} fler vänner online",
+    "onlineNowLabel": "Vänner online nu",
     "today": {
       "title": "Dagens utmaning med vänner",
       "share": "Dela",
@@ -1516,6 +1518,24 @@ const sv = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "Ditt gäng",
+      "inLobby": "I en lobby",
+      "playingNow": "Spelar nu",
+      "seen": "Sågs {when}",
+      "youLead": "Du leder {score}",
+      "theyLead": "De leder {score}",
+      "tied": "Lika {score}",
+      "firstMatch": "Första matchen?",
+      "join": "Gå med",
+      "invite": "Bjud in",
+      "retry": "Försök igen",
+      "error": "Kunde inte ladda ditt gäng.",
+      "wantsToBeFriends": "{name} vill bli vänner",
+      "moreRequests": "+{count} fler förfrågningar",
+      "empty": "Inga vänner än. Spela en match och lägg till dem du möter.",
+      "allFriends": "Alla vänner"
+    },
     "heroLine": "60 sekunder. Ny bricka. Tre rivaler.",
     "intro": "LexiClash är ett gratis ordspel i webbläsaren, på sex språk.",
     "playSub": "Solo · slumpläge",
@@ -11220,6 +11240,12 @@ const sv = {
     "multiplayer": "Flerspelare"
   },
   "friends": {
+    "recent": {
+      "title": "Du spelade mot de här nyligen. Lägg till dem!",
+      "add": "Lägg till",
+      "addName": "Lägg till {name} som vän",
+      "sent": "Förfrågan skickad"
+    },
     "title": "Vänner",
     "messages": "Meddelanden",
     "newMessage": "Nytt meddelande",
@@ -11257,6 +11283,12 @@ const sv = {
     "blockedUsers": "Blockerade användare",
     "unblock": "Avblockera",
     "challenges": {
+      "toast": {
+        "title": "{name} utmanade dig till en match",
+        "notNow": "Inte nu",
+        "close": "Stäng",
+        "join": "Gå med i matchen"
+      },
       "resultWin": "Du vann {mine}–{theirs}! 🏆",
       "resultLoss": "Du förlorade {mine}–{theirs}.",
       "resultTie": "Oavgjort, {mine}–{theirs}!",

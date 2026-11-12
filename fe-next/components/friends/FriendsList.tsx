@@ -35,6 +35,7 @@ import { MessageThread } from './messaging/MessageThread';
 import { ChallengeInviteDialog } from './ChallengeInviteDialog';
 import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
 import { AddFriendDialog } from './AddFriendDialog';
+import { RecentOpponents } from './RecentOpponents';
 import { FriendDetailDialog } from './FriendDetailDialog';
 import GiftModal from '@/components/social/GiftModal';
 import { PactFriendSelector } from '@/components/engagement/PactFriendSelector';
@@ -126,50 +127,6 @@ const FriendsList: React.FC<FriendsListProps> = ({
     };
     giftSocket.on('gift:receive', handleGiftReceive);
 
-    // When a challenge we SENT gets accepted, navigate sender to the room
-    const handleChallengeAccepted = (data: { roomCode: string; toUsername?: string; toDisplayName?: string }) => {
-      const name = resolveDisplayName([data.toDisplayName, data.toUsername], t('friends.aPlayer', 'a player'));
-      toast.success(t('friends.challenges.friendAccepted', { name }));
-      router.push(`/${language}/multiplayer?room=${data.roomCode}`);
-    };
-    giftSocket.on('friends:challengeAccepted', handleChallengeAccepted);
-
-    // Toast when a new challenge arrives
-    const handleChallengeReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
-      const name = resolveDisplayName([data.fromDisplayName, data.fromUsername], t('friends.aPlayer', 'a player'));
-      toast(t('friends.challenges.received', { name }), { icon: '⚔️' });
-    };
-    giftSocket.on('friends:challengeReceived', handleChallengeReceived);
-
-    // Toast when a challenge we SENT gets declined
-    const handleChallengeDeclined = (data: { toUserId?: string; fromUserId?: string; fromUsername?: string; toUsername?: string; toDisplayName?: string }) => {
-      // Only toast the challenger (fromUserId === challenger). Decliner already sees UI feedback.
-      const name = resolveDisplayName([data.toDisplayName, data.toUsername], t('friends.aPlayer', 'a player'));
-      toast(t('friends.challengeDeclinedToast', { name }), { icon: '🚫' });
-    };
-    giftSocket.on('friends:challengeDeclined', handleChallengeDeclined);
-
-    // Toast when a challenge we participated in completes (post-game result)
-    const handleChallengeResult = (data: { winnerUserId: string | null; scores?: Record<string, number> }) => {
-      const me = profile?.id;
-      if (!me) return;
-      const myScore = data.scores?.[me] ?? null;
-      const opponentEntry = Object.entries(data.scores ?? {}).find(([uid]) => uid !== me);
-      const opponentScore = opponentEntry?.[1] ?? null;
-      const isTie = data.winnerUserId === null;
-      const didWin = data.winnerUserId === me;
-      const key = isTie ? 'friends.challenges.resultTie' : didWin ? 'friends.challenges.resultWin' : 'friends.challenges.resultLoss';
-      const fallback = isTie ? "It's a tie!" : didWin ? 'You won the challenge!' : 'You lost the challenge.';
-      toast(
-        t(key, fallback, {
-          mine: String(myScore ?? '?'),
-          theirs: String(opponentScore ?? '?'),
-        }),
-        { icon: isTie ? '🤝' : didWin ? '🏆' : '💔' },
-      );
-    };
-    giftSocket.on('friends:challengeResult', handleChallengeResult);
-
     // Toast when a new friend request arrives
     const handleRequestReceived = (data: { fromUsername?: string; fromDisplayName?: string }) => {
       const name = resolveDisplayName([data.fromDisplayName, data.fromUsername], t('friends.aPlayer', 'a player'));
@@ -179,13 +136,9 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
     return () => {
       giftSocket.off('gift:receive', handleGiftReceive);
-      giftSocket.off('friends:challengeAccepted', handleChallengeAccepted);
-      giftSocket.off('friends:challengeReceived', handleChallengeReceived);
-      giftSocket.off('friends:challengeDeclined', handleChallengeDeclined);
-      giftSocket.off('friends:challengeResult', handleChallengeResult);
       giftSocket.off('friends:requestReceived', handleRequestReceived);
     };
-  }, [giftSocket, isGiftSocketConnected, t, router, language, profile?.id]);
+  }, [giftSocket, isGiftSocketConnected, t]);
 
   const {
     threads,
@@ -679,13 +632,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
                   </m.div>
                 ))
               ) : (
-                <EnhancedEmptyState
-                  title={t('friends.noFriendsYet')}
-                  description={t('friends.addFriendsToChallenge')}
-                  icon="sparkles"
-                  action={{ label: t('friends.add'), onClick: () => setShowAddFriend(true), variant: 'primary' }}
-                  compact
-                />
+                <div className="flex flex-col gap-3">
+                  <RecentOpponents source="friends_recent" />
+                  <p className={cn('text-sm font-bold', isDark ? 'text-neo-cream/80' : 'text-neo-black/70')}>
+                    {t('friends.addFriendsToChallenge')}
+                  </p>
+                  <Button onClick={() => setShowAddFriend(true)} className="self-start">
+                    <UserPlus aria-hidden="true" className="w-4 h-4" />
+                    {t('friends.add')}
+                  </Button>
+                </div>
               )}
             </div>
 

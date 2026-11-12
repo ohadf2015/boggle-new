@@ -41,7 +41,9 @@ export interface AuthUserConnection {
   connectedAt: number;
 }
 
-const authUserConnections = new Map<string, AuthUserConnection>();
+// One map per process: the Next route bundle loads its own copy of this module and reads presence from here.
+const globalScope = globalThis as typeof globalThis & { __lcAuthUserConnections?: Map<string, AuthUserConnection> };
+const authUserConnections = (globalScope.__lcAuthUserConnections ??= new Map<string, AuthUserConnection>());
 
 export interface AddUserOptions {
   avatar?: Avatar | null;

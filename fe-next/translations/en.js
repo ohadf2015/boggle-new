@@ -138,6 +138,8 @@ const en = {
   // @avatarChest:end
   // @friendSocial:start
   "friendSocial": {
+    "moreOnline": "See {count} more friends online",
+    "onlineNowLabel": "Friends online now",
     "today": {
       "title": "Today's daily with friends",
       "share": "Share",
@@ -1516,6 +1518,24 @@ const en = {
   // @quick-loop:end
   // @home-play:start
   "homePlay": {
+    "crew": {
+      "title": "Your crew",
+      "inLobby": "In a lobby",
+      "playingNow": "Playing now",
+      "seen": "Seen {when}",
+      "youLead": "You lead {score}",
+      "theyLead": "They lead {score}",
+      "tied": "Tied {score}",
+      "firstMatch": "First match?",
+      "join": "Join",
+      "invite": "Invite",
+      "retry": "Try again",
+      "error": "Couldn't load your crew.",
+      "wantsToBeFriends": "{name} wants to be friends",
+      "moreRequests": "+{count} more requests",
+      "empty": "No friends yet. Play a match and add who you meet.",
+      "allFriends": "All friends"
+    },
     "heroLine": "60 seconds. Fresh board. Three rivals.",
     "intro": "LexiClash is a free browser word game in six languages.",
     "playSub": "Solo · random mode",
@@ -10411,6 +10431,12 @@ const en = {
     "level": "Level"
   },
   "friends": {
+    "recent": {
+      "title": "You played these players recently. Add them!",
+      "add": "Add",
+      "addName": "Add {name} as a friend",
+      "sent": "Request sent"
+    },
     "title": "Friends",
     "add": "Add",
     "addFriend": "Add friend",
@@ -10448,6 +10474,12 @@ const en = {
     "typeMessage": "Say something...",
     "sendMessage": "Send",
     "challenges": {
+      "toast": {
+        "title": "{name} challenged you to a game",
+        "notNow": "Not now",
+        "close": "Close",
+        "join": "Join the game"
+      },
       "resultWin": "You won {mine}–{theirs}! 🏆",
       "resultLoss": "You lost {mine}–{theirs}.",
       "resultTie": "It's a tie, {mine}–{theirs}!",
