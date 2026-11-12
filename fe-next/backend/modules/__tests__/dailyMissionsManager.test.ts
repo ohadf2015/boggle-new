@@ -332,6 +332,11 @@ describe('completeDailyQuestsForResult — new daily-mode results', () => {
   });
 });
 
+const grandSlamClaimChain = () => {
+  const select = vi.fn().mockResolvedValue({ data: [{ grand_slam_claimed: true }], error: null });
+  return { eq: () => ({ eq: () => ({ eq: () => ({ select }) }) }) };
+};
+
 describe('checkAndClaimGrandSlam', () => {
   it('returns not claimed when missions incomplete', async () => {
     mockMaybeSingle.mockResolvedValueOnce({ data: EMPTY_ROW, error: null });
@@ -347,7 +352,7 @@ describe('checkAndClaimGrandSlam', () => {
     mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
 
     // update grand_slam_claimed
-    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
+    mockUpdate.mockReturnValue(grandSlamClaimChain());
 
     const result = await checkAndClaimGrandSlam(PLAYER_ID);
 
@@ -385,7 +390,7 @@ describe('checkAndClaimGrandSlam', () => {
 
   it('grants GRAND_SLAM_COIN_REWARD coins on claim (alongside XP)', async () => {
     mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
-    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
+    mockUpdate.mockReturnValue(grandSlamClaimChain());
 
     await checkAndClaimGrandSlam(PLAYER_ID);
 
@@ -419,7 +424,7 @@ describe('checkAndClaimGrandSlam', () => {
 
   it('still claims (returns claimed=true) when coin grant fails (best-effort)', async () => {
     mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
-    mockUpdate.mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue({ error: null }) }) });
+    mockUpdate.mockReturnValue(grandSlamClaimChain());
     mockAwardCoins.mockResolvedValueOnce({ success: false, error: 'rpc fail' });
 
     const result = await checkAndClaimGrandSlam(PLAYER_ID);

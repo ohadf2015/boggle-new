@@ -246,6 +246,12 @@ describe('processConnectionsCompletion — daily quest credit', () => {
     expect(result.puzzlesSolved).toBe(4);
   });
 
+  it('returns the mission level-up so the client can announce it', async () => {
+    creditMock.mockResolvedValueOnce({ oldLevel: 3, newLevel: 4 });
+    const r = await run({ puzzleDate: today, userIdForRow: 'player-1', puzzlesSolved: 4 });
+    expect(r.ok && r.body.levelUp).toEqual({ oldLevel: 3, newLevel: 4 });
+  });
+
   it('does not credit guests', async () => {
     await run({ puzzleDate: today, userIdForRow: null });
     expect(creditMock).not.toHaveBeenCalled();

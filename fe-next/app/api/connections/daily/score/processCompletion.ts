@@ -49,6 +49,7 @@ export interface ProcessConnectionsBody {
   score: number;
   currentRank: number;
   totalPlayers: number;
+  levelUp?: { oldLevel: number; newLevel: number };
 }
 
 export type ProcessConnectionsResult =
@@ -143,10 +144,10 @@ export async function processConnectionsCompletion(
     // Credit TODAY'S daily quests (authed players, today's puzzle only — a
     // replayed offline-sync submit for a past date must not credit today's set).
     // This function is shared by the live route and the offline-sync path, so
-    // both are covered by this single call. Fire-and-forget; failures are logged.
-    if (userIdForRow && isTodayUTC(sub.puzzleDate)) {
-      creditDailyQuests(userIdForRow, questResultForConnections({ puzzlesSolved: sub.puzzlesSolved }));
-    }
+    // both are covered by this single call. Capped wait; failures are logged.
+    const levelUp = userIdForRow && isTodayUTC(sub.puzzleDate)
+      ? await creditDailyQuests(userIdForRow, questResultForConnections({ puzzlesSolved: sub.puzzlesSolved }))
+      : null;
 
     return {
       ok: true,
@@ -156,6 +157,7 @@ export async function processConnectionsCompletion(
         score: finalScore,
         currentRank: (better ?? 0) + 1,
         totalPlayers: totalPlayers ?? 1,
+        ...(levelUp ? { levelUp } : {}),
       },
     };
   } catch (error) {

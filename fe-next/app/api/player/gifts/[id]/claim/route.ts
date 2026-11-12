@@ -6,6 +6,16 @@ interface ClaimResult {
   success: boolean;
   xp_awarded: number;
   coins_awarded: number;
+  old_level?: number | null;
+  new_level?: number | null;
+}
+
+function levelUpOf(result: ClaimResult): { oldLevel: number; newLevel: number } | null {
+  if (result.old_level == null || result.new_level == null) return null;
+  const oldLevel = Number(result.old_level);
+  const newLevel = Number(result.new_level);
+  if (!(newLevel > oldLevel)) return null;
+  return { oldLevel, newLevel };
 }
 
 /**
@@ -60,6 +70,7 @@ export async function POST(
       success: true,
       xpAwarded: claimResult.xp_awarded,
       coinsAwarded: claimResult.coins_awarded,
+      levelUp: levelUpOf(claimResult),
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

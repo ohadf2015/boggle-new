@@ -145,6 +145,7 @@ describe('POST /api/player/gifts/[id]/claim', () => {
       success: true,
       xpAwarded: XP,
       coinsAwarded: COINS,
+      levelUp: null,
     });
     expect(mockRpc).toHaveBeenCalledTimes(1);
     expect(mockRpc).toHaveBeenCalledWith('claim_admin_gift', { gift_id: GIFT });
@@ -214,5 +215,37 @@ describe('POST /api/player/gifts/[id]/claim', () => {
     const res = await claim(GIFT);
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ error: 'Cannot claim gift' });
+  });
+
+  describe('levelUp', () => {
+    function rpcReturns(extra: Record<string, unknown>) {
+      mockRpc.mockResolvedValueOnce({
+        data: { success: true, xp_awarded: XP, coins_awarded: COINS, badge_id: null, badge_awarded: false, ...extra },
+        error: null,
+      });
+    }
+
+    it('reports the level change when the gift crosses a level', async () => {
+      rpcReturns({ new_total_xp: 1200, old_level: 4, new_level: 6 });
+      const body = await (await claim(GIFT)).json();
+      expect(body.levelUp).toEqual({ oldLevel: 4, newLevel: 6 });
+    });
+
+    it('is null when the level did not change', async () => {
+      rpcReturns({ new_total_xp: 500, old_level: 4, new_level: 4 });
+      const body = await (await claim(GIFT)).json();
+      expect(body.levelUp).toBeNull();
+    });
+
+    it('is null when the RPC predates the level fields', async () => {
+      rpcReturns({});
+      const body = await (await claim(GIFT)).json();
+      expect(body.levelUp).toBeNull();
+    });
+
+    it('is never sent for an already-claimed gift', async () => {
+      const body = await (await claim('gift-already-claimed')).json();
+      expect(body).not.toHaveProperty('levelUp');
+    });
   });
 });

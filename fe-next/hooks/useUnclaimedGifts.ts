@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { queryKeys } from '@/lib/queryKeys';
 import logger from '@/utils/logger';
 import { fetchWithAuth, getWithAuth } from '@/utils/authFetch';
+import { publishLevelUp, type LevelUpLike } from '@/lib/avatar/revealTrigger';
 
 interface BadgeInfo {
   id: string;
@@ -146,9 +147,13 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
         const err = await response.json();
         throw new Error(err.error || 'Failed to claim gift');
       }
-      return { giftId, ...(await response.json()) as { xpAwarded: number; coinsAwarded: number } };
+      return {
+        giftId,
+        ...(await response.json()) as { xpAwarded: number; coinsAwarded: number; levelUp?: LevelUpLike | null },
+      };
     },
-    onSuccess: ({ giftId }) => {
+    onSuccess: ({ giftId, levelUp }) => {
+      if (levelUp) publishLevelUp(levelUp, 'gift');
       locallyClaimedIdsRef.current.add(giftId);
       setGifts(prev => prev.map(g =>
         g.id === giftId ? { ...g, claimed: true, claimed_at: new Date().toISOString() } : g

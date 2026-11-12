@@ -34,9 +34,21 @@ export function scaleBreakdown(breakdown: XpBreakdown, granted: number): XpBreak
   return scaled;
 }
 
+export interface LevelUp {
+  oldLevel: number;
+  newLevel: number;
+}
+
 /** The `levelUp` field responses carry; the client hands it to publishLevelUp. */
-export function levelUpOf(grant: XpGrantResult | null | undefined): { oldLevel: number; newLevel: number } | null {
+export function levelUpOf(grant: XpGrantResult | null | undefined): LevelUp | null {
   return grant?.leveledUp ? { oldLevel: grant.oldLevel, newLevel: grant.newLevel } : null;
+}
+
+/** Concurrent grants land in any order, so the combined jump is the lowest start to the highest end. */
+export function mergeLevelUps(a: LevelUp | null | undefined, b: LevelUp | null | undefined): LevelUp | null {
+  if (!a) return b ?? null;
+  if (!b) return a;
+  return { oldLevel: Math.min(a.oldLevel, b.oldLevel), newLevel: Math.max(a.newLevel, b.newLevel) };
 }
 
 /** increment_player_xp applies prestige, diminishing returns and the daily cap; this reports what it granted. */

@@ -74,7 +74,8 @@ export function useResultsSocketEvents({
   const [levelUpData, setLevelUpData] = useState<LevelUpData | null>(null);
   const [showLevelUpCelebration, setShowLevelUpCelebration] = useState(false);
 
-  const hasShownLevelUpRef = useRef<boolean>(false); // Prevent duplicate level-up celebrations
+  // Quest and mission XP can push a later, higher level-up after the game's own one.
+  const shownLevelRef = useRef(0);
   const hasShownWordFeedbackRef = useRef<boolean>(false); // Show the dictionary-building modal only once per results page
   const wordFeedbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Delays the dictionary modal so it never covers the rematch flow
 
@@ -152,8 +153,9 @@ export function useResultsSocketEvents({
     };
 
     const handleLevelUp = (data: LevelUpData) => {
-      if (hasShownLevelUpRef.current) return;
-      hasShownLevelUpRef.current = true;
+      const newLevel = Number(data?.newLevel) || 0;
+      if (shownLevelRef.current > 0 && newLevel <= shownLevelRef.current) return;
+      shownLevelRef.current = Math.max(newLevel, 1);
       logger.log('[RESULTS] Level up!', data);
       publishLevelUp(data, 'multiplayer');
       setLevelUpData(data);

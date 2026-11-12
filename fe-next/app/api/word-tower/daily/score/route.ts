@@ -41,6 +41,7 @@ import { questResultForWordTower } from '@/shared/dailyQuestPool';
 import { acceptGuestBoardName } from '@/lib/daily/guestBoardName';
 import { dailyTowerWords } from '@/lib/wordTowerV2/towerWords';
 import { claimDailyTowerXp } from '@/lib/wordTower/towerXp';
+import { mergeLevelUps } from '@/backend/modules/xpGrant';
 
 export const runtime = 'nodejs';
 
@@ -99,8 +100,15 @@ export async function POST(request: NextRequest) {
       ? { column: 'player_id' as const, value: user.id }
       : { column: 'guest_fingerprint' as const, value: guestFingerprint as string };
 
-    const reply = async (payload: Record<string, unknown>) =>
-      NextResponse.json(isFinal && user ? { ...payload, ...(await claimDailyTowerXp(supabase, user.id, puzzleDate, language)) } : payload);
+    const reply = async (payload: Record<string, unknown>, questCredit?: ReturnType<typeof creditDailyQuests>) => {
+      if (!isFinal || !user) return NextResponse.json(payload);
+      const [xp, questLevelUp] = await Promise.all([
+        claimDailyTowerXp(supabase, user.id, puzzleDate, language),
+        questCredit,
+      ]);
+      const levelUp = mergeLevelUps(xp.levelUp, questLevelUp);
+      return NextResponse.json({ ...payload, ...xp, ...(levelUp ? { levelUp } : {}) });
+    };
 
     const floors = Math.floor(Number(body.floors) || 0);
     const towerWords = dailyTowerWords(body.towerWords);
@@ -120,10 +128,10 @@ export async function POST(request: NextRequest) {
       const best = Number(existing.best_height_m) || 0;
       const merged = mergeDailyBest(best, heightM);
       if (merged <= best) {
-        if (isFinal) {
-          creditDailyQuests(user?.id, questResultForWordTower({ heightM: best, floors: Number(existing.floors) || 0 }));
-        }
-        return reply({ ok: true, bestHeightM: best, improved: false });
+        const questCredit = isFinal
+          ? creditDailyQuests(user?.id, questResultForWordTower({ heightM: best, floors: Number(existing.floors) || 0 }))
+          : undefined;
+        return reply({ ok: true, bestHeightM: best, improved: false }, questCredit);
       }
       const mergedFloors = Math.max(Number(existing.floors) || 0, floors);
       const { error } = await supabase
@@ -141,9 +149,10 @@ export async function POST(request: NextRequest) {
         captureApiError(error as unknown as Error, 'word-tower-daily-score-update');
         return NextResponse.json({ error: 'failed to save' }, { status: 500 });
       }
-      // Daily quests (authed only): today's banked climb + floors. Fire-and-forget.
-      if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM: merged, floors: mergedFloors }));
-      return reply({ ok: true, bestHeightM: merged, improved: true });
+      const questCredit = isFinal
+        ? creditDailyQuests(user?.id, questResultForWordTower({ heightM: merged, floors: mergedFloors }))
+        : undefined;
+      return reply({ ok: true, bestHeightM: merged, improved: true }, questCredit);
     };
 
     const { data: existing } = await lookup();
@@ -172,8 +181,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'failed to save' }, { status: 500 });
     }
 
-    if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM, floors }));
-    return reply({ ok: true, bestHeightM: heightM, improved: true });
+    const questCredit = isFinal ? creditDailyQuests(user?.id, questResultForWordTower({ heightM, floors })) : undefined;
+    return reply({ ok: true, bestHeightM: heightM, improved: true }, questCredit);
   } catch (err) {
     captureApiError(err as Error, 'word-tower-daily-score');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

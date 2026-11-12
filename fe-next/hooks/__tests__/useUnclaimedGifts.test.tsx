@@ -38,6 +38,9 @@ const mockFetch = vi.fn();
 vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn(), fetchWithAuth: vi.fn() }));
 import { getWithAuth, fetchWithAuth } from '@/utils/authFetch';
 
+const { mockPublishLevelUp } = vi.hoisted(() => ({ mockPublishLevelUp: vi.fn() }));
+vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp: mockPublishLevelUp }));
+
 // Mock localStorage
 const mockLocalStorage = {
   getItem: vi.fn(),
@@ -334,6 +337,28 @@ describe('useUnclaimedGifts', () => {
       expect(mockFetch).toHaveBeenCalledWith('/api/player/gifts/gift-1/claim', {
         method: 'POST',
       });
+    });
+
+    async function claimWith(body: Record<string, unknown>) {
+      mockFetch
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockCountResponse) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve({ gifts: [mockGiftsResponse.gifts[0]] }) })
+        .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(body) });
+      const { result } = renderHook(() => useUnclaimedGifts(), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      await act(async () => {
+        await result.current.claimGift('gift-1');
+      });
+    }
+
+    it('publishes the level-up when a claimed gift crosses a level', async () => {
+      await claimWith({ success: true, xpAwarded: 100, coinsAwarded: 50, levelUp: { oldLevel: 4, newLevel: 5 } });
+      expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 4, newLevel: 5 }, 'gift');
+    });
+
+    it('publishes nothing when the gift kept the level', async () => {
+      await claimWith({ success: true, xpAwarded: 100, coinsAwarded: 50, levelUp: null });
+      expect(mockPublishLevelUp).not.toHaveBeenCalled();
     });
 
     it('throws error on failed claim', async () => {

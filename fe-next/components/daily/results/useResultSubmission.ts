@@ -16,6 +16,7 @@ import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
 import { createClient } from '@/utils/supabase/client';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 import type { Language } from '@/types';
 
 interface UseResultSubmissionProps {
@@ -265,6 +266,8 @@ export function useResultSubmission({
           if (responseData.freezeBridged) {
             onFreezeBridged?.({ freezesRemaining: responseData.freezesRemaining });
           }
+
+          if (responseData.levelUp) publishLevelUp(responseData.levelUp, 'dailyWordHunt');
 
           // Notify parent of successful submission
           onSubmitSuccess();

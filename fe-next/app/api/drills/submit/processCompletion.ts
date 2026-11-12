@@ -21,7 +21,9 @@ import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
 import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
 import { computeDrillImprovement, type DrillImprovement } from '@/shared/utils/drillImprovement';
 import { upsertDailyBrainScoreHistory } from '@/lib/brain/dailyHistoryWrite';
-import { levelChangeFromRow, levelUpOf } from '@/backend/modules/xpGrant';
+import { levelChangeFromRow, levelUpOf, mergeLevelUps } from '@/backend/modules/xpGrant';
+import { creditDailyQuests } from '@/lib/daily/questSeams';
+import { emptyQuestResult } from '@/shared/dailyQuestPool';
 import {
   BRAIN_CHECK_COOLDOWN_MS,
   BRAIN_CHECK_PROTOCOL,
@@ -391,6 +393,9 @@ export async function processBrainDrillCompletion(
     console.error('Error upserting brain score history:', historyError);
   }
 
+  // Brain-discovery quest plus score/word skill quests; runs beside the drill XP grant.
+  const questCredit = creditDailyQuests(userId, emptyQuestResult({ mode: 'brain', score, wordsFound }));
+
   const DRILL_XP_BASE: Record<number, number> = { 1: 30, 2: 30, 3: 50, 4: 80, 5: 80 };
   const baseXp = DRILL_XP_BASE[level] ?? 30;
   const comboEstimate = Math.min(10, Math.floor(score / 100));
@@ -449,18 +454,7 @@ export async function processBrainDrillCompletion(
     lastSessionScore,
   );
 
-  // Fire-and-forget: evaluate today's daily quests against this brain-drill result.
-  // mode 'brain' satisfies the brain-discovery quest; score/wordsFound can satisfy
-  // skill quests too.
-  Promise.all([
-    import('@/backend/modules/dailyMissionsManager'),
-    import('@/shared/dailyQuestPool'),
-  ]).then(([{ completeDailyQuestsForResult }, { emptyQuestResult }]) => {
-    completeDailyQuestsForResult(
-      userId,
-      emptyQuestResult({ mode: 'brain', score, wordsFound }),
-    ).catch(() => {});
-  });
+  levelUp = mergeLevelUps(levelUp, await questCredit);
 
   return {
     ok: true,
