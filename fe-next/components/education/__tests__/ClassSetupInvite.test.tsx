@@ -7,13 +7,14 @@ import { QUICK_LAUNCH_KEY } from '@/components/teacher/dashboard/quickLaunchInte
 const tel = vi.hoisted(() => ({ shown: vi.fn(), shared: vi.fn(), copied: vi.fn(), first: vi.fn() }));
 const roster = vi.hoisted(() => ({ current: { students: [] as { id: string; name: string; avatar: null }[], loading: false, arrivals: [] as string[] } }));
 const classrooms = vi.hoisted(() => ({ current: [{ id: 'c1', name: 'Room 7', join_code: 'BLDA7Q' }] as { id: string; name: string; join_code: string; language?: string }[] }));
+const proState = vi.hoisted(() => ({ current: { hasPro: false, status: null as string | null, loading: false } }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k) }),
 }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playPlayerJoinedSound: vi.fn() }) }));
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: classrooms.current, isLoading: false }) }));
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, status: null, loading: false }) }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState.current }));
 vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => ({ markInviteCopied: vi.fn() }) }));
 vi.mock('@/components/teacher/hq/useClassRoster', () => ({ useClassRoster: () => roster.current }));
 vi.mock('@/lib/education/telemetry', () => ({
@@ -59,6 +60,7 @@ describe('ClassSetupInvite', () => {
     vi.clearAllMocks();
     sessionStorage.clear();
     roster.current = { students: [], loading: false, arrivals: [] };
+    proState.current = { hasPro: false, status: null, loading: false };
     classrooms.current = [{ id: 'c1', name: 'Room 7', join_code: 'BLDA7Q' }];
     forgetCreatedClassrooms();
     single.getClassroom.mockResolvedValue({ data: null, error: null });
@@ -169,7 +171,13 @@ describe('ClassSetupInvite', () => {
     expect(screen.getByTestId('invite-roster')).toHaveClass('max-sm:hidden');
   });
 
-  it('Given a class just made, Then no Pro offer sits on the way to the first game', () => {
+  it('Given a class just made, Then a free teacher sees the Teacher Pro offer on the way to the first game', () => {
+    render(<ClassSetupInvite classroomId="c1" packKey={enPack.nameKey} lessonId="L-pack" />);
+    expect(screen.getByTestId('pro-trial-card')).toBeInTheDocument();
+  });
+
+  it('Given a Pro teacher, Then no Pro offer sits on the way to the first game', () => {
+    proState.current = { hasPro: true, status: 'active', loading: false };
     render(<ClassSetupInvite classroomId="c1" packKey={enPack.nameKey} lessonId="L-pack" />);
     expect(screen.queryByTestId('pro-trial-card')).toBeNull();
   });

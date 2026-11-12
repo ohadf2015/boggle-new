@@ -18,6 +18,10 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro.current }));
 vi.mock('@/lib/education/firstRoundGuideTelemetry', () => ({
   trackFirstRoundGuideShown: (...args: unknown[]) => shown(...args),
 }));
+vi.mock('@/components/education/results/ResultsTeacherProTrialCard', () => ({
+  ResultsTeacherProTrialCard: () => <div data-testid="pro-trial-card" />,
+  CLASS_CREATED_TRIAL_PLACEMENT: 'class_created',
+}));
 
 import { ClassCreatedAsk } from '../ClassCreatedAsk';
 
@@ -46,16 +50,16 @@ describe('ClassCreatedAsk', () => {
     expect(shown).toHaveBeenCalledWith({ surface: 'class_ready', locale: 'en', step: 'day0_bridge' });
   });
 
-  it('renders nothing on day 3 and after the trial — this screen carries no Pro offer', () => {
+  it('renders the Teacher Pro offer card again on day 3 and after the trial', () => {
     pro.current.accessTrialExpires = teacherTrialExpiry(Date.now() - DAY0_BRIDGE_PAYWALL_FROM_DAY * DAY);
-    const { container, rerender } = render(<ClassCreatedAsk language="en" href={HREF} />);
-    expect(container).toBeEmptyDOMElement();
+    const { rerender } = render(<ClassCreatedAsk language="en" href={HREF} />);
     expect(screen.queryByTestId('day0-first-class-bridge')).toBeNull();
+    expect(screen.getByTestId('pro-trial-card')).toBeInTheDocument();
 
     pro.current.accessTrialExpires = new Date(Date.now() - DAY).toISOString();
     rerender(<ClassCreatedAsk language="en" href={HREF} />);
-    expect(container).toBeEmptyDOMElement();
     expect(screen.queryByTestId('day0-first-class-bridge')).toBeNull();
+    expect(screen.getByTestId('pro-trial-card')).toBeInTheDocument();
   });
 
   it('renders nothing for a Pro teacher and while entitlement is unread', () => {
