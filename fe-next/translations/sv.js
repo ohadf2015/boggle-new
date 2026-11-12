@@ -19145,6 +19145,38 @@ const sv = {
         "title": "Ordbyggare",
         "desc": "Hitta ett ord med 6+ bokstäver"
       },
+      "long_word_5": {
+        "title": "Uppvärmningsord",
+        "desc": "Hitta ett ord med 5+ bokstäver"
+      },
+      "words_10": {
+        "title": "Snabba tio",
+        "desc": "Hitta 10+ ord i ett spel"
+      },
+      "words_20": {
+        "title": "Ordlavin",
+        "desc": "Hitta 20+ ord i ett spel"
+      },
+      "tower_climb_50": {
+        "title": "Molnskrapa",
+        "desc": "Klättra 50 m i dagens Ordtorn"
+      },
+      "tower_floors_12": {
+        "title": "Takvåning",
+        "desc": "Bygg 12 våningar i dagens Ordtorn"
+      },
+      "connections_solve_2": {
+        "title": "Första överfarten",
+        "desc": "Lös 2 pussel i dagens Ordbro"
+      },
+      "score_400": {
+        "title": "Storspelare",
+        "desc": "Få 400+ poäng i ett spel"
+      },
+      "combo_5": {
+        "title": "Het svit",
+        "desc": "Nå 5x combo i ett spel"
+      },
       "long_word_7": {
         "title": "Språkjätte",
         "desc": "Hitta ett ord med 7+ bokstäver"

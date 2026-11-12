@@ -19068,6 +19068,38 @@ const es = {
         "title": "Arquitecto de Palabras",
         "desc": "Encuentra una palabra de 6+ letras"
       },
+      "long_word_5": {
+        "title": "Palabra de calentamiento",
+        "desc": "Encuentra una palabra de 5+ letras"
+      },
+      "words_10": {
+        "title": "Diez rapiditas",
+        "desc": "Encuentra 10+ palabras en una partida"
+      },
+      "words_20": {
+        "title": "Avalancha de palabras",
+        "desc": "Encuentra 20+ palabras en una partida"
+      },
+      "tower_climb_50": {
+        "title": "Rascanubes",
+        "desc": "Sube 50 m en la Torre de Palabras de hoy"
+      },
+      "tower_floors_12": {
+        "title": "Ático de lujo",
+        "desc": "Construye 12 pisos en la Torre de Palabras de hoy"
+      },
+      "connections_solve_2": {
+        "title": "Primer cruce",
+        "desc": "Resuelve 2 puzles en el Puente de palabras de hoy"
+      },
+      "score_400": {
+        "title": "Bolsillo lleno",
+        "desc": "Anota 400+ puntos en una partida"
+      },
+      "combo_5": {
+        "title": "Racha caliente",
+        "desc": "Logra un combo 5x en una partida"
+      },
       "long_word_7": {
         "title": "Coloso Léxico",
         "desc": "Encuentra una palabra de 7+ letras"
