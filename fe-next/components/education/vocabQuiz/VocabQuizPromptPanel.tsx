@@ -10,7 +10,7 @@
 import type { ReactNode } from 'react';
 import { Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import { promptSizeClass } from './vocabQuizTextFit';
@@ -35,16 +35,10 @@ export function VocabQuizPromptPanel({ focusLabel, ask, prompt, mascot, revealed
       className="relative flex items-center gap-3 sm:gap-5 [@media(max-width:639px)_and_(min-height:800px)]:flex-col [@media(max-width:639px)_and_(min-height:800px)]:gap-2"
     >
       <span data-testid="vocab-quiz-question-mascot" className={cn('shrink-0 self-center [@media(max-height:560px)]:hidden', revealed && 'sm:hidden')}>
-        <InteractiveMascot
-          variant={mascot}
-          sizeClassName="size-16 sm:size-24 [@media(max-width:639px)_and_(min-height:800px)]:size-20"
-          clipShape="circle"
-          clipBorder="purple"
-          clipBg="var(--neo-navy)"
-          animated
-          // A reaction, not a control: a tappable face inches from the answers is a mis-tap on a phone.
-          enableHover={false}
-          enableClick={false}
+        <VocabQuizMascotFace
+          face={mascot}
+          className="size-16 sm:size-24 [@media(max-width:639px)_and_(min-height:800px)]:size-20"
+          border="purple"
           alt={t('vocabQuiz.mascot.alt')}
         />
       </span>

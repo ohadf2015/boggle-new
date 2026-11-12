@@ -18,7 +18,7 @@
 import type { ReactNode } from 'react';
 import { Flame, Star, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { flameScale } from './vocabQuizJuice';
@@ -89,19 +89,7 @@ export function VocabQuizStudentHeader({
       )}
 
       {!playing && (
-        <InteractiveMascot
-          variant={mascot}
-          sizeClassName="w-11 h-11"
-          clipShape="circle"
-          clipBorder="cyan"
-          clipBg="var(--neo-navy-elevated)"
-          animated
-          // A reaction, not a control: a tappable face inches from the answers is a mis-tap on a phone.
-          enableHover={false}
-          enableClick={false}
-          alt={t('vocabQuiz.mascot.alt')}
-          className="shrink-0"
-        />
+        <VocabQuizMascotFace face={mascot} className="size-11" bg="elevated" alt={t('vocabQuiz.mascot.alt')} />
       )}
 
       <div

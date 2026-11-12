@@ -15,7 +15,7 @@ import { m } from 'framer-motion';
 import { Check, Flame, Sparkles, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import { EDU_MOTION } from '@/components/education/motion/tokens';
 import { resolvePreset, useEduReducedMotion } from '@/lib/education/motion';
@@ -105,18 +105,7 @@ function VerdictFace({ mascot, reduced, t }: { mascot: ExtendedMascotVariant; re
       // Block, not inline: an inline span ignores size-* and the art spills out of the band.
       className="relative block size-14 shrink-0 sm:size-20"
     >
-      <InteractiveMascot
-        variant={mascot}
-        sizeClassName="size-full"
-        clipShape="circle"
-        clipBorder="white"
-        clipBg="bg-neo-navy"
-        // The pop is the motion here; an idle bob would be clipped by the verdict row.
-        animated={false}
-        enableHover={false}
-        enableClick={false}
-        alt={t('vocabQuiz.mascot.alt')}
-      />
+      <VocabQuizMascotFace face={mascot} className="size-full" border="white" alt={t('vocabQuiz.mascot.alt')} />
     </m.span>
   );
 }

@@ -19,7 +19,7 @@
 'use client';
 
 import { Flame, Sparkles } from 'lucide-react';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { isPerfectRound } from './vocabQuizJuice';
 
@@ -49,18 +49,11 @@ export function VocabQuizOwnFinale({ correct, total, bestStreak, t }: VocabQuizO
       // it still never squeezes below its own content in a thirty-name room.
       className="grow shrink-0 flex items-center gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 shadow-hard"
     >
-      <InteractiveMascot
-        variant={perfect ? 'celebration' : 'trophy'}
-        sizeClassName="w-24 h-24"
-        clipShape="rounded-square"
-        clipBorder="cyan"
-        clipBg="var(--neo-navy)"
-        animated
-        // A reaction, not a control — see VocabQuizStudentHeader.
-        enableHover={false}
-        enableClick={false}
+      <VocabQuizMascotFace
+        face={perfect ? 'celebration' : 'trophy'}
+        className="size-24"
+        shape="rounded-square"
         alt={t('vocabQuiz.finished.mascotAlt')}
-        className="shrink-0"
       />
 
       <div className="flex flex-col gap-2 min-w-0">
