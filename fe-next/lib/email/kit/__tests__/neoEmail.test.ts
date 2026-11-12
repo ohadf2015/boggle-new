@@ -72,4 +72,21 @@ describe('renderNeoEmail', () => {
     expect(html).not.toContain('Unsubscribe');
     expect(html.length).toBeLessThan(40_000);
   });
+
+  it('sets Japanese in a Japanese face with no Latin letter-spacing, and breaks headlines by phrase', () => {
+    const ja = renderNeoEmail({
+      ...base,
+      lang: 'ja',
+      kicker: 'ようこそ',
+      headline: '言葉のゲームが待っています',
+      blocks: [{ type: 'html', html: `<div style="font-family:'Arial Black',Arial,Helvetica,sans-serif;letter-spacing:1px;text-transform:uppercase;">どれから</div>` }],
+    });
+    for (const [, fam] of ja.matchAll(/font-family:([^;"]+)/g)) if (!fam.startsWith("'Arial Black',Arial,sans-serif")) expect(fam).toMatch(/^'Hiragino Kaku Gothic ProN'/);
+    expect(ja).not.toMatch(/letter-spacing:\s*[1-9]|text-transform:uppercase/);
+    expect(ja).toMatch(/<h1[^>]*word-break:auto-phrase/);
+    const en = renderNeoEmail(base);
+    expect(en).not.toContain('Hiragino');
+    expect(en).toContain('text-transform:uppercase');
+  });
 });
+
