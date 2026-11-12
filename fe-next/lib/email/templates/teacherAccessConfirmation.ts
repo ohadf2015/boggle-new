@@ -14,7 +14,7 @@ interface Args {
 }
 
 const SITE = EMAIL_SITE;
-const CONTACT = 'ohadf2015@gmail.com';
+const CONTACT = 'lexiclash.game@gmail.com';
 
 /** Source tag for the Teacher Pro line; the click goes through a cookie-free server hop. */
 export const APPROVAL_EMAIL_PRO_SOURCE = 'approval_email';

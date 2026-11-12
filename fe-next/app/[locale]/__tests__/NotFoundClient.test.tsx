@@ -23,7 +23,8 @@ vi.mock('@/components/ui/InteractiveMascot', () => ({
 vi.mock('@/lib/deploy/staleDeployReload', () => ({
   recoverFromStaleChunk: vi.fn(async () => {}),
   clearCachesAndReload: vi.fn(),
-  CHUNK_RECOVERY_GUARD_KEY: 'chunk-recovery-guard',
+  chunkReloadAlreadyHappened: () => false,
+  claimChunkRecoveryGuard: () => true,
 }));
 
 import NotFoundClient from '../NotFoundClient';

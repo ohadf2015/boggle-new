@@ -27,16 +27,16 @@ describe('TitlePicker', () => {
     // Given a level-12 player
     render(<TitlePicker userId="u1" level={12} />);
     // Then the two unlocked level titles are pickable
-    expect(screen.getByRole('radio', { name: 'home.titles.WORD_SEEKER' })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: 'home.titles.LETTER_SCOUT' })).toBeInTheDocument();
-    expect(screen.queryByRole('radio', { name: 'home.titles.VOCAB_WARRIOR' })).toBeNull();
+    expect(screen.getByRole('radio', { name: 'landing.home.titles.WORD_SEEKER' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: 'landing.home.titles.LETTER_SCOUT' })).toBeInTheDocument();
+    expect(screen.queryByRole('radio', { name: 'landing.home.titles.VOCAB_WARRIOR' })).toBeNull();
     // And the next title is teased with its level
     expect(screen.getByTestId('title-next-locked')).toHaveTextContent('"level":15');
   });
 
   it('picking a title saves it', () => {
     render(<TitlePicker userId="u1" level={12} />);
-    fireEvent.click(screen.getByRole('radio', { name: 'home.titles.WORD_SEEKER' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'landing.home.titles.WORD_SEEKER' }));
     expect(hook.value.save).toHaveBeenCalledWith('WORD_SEEKER');
   });
 

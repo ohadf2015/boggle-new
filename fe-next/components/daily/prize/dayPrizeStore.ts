@@ -17,7 +17,8 @@ const onScreen = new Set<DayPrizeKind>();
 export function claimPopupSlot(kind: DayPrizeKind, date: string = getDailyChallengeDate()): boolean {
   if (onScreen.has(kind)) return false;
   try {
-    if (localStorage.getItem(shownKey(kind, date)) || localStorage.getItem(openedKey(kind, date))) return false;
+    // One chest a day: once either box is open, neither pops again.
+    if (localStorage.getItem(shownKey(kind, date)) || localStorage.getItem(openedKey('clear', date)) || localStorage.getItem(openedKey('perfect', date))) return false;
     localStorage.setItem(shownKey(kind, date), '1');
   } catch {
     // storage off: still pop once per mount
@@ -51,7 +52,7 @@ export function rememberOpenedPrize(prize: DayPrizeClaimResponse, date: string =
 
 export type ClaimOutcome =
   | { ok: true; prize: DayPrizeClaimResponse }
-  | { ok: false; reason: 'not-cleared' | 'failed' };
+  | { ok: false; reason: 'not-cleared' | 'opened' | 'failed' };
 
 const ROUTES: Record<DayPrizeKind, string> = {
   clear: '/api/daily/day-clear/claim',
@@ -63,6 +64,8 @@ export async function claimDayPrize(kind: DayPrizeKind): Promise<ClaimOutcome> {
   try {
     const res = await postWithAuth(ROUTES[kind]);
     if (res.status === 400) return { ok: false, reason: 'not-cleared' };
+    // Today's chest was already opened as the other box (on another device, say).
+    if (res.status === 409) return { ok: false, reason: 'opened' };
     if (!res.ok) return { ok: false, reason: 'failed' };
     const body: unknown = await res.json();
     if (!isDayPrizeResponse(body)) return { ok: false, reason: 'failed' };
@@ -86,5 +89,24 @@ export async function fetchDayPrizeFixed(kind: DayPrizeKind): Promise<boolean | 
     return typeof body?.fixed === 'boolean' ? body.fixed : null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Today's chest as the server knows it: the opened prize (remembered on this
+ * device too), null when it is still shut, undefined when the server could not
+ * say. Lets a chest opened on another device, or before a reload, show as open.
+ */
+export async function fetchOpenedToday(): Promise<DayPrizeClaimResponse | null | undefined> {
+  try {
+    const res = await getWithAuth(ROUTES.clear);
+    if (!res.ok) return undefined;
+    const body = (await res.json()) as { opened?: unknown };
+    if (body?.opened === null || body?.opened === undefined) return null;
+    if (!isDayPrizeResponse(body.opened)) return undefined;
+    rememberOpenedPrize(body.opened);
+    return body.opened;
+  } catch {
+    return undefined;
   }
 }

@@ -113,7 +113,7 @@ describe('/api/cron/teacher-activation-nudge', () => {
     expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
     const mail = h.sendEmailSpy.mock.calls[0][0];
     expect(mail.to).toBe('ada@school.edu');
-    expect(mail.replyTo).toBe('ohadf2015@gmail.com');
+    expect(mail.replyTo).toBe('lexiclash.game@gmail.com');
     expect(mail.html).toContain('/en/teacher/classroom/new');
     expect(mail.html).toContain('Practice first with 3 bots');
     expect(h.tables.teacher_access_requests.data[0].activation_nudges_sent).toEqual(['d1', 'd3']);

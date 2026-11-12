@@ -8,7 +8,11 @@ import {
   stripChunkReloadParam,
   chunkReloadAlreadyHappened,
   claimChunkRecoveryGuard,
+  isBrowserOffline,
+  STALE_DEPLOY_UPDATE_EVENT,
+  CHUNK_RECOVERY_READY_FLAG,
 } from '@/lib/deploy/staleDeployReload';
+import { currentPathname, isLiveGamePath } from '@/lib/deploy/liveGamePaths';
 
 /**
  * ChunkErrorRecovery — surface-agnostic stale-deploy / CDN-missing chunk recovery.
@@ -22,15 +26,22 @@ import {
  * reloaded when `/api/version` proved a build mismatch. CDN / offline-shell
  * SWR / flaky-network 404s on a hashed asset are unrecoverable in place even
  * when the version endpoint agrees the build is "current", so we now force
- * ONE cache-busting hard navigation per session (same policy as retryImport
+ * ONE cache-busting hard navigation per build (same policy as retryImport
  * and the boot guard). Mounted once, app-wide, beside VersionChecker.
  */
 export default function ChunkErrorRecovery(): null {
   useEffect(() => {
     stripChunkReloadParam();
+    const flags = window as unknown as Record<string, unknown>;
+    flags[CHUNK_RECOVERY_READY_FLAG] = true;
 
     const attempt = (name: string | undefined, message: string | undefined): void => {
-      if (!isChunkLoadError(name, message)) return;
+      if (!isChunkLoadError(name, message) || isBrowserOffline()) return;
+      // A reload would drop the player's seat in a running game: offer the update banner instead.
+      if (isLiveGamePath(currentPathname())) {
+        window.dispatchEvent(new Event(STALE_DEPLOY_UPDATE_EVENT));
+        return;
+      }
       void recoverFromStaleChunk({
         clientBuildTime: process.env.NEXT_PUBLIC_BUILD_TIME,
         fetchServerBuildTime: async () => {
@@ -78,6 +89,7 @@ export default function ChunkErrorRecovery(): null {
     window.addEventListener('error', onError, true);
     window.addEventListener('unhandledrejection', onRejection);
     return () => {
+      flags[CHUNK_RECOVERY_READY_FLAG] = false;
       window.removeEventListener('error', onError, true);
       window.removeEventListener('unhandledrejection', onRejection);
     };

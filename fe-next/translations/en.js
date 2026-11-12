@@ -9,6 +9,11 @@ const en = {
     "duplicate": "Already yours · +{coins} coins",
     "wearIt": "See it on you",
     "oddsLabel": "Avatar part:",
+    "cosmeticChance": "{pct}% chance it's a tile skin or board theme instead",
+    "tileSkin": "Tile skin",
+    "boardTheme": "Board theme",
+    "useIt": "Use it",
+    "inUse": "In use",
     "weeklyTeaser": "Avatar part inside · {legendary}% legendary at {tier}",
     "chestOnly": "Chest exclusive",
     "chestOnlyHint": "Clear the daily quests and open chests to find it",
@@ -9148,6 +9153,7 @@ const en = {
   },
   "daily": {
     "qrWelcome": {
+      "warping": "Taking you to today's puzzle…",
       "badge": "Scanned",
       "line": "You scanned in. Today’s puzzle is ready."
     },
@@ -9191,6 +9197,7 @@ const en = {
     "modesPlayedCount": "{count} of 4 games today",
     "nextUp": "Next up",
     "dayPrize": {"title": "Day cleared!", "titlePerfect": "Perfect day!", "ready": "Your prize box is ready", "readyPerfect": "All four done. Bonus box unlocked", "tapToOpen": "Tap to open", "open": "Open it", "opening": "Opening...", "later": "Later", "collect": "Collect", "coins": "+{coins} coins", "xp": "+{xp} XP", "notYet": "Finish today's two puzzles to open it", "failed": "Couldn't open it right now. Try again from the daily page", "tier": {"common": "Nice!", "lucky": "Lucky!", "jackpot": "Jackpot!"}, "todayLine": "Nice work today.", "odds": "Box odds: {common}% Nice · {lucky}% Lucky · {jackpot}% Jackpot", "hubReady": "Today's prize box is waiting", "hubReadyPerfect": "Your perfect-day box is waiting", "hubOpened": "Today's box: +{coins} coins", "hubOpenedPerfect": "Perfect-day box: +{coins} coins", "oneToGo": "1 more for today's prize", "guestNudge": "Sign in to open a daily prize box, up to {coins} coins"},
+    "todayChest": {"title": "Today's chest", "and": " and ", "locked": "Finish {modes} to open it", "progress": "{done}/{total}", "ready": "Today's chest is ready", "readyBig": "Big chest ready: all four done!", "upgradeHint": "Finish the bonus puzzles first for a bigger chest", "opened": "Today's chest: +{coins} coins", "alreadyOpen": "You already opened today's chest. Come back tomorrow for a new one.", "upgradeLater": "Or finish the bonus puzzles first for a bigger chest.", "next": "Next in {time}"},
     "allClearToday": "Today's board is clear. See you tomorrow.",
     "allClear": {
       "title": "All clear!",

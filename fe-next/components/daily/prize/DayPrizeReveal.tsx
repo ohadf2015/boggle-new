@@ -12,9 +12,10 @@ import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { dayPrizeOddsPct, type DayPrizeClaimResponse, type DayPrizeKind, type DayPrizeTier } from '@/lib/daily/dayPrize';
 import { claimDayPrize, fetchDayPrizeFixed, readOpenedPrize } from './dayPrizeStore';
-import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize';
+import ChestItemPrize from '@/components/avatar/chest/ChestItemPrize';
 import ChestPartOdds from '@/components/avatar/chest/ChestPartOdds';
-import { isChestPartDrop, type ChestDropSource } from '@/lib/avatar/chestDrops';
+import { isChestItemDrop, type ChestDropSource } from '@/lib/avatar/chestDrops';
+import { revalidateDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 
 const PART_SOURCE: Record<DayPrizeKind, ChestDropSource> = { clear: 'day_clear', perfect: 'day_perfect' };
 
@@ -54,7 +55,7 @@ function celebrate(tier: DayPrizeTier): void {
   }
 }
 
-type Phase = 'closed' | 'opening' | 'open' | 'not-cleared' | 'failed';
+type Phase = 'closed' | 'opening' | 'open' | 'not-cleared' | 'opened' | 'failed';
 
 interface DayPrizeRevealProps {
   kind: DayPrizeKind;
@@ -123,6 +124,9 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
     if (!mounted.current) return;
     if (!outcome.ok) {
       setPhase(outcome.reason);
+      // The page thought the day was done and the server disagrees: re-read
+      // played state so the hub stops offering a box it cannot open.
+      if (outcome.reason === 'not-cleared') void revalidateDailyPlayedStatus();
       return;
     }
     setPrize(outcome.prize);
@@ -229,8 +233,8 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
               <span ref={coinsRef} data-testid="day-prize-coins">{t('daily.dayPrize.coins', { coins: prize.coins })}</span>
             </h2>
             <p className="text-xs font-black text-neo-lime">{t('daily.dayPrize.xp', { xp: prize.xp })}</p>
-            {isChestPartDrop(prize.part) ? (
-              <ChestPartPrize drop={prize.part} source={PART_SOURCE[kind]} autoReveal={freshOpen} />
+            {isChestItemDrop(prize.part) ? (
+              <ChestItemPrize drop={prize.part} source={PART_SOURCE[kind]} autoReveal={freshOpen} />
             ) : (
               <p className="text-sm font-bold text-neo-cream" data-testid="day-prize-line">{t('daily.dayPrize.todayLine')}</p>
             )}
@@ -249,11 +253,16 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
             <h2 id="day-prize-title" className="font-neo-display font-black text-2xl text-neo-white">
               {phase === 'not-cleared'
                 ? t('daily.dayPrize.notYet')
-                : phase === 'failed'
+                : phase === 'opened'
+                  ? t('daily.todayChest.alreadyOpen')
+                  : phase === 'failed'
                   ? t('daily.dayPrize.failed')
                   : t(kind === 'perfect' ? 'daily.dayPrize.readyPerfect' : 'daily.dayPrize.ready')}
             </h2>
             {phase === 'closed' && oddsLine}
+            {phase === 'closed' && kind === 'clear' && (
+              <p data-testid="day-prize-upgrade-hint" className="text-xs font-bold text-neo-cream">{t('daily.todayChest.upgradeLater')}</p>
+            )}
             {phase === 'closed' || phase === 'opening' ? (
               <button
                 type="button"

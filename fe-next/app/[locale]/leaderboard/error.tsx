@@ -5,6 +5,8 @@ import { captureError } from '@/utils/sentry';
 import { Mascot } from '@/components/ui/Mascot';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
+import { useStaleDeployRecovery } from '@/lib/deploy/useStaleDeployRecovery';
+import { StaleDeployScreen } from '@/components/deploy/StaleDeployScreen';
 
 type SupportedLocale = Language;
 
@@ -43,7 +45,18 @@ export default function LeaderboardError({
     captureError(error, { errorBoundary: { type: 'leaderboard-error', digest: error.digest } });
   }, [error]);
 
+  const { state, refresh } = useStaleDeployRecovery(error, { autoReload: true });
   const locale = getLocale();
+
+  if (state !== 'not-stale') {
+    return (
+      <StaleDeployScreen
+        locale={locale}
+        onRefresh={refresh}
+        mascot={<Mascot variant="oops" size="xs" animated={false} className="mx-auto mb-4" />}
+      />
+    );
+  }
 
   return (
     <div className="flex-1 bg-neo-navy">

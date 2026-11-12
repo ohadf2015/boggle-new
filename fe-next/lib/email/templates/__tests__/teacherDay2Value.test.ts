@@ -33,7 +33,7 @@ describe('teacherDay2Value', () => {
     expect(html).toContain(esc(day2UpgradeUrl('en')));
     expect(html).toContain('$9');
     expect(html).toContain('Ada');
-    expect(replyTo).toBe('ohadf2015@gmail.com');
+    expect(replyTo).toBe('lexiclash.game@gmail.com');
   });
 
   it('renders Hebrew RTL and does not fall back to the English lead', () => {

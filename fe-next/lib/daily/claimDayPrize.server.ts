@@ -3,9 +3,9 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser'
 import { createAdminClient } from '@/utils/supabase/admin'
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils'
 import { awardCoinsServer, type AwardCoinsReason } from '@/backend/services/economy/awardCoins'
-import { eduDayPrize, rollDayPrize, type DayPrizeKind } from '@/lib/daily/dayPrize'
+import { eduDayPrize, rollDayPrize, type DayPrizeClaimResponse, type DayPrizeKind } from '@/lib/daily/dayPrize'
 import logger from '@/utils/logger'
-import { grantChestPart } from '@/lib/avatar/grantChestPart.server'
+import { grantChestPart, readChestPart } from '@/lib/avatar/grantChestPart.server'
 import type { ChestDropSource } from '@/lib/avatar/chestDrops'
 
 /** Attempt tables per daily mode, the same ones /api/daily/status reads. */
@@ -34,8 +34,9 @@ type AdminClient = NonNullable<ReturnType<typeof createAdminClient>>
 
 /**
  * Play inside the education system: a teacher account, or a student in any
- * classroom. Those players get the fixed prize (no roll). A failed lookup
- * throws, so the claim answers 500 rather than guessing.
+ * classroom. Those players get the fixed prize (no roll). Admins always get
+ * the normal box, even when they joined classrooms to test them. A failed
+ * lookup throws, so the claim answers 500 rather than guessing.
  */
 async function isEducationAccount(supabase: AdminClient, userId: string): Promise<boolean> {
   const [profile, membership] = await Promise.all([
@@ -45,17 +46,55 @@ async function isEducationAccount(supabase: AdminClient, userId: string): Promis
   if (profile.error) throw new Error(`profiles: ${profile.error.message}`)
   if (membership.error) throw new Error(`classroom_memberships: ${membership.error.message}`)
   const role = (profile.data?.[0] as { user_role?: string } | undefined)?.user_role
+  if (role === 'admin') return false
   return role === 'teacher' || (membership.data?.length ?? 0) > 0
 }
 
-/** GET on either claim route: whether this player's box is the fixed one, so the closed box can drop the shake and odds. */
+/**
+ * Today's chest if it was already opened (as either box), rebuilt from its
+ * claim row: coins and XP as paid, the tier from the same seeded roll, and the
+ * item from the drop ledger. Lets every device show "opened" after a reload.
+ */
+async function openedToday(supabase: AdminClient, userId: string, today: string, fixed: boolean): Promise<DayPrizeClaimResponse | null> {
+  for (const kind of ['perfect', 'clear'] as const) {
+    const { data, error } = await supabase
+      .from(DAY_PRIZE_CONFIG[kind].claimTable)
+      .select('coins, xp')
+      .eq('player_id', userId)
+      .eq('claim_date', today)
+      .limit(1)
+    if (error) throw new Error(`${DAY_PRIZE_CONFIG[kind].claimTable}: ${error.message}`)
+    const row = data?.[0] as { coins: number; xp: number } | undefined
+    if (!row) continue
+    const roll = fixed ? eduDayPrize(kind) : rollDayPrize(userId, today, kind)
+    const part = fixed ? null : await readChestPart(supabase, userId, PART_SOURCE[kind], today)
+    return {
+      kind,
+      tier: roll.coins === row.coins ? roll.tier : 'common',
+      coins: row.coins,
+      xp: row.xp,
+      fixed,
+      claimed: false,
+      ...(part ? { part } : {}),
+    }
+  }
+  return null
+}
+
+/**
+ * GET on either claim route: whether this player's box is the fixed one (so
+ * the closed box can drop the shake and odds), and today's chest if it is
+ * already open.
+ */
 export async function handleDayPrizeMode(request: NextRequest): Promise<NextResponse> {
   try {
     const user = await getAuthedUser(request)
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const supabase = createAdminClient()
     if (!supabase) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-    return NextResponse.json({ fixed: await isEducationAccount(supabase, user.id) })
+    const fixed = await isEducationAccount(supabase, user.id)
+    const opened = await openedToday(supabase, user.id, getDailyChallengeDate(), fixed)
+    return NextResponse.json({ fixed, opened }, { headers: { 'Cache-Control': 'private, no-store' } })
   } catch (error) {
     logger.error('Daily prize mode error:', error instanceof Error ? error.message : String(error))
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -103,6 +142,20 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
   )
   if (!played.every(Boolean)) {
     return NextResponse.json({ error: 'Day not cleared' }, { status: 400 })
+  }
+
+  // One chest a day: the day-clear box, or the bigger perfect-day box when all
+  // four were done before opening. Once either is open, the other stays shut.
+  const other = DAY_PRIZE_CONFIG[kind === 'clear' ? 'perfect' : 'clear']
+  const { data: otherRows, error: otherError } = await supabase
+    .from(other.claimTable)
+    .select('claim_date')
+    .eq('player_id', user.id)
+    .eq('claim_date', today)
+    .limit(1)
+  if (otherError) throw new Error(`${other.claimTable}: ${otherError.message}`)
+  if ((otherRows?.length ?? 0) > 0) {
+    return NextResponse.json({ error: "Today's chest is already open" }, { status: 409 })
   }
 
   const prize = (await isEducationAccount(supabase, user.id)) ? eduDayPrize(kind) : rollDayPrize(user.id, today, kind)

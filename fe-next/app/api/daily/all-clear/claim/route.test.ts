@@ -53,7 +53,6 @@ function setup(o: Opts = {}) {
   const del = vi.fn(() => delChain)
   const rpc = vi.fn().mockResolvedValue({ error: null })
   const from = vi.fn((table: string) => {
-    if (table === 'daily_all_clear_claims') return { insert, delete: del }
     const rows = extraRows[table] ?? (byTable[table] ? [{ puzzle_date: '2026-11-03' }] : [])
     const chain: any = {
       select: vi.fn(() => chain),
@@ -61,6 +60,8 @@ function setup(o: Opts = {}) {
       limit: vi.fn(() => chain),
       then: (ok: any) => Promise.resolve({ data: rows, error: null }).then(ok),
     }
+    // The claim table is written (insert / delete) and, by GET, read for today's open box.
+    if (table === 'daily_all_clear_claims') return { ...chain, insert, delete: del }
     return chain
   })
   vi.mocked(createAdminClient).mockReturnValue({ from, rpc } as never)
@@ -130,9 +131,9 @@ describe('POST /api/daily/all-clear/claim', () => {
 
   it('Given a regular player, Then GET says the box is random; for the education side it says fixed', async () => {
     setup()
-    expect(await (await GET(req())).json()).toEqual({ fixed: false })
+    expect(await (await GET(req())).json()).toEqual({ fixed: false, opened: null })
     setup({ edu: 'student' })
-    expect(await (await GET(req())).json()).toEqual({ fixed: true })
+    expect(await (await GET(req())).json()).toEqual({ fixed: true, opened: null })
     setup({ user: null })
     expect((await GET(req())).status).toBe(401)
   })

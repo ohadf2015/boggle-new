@@ -386,6 +386,8 @@ export type GrowthEvent =
   | 'streak_freeze_saved'
   // Avatar part out of a reward chest (components/avatar/chest).
   | 'avatar_chest_part_shown'
+  | 'chest_cosmetic_shown'
+  | 'chest_cosmetic_equipped'
   | 'level_up'
   | 'title_picked'
   | 'avatar_chest_part_reveal_open'

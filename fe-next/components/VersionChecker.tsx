@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import NavigationContext from '@/contexts/NavigationContext';
 import { useVisibilityPausedInterval } from '@/hooks/useVisibilityPausedInterval';
+import { STALE_DEPLOY_UPDATE_EVENT, clearCachesAndReload } from '@/lib/deploy/staleDeployReload';
 
 /**
  * VersionChecker Component
@@ -12,7 +13,7 @@ import { useVisibilityPausedInterval } from '@/hooks/useVisibilityPausedInterval
  * 1. Checks build time on server every 5 minutes
  * 2. If build time differs, raises a "new version available" flag
  * 3. Shows a manual "Refresh" button — NEVER auto-reloads
- * 4. On click: clears ALL caches, unregisters the service worker, reloads
+ * 4. On click: purges caches + service worker and reloads with the cache-busting marker
  *
  * Mid-gameplay guard: when NavigationContext reports `isInGame`, the refresh
  * button is hidden entirely so an active round (e.g. a multiplayer game) is
@@ -63,39 +64,23 @@ export function VersionChecker() {
 
   const forceUpdate = useCallback(async () => {
     console.log('[Version] Force updating to new version...');
-
     try {
-      // Step 1: Clear ALL caches
-      if ('caches' in window) {
-        const cacheKeys = await caches.keys();
-        await Promise.all(
-          cacheKeys
-            .filter(key => key.startsWith('lexiclash-'))
-            .map(key => caches.delete(key))
-        );
-        console.log('[Version] Cleared caches:', cacheKeys.length);
-      }
-
-      // Step 2: Unregister ALL service workers
-      if ('serviceWorker' in navigator) {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map(reg => reg.unregister()));
-        console.log('[Version] Unregistered service workers:', registrations.length);
-      }
-
-      // Step 3: Set flag to prevent reload loop
       sessionStorage.setItem('lexiclash-force-updated', 'true');
-
-      // Step 4: Force reload (hard reload to bypass any remaining cache)
-      window.location.reload();
-    } catch (error) {
-      console.error('[Version] Force update failed:', error);
-      // Fallback: Just reload without cache clearing
-      window.location.reload();
+    } catch {
+      /* storage blocked: the poll just runs again after the reload */
     }
+    // Same purge + cache-busting reload as the error pages; the one-reload mark is build-scoped, so the new build keeps its own.
+    await clearCachesAndReload();
   }, []);
 
   const [pollEnabled, setPollEnabled] = useState(false);
+
+  // A chunk that failed on a live game page asks for this banner instead of reloading the page.
+  useEffect(() => {
+    const onStaleDeploy = () => setNewVersionAvailable(true);
+    window.addEventListener(STALE_DEPLOY_UPDATE_EVENT, onStaleDeploy);
+    return () => window.removeEventListener(STALE_DEPLOY_UPDATE_EVENT, onStaleDeploy);
+  }, []);
 
   useEffect(() => {
     // Don't check if we just force-updated (prevent reload loop)

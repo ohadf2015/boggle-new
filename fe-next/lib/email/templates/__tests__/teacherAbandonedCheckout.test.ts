@@ -10,7 +10,7 @@ describe('teacherAbandonedCheckout', () => {
     expect(html).toContain(escapeHtml(abandonedCheckoutUpgradeUrl('en')));
     expect(html).toContain('Maya');
     expect(html).toContain('$9');
-    expect(replyTo).toBe('ohadf2015@gmail.com');
+    expect(replyTo).toBe('lexiclash.game@gmail.com');
   });
 
   it('talks about the free trial when that is what they started', () => {
