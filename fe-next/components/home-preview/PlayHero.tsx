@@ -107,7 +107,10 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
         </span>
       </div>
       {avatar && (
-        <div className="absolute end-1 bottom-2 z-20 [@media(max-height:700px)]:end-7 [@media(max-height:700px)]:bottom-8 lg:-end-4 lg:bottom-6">
+        // The pencil sits just outside the face's lower-end rim, never on it. On a
+        // short phone the avatar renders at 0.7 (its circle is inset ~16px in the
+        // unscaled box), so the badge steps in with it, still outside the circle.
+        <div className="absolute -end-3 -bottom-3 z-20 [@media(max-height:700px)]:end-0 [@media(max-height:700px)]:bottom-0 lg:-end-4 lg:bottom-6">
           <div ref={editSlotCallback} data-testid="hp-edit-avatar-slot" />
         </div>
       )}

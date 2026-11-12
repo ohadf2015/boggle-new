@@ -14,6 +14,13 @@
   .mp-arena-tail-inner { display: none; }
 }
 
+/* The empty state (ArenaEmptyState.tsx) is a size container so its mascot can
+   grow with the height the list leaves it (cqh), instead of sitting small in a
+   tall dashed box. Its min-height keeps the contents fitting when it is short. */
+.mp-arena-empty {
+  container-type: size;
+}
+
 /* The language chips scroll sideways on narrow phones without a visible bar;
    the row fades out at its inline end, so a chip cut by the edge reads as
    "more this way" rather than as a clipped button. */
