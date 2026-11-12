@@ -30,6 +30,12 @@ describe('RehearsalBotsBlocked', () => {
     expect(switchTo).toHaveBeenCalledWith('classic');
   });
 
+  it('Given the Start bar already explains the wait, When the note is turned off, Then only the Classic offer shows', () => {
+    render(<RehearsalBotsBlocked gameCode="AB12CD" currentMode="wordcraft" t={t} onApplied={vi.fn()} onRehearse={vi.fn()} showNote={false} />);
+    expect(screen.queryByText('education.projectorLobby.rehearseBotsBlocked')).toBeNull();
+    expect(screen.getByTestId('rehearsal-use-classic')).toBeInTheDocument();
+  });
+
   it('Given the teacher asked for Classic, When the server confirms, Then the rehearsal starts', () => {
     const onApplied = vi.fn();
     const onRehearse = vi.fn();

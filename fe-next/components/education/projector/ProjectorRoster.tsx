@@ -85,6 +85,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   const arrivals = useArrivals(names, playPlayerJoinedSound);
   const [editing, setEditing] = useState(false);
   const [pending, setPending] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const canEdit = !!onRemove && students.length > 0;
   const onlyBots = students.length > 0 && students.every((s) => s.isBot);
 
@@ -148,12 +149,13 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
               className="pointer-events-none size-[clamp(4rem,min(16cqw,18cqh),12rem)] select-none @max-md:hidden"
             />
             <p className="font-neo-display font-bold text-neo-cream text-[clamp(1.125rem,min(3.6cqw,3.4cqh),2.5rem)]">{t('eduLiveRoom.lobby.waitingTitle')}</p>
-            <p className="max-w-[34ch] font-neo-body text-neo-cream/75 @max-md:hidden text-[clamp(0.875rem,min(1.9cqw,2.2cqh),1.5rem)]">{t('eduLiveRoom.lobby.waitingHint')}</p>
+            <p className="max-w-[34ch] font-neo-body text-neo-cream/75 text-[clamp(0.875rem,min(1.9cqw,2.2cqh),1.5rem)]">{t('eduLiveRoom.lobby.waitingHint')}</p>
             {emptyActions}
           </div>
         </div>
       ) : (
         <ul
+          id="projector-roster-list"
           data-testid="projector-roster-list"
           data-burst={arrivals.still.size > 0 ? 'true' : 'false'}
           className={cn('grid min-h-0 flex-1 auto-rows-min content-start pe-1 pt-1', tier.grid, tier.scrolls ? 'overflow-y-auto' : 'overflow-visible')}
@@ -177,7 +179,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                   !arrivals.still.has(student.username) && 'motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
                   tier.chip,
                   STUDENT_CHIP,
-                  index >= PHONE_VISIBLE && '@max-md:hidden'
+                  index >= PHONE_VISIBLE && !showAll && '@max-md:hidden'
                 )}
               >
                 <span aria-hidden="true" className="inline-flex size-[1.5em] shrink-0 overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-cream">
@@ -217,11 +219,16 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             );
           })}
           {students.length > PHONE_VISIBLE && (
-            <li
-              data-testid="projector-more-joined"
-              className={cn('hidden items-center justify-center rounded-full font-neo-display font-bold leading-none @max-md:flex', tier.chip, STUDENT_CHIP)}
-            >
-              {t('eduLiveRoom.lobby.moreJoined', { count: students.length - PHONE_VISIBLE })}
+            <li data-testid="projector-more-joined" className="hidden @max-md:flex">
+              <button
+                type="button"
+                aria-expanded={showAll}
+                aria-controls="projector-roster-list"
+                onClick={() => setShowAll((v) => !v)}
+                className={cn('flex w-full items-center justify-center rounded-full font-neo-display font-bold leading-none', tier.chip, STUDENT_CHIP, PRESS)}
+              >
+                {showAll ? t('eduLiveRoom.lobby.showFewer') : t('eduLiveRoom.lobby.moreJoined', { count: students.length - PHONE_VISIBLE })}
+              </button>
             </li>
           )}
         </ul>
