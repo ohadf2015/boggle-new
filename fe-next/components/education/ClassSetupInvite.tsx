@@ -34,7 +34,7 @@ import { SavedListCard } from '@/components/teacher/setup/SavedListCard';
 import { useSavedList } from '@/components/teacher/setup/useSavedList';
 import { firstGameIntent, readPasted, sameWords, type FirstGameChoice } from '@/components/teacher/setup/firstGameLaunch';
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
-import { FirstGamePlanCard } from '@/components/education/FirstGamePlanCard';
+import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
 import { useInviteShare } from './useInviteShare';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
@@ -189,21 +189,24 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
           />
         }
         plan={
-          origin && joinUrl ? (
-            <FirstGamePlanCard
-              classroom={classroom}
-              joinUrl={joinUrl}
-              origin={origin}
-              language={language}
-              t={t}
-              className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
-              onSendHomeLink={
-                hasWordList
-                  ? () => void share('native', { url: joinUrl, text: t('teacher.classroom.shareInviteText', { name: classroom.name, code: classroom.join_code }) })
-                  : undefined
-              }
-            />
-          ) : null
+          <ClassSetupInvitePlan
+            classroomId={classroom.id}
+            calendar={
+              origin && joinUrl
+                ? {
+                    classroom,
+                    joinUrl,
+                    origin,
+                    language,
+                    onSendHomeLink: hasWordList
+                      ? () => void share('native', { url: joinUrl, text: t('teacher.classroom.shareInviteText', { name: classroom.name, code: classroom.join_code }) })
+                      : undefined,
+                  }
+                : null
+            }
+            t={t}
+            className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
+          />
         }
         footer={
           <ClassCreatedAsk

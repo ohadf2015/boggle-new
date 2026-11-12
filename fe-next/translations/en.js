@@ -16446,6 +16446,14 @@ const en = {
       "approval_pending_back": "Back to the form",
       "pending_title": "Your request is still finishing",
       "pending_body": "We have your request. Approval is taking longer than usual, so check back in a minute.",
+      "load_error_title": "We couldn't check your teacher account",
+      "load_error_body": "That's on our side, not yours. Try again, and if it keeps happening, reload the page.",
+      "load_error_retry": "Try again",
+      "pending_finish_body": "We have your request, but approval didn't finish on our side. Tap below and we'll finish it now.",
+      "pending_finish_cta": "Finish my teacher access",
+      "pending_still": "It's still finishing. We've let the team know, so try again in a few minutes.",
+      "pending_meanwhile": "While you wait, you can look through the games your class will play.",
+      "pending_meanwhile_link": "See the games",
       "declined_title": "Your request was not approved",
       "declined_reapply": "You can submit another application anytime. Let us know if you have questions.",
       "submitted_on": "Submitted",
@@ -21250,7 +21258,9 @@ const en = {
         "error": "That didn't save. Check your connection and try again.",
         "retry": "Try again",
         "tooSoon": "Pick a time at least 30 minutes from now.",
-        "tooFar": "Pick a time within the next 60 days."
+        "tooFar": "Pick a time within the next 60 days.",
+        "setupTitle": "When is your next lesson with this class?",
+        "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class."
       },
       "keepOpen": {
         "cta": "Keep it open as homework for a week",
@@ -21623,7 +21633,7 @@ const en = {
       "noAccount": "Students join with no account",
       "showProjector": "Show on projector",
       "backHome": "Back to Home",
-      "plan": {"title": "Not with your class right now?", "body": "Put the first game on your calendar. The event has the student join link and a one-tap Start, so it's ready when your class is.", "when": "When's your class?", "google": "Add to Google Calendar", "ics": "Apple or Outlook (.ics)", "added": "On your calendar. See you in class!", "eventTitle": "LexiClash word game with {name}", "eventStudents": "Students join here, no account: {url} (code {code})", "eventStart": "Start the game: {url}", "homeTitle": "Or send the link now.", "homeBody": "Students who join from home practise this class's word list.", "homeCta": "Send the link"},
+      "plan": {"title": "Not with your class right now?", "body": "Put the first game on your calendar. The event has the student join link and a one-tap Start, so it's ready when your class is.", "when": "When's your class?", "google": "Add to Google Calendar", "ics": "Apple or Outlook (.ics)", "added": "On your calendar. See you in class!", "eventTitle": "LexiClash word game with {name}", "eventStudents": "Students join here, no account: {url} (code {code})", "eventStart": "Start the game: {url}", "homeTitle": "Or send the link now.", "homeBody": "Students who join from home practise this class's word list.", "homeCta": "Send the link", "calendarToggle": "Add it to my calendar instead"},
       "firstRound": {
         "title": "Run your first round: 2 minutes",
         "step1": "Practice alone against bots (private, no students)",

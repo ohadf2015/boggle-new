@@ -32,6 +32,7 @@ vi.mock('@/components/teacher/hq/HqProjectorSheet', () => ({ HqProjectorSheet: (
 vi.mock('@/components/teacher/home/RehearseWithBotsButton', () => ({ RehearseWithBotsButton: () => null }));
 vi.mock('@/components/education/results/ResultsTeacherProTrialCard', () => ({ ResultsTeacherProTrialCard: () => <div data-testid="pro-trial-card" />, CLASS_CREATED_TRIAL_PLACEMENT: 'class_created' }));
 vi.mock('@/components/education/EduMascot', () => ({ EduMascot: () => null }));
+vi.mock('@/components/education/LessonPlanPrompt', () => ({ LessonPlanPrompt: () => null }));
 const single = vi.hoisted(() => ({ getClassroom: vi.fn() }));
 const nav = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }));
 const lessons = vi.hoisted(() => ({ createLesson: vi.fn(), assign: vi.fn(), get: vi.fn(), countAssigned: vi.fn() }));
@@ -425,53 +426,6 @@ describe('ClassSetupInvite', () => {
       expect(storedIntent()).toMatchObject({ source: 'paste', mode: 'classic', classroomId: 'c1' });
       expect(storedIntent().words).toHaveLength(10);
     });
-  });
-
-  it('Given nobody has joined yet, Then a calendar card offers to put the first game on the teacher\'s calendar', () => {
-    render(<ClassSetupInvite classroomId="c1" />);
-    expect(screen.getByTestId('first-game-plan')).toHaveTextContent('eduShell.setup.plan.title');
-  });
-
-  it('Given the class already has its word list, Then the card also offers to send the link for practice at home', () => {
-    render(<ClassSetupInvite classroomId="c1" lessonId="L1" />);
-    expect(screen.getByTestId('first-game-plan-home')).toBeInTheDocument();
-  });
-
-  it('Given the class already has its word list, Then it does not ask the database again', () => {
-    render(<ClassSetupInvite classroomId="c1" lessonId="L1" />);
-    expect(lessons.countAssigned).not.toHaveBeenCalled();
-  });
-
-  it('Given the teacher comes back from the calendar or a reminder email (no lessonId) and the class has a word list, Then the home-practice offer shows', async () => {
-    lessons.countAssigned.mockResolvedValue(1);
-    render(<ClassSetupInvite classroomId="c1" />);
-    expect(await screen.findByTestId('first-game-plan-home')).toBeInTheDocument();
-    expect(lessons.countAssigned).toHaveBeenCalledWith(['c1']);
-  });
-
-  it('Given no word list saved to the class, Then no home-practice offer shows', async () => {
-    render(<ClassSetupInvite classroomId="c1" />);
-    await waitFor(() => expect(lessons.countAssigned).toHaveBeenCalled());
-    expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
-  });
-
-  it('Given the word-list check fails, Then no home-practice offer shows', async () => {
-    lessons.countAssigned.mockResolvedValue(null);
-    render(<ClassSetupInvite classroomId="c1" />);
-    await waitFor(() => expect(lessons.countAssigned).toHaveBeenCalled());
-    expect(screen.queryByTestId('first-game-plan-home')).toBeNull();
-  });
-
-  it('Given a student has joined, Then the calendar card is gone: the class is in the room', () => {
-    roster.current = { students: [{ id: 's1', name: 'Noa', avatar: null }], loading: false, arrivals: [] };
-    render(<ClassSetupInvite classroomId="c1" />);
-    expect(screen.queryByTestId('first-game-plan')).toBeNull();
-  });
-
-  it('Given the roster is still loading, Then no calendar card flashes in before the count is known', () => {
-    roster.current = { students: [], loading: true, arrivals: [] };
-    render(<ClassSetupInvite classroomId="c1" />);
-    expect(screen.queryByTestId('first-game-plan')).toBeNull();
   });
 
   it('Given an unknown class id, Then after the one lookup it says so and links to the class list', async () => {

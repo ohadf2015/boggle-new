@@ -9,6 +9,7 @@ import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotic
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { AccessApprovedCard } from './AccessApprovedCard';
+import { AccessPendingCard } from './AccessPendingCard';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
@@ -31,7 +32,7 @@ const STEPS = [
 
 export function PageClient() {
   const { t, language } = useLanguage();
-  const { status, latestRequest, hasAccess, trial, isLoading } = useTeacherAccess();
+  const { status, latestRequest, hasAccess, trial, isLoading, error: lookupError, retry } = useTeacherAccess();
   // A Pro teacher keeps the trial deadline Pro replaced — never show her the
   // trial upsell, and show nothing until the entitlement has answered.
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -43,7 +44,7 @@ export function PageClient() {
   // Same predicate TeacherGate admits on, so the two can never bounce each other.
   // Only a TeacherGate bounce (`?from=`) auto-continues: a teacher bounced while
   // auth was settling, or who signed in here, returns to where they were headed.
-  // Direct visits from marketing CTAs keep the approved card.
+  // Without one, an approved teacher is sent on from the approved card (see AccessApprovedCard).
   const returnTo = accessReturnPath(redirectedFrom);
   // A teacher approved on this visit: this page alone navigates, once the profile re-read lands,
   // and the "already approved" card never gets a frame in between.
@@ -81,8 +82,11 @@ export function PageClient() {
   // `'none'`). Field CLS 0.30 on this route was the short loading column
   // swapping into the wide hero+gate layout. The gate itself still waits.
   const handingOff = approval !== null;
-  const showPitch = handingOff || (status === 'none' && !hasAccess);
-  const approved = !handingOff && !isLoading && (hasAccess || status === 'approved');
+  const failed = !handingOff && Boolean(lookupError);
+  const showPitch = handingOff || (!failed && status === 'none' && !hasAccess);
+  const approved = !handingOff && !failed && !isLoading && hasAccess;
+  // A request approved while the account kept its old role would bounce between the gate and here, so it finishes like a pending one.
+  const unfinished = !handingOff && !failed && !isLoading && !hasAccess && (status === 'pending' || status === 'approved');
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
   // an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
@@ -101,6 +105,18 @@ export function PageClient() {
     >
       <PageLoader size="md" text={t('education.access.class_ready_creating')} />
     </div>
+  ) : failed ? (
+    <div data-testid="access-load-error" role="alert" className="rounded-neo border-neo-thick border-neo-black bg-neo-purple p-6 text-neo-white shadow-hard-lg">
+      <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">{t('education.access.load_error_title')}</h2>
+      <p className="mt-2">{t('education.access.load_error_body')}</p>
+      <button
+        type="button"
+        onClick={retry}
+        className="mt-4 inline-flex min-h-11 items-center rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+      >
+        {t('education.access.load_error_retry')}
+      </button>
+    </div>
   ) : (
     <>
       {isLoading && (
@@ -111,20 +127,7 @@ export function PageClient() {
         />
       )}
 
-      {!isLoading && status === 'pending' && (
-        <div className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-6 text-neo-navy shadow-hard-lg">
-          <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
-            {t('education.access.pending_title')}
-          </h2>
-          <p className="mt-2 text-neo-navy/90">{t('education.access.pending_body')}</p>
-          {latestRequest?.created_at && (
-            <p className="mt-2 text-sm font-semibold text-neo-navy/70">
-              {t('education.access.submitted_on')}:{' '}
-              {new Date(latestRequest.created_at).toLocaleString(language)}
-            </p>
-          )}
-        </div>
-      )}
+      {unfinished && <AccessPendingCard request={latestRequest} onApproved={setApproval} />}
 
       {!isLoading && status === 'declined' && (
         <div className="rounded-neo border-neo-thick border-neo-black bg-neo-pink p-6 text-neo-white shadow-hard-lg">
@@ -173,7 +176,7 @@ export function PageClient() {
       <EducationShell header={<LandingHeader showStart={false} />} contentClassName="flex flex-col">
         <main className="flex flex-1 flex-col text-neo-white">
           <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 pb-10 pt-16">
-            <AccessApprovedCard trial={trial} showTrial={!hasPro && !proLoading} />
+            <AccessApprovedCard trial={trial} showTrial={!hasPro && !proLoading} autoContinue={!returnTo} />
           </section>
         </main>
       </EducationShell>

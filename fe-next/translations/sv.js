@@ -18494,6 +18494,14 @@ const sv = {
       "approval_pending_back": "Tillbaka till formuläret",
       "pending_title": "Din ansökan granskas",
       "pending_body": "Vi har tagit emot din ansökan och mejlar dig snart.",
+      "load_error_title": "Vi kunde inte kolla ditt lärarkonto",
+      "load_error_body": "Felet ligger hos oss, inte hos dig. Försök igen, och ladda om sidan om det fortsätter.",
+      "load_error_retry": "Försök igen",
+      "pending_finish_body": "Vi har din ansökan, men godkännandet blev aldrig klart hos oss. Tryck nedan så gör vi klart det nu.",
+      "pending_finish_cta": "Gör klart min lärarbehörighet",
+      "pending_still": "Det håller fortfarande på. Vi har sagt till teamet, så försök igen om några minuter.",
+      "pending_meanwhile": "Medan du väntar kan du kika på spelen som klassen kommer att spela.",
+      "pending_meanwhile_link": "Se spelen",
       "declined_title": "Din ansökan avslogs denna gång",
       "declined_reapply": "Du kan ansöka igen senare. Fler frågor? Mejla oss.",
       "submitted_on": "Skickad",
@@ -22205,7 +22213,9 @@ const sv = {
         "error": "Det gick inte att spara. Kolla anslutningen och försök igen.",
         "retry": "Försök igen",
         "tooSoon": "Välj en tid minst 30 minuter fram.",
-        "tooFar": "Välj en tid inom de närmaste 60 dagarna."
+        "tooFar": "Välj en tid inom de närmaste 60 dagarna.",
+        "setupTitle": "När har du nästa lektion med den här klassen?",
+        "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet."
       },
       "keepOpen": {
         "cta": "Håll den öppen som läxa i en vecka",
@@ -22578,7 +22588,7 @@ const sv = {
       "noAccount": "Eleverna ansluter utan konto",
       "showProjector": "Visa på projektorn",
       "backHome": "Tillbaka till startsidan",
-      "plan": {"title": "Inte med klassen just nu?", "body": "Lägg in första spelet i kalendern. Händelsen har elevernas länk och en Starta-knapp, så allt är klart när klassen är på plats.", "when": "När har du lektionen?", "google": "Lägg till i Google Kalender", "ics": "Apple eller Outlook (.ics)", "added": "Inlagt i kalendern. Vi ses på lektionen!", "eventTitle": "LexiClash ordspel med {name}", "eventStudents": "Eleverna går med här, inget konto: {url} (kod {code})", "eventStart": "Starta spelet: {url}", "homeTitle": "Eller skicka länken nu.", "homeBody": "Elever som går med hemifrån övar klassens ordlista.", "homeCta": "Skicka länken"},
+      "plan": {"title": "Inte med klassen just nu?", "body": "Lägg in första spelet i kalendern. Händelsen har elevernas länk och en Starta-knapp, så allt är klart när klassen är på plats.", "when": "När har du lektionen?", "google": "Lägg till i Google Kalender", "ics": "Apple eller Outlook (.ics)", "added": "Inlagt i kalendern. Vi ses på lektionen!", "eventTitle": "LexiClash ordspel med {name}", "eventStudents": "Eleverna går med här, inget konto: {url} (kod {code})", "eventStart": "Starta spelet: {url}", "homeTitle": "Eller skicka länken nu.", "homeBody": "Elever som går med hemifrån övar klassens ordlista.", "homeCta": "Skicka länken", "calendarToggle": "Lägg in det i min kalender i stället"},
       "firstRound": {
         "title": "Kör din första runda — 2 minuter",
         "step1": "Öva själv mot bottar (privat, inga elever)",

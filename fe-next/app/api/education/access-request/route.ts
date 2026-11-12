@@ -230,8 +230,9 @@ export async function GET(request: NextRequest) {
   const sb = await createClient();
   const user = await getAuthedUser(request);
   if (!user) return NextResponse.json({ row: null });
-  const { data } = await sb.from('teacher_access_requests')
+  const { data, error } = await sb.from('teacher_access_requests')
     .select('*').eq('user_id', user.id)
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
+  if (error) return bad('request lookup failed: ' + error.message, 500);
   return NextResponse.json({ row: data });
 }

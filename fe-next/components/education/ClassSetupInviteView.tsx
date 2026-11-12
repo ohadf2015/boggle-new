@@ -35,7 +35,7 @@ export interface ClassSetupInviteViewProps {
   words?: ReactNode;
   /** When given, this is the hero in the bottom slot whoever has joined, and the projector stays secondary. */
   play?: ReactNode;
-  /** "Not with your class right now?" calendar card; shown only while nobody has joined. */
+  /** What next for a teacher with no students yet; shown only once the roster says nobody has joined. */
   plan?: ReactNode;
   footer?: ReactNode;
   t: T;
@@ -149,8 +149,6 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
         </div>
       </div>
 
-      {studentsIn || joined === null ? null : plan}
-
       <div data-testid="setup-quiet-links" className="flex flex-wrap items-center justify-center gap-2 lg:col-span-2">
         {studentsIn ? null : rehearse}
         {play ? (
@@ -163,6 +161,8 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
           {t('eduShell.setup.backHome')}
         </Link>
       </div>
+
+      {studentsIn || joined === null ? null : plan}
 
       {footer}
     </section>

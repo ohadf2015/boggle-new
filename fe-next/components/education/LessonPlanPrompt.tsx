@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { BellRing, CalendarClock, Check, Loader2, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,7 +11,13 @@ import { cn } from '@/lib/utils';
 import { PRESS } from '@/components/education/live/eduLiveStyles';
 
 const K = 'eduLiveRoom.hostResults.lessonPlan';
-const SOURCE = 'practice_results';
+
+export type LessonPlanSource = 'practice_results' | 'class_setup';
+
+const COPY: Record<LessonPlanSource, { title: string; body: string }> = {
+  practice_results: { title: 'eduLiveRoom.hostResults.lessonPlan.title', body: 'eduLiveRoom.hostResults.lessonPlan.body' },
+  class_setup: { title: 'eduLiveRoom.hostResults.lessonPlan.setupTitle', body: 'eduLiveRoom.hostResults.lessonPlan.setupBody' },
+};
 
 const BUTTON_BASE = cn(
   PRESS,
@@ -31,7 +37,18 @@ function browserTimezone(): string | null {
   }
 }
 
-export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
+export function LessonPlanPrompt({
+  classroomId,
+  source = 'practice_results',
+  className,
+  after,
+}: {
+  classroomId: string;
+  source?: LessonPlanSource;
+  className?: string;
+  /** Mounts with the prompt, never before it, so nothing below jumps when it lands. */
+  after?: ReactNode;
+}) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const inputId = useId();
@@ -70,8 +87,8 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
   useEffect(() => {
     if (status !== 'idle' || shown.current) return;
     shown.current = true;
-    trackGrowthEvent('lesson_plan_prompt_shown', { source: SOURCE });
-  }, [status]);
+    trackGrowthEvent('lesson_plan_prompt_shown', { source });
+  }, [status, source]);
 
   if (!user || status === 'loading') return null;
 
@@ -102,7 +119,7 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
       const stored = new Date(body.lessonAt);
       setSavedAt(stored);
       setStatus('saved');
-      trackGrowthEvent('lesson_planned', { hours_ahead: Math.round((stored.getTime() - Date.now()) / 3_600_000), source: SOURCE });
+      trackGrowthEvent('lesson_planned', { hours_ahead: Math.round((stored.getTime() - Date.now()) / 3_600_000), source });
     } catch {
       setErrorKey('error');
       setStatus('error');
@@ -113,94 +130,97 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
   const picked = fromDatetimeLocal(when);
 
   return (
-    <section
-      data-testid="lesson-plan"
-      aria-labelledby={titleId}
-      aria-busy={saving}
-      className="flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 text-neo-cream shadow-hard @5xl/results:p-4"
-    >
-      <div className="flex items-start gap-2">
-        <CalendarClock className="mt-0.5 size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
-        <div className="min-w-0">
-          <h2 id={titleId} className="font-neo-display text-base font-black leading-tight @5xl/results:text-lg">
-            {t(`${K}.title`)}
-          </h2>
-          {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80">{t(`${K}.body`)}</p>}
-        </div>
-      </div>
-
-      {status === 'saved' && savedAt ? (
-        <div data-testid="lesson-plan-saved" role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <p className="flex min-w-0 items-start gap-2 font-neo-body text-sm font-bold text-neo-cream">
-            <Check className="mt-0.5 size-4 shrink-0 text-neo-lime" aria-hidden="true" />
-            {t(`${K}.saved`, { when: formatLessonTime(savedAt, timezone, language) })}
-          </p>
-          <button
-            type="button"
-            onClick={() => setStatus('idle')}
-            className={cn(PRESS, 'min-h-11 font-neo-display text-sm font-black text-neo-cyan underline underline-offset-4')}
-          >
-            {t(`${K}.change`)}
-          </button>
-        </div>
-      ) : (
-        <>
-          <button
-            type="button"
-            data-testid="lesson-plan-tomorrow"
-            disabled={saving}
-            onClick={() => save(defaultLessonAt(new Date()))}
-            className={PRIMARY}
-          >
-            {saving ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <BellRing className="size-4 shrink-0" aria-hidden="true" />}
-            {t(`${K}.tomorrow`)}
-          </button>
-
-          <div className="flex flex-col gap-1">
-            <label htmlFor={inputId} className="font-neo-body text-xs font-bold text-neo-cream/80">
-              {t(`${K}.pickLabel`)}
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <input
-                id={inputId}
-                type="datetime-local"
-                value={when}
-                onChange={(e) => setWhen(e.target.value)}
-                className="min-h-11 min-w-0 grow basis-48 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy px-2 font-neo-body text-sm font-bold text-neo-cream [color-scheme:dark] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
-              />
-              <button
-                type="button"
-                data-testid="lesson-plan-remind"
-                disabled={saving || !picked}
-                onClick={() => picked && save(picked)}
-                className={QUIET}
-              >
-                {t(`${K}.remind`)}
-              </button>
-            </div>
+    <>
+      <section
+        data-testid="lesson-plan"
+        aria-labelledby={titleId}
+        aria-busy={saving}
+        className={cn('flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 text-neo-cream shadow-hard @5xl/results:p-4', className)}
+      >
+        <div className="flex items-start gap-2">
+          <CalendarClock className="mt-0.5 size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
+          <div className="min-w-0">
+            <h2 id={titleId} className="font-neo-display text-base font-black leading-tight @5xl/results:text-lg">
+              {t(COPY[source].title)}
+            </h2>
+            {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80">{t(COPY[source].body)}</p>}
           </div>
+        </div>
 
-          {status === 'error' && (
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <p role="alert" className="font-neo-body text-xs font-bold text-neo-pink">
-                {t(`${K}.${errorKey}`)}
-              </p>
-              {errorKey === 'error' && lastAttempt.current && (
+        {status === 'saved' && savedAt ? (
+          <div data-testid="lesson-plan-saved" role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <p className="flex min-w-0 items-start gap-2 font-neo-body text-sm font-bold text-neo-cream">
+              <Check className="mt-0.5 size-4 shrink-0 text-neo-lime" aria-hidden="true" />
+              {t(`${K}.saved`, { when: formatLessonTime(savedAt, timezone, language) })}
+            </p>
+            <button
+              type="button"
+              onClick={() => setStatus('idle')}
+              className={cn(PRESS, 'min-h-11 font-neo-display text-sm font-black text-neo-cyan underline underline-offset-4')}
+            >
+              {t(`${K}.change`)}
+            </button>
+          </div>
+        ) : (
+          <>
+            <button
+              type="button"
+              data-testid="lesson-plan-tomorrow"
+              disabled={saving}
+              onClick={() => save(defaultLessonAt(new Date()))}
+              className={PRIMARY}
+            >
+              {saving ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <BellRing className="size-4 shrink-0" aria-hidden="true" />}
+              {t(`${K}.tomorrow`)}
+            </button>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor={inputId} className="font-neo-body text-xs font-bold text-neo-cream/80">
+                {t(`${K}.pickLabel`)}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <input
+                  id={inputId}
+                  type="datetime-local"
+                  value={when}
+                  onChange={(e) => setWhen(e.target.value)}
+                  className="min-h-11 min-w-0 grow basis-48 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy px-2 font-neo-body text-sm font-bold text-neo-cream [color-scheme:dark] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                />
                 <button
                   type="button"
-                  data-testid="lesson-plan-retry"
-                  onClick={() => lastAttempt.current && save(lastAttempt.current)}
-                  className={cn(PRESS, 'inline-flex min-h-11 items-center gap-1 font-neo-display text-sm font-black text-neo-cyan underline underline-offset-4')}
+                  data-testid="lesson-plan-remind"
+                  disabled={saving || !picked}
+                  onClick={() => picked && save(picked)}
+                  className={QUIET}
                 >
-                  <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
-                  {t(`${K}.retry`)}
+                  {t(`${K}.remind`)}
                 </button>
-              )}
+              </div>
             </div>
-          )}
-        </>
-      )}
-    </section>
+
+            {status === 'error' && (
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <p role="alert" className="font-neo-body text-xs font-bold text-neo-pink">
+                  {t(`${K}.${errorKey}`)}
+                </p>
+                {errorKey === 'error' && lastAttempt.current && (
+                  <button
+                    type="button"
+                    data-testid="lesson-plan-retry"
+                    onClick={() => lastAttempt.current && save(lastAttempt.current)}
+                    className={cn(PRESS, 'inline-flex min-h-11 items-center gap-1 font-neo-display text-sm font-black text-neo-cyan underline underline-offset-4')}
+                  >
+                    <RotateCcw className="size-4 shrink-0" aria-hidden="true" />
+                    {t(`${K}.retry`)}
+                  </button>
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </section>
+      {after}
+    </>
   );
 }
 

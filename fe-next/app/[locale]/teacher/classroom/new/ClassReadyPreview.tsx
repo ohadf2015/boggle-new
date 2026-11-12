@@ -14,7 +14,7 @@ import { MIN_PASTED_WORDS } from '@/components/teacher/dashboard/quickLaunchInte
 import { FirstGameWords, PlayNowButton } from '@/components/teacher/setup/FirstGameWords';
 import { readPasted } from '@/components/teacher/setup/firstGameLaunch';
 import { packsForLanguage } from '@/components/teacher/setup/starterPackPick';
-import { FirstGamePlanCard } from '@/components/education/FirstGamePlanCard';
+import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -48,16 +48,12 @@ export default function ClassReadyPreview() {
           onShare={() => toast('Preview: share')}
           onOpenProjector={() => toast('Preview: projector')}
           plan={
-            origin ? (
-              <FirstGamePlanCard
-                classroom={{ id: 'preview', ...CLASSROOM }}
-                joinUrl={classroomJoinUrl(origin, language, CLASSROOM.join_code)}
-                origin={origin}
-                language={language}
-                t={t}
-                className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
-              />
-            ) : null
+            <ClassSetupInvitePlan
+              classroomId="preview"
+              calendar={origin ? { classroom: { id: 'preview', ...CLASSROOM }, joinUrl: classroomJoinUrl(origin, language, CLASSROOM.join_code), origin, language } : null}
+              t={t}
+              className="lg:col-span-2 lg:mx-auto lg:w-full lg:max-w-xl"
+            />
           }
           words={
             <FirstGameWords

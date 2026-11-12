@@ -18108,6 +18108,14 @@ const es = {
       "approval_pending_back": "Volver al formulario",
       "pending_title": "Tu solicitud está en revisión",
       "pending_body": "Recibida. Te avisaremos pronto.",
+      "load_error_title": "No pudimos comprobar tu cuenta de docente",
+      "load_error_body": "El fallo es nuestro, no tuyo. Inténtalo de nuevo y, si sigue pasando, recarga la página.",
+      "load_error_retry": "Reintentar",
+      "pending_finish_body": "Tenemos tu solicitud, pero la aprobación no terminó de nuestro lado. Toca abajo y la terminamos ahora.",
+      "pending_finish_cta": "Terminar mi acceso docente",
+      "pending_still": "Todavía se está terminando. Ya avisamos al equipo, así que vuelve a intentarlo en unos minutos.",
+      "pending_meanwhile": "Mientras tanto, puedes echar un vistazo a los juegos que va a jugar tu clase.",
+      "pending_meanwhile_link": "Ver los juegos",
       "declined_title": "Esta vez no pudo ser",
       "declined_reapply": "Puedes reintentar cuando quieras. ¿Dudas? Aquí estamos.",
       "submitted_on": "Enviada el",
@@ -22217,7 +22225,9 @@ const es = {
         "error": "No se ha guardado. Revisa la conexión e inténtalo de nuevo.",
         "retry": "Reintentar",
         "tooSoon": "Elige una hora dentro de al menos 30 minutos.",
-        "tooFar": "Elige una fecha dentro de los próximos 60 días."
+        "tooFar": "Elige una fecha dentro de los próximos 60 días.",
+        "setupTitle": "¿Cuándo es tu próxima clase con este grupo?",
+        "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase."
       },
       "keepOpen": {
         "cta": "Dejarlo abierto como tarea una semana",
@@ -22590,7 +22600,7 @@ const es = {
       "noAccount": "Los alumnos entran sin cuenta",
       "showProjector": "Mostrar en el proyector",
       "backHome": "Volver al inicio",
-      "plan": {"title": "¿No estás con tu clase ahora?", "body": "Pon el primer juego en tu calendario. El evento lleva el enlace para que se unan los alumnos y un botón para empezar con un toque, así está listo cuando llegue tu clase.", "when": "¿Cuándo es tu clase?", "google": "Añadir a Google Calendar", "ics": "Apple u Outlook (.ics)", "added": "Ya está en tu calendario. ¡Nos vemos en clase!", "eventTitle": "Juego de palabras de LexiClash con {name}", "eventStudents": "Los alumnos se unen aquí, sin cuenta: {url} (código {code})", "eventStart": "Empezar el juego: {url}", "homeTitle": "O envía el enlace ahora.", "homeBody": "Los alumnos que se unen desde casa practican la lista de palabras de la clase.", "homeCta": "Enviar el enlace"},
+      "plan": {"title": "¿No estás con tu clase ahora?", "body": "Pon el primer juego en tu calendario. El evento lleva el enlace para que se unan los alumnos y un botón para empezar con un toque, así está listo cuando llegue tu clase.", "when": "¿Cuándo es tu clase?", "google": "Añadir a Google Calendar", "ics": "Apple u Outlook (.ics)", "added": "Ya está en tu calendario. ¡Nos vemos en clase!", "eventTitle": "Juego de palabras de LexiClash con {name}", "eventStudents": "Los alumnos se unen aquí, sin cuenta: {url} (código {code})", "eventStart": "Empezar el juego: {url}", "homeTitle": "O envía el enlace ahora.", "homeBody": "Los alumnos que se unen desde casa practican la lista de palabras de la clase.", "homeCta": "Enviar el enlace", "calendarToggle": "Prefiero añadirlo a mi calendario"},
       "firstRound": {
         "title": "Haz tu primera ronda — 2 minutos",
         "step1": "Practica a solas contra bots (privado, sin alumnos)",

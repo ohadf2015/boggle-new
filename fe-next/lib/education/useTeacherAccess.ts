@@ -6,6 +6,11 @@ import type { TeacherAccessRequest, TeacherAccessStatus } from './types';
 import { teacherTrialStatus, type TrialStatus } from './trial';
 import { isTeacherProfile } from './teacherRole';
 
+/** How long a signed-in user may sit with no profile before the read counts as failed. */
+export const PROFILE_WAIT_MS = 8_000;
+
+export type TeacherAccessError = 'request' | 'profile' | null;
+
 interface UseTeacherAccessResult {
   hasAccess: boolean;
   status: TeacherAccessStatus | 'none';
@@ -13,29 +18,61 @@ interface UseTeacherAccessResult {
   /** Trial countdown for the latest approved request, or null when none/active-unbounded. */
   trial: TrialStatus | null;
   isLoading: boolean;
+  /** A lookup failed: show an error with retry, never the "no access" form. */
+  error: TeacherAccessError;
+  retry: () => void;
 }
 
 export function useTeacherAccess(): UseTeacherAccessResult {
   const { profile, user, loading: authLoading, refreshProfile } = useAuth();
   const [latestRequest, setLatestRequest] = useState<TeacherAccessRequest | null>(null);
-  const [reqLoading, setReqLoading] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const [answeredFor, setAnsweredFor] = useState<string | null>(null);
+  const [requestFailed, setRequestFailed] = useState(false);
   // Tick a clock so the trial countdown stays live without re-deriving Date.now()
   // impurely during render.
   const [nowMs, setNowMs] = useState(() => Date.now());
 
   const hasAccess = isTeacherProfile(profile);
+  const userId = user?.id ?? null;
+  const requestKey = userId ? `${userId}:${attempt}` : null;
 
   // Fetch the latest request even for users who already have access — approved
   // teachers need their trial deadline to render the activation-urgency banner.
   useEffect(() => {
-    if (!user?.id) return;
-    setReqLoading(true);
+    if (!requestKey) return;
+    let live = true;
     getWithAuth('/api/education/access-request')
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => setLatestRequest(j?.row || null))
-      .catch(() => setLatestRequest(null))
-      .finally(() => setReqLoading(false));
-  }, [user?.id]);
+      .then((r) => {
+        if (!r.ok) throw new Error(`access request lookup failed: ${r.status}`);
+        return r.json();
+      })
+      .then((j) => {
+        if (!live) return;
+        setLatestRequest(j?.row || null);
+        setRequestFailed(false);
+      })
+      .catch(() => {
+        if (live) setRequestFailed(true);
+      })
+      .finally(() => {
+        if (live) setAnsweredFor(requestKey);
+      });
+    return () => {
+      live = false;
+    };
+  }, [requestKey]);
+  const reqLoading = requestKey !== null && answeredFor !== requestKey;
+
+  // AuthContext gives no signal when the profile read fails for good, so a bounded wait stands in for one.
+  const awaitingProfile = !authLoading && !!userId && !profile;
+  const [profileTimedOutFor, setProfileTimedOutFor] = useState<number | null>(null);
+  useEffect(() => {
+    if (!awaitingProfile) return;
+    const id = setTimeout(() => setProfileTimedOutFor(attempt), PROFILE_WAIT_MS);
+    return () => clearTimeout(id);
+  }, [awaitingProfile, attempt]);
+  const profileFailed = awaitingProfile && profileTimedOutFor === attempt;
 
   useEffect(() => {
     const id = setInterval(() => setNowMs(Date.now()), 60_000);
@@ -77,11 +114,22 @@ export function useTeacherAccess(): UseTeacherAccessResult {
   // cannot drift apart again.
   const profileLoading = !!user && !profile;
 
+  const retry = () => {
+    if (profileFailed && refreshProfile) {
+      Promise.resolve()
+        .then(() => refreshProfile())
+        .catch(() => {});
+    }
+    setAttempt((n) => n + 1);
+  };
+
   return {
     hasAccess,
     status,
     latestRequest,
     trial,
     isLoading: authLoading || reqLoading || profileLoading || profileStale,
+    error: profileFailed ? 'profile' : requestFailed && !reqLoading ? 'request' : null,
+    retry,
   };
 }
