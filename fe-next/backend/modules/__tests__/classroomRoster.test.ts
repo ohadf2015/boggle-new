@@ -1,9 +1,10 @@
 import { vi } from 'vitest';
 
-const { mockGetClassroomGame, mockSetex, mockLogError, redisRef } = vi.hoisted(() => ({
+const { mockGetClassroomGame, mockSetex, mockLogError, mockLogWarn, redisRef } = vi.hoisted(() => ({
   mockGetClassroomGame: vi.fn(),
   mockSetex: vi.fn(),
   mockLogError: vi.fn(),
+  mockLogWarn: vi.fn(),
   redisRef: { present: true },
 }));
 
@@ -13,9 +14,9 @@ vi.mock('../classroomGameManager', () => ({
   getClassroomGame: mockGetClassroomGame,
   withClassroomGameLock: (_code: string, fn: () => Promise<unknown>) => fn(),
 }));
-vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), warn: vi.fn(), error: mockLogError } }));
+vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), warn: mockLogWarn, error: mockLogError } }));
 
-import { classroomRosterCount, recordClassroomRosterEntry } from '../classroomRoster';
+import { classroomRosterCount, recordClassroomRosterEntry, CLASSROOM_ROSTER_CAP } from '../classroomRoster';
 
 const record = (over: Record<string, unknown> = {}) =>
   ({ gameCode: 'ABC123', teacherId: 't1', classroomId: 'c1', players: [], ...over }) as never;
@@ -70,6 +71,14 @@ describe('recordClassroomRosterEntry', () => {
     await recordClassroomRosterEntry('ABC123', record(), undefined);
     await recordClassroomRosterEntry('ABC123', null, 's1');
     expect(mockSetex).not.toHaveBeenCalled();
+  });
+
+  it('Given a roster already at its cap, When a new id arrives, Then it is not stored and a warning is logged', async () => {
+    const full = Array.from({ length: CLASSROOM_ROSTER_CAP }, (_, i) => `s${i}`);
+    mockGetClassroomGame.mockResolvedValue(record({ rosterUserIds: full }));
+    await recordClassroomRosterEntry('ABC123', record({ rosterUserIds: full }), 'one-more');
+    expect(mockSetex).not.toHaveBeenCalled();
+    expect(mockLogWarn).toHaveBeenCalledWith('CLASSROOM_GAME', expect.stringContaining('cap'));
   });
 
   it('Given Redis fails, When recorded, Then it logs an error and does not throw', async () => {

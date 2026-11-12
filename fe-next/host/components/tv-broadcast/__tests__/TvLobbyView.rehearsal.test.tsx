@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { writeRehearseIntent } from '@/lib/education/rehearsal';
+import { writeRehearseIntent, claimRehearseIntentForLaunch } from '@/lib/education/rehearsal';
 
 const trackMock = vi.fn();
 vi.mock('@/lib/education/rehearsalTelemetry', () => ({
@@ -47,7 +47,7 @@ describe('TvLobbyView — classroom rehearsal', () => {
   });
 
   it('Given the teacher tapped Rehearse on HQ, When the host is seated, Then bots are requested without another tap', () => {
-    writeRehearseIntent({ source: 'hq', classExists: false });
+    claimRehearseIntentForLaunch('AB12CD', writeRehearseIntent({ source: 'hq', classExists: false }));
     const solo = vi.fn(() => vi.fn());
     const { rerender } = render(<TvLobbyView {...base} playersReady={[]} onStartSoloDemoWithBots={solo} />);
     expect(solo).not.toHaveBeenCalled();
@@ -56,7 +56,7 @@ describe('TvLobbyView — classroom rehearsal', () => {
   });
 
   it('Given an HQ rehearsal, When the bots are seated and the round starts, Then it is counted as an HQ rehearsal', async () => {
-    writeRehearseIntent({ source: 'hq', classExists: false });
+    claimRehearseIntentForLaunch('AB12CD', writeRehearseIntent({ source: 'hq', classExists: false }));
     const begin = vi.fn();
     const solo = vi.fn(() => begin);
     const { rerender } = render(<TvLobbyView {...base} playersReady={[host]} onStartSoloDemoWithBots={solo} />);

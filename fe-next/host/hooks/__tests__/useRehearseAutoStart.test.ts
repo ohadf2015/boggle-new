@@ -1,15 +1,19 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { writeRehearseIntent, peekRehearseIntent } from '@/lib/education/rehearsal';
+import { writeRehearseIntent, peekRehearseIntent, claimRehearseIntentForLaunch, type RehearseIntent } from '@/lib/education/rehearsal';
 import { PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
+
+function armRehearsal(intent: RehearseIntent, gameCode = 'ROOM1') {
+  claimRehearseIntentForLaunch(gameCode, writeRehearseIntent(intent));
+}
 
 describe('useRehearseAutoStart', () => {
   beforeEach(() => sessionStorage.clear());
 
   it('Given a Rehearse tap from HQ, When the host is seated in the room, Then the practice round starts once and the intent is spent', () => {
-    writeRehearseIntent({ source: 'hq', classExists: false });
+    armRehearsal({ source: 'hq', classExists: false });
     const start = vi.fn();
-    const { rerender } = renderHook((p: { hostSeated: boolean }) => useRehearseAutoStart({ enabled: true, hostSeated: p.hostSeated, botsAllowed: true, start }), {
+    const { rerender } = renderHook((p: { hostSeated: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: p.hostSeated, botsAllowed: true, start }), {
       initialProps: { hostSeated: false },
     });
     expect(start).not.toHaveBeenCalled();
@@ -23,21 +27,21 @@ describe('useRehearseAutoStart', () => {
 
   it('Given no Rehearse tap, Then opening the lobby never starts bots', () => {
     const start = vi.fn();
-    renderHook(() => useRehearseAutoStart({ enabled: true, hostSeated: true, botsAllowed: true, start }));
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, botsAllowed: true, start }));
     expect(start).not.toHaveBeenCalled();
   });
 
   it('Given a lobby that cannot run practice rounds, Then the intent is left alone', () => {
-    writeRehearseIntent({ source: 'class', classExists: true });
+    armRehearsal({ source: 'class', classExists: true });
     const start = vi.fn();
-    renderHook(() => useRehearseAutoStart({ enabled: false, hostSeated: true, botsAllowed: true, start }));
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: false, hostSeated: true, botsAllowed: true, start }));
     expect(start).not.toHaveBeenCalled();
   });
 
   it('Given the classroom flag resolves after mount, Then the HQ tap still starts the round once', () => {
-    writeRehearseIntent({ source: 'hq', classExists: true });
+    armRehearsal({ source: 'hq', classExists: true });
     const start = vi.fn();
-    const { rerender } = renderHook((p: { enabled: boolean }) => useRehearseAutoStart({ enabled: p.enabled, hostSeated: true, botsAllowed: true, start }), {
+    const { rerender } = renderHook((p: { enabled: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: p.enabled, hostSeated: true, botsAllowed: true, start }), {
       initialProps: { enabled: false },
     });
     rerender({ enabled: true });
@@ -46,16 +50,16 @@ describe('useRehearseAutoStart', () => {
   });
 
   it('Given the room ended up in a mode bots cannot play, Then no dead bot round starts and the intent is dropped', () => {
-    writeRehearseIntent({ source: 'hq', classExists: true });
+    armRehearsal({ source: 'hq', classExists: true });
     const start = vi.fn();
-    renderHook(() => useRehearseAutoStart({ enabled: true, hostSeated: true, botsAllowed: false, start }));
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, botsAllowed: false, start }));
     expect(start).not.toHaveBeenCalled();
     expect(peekRehearseIntent()).toBeNull();
   });
   it('Given a practice run, When the host is seated but the teacher has not joined as a student yet, Then the round waits for that seat', () => {
-    writeRehearseIntent({ source: 'hq', classExists: true, withSeat: true });
+    armRehearsal({ source: 'hq', classExists: true, withSeat: true });
     const start = vi.fn();
-    const { rerender } = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
+    const { rerender } = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
       initialProps: { practiceSeated: false },
     });
     expect(start).not.toHaveBeenCalled();
@@ -71,9 +75,9 @@ describe('useRehearseAutoStart', () => {
     afterEach(() => vi.useRealTimers());
 
     const run = (practiceSeated = false) => {
-      writeRehearseIntent({ source: 'hq', classExists: true, withSeat: true });
+      armRehearsal({ source: 'hq', classExists: true, withSeat: true });
       const start = vi.fn();
-      const hook = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
+      const hook = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
         initialProps: { practiceSeated },
       });
       return { start, ...hook };
@@ -112,5 +116,19 @@ describe('useRehearseAutoStart', () => {
       act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS * 2));
       expect(result.current.seatTimedOut).toBe(false);
     });
+  });
+
+  it('Given a rehearse tap the teacher backed out of before any room existed, When a real room\'s host board opens, Then no bots start', () => {
+    writeRehearseIntent({ source: 'hq', classExists: true });
+    const start = vi.fn();
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, botsAllowed: true, start }));
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it('Given a rehearsal claimed for another room, When this room\'s host board opens, Then no bots start', () => {
+    armRehearsal({ source: 'hq', classExists: true }, 'OTHER1');
+    const start = vi.fn();
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, botsAllowed: true, start }));
+    expect(start).not.toHaveBeenCalled();
   });
 });

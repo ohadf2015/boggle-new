@@ -5347,7 +5347,16 @@ const es = {
     "switchToPlayer": "Cambiar a modo jugador",
     "viewOnlyBadge": "Modo TV · El anfitrión mira",
     "tryPracticeRound": "Probar una ronda de práctica (Bots)",
-    "practiceRoundFailed": "No se pudieron añadir jugadores de práctica. Revisa tu conexión e inténtalo de nuevo."
+    "practiceRoundFailed": "No se pudieron añadir jugadores de práctica. Revisa tu conexión e inténtalo de nuevo.",
+    "practiceRefused": {
+      "rate_limited": "Demasiados toques seguidos. Espera un momento y vuelve a intentarlo.",
+      "not_in_room": "Esta pantalla perdió su sitio en la sala. Recarga la página y vuelve a intentarlo.",
+      "room_gone": "La sala se ha cerrado. Vuelve a abrir el juego desde tu clase.",
+      "not_host": "Solo la pantalla que aloja la sala puede añadir jugadores de práctica.",
+      "in_progress": "Ya hay una ronda en marcha. Practica cuando termine.",
+      "room_full": "No quedan sitios libres para jugadores de práctica.",
+      "students_present": "Ya hay alumnos en la sala. Pulsa Empezar para comenzar."
+    }
   },
   "tvResults": {
     "installHeading": "LLÉVATELO 📱",
@@ -17949,6 +17958,8 @@ const es = {
         "enterCode": "Escribir un código"
       },
       "gameEnded": {
+        "joinClassLine": "El juego de tu profe acaba de terminar. Únete a tu clase ahora y entrarás en el próximo.",
+        "nextGameToast": "Ese juego acaba de terminar. Ya estás en la clase, así que entrarás en el próximo.",
         "title": "Este juego terminó",
         "retry": "Reintentar",
         "toClass": "Ir a mi clase",

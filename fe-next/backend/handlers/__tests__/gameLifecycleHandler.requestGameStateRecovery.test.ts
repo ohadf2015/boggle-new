@@ -133,6 +133,7 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
 import { getLeaderboard } from '../../../backend/modules/gameStateManager';
 import gameStartCoordinator from '../../../backend/utils/gameStartCoordinator';
+import { tryAcquireGameStart, releaseGameStart, START_WAIT_CAP_MS } from '../gameStartMutex';
 
 interface SocketHandlerMap { [event: string]: (...args: unknown[]) => void }
 
@@ -400,5 +401,43 @@ describe('requestGameState — a room running a Vocab Quiz', () => {
     socket.handlers['requestGameState']();
 
     expect(mockStartGameTimer).not.toHaveBeenCalled();
+  });
+});
+
+describe('requestGameState — during a round start', () => {
+  const inProgress = { gameState: 'in-progress', remainingTime: 76, timerSeconds: 180, letterGrid: [['A']], language: 'en', minWordLength: 2, gameMode: 'classic', gameSessionId: 3 };
+  const starts = () => mockSafeEmit.mock.calls.filter((c) => c[1] === 'startGame');
+  afterEach(() => {
+    releaseGameStart('ABC');
+    vi.useRealTimers();
+  });
+
+  it('Given a start still dealing, When a seated socket asks, Then it waits and answers once the start finishes', async () => {
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue(inProgress);
+    mockHasGameTimer.mockReturnValue(true);
+    tryAcquireGameStart('ABC');
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+    expect(starts()).toHaveLength(0);
+    expect(mockStartGameTimer).not.toHaveBeenCalled();
+    releaseGameStart('ABC');
+    await vi.waitFor(() => expect(starts()).toHaveLength(1));
+  });
+
+  it('Given a wedged start, When a seated socket asks, Then after the cap it is answered with the current state', async () => {
+    vi.useFakeTimers();
+    const socket = createSocket();
+    mockGetGameBySocketId.mockReturnValue('ABC');
+    mockGetGame.mockReturnValue(inProgress);
+    mockHasGameTimer.mockReturnValue(true);
+    tryAcquireGameStart('ABC');
+    registerGameLifecycleHandlers(fakeIo, socket as never);
+    socket.handlers['requestGameState']();
+    await vi.advanceTimersByTimeAsync(START_WAIT_CAP_MS - 1);
+    expect(starts()).toHaveLength(0);
+    await vi.advanceTimersByTimeAsync(1);
+    expect(starts()).toHaveLength(1);
   });
 });

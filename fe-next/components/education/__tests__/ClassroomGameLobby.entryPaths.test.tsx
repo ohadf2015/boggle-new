@@ -21,6 +21,7 @@ vi.mock('@/lib/education/telemetry', () => ({ trackEduLiveGameStarted: (...a: un
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
 import { modeGrid } from '../lobby/__tests__/lobbyGamesFold';
+import { writeRehearseIntent } from '@/lib/education/rehearsal';
 
 const handlers: Record<string, (data?: unknown) => void> = {};
 const socket = {
@@ -95,6 +96,22 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
     expect(payload.settings.gameMode).toBe('blast');
     expect(trackEduLiveGameStarted).toHaveBeenCalledWith({ classroomId: 'class-2', source: 'hq_express', lessonCount: 1 });
     await waitFor(() => expect(stableRouter.replace).toHaveBeenCalledWith(expect.stringContaining('/en/')));
+  });
+
+  it('Given a rehearse tap\'s lobby, When GO LIVE is tapped, Then the room is created as a rehearsal', async () => {
+    const entry = writeRehearseIntent({ source: 'hq', classExists: true });
+    render(<ClassroomGameLobby quick rehearseEntry={entry} initialClassroomId="class-2" initialLessonId="lesson-2" initialMode="classic" onBack={vi.fn()} />);
+    await screen.findByTestId('lobby-go-live');
+    const payload = (await tapGoLiveAndConfirm()) as unknown as { settings: { rehearsal?: boolean } };
+    expect(payload.settings.rehearsal).toBe(true);
+  });
+
+  it('Given an earlier rehearse tap the teacher walked away from, When an ordinary quick launch goes live, Then the room is not a rehearsal', async () => {
+    writeRehearseIntent({ source: 'hq', classExists: true });
+    render(<ClassroomGameLobby quick initialClassroomId="class-2" initialLessonId="lesson-2" initialMode="classic" onBack={vi.fn()} />);
+    await screen.findByTestId('lobby-go-live');
+    const payload = (await tapGoLiveAndConfirm()) as unknown as { settings: { rehearsal?: boolean } };
+    expect(payload.settings.rehearsal).toBeUndefined();
   });
 
   it('Given a quick launch, When More options is opened, Then the full picker appears and the launch keeps its source', async () => {

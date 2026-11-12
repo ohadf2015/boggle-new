@@ -39,6 +39,7 @@ import { getGame } from '../../../modules/gameStateManager';
 import { hasGameTimer, setGameTimer } from '../../../utils/timerManager';
 import { isInProgress } from '../../../utils/gameStateMachine';
 import { resumeGameTimerIfMissing } from '../gameTimer';
+import { tryAcquireGameStart, releaseGameStart, STALE_START_MS } from '../../../handlers/gameStartMutex';
 
 const mGetGame = getGame as Mock;
 const mHasTimer = hasGameTimer as Mock;
@@ -89,5 +90,30 @@ describe('resumeGameTimerIfMissing', () => {
     mGetGame.mockReturnValue(null);
     expect(await resumeGameTimerIfMissing(io, 'G1')).toBe(false);
     expect(mSetTimer).not.toHaveBeenCalled();
+  });
+
+  it('Given a round start still dealing, Then restart recovery stands down', async () => {
+    mGetGame.mockReturnValue({ gameState: 'in-progress', gameMode: 'classic', gameDuration: 90 });
+    mInProgress.mockReturnValue(true);
+    mHasTimer.mockReturnValue(false);
+    tryAcquireGameStart('G1');
+    try {
+      expect(await resumeGameTimerIfMissing(io, 'G1')).toBe(false);
+    } finally {
+      releaseGameStart('G1');
+    }
+  });
+
+  it('Given a start flag held far past its cap (wedged), Then recovery treats it as stale and resumes the clock', async () => {
+    mGetGame.mockReturnValue({ gameState: 'in-progress', gameMode: 'classic', gameDuration: 90 });
+    mInProgress.mockReturnValue(true);
+    mHasTimer.mockReturnValue(false);
+    tryAcquireGameStart('G1');
+    try {
+      await vi.advanceTimersByTimeAsync(STALE_START_MS + 1);
+      expect(await resumeGameTimerIfMissing(io, 'G1')).toBe(true);
+    } finally {
+      releaseGameStart('G1');
+    }
   });
 });

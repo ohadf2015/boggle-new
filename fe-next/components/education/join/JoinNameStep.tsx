@@ -67,6 +67,10 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
         <div data-testid="join-confirm-slot" className="min-h-[124px]">
           {flow.codeRejected ? (
             <JoinAlert>{t(`${K}.invalidCode`)}</JoinAlert>
+          ) : flow.target?.verdict === 'ended' ? (
+            <p data-testid="join-ended-note" role="status" className="rounded-neo border-3 border-neo-cream bg-neo-navy-light p-3 font-neo-body text-base font-bold text-neo-cream shadow-hard">
+              {t('education.student.gameEnded.joinClassLine')}
+            </p>
           ) : flow.target && (flow.target.label || flow.target.verdict === 'game') ? (
             <JoinTargetCard target={flow.target} />
           ) : flow.isChecking ? (

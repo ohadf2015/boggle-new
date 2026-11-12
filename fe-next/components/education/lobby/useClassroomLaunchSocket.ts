@@ -168,12 +168,12 @@ export function useClassroomLaunchSocket(t: Translate) {
   }, [fail]);
 
   const launch = useCallback(
-    (payload: ClassroomLaunchPayload, source: LaunchSource = 'create_room') => {
+    (payload: ClassroomLaunchPayload, source: LaunchSource = 'create_room', rehearseEntry?: string | null) => {
       setStartError(null);
       setIsStarting(true);
       const split = splitLaunchPayload(payload);
       const { pressure } = split;
-      const createPayload = claimRehearseIntentForLaunch(payload.gameCode)
+      const createPayload = claimRehearseIntentForLaunch(payload.gameCode, rehearseEntry)
         ? { ...split.createPayload, settings: { ...split.createPayload.settings, rehearsal: true } }
         : split.createPayload;
       inFlightRef.current = { classroomId: payload.classroomId, lessonIds: payload.lessonIds, source, pressure };

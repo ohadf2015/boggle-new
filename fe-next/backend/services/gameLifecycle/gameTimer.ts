@@ -17,6 +17,7 @@ import { endGame } from './gameEnd';
 import { startRoomBossClock, tickRoomBoss, pauseRoomBoss, resumeRoomBoss } from '../classroomBoss/roomBoss';
 import { ensureLanguageLoaded } from '../../dictionary';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
+import { isGameStarting, isGameStartStale, STALE_START_MS } from '../../handlers/gameStartMutex';
 import logger from '../../utils/logger';
 
 /**
@@ -384,6 +385,11 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
   if (!game) return false;
   if (!isInProgress(game.gameState)) return false;
   if (hasGameTimer(gameCode)) return false;
+  // A start still dealing its board is not a restart: it starts its own clock. A wedged one is.
+  if (isGameStarting(gameCode)) {
+    if (!isGameStartStale(gameCode)) return false;
+    logger.error('TIMER', `Start flag for ${gameCode} held past ${STALE_START_MS}ms; treating it as stale and resuming the clock`);
+  }
   // A teacher-paused round has no interval BY DESIGN — it is not orphaned.
   if (game.isPaused) return false;
   // The 3-2-1 countdown starts the clock itself (countdownComplete or its 8s fallback).

@@ -5,13 +5,16 @@ import { VOCAB_QUIZ_MODE } from '@/shared/types/vocabQuiz';
 export type RehearsalSource = 'hq' | 'class' | 'lobby';
 
 const INTENT_KEY = 'lexiclash:rehearse-intent';
+/** URL param that carries the tap's entry from the rehearse button through the launch lobby. */
+export const REHEARSE_ENTRY_PARAM = 'rehearse';
 // Matches the quick-launch hand-off: a failed launch must not leave bots queued for a lobby opened by hand later.
 const INTENT_TTL_MS = 5 * 60 * 1000;
 
 export const REHEARSAL_FALLBACK_MODE: GameMode = 'classic';
 
-export function realStudentCount(students: ReadonlyArray<{ isBot?: boolean }>): number {
-  return students.filter((s) => !s.isBot).length;
+// The teacher's own practice seat outlives a practice run (and a game switch); it is never a student.
+export function realStudentCount(students: ReadonlyArray<{ isBot?: boolean; isPractice?: boolean }>): number {
+  return students.filter((s) => !s.isBot && !s.isPractice).length;
 }
 
 // The quiz server enrols humans only, so a bots-only quiz has nobody answering.
@@ -26,12 +29,15 @@ export interface RehearseIntent {
   withSeat?: boolean;
 }
 
-export function writeRehearseIntent(intent: RehearseIntent, now = Date.now()): void {
+/** Returns the tap's entry: only a launch that carries it back may claim the intent. */
+export function writeRehearseIntent(intent: RehearseIntent, now = Date.now()): string {
+  const entry = `${now.toString(36)}${Math.random().toString(36).slice(2, 8)}`;
   try {
-    sessionStorage.setItem(INTENT_KEY, JSON.stringify({ ...intent, at: now }));
+    sessionStorage.setItem(INTENT_KEY, JSON.stringify({ ...intent, at: now, entry }));
   } catch {
     /* storage blocked: the teacher still lands in the lobby and can tap practice there */
   }
+  return entry;
 }
 
 export function peekRehearseIntent(now = Date.now()): RehearseIntent | null {
@@ -47,16 +53,29 @@ export function peekRehearseIntent(now = Date.now()): RehearseIntent | null {
   }
 }
 
+/** The intent only once a launch has claimed it for this room: a host board never acts on a tap nobody launched. */
+export function peekRehearseIntentForRoom(gameCode: string, now = Date.now()): RehearseIntent | null {
+  const intent = peekRehearseIntent(now);
+  if (!intent) return null;
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(INTENT_KEY) ?? '{}') as { gameCode?: unknown };
+    return parsed.gameCode === gameCode ? intent : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
- * Bind the intent to the room it launches. A second launch in the same tab finds it
- * bound to another room: that intent was abandoned, so it is cleared and this room is real.
+ * Bind the intent to the room it launches. Only the launch that came from the rehearse tap
+ * (same entry) claims it; any other launch, or a second room, finds an abandoned intent and clears it.
  */
-export function claimRehearseIntentForLaunch(gameCode: string, now = Date.now()): boolean {
+export function claimRehearseIntentForLaunch(gameCode: string, entry: string | null | undefined, now = Date.now()): boolean {
   try {
     const raw = sessionStorage.getItem(INTENT_KEY);
     if (!raw || !peekRehearseIntent(now)) return false;
     const parsed = JSON.parse(raw) as Record<string, unknown>;
-    if (typeof parsed.gameCode === 'string' && parsed.gameCode !== gameCode) {
+    const otherRoom = typeof parsed.gameCode === 'string' && parsed.gameCode !== gameCode;
+    if (!entry || parsed.entry !== entry || otherRoom) {
       sessionStorage.removeItem(INTENT_KEY);
       return false;
     }

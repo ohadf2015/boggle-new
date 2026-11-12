@@ -17,6 +17,7 @@ import { useSocket } from '@/utils/SocketContext';
 import { useGameActions, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
+import { useArcadeAutoFillRefusal } from './useArcadeAutoFillRefusal';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
 import { GAME_PRESETS } from './gamePresets';
 import { classroomHostPreset } from '@/lib/education/classroomHostPreset';
@@ -102,6 +103,7 @@ export function useHostLobby({
   // Disable Start while any player (host or guest) is mid rewarded-ad — starting
   // would tear a watcher out of their ad and void the reward they're earning.
   const { anyAdActive } = useLobbyAdGate({ socket });
+  useArcadeAutoFillRefusal(socket);
   const { isAdmin, canSeeInWorkModes } = useAuth();
 
   const [hasInitialized, setHasInitialized] = useState(false);

@@ -225,7 +225,6 @@ export function JoinFlow({
             <JoinEndedPanel
               code={flow.code}
               label={flow.target?.label}
-              classroomId={flow.endedClassroomId}
               onNewCode={flow.typeNewCode}
             />
           ) : asking ? (

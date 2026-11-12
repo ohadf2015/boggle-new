@@ -13,6 +13,7 @@ import { useJoinTargetLookup } from './useJoinTargetLookup';
 import { joinFailure } from './joinFailure';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { joinSuccessHref } from '@/lib/navigation/eduExitTargets';
+import { joinClassHref } from './joinDestinations';
 import type { JoinFlowState, JoinStep, JoinedClassroom, OwnClassRefusal } from './joinFlowState';
 
 export type { JoinFlowState, JoinStep, JoinedClassroom } from './joinFlowState';
@@ -105,7 +106,6 @@ export function useJoinFlow(
   const [holdExpired, setHoldExpired] = useState(false);
   const [joined, setJoined] = useState<JoinedClassroom | null>(null);
   const [ended, setEnded] = useState(false);
-  const [endedClassroomId, setEndedClassroomId] = useState<string | null>(null);
   const [ownClass, setOwnClass] = useState<OwnClassRefusal | null>(null);
   /** Synchronous: two taps in one frame must not send two joins. */
   const inFlight = useRef(false);
@@ -132,10 +132,6 @@ export function useJoinFlow(
     setStep('code');
     setCodeErrorKey('education.student.join.invalidCode');
   }, [step, target, targetCode, code, isSubmitting, name]);
-
-  useEffect(() => {
-    if (target?.verdict === 'ended' && targetCode === code && !isSubmitting) setEnded(true);
-  }, [target, targetCode, code, isSubmitting]);
 
   /* ── Keep the sign-in return path alive from every entry point. ──────── */
   useEffect(() => {
@@ -203,7 +199,6 @@ export function useJoinFlow(
 
   const typeNewCode = useCallback(() => {
     setEnded(false);
-    setEndedClassroomId(null);
     setCodeState('');
     setNameState('');
     setCodeErrorKey(null);
@@ -284,7 +279,12 @@ export function useJoinFlow(
               source,
             });
             if (result.endedSessionCode && !result.gameCode) {
-              setEndedClassroomId(result.classroomId ?? null);
+              // Enrolled off the ended game: the class page auto-joins them into the next room.
+              if (result.classroomId) {
+                toast(t('education.student.gameEnded.nextGameToast'), { duration: 6000 });
+                router.push(joinClassHref(language));
+                return;
+              }
               setEnded(true);
               return;
             }
@@ -442,7 +442,6 @@ export function useJoinFlow(
     suggestedName,
     joined,
     ended,
-    endedClassroomId,
     ownClass,
     // Live unless a join is genuinely in flight. Disabling GO for a missing
     // nickname looked tidy and behaved as a silent no-op: the student taps a

@@ -76,6 +76,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
+import { isGameStarting, waitForGameStart } from './gameStartMutex.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import { checkGuestRename, renamePlayerInGame } from '../modules/playerRename.js';
 
@@ -479,6 +480,15 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    // Mid-start the board is not dealt yet: wait for the start (capped), then answer with what is there.
+    if (isGameStarting(gameCode)) {
+      void waitForGameStart(gameCode).then(() => answerGameState(gameCode, getGame(gameCode) ?? game));
+      return;
+    }
+    answerGameState(gameCode, game);
+  });
+
+  function answerGameState(gameCode: string, game: GameState): void {
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
       // A running Vocab Quiz: same shell start as `join` (pitfall 3), and no board clock to "recover".
@@ -536,7 +546,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       // for what a thinner one costs the client.
       resendFinishedResults(socket, gameCode, game);
     }
-  });
+  }
 
   // Handle reset game
   socket.on('resetGame', (data: unknown, callback?: ResetGameCallback) => {

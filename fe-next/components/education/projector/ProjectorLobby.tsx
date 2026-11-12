@@ -52,6 +52,8 @@ export interface ProjectorLobbyProps {
   onStartPracticeRound?: () => void;
   practiceRoundPending?: boolean;
   practiceRoundFailed?: boolean;
+  /** Message for the failure: the server's refusal reason, or the generic connection line. */
+  practiceRoundFailedKey?: string;
   lessonWordsBlock?: LessonWordsBlock;
 }
 
@@ -82,6 +84,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   onStartPracticeRound,
   practiceRoundPending = false,
   practiceRoundFailed = false,
+  practiceRoundFailedKey,
   lessonWordsBlock,
 }) {
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
@@ -186,6 +189,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             onStartPracticeRound={onStartPracticeRound ? startPractice : undefined}
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
+            practiceRoundFailedKey={practiceRoundFailedKey}
             lessonWordsBlock={lessonWordsBlock}
             style={delay(4)}
             className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'}

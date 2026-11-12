@@ -66,6 +66,8 @@ export interface ClassroomGameLobbyProps {
   initialMinutes?: number;
   /** Arrived from a one-tap quick launch: show the decided room first. */
   quick?: boolean;
+  /** The rehearse tap this visit came from; only its launch is a rehearsal. */
+  rehearseEntry?: string;
   /** "Run this" session link: themed pack code, preset and quiz shape (validated by the page). */
   sessionPack?: string;
   initialPreset?: ClassroomPresetId;
@@ -74,7 +76,7 @@ export interface ClassroomGameLobbyProps {
   onBack: () => void;
 }
 
-export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initialFlow, cefrLevel, initialMode, initialMinutes, quick = false, sessionPack, initialPreset, initialQuestions, initialSeconds, onBack }: ClassroomGameLobbyProps) {
+export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initialFlow, cefrLevel, initialMode, initialMinutes, quick = false, rehearseEntry, sessionPack, initialPreset, initialQuestions, initialSeconds, onBack }: ClassroomGameLobbyProps) {
   const { t, language } = useLanguage();
   const tt = t as Translate;
   const { user, profile } = useAuth();
@@ -250,12 +252,13 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           accessibility,
           pressure: launchPressure({ hasPro: hasTeacherPro, loading: proLoading, accessTrialExpires }, opts.pressure, Date.now()),
         }),
-        quick ? 'hq_express' : 'create_room'
+        quick ? 'hq_express' : 'create_room',
+        rehearseEntry
       );
     },
     [
       user, profile, classroom, selectedClassroomId, selectedLessonIds, selectedLessons, allPlayableWords, gameCode,
-      language, t, launch, saveConfig, setStartError, opts, hasTeacherPro, proLoading, accessTrialExpires, quizPlayable, lessonLanguage, wordcraftOk, quick,
+      language, t, launch, saveConfig, setStartError, opts, hasTeacherPro, proLoading, accessTrialExpires, quizPlayable, lessonLanguage, wordcraftOk, quick, rehearseEntry,
     ]
   );
 

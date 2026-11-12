@@ -26,17 +26,27 @@ describe('RehearseWithBotsButton', () => {
     getLessons.mockResolvedValue({ data: [{ id: 'l1', name: 'Week 6', language: 'en', words: [{ word: 'river' }] }], error: null });
     render(<RehearseWithBotsButton classroomId="class-1" source="hq" language="en" t={t} />);
     fireEvent.click(screen.getByTestId('rehearse-with-bots'));
-    await waitFor(() => expect(push).toHaveBeenCalledWith('/en/education/classroom-game?flow=quickLaunch'));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(/^\/en\/education\/classroom-game\?flow=quickLaunch&rehearse=\w+$/)));
     expect(readQuickLaunchIntent()).toMatchObject({ source: 'lesson', lessonId: 'l1', classroomId: 'class-1', mode: 'classic' });
     expect(peekRehearseIntent()).toEqual({ source: 'hq', classExists: true });
     expect(getLessons).toHaveBeenCalledWith('teacher-1');
+  });
+
+  it('Given a tap, When the lobby opens, Then the URL carries the tap\'s own entry so only this visit can launch the rehearsal', async () => {
+    getLessons.mockResolvedValue({ data: [], error: null });
+    render(<RehearseWithBotsButton classroomId="class-1" source="hq" language="en" t={t} />);
+    fireEvent.click(screen.getByTestId('rehearse-with-bots'));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    const entry = new URL(push.mock.calls[0][0], 'https://x.test').searchParams.get('rehearse');
+    expect(entry).toBeTruthy();
+    expect(JSON.parse(sessionStorage.getItem('lexiclash:rehearse-intent') ?? '{}').entry).toBe(entry);
   });
 
   it('Given no class yet, When the teacher taps Rehearse, Then the launch makes the default class and the rehearsal is marked as class-less', async () => {
     getLessons.mockResolvedValue({ data: [], error: null });
     render(<RehearseWithBotsButton classroomId={undefined} source="hq" language="he" t={t} />);
     fireEvent.click(screen.getByTestId('rehearse-with-bots'));
-    await waitFor(() => expect(push).toHaveBeenCalledWith('/he/education/classroom-game?flow=quickLaunch'));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(/^\/he\/education\/classroom-game\?flow=quickLaunch&rehearse=\w+$/)));
     const intent = readQuickLaunchIntent();
     expect(intent).toMatchObject({ source: 'pack', mode: 'classic' });
     expect(intent?.classroomId).toBeUndefined();
@@ -59,7 +69,7 @@ describe('RehearseWithBotsButton', () => {
       render(<RehearseWithBotsButton classroomId="class-1" source="hq" language="en" t={t} />);
       fireEvent.click(screen.getByTestId('rehearse-with-bots'));
       await vi.advanceTimersByTimeAsync(2500);
-      expect(push).toHaveBeenCalledWith('/en/education/classroom-game?flow=quickLaunch');
+      expect(push).toHaveBeenCalledWith(expect.stringMatching(/^\/en\/education\/classroom-game\?flow=quickLaunch&rehearse=\w+$/));
       expect(readQuickLaunchIntent()).toMatchObject({ source: 'pack' });
     } finally {
       vi.useRealTimers();

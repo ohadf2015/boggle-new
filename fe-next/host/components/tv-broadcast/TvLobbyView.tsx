@@ -23,10 +23,11 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
-import { modeAllowsRehearsalBots, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
+import { modeAllowsRehearsalBots, realStudentCount, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
 import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
 import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
 import { PracticeSeatTimeoutNotice } from '@/components/education/live/PracticeSeatTimeoutNotice';
+import { PRACTICE_BOTS_FALLBACK_KEY, practiceBotsRefusalKey, usePracticeBotsRefusal } from '@/components/education/lobby/practiceBotsRefusal';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -177,11 +178,14 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const [soloDemoCallback, setSoloDemoCallback] = useState<(() => void) | null>(null);
 
   const [soloDemoFailed, setSoloDemoFailed] = useState(false);
+  const [soloDemoFailedKey, setSoloDemoFailedKey] = useState(PRACTICE_BOTS_FALLBACK_KEY);
   const rehearsalOrigin = useRef<{ source: RehearsalSource; classExists: boolean }>({ source: 'lobby', classExists: true });
 
   // Seats already taken when the practice round was asked for: the teacher's
   // own practice seat is one, and the round starts once bots join beside it.
   const soloDemoBaseline = useRef(0);
+  // Bumped when bots from an earlier practice run already fill the room, so the start check reruns.
+  const [soloDemoReadyTick, setSoloDemoReadyTick] = useState(0);
 
   // When bots are seated (more players than at the press), invoke the callback to start the game
   useEffect(() => {
@@ -193,7 +197,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
         trackEduRehearsalStarted({ ...rehearsalOrigin.current, mode: readLocalGameMode() ?? classroomGameMode ?? 'classic' });
       }
     }
-  }, [soloDemoInProgress, soloDemoCallback, playerCount, isClassroomMode, classroomGameMode]);
+  }, [soloDemoInProgress, soloDemoCallback, playerCount, isClassroomMode, classroomGameMode, soloDemoReadyTick]);
 
   // If the fill never lands, say so instead of leaving the button disabled
   // forever — a silently stuck control is the failure mode this repo keeps
@@ -203,10 +207,26 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     const timeout = setTimeout(() => {
       setSoloDemoInProgress(false);
       setSoloDemoCallback(null);
+      setSoloDemoFailedKey(PRACTICE_BOTS_FALLBACK_KEY);
       setSoloDemoFailed(true);
     }, SOLO_DEMO_FILL_TIMEOUT_MS);
     return () => clearTimeout(timeout);
   }, [soloDemoInProgress]);
+  const failSoloDemo = (key: string) => {
+    setSoloDemoInProgress(false);
+    setSoloDemoCallback(null);
+    setSoloDemoFailedKey(key);
+    setSoloDemoFailed(true);
+  };
+  usePracticeBotsRefusal(socketCtx?.socket ?? null, soloDemoInProgress, failSoloDemo, () => {
+    // Seated bots only stand in for a practice round while no real student is here; otherwise this would start the lesson.
+    if (realStudentCount(projectorStudents.filter((s) => !s.reconnecting)) > 0) {
+      failSoloDemo(practiceBotsRefusalKey('students_present'));
+      return;
+    }
+    soloDemoBaseline.current = -1;
+    setSoloDemoReadyTick((n) => n + 1);
+  });
 
   const handleSoloDemoClick = (origin?: RehearseIntent) => {
     if (!onStartSoloDemoWithBots) return;
@@ -221,6 +241,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
   const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
   const practiceRun = useRehearseAutoStart({
+    gameCode,
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
     practiceSeated,
@@ -255,6 +276,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           onStartPracticeRound={onStartSoloDemoWithBots ? () => handleSoloDemoClick() : undefined}
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
+          practiceRoundFailedKey={soloDemoFailedKey}
           lessonWordsBlock={lessonWordsBlock}
         />
         {practiceRun.seatTimedOut ? <PracticeSeatTimeoutNotice onBotsOnly={practiceRun.startBotsOnly} onRetry={practiceRun.retry} t={t} /> : null}
@@ -407,7 +429,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
 
           {soloDemoFailed && (
             <p data-testid="solo-demo-failed" role="status" className="text-center text-base font-bold text-neo-pink">
-              {t('tvLobby.practiceRoundFailed')}
+              {t(soloDemoFailedKey)}
             </p>
           )}
         </div>
