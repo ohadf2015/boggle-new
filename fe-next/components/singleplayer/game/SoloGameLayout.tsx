@@ -53,6 +53,8 @@ export interface SoloGameLayoutProps {
   grid: LetterGrid;
   language: Language;
   score: number;
+  /** Best score for these settings before this round; null when there is none to beat. */
+  personalBest?: number | null;
   /** null = untimed (practice). */
   remainingTime: number | null;
   totalSeconds: number;
@@ -145,7 +147,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
     foundWords, comboLevel, fireRoundActive, fireRoundRemaining, earthquakeState, currentFeedback,
     highlightedPath, isTypingMode = false, typedWord = '', keyboardHighlight, isDesktop, awaitingStart, onStart, onWordSubmit, onWordChange, onPathSubmit,
     onExit, onPauseToggle, gameStatsRef, t, soloStreak = 0, soloMultiplier = 1, soloPraiseKey = null,
-    soloMissions, soloChrome, soloLessonActive = false, children,
+    soloMissions, soloChrome, soloLessonActive = false, children, personalBest = null,
   } = props;
 
   const hapticsEnabled = useHapticsEnabled();
@@ -188,7 +190,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       )}
 
       {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
-      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" language={language} remainingTime={remainingTime} />}
+      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" language={language} remainingTime={remainingTime} score={score} personalBest={personalBest} />}
       {playing && !soloLessonActive && (
         <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}

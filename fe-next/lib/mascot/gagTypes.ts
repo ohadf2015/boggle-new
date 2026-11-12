@@ -3,8 +3,9 @@ import type { MascotSound } from './voice';
 
 export type BeatPhase = 'windup' | 'action' | 'freeze' | 'reaction';
 
-export type PropKind = 'tile' | 'tile-stack' | 'stamp' | 'book' | 'photo' | 'trophy' | 'dust' | 'cheat-sheet';
-export type PropMove = 'enter' | 'hold' | 'flip' | 'close' | 'fall' | 'drop' | 'exit';
+export type PropKind =
+  | 'tile' | 'tile-stack' | 'stamp' | 'book' | 'photo' | 'trophy' | 'dust' | 'cheat-sheet' | 'tape' | 'tape-double' | 'score-sheet';
+export type PropMove = 'enter' | 'hold' | 'flip' | 'close' | 'fall' | 'drop' | 'exit' | 'zip-out' | 'snap' | 'crumple';
 
 export interface GagBeat {
   phase: BeatPhase;
@@ -57,4 +58,12 @@ export interface GagDef {
   holdUntil?: 'word' | 'round-end';
   /** A real one-off moment that may follow another gag closely. */
   ignoresGap?: boolean;
+  /** Running-gag stages restart every play session instead of retiring for good. */
+  perSession?: boolean;
+  /** Eligible only once this gag has played in the current session (a callback). */
+  after?: string;
+  /** Daily gags in one group share a single daily slot and take turns across days. */
+  dailyGroup?: string;
+  /** Cuts a playing gag short and skips the round and session caps. */
+  interrupts?: boolean;
 }

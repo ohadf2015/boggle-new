@@ -45,7 +45,8 @@ describe('CrosswordView per-word juice', () => {
   it('Given solo play, the board runs the full reactions and the mascot is mounted for crossword', () => {
     render(<CrosswordView puzzle={puzzle} />);
     expect(grid.props?.juice).toBe('full');
-    expect(mascot.props).toEqual({ mode: 'crossword', comboLevel: 0 });
+    expect(mascot.props).toMatchObject({ mode: 'crossword', comboLevel: 0 });
+    expect(mascot.props).toHaveProperty('slotClassName', expect.stringContaining('lg:end-3'));
   });
 
   it('Given a word chain, shows a combo chip that grows with the chain and feeds the mascot', () => {

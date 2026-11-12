@@ -9,13 +9,13 @@ const ORDER: BeatPhase[] = ['windup', 'action', 'freeze', 'reaction'];
 describe('gag catalogue', () => {
   it('covers the bible gags this pass builds', () => {
     const numbers = GAG_CATALOG.map((g) => g.bible);
-    expect(numbers).toEqual(expect.arrayContaining([1, 3, 4, 6, 7, 8, 9, 12, 13, 16, 20]));
+    expect(numbers).toEqual(expect.arrayContaining([1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 13, 16, 20]));
   });
 
   it('ids are unique, and every gag has at least two variants so nothing plays twice in a row', () => {
     expect(new Set(GAG_CATALOG.map((g) => g.id)).size).toBe(GAG_CATALOG.length);
     for (const gag of GAG_CATALOG) {
-      expect(gag.variants.length).toBeGreaterThanOrEqual(gag.running ? 3 : 2);
+      expect(gag.variants.length).toBeGreaterThanOrEqual(gag.running && !gag.after ? 3 : 2);
       expect(new Set(gag.variants.map((v) => v.id)).size).toBe(gag.variants.length);
     }
   });

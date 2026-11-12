@@ -22,6 +22,11 @@ vi.mock('../components/SoloComboMeter', () => ({
 }));
 vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => <div data-testid="score-float" /> }));
 vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => <div data-testid="combo-milestone" /> }));
+vi.mock('@/components/mascot/GameMascotReactions', () => ({
+  GameMascotReactions: (p: { score?: number; personalBest?: number | null; personality?: string }) => (
+    <div data-testid="game-mascot" data-score={p.score} data-best={String(p.personalBest)} data-personality={p.personality} />
+  ),
+}));
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useHapticsEnabled: () => false,
   useShouldReduceMotion: () => true,
@@ -68,6 +73,12 @@ function props(over: Partial<SoloGameLayoutProps> = {}): SoloGameLayoutProps {
 }
 
 describe('SoloGameLayout', () => {
+  it('hands the mascot the live score and the old best so it can react the moment the record falls', () => {
+    render(<SoloGameLayout {...props({ score: 61, personalBest: 60 })} />);
+    const mascot = screen.getByTestId('game-mascot');
+    expect([mascot.dataset.score, mascot.dataset.best, mascot.dataset.personality]).toEqual(['61', '60', 'full']);
+  });
+
   it('sizes the board from its OWN slot, not the whole column', () => {
     // GIVEN a running game
     render(<SoloGameLayout {...props()} />);
