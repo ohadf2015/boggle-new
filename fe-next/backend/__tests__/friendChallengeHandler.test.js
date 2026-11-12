@@ -45,8 +45,6 @@ describe('Friend Challenge Handler — auth gate', () => {
     ['friends:sendChallenge', { friendUserId: 'u', challengeType: 'new_game' }],
     ['friends:acceptChallenge', { challengeId: 'c' }],
     ['friends:declineChallenge', { challengeId: 'c' }],
-    ['friends:getPendingChallenges', {}],
-    ['friends:cancelChallenge', { challengeId: 'c' }],
   ];
 
   for (const [evt, payload] of events) {

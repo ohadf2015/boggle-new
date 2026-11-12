@@ -211,15 +211,7 @@ export interface PendingChallengesResponse {
 
 export interface ClientToServerEvents {
   // Friend management
-  'friends:sendRequest': (data: SendFriendRequestPayload) => void;
-  'friends:acceptRequest': (data: AcceptFriendRequestPayload) => void;
-  'friends:declineRequest': (data: { requestId: string }) => void;
-  'friends:unfriend': (data: { friendUserId: string }) => void;
-  'friends:block': (data: { targetUserId: string }) => void;
-  'friends:unblock': (data: { targetUserId: string }) => void;
   'friends:getList': () => void;
-  'friends:searchUsers': (data: SearchUsersPayload) => void;
-  'friends:getPendingRequests': () => void;
 
   // Reporting (Social Apps & Features policy)
   'users:report': (data: { targetUserId: string; reason: string; context?: string }) => void;
@@ -235,18 +227,14 @@ export interface ClientToServerEvents {
 
   // Messaging
   'friends:sendMessage': (data: SendMessagePayload) => void;
-  'friends:getMessages': (data: GetMessagesPayload) => void;
   'friends:markRead': (data: MarkReadPayload) => void;
   'friends:typing': (data: TypingPayload) => void;
   'friends:deleteMessage': (data: { messageId: string }) => void;
-  'friends:getThreads': () => void;
 
   // Challenges
   'friends:sendChallenge': (data: SendChallengePayload) => void;
   'friends:acceptChallenge': (data: { challengeId: string }) => void;
   'friends:declineChallenge': (data: { challengeId: string }) => void;
-  'friends:getPendingChallenges': () => void;
-  'friends:cancelChallenge': (data: { challengeId: string }) => void;
 }
 
 export interface ServerToClientEvents {

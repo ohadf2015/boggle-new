@@ -8,6 +8,7 @@
 
 import { loadSupabaseClient } from '@/utils/supabase/loadClient';
 import logger from '@/utils/logger';
+import { postWithAuth } from '@/utils/authFetch';
 import {
   fetchPublicProfiles,
   PUBLIC_PROFILES_TABLE,
@@ -45,81 +46,27 @@ export {
   getUserByUsername,
 } from './friendsHeadToHead';
 
-/**
- * Send a friend request to another user
- */
-export async function sendFriendRequest(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await loadSupabaseClient();
+type FriendWriteResult = { success: boolean; error?: string; code?: string };
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'Not authenticated' };
+/** Every friendship write goes through the server: it applies the Families gate, notifies the other player and clears the cache. */
+async function friendAction(action: 'request' | 'accept' | 'unfriend' | 'block' | 'unblock', target: string): Promise<FriendWriteResult> {
+  try {
+    const res = await postWithAuth('/api/friends/action', { action, target }, { requireSession: true });
+    const body = (await res.json().catch(() => ({}))) as { success?: boolean; code?: string };
+    if (res.ok && body.success) return { success: true };
+    const code = body.code ?? `HTTP_${res.status}`;
+    return { success: false, code, error: code };
+  } catch (err) {
+    logger.error(`Friend ${action} failed:`, err);
+    return { success: false, code: 'NETWORK', error: 'NETWORK' };
   }
-
-  // Not .single(): duplicate rows for a pair make it error, which read as "no relationship".
-  const { data: rows } = await supabase
-    .from('friends')
-    .select('id, user_id, status')
-    .or(`and(user_id.eq.${user.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${user.id})`)
-    .limit(10);
-
-  const relations = (rows ?? []) as Array<{ id: string; user_id: string; status: FriendStatus }>;
-  if (relations.some((r) => r.status === 'blocked')) {
-    return { success: false, error: 'Unable to send request' };
-  }
-  if (relations.some((r) => r.status === 'accepted')) {
-    return { success: false, error: 'Already friends' };
-  }
-  const incoming = relations.find((r) => r.status === 'pending' && r.user_id === targetUserId);
-  if (incoming) {
-    // They already asked us — adding them back means accepting.
-    return acceptFriendRequest(incoming.id);
-  }
-  if (relations.some((r) => r.status === 'pending')) {
-    return { success: false, error: 'Request already pending' };
-  }
-
-  const { error } = await supabase
-    .from('friends')
-    .insert({
-      user_id: user.id,
-      friend_id: targetUserId,
-      status: 'pending',
-    });
-
-  if (error) {
-    logger.error('Error sending friend request:', error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
 }
 
-/**
- * Accept a friend request
- */
-export async function acceptFriendRequest(requestId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await loadSupabaseClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'Not authenticated' };
-  }
-
-  const { error } = await supabase
-    .from('friends')
-    .update({ status: 'accepted', updated_at: new Date().toISOString() })
-    .eq('id', requestId)
-    .eq('friend_id', user.id)
-    .eq('status', 'pending');
-
-  if (error) {
-    logger.error('Error accepting friend request:', error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}
+export const sendFriendRequest = (targetUserId: string) => friendAction('request', targetUserId);
+export const acceptFriendRequest = (requestId: string) => friendAction('accept', requestId);
+export const removeFriend = (friendUserId: string) => friendAction('unfriend', friendUserId);
+export const blockUser = (targetUserId: string) => friendAction('block', targetUserId);
+export const unblockUser = (targetUserId: string) => friendAction('unblock', targetUserId);
 
 /**
  * Decline a friend request
@@ -141,88 +88,6 @@ export async function declineFriendRequest(requestId: string): Promise<{ success
 
   if (error) {
     logger.error('Error declining friend request:', error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}
-
-/**
- * Remove a friend (unfriend)
- */
-export async function removeFriend(friendUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await loadSupabaseClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'Not authenticated' };
-  }
-
-  const { error } = await supabase
-    .from('friends')
-    .delete()
-    .or(`and(user_id.eq.${user.id},friend_id.eq.${friendUserId}),and(user_id.eq.${friendUserId},friend_id.eq.${user.id})`);
-
-  if (error) {
-    logger.error('Error removing friend:', error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}
-
-/**
- * Block a user
- */
-export async function blockUser(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await loadSupabaseClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'Not authenticated' };
-  }
-
-  await supabase
-    .from('friends')
-    .delete()
-    .or(`and(user_id.eq.${user.id},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${user.id})`);
-
-  const { error } = await supabase
-    .from('friends')
-    .insert({
-      user_id: user.id,
-      friend_id: targetUserId,
-      status: 'blocked',
-    });
-
-  if (error) {
-    logger.error('Error blocking user:', error);
-    return { success: false, error: error.message };
-  }
-
-  return { success: true };
-}
-
-/**
- * Unblock a user (removes the blocked relationship)
- */
-export async function unblockUser(targetUserId: string): Promise<{ success: boolean; error?: string }> {
-  const supabase = await loadSupabaseClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    return { success: false, error: 'Not authenticated' };
-  }
-
-  const { error } = await supabase
-    .from('friends')
-    .delete()
-    .eq('user_id', user.id)
-    .eq('friend_id', targetUserId)
-    .eq('status', 'blocked');
-
-  if (error) {
-    logger.error('Error unblocking user:', error);
     return { success: false, error: error.message };
   }
 

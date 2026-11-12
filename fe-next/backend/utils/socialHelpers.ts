@@ -3,7 +3,7 @@
  *
  * Provides O(1) user-room broadcasting, shared profile fetch with Redis caching,
  * and auth extraction. These replace the duplicated local copies in
- * friendsHandler.ts, friendMessagingHandler.ts, and friendChallengeHandler.ts.
+ * friendActions.ts, friendMessagingHandler.ts, and friendChallengeHandler.ts.
  */
 
 import type { Server, Socket } from 'socket.io';

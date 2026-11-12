@@ -12,7 +12,6 @@ import { registerBotHandlers } from './botHandler.js';
 import { registerTournamentHandlers } from './tournamentHandler.js';
 import { registerPresenceHandlers, startConnectionHealthCheck } from './presenceHandler.js';
 import { registerConnectionPageHandler } from './connectionPageHandler.js';
-import { registerFriendsHandlers } from './friendsHandler.js';
 import { registerFriendMessagingHandlers } from './friendMessagingHandler.js';
 import { registerFriendChallengeHandlers } from './friendChallengeHandler.js';
 import { registerUserReportHandlers } from './userReportHandler.js';
@@ -59,7 +58,6 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerTournamentHandlers(io, socket);
   registerPresenceHandlers(io, socket);
   registerConnectionPageHandler(io, socket);
-  registerFriendsHandlers(io, socket);
   registerFriendMessagingHandlers(io, socket);
   registerFriendChallengeHandlers(io, socket);
   registerUserReportHandlers(io, socket);

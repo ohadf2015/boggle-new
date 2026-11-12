@@ -213,6 +213,8 @@ export function createSocketServer(httpServer: HttpServer, corsOrigin: string): 
     });
   });
 
+  // Next API routes run in this process but get their own module graph; friendActions reads io from here.
+  (globalThis as { __lcIo?: Server }).__lcIo = io;
   return io;
 }
 

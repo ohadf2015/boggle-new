@@ -11,7 +11,6 @@ vi.mock('../chatHandler', () => ({ registerChatHandlers: vi.fn() }));
 vi.mock('../botHandler', () => ({ registerBotHandlers: vi.fn() }));
 vi.mock('../tournamentHandler', () => ({ registerTournamentHandlers: vi.fn() }));
 vi.mock('../presenceHandler', () => ({ registerPresenceHandlers: vi.fn(), startConnectionHealthCheck: vi.fn() }));
-vi.mock('../friendsHandler', () => ({ registerFriendsHandlers: vi.fn() }));
 vi.mock('../friendMessagingHandler', () => ({ registerFriendMessagingHandlers: vi.fn() }));
 vi.mock('../friendChallengeHandler', () => ({ registerFriendChallengeHandlers: vi.fn() }));
 vi.mock('../hostHandler', () => ({ registerHostHandlers: vi.fn() }));

@@ -1,6 +1,6 @@
 /**
  * friendChallengeHandler tests (Q-1)
- * Covers: sendChallenge, acceptChallenge, declineChallenge, getPendingChallenges, cancelChallenge, auth checks
+ * Covers: sendChallenge, acceptChallenge, declineChallenge, auth checks
  */
 
 vi.mock('../../utils/logger', () => {
@@ -100,8 +100,6 @@ describe('friendChallengeHandler', () => {
     expect(handlers.has('friends:sendChallenge')).toBe(true);
     expect(handlers.has('friends:acceptChallenge')).toBe(true);
     expect(handlers.has('friends:declineChallenge')).toBe(true);
-    expect(handlers.has('friends:getPendingChallenges')).toBe(true);
-    expect(handlers.has('friends:cancelChallenge')).toBe(true);
   });
 
   describe('friends:sendChallenge', () => {
@@ -198,12 +196,4 @@ describe('friendChallengeHandler', () => {
     });
   });
 
-  describe('friends:getPendingChallenges', () => {
-    it('should reject unauthenticated users', async () => {
-      mockGetAuthUserId.mockReturnValue(null);
-      const { trigger } = createTestHarness();
-      await trigger('friends:getPendingChallenges');
-      expect(mockEmitError).toHaveBeenCalled();
-    });
-  });
 });

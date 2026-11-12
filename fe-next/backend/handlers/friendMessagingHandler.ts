@@ -116,55 +116,6 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
     }
   });
 
-  // ==================== Get Message History ====================
-  socket.on('friends:getMessages', async (data: {
-    friendUserId: string;
-    before?: number;
-    limit?: number;
-  }) => {
-    const authUserId = getAuthUserId(socket);
-    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_MESSAGES)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    if (!authUserId) {
-      emitError(socket, ErrorCodes.AUTH_REQUIRED);
-      return;
-    }
-
-    if (!data?.friendUserId) {
-      socket.emit('friends:error', {
-        code: 'VALIDATION_FAILED',
-        message: 'Friend user ID is required',
-      });
-      return;
-    }
-
-    try {
-      const limit = Math.min(data.limit || 50, 100); // Max 100
-      const result = await friendsManager.getMessages(
-        authUserId,
-        data.friendUserId,
-        limit,
-        data.before
-      );
-
-      socket.emit('friends:messageHistory', {
-        friendUserId: data.friendUserId,
-        messages: result.messages,
-        hasMore: result.hasMore,
-        oldestTimestamp: result.oldestTimestamp,
-      });
-    } catch (error) {
-      logger.error('MESSAGING_HANDLER', `Error getting messages: ${(error as Error).message}`);
-      socket.emit('friends:error', {
-        code: 'SERVER_ERROR',
-        message: 'Failed to get messages',
-      });
-    }
-  });
-
   // ==================== Mark Messages as Read ====================
   socket.on('friends:markRead', async (data: {
     friendUserId: string;
@@ -318,74 +269,6 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
       socket.emit('friends:error', {
         code: 'SERVER_ERROR',
         message: 'Failed to delete message',
-      });
-    }
-  });
-
-  // ==================== Get Message Threads ====================
-  socket.on('friends:getThreads', async () => {
-    const authUserId = getAuthUserId(socket);
-    if (!checkRateLimit(authUserId || socket.id, RATE_WEIGHTS.GET_THREADS)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    if (!authUserId) {
-      emitError(socket, ErrorCodes.AUTH_REQUIRED);
-      return;
-    }
-
-    try {
-      const supabase = getSupabase();
-      if (!supabase) {
-        socket.emit('friends:error', {
-          code: 'SERVER_ERROR',
-          message: 'Database unavailable',
-        });
-        return;
-      }
-
-      // One round-trip: last message + profile + unread count per thread.
-      // Replaces the old per-friend N+1. See migration 20260628000000_friend_threads_rpc.sql.
-      const { data: rows, error } = await supabase.rpc('get_friend_threads', { p_user_id: authUserId });
-
-      if (error || !rows) {
-        if (error) {
-          logger.error('MESSAGING_HANDLER', `Error getting threads: ${error.message}`);
-        }
-        socket.emit('friends:threads', { threads: [], timestamp: Date.now() });
-        return;
-      }
-
-      const fiveMinAgo = Date.now() - 5 * 60 * 1000;
-      const validThreads = (rows as FriendThreadRow[])
-        .map((row) => ({
-          conversationId: [authUserId, row.friend_id].sort().join('_'),
-          friendUserId: row.friend_id,
-          friendUsername: row.username,
-          friendDisplayName: row.display_name || undefined,
-          friendAvatar: {
-            emoji: row.avatar_emoji || '👤',
-            color: row.avatar_color || '#808080',
-            image: row.avatar_image || undefined,
-            customAvatar: row.avatar_config || undefined,
-          },
-          lastMessage: row.last_message,
-          lastMessageAt: new Date(row.last_message_at).getTime(),
-          unreadCount: Number(row.unread_count) || 0,
-          isOnline: !!row.last_seen_at && new Date(row.last_seen_at).getTime() > fiveMinAgo,
-        }))
-        .sort((a, b) => b.lastMessageAt - a.lastMessageAt);
-
-      socket.emit('friends:threads', {
-        threads: validThreads,
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      logger.error('MESSAGING_HANDLER', `Error getting threads: ${(error as Error).message}`);
-      socket.emit('friends:error', {
-        code: 'SERVER_ERROR',
-        message: 'Failed to get message threads',
       });
     }
   });

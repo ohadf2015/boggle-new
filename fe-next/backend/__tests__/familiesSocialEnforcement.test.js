@@ -50,7 +50,6 @@ vi.mock('../utils/socialPolicyServer', () => ({
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { registerChatHandlers } from '../handlers/chatHandler';
 import { registerFriendMessagingHandlers } from '../handlers/friendMessagingHandler';
-import { registerFriendsHandlers } from '../handlers/friendsHandler';
 import { emitError, ErrorCodes } from '../utils/errorHandler';
 import { ensureSocialCapability } from '../utils/socialPolicyServer';
 import * as friendsManager from '../modules/friendsManager';
@@ -102,31 +101,5 @@ describe('friendMessagingHandler.friends:sendMessage — friendMessaging gate', 
       expect.anything(),
     );
     expect(friendsManager.sendMessage).not.toHaveBeenCalled();
-  });
-});
-
-describe('friendsHandler — friendManagement gate', () => {
-  it('rejects friend requests from a restricted user', async () => {
-    ensureSocialCapability.mockResolvedValue(false);
-    const { handlers } = wire(registerFriendsHandlers);
-    await handlers['friends:sendRequest']({ targetUserId: 'u2' });
-    expect(ensureSocialCapability).toHaveBeenCalledWith(expect.anything(), 'friendManagement');
-    expect(emitError).toHaveBeenCalledWith(
-      expect.anything(),
-      ErrorCodes.SOCIAL_RESTRICTED,
-      expect.anything(),
-    );
-  });
-
-  it('rejects user search from a restricted user', async () => {
-    ensureSocialCapability.mockResolvedValue(false);
-    const { handlers } = wire(registerFriendsHandlers);
-    await handlers['friends:searchUsers']({ query: 'bob' });
-    expect(ensureSocialCapability).toHaveBeenCalledWith(expect.anything(), 'friendManagement');
-    expect(emitError).toHaveBeenCalledWith(
-      expect.anything(),
-      ErrorCodes.SOCIAL_RESTRICTED,
-      expect.anything(),
-    );
   });
 });
