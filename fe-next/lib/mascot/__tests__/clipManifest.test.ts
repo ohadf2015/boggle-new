@@ -53,3 +53,12 @@ describe('withClip', () => {
     expect(v.beats.find((b) => b.phase === 'action')!.cry).toBe(variant.beats.find((b) => b.phase === 'action')!.cry);
   });
 });
+
+describe('withClip — paths from the shipped manifest', () => {
+  it('uses a manifest file path that is already absolute as-is', async () => {
+    const { withClip } = await import('../clipManifest');
+    const clips = new Map([['bonk-dizzy', { id: 'bonk-dizzy', file: '/mascot/anim/bonk-dizzy.webp', poster: '/mascot/anim/bonk-dizzy-poster.webp', durationMs: 2800, loop: false, beats: { windupMs: 400, actionMs: 300, holdMs: 600 }, tags: [] }]]);
+    const gag = { id: 'g', clip: 'bonk-dizzy', beats: [{ phase: 'action', pose: 'x', ms: 100 }] } as never;
+    expect(withClip(gag, clips as never).clipSrc).toBe('/mascot/anim/bonk-dizzy.webp');
+  });
+});
