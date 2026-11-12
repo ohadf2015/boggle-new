@@ -20,6 +20,9 @@ vi.mock('@/components/AvatarLite', () => ({
   ),
 }));
 
+const chosen = vi.hoisted(() => ({ title: null as string | null, status: 'ready' }));
+vi.mock('@/components/progression/useChosenTitle', () => ({ useChosenTitle: () => ({ status: chosen.status, title: chosen.title }) }));
+
 vi.mock('@/hooks/useAccountStreak', () => ({
   useAccountStreak: vi.fn(() => ({ streak: 0, loading: false })),
 }));
@@ -38,6 +41,7 @@ const t = (
     'landing.home.levelTitle': 'Level {level} · {title}',
     'landing.home.levelOnly': 'Level {level}',
     'landing.home.titles.LEXICON_KING': 'Lexicon King',
+    'progression.titles.NEMESIS': 'Nemesis',
   };
   const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
   const params =
@@ -49,6 +53,8 @@ const t = (
 
 describe('HomeTopBar', () => {
   beforeEach(() => {
+    chosen.title = null;
+    chosen.status = 'ready';
     vi.mocked(useAccountStreak).mockReturnValue({
       streak: 0,
       loading: false,
@@ -221,5 +227,25 @@ describe('HomeTopBar', () => {
     expect(src).not.toMatch(/from '@\/components\/Avatar'/);
     expect(src).not.toMatch(/from '@\/components\/avatar\//);
     expect(src).toMatch(/<AvatarLite/);
+  });
+
+  it('shows the title the player picked over the level title', () => {
+    chosen.title = 'NEMESIS';
+    const profile = { id: 'u1', username: 'f', display_name: 'Fish', current_level: 76, total_xp: 0, total_coins: 0 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} language="en" t={t} />);
+    expect(screen.getByText('Level 76 · Nemesis')).toBeInTheDocument();
+  });
+
+  it('wraps the avatar in the shared XP ring', () => {
+    render(<HomeTopBar profile={null} language="en" t={t} />);
+    expect(screen.getByTestId('level-ring')).toBeInTheDocument();
+  });
+
+  it('holds the title back while the picked title is still loading (no level-title flash)', () => {
+    chosen.status = 'loading';
+    const profile = { id: 'u1', username: 'f', display_name: 'Fish', current_level: 76, total_xp: 0, total_coins: 0 } as unknown as ProfileData;
+    render(<HomeTopBar profile={profile} language="en" t={t} />);
+    expect(screen.getByText('Level 76')).toBeInTheDocument();
+    expect(screen.queryByText(/Lexicon King/)).toBeNull();
   });
 });

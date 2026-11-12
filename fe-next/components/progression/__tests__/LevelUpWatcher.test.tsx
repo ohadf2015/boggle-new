@@ -10,7 +10,7 @@ vi.mock('@/components/animations/LevelUpCelebration', () => ({
   ),
 }));
 
-import { announceLevelUp, getPendingLevelUp, __resetLevelUpBusForTests } from '@/lib/levelUp/levelUpBus';
+import { announceLevelUp, getPendingLevelUp, registerRevealHost, __resetLevelUpBusForTests } from '@/lib/levelUp/levelUpBus';
 import { LEVEL_UNLOCK_LADDER } from '@/lib/avatar/unlocks';
 import { LevelUpWatcher } from '../LevelUpWatcher';
 
@@ -39,8 +39,9 @@ describe('LevelUpWatcher', () => {
     expect(getPendingLevelUp()).toBeNull();
   });
 
-  it('leaves part-granting level-ups to the unlock reveal (no double celebration)', async () => {
+  it('leaves part-granting level-ups to a mounted unlock reveal (no double celebration)', async () => {
     const rung = LEVEL_UNLOCK_LADDER[0].level;
+    const release = registerRevealHost();
     render(<LevelUpWatcher />);
     act(() => {
       announceLevelUp({ oldLevel: rung - 1, newLevel: rung }, 'single');
@@ -48,5 +49,15 @@ describe('LevelUpWatcher', () => {
     await new Promise(r => setTimeout(r, 0));
     expect(screen.queryByTestId('level-up-celebration')).toBeNull();
     expect(getPendingLevelUp()).toBeNull();
+    release();
+  });
+
+  it('celebrates a part-granting level-up when no reveal host is on screen', async () => {
+    const rung = LEVEL_UNLOCK_LADDER[0].level;
+    render(<LevelUpWatcher />);
+    act(() => {
+      announceLevelUp({ oldLevel: rung - 1, newLevel: rung }, 'quickPlay');
+    });
+    expect(await screen.findByTestId('level-up-celebration')).toHaveAttribute('data-level', String(rung));
   });
 });

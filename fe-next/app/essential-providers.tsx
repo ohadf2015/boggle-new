@@ -73,6 +73,7 @@ const SignupPromptHost = dynamic(() => import(/* webpackChunkName: "app-root-mou
 const PlayerStyleOnboardingWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/PlayerStyleOnboardingWrapper'), { ssr: false });
 const AgeGatePromptWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/AgeGatePromptWrapper'), { ssr: false });
 const UnlockNotifierMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
+const LevelUpWatcher = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/progression/LevelUpWatcher'), { ssr: false });
 const IncomingPingToast = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/rivals/IncomingPingToast'), { ssr: false });
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
@@ -332,6 +333,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
                                                 {gameSurface && <UnlockNotifierMount />}
                                                 {gameSurface && <IncomingPingToast />}
+                                                {gameSurface && <LevelUpWatcher />}
                                                 {/* Native AdMob banner — single global mount, route-aware.
                                                     BannerCoordinatorMount hosts the single banner coordinator
                                                     (ops + load/fail/foreground signals) the two banner owners

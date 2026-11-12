@@ -22969,6 +22969,13 @@ const sv = {
       "upNext": "Näst på tur",
       "atLevel": "Nv {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "Sparas inte",
+      "levelUp": "Nivå {level}!",
+      "signInToKeep": "Logga in och behåll dina +{xp} XP",
+      "toNextLevel": "{xp} XP kvar till nivå {level}"
+    },
     "titles": {
       "newTitle": "Ny titel",
       "pickerTitle": "Din titel",

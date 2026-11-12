@@ -274,24 +274,19 @@ export async function updatePlayerStats(
     updates.achievement_counts = currentCounts;
   }
 
-  // Calculate XP earned this game.
-  //
-  // This path is multiplayer-only (single-player XP is awarded separately in
-  // app/api/stats/record-game). `totalPlayers` here is the count of REAL
-  // (non-bot) players — bots are filtered out upstream in gameResults.ts. So a
-  // game with fewer than two real players means the human played only against
-  // bots and earns NO XP. Stats (games_played etc.) still update.
+  // `totalPlayers` is the REAL (non-bot) count, filtered upstream in gameResults.ts.
+  // A bot-only game earns what a solo game earns, granted through increment_player_xp
+  // so the daily cap and level diminishing returns apply (update_player_stats_and_xp skips them).
   const realPlayerCount = gameStats.totalPlayers || 1;
-  const isWinner = gameStats.placement === 1 && realPlayerCount > 1;
+  const botOnly = !hasRealOpponent(realPlayerCount);
+  const isWinner = !botOnly && gameStats.placement === 1;
   const achievementCount = gameStats.achievements?.length || 0;
-  const xpResult = hasRealOpponent(realPlayerCount)
-    ? calculateGameXp({
-        score: gameStats.score || 0,
-        isWinner,
-        achievementCount,
-        playerCount: realPlayerCount,
-      })
-    : { totalXp: 0, breakdown: { gameCompletion: 0, scoreXp: 0, winBonus: 0, achievementXp: 0 } };
+  const xpResult = calculateGameXp({
+    score: gameStats.score || 0,
+    isWinner,
+    achievementCount,
+    playerCount: botOnly ? 1 : realPlayerCount,
+  });
 
   // Apply comeback XP multiplier if active
   const { data: engagement } = await client
@@ -301,6 +296,7 @@ export async function updatePlayerStats(
     .single();
 
   if (
+    !botOnly &&
     xpResult.totalXp > 0 &&
     engagement?.comeback_xp_multiplier &&
     engagement.comeback_xp_multiplier > 1 &&
@@ -336,7 +332,7 @@ export async function updatePlayerStats(
   try {
     // Atomic stats + XP update in a single RPC to prevent deadlocks
     // The RPC acquires a FOR UPDATE lock once, then does both writes
-    let newTotalXp = (profile.total_xp || 0) + xpResult.totalXp;
+    let newTotalXp = (profile.total_xp || 0) + (botOnly ? 0 : xpResult.totalXp);
     let newLevel = getLevelFromXp(newTotalXp);
     let actualXpGranted = xpResult.totalXp;
 
@@ -345,7 +341,7 @@ export async function updatePlayerStats(
         .rpc('update_player_stats_and_xp', {
           p_player_id: playerId,
           p_stats: updates,
-          p_xp_amount: xpResult.totalXp,
+          p_xp_amount: botOnly ? 0 : xpResult.totalXp,
         }),
       'atomic stats+XP update'
     );
@@ -364,12 +360,28 @@ export async function updatePlayerStats(
       actualXpGranted = xpRow.xp_granted as number;
     }
 
+    if (botOnly) {
+      actualXpGranted = 0;
+      const { data: grant, error: grantError } = await retryOnDeadlock(
+        () => client.rpc('increment_player_xp', { p_player_id: playerId, p_xp_amount: xpResult.totalXp }),
+        'bot-only XP grant'
+      );
+      const grantRow = (grant as Record<string, unknown>[] | null)?.[0];
+      if (grantError || !grantRow) {
+        logger.error('SUPABASE', `Bot-only XP grant failed for ${playerId}`, grantError?.message ?? 'no row');
+      } else {
+        newTotalXp = Number(grantRow.new_total_xp);
+        newLevel = Number(grantRow.new_level);
+        actualXpGranted = Number(grantRow.xp_granted);
+      }
+    }
+
     // Build return data from what we already have — avoids an extra DB round-trip.
     // The RPC gave us XP/level; merge with the updates we just wrote.
     const data = { ...profile, ...updates, total_xp: newTotalXp, current_level: newLevel };
 
-    if (xpResult.totalXp > 0) {
-      // Feed XP into the player's weekly league (fire-and-forget)
+    if (!botOnly && actualXpGranted > 0) {
+      // Weekly league counts games against people; solo and bot-only XP stay out, as in record-game.
       addXpToLeague(playerId, actualXpGranted).catch((err) => {
         logger.warn('LEAGUE', `Failed to add league XP for ${playerId}`, err?.message);
       });

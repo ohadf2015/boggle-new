@@ -33,7 +33,7 @@ function makeSupabase({
 } = {}) {
   const rpc = vi.fn(async (fn: string) =>
     fn === 'increment_player_xp'
-      ? { data: [{ xp_granted: 40, new_level: newLevel }], error: null }
+      ? { data: [{ xp_granted: 40, new_level: newLevel, new_total_xp: 940 }], error: null }
       : { data: [], error: null },
   );
   const from = vi.fn((table: string) => {
@@ -70,6 +70,7 @@ describe('processBlastCompletion', () => {
       expect(result.body.personalBests?.bestScore).toBe(500);
       expect(result.body.isNewBestScore).toBe(true);
       expect(result.body.xpAwarded).toBe(40);
+      expect(result.body.newTotalXp).toBe(940);
       expect(result.body.percentile).toBe(42);
     }
   });

@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 import { en } from '@/translations/en';
 import { he } from '@/translations/he';
 import { sv } from '@/translations/sv';
@@ -7,6 +9,7 @@ import { es } from '@/translations/es';
 import { ru } from '@/translations/ru';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 import { LEVEL_UNLOCK_LADDER } from '@/lib/avatar/unlocks';
+import { __resetLevelUpBusForTests, settleLevelUp } from '@/lib/levelUp/levelUpBus';
 import {
   applyUnlockToConfig,
   buildUnlockReveal,
@@ -29,7 +32,10 @@ function resolve(obj: Record<string, unknown>, path: string): unknown {
   return path.split('.').reduce<unknown>((o, k) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[k] : undefined), obj);
 }
 
-beforeEach(() => __resetRevealSessionForTests());
+beforeEach(() => {
+  __resetRevealSessionForTests();
+  __resetLevelUpBusForTests();
+});
 
 describe('buildUnlockReveal', () => {
   it('returns null for no payload, same level, or a level-up that crosses no rung', () => {
@@ -104,6 +110,11 @@ describe('levelUpFromRecordGame', () => {
     expect(up).toEqual({ oldLevel: 1, newLevel: 2 });
   });
 
+  it('uses the old level the server reports when it has one', () => {
+    const up = levelUpFromRecordGame({ leveledUp: true, oldLevel: 4, newLevel: 6, newTotalXp: 999999, xpEarned: 10 });
+    expect(up).toEqual({ oldLevel: 4, newLevel: 6 });
+  });
+
   it('never reports an old level at or above the new one', () => {
     const up = levelUpFromRecordGame({ leveledUp: true, newLevel: 3, newTotalXp: 999999, xpEarned: 0 });
     expect(up).toEqual({ oldLevel: 2, newLevel: 3 });
@@ -124,6 +135,12 @@ describe('publish / subscribe (in-memory, no storage)', () => {
 
   it('ignores a level-up with nothing to reveal', () => {
     publishLevelUp({ oldLevel: 10, newLevel: 11 });
+    expect(getPublishedReveal()).toBeNull();
+  });
+
+  it('drops a reveal the celebration already covered, so it cannot pop later on another screen', () => {
+    publishLevelUp({ oldLevel: 1, newLevel: 2 }, 'quickPlay');
+    expect(settleLevelUp()).toBe('celebrate');
     expect(getPublishedReveal()).toBeNull();
   });
 

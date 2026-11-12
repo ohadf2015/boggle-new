@@ -22669,6 +22669,13 @@ const ru = {
       "upNext": "Дальше",
       "atLevel": "Ур. {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "Не сохранено",
+      "levelUp": "Уровень {level}!",
+      "signInToKeep": "Войди, чтобы сохранить +{xp} XP",
+      "toNextLevel": "До уровня {level}: {xp} XP"
+    },
     "titles": {
       "newTitle": "Новый титул",
       "pickerTitle": "Твой титул",

@@ -8,6 +8,10 @@ import {
   getPendingLevelUp,
   consumeLevelUp,
   subscribeLevelUp,
+  registerRevealHost,
+  hasRevealHost,
+  settleLevelUp,
+  celebratedThrough,
   __resetLevelUpBusForTests,
 } from '../levelUpBus';
 
@@ -55,5 +59,64 @@ describe('levelUpBus — every level-up, once', () => {
     announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'single');
     consumeLevelUp();
     expect(getPendingLevelUp()).toBeNull();
+  });
+});
+
+describe('levelUpBus — celebration or reveal, never both, never neither', () => {
+  beforeEach(() => {
+    capture.mockClear();
+    __resetLevelUpBusForTests();
+  });
+
+  it('Given a new level-up, Then it waits undecided until a watcher settles it', () => {
+    announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'quickPlay');
+    expect(getPendingLevelUp()?.display).toBe('undecided');
+  });
+
+  it('Given no reveal host, When a level unlocks a part, Then the celebration shows', () => {
+    announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'quickPlay');
+    expect(settleLevelUp()).toBe('celebrate');
+    expect(getPendingLevelUp()?.display).toBe('celebrate');
+    expect(celebratedThrough()).toBe(2);
+  });
+
+  it('Given a mounted reveal host, When a level unlocks a part, Then the reveal owns it and nothing stays pending', () => {
+    registerRevealHost();
+    announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'single');
+    expect(settleLevelUp()).toBe('reveal');
+    expect(getPendingLevelUp()).toBeNull();
+    expect(celebratedThrough()).toBe(0);
+  });
+
+  it('Given a mounted reveal host, When a level unlocks nothing, Then the celebration shows', () => {
+    registerRevealHost();
+    announceLevelUp({ oldLevel: 10, newLevel: 11 }, 'single');
+    expect(settleLevelUp()).toBe('celebrate');
+  });
+
+  it('Given a host that unmounted, When a level unlocks a part, Then the celebration shows', () => {
+    const release = registerRevealHost();
+    expect(hasRevealHost()).toBe(true);
+    release();
+    release();
+    expect(hasRevealHost()).toBe(false);
+    announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'blast');
+    expect(settleLevelUp()).toBe('celebrate');
+  });
+
+  it('settling twice or with nothing pending changes nothing', () => {
+    expect(settleLevelUp()).toBeNull();
+    announceLevelUp({ oldLevel: 1, newLevel: 2 }, 'blast');
+    settleLevelUp();
+    const first = getPendingLevelUp();
+    expect(settleLevelUp()).toBe('celebrate');
+    expect(getPendingLevelUp()).toBe(first);
+  });
+
+  it('notifies subscribers when a host registers, so a watcher re-reads', () => {
+    const listener = vi.fn();
+    subscribeLevelUp(listener);
+    registerRevealHost();
+    expect(listener).toHaveBeenCalled();
   });
 });

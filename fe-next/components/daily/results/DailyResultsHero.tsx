@@ -1,5 +1,6 @@
 'use client';
 
+import { useResultsXp } from '@/components/progression/resultsXpStore';
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import React, { useEffect, useRef, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
@@ -79,6 +80,7 @@ export function DailyResultsHero({
 }: DailyResultsHeroProps) {
   const { t } = useLanguage();
   const played = useDailyPlayedStatus();
+  const xp = useResultsXp(`daily:${mode}`);
   const def = DAILY_MODES.find(d => d.id === mode) as DailyModeDef;
   const accent = ACCENT[def.accent];
   const [reduced] = useState(prefersReducedMotion);
@@ -269,7 +271,7 @@ export function DailyResultsHero({
           <m.div {...beat(REVEAL.details, { y: 16, scale: 0.94 })}>{children}</m.div>
         </div>
       )}
-      <div className="border-t-3 border-neo-black p-3"><ResultsSocialSlot mode="daily" score={score} subMode={mode} /></div>
+      <div className="border-t-3 border-neo-black p-3"><ResultsSocialSlot mode="daily" score={score} subMode={mode} xp={xp} /></div>
     </section>
   );
 }

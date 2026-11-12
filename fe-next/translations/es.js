@@ -22981,6 +22981,13 @@ const es = {
       "upNext": "Lo próximo",
       "atLevel": "Nv {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "Sin guardar",
+      "levelUp": "¡Nivel {level}!",
+      "signInToKeep": "Inicia sesión para guardar tus +{xp} XP",
+      "toNextLevel": "Te faltan {xp} XP para el nivel {level}"
+    },
     "titles": {
       "newTitle": "Nuevo título",
       "pickerTitle": "Tu título",

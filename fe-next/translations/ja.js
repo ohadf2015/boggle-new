@@ -22969,6 +22969,13 @@ const ja = {
       "upNext": "次の解放",
       "atLevel": "Lv {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "未保存",
+      "levelUp": "レベル{level}！",
+      "signInToKeep": "ログインして+{xp} XPをキープしよう",
+      "toNextLevel": "レベル{level}まであと{xp} XP"
+    },
     "titles": {
       "newTitle": "新しい称号",
       "pickerTitle": "あなたの称号",

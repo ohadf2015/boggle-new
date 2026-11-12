@@ -47,6 +47,8 @@ export interface BlastCompletionBody {
   isNewBestScore: boolean;
   isNewBestCombo: boolean;
   xpAwarded: number;
+  /** Total XP after this grant; null when the grant did not report it */
+  newTotalXp?: number | null;
   levelUp?: { oldLevel: number; newLevel: number } | null;
   percentile: number | null;
   /** This week's board (the only Blast board). */
@@ -203,6 +205,7 @@ export async function processBlastCompletion(
   const scoreBonus = Math.min(cap - baseXp, Math.floor(data.score / 100));
   const xpToAward = Math.min(Math.round(baseXp + scoreBonus), cap);
   let xpAwarded = 0;
+  let newTotalXp: number | null = null;
   let levelUp: { oldLevel: number; newLevel: number } | null = null;
 
   if (xpToAward > 0) {
@@ -215,6 +218,7 @@ export async function processBlastCompletion(
     } else if (xpData && (xpData as unknown[]).length > 0) {
       const row = (xpData as Record<string, unknown>[])[0];
       xpAwarded = (row.xp_granted as number) ?? xpToAward;
+      if (row.new_total_xp != null) newTotalXp = Number(row.new_total_xp);
       const newLevel = typeof row.new_level === 'number' ? row.new_level : null;
       if (levelBefore !== null && newLevel !== null && newLevel > levelBefore) {
         levelUp = { oldLevel: levelBefore, newLevel };
@@ -257,6 +261,7 @@ export async function processBlastCompletion(
       isNewBestScore,
       isNewBestCombo,
       xpAwarded,
+      newTotalXp,
       levelUp,
       percentile,
       rank: after?.rank ?? null,

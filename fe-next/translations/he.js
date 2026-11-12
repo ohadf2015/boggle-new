@@ -22911,6 +22911,13 @@ const he = {
       "upNext": "בקרוב אצלך",
       "atLevel": "רמה {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "לא נשמר",
+      "levelUp": "רמה {level}!",
+      "signInToKeep": "התחברו ושמרו את {xp} נקודות ה־XP",
+      "toNextLevel": "עוד {xp} XP לרמה {level}"
+    },
     "titles": {
       "newTitle": "תואר חדש",
       "pickerTitle": "התואר שלך",

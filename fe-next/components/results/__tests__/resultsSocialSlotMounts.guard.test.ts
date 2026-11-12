@@ -20,4 +20,11 @@ describe('ResultsSocialSlot is mounted on every results screen', () => {
     const src = readFileSync(join(ROOT, file), 'utf8');
     expect(src).toMatch(new RegExp(`<ResultsSocialSlot\\s+mode="${mode}"`));
   });
+
+  it.each(MOUNTS.filter(([, mode]) => mode !== 'edu'))('%s feeds the XP moment an xp prop', (file) => {
+    const src = readFileSync(join(ROOT, file), 'utf8');
+    const start = src.indexOf('<ResultsSocialSlot');
+    const tag = src.slice(start, src.indexOf('/>', start));
+    expect(tag).toMatch(/\bxp=\{/);
+  });
 });

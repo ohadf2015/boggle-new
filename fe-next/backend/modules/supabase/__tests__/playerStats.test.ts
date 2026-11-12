@@ -19,6 +19,9 @@ vi.mock('../../xpManager', () => ({
   getTitleForLevel: vi.fn(),
 }));
 
+const addXpToLeague = vi.hoisted(() => vi.fn(async () => undefined));
+vi.mock('../../leagueManager', () => ({ addXpToLeague }));
+
 vi.mock('../../../utils/logger', () => ({ default: {
   info: vi.fn(),
   error: vi.fn(),
@@ -429,47 +432,53 @@ describe('updatePlayerStats', () => {
       expect(rpcCall[1].p_stats.practice_graduated_at).toEqual(expect.any(String));
     });
 
-    test('should award NO XP when there was no real opponent (only bots)', async () => {
-      // GIVEN: Player exists. This path is multiplayer-only and totalPlayers is
-      // the real (non-bot) player count, so totalPlayers=1 means the human played
-      // only against bots.
-      const playerId = 'user-123';
-      const currentProfile = {
-        id: playerId,
-        username: 'TestPlayer',
-        total_xp: 500,
-        current_level: 5,
-        total_games: 10,
-        total_score: 5000,
-        total_words: 100,
-        ranked_games: 5,
-        casual_games: 5,
-        ranked_wins: 2,
-        casual_wins: 3,
-        achievement_counts: {},
-      };
+    const botOnlyProfile = () => ({
+      id: 'user-123',
+      username: 'TestPlayer',
+      total_xp: 500,
+      current_level: 5,
+      total_games: 10,
+      total_score: 5000,
+      total_words: 100,
+      ranked_games: 5,
+      casual_games: 5,
+      ranked_wins: 2,
+      casual_wins: 3,
+      achievement_counts: {},
+    });
+    const botOnlyGame: GameStats = { score: 1000, wordCount: 15, placement: 1, totalPlayers: 1 };
 
-      mockClient.single.mockResolvedValueOnce({
-        data: currentProfile,
-        error: null,
-      });
+    test('Given only bots, When stats save, Then XP is computed with solo rules and granted through the capped RPC', async () => {
+      mockClient.single.mockResolvedValueOnce({ data: botOnlyProfile(), error: null });
+      mockClient.rpc.mockImplementation(async (name: string) =>
+        name === 'increment_player_xp'
+          ? { data: [{ new_total_xp: 585, new_lifetime_xp: 585, new_level: 6, xp_granted: 85 }], error: null }
+          : { data: [{ new_total_xp: 500, new_level: 5, xp_granted: 0 }], error: null });
+      checkLevelUp.mockReturnValue({ leveledUp: true, levelsGained: 1, newTitles: [] });
 
-      // WHEN: Player places 1st but only bots were present (totalPlayers = 1)
-      const gameStats: GameStats = {
-        score: 1000,
-        wordCount: 15,
-        placement: 1,
-        totalPlayers: 1, // lone human, rest were bots
-      };
+      const result = await updatePlayerStats('user-123', botOnlyGame);
 
-      await updatePlayerStats(playerId, gameStats);
+      expect(calculateGameXp).toHaveBeenCalledWith({ score: 1000, isWinner: false, achievementCount: 0, playerCount: 1 });
+      expect(mockClient.rpc).toHaveBeenCalledWith('update_player_stats_and_xp', expect.objectContaining({ p_xp_amount: 0 }));
+      expect(mockClient.rpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'user-123', p_xp_amount: 100 });
+      expect(checkLevelUp).toHaveBeenCalledWith(5, 6);
+      expect(result.xpInfo).toMatchObject({ xpEarned: 85, newTotalXp: 585, oldLevel: 5, newLevel: 6, leveledUp: true });
+      expect(result.updatedStats?.currentLevel).toBe(6);
+      expect(addXpToLeague).not.toHaveBeenCalled();
+    });
 
-      // THEN: XP is not even computed, and the stats RPC is told to grant 0 XP.
-      expect(calculateGameXp).not.toHaveBeenCalled();
-      expect(mockClient.rpc).toHaveBeenCalledWith(
-        'update_player_stats_and_xp',
-        expect.objectContaining({ p_xp_amount: 0 })
-      );
+    test('Given only bots and the XP grant fails, When stats save, Then stats stay saved and no XP is reported', async () => {
+      mockClient.single.mockResolvedValueOnce({ data: botOnlyProfile(), error: null });
+      mockClient.rpc.mockImplementation(async (name: string) =>
+        name === 'increment_player_xp'
+          ? { data: null, error: { message: 'boom' } }
+          : { data: [{ new_total_xp: 500, new_level: 5, xp_granted: 0 }], error: null });
+
+      const result = await updatePlayerStats('user-123', botOnlyGame);
+
+      expect(result.error).toBeNull();
+      expect(result.xpInfo).toMatchObject({ xpEarned: 0, newTotalXp: 500, newLevel: 5 });
+      expect(logger.error).toHaveBeenCalled();
     });
 
     test('should award XP when at least one real opponent was present', async () => {
@@ -516,6 +525,8 @@ describe('updatePlayerStats', () => {
         'update_player_stats_and_xp',
         expect.objectContaining({ p_xp_amount: 100 })
       );
+      expect(mockClient.rpc).not.toHaveBeenCalledWith('increment_player_xp', expect.anything());
+      expect(addXpToLeague).toHaveBeenCalledWith('user-123', 100);
     });
   });
 });

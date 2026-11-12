@@ -1,6 +1,7 @@
 'use client';
 
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
+import type { ResultsXp } from '@/components/progression/NextUnlockTeaser';
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -98,6 +99,7 @@ const RANK_CONFETTI_COLORS: Record<number, string[]> = {
 
 interface SinglePlayerResultsProps {
   results: SinglePlayerResultsData;
+  xp?: ResultsXp | null;
   mode: SinglePlayerMode;
   onPlayAgain: () => void;
   onQuickRematch?: () => void;
@@ -110,6 +112,7 @@ interface SinglePlayerResultsProps {
 
 const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   results,
+  xp = null,
   mode,
   onPlayAgain,
   onQuickRematch: _onQuickRematch,
@@ -335,7 +338,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   // "How am I doing?" — every game, right under the hero.
   const progressBlock = (
     <div className="flex flex-col gap-4">
-      <ResultsSocialSlot mode="single" score={results.playerScore} previousBest={previousBestScore} />
+      <ResultsSocialSlot mode="single" score={results.playerScore} previousBest={previousBestScore} xp={xp} />
       <ProgressPulseCard snapshot={progressSnapshot} />
     </div>
   );
@@ -401,7 +404,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       />
       <MissionsCompletedNote count={results.missionsCompleted} />
       <div className="mt-2 flex flex-col items-center gap-1 text-center">
-        <RewardLine coins={coinReward?.awarded} xp={null} mode={mode} t={t} className="text-base text-neo-yellow" />
+        <RewardLine coins={coinReward?.awarded} xp={isAuthenticated ? xp?.gained : null} mode={mode} t={t} className="text-base text-neo-yellow" />
         <BestMissedWordLine best={bestMissed} mode={mode} language={results.language || language} t={t} className="text-neo-cream/85" />
       </div>
     </>

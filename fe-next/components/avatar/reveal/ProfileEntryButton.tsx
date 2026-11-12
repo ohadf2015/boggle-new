@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
+import { LevelRing } from '@/components/progression/LevelRing';
 
 export interface ProfileEntryButtonProps {
   href: string;
@@ -9,6 +10,8 @@ export interface ProfileEntryButtonProps {
   avatarConfig: AvatarLiteConfig | null;
   userId?: string;
   level: number | null;
+  /** Progress through the current level, 0-100; draws the XP ring when set. */
+  pct?: number | null;
   /** An unlock was revealed this session and the profile wasn't opened yet. */
   hasNew: boolean;
   onClick?: () => void;
@@ -22,7 +25,7 @@ export interface ProfileEntryButtonProps {
  * AvatarLite only — header is first-paint, the full renderer never loads here.
  * 36px on phones (matches the compact header strip), 44px from sm up.
  */
-export default function ProfileEntryButton({ href, label, avatarConfig, userId, level, hasNew, onClick, revision }: ProfileEntryButtonProps) {
+export default function ProfileEntryButton({ href, label, avatarConfig, userId, level, pct = null, hasNew, onClick, revision }: ProfileEntryButtonProps) {
   return (
     <Link
       href={href}
@@ -31,9 +34,17 @@ export default function ProfileEntryButton({ href, label, avatarConfig, userId, 
       aria-label={label}
       className="relative shrink-0 flex items-center justify-center w-9 h-9 sm:w-11 sm:h-11 rounded-full hover:-translate-y-px active:translate-y-px transition-transform"
     >
-      <span className="block rounded-full border-2 sm:border-3 border-neo-black bg-neo-navy shadow-hard-sm">
-        <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={30} className="border-0 sm:!w-[34px] sm:!h-[34px]" />
-      </span>
+      {pct != null && level != null ? (
+        <LevelRing pct={pct} level={level} thickness={2} trackLevel className="h-full w-full">
+          <span className="block rounded-full border-2 sm:border-3 border-neo-black bg-neo-navy">
+            <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={28} className="border-0 sm:!w-[34px] sm:!h-[34px]" />
+          </span>
+        </LevelRing>
+      ) : (
+        <span className="block rounded-full border-2 sm:border-3 border-neo-black bg-neo-navy shadow-hard-sm">
+          <AvatarLite customAvatar={avatarConfig} userId={userId} revision={revision} pixelSize={30} className="border-0 sm:!w-[34px] sm:!h-[34px]" />
+        </span>
+      )}
       {level != null && (
         <span
           data-testid="header-profile-level"

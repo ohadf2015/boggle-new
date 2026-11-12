@@ -12,7 +12,7 @@ const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
 import AvatarLite from '@/components/AvatarLite';
 import { usePlayerStyle } from '@/contexts/PlayerStyleContext';
 import LevelBadge from '../LevelBadge';
-import { getLevelFromXp } from '../XpProgressBar';
+import { LevelRing, profileLevelProgress } from '@/components/progression/LevelRing';
 import { cn } from '../../lib/utils';
 import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
@@ -166,7 +166,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       );
     }
 
-    // Default dropdown variant
+    const levelInfo = profileLevelProgress(profile);
     return (
       <div className="relative shrink-0">
         <DropdownMenu open={showUserMenu} onOpenChange={setShowUserMenu}>
@@ -182,13 +182,13 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                   : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
               )}
             >
-              <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
-                <AvatarLite customAvatar={profile.avatar_config} userId={user?.id} revision={profile.updated_at ?? null} size="sm" />
-              </span>
+              <LevelRing pct={levelInfo.pct} level={levelInfo.level} size={38} trackLevel>
+                <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
+                  <AvatarLite customAvatar={profile.avatar_config} userId={user?.id} revision={profile.updated_at ?? null} size="sm" />
+                </span>
+              </LevelRing>
               <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
-              {profile.total_xp !== undefined && (
-                <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
-              )}
+              <LevelBadge level={levelInfo.level} size="sm" animate={false} />
               <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
             </Button>
           </DropdownMenuTrigger>

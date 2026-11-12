@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { clearUnseenUnlock, hasUnseenUnlock, subscribeReveal } from '@/lib/avatar/revealTrigger';
+import { profileLevelProgress } from '@/components/progression/LevelRing';
 import ProfileEntryButton from './ProfileEntryButton';
 
 const serverFalse = () => false;
@@ -22,7 +23,8 @@ export default function HeaderProfileEntry() {
   const hasNew = useSyncExternalStore(subscribeReveal, hasUnseenUnlock, serverFalse);
 
   if (!isAuthenticated || loading || cgLoading || isOnCrazyGamesPlatform) return null;
-  const level = profile?.current_level ?? null;
+  const progress = profile ? profileLevelProgress(profile) : null;
+  const level = progress?.level ?? null;
 
   return (
     <ProfileEntryButton
@@ -32,6 +34,7 @@ export default function HeaderProfileEntry() {
       userId={user?.id ?? profile?.id}
       revision={profile?.updated_at ?? null}
       level={level}
+      pct={progress?.pct ?? null}
       hasNew={hasNew}
       onClick={clearUnseenUnlock}
     />

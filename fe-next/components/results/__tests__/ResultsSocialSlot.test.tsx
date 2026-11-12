@@ -16,7 +16,9 @@ vi.mock('@/lib/records/runRecord', () => ({
 vi.mock('../PublicNamePrompt', () => ({ PublicNamePrompt: () => <div data-testid="slot-name" /> }));
 vi.mock('@/components/progression/NewRecordBanner', () => ({ NewRecordBanner: () => <div data-testid="slot-record" /> }));
 vi.mock('@/components/records/WorldRecordChip', () => ({ WorldRecordChip: ({ subMode }: { subMode?: string }) => <div data-testid="slot-world">{subMode}</div> }));
-vi.mock('@/components/progression/NextUnlockTeaser', () => ({ NextUnlockTeaser: () => <div data-testid="slot-unlock" /> }));
+vi.mock('@/components/progression/NextUnlockTeaser', () => ({
+  NextUnlockTeaser: ({ xp }: { xp?: { gained: number; total?: number | null } | null }) => <div data-testid="slot-unlock">{xp ? `${xp.gained}/${xp.total ?? '-'}` : ''}</div>,
+}));
 vi.mock('@/components/rivals/RivalCard', () => ({ RivalCard: ({ rival }: { rival: { name: string } }) => <div data-testid="slot-rival">{rival.name}</div> }));
 
 import { ResultsSocialSlot } from '../ResultsSocialSlot';
@@ -82,5 +84,10 @@ describe('ResultsSocialSlot', () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(screen.queryByTestId('slot-rival')).toBeNull();
     expect(screen.getByTestId('slot-unlock')).toBeTruthy();
+  });
+
+  it('Given the XP this game earned, Then the slot hands it to the progression meter', () => {
+    render(<ResultsSocialSlot mode="single" score={10} xp={{ gained: 42, total: 900 }} />);
+    expect(screen.getByTestId('slot-unlock').textContent).toBe('42/900');
   });
 });

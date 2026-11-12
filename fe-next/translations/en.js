@@ -22014,6 +22014,13 @@ const en = {
       "upNext": "Up next",
       "atLevel": "Lv {level}"
     },
+    "xp": {
+      "gained": "+{xp} XP",
+      "notSaved": "Not saved",
+      "levelUp": "Level {level}!",
+      "signInToKeep": "Sign in to keep your +{xp} XP",
+      "toNextLevel": "{xp} XP to level {level}"
+    },
     "titles": {
       "newTitle": "New title",
       "pickerTitle": "Your title",

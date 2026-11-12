@@ -29,7 +29,10 @@ export interface QuickSubmitInput {
 export interface QuickSubmitOutcome {
   scorePct: number;
   coins: number;
+  /** XP actually granted after the daily cap and level diminishing returns */
   xp: number;
+  /** Player's total XP after this grant; null when the grant failed */
+  newTotalXp?: number | null;
   percentileToday: number;
   /** Last 10 same-mode scorePct values (most recent first), for the improvement chip */
   history: number[];
@@ -98,14 +101,17 @@ export async function processQuickSubmit(
   const coins = quickPlayCoinsFor(scorePct);
   await awardCoinsServer(userId, coins, 'quick_play_round', { mode, seed, scorePct });
 
-  const xp = Math.round(QUICK_XP_BASE + scorePct * QUICK_XP_PCT_FACTOR);
+  const xpRequested = Math.round(QUICK_XP_BASE + scorePct * QUICK_XP_PCT_FACTOR);
   const levelBefore = await readLevel(db, userId);
   const { data: xpRows, error: xpError } = await db.rpc('increment_player_xp', {
     p_player_id: userId,
-    p_xp_amount: xp,
+    p_xp_amount: xpRequested,
   });
   if (xpError) logger.error('QUICK_PLAY', `XP grant failed for ${userId}: ${xpError.message}`);
-  const newLevel = Array.isArray(xpRows) && typeof xpRows[0]?.new_level === 'number' ? xpRows[0].new_level : null;
+  const xpRow = Array.isArray(xpRows) ? xpRows[0] : null;
+  const xp = xpRow ? Number(xpRow.xp_granted ?? 0) : 0;
+  const newTotalXp = xpRow && xpRow.new_total_xp != null ? Number(xpRow.new_total_xp) : null;
+  const newLevel = typeof xpRow?.new_level === 'number' ? xpRow.new_level : null;
   const levelUp = levelBefore !== null && newLevel !== null && newLevel > levelBefore
     ? { oldLevel: levelBefore, newLevel }
     : null;
@@ -145,7 +151,7 @@ export async function processQuickSubmit(
     .limit(10);
   const history = (historyRows ?? []).map((r: { score_pct: number }) => Number(r.score_pct));
 
-  return { scorePct, coins, xp, percentileToday, history, totalPoints, levelUp };
+  return { scorePct, coins, xp, newTotalXp, percentileToday, history, totalPoints, levelUp };
 }
 
 // The level only drives the level-up celebration, so a failed read skips it rather than the submit.

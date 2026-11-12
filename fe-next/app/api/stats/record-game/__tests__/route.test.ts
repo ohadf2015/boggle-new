@@ -132,7 +132,19 @@ describe('POST /api/stats/record-game', () => {
     expect(result.data.success).toBe(true);
     expect(result.data.xpEarned).toBe(150);
     expect(result.data.newLevel).toBe(4);
+    expect(result.data.oldLevel).toBe(3);
+    expect(result.data.newTotalXp).toBe(650);
     expect(result.data.leveledUp).toBe(true);
+  });
+
+  it('reports no XP and no level-up when the XP grant fails', async () => {
+    mockRpc.mockResolvedValue({ data: null, error: { message: 'down' } });
+    const result = await POST(makeRequest(validBody));
+    expect(result.status).toBe(200);
+    expect(result.data.xpEarned).toBe(0);
+    expect(result.data.newTotalXp).toBe(mockProfile.total_xp);
+    expect(result.data.newLevel).toBe(mockProfile.current_level);
+    expect(result.data.leveledUp).toBe(false);
   });
 
   it('calls increment_player_xp RPC with correct params', async () => {

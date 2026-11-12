@@ -38,6 +38,7 @@ import { PlayHud, PlayModeRow } from './ConnectionsPlayChrome';
 import OutOfLivesModal from './OutOfLivesModal';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import { recordConnectionsXp } from './recordConnectionsXp';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
 
@@ -264,11 +265,7 @@ export default function ConnectionsGame() {
       const xp = xpForPuzzle(puzzle.difficulty, state.streak);
       setXpEarned((prev) => prev + xp);
       setSessionScore((prev) => prev + state.score);
-      void fetch('/api/education/record-xp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
-      }).catch(() => {});
+      void recordConnectionsXp(xp);
     }
   }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion, sfx, customHaptic, language]);
 
