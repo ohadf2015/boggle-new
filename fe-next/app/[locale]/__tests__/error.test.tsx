@@ -52,6 +52,8 @@ beforeEach(() => {
   captureError.mockClear();
   mockLocale = 'he';
   try { window.sessionStorage.clear(); } catch { /* ignore */ }
+  window.name = '';
+  vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-A');
 });
 
 describe('app/[locale]/error.tsx — resilient fallback (black-screen fix)', () => {

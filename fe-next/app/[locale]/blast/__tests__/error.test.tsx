@@ -17,12 +17,14 @@ import BlastError from '../error';
 import { clearChunkRecoveryGuard } from '@/lib/deploy/staleDeployReload';
 
 beforeEach(() => {
+  vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-A');
   clearChunkRecoveryGuard();
   clearCachesAndReload.mockClear();
 });
 afterEach(() => {
   cleanup();
   clearChunkRecoveryGuard();
+  vi.unstubAllEnvs();
 });
 
 describe('Blast error boundary after a deploy', () => {

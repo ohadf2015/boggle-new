@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useContext } from 'react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import NavigationContext from '@/contexts/NavigationContext';
 import { useVisibilityPausedInterval } from '@/hooks/useVisibilityPausedInterval';
+import { STALE_DEPLOY_UPDATE_EVENT } from '@/lib/deploy/staleDeployReload';
 
 /**
  * VersionChecker Component
@@ -96,6 +97,13 @@ export function VersionChecker() {
   }, []);
 
   const [pollEnabled, setPollEnabled] = useState(false);
+
+  // A chunk that failed on a live game page asks for this banner instead of reloading the page.
+  useEffect(() => {
+    const onStaleDeploy = () => setNewVersionAvailable(true);
+    window.addEventListener(STALE_DEPLOY_UPDATE_EVENT, onStaleDeploy);
+    return () => window.removeEventListener(STALE_DEPLOY_UPDATE_EVENT, onStaleDeploy);
+  }, []);
 
   useEffect(() => {
     // Don't check if we just force-updated (prevent reload loop)

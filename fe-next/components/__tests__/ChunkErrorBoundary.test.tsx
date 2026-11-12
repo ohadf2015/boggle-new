@@ -10,6 +10,8 @@ beforeEach(() => {
   replaceSpy.mockClear();
   reloadSpy.mockClear();
   sessionStorage.clear();
+  window.name = '';
+  vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-A');
   Object.defineProperty(window, 'location', {
     configurable: true,
     value: {
@@ -30,6 +32,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  vi.unstubAllEnvs();
 });
 
 function Boom({ message, name }: { message: string; name: string }) {
@@ -48,7 +51,7 @@ describe('ChunkErrorBoundary (t_9cc3561f)', () => {
   });
 
   it('renders a dependency-free fallback when recovery guard already fired', async () => {
-    sessionStorage.setItem('chunk_error_refresh', 'true');
+    sessionStorage.setItem('chunk_error_refresh', 'build-A');
     render(
       <ChunkErrorBoundary>
         <Boom name="ChunkLoadError" message="Loading chunk 2703 failed." />

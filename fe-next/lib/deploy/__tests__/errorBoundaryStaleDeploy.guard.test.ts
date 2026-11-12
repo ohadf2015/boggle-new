@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { LIVE_GAME_SURFACES } from '../liveGamePaths';
 
 const FE_ROOT = join(__dirname, '..', '..', '..');
 const APP_DIR = join(FE_ROOT, 'app');
@@ -48,7 +49,14 @@ describe('every route error boundary recovers from a stale deploy', () => {
     }
   });
 
-  it('no boundary clears the one-reload guard, which would let the next failure reload again', () => {
+  it.each(LIVE_GAME_SURFACES)('the live game surface %s has its own boundary that never auto-reloads', (surface) => {
+    const file = join(APP_DIR, '[locale]', ...surface.split('/'), 'error.tsx');
+    expect(existsSync(file), relative(FE_ROOT, file)).toBe(true);
+    const src = readFileSync(file, 'utf8');
+    expect(src).toMatch(/autoReload:\s*false|autoReload=\{false\}|area="live"/);
+  });
+
+  it('no route boundary clears the one-reload guard by itself (only a Refresh the user presses may)', () => {
     const clearing = boundaries
       .map((file) => relative(FE_ROOT, file))
       .filter((rel) => /\bclearChunkRecoveryGuard\s*\(/.test(readFileSync(join(FE_ROOT, rel), 'utf8')));
