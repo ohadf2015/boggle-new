@@ -33,7 +33,7 @@ import {
 // second time as a per-route array (see lib/server/sharedWordSets.ts, OOM 2026-08-06).
 const gzippedPayloads: Record<
   string,
-  { gzip: Buffer; brotli?: Buffer; raw: string; count: number } | null
+  { gzip: Buffer; brotli?: Buffer; raw: string; count: number; encoded?: EncodedPayload } | null
 > = {
   en: null,
   es: null,
@@ -42,6 +42,17 @@ const gzippedPayloads: Record<
   ja: null,
   ru: null,
 };
+
+type EncodedPayload = { gzip: Buffer; brotli?: Buffer; raw: string };
+
+/** Base64 copy for clients whose network blocks the plain list (see sharedDictionaryFetch). */
+function encodedPayload(payload: { raw: string; encoded?: EncodedPayload }): EncodedPayload {
+  if (!payload.encoded) {
+    const raw = Buffer.from(payload.raw, 'utf-8').toString('base64');
+    payload.encoded = { raw, gzip: gzipSync(raw, { level: 6 }) };
+  }
+  return payload.encoded;
+}
 
 async function loadWords(language: string): Promise<string[]> {
   switch (language) {
@@ -157,7 +168,9 @@ export async function GET(request: NextRequest) {
       const raw = words.join('\n');
       gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw, count: words.length };
     }
-    const payload = gzippedPayloads[language]!;
+    const built = gzippedPayloads[language]!;
+    const isEncoded = searchParams.get('enc') === 'b64';
+    const payload = isEncoded ? encodedPayload(built) : built;
 
     const accept = request.headers.get('accept-encoding');
     const encoding = acceptsEncoding(accept, 'br')
@@ -170,7 +183,7 @@ export async function GET(request: NextRequest) {
     // representation, and gzip/brotli/identity are three different ones — with a
     // single shared tag, a shared cache can answer a gzip-cached client with a
     // 304 for bytes it never had.
-    const etag = `"${language}-${payload.count}-${encoding}"`;
+    const etag = `"${language}-${built.count}-${encoding}${isEncoded ? '-b64' : ''}"`;
 
     const cacheHeaders: Record<string, string> = {
       'Content-Type': 'text/plain; charset=utf-8',

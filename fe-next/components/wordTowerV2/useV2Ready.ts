@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
 import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
 import { getWithAuth } from '@/utils/authFetch';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
 import { rankFromDailyBoard } from '@/lib/wordTowerV2/daily';
+import { hasSavedDailyTower } from '@/lib/wordTowerV2/dailyTower';
 import { shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
 import { useDailyTowerLifecycle } from './useDailyTowerLifecycle';
 import type { DailyBoardRow } from './dailyRails';
@@ -80,10 +81,21 @@ export function useV2Ready({
     };
   }, [daily, language, rankTick]);
 
+  // Read synchronously: the restore effect sets restoredFloors after the start has already fired.
+  const startExtras = useMemo(() => {
+    if (!daily) return { v2: true, daily };
+    let restored = false;
+    try {
+      restored = hasSavedDailyTower(language, window.localStorage);
+    } catch {
+      /* storage blocked */
+    }
+    return { v2: true, daily, daily_restored: restored };
+  }, [daily, language]);
   useGameStartTelemetry({
     mode: 'word-tower',
     isGameActive: phase !== 'over',
-    extras: { v2: true, daily },
+    extras: startExtras,
   });
   useGameEndTelemetry({
     mode: 'word-tower',

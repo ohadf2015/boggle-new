@@ -156,6 +156,14 @@ export function loadDailyTower(
   }
 }
 
+/** A tower from an earlier visit exists: opening the daily only shows it until a floor lands. */
+export function hasSavedDailyTower(
+  language: string,
+  storage: { getItem(key: string): string | null } | null,
+): boolean {
+  return loadDailyTower(language, storage).words.length > 0;
+}
+
 export function saveDailyTower(
   save: DailyTowerSave,
   storage: { setItem(key: string, value: string): void } | null,

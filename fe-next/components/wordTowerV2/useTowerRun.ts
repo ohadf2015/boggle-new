@@ -30,7 +30,7 @@ import { v2DailySwing } from '@/lib/wordTowerV2/daily';
 import { type RunState, type SurprisePayout, applyLanding, consumeDrop, createRun } from '@/lib/wordTowerV2/run';
 import { BLOCK_HEIGHT_PX, blockWidthForWord } from '@/lib/wordTowerV2/scoring';
 import { isCounterweight, standingChain, towerLean, towerRisk } from '@/lib/wordTowerV2/stability';
-import { endV2Run, startV2Run } from '@/lib/wordTowerV2/telemetry';
+import { endV2Run, newFloorLog, startV2Run, trackFloorPlaced } from '@/lib/wordTowerV2/telemetry';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { TowerFx } from './TowerCanvas';
 import { MAGNET_VX_MUL, landingModsFor } from './rush/rushHelpers';
@@ -40,7 +40,6 @@ import { useRunBanners } from './useRunBanners';
 import { type Hanging, LANDING_SOUND, type PendingLanding, REWARD_SOUND, dampSway, recordLanding, readBest, seedDemoTower, seededPeakM, standing, supportTop, writeBest } from './runHelpers';
 
 /** Word Tower v2 run loop: judges the SETTLED sim; a crash that leaves floors standing clears the rubble and the run goes on. */
-
 const POLL_MS = 100;
 /** Stop waiting for a floor to settle after this long and judge it anyway. */
 const SETTLE_TIMEOUT_MS = 2600;
@@ -68,6 +67,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
   const runRef = useRef<RunState>(createRun(1));
   const runNoRef = useRef(0);
   const dropCountRef = useRef(0);
+  const floorLogRef = useRef(newFloorLog().current);
   const hangingRef = useRef<Hanging | null>(null);
   const pendingRef = useRef<PendingLanding | null>(null);
   /** Everything a hoist spent, so putting the word back costs the player nothing. */
@@ -148,6 +148,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     rushRef.current?.onLanding(quality);
     runRef.current = out.run;
     setRun(out.run);
+    trackFloorPlaced(floorLogRef, runNoRef.current, out.run.floors, dailySeed != null, pending.wordLen);
     fxRef.current.push({ kind: 'land', id: pending.id, quality, combo: out.run.combo });
     if (out.tenants > 0) fxRef.current.push({ kind: 'tenants', id: pending.id, count: out.tenants });
     // Crane Yard: name the upgrade when its wider band is what made this perfect.
@@ -176,7 +177,7 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
 
     recordLanding(statsRef.current, out.run, quality);
     checkBadges();
-  }, [playComboSound, playSound, openCrate, checkBadges, windowMultFor, rushMods, rushRef, traitRef]);
+  }, [playComboSound, playSound, openCrate, checkBadges, windowMultFor, rushMods, rushRef, traitRef, dailySeed]);
 
   /** `cashedOut`: the player ended a standing run — a win, not a fall. */
   const endRun = useCallback((cashedOut = false) => {
@@ -310,7 +311,6 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     }, POLL_MS);
     return () => window.clearInterval(id);
   }, [phase, endRun, recover, resolveLanding, playSound, banner, checkBadges, maybeOpenDraft, rushRef]);
-
 
   /** Drives the crane: the hanging floor follows the swing until released. */
   const onBeforeStep = useCallback((nowMs: number) => {

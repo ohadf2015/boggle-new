@@ -598,12 +598,15 @@ export type GrowthEvent =
   //   wt2_wrecking_ball_bought: fires when a player buys a wrecking ball. Props: { cost: number }.
   //   wt2_exit: fires when player leaves any WT2 screen.
   //     Props: { from: 'home'|'run'|'crash'|'results'|'rivals'|'raid'|'upgrades'|'loading'|'error' }.
+  //   word_tower_floor_placed: a new floor landed (once per floor per run).
+  //     Props: { floor: number, mode: 'daily'|'free', wordLength: number }.
   | 'wt2_run_ended'
   | 'wt2_upgrade_bought'
   | 'wt2_continue_used'
   | 'wt2_raid_played'
   | 'wt2_wrecking_ball_bought'
   | 'wt2_exit'
+  | 'word_tower_floor_placed'
   // Word Craft Run card-pick funnel — was fully uninstrumented (rageclicks on
   // /word-craft had no signal to attribute). Also verifies the 2026-08-24
   // rarity-weighted draw change actually shifted the served rarity mix.
@@ -1744,6 +1747,7 @@ export const trackGameStart = (
     landing_path: typeof extras.landing_path === 'string' ? extras.landing_path : undefined,
     gameCode: typeof extras.gameCode === 'string' && extras.gameCode ? extras.gameCode : undefined,
     isMultiplayer: extras.isMultiplayer === true ? true : undefined,
+    daily_restored: typeof extras.daily_restored === 'boolean' ? extras.daily_restored : undefined,
   });
   // First-win-fast: start the clock on a brand-new player's first game so the
   // eventual `first_game_won` carries time_to_first_win_sec (target: <60s).
