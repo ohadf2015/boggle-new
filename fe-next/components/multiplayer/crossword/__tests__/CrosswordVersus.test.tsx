@@ -5,7 +5,8 @@
  * rail, and progress emission on word-solve.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'ltr' }),
@@ -58,6 +59,12 @@ describe('CrosswordVersus', () => {
     solvedIds.value = [];
     revealedCells.value = [];
     mp = { puzzle: PUZZLE, standings, raceOver: false, ready: true, startedAt: 1234 };
+  });
+
+  it('shows the mascot reacting to a solved word in a race', () => {
+    render(<CrosswordVersus socket={null} username="me" remainingTime={415} />);
+    act(() => emitMascotEvent({ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false }));
+    expect(screen.getByTestId('blast-mascot-hud')).toBeInTheDocument();
   });
 
   it('shows the round clock counting down the server time', () => {
