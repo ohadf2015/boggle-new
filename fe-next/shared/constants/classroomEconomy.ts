@@ -79,6 +79,8 @@ export interface ClassroomChestReveal {
   bossWin?: boolean;
   /** Finished in the round's bottom quartile (4+ students): the chest rolled one more tier up, capped at epic. */
   underdog?: boolean;
+  /** Only on the reply that granted the XP; the cached copy a replay returns never has it. */
+  levelUp?: { oldLevel: number; newLevel: number };
 }
 
 export interface ClassroomLockerEntry {

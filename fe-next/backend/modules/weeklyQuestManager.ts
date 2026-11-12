@@ -9,6 +9,7 @@
  */
 
 import { getSupabase } from './supabaseServer';
+import { grantPlayerXp, type XpGrantResult } from './xpGrant';
 import logger from '../utils/logger';
 import {
   getWeekStart,
@@ -105,7 +106,7 @@ export async function getActiveQuest(playerId: string): Promise<ActiveQuest | nu
 export async function updateQuestProgress(
   playerId: string,
   stats: GameStats,
-): Promise<ActiveQuest | null> {
+): Promise<(ActiveQuest & { xpGrant?: XpGrantResult | null }) | null> {
   const quest = await getActiveQuest(playerId);
   if (!quest || quest.completed) return null;
 
@@ -155,17 +156,15 @@ export async function updateQuestProgress(
     }
   }
 
+  let xpGrant: XpGrantResult | null = null;
   // Grant XP + avatar part reward ONLY if THIS call completed the quest
   if (completed && affectedByThisCall) {
     // Grant XP reward
     try {
       const xpReward = quest.xpReward ?? 0;
       if (xpReward > 0) {
-        await supabase.rpc('increment_player_xp', {
-          p_player_id: playerId,
-          p_xp_amount: xpReward,
-        });
-        logger.info('weeklyQuest', `Granted ${xpReward} XP to ${playerId} for weekly quest`);
+        xpGrant = await grantPlayerXp(supabase, playerId, xpReward);
+        logger.info('weeklyQuest', `Granted ${xpGrant?.xpEarned ?? 0} of ${xpReward} XP to ${playerId} for weekly quest`);
       }
     } catch (err) {
       logger.error('weeklyQuest', `Failed to grant XP for ${playerId}: ${err}`);
@@ -179,7 +178,7 @@ export async function updateQuestProgress(
     }
   }
 
-  return { ...quest, current: newCurrent, completed };
+  return { ...quest, current: newCurrent, completed, xpGrant };
 }
 
 // --- Row parser ---

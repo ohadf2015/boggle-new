@@ -11,6 +11,7 @@
  */
 
 import { DAILY_CHEST_LESSON_TAG as CHEST_LESSON_TAG, DAILY_CHEST_XP } from '@/lib/education/recordXpPolicy';
+import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 export { DAILY_CHEST_XP };
 const KEY_PREFIX = 'lexiclash.academy.dailyChest.';
@@ -61,6 +62,8 @@ export async function claimDailyChestXp(fetchImpl: typeof fetch = fetch): Promis
     });
     if (!res.ok) return { ok: false };
     const data = (await res.json()) as { newTotalXp?: unknown };
+    const levelUp = levelUpFromRecordGame(data);
+    if (levelUp) publishLevelUp(levelUp, 'academyChest');
     const total = Number(data?.newTotalXp);
     return Number.isFinite(total) ? { ok: true, newTotalXp: total } : { ok: true };
   } catch {

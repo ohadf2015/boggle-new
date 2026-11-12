@@ -14,6 +14,7 @@
 import { useCallback } from 'react';
 import { usePracticeSession, type CompletePracticeSessionData } from '@/components/education/PracticeSessionProvider';
 import { completionPatchBody, recordedXpFrom } from '@/lib/education/practiceCompletionRecord';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 export function useRecordedXp(): (data: CompletePracticeSessionData) => Promise<number | null> {
   const { completePracticeSession } = usePracticeSession();
@@ -28,7 +29,9 @@ export function useRecordedXp(): (data: CompletePracticeSessionData) => Promise<
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(completionPatchBody({ ...data, sessionId })),
         });
-        return recordedXpFrom(res.ok, res.ok ? await res.json() : null);
+        const body = res.ok ? await res.json() : null;
+        if (body?.levelUp) publishLevelUp(body.levelUp, 'practice');
+        return recordedXpFrom(res.ok, body);
       } catch {
         return null;
       }

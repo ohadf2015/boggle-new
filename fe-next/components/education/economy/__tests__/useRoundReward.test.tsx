@@ -10,12 +10,16 @@ vi.mock('@/utils/SocketContext', () => ({
   },
 }));
 
+const publishLevelUp = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp }));
+
 import { useRoundReward } from '../useRoundReward';
 
 const reveal = { gameCode: 'ABC', roundId: '7', rarity: 'rare', xp: 25, itemId: 'tile-neon', roundCash: 9, rank: 1, size: 3 };
 
 beforeEach(() => {
   emit.mockClear();
+  publishLevelUp.mockClear();
   vi.useFakeTimers();
 });
 afterEach(() => vi.useRealTimers());
@@ -36,6 +40,25 @@ describe('useRoundReward', () => {
     const { result } = renderHook(() => useRoundReward('ABC', '7'));
     act(() => listeners['classroomEconomy:reward']({ ...reveal, roundId: '6' }));
     expect(result.current).toBeNull();
+  });
+
+  it('Given the chest levelled the student up, When the reveal arrives, Then the level-up is published once for the chest', () => {
+    renderHook(() => useRoundReward('ABC', '7'));
+    act(() => listeners['classroomEconomy:reward']({ ...reveal, levelUp: { oldLevel: 4, newLevel: 5 } }));
+    expect(publishLevelUp).toHaveBeenCalledTimes(1);
+    expect(publishLevelUp).toHaveBeenCalledWith({ oldLevel: 4, newLevel: 5 }, 'classroomChest');
+  });
+
+  it('Given a levelling reveal for another round, Then nothing is published', () => {
+    renderHook(() => useRoundReward('ABC', '7'));
+    act(() => listeners['classroomEconomy:reward']({ ...reveal, roundId: '6', levelUp: { oldLevel: 4, newLevel: 5 } }));
+    expect(publishLevelUp).not.toHaveBeenCalled();
+  });
+
+  it('Given a reveal without a level-up, Then nothing is published', () => {
+    renderHook(() => useRoundReward('ABC', '7'));
+    act(() => listeners['classroomEconomy:reward'](reveal));
+    expect(publishLevelUp).not.toHaveBeenCalled();
   });
 
   it('Given the server says the round is not settled, When it retries, Then the request is sent again', () => {

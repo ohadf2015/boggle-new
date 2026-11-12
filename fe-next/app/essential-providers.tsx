@@ -333,7 +333,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
                                                 {gameSurface && <UnlockNotifierMount />}
                                                 {gameSurface && <IncomingPingToast />}
-                                                {gameSurface && <LevelUpWatcher />}
+                                                <LevelUpWatcher />
                                                 {/* Native AdMob banner — single global mount, route-aware.
                                                     BannerCoordinatorMount hosts the single banner coordinator
                                                     (ops + load/fail/foreground signals) the two banner owners

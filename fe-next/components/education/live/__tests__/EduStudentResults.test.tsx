@@ -1,8 +1,9 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 const controller = vi.hoisted(() => ({ current: null as unknown }));
 vi.mock('@/components/multiplayer/results/useMpResultsController', () => ({ useMpResultsController: () => controller.current }));
 vi.mock('@/components/results/ResultsFriendStatus', () => ({ ResultsFriendStatusProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
@@ -35,6 +36,8 @@ import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import type { ClassroomBossView } from '@/shared/types/classroomBoss';
 import { sessionKeyFor } from '@/lib/education/roundEndHistory';
 import { openMore } from './openStudentMore';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
+import { __resetLevelUpBusForTests } from '@/lib/levelUp/levelUpBus';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -68,6 +71,7 @@ describe('EduStudentResults', () => {
     controller.current = makeController();
     useClassroomBossStore.getState().reset();
     window.sessionStorage.clear();
+    __resetLevelUpBusForTests();
   });
 
   it('given my round, when results show, then my placing and score lead the screen', () => {
@@ -187,6 +191,7 @@ describe('EduStudentResults', () => {
       socketEvents: { xpGainedData: { xpEarned: 45, newTotalXp: 345, newLevel: 3 }, levelUpData: { oldLevel: 2, newLevel: 3, levelsGained: 1, newTitles: [] }, showLevelUpCelebration: true, setShowLevelUpCelebration: setShow, setLevelUpData: setData },
     });
     render(<EduStudentResults {...(props as object)} />);
+    act(() => { publishLevelUp({ oldLevel: 2, newLevel: 3 }, 'multiplayer'); });
     expect(screen.queryByTestId('level-up')).toBeNull();
     fireEvent.click(await screen.findByTestId('level-up', {}, { timeout: 4500 }));
     expect(setShow).toHaveBeenCalledWith(false);

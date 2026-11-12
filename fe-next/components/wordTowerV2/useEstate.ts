@@ -5,6 +5,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCoinActions } from '@/contexts/CoinContext';
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { publishXpResponse } from '@/components/progression/publishXpResponse';
+import { publishResultsXp } from '@/components/progression/resultsXpStore';
+import { guestXpEstimate } from '@/components/progression/resultsXp';
 import {
   type ChestRoll,
   type Estate,
@@ -253,11 +256,13 @@ export function useEstate(): UseEstate {
     async (summary, opts) => {
       if (loading) return null;
       if (!isAuthenticated) {
+        publishResultsXp('tower:run', guestXpEstimate(summary.heightM));
         const r = applyRun(estateRef.current, summary, (Math.random() * 2 ** 32) >>> 0);
         setEstate(r.estate);
         writeLocal(r.estate);
         return { coins: r.coins, chest: r.chest };
       }
+      publishResultsXp('tower:run', null);
       // keepalive: a run banked on the way out (pagehide) must outlive the page.
       const res = await postWithAuth(`${API}/run`, summary, { requireSession: true, keepalive: opts?.keepalive }).catch(() => null);
       const body = res?.ok ? await readJson(res) : null;
@@ -271,6 +276,7 @@ export function useEstate(): UseEstate {
         return null;
       }
       fromServer(body.estate);
+      publishXpResponse('tower:run', body, 'tower');
       return { coins: Number(body.coins) || 0, chest: body.chest as ChestRoll };
     },
     [loading, isAuthenticated, uid, setEstate, fromServer],

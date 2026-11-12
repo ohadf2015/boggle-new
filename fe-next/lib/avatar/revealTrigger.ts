@@ -22,6 +22,7 @@ import { maxRarity, type VisualTier } from './rarity';
 export interface LevelUpLike {
   oldLevel?: number | null;
   newLevel: number;
+  newTitles?: readonly string[] | null;
 }
 
 export interface UnlockReveal {

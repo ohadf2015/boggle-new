@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { levelChangeFromRow, levelUpOf } from '@/backend/modules/xpGrant';
 import { grantStreakFreezes } from '../daily/chestFreezeGrant';
 import { CALENDAR_REWARDS, rollCalendarMysteryBox, type CalendarReward, type MysteryBoxContents } from './calendarRewards';
 
@@ -14,6 +15,7 @@ export interface CalendarClaimResult {
   reward?: CalendarReward;
   appliedReward?: AppliedCalendarReward;
   nextReward?: CalendarReward | null;
+  levelUp?: { oldLevel: number; newLevel: number } | null;
 }
 
 /** The calendar runs on the server's local date, as it always has. */
@@ -64,11 +66,13 @@ async function ensureCurrentMonth(supabase: SupabaseClient, playerId: string, ye
   return [];
 }
 
-async function pay(supabase: SupabaseClient, playerId: string, applied: AppliedCalendarReward): Promise<void> {
+async function pay(supabase: SupabaseClient, playerId: string, applied: AppliedCalendarReward): Promise<CalendarClaimResult['levelUp']> {
   const what = applied.type === 'mystery_box' ? applied.contents : applied;
   if (what.type === 'xp') {
-    const { error } = await supabase.rpc('increment_player_xp', { p_player_id: playerId, p_xp_amount: what.amount });
+    const { data, error } = await supabase.rpc('increment_player_xp', { p_player_id: playerId, p_xp_amount: what.amount });
     if (error) throw new Error(`xp grant failed: ${error.message}`);
+    const row = Array.isArray(data) ? (data[0] as Record<string, unknown> | undefined) : undefined;
+    return row ? levelUpOf(levelChangeFromRow(row)) : null;
   } else if (what.type === 'streak_freeze') {
     if (!(await grantStreakFreezes(supabase, playerId, what.amount))) throw new Error('streak freeze grant failed');
   } else if (what.type === 'hints') {
@@ -76,6 +80,7 @@ async function pay(supabase: SupabaseClient, playerId: string, applied: AppliedC
     const hints = (profile as { free_hints_available?: number } | null)?.free_hints_available ?? 0;
     await supabase.from('profiles').update({ free_hints_available: hints + what.amount }).eq('id', playerId);
   }
+  return null;
 }
 
 /**
@@ -106,8 +111,9 @@ export async function claimCalendarDay(supabase: SupabaseClient, playerId: strin
   if (error) throw new Error(`calendar claim failed: ${error.message}`);
   if (!marked || marked.length === 0) return { status: 'already', reward, appliedReward: applied, nextReward };
 
+  let levelUp: CalendarClaimResult['levelUp'] = null;
   try {
-    await pay(supabase, playerId, applied);
+    levelUp = await pay(supabase, playerId, applied);
   } catch (payError) {
     // Reopen today so a retry can pay; otherwise the mark blocks it with nothing given.
     await supabase
@@ -118,5 +124,5 @@ export async function claimCalendarDay(supabase: SupabaseClient, playerId: strin
       .eq('calendar_year', year);
     throw payError;
   }
-  return { status: 'claimed', reward, appliedReward: applied, nextReward };
+  return { status: 'claimed', reward, appliedReward: applied, nextReward, levelUp };
 }

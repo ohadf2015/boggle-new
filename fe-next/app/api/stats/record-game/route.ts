@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { calculateGameXp, getLevelFromXp, checkLevelUp, getTitleForLevel } from '@/backend/modules/xpManager';
+import { grantPlayerXp, scaleBreakdown } from '@/backend/modules/xpGrant';
 import { checkLifetimeAchievements, type UserStats } from '@/backend/modules/achievementManager';
 import { isDailyMode, awardsLeaderboardPoints, leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 import { captureApiError } from '@/utils/sentry';
@@ -173,41 +174,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update stats' }, { status: 500 });
     }
 
-    // Increment XP via RPC (prestige multiplier, daily cap, level diminishing returns)
-    const oldLevel = profile?.current_level || getLevelFromXp(profile?.total_xp || 0);
-    let newTotalXp = profile?.total_xp || 0;
-    let newLevel = oldLevel;
-    let actualXpGranted = 0;
-
-    if (xpResult.totalXp > 0) {
-      const { data: xpData, error: xpError } = await supabase
-        .rpc('increment_player_xp', {
-          p_player_id: userId,
-          p_xp_amount: xpResult.totalXp,
-        });
-
-      if (xpError) {
-        console.error('[STATS RECORD-GAME] XP increment error:', xpError);
-        // Stats saved, XP failed — still return partial success
-      } else if (xpData && (xpData as unknown[]).length > 0) {
-        const xpRow = (xpData as Record<string, unknown>[])[0];
-        newTotalXp = Number(xpRow.new_total_xp);
-        newLevel = xpRow.new_level as number;
-        actualXpGranted = xpRow.xp_granted as number;
-      }
-    }
-
-    // Check for level up and update title
-    const levelUpInfo = checkLevelUp(oldLevel, newLevel);
-    if (levelUpInfo.leveledUp) {
-      const newTitle = getTitleForLevel(newLevel);
-      if (newTitle && newTitle !== profile?.player_title) {
-        await supabase
-          .from('profiles')
-          .update({ player_title: newTitle })
-          .eq('id', userId);
-      }
-    }
+    // increment_player_xp applies prestige, diminishing returns and the daily cap.
+    const gameGrant = await grantPlayerXp(supabase, userId, xpResult.totalXp);
+    const profileLevel = profile?.current_level || getLevelFromXp(profile?.total_xp || 0);
+    let oldLevel = gameGrant?.oldLevel ?? profileLevel;
+    let newTotalXp = gameGrant?.newTotalXp ?? (profile?.total_xp || 0);
+    let newLevel = gameGrant?.newLevel ?? oldLevel;
+    const actualXpGranted = gameGrant?.xpEarned ?? 0;
 
     // Check lifetime achievements based on UPDATED stats. SP never had a
     // grant path before, so VETERAN/CENTURION/WORD_COLLECTOR/etc. were
@@ -261,6 +234,12 @@ export async function POST(request: NextRequest) {
         maxScore: score,
         dailyChallengesCompleted: isDailyChallenge ? 1 : 0,
       });
+      const questGrant = questResult?.xpGrant;
+      if (questGrant) {
+        if (!gameGrant) oldLevel = questGrant.oldLevel;
+        newTotalXp = questGrant.newTotalXp;
+        newLevel = Math.max(newLevel, questGrant.newLevel);
+      }
       if (questResult?.completed) {
         questUpdate = {
           completed: true,
@@ -273,10 +252,21 @@ export async function POST(request: NextRequest) {
       // Non-critical — don't fail the response
     }
 
+    const levelUpInfo = checkLevelUp(oldLevel, newLevel);
+    if (levelUpInfo.leveledUp) {
+      const newTitle = getTitleForLevel(newLevel);
+      if (newTitle && newTitle !== profile?.player_title) {
+        await supabase
+          .from('profiles')
+          .update({ player_title: newTitle })
+          .eq('id', userId);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       xpEarned: actualXpGranted,
-      xpBreakdown: xpResult.breakdown,
+      xpBreakdown: scaleBreakdown(xpResult.breakdown, actualXpGranted),
       newTotalXp,
       oldLevel,
       newLevel,

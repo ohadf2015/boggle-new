@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { type ChestRoll, applyRun, chestSeed, clampRunSummary, perksFromEstate } from '@/lib/wordTowerV2/estate';
 import { mutateEstate } from '@/lib/wordTowerV2/estateServer';
+import { grantTowerRunXp } from '@/lib/wordTower/towerXp';
 
 export const runtime = 'nodejs';
 
@@ -45,7 +46,8 @@ export async function POST(request: NextRequest) {
       return { ok: true, estate: r.estate, extra: { coins: r.coins, chest: r.chest } };
     });
     if (!res.ok) return NextResponse.json({ error: 'busy, retry', reason: res.reason }, { status: 409 });
-    return NextResponse.json({ estate: res.estate, perks: perksFromEstate(res.estate), ...res.extra });
+    const xp = await grantTowerRunXp(db, user.id, summary.heightM);
+    return NextResponse.json({ estate: res.estate, perks: perksFromEstate(res.estate), ...res.extra, ...xp });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-estate-run');
     return NextResponse.json({ error: 'unexpected' }, { status: 500 });

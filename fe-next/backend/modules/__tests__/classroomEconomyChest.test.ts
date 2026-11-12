@@ -24,6 +24,7 @@ function fakeDeps(claim: 'claimed' | 'taken' | 'unavailable', insertError: unkno
     }),
     grantXp: vi.fn(async (userId: string, amount: number) => {
       xp.push([userId, amount]);
+      return null;
     }),
     remember: vi.fn(async (key: string, reveal: ChestReveal) => {
       store.set(key, reveal);
@@ -35,7 +36,33 @@ function fakeDeps(claim: 'claimed' | 'taken' | 'unavailable', insertError: unkno
 
 const input = { gameCode: 'ABC', roundId: 'sess-1', userId: 'u1', summary: { roundCash: 12, rank: 2, size: 5 } };
 
+const levelledGrant = { xpEarned: 30, newTotalXp: 1030, oldLevel: 4, newLevel: 5, leveledUp: true };
+
 describe('grantRoundChest', () => {
+  it('Given the chest XP levels the student up, When granted, Then the reply carries the level-up but the cached reveal does not', async () => {
+    const { deps, store } = fakeDeps('claimed');
+    (deps.grantXp as ReturnType<typeof vi.fn>).mockResolvedValue(levelledGrant);
+    const chest = await grantRoundChest(input, deps);
+    expect(chest?.levelUp).toEqual({ oldLevel: 4, newLevel: 5 });
+    expect([...store.values()][0]).not.toHaveProperty('levelUp');
+  });
+
+  it('Given a levelling chest was granted, When the student asks again, Then the replay never re-announces the level-up', async () => {
+    const { deps } = fakeDeps('claimed');
+    (deps.grantXp as ReturnType<typeof vi.fn>).mockResolvedValue(levelledGrant);
+    await grantRoundChest(input, deps);
+    (deps.claim as ReturnType<typeof vi.fn>).mockResolvedValue('taken');
+    const replay = await grantRoundChest(input, deps);
+    expect(replay).not.toBeNull();
+    expect(replay).not.toHaveProperty('levelUp');
+  });
+
+  it('Given the chest XP did not level the student up, When granted, Then the reply has no level-up', async () => {
+    const { deps } = fakeDeps('claimed');
+    (deps.grantXp as ReturnType<typeof vi.fn>).mockResolvedValue({ ...levelledGrant, oldLevel: 5, leveledUp: false });
+    expect(await grantRoundChest(input, deps)).not.toHaveProperty('levelUp');
+  });
+
   it('Given a first claim, When granted, Then the row is written, XP awarded and the reveal carries the round summary', async () => {
     const { deps, inserted, xp } = fakeDeps('claimed');
     const chest = await grantRoundChest(input, deps);

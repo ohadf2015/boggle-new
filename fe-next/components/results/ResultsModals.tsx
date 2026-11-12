@@ -7,15 +7,15 @@
  * Modals included:
  * - WordFeedbackModal: Self-healing dictionary validation
  * - ReferralMilestonePopup: Friend milestone notifications
- * - Avatar unlock reveal: fullscreen "you unlocked X" when the level-up granted
- *   avatar parts (takes the levelUp slot; the old GSAP LevelUpCelebration stays retired)
+ * - Avatar unlock reveal: the reveal published for this level-up (lib/avatar/revealTrigger),
+ *   queued in the levelUp slot; the celebration-vs-reveal call is LevelUpWatcher's
  * - AuthModal: Guest signup prompt
  * - FirstWinSignupModal: Celebratory first win signup
  */
 
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import dynamic from 'next/dynamic';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useModalQueue } from '@/hooks/useModalQueue';
@@ -23,7 +23,7 @@ import { trackModalDismissed } from '@/utils/posthogEngagement';
 import type { WordToVote } from '@/types/components';
 import type { ReferralMilestone, LevelUpPayload } from '@/shared/types/socket';
 import type { GameResultForShare } from '@/utils/share';
-import { buildUnlockReveal } from '@/lib/avatar/revealTrigger';
+import { clearPublishedReveal, getPublishedReveal, subscribeReveal } from '@/lib/avatar/revealTrigger';
 
 // Dynamic imports for modals (loaded after initial render)
 const WordFeedbackModal = dynamic(() => import('@/components/voting/WordFeedbackModal'), { ssr: false });
@@ -33,6 +33,8 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
 const GameFeedbackCard = dynamic(() => import('@/components/results/GameFeedbackCard'), { ssr: false });
 const UnifiedShareModal = dynamic(() => import('@/components/modals/UnifiedShareModal'), { ssr: false });
+
+const noReveal = () => null;
 
 // ==============================================
 // TYPES
@@ -159,9 +161,8 @@ export function ResultsModals({
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hideExternal = isOnCrazyGamesPlatform;
 
-  // Avatar parts this level-up granted (null = nothing to reveal). In memory
-  // only: the payload IS the trigger, there is no stored seen-marker.
-  const unlockReveal = useMemo(() => buildUnlockReveal(levelUp.levelUpData), [levelUp.levelUpData]);
+  const unlockReveal = useSyncExternalStore(subscribeReveal, getPublishedReveal, noReveal);
+  const revealOpened = useRef(false);
 
   const modals = useMemo(() => {
     // Modal priority order (lower number = higher priority, shows first):
@@ -178,7 +179,7 @@ export function ResultsModals({
 
     const baseModals: Array<{ id: string; priority: number; isReady: boolean }> = [
       // Readiness must drop once closed, or the queue's reset never fires.
-      { id: 'levelUp', priority: 1, isReady: unlockReveal !== null && levelUp.showLevelUpCelebration },
+      { id: 'levelUp', priority: 1, isReady: unlockReveal !== null },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
       { id: 'share', priority: 4, isReady: shareModal?.showShareModal ?? false },
@@ -197,7 +198,6 @@ export function ResultsModals({
     return baseModals;
   }, [
     unlockReveal,
-    levelUp.showLevelUpCelebration,
     referralMilestone.showReferralMilestone,
     firstWinModal.showFirstWinModal,
     authModal.showAuthModal,
@@ -208,6 +208,14 @@ export function ResultsModals({
   ]);
 
   const { activeModalId, dismiss } = useModalQueue({ modals });
+  const revealOnScreen = unlockReveal !== null && activeModalId === 'levelUp';
+  useEffect(() => {
+    if (revealOnScreen) revealOpened.current = true;
+  }, [revealOnScreen]);
+  // A reveal already on screen must not come back when the next round's results mount.
+  useEffect(() => () => {
+    if (revealOpened.current) clearPublishedReveal();
+  }, []);
 
   return (
     <>
@@ -238,10 +246,10 @@ export function ResultsModals({
 
       {/* Avatar unlock reveal. Dismiss keeps levelUpData: ImprovementPanel's
           level-up flourish and "New unlock!" chip still read it. */}
-      {unlockReveal && activeModalId === 'levelUp' && (
+      {unlockReveal && revealOnScreen && (
         <UnlockReveal
           reveal={unlockReveal}
-          onClose={() => { dismiss('levelUp'); levelUp.setShowLevelUpCelebration(false); }}
+          onClose={() => { dismiss('levelUp'); clearPublishedReveal(); levelUp.setShowLevelUpCelebration(false); }}
         />
       )}
 

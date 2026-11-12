@@ -19,7 +19,9 @@ const {
   mockCheckForUnlocks,
   mockAcknowledgeUnlock,
   mockLoggerError,
+  mockPublishLevelUp,
 } = vi.hoisted(() => ({
+  mockPublishLevelUp: vi.fn(),
   mockAwardPracticeXp: vi.fn(),
   mockAcknowledgePersistence: vi.fn(),
   mockCheckForUnlocks: vi.fn(),
@@ -31,6 +33,8 @@ vi.mock('@/utils/logger', () => ({
   __esModule: true,
   default: { log: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: mockLoggerError, info: vi.fn() },
 }));
+
+vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp: mockPublishLevelUp }));
 
 vi.mock('@/lib/education/telemetry', () => ({
   trackEduPracticeComplete: vi.fn(),
@@ -162,6 +166,21 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
     await user.click(screen.getByTestId('complete-btn'));
 
     await waitFor(() => expect(screen.getByTestId('session-xp')).toHaveTextContent('42'));
+  });
+
+  it('GIVEN the server reports a player level-up WHEN the PATCH resolves THEN it is announced as practice', async () => {
+    stubFetch(async () => ({
+      ok: true,
+      json: async () => ({ session: { id: 'session-lv', completed_at: '2026-09-16T00:00:00Z', xp_awarded: 42 }, levelUp: { oldLevel: 6, newLevel: 7 } }),
+    }));
+    const user = userEvent.setup();
+    render(
+      <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+        <TestConsumer sessionId="session-lv" />
+      </PracticeSessionProvider>
+    );
+    await user.click(screen.getByTestId('complete-btn'));
+    await waitFor(() => expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 6, newLevel: 7 }, 'practice'));
   });
 
   it('GIVEN the same session completes twice WHEN completePracticeSession runs both times THEN only one PATCH is sent', async () => {

@@ -232,6 +232,23 @@ describe('POST /api/feedback', () => {
     expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', expect.any(Object));
   });
 
+  it('given the reward XP crosses a level, when reported, then the response carries levelUp', async () => {
+    mockSingle.mockResolvedValue({ data: { username: 'dana' }, error: null });
+    mockGte.mockResolvedValue({ count: 0, error: null });
+    mockRpc.mockResolvedValue({ data: [{ xp_granted: 50, new_total_xp: 280, new_level: 2 }], error: null });
+    const json = await (await POST(makeRequest(validBody))).json();
+    expect(json.levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
+  });
+
+  it('given the XP grant errors, when reported, then the report still succeeds with levelUp null', async () => {
+    mockSingle.mockResolvedValue({ data: { username: 'eve' }, error: null });
+    mockGte.mockResolvedValue({ count: 0, error: null });
+    mockRpc.mockResolvedValue({ data: null, error: { message: 'boom' } });
+    const json = await (await POST(makeRequest(validBody))).json();
+    expect(json.success).toBe(true);
+    expect(json.levelUp).toBeNull();
+  });
+
   it('does not grant reward on second report same UTC day', async () => {
     mockSingle.mockResolvedValue({
       data: { username: 'charlie_day' },

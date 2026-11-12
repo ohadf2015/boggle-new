@@ -15,6 +15,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 interface ReportBugModalProps {
   isOpen: boolean;
@@ -316,6 +317,7 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
       if (!res.ok) throw new Error('request failed');
       const data = await res.json().catch(() => ({}));
       setRewarded(data.rewarded ?? false);
+      if (data.levelUp) publishLevelUp(data.levelUp, 'feedback');
       setStatus('success');
     } catch {
       setStatus('error');

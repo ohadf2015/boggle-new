@@ -210,6 +210,21 @@ describe('processBrainDrillCompletion', () => {
     }
   });
 
+  it('given the drill XP crosses a player level, when completed, then levelUp carries old and new player level', async () => {
+    const supabase = makeMockSupabase();
+    supabase.rpc.mockResolvedValue({ data: [{ xp_granted: 30, new_total_xp: 280, new_level: 2 }], error: null });
+    const result = await processBrainDrillCompletion(validBody, 'user-1', 'sub-lvl', { supabase: supabase as unknown as never, source: 'live' });
+    expect(result.ok && result.body.levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
+    expect(result.ok && result.body.xpAwarded).toBe(30);
+  });
+
+  it('given drill XP that stays inside the player level, when completed, then levelUp is null', async () => {
+    const supabase = makeMockSupabase();
+    supabase.rpc.mockResolvedValue({ data: [{ xp_granted: 30, new_total_xp: 100, new_level: 1 }], error: null });
+    const result = await processBrainDrillCompletion(validBody, 'user-1', 'sub-nolvl', { supabase: supabase as unknown as never, source: 'live' });
+    expect(result.ok && result.body.levelUp).toBeNull();
+  });
+
   it('returns improvement signals; first ever play is not a personal best', async () => {
     const supabase = makeMockSupabase();
     const result = await processBrainDrillCompletion(

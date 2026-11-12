@@ -27,6 +27,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, fb?: string) => (typeof fb === 'string' ? fb : k), language: 'en', dir: 'ltr' }),
 }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/en/word-tower' }));
+const { mockPublishLevelUp } = vi.hoisted(() => ({ mockPublishLevelUp: vi.fn() }));
+vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp: mockPublishLevelUp }));
 
 import { ReportBugModal } from '../ReportBugModal';
 
@@ -135,6 +137,18 @@ describe('ReportBugModal', () => {
     await waitFor(() => {
       expect(screen.queryByText('bugReport.rewardEarned')).toBeTruthy();
     });
+  });
+
+  it('given the reward XP crossed a level, when submitted, then the level-up is announced as feedback', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, rewarded: true, levelUp: { oldLevel: 10, newLevel: 11 } }),
+    }));
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    await user.type(screen.getByRole('textbox'), 'A clear description of the bug here');
+    await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
+    await waitFor(() => expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 10, newLevel: 11 }, 'feedback'));
   });
 
   it('does not show reward message when rewarded is false', async () => {

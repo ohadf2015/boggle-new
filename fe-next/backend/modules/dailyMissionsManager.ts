@@ -6,6 +6,7 @@
  */
 
 import { getSupabase } from './supabase/client';
+import { grantPlayerXp, levelUpOf } from './xpGrant';
 import { awardCoinsServer } from '../services/economy/awardCoins';
 import {
   getDailyQuests,
@@ -273,7 +274,7 @@ export async function checkAndClaimGrandSlam(
 export async function checkAndClaimAllQuestsComplete(
   playerId: string,
   date?: string,
-): Promise<{ claimed: boolean; xpReward: number; coinReward: number }> {
+): Promise<{ claimed: boolean; xpReward: number; coinReward: number; levelUp?: ReturnType<typeof levelUpOf> }> {
   const missions = await getDailyMissions(playerId, date);
 
   // Must have all 3 daily missions complete
@@ -310,14 +311,8 @@ export async function checkAndClaimAllQuestsComplete(
   }
 
   // Genuine claim: grant XP (best-effort)
-  const { error: xpError } = await supabase.rpc('increment_player_xp', {
-    p_player_id: playerId,
-    p_xp_amount: ALL_QUESTS_COMPLETE_XP,
-  });
-
-  if (xpError) {
-    logger.error('DAILY_MISSIONS', `All-quests-complete XP grant failed for ${playerId}: ${xpError.message}`);
-  }
+  const xpGrant = await grantPlayerXp(supabase, playerId, ALL_QUESTS_COMPLETE_XP);
+  if (!xpGrant) logger.error('DAILY_MISSIONS', `All-quests-complete XP grant failed for ${playerId}`);
 
   // Grant coins (best-effort)
   await awardCoinsServer(playerId, ALL_QUESTS_COMPLETE_COIN_REWARD, 'all_quests_complete', {
@@ -328,7 +323,7 @@ export async function checkAndClaimAllQuestsComplete(
     'DAILY_MISSIONS',
     `All quests complete claimed by ${playerId}: ${ALL_QUESTS_COMPLETE_XP} XP + ${ALL_QUESTS_COMPLETE_COIN_REWARD} coins`,
   );
-  return { claimed: true, xpReward: ALL_QUESTS_COMPLETE_XP, coinReward: ALL_QUESTS_COMPLETE_COIN_REWARD };
+  return { claimed: true, xpReward: ALL_QUESTS_COMPLETE_XP, coinReward: ALL_QUESTS_COMPLETE_COIN_REWARD, levelUp: levelUpOf(xpGrant) };
 }
 
 const CELEBRATED_COLUMN_MAP: Record<CelebrationKey, string> = {

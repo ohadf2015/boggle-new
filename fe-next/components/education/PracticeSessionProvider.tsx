@@ -7,7 +7,6 @@
  * Handles:
  * - XP state from useEducationXp hook
  * - Session-specific tracking (XP earned this session)
- * - Level up modal state
  * - Achievement unlock detection
  * - Supabase persistence on session completion
  *
@@ -35,20 +34,12 @@ import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchiev
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 import { practiceXpPayload } from '@/lib/education/practiceXpPayload';
 import logger from '@/utils/logger';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 import { trackEduPracticeComplete, trackEduError } from '@/lib/education/telemetry';
 
 // ============================================
 // TYPE DEFINITIONS
 // ============================================
-
-export interface LevelUpPayload {
-  /** Previous level before the level-up */
-  oldLevel: number;
-  /** New level after the level-up */
-  newLevel: number;
-  /** Titles unlocked at this level (if any) */
-  newTitles: string[];
-}
 
 export interface CompletePracticeSessionData {
   type: 'flashcard' | 'solo_board' | 'lesson_completion' | 'matching' | 'spelling' | 'blitz' | 'vocab_focus';
@@ -90,10 +81,6 @@ export interface PracticeSessionContextValue {
   // Actions
   /** Resolves with the server's verdict on the round, or null when no session was patched. */
   completePracticeSession: (sessionData: CompletePracticeSessionData) => Promise<PracticeServerOutcome | null>;
-
-  // Level up state
-  levelUpData: LevelUpPayload | null;
-  dismissLevelUp: () => void;
 
   // Loading state
   isLoading: boolean;
@@ -151,7 +138,6 @@ export function PracticeSessionProvider({
   // Session-specific state
   const [sessionXpEarned, setSessionXpEarned] = useState<number>(0);
   const [sessionMasteryMessage, setSessionMasteryMessage] = useState<string | null>(null);
-  const [levelUpData, setLevelUpData] = useState<LevelUpPayload | null>(null);
   const [isPersisting, setIsPersisting] = useState<boolean>(false);
   const [totalPracticeSessions, setTotalPracticeSessions] = useState<number>(0);
   const [totalWordsMastered, setTotalWordsMastered] = useState<number>(0);
@@ -208,15 +194,6 @@ export function PracticeSessionProvider({
         setSessionXpEarned(result.totalXp);
         setSessionMasteryMessage(result.masteryMessage);
 
-        // Check for level up
-        if (result.leveledUp && result.newLevel) {
-          setLevelUpData({
-            oldLevel: currentLevel,
-            newLevel: result.newLevel,
-            newTitles: result.newTitles || [],
-          });
-        }
-
         // XP persistence is handled server-side by PATCH /api/education/practice.
         // Do NOT call persistToSupabase() here — it bypasses server validation (C2 fix).
         //
@@ -246,6 +223,7 @@ export function PracticeSessionProvider({
 
             if (response.ok) {
               const data = await response.json();
+              if (data?.levelUp) publishLevelUp(data.levelUp, 'practice');
               // Server is the XP source of truth (it never trusts a
               // client-supplied amount, and an idempotent replay returns the
               // existing session with no re-award) — prefer its number over
@@ -400,13 +378,6 @@ export function PracticeSessionProvider({
     ]
   );
 
-  /**
-   * Dismiss level up celebration modal
-   */
-  const dismissLevelUp = useCallback(() => {
-    setLevelUpData(null);
-  }, []);
-
   // Context value
   const value = useMemo<PracticeSessionContextValue>(
     () => ({
@@ -423,10 +394,6 @@ export function PracticeSessionProvider({
       // Actions
       completePracticeSession,
 
-      // Level up state
-      levelUpData,
-      dismissLevelUp,
-
       // Loading state
       isLoading: xpLoading || isPersisting,
     }),
@@ -438,8 +405,6 @@ export function PracticeSessionProvider({
       sessionXpEarned,
       sessionMasteryMessage,
       completePracticeSession,
-      levelUpData,
-      dismissLevelUp,
       xpLoading,
       isPersisting,
     ]

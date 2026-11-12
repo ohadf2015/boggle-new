@@ -566,6 +566,29 @@ describe('checkAndClaimAllQuestsComplete', () => {
     );
   });
 
+  it('given the claim XP crosses a level, when claimed, then the result carries levelUp', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
+    mockGetActiveQuest.mockResolvedValueOnce({ completed: true });
+    const selectFn = vi.fn().mockResolvedValue({ data: [{ all_quests_complete_celebrated: true }], error: null });
+    const eqPlayer = vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ select: selectFn }) }) });
+    mockUpdate.mockReturnValueOnce({ eq: eqPlayer });
+    mockRpc.mockResolvedValueOnce({ data: [{ xp_granted: ALL_QUESTS_COMPLETE_XP, new_total_xp: 470, new_level: 3 }], error: null });
+
+    const result = await checkAndClaimAllQuestsComplete(PLAYER_ID);
+
+    expect(result.levelUp).toEqual({ oldLevel: 1, newLevel: 3 });
+  });
+
+  it('given an already-claimed day, when claimed again, then levelUp is null', async () => {
+    mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
+    mockGetActiveQuest.mockResolvedValueOnce({ completed: true });
+    const selectFn = vi.fn().mockResolvedValue({ data: [], error: null });
+    const eqPlayer = vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ select: selectFn }) }) });
+    mockUpdate.mockReturnValueOnce({ eq: eqPlayer });
+
+    expect((await checkAndClaimAllQuestsComplete(PLAYER_ID)).levelUp ?? null).toBeNull();
+  });
+
   it('returns claimed=false when flag already true (idempotent)', async () => {
     mockMaybeSingle.mockResolvedValueOnce({ data: FULL_ROW, error: null });
     mockGetActiveQuest.mockResolvedValueOnce({ completed: true });

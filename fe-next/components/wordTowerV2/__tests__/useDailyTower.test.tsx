@@ -10,6 +10,7 @@ vi.mock('../runHelpers', () => ({ standingTower: () => ({ ...tower, words: [...t
 
 import { useDailyTower } from '../useDailyTower';
 import { emptySave, saveDailyTower } from '@/lib/wordTowerV2/dailyTower';
+import { resetResultsXp, useResultsXp } from '@/components/progression/resultsXpStore';
 
 function mount() {
   return renderHook(() =>
@@ -48,6 +49,27 @@ describe('useDailyTower', () => {
     expect(result.current.growthM).toBeGreaterThan(0);
     unmount();
     expect(bodies().some((b) => b.final)).toBe(true);
+  });
+
+  it('the banked climb feeds the day\'s XP to the results slot; mid-climb ticks do not', async () => {
+    resetResultsXp();
+    post.mockImplementation((...a: unknown[]) => {
+      const final = (a[1] as { final?: boolean }).final;
+      return Promise.resolve({ ok: true, json: async () => (final ? { xpEarned: 40, newTotalXp: 300 } : { xpEarned: 999 }) } as never);
+    });
+    const xp = renderHook(() => useResultsXp('daily:word-tower'));
+    const { unmount } = mount();
+    tower.words = ['cat', 'dog', 'emu'];
+    tower.standingM = 9;
+    act(() => {
+      vi.advanceTimersByTime(1600);
+    });
+    await act(async () => {});
+    expect(xp.result.current).toBeNull();
+    unmount();
+    await act(async () => {});
+    expect(xp.result.current).toEqual({ gained: 40, total: 300 });
+    post.mockImplementation(() => Promise.resolve({ ok: true }));
   });
 
   it('past midnight UTC, yesterday’s growth does not count for today', () => {

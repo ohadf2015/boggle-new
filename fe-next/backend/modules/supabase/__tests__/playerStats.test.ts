@@ -463,6 +463,7 @@ describe('updatePlayerStats', () => {
       expect(mockClient.rpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'user-123', p_xp_amount: 100 });
       expect(checkLevelUp).toHaveBeenCalledWith(5, 6);
       expect(result.xpInfo).toMatchObject({ xpEarned: 85, newTotalXp: 585, oldLevel: 5, newLevel: 6, leveledUp: true });
+      expect(result.xpInfo?.xpBreakdown).toEqual({ gameCompletion: 43, scoreXp: 25, winBonus: 17, achievementXp: 0 });
       expect(result.updatedStats?.currentLevel).toBe(6);
       expect(addXpToLeague).not.toHaveBeenCalled();
     });
@@ -478,7 +479,18 @@ describe('updatePlayerStats', () => {
 
       expect(result.error).toBeNull();
       expect(result.xpInfo).toMatchObject({ xpEarned: 0, newTotalXp: 500, newLevel: 5 });
+      expect(result.xpInfo?.xpBreakdown).toEqual({ gameCompletion: 0, scoreXp: 0, winBonus: 0, achievementXp: 0 });
       expect(logger.error).toHaveBeenCalled();
+    });
+
+    test('Given a real opponent and the stats RPC granted less than the formula, When stats save, Then the breakdown adds up to the granted XP', async () => {
+      mockClient.single.mockResolvedValueOnce({ data: botOnlyProfile(), error: null });
+      mockClient.rpc.mockResolvedValue({ data: [{ new_total_xp: 550, new_level: 5, xp_granted: 50 }], error: null });
+
+      const result = await updatePlayerStats('user-123', { ...botOnlyGame, totalPlayers: 2 });
+
+      expect(result.xpInfo?.xpEarned).toBe(50);
+      expect(result.xpInfo?.xpBreakdown).toEqual({ gameCompletion: 25, scoreXp: 15, winBonus: 10, achievementXp: 0 });
     });
 
     test('should award XP when at least one real opponent was present', async () => {

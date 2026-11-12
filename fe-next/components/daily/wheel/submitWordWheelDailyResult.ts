@@ -4,6 +4,7 @@ import { markWordWheelResultSubmitted } from '@/utils/dailyChallenge/wordWheelRu
 import { getGuestFingerprint, getGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 import { createClient } from '@/utils/supabase/client';
 import type { Language } from '@/types';
+import { publishXpResponse } from '@/components/progression/publishXpResponse';
 
 // Embedded hosts can block the session cookie, so signed-in submits also carry the token.
 async function authHeader(): Promise<Record<string, string>> {
@@ -90,6 +91,7 @@ export async function submitWordWheelDailyResult({
         completedAt: string | null;
       } | null;
     };
+    publishXpResponse('daily:word-wheel', json, 'wordWheel');
     if (json?.alreadySubmitted && json.result) {
       const c = json.result;
       saveWordWheelResult({

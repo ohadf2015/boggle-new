@@ -1,6 +1,7 @@
 "use client";
 
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
+import { useResultsXp } from '@/components/progression/resultsXpStore';
 import { useEffect, useState } from "react";
 import type { Language } from "@/types";
 import type { BiomeId } from "@/lib/wordTowerV2/biomes";
@@ -60,6 +61,7 @@ export function V2RunResults({
   const { run } = game;
   // `peakM` only settles when a run ends; a daily banked mid-climb reads the live height.
   const peakM = daily ? Math.max(game.peakM, game.heightM) : game.peakM;
+  const runXp = useResultsXp('tower:run');
   const [wreck, setWreck] = useState<DailyRivalRow | null>(null);
   const { onRaidOpen } = p;
   // The wreck round runs its own Pixi loop: the game canvas pauses under it, as for a raid.
@@ -137,7 +139,7 @@ export function V2RunResults({
           onRaidOpen: p.onRaidOpen,
         dailyLanguage: daily ? language : undefined,
         }}
-        socialSlot={daily ? undefined : <ResultsSocialSlot mode="tower" score={peakM} previousBest={game.prevBestRef.current} xp={null} />}
+        socialSlot={daily ? undefined : <ResultsSocialSlot mode="tower" score={peakM} previousBest={game.prevBestRef.current} xp={runXp} />}
         extra={
           <EstateButton
             t={t}

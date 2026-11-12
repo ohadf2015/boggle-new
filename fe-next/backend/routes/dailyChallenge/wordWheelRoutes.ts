@@ -24,6 +24,7 @@ import { grantDailyAchievements } from './dailyAchievements';
 import wordWheelLeaderboardRoutes from './wordWheelLeaderboardRoutes';
 import { sanitizeWheelSubmission, isWheelCatchup } from './wordWheelSubmission';
 import { handleGoldenWordKey, payGoldenWord } from './wheelGoldenWord';
+import { grantSoloGameXp, levelUpOf } from '../../modules/xpGrant';
 
 
 const router: Router = express.Router();
@@ -260,7 +261,18 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
 
     const goldenWordFound = await payGoldenWord({ puzzle, wordsFound, playerId, otherLanguagesToday });
 
-    res.json({ success: true, alreadySubmitted: false, data, rank, goldenWordFound });
+    // Fresh-insert path only: the one-row-per-day key keeps a replay from paying XP twice.
+    const xp = playerId
+      ? await grantSoloGameXp(supabase, playerId, { score }).catch((err) => {
+          logger.error('API', `[WordWheel] XP grant failed for ${playerId}: ${(err as Error).message}`);
+          return null;
+        })
+      : null;
+
+    res.json({
+      success: true, alreadySubmitted: false, data, rank, goldenWordFound,
+      ...(xp ? { xpEarned: xp.xpEarned, newTotalXp: xp.newTotalXp, levelUp: levelUpOf(xp) } : {}),
+    });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Wheel submit error: ${err.message}`);

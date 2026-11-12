@@ -12,6 +12,7 @@ import { toast } from 'react-hot-toast';
 import { Loader } from '@/components/ui/Loader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { fetchWithAuth, postWithAuth } from '@/utils/authFetch';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 import { Reveal } from '@/components/ui/Reveal';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -91,6 +92,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
       if (response.ok) {
         const data = await response.json();
         setClaimedReward(data.reward);
+        if (data.levelUp) publishLevelUp(data.levelUp, 'calendar');
 
         // Update local state
         setCalendarStatus(prev => prev ? {

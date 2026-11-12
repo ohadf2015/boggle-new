@@ -21,6 +21,7 @@ import { computeDrillProgressUpdate } from '@/shared/utils/drillLeveling';
 import { validateDrillSubmission } from '@/shared/utils/drillSubmissionValidation';
 import { computeDrillImprovement, type DrillImprovement } from '@/shared/utils/drillImprovement';
 import { upsertDailyBrainScoreHistory } from '@/lib/brain/dailyHistoryWrite';
+import { levelChangeFromRow, levelUpOf } from '@/backend/modules/xpGrant';
 import {
   BRAIN_CHECK_COOLDOWN_MS,
   BRAIN_CHECK_PROTOCOL,
@@ -57,6 +58,8 @@ export interface DrillCompletionResponseBody {
     targetDomain: CognitiveDomain;
   };
   xpAwarded: number;
+  /** Player level crossed by this drill's XP; newLevel/previousLevel are the drill's own level. */
+  levelUp: { oldLevel: number; newLevel: number } | null;
   levelPromoted: boolean;
   newLevel?: number;
   previousLevel?: number;
@@ -132,6 +135,7 @@ export async function processBrainDrillCompletion(
           idempotent: true,
           data: existing,
           xpAwarded: 0,
+          levelUp: null,
           levelPromoted: false,
         },
       };
@@ -393,6 +397,7 @@ export async function processBrainDrillCompletion(
   const comboMultiplier = 1 + comboEstimate * 0.1;
   const xpToAward = Math.min(Math.round(baseXp * comboMultiplier), 150);
   let xpAwarded = 0;
+  let levelUp: DrillCompletionResponseBody['levelUp'] = null;
 
   if (xpToAward > 0) {
     const { data: xpData, error: xpError } = await supabase.rpc('increment_player_xp', {
@@ -404,6 +409,7 @@ export async function processBrainDrillCompletion(
       console.error('Error awarding drill XP:', xpError);
     } else if (xpData && xpData.length > 0) {
       xpAwarded = xpData[0].xp_granted ?? xpToAward;
+      levelUp = levelUpOf(levelChangeFromRow(xpData[0]));
     } else {
       xpAwarded = xpToAward;
     }
@@ -463,6 +469,7 @@ export async function processBrainDrillCompletion(
       data: sessionData,
       brainScore: updatedBrainScore,
       xpAwarded,
+      levelUp,
       levelPromoted,
       newLevel,
       previousLevel,

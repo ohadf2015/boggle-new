@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
       reward: result.reward,
       appliedReward: result.appliedReward,
       nextReward: result.nextReward,
+      levelUp: result.levelUp ?? null,
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

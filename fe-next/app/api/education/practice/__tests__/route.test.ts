@@ -278,6 +278,45 @@ describe('PATCH /api/education/practice', () => {
     });
   });
 
+  describe('Player level-up on completion', () => {
+    const ids = { sessionId: '550e8400-e29b-41d4-a716-446655440001', studentId: '550e8400-e29b-41d4-a716-446655440002', lessonId: '550e8400-e29b-41d4-a716-446655440003' };
+    function completeWith(profileXpRow: Record<string, unknown> | null) {
+      mockRpc.mockImplementation(async (fn: string) => (fn === 'increment_player_xp'
+        ? { data: profileXpRow ? [profileXpRow] : null, error: null }
+        : { data: null, error: null }));
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'student_lesson_progress') {
+          return { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: { current_streak: 0 }, error: null }) };
+        }
+        let isWrite = false;
+        const builder: Record<string, Mock> = {
+          select: vi.fn(() => builder),
+          eq: vi.fn(() => builder),
+          update: vi.fn(() => { isWrite = true; return builder; }),
+          single: vi.fn(async () => (isWrite
+            ? { data: { id: ids.sessionId, completed_at: '2026-02-14T12:00:00Z' }, error: null }
+            : { data: { id: ids.sessionId, student_id: ids.studentId, lesson_id: ids.lessonId, practice_type: 'flashcard', completed_at: null }, error: null })),
+        };
+        return builder;
+      });
+      return PATCH(new NextRequest('http://localhost/api/education/practice', {
+        method: 'PATCH',
+        body: JSON.stringify({ sessionId: ids.sessionId, cardsReviewed: 10, cardsCorrect: 8, completed: true }),
+      }));
+    }
+
+    it('given the practice XP crosses a player level, when completed, then the response carries levelUp', async () => {
+      const data = await (await completeWith({ xp_granted: 120, new_total_xp: 300, new_level: 2 })).json();
+      expect(data.levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
+    });
+
+    it('given the player XP grant fails, when completed, then the save still succeeds with levelUp null', async () => {
+      const response = await completeWith(null);
+      expect(response.status).toBe(200);
+      expect((await response.json()).levelUp).toBeNull();
+    });
+  });
+
   describe('Idempotency Guard', () => {
     it('should return existing session when already completed (prevent double-awarding)', async () => {
       // GIVEN: Session already completed
