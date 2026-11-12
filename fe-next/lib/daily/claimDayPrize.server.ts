@@ -7,6 +7,7 @@ import { eduDayPrize, rollDayPrize, type DayPrizeClaimResponse, type DayPrizeKin
 import logger from '@/utils/logger'
 import { grantChestPart, readChestPart } from '@/lib/avatar/grantChestPart.server'
 import type { ChestDropSource } from '@/lib/avatar/chestDrops'
+import { levelBeforeGrant } from '@/shared/xp/levelCurve'
 
 /** Attempt tables per daily mode, the same ones /api/daily/status reads. */
 const HUNT = { table: 'daily_word_hunt_attempts', catchupFlag: true }
@@ -190,11 +191,20 @@ async function claim(request: NextRequest, kind: DayPrizeKind): Promise<NextResp
     return NextResponse.json({ error: 'Failed to award coins' }, { status: 502 })
   }
 
-  const { error: xpError } = await supabase.rpc('increment_player_xp', {
+  const { data: xpRows, error: xpError } = await supabase.rpc('increment_player_xp', {
     p_player_id: user.id,
     p_xp_amount: prize.xp,
   })
   if (xpError) logger.error(`Daily ${kind} prize claim: xp grant failed:`, xpError.message)
 
-  return NextResponse.json({ ...prize, claimed: true, ...(await withPart()) })
+  return NextResponse.json({ ...prize, claimed: true, ...levelUpFromXpRow(xpRows), ...(await withPart()) })
+}
+
+function levelUpFromXpRow(rows: unknown): { levelUp?: { oldLevel: number; newLevel: number } } {
+  const row = Array.isArray(rows) ? (rows[0] as Record<string, unknown> | undefined) : undefined
+  const newLevel = Number(row?.new_level)
+  const total = Number(row?.new_total_xp)
+  if (!Number.isFinite(newLevel) || !Number.isFinite(total)) return {}
+  const oldLevel = levelBeforeGrant(total, Number(row?.xp_granted ?? 0))
+  return newLevel > oldLevel ? { levelUp: { oldLevel, newLevel } } : {}
 }

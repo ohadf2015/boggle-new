@@ -60,6 +60,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useMpExit } from '@/hooks/useMpExit';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
+import { useRevealHost } from '@/lib/levelUp/useRevealHost';
 
 const MultiplayerSignupSheet = dynamic(() => import('@/components/auth/MultiplayerSignupSheet'), { ssr: false });
 const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr: false });
@@ -79,6 +80,8 @@ const NUDGE_DELAY_MS = 4000;
  * One screen, zero page scroll; everything else is behind DETAILS.
  */
 export function MpResultsStage({ c }: { c: MpResultsController }) {
+  // ResultsModals' levelUp slot shows the unlock reveal once the stage is done.
+  useRevealHost();
   const { props, t, data, socketEvents } = c;
   const { username, isHost = false, seriesRoundNumber = 0, seriesTotalGames = SERIES_TOTAL_GAMES, seriesStandings, gameCode } = props;
   const reduced = !!useReducedMotion();
@@ -411,6 +414,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             mode="multiplayer"
             subMode={c.resolvedGameMode}
             score={myScore}
+            xp={socketEvents.xpGainedData && { gained: socketEvents.xpGainedData.xpEarned, total: socketEvents.xpGainedData.newTotalXp }}
             opponentUserIds={boardRows.flatMap((r) => (!r.isMe && !r.isBot && r.userId ? [r.userId] : []))}
             {...(showH2hStrip ? { rival: mpH2hRival(rival, h2h), onRematch: rematch } : {})}
           />

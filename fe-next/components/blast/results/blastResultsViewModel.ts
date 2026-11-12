@@ -4,6 +4,7 @@ import type { BlastMpRanking, BlastScoreBreakdown } from '../legacy/blastMpRanki
 import type { BlastResultsData } from '../legacy/types';
 import { getWavePassPct } from '../legacy/utils/blastWaveTheme';
 import type { BlastGemCounts } from '../legacy/utils/blastGems';
+import type { ResultsXp } from '@/components/progression/NextUnlockTeaser';
 
 export type BlastOutcomeTier = 'low' | 'mid' | 'high' | 'newBest';
 export type BlastStatId = 'coins' | 'diamonds' | 'bombs' | 'combo' | 'words' | 'waves';
@@ -42,6 +43,7 @@ export interface BlastResultsExtras {
   previousRank?: number | null;
   totalPlayers?: number | null;
   rival?: ScoredName | null;
+  xp?: ResultsXp | null;
 }
 
 export type BlastMpStats = BlastPlayerStats;

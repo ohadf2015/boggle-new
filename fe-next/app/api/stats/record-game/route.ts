@@ -173,10 +173,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to update stats' }, { status: 500 });
     }
 
-    // Increment XP via RPC (applies prestige multiplier)
-    let newTotalXp = (profile?.total_xp || 0) + xpResult.totalXp;
-    let newLevel = getLevelFromXp(newTotalXp);
-    let actualXpGranted = xpResult.totalXp;
+    // Increment XP via RPC (prestige multiplier, daily cap, level diminishing returns)
+    const oldLevel = profile?.current_level || getLevelFromXp(profile?.total_xp || 0);
+    let newTotalXp = profile?.total_xp || 0;
+    let newLevel = oldLevel;
+    let actualXpGranted = 0;
 
     if (xpResult.totalXp > 0) {
       const { data: xpData, error: xpError } = await supabase
@@ -197,7 +198,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for level up and update title
-    const oldLevel = profile?.current_level || getLevelFromXp(profile?.total_xp || 0);
     const levelUpInfo = checkLevelUp(oldLevel, newLevel);
     if (levelUpInfo.leveledUp) {
       const newTitle = getTitleForLevel(newLevel);
@@ -278,6 +278,7 @@ export async function POST(request: NextRequest) {
       xpEarned: actualXpGranted,
       xpBreakdown: xpResult.breakdown,
       newTotalXp,
+      oldLevel,
       newLevel,
       leveledUp: levelUpInfo.leveledUp,
       ...(newLifetimeAchievements.length > 0 ? { lifetimeAchievements: newLifetimeAchievements } : {}),

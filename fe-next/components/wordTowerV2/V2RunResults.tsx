@@ -137,7 +137,7 @@ export function V2RunResults({
           onRaidOpen: p.onRaidOpen,
         dailyLanguage: daily ? language : undefined,
         }}
-        socialSlot={daily ? undefined : <ResultsSocialSlot mode="tower" score={peakM} previousBest={game.prevBestRef.current} />}
+        socialSlot={daily ? undefined : <ResultsSocialSlot mode="tower" score={peakM} previousBest={game.prevBestRef.current} xp={null} />}
         extra={
           <EstateButton
             t={t}

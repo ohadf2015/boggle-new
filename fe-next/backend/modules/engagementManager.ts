@@ -5,6 +5,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabase } from './supabaseServer';
+import { xpForLevel } from '@/shared/xp/levelCurve';
 import { CALENDAR_REWARDS } from '../../lib/engagement/calendarRewards';
 import { claimCalendarDay } from '../../lib/engagement/claimCalendarReward.server';
 import logger from '../utils/logger';
@@ -185,22 +186,9 @@ export async function getEngagementStatus(playerId: string): Promise<EngagementS
   const calendarStatus = await getCalendarStatus(playerId);
   const comebackInfo = await checkComebackBonus(playerId);
 
-  // Calculate XP progress within current level
-  // Inline XP formula to avoid cross-rootDir import (same as adventureXpUtils.getXpForLevel)
-  const getXpForLvl = (level: number): number => {
-    if (level <= 1) return 0;
-    const capped = Math.min(level, 50);
-    let total = 0;
-    for (let i = 2; i <= capped; i++) {
-      total += Math.floor((i + 300 * Math.pow(2, i / 7)) / 4);
-    }
-    return total;
-  };
   const currentLevel = profile?.current_level || 1;
   const totalXp = profile?.total_xp || 0;
-  const xpForCurrentLevel = getXpForLvl(currentLevel);
-  const xpForNextLevel = getXpForLvl(currentLevel + 1);
-  const xpToNextLevel = Math.max(0, xpForNextLevel - totalXp);
+  const xpToNextLevel = Math.max(0, xpForLevel(currentLevel + 1) - totalXp);
 
   return {
     streak: {
@@ -213,7 +201,7 @@ export async function getEngagementStatus(playerId: string): Promise<EngagementS
     xp: totalXp,
     level: currentLevel,
     xpToNextLevel,
-    xpForCurrentLevel,
+    xpForCurrentLevel: xpForLevel(currentLevel),
     gold: profile?.total_coins || 0,
   };
 }

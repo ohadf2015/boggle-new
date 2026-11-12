@@ -13,6 +13,7 @@ import { captureApiError } from '@/utils/sentry';
 import { claimOnce } from '@/lib/server/claimOnce';
 import { resolveRecordXpGrant } from '@/lib/education/recordXpPolicy';
 import { CONNECTIONS_DAILY_XP_CEILING, reserveDailyXp } from '@/lib/education/recordXpDailyCeiling';
+import { levelBeforeGrant } from '@/shared/xp/levelCurve';
 
 interface RecordEducationXpRequest {
   xpAmount: number;
@@ -106,11 +107,13 @@ export async function POST(request: NextRequest) {
 
     let newTotalXp = xpToGrant;
     let newLevel = 1;
+    let oldLevel = 1;
 
     if (xpData && (xpData as unknown[]).length > 0) {
       const xpRow = (xpData as Record<string, unknown>[])[0];
       newTotalXp = Number(xpRow.new_total_xp);
       newLevel = xpRow.new_level as number;
+      oldLevel = Math.min(newLevel, levelBeforeGrant(newTotalXp, Number(xpRow.xp_granted ?? xpToGrant)));
     }
 
     // Update last_game_at for activity tracking
@@ -123,7 +126,9 @@ export async function POST(request: NextRequest) {
       success: true,
       xpEarned: xpToGrant,
       newTotalXp,
+      oldLevel,
       newLevel,
+      leveledUp: newLevel > oldLevel,
     });
   } catch (error) {
     captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/education/record-xp', { method: 'POST' });

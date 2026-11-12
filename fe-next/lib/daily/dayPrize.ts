@@ -97,6 +97,8 @@ export interface DayPrizeClaimResponse extends Omit<DayPrize, 'fixed'> {
   part?: ChestItemDrop;
   /** Missing on boxes cached before the education-side split: read as false. */
   fixed?: boolean;
+  /** Present only on the claim that pushed the player up a level. */
+  levelUp?: { oldLevel: number; newLevel: number };
 }
 
 export function isDayPrizeResponse(body: unknown): body is DayPrizeClaimResponse {

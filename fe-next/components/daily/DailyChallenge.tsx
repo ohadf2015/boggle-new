@@ -52,10 +52,12 @@ import { usePrefetchDailyContent } from '@/hooks/usePrefetchDailyContent';
 import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
+import { useRevealHost } from '@/lib/levelUp/useRevealHost';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
 const DailyChallenge: React.FC = () => {
+  useRevealHost();
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
   const { unlockAudio, stopMusic } = useMusic();

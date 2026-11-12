@@ -102,6 +102,20 @@ describe('POST /api/daily/day-clear/claim', () => {
     expect(rpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'user-1', p_xp_amount: PRIZE.xp })
   })
 
+  it('Given the prize XP crossed a level, Then the response carries the level-up', async () => {
+    const { rpc } = setup()
+    rpc.mockResolvedValue({ data: [{ new_total_xp: 300, new_level: 2, xp_granted: 100 }], error: null })
+    const body = await (await POST(req())).json()
+    expect(body.levelUp).toEqual({ oldLevel: 1, newLevel: 2 })
+  })
+
+  it('Given the prize XP stayed inside the level, Then there is no level-up', async () => {
+    const { rpc } = setup()
+    rpc.mockResolvedValue({ data: [{ new_total_xp: 500, new_level: 3, xp_granted: 10 }], error: null })
+    const body = await (await POST(req())).json()
+    expect(body.levelUp).toBeUndefined()
+  })
+
   it('second claim the same day is a 200 with claimed:false and pays nothing', async () => {
     setup({ insertError: { code: '23505', message: 'dup' } })
     const res = await POST(req())

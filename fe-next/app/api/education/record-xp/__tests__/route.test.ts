@@ -91,6 +91,18 @@ describe('POST /api/education/record-xp', () => {
     expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 20 });
   });
 
+  it('reports the level before the grant so the client can tell a real level-up', async () => {
+    mockRpc.mockResolvedValue({ data: [{ new_total_xp: 300, new_level: 2, xp_granted: 50 }], error: null });
+    const result = await POST(makeRequest(connections));
+    expect(result.data).toMatchObject({ oldLevel: 1, newLevel: 2, leveledUp: true });
+  });
+
+  it('a grant that stays inside the level is not a level-up', async () => {
+    mockRpc.mockResolvedValue({ data: [{ new_total_xp: 400, new_level: 2, xp_granted: 20 }], error: null });
+    const result = await POST(makeRequest(connections));
+    expect(result.data).toMatchObject({ oldLevel: 2, newLevel: 2, leveledUp: false });
+  });
+
   it('never awards more than the best connections solve is worth (hard + streak = 53)', async () => {
     await POST(makeRequest({ ...connections, xpAmount: 1000 }));
     expect(mockRpc).toHaveBeenCalledWith('increment_player_xp', { p_player_id: 'student-456', p_xp_amount: 53 });

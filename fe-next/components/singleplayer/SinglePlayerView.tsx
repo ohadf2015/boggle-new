@@ -33,8 +33,11 @@ import { useSinglePlayerConfig } from './useSinglePlayerConfig';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import SessionRevealHost from '@/components/avatar/reveal/SessionRevealHost';
+import { useRevealHost } from '@/lib/levelUp/useRevealHost';
 import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigger';
 import { useRetireSpLcpShell } from './retireSpLcpShell';
+import type { ResultsXp } from '@/components/progression/NextUnlockTeaser';
+import { guestXpEstimate, xpFromResponse } from '@/components/progression/resultsXp';
 
 // Off the LCP-critical path (phase 'playing' renders SinglePlayerGame only) —
 // deferred so results/tutorial JS (framer-motion, ads, confetti) doesn't block first paint.
@@ -118,6 +121,8 @@ export interface SinglePlayerResultsData {
  */
 const SinglePlayerView: React.FC = () => {
   const { t } = useLanguage();
+  // View-wide: the record-game response can land before the results screen mounts SessionRevealHost.
+  useRevealHost();
   const searchParams = useSearchParams();
   const isPractice = usePracticeFlag();
   const { stopMusic } = useMusic();
@@ -145,6 +150,7 @@ const SinglePlayerView: React.FC = () => {
   const offlineFlag = useOfflineModeFlag();
   const { queueAchievement } = useAchievementQueue();
   const [resultsData, setResultsData] = useState<SinglePlayerResultsData | null>(null);
+  const [resultsXp, setResultsXp] = useState<ResultsXp | null>(null);
   const [sessionId] = useState(() => `sp_${safeRandomUUID()}`);
 
   // Show feature unlock notifications when user reaches milestones
@@ -197,6 +203,7 @@ const SinglePlayerView: React.FC = () => {
 
   const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     incrementTrainingGames();
+    setResultsXp(isAuthenticated ? null : guestXpEstimate(results.playerScore, results.achievements?.length || 0));
 
     // Flip returning-player flag so next /singleplayer?autoStart=bots entry
     // routes to Quick Play instead of replaying the FTUE bots flow.
@@ -276,6 +283,7 @@ const SinglePlayerView: React.FC = () => {
         })
           .then(r => r.json())
           .then(data => {
+            setResultsXp(xpFromResponse(data));
             // Level-up → avatar unlock reveal (in memory; SessionRevealHost shows it).
             publishLevelUp(levelUpFromRecordGame(data), 'single');
             if (Array.isArray(data.lifetimeAchievements)) {
@@ -372,6 +380,7 @@ const SinglePlayerView: React.FC = () => {
                 // phase already unmounts between games, so a constant is enough.
                 key={resultsData.gameSessionId || 'results'}
                 results={resultsData}
+                xp={resultsXp}
                 mode={gameState.mode}
                 difficulty={gameState.difficulty}
                 onPlayAgain={handlePlayAgain}

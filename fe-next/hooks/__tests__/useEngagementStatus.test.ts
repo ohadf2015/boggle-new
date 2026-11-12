@@ -26,16 +26,8 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
-// Mock adventureXpUtils
-vi.mock('@/shared/utils/adventureXpUtils', () => ({
-  getXpForLevel: vi.fn((level: number) => {
-    const xpTable: Record<number, number> = { 1: 0, 2: 100, 3: 250, 4: 500, 5: 800, 6: 1200 };
-    return xpTable[level] ?? level * 100;
-  }),
-  getLevelFromXp: vi.fn(),
-}));
-
 import { useEngagementStatus } from '../useEngagementStatus';
+import { xpForLevel } from '@/shared/xp/levelCurve';
 
 // Helper to create a chained Supabase query mock
 function createChain(data: Record<string, unknown> | null, error: unknown = null) {
@@ -58,7 +50,7 @@ const engagementData = {
 };
 
 const profileData = {
-  total_xp: 350,
+  total_xp: 600,
   current_level: 3,
   total_coins: 1500,
 };
@@ -105,7 +97,7 @@ describe('useEngagementStatus', () => {
     expect(result.current.streak).toBe(7);
     expect(result.current.level).toBe(3);
     expect(result.current.gold).toBe(1500);
-    expect(result.current.xp).toBe(350);
+    expect(result.current.xp).toBe(profileData.total_xp);
   });
 
   it('should calculate streakAtRisk when close to midnight', async () => {
@@ -169,9 +161,10 @@ describe('useEngagementStatus', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    // Level 3: xpForLevel(3)=250, xpForLevel(4)=500
-    // totalXp=350, so xpProgress = (350-250)/(500-250) = 100/250 = 0.4
-    expect(result.current.xpProgress).toBeCloseTo(0.4);
+    const start = xpForLevel(3);
+    const next = xpForLevel(4);
+    expect(result.current.xpProgress).toBeCloseTo((profileData.total_xp - start) / (next - start));
+    expect(result.current.xpToNextLevel).toBe(next - profileData.total_xp);
   });
 
   it('should handle API errors gracefully', async () => {

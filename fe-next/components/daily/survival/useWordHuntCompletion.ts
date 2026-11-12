@@ -8,6 +8,8 @@ import { levelUpFromRecordGame, publishLevelUp } from '@/lib/avatar/revealTrigge
 import type { Language } from '@/types';
 import type { SurvivalGameResult } from './types';
 import { clearWordHuntRunStarted } from './runStartedMarker';
+import { xpFromResponse } from '@/components/progression/resultsXp';
+import { publishResultsXp } from '@/components/progression/resultsXpStore';
 
 /** The ad hooks' own watchdogs run ~45s; past this the results open (under the ad if one is still up). */
 export const INTERSTITIAL_RESULTS_CAP_MS = 3000;
@@ -33,6 +35,7 @@ export interface WordHuntCompletionDeps {
 }
 
 function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
+  publishResultsXp('daily:word-hunt', null);
   fetch('/api/stats/record-game', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -46,6 +49,7 @@ function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
   })
     .then(r => r.json())
     .then(data => {
+      publishResultsXp('daily:word-hunt', xpFromResponse(data));
       publishLevelUp(levelUpFromRecordGame(data), 'daily');
       if (data.questUpdate?.completed) {
         import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {

@@ -78,10 +78,33 @@ describe('processQuickSubmit', () => {
 
   it('grants XP via increment_player_xp RPC', async () => {
     const { db, rpc } = makeDb();
-    const out = await processQuickSubmit(db, baseInput);
-    expect(out.xp).toBeGreaterThan(0);
+    await processQuickSubmit(db, baseInput);
     expect(rpc).toHaveBeenCalledWith('increment_player_xp',
-      expect.objectContaining({ p_player_id: 'u1' }));
+      expect.objectContaining({ p_player_id: 'u1', p_xp_amount: expect.any(Number) }));
+  });
+
+  it('reports the XP the RPC granted after caps, and the new total', async () => {
+    const { db, rpc } = makeDb();
+    rpc.mockImplementation((name: string) => {
+      if (name === 'quick_play_percentile_today') return Promise.resolve({ data: 73, error: null });
+      if (name === 'increment_player_xp') return Promise.resolve({ data: [{ new_total_xp: 1234, new_level: 6, xp_granted: 17 }], error: null });
+      return Promise.resolve({ data: null, error: null });
+    });
+    const out = await processQuickSubmit(db, baseInput);
+    expect(out.xp).toBe(17);
+    expect(out.newTotalXp).toBe(1234);
+  });
+
+  it('reports no XP when the grant failed', async () => {
+    const { db, rpc } = makeDb();
+    rpc.mockImplementation((name: string) => {
+      if (name === 'quick_play_percentile_today') return Promise.resolve({ data: 73, error: null });
+      if (name === 'increment_player_xp') return Promise.resolve({ data: null, error: { message: 'down' } });
+      return Promise.resolve({ data: null, error: null });
+    });
+    const out = await processQuickSubmit(db, baseInput);
+    expect(out.xp).toBe(0);
+    expect(out.newTotalXp).toBeNull();
   });
 
   it('returns cumulative rank points (all-time sum of score_pct)', async () => {

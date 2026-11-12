@@ -16,7 +16,7 @@
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getLevelFromXp } from '@/backend/modules/xpManager';
 import { LEVEL_UNLOCK_LADDER, getNewUnlocksBetween, normalizeLevel, type LevelUnlock } from './unlocks';
-import { announceLevelUp } from '@/lib/levelUp/levelUpBus';
+import { announceLevelUp, celebratedThrough } from '@/lib/levelUp/levelUpBus';
 import { maxRarity, type VisualTier } from './rarity';
 
 export interface LevelUpLike {
@@ -94,7 +94,7 @@ export function clearUnseenUnlock(): void {
   emit();
 }
 
-// ── publish / subscribe (singleplayer + any surface without a queue) ──
+// ── publish / subscribe: the one entry point for every mode's level-up ──
 
 export function publishLevelUp(payload: LevelUpLike | null | undefined, source = 'game'): UnlockReveal | null {
   announceLevelUp(payload, source);
@@ -106,6 +106,7 @@ export function publishLevelUp(payload: LevelUpLike | null | undefined, source =
 }
 
 export function getPublishedReveal(): UnlockReveal | null {
+  if (published && published.level <= celebratedThrough()) return null;
   return published;
 }
 
@@ -127,8 +128,8 @@ function num(v: unknown): number | null {
 }
 
 /**
- * /api/stats/record-game answers `{ leveledUp, newLevel, newTotalXp, xpEarned }`
- * but no old level. The XP before this game is authoritative for it (the
+ * /api/stats/record-game answers `{ leveledUp, oldLevel, newLevel, newTotalXp, xpEarned }`.
+ * Older responses lack oldLevel; then the XP before this game decides it (the
  * client profile's current_level can be stale between games).
  */
 export function levelUpFromRecordGame(resp: unknown): LevelUpLike | null {
@@ -137,7 +138,10 @@ export function levelUpFromRecordGame(resp: unknown): LevelUpLike | null {
   if (r.leveledUp !== true) return null;
   const newLevel = num(r.newLevel);
   const total = num(r.newTotalXp);
-  if (newLevel == null || total == null) return null;
+  if (newLevel == null) return null;
+  const reported = num(r.oldLevel);
+  if (reported != null && reported < newLevel) return { oldLevel: reported, newLevel };
+  if (total == null) return null;
   const before = getLevelFromXp(Math.max(0, total - (num(r.xpEarned) ?? 0)));
   return { oldLevel: Math.min(before, newLevel - 1), newLevel };
 }

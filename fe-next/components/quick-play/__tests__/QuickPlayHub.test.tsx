@@ -10,6 +10,8 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' } }),
 }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
+const publishLevelUp = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp }));
 vi.mock('@/components/ui/BackButton', () => ({
   BackButton: ({ label }: any) => <button data-testid="mock-back">{label}</button>,
 }));
@@ -137,6 +139,24 @@ describe('QuickPlayHub', () => {
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     expect(fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'))).toHaveLength(2);
     expect(goBack).not.toHaveBeenCalled();
+  });
+
+  it('a round that crossed a level publishes the level-up through the shared path', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) return Promise.resolve({ ok: true, json: async () => roundPayload });
+      if (String(url).includes('/submit')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ scorePct: 68, coins: 93, xp: 74, percentileToday: 73, history: [68], levelUp: { oldLevel: 1, newLevel: 2 } }),
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
+    expect(publishLevelUp).toHaveBeenCalledWith({ oldLevel: 1, newLevel: 2 }, 'quickPlay');
   });
 
   it('quitting mid-round leaves Quick Play instead of opening a picker', async () => {

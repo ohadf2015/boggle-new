@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { NewRecordBanner } from '@/components/progression/NewRecordBanner';
-import { NextUnlockTeaser } from '@/components/progression/NextUnlockTeaser';
+import { NextUnlockTeaser, type ResultsXp } from '@/components/progression/NextUnlockTeaser';
 import { RivalCard } from '@/components/rivals/RivalCard';
 import { WorldRecordChip } from '@/components/records/WorldRecordChip';
 import { useAuth } from '@/contexts/AuthContext';
@@ -30,10 +30,12 @@ export interface ResultsSocialSlotProps {
   /** A rival the screen already knows (edu classroom standings): no lookup runs. */
   rival?: RivalSummary | null;
   onRematch?: () => void;
+  /** Server XP for this game (null until it arrives, or for modes that award none). */
+  xp?: ResultsXp | null;
 }
 
 /** The one social block every results screen mounts: name prompt, new record, rival, next unlock. */
-export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch }: ResultsSocialSlotProps) {
+export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch, xp }: ResultsSocialSlotProps) {
   const { loading, isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const [fetched, setFetched] = useState<RivalSummary | null>(null);
@@ -75,7 +77,7 @@ export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, pr
       <NewRecordBanner mode={mode} score={score} />
       {mode !== 'edu' && <WorldRecordChip mode={mode} subMode={subMode} score={score} />}
       {rival && <RivalCard rival={rival} mode={mode} onRematch={onRematch} />}
-      <NextUnlockTeaser mode={mode} />
+      <NextUnlockTeaser mode={mode} xp={xp} />
     </div>
   );
 }

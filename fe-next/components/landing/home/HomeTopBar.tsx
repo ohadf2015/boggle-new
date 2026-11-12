@@ -6,8 +6,9 @@ import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite from '@/components/AvatarLite';
 import { NeoSkeleton } from '@/components/ui/skeleton';
-import { getXpProgress, getTitleForLevel } from '@/backend/modules/xpManager';
-import { clampPercent } from '@/lib/landing/homeHubFormat';
+import { LevelRing, profileLevelProgress } from '@/components/progression/LevelRing';
+import { useChosenTitle } from '@/components/progression/useChosenTitle';
+import { resolveDisplayTitle, titleLabelKey } from '@/lib/titles/playerTitles';
 import { useAccountStreak } from '@/hooks/useAccountStreak';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { CoinArt } from '@/components/ui/CoinArt';
@@ -90,16 +91,12 @@ export function HomeTopBar({
   // profile id wins once loaded; otherwise the stable guest seed gives a random one.
   const avatarSeed = p?.id ?? guestSeed ?? undefined;
 
-  const totalXp = p?.total_xp ?? 0;
-  const progress = getXpProgress(totalXp);
-  // Prefer the persisted level but fall back to the XP-derived one if absent.
-  const level = p?.current_level ?? progress.currentLevel;
-  // `getTitleForLevel` returns a raw constant key (e.g. "LEXICON_KING"). Localize
-  // it via the `landing.home.titles.*` table; fall back to a humanized key so a
-  // missing translation degrades to "Lexicon King" rather than the raw token.
-  const titleKey = getTitleForLevel(level);
-  const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;
-  const ringPct = clampPercent(progress.progressPercent);
+  const progress = profileLevelProgress(p);
+  const level = progress.level;
+  const { title: chosenTitle, status: titleStatus } = useChosenTitle(p?.id);
+  const titleSettled = !p?.id || titleStatus === 'ready' || titleStatus === 'error';
+  const titleKey = titleSettled ? resolveDisplayTitle({ chosenTitle, level }) : null;
+  const title = titleKey ? t(titleLabelKey(titleKey), humanizeTitleKey(titleKey)) : null;
   const coins = p?.total_coins ?? 0;
   const name = p?.display_name || p?.username || t('common.player');
 
@@ -111,13 +108,7 @@ export function HomeTopBar({
         aria-label={t('nav.profile', 'Profile')}
         className="flex min-w-0 items-center gap-2.5 rounded-full transition-transform active:scale-95"
       >
-        <div
-          className="relative h-[50px] w-[50px] shrink-0 rounded-full p-[3px]"
-          style={{
-            background: `conic-gradient(var(--neo-lime) 0 ${ringPct}%, rgba(255,255,255,0.16) ${ringPct}% 100%)`,
-          }}
-          aria-hidden="true"
-        >
+        <LevelRing pct={progress.pct} level={level} size={50} trackLevel={!!p?.id}>
           {/* The real face without the client art library: AvatarLite overlays
               the versioned server PNG (same compositor as Avatar), face-cropped,
               with its own black edge — no second bordered disc around it.
@@ -136,7 +127,7 @@ export function HomeTopBar({
               {level}
             </span>
           )}
-        </div>
+        </LevelRing>
         <div className="min-w-0">
           {showProfileSkeleton ? (
             <div className="flex flex-col gap-1.5 py-0.5">

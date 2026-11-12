@@ -4,6 +4,7 @@ import { memo, type ReactNode } from 'react';
 import Link from 'next/link';
 import { Trophy, Target, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import LevelBadge from '@/components/LevelBadge';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import Avatar from '@/components/Avatar';
 import { MobileTooltip } from './MobileTooltip';
@@ -64,8 +65,9 @@ const PlayerProfileTooltipContent = memo<{
             {countryFlag && <span className="text-sm">{countryFlag}</span>}
           </div>
           {player.level !== undefined && (
-            <span className="text-[10px] font-bold text-neo-black/60">
-              {t('profile.level')} {player.level}
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neo-black/60">
+              <LevelBadge level={player.level} size="sm" animate={false} />
+              {t('profile.level')}
             </span>
           )}
         </div>

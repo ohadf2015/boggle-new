@@ -5,7 +5,7 @@
  * One screen at a time, zero pre-game config. Tapping/dragging to a mode
  * plays it immediately; Random resolves at that same instant.
  */
-import { announceLevelUp, type LevelUpInput } from '@/lib/levelUp/levelUpBus';
+import { publishLevelUp, type LevelUpLike } from '@/lib/avatar/revealTrigger';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -309,7 +309,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
           // default so results still render instead of stranding the round.
         }
         setOutcome(out);
-        announceLevelUp((out as { levelUp?: LevelUpInput | null }).levelUp, 'quickPlay');
+        publishLevelUp((out as { levelUp?: LevelUpLike | null }).levelUp, 'quickPlay');
         if (out.totalPoints > 0) setTotalPoints(out.totalPoints);
         posthog.capture('quick_play_round_completed', {
           mode: r.mode,

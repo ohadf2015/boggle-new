@@ -1,4 +1,4 @@
-import { getLevelFromXp, getXpForLevel } from '@/backend/modules/xpManager';
+import { levelFromXp, xpForLevel } from '@/shared/xp/levelCurve';
 import { LEVEL_UNLOCK_LADDER, normalizeLevel, type LevelUnlock } from '@/lib/avatar/unlocks';
 
 export interface NextUnlockTeaserModel {
@@ -15,12 +15,12 @@ export function getUpcomingUnlocks(level: number | null | undefined, count: numb
 
 /** `knownLevel` covers a level-up this session that the profile XP hasn't caught up with. */
 export function buildNextUnlockTeaser(totalXp: number, knownLevel?: number | null): NextUnlockTeaserModel | null {
-  const xpLevel = getLevelFromXp(Math.max(0, totalXp));
+  const xpLevel = levelFromXp(Math.max(0, totalXp));
   const level = Math.max(xpLevel, knownLevel ?? 0);
   const [next] = getUpcomingUnlocks(level, 1);
   if (!next) return null;
-  const floorXp = getXpForLevel(level);
-  const targetXp = getXpForLevel(next.level);
+  const floorXp = xpForLevel(level);
+  const targetXp = xpForLevel(next.level);
   const xp = Math.max(totalXp, floorXp);
   const span = Math.max(1, targetXp - floorXp);
   return {

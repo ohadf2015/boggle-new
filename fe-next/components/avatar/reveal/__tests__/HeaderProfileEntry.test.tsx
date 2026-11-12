@@ -81,4 +81,9 @@ describe('HeaderProfileEntry', () => {
     expect(hasUnseenUnlock()).toBe(false);
     expect(screen.queryByTestId('header-profile-new')).not.toBeInTheDocument();
   });
+
+  it('wraps the header avatar in the XP ring', () => {
+    render(<HeaderProfileEntry />);
+    expect(screen.getByTestId('level-ring')).toBeInTheDocument();
+  });
 });

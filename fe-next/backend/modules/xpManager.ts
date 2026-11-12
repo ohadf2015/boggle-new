@@ -3,6 +3,8 @@
  * Handles XP calculation, level progression, and rewards
  */
 
+import { xpForLevel, levelFromXp } from '@/shared/xp/levelCurve';
+
 // XP Configuration
 export const XP_CONFIG = {
   // Base XP rewards
@@ -28,10 +30,6 @@ export const XP_CONFIG = {
     75: 0.70,  // Levels 51-75: 70%
     100: 0.55, // Levels 76-100: 55%
   } as Record<number, number>,
-
-  // Level curve: XP needed = 100 * level^exponent
-  LEVEL_EXPONENT: 1.5,
-  LEVEL_BASE: 100,
 
   // Max level (optional cap)
   MAX_LEVEL: 100,
@@ -162,15 +160,7 @@ export function calculateGameXp(gameStats: GameStats): XpResult {
   };
 }
 
-/**
- * Whether a multiplayer game had a real opponent to play against.
- *
- * Multiplayer XP is only granted when at least one OTHER real (non-bot) player
- * was in the game — a lobby filled out with bots (a lone human) grants no XP.
- * `realPlayerCount` is the number of non-bot participants (bots already filtered
- * out upstream in gameResults.ts). This does NOT govern single-player play,
- * which awards XP through a separate path.
- */
+/** At least one OTHER non-bot player; a bot-only game earns solo-rate XP instead (playerStats.ts). */
 export function hasRealOpponent(realPlayerCount: number | null | undefined): boolean {
   return (realPlayerCount ?? 0) >= 2;
 }
@@ -234,55 +224,12 @@ export function getDailyXpCap(xpToAdd: number, dailyXpSoFar: number): number {
   return Math.max(1, effective);
 }
 
-/**
- * Calculate XP required to reach a specific level
- * Formula: XP = 100 * level^exponent (segmented by tier)
- *
- * Segmented curve to improve mid-game retention:
- * - Levels 1-25: Exponent 1.4 (faster early progression)
- * - Levels 26-50: Exponent 1.45 (gentler mid-game)
- * - Levels 51-75: Exponent 1.5 (current baseline)
- * - Levels 76+: Exponent 1.55 (prestige tier challenge)
- */
 export function getXpForLevel(level: number): number {
-  if (level <= 1) return 0;
-
-  // Determine exponent based on level tier
-  let exponent: number;
-  if (level <= 25) {
-    exponent = 1.4;  // Faster early progression
-  } else if (level <= 50) {
-    exponent = 1.45; // Gentler mid-game (was 1.5)
-  } else if (level <= 75) {
-    exponent = 1.5;  // Current baseline
-  } else {
-    exponent = 1.55; // Prestige tier
-  }
-
-  return Math.round(XP_CONFIG.LEVEL_BASE * Math.pow(level, exponent));
+  return xpForLevel(level);
 }
 
-/**
- * Calculate level from total XP
- * Inverse of getXpForLevel
- */
 export function getLevelFromXp(totalXp: number): number {
-  if (totalXp <= 0) return 1;
-
-  // Binary search for level
-  let low = 1;
-  let high = XP_CONFIG.MAX_LEVEL;
-
-  while (low < high) {
-    const mid = Math.floor((low + high + 1) / 2);
-    if (getXpForLevel(mid) <= totalXp) {
-      low = mid;
-    } else {
-      high = mid - 1;
-    }
-  }
-
-  return Math.min(low, XP_CONFIG.MAX_LEVEL);
+  return levelFromXp(totalXp);
 }
 
 /**

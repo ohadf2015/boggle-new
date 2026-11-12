@@ -1,6 +1,8 @@
 import type { BlastResultsData } from '../types';
 import { postWithAuth } from '@/utils/authFetch';
-import { announceLevelUp } from '@/lib/levelUp/levelUpBus';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
+import type { ResultsXp } from '@/components/progression/NextUnlockTeaser';
+import { xpFromResponse } from '@/components/progression/resultsXp';
 
 /**
  * Subset of the /api/blast/result response the UI cares about for result-screen enrichment.
@@ -17,6 +19,7 @@ export interface SavedBlastResultPatch {
   previousRank?: number | null;
   totalPlayers?: number | null;
   rival?: { name: string; score: number } | null;
+  xp?: ResultsXp | null;
 }
 
 /**
@@ -99,7 +102,7 @@ export async function saveBlastResult(
       rival?: { name: string; score: number } | null;
       levelUp?: { oldLevel: number; newLevel: number } | null;
     };
-    if (body.levelUp) announceLevelUp(body.levelUp, 'blast');
+    if (body.levelUp) publishLevelUp(body.levelUp, 'blast');
 
     return {
       percentile: body.percentile ?? undefined,
@@ -109,6 +112,7 @@ export async function saveBlastResult(
       previousRank: body.previousRank ?? null,
       totalPlayers: body.totalPlayers ?? null,
       rival: body.rival ?? null,
+      xp: xpFromResponse(body),
     };
   } catch {
     return null;

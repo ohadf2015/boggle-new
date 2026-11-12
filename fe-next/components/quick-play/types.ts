@@ -96,6 +96,8 @@ export interface QuickSubmitOutcome {
   scorePct: number;
   coins: number;
   xp: number;
+  /** Server total XP after this round; absent on the local fallback outcome. */
+  newTotalXp?: number | null;
   percentileToday: number;
   history: number[];
   /** All-time Quick Rank points (sum of score_pct) */

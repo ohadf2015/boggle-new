@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Target, Circle, UserMinus, ShieldOff, Ban } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { cn } from '@/lib/utils';
+import LevelBadge from '@/components/LevelBadge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Avatar from '@/components/Avatar';
@@ -143,9 +144,9 @@ export function FriendDetailDialog({
                     </p>
                   </div>
                   <div className="p-3 rounded-neo border-3 border-neo-black bg-neo-pink-muted dark:bg-neo-navy-light shadow-hard-sm text-center">
-                    <p className="text-2xl font-black text-neo-black dark:text-neo-pink">
-                      {friend.currentLevel || 1}
-                    </p>
+                    <div className="flex justify-center">
+                      <LevelBadge level={friend.currentLevel || 1} size="md" animate={false} />
+                    </div>
                     <p className="text-xs font-black uppercase tracking-wide text-current/70">
                       {t('stats.level')}
                     </p>

@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { getXpForLevel } from '@/shared/utils/adventureXpUtils';
+import { xpForLevel } from '@/shared/xp/levelCurve';
 
 const CACHE_KEY = 'lexiclash_engagement_status';
 const STREAK_RISK_HOURS = 6;
@@ -51,8 +51,8 @@ function calculateStreakAtRisk(streak: number): boolean {
 }
 
 function calculateXpProgress(totalXp: number, level: number): number {
-  const xpForCurrent = getXpForLevel(level);
-  const xpForNext = getXpForLevel(level + 1);
+  const xpForCurrent = xpForLevel(level);
+  const xpForNext = xpForLevel(level + 1);
   const range = xpForNext - xpForCurrent;
   if (range <= 0) return 1;
   return Math.min(1, Math.max(0, (totalXp - xpForCurrent) / range));
@@ -145,7 +145,7 @@ export function useEngagementStatus(): EngagementStatusData {
         level,
         xp: totalXp,
         xpProgress: calculateXpProgress(totalXp, level),
-        xpToNextLevel: Math.max(0, getXpForLevel(level + 1) - totalXp),
+        xpToNextLevel: Math.max(0, xpForLevel(level + 1) - totalXp),
         gold: profile?.total_coins ?? 0,
         gamesToday: engagement?.games_today ?? 0,
         streakAtRisk: calculateStreakAtRisk(streak),

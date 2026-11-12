@@ -8,6 +8,7 @@ import {
   Swords, UserPlus, UserCheck, Clock, ArrowLeft, Star, Award,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import LevelBadge from '@/components/LevelBadge';
 import Avatar from '@/components/Avatar';
 import { XpByModeBreakdown } from '@/components/profile/XpByModeBreakdown';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -197,8 +198,9 @@ export default function PlayerProfilePageClient() {
 
             {/* Level + Percentile */}
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-sm font-bold text-slate-400">
-                {t('profile.level')} {profile.currentLevel}
+              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cream/60">
+                <LevelBadge level={profile.currentLevel} size="sm" animate={false} />
+                {t('profile.level')}
               </span>
               {profile.percentile <= 50 && (
                 <span className={cn(

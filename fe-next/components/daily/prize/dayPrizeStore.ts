@@ -1,6 +1,7 @@
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 import { isDayPrizeResponse, type DayPrizeClaimResponse, type DayPrizeKind } from '@/lib/daily/dayPrize';
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 /**
  * Per-device memory for the daily prize box: whether the box already popped up
@@ -70,6 +71,7 @@ export async function claimDayPrize(kind: DayPrizeKind): Promise<ClaimOutcome> {
     const body: unknown = await res.json();
     if (!isDayPrizeResponse(body)) return { ok: false, reason: 'failed' };
     rememberOpenedPrize(body);
+    if (body.levelUp) publishLevelUp(body.levelUp, 'dailyPrize');
     return { ok: true, prize: body };
   } catch {
     return { ok: false, reason: 'failed' };
