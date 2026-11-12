@@ -102,5 +102,7 @@ describe('join during a round start', () => {
 
     gate.resolve();
     await starting;
+    await vi.waitFor(() => expect(first.getEmittedEventsByName('startGame').length).toBeGreaterThan(1));
+    for (const e of first.getEmittedEventsByName('startGame')) expect(e.data.letterGrid).toEqual(getGame(gameCode).letterGrid);
   });
 });

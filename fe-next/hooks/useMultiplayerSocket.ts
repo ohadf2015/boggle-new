@@ -17,6 +17,7 @@ import {
 import { saveSession, clearSessionPreservingUsername, getSession } from '@/utils/session';
 import { buildRejoinPayload } from '@/lib/multiplayer/reloadRejoin';
 import { getRejoinIntent, planNotSeatedRejoin } from '@/utils/socketRejoin';
+import { autoFillRefusalRejoinCode } from '@/components/education/lobby/practiceBotsRefusal';
 import { setGuestName } from '@/utils/guestManager';
 import { resolveHostLeftMessage } from '@/lib/multiplayer/resolveHostLeftMessage';
 import logger from '@/utils/logger';
@@ -629,6 +630,19 @@ export function useMultiplayerSocket(
       const opts = optionsRef.current;
       const message = data?.type === 'persistence' ? opts.t('mpUi.lobby.progressNotSaved') : opts.t('errors.generic');
       toast.error(message, { icon: '⚠️', duration: data?.type === 'persistence' ? 6000 : 4000 });
+    });
+
+    // A bot-fill refusal is the fill's only answer; a lost seat still gets the rejoin the old error triggered.
+    listen('autoFillRefused', (data) => {
+      const rejoin = planNotSeatedRejoin({
+        errorCode: autoFillRefusalRejoinCode(data?.reason),
+        intent: getRejoinIntent(),
+        lastAttemptAt: notSeatedRejoinAtRef.current,
+        now: Date.now(),
+      });
+      if (!rejoin) return;
+      notSeatedRejoinAtRef.current = Date.now();
+      socketInstance.emit('join', rejoin);
     });
 
     listen('rateLimited', () => {

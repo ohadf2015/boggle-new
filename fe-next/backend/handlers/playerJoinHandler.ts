@@ -276,8 +276,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // broadcast and cannot carry a per-socket value (pitfalls class 3).
     // Fire-and-forget: it must never delay or fail the join.
     void emitClassroomContext(socket, gameCode, authUserId, seat);
-    const rosterId = authUserId ?? (guestTokenHash ? `guest:${guestTokenHash}` : null);
-    if (seat.game && !practiceSeat && rosterId) void recordClassroomRosterEntry(gameCode, seat.game, rosterId);
+    if (seat.game && authUserId) void recordClassroomRosterEntry(gameCode, seat.game, authUserId);
 
     // Handle reconnection
     if (existingSocketId || game.users[username]) {

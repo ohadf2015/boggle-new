@@ -53,6 +53,18 @@ export function peekRehearseIntent(now = Date.now()): RehearseIntent | null {
   }
 }
 
+/** The intent only once a launch has claimed it for this room: a host board never acts on a tap nobody launched. */
+export function peekRehearseIntentForRoom(gameCode: string, now = Date.now()): RehearseIntent | null {
+  const intent = peekRehearseIntent(now);
+  if (!intent) return null;
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(INTENT_KEY) ?? '{}') as { gameCode?: unknown };
+    return parsed.gameCode === gameCode ? intent : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Bind the intent to the room it launches. Only the launch that came from the rehearse tap
  * (same entry) claims it; any other launch, or a second room, finds an abandoned intent and clears it.

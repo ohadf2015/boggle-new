@@ -5654,7 +5654,8 @@ const sv = {
       "room_gone": "Rummet har stängts. Öppna spelet igen från din klass.",
       "not_host": "Bara skärmen som är värd för rummet kan lägga till träningsspelare.",
       "in_progress": "En runda pågår redan. Öva när den är slut.",
-      "room_full": "Det finns inga lediga platser kvar för träningsspelare."
+      "room_full": "Det finns inga lediga platser kvar för träningsspelare.",
+      "students_present": "Det finns redan elever här. Tryck på Starta för att börja."
     }
   },
   "tvResults": {

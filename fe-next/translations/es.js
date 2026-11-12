@@ -5354,7 +5354,8 @@ const es = {
       "room_gone": "La sala se ha cerrado. Vuelve a abrir el juego desde tu clase.",
       "not_host": "Solo la pantalla que aloja la sala puede añadir jugadores de práctica.",
       "in_progress": "Ya hay una ronda en marcha. Practica cuando termine.",
-      "room_full": "No quedan sitios libres para jugadores de práctica."
+      "room_full": "No quedan sitios libres para jugadores de práctica.",
+      "students_present": "Ya hay alumnos en la sala. Pulsa Empezar para comenzar."
     }
   },
   "tvResults": {

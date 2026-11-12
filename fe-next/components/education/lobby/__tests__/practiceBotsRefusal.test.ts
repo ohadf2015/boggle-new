@@ -7,7 +7,7 @@ import { sv } from '@/translations/sv';
 import { ja } from '@/translations/ja';
 import { ru } from '@/translations/ru';
 import { AUTO_FILL_REFUSAL_REASONS } from '@/shared/types/autoFillRefusal';
-import { practiceBotsRefusalKey, usePracticeBotsRefusal, PRACTICE_BOTS_FALLBACK_KEY } from '../practiceBotsRefusal';
+import { practiceBotsRefusalKey, usePracticeBotsRefusal, PRACTICE_BOTS_FALLBACK_KEY, autoFillRefusalRejoinCode, arcadeAutoFillToastKey } from '../practiceBotsRefusal';
 
 function lookup(dict: unknown, key: string): unknown {
   return key.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], dict);
@@ -61,5 +61,18 @@ describe('practice bots refusal', () => {
     const socket = fakeSocket();
     renderHook(() => usePracticeBotsRefusal(socket as never, false, vi.fn()));
     expect(socket.handlers.has('autoFillRefused')).toBe(false);
+  });
+
+  it('Given the server lost the host seat, When a fill is refused as not_in_room, Then the socket rejoin runs as it did for the old error', () => {
+    expect(autoFillRefusalRejoinCode('not_in_room')).toBe('PLAYER_NOT_IN_GAME');
+    expect(autoFillRefusalRejoinCode('room_gone')).toBeNull();
+  });
+
+  it('Given an arcade lobby fill is refused, Then only failures the host can act on get a toast', () => {
+    expect(arcadeAutoFillToastKey('rate_limited')).toBe('errors.rateLimited');
+    expect(arcadeAutoFillToastKey('room_gone')).toBe('errors.gameNotFound');
+    expect(arcadeAutoFillToastKey('not_host')).toBe('errors.generic');
+    expect(arcadeAutoFillToastKey('room_full')).toBeNull();
+    expect(arcadeAutoFillToastKey('not_in_room')).toBeNull();
   });
 });

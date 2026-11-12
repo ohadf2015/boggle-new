@@ -10,6 +10,22 @@ export function practiceBotsRefusalKey(reason: unknown): string {
     : PRACTICE_BOTS_FALLBACK_KEY;
 }
 
+/** A refusal that means the server lost this socket's seat gets the same rejoin the old error triggered. */
+export function autoFillRefusalRejoinCode(reason: unknown): 'PLAYER_NOT_IN_GAME' | null {
+  return reason === 'not_in_room' ? 'PLAYER_NOT_IN_GAME' : null;
+}
+
+const ARCADE_TOAST_KEYS: Partial<Record<AutoFillRefusalReason, string>> = {
+  rate_limited: 'errors.rateLimited',
+  room_gone: 'errors.gameNotFound',
+  not_host: 'errors.generic',
+};
+
+/** The arcade lobby's passive fill: a toast only for what the host can act on (a full room or a lost seat stays quiet). */
+export function arcadeAutoFillToastKey(reason: unknown): string | null {
+  return ARCADE_TOAST_KEYS[reason as AutoFillRefusalReason] ?? null;
+}
+
 /**
  * While a practice-bots request is pending, hands the server's refusal to the lobby as a message key,
  * and says when bots from an earlier practice run already fill the room (no new seat will appear).

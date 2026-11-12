@@ -4895,7 +4895,8 @@ const en = {
       "room_gone": "This room has closed. Open the game again from your class.",
       "not_host": "Only the screen hosting the room can add practice players.",
       "in_progress": "A round is already running. Practice after it ends.",
-      "room_full": "No free seats left for practice players."
+      "room_full": "No free seats left for practice players.",
+      "students_present": "Students are already here. Press Start to begin."
     }
   },
   "tvResults": {

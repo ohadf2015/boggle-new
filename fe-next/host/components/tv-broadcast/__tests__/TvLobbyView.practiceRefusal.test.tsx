@@ -58,4 +58,20 @@ describe('TvLobbyView — practice bots refused', () => {
     expect(begin).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('pending')).toHaveTextContent('false');
   });
+
+  it('Given real students on the roster, When an already-seated answer arrives anyway, Then nothing starts and the lobby says students are here', () => {
+    const begin = vi.fn();
+    render(
+      <TvLobbyView
+        gameCode="AB12CD" roomLanguage="en" username="Teacher" t={(k: string) => k} timerValue={120} difficulty="medium"
+        onStartGame={vi.fn()} onExitRoom={vi.fn()} tournamentCreating={false} isClassroomMode classroomGameMode="classic"
+        playersReady={[{ username: 'Teacher', isHost: true }, { username: 'Bot Ada', isBot: true }, { username: 'Ana' }]}
+        onStartSoloDemoWithBots={() => begin}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('practice'));
+    act(() => handlers.get('autoFillComplete')?.({ botsAdded: 0, alreadySeated: true }));
+    expect(begin).not.toHaveBeenCalled();
+    expect(screen.getByTestId('failed')).toHaveTextContent('tvLobby.practiceRefused.students_present');
+  });
 });

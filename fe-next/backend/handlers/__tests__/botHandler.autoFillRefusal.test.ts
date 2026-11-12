@@ -4,6 +4,7 @@ import { getGame, getGameBySocketId } from '../../modules/gameStateManager';
 import * as botManager from '../../modules/botManager';
 import { isInProgress } from '../../utils/gameStateMachine';
 import { checkRateLimit } from '../../utils/rateLimiter';
+import { emitError } from '../../utils/errorHandler';
 
 vi.mock('../../utils/logger', () => ({ default: { info: vi.fn(), debug: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 vi.mock('../../modules/gameStateManager');
@@ -28,7 +29,15 @@ function fill() {
   return socket.emit as Mock;
 }
 
-const refusal = (emit: Mock) => emit.mock.calls.find(([e]) => e === 'autoFillRefused')?.[1];
+const refusal = (emit: Mock) => {
+  const calls = emit.mock.calls.filter(([e]) => e === 'autoFillRefused');
+  expect(calls.length).toBeLessThanOrEqual(1);
+  if (calls.length) {
+    expect(emitError, 'a refused fill must send one signal, not a generic error too').not.toHaveBeenCalled();
+    expect(emit.mock.calls.some(([e]) => e === 'rateLimited' || e === 'autoFillComplete')).toBe(false);
+  }
+  return calls[0]?.[1];
+};
 const room = (over: Record<string, unknown> = {}) => ({ gameCode: 'G1', hostSocketId: 'socket-host', gameState: 'waiting', language: 'en', isClassroom: true, users: { Host: { isHost: true } }, ...over });
 
 describe('botHandler — a practice-bots request that cannot be served is answered', () => {
@@ -67,7 +76,7 @@ describe('botHandler — a practice-bots request that cannot be served is answer
   });
 
   it('Given no free seat for a bot, When the host asks for bots, Then it hears room_full', () => {
-    (getGame as Mock).mockReturnValue(room({ users: { Host: { isHost: true }, A: {}, B: {}, C: {} } }));
+    (getGame as Mock).mockReturnValue(room({ isClassroom: false, users: { Host: { isHost: true }, A: {}, B: {}, C: {} } }));
     expect(refusal(fill())).toEqual({ reason: 'room_full' });
   });
 
@@ -76,6 +85,25 @@ describe('botHandler — a practice-bots request that cannot be served is answer
     const emit = fill();
     expect(refusal(emit)).toBeUndefined();
     expect(emit).toHaveBeenCalledWith('autoFillComplete', { botsAdded: 0, alreadySeated: true });
+  });
+
+  it('Given real students already filling the classroom, When the teacher peeks with bots, Then it is refused as students_present and nothing starts', () => {
+    (getGame as Mock).mockReturnValue(room({ users: { Host: { isHost: true }, Ana: {}, Ben: {}, Cy: {} } }));
+    const emit = fill();
+    expect(refusal(emit)).toEqual({ reason: 'students_present' });
+    expect(botManager.addBot).not.toHaveBeenCalled();
+  });
+
+  it('Given leftover practice bots beside a real student, When the teacher peeks with bots, Then it is refused as students_present', () => {
+    (getGame as Mock).mockReturnValue(room({ users: { Host: { isHost: true }, B1: { isBot: true }, B2: { isBot: true }, Ana: {} } }));
+    expect(refusal(fill())).toEqual({ reason: 'students_present' });
+  });
+
+  it('Given a public room whose humans already meet the target, When it auto-fills, Then it just reports nothing added', () => {
+    (getGame as Mock).mockReturnValue(room({ isClassroom: false, users: { Host: { isHost: true }, Ana: {}, Ben: {} } }));
+    const emit = fill();
+    expect(refusal(emit)).toBeUndefined();
+    expect(emit).toHaveBeenCalledWith('autoFillComplete', { botsAdded: 0 });
   });
 
   it('Given an empty lobby, When the host asks for bots, Then bots are seated and nothing is refused', () => {

@@ -22,11 +22,11 @@ import type { GameModeOption } from '@/components/GameModeSelector';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettingsSummary';
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
-import { modeAllowsRehearsalBots, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
+import { modeAllowsRehearsalBots, realStudentCount, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
 import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
 import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
 import { PracticeSeatTimeoutNotice } from '@/components/education/live/PracticeSeatTimeoutNotice';
-import { PRACTICE_BOTS_FALLBACK_KEY, usePracticeBotsRefusal } from '@/components/education/lobby/practiceBotsRefusal';
+import { PRACTICE_BOTS_FALLBACK_KEY, practiceBotsRefusalKey, usePracticeBotsRefusal } from '@/components/education/lobby/practiceBotsRefusal';
 
 /** How long to wait for auto-filled stand-ins to appear on the roster before giving up. */
 const SOLO_DEMO_FILL_TIMEOUT_MS = 8000;
@@ -208,12 +208,18 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     }, SOLO_DEMO_FILL_TIMEOUT_MS);
     return () => clearTimeout(timeout);
   }, [soloDemoInProgress]);
-  usePracticeBotsRefusal(socketCtx?.socket ?? null, soloDemoInProgress, (key) => {
+  const failSoloDemo = (key: string) => {
     setSoloDemoInProgress(false);
     setSoloDemoCallback(null);
     setSoloDemoFailedKey(key);
     setSoloDemoFailed(true);
-  }, () => {
+  };
+  usePracticeBotsRefusal(socketCtx?.socket ?? null, soloDemoInProgress, failSoloDemo, () => {
+    // Seated bots only stand in for a practice round while no real student is here; otherwise this would start the lesson.
+    if (realStudentCount(projectorStudents.filter((s) => !s.reconnecting)) > 0) {
+      failSoloDemo(practiceBotsRefusalKey('students_present'));
+      return;
+    }
     soloDemoBaseline.current = -1;
     setSoloDemoReadyTick((n) => n + 1);
   });
@@ -231,6 +237,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
   const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
   const practiceRun = useRehearseAutoStart({
+    gameCode,
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
     practiceSeated,
