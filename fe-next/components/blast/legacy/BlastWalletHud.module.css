@@ -40,20 +40,28 @@
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
+/*
+ * A reel is as wide as its widest digit in the font that actually renders (the strip
+ * sits in flow), and clips only top and bottom. A fixed 1ch slot cut the sides off
+ * wide, fallback-font or faux-bold digits.
+ */
 .reel {
   position: relative;
   display: inline-block;
-  width: 1ch;
   height: var(--cell);
   overflow: hidden;
 }
 
+@supports (overflow: clip) {
+  .reel {
+    overflow-x: visible;
+    overflow-y: clip;
+  }
+}
+
 .reel::before {
   content: attr(data-strip);
-  position: absolute;
-  inset-inline-start: 0;
-  top: 0;
-  width: 100%;
+  display: block;
   text-align: center;
   white-space: pre;
   line-height: var(--cell);
