@@ -50,6 +50,9 @@ export interface CrosswordViewProps {
   onFormatChange?: (format: CrosswordFormat) => void;
 }
 
+// Phones: over the masthead's difficulty label, clear of the size toggle and the streak badge; desktop: the free gutter beside the clue rail.
+const CROSSWORD_MASCOT_SLOT = 'top-[max(0.25rem,env(safe-area-inset-top))] start-1 lg:top-40 lg:start-auto lg:end-3';
+
 export function CrosswordView({
   puzzle,
   edition,
@@ -336,7 +339,7 @@ export function CrosswordView({
       )}
 
       <CrosswordComboChip level={comboLevel} t={t} />
-      <GameMascotReactions mode="crossword" comboLevel={comboLevel} />
+      <GameMascotReactions mode="crossword" comboLevel={comboLevel} slotClassName={CROSSWORD_MASCOT_SLOT} />
 
       <CrosswordFx burstKey={burst} />
     </div>

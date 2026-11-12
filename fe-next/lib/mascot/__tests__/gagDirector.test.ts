@@ -94,7 +94,7 @@ describe('pickGag — rationing', () => {
 
   it('the personal-best overreaction plays at most once a day', () => {
     const first = pick({ kind: 'personal-best' })!;
-    expect(first.history.dailyShownOn['record-overreaction']).toBe(DAY);
+    expect(first.history.dailyShownOn['personal-best']).toBe(DAY);
     expect(pick({ kind: 'personal-best' }, { h: first.history })).toBeNull();
     expect(pick({ kind: 'personal-best' }, { h: first.history, day: '2026-11-13' })).not.toBeNull();
   });

@@ -41,6 +41,31 @@ const isWord = (e: { kind: string }) => e.kind === 'word-submitted';
 /** Gag content is data: swap or extend this list without touching the director. */
 export const GAG_CATALOG: readonly GagDef[] = [
   {
+    id: 'measuring-tape',
+    bible: 2,
+    chance: 1,
+    running: true,
+    perSession: true,
+    after: 'finger-count',
+    matches: (e) => isWord(e) && 'wordLength' in e && e.wordLength >= 7,
+    variants: [
+      { id: 'measures-the-word', beats: [
+        b('windup', P.think, 520, prop('tape', 'enter')),
+        b('action', P.power, 160, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
+        b('freeze', P.shock, 620, { ...stretch, ...prop('tape', 'hold') }),
+        b('reaction', P.smug, 520, { scaleX: 1.1, scaleY: 1.1, ...prop('tape', 'snap') }),
+        b('reaction', P.smug, 300, leave),
+      ] },
+      { id: 'tapes-two-together', beats: [
+        b('windup', P.think, 460, prop('tape', 'enter')),
+        b('action', P.power, 150, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
+        b('freeze', P.shock, 560, { ...squash, ...prop('tape', 'hold') }),
+        b('reaction', P.think, 560, { rotate: -6, ...prop('tape-double', 'enter') }),
+        b('reaction', P.smug, 820, { scaleX: 1.14, scaleY: 1.14, ...prop('tape-double', 'hold') }),
+      ] },
+    ],
+  },
+  {
     id: 'finger-count',
     bible: 1,
     chance: 0.2,
@@ -178,6 +203,8 @@ export const GAG_CATALOG: readonly GagDef[] = [
     bible: 9,
     chance: 1,
     daily: true,
+    dailyGroup: 'personal-best',
+    interrupts: true,
     ignoresGap: true,
     matches: (e) => e.kind === 'personal-best',
     variants: [
@@ -195,6 +222,32 @@ export const GAG_CATALOG: readonly GagDef[] = [
         b('freeze', P.smug, 600, { ...stretch, y: -14, ...prop('trophy', 'hold') }),
         b('reaction', P.smug, 520, { scaleX: 1.15, scaleY: 1.15, ...prop('trophy', 'hold') }),
         b('reaction', P.smug, 320, leave),
+      ] },
+    ],
+  },
+  {
+    id: 'crumpled-record',
+    bible: 10,
+    chance: 1,
+    daily: true,
+    dailyGroup: 'personal-best',
+    interrupts: true,
+    ignoresGap: true,
+    matches: (e) => e.kind === 'personal-best',
+    variants: [
+      { id: 'crumples-it-slowly', clip: 'slow-burn-stare', beats: [
+        b('windup', P.smug, 620, prop('score-sheet', 'enter')),
+        b('action', P.shock, 150, { ...stretch, ...prop('score-sheet', 'hold') }),
+        b('freeze', P.shock, 620, { ...stretch, ...prop('score-sheet', 'hold') }),
+        b('reaction', P.sad, 1100, { ...squash, ...prop('score-sheet', 'crumple'), sound: 'gagCrumple' }),
+        b('reaction', P.sad, 300, leave),
+      ] },
+      { id: 'crumples-and-tosses-it', clip: 'slow-burn-stare', beats: [
+        b('windup', P.smug, 600, prop('score-sheet', 'enter')),
+        b('action', P.shock, 150, { ...stretch, ...prop('score-sheet', 'hold') }),
+        b('freeze', P.think, 640, prop('score-sheet', 'hold')),
+        b('reaction', P.oops, 1000, { ...prop('score-sheet', 'crumple'), sound: 'gagCrumple', soundRate: 0.9 }),
+        b('reaction', P.smug, 420, { rotate: 8, ...prop('score-sheet', 'fall') }),
       ] },
     ],
   },

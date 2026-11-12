@@ -21,6 +21,7 @@ export interface SinglePlayerShellProps {
   grid: LetterGrid;
   language: Language;
   score: number;
+  personalBest?: number | null;
   remainingTime: number | null;
   /** Round length in seconds (the start card and clock read it). */
   totalSeconds: number;

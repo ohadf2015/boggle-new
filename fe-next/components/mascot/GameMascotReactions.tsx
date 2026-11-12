@@ -9,6 +9,7 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { comboTier, escalationMotion } from '@/lib/blast/mascotState';
 import { createVoiceHistory, pickVoice, SIGNATURE_CRY, type MascotVoice } from '@/lib/mascot/voice';
 import { gagSoundVolume } from '@/lib/mascot/gagSounds';
+import { createPersonalBestState, nextPersonalBestState } from '@/lib/mascot/personalBest';
 import type { GagBeat, GagDef, GagVariant } from '@/lib/mascot/gagTypes';
 import type { Language } from '@/shared/types/game';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
@@ -31,10 +32,16 @@ interface GameMascotReactionsProps {
   language?: Language;
   remainingTime?: number | null;
   seed?: number;
+  /** Live round score; with personalBest, fires the personal-best gag the moment it is passed. */
+  score?: number;
+  personalBest?: number | null;
+  /** Replaces the default position classes, for hosts whose corner holds their own controls. */
+  slotClassName?: string;
 }
 
 const COMBO_BREAK_MIN = 3;
 const FINAL_SECONDS = 10;
+const DEFAULT_SLOT = 'top-[calc(env(safe-area-inset-top,0px)+2.75rem)] end-[4.25rem] sm:top-3 sm:end-3';
 
 export function GameMascotReactions({
   mode,
@@ -43,6 +50,9 @@ export function GameMascotReactions({
   language,
   remainingTime = null,
   seed,
+  score,
+  personalBest = null,
+  slotClassName = DEFAULT_SLOT,
 }: GameMascotReactionsProps) {
   const mascot = useBlastMascot();
   const pref = useMascotEnabled();
@@ -74,6 +84,14 @@ export function GameMascotReactions({
     finalCountdownSent.current = true;
     emitMascotEvent({ kind: 'timer-final-10s', secondsLeft: remainingTime });
   }, [remainingTime]);
+
+  const personalBestState = useRef(createPersonalBestState());
+  useEffect(() => {
+    if (!full || score === undefined) return;
+    const { state, fire } = nextPersonalBestState(personalBestState.current, score, personalBest);
+    personalBestState.current = state;
+    if (fire) emitMascotEvent({ kind: 'personal-best' });
+  }, [full, score, personalBest]);
 
   const voiceHistory = useRef(createVoiceHistory());
   const onGag = useCallback(
@@ -114,11 +132,12 @@ export function GameMascotReactions({
         {show && (
           <AdaptiveMotion.div
             key="game-mascot"
+            data-testid="game-mascot-slot"
             initial={{ opacity: 0, scale: 0.6 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.6 }}
             transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-            className="absolute top-[calc(env(safe-area-inset-top,0px)+2.75rem)] end-[4.25rem] sm:top-3 sm:end-3 z-50 pointer-events-none [&_*]:pointer-events-none"
+            className={`absolute ${slotClassName} z-50 pointer-events-none [&_*]:pointer-events-none`}
           >
             <AdaptiveMotion.div
               data-testid="mascot-escalation"

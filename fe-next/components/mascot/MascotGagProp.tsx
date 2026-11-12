@@ -13,7 +13,23 @@ const MOVES: Record<PropMove, { initial: Record<string, number>; animate: Record
   fall: { initial: { y: 0, rotate: 0 }, animate: { y: 70, rotate: 40, opacity: 0 }, duration: 0.3 },
   drop: { initial: { y: -50 }, animate: { y: 0 }, duration: 0.14 },
   exit: { initial: { opacity: 1, x: 0 }, animate: { opacity: 0, x: 18 }, duration: 0.3 },
+  'zip-out': { initial: { scaleX: 0.15 }, animate: { scaleX: 1 }, duration: 0.14 },
+  snap: { initial: { scaleX: 1 }, animate: { scaleX: 0.15 }, duration: 0.09 },
+  crumple: { initial: { scale: 1, rotate: 0 }, animate: { scale: 0.35, rotate: 220 }, duration: 1 },
 };
+
+const TAPE_STRIP = 'h-2 w-10 border-2 border-neo-navy bg-neo-yellow bg-[repeating-linear-gradient(90deg,var(--color-neo-navy)_0_1px,transparent_1px_5px)]';
+
+function Tape({ double }: { double?: boolean }) {
+  return (
+    <div className="flex flex-row-reverse items-center">
+      <div className="size-4 shrink-0 rounded-full border-2 border-neo-navy bg-neo-lime" />
+      <div className={TAPE_STRIP} />
+      {double && <div className="z-10 -mx-1 h-3 w-2 rotate-6 bg-neo-pink/80" />}
+      {double && <div className={TAPE_STRIP} />}
+    </div>
+  );
+}
 
 function Shape({ kind }: { kind: PropKind }) {
   switch (kind) {
@@ -63,6 +79,18 @@ function Shape({ kind }: { kind: PropKind }) {
           <div className="size-2.5 rounded-full bg-neo-cream/40" />
         </div>
       );
+    case 'tape':
+      return <Tape />;
+    case 'tape-double':
+      return <Tape double />;
+    case 'score-sheet':
+      return (
+        <div className="flex h-8 w-7 rotate-3 flex-col items-center gap-1 rounded-sm border-2 border-neo-navy bg-neo-cream px-0.5 pt-0.5 shadow-hard-sm">
+          <div className="size-2 rotate-45 bg-neo-yellow" />
+          <div className="h-1 w-full bg-neo-pink" />
+          <div className="h-0.5 w-2/3 bg-neo-navy" />
+        </div>
+      );
     case 'cheat-sheet':
       return (
         <div className="flex h-7 w-6 flex-col justify-center gap-1 rounded-sm border-2 border-neo-navy bg-neo-cream px-0.5">
@@ -74,11 +102,14 @@ function Shape({ kind }: { kind: PropKind }) {
   }
 }
 
-const SIDE: ReadonlySet<PropKind> = new Set(['photo', 'cheat-sheet', 'tile']);
+const SIDE: ReadonlySet<PropKind> = new Set(['photo', 'cheat-sheet', 'tile', 'score-sheet']);
+const REACH: ReadonlySet<PropKind> = new Set(['tape', 'tape-double']);
 
 export function MascotGagProp({ kind, move }: { kind: PropKind; move: PropMove }) {
   const m = MOVES[move];
-  const place = SIDE.has(kind) ? 'top-8 -start-5' : '-top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2';
+  const place = REACH.has(kind)
+    ? 'top-10 end-1/2 ltr:origin-right rtl:origin-left'
+    : SIDE.has(kind) ? 'top-8 -start-5' : '-top-5 start-1/2 -translate-x-1/2 rtl:translate-x-1/2';
   return (
     <AdaptiveMotion.div
       data-testid="mascot-gag-prop"
