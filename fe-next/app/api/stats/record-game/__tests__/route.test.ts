@@ -57,6 +57,8 @@ vi.mock('@/utils/supabase/server', () => ({
 const recordPersonalBest = vi.hoisted(() => vi.fn(async () => []));
 vi.mock('@/backend/modules/achievements/grantAchievements', () => ({ recordPersonalBest }));
 vi.mock('@/lib/email', () => ({ getSupabaseAdmin: () => ({ rpc: vi.fn() }) }));
+const updateQuestProgress = vi.hoisted(() => vi.fn(async () => null));
+vi.mock('@/backend/modules/weeklyQuestManager', () => ({ updateQuestProgress }));
 
 import { NextRequest } from 'next/server';
 import { POST } from '../route';
@@ -145,6 +147,32 @@ describe('POST /api/stats/record-game', () => {
     expect(result.data.newTotalXp).toBe(mockProfile.total_xp);
     expect(result.data.newLevel).toBe(mockProfile.current_level);
     expect(result.data.leveledUp).toBe(false);
+  });
+
+  it('given the daily cap cut the grant, when recorded, then the breakdown adds up to the XP granted', async () => {
+    mockRpc.mockResolvedValue({ data: [{ new_total_xp: 520, new_level: 3, xp_granted: 20 }], error: null });
+    const { data } = await POST(makeRequest(validBody));
+    expect(data.xpEarned).toBe(20);
+    expect(Object.values(data.xpBreakdown).reduce((a: number, b: number) => a + b, 0)).toBe(20);
+  });
+
+  it('given a stale profile level, when the grant stays inside the level, then no level-up is reported', async () => {
+    mockSingle.mockResolvedValue({ data: { ...mockProfile, current_level: 1 }, error: null });
+    mockRpc.mockResolvedValue({ data: [{ new_total_xp: 520, new_level: 3, xp_granted: 20 }], error: null });
+    const { data } = await POST(makeRequest(validBody));
+    expect(data.leveledUp).toBe(false);
+    expect(data.oldLevel).toBe(3);
+  });
+
+  it('given the weekly quest reward crosses a level after the game XP, when recorded, then the response merges both grants', async () => {
+    mockRpc.mockResolvedValue({ data: [{ new_total_xp: 520, new_level: 3, xp_granted: 20 }], error: null });
+    updateQuestProgress.mockResolvedValueOnce({
+      completed: true, questType: 'play_games', xpReward: 500, description: 'Play 3 games',
+      xpGrant: { xpEarned: 500, newTotalXp: 1020, oldLevel: 3, newLevel: 5, leveledUp: true },
+    });
+    const { data } = await POST(makeRequest(validBody));
+    expect(data).toMatchObject({ xpEarned: 20, oldLevel: 3, newLevel: 5, newTotalXp: 1020, leveledUp: true });
+    expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ player_title: expect.any(String) }));
   });
 
   it('calls increment_player_xp RPC with correct params', async () => {

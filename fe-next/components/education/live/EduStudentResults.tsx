@@ -39,6 +39,7 @@ import { useRival } from './useRival';
 import { EduStudentShareButton } from './EduStudentShareButton';
 import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
+import { useClaimedLevelUp } from './useClaimedLevelUp';
 
 const LevelUpCelebration = dynamic(() => import('@/components/education/LevelUpCelebration'), { ssr: false });
 
@@ -102,8 +103,9 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const xpGained = c.socketEvents?.xpGainedData ?? null;
   const beat = useStudentReveal(reduceMotion);
   const reveal = useRoundReward(props.gameCode || null, rewardRoundId(props.gameSessionId, props.gameCode));
+  const [claimedLevelUp, releaseLevelUp] = useClaimedLevelUp();
   // The level-up overlay waits for the chest to settle, so it reads as the last payoff, not an interruption.
-  const levelUp = beat === STUDENT_REVEAL_FINAL && c.socketEvents?.showLevelUpCelebration ? c.socketEvents.levelUpData : null;
+  const levelUp = beat === STUDENT_REVEAL_FINAL ? claimedLevelUp : null;
   const verdict = placing ? studentVerdict({ ...placing, rivalDiff: rivalOutcome?.diff ?? null, gapKind: gap?.kind ?? null }) : 'lost';
   const classFound = summary?.classFoundCount;
   const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
@@ -232,7 +234,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
         </footer>
       )}
 
-      <LevelUpCelebration levelUpData={levelUp} onClose={() => c.socketEvents?.setShowLevelUpCelebration(false)} />
+      <LevelUpCelebration levelUpData={levelUp} onClose={() => { releaseLevelUp(); c.socketEvents?.setShowLevelUpCelebration(false); }} />
 
       <ConfirmationDialog
         open={c.showExitConfirm}

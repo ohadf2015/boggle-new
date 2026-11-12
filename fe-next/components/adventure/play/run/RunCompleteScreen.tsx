@@ -95,7 +95,7 @@ export default function RunCompleteScreen({ world, result, run, runBest, map = n
           {/* Two ledgers, kept apart on purpose: the RUN score below is derived
               on this screen and never leaves it, while the strip above is the
               account's own xp / coins / season points from the server. */}
-          <EcosystemRewards result={result} delay={0.9} celebrate className="mb-2.5" />
+          <EcosystemRewards result={result} delay={0.9} className="mb-2.5" />
           {/* How deep the act went, pip by pip — the same row the RUN OVER screen
               shows, so both endings answer "how far did I get?" in one shape
               (Class 3: two screens for one question must not diverge). It rides

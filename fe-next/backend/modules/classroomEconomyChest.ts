@@ -13,6 +13,7 @@ import { getRedisClient } from '../redisClient.js';
 import { getSupabase } from '../modules/supabase/client.js';
 import logger from '../utils/logger.js';
 import { rollChest } from './classroomEconomy';
+import { grantPlayerXp, levelUpOf, type XpGrantResult } from './xpGrant';
 import type { ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
 
 export type ChestReveal = ClassroomChestReveal;
@@ -30,7 +31,7 @@ export interface ChestDeps {
   /** Idempotent: owning a part twice is a no-op. Throws on failure. */
   grantPart: (userId: string, partKey: string) => Promise<void>;
   removeRow: (row: { gameCode: string; roundId: string; userId: string }) => Promise<void>;
-  grantXp: (userId: string, amount: number) => Promise<void>;
+  grantXp: (userId: string, amount: number) => Promise<XpGrantResult | null>;
   remember: (key: string, reveal: ChestReveal) => Promise<void>;
   recall: (key: string) => Promise<ChestReveal | null>;
 }
@@ -77,8 +78,9 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
     await deps.release(key);
     return null;
   }
+  let grant: XpGrantResult | null = null;
   try {
-    await deps.grantXp(input.userId, chest.xp);
+    grant = await deps.grantXp(input.userId, chest.xp);
   } catch (err) {
     logger.error('CLASSROOM_ECONOMY', `Chest XP failed for ${input.userId}: ${(err as Error).message}`);
   }
@@ -98,7 +100,8 @@ export async function grantRoundChest(input: RoundChestInput, deps: ChestDeps = 
   } catch (err) {
     logger.error('CLASSROOM_ECONOMY', `Chest reveal not cached for ${input.userId}: ${(err as Error).message}`);
   }
-  return reveal;
+  const levelUp = levelUpOf(grant);
+  return levelUp ? { ...reveal, levelUp } : reveal;
 }
 
 const REVEAL_TTL_SEC = 60 * 60 * 4;
@@ -139,9 +142,8 @@ function defaultChestDeps(): ChestDeps {
     },
     grantXp: async (userId, amount) => {
       const supabase = getSupabase();
-      if (!supabase) return;
-      const { error } = await supabase.rpc('increment_player_xp', { p_player_id: userId, p_xp_amount: amount });
-      if (error) throw new Error(error.message);
+      if (!supabase) return null;
+      return grantPlayerXp(supabase, userId, amount);
     },
     remember: async (key, reveal) => {
       const redis = getRedisClient();

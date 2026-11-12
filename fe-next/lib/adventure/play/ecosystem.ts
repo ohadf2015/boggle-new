@@ -17,7 +17,8 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
-import { calculateGameXp, checkLevelUp, getLevelFromXp, getTitleForLevel } from '@/backend/modules/xpManager';
+import { calculateGameXp, checkLevelUp, getTitleForLevel } from '@/backend/modules/xpManager';
+import { levelChangeFromRow } from '@/backend/modules/xpGrant';
 import { checkLifetimeAchievements, type UserStats } from '@/backend/modules/achievementManager';
 import { leaderboardPointsForGame } from '@/backend/modules/leaderboardScoring';
 import { notifyLevelUp } from '@/backend/modules/pushNotificationTriggers';
@@ -62,7 +63,7 @@ export interface EcosystemInput {
 
 export interface EcosystemResult {
   xpGained: number;
-  levelUp?: { newLevel: number; levelsGained: number; newTitles: string[] };
+  levelUp?: { oldLevel: number; newLevel: number; levelsGained: number; newTitles: string[] };
   coinsGained: number;
   leaderboardPoints: number;
   streak?: { current: number; longest: number };
@@ -177,12 +178,13 @@ export async function creditEcosystem(input: EcosystemInput): Promise<EcosystemR
     const { data, error } = await db.rpc('increment_player_xp', { p_player_id: userId, p_xp_amount: xp.totalXp });
     if (error) throw new Error(`increment_player_xp: ${error.message}`);
     const row = Array.isArray(data) ? data[0] : data;
-    out.xpGained = Number(row?.xp_granted ?? 0) || 0;
-    const oldLevel = num('current_level') || getLevelFromXp(num('total_xp'));
-    const newLevel = Number(row?.new_level ?? oldLevel) || oldLevel;
+    if (!row) return;
+    const grant = levelChangeFromRow(row);
+    out.xpGained = grant.xpEarned;
+    if (!grant.leveledUp) return;
+    const { oldLevel, newLevel } = grant;
     const info = checkLevelUp(oldLevel, newLevel);
-    if (!info.leveledUp) return;
-    out.levelUp = { newLevel, levelsGained: info.levelsGained, newTitles: info.newTitles };
+    out.levelUp = { oldLevel, newLevel, levelsGained: info.levelsGained, newTitles: info.newTitles };
     const title = getTitleForLevel(newLevel);
     if (title && title !== profile?.player_title) {
       await db.from('profiles').update({ player_title: title }).eq('id', userId);

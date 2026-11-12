@@ -6,6 +6,7 @@
 import { getSupabase, GameStats, XpInfo, UpdatedUserStats } from './client';
 import { calculateGameXp, hasRealOpponent, getLevelFromXp, checkLevelUp, getTitleForLevel } from '../xpManager';
 import { addXpToLeague } from '../leagueManager';
+import { scaleBreakdown } from '../xpGrant';
 import { leaderboardPointsForGame } from '../leaderboardScoring';
 import logger from '../../utils/logger';
 
@@ -417,7 +418,7 @@ export async function updatePlayerStats(
       error: null,
       xpInfo: {
         xpEarned: actualXpGranted,
-        xpBreakdown: xpResult.breakdown,
+        xpBreakdown: scaleBreakdown(xpResult.breakdown, actualXpGranted),
         newTotalXp,
         oldLevel,
         newLevel,

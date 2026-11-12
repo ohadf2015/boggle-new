@@ -6,6 +6,7 @@ import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { getOfflineStore } from '@/lib/offline';
 import { enqueueScore } from '@/lib/offline/scoreQueue';
 import { emitBrainDrillGameEnd } from '@/lib/brain/drillAnalytics';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 interface DrillResult {
   drillType: DrillType;
@@ -116,6 +117,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
       }
 
       const data = await response.json();
+      if (data.levelUp) publishLevelUp(data.levelUp, 'drills');
 
       // Return the brainScore data from the API response
       return {

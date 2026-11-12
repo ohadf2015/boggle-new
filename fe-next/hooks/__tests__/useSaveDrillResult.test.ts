@@ -37,6 +37,11 @@ vi.mock('@/lib/brain/drillAnalytics', () => ({
   emitBrainDrillGameEnd: (...args: unknown[]) => mockEmitBrainDrillGameEnd(...args),
 }));
 
+const mockPublishLevelUp = vi.fn();
+vi.mock('@/lib/avatar/revealTrigger', () => ({
+  publishLevelUp: (...args: unknown[]) => mockPublishLevelUp(...args),
+}));
+
 import { useSaveDrillResult } from '../useSaveDrillResult';
 
 describe('useSaveDrillResult', () => {
@@ -92,6 +97,30 @@ describe('useSaveDrillResult', () => {
       expect(saveResult!.brainScore?.overallScore).toBe(55);
       expect(saveResult!.brainScore?.scoreDelta).toBe(5);
       expect(saveResult!.brainScore?.tier).toBe('intermediate');
+    });
+
+    it('given the drill XP crossed a player level, when saved, then the level-up is announced as drills', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...mockBrainScoreResponse, levelUp: { oldLevel: 3, newLevel: 4 }, newLevel: 2, previousLevel: 1 }),
+      });
+      const { result } = renderHook(() => useSaveDrillResult());
+      await act(async () => {
+        await result.current.saveDrillResult(mockDrillResult);
+      });
+      expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 3, newLevel: 4 }, 'drills');
+    });
+
+    it('given a replayed submission, when saved, then nothing is announced', async () => {
+      (global.fetch as any).mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ ...mockBrainScoreResponse, idempotent: true, levelUp: null }),
+      });
+      const { result } = renderHook(() => useSaveDrillResult());
+      await act(async () => {
+        await result.current.saveDrillResult(mockDrillResult);
+      });
+      expect(mockPublishLevelUp).not.toHaveBeenCalled();
     });
 
     it('records completion analytics so the drill appears in the admin game log', async () => {

@@ -27,6 +27,7 @@ vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }))
 vi.mock('@/hooks/usePracticeSession', () => ({
   usePracticeWords: (words: unknown[]) => ({ words: words ?? [], level: 'core', isLevelLoading: false }),
 }));
+vi.mock('@/components/education/live/useClaimedLevelUp', () => ({ useClaimedLevelUp: () => [null, dismissLevelUp] }));
 vi.mock('@/components/education/PracticeSessionProvider', () => ({
   usePracticeSession: () => ({
     totalXp: 120,
@@ -34,8 +35,6 @@ vi.mock('@/components/education/PracticeSessionProvider', () => ({
     sessionXpEarned: 20,
     sessionMasteryMessage: null,
     completePracticeSession: completeSpy,
-    levelUpData: null,
-    dismissLevelUp,
   }),
 }));
 vi.mock('@/components/education/XpProgressBar', () => ({ __esModule: true, default: () => <div>xp</div> }));

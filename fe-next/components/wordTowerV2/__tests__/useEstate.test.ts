@@ -14,6 +14,7 @@ vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 import { getWithAuth, postWithAuth } from '@/utils/authFetch';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ESTATE_STORAGE_KEY, useEstate } from '../useEstate';
+import { resetResultsXp, useResultsXp } from '@/components/progression/resultsXpStore';
 
 const RUN = { floors: 12, perfects: 4, bestCombo: 3, crates: 2, heightM: 36 };
 const ok = (body: unknown, status = 200) => ({ ok: status < 400, status, json: async () => body }) as Response;
@@ -114,6 +115,18 @@ describe('useEstate — signed in', () => {
     expect(result.current.estate.coins).toBe(800);
     // The header / other modes show the same wallet, so they must hear about the payout.
     expect(refreshCoins).toHaveBeenCalled();
+  });
+
+  it('given a run that earned XP, when reported, then the results slot gets the granted XP', async () => {
+    resetResultsXp();
+    mockPost.mockResolvedValueOnce(ok({ estate: serverEstate, perks: perksFromEstate(serverEstate), coins: 1, chest: null, xpEarned: 55, newTotalXp: 420 }));
+    const { result } = renderHook(() => useEstate());
+    const xp = renderHook(() => useResultsXp('tower:run'));
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    await act(async () => {
+      await result.current.reportRun(RUN);
+    });
+    expect(xp.result.current).toEqual({ gained: 55, total: 420 });
   });
 
   it('given a guest, when a run is banked locally, then the app wallet is not touched', async () => {

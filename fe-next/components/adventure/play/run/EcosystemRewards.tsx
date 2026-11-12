@@ -3,23 +3,11 @@
 /**
  * Everything a cleared node moved OUTSIDE the run, made visible:
  *  - the ledger strip (xp / coins / season points / day streak), counted up
- *  - a rank ribbon + the app's own level-up celebration when the account levels
- *  - a toast per lifetime achievement unlocked
- *
- * Nothing is re-implemented: the celebration is `components/animations/
- * LevelUpCelebration` (the same one the multiplayer results screen opens, see
- * components/results/ResultsModals.tsx) and the toast is
- * `components/achievements/AchievementToast`, both loaded lazily so a node that
- * grants neither pays nothing.
- *
- * Sequencing matters. A node clear already had its own fullscreen stamp before
- * this mounts, and mid-run the Continue button is gated on tapping the chest —
- * so the ACCOUNT level-up shows as a persistent rank ribbon there and only opens
- * the fullscreen celebration where nothing is gated behind it (`celebrate`).
- * Either way it states the rank it reached, never a bare "level up".
+ *  - a rank ribbon when the account levels (the fullscreen celebration is the
+ *    app-wide level-up layer, published when the run ends)
+ *  - a toast per lifetime achievement unlocked, loaded lazily
  */
-import { useEffect, useRef, useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { m, useReducedMotion } from 'framer-motion';
 import { ChevronsUp } from 'lucide-react';
@@ -32,27 +20,15 @@ import { ecosystemGains, hasEcosystemGains } from './ecosystemGains';
 import EcosystemStrip from './EcosystemStrip';
 import { cn } from '@/lib/utils';
 
-const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
-
 interface Props {
   result: RunResult;
   /** Seconds of runway before the strip counts (the screen's own beats land first). */
   delay?: number;
-  /**
-   * Open the app's fullscreen level-up celebration on an account level-up.
-   * OFF mid-run on purpose: the cleared screen's Continue button is disabled
-   * until the chest is tapped, and a 4s fullscreen modal over that chest would
-   * block the only way forward. Mid-run the rank ribbon carries the news; the
-   * fullscreen beat belongs to the run-complete screen, which has no such gate.
-   */
-  celebrate?: boolean;
   className?: string;
 }
 
 /** Stagger between achievement toasts so several unlocks don't stack into a wall. */
 const TOAST_GAP_MS = 900;
-/** The account level-up waits out the strip so it never collides with the node burst. */
-const LEVEL_UP_DELAY_MS = 1800;
 
 /**
  * A lifetime achievement key (VETERAN, CENTURION, …) dressed as the toast's
@@ -70,18 +46,17 @@ function lifetimeDef(key: string): AdventureAchievementDef {
   };
 }
 
-export default function EcosystemRewards({ result, delay = 0, celebrate = false, className }: Props) {
+export default function EcosystemRewards({ result, delay = 0, className }: Props) {
   const { t } = useLanguageSafe();
   const reduce = useReducedMotion();
   const { playXpGainSound } = useSoundEffects();
-  const [showLevelUp, setShowLevelUp] = useState(false);
   const firedRef = useRef(false);
   const gains = ecosystemGains(result);
   const levelUp = result.levelUp;
   const unlocked = result.achievementsUnlocked ?? [];
   const title = levelUp?.newTitles?.[0];
 
-  // One-shot: the sound, the toasts, and the level-up hand-off.
+  // One-shot: the sound and the toasts.
   useEffect(() => {
     if (firedRef.current) return;
     firedRef.current = true;
@@ -107,7 +82,6 @@ export default function EcosystemRewards({ result, delay = 0, celebrate = false,
       }).catch(() => { /* toast art is a bonus beat — never break the result screen */ });
     }
 
-    if (levelUp && celebrate) timers.push(setTimeout(() => { if (!cancelled) setShowLevelUp(true); }, Math.round(delay * 1000) + LEVEL_UP_DELAY_MS));
     return () => {
       cancelled = true;
       timers.forEach(clearTimeout);
@@ -136,15 +110,6 @@ export default function EcosystemRewards({ result, delay = 0, celebrate = false,
             {title && <span className="opacity-80"> · {t(`landing.home.titles.${title}`)}</span>}
           </span>
         </m.div>
-      )}
-
-      {levelUp && showLevelUp && (
-        <LevelUpCelebration
-          level={levelUp.newLevel}
-          show
-          autoDismissAfter={4000}
-          onDismiss={() => setShowLevelUp(false)}
-        />
       )}
     </div>
   );

@@ -61,6 +61,7 @@ vi.mock('@/components/education/StreakBonusIndicator', () => ({
 }));
 
 const completeSpy = vi.fn();
+vi.mock('@/components/education/live/useClaimedLevelUp', () => ({ useClaimedLevelUp: () => [null, mockDismissLevelUp] }));
 vi.mock('@/components/education/PracticeSessionProvider', () => ({
   PracticeSessionProvider: ({ children, studentId }: { children: React.ReactNode; studentId: string }) => (
     <div data-testid="session-provider" data-student-id={studentId}>
@@ -73,8 +74,6 @@ vi.mock('@/components/education/PracticeSessionProvider', () => ({
     sessionXpEarned: 0,
     sessionMasteryMessage: null,
     completePracticeSession: completeSpy,
-    levelUpData: null,
-    dismissLevelUp: mockDismissLevelUp,
   }),
 }));
 

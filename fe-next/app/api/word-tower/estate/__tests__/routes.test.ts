@@ -20,6 +20,11 @@ vi.mock('@/lib/server/claimOnce', () => ({
     return 'claimed';
   }),
 }));
+const grantSoloGameXp = vi.fn();
+vi.mock('@/backend/modules/xpGrant', async (orig) => ({
+  ...(await orig<typeof import('@/backend/modules/xpGrant')>()),
+  grantSoloGameXp: (...a: unknown[]) => grantSoloGameXp(...a),
+}));
 vi.mock('@/backend/modules/pushNotificationTriggers', () => ({ notifyWordTowerWreck: vi.fn(() => Promise.resolve()) }));
 
 import { GET as getEstate } from '../route';
@@ -123,6 +128,22 @@ describe('POST /api/word-tower/estate/run', () => {
     expect(Number(est.get()!.coins)).toBe(0);
     expect(est.get()!.runs).toBe(1);
     expect(est.get()!.raid_charges).toBe(1);
+  });
+
+  it('given a banked run, then solo XP is granted for its height and the level-up comes back', async () => {
+    grantSoloGameXp.mockResolvedValueOnce({ xpEarned: 55, newTotalXp: 420, oldLevel: 2, newLevel: 3, leveledUp: true, xpBreakdown: {} });
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: estatesTable(row()).handler }).client);
+    const b = await body(await postRun(postReq(summary)));
+    expect(grantSoloGameXp).toHaveBeenCalledWith(expect.anything(), ME, { score: 36 });
+    expect(b).toMatchObject({ xpEarned: 55, newTotalXp: 420, levelUp: { oldLevel: 2, newLevel: 3 } });
+  });
+
+  it('given the XP grant throws, then the run is still banked', async () => {
+    grantSoloGameXp.mockRejectedValueOnce(new Error('rpc down'));
+    (getSupabaseAdmin as any).mockReturnValue(fakeDb({ word_tower_estates: estatesTable(row()).handler }).client);
+    const res = await postRun(postReq(summary));
+    expect(status(res)).toBe(200);
+    expect((await body(res)).xpEarned).toBeUndefined();
   });
 
   it('given a forged huge run, when banked, then the fields are clamped', async () => {

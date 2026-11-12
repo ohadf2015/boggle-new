@@ -26,6 +26,7 @@ import { trackGameStart, trackGameEnd, trackGrowthEvent } from '@/utils/growthTr
 import { tickClock } from '@/lib/adventure/play/runClock';
 import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
 import { useCoinActions } from '@/contexts/CoinContext';
+import { holdAdventureLevelUp } from './heldLevelUp';
 import { readRun, writeRun, readCarry, writeCarry } from './runStorage';
 import {
   STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
@@ -370,6 +371,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       }
       // Milestone coins and the banked purse land in the app-wide wallet.
       if ((data.coinsGained ?? 0) > 0 || (data.purseCoins ?? 0) > 0) void refreshCoinsRef.current().catch(() => undefined);
+      holdAdventureLevelUp(data.levelUp, !(data.nextRunToken && data.nextRun));
       setResult(data);
       setPhase('done');
     } catch (err) {

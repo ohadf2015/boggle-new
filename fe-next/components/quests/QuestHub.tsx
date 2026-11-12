@@ -24,12 +24,14 @@ import { useCoinsFromContext } from '@/contexts/CoinContext';
 import PartPreview from '@/components/avatar/PartPreview';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
 import type { AvatarPartReward } from '@/shared/weeklyQuestTemplates';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 interface AllCompleteClaimResponse {
   success: boolean;
   claimed: boolean;
   xpReward: number;
   coinReward: number;
+  levelUp?: { oldLevel: number; newLevel: number } | null;
 }
 
 // --- Stagger animation variants (spring: stiffness 300, damping 24 = snappy bounce) ---
@@ -400,6 +402,7 @@ export function QuestHub() {
           if (json.success && json.claimed) {
             // Reward was genuinely claimed — update coin balance and show toast
             refreshCoins();
+            if (json.levelUp) publishLevelUp(json.levelUp, 'quests');
             import('./QuestCompletionToast').then(({ showQuestCompletionToast }) => {
               showQuestCompletionToast({
                 questName: '',

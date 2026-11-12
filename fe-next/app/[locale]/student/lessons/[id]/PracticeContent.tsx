@@ -36,6 +36,7 @@ import { usePracticeSession } from '@/components/education/PracticeSessionProvid
 import XpProgressBar from '@/components/education/XpProgressBar';
 import StreakBonusIndicator from '@/components/education/StreakBonusIndicator';
 import { cn } from '@/lib/utils';
+import { useClaimedLevelUp } from '@/components/education/live/useClaimedLevelUp';
 import type { Language, VocabularyWord } from '@/lib/supabase/education/types';
 
 // Renders only after a level-up event, so it must not ship in the first load
@@ -177,9 +178,9 @@ export default function PracticeContent({
     sessionXpEarned,
     sessionMasteryMessage,
     completePracticeSession,
-    levelUpData,
-    dismissLevelUp,
   } = usePracticeSession();
+  // Claims the server's player level-up from the shared bus so the app-wide watcher does not show a second one.
+  const [levelUpData, dismissLevelUp] = useClaimedLevelUp();
 
   const openMode = useCallback(async (
     mode: PracticeType,

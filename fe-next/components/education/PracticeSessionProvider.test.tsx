@@ -132,7 +132,6 @@ function TestConsumer() {
       <span data-testid="session-xp">{context.sessionXpEarned}</span>
       <span data-testid="streak">{context.streak.currentStreak}</span>
       <span data-testid="mastery-message">{context.sessionMasteryMessage || 'none'}</span>
-      <span data-testid="level-up">{context.levelUpData ? 'yes' : 'no'}</span>
       <button
         data-testid="complete-btn"
         onClick={() => context.completePracticeSession({
@@ -142,12 +141,6 @@ function TestConsumer() {
         })}
       >
         Complete
-      </button>
-      <button
-        data-testid="dismiss-btn"
-        onClick={() => context.dismissLevelUp()}
-      >
-        Dismiss
       </button>
     </div>
   );
@@ -207,16 +200,6 @@ describe('PracticeSessionProvider', () => {
 
       expect(screen.getByTestId('mastery-message')).toHaveTextContent('none');
     });
-
-    it('initializes with no level up data', () => {
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      expect(screen.getByTestId('level-up')).toHaveTextContent('no');
-    });
   });
 
   describe('completePracticeSession', () => {
@@ -275,30 +258,24 @@ describe('PracticeSessionProvider', () => {
       });
     });
 
-    it('sets level up data when player levels up', async () => {
+    it('given the client XP estimate says level-up, when completed, then the provider raises no celebration of its own', async () => {
       const user = userEvent.setup();
-
-      // Configure mock to return level up
       mockAwardPracticeXp.mockResolvedValueOnce({
-        totalXp: 200,
-        breakdown: {},
-        masteryMessage: 'Level up!',
-        leveledUp: true,
-        newLevel: 4,
-        newTitles: ['Word Master'],
+        totalXp: 200, breakdown: {}, masteryMessage: 'Level up!', leveledUp: true, newLevel: 4, newTitles: [],
       });
-
+      function Spy() {
+        const keys = Object.keys(usePracticeSession()).join(',');
+        return <span data-testid="ctx-keys">{keys}</span>;
+      }
       render(
         <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
           <TestConsumer />
+          <Spy />
         </PracticeSessionProvider>
       );
-
       await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(screen.getByTestId('level-up')).toHaveTextContent('yes');
-      });
+      await waitFor(() => expect(screen.getByTestId('session-xp')).toHaveTextContent('200'));
+      expect(screen.getByTestId('ctx-keys').textContent).not.toMatch(/levelUp/);
     });
 
     it('does NOT call Supabase directly — XP persistence is server-side only (C2 fix)', async () => {
@@ -315,42 +292,6 @@ describe('PracticeSessionProvider', () => {
       // C2 fix: persistToSupabase was removed — client should NOT write XP directly
       // All XP persistence goes through PATCH /api/education/practice server-side
       expect(mockSupabaseUpsert).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('dismissLevelUp', () => {
-    it('clears level up data when dismissed', async () => {
-      const user = userEvent.setup();
-
-      // Configure mock to return level up
-      mockAwardPracticeXp.mockResolvedValueOnce({
-        totalXp: 200,
-        breakdown: {},
-        masteryMessage: 'Level up!',
-        leveledUp: true,
-        newLevel: 4,
-        newTitles: [],
-      });
-
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      // Trigger level up
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(screen.getByTestId('level-up')).toHaveTextContent('yes');
-      });
-
-      // Dismiss level up
-      await user.click(screen.getByTestId('dismiss-btn'));
-
-      await waitFor(() => {
-        expect(screen.getByTestId('level-up')).toHaveTextContent('no');
-      });
     });
   });
 

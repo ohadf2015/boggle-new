@@ -12,6 +12,7 @@ import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/educat
 import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
+import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 
 /**
  * GET /api/education/practice
@@ -409,19 +410,14 @@ export async function PATCH(request: NextRequest) {
     // BUG-02 fix: also bump global profile XP (single server-owned write path).
     // Previously the client called /api/education/record-xp separately, double-counting profile XP.
     const incrementProfileXp = shouldAwardXp
-      ? Promise.resolve(
-          supabase.rpc('increment_player_xp', {
-            p_player_id: existing.student_id,
-            p_xp_amount: serverCalculatedXp,
-          })
-        )
+      ? grantPlayerXp(supabase, existing.student_id, serverCalculatedXp)
       : Promise.resolve(null);
 
     const stampAssignment = satisfiedAssignment ? stampAssignmentCompletion(supabase, { studentId: existing.student_id,
       lessonId: existing.lesson_id, assignmentId: satisfiedAssignment.id, classroomId: satisfiedAssignment.classroomId }).catch((err) => { logger.error('Assignment stamp failed:', err); return false; })
       : Promise.resolve(null);
 
-    const [{ data: session, error }, xpResult, profileXpResult, stamped] = await Promise.all([
+    const [{ data: session, error }, xpResult, profileXp, stamped] = await Promise.all([
       sessionWrite,
       awardEducationXp,
       incrementProfileXp,
@@ -442,10 +438,6 @@ export async function PATCH(request: NextRequest) {
           `Awarded ${serverCalculatedXp} XP (server-calculated, streak=${streakDays}d) to student ${existing.student_id} for lesson ${existing.lesson_id}`
         );
       }
-
-      if (profileXpResult?.error) {
-        logger.error('Failed to increment profile XP:', profileXpResult.error);
-      }
     }
 
     if (completed) {
@@ -461,7 +453,7 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ session, assignmentCompleted: stamped === true });
+    return NextResponse.json({ session, assignmentCompleted: stamped === true, levelUp: levelUpOf(profileXp) });
   } catch (error) {
     logger.error('PATCH practice error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

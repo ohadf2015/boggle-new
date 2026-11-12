@@ -90,4 +90,17 @@ describe('claimCalendarDay', () => {
     expect(db.tables.player_engagement[0].calendar_days_claimed).toEqual([]);
     expect((await claimCalendarDay(db.client, 'p1', new Date(2026, 10, 1, 12))).status).toBe('claimed');
   });
+
+  it('Given an XP day that crosses a level, When claimed, Then the result carries the level-up; a re-claim does not', async () => {
+    const NOV_4 = new Date(2026, 10, 4, 12);
+    const db = fakeDb({ engagement: { player_id: 'p1', calendar_month: 11, calendar_year: 2026, calendar_days_claimed: [], streak_freezes_available: 0 } });
+    db.rpc.mockResolvedValue({ data: [{ xp_granted: 100, new_total_xp: 300, new_level: 2 }], error: null } as never);
+    expect((await claimCalendarDay(db.client, 'p1', NOV_4)).levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
+    expect((await claimCalendarDay(db.client, 'p1', NOV_4)).levelUp).toBeUndefined();
+  });
+
+  it('Given a hints day, When claimed, Then there is no level-up', async () => {
+    const db = fakeDb({ engagement: { player_id: 'p1', calendar_month: 11, calendar_year: 2026, calendar_days_claimed: [], streak_freezes_available: 0 }, profile: { free_hints_available: 0 } });
+    expect((await claimCalendarDay(db.client, 'p1', new Date(2026, 10, 3, 12))).levelUp ?? null).toBeNull();
+  });
 });

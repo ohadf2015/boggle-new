@@ -26,8 +26,7 @@ describe('RunResult routing', () => {
     expect(screen.getByText('adventurePlay.loot.nextWorld')).toBeTruthy();
   });
 
-  // --- The run-complete screen is the ONLY home of the share button and of the
-  // fullscreen level-up (`celebrate`). A live boss kill is gated behind level
+  // --- The run-complete screen is the ONLY home of the share button. A live boss kill is gated behind level
   // rules an automated solver cannot satisfy, so these assert the wiring here.
 
   it('Given a boss win, then the boss-defeat share button is offered', () => {

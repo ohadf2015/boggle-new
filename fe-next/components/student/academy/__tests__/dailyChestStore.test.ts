@@ -7,6 +7,9 @@ import {
   DAILY_CHEST_XP,
 } from '../dailyChestStore';
 
+const { mockPublishLevelUp } = vi.hoisted(() => ({ mockPublishLevelUp: vi.fn() }));
+vi.mock('@/lib/avatar/revealTrigger', async (orig) => ({ ...(await orig<object>()), publishLevelUp: mockPublishLevelUp }));
+
 describe('daily chest — once per local day, per student', () => {
   beforeEach(() => window.localStorage.clear());
   afterEach(() => vi.restoreAllMocks());
@@ -38,6 +41,22 @@ describe('daily chest — once per local day, per student', () => {
 });
 
 describe('claimDailyChestXp', () => {
+  it('given the chest XP crossed a level, when claimed, then the level-up is announced as academyChest', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, xpEarned: DAILY_CHEST_XP, newTotalXp: 300, oldLevel: 1, newLevel: 2, leveledUp: true }),
+    });
+    await claimDailyChestXp(fetchImpl as unknown as typeof fetch);
+    expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 1, newLevel: 2 }, 'academyChest');
+  });
+
+  it('given an already-claimed chest, when claimed, then nothing is announced', async () => {
+    mockPublishLevelUp.mockClear();
+    const fetchImpl = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, xpEarned: 0, alreadyClaimed: true }) });
+    await claimDailyChestXp(fetchImpl as unknown as typeof fetch);
+    expect(mockPublishLevelUp).not.toHaveBeenCalled();
+  });
+
   it('posts an allow-listed activity with a non-empty lesson id and returns the new total', async () => {
     const fetchImpl = vi.fn().mockResolvedValue({
       ok: true,

@@ -346,6 +346,28 @@ describe('updateQuestProgress', () => {
       });
     });
 
+    it('given the completing call crosses a level, then the result carries the XP grant', async () => {
+      const getChain = createChain();
+      getChain.single.mockResolvedValue({
+        data: {
+          id: 'quest-uuid', quest_type: 'play_games', title: 'Play 3 games', description: 'Play 3 games this week',
+          requirements: JSON.stringify({ target: 3, type: 'play_games' }), current_progress: JSON.stringify({ current: 2 }),
+          xp_reward: 500, completed: false, week_start: getWeekStart(),
+        },
+        error: null,
+      });
+      const updateChain = createChain();
+      updateChain.select = vi.fn().mockResolvedValue({ data: [{ id: 'quest-uuid' }], error: null });
+      updateChain.eq = vi.fn().mockReturnValue(updateChain);
+      let callCount = 0;
+      mockFrom.mockImplementation(() => (++callCount === 1 ? getChain : callCount === 2 ? updateChain : createChain()));
+      mockRpc.mockResolvedValueOnce({ data: [{ xp_granted: 500, new_total_xp: 700, new_level: 4 }], error: null });
+
+      const result = await updateQuestProgress(PLAYER_ID, { gamesPlayed: 1 });
+
+      expect(result!.xpGrant).toMatchObject({ xpEarned: 500, newTotalXp: 700, oldLevel: 1, newLevel: 4, leveledUp: true });
+    });
+
     it('skips XP grant when another concurrent call already completed quest', async () => {
       const getChain = createChain();
       getChain.single.mockResolvedValue({

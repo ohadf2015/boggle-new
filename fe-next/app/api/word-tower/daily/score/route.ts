@@ -40,6 +40,7 @@ import { creditDailyQuests } from '@/lib/daily/questSeams';
 import { questResultForWordTower } from '@/shared/dailyQuestPool';
 import { acceptGuestBoardName } from '@/lib/daily/guestBoardName';
 import { dailyTowerWords } from '@/lib/wordTowerV2/towerWords';
+import { claimDailyTowerXp } from '@/lib/wordTower/towerXp';
 
 export const runtime = 'nodejs';
 
@@ -98,6 +99,9 @@ export async function POST(request: NextRequest) {
       ? { column: 'player_id' as const, value: user.id }
       : { column: 'guest_fingerprint' as const, value: guestFingerprint as string };
 
+    const reply = async (payload: Record<string, unknown>) =>
+      NextResponse.json(isFinal && user ? { ...payload, ...(await claimDailyTowerXp(supabase, user.id, puzzleDate, language)) } : payload);
+
     const floors = Math.floor(Number(body.floors) || 0);
     const towerWords = dailyTowerWords(body.towerWords);
     const lookup = () =>
@@ -119,7 +123,7 @@ export async function POST(request: NextRequest) {
         if (isFinal) {
           creditDailyQuests(user?.id, questResultForWordTower({ heightM: best, floors: Number(existing.floors) || 0 }));
         }
-        return NextResponse.json({ ok: true, bestHeightM: best, improved: false });
+        return reply({ ok: true, bestHeightM: best, improved: false });
       }
       const mergedFloors = Math.max(Number(existing.floors) || 0, floors);
       const { error } = await supabase
@@ -139,7 +143,7 @@ export async function POST(request: NextRequest) {
       }
       // Daily quests (authed only): today's banked climb + floors. Fire-and-forget.
       if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM: merged, floors: mergedFloors }));
-      return NextResponse.json({ ok: true, bestHeightM: merged, improved: true });
+      return reply({ ok: true, bestHeightM: merged, improved: true });
     };
 
     const { data: existing } = await lookup();
@@ -169,7 +173,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (isFinal) creditDailyQuests(user?.id, questResultForWordTower({ heightM, floors }));
-    return NextResponse.json({ ok: true, bestHeightM: heightM, improved: true });
+    return reply({ ok: true, bestHeightM: heightM, improved: true });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-daily-score');
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

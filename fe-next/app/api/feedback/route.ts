@@ -7,6 +7,7 @@ import { withTimeout, EMAIL_COLORS } from '@/lib/email';
 import { sendTelegramMessage, sendTelegramPhoto, escapeTelegramMarkdownV2, isTelegramConfigured } from '@/lib/telegram';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 import { getSupabaseAdmin } from '@/lib/admin/server';
+import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 
 /**
  * Feedback / Bug-Report API
@@ -263,9 +264,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Grant reward if qualified (best-effort, never block the response)
+    let levelUp: ReturnType<typeof levelUpOf> = null;
     if (dbStored && shouldReward && fields.userId) {
       try {
-        await supabase?.rpc('increment_player_xp', { p_player_id: fields.userId, p_xp_amount: BUG_REPORT_XP });
+        if (supabase) levelUp = levelUpOf(await grantPlayerXp(supabase, fields.userId, BUG_REPORT_XP));
       } catch (err) {
         logger.error('[Feedback] XP grant failed:', err instanceof Error ? err.message : String(err));
       }
@@ -303,7 +305,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = NextResponse.json({ success: true, rewarded: dbStored && shouldReward });
+    const response = NextResponse.json({ success: true, rewarded: dbStored && shouldReward, levelUp });
     return addRateLimitHeaders(response, rateLimit, FEEDBACK_RATE_LIMIT.maxRequests);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSocketEmit, useSocketEvent } from '@/utils/SocketContext';
 import { CLASSROOM_ECONOMY_EVENTS as E, type ClassroomChestReveal } from '@/shared/constants/classroomEconomy';
+import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 const RETRY_MS = 2000;
 const MAX_ASKS = 4;
@@ -21,7 +22,9 @@ export function useRoundReward(gameCode: string | null, roundId: string | null) 
   const onReward = useCallback(
     (r: ClassroomChestReveal | null) => {
       if (r) {
-        if (r.gameCode === gameCode && r.roundId === roundId) setReveal(r);
+        if (r.gameCode !== gameCode || r.roundId !== roundId) return;
+        setReveal(r);
+        if (r.levelUp) publishLevelUp(r.levelUp, 'classroomChest');
         return;
       }
       if (asks.current < MAX_ASKS) setTimeout(() => setTick((n) => n + 1), RETRY_MS);

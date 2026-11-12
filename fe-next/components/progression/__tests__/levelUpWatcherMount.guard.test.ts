@@ -7,6 +7,9 @@ describe('LevelUpWatcher mount', () => {
     const users = execSync("git grep -l '<LevelUpWatcher' -- '*.tsx' ':!**/__tests__/**'", { encoding: 'utf8' })
       .trim().split('\n').map((f) => f.replace(/^fe-next\//, ''));
     expect(users).toEqual(['app/essential-providers.tsx']);
-    expect(readFileSync('app/essential-providers.tsx', 'utf8')).toMatch(/gameSurface && <LevelUpWatcher \/>/);
+    const providers = readFileSync('app/essential-providers.tsx', 'utf8');
+    expect(providers.match(/<LevelUpWatcher \/>/g)).toHaveLength(1);
+    // Edu pages (practice, chests, classroom results) level players up too.
+    expect(providers).toMatch(/^\s*<LevelUpWatcher \/>\s*$/m);
   });
 });

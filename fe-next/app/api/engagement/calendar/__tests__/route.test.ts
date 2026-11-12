@@ -63,3 +63,16 @@ describe('POST /api/engagement/calendar (day 21, epic box)', () => {
     expect(body.canClaimToday).toBe(true);
   });
 });
+
+describe('POST /api/engagement/calendar (day 4, XP)', () => {
+  afterAll(() => vi.setSystemTime(new Date(2026, 10, 21, 12)));
+
+  it('Given the day\'s XP crosses a level, When claimed, Then the response carries levelUp', async () => {
+    vi.setSystemTime(new Date(2026, 10, 4, 12));
+    state.db = fakeDb({ engagement: { player_id: 'p1', calendar_month: 11, calendar_year: 2026, calendar_days_claimed: [], streak_freezes_available: 0 } });
+    state.db.rpc.mockResolvedValue({ data: [{ xp_granted: 100, new_total_xp: 300, new_level: 2 }], error: null } as never);
+    const res = await POST(post());
+    expect(res.status).toBe(200);
+    expect((await res.json()).levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
+  });
+});

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { postWithAuth } from '@/utils/authFetch';
+import { publishXpResponse } from '@/components/progression/publishXpResponse';
 import { getChosenGuestName, getGuestFingerprint } from '@/utils/guestManager';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { recordV2DailyClimb } from '@/lib/wordTowerV2/daily';
@@ -109,7 +110,14 @@ export function useDailyTower({ daily, language, phase, worldRef, labelsRef, han
       );
       submittedRef.current = growth;
       if (final) finalSentRef.current = growth;
-      if (body) void postWithAuth('/api/word-tower/daily/score', body, keepalive ? { keepalive: true } : {}).catch(() => undefined);
+      if (!body) return;
+      const sent = postWithAuth('/api/word-tower/daily/score', body, keepalive ? { keepalive: true } : {});
+      // Only the banked flush can carry the day's XP.
+      void sent
+        .then(async (res) => {
+          if (final && res.ok) publishXpResponse('daily:word-tower', await res.json(), 'towerDaily');
+        })
+        .catch(() => undefined);
     },
     [language],
   );
