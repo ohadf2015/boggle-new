@@ -9824,6 +9824,7 @@ const es = {
     "totalAttempts": "intentos",
     "yourPosition": "Tu puesto",
     "showMore": "Mostrar más",
+    "showAllPlayers": "Ver los {count} jugadores",
     "showLess": "Mostrar menos",
     "more": "más",
     "shareImage": "Compartir como imagen",

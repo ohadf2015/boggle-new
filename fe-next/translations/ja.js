@@ -9950,6 +9950,7 @@ const ja = {
     "totalAttempts": "回",
     "yourPosition": "あなたの順位",
     "showMore": "もっと見る",
+    "showAllPlayers": "全{count}人のプレイヤーを表示",
     "showLess": "閉じる",
     "more": "人",
     "shareImage": "画像として共有",

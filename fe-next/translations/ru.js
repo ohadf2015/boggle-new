@@ -11326,6 +11326,7 @@ const ru = {
     "totalAttempts": "попыток",
     "yourPosition": "Твой ранг",
     "showMore": "Ещё",
+    "showAllPlayers": "Показать всех игроков: {count}",
     "showLess": "Меньше",
     "more": "ещё",
     "shareImage": "Поделиться картинкой",

@@ -9310,6 +9310,7 @@ const en = {
     "totalAttempts": "attempts",
     "yourPosition": "Your rank",
     "showMore": "More",
+    "showAllPlayers": "Show all {count} players",
     "showLess": "Less",
     "more": "more",
     "shareImage": "Share image",
