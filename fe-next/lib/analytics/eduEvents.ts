@@ -21,6 +21,9 @@ export const EDU_EVENTS = {
   latePracticeStarted: 'edu_late_join_practice_started',
   // A teacher refused on their own class code tapped the next step the join page offered.
   teacherOwnClassAction: 'edu_teacher_own_class_action',
+  // A student away from the class page (solo play) was shown, or tapped, their class's live game.
+  studentLiveBannerShown: 'edu_student_live_banner_shown',
+  studentLiveBannerJoin: 'edu_student_live_banner_join',
 } as const;
 
 export type EduEventName = (typeof EDU_EVENTS)[keyof typeof EDU_EVENTS];

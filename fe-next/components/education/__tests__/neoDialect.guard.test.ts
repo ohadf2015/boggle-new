@@ -69,6 +69,8 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
     'components/education/live/LessonClaimToast.tsx': 1,
     // Viewport-pinned mascot pop (fixed), same reason as the claim toast.
     'components/education/EduMascotReactions.tsx': 1,
+    // Viewport-pinned class-live banner over solo play (fixed), same reason as the claim toast.
+    'components/student/ClassLiveGameBanner.tsx': 1,
     'components/teacher/hq/HqProjectorSheet.tsx': 1,
     'components/teacher/nb/nbDialogStyles.ts': 1,
     'components/student/academy/AcademyHubView.tsx': 2,

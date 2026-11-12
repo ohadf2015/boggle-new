@@ -117,9 +117,11 @@ export function AcademyHubView(props: AcademyHubViewProps) {
   const hubSize = useRegionSize(hubRef);
   const layout = pickMapArt(hub.art, hubSize, insets);
 
+  // After the class read answers: a loading hub has no id yet even for a student with a class.
   useEffect(() => {
+    if (classroomLoading) return;
     posthog.capture('student_academy_viewed', { has_class: !!classroomId });
-  }, [classroomId]);
+  }, [classroomId, classroomLoading]);
 
   useEffect(() => {
     if (!reward) return;
