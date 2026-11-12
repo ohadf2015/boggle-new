@@ -84,10 +84,17 @@ export function isDefaultPlayerName(name: string | null | undefined): boolean {
   return DEFAULT_NAME_SET.has(n) || DEFAULT_NAME_SET.has(n.replace(/\s*#?\d+$/, ''));
 }
 
-const EDU_FUN_NAME_SET = new Set(Object.values(EDU_FUN_NAMES).flat().map(normalize));
+const handleKey = (name: string): string => normalize(name).replace(/[-_\s]+/g, ' ');
 
-/** Any name we made up, including the classroom join screen's fun names: never shown on a public board. */
+const GENERATED_KEYS = new Set([...DEFAULT_PLAYER_NAMES, ...Object.values(EDU_FUN_NAMES).flat()].map(handleKey));
+
+/**
+ * Any name we made up, including the classroom join screen's fun names and a handle built from one
+ * ("disco_llama-8erqwm"): never shown on a public board.
+ */
 export function isGeneratedName(name: string | null | undefined): boolean {
   if (isDefaultPlayerName(name)) return true;
-  return !!name && EDU_FUN_NAME_SET.has(normalize(name));
+  if (!name) return false;
+  const key = handleKey(name);
+  return GENERATED_KEYS.has(key) || GENERATED_KEYS.has(handleKey(name.trim().replace(/[-_][a-z0-9]{4,8}$/i, '')));
 }

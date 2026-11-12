@@ -15,3 +15,14 @@ describe('edu join fun names are generated names', () => {
     expect(isGeneratedName('Hot Potato')).toBe(false);
   });
 });
+
+describe('handles built from a generated name', () => {
+  it.each(['disco_llama-8erqwm', 'Disco-Llama_x7k2p9', 'sneaky_potato-ab12cd'])(
+    'Given the username %s made from a generated name, Then it is generated too',
+    (name) => expect(isGeneratedName(name)).toBe(true),
+  );
+
+  it.each(['tali_w', 'hot_potato', 'Yoyev boyev'])('Given a handle a player typed (%s), Then it stays a chosen name', (name) => {
+    expect(isGeneratedName(name)).toBe(false);
+  });
+});
