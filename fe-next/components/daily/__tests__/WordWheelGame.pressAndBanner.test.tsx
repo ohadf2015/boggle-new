@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: vi.fn(),
   trackGameEnd: vi.fn(),
+  trackGrowthEvent: vi.fn(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -55,6 +56,7 @@ vi.mock('@/utils/dailyChallenge/wordWheelGeneration', async () => {
   return { ...actual };
 });
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 

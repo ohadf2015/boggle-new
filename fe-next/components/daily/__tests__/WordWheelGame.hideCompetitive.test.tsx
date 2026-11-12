@@ -56,6 +56,7 @@ vi.mock('@/utils/dailyChallenge/wordWheelScoring', () => ({
   scoreWord: (w: string) => w.length,
 }));
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 

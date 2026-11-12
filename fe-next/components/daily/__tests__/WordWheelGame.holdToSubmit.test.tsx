@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: vi.fn(),
   trackGameEnd: vi.fn(),
+  trackGrowthEvent: vi.fn(),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -54,6 +55,7 @@ vi.mock('@/utils/dailyChallenge/wordWheelScoring', () => ({
   scoreWord: () => 5,
 }));
 
+vi.mock('@/components/mascot/GameMascotReactions', () => ({ GameMascotReactions: () => null }));
 import WordWheelGame from '../WordWheelGame';
 import type { WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 
