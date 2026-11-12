@@ -56,6 +56,17 @@ describe('ArenaEmptyState', () => {
     expect(container.querySelector('a')).toBeNull();
   });
 
+  // Live check 2026-11-12: on a tall phone the dashed box was mostly empty
+  // around a 56-88px mascot. The box is now a size container and the mascot's
+  // height tracks it (cqh), with a floor so the lines always fit.
+  it('grows the mascot with the box on phones, keeping a floor for its lines', () => {
+    render(<ArenaEmptyState {...props} />);
+    const box = screen.getByTestId('arena-empty-state');
+    expect(box.className).toMatch(/\bmp-arena-empty\b/);
+    expect(box.className).toMatch(/\bmin-h-\[14\.5rem\]/);
+    expect(screen.getByTestId('arena-empty-mascot').className).toMatch(/h-\[clamp\(56px,calc\(100cqh_-_172px\),180px\)\]/);
+  });
+
   it('Given rooms open in another language, When shown, Then a chip switches to it', () => {
     const onSwitch = vi.fn();
     render(<ArenaEmptyState {...props} elsewhere={{ flag: 'x', name: 'English', count: 2, onSwitch }} />);

@@ -52,6 +52,16 @@ describe('PlayHero', () => {
     expect(screen.queryByRole('button', { name: 'Edit avatar' })).toBeNull();
   });
 
+  // Phone report 2026-11-12: in a mobile browser (short viewport, avatar at
+  // 0.7) the pencil sat end-7/bottom-8, right on the face. It now hugs the
+  // avatar's lower-end rim at both scales.
+  it('given a short phone, then the edit button sits at the avatar rim, not on the face', () => {
+    renderHero();
+    const pos = screen.getByTestId('hp-edit-avatar-slot').parentElement?.className.split(/\s+/) ?? [];
+    expect(pos).toEqual(expect.arrayContaining(['-end-3', '-bottom-3', '[@media(max-height:700px)]:end-0', '[@media(max-height:700px)]:bottom-0']));
+    expect(pos.some((c) => /end-7|bottom-8/.test(c))).toBe(false);
+  });
+
   it('given no avatar yet (signed-in profile loading), then a neutral placeholder shows instead of a face', () => {
     renderHero({ avatar: null });
     expect(screen.getByTestId('hp-avatar-skeleton')).toBeInTheDocument();
