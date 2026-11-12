@@ -47,6 +47,44 @@ function readDeclaredBirthYear(socket: Socket): number | null {
   return Number.isInteger(n) ? (n as number) : null;
 }
 
+interface SocialProfile {
+  birthYear: number | null;
+  override: Partial<SocialCapabilities> | null;
+  grandfathered: boolean;
+}
+
+/** Any read failure falls through to the unknown (restricted) tier: fail safe. */
+async function readSocialProfile(userId: string): Promise<SocialProfile> {
+  try {
+    const supabase = getSupabase();
+    if (!supabase) return { birthYear: null, override: null, grandfathered: false };
+    const { data } = await supabase
+      .from('profiles')
+      .select('birth_year, social_features_override, created_at')
+      .eq('id', userId)
+      .single();
+    return {
+      birthYear: (data?.birth_year as number | null) ?? null,
+      override: (data?.social_features_override as Partial<SocialCapabilities> | null) ?? null,
+      grandfathered: isGrandfatheredCreatedAt(data?.created_at as string | null | undefined),
+    };
+  } catch {
+    return { birthYear: null, override: null, grandfathered: false };
+  }
+}
+
+function contextFrom({ birthYear, override, grandfathered }: SocialProfile): SocketSocialContext {
+  const computedTier = computeSocialTier(birthYear, currentYear());
+  // Grandfather upgrades ONLY the undeclared tier — a declared child stays a child.
+  const tier: SocialTier = computedTier === 'unknown' && grandfathered ? 'adult' : computedTier;
+  return { tier, caps: resolveSocialCapabilities(tier, override) };
+}
+
+/** Capabilities for a signed-in user outside a socket (HTTP routes). */
+export async function resolveUserSocialCapabilities(userId: string): Promise<SocialCapabilities> {
+  return contextFrom(await readSocialProfile(userId)).caps;
+}
+
 /**
  * Resolve (and memoise) the social context for a socket.
  * Guests never hit the database — their age is self-declared in the handshake.
@@ -57,42 +95,15 @@ export async function resolveSocketSocialContext(socket: Socket): Promise<Socket
     | undefined;
   if (cached) return cached;
 
-  let birthYear: number | null = null;
-  let override: Partial<SocialCapabilities> | null = null;
-  let grandfathered = false;
-
   const authUserId = getAuthUserId(socket);
-  if (authUserId) {
-    try {
-      const supabase = getSupabase();
-      if (supabase) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('birth_year, social_features_override, created_at')
-          .eq('id', authUserId)
-          .single();
-        birthYear = (data?.birth_year as number | null) ?? null;
-        override = (data?.social_features_override as Partial<SocialCapabilities> | null) ?? null;
-        grandfathered = isGrandfatheredCreatedAt(data?.created_at as string | null | undefined);
-      }
-    } catch {
-      // On any read failure, fall through to unknown tier (restricted) — fail safe.
-      birthYear = null;
-      override = null;
-      grandfathered = false;
-    }
-  } else {
-    birthYear = readDeclaredBirthYear(socket);
-    grandfathered =
-      (socket.handshake?.auth as Record<string, unknown> | undefined)?.grandfathered === '1';
-  }
-
-  const computedTier = computeSocialTier(birthYear, currentYear());
-  // Grandfather upgrades ONLY the undeclared tier — a declared child stays a child.
-  const tier: SocialTier =
-    computedTier === 'unknown' && grandfathered ? 'adult' : computedTier;
-  const caps = resolveSocialCapabilities(tier, override);
-  const ctx: SocketSocialContext = { tier, caps };
+  const profile = authUserId
+    ? await readSocialProfile(authUserId)
+    : {
+        birthYear: readDeclaredBirthYear(socket),
+        override: null,
+        grandfathered: (socket.handshake?.auth as Record<string, unknown> | undefined)?.grandfathered === '1',
+      };
+  const ctx = contextFrom(profile);
   // socket.data defaults to {} in real Socket.IO, but guard the memo write so a
   // socket-like object without `.data` (e.g. a lightweight test/mock socket)
   // can never throw "Cannot set properties of undefined" and abort the suite.

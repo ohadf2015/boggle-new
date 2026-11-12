@@ -41,10 +41,8 @@ describe('Friend Messaging Handler — auth gate', () => {
 
   const events = [
     ['friends:sendMessage', { friendUserId: 'u', message: 'hi' }],
-    ['friends:getMessages', { friendUserId: 'u' }],
     ['friends:markRead', { friendUserId: 'u' }],
     ['friends:deleteMessage', { messageId: 'm' }],
-    ['friends:getThreads', {}],
   ];
 
   for (const [evt, payload] of events) {

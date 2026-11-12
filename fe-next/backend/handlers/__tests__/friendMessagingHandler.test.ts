@@ -1,6 +1,6 @@
 /**
  * friendMessagingHandler tests (Q-1)
- * Covers: sendMessage, getMessages, markRead, typing, deleteMessage, getThreads, auth checks
+ * Covers: sendMessage, markRead, typing, deleteMessage, auth checks
  */
 
 vi.mock('../../utils/logger', () => {
@@ -116,11 +116,9 @@ describe('friendMessagingHandler', () => {
   it('should register all messaging event handlers', () => {
     const { handlers } = createTestHarness();
     expect(handlers.has('friends:sendMessage')).toBe(true);
-    expect(handlers.has('friends:getMessages')).toBe(true);
     expect(handlers.has('friends:markRead')).toBe(true);
     expect(handlers.has('friends:typing')).toBe(true);
     expect(handlers.has('friends:deleteMessage')).toBe(true);
-    expect(handlers.has('friends:getThreads')).toBe(true);
   });
 
   describe('friends:sendMessage', () => {
