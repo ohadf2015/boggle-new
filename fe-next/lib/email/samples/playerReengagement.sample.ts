@@ -5,7 +5,7 @@ import { TEACHER_LOCALES, type EmailSample } from './types';
 
 const PERSON: Record<string, { name: string; letter: string }> = {
   en: { name: 'Maya', letter: 'S' },
-  he: { name: 'Fish', letter: 'ש' },
+  he: { name: 'נועה', letter: 'ש' },
   sv: { name: 'Erik', letter: 'K' },
   ja: { name: 'Yuki', letter: 'さ' },
   es: { name: 'Carlos', letter: 'P' },

@@ -33,7 +33,7 @@ describe('teacher access email templates', () => {
     expect(out.subject.toLowerCase()).toContain('live');
     expect(out.html).toContain('Jane');
     expect(out.html).toContain('/teacher');
-    expect(out.html).toContain('ohadf2015@gmail.com');
+    expect(out.html).toContain('lexiclash.game@gmail.com');
   });
 
   it('decline is polite + reasoned + invites regular game', () => {

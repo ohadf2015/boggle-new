@@ -22,8 +22,16 @@ describe('teacherTrialReminder', () => {
     expect(html).toContain('/sv/teacher/upgrade');
   });
 
-  it('falls back to English for other locales', () => {
+  it('writes to a Japanese teacher in Japanese, linking the Japanese site', () => {
     const { html } = teacherTrialReminder({ full_name: 'Ada', locale: 'ja', bucket: 't-0', trialExpiresAt: ENDS });
+    expect(html).toContain('lang="ja"');
+    expect(html).toContain('先生向けの無料アクセスは本日で終了します。');
+    expect(html).toContain('/ja/teacher/upgrade');
+  });
+
+  it('falls back to English for a locale it does not know', () => {
+    const locale = 'fr' as unknown as 'en';
+    const { html } = teacherTrialReminder({ full_name: 'Ada', locale, bucket: 't-0', trialExpiresAt: ENDS });
     expect(html).toContain('Your free teacher access ends today.');
     expect(html).toContain('/en/teacher/upgrade');
   });

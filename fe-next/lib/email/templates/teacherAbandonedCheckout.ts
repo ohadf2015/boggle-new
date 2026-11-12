@@ -19,7 +19,7 @@ interface Args {
   mode: AbandonedCheckoutEmailMode;
 }
 
-const CONTACT = 'ohadf2015@gmail.com';
+const CONTACT = 'lexiclash.game@gmail.com';
 
 const LOOK: Record<AbandonedCheckoutEmailMode, { accent: NeoAccent; art: NeoArt }> = {
   paid: { accent: 'cyan', art: 'welcome' },
