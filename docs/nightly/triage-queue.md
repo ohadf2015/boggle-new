@@ -2819,3 +2819,11 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: WARN-level, 56-table sweep — too large/risky for one lane; each policy needs its own migration + verification. First two named: public.daily_streak_freezes, public.web_vitals.
   - recommended owner: self (lane 01) — batch 5-10 tables/night via apply_migration, verify query plans don't regress.
+
+## 2026-11-12
+- [Sentry] [BOT] Cannot start bots for game 83RNJV: letterGrid is invalid
+  - JAVASCRIPT-NEXTJS-2QK, first/last seen ~1h ago, count=1, userCount=0
+  - https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2QK
+  - status: deferred
+  - why: root cause found — `startBoardWordBots` (fe-next/backend/services/gameLifecycle/botClassic.ts:123) logs+no-ops on a null grid. `game.letterGrid` is nulled on round reset (gameStateManager.ts:357, `resetGameForNewRound`) and only re-set by `installBoard()` inside gameStartHandler's start flow (gameStartHandler.ts:330). But `startGameTimer()` is also called directly from connectionHandler.ts:131/359 (host/player disconnect during ack-wait), kickHandler.ts:70, and midRoundLeave.ts:13 — each reads `game.letterGrid` fresh with no guard that a new round's board has actually been dealt yet. If one of those fires in the reset→install gap, bots silently never start for that round (no retry — startBotsForGame is a single fire-and-forget call per round). Fixing this means auditing all 5 startGameTimer call sites' ordering against installBoard, in a reconnect/kick/host-transfer area this file's own comments already flag as regression-prone (grace periods, ad-watcher holds, coordinator acks) — ambiguous blast radius, needs design, not a one-line guard.
+  - recommended owner: backend
