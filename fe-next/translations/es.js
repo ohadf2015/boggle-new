@@ -19148,6 +19148,38 @@ const es = {
       "title": "¡Misión Cumplida!",
       "grandSlam": "¡Grand Slam!",
       "grandSlamDesc": "¡Todas las misiones diarias completadas!",
+      "cheers": {
+        "quest": {
+          "1": "¡Misión cumplida!",
+          "2": "Clavado.",
+          "3": "¡Bum! Tachada.",
+          "4": "Demasiado fácil. ¿O no?",
+          "5": "El malvavisco está bailando de alegría",
+          "6": "¡Una menos!"
+        },
+        "pvp": {
+          "1": "¡Le ganaste a una persona de verdad!",
+          "2": "Alguien por ahí está refunfuñando",
+          "3": "Ganada limpia y justa",
+          "4": "Esta va directa a la nevera"
+        },
+        "weekly": {
+          "1": "¡Misión semanal cumplida!",
+          "2": "Una semana entera de trabajo. Hecho.",
+          "3": "¡El jefe semanal cayó!"
+        },
+        "grandSlam": {
+          "1": "¡GRAND SLAM!",
+          "2": "Las tres. Todas y cada una.",
+          "3": "Misiones diarias: aplastadas",
+          "4": "¡Pleno total!"
+        },
+        "allComplete": {
+          "1": "¡Maestro de misiones!",
+          "2": "No queda nada por hacer. En serio.",
+          "3": "¡Todas las misiones, fuera!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Oro",
       "progress": "{{done}} de {{total}} misiones diarias completadas"

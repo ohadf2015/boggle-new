@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsGuest } from '@/hooks/useIsGuest';
 import { useResultsSocketEvents } from '@/components/results/useResultsSocketEvents';
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 import { useResultsData } from '@/hooks/useResultsData';
 import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -91,6 +92,7 @@ export function useMpResultsController(props: MpResultsProps) {
   }, [setHostSelectedGameMode]);
 
   const socketEvents = useResultsSocketEvents({ socket, username });
+  useEffect(() => { requestQuestCheck(); }, []);
   const reactions = useQuickReactions({ socket: socket ?? null, username: username || '' });
 
   // The intermission ad-gate: echo this client's fullscreen-ad state to the

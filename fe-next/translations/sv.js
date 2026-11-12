@@ -19225,6 +19225,38 @@ const sv = {
       "title": "Uppdrag klart!",
       "grandSlam": "Grand Slam!",
       "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
+      "cheers": {
+        "quest": {
+          "1": "Uppdrag klart!",
+          "2": "Spikat.",
+          "3": "Pang. Avbockat.",
+          "4": "För lätt. Var det för lätt?",
+          "5": "Marshmallowen gör en glädjedans",
+          "6": "En till avklarad!"
+        },
+        "pvp": {
+          "1": "Du slog en riktig människa!",
+          "2": "Någonstans sitter någon och surar",
+          "3": "Rättvist och snyggt vunnet",
+          "4": "Den här ska upp på kylskåpet"
+        },
+        "weekly": {
+          "1": "Veckouppdraget klart!",
+          "2": "En hel veckas jobb. Klart.",
+          "3": "Veckobossen är fälld!"
+        },
+        "grandSlam": {
+          "1": "GRAND SLAM!",
+          "2": "Alla tre. Varenda en.",
+          "3": "Dagens uppdrag: tillplattade",
+          "4": "Rent bord!"
+        },
+        "allComplete": {
+          "1": "Uppdragsmästare!",
+          "2": "Inget kvar att göra. På riktigt.",
+          "3": "Alla uppdrag, borta!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Guld",
       "progress": "{{done}} av {{total}} dagliga uppdrag klara"

@@ -17144,6 +17144,38 @@ const en = {
       "title": "Quest Complete!",
       "grandSlam": "GRAND SLAM!",
       "grandSlamDesc": "All daily missions crushed!",
+      "cheers": {
+        "quest": {
+          "1": "Quest done!",
+          "2": "Nailed it.",
+          "3": "Boom. Checked off.",
+          "4": "Too easy. Was that too easy?",
+          "5": "The marshmallow is doing a happy dance",
+          "6": "One more down!"
+        },
+        "pvp": {
+          "1": "You beat a real human!",
+          "2": "Somewhere, someone is sulking",
+          "3": "Outplayed, fair and square",
+          "4": "That one goes on the fridge"
+        },
+        "weekly": {
+          "1": "Weekly quest done!",
+          "2": "A whole week of work. Done.",
+          "3": "The weekly boss is down!"
+        },
+        "grandSlam": {
+          "1": "GRAND SLAM!",
+          "2": "All three. Every single one.",
+          "3": "Daily missions: flattened",
+          "4": "Clean sweep!"
+        },
+        "allComplete": {
+          "1": "Quest Master!",
+          "2": "Nothing left to do. Seriously.",
+          "3": "Every quest, gone!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Gold",
       "progress": "{{done}} of {{total}} daily quests done"

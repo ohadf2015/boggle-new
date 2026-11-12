@@ -1,5 +1,6 @@
 'use client';
 
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { SinglePlayerChunkFallback } from './SinglePlayerChunkFallback';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
@@ -293,16 +294,7 @@ const SinglePlayerView: React.FC = () => {
                 if (achievement?.key) queueAchievement(achievement);
               }
             }
-            if (data.questUpdate?.completed) {
-              import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-                showQuestCompletionToast({
-                  questName: t(data.questUpdate.description),
-                  xpReward: data.questUpdate.xpReward,
-                  dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
-                  t,
-                });
-              });
-            }
+            requestQuestCheck();
           })
           .catch(() => { /* non-critical — localStorage is the fallback */ });
       }
@@ -319,7 +311,7 @@ const SinglePlayerView: React.FC = () => {
 
     setResultsData(results);
     setPhase('results');
-}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, gameState.language, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice, online, offlineFlag, t]);
+}, [gameState.mode, gameState.difficulty, gameState.timerSeconds, gameState.language, boardCode, setPhase, isAuthenticated, user?.id, queueAchievement, isPractice, online, offlineFlag]);
 
   // Subtle seasonal ambience behind the board during play — atmosphere only,
   // sits below the grid (relative children) and never touches tile readability.

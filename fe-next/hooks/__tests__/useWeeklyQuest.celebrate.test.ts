@@ -14,6 +14,7 @@ vi.mock('@/components/quests/QuestCompletionToast', () => ({ showQuestCompletion
 vi.mock('@/utils/authFetch', () => ({ postWithAuth }));
 
 import { useWeeklyQuest } from '../useWeeklyQuest';
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 
 function row(completed: boolean) {
   return {
@@ -104,5 +105,19 @@ describe('useWeeklyQuest celebration', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(postWithAuth).not.toHaveBeenCalled();
     expect(showToast).not.toHaveBeenCalled();
+  });
+
+  it('given the weekly quest finishes in a game, when a quest check is requested, then it celebrates as a weekly win without navigating', async () => {
+    serve(row(false));
+    const { result } = renderHook(() => useWeeklyQuest());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(showToast).not.toHaveBeenCalled();
+
+    serve(row(true));
+    serverSays(true);
+    requestQuestCheck();
+
+    await waitFor(() => expect(showToast).toHaveBeenCalledTimes(1));
+    expect(showToast.mock.calls[0][0]).toMatchObject({ isWeekly: true, dedupKey: 'weekly:play_games' });
   });
 });

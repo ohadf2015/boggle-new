@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
-vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireFireworks: vi.fn() }));
+vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireFireworks: vi.fn(), fireStreakConfetti: vi.fn(), fireLevelUpConfetti: vi.fn() }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { custom: vi.fn(), dismiss: vi.fn() } }));
 
 import toast from 'react-hot-toast';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { showQuestCompletionToast } from '../QuestCompletionToast';
+import { showQuestCompletionToast, resetQuestToastQueue } from '../QuestCompletionToast';
 
 const t = (k: string, p?: Record<string, string | number>) =>
   p ? `${k}:${Object.entries(p).map(([a, b]) => `${a}=${b}`).join(',')}` : k;
@@ -19,7 +19,7 @@ function renderedToast() {
 }
 
 describe('QuestCompletionToast feel', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => { vi.clearAllMocks(); resetQuestToastQueue(); });
 
   it('shows "done of total" progress and the next-reward nudge while quests remain', () => {
     showQuestCompletionToast({ questName: 'q', xpReward: 100, progress: { done: 2, total: 3 }, dedupKey: 'a', t });

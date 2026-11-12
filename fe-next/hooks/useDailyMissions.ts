@@ -19,7 +19,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { onQuestCheck } from '@/lib/quests/questCheck';
+import { useQuestSound } from '@/lib/quests/useQuestSound';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import {
   getDailyQuests,
@@ -114,7 +115,7 @@ async function requestCelebration(key: CelebrationKey): Promise<{ ok: boolean; n
 export function useDailyMissions(): UseDailyMissionsReturn {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { playQuestCompleteSound } = useSoundEffects();
+  const playQuestSound = useQuestSound();
   const playerId = user?.id ?? null;
   const pathname = usePathname();
   const isMounted = useRef(true);
@@ -244,6 +245,8 @@ export function useDailyMissions(): UseDailyMissionsReturn {
     return () => clearTimeout(retry);
   }, [pathname, fetchMissions]);
 
+  useEffect(() => onQuestCheck(() => { if (isMounted.current) fetchMissions(); }), [fetchMissions]);
+
   const completedCount = missions.filter(m => m.completed).length;
   const isGrandSlam = completedCount === missions.length && missions.length > 0;
 
@@ -264,12 +267,12 @@ export function useDailyMissions(): UseDailyMissionsReturn {
             progress: { done: missions.filter((m) => m.completed).length, total: missions.length },
             dedupKey: `mission:${celebrationKey}`,
             t,
-            onComplete: playQuestCompleteSound,
+            onComplete: playQuestSound,
           });
         });
       });
     }
-  }, [missions, loading, t, playQuestCompleteSound, tryCelebrate]);
+  }, [missions, loading, t, playQuestSound, tryCelebrate]);
 
   useEffect(() => {
     if (loading) return;
@@ -295,14 +298,14 @@ export function useDailyMissions(): UseDailyMissionsReturn {
           isGrandSlam: true,
           dedupKey: 'mission:grand_slam',
           t,
-          onComplete: playQuestCompleteSound,
+          onComplete: playQuestSound,
         });
       });
       // Server granted the 200 coins — fire the flying-coins + sound FX.
       emitCoinEarned(200);
     });
     prevGrandSlamRef.current = true;
-  }, [isGrandSlam, loading, t, playQuestCompleteSound, tryCelebrate]);
+  }, [isGrandSlam, loading, t, playQuestSound, tryCelebrate]);
 
   const refresh = useCallback(async () => {
     setLoading(true);

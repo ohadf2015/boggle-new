@@ -1,5 +1,6 @@
 'use client';
 
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 import { useCallback, type MutableRefObject } from 'react';
 import { saveWordHuntResult, type WordHuntResult, type StoredWordHuntResult } from '@/utils/dailyChallenge';
 import { trackDailyPuzzle, trackGrowthEvent } from '@/utils/growthTracking';
@@ -34,7 +35,7 @@ export interface WordHuntCompletionDeps {
   t: TFn;
 }
 
-function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
+function recordQuestProgress(result: SurvivalGameResult) {
   publishResultsXp('daily:word-hunt', null);
   fetch('/api/stats/record-game', {
     method: 'POST',
@@ -51,16 +52,7 @@ function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
     .then(data => {
       publishResultsXp('daily:word-hunt', xpFromResponse(data));
       publishLevelUp(levelUpFromRecordGame(data), 'daily');
-      if (data.questUpdate?.completed) {
-        import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-          showQuestCompletionToast({
-            questName: t(data.questUpdate.description),
-            xpReward: data.questUpdate.xpReward,
-            dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
-            t,
-          });
-        });
-      }
+      requestQuestCheck();
     })
     .catch(() => { /* non-critical */ });
 }
@@ -69,7 +61,7 @@ function recordQuestProgress(result: SurvivalGameResult, t: TFn) {
 export function useWordHuntCompletion(d: WordHuntCompletionDeps) {
   const {
     isPractice, isCatchup, puzzleNumber, puzzleDate, gameLanguage, meaning, extraTries, isAuthenticated,
-    gameStartedAtRef, recordStreak, showInterstitial, setGameResult, setStoredResult, onShowResults, t,
+    gameStartedAtRef, recordStreak, showInterstitial, setGameResult, setStoredResult, onShowResults,
   } = d;
 
   return useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
@@ -140,7 +132,7 @@ export function useWordHuntCompletion(d: WordHuntCompletionDeps) {
       showResultsOnce();
     });
 
-    if (isAuthenticated && result.solved) recordQuestProgress(result, t);
+    if (isAuthenticated && result.solved) recordQuestProgress(result);
   // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
   }, [puzzleNumber, puzzleDate, gameLanguage, meaning, isAuthenticated, recordStreak, isPractice, isCatchup, showInterstitial, extraTries]);
 }
