@@ -96,16 +96,14 @@ describe('<PageClient> (access page state machine)', () => {
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });
 
-  it('renders the approved affordance when status is approved but hasAccess is not yet true', () => {
-    // This is the race condition: the request resolved, status is approved, but the
-    // profile hasn't resolved yet so hasAccess is false. Should show the approved
-    // card, not the form.
+  it('asks for a human look when the request says approved but the settled profile has no teacher role', () => {
+    // Loading covers the profile race; settled and still no role, the approved card's link would bounce straight back here.
     mockTeacherAccessState.hasAccess = false;
     mockTeacherAccessState.status = 'approved';
     mockTeacherAccessState.isLoading = false;
     render(<PageClient />);
-    expect(screen.getByText('education.access.already_approved_title')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'education.access.go_to_teacher' })).toBeInTheDocument();
+    expect(screen.getByText('education.access.review_title')).toBeInTheDocument();
+    expect(screen.queryByText('education.access.already_approved_title')).not.toBeInTheDocument();
     // Should NOT render the form
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });

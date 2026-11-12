@@ -19,6 +19,11 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false,
 vi.mock('@/lib/animation/useGsapReveal', () => ({ useGsapReveal: () => ({ current: null }) }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
+const classes = vi.hoisted(() => ({ value: { classrooms: [] as unknown[], isLoading: false, error: null as string | null } }));
+vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => classes.value }));
+// No class yet, so the safe place to go is class setup.
+const SAFE_DESTINATION = '/en/teacher/classroom/new';
+
 let mockAccess = { hasAccess: true, status: 'approved', latestRequest: null, trial: null, isLoading: false };
 vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => mockAccess }));
 
@@ -54,15 +59,18 @@ describe('access page returns a teacher to the page TeacherGate bounced', () => 
     expect(mockReplace).not.toHaveBeenCalled();
   });
 
-  it('ignores an off-site ?from=', () => {
+  it('ignores an off-site ?from= and sends the teacher to the teacher area instead', () => {
     mockFrom = '//evil.example/en/teacher';
     render(<PageClient />);
-    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith(SAFE_DESTINATION);
+    expect(mockReplace).not.toHaveBeenCalledWith('//evil.example/en/teacher');
   });
 
-  it('a direct visit (marketing CTA, no ?from=) keeps the approved card instead of bouncing', () => {
+  it('a direct visit with no ?from= (an email sign-in link, a marketing CTA) goes on to the teacher area once', () => {
     mockFrom = null;
     render(<PageClient />);
-    expect(mockReplace).not.toHaveBeenCalled();
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+    expect(mockReplace).toHaveBeenCalledWith(SAFE_DESTINATION);
   });
 });

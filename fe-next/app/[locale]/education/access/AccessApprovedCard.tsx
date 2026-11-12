@@ -1,6 +1,8 @@
 'use client';
 import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,11 +33,20 @@ function TrialNote({ trial }: { trial: TrialStatus }) {
 }
 
 /** An approved teacher's next step: her first class while she has none, her dashboard after. */
-export function AccessApprovedCard({ trial, showTrial }: { trial: TrialStatus | null; showTrial: boolean }) {
+export function AccessApprovedCard({ trial, showTrial, autoContinue = false }: { trial: TrialStatus | null; showTrial: boolean; autoContinue?: boolean }) {
   const { t, language } = useLanguage();
   const { classrooms, isLoading, error } = useClassrooms();
   const firstClass = !isLoading && !error && classrooms.length === 0;
   const dashboard = `/${language}/teacher`;
+  const next = firstClass ? `/${language}/teacher/classroom/new` : dashboard;
+  const router = useRouter();
+  const continued = useRef(false);
+  // A signed-in teacher landing here (often from an email sign-in link) belongs in the teacher area; the card is only the fallback frame.
+  useEffect(() => {
+    if (!autoContinue || isLoading || continued.current) return;
+    continued.current = true;
+    router.replace(next);
+  }, [autoContinue, isLoading, next, router]);
 
   return (
     <div className="relative rounded-neo-xl border-neo-thick border-neo-black bg-neo-lime p-6 pt-14 text-neo-navy shadow-hard-xl sm:p-8 sm:pt-16">
@@ -52,7 +63,7 @@ export function AccessApprovedCard({ trial, showTrial }: { trial: TrialStatus | 
         </div>
       ) : (
         <div className="mt-6 flex flex-col gap-3">
-          <Link href={firstClass ? `/${language}/teacher/classroom/new` : dashboard} className={PRIMARY}>
+          <Link href={next} className={PRIMARY}>
             {firstClass ? t('education.trial.cta') : t('education.access.go_to_teacher')}
             <DirectionalIcon icon={ArrowRight} className="size-5 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
           </Link>

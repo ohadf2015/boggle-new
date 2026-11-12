@@ -324,6 +324,7 @@ export type GrowthEvent =
   | 'edu_access_gate_viewed'
   | 'edu_access_signup_tapped'
   | 'edu_access_verify_resent'
+  | 'edu_access_pending_finish'
   | 'edu_access_request_submitted'
   // Teacher classroom ACTIVATION funnel (t_44f87dd2) — mirrored from
   // lib/education/telemetry.ts with identical props so Growth Radar's

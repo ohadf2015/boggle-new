@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
-import { accessHandoffHref, type AccessApproval } from './AccessRequestHandoff';
+import { accessHandoffHref, profileReady, type AccessApproval } from './AccessRequestHandoff';
 
 const ROLE_OPTIONS: { value: TeacherAccessRole; emoji: string }[] = [
   { value: 'teacher', emoji: '🍎' },
@@ -16,7 +16,41 @@ const ROLE_OPTIONS: { value: TeacherAccessRole; emoji: string }[] = [
   { value: 'other', emoji: '✨' },
 ];
 
-const REFRESH_CAP_MS = 4000;
+const ACCESS_DRAFT_PREFIX = 'lexiclash.eduAccessDraft.v2:';
+export const ACCESS_DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+export const accessDraftKey = (userId: string) => `${ACCESS_DRAFT_PREFIX}${userId}`;
+
+type Draft = { useCase: string; role: TeacherAccessRole | null };
+const EMPTY: Draft = { useCase: '', role: null };
+
+// Keyed by account so a shared school computer never hands one teacher's words to the next.
+function readDraft(userId: string | null): Draft {
+  if (!userId) return EMPTY;
+  try {
+    const key = accessDraftKey(userId);
+    const raw = JSON.parse(localStorage.getItem(key) ?? 'null') as (Partial<Draft> & { savedAt?: number }) | null;
+    if (!raw) return EMPTY;
+    if (typeof raw.savedAt !== 'number' || Date.now() - raw.savedAt > ACCESS_DRAFT_MAX_AGE_MS) {
+      localStorage.removeItem(key);
+      return EMPTY;
+    }
+    const role = ROLE_OPTIONS.some((o) => o.value === raw.role) ? (raw.role as TeacherAccessRole) : null;
+    return { useCase: typeof raw.useCase === 'string' ? raw.useCase : '', role };
+  } catch {
+    return EMPTY;
+  }
+}
+
+function writeDraft(userId: string | null, draft: Draft | null): void {
+  if (!userId) return;
+  try {
+    if (draft) localStorage.setItem(accessDraftKey(userId), JSON.stringify({ ...draft, savedAt: Date.now() }));
+    else localStorage.removeItem(accessDraftKey(userId));
+  } catch {
+    // Storage blocked: the form still works, it just won't survive a reload.
+  }
+}
+
 const USE_CASE_MIN = 10;
 const USE_CASE_MAX = 800;
 
@@ -37,10 +71,21 @@ export function AccessRequestForm({
   onApproved,
 }: { knownName?: string; knownEmail?: string; onApproved?: (approval: AccessApproval) => void } = {}) {
   const { t, language } = useLanguage();
-  const { refreshProfile } = useAuth();
+  const { refreshProfile, user } = useAuth();
+  const userId = user?.id ?? null;
   const router = useRouter();
-  const [role, setRole] = useState<TeacherAccessRole | null>(null);
-  const [useCase, setUseCase] = useState('');
+  // Lazy read is hydration-safe: the gate mounts this form only on the client, after auth resolves.
+  const [draft] = useState(() => readDraft(userId));
+  const [role, setRoleState] = useState<TeacherAccessRole | null>(draft.role);
+  const [useCase, setUseCaseState] = useState(draft.useCase);
+  const setRole = (next: TeacherAccessRole | null) => {
+    setRoleState(next);
+    writeDraft(userId, { useCase, role: next });
+  };
+  const setUseCase = (next: string) => {
+    setUseCaseState(next);
+    writeDraft(userId, { useCase: next, role });
+  };
   const [submitting, setSubmitting] = useState(false);
   // `submitting` disables the button only on the next render; two submits in one tick both pass it.
   const inFlight = useRef(false);
@@ -52,16 +97,7 @@ export function AccessRequestForm({
   const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
 
   const handOff = (paidDay0: boolean, alreadyApproved: boolean) => {
-    // The next page's gate re-reads a stale profile itself, so a stuck refresh must not hold the teacher here.
-    const ready = Promise.race([
-      Promise.resolve()
-        .then(() => refreshProfile())
-        .then(
-          () => undefined,
-          () => undefined,
-        ),
-      new Promise<void>((resolve) => setTimeout(resolve, REFRESH_CAP_MS)),
-    ]);
+    const ready = profileReady(refreshProfile);
     if (onApproved) {
       onApproved({ paidDay0, alreadyApproved, ready });
       return;
@@ -91,6 +127,7 @@ export function AccessRequestForm({
         setError(res.status === 429 ? t('education.access.rate_limited') : t('education.access.submit_error'));
         return;
       }
+      writeDraft(userId, null);
       const json = await res.json().catch(() => null);
       if (json?.approvalPending) {
         setApprovalPending(true);

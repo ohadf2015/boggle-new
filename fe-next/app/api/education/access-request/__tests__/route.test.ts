@@ -19,8 +19,9 @@ let adminAvailable = true;
 let sendEmailMock = vi.fn(async (_args: any) => ({ ok: true as boolean, error: undefined as string | undefined }));
 let captureMock = vi.fn();
 let posthogThrows = false;
-// Rows the twin-check select (approved request already exists?) returns.
-let twinRows: any[] = [];
+// What a press re-reads when another press changed its row first.
+let twinRole: string | null = null;
+let twinStatus = 'approved';
 
 vi.mock('@/lib/posthog', () => ({
   getPostHogServer: () => {
@@ -33,11 +34,16 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
     auth: { getUser: async () => ({ data: { user: mockUser }, error: null }) },
     from: (table: string) => ({
-      insert: insertMock,
+      insert: (row: unknown) => ({ select: () => ({ single: () => (insertMock as (r: unknown) => Promise<unknown>)(row) }) }),
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           // Rate-limit count query (teacher_access_requests)
           gte: vi.fn(async () => ({ data: [], count: recentCount, error: null })),
+          // This user's request history (none: a first request)
+          order: vi.fn(() => {
+            const res = Promise.resolve({ data: [], error: null });
+            return Object.assign(res, { order: () => res });
+          }),
           // Profile lookup for server-derived name/country
           maybeSingle: vi.fn(async () =>
             table === 'profiles' ? { data: mockProfile, error: profileFetchError } : { data: null, error: null }
@@ -69,11 +75,10 @@ vi.mock('@/utils/supabase/admin', () => ({
                       select: (cols: string) => adminSelectMock({ table, values, key, val, cols }),
                     }),
                   },
-            select: (cols: string) => ({
-              eq: (key: string, val: string) => ({
-                eq: (key2: string, val2: string) => ({
-                  limit: (n: number) => vi.fn(async () => ({ data: twinRows, error: null }))(),
-                }),
+            select: (_cols: string) => ({
+              eq: (_key: string, _val: string) => ({
+                maybeSingle: async () =>
+                  table === 'profiles' ? { data: { user_role: twinRole }, error: null } : { data: { status: twinStatus }, error: null },
               }),
             }),
           }),
@@ -117,7 +122,8 @@ describe('POST /api/education/access-request', () => {
     approveMock = vi.fn(async () => ({ data: [{ id: 'req-1' }], error: null }));
     adminSelectMock = vi.fn(async () => ({ data: [{ id: 'user-1' }], error: null }));
     adminAvailable = true;
-    twinRows = [];
+    twinRole = null;
+    twinStatus = 'approved';
     sendEmailMock = vi.fn(async () => ({ ok: true, error: undefined }));
     captureMock = vi.fn();
     posthogThrows = false;
@@ -379,8 +385,9 @@ describe('POST /api/education/access-request', () => {
       expect(approveMock).toHaveBeenCalledTimes(1);
       const call = approveMock.mock.calls[0][0] as any;
       expect(call.table).toBe('teacher_access_requests');
-      expect(call.key).toBe('user_id');
-      expect(call.val).toBe('user-1');
+      // Only the row this press filed, never every pending row of the user.
+      expect(call.key).toBe('id');
+      expect(call.val).toBe('req-1');
       expect(call.key2).toBe('status');
       expect(call.val2).toBe('pending');
       const update = call.values;
@@ -474,9 +481,9 @@ describe('POST /api/education/access-request', () => {
       expect(sendEmailMock).not.toHaveBeenCalled();
     });
 
-    it('202 approvalPending when approval matched no pending row and no approved twin exists', async () => {
+    it('202 approvalPending when approval matched no pending row and the role is not set', async () => {
       approveMock = vi.fn(async () => ({ data: [], error: null }));
-      twinRows = [];
+      twinRole = 'student';
       const res = await POST(mkReq(validPayload));
       expect(res.status).toBe(202);
       const json = await res.json();
@@ -485,9 +492,9 @@ describe('POST /api/education/access-request', () => {
       expect(adminSelectMock).not.toHaveBeenCalled();
     });
 
-    it('200 (not 202) when the racing twin already approved the row', async () => {
+    it('200 (not 202) when the racing twin already approved the row and the role is set', async () => {
       approveMock = vi.fn(async () => ({ data: [], error: null }));
-      twinRows = [{ id: 'req-twin' }];
+      twinRole = 'teacher';
       const res = await POST(mkReq(validPayload));
       expect(res.status).toBe(200);
       const json = await res.json();

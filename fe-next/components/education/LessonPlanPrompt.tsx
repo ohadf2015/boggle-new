@@ -11,7 +11,13 @@ import { cn } from '@/lib/utils';
 import { PRESS } from '@/components/education/live/eduLiveStyles';
 
 const K = 'eduLiveRoom.hostResults.lessonPlan';
-const SOURCE = 'practice_results';
+
+export type LessonPlanSource = 'practice_results' | 'class_setup';
+
+const COPY: Record<LessonPlanSource, { title: string; body: string }> = {
+  practice_results: { title: 'eduLiveRoom.hostResults.lessonPlan.title', body: 'eduLiveRoom.hostResults.lessonPlan.body' },
+  class_setup: { title: 'eduLiveRoom.hostResults.lessonPlan.setupTitle', body: 'eduLiveRoom.hostResults.lessonPlan.setupBody' },
+};
 
 const BUTTON_BASE = cn(
   PRESS,
@@ -31,7 +37,18 @@ function browserTimezone(): string | null {
   }
 }
 
-export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
+export function LessonPlanPrompt({
+  classroomId,
+  source = 'practice_results',
+  className,
+  reserveSpace = false,
+}: {
+  classroomId: string;
+  source?: LessonPlanSource;
+  className?: string;
+  /** Hold the idle card's height while the saved time loads, so nothing below it moves. */
+  reserveSpace?: boolean;
+}) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
   const inputId = useId();
@@ -70,10 +87,19 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
   useEffect(() => {
     if (status !== 'idle' || shown.current) return;
     shown.current = true;
-    trackGrowthEvent('lesson_plan_prompt_shown', { source: SOURCE });
-  }, [status]);
+    trackGrowthEvent('lesson_plan_prompt_shown', { source });
+  }, [status, source]);
 
-  if (!user || status === 'loading') return null;
+  if (!user) return null;
+  if (status === 'loading') {
+    return reserveSpace ? (
+      <div
+        data-testid="lesson-plan-placeholder"
+        aria-hidden="true"
+        className={cn('min-h-[220px] rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light', className)}
+      />
+    ) : null;
+  }
 
   const timezone = browserTimezone();
 
@@ -102,7 +128,7 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
       const stored = new Date(body.lessonAt);
       setSavedAt(stored);
       setStatus('saved');
-      trackGrowthEvent('lesson_planned', { hours_ahead: Math.round((stored.getTime() - Date.now()) / 3_600_000), source: SOURCE });
+      trackGrowthEvent('lesson_planned', { hours_ahead: Math.round((stored.getTime() - Date.now()) / 3_600_000), source });
     } catch {
       setErrorKey('error');
       setStatus('error');
@@ -117,15 +143,15 @@ export function LessonPlanPrompt({ classroomId }: { classroomId: string }) {
       data-testid="lesson-plan"
       aria-labelledby={titleId}
       aria-busy={saving}
-      className="flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 text-neo-cream shadow-hard @5xl/results:p-4"
+      className={cn('flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 text-neo-cream shadow-hard @5xl/results:p-4', className)}
     >
       <div className="flex items-start gap-2">
         <CalendarClock className="mt-0.5 size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
         <div className="min-w-0">
           <h2 id={titleId} className="font-neo-display text-base font-black leading-tight @5xl/results:text-lg">
-            {t(`${K}.title`)}
+            {t(COPY[source].title)}
           </h2>
-          {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80">{t(`${K}.body`)}</p>}
+          {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80">{t(COPY[source].body)}</p>}
         </div>
       </div>
 

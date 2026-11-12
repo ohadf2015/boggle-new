@@ -185,4 +185,29 @@ describe('<LessonPlanPrompt>', () => {
     expect(screen.queryByTestId('lesson-plan-retry')).toBeNull();
     expect(screen.queryByTestId('lesson-plan-saved')).toBeNull();
   });
+
+  describe('on the class invite screen', () => {
+    it('Given source class_setup, When shown, Then asks about the next lesson with this class, not the rehearsal, and tracks that source', async () => {
+      render(<LessonPlanPrompt classroomId="class-1" source="class_setup" />);
+      expect(await screen.findByRole('heading', { name: `${K}.setupTitle` })).toBeInTheDocument();
+      expect(screen.getByTestId('lesson-plan')).toHaveTextContent(`${K}.setupBody`);
+      expect(screen.queryByText(`${K}.title`)).toBeNull();
+      expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'class_setup' });
+    });
+
+    it('Given source class_setup, When the teacher saves tomorrow at 9, Then the plan is stored for this class and tracked as class_setup', async () => {
+      const at = defaultLessonAt(new Date());
+      postMock.mockResolvedValue(okResponse(at.toISOString()));
+      render(<LessonPlanPrompt classroomId="class-1" source="class_setup" />);
+      fireEvent.click(await screen.findByTestId('lesson-plan-tomorrow'));
+      await waitFor(() => expect(screen.getByTestId('lesson-plan-saved')).toBeInTheDocument());
+      expect(lastBody()).toMatchObject({ classroomId: 'class-1', lessonAt: at.toISOString() });
+      expect(track).toHaveBeenCalledWith('lesson_planned', expect.objectContaining({ source: 'class_setup' }));
+    });
+
+    it('Given a className, When rendered, Then the section carries it so the slot can place it', async () => {
+      render(<LessonPlanPrompt classroomId="class-1" source="class_setup" className="lg:col-span-2" />);
+      expect(await screen.findByTestId('lesson-plan')).toHaveClass('lg:col-span-2');
+    });
+  });
 });

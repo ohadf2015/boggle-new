@@ -25,6 +25,7 @@ const sentBody = (f: ReturnType<typeof ok>) => JSON.parse((f.mock.calls[0] as un
 describe('<AccessRequestForm> — one tap to the first class', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear();
   });
 
   const reasonBox = () => screen.getByRole('textbox');
