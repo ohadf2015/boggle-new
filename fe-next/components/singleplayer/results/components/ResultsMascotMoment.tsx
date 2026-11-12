@@ -9,6 +9,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { NearMiss } from '../nearMiss';
+import { PHONE_MASCOT_CLIPS } from '../phoneMascotClips';
 
 type Beat = 'celebrate' | 'faceplant';
 
@@ -58,33 +59,48 @@ export function ResultsMascotMoment({ celebration, nearMiss, t }: ResultsMascotM
   const { playSound } = useSoundEffects();
   const [visible, setVisible] = useState(true);
   // Decided after mount: the flash check reads matchMedia, which would mismatch SSR.
-  const [clipAllowed, setClipAllowed] = useState(false);
+  const [phone, setPhone] = useState<boolean | null>(null);
+  // One-shot WebPs hold their last frame; a fresh query per mount replays them.
+  const [playKey, setPlayKey] = useState(0);
 
   useEffect(() => {
-    setClipAllowed(!prefersStaticFullscreenOverlay());
+    setPhone(prefersStaticFullscreenOverlay());
+    setPlayKey(Date.now());
   }, []);
 
+  const phoneClip = beat && phone && !still ? PHONE_MASCOT_CLIPS[beat] : null;
+
   useEffect(() => {
-    if (!beat) return;
-    const hide = window.setTimeout(() => setVisible(false), VISIBLE_MS);
+    if (!beat || phone === null) return;
+    const hide = window.setTimeout(() => setVisible(false), phoneClip?.durationMs ?? VISIBLE_MS);
     const voice = still
       ? undefined
       : window.setTimeout(() => {
           const cfg = BEATS[beat];
           void playSound(cfg.voice, { rate: cfg.rate, volume: 0.6, requiresGameActive: false });
-        }, FREEZE_MS);
+        }, phoneClip?.freezeMs ?? FREEZE_MS);
     return () => {
       window.clearTimeout(hide);
       if (voice) window.clearTimeout(voice);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one beat per results screen
-  }, [beat]);
+  }, [beat, phone]);
 
-  if (!beat || !visible) return null;
+  if (!beat || !visible || phone === null) return null;
   const cfg = BEATS[beat];
-  const playClip = beat === 'celebrate' && celebration && clipAllowed && !still;
+  const playVideo = beat === 'celebrate' && celebration && !phone && !still;
 
-  const body = playClip ? (
+  const body = phoneClip ? (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      data-testid="sp-mascot-clip"
+      src={`${phoneClip.src}?t=${playKey}`}
+      alt=""
+      width={phoneClip.width}
+      height={phoneClip.height}
+      className="h-28 w-auto object-contain"
+    />
+  ) : playVideo ? (
     <MascotCelebrationVideo kind={celebration} overlay={false} size="128px" autoDismissMs={0} title={null} />
   ) : (
     <Mascot variant={cfg.pose} size="xs" animated={false} alt={t('singlePlayer.nearMiss.mascotAlt')} />
@@ -97,7 +113,7 @@ export function ResultsMascotMoment({ celebration, nearMiss, t }: ResultsMascotM
       aria-hidden="true"
       className="pointer-events-none fixed end-3 z-40 bottom-[calc(var(--results-sticky-cta-h,96px)+0.75rem)]"
     >
-      {still ? (
+      {still || phoneClip ? (
         body
       ) : (
         <m.div

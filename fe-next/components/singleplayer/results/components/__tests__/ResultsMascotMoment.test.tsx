@@ -37,13 +37,6 @@ describe('ResultsMascotMoment', () => {
     expect(screen.getByTestId('mascot-celebration-video')).toHaveAttribute('data-kind', 'champion');
   });
 
-  it('Given a win on a phone/webview, When mounted, Then a still pose does the slapstick beat instead of the clip', () => {
-    staticOverlay = true;
-    render(<ResultsMascotMoment celebration="knight" nearMiss={null} t={t} />);
-    expect(screen.queryByTestId('mascot-celebration-video')).toBeNull();
-    expect(screen.getByTestId('mascot-still')).toHaveAttribute('data-variant', 'celebration');
-  });
-
   it('Given reduce effects, When mounted, Then only a still pose shows and no voice line plays', () => {
     reducedEffects = true;
     render(<ResultsMascotMoment celebration="champion" nearMiss={null} t={t} />);
@@ -70,5 +63,48 @@ describe('ResultsMascotMoment', () => {
   it('Given nothing to react to, When mounted, Then nothing renders', () => {
     const { container } = render(<ResultsMascotMoment celebration={null} nearMiss={null} t={t} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('Given a win on a phone, When mounted, Then the small joy-jump clip plays at the edge instead of the video', () => {
+    staticOverlay = true;
+    render(<ResultsMascotMoment celebration="knight" nearMiss={null} t={t} />);
+    expect(screen.queryByTestId('mascot-celebration-video')).toBeNull();
+    const clip = screen.getByTestId('sp-mascot-clip');
+    expect(clip.getAttribute('src')).toMatch(/^\/mascot\/anim\/joy-jump\.webp\?t=/);
+    expect(clip.className).not.toMatch(/opacity-0|inset-0/);
+    expect(screen.getByTestId('sp-mascot-moment').className).not.toContain('inset-0');
+  });
+
+  it('Given a close-to-best miss on a phone, When mounted, Then the faceplant clip plays', () => {
+    staticOverlay = true;
+    render(<ResultsMascotMoment celebration={null} nearMiss={{ kind: 'best', gap: 2 }} t={t} />);
+    expect(screen.getByTestId('sp-mascot-clip').getAttribute('src')).toMatch(/^\/mascot\/anim\/faceplant-thumbsup\.webp\?t=/);
+  });
+
+  it('Given a phone clip is playing, When its duration is up, Then it hides', () => {
+    staticOverlay = true;
+    render(<ResultsMascotMoment celebration="champion" nearMiss={null} t={t} />);
+    act(() => { vi.advanceTimersByTime(2600); });
+    expect(screen.getByTestId('sp-mascot-clip')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(100); });
+    expect(screen.queryByTestId('sp-mascot-moment')).toBeNull();
+  });
+
+  it('Given the clip played on an earlier results screen, When a new one mounts, Then the clip src is fresh so it replays', () => {
+    staticOverlay = true;
+    const first = render(<ResultsMascotMoment celebration="champion" nearMiss={null} t={t} />);
+    const firstSrc = screen.getByTestId('sp-mascot-clip').getAttribute('src');
+    first.unmount();
+    act(() => { vi.advanceTimersByTime(50); });
+    render(<ResultsMascotMoment celebration="champion" nearMiss={null} t={t} />);
+    expect(screen.getByTestId('sp-mascot-clip').getAttribute('src')).not.toBe(firstSrc);
+  });
+
+  it('Given reduce effects on a phone, When mounted, Then the still pose shows and no clip plays', () => {
+    staticOverlay = true;
+    reducedEffects = true;
+    render(<ResultsMascotMoment celebration="champion" nearMiss={null} t={t} />);
+    expect(screen.queryByTestId('sp-mascot-clip')).toBeNull();
+    expect(screen.getByTestId('mascot-still')).toHaveAttribute('data-variant', 'celebration');
   });
 });
