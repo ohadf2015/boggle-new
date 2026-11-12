@@ -153,6 +153,7 @@ export function DailyChallengeLanding({
     firstDay.current = day;
     readLocal();
     dailyStatus.refresh();
+    void dailyPlayedStatus.refresh();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day]);
 

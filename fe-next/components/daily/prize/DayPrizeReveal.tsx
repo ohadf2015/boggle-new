@@ -15,6 +15,7 @@ import { claimDayPrize, fetchDayPrizeFixed, readOpenedPrize } from './dayPrizeSt
 import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize';
 import ChestPartOdds from '@/components/avatar/chest/ChestPartOdds';
 import { isChestPartDrop, type ChestDropSource } from '@/lib/avatar/chestDrops';
+import { revalidateDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
 
 const PART_SOURCE: Record<DayPrizeKind, ChestDropSource> = { clear: 'day_clear', perfect: 'day_perfect' };
 
@@ -123,6 +124,9 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
     if (!mounted.current) return;
     if (!outcome.ok) {
       setPhase(outcome.reason);
+      // The page thought the day was done and the server disagrees: re-read
+      // played state so the hub stops offering a box it cannot open.
+      if (outcome.reason === 'not-cleared') void revalidateDailyPlayedStatus();
       return;
     }
     setPrize(outcome.prize);

@@ -20,6 +20,8 @@ import { catchUpStreakRepairs } from '@/utils/dailyChallenge/catchUp';
 import { loadCarriedDates } from '@/lib/daily/streakCarryover.server';
 
 export interface DailyPlayedStatus {
+  /** The UTC day `today` describes; clients drop an answer for any other day. */
+  date?: string;
   today: {
     wordHunt: boolean;
     wordWheel: boolean;
@@ -171,6 +173,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
       // Build the response
       const response: DailyPlayedStatus = {
+        date: today,
         today: {
           wordHunt: huntRows.includes(today),
           wordWheel: wheelRows.includes(today),
@@ -198,7 +201,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         };
       }
 
-      return NextResponse.json<DailyPlayedStatus>(response);
+      // Per-player, per-day state: never reuse a stored copy.
+      return NextResponse.json<DailyPlayedStatus>(response, { headers: { 'Cache-Control': 'private, no-store' } });
     }
 
     // Guest user: NEVER call server, return default
