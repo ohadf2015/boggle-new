@@ -9,6 +9,8 @@
  * Kept as a flat list so the results screen doesn't load six translation catalogues.
  * defaultPlayerNames.test.ts fails when a source pool gains a name missing here.
  */
+import { EDU_FUN_NAMES } from './eduFunNames';
+
 export const DEFAULT_PLAYER_NAMES: readonly string[] = [
   'Sneaky Potato', 'Donut Disturb', 'Baron Waffle', 'Llama Rey', 'Taco Talent', 'Mochi Boss',
   'Sly Penguin', 'Rogue Walrus', 'Pro Goose', 'Captain Pretzel', 'Cosmic Avocado', 'Unhinged Flamingo',
@@ -80,4 +82,12 @@ export function isDefaultPlayerName(name: string | null | undefined): boolean {
   const n = normalize(name);
   if (!n) return false;
   return DEFAULT_NAME_SET.has(n) || DEFAULT_NAME_SET.has(n.replace(/\s*#?\d+$/, ''));
+}
+
+const EDU_FUN_NAME_SET = new Set(Object.values(EDU_FUN_NAMES).flat().map(normalize));
+
+/** Any name we made up, including the classroom join screen's fun names: never shown on a public board. */
+export function isGeneratedName(name: string | null | undefined): boolean {
+  if (isDefaultPlayerName(name)) return true;
+  return !!name && EDU_FUN_NAME_SET.has(normalize(name));
 }

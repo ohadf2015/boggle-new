@@ -70,3 +70,9 @@ describe('publicNameIssue', () => {
     expect(publicNameIssue('Zigzag')).toBeNull();
   });
 });
+
+describe('publicNameIssue with classroom fun names', () => {
+  it('Given a name the classroom join screen made up, Then it is not public', () => {
+    expect(publicNameIssue('Disco Llama')).toBe('default');
+  });
+});

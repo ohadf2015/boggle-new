@@ -1,0 +1,9 @@
+// The classroom join screen suggests these (eduStudent.join.funNames); a guard test keeps them in step.
+export const EDU_FUN_NAMES: Record<string, readonly string[]> = {
+  en: ["Pixel Panda","Captain Otter","Turbo Toast","Disco Llama","Ninja Noodle","Rocket Raccoon","Cosmic Kiwi","Sneaky Sloth","Mega Mango","Laser Lemur","Bubble Bison","Jazzy Jaguar","Waffle Wizard","Thunder Duck","Comet Cat","Glitter Gecko","Banana Boss","Turbo Turtle","Quantum Quokka","Fuzzy Falcon"],
+  he: ["קפטן לוטרה","נינג'ה פנדה","טורבו צב","לאמה בדיסקו","דוקטור בננה","רקטה סגולה","חתול קוסמי","עצלן ערמומי","מנגו על","למור לייזר","ביזון בועות","קוסם וופל","ברווז רעם","שביט זריז","שף טוסט","בוס בננה","קוקה קוונטית","נץ פרוותי","כוכב פופקורן","זיקית נוצצת"],
+  sv: ["Pixel-Panda","Kapten Utter","Turbo-Rostis","Disco-Lama","Ninja-Nudel","Raket-Tvättbjörn","Kosmisk Kiwi","Smygande Sengångare","Mega-Mango","Laser-Lemur","Bubbel-Bison","Jazzig Jaguar","Våffelvisard","Åsk-Anka","Komet-Katt","Glitter-Gecko","Banan-Bossen","Turbo-Sköldis","Kvant-Quokka","Fluffig Falk"],
+  ja: ["ピクセルパンダ","キャプテンラッコ","ターボトースト","ディスコアルパカ","忍者ヌードル","ロケットアライグマ","宇宙キウイ","こっそりナマケモノ","メガマンゴー","レーザーキツネザル","あわあわバイソン","ジャズジャガー","ワッフル魔法使い","カミナリアヒル","すい星ネコ","キラキラヤモリ","バナナボス","ターボカメ","量子クオッカ","ふわふわハヤブサ"],
+  es: ["Panda Píxel","Capitán Nutria","Tostada Turbo","Llama Disco","Fideo Ninja","Mapache Cohete","Kiwi Cósmico","Perezoso Sigiloso","Mango Mega","Lémur Láser","Bisonte Burbuja","Jaguar Jazzero","Mago Gofre","Pato Trueno","Gato Cometa","Geco Brillante","Jefe Banana","Tortuga Turbo","Quokka Cuántico","Halcón Peludo"],
+  ru: ["Пиксель-Панда","Капитан Выдра","Турбо-Тост","Диско-Лама","Ниндзя-Лапша","Ракета-Енот","Космический Киви","Хитрый Ленивец","Мега-Манго","Лазерный Лемур","Пузырь-Бизон","Джазовый Ягуар","Вафельный Волшебник","Громовая Утка","Кот-Комета","Блестящий Геккон","Банановый Босс","Турбо-Черепаха","Квантовая Квокка","Пушистый Сокол"],
+};

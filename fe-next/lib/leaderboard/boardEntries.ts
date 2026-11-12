@@ -1,6 +1,6 @@
 import { isPlaceholderName } from '@/lib/displayName';
 import { resolveDisplayTitle } from '@/lib/titles/playerTitles';
-import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
+import { isGeneratedName } from '@/utils/defaultPlayerNames';
 
 interface BoardRow {
   display_name?: string | null;
@@ -9,7 +9,7 @@ interface BoardRow {
   player_level?: number | null;
 }
 
-const shownName = (name: string | null | undefined): boolean => !isPlaceholderName(name) && !isDefaultPlayerName(name);
+const shownName = (name: string | null | undefined): boolean => !isPlaceholderName(name) && !isGeneratedName(name);
 
 /** Global board rows as players see them: chosen names only, with the title each player shows. */
 export function toBoardEntries<T extends BoardRow>(rows: T[] | null | undefined): Array<Omit<T, 'display_name'> & { display_name?: string; title: string | null }> {
