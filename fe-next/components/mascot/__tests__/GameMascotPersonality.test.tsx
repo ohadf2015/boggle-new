@@ -87,6 +87,18 @@ describe('GameMascotReactions personality', () => {
       expect(gagCalls().at(-1)?.[1]).toMatchObject({ gag: 'dictionary-bonk', mode: 'singleplayer' });
     });
 
+    it('slams the book shut with its sound as the dictionary lands', () => {
+      render(<Full />);
+      reject();
+      reject();
+      act(() => vi.advanceTimersByTime(10_000));
+      playSound.mockClear();
+      reject();
+      act(() => vi.advanceTimersByTime(700));
+      expect(playSound).toHaveBeenCalledWith('gagBookSlam', expect.objectContaining({ requiresGameActive: false }));
+      expect(playSound).toHaveBeenCalledWith(SIGNATURE_CRY.sound, expect.anything());
+    });
+
     it('holds back the timer in the last 10 seconds', () => {
       const { rerender } = render(<Full remainingTime={11} />);
       rerender(<Full remainingTime={10} />);
