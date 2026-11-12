@@ -9,6 +9,7 @@
  * - Players ready for next game
  */
 
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
@@ -179,16 +180,8 @@ export function useResultsSocketEvents({
       neoInfoToast(title, { description: message, duration: 8000 });
     };
 
-    const handleWeeklyQuestCompleted = (data: { questType: string; xpReward: number; description: string }) => {
-      import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
-        showQuestCompletionToast({
-          questName: t(data.description),
-          xpReward: data.xpReward,
-          dedupKey: `weekly:${data.questType}`,
-          t,
-        });
-      });
-    };
+    // useWeeklyQuest toasts it behind the server's celebrated flag; toasting here too showed it twice.
+    const handleWeeklyQuestCompleted = () => requestQuestCheck();
 
     socket.on('showWordFeedback', handleShowWordFeedback);
     socket.on('voteRecorded', handleVoteRecorded);

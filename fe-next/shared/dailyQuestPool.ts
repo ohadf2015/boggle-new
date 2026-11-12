@@ -297,7 +297,7 @@ export const MIN_DAILY_COMPLETABLE = 2;
  * stores completion per SLOT: switching mid-day would move today's flags onto
  * different quests.
  */
-export const QUEST_POOL_V2_START = '2026-11-13';
+export const QUEST_POOL_V2_START = '2026-11-14';
 
 export const DAILY_QUEST_POOL_V2: DailyQuest[] = [
   ...DAILY_QUEST_POOL,
