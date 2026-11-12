@@ -177,6 +177,22 @@ describe('teacherControlsHandler', () => {
       expect(mocks.endGame).toHaveBeenCalledWith(io, 'CLS1');
     });
 
+    it('Given the server lost the host socket (restart), When endRoundNow arrives, Then the host is told it was not applied', async () => {
+      mocks.getGameBySocketId.mockReturnValue(undefined);
+      const { socket, handlers } = createSocket();
+      await handlers.endRoundNow();
+      expect(mocks.endGame).not.toHaveBeenCalled();
+      expect(socket.emit).toHaveBeenCalledWith('teacherControlRejected', { action: 'endRoundNow', reason: 'not_in_room' });
+    });
+
+    it('Given the rate limit trips, When endRoundNow arrives, Then only rateLimited is sent', async () => {
+      mocks.checkRateLimit.mockReturnValue(false);
+      const { socket, handlers } = createSocket();
+      await handlers.endRoundNow();
+      expect(socket.emit).toHaveBeenCalledWith('rateLimited');
+      expect(socket.emit).not.toHaveBeenCalledWith('teacherControlRejected', expect.anything());
+    });
+
     it('skipTargetWord → skipWordHuntTarget', async () => {
       const { handlers } = createSocket();
       await handlers.skipTargetWord();

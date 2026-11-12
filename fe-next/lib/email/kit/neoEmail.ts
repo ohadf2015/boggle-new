@@ -64,6 +64,7 @@ export function escapeHtml(s: string): string {
 
 const FONT = "'Arial Black',Arial,Helvetica,sans-serif";
 const BODY = 'Arial,Helvetica,sans-serif';
+const WORDMARK = "'Arial Black',Arial,sans-serif";
 
 /** 3px black border with a 7px edge on the reading-end side and bottom: the hard shadow. */
 function hard(dir: 'ltr' | 'rtl', w = 7): string {
@@ -131,7 +132,7 @@ export function renderNeoEmail(e: NeoEmail): string {
     .filter(Boolean)
     .join('<br>');
 
-  return `<!doctype html>
+  const html = `<!doctype html>
 <html dir="${e.dir}" lang="${e.lang}">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light only"><meta name="supported-color-schemes" content="light only">
 <style>@media (max-width:520px){.neo-art{display:block!important;width:100%!important;padding:16px 0 0 0!important}.neo-hero{display:block!important;width:100%!important;text-align:center!important}.neo-pad{padding-left:20px!important;padding-right:20px!important}.neo-h1{font-size:28px!important}.neo-btn{display:block!important}}</style></head>
@@ -140,7 +141,7 @@ export function renderNeoEmail(e: NeoEmail): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${NEO_COLORS.page};">
 <tr><td align="center" style="padding:24px 10px 32px 10px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
-<tr><td dir="ltr" align="left" style="padding:0 4px 14px 4px;font-family:${FONT};font-size:24px;color:${NEO_ACCENTS.lime};letter-spacing:0.5px;"><img src="${base}/icon-192.png" width="34" height="34" alt="" style="vertical-align:middle;border:2px solid ${NEO_COLORS.black};border-radius:8px;">&nbsp; LexiClash</td></tr>
+<tr><td dir="ltr" align="left" style="padding:0 4px 14px 4px;font-family:${WORDMARK};font-size:24px;color:${NEO_ACCENTS.lime};letter-spacing:0.5px;"><img src="${base}/icon-192.png" width="34" height="34" alt="" style="vertical-align:middle;border:2px solid ${NEO_COLORS.black};border-radius:8px;">&nbsp; LexiClash</td></tr>
 <tr><td style="background:${NEO_COLORS.card};${hard(e.dir)}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
 <tr><td style="background:${accent};border-bottom:3px solid ${NEO_COLORS.black};">
@@ -167,4 +168,17 @@ ${foot ? `<tr><td dir="${e.dir}" align="center" style="padding:22px 20px 0 20px;
 </table>
 </td></tr></table>
 </body></html>`;
+  return /^(ja|zh|ko)\b/.test(e.lang) ? cjkType(html) : html;
+}
+
+const CJK_FACES = "'Hiragino Kaku Gothic ProN','Hiragino Sans',Meiryo,'Yu Gothic','Noto Sans JP'";
+
+/** Arial Black has no kana, so Japanese fell back to a thin face beside heavy Latin; letter-spacing split the kana apart. */
+function cjkType(html: string): string {
+  return html
+    .replace(/font-family:'Arial Black',Arial,Helvetica,sans-serif;?/g, `font-family:${CJK_FACES},Arial,sans-serif;font-weight:700;`)
+    .replace(/font-family:Arial,Helvetica,sans-serif/g, `font-family:${CJK_FACES},Arial,sans-serif`)
+    .replace(/letter-spacing:[\d.]+px;?|text-transform:uppercase;?/g, '')
+    .replace(/(<h1 class="neo-h1" style="[^"]*?)font-size:32px;/, '$1font-size:26px;word-break:auto-phrase;')
+    .replace('.neo-h1{font-size:28px!important}', '.neo-h1{font-size:23px!important}');
 }

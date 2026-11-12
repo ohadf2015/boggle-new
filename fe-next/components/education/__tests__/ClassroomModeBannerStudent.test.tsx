@@ -59,9 +59,10 @@ describe('ClassroomModeBanner - the student mode strip', () => {
     expect(screen.getByText('ELA Period 3')).toBeTruthy();
   });
 
-  it('keeps the host panel on the results screen', () => {
-    renderBanner({ isHost: true, liveGame: liveGame('classic'), showResults: true });
-    expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
+  it('Given the host on the results screen, Then only the slim class strip shows, with no second join code', () => {
+    renderBanner({ isHost: true, liveGame: liveGame('classic'), showResults: true, expanded: false });
+    expect(screen.getByText('ELA Period 3')).toBeTruthy();
+    expect(screen.queryByText('education.classroomGame.shareCode')).toBeNull();
   });
 });
 

@@ -9,6 +9,7 @@ import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
 import { LobbyReactions } from '@/components/lobby/LobbyReactions';
 import ProjectorLobby from '@/components/education/projector/ProjectorLobby';
+import type { LessonWordsBlock } from '@/components/education/projector/ProjectorStartBar';
 import { useLobbyRoster } from './lobbyPresence';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { useHostSelectedGameMode } from '@/hooks/gameState/store';
@@ -81,6 +82,8 @@ interface TvLobbyViewProps {
   lessonName?: string;
   /** How many vocabulary words that lesson carries. */
   wordCount?: number;
+  /** Classroom without a local lesson copy: Start waits for the lesson's words from the room record. */
+  lessonWordsBlock?: LessonWordsBlock;
   /** The teacher's own copy of the room settings, before the server record lands. */
   classroomTemplateSettings?: {
     timerSeconds: number;
@@ -121,6 +124,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   classroomGameMode,
   lessonName,
   wordCount,
+  lessonWordsBlock,
   classroomTemplateSettings = null,
 }) => {
   const { isAdmin, canSeeInWorkModes } = useAuth();
@@ -273,6 +277,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
           practiceRoundPending={soloDemoInProgress}
           practiceRoundFailed={soloDemoFailed}
           practiceRoundFailedKey={soloDemoFailedKey}
+          lessonWordsBlock={lessonWordsBlock}
         />
         {practiceRun.seatTimedOut ? <PracticeSeatTimeoutNotice onBotsOnly={practiceRun.startBotsOnly} onRetry={practiceRun.retry} t={t} /> : null}
         {/* Receive-only emoji floats — students fling reactions, the wall shows them. */}

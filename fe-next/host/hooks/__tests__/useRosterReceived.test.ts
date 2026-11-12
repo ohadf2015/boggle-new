@@ -49,4 +49,39 @@ describe('useRosterReceived', () => {
     rerender({ code: 'CD34' });
     expect(result.current).toBe(false);
   });
+
+  it('Given the host view mounts with the roster from the join reply, Then the roster is already known', () => {
+    const { socket } = fakeSocket();
+    const { result } = renderHook(() => useRosterReceived(socket, 'AB12', true));
+    expect(result.current).toBe(true);
+  });
+
+  it('Given the host view mounts with no roster from the join reply, Then the roster is unknown', () => {
+    const { socket } = fakeSocket();
+    const { result } = renderHook(() => useRosterReceived(socket, 'AB12', false));
+    expect(result.current).toBe(false);
+  });
+
+  it('Given a seeded roster and a reconnect, When no fresh payload has arrived, Then the roster is unknown again', () => {
+    const { socket, emit } = fakeSocket();
+    const { result } = renderHook(() => useRosterReceived(socket, 'AB12', true));
+    act(() => emit('connect'));
+    expect(result.current).toBe(false);
+  });
+
+  it('Given a reconnect, When the rejoin reply for this room arrives, Then the roster is known again', () => {
+    const { socket, emit } = fakeSocket();
+    const { result } = renderHook(() => useRosterReceived(socket, 'AB12', true));
+    act(() => emit('connect'));
+    act(() => emit('joined', { gameCode: 'AB12', users: [{ username: 'Ms K', isHost: true }] }));
+    expect(result.current).toBe(true);
+  });
+
+  it('Given a join reply for another room or without a player list, Then it does not count', () => {
+    const { socket, emit } = fakeSocket();
+    const { result } = renderHook(() => useRosterReceived(socket, 'AB12'));
+    act(() => emit('joined', { gameCode: 'ZZ99', users: [] }));
+    act(() => emit('joined', { gameCode: 'AB12' }));
+    expect(result.current).toBe(false);
+  });
 });

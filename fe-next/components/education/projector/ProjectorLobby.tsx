@@ -12,7 +12,7 @@ import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import ProjectorJoinPanel from './ProjectorJoinPanel';
 import ProjectorRoster, { type ProjectorStudent } from './ProjectorRoster';
 import { ProjectorModeCard } from './ProjectorModeCard';
-import { ProjectorStartBar } from './ProjectorStartBar';
+import { ProjectorStartBar, type LessonWordsBlock } from './ProjectorStartBar';
 import { ProjectorWordPanel } from './ProjectorWordPanel';
 import { studentsNotReady } from './projectorLobbyModel';
 import { ProjectorLobbyLock } from './ProjectorLobbyLock';
@@ -54,6 +54,7 @@ export interface ProjectorLobbyProps {
   practiceRoundFailed?: boolean;
   /** Message for the failure: the server's refusal reason, or the generic connection line. */
   practiceRoundFailedKey?: string;
+  lessonWordsBlock?: LessonWordsBlock;
 }
 
 const CHIP = cn(WALL_STICKER, '@5xl:px-[0.8em]');
@@ -84,6 +85,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   practiceRoundPending = false,
   practiceRoundFailed = false,
   practiceRoundFailedKey,
+  lessonWordsBlock,
 }) {
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
   const classCode = useProjectorClassCode(lobby.classroomId);
@@ -188,6 +190,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
             practiceRoundFailedKey={practiceRoundFailedKey}
+            lessonWordsBlock={lessonWordsBlock}
             style={delay(4)}
             className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'}
           />
