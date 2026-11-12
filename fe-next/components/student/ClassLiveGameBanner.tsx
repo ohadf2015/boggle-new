@@ -61,7 +61,7 @@ function LiveBanner({ classroomId, userId, username }: LiveProps) {
             data-testid="class-live-banner-join"
             onClick={onJoin}
             disabled={isJoining}
-            className="min-h-12 flex-1 rounded-neo border-3 border-neo-black bg-neo-navy px-3 font-neo-display text-base font-black uppercase text-neo-lime shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-70"
+            className="min-h-12 flex-1 rounded-neo border-3 border-neo-lime bg-neo-navy px-3 font-neo-display text-base font-black uppercase text-neo-lime shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-70"
           >
             {t('academy.student.ctaLive')}
           </button>
