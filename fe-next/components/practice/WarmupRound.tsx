@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
 import { DIFFICULTIES } from '@/utils/consts';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import {
   ArrowLeft,
   RotateCcw,
@@ -143,8 +144,10 @@ export default function WarmupRound({
     // Use language-aware normalization (handles Hebrew final letters, etc.)
     const normalizedWord = normalizeWord(word, language);
 
-    // Skip if already found
-    if (foundWords.includes(normalizedWord)) return;
+    if (foundWords.includes(normalizedWord)) {
+      emitMascotEvent({ kind: 'duplicate-word' });
+      return;
+    }
 
     // Calculate score (longer words = more points)
     const wordScore = word.length * 10 + (word.length > 4 ? (word.length - 4) * 5 : 0);
@@ -154,6 +157,7 @@ export default function WarmupRound({
     setFoundWords((prev) => [...prev, normalizedWord]);
     setScore((prev) => prev + wordScore + bonusScore);
     playWordAcceptedSound();
+    emitMascotEvent({ kind: 'word-submitted', wordLength: normalizedWord.length, gemLetterUsed: false });
 
     if (isVocab) {
       setVocabularyFound((prev) => [...prev, normalizedWord]);

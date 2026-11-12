@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import GridComponent from '@/components/GridComponent';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import { useContainerDimensions } from '@/hooks/useContainerDimensions';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   ArrowLeft,
@@ -130,6 +131,8 @@ export default function SoloPracticeBoard({
     return vocabularyWords.includes(normalizedWord);
   }, [vocabularyWords, language]);
 
+  const acceptedRef = useRef<Set<string>>(new Set());
+
   // Word submission with dictionary validation and feedback
   const {
     foundWords: hookFoundWords,
@@ -145,14 +148,18 @@ export default function SoloPracticeBoard({
     t,
     onWordAccepted: (word) => {
       playWordAcceptedSound();
+      acceptedRef.current.add(word);
+      // No word text: the joke-reading gags stay out of classroom practice.
+      emitMascotEvent({ kind: 'word-submitted', wordLength: word.length, gemLetterUsed: false });
       const isVocab = isVocabularyWordCheck(word);
       if (isVocab) {
         setVocabularyFound((prev) => [...prev, word]);
       }
       onWordFound?.(word, isVocab);
     },
-    onWordRejected: () => {
+    onWordRejected: (word) => {
       playWordRejectedSound();
+      emitMascotEvent({ kind: acceptedRef.current.has(word) ? 'duplicate-word' : 'word-rejected' });
     },
   });
 
@@ -182,6 +189,7 @@ export default function SoloPracticeBoard({
     if (next) setGrid(next.grid);
     setVocabularyFound([]);
     resetSubmission();
+    acceptedRef.current.clear();
     setFormingWord('');
     setFormingLetterCount(0);
   }, [generateBoard, boardSeed, resetSubmission]);
