@@ -11,6 +11,12 @@ import { RehearsalBotsBlocked } from './RehearsalBotsBlocked';
 import { canStartProjectorRound, projectorStartLabel } from './projectorLobbyModel';
 import type { useProjectorLobbyMode } from './useProjectorLobbyMode';
 
+/** The lesson's words are not loaded yet (no local copy on this device): Start waits for them. */
+export interface LessonWordsBlock {
+  status: 'loading' | 'error';
+  onRetry: () => void;
+}
+
 interface ProjectorStartBarProps {
   gameCode: string;
   t: Translate;
@@ -29,6 +35,7 @@ interface ProjectorStartBarProps {
   practiceRoundFailed: boolean;
   /** Sits beside Start in the same row. */
   lockSlot?: ReactNode;
+  lessonWordsBlock?: LessonWordsBlock;
   className?: string;
   style?: CSSProperties;
 }
@@ -48,16 +55,16 @@ export function ProjectorStartBar({
   practiceRoundPending,
   practiceRoundFailed,
   lockSlot,
+  lessonWordsBlock,
   className,
   style,
 }: ProjectorStartBarProps) {
   const canStart = canStartProjectorRound(studentCount);
   const botsCanRehearse = modeAllowsRehearsalBots(lobby.mode);
-  const startLocked = !canStart || starting || lobby.quizBlocked;
-  // Empty room: rehearsing is the one live action, so the locked Start steps aside for it.
+  const startLocked = !canStart || starting || lobby.quizBlocked || !!lessonWordsBlock;
+  // Empty room: the locked Start stays on screen with its reason, and the rehearsal option sits under it.
   const rehearseHere = !canStart && !!onStartPracticeRound && botsCanRehearse;
   const botsBlocked = !canStart && !!onStartPracticeRound && !botsCanRehearse && !lobby.quizBlocked;
-  const altPrimary = rehearseHere || botsBlocked || lobby.quizBlocked;
   const waitingOnClass = canStart && stillLearning > 0 && !starting;
   const label = waitingOnClass ? 'education.projectorLobby.startAnyway' : projectorStartLabel({ starting, canStart, isBoss: lobby.modeId === BOSS_BATTLE_ID, switched: lobby.switched, isQuiz: lobby.isQuiz, startLabelKey });
 
@@ -95,13 +102,13 @@ export function ProjectorStartBar({
             'normal-case tracking-normal',
             canStart && !waitingOnClass
               ? 'min-h-16 flex-[2_1_14rem] px-6 py-3 text-[clamp(1.5rem,min(3cqw,5.5cqh),4.5rem)]'
-              : 'min-h-12 flex-[1_1_14rem] px-4 py-2 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]',
+              : cn('min-h-12 px-4 py-2 text-[clamp(1rem,min(1.4cqw,2.6cqh),2rem)]', canStart ? 'flex-[1_1_14rem]' : 'flex-[1_1_100%]'),
             startLocked
               ? 'border-[3px] border-dashed border-neo-cream/50 bg-neo-navy-light font-bold text-neo-cream/80 shadow-none hover:translate-y-0 hover:shadow-none'
               : waitingOnClass
                 ? 'border-[3px] border-neo-cream/50 bg-neo-navy-elevated font-bold text-neo-cream shadow-hard'
                 : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
-            (lobby.quizBlocked || (!canStart && altPrimary)) && 'hidden'
+            lobby.quizBlocked && 'hidden'
           )}
         >
           {starting ? <Loader2 className="size-[0.8em] animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Play className="size-[0.8em]" fill="currentColor" aria-hidden="true" />}
@@ -131,7 +138,7 @@ export function ProjectorStartBar({
           </div>
         )}
         {botsBlocked && onStartPracticeRound && (
-          <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} onRehearse={onStartPracticeRound} className="flex-[1_1_12rem]" />
+          <RehearsalBotsBlocked gameCode={gameCode} currentMode={lobby.modeId} t={t} onApplied={lobby.applyMode} onRehearse={onStartPracticeRound} showNote={false} className="flex-[1_1_12rem]" />
         )}
         {lockSlot}
       </div>
@@ -142,11 +149,21 @@ export function ProjectorStartBar({
       )}
       {!canStart && (
         <p data-testid="projector-start-reason" role="status" className="font-neo-body text-neo-cream/75 text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
-          <span className={cn('block', altPrimary && '@max-5xl:hidden')}>{t('eduLiveRoom.lobby.startBlocked')}</span>
+          <span className="block">{t('eduLiveRoom.lobby.startBlocked')}</span>
           {rehearseHere && (
             <span data-testid="rehearsal-private-note" className="block">
               {t('education.projectorLobby.rehearsePrivate')}
             </span>
+          )}
+        </p>
+      )}
+      {lessonWordsBlock && (
+        <p data-testid="projector-lesson-words" role="alert" className="flex flex-wrap items-center gap-2 font-neo-body font-bold text-neo-yellow text-[clamp(0.8125rem,min(1cqw,1.9cqh),1.375rem)]">
+          {t(lessonWordsBlock.status === 'loading' ? 'education.projectorLobby.lessonWordsLoading' : 'education.projectorLobby.lessonWordsFailed')}
+          {lessonWordsBlock.status === 'error' && (
+            <button type="button" data-testid="projector-lesson-words-retry" onClick={lessonWordsBlock.onRetry} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 text-sm font-black text-neo-black shadow-hard-sm', PRESS)}>
+              {t('education.projectorLobby.lessonWordsRetry')}
+            </button>
           )}
         </p>
       )}

@@ -9,6 +9,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '../../components/ui/alert-dialog';
+import type { ClassroomExitPhase } from './exitConfirmModel';
+import type { EndRoundRequest } from '../hooks/useEndRoundRequest';
+import { CLASSROOM_FOOTER, DESTRUCTIVE, QUIET, RoundExitConfirm } from './RoundExitConfirm';
 
 interface ExitConfirmDialogProps {
   open: boolean;
@@ -17,8 +20,10 @@ interface ExitConfirmDialogProps {
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, params?: Record<string, string | number>) => string;
   /** Classroom host: no host hand-off exists, so the copy says the room closes. */
   classroom?: boolean;
-  /** Classroom only: `lobby` when no round has started, so the copy never offers to "keep playing". */
-  phase?: 'lobby' | 'game';
+  /** Classroom only: `lobby` before any round, `round` while one runs, `game` on results. */
+  phase?: ClassroomExitPhase;
+  /** Classroom `round` phase: ends the round for everyone instead of closing the room. */
+  endRound?: EndRoundRequest;
 }
 
 const CLASSROOM_KEYS = {
@@ -26,7 +31,7 @@ const CLASSROOM_KEYS = {
   lobby: { title: 'eduLive.exit.lobbyTitle', body: 'eduLive.exit.lobbyBody', stay: 'eduLive.exit.lobbyStay', confirm: 'eduLive.exit.lobbyConfirm' },
 } as const;
 
-const DESTRUCTIVE = 'bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed';
+const CLASSROOM_CONTENT = 'bg-neo-navy text-neo-cream border-[3px] border-neo-cream shadow-hard-lg';
 
 export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function ExitConfirmDialog({
   open,
@@ -35,6 +40,7 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
   t,
   classroom = false,
   phase = 'game',
+  endRound,
 }) {
   if (!classroom) {
     return (
@@ -57,24 +63,35 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
     );
   }
 
-  const keys = CLASSROOM_KEYS[phase];
+  if (phase === 'round' && endRound) {
+    return (
+      <AlertDialog open={open} onOpenChange={onOpenChange}>
+        <AlertDialogContent data-testid="classroom-exit-confirm" data-phase="round" className={CLASSROOM_CONTENT}>
+          {/* Keyed on open so a reopened dialog starts on the first question. */}
+          <RoundExitConfirm key={String(open)} t={t} endRound={endRound} onCloseRoom={onConfirm} />
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  const keys = CLASSROOM_KEYS[phase === 'lobby' ? 'lobby' : 'game'];
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
         data-testid="classroom-exit-confirm"
         data-phase={phase}
-        className="bg-neo-navy text-neo-cream border-[3px] border-neo-cream shadow-hard-lg"
+        className={CLASSROOM_CONTENT}
       >
         <AlertDialogHeader>
           <AlertDialogTitle className="font-neo-display font-black uppercase text-neo-cream">{t(keys.title)}</AlertDialogTitle>
           <AlertDialogDescription className="font-bold text-neo-cream/90">{t(keys.body)}</AlertDialogDescription>
         </AlertDialogHeader>
         {/* The host pressed exit, so the exit leads: first in reading order (LTR and RTL) and the only filled button. */}
-        <AlertDialogFooter className="flex-col gap-3 sm:flex-row sm:justify-start sm:space-x-0">
+        <AlertDialogFooter className={CLASSROOM_FOOTER}>
           <AlertDialogAction onClick={onConfirm} className={`min-h-12 font-neo-display text-base font-black ${DESTRUCTIVE}`}>
             {t(keys.confirm)}
           </AlertDialogAction>
-          <AlertDialogCancel className="mt-0 min-h-12 border-2 border-neo-cream/60 bg-transparent font-bold text-neo-cream shadow-none! hover:translate-x-0 hover:translate-y-0 hover:bg-neo-navy-light hover:text-neo-cream hover:shadow-none! active:shadow-none!">
+          <AlertDialogCancel className={`mt-0 min-h-12 ${QUIET}`}>
             {t(keys.stay)}
           </AlertDialogCancel>
         </AlertDialogFooter>

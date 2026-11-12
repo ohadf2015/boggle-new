@@ -127,15 +127,14 @@ describe('ClassroomModeBanner — the student half of a classroom lobby', () => 
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('treats an unspecified viewer as the host, so the teacher screen cannot regress', () => {
-    renderBanner({ liveGame: null });
-    expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
+  it('treats an unspecified viewer as the host, so it stands down for the projector board too', () => {
+    const { container } = renderBanner({ liveGame: null });
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it('still carries the code for a teacher whose tab has no lesson copy (no projector)', () => {
-    renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: null });
-    expect(screen.getByText('education.classroomGame.shareCode')).toBeTruthy();
-    expect(screen.getByText('JATS5Z')).toBeTruthy();
+  it('stands down for a teacher whose tab has no lesson copy: the projector board is forced and owns the code', () => {
+    const { container } = renderBanner({ isHost: true, liveGame: liveQuiz, lessonData: null });
+    expect(container).toBeEmptyDOMElement();
   });
 
   /**

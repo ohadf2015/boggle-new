@@ -122,8 +122,8 @@ export interface UseHostViewStateOptions {
   initialPlayers?: Player[];
   roomLanguage?: Language;
   defaultLanguage?: Language;
-  /** Lesson data indicates classroom game — force TV mode (hostPlaying=false) for projecting teacher */
-  hasLessonData?: boolean;
+  /** Classroom host (room flag or saved lesson data): always the host board (hostPlaying=false). */
+  classroomHost?: boolean;
 }
 
 export interface UseHostViewStateReturn {
@@ -220,7 +220,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     initialPlayers = [],
     roomLanguage: roomLanguageProp,
     defaultLanguage = 'en',
-    hasLessonData = false,
+    classroomHost = false,
   } = options;
 
   const resolvedRoomLanguage = (roomLanguageProp || defaultLanguage) as Language;
@@ -236,7 +236,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // This is a HARD REQUIREMENT, not a default — override any prior session's preference.
   // Dual-source-of-truth bug (repo pitfall #1): localStorage holds prior sessions' TV-mode
   // toggles. A teacher who previously hosted gets stored hostPlayingEnabled=true, which
-  // overrides defaults. Solution: when hasLessonData=true, force hostPlaying=false regardless
+  // overrides defaults. Solution: when classroomHost=true, force hostPlaying=false regardless
   // of stored value. Never write TV mode back into localStorage for classroom games.
   const [hostPlayingStoredValue, setHostPlayingStoredValue] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
 
@@ -245,9 +245,9 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
   );
 
-  // Priority: classroom (hasLessonData) > mobile > localStorage
+  // Priority: classroom > mobile > localStorage
   const hostPlayingEnabled = (() => {
-    if (hasLessonData) return false; // Classroom: teacher projects (TV mode)
+    if (classroomHost) return false; // Classroom: teacher projects (TV mode)
     if (isMobileRef.current) return true; // Mobile: player mode only
     return hostPlayingStoredValue; // Desktop, non-classroom: use preference
   })();
@@ -256,11 +256,11 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // would invalidate it every time.
   const setHostPlayingEnabled = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
     // Only write to localStorage for non-classroom, non-mobile cases
-    if (!hasLessonData && !isMobileRef.current) {
+    if (!classroomHost && !isMobileRef.current) {
       const newVal = typeof value === 'function' ? value(hostPlayingStoredValue) : value;
       setHostPlayingStoredValue(newVal);
     }
-  }, [hasLessonData, hostPlayingStoredValue, setHostPlayingStoredValue]);
+  }, [classroomHost, hostPlayingStoredValue, setHostPlayingStoredValue]);
 
   const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
   const [tournamentRounds, setTournamentRounds] = useState<number>(3);
