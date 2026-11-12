@@ -88,4 +88,29 @@ describe('useDailyPlayedStatus — a new UTC day never reuses yesterday', () => 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(String(fetchMock.mock.calls[1][0])).toContain('userId=u1');
   });
+
+  it('given a request that never answers (app frozen mid-request), then a later ask after the stuck window starts a fresh one', async () => {
+    let calls = 0;
+    const fetchMock = vi.fn(() => {
+      calls += 1;
+      if (calls === 1) return new Promise<Response>(() => {});
+      return Promise.resolve(new Response(JSON.stringify(answer('2026-11-11', NONE)), { status: 200 }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    renderHook(() => useDailyPlayedStatus());
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    vi.setSystemTime(new Date('2026-11-11T21:10:30Z'));
+    await revalidateDailyPlayedStatus();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('given a signed-in session whose profile has not loaded, then it still asks the server', async () => {
+    auth.value = { user: { id: 'u1' }, isAuthenticated: false, loading: false };
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify(answer('2026-11-11', ALL)), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const { result } = renderHook(() => useDailyPlayedStatus());
+    await waitFor(() => expect(result.current.fromServer).toBe(true));
+    expect(result.current.today).toEqual(ALL);
+  });
 });
