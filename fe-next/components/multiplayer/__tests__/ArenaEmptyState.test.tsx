@@ -24,12 +24,11 @@ vi.mock('next/link', () => ({
 
 import ArenaEmptyState from '../ArenaEmptyState';
 
-const props = { languageName: 'Hebrew', onStart: vi.fn() };
+const props = { languageName: 'Hebrew' };
 
 describe('ArenaEmptyState', () => {
   beforeEach(() => {
     tMock.mockClear();
-    props.onStart.mockClear();
   });
   afterEach(() => {
     cleanup();
@@ -49,11 +48,11 @@ describe('ArenaEmptyState', () => {
     expect(container.querySelector('img')).toHaveAttribute('loading', 'eager');
   });
 
-  it('Given the empty state, When START ONE is pressed, Then it starts a room and nothing links out of MP', () => {
+  // The entry keeps one CREATE (footer / side column); the line points at QUICK START.
+  it('Given the empty state, When shown, Then it adds no second CREATE and nothing links out of MP', () => {
     const { container } = render(<ArenaEmptyState {...props} />);
-    fireEvent.click(screen.getByTestId('arena-empty-start'));
-    expect(props.onStart).toHaveBeenCalledTimes(1);
-    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(screen.queryByTestId('arena-empty-start')).toBeNull();
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
     expect(container.querySelector('a')).toBeNull();
   });
 

@@ -21196,7 +21196,6 @@ const he = {
       "moreArenas": "עוד {{count}}",
       "allArenas": "כל המשחקים הפתוחים",
       "emptyInLanguage": "אין כרגע משחקים פתוחים ב{{language}}",
-      "startOne": "פתחו משחק",
       "openElsewhere": "{{count}} פתוחים ב{{language}}",
       "joinRow": "הצטרפו",
       "roomLanguage": "שפת החדר",

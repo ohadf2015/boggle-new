@@ -20954,7 +20954,6 @@ const ru = {
       "moreArenas": "Ещё {{count}}",
       "allArenas": "Все открытые игры",
       "emptyInLanguage": "Сейчас нет открытых игр (язык: {{language}})",
-      "startOne": "Начать свою",
       "openElsewhere": "Открыто {{count}} · язык: {{language}}",
       "joinRow": "Войти",
       "roomLanguage": "Язык комнаты",

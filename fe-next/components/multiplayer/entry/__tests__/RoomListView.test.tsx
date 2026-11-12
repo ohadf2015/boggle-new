@@ -32,7 +32,7 @@ const rooms: ActiveRoom[] = [
 ];
 const props = {
   activeRooms: rooms, roomsLoading: false, onRefreshRooms: vi.fn(), onRoomClick: vi.fn(), onCreateRoom: vi.fn(),
-  onJoinCode: vi.fn(), roomLanguage: 'en' as const, onRoomLanguageChange: vi.fn(), onStartRoom: vi.fn(),
+  onJoinCode: vi.fn(), roomLanguage: 'en' as const, onRoomLanguageChange: vi.fn(),
 };
 
 describe('RoomListView (entry body)', () => {
