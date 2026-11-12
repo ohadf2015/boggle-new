@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { NextRequest } from 'next/server';
 
-const state = vi.hoisted(() => ({ user: { id: 'user-1' } as { id: string } | null, row: null as unknown, error: null as unknown }));
+const state = vi.hoisted(() => ({ user: { id: 'user-1' } as { id: string } | null, row: null as unknown, error: null as unknown, cols: '' }));
 
 vi.mock('@/lib/auth/getAuthedUser', () => ({ getAuthedUser: async () => state.user }));
 vi.mock('@/lib/admin/adminNotifications', () => ({ notifyAdmins: vi.fn() }));
@@ -9,7 +9,7 @@ vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: () => null }));
 vi.mock('@/utils/supabase/server', () => ({
   createClient: async () => ({
     from: () => ({
-      select: () => ({
+      select: (cols: string) => ((state.cols = cols), {
         eq: () => ({
           order: () => ({ limit: () => ({ maybeSingle: async () => ({ data: state.row, error: state.error }) }) }),
         }),
@@ -49,5 +49,23 @@ describe('GET /api/education/access-request', () => {
     const body = await res.json();
     expect(body).toEqual({ ok: false, error: 'lookup_failed', code: 'lookup_failed' });
     expect(JSON.stringify(body)).not.toContain('timeout');
+  });
+
+  it('Given a pending or approved row, Then admin review fields never reach the browser and the select names its columns', async () => {
+    state.row = { id: 'r1', status: 'approved', admin_note: 'internal: check school', reviewed_by: 'admin-1', reviewed_at: '2026-11-01T00:00:00Z', email: 'jane@school.edu', created_at: '2026-11-01T00:00:00Z', trial_expires_at: null };
+    const body = await (await GET(req())).json();
+    expect(body.row).not.toHaveProperty('admin_note');
+    expect(body.row).not.toHaveProperty('reviewed_by');
+    expect(body.row).not.toHaveProperty('email');
+    expect(body.row).toMatchObject({ id: 'r1', status: 'approved' });
+    expect(state.cols).not.toContain('*');
+    expect(state.cols).not.toContain('reviewed_by');
+  });
+
+  it('Given a declined row, Then its note comes along, since it is the reason the decline email already sent the applicant', async () => {
+    state.row = { id: 'r1', status: 'declined', admin_note: 'Please use your school email', reviewed_by: 'admin-1' };
+    const body = await (await GET(req())).json();
+    expect(body.row.admin_note).toBe('Please use your school email');
+    expect(body.row).not.toHaveProperty('reviewed_by');
   });
 });

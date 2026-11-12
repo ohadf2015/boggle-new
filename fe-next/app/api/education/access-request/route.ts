@@ -13,6 +13,7 @@ import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 import { notifyAdmins } from '@/lib/admin/adminNotifications';
 import { teacherRequestNotice } from '@/lib/admin/adminEvents';
+import { accessStanding, type HistoryRow } from '@/lib/education/accessStanding';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -25,8 +26,6 @@ function bad(msg: string, status = 400) {
 function refuse(code: string, status: number) {
   return NextResponse.json({ ok: false, error: code, code }, { status });
 }
-
-type HistoryRow = { id: string; status: string; trial_expires_at: string | null };
 
 // The request row is already committed when this answers, so a generic 500
 // would lie ("Something went wrong" next to a durably filed request). 202 +
@@ -81,7 +80,10 @@ export async function POST(req: Request) {
   // Fail CLOSED on genuine profile fetch errors. maybeSingle() returns
   // { data: null, error: null } when the row simply does not exist (legitimate
   // for brand-new users); only a non-null error means "cannot verify, refuse to write".
-  if (profileError) return bad('profile fetch failed: ' + profileError.message, 500);
+  if (profileError) {
+    console.error('[access-request] profile fetch failed for', email, '-', profileError.message);
+    return refuse('lookup_failed', 500);
+  }
   const metaName =
     (user.user_metadata?.full_name as string | undefined) ||
     (user.user_metadata?.name as string | undefined) ||
@@ -100,32 +102,35 @@ export async function POST(req: Request) {
   }
 
   // Every branch reads this user's own history, so no press can undo a decline or start a second trial clock.
-  const history = await sb
-    .from('teacher_access_requests')
-    .select('id, status, trial_expires_at, created_at')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-  if (history.error) {
-    console.error('[access-request] history lookup failed for', email, '-', history.error.message);
-    return refuse('lookup_failed', 500);
-  }
-  const rows = (history.data ?? []) as HistoryRow[];
-  const latest = rows[0] ?? null;
-  const priorTrial = rows.find((r) => r.trial_expires_at)?.trial_expires_at ?? null;
-
-  if (latest?.status === 'declined') return refuse('declined', 403);
-  if (latest?.status === 'approved') {
-    // No column records whether the role was never set or was taken away, so a person decides.
+  const loadHistory = async (): Promise<HistoryRow[] | null> => {
+    const history = await sb
+      .from('teacher_access_requests')
+      .select('id, status, trial_expires_at, created_at, reviewed_at, reviewed_by')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false });
+    if (history.error) {
+      console.error('[access-request] history lookup failed for', email, '-', history.error.message);
+      return null;
+    }
+    return (history.data ?? []) as HistoryRow[];
+  };
+  const askForReview = async () => {
     await notifyAdmins({
       ...teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: false }),
       title: `Teacher access needs a look: ${full_name}`,
       dedupeKey: `teacher_access_review:${user.id}`,
     });
     return refuse('needs_review', 409);
-  }
+  };
+
+  let rows = await loadHistory();
+  if (!rows) return refuse('lookup_failed', 500);
+  let { standing, pending } = accessStanding(rows);
 
   const payload: TeacherAccessFormPayload = { email, full_name, role, locale, use_case, school_or_org, country };
-  if (latest?.status !== 'pending') {
+  const isNewRow = standing === 'new';
+  if (standing === 'new') {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const recent = await sb
       .from('teacher_access_requests')
@@ -134,14 +139,24 @@ export async function POST(req: Request) {
       .gte('created_at', since);
     if ((recent.count || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
 
-    const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
-    // The idempotency guard (short-circuit above) protects against most duplicate
-    // submits, so insert errors are real and should not be silently tolerated.
-    if (ins.error) {
-      console.error('[access-request] insert failed for', email, '-', ins.error.message);
+    const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id }).select('id').single();
+    if (ins.error && (ins.error as { code?: string }).code === '23505') {
+      // A concurrent press inserted first; converge on its row.
+      rows = await loadHistory();
+      if (!rows) return refuse('lookup_failed', 500);
+      ({ standing, pending } = accessStanding(rows));
+    } else if (ins.error || !ins.data) {
+      console.error('[access-request] insert failed for', email, '-', ins.error?.message ?? 'no row returned');
       return refuse('insert_failed', 500);
+    } else {
+      standing = 'pending';
+      pending = { id: (ins.data as { id: string }).id, status: 'pending', trial_expires_at: null, created_at: new Date().toISOString(), reviewed_at: null, reviewed_by: null };
     }
   }
+  if (standing === 'declined') return refuse('declined', 403);
+  if (standing === 'review' || !pending) return askForReview();
+  const pendingId = pending.id;
+  const priorTrial = rows.find((r) => r.trial_expires_at)?.trial_expires_at ?? null;
 
   // Every early exit below leaves the request pending; the owner still has to hear about it.
   const pendingAndTell = async () => {
@@ -153,7 +168,7 @@ export async function POST(req: Request) {
   };
 
   // Growth Radar server step: record request creation once durably inserted.
-  if (latest?.status !== 'pending') {
+  if (isNewRow) {
     try {
       captureProFunnelServerEvent(
         buildEduAccessRequestCreatedEvent(user.id, { role, locale, role_picked: rolePicked })
@@ -180,41 +195,43 @@ export async function POST(req: Request) {
 
   const trialExpiresAt = priorTrial ?? teacherTrialExpiry(Date.now());
   const nowIso = new Date().toISOString();
+  // Only the chosen row: the status check allows no "superseded" value, so older duplicate pending rows stay as they are.
   const approve = await admin
     .from('teacher_access_requests')
     .update({ status: 'approved', trial_expires_at: trialExpiresAt, reviewed_at: nowIso })
-    .eq('user_id', user.id)
+    .eq('id', pendingId)
     .eq('status', 'pending')
     .select('id');
-  // Approves this user's pending row. This insert just created exactly one
-  // (or the idempotency guard short-circuited), so the approval should match.
   if (approve.error) {
     console.error('[access-request] approval failed for', email, '-', approve.error.message);
     return pendingAndTell();
   }
   if (!approve.data?.length) {
-    // The racing twin request approved the row first — a double-submit
-    // converged on a single row. Confirm an approved request exists and
-    // report the same success instead of a bogus 500 (the twin owns the
-    // profile promotion and notification emails).
-    const { data: already } = await admin
-      .from('teacher_access_requests')
-      .select('id')
-      .eq('user_id', user.id)
-      .eq('status', 'approved')
-      .limit(1);
-    if (!already?.length) {
-      console.error('[access-request] approval matched no pending row and no approved twin for', email);
-      return pendingAndTell();
-    }
-    return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
+    // Another press changed this row first: succeed only if the role is really there now.
+    const [{ data: nowProfile }, { data: nowRow }] = await Promise.all([
+      admin.from('profiles').select('user_role').eq('id', user.id).maybeSingle(),
+      admin.from('teacher_access_requests').select('status').eq('id', pendingId).maybeSingle(),
+    ]);
+    if (isTeacherProfile(nowProfile)) return NextResponse.json({ ok: true, success: true, paidDay0: isPaidMedium(profile?.utm_medium) });
+    if (nowRow?.status === 'declined') return refuse('declined', 403);
+    console.error('[access-request] approval matched no pending row and the role is not set yet for', email);
+    return pendingAndTell();
   }
 
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
   if (promoted.error || !promoted.data?.length) {
     console.error('[access-request] profile promotion failed for', email, '-', promoted.error?.message ?? 'matched no row');
     // Back to pending (trial date kept) so the next press finishes it, instead of an approved row with no role.
-    await admin.from('teacher_access_requests').update({ status: 'pending' }).eq('id', approve.data[0].id).eq('status', 'approved').select('id');
+    const rollback = await admin
+      .from('teacher_access_requests')
+      .update({ status: 'pending' })
+      .eq('id', pendingId)
+      .eq('status', 'approved')
+      .select('id');
+    if (rollback.error || !rollback.data?.length) {
+      console.error('[access-request] rollback to pending failed for', email, '-', rollback.error?.message ?? 'matched no row');
+      return askForReview();
+    }
     return pendingAndTell();
   }
 
@@ -265,16 +282,27 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true, success: true, paidDay0 });
 }
 
+const APPLICANT_COLUMNS = 'id, status, role, use_case, created_at, trial_expires_at, admin_note';
+const APPLICANT_FIELDS = ['id', 'status', 'role', 'use_case', 'created_at', 'trial_expires_at'] as const;
+
+// The note travels only on a decline: it is the reason the decline email already sent the applicant.
+function applicantView(row: Record<string, unknown>): Record<string, unknown> {
+  const view: Record<string, unknown> = {};
+  for (const key of APPLICANT_FIELDS) if (key in row) view[key] = row[key];
+  if (row.status === 'declined' && 'admin_note' in row) view.admin_note = row.admin_note;
+  return view;
+}
+
 export async function GET(request: NextRequest) {
   const sb = await createClient();
   const user = await getAuthedUser(request);
   if (!user) return NextResponse.json({ row: null });
   const { data, error } = await sb.from('teacher_access_requests')
-    .select('*').eq('user_id', user.id)
+    .select(APPLICANT_COLUMNS).eq('user_id', user.id)
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
   if (error) {
     console.error('[access-request] request lookup failed for', user.id, '-', error.message);
     return refuse('lookup_failed', 500);
   }
-  return NextResponse.json({ row: data });
+  return NextResponse.json({ row: data ? applicantView(data as Record<string, unknown>) : null });
 }

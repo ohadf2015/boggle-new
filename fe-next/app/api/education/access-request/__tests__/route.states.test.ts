@@ -8,6 +8,8 @@ type Row = {
   trial_expires_at: string | null;
   school_or_org?: string | null;
   created_at: string;
+  reviewed_at?: string | null;
+  reviewed_by?: string | null;
 };
 
 const db = vi.hoisted(() => ({
@@ -16,6 +18,11 @@ const db = vi.hoisted(() => ({
   promoteFails: false,
   adminAvailable: true,
   seq: 0,
+  rollbackFails: false,
+  raceOnInsert: false,
+  stealApproval: null as null | 'with_role' | 'without_role',
+  profileError: false,
+  inserted: [] as Record<string, unknown>[],
 }));
 const notifyAdmins = vi.hoisted(() => vi.fn(async (_n: { dedupeKey?: string }) => true));
 const sendEmail = vi.hoisted(() => vi.fn(async (_a: unknown) => ({ ok: true })));
@@ -32,17 +39,32 @@ vi.mock('@/utils/supabase/server', () => ({
     from: (table: string) => ({
       select: (_cols: string, opts?: { head?: boolean }) => ({
         eq: (_k: string, _v: string) => ({
-          maybeSingle: async () => ({ data: { display_name: 'Jane', user_role: db.role }, error: null }),
-          order: async () => ({ data: [...db.rows].sort((a, b) => b.created_at.localeCompare(a.created_at)), error: null }),
+          maybeSingle: async () =>
+            db.profileError
+              ? { data: null, error: { message: 'relation "profiles" permission denied for secret_column' } }
+              : { data: { display_name: 'Jane', user_role: db.role }, error: null },
+          order: () => {
+            const res = Promise.resolve({ data: db.rows.map((r) => ({ ...r })), error: null });
+            return Object.assign(res, { order: () => res });
+          },
           gte: async () => ({ data: [], count: opts?.head ? db.rows.length : 0, error: null }),
         }),
       }),
-      insert: async (row: Partial<Row>) => {
-        if (table !== 'teacher_access_requests') return { error: null };
-        if (db.rows.some((r) => r.status === 'pending')) return { error: { code: '23505', message: 'duplicate' } };
-        db.seq += 1;
-        db.rows.push({ ...(row as Row), id: `r${db.seq}`, status: 'pending', trial_expires_at: null, created_at: `2026-11-12T10:00:0${db.seq}Z` });
-        return { error: null };
+      insert: (row: Partial<Row>) => {
+        const run = async () => {
+          db.inserted.push({ ...row });
+          if (db.raceOnInsert) {
+            db.raceOnInsert = false;
+            db.seq += 1;
+            db.rows.push({ ...(row as Row), id: `r${db.seq}`, status: 'pending', trial_expires_at: null, created_at: `2026-11-12T10:00:0${db.seq}Z` });
+          }
+          if (db.rows.some((r) => r.status === 'pending')) return { data: null, error: { code: '23505', message: 'duplicate key value violates unique constraint' } };
+          db.seq += 1;
+          const id = `r${db.seq}`;
+          db.rows.push({ ...(row as Row), id, status: 'pending', trial_expires_at: null, created_at: `2026-11-12T10:00:0${db.seq}Z` });
+          return { data: { id }, error: null };
+        };
+        return { select: () => ({ single: run }) };
       },
     }),
   }),
@@ -67,6 +89,12 @@ vi.mock('@/utils/supabase/admin', () => ({
                 return {
                   eq: (k2: string, v2: string) => ({
                     select: async () => {
+                      if (values.status === 'pending' && db.rollbackFails) return { data: null, error: { message: 'boom' } };
+                      if (values.status === 'approved' && db.stealApproval) {
+                        db.rows.filter((r) => r.status === 'pending').forEach((r) => Object.assign(r, { status: 'approved' }));
+                        if (db.stealApproval === 'with_role') db.role = 'teacher';
+                        return { data: [], error: null };
+                      }
                       const hit = db.rows.filter((r) => (r as Record<string, unknown>)[k] === v && (r as Record<string, unknown>)[k2] === v2);
                       hit.forEach((r) => Object.assign(r, values));
                       return { data: hit.map((r) => ({ id: r.id })), error: null };
@@ -76,7 +104,12 @@ vi.mock('@/utils/supabase/admin', () => ({
               },
             }),
             select: () => ({
-              eq: () => ({ eq: () => ({ limit: async () => ({ data: db.rows.filter((r) => r.status === 'approved'), error: null }) }) }),
+              eq: (_k: string, v: string) => ({
+                maybeSingle: async () =>
+                  table === 'profiles'
+                    ? { data: { user_role: db.role }, error: null }
+                    : { data: db.rows.find((r) => r.id === v) ?? null, error: null },
+              }),
             }),
           }),
         }
@@ -111,6 +144,11 @@ beforeEach(() => {
   db.promoteFails = false;
   db.adminAvailable = true;
   db.seq = 0;
+  db.rollbackFails = false;
+  db.raceOnInsert = false;
+  db.stealApproval = null;
+  db.profileError = false;
+  db.inserted = [];
 });
 
 describe('POST /api/education/access-request: the trial is granted at most once, and only from a fresh or pending request', () => {
@@ -184,5 +222,93 @@ describe('POST /api/education/access-request: the trial is granted at most once,
     expect((await press()).status).toBe(200);
     expect(db.rows).toHaveLength(1);
     expect(db.rows[0].trial_expires_at).toBe(trial);
+  });
+
+  it('Given an older declined row and a newer pending one, Then it is still refused as declined', async () => {
+    db.rows = [
+      row({ id: 'a', status: 'declined', created_at: '2026-10-01T00:00:00Z', reviewed_at: '2026-10-02T00:00:00Z', reviewed_by: 'admin-1' }),
+      row({ id: 'b', status: 'pending', created_at: '2026-10-05T00:00:00Z' }),
+    ];
+    const res = await press();
+    expect(res.status).toBe(403);
+    expect(await res.json()).toMatchObject({ code: 'declined' });
+    expect(db.role).toBe('student');
+    expect(db.rows.find((r) => r.id === 'b')?.status).toBe('pending');
+  });
+
+  it('Given a decline later overruled by an admin approval, Then the user is judged by that approval (a person looks), not refused', async () => {
+    db.rows = [
+      row({ id: 'a', status: 'declined', created_at: '2026-10-01T00:00:00Z', reviewed_at: '2026-10-02T00:00:00Z', reviewed_by: 'admin-1' }),
+      row({ id: 'b', status: 'approved', created_at: '2026-10-05T00:00:00Z', reviewed_at: '2026-10-06T00:00:00Z', reviewed_by: 'admin-1', trial_expires_at: '2026-10-20T00:00:00.000Z' }),
+    ];
+    const res = await press();
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: 'needs_review' });
+  });
+
+  it('Given two pending rows, Then only the newest is approved and the other is left pending', async () => {
+    db.rows = [row({ id: 'old', status: 'pending', created_at: '2026-10-01T00:00:00Z' }), row({ id: 'new', status: 'pending', created_at: '2026-10-03T00:00:00Z' })];
+    expect((await press()).status).toBe(200);
+    expect(db.rows.filter((r) => r.status === 'approved').map((r) => r.id)).toEqual(['new']);
+    expect(db.rows.find((r) => r.id === 'old')?.status).toBe('pending');
+  });
+
+  it('Given two rows with the same created_at, Then the choice is stable by id', async () => {
+    db.rows = [row({ id: 'r-a', status: 'pending', created_at: '2026-10-01T00:00:00Z' }), row({ id: 'r-b', status: 'pending', created_at: '2026-10-01T00:00:00Z' })];
+    expect((await press()).status).toBe(200);
+    expect(db.rows.filter((r) => r.status === 'approved').map((r) => r.id)).toEqual(['r-b']);
+  });
+
+  it('Given the role update fails and so does the rollback, Then admins are told under the review key and the user gets needs_review', async () => {
+    db.promoteFails = true;
+    db.rollbackFails = true;
+    const res = await press();
+    expect(res.status).toBe(409);
+    expect(await res.json()).toMatchObject({ code: 'needs_review' });
+    expect(notifyAdmins).toHaveBeenCalledWith(expect.objectContaining({ dedupeKey: 'teacher_access_review:user-1' }));
+  });
+
+  it('Given a concurrent first press wins the insert, When this press hits the unique index, Then it re-reads and approves that same row', async () => {
+    db.raceOnInsert = true;
+    const res = await press();
+    expect(res.status).toBe(200);
+    expect(db.rows).toHaveLength(1);
+    expect(db.rows[0].status).toBe('approved');
+    expect(db.role).toBe('teacher');
+  });
+
+  it.each([
+    ['the twin finished and the role is set', 'with_role', 200],
+    ['the twin approved but the role is not set (yet)', 'without_role', 202],
+  ] as const)('Given another press approved the row first and %s, Then success only when the role is really there', async (_l, steal, status) => {
+    db.rows = [row({ status: 'pending' })];
+    db.stealApproval = steal;
+    const res = await press();
+    expect(res.status).toBe(status);
+    if (status === 202) expect(await res.json()).toMatchObject({ approvalPending: true });
+  });
+
+  it('Given the profile read fails, Then the answer is lookup_failed with no database text', async () => {
+    db.profileError = true;
+    const res = await press();
+    expect(res.status).toBe(500);
+    const body = await res.json();
+    expect(body).toEqual({ ok: false, error: 'lookup_failed', code: 'lookup_failed' });
+    expect(JSON.stringify(body)).not.toMatch(/relation|permission|secret_column/);
+  });
+
+  it('Given a body that tries to set status, trial, user or role fields, Then none of them reach the stored row', async () => {
+    await press({ status: 'approved', trial_expires_at: '2099-01-01T00:00:00Z', user_id: 'someone-else', user_role: 'admin', reviewed_by: 'x' });
+    const stored = db.inserted[0];
+    expect(stored.user_id).toBe('user-1');
+    for (const key of ['status', 'trial_expires_at', 'user_role', 'reviewed_by']) expect(stored).not.toHaveProperty(key);
+    expect(db.rows[0].trial_expires_at).not.toBe('2099-01-01T00:00:00Z');
+  });
+
+  it('Given needs_review, Then every press asks for the admin notice under the same per-user dedupe key', async () => {
+    db.rows = [row({ status: 'approved', trial_expires_at: '2026-11-15T00:00:00.000Z' })];
+    for (let i = 0; i < 3; i++) await press();
+    expect(notifyAdmins).toHaveBeenCalledTimes(3);
+    for (const [n] of notifyAdmins.mock.calls) expect(n.dedupeKey).toBe('teacher_access_review:user-1');
   });
 });
