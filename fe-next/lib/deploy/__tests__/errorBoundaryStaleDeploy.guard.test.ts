@@ -63,3 +63,30 @@ describe('every route error boundary recovers from a stale deploy', () => {
     expect(clearing).toEqual([]);
   });
 });
+
+function listSources(dir: string): string[] {
+  const found: string[] = [];
+  for (const name of readdirSync(dir)) {
+    if (name === 'node_modules' || name === '__tests__' || name.startsWith('.')) continue;
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) found.push(...listSources(full));
+    else if (/\.(tsx?|jsx?)$/.test(name) && !/\.(test|spec)\./.test(name)) found.push(full);
+  }
+  return found;
+}
+
+describe('only lib/deploy writes the one-reload mark', () => {
+  const sources = [...listSources(APP_DIR), ...listSources(join(FE_ROOT, 'components'))];
+  const RAW_MARK = /chunk_error_refresh|CHUNK_RECOVERY_GUARD_KEY|CHUNK_RELOAD_WINDOW_MARK|__lc_cbr1/;
+
+  it('scans real sources (an empty scan is not a pass)', () => {
+    expect(sources.length).toBeGreaterThan(100);
+  });
+
+  it('no app/ or components/ file touches the raw sessionStorage key or window.name mark', () => {
+    const offenders = sources
+      .map((file) => relative(FE_ROOT, file))
+      .filter((rel) => RAW_MARK.test(readFileSync(join(FE_ROOT, rel), 'utf8')));
+    expect(offenders).toEqual([]);
+  });
+});
