@@ -1,5 +1,5 @@
 /**
- * The player level curve. The SQL functions increment_player_xp and
+ * The player level curve. The SQL functions increment_player_xp, claim_admin_gift and
  * update_player_stats_and_xp restate it; levelCurve.guard.test.ts pins them together.
  * Total XP to reach level L = round(100 * L^e), e by tier: 1.4 (≤25), 1.45 (≤50), 1.5 (≤75), 1.55.
  */

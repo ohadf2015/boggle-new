@@ -6,7 +6,7 @@
  */
 
 import { getSupabase } from './supabase/client';
-import { grantPlayerXp, levelUpOf } from './xpGrant';
+import { grantPlayerXp, levelUpOf, mergeLevelUps, type LevelUp, type XpGrantResult } from './xpGrant';
 import { awardCoinsServer } from '../services/economy/awardCoins';
 import {
   getDailyQuests,
@@ -56,6 +56,13 @@ export type CelebrationKey =
 export interface GrandSlamResult {
   claimed: boolean;
   reward: number;
+  xpGrant?: XpGrantResult | null;
+}
+
+/** XP the daily quests granted for one result; null when they granted nothing. */
+export interface DailyQuestGrant {
+  xpEarned: number;
+  levelUp: LevelUp | null;
 }
 
 const GRAND_SLAM_XP = 500;
@@ -173,13 +180,22 @@ export async function completeMission(
   missionType: MissionType,
   date?: string,
 ): Promise<DailyMissions> {
+  await completeMissionGrant(playerId, missionType, date);
+  return getDailyMissions(playerId, date);
+}
+
+async function completeMissionGrant(
+  playerId: string,
+  missionType: MissionType,
+  date?: string,
+): Promise<XpGrantResult | null> {
   const supabase = getSupabase()!;
   const today = getTodayDate(date);
   const column = COLUMN_MAP[missionType];
 
   if (!column) {
     logger.error('DAILY_MISSIONS', `Invalid mission type: ${missionType}`);
-    return getDailyMissions(playerId, date);
+    return null;
   }
 
   // Ensure row exists first
@@ -196,22 +212,14 @@ export async function completeMission(
 
   if (error) {
     logger.error('DAILY_MISSIONS', `Complete failed for ${playerId}/${missionType}: ${error.message}`);
-    return getDailyMissions(playerId, date);
+    return null;
   }
 
   // Grant XP only if this was a genuine false→true transition (affected > 0)
-  if (Array.isArray(data) && data.length > 0) {
-    const { error: xpError } = await supabase.rpc('increment_player_xp', {
-      p_player_id: playerId,
-      p_xp_amount: PER_MISSION_XP,
-    });
-
-    if (xpError) {
-      logger.error('DAILY_MISSIONS', `Per-mission XP grant failed for ${playerId}/${missionType}: ${xpError.message}`);
-    }
-  }
-
-  return getDailyMissions(playerId, date);
+  if (!Array.isArray(data) || data.length === 0) return null;
+  const xpGrant = await grantPlayerXp(supabase, playerId, PER_MISSION_XP);
+  if (!xpGrant) logger.error('DAILY_MISSIONS', `Per-mission XP grant failed for ${playerId}/${missionType}`);
+  return xpGrant;
 }
 
 /**
@@ -235,26 +243,25 @@ export async function checkAndClaimGrandSlam(
   const supabase = getSupabase()!;
   const today = getTodayDate(date);
 
-  const { error } = await supabase
+  // Two game ends can race here; only the one that flips the flag pays.
+  const { data: claimedRows, error } = await supabase
     .from('player_daily_missions')
     .update({ grand_slam_claimed: true })
     .eq('player_id', playerId)
-    .eq('mission_date', today);
+    .eq('mission_date', today)
+    .eq('grand_slam_claimed', false)
+    .select('grand_slam_claimed');
 
   if (error) {
     logger.error('DAILY_MISSIONS', `Grand slam claim failed for ${playerId}: ${error.message}`);
     return { claimed: false, reward: 0 };
   }
-
-  // Actually grant the XP reward
-  const { error: xpError } = await supabase.rpc('increment_player_xp', {
-    p_player_id: playerId,
-    p_xp_amount: GRAND_SLAM_XP,
-  });
-
-  if (xpError) {
-    logger.error('DAILY_MISSIONS', `Grand slam XP grant failed for ${playerId}: ${xpError.message}`);
+  if (!Array.isArray(claimedRows) || claimedRows.length === 0) {
+    return { claimed: true, reward: 0 };
   }
+
+  const xpGrant = await grantPlayerXp(supabase, playerId, GRAND_SLAM_XP);
+  if (!xpGrant) logger.error('DAILY_MISSIONS', `Grand slam XP grant failed for ${playerId}`);
 
   // Coin grant is best-effort; failure logged inside helper. We do not undo
   // the XP grant or the claim flag if coins fail — manual reconcile beats
@@ -264,7 +271,7 @@ export async function checkAndClaimGrandSlam(
   });
 
   logger.info('DAILY_MISSIONS', `Grand Slam claimed by ${playerId}: ${GRAND_SLAM_XP} XP + ${GRAND_SLAM_COIN_REWARD} coins`);
-  return { claimed: true, reward: GRAND_SLAM_XP };
+  return { claimed: true, reward: GRAND_SLAM_XP, xpGrant };
 }
 
 /**
@@ -399,11 +406,13 @@ export async function completeDailyQuestsForResult(
   playerId: string,
   result: QuestGameResult,
   date?: string,
-): Promise<void> {
+): Promise<DailyQuestGrant | null> {
   const today = getTodayDate(date);
   const quests = getDailyQuests(today);
   const slots = evaluateDailyQuests(quests, result);
-  if (slots.length === 0) return;
+  if (slots.length === 0) return null;
+
+  const grants: (XpGrantResult | null | undefined)[] = [];
 
   // Snapshot BEFORE completing so we broadcast only FRESH completions — a
   // repeated PvP win must not spam the social feed every game.
@@ -411,7 +420,7 @@ export async function completeDailyQuestsForResult(
   const wasComplete = [before.wordHunt, before.adventure, before.community];
 
   for (const slot of slots) {
-    await completeMission(playerId, SLOT_MISSION_TYPES[slot], today);
+    grants.push(await completeMissionGrant(playerId, SLOT_MISSION_TYPES[slot], today));
     // Social proof: broadcast brag-worthy (PvP) quests on first completion.
     if (!wasComplete[slot] && quests[slot].family === 'pvp') {
       void recordQuestAchievement(playerId, quests[slot].id, 'pvp');
@@ -422,13 +431,22 @@ export async function completeDailyQuestsForResult(
   // site — previously the only caller was a client socket handler that nothing
   // emitted, so the 500 XP bonus never actually fired on real play.
   const grandSlam = await checkAndClaimGrandSlam(playerId, today);
+  grants.push(grandSlam.xpGrant);
   if (grandSlam.claimed && grandSlam.reward > 0) {
     void recordQuestAchievement(playerId, 'grand_slam', 'grand_slam');
     try {
       const { updateQuestProgress } = await import('./weeklyQuestManager');
-      await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
+      const weekly = await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
+      grants.push(weekly?.xpGrant);
     } catch {
       // Non-critical: weekly streak credit is best-effort.
     }
   }
+
+  const granted = grants.filter((g): g is XpGrantResult => !!g);
+  if (granted.length === 0) return null;
+  return {
+    xpEarned: granted.reduce((sum, g) => sum + g.xpEarned, 0),
+    levelUp: granted.reduce<LevelUp | null>((acc, g) => mergeLevelUps(acc, levelUpOf(g)), null),
+  };
 }

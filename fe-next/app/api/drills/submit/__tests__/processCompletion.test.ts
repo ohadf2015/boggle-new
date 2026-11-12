@@ -17,6 +17,7 @@ vi.mock('@/backend/modules/dailyMissionsManager', () => ({
 vi.mock('@/shared/dailyQuestPool', () => ({ emptyQuestResult: vi.fn((r) => r) }));
 
 import { processBrainDrillCompletion } from '../processCompletion';
+import { completeDailyQuestsForResult } from '@/backend/modules/dailyMissionsManager';
 
 const validBody = {
   drillType: 'lightning-round',
@@ -216,6 +217,20 @@ describe('processBrainDrillCompletion', () => {
     const result = await processBrainDrillCompletion(validBody, 'user-1', 'sub-lvl', { supabase: supabase as unknown as never, source: 'live' });
     expect(result.ok && result.body.levelUp).toEqual({ oldLevel: 1, newLevel: 2 });
     expect(result.ok && result.body.xpAwarded).toBe(30);
+  });
+
+  it('given the daily-quest XP crosses a level, when completed, then levelUp spans drill and quest XP', async () => {
+    const supabase = makeMockSupabase();
+    supabase.rpc.mockResolvedValue({ data: [{ xp_granted: 30, new_total_xp: 280, new_level: 2 }], error: null });
+    completeDailyQuestsForResult.mockResolvedValueOnce({ xpEarned: 100, levelUp: { oldLevel: 2, newLevel: 3 } });
+    const result = await processBrainDrillCompletion(validBody, 'user-1', 'sub-quest', { supabase: supabase as unknown as never, source: 'live' });
+    expect(result.ok && result.body.levelUp).toEqual({ oldLevel: 1, newLevel: 3 });
+  });
+
+  it('given a replayed submission, then the daily quests are not credited again', async () => {
+    const supabase = makeMockSupabase({ existingIdempotent: { id: 'sess-prior', score: 400, level: 1 } });
+    await processBrainDrillCompletion(validBody, 'user-1', 'sub-replay', { supabase: supabase as unknown as never, source: 'live' });
+    expect(completeDailyQuestsForResult).not.toHaveBeenCalled();
   });
 
   it('given drill XP that stays inside the player level, when completed, then levelUp is null', async () => {

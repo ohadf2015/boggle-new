@@ -105,6 +105,7 @@ export interface SubmitResult {
   score: number;
   currentRank: number;
   totalPlayers: number;
+  levelUp?: { oldLevel: number; newLevel: number } | null;
 }
 
 /**
@@ -147,7 +148,12 @@ export async function submitDailyScore(payload: SubmitPayload): Promise<SubmitOu
       body: JSON.stringify(payload),
     });
     if (!res.ok) return { status: 'failed', retryable: res.status >= 500 || res.status === 429 };
-    return { status: 'saved', result: (await res.json()) as SubmitResult };
+    const result = (await res.json()) as SubmitResult;
+    if (result.levelUp) {
+      const { publishLevelUp } = await import('@/lib/avatar/revealTrigger');
+      publishLevelUp(result.levelUp, 'dailyConnections');
+    }
+    return { status: 'saved', result };
   } catch {
     return { status: 'failed', retryable: true };
   }

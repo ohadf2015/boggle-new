@@ -24,7 +24,8 @@ import { grantDailyAchievements } from './dailyAchievements';
 import wordWheelLeaderboardRoutes from './wordWheelLeaderboardRoutes';
 import { sanitizeWheelSubmission, isWheelCatchup } from './wordWheelSubmission';
 import { handleGoldenWordKey, payGoldenWord } from './wheelGoldenWord';
-import { grantSoloGameXp, levelUpOf } from '../../modules/xpGrant';
+import { grantSoloGameXp, levelUpOf, mergeLevelUps } from '../../modules/xpGrant';
+import { questLevelUpWithin, type QuestLevelUp } from '../../../lib/daily/questSeams';
 
 
 const router: Router = express.Router();
@@ -223,21 +224,29 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
     // Credit the `daily_challenges` weekly quest — non-fatal. This path only runs
     // on a fresh insert (a duplicate submit returns early above), so it can never
     // double-count.
+    let questLevelUp: Promise<QuestLevelUp | null> = Promise.resolve(null);
     if (shouldCreditDailyChallengeQuest({ mode: 'word_wheel', playerId, wordCount })) {
-      updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
-        logger.error('API', `[WordWheel] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
-      });
+      const weekly = updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 })
+        .then((quest) => levelUpOf(quest?.xpGrant))
+        .catch((err) => {
+          logger.error('API', `[WordWheel] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+          return null;
+        });
 
       // Credit TODAY'S quests too. This seam only ever bumped the weekly
       // `dailyChallengesCompleted` counter, so finishing the daily Word Wheel
       // moved no daily mission at all — the hub advertised "Daily Missions"
       // above a game that could not advance one. Non-fatal, same as above.
-      completeDailyQuestsForResult(
+      const daily = completeDailyQuestsForResult(
         playerId as string,
         questResultForWordWheel({ score, wordsFound }),
-      ).catch((err) => {
-        logger.error('API', `[WordWheel] daily quest update failed for ${playerId}: ${(err as Error).message}`);
-      });
+      )
+        .then((grant) => grant?.levelUp ?? null)
+        .catch((err) => {
+          logger.error('API', `[WordWheel] daily quest update failed for ${playerId}: ${(err as Error).message}`);
+          return null;
+        });
+      questLevelUp = questLevelUpWithin(Promise.all([weekly, daily]).then(([a, b]) => mergeLevelUps(a, b)));
     }
 
     let coins = playerId ? goldCoinsFor(wordsFound, goldLetter) : 0;
@@ -269,9 +278,11 @@ router.post('/submit', async (req: Request<unknown, unknown, WordWheelSubmitBody
         })
       : null;
 
+    const levelUp = mergeLevelUps(levelUpOf(xp), await questLevelUp);
     res.json({
       success: true, alreadySubmitted: false, data, rank, goldenWordFound,
-      ...(xp ? { xpEarned: xp.xpEarned, newTotalXp: xp.newTotalXp, levelUp: levelUpOf(xp) } : {}),
+      ...(xp ? { xpEarned: xp.xpEarned, newTotalXp: xp.newTotalXp } : {}),
+      ...(xp || levelUp ? { levelUp } : {}),
     });
   } catch (error) {
     const err = error as Error;

@@ -108,6 +108,26 @@ describe('POST /submit — XP', () => {
     expect(res.body).toMatchObject({ xpEarned: 60, newTotalXp: 900, levelUp: { oldLevel: 4, newLevel: 5 } });
   });
 
+  it('spans the game XP and the quest XP when the quests level the player up too', async () => {
+    completeDailyQuestsForResult.mockResolvedValueOnce({ xpEarned: 100, levelUp: { oldLevel: 5, newLevel: 6 } });
+    updateQuestProgress.mockResolvedValueOnce({ completed: true, xpGrant: { xpEarned: 300, newTotalXp: 2000, oldLevel: 6, newLevel: 7, leveledUp: true } });
+    const res = await request(makeApp()).post('/submit').send(submission);
+    expect(res.body.levelUp).toEqual({ oldLevel: 4, newLevel: 7 });
+  });
+
+  it('announces a quest level-up even when the game XP did not level up', async () => {
+    grantSoloGameXp.mockResolvedValueOnce({ xpEarned: 60, newTotalXp: 900, oldLevel: 5, newLevel: 5, leveledUp: false, xpBreakdown: {} });
+    completeDailyQuestsForResult.mockResolvedValueOnce({ xpEarned: 100, levelUp: { oldLevel: 5, newLevel: 6 } });
+    const res = await request(makeApp()).post('/submit').send(submission);
+    expect(res.body.levelUp).toEqual({ oldLevel: 5, newLevel: 6 });
+  });
+
+  it('still answers when a quest credit fails', async () => {
+    completeDailyQuestsForResult.mockRejectedValueOnce(new Error('db down'));
+    const res = await request(makeApp()).post('/submit').send(submission);
+    expect(res.body.levelUp).toEqual({ oldLevel: 4, newLevel: 5 });
+  });
+
   it('grants nothing to a guest', async () => {
     const guest = { ...submission, playerId: undefined, guestFingerprint: 'g-1' };
     await request(makeApp()).post('/submit').send(guest);

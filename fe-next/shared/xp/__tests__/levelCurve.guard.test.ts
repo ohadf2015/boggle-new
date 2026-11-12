@@ -52,6 +52,7 @@ function sqlXpForLevel(curve: SqlCurve, level: number): number {
 describe.each([
   ['increment_player_xp', ['increment_player_xp', 'increment_player_xp_unchecked']],
   ['update_player_stats_and_xp', ['update_player_stats_and_xp']],
+  ['claim_admin_gift', ['claim_admin_gift']],
 ])('%s level curve matches shared/xp/levelCurve', (_label, names) => {
   const curve = latestCurveFor(names);
 

@@ -35,6 +35,8 @@ const h = vi.hoisted(() => {
     resolveDailyPlayer: vi.fn(),
     leaderboardPointsForGame: vi.fn((_mode: string, score: number) => score),
     updateDailyProfileStats: vi.fn().mockResolvedValue(undefined),
+    completeDaily: vi.fn().mockResolvedValue(undefined),
+    updateQuest: vi.fn().mockResolvedValue(undefined),
   };
 });
 
@@ -46,8 +48,8 @@ vi.mock('../resolveDailyPlayer', () => ({ resolveDailyPlayer: h.resolveDailyPlay
 vi.mock('../../../redisClient', () => ({ getCachedDailyPuzzle: async () => ({ targetWord: 'PLANET' }) }));
 vi.mock('../../../dictionary', () => ({ ensureLanguageLoaded: async () => {}, isDictionaryWord: () => true }));
 vi.mock('../../../modules/communityWordManager', () => ({ isWordCommunityValid: () => false }));
-vi.mock('../../../modules/dailyMissionsManager', () => ({ completeDailyQuestsForResult: vi.fn().mockResolvedValue(undefined) }));
-vi.mock('../../../modules/weeklyQuestManager', () => ({ updateQuestProgress: vi.fn().mockResolvedValue(undefined) }));
+vi.mock('../../../modules/dailyMissionsManager', () => ({ completeDailyQuestsForResult: (...a: unknown[]) => h.completeDaily(...a) }));
+vi.mock('../../../modules/weeklyQuestManager', () => ({ updateQuestProgress: (...a: unknown[]) => h.updateQuest(...a) }));
 vi.mock('../profileStats', () => ({ updateDailyProfileStats: h.updateDailyProfileStats }));
 vi.mock('../../../modules/supabase/leaderboard', () => ({ updateLeaderboardEntry: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('../../../modules/leaderboardScoring', () => ({ leaderboardPointsForGame: h.leaderboardPointsForGame }));
@@ -164,5 +166,36 @@ describe('Word Hunt submit hardening', () => {
     vi.setSystemTime(new Date(`${TODAY}T00:05:00.000Z`));
     await request(app()).post('/submit').send(body({ puzzleDate: '2026-10-29', isCatchup: false }));
     expect(attemptWrites()[0].payload.is_catchup).toBe(false);
+  });
+});
+
+describe('Word Hunt submit — quest level-up', () => {
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(`${TODAY}T12:00:00.000Z`));
+    h.writes.length = 0;
+    h.state.existing = null;
+    h.resolveDailyPlayer.mockReset().mockResolvedValue({ ok: true, playerId: 'me' });
+    h.completeDaily.mockReset().mockResolvedValue(undefined);
+    h.updateQuest.mockReset().mockResolvedValue(undefined);
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('returns the level-up the daily-quest and weekly-quest XP caused', async () => {
+    h.completeDaily.mockResolvedValue({ xpEarned: 100, levelUp: { oldLevel: 3, newLevel: 4 } });
+    h.updateQuest.mockResolvedValue({ completed: true, xpGrant: { xpEarned: 300, newTotalXp: 1, oldLevel: 4, newLevel: 5, leveledUp: true } });
+    const res = await request(app()).post('/submit').send(body());
+    expect(res.status).toBe(200);
+    expect(res.body.levelUp).toEqual({ oldLevel: 3, newLevel: 5 });
+  });
+
+  it('carries no level-up when the quests granted nothing, and still answers when they fail', async () => {
+    let res = await request(app()).post('/submit').send(body());
+    expect(res.body.levelUp).toBeUndefined();
+    h.completeDaily.mockRejectedValue(new Error('db down'));
+    h.writes.length = 0;
+    res = await request(app()).post('/submit').send(body());
+    expect(res.status).toBe(200);
+    expect(res.body.levelUp).toBeUndefined();
   });
 });

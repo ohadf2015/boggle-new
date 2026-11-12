@@ -5,7 +5,7 @@ vi.mock('@/backend/modules/dailyMissionsManager', () => ({
   completeDailyQuestsForResult: (...a: unknown[]) => complete(...a),
 }));
 
-import { creditDailyQuests, isTodayUTC } from '../questSeams';
+import { creditDailyQuests, isTodayUTC, questLevelUpWithin } from '../questSeams';
 import { questResultForConnections } from '@/shared/dailyQuestPool';
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
@@ -36,6 +36,36 @@ describe('creditDailyQuests', () => {
     await flush();
     expect(spy).toHaveBeenCalled();
     spy.mockRestore();
+  });
+
+  it('resolves the level-up the quest XP caused', async () => {
+    complete.mockResolvedValue({ xpEarned: 100, levelUp: { oldLevel: 3, newLevel: 4 } });
+    await expect(creditDailyQuests('user-1', questResultForConnections({ puzzlesSolved: 4 }))).resolves.toEqual({ oldLevel: 3, newLevel: 4 });
+  });
+
+  it('resolves null for a guest, a failure, or a result that granted nothing', async () => {
+    await expect(creditDailyQuests(null, questResultForConnections({}))).resolves.toBeNull();
+    await expect(creditDailyQuests('user-1', questResultForConnections({}))).resolves.toBeNull();
+    complete.mockRejectedValue(new Error('boom'));
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(creditDailyQuests('user-1', questResultForConnections({}))).resolves.toBeNull();
+    spy.mockRestore();
+  });
+
+  it('gives up waiting after the timeout so a slow grant never holds the response', async () => {
+    complete.mockImplementation(() => new Promise(() => {}));
+    const started = Date.now();
+    await expect(creditDailyQuests('user-1', questResultForConnections({ puzzlesSolved: 4 }), 20)).resolves.toBeNull();
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+});
+
+describe('questLevelUpWithin', () => {
+  it('resolves the work, null on rejection, null after the wait', async () => {
+    await expect(questLevelUpWithin(Promise.resolve({ oldLevel: 1, newLevel: 2 }))).resolves.toEqual({ oldLevel: 1, newLevel: 2 });
+    await expect(questLevelUpWithin(Promise.resolve(undefined))).resolves.toBeNull();
+    await expect(questLevelUpWithin(Promise.reject(new Error('x')))).resolves.toBeNull();
+    await expect(questLevelUpWithin(new Promise(() => {}), 10)).resolves.toBeNull();
   });
 });
 

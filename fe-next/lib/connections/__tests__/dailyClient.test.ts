@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   todayUTC,
   markConnectionsPlayedToday,
@@ -49,5 +49,21 @@ describe('msUntilNextUtcDay — results-screen countdown', () => {
     expect(msUntilNextUtcDay(new Date('2026-08-01T21:15:30.500Z'))).toBe(
       2 * 3_600_000 + 44 * 60_000 + 29_500,
     );
+  });
+});
+
+describe('submitDailyScore — level-up', () => {
+  it('announces the level-up a saved score carries', async () => {
+    vi.resetModules();
+    const publishLevelUp = vi.fn();
+    vi.doMock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp }));
+    vi.stubGlobal('navigator', { ...navigator, onLine: true });
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ success: true, streak: 1, score: 10, currentRank: 1, totalPlayers: 1, levelUp: { oldLevel: 3, newLevel: 4 } }))));
+    const { submitDailyScore } = await import('../dailyClient');
+    const out = await submitDailyScore({} as never);
+    expect(out.status).toBe('saved');
+    expect(publishLevelUp).toHaveBeenCalledWith({ oldLevel: 3, newLevel: 4 }, 'dailyConnections');
+    vi.unstubAllGlobals();
+    vi.doUnmock('@/lib/avatar/revealTrigger');
   });
 });

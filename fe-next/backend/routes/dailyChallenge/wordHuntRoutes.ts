@@ -47,6 +47,8 @@ import {
 } from '../../../lib/daily/weeklyChest';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { shouldCreditDailyChallengeQuest } from '../../../lib/daily/questCredit';
+import { questLevelUpWithin, type QuestLevelUp } from '../../../lib/daily/questSeams';
+import { levelUpOf, mergeLevelUps } from '../../modules/xpGrant';
 import { isSubmittableDate } from '../../../utils/dailyChallenge/catchUp';
 import { freezeDateToBridge } from '../../../lib/daily/chestFreezeBridge';
 import { loadOwnedFreezes, spendFreezeOn } from '../../../lib/daily/streakExtras.server';
@@ -360,9 +362,9 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     const isRetry = !!existing;
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, isPaidRetry=${isPaidRetry}, penalty=${penaltyApplied}`);
 
-    // Evaluate today's daily quests against this word-hunt result (fire-and-forget).
     // mode 'word-hunt' satisfies the word-hunt discovery quest; the longest
     // discovered word / count can satisfy skill quests too.
+    let dailyQuestLevelUp: Promise<QuestLevelUp | null> = Promise.resolve(null);
     if (playerId) {
       const discovered: Array<{ word?: string }> = Array.isArray(wordsDiscovered)
         ? wordsDiscovered
@@ -371,16 +373,19 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
         (m: number, w) => Math.max(m, w?.word?.length || 0),
         0,
       );
-      completeDailyQuestsForResult(
+      dailyQuestLevelUp = completeDailyQuestsForResult(
         playerId,
         emptyQuestResult({
           mode: 'word-hunt',
           longestWordLength,
           wordsFound: discovered.length,
         }),
-      ).catch((err) => {
-        logger.error('API', `[WordHunt] Daily quest update failed for ${playerId}: ${(err as Error).message}`);
-      });
+      )
+        .then((grant) => grant?.levelUp ?? null)
+        .catch((err) => {
+          logger.error('API', `[WordHunt] Daily quest update failed for ${playerId}: ${(err as Error).message}`);
+          return null;
+        });
     }
 
     // Update profile stats for authenticated users (all attempts count for games played).
@@ -419,11 +424,18 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     // Credit the `daily_challenges` weekly quest on the submission that
     // *transitions* the row to solved=true. Includes paid retries that flip
     // a failed first attempt to solved.
+    let weeklyQuestLevelUp: Promise<QuestLevelUp | null> = Promise.resolve(null);
     if (shouldCreditDailyChallengeQuest({ mode: 'word_hunt', playerId, solved, isRetry, wasAlreadySolved })) {
-      updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 }).catch((err) => {
-        logger.error('API', `[WordHunt] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
-      });
+      weeklyQuestLevelUp = updateQuestProgress(playerId as string, { dailyChallengesCompleted: 1 })
+        .then((quest) => levelUpOf(quest?.xpGrant))
+        .catch((err) => {
+          logger.error('API', `[WordHunt] weekly quest update failed for ${playerId}: ${(err as Error).message}`);
+          return null;
+        });
     }
+    const questLevelUp = questLevelUpWithin(
+      Promise.all([dailyQuestLevelUp, weeklyQuestLevelUp]).then(([a, b]) => mergeLevelUps(a, b)),
+    );
 
     // Weekly chest hook — non-fatal
     let chestReady = false
@@ -508,7 +520,11 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
       }
     }
 
-    res.json({ success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier, freezeBridged, freezesRemaining });
+    const levelUp = await questLevelUp;
+    res.json({
+      success: true, alreadySubmitted: false, isRetry, penaltyApplied, data, chestReady, chestTier, freezeBridged, freezesRemaining,
+      ...(levelUp ? { levelUp } : {}),
+    });
   } catch (error) {
     const err = error as Error;
     logger.error('API', `Word Hunt submit error: ${err.message}`);

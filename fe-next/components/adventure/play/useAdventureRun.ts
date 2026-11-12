@@ -10,9 +10,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { isCombatKind, type PlayLevel } from '@/lib/adventure/play/levels';
 import { scoreWords, chainsFrom } from '@/lib/adventure/play/scoreRun';
-import { calculateComboChainWindow } from '@/shared/utils/comboUtils';
 import { bossPhase, type BossPhase } from '@/lib/adventure/play/boss';
-import { initCombat, step as combatStep, blockedTiles, type CombatEvent, type CombatFx, type CombatState } from '@/lib/adventure/play/combat';
+import { initCombat, step as combatStep, blockedTiles, type CombatEvent, type CombatState } from '@/lib/adventure/play/combat';
 import {
   BASE_HP, POTION_HEAL, POTION_HINTS, POTION_TIME_MS, hintCharges, revealsFullHint, type PotionId, type RelicId,
 } from '@/lib/adventure/play/relics';
@@ -23,20 +22,20 @@ import { eliteTrophy } from '@/lib/adventure/play/trophy';
 import { isWordOnBoard } from '@/utils/clientWordValidator';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { trackGameStart, trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
-import { tickClock } from '@/lib/adventure/play/runClock';
 import { clearClearedNodes } from '@/components/adventure/map/clearedNodes';
 import { useCoinActions } from '@/contexts/CoinContext';
 import { holdAdventureLevelUp } from './heldLevelUp';
 import { readRun, writeRun, readCarry, writeCarry } from './runStorage';
 import {
-  STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
-  type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, type CombatFxEntry,
-} from './runTypes';
+  NO_POTIONS, potionsLeftOf, ecosystemOf, reachableNodes, combatSetupOf, nextHintWord, settleCompletedRun, runWithTrophy,
+} from './runHelpers';
+import { useLiveCombo, useRunClock, useRunEndings } from './useRunTimers';
+import { STALE_DEAL_MS, ADVENTURE_MODE, type RunPhase, type SubmitResult, type RunResult, type CombatFxEntry } from './runTypes';
 
 export {
   STALE_DEAL_MS, FOE_KO_FINISH_MS, ADVENTURE_MODE,
   type RunPhase, type SubmitResult, type RunResult, type EcosystemGains, type CombatFxEntry,
-};
+} from './runTypes';
 
 interface Options {
   world: number;
@@ -52,7 +51,6 @@ interface Options {
   mapFirst?: boolean;
 }
 
-const NO_POTIONS: Record<PotionId, number> = { heal: 0, time: 0, cleanse: 0, insight: 0 };
 const ATTACK_FX = new Set(['hit', 'drain', 'freeze', 'curse', 'projectile', 'shuffle']);
 /** How many combat fx batches the stage can look back on. */
 const FX_FEED = 8;
@@ -112,25 +110,13 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   // timesRef is written in the same step as `words`, so this memo sees them aligned.
   const scored = useMemo(() => scoreWords(words, { relics, kind, language, times: timesRef.current }), [words, relics, kind, language]);
   const score = scored.score;
-  // The combo shown on the board lapses when its chain window runs out, like the classic game's.
-  const [liveCombo, setLiveCombo] = useState(0);
-  useEffect(() => {
-    const level = scored.combo[scored.combo.length - 1] ?? 0;
-    setLiveCombo(level);
-    if (!level) return;
-    const id = setTimeout(() => setLiveCombo(0), calculateComboChainWindow(level));
-    return () => clearTimeout(id);
-  }, [scored]);
+  const liveCombo = useLiveCombo(scored);
   const combatLevel = !!lvl && isCombatKind(lvl.kind);
   const bossHp = combatLevel && lvl ? Math.max(0, lvl.bossHp - score) : 0;
   const boss: BossPhase | null = lvl?.isBoss ? bossPhase(bossHp, lvl.bossHp) : null;
   // Rest-site hint upgrades ride on the run (`bh`), on top of the relic charges.
   const hintsLeft = Math.max(0, hintCharges(relics) + (run?.bh ?? 0) + extraHints - hintsGiven.length);
-  const potionsLeft = useMemo(() => {
-    const out = { ...NO_POTIONS };
-    for (const id of Object.keys(out) as PotionId[]) out[id] = Math.max(0, (run?.potions?.[id] ?? 0) - potionsUsed[id]);
-    return out;
-  }, [run, potionsUsed]);
+  const potionsLeft = useMemo(() => potionsLeftOf(run, potionsUsed), [run, potionsUsed]);
   const targetsFound = useMemo(() => (targets ? words.filter((w) => targets.includes(w)) : []), [targets, words]);
   const chainLetter = kind === 'chain' && words.length ? Array.from(words[words.length - 1]).pop() ?? null : null;
 
@@ -352,23 +338,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
         startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : undefined,
         { world, nodeKind: data.nodeKind ?? nodeKindRef.current, stars: data.stars ?? 0, runComplete: !!data.runComplete },
       );
-      if (data.nextRunToken && data.nextRun) {
-        writeRun(world, { runToken: data.nextRunToken, run: { ...data.nextRun, offer: data.offer ?? data.nextRun.offer } });
-        // The run moved on: every later call (the draft pick, opening the map)
-        // must speak the NEW token. Only a remount used to pick this up from
-        // storage, so an in-place map → node → map flow replayed the old run
-        // and silently dropped this node's gold, offer and progress.
-        pendingRunTokenRef.current = data.nextRunToken;
-        dealtRunTokenRef.current = data.nextRunToken;
-      } else {
-        // Run over (died or lost): the token is dead. Forget it, or the next
-        // "open the map" would resume a run the server will refuse — but keep
-        // it as the carry, so the next run starts with this one's relics.
-        writeCarry(data.carryToken || dealtRunTokenRef.current || pendingRunTokenRef.current || null);
-        writeRun(world, null);
-        pendingRunTokenRef.current = '';
-        dealtRunTokenRef.current = '';
-      }
+      const nextToken = settleCompletedRun(world, data, dealtRunTokenRef.current || pendingRunTokenRef.current);
+      pendingRunTokenRef.current = nextToken;
+      dealtRunTokenRef.current = nextToken;
       // Milestone coins and the banked purse land in the app-wide wallet.
       if ((data.coinsGained ?? 0) > 0 || (data.purseCoins ?? 0) > 0) void refreshCoinsRef.current().catch(() => undefined);
       holdAdventureLevelUp(data.levelUp, !(data.nextRunToken && data.nextRun));
@@ -408,19 +380,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     trackGameStart(ADVENTURE_MODE, { world, level: lvl.level, levelKind: lvl.kind, nodeKind: nodeKindRef.current, nodeId: currentNodeRef.current });
     // Fights are nodes too: same funnel event NodeScreen fires for shop/rest/treasure/event.
     trackGrowthEvent('adventure_node_entered', { world, nodeKind: nodeKindRef.current ?? lvl.kind });
-    // Every node fights back: elite/boss with their full scripts, an ordinary
-    // fight with a slow, non-lethal rival whose HP is the top-star bar it draws.
-    const combatLvl = isCombatKind(lvl.kind);
-    combatRef.current = initCombat({
-      enemyId: combatLvl ? lvl.enemyId ?? `${lvl.kind}-w${world}` : `foe-w${world}`,
-      world,
-      enemyHp: combatLvl ? lvl.bossHp : Math.max(1, lvl.stars[2]),
-      hp: run?.hp ?? BASE_HP,
-      maxHp: run?.maxHp ?? BASE_HP,
-      relics,
-      size: grid.length,
-      seed: tokenRef.current,
-    });
+    combatRef.current = initCombat(combatSetupOf(lvl, world, run, relics, grid.length, tokenRef.current));
     setCombat(combatRef.current);
     setPhase('playing');
   }, [lvl, msLeft, world, run, relics, grid.length, startLevel]);
@@ -432,50 +392,17 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
     begin();
   }, [phase, begin]);
 
-  // Clock + combat tick. A backgrounded tab does not drain the level (or let the
-  // enemy keep swinging) — `tickClock` slides the deadline instead.
-  useEffect(() => {
-    if (phase !== 'playing') return;
-    const id = setInterval(() => {
-      const now = Date.now();
-      // `tickClock` slides the deadline for a backgrounded tab (and hands back the
-      // real dt for combat). The commit is still throttled to the displayed
-      // second: at 5Hz this re-rendered the whole level screen — and every
-      // callback it hands the grid — right through the player's drag.
-      const paused = typeof document !== 'undefined' && document.visibilityState === 'hidden';
-      const t = tickClock({ now, endAt: endAtRef.current, lastTick: lastTickRef.current, paused });
-      endAtRef.current = t.endAt;
-      setMsLeft((prev) => (Math.ceil(prev / 1000) === Math.ceil(t.msLeft / 1000) ? prev : t.msLeft));
-      if (combatRef.current && t.dt > 0) dispatchCombat({ type: 'tick', dt: t.dt });
-      lastTickRef.current = now;
-      if (t.expired) void finish();
-    }, 200);
-    return () => clearInterval(id);
-  }, [phase, finish, dispatchCombat]);
-
-  // Death ends the run; the enemy falling ends the level.
-  useEffect(() => {
-    if (phase === 'playing' && combat?.dead) void finish({ died: true });
-  }, [phase, combat?.dead, finish]);
+  useRunClock({ phase, endAtRef, lastTickRef, combatRef, setMsLeft, dispatchCombat, finish });
   // The reducer is the fight's single source (its HP is the same relic-scored points).
   const enemyDown = combat ? combat.defeated : bossHp === 0;
-  useEffect(() => {
-    if (phase === 'playing' && combatLevel && enemyDown) void finish();
-  }, [phase, combatLevel, enemyDown, finish]);
-  // Normal level: the foe's HP is the top-star score. K.O. = nothing left to win, so end
-  // after the stamp instead of leaving a dead clock (hunt also needs its goal met).
+  // Normal level: the foe's HP is the top-star score (hunt also needs its goal met).
   const topStar = lvl && !combatLevel ? lvl.stars[2] : 0;
   const huntMet = kind !== 'hunt' || targetsFound.length >= (lvl?.huntCount ?? targets?.length ?? 0);
   const foeKo = topStar > 0 && score >= topStar && huntMet;
-  useEffect(() => {
-    if (phase !== 'playing' || !foeKo) return;
-    const id = setTimeout(() => { void finish(); }, FOE_KO_FINISH_MS);
-    return () => clearTimeout(id);
-  }, [phase, foeKo, finish]);
-  // Every hunt target found: nothing left to hunt.
-  useEffect(() => {
-    if (phase === 'playing' && targets?.length && targetsFound.length >= targets.length) void finish();
-  }, [phase, targets, targetsFound.length, finish]);
+  useRunEndings({
+    phase, dead: !!combat?.dead, combatLevel, enemyDown, foeKo,
+    allTargetsFound: !!targets?.length && targetsFound.length >= targets.length, finish,
+  });
 
   const submitWord = useCallback(
     async (raw: string): Promise<SubmitResult> => {
@@ -503,9 +430,7 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   /** Next unfound hint word (spends a charge), or null when out of charges / words. */
   const takeHint = useCallback((): string | null => {
     if (hintsLeft <= 0) return null;
-    // Hunt levels: a hint must point at a hidden target first — a side word does not move the goal.
-    const pool = [...(targets ?? []), ...hints];
-    const next = pool.find((h) => !wordsRef.current.includes(h) && !hintsGiven.includes(h));
+    const next = nextHintWord(targets, hints, wordsRef.current, hintsGiven);
     if (!next) return null;
     setHintsGiven((g) => [...g, next]);
     return next;
@@ -544,31 +469,15 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
   const frozen = useMemo(() => blockedTiles(combat), [frozenKey]);
   // Elite kill mints a relic (the server grants the same one in the next run link).
   const defeated = !!combat?.defeated;
+  // Once the server has spoken, only its grant counts (a rejected kill mints nothing).
   const trophy = useMemo<RelicId | null>(
-    // Once the server has spoken, only its grant counts (a rejected kill mints nothing).
     () => (kind === 'elite' && defeated ? (result ? result.trophy ?? null : eliteTrophy(world, relics)) : null),
     [kind, defeated, result, world, relics],
   );
-  /** The run as the screen should draw it: the minted trophy already in the relic bar. */
-  const runShown = useMemo(
-    () => (trophy && run && !run.relics.includes(trophy) ? { ...run, relics: [...run.relics, trophy] } : run),
-    [run, trophy],
-  );
+  const runShown = useMemo(() => runWithTrophy(run, trophy), [run, trophy]);
 
-  /** What this node moved elsewhere in the game — zeroed until the server answers. */
-  const ecosystem = useMemo<EcosystemGains | null>(() => (result ? {
-    xpGained: result.xpGained ?? 0,
-    coinsGained: result.coinsGained ?? 0,
-    leaderboardPoints: result.leaderboardPoints ?? 0,
-    achievementsUnlocked: result.achievementsUnlocked ?? [],
-    ...(result.levelUp ? { levelUp: result.levelUp } : {}),
-    ...(result.streak ? { streak: result.streak } : {}),
-  } : null), [result]);
-
-  const nextNodes = useMemo(
-    () => (map ? reachable.map((id) => map.nodes.find((n) => n.id === id)).filter((n): n is NonNullable<typeof n> => !!n) : []),
-    [map, reachable],
-  );
+  const ecosystem = useMemo(() => ecosystemOf(result), [result]);
+  const nextNodes = useMemo(() => reachableNodes(map, reachable), [map, reachable]);
 
   return {
     phase, grid, lvl, words, score, msLeft, frozen, bossHp, boss, bossHits, result,
