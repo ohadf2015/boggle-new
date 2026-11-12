@@ -23,32 +23,27 @@ export function ClassSetupInvitePlan({ classroomId, calendar, t, className }: Cl
   const cardId = useId();
   return (
     <div data-testid="setup-plan" className={cn('flex flex-col gap-2', className)}>
-      <LessonPlanPrompt
-        classroomId={classroomId}
-        source="class_setup"
-        after={
-          calendar ? (
-            <>
-              <button
-                type="button"
-                data-testid="setup-plan-calendar-toggle"
-                aria-expanded={calendarOpen}
-                aria-controls={cardId}
-                onClick={() => setCalendarOpen((open) => !open)}
-                className={cn(NB_LINK, 'self-center')}
-              >
-                <CalendarPlus className="size-4" aria-hidden="true" />
-                {t('eduShell.setup.plan.calendarToggle')}
-              </button>
-              {calendarOpen ? (
-                <div id={cardId}>
-                  <FirstGamePlanCard {...calendar} t={t} />
-                </div>
-              ) : null}
-            </>
-          ) : null
-        }
-      />
+      <LessonPlanPrompt classroomId={classroomId} source="class_setup" reserveSpace />
+      {calendar ? (
+        <>
+          <button
+            type="button"
+            data-testid="setup-plan-calendar-toggle"
+            aria-expanded={calendarOpen}
+            aria-controls={cardId}
+            onClick={() => setCalendarOpen((open) => !open)}
+            className={cn(NB_LINK, 'self-center')}
+          >
+            <CalendarPlus className="size-4" aria-hidden="true" />
+            {t('eduShell.setup.plan.calendarToggle')}
+          </button>
+          {calendarOpen ? (
+            <div id={cardId}>
+              <FirstGamePlanCard {...calendar} t={t} />
+            </div>
+          ) : null}
+        </>
+      ) : null}
     </div>
   );
 }

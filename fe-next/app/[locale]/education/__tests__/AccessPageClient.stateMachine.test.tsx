@@ -96,14 +96,15 @@ describe('<PageClient> (access page state machine)', () => {
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });
 
-  it('offers to finish access when the request says approved but the settled profile has no teacher role', () => {
+  it('asks for a human look when the request says approved but the settled profile has no teacher role', () => {
     // Loading covers the profile race; settled and still no role, the approved card's link would bounce straight back here.
     mockTeacherAccessState.hasAccess = false;
     mockTeacherAccessState.status = 'approved';
     mockTeacherAccessState.isLoading = false;
     render(<PageClient />);
-    expect(screen.getByText('education.access.pending_finish_cta')).toBeInTheDocument();
+    expect(screen.getByText('education.access.review_title')).toBeInTheDocument();
     expect(screen.queryByText('education.access.already_approved_title')).not.toBeInTheDocument();
+    // Should NOT render the form
     expect(screen.queryByTestId('access-request-gate')).not.toBeInTheDocument();
   });
 

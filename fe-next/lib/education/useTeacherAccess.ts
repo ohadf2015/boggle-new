@@ -70,7 +70,11 @@ export function useTeacherAccess(): UseTeacherAccessResult {
   useEffect(() => {
     if (!awaitingProfile) return;
     const id = setTimeout(() => setProfileTimedOutFor(attempt), PROFILE_WAIT_MS);
-    return () => clearTimeout(id);
+    // Leaving the wait (profile arrived, or Retry) clears it, so a later blip starts a fresh full wait.
+    return () => {
+      clearTimeout(id);
+      setProfileTimedOutFor(null);
+    };
   }, [awaitingProfile, attempt]);
   const profileFailed = awaitingProfile && profileTimedOutFor === attempt;
 

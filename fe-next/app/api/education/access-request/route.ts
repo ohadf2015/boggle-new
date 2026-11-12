@@ -22,11 +22,17 @@ function bad(msg: string, status = 400) {
   return NextResponse.json({ ok: false, error: msg }, { status });
 }
 
+function refuse(code: string, status: number) {
+  return NextResponse.json({ ok: false, error: code, code }, { status });
+}
+
+type HistoryRow = { id: string; status: string; trial_expires_at: string | null };
+
 // The request row is already committed when this answers, so a generic 500
 // would lie ("Something went wrong" next to a durably filed request). 202 +
 // approvalPending tells the client the truth: received, approval still
-// processing. A re-submit re-runs the approval against the stranded pending
-// row (rate limit allows 3/24h), so the path self-heals.
+// processing. A re-submit re-runs the approval on that same pending row, with
+// no new row, so the path self-heals.
 function pendingApproval() {
   return NextResponse.json({ ok: true, success: true, approvalPending: true }, { status: 202 });
 }
@@ -93,33 +99,68 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, success: true, alreadyApproved: true, paidDay0: isPaidMedium(profile?.utm_medium) });
   }
 
-  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const recent = await sb
+  // Every branch reads this user's own history, so no press can undo a decline or start a second trial clock.
+  const history = await sb
     .from('teacher_access_requests')
-    .select('id', { count: 'exact', head: true })
-    .eq('email', email)
-    .gte('created_at', since);
-  if ((recent.count || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
+    .select('id, status, trial_expires_at, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+  if (history.error) {
+    console.error('[access-request] history lookup failed for', email, '-', history.error.message);
+    return refuse('lookup_failed', 500);
+  }
+  const rows = (history.data ?? []) as HistoryRow[];
+  const latest = rows[0] ?? null;
+  const priorTrial = rows.find((r) => r.trial_expires_at)?.trial_expires_at ?? null;
+
+  if (latest?.status === 'declined') return refuse('declined', 403);
+  if (latest?.status === 'approved') {
+    // No column records whether the role was never set or was taken away, so a person decides.
+    await notifyAdmins({
+      ...teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: false }),
+      title: `Teacher access needs a look: ${full_name}`,
+      dedupeKey: `teacher_access_review:${user.id}`,
+    });
+    return refuse('needs_review', 409);
+  }
 
   const payload: TeacherAccessFormPayload = { email, full_name, role, locale, use_case, school_or_org, country };
-  const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
-  // The idempotency guard (short-circuit above) protects against most duplicate
-  // submits, so insert errors are real and should not be silently tolerated.
-  if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
+  if (latest?.status !== 'pending') {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const recent = await sb
+      .from('teacher_access_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('email', email)
+      .gte('created_at', since);
+    if ((recent.count || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
+
+    const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
+    // The idempotency guard (short-circuit above) protects against most duplicate
+    // submits, so insert errors are real and should not be silently tolerated.
+    if (ins.error) {
+      console.error('[access-request] insert failed for', email, '-', ins.error.message);
+      return refuse('insert_failed', 500);
+    }
+  }
 
   // Every early exit below leaves the request pending; the owner still has to hear about it.
   const pendingAndTell = async () => {
-    await notifyAdmins(teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: false }));
+    await notifyAdmins({
+      ...teacherRequestNotice({ full_name, role, school_or_org, country, autoApproved: false }),
+      dedupeKey: `teacher_request_pending:${user.id}`,
+    });
     return pendingApproval();
   };
 
   // Growth Radar server step: record request creation once durably inserted.
-  try {
-    captureProFunnelServerEvent(
-      buildEduAccessRequestCreatedEvent(user.id, { role, locale, role_picked: rolePicked })
-    );
-  } catch {
-    /* telemetry failure must never break access request */
+  if (latest?.status !== 'pending') {
+    try {
+      captureProFunnelServerEvent(
+        buildEduAccessRequestCreatedEvent(user.id, { role, locale, role_picked: rolePicked })
+      );
+    } catch {
+      /* telemetry failure must never break access request */
+    }
   }
 
   // Access is granted INSTANTLY on submit — no manual review step. The insert
@@ -137,7 +178,7 @@ export async function POST(req: Request) {
     return pendingAndTell();
   }
 
-  const trialExpiresAt = teacherTrialExpiry(Date.now());
+  const trialExpiresAt = priorTrial ?? teacherTrialExpiry(Date.now());
   const nowIso = new Date().toISOString();
   const approve = await admin
     .from('teacher_access_requests')
@@ -170,12 +211,10 @@ export async function POST(req: Request) {
   }
 
   const promoted = await admin.from('profiles').update({ user_role: 'teacher' }).eq('id', user.id).select('id');
-  if (promoted.error) {
-    console.error('[access-request] profile promotion failed for', email, '-', promoted.error.message);
-    return pendingAndTell();
-  }
-  if (!promoted.data?.length) {
-    console.error('[access-request] profile promotion matched no row for', email);
+  if (promoted.error || !promoted.data?.length) {
+    console.error('[access-request] profile promotion failed for', email, '-', promoted.error?.message ?? 'matched no row');
+    // Back to pending (trial date kept) so the next press finishes it, instead of an approved row with no role.
+    await admin.from('teacher_access_requests').update({ status: 'pending' }).eq('id', approve.data[0].id).eq('status', 'approved').select('id');
     return pendingAndTell();
   }
 
@@ -233,6 +272,9 @@ export async function GET(request: NextRequest) {
   const { data, error } = await sb.from('teacher_access_requests')
     .select('*').eq('user_id', user.id)
     .order('created_at', { ascending: false }).limit(1).maybeSingle();
-  if (error) return bad('request lookup failed: ' + error.message, 500);
+  if (error) {
+    console.error('[access-request] request lookup failed for', user.id, '-', error.message);
+    return refuse('lookup_failed', 500);
+  }
   return NextResponse.json({ row: data });
 }

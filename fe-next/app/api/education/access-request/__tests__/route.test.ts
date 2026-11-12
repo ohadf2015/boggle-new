@@ -38,6 +38,8 @@ vi.mock('@/utils/supabase/server', () => ({
         eq: vi.fn(() => ({
           // Rate-limit count query (teacher_access_requests)
           gte: vi.fn(async () => ({ data: [], count: recentCount, error: null })),
+          // This user's request history (none: a first request)
+          order: vi.fn(async () => ({ data: [], error: null })),
           // Profile lookup for server-derived name/country
           maybeSingle: vi.fn(async () =>
             table === 'profiles' ? { data: mockProfile, error: profileFetchError } : { data: null, error: null }

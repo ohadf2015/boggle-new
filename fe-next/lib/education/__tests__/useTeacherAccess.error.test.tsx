@@ -79,4 +79,47 @@ describe('useTeacherAccess: a failed check is not "no access"', () => {
     expect(result.current.error).toBeNull();
     expect(result.current.status).toBe('none');
   });
+
+  it('Given the profile arrived after a slow load, When a later refresh briefly drops it, Then no error shows at once; only a fresh full wait can raise it', async () => {
+    vi.useFakeTimers();
+    auth.current = { ...auth.current, profile: null };
+    getWithAuth.mockResolvedValue(ok(null));
+    const { result, rerender } = renderHook(() => useTeacherAccess());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(PROFILE_WAIT_MS + 1);
+    });
+    expect(result.current.error).toBe('profile');
+
+    auth.current = { ...auth.current, profile: { id: 'u-1', user_role: 'player' } };
+    rerender();
+    expect(result.current.error).toBeNull();
+
+    auth.current = { ...auth.current, profile: null };
+    rerender();
+    expect(result.current.error).toBeNull();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(PROFILE_WAIT_MS - 1);
+    });
+    expect(result.current.error).toBeNull();
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2);
+    });
+    expect(result.current.error).toBe('profile');
+  });
+
+  it('Given the profile error is showing, When nothing changes, Then it stays put until retry', async () => {
+    vi.useFakeTimers();
+    auth.current = { ...auth.current, profile: null };
+    getWithAuth.mockResolvedValue(ok(null));
+    const { result, rerender } = renderHook(() => useTeacherAccess());
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(PROFILE_WAIT_MS + 1);
+    });
+    expect(result.current.error).toBe('profile');
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(PROFILE_WAIT_MS * 3);
+    });
+    rerender();
+    expect(result.current.error).toBe('profile');
+  });
 });

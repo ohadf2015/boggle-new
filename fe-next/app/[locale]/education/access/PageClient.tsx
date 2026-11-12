@@ -82,11 +82,11 @@ export function PageClient() {
   // `'none'`). Field CLS 0.30 on this route was the short loading column
   // swapping into the wide hero+gate layout. The gate itself still waits.
   const handingOff = approval !== null;
-  const failed = !handingOff && Boolean(lookupError);
+  // A teacher who already has access is sent on whatever the request lookup says.
+  const failed = !handingOff && !hasAccess && Boolean(lookupError);
   const showPitch = handingOff || (!failed && status === 'none' && !hasAccess);
   const approved = !handingOff && !failed && !isLoading && hasAccess;
-  // A request approved while the account kept its old role would bounce between the gate and here, so it finishes like a pending one.
-  const unfinished = !handingOff && !failed && !isLoading && !hasAccess && (status === 'pending' || status === 'approved');
+  const settledWithoutRole = !handingOff && !failed && !isLoading && !hasAccess;
 
   // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
   // an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
@@ -127,7 +127,8 @@ export function PageClient() {
         />
       )}
 
-      {unfinished && <AccessPendingCard request={latestRequest} onApproved={setApproval} />}
+      {settledWithoutRole && status === 'pending' && <AccessPendingCard request={latestRequest} onApproved={setApproval} />}
+      {settledWithoutRole && status === 'approved' && <AccessPendingCard mode="review" request={latestRequest} onApproved={setApproval} />}
 
       {!isLoading && status === 'declined' && (
         <div className="rounded-neo border-neo-thick border-neo-black bg-neo-pink p-6 text-neo-white shadow-hard-lg">
@@ -139,7 +140,7 @@ export function PageClient() {
               {latestRequest.admin_note}
             </p>
           )}
-          <p className="mt-3 text-sm">{t('education.access.declined_reapply')}</p>
+          <p className="mt-3 text-sm">{t('education.access.declined_contact')}</p>
         </div>
       )}
 

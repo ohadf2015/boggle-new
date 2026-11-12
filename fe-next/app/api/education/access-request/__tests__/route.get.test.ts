@@ -46,6 +46,8 @@ describe('GET /api/education/access-request', () => {
     state.error = { message: 'timeout' };
     const res = await GET(req());
     expect(res.status).toBe(500);
-    expect(await res.json()).toMatchObject({ ok: false });
+    const body = await res.json();
+    expect(body).toEqual({ ok: false, error: 'lookup_failed', code: 'lookup_failed' });
+    expect(JSON.stringify(body)).not.toContain('timeout');
   });
 });

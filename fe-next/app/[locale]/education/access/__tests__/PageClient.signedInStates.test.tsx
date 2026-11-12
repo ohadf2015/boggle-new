@@ -113,11 +113,49 @@ describe('access page: a signed-in teacher always gets one clear next step', () 
     expect(await screen.findByRole('alert')).toHaveTextContent('education.access.submit_error');
   });
 
-  it('Given the request says approved but the account has no teacher role, Then it offers to finish, not an "already approved" card that bounces back here', () => {
+  it('Given the request says approved but the account has no teacher role, Then it says we need to look, offers no "finish", and no form or approved card', () => {
     set({ status: 'approved', latestRequest: { ...REQUEST, status: 'approved' } });
     render(<PageClient />);
-    expect(screen.getByTestId('access-pending')).toBeInTheDocument();
+    expect(screen.getByTestId('access-review')).toHaveTextContent('education.access.review_title');
+    expect(screen.queryByRole('button', { name: 'education.access.pending_finish_cta' })).toBeNull();
     expect(screen.queryByText('education.access.already_approved_title')).toBeNull();
+    expect(screen.queryByTestId('access-request-gate')).toBeNull();
+  });
+
+  it('Given approved without the role, When the teacher asks us to check, Then the route is told once and the card says the team has it', async () => {
+    const fetchMock = vi.fn(async () => ({ ok: false, status: 409, json: async () => ({ ok: false, code: 'needs_review' }) }));
+    vi.stubGlobal('fetch', fetchMock);
+    set({ status: 'approved', latestRequest: { ...REQUEST, status: 'approved' } });
+    render(<PageClient />);
+    fireEvent.click(screen.getByRole('button', { name: 'education.access.review_cta' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('education.access.review_sent');
+    expect(screen.queryByRole('button', { name: 'education.access.review_cta' })).toBeNull();
+    expect(replace).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a pending request, When the route answers that it was declined, Then it says so truthfully and offers no retry', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 403, json: async () => ({ ok: false, code: 'declined' }) })));
+    set({ status: 'pending', latestRequest: REQUEST });
+    render(<PageClient />);
+    fireEvent.click(screen.getByRole('button', { name: 'education.access.pending_finish_cta' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('education.access.declined_contact');
+    expect(screen.queryByRole('button', { name: 'education.access.pending_finish_cta' })).toBeNull();
+  });
+
+  it('Given a declined request, Then the card points to replying by email, not to reapplying through a form that is not there', () => {
+    set({ status: 'declined', latestRequest: { ...REQUEST, status: 'declined' } });
+    render(<PageClient />);
+    expect(screen.getByText('education.access.declined_contact')).toBeInTheDocument();
+    expect(screen.queryByText('education.access.declined_reapply')).toBeNull();
+    expect(screen.queryByTestId('access-request-gate')).toBeNull();
+  });
+
+  it('Given teacher access and a failed request lookup, with no from, Then the teacher is still sent on, never shown the error', async () => {
+    set({ hasAccess: true, status: 'approved', error: 'request' });
+    render(<PageClient />);
+    expect(screen.queryByTestId('access-load-error')).toBeNull();
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/en/teacher/classroom/new'));
   });
 
   it('Given teacher access and no class yet, with no from, Then the page goes straight to class setup', async () => {

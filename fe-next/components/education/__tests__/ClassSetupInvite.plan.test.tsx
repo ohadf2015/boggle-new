@@ -129,13 +129,27 @@ describe('ClassSetupInvite: what next with no students yet', () => {
     expect(screen.getByTestId('first-game-plan')).toHaveTextContent('eduShell.setup.plan.title');
   });
 
-  it('Given the saved lesson time is still loading, Then the calendar link waits too, so the reminder never pops in above it', async () => {
+  it('Given the saved lesson time is still loading, Then its space is held by a placeholder and the calendar link is already there', async () => {
     let answer: (v: unknown) => void = () => {};
     fetchMock.mockImplementation(() => new Promise((r) => { answer = r; }));
     render(<ClassSetupInvite classroomId="c1" />);
-    expect(screen.queryByTestId('setup-plan-calendar-toggle')).toBeNull();
+    expect(screen.getByTestId('lesson-plan-placeholder')).toBeInTheDocument();
+    expect(screen.getByTestId('setup-plan-calendar-toggle')).toBeInTheDocument();
     answer({ ok: true, status: 200, json: async () => ({ ok: true, lessonAt: null }) });
-    expect(await screen.findByTestId('setup-plan-calendar-toggle')).toBeInTheDocument();
+    expect(await screen.findByTestId('lesson-plan')).toBeInTheDocument();
+    expect(screen.queryByTestId('lesson-plan-placeholder')).toBeNull();
+  });
+
+  it('Given the teacher is typing a lesson time, When the first student joins, Then the reminder stays with her typed time', async () => {
+    const view = render(<ClassSetupInvite classroomId="c1" />);
+    await screen.findByTestId('lesson-plan');
+    const input = screen.getByLabelText(`${LP}.pickLabel`);
+    fireEvent.change(input, { target: { value: '2030-01-15T10:30' } });
+
+    roster.current = { students: [{ id: 's1', name: 'Noa', avatar: null }], loading: false, arrivals: ['s1'] };
+    view.rerender(<ClassSetupInvite classroomId="c1" />);
+    expect(screen.getByTestId('lesson-plan')).toBeInTheDocument();
+    expect(screen.getByLabelText(`${LP}.pickLabel`)).toHaveValue('2030-01-15T10:30');
   });
 
   it('Given the class already has its word list, Then the calendar card also offers to send the link for practice at home, without asking the database', async () => {

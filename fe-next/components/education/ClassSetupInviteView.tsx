@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, type ReactNode } from 'react';
+import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import Link from 'next/link';
 import { MonitorPlay, Play, UsersRound } from 'lucide-react';
 import { EduMascot } from '@/components/education/EduMascot';
@@ -35,7 +35,7 @@ export interface ClassSetupInviteViewProps {
   words?: ReactNode;
   /** When given, this is the hero in the bottom slot whoever has joined, and the projector stays secondary. */
   play?: ReactNode;
-  /** What next for a teacher with no students yet; shown only once the roster says nobody has joined. */
+  /** What next for a teacher with no students yet; appears once the roster says nobody has joined, then stays for the visit. */
   plan?: ReactNode;
   footer?: ReactNode;
   t: T;
@@ -67,6 +67,9 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
   const studentsIn = (joined ?? 0) > 0;
   const projectorLeads = !play && !studentsIn;
   const seats = useRosterSeats();
+  // Once shown, the plan stays for the visit: a student arriving must not wipe a time the teacher is typing.
+  const [planShown, setPlanShown] = useState(false);
+  if (!planShown && joined === 0 && plan) setPlanShown(true);
   const newest = roster.arrivals[roster.arrivals.length - 1];
 
   const projector = (
@@ -162,7 +165,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
         </Link>
       </div>
 
-      {studentsIn || joined === null ? null : plan}
+      {planShown ? plan : null}
 
       {footer}
     </section>
