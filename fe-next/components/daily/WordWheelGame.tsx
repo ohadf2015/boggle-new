@@ -19,9 +19,7 @@ import { useWheelWordFx } from './wheel/useWheelWordFx';
 import { reportGoldenWordFound, useWheelGoldenWord } from './wheel/useWheelGoldenWord';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
-import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
-import { useExperiment } from '@/hooks/useExperiment';
-import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
+import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
 import { claimPointer } from '@/lib/wordWheel/claimPointer';
@@ -35,6 +33,8 @@ import { useWheelTimer } from './wheel/useWheelTimer';
 import { useWheelRivals, usePassToasts } from './wheel/useWheelRivals';
 import { useWheelFeedback, useChannelTimers, haptic, afterPaint } from './wheel/useWheelFeedback';
 import { useWheelCombo } from './wheel/useWheelCombo';
+import { useWheelDragHint } from './wheel/useWheelDragHint';
+import { useWheelMascotStages } from './wheel/useWheelMascotStages';
 import { useWheelLetterInput } from './wheel/useWheelLetterInput';
 import WordWheelFoundWords from './WordWheelFoundWords';
 import WordWheelHud from './WordWheelHud';
@@ -88,19 +88,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const acceptedLogRef = useRef<Array<{ word: string; multiplier: number }>>([]);
   const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
 
-  // exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark, suppressed once a word is found.
-  const { variant: dragHintVariant, trackExposure: trackDragHintExposure } =
-    useExperiment('exp-wordwheel-drag-hint-v1');
-  useEffect(() => {
-    trackDragHintExposure();
-  }, [trackDragHintExposure]);
-  const dragHintFtue = useMPFTUEIdle({
-    enabled: dragHintVariant === 'drag-hint',
-    wordsFound: wordsFound.length,
-    idleMs: 6000,
-    storageKey: 'ww_ftue_drag_v1',
-    onShown: () => trackGrowthEvent('wordwheel_drag_hint_shown', { variant: dragHintVariant }),
-  });
+  const dragHint = useWheelDragHint(wordsFound.length);
+  const mascotStage = useWheelMascotStages();
 
   const gameOverRef = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
@@ -151,7 +140,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     handleRemoveLetter, handleClear, handleBackspace,
   } = useWheelLetterInput({
     builtLetters, setBuiltLetters, gameOverRef, handleSubmitRef, lastSubmitWasDragRef, gameContainerRef,
-    cancelIdleSubmit, onActivity: dragHintFtue.markActivity, onEffect, playTileSelectSound, playButtonClickSound,
+    cancelIdleSubmit, onActivity: dragHint.markActivity, onEffect, playTileSelectSound, playButtonClickSound,
   });
 
   // An idle builder submits itself (a drag submits on release instead). Tap spelling gets time to
@@ -384,6 +373,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* Word line + wheel + actions centre together in the leftover height. */}
       <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
+      {/* The slack above the word line is the phone gag stage; the wrappers split the slack evenly, so the wheel stays put. */}
+      <div ref={mascotStage.reachRef} className="relative flex w-full flex-[1_0_auto] flex-col items-center justify-end">
+      <div ref={mascotStage.bandRef} data-testid="wheel-mascot-stage" className="relative w-full min-h-0 flex-1" />
       <WordWheelWordLine
         t={t}
         letters={builtLetters}
@@ -409,6 +401,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         banner={<WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} delay={0.2} className="inset-0 items-center" />}
         className="shrink-0"
       />
+      </div>
       <WheelDisc
         orbitRef={wheelContainerRef}
         large={inShell}
@@ -433,18 +426,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         goldIndex={goldIndex >= 0 ? goldIndex : null}
       >
         {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
-        {dragHintFtue.visible && (
-          <MPDragCoachmark
-            t={t}
-            accent="cyan"
-            onDismiss={() => {
-              trackGrowthEvent('wordwheel_drag_hint_dismissed', { variant: dragHintVariant });
-              dragHintFtue.dismiss();
-            }}
-          />
-        )}
+        {dragHint.visible && <MPDragCoachmark t={t} accent="cyan" onDismiss={dragHint.onDismiss} />}
       </WheelDisc>
 
+      <div className="flex w-full flex-[1_0_auto] flex-col items-center justify-start">
       <WheelActionBar
         t={t}
         hasLetters={builtLetters.length > 0}
@@ -454,6 +439,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onSubmit={handleSubmit}
         onBackspace={handleBackspace}
       />
+      </div>
       </div>
     </>
   );
@@ -474,7 +460,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               <WordWheelLiveRanks t={t} score={score} rivals={[...rivals].reverse()} />
             )}
           </div>
-          <ShellKeysCard t={t} />
+          <ShellKeysCard t={t} mascotStageRef={mascotStage.railRef} />
         </>
       ) : null}
       right={inShell ? <div className="h-full min-h-0 overflow-hidden rounded-neo zone-panel-lime">{foundWords}</div> : null}
@@ -490,7 +476,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
-        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} />}
+        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
       </div>
     </GameShell>
   );
