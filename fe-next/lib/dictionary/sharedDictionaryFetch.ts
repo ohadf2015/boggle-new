@@ -20,8 +20,49 @@ export function hasClientDictionary(lang: string): boolean {
   return (SUPPORTED_GAME_LANGUAGES as readonly string[]).includes(lang);
 }
 
-export function dictionaryWordsUrl(lang: string): string {
-  return `/api/dictionary-words?lang=${lang}`;
+export function dictionaryWordsUrl(lang: string, opts: { encoded?: boolean } = {}): string {
+  return `/api/dictionary-words?lang=${lang}${opts.encoded ? '&enc=b64' : ''}`;
+}
+
+/** Filtered networks answer the plain Hebrew list with a 418 our server never sends; base64 is the fallback. */
+export function encodeDictionaryPayload(raw: string): string {
+  const bytes = new TextEncoder().encode(raw);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  }
+  return btoa(binary);
+}
+
+export function decodeDictionaryPayload(wire: string): string {
+  const binary = atob(wire.trim());
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+export async function fetchEncodedDictionaryText(
+  lang: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<string | null> {
+  try {
+    const res = await fetchFn(dictionaryWordsUrl(lang, { encoded: true }), { credentials: 'same-origin' });
+    if (!res.ok) return null;
+    return decodeDictionaryPayload(await res.text());
+  } catch {
+    return null;
+  }
+}
+
+async function withEncodedFallback(
+  lang: string,
+  plain: Response,
+  fetchFn: typeof fetch,
+): Promise<Response> {
+  if (plain.ok) return plain;
+  const text = await fetchEncodedDictionaryText(lang, fetchFn);
+  if (text == null) return plain;
+  return new Response(text, { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
 }
 
 export function fetchDictionaryWordsNetwork(
@@ -36,11 +77,19 @@ export function fetchDictionaryWordsNetwork(
   const url = dictionaryWordsUrl(lang);
   let pending = inflight.get(url);
   if (!pending) {
-    pending = fetchFn(url, { credentials: 'same-origin' });
-    inflight.set(url, pending);
-    pending.catch(() => {
-      inflight.delete(url);
-    });
+    pending = fetchFn(url, { credentials: 'same-origin' }).then((plain) =>
+      withEncodedFallback(lang, plain, fetchFn),
+    );
+    const settled = pending;
+    inflight.set(url, settled);
+    settled.then(
+      (res) => {
+        if (!res.ok && inflight.get(url) === settled) inflight.delete(url);
+      },
+      () => {
+        if (inflight.get(url) === settled) inflight.delete(url);
+      },
+    );
   }
   return pending.then((response) =>
     typeof response.clone === 'function' ? response.clone() : response,

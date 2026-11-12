@@ -24,6 +24,8 @@ export interface AbandonExtras {
   score?: number;
   /** Standing floors when the mode's unit of progress is not words (Word Tower). */
   floors?: number;
+  /** Word Tower daily opened on a saved tower, so a 0-floor leave may be a look, not a bounce. */
+  daily_restored?: boolean;
   sp_mode?: string;
   landing_path?: string;
   /** Last coach step reached. Set only for sp_mode=challenge. */
@@ -121,6 +123,7 @@ export function markGameActive(mode: string, extras: AbandonExtras = {}): void {
       ...(extras.coach_step ? { coach_step: extras.coach_step } : {}),
       ...(extras.gameCode ? { gameCode: extras.gameCode } : {}),
       ...(extras.isMultiplayer === true ? { isMultiplayer: true } : {}),
+      ...(extras.daily_restored !== undefined ? { daily_restored: extras.daily_restored } : {}),
       // Queued wins over the start payload's words_found: 0.
       ...(queued ?? {}),
     },
