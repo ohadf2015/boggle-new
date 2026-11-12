@@ -393,6 +393,7 @@ function SinglePlayerGame({
         grid={core.grid as LetterGrid}
         language={settings.language}
         score={core.score}
+        personalBest={settings.mode === 'practice' ? null : targetHighScore}
         remainingTime={settings.mode === 'practice' ? null : core.timer.remainingTime}
         totalSeconds={settings.timerSeconds}
         isPaused={core.isPaused}

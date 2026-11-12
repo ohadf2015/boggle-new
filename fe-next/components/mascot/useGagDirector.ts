@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { emitMascotEvent, subscribeMascotEvents } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
 import { createSeededRng } from '@/lib/mascot/rng';
-import { daysBetween, fitToRemaining, localDayKey, pickGag, variantDurationMs } from '@/lib/mascot/gagDirector';
+import { canInterrupt, daysBetween, fitToRemaining, forSession, localDayKey, pickGag, variantDurationMs } from '@/lib/mascot/gagDirector';
 import { loadGagHistory, saveGagHistory } from '@/lib/mascot/gagHistory';
 import { loadClipManifest, withClip, type ClipEntry } from '@/lib/mascot/clipManifest';
 import type { GagDef, GagEvent, GagVariant } from '@/lib/mascot/gagTypes';
@@ -25,11 +25,15 @@ interface Options {
 }
 
 let sessionShown = 0;
+let sessionCount = 0;
+const newSessionId = () => `${Date.now().toString(36)}-${++sessionCount}`;
+let sessionId = newSessionId();
 let manifestPromise: Promise<Map<string, ClipEntry>> | null = null;
 
 /** Test-only reset. */
 export function _resetGagSession(): void {
   sessionShown = 0;
+  sessionId = newSessionId();
   manifestPromise = null;
 }
 
@@ -53,13 +57,14 @@ export function useGagDirector({ enabled, language, seed, onShow }: Options): Ac
   }, []);
 
   const dispatch = useCallback((event: GagEvent) => {
-    if (activeRef.current) return;
-    const now = Date.now();
-    const history = loadGagHistory();
     const r = round.current;
+    const ctx = { rejectionsThisRound: r.rejections, wordsThisRound: r.words };
+    if (activeRef.current && !canInterrupt(event, ctx)) return;
+    const now = Date.now();
+    const history = forSession(loadGagHistory(), sessionId);
     const pick = pickGag(
       event,
-      { rejectionsThisRound: r.rejections, wordsThisRound: r.words },
+      ctx,
       { shownThisRound: r.shown, shownThisSession: sessionShown, lastShownAt: r.lastShownAt },
       history,
       rngRef.current,
@@ -67,6 +72,7 @@ export function useGagDirector({ enabled, language, seed, onShow }: Options): Ac
       localDayKey(now),
     );
     if (!pick) return;
+    if (endTimer.current) clearTimeout(endTimer.current);
     saveGagHistory(pick.history);
     r.shown += 1;
     r.lastShownAt = now;

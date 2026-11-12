@@ -321,9 +321,9 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         className={`
-          relative overflow-clip
+          relative overflow-clip min-w-0
           bg-neo-navy-light rounded-neo-lg border-2 border-neo-black
-          ${compact ? 'p-3' : 'p-4 sm:p-5'}
+          ${compact ? 'p-3' : 'p-3 sm:p-5'}
           shadow-hard
           ${accentIdentity.gridSkinClass}
         `}

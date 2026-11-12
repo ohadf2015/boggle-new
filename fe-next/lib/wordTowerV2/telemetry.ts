@@ -1,4 +1,4 @@
-import { trackGameEnd } from '@/utils/growthTracking';
+import { trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
 
 /**
  * One lifecycle stream. `v2` and `daily` are properties, not a second mode —
@@ -90,4 +90,17 @@ export function closeDailyTowerSession(
   stats: V2RunEndStats & { durationSec?: number },
 ): 'complete' | 'abandon' {
   return emitTowerEnd({ ...stats, daily: true }, stats.durationSec);
+}
+
+export type FloorLog = { current: { run: number; floor: number } };
+
+export function newFloorLog(): FloorLog {
+  return { current: { run: -1, floor: 0 } };
+}
+
+/** One event per floor per run; a floor rebuilt after a topple is not reported twice. */
+export function trackFloorPlaced(log: FloorLog, run: number, floor: number, daily: boolean, wordLength: number): void {
+  if (log.current.run === run && floor <= log.current.floor) return;
+  log.current = { run, floor };
+  trackGrowthEvent('word_tower_floor_placed', { floor, mode: daily ? 'daily' : 'free', wordLength });
 }

@@ -196,10 +196,12 @@ const SinglePlayerView: React.FC = () => {
   // in the codebase ever constructed that URL, so this branch was unreachable.
 
   // Get current high score for challenge mode
+  // phase is a dep so a record set last round is the one the next round races.
   const currentHighScore = useMemo(() => {
     if (gameState.mode !== 'challenge') return null;
     return getHighScore(gameState.difficulty, gameState.timerSeconds);
-  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState.mode, gameState.difficulty, gameState.timerSeconds, phase]);
 
   const handleGameEnd = useCallback((results: SinglePlayerResultsData) => {
     incrementTrainingGames();

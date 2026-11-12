@@ -1,5 +1,6 @@
 import { hasWordCraftBag, toWordCraftLocale, type SupportedLocale } from './tileBag'
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization'
+import { decodeDictionaryPayload, dictionaryWordsUrl } from '@/lib/dictionary/sharedDictionaryFetch'
 
 export function isValidWord(word: string, dict: Set<string> | null): boolean {
   if (!dict || !word) return false
@@ -140,13 +141,16 @@ export async function loadServerWordList(
 
   for (let attempt = 1; attempt <= FETCH_ATTEMPTS; attempt++) {
     try {
-      const resp = await fetchFn(`/api/dictionary-words?lang=${locale}`)
+      // The retry asks for the encoded copy: a filter that blocked the plain list blocks it again.
+      const encoded = attempt > 1
+      const resp = await fetchFn(dictionaryWordsUrl(locale, { encoded }))
       if (!resp.ok) {
         console.warn(
           `[loadWordCraftDictionary] ${locale}: HTTP ${resp.status} (attempt ${attempt}/${FETCH_ATTEMPTS})`,
         )
       } else {
-        const text = await resp.text()
+        const body = await resp.text()
+        const text = encoded ? decodeDictionaryPayload(body) : body
         const words: string[] = []
         for (const line of text.split('\n')) {
           const w = line.trim()

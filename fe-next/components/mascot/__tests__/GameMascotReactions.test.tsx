@@ -45,4 +45,14 @@ describe('GameMascotReactions', () => {
     act(() => emitMascotEvent({ kind: 'word-submitted', wordLength: 7, gemLetterUsed: false }));
     expect(screen.queryByTestId('blast-mascot-hud')).toBeNull();
   });
+
+  it('a host can move the mascot to its own slot instead of the default corner', () => {
+    render(<GameMascotReactions mode="crossword" comboLevel={0} slotClassName="bottom-4 start-2" />);
+    act(() => emitMascotEvent({ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false }));
+    const slot = screen.getByTestId('game-mascot-slot');
+    expect(slot.className).toContain('bottom-4 start-2');
+    expect(slot.className).not.toContain('end-[4.25rem]');
+    expect(slot.className).not.toContain('sm:top-3');
+    expect(slot.className).toContain('pointer-events-none');
+  });
 });

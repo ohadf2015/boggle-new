@@ -13,6 +13,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { loadWordCraftDictionary, loadServerWordList, DictionaryLoadError } from '../dictionary';
+import { encodeDictionaryPayload } from '@/lib/dictionary/sharedDictionaryFetch';
 
 const fetchMock = vi.fn();
 
@@ -54,7 +55,7 @@ describe('dictionary load — fails closed, loudly', () => {
   it('retries once before giving up, so a single dropped request is invisible', async () => {
     fetchMock
       .mockRejectedValueOnce(new Error('connection reset'))
-      .mockResolvedValueOnce({ ok: true, text: async () => 'ice\ncat' });
+      .mockResolvedValueOnce({ ok: true, text: async () => encodeDictionaryPayload('ice\ncat') });
 
     const dict = await loadWordCraftDictionary('en', { storage: memoryStorage() });
 
