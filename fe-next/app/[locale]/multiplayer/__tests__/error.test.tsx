@@ -90,4 +90,14 @@ describe('app/[locale]/multiplayer/error.tsx — Back goes through mpExit', () =
     expect(assign).toHaveBeenCalledWith('/en/multiplayer');
     expect(push).not.toHaveBeenCalled();
   });
+
+  it('a stale chunk in a live room never reloads by itself: it shows Update ready and the player taps Refresh', async () => {
+    setLocation('/en/multiplayer', '?room=ABCD');
+    render(<MultiplayerError error={makeError('ChunkLoadError', 'Loading chunk 7 failed')} reset={vi.fn()} />);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(window.location.replace).not.toHaveBeenCalled();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Update ready');
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }));
+    await vi.waitFor(() => expect(window.location.replace).toHaveBeenCalledTimes(1));
+  });
 });

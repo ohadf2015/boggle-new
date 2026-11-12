@@ -221,7 +221,12 @@ describe('hardNavigateCacheBust / stripChunkReloadParam', () => {
 describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)', () => {
   const originalSW = navigator.serviceWorker;
 
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-A');
+  });
+
   afterEach(() => {
+    vi.unstubAllEnvs();
     Object.defineProperty(navigator, 'serviceWorker', {
       configurable: true,
       value: originalSW,
@@ -246,14 +251,35 @@ describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)',
     expect(postMessage).toHaveBeenCalledWith(SW_SKIP_WAITING_MESSAGE);
   });
 
-  it('claimChunkRecoveryGuard is one-shot per session', async () => {
+  it('claimChunkRecoveryGuard is one-shot per build', async () => {
     const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, CHUNK_RECOVERY_GUARD_KEY } =
       await import('../staleDeployReload');
+    clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
-    expect(sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY)).toBe('true');
+    expect(sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY)).toBe('build-A');
     expect(claimChunkRecoveryGuard()).toBe(false);
     clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
+    clearChunkRecoveryGuard();
+  });
+
+  it('Given a reload already ran for an older build, When a newer build fails, Then it can claim once more and replaces the old mark', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, CHUNK_RELOAD_WINDOW_MARK } = await import('../staleDeployReload');
+    clearChunkRecoveryGuard();
+    expect(claimChunkRecoveryGuard()).toBe(true);
+    vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-B');
+    expect(claimChunkRecoveryGuard()).toBe(true);
+    expect(claimChunkRecoveryGuard()).toBe(false);
+    expect(window.name).toBe(`${CHUNK_RELOAD_WINDOW_MARK}@build-B;`);
+    clearChunkRecoveryGuard();
+  });
+
+  it('Given the build id is unknown, Then the guard never claims a reload', async () => {
+    const { claimChunkRecoveryGuard, clearChunkRecoveryGuard, chunkReloadAlreadyHappened } = await import('../staleDeployReload');
+    clearChunkRecoveryGuard();
+    vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', '');
+    expect(chunkReloadAlreadyHappened()).toBe(true);
+    expect(claimChunkRecoveryGuard()).toBe(false);
   });
   function blockStorage(): () => void {
     const real = window.sessionStorage;
@@ -304,8 +330,9 @@ describe('activateWaitingServiceWorkers / claimChunkRecoveryGuard (t_9cc3561f)',
     clearChunkRecoveryGuard();
     expect(claimChunkRecoveryGuard()).toBe(true);
     expect(window.name).toContain(CHUNK_RELOAD_WINDOW_MARK);
+    window.name = `keep${window.name}${CHUNK_RELOAD_WINDOW_MARK}`;
     clearChunkRecoveryGuard();
-    expect(window.name).not.toContain(CHUNK_RELOAD_WINDOW_MARK);
+    expect(window.name).toBe('keep');
   });
 });
 

@@ -8,6 +8,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 import { VersionChecker } from '../VersionChecker';
 import NavigationContext from '@/contexts/NavigationContext';
+import { STALE_DEPLOY_UPDATE_EVENT } from '@/lib/deploy/staleDeployReload';
 
 function NavWrapper({ isInGame, children }: { isInGame: boolean; children: ReactNode }) {
   const [active, setActive] = useState(isInGame);
@@ -91,6 +92,20 @@ describe('VersionChecker manual refresh', () => {
       await vi.advanceTimersByTimeAsync(10_000);
     });
 
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it('Given a chunk failed on a live game page, When the recovery asks for the banner, Then the refresh button shows without waiting for the poll', async () => {
+    render(
+      <NavWrapper isInGame={false}>
+        <VersionChecker />
+      </NavWrapper>,
+    );
+    expect(screen.queryByRole('button', REFRESH_BTN)).toBeNull();
+    act(() => {
+      window.dispatchEvent(new Event(STALE_DEPLOY_UPDATE_EVENT));
+    });
+    expect(screen.getByRole('button', REFRESH_BTN)).toBeTruthy();
     expect(reloadSpy).not.toHaveBeenCalled();
   });
 
