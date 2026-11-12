@@ -80,6 +80,13 @@ describe('<EduRouteError> after a deploy left the page with stale chunks', () =>
     expect(clearCachesAndReload).toHaveBeenCalledTimes(1);
   });
 
+  it('Given a student area that holds a live socket game, When a chunk fails for the first time, Then it never reloads by itself', () => {
+    render(<EduRouteError error={chunkError()} reset={vi.fn()} boundary="duels" area="student" autoReload={false} />);
+    expect(clearCachesAndReload).not.toHaveBeenCalled();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Update ready');
+    expect(screen.getByRole('button', { name: 'Back to class' })).toBeInTheDocument();
+  });
+
   it('Given an ordinary crash, When the boundary renders, Then nothing reloads, the crash is reported and Try again resets', () => {
     const reset = vi.fn();
     const error = new Error('boom');

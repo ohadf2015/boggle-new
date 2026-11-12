@@ -5,12 +5,8 @@ import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
-import {
-  clearCachesAndReload,
-  isChunkLoadError as isChunkLoadErrorNameMessage,
-  claimChunkRecoveryGuard,
-  clearChunkRecoveryGuard,
-} from '@/lib/deploy/staleDeployReload';
+import { isChunkLoadError as isChunkLoadErrorNameMessage } from '@/lib/deploy/staleDeployReload';
+import { useStaleDeployRecovery } from '@/lib/deploy/useStaleDeployRecovery';
 import { sectionHome } from '@/lib/navigation/sectionHome';
 
 function isChunkLoadError(error: Error): boolean {
@@ -61,28 +57,15 @@ export default function Error({
         path: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
     });
-
-    // Auto-refresh on chunk load errors (stale deployment cache)
-    if (chunkError) {
-      if (claimChunkRecoveryGuard()) {
-        void clearCachesAndReload();
-        return;
-      }
-      // Already tried refreshing once - clear the flag for next time
-      clearChunkRecoveryGuard();
-    }
   }, [error, locale]);
 
-  const handleRefresh = () => {
-    // For chunk errors, clear caches before reloading
-    if (isChunkLoadError(error)) {
-      clearCachesAndReload();
-    } else {
-      reset();
-    }
-  };
+  const { state, refresh } = useStaleDeployRecovery(error, { autoReload: true });
+  const isChunkError = state !== 'not-stale';
 
-  const isChunkError = isChunkLoadError(error);
+  const handleRefresh = () => {
+    if (isChunkError) refresh();
+    else reset();
+  };
 
   return (
     <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
