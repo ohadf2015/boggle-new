@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type Ref } from 'react';
 import { ShellKeysCard, ShellStandings, ShellStats, ShellWordFeed, type ShellStat, type ShellT } from '@/components/game/shell';
 import type { FoundWord } from '../types';
 
@@ -11,9 +11,10 @@ interface SoloLeftRailProps {
   validWords: readonly FoundWord[];
   streak: number;
   multiplier: number;
+  mascotStageRef?: Ref<HTMLDivElement>;
 }
 
-export const SoloLeftRail = memo(function SoloLeftRail({ t, score, bots, validWords, streak, multiplier }: SoloLeftRailProps) {
+export const SoloLeftRail = memo(function SoloLeftRail({ t, score, bots, validWords, streak, multiplier, mascotStageRef }: SoloLeftRailProps) {
   const rows = useMemo(
     () => [
       { id: 'you', name: t('gameShell.you') ?? '', score, isMe: true },
@@ -48,7 +49,7 @@ export const SoloLeftRail = memo(function SoloLeftRail({ t, score, bots, validWo
           </p>
         )}
       </ShellStats>
-      <ShellKeysCard t={t} />
+      <ShellKeysCard t={t} mascotStageRef={mascotStageRef} />
     </>
   );
 });

@@ -6,14 +6,25 @@ import type { GagBeat, GagVariant } from '@/lib/mascot/gagTypes';
 import { edgeSign } from './MascotEdgeStage';
 import { MascotGagProp } from './MascotGagProp';
 
+export type GagPlacement = 'edge' | 'stage' | 'timer';
+
+const PLACEMENT: Record<GagPlacement, string> = {
+  edge: 'absolute end-0 top-6 size-20 sm:size-24',
+  stage: 'absolute bottom-1 end-0 size-20 ltr:origin-bottom-right rtl:origin-bottom-left',
+  // Sits on the timer's start side and slides out from behind it, so it pushes the pill without covering the digits.
+  timer: 'absolute end-full top-1/2 -z-10 -mt-10 me-[-1.25rem] size-20 ltr:origin-right rtl:origin-left',
+};
+
 interface Props {
   playKey: number;
+  placement?: GagPlacement;
+  scale?: number;
   gagId: string;
   variant: GagVariant;
   onBeat: (beat: GagBeat) => void;
 }
 
-export function MascotGagPlayer({ playKey, gagId, variant, onBeat }: Props) {
+export function MascotGagPlayer({ playKey, placement = 'edge', scale = 1, gagId, variant, onBeat }: Props) {
   const [index, setIndex] = useState(0);
   const beat = variant.beats[index];
   const sign = edgeSign();
@@ -37,8 +48,11 @@ export function MascotGagPlayer({ playKey, gagId, variant, onBeat }: Props) {
       data-gag={gagId}
       data-variant={variant.id}
       data-phase={beat.phase}
+      data-placement={placement}
+      data-scale={scale}
       aria-hidden="true"
-      className="absolute end-0 top-6 size-20 sm:size-24 pointer-events-none"
+      style={scale === 1 ? undefined : { scale: String(scale) }}
+      className={`${PLACEMENT[placement]} pointer-events-none`}
     >
       <AdaptiveMotion.div
         initial={{ x: 84 * sign }}

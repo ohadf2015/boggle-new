@@ -81,3 +81,20 @@ describe('gag catalogue', () => {
     for (const s of sounds('record-overreaction')) expect(s.windup).toBe('gagDrumrollShort');
   });
 });
+
+describe('gag staging', () => {
+  const beats = GAG_CATALOG.flatMap((g) => g.variants.flatMap((v) => v.beats.map((b) => ({ gag: g.id, b }))));
+
+  it('no pose carries a baked-in backdrop disc behind the mascot', () => {
+    expect(beats.filter(({ b }) => b.pose.includes('powerup')).map(({ gag }) => gag)).toEqual([]);
+  });
+
+  it('the idle peek stays in view so the whole mascot reads', () => {
+    const idle = GAG_CATALOG.find((g) => g.id === 'caught-tracing')!;
+    for (const v of idle.variants) for (const b of v.beats) expect(b.out).toBeLessThanOrEqual(10);
+  });
+
+  it('the final-seconds gag plays at the timer, the only gag anchored there', () => {
+    expect(GAG_CATALOG.filter((g) => g.anchor === 'timer').map((g) => g.id)).toEqual(['holds-back-timer']);
+  });
+});

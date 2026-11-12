@@ -51,7 +51,9 @@ export interface CrosswordViewProps {
 }
 
 // Phones: over the masthead's difficulty label, clear of the size toggle and the streak badge; desktop: the free gutter beside the clue rail.
-const CROSSWORD_MASCOT_SLOT = 'top-[max(0.25rem,env(safe-area-inset-top))] start-1 lg:top-40 lg:start-auto lg:end-3';
+// Phones: in the header's free corner between the title and the sound button, clear of the difficulty badge.
+const CROSSWORD_MASCOT_SLOT =
+  'top-[max(0.625rem,env(safe-area-inset-top))] end-[3.25rem] scale-75 ltr:origin-top-right rtl:origin-top-left lg:top-40 lg:end-3 lg:scale-100';
 
 export function CrosswordView({
   puzzle,

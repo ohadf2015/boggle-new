@@ -11,4 +11,13 @@ describe('ShellKeysCard', () => {
     expect(mascot.getAttribute('aria-hidden')).toBe('true');
     expect(mascot.compareDocumentPosition(screen.getByTestId('shell-keys')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
+
+  it('given a host mascot stage, the idle sprite steps aside while a gag plays in its spot', () => {
+    let stage: HTMLDivElement | null = null;
+    render(<ShellKeysCard t={t} mascotStageRef={(el) => { stage = el; }} />);
+    const spot = screen.getByTestId('shell-mascot');
+    expect(stage).toBe(spot);
+    expect(spot.className).toContain('relative');
+    expect(spot.className).toContain('[&:has([data-mascot-stage-layer])>img]:invisible');
+  });
 });

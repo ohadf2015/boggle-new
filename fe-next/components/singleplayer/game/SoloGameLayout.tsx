@@ -153,6 +153,10 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
   const hapticsEnabled = useHapticsEnabled();
   const reduceMotion = useShouldReduceMotion();
   const playing = !awaitingStart && !isPaused && !isGameOver;
+  const [mascotBand, setMascotBand] = useState<HTMLDivElement | null>(null);
+  const [mascotRail, setMascotRail] = useState<HTMLDivElement | null>(null);
+  const [mascotTimer, setMascotTimer] = useState<HTMLDivElement | null>(null);
+  const mascotStages = useMemo(() => [mascotRail, mascotBand], [mascotRail, mascotBand]);
 
   // Floating "+N" on every accepted word.
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
@@ -190,7 +194,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       )}
 
       {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
-      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" language={language} remainingTime={remainingTime} score={score} personalBest={personalBest} />}
+      {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" language={language} remainingTime={remainingTime} score={score} personalBest={personalBest} stages={mascotStages} timerAnchor={mascotTimer} />}
       {playing && !soloLessonActive && (
         <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}
@@ -212,7 +216,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         accent="cyan"
         className={cn('relative z-10', soloLessonActive && LESSON_SHELL)}
         left={
-          <SoloLeftRail t={t} score={score} bots={bots} validWords={validWords} streak={soloStreak} multiplier={soloMultiplier} />
+          <SoloLeftRail t={t} score={score} bots={bots} validWords={validWords} streak={soloStreak} multiplier={soloMultiplier} mascotStageRef={setMascotRail} />
         }
         right={<SoloRightRail t={t} validWords={validWords} />}
       >
@@ -235,6 +239,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           <div className="flex-1" />
 
           {remainingTime !== null && (
+            <div ref={setMascotTimer} className="relative isolate shrink-0">
             <div
               data-testid="solo-timer"
               data-urgent={String(urgent)}
@@ -246,6 +251,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
               <Timer className="h-4 w-4" strokeWidth={3} aria-hidden />
               {/* Before Start the hook still holds its previous value; show the round length. */}
               <span dir="ltr">{formatClock(awaitingStart ? totalSeconds : remainingTime)}</span>
+            </div>
             </div>
           )}
 
@@ -297,12 +303,15 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           data-solo-slot="board"
           className="relative mt-1 flex min-h-0 flex-1 flex-col items-center justify-center [container-type:size]"
         >
+          {/* Phones: spare height collects above the board with the word row; the mascot plays there, under the traced word. Wide screens use the rail. */}
+          <div ref={setMascotBand} data-testid="solo-mascot-stage" className="relative flex min-h-0 w-full flex-1 flex-col justify-end shell:flex-none">
           {/* The traced word sits right on the board, where the eye already is. */}
-          <div className="relative flex h-[var(--solo-word-h)] w-full shrink-0 items-center justify-center">
+          <div className="relative z-10 flex h-[var(--solo-word-h)] w-full shrink-0 items-center justify-center">
             <WordFormingAreaConnected isTypingMode={isTypingMode} typedWord={typedWord} feedback={currentFeedback} />
             <div className="pointer-events-none absolute inset-x-0 -bottom-1 flex justify-center">
               {!soloLessonActive && <SoloComboMeter streak={soloStreak} multiplier={soloMultiplier} praiseKey={soloPraiseKey} />}
             </div>
+          </div>
           </div>
           <div className="flex justify-center" style={{ width: 'min(100cqw, calc(100cqh - var(--solo-word-h)), var(--solo-board-max))' }}>
             <GridComponent

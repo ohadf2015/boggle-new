@@ -49,6 +49,13 @@ describe('CrosswordView per-word juice', () => {
     expect(mascot.props).toHaveProperty('slotClassName', expect.stringContaining('lg:end-3'));
   });
 
+  it('Given a phone, the mascot sits clear of the difficulty badge at the header start', () => {
+    render(<CrosswordView puzzle={puzzle} />);
+    const slot = String((mascot.props as { slotClassName?: string }).slotClassName);
+    expect(slot.split(' ').filter((c) => /^start-/.test(c))).toEqual([]);
+    expect(slot).toMatch(/(^| )end-\S+/);
+  });
+
   it('Given a word chain, shows a combo chip that grows with the chain and feeds the mascot', () => {
     render(<CrosswordView puzzle={puzzle} />);
     expect(screen.queryByTestId('cw-combo')).toBeNull();

@@ -22,7 +22,6 @@ const P = {
   sleep: '/mascot/sleepy-nobg.webp',
   tada: '/mascot/victory-nobg.webp',
   sad: '/mascot/crying-nobg.webp',
-  power: '/mascot/powerup-nobg.webp',
 };
 
 type Extra = Partial<Omit<GagBeat, 'phase' | 'pose' | 'ms'>>;
@@ -51,14 +50,14 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'measures-the-word', beats: [
         b('windup', P.think, 520, prop('tape', 'enter')),
-        b('action', P.power, 160, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
+        b('action', P.cheer, 160, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
         b('freeze', P.shock, 620, { ...stretch, ...prop('tape', 'hold') }),
         b('reaction', P.smug, 520, { scaleX: 1.1, scaleY: 1.1, ...prop('tape', 'snap') }),
         b('reaction', P.smug, 300, leave),
       ] },
       { id: 'tapes-two-together', beats: [
         b('windup', P.think, 460, prop('tape', 'enter')),
-        b('action', P.power, 150, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
+        b('action', P.cheer, 150, { ...stretch, ...prop('tape', 'zip-out'), sound: 'gagTapeMeasure' }),
         b('freeze', P.shock, 560, { ...squash, ...prop('tape', 'hold') }),
         b('reaction', P.think, 560, { rotate: -6, ...prop('tape-double', 'enter') }),
         b('reaction', P.smug, 820, { scaleX: 1.14, scaleY: 1.14, ...prop('tape-double', 'hold') }),
@@ -139,14 +138,14 @@ export const GAG_CATALOG: readonly GagDef[] = [
     matches: (e) => e.kind === 'combo-broken' && e.fromLevel >= 3,
     variants: [
       { id: 'last-tile-on-nose', clip: 'bonk-dizzy', beats: [
-        b('windup', P.power, 380, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
+        b('windup', P.cheer, 380, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
         b('action', P.shock, 160, { ...squash, ...prop('tile-stack', 'fall'), sound: 'gagTileStackCrash' }),
         b('freeze', P.shock, 700, squash),
         b('reaction', P.dizzy, 520, { ...squash, ...prop('tile', 'drop'), sound: 'gagBonk' }),
         b('reaction', P.dizzy, 300, leave),
       ] },
       { id: 'catches-all-but-one', clip: 'bonk-dizzy', beats: [
-        b('windup', P.power, 360, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
+        b('windup', P.cheer, 360, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
         b('action', P.cheer, 160, { ...stretch, ...prop('tile-stack', 'fall'), sound: 'gagTileStackCrash' }),
         b('freeze', P.smug, 620, stretch),
         b('reaction', P.oops, 560, { ...squash, ...prop('tile', 'drop'), sound: 'gagBonk' }),
@@ -162,24 +161,25 @@ export const GAG_CATALOG: readonly GagDef[] = [
     matches: (e) => e.kind === 'idle',
     variants: [
       { id: 'traces-then-double-take', clip: 'glass-peek', beats: [
-        b('windup', P.sneak, 700, { out: 30 }),
-        b('action', P.think, 160, { out: 14, rotate: -10, sound: 'gagGlassSqueak' }),
-        b('freeze', P.think, 900, { out: 14, rotate: -10 }),
-        b('reaction', P.shock, 240, { out: 18, ...stretch }),
-        b('reaction', P.oops, 600, { out: 22 }),
+        b('windup', P.sneak, 700, { out: 8 }),
+        b('action', P.think, 160, { out: 0, rotate: -10, sound: 'gagGlassSqueak' }),
+        b('freeze', P.think, 900, { out: 0, rotate: -10 }),
+        b('reaction', P.shock, 240, { out: 2, ...stretch }),
+        b('reaction', P.oops, 600, { out: 4 }),
       ] },
       { id: 'dozes-then-double-take', clip: 'double-take', beats: [
-        b('windup', P.dizzy, 700, { out: 26 }),
-        b('action', P.sleep, 180, { out: 20, rotate: -14, y: 6 }),
-        b('freeze', P.sleep, 1400, { out: 20, rotate: -14, y: 6 }),
-        b('reaction', P.shock, 220, { out: 18, ...stretch }),
-        b('reaction', P.think, 600, { out: 22 }),
+        b('windup', P.dizzy, 700, { out: 8 }),
+        b('action', P.sleep, 180, { out: 0, rotate: -14, y: 6 }),
+        b('freeze', P.sleep, 1400, { out: 0, rotate: -14, y: 6 }),
+        b('reaction', P.shock, 220, { out: 2, ...stretch }),
+        b('reaction', P.think, 600, { out: 4 }),
       ] },
     ],
   },
   {
     id: 'holds-back-timer',
     bible: 8,
+    anchor: 'timer',
     chance: 1,
     holdUntil: 'round-end',
     matches: (e) => e.kind === 'timer-final-10s',
@@ -258,7 +258,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
     matches: (e) => e.kind === 'rare-letter',
     variants: [
       { id: 'tiny-whimper', clip: 'puffed-chest-smug', beats: [
-        b('windup', P.power, 520, { out: 20, ...prop('tile', 'hold') }),
+        b('windup', P.cheer, 520, { out: 20, ...prop('tile', 'hold') }),
         b('action', P.shock, 140, { out: 16, ...stretch, ...prop('tile', 'exit') }),
         b('freeze', P.sad, 620, { out: 16 }),
         b('reaction', P.sad, 420, { out: 20, sound: 'gagTinyWhimper' }),
@@ -287,7 +287,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
       ] },
       { id: 'taps-the-photo', beats: [
         b('windup', P.sneak, 440, prop('photo', 'enter')),
-        b('action', P.power, 140, { ...squash, ...prop('photo', 'flip') }),
+        b('action', P.cheer, 140, { ...squash, ...prop('photo', 'flip') }),
         b('freeze', P.smug, 680, prop('photo', 'hold')),
         b('reaction', P.think, 540, { rotate: -6, ...prop('photo', 'exit') }),
       ] },

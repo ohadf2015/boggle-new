@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, type Ref } from 'react';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ShellT } from './ShellPanel';
@@ -10,16 +10,23 @@ interface ShellKeysCardProps {
   t: ShellT;
   /** Esc has no meaning in a mode without a typed buffer to clear. */
   showClear?: boolean;
+  /** Lets a host play mascot gags in the sprite's spot. */
+  mascotStageRef?: Ref<HTMLDivElement>;
 }
 
 const KEY =
   'inline-flex min-w-[2.75rem] items-center justify-center rounded-md border-2 border-black bg-neo-cream px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase text-black shadow-[0_3px_0_#000] tv:text-base';
 
 /** Teaches keyboard play on desktop: the keys are drawn, not described. */
-function ShellKeysCardImpl({ t, showClear = true }: ShellKeysCardProps) {
+function ShellKeysCardImpl({ t, showClear = true, mascotStageRef }: ShellKeysCardProps) {
   return (
     <>
-      <div data-testid="shell-mascot" aria-hidden="true" className="flex min-h-0 flex-1 items-end justify-center overflow-hidden">
+      <div
+        ref={mascotStageRef}
+        data-testid="shell-mascot"
+        aria-hidden="true"
+        className="relative flex min-h-0 flex-1 items-end justify-center overflow-hidden [&:has([data-mascot-stage-layer])>img]:invisible"
+      >
         {/* eslint-disable-next-line @next/next/no-img-element -- decorative sprite, sized by the rail's leftover height */}
         <img src="/mascot/hello-nobg.webp" alt="" draggable={false} className={cn('h-full max-h-52 w-auto min-h-0 object-contain', styles.mascotBob)} />
       </div>

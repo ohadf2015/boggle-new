@@ -46,8 +46,9 @@ function Shape({ kind }: { kind: PropKind }) {
     case 'stamp':
       return (
         <div className="flex flex-col items-center">
-          <div className="h-3 w-2 rounded-t-sm border-2 border-neo-navy bg-neo-pink" />
-          <div className="h-3 w-7 rounded-sm border-2 border-neo-navy bg-neo-lime" />
+          <div className="size-3.5 rounded-full border-2 border-neo-black bg-neo-pink" />
+          <div className="-mt-0.5 h-2.5 w-2 border-x-2 border-neo-black bg-neo-pink" />
+          <div className="-mt-0.5 h-3.5 w-9 rounded-sm border-2 border-neo-black bg-neo-lime shadow-hard-sm" />
         </div>
       );
     case 'book':
@@ -119,7 +120,9 @@ export function MascotGagProp({ kind, move }: { kind: PropKind; move: PropMove }
       transition={{ duration: m.duration }}
       className={`absolute ${place} pointer-events-none`}
     >
-      <Shape kind={kind} />
+      <div className="scale-150">
+        <Shape kind={kind} />
+      </div>
     </AdaptiveMotion.div>
   );
 }

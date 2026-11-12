@@ -64,6 +64,8 @@ export interface GagDef {
   after?: string;
   /** Daily gags in one group share a single daily slot and take turns across days. */
   dailyGroup?: string;
+  /** Plays against a host element instead of the gag stage; the host passes it in. */
+  anchor?: 'timer';
   /** Cuts a playing gag short and skips the round and session caps. */
   interrupts?: boolean;
 }

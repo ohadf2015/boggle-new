@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { AdaptiveAnimatePresence, AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { BlastMascotHud } from '@/components/blast/legacy/BlastMascotHud';
 import { useBlastMascot } from '@/lib/blast/useBlastMascot';
@@ -21,6 +22,7 @@ import { MascotEdgeStage } from './MascotEdgeStage';
 import { MascotGagPlayer } from './MascotGagPlayer';
 import { MascotTileStack } from './MascotTileStack';
 import { useGagDirector } from './useGagDirector';
+import { useMascotStage } from './useMascotStage';
 
 export type MascotPersonality = 'full' | 'quiet';
 
@@ -39,11 +41,18 @@ interface GameMascotReactionsProps {
   slotClassName?: string;
   /** Position and height of the gag strip; defaults to the top HUD row. */
   stageClassName?: string;
+  /** Free areas the host leaves for the mascot (e.g. phone band, desktop rail); the first visible, tall-enough one is used. */
+  stages?: ReadonlyArray<HTMLElement | null>;
+  /** Element the final-seconds gag pushes against. */
+  timerAnchor?: HTMLElement | null;
 }
 
 const COMBO_BREAK_MIN = 3;
 const FINAL_SECONDS = 10;
 const DEFAULT_SLOT = 'top-[calc(env(safe-area-inset-top,0px)+2.75rem)] end-[4.25rem] sm:top-3 sm:end-3';
+const STAGE_SLOT = 'bottom-1 end-1';
+const STAGE_LAYER = 'absolute inset-0 overflow-x-clip pointer-events-none [&_*]:pointer-events-none';
+const TIMER_SCALE = 0.7;
 
 export function GameMascotReactions({
   mode,
@@ -56,7 +65,10 @@ export function GameMascotReactions({
   personalBest = null,
   slotClassName = DEFAULT_SLOT,
   stageClassName,
+  stages,
+  timerAnchor = null,
 }: GameMascotReactionsProps) {
+  const stage = useMascotStage(stages);
   const mascot = useBlastMascot();
   const pref = useMascotEnabled();
   const [reducedEffects] = useReducedEffects();
@@ -129,41 +141,70 @@ export function GameMascotReactions({
   const motion = escalationMotion(tier);
   const wiggle = tier > 0 && !reducedMotion;
 
+  const reaction = (
+    <AdaptiveAnimatePresence>
+      {show && (
+        <AdaptiveMotion.div
+          key="game-mascot"
+          data-testid="game-mascot-slot"
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.6 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 24 }}
+          className={`absolute ${stage ? STAGE_SLOT : slotClassName} z-50 pointer-events-none [&_*]:pointer-events-none`}
+        >
+          <AdaptiveMotion.div
+            data-testid="mascot-escalation"
+            className="relative"
+            data-tier={tier}
+            animate={
+              wiggle
+                ? { rotate: [-motion.wiggleDeg, motion.wiggleDeg, -motion.wiggleDeg], scale: [1, motion.bounceScale, 1] }
+                : { rotate: 0, scale: 1 }
+            }
+            transition={wiggle ? { duration: motion.periodMs / 1000, repeat: Infinity } : { duration: 0.15 }}
+          >
+            {full && <MascotTileStack count={comboLevel} />}
+            <BlastMascotHud state={mascot.state} />
+          </AdaptiveMotion.div>
+        </AdaptiveMotion.div>
+      )}
+    </AdaptiveAnimatePresence>
+  );
+
+  const atTimer = gag?.gag.anchor === 'timer' && timerAnchor ? timerAnchor : null;
+  const player = (placement: 'edge' | 'stage' | 'timer', scale = 1) =>
+    gag && (
+      <MascotGagPlayer
+        key={gag.key}
+        playKey={gag.key}
+        placement={placement}
+        scale={scale}
+        gagId={gag.gag.id}
+        variant={gag.variant}
+        onBeat={onBeat}
+      />
+    );
+  const inLayer = (el: HTMLElement, children: ReactNode) =>
+    createPortal(
+      <div data-mascot-stage-layer="" aria-hidden="true" className={STAGE_LAYER}>
+        {children}
+      </div>,
+      el,
+    );
+
+  const gagNode = !gag
+    ? null
+    : atTimer
+      ? createPortal(<div aria-hidden="true" className="contents">{player('timer', TIMER_SCALE)}</div>, atTimer)
+      : stage
+        ? null
+        : <MascotEdgeStage className={stageClassName}>{player('edge')}</MascotEdgeStage>;
+  const staged = !!stage && (show || (!!gag && !atTimer));
   return (
     <>
-      <AdaptiveAnimatePresence>
-        {show && (
-          <AdaptiveMotion.div
-            key="game-mascot"
-            data-testid="game-mascot-slot"
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.6 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 24 }}
-            className={`absolute ${slotClassName} z-50 pointer-events-none [&_*]:pointer-events-none`}
-          >
-            <AdaptiveMotion.div
-              data-testid="mascot-escalation"
-              className="relative"
-              data-tier={tier}
-              animate={
-                wiggle
-                  ? { rotate: [-motion.wiggleDeg, motion.wiggleDeg, -motion.wiggleDeg], scale: [1, motion.bounceScale, 1] }
-                  : { rotate: 0, scale: 1 }
-              }
-              transition={wiggle ? { duration: motion.periodMs / 1000, repeat: Infinity } : { duration: 0.15 }}
-            >
-              {full && <MascotTileStack count={comboLevel} />}
-              <BlastMascotHud state={mascot.state} />
-            </AdaptiveMotion.div>
-          </AdaptiveMotion.div>
-        )}
-      </AdaptiveAnimatePresence>
-      {gag && (
-        <MascotEdgeStage className={stageClassName}>
-          <MascotGagPlayer key={gag.key} playKey={gag.key} gagId={gag.gag.id} variant={gag.variant} onBeat={onBeat} />
-        </MascotEdgeStage>
-      )}
+      {stage ? staged && inLayer(stage.el, <>{reaction}{!atTimer && player('stage', stage.scale)}</>) : reaction}
+      {gagNode}
     </>
   );
 }

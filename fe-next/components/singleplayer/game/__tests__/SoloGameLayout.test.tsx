@@ -22,10 +22,12 @@ vi.mock('../components/SoloComboMeter', () => ({
 }));
 vi.mock('@/components/game/FloatingScoreAnimation', () => ({ default: () => <div data-testid="score-float" /> }));
 vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({ ComboMilestoneAnnouncement: () => <div data-testid="combo-milestone" /> }));
+const mascotProps = vi.hoisted(() => ({ last: null as null | { stages?: ReadonlyArray<HTMLElement | null>; timerAnchor?: HTMLElement | null } }));
 vi.mock('@/components/mascot/GameMascotReactions', () => ({
-  GameMascotReactions: (p: { score?: number; personalBest?: number | null; personality?: string }) => (
-    <div data-testid="game-mascot" data-score={p.score} data-best={String(p.personalBest)} data-personality={p.personality} />
-  ),
+  GameMascotReactions: (p: { score?: number; personalBest?: number | null; personality?: string; stages?: ReadonlyArray<HTMLElement | null>; timerAnchor?: HTMLElement | null }) => {
+    mascotProps.last = p;
+    return <div data-testid="game-mascot" data-score={p.score} data-best={String(p.personalBest)} data-personality={p.personality} />;
+  },
 }));
 vi.mock('@/contexts/AccessibilityContext', () => ({
   useHapticsEnabled: () => false,
@@ -77,6 +79,15 @@ describe('SoloGameLayout', () => {
     render(<SoloGameLayout {...props({ score: 61, personalBest: 60 })} />);
     const mascot = screen.getByTestId('game-mascot');
     expect([mascot.dataset.score, mascot.dataset.best, mascot.dataset.personality]).toEqual(['61', '60', 'full']);
+  });
+
+  it('gives the mascot the desktop rail spot, the free band above the board and the timer to play against', () => {
+    render(<SoloGameLayout {...props()} />);
+    const band = screen.getByTestId('solo-mascot-stage');
+    expect(band.className).toContain('flex-1');
+    expect(band.contains(screen.getByTestId('combo-meter'))).toBe(true);
+    expect(mascotProps.last?.stages).toEqual([screen.getByTestId('shell-mascot'), band]);
+    expect(mascotProps.last?.timerAnchor?.contains(screen.getByTestId('solo-timer'))).toBe(true);
   });
 
   it('sizes the board from its OWN slot, not the whole column', () => {
