@@ -14,9 +14,9 @@ describe('TitleBadge', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('shows a level title through the existing home.titles key', () => {
+  it('shows a level title through the landing.home.titles table', () => {
     render(<TitleBadge title="WORD_SEEKER" />);
-    expect(screen.getByTestId('title-badge')).toHaveTextContent('home.titles.WORD_SEEKER');
+    expect(screen.getByTestId('title-badge')).toHaveTextContent('landing.home.titles.WORD_SEEKER');
   });
 
   it('shows achievement titles from the progression namespace', () => {

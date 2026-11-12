@@ -18,6 +18,7 @@
  */
 import { COLLECTIBLE_PART_KEYS, isPartUsable } from './unlocks';
 import { getPartRarity, type VisualTier } from './rarity';
+import { COSMETICS } from '@/lib/cosmetics';
 
 export type ChestDropRarity = Exclude<VisualTier, 'common'>;
 export const CHEST_DROP_RARITIES: readonly ChestDropRarity[] = ['rare', 'epic', 'legendary'];
@@ -140,6 +141,101 @@ export function rollChestPart({ source, seed, ownedKeys, level }: RollChestPartI
   };
 }
 
+// ── Tile skins and board themes ─────────────────────────────────────────────
+//
+// Some rolls hand out a tile skin or board theme instead of an avatar part.
+// Same rarity roll and odds; the item is one the player does not own yet. With
+// none left at that rarity the chest falls back to an avatar part, so a
+// cosmetic never comes as a duplicate.
+
+export type ChestCosmeticCategory = 'tileSkin' | 'boardTheme';
+
+/** Percent chance that a chest's item is a tile skin or board theme, per chest. */
+export const CHEST_COSMETIC_ODDS: Record<ChestDropSource, number> = {
+  day_clear: 15,
+  day_perfect: 25,
+  weekly_bronze: 25,
+  weekly_silver: 30,
+  weekly_gold: 35,
+};
+
+/** Ledger key prefix: `cosmetic:<id>` in avatar_part_drops.part_key. */
+export const COSMETIC_KEY_PREFIX = 'cosmetic:';
+
+/** Skins and themes a chest can hold, by rarity (commons are cheap in the shop, so never). */
+export const CHEST_COSMETIC_POOL: Record<ChestDropRarity, readonly string[]> = (() => {
+  const pool: Record<ChestDropRarity, string[]> = { rare: [], epic: [], legendary: [] };
+  for (const c of COSMETICS) {
+    if (c.category !== 'tileSkin' && c.category !== 'boardTheme') continue;
+    if (c.rarity === 'common') continue;
+    pool[c.rarity].push(c.id);
+  }
+  return pool;
+})();
+
+export interface ChestCosmeticDrop {
+  kind: 'cosmetic';
+  /** `cosmetic:<id>`, the ledger key. */
+  key: string;
+  cosmeticId: string;
+  cosmeticCategory: ChestCosmeticCategory;
+  rarity: ChestDropRarity;
+  /** Always false: only unowned items drop. Kept for the shared ledger shape. */
+  duplicate: false;
+  refundCoins: 0;
+}
+
+/** Anything a chest can hold besides coins. */
+export type ChestItemDrop = ChestPartDrop | ChestCosmeticDrop;
+
+export function cosmeticDrop(cosmeticId: string, rarity: ChestDropRarity): ChestCosmeticDrop | null {
+  const c = COSMETICS.find((x) => x.id === cosmeticId);
+  if (!c || (c.category !== 'tileSkin' && c.category !== 'boardTheme')) return null;
+  return {
+    kind: 'cosmetic',
+    key: `${COSMETIC_KEY_PREFIX}${c.id}`,
+    cosmeticId: c.id,
+    cosmeticCategory: c.category,
+    rarity,
+    duplicate: false,
+    refundCoins: 0,
+  };
+}
+
+export interface RollChestItemInput extends RollChestPartInput {
+  /** profiles.purchased_cosmetics */
+  ownedCosmetics: readonly string[];
+}
+
+/**
+ * The chest's item: a tile skin or board theme on a CHEST_COSMETIC_ODDS roll
+ * when one of the rolled rarity is still unowned, else an avatar part.
+ */
+export function rollChestItem(input: RollChestItemInput): ChestItemDrop {
+  const { source, seed, ownedCosmetics } = input;
+  if (uniform(`${seed}#kind`) * 100 < CHEST_COSMETIC_ODDS[source]) {
+    const rarity = rollChestRarity(source, seed);
+    const owned = new Set(ownedCosmetics);
+    const fresh = CHEST_COSMETIC_POOL[rarity].filter((id) => !owned.has(id));
+    if (fresh.length > 0) {
+      const drop = cosmeticDrop(fresh[hash32(`${seed}#cosmetic`) % fresh.length], rarity);
+      if (drop) return drop;
+    }
+  }
+  return rollChestPart(input);
+}
+
+export function isChestCosmeticDrop(v: unknown): v is ChestCosmeticDrop {
+  if (!v || typeof v !== 'object') return false;
+  const d = v as Record<string, unknown>;
+  return (
+    d.kind === 'cosmetic' &&
+    typeof d.cosmeticId === 'string' &&
+    (d.cosmeticCategory === 'tileSkin' || d.cosmeticCategory === 'boardTheme') &&
+    (CHEST_DROP_RARITIES as readonly unknown[]).includes(d.rarity)
+  );
+}
+
 /** Shape a claim route answers with (`part` on the prize). */
 export function isChestPartDrop(v: unknown): v is ChestPartDrop {
   if (!v || typeof v !== 'object') return false;
@@ -152,4 +248,9 @@ export function isChestPartDrop(v: unknown): v is ChestPartDrop {
     typeof d.duplicate === 'boolean' &&
     typeof d.refundCoins === 'number'
   );
+}
+
+/** An avatar part or a tile skin / board theme, as a claim route answers it. */
+export function isChestItemDrop(v: unknown): v is ChestItemDrop {
+  return isChestCosmeticDrop(v) || isChestPartDrop(v);
 }

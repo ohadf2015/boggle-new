@@ -9,6 +9,11 @@ const es = {
     "duplicate": "Ya es tuya · +{coins} monedas",
     "wearIt": "Pruébatela",
     "oddsLabel": "Pieza de avatar:",
+    "cosmeticChance": "{pct}% de que sea un aspecto de fichas o un tema de tablero",
+    "tileSkin": "Aspecto de fichas",
+    "boardTheme": "Tema de tablero",
+    "useIt": "Usarlo",
+    "inUse": "En uso",
     "weeklyTeaser": "Pieza de avatar dentro · {legendary}% legendaria en {tier}",
     "chestOnly": "Exclusivo de cofres",
     "chestOnlyHint": "Completa las misiones diarias y abre cofres para encontrarla",
@@ -9700,6 +9705,7 @@ const es = {
   },
   "daily": {
     "qrWelcome": {
+      "warping": "Te llevamos al reto de hoy…",
       "badge": "Escaneado",
       "line": "Código escaneado: el puzle de hoy ya está listo."
     },
@@ -9948,6 +9954,7 @@ const es = {
     "modesPlayedCount": "{count} de 4 juegos hoy",
     "nextUp": "A continuación",
     "dayPrize": {"title": "¡Día superado!", "titlePerfect": "¡Día perfecto!", "ready": "Tu caja de premio está lista", "readyPerfect": "Los cuatro hechos. Caja extra desbloqueada", "tapToOpen": "Toca para abrir", "open": "Ábrela", "opening": "Abriendo...", "later": "Luego", "collect": "Recoger", "coins": "+{coins} monedas", "xp": "+{xp} XP", "notYet": "Termina los dos puzles de hoy para abrirla", "failed": "No se pudo abrir ahora. Inténtalo de nuevo desde la página diaria", "tier": {"common": "¡Bien!", "lucky": "¡Suerte!", "jackpot": "¡Premio gordo!"}, "todayLine": "Buen trabajo hoy.", "odds": "Probabilidades: {common}% Bien · {lucky}% Suerte · {jackpot}% Premio gordo", "hubReady": "La caja de premio de hoy te espera", "hubReadyPerfect": "Tu caja de día perfecto te espera", "hubOpened": "Caja de hoy: +{coins} monedas", "hubOpenedPerfect": "Caja de día perfecto: +{coins} monedas", "oneToGo": "1 más para el premio de hoy", "guestNudge": "Inicia sesión para abrir una caja diaria, hasta {coins} monedas"},
+    "todayChest": {"title": "Cofre de hoy", "and": " y ", "locked": "Termina {modes} para abrirlo", "progress": "{done}/{total}", "ready": "El cofre de hoy está listo", "readyBig": "¡Cofre grande listo: terminaste los cuatro!", "upgradeHint": "Termina antes los retos extra para un cofre más grande", "opened": "Cofre de hoy: +{coins} monedas", "alreadyOpen": "Ya abriste el cofre de hoy. Vuelve mañana por uno nuevo.", "upgradeLater": "O termina antes los retos extra para un cofre más grande.", "next": "Siguiente en {time}"},
     "allClearToday": "Todo listo por hoy. Hasta mañana",
     "allClear": {
       "title": "¡Todo listo!",

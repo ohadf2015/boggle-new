@@ -24,7 +24,8 @@ describe('equipWorldSkin', () => {
     equipWorldSkin(4, 'user-1');
 
     expect(JSON.parse(localStorage.getItem('lexiclash_cosmetics_equipped')!)).toEqual({ boardTheme: 'board-x', tileSkin: 'tile-world-4' });
-    expect(sync).toHaveBeenCalledWith('user-1', { boardTheme: 'board-x', tileSkin: 'tile-world-4' }, ['p1']);
+    // Only the equipped set is written: owned items (some granted by chests) are never overwritten from this tab.
+    expect(sync).toHaveBeenCalledWith('user-1', { boardTheme: 'board-x', tileSkin: 'tile-world-4' });
     expect(heard).toHaveBeenCalled();
     expect(equippedWorld()).toBe(4);
     window.removeEventListener('storage', heard);

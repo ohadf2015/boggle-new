@@ -9,6 +9,11 @@ const ja = {
     "duplicate": "もう持ってる · +{coins}コイン",
     "wearIt": "着てみる",
     "oddsLabel": "アバターパーツ：",
+    "cosmeticChance": "{pct}%の確率でタイルスキンかボードテーマ",
+    "tileSkin": "タイルスキン",
+    "boardTheme": "ボードテーマ",
+    "useIt": "使う",
+    "inUse": "使用中",
     "weeklyTeaser": "アバターパーツ入り · {tier}ならレジェンダリー{legendary}%",
     "chestOnly": "宝箱限定",
     "chestOnlyHint": "デイリーをクリアして宝箱から見つけよう",
@@ -9763,6 +9768,7 @@ const ja = {
   },
   "daily": {
     "qrWelcome": {
+      "warping": "今日のパズルへ移動中…",
       "badge": "スキャン済み",
       "line": "スキャン完了。今日のパズルをどうぞ。"
     },
@@ -9804,6 +9810,7 @@ const ja = {
     "modesPlayedCount": "今日のゲーム {count}/4",
     "nextUp": "次はこれ",
     "dayPrize": {"title": "今日をクリア!", "titlePerfect": "パーフェクトデー!", "ready": "プライズボックスの準備ができました", "readyPerfect": "4つすべてクリア。ボーナスボックス解放", "tapToOpen": "タップして開ける", "open": "開ける", "opening": "開けています...", "later": "あとで", "collect": "受け取る", "coins": "+{coins} コイン", "xp": "+{xp} XP", "notYet": "今日の2つのパズルをクリアすると開けられます", "failed": "今は開けられませんでした。デイリーページからもう一度お試しください", "tier": {"common": "ナイス!", "lucky": "ラッキー!", "jackpot": "ジャックポット!"}, "todayLine": "今日もおつかれさまでした。", "odds": "ボックスの確率: ナイス {common}% · ラッキー {lucky}% · ジャックポット {jackpot}%", "hubReady": "今日のプライズボックスが待っています", "hubReadyPerfect": "パーフェクトデーのボックスが待っています", "hubOpened": "今日のボックス: +{coins} コイン", "hubOpenedPerfect": "パーフェクトデーのボックス: +{coins} コイン", "oneToGo": "あと1つで今日の賞品", "guestNudge": "ログインすると毎日のプライズボックスを開けられます(最大 {coins} コイン)"},
+    "todayChest": {"title": "今日の宝箱", "and": "と", "locked": "{modes}をクリアすると開けられます", "progress": "{done}/{total}", "ready": "今日の宝箱を開けられます", "readyBig": "大きな宝箱：4つすべてクリア！", "upgradeHint": "先にボーナスパズルをクリアすると宝箱が大きくなります", "opened": "今日の宝箱：+{coins}コイン", "alreadyOpen": "今日の宝箱はもう開けました。また明日！", "upgradeLater": "先にボーナスパズルをクリアすると、もっと大きな宝箱になります。", "next": "次まで {time}"},
     "allClearToday": "今日はすべてクリア。また明日",
     "allClear": {
       "title": "オールクリア！",

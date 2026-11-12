@@ -5,7 +5,7 @@ import { CARRYOVER_GUEST_SESSION_KEY, GUEST_FINGERPRINT_KEY } from '@/utils/dail
 import { useAuth } from '@/contexts/AuthContext'
 import { subscribeRetentionStreak } from '@/lib/retention/streak'
 import posthog from '@/lib/analytics/lazyPosthog'
-import { isChestPartDrop, type ChestPartDrop } from '@/lib/avatar/chestDrops'
+import { isChestItemDrop, type ChestItemDrop } from '@/lib/avatar/chestDrops'
 import type { NextMilestone, StreakMilestone, WeekDay } from '@/lib/daily/streakRewards'
 
 export interface PendingChest {
@@ -18,7 +18,7 @@ export interface PendingChest {
   variantId?: string
   labelKey?: string
   /** The avatar part the chest held (missing on legacy chests / if the part side was down). */
-  part?: ChestPartDrop
+  part?: ChestItemDrop
 }
 
 export type ChestTier = 'bronze' | 'silver' | 'gold'
@@ -103,7 +103,7 @@ function normalizeOpenedChest(raw: unknown): PendingChest | null {
     freezes: Math.max(0, Number(raw.freezes) || 0),
     ...(typeof raw.variantId === 'string' ? { variantId: raw.variantId } : {}),
     ...(typeof raw.labelKey === 'string' ? { labelKey: raw.labelKey } : {}),
-    ...(isChestPartDrop(raw.part) ? { part: raw.part } : {}),
+    ...(isChestItemDrop(raw.part) ? { part: raw.part } : {}),
   }
 }
 
