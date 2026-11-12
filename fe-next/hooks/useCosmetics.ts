@@ -39,12 +39,13 @@ export function announceEquipped(): void {
 export function syncCosmeticsToSupabase(
   userId: string,
   equipped: Partial<Record<CosmeticCategory, string>>,
-  purchased: string[],
+  /** Leave out to write only what is equipped: chests add owned items server-side, and a stale list would erase them. */
+  purchased?: string[],
 ): void {
   if (!supabase) return;
   void supabase
     .from('profiles')
-    .update({ equipped_cosmetics: equipped, purchased_cosmetics: purchased })
+    .update(purchased ? { equipped_cosmetics: equipped, purchased_cosmetics: purchased } : { equipped_cosmetics: equipped })
     .eq('id', userId)
     .then(({ error }) => {
       if (error) console.error('[Cosmetics] Supabase sync failed:', error.message);
@@ -122,9 +123,9 @@ export function useCosmetics(input: UseCosmeticsInput) {
       setEquippedIds(next);
       saveJsonToLocalStorage(EQUIPPED_KEY, next);
       announceEquipped();
-      if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, next, purchasedIds);
+      if (isAuthenticated && user?.id) syncCosmeticsToSupabase(user.id, next);
     },
-    [equippedIds, playerState, isAuthenticated, user, purchasedIds]
+    [equippedIds, playerState, isAuthenticated, user]
   );
 
   const purchaseCosmetic = useCallback(

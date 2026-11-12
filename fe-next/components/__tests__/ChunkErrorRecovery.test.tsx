@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import ChunkErrorRecovery from '../ChunkErrorRecovery';
+import { STALE_DEPLOY_UPDATE_EVENT } from '@/lib/deploy/staleDeployReload';
 
 // Cache-busting replace is the observable side effect — stub it so the test
 // environment survives. Bare reload is the fallback only.
@@ -15,6 +16,8 @@ beforeEach(() => {
   Object.defineProperty(window, 'location', {
     value: {
       href: 'https://lexiclash.live/en',
+      pathname: '/en',
+      search: '',
       reload: reloadSpy,
       replace: replaceSpy,
     },
@@ -27,7 +30,14 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  Object.defineProperty(window.navigator, 'onLine', { configurable: true, get: () => true });
 });
+
+function rejectWithChunkError(): void {
+  const event = new Event('unhandledrejection') as Event & { reason?: unknown };
+  event.reason = new Error('Failed to fetch dynamically imported module: /_next/static/chunks/x.js');
+  window.dispatchEvent(event);
+}
 
 function mockVersion(serverBuildTime: string, ok = true): void {
   vi.stubGlobal(
@@ -96,5 +106,47 @@ describe('ChunkErrorRecovery', () => {
 
     await flush();
     expect(replaceSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChunkErrorRecovery on a live game page or offline', () => {
+  it.each(['/en/multiplayer', '/he/education/live/host', '/es/education/duels/7'])(
+    'Given a player in %s, When a lazy chunk fails, Then the page is not reloaded and the update banner is asked for instead',
+    async (pathname) => {
+      mockVersion('SERVER_NEW');
+      window.location = { ...window.location, pathname, href: `https://lexiclash.live${pathname}` } as Location;
+      const onUpdate = vi.fn();
+      window.addEventListener(STALE_DEPLOY_UPDATE_EVENT, onUpdate);
+      render(<ChunkErrorRecovery />);
+      rejectWithChunkError();
+      await flush();
+      await flush();
+      window.removeEventListener(STALE_DEPLOY_UPDATE_EVENT, onUpdate);
+      expect(replaceSpy).not.toHaveBeenCalled();
+      expect(reloadSpy).not.toHaveBeenCalled();
+      expect(onUpdate).toHaveBeenCalledTimes(1);
+      expect(sessionStorage.length).toBe(0);
+    },
+  );
+
+  it('Given a normal page, When a lazy chunk fails, Then it still reloads exactly once', async () => {
+    mockVersion('SERVER_NEW');
+    render(<ChunkErrorRecovery />);
+    rejectWithChunkError();
+    rejectWithChunkError();
+    await flush();
+    await flush();
+    expect(replaceSpy).toHaveBeenCalledOnce();
+  });
+
+  it('Given the browser is offline, When a dynamic import fails, Then nothing reloads and the guard stays free', async () => {
+    mockVersion('SERVER_NEW');
+    Object.defineProperty(window.navigator, 'onLine', { configurable: true, get: () => false });
+    render(<ChunkErrorRecovery />);
+    rejectWithChunkError();
+    await flush();
+    await flush();
+    expect(replaceSpy).not.toHaveBeenCalled();
+    expect(sessionStorage.length).toBe(0);
   });
 });

@@ -16,8 +16,9 @@ function dashboardUrl(locale: string): string {
   return teacherEmailUrl(siteLocale(locale), '/teacher', 'weekly_digest');
 }
 
-function copyFor(locale: string): DigestCopy {
-  return DIGEST_COPY[siteLocale(locale) as TeacherLocale] ?? DIGEST_COPY.en;
+function copyLocale(locale: string): TeacherLocale {
+  const site = siteLocale(locale);
+  return site in DIGEST_COPY ? (site as TeacherLocale) : 'en';
 }
 
 const signed = (n: number) => `\u200E${n >= 0 ? '+' : ''}${n}`;
@@ -61,7 +62,8 @@ ${rows.join('\n')}
 }
 
 export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subject: string; html: string } {
-  const c = copyFor(digest.locale);
+  const lang = copyLocale(digest.locale);
+  const c = DIGEST_COPY[lang];
   const classes = digest.classrooms;
   const played = classes.reduce((sum, cl) => sum + cl.progress.activeCount, 0);
   const games = classes.reduce((sum, cl) => sum + cl.metrics.thisWeek.gamesCompleted, 0);
@@ -99,7 +101,7 @@ export function teacherWeeklyProgressDigest(digest: WeeklyTeacherDigest): { subj
 
   const dashboard = { label: c.openDashboard, href: dashboardUrl(digest.locale) };
   const html = renderNeoEmail({
-    lang: siteLocale(digest.locale),
+    lang,
     dir: c.dir,
     preheader: c.preheader(played, games),
     accent: 'purple',

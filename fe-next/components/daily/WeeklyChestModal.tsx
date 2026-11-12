@@ -14,9 +14,9 @@ import { Mascot } from '@/components/ui/Mascot'
 import { getStreakHeat } from '@/lib/streakHeat'
 import { getStreakTier } from '@/lib/streakTierRewards'
 import { shareStreak } from '@/utils/streakShare'
-import ChestPartPrize from '@/components/avatar/chest/ChestPartPrize'
+import ChestItemPrize from '@/components/avatar/chest/ChestItemPrize'
 import ChestPartOdds from '@/components/avatar/chest/ChestPartOdds'
-import { isChestPartDrop, weeklyChestSource } from '@/lib/avatar/chestDrops'
+import { isChestItemDrop, weeklyChestSource } from '@/lib/avatar/chestDrops'
 
 const TIER_COLORS: Record<string, string> = {
   bronze: 'text-amber-500',
@@ -255,10 +255,10 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
             </span>
           </div>
 
-          {/* The headline prize: an avatar part, rarity first. */}
-          {isChestPartDrop(chest.part) ? (
+          {/* The headline prize: an avatar part or a skin / theme, rarity first. */}
+          {isChestItemDrop(chest.part) ? (
             <div className="w-full flex flex-col items-center gap-1.5">
-              <ChestPartPrize drop={chest.part} source={weeklyChestSource(chest.tier)} autoReveal={canClose} />
+              <ChestItemPrize drop={chest.part} source={weeklyChestSource(chest.tier)} autoReveal={canClose} />
               <ChestPartOdds source={weeklyChestSource(chest.tier)} className="text-center" />
             </div>
           ) : null}

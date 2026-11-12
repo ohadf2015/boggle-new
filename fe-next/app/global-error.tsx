@@ -2,12 +2,8 @@
 
 import { useEffect } from "react";
 import type { Language } from "@/types";
-import {
-  isChunkLoadError as isChunkLoadErrorNameMessage,
-  clearCachesAndReload,
-  claimChunkRecoveryGuard,
-  clearChunkRecoveryGuard,
-} from "@/lib/deploy/staleDeployReload";
+import { isChunkLoadError as isChunkLoadErrorNameMessage } from "@/lib/deploy/staleDeployReload";
+import { useStaleDeployRecovery } from "@/lib/deploy/useStaleDeployRecovery";
 import { detectLocaleFromPath } from "@/lib/deploy/detectLocaleFromPath";
 import { sectionHome } from "@/lib/navigation/sectionHome";
 
@@ -55,18 +51,9 @@ export default function GlobalError({
         digest: error.digest ?? "",
       });
     });
-
-    // Auto-refresh on chunk load errors — must use cache-bust + SW purge, not
-    // bare reload (that re-served offline-shell SWR HTML; t_9cc3561f).
-    if (chunkError) {
-      if (claimChunkRecoveryGuard()) {
-        void clearCachesAndReload();
-        return;
-      }
-      // Already tried once — clear so a later session can recover again.
-      clearChunkRecoveryGuard();
-    }
   }, [error, detectedLocale, chunkError]);
+
+  const { refresh } = useStaleDeployRecovery(error, { autoReload: true });
 
   const t = (path: string): string => {
     const fallbacks: Record<string, Record<string, string>> = {
@@ -94,8 +81,7 @@ export default function GlobalError({
 
   const handleRetry = () => {
     if (chunkError) {
-      clearChunkRecoveryGuard();
-      void clearCachesAndReload();
+      refresh();
       return;
     }
     reset();

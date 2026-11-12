@@ -22,6 +22,8 @@ import { captureError } from '@/utils/sentry';
 import { Mascot } from '@/components/ui/Mascot';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
+import { useStaleDeployRecovery } from '@/lib/deploy/useStaleDeployRecovery';
+import { StaleDeployScreen } from '@/components/deploy/StaleDeployScreen';
 
 export default function LessonPracticeError({
   error,
@@ -52,6 +54,24 @@ export default function LessonPracticeError({
     });
   }, [error]);
 
+  const { state, refresh } = useStaleDeployRecovery(error, { autoReload: true });
+  const goToLessons = () => {
+    const target = `/${locale}/student`;
+    if (state !== 'not-stale') window.location.assign(target);
+    else router.push(target);
+  };
+
+  if (state !== 'not-stale') {
+    return (
+      <StaleDeployScreen
+        locale={locale}
+        onRefresh={refresh}
+        mascot={<Mascot variant="oops" size="sm" animated={false} className="mx-auto mb-3" />}
+        secondary={{ label: t('student.practiceFun.myLessons', 'My lessons'), onClick: goToLessons, testId: 'practice-error-exit' }}
+      />
+    );
+  }
+
   return (
     <div className="flex h-dvh flex-1 items-center justify-center overflow-y-auto bg-neo-navy px-4 py-8">
       <div className="w-full max-w-sm rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light p-5 text-center shadow-hard-lg">
@@ -74,11 +94,7 @@ export default function LessonPracticeError({
         <button
           type="button"
           data-testid="practice-error-exit"
-          onClick={() => {
-            const target = `/${locale}/student`;
-            if (error.name === 'ChunkLoadError') window.location.assign(target);
-            else router.push(target);
-          }}
+          onClick={goToLessons}
           className="mt-3 flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-base font-bold text-neo-cream focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light"
         >
           {t('student.practiceFun.myLessons', 'My lessons')}

@@ -27,10 +27,9 @@
  *    param as network-only (no stale shell fallback).
  */
 
-/** Shared sessionStorage guard so every recovery path (error boundaries + the
- *  global listener + boot guard) cooperates on a single one-reload-per-session
- *  backstop. Boot guard uses a separate key for pre-hydration; post-hydration
- *  paths share this one. */
+/** Shared sessionStorage guard (value = the build id that was reloaded) so every
+ *  post-hydration recovery path cooperates on one reload per build per tab.
+ *  The boot guard uses its own key for pre-hydration. */
 export const CHUNK_RECOVERY_GUARD_KEY = 'chunk_error_refresh';
 
 /** Query param stamped onto the recovery navigation so the browser cannot
@@ -255,23 +254,55 @@ export function stripChunkReloadParam(): void {
 /** Survives the reload itself (unlike module state), so a storage-blocked browser still stops after one. Same mark as utils/chunkBootGuard.ts. */
 export const CHUNK_RELOAD_WINDOW_MARK = '__lc_cbr1';
 
-function windowNameHasMark(): boolean {
+/** Event asking the "new version" banner to show its Refresh instead of reloading the page. */
+export const STALE_DEPLOY_UPDATE_EVENT = 'lexiclash:update-ready';
+
+/** Window flag ChunkErrorRecovery sets once mounted; the boot script then leaves chunk failures to it. */
+export const CHUNK_RECOVERY_READY_FLAG = '__lcChunkRecoveryReady';
+
+/** The build this page runs; null when unknown, which callers treat as "already reloaded". */
+export function currentBuildId(): string | null {
+  return process.env.NEXT_PUBLIC_BUILD_TIME || null;
+}
+
+/** A failed import while offline is a connection problem, not a stale deploy. */
+export function isBrowserOffline(): boolean {
   try {
-    return String(window.name || '').includes(CHUNK_RELOAD_WINDOW_MARK);
+    return typeof navigator !== 'undefined' && navigator.onLine === false;
   } catch {
     return false;
   }
 }
 
-/** True once any recovery reload ran in this tab: sessionStorage, the window.name mark, or the cache-bust param on the address. */
+const WINDOW_MARK_PATTERN = new RegExp(`${CHUNK_RELOAD_WINDOW_MARK}(@[^;]*;)?`, 'g');
+
+function windowMarkFor(buildId: string): string {
+  return `${CHUNK_RELOAD_WINDOW_MARK}@${buildId};`;
+}
+
+function readWindowName(): string {
+  try {
+    return String(window.name || '');
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * True once a recovery reload ran in this tab for the build the page runs now: sessionStorage or the
+ * window.name mark (both keyed by build), or the cache-bust param of the reload that loaded this page.
+ * A reload for an older build does not count, so a later deploy gets its own one reload.
+ */
 export function chunkReloadAlreadyHappened(): boolean {
   if (typeof window === 'undefined') return false;
+  const buildId = currentBuildId();
+  if (!buildId) return true;
   try {
-    if (sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true') return true;
+    if (sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === buildId) return true;
   } catch {
     /* storage blocked: the two markers below still hold */
   }
-  if (windowNameHasMark()) return true;
+  if (readWindowName().includes(windowMarkFor(buildId))) return true;
   try {
     return new URLSearchParams(window.location.search).has(CHUNK_RELOAD_PARAM);
   } catch {
@@ -279,35 +310,37 @@ export function chunkReloadAlreadyHappened(): boolean {
   }
 }
 
-function markChunkReload(): void {
+function markChunkReload(buildId: string): void {
   try {
-    sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
+    sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, buildId);
   } catch {
     /* storage blocked */
   }
   try {
-    if (!windowNameHasMark()) window.name = String(window.name || '') + CHUNK_RELOAD_WINDOW_MARK;
+    window.name = readWindowName().replace(WINDOW_MARK_PATTERN, '') + windowMarkFor(buildId);
   } catch {
     /* window.name unwritable */
   }
 }
 
 /**
- * Shared one-shot guard helper for React error boundaries that cannot easily
- * wire the full RecoveryDeps object. Returns true iff this call claimed the
- * reload slot (caller should then invoke clearCachesAndReload).
+ * Claims this build's one recovery reload. Returns true iff the caller should
+ * now invoke clearCachesAndReload. Never claims when the build id is unknown.
  */
 export function claimChunkRecoveryGuard(): boolean {
   if (typeof window === 'undefined') return false;
   if (chunkReloadAlreadyHappened()) return false;
-  markChunkReload();
+  const buildId = currentBuildId();
+  if (!buildId) return false;
+  markChunkReload(buildId);
   return true;
 }
 
+/** Only for a manual Refresh the user pressed: the next failure may then auto-reload once more. */
 export function clearChunkRecoveryGuard(): void {
   if (typeof window === 'undefined') return;
   try {
-    window.name = String(window.name || '').split(CHUNK_RELOAD_WINDOW_MARK).join('');
+    window.name = readWindowName().replace(WINDOW_MARK_PATTERN, '');
   } catch {
     /* window.name unwritable */
   }

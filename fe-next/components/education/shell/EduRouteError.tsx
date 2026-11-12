@@ -3,12 +3,17 @@
 import { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
-import { getCachedTranslation } from '@/translations/loadTranslation';
-import type { Language } from '@/types';
 import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { multiplayerExitDestination } from '@/lib/multiplayer/exitDestination';
 import { EduMascot } from '@/components/education/EduMascot';
-import { claimChunkRecoveryGuard, clearCachesAndReload, isChunkLoadError } from '@/lib/deploy/staleDeployReload';
+import { useStaleDeployRecovery } from '@/lib/deploy/useStaleDeployRecovery';
+import {
+  ERROR_CARD_PRIMARY_BUTTON,
+  ERROR_CARD_SECONDARY_BUTTON,
+  ErrorCardShell,
+  StaleDeployScreen,
+  readCachedCopy,
+} from '@/components/deploy/StaleDeployScreen';
 
 export type EduErrorArea = 'live' | 'student' | 'teacher' | 'join';
 
@@ -36,10 +41,6 @@ export function eduErrorExit(area: EduErrorArea, locale: string, pathname: strin
   return `/${locale}/student`;
 }
 
-const PRESS =
-  'transition-[translate,box-shadow] duration-100 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none ' +
-  'focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light';
-
 /**
  * Crash screen for classroom routes (live room, student hub). Context-free: a
  * boundary that needs a provider can throw while rendering the error, so copy
@@ -50,41 +51,26 @@ export function EduRouteError({
   reset,
   boundary,
   area,
+  autoReload = area !== 'live',
 }: {
   error: Error & { digest?: string };
   reset: () => void;
   boundary: string;
   area: EduErrorArea;
+  /** False where a reload would drop a running socket game, so the player chooses when to refresh. */
+  autoReload?: boolean;
 }) {
   const params = useParams();
   const router = useRouter();
   const locale = (params?.locale as string) || 'en';
-
-  const t = (path: string, fallback: string): string => {
-    try {
-      let node: unknown = getCachedTranslation(locale as Language) || getCachedTranslation('en');
-      for (const key of path.split('.')) {
-        node = (node as Record<string, unknown> | undefined)?.[key];
-      }
-      return typeof node === 'string' && node ? node : fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
-  // A stale chunk after a deploy recovers only with a fresh, cache-busted load.
-  const staleChunk = isChunkLoadError(error.name, error.message);
+  const t = (path: string, fallback: string): string => readCachedCopy(locale, path, fallback);
 
   useEffect(() => {
     captureError(error, { errorBoundary: { type: boundary, digest: error.digest } });
-    // A reload inside the live room drops the room session, so there the player chooses when to refresh.
-    if (staleChunk && area !== 'live' && claimChunkRecoveryGuard()) void clearCachesAndReload();
-  }, [error, boundary, staleChunk, area]);
+  }, [error, boundary]);
 
-  const retry = () => {
-    if (staleChunk) void clearCachesAndReload();
-    else reset();
-  };
+  const { state, refresh } = useStaleDeployRecovery(error, { autoReload });
+  const staleChunk = state !== 'not-stale';
 
   const backToClass = () => {
     const target = eduErrorExit(area, locale, window.location.pathname, window.location.search);
@@ -93,42 +79,36 @@ export function EduRouteError({
     else router.push(target);
   };
 
+  const mascot = <EduMascot moment="error" size={112} className="mx-auto mb-3 size-28" />;
+  const backLabel = t(...BACK_LABEL[area]);
+
+  if (staleChunk) {
+    return (
+      <StaleDeployScreen
+        locale={locale}
+        onRefresh={refresh}
+        mascot={mascot}
+        testId="edu-route-error"
+        refreshTestId="edu-route-error-retry"
+        secondary={{ label: backLabel, onClick: backToClass, testId: 'edu-route-error-back' }}
+      />
+    );
+  }
+
   return (
-    <div
-      data-testid="edu-route-error"
-      role="alert"
-      className="flex h-dvh w-full flex-1 items-center justify-center overflow-y-auto bg-neo-navy px-4 py-8"
+    <ErrorCardShell
+      testId="edu-route-error"
+      mascot={mascot}
+      heading={t('eduShell.error.title', 'This screen hit a snag')}
+      body={t('eduShell.error.body', 'Try again. If it keeps happening, head back to your class and start from there.')}
     >
-      <div className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-light p-6 text-center shadow-hard-lg">
-        <EduMascot moment="error" size={112} className="mx-auto mb-3 size-28" />
-        <h1 className="mb-2 font-neo-display text-2xl font-black text-neo-cream">
-          {staleChunk ? t('errors.updateHeading', 'Update ready') : t('eduShell.error.title', 'This screen hit a snag')}
-        </h1>
-        <p className="mb-6 font-neo-body text-base font-semibold text-neo-cream/85">
-          {staleChunk
-            ? t('errors.updateMessage', 'New version available. Refresh to update.')
-            : t('eduShell.error.body', 'Try again. If it keeps happening, head back to your class and start from there.')}
-        </p>
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            data-testid="edu-route-error-retry"
-            onClick={retry}
-            className={`flex min-h-[56px] w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-lg font-black text-neo-black shadow-hard ${PRESS}`}
-          >
-            {staleChunk ? t('errors.refreshPage', 'Refresh') : t('common.retry', 'Try again')}
-          </button>
-          <button
-            type="button"
-            data-testid="edu-route-error-back"
-            onClick={backToClass}
-            className={`flex min-h-[48px] w-full items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 font-neo-display text-base font-bold text-neo-cream ${PRESS}`}
-          >
-            {t(...BACK_LABEL[area])}
-          </button>
-        </div>
-      </div>
-    </div>
+      <button type="button" data-testid="edu-route-error-retry" onClick={reset} className={ERROR_CARD_PRIMARY_BUTTON}>
+        {t('common.retry', 'Try again')}
+      </button>
+      <button type="button" data-testid="edu-route-error-back" onClick={backToClass} className={ERROR_CARD_SECONDARY_BUTTON}>
+        {backLabel}
+      </button>
+    </ErrorCardShell>
   );
 }
 

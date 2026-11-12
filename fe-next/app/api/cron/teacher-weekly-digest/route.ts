@@ -4,6 +4,7 @@ import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
 import { loadLifecycleAudience, reachFor, sendLifecycleEmail } from '@/lib/email/lifecycleUnsubscribe';
 import { teacherWeeklyProgressDigest } from '@/lib/email/templates/teacherWeeklyProgressDigest';
+import type { TeacherLocale } from '@/lib/education/types';
 import { assembleWeeklyDigests, isoWeekKey } from '@/lib/education/weeklyTeacherDigest';
 import { loadWeeklyDigestInputs } from '@/lib/education/weeklyDigestData';
 import { claimSend, DIGEST_JOB, loadLedger, releaseSend, writeHeartbeat } from '@/lib/education/lifecycleLedger';
@@ -107,12 +108,11 @@ export async function POST(request: NextRequest) {
           continue;
         }
         const tpl = teacherWeeklyProgressDigest(digest);
-        // The digest body exists in en/he only; the footer must match the body's language.
         const result = await sendLifecycleEmail({
           to: digest.email,
           subject: tpl.subject,
           html: tpl.html,
-          locale: digest.locale === 'he' ? 'he' : 'en',
+          locale: digest.locale as TeacherLocale,
           token: digest.token,
         });
         if (!result.ok) {

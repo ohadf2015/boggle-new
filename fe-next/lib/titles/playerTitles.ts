@@ -17,7 +17,7 @@ export interface TitleContext {
 const LEVEL_TITLE_IDS = new Set(Object.values(LEVEL_TITLES).filter((v): v is string => !!v));
 
 export function titleLabelKey(id: string): string {
-  return LEVEL_TITLE_IDS.has(id) ? `home.titles.${id}` : `progression.titles.${id}`;
+  return LEVEL_TITLE_IDS.has(id) ? `landing.home.titles.${id}` : `progression.titles.${id}`;
 }
 
 export function getUnlockedTitles({ level, prestigeLevel, achievementKeys }: TitleContext): UnlockedTitle[] {

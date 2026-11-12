@@ -7,6 +7,7 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
+import { autoReloadHeldBack } from '@/lib/deploy/liveGamePaths';
 import { sectionHome } from '@/lib/navigation/sectionHome';
 
 /**
@@ -39,7 +40,7 @@ export class ChunkErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, _info: ErrorInfo): void {
     if (!isChunkLoadError(error.name, error.message)) return;
-    if (!claimChunkRecoveryGuard()) return;
+    if (autoReloadHeldBack() || !claimChunkRecoveryGuard()) return;
     void clearCachesAndReload();
   }
 

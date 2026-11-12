@@ -38,7 +38,7 @@ import { NewcomerTip } from './landing/NewcomerTip';
 import { QuestCard } from './landing/QuestCard';
 import { CompactModeRow } from './landing/CompactModeRow';
 import { DailyAllClearCard } from './landing/DailyAllClearCard';
-import { DayPrizeHubCard } from './prize/DayPrizeHubCard';
+import { TodayChestCard } from './prize/TodayChestCard';
 import { LeaderboardTeaser } from './landing/LeaderboardTeaser';
 import { DailyBoardSheet } from './landing/DailyBoardSheet';
 import { useUtcDay } from '@/hooks/useUtcDay';
@@ -153,6 +153,7 @@ export function DailyChallengeLanding({
     firstDay.current = day;
     readLocal();
     dailyStatus.refresh();
+    void dailyPlayedStatus.refresh();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [day]);
 
@@ -207,6 +208,12 @@ export function DailyChallengeLanding({
   // Whole day done → closure card in the hero slot. A LOST Word Hunt is not
   // "done": it stays the hero so the retry is one tap away.
   const dayCleared = DAILY_MODES.every((mode) => playedById[mode.id]) && wordHuntStatus !== 'lost';
+  const chestProgress = {
+    wordWheel: wordWheelPlayed,
+    wordHunt: wordHuntStatus === 'won',
+    wordTower: playedById['word-tower'],
+    connections: playedById.connections,
+  };
   const primaryMode = dayCleared ? undefined : DAILY_MODES.find((mode) => mode.id === primaryModeId);
   const showChest = Boolean(user) && statusReady && !isNewcomer;
   const secondaryCount = DAILY_MODES.filter((mode) => mode.id !== primaryMode?.id).length;
@@ -237,7 +244,7 @@ export function DailyChallengeLanding({
             <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
               {t('daily.hub.requiredDone')}
             </p>
-            <DayPrizeHubCard kind="clear" />
+            <TodayChestCard progress={chestProgress} />
           </>
         )}
 
@@ -285,6 +292,9 @@ export function DailyChallengeLanding({
               />
             ))}
         </div>
+
+        {/* Today's chest stays in sight while it is locked, saying what opens it. */}
+        {!(chestProgress.wordWheel && chestProgress.wordHunt) && <TodayChestCard progress={chestProgress} />}
 
         {!isNewcomer && <StreakCardConnected source="daily_hub" className="w-full" />}
         </>

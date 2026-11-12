@@ -225,7 +225,7 @@ export async function POST(request: NextRequest) {
           to: access.email,
           subject: tpl.subject,
           html: tpl.html,
-          locale: locale === 'he' ? 'he' : 'en',
+          locale,
           token,
         });
         if (!result.ok) {

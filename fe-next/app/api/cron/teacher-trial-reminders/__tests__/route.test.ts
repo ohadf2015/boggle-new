@@ -133,7 +133,7 @@ describe('/api/cron/teacher-trial-reminders', () => {
     h.tables.teacher_access_requests = { data: [access({ locale: 'sv' })], error: null };
     await POST(authed());
     const mail = h.sendEmailSpy.mock.calls[0][0];
-    expect(mail.replyTo).toBe('ohadf2015@gmail.com');
+    expect(mail.replyTo).toBe('lexiclash.game@gmail.com');
     expect(mail.html).toContain('Avsluta prenumerationen');
     expect(mail.html).toContain('Svara bara på det här mejlet');
   });

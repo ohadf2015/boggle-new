@@ -11,6 +11,7 @@ import {
   claimChunkRecoveryGuard,
   clearChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
+import { autoReloadHeldBack } from '@/lib/deploy/liveGamePaths';
 import { sectionHome } from '@/lib/navigation/sectionHome';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
@@ -71,10 +72,11 @@ function isChunkLoadError(error: Error | null): boolean {
 
 /**
  * Attempts auto-refresh for chunk errors via the shared cache-bust + SW purge path.
- * Returns true if refresh was triggered, false if the session guard already fired.
+ * Returns true if refresh was triggered; false on a live game page, offline, or once this build already reloaded.
  */
 function handleChunkErrorRefresh(): boolean {
   if (typeof window === 'undefined') return false;
+  if (autoReloadHeldBack()) return false;
   if (!claimChunkRecoveryGuard()) {
     logger.warn('[ChunkError] Skipping auto-refresh (recovery guard already set)');
     return false;

@@ -65,9 +65,9 @@ interface Copy {
   dir: 'ltr' | 'rtl';
 }
 
-const CONTACT = 'ohadf2015@gmail.com';
+const CONTACT = 'lexiclash.game@gmail.com';
 
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
+const COPY: Record<TeacherLocale, Copy> = {
   en: {
     kicker: 'Teacher Pro',
     greeting: (n) => `Hi ${n},`,
@@ -161,6 +161,188 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     ask: `אם זה לא מתאים, אפשר להשיב ולספר לי למה. אני קורא כל תשובה: ${CONTACT}`,
     signoff: 'אוהד, שבנה את LexiClash',
     dir: 'rtl',
+  },
+  sv: {
+    kicker: 'Teacher Pro',
+    greeting: (n) => `Hej ${n},`,
+    buckets: {
+      't-0': {
+        subject: () => 'Din provperiod med Teacher Pro tar slut i dag',
+        preheader: 'Sista dagen av provperioden. Så här fortsätter det.',
+        headline: 'Sista dagen av din provperiod',
+        lead: (date) => `Din provperiod på 14 dagar med Teacher Pro tar slut i dag, ${date}.`,
+        cta: 'Behåll Teacher Pro',
+      },
+      't+3': {
+        subject: () => 'Vill du ha tillbaka dina rapporter i Teacher Pro?',
+        preheader: 'Provperioden tog slut för några dagar sedan. Så här kommer du igång igen.',
+        headline: 'Dina rapporter är pausade',
+        lead: (date) => `Din provperiod med Teacher Pro tog slut den ${date}.`,
+        cta: 'Aktivera Teacher Pro igen',
+      },
+    },
+    winback: {
+      subjectWithClasses: { 't+14': 'Dina klasser finns kvar', 't+30': 'Dina klasser väntar fortfarande på dig' },
+      subjectGeneric: {
+        't+14': 'Din provperiod med Teacher Pro tog slut för två veckor sedan',
+        't+30': 'Det har gått en månad sedan din provperiod med Teacher Pro',
+      },
+      preheader: 'Inget har raderats. Fortsätt när det passar dig.',
+      headlineWithClasses: 'Dina klasser finns kvar',
+      headlineGeneric: 'När du känner dig redo',
+      classes: (n) =>
+        n === 1
+          ? 'Din klass finns kvar på LexiClash, med alla elever och ordlistor precis där du lämnade dem.'
+          : `Dina ${n} klasser finns kvar på LexiClash, med alla elever och ordlistor precis där du lämnade dem.`,
+      games: (n) =>
+        n === 1
+          ? 'Dina elever spelade 1 livespel de senaste 30 dagarna.'
+          : `Dina elever spelade ${n} livespel de senaste 30 dagarna.`,
+      ended: (date) => `Din provperiod med Teacher Pro tog slut den ${date}.`,
+      body: 'Inget har raderats, så du kan fortsätta där du slutade när du vill.',
+      cta: 'Aktivera Teacher Pro igen',
+    },
+    body: 'Veckosiffrorna på din översikt kommer från klassrummet du redan har kört. Med Teacher Pro fortsätter rapporterna och du får obegränsat med klasser.',
+    priceTitle: 'Teacher Pro, 9 $ i månaden',
+    price: 'Obegränsat med klassrum, ordspel i realtid och översikten över elevernas framsteg. Du kan säga upp när du vill.',
+    ask: `Om det inte passar dig får du gärna svara och berätta varför. Jag läser varje svar: ${CONTACT}`,
+    signoff: 'Ohad, som byggde LexiClash',
+    dir: 'ltr',
+  },
+  ja: {
+    kicker: 'Teacher Pro',
+    greeting: (n) => `${n} 様`,
+    buckets: {
+      't-0': {
+        subject: () => 'Teacher Pro の無料体験は本日で終了します',
+        preheader: '無料体験の最終日です。このあとの流れをご案内します。',
+        headline: '無料体験は本日が最終日です',
+        lead: (date) => `14日間の Teacher Pro 無料体験は本日 ${date} で終了します。`,
+        cta: 'Teacher Pro を続ける',
+      },
+      't+3': {
+        subject: () => 'Teacher Pro のレポートをまた使いませんか？',
+        preheader: '無料体験は数日前に終了しました。再開の方法をご案内します。',
+        headline: 'レポートは一時停止中です',
+        lead: (date) => `Teacher Pro の無料体験は ${date} に終了しました。`,
+        cta: 'Teacher Pro を再開する',
+      },
+    },
+    winback: {
+      subjectWithClasses: { 't+14': 'クラスはそのまま残っています', 't+30': 'クラスは今もそのままお待ちしています' },
+      subjectGeneric: {
+        't+14': 'Teacher Pro の無料体験が終了して2週間が経ちました',
+        't+30': 'Teacher Pro の無料体験から1か月が経ちました',
+      },
+      preheader: 'データは何も削除されていません。ご都合のよいときに再開できます。',
+      headlineWithClasses: 'クラスはそのまま残っています',
+      headlineGeneric: 'ご準備ができたときにいつでも',
+      classes: (n) =>
+        n === 1
+          ? 'クラスは LexiClash にそのまま残っていて、生徒も単語リストも前回のままです。'
+          : `${n} 件のクラスは LexiClash にそのまま残っていて、生徒も単語リストも前回のままです。`,
+      games: (n) => `この30日間で、生徒の皆さんはライブゲームを ${n} 回プレイしました。`,
+      ended: (date) => `Teacher Pro の無料体験は ${date} に終了しました。`,
+      body: 'データは何も削除されていないので、ご準備ができたらいつでも前回の続きから始められます。',
+      cta: 'Teacher Pro を再開する',
+    },
+    body: 'ダッシュボードの週ごとの数字は、すでに実施されたクラスのものです。Teacher Pro なら、レポートも無制限のクラスもそのまま使い続けられます。',
+    priceTitle: 'Teacher Pro 月額 9 ドル',
+    price: 'クラス数は無制限、ライブの単語ゲームと学習の進み具合がわかるダッシュボードが使えます。解約はいつでもできます。',
+    ask: `もし合わないと感じられたら、このメールに返信して理由を教えていただけるとうれしいです。いただいた返信はすべて読んでいます: ${CONTACT}`,
+    signoff: 'LexiClash 開発者 Ohad',
+    dir: 'ltr',
+  },
+  es: {
+    kicker: 'Teacher Pro',
+    greeting: (n) => `Hola, ${n}:`,
+    buckets: {
+      't-0': {
+        subject: () => 'Tu prueba de Teacher Pro termina hoy',
+        preheader: 'Es el último día de la prueba. Te cuento qué pasa ahora.',
+        headline: 'Último día de tu prueba',
+        lead: (date) => `Tu prueba de 14 días de Teacher Pro termina hoy, ${date}.`,
+        cta: 'Seguir con Teacher Pro',
+      },
+      't+3': {
+        subject: () => '¿Quieres recuperar tus informes de Teacher Pro?',
+        preheader: 'Tu prueba terminó hace unos días. Así puedes retomarla.',
+        headline: 'Tus informes están en pausa',
+        lead: (date) => `Tu prueba de Teacher Pro terminó el ${date}.`,
+        cta: 'Reactivar Teacher Pro',
+      },
+    },
+    winback: {
+      subjectWithClasses: { 't+14': 'Tus clases siguen aquí', 't+30': 'Tus clases te siguen esperando' },
+      subjectGeneric: {
+        't+14': 'Tu prueba de Teacher Pro terminó hace dos semanas',
+        't+30': 'Ya pasó un mes desde tu prueba de Teacher Pro',
+      },
+      preheader: 'No se borró nada. Puedes retomarlo cuando te venga bien.',
+      headlineWithClasses: 'Tus clases siguen aquí',
+      headlineGeneric: 'Cuando quieras',
+      classes: (n) =>
+        n === 1
+          ? 'Tu clase sigue en LexiClash, con todos tus alumnos y listas de palabras tal como los dejaste.'
+          : `Tus ${n} clases siguen en LexiClash, con todos tus alumnos y listas de palabras tal como los dejaste.`,
+      games: (n) =>
+        n === 1
+          ? 'Tus alumnos jugaron 1 partida en vivo en los últimos 30 días.'
+          : `Tus alumnos jugaron ${n} partidas en vivo en los últimos 30 días.`,
+      ended: (date) => `Tu prueba de Teacher Pro terminó el ${date}.`,
+      body: 'No se borró nada, así que puedes seguir donde lo dejaste cuando quieras.',
+      cta: 'Reactivar Teacher Pro',
+    },
+    body: 'Las cifras semanales de tu panel salen de la clase que ya hiciste. Con Teacher Pro sigues teniendo los informes y clases ilimitadas.',
+    priceTitle: 'Teacher Pro, 9 $ al mes',
+    price: 'Aulas ilimitadas, juegos de palabras en vivo y el panel de progreso. Puedes cancelar cuando quieras.',
+    ask: `Si no te encaja, respóndeme y cuéntame por qué. Leo todas las respuestas: ${CONTACT}`,
+    signoff: 'Ohad, el creador de LexiClash',
+    dir: 'ltr',
+  },
+  ru: {
+    kicker: 'Teacher Pro',
+    greeting: (n) => `Здравствуйте, ${n}!`,
+    buckets: {
+      't-0': {
+        subject: () => 'Пробный период Teacher Pro заканчивается сегодня',
+        preheader: 'Сегодня последний день пробного периода. Рассказываю, что будет дальше.',
+        headline: 'Последний день пробного периода',
+        lead: (date) => `Ваш 14-дневный пробный период Teacher Pro заканчивается сегодня, ${date}.`,
+        cta: 'Оставить Teacher Pro',
+      },
+      't+3': {
+        subject: () => 'Хотите вернуть отчёты Teacher Pro?',
+        preheader: 'Пробный период закончился несколько дней назад. Вот как к нему вернуться.',
+        headline: 'Ваши отчёты на паузе',
+        lead: (date) => `Пробный период Teacher Pro закончился ${date}.`,
+        cta: 'Снова включить Teacher Pro',
+      },
+    },
+    winback: {
+      subjectWithClasses: { 't+14': 'Ваши классы на месте', 't+30': 'Ваши классы всё ещё ждут вас' },
+      subjectGeneric: {
+        't+14': 'Пробный период Teacher Pro закончился две недели назад',
+        't+30': 'Прошёл месяц с вашего пробного периода Teacher Pro',
+      },
+      preheader: 'Ничего не удалено. Можно вернуться, когда вам удобно.',
+      headlineWithClasses: 'Ваши классы на месте',
+      headlineGeneric: 'Когда будете готовы',
+      classes: (n) =>
+        n === 1
+          ? 'Ваш класс по-прежнему в LexiClash, все ученики и списки слов там, где вы их оставили.'
+          : `Ваши классы (${n}) по-прежнему в LexiClash, все ученики и списки слов там, где вы их оставили.`,
+      games: (n) => `За последние 30 дней ваши ученики сыграли живых игр: ${n}.`,
+      ended: (date) => `Пробный период Teacher Pro закончился ${date}.`,
+      body: 'Ничего не удалено, так что вы можете продолжить с того же места, когда будете готовы.',
+      cta: 'Снова включить Teacher Pro',
+    },
+    body: 'Недельные цифры на вашей панели взяты из урока, который вы уже провели. С Teacher Pro отчёты продолжают приходить, а число классов не ограничено.',
+    priceTitle: 'Teacher Pro, 9 $ в месяц',
+    price: 'Неограниченное число классов, словесные игры в реальном времени и панель прогресса учеников. Отменить можно в любой момент.',
+    ask: `Если вам это не подходит, ответьте на письмо и расскажите почему. Я читаю каждый ответ: ${CONTACT}`,
+    signoff: 'Охад, создатель LexiClash',
+    dir: 'ltr',
   },
 };
 

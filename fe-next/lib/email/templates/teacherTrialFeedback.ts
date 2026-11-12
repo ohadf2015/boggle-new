@@ -31,7 +31,7 @@ interface Copy {
   dir: 'ltr' | 'rtl';
 }
 
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
+const COPY: Record<TeacherLocale, Copy> = {
   en: {
     subject: 'How is LexiClash going with your class?',
     preheader: "A quick check-in from the person who built it.",
@@ -77,11 +77,56 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     footnote: 'Du får det här för att du startade kostnadsfri lärartillgång på LexiClash.',
     dir: 'ltr',
   },
+  ja: {
+    subject: 'LexiClash、クラスでの様子はいかがですか？',
+    preheader: 'LexiClashを作った本人から、近況をうかがうご連絡です。',
+    kicker: '先生向け',
+    headline: 'ここまでの使い心地はいかがですか？',
+    greeting: (n) => (n ? `${n}さん、こんにちは。` : 'こんにちは。'),
+    lead: 'LexiClashを使い始めて数日たちましたので、様子をうかがいたくてご連絡しました。',
+    askTitle: '率直に教えてください',
+    ask: 'うまく動かなかったこと、生徒さんが戸惑ったこと、クラスに合わないと感じたことがあれば、ぜひ知りたいです。このメールに返信していただければ、私に直接届きます。',
+    access: (date) => `無料アクセスは${date}までご利用いただけます。カードの登録は必要ありません。`,
+    cta: '自分のクラスを開く',
+    signoff: 'ありがとうございます。Ohad（LexiClashを作っています）',
+    footnote: 'LexiClashで先生向けの無料アクセスを始められた方にお送りしています。',
+    dir: 'ltr',
+  },
+  es: {
+    subject: '¿Qué tal va LexiClash con tu clase?',
+    preheader: 'Un mensaje rápido de quien lo creó.',
+    kicker: 'Para docentes',
+    headline: '¿Cómo te está yendo?',
+    greeting: (n) => (n ? `Hola, ${n}:` : 'Hola:'),
+    lead: 'Ya llevas unos días con LexiClash y quería saber cómo te va.',
+    askTitle: 'Dímelo sin rodeos',
+    ask: 'Si algo falló, confundió a tus alumnos o simplemente no encaja con tu clase, quiero saberlo. Solo responde a este correo, que me llega directamente a mí.',
+    access: (date) => `Tu acceso gratuito dura hasta el ${date} y no necesitas tarjeta.`,
+    cta: 'Abrir mi clase',
+    signoff: 'Gracias, Ohad (soy quien hace LexiClash)',
+    footnote: 'Te llega este correo porque activaste el acceso gratuito para docentes en LexiClash.',
+    dir: 'ltr',
+  },
+  ru: {
+    subject: 'Как идут дела с LexiClash в вашем классе?',
+    preheader: 'Короткое письмо от того, кто сделал игру.',
+    kicker: 'Для учителей',
+    headline: 'Как вам пока?',
+    greeting: (n) => (n ? `Здравствуйте, ${n}!` : 'Здравствуйте!'),
+    lead: 'Вы пользуетесь LexiClash уже несколько дней, и мне хотелось узнать, как всё проходит.',
+    askTitle: 'Скажите честно',
+    ask: 'Если что-то не работало, запутало учеников или просто не подходит вашему классу, я хочу об этом знать. Просто ответьте на это письмо, оно придёт прямо ко мне.',
+    access: (date) => `Бесплатный доступ действует до ${date}, и карта не нужна.`,
+    cta: 'Открыть мой класс',
+    signoff: 'Спасибо, Охад (я делаю LexiClash)',
+    footnote: 'Вы получили это письмо, потому что подключили бесплатный доступ для учителей в LexiClash.',
+    dir: 'ltr',
+  },
 };
 
 export function teacherTrialFeedback({ full_name, locale, trialExpiresAt }: Args) {
-  const lang = COPY[locale] ? locale : 'en';
-  const c = COPY[lang]!;
+  const lang: TeacherLocale = locale in COPY ? locale : 'en';
+  const c = COPY[lang];
   const dateStr = new Date(trialExpiresAt).toLocaleDateString(DATE_LOCALE[lang], {
     month: 'long', day: 'numeric',
   });

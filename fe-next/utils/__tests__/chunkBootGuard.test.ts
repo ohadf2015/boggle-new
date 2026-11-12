@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { CHUNK_BOOT_GUARD_SCRIPT } from '../chunkBootGuard';
+import { CHUNK_RECOVERY_READY_FLAG } from '@/lib/deploy/staleDeployReload';
 
 type Handler = (e: unknown) => void;
 
@@ -69,6 +70,16 @@ describe('CHUNK_BOOT_GUARD_SCRIPT', () => {
     runGuard(w.win as unknown as Record<string, unknown>);
     fire(w, 'error', script404);
     expectNavigatedOnce(w);
+  });
+
+  it('leaves a failure after hydration to ChunkErrorRecovery, which knows live game pages', () => {
+    const w = makeWindow();
+    runGuard(w.win as unknown as Record<string, unknown>);
+    (w.win as unknown as Record<string, unknown>)[CHUNK_RECOVERY_READY_FLAG] = true;
+    fire(w, 'error', script404);
+    fire(w, 'error', chunkMessage);
+    expect(w.win.location.replace).not.toHaveBeenCalled();
+    expect(w.win.location.reload).not.toHaveBeenCalled();
   });
 
   it('hard-navigates once when an /_next/static stylesheet fails at boot', () => {
