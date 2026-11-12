@@ -55,7 +55,7 @@ export function withClip(gag: GagVariant, clips: Map<string, ClipEntry>): GagVar
     freeze: spread(gag.beats, 'freeze', holdMs),
     reaction: spread(gag.beats, 'reaction', reactionMs),
   };
-  const clipSrc = `${CLIP_DIR}/${entry.file}`;
+  const clipSrc = entry.file.startsWith('/') ? entry.file : `${CLIP_DIR}/${entry.file}`;
   return {
     ...gag,
     clipSrc,
