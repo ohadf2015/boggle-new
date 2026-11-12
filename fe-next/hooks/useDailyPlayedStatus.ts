@@ -29,12 +29,19 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { getWordHuntResultKey, getWordWheelResultKey } from '@/utils/dailyChallenge/constants';
 import { ALL_LANGUAGES } from '@/lib/languageConfig';
+import { getWithAuth } from '@/utils/authFetch';
 
 type PlayedToday = DailyPlayedStatus['today'];
 
 const NOTHING_PLAYED: PlayedToday = { wordHunt: false, wordWheel: false, wordTower: false, connections: false };
 /** Consumers mounting within this window share the previous answer instead of refetching. */
 const FRESH_MS = 5000;
+/**
+ * A request older than this is treated as lost. A request started just before
+ * an app was frozen in the background can stay pending forever; every later
+ * ask then waited on it, so the page never learned the day had changed.
+ */
+const STUCK_MS = 15000;
 
 /**
  * This device's "played today" flags, read from the keys the games actually
@@ -97,6 +104,7 @@ interface Entry {
   fetchedAt: number;
   settled: boolean;
   inflight: Promise<void> | null;
+  inflightSince: number;
 }
 
 let entry: Entry | null = null;
@@ -122,17 +130,20 @@ function revalidate(playerId: string, force = false): Promise<void> {
   const day = getDailyChallengeDate();
   const key = entryKey(playerId, day);
   if (!entry || entry.key !== key) {
-    entry = { key, data: null, fetchedAt: 0, settled: false, inflight: null };
+    entry = { key, data: null, fetchedAt: 0, settled: false, inflight: null, inflightSince: 0 };
   }
   const current = entry;
-  if (current.inflight) return current.inflight;
+  if (current.inflight && Date.now() - current.inflightSince < STUCK_MS) return current.inflight;
   if (!force && current.data && Date.now() - current.fetchedAt < FRESH_MS) return Promise.resolve();
 
+  const startedAt = Date.now();
   const request = (async () => {
     try {
       // The day in the URL and no-store: a reused HTTP answer from yesterday
       // would read as "everything played" today.
-      const response = await fetch(
+      // With the bearer token too: the app's WebView does not always send the
+      // session cookie, and a signed-out answer would hide the player's progress.
+      const response = await getWithAuth(
         `/api/daily/status?userId=${encodeURIComponent(playerId)}&day=${day}`,
         { signal: AbortSignal.timeout(5000), cache: 'no-store' },
       );
@@ -150,11 +161,13 @@ function revalidate(playerId: string, force = false): Promise<void> {
       console.warn('[useDailyPlayedStatus] fetch error:', error);
     } finally {
       current.settled = true;
-      current.inflight = null;
+      // A newer request may have replaced one that looked stuck: leave that one in place.
+      if (current.inflightSince === startedAt) current.inflight = null;
       notify();
     }
   })();
   current.inflight = request;
+  current.inflightSince = startedAt;
   return request;
 }
 
@@ -182,8 +195,11 @@ export type DailyPlayedStatusResult = DailyPlayedStatus & {
 };
 
 export function useDailyPlayedStatus(): DailyPlayedStatusResult {
-  const { user, isAuthenticated, loading: authLoading = false } = useAuth();
-  const playerId = isAuthenticated && user?.id ? user.id : null;
+  const { user, loading: authLoading = false } = useAuth();
+  // A signed-in session is enough: waiting for the profile row as well (what
+  // isAuthenticated means) left a player whose profile was slow or missing on
+  // this device's played flags alone, never asking the server.
+  const playerId = user?.id ?? null;
 
   useSyncExternalStore(subscribe, getVersion, getServerVersion);
   // Re-render on the UTC rollover and on tab return; the day itself is read
