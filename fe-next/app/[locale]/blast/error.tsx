@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
+import { useStaleDeployRecovery } from '@/lib/deploy/useStaleDeployRecovery';
+import { StaleDeployScreen } from '@/components/deploy/StaleDeployScreen';
 
 export default function BlastError({
   error,
@@ -39,6 +41,20 @@ export default function BlastError({
     });
   }, [error]);
 
+  const { state, refresh } = useStaleDeployRecovery(error, { autoReload: true });
+  const goBack = () => { window.location.href = `/${locale}`; };
+
+  if (state !== 'not-stale') {
+    return (
+      <StaleDeployScreen
+        locale={locale}
+        onRefresh={refresh}
+        mascot={<div className="text-6xl mb-4" aria-hidden="true">💥</div>}
+        secondary={{ label: t('common.back'), onClick: goBack }}
+      />
+    );
+  }
+
   return (
     <div className="flex-1 flex items-center justify-center bg-neo-navy px-4 py-8">
       <div className="max-w-lg w-full text-center">
@@ -59,7 +75,7 @@ export default function BlastError({
           </button>
           <button
             type="button"
-            onClick={() => window.location.href = `/${locale}`}
+            onClick={goBack}
             className="px-5 py-2 rounded-lg font-bold bg-neo-navy-light text-white border border-gray-600 hover:bg-neo-navy-elevated transition-[background-color]"
           >
             {t('common.back')}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { CHEST_DROP_ODDS, type ChestDropSource } from '@/lib/avatar/chestDrops';
+import { CHEST_COSMETIC_ODDS, CHEST_DROP_ODDS, type ChestDropSource } from '@/lib/avatar/chestDrops';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
 
 /**
@@ -13,6 +13,7 @@ export default function ChestPartOdds({ source, className = '' }: { source: Ches
   const { t } = useLanguage();
   const odds = CHEST_DROP_ODDS[source];
   return (
+    <>
     <p data-testid="chest-part-odds" className={`text-[11px] font-bold text-neo-white/70 ${className}`}>
       {t('avatarChest.oddsLabel')}{' '}
       {(['rare', 'epic', 'legendary'] as const).map((r, i) => (
@@ -22,5 +23,9 @@ export default function ChestPartOdds({ source, className = '' }: { source: Ches
         </span>
       ))}
     </p>
+    <p data-testid="chest-cosmetic-odds" className={`text-[11px] font-bold text-neo-white/70 ${className}`}>
+      {t('avatarChest.cosmeticChance', { pct: CHEST_COSMETIC_ODDS[source] })}
+    </p>
+    </>
   );
 }

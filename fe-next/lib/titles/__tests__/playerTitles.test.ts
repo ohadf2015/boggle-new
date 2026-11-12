@@ -14,8 +14,8 @@ describe('playerTitles', () => {
     expect(ids).toEqual(['ASCENDED_ONE', 'TWICE_RISEN', 'RECORD_BREAKER']);
   });
 
-  it('labels level titles with the existing home.titles keys, others under progression', () => {
-    expect(titleLabelKey('WORD_SEEKER')).toBe('home.titles.WORD_SEEKER');
+  it('labels level titles with the landing.home.titles table, others under progression', () => {
+    expect(titleLabelKey('WORD_SEEKER')).toBe('landing.home.titles.WORD_SEEKER');
     expect(titleLabelKey('NEMESIS')).toBe('progression.titles.NEMESIS');
   });
 

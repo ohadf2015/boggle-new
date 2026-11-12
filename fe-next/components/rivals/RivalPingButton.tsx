@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import posthog from '@/lib/analytics/lazyPosthog';
@@ -34,23 +35,10 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
   const [menuOpen, setMenuOpen] = useState(false);
   const [reported, setReported] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!pickerOpen && !menuOpen) return;
-    const close = (e: Event) => {
-      if (e instanceof KeyboardEvent && e.key !== 'Escape') return;
-      if (e instanceof PointerEvent && rootRef.current?.contains(e.target as Node)) return;
-      setPickerOpen(false);
-      setMenuOpen(false);
-    };
-    document.addEventListener('pointerdown', close);
-    document.addEventListener('keydown', close);
-    return () => {
-      document.removeEventListener('pointerdown', close);
-      document.removeEventListener('keydown', close);
-    };
-  }, [pickerOpen, menuOpen]);
+  const closeSheets = () => {
+    setPickerOpen(false);
+    setMenuOpen(false);
+  };
 
   if (context === 'edu') return null;
 
@@ -86,7 +74,7 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
   const disabled = status.kind === 'sent' || (refusal !== null && refusal !== 'sign_in_required' && refusal !== 'unavailable');
 
   return (
-    <div ref={rootRef} className="relative inline-flex flex-col items-start gap-1">
+    <div className="relative inline-flex flex-col items-start gap-1">
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -132,24 +120,58 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
       {reported && <p role="status" className="text-xs font-bold text-neo-cyan">{t('rivalPings.reported')}</p>}
 
       {pickerOpen && (
-        <div className="absolute top-full start-0 z-50 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-xl border-[3px] border-neo-black bg-neo-white p-3 shadow-hard">
+        <PingSheet testId="rival-ping-sheet" label={t('rivalPings.pickerTitle', { name: targetName })} onClose={closeSheets}>
           <RivalPingPicker onPick={send} title={t('rivalPings.pickerTitle', { name: targetName })} />
-        </div>
+        </PingSheet>
       )}
 
       {menuOpen && (
-        <div role="menu" className="absolute top-full start-0 z-50 mt-2 flex w-56 flex-col overflow-hidden rounded-xl border-[3px] border-neo-black bg-neo-white shadow-hard">
-          <button role="menuitem" type="button" onClick={block} className="min-h-[44px] px-3 text-start font-bold text-neo-black hover:bg-neo-cream">
-            {t('rivalPings.block', { name: targetName })}
-          </button>
-          <button role="menuitem" type="button" onClick={report} className="min-h-[44px] border-t-2 border-neo-black px-3 text-start font-bold text-neo-red hover:bg-neo-cream">
-            {t('rivalPings.report')}
-          </button>
-        </div>
+        <PingSheet testId="rival-ping-menu" label={t('rivalPings.more')} onClose={closeSheets}>
+          <div role="menu" className="flex flex-col overflow-hidden rounded-xl border-[3px] border-neo-black">
+            <button role="menuitem" type="button" onClick={block} className="min-h-[44px] px-3 text-start font-bold text-neo-black hover:bg-neo-cream">
+              {t('rivalPings.block', { name: targetName })}
+            </button>
+            <button role="menuitem" type="button" onClick={report} className="min-h-[44px] border-t-2 border-neo-black px-3 text-start font-bold text-neo-red hover:bg-neo-cream">
+              {t('rivalPings.report')}
+            </button>
+          </div>
+        </PingSheet>
       )}
 
       {authOpen && <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />}
     </div>
+  );
+}
+
+/**
+ * The ping choices and the ... menu open as a sheet on top of the page. Results screens put the rival card inside
+ * panels that clip their overflow (the daily results card does), so a dropdown anchored to the button was cut off
+ * and tapping Ping looked like it did nothing.
+ */
+function PingSheet({ label, testId, onClose, children }: { label: string; testId: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  if (typeof document === 'undefined') return null;
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      data-testid={testId}
+      className="fixed inset-0 z-80 flex items-end justify-center bg-neo-navy/80 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:items-center sm:pb-0"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="w-full max-w-sm rounded-2xl border-[3px] border-neo-black bg-neo-white p-3 shadow-hard-lg">{children}</div>
+    </div>,
+    document.body,
   );
 }
 

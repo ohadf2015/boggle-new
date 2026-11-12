@@ -224,6 +224,9 @@ export function isUnlocked(cosmeticId: string, state: PlayerCosmeticState): bool
   const cosmetic = COSMETICS.find((c) => c.id === cosmeticId);
   if (!cosmetic) return false;
 
+  // Owned outright (bought, or found in a reward chest) beats any other gate.
+  if (state.purchasedIds.includes(cosmeticId)) return true;
+
   const cond = cosmetic.unlockCondition;
   switch (cond.type) {
     case 'default':

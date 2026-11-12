@@ -38,6 +38,30 @@ describe('RivalPingButton', () => {
     for (const chip of chips) expect(chip.className).toContain('min-h-[44px]');
   });
 
+  it('opens the choices on top of the page, outside a card that clips its overflow', () => {
+    const { container } = render(
+      <div style={{ overflow: 'hidden' }}>
+        <RivalPingButton {...props} />
+      </div>,
+    );
+    open();
+    const sheet = screen.getByTestId('rival-ping-sheet');
+    expect(container.contains(sheet)).toBe(false);
+    expect(sheet.parentElement).toBe(document.body);
+    expect(sheet.className).toContain('fixed');
+  });
+
+  it('closes the choices on a tap outside or Escape without sending', () => {
+    render(<RivalPingButton {...props} />);
+    open();
+    fireEvent.click(screen.getByTestId('rival-ping-sheet'));
+    expect(screen.queryByTestId('rival-ping-sheet')).toBeNull();
+    open();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByTestId('rival-ping-sheet')).toBeNull();
+    expect(sendRivalPing).not.toHaveBeenCalled();
+  });
+
   it('shows Sent! straight away, sends the ping and tracks it', async () => {
     let resolve!: (v: unknown) => void;
     vi.mocked(sendRivalPing).mockReturnValue(new Promise((r) => (resolve = r)) as never);

@@ -9,6 +9,11 @@ const sv = {
     "duplicate": "Redan din · +{coins} mynt",
     "wearIt": "Se den på dig",
     "oddsLabel": "Avatardel:",
+    "cosmeticChance": "{pct}% chans att det är ett brickutseende eller brädtema",
+    "tileSkin": "Brickutseende",
+    "boardTheme": "Brädtema",
+    "useIt": "Använd",
+    "inUse": "Används",
     "weeklyTeaser": "Avatardel inuti · {legendary}% legendarisk på {tier}",
     "chestOnly": "Endast i kistor",
     "chestOnlyHint": "Klara dagens uppdrag och öppna kistor för att hitta den",
@@ -10071,6 +10076,7 @@ const sv = {
   },
   "daily": {
     "qrWelcome": {
+      "warping": "Tar dig till dagens pussel…",
       "badge": "Skannad",
       "line": "Du skannade in. Dagens pussel är redo."
     },
@@ -10141,6 +10147,7 @@ const sv = {
     "modesPlayedCount": "{count} av 4 spel idag",
     "nextUp": "Härnäst",
     "dayPrize": {"title": "Dagen klar!", "titlePerfect": "Perfekt dag!", "ready": "Din prislåda är redo", "readyPerfect": "Alla fyra klara. Bonuslåda upplåst", "tapToOpen": "Tryck för att öppna", "open": "Öppna", "opening": "Öppnar...", "later": "Senare", "collect": "Hämta", "coins": "+{coins} mynt", "xp": "+{xp} XP", "notYet": "Klara dagens två pussel för att öppna den", "failed": "Kunde inte öppna just nu. Försök igen från dagliga sidan", "tier": {"common": "Snyggt!", "lucky": "Tur!", "jackpot": "Jackpot!"}, "todayLine": "Bra jobbat i dag.", "odds": "Lådans odds: {common}% Snyggt · {lucky}% Tur · {jackpot}% Jackpot", "hubReady": "Dagens prislåda väntar", "hubReadyPerfect": "Din perfekta-dagen-låda väntar", "hubOpened": "Dagens låda: +{coins} mynt", "hubOpenedPerfect": "Perfekt dag-låda: +{coins} mynt", "oneToGo": "1 kvar till dagens pris", "guestNudge": "Logga in för att öppna en daglig prislåda, upp till {coins} mynt"},
+    "todayChest": {"title": "Dagens kista", "and": " och ", "locked": "Klara {modes} för att öppna den", "progress": "{done}/{total}", "ready": "Dagens kista är redo", "readyBig": "Stor kista redo: alla fyra klara!", "upgradeHint": "Klara bonuspusslen först för en större kista", "opened": "Dagens kista: +{coins} mynt", "alreadyOpen": "Du har redan öppnat dagens kista. Kom tillbaka i morgon för en ny.", "upgradeLater": "Eller klara bonuspusslen först för en större kista.", "next": "Nästa om {time}"},
     "allClearToday": "Klart för idag — vi ses i morgon",
     "allClear": {
       "title": "Allt klart!",

@@ -11,10 +11,15 @@
  * 2. Authed: one shared /api/daily/status request for every consumer on the
  *    page; skeleton until the first answer, then silent revalidation
  * 3. Guests: localStorage, read before first paint
- * 4. Played flags are per UTC day: a new day drops yesterday's answer
+ * 4. Played flags are per UTC day: a new day drops yesterday's answer. The
+ *    day is read from the clock on every render, never from a snapshot: an
+ *    app resumed after midnight with no focus or visibility event (Android
+ *    WebView) kept yesterday's "all played" answer as today's, so the hub
+ *    showed a finished day the server did not know about.
  */
 
 import { useState, useEffect, useLayoutEffect, useCallback, useSyncExternalStore } from 'react';
+import { useUtcDay } from '@/hooks/useUtcDay';
 import { useAuth } from '@/contexts/AuthContext';
 import type { DailyPlayedStatus } from '@/app/api/daily/status/route';
 import { getDailyStreak } from '@/utils/dailyChallenge/streaks';
@@ -114,7 +119,8 @@ const getServerVersion = () => 0;
 const entryKey = (playerId: string, day: string) => `${playerId}:${day}`;
 
 function revalidate(playerId: string, force = false): Promise<void> {
-  const key = entryKey(playerId, getDailyChallengeDate());
+  const day = getDailyChallengeDate();
+  const key = entryKey(playerId, day);
   if (!entry || entry.key !== key) {
     entry = { key, data: null, fetchedAt: 0, settled: false, inflight: null };
   }
@@ -124,12 +130,19 @@ function revalidate(playerId: string, force = false): Promise<void> {
 
   const request = (async () => {
     try {
-      const response = await fetch(`/api/daily/status?userId=${encodeURIComponent(playerId)}`, {
-        signal: AbortSignal.timeout(5000),
-      });
+      // The day in the URL and no-store: a reused HTTP answer from yesterday
+      // would read as "everything played" today.
+      const response = await fetch(
+        `/api/daily/status?userId=${encodeURIComponent(playerId)}&day=${day}`,
+        { signal: AbortSignal.timeout(5000), cache: 'no-store' },
+      );
       if (response.ok) {
-        current.data = (await response.json()) as DailyPlayedStatus;
-        current.fetchedAt = Date.now();
+        const body = (await response.json()) as DailyPlayedStatus;
+        // An answer for another day (clock skew around midnight) is not today's.
+        if (!body.date || body.date === day) {
+          current.data = body;
+          current.fetchedAt = Date.now();
+        }
       } else {
         console.warn('[useDailyPlayedStatus] status', response.status);
       }
@@ -143,6 +156,16 @@ function revalidate(playerId: string, force = false): Promise<void> {
   })();
   current.inflight = request;
   return request;
+}
+
+/**
+ * Ask the server again for whoever is signed in on this page, e.g. after a
+ * prize claim said the day is not cleared: the hub then shows what the server
+ * knows instead of a finished day it cannot pay for.
+ */
+export function revalidateDailyPlayedStatus(): Promise<void> {
+  const playerId = entry?.key.slice(0, entry.key.lastIndexOf(':'));
+  return playerId ? revalidate(playerId, true) : Promise.resolve();
 }
 
 /** Test-only: drop the shared answer between tests. */
@@ -163,6 +186,9 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
   const playerId = isAuthenticated && user?.id ? user.id : null;
 
   useSyncExternalStore(subscribe, getVersion, getServerVersion);
+  // Re-render on the UTC rollover and on tab return; the day itself is read
+  // from the clock below, so a missed event can never pin yesterday.
+  useUtcDay();
 
   // This device's flags. Read in a layout effect, never during render: the hub
   // SSRs, and touching localStorage there throws / mismatches hydration.
@@ -173,6 +199,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
     syncLocal();
   }, [syncLocal, playerId]);
 
+  // Every mount revalidates (shared within FRESH_MS), as before.
   useEffect(() => {
     if (authLoading || !playerId) return;
     void revalidate(playerId);
@@ -205,8 +232,20 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
     if (playerId) await revalidate(playerId, true);
   }, [playerId, syncLocal]);
 
-  const day = local?.day ?? getDailyChallengeDate();
+  const day = getDailyChallengeDate();
   const localToday = local && local.day === day ? local.today : null;
+  const staleLocal = Boolean(local && local.day !== day);
+  const hasEntryForDay = Boolean(playerId && entry && entry.key === entryKey(playerId, day));
+
+  // A new day reached without any event: re-read this device and ask the server.
+  useEffect(() => {
+    if (staleLocal) syncLocal();
+  }, [staleLocal, syncLocal]);
+  useEffect(() => {
+    if (authLoading || !playerId || hasEntryForDay) return;
+    void revalidate(playerId);
+  }, [authLoading, playerId, hasEntryForDay, day]);
+
   const localEver = Boolean(local && (local.totalCompleted > 0 || local.streak.longest > 0));
 
   if (authLoading) {

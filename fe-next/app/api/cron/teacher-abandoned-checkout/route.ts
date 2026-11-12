@@ -172,7 +172,7 @@ export async function POST(request: NextRequest) {
           subject: tpl.subject,
           html: tpl.html,
           replyTo: tpl.replyTo,
-          locale: d.locale === 'he' ? 'he' : 'en',
+          locale: d.locale,
           token: d.token,
         });
         if (!result.ok) {

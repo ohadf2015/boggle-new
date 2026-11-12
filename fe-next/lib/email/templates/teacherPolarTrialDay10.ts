@@ -30,9 +30,12 @@ interface Copy {
   dir: 'ltr' | 'rtl';
 }
 
-const CONTACT = 'ohadf2015@gmail.com';
+const CONTACT = 'lexiclash.game@gmail.com';
 
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
+const ruDays = (n: number) =>
+  ({ one: 'день', few: 'дня' } as Record<string, string>)[new Intl.PluralRules('ru').select(n)] ?? 'дней';
+
+const COPY: Record<TeacherLocale, Copy> = {
   en: {
     kicker: 'Teacher Pro trial',
     headline: 'Your trial is in its last stretch',
@@ -62,6 +65,66 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     ask: `אם זה לא מתאים, אפשר להשיב ולספר לי למה. אני קורא כל תשובה: ${CONTACT}`,
     signoff: 'אוהד, שבנה את LexiClash',
     dir: 'rtl',
+  },
+  sv: {
+    kicker: 'Provperiod för Teacher Pro',
+    headline: 'Din provperiod går mot sitt slut',
+    greeting: (n) => `Hej ${n},`,
+    subject: (days) => `Din provperiod för Teacher Pro har ${days} dagar kvar`,
+    preheader: 'Så här blir det när den tar slut, så att inget kommer som en överraskning.',
+    lead: (days, date) => `Din provperiod på 14 dagar för Teacher Pro tar slut om ${days} dagar, den ${date}.`,
+    body: 'Om klassrummet fungerar bra för dig behöver du inte göra något. När provperioden är slut drar Polar $9 i månaden, om du inte avslutar innan dess.',
+    priceTitle: 'Teacher Pro, $9 i månaden',
+    price: 'Obegränsat antal klassrum, ordspel i realtid och översikten över elevernas framsteg. Du kan avsluta när du vill.',
+    cta: 'Behåll Teacher Pro',
+    ask: `Om det inte passar, svara på mejlet och berätta varför. Jag läser alla svar: ${CONTACT}`,
+    signoff: 'Ohad, som byggde LexiClash',
+    dir: 'ltr',
+  },
+  ja: {
+    kicker: 'Teacher Pro トライアル',
+    headline: 'トライアル期間が残りわずかになりました',
+    greeting: (n) => `${n}さん、こんにちは。`,
+    subject: (days) => `Teacher Pro のトライアルは残り${days}日です`,
+    preheader: '終了後にどうなるのか、驚かれないよう先にお伝えします。',
+    lead: (days, date) => `14日間の Teacher Pro トライアルは、あと${days}日、${date}に終了します。`,
+    body: 'クラスでうまく使えているようでしたら、特に手続きは必要ありません。トライアル終了後は、それまでに解約されない限り、Polar から毎月$9が請求されます。',
+    priceTitle: 'Teacher Pro 月額$9',
+    price: 'クラス数は無制限で、リアルタイムの言葉ゲームと学習の進み具合がわかるダッシュボードが使えます。いつでも解約できます。',
+    cta: 'Teacher Pro を続ける',
+    ask: `合わないと感じたら、このメールに返信して理由を教えてください。いただいた返信にはすべて目を通しています：${CONTACT}`,
+    signoff: 'LexiClash を作った Ohad より',
+    dir: 'ltr',
+  },
+  es: {
+    kicker: 'Prueba de Teacher Pro',
+    headline: 'Tu prueba está en la recta final',
+    greeting: (n) => `Hola, ${n}:`,
+    subject: (days) => `A tu prueba de Teacher Pro le quedan ${days} días`,
+    preheader: 'Qué pasa cuando termine, para que nada te tome por sorpresa.',
+    lead: (days, date) => `Tu prueba de 14 días de Teacher Pro termina en ${days} días, el ${date}.`,
+    body: 'Si la clase te está funcionando, no tienes que hacer nada. Cuando termine la prueba, Polar te cobrará $9 al mes, a menos que canceles antes.',
+    priceTitle: 'Teacher Pro, $9 al mes',
+    price: 'Clases ilimitadas, juegos de palabras en vivo y el panel de progreso. Puedes cancelar cuando quieras.',
+    cta: 'Seguir con Teacher Pro',
+    ask: `Si no es lo que buscas, responde y cuéntame por qué. Leo todas las respuestas: ${CONTACT}`,
+    signoff: 'Ohad, el creador de LexiClash',
+    dir: 'ltr',
+  },
+  ru: {
+    kicker: 'Пробный период Teacher Pro',
+    headline: 'Пробный период подходит к концу',
+    greeting: (n) => `Здравствуйте, ${n}!`,
+    subject: (days) => `Пробный период Teacher Pro закончится через ${days} ${ruDays(days)}`,
+    preheader: 'Рассказываю заранее, что будет после его окончания, чтобы не было сюрпризов.',
+    lead: (days, date) => `Ваш 14-дневный пробный период Teacher Pro закончится через ${days} ${ruDays(days)}, ${date}.`,
+    body: 'Если класс вам подходит, ничего делать не нужно. Когда пробный период закончится, Polar будет списывать $9 в месяц, если вы не отмените подписку до этого.',
+    priceTitle: 'Teacher Pro за $9 в месяц',
+    price: 'Неограниченное число классов, словесные игры в реальном времени и панель успеваемости. Отменить можно в любой момент.',
+    cta: 'Оставить Teacher Pro',
+    ask: `Если не подходит, ответьте и расскажите почему. Я читаю каждое письмо: ${CONTACT}`,
+    signoff: 'Охад, создатель LexiClash',
+    dir: 'ltr',
   },
 };
 

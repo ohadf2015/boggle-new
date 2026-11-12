@@ -52,6 +52,8 @@ beforeEach(() => {
   captureError.mockClear();
   mockLocale = 'he';
   try { window.sessionStorage.clear(); } catch { /* ignore */ }
+  window.name = '';
+  vi.stubEnv('NEXT_PUBLIC_BUILD_TIME', 'build-A');
 });
 
 describe('app/[locale]/error.tsx — resilient fallback (black-screen fix)', () => {
@@ -138,7 +140,7 @@ describe('app/global-error.tsx — last-resort boundary depends on no lazy chunk
 
   it('uses cache-bust clearCachesAndReload — not bare location.reload (t_9cc3561f)', () => {
     const src = readFileSync(join(__dirname, '..', '..', 'global-error.tsx'), 'utf8');
-    expect(src).toMatch(/clearCachesAndReload/);
+    expect(src).toMatch(/clearCachesAndReload|useStaleDeployRecovery/);
     // Reject real call sites; comments mentioning reload are fine.
     expect(src).not.toMatch(/window\.location\.reload\s*\(/);
     expect(src.split('\n').filter((l) => /location\.reload\s*\(/.test(l) && !l.trim().startsWith('//') && !l.includes('*')).length).toBe(0);
