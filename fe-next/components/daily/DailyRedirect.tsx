@@ -1,12 +1,34 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { DailyChallengeLanding } from './DailyChallengeLanding';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyRivalChallenge } from '@/hooks/useDailyRivalChallenge';
+import { DailyLoadingFallback } from './DailyLoadingFallback';
+import {
+  hasEverPlayedWordHunt,
+  hasEverPlayedWordWheel,
+  hasPlayedWordWheelToday,
+} from '@/utils/dailyChallenge/storage';
 import type { Language } from '@/types';
+
+const AUTO_WHEEL_SESSION_KEY = 'lexiclash_daily_auto_wheel';
+
+// Once per session: the wheel's exit goes back to /daily, which must then show the hub.
+function wantsAutoWheel(language: Language): boolean {
+  if (new URLSearchParams(window.location.search).has('whName')) return false;
+  if (!hasEverPlayedWordHunt(language) && !hasEverPlayedWordWheel(language)) return false;
+  if (hasPlayedWordWheelToday(language)) return false;
+  try {
+    return !sessionStorage.getItem(AUTO_WHEEL_SESSION_KEY);
+  } catch {
+    return false;
+  }
+}
+
+const noopSubscribe = () => () => {};
 
 /**
  * Isolated so useSearchParams (inside useDailyRivalChallenge) cannot suspend
@@ -18,23 +40,33 @@ function DailyRivalChallengeCapture() {
   return null;
 }
 
-/**
- * DailyRedirect - The /daily hub. Renders the quest-selection landing for
- * EVERY player — no auto-redirect into a quest.
- *
- * History: a once-per-session auto-skip used to bounce returning players
- * straight into Word Hunt. Ohad (2026-07-29): "when the user already played
- * daily challenge I didn't mean it should redirect to the word hunt page
- * immediately, but to the main daily challenge page where the player can
- * choose a challenge and enter immediately." The hub's quest cards already
- * deep-link into each game with one tap, so the hub IS the fast path.
- *
- * Rival-challenge URL params (whName/whScore/whEmoji) are still captured so
- * the share-banner flow works from the hub.
- */
+/** The /daily hub. Returning players skip it once per session and land in today's Word Wheel. */
 export default function DailyRedirect() {
   const { language } = useLanguage();
   const router = useRouter();
+  // False only while hydrating, so client navigations decide before the hub ever mounts.
+  const canReadStorage = useSyncExternalStore(noopSubscribe, () => true, () => false);
+  const [autoWheel, setAutoWheel] = useState(() => canReadStorage && wantsAutoWheel(language as Language));
+
+  useEffect(() => {
+    if (!wantsAutoWheel(language as Language)) return;
+    try {
+      sessionStorage.setItem(AUTO_WHEEL_SESSION_KEY, '1');
+    } catch {
+      setAutoWheel(false);
+      return;
+    }
+    setAutoWheel(true);
+    const url = `/${language}/daily/word-wheel?start=1`;
+    try {
+      router.replace(url);
+    } catch {
+      // On a cold load this can run before Next has initialized the app router.
+      window.location.replace(url);
+    }
+  }, [language, router]);
+
+  if (autoWheel) return <DailyLoadingFallback mode="wordWheel" />;
 
   return (
     <div className="flex-1 flex flex-col bg-neo-navy min-h-screen page-content-safe">
