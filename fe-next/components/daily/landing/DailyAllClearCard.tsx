@@ -5,7 +5,9 @@ import { CheckCheck, Flame } from 'lucide-react';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { DayPrizeHubCard } from '../prize/DayPrizeHubCard';
+import { TodayChestCard } from '../prize/TodayChestCard';
+
+const ALL_DONE = { wordWheel: true, wordHunt: true, wordTower: true, connections: true };
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
 interface DailyAllClearCardProps {
@@ -76,13 +78,11 @@ export function DailyAllClearCard({ streak }: DailyAllClearCardProps) {
           {t('daily.allClear.streak', { n: streak })}
         </p>
       )}
-      {/* Today's two pay their own box; finishing the bonuses opens a second,
-          bigger one. Full card width, under the header row: squeezed between the
-          check and the coin art they had ~90px on a phone, so the text broke one
-          word per line and the Open pill spilled over the card. */}
-      <div className="flex flex-col gap-2" data-testid="all-clear-boxes">
-        <DayPrizeHubCard kind="clear" guestNudge={false} />
-        <DayPrizeHubCard kind="perfect" />
+      {/* Today's one chest, the big one now that all four are done. Full card
+          width, under the header row: squeezed between the check and the coin
+          art it had ~90px on a phone. */}
+      <div data-testid="all-clear-boxes">
+        <TodayChestCard progress={ALL_DONE} />
       </div>
     </section>
   );

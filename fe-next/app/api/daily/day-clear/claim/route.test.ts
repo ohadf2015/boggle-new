@@ -33,6 +33,10 @@ interface Opts {
   insertError?: { code?: string; message: string } | null
   /** Education side: a teacher account or a classroom member. */
   edu?: 'teacher' | 'student' | null
+  /** An admin account (may also be in a classroom, to test it). */
+  admin?: boolean
+  /** Today's bigger box was already opened. */
+  perfectOpened?: boolean
 }
 
 function setup(o: Opts = {}) {
@@ -45,15 +49,15 @@ function setup(o: Opts = {}) {
     connections_daily_scores: played.connections,
   }
   const extraRows: Record<string, unknown[]> = {
-    profiles: [{ user_role: o.edu === 'teacher' ? 'teacher' : 'student' }],
+    profiles: [{ user_role: o.admin ? 'admin' : o.edu === 'teacher' ? 'teacher' : 'student' }],
     classroom_memberships: o.edu === 'student' ? [{ classroom_id: 'class-1' }] : [],
+    daily_all_clear_claims: o.perfectOpened ? [{ claim_date: '2026-11-03', coins: 60, xp: 100 }] : [],
   }
   const insert = vi.fn().mockResolvedValue({ error: o.insertError ?? null })
   const delChain: any = { eq: vi.fn(() => delChain), then: (ok: any) => Promise.resolve({ error: null }).then(ok) }
   const del = vi.fn(() => delChain)
   const rpc = vi.fn().mockResolvedValue({ error: null })
   const from = vi.fn((table: string) => {
-    if (table === 'daily_day_clear_claims') return { insert, delete: del }
     const rows = extraRows[table] ?? (byTable[table] ? [{ puzzle_date: '2026-11-03' }] : [])
     const chain: any = {
       select: vi.fn(() => chain),
@@ -61,6 +65,8 @@ function setup(o: Opts = {}) {
       limit: vi.fn(() => chain),
       then: (ok: any) => Promise.resolve({ data: rows, error: null }).then(ok),
     }
+    // The claim table is written (insert / delete) and, by GET, read for today's open box.
+    if (table === 'daily_day_clear_claims') return { ...chain, insert, delete: del }
     return chain
   })
   vi.mocked(createAdminClient).mockReturnValue({ from, rpc } as never)
@@ -130,9 +136,9 @@ describe('POST /api/daily/day-clear/claim', () => {
 
   it('Given a regular player, Then GET says the box is random; for the education side it says fixed', async () => {
     setup()
-    expect(await (await GET(req())).json()).toEqual({ fixed: false })
+    expect(await (await GET(req())).json()).toEqual({ fixed: false, opened: null })
     setup({ edu: 'student' })
-    expect(await (await GET(req())).json()).toEqual({ fixed: true })
+    expect(await (await GET(req())).json()).toEqual({ fixed: true, opened: null })
     setup({ user: null })
     expect((await GET(req())).status).toBe(401)
   })
@@ -142,5 +148,25 @@ describe('POST /api/daily/day-clear/claim', () => {
     const res = await POST(req())
     expect(res.status).toBe(500)
     expect(awardCoinsServer).not.toHaveBeenCalled()
+  })
+
+  it('Given an admin who joined a classroom to test it, When claiming, Then the box is the random one', async () => {
+    setup({ edu: 'student', admin: true })
+    const body = await (await POST(req())).json()
+    expect(body).toMatchObject({ coins: PRIZE.coins, tier: PRIZE.tier, fixed: false })
+  })
+
+  it('Given the bigger box was already opened today, When claiming the day-clear box, Then 409 and nothing paid', async () => {
+    const { insert } = setup({ perfectOpened: true })
+    const res = await POST(req())
+    expect(res.status).toBe(409)
+    expect(insert).not.toHaveBeenCalled()
+    expect(awardCoinsServer).not.toHaveBeenCalled()
+  })
+
+  it('Given today\'s chest is open, Then GET returns it so every device shows it opened', async () => {
+    setup({ perfectOpened: true })
+    const body = await (await GET(req())).json()
+    expect(body.opened).toMatchObject({ kind: 'perfect', coins: 60, xp: 100, claimed: false, fixed: false })
   })
 })

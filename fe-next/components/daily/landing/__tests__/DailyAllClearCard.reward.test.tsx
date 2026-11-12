@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 
-const { postWithAuth, useAuth } = vi.hoisted(() => ({ postWithAuth: vi.fn(), useAuth: vi.fn() }));
+const { postWithAuth, getWithAuth, useAuth } = vi.hoisted(() => ({ postWithAuth: vi.fn(), getWithAuth: vi.fn(), useAuth: vi.fn() }));
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -9,7 +9,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth }));
-vi.mock('@/utils/authFetch', () => ({ postWithAuth }));
+vi.mock('@/utils/authFetch', () => ({ postWithAuth, getWithAuth }));
 vi.mock('@/utils/coinEarnedFx', () => ({ emitCoinEarned: vi.fn() }));
 vi.mock('@/utils/confettiUtils', () => ({ fireVictoryConfetti: vi.fn(), fireConfetti: vi.fn(), fireFireworks: vi.fn() }));
 vi.mock('@/utils/hapticFeedback', () => ({ triggerHaptic: vi.fn() }));
@@ -18,17 +18,18 @@ vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 import { DailyAllClearCard } from '../DailyAllClearCard';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
-describe('DailyAllClearCard prize boxes', () => {
+describe('DailyAllClearCard: today\'s one chest', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
     useAuth.mockReturnValue({ user: { id: 'u1' } });
+    getWithAuth.mockResolvedValue(new Response(JSON.stringify({ fixed: false, opened: null }), { status: 200 }));
   });
 
-  it('does not pay on show: both boxes wait for a tap', () => {
+  it('does not pay on show: the one chest, the big one, waits for a tap', () => {
     render(<DailyAllClearCard streak={2} />);
-    expect(screen.getByTestId('day-prize-waiting-clear')).toBeTruthy();
-    expect(screen.getByTestId('day-prize-waiting-perfect')).toBeTruthy();
+    expect(screen.getByTestId('today-chest-ready').getAttribute('data-kind')).toBe('perfect');
+    expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(postWithAuth).not.toHaveBeenCalled();
   });
 
@@ -38,7 +39,7 @@ describe('DailyAllClearCard prize boxes', () => {
       JSON.stringify({ kind: 'perfect', tier: 'jackpot', coins: 150, xp: 100, claimed: true }),
     );
     render(<DailyAllClearCard streak={0} />);
-    const opened = screen.getByTestId('day-prize-opened-perfect');
+    const opened = screen.getByTestId('today-chest-opened');
     expect(opened.getAttribute('data-tier')).toBe('jackpot');
     expect(opened.textContent).toContain('"coins":150');
     expect(screen.queryByTestId('all-clear-streak')).toBeNull();
@@ -46,15 +47,15 @@ describe('DailyAllClearCard prize boxes', () => {
 
   it('tapping the perfect box opens the reveal', () => {
     render(<DailyAllClearCard streak={1} />);
-    fireEvent.click(screen.getByTestId('day-prize-waiting-perfect'));
+    fireEvent.click(screen.getByTestId('today-chest-ready'));
     expect(screen.getByTestId('day-prize-reveal').getAttribute('data-phase')).toBe('closed');
   });
 
-  it('guests see one sign-in line, for the perfect-day box, and no API call', () => {
+  it('guests see one sign-in line and no API call', () => {
     useAuth.mockReturnValue({ user: null });
     render(<DailyAllClearCard streak={1} />);
-    expect(screen.queryByTestId('day-prize-guest-clear')).toBeNull();
-    expect(screen.getByTestId('day-prize-guest-perfect').textContent).toContain('daily.allClear.guestNudge');
+    expect(screen.getAllByTestId('today-chest-guest')).toHaveLength(1);
     expect(postWithAuth).not.toHaveBeenCalled();
+    expect(getWithAuth).not.toHaveBeenCalled();
   });
 });
