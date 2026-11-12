@@ -8,7 +8,8 @@ import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import {
   recoverFromStaleChunk,
   clearCachesAndReload,
-  CHUNK_RECOVERY_GUARD_KEY,
+  chunkReloadAlreadyHappened,
+  claimChunkRecoveryGuard,
 } from '@/lib/deploy/staleDeployReload';
 import { sectionHome } from '@/lib/navigation/sectionHome';
 
@@ -37,21 +38,12 @@ export default function NotFoundClient() {
         const data = (await res.json()) as { buildTime?: string };
         return data?.buildTime;
       },
-      getGuard: () => {
-        try {
-          return sessionStorage.getItem(CHUNK_RECOVERY_GUARD_KEY) === 'true';
-        } catch {
-          return false;
-        }
-      },
+      getGuard: chunkReloadAlreadyHappened,
       setGuard: () => {
-        try {
-          sessionStorage.setItem(CHUNK_RECOVERY_GUARD_KEY, 'true');
-        } catch {
-          /* sessionStorage unavailable — version mismatch is still the primary guard */
-        }
+        claimChunkRecoveryGuard();
       },
       clearCachesAndReload,
+      forceOnChunkFailure: false,
     });
   }, []);
 

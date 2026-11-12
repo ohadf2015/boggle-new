@@ -8,7 +8,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 import { VersionChecker } from '../VersionChecker';
 import NavigationContext from '@/contexts/NavigationContext';
-import { STALE_DEPLOY_UPDATE_EVENT } from '@/lib/deploy/staleDeployReload';
+import {
+  STALE_DEPLOY_UPDATE_EVENT,
+  CHUNK_RELOAD_PARAM,
+  claimChunkRecoveryGuard,
+} from '@/lib/deploy/staleDeployReload';
 
 function NavWrapper({ isInGame, children }: { isInGame: boolean; children: ReactNode }) {
   const [active, setActive] = useState(isInGame);
@@ -33,6 +37,7 @@ const REFRESH_BTN = { name: /refreshToUpdate/i };
 describe('VersionChecker manual refresh', () => {
   const originalBuildTime = process.env.NEXT_PUBLIC_BUILD_TIME;
   const reloadSpy = vi.fn();
+  const replaceSpy = vi.fn();
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -41,7 +46,12 @@ describe('VersionChecker manual refresh', () => {
     // jsdom location.reload is a no-op stub; replace with a spy
     Object.defineProperty(window, 'location', {
       configurable: true,
-      value: { ...window.location, reload: reloadSpy },
+      value: {
+        href: 'http://localhost/en/play',
+        search: '',
+        reload: reloadSpy,
+        replace: replaceSpy,
+      },
     });
 
     sessionStorage.clear();
@@ -63,6 +73,8 @@ describe('VersionChecker manual refresh', () => {
     });
 
     reloadSpy.mockClear();
+    replaceSpy.mockClear();
+    window.name = '';
   });
 
   afterEach(() => {
@@ -121,7 +133,7 @@ describe('VersionChecker manual refresh', () => {
     expect(screen.getByRole('button', REFRESH_BTN)).toBeTruthy();
   });
 
-  it('reloads ONLY when the user clicks the refresh button', async () => {
+  it('reloads ONLY when the user clicks the refresh button, with the cache-busting param', async () => {
     render(
       <NavWrapper isInGame={false}>
         <VersionChecker />
@@ -129,16 +141,36 @@ describe('VersionChecker manual refresh', () => {
     );
 
     await detectUpdate();
-    expect(reloadSpy).not.toHaveBeenCalled();
+    expect(replaceSpy).not.toHaveBeenCalled();
 
     const btn = screen.getByRole('button', REFRESH_BTN);
     await act(async () => {
       fireEvent.click(btn);
-      // forceUpdate awaits caches/serviceWorker before reload — flush microtasks
       await vi.advanceTimersByTimeAsync(0);
     });
 
-    expect(reloadSpy).toHaveBeenCalledTimes(1);
+    expect(replaceSpy).toHaveBeenCalledTimes(1);
+    expect(replaceSpy.mock.calls[0][0]).toContain(`${CHUNK_RELOAD_PARAM}=`);
+    expect(reloadSpy).not.toHaveBeenCalled();
+  });
+
+  it('after a banner Refresh, a stale failure on the new build still gets one automatic reload', async () => {
+    expect(claimChunkRecoveryGuard()).toBe(true); // old build already used its one reload
+    render(
+      <NavWrapper isInGame={false}>
+        <VersionChecker />
+      </NavWrapper>,
+    );
+    await detectUpdate();
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', REFRESH_BTN));
+      await vi.advanceTimersByTimeAsync(0);
+    });
+
+    process.env.NEXT_PUBLIC_BUILD_TIME = 'build-new';
+    window.location.search = '';
+    expect(claimChunkRecoveryGuard()).toBe(true);
+    expect(claimChunkRecoveryGuard()).toBe(false);
   });
 
   it('hides the refresh button while in-game and never reloads', async () => {
