@@ -5642,7 +5642,15 @@ const sv = {
     "switchToPlayer": "Byt till spelarläge",
     "viewOnlyBadge": "TV-läge · Värden tittar",
     "tryPracticeRound": "Testa en träningsrunda (bottar)",
-    "practiceRoundFailed": "Kunde inte lägga till träningsspelare. Kontrollera anslutningen och försök igen."
+    "practiceRoundFailed": "Kunde inte lägga till träningsspelare. Kontrollera anslutningen och försök igen.",
+    "practiceRefused": {
+      "rate_limited": "För många tryck på en gång. Vänta en sekund och försök igen.",
+      "not_in_room": "Den här skärmen tappade sin plats i rummet. Ladda om sidan och försök igen.",
+      "room_gone": "Rummet har stängts. Öppna spelet igen från din klass.",
+      "not_host": "Bara skärmen som är värd för rummet kan lägga till träningsspelare.",
+      "in_progress": "En runda pågår redan. Öva när den är slut.",
+      "room_full": "Det finns inga lediga platser kvar för träningsspelare."
+    }
   },
   "tvResults": {
     "installHeading": "TA MED HEM 📱",
@@ -18301,6 +18309,8 @@ const sv = {
         "enterCode": "Skriv in en kod"
       },
       "gameEnded": {
+        "joinClassLine": "Lärarens spel tog precis slut. Gå med i klassen nu så är du med i nästa.",
+        "nextGameToast": "Det spelet tog precis slut. Nu är du med i klassen, så du kommer med i nästa.",
         "title": "Det här spelet är slut",
         "retry": "Försök igen",
         "toClass": "Till min klass",

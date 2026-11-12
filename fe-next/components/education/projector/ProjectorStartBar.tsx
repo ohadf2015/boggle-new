@@ -27,6 +27,7 @@ interface ProjectorStartBarProps {
   onStartPracticeRound?: () => void;
   practiceRoundPending: boolean;
   practiceRoundFailed: boolean;
+  practiceRoundFailedKey?: string;
   /** Sits beside Start in the same row. */
   lockSlot?: ReactNode;
   className?: string;
@@ -47,6 +48,7 @@ export function ProjectorStartBar({
   onStartPracticeRound,
   practiceRoundPending,
   practiceRoundFailed,
+  practiceRoundFailedKey = 'tvLobby.practiceRoundFailed',
   lockSlot,
   className,
   style,
@@ -152,7 +154,7 @@ export function ProjectorStartBar({
       )}
       {practiceRoundFailed && (
         <p role="alert" className="font-neo-body text-sm font-bold text-neo-pink">
-          {t('tvLobby.practiceRoundFailed')}
+          {t(practiceRoundFailedKey)}
         </p>
       )}
     </div>

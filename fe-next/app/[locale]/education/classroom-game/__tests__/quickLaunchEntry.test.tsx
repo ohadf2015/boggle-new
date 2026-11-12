@@ -59,6 +59,23 @@ describe('classroom-game: the quick-launch entry path', () => {
     expect(sessionStorage.getItem(QUICK_LAUNCH_KEY)).toBeNull();
   });
 
+  it('Given a rehearse tap\'s quick launch, When provisioning swaps the URL, Then the rehearse entry rides along to the lobby', async () => {
+    search = new URLSearchParams('flow=quickLaunch&rehearse=tap123');
+    sessionStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(intent));
+    render(<ClassroomGamePage />);
+    await screen.findByTestId('provisioner');
+    const { onReady } = provisionerProps.mock.calls[provisionerProps.mock.calls.length - 1][0] as { onReady: (r: unknown) => void };
+    act(() => onReady({ classroomId: 'c-1', lessonId: 'l-1', mode: 'classic' }));
+    expect(replace).toHaveBeenCalledWith('/en/education/classroom-game?flow=quick&classroomId=c-1&lessonId=l-1&mode=classic&rehearse=tap123');
+  });
+
+  it('Given the quick lobby URL with a rehearse entry, Then the lobby launches with that entry', async () => {
+    search = new URLSearchParams('flow=quick&classroomId=c-1&lessonId=l-1&mode=classic&rehearse=tap123');
+    render(<ClassroomGamePage />);
+    await screen.findByTestId('lobby');
+    expect(lobbyProps).toHaveBeenLastCalledWith(expect.objectContaining({ rehearseEntry: 'tap123' }));
+  });
+
   it('Given the replaced URL (or a reload of it), Then the lobby opens in its quick presentation, preselected', async () => {
     search = new URLSearchParams('flow=quick&classroomId=c-1&lessonId=l-1&mode=blast');
     render(<ClassroomGamePage />);

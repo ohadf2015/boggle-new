@@ -7,6 +7,7 @@ interface LobbyPlayer {
   username: string;
   isHost?: boolean;
   isBot?: boolean;
+  isPractice?: boolean;
   disconnected?: boolean;
   avatar?: AvatarType | null;
 }
@@ -14,6 +15,7 @@ interface LobbyPlayer {
 export interface LobbyStudent {
   username: string;
   isBot?: boolean;
+  isPractice?: boolean;
   avatar?: AvatarType | null;
   reconnecting?: true;
 }
@@ -36,7 +38,7 @@ export function lobbyRoster(players: ReadonlyArray<LobbyPlayer | string>, drops:
   for (const raw of players) {
     const p = asPlayer(raw);
     if (p.isHost || p.username === hostName) continue;
-    const student: LobbyStudent = typeof raw === 'string' ? { username: p.username } : { username: p.username, isBot: p.isBot, avatar: p.avatar };
+    const student: LobbyStudent = typeof raw === 'string' ? { username: p.username } : { username: p.username, isBot: p.isBot, avatar: p.avatar, ...(p.isPractice ? { isPractice: true } : {}) };
     if (p.disconnected === true) {
       if (now - (drops[p.username] ?? now) >= LOBBY_RECONNECT_SHOW_MS) continue;
       student.reconnecting = true;

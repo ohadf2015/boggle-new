@@ -23,6 +23,7 @@ import {
 import { CEFR_LEVELS, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { parseHostMinutes, parseHostMode } from '@/lib/education/teacherHostHref';
 import { QUICK_PRESENTATION_FLOW } from '@/components/education/lobby/quickLaunchProvision';
+import { REHEARSE_ENTRY_PARAM } from '@/lib/education/rehearsal';
 import { parseQuizQuestions, parseQuizSeconds, parseSessionPack, parseSessionPreset } from '@/components/education/lobby/sessionRunParams';
 import { cn } from '@/lib/utils';
 import { LIVE_SURFACE_PREVIEW_KINDS, type LiveSurfacePreviewKind } from './previewKinds';
@@ -67,6 +68,7 @@ function ClassroomGameInner() {
   const classroomIdParam = searchParams?.get('classroomId') || '';
   // 'repeatLast' (dashboard Repeat-last hero) prefills the whole last setup.
   const flow = searchParams?.get('flow') || '';
+  const rehearseEntry = searchParams?.get(REHEARSE_ENTRY_PARAM) || undefined;
   // ?cefr=A1|A2|B1 — the ESL page demo's "Run this list with the class" CTA.
   // Validated here so a junk param falls through to the plain lobby.
   const cefrParam = searchParams?.get('cefr') || '';
@@ -95,9 +97,10 @@ function ClassroomGameInner() {
     ({ classroomId, lessonId, mode }: QuickLaunchReady) => {
       clearQuickLaunchIntent();
       const query = new URLSearchParams({ flow: QUICK_PRESENTATION_FLOW, classroomId, lessonId, mode });
+      if (rehearseEntry) query.set(REHEARSE_ENTRY_PARAM, rehearseEntry);
       router.replace(`/${language}/education/classroom-game?${query.toString()}`);
     },
-    [router, language]
+    [router, language, rehearseEntry]
   );
 
   useEffect(() => {
@@ -179,6 +182,7 @@ function ClassroomGameInner() {
             initialMode={initialMode}
             initialMinutes={initialMinutes}
             quick={flow === QUICK_PRESENTATION_FLOW}
+            rehearseEntry={rehearseEntry}
             sessionPack={sessionPack}
             initialPreset={initialPreset}
             initialQuestions={initialQuestions}

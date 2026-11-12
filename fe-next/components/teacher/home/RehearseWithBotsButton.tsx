@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { getLessons } from '@/lib/supabase/education';
 import { QUICK_LAUNCH_FLOW, writeQuickLaunchIntent } from '@/components/teacher/dashboard/quickLaunchIntent';
-import { writeRehearseIntent } from '@/lib/education/rehearsal';
+import { REHEARSE_ENTRY_PARAM, writeRehearseIntent } from '@/lib/education/rehearsal';
 import { buildRehearsalLaunch } from '@/lib/education/rehearsalLaunch';
 import { QUIET_LINK } from './homeStyles';
 
@@ -52,8 +52,8 @@ export function RehearseWithBotsButton({ classroomId, source, language, t, showN
       lessons = await Promise.race([getLessons(user.id).then((r) => r.data ?? []), capped]).catch(() => []);
     }
     writeQuickLaunchIntent(buildRehearsalLaunch({ lessons, uiLanguage: language, classroomId, packName: (key) => t(key) }));
-    writeRehearseIntent({ source, classExists: !!classroomId, ...(withSeat ? { withSeat: true } : {}) });
-    router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`);
+    const entry = writeRehearseIntent({ source, classExists: !!classroomId, ...(withSeat ? { withSeat: true } : {}) });
+    router.push(`/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}&${REHEARSE_ENTRY_PARAM}=${entry}`);
   };
 
   return (

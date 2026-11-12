@@ -37,8 +37,6 @@ export interface JoinFlowState {
   joined: JoinedClassroom | null;
   /** The game behind this code is over: retrying it can only fail. */
   ended: boolean;
-  /** The class the server enrolled them in off an ended game code, if any. */
-  endedClassroomId: string | null;
   /** A signed-in teacher submitted their own class: show them how to host instead of a refusal. */
   ownClass: OwnClassRefusal | null;
   canSubmit: boolean;

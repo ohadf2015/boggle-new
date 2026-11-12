@@ -259,6 +259,23 @@ describe('PlayerJoinHandler — practice seat in a classroom room', () => {
     expect(mockRecordRoster).toHaveBeenCalledWith('ABC123', record, STUDENT);
   });
 
+  it('Given a guest with no account but a stable guest token, When they join the classroom room, Then they are recorded once under that token', async () => {
+    const record = { teacherId: TEACHER, settings: {} };
+    mockCheckSeat.mockResolvedValue({ game: record, refused: false });
+    mockGetGame.mockReturnValue(lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Noa', guestTokenHash: 'b'.repeat(64) });
+    expect(mockRecordRoster).toHaveBeenCalledWith('ABC123', record, `guest:${'b'.repeat(64)}`);
+  });
+
+  it('Given a guest with no account and no guest token, When they join the classroom room, Then nothing is recorded', async () => {
+    mockCheckSeat.mockResolvedValue({ game: { teacherId: TEACHER, settings: {} }, refused: false });
+    mockGetGame.mockReturnValue(lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } }));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Noa' });
+    expect(mockRecordRoster).not.toHaveBeenCalled();
+  });
+
   it('Given the teacher practice seat, When it joins, Then nothing is recorded on the room roster', async () => {
     mockGetGame.mockReturnValue(lobbyGame({ Dana: { socketId: 'host-socket', authUserId: TEACHER, isHost: true } }));
     const { join, socket } = captureJoinHandler();

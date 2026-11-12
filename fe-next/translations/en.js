@@ -4883,7 +4883,15 @@ const en = {
     "switchToPlayer": "Switch to player mode",
     "viewOnlyBadge": "TV Mode · Host watches",
     "tryPracticeRound": "Try a practice round (bots)",
-    "practiceRoundFailed": "Couldn't add practice players. Check your connection and try again."
+    "practiceRoundFailed": "Couldn't add practice players. Check your connection and try again.",
+    "practiceRefused": {
+      "rate_limited": "Too many taps at once. Wait a second and try again.",
+      "not_in_room": "This screen lost its place in the room. Reload the page and try again.",
+      "room_gone": "This room has closed. Open the game again from your class.",
+      "not_host": "Only the screen hosting the room can add practice players.",
+      "in_progress": "A round is already running. Practice after it ends.",
+      "room_full": "No free seats left for practice players."
+    }
   },
   "tvResults": {
     "installHeading": "TAKE IT HOME 📱",
@@ -16268,6 +16276,8 @@ const en = {
         "enterCode": "Enter a code"
       },
       "gameEnded": {
+        "joinClassLine": "Your teacher's game just ended. Join your class now and you'll be in the next one.",
+        "nextGameToast": "That game just ended. You're in the class now, so you'll join the next one.",
         "title": "This game has ended",
         "retry": "Try again",
         "toClass": "Go to my class",

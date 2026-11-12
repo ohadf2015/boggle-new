@@ -76,6 +76,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
+import { isGameStarting } from './gameStartMutex.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import { checkGuestRename, renamePlayerInGame } from '../modules/playerRename.js';
 
@@ -478,6 +479,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
+
+    // Mid-start the board is not dealt yet; the start broadcast is on its way to this seated socket.
+    if (isGameStarting(gameCode)) return;
 
     if (isInProgress(game.gameState)) {
       logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);

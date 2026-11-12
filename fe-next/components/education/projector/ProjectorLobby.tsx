@@ -52,6 +52,8 @@ export interface ProjectorLobbyProps {
   onStartPracticeRound?: () => void;
   practiceRoundPending?: boolean;
   practiceRoundFailed?: boolean;
+  /** Message for the failure: the server's refusal reason, or the generic connection line. */
+  practiceRoundFailedKey?: string;
 }
 
 const CHIP = cn(WALL_STICKER, '@5xl:px-[0.8em]');
@@ -81,6 +83,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   onStartPracticeRound,
   practiceRoundPending = false,
   practiceRoundFailed = false,
+  practiceRoundFailedKey,
 }) {
   const lobby = useProjectorLobbyMode({ gameCode, classroomGameMode, templateSettings, t });
   const classCode = useProjectorClassCode(lobby.classroomId);
@@ -184,6 +187,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             onStartPracticeRound={onStartPracticeRound ? startPractice : undefined}
             practiceRoundPending={practiceRoundPending}
             practiceRoundFailed={practiceRoundFailed}
+            practiceRoundFailedKey={practiceRoundFailedKey}
             style={delay(4)}
             className={hasWords ? '@5xl:row-start-4' : '@5xl:row-start-3'}
           />

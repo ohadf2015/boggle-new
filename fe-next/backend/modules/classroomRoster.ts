@@ -4,8 +4,9 @@
  * `players` only holds students who joined from the class page; the join link,
  * QR and typed room code reach the room through the ordinary `join` socket and
  * never touched it, so a full room reported a roster of zero. The `join` handler
- * calls this for every account seat, which covers both doors. A guest seat with
- * no account (and a spectator over the seat cap) is not recorded or counted.
+ * calls this for every seat, which covers both doors. A guest with no account is
+ * recorded as `guest:<guest token hash>` (stable per browser); a guest with no token,
+ * the teacher's practice seat and a spectator over the seat cap are not recorded.
  */
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';

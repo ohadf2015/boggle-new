@@ -77,11 +77,20 @@ describe('useClassroomLaunchSocket — rehearsal rooms', () => {
   const createdSettings = () => emit.mock.calls.find((c) => c[0] === 'createClassroomGame')?.[1]?.settings;
 
   it('Given the teacher chose to rehearse, When the room is launched, Then it is marked as a rehearsal', async () => {
-    writeRehearseIntent({ source: 'class', classExists: true, withSeat: true });
+    const entry = writeRehearseIntent({ source: 'class', classExists: true, withSeat: true });
     const { result } = renderHook(() => useClassroomLaunchSocket(t));
     await waitFor(() => expect(result.current.socket).not.toBeNull());
-    act(() => result.current.launch(payload(result.current.gameCode)));
+    act(() => result.current.launch(payload(result.current.gameCode), 'hq_express', entry));
     expect(createdSettings()).toMatchObject({ rehearsal: true });
+  });
+
+  it('Given the teacher tapped rehearse and left before any launch, When they start a real lesson, Then it is not a rehearsal and the intent is gone', async () => {
+    writeRehearseIntent({ source: 'hq', classExists: true });
+    const { result } = renderHook(() => useClassroomLaunchSocket(t));
+    await waitFor(() => expect(result.current.socket).not.toBeNull());
+    act(() => result.current.launch(payload('REAL02'), 'hq_express'));
+    expect(createdSettings().rehearsal).toBeUndefined();
+    expect(peekRehearseIntent()).toBeNull();
   });
 
   it('Given a real lesson, When the room is launched, Then it is not marked as a rehearsal', async () => {
@@ -93,22 +102,22 @@ describe('useClassroomLaunchSocket — rehearsal rooms', () => {
   });
 
   it('Given a rehearsal launched and abandoned, When the teacher launches a real lesson in the same tab, Then the real room is not marked and the stale intent is gone', async () => {
-    writeRehearseIntent({ source: 'class', classExists: true });
+    const entry = writeRehearseIntent({ source: 'class', classExists: true });
     const { result } = renderHook(() => useClassroomLaunchSocket(t));
     await waitFor(() => expect(result.current.socket).not.toBeNull());
-    act(() => result.current.launch(payload('REH001')));
+    act(() => result.current.launch(payload('REH001'), 'hq_express', entry));
     expect(peekRehearseIntent()).not.toBeNull();
     emit.mockClear();
-    act(() => result.current.launch(payload('REAL01')));
+    act(() => result.current.launch(payload('REAL01'), 'hq_express', entry));
     expect(createdSettings().rehearsal).toBeUndefined();
     expect(peekRehearseIntent()).toBeNull();
   });
 
   it('Given a rehearsal launch, When the host board reads the intent afterwards, Then it is still there so the bots auto-start', async () => {
-    writeRehearseIntent({ source: 'hq', classExists: false });
+    const entry = writeRehearseIntent({ source: 'hq', classExists: false });
     const { result } = renderHook(() => useClassroomLaunchSocket(t));
     await waitFor(() => expect(result.current.socket).not.toBeNull());
-    act(() => result.current.launch(payload('REH002')));
+    act(() => result.current.launch(payload('REH002'), 'hq_express', entry));
     expect(createdSettings()).toMatchObject({ rehearsal: true });
     expect(peekRehearseIntent()).toMatchObject({ source: 'hq' });
   });

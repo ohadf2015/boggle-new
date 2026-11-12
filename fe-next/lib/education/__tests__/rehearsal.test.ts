@@ -6,6 +6,7 @@ import {
   peekRehearseIntent,
   realStudentCount,
   writeRehearseIntent,
+  claimRehearseIntentForLaunch,
 } from '../rehearsal';
 
 describe('realStudentCount', () => {
@@ -15,6 +16,10 @@ describe('realStudentCount', () => {
 
   it('Given one student beside the bots, Then exactly one real student is counted', () => {
     expect(realStudentCount([{ username: 'Bot1', isBot: true }, { username: 'Ada' }])).toBe(1);
+  });
+
+  it('Given the teacher\'s own practice seat left in the lobby after a game switch, Then it is not a student and the lone teacher can still peek with bots', () => {
+    expect(realStudentCount([{ username: 'Ms Lee', isPractice: true }, { username: 'Bot1', isBot: true }])).toBe(0);
   });
 });
 
@@ -56,5 +61,26 @@ describe('rehearse intent hand-off', () => {
   it('Given a garbled entry, Then it reads as no intent', () => {
     sessionStorage.setItem('lexiclash:rehearse-intent', '{"source":"elsewhere","at":1}');
     expect(peekRehearseIntent(2)).toBeNull();
+  });
+});
+
+describe('rehearse intent claim', () => {
+  beforeEach(() => sessionStorage.clear());
+
+  it('Given a rehearse tap, When the launch carries that tap\'s entry, Then the room is claimed as a rehearsal', () => {
+    const entry = writeRehearseIntent({ source: 'hq', classExists: true }, 1_000);
+    expect(claimRehearseIntentForLaunch('ROOM01', entry, 2_000)).toBe(true);
+    expect(claimRehearseIntentForLaunch('ROOM01', entry, 2_001)).toBe(true);
+  });
+
+  it('Given a rehearse tap that was abandoned, When an ordinary launch without the entry happens, Then it is not a rehearsal and the intent is cleared', () => {
+    writeRehearseIntent({ source: 'hq', classExists: true }, 1_000);
+    expect(claimRehearseIntentForLaunch('REAL01', undefined, 2_000)).toBe(false);
+    expect(peekRehearseIntent(2_001)).toBeNull();
+  });
+
+  it('Given an older rehearse tap, When a launch carries a different entry, Then it is not a rehearsal', () => {
+    writeRehearseIntent({ source: 'hq', classExists: true }, 1_000);
+    expect(claimRehearseIntentForLaunch('REAL02', 'some-other-entry', 2_000)).toBe(false);
   });
 });

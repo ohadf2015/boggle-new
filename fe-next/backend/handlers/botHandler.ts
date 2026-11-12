@@ -25,6 +25,7 @@ import { clearGameTimer } from '../utils/timerManager.js';
 import logger from '../utils/logger.js';
 import { validatePayload, addBotSchema, removeBotSchema } from '../utils/socketValidation.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
+import { refuseAutoFill, answerNothingToFill } from './autoFillRefusal.js';
 
 import { MAX_PLAYERS_PER_ROOM, MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 
@@ -327,6 +328,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
   socket.on('setAutoFill', (data: SetAutoFillPayload) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
+      refuseAutoFill(socket, 'rate_limited');
       return;
     }
 
@@ -335,24 +337,28 @@ function registerBotHandlers(io: Server, socket: Socket): void {
 
     if (!gameCode) {
       emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
+      refuseAutoFill(socket, 'not_in_room');
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
       emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+      refuseAutoFill(socket, 'room_gone');
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
       emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can enable auto-fill' });
+      refuseAutoFill(socket, 'not_host');
       return;
     }
 
     // Check if game is in progress
     if (isInProgress(game.gameState)) {
       emitError(socket, ErrorCodes.GAME_ALREADY_STARTED, { message: 'Cannot auto-fill during a game' });
+      refuseAutoFill(socket, 'in_progress');
       return;
     }
 
@@ -366,6 +372,7 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     // spectator of sorts, so it does not take the place of a bot opponent.
     const currentPlayerCount = Object.values(game.users).filter((u) => !(u as { isPractice?: boolean }).isPractice && !u.disconnected).length;
     const botsToAdd = Math.min(targetCount - currentPlayerCount, MAX_PLAYERS_PER_ROOM - currentPlayerCount);
+    if (botsToAdd <= 0) return answerNothingToFill(socket, MAX_PLAYERS_PER_ROOM - currentPlayerCount > 0);
     let botsAdded = 0;
 
     const difficulties = ['easy', 'medium', 'hard'];
