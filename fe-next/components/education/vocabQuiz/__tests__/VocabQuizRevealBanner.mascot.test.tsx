@@ -18,13 +18,13 @@ describe('VocabQuizRevealBanner — Lexi reacts in the verdict', () => {
   it('Given a right answer and a face, Then the mascot wears it with a check badge', () => {
     render(<VocabQuizRevealBanner {...props} correct mascot="celebration" />);
     const slot = screen.getByTestId('vocab-quiz-verdict-mascot');
-    expect(slot.querySelector('[data-variant="celebration"]')).not.toBeNull();
+    expect(slot.querySelector('[data-testid="edu-mascot-success"]')).not.toBeNull();
     expect(screen.getByTestId('vocab-quiz-verdict-badge').dataset.verdict).toBe('correct');
   });
 
   it('Given a wrong answer, Then the mascot winces with a cross badge', () => {
     render(<VocabQuizRevealBanner {...props} correct={false} mascot="oops" />);
-    expect(screen.getByTestId('vocab-quiz-verdict-mascot').querySelector('[data-variant="oops"]')).not.toBeNull();
+    expect(screen.getByTestId('vocab-quiz-verdict-mascot').querySelector('[data-testid="edu-mascot-empty"]')).not.toBeNull();
     expect(screen.getByTestId('vocab-quiz-verdict-badge').dataset.verdict).toBe('wrong');
   });
 

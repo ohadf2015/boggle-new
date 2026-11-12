@@ -20,7 +20,7 @@ import { useEffect, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 import { PauseCircle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import type { ExtendedMascotVariant } from '@/components/ui/mascotUtils';
 import type { TranslateFn } from '@/shared/types/vocabQuiz';
 import { useVocabQuiz } from './useVocabQuiz';
@@ -112,17 +112,12 @@ export function VocabQuizHostView({ socket, joinCode, playerCount, onPlayAgain, 
       className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-neo-navy text-neo-white p-3 gap-3 md:p-6 md:gap-5"
     >
       <header className="flex items-center gap-2 md:gap-4 flex-wrap shrink-0">
-        <InteractiveMascot
-          variant={roomMascot}
-          sizeClassName="w-10 h-10 md:w-16 md:h-16"
-          clipShape="rounded-square"
-          clipBorder="cyan"
-          clipBg="var(--neo-navy-elevated)"
-          animated
-          enableHover={false}
-          enableClick={false}
+        <VocabQuizMascotFace
+          face={roomMascot}
+          className="size-10 md:size-16"
+          shape="rounded-square"
+          bg="elevated"
           alt={t('vocabQuiz.mascot.alt')}
-          className="shrink-0"
         />
         {/* A question counter on a finished round is chrome from a screen that
             no longer exists; the finale below carries its own headline. The

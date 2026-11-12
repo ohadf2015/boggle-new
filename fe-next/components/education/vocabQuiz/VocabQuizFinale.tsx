@@ -28,7 +28,7 @@
 import { useEffect, useRef } from 'react';
 import { Flame, RotateCcw, Target, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
+import { VocabQuizMascotFace } from './VocabQuizMascotFace';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { isRevealed } from '@/lib/education/roundEndStage';
 import type { VocabQuizStanding, TranslateFn } from '@/shared/types/vocabQuiz';
@@ -144,15 +144,11 @@ export function VocabQuizFinale({ standings, totalQuestions, onPlayAgain, onBack
     >
       <div className="shrink-0 flex items-center gap-3 md:gap-6 flex-wrap rounded-neo border-[3px] border-neo-cream bg-neo-navy-elevated p-3 md:px-5 md:py-3 shadow-hard">
         <div data-testid="quiz-finale-mascot" className="shrink-0">
-          <InteractiveMascot
-            variant="trophy"
-            sizeClassName="w-16 h-16 md:w-20 md:h-20 md:[@media(min-height:1000px)]:w-28 md:[@media(min-height:1000px)]:h-28"
-            clipShape="rounded-square"
-            clipBorder="lime"
-            clipBg="var(--neo-navy)"
-            animated
-            enableHover={false}
-            enableClick={false}
+          <VocabQuizMascotFace
+            face="trophy"
+            className="size-16 md:size-20 md:[@media(min-height:1000px)]:size-28"
+            shape="rounded-square"
+            border="lime"
             alt={t('vocabQuiz.finished.mascotAlt')}
           />
         </div>
