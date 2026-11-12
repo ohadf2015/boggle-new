@@ -39,8 +39,7 @@ interface Copy {
   dir: 'ltr' | 'rtl';
 }
 
-// en, he and sv: every approved teacher so far writes in one of these. Other locales fall back to en.
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
+const COPY: Record<TeacherLocale, Copy> = {
   en: {
     greeting: (n) => (n ? `Hi ${n},` : 'Hi there,'),
     kicker: 'For teachers',
@@ -149,11 +148,119 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     footnote: 'Du får det här för att du startade kostnadsfri lärartillgång på LexiClash.',
     dir: 'ltr',
   },
+  ja: {
+    greeting: (n) => (n ? `${n}さん、こんにちは。` : 'こんにちは。'),
+    kicker: '先生向け',
+    buckets: {
+      't-3': {
+        subject: (date) => `LexiClashの無料体験は${date}で終了します`,
+        preheader: '無料アクセスの終了日のお知らせと、率直な質問がひとつあります。',
+        headline: '無料期間がまもなく終わります',
+        lead: (date) => `先生向けの無料アクセスは${date}で終了します。`,
+        body: 'LexiClashが授業で役に立っているようでしたら、Teacher Proで引き続きお使いいただけます。月額9ドルで、いつでも解約できます。もしお役に立てていなかったなら、それも教えていただけるとありがたいです。',
+        cta: 'Teacher Proを続ける',
+      },
+      't-0': {
+        subject: () => 'LexiClashの無料体験は本日で終了します',
+        preheader: '無料アクセスが終わる前に、ひとことお知らせです。',
+        headline: '無料期間は本日までです',
+        lead: () => '先生向けの無料アクセスは本日で終了します。',
+        body: 'これからもクラスで遊びたい場合は、Teacher Proを月額9ドルでご利用いただけます。解約はいつでもできます。',
+        cta: 'Teacher Proを続ける',
+      },
+      't+3': {
+        subject: () => 'LexiClashの無料体験が終了しました',
+        preheader: 'お試しいただきありがとうございました。ひとつだけ質問させてください。',
+        headline: 'お試しいただきありがとうございました',
+        lead: (date) => `LexiClashをお試しいただきありがとうございました。先生向けの無料アクセスは${date}で終了しました。`,
+        body: 'またクラスで使いたくなりましたら、Teacher Proを月額9ドルでご利用いただけます。解約はいつでもできます。',
+        cta: 'Teacher Proを見る',
+      },
+    },
+    askTitle: 'ひとつ質問です',
+    ask: '合わなかった場合は、何が足りなかったのか、何が使いにくかったのかを教えていただけませんか。このメールにそのまま返信してください。いただいた返信はすべて私が自分で読んでいます。',
+    classroom: '自分のクラスを開く',
+    signoff: 'ありがとうございます。Ohad（LexiClashを作っています）',
+    footnote: 'LexiClashで先生向けの無料アクセスを始められた方にお送りしています。',
+    dir: 'ltr',
+  },
+  es: {
+    greeting: (n) => (n ? `Hola, ${n}:` : 'Hola:'),
+    kicker: 'Para docentes',
+    buckets: {
+      't-3': {
+        subject: (date) => `Tu prueba de LexiClash termina el ${date}`,
+        preheader: 'Cuándo termina tu acceso, y una pregunta sincera.',
+        headline: 'Tu acceso gratuito termina pronto',
+        lead: (date) => `Tu acceso gratuito para docentes termina el ${date}.`,
+        body: 'Si LexiClash se ha ganado un lugar en tus clases, con Teacher Pro puedes seguir usándolo por 9 dólares al mes y cancelar cuando quieras. Si no ha sido así, también me sirve saberlo.',
+        cta: 'Seguir con Teacher Pro',
+      },
+      't-0': {
+        subject: () => 'Tu prueba de LexiClash termina hoy',
+        preheader: 'Una nota rápida antes de que termine tu acceso gratuito.',
+        headline: 'Tu acceso gratuito termina hoy',
+        lead: () => 'Tu acceso gratuito para docentes termina hoy.',
+        body: 'Si quieres seguir jugando con tu clase, Teacher Pro cuesta 9 dólares al mes y puedes cancelar en cualquier momento.',
+        cta: 'Seguir con Teacher Pro',
+      },
+      't+3': {
+        subject: () => 'Tu prueba de LexiClash ha terminado',
+        preheader: 'Gracias por probarlo. Solo una pregunta rápida.',
+        headline: 'Gracias por probar LexiClash',
+        lead: (date) => `Gracias por probar LexiClash. Tu acceso gratuito para docentes terminó el ${date}.`,
+        body: 'Si quieres volver a usarlo con tu clase, Teacher Pro cuesta 9 dólares al mes y puedes cancelar en cualquier momento.',
+        cta: 'Ver Teacher Pro',
+      },
+    },
+    askTitle: 'Una pregunta',
+    ask: '¿No terminó de encajar? Respóndeme y cuéntame qué faltó o qué te lo puso difícil. Leo cada respuesta yo mismo.',
+    classroom: 'Abrir mi clase',
+    signoff: 'Gracias, Ohad (soy quien hace LexiClash)',
+    footnote: 'Te llega este correo porque activaste el acceso gratuito para docentes en LexiClash.',
+    dir: 'ltr',
+  },
+  ru: {
+    greeting: (n) => (n ? `Здравствуйте, ${n}!` : 'Здравствуйте!'),
+    kicker: 'Для учителей',
+    buckets: {
+      't-3': {
+        subject: (date) => `Пробный период LexiClash закончится ${date}`,
+        preheader: 'Когда заканчивается доступ, и один честный вопрос.',
+        headline: 'Бесплатный доступ скоро закончится',
+        lead: (date) => `Ваш бесплатный доступ для учителей закончится ${date}.`,
+        body: 'Если LexiClash прижился на ваших уроках, с Teacher Pro всё будет работать дальше за 9 долларов в месяц, а отменить подписку можно когда угодно. Если не прижился, мне это тоже полезно знать.',
+        cta: 'Продолжить с Teacher Pro',
+      },
+      't-0': {
+        subject: () => 'Пробный период LexiClash заканчивается сегодня',
+        preheader: 'Короткое письмо, пока бесплатный доступ ещё действует.',
+        headline: 'Бесплатный доступ заканчивается сегодня',
+        lead: () => 'Ваш бесплатный доступ для учителей заканчивается сегодня.',
+        body: 'Если хотите и дальше играть с классом, Teacher Pro стоит 9 долларов в месяц, и отменить его можно в любой момент.',
+        cta: 'Продолжить с Teacher Pro',
+      },
+      't+3': {
+        subject: () => 'Пробный период LexiClash закончился',
+        preheader: 'Спасибо, что попробовали. И один короткий вопрос.',
+        headline: 'Спасибо, что попробовали LexiClash',
+        lead: (date) => `Спасибо, что попробовали LexiClash. Ваш бесплатный доступ для учителей закончился ${date}.`,
+        body: 'Если захотите вернуть игру в класс, Teacher Pro стоит 9 долларов в месяц, и отменить его можно в любой момент.',
+        cta: 'Посмотреть Teacher Pro',
+      },
+    },
+    askTitle: 'Один вопрос',
+    ask: 'Не подошло? Ответьте на это письмо и расскажите, чего не хватило или что мешало. Я сам читаю каждый ответ.',
+    classroom: 'Открыть мой класс',
+    signoff: 'Спасибо, Охад (я делаю LexiClash)',
+    footnote: 'Вы получили это письмо, потому что подключили бесплатный доступ для учителей в LexiClash.',
+    dir: 'ltr',
+  },
 };
 
 export function teacherTrialReminder({ full_name, locale, bucket, trialExpiresAt }: Args) {
-  const lang = COPY[locale] ? locale : 'en';
-  const c = COPY[lang]!;
+  const lang: TeacherLocale = locale in COPY ? locale : 'en';
+  const c = COPY[lang];
   const b = c.buckets[bucket];
   const dateStr = new Date(trialExpiresAt).toLocaleDateString(DATE_LOCALE[lang], {
     month: 'long', day: 'numeric',
