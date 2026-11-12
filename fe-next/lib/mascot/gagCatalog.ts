@@ -48,7 +48,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'toes-tip-over', clip: 'faceplant-thumbsup', beats: [
         b('windup', P.think, 620, { rotate: -4 }),
-        b('action', P.shock, 150, { y: 6, rotate: 70, ...squash, cry: true }),
+        b('action', P.shock, 150, { y: 6, rotate: 70, ...squash, cry: true, sound: 'gagFaceplantThud' }),
         b('freeze', P.sleep, 520, { y: 6, rotate: 70, ...squash }),
         b('reaction', P.tada, 420, { y: -8, ...stretch }),
         b('reaction', P.tada, 320, leave),
@@ -71,16 +71,16 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'book-snaps-shut', clip: 'bonk-dizzy', beats: [
         b('windup', P.think, 560, prop('book', 'enter')),
-        b('action', P.shock, 140, { ...squash, ...prop('book', 'close'), cry: true }),
+        b('action', P.shock, 140, { ...squash, ...prop('book', 'close'), cry: true, sound: 'gagBookSlam' }),
         b('freeze', P.shock, 480, { ...squash, ...prop('book', 'close') }),
-        b('reaction', P.dizzy, 700, { rotate: 720 }),
+        b('reaction', P.dizzy, 700, { rotate: 720, sound: 'gagDizzyStars' }),
         b('reaction', P.dizzy, 300, leave),
       ] },
       { id: 'book-drops-from-shelf', clip: 'bonk-dizzy', beats: [
         b('windup', P.sneak, 520, { rotate: -6 }),
-        b('action', P.shock, 140, { ...squash, ...prop('book', 'drop'), cry: true }),
+        b('action', P.shock, 140, { ...squash, ...prop('book', 'drop'), cry: true, sound: 'gagBookSlam' }),
         b('freeze', P.shock, 500, { ...squash, ...prop('book', 'hold') }),
-        b('reaction', P.dizzy, 640, { rotate: -540 }),
+        b('reaction', P.dizzy, 640, { rotate: -540, sound: 'gagDizzyStars' }),
         b('reaction', P.dizzy, 300, leave),
       ] },
     ],
@@ -93,14 +93,14 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'turns-stamp-around', clip: 'slow-burn-stare', beats: [
         b('windup', P.smug, 480, prop('stamp', 'enter')),
-        b('action', P.cheer, 140, { ...squash, ...prop('stamp', 'drop') }),
+        b('action', P.cheer, 140, { ...squash, ...prop('stamp', 'drop'), sound: 'gagRubberStamp' }),
         b('freeze', P.shock, 520, prop('stamp', 'hold')),
         b('reaction', P.oops, 900, prop('stamp', 'flip')),
         b('reaction', P.oops, 300, leave),
       ] },
       { id: 'hides-stamp', clip: 'slow-burn-stare', beats: [
         b('windup', P.smug, 460, prop('stamp', 'enter')),
-        b('action', P.cheer, 140, { ...stretch, ...prop('stamp', 'drop') }),
+        b('action', P.cheer, 140, { ...stretch, ...prop('stamp', 'drop'), sound: 'gagRubberStamp' }),
         b('freeze', P.shock, 560, prop('stamp', 'hold')),
         b('reaction', P.think, 820, { rotate: 6, ...prop('stamp', 'exit') }),
         b('reaction', P.think, 300, leave),
@@ -114,17 +114,17 @@ export const GAG_CATALOG: readonly GagDef[] = [
     matches: (e) => e.kind === 'combo-broken' && e.fromLevel >= 3,
     variants: [
       { id: 'last-tile-on-nose', clip: 'bonk-dizzy', beats: [
-        b('windup', P.power, 380, prop('tile-stack', 'hold')),
-        b('action', P.shock, 160, { ...squash, ...prop('tile-stack', 'fall') }),
+        b('windup', P.power, 380, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
+        b('action', P.shock, 160, { ...squash, ...prop('tile-stack', 'fall'), sound: 'gagTileStackCrash' }),
         b('freeze', P.shock, 700, squash),
-        b('reaction', P.dizzy, 520, { ...squash, ...prop('tile', 'drop') }),
+        b('reaction', P.dizzy, 520, { ...squash, ...prop('tile', 'drop'), sound: 'gagBonk' }),
         b('reaction', P.dizzy, 300, leave),
       ] },
       { id: 'catches-all-but-one', clip: 'bonk-dizzy', beats: [
-        b('windup', P.power, 360, prop('tile-stack', 'hold')),
-        b('action', P.cheer, 160, { ...stretch, ...prop('tile-stack', 'fall') }),
+        b('windup', P.power, 360, { ...prop('tile-stack', 'hold'), sound: 'gagTileStackWobble', soundRate: 1.3 }),
+        b('action', P.cheer, 160, { ...stretch, ...prop('tile-stack', 'fall'), sound: 'gagTileStackCrash' }),
         b('freeze', P.smug, 620, stretch),
-        b('reaction', P.oops, 560, { ...squash, ...prop('tile', 'drop') }),
+        b('reaction', P.oops, 560, { ...squash, ...prop('tile', 'drop'), sound: 'gagBonk' }),
         b('reaction', P.oops, 300, leave),
       ] },
     ],
@@ -138,7 +138,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'traces-then-double-take', clip: 'glass-peek', beats: [
         b('windup', P.sneak, 700, { out: 30 }),
-        b('action', P.think, 160, { out: 14, rotate: -10 }),
+        b('action', P.think, 160, { out: 14, rotate: -10, sound: 'gagGlassSqueak' }),
         b('freeze', P.think, 900, { out: 14, rotate: -10 }),
         b('reaction', P.shock, 240, { out: 18, ...stretch }),
         b('reaction', P.oops, 600, { out: 22 }),
@@ -161,7 +161,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'pushes-the-edge', beats: [
         b('windup', P.run, 360, { out: 30, rotate: -10 }),
-        b('action', P.hello, 150, { out: 0, scaleX: 0.6, scaleY: 1.2 }),
+        b('action', P.hello, 150, { out: 0, scaleX: 0.6, scaleY: 1.2, sound: 'gagGlassSqueak' }),
         b('freeze', P.hello, 8000, { out: 0, scaleX: 0.62, scaleY: 1.18 }),
         b('reaction', P.oops, 400, leave),
       ] },
@@ -181,15 +181,16 @@ export const GAG_CATALOG: readonly GagDef[] = [
     ignoresGap: true,
     matches: (e) => e.kind === 'personal-best',
     variants: [
+      // soundRate 1.34 lands the drumroll's cymbal (1.0s in) on the 760ms action beat.
       { id: 'drumroll-faceplant', clip: 'faceplant-thumbsup', beats: [
-        b('windup', P.think, 760, { sound: 'mascotDrumroll' }),
+        b('windup', P.think, 760, { sound: 'gagDrumrollShort', soundRate: 1.34 }),
         b('action', P.tada, 150, { ...stretch, y: -12, cry: true, ...prop('trophy', 'enter') }),
         b('freeze', P.tada, 520, { ...stretch, y: -12, ...prop('trophy', 'hold') }),
-        b('reaction', P.sleep, 460, { rotate: 80, ...squash }),
+        b('reaction', P.sleep, 460, { rotate: 80, ...squash, sound: 'gagFaceplantThud' }),
         b('reaction', P.tada, 360, leave),
       ] },
       { id: 'drumroll-trophy-hoist', clip: 'puffed-chest-smug', beats: [
-        b('windup', P.think, 760, { sound: 'mascotDrumroll' }),
+        b('windup', P.think, 760, { sound: 'gagDrumrollShort', soundRate: 1.34 }),
         b('action', P.tada, 150, { ...stretch, y: -14, cry: true }),
         b('freeze', P.smug, 600, { ...stretch, y: -14, ...prop('trophy', 'hold') }),
         b('reaction', P.smug, 520, { scaleX: 1.15, scaleY: 1.15, ...prop('trophy', 'hold') }),
@@ -207,7 +208,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
         b('windup', P.power, 520, { out: 20, ...prop('tile', 'hold') }),
         b('action', P.shock, 140, { out: 16, ...stretch, ...prop('tile', 'exit') }),
         b('freeze', P.sad, 620, { out: 16 }),
-        b('reaction', P.sad, 420, { out: 20, sound: 'mascotAww', soundRate: 1.4 }),
+        b('reaction', P.sad, 420, { out: 20, sound: 'gagTinyWhimper' }),
         b('reaction', P.sad, 300, leave),
       ] },
       { id: 'hides-it-behind-back', clip: 'puffed-chest-smug', beats: [
@@ -270,7 +271,7 @@ export const GAG_CATALOG: readonly GagDef[] = [
     variants: [
       { id: 'clap-slows-down', clip: 'slow-burn-stare', beats: [
         b('windup', P.smug, 400, { out: 20 }),
-        b('action', P.cheer, 140, { out: 14, ...squash }),
+        b('action', P.cheer, 140, { out: 14, ...squash, sound: 'gagSlowClap' }),
         b('freeze', P.cheer, 380, { out: 14 }),
         b('reaction', P.smug, 900, { out: 14, scaleX: 1.08 }),
         b('reaction', P.smug, 300, leave),

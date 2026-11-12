@@ -1,0 +1,86 @@
+[
+  {
+    "id": "bonk",
+    "file": "/sounds/mascot-gags/bonk.mp3",
+    "durationMs": 400,
+    "lufs": -12.0
+  },
+  {
+    "id": "dizzy-stars",
+    "file": "/sounds/mascot-gags/dizzy-stars.mp3",
+    "durationMs": 1500,
+    "lufs": -12.0
+  },
+  {
+    "id": "faceplant-thud",
+    "file": "/sounds/mascot-gags/faceplant-thud.mp3",
+    "durationMs": 600,
+    "lufs": -15.0
+  },
+  {
+    "id": "glass-squeak",
+    "file": "/sounds/mascot-gags/glass-squeak.mp3",
+    "durationMs": 900,
+    "lufs": -12.0
+  },
+  {
+    "id": "rubber-stamp",
+    "file": "/sounds/mascot-gags/rubber-stamp.mp3",
+    "durationMs": 600,
+    "lufs": -12.3
+  },
+  {
+    "id": "book-slam",
+    "file": "/sounds/mascot-gags/book-slam.mp3",
+    "durationMs": 700,
+    "lufs": -13.3
+  },
+  {
+    "id": "tape-measure",
+    "file": "/sounds/mascot-gags/tape-measure.mp3",
+    "durationMs": 1170,
+    "lufs": -14.4
+  },
+  {
+    "id": "tile-stack-wobble",
+    "file": "/sounds/mascot-gags/tile-stack-wobble.mp3",
+    "durationMs": 1150,
+    "lufs": -11.9
+  },
+  {
+    "id": "tile-stack-crash",
+    "file": "/sounds/mascot-gags/tile-stack-crash.mp3",
+    "durationMs": 1150,
+    "lufs": -11.9
+  },
+  {
+    "id": "tiny-whimper",
+    "file": "/sounds/mascot-gags/tiny-whimper.mp3",
+    "durationMs": 750,
+    "lufs": -11.4
+  },
+  {
+    "id": "crumple",
+    "file": "/sounds/mascot-gags/crumple.mp3",
+    "durationMs": 1120,
+    "lufs": -18.1
+  },
+  {
+    "id": "drumroll-short",
+    "file": "/sounds/mascot-gags/drumroll-short.mp3",
+    "durationMs": 1550,
+    "lufs": -12.6
+  },
+  {
+    "id": "mascot-cry",
+    "file": "/sounds/mascot-gags/mascot-cry.mp3",
+    "durationMs": 800,
+    "lufs": -11.9
+  },
+  {
+    "id": "slow-clap",
+    "file": "/sounds/mascot-gags/slow-clap.mp3",
+    "durationMs": 1900,
+    "lufs": -16.2
+  }
+]

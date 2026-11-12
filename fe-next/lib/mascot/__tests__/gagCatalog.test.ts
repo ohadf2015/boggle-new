@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { GAG_CATALOG, CLIP_IDS } from '../gagCatalog';
 import { variantDurationMs } from '../gagDirector';
 import type { BeatPhase } from '../gagTypes';
+import { SOUND_EFFECTS } from '@/lib/audio/soundEffectsConfig';
 
 const ORDER: BeatPhase[] = ['windup', 'action', 'freeze', 'reaction'];
 
@@ -57,5 +58,26 @@ describe('gag catalogue', () => {
     expect(byBible(20).chance).toBeLessThanOrEqual(0.25);
     expect(byBible(4).chance).toBe(1);
     expect(byBible(9).daily).toBe(true);
+  });
+
+  it('every beat sound is a registered sound effect', () => {
+    for (const gag of GAG_CATALOG) {
+      for (const v of gag.variants) {
+        for (const beat of v.beats) if (beat.sound) expect(SOUND_EFFECTS).toHaveProperty(beat.sound);
+      }
+    }
+  });
+
+  it('lands the slapstick sound on the beat it belongs to', () => {
+    const sounds = (gagId: string, variantId?: string) =>
+      GAG_CATALOG.find((g) => g.id === gagId)!
+        .variants.filter((v) => !variantId || v.id === variantId)
+        .map((v) => Object.fromEntries(v.beats.filter((b) => b.sound).map((b) => [b.phase, b.sound])));
+    for (const s of sounds('stamp-too-early')) expect(s.action).toBe('gagRubberStamp');
+    for (const s of sounds('dictionary-bonk')) expect(s.action).toBe('gagBookSlam');
+    for (const s of sounds('stack-collapse')) expect(s.action).toBe('gagTileStackCrash');
+    expect(sounds('rare-letter-whimper', 'tiny-whimper')[0].reaction).toBe('gagTinyWhimper');
+    expect(sounds('slow-clap', 'clap-slows-down')[0].action).toBe('gagSlowClap');
+    for (const s of sounds('record-overreaction')) expect(s.windup).toBe('gagDrumrollShort');
   });
 });

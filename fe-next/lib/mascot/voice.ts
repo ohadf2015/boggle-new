@@ -1,4 +1,5 @@
 import type { MascotState } from '@/lib/blast/mascotState';
+import type { MascotGagSound } from './gagSounds';
 
 export type MascotVoiceSound =
   | 'mascotCheer'
@@ -8,15 +9,17 @@ export type MascotVoiceSound =
   | 'mascotAww'
   | 'mascotDrumroll';
 
+export type MascotSound = MascotVoiceSound | MascotGagSound;
+
 export interface MascotVoice {
-  sound: MascotVoiceSound;
+  sound: MascotSound;
   rate: number;
 }
 
 export const VOICE_CHANCE = 1 / 3;
 
-/** The mascot's own cry: a pitched-up whoa, saved for big moments so players learn it. */
-export const SIGNATURE_CRY: MascotVoice = { sound: 'mascotWhoa', rate: 1.55 };
+/** The mascot's own cry, saved for big moments so players learn it. */
+export const SIGNATURE_CRY: MascotVoice = { sound: 'gagMascotCry', rate: 1 };
 
 const LINES: Partial<Record<MascotState, MascotVoiceSound>> = {
   cheer: 'mascotCheer',

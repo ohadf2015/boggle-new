@@ -1,5 +1,5 @@
 import type { MascotEvent } from '@/lib/blast/mascotState';
-import type { MascotVoiceSound } from './voice';
+import type { MascotSound } from './voice';
 
 export type BeatPhase = 'windup' | 'action' | 'freeze' | 'reaction';
 
@@ -18,7 +18,7 @@ export interface GagBeat {
   scaleY: number;
   prop?: { kind: PropKind; move: PropMove };
   cry?: boolean;
-  sound?: MascotVoiceSound;
+  sound?: MascotSound;
   soundRate?: number;
 }
 

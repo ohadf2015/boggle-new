@@ -17,9 +17,8 @@ describe('voiceLineFor', () => {
 });
 
 describe('signature cry', () => {
-  it('is an existing line pitched up, not a new sound', () => {
-    expect(SIGNATURE_CRY.sound).toBe('mascotWhoa');
-    expect(SIGNATURE_CRY.rate).toBeGreaterThan(1.2);
+  it("is the mascot's own recorded cry", () => {
+    expect(SIGNATURE_CRY.sound).toBe('gagMascotCry');
   });
 
   it('long words and an unhinged combo are big moments', () => {

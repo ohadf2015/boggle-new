@@ -8,6 +8,7 @@ import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { comboTier, escalationMotion } from '@/lib/blast/mascotState';
 import { createVoiceHistory, pickVoice, SIGNATURE_CRY, type MascotVoice } from '@/lib/mascot/voice';
+import { gagSoundVolume } from '@/lib/mascot/gagSounds';
 import type { GagBeat, GagDef, GagVariant } from '@/lib/mascot/gagTypes';
 import type { Language } from '@/shared/types/game';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
@@ -54,7 +55,8 @@ export function GameMascotReactions({
   const full = personality === 'full' && allowed;
 
   const say = useCallback(
-    (voice: MascotVoice) => playSound(voice.sound, { rate: voice.rate, requiresGameActive: false }),
+    (voice: MascotVoice) =>
+      playSound(voice.sound, { rate: voice.rate, volume: gagSoundVolume(voice.sound), requiresGameActive: false }),
     [playSound],
   );
 
