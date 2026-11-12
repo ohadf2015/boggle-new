@@ -125,7 +125,7 @@ function RowShell({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
-      className={`flex items-center gap-2.5 p-2.5 rounded-neo border-2 ${rowTone(rank, isCurrentUser)} ${compact ? 'py-2' : 'sm:gap-3 sm:p-3'}`}
+      className={`flex min-w-0 items-center gap-2 p-2 rounded-neo border-2 ${rowTone(rank, isCurrentUser)} ${compact ? 'py-2' : 'sm:gap-3 sm:p-3'}`}
     >
       <div
         className={`relative w-9 h-9 ${compact ? '' : 'sm:w-10 sm:h-10'} shrink-0 rounded-neo border-2 border-neo-black flex items-center justify-center font-neo-display font-black text-sm sm:text-base tabular-nums ${

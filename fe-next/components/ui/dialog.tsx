@@ -102,7 +102,11 @@ const DialogContent = React.forwardRef<
       aria-describedby={noDescription ? undefined : props['aria-describedby']}
       className={cn(
         // Sizing — centered by parent flex container
-        "relative grid w-[calc(100%-2rem)] max-w-[95vw] pointer-events-auto",
+        // One column that may shrink below its content's min-content width: an
+        // implicit `auto` track grows to the widest unbreakable line inside
+        // (truncated names, nowrap chips), pushing content past the dialog
+        // edge where overflow-x-hidden clips it — the start edge in RTL.
+        "relative grid grid-cols-[minmax(0,1fr)] w-[calc(100%-2rem)] max-w-[95vw] pointer-events-auto",
         "sm:max-w-lg lg:max-w-xl xl:max-w-2xl",
         // Height constraints - prevent overflow
         "max-h-[90vh] sm:max-h-[85vh]",
