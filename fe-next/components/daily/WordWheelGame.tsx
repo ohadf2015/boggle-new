@@ -43,7 +43,7 @@ import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
-import { emitFinalSeconds, emitWheelVerdict } from './mascot/dailyMascotEvents';
+import { emitFinalSeconds, emitWheelVerdict, WHEEL_MASCOT_SLOT } from './mascot/dailyMascotEvents';
 
 export type { WordWheelGameResult } from './wheel/wordWheelGameProps';
 
@@ -490,7 +490,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
-        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} />}
+        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} />}
       </div>
     </GameShell>
   );

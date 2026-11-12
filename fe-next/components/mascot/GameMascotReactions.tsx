@@ -37,6 +37,8 @@ interface GameMascotReactionsProps {
   personalBest?: number | null;
   /** Replaces the default position classes, for hosts whose corner holds their own controls. */
   slotClassName?: string;
+  /** Position and height of the gag strip; defaults to the top HUD row. */
+  stageClassName?: string;
 }
 
 const COMBO_BREAK_MIN = 3;
@@ -53,6 +55,7 @@ export function GameMascotReactions({
   score,
   personalBest = null,
   slotClassName = DEFAULT_SLOT,
+  stageClassName,
 }: GameMascotReactionsProps) {
   const mascot = useBlastMascot();
   const pref = useMascotEnabled();
@@ -157,7 +160,7 @@ export function GameMascotReactions({
         )}
       </AdaptiveAnimatePresence>
       {gag && (
-        <MascotEdgeStage>
+        <MascotEdgeStage className={stageClassName}>
           <MascotGagPlayer key={gag.key} playKey={gag.key} gagId={gag.gag.id} variant={gag.variant} onBeat={onBeat} />
         </MascotEdgeStage>
       )}
