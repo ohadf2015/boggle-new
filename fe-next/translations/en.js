@@ -17108,6 +17108,8 @@ const en = {
     "progress": "{{completed}}/{{total}}",
     "go": "GO",
     "done": "Done",
+    "resetIn": "New quests in {{time}}",
+    "hero": { "fresh": "Three fresh quests. Go get 'em.", "one": "One down. The chest is getting nervous.", "two": "One more and the chest pops open!", "done": "Chest cracked. See you tomorrow!" },
     "feed": {
       "title": "Recent wins",
       "pvp": "{{name}} beat a human rival",

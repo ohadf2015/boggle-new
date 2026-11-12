@@ -19058,6 +19058,8 @@ const es = {
     "progress": "{{completed}}/{{total}}",
     "go": "IR",
     "done": "¡Hecho!",
+    "resetIn": "Nuevas misiones en {{time}}",
+    "hero": { "fresh": "Tres misiones nuevas. ¡A por ellas!", "one": "Una menos. El cofre empieza a sudar.", "two": "¡Una más y el cofre se abre!", "done": "Cofre abierto. ¡Hasta mañana!" },
     "feed": {
       "title": "Victorias recientes",
       "pvp": "{{name}} venció a un rival real",

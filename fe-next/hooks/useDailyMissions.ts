@@ -27,6 +27,7 @@ import {
   type DailyQuest,
   type QuestConditionType,
   type QuestFamily,
+  type QuestPublicMode,
 } from '@/shared/dailyQuestPool';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
 
@@ -41,6 +42,7 @@ export interface Mission {
   icon: string;
   completed: boolean;
   href: string;
+  mode?: QuestPublicMode;
 }
 
 export interface UseDailyMissionsReturn {
@@ -94,6 +96,7 @@ function buildMissions(data: MissionRow | null): Mission[] {
     icon: quest.icon,
     completed: d[SLOT_COLUMNS[i]],
     href: quest.href,
+    mode: quest.mode,
   }));
 }
 

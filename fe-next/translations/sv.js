@@ -19135,6 +19135,8 @@ const sv = {
     "progress": "{{completed}}/{{total}}",
     "go": "KÖR",
     "done": "Klart!",
+    "resetIn": "Nya uppdrag om {{time}}",
+    "hero": { "fresh": "Tre nya uppdrag. Kör!", "one": "Ett klart. Kistan börjar svettas.", "two": "Ett till så öppnas kistan!", "done": "Kistan är öppen. Vi ses i morgon!" },
     "feed": {
       "title": "Senaste vinster",
       "pvp": "{{name}} besegrade en riktig motståndare",
