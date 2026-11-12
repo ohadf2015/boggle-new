@@ -1,6 +1,6 @@
 export const TEACHER_EMAIL_SITE = 'https://www.lexiclash.live';
 /** Replies to trial emails go to Ohad, who reads them. */
-export const TEACHER_EMAIL_REPLY_TO = 'ohadf2015@gmail.com';
+export const TEACHER_EMAIL_REPLY_TO = 'lexiclash.game@gmail.com';
 
 /** Every teacher-page link in an email goes through here, so the visit it brings is attributed to that email. */
 export function teacherEmailUrl(locale: string, path: string, campaign: string, params: Record<string, string> = {}): string {

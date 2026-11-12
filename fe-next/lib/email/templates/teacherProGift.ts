@@ -6,7 +6,6 @@ import { firstName, teacherEmailUrl } from './teacherEmailLayout';
  * Sent when an admin grants a teacher a complimentary Pro period by email
  * (see lib/education/proGrantServer.ts). `pending: true` means no account has
  * this address yet: Pro is reserved and switches on when they sign up with it.
- * en / he / es, falling back to en.
  */
 
 interface Args {
@@ -21,7 +20,7 @@ interface Args {
 }
 
 const SITE = 'https://www.lexiclash.live';
-const CONTACT = 'ohadf2015@gmail.com';
+const CONTACT = 'lexiclash.game@gmail.com';
 
 const DATE_LOCALE: Record<TeacherLocale, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
@@ -47,7 +46,7 @@ interface Copy {
   dir: 'ltr' | 'rtl';
 }
 
-const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
+const COPY: Record<TeacherLocale, Copy> = {
   en: {
     subject: 'Your LexiClash Teacher Pro is on, my treat',
     preheader: 'No card, no trial, nothing to claim.',
@@ -115,6 +114,75 @@ const COPY: Partial<Record<TeacherLocale, Copy>> & { en: Copy } = {
     cta: 'Abrir mi panel de profesor',
     ask: `Si algo falla, confunde o falta, responde a este correo. Me llega directamente y leo todos (${CONTACT}).`,
     signoff: 'Ohad, creador de LexiClash',
+    dir: 'ltr',
+  },
+  sv: {
+    subject: 'Teacher Pro i LexiClash är på, det bjuder jag på',
+    preheader: 'Inget kort, ingen provperiod och inget du behöver lösa in.',
+    kicker: 'En present till din klass',
+    headline: 'Teacher Pro, det bjuder jag på',
+    greeting: (n) => `Hej ${n},`,
+    lead: 'Teacher Pro är aktiverat på ditt konto. Du behöver inte lösa in något eller ange något kort, och det finns ingen provperiod som i tysthet blir en faktura.',
+    noteTitle: 'Några rader till dig',
+    until: (date) => `Det gäller till ${date}.`,
+    includedTitle: 'Det här ingår',
+    included: [
+      'Analys efter varje spel: vilka ord klassen hade svårt med, och vem som hade det',
+      'Utskrivbara rapporter för klassen och för varje elev',
+      'Obegränsat antal klasser',
+    ],
+    noCard: 'När perioden tar slut går du helt enkelt tillbaka till gratisplanen. Du debiteras aldrig om du inte själv väljer det.',
+    pendingLead: 'Det finns inget LexiClash-konto med den här adressen än. Registrera dig med exakt den här mejladressen, så slås Pro på av sig självt när du loggar in.',
+    pendingCta: 'Skapa ditt konto',
+    cta: 'Öppna min lärarpanel',
+    ask: `Om något är trasigt, krångligt eller saknas, svara bara på mejlet. Det kommer direkt till mig och jag läser varenda svar (${CONTACT}).`,
+    signoff: 'Ohad, som har byggt LexiClash',
+    dir: 'ltr',
+  },
+  ja: {
+    subject: 'LexiClashのTeacher Proを有効にしました。費用はいただきません',
+    preheader: 'カードの登録も、お試し期間も、受け取りの手続きもありません。',
+    kicker: 'クラスへのプレゼント',
+    headline: 'Teacher Proをお贈りします',
+    greeting: (n) => `${n}さん、こんにちは。`,
+    lead: 'あなたのアカウントでTeacher Proを有効にしました。受け取りの手続きもカードの登録も不要で、知らないうちに有料に切り替わるお試し期間でもありません。',
+    noteTitle: 'あなたへのメッセージ',
+    until: (date) => `${date}までご利用いただけます。`,
+    includedTitle: '含まれる機能',
+    included: [
+      '毎回のゲーム後の分析：クラスがどの単語でつまずいたか、誰がつまずいたか',
+      '印刷できるクラス別・生徒別のレポート',
+      'クラス数は無制限',
+    ],
+    noCard: '期間が終わると、そのまま無料プランに戻ります。ご自身で選ばない限り、料金が発生することはありません。',
+    pendingLead: 'このメールアドレスのLexiClashアカウントはまだありません。このアドレスで登録していただければ、ログインした時点でProが自動的に有効になります。',
+    pendingCta: 'アカウントを作成する',
+    cta: '教師用ダッシュボードを開く',
+    ask: `不具合や分かりにくい点、足りない機能があれば、このメールに返信してください。私に直接届きますし、いただいたお返事はすべて読んでいます（${CONTACT}）。`,
+    signoff: 'Ohad（LexiClash開発者）',
+    dir: 'ltr',
+  },
+  ru: {
+    subject: 'Teacher Pro в LexiClash включён, это подарок от меня',
+    preheader: 'Без карты и пробного периода, активировать ничего не нужно.',
+    kicker: 'Подарок для вашего класса',
+    headline: 'Teacher Pro в подарок от меня',
+    greeting: (n) => `Здравствуйте, ${n}!`,
+    lead: 'Teacher Pro уже включён в вашем аккаунте. Ничего не нужно активировать, карта не нужна, и это не пробный период, который потом незаметно превратится в платёж.',
+    noteTitle: 'Несколько слов для вас',
+    until: (date) => `Действует до ${date}.`,
+    includedTitle: 'Что входит',
+    included: [
+      'Аналитика после каждой игры: какие слова дались классу труднее всего и кому именно',
+      'Отчёты по классу и по каждому ученику, готовые к печати',
+      'Неограниченное число классов',
+    ],
+    noCard: 'Когда срок закончится, вы просто вернётесь на бесплатный тариф. Деньги не спишутся, если вы сами этого не решите.',
+    pendingLead: 'Аккаунта LexiClash с этим адресом пока нет. Зарегистрируйтесь именно с этой почтой, и Pro включится сам, как только вы войдёте.',
+    pendingCta: 'Создать аккаунт',
+    cta: 'Открыть мою панель учителя',
+    ask: `Если что-то не работает, непонятно или чего-то не хватает, просто ответьте на это письмо. Оно приходит прямо ко мне, и я читаю каждый ответ (${CONTACT}).`,
+    signoff: 'Охад, создатель LexiClash',
     dir: 'ltr',
   },
 };

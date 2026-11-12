@@ -21,7 +21,7 @@ describe('teacherAccessConfirmation email', () => {
     const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
     // The template HTML-escapes apostrophes (I&#39;m) — assert the escaped form.
     expect(html).toContain('I&#39;m Ohad, the creator of LexiClash');
-    expect(html).toContain('ohadf2015@gmail.com');
+    expect(html).toContain('lexiclash.game@gmail.com');
     expect(html).toMatch(/>Ohad[ ,]/);
     expect(html).not.toContain('The LexiClash Team');
   });
@@ -43,7 +43,7 @@ describe('teacherAccessConfirmation email', () => {
   it.each(LOCALES)('is personal and asks for feedback in %s', (locale) => {
     const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale });
     // Every locale keeps the real contact address and a personal sign-off.
-    expect(html).toContain('ohadf2015@gmail.com');
+    expect(html).toContain('lexiclash.game@gmail.com');
     expect(html).toMatch(/Ohad|Охад|אוהד/);
   });
 

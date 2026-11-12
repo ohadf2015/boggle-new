@@ -24,11 +24,9 @@ describe('teacherGoodwillExtension', () => {
     expect(html).toContain('/es/teacher');
   });
 
-  it('falls back to English copy but keeps the reader\'s own locale in the link', () => {
-    // sv has no copy of its own; sending them to /en/teacher would drop them
-    // into a language they did not choose on the page we just fixed.
+  it('writes to a Swedish teacher in Swedish and links to their own locale', () => {
     const { html } = teacherGoodwillExtension({ full_name: 'Sven', locale: 'sv', newExpiresAt: NEW_EXPIRY });
-    expect(html).toContain('Hi Sven');
+    expect(html).toContain('Hej Sven');
     expect(html).toContain('/sv/teacher');
   });
 
