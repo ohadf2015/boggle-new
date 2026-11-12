@@ -8,7 +8,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { isPlaceholderName } from '@/lib/displayName';
 import { checkPublicName } from '@/lib/names/checkPublicName';
 import type { ResultsMode } from '@/lib/rivals/types';
-import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
+import { isGeneratedName } from '@/utils/defaultPlayerNames';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { getChosenGuestName, getGuestName } from '@/utils/guestManager';
 import { suggestPublicPlayerName } from '@/utils/onboardingNameSuggestions';
@@ -16,7 +16,7 @@ import { MAX_GUEST_NAME_LENGTH, useGuestNameSave } from '@/components/daily/resu
 
 export const PUBLIC_NAME_PROMPT_SHOWN_KEY = 'lexiclash_public_name_prompt_shown_at';
 
-const looksPublic = (name: string | null | undefined) => !isPlaceholderName(name) && !isDefaultPlayerName(name);
+const looksPublic = (name: string | null | undefined) => !isPlaceholderName(name) && !isGeneratedName(name);
 
 export interface PublicNamePromptProps {
   mode: ResultsMode;

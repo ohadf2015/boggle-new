@@ -12,7 +12,7 @@ import { useRecordFormatter } from './useRecordFormatter';
 import type { ResultsMode } from '@/lib/rivals/types';
 import { cn } from '@/lib/utils';
 import { isPlaceholderName } from '@/lib/displayName';
-import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
+import { isGeneratedName } from '@/utils/defaultPlayerNames';
 
 export interface WorldRecordChipProps {
   mode: ResultsMode;
@@ -27,7 +27,7 @@ type ChipState = 'new' | 'claimSignIn' | 'claimName' | 'holder' | 'chasing' | 's
 /** Only signed-in players with a chosen name can hold a record; anyone else who beats it is told how to claim it. */
 function beatState(user: { id: string } | null | undefined, name: string | null | undefined): ChipState {
   if (!user) return 'claimSignIn';
-  if (isPlaceholderName(name) || isDefaultPlayerName(name)) return 'claimName';
+  if (isPlaceholderName(name) || isGeneratedName(name)) return 'claimName';
   return 'new';
 }
 

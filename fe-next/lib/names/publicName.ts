@@ -1,7 +1,7 @@
 // Server-only: pulls in `bad-words`. Clients ask /api/names/check instead.
 import { isProfane } from '@/backend/utils/profanityFilter';
 import { isPlaceholderName } from '@/lib/displayName';
-import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
+import { isGeneratedName } from '@/utils/defaultPlayerNames';
 
 export type PublicNameIssue = 'empty' | 'placeholder' | 'default' | 'profane';
 
@@ -10,7 +10,7 @@ export function publicNameIssue(name: string | null | undefined): PublicNameIssu
   const trimmed = typeof name === 'string' ? name.trim() : '';
   if (!trimmed) return 'empty';
   if (isPlaceholderName(trimmed)) return 'placeholder';
-  if (isDefaultPlayerName(trimmed)) return 'default';
+  if (isGeneratedName(trimmed)) return 'default';
   if (isProfane(trimmed)) return 'profane';
   return null;
 }
