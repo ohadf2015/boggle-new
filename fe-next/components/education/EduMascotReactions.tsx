@@ -24,6 +24,8 @@ const POSE: Record<MascotState, EduMascotPose> = {
   'sad-supportive': 'brainBreak',
   proud: 'podium',
   dancing: 'endOfYear',
+  unhinged: 'attack',
+  exhausted: 'brainBreak',
 };
 
 export function eduPoseFor(state: MascotState): EduMascotPose {

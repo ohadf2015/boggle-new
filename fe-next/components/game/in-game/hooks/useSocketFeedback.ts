@@ -60,7 +60,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       // A valid word landed — let the stuck-player coach mark success / "helped".
       onWordAccepted?.();
       const wordLen = data.word.length;
-      emitMascotEvent({ kind: 'word-submitted', wordLength: wordLen, gemLetterUsed: false });
+      emitMascotEvent({ kind: 'word-submitted', wordLength: wordLen, gemLetterUsed: false, word: data.word });
       const longWordLabel = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
       setCurrentFeedback({
         id: `accepted-${Date.now()}`,
@@ -88,6 +88,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     };
 
     const handleWordAlreadyFound = (data: { word: string }): void => {
+      emitMascotEvent({ kind: 'duplicate-word' });
       setCurrentFeedback({
         id: `duplicate-${Date.now()}`,
         type: 'duplicate',
@@ -98,6 +99,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     };
 
     const handleWordRejected = (data: { word: string; reason?: string }): void => {
+      emitMascotEvent({ kind: data.reason === 'duplicate' ? 'duplicate-word' : 'word-rejected' });
       const reasonKeyMap: Record<string, string> = {
         not_in_dictionary: 'playerView.notInDictionary',
         invalid_shape: 'playerView.invalidWord',
@@ -121,6 +123,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     };
 
     const handleWordNotOnBoard = (data: { word: string }): void => {
+      emitMascotEvent({ kind: 'word-rejected' });
       setCurrentFeedback({
         id: `rejected-${Date.now()}`,
         type: 'rejected',
@@ -133,6 +136,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     };
 
     const handleWordTooShort = (data: { word: string; minLength?: number }): void => {
+      emitMascotEvent({ kind: 'word-rejected' });
       setCurrentFeedback({
         id: `rejected-${Date.now()}`,
         type: 'rejected',

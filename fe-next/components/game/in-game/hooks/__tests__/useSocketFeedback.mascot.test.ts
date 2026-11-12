@@ -39,6 +39,29 @@ describe('useSocketFeedback — mascot', () => {
 
     socket.handlers.wordAccepted({ word: 'PLANET', score: 6 });
 
-    expect(events).toEqual([{ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false }]);
+    expect(events).toEqual([{ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false, word: 'PLANET' }]);
+  });
+
+  it('tells the mascot about rejections and repeats', () => {
+    const socket = socketStub();
+    const events: { kind: string }[] = [];
+    subscribeMascotEvents((e) => events.push(e as { kind: string }));
+    renderHook(() => useSocketFeedback({
+      socket: socket as never,
+      isPlaying: true,
+      t: (k: string) => k,
+      setCurrentFeedback: vi.fn(),
+      setLastWordFoundTime: vi.fn(),
+      playWordAcceptedSound: vi.fn(),
+      playWordRejectedSound: vi.fn(),
+    }));
+
+    socket.handlers.wordRejected({ word: 'QQQ', reason: 'not_in_dictionary' });
+    socket.handlers.wordRejected({ word: 'CAT', reason: 'duplicate' });
+    socket.handlers.wordAlreadyFound({ word: 'CAT' });
+    socket.handlers.wordNotOnBoard({ word: 'XYZ' });
+    socket.handlers.wordTooShort({ word: 'A' });
+
+    expect(events.map((e) => e.kind)).toEqual(['word-rejected', 'duplicate-word', 'duplicate-word', 'word-rejected', 'word-rejected']);
   });
 });
