@@ -13,6 +13,7 @@ import type { Socket } from 'socket.io-client';
 import { CheckCheck, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ExitRoomButton from '@/components/ExitRoomButton';
+import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import type { CrosswordPuzzle } from '@/lib/crossword/types';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
@@ -96,6 +97,7 @@ function CrosswordRace({
 
   return (
     <div className="fixed inset-0 flex h-[100dvh] flex-col bg-neo-navy p-3" dir={dir}>
+      <GameMascotReactions mode="crossword" comboLevel={0} personality="quiet" />
       {/* Header: exit + progress + timer; pe-14 clears the floating mute button. */}
       <div className="flex items-center gap-3 pe-14">
         {onQuit && <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />}
