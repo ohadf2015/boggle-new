@@ -14,6 +14,7 @@ import { useTeacherStripState } from '@/components/education/controls/useTeacher
 import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/vocabQuiz/useIsVocabQuizRoom';
 import { useQuizBossVerdict } from '@/components/education/boss/useQuizBossVerdict';
 import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { classJoinPathForDeadCode } from '@/lib/education/classJoinPathForDeadCode';
 import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -219,10 +220,11 @@ export function useMpPageState() {
   // by the entry screen (lib/multiplayer/roomEndedRecovery). Never classroom.
   const [roomEndedOffer, setRoomEndedOffer] = useState<{ seq: number } | null>(null);
   const roomEndedSeqRef = useRef(0);
-  const offerQuickPlayRecovery = useCallback(() => {
-    roomEndedSeqRef.current += 1;
-    setRoomEndedOffer({ seq: roomEndedSeqRef.current });
-  }, []);
+  const offerQuickPlayRecovery = useCallback((goneCode: string) => {
+    const offer = () => { roomEndedSeqRef.current += 1; setRoomEndedOffer({ seq: roomEndedSeqRef.current }); };
+    if (!goneCode) { offer(); return; }
+    void classJoinPathForDeadCode(goneCode, language).then((path) => (path ? router.push(path) : offer()));
+  }, [language, router]);
   const clearRoomEndedOffer = useCallback(() => setRoomEndedOffer(null), []);
   // EVERY server-confirmed dead room, seq-bumped (handleRoomGone's arcade
   // paths). The entry flow watches this to close a join sheet still open for

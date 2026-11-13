@@ -9,6 +9,7 @@ import type { GameState } from '../modules/gameState/types.js';
 import { getSocketById } from '../utils/socketHelpers.js';
 import logger from '../utils/logger.js';
 import { handleExistingAuthConnectionJoin } from './playerReconnectHandler';
+import { hostsClassroomElsewhere } from './classroomHostElsewhere';
 import { classroomSeatName, cleanClassroomSeatName } from './classroomSeatName';
 import { practiceSeatToken } from './practiceSeat';
 import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
@@ -59,6 +60,11 @@ export async function resolveJoinIdentity(
   if (teacherSecondPage) logger.info('SOCKET', `Teacher ${verifiedUserId} opened ${gameCode} on a second page while hosting; seating it as the practice seat`);
   if (practiceSeat) {
     guestTokenHash = practiceSeatToken(verifiedUserId, guestTokenHash, socket.id);
+    authUserId = undefined;
+  }
+
+  if (!seat.game && hostsClassroomElsewhere(authUserId, gameCode)) {
+    logger.info('SOCKET', `Account ${authUserId} hosts a classroom game; seating ${gameCode} without the account so the board stays up`);
     authUserId = undefined;
   }
 

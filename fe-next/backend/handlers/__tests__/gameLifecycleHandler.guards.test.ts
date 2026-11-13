@@ -103,6 +103,8 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 });
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
+import { getAuthUserConnection, deleteGame } from '../../modules/gameStateManager';
+import { safeEmit, broadcastToRoom } from '../../utils/socketHelpers';
 import { ErrorCodes } from '../../utils/errorHandler';
 
 function createSocket(verifiedUserId?: string) {
@@ -255,5 +257,30 @@ describe('blastDeadEnd', () => {
   it.each(['finished', 'waiting'])('ignores a late dead-end report once the room is %s', (state) => {
     fire(state);
     expect(mockEndGame).not.toHaveBeenCalled();
+  });
+});
+
+describe('createGame while the same account hosts a live classroom game in another tab', () => {
+  beforeEach(() => {
+    mockGetClassroomGame.mockResolvedValue(null);
+    vi.mocked(getAuthUserConnection).mockReturnValue({ gameCode: 'CLASS1', socketId: 'board-sock', username: 'Ms T', isHost: true, connectedAt: 0 });
+    mockGetGame.mockImplementation((code: string) => (code === 'CLASS1' ? { isClassroom: true, users: {} } : undefined));
+  });
+
+  it('leaves the classroom board running and seats the new room without the account', async () => {
+    await create(createSocket('teacher-1'), { gameCode: 'QP1', authUserId: 'teacher-1' });
+
+    expect(deleteGame).not.toHaveBeenCalledWith('CLASS1');
+    expect(broadcastToRoom).not.toHaveBeenCalledWith(expect.anything(), expect.anything(), 'hostLeftRoomClosing', expect.anything());
+    expect(safeEmit).not.toHaveBeenCalledWith(expect.anything(), 'sessionMigrated', expect.anything());
+    expect(mockAddUserToGame).toHaveBeenCalledWith('QP1', 'Host', 'sock-1', expect.objectContaining({ authUserId: null }));
+  });
+
+  it('still closes an ordinary arcade room the host walks away from', async () => {
+    mockGetGame.mockImplementation((code: string) => (code === 'CLASS1' ? { isClassroom: false, users: {} } : undefined));
+
+    await create(createSocket('teacher-1'), { gameCode: 'QP1', authUserId: 'teacher-1' });
+
+    expect(deleteGame).toHaveBeenCalledWith('CLASS1');
   });
 });
