@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
@@ -52,21 +52,28 @@ function TeacherDashboardInner() {
   return (
     <TeacherDashboard
       alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : undefined}
-      banner={
-        banner === 'pendingCheckout' ? (
-          <PendingCheckoutBanner />
-        ) : banner === 'trialEnding' || banner === 'trialExpired' || banner === 'trialReminder' ? (
-          <TeacherTrialEndingCard trial={b.trial} />
-        ) : banner === 'reactivate' ? (
-          <TrialEndedBannerWithRecap onDismiss={b.dismissEnded} />
-        ) : banner === 'trialExpiring' ? (
-          <TeacherProTrialExpiringBanner trialExpires={b.trialExpires} onDismiss={b.dismissExpiring} />
-        ) : banner === 'trialing' ? (
-          <TeacherProTrialLifecycleBanner trialExpires={b.trialExpires} />
-        ) : undefined
-      }
+      banner={banner ? accountBanner(banner, b) : undefined}
     />
   );
+}
+
+function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTeacherBanner>): ReactNode {
+  switch (banner) {
+    case 'paymentFailed':
+      return undefined;
+    case 'pendingCheckout':
+      return <PendingCheckoutBanner />;
+    case 'trialEnding':
+    case 'trialExpired':
+    case 'trialReminder':
+      return <TeacherTrialEndingCard trial={b.trial} />;
+    case 'reactivate':
+      return <TrialEndedBannerWithRecap onDismiss={b.dismissEnded} />;
+    case 'trialExpiring':
+      return <TeacherProTrialExpiringBanner trialExpires={b.trialExpires} onDismiss={b.dismissExpiring} />;
+    case 'trialing':
+      return <TeacherProTrialLifecycleBanner trialExpires={b.trialExpires} />;
+  }
 }
 
 export default function TeacherPage() {

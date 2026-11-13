@@ -2,15 +2,11 @@
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { NeoButton } from '@/components/ui/button';
 import { pickHomeAsk } from '@/lib/education/teacherBannerPriority';
 import { useTeacherReveal } from './motion/useTeacherReveal';
-import LessonBuilder from './LessonBuilder';
 import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { greetingName } from './home/greetingName';
@@ -23,13 +19,13 @@ import { StudentCapMeter } from './StudentCapMeter';
 import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
 import { HomeDeskBoard } from './home/HomeDeskBoard';
-import { WeeklyProgressDigestCard } from './digest/WeeklyProgressDigestCard';
-import { WeeklyEmailReport } from './digest/WeeklyEmailReport';
 import { HomeClassInsightCard } from './home/HomeClassInsightCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
+import { HomeOnboardingPractice } from './home/HomeOnboardingPractice';
 import { HomeHowItWorks } from './home/HomeHowItWorks';
-import { NB_BLOCK, NB_SMALL } from './nb/nbStyles';
-import { cn } from '@/lib/utils';
+import { HomeReportsDialog, HomeReviewDialog } from './home/HomeDialogs';
+import { useAssignCreator } from './home/useAssignCreator';
+import { useCheckoutReturn } from './home/useCheckoutReturn';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
@@ -45,9 +41,7 @@ import { useLessons } from '@/hooks/useVocabularyLesson';
 import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
 import { isPackLanguage } from '@/lib/education/themedPacks';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
-import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
@@ -77,7 +71,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const { profile } = useAuth();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const deepLink = useTeacherDashboardDeepLink();
   const isRTL = language === 'he';
@@ -109,63 +102,22 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     classrooms[0]?.id ??
     '';
 
-  const [showAssignmentCreator, setShowAssignmentCreator] = useState(() => deepLink.openAssignment);
-  const [assignLessonId, setAssignLessonId] = useState<string | undefined>(undefined);
+  const assign = useAssignCreator(deepLink.openAssignment, language);
   const [lessonsOpen, setLessonsOpen] = useState(() => deepLink.reviewWords.length > 0);
-  // One-shot: drop ?assign=1 once read so a refresh doesn't reopen the creator.
-  useEffect(() => {
-    if (!deepLink.openAssignment) return;
-    setShowAssignmentCreator(true);
-    const rest = new URLSearchParams(searchParams?.toString() ?? '');
-    rest.delete('assign');
-    const query = rest.toString();
-    router.replace(`/${language}/teacher${query ? `?${query}` : ''}`, { scroll: false });
-  }, [deepLink.openAssignment, searchParams, router, language]);
+  const welcomeKind = useCheckoutReturn(searchParams?.get('checkout') === 'success', pro);
 
-  // Back from Polar checkout: the webhook can land after the redirect, so keep re-reading.
-  const checkoutSuccess = searchParams?.get('checkout') === 'success';
-  // Unconditional on entitlement — fires even if the webhook never lands, so it can
-  // distinguish "webhook broken" (this fires, checkout_complete never does) from
-  // "user abandoned on Polar" (neither fires).
-  const returnLandedTracked = useRef(false);
-  useEffect(() => {
-    if (!checkoutSuccess || returnLandedTracked.current) return;
-    returnLandedTracked.current = true;
-    trackEduProCheckoutReturnLanded();
-  }, [checkoutSuccess]);
-  const refreshPro = pro.refresh;
-  useEffect(() => {
-    if (!checkoutSuccess || proLoading || hasPro || !refreshPro) return;
-    let tries = 0;
-    const id = setInterval(() => {
-      tries += 1;
-      void refreshPro();
-      if (tries >= 8) clearInterval(id);
-    }, 2000);
-    return () => clearInterval(id);
-  }, [checkoutSuccess, proLoading, hasPro, refreshPro]);
-  const welcomeKind = polarCheckoutWelcomeKind({
-    checkoutSuccess,
-    hasPro,
-    source: pro.source,
-    status: pro.status ?? 'active',
-  });
-
+  const studentCount = classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0);
   // Sent once both sources resolve: "0 classrooms" mid-load is a false zero.
   const viewTracked = useRef(false);
   useEffect(() => {
     if (classroomsLoading || proLoading || viewTracked.current) return;
     viewTracked.current = true;
-    trackEduTeacherDashboardViewed({
-      classroomCount: classrooms.length,
-      studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
-      hasPro,
-    });
-  }, [classroomsLoading, proLoading, classrooms, hasPro]);
+    trackEduTeacherDashboardViewed({ classroomCount: classrooms.length, studentCount, hasPro });
+  }, [classroomsLoading, proLoading, classrooms.length, studentCount, hasPro]);
 
   const onboarding = homeOnboarding({
     classroomCount: classrooms.length,
-    studentCount: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
+    studentCount,
     inviteCopied: activation.progress.inviteCopied,
     liveStarted: activation.progress.liveStarted,
     roomOpened: activation.progress.roomOpened,
@@ -198,10 +150,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
   const rosterShown = hasPro && selectedClassroom !== null && (selectedClassroom.member_count ?? 0) > 0;
   const roster = useHomeRoster(rosterShown && selectedClassroom ? selectedClassroom.id : '', nowMs);
-  const openAssign = (listId?: string | null) => {
-    setAssignLessonId(listId ?? undefined);
-    setShowAssignmentCreator(true);
-  };
   const overFreeTierCaps = isDigestOverFreeTierCaps({
     hasPro,
     classroomCount: classrooms.length,
@@ -253,7 +201,8 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     nowMs,
     t,
   });
-  const cue = ready && hasClasses && week.status !== 'loading'
+  const assignLoopList = () => assign.openWith(loop.listId);
+  const cue =ready && hasClasses && week.status !== 'loading'
     ? homeCoachCue({ nowMs, lastPlayedMs, everPlayed, rail: homeSessionRail({ language: classLanguage, gradeBand: null, nowMs, lastPlayedMs }) })
     : null;
 
@@ -279,24 +228,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
             onStepStart={onOnboardingStep}
             variant="full"
             t={t}
-            secondary={
-              <div data-testid="home-onboarding-practice" className="flex flex-col gap-2 rounded-neo-lg border-[3px] border-dashed border-white/55 p-3 sm:flex-row sm:items-center sm:gap-3">
-                <p className="min-w-0 flex-1 font-neo-body text-sm font-semibold leading-snug text-white">
-                  <span className="block font-neo-display text-base font-black">{t('eduShell.home.practice.title')}</span>
-                  {t('eduShell.home.practice.body')}
-                </p>
-                <RehearseWithBotsButton
-                  classroomId={undefined}
-                  source="hq"
-                  language={language}
-                  t={t}
-                  withSeat
-                  label={t('eduShell.home.practice.cta')}
-                  buttonClassName={cn(NB_SMALL, NB_BLOCK.cyan)}
-                  className="shrink-0"
-                />
-              </div>
-            }
+            secondary={<HomeOnboardingPractice language={language} t={t} />}
           />
           <HomeHowItWorks t={t} />
         </div>
@@ -340,9 +272,9 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 onOpenResults={() => setReportsOpen(true)}
                 readyLabel={loop.ready?.kind === 'counts' ? t('eduShell.home.loop.ready', { ready: loop.ready.ready, total: loop.ready.rated }) : null}
                 readyEmpty={loop.ready?.kind === 'noResults' ? t('eduShell.home.loop.readyEmpty') : null}
-                missed={loop.missed.length > 0 ? { count: loop.missed.length, onHomework: () => openAssign(loop.listId) } : null}
-                onAssign={() => openAssign(loop.listId)}
-                onAssignAll={() => openAssign(loop.listId)}
+                missed={loop.missed.length > 0 ? { count: loop.missed.length, onHomework: assignLoopList } : null}
+                onAssign={assignLoopList}
+                onAssignAll={assignLoopList}
                 language={language}
                 nowMs={nowMs}
                 t={t}
@@ -358,7 +290,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 lessons={lessons.lessons}
                 preferredLessonId={loop.listId ?? null}
                 resultsHref={resultsHref}
-                onPickList={() => openAssign()}
+                onPickList={() => assign.openWith()}
                 language={language}
                 t={t}
               />
@@ -400,41 +332,24 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
       ) : null}
     >
       {selectedClassroom ? (
-        <Dialog open={reportsOpen} onOpenChange={setReportsOpen}>
-          <DialogContent
-            closeButtonLabel={t('common.close')}
-            closeButtonVariant="minimal"
-            style={{ backgroundImage: 'none' }}
-            className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-neo-cream/40 bg-neo-navy p-5 text-neo-cream dark:border-neo-cream/40 dark:bg-neo-navy sm:max-w-3xl lg:max-w-5xl"
-          >
-            <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-neo-cream">{t('eduShell.home.weeklyReports')}</DialogTitle>
-            <DialogDescription className="mb-4 font-neo-body text-sm text-neo-cream/70">
-              {selectedClassroom.name} · {t('eduShell.home.weeklyReportsHint')}
-            </DialogDescription>
-            <div data-testid="home-weekly-reports-grid" className="grid items-start gap-4 lg:grid-cols-2">
-              <WeeklyProgressDigestCard classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} overFreeTierCaps={overFreeTierCaps} />
-              <WeeklyEmailReport classroomId={selectedClassroom.id} classroomName={selectedClassroom.name} />
-            </div>
-            <NeoButton asChild variant="outline" className="mt-4 self-start">
-              <Link href={resultsHref} data-testid="home-weekly-reports-all">{t('eduShell.home.allResults')}</Link>
-            </NeoButton>
-          </DialogContent>
-        </Dialog>
+        <HomeReportsDialog
+          classroom={selectedClassroom}
+          open={reportsOpen}
+          onOpenChange={setReportsOpen}
+          overFreeTierCaps={overFreeTierCaps}
+          resultsHref={resultsHref}
+          t={t}
+        />
       ) : null}
-      <Dialog open={lessonsOpen} onOpenChange={setLessonsOpen}>
-        <DialogContent className="max-h-[90dvh] overflow-auto border-[3px] border-neo-cream bg-neo-navy sm:max-w-3xl">
-          <DialogTitle className="font-neo-display text-xl font-black text-neo-cream">{t('eduShell.home.reviewTitle')}</DialogTitle>
-          {lessonsOpen ? <LessonBuilder initialReviewWords={deepLink.reviewWords} /> : null}
-        </DialogContent>
-      </Dialog>
+      <HomeReviewDialog open={lessonsOpen} onOpenChange={setLessonsOpen} reviewWords={deepLink.reviewWords} t={t} />
 
       {effectiveId ? (
         <AssignmentCreator
           classroomId={effectiveId}
-          initialLessonId={assignLessonId}
-          isOpen={showAssignmentCreator}
-          onClose={() => setShowAssignmentCreator(false)}
-          onComplete={() => setShowAssignmentCreator(false)}
+          initialLessonId={assign.lessonId}
+          isOpen={assign.open}
+          onClose={assign.close}
+          onComplete={assign.close}
         />
       ) : null}
     </TeacherHomeView>
