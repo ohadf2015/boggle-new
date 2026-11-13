@@ -52,6 +52,14 @@ describe('game route aliases', () => {
     }
   });
 
+  it('sends /multiplayer/join to the code entry page', () => {
+    expect(rules.find((r) => r.source.endsWith('/multiplayer/join') && r.source.includes(':locale'))?.destination).toBe(
+      '/:locale/join',
+    );
+    expect(rules.find((r) => r.source.endsWith('/multiplayer/join/:code'))?.destination).toBe('/:locale/join/:code');
+    expect(rules.find((r) => r.source === '/multiplayer/join')?.destination).toBe('/en/join');
+  });
+
   it('sends /ranks to the leaderboard, per locale and bare', () => {
     // The nav labels the page "Ranks" but the route is /leaderboard — typed
     // /ranks 404'd on every locale.
@@ -69,7 +77,7 @@ describe('game route aliases', () => {
     // A `:rest*` or prefix shape here would eat `/en/connections/play` and
     // `/en/play-boggle-online-free`, both real pages.
     for (const rule of rules) {
-      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code|ranks)$/);
+      expect(rule.source).toMatch(/^(\/:locale\(.+\))?\/(play|room|room\/:code|ranks|multiplayer\/join|multiplayer\/join\/:code)$/);
     }
   });
 });

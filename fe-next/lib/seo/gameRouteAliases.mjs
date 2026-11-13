@@ -64,6 +64,23 @@ export const GAME_ROUTE_ALIASES = [
     destination: '/en/join/:code',
     permanent: false,
   },
+  // /multiplayer/join — guessed from the lobby URL plus "join"; the code entry
+  // screen is /join, and a code in the path goes to /join/CODE.
+  {
+    source: `/${LOCALE}/multiplayer/join`,
+    destination: '/:locale/join',
+    permanent: false,
+  },
+  {
+    source: `/${LOCALE}/multiplayer/join/:code`,
+    destination: '/:locale/join/:code',
+    permanent: false,
+  },
+  {
+    source: '/multiplayer/join',
+    destination: '/en/join',
+    permanent: false,
+  },
   // /ranks — the global nav labels the leaderboard "Ranks", but the route has
   // always been /leaderboard, so /ranks 404s on every locale. Same alias class
   // as /play and /room: a guessed path, never a real route.
