@@ -6,20 +6,18 @@
  * remote web bundle builds with the plugin absent), `isAndroid()` guard, and a
  * fire-and-forget call that NEVER throws to the caller.
  *
- * Why gate it: a no-review listing is the conversion gate (see memory
- * android-store-visits-pretraction). But Play quotas the review sheet and
- * prompting on the first-ever win reads as desperate, so we ask only after a
- * couple of wins and at most once per throttle window. The native API ALSO
- * decides whether to actually surface the sheet — this gate just avoids
- * burning that quota on low-intent moments.
+ * Ask on the first win: with ~1 Android win per active player, a two-win gate
+ * almost never opened. Play still quotas the sheet itself, so the throttle only
+ * stops us burning that quota.
  *
  * Off Android (web / iOS shell) every export is a safe no-op.
  */
 
 import { isAndroid } from '@/utils/platform';
 import logger from '@/utils/logger';
+import posthog from '@/lib/analytics/lazyPosthog';
 
-export const REVIEW_WIN_THRESHOLD = 2;
+export const REVIEW_WIN_THRESHOLD = 1;
 export const REVIEW_THROTTLE_MS = 45 * 24 * 60 * 60 * 1000; // 45 days
 
 const WIN_COUNT_KEY = 'lc_review_win_count';
@@ -73,8 +71,18 @@ export async function maybeRequestReviewAfterWin(): Promise<void> {
     // Record the attempt BEFORE awaiting so a throttle holds even if the
     // sheet is quota-suppressed by Play.
     localStorage.setItem(LAST_PROMPTED_KEY, String(Date.now()));
-    const { InAppReview } = await import('@capacitor-community/in-app-review');
-    await InAppReview.requestReview();
+    posthog.capture('native_review_requested', { win_count: winCount });
+    try {
+      const { InAppReview } = await import('@capacitor-community/in-app-review');
+      await InAppReview.requestReview();
+      posthog.capture('native_review_completed', { win_count: winCount });
+    } catch (err) {
+      posthog.capture('native_review_failed', {
+        win_count: winCount,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
   } catch (err) {
     logger.warn('[nativeReview] requestReview failed (non-fatal)', err);
   }
