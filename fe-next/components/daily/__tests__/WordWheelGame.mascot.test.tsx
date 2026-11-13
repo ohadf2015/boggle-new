@@ -117,10 +117,10 @@ describe('WordWheelGame — mascot', () => {
     expect(events.map((e) => e.kind)).toContain('duplicate-word');
   });
 
-  it('pops the mascot in when a long word lands', async () => {
+  it('cheers when a word lands, from the idle pose it holds all game', async () => {
     mountGame();
-    expect(screen.queryByTestId('blast-mascot-hud')).toBeNull();
+    expect(screen.getByTestId('blast-mascot-hud').getAttribute('data-state')).toBe('idle');
     await submit('FACED');
-    expect(screen.getByTestId('blast-mascot-hud')).toBeInTheDocument();
+    expect(screen.getByTestId('blast-mascot-hud').getAttribute('data-state')).toBe('cheer');
   });
 });
