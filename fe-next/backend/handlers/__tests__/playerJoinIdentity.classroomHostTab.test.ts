@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { resolveJoinIdentity } from '../playerJoinIdentity';
-import { getAuthUserConnection, getGame, deleteGame } from '../../modules/gameStateManager';
+import { getAuthUserConnection, getGame, deleteGame, removeUserFromGame } from '../../modules/gameStateManager';
 import { safeEmit, broadcastToRoom, getSocketById } from '../../utils/socketHelpers';
 import type { GameState } from '../../modules/gameState/types';
 import type { ClassroomSeat } from '../classroomSeatGate';
@@ -44,5 +44,52 @@ describe('joining another room while hosting a live classroom game', () => {
 
     expect(identity.authUserId).toBe('teacher-1');
     expect(deleteGame).toHaveBeenCalledWith('CLASS1');
+  });
+});
+
+describe('a student in a live class game opening another room in a second tab', () => {
+  const student = { ...input, username: 'Maya', authUserId: 'student-1', verifiedUserId: 'student-1' };
+  const classGame = { isClassroom: true, users: { Maya: {} } };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getAuthUserConnection).mockReturnValue({ gameCode: 'CLASS1', socketId: 'class-tab', username: 'Maya', isHost: false, connectedAt: 0 });
+    vi.mocked(getSocketById).mockReturnValue({ id: 'class-tab', connected: true, data: {} } as never);
+    vi.mocked(getGame).mockImplementation(((code: string) => (code === 'CLASS1' ? classGame : quickPlayRoom)) as never);
+  });
+
+  it('keeps their class seat and seats the new tab without the account', async () => {
+    const identity = await resolveJoinIdentity(io, socket, quickPlayRoom, 'QP1', noClassroom, student);
+
+    expect(identity.authUserId).toBeUndefined();
+    expect(removeUserFromGame).not.toHaveBeenCalled();
+    expect(safeEmit).not.toHaveBeenCalledWith(expect.anything(), 'sessionMigrated', expect.anything());
+  });
+
+  it('moves the account as before when the class tab is already closed', async () => {
+    vi.mocked(getSocketById).mockReturnValue({ id: 'class-tab', connected: false, data: {} } as never);
+
+    const identity = await resolveJoinIdentity(io, socket, quickPlayRoom, 'QP1', noClassroom, student);
+
+    expect(identity.authUserId).toBe('student-1');
+    expect(removeUserFromGame).toHaveBeenCalledWith('CLASS1', 'Maya');
+  });
+
+  it('moves the account as before when the same tab navigates from the class to another room', async () => {
+    vi.mocked(getAuthUserConnection).mockReturnValue({ gameCode: 'CLASS1', socketId: 'tab-b', username: 'Maya', isHost: false, connectedAt: 0 });
+
+    const identity = await resolveJoinIdentity(io, socket, quickPlayRoom, 'QP1', noClassroom, student);
+
+    expect(identity.authUserId).toBe('student-1');
+    expect(removeUserFromGame).toHaveBeenCalledWith('CLASS1', 'Maya');
+  });
+
+  it('moves the account as before out of an ordinary arcade room', async () => {
+    vi.mocked(getGame).mockImplementation(((code: string) => (code === 'CLASS1' ? { isClassroom: false, users: { Maya: {} } } : quickPlayRoom)) as never);
+
+    const identity = await resolveJoinIdentity(io, socket, quickPlayRoom, 'QP1', noClassroom, student);
+
+    expect(identity.authUserId).toBe('student-1');
+    expect(removeUserFromGame).toHaveBeenCalledWith('CLASS1', 'Maya');
   });
 });

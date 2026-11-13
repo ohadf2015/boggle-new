@@ -18,6 +18,7 @@ vi.mock('@/backend/cache/redisCache', () => ({ getCacheClient: () => redis }));
 
 import {
   lookupEndedClassroomSession,
+  readEndedClassroomSession,
   recordEndedCodeTry,
   countEndedCodeTries,
   clearEndedCodeTries,
@@ -74,5 +75,17 @@ describe('ended code tries', () => {
     await expect(recordEndedCodeTry('c1', 's1')).resolves.toBeUndefined();
     redis.scard.mockRejectedValueOnce(new Error('down'));
     await expect(countEndedCodeTries('c1')).resolves.toBe(0);
+  });
+});
+
+describe('readEndedClassroomSession', () => {
+  it('given redis fails, when read, then it rejects so callers can say unverified', async () => {
+    redis.get.mockRejectedValueOnce(new Error('timeout'));
+    await expect(readEndedClassroomSession('ABC123')).rejects.toThrow('timeout');
+  });
+
+  it('given an ended record, then it names the class', async () => {
+    store.set('classroom_game:ABC123', JSON.stringify({ classroomId: 'c1', endedAt: '2026-10-23T10:00:00Z' }));
+    await expect(readEndedClassroomSession('ABC123')).resolves.toEqual({ classroomId: 'c1' });
   });
 });

@@ -18319,6 +18319,8 @@ const sv = {
         "emptyClipboard": "Urklipp är tomt",
         "guestError": "Kunde inte starta. Försök igen eller fråga din lärare.",
         "invalidCode": "Vi känner inte igen den koden. Dubbelkolla med din lärare – koder slutar fungera när spelet är slut.",
+        "noLookalikes": "Koderna har aldrig bokstäverna O eller I, och aldrig siffrorna 0 eller 1. Titta på tavlan igen.",
+        "wrongCodeClassLine": "Redan med i en klass? Lärarens nästa spel startar där.",
         "joining": "Går med...",
         "nameHint": "Inget konto behövs – välj bara ett namn",
         "nameLabel": "Ditt namn",

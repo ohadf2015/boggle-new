@@ -5,7 +5,10 @@ const { mockLookup, mockLimit, mockHeaders } = vi.hoisted(() => ({
   mockLimit: vi.fn(),
   mockHeaders: vi.fn(),
 }));
-vi.mock('@/app/api/education/classroom/join/endedSessionCode', () => ({ lookupEndedClassroomSession: mockLookup }));
+vi.mock('@/app/api/education/classroom/join/endedSessionCode', () => ({
+  lookupEndedClassroomSession: mockLookup,
+  readEndedClassroomSession: mockLookup,
+}));
 vi.mock('@/backend/redis/rateLimit', () => ({
   checkRateLimitRedis: mockLimit,
   RATE_LIMIT_KEYS: { api: (k: string) => `api:${k}` },
@@ -42,5 +45,11 @@ describe('isEndedJoinCode rate limit', () => {
   it('GIVEN an ip under the limit THEN the lookup answers', async () => {
     mockLimit.mockResolvedValue({ limited: false, remaining: 5, resetTime: 0 });
     await expect(isEndedJoinCode('ABC123')).resolves.toBe(true);
+  });
+
+  it('GIVEN the ended record cannot be read THEN the status is unverified, not not_ended', async () => {
+    mockLimit.mockResolvedValue({ limited: false, remaining: 1, resetTime: 0 });
+    mockLookup.mockRejectedValue(new Error('redis timeout'));
+    await expect(endedJoinCodeStatus('ABC123')).resolves.toBe('unverified');
   });
 });

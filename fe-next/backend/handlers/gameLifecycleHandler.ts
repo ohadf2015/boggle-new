@@ -69,7 +69,7 @@ import {
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
 import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
-import { hostsClassroomElsewhere } from './classroomHostElsewhere';
+import { inClassroomElsewhere } from './classroomHostElsewhere';
 import { decideClassroomHost } from './classroomHostGate.js';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
@@ -213,7 +213,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
       const { isClassroom, isPrivate } = classroomGate;
-      const accountId = !isClassroom && hostsClassroomElsewhere(authUserId, gameCode) ? undefined : authUserId;
+      const accountId = !isClassroom && inClassroomElsewhere(io, socket, authUserId, gameCode) ? undefined : authUserId;
 
       if (accountId) {
         await handleExistingAuthConnection(io, socket, accountId, gameCode,

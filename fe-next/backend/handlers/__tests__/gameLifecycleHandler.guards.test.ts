@@ -103,8 +103,8 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 });
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
-import { getAuthUserConnection, deleteGame } from '../../modules/gameStateManager';
-import { safeEmit, broadcastToRoom } from '../../utils/socketHelpers';
+import { getAuthUserConnection, deleteGame, removeUserFromGame } from '../../modules/gameStateManager';
+import { safeEmit, broadcastToRoom, getSocketById } from '../../utils/socketHelpers';
 import { ErrorCodes } from '../../utils/errorHandler';
 
 function createSocket(verifiedUserId?: string) {
@@ -282,5 +282,29 @@ describe('createGame while the same account hosts a live classroom game in anoth
     await create(createSocket('teacher-1'), { gameCode: 'QP1', authUserId: 'teacher-1' });
 
     expect(deleteGame).toHaveBeenCalledWith('CLASS1');
+  });
+});
+
+describe('createGame while the same account sits in a live classroom game in another tab', () => {
+  beforeEach(() => {
+    mockGetClassroomGame.mockResolvedValue(null);
+    vi.mocked(getAuthUserConnection).mockReturnValue({ gameCode: 'CLASS1', socketId: 'class-tab', username: 'Maya', isHost: false, connectedAt: 0 });
+    vi.mocked(getSocketById).mockReturnValue({ id: 'class-tab', connected: true, data: {} } as never);
+    mockGetGame.mockImplementation((code: string) => (code === 'CLASS1' ? { isClassroom: true, users: { Maya: {} } } : undefined));
+  });
+
+  it('keeps the student in the class and opens the new room without the account', async () => {
+    await create(createSocket('student-1'), { gameCode: 'QP1', authUserId: 'student-1' });
+
+    expect(removeUserFromGame).not.toHaveBeenCalledWith('CLASS1', 'Maya');
+    expect(mockAddUserToGame).toHaveBeenCalledWith('QP1', 'Host', 'sock-1', expect.objectContaining({ authUserId: null }));
+  });
+
+  it('moves the account as before once the class tab is closed', async () => {
+    vi.mocked(getSocketById).mockReturnValue({ id: 'class-tab', connected: false, data: {} } as never);
+
+    await create(createSocket('student-1'), { gameCode: 'QP1', authUserId: 'student-1' });
+
+    expect(removeUserFromGame).toHaveBeenCalledWith('CLASS1', 'Maya');
   });
 });

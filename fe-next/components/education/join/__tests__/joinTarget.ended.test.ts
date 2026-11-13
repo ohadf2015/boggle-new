@@ -37,10 +37,10 @@ describe('resolveJoinTarget — ended games', () => {
     expect(mockIsEnded).toHaveBeenCalledWith('ABC123');
   });
 
-  it('GIVEN the ended check throws THEN a confident unknown stays invalid', async () => {
+  it('GIVEN the ended check throws THEN the code is unverified, never shown as a typo', async () => {
     vi.stubGlobal('fetch', answer({ kind: 'unknown' }));
     mockIsEnded.mockRejectedValue(new Error('action failed'));
-    await expect(resolveJoinTarget('ABC123')).resolves.toEqual({ verdict: 'invalid' });
+    await expect(resolveJoinTarget('ABC123')).resolves.toEqual({ verdict: 'unverified' });
   });
 
   it('GIVEN the ended check is rate limited THEN a confident unknown is unverified, not invalid', async () => {

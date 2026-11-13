@@ -16287,6 +16287,8 @@ const en = {
         "emptyClipboard": "Nothing to paste",
         "guestError": "Couldn't start your session. Try again or ask your teacher.",
         "invalidCode": "We didn't recognize that code. Check it with your teacher. Codes stop working once the game ends.",
+        "noLookalikes": "Codes never use the letters O or I, or the numbers 0 or 1. Look at the board again.",
+        "wrongCodeClassLine": "Already in a class? Your teacher's next game opens there.",
         "joining": "Joining...",
         "nameHint": "No account needed. Just pick a name",
         "nameLabel": "Your name",

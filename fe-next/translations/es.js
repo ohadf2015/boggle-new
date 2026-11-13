@@ -17918,6 +17918,8 @@ const es = {
         },
         "success": "¡Ya estás dentro!",
         "invalidCode": "No reconocemos ese código. Compruébalo con tu profe: los códigos dejan de funcionar cuando termina la partida.",
+        "noLookalikes": "Los códigos nunca llevan las letras O ni I, ni los números 0 ni 1. Vuelve a mirar la pizarra.",
+        "wrongCodeClassLine": "¿Ya estás en una clase? La próxima partida de tu profe se abre ahí.",
         "alreadyMember": "Ya estás en esta aula",
         "classroomFull": "Esta clase está llena. Pídele a tu profe que haga sitio.",
         "unconfirmed": {
