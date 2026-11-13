@@ -1,6 +1,6 @@
-interface LeaveSocket {
-  connected: boolean;
-  connect: () => unknown;
+import { redialSocket, type RedialSocket } from './redialSocket';
+
+interface LeaveSocket extends RedialSocket {
   emit: (event: string, payload: { gameCode: string; username: string }) => unknown;
 }
 
@@ -8,7 +8,7 @@ interface LeaveSocket {
 export function sendLeaveRoom(socket: LeaveSocket | null | undefined, gameCode: string, username: string): void {
   if (!socket || !gameCode) return;
   try {
-    if (!socket.connected) socket.connect();
+    redialSocket(socket);
     socket.emit('leaveRoom', { gameCode, username });
   } catch {
     /* socket gone: the exit itself still goes on */

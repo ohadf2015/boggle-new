@@ -25,6 +25,7 @@ import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { clearHostCreateRefusal, setHostCreateRefusal } from './hostCreateRefusal';
 import { waitForSignedInUser } from './classroomHostSignIn';
 import type { Language, Avatar } from '@/shared/types/game';
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 
 // Hex color validation pattern (must match backend schema)
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -217,7 +218,7 @@ export function useMultiplayerJoin({
         // Ask socket.io to redial. It does NOT retry on its own once its
         // reconnection budget is spent, so without this the wait below could
         // only ever listen to a socket that had already stopped trying.
-        try { socket.connect(); } catch { /* already connecting — fine */ }
+        try { redialSocket(socket); } catch { /* socket gone: the wait below times out */ }
         const connected = await new Promise<boolean>((resolve) => {
           // 5s was too short for a cold mobile radio: 50 dead-socket taps from
           // 27 people in 11 days, 26 of them in their first 24 hours.

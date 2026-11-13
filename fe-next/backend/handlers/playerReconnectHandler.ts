@@ -45,6 +45,7 @@ import { getGameModeModule } from '../modes/index.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import { resendFinishedResults } from './finishedResultsResend.js';
 import { broadcastRoomUsers } from './classroomUsersBroadcast.js';
+import { parkSameConnectionGhost } from './sameConnectionGhost.js';
 
 interface AuthConnectionResult {
   handled: boolean;
@@ -72,6 +73,10 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
   if (existingConnection.gameCode === gameCode) {
     if (!isSameSocket) {
       const oldSocket = getSocketById(io, existingConnection.socketId);
+      if (oldSocket && oldSocket.connected && parkSameConnectionGhost(oldSocket, socket)) {
+        logger.info('SOCKET', `Auth user ${authUserId} rejoined ${gameCode} on the same connection as ${oldSocket.id}; keeping the connection`);
+        return { handled: true, existingUsername: existingConnection.username, isHost: existingConnection.isHost };
+      }
       if (oldSocket && oldSocket.connected) {
         // Old socket is still connected - this is a multi-tab session takeover
         // Use existing username to prevent duplicates
@@ -119,7 +124,7 @@ async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, auth
 
   if (!isSameSocket) {
     const oldSocket = getSocketById(io, existingConnection.socketId);
-    if (oldSocket && oldSocket.connected) {
+    if (oldSocket && oldSocket.connected && !parkSameConnectionGhost(oldSocket, socket)) {
       safeEmit(oldSocket, 'sessionMigrated', {
         message: 'Your session was moved to another tab'
       });
