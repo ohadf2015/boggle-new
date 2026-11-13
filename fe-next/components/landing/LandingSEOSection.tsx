@@ -7,6 +7,7 @@ import { FreshCrossLink } from './fresh/FreshCrossLink';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
 import { BoggleAppFreeLink } from '@/components/seo/BoggleAppFreeLink';
 import { AnagramSolverLink } from '@/components/seo/AnagramSolverLink';
+import { OrdAvBokstaverLink } from '@/components/seo/OrdAvBokstaverLink';
 import { DescargarScrabblePcLink } from '@/components/seo/DescargarScrabblePcLink';
 import { contentByLocale, type LandingSEOContent } from './landingSEOContent';
 import s from './fresh/FreshMotion.module.css';
@@ -105,6 +106,12 @@ export function LandingSEOSection({ className }: LandingSEOSectionProps) {
         {locale === 'en' ? (
           <AnagramSolverLink
             lead="Stuck on a rack of letters? Unscramble them with the free"
+            className="max-w-[46ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg"
+          />
+        ) : null}
+        {locale === 'sv' ? (
+          <OrdAvBokstaverLink
+            lead="Har du bokstäver men hittar inga ord? Vår gratis ordlösare bildar"
             className="max-w-[46ch] font-neo-body text-base leading-relaxed text-neo-cream/80 md:text-lg"
           />
         ) : null}
