@@ -70,6 +70,7 @@ import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
 import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
 import { inClassroomElsewhere } from './classroomHostElsewhere';
+import { parkSameConnectionGhost } from './sameConnectionGhost';
 import { decideClassroomHost } from './classroomHostGate.js';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
@@ -847,7 +848,7 @@ async function handleExistingAuthConnection(
 
   if (!isSameSocket) {
     const oldSocket = getSocketById(io, existingConnection.socketId);
-    if (oldSocket && oldSocket.connected) {
+    if (oldSocket && oldSocket.connected && !parkSameConnectionGhost(oldSocket, socket)) {
       safeEmit(oldSocket, 'sessionMigrated', {
         message: 'Your session was moved to another tab'
       });
