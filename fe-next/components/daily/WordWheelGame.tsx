@@ -373,7 +373,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* Word line + wheel + actions centre together in the leftover height. */}
       <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
-      {/* The slack above the word line is the phone gag stage; the wrappers split the slack evenly, so the wheel stays put. */}
+      {/* Phones: all the slack goes above the word line, the gag stage; the desktop shell splits it to keep the wheel centred. */}
       <div ref={mascotStage.reachRef} className="relative flex w-full flex-[1_0_auto] flex-col items-center justify-end">
       <div ref={mascotStage.bandRef} data-testid="wheel-mascot-stage" className="relative w-full min-h-0 flex-1" />
       <WordWheelWordLine
@@ -429,7 +429,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         {dragHint.visible && <MPDragCoachmark t={t} accent="cyan" onDismiss={dragHint.onDismiss} />}
       </WheelDisc>
 
-      <div className="flex w-full flex-[1_0_auto] flex-col items-center justify-start">
+      <div className="flex w-full flex-none shell:flex-[1_0_auto] flex-col items-center justify-start">
       <WheelActionBar
         t={t}
         hasLetters={builtLetters.length > 0}

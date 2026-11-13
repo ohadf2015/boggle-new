@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import React from 'react';
+import { STAGE_TARGET_PX, boardFloorPx } from '@/lib/mascot/stage';
 
 // The board, word strip and overlays are covered by their own suites; here they
 // are stand-ins so the test reads the layout's own decisions.
@@ -88,6 +89,25 @@ describe('SoloGameLayout', () => {
     expect(band.contains(screen.getByTestId('combo-meter'))).toBe(true);
     expect(mascotProps.last?.stages).toEqual([screen.getByTestId('shell-mascot'), band]);
     expect(mascotProps.last?.timerAnchor?.contains(screen.getByTestId('solo-timer'))).toBe(true);
+  });
+
+  it('on phones the board leaves the gag stage room for a full-size mascot, never shrinking tiles under 44px', () => {
+    const { container } = render(<SoloGameLayout {...props()} />);
+    const slot = screen.getByTestId('solo-slot-board');
+    expect(slot.style.getPropertyValue('--solo-board-floor')).toBe(`${boardFloorPx(props().grid[0].length)}px`);
+    const css = container.querySelector('style')?.textContent ?? '';
+    expect(css).toContain(`--solo-stage-reserve: ${STAGE_TARGET_PX}px`);
+    expect(css).toContain('max(var(--solo-board-floor), calc(100cqh - var(--solo-stage-reserve)))');
+    expect(css.match(/--solo-stage-reserve: 0px/g)).toHaveLength(2);
+  });
+
+  it('on short phones the HUD rows sit tighter, so the gag band gets that height instead', () => {
+    const { container } = render(<SoloGameLayout {...props()} />);
+    const css = container.querySelector('style')?.textContent ?? '';
+    const short = css.slice(css.indexOf('@media (max-width: 1023px) and (max-height: 700px)'));
+    expect(short).toMatch(/> \[data-solo-slot\]:not\(\[data-solo-slot="bar"\]\) \{ margin-top: 0\.25rem; \}/);
+    expect(short).toMatch(/> \[data-solo-slot="board"\] \{ margin-top: 0; \}/);
+    expect(css.indexOf('@media (max-width: 1023px) and (max-height: 700px)')).toBeLessThan(css.indexOf('@media (orientation: landscape)'));
   });
 
   it('sizes the board from its OWN slot, not the whole column', () => {

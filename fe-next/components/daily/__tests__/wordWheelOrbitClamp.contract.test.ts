@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { STAGE_TARGET_PX } from '@/lib/mascot/stage';
 
 /**
  * Contract: the wheel orbit may never be allowed to exceed its container's
@@ -39,6 +40,17 @@ describe('word wheel orbit clamp', () => {
 
   it('the orbit sizing line is still findable', () => {
     expect(orbitLine, `no aspect-square + cqb line in ${FILE}`).toBeTruthy();
+  });
+
+  it('on phones the orbit leaves the gag band its target height above the word line', () => {
+    // Band + word line (STAGE_TARGET_PX) + action bar (62px) + cluster gaps (16px).
+    const reserve = STAGE_TARGET_PX + 62 + 16;
+    const phoneCaps = (orbitLine ?? '').match(/(?<![:\w-])max-[wh]-\[[^\]]*\]/g) ?? [];
+    expect(phoneCaps).toHaveLength(2);
+    for (const cap of phoneCaps) {
+      const px = Number(cap.match(/calc\(100cqb-(\d+)px\)/)?.[1]);
+      expect(px).toBeGreaterThanOrEqual(reserve);
+    }
   });
 
   it('every cqb-based cap is bounded by the container block size', () => {
