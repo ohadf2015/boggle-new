@@ -11,7 +11,7 @@ import { startWordWheelRun, recordWordWheelRunProgress, markWordWheelResultSubmi
 const today = getDailyChallengeDate();
 const opts = (over: Record<string, unknown> = {}) => ({
   language: 'en' as const, isPractice: false, catchupDate: null, isAuthenticated: false, playerId: undefined,
-  guestFingerprint: 'fp-1', setGameActive: vi.fn(), catchupAdUnlockedRef: { current: false }, ...over,
+  guestFingerprint: 'fp-1', setGameActive: vi.fn(), ...over,
 });
 
 beforeEach(() => {

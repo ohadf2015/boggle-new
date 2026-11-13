@@ -1,13 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ChevronDown } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { archiveCopy } from './archiveCopy';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
+import { formatArchiveMonth, getArchiveDates, groupArchiveByMonth } from '@/utils/dailyChallenge/archiveDates';
 import { safeToLocaleDateString } from '@/utils/bcp47Locale';
-import { InlineBannerAd } from '@/components/ads';
+import CatchUpDays from '@/components/daily/archive/CatchUpDays';
+import { CATCH_UP_WINDOW_DAYS } from '@/utils/dailyChallenge/catchUp';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
@@ -16,30 +17,6 @@ type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
-}
-
-/**
- * Get all valid puzzle dates from epoch to yesterday (today's puzzle is still live)
- */
-function getArchiveDates(): Array<{ date: string; puzzleNumber: number }> {
-  const dates: Array<{ date: string; puzzleNumber: number }> = [];
-  const now = new Date();
-  // Yesterday UTC — today's puzzle is still active
-  const yesterday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1));
-
-  let current = new Date(DAILY_CHALLENGE_EPOCH);
-  let puzzleNumber = 1;
-
-  while (current <= yesterday) {
-    dates.push({
-      date: current.toISOString().split('T')[0],
-      puzzleNumber,
-    });
-    current.setUTCDate(current.getUTCDate() + 1);
-    puzzleNumber++;
-  }
-
-  return dates.reverse(); // Most recent first
 }
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
@@ -53,24 +30,13 @@ export default async function DailyArchivePage({ params }: PageParams) {
   const tx = archiveCopy(await loadTranslation(validLocale) as Record<string, unknown>);
 
   const dates = getArchiveDates();
+  const olderDates = dates.slice(CATCH_UP_WINDOW_DAYS);
 
-  // Group by month for better organization
-  const groupedByMonth: Record<string, typeof dates> = {};
-  for (const entry of dates) {
-    const monthKey = entry.date.substring(0, 7); // YYYY-MM
-    if (!groupedByMonth[monthKey]) groupedByMonth[monthKey] = [];
-    groupedByMonth[monthKey].push(entry);
-  }
-
-  const formatMonth = (monthKey: string) => {
-    const [year, month] = monthKey.split('-');
-    const date = new Date(Number(year), Number(month) - 1);
-    return safeToLocaleDateString(date, validLocale, { month: 'long', year: 'numeric' });
-  };
+  const groupedByMonth = groupArchiveByMonth(olderDates);
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00Z');
-    return safeToLocaleDateString(date, validLocale, { weekday: 'short', month: 'short', day: 'numeric' });
+    return safeToLocaleDateString(date, validLocale, { month: 'short', day: 'numeric', timeZone: 'UTC' });
   };
 
   // JSON-LD schemas — all content is server-generated from trusted constants, no user input
@@ -102,60 +68,67 @@ export default async function DailyArchivePage({ params }: PageParams) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(schemas)) }}
       />
       <div className="min-h-screen bg-neo-navy text-neo-white">
-        <div className="max-w-2xl mx-auto px-4 py-8">
-          {/* Header */}
-          <div className="mb-8">
+        <div className="mx-auto max-w-2xl px-4 py-8">
+          <header className="mb-6">
             <Link
               href={`/${locale}/daily`}
-              className="text-neo-cyan text-sm hover:underline mb-2 inline-flex items-center gap-1"
+              className="mb-3 inline-flex min-h-11 items-center gap-1 text-sm font-bold text-neo-cyan hover:underline"
             >
-              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+              <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
               {tx('backToHub')}
             </Link>
-            <h1 className="text-3xl font-neo-display font-black text-neo-yellow">
-              {tx('title')}
-            </h1>
-            <p className="text-slate-400 mt-1">
-              {tx('subtitle')}
-            </p>
-            <p className="text-slate-500 text-sm mt-1">
-              {tx('count', { n: dates.length })}
-            </p>
-          </div>
+            <h1 className="font-neo-display text-3xl font-black text-neo-yellow">{tx('title')}</h1>
+            <p className="mt-1 text-neo-white/70">{tx('subtitle')}</p>
+          </header>
 
-          <InlineBannerAd webZone="content-page" className="mb-6" />
-
-          {/* Grouped by month */}
-          {Object.entries(groupedByMonth).map(([monthKey, entries], monthIdx) => (
-            <section key={monthKey} className="mb-8">
-              <h2 className="text-lg font-neo-display font-bold text-neo-cyan mb-3 border-b border-slate-700/50 pb-1">
-                {formatMonth(monthKey)}
+          <section aria-labelledby="catch-up-heading" className="mb-10">
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+              <h2 id="catch-up-heading" className="font-neo-display text-xl font-black text-neo-white">
+                {tx('catchUpTitle')}
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {entries.map(({ date, puzzleNumber }) => (
-                  <Link
-                    key={date}
-                    href={`/${locale}/daily/archive/${date}`}
-                    className="flex items-center justify-between bg-neo-navy border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:border-neo-yellow hover:shadow-hard transition-[border-color,box-shadow]"
-                  >
-                    <div>
-                      <span className="text-neo-white font-bold">
-                        #{puzzleNumber}
-                      </span>
-                      <span className="text-slate-400 ms-2 text-sm">
-                        {formatDate(date)}
-                      </span>
-                    </div>
-                    <span className="text-neo-cyan text-sm font-medium inline-flex items-center gap-1">
-                      {tx('view')}
-                      <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
-                    </span>
-                  </Link>
-                ))}
-              </div>
-              {monthIdx === 2 && <InlineBannerAd webZone="content-page" className="mt-6" />}
-            </section>
-          ))}
+              <span className="rounded-full border-neo border-neo-black bg-neo-lime px-2.5 py-0.5 text-xs font-black text-neo-black">
+                {tx('catchUpHint')}
+              </span>
+            </div>
+            <CatchUpDays />
+          </section>
+
+          <section aria-labelledby="older-heading">
+            <h2 id="older-heading" className="font-neo-display text-xl font-black text-neo-white">
+              {tx('olderTitle')}
+            </h2>
+            <p className="mb-3 text-sm text-neo-white/60">
+              {tx('olderHint')} · {tx('count', { n: olderDates.length })}
+            </p>
+            <div className="grid gap-2">
+              {Object.entries(groupedByMonth).map(([monthKey, entries], monthIdx) => (
+                <details
+                  key={monthKey}
+                  open={monthIdx === 0}
+                  className="group rounded-neo border-neo border-neo-black bg-neo-navy-light shadow-hard-sm"
+                >
+                  <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-3 font-neo-display font-black text-neo-cyan [&::-webkit-details-marker]:hidden">
+                    {formatArchiveMonth(monthKey, validLocale)}
+                    <span className="text-xs font-bold text-neo-white/50">{entries.length}</span>
+                    <ChevronDown aria-hidden className="ms-auto h-5 w-5 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <ul className="grid grid-cols-3 gap-2 px-3 pb-3 sm:grid-cols-5">
+                    {entries.map(({ date, puzzleNumber }) => (
+                      <li key={date}>
+                        <Link
+                          href={`/${locale}/daily/archive/${date}`}
+                          className="flex flex-col items-center rounded-neo border-neo border-neo-black bg-neo-navy px-2 py-2 text-center transition-colors hover:border-neo-yellow"
+                        >
+                          <bdi className="font-neo-display font-black text-neo-white">#{puzzleNumber}</bdi>
+                          <span className="text-xs text-neo-white/60">{formatDate(date)}</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </>

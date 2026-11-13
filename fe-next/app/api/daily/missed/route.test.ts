@@ -12,9 +12,11 @@ function makeSupabase(opts: { user?: { id: string } | null; solved?: string[]; d
     : { data: (opts.solved ?? []).map(d => ({ puzzle_date: d })), error: null }
   const huntChain: any = {
     eq: vi.fn(() => huntChain),
+    in: vi.fn(() => huntChain),
     then: (f: any) => Promise.resolve(huntResolved).then(f),
   }
   return {
+    huntChain,
     auth: {
       getUser: vi.fn().mockResolvedValue({
         data: { user: opts.user === undefined ? { id: 'u1' } : opts.user },
@@ -72,5 +74,13 @@ describe('GET /api/daily/missed', () => {
     expect(res.status).toBe(500)
     const json = await res.json()
     expect(json.missed).toBeUndefined()
+  })
+
+  // A failed Word Hunt still locks the day (check-played says "already played"), so offering it again was a dead end.
+  it('Given a failed (unsolved) attempt on a day, Then that day is not offered as missed', async () => {
+    const sb = makeSupabase({ solved: ['2026-05-11'] })
+    vi.mocked(createClient).mockResolvedValue(sb as any)
+    await GET(new Request('http://localhost/api/daily/missed') as never)
+    expect(sb.huntChain.eq).not.toHaveBeenCalledWith('solved', true)
   })
 })

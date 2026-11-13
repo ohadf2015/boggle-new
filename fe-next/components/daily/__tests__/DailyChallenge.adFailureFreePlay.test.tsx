@@ -13,7 +13,7 @@
  * attempts never reach `rewarded`. So this strands a large fraction of players.
  *
  * Fix: degrade to free play on ad failure — identical to the documented web
- * contract (shouldGateCatchUpBehindAd: "web degrades to free play"). The ad is a
+ * web contract. Catch-up plays have since dropped the ad entirely; the forfeit retry keeps it. The ad is a
  * best-effort speed bump, never a hard wall that can permanently block gameplay.
  */
 
@@ -23,6 +23,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 // Mutable per-test controls for the module mocks below.
 let mockDateParam: string | null = null;
 let mockForfeit = false;
+let mockAdShows = 0;
 
 vi.mock('framer-motion', () => ({
   m: {
@@ -102,7 +103,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
 // the exact path that strands the player today.
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: (opts: { onAdError?: (msg: string) => void } = {}) => ({
-    showAd: () => { opts.onAdError?.('Ad timed out — please try again'); },
+    showAd: () => { mockAdShows++; opts.onAdError?.('Ad timed out — please try again'); },
     isAdAvailable: true,
     isPlaceholderCooldown: false,
     status: 'idle',
@@ -132,11 +133,12 @@ describe('DailyChallenge — rewarded ad failure degrades to free play (no stran
     vi.clearAllMocks();
     mockDateParam = null;
     mockForfeit = false;
+    mockAdShows = 0;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
   });
 
-  it('GIVEN a missed-daily (catch-up) WHEN the rewarded ad fails (no reward) THEN the game starts anyway instead of leaving the player stuck on the ready screen', async () => {
+  it('GIVEN a missed-daily (catch-up) on native with an ad ready WHEN Play is tapped THEN the game starts with no ad', async () => {
     mockDateParam = '2024-01-09'; // within the 3-day catch-up window of 2024-01-10
 
     render(<DailyChallenge />);
@@ -145,8 +147,8 @@ describe('DailyChallenge — rewarded ad failure degrades to free play (no stran
 
     fireEvent.click(screen.getByTestId('play-button'));
 
-    // The ad failed → degrade to free play → the game must start.
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
+    expect(mockAdShows).toBe(0);
   });
 
   it('GIVEN a mid-game forfeit (retry) WHEN the rewarded ad fails (no reward) THEN the replay starts anyway', async () => {

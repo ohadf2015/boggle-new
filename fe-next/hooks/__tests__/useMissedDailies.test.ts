@@ -65,4 +65,22 @@ describe('useMissedDailies', () => {
     await new Promise(resolve => setTimeout(resolve, 100));
     expect(mockFetch).not.toHaveBeenCalled();
   });
+
+  it('Given the server answers, Then status is ok', async () => {
+    mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ missed: [] }) });
+    const { result } = renderHook(() => useMissedDailies());
+    await waitFor(() => expect(result.current.status).toBe('ok'));
+  });
+
+  it('Given a 5xx or network error, Then status is error so callers do not read an empty list as "all played"', async () => {
+    mockFetch.mockResolvedValue({ ok: false, json: () => Promise.resolve({}) });
+    const { result } = renderHook(() => useMissedDailies());
+    await waitFor(() => expect(result.current.status).toBe('error'));
+  });
+
+  it('Given it is disabled, Then status stays idle and nothing is fetched', () => {
+    const { result } = renderHook(() => useMissedDailies('word-hunt', false));
+    expect(result.current.status).toBe('idle');
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
 });

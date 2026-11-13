@@ -43,7 +43,7 @@ import { useWordHuntPuzzleInit } from './survival/useWordHuntPuzzleInit';
 import { markWordHuntRunStarted, clearWordHuntRunStarted } from './survival/runStartedMarker';
 import { COACH_VERSION, hasSeenCoach, markCoachSeen } from '@/lib/tutorial/modeCoachStore';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
-import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
+import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
 import { useRetryChallenge } from './useRetryChallenge';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeBadge from '@/components/practice/PracticeBadge';
@@ -156,13 +156,6 @@ const DailyChallenge: React.FC = () => {
 
   // Track previous values for smarter re-initialization
   const gameStartedAtRef = useRef<number>(0);
-  // One rewarded ad unlocks one catch-up date; reset when the date changes so
-  // each missed day is its own watch (and today's daily is never gated).
-  const catchupAdUnlockedRef = useRef<boolean>(false);
-  useEffect(() => {
-    catchupAdUnlockedRef.current = false;
-  }, [catchupDate]);
-
   useWordHuntPuzzleInit({
     gameLanguage, today, wasReset, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
     setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
@@ -220,26 +213,6 @@ const DailyChallenge: React.FC = () => {
     // Activity tore down. sessionSettled in useRewardedAd guarantees exactly one
     // of these fires, so this can't double-start.
     onAdError: () => beginPlaying(),
-  });
-
-  // Rewarded ad that unlocks playing a past day's daily (catch-up). Native only;
-  // web degrades to a free play. Reward → mark this date unlocked + start.
-  const {
-    showAd: showCatchUpAd,
-    isAdAvailable: isCatchUpAdAvailable,
-    isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
-  } = useRewardedAd({
-    rewardKind: 'feature',
-    surface: 'catchup',
-    onRewardEarned: () => {
-      catchupAdUnlockedRef.current = true;
-      startPlaying();
-    },
-    // Degrade to free play on any non-reward outcome so a stalled/skipped ad
-    // can't strand the player on the ready screen (the "tapped play, button
-    // vanished, nothing happened" report). No unlock flag — no reward was
-    // granted; we just let this one play through.
-    onAdError: () => startPlaying(),
   });
 
   // Handle game start with safety checks
@@ -308,25 +281,8 @@ const DailyChallenge: React.FC = () => {
       }
     }
 
-    // Catch-up ad gate (last gate): playing a past day's daily costs a rewarded
-    // ad on native. Placed AFTER the already-played check so we never burn an ad
-    // only to hit an "already played" wall on a deep-linked completed day.
-    // Web / no ad / placeholder cooldown → gate is false → free play.
-    if (
-      shouldGateCatchUpBehindAd({
-        isCatchup,
-        alreadyUnlocked: catchupAdUnlockedRef.current,
-        isNative: isNative(),
-        isAdAvailable: isCatchUpAdAvailable,
-        isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
-      })
-    ) {
-      showCatchUpAd();
-      return;
-    }
-
     startPlaying();
-  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, startPlaying]);
 
   // Returning players ("already play this kind of challenge") don't need the
   // intro/ready page — jump straight into gameplay. First-time players and

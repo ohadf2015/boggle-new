@@ -21,7 +21,7 @@ describe('useWordWheelLoad re-run after the player started', () => {
   it('keeps the board when sign-in lands while the server check is in flight', async () => {
     const base = {
       language: 'en' as const, isPractice: false, catchupDate: null, authLoading: false,
-      guestFingerprint: null, setGameActive: vi.fn(), catchupAdUnlockedRef: { current: false },
+      guestFingerprint: null, setGameActive: vi.fn(),
     };
     const { result, rerender } = renderHook((p: { auth: boolean }) => useWordWheelLoad({
       ...base, isAuthenticated: p.auth, playerId: p.auth ? 'user-1' : undefined,

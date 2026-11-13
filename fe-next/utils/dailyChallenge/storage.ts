@@ -405,6 +405,10 @@ export function hasEverPlayedWordWheel(language: Language): boolean {
   return false;
 }
 
+export function hasPlayedWordHunt(language: Language, date: string): boolean {
+  return getFromLocalStorage(getWordHuntResultKey(language, date)) !== null;
+}
+
 /**
  * Check if user has played a specific date's Word Wheel (for catch-up)
  */

@@ -32,7 +32,7 @@ import {
 } from '@/utils/dailyChallenge/wordWheelRun';
 import { goldLetterFor, hasWheelBonuses } from '@/utils/dailyChallenge/wordWheelScoring';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
-import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
+import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
 import type { Language } from '@/types';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fastValidateWord } from '@/hooks/fastValidateWord';
@@ -44,7 +44,6 @@ import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
-import { isNative } from '@/utils/platform';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -96,10 +95,6 @@ const WordWheelChallenge: React.FC = () => {
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
 
-  // Catch-up ad gate — mirrors DailyChallenge pattern. Per-date unlock so a
-  // single ad watch covers the whole session for that date.
-  const catchupAdUnlockedRef = useRef(false);
-
   const gameLang = language as Language;
   // Load and completion need each other: load hands back unsent and unfinished runs, completion settles them.
   const completionRef = useRef<ReturnType<typeof useWheelCompletion> | null>(null);
@@ -115,7 +110,6 @@ const WordWheelChallenge: React.FC = () => {
     playerId: profile?.id,
     guestFingerprint,
     setGameActive,
-    catchupAdUnlockedRef,
     preloadForPlay: loadEffectsCanvas,
     autoStart: bridgeStart,
     onUnsent: (stored) => completionRef.current?.retryUnsent(stored),
@@ -262,43 +256,6 @@ const WordWheelChallenge: React.FC = () => {
     enterPlaying();
   }, [enterPlaying, language]);
 
-  // Rewarded ad for catch-up plays (native only; web degrades to free).
-  const {
-    showAd: showCatchUpAd,
-    isAdAvailable: isCatchUpAdAvailable,
-    isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
-  } = useRewardedAd({
-    rewardKind: 'feature',
-    surface: 'catchup',
-    onRewardEarned: () => {
-      catchupAdUnlockedRef.current = true;
-      startPlaying();
-    },
-    // Best-effort gate: on any non-reward outcome (skip / no-fill / stalled show
-    // that hits the safety timeout) degrade to free play so the player isn't
-    // stranded on the ready screen after the native ad Activity tears down.
-    // Mirrors the web contract (which never gates). sessionSettled guarantees
-    // exactly one terminal callback, so this can't double-start.
-    onAdError: () => startPlaying(),
-  });
-
-  const handleStart = useCallback(() => {
-    // Catch-up ad gate: playing a past day costs a rewarded ad on native.
-    if (
-      shouldGateCatchUpBehindAd({
-        isCatchup,
-        alreadyUnlocked: catchupAdUnlockedRef.current,
-        isNative: isNative(),
-        isAdAvailable: isCatchUpAdAvailable,
-        isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
-      })
-    ) {
-      showCatchUpAd();
-      return;
-    }
-    startPlaying();
-  }, [isCatchup, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
-
   const handleComplete = useCallback((result: WordWheelGameResult) => {
     if (puzzle) completionRef.current?.handleComplete(result, puzzle);
   }, [puzzle]);
@@ -394,7 +351,7 @@ const WordWheelChallenge: React.FC = () => {
             outerLetters={puzzle.outerLetters}
             puzzleNumber={puzzleNumber}
             streakDays={isPractice ? 0 : getDailyStreak().currentStreak}
-            onPlay={handleStart}
+            onPlay={startPlaying}
             wide={isDesktop || isTv}
           >
             <ReadyLeaderboardPeek t={t} defaultOpen={isDesktop || isTv}>

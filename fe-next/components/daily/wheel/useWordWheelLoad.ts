@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, type MutableRefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WordWheelGameResult } from '../WordWheelGame';
 import {
   generateWordWheelPuzzle,
@@ -57,7 +57,6 @@ interface UseWordWheelLoadOptions {
   playerId: string | undefined;
   guestFingerprint: string | null;
   setGameActive: (active: boolean) => void;
-  catchupAdUnlockedRef: MutableRefObject<boolean>;
   /** Extra chunks to load while the loader is still up (e.g. the effects canvas). */
   preloadForPlay?: () => Promise<unknown>;
   /** `?start=1`: skip the ready card and the how-to. */
@@ -70,7 +69,7 @@ interface UseWordWheelLoadOptions {
 
 export function useWordWheelLoad({
   language, isPractice, catchupDate, isAuthenticated, authLoading, playerId, guestFingerprint,
-  setGameActive, catchupAdUnlockedRef, preloadForPlay, autoStart = false, onUnsent, onUnfinishedRun,
+  setGameActive, preloadForPlay, autoStart = false, onUnsent, onUnfinishedRun,
 }: UseWordWheelLoadOptions) {
   const callbacksRef = useRef({ onUnsent, onUnfinishedRun });
   callbacksRef.current = { onUnsent, onUnfinishedRun };
@@ -105,7 +104,6 @@ export function useWordWheelLoad({
     const date = catchupDate || day;
     const number = getPuzzleNumber(date);
     setPuzzleNumber(number);
-    catchupAdUnlockedRef.current = false;
 
     const init = async () => {
       if (isPractice) {

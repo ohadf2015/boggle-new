@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { getAuthedUser } from '@/lib/auth/getAuthedUser'
-import { getMissedCatchUpDates } from '@/utils/dailyChallenge/catchUp'
+import { getCatchUpDates, getMissedCatchUpDates } from '@/utils/dailyChallenge/catchUp'
 import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils'
 import logger from '@/utils/logger'
 
 /**
  * GET /api/daily/missed?mode=word-hunt|word-wheel
  * Daily challenges (Word Hunt or Word Wheel) in the catch-up window (last 3 days) that the
- * authenticated player has NOT yet completed. Powers the post-results
+ * authenticated player has not played yet. Powers the post-results
  * "catch up your missed dailies" suggestion.
  *
  * Returns: { today, missed: [{ date, puzzleNumber }] } — newest first.
@@ -34,19 +34,20 @@ export async function GET(request: NextRequest) {
     // Pick table based on mode
     const table = mode === 'word-wheel' ? 'daily_word_wheel_attempts' : 'daily_word_hunt_attempts'
 
-    // Word Hunt uses 'solved', Word Wheel just checks existence (any score counts as played)
-    let query = supabase.from(table).select('puzzle_date').eq('player_id', user.id)
-    if (mode === 'word-hunt') {
-      query = query.eq('solved', true)
-    }
+    // Any attempt counts as played: a failed Word Hunt is locked by check-played just like a solved one.
+    const query = supabase
+      .from(table)
+      .select('puzzle_date')
+      .eq('player_id', user.id)
+      .in('puzzle_date', getCatchUpDates(today))
 
-    const { data: solvedRows, error } = await query
+    const { data: playedRows, error } = await query
     if (error) {
       logger.error('Daily missed lookup error:', error.message)
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 
-    const completed = (solvedRows ?? []).map((r: { puzzle_date: string }) => r.puzzle_date)
+    const completed = (playedRows ?? []).map((r: { puzzle_date: string }) => r.puzzle_date)
     const missed = getMissedCatchUpDates(today, completed).map(date => ({
       date,
       puzzleNumber: getPuzzleNumber(date),

@@ -1,5 +1,7 @@
 # Spec: Rewarded-ad gate on daily catch-up play
 
+> **Superseded 2026-11-13:** playing a previous day is free on every platform; the catch-up rewarded ad was removed.
+
 ## Problem
 Catch-up (playing a daily you missed in the last 3 days via `?date=YYYY-MM-DD`)
 currently launches for free. Product wants: **playing a previous day's daily

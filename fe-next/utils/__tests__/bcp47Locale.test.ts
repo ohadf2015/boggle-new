@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { safeToLocaleDateString } from "../bcp47Locale";
+import { safeToLocaleDateString, toBcp47Locale } from "../bcp47Locale";
 
 describe("safeToLocaleDateString hydration stability", () => {
   it("formats the same calendar day under UTC for en", () => {
@@ -15,5 +15,12 @@ describe("safeToLocaleDateString hydration stability", () => {
     });
     expect(a).toBe(b);
     expect(a).toMatch(/2025/);
+  });
+});
+
+describe('Russian dates', () => {
+  it('Given ru, Then dates format in Russian, not the en-US fallback', () => {
+    expect(toBcp47Locale('ru')).toBe('ru-RU');
+    expect(safeToLocaleDateString(new Date('2026-11-12T00:00:00Z'), 'ru', { month: 'long' })).toBe('ноябрь');
   });
 });

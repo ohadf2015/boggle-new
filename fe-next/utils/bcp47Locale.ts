@@ -10,6 +10,7 @@ const BCP47_MAP: Record<string, string> = {
   es: 'es-ES',
   fr: 'fr-FR',
   de: 'de-DE',
+  ru: 'ru-RU',
 };
 
 export function toBcp47Locale(language: string): string {

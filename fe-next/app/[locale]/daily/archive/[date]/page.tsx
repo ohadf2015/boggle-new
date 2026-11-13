@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
+import { catchUpPlayHref } from '@/utils/dailyChallenge/missedDayAction';
 import { archiveCopy } from '../archiveCopy';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
@@ -253,7 +254,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
                       <span className="w-4 text-neo-white/60 text-end">{attempt}</span>
                       <div className="flex-1 h-5 bg-neo-navy-light rounded-sm overflow-hidden">
                         <div
-                          className={`h-full rounded-sm ${attempt <= 2 ? 'bg-green-500' : attempt <= 4 ? 'bg-neo-cyan' : attempt <= 6 ? 'bg-neo-yellow' : 'bg-neo-orange'}`}
+                          className={`h-full rounded-sm ${attempt <= 2 ? 'bg-neo-lime' : attempt <= 4 ? 'bg-neo-cyan' : attempt <= 6 ? 'bg-neo-yellow' : 'bg-neo-orange'}`}
                           style={{ width: `${Math.max(width, count > 0 ? 2 : 0)}%` }}
                         />
                       </div>
@@ -265,18 +266,35 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
             </div>
           )}
 
-          {/* CTA */}
-          <div className="text-center mt-8">
-            <Link
-              href={canCatchUp ? `/${locale}/daily/word-hunt?date=${date}` : `/${locale}/daily`}
-              className="inline-block bg-neo-yellow text-neo-black font-neo-display font-black px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
-            >
-              <span className="inline-flex items-center gap-2">
-                {tx(canCatchUp ? 'playThisDay' : 'playToday')}
-                <DirectionalIcon icon={ArrowRight} className="w-5 h-5" />
-              </span>
-            </Link>
-          </div>
+          {canCatchUp ? (
+            <div className="mt-8 rounded-neo border-neo-thick border-neo-black bg-neo-navy-light p-4 shadow-hard">
+              <p className="mb-3 text-center font-neo-display font-black text-neo-white">{tx('catchUpHint')}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <Link
+                  href={catchUpPlayHref(validLocale, 'word-hunt', date)}
+                  className="flex min-h-12 items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-yellow px-4 py-3 font-neo-display font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed"
+                >
+                  🔎 {tx('playThisDay')}
+                </Link>
+                <Link
+                  href={catchUpPlayHref(validLocale, 'word-wheel', date)}
+                  className="flex min-h-12 items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-pink px-4 py-3 font-neo-display font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed"
+                >
+                  🎡 {tx('playThisDayWheel')}
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 text-center">
+              <Link
+                href={`/${locale}/daily`}
+                className="inline-flex min-h-12 items-center gap-2 rounded-neo border-neo-thick border-neo-black bg-neo-yellow px-6 py-3 font-neo-display font-black text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-hard-pressed"
+              >
+                {tx('playToday')}
+                <DirectionalIcon icon={ArrowRight} className="h-5 w-5" />
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </>

@@ -8,7 +8,7 @@ vi.mock('@/hooks/useDictionaryCache', () => ({ prewarmDictionary: vi.fn(async ()
 
 const base = {
   language: 'he' as const, isPractice: false, catchupDate: null, authLoading: false, isAuthenticated: false,
-  playerId: undefined, guestFingerprint: null, setGameActive: vi.fn(), catchupAdUnlockedRef: { current: false },
+  playerId: undefined, guestFingerprint: null, setGameActive: vi.fn(),
 };
 
 function comeBack() {

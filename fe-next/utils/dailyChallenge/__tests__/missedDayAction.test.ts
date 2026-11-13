@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { resolveMissedDayAction } from '../missedDayAction';
+import { resolveMissedDayAction, catchUpPlayHref } from '../missedDayAction';
 
 describe('resolveMissedDayAction', () => {
   const today = '2026-09-06';
@@ -59,5 +59,11 @@ describe('resolveMissedDayAction', () => {
       { today, language: 'en', preferredMode: 'word-wheel' },
     );
     expect(action).toEqual({ kind: 'play', href: '/en/daily/word-wheel?date=2026-09-05', mode: 'word-wheel' });
+  });
+});
+
+describe('catchUpPlayHref', () => {
+  it('Given a mode and date, Then it builds the one catch-up play URL', () => {
+    expect(catchUpPlayHref('he', 'word-wheel', '2026-09-05')).toBe('/he/daily/word-wheel?date=2026-09-05');
   });
 });

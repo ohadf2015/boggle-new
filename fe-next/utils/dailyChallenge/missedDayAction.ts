@@ -36,6 +36,10 @@ export type MissedDayAction =
   | { kind: 'expired' }
   | { kind: 'pending' };
 
+export function catchUpPlayHref(language: string, mode: DailyPlayMode, date: string): string {
+  return `/${language}/daily/${mode}?date=${date}`;
+}
+
 export function resolveMissedDayAction(day: DailyDayState, ctx: MissedDayContext): MissedDayAction {
   const { today, language } = ctx;
   const done = day.wordHunt || day.wordWheel;
@@ -45,7 +49,7 @@ export function resolveMissedDayAction(day: DailyDayState, ctx: MissedDayContext
   if (day.date > today) return { kind: 'pending' };
   if (isCatchUpDate(today, day.date)) {
     const mode = ctx.preferredMode ?? 'word-hunt';
-    return { kind: 'play', href: `/${language}/daily/${mode}?date=${day.date}`, mode };
+    return { kind: 'play', href: catchUpPlayHref(language, mode, day.date), mode };
   }
   return { kind: 'expired' };
 }

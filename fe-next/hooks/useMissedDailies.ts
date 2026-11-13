@@ -10,6 +10,9 @@ export interface MissedDaily {
 
 export type DailyMode = 'word-hunt' | 'word-wheel';
 
+/** 'error' means the list is unknown, not empty. */
+export type MissedDailiesStatus = 'idle' | 'loading' | 'ok' | 'error';
+
 /**
  * Fetches the daily challenges (Word Hunt or Word Wheel) the player missed within the catch-up
  * window (last 3 days). Powers the post-results "catch up" suggestion.
@@ -17,22 +20,26 @@ export type DailyMode = 'word-hunt' | 'word-wheel';
  * @param mode - Which daily mode to fetch missed challenges for (default: 'word-hunt')
  * @param enabled - Whether to fetch (default: true)
  */
-export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean = true): { missed: MissedDaily[]; loading: boolean } {
+export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean = true): { missed: MissedDaily[]; loading: boolean; status: MissedDailiesStatus } {
   const [missed, setMissed] = useState<MissedDaily[]>([]);
-  const [loading, setLoading] = useState(enabled);
+  const [status, setStatus] = useState<MissedDailiesStatus>(enabled ? 'loading' : 'idle');
   const mountedRef = useRef(true);
 
   const refresh = useCallback(() => {
-    if (!enabled) return;
-    setLoading(true);
+    if (!enabled) { setStatus('idle'); return; }
+    setStatus('loading');
     getWithAuth(`/api/daily/missed?mode=${mode}`)
       .then(r => (r.ok ? r.json() : null))
       .then(json => {
         if (!mountedRef.current) return;
-        if (Array.isArray(json?.missed)) setMissed(json.missed);
-        setLoading(false);
+        if (Array.isArray(json?.missed)) {
+          setMissed(json.missed);
+          setStatus('ok');
+        } else {
+          setStatus('error');
+        }
       })
-      .catch(() => { if (mountedRef.current) setLoading(false); });
+      .catch(() => { if (mountedRef.current) setStatus('error'); });
   }, [enabled, mode]);
 
   useEffect(() => {
@@ -41,5 +48,5 @@ export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean
     return () => { mountedRef.current = false; };
   }, [refresh]);
 
-  return { missed, loading };
+  return { missed, loading: status === 'loading', status };
 }
