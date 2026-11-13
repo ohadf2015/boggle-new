@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { Crown } from 'lucide-react';
+import { ProBadge } from '@/components/ui/ProBadge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -202,16 +202,12 @@ export function ProGate({ feature, children, active = true, whileChecking = null
         </div>
         {/* Phones: the pitch and its button lead, the sample sits under them instead of pushing the button off screen. */}
         <div data-testid="pro-gate-pitch" className="text-center max-md:order-first md:text-start">
-          <span
+          <ProBadge
             data-testid="pro-gate-pill"
-            className={cn(
-              'mb-2 inline-flex items-center gap-1 rounded-neo bg-neo-yellow text-neo-black',
-              arcade ? 'px-1.5 py-px text-[11px] font-black sm:-rotate-2 sm:border-[3px] sm:border-neo-black sm:px-2.5 sm:py-0.5 sm:font-neo-display sm:text-sm sm:shadow-hard' : 'px-1.5 py-px text-[11px] font-black',
-            )}
-          >
-            <Crown className="size-3" aria-hidden="true" />
-            {t('eduShell.nav.pro')}
-          </span>
+            size={arcade ? 'md' : 'sm'}
+            label={t('eduShell.nav.pro')}
+            className={cn('mb-2', arcade && 'sm:-rotate-2')}
+          />
           <h3 className={cn('mb-2 font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
             {t(`teacher.proGate.${feature}.title`)}
           </h3>

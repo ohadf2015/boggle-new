@@ -159,10 +159,10 @@ describe('StudentCapMeter', () => {
     expect(screen.getByTestId('student-cap-meter').className).toMatch(/border-neo-cream/);
   });
 
-  it('marks the ask with a small yellow PRO badge', () => {
+  it('marks the ask with the small gold Pro badge', () => {
     render(<StudentCapMeter studentCount={3} />);
     const badge = screen.getByTestId('student-cap-pro-badge');
-    expect(badge.className).toContain('bg-neo-yellow');
+    expect(badge.getAttribute('data-pro-badge')).toBe('xs');
     expect(badge).toHaveTextContent('teacher.lastGame.proBadge');
   });
 

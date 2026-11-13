@@ -11,6 +11,7 @@ import { rememberCheckoutOrigin } from '@/lib/education/checkoutReturn';
 import { trackProUpgradeClicked, type ProUpgradeSource } from '@/lib/education/proFunnelTelemetry';
 import type { ProFeature } from '@/components/teacher/ProGate';
 import { ProFeaturePreview } from './ProFeaturePreview';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 const PRESS =
   'transition-[transform,box-shadow] hover:-translate-y-0.5 active:translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0';
@@ -44,7 +45,7 @@ export function ProInlineLock({ feature, label, className }: { feature: ProFeatu
       >
         <Lock className="size-4" aria-hidden="true" />
         {label}
-        <span className="rounded-neo border-2 border-black bg-neo-lime px-1.5 text-[11px] text-neo-black">{t('eduShell.nav.pro')}</span>
+        <ProBadge size="xs" label={t('eduShell.nav.pro')} />
       </button>
       {open && (
         <div

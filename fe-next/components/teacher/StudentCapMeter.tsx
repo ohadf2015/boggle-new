@@ -22,6 +22,7 @@ import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMi
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 export function shouldShowStudentCapUpgradeCta(studentCount: number, hasPro: boolean): boolean {
   if (hasPro) return false;
@@ -128,12 +129,7 @@ export function StudentCapMeter({
       </div>
       {showCta ? (
         <p data-testid="student-cap-pro-unlocks" className="flex items-start gap-1.5 font-neo-body text-xs font-semibold text-neo-cream/75">
-          <span
-            data-testid="student-cap-pro-badge"
-            className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[0.65rem] font-black leading-4 text-neo-black"
-          >
-            {t('teacher.lastGame.proBadge')}
-          </span>
+          <ProBadge data-testid="student-cap-pro-badge" size="xs" label={t('teacher.lastGame.proBadge')} />
           <span className="min-w-0">{t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports')}</span>
         </p>
       ) : null}

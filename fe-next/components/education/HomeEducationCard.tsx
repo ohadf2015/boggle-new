@@ -186,6 +186,8 @@ interface TrialPillProps {
   trial: TrialStatus;
   t: (key: string) => string;
   language: string;
+  /** Show at phone width too (the slim strip hides it below sm). */
+  showOnPhones?: boolean;
 }
 
 /**
@@ -194,12 +196,15 @@ interface TrialPillProps {
  * to an urgent tone in the last stretch; shows a soft "ended" chip once expired
  * (access is not revoked — the card still links into the dashboard).
  */
-function TrialPill({ trial, t, language }: TrialPillProps) {
+export function TrialPill({ trial, t, language, showOnPhones = false }: TrialPillProps) {
   if (trial.isExpired) {
     return (
       <span
         data-testid="home-education-trial"
-        className="hidden shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-xs font-black text-neo-white shadow-hard-sm sm:block"
+        className={cn(
+          'shrink-0 rounded-neo border-neo bg-neo-pink px-2.5 py-1.5 text-center text-xs font-black text-neo-white shadow-hard-sm',
+          showOnPhones ? 'block' : 'hidden sm:block'
+        )}
       >
         {t('education.home.trial_ended')}
       </span>
@@ -217,7 +222,8 @@ function TrialPill({ trial, t, language }: TrialPillProps) {
     <span
       data-testid="home-education-trial"
       className={cn(
-        'hidden shrink-0 flex-col items-center rounded-neo border-neo px-2.5 py-1.5 text-center shadow-hard-sm sm:flex',
+        'shrink-0 flex-col items-center rounded-neo border-neo px-2.5 py-1.5 text-center shadow-hard-sm',
+        showOnPhones ? 'flex' : 'hidden sm:flex',
         tone
       )}
     >

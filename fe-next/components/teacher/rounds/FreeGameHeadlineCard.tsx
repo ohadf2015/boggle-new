@@ -10,6 +10,7 @@ import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import { freeGameHeadline } from '@/lib/education/freeGameHeadline';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { roundTitleKey } from './roundReport';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 /** A free teacher's headline for their latest real class game; per-student and weekly views stay behind Pro. */
 export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
@@ -73,9 +74,7 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
         }}
         className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-3 text-sm font-bold shadow-hard text-neo-cream hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
       >
-        <span className="rounded-full border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[0.65rem] font-black leading-4 text-neo-black">
-          {t('teacher.lastGame.proBadge')}
-        </span>
+        <ProBadge size="xs" label={t('teacher.lastGame.proBadge')} />
         {t('teacher.lastGame.proLine')}
       </Link>
     </section>

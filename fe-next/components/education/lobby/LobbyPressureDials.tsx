@@ -28,6 +28,7 @@ import {
   normalizeClassroomPressure,
 } from '@/shared/utils/classroomPressure';
 import type { ClassroomPressure } from '@/shared/types/classroom';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 const LEADERBOARD_CHOICES = ['full', 'top3', 'hidden'] as const;
 const TIMER_CHOICES = ['full', 'gentle', 'off'] as const;
@@ -65,12 +66,7 @@ export function LobbyPressureDials({ pressure, onChange, access }: LobbyPressure
         <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream">
           <Gauge className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
-          <span
-            data-testid="pressure-pro-badge"
-            className="rounded-neo bg-neo-yellow px-1.5 font-neo-display text-xs font-black leading-tight text-neo-black"
-          >
-            {t('eduShell.host.proBadge')}
-          </span>
+          <ProBadge data-testid="pressure-pro-badge" size="xs" label={t('eduShell.host.proBadge')} />
         </span>
         {!loading && locked && (
           <ProInlineLock feature="pressureDials" label={t('teacher.proGate.pressureDials.title')} />

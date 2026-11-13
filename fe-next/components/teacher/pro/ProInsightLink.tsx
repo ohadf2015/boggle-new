@@ -2,7 +2,7 @@
 
 import { useRef, type RefObject } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Crown } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -11,6 +11,7 @@ import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
 import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 /** Surfaces where a free teacher sees real class data first and Pro second. */
 export type ProInsightPlacement = 'analytics_week_insight' | 'results_hardest_words' | 'home_class_insight';
@@ -66,10 +67,7 @@ export function ProInsightLink({ placement, language, label, proLabel, href, act
         className,
       )}
     >
-      <span className="inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-yellow px-1.5 font-neo-display text-[0.7rem] font-black leading-4 text-neo-black">
-        <Crown className="size-3" aria-hidden="true" />
-        {proLabel}
-      </span>
+      <ProBadge size="xs" label={proLabel} />
       <span className="min-w-0">{label}</span>
       <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
     </Link>
