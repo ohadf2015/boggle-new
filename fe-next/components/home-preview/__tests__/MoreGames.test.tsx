@@ -48,4 +48,12 @@ describe('MoreGames', () => {
       expect(size).toBeLessThan(20_000);
     }
   });
+
+  it('given an admin or beta tester, then Crossword is on the shelf; everyone else does not see it', () => {
+    const { unmount } = render(<MoreGames lang="he" t={(k) => k} showCrossword />);
+    expect(screen.getByRole('link', { name: /crossword\.name/ }).getAttribute('href')).toBe('/he/crossword');
+    unmount();
+    render(<MoreGames lang="he" t={(k) => k} />);
+    expect(screen.queryByRole('link', { name: /crossword\.name/ })).toBeNull();
+  });
 });
