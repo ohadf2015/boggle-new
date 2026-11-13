@@ -7,7 +7,7 @@ import { JoinCodeField } from './JoinCodeField';
 import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 import { useKeepInView } from './useKeepInView';
-import { DeadEndPracticeLink } from './DeadEndPracticeLink';
+import { JoinWrongCodeHelp } from './JoinWrongCodeHelp';
 import type { JoinFlowState } from './joinFlowState';
 
 const K = 'education.student.join';
@@ -64,7 +64,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           {refused ? (
             <div className="flex flex-col gap-2">
               <JoinAlert key={flow.refusalTick}>{t(flow.codeErrorKey ?? `${K}.invalidCode`)}</JoinAlert>
-              {wrongCode && <DeadEndPracticeLink state="invalid_code" variant="quiet" />}
+              {wrongCode && <JoinWrongCodeHelp code={flow.code} />}
             </div>
           ) : (
             <p

@@ -77,7 +77,7 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
     }
     if (data?.kind === 'unknown' && !data.degraded) {
       // Resolve hides ended sessions behind 'unknown'; a dead code must not read as a typo.
-      const status = await endedJoinCodeStatus(normalized).catch(() => 'not_ended' as const);
+      const status = await endedJoinCodeStatus(normalized).catch(() => 'unverified' as const);
       if (status === 'unverified') return { verdict: 'unverified' };
       return status === 'ended' ? { verdict: 'ended' } : { verdict: 'invalid' };
     }

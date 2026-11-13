@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const { mockLookup } = vi.hoisted(() => ({ mockLookup: vi.fn() }));
 vi.mock('@/app/api/education/classroom/join/endedSessionCode', () => ({
   lookupEndedClassroomSession: mockLookup,
+  readEndedClassroomSession: mockLookup,
 }));
 
 vi.mock('next/headers', () => ({ headers: async () => new Headers() }));

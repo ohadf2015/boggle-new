@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { checkRateLimitRedis, RATE_LIMIT_KEYS } from '@/backend/redis/rateLimit';
-import { lookupEndedClassroomSession } from '@/app/api/education/classroom/join/endedSessionCode';
+import { readEndedClassroomSession } from '@/app/api/education/classroom/join/endedSessionCode';
 
 const CODE_RE = /^[A-Z0-9]{6}$/;
 const LOOKUPS_PER_MINUTE = 20;
@@ -20,7 +20,11 @@ export async function endedJoinCodeStatus(code: string): Promise<EndedJoinCodeSt
   });
   // A class behind one school IP trips this; "could not check" must never read as "wrong code".
   if (limited) return 'unverified';
-  return (await lookupEndedClassroomSession(normalized)) !== null ? 'ended' : 'not_ended';
+  try {
+    return (await readEndedClassroomSession(normalized)) !== null ? 'ended' : 'not_ended';
+  } catch {
+    return 'unverified';
+  }
 }
 
 export async function isEndedJoinCode(code: string): Promise<boolean> {
