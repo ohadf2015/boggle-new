@@ -3,7 +3,6 @@
 import { Puzzle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { getAssetUrl } from '@/lib/assets/cdn';
 import { cn } from '@/lib/utils';
 
 const POP_IN = {
@@ -20,7 +19,7 @@ function Sticker({ src, className }: { src: string; className?: string }) {
         aria-hidden="true"
       />
       {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized sticker */}
-      <img src={getAssetUrl(src)} width={64} height={64} alt="" className={cn('relative size-16 object-contain', className)} />
+      <img src={src} width={64} height={64} alt="" className={cn('relative size-16 object-contain', className)} />
     </div>
   );
 }

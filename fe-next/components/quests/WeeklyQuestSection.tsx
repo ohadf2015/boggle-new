@@ -3,7 +3,6 @@
 import { Puzzle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
-import { getAssetUrl } from '@/lib/assets/cdn';
 import { cn } from '@/lib/utils';
 import PartPreview from '@/components/avatar/PartPreview';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
@@ -87,7 +86,7 @@ export function WeeklyQuestSection() {
       <div className="mb-3 flex items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized sticker */}
         <img
-          src={getAssetUrl('/quests/crown.webp')}
+          src={'/quests/crown.webp'}
           width={40}
           height={40}
           alt=""
@@ -101,7 +100,7 @@ export function WeeklyQuestSection() {
           <div className="flex flex-col items-center gap-3 py-3 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized sticker */}
             <img
-              src={getAssetUrl('/quests/chest.webp')}
+              src={'/quests/chest.webp'}
               width={72}
               height={72}
               alt=""

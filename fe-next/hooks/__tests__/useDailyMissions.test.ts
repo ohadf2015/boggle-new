@@ -360,7 +360,7 @@ describe('useDailyMissions', () => {
       .mockResolvedValueOnce({ data: EMPTY_DATA, error: null })
       .mockResolvedValue({ data: { ...EMPTY_DATA, word_hunt_completed: true }, error: null });
 
-    const { result } = renderHook(() => useDailyMissions());
+    const { result, unmount } = renderHook(() => useDailyMissions());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(showQuestCompletionToast).not.toHaveBeenCalled();
 
@@ -371,6 +371,7 @@ describe('useDailyMissions', () => {
         expect.objectContaining({ questName: 'quests.daily.long_word_6.title', xpReward: 100 }),
       );
     });
+    unmount();
   });
 
   it('fires per-quest toast when a mission transitions false → true after refetch', async () => {

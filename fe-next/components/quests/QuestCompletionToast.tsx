@@ -11,7 +11,6 @@ import { Trophy, Star, Sparkles, Crown, Coins, X, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireFireworks, fireStreakConfetti, fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { getAssetUrl } from '@/lib/assets/cdn';
 import { pickQuestReaction, type QuestConfetti, type QuestSound, type QuestTier } from '@/lib/quests/questReactions';
 
 interface QuestCompletionOptions {
@@ -189,7 +188,7 @@ function render({ opts, tier, key }: Queued): string {
           <div className="relative shrink-0 w-20 h-20 motion-safe:animate-[mode-bomb-wobble_0.8s_ease-out_0.2s_both]">
             {/* eslint-disable-next-line @next/next/no-img-element -- tiny static cutout inside a toast portal */}
             <img
-              src={getAssetUrl(reaction.mascot)}
+              src={reaction.mascot}
               alt=""
               width={80}
               height={80}
