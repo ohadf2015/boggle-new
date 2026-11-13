@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { posthogApiHost } from '../posthogApiHost';
 
 describe('posthogApiHost', () => {
-  it('Given the production site, Then events go through our own /ingest so school ad blockers do not drop them', () => {
-    expect(posthogApiHost('www.lexiclash.live', 'https://eu.i.posthog.com')).toBe('/ingest');
-    expect(posthogApiHost('lexiclash.live', undefined)).toBe('/ingest');
+  it('Given the production site, Then events go through our own /lcx so school ad blockers do not drop them', () => {
+    expect(posthogApiHost('www.lexiclash.live', 'https://eu.i.posthog.com')).toBe('/lcx');
+    expect(posthogApiHost('lexiclash.live', undefined)).toBe('/lcx');
   });
 
   it('Given the native app or any other host (no Next server behind it), Then events go straight to PostHog', () => {

@@ -308,7 +308,7 @@ export function decideNextHandle(
   if (parts.length === 0) return { action: 'pass' };
 
   const first = parts[0];
-  if (first === '_next' || first === 'static' || first === 'api' || first === 'ingest') return { action: 'pass' };
+  if (first === '_next' || first === 'static' || first === 'api' || first === 'lcx') return { action: 'pass' };
   const dotted = dottedNonLocaleDecision(parts);
   if (dotted) return dotted;
   // Static files in public/ subdirectories (/mascot/winner.webp,

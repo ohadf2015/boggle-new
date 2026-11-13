@@ -22,9 +22,9 @@ describe('public subdirectory assets', () => {
 });
 
 describe('first-party analytics proxy', () => {
-  it('passes /ingest so the next.config rewrite to PostHog runs (a drop here silently loses every browser event)', async () => {
+  it('passes /lcx so the next.config rewrite to PostHog runs (a drop here silently loses every browser event)', async () => {
     const { decideNextHandle } = await import('./nextHandleGate');
-    for (const p of ['/ingest/e/', '/ingest/flags/', '/ingest/static/array.js']) {
+    for (const p of ['/lcx/e/', '/lcx/flags/', '/lcx/static/array.js']) {
       expect(decideNextHandle(p)).toEqual({ action: 'pass' });
     }
   });
