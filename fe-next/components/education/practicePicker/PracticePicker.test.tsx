@@ -220,6 +220,25 @@ describe('PracticePicker decision load', () => {
     expect(screen.getByTestId('practice-tile-vocab_focus:synonym')).toBeInTheDocument();
   });
 
+  it('GIVEN the more button sits at the bottom of a phone WHEN it is opened THEN the extra games scroll into view', () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderIt();
+    fireEvent.click(screen.getByTestId('practice-picker-more'));
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(scrollIntoView.mock.contexts[0]).toBe(screen.getByTestId('practice-picker-rest'));
+  });
+
+  it('GIVEN the extra games are open WHEN they are closed THEN nothing scrolls', () => {
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    renderIt();
+    const more = screen.getByTestId('practice-picker-more');
+    fireEvent.click(more);
+    fireEvent.click(more);
+    expect(scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
   it('GIVEN an unplayed game WHEN a played one exists THEN the unplayed one is recommended', () => {
     render(
       <PracticePicker
