@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import type { VocabularyWord } from '@/lib/supabase/education/types';
+import { normalizeForStorage, type VocabularyWord } from '@/lib/supabase/education/types';
 
 // XP constants from educationXpManager (for score calculation)
 const BLITZ_WORD_FOUND = 10;
@@ -20,6 +20,7 @@ interface BlitzGameState {
 
 interface SubmitAnswerResponse {
   correct: boolean;
+  answer?: string;
 }
 
 export interface UseBlitzGameReturn extends BlitzGameState {
@@ -123,11 +124,7 @@ export function useBlitzGame(
         return { correct: false };
       }
 
-      // Normalize input: trim and lowercase
-      const normalizedInput = input.trim().toLowerCase();
-      const normalizedCorrect = currentWord.word.trim().toLowerCase();
-
-      const correct = normalizedInput === normalizedCorrect;
+      const correct = normalizeForStorage(input.trim()) === normalizeForStorage(currentWord.word.trim());
 
       // Always count the attempt
       setWordsAttempted((prev) => prev + 1);
@@ -154,7 +151,7 @@ export function useBlitzGame(
         return nextIndex;
       });
 
-      return { correct };
+      return correct ? { correct } : { correct, answer: currentWord.word };
     },
     [currentWord, shuffledWords, isGameOver, combo]
   );

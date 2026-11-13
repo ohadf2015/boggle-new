@@ -661,3 +661,33 @@ describe('TimedBlitzPractice', () => {
     });
   });
 });
+
+describe('TimedBlitzPractice miss feedback', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => { vi.runOnlyPendingTimers(); vi.useRealTimers(); });
+
+  it('shows the right answer after a wrong one instead of silently moving on', async () => {
+    const user = userEvent.setup({ delay: null });
+    render(<TimedBlitzPractice words={mockWords} onComplete={vi.fn()} onBack={vi.fn()} />);
+    for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(1100); });
+    await waitFor(() => expect(screen.getByTestId('playing-phase')).toBeInTheDocument());
+
+    const missed = mockWords.find(w => screen.getByTestId('definition-card').textContent?.includes(w.definition!))!.word;
+    await user.type(screen.getByTestId('word-input'), 'wrongword{Enter}');
+
+    expect(screen.getByTestId('blitz-miss-reveal')).toHaveTextContent(missed);
+  });
+});
+
+describe('TimedBlitzPractice hint', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => { vi.runOnlyPendingTimers(); vi.useRealTimers(); });
+
+  it('shows the first letter and the word length under the definition', async () => {
+    render(<TimedBlitzPractice words={[{ word: 'ice cream', definition: 'Cold dessert', canIntegrate: true }]} onComplete={vi.fn()} onBack={vi.fn()} />);
+    for (let i = 0; i < 3; i++) act(() => { vi.advanceTimersByTime(1100); });
+    await waitFor(() => expect(screen.getByTestId('playing-phase')).toBeInTheDocument());
+
+    expect(screen.getByTestId('blitz-hint')).toHaveTextContent('i _ _   _ _ _ _ _', { normalizeWhitespace: false });
+  });
+});

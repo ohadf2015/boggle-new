@@ -69,6 +69,7 @@ import {
 import { startGameTimer, endGame } from './shared.js';
 import { resendFinishedResults } from './finishedResultsResend';
 import { tryReclaimClassroomHostSeat } from './classroomGameHostReclaim';
+import { hostsClassroomElsewhere } from './classroomHostElsewhere';
 import { decideClassroomHost } from './classroomHostGate.js';
 import { handleQuizRequestResults } from './vocabQuizHandler.js';
 import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
@@ -212,9 +213,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
       const { isClassroom, isPrivate } = classroomGate;
+      const accountId = !isClassroom && hostsClassroomElsewhere(authUserId, gameCode) ? undefined : authUserId;
 
-      if (authUserId) {
-        await handleExistingAuthConnection(io, socket, authUserId, gameCode,
+      if (accountId) {
+        await handleExistingAuthConnection(io, socket, accountId, gameCode,
           isClassroom ? { classroomId: classroomGate.classroomId, teacherId: classroomGate.teacherId } : undefined);
       }
       const roomLanguage = isClassroom ? (classroomGate.recordLanguage ?? await classroomRoomLanguage(gameCode, language)) : (language || 'en');
@@ -250,7 +252,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       }
 
       const hostAvatar = avatar || generateRandomAvatar();
-      const hostAuthUserId = isClassroom ? getAuthUserId(socket) : authUserId || null;
+      const hostAuthUserId = isClassroom ? getAuthUserId(socket) : accountId || null;
       logger.info('HOST_JOIN', `Adding host ${hostUsername || 'Host'} to game ${gameCode} with authUserId=${hostAuthUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
         avatar: hostAvatar,

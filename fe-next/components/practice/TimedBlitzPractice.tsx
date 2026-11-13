@@ -73,6 +73,7 @@ export function TimedBlitzPractice({
   const [phase, setPhase] = useState<GamePhase>('countdown');
   const [countdown, setCountdown] = useState(3);
   const [inputValue, setInputValue] = useState('');
+  const [missedAnswer, setMissedAnswer] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -158,6 +159,7 @@ export function TimedBlitzPractice({
       const result = submitAnswer(inputValue);
       if (result.correct) sfx.correct();
       else sfx.wrong();
+      setMissedAnswer(result.correct ? null : result.answer ?? null);
 
       // Clear input immediately (no pause)
       setInputValue('');
@@ -174,6 +176,7 @@ export function TimedBlitzPractice({
   const handleRestart = useCallback(() => {
     setPhase('countdown');
     setCountdown(3);
+    setMissedAnswer(null);
     setInputValue('');
   }, []);
 
@@ -315,13 +318,29 @@ export function TimedBlitzPractice({
                 // Cream edge, not black: black on navy measures 1.23:1.
                 'bg-neo-navy-light border-[3px] border-neo-cream',
                 'shadow-hard-lg',
-                'min-h-[150px] flex items-center justify-center'
+                'min-h-[150px] flex flex-col items-center justify-center'
               )}
             >
               <p className="font-neo-body text-neo-white text-2xl text-center">
                 {currentWord?.definition || t('education.practice.noWords')}
               </p>
+              {currentWord?.word && (
+                <p data-testid="blitz-hint" dir="auto" aria-hidden="true" className="mt-3 whitespace-pre text-center font-neo-display text-xl tracking-widest text-neo-cyan">
+                  {Array.from(currentWord.word.trim()).map((ch, i) => (i === 0 || ch === ' ' ? ch : '_')).join(' ')}
+                </p>
+              )}
             </AdaptiveMotion.div>
+
+            {missedAnswer && (
+              <p
+                role="status"
+                data-testid="blitz-miss-reveal"
+                className="-mt-3 text-center font-neo-body text-lg font-bold text-neo-pink"
+              >
+                {t('education.produce.theWordWas')}{' '}
+                <bdi className="text-neo-cream">{missedAnswer}</bdi>
+              </p>
+            )}
 
             {/* Bottom: Input form */}
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
