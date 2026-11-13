@@ -15234,7 +15234,7 @@ const ja = {
         },
         "standard": {
           "name": "標準",
-          "desc": "定番3分間の全員対戦"
+          "desc": "全員が個人戦・3分"
         }
       },
       "playStyle": {

@@ -16,7 +16,7 @@ describe('PageClient — exit to lobby notifies the server', () => {
   it('handleExitToLobby emits leaveRoom so the player is not a ghost in the room', () => {
     // leaveRoom must appear inside the handleExitToLobby useCallback body
     // (between its `() => {` and the closing `}, [` deps array).
-    const block = /const handleExitToLobby = useCallback\(\(\)\s*=>\s*\{[\s\S]*?leaveRoom[\s\S]*?\},\s*\[/;
+    const block = /const handleExitToLobby = useCallback\(\(\)\s*=>\s*\{[\s\S]*?sendLeaveRoom\(socketRef\.current, gameCode, username\)[\s\S]*?\},\s*\[/;
     expect(source).toMatch(block);
   });
 });

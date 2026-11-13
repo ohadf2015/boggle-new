@@ -15542,7 +15542,7 @@ const sv = {
         },
         "standard": {
           "name": "Standard",
-          "desc": "Klassisk 3-minuters alla-mot-alla"
+          "desc": "Alla mot alla · 3 minuter"
         }
       },
       "playStyle": {

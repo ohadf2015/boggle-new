@@ -28,7 +28,7 @@ describe('a classroom student whose room is gone gets a friendly state, not a de
 
   it('still leaves the room: the page stays mounted, so a promoted student must not linger as a ghost host', () => {
     const body = exitBody();
-    expect(body).toMatch(/emit\('leaveRoom'/);
+    expect(body).toMatch(/sendLeaveRoom\(socketRef\.current, gameCode, username\)/);
     expect(body).toMatch(/boggle_intentional_exit/);
   });
 

@@ -15161,7 +15161,7 @@ const es = {
         },
         "standard": {
           "name": "Estándar",
-          "desc": "Todos contra todos, 3 minutos clásicos"
+          "desc": "Cada uno por su cuenta · 3 minutos"
         }
       },
       "playStyle": {

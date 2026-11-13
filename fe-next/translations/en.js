@@ -13311,7 +13311,7 @@ const en = {
         },
         "standard": {
           "name": "Standard",
-          "desc": "Classic 3-minute free-for-all"
+          "desc": "Everyone for themselves · 3 minutes"
         }
       },
       "playStyle": {

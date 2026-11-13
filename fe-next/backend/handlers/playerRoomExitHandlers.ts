@@ -39,6 +39,7 @@ import { isInProgress } from '../utils/gameStateMachine.js';
 import { handleLateJoin } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { removeMidRoundLeaver } from './midRoundLeave.js';
+import { sessionEndedNotice } from './classroomSessionEndedNotice';
 
 interface LeaveRoomPayload {
   gameCode: string;
@@ -122,7 +123,9 @@ export function registerPlayerRoomExitHandlers(io: Server, socket: Socket): void
 
     // Handle host transfer if the leaving user was the host
     if (isLeavingUserHost) {
-      const nextHost = getNextEligibleHost(gameCode, username);
+      // Same rule as a host disconnect: a classroom, ranked or tournament seat is never handed to another player.
+      const skipTransfer = game.isClassroom || game.isRanked || !!game.tournamentId;
+      const nextHost = skipTransfer ? null : getNextEligibleHost(gameCode, username);
       if (nextHost) {
         const transferResult = transferHost(gameCode, nextHost);
         if (transferResult.success) {
@@ -144,7 +147,7 @@ export function registerPlayerRoomExitHandlers(io: Server, socket: Socket): void
         cleanupGameBots(gameCode);
         gameStartCoordinator.cleanupSequence(gameCode);
 
-        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
+        broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', game.isClassroom ? sessionEndedNotice() : {
           message: 'Host left and no other players available. Room is closing.',
           i18nKey: 'multiplayerFlow.hostLeftReason.explicitNoSuccessor',
           i18nParams: { host: username },
