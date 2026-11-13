@@ -20,3 +20,12 @@ describe('public subdirectory assets', () => {
     expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d))).toEqual([]);
   });
 });
+
+describe('first-party analytics proxy', () => {
+  it('passes /ingest so the next.config rewrite to PostHog runs (a drop here silently loses every browser event)', async () => {
+    const { decideNextHandle } = await import('./nextHandleGate');
+    for (const p of ['/ingest/e/', '/ingest/flags/', '/ingest/static/array.js']) {
+      expect(decideNextHandle(p)).toEqual({ action: 'pass' });
+    }
+  });
+});
