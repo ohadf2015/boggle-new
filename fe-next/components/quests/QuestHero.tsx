@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { getAssetUrl } from '@/lib/assets/cdn';
 import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 import { cn } from '@/lib/utils';
 
@@ -49,7 +48,7 @@ function Chest({ state }: { state: ChestState }) {
       )}
       {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized sticker; the optimizer adds nothing */}
       <img
-        src={getAssetUrl('/quests/chest.webp')}
+        src={'/quests/chest.webp'}
         width={56}
         height={56}
         alt=""
@@ -84,7 +83,7 @@ export function QuestHero({ completed, total }: { completed: number; total: numb
           {/* eslint-disable-next-line @next/next/no-img-element -- transparent cutout, already sized for this slot */}
           <img
             data-testid="quest-hero-mascot"
-            src={getAssetUrl(MASCOTS[step])}
+            src={MASCOTS[step]}
             width={96}
             height={96}
             alt=""

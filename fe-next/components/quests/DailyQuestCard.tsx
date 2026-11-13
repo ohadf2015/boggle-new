@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Check, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
-import { getAssetUrl } from '@/lib/assets/cdn';
 import { cn } from '@/lib/utils';
 import type { QuestConditionType, QuestPublicMode } from '@/shared/dailyQuestPool';
 import { getQuestArt } from './questArt';
@@ -48,7 +47,7 @@ export function DailyQuestCard({ titleKey, descKey, href, completed, type, mode,
           {/* eslint-disable-next-line @next/next/no-img-element -- 256px transparent sticker shown at a fixed size */}
           <img
             data-testid="quest-card-art"
-            src={getAssetUrl(art)}
+            src={art}
             width={72}
             height={72}
             alt=""

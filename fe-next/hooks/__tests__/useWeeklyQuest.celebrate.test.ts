@@ -109,7 +109,7 @@ describe('useWeeklyQuest celebration', () => {
 
   it('given the weekly quest finishes in a game, when a quest check is requested, then it celebrates as a weekly win without navigating', async () => {
     serve(row(false));
-    const { result } = renderHook(() => useWeeklyQuest());
+    const { result, unmount } = renderHook(() => useWeeklyQuest());
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(showToast).not.toHaveBeenCalled();
 
@@ -119,5 +119,6 @@ describe('useWeeklyQuest celebration', () => {
 
     await waitFor(() => expect(showToast).toHaveBeenCalledTimes(1));
     expect(showToast.mock.calls[0][0]).toMatchObject({ isWeekly: true, dedupKey: 'weekly:play_games' });
+    unmount();
   });
 });

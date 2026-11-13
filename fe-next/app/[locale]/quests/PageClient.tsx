@@ -8,7 +8,6 @@
 import Header from '@/components/Header';
 import { QuestHub } from '@/components/quests/QuestHub';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getAssetUrl } from '@/lib/assets/cdn';
 
 export default function QuestsPageClient() {
   const { t } = useLanguage();
@@ -20,7 +19,7 @@ export default function QuestsPageClient() {
         <div className="flex items-center gap-3 mb-5">
           {/* eslint-disable-next-line @next/next/no-img-element -- small pre-sized sticker */}
           <img
-            src={getAssetUrl('/quests/crown.webp')}
+            src={'/quests/crown.webp'}
             width={48}
             height={48}
             alt=""
