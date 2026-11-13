@@ -2827,3 +2827,21 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: root cause found — `startBoardWordBots` (fe-next/backend/services/gameLifecycle/botClassic.ts:123) logs+no-ops on a null grid. `game.letterGrid` is nulled on round reset (gameStateManager.ts:357, `resetGameForNewRound`) and only re-set by `installBoard()` inside gameStartHandler's start flow (gameStartHandler.ts:330). But `startGameTimer()` is also called directly from connectionHandler.ts:131/359 (host/player disconnect during ack-wait), kickHandler.ts:70, and midRoundLeave.ts:13 — each reads `game.letterGrid` fresh with no guard that a new round's board has actually been dealt yet. If one of those fires in the reset→install gap, bots silently never start for that round (no retry — startBotsForGame is a single fire-and-forget call per round). Fixing this means auditing all 5 startGameTimer call sites' ordering against installBoard, in a reconnect/kick/host-transfer area this file's own comments already flag as regression-prone (grace periods, ad-watcher holds, coordinator acks) — ambiguous blast radius, needs design, not a one-line guard.
   - recommended owner: backend
+
+## 2026-11-13
+- [Sentry] Error: lexiclash [desktop]: PSI HTTP 500 (JAVASCRIPT-NEXTJS-2R0)
+  - first seen 11h ago, last seen 7h ago, count 3, userCount 2
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-2R0
+  - status: deferred
+  - why: third-party PageSpeed Insights API returning 500 — external dependency, not app code; low volume
+  - recommended owner: review-by-eod (confirm it's not a sustained outage)
+- [Supabase] authenticated_security_definer_function_executable grew 69 -> 86 since 2026-04-29 baseline
+  - status: deferred
+  - why: 17 new SECURITY DEFINER RPCs since last cleanup; each needs its own anon-caller grep before
+    REVOKE (ambiguous root cause at scale — can't verify intent for 17 functions safely in one lane)
+  - recommended owner: self (next lane 01 run, one function at a time)
+- [Supabase] rls_enabled_no_policy (41 tables, mostly *_backup_* snapshot tables + admin_* tables)
+  - status: deferred
+  - why: INFO level, fail-closed (deny-all) by default — not a vulnerability. Needs owner decision on
+    whether backup tables should be dropped or ignored.
+  - recommended owner: review-by-eod

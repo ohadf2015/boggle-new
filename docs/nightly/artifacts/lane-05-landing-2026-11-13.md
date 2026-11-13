@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/multiplayer/WheelRushPieces.tsx, fe-next/components/multiplayer/WheelRushPieces.test.tsx, fe-next/components/multiplayer/WheelRushView.tsx
+next_steps: node_modules in this checkout was mid-install (0 bin files, vitest/eslint both absent) — could not run the new tests locally. Diff is small and mechanical (add `pangram?: boolean` to WordEntry, render a Crown badge on pangram chips, compute `coverage` once and pass `pangram: coverage === 'all'` at the existing push site). Gate should run the new WheelRushPieces.test.tsx cases on its own install. If red, the likely spot is the Crown import conflicting with an existing icon alias in WheelRushPieces.tsx (checked: none existed before this change).
