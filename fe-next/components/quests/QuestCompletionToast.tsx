@@ -214,7 +214,7 @@ function render({ opts, tier, key }: Queued): string {
                 s.reward,
               )}>
                 <Star className="w-4 h-4" aria-hidden="true" />
-                {t('quests.completion.xpReward', { xp: xpReward })}
+                <bdi>{t('quests.completion.xpReward', { xp: xpReward })}</bdi>
               </span>
               {goldReward && goldReward > 0 ? (
                 <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-neo-black/30 border-2 border-neo-black font-neo-display text-sm font-black text-neo-yellow animate-[rewardSlide_0.4s_ease-out_0.45s_both]">

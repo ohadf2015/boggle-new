@@ -109,7 +109,7 @@ export function WeeklyQuestSection() {
             <span className="font-neo-display text-xl font-black text-neo-yellow">{t('weeklyQuest.complete')}</span>
             <div className="flex items-center gap-3">
               <span className="rounded-neo-sm border-2 border-neo-black bg-neo-cyan px-2 py-0.5 font-neo-display text-sm font-black text-neo-black">
-                {t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}
+                <bdi>{t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}</bdi>
               </span>
               {activeQuest.avatarPartReward ? (
                 <AvatarPartBadge reward={activeQuest.avatarPartReward} t={t} size="md" />
@@ -130,7 +130,7 @@ export function WeeklyQuestSection() {
             </p>
             <div className="flex items-center gap-3 text-xs">
               <span className="rounded-neo-sm border-2 border-neo-black bg-neo-cyan px-1.5 py-px font-neo-display font-black text-neo-black">
-                {t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}
+                <bdi>{t('weeklyQuest.xpReward', { xp: activeQuest.xpReward })}</bdi>
               </span>
               {activeQuest.avatarPartReward ? (
                 <AvatarPartBadge reward={activeQuest.avatarPartReward} t={t} />
@@ -175,7 +175,7 @@ export function WeeklyQuestSection() {
                     </div>
                     <div className="flex shrink-0 flex-col items-end gap-1">
                       <span className="font-neo-display text-sm font-black text-neo-cyan">
-                        {t('quests.reward.xp', { xp: quest.xpReward })}
+                        <bdi>{t('quests.reward.xp', { xp: quest.xpReward })}</bdi>
                       </span>
                       <AvatarPartBadge reward={quest.avatarPartReward} t={t} />
                     </div>
