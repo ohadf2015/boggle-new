@@ -9,8 +9,11 @@
  */
 export function shouldArmBackgroundDisconnect({
   fullscreenAdActive,
+  classroomLive,
 }: {
   fullscreenAdActive: boolean;
+  /** A class round enrols whoever is connected at Start; the server's seat grace covers a dead phone. */
+  classroomLive: boolean;
 }): boolean {
-  return !fullscreenAdActive;
+  return !fullscreenAdActive && !classroomLive;
 }

@@ -152,6 +152,10 @@ const nextConfig = {
   async rewrites() {
     return {
       beforeFiles: [
+        // First-party PostHog: school networks and ad blockers drop *.posthog.com,
+        // which hid whole teacher sessions. Paths match PostHog's Next.js proxy recipe.
+        { source: '/ingest/static/:path*', destination: 'https://eu-assets.i.posthog.com/static/:path*' },
+        { source: '/ingest/:path*', destination: 'https://eu.i.posthog.com/:path*' },
         // Bare /singleplayer: internal rewrite to /en/singleplayer instead of the
         // catch-all 308 below. PSI (and every real visitor on the bare path) saves
         // a full redirect round trip before any render-blocking resource can start

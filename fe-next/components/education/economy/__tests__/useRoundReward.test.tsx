@@ -36,6 +36,15 @@ describe('useRoundReward', () => {
     expect(result.current).toEqual(reveal);
   });
 
+  it('Given the results stay up into the next round, When the round id changes, Then the student asks for the new chest and drops the old one', () => {
+    const { result, rerender } = renderHook(({ round }) => useRoundReward('ABC', round), { initialProps: { round: '7' } });
+    act(() => listeners['classroomEconomy:reward'](reveal));
+    emit.mockClear();
+    rerender({ round: '8' });
+    expect(result.current).toBeNull();
+    expect(emit).toHaveBeenCalledWith('classroomEconomy:requestReward', { gameCode: 'ABC', roundId: '8' });
+  });
+
   it('Given a reveal for another round, Then it is ignored', () => {
     const { result } = renderHook(() => useRoundReward('ABC', '7'));
     act(() => listeners['classroomEconomy:reward']({ ...reveal, roundId: '6' }));

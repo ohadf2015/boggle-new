@@ -18,6 +18,12 @@ export function useRoundReward(gameCode: string | null, roundId: string | null) 
   const [reveal, setReveal] = useState<ClassroomChestReveal | null>(null);
   const [tick, setTick] = useState(0);
   const asks = useRef(0);
+  const [round, setRound] = useState(`${gameCode}:${roundId}`);
+  if (round !== `${gameCode}:${roundId}`) {
+    setRound(`${gameCode}:${roundId}`);
+    setReveal(null);
+    asks.current = 0;
+  }
 
   const onReward = useCallback(
     (r: ClassroomChestReveal | null) => {
