@@ -102,6 +102,17 @@ describe('Word Wheel mascot stage', () => {
     expect(last.contains(screen.getByTestId('wheel-orbit'))).toBe(false);
   });
 
+  it('Given a phone, the band above the word line takes all of the cluster slack, so the space under the actions never grows', () => {
+    onDesktop(false);
+    renderGame();
+    const cluster = screen.getByTestId('wheel-cluster');
+    const orbit = screen.getByTestId('wheel-orbit');
+    const below = [...cluster.children].slice([...cluster.children].indexOf(orbit) + 1) as HTMLElement[];
+    expect(below.length).toBeGreaterThan(0);
+    for (const el of below) expect(el.className.split(' ').filter((c) => c.startsWith('flex-['))).toEqual([]);
+    expect(stages()[2]?.className).toContain('flex-[1_0_auto]');
+  });
+
   it('Given the desktop shell, gags play in the rail mascot spot first', () => {
     onDesktop(true);
     renderGame();

@@ -26,7 +26,7 @@
  *  All media queries, never a JS breakpoint: CSS is right at first paint.
  */
 import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
-import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
 import { Pause, Play, Timer, X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { WordFormingAreaConnected } from '@/components/game/in-game/components/WordFormingAreaConnected';
@@ -48,6 +48,7 @@ import { SoloStartCard } from './components/SoloStartCard';
 import { SoloLeftRail, SoloRightRail } from './components/SoloShellRails';
 import { GameShell } from '@/components/game/shell';
 import { formatClock } from '@/components/game/shell/formatClock';
+import { STAGE_TARGET_PX, boardFloorPx } from '@/lib/mascot/stage';
 
 export interface SoloGameLayoutProps {
   grid: LetterGrid;
@@ -99,10 +100,15 @@ const SHELL = 'solo-shell';
 /** Lifts the whole desktop frame, rails included, above the lesson banner's lane. */
 const LESSON_SHELL = 'solo-shell-lesson';
 
+/** Phones give the gag band above the board its target height, down to the 44px-tile floor. */
+const BOARD_SIZE =
+  'min(100cqw, calc(100cqh - var(--solo-word-h)), var(--solo-board-max), max(var(--solo-board-floor), calc(100cqh - var(--solo-stage-reserve))))';
+
 /** Hand-written like Adventure's run/landscape.ts: a layout, not utility tweaks. */
 const SOLO_SHELL_CSS = `
+.${SHELL} { --solo-stage-reserve: ${STAGE_TARGET_PX}px; }
 .${SHELL} [data-solo-slot="board"] .game-board-frame {
-  --board-size: min(100cqw, calc(100cqh - var(--solo-word-h)), var(--solo-board-max));
+  --board-size: ${BOARD_SIZE};
   width: var(--board-size);
   height: var(--board-size);
   max-width: min(var(--board-size), 100%);
@@ -112,8 +118,13 @@ const SOLO_SHELL_CSS = `
 .${SHELL}[data-lesson="on"] [role="gridcell"][aria-selected="true"] { box-shadow: 3px 3px 0 #0a0a1a !important; border-color: #0a0a1a !important; }
 .${SHELL}[data-lesson="on"] [role="gridcell"][aria-selected="true"][style*="rgb(0, 255, 255)"] { background: linear-gradient(135deg, #ffd60a, #ff6b35 55%, #ff1493) !important; animation: none !important; }
 .${SHELL}[data-lesson="on"] [role="gridcell"] > div.pointer-events-none { display: none; }
+@media (max-width: 1023px) and (max-height: 700px) {
+  .${SHELL} > [data-solo-slot]:not([data-solo-slot="bar"]) { margin-top: 0.25rem; }
+  .${SHELL} > [data-solo-slot="board"] { margin-top: 0; }
+}
 @media (orientation: landscape) and (max-height: 540px) {
   .${SHELL} {
+    --solo-stage-reserve: 0px;
     max-width: none;
     display: grid;
     column-gap: 1rem;
@@ -133,6 +144,7 @@ const SOLO_SHELL_CSS = `
   .${SHELL} > [data-solo-slot="words"] > ul { flex-wrap: wrap; overflow: hidden; align-content: flex-start; }
 }
 @media (min-width: 1024px) and (min-height: 600px) {
+  .${SHELL} { --solo-stage-reserve: 0px; }
   .${SHELL} [data-solo-slot="board"] { --solo-board-max: 100cqh; }
   .${SHELL}[data-lesson="on"] { padding-bottom: 0; }
   [data-game-shell].${LESSON_SHELL} { padding-bottom: ${LESSON_LANE_CLEARANCE}; }
@@ -302,6 +314,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           data-testid="solo-slot-board"
           data-solo-slot="board"
           className="relative mt-1 flex min-h-0 flex-1 flex-col items-center justify-center [container-type:size]"
+          style={{ '--solo-board-floor': `${boardFloorPx(grid[0]?.length ?? 4)}px` } as CSSProperties}
         >
           {/* Phones: spare height collects above the board with the word row; the mascot plays there, under the traced word. Wide screens use the rail. */}
           <div ref={setMascotBand} data-testid="solo-mascot-stage" className="relative flex min-h-0 w-full flex-1 flex-col justify-end shell:flex-none">
@@ -313,7 +326,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
             </div>
           </div>
           </div>
-          <div className="flex justify-center" style={{ width: 'min(100cqw, calc(100cqh - var(--solo-word-h)), var(--solo-board-max))' }}>
+          <div className="flex justify-center" style={{ width: BOARD_SIZE }}>
             <GridComponent
               grid={grid}
               interactive={playing}
