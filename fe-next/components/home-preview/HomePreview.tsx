@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { hasCrosswordPuzzles } from '@/lib/crossword/locales';
 import { useLanguage } from '@/contexts/LanguageContext';
 import useReducedMotion from '@/hooks/useReducedMotion';
 import { useStreakView } from '@/hooks/useStreakView';
@@ -23,7 +24,7 @@ import { readLastAccountAvatar } from '@/utils/accountAvatarCache';
 
 export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   const { t, language } = useLanguage();
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading, canSeeInWorkModes } = useAuth();
   const reduced = useReducedMotion();
   const streakView = useStreakView();
   const { current: streak, loading: streakLoading, freezes } = streakView;
@@ -90,7 +91,7 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           <HomeAdventureCard />
         </div>
         <div className="lg:col-span-12">
-          <MoreGames lang={language} t={tt} hideAdventure />
+          <MoreGames lang={language} t={tt} hideAdventure showCrossword={canSeeInWorkModes && hasCrosswordPuzzles(language)} />
         </div>
       </div>
 

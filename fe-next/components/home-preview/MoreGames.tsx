@@ -71,6 +71,17 @@ const GAMES: Game[] = [
   },
 ];
 
+/** Admin and beta preview: the old home showed it only to them, so the new shelf does the same. */
+const CROSSWORD: Game = {
+  id: 'crossword',
+  href: 'crossword',
+  titleKey: 'crossword.name',
+  lineKey: 'crossword.tagline',
+  bg: 'bg-neo-cream',
+  tilt: 'rotate-1',
+  art: { src: '/mascot/scholar.webp' },
+};
+
 /** Word Tower finishes ~37% of the time, so it stays one tap away under "More". */
 const TUCKED = new Set(['tower']);
 
@@ -115,8 +126,9 @@ function GameArt({ art }: { art: Game['art'] }) {
 }
 
 /** A shelf of game cartridges: each tilted a little, each its own colour. */
-export function MoreGames({ lang, t, hideAdventure = false }: { lang: string; t: (key: string) => string; hideAdventure?: boolean }) {
-  const games = hideAdventure ? GAMES.filter((g) => g.id !== 'adventure') : GAMES;
+export function MoreGames({ lang, t, hideAdventure = false, showCrossword = false }: { lang: string; t: (key: string) => string; hideAdventure?: boolean; showCrossword?: boolean }) {
+  const shelf = showCrossword ? [...GAMES, CROSSWORD] : GAMES;
+  const games = hideAdventure ? shelf.filter((g) => g.id !== 'adventure') : shelf;
   return (
     <section aria-labelledby="hp-games-title" data-testid="hp-games">
       <div className="mb-4 flex items-end justify-between gap-3 lg:mb-6">
