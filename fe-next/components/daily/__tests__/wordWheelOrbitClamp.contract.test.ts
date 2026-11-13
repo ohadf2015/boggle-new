@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { STAGE_TARGET_PX } from '@/lib/mascot/stage';
 
 /**
  * Contract: the wheel orbit may never be allowed to exceed its container's
@@ -42,17 +41,6 @@ describe('word wheel orbit clamp', () => {
     expect(orbitLine, `no aspect-square + cqb line in ${FILE}`).toBeTruthy();
   });
 
-  it('on phones the orbit leaves the gag band its target height above the word line', () => {
-    // Band + word line (STAGE_TARGET_PX) + action bar (62px) + cluster gaps (16px).
-    const reserve = STAGE_TARGET_PX + 62 + 16;
-    const phoneCaps = (orbitLine ?? '').match(/(?<![:\w-])max-[wh]-\[[^\]]*\]/g) ?? [];
-    expect(phoneCaps).toHaveLength(2);
-    for (const cap of phoneCaps) {
-      const px = Number(cap.match(/calc\(100cqb-(\d+)px\)/)?.[1]);
-      expect(px).toBeGreaterThanOrEqual(reserve);
-    }
-  });
-
   it('every cqb-based cap is bounded by the container block size', () => {
     // Each `max-w-[…]` / `max-h-[…]` that mentions cqb must be wrapped so the
     // container size is an upper bound — otherwise a px floor can exceed it.
@@ -67,6 +55,12 @@ describe('word wheel orbit clamp', () => {
         'squeezes the cluster to ~126px, orbit floors at 176px, Submit overlaps ' +
         'the found-words chips). Wrap the cap in min(100cqb, …).',
     ).toEqual([]);
+  });
+
+  it('on phones the orbit cap reserves 176px for the word line and actions, no mascot band', () => {
+    const phoneCaps = (orbitLine ?? '').match(/(?<![:\w-])max-[wh]-\[[^\]]*\]/g) ?? [];
+    expect(phoneCaps).toHaveLength(2);
+    for (const cap of phoneCaps) expect(cap).toContain('calc(100cqb-176px)');
   });
 });
 

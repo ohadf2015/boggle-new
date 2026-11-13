@@ -34,19 +34,25 @@ const WheelTrail: React.FC<WheelTrailProps> = ({
   useEffect(() => {
     if (!last) return;
     let raf = 0;
+    // Measured once per drag: a per-frame read right after the attribute writes forced a full layout every frame.
+    let rect: DOMRect | null = null;
+    let shown = false;
     const tick = () => {
       const pos = pointerPosRef.current;
-      const rect = discRef.current?.getBoundingClientRect();
       const lines = [tailInkRef.current, tailRef.current];
-      if (pos && rect && draggingRef.current && rect.width > 0) {
+      if (draggingRef.current && !rect) rect = discRef.current?.getBoundingClientRect() ?? null;
+      if (!draggingRef.current) rect = null;
+      if (pos && rect && rect.width > 0) {
         const p = toDiscPercent(pos.x, pos.y, rect);
         for (const line of lines) {
           line?.setAttribute('x2', String(p.x));
           line?.setAttribute('y2', String(p.y));
-          line?.setAttribute('visibility', 'visible');
+          if (!shown) line?.setAttribute('visibility', 'visible');
         }
-      } else {
+        shown = true;
+      } else if (shown) {
         for (const line of lines) line?.setAttribute('visibility', 'hidden');
+        shown = false;
       }
       // jsdom drops requestAnimationFrame after the test that stubbed it; a late tick must not throw.
       if (typeof requestAnimationFrame !== 'function') return;

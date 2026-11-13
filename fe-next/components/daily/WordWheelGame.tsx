@@ -373,9 +373,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* Word line + wheel + actions centre together in the leftover height. */}
       <div className="@container/wheel [container-type:size] flex-1 flex flex-col items-center justify-center w-full min-h-0 gap-2 py-1 short:gap-0.5 short:py-0" data-testid="wheel-cluster">
-      {/* Phones: all the slack goes above the word line, the gag stage; the desktop shell splits it to keep the wheel centred. */}
-      <div ref={mascotStage.reachRef} className="relative flex w-full flex-[1_0_auto] flex-col items-center justify-end">
-      <div ref={mascotStage.bandRef} data-testid="wheel-mascot-stage" className="relative w-full min-h-0 flex-1" />
       <WordWheelWordLine
         t={t}
         letters={builtLetters}
@@ -401,7 +398,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         banner={<WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} delay={0.2} className="inset-0 items-center" />}
         className="shrink-0"
       />
-      </div>
       <WheelDisc
         orbitRef={wheelContainerRef}
         large={inShell}
@@ -429,7 +425,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         {dragHint.visible && <MPDragCoachmark t={t} accent="cyan" onDismiss={dragHint.onDismiss} />}
       </WheelDisc>
 
-      <div className="flex w-full flex-none shell:flex-[1_0_auto] flex-col items-center justify-start">
       <WheelActionBar
         t={t}
         hasLetters={builtLetters.length > 0}
@@ -439,7 +434,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onSubmit={handleSubmit}
         onBackspace={handleBackspace}
       />
-      </div>
       </div>
     </>
   );
@@ -476,7 +470,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
-        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality="full" language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
+        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality={inShell ? 'full' : 'quiet'} language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
       </div>
     </GameShell>
   );

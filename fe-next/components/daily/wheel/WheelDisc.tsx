@@ -86,7 +86,7 @@ const WheelDisc: React.FC<WheelDiscProps> = ({
       // Each cap is wrapped in min(100cqb, …): the box is shrink-0 in the flex-1 cluster, so these caps alone keep it inside (see wordWheelOrbitClamp.contract).
       className={cn(
         large ? 'w-[min(100cqi,calc(100cqb-184px),640px)] h-[min(100cqi,calc(100cqb-184px),640px)] !max-w-none !max-h-none' : 'w-[21rem] h-[21rem] sm:w-[24rem] sm:h-[24rem] lg:w-[31rem] lg:h-[31rem]',
-        'ww-orbit relative aspect-square [container-type:size] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-200px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-200px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none',
+        'ww-orbit relative aspect-square [container-type:size] max-w-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] max-h-[min(100cqb,100cqi,max(176px,calc(100cqb-176px)))] short:max-w-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] short:max-h-[min(100cqb,100cqi,max(132px,min(calc(100cqb-124px),46svh)))] shrink-0 touch-none select-none',
       )}
       onPointerDown={(e) => {
         if (celebrating) setSettledFx(celebrating.id);
