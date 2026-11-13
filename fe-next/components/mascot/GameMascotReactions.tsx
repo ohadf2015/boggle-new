@@ -45,6 +45,8 @@ interface GameMascotReactionsProps {
   stages?: ReadonlyArray<HTMLElement | null>;
   /** Element the final-seconds gag pushes against. */
   timerAnchor?: HTMLElement | null;
+  /** Stays on screen in the idle pose between reactions instead of popping out. */
+  persistent?: boolean;
 }
 
 const COMBO_BREAK_MIN = 3;
@@ -67,6 +69,7 @@ export function GameMascotReactions({
   stageClassName,
   stages,
   timerAnchor = null,
+  persistent = false,
 }: GameMascotReactionsProps) {
   const stage = useMascotStage(stages);
   const mascot = useBlastMascot();
@@ -123,19 +126,21 @@ export function GameMascotReactions({
     [say],
   );
 
-  const show = mascot.visible && allowed && !gag;
+  const reacting = mascot.visible && allowed && !gag;
+  const show = reacting || (persistent && allowed && !gag);
+  const pose = reacting ? mascot.state : 'idle';
   useEffect(() => {
-    if (show) trackGrowthEvent('mascot_reaction_shown', { state: mascot.state, mode });
-  }, [show, mascot.state, mode]);
+    if (reacting) trackGrowthEvent('mascot_reaction_shown', { state: mascot.state, mode });
+  }, [reacting, mascot.state, mode]);
 
   const lastVoicedAt = useRef(0);
   useEffect(() => {
-    if (!show || !full || mascot.transitionAt === lastVoicedAt.current) return;
+    if (!reacting || !full || mascot.transitionAt === lastVoicedAt.current) return;
     lastVoicedAt.current = mascot.transitionAt;
     const { voice, history } = pickVoice(mascot.state, voiceHistory.current, Math.random);
     voiceHistory.current = history;
     if (voice) say(voice);
-  }, [show, full, mascot.state, mascot.transitionAt, say]);
+  }, [reacting, full, mascot.state, mascot.transitionAt, say]);
 
   const tier = comboTier(comboLevel);
   const motion = escalationMotion(tier);
@@ -165,7 +170,7 @@ export function GameMascotReactions({
             transition={wiggle ? { duration: motion.periodMs / 1000, repeat: Infinity } : { duration: 0.15 }}
           >
             {full && <MascotTileStack count={comboLevel} />}
-            <BlastMascotHud state={mascot.state} />
+            <BlastMascotHud state={pose} />
           </AdaptiveMotion.div>
         </AdaptiveMotion.div>
       )}

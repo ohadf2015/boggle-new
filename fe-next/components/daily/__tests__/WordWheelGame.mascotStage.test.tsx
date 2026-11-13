@@ -51,7 +51,7 @@ const mascotProps = vi.hoisted(() => ({ current: null as null | Record<string, u
 vi.mock('@/components/mascot/GameMascotReactions', () => ({
   GameMascotReactions: (props: Record<string, unknown>) => {
     mascotProps.current = props;
-    return null;
+    return <div data-testid="mascot-mock" />;
   },
 }));
 import WordWheelGame from '../WordWheelGame';
@@ -97,6 +97,20 @@ describe('Word Wheel mascot placement', () => {
     onDesktop(false);
     renderGame();
     expect(mascotProps.current?.personality).toBe('quiet');
+  });
+
+  it('Given a phone, the mascot stays on the wheel corner the whole game', () => {
+    onDesktop(false);
+    renderGame();
+    expect(screen.getByTestId('wheel-orbit').contains(screen.getByTestId('mascot-mock'))).toBe(true);
+    expect(mascotProps.current?.persistent).toBe(true);
+  });
+
+  it('Given the desktop shell, the mascot is not drawn on the wheel', () => {
+    onDesktop(true);
+    renderGame();
+    expect(screen.getByTestId('wheel-orbit').contains(screen.getByTestId('mascot-mock'))).toBe(false);
+    expect(mascotProps.current?.persistent).toBeFalsy();
   });
 
   it('Given the desktop shell, gags play in the rail mascot spot only', () => {

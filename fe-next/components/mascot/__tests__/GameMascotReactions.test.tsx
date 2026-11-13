@@ -55,4 +55,25 @@ describe('GameMascotReactions', () => {
     expect(slot.className).not.toContain('sm:top-3');
     expect(slot.className).toContain('pointer-events-none');
   });
+
+  describe('persistent', () => {
+    it('rests in the idle pose before anything happens', () => {
+      render(<GameMascotReactions mode="word-wheel" comboLevel={0} persistent />);
+      expect(screen.getByTestId('blast-mascot-hud').getAttribute('data-state')).toBe('idle');
+      expect(trackGrowthEvent).not.toHaveBeenCalled();
+    });
+
+    it('reacts to a miss, then settles back to idle instead of vanishing', () => {
+      vi.useFakeTimers();
+      try {
+        render(<GameMascotReactions mode="word-wheel" comboLevel={0} persistent />);
+        act(() => emitMascotEvent({ kind: 'word-rejected' }));
+        expect(screen.getByTestId('blast-mascot-hud').getAttribute('data-state')).toBe('sad-supportive');
+        act(() => { vi.advanceTimersByTime(2500); });
+        expect(screen.getByTestId('blast-mascot-hud').getAttribute('data-state')).toBe('idle');
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+  });
 });

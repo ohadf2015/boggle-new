@@ -19,12 +19,12 @@ import {
 } from '../mascotState';
 
 describe('mascotState — pure word event mapper', () => {
-  it('returns null for words shorter than 4 letters (no reaction)', () => {
+  it('returns null for words shorter than 3 letters (no reaction)', () => {
     expect(pickMascotStateForWord({ wordLength: 2, gemLetterUsed: false })).toBeNull();
-    expect(pickMascotStateForWord({ wordLength: 3, gemLetterUsed: false })).toBeNull();
   });
 
-  it('returns "cheer" for 4-5 letter words', () => {
+  it('returns "cheer" for 3-5 letter words', () => {
+    expect(pickMascotStateForWord({ wordLength: 3, gemLetterUsed: false })).toBe('cheer');
     expect(pickMascotStateForWord({ wordLength: 4, gemLetterUsed: false })).toBe('cheer');
     expect(pickMascotStateForWord({ wordLength: 5, gemLetterUsed: false })).toBe('cheer');
   });
@@ -309,12 +309,23 @@ describe('mascotState — combo escalation', () => {
   });
 });
 
+describe('mascotState — misses', () => {
+  it('cries at a rejected word and thinks at a duplicate', () => {
+    const s = createInitialMascotState();
+    expect(reduceMascotEvent(s, { kind: 'word-rejected' }, 1000).current).toBe('sad-supportive');
+    expect(reduceMascotEvent(s, { kind: 'duplicate-word' }, 1000).current).toBe('focused');
+  });
+
+  it('reacts to a miss right after a cheer, inside the cooldown', () => {
+    const cheered = reduceMascotEvent(createInitialMascotState(), { kind: 'word-submitted', wordLength: 4, gemLetterUsed: false }, 1000);
+    expect(reduceMascotEvent(cheered, { kind: 'word-rejected' }, 1300).current).toBe('sad-supportive');
+  });
+});
+
 describe('mascotState — gag-only events leave the HUD alone', () => {
-  it('rejections, rare letters, duplicates, the last 10s and records pick no HUD pose', () => {
+  it('rare letters, the last 10s and records pick no HUD pose', () => {
     const s = createInitialMascotState();
     for (const e of [
-      { kind: 'word-rejected' as const },
-      { kind: 'duplicate-word' as const },
       { kind: 'rare-letter' as const, letter: 'Q' },
       { kind: 'timer-final-10s' as const, secondsLeft: 10 },
       { kind: 'personal-best' as const },

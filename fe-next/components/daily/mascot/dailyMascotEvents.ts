@@ -3,8 +3,9 @@ import type { MascotEvent } from '@/lib/blast/mascotState';
 import type { RejectKind } from '../useWordWheelSubmit';
 import type { FeedbackType } from '../survival/types';
 
-// Just under the wheel's found-words row, beside the word line: clear of the HUD, ladder and wheel.
-export const WHEEL_MASCOT_SLOT = 'top-[11rem] end-1 shell:top-[8.75rem] shell:end-2';
+export const WHEEL_MASCOT_SLOT = 'top-[8.75rem] end-2';
+// The wheel's top corner is outside the disc, so the phone mascot costs the layout nothing.
+export const WHEEL_ORBIT_MASCOT_SLOT = 'top-0 end-0';
 
 const FOUND: ReadonlySet<FeedbackType> = new Set(['valid-word', 'short-valid', 'discovery', 'target-found']);
 const REJECTED: ReadonlySet<FeedbackType> = new Set(['invalid-word', 'not-on-board', 'not-in-dictionary', 'too-short', 'too-long']);

@@ -19,7 +19,7 @@
 export type MascotState =
   | 'idle'             // ambient
   | 'focused'          // mid-drag
-  | 'cheer'            // 4-5 letter word
+  | 'cheer'            // 3-5 letter word
   | 'wow'              // 6 letter word
   | 'awe'              // 7+ letter OR 3+ cascade chain
   | 'oh'               // gem letter (Q/Z/X/J) used in word
@@ -47,8 +47,6 @@ export const MASCOT_GIF_PATHS: Record<MascotState, string> = {
   exhausted: '/mascot/sleepy-nobg.webp',
 };
 
-export const GLOBAL_COOLDOWN_MS = 4000;
-export const STATE_COOLDOWN_MS = 10000;
 
 /**
  * How long the HUD mascot stays on screen after a reaction before auto-hiding.
@@ -56,8 +54,10 @@ export const STATE_COOLDOWN_MS = 10000;
  * the way so it never permanently occludes the score/HUD.
  */
 export const MASCOT_VISIBLE_MS = 2000;
+export const GLOBAL_COOLDOWN_MS = 4000;
+export const STATE_COOLDOWN_MS = 10000;
 
-const WORD_LEN_CHEER_MIN = 4;
+const WORD_LEN_CHEER_MIN = 3;
 const WORD_LEN_WOW = 6;
 const WORD_LEN_AWE_MIN = 7;
 const CASCADE_AWE_MIN = 3;
@@ -164,6 +164,8 @@ const BYPASS_COOLDOWN_KINDS: ReadonlySet<MascotEvent['kind']> = new Set([
   'wave-clear',
   'wave-fail',
   'combo-broken',
+  'word-rejected',
+  'duplicate-word',
 ]);
 
 function pickStateForEvent(event: MascotEvent): MascotState | null {
@@ -183,7 +185,9 @@ function pickStateForEvent(event: MascotEvent): MascotState | null {
     case 'combo-broken':
       return event.fromLevel >= COMBO_EXHAUST_MIN ? 'exhausted' : null;
     case 'word-rejected':
+      return 'sad-supportive';
     case 'duplicate-word':
+      return 'focused';
     case 'rare-letter':
     case 'timer-final-10s':
     case 'personal-best':

@@ -43,7 +43,7 @@ import { GameShell, ShellKeysCard, SHELL_MEDIA } from '@/components/game/shell';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { wheelRankLadder } from '@/lib/wordWheel/rankLadder';
 import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
-import { emitFinalSeconds, emitWheelVerdict, WHEEL_MASCOT_SLOT } from './mascot/dailyMascotEvents';
+import { emitFinalSeconds, emitWheelVerdict, WHEEL_MASCOT_SLOT, WHEEL_ORBIT_MASCOT_SLOT } from './mascot/dailyMascotEvents';
 
 export type { WordWheelGameResult } from './wheel/wordWheelGameProps';
 
@@ -359,6 +359,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   );
 
   // Wheel cluster JSX (word line + wheel + action-bar; phone adds the HUD, ladder and words above)
+  const mascotProps = { mode: 'word-wheel', comboLevel: combo, language: language as Language };
+
   const wheelCluster = (
     <>
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
@@ -423,6 +425,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       >
         {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
         {dragHint.visible && <MPDragCoachmark t={t} accent="cyan" onDismiss={dragHint.onDismiss} />}
+        {!paused && !inShell && <GameMascotReactions {...mascotProps} personality="quiet" persistent slotClassName={WHEEL_ORBIT_MASCOT_SLOT} />}
       </WheelDisc>
 
       <WheelActionBar
@@ -470,7 +473,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         translate="no"
       >
         {wheelCluster}
-        {!paused && <GameMascotReactions mode="word-wheel" comboLevel={combo} personality={inShell ? 'full' : 'quiet'} language={language as Language} slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
+        {!paused && inShell && <GameMascotReactions {...mascotProps} personality="full" slotClassName={WHEEL_MASCOT_SLOT} stages={mascotStage.stages} />}
       </div>
     </GameShell>
   );
