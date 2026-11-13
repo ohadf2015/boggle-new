@@ -71,7 +71,6 @@ function onDesktop(matches: boolean) {
     addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {}, dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia;
 }
-const stages = () => (mascotProps.current?.stages ?? []) as Array<HTMLElement | null>;
 
 beforeEach(() => {
   mascotProps.current = null;
@@ -81,41 +80,29 @@ afterEach(() => {
   window.matchMedia = realMatchMedia;
 });
 
-describe('Word Wheel mascot stage', () => {
-  it('Given a phone, gags get the free band above the word line, clear of the word and the found-words row', () => {
-    onDesktop(false);
-    renderGame();
-    const band = screen.getByTestId('wheel-mascot-stage');
-    expect(stages()).toContain(band);
-    expect(band.contains(screen.getByTestId('word-builder'))).toBe(false);
-    expect(band.contains(screen.getByTestId('found-words-slot'))).toBe(false);
-    expect(screen.getByTestId('wheel-cluster').contains(band)).toBe(true);
-  });
-
-  it('Given a short phone, the last-resort stage still sits in the wheel cluster, never the HUD strip', () => {
-    onDesktop(false);
-    renderGame();
-    const all = stages().filter(Boolean) as HTMLElement[];
-    const last = all[all.length - 1];
-    expect(all.indexOf(screen.getByTestId('wheel-mascot-stage'))).toBeLessThan(all.length - 1);
-    expect(last.contains(screen.getByTestId('word-builder'))).toBe(true);
-    expect(last.contains(screen.getByTestId('wheel-orbit'))).toBe(false);
-  });
-
-  it('Given a phone, the band above the word line takes all of the cluster slack, so the space under the actions never grows', () => {
+describe('Word Wheel mascot placement', () => {
+  it('Given a phone, the mascot takes no layout room: word line, wheel and actions sit directly in the cluster', () => {
     onDesktop(false);
     renderGame();
     const cluster = screen.getByTestId('wheel-cluster');
-    const orbit = screen.getByTestId('wheel-orbit');
-    const below = [...cluster.children].slice([...cluster.children].indexOf(orbit) + 1) as HTMLElement[];
-    expect(below.length).toBeGreaterThan(0);
-    for (const el of below) expect(el.className.split(' ').filter((c) => c.startsWith('flex-['))).toEqual([]);
-    expect(stages()[2]?.className).toContain('flex-[1_0_auto]');
+    expect(screen.queryByTestId('wheel-mascot-stage')).toBeNull();
+    expect(cluster.contains(screen.getByTestId('word-builder'))).toBe(true);
+    expect(screen.getByTestId('wheel-orbit').parentElement).toBe(cluster);
+    for (const el of [...cluster.children] as HTMLElement[]) {
+      expect(el.className).not.toContain('flex-[1_0_auto]');
+    }
   });
 
-  it('Given the desktop shell, gags play in the rail mascot spot first', () => {
+  it('Given a phone, the mascot only reacts (no slapstick gags over the game)', () => {
+    onDesktop(false);
+    renderGame();
+    expect(mascotProps.current?.personality).toBe('quiet');
+  });
+
+  it('Given the desktop shell, gags play in the rail mascot spot only', () => {
     onDesktop(true);
     renderGame();
-    expect(stages()[0]).toBe(screen.getByTestId('shell-mascot'));
+    expect(mascotProps.current?.personality).toBe('full');
+    expect(mascotProps.current?.stages).toEqual([screen.getByTestId('shell-mascot')]);
   });
 });

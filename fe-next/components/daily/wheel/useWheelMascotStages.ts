@@ -2,11 +2,9 @@
 
 import { useMemo, useState } from 'react';
 
-/** Where Word Wheel gags may play: the desktop rail spot, the phone band above the word line, then that band plus the word line on short phones. */
+/** Gags play only in the desktop rail spot; on phones the mascot never takes room from the wheel. */
 export function useWheelMascotStages() {
   const [rail, railRef] = useState<HTMLDivElement | null>(null);
-  const [band, bandRef] = useState<HTMLDivElement | null>(null);
-  const [reach, reachRef] = useState<HTMLDivElement | null>(null);
-  const stages = useMemo(() => [rail, band, reach], [rail, band, reach]);
-  return { stages, railRef, bandRef, reachRef };
+  const stages = useMemo(() => [rail], [rail]);
+  return { stages, railRef };
 }
