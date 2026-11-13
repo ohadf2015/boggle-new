@@ -74,6 +74,6 @@ describe('CatchUpSuggestion', () => {
 
   it('passes mode to useMissedDailies', () => {
     render(<CatchUpSuggestion mode="word-wheel" />);
-    expect(useMissedDailies).toHaveBeenCalledWith('word-wheel');
+    expect(useMissedDailies).toHaveBeenCalledWith('word-wheel', true, 'en');
   });
 });

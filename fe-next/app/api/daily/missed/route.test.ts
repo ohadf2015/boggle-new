@@ -83,4 +83,21 @@ describe('GET /api/daily/missed', () => {
     await GET(new Request('http://localhost/api/daily/missed') as never)
     expect(sb.huntChain.eq).not.toHaveBeenCalledWith('solved', true)
   })
+
+  // check-played locks per language, so a Hebrew play must not mark the English day as played.
+  it('Given a language, Then only attempts in that language count', async () => {
+    const sb = makeSupabase({ solved: [] })
+    vi.mocked(createClient).mockResolvedValue(sb as any)
+    const { NextRequest } = await import('next/server')
+    await GET(new NextRequest('http://localhost/api/daily/missed?mode=word-wheel&language=he'))
+    expect(sb.huntChain.eq).toHaveBeenCalledWith('language', 'he')
+  })
+
+  it('Given an unknown language, Then it is ignored rather than queried', async () => {
+    const sb = makeSupabase({ solved: [] })
+    vi.mocked(createClient).mockResolvedValue(sb as any)
+    const { NextRequest } = await import('next/server')
+    await GET(new NextRequest('http://localhost/api/daily/missed?language=xx'))
+    expect(sb.huntChain.eq).not.toHaveBeenCalledWith('language', 'xx')
+  })
 })

@@ -20,7 +20,7 @@ export type MissedDailiesStatus = 'idle' | 'loading' | 'ok' | 'error';
  * @param mode - Which daily mode to fetch missed challenges for (default: 'word-hunt')
  * @param enabled - Whether to fetch (default: true)
  */
-export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean = true): { missed: MissedDaily[]; loading: boolean; status: MissedDailiesStatus } {
+export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean = true, language?: string): { missed: MissedDaily[]; loading: boolean; status: MissedDailiesStatus } {
   const [missed, setMissed] = useState<MissedDaily[]>([]);
   const [status, setStatus] = useState<MissedDailiesStatus>(enabled ? 'loading' : 'idle');
   const mountedRef = useRef(true);
@@ -28,7 +28,7 @@ export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean
   const refresh = useCallback(() => {
     if (!enabled) { setStatus('idle'); return; }
     setStatus('loading');
-    getWithAuth(`/api/daily/missed?mode=${mode}`)
+    getWithAuth(`/api/daily/missed?mode=${mode}${language ? `&language=${language}` : ''}`)
       .then(r => (r.ok ? r.json() : null))
       .then(json => {
         if (!mountedRef.current) return;
@@ -40,7 +40,7 @@ export function useMissedDailies(mode: DailyMode = 'word-hunt', enabled: boolean
         }
       })
       .catch(() => { if (mountedRef.current) setStatus('error'); });
-  }, [enabled, mode]);
+  }, [enabled, mode, language]);
 
   useEffect(() => {
     mountedRef.current = true;

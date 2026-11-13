@@ -412,6 +412,7 @@ const DailyChallenge: React.FC = () => {
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             practice={isPractice}
+            adFree={isCatchup}
             hideModeCoach={onboardedThisVisit}
           />
         )}
@@ -432,6 +433,7 @@ const DailyChallenge: React.FC = () => {
             isNewCompletion={phase === 'completed'}
             onBack={handleBack}
             onRetry={handleRetryChallenge}
+            retryable={!isCatchup}
             onGameLanguageChange={setGameLanguage}
           />
         )}

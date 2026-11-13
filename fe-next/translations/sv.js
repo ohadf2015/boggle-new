@@ -10515,7 +10515,7 @@ const sv = {
 "playToday": "Spela dagens pussel",
 "playThisDay": "Spela den dagens Ordjakt",
 "catchUpTitle": "Ta igen",
-"catchUpHint": "Gratis, och det räknas till din svit",
+"catchUpHint": "Gratis att spela",
 "olderTitle": "Äldre pussel",
 "olderHint": "Så gick det för alla",
 "wordHunt": "Ordjakt",

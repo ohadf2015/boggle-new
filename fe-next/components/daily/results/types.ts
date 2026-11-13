@@ -41,6 +41,7 @@ export interface DailyWordHuntResultsProps {
   isNewCompletion: boolean;
   onBack: () => void;
   onRetry: () => void;
+  retryable?: boolean;
   onGameLanguageChange?: (lang: Language) => void;
 }
 

@@ -5,6 +5,7 @@ import {
   generateDailyPuzzle,
   getPuzzleNumber,
   getTodaysWordHuntResult,
+  getWordHuntResultForDate,
   getGuestFingerprint,
   mapServerResultToStoredResult,
   getWordHuntResultKey,
@@ -74,10 +75,8 @@ export function useWordHuntPuzzleInit({
       setForfeitedToday(!isPractice && !wasJustReset && (abandonedRun || hasWordHuntForfeitToday(gameLanguage)));
 
       // Practice mode: bypass already-played gates so the player can replay safely.
-      // Catch-up skips the today-only local cache (it's keyed to today) but still
-      // runs the server check below, which gates by the catch-up `date`.
       if (!wasJustReset && !isPractice) {
-        const localResult = isCatchup ? null : getTodaysWordHuntResult(gameLanguage);
+        const localResult = isCatchup ? getWordHuntResultForDate(gameLanguage, date) : getTodaysWordHuntResult(gameLanguage);
         if (localResult) {
           if (!isMounted) return;
           setStoredResult(localResult);

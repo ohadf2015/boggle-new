@@ -9592,7 +9592,7 @@ const en = {
 "playToday": "Play today's puzzles",
 "playThisDay": "Play this day's Word Hunt",
 "catchUpTitle": "Catch up",
-"catchUpHint": "Free, and it counts for your streak",
+"catchUpHint": "Free to play",
 "olderTitle": "Older puzzles",
 "olderHint": "How everyone did",
 "wordHunt": "Word Hunt",

@@ -16,19 +16,23 @@ interface SurvivalExtraLifeModalProps {
   canAffordCoinRestore?: boolean;
   onCoinRestore?: () => void;
   coinPending?: boolean;
+  /** Previous-day runs never offer an ad. */
+  adFree?: boolean;
 }
 
 export function SurvivalExtraLifeModal({
   isOpen, restoreAmount, onRestore, onDecline, t, language,
-  coinCost, canAffordCoinRestore, onCoinRestore, coinPending = false,
+  coinCost, canAffordCoinRestore, onCoinRestore, coinPending = false, adFree = false,
 }: SurvivalExtraLifeModalProps) {
-  const { offer, canShowAd } = useRewardedFeatureUnlock({
+  const { offer, canShowAd: adReady } = useRewardedFeatureUnlock({
     placement: 'daily_survival_extra_life',
     surface: 'retry',
     onUnlock: onRestore,
-    disabled: !isOpen,
+    disabled: !isOpen || adFree,
     context: { restoreAmount },
   });
+
+  const canShowAd = adReady && !adFree;
 
   if (!isOpen) return null;
 

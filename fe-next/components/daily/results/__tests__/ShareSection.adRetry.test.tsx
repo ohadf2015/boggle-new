@@ -133,4 +133,13 @@ describe('ShareSection — retry CTA platform branching', () => {
     await waitFor(() => expect(onRetryFree).toHaveBeenCalled());
     expect(onRetry).not.toHaveBeenCalled();
   });
+
+  // Retry resets today's result, so on a previous day's results it must not appear (nor its ad).
+  it.each([false, true])('Given a past day (retryable=false), native=%s, Then no retry or ad button shows', (native) => {
+    isNativeMock.mockReturnValue(native);
+    render(<ShareSection {...baseProps} retryable={false} onRetry={vi.fn()} onRetryFree={vi.fn()} />);
+    expect(screen.queryByText(/wordHunt.results.retry/)).toBeNull();
+    expect(screen.queryByText(/200🪙/)).toBeNull();
+    expect(screen.queryAllByRole('button').some(b => /watch|ad/i.test(b.textContent ?? ''))).toBe(false);
+  });
 });

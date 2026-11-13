@@ -10167,7 +10167,7 @@ const es = {
 "playToday": "Jugar los retos de hoy",
 "playThisDay": "Jugar la Caza de Palabras de ese día",
 "catchUpTitle": "Ponte al día",
-"catchUpHint": "Gratis, y cuenta para tu racha",
+"catchUpHint": "Gratis",
 "olderTitle": "Acertijos más antiguos",
 "olderHint": "Cómo les fue a todos",
 "wordHunt": "Caza de palabras",

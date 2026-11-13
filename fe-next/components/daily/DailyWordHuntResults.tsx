@@ -68,6 +68,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   isNewCompletion,
   onBack,
   onRetry,
+  retryable,
   onGameLanguageChange,
 }) => {
   const { t, language: uiLanguage } = useLanguage();
@@ -247,6 +248,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     shareHandlers,
     coinActions,
     onRetryFree: onRetry,
+    retryable,
     isAuthenticated,
     inlineSignupDismissed,
     onInlineSignupDismiss: () => setInlineSignupDismissed(true),

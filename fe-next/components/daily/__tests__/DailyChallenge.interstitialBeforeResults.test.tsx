@@ -94,6 +94,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
   formatCountdown: vi.fn(() => '1:00:00'),
   hasPlayedWordHuntToday: vi.fn(() => false),
   getTodaysWordHuntResult: vi.fn(() => null),
+  getWordHuntResultForDate: vi.fn(() => null),
   saveWordHuntResult: vi.fn(() => ({ currentStreak: 3 })),
   getDailyStreak: vi.fn(() => 0),
   parseChallengeParam: vi.fn(() => null),
@@ -175,7 +176,7 @@ describe('DailyChallenge — interstitial before results', () => {
     await waitFor(() => expect(screen.getByTestId('results-screen')).toBeInTheDocument());
   });
 
-  it('skips the ad for catch-up days (already paid with a rewarded ad)', async () => {
+  it('skips the ad for catch-up days (previous days are ad-free)', async () => {
     mockDateParam = '2024-01-09';
     await finishGame();
     await waitFor(() => expect(screen.getByTestId('results-screen')).toBeInTheDocument());

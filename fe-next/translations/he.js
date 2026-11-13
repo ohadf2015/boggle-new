@@ -10147,7 +10147,7 @@ const he = {
 "playToday": "לחידות של היום",
 "playThisDay": "לשחק בציד המילים של היום הזה",
 "catchUpTitle": "להשלים ימים",
-"catchUpHint": "בחינם, ונספר ברצף שלכם",
+"catchUpHint": "משחקים בחינם",
 "olderTitle": "חידות ישנות יותר",
 "olderHint": "איך הלך לכולם",
 "wordHunt": "ציד מילים",

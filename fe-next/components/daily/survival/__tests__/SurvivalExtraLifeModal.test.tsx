@@ -239,5 +239,24 @@ describe('SurvivalExtraLifeModal', () => {
     expect(screen.getByTestId('survival-extralife-coin-cta')).toBeDisabled();
     expect(screen.getByTestId('survival-extralife-decline')).toBeDisabled();
   });
-});
 
+  it('Given a previous-day run (adFree), Then no ad is offered and the coin restore shows instead', () => {
+    render(
+      <SurvivalExtraLifeModal
+        isOpen
+        adFree
+        restoreAmount={50}
+        onRestore={vi.fn()}
+        onDecline={vi.fn()}
+        coinCost={10}
+        canAffordCoinRestore
+        onCoinRestore={vi.fn()}
+        t={t}
+        language="en"
+      />,
+    );
+    expect(screen.queryByTestId('survival-extralife-cta')).toBeNull();
+    expect(screen.getByTestId('survival-extralife-coin-cta')).toBeDefined();
+    expect(unlockOpts?.disabled).toBe(true);
+  });
+});

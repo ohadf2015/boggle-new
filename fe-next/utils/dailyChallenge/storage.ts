@@ -409,6 +409,10 @@ export function hasPlayedWordHunt(language: Language, date: string): boolean {
   return getFromLocalStorage(getWordHuntResultKey(language, date)) !== null;
 }
 
+export function getWordHuntResultForDate(language: Language, date: string): StoredWordHuntResult | null {
+  return getJsonFromLocalStorage<StoredWordHuntResult | null>(getWordHuntResultKey(language, date), null);
+}
+
 /**
  * Check if user has played a specific date's Word Wheel (for catch-up)
  */

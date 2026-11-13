@@ -5,8 +5,10 @@ import { getCatchUpDates, getMissedCatchUpDates } from '@/utils/dailyChallenge/c
 import { getPuzzleNumber } from '@/utils/dailyChallenge/dateUtils'
 import logger from '@/utils/logger'
 
+const GAME_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru']
+
 /**
- * GET /api/daily/missed?mode=word-hunt|word-wheel
+ * GET /api/daily/missed?mode=word-hunt|word-wheel&language=en
  * Daily challenges (Word Hunt or Word Wheel) in the catch-up window (last 3 days) that the
  * authenticated player has not played yet. Powers the post-results
  * "catch up your missed dailies" suggestion.
@@ -24,6 +26,8 @@ export async function GET(request: NextRequest) {
     // Optional-chain nextUrl: production always passes a NextRequest, but unit
     // tests may call with a plain Request (no `.nextUrl`) — default to word-hunt.
     const mode = request?.nextUrl?.searchParams.get('mode') || 'word-hunt'
+    const languageParam = request?.nextUrl?.searchParams.get('language')
+    const language = languageParam && GAME_LANGUAGES.includes(languageParam) ? languageParam : null
 
     if (!user) {
       return NextResponse.json({ today, missed: [] })
@@ -35,11 +39,12 @@ export async function GET(request: NextRequest) {
     const table = mode === 'word-wheel' ? 'daily_word_wheel_attempts' : 'daily_word_hunt_attempts'
 
     // Any attempt counts as played: a failed Word Hunt is locked by check-played just like a solved one.
-    const query = supabase
+    let query = supabase
       .from(table)
       .select('puzzle_date')
       .eq('player_id', user.id)
       .in('puzzle_date', getCatchUpDates(today))
+    if (language) query = query.eq('language', language)
 
     const { data: playedRows, error } = await query
     if (error) {

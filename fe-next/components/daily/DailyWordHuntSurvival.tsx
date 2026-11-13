@@ -73,6 +73,8 @@ interface DailyWordHuntSurvivalProps {
   currentGuestFingerprint?: string | null;
   /** Practice mode: suppress life drain + extra-life monetization. */
   practice?: boolean;
+  /** Previous-day run: no ads. */
+  adFree?: boolean;
   /**
    * Quick Play only: other players' scores on this mode, shown as a live
    * standing in the practice header. Undefined for the daily challenge.
@@ -108,6 +110,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   currentPlayerId,
   currentGuestFingerprint,
   practice = false,
+  adFree = false,
   rivals,
   hideModeCoach = false,
   quitStaysOnPage = false,
@@ -279,6 +282,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const extraLifeModal = extraLifeModalOpen ? (
     <SurvivalExtraLifeModal
       isOpen
+      adFree={adFree}
       restoreAmount={EXTRA_LIFE_RESTORE_AMOUNT}
       onRestore={extraLife.onAdRestore}
       onDecline={extraLife.onDecline}

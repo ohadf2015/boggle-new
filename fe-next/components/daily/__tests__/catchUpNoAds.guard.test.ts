@@ -28,4 +28,10 @@ describe('playing a previous day is ad-free', () => {
     );
     expect(offenders).toEqual([]);
   });
+
+  it('Given a Word Hunt past-day run, Then the extra-life ad and the results retry (ad on native) are off', () => {
+    const src = readFileSync(join(ROOT, 'DailyChallenge.tsx'), 'utf8');
+    expect(src).toMatch(/adFree=\{isCatchup\}/);
+    expect(src).toMatch(/retryable=\{!isCatchup\}/);
+  });
 });

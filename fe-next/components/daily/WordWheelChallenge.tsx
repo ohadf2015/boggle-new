@@ -42,7 +42,6 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { WordWheelEffect } from './WordWheelEffectsCanvas';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
-import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import PracticeBadge from '@/components/practice/PracticeBadge';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';

@@ -79,6 +79,7 @@ export {
   hasPlayedWordHuntToday,
   getWordHuntStatusToday,
   getTodaysWordHuntResult,
+  getWordHuntResultForDate,
   saveWordHuntResult,
   clearWordHuntResultForRetry,
   markWordHuntForfeitToday,

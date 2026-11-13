@@ -17,6 +17,8 @@ import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
 export interface ShareSectionProps {
   solved: boolean;
+  /** False on a previous day's results: retry resets today's play. */
+  retryable?: boolean;
   onShare: () => void;
   onChallengeShare?: () => void;
   /** Web retry path — spends coins (wrapped by useCoinActions). */
@@ -84,6 +86,7 @@ function WatchAdRetryButton({
 
 export const ShareSection: React.FC<ShareSectionProps> = ({
   solved,
+  retryable = true,
   onShare,
   onChallengeShare,
   onRetry,
@@ -128,7 +131,7 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
       </div>
 
       {/* Failed players: Retry is primary, Share is secondary */}
-      {!solved ? (
+      {!solved && retryable ? (
         <div className="max-w-btn mx-auto space-y-2">
           {useAdRetry ? (
             // Native (Android/iOS): rewarded-ad gated retry — no coin spend.

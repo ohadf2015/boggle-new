@@ -26,8 +26,8 @@ const serverList = (r: { missed: MissedDaily[]; status: MissedDailiesStatus }) =
 export default function CatchUpDays() {
   const { t, language } = useLanguage();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const hunt = useMissedDailies('word-hunt', isAuthenticated);
-  const wheel = useMissedDailies('word-wheel', isAuthenticated);
+  const hunt = useMissedDailies('word-hunt', isAuthenticated, language);
+  const wheel = useMissedDailies('word-wheel', isAuthenticated, language);
 
   // Played state lives in localStorage and the server; render nothing until both can be read.
   const [mounted, setMounted] = useState(false);
@@ -53,6 +53,7 @@ export default function CatchUpDays() {
     <ol className="grid gap-3">
       {days.map((day, i) => {
         const allDone = CATCH_UP_MODES.every(mode => day.played[mode]);
+        const dayLabel = i === 0 ? t('daily.catchUp.yesterday') : t('daily.catchUp.daysAgo', { count: i + 1 });
         return (
           <li
             key={day.date}
@@ -60,7 +61,7 @@ export default function CatchUpDays() {
           >
             <div className="mb-3 flex items-baseline gap-2">
               <h3 className="font-neo-display text-lg font-black text-neo-white">
-                {i === 0 ? t('daily.catchUp.yesterday') : t('daily.catchUp.daysAgo', { count: i + 1 })}
+                {dayLabel}
               </h3>
               <span className="text-sm font-semibold text-neo-white/60">
                 {safeToLocaleDateString(new Date(day.date + 'T00:00:00Z'), language, { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}
@@ -70,21 +71,24 @@ export default function CatchUpDays() {
             <div className="grid grid-cols-2 gap-2">
               {CATCH_UP_MODES.map(mode => {
                 const played = day.played[mode];
+                const modeName = t(`daily.archivePage.${mode === 'word-hunt' ? 'wordHunt' : 'wordWheel'}`);
+                const status = t(played ? 'daily.archivePage.done' : 'daily.archivePage.play');
                 return (
                   <Link
                     key={mode}
                     href={catchUpPlayHref(language, mode, day.date)}
                     data-testid={`catch-up-${mode}-${day.date}`}
                     data-played={played}
+                    aria-label={`${modeName} · ${dayLabel} · ${status}`}
                     className={`flex min-h-14 items-center gap-2 rounded-neo border-neo border-neo-black px-2.5 py-2 font-neo-display font-black shadow-hard-sm transition-transform hover:-translate-y-px active:translate-y-px active:shadow-hard-pressed ${
                       played ? 'bg-neo-navy text-neo-white/70' : `${MODE_STYLE[mode].play} text-neo-black`
                     }`}
                   >
                     <span aria-hidden className="text-lg">{MODE_STYLE[mode].emoji}</span>
                     <span className="min-w-0 flex-1 leading-tight">
-                      <span className="block text-sm [overflow-wrap:anywhere]">{t(`daily.archivePage.${mode === 'word-hunt' ? 'wordHunt' : 'wordWheel'}`)}</span>
+                      <span className="block text-sm [overflow-wrap:anywhere]">{modeName}</span>
                       <span className={`block text-xs ${played ? 'text-neo-lime' : 'text-neo-black/70'}`}>
-                        {t(played ? 'daily.archivePage.done' : 'daily.archivePage.play')}
+                        {status}
                       </span>
                     </span>
                     {played && <Check aria-hidden className="h-5 w-5 shrink-0 text-neo-lime" strokeWidth={3} />}

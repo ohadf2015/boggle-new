@@ -85,6 +85,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
   formatCountdown: vi.fn(() => '1:00:00'),
   hasPlayedWordHuntToday: vi.fn(() => false),
   getTodaysWordHuntResult: vi.fn(() => null),
+  getWordHuntResultForDate: vi.fn(() => null),
   saveWordHuntResult: vi.fn(),
   getDailyStreak: vi.fn(() => 0),
   parseChallengeParam: vi.fn(() => null),

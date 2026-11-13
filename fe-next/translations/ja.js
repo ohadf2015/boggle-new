@@ -10207,7 +10207,7 @@ const ja = {
 "playToday": "今日のパズルをプレイ",
 "playThisDay": "この日のワードハントをプレイ",
 "catchUpTitle": "遊び逃した日",
-"catchUpHint": "無料・連続記録にもカウント",
+"catchUpHint": "無料でプレイ",
 "olderTitle": "以前のパズル",
 "olderHint": "みんなの結果",
 "wordHunt": "ワードハント",

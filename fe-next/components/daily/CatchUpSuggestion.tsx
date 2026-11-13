@@ -27,7 +27,7 @@ interface CatchUpSuggestionProps {
  */
 export default function CatchUpSuggestion({ excludeDate, mode = 'word-hunt' }: CatchUpSuggestionProps) {
   const { t, language } = useLanguage();
-  const { missed } = useMissedDailies(mode);
+  const { missed } = useMissedDailies(mode, true, language);
   const today = getDailyChallengeDate();
 
   // On a past day's own results two unsolved days would offer each other forever (#189<->#190).
