@@ -48,6 +48,10 @@ describe('PageClient — leaving a classroom room does not drop the teacher in t
     expect(body).toMatch(/router\.(push|replace)\(/);
   });
 
+  it('replaces the left room in history, so Back never lands on a room-less live page', () => {
+    expect(exitHandlerBody()).toMatch(/router\.replace\(destination\)/);
+  });
+
   it('does not hardcode a teacher or student route at the call site', () => {
     const body = exitHandlerBody();
     expect(body).not.toMatch(/['"`]\/\$\{[^}]*\}\/teacher['"`]/);

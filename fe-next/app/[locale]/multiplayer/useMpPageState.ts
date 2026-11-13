@@ -279,8 +279,9 @@ export function useMpPageState() {
     });
     // `null` = an ordinary arcade game, where the lobby genuinely is home and
     // the in-place reset above is the whole exit (a hard nav blanks the
-    // Capacitor WebView). A router push is SPA navigation, so it is safe too.
-    if (destination) router.push(destination);
+    // Capacitor WebView). A router replace is SPA navigation, so it is safe too, and
+    // Back then skips the room-less page this entry became.
+    if (destination) router.replace(destination);
     return Boolean(destination);
   }, [gameCode, username, setIsActive, setIsHost, setIsPrivate, setGameCode, setShowResults, setResultsData,
       classroomContext, isHost, isClassroomHost, language, router, pathname]);

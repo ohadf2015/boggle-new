@@ -42,6 +42,8 @@ import * as classroomGameManager from '../../modules/classroomGameManager';
 import * as gameStateManager from '../../modules/gameStateManager';
 import * as lessonWords from '../../services/vocabQuizLessonWords';
 import { startVocabQuizForClassroom, stopAllQuizzesForTest } from '../vocabQuizHandler';
+import { getQuizSession } from '../../modules/vocabQuizStore';
+import { roundIdOf } from '../classroomEconomyHandler';
 
 const word = (w: string, definition: string): VocabularyWord => ({ word: w, definition, canIntegrate: true });
 
@@ -94,6 +96,17 @@ describe('startVocabQuizForClassroom reopens the classroom code', () => {
       CODE,
       expect.objectContaining({ gameCode: CODE })
     );
+  });
+
+  it('Given room round 7, When a quiz round starts, Then its round id is the one the reward check compares', async () => {
+    const room = { gameCode: CODE, gameSessionId: 7, users: { Teacher: { isHost: true, socketId: 's-t' }, Maya: { socketId: 's-m', authUserId: 'u-maya' } } };
+    (gameStateManager.getGame as Mock).mockReturnValue(room);
+    (classroomGameManager.getClassroomGame as Mock).mockResolvedValue(quizRoom('vocab-quiz'));
+
+    await startVocabQuizForClassroom(io, CODE);
+
+    expect(getQuizSession(CODE)?.shellSessionId).toBe(7);
+    expect(String(getQuizSession(CODE)?.shellSessionId)).toBe(roundIdOf(room, CODE));
   });
 
   it('does not reopen a room the quiz declines to take over', async () => {

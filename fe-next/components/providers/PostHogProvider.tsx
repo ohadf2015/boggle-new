@@ -10,6 +10,7 @@
  * - Tracks page views on route changes (manual, not autocapture)
  */
 
+import { posthogApiHost } from '@/lib/analytics/posthogApiHost';
 import { Suspense, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 // Lazy proxy — NO static `posthog-js` import. The lib is dynamic-import()ed on
@@ -82,7 +83,8 @@ function initPostHog() {
   posthogInitialized = true;
 
   posthog.init(key, {
-    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://eu.i.posthog.com',
+    api_host: posthogApiHost(window.location.hostname, process.env.NEXT_PUBLIC_POSTHOG_HOST),
+    ui_host: 'https://eu.posthog.com',
     // GDPR: opted-out visitors are captured cookielessly; only an accepted banner enables cookies.
     opt_out_capturing_by_default: true,
     cookieless_mode: 'on_reject',

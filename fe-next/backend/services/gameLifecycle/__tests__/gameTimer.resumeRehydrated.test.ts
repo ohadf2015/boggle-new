@@ -33,12 +33,14 @@ vi.mock('../botGame', () => ({ startBotsForGame: vi.fn(), restoreBotsForGame: vi
 vi.mock('../gameEnd', () => ({ endGame: vi.fn().mockResolvedValue(undefined) }));
 vi.mock('../../../utils/gameStateMachine', () => ({ isInProgress: vi.fn() }));
 vi.mock('../../../dictionary', () => ({ ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined) }));
+vi.mock('../../../modules/vocabQuizStore', () => ({ hasQuizSession: vi.fn().mockReturnValue(false) }));
 
 import { vi, type Mock } from 'vitest';
 import { getGame } from '../../../modules/gameStateManager';
 import { hasGameTimer, setGameTimer } from '../../../utils/timerManager';
 import { isInProgress } from '../../../utils/gameStateMachine';
 import { resumeGameTimerIfMissing } from '../gameTimer';
+import { hasQuizSession } from '../../../modules/vocabQuizStore';
 import { tryAcquireGameStart, releaseGameStart, STALE_START_MS } from '../../../handlers/gameStartMutex';
 
 const mGetGame = getGame as Mock;
@@ -64,6 +66,18 @@ describe('resumeGameTimerIfMissing', () => {
 
     expect(resumed).toBe(true);
     expect(mSetTimer).toHaveBeenCalledWith('G1', expect.anything()); // startGameTimer registered an interval
+  });
+
+  it('Given a live vocab quiz in the room, When a student rejoins, Then no board clock starts (the quiz runs its own)', async () => {
+    mGetGame.mockReturnValue({ gameState: 'in-progress', gameMode: 'classic', gameDuration: 180, remainingTime: 11 });
+    mInProgress.mockReturnValue(true);
+    mHasTimer.mockReturnValue(false);
+    (hasQuizSession as Mock).mockReturnValueOnce(true);
+
+    const resumed = await resumeGameTimerIfMissing(io, 'G1');
+
+    expect(resumed).toBe(false);
+    expect(mSetTimer).not.toHaveBeenCalled();
   });
 
   it('does NOT restart the timer when one is already running (normal live reconnect)', async () => {

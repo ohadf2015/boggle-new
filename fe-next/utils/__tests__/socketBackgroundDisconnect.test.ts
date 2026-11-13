@@ -15,10 +15,14 @@ import { shouldArmBackgroundDisconnect } from '../socketBackgroundDisconnect';
 
 describe('shouldArmBackgroundDisconnect', () => {
   it('arms on an ordinary backgrounding (no ad) — battery/data saving preserved', () => {
-    expect(shouldArmBackgroundDisconnect({ fullscreenAdActive: false })).toBe(true);
+    expect(shouldArmBackgroundDisconnect({ fullscreenAdActive: false, classroomLive: false })).toBe(true);
   });
 
   it('does NOT arm while a fullscreen ad owns the screen', () => {
-    expect(shouldArmBackgroundDisconnect({ fullscreenAdActive: true })).toBe(false);
+    expect(shouldArmBackgroundDisconnect({ fullscreenAdActive: true, classroomLive: false })).toBe(false);
+  });
+
+  it('Given a student in a live class game, When the phone hides the page, Then the socket stays up so the next round still seats them', () => {
+    expect(shouldArmBackgroundDisconnect({ fullscreenAdActive: false, classroomLive: true })).toBe(false);
   });
 });

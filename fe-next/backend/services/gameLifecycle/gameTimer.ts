@@ -19,6 +19,7 @@ import { ensureLanguageLoaded } from '../../dictionary';
 import gameStartCoordinator from '../../utils/gameStartCoordinator';
 import { isGameStarting, isGameStartStale, STALE_START_MS } from '../../handlers/gameStartMutex';
 import logger from '../../utils/logger';
+import { hasQuizSession } from '../../modules/vocabQuizStore';
 
 /**
  * Consecutive ticks a word-hunt round may run with a NULL wordHuntState before
@@ -392,6 +393,8 @@ export async function resumeGameTimerIfMissing(io: Server, gameCode: string): Pr
   }
   // A teacher-paused round has no interval BY DESIGN — it is not orphaned.
   if (game.isPaused) return false;
+  // A live vocab quiz runs its own question clock; a board clock here would end the room mid-quiz.
+  if (hasQuizSession(gameCode)) return false;
   // The 3-2-1 countdown starts the clock itself (countdownComplete or its 8s fallback).
   const sequence = gameStartCoordinator.getSequenceStats(gameCode);
   if (sequence && !sequence.timerStarted) return false;
