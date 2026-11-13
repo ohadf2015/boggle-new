@@ -279,6 +279,13 @@ describe('EducationNav — teacher sidebar extras', () => {
     expect(queryByText('teacher.plan.upgrade')).toBeNull();
   });
 
+  it('dresses a paying teacher in the gold Pro badge instead of a plain label', () => {
+    const nav = resolveEducationNav('/en/teacher/classroom')!;
+    const { getByTestId, queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="pro" />);
+    expect(getByTestId('education-side-pro-owned').getAttribute('data-pro-badge')).toBe('md');
+    expect(queryByTestId('education-side-pro-crown')).toBeNull();
+  });
+
   it('labels a Polar trial in the pill', () => {
     const nav = resolveEducationNav('/en/teacher/classroom')!;
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="trial" />);

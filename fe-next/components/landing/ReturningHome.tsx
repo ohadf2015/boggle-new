@@ -111,6 +111,9 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
           profileLoading={dashboardProfileLoading}
         />
 
+        {/* Teachers: their class first, right under the greeting. Renders nothing for anyone else. */}
+        <HomeEducationCardConnected slot="top" />
+
         <HomeDailyHero preloadedStats={dailyChallengeStats} />
         <HomeAdventureCard />
         <LandingChallengeCards
@@ -123,7 +126,7 @@ export const ReturningHome: React.FC<ReturningHomeProps> = ({ initialData }) => 
         />
         {/* Education entry: teacher dashboard, the student's class, or the
             classroom-mode promo for everyone else. Slim, after the modes. */}
-        <HomeEducationCardConnected />
+        <HomeEducationCardConnected slot="bottom" />
       </section>
     </LaunchProvider>
   );

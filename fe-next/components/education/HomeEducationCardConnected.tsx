@@ -8,6 +8,7 @@ import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { HomeEducationCard } from './HomeEducationCard';
+import { TeacherClassEntryCard } from './TeacherClassEntryCard';
 
 /**
  * Decides whether the homepage should surface an education entry point, and for
@@ -29,14 +30,25 @@ import { HomeEducationCard } from './HomeEducationCard';
  */
 const noopSubscribe = () => () => {};
 
-export function HomeEducationCardConnected() {
+/**
+ * `slot` lets the returning home split the entry by role: teachers get a big card
+ * at the TOP (their class is why they came), everyone else keeps the slim strip
+ * after the modes. Without a slot, the old single-strip behaviour is kept.
+ */
+export type HomeEducationSlot = 'top' | 'bottom';
+
+export function HomeEducationCardConnected({ slot }: { slot?: HomeEducationSlot } = {}) {
   const { isAuthenticated, isTeacher, isAdmin } = useAuth();
   const isGuest = useIsGuest(isAuthenticated);
   // false on the server and during hydration (no storage there), so the server
   // HTML and the first client render agree; the real value lands right after.
   const noStoredSession = useSyncExternalStore(noopSubscribe, () => !hasSupabaseSession(), () => false);
 
-  if (isTeacher || isAdmin) return <TeacherHomeCard />;
+  if (isTeacher || isAdmin) {
+    if (slot === 'bottom') return null;
+    return slot === 'top' ? <TeacherTopCard /> : <TeacherHomeCard />;
+  }
+  if (slot === 'top') return null;
   // Guests get the promo but no classroom lookup — there is no session to look up.
   if (isGuest) return <EducationPromoCard />;
   // Neither a guest nor authed yet = auth still resolving. On the homepage that can
@@ -54,6 +66,12 @@ export function HomeEducationCardConnected() {
 function TeacherHomeCard() {
   const { trial } = useTeacherAccess();
   return <HomeEducationCard role="teacher" trial={trial} />;
+}
+
+/** Teacher/admin at the top of home: the prominent class entry. */
+function TeacherTopCard() {
+  const { trial } = useTeacherAccess();
+  return <TeacherClassEntryCard trial={trial} />;
 }
 
 /** Non-teacher authed user: show the card only once we've confirmed a classroom

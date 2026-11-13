@@ -1,0 +1,105 @@
+/*
+ * Teacher Pro badge — stamped gold foil, neo-brutalist edge.
+ * Lives in the critical CSS (imported by globals.css) so the badge never paints
+ * as a plain pill and then snaps to gold. Motion is opt-in via
+ * prefers-reduced-motion: no-preference.
+ */
+.pro-badge {
+  --pro-ink: #241503;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.28em;
+  border: 2px solid var(--pro-ink);
+  border-radius: 9999px;
+  color: var(--pro-ink);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.55);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.5) 0%, rgb(255 255 255 / 0.12) 46%, rgb(255 255 255 / 0) 52%),
+    linear-gradient(115deg, #fff3b0 0%, #ffd84a 22%, #f7b02a 46%, #ffe48a 60%, #f0a21c 80%, #c97f06 100%);
+  box-shadow:
+    2px 2px 0 var(--pro-ink),
+    inset 0 -2px 0 rgb(122 66 0 / 0.38),
+    inset 0 1px 0 rgb(255 255 255 / 0.7);
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.pro-badge__crown {
+  width: 1.05em;
+  height: 1.05em;
+  flex-shrink: 0;
+  fill: #fff6c7;
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.55));
+}
+
+.pro-badge__label {
+  position: relative;
+}
+
+.pro-badge__shine {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+}
+
+.pro-badge__shine::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  bottom: -20%;
+  left: 0;
+  width: 38%;
+  background: linear-gradient(90deg, rgb(255 255 255 / 0) 0%, rgb(255 255 255 / 0.85) 50%, rgb(255 255 255 / 0) 100%);
+  transform: translateX(-180%) skewX(-22deg);
+}
+
+/* Sizes */
+.pro-badge--xs { font-size: 10px; padding: 2px 6px; border-width: 1.5px; box-shadow: 1.5px 1.5px 0 var(--pro-ink), inset 0 -1.5px 0 rgb(122 66 0 / 0.38); }
+.pro-badge--sm { font-size: 12px; padding: 3px 8px; }
+.pro-badge--md { font-size: 14px; padding: 4px 10px; }
+.pro-badge--lg { font-size: 18px; padding: 6px 14px; border-width: 3px; box-shadow: 3px 3px 0 var(--pro-ink), inset 0 -3px 0 rgb(122 66 0 / 0.38), inset 0 1px 0 rgb(255 255 255 / 0.7); }
+
+@keyframes pro-badge-sweep {
+  0%, 72% { transform: translateX(-180%) skewX(-22deg); }
+  100% { transform: translateX(380%) skewX(-22deg); }
+}
+
+@keyframes pro-badge-sweep-once {
+  from { transform: translateX(-180%) skewX(-22deg); }
+  to { transform: translateX(380%) skewX(-22deg); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pro-badge__shine::after {
+    animation: pro-badge-sweep 4.6s cubic-bezier(0.45, 0, 0.2, 1) 0.8s infinite;
+  }
+  .pro-badge:hover,
+  a:hover .pro-badge,
+  button:hover .pro-badge {
+    transform: translate(-1px, -1px) rotate(-2deg);
+  }
+  .pro-badge:hover .pro-badge__shine::after,
+  a:hover .pro-badge__shine::after,
+  button:hover .pro-badge__shine::after {
+    animation: pro-badge-sweep-once 620ms ease-out 1;
+  }
+  [dir='rtl'] .pro-badge:hover,
+  [dir='rtl'] a:hover .pro-badge,
+  [dir='rtl'] button:hover .pro-badge {
+    transform: translate(1px, -1px) rotate(2deg);
+  }
+}
+
+@media print {
+  .pro-badge__shine { display: none; }
+}

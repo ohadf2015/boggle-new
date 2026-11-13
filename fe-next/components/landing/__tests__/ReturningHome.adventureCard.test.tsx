@@ -31,14 +31,15 @@ vi.mock('../LandingChallengeCards', () => ({
   },
 }));
 vi.mock('@/components/education/HomeEducationCardConnected', () => ({
-  HomeEducationCardConnected: () => <div data-testid="slot-edu" />,
+  HomeEducationCardConnected: ({ slot }: { slot?: string }) => <div data-testid={slot === 'top' ? 'slot-edu-top' : 'slot-edu'} />,
 }));
 
 describe('ReturningHome — Adventure card', () => {
   it('Given a returning player, then the Adventure card sits between the daily hero and the mode grid, and the grid drops its duplicate tile', () => {
     render(<ReturningHome />);
     const order = Array.from(document.querySelectorAll('[data-testid^="slot-"]')).map((el) => el.getAttribute('data-testid'));
-    expect(order).toEqual(['slot-topbar', 'slot-daily', 'slot-adventure', 'slot-modes', 'slot-edu']);
+    // The top education slot renders only for teachers (their class first); players see nothing there.
+    expect(order).toEqual(['slot-topbar', 'slot-edu-top', 'slot-daily', 'slot-adventure', 'slot-modes', 'slot-edu']);
     expect(screen.getByTestId('slot-adventure')).toBeInTheDocument();
     expect(challengeProps).toHaveBeenCalledWith(expect.objectContaining({ hideAdventure: true }));
   });

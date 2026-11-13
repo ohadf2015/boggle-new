@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
-import { Crown, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NB_BLOCK, NB_DARK_EDGE, NB_PANEL, NB_SMALL } from '../nb/nbStyles';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 export type ProBannerTone = 'calm' | 'urgent';
 
@@ -74,13 +75,12 @@ export function ProBanner({
           tone === 'urgent' ? 'bg-neo-pink' : 'bg-neo-yellow',
         )}
       />
-      <span
+      <ProBadge
         data-testid={`${testId}-sticker`}
-        className="absolute -top-3.5 start-4 inline-flex -rotate-3 items-center gap-1 rounded-neo border-[3px] border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black uppercase text-neo-black shadow-hard"
-      >
-        <Crown className="size-3.5" aria-hidden="true" />
-        {proLabel}
-      </span>
+        size="sm"
+        label={proLabel}
+        className="absolute -top-3.5 start-4 -rotate-3"
+      />
       {onDismiss ? (
         <button
           type="button"

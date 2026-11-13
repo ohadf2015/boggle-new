@@ -24,7 +24,7 @@ const fills = (root: HTMLElement) =>
 afterEach(cleanup);
 
 describe('ProGate calm tone (reports)', () => {
-  it('Given a never-trialed free teacher, Then the lock has one lime trial CTA, a small yellow PRO badge, and no other fill', () => {
+  it('Given a never-trialed free teacher, Then the lock has one lime trial CTA, a small gold Pro badge, and no other fill', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, status: 'active', trialUsed: false });
     const { container } = render(
       <ProGate feature="reports" tone="calm" polarTrialPlacement="reports_teaser">
@@ -35,7 +35,7 @@ describe('ProGate calm tone (reports)', () => {
     const badge = screen.getByTestId('pro-gate-pill');
     expect(cta).toHaveTextContent('eduPlans.reports.startTrialCta');
     expect(cta.className).toMatch(/\bbg-neo-lime\b/);
-    expect(badge.className).toMatch(/\bbg-neo-yellow\b/);
+    expect(badge.className).toMatch(/\bpro-badge\b/);
     expect(badge).toHaveTextContent('eduShell.nav.pro');
     expect(fills(container).filter((el) => el !== cta && el !== badge)).toEqual([]);
     expect(container.querySelectorAll('.uppercase')).toHaveLength(0);
@@ -59,7 +59,7 @@ describe('ProGate calm tone (reports)', () => {
       </ProGate>,
     );
     expect(screen.getByTestId('pro-gate-upgrade-analytics').className).toMatch(/\bbg-neo-lime\b/);
-    expect(screen.getByTestId('pro-gate-pill').className).toMatch(/\bbg-neo-yellow\b/);
+    expect(screen.getByTestId('pro-gate-pill').className).toMatch(/\bpro-badge\b/);
     expect(screen.getByTestId('pro-gate-lock').className).toMatch(/\bshadow-hard-xl\b/);
     expect(screen.getByTestId('pro-gate-upgrade-analytics')).toHaveTextContent('eduPlans.reports.trialCta');
   });

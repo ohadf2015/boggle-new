@@ -184,3 +184,30 @@ describe('HomeEducationCardConnected', () => {
     expect(screen.getByTestId('home-education-subtitle')).toHaveTextContent('Room 12');
   });
 });
+
+describe('HomeEducationCardConnected slots (returning home)', () => {
+  beforeEach(() => {
+    useAuthMock.mockReset();
+    useTeacherAccessMock.mockReset();
+    useStudentClassroomMock.mockReset();
+    useTeacherAccessMock.mockReturnValue(teacherAccess());
+    useStudentClassroomMock.mockReturnValue(studentClassroom());
+  });
+
+  it('Given a teacher, Then the top slot shows the big class entry and the bottom slot shows nothing', () => {
+    useAuthMock.mockReturnValue(auth({ isTeacher: true }));
+    const { rerender } = render(<HomeEducationCardConnected slot="top" />);
+    expect(screen.getByTestId('home-teacher-class-entry')).toHaveAttribute('href', '/en/teacher');
+    rerender(<HomeEducationCardConnected slot="bottom" />);
+    expect(screen.queryByTestId('home-teacher-class-entry')).toBeNull();
+    expect(screen.queryByTestId('home-education-strip')).toBeNull();
+  });
+
+  it('Given a player, Then the top slot is empty and the strip stays at the bottom', () => {
+    useAuthMock.mockReturnValue(auth({ isAuthenticated: false }));
+    const { rerender } = render(<HomeEducationCardConnected slot="top" />);
+    expect(screen.queryByTestId('home-education-strip')).toBeNull();
+    rerender(<HomeEducationCardConnected slot="bottom" />);
+    expect(screen.getByTestId('home-education-strip')).toBeInTheDocument();
+  });
+});

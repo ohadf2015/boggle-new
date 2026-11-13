@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
+import { ProBadge } from '@/components/ui/ProBadge';
 import type { EducationNavItem, ResolvedEducationNav } from './navItems';
 import './eduNav.css';
 
@@ -192,8 +193,17 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
                 FOCUS,
               )}
             >
-              <Crown data-testid="education-side-pro-crown" className="h-5 w-5 shrink-0 text-neo-yellow" aria-hidden />
-              <span className="line-clamp-2 min-w-0 flex-1 leading-tight">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
+              {plan === 'pro' ? (
+                // A paying teacher wears the gold badge itself, not a plain label.
+                <span className="min-w-0 flex-1">
+                  <ProBadge data-testid="education-side-pro-owned" size="md" label={t('eduShell.nav.pro')} />
+                </span>
+              ) : (
+                <>
+                  <Crown data-testid="education-side-pro-crown" className="h-5 w-5 shrink-0 text-neo-yellow" aria-hidden />
+                  <span className="line-clamp-2 min-w-0 flex-1 leading-tight">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
+                </>
+              )}
               {plan === 'free' || plan === 'trial' ? (
                 <span
                   data-testid="education-side-pro-pill"

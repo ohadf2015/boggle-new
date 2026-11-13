@@ -18,6 +18,7 @@ import {
 import { TeacherWhatsNewDialog } from '@/components/teacher/TeacherWhatsNew';
 import AvatarLite from '@/components/AvatarLite';
 import { NB_MENU, NB_MENU_ITEM } from '@/components/teacher/nb/nbDialogStyles';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 export interface TeacherAccountMenuProps {
   proHref: string;
@@ -81,9 +82,7 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
             <Link href={proHref}>
               <Crown className="size-4" aria-hidden="true" />
               {t('eduShell.account.plans')}
-              <span data-testid="teacher-account-pro-badge" className="ms-auto rounded-neo-pill border-2 border-neo-black bg-neo-yellow px-2 py-px text-xs font-black text-neo-black">
-                {t('eduShell.nav.pro')}
-              </span>
+              <ProBadge data-testid="teacher-account-pro-badge" size="xs" crown={false} className="ms-auto" label={t('eduShell.nav.pro')} />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className={ITEM}>

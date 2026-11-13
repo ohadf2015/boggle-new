@@ -17,6 +17,7 @@ import { ReportShareActions, ReportPrintStyles, buildReportSummary } from './Rep
 import { ReportEmptyState } from './ReportEmptyState';
 import type { ClassInsights, WordState } from './classInsights';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
+import { ProBadge } from '@/components/ui/ProBadge';
 
 export interface WordMasteryReportProps {
   classroomId: string;
@@ -249,9 +250,7 @@ function Shell({ children, pro = false, actions }: { children: React.ReactNode; 
           <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
             {t('eg2Rep.report.title')}
             {pro && (
-              <span data-testid="mastery-pro-badge" className="inline-flex shrink-0 items-center rounded-full border-2 border-neo-yellow px-1.5 font-neo-body text-[11px] font-black leading-tight text-neo-yellow">
-                {t('eduPro.mastery.proBadge')}
-              </span>
+              <ProBadge data-testid="mastery-pro-badge" size="xs" label={t('eduPro.mastery.proBadge')} />
             )}
           </h2>
           <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
