@@ -63,6 +63,8 @@ function broadcastClassroomsChanged(except?: () => void): void {
   }
 }
 
+const CLASSROOM_RETRY_MS = 800;
+
 export function useClassrooms(): UseClassroomsReturn {
   const { isAuthenticated, user } = useAuth();
   const isMounted = useMounted();
@@ -92,8 +94,17 @@ export function useClassrooms(): UseClassroomsReturn {
       return;
     }
 
+    const read = () => getClassrooms(userId).catch((err: unknown) => {
+      logger.error('Error fetching classrooms:', err);
+      return { data: [], error: { message: 'Failed to load classrooms' } };
+    });
     try {
-      const { data, error } = await getClassrooms(userId);
+      let { data, error } = await read();
+      // One quiet retry: a classroom laptop on busy school wifi drops a read now and then.
+      if (error) {
+        await new Promise((r) => setTimeout(r, CLASSROOM_RETRY_MS));
+        ({ data, error } = await read());
+      }
 
       if (isMounted.current) {
         setState({

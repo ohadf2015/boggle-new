@@ -6,12 +6,16 @@ describe('fitPageSize', () => {
     expect(fitPageSize({ availH: 420, cardH: 128, gap: 12, cols: 4 })).toBe(12);
   });
 
-  it('Given a phone with two columns and room for two rows, Then a page holds four', () => {
-    expect(fitPageSize({ availH: 300, cardH: 128, gap: 12, cols: 2 })).toBe(4);
+  it('Given a phone with two columns and room for two rows, Then a page still holds three rows and scrolls', () => {
+    expect(fitPageSize({ availH: 300, cardH: 128, gap: 12, cols: 2 })).toBe(6);
   });
 
-  it('Given less height than one card, Then a page still holds one full row', () => {
-    expect(fitPageSize({ availH: 40, cardH: 128, gap: 12, cols: 3 })).toBe(3);
+  it('Given a short laptop window with room for one row of four, Then a page holds two rows instead of four cards', () => {
+    expect(fitPageSize({ availH: 140, cardH: 128, gap: 12, cols: 4 })).toBe(8);
+  });
+
+  it('Given a table with room for two rows, Then a page still holds six rows', () => {
+    expect(fitPageSize({ availH: 100, cardH: 44, gap: 0, cols: 1 })).toBe(6);
   });
 
   it('Given a layout that is not measured yet, Then it falls back to the default size', () => {
@@ -19,14 +23,14 @@ describe('fitPageSize', () => {
   });
 
   it('Given an exact fit including gaps, Then the last row is counted', () => {
-    expect(fitPageSize({ availH: 128 * 3 + 12 * 2, cardH: 128, gap: 12, cols: 1 })).toBe(3);
+    expect(fitPageSize({ availH: 128 * 8 + 12 * 7, cardH: 128, gap: 12, cols: 1 })).toBe(8);
   });
 
-  it('Given a one-column phone list with room for two cards, When a stacked minimum is set, Then the page holds the minimum and scrolls', () => {
-    expect(fitPageSize({ availH: 300, cardH: 104, gap: 8, cols: 1, minStacked: 6 })).toBe(6);
+  it('Given a one-column phone list with room for two cards, When a minimum is set, Then the page holds the minimum and scrolls', () => {
+    expect(fitPageSize({ availH: 300, cardH: 104, gap: 8, cols: 1, minItems: 9 })).toBe(9);
   });
 
-  it('Given several columns, Then the stacked minimum does not apply', () => {
-    expect(fitPageSize({ availH: 300, cardH: 128, gap: 12, cols: 2, minStacked: 6 })).toBe(4);
+  it('Given several columns and a minimum, Then whole rows cover the minimum', () => {
+    expect(fitPageSize({ availH: 300, cardH: 128, gap: 12, cols: 2, minItems: 9 })).toBe(10);
   });
 });

@@ -7,17 +7,19 @@ interface FitInput {
   cardH: number;
   gap: number;
   cols: number;
-  /** One-column phone lists scroll rather than show two cards a page. */
-  minStacked?: number;
+  /** A short window scrolls rather than page through a handful of items. */
+  minItems?: number;
 }
 
-export function fitPageSize({ availH, cardH, gap, cols, minStacked = 1 }: FitInput, fallback = 12): number {
+export const MIN_PAGE_ITEMS = 6;
+
+export function fitPageSize({ availH, cardH, gap, cols, minItems = MIN_PAGE_ITEMS }: FitInput, fallback = 12): number {
   if (cols < 1 || cardH <= 0) return fallback;
-  const rows = Math.max(cols === 1 ? minStacked : 1, Math.floor((availH + gap) / (cardH + gap)));
+  const rows = Math.max(Math.ceil(minItems / cols), Math.floor((availH + gap) / (cardH + gap)));
   return rows * cols;
 }
 
-function measure(grid: HTMLElement, cardH: number, reserve: number, fallback: number, minStacked: number): number {
+function measure(grid: HTMLElement, cardH: number, reserve: number, fallback: number, minItems: number): number {
   const region = grid.closest<HTMLElement>('.edu-shell-scroll') ?? document.documentElement;
   const regionStyle = getComputedStyle(region);
   const gridStyle = getComputedStyle(grid);
@@ -26,14 +28,14 @@ function measure(grid: HTMLElement, cardH: number, reserve: number, fallback: nu
   const cols = Math.max(1, gridStyle.gridTemplateColumns.split(' ').filter((c) => c && c !== 'none').length);
   const gap = parseFloat(gridStyle.rowGap) || 0;
   const tallest = Math.max(0, ...Array.from(grid.children, (c) => (c as HTMLElement).offsetHeight));
-  return fitPageSize({ availH, cardH: tallest || cardH, gap, cols, minStacked }, fallback);
+  return fitPageSize({ availH, cardH: tallest || cardH, gap, cols, minItems }, fallback);
 }
 
 /**
  * Cards per page so the grid plus its pager fit the shell's scroll region without scrolling.
  * Rows are sized by the tallest rendered card (`cardH` until one renders); `reserve` is the pager's height plus its gap.
  */
-export function useFitPageSize(cardH: number, reserve: number, fallback = 12, minStacked = 1): [(el: HTMLElement | null) => void, number] {
+export function useFitPageSize(cardH: number, reserve: number, fallback = 12, minItems = MIN_PAGE_ITEMS): [(el: HTMLElement | null) => void, number] {
   const [grid, setGrid] = useState<HTMLElement | null>(null);
   const [size, setSize] = useState(fallback);
 
@@ -42,7 +44,7 @@ export function useFitPageSize(cardH: number, reserve: number, fallback = 12, mi
     let frame = 0;
     const update = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setSize(measure(grid, cardH, reserve, fallback, minStacked)));
+      frame = requestAnimationFrame(() => setSize(measure(grid, cardH, reserve, fallback, minItems)));
     };
     const ro = new ResizeObserver(update);
     const region = grid.closest<HTMLElement>('.edu-shell-scroll');
@@ -55,7 +57,7 @@ export function useFitPageSize(cardH: number, reserve: number, fallback = 12, mi
       ro.disconnect();
       window.removeEventListener('resize', update);
     };
-  }, [grid, cardH, reserve, fallback, minStacked]);
+  }, [grid, cardH, reserve, fallback, minItems]);
 
   return [setGrid, size];
 }
