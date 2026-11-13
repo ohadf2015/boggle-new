@@ -48,4 +48,16 @@ describe('studyDeckStore', () => {
     expect(deckCardsFor(useStudyDeck.getState(), 'ROOM2')).toEqual([]);
     expect(deckCardsFor(useStudyDeck.getState(), undefined)).toEqual([]);
   });
+
+  it('given cards that arrived just before joined for the same room, when joined resets, then the deck stays', () => {
+    useStudyDeck.getState().setDeck('ROOM1', cards);
+    useStudyDeck.getState().resetForJoin('room1');
+    expect(useStudyDeck.getState().cards).toEqual(cards);
+  });
+
+  it('given a deck from another room, when joined resets, then the deck is cleared', () => {
+    useStudyDeck.getState().setDeck('ROOM1', cards);
+    useStudyDeck.getState().resetForJoin('ROOM2');
+    expect(useStudyDeck.getState()).toMatchObject({ gameCode: null, cards: [] });
+  });
 });

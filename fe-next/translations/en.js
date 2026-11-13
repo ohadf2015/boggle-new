@@ -20594,6 +20594,7 @@ const en = {
       "intro": "Read through them, then a quick quiz checks you've got them.",
       "start": "Quiz me",
       "question": "Which word means this?",
+      "spellQuestion": "Build the word that means this",
       "progress": "{mastered} of {total} words learned",
       "streak": "{count} in a row!",
       "correct": "Got it!",

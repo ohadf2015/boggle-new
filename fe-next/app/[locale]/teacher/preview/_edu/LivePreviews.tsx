@@ -14,6 +14,7 @@ import { LessonClaimToast } from '@/components/education/live/LessonClaimToast';
 import { ingestLessonClaim, ingestLessonClaimsRound } from '@/components/education/live/useLessonClaims';
 import { CLASSROOM_ECONOMY_EVENTS as E } from '@/shared/constants/classroomEconomy';
 import { RIVAL_EVENTS } from '@/shared/types/rivalry';
+import { useStudyDeck } from '@/lib/education/studyDeckStore';
 import { FakeSocket } from './fakeSocket';
 import { fixtureFor, gridOf, raceView, type PreviewFixture } from './fixtures';
 
@@ -23,9 +24,29 @@ const noop = () => undefined;
 
 export const LIVE_PREVIEW_STATES = ['edu-combo', 'edu-rival', 'edu-claim', 'edu-arrivals'] as const;
 
-/** The student lobby while classmates walk in: one arrival every 1.5s, each popping onto the wall. */
-export function LobbyArrivalsPreview() {
+const STUDY_DECK = {
+  en: [
+    { word: 'orbit', definition: 'The curved path a planet takes around a star' },
+    { word: 'magnet', definition: 'A metal that pulls iron toward it' },
+    { word: 'gravity', definition: 'The force that pulls things toward the ground' },
+    { word: 'comet', definition: 'An icy ball with a long glowing tail' },
+  ],
+  he: [
+    { word: 'מסלול', definition: 'הדרך המעוגלת שכוכב לכת עושה סביב כוכב' },
+    { word: 'מגנט', definition: 'מתכת שמושכת אליה ברזל' },
+    { word: 'כבידה', definition: 'הכוח שמושך דברים אל הקרקע' },
+    { word: 'שביט', definition: 'כדור קרח עם זנב ארוך וזוהר' },
+  ],
+};
+
+/** The student lobby while classmates walk in: one arrival every 1.5s, each popping onto the wall. `study` seeds a lesson deck. */
+export function LobbyArrivalsPreview({ study = false }: { study?: boolean }) {
   const { t, language } = useLanguage();
+  useEffect(() => {
+    if (!study) return undefined;
+    useStudyDeck.getState().setDeck('PREVIEW-STUDY', language === 'he' ? STUDY_DECK.he : STUDY_DECK.en);
+    return () => useStudyDeck.getState().clear();
+  }, [study, language]);
   const f = fixtureFor(language);
   const everyone = useMemo(() => [f.me, f.shortRival, ...f.classmates], [f]);
   const [count, setCount] = useState(2);

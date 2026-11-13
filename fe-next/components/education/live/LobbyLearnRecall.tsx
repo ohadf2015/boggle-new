@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { CheckCircle2, Play, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StudyCard } from '@/shared/utils/studyCards';
@@ -8,6 +8,7 @@ import type { EduT } from '@/components/education/lobby/eduText';
 import { quizzableCards, recallTarget } from '@/lib/education/recallQuiz';
 import { LobbyWordStudy } from './LobbyWordStudy';
 import { RecallQuiz } from './RecallQuiz';
+import { trackEduStudyCompleted } from '@/lib/education/studyTelemetry';
 import { PRESS } from './eduLiveStyles';
 
 interface LobbyLearnRecallProps {
@@ -30,11 +31,15 @@ export function LobbyLearnRecall({ cards, studied, onDone, t }: LobbyLearnRecall
   const pool = useMemo(() => cards.map((c) => c.word), [cards]);
   const [phase, setPhase] = useState<Phase>(studied ? 'learned' : 'meet');
   const [round, setRound] = useState(0);
+  const startedAt = useRef(0);
 
   if (items.length < 2) return <LobbyWordStudy cards={cards} studied={studied} onDone={onDone} t={t} />;
 
   const finish = () => {
-    if (!studied) onDone();
+    if (!studied) {
+      trackEduStudyCompleted({ words: items.length, seconds: Math.round((Date.now() - startedAt.current) / 1000) });
+      onDone();
+    }
     setPhase('learned');
   };
 
@@ -63,7 +68,10 @@ export function LobbyLearnRecall({ cards, studied, onDone, t }: LobbyLearnRecall
               </li>
             ))}
           </ul>
-          <button type="button" data-testid="recall-start" onClick={() => setPhase('quiz')} className={cn(BUTTON, PRESS, 'border-neo-black bg-neo-lime text-neo-black')}>
+          <button type="button" data-testid="recall-start" onClick={() => {
+              startedAt.current = Date.now();
+              setPhase('quiz');
+            }} className={cn(BUTTON, PRESS, 'border-neo-black bg-neo-lime text-neo-black')}>
             <Play className="size-5" aria-hidden="true" />
             {t('eduStudent.recall.start')}
           </button>

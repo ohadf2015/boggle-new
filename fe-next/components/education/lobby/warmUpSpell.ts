@@ -10,12 +10,12 @@ const LETTER = /^\p{L}$/u;
 const HAN = /\p{Script=Han}/u;
 const RTL = /[\p{Script=Hebrew}\p{Script=Arabic}]/u;
 
-export function spellableWords(words: readonly string[]): string[][] {
+export function spellableWords(words: readonly string[], maxLetters = SPELL_MAX_LETTERS): string[][] {
   const seen = new Set<string>();
   const out: string[][] = [];
   for (const raw of words) {
     const letters = Array.from(raw.trim().toLocaleUpperCase());
-    if (letters.length < SPELL_MIN_LETTERS || letters.length > SPELL_MAX_LETTERS) continue;
+    if (letters.length < SPELL_MIN_LETTERS || letters.length > maxLetters) continue;
     if (!letters.every((c) => LETTER.test(c)) || letters.some((c) => HAN.test(c))) continue;
     const key = letters.join('');
     if (seen.has(key)) continue;

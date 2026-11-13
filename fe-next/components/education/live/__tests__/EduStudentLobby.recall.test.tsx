@@ -6,6 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ loading: false, isAuthenticated: false, user: null, profile: null }) }));
 vi.mock('@/hooks/useWinStreak', () => ({ useWinStreak: () => ({ currentStreak: 0 }) }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playTileSelectSound: vi.fn(), playStreakMilestoneSound: vi.fn() }) }));
+const studyCompleted = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/education/studyTelemetry', () => ({ trackEduStudyCompleted: studyCompleted }));
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));
 
 import EduStudentLobby from '@/components/education/live/EduStudentLobby';
@@ -33,9 +35,23 @@ const base = {
 };
 
 const option = (word: string) => within(screen.getByTestId('recall-options')).getByRole('button', { name: word });
-const answerRight = () => fireEvent.click(option(wordFor(screen.getByTestId('recall-definition').textContent!)));
+const tile = (letter: string) =>
+  within(screen.getByTestId('recall-spell-tiles')).getAllByRole('button').find((b) => b.dataset.letter === letter && b.dataset.used === 'false')!;
+const wrongTile = (next: string) =>
+  within(screen.getByTestId('recall-spell-tiles')).getAllByRole('button').find((b) => b.dataset.letter !== next && b.dataset.used === 'false')!;
+const spelling = () => screen.queryByTestId('recall-spell');
+const answerRight = () => {
+  const answer = wordFor(screen.getByTestId('recall-definition').textContent!);
+  if (!spelling()) return fireEvent.click(option(answer));
+  for (const letter of answer.toUpperCase()) fireEvent.click(tile(letter));
+};
 const answerWrong = () => {
   const answer = wordFor(screen.getByTestId('recall-definition').textContent!);
+  if (spelling()) {
+    fireEvent.click(wrongTile(answer[0].toUpperCase()));
+    fireEvent.click(wrongTile(answer[0].toUpperCase()));
+    return answer;
+  }
   const other = within(screen.getByTestId('recall-options')).getAllByRole('button').find((b) => b.textContent !== answer)!;
   fireEvent.click(other);
   return answer;
@@ -44,6 +60,7 @@ const answerWrong = () => {
 describe('EduStudentLobby learn then recall', () => {
   beforeEach(() => {
     sessionStorage.clear();
+    studyCompleted.mockClear();
     act(() => useStudyDeck.getState().clear());
   });
 
@@ -72,6 +89,8 @@ describe('EduStudentLobby learn then recall', () => {
     expect(screen.getByTestId('ready-slot')).toBeInTheDocument();
     expect(screen.getByTestId('study-learned')).toBeInTheDocument();
     expect(useStudyDeck.getState().studied).toBe(true);
+    expect(studyCompleted).toHaveBeenCalledTimes(1);
+    expect(studyCompleted).toHaveBeenCalledWith(expect.objectContaining({ words: 3 }));
   });
 
   it('given a right answer streak, when the second one lands, then the streak counter shows it', () => {
@@ -123,5 +142,41 @@ describe('EduStudentLobby learn then recall', () => {
     expect(screen.getByTestId('study-word')).toHaveTextContent('xylem');
     expect(screen.queryByTestId('recall-meet')).not.toBeInTheDocument();
     expect(screen.getByTestId('study-ready-locked')).toHaveTextContent('eduStudent.lobby.studyReadyLocked');
+  });
+
+  it('given a word picked right once, when it comes back, then the student builds it from scrambled letters', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    for (let i = 0; i < 3; i++) answerRight();
+
+    expect(spelling()).toBeInTheDocument();
+    expect(screen.queryByTestId('recall-options')).not.toBeInTheDocument();
+    expect(screen.getByTestId('recall-progress')).toHaveTextContent('"mastered":0');
+    answerRight();
+    expect(screen.getByTestId('recall-progress')).toHaveTextContent('"mastered":1');
+  });
+
+  it('given a spelling, when one tile is wrong, then the word still counts', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck.slice(0, 2)));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    for (let i = 0; i < 2; i++) answerRight();
+    const answer = wordFor(screen.getByTestId('recall-definition').textContent!);
+    fireEvent.click(wrongTile(answer[0].toUpperCase()));
+    for (const letter of answer.toUpperCase()) fireEvent.click(tile(letter));
+    expect(screen.queryByTestId('recall-feedback-wrong')).not.toBeInTheDocument();
+    expect(screen.getByTestId('recall-progress')).toHaveTextContent('"mastered":1');
+  });
+
+  it('given a spelling, when two tiles are wrong, then the word and its meaning show and it comes back later', () => {
+    act(() => useStudyDeck.getState().setDeck('ROOM1', deck.slice(0, 2)));
+    render(<EduStudentLobby {...base} />);
+    fireEvent.click(screen.getByTestId('recall-start'));
+    for (let i = 0; i < 2; i++) answerRight();
+    const answer = answerWrong();
+
+    expect(within(screen.getByTestId('recall-feedback-wrong')).getByText(answer)).toBeInTheDocument();
+    expect(screen.getByTestId('recall-progress')).toHaveTextContent('"mastered":0');
   });
 });

@@ -280,7 +280,7 @@ export function useMultiplayerSocket(
       // word bank never leaks into this one. The server re-sends `classroomContext`
       // right after `joined` for classroom games.
       resetClassroomContext();
-      useStudyDeck.getState().clear();
+      useStudyDeck.getState().resetForJoin(data?.gameCode);
       // Forward-only: persist a GUEST's chosen room name so it reaches analytics
       // (game_completed metadata.guest_name via getGuestName). Without this the
       // admin game log can only show a guest's session-id fragment, never their

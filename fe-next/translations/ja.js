@@ -21573,6 +21573,7 @@ const ja = {
       "intro": "まず目を通して、そのあと短いクイズで覚えたかチェックしよう。",
       "start": "クイズをはじめる",
       "question": "この意味の単語はどれ？",
+      "spellQuestion": "この意味の単語を組み立てよう",
       "progress": "{total}語中{mastered}語おぼえた",
       "streak": "{count}連続！",
       "correct": "正解！",
