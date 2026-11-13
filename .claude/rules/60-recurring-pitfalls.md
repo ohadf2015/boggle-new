@@ -49,6 +49,7 @@
 - [ ] Client and server computing the "same" number independently → they WILL drift. One side is the source of truth; the other displays it.
 - [ ] **Optimistic client mutation (Blast pops, local cascades):** every server branch that REJECTS must still reach the client, or the optimistic state stays on screen. Rejections usually emit nothing board-shaped — give the client an ack-or-resync path (unacked after N ms → request the authoritative state) and drop stale acks while a newer optimistic move is in flight. Gate on a pending-ack count, never on two server counters that only look alike.
 - [ ] **Callback wrappers drop arguments silently:** a child calling `onX(a, b, c)` through a parent typed `(a, b) => …` compiles and loses `c`. When a child grows an argument, grep every wrapper that forwards it.
+- [ ] **Two sockets on one connection:** `socket.connect()` while the handshake is still pending sends a second CONNECT over the same engine connection, so the server holds two sockets for one tab and every reconnect listener re-joins from the new one. Dropping the "old tab" socket then closes the shared connection and kills the live one, so a host can lose the room it just created. Reconnect only through `redialSocket()` (`rawSocketConnect.guard.test.ts` enforces it), and on the server treat a socket on the joiner's own connection as the same tab: park it, never disconnect it.
 
 ---
 

@@ -52,6 +52,11 @@ describe('shouldUpgradeSocketAuth', () => {
   });
 });
 
+function liveSocket() {
+  const socket = { connected: true, connect: vi.fn(), disconnect: vi.fn(() => { socket.connected = false; }) };
+  return socket;
+}
+
 describe('watchSocketAuthUpgrade', () => {
   beforeEach(() => {
     listeners.length = 0;
@@ -59,7 +64,7 @@ describe('watchSocketAuthUpgrade', () => {
   });
 
   it('given a guest socket, when the anonymous sign-in lands, then it reconnects so the server re-reads the handshake', async () => {
-    const socket = { connected: true, disconnect: vi.fn(), connect: vi.fn() };
+    const socket = liveSocket();
     watchSocketAuthUpgrade(socket, () => false);
     await flush();
     listeners[0]('SIGNED_IN', { access_token: 'anon-jwt' });
@@ -68,7 +73,7 @@ describe('watchSocketAuthUpgrade', () => {
   });
 
   it('does not bounce a socket that already verified', async () => {
-    const socket = { connected: true, disconnect: vi.fn(), connect: vi.fn() };
+    const socket = liveSocket();
     watchSocketAuthUpgrade(socket, () => true);
     await flush();
     listeners[0]('SIGNED_IN', { access_token: 'jwt' });
@@ -76,7 +81,7 @@ describe('watchSocketAuthUpgrade', () => {
   });
 
   it('stop() unsubscribes, even when called before the subscription resolved', async () => {
-    const socket = { connected: true, disconnect: vi.fn(), connect: vi.fn() };
+    const socket = liveSocket();
     const stop = watchSocketAuthUpgrade(socket, () => false);
     stop();
     await flush();

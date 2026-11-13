@@ -1,5 +1,6 @@
 'use client';
 
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { getSocketURL } from '@/utils/SocketContext';
@@ -107,7 +108,7 @@ export function useActiveClassroomGame(classroomId: string) {
             sock.auth = { token: late };
             // A handshake is only re-read on a fresh connection.
             sock.disconnect();
-            sock.connect();
+            redialSocket(sock);
             // One upgrade is all we need; stop listening so a token refresh
             // does not bounce the socket every hour.
             unsubscribeAuth?.();

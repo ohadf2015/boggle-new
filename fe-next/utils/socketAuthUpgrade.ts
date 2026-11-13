@@ -1,3 +1,4 @@
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 /**
  * Re-handshake the shared socket when a session appears AFTER it connected.
  *
@@ -62,7 +63,7 @@ export function watchSocketAuthUpgrade(
         }
         logger.log('[SOCKET.IO] Session appeared on a guest socket — re-handshaking');
         socket.disconnect();
-        socket.connect();
+        redialSocket(socket);
       });
       unsubscribe = () => data.subscription.unsubscribe();
       if (stopped) unsubscribe();

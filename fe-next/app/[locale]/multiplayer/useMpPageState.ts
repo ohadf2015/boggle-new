@@ -1,5 +1,6 @@
 'use client';
 
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 /**
  * All state of the multiplayer page, as one hook. PageClient renders the
  * frame; `MpPhaseRouter` renders the phase from `resolveMpPagePhase`. Split out
@@ -400,7 +401,7 @@ export function useMpPageState() {
   });
 
   const handleManualReconnect = useCallback(() => {
-    if (socket && !socket.connected) socket.connect();
+    if (socket && !socket.connected) redialSocket(socket);
   }, [socket]);
 
   // PageClient renders UNDER the app-wide SocketProvider, so this reads the
