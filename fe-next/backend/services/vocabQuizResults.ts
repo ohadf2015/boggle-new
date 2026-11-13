@@ -37,7 +37,7 @@ export interface QuizResultsPayload {
   duplicateRuleDisabled: false;
   playerCount: number;
   gameMode: typeof VOCAB_QUIZ_MODE;
-  gameSessionId?: string;
+  gameSessionId?: number | string;
   classroomSummary: ClassroomSummary;
   vocabQuizBoss?: VocabQuizBoss;
   tvMode: boolean;
