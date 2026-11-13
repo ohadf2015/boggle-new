@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/incompatible-library */
 'use no memo'; // Disable React Compiler memoization due to TanStack Virtual incompatibility
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CardContent } from './ui/card';
@@ -332,7 +333,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
             setShowAgeGate(false);
             // Reconnect so the server re-resolves the social tier for this socket.
             socket?.disconnect();
-            socket?.connect();
+            if (socket) redialSocket(socket);
           }}
         />
       </div>

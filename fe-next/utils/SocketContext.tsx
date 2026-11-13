@@ -1,5 +1,6 @@
 'use client';
 
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
@@ -184,7 +185,7 @@ export function getSharedSocket(): Socket {
       },
     });
 
-    sharedSocketInstance.connect();
+    redialSocket(sharedSocketInstance);
     stopAuthUpgrade = watchSocketAuthUpgrade(sharedSocketInstance, () => handshakeHadToken);
   }
   sharedSocketRefCount++;
@@ -256,7 +257,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Manual reconnection triggered');
       reconnectAttemptRef.current = 0;
       setConnectionError(null);
-      socketInstance.connect();
+      redialSocket(socketInstance);
     }
   }, []);
 
@@ -299,7 +300,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
 
       if (reason === 'io server disconnect') {
         // Server disconnected us, try to reconnect
-        socketInstance.connect();
+        redialSocket(socketInstance);
       }
     };
 
@@ -377,7 +378,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       if (shutdownTimerRef.current) clearTimeout(shutdownTimerRef.current);
       shutdownTimerRef.current = setTimeout(() => {
         shutdownTimerRef.current = null;
-        socketInstance.connect();
+        redialSocket(socketInstance);
       }, delay);
     };
 
@@ -457,7 +458,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
         if (!socketInstance.connected) {
           logger.log('[SOCKET.IO] App foregrounded — reconnecting');
           // auth() re-reads a fresh token (and guest age) on reconnect; just connect.
-          socketInstance.connect();
+          redialSocket(socketInstance);
         }
       }
     };
@@ -472,7 +473,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
     const handleOnline = () => {
       if (!socketInstance.connected) {
         logger.log('[SOCKET.IO] Network restored — reconnecting');
-        socketInstance.connect();
+        redialSocket(socketInstance);
       }
     };
 

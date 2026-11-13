@@ -8,6 +8,7 @@
  */
 
 'use client';
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
@@ -87,7 +88,7 @@ export function NativeAppProvider({ children }: NativeAppProviderProps): React.R
       const socket = getSharedSocketIfExists();
       if (socket && !socket.connected) {
         logger.log('[NativeAppProvider] Reconnecting socket after foreground');
-        socket.connect();
+        redialSocket(socket);
       }
     },
     onBackground: () => {

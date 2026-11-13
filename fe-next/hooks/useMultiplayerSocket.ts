@@ -1,3 +1,4 @@
+import { redialSocket } from '@/lib/multiplayer/redialSocket';
 /**
  * Socket.IO connection and event handling for multiplayer games
  * Manages connection lifecycle, room events, and error handling
@@ -238,7 +239,7 @@ export function useMultiplayerSocket(
       setIsConnected(false);
 
       if (reason === 'io server disconnect') {
-        socketInstance.connect();
+        redialSocket(socketInstance);
       }
     };
 
@@ -705,7 +706,7 @@ export function useMultiplayerSocket(
       if (document.visibilityState === 'visible' && socketInstance) {
         if (!socketInstance.connected) {
           logger.log('[SOCKET.IO] Tab became visible — socket disconnected, reconnecting');
-          socketInstance.connect();
+          redialSocket(socketInstance);
         } else {
           // Socket is connected — send heartbeat immediately to refresh stale timer
           socketInstance.emit('presenceHeartbeat');
