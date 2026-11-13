@@ -88,17 +88,23 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
         {own ? <SetupOwnWordsField own={own} t={t} /> : null}
 
         <ul data-testid="setup-advanced-summary" aria-label={t('eduShell.setup.advancedOpen')} className="flex flex-wrap gap-1.5">
-          <li className={cn(NB_STICKER, NB_BLOCK.cream)}>
-            <span aria-hidden="true">{languageFlag(language)}</span>
-            {nativeLanguageName(language)}
+          <li>
+            <button type="button" onClick={() => setAdvancedOpen(true)} className={cn(NB_STICKER, NB_BLOCK.cream)}>
+              <span aria-hidden="true">{languageFlag(language)}</span>
+              {nativeLanguageName(language)}
+            </button>
           </li>
-          <li className={cn(NB_STICKER, NB_BLOCK.cyan)}>
-            {ownCount !== null
-              ? t('eduShell.setup.ownWords.sticker', { count: ownCount })
-              : `${t('eduShell.setup.packSticker', { name: t(props.pack.nameKey) })} · ${t('eduShell.setup.packWords', { count: props.pack.words.length })}`}
+          <li>
+            <button type="button" onClick={() => setAdvancedOpen(true)} className={cn(NB_STICKER, NB_BLOCK.cyan)}>
+              {ownCount !== null
+                ? t('eduShell.setup.ownWords.sticker', { count: ownCount })
+                : `${t('eduShell.setup.packSticker', { name: t(props.pack.nameKey) })} · ${t('eduShell.setup.packWords', { count: props.pack.words.length })}`}
+            </button>
           </li>
-          <li className={cn(NB_STICKER, NB_BLOCK.cream)}>
-            {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
+          <li>
+            <button type="button" onClick={() => setAdvancedOpen(true)} className={cn(NB_STICKER, NB_BLOCK.cream)}>
+              {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
+            </button>
           </li>
         </ul>
         {ownCount !== null ? (

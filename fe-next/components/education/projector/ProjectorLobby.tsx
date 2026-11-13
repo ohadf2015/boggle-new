@@ -92,12 +92,12 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
   const present = students.filter((s) => !s.reconnecting);
   const studentCount = realStudentCount(present);
-  // Lesson words mean students study them before READY unlocks, so READY now means "learned".
-  const stillLearning = Math.max(wordCount, lobby.studyWordCount) > 0 ? studentsNotReady(present, readyUsernames).length : 0;
-  const delay = useEnterStyle();
-  const lesson = lessonName || lobby.lessonNames.join(' · ');
   // Read every render, not once: the lobby may stay mounted under the results layer between rounds.
   const canChangeMode = roomPlayed(gameCode);
+  // READY means "learned the words" only before round one; it resets every round, so later it would flag the whole class.
+  const stillLearning = !canChangeMode && Math.max(wordCount, lobby.studyWordCount) > 0 ? studentsNotReady(present, readyUsernames).length : 0;
+  const delay = useEnterStyle();
+  const lesson = lessonName || lobby.lessonNames.join(' · ');
   const hasWords = lobby.studyCards.length > 0;
   const startGame = useCallback(() => {
     markRoomPlayed(gameCode);

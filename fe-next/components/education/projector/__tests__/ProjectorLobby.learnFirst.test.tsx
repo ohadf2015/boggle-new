@@ -13,6 +13,7 @@ vi.mock('@/hooks/useLiveClassroomGameInfo', () => ({ useLiveClassroomGameInfo: (
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
 
 import ProjectorLobby from '../ProjectorLobby';
+import { markRoomPlayed } from '../roomPlayed';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 const props = {
@@ -40,6 +41,17 @@ describe('ProjectorLobby — the match waits for students to learn the words', (
     render(<ProjectorLobby {...props} readyUsernames={[]} onStartGame={onStartGame} />);
     fireEvent.click(screen.getByTestId('projector-start'));
     expect(onStartGame).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given the class already played a round, When nobody has re-tapped READY, Then Start is the full primary, not Start anyway', () => {
+    markRoomPlayed(props.gameCode);
+    try {
+      render(<ProjectorLobby {...props} readyUsernames={[]} />);
+      expect(screen.getByTestId('projector-start')).toHaveTextContent('hostView.startClassGame');
+      expect(screen.queryByTestId('projector-still-learning')).toBeNull();
+    } finally {
+      sessionStorage.clear();
+    }
   });
 
   it('Given everyone is ready, Then Start is the full primary again', () => {

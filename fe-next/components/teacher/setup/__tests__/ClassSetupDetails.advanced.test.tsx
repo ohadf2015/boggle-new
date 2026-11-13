@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { packsForLanguage, recommendedPack } from '../starterPackPick';
 
@@ -52,6 +52,13 @@ describe('ClassSetupDetails advanced options', () => {
     const summary = screen.getByTestId('setup-advanced-summary');
     expect(summary.textContent).toContain('eduShell.setup.anyGrade');
     expect(summary.textContent).toContain('English');
+  });
+
+  it('When the language sticker in the summary is tapped, Then the grade, language and words options open', () => {
+    renderDetails();
+    fireEvent.click(within(screen.getByTestId('setup-advanced-summary')).getByRole('button', { name: /^English$/ }));
+    expect(screen.getByTestId('setup-advanced-toggle')).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('eduShell.setup.gradeLabel')).toBeInTheDocument();
   });
 
   it('When "Change grade, language or words" is tapped, Then grade, language and words open, and tapping again hides them', () => {
