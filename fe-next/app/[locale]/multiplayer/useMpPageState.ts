@@ -7,6 +7,7 @@
  */
 import { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { sendLeaveRoom } from '@/lib/multiplayer/sendLeaveRoom';
 import { readClassroomLiveFlags } from '@/lib/education/classroomLivePath';
 import { useClassroomLiveGame } from '@/hooks/useLiveClassroomGameInfo';
 import { useFollowedClassroomGame } from '@/components/student/live/useFollowedClassroomGame';
@@ -207,9 +208,7 @@ export function useMpPageState() {
   const exitClassroomStudentToHub = useCallback(() => {
     const endedCode = gameCode || prefilledRoomCode || searchParams?.get('room') || '';
     // The page stays mounted under the ended card, so leave explicitly.
-    if (gameCode) {
-      try { socketRef.current?.emit('leaveRoom', { gameCode, username }); } catch { /* socket gone */ }
-    }
+    sendLeaveRoom(socketRef.current, gameCode, username);
     try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* storage blocked */ }
     clearSessionPreservingUsername(username);
     setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
@@ -255,9 +254,7 @@ export function useMpPageState() {
     // from its roster (and migrates host if we were it) instead of keeping a
     // ghost player around for the next round. Mirrors the ConnectionBanner
     // onLeaveGame path.
-    if (gameCode) {
-      try { socketRef.current?.emit('leaveRoom', { gameCode, username }); } catch { /* socket gone */ }
-    }
+    sendLeaveRoom(socketRef.current, gameCode, username);
     clearSessionPreservingUsername(username);
     setIsActive(false); setIsHost(false); setIsPrivate(false); setGameCode('');
     setShowResults(false); setResultsData(null);
