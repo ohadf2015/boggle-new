@@ -8,7 +8,8 @@ import type { ClassroomReward } from '@/hooks/useClassroomRewardListener';
 import { cn } from '@/lib/utils';
 import { InkPanel } from './chrome';
 
-export type HubNote = { kind: 'arena' } | { kind: 'boss'; left: number } | null;
+/** `tap` counts repeat taps so the same note pops again instead of sitting there unchanged. */
+export type HubNote = { kind: 'arena'; tap?: number } | { kind: 'boss'; left: number; tap?: number } | null;
 
 interface Props {
   reward: ClassroomReward | null;
@@ -41,26 +42,34 @@ export function HubToast({ reward, note, onDismiss, reducedMotion, rail }: Props
               <button type="button" onClick={onDismiss} className="ms-1 inline-flex min-h-11 min-w-11 items-center justify-center text-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black" aria-label={t('common.dismiss', 'Dismiss')}>×</button>
             </InkPanel>
           ) : (
-            <InkPanel tone="night" className="flex items-center gap-3 p-2 pe-3">
-              <span className="relative h-12 w-20 shrink-0 overflow-hidden rounded-[10px] border-2 border-neo-black">
-                <Image
-                  src={note?.kind === 'arena' ? '/images/education/waiting-for-teacher.webp' : '/images/education/node-boss.webp'}
-                  alt=""
-                  aria-hidden="true"
-                  fill
-                  unoptimized
-                  sizes="80px"
-                  className="object-cover"
-                />
-              </span>
-              <span dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-white">
-                {note?.kind === 'arena'
-                  ? t('academy.student.arenaWaiting', "Your teacher hasn't started a live game yet. This island lights up when they do.")
-                  : t('academy.student.bossLockedNote', 'Master {count} more words to unlock the boss.', {
-                      count: note?.kind === 'boss' ? note.left : 0,
-                    })}
-              </span>
-            </InkPanel>
+            <m.div
+              key={note?.tap ?? 0}
+              data-testid="hub-note-body"
+              initial={reducedMotion ? false : { rotate: -3, scale: 1.06 }}
+              animate={{ rotate: 0, scale: 1 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 12 }}
+            >
+              <InkPanel tone="night" className="flex items-center gap-3 p-2 pe-3">
+                <span className="relative h-12 w-20 shrink-0 overflow-hidden rounded-[10px] border-2 border-neo-black">
+                  <Image
+                    src={note?.kind === 'arena' ? '/images/education/waiting-for-teacher.webp' : '/images/education/node-boss.webp'}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    unoptimized
+                    sizes="80px"
+                    className="object-cover"
+                  />
+                </span>
+                <span dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-white">
+                  {note?.kind === 'arena'
+                    ? t('academy.student.arenaWaiting', "Your teacher hasn't started a live game yet. This island lights up when they do.")
+                    : t('academy.student.bossLockedNote', 'Master {count} more words to unlock the boss.', {
+                        count: note?.kind === 'boss' ? note.left : 0,
+                      })}
+                </span>
+              </InkPanel>
+            </m.div>
           )}
         </m.div>
       )}

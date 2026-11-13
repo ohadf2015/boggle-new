@@ -33,7 +33,7 @@
  * that chooses the hero is pure in `lib/education/practiceShortlist`.
  */
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import type { PracticeType, MasteryLevel } from '@/hooks/usePracticeSession';
@@ -80,6 +80,12 @@ export default function PracticePicker({
 }: PracticePickerProps) {
   const { t } = useLanguage();
   const [showAll, setShowAll] = useState(false);
+  const restRef = useRef<HTMLDivElement>(null);
+
+  // The button sits at the foot of a phone screen, so the games it opens land below the fold.
+  useEffect(() => {
+    if (showAll) restRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [showAll]);
 
   const tiles = useMemo(
     () => buildPracticeTiles(words, { language, sessions }),
@@ -154,6 +160,7 @@ export default function PracticePicker({
 
             {showAll && (
               <div
+                ref={restRef}
                 data-testid="practice-picker-rest"
                 className="grid grid-cols-2 content-start gap-2.5 sm:grid-cols-3 lg:grid-cols-4"
               >

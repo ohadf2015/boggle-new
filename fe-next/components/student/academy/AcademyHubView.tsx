@@ -204,12 +204,12 @@ export function AcademyHubView(props: AcademyHubViewProps) {
       posthog.capture('student_academy_node_clicked', { type: node.kind, state: node.state });
       if (node.kind === 'arena') {
         if (node.state === 'live') join();
-        else setNote({ kind: 'arena' });
+        else setNote((prev) => ({ kind: 'arena', tap: prev?.kind === 'arena' ? (prev.tap ?? 0) + 1 : 0 }));
         return;
       }
       if (node.kind === 'boss' && !node.href) {
         const p = node.progress ?? { have: 0, need: 0 };
-        setNote({ kind: 'boss', left: Math.max(0, p.need - p.have) });
+        setNote((prev) => ({ kind: 'boss', left: Math.max(0, p.need - p.have), tap: prev?.kind === 'boss' ? (prev.tap ?? 0) + 1 : 0 }));
         return;
       }
       if (node.href) router.push(node.href);

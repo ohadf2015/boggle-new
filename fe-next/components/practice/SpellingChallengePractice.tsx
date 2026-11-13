@@ -164,6 +164,8 @@ export function SpellingChallengePractice({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wordIndex]);
 
+  const hintSpent = currentHint.length >= (sortedWords[wordIndex]?.word?.length ?? 0);
+
   if (usable.length < 1) {
     return <PracticeInsufficientData onBack={onBack} />;
   }
@@ -302,7 +304,7 @@ export function SpellingChallengePractice({
               sfx.hint();
               getHint();
             }}
-            disabled={!!feedback || isComplete}
+            disabled={!!feedback || isComplete || hintSpent}
             data-testid="hint-button"
             className="text-neo-yellow hover:text-neo-yellow/80"
           >
