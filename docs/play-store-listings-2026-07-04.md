@@ -1,5 +1,7 @@
 # Play Store Listings — LIVE COPY (source of truth)
 
+> 2026-11-13: titles en-GB "Word Party Game" → "Word Hunt Online", iw-IL adds "בעברית" (search-card fix, see docs/2026-11-13-play-store-download-rate.md). Short-description experiment ended (tie), current copy kept.
+
 > 2026-11-02: en-GB full description keyword pass (word search / anagram / online; Adventure line dropped to match live); ja-JP short+full re-synced (live short had 完全無料 + 世界ランキング, both Google price/rank-word triggers). Committed via androidpublisher edit 11053173529164930069.
 > Updated 2026-07-04 via androidpublisher API (edit committed; managed publishing OFF — changes auto-publish once Google review approves, verified in Console same day).
 > Changes: NEW ru-RU listing · 5→6 languages everywhere · Word Tower added to mode lists · removed Jackbox/Boggle trademark line (Play metadata policy risk).
@@ -8,7 +10,7 @@
 
 ## en-GB
 
-**Title** (26/30): LexiClash: Word Party Game
+**Title** (27/30): LexiClash: Word Hunt Online
 
 **Short** (77/80): Live multiplayer word games: swipe letters, build words, battle friends fast.
 
@@ -51,7 +53,7 @@ Download, find a word, talk trash to your friends.
 
 ## iw-IL
 
-**Title** (21/30): LexiClash: משחק מילים
+**Title** (29/30): LexiClash: משחק מילים בעברית
 
 **Short** (72/80): משחק מילים רב-משתתפים בזמן אמת — בנו מילים, התחרו בחברים ונצחו את השעון.
 
