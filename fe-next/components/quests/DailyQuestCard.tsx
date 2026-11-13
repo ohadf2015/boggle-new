@@ -85,7 +85,7 @@ export function DailyQuestCard({ titleKey, descKey, href, completed, type, mode,
           )}
         >
           <Star className="size-3 fill-neo-black" aria-hidden="true" />
-          {t('quests.reward.xp', { xp: xpReward })}
+          <bdi>{t('quests.reward.xp', { xp: xpReward })}</bdi>
         </span>
       </div>
 
