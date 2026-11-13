@@ -102,6 +102,12 @@ describe('isEligibleForTeacherProUpgradeCta', () => {
     expect(isEligibleForTeacherProUpgradeCta({ trial: expired, hasPro: false })).toBe(false);
     expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: false })).toBe(false);
   });
+
+  it('shows for a teacher with no free window who has not started a card trial', () => {
+    expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: false, trialUsed: false })).toBe(true);
+    expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: false, trialUsed: true })).toBe(false);
+    expect(isEligibleForTeacherProUpgradeCta({ trial: null, hasPro: true, trialUsed: false })).toBe(false);
+  });
 });
 
 describe('isTrialReminderWindow', () => {

@@ -164,7 +164,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
 
   const topActions = (
     <div className="flex shrink-0 items-center gap-2">
-      {isEligibleForTeacherProUpgradeCta({ trial, hasPro, proLoading, accessLoading }) ? (
+      {isEligibleForTeacherProUpgradeCta({ trial, hasPro, proLoading, accessLoading, trialUsed: pro.known ? pro.trialUsed : undefined }) ? (
         <Link
           href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
           data-testid="classrooms-upgrade-teacher-pro"

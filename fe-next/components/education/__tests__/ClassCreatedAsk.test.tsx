@@ -14,7 +14,12 @@ const pro = vi.hoisted(() => ({
   },
 }));
 
+const access = vi.hoisted(() => ({
+  current: { latestRequest: null as { status: string; created_at: string } | null },
+}));
+
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro.current }));
+vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => access.current }));
 vi.mock('@/lib/education/firstRoundGuideTelemetry', () => ({
   trackFirstRoundGuideShown: (...args: unknown[]) => shown(...args),
 }));
@@ -31,6 +36,7 @@ const HREF = '/en/education/classroom-game?classroomId=c1&minutes=2';
 describe('ClassCreatedAsk', () => {
   beforeEach(() => {
     shown.mockClear();
+    access.current = { latestRequest: null };
     pro.current = {
       hasPro: false,
       loading: false,
@@ -59,6 +65,19 @@ describe('ClassCreatedAsk', () => {
     pro.current.accessTrialExpires = new Date(Date.now() - DAY).toISOString();
     rerender(<ClassCreatedAsk language="en" href={HREF} />);
     expect(screen.queryByTestId('day0-first-class-bridge')).toBeNull();
+    expect(screen.getByTestId('pro-trial-card')).toBeInTheDocument();
+  });
+
+  it('counts the day from approval for a teacher approved with no free window (trial needs a card)', () => {
+    pro.current.accessTrialExpires = null;
+    access.current = { latestRequest: { status: 'approved', created_at: new Date(Date.now() - DAY).toISOString() } };
+    const { rerender } = render(<ClassCreatedAsk language="en" href={HREF} />);
+    expect(screen.getByTestId('day0-first-class-bridge')).toBeInTheDocument();
+
+    access.current = {
+      latestRequest: { status: 'approved', created_at: new Date(Date.now() - DAY0_BRIDGE_PAYWALL_FROM_DAY * DAY - 60_000).toISOString() },
+    };
+    rerender(<ClassCreatedAsk language="en" href={HREF} />);
     expect(screen.getByTestId('pro-trial-card')).toBeInTheDocument();
   });
 

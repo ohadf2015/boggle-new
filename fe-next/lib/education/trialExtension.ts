@@ -52,6 +52,9 @@ export function planTrialExtension(
     // pre-auth request rows, not people we can extend anything for.
     if (!row.user_id) continue;
     if (row.trial_reminders_sent?.includes(GOODWILL_EXTENSION_MARKER)) continue;
+    // No window was ever given (approved after trials started needing a card):
+    // nothing to extend, and a fresh one would be a cardless trial.
+    if (!row.trial_expires_at) continue;
     const key = row.email.trim().toLowerCase();
     const held = newest.get(key);
     if (!held || Date.parse(row.created_at) > Date.parse(held.created_at)) newest.set(key, row);

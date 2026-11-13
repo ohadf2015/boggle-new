@@ -17,10 +17,21 @@ import { TEACHER_TRIAL_DAYS, teacherTrialStatus } from '@/lib/education/trial';
 /** Paywall returns on this day (0 = approval day). Days before it get the bridge. */
 export const DAY0_BRIDGE_PAYWALL_FROM_DAY = 3;
 
+/**
+ * Teachers approved since trials need a card have no access window, so their day
+ * count comes from `approvedAt` (the access request, which approves on submit).
+ */
 export function showDay0FirstClassBridge(
   accessTrialExpires: string | null | undefined,
   nowMs: number,
+  approvedAt?: string | null,
 ): boolean {
+  if (!accessTrialExpires) {
+    const approved = approvedAt ? Date.parse(approvedAt) : Number.NaN;
+    if (!Number.isFinite(approved)) return false;
+    const days = Math.floor((nowMs - approved) / 86_400_000);
+    return days >= 0 && days < DAY0_BRIDGE_PAYWALL_FROM_DAY;
+  }
   const trial = teacherTrialStatus(accessTrialExpires, nowMs);
   if (!trial || trial.isExpired) return false;
   const daysSinceApproval = TEACHER_TRIAL_DAYS - trial.daysLeft;

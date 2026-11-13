@@ -239,7 +239,7 @@ describe('POST /api/education/access-request', () => {
       expect(row.role).toBe('teacher');
       expect(row.use_case).toBe('Friday vocab battles with my class');
       expect(approveMock).toHaveBeenCalledTimes(1);
-      expect(approveMock.mock.calls[0][0].values.trial_expires_at).toBeTruthy();
+      expect(approveMock.mock.calls[0][0].values.trial_expires_at).toBeNull();
     });
 
     it('records whether the teacher picked a role, so the default does not read as a choice', async () => {
@@ -379,7 +379,7 @@ describe('POST /api/education/access-request', () => {
   });
 
   describe('instant auto-approval', () => {
-    it('marks the request approved with trial expiry + reviewed_at right after insert (via admin client — RLS has no user UPDATE policy)', async () => {
+    it('marks the request approved with no cardless trial window + reviewed_at right after insert (via admin client — RLS has no user UPDATE policy)', async () => {
       const res = await POST(mkReq(validPayload));
       expect(res.status).toBe(200);
       expect(approveMock).toHaveBeenCalledTimes(1);
@@ -392,9 +392,8 @@ describe('POST /api/education/access-request', () => {
       expect(call.val2).toBe('pending');
       const update = call.values;
       expect(update.status).toBe('approved');
-      expect(typeof update.trial_expires_at).toBe('string');
-      // Trial is ~14 days out — just verify it parses and is in the future.
-      expect(new Date(update.trial_expires_at).getTime()).toBeGreaterThan(Date.now());
+      // The Pro trial now starts at the Polar checkout, with a card: approval opens no free window.
+      expect(update.trial_expires_at).toBeNull();
       expect(typeof update.reviewed_at).toBe('string');
     });
 

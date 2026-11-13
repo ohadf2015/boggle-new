@@ -16,6 +16,7 @@ const base: TeacherBannerInput = {
   trialReminderOpen: false,
   trialEndedDismissed: false,
   polarTrialExpiring: false,
+  polarChargeSoon: false,
   trialExpiringDismissed: false,
 };
 const pick = (over: Partial<TeacherBannerInput>) => selectTeacherBanner({ ...base, ...over });
@@ -46,6 +47,13 @@ describe('selectTeacherBanner', () => {
 
   it('given paid Pro, when picking, then no banner', () => {
     expect(pick({ hasPro: true })).toEqual({ kind: 'none' });
+  });
+
+  it('given a card trial that charges within a day, when picking, then the charge notice shows even if the expiring card was dismissed', () => {
+    expect(pick({ hasPro: true, status: 'trialing', polarTrialExpiring: true, polarChargeSoon: true })).toEqual({ kind: 'show', banner: 'chargeSoon' });
+    expect(
+      pick({ hasPro: true, status: 'trialing', polarTrialExpiring: true, polarChargeSoon: true, trialExpiringDismissed: true }),
+    ).toEqual({ kind: 'show', banner: 'chargeSoon' });
   });
 
   it('given admin-granted Pro marked trialing, when picking, then no trial banner', () => {

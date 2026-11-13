@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
-import { teacherTrialExpiry } from '@/lib/education/trial';
+import { approvalTrialExpiry } from '@/lib/education/trial';
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -19,10 +19,9 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   const { data: row, error: fetchErr } = await sb.from('teacher_access_requests').select('*').eq('id', id).single();
   if (fetchErr || !row) return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
 
-  // Approval starts a time-limited trial — stamp the deadline so the email and
-  // the teacher UI can drive activation urgency. Reuse an existing deadline on
-  // re-approval rather than silently extending the window.
-  const trialExpiresAt = row.trial_expires_at || teacherTrialExpiry(Date.now());
+  // No cardless Pro window on approval: the trial starts at the Polar checkout,
+  // with a card. A re-approval keeps a window given before that switch.
+  const trialExpiresAt = approvalTrialExpiry(row.trial_expires_at);
 
   const upd = await sb.from('teacher_access_requests').update({
     status: 'approved',

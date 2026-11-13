@@ -16,6 +16,18 @@ export const TRIAL_URGENT_DAYS = 3;
 
 const TRIAL_REMINDER_DISMISS_PREFIX = 'lexiclash.teacher_trial_reminder_dismissed:';
 
+/**
+ * The free access window a teacher gets on approval: none, since Nov 2026.
+ *
+ * Teacher Pro is tried only through the Polar trial, which starts with a card on
+ * file and turns into $9/mo unless they cancel (reminded the day before). A no-card
+ * window on approval would be a second, cardless way in. A teacher approved before
+ * the switch keeps the window they were given (`prior`), and it is never charged.
+ */
+export function approvalTrialExpiry(prior: string | null | undefined): string | null {
+  return prior || null;
+}
+
 /** ISO timestamp for the trial deadline, TEACHER_TRIAL_DAYS after `fromMs`. */
 export function teacherTrialExpiry(fromMs: number): string {
   return new Date(fromMs + TEACHER_TRIAL_DAYS * DAY_MS).toISOString();
@@ -96,22 +108,30 @@ export function isTrialReminderWindow(trial: TrialStatus | null | undefined): bo
 }
 
 /**
- * Classrooms-list header CTA: approved teacher on an *active* trial who is not
- * already Pro. Loading states fail closed so a paying teacher never sees "pay".
+ * Classrooms-list header CTA: approved teacher on an *active* access trial, or one
+ * who never had a trial of any kind, who is not already Pro. Loading states fail closed so a paying teacher never sees "pay".
  */
 export function isEligibleForTeacherProUpgradeCta({
   trial,
   hasPro,
   proLoading = false,
   accessLoading = false,
+  trialUsed,
 }: {
   trial: TrialStatus | null | undefined;
   hasPro: boolean;
   proLoading?: boolean;
   accessLoading?: boolean;
+  /**
+   * Known Polar trial history. A teacher approved with no free window (the trial
+   * now needs a card) and no card trial yet still gets the way in. Unknown keeps
+   * the old rule.
+   */
+  trialUsed?: boolean;
 }): boolean {
   if (proLoading || accessLoading || hasPro) return false;
-  return !!trial && !trial.isExpired;
+  if (!trial) return trialUsed === false;
+  return !trial.isExpired;
 }
 
 export function trialReminderDismissKey(expiresAt: string): string {

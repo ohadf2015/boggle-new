@@ -9,6 +9,7 @@ import { useTeacherTrialEnded } from '@/hooks/useTeacherTrialEnded';
 import { useTrialReminderBanner } from '@/lib/education/useTrialReminderBanner';
 import { isPolarTrialDay10Expiring, polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { isTrialReminderWindow } from '@/lib/education/trial';
+import { isPolarTrialChargeSoon } from '@/lib/education/polarTrialDayBefore';
 import { selectTeacherBanner } from './teacherBannerSelect';
 
 /** Every input the Home billing banner depends on, read once, decided by one pure function. */
@@ -37,6 +38,14 @@ export function useTeacherBanner() {
     trialReminderOpen: isTrialReminderWindow(access.trial) && !reminder.dismissed,
     trialEndedDismissed: ended.dismissed,
     polarTrialExpiring: isPolarTrialDay10Expiring(polarTrialDaysLeft(trialExpires, nowMs)),
+    polarChargeSoon: isPolarTrialChargeSoon({
+      tier: pro.hasPro ? 'pro' : 'free',
+      status: pro.status ?? 'active',
+      source: pro.source,
+      currentPeriodEnd: trialExpires,
+      cancelAtPeriodEnd: pro.cancelAtPeriodEnd,
+      nowMs,
+    }),
     trialExpiringDismissed: expiring.dismissed,
   });
 

@@ -31,9 +31,8 @@ describe('planTrialExtension', () => {
     expect(Date.parse(plan.newExpiresAt)).toBe(Date.parse('2026-09-10T00:00:00.000Z') + 14 * DAY);
   });
 
-  it('gives a row with no deadline at all a fresh 14 days', () => {
-    const [plan] = planTrialExtension([row({ trial_expires_at: null })], NOW);
-    expect(Date.parse(plan.newExpiresAt)).toBe(NOW + 14 * DAY);
+  it('skips a row with no deadline: it never had a free window, and a new one would be a cardless trial', () => {
+    expect(planTrialExtension([row({ trial_expires_at: null })], NOW)).toEqual([]);
   });
 
   it('mails a person once, not once per request row', () => {

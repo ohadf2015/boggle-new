@@ -15062,8 +15062,8 @@ const ja = {
       "upgradeNow": "今すぐProにアップグレード",
       "startTrial": "14日間の無料トライアルを開始",
       "trialOfferTitle": "Teacher Proを14日間無料で試す",
-      "trialOfferBody": "クラスもレポートも無制限。14日間無料、その後は月額9ドル。いつでも解約できます。",
-      "trialCtaSubtext": "14日間無料、その後は月額9ドル。いつでも解約できます。",
+      "trialOfferBody": "クラスもレポートも無制限。開始にはカードの登録が必要です。14日間無料、解約しなければその後は月額9ドル。",
+      "trialCtaSubtext": "開始にはカードの登録が必要です。14日間無料、解約しなければその後は月額9ドル。",
       "trialEndedTitle": "Proの無料体験が終了しました。クラスはそのまま残ります。",
       "trialEndedBody": "無料プランでも全クラスで遊べます。Proなら月$9でクラス数無制限と印刷用レポートが戻ります。新しい無料体験ではありません。",
       "trialEndedCta": "Proを続ける（月額9ドル）",
@@ -15074,6 +15074,10 @@ const ja = {
       "trialLifecycleBody": "無制限クラスと印刷レポートを継続。トライアル後は月額9ドルです。",
       "trialExpiringLoss": "Proがない場合、無制限のクラスと印刷可能な生徒レポートが利用できなくなります。",
       "trialLifecycleCta": "Proを続ける（月額9ドル）",
+      "trialAutoRenewBody": "トライアル終了後、登録したカードに月額9ドルが請求されます。それまでに解約すれば料金はかかりません。",
+      "trialChargeSoonTitle": "無料トライアルは明日で終了します",
+      "trialChargeSoonBody": "{date}に登録したカードへ9ドルが請求され、以降は毎月9ドルです。それまでに解約すれば一切請求されません。",
+      "trialManageCta": "管理・解約する",
       "pendingCheckoutTitle": "Teacher Proの登録を完了しましょう",
       "pendingCheckoutBody": "Teacher Proのお手続きが途中で中断されています。続きから完了して、無制限のクラスと印刷用レポートを利用しましょう。",
       "pendingCheckoutCta": "手続きを再開する",
@@ -21914,7 +21918,7 @@ const ja = {
       "trialCta": "{days}日間の無料体験を始める",
       "buyNowInstead": "今すぐ購入（月{price}）",
       "buyCta": "Teacher Proに登録（月{price}）",
-      "trialNote": "{days}日間は無料、その後は月{price}です。期間内に解約すれば料金はかかりません。",
+      "trialNote": "開始にはカードの登録が必要です。{days}日間は無料、その後は月{price}です。終了の前日にお知らせし、期間内に解約すれば料金はかかりません。",
       "proBestFor": "毎回のゲーム後に誰がつまずいたかを把握し、翌日にはフォローしたい方。",
       "schoolName": "学校・教科単位",
       "schoolTagline": "教員{min}名以上向け",
@@ -22619,7 +22623,7 @@ const ja = {
       },
       "cta": "Proでできること",
       "trialCta": "14日間の無料体験を始める",
-      "trialFine": "14日間無料、その後は月{price}。いつでも解約できます。",
+      "trialFine": "開始にはカードの登録が必要です。14日間無料、解約しなければその後は月{price}。",
       "dismiss": "今はしない"
     },
     "onboarding": {
@@ -22860,7 +22864,7 @@ const ja = {
       "trialCta": "Proを{days}日間無料で試す",
       "startTrialCta": "{days}日間の無料体験を始める",
       "buyCta": "Teacher Pro · 月{price}",
-      "trialFine": "{days}日間無料、その後は月{price}。いつでも解約できます。"
+      "trialFine": "開始にはカードの登録が必要です。{days}日間無料、解約しなければその後は月{price}。"
     },
     "cap": {
       "used": "無料クラス{limit}つのうち{count}つを使用中",

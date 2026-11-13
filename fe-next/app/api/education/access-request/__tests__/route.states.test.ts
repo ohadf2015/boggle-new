@@ -183,7 +183,8 @@ describe('POST /api/education/access-request: the trial is granted at most once,
     expect(res.status).toBe(200);
     expect(db.rows).toHaveLength(1);
     expect(db.rows[0]).toMatchObject({ id: 'old', status: 'approved', school_or_org: 'Hill School' });
-    expect(db.rows[0].trial_expires_at).not.toBeNull();
+    // No cardless window: the Pro trial starts at the Polar checkout, with a card.
+    expect(db.rows[0].trial_expires_at).toBeNull();
     expect(db.role).toBe('teacher');
   });
 
@@ -197,6 +198,8 @@ describe('POST /api/education/access-request: the trial is granted at most once,
   });
 
   it('Given the role update fails after approval, Then the row goes back to pending with its trial kept, so the next press finishes without moving the clock', async () => {
+    // A window given before trials needed a card is kept as it was.
+    db.rows = [row({ status: 'pending', trial_expires_at: '2026-11-20T00:00:00.000Z' })];
     db.promoteFails = true;
     expect((await press()).status).toBe(202);
     expect(db.rows[0].status).toBe('pending');
