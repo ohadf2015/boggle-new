@@ -34,7 +34,7 @@ export function TeacherClassEntryCard({ trial }: TeacherClassEntryCardProps) {
       <div className="flex items-center gap-3">
         <span
           aria-hidden="true"
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-navy text-neo-cyan shadow-hard-sm motion-safe:transition-transform motion-safe:group-hover:-rotate-6 sm:h-14 sm:w-14"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-2 border-neo-cream bg-neo-navy text-neo-cyan shadow-hard-sm motion-safe:transition-transform motion-safe:group-hover:-rotate-6 sm:h-14 sm:w-14"
         >
           <GraduationCap className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={2.5} />
         </span>
@@ -63,7 +63,7 @@ export function TeacherClassEntryCard({ trial }: TeacherClassEntryCardProps) {
         aria-hidden="true"
         data-testid="home-teacher-class-entry-cta"
         className={cn(
-          'mt-3 flex w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-black bg-neo-navy px-4 py-2.5',
+          'mt-3 flex w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream bg-neo-navy px-4 py-2.5',
           'font-neo-display text-base font-black text-neo-cream shadow-hard-sm',
           'motion-safe:transition-transform motion-safe:group-hover:translate-x-0.5 rtl:motion-safe:group-hover:-translate-x-0.5',
           'sm:ms-auto sm:w-fit'
