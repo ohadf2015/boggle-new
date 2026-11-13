@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import type { EduT } from '@/components/education/lobby/eduText';
 import { answerRecall, isRecallFinished, masteredCount, startRecall, type RecallItem, type Rng } from '@/lib/education/recallQuiz';
 import { PRESS } from './eduLiveStyles';
+import { RecallSpell } from './RecallSpell';
 
 interface RecallQuizProps {
   items: RecallItem[];
@@ -80,7 +81,9 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
                 last?.correct ? 'ring-4 ring-neo-lime motion-safe:animate-[edu-live-pop_220ms_cubic-bezier(0.23,1,0.32,1)_both]' : ''
               )}
             >
-              <p className="font-neo-display text-sm font-black uppercase text-neo-black/70">{t('eduStudent.recall.question')}</p>
+              <p className="font-neo-display text-sm font-black uppercase text-neo-black/70">
+                {t(state.question.kind === 'spell' ? 'eduStudent.recall.spellQuestion' : 'eduStudent.recall.question')}
+              </p>
               <p data-testid="recall-definition" dir="auto" className="font-neo-body text-lg font-bold leading-snug">{state.question.definition}</p>
             </div>
             <span aria-live="polite" className="sr-only">
@@ -92,13 +95,22 @@ export function RecallQuiz({ items, pool, target, onFinish, t, rng = Math.random
                 {t('eduStudent.recall.correct')}
               </span>
             )}
-            <div data-testid="recall-options" className="grid grid-cols-2 gap-2">
-              {state.question.options.map((word) => (
-                <button key={word} type="button" dir="auto" onClick={() => pick(word)} className={cn(BUTTON, PRESS, 'break-words bg-neo-cream py-2 text-neo-black hover:bg-neo-yellow')}>
-                  {word}
-                </button>
-              ))}
-            </div>
+            {state.question.kind === 'spell' ? (
+              <RecallSpell
+                key={`spell-${state.question.word}-${state.queue.length}-${mastered}`}
+                word={state.question.word}
+                seed={state.queue.length + mastered * 7 + total}
+                onDone={(clean) => pick(clean ? state.question!.word : '')}
+              />
+            ) : (
+              <div data-testid="recall-options" className="grid grid-cols-2 gap-2">
+                {state.question.options.map((word) => (
+                  <button key={word} type="button" dir="auto" onClick={() => pick(word)} className={cn(BUTTON, PRESS, 'break-words bg-neo-cream py-2 text-neo-black hover:bg-neo-yellow')}>
+                    {word}
+                  </button>
+                ))}
+              </div>
+            )}
           </>
         )
       )}

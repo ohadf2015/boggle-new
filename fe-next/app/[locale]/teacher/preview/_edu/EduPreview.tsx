@@ -30,7 +30,7 @@ export function EduPreview({ state, v }: { state: string; v?: string }) {
     case 'edu-reports': return <ReportsPreview v={v} />;
     case 'edu-upgrade': return <UpgradePreview v={v} />;
     case 'edu-combo': case 'edu-rival': case 'edu-claim': return <LiveRoundPreview state={state} v={v} />;
-    case 'edu-arrivals': return <LobbyArrivalsPreview />;
+    case 'edu-arrivals': return <LobbyArrivalsPreview study={v === 'study'} />;
     case 'edu-lobby': return <LobbyHostPreview v={v} />;
     case 'edu-live-controls': return <LiveControlsPreview v={v} />;
     case 'edu-invite': case 'edu-class-page': case 'edu-classes': case 'edu-library': return <SetupBatchPreview state={state} v={v} />;

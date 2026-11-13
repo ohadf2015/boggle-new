@@ -143,3 +143,27 @@ describe('answerRecall', () => {
     expect(answerRecall(s0, 'XYLEM', first).last?.correct).toBe(true);
   });
 });
+
+describe('question kind', () => {
+  it('given target 2, when a word is first asked, then it is a pick; once picked right, then it must be spelled', () => {
+    const s0 = startRecall(deck.slice(0, 1), { pool: words, target: 2, rng: first });
+    expect(s0.question!.kind).toBe('pick');
+    expect(right(s0).question!.kind).toBe('spell');
+  });
+
+  it('given target 1, then the only recall is a spell', () => {
+    expect(startRecall(deck.slice(0, 1), { pool: words, target: 1, rng: first }).question!.kind).toBe('spell');
+  });
+
+  it('given a word too long, too short or with a space, then it stays a pick', () => {
+    for (const word of ['photosynthesis', 'ox', 'cell wall']) {
+      const s = startRecall([{ word, definition: 'd' }], { pool: words, target: 1, rng: first });
+      expect(s.question!.kind).toBe('pick');
+    }
+  });
+
+  it('given a twelve-letter word, then it can be spelled', () => {
+    const s = startRecall([{ word: 'chlorophylls', definition: 'd' }], { pool: words, target: 1, rng: first });
+    expect(s.question!.kind).toBe('spell');
+  });
+});

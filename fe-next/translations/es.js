@@ -21585,6 +21585,7 @@ const es = {
       "intro": "Léelas una vez y luego un quiz rápido comprueba que te las sabes.",
       "start": "Empezar el quiz",
       "question": "¿Qué palabra significa esto?",
+      "spellQuestion": "Arma la palabra que significa esto",
       "progress": "{mastered} de {total} palabras aprendidas",
       "streak": "¡{count} seguidas!",
       "correct": "¡Bien!",

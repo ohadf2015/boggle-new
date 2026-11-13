@@ -21573,6 +21573,7 @@ const sv = {
       "intro": "Läs igenom dem, sen kollar ett snabbt quiz att de sitter.",
       "start": "Starta quizet",
       "question": "Vilket ord betyder det här?",
+      "spellQuestion": "Bygg ordet som betyder detta",
       "progress": "{mastered} av {total} ord klara",
       "streak": "{count} i rad!",
       "correct": "Rätt!",

@@ -20,6 +20,7 @@ interface StudyDeckState {
   setDeck: (gameCode: string, cards: StudyCard[]) => void;
   markStudied: () => void;
   clear: () => void;
+  resetForJoin: (gameCode: unknown) => void;
 }
 
 /** Fed by the `classroomStudyCards` socket event; read by the student lobby. Readiness itself stays on the server. */
@@ -41,6 +42,11 @@ export const useStudyDeck = create<StudyDeckState>((set, get) => ({
     set({ studied: true });
   },
   clear: () => set({ gameCode: null, cards: [], studied: false }),
+  /** A guest's cards can be emitted before `joined` for the same room; only another room's deck is stale. */
+  resetForJoin: (gameCode) => {
+    const current = get().gameCode;
+    if (!current || typeof gameCode !== 'string' || current.toUpperCase() !== gameCode.toUpperCase()) get().clear();
+  },
 }));
 
 /** A reconnect's `joined` clears the live deck without a resend, so results fall back to the last deck seen for this room. */

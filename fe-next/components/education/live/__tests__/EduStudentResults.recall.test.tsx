@@ -77,7 +77,7 @@ describe('EduStudentResults missed-word recall', () => {
     expect(missedProps.current?.definitions).toEqual({ apple: 'A red fruit' });
   });
 
-  it('given a reconnect cleared the live deck, when quick recall runs, then it quizzes the missed word against the deck', () => {
+  it('given a reconnect cleared the live deck, when quick recall runs, then the student builds the missed word from its meaning', () => {
     act(() => {
       useStudyDeck.getState().setDeck('AB12CD', deck);
       useStudyDeck.getState().clear();
@@ -87,9 +87,8 @@ describe('EduStudentResults missed-word recall', () => {
 
     fireEvent.click(screen.getByTestId('missed-recall-start'));
     expect(screen.getByTestId('recall-definition')).toHaveTextContent('A red fruit');
-    const options = within(screen.getByTestId('recall-options')).getAllByRole('button');
-    expect(options.length).toBeGreaterThanOrEqual(2);
-    fireEvent.click(within(screen.getByTestId('recall-options')).getByRole('button', { name: 'Apple' }));
+    const tiles = () => within(screen.getByTestId('recall-spell-tiles')).getAllByRole('button');
+    for (const letter of 'APPLE') fireEvent.click(tiles().find((b) => b.dataset.letter === letter && b.dataset.used === 'false')!);
 
     expect(screen.getByTestId('missed-recall-done')).toBeInTheDocument();
     expect(useStudyDeck.getState().studied).toBe(false);

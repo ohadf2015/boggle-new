@@ -1,4 +1,5 @@
 import type { StudyCard } from '@/shared/utils/studyCards';
+import { spellableWords } from '@/components/education/lobby/warmUpSpell';
 
 /** Recalling a word from its meaning beats re-reading it; a missed word comes back after a short gap, not straight away. */
 
@@ -9,7 +10,11 @@ export interface RecallItem {
   definition: string;
 }
 
+/** A word's last recall is built from scrambled letters: producing it, not just recognising it, is what makes it stick. */
+export type RecallKind = 'pick' | 'spell';
+
 export interface RecallQuestion extends RecallItem {
+  kind: RecallKind;
   options: string[];
 }
 
@@ -32,6 +37,7 @@ export interface RecallState {
 const MAX_OPTIONS = 4;
 const RETRY_GAP = 3;
 const SMALL_DECK = 12;
+const SPELL_MAX = 12;
 
 const keyOf = (text: string) => text.trim().toLowerCase();
 
@@ -71,7 +77,9 @@ function ask(state: Omit<RecallState, 'question'>, rng: Rng): RecallQuestion | n
     return k !== key && (!state.items[k] || keyOf(state.items[k].definition) !== sameMeaning);
   });
   const picked = shuffle(distractors, rng).slice(0, MAX_OPTIONS - 1);
-  return { ...item, options: shuffle([item.word, ...picked], rng) };
+  const lastStep = (state.counts[key] ?? 0) + 1 >= state.target;
+  const kind: RecallKind = lastStep && spellableWords([item.word], SPELL_MAX).length ? 'spell' : 'pick';
+  return { ...item, kind, options: shuffle([item.word, ...picked], rng) };
 }
 
 export function startRecall(items: readonly RecallItem[], opts: { pool: readonly string[]; target: number; rng: Rng }): RecallState {

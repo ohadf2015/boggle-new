@@ -1,5 +1,6 @@
 'use client';
 
+import { trackEduStartedWhileLearning } from '@/lib/education/studyTelemetry';
 import { memo, useCallback } from 'react';
 import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -101,8 +102,9 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const hasWords = lobby.studyCards.length > 0;
   const startGame = useCallback(() => {
     markRoomPlayed(gameCode);
+    if (stillLearning > 0) trackEduStartedWhileLearning({ stillLearning, students: studentCount });
     onStartGame();
-  }, [gameCode, onStartGame]);
+  }, [gameCode, onStartGame, stillLearning, studentCount]);
   const startPractice = useCallback(() => {
     markRoomPlayed(gameCode);
     onStartPracticeRound?.();
