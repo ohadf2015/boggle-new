@@ -106,6 +106,7 @@ vi.mock('@/utils/coinManager', async () => {
 import { useDailyMissions } from '../useDailyMissions';
 import { showQuestCompletionToast } from '@/components/quests/QuestCompletionToast';
 import { GRAND_SLAM_BONUS } from '@/utils/coinManager';
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -350,6 +351,24 @@ describe('useDailyMissions', () => {
           questName: 'quests.daily.long_word_6.title',
           xpReward: 100,
         }),
+      );
+    });
+  });
+
+  it('given a game just ended on the same screen, when a quest check is requested, then the toast fires with no navigation', async () => {
+    mockSingle
+      .mockResolvedValueOnce({ data: EMPTY_DATA, error: null })
+      .mockResolvedValue({ data: { ...EMPTY_DATA, word_hunt_completed: true }, error: null });
+
+    const { result } = renderHook(() => useDailyMissions());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(showQuestCompletionToast).not.toHaveBeenCalled();
+
+    requestQuestCheck();
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).toHaveBeenCalledWith(
+        expect.objectContaining({ questName: 'quests.daily.long_word_6.title', xpReward: 100 }),
       );
     });
   });

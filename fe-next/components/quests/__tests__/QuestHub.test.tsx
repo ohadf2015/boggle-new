@@ -16,8 +16,6 @@ import { render, screen } from '@testing-library/react';
 // --- Mocks ---
 
 const mockUseDailyMissions = vi.fn();
-const { mockPublishLevelUp } = vi.hoisted(() => ({ mockPublishLevelUp: vi.fn() }));
-vi.mock('@/lib/avatar/revealTrigger', () => ({ publishLevelUp: mockPublishLevelUp }));
 vi.mock('@/hooks/useDailyMissions', () => ({
   useDailyMissions: () => mockUseDailyMissions(),
 }));
@@ -297,111 +295,5 @@ describe('QuestHub', () => {
     // Progress text may be split across elements
     const progressEl = screen.getByText((content) => content.includes('1/3'));
     expect(progressEl).toBeInTheDocument();
-  });
-
-  it('POSTs to /api/quests/all-complete-claim when all quests complete (daily + weekly)', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        success: true,
-        claimed: true,
-        xpReward: 250,
-        coinReward: 200,
-      }),
-    });
-    vi.stubGlobal('fetch', mockFetch);
-
-    mockUseDailyMissions.mockReturnValue({
-      ...defaultMissions,
-      missions: [
-        { ...defaultMissions.missions[0], completed: true },
-        { ...defaultMissions.missions[1], completed: true },
-        { ...defaultMissions.missions[2], completed: true },
-      ],
-      completedCount: 3,
-      isGrandSlam: true,
-    });
-
-    mockUseWeeklyQuest.mockReturnValue({
-      ...defaultWeekly,
-      isComplete: true,
-    });
-
-    render(<QuestHub />);
-
-    await vi.waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/quests/all-complete-claim', {
-        method: 'POST',
-      });
-    });
-
-    vi.unstubAllGlobals();
-  });
-
-  it('given the all-complete claim crossed a level, when claimed, then the level-up is announced as quests', async () => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true, claimed: true, xpReward: 250, coinReward: 200, levelUp: { oldLevel: 12, newLevel: 13 } }),
-    }));
-    mockUseDailyMissions.mockReturnValue({
-      ...defaultMissions,
-      missions: defaultMissions.missions.map((m: Record<string, unknown>) => ({ ...m, completed: true })),
-      completedCount: 3,
-      isGrandSlam: true,
-    });
-    mockUseWeeklyQuest.mockReturnValue({ ...defaultWeekly, isComplete: true });
-
-    render(<QuestHub />);
-
-    await vi.waitFor(() => expect(mockPublishLevelUp).toHaveBeenCalledWith({ oldLevel: 12, newLevel: 13 }, 'quests'));
-    vi.unstubAllGlobals();
-  });
-
-  it('does NOT show toast when all-complete claim returns claimed=false', async () => {
-    const mockFetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({
-        success: true,
-        claimed: false,
-        xpReward: 0,
-        coinReward: 0,
-      }),
-    });
-    vi.stubGlobal('fetch', mockFetch);
-
-    mockUseDailyMissions.mockReturnValue({
-      ...defaultMissions,
-      missions: [
-        { ...defaultMissions.missions[0], completed: true },
-        { ...defaultMissions.missions[1], completed: true },
-        { ...defaultMissions.missions[2], completed: true },
-      ],
-      completedCount: 3,
-      isGrandSlam: true,
-    });
-
-    mockUseWeeklyQuest.mockReturnValue({
-      ...defaultWeekly,
-      isComplete: true,
-    });
-
-    render(<QuestHub />);
-
-    await vi.waitFor(() => {
-      expect(mockFetch).toHaveBeenCalled();
-    });
-
-    // Should not show "All Quests Complete" toast banner when already claimed
-    // (allComplete is still true, but toast is handled server-side only on newly-claimed)
-    const allCompleteText = screen.queryByText((content) =>
-      content && content.includes('Quests')
-    );
-    // Note: We can't easily assert "no toast" since showQuestCompletionToast is not mocked here.
-    // The key test is that the fetch succeeds and handles claimed=false properly.
-    expect(mockFetch).toHaveBeenCalledWith('/api/quests/all-complete-claim', {
-      method: 'POST',
-    });
-
-    vi.unstubAllGlobals();
   });
 });

@@ -9,7 +9,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { postWithAuth } from '@/utils/authFetch';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { onQuestCheck } from '@/lib/quests/questCheck';
+import { useQuestSound } from '@/lib/quests/useQuestSound';
 import {
   getAvailableQuests, getWeekStart, getWeekNumber, pickAvatarReward,
   getDifficultyFromType, getDisplayTargetForType,
@@ -59,7 +60,7 @@ function parseRow(row: Record<string, unknown>): ActiveQuest {
 export function useWeeklyQuest(): UseWeeklyQuestReturn {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { playQuestCompleteSound } = useSoundEffects();
+  const playQuestSound = useQuestSound();
   const [activeQuest, setActiveQuest] = useState<ActiveQuest | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectingQuestId, setSelectingQuestId] = useState<string | null>(null);
@@ -114,7 +115,11 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
-    return () => document.removeEventListener('visibilitychange', handleVisibility);
+    const offCheck = onQuestCheck(fetchQuest);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      offCheck();
+    };
   }, [fetchQuest]);
 
   // The server owns "already celebrated" (cross-device); the local marker only
@@ -143,9 +148,10 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
         showQuestCompletionToast({
           questName: activeQuest.title ? t(activeQuest.title) : t('weeklyQuest.title'),
           xpReward: activeQuest.xpReward,
+          isWeekly: true,
           dedupKey: `weekly:${activeQuest.questType}`,
           t,
-          onComplete: playQuestCompleteSound,
+          onComplete: playQuestSound,
         });
       } catch {
         // offline: retried on the next mount
@@ -154,7 +160,7 @@ export function useWeeklyQuest(): UseWeeklyQuestReturn {
     return () => {
       cancelled = true;
     };
-  }, [activeQuest, loading, t, playQuestCompleteSound]);
+  }, [activeQuest, loading, t, playQuestSound]);
 
   const handleSelectQuest = useCallback(async (questId: string) => {
     if (!user?.id) return;

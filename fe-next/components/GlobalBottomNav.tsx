@@ -18,6 +18,7 @@ import { navTierForPath, tierDotClass } from '@/lib/seasons/scoreTier';
 import { useSafeArea } from '../hooks/useSafeArea';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
+import { useAllQuestsCompleteClaim } from '@/hooks/useAllQuestsCompleteClaim';
 import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
 import { useFriends } from '../hooks/useFriends';
 import { useFriendMessages } from '../hooks/useFriendMessages';
@@ -177,8 +178,9 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { user, profile } = useAuth();
     const [showAuthModal, setShowAuthModal] = useState(false);
     const authGateOpen = useLandingAuthGate();
-    const { missions } = useDailyMissions();
-    useWeeklyQuest();
+    const { missions, isGrandSlam, loading: missionsLoading } = useDailyMissions();
+    const { isComplete: weeklyComplete, loading: weeklyLoading } = useWeeklyQuest();
+    useAllQuestsCompleteClaim(isGrandSlam, weeklyComplete, missionsLoading || weeklyLoading);
     const { pendingRequests, pendingChallenges, friends } = useFriends();
 
     // Refs with fresh values so onMessage callback can decide whether to toast

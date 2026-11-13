@@ -19135,6 +19135,8 @@ const sv = {
     "progress": "{{completed}}/{{total}}",
     "go": "KÖR",
     "done": "Klart!",
+    "resetIn": "Nya uppdrag om {{time}}",
+    "hero": { "fresh": "Tre nya uppdrag. Kör!", "one": "Ett klart. Kistan börjar svettas.", "two": "Ett till så öppnas kistan!", "done": "Kistan är öppen. Vi ses i morgon!" },
     "feed": {
       "title": "Senaste vinster",
       "pvp": "{{name}} besegrade en riktig motståndare",
@@ -19144,6 +19146,38 @@ const sv = {
       "long_word_6": {
         "title": "Ordbyggare",
         "desc": "Hitta ett ord med 6+ bokstäver"
+      },
+      "long_word_5": {
+        "title": "Uppvärmningsord",
+        "desc": "Hitta ett ord med 5+ bokstäver"
+      },
+      "words_10": {
+        "title": "Snabba tio",
+        "desc": "Hitta 10+ ord i ett spel"
+      },
+      "words_20": {
+        "title": "Ordlavin",
+        "desc": "Hitta 20+ ord i ett spel"
+      },
+      "tower_climb_50": {
+        "title": "Molnskrapa",
+        "desc": "Klättra 50 m i dagens Ordtorn"
+      },
+      "tower_floors_12": {
+        "title": "Takvåning",
+        "desc": "Bygg 12 våningar i dagens Ordtorn"
+      },
+      "connections_solve_2": {
+        "title": "Första överfarten",
+        "desc": "Lös 2 pussel i dagens Ordbro"
+      },
+      "score_400": {
+        "title": "Storspelare",
+        "desc": "Få 400+ poäng i ett spel"
+      },
+      "combo_5": {
+        "title": "Het svit",
+        "desc": "Nå 5x combo i ett spel"
       },
       "long_word_7": {
         "title": "Språkjätte",
@@ -19225,6 +19259,38 @@ const sv = {
       "title": "Uppdrag klart!",
       "grandSlam": "Grand Slam!",
       "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
+      "cheers": {
+        "quest": {
+          "1": "Uppdrag klart!",
+          "2": "Spikat.",
+          "3": "Pang. Avbockat.",
+          "4": "För lätt. Var det för lätt?",
+          "5": "Marshmallowen gör en glädjedans",
+          "6": "En till avklarad!"
+        },
+        "pvp": {
+          "1": "Du slog en riktig människa!",
+          "2": "Någonstans sitter någon och surar",
+          "3": "Rättvist och snyggt vunnet",
+          "4": "Den här ska upp på kylskåpet"
+        },
+        "weekly": {
+          "1": "Veckouppdraget klart!",
+          "2": "En hel veckas jobb. Klart.",
+          "3": "Veckobossen är fälld!"
+        },
+        "grandSlam": {
+          "1": "GRAND SLAM!",
+          "2": "Alla tre. Varenda en.",
+          "3": "Dagens uppdrag: tillplattade",
+          "4": "Rent bord!"
+        },
+        "allComplete": {
+          "1": "Uppdragsmästare!",
+          "2": "Inget kvar att göra. På riktigt.",
+          "3": "Alla uppdrag, borta!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Guld",
       "progress": "{{done}} av {{total}} dagliga uppdrag klara"

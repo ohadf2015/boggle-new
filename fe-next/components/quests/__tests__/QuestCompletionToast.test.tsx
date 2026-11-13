@@ -1,78 +1,66 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock confetti utils
 vi.mock('@/utils/confettiUtils', () => ({
   fireVictoryConfetti: vi.fn(),
   fireFireworks: vi.fn(),
+  fireStreakConfetti: vi.fn(),
+  fireLevelUpConfetti: vi.fn(),
+}));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('react-hot-toast', () => ({
+  default: { custom: vi.fn((_r, o) => o?.id), dismiss: vi.fn() },
 }));
 
-// Mock react-hot-toast
-vi.mock('react-hot-toast', () => {
-  const mockToastCustom = vi.fn((render, options) => {
-    return options?.id || `quest-toast-${Date.now()}`;
-  });
-  const mockToastDismiss = vi.fn();
+import toast from 'react-hot-toast';
+import { showQuestCompletionToast, resetQuestToastQueue } from '../QuestCompletionToast';
 
-  return {
-    default: {
-      custom: mockToastCustom,
-      dismiss: mockToastDismiss,
-    },
-    mockToastCustom,
-    mockToastDismiss,
-  };
-});
+const custom = toast.custom as unknown as ReturnType<typeof vi.fn>;
+const tierOfCall = (i: number) => {
+  const el = (custom.mock.calls[i][0] as (x: { id: string; visible: boolean }) => React.ReactElement)({ id: 'x', visible: true });
+  return (el.props as Record<string, unknown>)['data-tier'];
+};
 
-import { showQuestCompletionToast } from '../QuestCompletionToast';
-import toastModule from 'react-hot-toast';
-
-describe('QuestCompletionToast', () => {
+describe('QuestCompletionToast queue', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     vi.clearAllMocks();
+    resetQuestToastQueue();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('given two quests finish together, when shown, then both play one after the other and none is dropped', () => {
+    showQuestCompletionToast({ questName: 'A', xpReward: 100, dedupKey: 'a' });
+    showQuestCompletionToast({ questName: 'B', xpReward: 100, dedupKey: 'b' });
+    expect(custom).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(3000);
+    expect(custom).toHaveBeenCalledTimes(2);
+    expect(toast.dismiss).toHaveBeenCalledTimes(1);
   });
 
-  it('should track quest toast IDs and dismiss only the previous quest toast, not all toasts', () => {
-    const mockToastCustom = (toastModule.custom as any).getMockImplementation() ? toastModule.custom : toastModule.custom;
-    const mockToastDismiss = toastModule.dismiss;
+  it('given a Grand Slam queued before another quest, when played, then the Grand Slam lands last', () => {
+    showQuestCompletionToast({ questName: 'A', xpReward: 100, dedupKey: 'a' });
+    showQuestCompletionToast({ questName: '', xpReward: 500, isGrandSlam: true, dedupKey: 'gs' });
+    showQuestCompletionToast({ questName: 'B', xpReward: 100, dedupKey: 'b' });
 
-    // First call - should not dismiss anything yet
-    showQuestCompletionToast({
-      questName: 'Quest 1',
-      xpReward: 100,
-    });
-
-    expect(mockToastCustom).toHaveBeenCalledTimes(1);
-    expect(mockToastDismiss).not.toHaveBeenCalled();
-
-    // Second call - should dismiss the first quest toast ID
-    showQuestCompletionToast({
-      questName: 'Quest 2',
-      xpReward: 200,
-      dedupKey: 'quest-2',
-    });
-
-    expect(mockToastCustom).toHaveBeenCalledTimes(2);
-    // Should dismiss with an ID, not bare toast.dismiss()
-    expect(mockToastDismiss).toHaveBeenCalled();
-    const dismissArgs = (mockToastDismiss as any).mock.calls[0];
-    expect(dismissArgs.length).toBeGreaterThan(0);
-    expect(dismissArgs[0]).toBeDefined();
+    vi.advanceTimersByTime(20000);
+    expect(custom).toHaveBeenCalledTimes(3);
+    expect([0, 1, 2].map(tierOfCall)).toEqual(['quest', 'quest', 'grandSlam']);
   });
 
-  it('should pass explicit toast ID to toast.custom options', () => {
-    const mockToastCustom = toastModule.custom;
+  it('plays the reaction sound for each celebration', () => {
+    const onComplete = vi.fn();
+    showQuestCompletionToast({ questName: 'A', xpReward: 100, dedupKey: 'a', onComplete });
+    showQuestCompletionToast({ questName: 'B', xpReward: 100, dedupKey: 'b', onComplete });
+    vi.advanceTimersByTime(10000);
+    expect(onComplete).toHaveBeenCalledTimes(2);
+    expect(typeof onComplete.mock.calls[0][0]).toBe('string');
+  });
 
-    showQuestCompletionToast({
-      questName: 'Test Quest',
-      xpReward: 100,
-      dedupKey: 'my-test-quest',
-    });
-
-    const customCall = (mockToastCustom as any).mock.calls[0];
-    const options = customCall[1];
-
-    // Toast should have an id property in options
-    expect(options).toHaveProperty('id');
-    expect(typeof options.id).toBe('string');
+  it('ignores a repeat of the same key within the dedup window', () => {
+    showQuestCompletionToast({ questName: 'A', xpReward: 100, dedupKey: 'a' });
+    showQuestCompletionToast({ questName: 'A', xpReward: 100, dedupKey: 'a' });
+    vi.advanceTimersByTime(10000);
+    expect(custom).toHaveBeenCalledTimes(1);
   });
 });

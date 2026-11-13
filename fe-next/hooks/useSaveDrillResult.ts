@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { requestQuestCheck } from '@/lib/quests/questCheck';
 import type { DrillType, CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
 import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 import { useNetworkState } from '@/hooks/useNetworkState';
@@ -118,6 +119,7 @@ export function useSaveDrillResult(): UseSaveDrillResultReturn {
 
       const data = await response.json();
       if (data.levelUp) publishLevelUp(data.levelUp, 'drills');
+      requestQuestCheck();
 
       // Return the brainScore data from the API response
       return {

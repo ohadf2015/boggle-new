@@ -19058,6 +19058,8 @@ const es = {
     "progress": "{{completed}}/{{total}}",
     "go": "IR",
     "done": "¡Hecho!",
+    "resetIn": "Nuevas misiones en {{time}}",
+    "hero": { "fresh": "Tres misiones nuevas. ¡A por ellas!", "one": "Una menos. El cofre empieza a sudar.", "two": "¡Una más y el cofre se abre!", "done": "Cofre abierto. ¡Hasta mañana!" },
     "feed": {
       "title": "Victorias recientes",
       "pvp": "{{name}} venció a un rival real",
@@ -19067,6 +19069,38 @@ const es = {
       "long_word_6": {
         "title": "Arquitecto de Palabras",
         "desc": "Encuentra una palabra de 6+ letras"
+      },
+      "long_word_5": {
+        "title": "Palabra de calentamiento",
+        "desc": "Encuentra una palabra de 5+ letras"
+      },
+      "words_10": {
+        "title": "Diez rapiditas",
+        "desc": "Encuentra 10+ palabras en una partida"
+      },
+      "words_20": {
+        "title": "Avalancha de palabras",
+        "desc": "Encuentra 20+ palabras en una partida"
+      },
+      "tower_climb_50": {
+        "title": "Rascanubes",
+        "desc": "Sube 50 m en la Torre de Palabras de hoy"
+      },
+      "tower_floors_12": {
+        "title": "Ático de lujo",
+        "desc": "Construye 12 pisos en la Torre de Palabras de hoy"
+      },
+      "connections_solve_2": {
+        "title": "Primer cruce",
+        "desc": "Resuelve 2 puzles en el Puente de palabras de hoy"
+      },
+      "score_400": {
+        "title": "Bolsillo lleno",
+        "desc": "Anota 400+ puntos en una partida"
+      },
+      "combo_5": {
+        "title": "Racha caliente",
+        "desc": "Logra un combo 5x en una partida"
       },
       "long_word_7": {
         "title": "Coloso Léxico",
@@ -19148,6 +19182,38 @@ const es = {
       "title": "¡Misión Cumplida!",
       "grandSlam": "¡Grand Slam!",
       "grandSlamDesc": "¡Todas las misiones diarias completadas!",
+      "cheers": {
+        "quest": {
+          "1": "¡Misión cumplida!",
+          "2": "Clavado.",
+          "3": "¡Bum! Tachada.",
+          "4": "Demasiado fácil. ¿O no?",
+          "5": "El malvavisco está bailando de alegría",
+          "6": "¡Una menos!"
+        },
+        "pvp": {
+          "1": "¡Le ganaste a una persona de verdad!",
+          "2": "Alguien por ahí está refunfuñando",
+          "3": "Ganada limpia y justa",
+          "4": "Esta va directa a la nevera"
+        },
+        "weekly": {
+          "1": "¡Misión semanal cumplida!",
+          "2": "Una semana entera de trabajo. Hecho.",
+          "3": "¡El jefe semanal cayó!"
+        },
+        "grandSlam": {
+          "1": "¡GRAND SLAM!",
+          "2": "Las tres. Todas y cada una.",
+          "3": "Misiones diarias: aplastadas",
+          "4": "¡Pleno total!"
+        },
+        "allComplete": {
+          "1": "¡Maestro de misiones!",
+          "2": "No queda nada por hacer. En serio.",
+          "3": "¡Todas las misiones, fuera!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Oro",
       "progress": "{{done}} de {{total}} misiones diarias completadas"

@@ -291,10 +291,57 @@ function seedFor(dateStr?: string): number {
  */
 export const MIN_DAILY_COMPLETABLE = 2;
 
+/**
+ * v2 widens the pool and never repeats a quest from yesterday. It starts on a
+ * fixed date because the rotation is shared by client and server and the DB
+ * stores completion per SLOT: switching mid-day would move today's flags onto
+ * different quests.
+ */
+export const QUEST_POOL_V2_START = '2026-11-14';
+
+export const DAILY_QUEST_POOL_V2: DailyQuest[] = [
+  ...DAILY_QUEST_POOL,
+  q('long_word_5', 'longWord', 5, 'skill', '/daily', '📐'),
+  q('words_10', 'wordsInGame', 10, 'skill', '/daily', '🔟'),
+  q('words_20', 'wordsInGame', 20, 'skill', '/daily', '🌊'),
+  q('tower_climb_50', 'towerMetres', 50, 'skill', '/word-tower/daily', '☁️'),
+  q('tower_floors_12', 'towerFloors', 12, 'skill', '/word-tower/daily', '🏢'),
+  q('connections_solve_2', 'puzzlesSolved', 2, 'skill', '/connections/daily', '🌉'),
+  q('score_400', 'score', 400, 'skill', '/multiplayer', '💰'),
+  q('combo_5', 'combo', 5, 'skill', '/multiplayer', '♨️'),
+];
+
+const v2Memo = new Map<string, [DailyQuest, DailyQuest, DailyQuest]>();
+const nextDay = (d: string) => new Date(Date.parse(`${d}T00:00:00Z`) + 86_400_000).toISOString().split('T')[0];
+
 export function getDailyQuests(
   dateStr?: string,
 ): [DailyQuest, DailyQuest, DailyQuest] {
-  const shuffled = seededShuffle(DAILY_QUEST_POOL, seedFor(dateStr));
+  const date = dateStr ?? new Date().toISOString().split('T')[0];
+  if (date < QUEST_POOL_V2_START) return pickQuests(DAILY_QUEST_POOL, seedFor(date), new Set());
+  const hit = v2Memo.get(date);
+  if (hit) return hit;
+  // Walk forward from the latest memoised day (or the start) so each day excludes the one before it.
+  let d = QUEST_POOL_V2_START;
+  let prev: DailyQuest[] = [];
+  for (const [k, v] of v2Memo) if (k < date && k >= d) { d = k; prev = v; }
+  if (prev.length) d = nextDay(d);
+  let out = pickQuests(DAILY_QUEST_POOL_V2, seedFor(d), new Set(prev.map((x) => x.id)));
+  v2Memo.set(d, out);
+  while (d < date) {
+    d = nextDay(d);
+    out = pickQuests(DAILY_QUEST_POOL_V2, seedFor(d), new Set(out.map((x) => x.id)));
+    v2Memo.set(d, out);
+  }
+  return out;
+}
+
+function pickQuests(
+  pool: DailyQuest[],
+  seed: number,
+  exclude: ReadonlySet<string>,
+): [DailyQuest, DailyQuest, DailyQuest] {
+  const shuffled = seededShuffle(pool, seed).filter((x) => !exclude.has(x.id));
   const picked: DailyQuest[] = [];
   const usedTypes = new Set<QuestConditionType>();
   let pvpCount = 0;

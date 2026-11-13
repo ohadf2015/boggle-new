@@ -17108,6 +17108,8 @@ const en = {
     "progress": "{{completed}}/{{total}}",
     "go": "GO",
     "done": "Done",
+    "resetIn": "New quests in {{time}}",
+    "hero": { "fresh": "Three fresh quests. Go get 'em.", "one": "One down. The chest is getting nervous.", "two": "One more and the chest pops open!", "done": "Chest cracked. See you tomorrow!" },
     "feed": {
       "title": "Recent wins",
       "pvp": "{{name}} beat a human rival",
@@ -17115,6 +17117,14 @@ const en = {
     },
     "daily": {
       "long_word_6": { "title": "Word Architect", "desc": "Find a word 6+ letters long" },
+      "long_word_5": { "title": "Warm-Up Word", "desc": "Find a word 5+ letters long" },
+      "words_10": { "title": "Quick Ten", "desc": "Find 10+ words in one game" },
+      "words_20": { "title": "Word Avalanche", "desc": "Find 20+ words in one game" },
+      "tower_climb_50": { "title": "Cloud Scraper", "desc": "Climb 50 m in today's Word Tower" },
+      "tower_floors_12": { "title": "Penthouse", "desc": "Build 12 floors in today's Word Tower" },
+      "connections_solve_2": { "title": "First Crossing", "desc": "Solve 2 puzzles in today's Word Bridge" },
+      "score_400": { "title": "Big Spender", "desc": "Score 400+ in a single game" },
+      "combo_5": { "title": "Hot Streak", "desc": "Hit a 5x combo in one game" },
       "long_word_7": { "title": "Lexical Giant", "desc": "Find a word 7+ letters long" },
       "score_300": { "title": "Sharp Shooter", "desc": "Score 300+ in a single game" },
       "score_500": { "title": "High Roller", "desc": "Score 500+ in a single game" },
@@ -17144,6 +17154,38 @@ const en = {
       "title": "Quest Complete!",
       "grandSlam": "GRAND SLAM!",
       "grandSlamDesc": "All daily missions crushed!",
+      "cheers": {
+        "quest": {
+          "1": "Quest done!",
+          "2": "Nailed it.",
+          "3": "Boom. Checked off.",
+          "4": "Too easy. Was that too easy?",
+          "5": "The marshmallow is doing a happy dance",
+          "6": "One more down!"
+        },
+        "pvp": {
+          "1": "You beat a real human!",
+          "2": "Somewhere, someone is sulking",
+          "3": "Outplayed, fair and square",
+          "4": "That one goes on the fridge"
+        },
+        "weekly": {
+          "1": "Weekly quest done!",
+          "2": "A whole week of work. Done.",
+          "3": "The weekly boss is down!"
+        },
+        "grandSlam": {
+          "1": "GRAND SLAM!",
+          "2": "All three. Every single one.",
+          "3": "Daily missions: flattened",
+          "4": "Clean sweep!"
+        },
+        "allComplete": {
+          "1": "Quest Master!",
+          "2": "Nothing left to do. Seriously.",
+          "3": "Every quest, gone!"
+        }
+      },
       "xpReward": "+{{xp}} XP",
       "goldReward": "+{{gold}} Gold",
       "progress": "{{done}} of {{total}} daily quests done"
