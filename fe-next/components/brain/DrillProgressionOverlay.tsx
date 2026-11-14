@@ -129,7 +129,7 @@ export default function DrillProgressionOverlay({
   return (
     <>
       {isOpen && (
-        <div
+        <div role="dialog" aria-modal="true"
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-in fade-in-0 duration-300"
           style={{ backdropFilter: 'blur(8px)' }}
         >

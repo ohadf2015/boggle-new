@@ -276,7 +276,7 @@ export function AdminGiftModal({
   // settles visible. (The GSAP reveal timeline animates already-visible content.)
   return (
       show && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-300">
+        <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in-0 duration-300">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-xs animate-in fade-in-0 duration-300"

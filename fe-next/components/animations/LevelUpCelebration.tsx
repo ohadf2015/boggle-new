@@ -211,7 +211,7 @@ export function LevelUpCelebration({
   // Reduced motion variant
   if (prefersReducedMotion && show) {
     return (
-      <div
+      <div role="dialog" aria-modal="true"
         className={cn(
           'fixed inset-0 z-60 flex items-center justify-center bg-neo-black/80',
           className
@@ -241,7 +241,7 @@ export function LevelUpCelebration({
   return (
     <AnimatePresence>
       {show && (
-        <m.div
+        <m.div role="dialog" aria-modal="true"
           ref={containerRef}
           className={cn(
             'fixed inset-0 z-60 flex items-center justify-center',

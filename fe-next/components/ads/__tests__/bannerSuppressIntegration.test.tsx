@@ -71,6 +71,7 @@ const SUPPRESS_HTML_CLASSES = [
   'fdw-modal-open',
   'onboarding-active',
   'banner-allow-in-game',
+  'blocking-overlay-open',
 ] as const;
 
 function clearSuppressDom() {
@@ -108,7 +109,8 @@ async function toggleSuppressClass(
       onboarding: document.documentElement.classList.contains('onboarding-active'),
       modalOpen:
         document.documentElement.classList.contains('modal-open') ||
-        document.documentElement.classList.contains('fdw-modal-open'),
+        document.documentElement.classList.contains('fdw-modal-open') ||
+        document.documentElement.classList.contains('blocking-overlay-open'),
     }),
   );
   await whenIdle(bannerController);
@@ -202,6 +204,46 @@ describe('Banner suppress/restore — integration', () => {
     await toggleSuppressClass(bannerController, shouldSuppressBanner, () => {
       document.documentElement.classList.remove('modal-open');
     });
+    expect(resumeBannerSpy).toHaveBeenCalled();
+    expect(showBannerSpy).toHaveBeenCalled();
+  });
+
+  it('hides while a custom aria-modal overlay is shown (chest reveal) and restores when it unmounts', async () => {
+    // Player report 2026-11-14: the chest prize reveal is a hand-rolled portal
+    // (role=dialog aria-modal=true) that never touched html.modal-open, so the
+    // native banner painted over its main CTA. The DOM watch must catch it.
+    const BannerCoordinatorMount = (await import('../BannerCoordinatorMount')).default;
+    const AnchoredNativeBanner = (await import('../AnchoredNativeBanner')).default;
+    const { bannerController, shouldSuppressBanner } = await import('@/lib/native/bannerController');
+
+    render(
+      <>
+        <BannerCoordinatorMount />
+        <AnchoredNativeBanner />
+      </>,
+    );
+
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 15000 });
+    await whenIdle(bannerController);
+    await bannerController.setSuppressed(false);
+    await whenIdle(bannerController);
+    hideBannerSpy.mockClear();
+    showBannerSpy.mockClear();
+    resumeBannerSpy.mockClear();
+
+    const reveal = document.createElement('div');
+    reveal.setAttribute('role', 'dialog');
+    reveal.setAttribute('aria-modal', 'true');
+    await toggleSuppressClass(bannerController, shouldSuppressBanner, () => {
+      document.body.appendChild(reveal);
+    });
+    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(true));
+    await whenIdle(bannerController);
+    expect(hideBannerSpy).toHaveBeenCalled();
+
+    reveal.remove();
+    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(false));
+    await toggleSuppressClass(bannerController, shouldSuppressBanner, () => {});
     expect(resumeBannerSpy).toHaveBeenCalled();
     expect(showBannerSpy).toHaveBeenCalled();
   });

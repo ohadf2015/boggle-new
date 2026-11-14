@@ -8,6 +8,7 @@ import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
 import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { removeNativeBanner } from '@/lib/native/removeNativeBanner';
+import { BLOCKING_OVERLAY_CLASS, startBlockingOverlayWatch } from '@/lib/native/blockingOverlay';
 
 /**
  * Lifecycle host for the single banner coordinator. Rendered once (next to
@@ -156,9 +157,14 @@ export default function BannerCoordinatorMount() {
           // can cover it — suppress so it doesn't paint over the modal's content/CTAs.
           // Player report 2026-08-12: "the add hides part of the report bug form".
           // Both live on <html>, covered by the observer below.
+          // `blocking-overlay-open` = any shown aria-modal / alertdialog overlay
+          // (custom portals that never touch modal-open: chest + prize reveals,
+          // weekly chest, streak/season popups, sheets). Set by the DOM watch below.
+          // Player report 2026-11-14: banner hid the chest reveal's main CTA.
           modalOpen:
             document.documentElement.classList.contains('modal-open') ||
-            document.documentElement.classList.contains('fdw-modal-open'),
+            document.documentElement.classList.contains('fdw-modal-open') ||
+            document.documentElement.classList.contains(BLOCKING_OVERLAY_CLASS),
           adFreeRoute: document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS),
         }),
       );
@@ -173,6 +179,8 @@ export default function BannerCoordinatorMount() {
       attributeFilter: ['class'],
     });
     removers.push(() => suppressObserver.disconnect());
+    // Mirror "a modal overlay is shown" onto <html> so the observer above re-syncs.
+    removers.push(startBlockingOverlayWatch(document));
 
     // Periodic refresh so the banner doesn't sit on one stale creative. AdMob's
     // own refresh can stall when the WebView is backgrounded/throttled, so we

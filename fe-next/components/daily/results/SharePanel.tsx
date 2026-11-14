@@ -53,7 +53,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   return (
     <>
       {isOpen && (
-        <div
+        <div role="dialog" aria-modal="true"
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain scrollable-area animate-in fade-in-0 duration-300"
           onClick={onClose}
         >

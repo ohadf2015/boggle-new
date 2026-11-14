@@ -28,7 +28,7 @@ export function BlastContinueModal({
 
   return (
     <>
-      <div
+      <div role="dialog" aria-modal="true"
         data-testid="blast-continue-modal"
         className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/80 p-4 animate-in fade-in-0 duration-300"
       >

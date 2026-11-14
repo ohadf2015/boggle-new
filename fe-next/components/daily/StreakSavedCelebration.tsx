@@ -76,7 +76,7 @@ const StreakSavedCelebration: React.FC<StreakSavedCelebrationProps> = ({
   return (
     <>
       {isOpen && (
-        <div
+        <div role="dialog" aria-modal="true"
           className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 animate-in fade-in-0 duration-300"
           onClick={onClose}
         >

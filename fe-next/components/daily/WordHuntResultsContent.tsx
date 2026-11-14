@@ -293,7 +293,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
   // Simplified signup modal — shown only if tapped, not on default scroll path
   const signupModalNode = showSignupModal && !isAuthenticated ? (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-40 flex items-center justify-center p-4">
       <ResultsSignupModal
         pendingResult={{ result, puzzleNumber, puzzleDate, language }}
         onDismiss={() => {

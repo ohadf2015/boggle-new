@@ -40,7 +40,7 @@ export function MatchmakingOverlay({
   const timeStr = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
   return (
-    <div
+    <div aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-xs"
       role="dialog"
       aria-label={t('matchmaking.findingOpponent')}

@@ -23,7 +23,7 @@ export function DailyPartClaimModal({
 
   return (
     <>
-      <div
+      <div role="dialog" aria-modal="true"
         data-testid="avatar-daily-claim-modal"
         // z above the avatar builder (z-[110]): this claim offer is launched
         // from a reward button INSIDE the builder, so it must overlay it, not
