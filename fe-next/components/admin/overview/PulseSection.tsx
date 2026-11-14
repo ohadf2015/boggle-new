@@ -151,8 +151,7 @@ export function PulseSection({ pulse, windowDays, onWindowChange, failed, onRetr
 
       {stats && (
         <ul data-testid="pulse-totals" className={`flex flex-wrap items-baseline gap-x-6 gap-y-1 text-xs ${MUTED}`}>
-          <li data-testid="pulse-total-players" className="text-sm">{t('admin.pulse.totalPlayers', 'Total players')} <b className="text-xl font-black tabular-nums text-neo-lime">{(stats.overview.totalPlayers + (stats.overview.totalGuests ?? 0)).toLocaleString(language)}</b></li>
-          <li>{t('admin.pulse.totalRegistered', 'Registered')} <b className="tabular-nums text-neo-cream">{stats.overview.totalPlayers.toLocaleString(language)}</b></li>
+          <li data-testid="pulse-total-signups" className="text-sm">{t('admin.pulse.totalSignups', 'Total signups')} <b className="text-xl font-black tabular-nums text-neo-lime">{stats.overview.totalPlayers.toLocaleString(language)}</b></li>
           {stats.overview.totalGuests != null && <li>{t('admin.pulse.totalGuests', 'Guests')} <b className="tabular-nums text-neo-cream">{stats.overview.totalGuests.toLocaleString(language)}</b></li>}
           <li>{t('admin.pulse.totalGames', 'Games ever')} <b className="tabular-nums text-neo-cream">{stats.overview.totalGames.toLocaleString(language)}</b></li>
           <li>{t('admin.pulse.totalHours', 'Hours played')} <b className="tabular-nums text-neo-cream">{Math.round(stats.overview.totalGameTimeHours).toLocaleString(language)}</b></li>
