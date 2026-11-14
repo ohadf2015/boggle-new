@@ -91,6 +91,7 @@ export type GrowthEvent =
   // Props { wait_ms, waited_for: 'grid'|'dictionary'|'both', mode, language }.
   | 'blast_board_wait'
   | 'blast_board_stuck'
+  | 'dictionary_prewarm_failed' // prewarmDictionary failed (language, reason); submits fall back to the server
   | 'results_viewed'
   | 'replay_countdown_shown'
   | 'results_autoplay_cancelled'
