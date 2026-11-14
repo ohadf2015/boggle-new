@@ -1,14 +1,7 @@
 /**
- * Piece D (perf), SPEC section 10 item 4: the homepage's loading boundaries
- * must not spend first-load bandwidth.
- *
- * 1. `(home)/loading.tsx` (random dancing mascot PNG, 45-94KB) is gone: the
- *    fresh page streams its h1 in the shell, so a homepage-only fallback only
- *    added a hidden `S:` segment + an image fetch in front of it. The homepage
- *    now inherits the generic `[locale]/loading.tsx`.
- * 2. That generic boundary keeps its PageLoader, but the loader's mascot must
- *    not be `priority` (a high-priority preload for an image that is on screen
- *    for a few hundred ms at most). Other PageLoader callers keep the default.
+ * The homepage and content pages sit outside every loading boundary, so their
+ * h1 is in the first HTML instead of a hidden streamed segment. Game and app
+ * routes keep the mascot loader, which must not preload its image.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -23,7 +16,7 @@ vi.mock('@/components/ui/PageLoader', () => ({
   },
 }));
 
-import LocaleLoading from '@/app/[locale]/loading';
+import RouteLoading from '@/components/ui/RouteLoading';
 
 const APP_LOCALE = path.resolve(__dirname, '../../../app/[locale]');
 
@@ -34,14 +27,22 @@ describe('homepage loading boundary (fresh first load)', () => {
     expect(fs.existsSync(path.join(APP_LOCALE, '(home)', 'loading.tsx'))).toBe(false);
   });
 
-  it('shouldKeepTheGenericLocaleBoundary', () => {
-    expect(fs.existsSync(path.join(APP_LOCALE, 'loading.tsx'))).toBe(true);
+  it('shouldKeepContentPagesOutsideAnyLoadingBoundary', () => {
+    for (const dir of ['.', 'faq', 'scrabble-alternative-online']) {
+      expect(fs.existsSync(path.join(APP_LOCALE, dir, 'loading.tsx'))).toBe(false);
+    }
+  });
+
+  it('shouldKeepTheLoaderOnGameRoutes', () => {
+    for (const dir of ['blast', 'crossword', 'quick-play', 'daily', 'join']) {
+      expect(fs.readFileSync(path.join(APP_LOCALE, dir, 'loading.tsx'), 'utf8')).toContain('@/components/ui/RouteLoading');
+    }
   });
 
   it('shouldRenderTheLocaleLoaderWithoutAPriorityImage', () => {
     // GIVEN the generic [locale] boundary
     pageLoaderProps.length = 0;
-    const { getByTestId } = render(<LocaleLoading />);
+    const { getByTestId } = render(<RouteLoading />);
     // THEN it still renders the mascot PageLoader
     expect(getByTestId('page-loader')).toBeTruthy();
     // AND asks it not to preload its mascot image
