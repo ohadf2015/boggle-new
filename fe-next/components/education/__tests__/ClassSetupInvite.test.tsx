@@ -342,7 +342,9 @@ describe('ClassSetupInvite', () => {
     it('Given the teacher opens change words and plays without editing, Then the saved list plays and no second list is written', async () => {
       lessons.get.mockResolvedValue({ data: { id: 'L-own', name: 'Words for Nov 11', words: [{ word: 'photon' }, { word: 'gravity' }, { word: 'magnet' }] }, error: null });
       render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
-      fireEvent.click(await screen.findByTestId('saved-list-change'));
+      const change = await screen.findByTestId('saved-list-change');
+      await waitFor(() => expect(change).toBeEnabled());
+      fireEvent.click(change);
       fireEvent.click(screen.getByTestId('setup-play-now'));
       await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
       expect(lessons.createLesson).not.toHaveBeenCalled();
@@ -358,8 +360,12 @@ describe('ClassSetupInvite', () => {
 
     it('Given the setup list and new words typed over it, Then the typed words win', async () => {
       render(<ClassSetupInvite classroomId="c1" lessonId="L-own" />);
-      fireEvent.click(await screen.findByTestId('saved-list-change'));
-      fireEvent.change(screen.getByTestId('first-game-words'), { target: { value: TEN } });
+      // The Change button renders disabled while the saved list loads; a click
+      // before it loads does nothing (seen on a loaded CI runner).
+      const change = await screen.findByTestId('saved-list-change');
+      await waitFor(() => expect(change).toBeEnabled());
+      fireEvent.click(change);
+      fireEvent.change(await screen.findByTestId('first-game-words'), { target: { value: TEN } });
       fireEvent.click(screen.getByTestId('setup-play-now'));
       await waitFor(() => expect(nav.push).toHaveBeenCalledWith(LOBBY));
       expect(lessons.createLesson.mock.calls[0][0].words).toHaveLength(10);
