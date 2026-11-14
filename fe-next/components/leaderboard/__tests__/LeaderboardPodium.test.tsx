@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import LeaderboardPodium from '../LeaderboardPodium';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
@@ -16,6 +16,12 @@ vi.mock('@/components/Avatar', () => ({
     />
   ),
 }));
+
+vi.mock('@/components/players/PlayerSummaryDialog', () => ({
+  PlayerSummaryDialog: ({ player, open }: { player: { id: string }; open: boolean }) =>
+    open ? <div data-testid={`summary-${player.id}`} /> : null,
+}));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 const goldCfg = { base: 'GOLD' } as unknown as CustomAvatarConfig;
 
@@ -71,11 +77,19 @@ describe('LeaderboardPodium', () => {
     expect(glow.className).toContain('pointer-events-none');
   });
 
-  it('links each podium player to their profile page', () => {
+  it('opens each other player\'s summary card (which links the profile) on tap', () => {
     render(<LeaderboardPodium entries={entries} language="en" />);
-    expect(screen.getByText('Ada').closest('a')).toHaveAttribute('href', '/en/player/a');
+    for (const [name, id] of [['Ada', 'a'], ['Ben', 'b'], ['Cy', 'c']] as const) {
+      const trigger = screen.getByText(name).closest('[role="button"]') as HTMLElement;
+      expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+      fireEvent.click(trigger);
+      expect(screen.getByTestId(`summary-${id}`)).toBeInTheDocument();
+    }
+  });
+
+  it('keeps a direct profile link on the viewer\'s own spot', () => {
+    render(<LeaderboardPodium entries={entries} language="en" currentUserId="b" />);
     expect(screen.getByText('Ben').closest('a')).toHaveAttribute('href', '/en/player/b');
-    expect(screen.getByText('Cy').closest('a')).toHaveAttribute('href', '/en/player/c');
   });
 
   it('shouldKeepPodiumColumnsFromOverflowingOnNarrowViewports', () => {

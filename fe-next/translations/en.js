@@ -136,6 +136,14 @@ const en = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "View full profile",
+    "openFor": "Open {name}'s profile summary",
+    "guest": "Guest player. No profile yet.",
+    "signInToSee": "Sign in to see their stats and profile",
+    "loadFailed": "Couldn't load their stats right now",
+    "noStats": "No games played yet"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "See {count} more friends online",

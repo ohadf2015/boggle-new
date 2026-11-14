@@ -1,19 +1,22 @@
 'use client';
 
-import { memo, type ReactNode } from 'react';
-import Link from 'next/link';
-import { Trophy, Target, ExternalLink } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { isValidElement, memo, type ReactNode } from 'react';
+import { Trophy, Target } from 'lucide-react';
 import LevelBadge from '@/components/LevelBadge';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import Avatar from '@/components/Avatar';
 import { MobileTooltip } from './MobileTooltip';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
 
 export interface PlayerTooltipData {
-  /** Player UUID — preferred for profile links */
+  /** Player UUID — when set, a tap opens the summary card with a profile link */
   id?: string;
+  /** Opaque row key on an id-free daily board (resolved on tap for signed-in viewers) */
+  boardKey?: string;
+  /** Equipped progression title */
+  title?: string | null;
   username: string;
   displayName?: string;
   avatarImage?: string;
@@ -31,18 +34,19 @@ interface PlayerProfileTooltipProps {
   isCurrentUser?: boolean;
   children: ReactNode;
   side?: 'top' | 'right' | 'bottom' | 'left';
+  /** Analytics surface for the summary card */
+  surface?: string;
 }
 
 /**
- * Mini profile card shown on hover/tap for player names in leaderboards.
- * Shows avatar, name, level, country, win stats.
- * Links to full /player/[username] profile page.
+ * Hover/tap mini card for a player with no account behind the row (room
+ * nickname, guest, bot): avatar, name, level, country, win stats. There is no
+ * profile to link to — rows with an account open PlayerSummaryTrigger instead.
  */
 const PlayerProfileTooltipContent = memo<{
   player: PlayerTooltipData;
   t: (key: string, params?: Record<string, string | number>) => string;
-  language: string;
-}>(({ player, t, language }) => {
+}>(({ player, t }) => {
   const countryFlag = player.countryCode ? getCountryFlag(player.countryCode) : null;
   const name = player.displayName || player.username;
 
@@ -89,23 +93,6 @@ const PlayerProfileTooltipContent = memo<{
         )}
       </div>
 
-      {/* View Profile Link */}
-      <Link
-        href={`/${language}/player/${encodeURIComponent(player.id || player.username)}`}
-        className={cn(
-          'flex items-center justify-center gap-1',
-          'text-[11px] font-black uppercase',
-          'bg-neo-navy text-neo-white',
-          'px-2 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
-          'hover:bg-neo-cyan hover:text-neo-black',
-          'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-          'transition'
-        )}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <ExternalLink className="w-3 h-3" />
-        {t('profile.viewProfile')}
-      </Link>
     </div>
   );
 });
@@ -113,26 +100,47 @@ const PlayerProfileTooltipContent = memo<{
 PlayerProfileTooltipContent.displayName = 'PlayerProfileTooltipContent';
 
 /**
- * Wraps any leaderboard player element with a hover/tap tooltip
- * showing a mini profile card + link to full profile page.
+ * Wraps a player's name on a board. With an account behind the row (id, or a
+ * daily board key) a tap opens the summary card with a link to the full
+ * profile; otherwise a hover/tap tooltip with what the row knows.
  *
- * Skips rendering tooltip for the current user.
+ * Skips both for the current user.
  */
 const PlayerProfileTooltip = memo<PlayerProfileTooltipProps>(({
   player,
   isCurrentUser = false,
   children,
   side = 'top',
+  surface = 'leaderboard',
 }) => {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
 
   if (isCurrentUser) {
     return <>{children}</>;
   }
 
+  if ((player.id || player.boardKey) && isValidElement(children)) {
+    return (
+      <PlayerSummaryTrigger
+        player={{
+          id: player.id,
+          boardKey: player.boardKey,
+          name: player.displayName || player.username,
+          avatarImage: player.avatarImage,
+          customAvatar: player.customAvatar,
+          countryCode: player.countryCode,
+          title: player.title,
+        }}
+        surface={surface}
+      >
+        {children}
+      </PlayerSummaryTrigger>
+    );
+  }
+
   return (
     <MobileTooltip
-      content={<PlayerProfileTooltipContent player={player} t={t} language={language} />}
+      content={<PlayerProfileTooltipContent player={player} t={t} />}
       side={side}
       contentClassName="p-3"
       delayDuration={300}

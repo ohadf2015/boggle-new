@@ -136,6 +136,14 @@ const ja = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "プロフィールを見る",
+    "openFor": "{name}のプロフィール概要を開く",
+    "guest": "ゲストプレイヤー。プロフィールはまだありません。",
+    "signInToSee": "ログインすると成績とプロフィールを見られます",
+    "loadFailed": "今は成績を読み込めませんでした",
+    "noStats": "まだ対戦がありません"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "ほか{count}人のフレンドがオンライン",

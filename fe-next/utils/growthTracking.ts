@@ -182,6 +182,9 @@ export type GrowthEvent =
   | 'friend_request_sent'
   | 'friend_request_accepted'
   | 'friend_chat_opened'
+  // Tap a player on a board → summary card → full profile
+  | 'player_summary_opened'
+  | 'player_summary_profile_clicked'
   | 'friend_quick_reply_sent'
   | 'friend_invite_sent'
   | 'challenge_sent'

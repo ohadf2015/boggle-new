@@ -136,6 +136,14 @@ const es = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "Ver perfil completo",
+    "openFor": "Abrir el resumen del perfil de {name}",
+    "guest": "Jugador invitado. Aún sin perfil.",
+    "signInToSee": "Inicia sesión para ver sus estadísticas y su perfil",
+    "loadFailed": "No pudimos cargar sus estadísticas ahora",
+    "noStats": "Aún no ha jugado partidas"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "Ver {count} amigos más en línea",

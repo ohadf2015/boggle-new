@@ -136,6 +136,14 @@ const he = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "לפרופיל המלא",
+    "openFor": "סיכום הפרופיל של {name}",
+    "guest": "משחק כאורח, אין עדיין פרופיל",
+    "signInToSee": "התחברו כדי לראות סטטיסטיקות ופרופיל",
+    "loadFailed": "לא הצלחנו לטעון את הנתונים כרגע",
+    "noStats": "עוד אין משחקים"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "עוד {count} חברים מחוברים",
