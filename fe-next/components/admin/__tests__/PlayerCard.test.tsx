@@ -102,3 +102,28 @@ describe('PlayerCard — beta tester control', () => {
     expect(screen.getByTestId('player-beta-toggle')).toBeDisabled();
   });
 });
+
+describe('PlayerCard — compact row', () => {
+  it('keeps the curator panel folded until its toggle is pressed', () => {
+    renderCard(makePlayer());
+    expect(screen.queryByTestId('curator-control')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('player-curator-toggle'));
+    expect(screen.getByTestId('curator-control')).toBeInTheDocument();
+  });
+
+  it('shows how many curator languages a player holds on the folded toggle', () => {
+    renderCard(makePlayer(), { curatorAssignments: [{ language: 'he', tier: 1 } as never, { language: 'en', tier: 2 } as never] });
+    expect(screen.getByTestId('player-curator-toggle')).toHaveTextContent('2');
+  });
+
+  it('names every icon action for screen readers', () => {
+    const onGift = vi.fn();
+    const onBlock = vi.fn();
+    const player = makePlayer();
+    renderCard(player, { onGift, onBlock });
+    fireEvent.click(screen.getByRole('button', { name: 'Gift' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Block' }));
+    expect(onGift).toHaveBeenCalledWith(player);
+    expect(onBlock).toHaveBeenCalledWith(player);
+  });
+});

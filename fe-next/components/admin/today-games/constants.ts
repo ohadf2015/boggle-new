@@ -36,7 +36,7 @@ export const GAME_TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 // Date range options for filtering
-export const DATE_RANGES = ['today', '7d', '30d', '90d', 'all'] as const;
+export const DATE_RANGES = ['24h', '7d', '30d', '90d', 'all'] as const;
 export type DateRange = typeof DATE_RANGES[number];
 
 /**
@@ -46,9 +46,7 @@ export type DateRange = typeof DATE_RANGES[number];
  */
 export function getDateRangeStart(range: DateRange, now: Date = new Date()): string | null {
   if (range === 'all') return null;
-  if (range === 'today') {
-    return now.toISOString().split('T')[0];
-  }
+  if (range === '24h') return new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const days = range === '7d' ? 7 : range === '30d' ? 30 : 90;
   const start = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
   return start.toISOString().split('T')[0];

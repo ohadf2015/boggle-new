@@ -382,7 +382,7 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       ) : players.length === 0 ? (
         <div className="text-center py-12 text-slate-500">No players found.</div>
       ) : (
-        <div className="space-y-4">
+        <div data-testid="player-list" className="divide-y divide-white/10 overflow-hidden rounded-lg border-2 border-neo-cream/20 bg-neo-navy-light text-white">
           {players.map((player) => (
             <PlayerCard
               key={player.id}

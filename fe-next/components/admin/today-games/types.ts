@@ -94,6 +94,7 @@ export interface GamesResponse {
   success: boolean;
   source?: GameLogSource;
   modeBreakdown?: ModeBreakdownEntry[];
+  education?: import('@/lib/admin/gameLog/educationBreakdown').EducationBreakdown | null;
   /** Present when source='analytics': one entry per GAME (players grouped). */
   grouped?: boolean;
   gameGroups?: import('@/lib/admin/gameLog/groupGames').GameGroup[];

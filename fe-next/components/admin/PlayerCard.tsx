@@ -1,11 +1,10 @@
 'use client';
 
-import React from 'react';
-import { Calendar, Gift, Bomb, ExternalLink, Ban, FlaskConical, ShieldCheck } from 'lucide-react';
+import React, { useState } from 'react';
+import { Gift, Bomb, ExternalLink, Ban, FlaskConical, ShieldCheck, Languages } from 'lucide-react';
 import Link from 'next/link';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import Avatar from '@/components/Avatar';
 import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
@@ -30,11 +29,6 @@ interface PlayerCardProps {
   curatorBusyKey: string | null;
 }
 
-/**
- * A single row in the admin players list. Pulled out of PlayerManager so the
- * manager stays a thin orchestrator (selection + filters + pagination) and each
- * card owns its own presentation + per-player actions.
- */
 export function PlayerCard({
   player,
   language,
@@ -52,166 +46,104 @@ export function PlayerCard({
   onRevokeCurator,
   curatorBusyKey,
 }: PlayerCardProps) {
+  const [curatorOpen, setCuratorOpen] = useState(false);
   const name = player.display_name || player.username;
   const phUrl = postHogPersonUrl(player.id);
   const styleBadge = formatStyleBadge(player.player_style);
+  const date = (iso: string) => new Date(iso).toLocaleDateString(language, { day: 'numeric', month: 'short', year: '2-digit' });
 
   return (
-    <Card className={`overflow-hidden transition-shadow ${selected ? 'ring-2 ring-neo-lime' : 'hover:shadow-md'}`}>
-      <CardContent className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          {/* Player Info */}
-          <div className="flex items-center gap-3">
-            <Checkbox
-              checked={selected}
-              onCheckedChange={() => onToggleSelect(player.id)}
-              aria-label={`Select ${name}`}
-              className="flex-shrink-0"
-            />
-            <Avatar customAvatar={player.avatar_config} userId={player.id} size="lg" />
-            <div>
-              <Link
-                href={`/${language}/admin/players/${player.id}`}
-                className="font-bold text-lg flex items-center gap-2 hover:text-neo-cyan transition-colors"
-              >
-                {name}
-                {player.display_name && player.username && (
-                  <span className="text-xs font-normal text-slate-500">@{player.username}</span>
-                )}
-                {styleBadge && (
-                  <span
-                    data-testid="player-style-badge"
-                    title={`Chosen style: ${styleBadge.label}`}
-                    className="inline-flex items-center gap-1 rounded-full border border-neo-purple/40 bg-neo-purple/10 px-2 py-0.5 text-xs font-semibold text-neo-purple"
-                  >
-                    <span aria-hidden>{styleBadge.emoji}</span>
-                    {styleBadge.label}
-                  </span>
-                )}
-                {player.is_test_account && (
-                  <span
-                    data-testid="player-test-badge"
-                    title="Test account: excluded from dashboard stats"
-                    className="inline-flex items-center gap-1 rounded-full border border-neo-purple bg-neo-purple/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-purple"
-                  >
-                    <FlaskConical className="w-3 h-3" />
-                    Test
-                  </span>
-                )}
-                {player.is_admin && (
-                  <span
-                    data-testid="player-admin-badge"
-                    title="Admin"
-                    className="inline-flex items-center gap-1 rounded-full border border-neo-cyan/40 bg-neo-cyan/10 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-cyan"
-                  >
-                    <ShieldCheck className="w-3 h-3" />
-                    Admin
-                  </span>
-                )}
-                {player.is_beta_tester && (
-                  <span
-                    data-testid="player-beta-badge"
-                    title="Beta tester — sees in-work modes"
-                    className="inline-flex items-center gap-1 rounded-full border border-neo-purple/50 bg-neo-purple/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-neo-purple"
-                  >
-                    <FlaskConical className="w-3 h-3" />
-                    Beta
-                  </span>
-                )}
-              </Link>
-              <div className="text-xs text-slate-500 flex items-center gap-3 mt-1">
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3 h-3" />
-                  Joined {new Date(player.created_at).toLocaleDateString()}
-                </span>
-                {player.last_game_at && (
-                  <span className="flex items-center gap-1">
-                    Last game {new Date(player.last_game_at).toLocaleDateString()}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
+    <div data-testid="player-row" className={cn('px-3 py-2 transition-colors', selected ? 'bg-neo-lime/10' : 'hover:bg-white/5')}>
+      <div className="flex items-center gap-3">
+        <Checkbox checked={selected} onCheckedChange={() => onToggleSelect(player.id)} aria-label={`Select ${name}`} className="shrink-0" />
+        <Avatar customAvatar={player.avatar_config} userId={player.id} size="sm" />
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-2 w-full sm:w-auto mt-2 sm:mt-0">
-            <Stat label="Games" value={player.total_games} />
-            <Stat label="Score" value={`${(player.total_score / 1000).toFixed(1)}k`} valueClass="text-blue-500" />
-            <Stat label="MMR" value={player.ranked_mmr} valueClass="text-amber-500" />
-            <div className="flex flex-col items-center sm:items-end gap-1.5">
-              {phUrl && (
-                <a
-                  href={phUrl}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  title="Open in PostHog"
-                  className="inline-flex items-center gap-1 text-xs text-purple-600 hover:text-purple-700 hover:underline"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  PostHog
-                </a>
-              )}
-              {/* Per-player actions: wrap into a tidy row so adding access toggles
-                  (blast, beta, …) never stretches the card into a tall column. */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-end gap-1.5">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onGift(player)}
-                  className="text-amber-600 border-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                >
-                  <Gift className="w-4 h-4 me-1" />
-                  Gift
-                </Button>
-                <Button
-                  variant={player.blast_access ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onToggleBlast(player)}
-                  disabled={blastLoading}
-                  className={player.blast_access
-                    ? 'bg-orange-500 hover:bg-orange-600 text-white border-orange-500'
-                    : 'text-orange-600 border-orange-300 hover:bg-orange-50 dark:hover:bg-orange-900/20'
-                  }
-                  title={player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
-                >
-                  <Bomb className="w-4 h-4 me-1" />
-                  {player.blast_access ? 'Blast ✓' : 'Blast'}
-                </Button>
-                <Button
-                  data-testid="player-beta-toggle"
-                  variant={player.is_beta_tester ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => onToggleBeta(player)}
-                  disabled={betaLoading}
-                  className={player.is_beta_tester
-                    ? 'bg-neo-purple hover:bg-neo-purple-dark text-white border-neo-purple'
-                    : 'text-neo-purple border-neo-purple/40 hover:bg-neo-purple/10'
-                  }
-                  title={player.is_beta_tester
-                    ? 'Revoke beta access (in-work modes)'
-                    : 'Grant beta access (lets them see in-work modes)'}
-                >
-                  <FlaskConical className="w-4 h-4 me-1" />
-                  {player.is_beta_tester ? 'Beta ✓' : 'Beta'}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onBlock(player)}
-                  disabled={blockLoading}
-                  className="text-red-600 border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
-                  title="Block this player from joining games"
-                >
-                  <Ban className="w-4 h-4 me-1" />
-                  Block
-                </Button>
-              </div>
-            </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <Link href={`/${language}/admin/players/${player.id}`} className="truncate font-bold hover:text-neo-cyan transition-colors">
+              {name}
+            </Link>
+            {player.display_name && player.username && (
+              <span className="hidden truncate text-xs text-slate-500 md:inline">@{player.username}</span>
+            )}
+            {styleBadge && (
+              <span data-testid="player-style-badge" title={`Chosen style: ${styleBadge.label}`} className={PILL}>
+                <span aria-hidden>{styleBadge.emoji}</span>
+                <span className="hidden lg:inline">{styleBadge.label}</span>
+              </span>
+            )}
+            {player.is_test_account && (
+              <span data-testid="player-test-badge" title="Test account: excluded from dashboard stats" className={PILL}>Test</span>
+            )}
+            {player.is_admin && (
+              <span data-testid="player-admin-badge" title="Admin" className={cn(PILL, 'border-neo-cyan/40 bg-neo-cyan/10 text-neo-cyan')}>
+                <ShieldCheck className="h-3 w-3" />Admin
+              </span>
+            )}
+            {player.is_beta_tester && (
+              <span data-testid="player-beta-badge" title="Beta tester — sees in-work modes" className={PILL}>Beta</span>
+            )}
+          </div>
+          <div className="truncate text-[11px] text-slate-500">
+            Joined {date(player.created_at)}
+            {player.last_game_at && <> · Last game {date(player.last_game_at)}</>}
           </div>
         </div>
 
-        {/* Native-speaker / Language Curator management */}
-        <div className="mt-3 border-t border-dashed border-slate-200 pt-3 dark:border-slate-700">
+        <dl className="hidden shrink-0 grid-cols-3 gap-4 text-end sm:grid">
+          <Stat label="Games" value={player.total_games} />
+          <Stat label="Score" value={`${(player.total_score / 1000).toFixed(1)}k`} valueClass="text-neo-cyan" />
+          <Stat label="MMR" value={player.ranked_mmr} valueClass="text-neo-yellow" />
+        </dl>
+
+        <div className="flex shrink-0 items-center gap-0.5">
+          <IconAction label="Gift" onClick={() => onGift(player)} className="text-neo-yellow">
+            <Gift className="h-4 w-4" />
+          </IconAction>
+          <IconAction
+            label={player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
+            onClick={() => onToggleBlast(player)}
+            disabled={blastLoading}
+            pressed={!!player.blast_access}
+            className="text-neo-orange"
+          >
+            <Bomb className="h-4 w-4" />
+          </IconAction>
+          <IconAction
+            testId="player-beta-toggle"
+            label={player.is_beta_tester ? 'Revoke beta access' : 'Grant beta access'}
+            onClick={() => onToggleBeta(player)}
+            disabled={betaLoading}
+            pressed={!!player.is_beta_tester}
+            className="text-neo-purple"
+          >
+            <FlaskConical className="h-4 w-4" />
+          </IconAction>
+          <button
+            type="button"
+            data-testid="player-curator-toggle"
+            aria-expanded={curatorOpen}
+            aria-label="Language curator"
+            title="Language curator"
+            onClick={() => setCuratorOpen((v) => !v)}
+            className={cn(ICON_BTN, 'gap-0.5 text-neo-lime', (curatorOpen || curatorAssignments.length > 0) && 'bg-neo-lime/15')}
+          >
+            <Languages className="h-4 w-4" />
+            {curatorAssignments.length > 0 && <span className="text-[10px] font-bold tabular-nums">{curatorAssignments.length}</span>}
+          </button>
+          {phUrl && (
+            <a href={phUrl} target="_blank" rel="noreferrer noopener" aria-label="Open in PostHog" title="Open in PostHog" className={cn(ICON_BTN, 'text-slate-400')}>
+              <ExternalLink className="h-4 w-4" />
+            </a>
+          )}
+          <IconAction label="Block" onClick={() => onBlock(player)} disabled={blockLoading} className="text-neo-red">
+            <Ban className="h-4 w-4" />
+          </IconAction>
+        </div>
+      </div>
+
+      {curatorOpen && (
+        <div className="ms-14 mt-2 border-t border-dashed border-slate-700 pt-2">
           <PlayerCuratorControl
             isAdmin={player.is_admin}
             assignments={curatorAssignments}
@@ -220,16 +152,38 @@ export function PlayerCard({
             busyKey={curatorBusyKey}
           />
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
+  );
+}
+
+const PILL = 'inline-flex shrink-0 items-center gap-1 rounded-full border border-neo-purple/40 bg-neo-purple/10 px-1.5 py-px text-[10px] font-black uppercase tracking-wide text-neo-purple';
+const ICON_BTN = 'inline-flex h-8 min-w-8 items-center justify-center rounded px-1 hover:bg-white/10 disabled:opacity-40';
+
+function IconAction({ label, onClick, disabled, pressed, className, testId, children }: {
+  label: string; onClick: () => void; disabled?: boolean; pressed?: boolean; className?: string; testId?: string; children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      aria-label={label}
+      aria-pressed={pressed}
+      title={label}
+      onClick={onClick}
+      disabled={disabled}
+      className={cn(ICON_BTN, className, pressed && 'bg-current/15 ring-1 ring-current')}
+    >
+      {children}
+    </button>
   );
 }
 
 function Stat({ label, value, valueClass = '' }: { label: string; value: React.ReactNode; valueClass?: string }) {
   return (
-    <div className="flex flex-col items-center sm:items-end">
-      <span className="text-xs text-slate-400 uppercase">{label}</span>
-      <span className={`font-mono font-bold ${valueClass}`}>{value}</span>
+    <div className="w-12">
+      <dt className="text-[10px] uppercase text-slate-500">{label}</dt>
+      <dd className={cn('font-mono text-sm font-bold tabular-nums', valueClass)}>{value}</dd>
     </div>
   );
 }

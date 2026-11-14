@@ -16,6 +16,7 @@ import { useTodayGames } from './hooks';
 // Components
 import { StatsBar, GamesFilters, VirtualGamesList, EmptyState } from './components';
 import { ShowChips } from './components/ShowChips';
+import { EducationBreakdown } from './components/EducationBreakdown';
 
 export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
   const { t } = useLanguage();
@@ -106,6 +107,8 @@ export function TodayGamesHistory({ authToken }: TodayGamesHistoryProps) {
         onModeSelect={logSource === 'analytics' ? setModeFilter : undefined}
         t={t}
       />
+
+      {data?.education && <EducationBreakdown education={data.education} t={t} />}
 
       {/* Filters */}
       <GamesFilters

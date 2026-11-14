@@ -699,14 +699,8 @@ describe('TodayGamesHistory', () => {
       expect(screen.getByText("Today's Games")).toBeInTheDocument();
     });
 
-    // Default range is 7d (historical), which does not auto-refresh.
-    // Switch to "today" to enable the live polling loop.
-    const dateRangeSelect = screen.getAllByRole('combobox')[0];
-    fireEvent.change(dateRangeSelect, { target: { value: 'today' } });
-
-    await waitFor(() => {
-      expect(callCount).toBeGreaterThanOrEqual(2); // initial + after-range-change refetch
-    });
+    // Default range is the last 24 hours, which polls live.
+    await waitFor(() => expect(callCount).toBeGreaterThanOrEqual(1));
     const countAfterRangeSwitch = callCount;
 
     // Advance timers by 30 seconds — auto-refresh should fire
