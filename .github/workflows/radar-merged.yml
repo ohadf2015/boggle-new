@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
+      contents: read
       pull-requests: write
     env:
       GROWTH_RADAR_TOKEN: ${{ secrets.GROWTH_RADAR_TOKEN }}
@@ -25,6 +26,12 @@ jobs:
       REPO: ${{ github.repository }}
       GH_TOKEN: ${{ github.token }}
     steps:
+      # The radar block parser is shared with radar-fix.yml, which checks the same block before the PR opens.
+      - uses: actions/checkout@v4
+        if: github.event.pull_request.merged
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          sparse-checkout: .github/scripts
       - run: |
           mcp() {
             local out
@@ -46,24 +53,13 @@ jobs:
             echo "record_intervention: $line"
             echo "Growth Radar record_intervention: $line" >> "$GITHUB_STEP_SUMMARY"
           }
-          BODY=$(printf '%s\n' "$BODY" | tr -d '\r')
           if [ "$MERGED" != true ]; then
             id=${REF#radar/}
             [[ "$id" =~ ^[0-9]+$ ]] || { echo "hunted fix, no recommendation to reopen"; exit 0; }
             mcp update_recommendation "{\"id\":$id,\"action\":\"reopen\"}"
             exit 0
           fi
-          if printf '%s\n' "$BODY" | grep -q '^```radar'; then
-            printf '%s\n' "$BODY" | sed -n '/^```radar/,$p' | sed 1d | grep -q '^```[[:space:]]*$' \
-              || { echo "::error::radar block in the PR body has no closing \`\`\` fence"; exit 1; }
-            meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```[[:space:]]*$/p' | sed '1d;$d')
-            printf '%s' "$meta" | jq -e 'type == "object"' > /dev/null 2>&1 \
-              || { echo "::error::radar block is not a JSON object:"; printf '%s\n' "$meta"; exit 1; }
-            missing=$(printf '%s' "$meta" | jq -r '[("app","surface","kind","metric","summary") as $k | select((.[$k] // "") | tostring | length == 0) | $k] | join(", ")')
-            [ -z "$missing" ] || { echo "::error::radar block is missing: $missing"; exit 1; }
-          else
-            meta=
-          fi
+          meta=$(printf '%s\n' "$BODY" | bash .github/scripts/radar-block.sh "$REF")
           if [ -z "$meta" ]; then
             # A radar/<id> PR opened by hand has no block: the branch still names the row, but kind/metric would be guesses.
             id=${REF#radar/}
@@ -75,14 +71,7 @@ jobs:
             gh pr comment "$PR_NUMBER" -R "$REPO" --body "$msg" || echo "::warning::could not comment on the PR (caller needs pull-requests: write)"
             exit 0
           fi
-          id=$(printf '%s' "$meta" | jq -r '.recommendationId // .rec_id // empty')
-          branch_id=${REF#radar/}
-          if [[ "$branch_id" =~ ^[0-9]+$ ]]; then
-            [ -z "$id" ] && id=$branch_id
-            [ "$id" = "$branch_id" ] || { echo "::error::radar block recommendationId $id does not match branch $REF"; exit 1; }
-          elif [ -n "$id" ] && ! [[ "$id" =~ ^[0-9]+$ ]]; then
-            echo "::error::radar block recommendationId is not a number: $id"; exit 1
-          fi
+          id=$(printf '%s' "$meta" | jq -r '.recommendationId // empty')
           if [ -n "$id" ]; then
             mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"
           fi
