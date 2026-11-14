@@ -52,16 +52,16 @@ const SCRABLE_ON_LINE_ANSWER =
 /** Growth Radar rec 11099 — Bing grounds this query but cited other domains. Answer must quote standalone. */
 const NOT_ON_POGO_QUESTION = 'Where can I play Scrabble online, not on Pogo?';
 const NOT_ON_POGO_ANSWER =
-  'LexiClash is a free way to play a Scrabble-style word game online without Pogo: no Pogo account, no Club Pogo subscription and nothing to download. It runs in any phone or laptop browser. Open a room, send the link, and two to twenty players find words on one shared letter grid in about three minutes.';
+  'LexiClash is a free Scrabble-style word game that runs in any browser, with no Pogo account, no Club Pogo subscription and nothing to download. Two to twenty players share one grid, and a round takes about three minutes. For official Scrabble rules, use the Scrabble GO app; Woogles.io hosts the classic crossword board game in a browser.';
 
 const faqs = [
   {
-    q: SCRABLE_ON_LINE_QUESTION,
-    a: SCRABLE_ON_LINE_ANSWER,
-  },
-  {
     q: NOT_ON_POGO_QUESTION,
     a: NOT_ON_POGO_ANSWER,
+  },
+  {
+    q: SCRABLE_ON_LINE_QUESTION,
+    a: SCRABLE_ON_LINE_ANSWER,
   },
   {
     q: 'What is the best free Scrabble alternative online?',
@@ -187,19 +187,6 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
         </section>
 
         <section className="mb-12">
-          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-cyan">
-            {SCRABLE_ON_LINE_QUESTION}
-          </h2>
-          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{SCRABLE_ON_LINE_ANSWER}</p>
-          <Link
-            href="/en/multiplayer"
-            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
-          >
-            Play free now →
-          </Link>
-        </section>
-
-        <section className="mb-12">
           <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-pink">
             {NOT_ON_POGO_QUESTION}
           </h2>
@@ -209,6 +196,19 @@ export default async function ScrabbleAlternativeOnlinePage({ params }: PageProp
             className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
           >
             Start a free room →
+          </Link>
+        </section>
+
+        <section className="mb-12">
+          <h2 className="mb-3 font-neo-display text-3xl font-black tracking-tight text-neo-cyan">
+            {SCRABLE_ON_LINE_QUESTION}
+          </h2>
+          <p className="max-w-2xl text-lg leading-relaxed text-slate-300">{SCRABLE_ON_LINE_ANSWER}</p>
+          <Link
+            href="/en/multiplayer"
+            className="mt-4 inline-block rounded-neo border-3 border-neo-black bg-neo-lime px-6 py-3 text-center font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard"
+          >
+            Play free now →
           </Link>
         </section>
 

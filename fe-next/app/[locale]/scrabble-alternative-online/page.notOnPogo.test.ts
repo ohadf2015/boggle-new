@@ -28,9 +28,14 @@ describe('scrabble-alternative-online GEO (play scrabble not on pogo)', () => {
     expect(a).toMatch(/Scrabble/);
   });
 
-  it('puts the question in FAQPage JSON-LD', () => {
+  it('renders the answer as the first section after the hero', () => {
+    expect(SRC.indexOf('{NOT_ON_POGO_QUESTION}')).toBeLessThan(SRC.indexOf('{SCRABLE_ON_LINE_QUESTION}'));
+  });
+
+  it('puts the question first in FAQPage JSON-LD', () => {
     const faqs = SRC.slice(SRC.indexOf('const faqs = ['), SRC.indexOf('const faqJsonLd'));
     expect(faqs).toContain('q: NOT_ON_POGO_QUESTION');
+    expect(faqs.indexOf('q: NOT_ON_POGO_QUESTION')).toBeLessThan(faqs.indexOf('q: SCRABLE_ON_LINE_QUESTION'));
     expect(faqs).toContain('a: NOT_ON_POGO_ANSWER');
   });
 
