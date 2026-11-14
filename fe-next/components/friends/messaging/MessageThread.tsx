@@ -139,7 +139,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <m.div
+        <m.div role="dialog" aria-modal="true"
           // Slide-only initial (no opacity:0/scale:0) so the panel is never
           // invisible at rest — a hidden framer initial on a fixed-inset modal
           // black-screens on mobile Hebrew when the rAF loop is starved

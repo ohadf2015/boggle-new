@@ -16,7 +16,7 @@ interface QuickPlaySeekingOverlayProps {
 
 export function QuickPlaySeekingOverlay({ t, onCancel }: QuickPlaySeekingOverlayProps) {
   return (
-    <div
+    <div data-blocks-banner="true"
       className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/90"
       role="status"
       aria-live="polite"

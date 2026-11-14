@@ -53,7 +53,7 @@ export function CrosswordSolvedCard({
   }, [reduced]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/75 p-6">
+    <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/75 p-6">
       <div
         ref={overlayRef}
         className="bg-neo-cyan text-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg px-8 py-7 text-center max-w-sm w-full"

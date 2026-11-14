@@ -39,7 +39,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
 
   return (
     <>
-      <div
+      <div role="dialog" aria-modal="true"
         data-testid="blast-pregame-buff-modal"
         className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/90 p-4 backdrop-blur-sm animate-in fade-in-0 duration-300"
       >

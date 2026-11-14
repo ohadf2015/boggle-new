@@ -91,7 +91,7 @@ export function ReferralMilestonePopup({
           />
 
           {/* Popup */}
-          <div
+          <div role="dialog" aria-modal="true"
             className={`fixed left-1/2 top-1/2 z-50 w-[90%] max-w-sm -translate-x-1/2 -translate-y-1/2 animate-in fade-in-0 duration-300 ${
               isDarkMode
                 ? 'bg-neo-black border-neo-cream/30'

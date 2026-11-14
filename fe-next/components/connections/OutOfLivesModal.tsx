@@ -65,7 +65,7 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
         // parses — would leave a framer-motion `initial` opacity:0 pinned, so the
         // user sees only the dark backdrop ("black screen"). CSS runs off the
         // main thread and always settles visible.
-        <div
+        <div role="dialog" aria-modal="true"
           className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/85 backdrop-blur-sm px-6 animate-in fade-in-0 duration-300"
           dir={isRTL ? 'rtl' : 'ltr'}
         >

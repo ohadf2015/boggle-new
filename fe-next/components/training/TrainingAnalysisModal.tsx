@@ -127,7 +127,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
     <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-300" />
-        <DialogPrimitive.Content
+        <DialogPrimitive.Content aria-modal="true"
           aria-describedby={undefined}
           onClick={handleClose}
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none"
