@@ -42,7 +42,7 @@ import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastSessionCoins } from './hooks/useBlastSessionCoins';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
-import { BlastLoadingGate } from './BlastLoadingGate';
+import { BlastLoadingGate, useBlastBoardWait } from './BlastLoadingGate';
 import { resolveBlastRecover, BLAST_MAX_LIVES } from './utils/blastLives';
 import type { BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastBuffEffects } from './hooks/useBlastBuffEffects';
@@ -383,6 +383,9 @@ export function BlastGame({
     lastPathRef.current = cells;
   }, []);
 
+  const boardReady = !!engine.grid && isDictionaryReady;
+  useBlastBoardWait(!!engine.grid, isDictionaryReady, isMultiplayer ? 'mp' : 'solo', config.language);
+
   const handleIdle = useCallback(() => {
     trackDeadTime(isMultiplayer ? 'blast_multiplayer' : 'blast', BLAST_DEAD_TIME_THRESHOLD_MS, {
       waveNumber,
@@ -390,7 +393,7 @@ export function BlastGame({
     });
   }, [isMultiplayer, waveNumber, engine.gameState.score]);
   const { reportActivity: reportIdleActivity } = useIdleDetection({
-    enabled: !engine.gameState.isComplete && !engine.gameState.isDeadEnd,
+    enabled: boardReady && !engine.gameState.isComplete && !engine.gameState.isDeadEnd,
     thresholdMs: BLAST_DEAD_TIME_THRESHOLD_MS,
     onIdle: handleIdle,
     sessionKey: `${waveNumber}`,

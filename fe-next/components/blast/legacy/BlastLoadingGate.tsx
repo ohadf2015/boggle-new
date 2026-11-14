@@ -38,6 +38,28 @@ export interface BlastLoadingGateProps {
   onBackToLobby: () => void;
 }
 
+// Lives in BlastGame, not the gate: the gate is swapped out while its last props still say "not ready".
+export function useBlastBoardWait(gridReady: boolean, dictionaryReady: boolean, mode: 'mp' | 'solo', language: Language) {
+  const waitRef = useRef<{ start: number; grid: boolean; dictionary: boolean } | null>(null);
+  const ready = gridReady && dictionaryReady;
+  if (!ready) {
+    waitRef.current ??= { start: Date.now(), grid: false, dictionary: false };
+    if (!gridReady) waitRef.current.grid = true;
+    if (!dictionaryReady) waitRef.current.dictionary = true;
+  }
+  useEffect(() => {
+    const wait = waitRef.current;
+    if (!ready || !wait) return;
+    waitRef.current = null;
+    trackGrowthEvent('blast_board_wait', {
+      wait_ms: Date.now() - wait.start,
+      waited_for: wait.grid && wait.dictionary ? 'both' : wait.grid ? 'grid' : 'dictionary',
+      mode,
+      language,
+    });
+  }, [ready, mode, language]);
+}
+
 export function BlastLoadingGate({
   gridReady,
   dictionaryReady,
@@ -57,9 +79,6 @@ export function BlastLoadingGate({
   if (!gridReady) pendingRef.current.grid = true;
   if (!dictionaryReady) pendingRef.current.dictionary = true;
   const stuckFiredRef = useRef(false);
-  // Latest readiness for the unmount-time wait event.
-  const latestRef = useRef({ gridReady, dictionaryReady });
-  latestRef.current = { gridReady, dictionaryReady };
 
   const waitedFor = (): BlastBoardWaitedFor => {
     const { grid, dictionary } = pendingRef.current;
@@ -88,23 +107,6 @@ export function BlastLoadingGate({
       clearTimeout(stuckTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-once ladder; mode/language/waitedFor read at fire time
-  }, []);
-
-  // Fire growth:blast_board_wait exactly once, when the spinner CLEARS. The
-  // gate unmounts on clear, so a cleanup that sees both parts ready is the
-  // clear signal. A quit before ready emits nothing — that is an abandon, not
-  // a wait, and blast_board_stuck already covered the hang case.
-  useEffect(() => {
-    return () => {
-      if (!latestRef.current.gridReady || !latestRef.current.dictionaryReady) return;
-      trackGrowthEvent('blast_board_wait', {
-        wait_ms: Date.now() - mountTimeRef.current,
-        waited_for: waitedFor(),
-        mode,
-        language,
-      });
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount-only emit; values read from refs at cleanup time
   }, []);
 
   const handleRetry = () => {

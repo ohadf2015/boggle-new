@@ -31,6 +31,7 @@ import type { WordObject } from '@/components/results/types';
 import { markModePlayedLogic } from '@/hooks/useDailyModeQuest';
 import { useMpWinStreak, type MpMode } from '@/hooks/useMpWinStreak';
 import { syncGhostRivalScore } from '@/utils/ghostRivalSync';
+import { fnv1aHash } from '@/lib/rng/seededRandom';
 
 // ==============================================
 // TYPES
@@ -54,6 +55,13 @@ interface PlayerData {
 
 interface ScoreEntry {
   score?: number;
+}
+
+// Results can remount (back-navigation, re-sent standings); the id must stay the same so coins land once.
+export function mpCoinAwardId(gameCode: string, sortedScores: ScoreEntry[], player: PlayerData): string {
+  const words = (player.allWords ?? []).map((w) => w.word).join(',');
+  const fingerprint = `${sortedScores.map((s) => s.score ?? 0).join(',')}|${player.score ?? 0}|${words}`;
+  return `mp_${gameCode}_${fnv1aHash(fingerprint).toString(36)}`;
 }
 
 /** Configuration for useResultsSideEffects hook */
@@ -255,7 +263,7 @@ export function useResultsSideEffects({
     // the other mount effects compounds the results-page setState cascade and
     // costs visible jank in the first ~100ms.
     const rafId = requestAnimationFrame(() => {
-      const sessionId = `mp_${gameCode}_${Date.now()}`;
+      const sessionId = mpCoinAwardId(gameCode, sortedScores, currentPlayerData);
       const reward = awardGameCoins(
         sessionId,
         'multiplayer',
@@ -290,7 +298,7 @@ export function useResultsSideEffects({
     });
 
     return () => cancelAnimationFrame(rafId);
-  }, [currentPlayerData, currentPlayerRank, totalPlayers, gameCode, user?.id, refreshCoins, currentStreak]);
+  }, [currentPlayerData, currentPlayerRank, totalPlayers, sortedScores, gameCode, user?.id, refreshCoins, currentStreak]);
 
   // ==============================================
   // EFFECT 3: Save Cognitive Score
