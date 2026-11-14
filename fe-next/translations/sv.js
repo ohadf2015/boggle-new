@@ -136,6 +136,14 @@ const sv = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "Visa hela profilen",
+    "openFor": "Öppna profilsammanfattningen för {name}",
+    "guest": "Gästspelare. Ingen profil än.",
+    "signInToSee": "Logga in för att se statistik och profil",
+    "loadFailed": "Kunde inte ladda statistiken just nu",
+    "noStats": "Inga spel än"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "Se {count} fler vänner online",

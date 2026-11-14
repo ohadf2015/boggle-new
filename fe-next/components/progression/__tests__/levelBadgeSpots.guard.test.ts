@@ -9,6 +9,7 @@ const SPOTS = [
   'app/[locale]/player/[id]/PageClient.tsx',
   'components/ui/PlayerProfileTooltip.tsx',
   'components/friends/FriendDetailDialog.tsx',
+  'components/players/PlayerSummaryDialog.tsx',
 ];
 
 describe('player levels render as LevelBadge', () => {

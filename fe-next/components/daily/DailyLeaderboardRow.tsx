@@ -10,6 +10,7 @@ import type { Language } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import Avatar from '@/components/Avatar';
 import PlayerProfileTooltip from '@/components/ui/PlayerProfileTooltip';
+import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
 import { getDailyLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
@@ -117,6 +118,17 @@ function RowShell({
   const name = person.display_name || t('daily.aPlayer');
   const flag = showFlag ? getCountryFlag(person.country_code) : null;
   const podium = PODIUM[rank];
+  // Signed-in rows on the id-free combined board carry only a row key; the card resolves it.
+  const boardKey = !person.player_id && person.is_member ? person.row_key : undefined;
+  const summary = {
+    id: person.player_id,
+    boardKey,
+    name,
+    avatarImage: person.avatar_image,
+    customAvatar: person.custom_avatar,
+    countryCode: person.country_code,
+    title: person.title,
+  };
   return (
     <m.div
       data-testid={testId}
@@ -136,28 +148,32 @@ function RowShell({
         {rank}
       </div>
 
-      <div className="relative shrink-0">
-        <div className={`w-10 h-10 ${compact ? '' : 'sm:w-12 sm:h-12'} border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
-          <Avatar
-            avatarImage={person.avatar_image ?? undefined}
-            customAvatar={person.custom_avatar ?? undefined}
-            userId={avatarSeed(person)}
-            size="lg"
-            className="w-full h-full"
-          />
-        </div>
-        {flag && (
-          <div className="absolute -bottom-1 -end-1 text-sm leading-none" title={person.country_code || undefined}>
-            {flag}
+      <PlayerSummaryTrigger player={summary} surface="daily_leaderboard" labelled disabled={isCurrentUser}>
+        <div className="relative shrink-0 rounded-full">
+          <div className={`w-10 h-10 ${compact ? '' : 'sm:w-12 sm:h-12'} border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
+            <Avatar
+              avatarImage={person.avatar_image ?? undefined}
+              customAvatar={person.custom_avatar ?? undefined}
+              userId={avatarSeed(person)}
+              size="lg"
+              className="w-full h-full"
+            />
           </div>
-        )}
-      </div>
+          {flag && (
+            <div className="absolute -bottom-1 -end-1 text-sm leading-none" title={person.country_code || undefined}>
+              {flag}
+            </div>
+          )}
+        </div>
+      </PlayerSummaryTrigger>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0">
           <PlayerProfileTooltip
             player={{
               id: person.player_id ?? undefined,
+              boardKey,
+              title: person.title,
               username: name,
               avatarImage: person.avatar_image ?? undefined,
               customAvatar: person.custom_avatar,
@@ -166,6 +182,7 @@ function RowShell({
             }}
             isCurrentUser={isCurrentUser}
             side="bottom"
+            surface="daily_leaderboard"
           >
             <span dir="auto" className={`min-w-0 font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan' : 'text-neo-white cursor-pointer hover:underline'}`}>
               {name}

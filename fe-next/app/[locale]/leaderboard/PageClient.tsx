@@ -29,6 +29,8 @@ import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
 import { TierBadge } from '@/components/ui/TierBadge';
 import { FriendStatusProvider } from '@/components/friends/FriendStatusContext';
 import { FriendQuickAction } from '@/components/friends/FriendQuickAction';
+import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
+import type { PlayerSummarySeed } from '@/components/players/playerSummaryModel';
 import { YouCard } from '@/components/leaderboard/YouCard';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
@@ -53,6 +55,14 @@ interface LeaderboardEntry {
   player_level?: number | null;
   title?: string | null;
 }
+
+const summarySeed = (entry: LeaderboardEntry): PlayerSummarySeed => ({
+  id: entry.player_id,
+  name: entry.display_name || entry.username || '',
+  avatarImage: entry.avatar_image,
+  customAvatar: entry.avatar_config,
+  title: entry.title,
+});
 
 export default function LeaderboardPageClient(): React.JSX.Element {
   const { t, language } = useLanguage();
@@ -305,13 +315,30 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       {rank}
                     </span>
                     <div className="flex min-w-0 items-center gap-2">
-                      <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
-                      <Link
-                        href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
-                        className={cn('truncate text-sm font-semibold hover:underline', isCurrentUser ? 'text-neo-cyan' : 'text-neo-white')}
-                      >
-                        {entry.display_name || entry.username}
-                      </Link>
+                      {isCurrentUser ? (
+                        <>
+                          <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
+                          <Link
+                            href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
+                            className="truncate text-sm font-semibold hover:underline text-neo-cyan"
+                          >
+                            {entry.display_name || entry.username}
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard" labelled>
+                            <span className="shrink-0 rounded-full">
+                              <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
+                            </span>
+                          </PlayerSummaryTrigger>
+                          <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard">
+                            <span dir="auto" className="min-w-0 truncate text-sm font-semibold hover:underline text-neo-white">
+                              {entry.display_name || entry.username}
+                            </span>
+                          </PlayerSummaryTrigger>
+                        </>
+                      )}
                       <RecordHolderCrown userId={entry.player_id} />
                       <TitleBadge title={entry.title} className="min-w-0 max-w-[40%] shrink" />
                       <TierBadge

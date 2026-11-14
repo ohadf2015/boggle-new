@@ -136,6 +136,14 @@ const ru = {
     }
   },
   // @avatarChest:end
+  "playerSummary": {
+    "viewProfile": "Открыть профиль",
+    "openFor": "Краткий профиль игрока {name}",
+    "guest": "Гость. Профиля пока нет.",
+    "signInToSee": "Войдите, чтобы увидеть статистику и профиль",
+    "loadFailed": "Сейчас не удалось загрузить статистику",
+    "noStats": "Игр пока нет"
+  },
   // @friendSocial:start
   "friendSocial": {
     "moreOnline": "Ещё друзей онлайн: {count}",

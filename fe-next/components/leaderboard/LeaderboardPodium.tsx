@@ -9,6 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
+import { playerProfileHref } from '@/components/players/playerSummaryModel';
 
 export interface PodiumEntry {
   player_id: string;
@@ -25,6 +27,35 @@ interface LeaderboardPodiumProps {
   language: string;
   currentUserId?: string;
   className?: string;
+}
+
+const PLAYER_CLS =
+  'flex flex-col items-center w-full min-w-0 rounded-neo transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan';
+
+/** Your own spot links to your profile; anyone else's opens their summary card. */
+function PodiumPlayer({ entry, name, isYou, language, children }: {
+  entry: PodiumEntry;
+  name: string;
+  isYou: boolean;
+  language: string;
+  children: React.ReactNode;
+}) {
+  if (isYou) {
+    return (
+      <Link href={playerProfileHref(language, entry.player_id)} aria-label={name} className={PLAYER_CLS}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <PlayerSummaryTrigger
+      player={{ id: entry.player_id, name, avatarImage: entry.avatar_image, customAvatar: entry.avatar_config }}
+      surface="global_leaderboard"
+      labelled
+    >
+      <div className={PLAYER_CLS}>{children}</div>
+    </PlayerSummaryTrigger>
+  );
 }
 
 /** Per-rank visual identity. BLACK ink on every fill — accent colours are
@@ -87,10 +118,11 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
               aria-hidden={!isChampion}
             />
 
-            <Link
-              href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
-              aria-label={name}
-              className="flex flex-col items-center w-full min-w-0 rounded-neo transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+            <PodiumPlayer
+              entry={entry}
+              name={name}
+              isYou={isYou}
+              language={language}
             >
               {/* Avatar with rank-coloured ring; cyan ring + YOU chip for current user.
                   `isolate` bounds the champion glow to this box so it never escapes
@@ -135,7 +167,7 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
               <span className={cn('font-mono tabular-nums font-black text-sm sm:text-base leading-none', style.score)}>
                 {safeToLocaleString(entry.total_score ?? 0, language)}
               </span>
-            </Link>
+            </PodiumPlayer>
 
             {/* Pedestal block — rank number in BLACK ink on the medal fill */}
             <div
