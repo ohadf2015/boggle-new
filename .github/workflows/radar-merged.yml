@@ -27,18 +27,43 @@ jobs:
     steps:
       - run: |
           mcp() {
-            curl -sS --fail-with-body -H "Authorization: Bearer $GROWTH_RADAR_TOKEN" -H 'content-type: application/json' \
+            local out
+            out=$(curl -sS --fail-with-body -H "Authorization: Bearer $GROWTH_RADAR_TOKEN" -H 'content-type: application/json' \
               https://growthradar.app/api/mcp \
-              -d "$(jq -n --arg n "$1" --argjson a "$2" '{jsonrpc:"2.0",id:1,method:"tools/call",params:{name:$n,arguments:$a}}')" \
-              | tee /dev/stderr | jq -e '.error == null and .result.isError != true' > /dev/null
+              -d "$(jq -n --arg n "$1" --argjson a "$2" '{jsonrpc:"2.0",id:1,method:"tools/call",params:{name:$n,arguments:$a}}')") \
+              || { echo "::error::$1: HTTP call failed: $out"; return 1; }
+            printf '%s response: %s\n' "$1" "$out"
+            if ! printf '%s' "$out" | jq -e '.error == null and .result.isError != true and ([.result.content[]?.text | fromjson? | .ok?][0] != false)' > /dev/null; then
+              echo "::error::$1 returned an error: $(printf '%s' "$out" | jq -r '[.error.message?, (.result.content[]?.text | fromjson? | .error?)] | map(select(. != null)) | join("; ")' 2>/dev/null)"
+              return 1
+            fi
+            MCP_TEXT=$(printf '%s' "$out" | jq -c '.result.content[0].text | fromjson? // {}')
           }
+          record() {
+            mcp record_intervention "$1" || return 1
+            local line
+            line=$(printf '%s' "$MCP_TEXT" | jq -r 'if .duplicateOf then "deduped to existing intervention #\(.duplicateOf), nothing new written" elif .id then "recorded intervention #\(.id)" else "recorded (no id in response)" end')
+            echo "record_intervention: $line"
+            echo "Growth Radar record_intervention: $line" >> "$GITHUB_STEP_SUMMARY"
+          }
+          BODY=$(printf '%s\n' "$BODY" | tr -d '\r')
           if [ "$MERGED" != true ]; then
             id=${REF#radar/}
             [[ "$id" =~ ^[0-9]+$ ]] || { echo "hunted fix, no recommendation to reopen"; exit 0; }
             mcp update_recommendation "{\"id\":$id,\"action\":\"reopen\"}"
             exit 0
           fi
-          meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```$/p' | sed '1d;$d')
+          if printf '%s\n' "$BODY" | grep -q '^```radar'; then
+            printf '%s\n' "$BODY" | sed -n '/^```radar/,$p' | sed 1d | grep -q '^```[[:space:]]*$' \
+              || { echo "::error::radar block in the PR body has no closing \`\`\` fence"; exit 1; }
+            meta=$(printf '%s\n' "$BODY" | sed -n '/^```radar/,/^```[[:space:]]*$/p' | sed '1d;$d')
+            printf '%s' "$meta" | jq -e 'type == "object"' > /dev/null 2>&1 \
+              || { echo "::error::radar block is not a JSON object:"; printf '%s\n' "$meta"; exit 1; }
+            missing=$(printf '%s' "$meta" | jq -r '[("app","surface","kind","metric","summary") as $k | select((.[$k] // "") | tostring | length == 0) | $k] | join(", ")')
+            [ -z "$missing" ] || { echo "::error::radar block is missing: $missing"; exit 1; }
+          else
+            meta=
+          fi
           if [ -z "$meta" ]; then
             # A radar/<id> PR opened by hand has no block: the branch still names the row, but kind/metric would be guesses.
             id=${REF#radar/}
@@ -51,9 +76,16 @@ jobs:
             exit 0
           fi
           id=$(printf '%s' "$meta" | jq -r '.recommendationId // .rec_id // empty')
-          if [[ "$id" =~ ^[0-9]+$ ]]; then
+          branch_id=${REF#radar/}
+          if [[ "$branch_id" =~ ^[0-9]+$ ]]; then
+            [ -z "$id" ] && id=$branch_id
+            [ "$id" = "$branch_id" ] || { echo "::error::radar block recommendationId $id does not match branch $REF"; exit 1; }
+          elif [ -n "$id" ] && ! [[ "$id" =~ ^[0-9]+$ ]]; then
+            echo "::error::radar block recommendationId is not a number: $id"; exit 1
+          fi
+          if [ -n "$id" ]; then
             mcp update_recommendation "{\"id\":$id,\"action\":\"complete\"}"
           fi
-          args=$(printf '%s' "$meta" | jq -c --arg pr "$PR_URL" \
-            '{app,surface,kind,metric,summary,hypothesis,evidence:$pr} + ((.recommendationId // .rec_id) as $r | if ($r|type)=="number" then {recommendationId:$r} else {} end)')
-          mcp record_intervention "$args"
+          args=$(printf '%s' "$meta" | jq -c --arg pr "$PR_URL" --arg id "$id" \
+            '{app,surface,kind,metric,summary,hypothesis,evidence:$pr} | with_entries(select(.value != null)) + (if $id == "" then {} else {recommendationId:($id|tonumber)} end)')
+          record "$args"
