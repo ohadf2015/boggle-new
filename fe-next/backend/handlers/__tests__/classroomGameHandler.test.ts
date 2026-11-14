@@ -17,6 +17,9 @@ vi.mock('../../modules/gameStateManager', () => ({
   getGameUsers: vi.fn(() => []),
   gameExists: vi.fn((code: string) => code === 'OPEN01'),
 }));
+// Side-effecting broadcast; the join/leave handler tests assert the events they
+// emit, not the roster push (covered by classroomRosterBroadcast.test.ts).
+vi.mock('../classroomRosterBroadcast', () => ({ broadcastClassroomRoster: vi.fn() }));
 vi.mock('../../modules/supabase/classroomMembership', () => ({
   isClassroomTeacher: vi.fn(),
   isClassroomStudent: vi.fn(),

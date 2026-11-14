@@ -26,6 +26,7 @@ import {
 } from '../modules/supabase/classroomMembership.js';
 import { resolveCreatedRoomLanguage } from '../modules/classroomRoomLanguage.js';
 import { ensureJoinableClassroomGame } from './classroomGameJoinGate.js';
+import { broadcastClassroomRoster } from './classroomRosterBroadcast.js';
 import { registerClassroomRecoveryHandlers } from './classroomGameRecovery.js';
 import { registerClassroomLobbyLockHandlers } from './classroomLobbyLockHandler.js';
 import { isRecordJoinLockedOut, ROOM_LOCKED } from '../modules/classroomLobbyLock.js';
@@ -348,6 +349,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
           username: joinPayload.username,
           playerCount: game.players.length,
         });
+        // The lobby headline counts the joined roster (not just live sockets):
+        // a student who joins and then drops wifi must stay on the wall.
+        broadcastClassroomRoster(io, joinPayload.gameCode);
       }
 
       socket.emit('joinedClassroomGame', {
@@ -392,6 +396,9 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
 
     try {
       await removePlayerFromClassroomGame(leavePayload.gameCode, leavePayload.userId);
+      // A deliberate leave removes the student from the joined roster too, so
+      // the lobby headline can stop counting them.
+      broadcastClassroomRoster(io, leavePayload.gameCode);
       logger.info('CLASSROOM_GAME', `Player ${leavePayload.userId} left game ${leavePayload.gameCode}`);
     } catch (error) {
       logger.error('CLASSROOM_GAME', `Failed to leave game: ${error}`);

@@ -28,6 +28,8 @@ import { checkRateLimit } from '../utils/rateLimiter.js';
 import { cleanupPlayerData } from '../utils/playerCleanup.js';
 import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
+import { removePlayerFromClassroomGame } from '../modules/classroomGameManager.js';
+import { broadcastClassroomRoster } from './classroomRosterBroadcast.js';
 import logger from '../utils/logger.js';
 import { notifyRivalLeft } from '../modules/rivalSocket.js';
 
@@ -73,12 +75,22 @@ function executeKick(
   // Clean up player data and remove
   notifyRivalLeft(gameCode, game, targetUsername);
   cleanupPlayerData(game, targetUsername);
+  const targetAuthUserId = game.users[targetUsername]?.authUserId ?? null;
   removeUserFromGame(gameCode, targetUsername);
 
   // An AFK kick is housekeeping, not a ban: a backgrounded phone must be able to rejoin.
   if (reason === 'host') {
     if (!game.kickedPlayers) game.kickedPlayers = new Set<string>();
     game.kickedPlayers.add(targetUsername);
+  }
+
+  // A host kick also un-joins the student. The classroom roster outlives socket
+  // drops, so without this the projector wall would keep listing the kicked
+  // student as a reconnecting joiner for the rest of the lesson.
+  if (game.isClassroom && reason === 'host' && targetAuthUserId) {
+    void removePlayerFromClassroomGame(gameCode, targetAuthUserId)
+      .then(() => broadcastClassroomRoster(io, gameCode))
+      .catch((error) => logger.error('KICK', `Failed to remove kicked student from classroom roster: ${(error as Error).message}`));
   }
 
   // Broadcast to room
