@@ -10,6 +10,8 @@ export interface PlayerSummarySeed {
   id?: string | null;
   /** Opaque daily-board row key; a signed-in viewer can trade it for the id. */
   boardKey?: string | null;
+  /** The board's day, for resolving `boardKey` outside a FriendStatusProvider. */
+  boardDate?: string | null;
   name: string;
   avatarImage?: string | null;
   customAvatar?: CustomAvatarConfig | null;

@@ -17,6 +17,9 @@ vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: track }));
 const friendCtx = vi.hoisted(() => ({ value: null as null | Record<string, unknown> }));
 vi.mock('@/components/friends/FriendStatusContext', () => ({ useFriendStatus: () => friendCtx.value }));
 
+const resolveBoardPlayer = vi.hoisted(() => vi.fn());
+vi.mock('../resolveBoardPlayer', () => ({ resolveBoardPlayer }));
+
 const getQuery = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/trpc', () => ({
   trpc: { playerProfile: { get: { useQuery: (...a: unknown[]) => getQuery(...a) } } },
@@ -112,5 +115,15 @@ describe('PlayerSummaryTrigger', () => {
   it('does nothing when disabled (the viewer\'s own row)', () => {
     render(<PlayerSummaryTrigger player={{ id: 'me', name: 'Me' }} surface="t" disabled><span>Me</span></PlayerSummaryTrigger>);
     expect(screen.queryByTestId('player-summary-trigger')).toBeNull();
+  });
+
+  it('resolves a board key outside a friends provider using the board date it was given', async () => {
+    resolveBoardPlayer.mockResolvedValue('u-7');
+    getQuery.mockImplementation(({ id }: { id: string }) =>
+      id ? { data: { ...PROFILE, id }, isLoading: false, isError: false } : { data: undefined, isLoading: false, isError: false });
+    render(<PlayerSummaryTrigger player={{ boardKey: 'rowkey777', boardDate: '2026-11-14', name: 'Fish' }} surface="daily_hub"><span>Fish</span></PlayerSummaryTrigger>);
+    fireEvent.click(screen.getByTestId('player-summary-trigger'));
+    await waitFor(() => expect(screen.getByTestId('player-summary-profile-link')).toHaveAttribute('href', '/he/player/u-7'));
+    expect(resolveBoardPlayer).toHaveBeenCalledWith('2026-11-14', 'rowkey777');
   });
 });

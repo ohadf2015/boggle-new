@@ -17,19 +17,19 @@ import type { PublicNameIssue } from '@/lib/names/publicName';
 interface ProfileCustomizationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  defaultName: string;
   initialAvatar?: CustomAvatarConfig | null;
   onSave: (name: string, avatarConfig: CustomAvatarConfig) => Promise<void>;
 }
 
 /**
  * ProfileCustomizationModal - Required modal for new users to set their name and avatar.
- * Name is mandatory (no skip). Avatar defaults to random if not customized.
+ * Name is mandatory (no skip) and starts EMPTY: a prefilled default (a sign-in
+ * name or a generated one) got trimmed letter by letter into near-copies instead
+ * of a name the player chose. Avatar defaults to random if not customized.
  */
 const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   isOpen,
   onClose,
-  defaultName,
   initialAvatar,
   onSave,
 }) => {
@@ -46,7 +46,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
   const [selectedAvatar, setSelectedAvatar] = useState<CustomAvatarConfig>(
     () => initialAvatar ?? getRandomAvatarConfig()
   );
-  const [displayName, setDisplayName] = useState(defaultName);
+  const [displayName, setDisplayName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
   const [nameTouched, setNameTouched] = useState(false);
@@ -59,13 +59,13 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
     const justOpened = isOpen && !prevOpenRef.current;
     prevOpenRef.current = isOpen;
     if (justOpened) {
-      setDisplayName(defaultName);
+      setDisplayName('');
       setSelectedAvatar(initialAvatar ?? getRandomAvatarConfig());
       setNameTouched(false);
       // Auto-focus the name input after a brief delay
       setTimeout(() => inputRef.current?.focus(), 400);
     }
-  }, [isOpen, defaultName, initialAvatar]);
+  }, [isOpen, initialAvatar]);
 
   // Name validation
   const minLength = 2;

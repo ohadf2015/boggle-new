@@ -148,7 +148,7 @@ function RowShell({
         {rank}
       </div>
 
-      <PlayerSummaryTrigger player={summary} surface="daily_leaderboard" labelled disabled={isCurrentUser}>
+      <PlayerSummaryTrigger player={summary} surface="daily_leaderboard" labelled>
         <div className="relative shrink-0 rounded-full">
           <div className={`w-10 h-10 ${compact ? '' : 'sm:w-12 sm:h-12'} border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
             <Avatar
