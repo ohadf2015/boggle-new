@@ -3,8 +3,10 @@ name: Schema drift
 on:
   pull_request:
     branches: [main, master]
-  push:
-    branches: [main, master]
+
+concurrency:
+  group: schema-drift-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check:
