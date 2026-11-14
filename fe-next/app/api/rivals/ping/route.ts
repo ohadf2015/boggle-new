@@ -11,7 +11,7 @@ import { checkPingAllowed, grantPingAchievements } from '@/lib/rivals/pingServer
 import { RIVAL_PING_IDS, RIVAL_PING_PER_TARGET_WINDOW_MS, type RivalPingErrorCode } from '@/lib/rivals/pings';
 import { notifyRivalPing } from '@/backend/modules/pushNotificationTriggers';
 
-const CONTEXTS = ['daily', 'quickPlay', 'multiplayer', 'blast', 'tower', 'single', 'edu', 'reply'] as const;
+const CONTEXTS = ['daily', 'quickPlay', 'multiplayer', 'blast', 'tower', 'single', 'edu', 'reply', 'friendFree', 'friendPlaying'] as const;
 
 const Body = z.object({
   targetUserId: z.string().uuid(),

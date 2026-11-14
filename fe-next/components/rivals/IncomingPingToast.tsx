@@ -10,7 +10,7 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { useInGameSurface } from '@/lib/inGameSurface';
 import { surfaceOf } from '@/lib/navigation/eduSections';
 import { pingErrorKey, sendRivalPing } from '@/lib/rivals/pingClient';
-import { RIVAL_PINGS, type RivalPingErrorCode, type RivalPingId } from '@/lib/rivals/pings';
+import { RIVAL_PINGS, pingsFor, type RivalPingErrorCode, type RivalPingId } from '@/lib/rivals/pings';
 import { markNotificationRead } from '@/lib/supabaseRealtimeNotifications';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { RivalPingPicker } from './RivalPingPicker';
@@ -98,7 +98,7 @@ export function IncomingPingToast() {
 
         {replying ? (
           <div className="mt-3 rounded-xl border-2 border-neo-black bg-neo-white p-2">
-            <RivalPingPicker onPick={reply} />
+            <RivalPingPicker ids={pingsFor('reply')} onPick={reply} />
           </div>
         ) : (
           <div className="mt-3 flex gap-2">

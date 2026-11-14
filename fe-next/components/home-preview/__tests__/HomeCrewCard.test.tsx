@@ -17,6 +17,12 @@ vi.mock('@/hooks/useFriends', () => ({ useFriends: () => ({ acceptRequest: h.acc
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: (...a: unknown[]) => h.track(...a) }));
 vi.mock('next/link', () => ({ default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => <a href={href} {...rest}>{children}</a> }));
 
+vi.mock('@/components/rivals/RivalPingButton', () => ({
+  RivalPingButton: ({ targetUserId, context }: { targetUserId: string; context: string }) => (
+    <button type="button" data-testid="crew-ping" data-target={targetUserId} data-context={context}>ping</button>
+  ),
+}));
+
 import { HomeCrewCard } from '../HomeCrewCard';
 
 const t = (k: string, p?: Record<string, unknown>) => (p && Object.keys(p).length ? `${k}:${JSON.stringify(p)}` : k);
@@ -39,13 +45,14 @@ describe('HomeCrewCard', () => {
     h.track.mockReset();
   });
 
-  it('Given friends, Then the one in a lobby comes first with Join, online gets Invite, offline gets nothing', () => {
+  it('Given friends, Then the one in a lobby comes first with Join, online gets Invite, offline gets a Ping', () => {
     render(<HomeCrewCard lang="en" t={t} />);
     const rows = screen.getAllByTestId('crew-row');
     expect(rows.map((r) => r.getAttribute('data-user'))).toEqual(['lob', 'on', 'old']);
     expect(within(rows[0]).getByRole('link', { name: /homePlay\.crew\.join/ }).getAttribute('href')).toBe('/en/multiplayer?room=ROOM1');
     expect(within(rows[1]).getByRole('link', { name: /homePlay\.crew\.invite/ }).getAttribute('href')).toBe('/en/multiplayer?invite=on');
     expect(within(rows[2]).queryByRole('link')).toBeNull();
+    expect(within(rows[2]).getByTestId('crew-ping').getAttribute('data-context')).toBe('friendFree');
     expect(within(rows[0]).getByText(/homePlay\.crew\.inLobby/)).toBeTruthy();
     expect(within(rows[2]).getByText(/homePlay\.crew\.youLead/)).toBeTruthy();
   });
@@ -81,6 +88,27 @@ describe('HomeCrewCard', () => {
     rerender(<HomeCrewCard lang="en" t={t} />);
     fireEvent.click(screen.getByRole('button', { name: /homePlay\.crew\.retry/ }));
     expect(h.home.refresh).toHaveBeenCalled();
+  });
+
+  it('Given a friend in a private game, Then a Ping with in-game lines', () => {
+    h.home.data = data({ friends: [friend('busy', 60_000)], presence: [{ userId: 'busy', status: 'private' }] });
+    render(<HomeCrewCard lang="en" t={t} />);
+    expect(screen.getByTestId('crew-ping').getAttribute('data-context')).toBe('friendPlaying');
+  });
+
+  it('Given friends gone for weeks next to active ones, Then only the active ones show on home', () => {
+    h.home.data = data({ friends: [friend('fresh', 3_600_000), friend('gone', 86_400_000 * 40)], presence: [] });
+    render(<HomeCrewCard lang="en" t={t} />);
+    expect(screen.getAllByTestId('crew-row').map((r) => r.getAttribute('data-user'))).toEqual(['fresh']);
+  });
+
+  it('Given six active friends, Then four show and See more reveals the rest', () => {
+    h.home.data = data({ friends: Array.from({ length: 6 }, (_, i) => friend(`f${i}`, (i + 1) * 3_600_000)), friendCount: 6, presence: [] });
+    render(<HomeCrewCard lang="en" t={t} />);
+    expect(screen.getAllByTestId('crew-row')).toHaveLength(4);
+    fireEvent.click(screen.getByRole('button', { name: /homePlay\.crew\.seeMore/ }));
+    expect(screen.getAllByTestId('crew-row')).toHaveLength(6);
+    expect(screen.queryByRole('button', { name: /homePlay\.crew\.seeMore/ })).toBeNull();
   });
 
   it('Always links to the friends page', () => {

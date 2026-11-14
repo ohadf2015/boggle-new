@@ -148,6 +148,8 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           animate={{ x: 0 }}
           exit={{ opacity: 0, x: isRTL ? -20 : 20 }}
           transition={{ duration: 0.25 }}
+          role="dialog"
+          aria-modal="true"
           className={cn(
             'fixed inset-0 z-50 flex flex-col',
             'pt-[env(safe-area-inset-top)]',
