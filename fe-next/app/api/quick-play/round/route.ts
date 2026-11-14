@@ -22,12 +22,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
+  // An empty or broken body is a client mistake, not a server fault: answer
+  // 400 and keep it out of error tracking (PostHog inbox 01a1c16a).
+  const body: unknown = await request.json().catch(() => null);
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return NextResponse.json({ error: 'Invalid body' }, { status: 400 });
+  }
+
   try {
-    const body = await request.json();
-    const mode = body?.mode as QuickMode;
-    const language = typeof body?.language === 'string' && LANGUAGES.includes(body.language) ? body.language : 'en';
-    const seed = typeof body?.seed === 'string' && body.seed.length <= 64 ? body.seed : undefined;
-    const recentPct = typeof body?.recentPct === 'number' ? Math.max(0, Math.min(100, body.recentPct)) : 0;
+    const { mode: rawMode, language: rawLanguage, seed: rawSeed, recentPct: rawRecentPct } = body as Record<string, unknown>;
+    const mode = rawMode as QuickMode;
+    const language = typeof rawLanguage === 'string' && LANGUAGES.includes(rawLanguage) ? rawLanguage : 'en';
+    const seed = typeof rawSeed === 'string' && rawSeed.length <= 64 ? rawSeed : undefined;
+    const recentPct = typeof rawRecentPct === 'number' ? Math.max(0, Math.min(100, rawRecentPct)) : 0;
 
     if (!MODES.includes(mode)) {
       return NextResponse.json({ error: 'Invalid mode' }, { status: 400 });
