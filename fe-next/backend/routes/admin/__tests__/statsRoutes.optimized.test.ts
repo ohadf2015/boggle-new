@@ -37,25 +37,29 @@ describe('statsService', () => {
     vi.clearAllMocks();
   });
 
-  it('should call all 3 RPCs in parallel', async () => {
+  it('should call all 4 RPCs in parallel', async () => {
     mockRpc
       .mockResolvedValueOnce({ data: { totalPlayers: 100, totalGames: 500, totalWords: 5000, totalGameTimeHours: 42.5 }, error: null })
       .mockResolvedValueOnce({ data: { gamesToday: 10, uniquePlayersToday: 8, uniquePlayersWeek: 30, uniquePlayersMonth: 60, signupsToday: 3, signupsWeek: 15 }, error: null })
-      .mockResolvedValueOnce({ data: { en: 300, he: 100, sv: 50, ja: 50 }, error: null });
+      .mockResolvedValueOnce({ data: { en: 300, he: 100, sv: 50, ja: 50 }, error: null })
+      .mockResolvedValueOnce({ data: { total: 5678, today: 44, week: 469 }, error: null });
 
     const result = await fetchDashboardStats(mockSupabase as never);
 
-    expect(mockRpc).toHaveBeenCalledTimes(3);
+    expect(mockRpc).toHaveBeenCalledTimes(4);
     expect(mockRpc).toHaveBeenCalledWith('admin_overview_stats');
     expect(mockRpc).toHaveBeenCalledWith('admin_activity_stats');
     expect(mockRpc).toHaveBeenCalledWith('admin_language_breakdown');
+    expect(mockRpc).toHaveBeenCalledWith('admin_real_games_stats');
     expect(result.overview.totalPlayers).toBe(100);
     expect(result.activity.gamesToday).toBe(10);
     expect(result.languages).toEqual({ en: 300, he: 100, sv: 50, ja: 50 });
+    expect(result.realGames).toEqual({ total: 5678, today: 44, week: 469 });
   });
 
   it('should handle RPC errors gracefully', async () => {
     mockRpc
+      .mockResolvedValueOnce({ data: null, error: { message: 'RPC not found' } })
       .mockResolvedValueOnce({ data: null, error: { message: 'RPC not found' } })
       .mockResolvedValueOnce({ data: null, error: { message: 'RPC not found' } })
       .mockResolvedValueOnce({ data: null, error: { message: 'RPC not found' } });
@@ -66,5 +70,7 @@ describe('statsService', () => {
     expect(result.overview.totalPlayers).toBe(0);
     expect(result.activity.gamesToday).toBe(0);
     expect(result.languages).toEqual({});
+    // No false zero for real games: the card hides until the RPC exists.
+    expect(result.realGames).toBeUndefined();
   });
 });

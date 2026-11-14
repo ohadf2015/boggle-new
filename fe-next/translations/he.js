@@ -23358,6 +23358,8 @@ const adminDashboardHe = {
   'signupsHero.week': 'השבוע',
   'signupsHero.milestone': 'עברנו {n} השבוע!',
   'signupsHero.next': 'עוד {left} ל-{next}',
+  'realGamesHero.title': 'משחקים מאז ההשקה',
+  'realGamesHero.hint': 'רק משחקים אמיתיים: כל משחק שהסתיים ובו השחקן מצא לפחות מילה אחת. בלי חשבונות בדיקה ותצוגות מקדימות.',
   'appStats.loadFailed': 'לא הצלחנו לטעון את נתוני האפליקציה.',
   'appStats.appTitle': 'אנשים באפליקציה',
   'appStats.new7': 'חדשים, 7 ימים',

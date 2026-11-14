@@ -63,6 +63,8 @@ export interface StatsResponse {
     signupsWeek: number;
   };
   languages: Record<string, number>;
+  /** Real games (see admin_real_games_stats): all time, this UTC day, last 7 days. Absent before the migration. */
+  realGames?: { total: number; today: number; week: number };
   guests?: {
     totalGuestGames: number;
     guestGamesToday: number;
