@@ -1,6 +1,6 @@
 name: radar-fix
 
-# Inline copy of ohadf2015/growth-radar radar-loop.yml (this repo is public and cannot call it). One app's daily Growth Radar loop. Refresh its data, have Claude verify the open
+# Inline copy of ohadf2015/growth-radar radar-loop.yml (this repo is public and cannot call it). One app's Growth Radar loop, every third day. Refresh its data, have Claude verify the open
 # recommendations over the MCP, dismiss the noise and fix one real issue in a PR. Never merges.
 # Callers: radar-fix.yml here and in every app repo. radar-close.yml closes the loop on merge.
 # RADAR_GIT_TOKEN is a repo secret: a user or GitHub App token with contents and pull-requests write.
@@ -8,7 +8,7 @@ name: radar-fix
 # check does not satisfy a required status check. Mirrored from growth-radar 80c9655e.
 on:
   schedule:
-    - cron: "0 11 * * *"
+    - cron: "0 11 */3 * *"
   workflow_dispatch:
   # An issue Growth Radar files for this repo wakes the agent now instead of at the next scheduled run.
   issues:
