@@ -10,10 +10,12 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 
 /**
- * Phone-only "My classroom" button for approved teachers. Below `sm` the header
- * strip (with its teacher link) is hidden, so a teacher had to open the drawer or
+ * Phone-only class button for approved teachers. Below `sm` the header strip
+ * (with its teacher link) is hidden, so a teacher had to open the drawer or
  * scroll to the bottom of home to reach their class. This keeps it one tap away
- * on every page. Steps aside inside /teacher and on CrazyGames.
+ * on every page. Icon-only, the same 36px square as the mute and language
+ * buttons: a text label crowded the logo on 360px phones (Hebrew logo overlapped
+ * it). Steps aside inside /teacher, on CrazyGames and below 350px.
  */
 const HeaderClassButton = memo(() => {
   const { t, language } = useLanguage();
@@ -32,10 +34,10 @@ const HeaderClassButton = memo(() => {
       href={`/${language}/teacher`}
       data-testid="header-my-class"
       aria-label={label}
-      className="sm:hidden inline-flex min-h-9 shrink-0 items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-cyan px-2 py-1 font-neo-display text-xs font-black leading-none text-neo-black shadow-hard-sm transition-transform active:translate-y-px active:shadow-none"
+      title={label}
+      className="sm:hidden max-[349px]:hidden inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm transition-transform active:translate-y-px active:shadow-none"
     >
-      <GraduationCap className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden="true" />
-      <span className="max-[359px]:sr-only">{label}</span>
+      <GraduationCap className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
     </Link>
   );
 });

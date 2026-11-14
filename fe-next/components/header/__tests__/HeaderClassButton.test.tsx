@@ -22,14 +22,23 @@ describe('HeaderClassButton', () => {
     cg.isLoading = false;
   });
 
-  it('Given a teacher on any page, Then a solid My classroom button links to the dashboard on phones', () => {
+  it('Given a teacher on any page, Then a solid class icon button links to the dashboard on phones', () => {
     profile = { user_role: 'teacher' };
     render(<HeaderClassButton />);
     const link = screen.getByTestId('header-my-class');
     expect(link).toHaveAttribute('href', '/en/teacher');
-    expect(link).toHaveTextContent('education.nav.myClassroom');
+    expect(link).toHaveAccessibleName('education.nav.myClassroom');
     expect(link.className).toMatch(/\bsm:hidden\b/);
     expect(link.className).toMatch(/\bbg-neo-cyan\b/);
+  });
+
+  it('Then it is an icon-only square the size of the mute and language buttons, so it never crowds the logo', () => {
+    profile = { user_role: 'teacher' };
+    render(<HeaderClassButton />);
+    const link = screen.getByTestId('header-my-class');
+    expect(link.textContent).toBe('');
+    expect(link.className).toMatch(/\bh-9\b/);
+    expect(link.className).toMatch(/\bw-9\b/);
   });
 
   it('Given an admin, Then they get the same entry', () => {

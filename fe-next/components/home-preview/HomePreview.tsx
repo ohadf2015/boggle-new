@@ -18,6 +18,7 @@ import { MoreGames } from './MoreGames';
 import { HomeAdventureCard } from '@/components/landing/home/HomeAdventureCard';
 import { WeeklyThemeCard } from '@/components/daily/WeeklyThemeCard';
 import { ClassroomStrip } from './ClassroomStrip';
+import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
 import { FreshAdSlot } from '@/components/landing/fresh/FreshAdSlot';
 import { pickHeroAvatar, type HeroAvatar } from './heroAvatar';
 import { readLastAccountAvatar } from '@/utils/accountAvatarCache';
@@ -50,6 +51,10 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
 
   return (
     <div className="overflow-x-clip bg-neo-navy pb-8" data-testid="home-preview">
+      {/* Teachers: their class first, above the play hero. Renders nothing for anyone else. */}
+      <div className="mx-auto w-full max-w-md px-4 pt-3 empty:hidden lg:max-w-[1600px] lg:px-14 lg:pt-6">
+        <HomeEducationCardConnected slot="top" />
+      </div>
       <div className="mx-auto w-full lg:max-w-[1600px] lg:px-14 lg:pt-6">
         <PlayHero
           lang={language}
