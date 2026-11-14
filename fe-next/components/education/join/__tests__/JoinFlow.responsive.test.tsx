@@ -40,52 +40,37 @@ describe('<JoinFlow> layout', () => {
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Year 9 English' });
   });
 
-  it('Given the standalone door, Then it paints its own navy and decorations', () => {
+  it('Given any door, Then the arena backdrop paints behind a transparent root, with no slabs', () => {
     render(<JoinFlow />);
-    expect(root().className).toContain('bg-neo-navy');
-    expect(screen.getByTestId('join-decor')).toBeInTheDocument();
-  });
-
-  it('Given the academy door, Then the root is transparent so the arena backdrop shows, with no slabs', () => {
-    render(<JoinFlow variant="academy" />);
+    expect(screen.getByTestId('academy-backdrop')).toHaveAttribute('data-art', 'arena');
+    expect(root()).toContainElement(screen.getByTestId('academy-backdrop'));
+    expect(root().className).toContain('isolate');
     expect(root().className).not.toMatch(/(^|\s)bg-neo-navy(\s|$)/);
     expect(screen.queryByTestId('join-decor')).not.toBeInTheDocument();
   });
 
-  it.each(['standalone', 'academy'] as const)(
-    'Given the %s door, Then the frame is locked to the viewport and one inner region scrolls',
-    (variant) => {
-      render(<JoinFlow variant={variant} />);
-      expect(root().className).not.toContain('min-h-dvh');
-      expect(root().className).not.toContain('overflow-y-auto');
-      const scroller = screen.getByTestId('join-scroll');
-      expect(scroller.className).toContain('min-h-0');
-      expect(scroller.className).toContain('flex-1');
-      expect(scroller.className).toContain('overflow-y-auto');
-      expect(scroller).toContainElement(screen.getByTestId('join-stage'));
-    }
-  );
-
-  it('Given the standalone door, Then the root is exactly one viewport tall', () => {
+  it('Then the frame is locked to the viewport and one inner region scrolls', () => {
     render(<JoinFlow />);
-    expect(root().className).toMatch(/(^|\s)h-dvh(\s|$)/);
+    expect(root().className).toContain('fixed');
+    expect(root().className).not.toContain('min-h-dvh');
+    expect(root().className).not.toContain('overflow-y-auto');
+    const scroller = screen.getByTestId('join-scroll');
+    expect(scroller.className).toContain('min-h-0');
+    expect(scroller.className).toContain('flex-1');
+    expect(scroller.className).toContain('overflow-y-auto');
+    expect(scroller).toContainElement(screen.getByTestId('join-stage'));
   });
 
-  it('Given the academy door, Then the form sits on a solid panel over the busy stage and widens on desktop', () => {
-    render(<JoinFlow variant="academy" />);
+  it('Then the form sits on a solid panel over the busy stage and widens on desktop', () => {
+    render(<JoinFlow />);
     const stage = screen.getByTestId('join-stage').className;
     expect(stage).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
     expect(stage).toContain('border-neo-cream');
     expect(stage).toContain('lg:max-w-2xl');
   });
 
-  it('Given the standalone door, Then there is no panel behind the form', () => {
-    render(<JoinFlow />);
-    expect(screen.getByTestId('join-stage').className).not.toContain('border-neo-black');
-  });
-
   it('sizes with CSS, not a JS zoom pinned to a phone design', () => {
-    render(<JoinFlow variant="academy" />);
+    render(<JoinFlow />);
     expect(screen.getByTestId('join-stage').style.zoom).toBe('');
     expect(screen.getByTestId('join-stage').style.width).toBe('');
   });

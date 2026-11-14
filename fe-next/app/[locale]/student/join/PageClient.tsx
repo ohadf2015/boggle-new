@@ -13,15 +13,7 @@
 'use client';
 
 import JoinFlow from '@/components/education/join/JoinFlow';
-import { StudentJoinBackdrop } from '@/components/student/academy/StudentJoinBackdrop';
 
 export default function StudentJoinPageClient() {
-  // The backdrop comes FIRST with no z-index, so the flow (later, positioned)
-  // and the success confetti paint above it.
-  return (
-    <div>
-      <StudentJoinBackdrop />
-      <JoinFlow variant="academy" />
-    </div>
-  );
+  return <JoinFlow />;
 }

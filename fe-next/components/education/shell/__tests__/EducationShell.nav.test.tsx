@@ -58,19 +58,56 @@ describe('EducationShell — nav shell', () => {
     expect(queryByTestId('page-header')).toBeNull();
   });
 
-  it('keeps the page header on a student screen', () => {
-    pathname.current = '/en/student';
-    const { getByTestId, queryByTestId } = render(
-      <EducationShell header={<div data-testid="page-header" />}>body</EducationShell>,
-    );
-    expect(getByTestId('page-header')).toBeTruthy();
-    expect(queryByTestId('teacher-topbar')).toBeNull();
+  it('puts a student screen in the academy world: map backdrop and map dock, no sidebar or tab bar', () => {
+    pathname.current = '/en/student/lessons/abc';
+    const { getByTestId, queryByTestId } = render(<EducationShell>body</EducationShell>);
+    expect(getByTestId('academy-backdrop').getAttribute('data-art')).toBe('map');
+    expect(getByTestId('academy-dock-lessons')).toBeTruthy();
+    expect(getByTestId('academy-dock-me')).toBeTruthy();
+    expect(queryByTestId('education-sidebar')).toBeNull();
+    expect(queryByTestId('education-tabbar')).toBeNull();
   });
 
-  it('gives a student screen its own tab set', () => {
-    pathname.current = '/en/student/achievements';
+  it('titles a student screen on an academy plaque with a way back to the map, in place of the page header', () => {
+    pathname.current = '/en/student/lessons/abc';
+    const { getByTestId, queryByTestId } = render(
+      <EducationShell title="Space words" header={<div data-testid="page-header" />}>body</EducationShell>,
+    );
+    expect(queryByTestId('page-header')).toBeNull();
+    expect(getByTestId('academy-plaque').textContent).toContain('Space words');
+    expect(getByTestId('academy-page-back').getAttribute('href')).toBe('/en/student');
+  });
+
+  it('falls back to the active tab name when a student screen passes no title', () => {
+    pathname.current = '/en/student/profile';
     const { getByTestId } = render(<EducationShell>body</EducationShell>);
-    expect(getByTestId('education-tab-achievements').getAttribute('aria-current')).toBe('page');
+    expect(getByTestId('academy-plaque').textContent).toContain('teacher.nav.me');
+  });
+
+  it('on a short landscape window, moves the student dock up beside the plaque as icons so the page keeps its height', () => {
+    pathname.current = '/en/student/lessons/abc';
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: query.includes('orientation: landscape') && query.includes('max-height'),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    })) as unknown as typeof window.matchMedia;
+    try {
+      const { getByTestId, getAllByTestId } = render(<EducationShell title="Space words">body</EducationShell>);
+      expect(getAllByTestId('academy-dock-lessons')).toHaveLength(1);
+      expect(getByTestId('student-academy-top').contains(getByTestId('academy-dock-lessons'))).toBe(true);
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it('keeps an active student drill clean: no world, no dock, no plaque', () => {
+    pathname.current = '/en/student/lessons/abc';
+    const { queryByTestId } = render(<EducationShell chromeFree>body</EducationShell>);
+    expect(queryByTestId('academy-backdrop')).toBeNull();
+    expect(queryByTestId('academy-dock-lessons')).toBeNull();
+    expect(queryByTestId('academy-plaque')).toBeNull();
   });
 
   it('leaves a projector / in-game surface chrome-free', () => {
@@ -93,8 +130,8 @@ describe('EducationShell — nav shell', () => {
   it('keeps the nav without chromeFree on the same drill path (picker needs a way home)', () => {
     pathname.current = '/en/student/lessons/lesson-1';
     const { queryByTestId } = render(<EducationShell>body</EducationShell>);
-    // Whatever nav this path resolves to, chromeFree=false must not suppress it.
-    expect(queryByTestId('education-tabbar') ?? queryByTestId('education-sidebar')).not.toBeNull();
+    expect(queryByTestId('academy-dock-lessons')).not.toBeNull();
+    expect(queryByTestId('academy-page-back')).not.toBeNull();
   });
 
   it('lays the tab bar out in the column, so the scroll region gets shorter', () => {

@@ -47,14 +47,6 @@ vi.mock('@/hooks/usePracticeSession', () => ({
   }),
 }));
 
-/* The real header is the thing under test here — but only through its props. */
-vi.mock('@/components/education/EducationHeader', () => ({
-  EducationHeader: ({ title }: { title?: string }) => (
-    <div data-testid="education-header" data-title={title ?? ''}>
-      header
-    </div>
-  ),
-}));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div>loading</div> }));
 vi.mock('@/components/education/XpProgressBar', () => ({
   __esModule: true,
@@ -125,8 +117,8 @@ describe('lesson practice header', () => {
   it('titles the screen with the lesson name, which retires the id breadcrumb', async () => {
     render(<LessonPracticePageClient />);
 
-    const header = await waitFor(() => screen.getByTestId('education-header'));
-    expect(header.getAttribute('data-title')).toBe('Word Power A');
+    const header = await waitFor(() => screen.getByTestId('academy-plaque'));
+    expect(header.textContent).toBe('Word Power A');
   });
 
   /*
@@ -144,8 +136,8 @@ describe('lesson practice header', () => {
 
     render(<LessonPracticePageClient />);
 
-    const header = await waitFor(() => screen.getByTestId('education-header'));
-    const title = header.getAttribute('data-title') ?? '';
+    const header = await waitFor(() => screen.getByTestId('academy-plaque'));
+    const title = header.textContent ?? '';
     expect(title.length).toBeLessThanOrEqual(24);
     expect(title.endsWith('…')).toBe(true);
     expect(title.startsWith('Unit 4')).toBe(true);
@@ -162,8 +154,8 @@ describe('lesson practice header', () => {
 
     render(<LessonPracticePageClient />);
 
-    const header = await waitFor(() => screen.getByTestId('education-header'));
-    expect(header.getAttribute('data-title')).toBeTruthy();
+    const header = await waitFor(() => screen.getByTestId('academy-plaque'));
+    expect(header.textContent).toBeTruthy();
   });
 
   it('titles the dead-link state too', async () => {
@@ -171,14 +163,14 @@ describe('lesson practice header', () => {
 
     render(<LessonPracticePageClient />);
 
-    const header = await waitFor(() => screen.getByTestId('education-header'));
-    expect(header.getAttribute('data-title')).toBeTruthy();
+    const header = await waitFor(() => screen.getByTestId('academy-plaque'));
+    expect(header.textContent).toBeTruthy();
   });
 
   it('never prints the lesson id anywhere on the picker screen', async () => {
     const { container } = render(<LessonPracticePageClient />);
 
-    await waitFor(() => expect(screen.getByTestId('education-header')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('academy-plaque')).toBeInTheDocument());
     expect(container.textContent).not.toContain('d647f2f8');
   });
 });

@@ -27,7 +27,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePracticeLesson } from '@/hooks/usePracticeLessons';
 import { usePracticeProgress, type PracticeType } from '@/hooks/usePracticeSession';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { parseFocusParam } from '@/lib/education/vocabFocus';
@@ -90,7 +89,7 @@ export default function LessonPracticePageClient() {
 
   if (loading || isLoadingLesson || isLoadingProgress || !studentId) {
     return (
-      <EducationShell header={<EducationHeader showBackButton title={t('education.practicePicker.title')} />} contentClassName="flex items-center justify-center">
+      <EducationShell title={t('education.practicePicker.title')} contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
       </EducationShell>
     );
@@ -100,7 +99,7 @@ export default function LessonPracticePageClient() {
   // `border-[3px]`, not `border-3`: preflight zeroes the latter.
   if (!lesson) {
     return (
-      <EducationShell header={<EducationHeader showBackButton title={t('education.practicePicker.title')} />} contentClassName="flex items-center justify-center px-4">
+      <EducationShell title={t('education.practicePicker.title')} contentClassName="flex items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-neo border-[3px] border-black bg-neo-lime p-6 text-neo-black shadow-hard">
           <h1 className="mb-2 font-neo-display text-xl font-black">
             {t('education.practice.lessonUnavailable')}

@@ -19,7 +19,6 @@ import posthog from '@/lib/analytics/lazyPosthog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { AcademyHub } from '@/components/student/academy/AcademyHub';
@@ -92,7 +91,7 @@ export default function StudentPageClient() {
   // for a second and then stops is a jolt on a phone.
   if (profileStalled && isChecking) {
     return (
-      <EducationShell header={<EducationHeader />} contentClassName="flex items-center justify-center px-4">
+      <EducationShell contentClassName="flex items-center justify-center px-4">
         <div className="w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime p-6 text-neo-black shadow-hard">
           <h1 className="mb-2 font-neo-display text-xl font-black">
             {t('student.profileStalled.title')}
@@ -114,7 +113,7 @@ export default function StudentPageClient() {
 
   if (isChecking || loading) {
     return (
-      <EducationShell header={<EducationHeader />} contentClassName="flex items-center justify-center">
+      <EducationShell contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
       </EducationShell>
     );

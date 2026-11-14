@@ -52,27 +52,10 @@ describe('<StudentJoinPageClient>', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('dresses the shared flow in the Academy arena art, behind the code field', () => {
+  it('mounts the shared flow as-is: the flow paints its own arena, the same on every door', () => {
     const { container } = render(<StudentJoinPageClient />);
-    const backdrop = screen.getByTestId('student-join-backdrop');
-    expect(backdrop).toHaveAttribute('aria-hidden', 'true');
-    // Never intercepts a tap meant for the code boxes.
-    expect(backdrop.className).toContain('pointer-events-none');
-    expect(container.querySelector('img[src*="arena-lobby-bg"]')).not.toBeNull();
-  });
-
-  it('asks the shared flow for its academy skin instead of overriding its markup', () => {
-    const { container } = render(<StudentJoinPageClient />);
-    expect(screen.getByTestId('join-flow')).toHaveAttribute('data-variant', 'academy');
-    expect(container.innerHTML).not.toContain(':!');
-  });
-
-  it('paints the backdrop BEFORE the flow, so the flow and its confetti sit above it', () => {
-    render(<StudentJoinPageClient />);
-    const backdrop = screen.getByTestId('student-join-backdrop');
-    const flow = screen.getByTestId('join-flow');
-    expect(backdrop.compareDocumentPosition(flow) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(backdrop.className).not.toMatch(/(^|\s)z-/);
+    expect(screen.getByTestId('join-flow')).not.toHaveAttribute('data-variant');
+    expect(container.querySelector('[data-testid="student-join-backdrop"]')).toBeNull();
   });
 
   it('never redirects a signed-in student either', () => {

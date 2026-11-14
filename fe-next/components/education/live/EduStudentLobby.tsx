@@ -10,6 +10,7 @@ import { LobbyLearnRecall, canRecall } from "./LobbyLearnRecall";
 import { LIVE_KEYFRAMES, PRESS } from "./eduLiveStyles";
 import { EduStudentLobbyCrowd } from "./EduStudentLobbyCrowd";
 import { EduStudentLobbyHud } from "./EduStudentLobbyHud";
+import { AcademyBackdrop } from "@/components/student/academy/AcademyBackdrop";
 
 const STICKER_KEYFRAMES =
   "@keyframes edu-sticker-slap{0%{transform:rotate(-30deg) scale(2)}100%{transform:rotate(-8deg) scale(1)}}";
@@ -37,8 +38,9 @@ export function EduStudentLobby({
   return (
     <div
       data-testid="edu-student-lobby"
-      className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream"
+      className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream"
     >
+      <AcademyBackdrop art="arena" />
       <style>{LIVE_KEYFRAMES + STICKER_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-between gap-3 pe-16 ps-4 pt-3">
         <span

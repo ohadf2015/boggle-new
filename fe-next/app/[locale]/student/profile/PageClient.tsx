@@ -13,7 +13,6 @@ import { ArrowRight } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -124,7 +123,7 @@ export default function StudentProfilePageClient() {
   // Show loader during auth check or while auth is loading
   if (isChecking || loading) {
     return (
-      <EducationShell header={<EducationHeader showBackButton />} contentClassName="flex items-center justify-center">
+      <EducationShell contentClassName="flex items-center justify-center">
         <PageLoader size="lg" text={t('common.loading')} />
       </EducationShell>
     );
@@ -137,7 +136,6 @@ export default function StudentProfilePageClient() {
   return (
     <EducationShell
       className={cn(isRTL && 'rtl')}
-      header={<EducationHeader showBackButton />}
       scrollRegionLabel={t('student.dashboard.title')}
       contentClassName="px-4 py-6 sm:px-6 lg:px-8"
     >

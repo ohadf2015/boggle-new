@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePracticeProgress, usePracticeWords, type PracticeType } from '@/hooks/usePracticeSession';
 import { toVocabularyWords } from '@/lib/education/practiceWordShape';
-import { EducationHeader } from '@/components/education/EducationHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 import PracticePicker from '@/components/education/practicePicker/PracticePicker';
@@ -356,15 +355,8 @@ export default function PracticeContent({
     );
   }
 
-  /*
-    Mode selector view. `title` is not decoration: an untitled EducationHeader
-    draws a phone breadcrumb row whose last crumb is the URL segment, and on
-    this route that segment is the lesson's UUID — `Lessons › d647f2f8…` sat
-    above the games on the r5 capture. Naming the lesson retires that row and
-    the picker below therefore stops repeating the name.
-  */
   return (
-    <EducationShell className={cn(isRTL && 'rtl')} header={<EducationHeader showBackButton title={headerTitle(lesson.name)} />}
+    <EducationShell className={cn(isRTL && 'rtl')} title={headerTitle(lesson.name)}
       scrollRegionLabel={lesson.name}
       contentClassName="flex flex-col overflow-hidden px-3 py-3 sm:px-6">
       {/*

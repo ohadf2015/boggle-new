@@ -106,6 +106,14 @@ describe('edu live surfaces — student lobby', () => {
     expect(screen.queryByTestId('classroom-waiting-count')).not.toBeInTheDocument();
   });
 
+  it('given no provider, when a classroom student waits, then the lobby stands in the arena scene, not a flat navy page', () => {
+    render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
+    const lobby = screen.getByTestId('edu-student-lobby');
+    expect(lobby).toContainElement(screen.getByTestId('academy-backdrop'));
+    expect(screen.getByTestId('academy-backdrop')).toHaveAttribute('data-art', 'arena');
+    expect(lobby.className).toContain('isolate');
+  });
+
   it('given no provider, when a classroom student waits, then the same edu student lobby renders', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
     expect(screen.getByTestId('edu-student-count')).toBeInTheDocument();
