@@ -175,61 +175,69 @@ export default function WordSolverPageClient() {
 
         <InlineBannerAd webZone="content-page" />
 
-        {error && (
-          <div className="bg-red-900/50 border-3 border-red-500 rounded-neo p-4 mb-6 text-red-200">
-            {error}
-          </div>
-        )}
-
-        {hasSearched && !error && (
-          <section className="mb-8" aria-live="polite">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-neo-display text-2xl font-bold text-white">
-                {content.resultsTitle}
-              </h2>
-              {totalCount > 0 && (
-                <span className="bg-neo-cyan text-neo-black font-bold px-3 py-1 border-3 border-neo-black rounded-neo text-sm">
-                  {totalCount} {content.wordsFound}
-                  {wasCapped && ` (${content.showingFirst} 500)`}
-                </span>
-              )}
-            </div>
-
-            {totalCount === 0 ? (
-              <p className="text-neo-white text-lg bg-neo-navy-light border-3 border-neo-black rounded-neo p-6 text-center">
-                {content.noResults}
-              </p>
-            ) : (
+        {/* Reserved from the tap onward: the region opens (and pushes the
+            sections below it down) while the click still counts as input, so
+            the answer that lands later fills space that is already there
+            instead of shifting the page. It never shrinks back, even for no
+            results or an error, because that collapse would be a shift too. */}
+        {(isLoading || hasSearched || error) && (
+          <section className="mb-8 min-h-[50vh]" aria-live="polite" data-testid="solver-results">
+            {error && (
+              <div className="bg-red-900/50 border-3 border-red-500 rounded-neo p-4 mb-6 text-red-200">
+                {error}
+              </div>
+            )}
+            {hasSearched && !error && (
               <>
-                <div className="space-y-4">
-                  {grouped.map(([len, words]) => (
-                    <div
-                      key={len}
-                      className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4"
-                    >
-                      <h3 className="font-neo-display font-bold text-neo-orange mb-3">
-                        {len}{content.letterWords} ({words.length})
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {words.map((word) => (
-                          <span
-                            key={word}
-                            className={cn(
-                              'px-3 py-1.5 font-mono font-bold text-sm',
-                              'bg-neo-navy text-white border-2 border-neo-black rounded-neo',
-                              'shadow-hard-sm'
-                            )}
-                          >
-                            {word}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-neo-display text-2xl font-bold text-white">
+                    {content.resultsTitle}
+                  </h2>
+                  {totalCount > 0 && (
+                    <span className="bg-neo-cyan text-neo-black font-bold px-3 py-1 border-3 border-neo-black rounded-neo text-sm">
+                      {totalCount} {content.wordsFound}
+                      {wasCapped && ` (${content.showingFirst} 500)`}
+                    </span>
+                  )}
                 </div>
-                <p className="text-neo-white text-sm mt-4 italic">
-                  {content.fullDictionaryNote}
-                </p>
+    
+                {totalCount === 0 ? (
+                  <p className="text-neo-white text-lg bg-neo-navy-light border-3 border-neo-black rounded-neo p-6 text-center">
+                    {content.noResults}
+                  </p>
+                ) : (
+                  <>
+                    <div className="space-y-4">
+                      {grouped.map(([len, words]) => (
+                        <div
+                          key={len}
+                          className="bg-neo-navy-light border-3 border-neo-black rounded-neo p-4"
+                        >
+                          <h3 className="font-neo-display font-bold text-neo-orange mb-3">
+                            {len}{content.letterWords} ({words.length})
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {words.map((word) => (
+                              <span
+                                key={word}
+                                className={cn(
+                                  'px-3 py-1.5 font-mono font-bold text-sm',
+                                  'bg-neo-navy text-white border-2 border-neo-black rounded-neo',
+                                  'shadow-hard-sm'
+                                )}
+                              >
+                                {word}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-neo-white text-sm mt-4 italic">
+                      {content.fullDictionaryNote}
+                    </p>
+                  </>
+                )}
               </>
             )}
           </section>
