@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import * as Comlink from 'comlink';
+import { isAutomatedUserAgent } from '@/lib/seo/botUa';
 import type { Language } from '@/shared/types/game';
 import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { DictionaryWorkerApi } from '@/workers/dictionaryWorker';
@@ -301,6 +302,8 @@ async function fetchDictionary(language: Language): Promise<Set<string>> {
  */
 export async function prewarmDictionary(language: Language): Promise<void> {
   if (memoryCache.has(language)) return;
+  // Bing's headless renderer pulled the 1.5 MB dictionary on every page it rendered: most of our Railway egress.
+  if (typeof navigator !== 'undefined' && isAutomatedUserAgent(navigator.userAgent)) return;
   try {
     await fetchDictionary(language);
   } catch (err) {
