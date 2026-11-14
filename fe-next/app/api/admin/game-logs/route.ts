@@ -13,6 +13,7 @@ import { CANONICAL_MODE_BUCKETS, unbucketedModes } from '@/lib/admin/gameLog/mod
 import { groupGames, type GameGroup } from '@/lib/admin/gameLog/groupGames';
 import { filterGameGroups, parseShowFilter, parseModeFilter, type ShowFilter } from '@/lib/admin/gameLog/filterGroups';
 import type { GameProfile } from '@/components/admin/today-games/types';
+import { fetchEducationBreakdown } from '@/lib/admin/gameLog/educationBreakdown';
 
 type ProfileEmbed = unknown;
 
@@ -975,6 +976,10 @@ async function fetchFromAnalyticsEvents(opts: {
 }): Promise<NextResponse> {
   // `language` is intentionally omitted — analytics_events has no per-game language.
   const { supabase, page, pageSize, offset, ascending, gameType, startDate, endDate, show, mode } = opts;
+  const educationPromise = fetchEducationBreakdown(supabase as unknown as Parameters<typeof fetchEducationBreakdown>[0], startDate).catch((err) => {
+    console.error('[admin/game-logs] education breakdown threw:', err);
+    return null;
+  });
 
   const applyCommon = (q: PgFilter): PgFilter => {
     // Lifecycle events that define a play. game_started carries host attribution;
@@ -1081,6 +1086,7 @@ async function fetchFromAnalyticsEvents(opts: {
       hasPrevPage: page > 1,
     },
     modeBreakdown: bucketCounts,
+    education: await educationPromise,
     breakdown: {
       authenticatedGames: mpBucket?.count ?? 0,
       guestGames: 0,

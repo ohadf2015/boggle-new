@@ -71,7 +71,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
   const [languageFilter, setLanguageFilter] = useState<string>('all');
   const [gameTypeFilter, setGameTypeFilter] = useState<GameTypeFilter>('all');
   const [rankedFilter, setRankedFilter] = useState<string>('all');
-  const [dateRange, setDateRangeState] = useState<DateRange>('7d');
+  const [dateRange, setDateRangeState] = useState<DateRange>('24h');
   const [logSource, setLogSourceState] = useState<GameLogSource>('analytics');
   // Bots are hidden by default: a single headless visitor was ~90% of solo rows.
   const [showFilter, setShowFilterState] = useState<ShowFilter>('people');
@@ -139,7 +139,7 @@ export function useTodayGames({ authToken }: UseTodayGamesOptions): UseTodayGame
 
   // Auto-refresh only for the live "today" view — historical ranges are stable.
   useEffect(() => {
-    if (dateRange !== 'today') return;
+    if (dateRange !== '24h') return;
     const interval = setInterval(() => {
       fetchTodayGames();
     }, AUTO_REFRESH_INTERVAL);
