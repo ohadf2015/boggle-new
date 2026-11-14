@@ -23,6 +23,7 @@ import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { PulseSection } from '@/components/admin/overview/PulseSection';
 import { SignupsHero } from '@/components/admin/overview/SignupsHero';
+import { RealGamesHero } from '@/components/admin/overview/RealGamesHero';
 import { AdminNotificationBell } from '@/components/admin/AdminNotificationBell';
 import { useOverviewPulse } from '@/hooks/useOverviewPulse';
 import { TeacherHealthCard } from '@/components/admin/overview/TeacherHealthCard';
@@ -158,6 +159,7 @@ export default function AdminPageClient() {
           />
 
           {stats && <SignupsHero total={stats.overview.totalPlayers} today={stats.activity.signupsToday} week={stats.activity.signupsWeek} />}
+          {stats?.realGames && <RealGamesHero total={stats.realGames.total} today={stats.realGames.today} week={stats.realGames.week} />}
 
           {/* Insight first: today against yesterday, then what is working / not / about to break */}
           <PulseSection

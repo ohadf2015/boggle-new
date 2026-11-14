@@ -9,6 +9,7 @@ const REFRESH_INTERVAL = 30_000;
 export interface StatsData {
   overview: { totalPlayers: number; totalGames: number; totalWords: number; totalGameTimeHours: number; totalGuests?: number; testAccounts?: number };
   activity: { gamesToday: number; uniquePlayersToday: number; uniquePlayersWeek: number; uniquePlayersMonth: number; signupsToday: number; signupsWeek: number };
+  realGames?: { total: number; today: number; week: number };
   languages: Record<string, number>;
 }
 
