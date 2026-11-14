@@ -42,7 +42,7 @@ jobs:
           record() {
             mcp record_intervention "$1" || return 1
             local line
-            line=$(printf '%s' "$MCP_TEXT" | jq -r 'if .duplicateOf then "deduped to existing intervention #\(.duplicateOf), nothing new written" elif .id then "recorded intervention #\(.id)" else "recorded (no id in response)" end')
+            line=$(printf '%s' "$MCP_TEXT" | jq -r 'if .duplicateOf then "deduped to existing intervention #\(.duplicateOf), nothing new written" elif .alreadyRecordedToday then "already recorded today as intervention #\(.id), nothing new written" elif .id then "recorded intervention #\(.id)" else "recorded (no id in response)" end')
             echo "record_intervention: $line"
             echo "Growth Radar record_intervention: $line" >> "$GITHUB_STEP_SUMMARY"
           }
