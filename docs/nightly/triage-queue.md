@@ -2845,3 +2845,10 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - why: INFO level, fail-closed (deny-all) by default — not a vulnerability. Needs owner decision on
     whether backup tables should be dropped or ignored.
   - recommended owner: review-by-eod
+
+## 2026-11-14
+- [Restore] Stale salvage 20261105-010005 (11 files merged, 12 skipped-conflict left untouched)
+  - root cause of original gate fail: `exp-edu-join-loading-feedback-v1` used by ClassroomJoinNamePrompt.tsx but missing from `lib/experiments.ts` registry (TS2345 — classic 3-site-edit miss)
+  - status: shipped (fix: registered the experiment in lib/experiments.ts, matching sibling defineExperiment entries)
+  - recommended owner: review-by-eod
+  - why: reversible, small blast radius (additive registry entry); verified call site + translation key + type shape by hand, local eslint unavailable (ESM resolve broke), full gate runs after this lane
