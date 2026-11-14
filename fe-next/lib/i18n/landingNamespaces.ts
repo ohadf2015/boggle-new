@@ -62,6 +62,9 @@ export const LANDING_NAMESPACES = [
   // page, including the landing before the full catalogue upgrades in.
   'system',
   'pwa',
+  // Homepage hero EditAvatarButton opens AvatarBuilderModal before the full
+  // catalogue upgrades in (~2KiB); without it the editor paints raw keys.
+  'avatarBuilder',
 ] as const;
 
 export const LANDING_EXTRA_KEYS = [
@@ -117,4 +120,11 @@ export const LANDING_EXTRA_KEYS = [
   'legal.refundPolicy',
   'legal.termsOfService',
   'legal.title',
+  // AvatarBuilderModal children outside avatarBuilder (homepage avatar editor).
+  'avatar.dailyPart.lobbyCta',
+  'avatar.dailyPart.title',
+  'avatarChest.chestOnly',
+  'avatarChest.chestOnlyHint',
+  'progression.unlock.atLevel',
+  'progression.unlock.upNext',
 ] as const;
