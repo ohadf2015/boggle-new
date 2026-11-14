@@ -26,7 +26,8 @@ import {
   installTabVisibilityTracker,
   detectPlatform,
 } from '@/utils/posthogEngagement';
-import { filterEmptyException } from '@/utils/posthogExceptionFilter';
+// ONE before_send slot — every filter composes inside filterBeforeSend.
+import { filterBeforeSend } from '@/utils/posthogBeforeSend';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 import { installInpAttributionTracker } from '@/utils/inpAttribution';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
@@ -103,7 +104,7 @@ function initPostHog() {
     // element, so a homepage-LCP regression can't be targeted without guessing
     // (the 2026-06-03 /en LCP spike had an unknown LCP element for exactly this).
     capture_performance: { web_vitals: true, web_vitals_attribution: true },
-    before_send: filterEmptyException,
+    before_send: filterBeforeSend,
     persistence: 'localStorage+cookie',
     loaded: (ph: PostHog) => {
       // If the user has already granted analytics consent in a prior session,
