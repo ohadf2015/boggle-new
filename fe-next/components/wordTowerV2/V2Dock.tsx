@@ -16,6 +16,8 @@ interface Props {
   composing: boolean;
   rejected: string | null;
   dictError: boolean;
+  /** Re-run the dictionary load in place (no page reload). */
+  onDictRetry?: () => void;
   scrambles: number;
   wheel: string[];
   selected: number[];
@@ -135,7 +137,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
         {p.dictError ? (
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => (p.onDictRetry ? p.onDictRetry() : window.location.reload())}
             className="mx-auto rounded-neo border-neo-thick border-black bg-neo-red px-6 py-3 font-neo-display text-base font-bold uppercase text-neo-navy shadow-hard"
           >
             {t('wordTower.loadError')}
