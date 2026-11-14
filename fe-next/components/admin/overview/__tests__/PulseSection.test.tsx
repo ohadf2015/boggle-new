@@ -108,6 +108,11 @@ describe('PulseSection', () => {
     expect(totals.textContent).toContain('450');
   });
 
+  it('leads the totals with all players ever, registered plus guests', () => {
+    render(<PulseSection {...props} />);
+    expect(screen.getByTestId('pulse-total-players').textContent).toContain('1,500');
+  });
+
   it('shows a skeleton while loading and a retry when the data could not load', () => {
     const { rerender } = render(<PulseSection {...props} pulse={null} />);
     expect(screen.getAllByTestId('pulse-skeleton')).toHaveLength(6);

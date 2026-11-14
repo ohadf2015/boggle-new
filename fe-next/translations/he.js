@@ -23290,6 +23290,7 @@ const adminDashboardHe = {
   'pulse.stickinessHint': 'מהשחקנים החודשיים מגיעים ביום ממוצע',
   'pulse.paying': 'לקוחות משלמים',
   'pulse.payingHint': '{trialing} בניסיון · {orders} הזמנות ששולמו ב-30 יום',
+  'pulse.totalPlayers': 'סה״כ שחקנים',
   'pulse.totalRegistered': 'רשומים',
   'pulse.totalGuests': 'אורחים',
   'pulse.totalGames': 'משחקים אי פעם',
