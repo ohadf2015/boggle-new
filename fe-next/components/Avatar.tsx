@@ -183,6 +183,15 @@ const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
 };
 
 /**
+ * The art fills its tile, whatever px it was drawn at. Callers often size the
+ * tile themselves (e.g. a 40px leaderboard circle around `size="lg"`, 48px);
+ * a fixed-width SVG overflowed that tile and, being inline, hugged its start
+ * edge, so the face sat low and to one side. `block` also drops the inline
+ * baseline gap under the SVG.
+ */
+const FILL_TILE = 'block w-full h-full';
+
+/**
  * Unified Avatar Component
  * Fallback chain: customAvatar (SVG) > deterministic random custom avatar.
  */
@@ -248,7 +257,7 @@ const Avatar = memo<AvatarProps>((props) => {
         {...frameAttr}
       >
         <AvatarRendererGuard seed={fallbackSeed}>
-          <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
+          <AvatarRenderer config={customAvatar} size={config.px} circular className={FILL_TILE} mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
         </AvatarRendererGuard>
       </div>
     );
@@ -264,7 +273,7 @@ const Avatar = memo<AvatarProps>((props) => {
       {...frameAttr}
     >
       <AvatarRendererGuard seed={fallbackSeed}>
-        <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
+        <AvatarRenderer config={fallbackConfig} size={config.px} circular className={FILL_TILE} mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
       </AvatarRendererGuard>
     </div>
   );
