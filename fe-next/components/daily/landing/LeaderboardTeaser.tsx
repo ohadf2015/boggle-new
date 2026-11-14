@@ -13,6 +13,8 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { getGuestFingerprint } from '@/utils/dailyChallenge/guestPlayer';
 import { getWithAuth } from '@/utils/authFetch';
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
+import type { PlayerSummarySeed } from '@/components/players/playerSummaryModel';
 
 interface LeaderboardTeaserProps {
   /** Unused: the teaser always shows every language. Kept so existing callers compile. */
@@ -23,6 +25,17 @@ interface LeaderboardTeaserProps {
 /** Every player today (the API's cap); rows past the first VISIBLE_ROWS fold behind "show more". */
 const FETCH_LIMIT = 100;
 const VISIBLE_ROWS = 10;
+
+/** Signed-in rows carry only a row key; the card trades it for the id (signed-in viewers). */
+const summarySeed = (entry: MergedLeaderboardEntry, boardDate: string, fallbackName: string): PlayerSummarySeed => ({
+  boardKey: entry.member ? entry.key : undefined,
+  boardDate,
+  name: entry.name || fallbackName,
+  avatarImage: entry.avatarImage,
+  customAvatar: entry.customAvatar as CustomAvatarConfig | null,
+  countryCode: entry.countryCode ?? null,
+  title: entry.title ?? null,
+});
 
 const RANK_STYLES = [
   { text: 'text-neo-lime', medal: '🥇' },
@@ -42,6 +55,7 @@ const RANK_STYLES = [
  *
  * Tapping a row opens what that player scored in each mode. Word Tower scores
  * in metres, so its points are shown with the real height beside them.
+ * Tapping a player's avatar or name opens their summary card instead.
  */
 export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
   const { t } = useLanguage();
@@ -49,6 +63,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
+  const [boardDate] = useState(getDailyChallengeDate);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +71,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
     async function fetchLeaderboard() {
       setLoading(true);
       try {
-        const today = getDailyChallengeDate();
+        const today = boardDate;
         // Every language: the hub is mounted in the UI locale, so a Hebrew solve
         // was invisible from an English hub. `fp` lets the server find a guest
         // viewer's own row (a signed-in viewer is found by their session).
@@ -77,7 +92,7 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
 
     fetchLeaderboard();
     return () => { cancelled = true; };
-  }, []);
+  }, [boardDate]);
 
   return (
     <div
@@ -122,16 +137,15 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
             const isOpen = expanded === rowId;
             return (
               <div key={rowId} className="border-b border-neo-black/40 last:border-b-0">
-                <button
-                  type="button"
+                {/* The row toggles the per-mode breakdown; the avatar and name open
+                    the player's summary card instead (they stop the row's click). */}
+                <div
                   data-testid={`leaderboard-row-${entry.rank}`}
                   data-you={entry.isYou ? 'true' : undefined}
-                  aria-expanded={isOpen}
                   onClick={() => setExpanded(isOpen ? null : rowId)}
                   className={cn(
                     'w-full flex items-center gap-3 px-3 py-2.5 text-start',
                     'hover:bg-neo-navy-light transition-colors cursor-pointer',
-                    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime',
                     entry.rank === 1 && 'bg-neo-lime/10',
                     entry.isYou && 'bg-neo-cyan/10 ring-2 ring-inset ring-neo-cyan',
                   )}
@@ -145,22 +159,29 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
                         #{entry.rank}
                       </span>
                     )}
-                    <div className={cn(
-                      'rounded-full border-2 border-neo-black shrink-0 overflow-hidden',
-                      entry.rank === 1 && 'ring-2 ring-neo-lime/60',
-                    )}>
-                      <Avatar
-                        size="sm"
-                        customAvatar={entry.customAvatar as CustomAvatarConfig | null}
-                        userId={entry.key ?? entry.name}
-                      />
-                    </div>
+                    <PlayerSummaryTrigger player={summarySeed(entry, boardDate, t('daily.aPlayer'))} surface="daily_hub" labelled>
+                      <span
+                        data-testid={`leaderboard-avatar-${entry.rank}`}
+                        className={cn(
+                          'block rounded-full border-2 border-neo-black shrink-0 overflow-hidden',
+                          entry.rank === 1 && 'ring-2 ring-neo-lime/60',
+                        )}
+                      >
+                        <Avatar
+                          size="sm"
+                          customAvatar={entry.customAvatar as CustomAvatarConfig | null}
+                          userId={entry.key ?? entry.name}
+                        />
+                      </span>
+                    </PlayerSummaryTrigger>
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-neo-white truncate">
-                      {entry.name || t('daily.aPlayer')}
-                    </div>
+                    <PlayerSummaryTrigger player={summarySeed(entry, boardDate, t('daily.aPlayer'))} surface="daily_hub">
+                      <span dir="auto" className="block max-w-full w-fit text-sm font-bold text-neo-white truncate">
+                        {entry.name || t('daily.aPlayer')}
+                      </span>
+                    </PlayerSummaryTrigger>
                     {/* Each game's REAL score, beside the combined total — the total
                         alone (with tower metres converted to points) read as
                         points nobody actually scored. */}
@@ -176,17 +197,25 @@ export function LeaderboardTeaser({ onViewFull }: LeaderboardTeaserProps) {
                     </div>
                   </div>
 
-                  <span className={cn('text-base font-black tabular-nums', style.text)}>
-                    {entry.total.toLocaleString()}
-                  </span>
-                  <ChevronDown
-                    aria-hidden="true"
-                    className={cn(
-                      'w-4 h-4 shrink-0 text-neo-white/60 transition-transform',
-                      isOpen && 'rotate-180',
-                    )}
-                  />
-                </button>
+                  <button
+                    type="button"
+                    data-testid={`leaderboard-row-toggle-${entry.rank}`}
+                    aria-expanded={isOpen}
+                    onClick={(e) => { e.stopPropagation(); setExpanded(isOpen ? null : rowId); }}
+                    className="shrink-0 flex items-center gap-1.5 rounded-neo focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-lime"
+                  >
+                    <span className={cn('text-base font-black tabular-nums', style.text)}>
+                      {entry.total.toLocaleString()}
+                    </span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      className={cn(
+                        'w-4 h-4 shrink-0 text-neo-white/60 transition-transform',
+                        isOpen && 'rotate-180',
+                      )}
+                    />
+                  </button>
+                </div>
 
                 {isOpen && (
                   <div

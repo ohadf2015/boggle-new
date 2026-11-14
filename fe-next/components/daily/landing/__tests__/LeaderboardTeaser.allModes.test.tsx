@@ -123,9 +123,12 @@ describe('LeaderboardTeaser — all four modes', () => {
 
   it('is operable by keyboard, since it is now interactive', async () => {
     renderBoard();
-    const row = await screen.findByTestId('leaderboard-row-1');
-    expect(row.tagName).toBe('BUTTON');
-    row.focus();
+    await screen.findByTestId('leaderboard-row-1');
+    // The expand control is a real button (the avatar and name open the player card).
+    const toggle = screen.getByTestId('leaderboard-row-toggle-1');
+    expect(toggle.tagName).toBe('BUTTON');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    toggle.focus();
     await userEvent.keyboard('{Enter}');
     expect(await screen.findByTestId('leaderboard-breakdown-1')).toBeInTheDocument();
   });

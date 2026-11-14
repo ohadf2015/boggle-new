@@ -91,7 +91,6 @@ export default function ProfileCustomizationWrapper() {
     <ProfileCustomizationModal
       isOpen={showModal}
       onClose={handleClose}
-      defaultName={profile.display_name || profile.username || ''}
       initialAvatar={profile.avatar_config}
       onSave={handleSave}
     />

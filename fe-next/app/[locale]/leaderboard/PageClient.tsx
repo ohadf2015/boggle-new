@@ -22,7 +22,6 @@ import { TitleBadge } from '@/components/progression/TitleBadge';
 import { HallOfFame } from '@/components/records/HallOfFame';
 import { RecordHolderCrown } from '@/components/records/RecordHolderCrown';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
-import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
 import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
@@ -315,30 +314,16 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                       {rank}
                     </span>
                     <div className="flex min-w-0 items-center gap-2">
-                      {isCurrentUser ? (
-                        <>
+                      <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard" labelled>
+                        <span className="shrink-0 rounded-full">
                           <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
-                          <Link
-                            href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
-                            className="truncate text-sm font-semibold hover:underline text-neo-cyan"
-                          >
-                            {entry.display_name || entry.username}
-                          </Link>
-                        </>
-                      ) : (
-                        <>
-                          <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard" labelled>
-                            <span className="shrink-0 rounded-full">
-                              <Avatar customAvatar={entry.avatar_config} userId={entry.player_id} size="sm" />
-                            </span>
-                          </PlayerSummaryTrigger>
-                          <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard">
-                            <span dir="auto" className="min-w-0 truncate text-sm font-semibold hover:underline text-neo-white">
-                              {entry.display_name || entry.username}
-                            </span>
-                          </PlayerSummaryTrigger>
-                        </>
-                      )}
+                        </span>
+                      </PlayerSummaryTrigger>
+                      <PlayerSummaryTrigger player={summarySeed(entry)} surface="global_leaderboard">
+                        <span dir="auto" className={cn('min-w-0 truncate text-sm font-semibold hover:underline', isCurrentUser ? 'text-neo-cyan' : 'text-neo-white')}>
+                          {entry.display_name || entry.username}
+                        </span>
+                      </PlayerSummaryTrigger>
                       <RecordHolderCrown userId={entry.player_id} />
                       <TitleBadge title={entry.title} className="min-w-0 max-w-[40%] shrink" />
                       <TierBadge

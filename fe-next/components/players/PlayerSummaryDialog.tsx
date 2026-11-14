@@ -20,6 +20,7 @@ import { scoreTier } from '@/lib/seasons/scoreTier';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trpc } from '@/lib/trpc';
 import { playerProfileHref, summaryAccess, type PlayerSummarySeed } from './playerSummaryModel';
+import { resolveBoardPlayer } from './resolveBoardPlayer';
 
 interface PlayerSummaryDialogProps {
   player: PlayerSummarySeed;
@@ -32,20 +33,22 @@ interface PlayerSummaryDialogProps {
 /** Trade an id-free board's row key for the account id, once, while the card is open. */
 function useResolvedId(player: PlayerSummarySeed, open: boolean, enabled: boolean) {
   const ctx = useFriendStatus();
-  const resolve = ctx?.resolveBoardKey;
+  const ctxResolve = ctx?.boardDate ? ctx.resolveBoardKey : undefined;
+  const seedDate = player.boardDate ?? null;
   const [resolved, setResolved] = useState<{ key: string; id: string | null } | null>(null);
   const key = player.boardKey ?? null;
   const done = resolved?.key === key;
 
   useEffect(() => {
-    if (!open || !enabled || !key || !resolve || done) return;
+    if (!open || !enabled || !key || done || (!ctxResolve && !seedDate)) return;
     let live = true;
-    resolve(key).then(
+    const run = ctxResolve ?? ((k: string) => resolveBoardPlayer(seedDate!, k));
+    run(key).then(
       (id) => { if (live) setResolved({ key, id }); },
       () => { if (live) setResolved({ key, id: null }); },
     );
     return () => { live = false; };
-  }, [open, enabled, key, resolve, done]);
+  }, [open, enabled, key, ctxResolve, seedDate, done]);
 
   return { id: done ? resolved!.id : null, resolving: enabled && !done };
 }
@@ -61,7 +64,7 @@ export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: Pla
   const friendCtx = useFriendStatus();
   const access = summaryAccess(player, {
     isAuthenticated,
-    canResolveBoardKey: !!(friendCtx?.isAuthenticated && friendCtx.boardDate),
+    canResolveBoardKey: isAuthenticated && !!(friendCtx?.boardDate || player.boardDate),
   });
 
   const { id: resolvedId, resolving } = useResolvedId(player, open, access === 'boardKey');

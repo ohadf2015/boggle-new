@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 /*
  * Tapping a player's avatar (or name) on the daily board opens their summary
  * card. The combined board is id-free, so signed-in rows hand the card their
- * row key to resolve; guest rows and the viewer's own row open nothing.
+ * row key to resolve; guest rows open nothing; your own row opens your own card.
  */
 
 vi.mock('framer-motion', () => ({
@@ -52,11 +52,14 @@ describe('TodayParticipantRow player summary', () => {
     expect(screen.getByTestId('summary')).toHaveAttribute('data-key', 'abcdefgh12');
   });
 
-  it('opens nothing for a guest row or the viewer\'s own row', () => {
-    const { unmount } = render(<TodayParticipantRow participant={row({ row_key: 'abcdefgh12' })} index={0} isCurrentUser={false} compact={false} t={(k) => k} />);
+  it('opens nothing for a guest row', () => {
+    render(<TodayParticipantRow participant={row({ row_key: 'abcdefgh12' })} index={0} isCurrentUser={false} compact={false} t={(k) => k} />);
     expect(screen.queryByRole('button', { name: 'playerSummary.openFor' })).toBeNull();
-    unmount();
-    render(<TodayParticipantRow participant={row({ player_id: 'me' })} index={0} isCurrentUser compact={false} t={(k) => k} />);
-    expect(screen.queryByRole('button', { name: 'playerSummary.openFor' })).toBeNull();
+  });
+
+  it('opens your own card from your own avatar on the id-free board', () => {
+    render(<TodayParticipantRow participant={row({ row_key: 'abcdefgh12', is_member: true, is_you: true })} index={0} isCurrentUser compact={false} t={(k) => k} />);
+    fireEvent.click(screen.getByRole('button', { name: 'playerSummary.openFor' }));
+    expect(screen.getByTestId('summary')).toHaveAttribute('data-key', 'abcdefgh12');
   });
 });

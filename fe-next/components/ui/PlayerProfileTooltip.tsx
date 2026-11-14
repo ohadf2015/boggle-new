@@ -104,7 +104,7 @@ PlayerProfileTooltipContent.displayName = 'PlayerProfileTooltipContent';
  * daily board key) a tap opens the summary card with a link to the full
  * profile; otherwise a hover/tap tooltip with what the row knows.
  *
- * Skips both for the current user.
+ * The current user's own nameless row (room nickname) gets neither.
  */
 const PlayerProfileTooltip = memo<PlayerProfileTooltipProps>(({
   player,
@@ -115,10 +115,8 @@ const PlayerProfileTooltip = memo<PlayerProfileTooltipProps>(({
 }) => {
   const { t } = useLanguage();
 
-  if (isCurrentUser) {
-    return <>{children}</>;
-  }
-
+  // Rows backed by an account open the summary card, your own row included
+  // (it links to your profile). Rows with no account keep the tooltip.
   if ((player.id || player.boardKey) && isValidElement(children)) {
     return (
       <PlayerSummaryTrigger
@@ -136,6 +134,10 @@ const PlayerProfileTooltip = memo<PlayerProfileTooltipProps>(({
         {children}
       </PlayerSummaryTrigger>
     );
+  }
+
+  if (isCurrentUser) {
+    return <>{children}</>;
   }
 
   return (

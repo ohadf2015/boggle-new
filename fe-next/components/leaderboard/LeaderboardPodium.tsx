@@ -3,14 +3,12 @@
 import React, { memo, useMemo } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { Crown } from 'lucide-react';
-import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { PlayerSummaryTrigger } from '@/components/players/PlayerSummaryTrigger';
-import { playerProfileHref } from '@/components/players/playerSummaryModel';
 
 export interface PodiumEntry {
   player_id: string;
@@ -32,21 +30,12 @@ interface LeaderboardPodiumProps {
 const PLAYER_CLS =
   'flex flex-col items-center w-full min-w-0 rounded-neo transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan';
 
-/** Your own spot links to your profile; anyone else's opens their summary card. */
-function PodiumPlayer({ entry, name, isYou, language, children }: {
+/** Tapping a podium spot opens that player's summary card (yours links to your profile). */
+function PodiumPlayer({ entry, name, children }: {
   entry: PodiumEntry;
   name: string;
-  isYou: boolean;
-  language: string;
   children: React.ReactNode;
 }) {
-  if (isYou) {
-    return (
-      <Link href={playerProfileHref(language, entry.player_id)} aria-label={name} className={PLAYER_CLS}>
-        {children}
-      </Link>
-    );
-  }
   return (
     <PlayerSummaryTrigger
       player={{ id: entry.player_id, name, avatarImage: entry.avatar_image, customAvatar: entry.avatar_config }}
@@ -118,12 +107,7 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
               aria-hidden={!isChampion}
             />
 
-            <PodiumPlayer
-              entry={entry}
-              name={name}
-              isYou={isYou}
-              language={language}
-            >
+            <PodiumPlayer entry={entry} name={name}>
               {/* Avatar with rank-coloured ring; cyan ring + YOU chip for current user.
                   `isolate` bounds the champion glow to this box so it never escapes
                   to cover the page and swallow clicks. */}

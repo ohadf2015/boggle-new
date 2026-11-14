@@ -77,19 +77,14 @@ describe('LeaderboardPodium', () => {
     expect(glow.className).toContain('pointer-events-none');
   });
 
-  it('opens each other player\'s summary card (which links the profile) on tap', () => {
-    render(<LeaderboardPodium entries={entries} language="en" />);
+  it('opens each player\'s summary card (which links the profile) on tap, your own spot included', () => {
+    render(<LeaderboardPodium entries={entries} language="en" currentUserId="b" />);
     for (const [name, id] of [['Ada', 'a'], ['Ben', 'b'], ['Cy', 'c']] as const) {
       const trigger = screen.getByText(name).closest('[role="button"]') as HTMLElement;
       expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
       fireEvent.click(trigger);
       expect(screen.getByTestId(`summary-${id}`)).toBeInTheDocument();
     }
-  });
-
-  it('keeps a direct profile link on the viewer\'s own spot', () => {
-    render(<LeaderboardPodium entries={entries} language="en" currentUserId="b" />);
-    expect(screen.getByText('Ben').closest('a')).toHaveAttribute('href', '/en/player/b');
   });
 
   it('shouldKeepPodiumColumnsFromOverflowingOnNarrowViewports', () => {
