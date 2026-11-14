@@ -49,7 +49,8 @@ export type PushNotificationType =
   | 'word_tower_wreck'
   | 'word_tower_pass'
   | 'rival_ping'
-  | 'world_record_broken';
+  | 'world_record_broken'
+  | 'admin_alert';
 
 /**
  * Map push types to notification_type for user_notifications table (N-7)
@@ -70,6 +71,7 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   word_tower_pass: 'social',
   rival_ping: 'social',
   world_record_broken: 'social',
+  admin_alert: 'system',
   achievement: 'achievement',
   daily_challenge: 'system',
   level_up: 'achievement',
@@ -894,4 +896,28 @@ export async function notifyRecordBroken(
       recordKey,
     },
   }, 'both', newHolderId);
+}
+
+/**
+ * Push an admin-bell notice to every admin's devices. The bell row is the in-app copy,
+ * so this is push only.
+ */
+export async function notifyAdminAlert(notice: { title: string; body?: string; link?: string }): Promise<void> {
+  try {
+    const supabase = isSupabaseConfigured() ? getSupabase() : null;
+    if (!supabase) return;
+    const { data, error } = await supabase.from('profiles').select('id').eq('is_admin', true);
+    if (error) {
+      logger.warn('PUSH_TRIGGER', `Admin lookup failed: ${error.message}`);
+      return;
+    }
+    const payload: FCMPayload = {
+      title: notice.title,
+      body: notice.body ?? '',
+      data: { type: 'admin_alert', deepLink: notice.link ?? '/admin' },
+    };
+    await Promise.allSettled(((data ?? []) as Array<{ id: string }>).map((a) => triggerPush(a.id, 'admin_alert', payload, 'push_only')));
+  } catch (error) {
+    logger.error('PUSH_TRIGGER', `Admin alert failed: ${(error as Error).message}`);
+  }
 }

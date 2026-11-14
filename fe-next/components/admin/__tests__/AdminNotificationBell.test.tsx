@@ -66,24 +66,31 @@ describe('AdminNotificationBell', () => {
     expect(screen.getByText('Nothing yet. Interesting events show up here.')).toBeInTheDocument();
   });
 
-  it('opening an item marks it read and goes to its admin page in the current locale', async () => {
-    feed({ items: [item('11111111-1111-4111-8111-111111111111')], unread: 1, available: true });
+  it('opening the bell clears the badge and records the newest notice as seen for this admin', async () => {
+    const newest = item('1');
+    feed({ items: [newest, item('2', { title: 'Older', read_at: 'x' })], unread: 1, available: true });
+    render(<AdminNotificationBell />);
+    expect(await screen.findByText('1')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /notifications/i }));
+    const post = fetchWithAuth.mock.calls.find(([, init]) => (init as { method?: string } | undefined)?.method === 'POST');
+    expect(JSON.parse((post![1] as { body: string }).body)).toEqual({ seenAt: newest.created_at });
+    await waitFor(() => expect(screen.queryByText('1')).toBeNull());
+    expect(screen.getByText('New paying Pro customer')).toBeInTheDocument();
+  });
+
+  it('opening with nothing unread posts nothing', async () => {
+    feed({ items: [item('1', { read_at: 'x' })], unread: 0, available: true });
+    render(<AdminNotificationBell />);
+    fireEvent.click(await screen.findByRole('button', { name: /notifications/i }));
+    expect(fetchWithAuth.mock.calls.some(([, init]) => (init as { method?: string } | undefined)?.method === 'POST')).toBe(false);
+  });
+
+  it('opening an item goes to its admin page in the current locale', async () => {
+    feed({ items: [item('1')], unread: 1, available: true });
     render(<AdminNotificationBell />);
     fireEvent.click(await screen.findByRole('button', { name: /notifications/i }));
     fireEvent.click(screen.getByText('New paying Pro customer'));
     expect(push).toHaveBeenCalledWith('/en/admin/teacher-pro');
-    const post = fetchWithAuth.mock.calls.find(([, init]) => (init as { method?: string } | undefined)?.method === 'POST');
-    expect(JSON.parse((post![1] as { body: string }).body)).toEqual({ ids: ['11111111-1111-4111-8111-111111111111'] });
-  });
-
-  it('mark all read posts {all:true} and clears the badge', async () => {
-    feed({ items: [item('1')], unread: 2, available: true });
-    render(<AdminNotificationBell />);
-    fireEvent.click(await screen.findByRole('button', { name: /notifications/i }));
-    fireEvent.click(screen.getByRole('button', { name: 'Mark all read' }));
-    const post = fetchWithAuth.mock.calls.find(([, init]) => (init as { method?: string } | undefined)?.method === 'POST');
-    expect(JSON.parse((post![1] as { body: string }).body)).toEqual({ all: true });
-    await waitFor(() => expect(screen.queryByText('2')).toBeNull());
   });
 
   it('polls once a minute and stops on unmount', async () => {

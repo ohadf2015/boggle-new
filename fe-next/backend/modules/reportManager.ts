@@ -9,6 +9,7 @@
 
 import { getSupabase } from './supabaseServer';
 import logger from '../utils/logger';
+import { notifyAdminAlert } from './pushNotificationTriggers';
 
 export const REPORT_REASONS = ['harassment', 'spam', 'inappropriate', 'other'] as const;
 export type ReportReason = (typeof REPORT_REASONS)[number];
@@ -31,6 +32,8 @@ async function insertReport(row: Record<string, unknown>): Promise<ReportResult>
     logger.error('REPORT_MANAGER', `Error inserting report: ${error.message}`);
     return { success: false, errorCode: 'SERVER_ERROR' };
   }
+  // The bell row comes from a DB trigger on user_reports; this is its phone push.
+  void notifyAdminAlert({ title: 'New user report', body: `${row.reason} · ${row.target_type}`, link: '/admin/moderation' }).catch(() => undefined);
   return { success: true };
 }
 
