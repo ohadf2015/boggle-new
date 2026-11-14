@@ -40,6 +40,7 @@ import { EduStudentShareButton } from './EduStudentShareButton';
 import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 import { useClaimedLevelUp } from './useClaimedLevelUp';
+import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
 
 const LevelUpCelebration = dynamic(() => import('@/components/education/LevelUpCelebration'), { ssr: false });
 
@@ -115,7 +116,8 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
 
   return (
-    <div data-testid="edu-student-results" className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
+    <div data-testid="edu-student-results" className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
+      <AcademyBackdrop art="podium" />
       <style>{LIVE_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
         <EduStudentShareButton t={t} language={c.language} placing={placing} />

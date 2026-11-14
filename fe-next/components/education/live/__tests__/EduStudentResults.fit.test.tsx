@@ -66,6 +66,14 @@ describe('EduStudentResults on a 390x844 phone', () => {
     window.sessionStorage.clear();
   });
 
+  it('given my round, when results show, then they stand on the podium scene, not a flat navy page', () => {
+    render(<EduStudentResults {...(props as object)} />);
+    const root = screen.getByTestId('edu-student-results');
+    expect(root).toContainElement(screen.getByTestId('academy-backdrop'));
+    expect(screen.getByTestId('academy-backdrop')).toHaveAttribute('data-art', 'podium');
+    expect(root.className).toContain('isolate');
+  });
+
   it('given my round, when results show, then the word lists fold into one closed row that mounts nothing until opened', () => {
     render(<EduStudentResults {...(props as object)} />);
     const more = screen.getByTestId('edu-student-more');

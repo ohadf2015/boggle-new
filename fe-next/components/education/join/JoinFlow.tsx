@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { signedInNeedsRecovery } from '@/lib/education/unconfirmedJoinEmail';
 import { cn } from '@/lib/utils';
+import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
 import { JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
 import { pickFunName } from './funName';
@@ -34,19 +35,12 @@ import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
  * viewport whose one inner region scrolls, so an open keyboard can never hide
  * the field or its button and the page itself never scrolls.
  */
-export type JoinFlowVariant = 'standalone' | 'academy';
 
 interface JoinFlowProps {
   /** From `/join/[code]` or `/join?code=` — the QR lands here pre-filled. */
   initialCode?: string;
   /** Called on successful join, before navigation. May return a Promise to delay it. */
   onSuccessBeforeNavigation?: () => Promise<void> | void;
-  /**
-   * `standalone` (default) paints its own navy and decorations in page flow.
-   * `academy` owns the viewport with a transparent root, so the page's arena
-   * backdrop shows through.
-   */
-  variant?: JoinFlowVariant;
 }
 
 const K = 'education.student.join';
@@ -55,12 +49,10 @@ const STEPS = ['code', 'name'] as const;
 export function JoinFlow({
   initialCode = '',
   onSuccessBeforeNavigation: externalCallback,
-  variant = 'standalone',
 }: JoinFlowProps) {
   const { t, dir, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
   const returning = useReturningStudent(user, authLoading);
-  const academy = variant === 'academy';
   const [showSuccessCelebration, setShowSuccessCelebration] = useState(false);
 
   // Confetti, then navigation: the celebration must not be erased instantly.
@@ -154,20 +146,9 @@ export function JoinFlow({
       <div
         data-testid="join-root"
         dir={dir}
-        className={cn(
-          'flex flex-col overflow-hidden text-neo-white',
-          academy
-            ? 'fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)]'
-            : 'relative h-dvh bg-neo-navy pb-[var(--cookie-consent-height,0px)]'
-        )}
+        className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] isolate flex flex-col overflow-hidden text-neo-white"
       >
-        {!academy && (
-          <div data-testid="join-decor" aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="absolute -start-16 -top-16 h-56 w-56 rotate-12 rounded-neo border-3 border-neo-purple bg-neo-purple/20" />
-            <div className="absolute -end-20 top-1/3 h-64 w-64 -rotate-6 rounded-neo border-3 border-neo-pink bg-neo-pink/20" />
-            <div className="absolute -bottom-24 start-1/4 h-52 w-52 rotate-6 rounded-neo border-3 border-neo-cyan bg-neo-cyan/15" />
-          </div>
-        )}
+        <AcademyBackdrop art="arena" />
 
         <div
           data-testid="join-scroll"
@@ -178,9 +159,7 @@ export function JoinFlow({
           className={cn(
             'mx-auto flex w-full max-w-md flex-col justify-center short:justify-start sm:max-w-lg [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center',
             // The arena art is loud: a solid panel keeps the subtitle and helper text readable and lets the form own the screen.
-            academy
-              ? 'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-neo-cream/50 bg-neo-navy px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
-              : 'flex-1 px-4 py-6 short:py-3 lg:max-w-xl tv:max-w-3xl'
+            'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-neo-cream/50 bg-neo-navy px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
           )}
         >
           <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">

@@ -7,6 +7,8 @@ import { useEducationShellLock, EDUCATION_SHELL_LOCK_CLASS } from './useEducatio
 import { resolveEducationNav, type ResolvedEducationNav } from './navItems';
 import { EducationShellNav } from './EducationShellNav';
 import { ArcadeBackdrop } from './ArcadeBackdrop';
+import { StudentAcademyDock, StudentAcademyTop, useTopDock } from './StudentAcademyChrome';
+import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
 
 export { EDUCATION_SHELL_LOCK_CLASS };
 
@@ -74,6 +76,8 @@ export interface EducationShellProps {
   nav?: ResolvedEducationNav;
   /** Drop the phone tab bar on a screen whose own bottom bar holds its one action. */
   tabs?: boolean;
+  /** Student screens: the name on the academy plaque (defaults to the active tab's). */
+  title?: string;
 }
 
 export function EducationShell({
@@ -88,6 +92,7 @@ export function EducationShell({
   chromeFree = false,
   nav: navOverride,
   tabs = true,
+  title,
   'data-testid': testId = 'education-shell',
 }: EducationShellProps) {
   useEducationShellLock();
@@ -101,6 +106,9 @@ export function EducationShell({
   const nav = chromeFree ? null : (navOverride ?? resolvedNav);
   // A teacher screen's chrome is the shell's own (top bar + sidebar); a page header there would be a second menu.
   const teacherChrome = nav?.kind === 'teacher';
+  const studentChrome = nav?.kind === 'student';
+  const pageHeader = teacherChrome || studentChrome ? null : header;
+  const topDock = useTopDock();
 
   return (
     <div
@@ -110,17 +118,20 @@ export function EducationShell({
         // body lock cannot provide: it stops THIS subtree growing the page.
         // `relative` makes overflow-hidden clip absolute descendants (sr-only text) that otherwise grow the page.
         'relative flex h-dvh w-full flex-col overflow-hidden bg-neo-navy',
+        studentChrome && 'isolate',
         className,
       )}
     >
+      {studentChrome ? <AcademyBackdrop art="map" /> : null}
       {teacherChrome && nav ? <EducationShellNav nav={nav} variant="topbar" /> : null}
-      {header && !teacherChrome ? (
+      {studentChrome && nav ? <StudentAcademyTop nav={nav} title={title} topDock={topDock} /> : null}
+      {pageHeader ? (
         // `flex-shrink` defaults to 1, so a bare header band is the first thing
         // a tall column squeezes — the back button and locale switcher would
         // lose height while the one child that can actually scroll instead does
         // not give up a pixel.
         <div data-testid="education-shell-header" className="shrink-0">
-          {header}
+          {pageHeader}
         </div>
       ) : null}
 
@@ -130,7 +141,7 @@ export function EducationShell({
           shrink below its content — beside the sidebar that pushed the scroll
           region wider than the viewport and flashed a horizontal scrollbar. */}
       <div data-testid="education-shell-body" className="flex min-h-0 min-w-0 flex-1">
-        {nav ? <EducationShellNav nav={nav} variant="sidebar" /> : null}
+        {nav && !studentChrome ? <EducationShellNav nav={nav} variant="sidebar" /> : null}
 
         <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col', teacherChrome && 'relative isolate')}>
           {teacherChrome ? <ArcadeBackdrop /> : null}
@@ -177,7 +188,8 @@ export function EducationShell({
       {/* Laid out in the column, never fixed over it: a fixed bar would keep
           scrollHeight === innerHeight true while hiding the last row of
           content underneath itself. */}
-      {nav && tabs ? <EducationShellNav nav={nav} variant="tabs" /> : null}
+      {studentChrome && nav && !topDock ? <StudentAcademyDock nav={nav} /> : null}
+      {nav && tabs && !studentChrome ? <EducationShellNav nav={nav} variant="tabs" /> : null}
     </div>
   );
 }
