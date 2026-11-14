@@ -148,7 +148,10 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;
-  const projectorStudents = useLobbyRoster(playersReady, username);
+  // Classroom rooms: the server pushes the JOINED roster (which survives socket
+  // drops) and this merges live connection onto it. Arcade rooms never receive
+  // that push — the socket-derived path below is untouched for them.
+  const projectorStudents = useLobbyRoster(playersReady, username, gameCode);
   const hostSelectedGameMode = useHostSelectedGameMode();
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
   const [localGameMode, setLocalGameMode] = useState<GameModeOption>(hostSelectedGameMode || 'random');

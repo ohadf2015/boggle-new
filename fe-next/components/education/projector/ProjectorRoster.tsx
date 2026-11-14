@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { PRESS, tiltOf, type Translate } from '@/components/education/live/eduLiveStyles';
 import { STUDENT_CHIP, arrivalsSince, isArrivalBurst, recordArrivals, rosterTier } from './projectorLobbyModel';
+import { realStudentCount } from '@/lib/education/rehearsal';
 import { WALL_PANEL } from './projectorNbStyles';
 
 export interface ProjectorStudent {
@@ -78,7 +79,11 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   const { playPlayerJoinedSound } = useSoundEffects();
   const ready = useMemo(() => new Set(readyUsernames), [readyUsernames]);
   const present = students.filter((s) => !s.reconnecting);
-  const joined = present.length;
+  // Headline = the joined class, not the phones currently holding a socket: a
+  // dropped socket renders as a per-student "reconnecting" overlay, it does not
+  // shrink the class the teacher sees (2026-11-13 REMAFZ audit: 4 connected vs
+  // 21 joined). Bots and the practice seat stay visible but never count.
+  const joined = realStudentCount(students);
   const readyCount = present.filter((s) => ready.has(s.username)).length;
   const tier = rosterTier(students.length);
   const names = useMemo(() => students.map((s) => s.username), [students]);

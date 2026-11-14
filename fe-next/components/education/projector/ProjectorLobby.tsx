@@ -92,7 +92,10 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   const classCode = useProjectorClassCode(lobby.classroomId);
   const { kick, statusOf } = useKickStudent(getSharedSocketIfExists());
   const present = students.filter((s) => !s.reconnecting);
-  const studentCount = realStudentCount(present);
+  // Start counts the joined class — a student whose phone dropped is still in
+  // the lesson and reconnects into the round — while "still learning" stays
+  // online-only: an offline student cannot be working through the word deck.
+  const studentCount = realStudentCount(students);
   // Read every render, not once: the lobby may stay mounted under the results layer between rounds.
   const canChangeMode = roomPlayed(gameCode);
   // READY means "learned the words" only before round one; it resets every round, so later it would flag the whole class.
