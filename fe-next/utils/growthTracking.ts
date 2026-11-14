@@ -605,6 +605,7 @@ export type GrowthEvent =
   //   word_tower_floor_placed: a new floor landed (once per floor per run).
   //     Props: { floor: number, mode: 'daily'|'free', wordLength: number }.
   | 'wt2_run_ended'
+  | 'wt2_dict_load_failed' // Word Tower dictionary load failed. Props: { locale, attempt, reason }
   | 'wt2_upgrade_bought'
   | 'wt2_continue_used'
   | 'wt2_raid_played'

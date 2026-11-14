@@ -100,6 +100,12 @@ const MAX_CACHEABLE_CHARS = 1_000_000
  */
 const FETCH_ATTEMPTS = 2
 const RETRY_DELAY_MS = 400
+/**
+ * A stalled fetch had no timeout, so a dead connection hung the loading screen
+ * forever and the retry never ran (Hebrew Word Tower, PostHog inbox 01a15a17).
+ * Generous: HE is ~5MB over phone networks.
+ */
+export const FETCH_TIMEOUT_MS = 25_000
 
 /** Thrown when no word list could be obtained — neither network nor cache. */
 export class DictionaryLoadError extends Error {
@@ -143,7 +149,14 @@ export async function loadServerWordList(
     try {
       // The retry asks for the encoded copy: a filter that blocked the plain list blocks it again.
       const encoded = attempt > 1
-      const resp = await fetchFn(dictionaryWordsUrl(locale, { encoded }))
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
+      const timer = controller ? setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS) : null
+      let resp: Response
+      try {
+        resp = await fetchFn(dictionaryWordsUrl(locale, { encoded }), controller ? { signal: controller.signal } : undefined)
+      } finally {
+        if (timer) clearTimeout(timer)
+      }
       if (!resp.ok) {
         console.warn(
           `[loadWordCraftDictionary] ${locale}: HTTP ${resp.status} (attempt ${attempt}/${FETCH_ATTEMPTS})`,

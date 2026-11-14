@@ -123,7 +123,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   // The daily never holds its results for the server: coins fill in when they land.
   const resultsReady = daily || rewardsFlow.resultsReady;
 
-  const { dictRef, dictReady, dictError } = useV2Dictionary(language);
+  const { dictRef, dictReady, dictError, retry: retryDict } = useV2Dictionary(language);
 
   // Emergency brace (coins off the run, a free one from upgrades, or a rescue word).
   const { rejected, flash: flashReject } = useRejectFlash(playSound);
@@ -387,6 +387,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         composing={phase === 'composing'}
         rejected={rejected}
         dictError={dictError}
+        onDictRetry={retryDict}
         scrambles={run.scrambles}
         wheel={wheel}
         selected={selected}
