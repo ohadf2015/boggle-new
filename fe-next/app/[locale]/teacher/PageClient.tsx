@@ -8,6 +8,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 import { TrialEndedBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
+import { TeacherProTrialChargeSoonBanner } from '@/components/teacher/TeacherProTrialChargeSoonBanner';
 import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingCard';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
@@ -24,6 +25,7 @@ const IMPRESSION_SOURCE: Partial<Record<TeacherBillingBanner, string>> = {
   reactivate: 'dashboard_trial_ended',
   trialing: 'dashboard_trial_lifecycle',
   trialExpiring: 'dashboard_trial_lifecycle',
+  chargeSoon: 'dashboard_trial_charge_soon',
   trialEnding: 'trial_ending_card',
   trialExpired: 'trial_ending_card',
   trialReminder: 'trial_ending_card',
@@ -70,9 +72,11 @@ function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTea
     case 'reactivate':
       return <TrialEndedBannerWithRecap onDismiss={b.dismissEnded} />;
     case 'trialExpiring':
-      return <TeacherProTrialExpiringBanner trialExpires={b.trialExpires} onDismiss={b.dismissExpiring} />;
+      return <TeacherProTrialExpiringBanner trialExpires={b.trialExpires} portalUrl={b.portalUrl} onDismiss={b.dismissExpiring} />;
     case 'trialing':
-      return <TeacherProTrialLifecycleBanner trialExpires={b.trialExpires} />;
+      return <TeacherProTrialLifecycleBanner trialExpires={b.trialExpires} portalUrl={b.portalUrl} />;
+    case 'chargeSoon':
+      return <TeacherProTrialChargeSoonBanner chargeAt={b.trialExpires} portalUrl={b.portalUrl} />;
   }
 }
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { TeacherProTrialLifecycleBanner } from '../TeacherProTrialLifecycleBanner';
 
@@ -49,16 +49,15 @@ describe('TeacherProTrialLifecycleBanner', () => {
     expect(screen.getByText('teacher.subscription.trialLifecycleTitleToday')).toBeInTheDocument();
   });
 
-  it('POSTs paid Polar checkout and tracks the dashboard source', async () => {
-    postTeacherProCheckout.mockResolvedValue({ ok: true, url: 'https://polar.sh/c/1' });
+  it('says the card is charged after the trial and links to the Polar portal, not a new checkout', () => {
+    const portal = 'https://polar.sh/lexiclash/portal?customer_session_token=x';
     const trialExpires = new Date(Date.now() + 5 * 86400000).toISOString();
-    render(<TeacherProTrialLifecycleBanner trialExpires={trialExpires} />);
-    fireEvent.click(screen.getByTestId('teacher-pro-trial-lifecycle-cta'));
-    await waitFor(() => {
-      expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
-    });
-    expect(trackEduProUpgradeClicked).toHaveBeenCalledWith({ source: 'dashboard_trial_lifecycle' });
-    expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'dashboard_trial_lifecycle' });
-    expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/1');
+    render(<TeacherProTrialLifecycleBanner trialExpires={trialExpires} portalUrl={portal} />);
+    expect(screen.getByText('teacher.subscription.trialAutoRenewBody')).toBeInTheDocument();
+    const cta = screen.getByTestId('teacher-pro-trial-lifecycle-cta');
+    expect(cta).toHaveAttribute('href', portal);
+    fireEvent.click(cta);
+    expect(postTeacherProCheckout).not.toHaveBeenCalled();
+    expect(goToPolarCheckout).not.toHaveBeenCalled();
   });
 });

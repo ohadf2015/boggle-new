@@ -14265,8 +14265,8 @@ const en = {
       "upgradeNow": "Upgrade to Pro",
       "startTrial": "Start 14-day free trial",
       "trialOfferTitle": "Try Teacher Pro free for 14 days",
-      "trialOfferBody": "Unlimited classes and reports. Free for 14 days, then $9/month. Cancel anytime.",
-      "trialCtaSubtext": "Free for 14 days, then $9/month. Cancel anytime.",
+      "trialOfferBody": "Unlimited classes and reports. Add a card to start: free for 14 days, then $9/month unless you cancel.",
+      "trialCtaSubtext": "Add a card to start. Free for 14 days, then $9/month unless you cancel.",
       "trialEndedTitle": "Your Pro trial has ended. Your classes are safe.",
       "trialEndedBody": "Free still runs every class. Pro brings back unlimited classes and printable reports for $9/month. This is not another free trial.",
       "trialEndedCta": "Keep Pro: $9/mo",
@@ -14277,6 +14277,10 @@ const en = {
       "trialLifecycleBody": "Keep unlimited classes and printable reports for $9/mo after the trial.",
       "trialExpiringLoss": "Without Pro, you will lose unlimited classes and printable student reports.",
       "trialLifecycleCta": "Keep Pro: $9/mo",
+      "trialAutoRenewBody": "When the trial ends, the card you added is charged $9/mo. Cancel any time before and you won't pay.",
+      "trialChargeSoonTitle": "Your free trial ends tomorrow",
+      "trialChargeSoonBody": "On {date}, the card you added is charged $9, then $9 each month. Cancel before then and you won't pay anything.",
+      "trialManageCta": "Manage or cancel",
       "pendingCheckoutTitle": "Complete your Teacher Pro setup",
       "pendingCheckoutBody": "You started a Teacher Pro checkout that didn't finish. Pick up where you left off to get unlimited classrooms and printable reports.",
       "pendingCheckoutCta": "Resume checkout",
@@ -20935,7 +20939,7 @@ const en = {
       "trialCta": "Start {days}-day free trial",
       "buyNowInstead": "Or buy now: {price}/month",
       "buyCta": "Get Teacher Pro: {price}/month",
-      "trialNote": "Free for {days} days, then {price}/month. Cancel before it ends and you pay nothing.",
+      "trialNote": "Add a card to start. Free for {days} days, then {price}/month. We remind you the day before, and if you cancel before it ends you pay nothing.",
       "proBestFor": "Seeing who's stuck after every game, and fixing it the next day.",
       "schoolName": "Schools & departments",
       "schoolTagline": "For {min} or more teachers",
@@ -21640,7 +21644,7 @@ const en = {
       },
       "cta": "See what Teacher Pro adds",
       "trialCta": "Start 14-day free trial",
-      "trialFine": "Free for 14 days, then {price}/month. Cancel anytime.",
+      "trialFine": "Add a card to start. Free for 14 days, then {price}/month unless you cancel.",
       "dismiss": "Not now"
     },
     "onboarding": {
@@ -21881,7 +21885,7 @@ const en = {
       "trialCta": "Try Teacher Pro free for {days} days",
       "startTrialCta": "Start free {days}-day trial",
       "buyCta": "Get Teacher Pro · {price}/month",
-      "trialFine": "Free for {days} days, then {price}/month. Cancel anytime."
+      "trialFine": "Add a card to start. Free for {days} days, then {price}/month unless you cancel."
     },
     "cap": {
       "used": "{count} of {limit} free classes used",

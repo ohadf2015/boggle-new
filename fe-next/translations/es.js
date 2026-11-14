@@ -15010,8 +15010,8 @@ const es = {
       "upgradeNow": "Mejorar a Pro",
       "startTrial": "Empieza 14 días gratis",
       "trialOfferTitle": "Prueba Teacher Pro 14 días gratis",
-      "trialOfferBody": "Clases e informes ilimitados. Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
-      "trialCtaSubtext": "Gratis 14 días y luego 9 $/mes. Cancela cuando quieras.",
+      "trialOfferBody": "Clases e informes ilimitados. Agrega una tarjeta para empezar: gratis 14 días y luego 9 $/mes si no cancelas.",
+      "trialCtaSubtext": "Agrega una tarjeta para empezar. Gratis 14 días y luego 9 $/mes si no cancelas.",
       "trialEndedTitle": "Tu prueba de Pro terminó. Tus clases siguen a salvo.",
       "trialEndedBody": "El plan gratis sigue funcionando en todas tus clases. Pro recupera las clases ilimitadas y los informes imprimibles por $9/mes. No es otra prueba gratis.",
       "trialEndedCta": "Seguir con Pro: 9 $/mes",
@@ -15022,6 +15022,10 @@ const es = {
       "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes al terminar la prueba.",
       "trialExpiringLoss": "Sin Pro, perderás las clases ilimitadas y los informes de alumnos imprimibles.",
       "trialLifecycleCta": "Seguir con Pro: 9 $/mes",
+      "trialAutoRenewBody": "Cuando termine la prueba, se cobrarán 9 $/mes a la tarjeta que agregaste. Cancela antes cuando quieras y no pagarás.",
+      "trialChargeSoonTitle": "Tu prueba gratis termina mañana",
+      "trialChargeSoonBody": "El {date} se cobrarán 9 $ a la tarjeta que agregaste, y luego 9 $ cada mes. Cancela antes y no pagarás nada.",
+      "trialManageCta": "Gestionar o cancelar",
       "pendingCheckoutTitle": "Completa tu configuración de Teacher Pro",
       "pendingCheckoutBody": "Iniciaste un pago de Teacher Pro que no se completó. Continúa donde lo dejaste para desbloquear aulas ilimitadas e informes imprimibles.",
       "pendingCheckoutCta": "Reanudar pago",
@@ -21926,7 +21930,7 @@ const es = {
       "trialCta": "Prueba gratis {days} días",
       "buyNowInstead": "O cómpralo ya: {price}/mes",
       "buyCta": "Contrata Teacher Pro: {price}/mes",
-      "trialNote": "Gratis durante {days} días; después, {price}/mes. Si cancelas antes de que termine, no pagas nada.",
+      "trialNote": "Agrega una tarjeta para empezar. Gratis durante {days} días; después, {price}/mes. Te avisamos el día antes y, si cancelas antes de que termine, no pagas nada.",
       "proBestFor": "Ver quién se atasca después de cada partida y corregirlo al día siguiente.",
       "schoolName": "Centros y departamentos",
       "schoolTagline": "Para {min} docentes o más",
@@ -22631,7 +22635,7 @@ const es = {
       },
       "cta": "Ver qué añade Pro",
       "trialCta": "Empezar prueba gratis de 14 días",
-      "trialFine": "Gratis 14 días, luego {price}/mes. Cancela cuando quieras.",
+      "trialFine": "Agrega una tarjeta para empezar. Gratis 14 días, luego {price}/mes si no cancelas.",
       "dismiss": "Ahora no"
     },
     "onboarding": {
@@ -22872,7 +22876,7 @@ const es = {
       "trialCta": "Prueba Pro gratis {days} días",
       "startTrialCta": "Empezar prueba gratis de {days} días",
       "buyCta": "Teacher Pro · {price}/mes",
-      "trialFine": "Gratis {days} días y después {price}/mes. Cancela cuando quieras."
+      "trialFine": "Agrega una tarjeta para empezar. Gratis {days} días y después {price}/mes si no cancelas."
     },
     "cap": {
       "used": "Usas {count} de {limit} clases gratis",

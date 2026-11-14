@@ -69,24 +69,32 @@ describe('admin teacher-access endpoints', () => {
     expect(res.status).toBe(200);
   });
 
-  it('approve stamps a trial deadline and the email mentions the trial window in one line', async () => {
+  it('approve opens no cardless trial window and the email offers the card trial instead', async () => {
     const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
     const sb = mockSupabase(adminProfile, row);
     (createClient as any).mockReturnValue(sb);
     const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(200);
 
-    // The status UPDATE payload includes a future trial_expires_at.
     expect(sb.requestsUpdate).toHaveBeenCalled();
     const payload = (sb.requestsUpdate as any).mock.calls.at(-1)[0];
     expect(payload.status).toBe('approved');
-    expect(typeof payload.trial_expires_at).toBe('string');
-    expect(Date.parse(payload.trial_expires_at)).toBeGreaterThan(Date.now());
+    expect(payload.trial_expires_at).toBeNull();
 
-    // Email reflects the trial as a single informational line (no urgency block).
     const arg = (sendEmail as any).mock.calls[0][0];
-    expect(arg.html).toMatch(/free trial runs until/i);
+    expect(arg.html).not.toMatch(/free trial runs until/i);
+    expect(arg.html).toContain('Card needed');
     expect(arg.html).not.toContain('trial-urgency');
+  });
+
+  it('re-approval keeps a window given before trials needed a card', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', trial_expires_at: new Date(Date.now() + 5 * 86_400_000).toISOString() };
+    const sb = mockSupabase(adminProfile, row);
+    (createClient as any).mockReturnValue(sb);
+    await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    const payload = (sb.requestsUpdate as any).mock.calls.at(-1)[0];
+    expect(payload.trial_expires_at).toBe(row.trial_expires_at);
+    expect((sendEmail as any).mock.calls[0][0].html).toMatch(/free trial runs until/i);
   });
 
   it('approve forwards the admin custom message into the confirmation email', async () => {

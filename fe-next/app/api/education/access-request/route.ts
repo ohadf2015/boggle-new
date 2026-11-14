@@ -5,7 +5,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdminNotify';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
-import { teacherTrialExpiry } from '@/lib/education/trial';
+import { approvalTrialExpiry } from '@/lib/education/trial';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { isPaidMedium } from '@/lib/education/paidDay0';
 import { testEmailReason } from '@/lib/education/checkoutTrafficTags';
@@ -193,7 +193,8 @@ export async function POST(req: Request) {
     return pendingAndTell();
   }
 
-  const trialExpiresAt = priorTrial ?? teacherTrialExpiry(Date.now());
+  // No cardless Pro window on approval: the trial starts at the Polar checkout, with a card.
+  const trialExpiresAt = approvalTrialExpiry(priorTrial);
   const nowIso = new Date().toISOString();
   // Only the chosen row: the status check allows no "superseded" value, so older duplicate pending rows stay as they are.
   const approve = await admin

@@ -15370,8 +15370,8 @@ const sv = {
       "upgradeNow": "Uppgradera till Pro nu",
       "startTrial": "Starta gratis provperiod på 14 dagar",
       "trialOfferTitle": "Prova Teacher Pro gratis i 14 dagar",
-      "trialOfferBody": "Obegränsade klasser och rapporter. Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
-      "trialCtaSubtext": "Gratis i 14 dagar, sedan 9 $/månad. Avsluta när du vill.",
+      "trialOfferBody": "Obegränsade klasser och rapporter. Lägg till ett kort för att börja: gratis i 14 dagar, sedan 9 $/månad om du inte avslutar.",
+      "trialCtaSubtext": "Lägg till ett kort för att börja. Gratis i 14 dagar, sedan 9 $/månad om du inte avslutar.",
       "trialEndedTitle": "Din Pro-provperiod är slut. Dina klasser finns kvar.",
       "trialEndedBody": "Gratisplanen kör fortfarande alla klasser. Pro ger tillbaka obegränsat med klasser och utskrivbara rapporter för $9/mån. Det här är ingen ny provperiod.",
       "trialEndedCta": "Behåll Pro – 9 $/mån",
@@ -15382,6 +15382,10 @@ const sv = {
       "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter. 9 $/mån efter provperioden.",
       "trialExpiringLoss": "Utan Pro förlorar du obegränsade klasser och utskrivbara elevrapporter.",
       "trialLifecycleCta": "Behåll Pro – 9 $/mån",
+      "trialAutoRenewBody": "När provperioden är slut dras 9 $/mån från kortet du lade till. Avsluta när du vill innan dess så betalar du inget.",
+      "trialChargeSoonTitle": "Din gratis provperiod tar slut i morgon",
+      "trialChargeSoonBody": "Den {date} dras 9 $ från kortet du lade till, och sedan 9 $ varje månad. Avsluta innan dess så betalar du ingenting.",
+      "trialManageCta": "Hantera eller avsluta",
       "pendingCheckoutTitle": "Slutför din Teacher Pro-konfiguration",
       "pendingCheckoutBody": "Du påbörjade en Teacher Pro-betalning som inte slutfördes. Fortsätt där du slutade för att låsa upp obegränsade klassrum och utskrivbara rapporter.",
       "pendingCheckoutCta": "Återuppta betalning",
@@ -21914,7 +21918,7 @@ const sv = {
       "trialCta": "Starta {days} dagars gratis provperiod",
       "buyNowInstead": "Eller köp direkt: {price}/månad",
       "buyCta": "Skaffa Teacher Pro: {price}/månad",
-      "trialNote": "Gratis i {days} dagar, sedan {price}/månad. Avsluta innan perioden är slut så betalar du ingenting.",
+      "trialNote": "Lägg till ett kort för att börja. Gratis i {days} dagar, sedan {price}/månad. Vi påminner dig dagen innan, och avslutar du innan perioden är slut betalar du ingenting.",
       "proBestFor": "Att se vem som kör fast efter varje spel och fixa det dagen efter.",
       "schoolName": "Skolor och ämneslag",
       "schoolTagline": "För {min} lärare eller fler",
@@ -22619,7 +22623,7 @@ const sv = {
       },
       "cta": "Se vad Pro ger",
       "trialCta": "Starta 14 dagars gratis provperiod",
-      "trialFine": "Gratis i 14 dagar, sedan {price}/månad. Avsluta när du vill.",
+      "trialFine": "Lägg till ett kort för att börja. Gratis i 14 dagar, sedan {price}/månad om du inte avslutar.",
       "dismiss": "Inte nu"
     },
     "onboarding": {
@@ -22860,7 +22864,7 @@ const sv = {
       "trialCta": "Prova Pro gratis i {days} dagar",
       "startTrialCta": "Starta gratis provperiod på {days} dagar",
       "buyCta": "Teacher Pro · {price}/mån",
-      "trialFine": "Gratis i {days} dagar, sedan {price}/mån. Avsluta när du vill."
+      "trialFine": "Lägg till ett kort för att börja. Gratis i {days} dagar, sedan {price}/mån om du inte avslutar."
     },
     "cap": {
       "used": "{count} av {limit} gratisklasser använda",

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
+import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { showDay0FirstClassBridge } from '@/lib/education/day0FirstClassBridge';
 import { trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 import { ResultsTeacherProTrialCard, CLASS_CREATED_TRIAL_PLACEMENT } from '@/components/education/results/ResultsTeacherProTrialCard';
@@ -23,8 +24,10 @@ export interface ClassCreatedAskProps {
  */
 export function ClassCreatedAsk({ language, href, onStart, className }: ClassCreatedAskProps) {
   const { hasPro, loading, known, accessTrialExpires } = useTeacherPro();
+  const { latestRequest } = useTeacherAccess();
   const [nowMs] = useState(() => Date.now());
-  const bridge = !loading && known && !hasPro && showDay0FirstClassBridge(accessTrialExpires, nowMs);
+  const approvedAt = latestRequest?.status === 'approved' ? latestRequest.created_at : null;
+  const bridge = !loading && known && !hasPro && showDay0FirstClassBridge(accessTrialExpires, nowMs, approvedAt);
 
   useEffect(() => {
     if (!bridge) return;

@@ -4,19 +4,21 @@ import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft, polarTrialDaysTitle } from '@/lib/education/polarTrial';
 import { ProBanner } from './pro/ProBanner';
-import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
+import { TeacherProManageLink } from './TeacherProManageLink';
 
 /**
- * Live Polar Teacher Pro trial — days remaining + paid checkout CTA.
+ * Live Polar Teacher Pro trial: days remaining, and what happens at the end.
  *
- * Distinct from the access-trial `TrialUrgencyBanner` and from the expired
- * `TeacherProTrialEndedBanner`. CTA POSTs /api/subscription/checkout (Polar
- * Teacher Pro $9/mo) — same till as the upgrade page, not a second handler.
+ * The trial started with a card and converts to $9/mo on its own, so the banner
+ * says so and links to the Polar portal to manage or cancel. It never starts a
+ * second (paid) checkout. Distinct from the access-trial `TrialUrgencyBanner`.
  */
 export function TeacherProTrialLifecycleBanner({
   trialExpires,
+  portalUrl = null,
 }: {
   trialExpires: string | null;
+  portalUrl?: string | null;
 }) {
   const { t } = useLanguage();
   const [nowMs] = useState(() => Date.now());
@@ -31,11 +33,11 @@ export function TeacherProTrialLifecycleBanner({
       tone={urgent ? 'urgent' : 'calm'}
       proLabel={t('eduShell.nav.pro')}
       title={title}
-      body={t('teacher.subscription.trialLifecycleBody')}
+      body={t('teacher.subscription.trialAutoRenewBody')}
       action={
-        <TeacherProCheckoutButton source="dashboard_trial_lifecycle" testId="teacher-pro-trial-lifecycle-cta">
-          {t('teacher.subscription.trialLifecycleCta')}
-        </TeacherProCheckoutButton>
+        <TeacherProManageLink portalUrl={portalUrl} testId="teacher-pro-trial-lifecycle-cta">
+          {t('teacher.subscription.trialManageCta')}
+        </TeacherProManageLink>
       }
     />
   );

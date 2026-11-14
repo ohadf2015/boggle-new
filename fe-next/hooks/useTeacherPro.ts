@@ -26,6 +26,8 @@ export interface TeacherProState {
   periodEnd: string | null;
   /** ISO Polar trial end while status is trialing, else null. */
   trialExpires: string | null;
+  /** They cancelled: the plan (or trial) ends at periodEnd and nothing more is charged. */
+  cancelAtPeriodEnd: boolean;
   /** ISO end of the live ACCESS trial (no card, no Pro entitlement), else null. */
   accessTrialExpires: string | null;
   /** The free access trial is known to have ended: no trial offer, straight to paid. */
@@ -47,7 +49,7 @@ export interface TeacherProState {
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, accessTrialExpires: null, accessTrialEnded: false, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null, pendingCheckout: false,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, cancelAtPeriodEnd: false, accessTrialExpires: null, accessTrialEnded: false, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null, pendingCheckout: false,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -86,6 +88,7 @@ function stateFrom(data: StatusBody): Omit<TeacherProState, 'loading' | 'refresh
     status,
     periodEnd: (data?.current_period_end as string | null) ?? null,
     trialExpires: typeof data?.trial_expires === 'string' ? data.trial_expires : null,
+    cancelAtPeriodEnd: data?.cancel_at_period_end === true,
     accessTrialExpires: typeof data?.access_trial_expires === 'string' ? data.access_trial_expires : null,
     accessTrialEnded: data?.has_pro === true ? false : data?.access_trial_ended === true,
     trialUsed: data?.trial_used === true || status === 'trialing',
