@@ -1520,13 +1520,16 @@ const he = {
   "homePlay": {
     "crew": {
       "title": "החבר'ה שלך",
+      "eyebrow": "חברים",
+      "line": "אפשר להצטרף למשחק, להזמין או לשלוח פינג.",
+      "seeMore": "עוד {count}",
       "inLobby": "בלובי",
       "playingNow": "במשחק עכשיו",
       "seen": "פעילות אחרונה: {when}",
-      "youLead": "יתרון לך {score}",
-      "theyLead": "יתרון להם {score}",
-      "tied": "תיקו {score}",
-      "firstMatch": "משחק ראשון?",
+      "youLead": "{score} לטובתך במשחקים",
+      "theyLead": "{score} נגדך במשחקים",
+      "tied": "תיקו {score} במשחקים",
+      "firstMatch": "עוד לא שיחקתם יחד",
       "join": "הצטרפות",
       "invite": "הזמנה",
       "retry": "לנסות שוב",
@@ -22962,7 +22965,10 @@ const he = {
       "close_one": "היה צמוד!",
       "your_turn": "התור שלך",
       "nice_word": "איזו מילה, כל הכבוד",
-      "see_you_tomorrow": "נתראה מחר"
+      "see_you_tomorrow": "נתראה מחר",
+      "play_now": "בא לך משחק?",
+      "good_luck": "בהצלחה!",
+      "after_this": "נשחק אחרי זה?"
     },
     "button": "פינג",
     "buttonLabel": "לשלוח פינג ל{name}",

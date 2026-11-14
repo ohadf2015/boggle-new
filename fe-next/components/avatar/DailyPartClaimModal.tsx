@@ -28,7 +28,7 @@ export function DailyPartClaimModal({
         // z above the avatar builder (z-[110]): this claim offer is launched
         // from a reward button INSIDE the builder, so it must overlay it, not
         // hide behind it. Still fine standalone in the lobby (nothing higher).
-        className="fixed inset-0 z-[120] flex items-center justify-center bg-neo-navy/80 p-4 animate-in fade-in-0 duration-300"
+        role="dialog" aria-modal="true" className="fixed inset-0 z-[120] flex items-center justify-center bg-neo-navy/80 p-4 animate-in fade-in-0 duration-300"
       >
         <div
           className="relative w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"

@@ -1522,13 +1522,16 @@ const ru = {
   "homePlay": {
     "crew": {
       "title": "Твоя команда",
+      "eyebrow": "Друзья",
+      "line": "Присоединяйся к их игре, зови или шли пинг.",
+      "seeMore": "Ещё {count}",
       "inLobby": "В лобби",
       "playingNow": "Играет сейчас",
       "seen": "Активность: {when}",
-      "youLead": "Ты ведёшь {score}",
-      "theyLead": "Соперник ведёт {score}",
-      "tied": "Ничья {score}",
-      "firstMatch": "Первая игра?",
+      "youLead": "Ты ведёшь {score} по матчам",
+      "theyLead": "Соперник ведёт {score} по матчам",
+      "tied": "Ничья {score} по матчам",
+      "firstMatch": "Ещё не играли",
       "join": "Войти",
       "invite": "Позвать",
       "retry": "Ещё раз",
@@ -22720,7 +22723,10 @@ const ru = {
       "close_one": "Было близко!",
       "your_turn": "Твой ход",
       "nice_word": "Классное слово, уважаю",
-      "see_you_tomorrow": "До завтра"
+      "see_you_tomorrow": "До завтра",
+      "play_now": "Сыграем?",
+      "good_luck": "Удачи!",
+      "after_this": "Сыграем после этой?"
     },
     "button": "Пинг",
     "buttonLabel": "Отправить пинг игроку {name}",

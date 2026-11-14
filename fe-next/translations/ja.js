@@ -1520,13 +1520,16 @@ const ja = {
   "homePlay": {
     "crew": {
       "title": "あなたの仲間",
+      "eyebrow": "フレンド",
+      "line": "ゲームに参加したり、招待したり、ピンを送ったりできるよ。",
+      "seeMore": "あと{count}人を見る",
       "inLobby": "ロビーにいます",
       "playingNow": "プレイ中",
       "seen": "{when}にオンライン",
-      "youLead": "あなたがリード {score}",
-      "theyLead": "相手がリード {score}",
-      "tied": "互角 {score}",
-      "firstMatch": "初対戦?",
+      "youLead": "対戦成績 {score} でリード",
+      "theyLead": "対戦成績 {score} で負け越し",
+      "tied": "対戦成績 {score} で互角",
+      "firstMatch": "まだ対戦してない",
       "join": "参加",
       "invite": "招待",
       "retry": "再試行",
@@ -23020,7 +23023,10 @@ const ja = {
       "close_one": "接戦だったね",
       "your_turn": "次はそっちの番",
       "nice_word": "いい単語、さすが",
-      "see_you_tomorrow": "また明日ね"
+      "see_you_tomorrow": "また明日ね",
+      "play_now": "一局どう？",
+      "good_luck": "がんばって！",
+      "after_this": "これ終わったら対戦しよ？"
     },
     "button": "ピン",
     "buttonLabel": "{name}さんにピンを送る",

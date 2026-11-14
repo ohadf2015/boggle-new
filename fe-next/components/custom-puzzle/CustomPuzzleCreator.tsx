@@ -204,7 +204,7 @@ const CustomPuzzleCreator: React.FC<CustomPuzzleCreatorProps> = ({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in-0 duration-300"
+        role="dialog" aria-modal="true" className="fixed inset-0 z-50 bg-neo-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in-0 duration-300"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         {/* Word Input Phase */}

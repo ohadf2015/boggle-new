@@ -47,7 +47,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
   const giftTypes: GiftType[] = ['hints', 'streak_freeze', 'coins'];
 
   return (
-    <div data-testid="gift-modal" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/60 backdrop-blur-xs">
+    <div data-testid="gift-modal" role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-neo-black/60 backdrop-blur-xs">
       {/* CSS entrance (animate-in) instead of framer-motion: a starved main
           thread — e.g. while the large Hebrew bundle parses — would leave a
           framer-motion `initial` opacity:0 pinned, showing only the dark

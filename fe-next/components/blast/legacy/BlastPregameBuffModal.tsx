@@ -41,7 +41,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
     <>
       <div
         data-testid="blast-pregame-buff-modal"
-        className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/90 p-4 backdrop-blur-sm animate-in fade-in-0 duration-300"
+        role="dialog" aria-modal="true" className="fixed inset-0 z-[90] flex items-center justify-center bg-neo-navy/90 p-4 backdrop-blur-sm animate-in fade-in-0 duration-300"
       >
         <div
           className="relative w-full max-w-md rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg animate-in fade-in-0 zoom-in-95 slide-in-from-bottom-2 duration-300"

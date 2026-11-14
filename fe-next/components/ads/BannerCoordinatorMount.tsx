@@ -8,6 +8,7 @@ import { useAppLifecycle } from '@/hooks/useAppLifecycle';
 import { bannerController, shouldSuppressBanner } from '@/lib/native/bannerController';
 import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { removeNativeBanner } from '@/lib/native/removeNativeBanner';
+import { hasOpenModal } from '@/lib/native/openModal';
 
 /**
  * Lifecycle host for the single banner coordinator. Rendered once (next to
@@ -139,29 +140,31 @@ export default function BannerCoordinatorMount() {
     //     --admob-banner-height).
     // NOTE: the two classes live on DIFFERENT nodes (drawer/opt-in on <html>,
     // game-lock on <body>), so we observe both.
-    const syncSuppress = () =>
-      void bannerController.setSuppressed(
-        shouldSuppressBanner({
-          drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
-          inGame: document.body.classList.contains('screen-fit-locked'),
-          allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
-          // FTUE overlay open (set by OnboardingFlow). Unconditional suppress so the
-          // first run stays ad-free — see shouldSuppressBanner. Lives on <html>,
-          // already covered by the observer below.
-          onboarding: document.documentElement.classList.contains('onboarding-active'),
-          // A modal/dialog is open (ref-counted by the shared DialogContent), OR the
-          // feedback widget's own modal is open (`fdw-modal-open`, set by the widget
-          // — it lives in a shadow root, so it can't use DialogContent). The native
-          // banner is a SurfaceView composited ABOVE the WebView, so neither overlay
-          // can cover it — suppress so it doesn't paint over the modal's content/CTAs.
-          // Player report 2026-08-12: "the add hides part of the report bug form".
-          // Both live on <html>, covered by the observer below.
-          modalOpen:
-            document.documentElement.classList.contains('modal-open') ||
-            document.documentElement.classList.contains('fdw-modal-open'),
-          adFreeRoute: document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS),
-        }),
-      );
+    const syncSuppress = () => {
+      const flags = {
+        drawerOpen: document.documentElement.classList.contains('mobile-drawer-open'),
+        inGame: document.body.classList.contains('screen-fit-locked'),
+        allowInGame: document.documentElement.classList.contains('banner-allow-in-game'),
+        // FTUE overlay open (set by OnboardingFlow). Unconditional suppress so the
+        // first run stays ad-free — see shouldSuppressBanner. Lives on <html>,
+        // already covered by the observer below.
+        onboarding: document.documentElement.classList.contains('onboarding-active'),
+        // A modal/dialog is open (ref-counted by the shared DialogContent), OR the
+        // feedback widget's own modal is open (`fdw-modal-open`, set by the widget
+        // — it lives in a shadow root, so it can't use DialogContent). The native
+        // banner is a SurfaceView composited ABOVE the WebView, so neither overlay
+        // can cover it — suppress so it doesn't paint over the modal's content/CTAs.
+        // Player report 2026-08-12: "the add hides part of the report bug form".
+        // Both live on <html>, covered by the observer below.
+        modalOpen:
+          document.documentElement.classList.contains('modal-open') ||
+          document.documentElement.classList.contains('fdw-modal-open'),
+        adFreeRoute: document.documentElement.classList.contains(AD_FREE_ROUTE_CLASS),
+      };
+      // Most sheets never call acquireModalOpen, so any visible aria-modal counts too.
+      const suppressed = shouldSuppressBanner(flags) || shouldSuppressBanner({ ...flags, modalOpen: hasOpenModal() });
+      void bannerController.setSuppressed(suppressed);
+    };
     syncSuppress(); // reflect any drawer/game state already active at mount
     const suppressObserver = new MutationObserver(syncSuppress);
     suppressObserver.observe(document.documentElement, {
@@ -173,6 +176,19 @@ export default function BannerCoordinatorMount() {
       attributeFilter: ['class'],
     });
     removers.push(() => suppressObserver.disconnect());
+
+    let modalScan = 0;
+    const modalObserver = new MutationObserver(() => {
+      if (!modalScan) modalScan = requestAnimationFrame(() => {
+        modalScan = 0;
+        syncSuppress();
+      });
+    });
+    modalObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-modal', 'role', 'hidden'] });
+    removers.push(() => {
+      modalObserver.disconnect();
+      if (modalScan) cancelAnimationFrame(modalScan);
+    });
 
     // Periodic refresh so the banner doesn't sit on one stale creative. AdMob's
     // own refresh can stall when the WebView is backgrounded/throttled, so we
