@@ -158,7 +158,6 @@ jobs:
           [ -f "$f" ] || { echo "outcome=none" >> "$GITHUB_OUTPUT"; echo "Agent wrote no result." >> "$GITHUB_STEP_SUMMARY"; exit 0; }
           echo "outcome=$(jq -r .outcome "$f")" >> "$GITHUB_OUTPUT"
           echo "branch=$(jq -r '.branch // ""' "$f" | grep -E '^radar/(h-)?[0-9]+$' || true)" >> "$GITHUB_OUTPUT"
-          echo "id=$(jq -r '.recommendationId // .rec_id // ""' "$f" | grep -E '^[0-9]+$' || true)" >> "$GITHUB_OUTPUT"
           { echo "## $(jq -r .outcome "$f"), $(jq '.dismissed | length' "$f") dismissed"; cat "$OUT/body.md" 2>/dev/null; } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Gate the commit
@@ -185,13 +184,29 @@ jobs:
           EOF
           cd fe-next && npx tsx scripts/build-i18n-assets.ts --skip-brotli && npx tsc --noEmit && npm run lint
 
+      # radar-merged runs the same check at merge; failing here keeps a bad block from ever being pushed.
+      - name: Build and check the PR body
+        id: block
+        if: steps.result.outputs.outcome == 'fixed'
+        env:
+          BRANCH: ${{ steps.result.outputs.branch }}
+        run: |
+          {
+            tr -d '\r' < "$OUT/body.md" | sed 's/^```radar/```json/'
+            printf '\n\n```radar\n'
+            jq -c --arg b "$BRANCH" '.intervention + {recommendationId: (.recommendationId // .rec_id // ($b | ltrimstr("radar/") | tonumber? // null))} | with_entries(select(.value != null))' "$OUT/result.json"
+            printf '```\n'
+          } > "$RUNNER_TEMP/pr.md"
+          meta=$(bash .github/scripts/radar-block.sh "$BRANCH" true < "$RUNNER_TEMP/pr.md")
+          echo "id=$(printf '%s' "$meta" | jq -r '.recommendationId // empty')" >> "$GITHUB_OUTPUT"
+
       - name: Open PR and mark the recommendation active
         if: steps.result.outputs.outcome == 'fixed'
         env:
           GH_TOKEN: ${{ github.token }}
           RADAR_GIT_TOKEN: ${{ secrets.RADAR_GIT_TOKEN }}
           BRANCH: ${{ steps.result.outputs.branch }}
-          ID: ${{ steps.result.outputs.id }}
+          ID: ${{ steps.block.outputs.id }}
         run: |
           # A user/app token makes the pull_request event run CI. GITHUB_TOKEN
           # parks that run at action_required, and workflow_dispatch checks do
@@ -202,7 +217,6 @@ jobs:
             gh auth setup-git
           fi
           git push -u origin "$BRANCH"
-          { cat "$OUT/body.md"; printf '\n\n```radar\n'; jq -c '.intervention + {recommendationId: (.recommendationId // .rec_id)}' "$OUT/result.json"; printf '```\n'; } > "$RUNNER_TEMP/pr.md"
           url=$(gh pr create --base "$BASE" --head "$BRANCH" --title "$(jq -r .title "$OUT/result.json")" --body-file "$RUNNER_TEMP/pr.md")
           echo "PR: $url" >> "$GITHUB_STEP_SUMMARY"
           if [ -n "$RADAR_GIT_TOKEN" ]; then
