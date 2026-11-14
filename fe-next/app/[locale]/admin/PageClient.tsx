@@ -22,6 +22,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { useAdminDashboard } from '@/hooks/useAdminDashboard';
 import { PulseSection } from '@/components/admin/overview/PulseSection';
+import { SignupsHero } from '@/components/admin/overview/SignupsHero';
 import { AdminNotificationBell } from '@/components/admin/AdminNotificationBell';
 import { useOverviewPulse } from '@/hooks/useOverviewPulse';
 import { TeacherHealthCard } from '@/components/admin/overview/TeacherHealthCard';
@@ -33,6 +34,7 @@ const DailyActivityChart = dynamic(
   { ssr: false }
 );
 import { RevenuePanel } from '@/components/admin/overview/RevenuePanel';
+import { AppStatsPanel } from '@/components/admin/overview/AppStatsPanel';
 import { SignupGrowthChart } from '@/components/admin/overview/SignupGrowthChart';
 import { DeploymentInfoPanel } from '@/components/admin/overview/DeploymentInfoPanel';
 
@@ -155,6 +157,8 @@ export default function AdminPageClient() {
             }
           />
 
+          {stats && <SignupsHero total={stats.overview.totalPlayers} today={stats.activity.signupsToday} week={stats.activity.signupsWeek} />}
+
           {/* Insight first: today against yesterday, then what is working / not / about to break */}
           <PulseSection
             pulse={pulse}
@@ -197,6 +201,9 @@ export default function AdminPageClient() {
               </DrillSection>
               <DrillSection id="overview-signups" title={t('admin.overview.section.signups', 'Signups')} summary={stats ? t('admin.overview.section.signupsHint', '{today} today, {week} this week', { today: stats.activity.signupsToday, week: stats.activity.signupsWeek }) : undefined} open={isOpen('overview-signups')} onOpenChange={setSection('overview-signups')}>
                 <SignupGrowthChart authToken={authToken} />
+              </DrillSection>
+              <DrillSection id="overview-app" title={t('admin.overview.section.app', 'Mobile app')} summary={t('admin.overview.section.appHint', 'New and active app users, store visits')} open={isOpen('overview-app')} onOpenChange={setSection('overview-app')}>
+                <AppStatsPanel authToken={authToken} />
               </DrillSection>
               <DrillSection id="overview-revenue" title={t('admin.overview.section.revenue', 'Revenue')} summary={revenue ? t('admin.overview.section.revenueHint', '{paying} paying, {trialing} in a trial', { paying: revenue.paying, trialing: revenue.trialing }) : undefined} open={isOpen('overview-revenue')} onOpenChange={setSection('overview-revenue')}>
                 <RevenuePanel authToken={authToken} />
