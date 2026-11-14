@@ -308,7 +308,8 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   // Single FTUE arbiter for confused classic-MP players (idle / tap-only /
   // fruitless-fiddle). One coordinator → never stacks popups, never nags veterans.
   const stuckCoach = useMPStuckCoach({
-    active: gameActive && isPlaying && !showStartAnimation,
+    // Quick Play's socketless board runs its own coach hint; two stacked hints 2s apart helped no one.
+    active: gameActive && isPlaying && !showStartAnimation && !clientAuthoritative,
     isClassic: gameMode === 'classic',
     totalGamesPlayed: totalGamesPlayed ?? 0,
     isDesktop,

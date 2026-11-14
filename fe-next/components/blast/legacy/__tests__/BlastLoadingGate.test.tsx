@@ -5,19 +5,19 @@
  *  (a) grid present + dictionary pending → dictionary status + Retry at 8s,
  *      Retry calls the dictionary retry
  *  (b) MP grid missing → board status at 8s, Retry fires the grid resync
- *  (c) growth:blast_board_wait once on clear with the right waited_for;
+ *  (c) growth:blast_board_wait once when the board becomes ready (useBlastBoardWait);
  *      growth:blast_board_stuck once at 15s, never if the board arrives at 10s
  *  (d) Back to lobby at 30s
  */
 import { vi, type Mock } from 'vitest';
-import { render, screen, act, fireEvent } from '@testing-library/react';
+import { render, renderHook, screen, act, fireEvent } from '@testing-library/react';
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: vi.fn(),
 }));
 
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { BlastLoadingGate } from '../BlastLoadingGate';
+import { BlastLoadingGate, useBlastBoardWait } from '../BlastLoadingGate';
 
 const trackMock = trackGrowthEvent as unknown as Mock;
 
@@ -85,24 +85,27 @@ describe('BlastLoadingGate', () => {
     expect(props.onDictionaryRetry).not.toHaveBeenCalled();
   });
 
-  it("(c) emits blast_board_wait exactly once on clear with waited_for 'both'", () => {
-    const props = makeProps({ gridReady: false, dictionaryReady: false });
-    const { rerender, unmount } = render(<BlastLoadingGate {...props} />);
-
-    act(() => { vi.advanceTimersByTime(10000); });
-
-    // Board arrives: gate unmounts on the next BlastGame render.
-    rerender(<BlastLoadingGate {...props} gridReady dictionaryReady />);
-    unmount();
+  it("(c) emits blast_board_wait once when the board becomes ready, as BlastGame swaps the gate out", () => {
+    const { rerender } = renderHook((p: { grid: boolean; dict: boolean }) => useBlastBoardWait(p.grid, p.dict, 'mp', 'en'), {
+      initialProps: { grid: false, dict: false },
+    });
+    act(() => { vi.advanceTimersByTime(4000); });
+    rerender({ grid: true, dict: false });
+    act(() => { vi.advanceTimersByTime(6000); });
+    rerender({ grid: true, dict: true });
+    rerender({ grid: true, dict: true });
 
     const waits = trackMock.mock.calls.filter(([e]) => e === 'blast_board_wait');
     expect(waits).toHaveLength(1);
-    expect(waits[0][1]).toMatchObject({
-      waited_for: 'both',
-      mode: 'mp',
-      language: 'en',
-      wait_ms: 10000,
-    });
+    expect(waits[0][1]).toMatchObject({ waited_for: 'both', mode: 'mp', language: 'en', wait_ms: 10000 });
+  });
+
+  it('(c) emits no blast_board_wait when the board was ready at once or the player left mid-load', () => {
+    renderHook(() => useBlastBoardWait(true, true, 'solo', 'es'));
+    const left = renderHook(() => useBlastBoardWait(true, false, 'solo', 'es'));
+    act(() => { vi.advanceTimersByTime(5000); });
+    left.unmount();
+    expect(trackMock.mock.calls.filter(([e]) => e === 'blast_board_wait')).toHaveLength(0);
   });
 
   it('(c) emits blast_board_stuck once at 15s while still waiting — and never when the board arrives at 10s', () => {
@@ -118,16 +121,10 @@ describe('BlastLoadingGate', () => {
 
     trackMock.mockClear();
 
-    // Board arrives at 10s: no stuck event, and wait_ms reflects the real wait
-    const okProps = makeProps({ gridReady: false, dictionaryReady: true });
-    const ok = render(<BlastLoadingGate {...okProps} />);
+    const ok = render(<BlastLoadingGate {...makeProps({ gridReady: false, dictionaryReady: true })} />);
     act(() => { vi.advanceTimersByTime(10000); });
-    ok.rerender(<BlastLoadingGate {...okProps} gridReady dictionaryReady />);
     ok.unmount();
     expect(trackMock.mock.calls.filter(([e]) => e === 'blast_board_stuck')).toHaveLength(0);
-    const waits = trackMock.mock.calls.filter(([e]) => e === 'blast_board_wait');
-    expect(waits).toHaveLength(1);
-    expect(waits[0][1]).toMatchObject({ waited_for: 'grid', wait_ms: 10000 });
   });
 
   it('(d) offers Back to lobby at 30s and it calls onBackToLobby', () => {
