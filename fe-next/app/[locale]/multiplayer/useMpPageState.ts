@@ -46,6 +46,7 @@ import { ENTRY_HIDES_GLOBAL_CHROME } from '@/components/multiplayer/entry/entryC
 import type { Language, ActiveRoom, GameMode } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
+import { useQuickPlayIntent } from './useQuickPlayIntent';
 import { useClassroomRoomWait, rejoinWaitingRoom } from './useClassroomRoomWait';
 import { useClassroomGameMove } from './useClassroomGameMove';
 import { useMpRoomSocket, type MpRoomPlayer, type MpHostLeftState } from './useMpRoomSocket';
@@ -61,7 +62,7 @@ export function useMpPageState() {
   const { isClassroomMode, isClassroomHost } = readClassroomLiveFlags(pathname, searchParams);
   const preselectedMode = searchParams?.get('mode') as GameMode | null;
   const autoCreate = searchParams?.get('autoCreate') === 'true';
-  const quickPlay = searchParams?.get('quickPlay') === 'true';
+  const urlQuickPlay = searchParams?.get('quickPlay') === 'true';
   const inviteUserId = searchParams?.get('invite') ?? null;
   const roomParam = searchParams?.get('room') ?? null;
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
@@ -358,6 +359,9 @@ export function useMpPageState() {
     guestAvatar, setGuestAvatar,
     setUsername, setError, setIsJoining,
   });
+  // The in-page Quick Start button hosts with options.quickPlay; the lobby must
+  // see that too, not only ?quickPlay=true (PostHog inbox 01a0ed1f-f749).
+  const { handleJoin: entryHandleJoin, quickPlay } = useQuickPlayIntent(handleJoin, urlQuickPlay);
 
   useMpFriendInvite({
     inviteUserId, roomParam, isAuthenticated, socket, isConnected, isActive, isHost, gameCode,
@@ -432,8 +436,9 @@ export function useMpPageState() {
     onExitToLobby: handleExitToLobby, onUsernameChange: setUsername,
     resultsData: withResultsSessionId(resultsData, resultsSessionId), handleReturnToRoom, gameDuration, seriesTracker,
     entry: {
-      handleJoin, refreshRooms, activeRooms, roomsLoading,
-      isJoining, isAuthenticated, autoCreate, quickPlay,
+      handleJoin: entryHandleJoin, refreshRooms, activeRooms, roomsLoading,
+      // Entry keeps the URL flag only: it auto-fires Quick Play on mount.
+      isJoining, isAuthenticated, autoCreate, quickPlay: urlQuickPlay,
       // The teacher's practice seat joins under its own name: the server keeps the teacher's name for the host seat.
       displayName: practiceSeat ? practiceSeatName ?? '' : (isCrazyGames && cgUser?.username) || profile?.display_name || '', profileAvatar: profile?.avatar_config,
       onCrazyGamesLogin: isCrazyGames && !cgUser ? loginCrazyGames : undefined,
