@@ -55,6 +55,28 @@ function isSupabaseLockAbort(entry: ExceptionListEntry): boolean {
   );
 }
 
+// Chunk-load failures carry a per-deploy file hash and, after the webpack
+// retry plugin, an `lc_retry=<ts>` cache-bust param. Minified frames are not
+// symbolicated, so each recurrence opened its own issue (inbox 01a0e5c7).
+const CHUNK_ID_RE = /Loading (?:CSS )?chunk (\S+?) failed/i;
+const CHUNK_MESSAGE_RE = /loading (?:css )?chunk|failed to load chunk/i;
+const LC_RETRY_RE = /([?&])lc_retry=[^&\s)]*&?/g;
+
+function fingerprintChunkLoadError(
+  properties: Record<string, unknown>,
+  first: ExceptionListEntry,
+): void {
+  const value = typeof first?.value === 'string' ? first.value : '';
+  if (first?.type !== 'ChunkLoadError' && !CHUNK_MESSAGE_RE.test(value)) return;
+
+  if (value.includes('lc_retry=')) {
+    first.value = value.replace(LC_RETRY_RE, (_m, sep: string) => sep).replace(/[?&](?=[\s)]|$)/g, '');
+  }
+  if (properties.$exception_fingerprint) return;
+  const id = CHUNK_ID_RE.exec(value)?.[1];
+  properties.$exception_fingerprint = id ? `chunk-load-error:${id}` : 'chunk-load-error';
+}
+
 export function filterEmptyException<T extends PostHogEventLike | null>(
   event: T,
 ): T | null {
@@ -75,6 +97,8 @@ export function filterEmptyException<T extends PostHogEventLike | null>(
   }
 
   if (isSupabaseLockAbort(first)) return null;
+
+  if (event.properties) fingerprintChunkLoadError(event.properties, first);
 
   return event;
 }
