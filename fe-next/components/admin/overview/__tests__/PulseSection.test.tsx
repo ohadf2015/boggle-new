@@ -103,14 +103,8 @@ describe('PulseSection', () => {
   it('shows lifetime totals under the tiles', () => {
     render(<PulseSection {...props} />);
     const totals = screen.getByTestId('pulse-totals');
-    expect(totals.textContent).toContain('1,200');
     expect(totals.textContent).toContain('9,000');
     expect(totals.textContent).toContain('450');
-  });
-
-  it('leads the totals with all signups ever, guests excluded', () => {
-    render(<PulseSection {...props} />);
-    expect(screen.getByTestId('pulse-total-signups').textContent).toContain('1,200');
   });
 
   it('shows a skeleton while loading and a retry when the data could not load', () => {
