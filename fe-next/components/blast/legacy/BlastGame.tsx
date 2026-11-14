@@ -242,7 +242,19 @@ export function BlastGame({
   }, [engine.isCascading, engine.applyServerBoard]);
 
   // Dictionary cache for cascade word detection + validation gate
-  const { checkWord, isLoaded: isDictionaryReady, retry: retryDictionary } = useDictionaryCache(config.language);
+  const { checkWord, isLoaded: isDictionaryLoaded, retry: retryDictionary } = useDictionaryCache(config.language);
+  // MP: the server validates every submit and owns the board, and the client
+  // dictionary only feeds cascade hints. Gating the board on it left players
+  // behind "Generating grid..." while the round clock ran: every
+  // growth:blast_board_stuck in 30 days waited on the dictionary (PostHog inbox
+  // 01a108ad). Show the board now; start the deferred load once in the background.
+  const isDictionaryReady = isDictionaryLoaded || isMultiplayer;
+  const mpDictionaryKickedRef = useRef(false);
+  useEffect(() => {
+    if (!isMultiplayer || isDictionaryLoaded || mpDictionaryKickedRef.current) return;
+    mpDictionaryKickedRef.current = true;
+    retryDictionary();
+  }, [isMultiplayer, isDictionaryLoaded, retryDictionary]);
 
   // Enable sound gate on mount, disable on unmount
   useEffect(() => {

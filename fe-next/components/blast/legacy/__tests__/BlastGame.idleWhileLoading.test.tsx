@@ -25,16 +25,16 @@ vi.mock('@/contexts/AdMobContext', async (importOriginal) => {
 
 import { BlastGame } from '../BlastGame';
 
-const grid = Array.from({ length: 6 }, () => ['C', 'A', 'T', 'S', 'E', 'R']);
-
 describe('Blast idle detection while the board is loading', () => {
-  it('given the dictionary is still loading, the idle timer stays off so loading is not reported as dead time', () => {
+  it('given the board is still loading, the idle timer stays off so loading is not reported as dead time', () => {
     const noop = () => {};
     render(
       <BlastGame
         config={{ gridSize: 6, specialTileChance: 0.12, language: 'es' as never, boardClearMode: 'shrink' }}
         mode="multiplayer"
-        serverGrid={grid as never}
+        // MP no longer waits on the client dictionary (PostHog inbox 01a108ad);
+        // the board is "loading" until the server grid arrives.
+        serverGrid={undefined}
         blastSeed={1}
         remainingTime={50}
         totalTime={60}

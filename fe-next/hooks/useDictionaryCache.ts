@@ -303,8 +303,14 @@ export async function prewarmDictionary(language: Language): Promise<void> {
   if (memoryCache.has(language)) return;
   try {
     await fetchDictionary(language);
-  } catch {
-    // Silent — real submits fall back to server-side dict check.
+  } catch (err) {
+    // Real submits fall back to server-side dict check, but a silent failure
+    // here hid why MP Blast boards waited on the dictionary (PostHog inbox
+    // 01a108ad). Dynamic import keeps analytics off this hook's static graph.
+    const reason = err instanceof Error ? err.message.slice(0, 120) : 'unknown';
+    void import('@/utils/growthTracking')
+      .then((m) => m.trackGrowthEvent('dictionary_prewarm_failed', { language, reason }))
+      .catch(() => {});
   }
 }
 
