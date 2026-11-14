@@ -32,6 +32,7 @@ function timeAgo(iso: string, language: string, now = Date.now()): string {
 /**
  * Floating admin-only bell on every /admin page (the shell only mounts for admins and the
  * API re-checks). Polls while the tab is visible; the table is deliberately not realtime.
+ * Opening it marks everything shown as seen for this admin; new dots stay until the next poll.
  */
 export function AdminNotificationBell() {
   const { t, language } = useLanguage();
@@ -62,28 +63,26 @@ export function AdminNotificationBell() {
     return () => window.clearInterval(id);
   }, [load]);
 
-  const markRead = (body: { ids: string[] } | { all: true }) =>
-    fetchWithAuth('/api/admin/notifications', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    }).catch(() => undefined);
-
   const openItem = (n: Notice) => {
-    if (!n.read_at) {
-      setItems((list) => list.map((x) => (x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x)));
-      setUnread((c) => Math.max(0, c - 1));
-      void markRead({ ids: [n.id] });
-    }
     setOpen(false);
     if (n.link) router.push(`/${language}${n.link}`);
   };
 
-  const markAll = () => {
-    const now = new Date().toISOString();
-    setItems((list) => list.map((x) => ({ ...x, read_at: x.read_at ?? now })));
+  const toggle = async () => {
+    const opening = !open;
+    setOpen(opening);
+    if (!opening || unread === 0 || items.length === 0) return;
     setUnread(0);
-    void markRead({ all: true });
+    try {
+      const res = await fetchWithAuth('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seenAt: items[0].created_at }),
+      });
+      if (!res.ok) void load();
+    } catch {
+      void load();
+    }
   };
 
   if (!available) return null;
@@ -98,11 +97,6 @@ export function AdminNotificationBell() {
         >
           <div className="flex items-center justify-between gap-2 border-b border-neo-cream/20 p-3">
             <h2 className="text-sm font-bold text-neo-cream">{t('admin.notifications.title', 'Notifications')}</h2>
-            {unread > 0 && (
-              <button type="button" onClick={markAll} className="text-xs font-semibold text-neo-cyan underline-offset-2 hover:underline">
-                {t('admin.notifications.markAll', 'Mark all read')}
-              </button>
-            )}
           </div>
           {items.length === 0 ? (
             <p className="p-4 text-sm text-neo-cream/70">{t('admin.notifications.empty', 'Nothing yet. Interesting events show up here.')}</p>
@@ -131,10 +125,7 @@ export function AdminNotificationBell() {
         type="button"
         aria-label={t('admin.notifications.title', 'Notifications')}
         aria-expanded={open}
-        onClick={() => {
-          setOpen((v) => !v);
-          void load();
-        }}
+        onClick={() => void toggle()}
         className="relative flex h-12 w-12 items-center justify-center rounded-full border-2 border-neo-cream/40 bg-neo-navy-light text-neo-cream shadow-hard focus-visible:outline-2 focus-visible:outline-neo-cyan"
       >
         <Bell className="h-5 w-5" aria-hidden="true" />

@@ -5,6 +5,8 @@ vi.mock('@/lib/telegram', () => ({
   sendTelegramMessage: (...a: unknown[]) => sendTelegramMessage(...a),
   escapeTelegramMarkdownV2: (s?: string | null) => (s ?? '').replace(/[.!-]/g, '\\$&'),
 }));
+const notifyAdminAlert = vi.fn();
+vi.mock('@/backend/modules/pushNotificationTriggers', () => ({ notifyAdminAlert: (...a: unknown[]) => notifyAdminAlert(...a) }));
 vi.mock('@/utils/logger', () => ({ default: { error: vi.fn(), warn: vi.fn() } }));
 
 const insert = vi.fn();
@@ -22,6 +24,7 @@ beforeEach(() => {
   insert.mockReturnValue(chain({ data: [{ id: '1' }], error: null }));
   upsert.mockReturnValue(chain({ data: [{ id: '1' }], error: null }));
   sendTelegramMessage.mockResolvedValue(true);
+  notifyAdminAlert.mockResolvedValue(undefined);
 });
 
 const base = { kind: 'k', severity: 'normal' as const, title: 'T' };
@@ -63,5 +66,23 @@ describe('notifyAdmins', () => {
   it('a failed Telegram send does not turn a stored notification into a failure', async () => {
     sendTelegramMessage.mockRejectedValue(new Error('down'));
     expect(await notifyAdmins({ ...base, severity: 'high' })).toBe(true);
+  });
+
+  it('pushes every stored notice, any severity, to the admins’ phones', async () => {
+    await notifyAdmins({ ...base, body: 'b', link: '/admin/x' });
+    expect(notifyAdminAlert).toHaveBeenCalledWith({ title: 'T', body: 'b', link: '/admin/x' });
+  });
+
+  it('a duplicate or failed store pushes nothing', async () => {
+    upsert.mockReturnValue(chain({ data: [], error: null }));
+    await notifyAdmins({ ...base, dedupeKey: 'd' });
+    insert.mockReturnValue(chain({ data: null, error: { message: 'x' } }));
+    await notifyAdmins(base);
+    expect(notifyAdminAlert).not.toHaveBeenCalled();
+  });
+
+  it('a failed push does not turn a stored notification into a failure', async () => {
+    notifyAdminAlert.mockRejectedValue(new Error('fcm down'));
+    expect(await notifyAdmins(base)).toBe(true);
   });
 });

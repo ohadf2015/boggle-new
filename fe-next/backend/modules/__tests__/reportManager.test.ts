@@ -14,6 +14,9 @@ vi.mock('../supabaseServer', () => ({
   getSupabase: vi.fn(),
 }));
 
+const { notifyAdminAlert } = vi.hoisted(() => ({ notifyAdminAlert: vi.fn(async () => undefined) }));
+vi.mock('../pushNotificationTriggers', () => ({ notifyAdminAlert }));
+
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { reportUser, reportMessage } from '../reportManager';
 import { getSupabase } from '../supabaseServer';
@@ -130,5 +133,28 @@ describe('reportManager.reportMessage', () => {
 
     expect(result.success).toBe(false);
     expect(result.errorCode).toBe('INVALID_REASON');
+  });
+});
+
+describe('reportManager admin push', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    notifyAdminAlert.mockImplementation(async () => undefined);
+  });
+
+  it('GIVEN a stored report THEN every admin gets a push that opens moderation', async () => {
+    mockGetSupabase.mockReturnValue(makeSupabase());
+    await reportUser('reporter-1', 'target-9', 'spam');
+    expect(notifyAdminAlert).toHaveBeenCalledWith({ title: 'New user report', body: 'spam · user', link: '/admin/moderation' });
+  });
+
+  it('GIVEN the insert fails THEN no push and a failing push never fails the report', async () => {
+    mockGetSupabase.mockReturnValue(makeSupabase({ data: null, error: { message: 'x' } }));
+    await reportUser('reporter-1', 'target-9', 'spam');
+    expect(notifyAdminAlert).not.toHaveBeenCalled();
+
+    notifyAdminAlert.mockRejectedValue(new Error('fcm down'));
+    mockGetSupabase.mockReturnValue(makeSupabase());
+    expect((await reportUser('reporter-1', 'target-9', 'spam')).success).toBe(true);
   });
 });

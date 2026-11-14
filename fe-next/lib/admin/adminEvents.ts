@@ -64,3 +64,25 @@ export function proNotice(p: { event: 'trial' | 'paid' | 'ended'; email?: string
     dedupeKey: p.subscriptionId ? `pro:${p.event}:${p.subscriptionId}` : undefined,
   };
 }
+
+export interface DayCounts {
+  games: number;
+  signups: number;
+  teachers: number;
+}
+
+const trend = (n: number, prev: number, one: string, many: string) =>
+  `${n} ${n === 1 ? one : many}, ${n === prev ? 'same as the day before' : `${n > prev ? 'up' : 'down'} from ${prev}`}`;
+
+/** Yesterday against the day before; `day` is the UTC date summarised. */
+export function dailySummaryNotice(p: { day: string; current: DayCounts; previous: DayCounts }): AdminNotice {
+  const { current: c, previous: v } = p;
+  return {
+    kind: 'daily_summary',
+    severity: 'normal',
+    title: `Yesterday: ${trend(c.games, v.games, 'game', 'games')}`,
+    body: join([trend(c.signups, v.signups, 'signup', 'signups'), trend(c.teachers, v.teachers, 'teacher signup', 'teacher signups')]),
+    link: '/admin',
+    dedupeKey: `daily-summary:${p.day}`,
+  };
+}
