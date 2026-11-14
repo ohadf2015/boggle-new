@@ -1520,13 +1520,16 @@ const en = {
   "homePlay": {
     "crew": {
       "title": "Your crew",
+      "eyebrow": "Friends",
+      "line": "Join their game, invite them, or send a ping.",
+      "seeMore": "See {count} more",
       "inLobby": "In a lobby",
       "playingNow": "Playing now",
       "seen": "Seen {when}",
-      "youLead": "You lead {score}",
-      "theyLead": "They lead {score}",
-      "tied": "Tied {score}",
-      "firstMatch": "First match?",
+      "youLead": "You're up {score} in matches",
+      "theyLead": "They're up {score} in matches",
+      "tied": "Tied {score} in matches",
+      "firstMatch": "No matches yet",
       "join": "Join",
       "invite": "Invite",
       "retry": "Try again",
@@ -22041,7 +22044,10 @@ const en = {
       "close_one": "That was a close one",
       "your_turn": "Your move",
       "nice_word": "Nice word, respect",
-      "see_you_tomorrow": "See you tomorrow"
+      "see_you_tomorrow": "See you tomorrow",
+      "play_now": "Up for a game?",
+      "good_luck": "Good luck!",
+      "after_this": "Play me after this one?"
     },
     "button": "Ping",
     "buttonLabel": "Send {name} a ping",

@@ -161,7 +161,7 @@ const StreakMilestoneCelebration: React.FC<StreakMilestoneCelebrationProps> = ({
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 animate-in fade-in-0 duration-300"
+          role="dialog" aria-modal="true" className="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-4 animate-in fade-in-0 duration-300"
           onClick={onClose}
         >
           <div

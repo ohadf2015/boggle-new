@@ -1520,13 +1520,16 @@ const es = {
   "homePlay": {
     "crew": {
       "title": "Tu grupo",
+      "eyebrow": "Amigos",
+      "line": "Únete a su partida, invítalos o mándales un toque.",
+      "seeMore": "Ver {count} más",
       "inLobby": "En una sala",
       "playingNow": "Jugando ahora",
       "seen": "Visto {when}",
-      "youLead": "Vas ganando {score}",
-      "theyLead": "Te gana {score}",
-      "tied": "Empate {score}",
-      "firstMatch": "¿Primera partida?",
+      "youLead": "Vas ganando {score} en partidas",
+      "theyLead": "Te van ganando {score} en partidas",
+      "tied": "Empate {score} en partidas",
+      "firstMatch": "Aún no han jugado",
       "join": "Unirse",
       "invite": "Invitar",
       "retry": "Reintentar",
@@ -23032,7 +23035,10 @@ const es = {
       "close_one": "¡Estuvo reñido!",
       "your_turn": "Te toca",
       "nice_word": "Qué palabra, respeto",
-      "see_you_tomorrow": "Nos vemos mañana"
+      "see_you_tomorrow": "Nos vemos mañana",
+      "play_now": "¿Echamos una partida?",
+      "good_luck": "¡Suerte!",
+      "after_this": "¿Jugamos después de esta?"
     },
     "button": "Toque",
     "buttonLabel": "Mandarle un toque a {name}",

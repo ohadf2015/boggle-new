@@ -19,7 +19,7 @@ import { RivalPingButton } from '../RivalPingButton';
 import { sendRivalPing, reportRival } from '@/lib/rivals/pingClient';
 import { blockUser } from '@/utils/friends';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { RIVAL_PING_IDS } from '@/lib/rivals/pings';
+import { pingsFor } from '@/lib/rivals/pings';
 
 const props = { targetUserId: 'them', targetName: 'Noam', context: 'daily' as const };
 const open = () => fireEvent.click(screen.getByRole('button', { name: 'rivalPings.buttonLabel|Noam' }));
@@ -30,12 +30,30 @@ beforeEach(() => {
 });
 
 describe('RivalPingButton', () => {
-  it('opens a grid of every canned ping, each a 44px target', () => {
+  it('opens only the pings that fit a score chase, each a 44px target', () => {
     render(<RivalPingButton {...props} />);
     open();
-    const chips = RIVAL_PING_IDS.map((id) => screen.getByRole('button', { name: new RegExp(`rivalPings.ping.${id}`) }));
-    expect(chips).toHaveLength(8);
+    const chips = pingsFor('daily').map((id) => screen.getByRole('button', { name: new RegExp(`rivalPings.ping.${id}`) }));
     for (const chip of chips) expect(chip.className).toContain('min-h-[44px]');
+    expect(screen.queryByRole('button', { name: /rivalPings.ping.rematch/ })).toBeNull();
+  });
+
+  it('offers in-game lines when the friend is playing right now', () => {
+    render(<RivalPingButton {...props} context="friendPlaying" />);
+    open();
+    expect(screen.getByRole('button', { name: /rivalPings.ping.good_luck/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /rivalPings.ping.gg/ })).toBeNull();
+  });
+
+  it('compact: no ... menu, and a refusal goes to the parent instead of under the button', async () => {
+    vi.mocked(sendRivalPing).mockResolvedValue({ ok: false, code: 'daily_limit' });
+    const onRefused = vi.fn();
+    render(<RivalPingButton {...props} context="friendFree" compact onRefused={onRefused} />);
+    expect(screen.queryByRole('button', { name: 'rivalPings.more' })).toBeNull();
+    open();
+    fireEvent.click(screen.getByRole('button', { name: /rivalPings.ping.play_now/ }));
+    await waitFor(() => expect(onRefused).toHaveBeenCalledWith('daily_limit'));
+    expect(screen.queryByText('rivalPings.error.daily_limit')).toBeNull();
   });
 
   it('opens the choices on top of the page, outside a card that clips its overflow', () => {
@@ -67,12 +85,12 @@ describe('RivalPingButton', () => {
     vi.mocked(sendRivalPing).mockReturnValue(new Promise((r) => (resolve = r)) as never);
     render(<RivalPingButton {...props} />);
     open();
-    fireEvent.click(screen.getByRole('button', { name: /rivalPings.ping.rematch/ }));
+    fireEvent.click(screen.getByRole('button', { name: /rivalPings.ping.beat_you/ }));
 
     expect(screen.getByText('rivalPings.sent')).toBeTruthy();
-    expect(sendRivalPing).toHaveBeenCalledWith('them', 'rematch', 'daily');
+    expect(sendRivalPing).toHaveBeenCalledWith('them', 'beat_you', 'daily');
     await act(async () => resolve({ ok: true }));
-    expect(posthog.capture).toHaveBeenCalledWith('rival_ping_sent', { pingId: 'rematch', context: 'daily' });
+    expect(posthog.capture).toHaveBeenCalledWith('rival_ping_sent', { pingId: 'beat_you', context: 'daily' });
     expect(screen.getByText('rivalPings.sent')).toBeTruthy();
   });
 

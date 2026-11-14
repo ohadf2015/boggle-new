@@ -1,20 +1,21 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
-import { RIVAL_PING_IDS, RIVAL_PINGS, type RivalPingId } from '@/lib/rivals/pings';
+import { RIVAL_PINGS, type RivalPingId } from '@/lib/rivals/pings';
 
 interface RivalPingPickerProps {
+  ids: readonly RivalPingId[];
   onPick: (id: RivalPingId) => void;
   title?: string;
 }
 
-export function RivalPingPicker({ onPick, title }: RivalPingPickerProps) {
+export function RivalPingPicker({ ids, onPick, title }: RivalPingPickerProps) {
   const { t } = useLanguage();
   return (
     <div className="flex flex-col gap-2">
       {title && <p className="text-sm font-black text-neo-black">{title}</p>}
       <div className="grid grid-cols-2 gap-2">
-        {RIVAL_PING_IDS.map((id) => {
+        {ids.map((id) => {
           const label = t(RIVAL_PINGS[id].textKey);
           return (
             <button

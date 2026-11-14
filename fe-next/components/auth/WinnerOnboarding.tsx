@@ -127,6 +127,8 @@ const WinnerOnboarding: React.FC<WinnerOnboardingProps> = ({
     <AnimatePresence>
       <Reveal
         noSlide
+        role="dialog"
+        aria-modal="true"
         className="fixed inset-0 z-110 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs"
         onClick={(e) => e.stopPropagation()}
       >

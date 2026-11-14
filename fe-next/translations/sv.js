@@ -1520,13 +1520,16 @@ const sv = {
   "homePlay": {
     "crew": {
       "title": "Ditt gäng",
+      "eyebrow": "Vänner",
+      "line": "Gå med i deras spel, bjud in dem eller skicka en ping.",
+      "seeMore": "Visa {count} till",
       "inLobby": "I en lobby",
       "playingNow": "Spelar nu",
       "seen": "Sågs {when}",
-      "youLead": "Du leder {score}",
-      "theyLead": "De leder {score}",
-      "tied": "Lika {score}",
-      "firstMatch": "Första matchen?",
+      "youLead": "Du leder {score} i matcher",
+      "theyLead": "De leder {score} i matcher",
+      "tied": "Lika {score} i matcher",
+      "firstMatch": "Inga matcher än",
       "join": "Gå med",
       "invite": "Bjud in",
       "retry": "Försök igen",
@@ -23020,7 +23023,10 @@ const sv = {
       "close_one": "Det var nära!",
       "your_turn": "Din tur",
       "nice_word": "Snyggt ord, respekt",
-      "see_you_tomorrow": "Vi ses imorgon"
+      "see_you_tomorrow": "Vi ses imorgon",
+      "play_now": "Sugen på en match?",
+      "good_luck": "Lycka till!",
+      "after_this": "Spela mot mig efter den här?"
     },
     "button": "Pinga",
     "buttonLabel": "Skicka en ping till {name}",
