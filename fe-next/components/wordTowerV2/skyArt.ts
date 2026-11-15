@@ -2,6 +2,7 @@ import { Container, Graphics } from 'pixi.js';
 import { type CritterKind, FOOD_KINDS, type PropKind, type Sky, type SkyFx, lerpColour } from '@/lib/wordTowerV2/biomes';
 import type { SkyProp } from '@/lib/wordTowerV2/scenery';
 import { buildCritter, isCritter } from './skyCritters';
+import { WeatherView } from './skyWeather';
 
 /**
  * The v2 sky, drawn by Pixi on the tower's own camera.
@@ -297,13 +298,16 @@ export class SkyLayer {
   /** Two effect layers cross-faded by the sky blend — never a swap. */
   private readonly fxFrom = new FxView();
   private readonly fxTo = new FxView();
+  /** Moving air, cross-faded like the effects (skyWeather.ts). */
+  private readonly weatherFrom = new WeatherView();
+  private readonly weatherTo = new WeatherView();
   private readonly propLayer = new Container();
   private readonly views: PropView[];
   private bandKey = '';
   private starKey = '';
 
   constructor(props: SkyProp[]) {
-    this.container.addChild(this.bands, this.stars, this.fxFrom.g, this.fxTo.g, this.propLayer);
+    this.container.addChild(this.bands, this.stars, this.fxFrom.g, this.fxTo.g, this.weatherFrom.container, this.weatherTo.container, this.propLayer);
     this.views = props.map((prop) => ({ prop, g: null }));
   }
 
@@ -373,6 +377,11 @@ export class SkyLayer {
       view.g.tint = tint;
       placeFx(view.g, kind, f);
     }
+
+    // Same blend for the air: the weather of the sky you are leaving thins out
+    // as the next one's arrives.
+    this.weatherFrom.update(sky.from.weather, w, h, f.ts, lift, 1 - sky.t, f.reducedMotion);
+    this.weatherTo.update(sky.to.weather, w, h, f.ts, lift, sky.t, f.reducedMotion);
 
     const floorScreen = f.floorPx * f.scale;
     for (const v of this.views) {

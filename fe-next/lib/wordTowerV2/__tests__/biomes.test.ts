@@ -70,6 +70,10 @@ describe('sky effects', () => {
     expect(new Set(BIOMES.map((b) => b.fx)).size).toBeGreaterThanOrEqual(4);
   });
 
+  it('given the climb, when each sky arrives, then it brings its own moving air (no repeats)', () => {
+    expect(new Set(BIOMES.map((b) => b.weather)).size).toBe(BIOMES.length);
+  });
+
   it('given a boundary, when crossed, then the two effects cross-fade rather than swap', () => {
     const mid = skyAt(BIOMES[1].fromFloor - 1);
     expect(mid.from.fx).toBe(BIOMES[0].fx);

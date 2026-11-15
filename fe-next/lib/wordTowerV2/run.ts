@@ -10,6 +10,7 @@ import type { LandingQuality } from './landing';
 import type { BlockTrait } from './rush/types';
 import { type RewardPayout, payoutFor, rollReward } from './rewards';
 import { scoreFromHeightM } from './scoring';
+import { CHALLENGE_BONUS, type Challenge, challengeMet } from './rush/challenges';
 
 export const PERFECT_BONUS = 50;
 const GOOD_BONUS = 10;
@@ -30,6 +31,8 @@ export interface LandingMods {
   wordLenBonusPerLetter?: number;
   chanceMul?: number;
   trait?: BlockTrait;
+  /** A floor challenge riding on this word (rush/challenges.ts): met = bonus + a crate. */
+  challenge?: Challenge | null;
 }
 
 export interface RunState {
@@ -120,7 +123,8 @@ export function applyLanding(
   const comboGain = (mods.comboGainMul ?? 1) * (mods.trait === 'anvil' ? ANVIL_COMBO_MUL : 1);
   const perfectPoints = PERFECT_BONUS * (mods.perfectBonusMul ?? 1) * (1 + (Math.min(combo, COMBO_CAP) - 1) * comboGain);
   const gold = mods.trait === 'gold' && landing.quality !== 'miss' ? GOLD_BONUS : 0;
-  const points = Math.round(perfect ? perfectPoints : landing.quality === 'good' ? GOOD_BONUS : 0) + gold;
+  const challenge = challengeMet(mods.challenge, landing.quality, landing.wordLen) ? CHALLENGE_BONUS : 0;
+  const points = Math.round(perfect ? perfectPoints : landing.quality === 'good' ? GOOD_BONUS : 0) + gold + challenge;
 
   let seed = prev.seed;
   const rng = () => {
@@ -136,7 +140,7 @@ export function applyLanding(
     wordLen: landing.wordLen,
     chanceMul: mods.chanceMul,
     bonusPerLetter: mods.wordLenBonusPerLetter,
-    guaranteed: mods.trait === 'lucky',
+    guaranteed: mods.trait === 'lucky' || challenge > 0,
   });
   const reward = id ? payoutFor(id, floors) : null;
 
