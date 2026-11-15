@@ -2852,3 +2852,26 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: shipped (fix: registered the experiment in lib/experiments.ts, matching sibling defineExperiment entries)
   - recommended owner: review-by-eod
   - why: reversible, small blast radius (additive registry entry); verified call site + translation key + type shape by hand, local eslint unavailable (ESM resolve broke), full gate runs after this lane
+
+## 2026-11-15
+- [Sentry] 4 of 6 unresolved errors are cross-tenant noise, not LexiClash
+  - JAVASCRIPT-NEXTJS-2S6 (since-visit read timed out), 2QH (statement timeout), 2KR (TypeError: Error in input stream), and issue "neverdieqr-com:bing timeout" all carry `app: growth-radar` tag and `url: https://growthradar.app/...` — the lexiclash Sentry org/project is receiving growth-radar's own server errors, not LexiClash's
+  - status: deferred
+  - why: fix belongs in the growth-radar repo (separate codebase, likely shared Sentry DSN/org misconfig), not boggle-new
+  - recommended owner: self (next growth-radar session) — separate the DSN or filter by `app` tag before next nightly Sentry sweep wastes another lane's budget on this
+- [Sentry] JAVASCRIPT-NEXTJS-2MB "Auth session check never answered" on /en/multiplayer, 6 occurrences since 11-07, ongoing
+  - status: deferred
+  - why: auth-adjacent (background auth session check) — hard rule, no autonomous fix
+  - recommended owner: backend
+- [Supabase] `security_definer_view` ERROR: `public.public_profiles` defined with SECURITY DEFINER, bypasses querying user's RLS
+  - status: deferred
+  - why: memory/archive suggests this view's `security_invoker` was already addressed around 2026-09; advisor still flags it as of 2026-11-14 — needs a live check of the view's current `reloptions` before touching it (false-positive vs regression), not enough budget tonight to confirm+fix safely
+  - recommended owner: self — check `SELECT reloptions FROM pg_class WHERE relname='public_profiles'` first
+- [Supabase] 7 functions callable by fully-unauthenticated `anon` role as SECURITY DEFINER (via `/rest/v1/rpc/*`): bump_vocabulary_lesson_stat, flagged_vocabulary_lesson_ids, get_leaderboard, get_past_season_leaderboard, lookup_classroom_by_join_code, record_word_mastery_event, report_vocabulary_lesson
+  - status: deferred
+  - why: leaderboard/join-code lookups are plausibly intentional public access; the vocabulary-lesson ones (record/report/bump/flagged) need a grep of every call site to confirm no truly-unauthenticated (pre-session) caller exists before a REVOKE — ran out of budget confirming this safely (a `rg` across the tree alone took >2min tonight)
+  - recommended owner: self — next triage lane, budget 10+ min just for this
+- [Supabase] `authenticated_security_definer_function_executable` grew from 69 (baseline 2026-04-29) to 86 — 17 new SECURITY DEFINER functions exposed to signed-in users since, never individually reviewed
+  - status: deferred
+  - why: needs per-function audit, same reason as above
+  - recommended owner: self

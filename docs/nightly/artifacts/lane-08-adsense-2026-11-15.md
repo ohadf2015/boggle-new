@@ -1,0 +1,6 @@
+status: research-only
+files_touched: none
+next_steps: live word-count audit (Googlebot UA, prod) found no genuinely thin informational page tonight — en 1021, about 1556, blog 999, faq 906, how-to-play 1181, rules 862, glossary 1872, guides 665, leaderboard 437, privacy 2357, terms 1158, education 1563, word-solver 1461, sv 623, es 754, he 795. /ja=121 is the known tokenizer artifact (whitespace-split undercounts CJK), not real thinness. /en/leaderboard (437w) already carries authored FAQ+features SSR content (GamePageSeoContent, collapsible) with breadcrumb+FAQ JSON-LD — by design, not a defect (see app/[locale]/leaderboard/page.tsx comment). sv/es/he home word gap vs en is normal (less marketing copy ported), not an SSR bug.
+GSC dead-pages tool (scripts/nightly/tools/dead_pages.py) timed out (rc=124, no ADC/network) — per its own skip rule, did NOT noindex anything blind.
+No internal-link or JSON-LD gap found worth a real (non-padding) edit tonight. Per lane rule "if nothing clears the bar, do nothing" — this is a no-op night.
+Tomorrow: re-run dead_pages.py with working gcloud ADC to get real zero-traffic noindex candidates; re-check GSC seo-daily report (last one is 2026-10-30, stale) for pages that DO earn clicks so a ≤200-word improvement can target one with evidence instead of guessing.
