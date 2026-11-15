@@ -46,7 +46,7 @@ export function BlockLegend({ t, current }: Props) {
       <li className="flex items-center gap-2 px-1 py-0.5">
         <span
           aria-hidden
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo-sm border-2 border-black bg-neo-navy-light font-neo-display text-sm font-black text-neo-cream"
+          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-neo-sm border-2 border-neo-cream bg-neo-navy-light font-neo-display text-sm font-black text-neo-cream"
         >
           ?
         </span>

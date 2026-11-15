@@ -120,7 +120,7 @@ export function RivalsCard({ t, balls, onOpen }: RivalsProps) {
     >
       <span
         aria-hidden
-        className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy text-2xl shadow-hard-sm"
+        className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-neo border-[3px] border-neo-cream bg-neo-navy text-2xl shadow-hard-sm"
       >
         ⚒️
         {balls > 0 ? (

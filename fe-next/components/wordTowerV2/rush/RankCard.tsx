@@ -33,7 +33,7 @@ export function RankCard({ t, rank }: Props) {
   return (
     <section
       data-wt2-rank-card
-      className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-3 text-neo-cream shadow-hard"
+      className="rounded-neo border-[3px] border-neo-cream bg-neo-navy-light p-3 text-neo-cream shadow-hard"
     >
       <div className="flex items-center gap-2">
         <span
@@ -57,7 +57,7 @@ export function RankCard({ t, rank }: Props) {
         aria-valuemax={100}
         aria-valuenow={pct}
         aria-label={t("wordTowerV2.rush.rank.progress")}
-        className="mt-2.5 h-3 w-full overflow-hidden rounded-full border-2 border-black bg-neo-navy"
+        className="mt-2.5 h-3 w-full overflow-hidden rounded-full border-2 border-neo-cream/70 bg-neo-navy"
       >
         <div className={`h-full ${fill}`} style={{ width: `${pct}%` }} />
       </div>

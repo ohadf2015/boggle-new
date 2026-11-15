@@ -80,7 +80,7 @@ export function V2HudMenu({
         data-wt2-hud-menu
         role="dialog"
         aria-label={t('wordTowerV2.hud.sheet.title')}
-        className="fixed bottom-0 inset-x-0 z-50 mx-auto max-h-[78vh] max-w-lg overflow-y-auto rounded-t-neo-xl border-x-[3px] border-t-[3px] border-black bg-neo-navy pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))]"
+        className="fixed bottom-0 inset-x-0 z-50 mx-auto max-h-[78vh] max-w-lg overflow-y-auto rounded-t-neo-xl border-x-[3px] border-t-[3px] border-neo-cream bg-neo-navy pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))]"
       >
         <div className="sticky top-0 z-10 flex items-center justify-between border-b-[3px] border-black bg-neo-purple px-4 py-2.5">
           <h2 className="font-neo-display text-lg font-black uppercase text-neo-cream [text-shadow:2px_2px_0_rgb(var(--neo-black))]">
@@ -195,7 +195,7 @@ interface StatProps {
 function Stat({ label, sub, value, note, tone, icon, ariaLabel }: StatProps) {
   return (
     <div
-      className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light p-2 text-neo-cream shadow-hard-sm"
+      className="flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/80 bg-neo-navy-light p-2 text-neo-cream shadow-hard-sm"
       aria-label={ariaLabel}
     >
       <span aria-hidden className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-neo-sm border-2 border-black text-lg ${tone}`}>

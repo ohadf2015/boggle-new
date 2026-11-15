@@ -76,7 +76,7 @@ export function NextUpQueue({ t, slots, reducedMotion = false, compact = false }
           setHint((h) => !h);
         }
       }}
-      className="pointer-events-auto relative flex cursor-pointer items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy py-0.5 pe-1.5 ps-1 shadow-hard-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-neo-cream active:translate-x-[1px] active:translate-y-[1px]"
+      className="pointer-events-auto relative flex cursor-pointer items-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy py-0.5 pe-1.5 ps-1 shadow-hard-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-neo-cream active:translate-x-[1px] active:translate-y-[1px]"
     >
       <ul
         aria-label={t("wordTowerV2.rush.nextUp.label")}
