@@ -1,5 +1,16 @@
 import { Suspense } from 'react';
+import type { Metadata } from 'next';
+import { createAdminClient } from '@/utils/supabase/admin';
+import { loadPublicProfileName } from '@/lib/players/loadPublicProfileName';
+import { buildPlayerProfileMetadata } from '@/lib/players/profileMetadata';
 import PublicProfilePageClient from './PageClient';
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; username: string }> }): Promise<Metadata> {
+  const { locale, username: raw } = await params;
+  const username = (() => { try { return decodeURIComponent(raw); } catch { return raw; } })();
+  const name = await loadPublicProfileName(createAdminClient(), { username });
+  return buildPlayerProfileMetadata({ locale, path: `/u/${encodeURIComponent(username)}`, name });
+}
 
 export default async function PublicProfilePage({
   params,

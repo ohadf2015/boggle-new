@@ -22982,6 +22982,68 @@ const he = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "להשוויץ"
+    },
+    "classWin": {
+      "button": "לשתף את הניצחון של הכיתה",
+      "copied": "הקישור הועתק",
+      "pageCta": "לנסות את LexiClash עם הכיתה",
+      "pageEyebrow": "ניצחון כיתתי",
+      "pageHeadline": "כיתה מצאה {words} מילים ביחד",
+      "pageLesson": "{found} מתוך {total} מילים מהשיעור",
+      "text": "הכיתה שלנו, {students} תלמידים, מצאה ביחד {words} מילים ב{mode}!",
+      "textNoMode": "הכיתה שלנו, {students} תלמידים, מצאה ביחד {words} מילים ב-LexiClash!",
+      "title": "הניצחון של הכיתה שלנו ב-LexiClash"
+    },
+    "mode": {
+      "blast": "בלאסט",
+      "daily": "היומי",
+      "edu": "תרגול",
+      "multiplayer": "מרובה משתתפים",
+      "quickPlay": "משחק מהיר",
+      "single": "סולו",
+      "tower": "מגדל המילים"
+    },
+    "mp": {
+      "bragButton": "להשוויץ",
+      "signInToAdd": "להתחבר כדי להוסיף",
+      "winText": "ניצחתי {score} מול {rival} ב-LexiClash. תורך",
+      "winTextSolo": "ניצחתי עם {score} נקודות ב-LexiClash. תורך"
+    },
+    "page": {
+      "ctaPlay": "לשחק עכשיו",
+      "title": {
+        "achievement": "פתחתי הישג חדש. תורך.",
+        "level": "עליתי רמה. תצליחו להדביק?",
+        "record": "שיא אישי חדש. חושבים שתשברו אותו?",
+        "worldRecord": "שיא עולם חדש. חושבים שתשברו אותו?"
+      }
+    },
+    "profile": {
+      "metaTitle": "{name} ב-LexiClash",
+      "shareTextOther": "תראו את הנתונים של השחקן הזה ב-LexiClash",
+      "shareTextOwn": "תראו את הנתונים שלי ב-LexiClash: רמה {level}, {achievements} הישגים"
+    },
+    "solo": {
+      "body": "תשלחו לחבר ותאתגרו אותו לשבור את זה.",
+      "bragButton": "להשוויץ",
+      "notNow": "לא עכשיו",
+      "recordTitle": "שיא חדש!",
+      "shareText": "עשיתי {score} נקודות ב-LexiClash. תצליחו יותר?",
+      "shareTextRecord": "שיא חדש ב-LexiClash: {score}. תצליחו יותר?",
+      "winTitle": "ניצחת!"
+    },
+    "text": {
+      "achievement": "פתחתי את '{name}' ב-LexiClash",
+      "level": "הגעתי לרמה {level} ב-LexiClash",
+      "record": "שיא אישי חדש: {score} ב{mode} ב-LexiClash. נראה אתכם",
+      "worldRecord": "הרגע קבעתי שיא עולם ב-LexiClash: {score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

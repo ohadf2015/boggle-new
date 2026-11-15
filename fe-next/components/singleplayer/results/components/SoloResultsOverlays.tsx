@@ -1,11 +1,8 @@
-import dynamic from 'next/dynamic';
 import { AnimatePresence } from 'framer-motion';
 import WordFeedbackModal from '@/components/voting/WordFeedbackModal';
 import TomorrowPreview from '@/components/results/TomorrowPreview';
-import { longestWordOf } from '@/components/results/utils';
+import { SoloBragPrompt } from './SoloBragPrompt';
 import type { SinglePlayerMode, SinglePlayerResultsData } from '../../SinglePlayerView';
-
-const UnifiedShareModal = dynamic(() => import('@/components/modals/UnifiedShareModal'), { ssr: false });
 
 const BOT_AVATAR = { emoji: '\u{1F916}', color: '#6366f1' };
 
@@ -13,7 +10,6 @@ interface Props {
   results: SinglePlayerResultsData;
   mode: SinglePlayerMode;
   isWinner: boolean;
-  gameLanguage: string;
   showTomorrowPreview: boolean;
   onTomorrowDismiss: () => void;
   wordValidationQueue: string[];
@@ -27,7 +23,7 @@ interface Props {
 
 /** Modals that sit over the solo results: tomorrow banner, bot-word vote, post-win share. */
 export function SoloResultsOverlays({
-  results, mode, isWinner, gameLanguage, showTomorrowPreview, onTomorrowDismiss,
+  results, mode, isWinner, showTomorrowPreview, onTomorrowDismiss,
   wordValidationQueue, showWordValidation, setShowWordValidation, onWordVote,
   showShareModal, onCloseShare, t,
 }: Props) {
@@ -47,19 +43,11 @@ export function SoloResultsOverlays({
           onSkip={() => setShowWordValidation(false)} onTimeout={() => setShowWordValidation(false)} />
       )}
 
-      <UnifiedShareModal
-        isOpen={showShareModal}
+      <SoloBragPrompt
+        open={showShareModal}
         onClose={onCloseShare}
-        gameCode={`sp_${results.gameSessionId || ''}`}
-        context="post-game"
-        gameResult={{
-          score: results.playerScore,
-          wordCount: results.playerWords?.length || 0,
-          isWinner: isWinner || results.isNewHighScore,
-          longestWord: longestWordOf(results.playerWords),
-          maxCombo: results.maxCombo,
-        }}
-        language={gameLanguage}
+        results={results}
+        isWinner={isWinner}
         t={t}
       />
     </>

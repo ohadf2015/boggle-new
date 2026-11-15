@@ -3,6 +3,8 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BragButton, useBragSharer } from '@/components/share/BragButton';
+import { getBragShareUrl } from '@/utils/share';
 import type { ResultsMode } from '@/lib/rivals/types';
 import {
   PUBLISHING_MODES,
@@ -21,6 +23,7 @@ const noRecord = () => null;
 
 export function NewRecordBanner({ mode, score }: NewRecordBannerProps) {
   const { t, language } = useLanguage();
+  const { me } = useBragSharer();
   const published = useSyncExternalStore(subscribeRunRecords, () => getRunRecord(mode), noRecord);
   const [ledgerRecord, setLedgerRecord] = useState<RunRecord | null>(null);
   const usesLedger = !PUBLISHING_MODES.has(mode);
@@ -49,6 +52,15 @@ export function NewRecordBanner({ mode, score }: NewRecordBannerProps) {
           {t('progression.records.beatPrevious', { value: fmt(record.value), previous: fmt(record.previous) })}
         </p>
       </div>
+      {mode !== 'edu' && (
+        <BragButton
+          surface="new_record"
+          kind="record"
+          size="sm"
+          text={t('brag2.text.record', { score: fmt(record.value), mode: t(`brag2.mode.${mode}`) })}
+          url={getBragShareUrl('me', { score: record.value, mode, kind: 'record', me })}
+        />
+      )}
     </div>
   );
 }

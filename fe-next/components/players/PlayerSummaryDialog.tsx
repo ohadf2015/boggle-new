@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Swords } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import LevelBadge from '@/components/LevelBadge';
@@ -21,6 +21,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 import { trpc } from '@/lib/trpc';
 import { playerProfileHref, summaryAccess, type PlayerSummarySeed } from './playerSummaryModel';
 import { resolveBoardPlayer } from './resolveBoardPlayer';
+import { playerChallengeHref } from './challengeHref';
 
 interface PlayerSummaryDialogProps {
   player: PlayerSummarySeed;
@@ -29,6 +30,13 @@ interface PlayerSummaryDialogProps {
   /** Analytics surface, e.g. 'daily_leaderboard'. */
   surface: string;
 }
+
+const PRIMARY = cn(
+  'flex-1 inline-flex items-center justify-center gap-2 h-12 px-4 rounded-neo',
+  'border-3 border-neo-black shadow-hard',
+  'font-neo-display font-black uppercase tracking-wide text-sm',
+  'motion-safe:hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow]',
+);
 
 /** Trade an id-free board's row key for the account id, once, while the card is open. */
 function useResolvedId(player: PlayerSummarySeed, open: boolean, enabled: boolean) {
@@ -60,7 +68,7 @@ function useResolvedId(player: PlayerSummarySeed, open: boolean, enabled: boolea
  */
 export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: PlayerSummaryDialogProps) {
   const { t, language } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const friendCtx = useFriendStatus();
   const access = summaryAccess(player, {
     isAuthenticated,
@@ -92,6 +100,8 @@ export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: Pla
     [profile],
   );
   const showHandle = !!profile?.username && profile.username !== name;
+  const isSelf = !!id && (user?.id === id || friendCtx?.relationFor?.(id) === 'self');
+  const canChallenge = !!id && isAuthenticated && !isSelf;
 
   const note =
     access === 'guest' ? t('playerSummary.guest')
@@ -157,6 +167,21 @@ export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: Pla
             <p data-testid="player-summary-note" className="text-sm font-bold text-neo-white/75 text-center">{note}</p>
           )}
 
+          {canChallenge && (
+            <div className="flex items-stretch gap-2">
+              <Link
+                href={playerChallengeHref(language, id!, friendCtx?.relationFor(id) === 'friend')}
+                data-testid="player-summary-challenge"
+                onClick={() => trackGrowthEvent('player_summary_challenge_clicked', { surface })}
+                className={cn(PRIMARY, 'bg-neo-orange text-neo-black')}
+              >
+                <Swords aria-hidden className="w-4 h-4" strokeWidth={3} />
+                {t('profile.challenge')}
+              </Link>
+              <FriendQuickAction userId={id} name={name} surface={surface} className="h-12 min-w-12 px-3" />
+            </div>
+          )}
+
           <div className="flex items-stretch gap-2">
             {id ? (
               <Link
@@ -164,10 +189,10 @@ export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: Pla
                 data-testid="player-summary-profile-link"
                 onClick={() => trackGrowthEvent('player_summary_profile_clicked', { surface })}
                 className={cn(
-                  'flex-1 inline-flex items-center justify-center gap-2 h-12 px-4 rounded-neo',
-                  'border-3 border-neo-black bg-neo-lime text-neo-black shadow-hard',
-                  'font-neo-display font-black uppercase tracking-wide text-sm',
-                  'motion-safe:hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none transition-[transform,box-shadow]',
+                  PRIMARY,
+                  canChallenge
+                    ? 'h-10 bg-neo-navy-light text-neo-white shadow-hard-sm'
+                    : 'bg-neo-lime text-neo-black',
                 )}
               >
                 {t('playerSummary.viewProfile')}
@@ -178,7 +203,7 @@ export function PlayerSummaryDialog({ player, open, onOpenChange, surface }: Pla
                 <Loader2 aria-hidden className="w-5 h-5 animate-spin text-neo-white/70" />
               </span>
             ) : null}
-            {id && (
+            {id && !canChallenge && (
               <FriendQuickAction userId={id} name={name} surface={surface} className="h-12 min-w-12 px-3" />
             )}
           </div>

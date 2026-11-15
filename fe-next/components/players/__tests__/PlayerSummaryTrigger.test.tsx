@@ -85,7 +85,7 @@ describe('PlayerSummaryTrigger', () => {
 
   it('resolves a daily board key for a signed-in viewer, then links the profile', async () => {
     const resolveBoardKey = vi.fn(async () => 'u-9');
-    friendCtx.value = { isAuthenticated: true, boardDate: '2026-11-14', resolveBoardKey };
+    friendCtx.value = { isAuthenticated: true, boardDate: '2026-11-14', resolveBoardKey, relationFor: () => 'none' };
     getQuery.mockImplementation(({ id }: { id: string }) =>
       id ? { data: { ...PROFILE, id }, isLoading: false, isError: false } : { data: undefined, isLoading: false, isError: false });
 

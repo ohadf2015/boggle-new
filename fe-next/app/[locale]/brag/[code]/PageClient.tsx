@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { BragKind } from '@/lib/results/bragOgModel';
 
 /**
  * Shows the shared result and puts the rematch one tap away.
@@ -16,14 +17,22 @@ export default function BragPageClient({
   code,
   imageQuery,
   hasRival,
+  kind = 'result',
 }: {
   locale: string;
   code: string;
   imageQuery: string;
   hasRival: boolean;
+  kind?: BragKind;
 }) {
   const { t } = useLanguage();
-  const joinHref = `/${locale}?room=${encodeURIComponent(code)}&utm_source=brag_page&utm_medium=referral&utm_campaign=player_invite`;
+  const utm = 'utm_source=brag_page&utm_medium=referral&utm_campaign=player_invite';
+  const isMoment = kind !== 'result';
+  const noRoom = isMoment || code === 'solo';
+  const ctaHref = noRoom ? `/${locale}?${utm}` : `/${locale}?room=${encodeURIComponent(code)}&${utm}`;
+  const heading = isMoment
+    ? t(`brag2.page.title.${kind}`)
+    : hasRival ? t('brag.page.titleVs', 'Think you can beat this?') : t('brag.page.titleSolo', 'Think you can beat this score?');
 
   return (
     <main className="min-h-screen bg-neo-navy flex flex-col items-center justify-center gap-6 px-4 py-10">
@@ -44,7 +53,7 @@ export default function BragPageClient({
 
         <div className="flex flex-col gap-3 text-center">
           <h1 className="font-neo-display font-bold text-2xl sm:text-3xl text-neo-white">
-            {hasRival ? t('brag.page.titleVs', 'Think you can beat this?') : t('brag.page.titleSolo', 'Think you can beat this score?')}
+            {heading}
           </h1>
           <p className="font-neo-body text-neo-white/70 text-sm sm:text-base">
             {t('brag.page.sub', 'No signup, no download. Jump straight into the next round.')}
@@ -52,18 +61,20 @@ export default function BragPageClient({
         </div>
 
         <Link
-          href={joinHref}
+          href={ctaHref}
           className="w-full flex items-center justify-center py-4 px-6 border-neo-thick border-black bg-neo-lime text-neo-navy font-neo-display font-bold text-lg rounded-neo shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed transition-[box-shadow]"
         >
-          {t('brag.page.cta', 'Take the rematch')}
+          {noRoom ? t('brag2.page.ctaPlay') : t('brag.page.cta', 'Take the rematch')}
         </Link>
 
-        <Link
-          href={`/${locale}`}
-          className="text-center font-neo-body text-sm text-neo-white/60 underline hover:text-neo-white transition-colors"
-        >
-          {t('brag.page.explore', 'Or explore LexiClash')}
-        </Link>
+        {!noRoom && (
+          <Link
+            href={`/${locale}`}
+            className="text-center font-neo-body text-sm text-neo-white/60 underline hover:text-neo-white transition-colors"
+          >
+            {t('brag.page.explore', 'Or explore LexiClash')}
+          </Link>
+        )}
       </div>
     </main>
   );

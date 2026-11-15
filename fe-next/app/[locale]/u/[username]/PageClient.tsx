@@ -13,6 +13,7 @@ import { ProfileAchievementsPublic } from '@/components/profile/ProfileAchieveme
 import { ShowcaseStage } from '@/components/profile/showcase/ShowcaseStage';
 import { useShareProfile } from '@/components/profile/showcase/useShareProfile';
 import { useProfileViewTracking } from '@/components/profile/showcase/useProfileViewTracking';
+import { ProfileSocialActions } from '@/components/players/ProfileSocialActions';
 import { friendlyDisplayName, getHeadlineStats } from '@/components/profile/showcase/profileShowcaseModel';
 import { getCollectionProgress } from '@/lib/avatar/unlocks';
 import { scoreTier } from '@/lib/seasons/scoreTier';
@@ -115,6 +116,9 @@ export default function PublicProfilePageClient({ username }: { username: string
             isOwn={false}
             onShare={share}
           />
+          {!isOwn && !authLoading && (
+            <ProfileSocialActions userId={profile.id} name={name} surface="public_profile" />
+          )}
         </div>
 
         <div className="min-w-0 mt-6 md:mt-0 flex flex-col gap-4">

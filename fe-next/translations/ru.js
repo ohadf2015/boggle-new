@@ -22721,6 +22721,68 @@ const ru = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "Похвастаться"
+    },
+    "classWin": {
+      "button": "Поделиться победой класса",
+      "copied": "Ссылка скопирована",
+      "pageCta": "Попробуйте LexiClash с классом",
+      "pageEyebrow": "Победа класса",
+      "pageHeadline": "Класс вместе нашёл {words} слов",
+      "pageLesson": "{found} из {total} слов урока",
+      "text": "Наш класс из {students} учеников вместе нашёл {words} слов в режиме «{mode}»!",
+      "textNoMode": "Наш класс из {students} учеников вместе нашёл {words} слов в LexiClash!",
+      "title": "Победа нашего класса в LexiClash"
+    },
+    "mode": {
+      "blast": "Бласт",
+      "daily": "Ежедневная",
+      "edu": "Практика",
+      "multiplayer": "Мультиплеер",
+      "quickPlay": "Быстрая игра",
+      "single": "Соло",
+      "tower": "Башня слов"
+    },
+    "mp": {
+      "bragButton": "Похвастаться",
+      "signInToAdd": "Войдите, чтобы добавить",
+      "winText": "Победа {score}–{rival} в LexiClash. Твой ход",
+      "winTextSolo": "Победа с {score} очками в LexiClash. Твой ход"
+    },
+    "page": {
+      "ctaPlay": "Играть",
+      "title": {
+        "achievement": "Новое достижение. Твой ход.",
+        "level": "Новый уровень. Догонишь?",
+        "record": "Новый личный рекорд. Думаешь, побьёшь?",
+        "worldRecord": "Новый мировой рекорд. Думаешь, побьёшь?"
+      }
+    },
+    "profile": {
+      "metaTitle": "{name} в LexiClash",
+      "shareTextOther": "Посмотри статистику этого игрока в LexiClash",
+      "shareTextOwn": "Моя статистика в LexiClash: уровень {level}, достижений: {achievements}"
+    },
+    "solo": {
+      "body": "Отправь другу и предложи побить.",
+      "bragButton": "Похвастаться",
+      "notNow": "Не сейчас",
+      "recordTitle": "Новый рекорд!",
+      "shareText": "{score} очков в LexiClash. Сможешь больше?",
+      "shareTextRecord": "Новый рекорд в LexiClash: {score}. Сможешь больше?",
+      "winTitle": "Победа!"
+    },
+    "text": {
+      "achievement": "Открыто достижение «{name}» в LexiClash",
+      "level": "Уровень {level} в LexiClash!",
+      "record": "Новый личный рекорд: {score} в режиме «{mode}» в LexiClash. Попробуй побить",
+      "worldRecord": "Новый мировой рекорд в LexiClash: {score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

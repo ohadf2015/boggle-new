@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import {
-  Trophy, Hash, Target, TrendingUp, Calendar,
-  Swords, UserPlus, UserCheck, Clock, ArrowLeft, Star, Award,
+  Trophy, Hash, Target, TrendingUp, Calendar, ArrowLeft, Star, Award,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LevelBadge from '@/components/LevelBadge';
@@ -17,14 +16,12 @@ import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { Loader } from '@/components/ui/Loader';
-import { sendFriendRequest } from '@/utils/friends';
 import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import { getAchievementIcon } from '@/constants/achievementIcons';
-import { createClient } from '@/utils/supabase/client';
 import type { PublicProfile } from '@/shared/types/publicProfile';
 import { RankBadge } from '@/components/results/MmrChangeBadge';
-
-type FriendshipState = 'none' | 'pending' | 'accepted' | 'blocked' | 'loading';
+import { ProfileSocialActions } from '@/components/players/ProfileSocialActions';
+import { ProfileShareButton } from '@/components/players/ProfileShareButton';
 
 /**
  * Percentile tier styling
@@ -43,16 +40,13 @@ function getPercentileTier(percentile: number) {
  */
 export default function PlayerProfilePageClient() {
   const { t, language } = useLanguage();
-  const router = useRouter();
   const { id } = useParams<{ id: string }>();
   const goBack = useSafeBack(`/${language}`);
-  const { profile: myProfile, isAuthenticated } = useAuth();
+  const { profile: myProfile } = useAuth();
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [friendshipState, setFriendshipState] = useState<FriendshipState>('none');
-  const [friendActionLoading, setFriendActionLoading] = useState(false);
 
   const isOwnProfile = myProfile?.id === id;
 
@@ -80,50 +74,9 @@ export default function PlayerProfilePageClient() {
     }
   }, [id]);
 
-  // Fetch friendship status between current user and profile user
-  const fetchFriendshipStatus = useCallback(async () => {
-    if (!id || !isAuthenticated || !myProfile?.id || isOwnProfile) return;
-    setFriendshipState('loading');
-
-    try {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('friends')
-        .select('status')
-        .or(
-          `and(user_id.eq.${myProfile.id},friend_id.eq.${id}),and(user_id.eq.${id},friend_id.eq.${myProfile.id})`
-        )
-        .single();
-
-      setFriendshipState(data?.status ?? 'none');
-    } catch {
-      setFriendshipState('none');
-    }
-  }, [id, isAuthenticated, myProfile?.id, isOwnProfile]);
-
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
-
-  useEffect(() => {
-    fetchFriendshipStatus();
-  }, [fetchFriendshipStatus]);
-
-  const handleAddFriend = async () => {
-    if (!id || friendActionLoading) return;
-    setFriendActionLoading(true);
-    const result = await sendFriendRequest(id);
-    if (result.success) {
-      setFriendshipState('pending');
-    }
-    setFriendActionLoading(false);
-  };
-
-  const handleChallenge = () => {
-    if (!id) return;
-    // Navigate to multiplayer lobby with auto-create room
-    router.push(`/${language}/multiplayer?challenge=${id}&autoCreate=true`);
-  };
 
   if (loading) {
     return (
@@ -148,6 +101,7 @@ export default function PlayerProfilePageClient() {
   }
 
   const tier = getPercentileTier(profile.percentile);
+  const achievementTotal = Object.values(profile.achievementCounts).reduce((a, b) => a + b, 0);
 
   // Sort achievements: Hall of Fame first, then by count descending
   const sortedAchievements = Object.entries(profile.achievementCounts)
@@ -227,31 +181,21 @@ export default function PlayerProfilePageClient() {
           </div>
         </div>
 
-        {/* Action buttons */}
-        {!isOwnProfile && (
-          <div className="flex gap-2 mt-4">
-            <button
-              type="button"
-              onClick={handleChallenge}
-              className={cn(
-                'flex-1 flex items-center justify-center gap-1.5',
-                'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-                'bg-neo-orange text-neo-black font-black text-sm uppercase',
-                'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-                'transition-[filter,box-shadow,translate,scale,rotate,transform]'
-              )}
-            >
-              <Swords className="w-4 h-4" />
-              {t('profile.challenge')}
-            </button>
-            {isAuthenticated && <FriendButton
-              state={friendshipState}
-              loading={friendActionLoading}
-              onAdd={handleAddFriend}
-              t={t}
-            />}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2 mt-4">
+          {!isOwnProfile && id && (
+            <ProfileSocialActions userId={id} name={profile.displayName} surface="player_profile" className="flex-1 min-w-48" />
+          )}
+          {id && (
+            <ProfileShareButton
+              userId={id}
+              isOwn={isOwnProfile}
+              level={profile.currentLevel}
+              achievements={achievementTotal}
+              surface="player_profile"
+              className={isOwnProfile ? 'flex-1' : undefined}
+            />
+          )}
+        </div>
       </m.div>
 
       {/* Stats Grid */}
@@ -289,7 +233,7 @@ export default function PlayerProfilePageClient() {
         />
         <StatCard
           icon={<Award className="w-4 h-4 text-purple-400" />}
-          value={Object.values(profile.achievementCounts).reduce((a, b) => a + b, 0).toString()}
+          value={achievementTotal.toString()}
           label={t('profile.achievements')}
         />
       </m.div>
@@ -345,70 +289,6 @@ export default function PlayerProfilePageClient() {
         </m.div>
       )}
     </div>
-  );
-}
-
-/**
- * Friend button with state-aware display
- */
-function FriendButton({
-  state,
-  loading,
-  onAdd,
-  t,
-}: {
-  state: FriendshipState;
-  loading: boolean;
-  onAdd: () => void;
-  t: (key: string) => string;
-}) {
-  const base = cn(
-    'flex items-center justify-center gap-1.5',
-    'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard-sm',
-    'font-black text-sm uppercase transition-[filter,box-shadow,translate,scale,rotate,transform]',
-  );
-
-  if (state === 'loading') {
-    return (
-      <div className={cn(base, 'bg-slate-600 text-slate-300 cursor-default')}>
-        <Loader size="sm" />
-      </div>
-    );
-  }
-
-  if (state === 'accepted') {
-    return (
-      <div className={cn(base, 'bg-neo-lime/20 text-neo-lime border-neo-lime/50 cursor-default')}>
-        <UserCheck className="w-4 h-4" />
-        {t('profile.friends')}
-      </div>
-    );
-  }
-
-  if (state === 'pending') {
-    return (
-      <div className={cn(base, 'bg-neo-navy-elevated text-slate-300 cursor-default')}>
-        <Clock className="w-4 h-4" />
-        {t('profile.requestSent')}
-      </div>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={onAdd}
-      disabled={loading}
-      className={cn(
-        base,
-        'bg-neo-cyan text-neo-black',
-        'hover:brightness-110 active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px]',
-        loading && 'opacity-60 pointer-events-none'
-      )}
-    >
-      {loading ? <Loader size="sm" /> : <UserPlus className="w-4 h-4" />}
-      {t('profile.addFriend')}
-    </button>
   );
 }
 

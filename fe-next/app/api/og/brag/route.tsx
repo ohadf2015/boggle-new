@@ -32,22 +32,22 @@ const LIME = '#BFFF00';
 const PINK = '#FF1493';
 const CYAN = '#00FFFF';
 const BLACK = '#000000';
+const YELLOW = '#FFE135';
+const PURPLE = '#B47CFF';
+
+const MOMENT_ACCENT: Record<string, string> = { record: YELLOW, worldRecord: YELLOW, achievement: LIME, level: PURPLE };
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const m = deriveBragOgModel(searchParams);
 
-  const headline =
-    m.outcome === 'won'
-      ? 'VICTORY'
-      : m.outcome === 'lost'
-        ? 'SO CLOSE'
-        : m.outcome === 'tie'
-          ? 'DEAD HEAT'
-          : 'FINAL SCORE';
-
-  const accent = m.outcome === 'won' ? LIME : m.outcome === 'lost' ? PINK : CYAN;
+  const headline = m.headline;
+  const isMoment = m.kind !== 'result';
+  const accent = isMoment
+    ? MOMENT_ACCENT[m.kind]
+    : m.outcome === 'won' ? LIME : m.outcome === 'lost' ? PINK : CYAN;
   const isVersus = m.rivalScore != null;
+  const chip = m.kind === 'achievement' ? 'UNLOCKED' : m.kind === 'level' ? 'LEVEL UP' : m.modeLabel;
 
   const statBits: string[] = [];
   if (m.words != null) statBits.push(`${m.words} WORDS`);
@@ -114,10 +114,14 @@ export async function GET(request: NextRequest) {
                 letterSpacing: '0.08em',
               }}
             >
-              {m.modeLabel}
+              {isMoment ? chip : m.modeLabel}
             </div>
           </div>
 
+          {isMoment ? (
+            <MomentBody headline={headline} score={m.kind === 'level' || m.kind === 'achievement' ? null : m.score} title={m.imageTitle} me={m.imageMe} />
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
           {/* The verdict, then your number. The rival's score lives on its own
               bar below, so it is not printed three times. */}
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: 18 }}>
@@ -173,6 +177,9 @@ export async function GET(request: NextRequest) {
             </div>
           )}
 
+            </div>
+          )}
+
           {/* Footer: stats left, the dare right. */}
           <div
             style={{
@@ -193,7 +200,7 @@ export async function GET(request: NextRequest) {
                 letterSpacing: '0.06em',
               }}
             >
-              {statBits.join('   ·   ')}
+              {isMoment ? 'BEAT THAT' : statBits.join('   ·   ')}
             </div>
             <div
               style={{
@@ -274,6 +281,31 @@ function ScoreBar({
       >
         {value}
       </div>
+    </div>
+  );
+}
+
+function MomentBody({ headline, score, title, me }: { headline: string; score: number | null; title: string | null; me: string | null }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 22 }}>
+      <div style={{ display: 'flex', fontSize: 76, fontWeight: 900, color: INK, letterSpacing: '-0.035em', lineHeight: 1 }}>
+        {headline}
+      </div>
+      {score != null && (
+        <div style={{ display: 'flex', fontSize: 132, fontWeight: 900, color: INK, lineHeight: 1, letterSpacing: '-0.05em', marginTop: 6 }}>
+          {score}
+        </div>
+      )}
+      {title && (
+        <div style={{ display: 'flex', fontSize: score != null ? 40 : 64, fontWeight: 900, color: INK, lineHeight: 1.1, marginTop: 18 }}>
+          {title}
+        </div>
+      )}
+      {me && (
+        <div style={{ display: 'flex', fontSize: 30, fontWeight: 700, color: '#4a5068', marginTop: 16, letterSpacing: '0.02em' }}>
+          {`BY ${me.toUpperCase()}`}
+        </div>
+      )}
     </div>
   );
 }

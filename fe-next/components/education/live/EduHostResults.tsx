@@ -11,7 +11,11 @@
  * frame or a zoomed TV lays out like the wall.
  */
 import type { ReactNode } from 'react';
-import { Loader2, LogOut, RotateCcw, Shuffle, Target } from 'lucide-react';
+import { Loader2, LogOut, PartyPopper, RotateCcw, Shuffle, Target } from 'lucide-react';
+import toast from 'react-hot-toast';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { buildClassWinShare, CLASS_WIN_FALLBACK, type ClassWinShare } from '@/lib/education/classWinShare';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomTvResultsScreenProps } from '@/host/components/tv-results/ClassroomTvResultsScreen';
@@ -74,6 +78,8 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
   exportSlot?: ReactNode;
   /** A free teacher's Teacher Pro report preview: for the teacher, not the class watching the wall, so under More. */
   proSlot?: ReactNode;
+  /** Share class win: a name-free class card, under More. */
+  bragSlot?: ReactNode;
 }
 
 /**
@@ -81,7 +87,7 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
  * under it as the one quiet rematch. Everything rarer (share, next game, export, end) waits under More, so the
  * wall reads as one choice.
  */
-function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot, proSlot }: ActionsProps) {
+function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot, proSlot, bragSlot }: ActionsProps) {
   const playAgain = onRematch
     ? () => {
         trackResultsAction('rematch', 'projector');
@@ -89,7 +95,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
       }
     : undefined;
   const quietPlayAgain = practiceLeads && !!playAgain;
-  const hasMore = !!secondary || !!exportSlot || !!proSlot || !!onClose || !!onExitRoom;
+  const hasMore = !!bragSlot || !!secondary || !!exportSlot || !!proSlot || !!onClose || !!onExitRoom;
 
   return (
     <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 @5xl/results:gap-3">
@@ -124,6 +130,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
                 )}
               </div>
             )}
+            {bragSlot}
             {secondary}
             {exportSlot}
             {proSlot}
@@ -134,6 +141,20 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
   );
 }
 
+
+function ShareClassWinButton({ share, label, copied }: { share: ClassWinShare; label: string; copied: string }) {
+  const onShare = async () => {
+    const result = await shareWithFallback({ title: share.title, text: `${share.text} `, url: share.url });
+    if (result === 'copied') toast.success(copied);
+    posthog.capture('brag_share_tapped', { surface: 'edu_class_win', kind: 'class', result });
+  };
+  return (
+    <button type="button" data-testid="edu-results-share-class-win" onClick={onShare} className={cn(TERTIARY, 'basis-auto border-neo-lime text-neo-lime')}>
+      <PartyPopper className="size-4 shrink-0" aria-hidden="true" />
+      {label}
+    </button>
+  );
+}
 
 const PRIMARY_SIZE = cn(
   PRESS,
@@ -187,6 +208,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const students = stats?.students ?? 0;
   const practice = isRehearsalRound(players, searchParams?.get('practice') === '1' || undefined);
   const shortWall = bossOver;
+  const classWin = practice ? null : buildClassWinShare({ summary, players, gameCode, locale: language, t: (key, params) => tf(key, CLASS_WIN_FALLBACK[key] ?? key, params) });
   const proCard = !proLoading && !hasPro && !practice && summary.totalWords > 0;
   const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
@@ -326,6 +348,15 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                 onClose={onClose}
                 onExitRoom={onExitRoom}
                 practiceLeads={practiceLeads}
+                bragSlot={
+                  classWin ? (
+                    <ShareClassWinButton
+                      share={classWin}
+                      label={tf('brag2.classWin.button', 'Share class win')}
+                      copied={tf('brag2.classWin.copied', 'Link copied')}
+                    />
+                  ) : null
+                }
                 proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} round={round} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
                 exportSlot={
                   // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.

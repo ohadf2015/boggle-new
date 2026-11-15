@@ -22042,6 +22042,68 @@ const en = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "Brag"
+    },
+    "classWin": {
+      "button": "Share class win",
+      "copied": "Link copied",
+      "pageCta": "Try LexiClash with your class",
+      "pageEyebrow": "Class win",
+      "pageHeadline": "A class found {words} words together",
+      "pageLesson": "{found} of {total} lesson words",
+      "text": "Our class of {students} found {words} words together in {mode}!",
+      "textNoMode": "Our class of {students} found {words} words together on LexiClash!",
+      "title": "Our class win on LexiClash"
+    },
+    "mode": {
+      "blast": "Blast",
+      "daily": "Daily",
+      "edu": "Practice",
+      "multiplayer": "Multiplayer",
+      "quickPlay": "Quick Play",
+      "single": "Solo",
+      "tower": "Word Tower"
+    },
+    "mp": {
+      "bragButton": "Brag",
+      "signInToAdd": "Sign in to add",
+      "winText": "I won {score}–{rival} on LexiClash. Your turn",
+      "winTextSolo": "I won with {score} points on LexiClash. Your turn"
+    },
+    "page": {
+      "ctaPlay": "Play now",
+      "title": {
+        "achievement": "Achievement unlocked. Your turn.",
+        "level": "Level up. Can you catch up?",
+        "record": "A new personal best. Think you can beat it?",
+        "worldRecord": "A new world record. Think you can beat it?"
+      }
+    },
+    "profile": {
+      "metaTitle": "{name} on LexiClash",
+      "shareTextOther": "Check out this player's LexiClash stats",
+      "shareTextOwn": "Check my LexiClash stats: level {level}, {achievements} achievements"
+    },
+    "solo": {
+      "body": "Send it to a friend and dare them to beat it.",
+      "bragButton": "Brag",
+      "notNow": "Not now",
+      "recordTitle": "New high score!",
+      "shareText": "I scored {score} on LexiClash. Can you beat it?",
+      "shareTextRecord": "New high score on LexiClash: {score}. Can you beat it?",
+      "winTitle": "You won!"
+    },
+    "text": {
+      "achievement": "Unlocked '{name}' on LexiClash",
+      "level": "Hit level {level} on LexiClash",
+      "record": "New personal best: {score} in {mode} on LexiClash. Beat that",
+      "worldRecord": "I just set a LexiClash world record: {score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

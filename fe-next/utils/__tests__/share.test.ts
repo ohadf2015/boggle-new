@@ -90,6 +90,25 @@ describe('getBragShareUrl', () => {
     expect((parsed.searchParams.get('name') ?? '').length).toBeLessThanOrEqual(24);
   });
 
+  it('carries a personal moment: kind, a clamped title and the sharer name', async () => {
+    const { getBragShareUrl } = await import('@/utils/share');
+    const parsed = new URL(
+      getBragShareUrl('me', { score: 12, kind: 'level', title: 'x'.repeat(80), me: 'y'.repeat(80) })
+    );
+    expect(parsed.pathname).toBe('/en/brag/me');
+    expect(parsed.searchParams.get('kind')).toBe('level');
+    expect(parsed.searchParams.get('title')).toHaveLength(40);
+    expect(parsed.searchParams.get('me')).toHaveLength(24);
+  });
+
+  it('leaves kind off a plain result link', async () => {
+    const { getBragShareUrl } = await import('@/utils/share');
+    const parsed = new URL(getBragShareUrl('ABC123', { score: 10, kind: 'result' }));
+    expect(parsed.searchParams.get('kind')).toBeNull();
+    expect(parsed.searchParams.get('title')).toBeNull();
+    expect(parsed.searchParams.get('me')).toBeNull();
+  });
+
   it('falls back to the homepage when there is no game code', async () => {
     const { getBragShareUrl } = await import('@/utils/share');
     expect(getBragShareUrl(undefined)).toBe('https://lexiclash.live');

@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, ChevronDown, ChevronUp, Copy, Share2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Share2, Trophy } from 'lucide-react';
 import MpBragCard from '@/components/results/MpBragCard';
 import { deriveBragCardData, deriveBragShareText } from '@/lib/results/bragCard';
 import { getBragShareUrl, trackShareCompleted } from '@/utils/share';
+import { runBragShare } from '@/utils/bragShare';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { Avatar as AvatarType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -17,8 +18,7 @@ export interface MpBragStripPlayer {
   score: number;
 }
 
-export interface MpBragStripProps {
-  visible: boolean;
+export interface MpBragInput {
   gameCode?: string;
   gameMode?: string;
   language: string;
@@ -29,43 +29,24 @@ export interface MpBragStripProps {
   wordsFound: number;
   longestWord?: string;
   maxCombo?: number;
-  current: MpBragStripPlayer;
   opponent?: MpBragStripPlayer;
+}
+
+export interface MpBragStripProps extends MpBragInput {
+  visible: boolean;
+  current: MpBragStripPlayer;
   modeLabel: string;
   onChallenge?: () => void;
+  /** Runs synchronously on the tap, before the share sheet opens (e.g. pause auto-continue). */
+  onShareStart?: () => void;
   className?: string;
   t: TFn;
 }
 
-/**
- * Collapsed brag strip + expandable MpBragCard on the NEW MpResultsStage chassis.
- * Impression fires once when the strip becomes visible (IntersectionObserver),
- * matching privacy/no-board-spoiler (scores + names only; no board letters).
- */
-export function MpBragStrip({
-  visible,
-  gameCode,
-  gameMode,
-  language,
-  isWinner,
-  rank,
-  playerCount,
-  score,
-  wordsFound,
-  longestWord,
-  maxCombo,
-  current,
-  opponent,
-  modeLabel,
-  onChallenge,
-  className,
-  t,
-}: MpBragStripProps) {
-  const [expanded, setExpanded] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const impressed = useRef(false);
-  const rootRef = useRef<HTMLDivElement | null>(null);
-
+export function useMpBrag(
+  { gameCode, gameMode, language, isWinner, rank, playerCount, score, wordsFound, longestWord, maxCombo, opponent }: MpBragInput,
+  t: TFn,
+) {
   const data = useMemo(
     () =>
       deriveBragCardData({
@@ -97,10 +78,51 @@ export function MpBragStrip({
     [gameCode, score, data.rival, gameMode, wordsFound, longestWord],
   );
 
-  const shareText = useMemo(() => {
+  const cardText = useMemo(() => {
     const { key, params } = deriveBragShareText(data, score);
     return t(key, params);
   }, [data, score, t]);
+
+  const winText = isWinner
+    ? data.rival
+      ? t('brag2.mp.winText', { score, rival: data.rival.score })
+      : t('brag2.mp.winTextSolo', { score })
+    : null;
+  const shareText = winText ?? cardText;
+
+  const share = useCallback(
+    (surface: string) =>
+      runBragShare({ text: shareText, url: shareUrl, surface, kind: isWinner ? 'mp_win' : 'mp_result', copiedLabel: t('brag.copied') }),
+    [shareText, shareUrl, isWinner, t],
+  );
+
+  return { data, shareUrl, shareText, cardText, share };
+}
+
+/**
+ * Collapsed brag strip + expandable MpBragCard on the NEW MpResultsStage chassis.
+ * Impression fires once when the strip becomes visible (IntersectionObserver),
+ * matching privacy/no-board-spoiler (scores + names only; no board letters).
+ */
+export function MpBragStrip({
+  visible,
+  gameCode,
+  gameMode,
+  language,
+  isWinner,
+  current,
+  modeLabel,
+  onChallenge,
+  onShareStart,
+  className,
+  t,
+  ...rest
+}: MpBragStripProps) {
+  const [expanded, setExpanded] = useState(false);
+  const impressed = useRef(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const { data, shareUrl, cardText, share } = useMpBrag({ gameCode, gameMode, language, isWinner, ...rest }, t);
+  const { score } = rest;
 
   const scoreline = data.rival ? `${score} - ${data.rival.score}` : `${score}`;
 
@@ -150,23 +172,19 @@ export function MpBragStrip({
     });
   }, [gameMode, data.outcome, language]);
 
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      return;
-    }
-    trackGrowthEvent('mp_brag_card_copy_link', {
-      gameMode: gameMode ?? 'unknown',
-      outcome: data.outcome,
-      language,
-      hasRoomLink: !!gameCode,
-      surface: 'strip',
+  const handleShare = useCallback(() => {
+    onShareStart?.();
+    void share('mp_brag_strip').then((result) => {
+      if (result !== 'copied') return;
+      trackGrowthEvent('mp_brag_card_copy_link', {
+        gameMode: gameMode ?? 'unknown',
+        outcome: data.outcome,
+        language,
+        hasRoomLink: !!gameCode,
+        surface: 'strip',
+      });
     });
-    trackShareCompleted('clipboard', { surface: 'mp_brag_strip' });
-  }, [shareText, shareUrl, gameMode, data.outcome, language, gameCode]);
+  }, [onShareStart, share, gameMode, data.outcome, language, gameCode]);
 
   if (!visible) return null;
 
@@ -186,22 +204,27 @@ export function MpBragStrip({
         </button>
         <button
           type="button"
-          onClick={handleCopy}
+          onClick={handleShare}
           data-testid="mp-brag-strip-copy"
-          className="shrink-0 flex items-center gap-1.5 py-2 px-3 border-2 border-black bg-neo-pink text-neo-white font-neo-body font-bold text-sm rounded-neo shadow-hard-sm"
+          className={cn(
+            'shrink-0 flex items-center gap-1.5 border-2 border-neo-black rounded-neo font-neo-body font-bold',
+            isWinner
+              ? 'py-2.5 px-4 bg-neo-lime text-neo-black text-base uppercase shadow-hard motion-safe:animate-mp-bump active:translate-y-0.5 active:shadow-none'
+              : 'py-2 px-3 bg-neo-pink text-neo-white text-sm shadow-hard-sm',
+          )}
         >
-          {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-          <span>{copied ? t('brag.copied') : t('brag.share')}</span>
+          {isWinner ? <Trophy className="w-5 h-5" aria-hidden="true" /> : <Share2 className="w-4 h-4" aria-hidden="true" />}
+          <span>{isWinner ? t('brag2.mp.bragButton') : t('brag.share')}</span>
         </button>
       </div>
       {expanded && (
         <MpBragCard
           data={data}
           current={current}
-          opponent={opponent}
+          opponent={rest.opponent}
           modeLabel={modeLabel}
           shareUrl={shareUrl}
-          shareText={shareText}
+          shareText={cardText}
           onCopyLink={() =>
             trackGrowthEvent('mp_brag_card_copy_link', {
               gameMode: gameMode ?? 'unknown',

@@ -13,6 +13,8 @@ import type { ResultsMode } from '@/lib/rivals/types';
 import { cn } from '@/lib/utils';
 import { isPlaceholderName } from '@/lib/displayName';
 import { isGeneratedName } from '@/utils/defaultPlayerNames';
+import { BragButton, useBragSharer } from '@/components/share/BragButton';
+import { getBragShareUrl } from '@/utils/share';
 
 export interface WorldRecordChipProps {
   mode: ResultsMode;
@@ -36,6 +38,7 @@ export function WorldRecordChip({ mode, subMode, score, className }: WorldRecord
   const { user, profile, loading } = useAuth();
   const { records, status } = useWorldRecords();
   const format = useRecordFormatter();
+  const { me } = useBragSharer();
   const key = recordKeyFor(mode, subMode);
   const record = key && status === 'ready' ? records.find((r) => r.recordKey === key) : undefined;
 
@@ -89,6 +92,15 @@ export function WorldRecordChip({ mode, subMode, score, className }: WorldRecord
           </p>
         )}
       </div>
+      {state === 'new' && typeof score === 'number' && (
+        <BragButton
+          surface="world_record"
+          kind="worldRecord"
+          size="sm"
+          text={t('brag2.text.worldRecord', { score: format(score, record.unit) })}
+          url={getBragShareUrl('me', { score, mode, kind: 'worldRecord', me })}
+        />
+      )}
     </div>
   );
 }

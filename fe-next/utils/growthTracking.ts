@@ -188,6 +188,8 @@ export type GrowthEvent =
   | 'player_summary_profile_clicked'
   | 'friend_quick_reply_sent'
   | 'friend_invite_sent'
+  | 'player_summary_challenge_clicked'
+  | 'profile_challenge_clicked'
   | 'challenge_sent'
   // Engagement
   | 'achievement_earned'
