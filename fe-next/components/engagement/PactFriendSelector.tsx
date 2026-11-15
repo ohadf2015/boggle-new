@@ -103,7 +103,7 @@ export const PactFriendSelector: React.FC<PactFriendSelectorProps> = memo(
     return (
       <div role="dialog" aria-modal="true"
         data-testid="pact-friend-selector"
-        role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
         onClick={onClose}
       >
         <div
