@@ -27,6 +27,7 @@ import {
   detectPlatform,
 } from '@/utils/posthogEngagement';
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
+import { enrichRageclick, installRageclickTargetTracker } from '@/utils/posthogRageclickTarget';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 import { installInpAttributionTracker } from '@/utils/inpAttribution';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
@@ -82,6 +83,7 @@ function initPostHog() {
 
   posthogInitialized = true;
 
+  installRageclickTargetTracker();
   posthog.init(key, {
     api_host: posthogApiHost(window.location.hostname, process.env.NEXT_PUBLIC_POSTHOG_HOST),
     ui_host: 'https://eu.posthog.com',
@@ -103,7 +105,9 @@ function initPostHog() {
     // element, so a homepage-LCP regression can't be targeted without guessing
     // (the 2026-06-03 /en LCP spike had an unknown LCP element for exactly this).
     capture_performance: { web_vitals: true, web_vitals_attribution: true },
-    before_send: filterEmptyException,
+    // $rageclick has a null target; stamp the last clicked element (Word Tower cluster).
+    before_send: (e: Parameters<typeof filterEmptyException>[0]) =>
+      enrichRageclick(filterEmptyException(e)),
     persistence: 'localStorage+cookie',
     loaded: (ph: PostHog) => {
       // If the user has already granted analytics consent in a prior session,
