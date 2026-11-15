@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+const capture = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture } }));
+
 import { fetchIncomingPings, pingErrorKey, reportRival, sendRivalPing } from '../pingClient';
 
 const fetchMock = vi.fn();
 beforeEach(() => {
   fetchMock.mockReset();
+  capture.mockReset();
   vi.stubGlobal('fetch', fetchMock);
 });
 const respond = (status: number, body: unknown) => fetchMock.mockResolvedValueOnce({ ok: status < 400, status, json: async () => body });
@@ -21,6 +25,21 @@ describe('sendRivalPing', () => {
   it('returns the server error code', async () => {
     respond(429, { error: 'target_cooldown' });
     expect(await sendRivalPing('t', 'gg', 'daily')).toEqual({ ok: false, code: 'target_cooldown' });
+  });
+
+  it('records every refusal with its code, so a ping that never lands is visible', async () => {
+    respond(403, { error: 'not_allowed' });
+    await sendRivalPing('t', 'gg', 'multiplayer');
+    expect(capture).toHaveBeenCalledWith('rival_ping_refused', { code: 'not_allowed', context: 'multiplayer', status: 403 });
+    fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+    await sendRivalPing('t', 'gg', 'reply');
+    expect(capture).toHaveBeenLastCalledWith('rival_ping_refused', { code: 'unavailable', context: 'reply', status: 0 });
+  });
+
+  it('records nothing on success', async () => {
+    respond(200, { ok: true });
+    await sendRivalPing('t', 'gg', 'daily');
+    expect(capture).not.toHaveBeenCalled();
   });
 
   it('maps a 401 without a body to sign_in_required and a network failure to unavailable', async () => {

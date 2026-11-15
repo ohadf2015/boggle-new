@@ -4,6 +4,7 @@ import { publicNameOrNull } from '@/lib/names/publicName';
 import { grantCountLadder, type RpcClient } from '@/backend/modules/achievements/grantAchievements';
 import { COUNT_LADDERS } from '@/backend/modules/achievements/progressionAchievements';
 import type { IncomingPingView } from './pingClient';
+import { shieldedIds } from './shielded';
 import {
   RIVAL_PING_DAILY_LIMIT,
   RIVAL_PING_ENTITY_PREFIX,
@@ -28,6 +29,7 @@ interface ProfileRow {
   id: string;
   display_name: string | null;
   username: string | null;
+  birth_year?: number | null;
 }
 
 export function publicNameOf(row: Pick<ProfileRow, 'display_name' | 'username'> | undefined): string | null {
@@ -41,15 +43,15 @@ export async function checkPingAllowed(db: Db, senderId: string, targetId: strin
 
   const pair = [senderId, targetId];
   const [profiles, blocks, students, consents, sent] = await Promise.all([
-    db.from('profiles').select('id, display_name, username').in('id', pair),
+    db.from('profiles').select('id, display_name, username, birth_year').in('id', pair),
     db
       .from('friends')
       .select('user_id')
       .eq('status', 'blocked')
       .or(`and(user_id.eq.${senderId},friend_id.eq.${targetId}),and(user_id.eq.${targetId},friend_id.eq.${senderId})`)
       .limit(2),
-    db.from('classroom_memberships').select('student_id').in('student_id', pair).limit(1),
-    db.from('parental_consents').select('user_id').in('user_id', pair).limit(1),
+    db.from('classroom_memberships').select('student_id').in('student_id', pair).limit(20),
+    db.from('parental_consents').select('user_id').in('user_id', pair).limit(2),
     db
       .from('user_notifications')
       .select('user_id, created_at')
@@ -70,7 +72,15 @@ export async function checkPingAllowed(db: Db, senderId: string, targetId: strin
   // Whoever blocked the sender stays private: the sender sees a generic refusal.
   if (blockRows.length > 0) return fail('not_allowed', 403);
 
-  if ((students.data ?? []).length > 0 || (consents.data ?? []).length > 0) return fail('not_allowed', 403);
+  const shielded = shieldedIds(
+    {
+      memberIds: ((students.data ?? []) as { student_id: string }[]).map((r) => r.student_id),
+      consentIds: ((consents.data ?? []) as { user_id: string }[]).map((r) => r.user_id),
+      birthYears: new Map(rows.map((r) => [r.id, r.birth_year])),
+    },
+    now,
+  );
+  if (shielded.has(senderId) || shielded.has(targetId)) return fail('not_allowed', 403);
   if (!publicNameOf(target)) return fail('not_allowed', 403);
 
   const senderName = publicNameOf(rows.find((r) => r.id === senderId));

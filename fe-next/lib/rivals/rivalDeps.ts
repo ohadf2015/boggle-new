@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadRankedDailyBoard } from '@/lib/daily/loadDailyBoard';
 import { fetchGhostRivals } from '@/lib/quickPlay/fetchGhostRivals';
 import { latestPingFrom } from './pings';
+import { shieldedIds } from './shielded';
 import { leagueWeekStartIso, loadLeagueNeighbors } from './leagueRivals';
 import type { H2HRow } from './pickers';
 import type { RivalDeps, RivalProfileRow } from './resolveRival';
@@ -88,21 +89,24 @@ export function rivalDeps(db: SupabaseClient, onError?: RivalDeps['onError']): R
       if (err2) throw new Error(err2.message);
       return (data ?? []).map((r: { player_id: string; game_code: string; created_at: string | null }) => ({ userId: r.player_id, gameCode: r.game_code, at: r.created_at }));
     },
-    // Same rule as the ping gate (pingServer.checkPingAllowed): students, parental consent, blocks.
+    // Same rule as the ping gate (pingServer.checkPingAllowed): shieldedIds, plus blocks.
     async excludedIds(me, ids) {
       const list = ids.slice(0, PROFILE_LIMIT);
-      const [students, consents, blocks] = await Promise.all([
+      const [students, consents, ages, blocks] = await Promise.all([
         db.from('classroom_memberships').select('student_id').in('student_id', list).limit(PROFILE_LIMIT * 4),
         db.from('parental_consents').select('user_id').in('user_id', list).limit(PROFILE_LIMIT),
+        db.from('profiles').select('id, birth_year').in('id', list).limit(PROFILE_LIMIT),
         me
           ? db.from('friends').select('user_id, friend_id').eq('status', 'blocked').or(`user_id.eq.${me},friend_id.eq.${me}`).limit(FRIEND_LIMIT * 4)
           : Promise.resolve({ data: [], error: null }),
       ]);
-      const failed = students.error ?? consents.error ?? blocks.error;
+      const failed = students.error ?? consents.error ?? ages.error ?? blocks.error;
       if (failed) throw new Error(failed.message);
-      const out = new Set<string>();
-      for (const r of (students.data ?? []) as Array<{ student_id: string }>) out.add(r.student_id);
-      for (const r of (consents.data ?? []) as Array<{ user_id: string }>) out.add(r.user_id);
+      const out = shieldedIds({
+        memberIds: ((students.data ?? []) as Array<{ student_id: string }>).map((r) => r.student_id),
+        consentIds: ((consents.data ?? []) as Array<{ user_id: string }>).map((r) => r.user_id),
+        birthYears: new Map(((ages.data ?? []) as Array<{ id: string; birth_year: number | null }>).map((r) => [r.id, r.birth_year])),
+      });
       for (const r of (blocks.data ?? []) as Array<{ user_id: string; friend_id: string }>) out.add(r.user_id === me ? r.friend_id : r.user_id);
       return [...out];
     },
