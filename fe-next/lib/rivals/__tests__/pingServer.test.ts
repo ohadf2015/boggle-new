@@ -88,9 +88,51 @@ describe('checkPingAllowed', () => {
     expect(or).toContain(`user_id.eq.${THEM},friend_id.eq.${ME}`);
   });
 
-  it.each(['classroom_memberships', 'parental_consents'])('refuses when either side is a student (%s)', async (table) => {
-    const d = db({ [table]: () => ({ data: [{ id: 'x' }], error: null }) });
+  it.each([ME, THEM])('refuses when either side is in a class with no declared adult age (%s)', async (who) => {
+    const d = db({ classroom_memberships: () => ({ data: [{ student_id: who }], error: null }) });
     expect(await checkPingAllowed(d.client, ME, THEM, NOW)).toMatchObject({ ok: false, code: 'not_allowed', status: 403 });
+  });
+
+  it.each([ME, THEM])('refuses when either side has a parental consent, even with an adult age (%s)', async (who) => {
+    const d = db({
+      profiles: () => ({
+        data: [
+          { id: ME, display_name: 'Maya', username: 'maya', birth_year: 1990 },
+          { id: THEM, display_name: 'Noam', username: 'noam', birth_year: 1990 },
+        ],
+        error: null,
+      }),
+      parental_consents: () => ({ data: [{ user_id: who }], error: null }),
+    });
+    expect(await checkPingAllowed(d.client, ME, THEM, NOW)).toMatchObject({ ok: false, code: 'not_allowed', status: 403 });
+  });
+
+  it('lets a declared adult who once joined a class (a teacher testing their own room) ping and be pinged', async () => {
+    const d = db({
+      profiles: () => ({
+        data: [
+          { id: ME, display_name: 'Maya', username: 'maya', birth_year: 1994 },
+          { id: THEM, display_name: 'Noam', username: 'noam', birth_year: 1988 },
+        ],
+        error: null,
+      }),
+      classroom_memberships: () => ({ data: [{ student_id: ME }, { student_id: THEM }], error: null }),
+    });
+    expect(await checkPingAllowed(d.client, ME, THEM, NOW)).toEqual({ ok: true, senderName: 'Maya' });
+  });
+
+  it('still refuses a class member whose declared age is a child', async () => {
+    const d = db({
+      profiles: () => ({
+        data: [
+          { id: ME, display_name: 'Maya', username: 'maya', birth_year: 1994 },
+          { id: THEM, display_name: 'Noam', username: 'noam', birth_year: NOW.getUTCFullYear() - 12 },
+        ],
+        error: null,
+      }),
+      classroom_memberships: () => ({ data: [{ student_id: THEM }], error: null }),
+    });
+    expect(await checkPingAllowed(d.client, ME, THEM, NOW)).toMatchObject({ ok: false, code: 'not_allowed' });
   });
 
   it('caps a sender at 3 pings in a rolling day', async () => {

@@ -1,3 +1,4 @@
+import posthog from '@/lib/analytics/lazyPosthog';
 import type { PingSituation, RivalPingErrorCode, RivalPingId } from './pings';
 
 export interface IncomingPingView {
@@ -17,6 +18,10 @@ export type PingContext = PingSituation;
 export type SendResult = { ok: true } | { ok: false; code: RivalPingErrorCode };
 
 export async function sendRivalPing(targetUserId: string, pingId: RivalPingId, context: PingContext): Promise<SendResult> {
+  const refuse = (code: RivalPingErrorCode, status: number): SendResult => {
+    posthog.capture('rival_ping_refused', { code, context, status });
+    return { ok: false, code };
+  };
   try {
     const res = await fetch('/api/rivals/ping', {
       method: 'POST',
@@ -25,9 +30,9 @@ export async function sendRivalPing(targetUserId: string, pingId: RivalPingId, c
     });
     if (res.ok) return { ok: true };
     const body = (await res.json().catch(() => null)) as { error?: RivalPingErrorCode } | null;
-    return { ok: false, code: body?.error ?? (res.status === 401 ? 'sign_in_required' : 'unavailable') };
+    return refuse(body?.error ?? (res.status === 401 ? 'sign_in_required' : 'unavailable'), res.status);
   } catch {
-    return { ok: false, code: 'unavailable' };
+    return refuse('unavailable', 0);
   }
 }
 
