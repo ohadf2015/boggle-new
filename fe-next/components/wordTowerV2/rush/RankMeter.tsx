@@ -6,7 +6,7 @@ import type { RankState } from "@/lib/wordTowerV2/rush/types";
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-const TIER_FILL = [
+export const TIER_FILL = [
   "bg-neo-gray-300",
   "bg-neo-cream",
   "bg-neo-cyan",

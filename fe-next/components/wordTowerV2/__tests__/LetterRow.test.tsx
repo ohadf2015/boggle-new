@@ -70,6 +70,14 @@ describe('LetterRow', () => {
     expect(p.onSubmit).toHaveBeenCalledTimes(1);
   });
 
+  it('given a real word that is still being spelled, when 1.2 s pass, then it has not gone up yet', () => {
+    // 700 ms sent "בית" up while the player was spelling "ביתן" (player report, Nov 2026).
+    vi.useFakeTimers();
+    const p = row({ selected: [0, 1, 2], canBuild: true });
+    act(() => vi.advanceTimersByTime(1200));
+    expect(p.onSubmit).not.toHaveBeenCalled();
+  });
+
   it('given a real word left alone, when the beat passes, then it builds by itself (as the wheel did)', () => {
     vi.useFakeTimers();
     const p = row({ selected: [0, 1, 2], canBuild: true });

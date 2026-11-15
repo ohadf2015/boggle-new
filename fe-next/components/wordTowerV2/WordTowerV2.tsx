@@ -325,6 +325,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           hasTower={towerFloors > 0}
           rushSlot={rushUi.hudSlot}
           menuSlot={rushUi.menuSlot}
+          menuFootSlot={rushUi.menuFootSlot}
         />
       ) : null}
       <TowerFeel run={run} risk={game.risk} over={phase === 'over'} collapsed={game.worldRef.current.collapsed} lastWord={builtWords[builtWords.length - 1] ?? ''} hidden={smashing || raiding || district || showOver || forceResults} />

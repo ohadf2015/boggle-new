@@ -28,8 +28,13 @@ export interface LetterRowProps {
   hint?: number[] | null;
 }
 
-/** Same hand-off beat as the old wheel: a buildable word rests this long, then goes to the crane. */
-export const AUTO_BUILD_MS = 700;
+/**
+ * A buildable word rests this long, then goes to the crane. It was 700ms (the
+ * old wheel's beat), which sent a short word up while the player was still
+ * spelling a longer one that starts with it (player report, Nov 2026: "the
+ * auto transition to place the word is too quick"). BUILD still sends at once.
+ */
+export const AUTO_BUILD_MS = 1500;
 const DRAG_ENGAGEMENT_THRESHOLD_PX = 8;
 
 /**
