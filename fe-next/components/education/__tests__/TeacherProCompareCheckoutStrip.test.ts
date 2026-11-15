@@ -2,7 +2,7 @@
  * Public classroom compare pages must link Teacher Pro checkout.
  * Schools & departments ($49/teacher/year) stay lead-capture and are not linked here.
  */
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -11,6 +11,15 @@ import { teacherProCompareCheckoutCopy } from '@/components/education/TeacherPro
 const ROOT = join(__dirname, '..', '..', '..');
 const LOCALE = join(ROOT, 'app', '[locale]');
 const STRIP = join(ROOT, 'components', 'education', 'TeacherProCompareCheckoutStrip.tsx');
+const FOIL = readFileSync(join(ROOT, 'components', 'seo', 'VsFoilPage.tsx'), 'utf8');
+
+/** A page plus its sibling copy.ts, where localized pages keep their text. */
+const pageSource = (slug: string) => {
+  const copy = join(LOCALE, slug, 'copy.ts');
+  return readFileSync(join(LOCALE, slug, 'page.tsx'), 'utf8') + (existsSync(copy) ? readFileSync(copy, 'utf8') : '');
+};
+/** Pages rendered through VsFoilPage get the strip from it. */
+const mounted = (page: string) => (/<VsFoilPage\b/.test(page) ? FOIL : page);
 
 /** Classroom compare pages, not consumer word-game foils. */
 const EDUCATION = [
@@ -79,13 +88,14 @@ describe('Teacher Pro checkout strip on classroom compare pages', () => {
   it('mounts once on every education compare page and nowhere on word-game foils', () => {
     for (const slug of EDUCATION) {
       const page = readFileSync(join(LOCALE, slug, 'page.tsx'), 'utf8');
-      expect(page, slug).toContain('TeacherProCompareCheckoutStrip');
-      expect(page, slug).toContain('<TeacherProCompareCheckoutStrip locale={locale} />');
-      expect(page.match(/<TeacherProCompareCheckoutStrip/g)?.length, slug).toBe(1);
+      const host = mounted(page);
+      expect(host, slug).toContain('<TeacherProCompareCheckoutStrip locale={locale} />');
+      expect(host.match(/<TeacherProCompareCheckoutStrip/g)?.length, slug).toBe(1);
       expect(page, slug).not.toMatch(/lexiclash\.com/);
     }
     for (const slug of NOT_EDUCATION) {
       const page = readFileSync(join(LOCALE, slug, 'page.tsx'), 'utf8');
+      expect(page, slug).not.toMatch(/<VsFoilPage\b/);
       expect(page, slug).not.toContain('TeacherProCompareCheckoutStrip');
       expect(page, slug).not.toContain('teacher/upgrade');
     }
@@ -95,8 +105,8 @@ describe('Teacher Pro checkout strip on classroom compare pages', () => {
   });
 
   it('stops claiming the free tier has no upgrade on Kahoot and Wordwall', () => {
-    const kahoot = readFileSync(join(LOCALE, 'lexiclash-vs-kahoot', 'page.tsx'), 'utf8');
-    const wordwall = readFileSync(join(LOCALE, 'lexiclash-vs-wordwall', 'page.tsx'), 'utf8');
+    const kahoot = pageSource('lexiclash-vs-kahoot');
+    const wordwall = pageSource('lexiclash-vs-wordwall');
     expect(kahoot).not.toMatch(/no upgrade screen/i);
     expect(kahoot).toMatch(/Teacher Pro \(\$9\/mo\)/);
     expect(kahoot).toMatch(/calm-mode pressure dials/);
