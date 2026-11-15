@@ -15,7 +15,7 @@ const LOCALE_SET = new Set<string>(LOCALES);
 
 /**
  * First URL segment under `app/[locale]/` (route groups like `(home)` omitted).
- * Keep in sync with that directory — `nextHandleGate.test.ts` asserts it.
+ * Keep in sync with that directory — `__tests__/nextHandleGate.guard.test.ts` asserts it.
  */
 export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'about',
@@ -149,7 +149,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
 /**
  * Segments that exist only as next.config redirect sources. Next applies those
  * redirects inside handle(), so the gate must pass them or they answer 404.
- * `nextHandleGate.test.ts` asserts every static redirect source passes.
+ * `__tests__/nextHandleGate.guard.test.ts` asserts every static redirect source passes.
  */
 export const REDIRECT_ONLY_SEGMENTS: ReadonlySet<string> = new Set([
   'cookies',
@@ -174,7 +174,7 @@ export const REDIRECT_ONLY_SEGMENTS: ReadonlySet<string> = new Set([
 
 /**
  * Top-level directories under `public/`. Files inside them are static assets
- * that Next serves from disk. Keep in sync — `nextHandleGate.test.ts` asserts it.
+ * that Next serves from disk. Keep in sync — `__tests__/nextHandleGate.guard.test.ts` asserts it.
  */
 export const PUBLIC_DIRS: ReadonlySet<string> = new Set([
   '.well-known',

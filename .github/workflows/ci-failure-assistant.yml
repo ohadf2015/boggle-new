@@ -150,24 +150,15 @@ jobs:
               labels: 'ci-failure'
             });
 
-            // Only create if no recent issue for same branch
-            const existingIssue = issues.data.find(i =>
-              i.title.includes(info.headBranch) &&
-              new Date(i.created_at) > new Date(Date.now() - 24 * 60 * 60 * 1000)
-            );
+            // One open issue per branch: a red streak adds comments to it instead of opening one issue per run.
+            const existingIssue = issues.data.find(i => i.title === `🚨 CI Failure on ${info.headBranch}`);
 
             if (existingIssue) {
-              // Update existing issue
-              let body = existingIssue.body + `\n\n---\n\n`;
-              body += `## Update: New failure at ${new Date().toISOString()}\n`;
-              body += `**Commit:** \`${info.headSha}\`\n`;
-              body += `**Run:** [${info.runId}](${info.runUrl})\n`;
-
-              await github.rest.issues.update({
+              await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: existingIssue.number,
-                body
+                body: `Failed again at \`${info.headSha}\`: [run ${info.runId}](${info.runUrl}) (${info.failedJobs.join(', ')})`
               });
             } else {
               // Create new issue

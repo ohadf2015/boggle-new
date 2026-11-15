@@ -3,6 +3,12 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { error: vi.fn(), success: vi.fn() } }));
+// Under fake timers waitFor gives up after a few real ms; a real crypto digest on a busy runner can take longer.
+vi.mock('@/utils/guestManager', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/utils/guestManager')>()),
+  getGuestSessionId: () => 'guest-session',
+  hashToken: async () => 'guest-hash',
+}));
 
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { clearHostCreateRefusal, getHostCreateRefusal } from './hostCreateRefusal';
