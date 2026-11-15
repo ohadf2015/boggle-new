@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-padlet Neon Free 3-padlet / 20MB honesty wiring', () => {
   it('wires PadletNeonFreeHonestyStrip and locks Neon Free foil + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/PadletNeonFreeHonestyStrip/);
     expect(page).toMatch(/export const revalidate = 86400/);
     expect(page).toMatch(/3 (active )?padlets/i);

@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-mentimeter Free 50/month honesty wiring', () => {
   it('wires MentimeterFreeTierHonestyStrip and locks 50 + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/MentimeterFreeTierHonestyStrip/);
     expect(page).toMatch(/50 participants per month/);
     expect(page).toMatch(/Participants per month: 50/);

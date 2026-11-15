@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-classpoint Basic Free 25/5Q honesty wiring', () => {
   it('wires ClassPointBasicFreeHonestyStrip and locks 25 / 5 Q + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/ClassPointBasicFreeHonestyStrip/);
     expect(page).toMatch(/Max 25 class size/);
     expect(page).toMatch(/5 Questions per PPT/);
