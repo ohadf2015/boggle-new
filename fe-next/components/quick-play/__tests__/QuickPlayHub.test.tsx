@@ -126,6 +126,52 @@ describe('QuickPlayHub', () => {
     expect(bodies).toEqual(['blast', 'blast']);
   });
 
+  it('a hung board fetch cannot strand the player: the round request is time-capped', async () => {
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    const roundCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/round'));
+    expect(roundCall?.[1].signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('a timed-out board build surfaces the error and reports it as a timeout', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return Promise.reject(new DOMException('aborted', 'TimeoutError'));
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_failed',
+      expect.objectContaining({ mode: 'blast', reason: 'timeout' })
+    );
+  });
+
+  it('a rejected board build reports its http status', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return Promise.resolve({ ok: false, status: 503, json: async () => ({}) });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_failed',
+      expect.objectContaining({ mode: 'blast', reason: 'http', status: 503 })
+    );
+  });
+
+  it('a board that builds reports its build duration once', async () => {
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    const ready = vi.mocked(posthog.capture).mock.calls.filter((c) => c[0] === 'quick_play_board_ready');
+    expect(ready).toHaveLength(1);
+    expect(ready[0][1]).toMatchObject({ mode: 'blast', roundIndex: 1 });
+    expect(typeof (ready[0][1] as { buildMs: number }).buildMs).toBe('number');
+  });
+
   it('round completion shows results, and Next round starts another round instead of a picker', async () => {
     render(<QuickPlayHub />);
     await waitFor(() => screen.getByTestId('mock-finish'));

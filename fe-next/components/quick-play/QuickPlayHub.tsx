@@ -51,6 +51,24 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+// Deliberately generous: board generation is solver + dictionary work and a
+// cold language is slower, so a tight cap would fail builds that would have
+// worked. Tighten only off the buildMs spread on `quick_play_board_ready`.
+const ROUND_FETCH_TIMEOUT_MS = 12_000;
+
+function timeoutSignal(ms: number): AbortSignal | undefined {
+  return typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+    ? AbortSignal.timeout(ms)
+    : undefined;
+}
+
+/** `AbortSignal.timeout` rejects with TimeoutError; a manual abort with AbortError. */
+function boardFailReason(err: unknown, status: number): 'http' | 'timeout' | 'network' {
+  if (status > 0) return 'http';
+  const name = (err as { name?: string } | null)?.name;
+  return name === 'TimeoutError' || name === 'AbortError' ? 'timeout' : 'network';
+}
+
 interface ChallengeInfo {
   id: string;
   mode: QuickMode;
@@ -210,25 +228,43 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
+    let status = 0;
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // A slow server never rejects a fetch, so without this cap a stuck
+        // build held the player on the loading mascot with no way out.
+        signal: timeoutSignal(ROUND_FETCH_TIMEOUT_MS),
         // recentPct lets the server aim the rival field at THIS player: without
         // it a beginner passes nobody and a strong player passes everyone,
         // every round. Local history, so guests are covered too; 0 = unknown.
         body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
       });
-      if (!res.ok) throw new Error(`round fetch ${res.status}`);
+      if (!res.ok) {
+        status = res.status;
+        throw new Error(`round fetch ${res.status}`);
+      }
       const round = (await res.json()) as QuickRoundConfig;
       if (variant === 'coach') round.coach = true;
       const elapsed = Date.now() - started;
+      // One per board actually built, unlike mode_selected (twice on Random),
+      // so board_ready → round_completed measures abandonment alone.
+      posthog.capture('quick_play_board_ready', { mode, buildMs: elapsed, roundIndex });
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
       setPhase('playing');
-    } catch {
-      // Silent no-op on error is forbidden — surface it (a dead-looking wheel
-      // tap is indistinguishable from a bug).
+    } catch (err) {
+      // Silent no-op on error is forbidden — surface it to the player (a
+      // dead-looking wheel tap is indistinguishable from a bug) and to
+      // analytics, so a failed build is never read as an abandoned round.
+      posthog.capture('quick_play_board_failed', {
+        mode,
+        reason: boardFailReason(err, status),
+        status,
+        ms: Date.now() - started,
+        roundIndex,
+      });
       setPhase('error');
     } finally {
       loadingRef.current = false;
