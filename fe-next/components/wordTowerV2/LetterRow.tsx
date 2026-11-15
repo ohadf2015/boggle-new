@@ -170,6 +170,8 @@ export const LetterRow = memo(function LetterRow({
               type="button"
               data-wheel-letter={letter}
               data-wheel-index={i}
+              // Spelling is a burst of taps in one small area; that is play, not rage.
+              data-feedback-ignore-rage="true"
               disabled={placing}
               onClick={() => tapLetter(i)}
               aria-label={t('wordTower.a11y.tile', { letter })}
@@ -203,6 +205,7 @@ export const LetterRow = memo(function LetterRow({
       <button
         type="button"
         data-wt2-action={action}
+        data-feedback-ignore-rage="true"
         disabled={action === 'idle'}
         onClick={() => {
           if (action === 'drop') onDrop();

@@ -5,7 +5,7 @@
  * pollute error tracking and waste event quota.
  */
 
-interface PostHogEventLike {
+export interface PostHogEventLike {
   event?: string;
   properties?: Record<string, unknown>;
 }
