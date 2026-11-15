@@ -1,5 +1,4 @@
-import type { RivalPingErrorCode, RivalPingId } from './pings';
-import type { ResultsMode } from './types';
+import type { PingSituation, RivalPingErrorCode, RivalPingId } from './pings';
 
 export interface IncomingPingView {
   id: string;
@@ -13,7 +12,7 @@ export interface IncomingPingView {
 }
 
 /** Where a ping was sent from: a results screen, or a ping-back from the incoming toast. */
-export type PingContext = ResultsMode | 'reply';
+export type PingContext = PingSituation;
 
 export type SendResult = { ok: true } | { ok: false; code: RivalPingErrorCode };
 

@@ -9,12 +9,13 @@ import {
   latestPingFrom,
   pingEntityType,
   pingIdFromEntityType,
+  pingsFor,
 } from '../pings';
 import { pingFakeDb, has } from './pingFakeDb';
 
 describe('rival ping catalog', () => {
-  it('has eight canned pings, each with an emoji and a rivalPings text key', () => {
-    expect(RIVAL_PING_IDS).toHaveLength(8);
+  it('has eleven canned pings, each with an emoji and a rivalPings text key', () => {
+    expect(RIVAL_PING_IDS).toHaveLength(11);
     for (const id of RIVAL_PING_IDS) {
       const ping = RIVAL_PINGS[id];
       expect(ping.emoji.length).toBeGreaterThan(0);
@@ -72,5 +73,47 @@ describe('latestPingFrom', () => {
     expect(await latestPingFrom(none.client, ME, THEM)).toBeNull();
     const broken = pingFakeDb({ user_notifications: () => ({ data: null, error: { message: 'x' } }) });
     expect(await latestPingFrom(broken.client, ME, THEM)).toBeNull();
+  });
+});
+
+describe('pingsFor', () => {
+  it('Given a friend in a game right now, Then good-luck and play-after lines, no post-game banter', () => {
+    const ids = pingsFor('friendPlaying');
+    expect(ids).toEqual(expect.arrayContaining(['good_luck', 'after_this']));
+    expect(ids).not.toContain('gg');
+    expect(ids).not.toContain('rematch');
+  });
+
+  it('Given a free friend from home, Then an invite to play leads and post-game lines are absent', () => {
+    const ids = pingsFor('friendFree');
+    expect(ids[0]).toBe('play_now');
+    expect(ids).not.toContain('gg');
+    expect(ids).not.toContain('nice_word');
+    expect(ids).not.toContain('good_luck');
+  });
+
+  it('Given a live match just ended, Then GG and rematch, no good-luck', () => {
+    const ids = pingsFor('multiplayer');
+    expect(ids).toEqual(expect.arrayContaining(['gg', 'rematch', 'close_one']));
+    expect(ids).not.toContain('good_luck');
+    expect(ids).not.toContain('play_now');
+  });
+
+  it('Given a score chase (daily, solo modes), Then score lines and no rematch', () => {
+    for (const ctx of ['daily', 'quickPlay', 'blast', 'tower', 'single'] as const) {
+      const ids = pingsFor(ctx);
+      expect(ids).toEqual(expect.arrayContaining(['beat_you', 'your_turn']));
+      expect(ids).not.toContain('rematch');
+      expect(ids).not.toContain('good_luck');
+    }
+  });
+
+  it('Given any context, Then every id is a known ping and the list fits the 2-column picker', () => {
+    for (const ctx of ['friendPlaying', 'friendFree', 'reply', 'multiplayer', 'daily'] as const) {
+      const ids = pingsFor(ctx);
+      expect(ids.every(isRivalPingId)).toBe(true);
+      expect(ids.length).toBeGreaterThanOrEqual(4);
+      expect(ids.length).toBeLessThanOrEqual(8);
+    }
   });
 });

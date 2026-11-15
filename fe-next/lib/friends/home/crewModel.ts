@@ -3,9 +3,15 @@ import type { FriendPresence } from '@/shared/types/friends';
 export const ONLINE_WINDOW_MS = 5 * 60 * 1000;
 /** Below this many friends the crew card suggests recent opponents. */
 export const SUGGEST_BELOW = 3;
+export const HOME_CREW_CAP = 4;
+/** Friends unseen longer than this leave the home card; they stay on the friends page. */
+export const ACTIVE_WINDOW_MS = 14 * 86_400_000;
 
 export type CrewStatus = 'in_lobby' | 'playing' | 'online' | 'offline';
-export type CrewAction = { kind: 'join'; code: string } | { kind: 'invite' } | null;
+export type CrewAction =
+  | { kind: 'join'; code: string }
+  | { kind: 'invite' }
+  | { kind: 'ping'; situation: 'friendFree' | 'friendPlaying' };
 export interface Line {
   key: string;
   params: Record<string, string | number>;
@@ -28,7 +34,7 @@ export function crewStatus(person: Seen, presence: FriendPresence | undefined, n
 export function crewAction(status: CrewStatus, presence: FriendPresence | undefined): CrewAction {
   if ((status === 'in_lobby' || status === 'playing') && presence?.gameCode) return { kind: 'join', code: presence.gameCode };
   if (status === 'online') return { kind: 'invite' };
-  return null;
+  return { kind: 'ping', situation: status === 'playing' ? 'friendPlaying' : 'friendFree' };
 }
 
 const RANK: Record<CrewStatus, number> = { in_lobby: 0, playing: 0, online: 1, offline: 2 };
@@ -38,6 +44,13 @@ export function sortCrew<T extends Seen>(people: readonly T[], presence: Readonl
     const r = RANK[crewStatus(a, presence.get(a.userId), now)] - RANK[crewStatus(b, presence.get(b.userId), now)];
     return r !== 0 ? r : seenMs(b.lastSeenAt) - seenMs(a.lastSeenAt);
   });
+}
+
+export function homeCrew<T extends Seen>(people: readonly T[], presence: ReadonlyMap<string, FriendPresence>, now: number): { shown: T[]; more: T[] } {
+  const sorted = sortCrew(people, presence, now);
+  const active = sorted.filter((p) => presence.has(p.userId) || now - seenMs(p.lastSeenAt) < ACTIVE_WINDOW_MS);
+  const pool = active.length > 0 ? active : sorted;
+  return { shown: pool.slice(0, HOME_CREW_CAP), more: pool.slice(HOME_CREW_CAP) };
 }
 
 // LRI…PDI keeps "3–1" in reading order inside RTL sentences.

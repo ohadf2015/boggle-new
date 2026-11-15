@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFriendsHome } from '@/hooks/friends/useFriendsHome';
 import { useFriends } from '@/hooks/useFriends';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import { sortCrew, SUGGEST_BELOW } from '@/lib/friends/home/crewModel';
+import { homeCrew, SUGGEST_BELOW } from '@/lib/friends/home/crewModel';
 import { RecentOpponentsList } from '@/components/friends/RecentOpponentsList';
 import { useCrewAdd } from '@/components/friends/useCrewAdd';
 import { CrewAvatarSlot } from './CrewAvatarSlot';
@@ -31,7 +31,9 @@ export function HomeCrewCard({ lang, t }: { lang: string; t: T }) {
   const [copied, setCopied] = useState(false);
   const now = Date.now();
   const presence = useMemo(() => new Map((data?.presence ?? []).map((p) => [p.userId, p])), [data]);
-  const friends = data ? sortCrew(data.friends, presence, now) : [];
+  const { shown, more } = data ? homeCrew(data.friends, presence, now) : { shown: [], more: [] };
+  const [expanded, setExpanded] = useState(false);
+  const friends = expanded ? [...shown, ...more] : shown;
 
   const accept = useCallback(
     async (requestId: string) => {
@@ -72,11 +74,12 @@ export function HomeCrewCard({ lang, t }: { lang: string; t: T }) {
       <div>
         <p className="flex items-center gap-1.5 font-neo-display text-xs font-bold tracking-widest uppercase lg:text-sm">
           <Users className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-          {t('nav.play')}
+          {t('homePlay.crew.eyebrow')}
         </p>
         <h2 id="hp-crew-title" className="mt-1 font-neo-display text-xl font-bold leading-tight lg:text-4xl">
           {t('homePlay.crew.title')}
         </h2>
+        <p className="mt-1 text-sm font-medium lg:text-base">{t('homePlay.crew.line')}</p>
       </div>
 
       {loading && (
@@ -122,6 +125,12 @@ export function HomeCrewCard({ lang, t }: { lang: string; t: T }) {
             <CrewRow key={f.userId} person={f} presence={presence.get(f.userId)} now={now} lang={lang} t={t} />
           ))}
         </ul>
+      )}
+
+      {!expanded && more.length > 0 && (
+        <button type="button" onClick={() => setExpanded(true)} className={`${BUTTON} self-start bg-neo-cream text-black`}>
+          {t('homePlay.crew.seeMore', { count: more.length })}
+        </button>
       )}
 
       {data && friends.length === 0 && !showSuggestions && <p className="text-sm font-medium">{t('homePlay.crew.empty')}</p>}

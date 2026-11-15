@@ -7,8 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { pingErrorKey, reportRival, sendRivalPing } from '@/lib/rivals/pingClient';
-import type { RivalPingErrorCode, RivalPingId } from '@/lib/rivals/pings';
-import type { ResultsMode } from '@/lib/rivals/types';
+import { pingsFor, type PingSituation, type RivalPingErrorCode, type RivalPingId } from '@/lib/rivals/pings';
 import { blockUser } from '@/utils/friends';
 import { RivalPingPicker } from './RivalPingPicker';
 
@@ -17,7 +16,10 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 export interface RivalPingButtonProps {
   targetUserId: string;
   targetName: string;
-  context: ResultsMode;
+  context: PingSituation;
+  /** Friend rows: no ... menu, and a refusal is shown by the parent instead of under the button. */
+  compact?: boolean;
+  onRefused?: (code: RivalPingErrorCode) => void;
 }
 
 type Status = { kind: 'idle' } | { kind: 'sent' } | { kind: 'refused'; code: RivalPingErrorCode };
@@ -25,7 +27,7 @@ type Status = { kind: 'idle' } | { kind: 'sent' } | { kind: 'refused'; code: Riv
 const chip =
   'inline-flex min-h-[44px] items-center justify-center gap-1 rounded-lg border-2 border-neo-black px-3 font-black shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-60 disabled:active:translate-x-0 disabled:active:translate-y-0';
 
-export function RivalPingButton({ targetUserId, targetName, context }: RivalPingButtonProps) {
+export function RivalPingButton({ targetUserId, targetName, context, compact = false, onRefused }: RivalPingButtonProps) {
   const { t } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const isGuest = !isAuthenticated || !user || user.is_anonymous === true;
@@ -42,10 +44,15 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
 
   if (context === 'edu') return null;
 
+  const refuse = (code: RivalPingErrorCode) => {
+    setStatus({ kind: 'refused', code });
+    onRefused?.(code);
+  };
+
   const send = async (pingId: RivalPingId) => {
     setPickerOpen(false);
     if (isGuest) {
-      setStatus({ kind: 'refused', code: 'sign_in_required' });
+      refuse('sign_in_required');
       return;
     }
     setStatus({ kind: 'sent' });
@@ -53,7 +60,7 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
     if (result.ok) {
       posthog.capture('rival_ping_sent', { pingId, context });
     } else {
-      setStatus({ kind: 'refused', code: result.code });
+      refuse(result.code);
     }
   };
 
@@ -85,12 +92,12 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
             setMenuOpen(false);
             setPickerOpen((o) => !o);
           }}
-          className={`${chip} ${status.kind === 'sent' ? 'bg-neo-lime' : 'bg-neo-pink'} text-neo-black`}
+          className={`${chip} ${status.kind === 'sent' ? 'bg-neo-lime' : compact ? 'bg-neo-yellow' : 'bg-neo-pink'} text-neo-black`}
         >
           <span aria-hidden="true">{status.kind === 'sent' ? '✅' : '⚡'}</span>
           <span>{status.kind === 'sent' ? t('rivalPings.sent') : t('rivalPings.button')}</span>
         </button>
-        {!isGuest && (
+        {!isGuest && !compact && (
           <button
             type="button"
             aria-label={t('rivalPings.more')}
@@ -107,7 +114,7 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
         )}
       </div>
 
-      {refusal && (
+      {refusal && !compact && (
         <p role="status" className="text-xs font-bold text-neo-yellow">
           {t(pingErrorKey(refusal))}
           {refusal === 'sign_in_required' && (
@@ -121,7 +128,7 @@ export function RivalPingButton({ targetUserId, targetName, context }: RivalPing
 
       {pickerOpen && (
         <PingSheet testId="rival-ping-sheet" label={t('rivalPings.pickerTitle', { name: targetName })} onClose={closeSheets}>
-          <RivalPingPicker onPick={send} title={t('rivalPings.pickerTitle', { name: targetName })} />
+          <RivalPingPicker ids={pingsFor(context)} onPick={send} title={t('rivalPings.pickerTitle', { name: targetName })} />
         </PingSheet>
       )}
 

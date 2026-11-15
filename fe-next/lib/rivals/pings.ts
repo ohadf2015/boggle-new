@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { ResultsMode } from './types';
 
 export const RIVAL_PING_IDS = [
   'come_at_me',
@@ -9,6 +10,9 @@ export const RIVAL_PING_IDS = [
   'your_turn',
   'nice_word',
   'see_you_tomorrow',
+  'play_now',
+  'good_luck',
+  'after_this',
 ] as const;
 
 export type RivalPingId = (typeof RIVAL_PING_IDS)[number];
@@ -28,11 +32,30 @@ const EMOJI: Record<RivalPingId, string> = {
   your_turn: '👉',
   nice_word: '🤯',
   see_you_tomorrow: '👋',
+  play_now: '🎮',
+  good_luck: '🍀',
+  after_this: '🎯',
 };
 
 export const RIVAL_PINGS: Record<RivalPingId, RivalPing> = Object.fromEntries(
   RIVAL_PING_IDS.map((id) => [id, { id, emoji: EMOJI[id], textKey: `rivalPings.ping.${id}` }]),
 ) as Record<RivalPingId, RivalPing>;
+
+/** Where the ping is sent from: a results screen, a reply, or a friend row that knows if they are mid-game. */
+export type PingSituation = ResultsMode | 'reply' | 'friendFree' | 'friendPlaying';
+
+const SCORE_CHASE: readonly RivalPingId[] = ['beat_you', 'your_turn', 'come_at_me', 'close_one', 'gg', 'see_you_tomorrow'];
+
+const BY_SITUATION: Partial<Record<PingSituation, readonly RivalPingId[]>> = {
+  friendPlaying: ['good_luck', 'after_this', 'come_at_me', 'see_you_tomorrow'],
+  friendFree: ['play_now', 'come_at_me', 'your_turn', 'see_you_tomorrow'],
+  reply: ['gg', 'rematch', 'play_now', 'come_at_me', 'your_turn', 'see_you_tomorrow'],
+  multiplayer: ['gg', 'rematch', 'close_one', 'nice_word', 'beat_you', 'see_you_tomorrow'],
+};
+
+export function pingsFor(situation: PingSituation): readonly RivalPingId[] {
+  return BY_SITUATION[situation] ?? SCORE_CHASE;
+}
 
 export const RIVAL_PING_DAILY_LIMIT = 3;
 export const RIVAL_PING_PER_TARGET_WINDOW_MS = 6 * 60 * 60 * 1000;
