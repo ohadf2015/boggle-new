@@ -48,6 +48,20 @@ describe('TeacherAccessCTA', () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
+  it('groups the two primary buttons in a flex-wrap row with a gap wider than the hard shadow', () => {
+    render(<TeacherAccessCTA />);
+    const access = screen.getByRole('link', { name: 'education.landing.cta.button' });
+    const trial = screen.getByTestId('teacher-pro-trial-landing-cta');
+    expect(access.parentElement).toBe(trial.parentElement);
+    const row = access.parentElement as HTMLElement;
+    expect(row.className).toMatch(/\bflex\b/);
+    expect(row.className).toMatch(/\bflex-wrap\b/);
+    expect(row.className).toMatch(/\bgap-x-5\b/);
+    expect(row.className).toMatch(/\bgap-y-5\b/);
+    expect(access.className).not.toMatch(/\bmt-3\b/);
+    expect(trial.className).not.toMatch(/\bmt-3\b/);
+  });
+
   it('renders teacher access link', () => {
     render(<TeacherAccessCTA />);
     const link = screen.getByRole('link', { name: 'education.landing.cta.button' });
