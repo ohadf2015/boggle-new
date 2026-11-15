@@ -45,8 +45,10 @@ interface Props {
   hasTower?: boolean;
   /** Rush widgets; see V2TopBar: `null` reserves the row, `undefined` omits it. */
   rushSlot?: ReactNode;
-  /** Progress that is not a decision (the rank meter): shown in the menu, not the bar. */
+  /** Progress that is not a decision (the rank card): shown first in the menu, not the bar. */
   menuSlot?: ReactNode;
+  /** Shown last in the menu (what each block does). */
+  menuFootSlot?: ReactNode;
 }
 
 /**
@@ -77,6 +79,7 @@ export function V2Hud({
   hasTower,
   rushSlot,
   menuSlot,
+  menuFootSlot,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const coins = estate.coins + runCoins;
@@ -123,6 +126,7 @@ export function V2Hud({
         onOpenRivals={onOpenRivals}
         reducedMotion={reducedMotion}
         topSlot={menuSlot}
+        footSlot={menuFootSlot}
       />
     </>
   );

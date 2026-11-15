@@ -6,7 +6,8 @@ import type { Phase } from '../useTowerRun';
 import { NextUpQueue } from './NextUpQueue';
 import { OvertakeToast } from './OvertakeToast';
 import { PerkDraft } from './PerkDraft';
-import { RankMeter } from './RankMeter';
+import { BlockLegend } from './BlockLegend';
+import { RankCard } from './RankCard';
 import { RankUpBurst } from './RankUpBurst';
 import { RushGhosts } from './RushGhosts';
 import type { RushApi } from './useRush';
@@ -44,7 +45,9 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
       <NextUpQueue t={t} slots={rush.slots} reducedMotion={reducedMotion} compact />
     </div>
   );
-  const menuSlot = <RankMeter t={t} rank={rush.rank} reducedMotion={reducedMotion} />;
+  const menuSlot = <RankCard t={t} rank={rush.rank} />;
+  const first = rush.slots[0];
+  const menuFootSlot = <BlockLegend t={t} current={first && !first.sealed ? first.trait : undefined} />;
 
   const toastsOn = inRun && game.phase !== 'draft';
   // In an effect: React Compiler memoizes render-time ref reads, which froze this at 0.
@@ -67,5 +70,5 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
     </>
   );
 
-  return { canvasProps, hudSlot, menuSlot, overlays };
+  return { canvasProps, hudSlot, menuSlot, menuFootSlot, overlays };
 }
