@@ -11,7 +11,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { useLessonDraft } from '@/hooks/useLessonDraft';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/lib/supabase/education';
-import { LessonCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
+import { ListGridSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 import { publishList } from '@/lib/education/libraryClient';
 import { paginate } from '@/lib/education/library';
@@ -165,7 +165,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
   const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, pageSize), [lessons, page, pageSize]);
 
   if (isLoading) {
-    return <SkeletonGrid count={3} skeleton={LessonCardSkeleton} />;
+    return <ListGridSkeleton />;
   }
 
   return (

@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherGate } from '@/components/education/TeacherGate';
+import { TeacherRouteLoading } from '@/components/teacher/routeLoading/TeacherRouteLoading';
 import { TrialEndedBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
@@ -81,5 +82,6 @@ function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTea
 }
 
 export default function TeacherPage() {
-  return <TeacherGate><TeacherDashboardInner /></TeacherGate>;
+  // The gate's wait shows the same shell-and-skeleton as the route fallback, so access resolving never swaps the chrome for a bare loader.
+  return <TeacherGate loadingFallback={<TeacherRouteLoading />}><TeacherDashboardInner /></TeacherGate>;
 }

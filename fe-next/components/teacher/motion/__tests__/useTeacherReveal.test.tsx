@@ -111,3 +111,39 @@ describe('useTeacherReveal', () => {
     expect(gsapMock.to.mock.calls.at(-1)![1]).toMatchObject({ rotateX: 0, rotateY: 0 });
   });
 });
+
+describe('useTeacherReveal rescan', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    reduced.value = false;
+  });
+
+  function Rescan({ rescan, extra }: { rescan: string; extra: boolean }) {
+    const ref = useTeacherReveal<HTMLDivElement>(rescan);
+    return (
+      <div className="edu-shell-scroll">
+        <div ref={ref}>
+          <p data-tm data-testid="first">a</p>
+          {extra ? <p data-tm data-testid="late">b</p> : null}
+        </div>
+      </div>
+    );
+  }
+
+  it('does not replay the entrance on content that already landed when a rescan adds a late section', async () => {
+    // Given a page whose first section has already been revealed
+    const { rerender } = render(<Rescan rescan="loading" extra={false} />);
+    await waitFor(() => expect(gsapMock.batch).toHaveBeenCalledTimes(1));
+    const [firstTargets, firstVars] = gsapMock.batch.mock.calls[0];
+    firstVars.onEnter(firstTargets);
+
+    // When async content mounts and the page rescans
+    rerender(<Rescan rescan="ready" extra />);
+    await waitFor(() => expect(gsapMock.batch).toHaveBeenCalledTimes(2));
+
+    // Then only the new section is dealt an entrance
+    const [secondTargets] = gsapMock.batch.mock.calls[1];
+    expect(secondTargets).toHaveLength(1);
+    expect((secondTargets[0] as HTMLElement).dataset.testid).toBe('late');
+  });
+});
