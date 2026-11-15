@@ -13,6 +13,7 @@ import { DISTRICTS, MAX_DISTRICT, PLOT_SLOTS } from '@/lib/wordTowerV2/estateCat
 import { buildingNameKey } from '../estate/estateArt';
 import { PERKS } from '@/lib/wordTowerV2/rush/perks';
 import { RANK_TIERS } from '@/lib/wordTowerV2/rush/rankLadder';
+import { TOWER_STYLES } from '@/lib/wordTowerV2/towerStyle';
 import type { BlockTrait, PerkRarity } from '@/lib/wordTowerV2/rush/types';
 
 const RUSH_TRAITS: BlockTrait[] = ['plain', 'gold', 'feather', 'anvil', 'magnet', 'lucky'];
@@ -133,6 +134,8 @@ const keys: string[] = [
   ...RUSH_TRAITS.map((k) => `wordTowerV2.rush.blockInfo.short.${k}`),
   ...RUSH_TRAITS.map((k) => `wordTowerV2.rush.blockInfo.desc.${k}`),
   'wordTowerV2.rush.blockInfo.next',
+  ...TOWER_STYLES.map((st) => `wordTowerV2.style.name.${st.id}`),
+  ...['label', 'next', 'nextOne', 'max', 'unlocked', 'unlockedHint', 'readyTitle', 'readyLine', 'readyNewLook'].map((k) => `wordTowerV2.style.${k}`),
   ...['title', 'rankLabel', 'rankToNext', 'rankMax', 'workshopReadyOne', 'workshopReady', 'workshopNext', 'workshopRepair', 'workshopDone', 'rivalsBallsOne', 'rivalsBalls', 'rivalsNone', 'thisRun', 'streak', 'streakBest', 'tenants', 'legendTitle'].map((k) => `wordTowerV2.hud.sheet.${k}`),
   ...RUSH_RARITIES.map((k) => `wordTowerV2.rush.rarity.${k}`),
   ...['draft.title', 'draft.subtitle', 'nextUp.title', 'nextUp.label', 'nextUp.sealed', 'rank.max', 'rank.progress',
