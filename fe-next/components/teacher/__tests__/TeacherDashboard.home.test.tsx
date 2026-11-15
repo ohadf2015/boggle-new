@@ -151,6 +151,13 @@ describe('Teacher Home', () => {
     expect(within(screen.getByTestId('home-hero')).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
   });
 
+  it('Given the desktop rail, Then it starts below the greeting row so Your classes lines up with the hero, not the mascot', () => {
+    render(<TeacherDashboard />);
+    const rail = screen.getByTestId('home-week').parentElement as HTMLElement;
+    expect(rail.className).toContain('lg:pt-24');
+    expect(rail.className).not.toMatch(/\b(pl|pr|ml|mr)-/);
+  });
+
   it('Given one class, Then This week shows no per-class rows that would repeat the hero', () => {
     classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
     render(<TeacherDashboard />);
