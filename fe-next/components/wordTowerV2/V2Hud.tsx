@@ -5,6 +5,7 @@ import type { Estate } from '@/lib/wordTowerV2/estate';
 import type { RunState } from '@/lib/wordTowerV2/run';
 import { V2TopBar } from './V2TopBar';
 import { V2HudMenu } from './V2HudMenu';
+import { UpgradeReadyToast } from './hud/UpgradeReadyToast';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -114,6 +115,7 @@ export function V2Hud({
         hasTower={hasTower}
         rushSlot={rushSlot}
       />
+      <UpgradeReadyToast t={t} estate={estate} runCoins={runCoins} reducedMotion={reducedMotion} />
       <V2HudMenu
         t={t}
         open={menuOpen}

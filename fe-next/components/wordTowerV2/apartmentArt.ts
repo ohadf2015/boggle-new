@@ -4,9 +4,12 @@ import { blockLabel, labelTracking } from '@/lib/wordTowerV2/label';
 import { landingBounce, squashScale } from '@/lib/wordTowerV2/juice';
 import { traitTint } from '@/lib/wordTowerV2/rush/landingFeel';
 import type { BlockTrait } from '@/lib/wordTowerV2/rush/types';
+import { TOWER_STYLES, type TowerStyle } from '@/lib/wordTowerV2/towerStyle';
+import { paintStyledWindow, paintSurface } from './apartmentStyleArt';
 
 /**
- * A Word Tower v2 block, drawn as an apartment floor: facade with brick coursing,
+ * A Word Tower v2 block, drawn as an apartment floor in the workshop's style
+ * (towerStyle.ts: brick walk-up, brownstone, deco, glass, neon...): facade,
  * cornice, the word on a sign plaque, a row of windows that light up as tenants
  * move in, and a concrete floor slab. The run's first floor is the lobby (door).
  *
@@ -20,19 +23,10 @@ const CREAM = 0xfffef0;
 const LIME = 0xbfff00;
 const GOLD = 0xffe135;
 const GOLD_SIDE = 0xb8860b;
-const GLASS = 0x1b2a4a;
-const LIT = 0xffe135;
 const CONCRETE = 0x3a3f58;
+const BASE_STYLE = TOWER_STYLES[0];
 
-/** Facade + darker trim per floor, cycling. Brand accents, dialled to facade. */
-const FACADES: Array<[number, number]> = [
-  [0xff6b8b, 0xb3365a],
-  [0x37e0ff, 0x117f99],
-  [0xb58cff, 0x6d45b8],
-  [0xbfff00, 0x6f9400],
-  [0xff9f43, 0xb3621a],
-  [0x4fe3b0, 0x1f8f6a],
-];
+const facadeOf = (style: TowerStyle, index: number): [number, number] => style.facades[index % style.facades.length];
 
 export interface BlockView {
   container: Container;
@@ -57,6 +51,10 @@ export interface BlockView {
   tenants: number;
   /** Welded by a rebar crate: steel columns bolted on, and it no longer moves. */
   rebar: boolean;
+  /** The workshop look this floor is built in. */
+  style: TowerStyle;
+  /** A trait (or gold) chose the colour; a style change keeps it. */
+  tinted: boolean;
 }
 
 const labelStyle = new TextStyle({
@@ -81,7 +79,7 @@ function makeLabel(word: string): Text {
   return label;
 }
 
-export function createBlockView(index: number, w: number, h: number, word: string, scale: number): BlockView {
+export function createBlockView(index: number, w: number, h: number, word: string, scale: number, style: TowerStyle = BASE_STYLE): BlockView {
   const container = new Container();
   const body = new Graphics();
   const glow = new Graphics();
@@ -97,7 +95,7 @@ export function createBlockView(index: number, w: number, h: number, word: strin
     body,
     glow,
     label,
-    colour: FACADES[index % FACADES.length],
+    colour: facadeOf(style, index),
     index,
     lobby: index === 0,
     builtScale: 0,
@@ -108,6 +106,8 @@ export function createBlockView(index: number, w: number, h: number, word: strin
     squash: 0,
     tenants: 0,
     rebar: false,
+    style,
+    tinted: false,
   };
   paintBlock(view, scale);
   return view;
@@ -123,7 +123,16 @@ export function setBlockRebar(view: BlockView): void {
 /** Turn a block gold — a reward's payout stays visible IN the tower. */
 export function setBlockGold(view: BlockView): void {
   view.gold = true;
+  view.tinted = true;
   view.colour = [GOLD, GOLD_SIDE];
+  view.builtScale = 0;
+}
+
+/** Rebuild a floor in a new workshop look (bought mid-run, or the estate loaded late). */
+export function setBlockStyle(view: BlockView, style: TowerStyle): void {
+  if (view.style.id === style.id) return;
+  view.style = style;
+  if (!view.tinted) view.colour = facadeOf(style, view.index);
   view.builtScale = 0;
 }
 
@@ -132,23 +141,9 @@ export function setBlockTrait(view: BlockView, trait: BlockTrait | undefined): v
   if (tint === 'gold') setBlockGold(view);
   else if (tint) {
     view.colour = tint;
+    view.tinted = true;
     view.builtScale = 0;
   }
-}
-
-function paintWindow(g: Graphics, r: Rect, lit: boolean, px: (n: number) => number): void {
-  g.rect(r.x - px(3), r.y - px(3), r.w + px(6), r.h + px(6)).fill(INK);
-  g.rect(r.x, r.y, r.w, r.h).fill(lit ? LIT : GLASS);
-  if (lit) {
-    // A tenant's silhouette in the lit pane.
-    g.circle(r.x + r.w / 2, r.y + r.h * 0.42, r.w * 0.2).fill({ color: INK, alpha: 0.75 });
-    g.roundRect(r.x + r.w * 0.22, r.y + r.h * 0.62, r.w * 0.56, r.h * 0.38, r.w * 0.2).fill({ color: INK, alpha: 0.75 });
-  } else {
-    g.poly([r.x + r.w * 0.55, r.y, r.x + r.w * 0.8, r.y, r.x + r.w * 0.25, r.y + r.h, r.x, r.y + r.h]).fill({ color: CREAM, alpha: 0.16 });
-  }
-  // Mullion + sill.
-  g.rect(r.x + r.w / 2 - px(1), r.y, px(2), r.h).fill({ color: INK, alpha: 0.55 });
-  g.rect(r.x - px(4), r.y + r.h + px(2), r.w + px(8), px(4)).fill(CREAM);
 }
 
 /** Repaint only when the scale moved enough for stroke widths to visibly drift. */
@@ -167,15 +162,14 @@ export function paintBlock(view: BlockView, scale: number): void {
   // Hard offset shadow, facade, brick coursing (one batched fill).
   body.rect(x + px(6), y + px(6), w, h).fill(INK);
   body.rect(x, y, w, h).fill(fill);
-  for (let cy = y + 16; cy < y + h - 14; cy += 12) body.rect(x, cy, w, px(2));
-  body.fill({ color: INK, alpha: 0.1 });
-  // Cornice: trim band with a cream lip.
   const { cornice, sign, slab, door } = layout;
+  paintSurface(body, view.style, x, cornice.y + cornice.h, w, slab.y, trim, px);
+  // Cornice: trim band with a cream lip.
   body.rect(cornice.x, cornice.y, cornice.w, cornice.h).fill(trim);
   body.rect(cornice.x, cornice.y + cornice.h - px(3), cornice.w, px(3)).fill({ color: CREAM, alpha: 0.6 });
 
   const lit = view.gold ? layout.windows.map(() => true) : litWindows(layout.windows.length, view.tenants, view.index + 1);
-  layout.windows.forEach((win, i) => paintWindow(body, win, lit[i], px));
+  layout.windows.forEach((win, i) => paintStyledWindow(body, view.style, win, lit[i], trim, px));
 
   if (door) {
     body.rect(door.x - px(3), door.y - px(3), door.w + px(6), door.h + px(3)).fill(INK);
@@ -189,7 +183,7 @@ export function paintBlock(view: BlockView, scale: number): void {
 
   // Sign plaque carrying the word.
   body.rect(sign.x + px(4), sign.y + px(4), sign.w, sign.h).fill(INK);
-  body.rect(sign.x, sign.y, sign.w, sign.h).fill(view.gold ? 0xfff6c2 : CREAM).stroke({ width: px(3), color: INK, alignment: 1 });
+  body.rect(sign.x, sign.y, sign.w, sign.h).fill(view.gold ? 0xfff6c2 : view.style.plaque).stroke({ width: px(3), color: INK, alignment: 1 });
   for (const bx of [sign.x + px(7), sign.x + sign.w - px(7)]) body.circle(bx, sign.y + sign.h / 2, px(2.4)).fill({ color: INK, alpha: 0.6 });
 
   // Floor slab.

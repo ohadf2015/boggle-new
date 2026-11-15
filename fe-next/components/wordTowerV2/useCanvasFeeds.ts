@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { impactThunk } from '@/lib/wordTowerV2/juice';
 import { type TowerGear, gearFromEstate } from '@/lib/wordTowerV2/gear';
+import { type TowerStyle, empireLevel, towerStyleFor } from '@/lib/wordTowerV2/towerStyle';
 import type { GhostPreview } from './TowerCanvas';
 import type { UseEstate } from './useEstate';
 import type { useTowerRun } from './useTowerRun';
@@ -41,6 +42,10 @@ export function useCanvasFeeds({ game, estateApi, word, valid, playSound }: Args
   const gearRef = useRef<TowerGear | null>(null);
   gearRef.current = estateApi.status === 'loading' ? null : gearFromEstate(estateApi.estate);
   const getGear = useCallback(() => gearRef.current, []);
+  // ...and the building style they add up to: every floor is drawn in it.
+  const styleRef = useRef<TowerStyle | null>(null);
+  styleRef.current = estateApi.status === 'loading' ? null : towerStyleFor(empireLevel(estateApi.estate));
+  const getStyle = useCallback(() => styleRef.current, []);
 
   // Free look sends the camera home on every hoist, so the swing a player has to
   // time is always framed — see TowerCanvas `homeKey`.
@@ -58,5 +63,5 @@ export function useCanvasFeeds({ game, estateApi, word, valid, playSound }: Args
     [playSound],
   );
 
-  return { getGhost, getHangingId, getBestM, getSceneM, getPerfectWindowMult, getGear, homeKey, onImpact };
+  return { getGhost, getHangingId, getBestM, getSceneM, getPerfectWindowMult, getGear, getStyle, homeKey, onImpact };
 }

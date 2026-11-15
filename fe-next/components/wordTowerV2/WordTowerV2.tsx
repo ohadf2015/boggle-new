@@ -291,6 +291,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           homeKey={feeds.homeKey}
           reducedMotion={reducedMotion}
           getGear={feeds.getGear}
+          getStyle={feeds.getStyle}
           {...rushUi.canvasProps}
           dockSide={wide ? 'inline' : 'bottom'}
           className={canvasClass}

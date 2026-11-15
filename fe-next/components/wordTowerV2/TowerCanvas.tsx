@@ -16,7 +16,8 @@ import { ParticlePool } from '@/lib/gameEngine/ParticleSystem';
 import { ScreenShake } from '@/lib/gameEngine/ScreenShake';
 import { COMBO_FLASH, CONFETTI_BURST, GOLD_STARS, RUBBLE_BURST, TOWER_DUST } from '@/lib/gameEngine/presets/particles';
 import { createBestLabel, paintBestLine, paintGround, paintLandingMark, paintRuler, paintThrowArc, paintTowerShaft, skirtsKey } from './towerArt';
-import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, setBlockTrait, tickBlock } from './apartmentArt';
+import { type BlockView, addTenant, createBlockView, createGhost, paintBlock, paintGhost, setBlockGold, setBlockRebar, setBlockStyle, setBlockTrait, tickBlock } from './apartmentArt';
+import type { TowerStyle } from '@/lib/wordTowerV2/towerStyle';
 import { perfectLandingFeel } from '@/lib/wordTowerV2/rush/landingFeel';
 import type { BlockTrait } from '@/lib/wordTowerV2/rush/types';
 import { createCity, paintCity, placeCity } from './skylineArt';
@@ -112,6 +113,8 @@ interface Props {
   reducedMotion?: boolean;
   /** Workshop upgrades to paint on the tower (plinth, braces, cornices, rooftop, crane paint). */
   getGear?: () => TowerGear | null;
+  /** The workshop's building style: every floor is drawn in it (towerStyle.ts). */
+  getStyle?: () => TowerStyle | null;
   /** Receives a live metres -> canvas-Y projector (same camera maths as the scene). */
   /** null on unmount: the projector reads a scene that no longer exists. */
   registerProjector?: (fn: ((hM: number) => number) | null) => void;
@@ -558,16 +561,17 @@ export default function TowerCanvas(props: Props) {
           shaftKey = nextShaftKey;
           paintTowerShaft(shaft, skirts, scale);
         }
+        const style = p.getStyle?.() ?? undefined;
         for (const block of snap.blocks) {
           let view = views.get(block.id);
           if (!view) {
             // Floor number from the id (`r0-b7` -> 7): colour cycle + lobby on floor 0.
             const floor = floorNo(block.id);
-            view = createBlockView(floor < 0 ? views.size : floor, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale);
+            view = createBlockView(floor < 0 ? views.size : floor, block.widthPx, block.heightPx, p.labels.get(block.id) ?? '', scale, style);
             setBlockTrait(view, p.getTrait?.(block.id));
             blocks.addChild(view.container);
             views.set(block.id, view);
-          }
+          } else if (style) setBlockStyle(view, style);
           paintBlock(view, scale);
           tickBlock(view, dt);
           view.container.position.set(block.x, block.y);
