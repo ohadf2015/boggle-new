@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-socrative Free 5/1/50 honesty wiring', () => {
   it('wires SocrativeFreeTierHonestyStrip and locks 5 Quizzes / 1 Room / 50 + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/SocrativeFreeTierHonestyStrip/);
     expect(page).toMatch(/5 Quizzes/);
     expect(page).toMatch(/1 Room/);

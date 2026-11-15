@@ -21,33 +21,35 @@ const ENGLISH_ONLY_PENDING = new Set<string>([
   'lexiclash-vs-apalabrados',
   'lexiclash-vs-blooket',
   'lexiclash-vs-cabanagrams',
-  'lexiclash-vs-classpoint',
   'lexiclash-vs-flocabulary',
-  'lexiclash-vs-freerice',
-  'lexiclash-vs-gimkit',
-  'lexiclash-vs-kahoot-gimkit-vocabulary',
-  'lexiclash-vs-mentimeter',
-  'lexiclash-vs-nearpod',
-  'lexiclash-vs-padlet',
-  'lexiclash-vs-peardeck',
   'lexiclash-vs-popple',
   'lexiclash-vs-puzzly-words',
   'lexiclash-vs-quizlet',
   'lexiclash-vs-scrabble',
-  'lexiclash-vs-socrative',
-  'lexiclash-vs-vocabularyspellingcity',
-  'lexiclash-vs-wayground',
-  'lexiclash-vs-wooclap',
   'lexiclash-vs-wordfeud',
-  'lexiclash-vs-wordle',
   'lexiclash-vs-wordwall',
   'lexiclash-vs-wordwall-kahoot-quizlet',
 ]);
 
-/** Localized pages: each loads its `copy.ts`. */
+/** Pages localized through `./copy`: each loads its `copy.ts` for the checks below. */
 const LOCALIZED_COPY: Record<string, () => Promise<{ default?: unknown; copies: Record<string, unknown> }>> = {
+  'lexiclash-vs-classpoint': () => import('../../../app/[locale]/lexiclash-vs-classpoint/copy'),
   'lexiclash-vs-kahoot': () => import('../../../app/[locale]/lexiclash-vs-kahoot/copy'),
+  'lexiclash-vs-mentimeter': () => import('../../../app/[locale]/lexiclash-vs-mentimeter/copy'),
+  'lexiclash-vs-nearpod': () => import('../../../app/[locale]/lexiclash-vs-nearpod/copy'),
+  'lexiclash-vs-padlet': () => import('../../../app/[locale]/lexiclash-vs-padlet/copy'),
+  'lexiclash-vs-peardeck': () => import('../../../app/[locale]/lexiclash-vs-peardeck/copy'),
+  'lexiclash-vs-socrative': () => import('../../../app/[locale]/lexiclash-vs-socrative/copy'),
+  'lexiclash-vs-wayground': () => import('../../../app/[locale]/lexiclash-vs-wayground/copy'),
+  'lexiclash-vs-wooclap': () => import('../../../app/[locale]/lexiclash-vs-wooclap/copy'),
 };
+
+/**
+ * Pages that handle other locales by an older mechanism, so they never show a
+ * mixed-language body: a per-page `content.ts` with all six locales, the
+ * translation catalogue (`translateKey`), or a permanent redirect to /en.
+ */
+const OTHER_MECHANISMS = [/from '\.\/content'/, /\btranslateKey\b/, /\benglishComparisonRedirect\b/];
 
 const vsDirs = readdirSync(APP_LOCALE_DIR).filter(
   (d) => d.startsWith('lexiclash-vs-') && existsSync(join(APP_LOCALE_DIR, d, 'page.tsx')),
@@ -63,7 +65,7 @@ function leaves(value: unknown, path = ''): Array<[string, string]> {
 }
 
 /** Product names and "vs" read the same in every locale (e.g. "LexiClash vs Quizlet"). */
-const NEUTRAL = /LexiClash|Kahoot|Quizlet|Wordle|Gimkit|Blooket|\bvs\b|\bPlus\b|\b(?:EN|HE|SV|JA|ES|RU)\b|[^A-Za-z]/gi;
+const NEUTRAL = /\S*[/…]\S*|[a-z0-9.-]+\.(?:com|io|help)\S*|LexiClash|Kahoot|Quizlet|Wordle|Gimkit|Blooket|Wordwall|Flocabulary|SpellingCity|Starter|ClassPoint|Socrative|Mentimeter|Nearpod|Padlet|Pear Deck|Wooclap|Wayground|Quizizz|Neon Free|Teacher (?:Free|Premium)|Flashcard Factory|Reflect & Review|Space Race|Sandbox|Google|Microsoft|PowerPoint|Silver|Gold|Platinum|Basic|Free|Premium|\bPro\b|Teacher Pro|\bvs\b|\bPlus\b|\b(?:EN|HE|SV|JA|ES|RU)\b|[^A-Za-z]/gi;
 
 const SCRIPT: Record<string, RegExp> = {
   he: /[֐-׿]/,
@@ -75,11 +77,13 @@ describe('lexiclash-vs-* pages are localized', () => {
   it.each(vsDirs)('%s is either localized or on the pending list', (dir) => {
     const page = readFileSync(join(APP_LOCALE_DIR, dir, 'page.tsx'), 'utf8');
     const usesCopy = /from ['"]\.\/copy['"]/.test(page);
+    const usesOther = OTHER_MECHANISMS.some((re) => re.test(page));
     if (ENGLISH_ONLY_PENDING.has(dir)) {
-      expect(usesCopy, `${dir} is localized: remove it from ENGLISH_ONLY_PENDING`).toBe(false);
-    } else {
-      expect(usesCopy, `${dir} renders English-only body: localize it via ./copy`).toBe(true);
+      expect(usesCopy || usesOther, `${dir} is localized: remove it from ENGLISH_ONLY_PENDING`).toBe(false);
+    } else if (usesCopy) {
       expect(LOCALIZED_COPY[dir], `${dir} must be registered in LOCALIZED_COPY`).toBeDefined();
+    } else {
+      expect(usesOther, `${dir} renders an English-only body: localize it via ./copy`).toBe(true);
     }
   });
 
@@ -102,7 +106,7 @@ describe('lexiclash-vs-* pages are localized', () => {
       for (const l of locales.filter((x) => x !== 'en')) {
         for (const [path, text] of leaves(copies[l])) {
           const same = text === en.get(path) && text.replace(NEUTRAL, '').length >= 4 && text.length >= 12;
-          const wrongScript = SCRIPT[l] && /[A-Za-z]{6,} [A-Za-z]{3,} [A-Za-z]{3,}/.test(text) && !SCRIPT[l].test(text);
+          const wrongScript = SCRIPT[l] && /[A-Za-z]{6,} [A-Za-z]{3,} [A-Za-z]{3,}/.test(text.replace(NEUTRAL, ' ')) && !SCRIPT[l].test(text);
           if (same || wrongScript) untranslated.push(`${l}:${path}`);
         }
       }

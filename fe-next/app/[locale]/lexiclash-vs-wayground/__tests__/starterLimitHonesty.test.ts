@@ -11,7 +11,8 @@ const EN = join(__dirname, '..', '..', '..', '..', 'translations', 'en.js');
 const HE = join(__dirname, '..', '..', '..', '..', 'translations', 'he.js');
 
 describe('lexiclash-vs-wayground Basic 20 max honesty foil', () => {
-  const page = readFileSync(PAGE, 'utf8');
+  // Visible text lives in copy.ts (all locales); the page file only wires it.
+  const page = readFileSync(PAGE, 'utf8') + readFileSync(join(__dirname, '..', 'copy.ts'), 'utf8');
   const en = readFileSync(EN, 'utf8');
   const he = readFileSync(HE, 'utf8');
 
