@@ -7,11 +7,14 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const PAGE = join(__dirname, '..', 'page.tsx');
+const COPY = join(__dirname, '..', 'copy.ts');
 const EN = join(__dirname, '..', '..', '..', '..', 'translations', 'en.js');
 const HE = join(__dirname, '..', '..', '..', '..', 'translations', 'he.js');
 
 describe('lexiclash-vs-kahoot Go Free limit honesty foil', () => {
-  const page = readFileSync(PAGE, 'utf8');
+  const pageShell = readFileSync(PAGE, 'utf8');
+  // Visible text lives in copy.ts (all locales); the page file only wires it.
+  const page = pageShell + readFileSync(COPY, 'utf8');
   const en = readFileSync(EN, 'utf8');
   const he = readFileSync(HE, 'utf8');
 
