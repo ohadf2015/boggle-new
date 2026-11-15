@@ -70,7 +70,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'peardeck.com/pricing + help.peardeck.com …/handling-inappropriate-responses',
       ],
     ],
-    footnote: "ClassPoint Basic Free Max 25 / 5 Q is #1202. Socrative Free 5/1/50 is #1196. Mentimeter Free 50/month is #1183. Wooclap Starter 5 active is #1186. Do NOT touch open #1204 audio PR.",
+    footnote: '',
     faqs: [
       {
           q: "What does Pear Deck Teacher Free publish for named student responses?",
@@ -78,7 +78,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: 'How does LexiClash foil Pear Deck Teacher Free named-response honesty?',
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50) with a classroom roster and named feedback disclosure on the free path — teachers see who submitted what without a Premium Teacher Dashboard or post-session spreadsheet export. Distinct from ClassPoint Basic Free Max 25 / 5 Q (#1202), Socrative Free 5/1/50 (#1196), Mentimeter Free 50/month (#1183), and Wooclap Starter 5 active (#1186).',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50) with a classroom roster and named feedback disclosure on the free path — teachers see who submitted what without a Premium Teacher Dashboard or post-session spreadsheet export. Distinct from ClassPoint Basic Free Max 25 / 5 Q, Socrative Free 5/1/50, Mentimeter Free 50/month, and Wooclap Starter 5 active.',
       },
       {
           q: 'Is LexiClash a Google Slides / PowerPoint add-in like Pear Deck?',

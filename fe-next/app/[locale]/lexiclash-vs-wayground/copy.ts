@@ -31,7 +31,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       ['Whole-class multiplayer', '✓ Up to 50 students free', 'Up to 100 students (Basic)'],
       ['Evidence (Basic / Starter)', '—', 'Plans “20 max” + help Updated 12 May 2026'],
     ],
-    footnote: "Mentimeter Free 50/month is #1183. Wooclap Starter 5 active is #1186. Nearpod Silver 40-join / 300 MB is #1169. Blooket free-tier is #1166. Gimkit Pro-Exclusive 5 is #1137.",
+    footnote: '',
     faqs: [
       {
           q: 'Does Wayground Basic limit how many activities I can store?',
@@ -39,7 +39,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: 'How does LexiClash foil the Wayground Basic 20 max activity storage limit?',
-          a: 'LexiClash free classroom vocab + reteach / Live turns miss gaps into a Live deep-link — no 20-resource library ceiling on the free classroom loop. Distinct from Mentimeter Free 50 participants/month (#1183), Wooclap Starter 5 active questions (#1186), Nearpod Silver 40-join (#1169), Blooket free-tier caps (#1166), and Gimkit Pro-Exclusive 5-player (#1137).',
+          a: 'LexiClash free classroom vocab + reteach / Live turns miss gaps into a Live deep-link — no 20-resource library ceiling on the free classroom loop. Distinct from Mentimeter Free 50 participants/month, Wooclap Starter 5 active questions, Nearpod Silver 40-join, Blooket free-tier caps, and Gimkit Pro-Exclusive 5-player.',
       },
       {
           q: 'Is Wayground the same as Quizizz?',

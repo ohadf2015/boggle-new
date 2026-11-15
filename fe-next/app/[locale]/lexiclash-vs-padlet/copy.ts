@@ -65,7 +65,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'padlet.help …/is-it-free + padlet.com/site/subscriptions',
       ],
     ],
-    footnote: "Pear Deck Teacher Free named-response is #1205. Nearpod Silver is #1169. Mentimeter Free 50/month is #1183. Wayground Starter is #1189. Kahoot Go is #1132. Socrative Free is #1196. ClassPoint Basic Free is #1202. Do NOT touch open #1204 audio PR.",
+    footnote: '',
     faqs: [
       {
           q: 'What does Padlet Neon Free publish for active boards and uploads?',
@@ -73,7 +73,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: 'How does LexiClash foil Padlet Neon Free honesty?',
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50) for word-formation games with miss-gap → reteach Live — no Neon Free 3-active-padlet or 20MB board-upload gate for classroom play. Distinct from Pear Deck Teacher Free named-response (#1205), Nearpod Silver (#1169), Mentimeter Free 50/month (#1183), Wayground Starter (#1189), Kahoot Go (#1132), Socrative Free (#1196), and ClassPoint Basic Free (#1202).',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50) for word-formation games with miss-gap → reteach Live — no Neon Free 3-active-padlet or 20MB board-upload gate for classroom play. Distinct from Pear Deck Teacher Free named-response, Nearpod Silver, Mentimeter Free 50/month, Wayground Starter, Kahoot Go, Socrative Free, and ClassPoint Basic Free.',
       },
       {
           q: 'Is LexiClash a digital canvas / board tool like Padlet?',

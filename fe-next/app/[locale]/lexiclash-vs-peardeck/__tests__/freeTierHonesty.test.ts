@@ -20,7 +20,7 @@ describe('lexiclash-vs-peardeck Teacher Free named-response honesty wiring', () 
     expect(page).toMatch(/handling-inappropriate-responses/);
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
-    expect(page).toMatch(/#1204|Do NOT touch open #1204/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 / roster only — no Pear Deck Premium dashboard copy', () => {

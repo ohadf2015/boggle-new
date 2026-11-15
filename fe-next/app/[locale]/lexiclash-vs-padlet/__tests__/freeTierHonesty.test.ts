@@ -16,7 +16,7 @@ describe('lexiclash-vs-padlet Neon Free 3-padlet / 20MB honesty wiring', () => {
     expect(page).toMatch(/padlet\.com\/site\/subscriptions/);
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
-    expect(page).toMatch(/#1204|Do NOT touch open #1204/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 / whole-class only — no Padlet 20MB / Platinum copy', () => {

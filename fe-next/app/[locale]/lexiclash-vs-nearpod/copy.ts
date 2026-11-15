@@ -31,7 +31,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       ['Game / lesson type', 'Word-formation (Boggle/Wheel/Anagram)', 'Interactive lessons / slides / assessments'],
       ['Evidence', '—', 'nearpod.com/pricing (Silver $0: 40 joins · 300 MB)'],
     ],
-    footnote: "Blooket Starter ≤60 + homework 14d is #1166. Gimkit Pro-Exclusive 5 is #1137. Wayground Starter 20-activity is #1136. Kahoot Go 40 vs FAQ 10 is #1132.",
+    footnote: '',
     faqs: [
       {
           q: 'What are Nearpod Silver free join and storage caps?',
@@ -39,7 +39,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: 'How does LexiClash foil Nearpod Silver’s 40-join / 300 MB free caps?',
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap, no separate 300 MB lesson-storage gate on the free reteach path. Distinct from Blooket Starter ≤60/#1166, Wayground Starter 20-activity/#1136, Gimkit Pro-Exclusive 5/#1137, Kahoot Go 40vs10/#1132, and Blooket Gaps/#1125.',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap, no separate 300 MB lesson-storage gate on the free reteach path. Distinct from Blooket Starter ≤60, Wayground Starter 20-activity, Gimkit Pro-Exclusive 5, Kahoot Go 40vs10, and Blooket Gaps.',
       },
       {
           q: 'Is LexiClash a slide/lesson platform like Nearpod?',
