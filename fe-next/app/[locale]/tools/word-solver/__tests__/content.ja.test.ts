@@ -27,6 +27,21 @@ describe('word-solver ja content', () => {
     expect(ja.inputPlaceholder).not.toMatch(/[A-Za-z]/);
   });
 
+  // Growth Radar row 12816: 668 impressions at position 6.8, CTR 1.6%. Searchers
+  // type アナグラムソルバー / アナグラム検索, but the title led with ワードソルバー.
+  it('given the ja SERP title, then it leads with アナグラムソルバー and fits a Japanese snippet', () => {
+    expect(ja.metaTitle).toBeDefined();
+    expect(ja.metaTitle!.startsWith('アナグラムソルバー')).toBe(true);
+    expect(ja.metaTitle).toContain('検索');
+    expect(`${ja.metaTitle} | LexiClash`.length).toBeLessThanOrEqual(40);
+  });
+
+  it('given the ja meta description, then it answers アナグラム検索 in its opening words', () => {
+    expect(ja.metaDescription.slice(0, 20)).toContain('アナグラム検索');
+    expect(ja.metaDescription).toContain('日本語');
+    expect(ja.metaDescription.length).toBeLessThanOrEqual(120);
+  });
+
   it('given the ja FAQs, then the anagram-solver question comes first', () => {
     expect(ja.faqs[0].question).toContain('アナグラムソルバー');
   });
