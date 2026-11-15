@@ -3,6 +3,7 @@ import path from 'path';
 import { describe, expect, it } from 'vitest';
 import {
   KNOWN_APP_ROOT_SEGMENTS,
+  PUBLIC_DIRS,
   decideNextHandle,
   isSeoCrawler,
 } from '../nextHandleGate';
@@ -13,6 +14,7 @@ import { RETIRED_MODE_REDIRECTS } from '../retiredModeRedirects.mjs';
 
 const LOCALE_DIR = path.resolve(__dirname, '../../../app/[locale]');
 const NEXT_CONFIG = path.resolve(__dirname, '../../../next.config.mjs');
+const PUBLIC_DIR = path.resolve(__dirname, '../../../public');
 
 function staticRedirectSources(): string[] {
   const config = fs.readFileSync(NEXT_CONFIG, 'utf8');
@@ -150,5 +152,30 @@ describe('decideNextHandle', () => {
     expect(server).toMatch(/finishNextHandleGate\(/);
     expect(gateRoute).toMatch(/gate\.action === 'redirect'[\s\S]{0,240}res\.status\(308\)/);
     expect(server).toMatch(/app\.get\('\/sitemap\.xml'/);
+  });
+});
+
+describe('public subdirectory assets', () => {
+  it('passes static files under public/ subdirectories (mascot loader regression)', () => {
+    for (const p of ['/mascot/winner.webp', '/mascots/styles/arcade.png', '/home/daily-streak.webp', '/mascot/posters/x.jpg', '/sql/sql-wasm.wasm', '/i18n/en.landing.32ac01bc.js']) {
+      expect(decideNextHandle(p)).toEqual({ action: 'pass' });
+    }
+  });
+  it('still drops unknown non-public paths and locale probes', () => {
+    expect(decideNextHandle('/randomscan/x.php').action).toBe('drop');
+    expect(decideNextHandle('/he/mascot/x.webp').action).toBe('drop');
+  });
+  it('PUBLIC_DIRS matches public/ on disk', () => {
+    const onDisk = fs.readdirSync(PUBLIC_DIR, { withFileTypes: true })
+      .filter((d) => d.isDirectory()).map((d) => d.name).sort();
+    expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d))).toEqual([]);
+  });
+});
+
+describe('first-party analytics proxy', () => {
+  it('passes /lcx so the next.config rewrite to PostHog runs (a drop here silently loses every browser event)', () => {
+    for (const p of ['/lcx/e/', '/lcx/flags/', '/lcx/static/array.js']) {
+      expect(decideNextHandle(p)).toEqual({ action: 'pass' });
+    }
   });
 });

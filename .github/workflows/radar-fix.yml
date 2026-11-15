@@ -85,6 +85,9 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ github.token }}
+          # radar-fix.yml runs on `issues: opened`, and Growth Radar files those issues as its GitHub App.
+          # The action refuses non-human actors unless listed; name only that App, never '*'.
+          allowed_bots: growth-radar[bot]
           claude_args: >-
             --model claude-opus-5-5
             --max-turns 120

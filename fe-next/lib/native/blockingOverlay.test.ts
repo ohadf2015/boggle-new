@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   BLOCKING_OVERLAY_CLASS,
   hasBlockingOverlay,
@@ -6,7 +6,7 @@ import {
 } from './blockingOverlay';
 
 const html = () => document.documentElement;
-const flush = () => new Promise((r) => setTimeout(r, 80));
+const flush = () => vi.advanceTimersByTimeAsync(80);
 
 function mountOverlay(attrs: Record<string, string>, style = ''): HTMLElement {
   const el = document.createElement('div');
@@ -17,7 +17,9 @@ function mountOverlay(attrs: Record<string, string>, style = ''): HTMLElement {
 }
 
 describe('blockingOverlay — any open modal overlay stands the native banner down', () => {
+  beforeEach(() => vi.useFakeTimers());
   afterEach(() => {
+    vi.useRealTimers();
     document.body.innerHTML = '';
     html().classList.remove(BLOCKING_OVERLAY_CLASS);
   });
