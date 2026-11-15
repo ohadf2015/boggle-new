@@ -27,7 +27,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       ['Free rooms / sessions', '✓ Whole-class Live + miss→reteach', 'Free: 1 Room'],
       ['Free student / seat model', '✓ Up to 50 students free per class', 'Free: 50 student per activity'],
       ['Report history (Free)', '—', '30-day report history'],
-      ['Vs Wayground storage foil', '—', 'Distinct from Wayground Basic 20 max activity storage (#1189)'],
+      ['Vs Wayground storage foil', '—', 'Distinct from Wayground Basic 20 max activity storage'],
       ['Miss → reteach Live', '✓ Free miss-gap → Live deep-link', 'Quiz reports / rooms (plan-gated features vary)'],
       ['No student signup', '✓ 6-character join code', 'Students join Socrative rooms'],
       ['Game / lesson type', 'Word-formation (Boggle/Wheel/Anagram)', 'Formative quizzes / Space Race / Exit Tickets'],
@@ -37,15 +37,15 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'socrative.com/pricing (Free: 5 Quizzes · 1 Room · 50) + Help choosing-the-right-plan',
       ],
     ],
-    footnote: "Wayground Basic 20 max is #1189. Mentimeter Free 50/month is #1183. Wooclap Starter 5 active is #1186. Nearpod Silver 40-join is #1169. Skip open #1187 (CTR titles).",
+    footnote: '',
     faqs: [
       {
           q: "What is Socrative Free's published cap?",
-          a: 'Socrative pricing (socrative.com/pricing, lastChecked September 29, 2026) lists Free: 5 Quizzes, 1 Room, 50 student per activity, plus 30-day report history. Help (choosing the right Socrative plan) notes Free keeps access to the last 5 modified quizzes and one room on downgrade. Distinct from Wayground Basic 20 max activity storage (#1189).',
+          a: 'Socrative pricing (socrative.com/pricing, lastChecked September 29, 2026) lists Free: 5 Quizzes, 1 Room, 50 student per activity, plus 30-day report history. Help (choosing the right Socrative plan) notes Free keeps access to the last 5 modified quizzes and one room on downgrade. Distinct from Wayground Basic 20 max activity storage.',
       },
       {
           q: "How does LexiClash foil Socrative Free's 5 Quizzes / 1 Room / 50 cap?",
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a 5-quiz / 1-room Free library ceiling. Distinct from Wayground Basic 20 max/#1189, Mentimeter Free 50/month/#1183, Wooclap Starter 5 active/#1186, Nearpod Silver 40-join/#1169, Blooket Starter ≤60/#1166, and Gimkit Pro-Exclusive 5/#1137.',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a 5-quiz / 1-room Free library ceiling. Distinct from Wayground Basic 20 max, Mentimeter Free 50/month, Wooclap Starter 5 active, Nearpod Silver 40-join, Blooket Starter ≤60, and Gimkit Pro-Exclusive 5.',
       },
       {
           q: 'Is LexiClash a quiz-response tool like Socrative?',

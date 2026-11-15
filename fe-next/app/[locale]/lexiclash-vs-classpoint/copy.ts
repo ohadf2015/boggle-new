@@ -28,7 +28,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       ['Question / activity types', '✓ Word-formation modes (Boggle/Wheel/Anagram)', 'Basic Free: 5 Question types'],
       ['Saved classes / library', '✓ Free classroom loop + Live', 'Basic Free: 3 saved classes'],
       ['Draggable / interactive objects', '—', 'Basic Free: 3 Draggable objects'],
-      ['Vs Socrative Free foil', '—', 'Distinct from Socrative Free 5 Quizzes / 1 Room / 50 (#1190)'],
+      ['Vs Socrative Free foil', '—', 'Distinct from Socrative Free 5 Quizzes / 1 Room / 50'],
       ['Miss → reteach Live', '✓ Free miss-gap → Live deep-link', 'In-PPT questions / reports (plan-gated)'],
       ['No student signup', '✓ 6-character join code', 'Students join ClassPoint sessions'],
       ['Game / lesson type', 'Word-formation (Boggle/Wheel/Anagram)', 'PowerPoint interactive questions / gamification'],
@@ -38,15 +38,15 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'classpoint.io/pricing (Basic Free: Max 25 · 5 Q/PPT · 5 types · 3 drag · 3 saved)',
       ],
     ],
-    footnote: "Socrative Free 5/1/50 is #1190. Wayground Basic 20 max is #1189. Mentimeter Free 50/month is #1183. Wooclap Starter 5 active is #1186. Nearpod Silver 40-join is #1169. Skip open #1187 (CTR titles).",
+    footnote: '',
     faqs: [
       {
           q: "What is ClassPoint Basic Free's published cap?",
-          a: 'ClassPoint pricing (classpoint.io/pricing, lastChecked September 30, 2026) lists Basic Free: Max 25 class size, 5 Questions per PPT, 5 Question types, 3 Draggable objects, 3 saved classes (plus 20 free AI quiz credits and Basic gamification). Distinct from Socrative Free 5 Quizzes / 1 Room / 50 (#1190).',
+          a: 'ClassPoint pricing (classpoint.io/pricing, lastChecked September 30, 2026) lists Basic Free: Max 25 class size, 5 Questions per PPT, 5 Question types, 3 Draggable objects, 3 saved classes (plus 20 free AI quiz credits and Basic gamification). Distinct from Socrative Free 5 Quizzes / 1 Room / 50.',
       },
       {
           q: "How does LexiClash foil ClassPoint Basic Free's Max 25 / 5 Q cap?",
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a Max-25 PowerPoint class-size / 5-questions-per-PPT Free ceiling. Distinct from Socrative Free 5/1/50/#1190, Wayground Basic 20 max/#1189, Mentimeter Free 50/month/#1183, Wooclap Starter 5 active/#1186, Nearpod Silver 40-join/#1169, Blooket Starter ≤60/#1166, and Gimkit Pro-Exclusive 5/#1137.',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a Max-25 PowerPoint class-size / 5-questions-per-PPT Free ceiling. Distinct from Socrative Free 5/1/50, Wayground Basic 20 max, Mentimeter Free 50/month, Wooclap Starter 5 active, Nearpod Silver 40-join, Blooket Starter ≤60, and Gimkit Pro-Exclusive 5.',
       },
       {
           q: 'Is LexiClash a PowerPoint add-in like ClassPoint?',

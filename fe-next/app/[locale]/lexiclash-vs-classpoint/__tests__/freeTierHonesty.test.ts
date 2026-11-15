@@ -15,7 +15,7 @@ describe('lexiclash-vs-classpoint Basic Free 25/5Q honesty wiring', () => {
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
     expect(page).toMatch(/Socrative Free 5 Quizzes|5 Quizzes \/ 1 Room \/ 50/);
-    expect(page).toMatch(/#1187|Skip open #1187/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 only — no ClassPoint 25 / 5 Q copy', () => {

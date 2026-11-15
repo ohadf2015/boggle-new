@@ -14,7 +14,7 @@ describe('lexiclash-vs-socrative Free 5/1/50 honesty wiring', () => {
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
     expect(page).toMatch(/Wayground Basic 20 max|20 max activity storage/);
-    expect(page).toMatch(/#1187|Skip open #1187/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 only — no Socrative 5-quiz / 1-room copy', () => {

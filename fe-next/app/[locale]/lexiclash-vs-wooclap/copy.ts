@@ -36,7 +36,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'docs…/14402104 (June 2, 2026) + wooclap.com/…/pricing-education',
       ],
     ],
-    footnote: "Mentimeter Free 50/month is #1183. Nearpod Silver 40-join / 300 MB is #1169. Distinct from Blooket, Gimkit, Wayground, Kahoot Go.",
+    footnote: '',
     faqs: [
       {
           q: "What is Wooclap Starter's free question limit?",
@@ -44,7 +44,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: "How does LexiClash foil Wooclap Starter's 5 active / 30d meter?",
-          a: 'LexiClash free classroom vocab runs without Wooclap’s active-question meter — question-quota honesty (5 active / 30 days), not a participant-cap fight. Distinct from Mentimeter Free 50/month/#1183, Nearpod Silver 40-join/#1169, Blooket Starter, Gimkit Pro-Exclusive, Wayground, and Kahoot Go Free.',
+          a: 'LexiClash free classroom vocab runs without Wooclap’s active-question meter — question-quota honesty (5 active / 30 days), not a participant-cap fight. Distinct from Mentimeter Free 50/month, Nearpod Silver 40-join, Blooket Starter, Gimkit Pro-Exclusive, Wayground, and Kahoot Go Free.',
       },
       {
           q: 'Is LexiClash a live-polling tool like Wooclap?',

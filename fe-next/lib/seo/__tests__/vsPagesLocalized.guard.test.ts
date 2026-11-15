@@ -113,6 +113,13 @@ describe('lexiclash-vs-* pages are localized', () => {
       expect(untranslated).toEqual([]);
     });
 
+    it('carries no internal ticket references (#NNNN) in any locale', async () => {
+      const { copies } = await LOCALIZED_COPY[dir]();
+      for (const l of locales) {
+        for (const [path, text] of leaves(copies[l])) expect(text, `${l}:${path}`).not.toMatch(/#\d{3,4}\b/);
+      }
+    });
+
     it('uses natural Hebrew wording (דו-קרב, never דואלי)', async () => {
       const { copies } = await LOCALIZED_COPY[dir]();
       for (const [, text] of leaves(copies.he)) expect(text).not.toContain('דואל');

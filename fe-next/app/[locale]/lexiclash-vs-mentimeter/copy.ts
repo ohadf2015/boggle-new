@@ -36,7 +36,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
         'help…/1258367 + mentimeter.com/plans?view=standard (Free: 50/month)',
       ],
     ],
-    footnote: "Nearpod Silver 40-join / 300 MB is #1169. Blooket Starter ≤60 is #1166. Gimkit Pro-Exclusive 5 is #1137.",
+    footnote: '',
     faqs: [
       {
           q: 'What is Mentimeter Free’s participant cap?',
@@ -44,7 +44,7 @@ const pageCopy: Record<Locale, Omit<VsFoilCopy, 'sideHeading' | 'thFeature' | 'f
       },
       {
           q: 'How does LexiClash foil Mentimeter Free’s 50 participants/month cap?',
-          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a monthly participant counter that resets on the account-creation date. Distinct from Nearpod Silver 40-join/#1169, Blooket Starter ≤60/#1166, Gimkit Pro-Exclusive 5/#1137, Wayground, and Kahoot Go Free.',
+          a: 'LexiClash free classroom vocab runs a whole class (up to 50 students) with miss-gap → reteach Live — one published free seat cap per class, not a monthly participant counter that resets on the account-creation date. Distinct from Nearpod Silver 40-join, Blooket Starter ≤60, Gimkit Pro-Exclusive 5, Wayground, and Kahoot Go Free.',
       },
       {
           q: 'Is LexiClash a live-polling tool like Mentimeter?',
