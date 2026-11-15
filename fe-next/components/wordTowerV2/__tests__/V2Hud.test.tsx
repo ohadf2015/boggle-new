@@ -357,7 +357,7 @@ describe('V2Hud', () => {
     );
     await user.click(screen.getByRole('button', { name: /wordTowerV2.hud.menu/i }));
 
-    expect(screen.getByLabelText('wordTowerV2.wreck.balls {"n":2}')).toBeInTheDocument();
+    expect(screen.getByText('wordTowerV2.hud.sheet.rivalsBalls {"n":2}')).toBeInTheDocument();
     expect(screen.getByLabelText('wordTowerV2.tenants {"n":3}')).toBeInTheDocument();
     expect(
       screen.getByLabelText('wordTowerV2.hud.effect {"name":"wordTowerV2.reward.steady.name","n":2}'),

@@ -6,6 +6,8 @@ import type { RunState } from '@/lib/wordTowerV2/run';
 import { V2TopBar } from './V2TopBar';
 import { V2HudMenu } from './V2HudMenu';
 import { UpgradeReadyToast } from './hud/UpgradeReadyToast';
+import { RivalNudgeToast, rivalAhead } from './hud/RivalNudgeToast';
+import type { GhostRival } from '@/lib/wordTowerV2/rush/types';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -50,6 +52,10 @@ interface Props {
   menuSlot?: ReactNode;
   /** Shown last in the menu (what each block does). */
   menuFootSlot?: ReactNode;
+  /** The rival tower marked in the sky (the next one above you), for wreck suggestions. */
+  rival?: GhostRival | null;
+  /** Raids on you not answered yet, newest first — the revenge suggestion. */
+  raiders?: string[];
 }
 
 /**
@@ -81,9 +87,12 @@ export function V2Hud({
   rushSlot,
   menuSlot,
   menuFootSlot,
+  rival,
+  raiders,
 }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
   const coins = estate.coins + runCoins;
+  const target = rivalAhead(rival, heightM);
 
   const handleMenuOpen = useCallback(() => {
     setMenuOpen(true);
@@ -115,7 +124,11 @@ export function V2Hud({
         hasTower={hasTower}
         rushSlot={rushSlot}
       />
-      <UpgradeReadyToast t={t} estate={estate} runCoins={runCoins} reducedMotion={reducedMotion} />
+      {/* Toasts stack under the bar, so an upgrade and a wrecking ball earned on the same drop never overlap. */}
+      <div data-wt2-toasts className="pointer-events-none absolute inset-x-4 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-40 mx-auto flex max-w-sm flex-col gap-2">
+        <UpgradeReadyToast t={t} estate={estate} runCoins={runCoins} reducedMotion={reducedMotion} />
+        <RivalNudgeToast t={t} balls={run.balls} target={target} onWreck={onOpenRivals} reducedMotion={reducedMotion} />
+      </div>
       <V2HudMenu
         t={t}
         open={menuOpen}
@@ -129,6 +142,8 @@ export function V2Hud({
         reducedMotion={reducedMotion}
         topSlot={menuSlot}
         footSlot={menuFootSlot}
+        rivalTarget={target}
+        raider={raiders?.[0] ?? null}
       />
     </>
   );

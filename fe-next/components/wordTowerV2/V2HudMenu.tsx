@@ -26,6 +26,10 @@ interface Props {
   topSlot?: ReactNode;
   /** Shown last, under "What each block does" (the block legend). */
   footSlot?: ReactNode;
+  /** The tower right above you, to suggest as the next wreck. */
+  rivalTarget?: { name: string; gapM: number } | null;
+  /** Someone who raided you and is still owed a payback. */
+  raider?: string | null;
 }
 
 const EFFECT_CLASS: Record<'steady' | 'plumb' | 'wide', string> = {
@@ -56,6 +60,8 @@ export function V2HudMenu({
   reducedMotion,
   topSlot,
   footSlot,
+  rivalTarget = null,
+  raider = null,
 }: Props) {
   const effects: Array<{ id: 'steady' | 'plumb' | 'wide'; n: number }> = [];
   if (run.steadyDrops > 0) effects.push({ id: 'steady', n: run.steadyDrops });
@@ -113,6 +119,8 @@ export function V2HudMenu({
             <RivalsCard
               t={t}
               balls={run.balls}
+              target={rivalTarget}
+              raider={raider}
               onOpen={() => {
                 onOpenRivals();
                 onClose();
