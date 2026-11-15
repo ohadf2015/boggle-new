@@ -69,6 +69,62 @@ describe('dailyTower — the tower persists across UTC days', () => {
     expect(growthToday(reverted)).toBe(0);
   });
 
+  it('Given a partial fall below the morning height, when floors are rebuilt, then every rebuilt metre counts', () => {
+    const morning = ['a1', 'b2', 'c3', 'd4', 'e5', 'f6'];
+    let s = rollDay(emptySave('en'), D1);
+    s = commitTower(s, { words: morning, standingM: 18 });
+    s = rollDay(s, D2);
+    s = commitTower(s, { words: [...morning, 'g7', 'h8'], standingM: 24 });
+    expect(growthToday(s)).toBe(6);
+    // The top five floors fall; the run goes on with three standing.
+    s = commitTower(s, { words: ['a1', 'b2', 'c3'], standingM: 9 });
+    expect(growthToday(s)).toBe(0);
+    // Rebuilt back to the morning height: 9 m of new floors, all of them count.
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'x1', 'x2', 'x3'], standingM: 18 });
+    expect(growthToday(s)).toBe(9);
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'x1', 'x2', 'x3', 'x4'], standingM: 21 });
+    expect(growthToday(s)).toBe(12);
+  });
+
+  it('Given a fall that stays above the morning height, then only the lost floors are lost', () => {
+    let s = rollDay(emptySave('en'), D1);
+    s = commitTower(s, { words: ['a1', 'b2'], standingM: 6 });
+    s = rollDay(s, D2);
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'd4', 'e5'], standingM: 15 });
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'd4'], standingM: 12 });
+    expect(growthToday(s)).toBe(6);
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'd4', 'z9'], standingM: 15 });
+    expect(growthToday(s)).toBe(9);
+  });
+
+  it('Given a partial fall then a total collapse, then the rebuilt checkpoint counts from the morning height again', () => {
+    let s = rollDay(emptySave('en'), D1);
+    s = commitTower(s, { words: ['a1', 'b2', 'c3'], standingM: 9 });
+    s = rollDay(s, D2);
+    s = commitTower(s, { words: ['a1'], standingM: 3 });
+    s = revertToDayStart(s);
+    expect(s.totalM).toBe(9);
+    expect(growthToday(s)).toBe(0);
+    s = commitTower(s, { words: ['a1', 'b2', 'c3', 'd4'], standingM: 12 });
+    expect(growthToday(s)).toBe(3);
+  });
+
+  it('Given a save from before the score baseline existed, then it counts from the morning height', () => {
+    const raw = {
+      v: 1,
+      language: 'en',
+      dayKey: D1,
+      words: ['a1', 'b2', 'c3'],
+      carriedM: 0,
+      totalM: 12,
+      dayStart: { words: ['a1', 'b2'], carriedM: 0, totalM: 6 },
+    };
+    const s = loadDailyTower('en', mem({ [towerSaveKey('en')]: JSON.stringify(raw) }));
+    expect(growthToday(s)).toBe(6);
+    const forged = loadDailyTower('en', mem({ [towerSaveKey('en')]: JSON.stringify({ ...raw, scoreFromM: 99 }) }));
+    expect(growthToday(forged)).toBe(6);
+  });
+
   it('Given a tower past the floor cap, then the oldest floors drop off the bottom but the height is carried', () => {
     const words = Array.from({ length: MAX_SAVED_FLOORS + 10 }, (_, i) => `w${i}`);
     const standingM = words.length * 3;
