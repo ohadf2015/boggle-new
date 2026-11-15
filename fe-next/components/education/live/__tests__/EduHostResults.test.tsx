@@ -77,8 +77,9 @@ describe('EduHostResults', () => {
     const onExitRoom = vi.fn();
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={onRematch} onClose={onClose} onExitRoom={onExitRoom} />);
     expect(screen.getAllByRole('button').filter((b) => b.className.includes('bg-neo-lime'))).toEqual([screen.getByTestId('edu-results-play-again')]);
+    expect(screen.getByTestId('edu-results-more')).not.toContainElement(screen.getByTestId('edu-results-end'));
+    expect(screen.getByTestId('edu-results-more')).not.toContainElement(screen.getByTestId('edu-results-next-mode'));
     fireEvent.click(screen.getByTestId('edu-results-play-again'));
-    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     fireEvent.click(screen.getByTestId('edu-results-next-mode'));
     fireEvent.click(screen.getByTestId('edu-results-end'));
     expect(onRematch).toHaveBeenCalledTimes(1);
