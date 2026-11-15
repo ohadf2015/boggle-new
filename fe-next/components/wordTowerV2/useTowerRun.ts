@@ -144,8 +144,8 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     const landed = { x: block.x, bottomY: block.y + block.heightPx / 2, angleRad: block.angleRad };
     const trait = traitRef.current.get(pending.id);
     const quality: LandingQuality = classifyLanding(landed, pending.support, windowMultFor(trait));
-    const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen }, landingModsFor(rushMods(), trait));
-    rushRef.current?.onLanding(quality);
+    const out = applyLanding(runRef.current, { quality, wordLen: pending.wordLen }, landingModsFor(rushMods(), trait, rushRef.current?.challengeRef.current ?? null));
+    rushRef.current?.onLanding(quality, pending.wordLen);
     runRef.current = out.run;
     setRun(out.run);
     trackFloorPlaced(floorLogRef, runNoRef.current, out.run.floors, dailySeed != null, pending.wordLen);

@@ -135,6 +135,7 @@ const keys: string[] = [
   ...RUSH_TRAITS.map((k) => `wordTowerV2.rush.blockInfo.desc.${k}`),
   'wordTowerV2.rush.blockInfo.next',
   ...['ballTitle', 'ballAhead', 'ballAny', 'wreck'].map((k) => `wordTowerV2.nudge.${k}`),
+  ...['label', 'long', 'perfect', 'good', 'prize', 'done', 'missed'].map((k) => `wordTowerV2.challenge.${k}`),
   ...TOWER_STYLES.map((st) => `wordTowerV2.style.name.${st.id}`),
   ...['label', 'next', 'nextOne', 'max', 'unlocked', 'unlockedHint', 'readyTitle', 'readyLine', 'readyNewLook'].map((k) => `wordTowerV2.style.${k}`),
   ...['title', 'rankLabel', 'rankToNext', 'rankMax', 'workshopReadyOne', 'workshopReady', 'workshopNext', 'workshopRepair', 'workshopDone', 'rivalsBallsOne', 'rivalsBalls', 'rivalsNone', 'thisRun', 'streak', 'streakBest', 'tenants', 'legendTitle', 'rivalsRevenge', 'rivalsAhead'].map((k) => `wordTowerV2.hud.sheet.${k}`),

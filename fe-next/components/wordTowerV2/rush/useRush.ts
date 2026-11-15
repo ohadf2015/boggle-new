@@ -10,6 +10,7 @@ import { crossedRivals, pickRivals } from '@/lib/wordTowerV2/rush/rivals';
 import { type TraitQueue, createTraitQueue } from '@/lib/wordTowerV2/rush/traits';
 import type { BlockTrait, GhostRival, NextUpSlot, Perk, PerkId, PerkMods, RankState } from '@/lib/wordTowerV2/rush/types';
 import { type RushBoardRow, boardToRivalRows, sameRivals, slotsWithCarry } from './rushHelpers';
+import { type ChallengeApi, useChallenge } from './useChallenge';
 
 export type { RushBoardRow } from './rushHelpers';
 
@@ -17,7 +18,7 @@ export interface RushEvent {
   key: number;
 }
 
-export interface RushApi {
+export interface RushApi extends ChallengeApi {
   owned: PerkId[];
   mods: PerkMods;
   modsRef: MutableRefObject<PerkMods>;
@@ -39,7 +40,7 @@ export interface RushApi {
   pickPerk(id: PerkId): PickResult;
   takeTrait(): BlockTrait;
   returnTrait(trait: BlockTrait): void;
-  onLanding(quality: LandingQuality): void;
+  onLanding(quality: LandingQuality, wordLen?: number): void;
   consumeFreeRecovery(): boolean;
   reset(seed: number): void;
 }
@@ -178,13 +179,16 @@ export function useRush(opts?: { daily?: boolean }): RushApi {
     [refreshSlots],
   );
 
+  const challengeApi = useChallenge(seedRef);
+  const { landChallenge, resetChallenge } = challengeApi;
   const onLanding = useCallback(
-    (quality: LandingQuality) => {
+    (quality: LandingQuality, wordLen = 0) => {
+      landChallenge(quality, wordLen);
       if (quality !== 'perfect') return;
       queueRef.current.revealSealed();
       refreshSlots();
     },
-    [refreshSlots],
+    [refreshSlots, landChallenge],
   );
 
   const consumeFreeRecovery = useCallback(() => {
@@ -213,10 +217,11 @@ export function useRush(opts?: { daily?: boolean }): RushApi {
       setRank(rankFor(0));
       setRankUp(null);
       setOvertakes([]);
+      resetChallenge();
       refreshSlots();
       repickRivals();
     },
-    [refreshSlots, repickRivals, goldWeightMul],
+    [refreshSlots, repickRivals, goldWeightMul, resetChallenge],
   );
 
   const clearRankUp = useCallback(() => setRankUp(null), []);
@@ -224,6 +229,7 @@ export function useRush(opts?: { daily?: boolean }): RushApi {
   const mods = useMemo(() => combineMods(owned), [owned]);
 
   return {
+    ...challengeApi,
     owned, mods, modsRef, slots,
     draftOffer: draft?.offer ?? null, draftFloor: draft?.floor ?? null,
     rank, rankUp, clearRankUp, rivals, overtake: overtakes[0] ?? null, shiftOvertake, setBoard,

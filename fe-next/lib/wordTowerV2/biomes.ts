@@ -31,6 +31,9 @@ export const CRITTER_KINDS: readonly PropKind[] = ['puff', 'whale', 'astronaut',
  */
 export type SkyFx = 'rays' | 'haze' | 'streaks' | 'curtain' | 'deep';
 
+/** Each sky's moving air (skyWeather.ts): no two consecutive skies share one. */
+export type Weather = 'confetti' | 'fireflies' | 'wisps' | 'wind' | 'snow' | 'twinkle' | 'meteors';
+
 export interface Biome {
   id: BiomeId;
   /** First floor fully inside this sky. */
@@ -45,16 +48,17 @@ export interface Biome {
   city: number;
   props: PropKind[];
   fx: SkyFx;
+  weather: Weather;
 }
 
 export const BIOMES: Biome[] = [
-  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird', 'balloon'], fx: 'rays' },
-  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud', 'puff'], fx: 'haze' },
-  { id: 'clouds', fromFloor: 6, skyTop: 0x7a5cff, skyBottom: 0xffb3d9, accent: 0x37e0ff, stars: 0, city: 0x4a3a8a, props: ['cloud', 'balloon', 'puff', 'whale'], fx: 'rays' },
-  { id: 'jetstream', fromFloor: 10, skyTop: 0x1b1f5e, skyBottom: 0x3f6fd8, accent: 0x37e0ff, stars: 0.25, city: 0x1b1f45, props: ['jet', 'cloud', 'whale', 'puff'], fx: 'streaks' },
-  { id: 'aurora', fromFloor: 15, skyTop: 0x061233, skyBottom: 0x0f4d5c, accent: 0xbfff00, stars: 0.6, city: 0x0a1a2a, props: ['aurora', 'jet', 'whale'], fx: 'curtain' },
-  { id: 'orbit', fromFloor: 21, skyTop: 0x02030d, skyBottom: 0x141a45, accent: 0xb06cff, stars: 1, city: 0x05060f, props: ['satellite', 'planet', 'astronaut', 'ufo'], fx: 'deep' },
-  { id: 'cosmos', fromFloor: 28, skyTop: 0x12002a, skyBottom: 0x3a0a5e, accent: 0xff4d9d, stars: 1, city: 0x05060f, props: ['comet', 'planet', 'ufo', 'astronaut'], fx: 'rays' },
+  { id: 'downtown', fromFloor: 0, skyTop: 0x2f7bff, skyBottom: 0x8fd8ff, accent: 0xbfff00, stars: 0, city: 0x2a2f5a, props: ['cloud', 'bird', 'balloon'], fx: 'rays', weather: 'confetti' },
+  { id: 'sunset', fromFloor: 3, skyTop: 0x5b2a86, skyBottom: 0xff8a4c, accent: 0xff4d9d, stars: 0, city: 0x3b1f4f, props: ['bird', 'balloon', 'cloud', 'puff'], fx: 'haze', weather: 'fireflies' },
+  { id: 'clouds', fromFloor: 6, skyTop: 0x7a5cff, skyBottom: 0xffb3d9, accent: 0x37e0ff, stars: 0, city: 0x4a3a8a, props: ['cloud', 'balloon', 'puff', 'whale'], fx: 'rays', weather: 'wisps' },
+  { id: 'jetstream', fromFloor: 10, skyTop: 0x1b1f5e, skyBottom: 0x3f6fd8, accent: 0x37e0ff, stars: 0.25, city: 0x1b1f45, props: ['jet', 'cloud', 'whale', 'puff'], fx: 'streaks', weather: 'wind' },
+  { id: 'aurora', fromFloor: 15, skyTop: 0x061233, skyBottom: 0x0f4d5c, accent: 0xbfff00, stars: 0.6, city: 0x0a1a2a, props: ['aurora', 'jet', 'whale'], fx: 'curtain', weather: 'snow' },
+  { id: 'orbit', fromFloor: 21, skyTop: 0x02030d, skyBottom: 0x141a45, accent: 0xb06cff, stars: 1, city: 0x05060f, props: ['satellite', 'planet', 'astronaut', 'ufo'], fx: 'deep', weather: 'twinkle' },
+  { id: 'cosmos', fromFloor: 28, skyTop: 0x12002a, skyBottom: 0x3a0a5e, accent: 0xff4d9d, stars: 1, city: 0x05060f, props: ['comet', 'planet', 'ufo', 'astronaut'], fx: 'rays', weather: 'meteors' },
 ];
 
 /** Floors over which one sky fades into the next, ending at the next's fromFloor. */
