@@ -104,7 +104,7 @@ export function TeacherHomeView({
         ) : null}
 
         {hasRail ? (
-          <aside aria-label={t('eduShell.home.railLabel')} className={cn('flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1', showSessions && RAIL_SPAN)}>
+          <aside aria-label={t('eduShell.home.railLabel')} className={cn('flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:pt-24', showSessions && RAIL_SPAN)}>
             {!ready ? <HomeRailSkeleton /> : week?.classes ? (
               <section data-tm data-testid="home-week" aria-labelledby="home-week-title" className={cn(GAME_CARD, 'flex flex-col gap-2.5 p-3 max-lg:hidden')}>
                 <h2 id="home-week-title" data-accent-decor className={cn(STICKER, 'self-start bg-neo-pink text-neo-cream')}>{t('eduShell.home.yourClasses')}</h2>
