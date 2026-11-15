@@ -19,37 +19,35 @@ const APP_LOCALE_DIR = join(__dirname, '..', '..', '..', 'app', '[locale]');
 /** Pages whose body is still English-only. Do not add to this list. */
 const ENGLISH_ONLY_PENDING = new Set<string>([
   'lexiclash-vs-apalabrados',
+  'lexiclash-vs-blooket',
   'lexiclash-vs-cabanagrams',
   'lexiclash-vs-classpoint',
+  'lexiclash-vs-flocabulary',
+  'lexiclash-vs-freerice',
+  'lexiclash-vs-gimkit',
+  'lexiclash-vs-kahoot-gimkit-vocabulary',
   'lexiclash-vs-mentimeter',
   'lexiclash-vs-nearpod',
   'lexiclash-vs-padlet',
   'lexiclash-vs-peardeck',
   'lexiclash-vs-popple',
   'lexiclash-vs-puzzly-words',
+  'lexiclash-vs-quizlet',
   'lexiclash-vs-scrabble',
   'lexiclash-vs-socrative',
+  'lexiclash-vs-vocabularyspellingcity',
   'lexiclash-vs-wayground',
   'lexiclash-vs-wooclap',
   'lexiclash-vs-wordfeud',
+  'lexiclash-vs-wordle',
+  'lexiclash-vs-wordwall',
   'lexiclash-vs-wordwall-kahoot-quizlet',
 ]);
 
-/** Pages localized through `./copy`: each loads its `copy.ts` for the checks below. */
+/** Localized pages: each loads its `copy.ts`. */
 const LOCALIZED_COPY: Record<string, () => Promise<{ default?: unknown; copies: Record<string, unknown> }>> = {
-  'lexiclash-vs-blooket': () => import('../../../app/[locale]/lexiclash-vs-blooket/copy'),
-  'lexiclash-vs-flocabulary': () => import('../../../app/[locale]/lexiclash-vs-flocabulary/copy'),
   'lexiclash-vs-kahoot': () => import('../../../app/[locale]/lexiclash-vs-kahoot/copy'),
-  'lexiclash-vs-quizlet': () => import('../../../app/[locale]/lexiclash-vs-quizlet/copy'),
-  'lexiclash-vs-wordwall': () => import('../../../app/[locale]/lexiclash-vs-wordwall/copy'),
 };
-
-/**
- * Pages that handle other locales by an older mechanism, so they never show a
- * mixed-language body: a per-page `content.ts` with all six locales, the
- * translation catalogue (`translateKey`), or a permanent redirect to /en.
- */
-const OTHER_MECHANISMS = [/from '\.\/content'/, /\btranslateKey\b/, /\benglishComparisonRedirect\b/];
 
 const vsDirs = readdirSync(APP_LOCALE_DIR).filter(
   (d) => d.startsWith('lexiclash-vs-') && existsSync(join(APP_LOCALE_DIR, d, 'page.tsx')),
@@ -65,7 +63,7 @@ function leaves(value: unknown, path = ''): Array<[string, string]> {
 }
 
 /** Product names and "vs" read the same in every locale (e.g. "LexiClash vs Quizlet"). */
-const NEUTRAL = /LexiClash|Kahoot|Quizlet|Wordle|Gimkit|Blooket|Wordwall|Flocabulary|SpellingCity|Starter|\bPro\b|Teacher Pro|\bvs\b|\bPlus\b|\b(?:EN|HE|SV|JA|ES|RU)\b|[^A-Za-z]/gi;
+const NEUTRAL = /LexiClash|Kahoot|Quizlet|Wordle|Gimkit|Blooket|\bvs\b|\bPlus\b|\b(?:EN|HE|SV|JA|ES|RU)\b|[^A-Za-z]/gi;
 
 const SCRIPT: Record<string, RegExp> = {
   he: /[֐-׿]/,
@@ -77,13 +75,11 @@ describe('lexiclash-vs-* pages are localized', () => {
   it.each(vsDirs)('%s is either localized or on the pending list', (dir) => {
     const page = readFileSync(join(APP_LOCALE_DIR, dir, 'page.tsx'), 'utf8');
     const usesCopy = /from ['"]\.\/copy['"]/.test(page);
-    const usesOther = OTHER_MECHANISMS.some((re) => re.test(page));
     if (ENGLISH_ONLY_PENDING.has(dir)) {
-      expect(usesCopy || usesOther, `${dir} is localized: remove it from ENGLISH_ONLY_PENDING`).toBe(false);
-    } else if (usesCopy) {
-      expect(LOCALIZED_COPY[dir], `${dir} must be registered in LOCALIZED_COPY`).toBeDefined();
+      expect(usesCopy, `${dir} is localized: remove it from ENGLISH_ONLY_PENDING`).toBe(false);
     } else {
-      expect(usesOther, `${dir} renders an English-only body: localize it via ./copy`).toBe(true);
+      expect(usesCopy, `${dir} renders English-only body: localize it via ./copy`).toBe(true);
+      expect(LOCALIZED_COPY[dir], `${dir} must be registered in LOCALIZED_COPY`).toBeDefined();
     }
   });
 

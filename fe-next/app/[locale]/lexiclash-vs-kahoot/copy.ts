@@ -5,11 +5,25 @@
  */
 import type { Locale } from '@/i18n/config';
 import { vsCommonCopy, type VsCommonCopy } from '@/lib/seo/vsCommonCopy';
-import type { VsPageCopy } from '@/lib/seo/vsPageCopy';
 
-export type KahootPageCopy = VsPageCopy;
+export interface KahootPageCopy extends VsCommonCopy {
+  h1: string;
+  intro: string;
+  rows: ReadonlyArray<readonly [string, string, string]>;
+  pricingNote: string;
+  beatsTitle: string;
+  beats: ReadonlyArray<{ title: string; desc: string }>;
+  kahootWinsTitle: string;
+  kahootWins: string;
+  faqs: ReadonlyArray<{ q: string; a: string }>;
+  moreComparisons: ReadonlyArray<{ title: string; desc: string }>;
+  tryTitle: string;
+  tryBody: string;
+  tryCta: string;
+  breadcrumbPage: string;
+}
 
-const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' | 'cta3'>> = {
+const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy>> = {
   en: {
     h1: 'Kahoot is fun. For vocabulary, LexiClash is faster, freer, and word-game native.',
     intro:
@@ -41,8 +55,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: 'Faster setup', desc: 'Kahoot quizzes take 2-5 minutes per quiz to author. LexiClash word lists upload in under a minute, and many teachers use built-in lists for instant play.' },
       { title: 'Ad-free classroom', desc: 'Free Kahoot occasionally surfaces promos to students. LexiClash classroom mode is ad-free in all tiers.' },
     ],
-    winsTitle: 'When Kahoot still wins',
-    wins:
+    kahootWinsTitle: 'When Kahoot still wins',
+    kahootWins:
       'Kahoot is built for trivia, review quizzes, and presentation-driven learning. If your goal is to quiz students on history facts, science vocabulary in question form, or end-of-unit multiple-choice review, Kahoot’s format is purpose-built for that. LexiClash is the better fit for vocabulary spelling, language pattern recognition, ESL/EFL practice, and word-formation games. Many teachers use both: Kahoot for fact-quiz review, LexiClash for vocabulary and spelling games.',
     faqs: [
       { q: 'Is LexiClash a free alternative to Kahoot?', a: 'Yes — LexiClash is free for your whole class: 3 classes of up to 50 students, no per-seat fee and no district licence required. Teacher Pro ($9/mo) adds unlimited classes and printable reports. Kahoot! Go Free is harder to size: the schools plans table lists Participant limit 40, while the same-page FAQ “What are the participant limits per game?” says Go up to 10 (kahoot.com/schools/plans). Most classroom-quality features still need Kahoot+ at $4-15/month per teacher.' },
@@ -97,8 +111,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: 'הכנה מהירה יותר', desc: 'כתיבת חידון ב-Kahoot לוקחת 2–5 דקות. רשימות מילים ב-LexiClash מועלות תוך פחות מדקה, ורבים מהמורים משתמשים ברשימות מובנות כדי להתחיל לשחק מיד.' },
       { title: 'כיתה בלי פרסומות', desc: 'ב-Kahoot החינמי מדי פעם מוצגות לתלמידים פרסומות. מצב הכיתה של LexiClash נקי מפרסומות בכל המסלולים.' },
     ],
-    winsTitle: 'מתי Kahoot עדיין מנצח',
-    wins:
+    kahootWinsTitle: 'מתי Kahoot עדיין מנצח',
+    kahootWins:
       'Kahoot נבנה לטריוויה, לחידוני חזרה וללמידה שמונחית מצגת. אם המטרה היא לבחון תלמידים בעובדות היסטוריות, באוצר מילים מדעי בצורת שאלה או בחזרה אמריקאית בסוף יחידה, הפורמט של Kahoot בנוי בדיוק לזה. LexiClash מתאים יותר לאיות אוצר מילים, זיהוי דפוסי שפה, תרגול אנגלית כשפה זרה ומשחקי יצירת מילים. מורים רבים משתמשים בשניהם: Kahoot לחזרה על עובדות, ו-LexiClash למשחקי אוצר מילים ואיות.',
     faqs: [
       { q: 'האם LexiClash הוא חלופה חינמית ל-Kahoot?', a: 'כן — LexiClash חינמי לכל הכיתה: 3 כיתות של עד 50 תלמידים, בלי תשלום לכל מקום ובלי רישיון מחוזי. Teacher Pro (9$ לחודש) מוסיף כיתות ללא הגבלה ודוחות להדפסה. את Kahoot! Go Free קשה יותר להעריך: בטבלת התוכניות לבתי ספר מופיע Participant limit 40, ואילו ב-FAQ “What are the participant limits per game?” באותו עמוד כתוב Go up to 10 (kahoot.com/schools/plans). רוב התכונות ברמת כיתה עדיין דורשות Kahoot+ ב-4–15$ לחודש למורה.' },
@@ -153,8 +167,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: 'Preparación más rápida', desc: 'Crear un cuestionario de Kahoot lleva 2-5 minutos. Las listas de palabras de LexiClash se suben en menos de un minuto, y muchos docentes usan las listas integradas para jugar al instante.' },
       { title: 'Aula sin anuncios', desc: 'Kahoot gratis muestra de vez en cuando promociones al alumnado. El modo clase de LexiClash no tiene anuncios en ningún plan.' },
     ],
-    winsTitle: 'Cuándo Kahoot sigue ganando',
-    wins:
+    kahootWinsTitle: 'Cuándo Kahoot sigue ganando',
+    kahootWins:
       'Kahoot está pensado para trivia, cuestionarios de repaso y aprendizaje guiado por presentaciones. Si tu objetivo es examinar datos de historia, vocabulario científico en forma de pregunta o un repaso de opción múltiple al final de la unidad, el formato de Kahoot está hecho para eso. LexiClash encaja mejor con la ortografía del vocabulario, el reconocimiento de patrones del idioma, la práctica de ESL/EFL y los juegos de formar palabras. Muchos docentes usan ambos: Kahoot para repasar datos y LexiClash para juegos de vocabulario y ortografía.',
     faqs: [
       { q: '¿Es LexiClash una alternativa gratuita a Kahoot?', a: 'Sí: LexiClash es gratis para toda tu clase, con 3 clases de hasta 50 estudiantes, sin cuota por plaza y sin licencia de distrito. Teacher Pro (9 $/mes) añade clases ilimitadas e informes imprimibles. Kahoot! Go Free es más difícil de dimensionar: la tabla de planes para escuelas indica Participant limit 40, mientras que las FAQ “What are the participant limits per game?” de la misma página dicen Go up to 10 (kahoot.com/schools/plans). La mayoría de las funciones de calidad para el aula siguen requiriendo Kahoot+ por 4-15 $ al mes por docente.' },
@@ -209,8 +223,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: 'Snabbare förberedelse', desc: 'Det tar 2–5 minuter att skriva ett quiz i Kahoot. Ordlistor laddas upp i LexiClash på under en minut, och många lärare använder de inbyggda listorna för att komma igång direkt.' },
       { title: 'Reklamfritt klassrum', desc: 'Gratisversionen av Kahoot visar ibland kampanjer för eleverna. Klassrumsläget i LexiClash är reklamfritt i alla nivåer.' },
     ],
-    winsTitle: 'När Kahoot fortfarande vinner',
-    wins:
+    kahootWinsTitle: 'När Kahoot fortfarande vinner',
+    kahootWins:
       'Kahoot är byggt för allmänbildning, repetitionsquiz och presentationsstyrt lärande. Om målet är att testa eleverna på historiska fakta, naturvetenskapliga begrepp i frågeform eller flervalsrepetition i slutet av ett område är Kahoots format gjort för det. LexiClash passar bättre för stavning av ordförråd, igenkänning av språkmönster, träning i engelska som främmande språk och ordbildningsspel. Många lärare använder båda: Kahoot för faktarepetition och LexiClash för ordförråds- och stavningsspel.',
     faqs: [
       { q: 'Är LexiClash ett gratis alternativ till Kahoot?', a: 'Ja — LexiClash är gratis för hela klassen: 3 klasser med upp till 50 elever, ingen avgift per plats och ingen distriktslicens. Teacher Pro (9 USD/mån) ger obegränsat antal klasser och utskrivbara rapporter. Kahoot! Go Free är svårare att bedöma: plantabellen för skolor anger Participant limit 40, medan FAQ ”What are the participant limits per game?” på samma sida säger Go up to 10 (kahoot.com/schools/plans). De flesta funktioner av klassrumskvalitet kräver fortfarande Kahoot+ för 4–15 USD per månad och lärare.' },
@@ -265,8 +279,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: '準備が早い', desc: 'Kahootのクイズは作るのに1つ2〜5分かかります。LexiClashの単語リストは1分かからずにアップロードでき、組み込みのリストを使えばすぐに遊べるため、そうする先生も多くいます。' },
       { title: '広告のない教室', desc: 'Kahootの無料版では、ときどき生徒に宣伝が表示されます。LexiClashの教室モードは、どのプランでも広告なしです。' },
     ],
-    winsTitle: 'それでもKahootが強い場面',
-    wins:
+    kahootWinsTitle: 'それでもKahootが強い場面',
+    kahootWins:
       'Kahootは、雑学、復習クイズ、プレゼン中心の授業のために作られています。歴史の知識、問題形式の理科用語、単元末の選択式の復習などを出題したいなら、Kahootの形式はまさにそのためのものです。LexiClashは、語彙のスペル、言語パターンの認識、ESL/EFLの練習、単語づくりのゲームに向いています。多くの先生は両方を使い分けていて、知識の復習にはKahoot、語彙とスペルのゲームにはLexiClashを使っています。',
     faqs: [
       { q: 'LexiClashはKahootの無料の代わりになりますか？', a: 'はい。LexiClashはクラス全員が無料で使えます。最大50人のクラスを3つまで、席ごとの料金も学区ライセンスも不要です。Teacher Pro（月9ドル）では、クラス数が無制限になり、印刷できるレポートも使えます。Kahoot! Go Freeは人数の見積もりが難しく、学校向けプラン表ではParticipant limit 40ですが、同じページのFAQ「What are the participant limits per game?」ではGo up to 10とあります（kahoot.com/schools/plans）。教室で役立つ機能の多くは、いまもKahoot+（先生1人あたり月4〜15ドル）が必要です。' },
@@ -321,8 +335,8 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
       { title: 'Быстрая подготовка', desc: 'На составление викторины в Kahoot уходит 2–5 минут. Списки слов в LexiClash загружаются меньше чем за минуту, а многие учителя берут встроенные списки и начинают играть сразу.' },
       { title: 'Класс без рекламы', desc: 'Бесплатный Kahoot время от времени показывает ученикам промо. Режим класса в LexiClash не содержит рекламы ни в одном тарифе.' },
     ],
-    winsTitle: 'Когда Kahoot по-прежнему лучше',
-    wins:
+    kahootWinsTitle: 'Когда Kahoot по-прежнему лучше',
+    kahootWins:
       'Kahoot создан для викторин, проверочных тестов и обучения вокруг презентации. Если цель — проверить знание исторических фактов, научных терминов в форме вопроса или повторить тему в конце раздела с выбором ответа, формат Kahoot создан именно для этого. LexiClash лучше подходит для правописания слов, распознавания языковых закономерностей, практики ESL/EFL и игр на составление слов. Многие учителя используют оба сервиса: Kahoot — для повторения фактов, LexiClash — для игр на словарный запас и правописание.',
     faqs: [
       { q: 'Является ли LexiClash бесплатной альтернативой Kahoot?', a: 'Да — LexiClash бесплатен для всего класса: 3 класса до 50 учеников, без платы за каждое место и без школьной лицензии. Teacher Pro (9 $/мес.) добавляет неограниченное число классов и отчёты для печати. Kahoot! Go Free оценить сложнее: в таблице планов для школ указано Participant limit 40, а в FAQ «What are the participant limits per game?» на той же странице — Go up to 10 (kahoot.com/schools/plans). Большинство возможностей уровня класса по-прежнему требует Kahoot+ за 4–15 $ в месяц на учителя.' },
@@ -348,7 +362,7 @@ const pageCopy: Record<Locale, Omit<KahootPageCopy, keyof VsCommonCopy | 'cta2' 
 };
 
 export const copies: Record<Locale, KahootPageCopy> = Object.fromEntries(
-  (Object.keys(pageCopy) as Locale[]).map((l) => [l, { ...vsCommonCopy[l], ...pageCopy[l], cta2: vsCommonCopy[l].ctaTeachers, cta3: vsCommonCopy[l].ctaEsl }]),
+  (Object.keys(pageCopy) as Locale[]).map((l) => [l, { ...vsCommonCopy[l], ...pageCopy[l] }]),
 ) as Record<Locale, KahootPageCopy>;
 
 export { resolveVsLocale } from '@/lib/seo/vsCommonCopy';
