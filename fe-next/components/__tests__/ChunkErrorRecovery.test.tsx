@@ -81,6 +81,22 @@ describe('ChunkErrorRecovery', () => {
     expect(replaceSpy).toHaveBeenCalledOnce();
   });
 
+  it('hard-navigates when a /_next/static <script> fails to load, with no rejection', async () => {
+    mockVersion('SERVER_NEW');
+    render(<ChunkErrorRecovery />);
+
+    const script = document.createElement('script');
+    script.type = 'text/plain';
+    script.src = 'https://lexiclash.live/_next/static/chunks/80564.oldhash.js';
+    document.head.appendChild(script);
+    script.dispatchEvent(new Event('error'));
+    script.remove();
+
+    await flush();
+    await flush();
+    expect(replaceSpy).toHaveBeenCalledOnce();
+  });
+
   it('ignores non-chunk errors (no navigation)', async () => {
     const fetchSpy = vi.fn();
     vi.stubGlobal('fetch', fetchSpy);
