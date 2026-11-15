@@ -73,7 +73,7 @@ export function UpgradeReadyToast({ t, estate, runCoins, reducedMotion }: Props)
       initial={reducedMotion ? false : { y: -24, scale: 0.8, opacity: 0 }}
       animate={{ y: 0, scale: 1, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 420, damping: 18 }}
-      className="pointer-events-auto absolute inset-x-4 top-[calc(var(--wt2-hud,7rem)+0.5rem)] z-40 mx-auto flex max-w-sm items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-lime p-2.5 text-start text-neo-navy shadow-hard"
+      className="pointer-events-auto flex w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-lime p-2.5 text-start text-neo-navy shadow-hard"
     >
       <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-yellow">
         <Hammer className="h-5 w-5" />

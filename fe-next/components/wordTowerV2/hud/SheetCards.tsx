@@ -100,21 +100,33 @@ export function WorkshopCard({ t, estate, raids, onOpen }: WorkshopProps) {
 interface RivalsProps {
   t: T;
   balls: number;
+  /** The tower right above you. */
+  target?: { name: string; gapM: number } | null;
+  /** Someone who raided you, still owed a payback. */
+  raider?: string | null;
   onOpen: () => void;
 }
 
-/** Rivals: what you can do there, and how many wrecking balls you hold to do it. */
-export function RivalsCard({ t, balls, onOpen }: RivalsProps) {
-  const line =
+/** The one rivals line, most personal first: who hit you, who is just above you, then what you hold. */
+export function rivalsLine(t: T, balls: number, target: RivalsProps['target'], raider: RivalsProps['raider']): { text: string; tone: 'revenge' | 'target' | 'balls' } {
+  if (raider) return { text: t('wordTowerV2.hud.sheet.rivalsRevenge', { name: raider }), tone: 'revenge' };
+  if (target) return { text: t('wordTowerV2.hud.sheet.rivalsAhead', { name: target.name, m: target.gapM }), tone: 'target' };
+  const text =
     balls > 1
       ? t('wordTowerV2.hud.sheet.rivalsBalls', { n: balls })
       : balls === 1
         ? t('wordTowerV2.hud.sheet.rivalsBallsOne')
         : t('wordTowerV2.hud.sheet.rivalsNone');
+  return { text, tone: 'balls' };
+}
+
+/** Rivals: who to hit (a payback first), and how many wrecking balls you hold to do it. */
+export function RivalsCard({ t, balls, target = null, raider = null, onOpen }: RivalsProps) {
+  const { text: line, tone } = rivalsLine(t, balls, target, raider);
   return (
     <button
       type="button"
-      data-wt2-open-rivals
+      data-wt2-open-rivals={tone}
       onClick={onOpen}
       className="flex w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-pink p-3 text-start text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
     >
@@ -131,12 +143,10 @@ export function RivalsCard({ t, balls, onOpen }: RivalsProps) {
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-neo-display text-base font-black uppercase">{t('wordTowerV2.dailyTower.openRivals')}</span>
-        <span
-          className="mt-0.5 block text-sm font-bold leading-snug"
-          aria-label={balls > 0 ? t('wordTowerV2.wreck.balls', { n: balls }) : undefined}
-        >
+        <span data-wt2-rivals-line className="mt-0.5 block text-sm font-bold leading-snug">
           {line}
         </span>
+        {balls > 0 && tone !== 'balls' ? <span className="sr-only">{t('wordTowerV2.wreck.balls', { n: balls })}</span> : null}
       </span>
       <Chevron className="h-5 w-5 shrink-0" />
     </button>
