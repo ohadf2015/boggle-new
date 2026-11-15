@@ -53,6 +53,7 @@ import { formatRankOrdinal } from '@/utils/formatRankOrdinal';
 import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { GameEmojiShareCard, type SingleplayerShareData } from '@/components/shared/GameEmojiShareCard';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { canOfferStreakSave } from '@/lib/growth/streakSave';
 import { useSoloAsyncChallenge } from './results/hooks/useSoloAsyncChallenge';
 import { useProgressSnapshot } from './results/hooks/useProgressSnapshot';
 import { ProgressPulseCard } from './results/components/ProgressPulseCard';
@@ -73,7 +74,7 @@ const HIDE_SAME = ['rematch-same'] as const;
 import { MissionsCompletedNote, RecordBadges } from './results/components/RecordBadges';
 import type { DifficultyLevel } from '@/shared/types/game';
 
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
+const StreakSaveLink = dynamic(() => import('@/components/auth/StreakSaveLink'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 
 interface SinglePlayerResultsProps {
@@ -316,13 +317,15 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   ) : null;
 
   // Zero words + no coins = three empty tiles; the hero already says 0.
-  const signupBlock = !isAuthenticated && !authLoading ? (
-    <InlineSignupCard
+  // Eligibility is decided here, not inside the link: the phone stack wraps
+  // this in RevealIn, and a wrapper around a null-rendering child is a blank
+  // 16px band in the space-y column.
+  const signupBlock = !authLoading && canOfferStreakSave({ isAuthenticated, streak: currentStreak, isStreakLoaded }) ? (
+    <StreakSaveLink
       isAuthenticated={isAuthenticated}
-      titleKey="results.saveStreak.title"
-      bodyKey="results.saveStreak.body"
-      onCTAClick={() => trackGrowthEvent('save_streak_clicked', { source: 'solo_results' })}
-      analyticsSource="results_inline"
+      streak={currentStreak}
+      isStreakLoaded={isStreakLoaded}
+      source="solo_results"
     />
   ) : null;
 
@@ -400,9 +403,8 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-                {/* Signup is demoted below the return CTAs and reframed as
-                    streak insurance (t_89663cfc) — the screen asks for a
-                    RETURN first, an account second. */}
+                {/* The screen asks for a RETURN first; the account ask is one
+                    line, and only for a guest with a streak to lose. */}
                 {signupBlock}
               </div>
             </div>
@@ -443,7 +445,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
               </RevealIn>
             )}
-            {/* Signup reframed as streak insurance (t_89663cfc): ask for the RETURN first. */}
             {signupBlock && (
               <RevealIn delay={0.48}>
                 {signupBlock}

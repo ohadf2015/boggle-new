@@ -16,6 +16,7 @@ import useReducedMotion from '@/hooks/useReducedMotion';
 import { useResultsStickyCtaHeight } from '@/hooks/useResultsStickyCtaHeight';
 import { usePracticeStreak } from '@/hooks/usePracticeStreak';
 import { selectFirstSessionDailyCta } from '@/lib/growth/firstSessionDailyCta';
+import { canOfferStreakSave } from '@/lib/growth/streakSave';
 import {
   trackFirstSessionDailyClicked,
   trackFirstSessionDailyShown,
@@ -34,9 +35,8 @@ import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
 
 // SignupPromptHost owns the post-game prompt (t_4833c3cd). PracticeResults
-// only renders a non-blocking inline card so guests see value without a
-// second stacked modal racing the host.
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
+// only offers a streak-gated link, so nothing stacks on the host's sheet.
+const StreakSaveLink = dynamic(() => import('@/components/auth/StreakSaveLink'), { ssr: false });
 
 // ─── Encouragement tiers — always positive ───
 
@@ -406,14 +406,13 @@ const PracticeResults = memo(function PracticeResults({
           </m.div>
 
 
-          {/* Soft signup CTA — Host owns the timed prompt; no duplicate modal. */}
-          {!isAuthenticated && !authLoading && (
-            <InlineSignupCard
+          {/* Host owns the timed prompt; this is one line, streak-gated. */}
+          {!authLoading && canOfferStreakSave({ isAuthenticated, streak: practiceStreak }) && (
+            <StreakSaveLink
               isAuthenticated={isAuthenticated}
-              titleKey="auth.firstWin.title"
-              bodyKey="auth.firstWin.subtitleValueProp"
+              streak={practiceStreak}
+              source="practice_results"
               className="mb-4"
-              analyticsSource="results_inline"
             />
           )}
 

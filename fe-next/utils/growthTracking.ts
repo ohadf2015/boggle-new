@@ -111,8 +111,6 @@ export type GrowthEvent =
   // Streak Ignition (t_89663cfc) — first-session win-moment redesign on the
   // solo results screen. streak_ignition_shown: StreakIgnitionCard impression,
   //   props { day: number, won: boolean, variant: 'won' | 'lost' }.
-  // save_streak_clicked: player acted on the streak-insurance signup card,
-  //   props { source: 'solo_results' }.
   | 'streak_ignition_shown'
   // tomorrow_card_shown: post-game daily card on solo/MP results.
   //   props { seconds_to_midnight, variant: 'finish-today'|'keep-streak',
@@ -121,7 +119,14 @@ export type GrowthEvent =
   // postgame_daily_cta_clicked: CTA on TomorrowCard.
   //   props { variant: 'finish-today'|'keep-streak', source: 'solo'|'mp' }.
   | 'postgame_daily_cta_clicked'
-  | 'save_streak_clicked'
+  // Solo-results streak link (StreakSaveLink) that replaced the always-on
+  // results_inline card: shown/clicked carry { streak, source:
+  // 'solo_results' | 'practice_results' } — the two streaks are different
+  // quantities, so the surface must ride the event. Tapping it expands the
+  // signup card on its own `streak_save` surface, so the signup funnel itself
+  // stays in the signup_prompt_* pair.
+  | 'streak_save_link_shown'
+  | 'streak_save_link_clicked'
   // NextStepPrompt — the only cross-mode CTA in the product, and until now it
   // emitted nothing, so a 151/14d `daily_puzzle_opened` count could not be told
   // apart from "the CTA is never shown". `to` is the destination mode, `from`

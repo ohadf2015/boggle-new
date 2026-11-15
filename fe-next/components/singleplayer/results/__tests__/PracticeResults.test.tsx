@@ -71,9 +71,9 @@ vi.mock('@/contexts/AuthContext', () => ({
   }),
 }));
 
-vi.mock('@/components/auth/InlineSignupCard', () => ({
+vi.mock('@/components/auth/StreakSaveLink', () => ({
   __esModule: true,
-  default: () => <div data-testid="inline-signup-card">InlineSignup</div>,
+  default: () => <div data-testid="streak-save-link">SaveStreak</div>,
 }));
 
 vi.mock('@/hooks/useReducedMotion', () => ({
