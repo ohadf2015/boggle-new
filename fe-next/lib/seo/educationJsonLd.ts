@@ -61,7 +61,7 @@ export function buildEducationFaqJsonLd(locale: string, faq: FaqItem[]) {
 
 const ORG_DESCRIPTION: Record<string, string> = {
   en: 'LexiClash Education provides classroom-ready word games, vocabulary duels, and a teacher dashboard for assigning curriculum-aligned exercises and tracking student progress. Free to use, browser-based, no downloads required.',
-  he: 'LexiClash Education מספק משחקי מילים מוכנים לכיתה, דואלי אוצר מילים ולוח מחוונים למורים להקצאת תרגילים מותאמי תכנית לימודים ומעקב אחר התקדמות תלמידים. שימוש חינם, מבוסס דפדפן, ללא הורדות.',
+  he: 'LexiClash Education מספק משחקי מילים מוכנים לכיתה, דו-קרבות אוצר מילים ולוח בקרה למורים להקצאת תרגילים מותאמי תכנית לימודים ומעקב אחר התקדמות תלמידים. שימוש חינם, מבוסס דפדפן, ללא הורדות.',
   sv: 'LexiClash Education erbjuder klassrumsfärdiga ordspel, ordförrådsdueller och en lärarpanel för att tilldela läroplansanpassade övningar och följa elevernas framsteg. Gratis att använda, webbläsarbaserad, inga nedladdningar krävs.',
   ja: 'LexiClash Educationは、教室向けのワードゲーム、語彙デュエル、カリキュラムに沿った課題の割り当てと生徒の進捗追跡のための教師ダッシュボードを提供します。無料、ブラウザベース、ダウンロード不要。',
   es: 'LexiClash Education ofrece juegos de palabras listos para el aula, duelos de vocabulario y un panel del profesor para asignar ejercicios alineados con el currículo y monitorear el progreso de los estudiantes. Gratis, basado en navegador, sin descargas.',
@@ -185,8 +185,8 @@ const WEBAPP_FEATURES: Record<string, string[]> = {
   ],
   he: [
     `בלי הרשמת תלמידים — הצטרפות לכיתה עם קוד בן ${JOIN_CODE_LENGTH} תווים`,
-    'דואלי אוצר מילים רב-משתתפים (1v1) ומשחקים חיים לכל הכיתה',
-    'לוח מחוונים למורה: רשימות מילים מותאמות, מעקב התקדמות, אנליטיקת כיתה',
+    'דו-קרבות אוצר מילים אחד על אחד ומשחקים חיים לכל הכיתה',
+    'לוח בקרה למורה: רשימות מילים מותאמות, מעקב התקדמות, אנליטיקת כיתה',
     `${LANGUAGE_COUNT} שפות כולל עברית (RTL) ויפנית, לכל אחת מילון משלה`,
     'רמת קושי מותאמת תכנית לימודים ליסודי, על-יסודי ולומדי אנגלית כשפה שנייה',
     'פועל בכל דפדפן — בלי הורדות ובלי פרסומות בשיעור; מסלול Teacher Pro הוא אופציונלי',

@@ -194,7 +194,7 @@ const HE: EducationLandingContent = {
   },
   answer: {
     question: 'מה אני יכול לעשות עם הכיתה שלי בימים האחרונים של בית הספר?',
-    answer: 'השתמש במשחקי מילים של LexiClash—בלי הכנה, בלי בדיקות. צור כיתה, תן לתלמידים קוד הצטרפות, והפעל Boggle, Word Wheel, משחקי Connections או דואלים. בחינם להתחיל.',
+    answer: 'השתמש במשחקי מילים של LexiClash—בלי הכנה, בלי בדיקות. צור כיתה, תן לתלמידים קוד הצטרפות, והפעל Boggle, Word Wheel, משחקי Connections או דו-קרבות. בחינם להתחיל.',
   },
   sections: [
     {
