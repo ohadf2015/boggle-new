@@ -30,6 +30,8 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
+import { REPORTS_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
+import { ReportsSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
@@ -426,7 +428,7 @@ function ReportsShell({ children }: { children: ReactNode }) {
     <EducationShell
       className={TEACHER_TV_SCALE}
       scrollRegionLabel={t("teacher.reports.title")}
-      contentClassName="relative p-4 sm:p-6 lg:p-8"
+      contentClassName={REPORTS_CONTENT_CLASS}
     >
       {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
           behind a working deck. Dark-only surface (pitfall 5). */}
@@ -441,7 +443,7 @@ function ReportsShell({ children }: { children: ReactNode }) {
 export default function TeacherReportsPage({ gradePassbackEnabled = false }: { gradePassbackEnabled?: boolean }) {
   return (
     <ReportsShell>
-      <TeacherGate>
+      <TeacherGate loadingFallback={<ReportsSkeleton />}>
         <ReportsProGate>
           <TeacherReportsInner gradePassbackEnabled={gradePassbackEnabled} />
         </ReportsProGate>

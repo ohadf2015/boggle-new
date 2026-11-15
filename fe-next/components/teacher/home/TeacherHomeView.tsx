@@ -9,6 +9,7 @@ import { TeacherPlanBadge } from '../TeacherPlanBadge';
 import { HqLoadError } from '../hq/HqLoadError';
 import { GAME_CARD, STICKER } from './homeStyles';
 import { HomeRailSkeleton, HomeSkeleton } from './HomeSkeleton';
+import { HOME_GREETING_ROW, HOME_GRID_BASE, HOME_MAIN_COLUMN, HOME_RAIL_COLUMN, HOME_RAIL_COLUMNS } from './homeLayout';
 import { MascotBubble } from '../nb/MascotBubble';
 
 // From xl the rail runs beside the sessions too, so its class rows never push the sessions down.
@@ -66,14 +67,14 @@ export function TeacherHomeView({
         ref={revealRef}
         data-testid="teacher-home"
         className={cn(
-          'mx-auto grid w-full max-w-[1280px] gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4 lg:gap-5 lg:px-8 lg:py-5 lg:[@media(max-height:820px)]:gap-4 lg:[@media(max-height:820px)]:py-3',
-          hasRail && 'lg:grid-cols-[minmax(0,1fr)_20rem]',
+          HOME_GRID_BASE,
+          hasRail && HOME_RAIL_COLUMNS,
           stretch && 'lg:min-h-full',
           stretch && (accountBanner ? 'lg:grid-rows-[auto_1fr_auto]' : 'lg:grid-rows-[auto_1fr]'),
         )}
       >
-        <div className="flex min-w-0 flex-col gap-3 sm:gap-4 lg:col-start-1 lg:row-start-1">
-          <header data-tm data-testid="home-greeting-row" className="flex items-start justify-between gap-3 max-sm:flex-col max-sm:gap-2">
+        <div className={HOME_MAIN_COLUMN}>
+          <header data-tm data-testid="home-greeting-row" className={HOME_GREETING_ROW}>
             {/* The mascot says hello and the one thing worth doing today, like a teammate would. */}
             <MascotBubble pose={hasClasses ? 'gameStart' : 'welcome'} size={72} className="min-w-0 flex-1 max-sm:self-stretch lg:[&>img]:size-20">
               <h1 data-wipe suppressHydrationWarning className="font-neo-display text-lg font-black leading-tight text-neo-black sm:text-xl">
@@ -104,7 +105,7 @@ export function TeacherHomeView({
         ) : null}
 
         {hasRail ? (
-          <aside aria-label={t('eduShell.home.railLabel')} className={cn('flex min-w-0 flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:pt-24', showSessions && RAIL_SPAN)}>
+          <aside aria-label={t('eduShell.home.railLabel')} className={cn(HOME_RAIL_COLUMN, showSessions && RAIL_SPAN)}>
             {!ready ? <HomeRailSkeleton /> : week?.classes ? (
               <section data-tm data-testid="home-week" aria-labelledby="home-week-title" className={cn(GAME_CARD, 'flex flex-col gap-2.5 p-3 max-lg:hidden')}>
                 <h2 id="home-week-title" data-accent-decor className={cn(STICKER, 'self-start bg-neo-pink text-neo-cream')}>{t('eduShell.home.yourClasses')}</h2>

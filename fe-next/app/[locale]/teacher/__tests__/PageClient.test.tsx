@@ -15,6 +15,7 @@ const FREE_PRO = { hasPro: false, loading: false, known: true, source: 'polar', 
 let proState: Record<string, unknown> = { ...FREE_PRO };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState }));
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => <div /> }));
+vi.mock('@/components/teacher/routeLoading/TeacherRouteLoading', () => ({ TeacherRouteLoading: () => <div data-testid="teacher-route-loading" /> }));
 const dashboardProps = vi.hoisted(() => ({ last: {} as Record<string, unknown> }));
 vi.mock('@/components/teacher/TeacherDashboard', () => ({
   default: function MockTeacherDashboard(props: { banner?: React.ReactNode; alert?: React.ReactNode }) {
