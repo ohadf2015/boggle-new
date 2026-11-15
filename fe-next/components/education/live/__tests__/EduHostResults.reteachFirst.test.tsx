@@ -128,13 +128,13 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(screen.getByTestId('edu-results-parent-share')).toHaveAttribute('href', '/en/teacher/reports');
   });
 
-  it('given practice leads, then Play again is one quiet button and Next game and End game wait under More, none looking like a primary', () => {
+  it('given practice leads, then Play again is one quiet button and Next game and End game sit side by side in view, none looking like a primary', () => {
     renderWall();
     const more = screen.getByTestId('edu-results-more');
     expect(more).toHaveAttribute('data-open', 'false');
-    openMore();
-    const quiet = screen.getByTestId('edu-results-tertiary');
-    expect(Array.from(quiet.querySelectorAll(':scope > div > button')).map((b) => (b as HTMLElement).dataset.testid)).toEqual(expect.arrayContaining(['edu-results-next-mode', 'edu-results-end']));
+    const room = screen.getByTestId('edu-results-room-controls');
+    expect(Array.from(room.querySelectorAll('button')).map((b) => (b as HTMLElement).dataset.testid)).toEqual(['edu-results-next-mode', 'edu-results-end']);
+    expect(more).not.toContainElement(room);
     const buttons = [screen.getByTestId('edu-results-play-again'), screen.getByTestId('edu-results-next-mode'), screen.getByTestId('edu-results-end')];
     for (const b of buttons) {
       expect(b.className).not.toMatch(/bg-neo-(lime|pink)\b/);
@@ -162,7 +162,7 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     const more = screen.getByTestId('edu-results-more');
     const invite = screen.queryByTestId('teacher-invite');
     const outside = Array.from(document.querySelectorAll('a, button')).filter((el) => !more.contains(el) && !invite?.contains(el));
-    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-play-again', 'edu-results-report', 'struggle-open-grid']);
+    expect(outside.map((el) => el.getAttribute('data-testid'))).toEqual(['edu-replay-missed', 'edu-results-play-again', 'edu-results-next-mode', 'edu-results-end', 'edu-results-report', 'struggle-open-grid']);
     expect(more).toContainElement(screen.getByTestId('edu-results-parent-share'));
     expect(more).toContainElement(screen.getByTestId('report-pdf-export'));
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('target', '_blank');
