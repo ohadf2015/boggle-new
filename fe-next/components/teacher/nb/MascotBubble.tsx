@@ -34,9 +34,10 @@ export function MascotBubble({
       <div
         className={cn(
           'relative min-w-0 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-neo-body text-sm font-semibold leading-snug text-neo-black shadow-hard-lg sm:text-base',
-          // Tail toward the mascot; flips with the text direction. The 16px box sits fully outside the
-          // 3px border (3+16=19) so the visible half is a real arrow, and gap-5 leaves air before the mascot.
-          "before:absolute before:top-4 before:-start-[19px] before:border-8 before:border-transparent before:border-e-neo-black before:content-['']",
+          // Tail toward the mascot: a cream diamond outlined on its start and bottom edges, centred on the
+          // bubble's border so its outer half reads as an arrow. (A black-only triangle vanished against
+          // the dark page.) Offset and border are logical; RTL mirrors the rotation.
+          "before:absolute before:top-4 before:-start-[10px] before:size-3.5 before:rotate-45 rtl:before:-rotate-45 before:border-b-[3px] before:border-s-[3px] before:border-neo-black before:bg-neo-cream before:content-['']",
           bubbleClassName,
         )}
       >

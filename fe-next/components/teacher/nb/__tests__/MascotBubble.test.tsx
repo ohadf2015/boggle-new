@@ -15,15 +15,21 @@ describe('MascotBubble', () => {
     expect(img).toHaveAttribute('alt', '');
   });
 
-  it('Given the tail points at the mascot, Then it sits outside the border with room to the mascot, using logical properties only', () => {
+  it('Given the page behind the bubble is dark, Then the tail is cream with its own black outline, so it stays visible in RTL and LTR', () => {
     render(<MascotBubble pose="setup" testId="bubble">Just a name.</MascotBubble>);
     const row = screen.getByTestId('bubble');
     const bubble = screen.getByText('Just a name.');
-    // Mascot gap leaves clear space beyond the 8px tail (was gap-2: tail touched the mascot).
+    // Room between the tail tip and the mascot.
     expect(row.className).toMatch(/\bgap-5\b/);
-    // Tail base sits on the outer border edge (3px border + 16px box), so it is visible, not buried.
-    expect(bubble.className).toContain('before:-start-[19px]');
-    // RTL-safe: no physical left/right offsets on the tail.
+    // A black-only triangle vanished against the dark page; the tail is a cream diamond outlined in black.
+    expect(bubble.className).toContain('before:bg-neo-cream');
+    expect(bubble.className).toContain('before:border-neo-black');
+    expect(bubble.className).not.toContain('before:border-transparent');
+    // Points at the mascot on either side: logical offset + border, mirrored rotation in RTL.
+    expect(bubble.className).toContain('before:-start-[10px]');
+    expect(bubble.className).toContain('before:border-s-[3px]');
+    expect(bubble.className).toContain('before:rotate-45');
+    expect(bubble.className).toContain('rtl:before:-rotate-45');
     expect(bubble.className).not.toMatch(/before:-?(left|right)-/);
   });
 });
