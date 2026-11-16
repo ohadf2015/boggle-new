@@ -7,6 +7,11 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...a: unknown[]) => trackGrowthEvent(...a),
 }));
 
+const saveClassRoundRating = vi.fn();
+vi.mock('@/lib/education/classRoundRatingWrite', () => ({
+  saveClassRoundRating: (...a: unknown[]) => saveClassRoundRating(...a),
+}));
+
 import { useGameFeedback } from '../useGameFeedback';
 
 const base = {
@@ -19,6 +24,7 @@ const base = {
 
 beforeEach(() => {
   trackGrowthEvent.mockClear();
+  saveClassRoundRating.mockClear();
   window.localStorage.clear();
   window.sessionStorage.clear();
   // Default: plenty of prior games so the min-games gate is satisfied.
@@ -69,6 +75,34 @@ describe('useGameFeedback', () => {
         language: 'en',
       }),
     );
+    const payload = trackGrowthEvent.mock.calls[0][1] as Record<string, unknown>;
+    expect(payload).not.toHaveProperty('classroom_id');
+    expect(payload).not.toHaveProperty('game_code');
+  });
+
+  it('stamps classroom_id and game_code on a class rating without skipping the throttle', () => {
+    window.localStorage.setItem('lc_fb_last', String(Date.now()));
+    const { result } = renderHook(() =>
+      useGameFeedback({
+        ...base,
+        surface: 'class_round',
+        classroomId: 'class-1',
+        gameCode: 'ABC123',
+        throttleKey: 'ABC123',
+      }),
+    );
+    expect(result.current.shouldShow).toBe(false);
+    act(() => result.current.recordRating('ok'));
+    expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'game_feedback',
+      expect.objectContaining({
+        surface: 'class_round',
+        rating: 'ok',
+        ratingValue: 2,
+        classroom_id: 'class-1',
+        game_code: 'ABC123',
+      }),
+    );
   });
 
   it('opens the global cooldown after answering, so other surfaces stay quiet', () => {
@@ -86,6 +120,33 @@ describe('useGameFeedback', () => {
     act(() => result.current.dismiss());
     expect(result.current.shouldShow).toBe(false);
     expect(trackGrowthEvent).not.toHaveBeenCalled();
+    expect(saveClassRoundRating).not.toHaveBeenCalled();
     expect(window.localStorage.getItem('lc_fb_last')).not.toBeNull();
+  });
+
+  it('persists a class rating and leaves other surfaces as events only', () => {
+    const { result } = renderHook(() =>
+      useGameFeedback({
+        ...base,
+        surface: 'class_round',
+        classroomId: 'class-1',
+        gameCode: 'ABC123',
+        studentId: 'student-1',
+        throttleKey: 'ABC123',
+      }),
+    );
+    act(() => result.current.recordRating('great'));
+    expect(saveClassRoundRating).toHaveBeenCalledWith({
+      surface: 'class_round',
+      studentId: 'student-1',
+      classroomId: 'class-1',
+      gameCode: 'ABC123',
+      rating: 'great',
+    });
+
+    saveClassRoundRating.mockClear();
+    const other = renderHook(() => useGameFeedback(base));
+    act(() => other.result.current.recordRating('ok'));
+    expect(saveClassRoundRating).not.toHaveBeenCalled();
   });
 });

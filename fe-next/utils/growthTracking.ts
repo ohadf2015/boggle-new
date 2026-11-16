@@ -442,9 +442,9 @@ export type GrowthEvent =
   | 'cg_auth_prompt_outcome'
   // In-game sentiment — a single `game_feedback` event fired by useGameFeedback
   // when a player taps the "how was that?" card on an end-of-game surface
-  // (MP round, single-player, daily, daily word-hunt). Properties: { surface:
-  // 'mp_round'|'singleplayer'|'daily'|'word_hunt', rating: 'bad'|'ok'|'great', ratingValue:
-  // 1|2|3, gameMode?, language? }. NOT a funnel step — kept off
+  // (MP round, single-player, daily, daily word-hunt, class round). Properties: { surface:
+  // 'mp_round'|'singleplayer'|'daily'|'word_hunt'|'class_round', rating: 'bad'|'ok'|'great', ratingValue:
+  // 1|2|3, gameMode?, language?, classroom_id?, game_code? }. NOT a funnel step — kept off
   // CANONICAL_DUAL_EMIT. Consumed by the nightly improvement loop's feedback
   // digest, so all surfaces stay one query.
   | 'game_feedback'

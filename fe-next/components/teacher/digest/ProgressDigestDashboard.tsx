@@ -19,6 +19,8 @@ import { deriveProgressDigest } from '@/lib/education/progressDigest';
 import { trackEduProgressDigestViewed } from '@/lib/education/telemetry';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
+import { useClassRoundMood } from '@/hooks/useClassRoundMood';
+import type { ClassRoundMood } from '@/lib/education/classRoundMood';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 import { ScheduleReteachLiveButton } from '@/components/teacher/digest/ScheduleReteachLiveButton';
@@ -40,6 +42,7 @@ export function ProgressDigestDashboard({
   const { games, isLoading, error, refresh } = useRecentClassroomGames({ classroomId, limit: 1 });
 
   const lastGame = isLoading ? null : (games[0] ?? null);
+  const mood = useClassRoundMood({ classroomId, gameCode: lastGame?.gameCode ?? null });
   const digest = useMemo(
     () =>
       deriveProgressDigest({
@@ -167,6 +170,17 @@ export function ProgressDigestDashboard({
               })}
             </p>
           )}
+
+          {mood.mood && mood.count > 0 && (
+            <p
+              data-testid="progress-digest-mood"
+              data-mood={mood.mood}
+              data-count={mood.count}
+              className="text-sm font-bold text-neo-white/85"
+            >
+              {t(moodCopyKey(mood.mood), { count: mood.count })}
+            </p>
+          )}
         </>
       )}
 
@@ -189,6 +203,12 @@ export function ProgressDigestDashboard({
       )}
     </section>
   );
+}
+
+function moodCopyKey(mood: ClassRoundMood): string {
+  if (mood === 'great') return 'teacher.digest.moodGreat';
+  if (mood === 'rough') return 'teacher.digest.moodRough';
+  return 'teacher.digest.moodMixed';
 }
 
 export default ProgressDigestDashboard;

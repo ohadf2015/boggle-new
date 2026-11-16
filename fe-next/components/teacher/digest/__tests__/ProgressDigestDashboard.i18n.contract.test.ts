@@ -48,4 +48,11 @@ describe('ProgressDigestDashboard i18n contract', () => {
       expect(resolve(LOCALES[locale], 'teacher.digest.title')).not.toBe(english);
     }
   });
+
+  it('does not paste the English mood sentence into he/ja/ru', () => {
+    const english = resolve(en, 'teacher.digest.moodGreat') as string;
+    for (const locale of ['he', 'ja', 'ru'] as const) {
+      expect(resolve(LOCALES[locale], 'teacher.digest.moodGreat')).not.toBe(english);
+    }
+  });
 });

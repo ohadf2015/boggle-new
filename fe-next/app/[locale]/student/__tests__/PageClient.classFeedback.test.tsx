@@ -15,6 +15,9 @@ vi.mock('@/components/feedback/GameFeedback', () => ({
       data-surface={String(props.surface)}
       data-game-mode={String(props.gameMode)}
       data-throttle-key={String(props.throttleKey)}
+      data-classroom-id={props.classroomId == null ? '' : String(props.classroomId)}
+      data-game-code={props.gameCode == null ? '' : String(props.gameCode)}
+      data-student-id={props.studentId == null ? '' : String(props.studentId)}
     />
   ),
 }));
@@ -40,6 +43,9 @@ describe('StudentPageClient — class round feedback bubble', () => {
     expect(bubble.getAttribute('data-surface')).toBe('class_round');
     expect(bubble.getAttribute('data-game-mode')).toBe('classroom');
     expect(bubble.getAttribute('data-throttle-key')).toBe('ABC123');
+    expect(bubble.getAttribute('data-classroom-id')).toBe('c1');
+    expect(bubble.getAttribute('data-game-code')).toBe('ABC123');
+    expect(bubble.getAttribute('data-student-id')).toBe('s1');
   });
 
   it('keeps the bubble after the reward toast clears', async () => {
