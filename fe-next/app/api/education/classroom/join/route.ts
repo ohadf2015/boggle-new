@@ -199,6 +199,13 @@ export async function POST(request: NextRequest) {
     const fullClass = () => NextResponse.json({ error: 'STUDENT_LIMIT_REACHED' }, { status: 403 });
 
     if (!userId) {
+      // The browser already minted this guest and sent that session. Minting
+      // again writes the membership to a user /student will never be. Refuse
+      // so the client retries with the session it actually holds.
+      if (presentedSession(request)) {
+        logger.error('classroom join: presented session did not verify; not minting a second identity');
+        return NextResponse.json({ error: 'Not authenticated', code: 'SESSION_MISMATCH' }, { status: 401 });
+      }
       const seat = await canAddStudent(classroom.id);
       if (!seat.allowed) return fullClass();
       const { data: authData, error: authError } = await supabase.auth.signInAnonymously({
@@ -308,6 +315,11 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/** A bearer the browser already holds. Unverified is not a license to mint someone else. */
+function presentedSession(request: NextRequest): boolean {
+  return /^Bearer\s+\S+/i.test(request.headers.get('authorization') ?? '');
 }
 
 async function teachesClassroom(classroom: { id: string; teacher_id?: string | null }, userId: string): Promise<boolean> {

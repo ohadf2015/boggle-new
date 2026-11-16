@@ -61,7 +61,7 @@ describe('useJoinClassroom — a bad code on the guest path', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseAuth.mockReturnValue({ user: null });
-    mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, error: null });
+    mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, accessToken: 'anon-token', error: null });
     mockWaitForProfile.mockResolvedValue(true);
     mockVerdict.mockResolvedValue('game');
     fetchMock = vi.fn(async (url: string) =>

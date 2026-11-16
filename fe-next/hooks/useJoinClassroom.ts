@@ -44,6 +44,10 @@ export function useJoinClassroom() {
     options?: { guestName?: string; rehearsal?: boolean }
   ): Promise<JoinClassroomResult> => {
     try {
+      // The token from the guest we just minted. Sent on the join so the route
+      // writes the membership to this browser's user even when the cookie has
+      // not landed yet (or still belongs to the previous person on the device).
+      let accessToken: string | undefined;
       // Account-less path: a logged-out student who supplied a name joins as an
       // anonymous guest. We mint the anon identity and await the trigger-created
       // profile (race-safe) BEFORE joining, so the server route sees an
@@ -63,10 +67,22 @@ export function useJoinClassroom() {
 
         const supabase = createClient();
         const guest = await signInAsGuestStudent(supabase, guestName);
-        if (guest.error || !guest.user) {
+        if (guest.error || !guest.user || !guest.accessToken) {
           return { success: false, error: guest.error || 'Failed to start guest session' };
         }
         await waitForProfile(supabase, guest.user.id);
+        accessToken = guest.accessToken;
+      } else {
+        // Signed-in join: send the session the page is actually holding, so a
+        // cookie that has not landed (or still names the teacher on a shared
+        // phone) cannot enrol a different person.
+        try {
+          const supabase = createClient();
+          const { data } = await supabase.auth.getSession();
+          if (data?.session?.access_token) accessToken = data.session.access_token;
+        } catch {
+          // Cookie session. The route still reads it.
+        }
       }
 
       // Server-side API route enforces the free-tier student cap and reads the
@@ -75,6 +91,7 @@ export function useJoinClassroom() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
         body: JSON.stringify({
           joinCode,

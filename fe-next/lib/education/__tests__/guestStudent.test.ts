@@ -48,10 +48,14 @@ describe('signInAsGuestStudent', () => {
   });
 
   it('signs in anonymously passing the name as full_name + a username slug', async () => {
-    const sb = mockSupabase(async () => ({ data: { user: { id: 'anon-1' } }, error: null }));
+    const sb = mockSupabase(async () => ({
+      data: { user: { id: 'anon-1' }, session: { access_token: 'guest-access-token' } },
+      error: null,
+    }));
     const res = await signInAsGuestStudent(sb as never, 'Maya Kohn');
     expect(res.error).toBeNull();
     expect(res.user).toEqual({ id: 'anon-1' });
+    expect(res.accessToken).toBe('guest-access-token');
     // The TYPED name goes to full_name (which the trigger writes to
     // display_name, and which every student-facing surface renders). The
     // username is an internal, globally unique handle, so it is matched as a
