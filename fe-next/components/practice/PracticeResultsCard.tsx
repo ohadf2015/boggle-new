@@ -16,7 +16,7 @@
  * ones and folds the three optional extras into the stats row.
  */
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import PracticeCompletionMoment, {
@@ -46,6 +46,8 @@ export interface PracticeResultsCardProps {
   onNext?: () => void;
   /** Human name of that next mode, for the button label. */
   nextLabel?: string;
+  /** Mode-specific extra under the stats (e.g. the words to practise again). */
+  footer?: ReactNode;
 }
 
 function formatClock(seconds: number): string {
@@ -66,6 +68,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
   hintsUsed,
   onNext,
   nextLabel,
+  footer,
 }) => {
   const { t } = useLanguage();
 
@@ -98,6 +101,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
         onBack={onBack}
         onNext={onNext}
         nextLabel={nextLabel}
+        footer={footer}
       />
     </div>
   );

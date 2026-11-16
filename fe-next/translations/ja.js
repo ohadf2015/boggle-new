@@ -21648,7 +21648,9 @@ const ja = {
       "answerIs": "正しいつづりは",
       "youWrote": "あなたの答え",
       "next": "次の単語",
-      "finish": "結果を見る"
+      "finish": "結果を見る",
+      "praise": "やったね！|ばっちり！|パーフェクト！|せいかい！|すごい！",
+      "progress": "{total}語中{current}語目"
     },
     "cookie": {
       "message": "プレイ数の集計と、ゲームをスムーズに動かすためにクッキーを使います。"
