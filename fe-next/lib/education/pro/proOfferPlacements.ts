@@ -15,4 +15,6 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'results_report_pdf',
   // Teacher Home card for a live or ended free access trial.
   'trial_ending_card',
+  // The trial-ending emails (t-3 / t-0 / t+3): the upgrade link opens checkout on arrival.
+  'trial_reminder_email',
 ]);

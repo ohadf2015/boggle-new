@@ -7,7 +7,13 @@ import { getSupabase } from '../modules/supabase/client';
 import type { ClassroomGame } from '../modules/classroomGameManager';
 import logger from '../utils/logger';
 import { REAL_CLASS_MIN_PLAYERS } from '@/lib/education/teacherUsagePrompt';
-import { planTrialClockStart, type TrialClockRow } from '@/lib/education/trialClockStart';
+import { hasFirstGameRestart, markFirstGameRestart, planTrialClockStart, type TrialClockRow } from '@/lib/education/trialClockStart';
+import {
+  isLivePolarTrial,
+  planPolarTrialFirstGameRestart,
+  POLAR_FIRST_GAME_RESTART_EVENT,
+  type PolarTrialSubRow,
+} from '@/lib/education/polarTrialFirstGame';
 import { realClassPlayerIds } from '@/lib/education/paidDay0';
 import { captureEduServerEvents, type EduServerEvent } from '../utils/educationTelemetry';
 import {
@@ -224,8 +230,21 @@ async function startAccessTrialClock(
     logger.error('CLASSROOM_GAME', `Trial clock lookup failed for ${teacherId}: ${error.message}`);
     return;
   }
-  if (!data) return;
-  const row = data as unknown as TrialClockRow & { id: string };
+  const row = (data ?? null) as unknown as (TrialClockRow & { id: string }) | null;
+
+  // A live card trial restarts on Polar instead, and the free window is left alone so the
+  // two never stack. The access row still gets the once-only marker.
+  const cardTrial = await restartPolarTrialAtFirstGame(supabase, teacherId, nowMs, row ? hasFirstGameRestart(row) : false);
+  if (cardTrial !== 'none') {
+    const mark = row ? markFirstGameRestart(row) : null;
+    if (row && mark) {
+      const { error: markError } = await supabase.from('teacher_access_requests').update(mark as never).eq('id', row.id);
+      if (markError) logger.error('CLASSROOM_GAME', `First-game restart mark failed for ${teacherId}: ${markError.message}`);
+    }
+    return;
+  }
+
+  if (!row) return;
   const patch = planTrialClockStart(row, nowMs);
   if (!patch) return;
   const { error: updateError } = await supabase.from('teacher_access_requests').update(patch as never).eq('id', row.id);
@@ -234,4 +253,54 @@ async function startAccessTrialClock(
     return;
   }
   logger.info('CLASSROOM_GAME', `Access trial clock started at first real class game for ${teacherId}: ends ${patch.trial_expires_at}`);
+}
+
+/**
+ * 'none' when the teacher has no live card trial (the free window path runs instead),
+ * otherwise what happened to it. Never throws; a Polar failure leaves the trial as it was.
+ */
+async function restartPolarTrialAtFirstGame(
+  supabase: NonNullable<ReturnType<typeof getSupabase>>,
+  teacherId: string,
+  nowMs: number,
+  markedOnAccessRow: boolean
+): Promise<'none' | 'restarted' | 'unchanged' | 'failed'> {
+  const { data: subData, error: subError } = await supabase
+    .from('subscriptions')
+    .select('tier, status, source, current_period_end, cancel_at_period_end, lemon_squeezy_subscription_id')
+    .eq('user_id', teacherId)
+    .maybeSingle();
+  if (subError) {
+    logger.error('CLASSROOM_GAME', `Card trial lookup failed for ${teacherId}: ${subError.message}`);
+    return 'none';
+  }
+  const sub = (subData ?? null) as PolarTrialSubRow | null;
+  if (!isLivePolarTrial(sub)) return 'none';
+
+  const { data: prior } = await supabase
+    .from('subscription_events')
+    .select('id')
+    .eq('user_id', teacherId)
+    .eq('event_type', POLAR_FIRST_GAME_RESTART_EVENT)
+    .limit(1);
+  const already = markedOnAccessRow || ((prior ?? []) as unknown[]).length > 0;
+  const plan = planPolarTrialFirstGameRestart(sub, nowMs, already);
+  if (!plan) return 'unchanged';
+  try {
+    const { getPolarClient } = await import('@/lib/polar');
+    await getPolarClient().setTrialEnd(plan.subscriptionId, plan.trialEnd);
+  } catch (err) {
+    logger.error('CLASSROOM_GAME', `Card trial restart failed for ${teacherId}: ${err instanceof Error ? err.message : String(err)}`);
+    return 'failed';
+  }
+  await supabase.from('subscription_events').insert({
+    user_id: teacherId,
+    event_type: POLAR_FIRST_GAME_RESTART_EVENT,
+    subscription_id: plan.subscriptionId,
+    payload: { trial_end: plan.trialEnd, was: sub?.current_period_end ?? null },
+  } as never);
+  // The webhook carries the new end too; writing it now keeps the in-app countdown right meanwhile.
+  await supabase.from('subscriptions').update({ current_period_end: plan.trialEnd } as never).eq('user_id', teacherId);
+  logger.info('CLASSROOM_GAME', `Card trial restarted at first real class game for ${teacherId}: ends ${plan.trialEnd}`);
+  return 'restarted';
 }

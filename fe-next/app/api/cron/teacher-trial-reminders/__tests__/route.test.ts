@@ -100,6 +100,17 @@ describe('/api/cron/teacher-trial-reminders', () => {
       teacher_access_requests: { data: [access()], error: null },
       subscriptions: { data: [], error: null },
       profiles: { data: [profile()], error: null },
+      // u1 ran a class game, so their trial clock is running (not waiting for the first game).
+      classroom_rounds: { data: [{ teacher_id: 'u1', classroom_id: 'c1', game_code: 'G1' }], error: null },
+      classrooms: { data: [{ id: 'c1', teacher_id: 'u1' }], error: null },
+      classroom_memberships: { data: [{ classroom_id: 'c1', student_id: 's1' }, { classroom_id: 'c1', student_id: 's2' }], error: null },
+      game_sessions: {
+        data: [
+          { room_code: 'G1', score: 318, words_found: [{ word: 'garden' }, { word: 'cat' }] },
+          { room_code: 'G1', score: 120, words_found: [{ word: 'dear' }] },
+        ],
+        error: null,
+      },
     };
   });
 
@@ -223,5 +234,40 @@ describe('/api/cron/teacher-trial-reminders', () => {
     };
     const body = await (await POST(authed(true))).json();
     expect(body).toMatchObject({ dry: true, due: 0, skippedPro: 1 });
+  });
+
+  it('t-3 shows the teacher\'s own class results and a one-tap checkout link', async () => {
+    await POST(authed());
+    const html = h.sendEmailSpy.mock.calls[0][0].html;
+    expect(html).toContain('Your class so far');
+    expect(html).toContain('class games');
+    expect(html).toContain('words found');
+    expect(html).toContain('Longest word: GARDEN');
+    expect(html).toContain('Top score: 318');
+    expect(html).toContain('/en/teacher/upgrade?source=trial_reminder_email');
+    expect(html).toContain('Keep Teacher Pro after your free trial');
+  });
+
+  it('sends no trial email to a teacher who never ran a class game (waiting for the first one)', async () => {
+    h.tables.classroom_rounds = { data: [], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ sent: 0, skippedWaiting: 1 });
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+    expect(h.updates).toHaveLength(0);
+  });
+
+  it('a waiting teacher whose window ended long ago gets no "trial ended" email either', async () => {
+    h.tables.classroom_rounds = { data: [], error: null };
+    h.tables.teacher_access_requests = { data: [access({ trial_expires_at: inDays(-4), trial_reminders_sent: ['t-3', 't-0'] })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body.sent).toBe(0);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when the class-game history read fails', async () => {
+    h.tables.classroom_rounds = { data: null, error: { message: 'boom' } };
+    const res = await POST(authed());
+    expect(res.status).toBe(500);
+    expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 });
