@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createRequestClient } from '@/utils/supabase/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 
@@ -32,32 +32,23 @@ interface GiftMessage {
 
 /**
  * GET /api/player/gifts
- * Get player's gift messages (unclaimed and not dismissed)
+ * Get player's unclaimed gift messages.
  *
- * Only returns gifts that:
- * 1. Are not claimed (claimed = false)
- * 2. Were created AFTER the user's gift_modal_dismissed_at timestamp (if set)
- *    This ensures dismissed gifts don't appear in the gift list/badge
+ * Closing the gift popup only stops it auto-opening (client-side, via
+ * gift_modal_dismissed_at); it never hides a gift from the list or badge.
  */
 export async function GET(request: Request) {
   try {
     // Local JWT verify (sub-ms) when fetchWithAuth sends a Bearer; cookie fallback
-    // otherwise. Read-only. Query keeps the cookie client so RLS still applies.
+    // otherwise. The query uses the Bearer-aware client: a cookie-only client runs
+    // as signed-out for webview / cookie-blocked players and RLS returns no rows.
     const user = await getAuthedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
-    // Get user's profile to check gift_modal_dismissed_at
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('gift_modal_dismissed_at')
-      .eq('id', user.id)
-      .single();
-
-    // Build the query - filter by claimed status and dismissal timestamp
-    let query = supabase
+    const { supabase } = await createRequestClient(request);
+    const query = supabase
       .from('admin_gift_messages')
       .select(`
         id,
@@ -76,11 +67,6 @@ export async function GET(request: Request) {
       `)
       .eq('recipient_id', user.id)
       .eq('claimed', false);
-
-    // If user has dismissed the modal, only return gifts created AFTER that time
-    if (profile?.gift_modal_dismissed_at) {
-      query = query.gt('created_at', profile.gift_modal_dismissed_at);
-    }
 
     const { data: gifts, error: giftsError } = await query
       .order('created_at', { ascending: false });

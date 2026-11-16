@@ -65,6 +65,11 @@ const giftSendSchema = z.object({
   amount: z.number().int().positive().optional(),
 });
 
+/** Units delivered: hints and streak freezes cost a fixed price per gift, so one unit; coins are the paid amount. */
+export function giftUnits(type: GiftType, amount?: number): number {
+  return type === 'coins' ? amount ?? 1 : 1;
+}
+
 interface GiftResult {
   success: boolean;
   error?: string;
@@ -179,7 +184,7 @@ async function handleGiftSendInner(
     p_sender_id: senderId,
     p_recipient_id: params.recipientId,
     p_gift_type: params.giftType,
-    p_amount: params.amount ?? 1,
+    p_amount: giftUnits(params.giftType, params.amount),
     p_cost: cost,
     p_xp: xp,
   });

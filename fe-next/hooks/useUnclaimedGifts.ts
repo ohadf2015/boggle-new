@@ -60,8 +60,9 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
 
   // Track locally claimed gift IDs to preserve claimed status during refresh
   const locallyClaimedIdsRef = useRef<Set<string>>(new Set());
-  // Track whether we have loaded the full gift list (once loaded, derive count from gifts)
+  // Once the full gift list is loaded it derives the count; giftsCountRef is its unclaimed size.
   const giftsLoadedRef = useRef(false);
+  const giftsCountRef = useRef(0);
 
   // Save to localStorage cache
   const setCachedCount = useCallback((count: number) => {
@@ -97,13 +98,18 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
     },
   });
 
-  // Sync count query into local state + localStorage (skip if gifts already loaded locally)
+  // Sync the server count into local state + localStorage. Once the list has loaded it
+  // owns the count (it knows about local claims), except when the server reports MORE
+  // than the list holds: a gift arrived after the list was fetched, so take that count
+  // and refetch the list, otherwise it stays hidden until a full reload.
   useEffect(() => {
-    if (giftsLoadedRef.current) return; // gifts effect manages count after first load
-    const count = countQuery.data?.count ?? 0;
+    if (!countQuery.data) return;
+    const count = countQuery.data.count ?? 0;
+    if (giftsLoadedRef.current && count <= giftsCountRef.current) return;
     setUnclaimedCount(count);
-    if (countQuery.data) setCachedCount(count);
-  }, [countQuery.data, setCachedCount]);
+    setCachedCount(count);
+    if (giftsLoadedRef.current) queryClient.invalidateQueries({ queryKey: queryKeys.gifts.list() });
+  }, [countQuery.data, setCachedCount, queryClient]);
 
   // Query: full gift list (only when count > 0)
   const giftsQuery = useQuery({
@@ -131,6 +137,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       return g;
     });
     setGifts(mergedGifts);
+    giftsCountRef.current = mergedGifts.filter(g => !g.claimed).length;
     const unclaimed = mergedGifts.filter(g => !g.claimed).length;
     setUnclaimedCount(unclaimed);
     setCachedCount(unclaimed);
@@ -158,6 +165,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setGifts(prev => prev.map(g =>
         g.id === giftId ? { ...g, claimed: true, claimed_at: new Date().toISOString() } : g
       ));
+      giftsCountRef.current = Math.max(0, giftsCountRef.current - 1);
       setUnclaimedCount(prev => {
         const next = Math.max(0, prev - 1);
         setCachedCount(next);
@@ -185,6 +193,7 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       setUnclaimedCount(0);
       setGifts([]);
       giftsLoadedRef.current = false;
+      giftsCountRef.current = 0;
       locallyClaimedIdsRef.current = new Set();
     }
   }, [isAuthenticated]);

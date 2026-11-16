@@ -1,16 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createRequestClient } from '@/utils/supabase/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/player/gifts/unclaimed-count
- * Get count of unclaimed gift messages for the current player
- *
- * Only counts gifts that:
- * 1. Are not claimed (claimed = false)
- * 2. Were created AFTER the user's gift_modal_dismissed_at timestamp (if set)
- *    This ensures dismissed gifts don't show in the badge count
+ * Count of unclaimed gift messages for the current player. Closing the popup
+ * never hides a gift here (see GET /api/player/gifts).
  */
 export async function GET(request: NextRequest) {
   try {
@@ -20,34 +16,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const { supabase } = await createRequestClient(request);
 
-    // Fetch profile + gift count in parallel (was sequential — 2 round-trips)
-    const [profileResult, giftCountResult] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('gift_modal_dismissed_at')
-        .eq('id', user.id)
-        .single(),
-      supabase
-        .from('admin_gift_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('recipient_id', user.id)
-        .eq('claimed', false),
-    ]);
-
-    // If user has dismissed the modal, re-query with timestamp filter
-    let count = giftCountResult.count;
-    const countError = giftCountResult.error;
-    if (profileResult.data?.gift_modal_dismissed_at && !countError) {
-      const { count: filteredCount } = await supabase
-        .from('admin_gift_messages')
-        .select('*', { count: 'exact', head: true })
-        .eq('recipient_id', user.id)
-        .eq('claimed', false)
-        .gt('created_at', profileResult.data.gift_modal_dismissed_at);
-      count = filteredCount;
-    }
+    const { count, error: countError } = await supabase
+      .from('admin_gift_messages')
+      .select('*', { count: 'exact', head: true })
+      .eq('recipient_id', user.id)
+      .eq('claimed', false);
 
     if (countError) {
       console.error('Error fetching unclaimed count:', countError);

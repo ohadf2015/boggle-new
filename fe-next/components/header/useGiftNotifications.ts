@@ -14,6 +14,9 @@ export function useGiftNotifications() {
     // Track which gift IDs have been dismissed this session (user clicked X without claiming)
     // Note: Dismissal is immediately persisted to DB via /api/player/gifts/dismiss-modal
     const dismissedGiftIdsRef = useRef<Set<string>>(new Set());
+    // The modal closes itself after a claim; that close is not a "not now" and must not
+    // write a dismissal.
+    const claimedGiftIdsRef = useRef<Set<string>>(new Set());
 
     // Handle opening gift modal with oldest unclaimed gift
     const handleOpenGiftModal = useCallback(() => {
@@ -26,7 +29,14 @@ export function useGiftNotifications() {
 
     // Handle claiming a gift
     const handleClaimGift = useCallback(async (giftId: string) => {
-        await claimGift(giftId);
+        try {
+            await claimGift(giftId);
+        } catch (error) {
+            // Deleted by an admin or claimed in another tab: resync so the list stops offering it.
+            await refreshGifts();
+            throw error;
+        }
+        claimedGiftIdsRef.current.add(giftId);
         await Promise.all([
             refreshGifts(),
             refreshProfile(),
@@ -43,11 +53,13 @@ export function useGiftNotifications() {
         // Persist dismissal to database IMMEDIATELY (fire-and-forget)
         // postWithAuth sends the Bearer token — plain fetch 401s for clients
         // without auth cookies (Capacitor / cookie-blocked browsers).
-        postWithAuth('/api/player/gifts/dismiss-modal').then(() => {
-            refreshProfile();
-        }).catch(error => {
-            console.error('Failed to persist gift modal dismissal:', error);
-        });
+        if (!selectedGift?.id || !claimedGiftIdsRef.current.has(selectedGift.id)) {
+            postWithAuth('/api/player/gifts/dismiss-modal').then(() => {
+                refreshProfile();
+            }).catch(error => {
+                console.error('Failed to persist gift modal dismissal:', error);
+            });
+        }
 
         // Find the next unclaimed gift (excluding the currently selected one and dismissed ones)
         const nextUnclaimedGift = gifts.find(g =>

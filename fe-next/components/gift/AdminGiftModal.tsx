@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Gift, Sparkles, Coins, Crown, X, Award } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-hot-toast';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -248,6 +249,7 @@ export function AdminGiftModal({
       setTimeout(() => onDismissRef.current(), 1500);
     } catch (error) {
       console.error('Failed to claim gift:', error);
+      toast.error(t('gift.claimError'));
       setClaiming(false);
       setPhase('ready');
     }

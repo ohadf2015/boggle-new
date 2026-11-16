@@ -1,5 +1,5 @@
 import { vi, type Mock, type MockInstance } from 'vitest';
-import { handleGiftSend, clearGiftDedup } from '../giftHandler';
+import { handleGiftSend, clearGiftDedup, giftUnits } from '../giftHandler';
 
 // Mock dependencies
 vi.mock('../../utils/logger', () => {
@@ -59,6 +59,17 @@ describe('giftHandler', () => {
     (areFriends as Mock).mockResolvedValue(true);
     mockSupabaseSelect.mockResolvedValue({ count: 0, error: null });
     mockSupabaseRpc.mockResolvedValue({ error: null });
+  });
+
+  describe('giftUnits', () => {
+    test('hints and streak freezes are one unit, whatever amount the client sends (price is fixed)', () => {
+      expect(giftUnits('hints', 1000)).toBe(1);
+      expect(giftUnits('streak_freeze', 50)).toBe(1);
+    });
+
+    test('coins are the amount the sender pays', () => {
+      expect(giftUnits('coins', 25)).toBe(25);
+    });
   });
 
   describe('handleGiftSend', () => {
