@@ -217,6 +217,14 @@ const content: Record<EducationLocale, LocaleContent> = {
         a: 'Absolutely. Adult learners and university ESL/EFL programs use LexiClash for conversation-starter icebreakers and vocabulary retention activities.',
       },
       {
+        q: 'What ages are these vocabulary games for?',
+        a: 'Any learner who can read a short word. The free word lists go from Grade 1 up to Grade 12, so you can match the list to the class rather than the other way round. For young kids, pick a Grade 1 list and put them on the Support tier, which gives them shorter words, a longer timer and a word bank during the live game. They join by typing the six-character code on a tablet or phone.',
+      },
+      {
+        q: 'Can students play these vocabulary games without a teacher?',
+        a: 'Yes. Every free word list has a Practice solo button, so a student can open a list at home and play it as a letter grid, a spelling round or a matching game, with no account. Only the live class modes need a teacher, because someone has to open the room and share the code.',
+      },
+      {
         q: 'Can I use LexiClash in a bilingual program?',
         a: 'Yes. LexiClash supports English, Spanish, Hebrew, Swedish, Japanese and Russian dictionaries. Perfect for immersion and transition classrooms.',
       },
