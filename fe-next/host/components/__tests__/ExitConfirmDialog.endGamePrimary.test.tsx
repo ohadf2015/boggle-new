@@ -3,7 +3,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ExitConfirmDialog } from '../HostDialogs';
-import { classroomLobbyExitSkipsConfirm, countClassStudents } from '../exitConfirmModel';
+import { classroomLobbyExitSkipsConfirm, countClassStudents, emptyLobbyEndConfirm } from '../exitConfirmModel';
 import { PlayerRoundDialogs } from '@/player/components/in-game/PlayerRoundDialogs';
 
 const t = (key: string) => key;
@@ -63,6 +63,22 @@ describe('ExitConfirmDialog — a classroom host in the lobby with students wait
     expect(screen.queryByText('eduLive.exit.title')).toBeNull();
   });
 
+  it('Given an empty classroom lobby, When exit opens, Then it names the share code and does not end until End anyway', () => {
+    const onConfirm = vi.fn();
+    const tParams = (key: string, params?: string | Record<string, string | number>) =>
+      params && typeof params === 'object' && params.code ? `${key}:${params.code}` : key;
+    render(
+      <ExitConfirmDialog open onOpenChange={() => {}} onConfirm={onConfirm} t={tParams} classroom phase="lobby" emptyLobby gameCode="ABC123" />
+    );
+    expect(screen.getByTestId('classroom-exit-confirm')).toHaveAttribute('data-empty', 'true');
+    expect(screen.getByText('eduLive.exit.emptyTitle')).toBeInTheDocument();
+    expect(screen.getByText('eduLive.exit.emptyBody:ABC123')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'eduLive.exit.emptyStay' }));
+    expect(onConfirm).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'eduLive.exit.emptyConfirm' }));
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+  });
+
   it('Given the lobby, When the dialog opens, Then Close room leads and is destructive, Stay is secondary', () => {
     const onConfirm = vi.fn();
     render(<ExitConfirmDialog open onOpenChange={() => {}} onConfirm={onConfirm} t={t} classroom phase="lobby" />);
@@ -102,22 +118,19 @@ describe('countClassStudents — whether an empty lobby needs a confirm at all',
   });
 });
 
-describe('classroomLobbyExitSkipsConfirm — leaving silently needs a known, empty roster', () => {
-  it('Given no roster update has arrived for this room, When the host presses exit, Then the dialog is asked', () => {
-    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: false, players: [] })).toBe(false);
+describe('classroomLobbyExitSkipsConfirm — an empty class lobby no longer leaves in one tap', () => {
+  it('Given a known empty roster, When the host presses exit, Then the confirm is still asked', () => {
+    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: true, players: [{ username: 'Ms K', isHost: true }] })).toBe(false);
+    expect(emptyLobbyEndConfirm({ classroom: true, rosterKnown: true, players: [{ username: 'Ms K', isHost: true }] })).toBe(true);
   });
 
-  it('Given a roster update showed only the teacher, When the host presses exit, Then it exits without asking', () => {
-    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: true, players: [{ username: 'Ms K', isHost: true }] })).toBe(true);
+  it('Given the roster has not arrived, When the host presses exit, Then it does not claim the room is empty', () => {
+    expect(emptyLobbyEndConfirm({ classroom: true, rosterKnown: false, players: [] })).toBe(false);
   });
 
-  it('Given a roster with a student named like the teacher, When the host presses exit, Then the dialog is asked', () => {
-    const players = [{ username: 'Ms K', isHost: true, playerId: 'h' }, { username: 'Ms K', playerId: 's' }];
-    expect(classroomLobbyExitSkipsConfirm({ classroom: true, rosterKnown: true, players })).toBe(false);
-  });
-
-  it('Given an arcade room, When the host presses exit, Then the dialog is always asked', () => {
-    expect(classroomLobbyExitSkipsConfirm({ classroom: false, rosterKnown: true, players: [] })).toBe(false);
+  it('Given a student is seated, When the host presses exit, Then the empty-room copy stays off', () => {
+    const players = [{ username: 'Ms K', isHost: true, playerId: 'h' }, { username: 'Dana', playerId: 's' }];
+    expect(emptyLobbyEndConfirm({ classroom: true, rosterKnown: true, players })).toBe(false);
   });
 });
 

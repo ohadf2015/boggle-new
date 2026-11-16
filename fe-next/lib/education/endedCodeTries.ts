@@ -10,6 +10,7 @@
  */
 import { getCacheClient } from '@/backend/cache/redisCache';
 import logger from '@/utils/logger';
+import { LATE_JOIN_NOTICE_MS, endedCodeTriesAtKey } from '@/lib/education/recentEndedTries';
 
 /** Long enough that a teacher who opens HQ the next school day still sees it. */
 export const ENDED_CODE_TRIES_TTL_SECONDS = 48 * 60 * 60;
@@ -35,13 +36,34 @@ export function lateJoinStudentKey(args: {
   return `socket:${args.socketId || 'unknown'}`;
 }
 
-export async function recordEndedCodeTry(classroomId: string, studentId: string): Promise<void> {
+export async function recordEndedCodeTry(classroomId: string, studentId: string, now = Date.now()): Promise<void> {
   try {
     const redis = getCacheClient();
     await redis.sadd(endedCodeTriesKey(classroomId), studentId);
     await redis.expire(endedCodeTriesKey(classroomId), ENDED_CODE_TRIES_TTL_SECONDS);
+    // Score is the arrival time so the lobby can count the last 10 minutes
+    // even after a new room opens and the 48h set is cleared.
+    await redis.zadd(endedCodeTriesAtKey(classroomId), now, studentId);
+    await redis.expire(endedCodeTriesAtKey(classroomId), ENDED_CODE_TRIES_TTL_SECONDS);
   } catch (err) {
     logger.warn('ended code try not recorded:', err);
+  }
+}
+
+/** Unique students who tried an ended code inside the lobby window. Never throws. */
+export async function countRecentEndedCodeTries(
+  classroomId: string,
+  now = Date.now(),
+  windowMs = LATE_JOIN_NOTICE_MS
+): Promise<number> {
+  try {
+    const redis = getCacheClient();
+    const key = endedCodeTriesAtKey(classroomId);
+    await redis.zremrangebyscore(key, 0, now - windowMs - 1);
+    return await redis.zcard(key);
+  } catch (err) {
+    logger.warn('recent ended code tries unreadable:', err);
+    return 0;
   }
 }
 

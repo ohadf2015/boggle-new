@@ -267,6 +267,8 @@ export interface ClassroomJoinRefusal {
   /** Supabase auth id, or null for a guest student. */
   actorId: string | null;
   isTestAccount: boolean;
+  /** Seconds after the teacher ended, when the record has an end stamp. */
+  secondsSinceEnd?: number | null;
 }
 
 /**
@@ -309,6 +311,7 @@ export function buildClassroomJoinRefusedEvent(
       door: refusal.door,
       is_guest: !refusal.actorId,
       is_test_account: refusal.isTestAccount,
+      seconds_since_end: refusal.secondsSinceEnd ?? null,
     },
   };
 }

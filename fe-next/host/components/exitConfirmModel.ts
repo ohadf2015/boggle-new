@@ -12,8 +12,20 @@ export function countClassStudents(players: ReadonlyArray<RosterEntry> | undefin
   return ids.size;
 }
 
-/** Leave without the confirm only when the server has told us who is here and nobody is a student. */
-export function classroomLobbyExitSkipsConfirm(args: {
+/**
+ * An empty classroom lobby used to leave with no confirm. That is the end
+ * teachers tap before anyone has sat down, so it always asks.
+ */
+export function classroomLobbyExitSkipsConfirm(_args: {
+  classroom: boolean;
+  rosterKnown: boolean;
+  players: ReadonlyArray<RosterEntry> | undefined;
+}): boolean {
+  return false;
+}
+
+/** The share-code confirm: the roster has arrived and no student is seated. */
+export function emptyLobbyEndConfirm(args: {
   classroom: boolean;
   rosterKnown: boolean;
   players: ReadonlyArray<RosterEntry> | undefined;

@@ -24,6 +24,9 @@ interface ExitConfirmDialogProps {
   phase?: ClassroomExitPhase;
   /** Classroom `round` phase: ends the round for everyone instead of closing the room. */
   endRound?: EndRoundRequest;
+  /** Lobby with a known empty roster: confirm, and tell the teacher to share the code. */
+  emptyLobby?: boolean;
+  gameCode?: string;
 }
 
 const CLASSROOM_KEYS = {
@@ -41,6 +44,8 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
   classroom = false,
   phase = 'game',
   endRound,
+  emptyLobby = false,
+  gameCode = '',
 }) {
   if (!classroom) {
     return (
@@ -75,25 +80,38 @@ export const ExitConfirmDialog: React.FC<ExitConfirmDialogProps> = memo(function
   }
 
   const keys = CLASSROOM_KEYS[phase === 'lobby' ? 'lobby' : 'game'];
+  const empty = phase === 'lobby' && emptyLobby;
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent
         data-testid="classroom-exit-confirm"
         data-phase={phase}
+        data-empty={empty ? 'true' : 'false'}
         className={CLASSROOM_CONTENT}
       >
         <AlertDialogHeader>
-          <AlertDialogTitle className="font-neo-display font-black uppercase text-neo-cream">{t(keys.title)}</AlertDialogTitle>
-          <AlertDialogDescription className="font-bold text-neo-cream/90">{t(keys.body)}</AlertDialogDescription>
+          <AlertDialogTitle className="font-neo-display font-black uppercase text-neo-cream">
+            {t(empty ? 'eduLive.exit.emptyTitle' : keys.title)}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="font-bold text-neo-cream/90">
+            {t(empty ? 'eduLive.exit.emptyBody' : keys.body, empty ? { code: gameCode } : undefined)}
+          </AlertDialogDescription>
         </AlertDialogHeader>
-        {/* The host pressed exit, so the exit leads: first in reading order (LTR and RTL) and the only filled button. */}
+        {/* Empty lobby: staying open leads, so a mis-tap does not end the room before anyone sits. */}
         <AlertDialogFooter className={CLASSROOM_FOOTER}>
+          {empty ? (
+            <AlertDialogCancel className={`mt-0 min-h-12 bg-neo-lime text-neo-black font-black border-3 border-neo-black shadow-hard`}>
+              {t('eduLive.exit.emptyStay')}
+            </AlertDialogCancel>
+          ) : null}
           <AlertDialogAction onClick={onConfirm} className={`min-h-12 font-neo-display text-base font-black ${DESTRUCTIVE}`}>
-            {t(keys.confirm)}
+            {t(empty ? 'eduLive.exit.emptyConfirm' : keys.confirm)}
           </AlertDialogAction>
-          <AlertDialogCancel className={`mt-0 min-h-12 ${QUIET}`}>
-            {t(keys.stay)}
-          </AlertDialogCancel>
+          {empty ? null : (
+            <AlertDialogCancel className={`mt-0 min-h-12 ${QUIET}`}>
+              {t(keys.stay)}
+            </AlertDialogCancel>
+          )}
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

@@ -82,6 +82,7 @@ vi.mock('../../utils/errorHandler', () => ({
     PLAYER_BLOCKED: 'PLAYER_BLOCKED',
     GAME_CLOSED: 'GAME_CLOSED',
     CLASSROOM_NOT_OPEN: 'CLASSROOM_NOT_OPEN',
+    CLASSROOM_SESSION_WAITING: 'CLASSROOM_SESSION_WAITING',
   },
 }));
 vi.mock('../../utils/rateLimiter', () => ({
@@ -198,14 +199,15 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     expect(addUserToGame).toHaveBeenCalled();
   });
 
-  it('still answers GAME_NOT_FOUND for an ENDED session (no new oracle, no endless wait)', async () => {
+  it('answers CLASSROOM_SESSION_WAITING for an ENDED session so the student waits instead of retrying', async () => {
     mockGetClassroomGame.mockResolvedValue({ ...waitingClassroom, status: 'ended', endedAt: '2026-09-19T10:00:00Z' });
 
     const { socket, join } = captureJoinHandler('student-1');
     await join({ gameCode: 'ABC123', username: 'Ada' });
     await flush();
 
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'CLASSROOM_SESSION_WAITING', expect.objectContaining({ details: { classroomId: waitingClassroom.classroomId } }));
+    expect(errorCodes()).not.toContain('GAME_NOT_FOUND');
     expect(errorCodes()).not.toContain('CLASSROOM_NOT_OPEN');
   });
 

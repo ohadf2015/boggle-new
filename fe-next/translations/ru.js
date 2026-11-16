@@ -21442,6 +21442,10 @@ const ru = {
       "lobbyBody": "Ученики, которые уже вошли, выйдут из комнаты.",
       "lobbyConfirm": "Закрыть комнату",
       "lobbyStay": "Оставить открытой",
+      "emptyTitle": "Пока никто не зашёл",
+      "emptyBody": "Поделитесь кодом {{code}}, чтобы класс смог войти.",
+      "emptyStay": "Оставить комнату открытой",
+      "emptyConfirm": "Всё равно завершить",
       "roundTitle": "Завершить этот раунд?",
       "roundBody": "Все сразу увидят результаты.",
       "roundConfirm": "Завершить раунд",
@@ -21498,7 +21502,9 @@ const ru = {
       "googleClassroom": "Опубликовать в Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "Ждём учеников"
+      "waitingForStudents": "Ждём учеников",
+      "lateJoins": "{{count}} учеников пытались войти после конца игры. Начните новую.",
+      "lateJoinsOne": "1 ученик пытался войти после конца игры. Начните новую."
     },
     "wordcraft": {
       "bingo": "БИНГО!",

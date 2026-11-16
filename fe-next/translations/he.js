@@ -21703,6 +21703,10 @@ const he = {
       "lobbyBody": "תלמידים שכבר הצטרפו ייצאו מהחדר.",
       "lobbyConfirm": "סגירת החדר",
       "lobbyStay": "להשאיר פתוח",
+      "emptyTitle": "עדיין אף אחד לא הצטרף",
+      "emptyBody": "שתפו את הקוד {{code}} כדי שהכיתה תוכל להיכנס.",
+      "emptyStay": "השאירו את החדר פתוח",
+      "emptyConfirm": "לסיים בכל זאת",
       "roundTitle": "לסיים את הסיבוב?",
       "roundBody": "כולם יראו עכשיו את התוצאות.",
       "roundConfirm": "סיום הסיבוב",
@@ -21759,7 +21763,9 @@ const he = {
       "googleClassroom": "פרסום ב-Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "מחכים לתלמידים"
+      "waitingForStudents": "מחכים לתלמידים",
+      "lateJoins": "{{count}} תלמידים ניסו להצטרף אחרי שהמשחק נגמר. התחילו משחק חדש.",
+      "lateJoinsOne": "תלמיד אחד ניסה להצטרף אחרי שהמשחק נגמר. התחילו משחק חדש."
     },
     "wordcraft": {
       "bingo": "בינגו!",

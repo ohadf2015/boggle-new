@@ -51,14 +51,15 @@ describe('answerMissingRoom - old code of a class that moved on', () => {
     expect(captureJoinRefusal).not.toHaveBeenCalled();
   });
 
-  it('given no newer game, then the old answer stands (GAME_NOT_FOUND + SESSION_ENDED record)', async () => {
+  it('given no newer game, then the student waits and the refusal is still SESSION_ENDED', async () => {
     getClassroomGame.mockResolvedValue({ gameCode: 'OLD111', classroomId: 'cls-1', status: 'ended', endedAt: 'x' });
     findNewerClassroomGame.mockResolvedValue(null);
     const { socket, emit } = fakeSocket();
 
     await answerMissingRoom(socket, 'OLD111', 'Pip');
 
-    expect(emit.mock.calls.some((c) => JSON.stringify(c).includes('GAME_NOT_FOUND'))).toBe(true);
+    expect(emit.mock.calls.some((c) => JSON.stringify(c).includes('CLASSROOM_SESSION_WAITING'))).toBe(true);
+    expect(emit.mock.calls.some((c) => JSON.stringify(c).includes('GAME_NOT_FOUND'))).toBe(false);
     expect((captureJoinRefusal.mock.calls[0]?.[0] as { reason?: string }).reason).toBe('SESSION_ENDED');
   });
 

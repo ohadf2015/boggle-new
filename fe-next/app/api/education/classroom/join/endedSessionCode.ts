@@ -26,4 +26,4 @@ export async function lookupEndedClassroomSession(gameCode: string): Promise<{ c
   }
 }
 
-export { recordEndedCodeTry, countEndedCodeTries, clearEndedCodeTries } from '@/lib/education/endedCodeTries';
+export { recordEndedCodeTry, countEndedCodeTries, countRecentEndedCodeTries, clearEndedCodeTries } from '@/lib/education/endedCodeTries';

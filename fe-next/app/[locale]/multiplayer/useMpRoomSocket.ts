@@ -80,6 +80,8 @@ export interface MpRoomSocketContext {
   onMatchStart: () => void;
   /** Early classroom joiner: hold on the teacher's code instead of bouncing. */
   roomWaitHold: (code: string) => void;
+  /** Ended class code: enroll via the join page and wait. Do not re-emit join. */
+  onSessionWaiting?: (code: string) => void;
   /** Tri-state classroom detection — 'pending' defers the irreversible decisions. */
   classroomContext: ClassroomContext;
   classroomDecisionRef: MutableRefObject<{ context: ClassroomContext; isHost: boolean }>;
@@ -216,8 +218,17 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       // fallback). The old message-only matcher leaked raw English for the
       // GAME_CLOSED paths whose custom message lacked "closed"/"not found".
       const kind = classifyRoomError(data);
-      // Same code derivation as the 'gone' branch below: both state values can be empty on a cold invite load.
-      if (kind === 'notOpen') { setError(''); roomWait.hold(gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '')); return; }
+      const waitingCode = gameCode || prefilledRoomCode || (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('room') ?? '' : '');
+      if (kind === 'sessionWaiting') {
+        setError('');
+        setIsJoining(false);
+        setAttemptingReconnect(false);
+        setShouldAutoJoin(false);
+        clearSessionPreservingUsername();
+        if (waitingCode) ctx.onSessionWaiting?.(waitingCode);
+        return;
+      }
+      if (kind === 'notOpen') { setError(''); roomWait.hold(waitingCode); return; }
       if (kind === 'locked') {
         setError(t('education.student.join.roomLocked.title'));
         toast.error(`${t('education.student.join.roomLocked.title')}\n${t('education.student.join.roomLocked.hint')}`, { duration: 5000, icon: '🔒', id: MP_TOAST_IDS.joinError });
