@@ -237,6 +237,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
     posthog.capture('student_academy_cta_clicked', { kind: action.kind });
     if (action.kind === 'live') join();
     else if (action.kind === 'join-class') router.push(`/${language}/student/join`);
+    else if (action.kind === 'waiting') return;
     else if (action.kind === 'solo') goSolo();
     else if (target?.href) router.push(target.href);
   };
@@ -379,6 +380,11 @@ export function AcademyHubView(props: AcademyHubViewProps) {
               ? <AcademyMascot mood={mascotMood} reducedMotion={reducedMotion} />
               : <div aria-hidden="true" data-testid="academy-mascot-slot" className="h-16" />)}
             {ready && isLive && props.autoJoinPending && props.onStayHere && <ClassroomAutoJoinNotice onStay={props.onStayHere} />}
+            {ready && classroomId && !isLive && action.kind !== 'waiting' && (
+              <p role="status" data-testid="academy-waiting-for-teacher" className="pointer-events-auto rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-2 text-center font-neo-display text-sm font-black uppercase leading-tight text-neo-navy shadow-hard-sm [overflow-wrap:anywhere]">
+                {t('academy.student.waitingForTeacher', 'Waiting for your teacher')}
+              </p>
+            )}
             {noClass ? null : ready ? (
               <AcademyCta
                 kind={action.kind}

@@ -1367,6 +1367,8 @@ const ja = {
       "title": "ことばアカデミー",
       "rewardXp": "+{xp} XP",
       "arenaWaiting": "先生はまだライブゲームを始めていないよ。始まるとこの島が光るよ。",
+      "waitingForTeacher": "先生を待っているよ",
+      "waitingOver": "まって",
       "bossLockedNote": "あと{count}語マスターするとボスが解放されるよ。",
       "level": "レベル{level}",
       "xpToNext": "次のレベルまでのXP",
@@ -17877,7 +17879,11 @@ const ja = {
           "liveHint": "ゲームはもう開いていて、生徒は今すぐ参加できます。ボードを開いて進めましょう。",
           "startGame": "このクラスでゲームを始める",
           "openBoard": "ゲームボードを開く",
-          "openClass": "クラスを開く"
+          "openClass": "クラスを開く",
+          "joinAsStudent": "この端末で生徒として参加",
+          "joinAsStudentHint": "先生をサインアウトして、生徒がここから参加できるようにします。",
+          "joiningAsStudent": "先生をサインアウトしています…",
+          "joinAsStudentFailed": "先生をサインアウトできませんでした。もう一度試してください。"
         },
         "returning": {
           "title": "{name}として続ける？",
@@ -22529,6 +22535,8 @@ const ja = {
       "greetEvening": "こんばんは、{name}さん",
       "greetNoName": "おかえりなさい",
       "startWith": "ゲームを始めるクラス：",
+      "waitingNudge": "{count}人の生徒が待っています — ラウンドを始めましょう",
+      "waitingNudgeOne": "1人の生徒が待っています — ラウンドを始めましょう",
       "switchClass": "クラスを選ぶ",
       "startLive": "ゲームを始める",
       "yourClasses": "あなたのクラス",

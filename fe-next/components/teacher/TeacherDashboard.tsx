@@ -28,6 +28,7 @@ import { useAssignCreator } from './home/useAssignCreator';
 import { useCheckoutReturn } from './home/useCheckoutReturn';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
+import { WaitingStudentsNudge } from './home/WaitingStudentsNudge';
 import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
 import { HomeWeekClasses } from './home/HomeWeekClasses';
 import { useHomeWeekLoop } from './home/useHomeWeekLoop';
@@ -236,6 +237,14 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
       desk={
         <>
           {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
+          {hasClasses ? (
+            <WaitingStudentsNudge
+              classroomIds={classrooms.map((c) => c.id)}
+              selectedId={effectiveId}
+              language={language}
+              t={t}
+            />
+          ) : null}
           <div data-tm>
             <HomeHero
               classrooms={classrooms}

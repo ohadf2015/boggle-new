@@ -1367,6 +1367,8 @@ const he = {
       "title": "אקדמיית המילים",
       "rewardXp": "+{xp} XP",
       "arenaWaiting": "עוד לא התחיל משחק לייב בכיתה. האי הזה יידלק ברגע שזה יקרה.",
+      "waitingForTeacher": "מחכים למורה",
+      "waitingOver": "רגע",
       "bossLockedNote": "כדי לפתוח את הבוס, צריך ללמוד עוד מילים: {count}.",
       "level": "רמה {level}",
       "xpToNext": "XP לרמה הבאה",
@@ -17872,7 +17874,11 @@ const he = {
           "liveHint": "המשחק שלך פתוח, ותלמידים יכולים להצטרף כבר עכשיו. פותחים את הלוח ומנהלים אותו משם.",
           "startGame": "להתחיל משחק לכיתה הזו",
           "openBoard": "לפתוח את לוח המשחק",
-          "openClass": "לכיתה שלי"
+          "openClass": "לכיתה שלי",
+          "joinAsStudent": "להצטרף כתלמיד במכשיר הזה",
+          "joinAsStudentHint": "זה מנתק את המורה, כדי שתלמיד יוכל להיכנס מכאן.",
+          "joiningAsStudent": "מנתקים את המורה…",
+          "joinAsStudentFailed": "לא הצלחנו לנתק את המורה. נסו שוב."
         },
         "returning": {
           "title": "להמשיך בתור {name}?",
@@ -22490,6 +22496,8 @@ const he = {
       "greetEvening": "ערב טוב, {name}",
       "greetNoName": "טוב לראות אותך שוב",
       "startWith": "מתחילים משחק עם",
+      "waitingNudge": "{count} תלמידים מחכים — התחילו סיבוב",
+      "waitingNudgeOne": "תלמיד אחד מחכה — התחילו סיבוב",
       "switchClass": "בחירת כיתה",
       "startLive": "מתחילים משחק",
       "yourClasses": "הכיתות שלך",
