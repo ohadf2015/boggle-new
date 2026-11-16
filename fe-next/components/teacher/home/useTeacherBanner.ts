@@ -10,6 +10,7 @@ import { useTrialReminderBanner } from '@/lib/education/useTrialReminderBanner';
 import { isPolarTrialDay10Expiring, polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { isTrialReminderWindow } from '@/lib/education/trial';
 import { isPolarTrialChargeSoon } from '@/lib/education/polarTrialDayBefore';
+import { useTeacherWinbackDismiss } from '@/hooks/useTeacherWinbackDismiss';
 import { selectTeacherBanner } from './teacherBannerSelect';
 
 /** Every input the Home billing banner depends on, read once, decided by one pure function. */
@@ -20,6 +21,7 @@ export function useTeacherBanner() {
   const expiring = useTeacherTrialExpiring();
   const ended = useTeacherTrialEnded();
   const reminder = useTrialReminderBanner(access.trial);
+  const winback = useTeacherWinbackDismiss();
   const [nowMs] = useState(() => Date.now());
   const trialExpires = pro.trialExpires ?? pro.periodEnd;
 
@@ -47,6 +49,8 @@ export function useTeacherBanner() {
       nowMs,
     }),
     trialExpiringDismissed: expiring.dismissed,
+    approved: access.latestRequest?.status === 'approved',
+    winbackDismissed: winback.dismissed,
   });
 
   return {
@@ -58,5 +62,7 @@ export function useTeacherBanner() {
     dismissReminder: reminder.dismiss,
     dismissEnded: ended.dismiss,
     dismissExpiring: expiring.dismiss,
+    dismissWinback: winback.dismiss,
+    approved: access.latestRequest?.status === 'approved',
   };
 }

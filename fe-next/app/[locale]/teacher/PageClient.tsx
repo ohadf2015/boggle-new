@@ -10,6 +10,7 @@ import { TrialEndedBannerWithRecap } from '@/components/teacher/TrialRecapBanner
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherProTrialChargeSoonBanner } from '@/components/teacher/TeacherProTrialChargeSoonBanner';
+import { TeacherWinbackBanner } from '@/components/teacher/TeacherWinbackBanner';
 import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingCard';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
@@ -30,6 +31,7 @@ const IMPRESSION_SOURCE: Partial<Record<TeacherBillingBanner, string>> = {
   trialEnding: 'trial_ending_card',
   trialExpired: 'trial_ending_card',
   trialReminder: 'trial_ending_card',
+  winback: 'dashboard_teacher_winback',
 };
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the redirect.
@@ -54,7 +56,7 @@ function TeacherDashboardInner() {
 
   return (
     <TeacherDashboard
-      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : undefined}
+      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : banner === 'winback' ? <TeacherWinbackBanner approved={b.approved} onDismiss={b.dismissWinback} /> : undefined}
       banner={banner ? accountBanner(banner, b) : undefined}
     />
   );
@@ -63,6 +65,7 @@ function TeacherDashboardInner() {
 function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTeacherBanner>): ReactNode {
   switch (banner) {
     case 'paymentFailed':
+    case 'winback':
       return undefined;
     case 'pendingCheckout':
       return <PendingCheckoutBanner />;

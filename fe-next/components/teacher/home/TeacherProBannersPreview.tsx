@@ -17,6 +17,7 @@ import { MasteryLockedTeaser } from '@/components/teacher/reports/MasteryLockedT
 import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
+import { TeacherWinbackBanner } from '@/components/teacher/TeacherWinbackBanner';
 
 const DAY = 86_400_000;
 
@@ -77,6 +78,9 @@ export function TeacherProBannersPreview() {
         <Slot name="TeacherProCompareCheckoutStrip">
           <TeacherProCompareCheckoutStrip locale={language} />
         </Slot>
+        <Slot name="TeacherWinbackBanner">
+          <TeacherWinbackBanner approved />
+        </Slot>
         <Slot name="TeacherTrialWelcome">
           <TeacherTrialWelcome trialExpires={iso(14)} onReturnPage />
         </Slot>
@@ -93,5 +97,6 @@ export function previewBanner(name: string | undefined): ReactNode {
   if (name === 'lifecycle') return <TeacherProTrialLifecycleBanner trialExpires={iso(8)} />;
   if (name === 'trialEnding') return <TeacherTrialEndingCard trial={teacherTrialStatus(iso(3), Date.now())} />;
   if (name === 'expired') return <TrialUrgencyBanner trial={teacherTrialStatus(iso(-1), Date.now())} href="#" />;
+  if (name === 'winback') return <TeacherWinbackBanner approved />;
   return null;
 }

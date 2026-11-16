@@ -18,6 +18,8 @@ const base: TeacherBannerInput = {
   polarTrialExpiring: false,
   polarChargeSoon: false,
   trialExpiringDismissed: false,
+  approved: false,
+  winbackDismissed: false,
 };
 const pick = (over: Partial<TeacherBannerInput>) => selectTeacherBanner({ ...base, ...over });
 
@@ -80,5 +82,32 @@ describe('selectTeacherBanner', () => {
     expect(pick({ accessTrialLive: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
     expect(pick({ accessTrialLive: true, trialReminderOpen: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
     expect(pick({ accessTrialLive: true, isAdmin: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
+  });
+
+  it('given an approved teacher who never started a trial, when picking, then the win-back shows until dismissed', () => {
+    expect(pick({ approved: true })).toEqual({ kind: 'show', banner: 'winback' });
+    expect(pick({ approved: true, winbackDismissed: true })).toEqual({ kind: 'none' });
+  });
+
+  it('given someone who was not approved, when picking, then no win-back', () => {
+    expect(pick({ approved: false })).toEqual({ kind: 'none' });
+  });
+
+  it('given an approved teacher who already has a billing banner, when picking, then that banner wins and win-back does not stack', () => {
+    expect(pick({ approved: true, hasPro: true, status: 'trialing' })).toEqual({ kind: 'show', banner: 'trialing' });
+    expect(pick({ approved: true, hasPro: true, status: 'trialing', polarTrialExpiring: true })).toEqual({
+      kind: 'show',
+      banner: 'trialExpiring',
+    });
+    expect(pick({ approved: true, hasPro: true, status: 'trialing', polarChargeSoon: true })).toEqual({
+      kind: 'show',
+      banner: 'chargeSoon',
+    });
+    expect(pick({ approved: true, trialUsed: true })).toEqual({ kind: 'show', banner: 'reactivate' });
+    expect(pick({ approved: true, accessTrialLive: true })).toEqual({ kind: 'show', banner: 'trialEnding' });
+    expect(pick({ approved: true, trialReminderOpen: true })).toEqual({ kind: 'show', banner: 'trialReminder' });
+    expect(pick({ approved: true, accessTrialExpired: true })).toEqual({ kind: 'show', banner: 'trialExpired' });
+    expect(pick({ approved: true, pendingCheckout: true })).toEqual({ kind: 'show', banner: 'pendingCheckout' });
+    expect(pick({ approved: true, hasPro: true })).toEqual({ kind: 'none' });
   });
 });
