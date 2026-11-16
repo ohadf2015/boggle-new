@@ -1,4 +1,5 @@
 import { polarTrialUx } from '@/lib/education/polarTrial';
+import { teacherWinbackEligible } from '@/lib/education/teacherWinback';
 import type { SubscriptionSource } from '@/lib/education/proGrant';
 import type { TeacherProStatus } from '@/hooks/useTeacherPro';
 
@@ -12,7 +13,8 @@ export type TeacherBillingBanner =
   | 'reactivate'
   | 'trialing'
   | 'trialExpiring'
-  | 'chargeSoon';
+  | 'chargeSoon'
+  | 'winback';
 
 export type TeacherBannerSelection =
   | { kind: 'pending' }
@@ -40,6 +42,10 @@ export interface TeacherBannerInput {
   /** The card trial converts to $9/mo within a day (and was not cancelled): always say so, no dismiss. */
   polarChargeSoon: boolean;
   trialExpiringDismissed: boolean;
+  /** Latest access request is approved. A teacher role alone is not this. */
+  approved: boolean;
+  /** Dismissed the never-tried recall. Stays dismissed. */
+  winbackDismissed: boolean;
 }
 
 const show = (banner: TeacherBillingBanner): TeacherBannerSelection => ({ kind: 'show', banner });
@@ -61,5 +67,18 @@ export function selectTeacherBanner(s: TeacherBannerInput): TeacherBannerSelecti
   if (s.accessTrialLive) return show('trialEnding');
   if (s.trialReminderOpen) return show('trialReminder');
   if (s.accessTrialExpired) return show('trialExpired');
+  const polarOnTrial = polar.showLifecycleBanner;
+  if (
+    !s.pendingCheckout &&
+    teacherWinbackEligible({
+      approved: s.approved,
+      hasPro: s.hasPro,
+      trialUsed: s.trialUsed,
+      activeTrial: s.accessTrialLive || polarOnTrial,
+      dismissed: s.winbackDismissed,
+    })
+  ) {
+    return show('winback');
+  }
   return { kind: 'none' };
 }
