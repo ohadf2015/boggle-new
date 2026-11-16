@@ -8,6 +8,7 @@ vi.mock('@/lib/polar', () => ({ getPolarClient: () => ({ createCustomerPortalUrl
 
 let accessRow: { trial_expires_at: string | null } | null = null;
 let accessError: unknown = null;
+let realRounds: number | null = 1;
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => ({
     from: (table: string) => {
@@ -18,6 +19,13 @@ vi.mock('@/utils/supabase/admin', () => ({
         chain.order = () => chain;
         chain.limit = () => chain;
         chain.maybeSingle = async () => ({ data: accessRow, error: accessError });
+        return chain;
+      }
+      if (table === 'classroom_rounds') {
+        const chain: Record<string, unknown> = {};
+        chain.select = () => chain;
+        chain.eq = () => chain;
+        chain.gte = async () => (realRounds === null ? { count: null, error: { message: 'boom' } } : { count: realRounds, error: null });
         return chain;
       }
       return { select: () => ({ eq: () => ({ contains: () => ({ limit: async () => ({ data: [], error: null }) }) }) }) };
@@ -38,6 +46,7 @@ describe('GET /api/subscription/status — access trial', () => {
   beforeEach(() => {
     accessRow = null;
     accessError = null;
+    realRounds = 1;
     checkTeacherSubscription.mockResolvedValue(free);
   });
 
@@ -85,4 +94,23 @@ describe('GET /api/subscription/status — access trial', () => {
     checkTeacherSubscription.mockResolvedValue({ ...free, has_pro: true, tier: 'pro' });
     expect((await (await GET(req())).json()).access_trial_expires).toBeNull();
   });
+
+  it('never ran a class game: waiting, and an ended window is not reported as ended', async () => {
+    checkTeacherSubscription.mockResolvedValue(free);
+    accessRow = { trial_expires_at: inDays(-10) };
+    realRounds = 0;
+    const body = await (await GET(req())).json();
+    expect(body.access_trial_waiting).toBe(true);
+    expect(body.access_trial_ended).toBe(true); // checkout eligibility unchanged: no second trial on top
+  });
+
+  it('ran a class game, or the history read failed: not waiting', async () => {
+    checkTeacherSubscription.mockResolvedValue(free);
+    accessRow = { trial_expires_at: inDays(3) };
+    realRounds = 2;
+    expect((await (await GET(req())).json()).access_trial_waiting).toBe(false);
+    realRounds = null;
+    expect((await (await GET(req())).json()).access_trial_waiting).toBe(false);
+  });
 });
+

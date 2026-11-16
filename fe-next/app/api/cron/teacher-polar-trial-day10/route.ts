@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { noticesStillCounted, POLAR_FIRST_GAME_RESTART_EVENT } from '@/lib/education/polarTrialFirstGame';
 import { isAuthorizedCronRequest } from '@/lib/cronAuth';
 import logger from '@/utils/logger';
 import { getSupabaseAdmin } from '@/lib/email';
@@ -91,13 +92,23 @@ export async function POST(request: NextRequest) {
 
       const { data: sentRows, error: sentError } = await supabase
         .from('subscription_events')
-        .select('user_id, event_type')
-        .in('event_type', [DAY10_EVENT, DAY_BEFORE_EVENT])
+        .select('user_id, event_type, created_at')
+        .in('event_type', [DAY10_EVENT, DAY_BEFORE_EVENT, POLAR_FIRST_GAME_RESTART_EVENT])
         .in('user_id', userIds);
       if (sentError) throw new Error(`subscription_events select failed: ${sentError.message}`);
+      type SentRow = { user_id: string | null; event_type: string; created_at?: string | null };
+      const allRows = (sentRows ?? []) as SentRow[];
+      // A trial that restarted at the first class game has a new charge date: notices sent
+      // for the old date do not count, so the day-before notice always precedes the charge.
+      const restartAtByUser = new Map<string, string>();
+      for (const r of allRows) {
+        if (r.event_type !== POLAR_FIRST_GAME_RESTART_EVENT || !r.user_id || !r.created_at) continue;
+        const prev = restartAtByUser.get(r.user_id);
+        if (!prev || r.created_at > prev) restartAtByUser.set(r.user_id, r.created_at);
+      }
       const sentDay10 = new Set<string>();
       const sentDayBefore = new Set<string>();
-      for (const r of (sentRows ?? []) as Array<{ user_id: string | null; event_type: string }>) {
+      for (const r of noticesStillCounted(allRows.filter((x) => x.event_type !== POLAR_FIRST_GAME_RESTART_EVENT), restartAtByUser)) {
         if (!r.user_id) continue;
         (r.event_type === DAY_BEFORE_EVENT ? sentDayBefore : sentDay10).add(r.user_id);
       }

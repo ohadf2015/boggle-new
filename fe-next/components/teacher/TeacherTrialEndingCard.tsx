@@ -15,7 +15,9 @@ import {
   trialEndingEndedCopy,
   trialEndingLiveCopy,
   trialEndingNeverCopy,
+  trialEndingWaitingCopy,
 } from '@/lib/education/pro/trialEndingCardCopy';
+import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
@@ -32,7 +34,10 @@ import type { TrialStatus } from '@/lib/education/trial';
 export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }) {
   const { language, t } = useLanguage();
   const { user } = useAuth();
-  const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
+  const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded, accessTrialWaiting } = useTeacherPro();
+  // Never ran a class game: the 14 days start at the first one. No countdown, no "ended",
+  // no pay ask; the one action is starting that game.
+  const waiting = accessTrialWaiting === true;
   const userId = user?.id ?? null;
   // Prefer the Home trial prop (useTeacherAccess) so the card stays visible when
   // the parent already chose this banner, even if useTeacherPro has not yet
@@ -41,8 +46,9 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
   const expiresAt = accessTrialExpires ?? trial?.expiresAt ?? null;
   const live = trial ? !trial.isExpired : accessTrialLive(expiresAt);
   const ended = trial ? trial.isExpired === true : accessTrialEnded === true && !live;
-  const copy =
-    live && expiresAt
+  const copy = waiting
+    ? trialEndingWaitingCopy(language)
+    : live && expiresAt
       ? trialEndingLiveCopy(language, trial?.daysLeft ?? 0, expiresAt)
       : ended
         ? trialEndingEndedCopy(language)
@@ -52,7 +58,8 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
     { known, trialUsed, accessTrialExpires, accessTrialEnded },
     resultsTrialCopy(language),
   );
-  const visible = !loading && !hasPro && known && (live || ended);
+  const visible = !loading && !hasPro && known && (live || ended || waiting);
+  const offerVisible = visible && !waiting;
   const cardRef = useRef<HTMLDivElement>(null);
   const offerRef = useRef({
     placement: TRIAL_ENDING_CARD_PLACEMENT,
@@ -68,23 +75,25 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
   };
   const renderedRef = useRef(false);
   useEffect(() => {
-    if (!visible || renderedRef.current) return;
+    if (!offerVisible || renderedRef.current) return;
     renderedRef.current = true;
     reportProOfferImpression({ ...offerRef.current, stage: 'rendered' }, { userId });
-  }, [visible, userId]);
+  }, [offerVisible, userId]);
   useUpsellImpression(
     cardRef,
-    visible ? { cta: proOffer.cta, placement: TRIAL_ENDING_CARD_PLACEMENT } : null,
+    offerVisible ? { cta: proOffer.cta, placement: TRIAL_ENDING_CARD_PLACEMENT } : null,
     { locale: language },
     () => reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }, { userId }),
   );
 
   if (!visible) return null;
 
-  const href = `/${language}${TEACHER_PRO_CHECKOUT_PATH}?source=${TRIAL_ENDING_CARD_PLACEMENT}`;
+  const href = waiting
+    ? teacherHostHref(language, {})
+    : `/${language}${TEACHER_PRO_CHECKOUT_PATH}?source=${TRIAL_ENDING_CARD_PLACEMENT}`;
   const dir = TRIAL_COPY_RTL.has(trialCopyBase(language)) ? 'rtl' : undefined;
   const daysLeft = trial?.daysLeft ?? 0;
-  const urgent = ended || (live && daysLeft <= 3);
+  const urgent = !waiting && (ended || (live && daysLeft <= 3));
 
   return (
     <div
@@ -106,7 +115,7 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
           </>
         }
         lead={
-          live && daysLeft > 0 ? (
+          !waiting && live && daysLeft > 0 ? (
             <div aria-hidden="true">
               <ProCountdownTile count={daysLeft} unit="" tone={urgent ? 'urgent' : 'calm'} />
             </div>
@@ -116,7 +125,9 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
           <Link
             href={href}
             data-testid="teacher-trial-ending-cta"
+            data-waiting={waiting ? 'true' : undefined}
             onClick={() => {
+              if (waiting) return;
               try {
                 trackTeacherProUpgradeClick({
                   page: typeof window !== 'undefined' ? window.location.pathname : `/${language}/teacher`,

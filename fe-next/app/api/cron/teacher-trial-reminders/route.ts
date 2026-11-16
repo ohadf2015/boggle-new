@@ -8,6 +8,8 @@ import { teacherTrialFeedback } from '@/lib/email/templates/teacherTrialFeedback
 import { TEACHER_EMAIL_REPLY_TO } from '@/lib/email/templates/teacherEmailLayout';
 import { pickTrialEmail, dedupeDueByEmail, TRIAL_FEEDBACK_BUCKET } from '@/lib/education/trialReminders';
 import { proUserIdsFrom, type SubscriptionRowLike } from '@/lib/education/proGrant';
+import { teacherIdsWithClassGame } from '@/lib/education/classGameHistory';
+import { loadTrialClassResults } from '@/lib/education/trialClassResults';
 import type { TeacherLocale } from '@/lib/education/types';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
@@ -17,7 +19,9 @@ import { withCronLock } from '@/backend/redis/locking';
  *
  * Daily cron: the only moment a teacher is actually asked to pay. Sends one
  * email per teacher per run at T-3d / T-0 / T+3d around `trial_expires_at`,
- * each linking straight at /teacher/upgrade.
+ * each linking straight at /teacher/upgrade (which opens the checkout on arrival) and
+ * showing the teacher's own class results. Teachers who never ran a class game are
+ * skipped: their 14 days start at the first class game.
  *
  * Before this existed, every trial died in silence — 8 had already lapsed with
  * nothing sent and subscriptions/subscription_events were both empty.
@@ -89,7 +93,18 @@ export async function POST(request: NextRequest) {
       const pickedRows = rows
         .map((row) => ({ row, bucket: pickTrialEmail(row.reviewed_at, row.trial_expires_at, row.trial_reminders_sent, now) }))
         .filter((d): d is { row: Row; bucket: NonNullable<ReturnType<typeof pickTrialEmail>> } => d.bucket !== null);
-      const dueRows = pickedRows.filter((d) => !proEmails.has(emailKey(d.row.email)));
+      // A teacher who never ran a class game is still waiting for their 14 days to start
+      // (the trial restarts at the first class game), so no "ends soon / has ended" email
+      // is true for them yet. Fails closed: an unknown history sends nothing this run.
+      const playedIds = await teacherIdsWithClassGame(
+        supabase,
+        pickedRows.map((d) => d.row.user_id).filter((id): id is string => Boolean(id)),
+      );
+      const waitingEmails = new Set(
+        pickedRows.filter((d) => !d.row.user_id || !playedIds.has(d.row.user_id)).map((d) => emailKey(d.row.email)),
+      );
+      const skippedWaiting = waitingEmails.size;
+      const dueRows = pickedRows.filter((d) => !proEmails.has(emailKey(d.row.email)) && !waitingEmails.has(emailKey(d.row.email)));
       const skippedPro = new Set(
         pickedRows.filter((d) => proEmails.has(emailKey(d.row.email))).map((d) => emailKey(d.row.email)),
       ).size;
@@ -131,6 +146,7 @@ export async function POST(request: NextRequest) {
           // requests are being created again and the fix belongs upstream at the form.
           (collapsed > 0 ? ` (${collapsed} duplicate row(s) collapsed)` : '') +
           (skippedPro > 0 ? ` (${skippedPro} already on Pro, skipped)` : '') +
+          (skippedWaiting > 0 ? ` (${skippedWaiting} waiting for their first class game, skipped)` : '') +
           (unsubscribed > 0 ? ` (${unsubscribed} unsubscribed, skipped)` : '') +
           (unreachable > 0 ? ` (${unreachable} with no unsubscribe link, skipped)` : ''),
       );
@@ -140,6 +156,7 @@ export async function POST(request: NextRequest) {
           dry: true,
           due: due.length,
           skippedPro,
+          skippedWaiting,
           unsubscribed,
           unreachable,
           plan: due.map(({ row, bucket }) => ({
@@ -152,6 +169,12 @@ export async function POST(request: NextRequest) {
         };
       }
 
+      // Each teacher's own class results go into the trial-ending emails (best effort).
+      const resultsByTeacher = await loadTrialClassResults(
+        supabase,
+        due.filter((d) => d.bucket !== TRIAL_FEEDBACK_BUCKET).map((d) => d.row.user_id).filter((id): id is string => Boolean(id)),
+      );
+
       let sent = 0;
       let failed = 0;
       for (const { row, bucket, token } of due) {
@@ -163,6 +186,7 @@ export async function POST(request: NextRequest) {
                 locale: row.locale,
                 bucket,
                 trialExpiresAt: row.trial_expires_at!,
+                results: row.user_id ? resultsByTeacher.get(row.user_id) ?? null : null,
               });
         const result = await sendLifecycleEmail({
           to: row.email,
@@ -190,7 +214,7 @@ export async function POST(request: NextRequest) {
       }
 
       logger.log(`[Trial Cron] Completed: ${sent} sent, ${failed} failed of ${due.length} due`);
-      return { due: due.length, sent, failed, skippedPro, unsubscribed, unreachable };
+      return { due: due.length, sent, failed, skippedPro, skippedWaiting, unsubscribed, unreachable };
     });
 
     if (locked.status === 'skipped') {

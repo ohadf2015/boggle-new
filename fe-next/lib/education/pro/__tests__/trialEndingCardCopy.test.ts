@@ -3,6 +3,7 @@ import {
   trialEndingLiveCopy,
   trialEndingEndedCopy,
   trialEndingNeverCopy,
+  trialEndingWaitingCopy,
   TRIAL_ENDING_COPY_LOCALES,
 } from '../trialEndingCardCopy';
 import { locales } from '@/i18n/config';
@@ -54,5 +55,18 @@ describe('trialEndingCardCopy', () => {
       expect(ended.cta + ended.title + ended.body + ended.note).not.toMatch(/14/);
       expect(never.cta).toMatch(/14/);
     }
+  });
+});
+
+
+describe('trialEndingWaitingCopy: the 14 days start at the first class game', () => {
+  it.each(['en', 'he', 'es', 'sv', 'ja', 'ru'])('%s has its own copy with the $9 price and no countdown', (l) => {
+    const c = trialEndingWaitingCopy(l);
+    expect(c.title.length).toBeGreaterThan(10);
+    expect(c.note).toContain('9');
+    if (l !== 'en') expect(c.title).not.toBe(trialEndingWaitingCopy('en').title);
+  });
+  it('en keeps the single-trial wording', () => {
+    expect(trialEndingWaitingCopy('en').note).toContain('Keep Teacher Pro after your free trial');
   });
 });

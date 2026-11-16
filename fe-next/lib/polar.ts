@@ -268,6 +268,18 @@ export class PolarClient {
   }
 
   /**
+   * Move a live Polar trial's end (PATCH /v1/subscriptions/{id} `trial_end`). Used once,
+   * when a trial teacher runs their first class game: the trial restarts as 14 days from
+   * then. Polar charges at the new end; no charge happens here.
+   */
+  async setTrialEnd(subscriptionId: string, trialEndIso: string): Promise<void> {
+    await this.request(`/v1/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ trial_end: trialEndIso }),
+    })
+  }
+
+  /**
    * Create a customer portal session for a customer by their external id
    * (our user id, set at checkout time). Returns the portal URL.
    */

@@ -64,14 +64,15 @@ export function HomeEducationCardConnected({ slot }: { slot?: HomeEducationSlot 
  * fills in once the countdown resolves (no loading gate — the card is useful
  * without it). */
 function TeacherHomeCard() {
-  const { trial } = useTeacherAccess();
-  return <HomeEducationCard role="teacher" trial={trial} />;
+  const { trial, trialWaiting } = useTeacherAccess();
+  // Waiting for the first class game: no countdown and no "trial ended" pill.
+  return <HomeEducationCard role="teacher" trial={trialWaiting ? null : trial} />;
 }
 
 /** Teacher/admin at the top of home: the prominent class entry. */
 function TeacherTopCard() {
-  const { trial } = useTeacherAccess();
-  return <TeacherClassEntryCard trial={trial} />;
+  const { trial, trialWaiting } = useTeacherAccess();
+  return <TeacherClassEntryCard trial={trialWaiting ? null : trial} />;
 }
 
 /** Non-teacher authed user: show the card only once we've confirmed a classroom
