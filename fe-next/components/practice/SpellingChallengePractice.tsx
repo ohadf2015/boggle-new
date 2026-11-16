@@ -17,6 +17,40 @@ import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
 import StreakFlame from '@/components/education/practice/StreakFlame';
 import { PracticeInsufficientData } from './PracticeInsufficientData';
 import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
+import { fireConfetti } from '@/utils/confettiUtils';
+import { SpellingTiles, TILE_KEYFRAMES } from './spelling/SpellingTiles';
+import { StarTrack, STAR_KEYFRAMES } from './spelling/StarTrack';
+import { candyKey } from './spelling/candyKey';
+
+/*
+ * The stage behind the drill: two soft brand-colour glows and a faint dot grid
+ * over the navy, so the round reads as a game board rather than a blank form.
+ * Static (no animation), so it costs nothing on a low-end phone.
+ */
+const STAGE_STYLE: React.CSSProperties = {
+  backgroundImage: [
+    'radial-gradient(60% 38% at 12% 0%, color-mix(in srgb, var(--neo-cyan) 20%, transparent), transparent 70%)',
+    'radial-gradient(55% 35% at 100% 40%, color-mix(in srgb, var(--neo-pink) 18%, transparent), transparent 70%)',
+    'radial-gradient(55% 30% at 0% 100%, color-mix(in srgb, var(--neo-lime) 12%, transparent), transparent 70%)',
+    'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.6px)',
+  ].join(','),
+  backgroundSize: 'auto, auto, auto, 18px 18px',
+};
+
+/** A small burst of confetti from the tiles on a right answer (skipped for reduced motion / low-end). */
+function burstFrom(el: HTMLElement | null) {
+  if (!el || typeof window === 'undefined') return;
+  const r = el.getBoundingClientRect();
+  fireConfetti({
+    particleCount: 36,
+    spread: 70,
+    startVelocity: 32,
+    gravity: 1.1,
+    ticks: 120,
+    scalar: 0.8,
+    origin: { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight },
+  });
+}
 
 export interface SpellingChallengePracticeProps {
   words: VocabularyWord[];
@@ -118,6 +152,7 @@ function SpellingRound({
   const [timeSpent, setTimeSpent] = useState(0);
   const sessionStartRef = useRef<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const tilesRef = useRef<HTMLDivElement>(null);
 
   // Initialize session start time — and open the round with a cue, so the
   // student hears that a drill has begun rather than just seeing a new card.
@@ -157,8 +192,10 @@ function SpellingRound({
         next[answeredAt] = { correct: result.correct, attempt: inputValue.trim() };
         return next;
       });
-      if (result.correct) sfx.correct();
-      else sfx.wrong();
+      if (result.correct) {
+        sfx.correct();
+        burstFrom(tilesRef.current);
+      } else sfx.wrong();
       // Keep what they typed: seeing their own spelling next to the right one is the lesson.
       setFeedback({ ...result, attempt: inputValue.trim() });
       setInputValue('');
@@ -205,7 +242,7 @@ function SpellingRound({
 
   if (showResults) {
     return (
-      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4">
+      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" style={STAGE_STYLE}>
         <PracticeResultsCard
           correct={correctCount}
           total={attempts}
@@ -252,7 +289,8 @@ function SpellingRound({
   }
 
   return (
-    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-full bg-neo-navy p-4" style={STAGE_STYLE} data-testid="spelling-stage" dir={isRTL ? 'rtl' : 'ltr'}>
+      <style>{TILE_KEYFRAMES + STAR_KEYFRAMES}</style>
       {/* Header */}
       <div className="max-w-2xl mx-auto mb-6">
         <div className="flex items-center justify-between">
@@ -279,46 +317,13 @@ function SpellingRound({
 
           <div className="w-10" />
         </div>
-        {/*
-          One pip per word, filled lime or pink as it is answered: a round you can
-          see filling up, and the misses stay visible. The old 80px hairline bar
-          was hard to see at all. Long teacher lists fall back to a single bar.
-        */}
-        <div
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={totalWords}
-          aria-valuenow={wordIndex}
-          aria-label={t('eduStudent.practice.progress', { current: Math.min(wordIndex + 1, totalWords), total: totalWords })}
-          data-testid="practice-progress-track"
-          className="mt-3 flex gap-1"
-        >
-          {totalWords <= 20 ? (
-            Array.from({ length: totalWords }, (_, i) => (
-              <span
-                key={i}
-                data-state={outcomes[i] ? (outcomes[i].correct ? 'hit' : 'miss') : i === wordIndex ? 'current' : 'todo'}
-                className={cn(
-                  'h-2.5 flex-1 rounded-full border-2 border-neo-black transition-colors duration-300',
-                  outcomes[i]
-                    ? outcomes[i].correct
-                      ? 'bg-neo-lime'
-                      : 'bg-neo-pink'
-                    : i === wordIndex
-                      ? 'bg-neo-cyan motion-safe:animate-pulse'
-                      : 'bg-neo-white/15'
-                )}
-              />
-            ))
-          ) : (
-            <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-white/15">
-              <span
-                className="block h-full bg-neo-cyan transition-[width] duration-300"
-                style={{ width: `${(wordIndex / totalWords) * 100}%` }}
-              />
-            </span>
-          )}
-        </div>
+        {/* Stars to collect on the way to the trophy; misses stay visible as pink marks. */}
+        <StarTrack
+          total={totalWords}
+          current={wordIndex}
+          outcomes={outcomes}
+          label={t('eduStudent.practice.progress', { current: Math.min(wordIndex + 1, totalWords), total: totalWords })}
+        />
       </div>
 
       {/* Main content */}
@@ -349,7 +354,7 @@ function SpellingRound({
               // Cream edge, not black: a black border on navy measures 1.23:1,
               // so the prompt card had no visible edge at all.
               'bg-neo-navy-light border-[3px] border-neo-cream',
-              'shadow-hard-lg',
+              'shadow-hard-cyan-xl',
               'min-h-[120px] flex items-center justify-center'
             )}
           >
@@ -371,20 +376,24 @@ function SpellingRound({
         {/* Hint display */}
         <div
           data-testid="hint-display"
-          className="flex items-center justify-center gap-3"
+          className="flex flex-col items-center gap-3"
         >
-          <span className="font-mono text-neo-cyan text-2xl tracking-widest">
-            {/*
-              Blanks come from the SORTED list. Reading the unsorted prop here
-              counted the underscores off a different word entirely, and the
-              optional chain stopped one level too early: an entry with no
-              `word` threw and took the whole round down with it.
-            */}
-            {currentHint}
-            {'_'.repeat(
-              Math.max(0, (sortedWords[wordIndex]?.word?.length ?? 0) - currentHint.length)
-            )}
-          </span>
+          {/*
+            Blanks come from the SORTED list. Reading the unsorted prop here
+            counted the slots off a different word entirely, and the optional
+            chain stopped one level too early: an entry with no `word` threw
+            and took the whole round down with it.
+          */}
+          <div ref={tilesRef} className="flex w-full justify-center">
+            <SpellingTiles
+              length={sortedWords[wordIndex]?.word?.length ?? 0}
+              hint={currentHint}
+              typed={inputValue}
+              state={feedback ? (feedback.correct ? 'correct' : 'wrong') : 'typing'}
+              answer={feedback?.correctWord}
+            />
+          </div>
+          <div className="flex items-center justify-center gap-3">
           {sortedWords[wordIndex] && (
             <PronunciationButton
               word={sortedWords[wordIndex].word}
@@ -401,10 +410,12 @@ function SpellingRound({
             }}
             disabled={!!feedback || isComplete || hintSpent}
             data-testid="hint-button"
-            className="text-neo-yellow hover:text-neo-yellow/80"
+            style={candyKey('gold')}
+            className="size-11 rounded-full p-0 text-neo-navy hover:bg-transparent hover:text-neo-navy hover:brightness-105 active:translate-y-0.5 disabled:opacity-40"
           >
-            <Lightbulb className="w-5 h-5" />
+            <Lightbulb className="w-5 h-5" strokeWidth={2.5} />
           </Button>
+          </div>
         </div>
 
         <div data-testid="spelling-answer-zone" className="relative min-h-[152px]">
@@ -422,11 +433,11 @@ function SpellingRound({
             data-testid="spelling-input"
             aria-label={t('education.practice.spellTheWord')}
             className={cn(
-              'px-6 py-4 rounded-neo',
+              'px-6 py-3.5 rounded-neo text-center',
               'border-[4px] border-neo-black',
-              'bg-neo-white text-neo-black',
-              'font-neo-body text-xl',
-              'shadow-hard',
+              'bg-neo-cream text-neo-black',
+              'font-neo-display text-2xl font-black tracking-[0.12em] placeholder:font-neo-body placeholder:text-lg placeholder:font-normal placeholder:tracking-normal',
+              'shadow-hard-lime',
               'focus:outline-hidden focus:ring-4 focus:ring-neo-purple',
               'disabled:opacity-50 disabled:cursor-not-allowed',
               'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]'
@@ -443,13 +454,15 @@ function SpellingRound({
               // moment `disabled:opacity-50` faded the label with the fill.
               'bg-neo-lime hover:bg-neo-lime/90',
               'border-[3px] border-black',
-              'shadow-hard hover:shadow-hard-lg',
-              'font-neo-display text-black text-xl',
+              // A chunky key with a real press: a deep ink lip that the button sinks into.
+              'shadow-[0_6px_0_0_#0b1530,inset_0_2px_0_rgba(255,255,255,0.55),inset_0_-5px_0_rgba(0,0,0,0.18)]',
+              'active:translate-y-[5px] active:shadow-[0_1px_0_0_#0b1530]',
+              'font-neo-display text-black text-2xl font-black uppercase tracking-wide',
               // Disabled drains the FILL and keeps a readable label and a
               // visible edge, instead of fading the whole control.
               'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
               'disabled:shadow-none disabled:cursor-not-allowed',
-              'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] active:translate-y-1'
+              'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]'
             )}
           >
             {t('education.practice.submit')}
@@ -460,12 +473,35 @@ function SpellingRound({
             data-testid="feedback-display"
             role="status"
             className={cn(
-              'absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 rounded-neo border-[3px] border-neo-black p-2 text-center shadow-hard-lg sm:gap-2 sm:p-3',
+              'absolute inset-0 z-10 flex flex-col items-center justify-center gap-1.5 overflow-hidden rounded-neo border-[3px] border-neo-black p-2 text-center shadow-hard-lg sm:gap-2 sm:p-3',
               'motion-safe:animate-[lc-verdict-in_260ms_cubic-bezier(.34,1.56,.64,1)]',
               feedback.correct ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black motion-safe:animate-neo-shake'
             )}
           >
-            <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}'}</style>
+            <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}@keyframes lc-rays{to{transform:rotate(360deg)}}@keyframes lc-mascot-in{0%{transform:translateY(40%) scale(.6);opacity:0}100%{transform:none;opacity:1}}'}</style>
+            {/* Sunburst behind a right answer: slow spin, still for reduced motion. */}
+            {feedback.correct && (
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 size-[180%] -translate-x-1/2 -translate-y-1/2 opacity-40"
+              >
+                <span
+                  className="block size-full rounded-full motion-safe:animate-[lc-rays_9s_linear_infinite]"
+                  style={{ background: 'repeating-conic-gradient(from 0deg, #ffffff 0deg 10deg, transparent 10deg 24deg)' }}
+                />
+              </span>
+            )}
+            {/* The mascot pops up to cheer, or to shrug kindly on a miss. */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- 20KB static art, decorative */}
+            <img
+              src={feedback.correct ? '/mascot/bridge-cheer-nobg.webp' : '/mascot/bridge-oops-nobg.webp'}
+              alt=""
+              aria-hidden="true"
+              width={64}
+              height={64}
+              data-testid="verdict-mascot"
+              className="pointer-events-none absolute bottom-0 end-1 size-14 object-contain motion-safe:animate-[lc-mascot-in_320ms_cubic-bezier(.34,1.56,.64,1)_both] sm:size-16"
+            />
             <p className="flex items-center gap-2 font-neo-display text-xl font-black uppercase sm:text-2xl">
               {feedback.correct ? <Check className="size-7" strokeWidth={3.5} /> : <X className="size-7" strokeWidth={3.5} />}
               {feedback.correct ? praise : t('education.practice.incorrect')}
