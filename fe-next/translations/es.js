@@ -2273,6 +2273,7 @@ const es = {
       "label": "En juego",
       "streak": "{count} seguidas",
       "seconds": "{seconds} s",
+      "pointsNow": "+{points} pts",
       "timeUp": "Se acabó el tiempo"
     },
     "correctShort": "¡Bien hecho!",

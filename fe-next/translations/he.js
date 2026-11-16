@@ -2273,6 +2273,7 @@ const he = {
       "label": "על הכף",
       "streak": "{count} ברצף",
       "seconds": "{seconds} שנ׳",
+      "pointsNow": "+{points} נק׳",
       "timeUp": "נגמר הזמן"
     },
     "correctShort": "יש!",

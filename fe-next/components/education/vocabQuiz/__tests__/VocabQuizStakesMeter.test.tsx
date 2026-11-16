@@ -74,7 +74,9 @@ describe('The clock is one countdown ring with quiet points text, never a second
     expect(fill.getAttribute('class')).toContain('motion-reduce:transition-none');
     expect(timer.outerHTML).not.toMatch(/rounded-full bg-neo-white\/15/);
     const chip = screen.getByTestId('vocab-quiz-stakes-now');
-    expect(chip).toHaveTextContent('+135');
+    // Labelled as points ("+135 pts"), with "Up for grabs" for screen readers: a bare +135 read as a score.
+    expect(chip).toHaveTextContent('vocabQuiz.stakes.pointsNow:135');
+    expect(chip.querySelector('.sr-only')).toHaveTextContent('vocabQuiz.stakes.label');
     expect(chip.className).toMatch(/(^|\s)text-(xs|sm)(\s|$)/);
     expect(chip.className).not.toMatch(/(^|\s)border-/);
     expect(screen.queryByTestId('vocab-quiz-stakes-floor')).toBeNull();
@@ -130,13 +132,13 @@ describe('The student screen: the clock lives inside the question card', () => {
 
   it('Given 14s of 20 left and no streak, Then the chip offers +135 from the shared scoring', () => {
     mount();
-    expect(screen.getByTestId('vocab-quiz-stakes-now')).toHaveTextContent('+135');
+    expect(screen.getByTestId('vocab-quiz-stakes-now')).toHaveTextContent('vocabQuiz.stakes.pointsNow:135');
   });
 
   it('Given the teacher turned speed scoring off, Then the chip offers flat points', () => {
     useClassroomPressureStore.getState().setClassroomPressure({ ...DEFAULT_CLASSROOM_PRESSURE, speedScoring: false });
     mount();
-    expect(screen.getByTestId('vocab-quiz-stakes-now')).toHaveTextContent('+100');
+    expect(screen.getByTestId('vocab-quiz-stakes-now')).toHaveTextContent('vocabQuiz.stakes.pointsNow:100');
   });
 
   it('Given a pick, Then the offer disappears once the answer is locked', () => {

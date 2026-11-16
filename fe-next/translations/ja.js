@@ -2273,6 +2273,7 @@ const ja = {
       "label": "獲得チャンス",
       "streak": "{count}連続",
       "seconds": "{seconds}秒",
+      "pointsNow": "+{points}点",
       "timeUp": "時間切れ"
     },
     "correctShort": "せいかい！",

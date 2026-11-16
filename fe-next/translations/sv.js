@@ -2273,6 +2273,7 @@ const sv = {
       "label": "Står på spel",
       "streak": "{count} i rad",
       "seconds": "{seconds} s",
+      "pointsNow": "+{points} p",
       "timeUp": "Tiden är ute"
     },
     "correctShort": "Snyggt!",

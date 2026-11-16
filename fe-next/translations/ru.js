@@ -2275,6 +2275,7 @@ const ru = {
       "label": "На кону",
       "streak": "{count} подряд",
       "seconds": "{seconds} с",
+      "pointsNow": "+{points} очк.",
       "timeUp": "Время вышло"
     },
     "correctShort": "В точку!",
