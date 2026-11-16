@@ -81,6 +81,15 @@ describe('captureJoinRefusal', () => {
     expect(captured[0].properties.is_test_account).toBe(false);
   });
 
+  it('Given a student parked after the game ended, Then the class late-join tally still counts them', async () => {
+    tally.calls.length = 0;
+    await captureJoinRefusal(
+      { gameCode: 'G1', classroomId: 'c1', reason: 'SESSION_WAITING', door: 'join', actorId: null },
+      { studentKey: 'guest:G1:ada' },
+    );
+    expect(tally.calls).toEqual([['c1', 'guest:G1:ada']]);
+  });
+
   it('Given a student refused because the game ended, Then the class late-join tally counts them for the teacher', async () => {
     tally.calls.length = 0;
     await captureJoinRefusal(

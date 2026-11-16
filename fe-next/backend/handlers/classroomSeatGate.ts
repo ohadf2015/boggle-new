@@ -104,7 +104,7 @@ export function refuseSeat(
     {
       gameCode,
       classroomId,
-      reason: refusal === 'ended' ? 'SESSION_ENDED' : 'CODE_UNKNOWN',
+      reason: refusal === 'ended' ? 'SESSION_WAITING' : 'CODE_UNKNOWN',
       door: dialect === 'multiplayer' ? 'join' : 'classroomBanner',
       actorId,
       secondsSinceEnd: refusal === 'ended' ? secondsSinceEnd(endedAt, new Date()) : null,

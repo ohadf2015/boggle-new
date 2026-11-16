@@ -190,7 +190,8 @@ export async function answerMissingRoom(
       {
         gameCode,
         classroomId: record.classroomId,
-        reason: isClassroomSessionEnded(record) ? 'SESSION_ENDED' : 'ROOM_GONE',
+        // Parked students are not refused. SESSION_ENDED is the dead-wall metric.
+        reason: isClassroomSessionEnded(record) ? 'SESSION_WAITING' : 'ROOM_GONE',
         door: 'join',
         actorId,
         secondsSinceEnd: isClassroomSessionEnded(record) ? secondsSinceEnd(record.endedAt, new Date()) : null,

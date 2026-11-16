@@ -55,15 +55,18 @@ export async function captureLiveGameEnded(game: ClassroomGame): Promise<void> {
 }
 
 /**
- * Record one socket refusal. A SESSION_ENDED refusal also lands in the class's
- * late-join tally (`studentKey`, see lateJoinStudentKey) so the teacher's HQ can
- * say how many students tried to join after the game ended.
+ * Record one socket refusal. An ended-session arrival (still SESSION_ENDED on a
+ * true dead wall, SESSION_WAITING once the student is parked) also lands in the
+ * class's late-join tally (`studentKey`, see lateJoinStudentKey) so the teacher's
+ * HQ can say how many students tried to join after the game ended.
  */
+const LATE_ARRIVAL_REASONS = new Set(['SESSION_ENDED', 'SESSION_WAITING']);
+
 export async function captureJoinRefusal(
   refusal: Omit<ClassroomJoinRefusal, 'isTestAccount'>,
   opts: { studentKey?: string | null } = {},
 ): Promise<void> {
-  if (refusal?.reason === 'SESSION_ENDED' && refusal.classroomId) {
+  if (LATE_ARRIVAL_REASONS.has(refusal?.reason) && refusal.classroomId) {
     try {
       await recordEndedCodeTry(refusal.classroomId, opts.studentKey || refusal.actorId || `guest:${refusal.gameCode}`);
     } catch (err) {

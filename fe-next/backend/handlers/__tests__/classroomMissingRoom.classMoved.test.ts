@@ -51,7 +51,7 @@ describe('answerMissingRoom - old code of a class that moved on', () => {
     expect(captureJoinRefusal).not.toHaveBeenCalled();
   });
 
-  it('given no newer game, then the student waits and the refusal is still SESSION_ENDED', async () => {
+  it('given no newer game, then the student waits and the arrival is not a SESSION_ENDED refusal', async () => {
     getClassroomGame.mockResolvedValue({ gameCode: 'OLD111', classroomId: 'cls-1', status: 'ended', endedAt: 'x' });
     findNewerClassroomGame.mockResolvedValue(null);
     const { socket, emit } = fakeSocket();
@@ -60,7 +60,7 @@ describe('answerMissingRoom - old code of a class that moved on', () => {
 
     expect(emit.mock.calls.some((c) => JSON.stringify(c).includes('CLASSROOM_SESSION_WAITING'))).toBe(true);
     expect(emit.mock.calls.some((c) => JSON.stringify(c).includes('GAME_NOT_FOUND'))).toBe(false);
-    expect((captureJoinRefusal.mock.calls[0]?.[0] as { reason?: string }).reason).toBe('SESSION_ENDED');
+    expect((captureJoinRefusal.mock.calls[0]?.[0] as { reason?: string }).reason).toBe('SESSION_WAITING');
   });
 
   it('given an unknown code, then no lookup runs and it is GAME_NOT_FOUND', async () => {
