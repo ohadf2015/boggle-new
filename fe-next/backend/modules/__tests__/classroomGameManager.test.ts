@@ -374,6 +374,22 @@ describe('ClassroomGameManager', () => {
       );
       expect(savedData.players).toHaveLength(1);
       expect(savedData.players[0].userId).toBe('student-2');
-    });
+      });
+
+      it('also drops the durable join id, so a kicked QR student is no longer counted as joined', async () => {
+      const gameCode = 'ABC123';
+      (mockRedis.get as Mock).mockResolvedValue(JSON.stringify({
+        gameCode,
+        classroomId: 'classroom-1',
+        players: [{ userId: 'student-1', username: 'Alice', socketId: 'socket-1' }],
+        rosterUserIds: ['student-1', 'student-2'],
+      }));
+      (mockRedis.setex as Mock).mockResolvedValue('OK');
+
+      await removePlayerFromClassroomGame(gameCode, 'student-1');
+
+      const savedData = JSON.parse((mockRedis.setex as Mock).mock.calls.at(-1)[2]);
+      expect(savedData.rosterUserIds).toEqual(['student-2']);
+      });
   });
 });

@@ -22326,6 +22326,7 @@ const es = {
       "brand": "Clase",
       "joinAt": "Únete en",
       "joined": "{count} dentro",
+      "phonesConnected": "{count} teléfonos conectados",
       "waitingTitle": "Esperando a los alumnos",
       "waitingHint": "Escanea el QR o escribe el código para unirte",
       "startBlocked": "Podrás empezar en cuanto entre un alumno",

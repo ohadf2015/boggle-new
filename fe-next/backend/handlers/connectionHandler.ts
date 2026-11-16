@@ -36,6 +36,7 @@ import gameStartCoordinator from '../utils/gameStartCoordinator.js';
 import { startGameTimer } from '../services/gameLifecycle/gameTimer.js';
 import { buildMpDropEvent, buildHostLeftDropEvents } from '../utils/mpDropTelemetry.js';
 import { wasRecentAdWatcher } from './lobbyAdGateHandler.js';
+import { broadcastClassroomRoster } from './classroomRosterBroadcast.js';
 import { getPostHogServer } from '@/lib/posthog';
 import logger from '../utils/logger.js';
 import { notifyRivalLeft } from '../modules/rivalSocket.js';
@@ -443,6 +444,7 @@ function handlePlayerDisconnect(io: Server, _socket: Socket, game: Game, gameCod
           broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
             users: getGameUsers(gameCode) as GameUser[]
           });
+          if (currentGame.isClassroom) broadcastClassroomRoster(io, gameCode);
 
           broadcastActiveRooms(io, getActiveRooms() as unknown as ActiveRoom[]);
         }

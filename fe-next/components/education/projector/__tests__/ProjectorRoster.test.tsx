@@ -45,19 +45,45 @@ describe('ProjectorRoster — who is in the room', () => {
     expect(name.className).toMatch(/text-\[0\.7em\]/);
   });
 
-  it('Given a student whose phone dropped, Then the chip stays greyed as reconnecting and the counts leave them out', () => {
+  it('Given a student whose phone dropped, Then the chip stays greyed as reconnecting and the headline still counts them joined', () => {
     render(<ProjectorRoster students={[{ username: 'Ana' }, { username: 'Ben', reconnecting: true }]} readyUsernames={['Ana']} t={t} />);
-    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":1}');
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":2}');
+    // Ready is who can tap. The dropped phone is the connection detail, not the headline.
     expect(screen.getByTestId('projector-ready-count')).toHaveAttribute('aria-valuemax', '1');
+    expect(screen.getByTestId('projector-ready-count')).toHaveAttribute('aria-valuenow', '1');
+    expect(screen.getByTestId('projector-connected-count')).toHaveTextContent('eduLiveRoom.lobby.phonesConnected:{"count":1}');
     const ben = screen.getAllByTestId('projector-student')[1];
     expect(ben).toHaveAttribute('data-reconnecting', 'true');
     expect(ben).toHaveTextContent('common.playerReconnecting');
   });
 
-  it('Given only a dropped student, Then the wall reads as nobody joined yet while still naming them', () => {
+  it('Given 21 joined and 4 phones still connected, Then the headline is the joined class and connection is the detail', () => {
+    const students = [
+      ...Array.from({ length: 4 }, (_, i) => ({ username: `On${i}` })),
+      ...Array.from({ length: 17 }, (_, i) => ({ username: `Off${i}`, reconnecting: true })),
+    ];
+    render(<ProjectorRoster students={students} t={t} />);
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":21}');
+    expect(screen.getByTestId('projector-connected-count')).toHaveTextContent('eduLiveRoom.lobby.phonesConnected:{"count":4}');
+  });
+
+  it('Given only a dropped student, Then the wall still counts them joined and says no phone is connected', () => {
     render(<ProjectorRoster students={[{ username: 'Ben', reconnecting: true }]} t={t} />);
-    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":0}');
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":1}');
+    expect(screen.getByTestId('projector-connected-count')).toHaveTextContent('eduLiveRoom.lobby.phonesConnected:{"count":0}');
+    expect(screen.queryByTestId('projector-ready-count')).toBeNull();
     expect(screen.getByTestId('projector-student')).toHaveAttribute('data-reconnecting', 'true');
+  });
+
+  it('Given rehearsal bots beside a real student, Then the headline counts only the student', () => {
+    render(
+      <ProjectorRoster
+        students={[{ username: 'Ana' }, { username: 'Bot1', isBot: true }, { username: 'Ms Lee', isPractice: true }]}
+        t={t}
+      />
+    );
+    expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":1}');
+    expect(screen.getAllByTestId('projector-student')).toHaveLength(3);
   });
 
   it('Given nobody yet, Then the mascot shows the class how to join and no ready bar shows', () => {

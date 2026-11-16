@@ -22275,6 +22275,7 @@ const he = {
       "brand": "כיתה",
       "joinAt": "הצטרפו ב־",
       "joined": "{count} הצטרפו",
+      "phonesConnected": "{count} טלפונים מחוברים",
       "waitingTitle": "מחכים לתלמידים",
       "waitingHint": "סרקו את ה-QR או הקלידו את הקוד כדי להצטרף",
       "startBlocked": "אפשר להתחיל ברגע שתלמיד אחד מצטרף",

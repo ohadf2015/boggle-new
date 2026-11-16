@@ -30,6 +30,8 @@ export interface GameUser {
   botDifficulty?: string;
   disconnected?: boolean;
   disconnectedAt?: number;
+  /** Teacher's own practice seat. Never a student on the classroom wall. */
+  isPractice?: boolean;
   presence?: 'active' | 'idle' | 'afk';
   lastActivity?: number;
   lastHeartbeat?: number;

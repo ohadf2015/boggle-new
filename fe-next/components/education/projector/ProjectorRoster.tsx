@@ -11,14 +11,17 @@ import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { PRESS, tiltOf, type Translate } from '@/components/education/live/eduLiveStyles';
 import { STUDENT_CHIP, arrivalsSince, isArrivalBurst, recordArrivals, rosterTier } from './projectorLobbyModel';
+import { realStudentCount } from '@/lib/education/rehearsal';
 import { WALL_PANEL } from './projectorNbStyles';
 
 export interface ProjectorStudent {
   username: string;
   isBot?: boolean;
+  /** Teacher's practice seat: visible on the wall, never in the joined or ready counts. Mapped through from LobbyStudent.isPractice. */
+  isPractice?: boolean;
   /** Stored avatar when the room carries it; absent = a face seeded from the name. */
   avatar?: AvatarType | null;
-  /** Phone dropped in the lobby: still named, not counted. */
+  /** Phone dropped: still named and counted in the headline. Connection is an overlay, not removal. */
   reconnecting?: boolean;
 }
 
@@ -78,8 +81,13 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
   const { playPlayerJoinedSound } = useSoundEffects();
   const ready = useMemo(() => new Set(readyUsernames), [readyUsernames]);
   const present = students.filter((s) => !s.reconnecting);
-  const joined = present.length;
-  const readyCount = present.filter((s) => ready.has(s.username)).length;
+  // Headline = the joined class, not the phones currently holding a socket: a
+  // dropped socket renders as a per-student "reconnecting" overlay, it does not
+  // shrink the class the teacher sees (2026-11-13 REMAFZ audit: 4 connected vs
+  // 21 joined). Bots and the practice seat stay visible but never count.
+  const joined = realStudentCount(students);
+  const phonesConnected = realStudentCount(present);
+  const readyCount = present.filter((s) => !s.isBot && !s.isPractice && ready.has(s.username)).length;
   const tier = rosterTier(students.length);
   const names = useMemo(() => students.map((s) => s.username), [students]);
   const arrivals = useArrivals(names, playPlayerJoinedSound);
@@ -101,21 +109,29 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             {t('eduLiveRoom.lobby.joined', { count: joined })}
           </span>
         </h2>
-        {joined > 0 && (
+        {phonesConnected < joined && (
+          <span
+            data-testid="projector-connected-count"
+            className="inline-flex items-center rounded-full border-[3px] border-neo-cream/50 bg-neo-navy-elevated px-[0.6em] py-[0.15em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.75rem,min(1.5cqw,1.8cqh),1.25rem)]"
+          >
+            {t('eduLiveRoom.lobby.phonesConnected', { count: phonesConnected })}
+          </span>
+        )}
+        {phonesConnected > 0 && (
           <div
             data-testid="projector-ready-count"
             role="progressbar"
             aria-valuenow={readyCount}
             aria-valuemin={0}
-            aria-valuemax={joined}
-            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: joined })}
+            aria-valuemax={phonesConnected}
+            aria-label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}
             className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
-            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: joined })}</span>
+            <span className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}</span>
             <span className="relative h-[0.8em] min-w-0 flex-1 overflow-hidden rounded-neo border-[3px] border-neo-cream/60 bg-neo-navy">
               <span
                 className="absolute inset-y-0 start-0 bg-neo-cream transition-[width] duration-500 ease-out motion-reduce:transition-none"
-                style={{ width: `${Math.round((readyCount / joined) * 100)}%` }}
+                style={{ width: `${Math.round((readyCount / phonesConnected) * 100)}%` }}
               />
             </span>
           </div>
