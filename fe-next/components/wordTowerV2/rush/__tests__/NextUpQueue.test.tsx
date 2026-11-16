@@ -14,12 +14,17 @@ const SLOTS: NextUpSlot[] = [
 ];
 
 describe("NextUpQueue", () => {
-  it("given the strip, when tapped, then one line explains the blocks coming up, and a second tap hides it", () => {
+  it("given the strip, when tapped, then a legend says what every block does, and a second tap hides it", () => {
     render(<NextUpQueue t={t} slots={SLOTS} reducedMotion compact />);
     expect(screen.queryByRole("status")).toBeNull();
     const strip = screen.getByRole("button", { name: "wordTowerV2.rush.nextUp.hint" });
     fireEvent.click(strip);
-    expect(screen.getByRole("status").textContent).toBe("wordTowerV2.rush.nextUp.hint");
+    const legend = screen.getByRole("status");
+    for (const trait of ["plain", "gold", "feather", "anvil", "magnet", "lucky"]) {
+      expect(legend.textContent).toContain(`wordTowerV2.rush.blockInfo.desc.${trait}`);
+    }
+    // The block coming next is the one marked in the legend.
+    expect(legend.querySelector('[data-current="true"]')?.getAttribute("data-legend-trait")).toBe("gold");
     expect(strip.getAttribute("aria-expanded")).toBe("true");
     fireEvent.click(strip);
     expect(screen.queryByRole("status")).toBeNull();
@@ -36,8 +41,13 @@ describe("NextUpQueue", () => {
   it("given the compact bar size, when rendered, then the chips are smaller and still named", () => {
     render(<NextUpQueue t={t} slots={SLOTS} reducedMotion compact />);
     const first = screen.getByLabelText("wordTowerV2.rush.trait.gold");
-    expect(first.className).toContain("h-8 w-8");
+    expect(first.className).toContain("h-7 w-7");
     expect(screen.getByLabelText("wordTowerV2.rush.trait.plain").className).toContain("h-6 w-6");
+  });
+
+  it("given an open first slot, when rendered, then the strip names it in words", () => {
+    render(<NextUpQueue t={t} slots={SLOTS} reducedMotion compact />);
+    expect(document.querySelector("[data-next-up-name]")?.textContent).toContain("wordTowerV2.rush.blockInfo.short.gold");
   });
 
   it("given open slots, when rendered, then each is named by its trait", () => {

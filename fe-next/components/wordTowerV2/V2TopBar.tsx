@@ -256,7 +256,7 @@ export const V2TopBar = memo(function V2TopBar({
         ) : null}
       </div>
       {rushSlot !== undefined ? (
-        <div data-wt2-rush-slot className="flex h-9 min-w-0 items-center gap-2 lg:h-12">
+        <div data-wt2-rush-slot className="flex h-10 min-w-0 items-center gap-2 lg:h-14">
           {rushSlot}
         </div>
       ) : null}

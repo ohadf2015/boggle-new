@@ -151,6 +151,13 @@ describe('Teacher Home', () => {
     expect(within(screen.getByTestId('home-hero')).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
   });
 
+  it('Given the desktop rail, Then it starts below the greeting row so Your classes lines up with the hero, not the mascot', () => {
+    render(<TeacherDashboard />);
+    const rail = screen.getByTestId('home-week').parentElement as HTMLElement;
+    expect(rail.className).toContain('lg:pt-24');
+    expect(rail.className).not.toMatch(/\b(pl|pr|ml|mr)-/);
+  });
+
   it('Given one class, Then This week shows no per-class rows that would repeat the hero', () => {
     classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
     render(<TeacherDashboard />);
@@ -170,11 +177,12 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-roster')).toBeNull();
   });
 
-  it('Given a free teacher, Then the desk has one lime button, one class-insight offer, and the seat meters wait below the games', () => {
+  it('Given a free teacher, Then the desk has one lime button, the Teacher Pro offer, and the seat meters wait below the games', () => {
     render(<TeacherDashboard />);
     const desk = screen.getByTestId('home-hero');
     expect(desk.querySelectorAll('[class*="bg-neo-lime"]')).toHaveLength(1);
-    expect(screen.getAllByTestId('home-class-insight')).toHaveLength(1);
+    expect(screen.getAllByTestId('dashboard-pro-offer')).toHaveLength(1);
+    expect(screen.getByTestId('dashboard-pro-offer')).toHaveAttribute('data-placement', 'dashboard');
     expect(screen.getByTestId('home-footer')).toContainElement(screen.getByTestId('dashboard-student-cap-meters'));
   });
 
@@ -190,54 +198,66 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-status-tile-loading')).toBeNull();
   });
 
-  it('Given a free teacher with classes, Then exactly one Pro entry shows: the oldest class\'s weekly insight, in the rail', () => {
+  it('Given a free teacher with classes, Then the rail mounts the Teacher Pro offer card, not an analytics-only insight', () => {
     classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], created_at: '2026-10-02T00:00:00Z' }, { ...CLASSES[1], created_at: '2026-09-01T00:00:00Z' }] };
     render(<TeacherDashboard />);
-    const cards = screen.getAllByTestId('home-class-insight');
+    const cards = screen.getAllByTestId('dashboard-pro-offer');
     expect(cards).toHaveLength(1);
-    expect(cards[0].parentElement?.closest('aside')).not.toBeNull();
-    expect(cards[0]).toHaveTextContent('4A - Reading');
-    expect(screen.getByTestId('home-class-insight-cta')).toHaveAttribute('href', '/en/teacher/classroom/c4a/analytics');
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    expect(cards[0]).toHaveAttribute('data-placement', 'dashboard');
+    expect(screen.getByTestId('dashboard-pro-offer-cta')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
     expect(screen.queryByTestId('home-pro-slot')).not.toBeInTheDocument();
     expect(screen.queryByTestId('teacher-pro-usage-prompt')).not.toBeInTheDocument();
+  });
+
+  it('Given a free teacher with a class and a next step that is not on screen, Then the offer card still mounts', () => {
+    activation = { ...activation, progress: { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false } };
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('home-onboarding')).not.toBeInTheDocument();
+    expect(screen.getByTestId('dashboard-pro-offer')).toBeInTheDocument();
   });
 
   it('Given a free teacher with no class yet, Then the onboarding guide is the one ask and no Pro entry shows', () => {
     classroomsState = { classrooms: [], isLoading: false, error: null, refresh: vi.fn() };
     render(<TeacherDashboard />);
     expect(screen.getByTestId('home-onboarding')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given the week read is still loading, Then the Pro entry waits instead of flashing', () => {
     week = { status: 'loading', summary: null };
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given an account banner, Then no Pro entry stacks under it', () => {
     render(<TeacherDashboard banner={<div data-testid="trial-banner" />} />);
     expect(screen.getByTestId('trial-banner')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
+  });
+
+  it('Given a win-back alert, Then the offer card does not stack a second ask', () => {
+    render(<TeacherDashboard alert={<div data-testid="winback-alert" />} />);
+    expect(screen.getByTestId('winback-alert')).toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given a Pro teacher, Then there is no Pro entry', () => {
     proState = PRO;
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given a teacher inside a live access trial, Then there is no Pro entry (everything is open)', () => {
     proState = { ...FREE, accessTrialExpires: new Date(Date.now() + 3 * 86_400_000).toISOString() };
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given the plan read failed, Then no Pro entry is guessed', () => {
     proState = { ...FREE, known: false };
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-class-insight')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given a brand-new teacher, Then Home is the 3-step onboarding card, not a page of zeros', () => {
@@ -260,7 +280,7 @@ describe('Teacher Home', () => {
   it('Given trial account state (days left / renew), Then it shows as one strip under the classes', () => {
     render(<TeacherDashboard banner={<div data-testid="trial-banner" />} />);
     expect(screen.getByTestId('home-account-banner')).toContainElement(screen.getByTestId('trial-banner'));
-    expect(screen.queryByTestId('home-pro-card')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
   });
 
   it('Given a brand-new week with no games, Then Home shows no This week card at all', () => {

@@ -1,1 +1,1 @@
-export { default } from '@/components/ui/RouteLoading';
+export { default } from '@/components/teacher/routeLoading/TeacherRouteLoading';

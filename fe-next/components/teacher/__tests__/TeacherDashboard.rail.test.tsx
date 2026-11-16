@@ -142,13 +142,14 @@ describe('Teacher Home greeting cue, week mascot and Pro strip', () => {
     expect(screen.getByTestId('home-coach-cue').textContent).toMatch(/^eduShell\.home\.cue\.season\./);
   });
 
-  it('Given a free teacher, Then the class-insight Pro entry is one compact strip at the bottom of the rail with no bullet list', () => {
+  it('Given a free teacher, Then the Teacher Pro offer is one compact strip at the bottom of the rail with no bullet list', () => {
     render(<TeacherDashboard />);
-    const strip = screen.getByTestId('home-class-insight');
-    const aside = strip.parentElement?.closest('aside');
-    expect(aside).not.toBeNull();
-    expect(aside?.lastElementChild?.contains(strip)).toBe(true);
+    const strip = screen.getByTestId('dashboard-pro-offer');
+    const rail = strip.parentElement?.closest('aside');
+    expect(rail).not.toBeNull();
+    expect(rail?.getAttribute('aria-label')).toBe('eduShell.home.railLabel');
+    expect(rail?.lastElementChild?.contains(strip)).toBe(true);
     expect(within(strip).queryAllByRole('listitem')).toHaveLength(0);
-    expect(within(strip).getByTestId('home-class-insight-cta')).toBeInTheDocument();
+    expect(within(strip).getByTestId('dashboard-pro-offer-cta')).toBeInTheDocument();
   });
 });

@@ -28,7 +28,7 @@ export default function ExitHintToast() {
   return (
     <div
       role="status"
-      className="pointer-events-none fixed inset-x-0 bottom-24 z-[200] mx-auto w-fit max-w-[80vw] rounded-xl border-2 border-neo-black bg-neo-navy px-4 py-2 text-center font-bold text-neo-cream shadow-hard-sm"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(max(var(--bottom-stack-height,0px),env(safe-area-inset-bottom,0px))+0.75rem)] z-[200] mx-auto w-fit max-w-[80vw] rounded-xl border-2 border-neo-black bg-neo-navy px-4 py-2 text-center font-bold text-neo-cream shadow-hard-sm"
     >
       {t('common.pressBackAgainToExit')}
     </div>

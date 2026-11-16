@@ -291,6 +291,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           homeKey={feeds.homeKey}
           reducedMotion={reducedMotion}
           getGear={feeds.getGear}
+          getStyle={feeds.getStyle}
           {...rushUi.canvasProps}
           dockSide={wide ? 'inline' : 'bottom'}
           className={canvasClass}
@@ -325,6 +326,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
           hasTower={towerFloors > 0}
           rushSlot={rushUi.hudSlot}
           menuSlot={rushUi.menuSlot}
+          menuFootSlot={rushUi.menuFootSlot}
+          rival={rush.rivals[0] ?? null}
+          raiders={estateApi.inbox.filter((r) => !r.avenged).map((r) => r.attackerName)}
         />
       ) : null}
       <TowerFeel run={run} risk={game.risk} over={phase === 'over'} collapsed={game.worldRef.current.collapsed} lastWord={builtWords[builtWords.length - 1] ?? ''} hidden={smashing || raiding || district || showOver || forceResults} />

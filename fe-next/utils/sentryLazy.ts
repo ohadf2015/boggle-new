@@ -40,7 +40,14 @@ export function loadSentry(): Promise<SentryModule> {
           console.warn("[sentryLazy] Sentry init failed:", err);
         }
       }
-      const S = await import("@sentry/nextjs");
+      let S: SentryModule;
+      try {
+        S = await import("@sentry/nextjs");
+      } catch {
+        // A tab left open across a deploy asks for an SDK chunk that no longer exists; ChunkErrorRecovery
+        // reloads on the failed <script>, so the fire-and-forget callers just skip telemetry.
+        return new Promise<SentryModule>(() => {});
+      }
       resolvedModule = S;
       return S;
     })();

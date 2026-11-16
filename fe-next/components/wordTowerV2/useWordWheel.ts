@@ -8,6 +8,7 @@ import { v2DailySeed } from '@/lib/wordTowerV2/daily';
 import type { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { Phase, useTowerRun } from './useTowerRun';
 import type { useBrace } from './rescue/useBrace';
+import { AUTO_BUILD_MS } from './LetterRow';
 
 type TowerRun = ReturnType<typeof useTowerRun>;
 type PlaySound = ReturnType<typeof useSoundEffects>['playSound'];
@@ -136,8 +137,8 @@ export function useWordWheel({
   /** The wheel exactly as it was before the last submit, for the undo. */
   const preSubmitRef = useRef<{ wheel: string[]; selected: number[]; draw: number } | null>(null);
   /**
-   * The wheel auto-builds a valid word 700ms after the last tile change
-   * (WordTowerWheel AUTO_BUILD_MS). A word restored by the undo looks exactly
+   * The row auto-builds a valid word AUTO_BUILD_MS after the last tile change
+   * (LetterRow). A word restored by the undo looks exactly
    * like "the player just finished spelling it", so the slab went straight back
    * onto the hook and the undo undid itself. This swallows that one auto-fire:
    * same selection, within a beat of the undo. A BUILD tap comes later and works.
@@ -180,7 +181,7 @@ export function useWordWheel({
     const prev = preSubmitRef.current;
     if (!prev) return;
     preSubmitRef.current = null;
-    undoGuardRef.current = { key: prev.selected.join(','), until: performance.now() + 1100 };
+    undoGuardRef.current = { key: prev.selected.join(','), until: performance.now() + AUTO_BUILD_MS + 400 };
     drawRef.current = prev.draw;
     setWheel(prev.wheel);
     setSelected(prev.selected);

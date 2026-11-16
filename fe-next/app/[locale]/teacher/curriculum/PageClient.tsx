@@ -9,6 +9,8 @@ import React, { useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { LIBRARY_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
+import { LibrarySkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { TeacherLibrary } from '@/components/teacher/lesson-creation/library/TeacherLibrary';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
@@ -49,7 +51,7 @@ import { TeacherGate } from '@/components/education/TeacherGate';
 export default function TeacherCurriculumPage() {
   return (
     <CurriculumShell>
-      <TeacherGate>
+      <TeacherGate loadingFallback={<LibrarySkeleton />}>
         <TeacherCurriculumInner />
       </TeacherGate>
     </CurriculumShell>
@@ -61,7 +63,7 @@ function CurriculumShell({ children }: { children: React.ReactNode }) {
   return (
     <EducationShell
       scrollRegionLabel={t('teacher.nav.lessons')}
-      contentClassName="p-4 sm:p-6 lg:p-8"
+      contentClassName={LIBRARY_CONTENT_CLASS}
     >
       {children}
     </EducationShell>

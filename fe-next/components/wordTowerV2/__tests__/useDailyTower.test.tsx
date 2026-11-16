@@ -72,6 +72,30 @@ describe('useDailyTower', () => {
     post.mockImplementation(() => Promise.resolve({ ok: true }));
   });
 
+  it('after a partial fall, the floors rebuilt on what still stands count toward the goal', () => {
+    // This morning the tower already stood three floors (9 m).
+    const yesterday = { ...emptySave('en'), dayKey: '2026-10-28', words: ['cat', 'dog', 'emu'], totalM: 9 };
+    saveDailyTower(yesterday, window.localStorage);
+    const { result } = mount();
+    const tick = () =>
+      act(() => {
+        vi.advanceTimersByTime(1600);
+      });
+    tower.words = ['cat', 'dog', 'emu', 'fox'];
+    tower.standingM = 12;
+    tick();
+    expect(result.current.growthM).toBe(3);
+    // The top three floors fall; the run goes on with one standing.
+    tower.words = ['cat'];
+    tower.standingM = 3;
+    tick();
+    expect(result.current.growthM).toBe(0);
+    tower.words = ['cat', 'owl', 'yak'];
+    tower.standingM = 9;
+    tick();
+    expect(result.current.growthM).toBe(6);
+  });
+
   it('past midnight UTC, yesterday’s growth does not count for today', () => {
     saveDailyTower({ ...emptySave('en'), dayKey: '2026-10-29' }, window.localStorage);
     const { result } = mount();

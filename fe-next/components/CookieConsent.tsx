@@ -221,6 +221,13 @@ export default function CookieConsent() {
       data-density={dense ? 'dense' : 'regular'}
       className={cn(
         'fixed bottom-0 left-0 right-0',
+        // Native AdMob is a SurfaceView above the WebView — z-index cannot
+        // cover it. On /daily the banner is allowed and sits on top of this
+        // sheet (measured: 90px of a 144px sheet hidden). Lift above the
+        // nav+banner stack only while that banner is up. Do not key off
+        // has-global-bottom-nav: that class stays on at sm+ where the nav is
+        // display:none and the 16px stack floor would float the sheet.
+        '[html.has-admob-banner_&]:bottom-[var(--bottom-stack-height,0px)]',
         // z-[200] wins every stacking contest — including the ones it should
         // lose. On a projected game surface it covered `TeacherLiveControls`
         // (z-[70]) and `GamePausedOverlay` (z-60). There it drops below both

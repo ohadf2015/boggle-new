@@ -7,7 +7,7 @@
  * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
  * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
  * One primary (Practice these words when the class missed some, else Play again), a quiet Play again under
- * practice, everything rarer (Share with parents, PDF export, Next game, End game) under More, one Pro slot. Sized off its own size container, so a preview
+ * practice, Next game and End game side by side in view (a teacher must never hunt for the exit), the rarer class-win share, Share with parents and PDF export under More, one Pro slot. Sized off its own size container, so a preview
  * frame or a zoomed TV lays out like the wall.
  */
 import type { ReactNode } from 'react';
@@ -84,8 +84,7 @@ interface ActionsProps extends Pick<ClassroomTvResultsScreenProps, 'onRematch' |
 
 /**
  * One primary on the wall (Practice these words, else Play again). When practice leads, Play again sits right
- * under it as the one quiet rematch. Everything rarer (share, next game, export, end) waits under More, so the
- * wall reads as one choice.
+ * under it as the one quiet rematch. Next game and End game stay visible as a quiet pair; class-win share, parent share and export wait under More.
  */
 function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, exportSlot, proSlot, bragSlot }: ActionsProps) {
   const playAgain = onRematch
@@ -95,7 +94,7 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
       }
     : undefined;
   const quietPlayAgain = practiceLeads && !!playAgain;
-  const hasMore = !!bragSlot || !!secondary || !!exportSlot || !!proSlot || !!onClose || !!onExitRoom;
+  const hasMore = !!bragSlot || !!secondary || !!exportSlot || !!proSlot;
 
   return (
     <div data-testid="edu-results-actions" className="flex shrink-0 flex-col gap-2 @5xl/results:gap-3">
@@ -111,25 +110,25 @@ function Actions({ t, onRematch, onClose, onExitRoom, practiceLeads, secondary, 
           {t('eduLiveRoom.hostResults.playAgain')}
         </button>
       )}
+      {(onClose || onExitRoom) && (
+        <div data-testid="edu-results-room-controls" className="flex flex-wrap gap-2 @5xl/results:gap-3">
+          {onClose && (
+            <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={TERTIARY}>
+              <Shuffle className="size-4 shrink-0" aria-hidden="true" />
+              {t('eduLiveRoom.hostResults.nextMode')}
+            </button>
+          )}
+          {onExitRoom && (
+            <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={TERTIARY}>
+              <LogOut className="size-4 shrink-0" aria-hidden="true" />
+              {t('eduLiveRoom.hostResults.endGame')}
+            </button>
+          )}
+        </div>
+      )}
       {hasMore && (
         <ResultsMoreTools label={t('eduLiveRoom.hostResults.more')}>
           <div data-testid="edu-results-tertiary" className="flex flex-col gap-2 @5xl/results:gap-3">
-            {(onClose || onExitRoom) && (
-              <div className="flex flex-wrap gap-2 @5xl/results:gap-3">
-                {onClose && (
-                  <button type="button" data-testid="edu-results-next-mode" onClick={onClose} className={TERTIARY}>
-                    <Shuffle className="size-4 shrink-0" aria-hidden="true" />
-                    {t('eduLiveRoom.hostResults.nextMode')}
-                  </button>
-                )}
-                {onExitRoom && (
-                  <button type="button" data-testid="edu-results-end" onClick={onExitRoom} className={TERTIARY}>
-                    <LogOut className="size-4 shrink-0" aria-hidden="true" />
-                    {t('eduLiveRoom.hostResults.endGame')}
-                  </button>
-                )}
-              </div>
-            )}
             {bragSlot}
             {secondary}
             {exportSlot}

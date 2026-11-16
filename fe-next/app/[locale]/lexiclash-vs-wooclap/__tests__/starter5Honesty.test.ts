@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-wooclap Starter 5 active / 30d honesty wiring', () => {
   it('wires WooclapStarterHonestyStrip and locks 5-active + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/WooclapStarterHonestyStrip/);
     expect(page).toMatch(/5 active questions/);
     expect(page).toMatch(/30 days/);

@@ -13,6 +13,8 @@ import { PlotCard } from './PlotCard';
 import { PlotPanel } from './PlotPanel';
 import { ITEM, backdropFor, districtProgress, whatsNew } from './estateArt';
 import { gearFromEstate } from '@/lib/wordTowerV2/gear';
+import { TOWER_STYLES, empireLevel, styleIndexFor, styleProgress } from '@/lib/wordTowerV2/towerStyle';
+import { StyleBanner, StyleUnlocked } from './StyleBanner';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -52,6 +54,19 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   const opened = useRef(false);
 
   const news = useMemo(() => whatsNew(estate, raidsOnOpen), [estate, raidsOnOpen]);
+  // A build that crosses into a new building style gets its own moment: the
+  // whole tower is about to look different, and the player should know why.
+  const styleIdx = status === 'loading' ? -1 : styleIndexFor(empireLevel(estate));
+  const seenStyle = useRef(-1);
+  const [unlocked, setUnlocked] = useState<number | null>(null);
+  useEffect(() => {
+    if (styleIdx < 0) return;
+    if (seenStyle.current >= 0 && styleIdx > seenStyle.current) {
+      setUnlocked(styleIdx);
+      playSound('crownSparkle', { volume: 0.6 });
+    }
+    seenStyle.current = styleIdx;
+  }, [styleIdx, playSound]);
 
   // Land on what changed: the first thing you can act on is already selected.
   useEffect(() => {
@@ -186,6 +201,8 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
         </div>
       </header>
 
+      <StyleBanner t={t} progress={styleProgress(estate)} />
+
       {news.hasNews ? (
         <div className="flex flex-wrap items-center justify-center gap-1.5 border-b-4 border-black bg-neo-navy-light px-3 py-1.5">
           {news.raids > 0 ? (
@@ -240,6 +257,10 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
           <p className="mx-auto mt-1.5 max-w-md text-center font-neo-display text-[11px] font-bold text-neo-cream/60">{t('wordTowerV2.estate.guest')}</p>
         ) : null}
       </div>
+
+      {unlocked !== null && completed === null ? (
+        <StyleUnlocked t={t} style={TOWER_STYLES[unlocked]} reducedMotion={reducedMotion} onDone={() => setUnlocked(null)} />
+      ) : null}
 
       {completed !== null ? (
         <DistrictComplete

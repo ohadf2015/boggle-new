@@ -72,7 +72,15 @@ export function TimedBlitzPractice({
 
   const [phase, setPhase] = useState<GamePhase>('countdown');
   const [countdown, setCountdown] = useState(3);
-  const [inputValue, setInputValue] = useState('');
+  /*
+    The field is UNCONTROLLED on purpose. This component re-renders every second
+    (the clock). A controlled `value` is rewritten from React state on each of
+    those renders, and Android Gboard (Hebrew) edits through composition, so the
+    DOM can be ahead of state; the render then overwrites what was typed and the
+    student watches each letter vanish within a second. The DOM owns the text;
+    state only knows whether there is any (for the Send button).
+  */
+  const [hasText, setHasText] = useState(false);
   const [missedAnswer, setMissedAnswer] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -151,23 +159,25 @@ export function TimedBlitzPractice({
     (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!isStarted || isGameOver || !inputValue.trim()) {
+      const typed = inputRef.current?.value ?? '';
+      if (!isStarted || isGameOver || !typed.trim()) {
         return;
       }
 
       // Submit answer
-      const result = submitAnswer(inputValue);
+      const result = submitAnswer(typed);
       if (result.correct) sfx.correct();
       else sfx.wrong();
       setMissedAnswer(result.correct ? null : result.answer ?? null);
 
       // Clear input immediately (no pause)
-      setInputValue('');
+      if (inputRef.current) inputRef.current.value = '';
+      setHasText(false);
 
       // Keep focus
       inputRef.current?.focus();
     },
-    [inputValue, isStarted, isGameOver, submitAnswer, sfx]
+    [isStarted, isGameOver, submitAnswer, sfx]
   );
 
   /**
@@ -177,7 +187,7 @@ export function TimedBlitzPractice({
     setPhase('countdown');
     setCountdown(3);
     setMissedAnswer(null);
-    setInputValue('');
+    setHasText(false);
   }, []);
 
   /**
@@ -347,8 +357,7 @@ export function TimedBlitzPractice({
               <input
                 ref={inputRef}
                 type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => setHasText(e.target.value.trim() !== '')}
                 disabled={isGameOver}
                 autoComplete="off"
                 autoCorrect="off"
@@ -371,7 +380,7 @@ export function TimedBlitzPractice({
 
               <button
                 type="submit"
-                disabled={isGameOver || !inputValue.trim()}
+                disabled={isGameOver || !hasText}
                 className={cn(
                 'px-6 py-4 rounded-neo',
                 // Lime + black, the same primary the picker's PLAY uses. White on

@@ -9,6 +9,10 @@
  *  - `dayStart` is a checkpoint of the tower as the day began. A total collapse
  *    rolls back to it (you lose today's growth, never the whole skyline) — the
  *    daily board already kept your best climb, so the score is not lost.
+ *  - a partial fall (the run goes on with the floors still standing) can leave
+ *    the tower SHORTER than it was this morning. The score then counts from that
+ *    low point (`scoreFromM`), so every floor rebuilt counts toward today's goal
+ *    instead of first having to climb back past the morning height.
  *  - floors are capped at MAX_SAVED_FLOORS so the physics restore stays cheap;
  *    the height of floors dropped off the bottom is carried (`carriedM`) so the
  *    growth arithmetic never notices.
@@ -37,8 +41,13 @@ export interface DailyTowerSave {
   carriedM: number;
   /** carriedM + the standing height at the last commit. */
   totalM: number;
-  /** The tower as today began — baseline for the score and the collapse fallback. */
+  /** The tower as today began — the collapse fallback and the goal's size. */
   dayStart: TowerCheckpoint;
+  /**
+   * Height today's score counts from: `dayStart.totalM`, or lower once a fall
+   * left the tower below it. Missing in saves written before it existed.
+   */
+  scoreFromM?: number;
 }
 
 export const towerSaveKey = (language: string) => `wt2-daily-tower-${language}`;
@@ -52,6 +61,7 @@ export function emptySave(language: string): DailyTowerSave {
     carriedM: 0,
     totalM: 0,
     dayStart: { words: [], carriedM: 0, totalM: 0 },
+    scoreFromM: 0,
   };
 }
 
@@ -62,12 +72,19 @@ export function rollDay(save: DailyTowerSave, today: string): DailyTowerSave {
     ...save,
     dayKey: today,
     dayStart: { words: save.words, carriedM: save.carriedM, totalM: save.totalM },
+    scoreFromM: save.totalM,
   };
 }
 
-/** Whole metres grown since today began — this IS the day's score. */
+/** Where today's score counts from: never above the morning height. */
+export function scoreBaseM(save: DailyTowerSave): number {
+  const morning = save.dayStart.totalM;
+  return typeof save.scoreFromM === 'number' ? Math.min(save.scoreFromM, morning) : morning;
+}
+
+/** Whole metres grown today — this IS the day's score. */
 export function growthToday(save: DailyTowerSave): number {
-  return Math.max(0, Math.floor(save.totalM - save.dayStart.totalM));
+  return Math.max(0, Math.floor(save.totalM - scoreBaseM(save)));
 }
 
 /**
@@ -86,13 +103,17 @@ export function commitTower(
   // `save.carriedM` already covers floors dropped by EARLIER commits; the world
   // being committed only ever contains the kept ones, so it is added, not replaced.
   const carriedM = save.carriedM + droppedM;
-  return { ...save, words: kept, carriedM, totalM: carriedM + (standingM - droppedM) };
+  const totalM = carriedM + (standingM - droppedM);
+  // A fall that left the tower below where today's score counts from: count from
+  // here, so the floors rebuilt on top of what still stands are today's growth.
+  const scoreFromM = Math.min(scoreBaseM(save), totalM);
+  return { ...save, words: kept, carriedM, totalM, scoreFromM };
 }
 
-/** Total collapse: back to the checkpoint the day started from. */
+/** Total collapse: back to the checkpoint the day started from (today's growth is lost). */
 export function revertToDayStart(save: DailyTowerSave): DailyTowerSave {
   const { words, carriedM, totalM } = save.dayStart;
-  return { ...save, words, carriedM, totalM };
+  return { ...save, words, carriedM, totalM, scoreFromM: totalM };
 }
 
 /**
@@ -142,6 +163,7 @@ export function loadDailyTower(
     if (!raw) return empty;
     const o = JSON.parse(raw) as Record<string, unknown>;
     if (!o || o.v !== 1 || !Array.isArray(o.words)) return empty;
+    const dayStart = cleanCheckpoint(o.dayStart);
     return {
       v: 1,
       language,
@@ -149,7 +171,8 @@ export function loadDailyTower(
       words: cleanWords(o.words),
       carriedM: num(o.carriedM),
       totalM: num(o.totalM),
-      dayStart: cleanCheckpoint(o.dayStart),
+      dayStart,
+      scoreFromM: typeof o.scoreFromM === 'number' ? Math.min(num(o.scoreFromM), dayStart.totalM) : dayStart.totalM,
     };
   } catch {
     return empty;

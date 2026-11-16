@@ -5,10 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { TeacherGate } from '@/components/education/TeacherGate';
+import { TeacherRouteLoading } from '@/components/teacher/routeLoading/TeacherRouteLoading';
 import { TrialEndedBannerWithRecap } from '@/components/teacher/TrialRecapBanners';
 import { TeacherProTrialExpiringBanner } from '@/components/teacher/TeacherProTrialExpiringBanner';
 import { TeacherProTrialLifecycleBanner } from '@/components/teacher/TeacherProTrialLifecycleBanner';
 import { TeacherProTrialChargeSoonBanner } from '@/components/teacher/TeacherProTrialChargeSoonBanner';
+import { TeacherWinbackBanner } from '@/components/teacher/TeacherWinbackBanner';
 import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingCard';
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
@@ -29,6 +31,7 @@ const IMPRESSION_SOURCE: Partial<Record<TeacherBillingBanner, string>> = {
   trialEnding: 'trial_ending_card',
   trialExpired: 'trial_ending_card',
   trialReminder: 'trial_ending_card',
+  winback: 'dashboard_teacher_winback',
 };
 
 // Access is settled by <TeacherGate> above: it owns the loading state and the redirect.
@@ -53,7 +56,7 @@ function TeacherDashboardInner() {
 
   return (
     <TeacherDashboard
-      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : undefined}
+      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : banner === 'winback' ? <TeacherWinbackBanner approved={b.approved} onDismiss={b.dismissWinback} /> : undefined}
       banner={banner ? accountBanner(banner, b) : undefined}
     />
   );
@@ -62,6 +65,7 @@ function TeacherDashboardInner() {
 function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTeacherBanner>): ReactNode {
   switch (banner) {
     case 'paymentFailed':
+    case 'winback':
       return undefined;
     case 'pendingCheckout':
       return <PendingCheckoutBanner />;
@@ -81,5 +85,6 @@ function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTea
 }
 
 export default function TeacherPage() {
-  return <TeacherGate><TeacherDashboardInner /></TeacherGate>;
+  // The gate's wait shows the same shell-and-skeleton as the route fallback, so access resolving never swaps the chrome for a bare loader.
+  return <TeacherGate loadingFallback={<TeacherRouteLoading />}><TeacherDashboardInner /></TeacherGate>;
 }

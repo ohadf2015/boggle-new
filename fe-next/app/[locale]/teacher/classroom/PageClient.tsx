@@ -8,6 +8,8 @@ import { EducationShell } from '@/components/education/shell/EducationShell';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
+import { CLASSES_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
+import { ClassesSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 
 /** The shell wraps the gate, not the other way round — see curriculum's PageClient
  *  for why: the gate's own loading/denial states need the lock too. */
@@ -23,7 +25,7 @@ function ClassesMain() {
 export default function TeacherClassroomsPage() {
   return (
     <ClassesShell>
-      <TeacherGate>
+      <TeacherGate loadingFallback={<ClassesSkeleton />}>
         <ClassesMain />
       </TeacherGate>
     </ClassesShell>
@@ -46,7 +48,7 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
     <EducationShell
       className={TEACHER_TV_SCALE}
       scrollRegionLabel={t('teacher.nav.classes')}
-      contentClassName="relative p-4 sm:p-6 lg:px-8 lg:py-5 [@media(orientation:landscape)_and_(max-height:500px)]:px-3 [@media(orientation:landscape)_and_(max-height:500px)]:py-2"
+      contentClassName={CLASSES_CONTENT_CLASS}
     >
       {children}
     </EducationShell>

@@ -41,7 +41,7 @@ interface GoogleSignInButtonProps {
  *
  * The GSI button is an iframe and can't be CSS-styled, and it MUST stay visible
  * (GSI anti-clickjacking ignores clicks on hidden/obscured buttons — a custom
- * overlay is impossible). So we render Google's own `outline` (white) button and
+ * overlay is impossible). So we render Google's own `filled_black` (dark) button and
  * wrap it in a neo frame whose chrome (border-3, rounded-xl, 48px) matches the
  * Discord Button so the two providers read as a matched pair. It uses the in-page
  * ID-token flow → consent shows OUR domain.
@@ -99,13 +99,14 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     const container = containerRef.current;
     if (!container) return;
     renderedRef.current = true;
-    // A snug GSI button draws its own grey box inside our white frame; filling the
+    // A snug GSI button draws its own grey box inside our dark frame; filling the
     // frame (logo_alignment 'center' keeps he/en content centered) leaves one box.
     const frameWidth = container.parentElement?.clientWidth ?? 0;
     const fitWidth = width ?? (frameWidth > 0 ? frameWidth : undefined);
     google.accounts.id.renderButton(container, {
       type: 'standard',
-      theme: 'outline',
+      // Dark theme: the white `outline` button clashed with the dark navy modal.
+      theme: 'filled_black',
       size: 'large',
       shape: 'rectangular',
       text: 'continue_with',
@@ -152,7 +153,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
           }}
           className={cn(
             'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
-            'border-3 border-neo-black bg-white text-neo-black font-black text-sm',
+            'border-3 border-neo-black bg-[#131314] text-white font-black text-sm',
             'shadow-hard transition hover:shadow-hard-sm active:translate-y-0.5',
           )}
         >
@@ -178,21 +179,21 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       <Script id="google-gsi-client" src={gsiSrc} strategy="afterInteractive" onReady={() => void renderButton()} />
       {/* Neo-brutalist frame around the (visible, clickable) Google button — hard
           black border + hard shadow, corners rounded-neo; overflow MUST stay visible — GSI anti-clickjacking drops clicks when an ancestor clips/obscures the iframe (t_375bffc3). Full width +
-          white bg + centered: GSI renders a snug, content-sized white button, and
-          the white frame bg blends with it so the control reads as one full-width
+          dark bg + centered: GSI renders a snug, content-sized dark button, and
+          the dark frame bg blends with it so the control reads as one full-width
           button (matching the Discord/email buttons) with perfectly centered
           content — instead of a fixed-width button with the logo+text drifting to
           one end. */}
       <div
         data-testid="gsi-frame"
         onPointerDown={handlePromptClickIntent}
-        className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-white shadow-hard"
+        className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
       >
         {!gsiRendered && (
           <div
             data-testid="gsi-placeholder"
             aria-hidden="true"
-            className="pointer-events-none flex items-center justify-center gap-2 text-sm font-medium text-neo-black"
+            className="pointer-events-none flex items-center justify-center gap-2 text-sm font-medium text-white"
           >
             <GoogleIcon className="w-[18px] h-[18px]" />
             <span>{t('auth.continueWithGoogle', 'Continue with Google')}</span>

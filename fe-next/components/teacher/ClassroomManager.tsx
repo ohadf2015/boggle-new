@@ -22,7 +22,7 @@ import { freeInsightClassId } from '@/lib/education/pro/freeClassInsight';
 import { type Language, type LeaderboardVisibility } from '@/lib/supabase/education/types';
 import { shareWithFallback } from '@/utils/shareWithFallback';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
+import { ClassGridSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { TEACHER_PRO_CHECKOUT_PATH, teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 import { ClassCapMeter } from '@/components/teacher/ClassCapMeter';
 import { useTeacherReveal } from './motion/useTeacherReveal';
@@ -156,9 +156,12 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="h-10 w-40 animate-pulse rounded bg-neo-white/10" />
-        <SkeletonGrid count={3} skeleton={ClassroomCardSkeleton} />
+      <div className="space-y-3 sm:space-y-4 [@media(orientation:landscape)_and_(max-height:500px)]:space-y-1.5">
+        <div data-testid="classroom-manager-toprow" className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+          {heading}
+          <span aria-hidden="true" className="h-10 w-28 animate-pulse rounded-neo bg-neo-cream/10" />
+        </div>
+        <ClassGridSkeleton columns={pageSize} />
       </div>
     );
   }

@@ -3,10 +3,12 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { BlockTrait, PerkId } from '@/lib/wordTowerV2/rush/types';
 import type { Phase } from '../useTowerRun';
+import { ChallengeChip, ChallengeResultToast } from './ChallengeChip';
 import { NextUpQueue } from './NextUpQueue';
 import { OvertakeToast } from './OvertakeToast';
 import { PerkDraft } from './PerkDraft';
-import { RankMeter } from './RankMeter';
+import { BlockLegend } from './BlockLegend';
+import { RankCard } from './RankCard';
 import { RankUpBurst } from './RankUpBurst';
 import { RushGhosts } from './RushGhosts';
 import type { RushApi } from './useRush';
@@ -42,14 +44,17 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
   const hudSlot = (
     <div className="flex h-full w-full items-center justify-center gap-2">
       <NextUpQueue t={t} slots={rush.slots} reducedMotion={reducedMotion} compact />
+      {inRun ? <ChallengeChip t={t} challenge={rush.challenge} reducedMotion={reducedMotion} /> : null}
     </div>
   );
-  const menuSlot = <RankMeter t={t} rank={rush.rank} reducedMotion={reducedMotion} />;
+  const menuSlot = <RankCard t={t} rank={rush.rank} />;
+  const first = rush.slots[0];
+  const menuFootSlot = <BlockLegend t={t} current={first && !first.sealed ? first.trait : undefined} />;
 
   const toastsOn = inRun && game.phase !== 'draft';
   // In an effect: React Compiler memoizes render-time ref reads, which froze this at 0.
   const [hudPx, setHudPx] = useState(0);
-  const toastKey = `${rush.rankUp?.key ?? ''}-${rush.overtake?.key ?? ''}`;
+  const toastKey = `${rush.rankUp?.key ?? ''}-${rush.overtake?.key ?? ''}-${rush.challengeResult?.key ?? ''}`;
   useLayoutEffect(() => setHudPx(Math.round(getHudPx())), [toastKey, getHudPx]);
   const toastTop = `calc(${hudPx}px - max(0.5rem, env(safe-area-inset-top)) + 0.5rem)`;
   const overlays = (
@@ -61,11 +66,14 @@ export function useRushUi({ t, rush, game, daily, language, dailyBoard, dailyBas
       {toastsOn && !rush.rankUp && rush.overtake ? (
         <OvertakeToast key={rush.overtake.key} t={t} name={rush.overtake.name} onDone={rush.shiftOvertake} reducedMotion={reducedMotion} topOffset={toastTop} />
       ) : null}
+      {toastsOn && rush.challengeResult && !rush.rankUp && !rush.overtake ? (
+        <ChallengeResultToast key={rush.challengeResult.key} t={t} result={rush.challengeResult} onDone={rush.clearChallengeResult} reducedMotion={reducedMotion} topOffset={toastTop} />
+      ) : null}
       {toastsOn && rush.rankUp ? (
         <RankUpBurst key={rush.rankUp.key} t={t} tierId={rush.rankUp.tierId} onDone={rush.clearRankUp} reducedMotion={reducedMotion} topOffset={toastTop} />
       ) : null}
     </>
   );
 
-  return { canvasProps, hudSlot, menuSlot, overlays };
+  return { canvasProps, hudSlot, menuSlot, menuFootSlot, overlays };
 }

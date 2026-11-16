@@ -79,7 +79,7 @@ export default function SiteExtras({ lang }: SiteExtrasProps) {
       <SiteFooter className="relative z-0 shrink-0" />
       <PlayerBottomNav />
       <DeferredLayoutWidgets />
-      <FeedbackDevtoolsWidget />
+      <FeedbackDevtoolsWidget lang={lang} />
       <DeferredGoogleOneTap />
     </>
   );

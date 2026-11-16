@@ -66,12 +66,14 @@ describe('EduHostResults: fits the wall with the Teacher Pro card', () => {
     expect(more.lastElementChild!.lastElementChild).toContainElement(screen.getByTestId('class-report-teaser'));
   });
 
-  it('given a free teacher opens More, then room controls come first and the trial is offered once, on the Pro preview', () => {
+  it('given a free teacher, then room controls stay in view outside More and the trial is offered once, on the Pro preview', () => {
     renderZeroRound();
+    expect(screen.getByTestId('edu-results-end')).toBeInTheDocument();
+    expect(screen.getByTestId('edu-results-next-mode')).toBeInTheDocument();
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
-    const ids = Array.from(screen.getByTestId('edu-results-tertiary').querySelectorAll('[data-testid]')).map((el) => el.getAttribute('data-testid'));
-    expect(ids.indexOf('edu-results-next-mode')).toBeLessThan(ids.indexOf('edu-results-parent-share'));
-    expect(ids.indexOf('edu-results-end')).toBeLessThan(ids.indexOf('report-pdf-locked'));
+    const more = screen.getByTestId('edu-results-more');
+    expect(more).not.toContainElement(screen.getByTestId('edu-results-end'));
+    expect(more).not.toContainElement(screen.getByTestId('edu-results-next-mode'));
     expect(screen.queryByTestId('report-pdf-offer')).toBeNull();
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
   });

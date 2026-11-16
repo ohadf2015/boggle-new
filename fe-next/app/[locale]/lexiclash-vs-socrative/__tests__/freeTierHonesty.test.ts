@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-socrative Free 5/1/50 honesty wiring', () => {
   it('wires SocrativeFreeTierHonestyStrip and locks 5 Quizzes / 1 Room / 50 + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/SocrativeFreeTierHonestyStrip/);
     expect(page).toMatch(/5 Quizzes/);
     expect(page).toMatch(/1 Room/);
@@ -14,7 +14,7 @@ describe('lexiclash-vs-socrative Free 5/1/50 honesty wiring', () => {
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
     expect(page).toMatch(/Wayground Basic 20 max|20 max activity storage/);
-    expect(page).toMatch(/#1187|Skip open #1187/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 only — no Socrative 5-quiz / 1-room copy', () => {

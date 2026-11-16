@@ -1,4 +1,5 @@
 import type { LandingMods } from '@/lib/wordTowerV2/run';
+import type { Challenge } from '@/lib/wordTowerV2/rush/challenges';
 import { combineMods } from '@/lib/wordTowerV2/rush/perks';
 import type { TraitQueue } from '@/lib/wordTowerV2/rush/traits';
 import type { BlockTrait, GhostRival, NextUpSlot, PerkMods } from '@/lib/wordTowerV2/rush/types';
@@ -35,12 +36,13 @@ export const MAGNET_VX_MUL = 0.6;
 
 export const NEUTRAL_RUSH_MODS: PerkMods = combineMods([]);
 
-export function landingModsFor(mods: PerkMods, trait: BlockTrait | undefined): LandingMods {
+export function landingModsFor(mods: PerkMods, trait: BlockTrait | undefined, challenge: Challenge | null = null): LandingMods {
   return {
     perfectBonusMul: mods.perfectBonusMul,
     comboGainMul: mods.comboGainMul,
     wordLenBonusPerLetter: mods.wordLenBonusPerLetter,
     chanceMul: mods.crateChanceMul,
     trait,
+    challenge,
   };
 }

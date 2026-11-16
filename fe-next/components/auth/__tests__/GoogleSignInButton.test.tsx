@@ -78,14 +78,24 @@ describe('GoogleSignInButton', () => {
     expect(frame.className).toMatch(/items-center/);
   });
 
-  it('renders a full-width white frame so the snug button reads as full-width like the other providers', () => {
+  it('renders a full-width dark frame so the snug button reads as full-width like the other providers', () => {
     render(<GoogleSignInButton />);
     const frame = screen.getByTestId('gsi-frame');
-    // Full-width + white bg: the auto-sized (snug) GSI button is centered inside,
-    // and the white frame bg blends with the white button → one full-width control.
+    // Full-width + dark bg: the auto-sized (snug) GSI button is centered inside,
+    // and the dark frame bg (#131314, Google's own dark-button fill) blends with
+    // the filled_black button → one full-width control on the game's dark modal.
     expect(frame.className).toMatch(/w-full/);
     expect(frame.className).toMatch(/justify-center/);
-    expect(frame.className).toMatch(/bg-white/);
+    expect(frame.className).toMatch(/bg-\[#131314\]/);
+    expect(frame.className).not.toMatch(/bg-white/);
+  });
+
+  it('asks GSI for the dark (filled_black) theme so it matches the game', async () => {
+    const renderButton = stubGoogleId();
+    render(<GoogleSignInButton />);
+    await waitFor(() => expect(renderButton).toHaveBeenCalled());
+    const opts = renderButton.mock.calls[0][1] as Record<string, unknown>;
+    expect(opts.theme).toBe('filled_black');
   });
 
   it('falls back to an auto-sized, centered button when the frame has no measurable width', async () => {

@@ -35,7 +35,7 @@
  * SECURITY: All attribute values are static string literals — no user input.
  */
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
 import {
     FEEDBACK_WIDGET_SRC,
@@ -105,7 +105,17 @@ function isFeedbackWidgetEnabled(): boolean {
     return false;
 }
 
-function injectFeedbackWidget(): void {
+/**
+ * The hosted widget resolves its UI language once, at init, and never
+ * re-labels itself. Only the parts of its API we call are typed here.
+ */
+interface FeedbackWidgetApi {
+    readonly active: boolean;
+    init(options?: { locale?: string }): boolean;
+    destroy(): void;
+}
+
+function injectFeedbackWidget(locale?: string): void {
     if (!isFeedbackWidgetEnabled()) return;
     if (document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
     const s = document.createElement('script');
@@ -116,13 +126,36 @@ function injectFeedbackWidget(): void {
     s.setAttribute('data-side', 'left');
     s.setAttribute('data-theme', LEXICLASH_THEME);
     s.setAttribute('data-dir', 'auto');
+    if (locale) s.setAttribute('data-locale', locale);
     s.setAttribute('data-app-version', feedbackAppVersion());
     s.setAttribute('data-ignore-network', FEEDBACK_WIDGET_IGNORE_NETWORK);
     s.setAttribute('data-ignore-console', FEEDBACK_WIDGET_IGNORE_CONSOLE);
     document.body.appendChild(s);
 }
 
-export default function FeedbackDevtoolsWidget(): ReactNode {
+/**
+ * Follow the app language after the widget is already mounted: record the new
+ * locale on the embed tag and rebuild the widget so the launcher label, modal
+ * strings and text direction switch with it (no page reload).
+ */
+function syncWidgetLocale(locale: string): void {
+    const tag = document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID);
+    if (!tag || tag.getAttribute('data-locale') === locale) return;
+    tag.setAttribute('data-locale', locale);
+    const api = (window as unknown as { feedbackDevTools?: FeedbackWidgetApi }).feedbackDevTools;
+    if (!api?.active) return;
+    api.destroy();
+    api.init({ locale });
+}
+
+export default function FeedbackDevtoolsWidget({ lang }: { lang?: string } = {}): ReactNode {
+    const langRef = useRef(lang);
+    langRef.current = lang;
+
+    useEffect(() => {
+        if (lang) syncWidgetLocale(lang);
+    }, [lang]);
+
     useEffect(() => {
         if (!isFeedbackWidgetEnabled()) return;
         let cancelPending: (() => void) | undefined;
@@ -130,7 +163,7 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
                 window.removeEventListener(ev, onIntent);
             }
-            cancelPending = runWhenScrollSettles(injectFeedbackWidget);
+            cancelPending = runWhenScrollSettles(() => injectFeedbackWidget(langRef.current));
         };
         for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
             window.addEventListener(ev, onIntent, { once: true, passive: true });

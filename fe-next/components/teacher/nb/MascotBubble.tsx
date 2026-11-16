@@ -25,7 +25,7 @@ export function MascotBubble({
   bubbleClassName?: string;
 }) {
   return (
-    <div data-testid={testId} className={cn('flex items-center gap-2', className)}>
+    <div data-testid={testId} className={cn('flex items-center gap-5', className)}>
       <EduMascot
         moment={pose}
         size={size}
@@ -34,8 +34,10 @@ export function MascotBubble({
       <div
         className={cn(
           'relative min-w-0 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-neo-body text-sm font-semibold leading-snug text-neo-black shadow-hard-lg sm:text-base',
-          // Tail toward the mascot; flips with the text direction.
-          "before:absolute before:top-4 before:-start-[11px] before:border-8 before:border-transparent before:border-e-neo-black before:content-['']",
+          // Tail toward the mascot: a cream diamond outlined on its start and bottom edges, centred on the
+          // bubble's border so its outer half reads as an arrow. (A black-only triangle vanished against
+          // the dark page.) Offset and border are logical; RTL mirrors the rotation.
+          "before:absolute before:top-4 before:-start-[10px] before:size-3.5 before:rotate-45 rtl:before:-rotate-45 before:border-b-[3px] before:border-s-[3px] before:border-neo-black before:bg-neo-cream before:content-['']",
           bubbleClassName,
         )}
       >

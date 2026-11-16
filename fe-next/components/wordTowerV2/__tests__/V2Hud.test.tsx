@@ -112,14 +112,14 @@ describe('V2Hud', () => {
 
     // Menu should not be visible initially
     expect(
-      screen.queryByText('wordTowerV2.estate.open'),
+      screen.queryByRole('button', { name: 'wordTowerV2.estate.open' }),
     ).not.toBeInTheDocument();
 
     // Click menu button
     await user.click(menuButton);
 
     // Menu should now be visible - check for the estate button
-    expect(screen.getByText('wordTowerV2.estate.open')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'wordTowerV2.estate.open' })).toBeInTheDocument();
 
     // Click close button (X button) in the menu
     const closeButton = screen.getByRole('button', {
@@ -129,7 +129,7 @@ describe('V2Hud', () => {
 
     // Menu should be hidden again
     expect(
-      screen.queryByText('wordTowerV2.estate.open'),
+      screen.queryByRole('button', { name: 'wordTowerV2.estate.open' }),
     ).not.toBeInTheDocument();
   });
 
@@ -213,8 +213,9 @@ describe('V2Hud', () => {
     // Check that streak section is visible
     expect(screen.getByText('wordTowerV2.streak.label')).toBeInTheDocument();
 
-    // Check that the banked section with balls and tenants is visible
-    expect(screen.getByText('wordTowerV2.hud.banked')).toBeInTheDocument();
+    // Every number in the sheet has a name: this run's section, streak and tenants.
+    expect(screen.getByText('wordTowerV2.hud.sheet.thisRun')).toBeInTheDocument();
+    expect(screen.getByText('wordTowerV2.hud.sheet.tenants')).toBeInTheDocument();
   });
 
   it('menu closes when backdrop is clicked', async () => {
@@ -249,7 +250,7 @@ describe('V2Hud', () => {
     await user.click(menuButton);
 
     // Verify menu is open
-    expect(screen.getByText('wordTowerV2.estate.open')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'wordTowerV2.estate.open' })).toBeInTheDocument();
 
     // Find and click the backdrop
     const backdrop = container.querySelector('[class*="bg-black/40"]');
@@ -259,7 +260,7 @@ describe('V2Hud', () => {
 
     // Menu should be hidden
     expect(
-      screen.queryByText('wordTowerV2.estate.open'),
+      screen.queryByRole('button', { name: 'wordTowerV2.estate.open' }),
     ).not.toBeInTheDocument();
   });
 
@@ -348,6 +349,7 @@ describe('V2Hud', () => {
         raids={0}
         coinsRef={createRef<HTMLDivElement>()}
         onOpenEstate={vi.fn()}
+        onOpenRivals={vi.fn()}
         risk={0}
         onExit={vi.fn()}
         reducedMotion={false}
@@ -355,7 +357,7 @@ describe('V2Hud', () => {
     );
     await user.click(screen.getByRole('button', { name: /wordTowerV2.hud.menu/i }));
 
-    expect(screen.getByLabelText('wordTowerV2.wreck.balls {"n":2}')).toBeInTheDocument();
+    expect(screen.getByText('wordTowerV2.hud.sheet.rivalsBalls {"n":2}')).toBeInTheDocument();
     expect(screen.getByLabelText('wordTowerV2.tenants {"n":3}')).toBeInTheDocument();
     expect(
       screen.getByLabelText('wordTowerV2.hud.effect {"name":"wordTowerV2.reward.steady.name","n":2}'),

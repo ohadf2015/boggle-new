@@ -18,15 +18,18 @@ const TILT_DEG = 3;
 /** `rescan` re-collects targets when async content (a loaded list) mounts after first paint. */
 export function useTeacherReveal<T extends HTMLElement>(rescan: string | number | boolean = true) {
   const ref = useRef<T | null>(null);
+  // Elements whose entrance already played. A rescan (data landed, a section mounted late) must deal an
+  // entrance only to NEW targets: replaying it on content already on screen is the page "loading twice".
+  const landed = useRef<WeakSet<HTMLElement>>(new WeakSet());
   const reduced = useEduReducedMotion();
 
   useEffect(() => {
     const root = ref.current;
     if (!root || reduced) return;
-    const targets = Array.from(root.querySelectorAll<HTMLElement>('[data-tm]'));
+    const targets = Array.from(root.querySelectorAll<HTMLElement>('[data-tm]')).filter((el) => !landed.current.has(el));
     const magnets = Array.from(root.querySelectorAll<HTMLElement>('[data-magnet]'));
     const tilts = Array.from(root.querySelectorAll<HTMLElement>('[data-tilt]'));
-    const wipes = Array.from(root.querySelectorAll<HTMLElement>('[data-wipe]'));
+    const wipes = Array.from(root.querySelectorAll<HTMLElement>('[data-wipe]')).filter((el) => !landed.current.has(el));
     if (targets.length + magnets.length + tilts.length + wipes.length === 0) return;
 
     let cancelled = false;
@@ -68,6 +71,7 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
       const sig = pickRevealSignature();
       const wipeFrom = ['inset(0 0 100% 0)', 'inset(0 100% 0 0)', 'inset(0 50% 0 50%)'][Math.floor(Math.random() * 3)];
       for (const el of wipes) {
+        landed.current.add(el);
         gsap.fromTo(
           el,
           { clipPath: wipeFrom, y: 12 },
@@ -92,8 +96,9 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
           once: true,
           interval: 0.08,
           batchMax: 6,
-          onEnter: (batch) =>
-            gsap.to(batch, {
+          onEnter: (batch) => {
+            for (const el of batch) landed.current.add(el as HTMLElement);
+            return gsap.to(batch, {
               x: 0,
               y: 0,
               rotate: 0,
@@ -104,7 +109,8 @@ export function useTeacherReveal<T extends HTMLElement>(rescan: string | number 
               stagger: { each: sig.stagger, from: sig.from },
               overwrite: true,
               clearProps: 'transform',
-            }),
+            });
+          },
         });
       }, root);
       revert = () => ctx.revert();

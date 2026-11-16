@@ -184,6 +184,41 @@ export default function PuzzleCard({
             </div>
           </div>
 
+          {/* Verdict line (correct / wrong / gave up) gets its own fixed slot above the stage, so it
+              never shares a row with the hint and never shifts the stage or keyboard. */}
+          <div data-testid="puzzle-verdict" className="flex h-6 shrink-0 items-center justify-center" aria-live="polite">
+            <AnimatePresence mode="wait">
+              {isCorrect && (
+                <m.p
+                  key="correct"
+                  initial={{ scale: 0.6 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 14 }}
+                  className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
+                >
+                  {t('connections.correct')}
+                  <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                </m.p>
+              )}
+              {isWrong && (
+                <m.p key="wrong" initial={{ y: -4 }} animate={{ y: 0 }} className="text-center text-sm font-bold text-neo-red">
+                  {t('connections.wrong')}
+                </m.p>
+              )}
+              {isGaveUp && (
+                <m.p
+                  key="gaveUp"
+                  initial={{ y: -6 }}
+                  animate={{ y: 0 }}
+                  transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+                  className="text-center text-sm font-bold text-neo-red"
+                >
+                  {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
+                </m.p>
+              )}
+            </AnimatePresence>
+          </div>
+
           {/* Size container: BridgeStage caps its plates, tiles and river by this box's
               height (cqh), so they shrink to fit instead of spilling over the action row
               above or the feedback line below. `safe` centering never pushes content
@@ -218,9 +253,12 @@ export default function PuzzleCard({
             {isCorrect && <BridgeCelebration streak={state.streak} points={solvePoints} />}
           </div>
 
-          {/* Fixed-height feedback line: a hint or verdict appearing never shifts the keyboard. */}
-          <div className="flex h-10 shrink-0 items-center justify-center [@container(max-height:36rem)]:h-8" aria-live="polite">
-            <AnimatePresence mode="wait">
+          {/* Hint: its own full-width row between the stage and the keyboard dock. The
+              min-height reserves two wrapped lines up front (so revealing it never moves
+              the dock) and the bottom margin keeps the pill off the keys. */}
+          {puzzle.hint && !isResolved && (
+            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@container(max-height:36rem)]:min-h-[2.75rem]">
+              <AnimatePresence>
               {showHint && !isResolved && (
                 <m.p
                   key="hint"
@@ -228,42 +266,15 @@ export default function PuzzleCard({
                   animate={{ y: 0, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ type: 'spring', stiffness: 420, damping: 18 }}
-                  className="inline-flex max-w-full items-center justify-center gap-2 rounded-full border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1 text-center text-sm font-bold leading-tight text-neo-yellow"
+                  className="inline-flex w-full max-w-full items-center justify-center gap-2 rounded-2xl border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1 text-center text-sm font-bold leading-tight text-neo-yellow"
                 >
                   <Lightbulb className="h-4 w-4 shrink-0" aria-hidden="true" />
                   <span className="line-clamp-2">{puzzle.hint}</span>
                 </m.p>
               )}
-              {isCorrect && (
-                <m.p
-                  key="correct"
-                  initial={{ scale: 0.6 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 350, damping: 14 }}
-                  className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
-                >
-                  {t('connections.correct')}
-                  <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
-                </m.p>
-              )}
-              {isWrong && (
-                <m.p key="wrong" initial={{ y: -4 }} animate={{ y: 0 }} className="text-center text-sm font-bold text-neo-red">
-                  {t('connections.wrong')}
-                </m.p>
-              )}
-              {isGaveUp && (
-                <m.p
-                  key="gaveUp"
-                  initial={{ y: -6 }}
-                  animate={{ y: 0 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-                  className="text-center text-sm font-bold text-neo-red"
-                >
-                  {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
-                </m.p>
-              )}
-            </AnimatePresence>
-          </div>
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* The dock: keyboard while playing, the payoff + Next once resolved —
               same reserved height, so the page never grows into a scroll. The one-line

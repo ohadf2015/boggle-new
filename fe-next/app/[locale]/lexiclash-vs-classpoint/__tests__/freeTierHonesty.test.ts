@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 describe('lexiclash-vs-classpoint Basic Free 25/5Q honesty wiring', () => {
   it('wires ClassPointBasicFreeHonestyStrip and locks 25 / 5 Q + URLs', () => {
-    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8');
+    const page = readFileSync(join(__dirname, '../page.tsx'), 'utf8') + readFileSync(join(__dirname, '../copy.ts'), 'utf8');
     expect(page).toMatch(/ClassPointBasicFreeHonestyStrip/);
     expect(page).toMatch(/Max 25 class size/);
     expect(page).toMatch(/5 Questions per PPT/);
@@ -15,7 +15,7 @@ describe('lexiclash-vs-classpoint Basic Free 25/5Q honesty wiring', () => {
     expect(page).toMatch(/https:\/\/www\.lexiclash\.live/);
     expect(page).not.toMatch(/https:\/\/([a-z.]*\.)?lexiclash\.com/);
     expect(page).toMatch(/Socrative Free 5 Quizzes|5 Quizzes \/ 1 Room \/ 50/);
-    expect(page).toMatch(/#1187|Skip open #1187/);
+    expect(page).not.toMatch(/#1[0-9]{3}/); // internal ticket notes are not page copy
   });
 
   it('JA/ES CTA i18n has LexiClash 50 only — no ClassPoint 25 / 5 Q copy', () => {
