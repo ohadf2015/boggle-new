@@ -10,6 +10,7 @@ import { hasPendingCheckout, type PendingCheckoutEventRow } from '@/lib/educatio
 import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
+import { canUseBillingPortal } from '@/lib/education/billingPortal';
 
 const PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS = 800;
 
@@ -101,8 +102,10 @@ export async function GET(request: NextRequest) {
 
     // Portal only for a provider subscription. A granted teacher has no Polar
     // customer, so the call could only fail and log a warning on every load.
+    // A past_due row keeps the portal after the in-app grace ends: updating the card is the
+    // one fix, and a new checkout would start a second subscription.
     let portalUrl: string | null = null;
-    if (subscription.has_pro && !isGrant) {
+    if (canUseBillingPortal(subscription)) {
       try {
         const client = getPolarClient();
         portalUrl = await client.createCustomerPortalUrl(user.id);

@@ -94,11 +94,12 @@ describe('maybeSendPaymentFailedEmail', () => {
     const result = await maybeSendPaymentFailedEmail({ payload, userId: 'u1' });
 
     expect(result).toEqual({ sent: true });
-    expect(createCustomerPortalUrlMock).toHaveBeenCalledWith('u1');
+    // Polar portal sessions are short-lived: the email carries the stable route, never a minted session.
+    expect(createCustomerPortalUrlMock).not.toHaveBeenCalled();
     expect(vi.mocked(teacherPaymentFailed)).toHaveBeenCalledWith({
       full_name: 'Dana Cohen',
       locale: 'he',
-      portalUrl: 'https://polar.sh/portal/session_123',
+      portalUrl: 'https://www.lexiclash.live/api/subscription/portal?locale=he',
       renewalDate: '2026-10-09T00:05:00.000Z',
     });
     expect(vi.mocked(sendEmail)).toHaveBeenCalledWith({
@@ -125,8 +126,7 @@ describe('maybeSendPaymentFailedEmail', () => {
     expect(vi.mocked(logSubscriptionEvent)).not.toHaveBeenCalled();
   });
 
-  it('falls back to the English dashboard link when the portal session fails, and does not log when sending fails', async () => {
-    createCustomerPortalUrlMock.mockRejectedValue(new Error('polar down'));
+  it('uses the English portal route when the locale is unknown, and does not log when sending fails', async () => {
     vi.mocked(sendEmail).mockResolvedValue({ ok: false, error: 'resend down' } as any);
 
     const result = await maybeSendPaymentFailedEmail({ payload, userId: 'u1' });
@@ -135,7 +135,7 @@ describe('maybeSendPaymentFailedEmail', () => {
     expect(vi.mocked(teacherPaymentFailed)).toHaveBeenCalledWith({
       full_name: 'teacher',
       locale: 'en',
-      portalUrl: 'https://www.lexiclash.live/en/teacher',
+      portalUrl: 'https://www.lexiclash.live/api/subscription/portal?locale=en',
       renewalDate: '2026-10-09T00:05:00.000Z',
     });
     expect(vi.mocked(logSubscriptionEvent)).not.toHaveBeenCalled();

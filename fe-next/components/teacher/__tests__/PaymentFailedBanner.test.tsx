@@ -35,6 +35,6 @@ describe('PaymentFailedBanner', () => {
 
   it('falls back to the localized plan page when no portal URL came back', () => {
     render(<PaymentFailedBanner portalUrl={null} stillPro />);
-    expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute('href', '/he/teacher/upgrade');
+    expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute('href', '/api/subscription/portal?locale=he');
   });
 });

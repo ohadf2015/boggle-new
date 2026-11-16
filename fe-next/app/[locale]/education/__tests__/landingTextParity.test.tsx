@@ -47,6 +47,8 @@ import Icebreakers, { generateMetadata as metaIcebreakers } from '../first-day-o
  * Free-vs-Pro table, and the plan copy (no student sign-up, no duels, prices from
  * lib/education/proFeatures) changed the esl, vocabulary and for-schools text and JSON-LD.
  * Metadata snapshots are unchanged, and `for-schools` does not use the template.
+ * The for-schools hero and trial FAQ text/JSON-LD were regenerated when the
+ * 14-day Teacher Pro trial became card-required (card needed, then $9/mo).
  *
  * Regenerate them only when the copy itself is meant to change:
  *

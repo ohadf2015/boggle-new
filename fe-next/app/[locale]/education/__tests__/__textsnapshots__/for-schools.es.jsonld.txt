@@ -9,7 +9,7 @@
       "name": "¿Es LexiClash gratis para maestros?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, los 8 modos de juego, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes, sin tarjeta de crédito. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas."
+        "text": "Sí. Cada maestro obtiene una prueba gratuita de 14 días de Teacher Pro: juego en clase, los 8 modos de juego, los seis idiomas, sin anuncios, sin inicios de sesión de estudiantes. Para empezar la prueba se pide tarjeta, y después cuesta $9/mes si no cancelas. Después de la prueba, el juego de aula sigue siendo gratis para maestros individuales — hasta 3 clases de 50 estudiantes cada una. Teacher Pro cuesta $9/mes y agrega análisis por clase, informes de progreso en PDF/CSV y clases ilimitadas."
       }
     },
     {
