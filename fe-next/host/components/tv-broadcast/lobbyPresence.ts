@@ -155,8 +155,11 @@ export function useLobbyRoster(players: ReadonlyArray<LobbyPlayer | string>, hos
     return () => clearTimeout(timer);
   }, [drops, now]);
 
-  return useMemo(
-    () => (joinedRoster?.gameCode === gameCode ? classroomLobbyRoster(players, joinedRoster, hostName) : lobbyRoster(players, drops, now, hostName)),
-    [joinedRoster, players, drops, now, hostName, gameCode],
-  );
+  return useMemo(() => {
+    // Optional chaining does not narrow `joinedRoster` off null (TS2345).
+    if (joinedRoster != null && joinedRoster.gameCode === gameCode) {
+      return classroomLobbyRoster(players, joinedRoster, hostName);
+    }
+    return lobbyRoster(players, drops, now, hostName);
+  }, [joinedRoster, players, drops, now, hostName, gameCode]);
 }

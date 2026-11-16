@@ -17,6 +17,8 @@ import { WALL_PANEL } from './projectorNbStyles';
 export interface ProjectorStudent {
   username: string;
   isBot?: boolean;
+  /** Teacher's practice seat: visible on the wall, never in the joined or ready counts. Mapped through from LobbyStudent.isPractice. */
+  isPractice?: boolean;
   /** Stored avatar when the room carries it; absent = a face seeded from the name. */
   avatar?: AvatarType | null;
   /** Phone dropped: still named and counted in the headline. Connection is an overlay, not removal. */
