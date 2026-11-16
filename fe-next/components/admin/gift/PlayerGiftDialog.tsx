@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import { Send, Gift, Sparkles, Coins, Award, ChevronDown, ChevronUp } from 'lucide-react';
 import {
@@ -28,7 +28,10 @@ import {
   type GiftTemplate,
   type GiftFormData,
   type BadgeOption,
+  GIFT_TEMPLATES,
 } from './types';
+
+const DEFAULT_TEMPLATE = GIFT_TEMPLATES[0];
 
 interface PlayerGiftDialogProps {
   open: boolean;
@@ -64,41 +67,54 @@ export function PlayerGiftDialog({
   const [badgeOpen, setBadgeOpen] = useState(false);
 
   const [selectedPlayers, setSelectedPlayers] = useState<GiftRecipient[]>([]);
-  const [templateType, setTemplateType] = useState<GiftTemplateType>('top_player');
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [xpAmount, setXpAmount] = useState(0);
-  const [coinAmount, setCoinAmount] = useState(0);
+  // The preselected template fills the form, so what looks chosen is what gets sent.
+  const [templateType, setTemplateType] = useState<GiftTemplateType>(DEFAULT_TEMPLATE.id);
+  const [title, setTitle] = useState(DEFAULT_TEMPLATE.defaultTitle);
+  const [message, setMessage] = useState(DEFAULT_TEMPLATE.defaultMessage);
+  const [xpAmount, setXpAmount] = useState(DEFAULT_TEMPLATE.suggestedXp);
+  const [coinAmount, setCoinAmount] = useState(DEFAULT_TEMPLATE.suggestedCoins);
   const [selectedBadgeId, setSelectedBadgeId] = useState<string | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<BadgeOption | null>(null);
 
   const handleTemplateSelect = useCallback((template: GiftTemplate) => {
     setTemplateType(template.id);
-    if (template.id !== 'custom') {
-      setTitle(template.defaultTitle);
-      setMessage(template.defaultMessage);
-      setXpAmount(template.suggestedXp);
-      setCoinAmount(template.suggestedCoins);
-    }
+    setTitle(template.defaultTitle);
+    setMessage(template.defaultMessage);
+    setXpAmount(template.suggestedXp);
+    setCoinAmount(template.suggestedCoins);
   }, []);
 
-  const reset = () => {
+  const reset = useCallback(() => {
     setSelectedPlayers([]);
-    setTemplateType('top_player');
-    setTitle('');
-    setMessage('');
-    setXpAmount(0);
-    setCoinAmount(0);
+    setTemplateType(DEFAULT_TEMPLATE.id);
+    setTitle(DEFAULT_TEMPLATE.defaultTitle);
+    setMessage(DEFAULT_TEMPLATE.defaultMessage);
+    setXpAmount(DEFAULT_TEMPLATE.suggestedXp);
+    setCoinAmount(DEFAULT_TEMPLATE.suggestedCoins);
     setSelectedBadgeId(null);
     setSelectedBadge(null);
     setBadgeOpen(false);
-  };
+  }, []);
+
+  // Every open starts clean: a dialog closed without sending must not carry the old recipients
+  // or edits into the next player's gift.
+  useEffect(() => {
+    if (open) reset();
+  }, [open, reset]);
 
   const canSend =
     selectedPlayers.length > 0 &&
     title.trim().length > 0 &&
     message.trim().length > 0 &&
     !sending;
+
+  const disabledReason = sending
+    ? null
+    : selectedPlayers.length === 0
+      ? 'Add a recipient to send'
+      : !title.trim() || !message.trim()
+        ? 'Add a title and message to send'
+        : null;
 
   const handleSend = async () => {
     if (!canSend) return;
@@ -263,6 +279,7 @@ export function PlayerGiftDialog({
                   {selectedBadge.name_key.split('.').pop()?.replace(/_/g, ' ')}
                 </span>
               )}
+              {disabledReason && <span role="status" className="text-amber-600 dark:text-amber-400">{disabledReason}</span>}
             </div>
             <Button
               onClick={handleSend}
