@@ -2,11 +2,12 @@
  * Tests for PlayerCard — focuses on the chosen-style badge: it appears (emoji +
  * label) when the player picked a player_style, and is absent when they never did
  * (NULL). Heavy children (Avatar, curator control) are mocked so the test stays a
- * pure render assertion.
+ * pure render assertion. Row actions live in a 3-dots menu so the name keeps its width.
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
@@ -78,12 +79,17 @@ describe('PlayerCard — chosen style badge', () => {
   });
 });
 
+async function openMenu() {
+  await userEvent.click(screen.getByTestId('player-actions'));
+}
+
 describe('PlayerCard — beta tester control', () => {
-  it('calls onToggleBeta when the beta button is clicked', () => {
+  it('calls onToggleBeta when the beta item is chosen', async () => {
     const onToggleBeta = vi.fn();
     const player = makePlayer({ is_beta_tester: false });
     renderCard(player, { onToggleBeta });
-    fireEvent.click(screen.getByTestId('player-beta-toggle'));
+    await openMenu();
+    await userEvent.click(screen.getByTestId('player-beta-toggle'));
     expect(onToggleBeta).toHaveBeenCalledWith(player);
   });
 
@@ -97,33 +103,62 @@ describe('PlayerCard — beta tester control', () => {
     expect(screen.queryByTestId('player-beta-badge')).not.toBeInTheDocument();
   });
 
-  it('disables the beta button while a toggle is in flight', () => {
+  it('disables the beta item while a toggle is in flight', async () => {
     renderCard(makePlayer({ is_beta_tester: false }), { betaLoading: true });
-    expect(screen.getByTestId('player-beta-toggle')).toBeDisabled();
+    await openMenu();
+    expect(screen.getByTestId('player-beta-toggle')).toHaveAttribute('data-disabled');
   });
 });
 
-describe('PlayerCard — compact row', () => {
-  it('keeps the curator panel folded until its toggle is pressed', () => {
+describe('PlayerCard — 3-dots actions', () => {
+  it('keeps every action out of the row until the menu opens', () => {
     renderCard(makePlayer());
-    expect(screen.queryByTestId('curator-control')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('player-curator-toggle'));
-    expect(screen.getByTestId('curator-control')).toBeInTheDocument();
+    expect(screen.getByTestId('player-actions')).toHaveAccessibleName('Player actions');
+    expect(screen.queryByRole('menuitem', { name: /Gift/ })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('player-beta-toggle')).not.toBeInTheDocument();
   });
 
-  it('shows how many curator languages a player holds on the folded toggle', () => {
-    renderCard(makePlayer(), { curatorAssignments: [{ language: 'he', tier: 1 } as never, { language: 'en', tier: 2 } as never] });
-    expect(screen.getByTestId('player-curator-toggle')).toHaveTextContent('2');
-  });
-
-  it('names every icon action for screen readers', () => {
+  it('fires gift and block from the menu', async () => {
     const onGift = vi.fn();
     const onBlock = vi.fn();
     const player = makePlayer();
     renderCard(player, { onGift, onBlock });
-    fireEvent.click(screen.getByRole('button', { name: 'Gift' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Block' }));
+    await openMenu();
+    await userEvent.click(screen.getByRole('menuitem', { name: /Gift/ }));
     expect(onGift).toHaveBeenCalledWith(player);
+    await openMenu();
+    await userEvent.click(screen.getByRole('menuitem', { name: /Block/ }));
     expect(onBlock).toHaveBeenCalledWith(player);
+  });
+
+  it('keeps the curator panel folded until its menu item is chosen', async () => {
+    renderCard(makePlayer());
+    expect(screen.queryByTestId('curator-control')).not.toBeInTheDocument();
+    await openMenu();
+    await userEvent.click(screen.getByTestId('player-curator-toggle'));
+    expect(screen.getByTestId('curator-control')).toBeInTheDocument();
+  });
+
+  it('shows how many curator languages a player holds on the menu item', async () => {
+    renderCard(makePlayer(), { curatorAssignments: [{ language: 'he', tier: 1 } as never, { language: 'en', tier: 2 } as never] });
+    await openMenu();
+    expect(screen.getByTestId('player-curator-toggle')).toHaveTextContent('2');
+  });
+});
+
+describe('PlayerCard — name', () => {
+  it('shows the display name with the username beside it', () => {
+    renderCard(makePlayer());
+    expect(screen.getByRole('link', { name: 'Wordy' })).toBeInTheDocument();
+  });
+
+  it('falls back to the username when there is no display name', () => {
+    renderCard(makePlayer({ display_name: '', username: 'wordy' }));
+    expect(screen.getByRole('link', { name: 'wordy' })).toBeInTheDocument();
+  });
+
+  it('never renders an empty name: a nameless profile reads as a guest with its short id', () => {
+    renderCard(makePlayer({ id: 'abcdef12-0000', display_name: '', username: '' }));
+    expect(screen.getByRole('link', { name: 'Guest abcdef' })).toBeInTheDocument();
   });
 });

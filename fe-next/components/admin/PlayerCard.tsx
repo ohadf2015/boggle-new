@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Gift, Bomb, ExternalLink, Ban, FlaskConical, ShieldCheck, Languages } from 'lucide-react';
+import { Gift, Bomb, ExternalLink, Ban, FlaskConical, ShieldCheck, Languages, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Avatar from '@/components/Avatar';
 import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
 import { PlayerCuratorControl } from './PlayerCuratorControl';
@@ -47,7 +48,7 @@ export function PlayerCard({
   curatorBusyKey,
 }: PlayerCardProps) {
   const [curatorOpen, setCuratorOpen] = useState(false);
-  const name = player.display_name || player.username;
+  const name = player.display_name || player.username || `Guest ${player.id.slice(0, 6)}`;
   const phUrl = postHogPersonUrl(player.id);
   const styleBadge = formatStyleBadge(player.player_style);
   const date = (iso: string) => new Date(iso).toLocaleDateString(language, { day: 'numeric', month: 'short', year: '2-digit' });
@@ -59,8 +60,8 @@ export function PlayerCard({
         <Avatar customAvatar={player.avatar_config} userId={player.id} size="sm" />
 
         <div className="min-w-0 flex-1">
-          <div className="flex min-w-0 items-center gap-1.5">
-            <Link href={`/${language}/admin/players/${player.id}`} className="truncate font-bold hover:text-neo-cyan transition-colors">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+            <Link href={`/${language}/admin/players/${player.id}`} className="min-w-[7rem] max-w-full truncate font-bold hover:text-neo-cyan transition-colors">
               {name}
             </Link>
             {player.display_name && player.username && (
@@ -96,50 +97,40 @@ export function PlayerCard({
           <Stat label="MMR" value={player.ranked_mmr} valueClass="text-neo-yellow" />
         </dl>
 
-        <div className="flex shrink-0 items-center gap-0.5">
-          <IconAction label="Gift" onClick={() => onGift(player)} className="text-neo-yellow">
-            <Gift className="h-4 w-4" />
-          </IconAction>
-          <IconAction
-            label={player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
-            onClick={() => onToggleBlast(player)}
-            disabled={blastLoading}
-            pressed={!!player.blast_access}
-            className="text-neo-orange"
-          >
-            <Bomb className="h-4 w-4" />
-          </IconAction>
-          <IconAction
-            testId="player-beta-toggle"
-            label={player.is_beta_tester ? 'Revoke beta access' : 'Grant beta access'}
-            onClick={() => onToggleBeta(player)}
-            disabled={betaLoading}
-            pressed={!!player.is_beta_tester}
-            className="text-neo-purple"
-          >
-            <FlaskConical className="h-4 w-4" />
-          </IconAction>
-          <button
-            type="button"
-            data-testid="player-curator-toggle"
-            aria-expanded={curatorOpen}
-            aria-label="Language curator"
-            title="Language curator"
-            onClick={() => setCuratorOpen((v) => !v)}
-            className={cn(ICON_BTN, 'gap-0.5 text-neo-lime', (curatorOpen || curatorAssignments.length > 0) && 'bg-neo-lime/15')}
-          >
-            <Languages className="h-4 w-4" />
-            {curatorAssignments.length > 0 && <span className="text-[10px] font-bold tabular-nums">{curatorAssignments.length}</span>}
-          </button>
-          {phUrl && (
-            <a href={phUrl} target="_blank" rel="noreferrer noopener" aria-label="Open in PostHog" title="Open in PostHog" className={cn(ICON_BTN, 'text-slate-400')}>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-          )}
-          <IconAction label="Block" onClick={() => onBlock(player)} disabled={blockLoading} className="text-neo-red">
-            <Ban className="h-4 w-4" />
-          </IconAction>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button type="button" data-testid="player-actions" aria-label="Player actions" title="Player actions" className={cn(ICON_BTN, 'shrink-0 text-slate-300')}>
+              <MoreVertical className="h-4 w-4" />
+              {curatorAssignments.length > 0 && <span className="sr-only">{curatorAssignments.length} curator languages</span>}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-[200px]">
+            <DropdownMenuItem onSelect={() => onGift(player)} className="text-neo-yellow">
+              <Gift className="h-4 w-4" />Gift
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => onToggleBlast(player)} disabled={blastLoading} className="text-neo-orange">
+              <Bomb className="h-4 w-4" />{player.blast_access ? 'Revoke blast access' : 'Grant blast access'}
+            </DropdownMenuItem>
+            <DropdownMenuItem data-testid="player-beta-toggle" onSelect={() => onToggleBeta(player)} disabled={betaLoading} className="text-neo-purple">
+              <FlaskConical className="h-4 w-4" />{player.is_beta_tester ? 'Revoke beta access' : 'Grant beta access'}
+            </DropdownMenuItem>
+            <DropdownMenuItem data-testid="player-curator-toggle" onSelect={() => setCuratorOpen((v) => !v)} className="text-neo-lime">
+              <Languages className="h-4 w-4" />Language curator
+              {curatorAssignments.length > 0 && <span className="ms-auto text-[10px] font-bold tabular-nums">{curatorAssignments.length}</span>}
+            </DropdownMenuItem>
+            {phUrl && (
+              <DropdownMenuItem asChild className="text-slate-300">
+                <a href={phUrl} target="_blank" rel="noreferrer noopener">
+                  <ExternalLink className="h-4 w-4" />Open in PostHog
+                </a>
+              </DropdownMenuItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={() => onBlock(player)} disabled={blockLoading} className="text-neo-red">
+              <Ban className="h-4 w-4" />Block
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {curatorOpen && (
@@ -159,25 +150,6 @@ export function PlayerCard({
 
 const PILL = 'inline-flex shrink-0 items-center gap-1 rounded-full border border-neo-purple/40 bg-neo-purple/10 px-1.5 py-px text-[10px] font-black uppercase tracking-wide text-neo-purple';
 const ICON_BTN = 'inline-flex h-8 min-w-8 items-center justify-center rounded px-1 hover:bg-white/10 disabled:opacity-40';
-
-function IconAction({ label, onClick, disabled, pressed, className, testId, children }: {
-  label: string; onClick: () => void; disabled?: boolean; pressed?: boolean; className?: string; testId?: string; children: React.ReactNode;
-}) {
-  return (
-    <button
-      type="button"
-      data-testid={testId}
-      aria-label={label}
-      aria-pressed={pressed}
-      title={label}
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(ICON_BTN, className, pressed && 'bg-current/15 ring-1 ring-current')}
-    >
-      {children}
-    </button>
-  );
-}
 
 function Stat({ label, value, valueClass = '' }: { label: string; value: React.ReactNode; valueClass?: string }) {
   return (
