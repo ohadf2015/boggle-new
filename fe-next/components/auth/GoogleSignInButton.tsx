@@ -199,7 +199,14 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
             <span>{t('auth.continueWithGoogle', 'Continue with Google')}</span>
           </div>
         )}
-        <div ref={containerRef} data-testid="gsi-button-container" />
+        {/*
+          colorScheme light: the site root is `color-scheme: dark` and the GSI
+          iframe document is light. When the two differ the browser paints an
+          opaque white backdrop behind the iframe, and GSI's iframe is 20px wider
+          than the button (margin -10px), so a white strip stuck out of the dark
+          frame on both sides. Matching schemes keeps the backdrop transparent.
+        */}
+        <div ref={containerRef} data-testid="gsi-button-container" style={{ colorScheme: 'light' }} />
       </div>
     </div>
   );

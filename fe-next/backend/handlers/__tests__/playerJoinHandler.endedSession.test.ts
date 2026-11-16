@@ -84,6 +84,7 @@ vi.mock('../../utils/errorHandler', () => ({
     PLAYER_KICKED: 'PLAYER_KICKED',
     PLAYER_BLOCKED: 'PLAYER_BLOCKED',
     GAME_CLOSED: 'GAME_CLOSED',
+    CLASSROOM_SESSION_WAITING: 'CLASSROOM_SESSION_WAITING',
   },
 }));
 vi.mock('../../utils/rateLimiter', () => ({
@@ -167,7 +168,9 @@ describe("base 'join' — an ended classroom session is not a door", () => {
     mockGetClassroomMembershipLevel.mockResolvedValue('core');
   });
 
-  it('refuses a fresh join into an ended session, with the same error an unknown code gets', async () => {
+  // #1977: an ended class parks the student (CLASSROOM_SESSION_WAITING + class id) to wait for
+  // the next game, instead of the GAME_NOT_FOUND wall. Still no seat in the ended room.
+  it('refuses a fresh join into an ended session and parks the student to wait for the next game', async () => {
     mockGetGame.mockReturnValue(liveRoom());
     mockGetClassroomGame.mockResolvedValue(endedClassroom);
 
@@ -175,7 +178,7 @@ describe("base 'join' — an ended classroom session is not a door", () => {
     await join({ gameCode: 'ABC123', username: 'Ada' });
     await flush();
 
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'CLASSROOM_SESSION_WAITING', { details: { classroomId: 'class-1' } });
     expect(joinedEmits(socket)).toHaveLength(0);
     expect(addUserToGame).not.toHaveBeenCalled();
   });
@@ -190,7 +193,7 @@ describe("base 'join' — an ended classroom session is not a door", () => {
     await flush();
 
     expect(handleReconnection).not.toHaveBeenCalled();
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'CLASSROOM_SESSION_WAITING', { details: { classroomId: 'class-1' } });
   });
 
   it('leaves an ORDINARY multiplayer room completely untouched', async () => {
