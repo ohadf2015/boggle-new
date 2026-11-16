@@ -19346,6 +19346,14 @@ const es = {
     "noRivals": "Sube en la liga para encontrar rivales"
   },
   "socialGift": {
+    "errors": {
+      "limit": "Ya usaste todos tus regalos de hoy.",
+      "balance": "No tienes monedas suficientes para ese regalo.",
+      "notFriends": "Solo puedes enviar regalos a tus amigos.",
+      "blocked": "No puedes enviar un regalo a este jugador.",
+      "self": "No puedes enviarte un regalo a ti mismo.",
+      "busy": "Espera, tu último regalo aún se está enviando."
+    },
     "title": "Enviar regalo",
     "sendTo": "Enviar a",
     "type": {

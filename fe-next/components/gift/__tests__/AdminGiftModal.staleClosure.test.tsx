@@ -98,7 +98,7 @@ describe('AdminGiftModal - Stale Closure Fix', () => {
       expect(onClaim).toHaveBeenCalled();
     });
 
-    // CRITICAL: Before the 1.5s timeout fires, update onDismiss prop
+    // CRITICAL: Before the auto-dismiss timeout fires, update onDismiss prop
     // This simulates what happens when Header re-renders with new gifts array
     rerender(
       <AdminGiftModal
@@ -111,9 +111,9 @@ describe('AdminGiftModal - Stale Closure Fix', () => {
       />
     );
 
-    // Advance timer past the 1.5s auto-dismiss
+    // Advance timer past the auto-dismiss
     act(() => {
-      vi.advanceTimersByTime(1600);
+      vi.advanceTimersByTime(2300);
     });
 
     // BUG (before fix): v1 would be called because setTimeout captured stale reference

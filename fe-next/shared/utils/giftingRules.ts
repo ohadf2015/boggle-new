@@ -31,6 +31,21 @@ export interface GiftValidation {
 
 const XP_PER_GIFT = 5;
 
+const ERROR_KEYS: Record<string, string> = {
+  'Daily gift limit reached': 'socialGift.errors.limit',
+  'Insufficient balance': 'socialGift.errors.balance',
+  'Can only send gifts to friends': 'socialGift.errors.notFriends',
+  'Cannot send gift to blocked user': 'socialGift.errors.blocked',
+  'Cannot send gift to yourself': 'socialGift.errors.self',
+  'Gift already processing, please wait': 'socialGift.errors.busy',
+  'Too many requests': 'socialGift.errors.busy',
+};
+
+/** Translation key for a server gift error (the server sends English text); unknown errors get the generic one. */
+export function giftErrorKey(error?: string): string {
+  return (error && ERROR_KEYS[error]) || 'socialGift.error';
+}
+
 export function canSendGift(giftsToday: number): boolean {
   return giftsToday < DAILY_GIFT_LIMIT;
 }

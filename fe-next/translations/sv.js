@@ -19652,6 +19652,14 @@ const sv = {
     "noRivals": "Klättra i ligan för att hitta rivaler"
   },
   "socialGift": {
+    "errors": {
+      "limit": "Du har använt alla dina presenter för idag.",
+      "balance": "Du har inte tillräckligt med mynt för den presenten.",
+      "notFriends": "Du kan bara skicka presenter till vänner.",
+      "blocked": "Du kan inte skicka en present till den här spelaren.",
+      "self": "Du kan inte skicka en present till dig själv.",
+      "busy": "Vänta, din förra present är fortfarande på väg."
+    },
     "title": "Skicka en gåva",
     "sendTo": "Skicka till",
     "type": {

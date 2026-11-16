@@ -150,7 +150,7 @@ export function PlayerGiftDialog({
             Send Gift Message
           </DialogTitle>
           <DialogDescription>
-            Fill out any sections — a template fills most of it for you.
+            Pick a template to fill the message and rewards, then adjust.
           </DialogDescription>
         </DialogHeader>
 
@@ -165,7 +165,7 @@ export function PlayerGiftDialog({
             />
           </Section>
 
-          <Section title="Template (fills title, message, rewards)">
+          <Section title="Template">
             <GiftTemplateSelector
               selectedTemplate={templateType}
               onSelect={handleTemplateSelect}

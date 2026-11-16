@@ -17660,6 +17660,14 @@ const en = {
     "noRivals": "Climb the league to find rivals"
   },
   "socialGift": {
+    "errors": {
+      "limit": "You have used all your gifts for today.",
+      "balance": "Not enough coins for that gift.",
+      "notFriends": "You can only send gifts to friends.",
+      "blocked": "You can not send a gift to this player.",
+      "self": "You can not send a gift to yourself.",
+      "busy": "Hang on, your last gift is still going out."
+    },
     "title": "Send a gift",
     "sendTo": "Send to",
     "type": {

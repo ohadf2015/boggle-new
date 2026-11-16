@@ -4,6 +4,7 @@ import {
   canSendGift,
   calculateGiftXP,
   validateGift,
+  giftErrorKey,
   GiftType,
 } from '../giftingRules';
 
@@ -99,5 +100,24 @@ describe('giftingRules', () => {
       const result = validateGift({ type: 'unknown' as GiftType }, 100);
       expect(result.valid).toBe(false);
     });
+  });
+});
+
+describe('giftErrorKey', () => {
+  it.each([
+    ['Daily gift limit reached', 'socialGift.errors.limit'],
+    ['Insufficient balance', 'socialGift.errors.balance'],
+    ['Can only send gifts to friends', 'socialGift.errors.notFriends'],
+    ['Cannot send gift to blocked user', 'socialGift.errors.blocked'],
+    ['Cannot send gift to yourself', 'socialGift.errors.self'],
+    ['Gift already processing, please wait', 'socialGift.errors.busy'],
+    ['Too many requests', 'socialGift.errors.busy'],
+  ])('maps %s to a translation key', (error, key) => {
+    expect(giftErrorKey(error)).toBe(key);
+  });
+
+  it('falls back to the generic error for anything unknown or missing', () => {
+    expect(giftErrorKey('Database unavailable')).toBe('socialGift.error');
+    expect(giftErrorKey(undefined)).toBe('socialGift.error');
   });
 });

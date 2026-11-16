@@ -108,4 +108,30 @@ describe('GiftModal', () => {
     fireEvent.click(screen.getByTestId('close-gift-modal'));
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
+
+  test('a sender with fewer than 10 coins can still gift coins, and never sends more than they own', () => {
+    const onSend = vi.fn();
+    render(
+      <LanguageProvider>
+        <GiftModal {...defaultProps} senderBalance={7} onSend={onSend} />
+      </LanguageProvider>
+    );
+    const coins = screen.getByTestId('gift-card-coins');
+    expect(coins).not.toBeDisabled();
+    fireEvent.click(coins);
+    fireEvent.click(screen.getByTestId('send-gift-button'));
+    const sent = onSend.mock.calls[0][0];
+    expect(sent.type).toBe('coins');
+    expect(sent.amount).toBeGreaterThanOrEqual(5);
+    expect(sent.amount).toBeLessThanOrEqual(7);
+  });
+
+  test('coins stay disabled below the 5-coin minimum', () => {
+    render(
+      <LanguageProvider>
+        <GiftModal {...defaultProps} senderBalance={4} />
+      </LanguageProvider>
+    );
+    expect(screen.getByTestId('gift-card-coins')).toBeDisabled();
+  });
 });

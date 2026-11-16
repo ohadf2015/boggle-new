@@ -31,7 +31,11 @@ const GiftModal: React.FC<GiftModalProps> = ({
 }) => {
   const { t } = useLanguage();
   const [selectedType, setSelectedType] = useState<GiftType | null>(null);
-  const [coinAmount, setCoinAmount] = useState(10);
+  const [requestedCoins, setRequestedCoins] = useState(10);
+
+  const { minAmount: minCoins = 5, maxAmount: maxCoins = 50 } = GIFT_TYPES.coins;
+  // What is actually sent: the slider value, never above what the sender owns.
+  const coinAmount = Math.max(minCoins, Math.min(requestedCoins, maxCoins, senderBalance));
 
   if (!isOpen) return null;
 
@@ -80,8 +84,8 @@ const GiftModal: React.FC<GiftModalProps> = ({
             const Icon = GIFT_ICONS[type];
             const config = GIFT_TYPES[type];
             const isSelected = selectedType === type;
-            const cost = type === 'coins' ? coinAmount : config.cost;
-            const canAfford = senderBalance >= cost;
+            const cost = config.cost;
+            const canAfford = senderBalance >= (type === 'coins' ? minCoins : cost);
 
             return (
               <button
@@ -121,9 +125,9 @@ const GiftModal: React.FC<GiftModalProps> = ({
               id="coin-slider"
               type="range"
               min={GIFT_TYPES.coins.minAmount}
-              max={Math.min(GIFT_TYPES.coins.maxAmount!, senderBalance)}
+              max={Math.min(maxCoins, senderBalance)}
               value={coinAmount}
-              onChange={(e) => setCoinAmount(Number(e.target.value))}
+              onChange={(e) => setRequestedCoins(Number(e.target.value))}
               className="w-full"
               data-testid="coin-slider"
             />

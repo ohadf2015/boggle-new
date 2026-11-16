@@ -44,7 +44,7 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 import { useSocketOptional } from '@/utils/SocketContext';
 import type { Friend } from '@/utils/friends';
 import type { MessageThread as MessageThreadType } from '@/shared/types/friends';
-import { DAILY_GIFT_LIMIT, type GiftPayload } from '@/shared/utils/giftingRules';
+import { DAILY_GIFT_LIMIT, giftErrorKey, type GiftPayload } from '@/shared/utils/giftingRules';
 
 interface FriendsListProps {
   onChallengeClick?: (friend: Friend) => void;
@@ -359,7 +359,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         toast.success(t('socialGift.sent'));
         setGiftsUsedToday(prev => prev + 1);
       } else {
-        toast.error(result.error || t('socialGift.error'));
+        toast.error(t(giftErrorKey(result.error)));
       }
     });
     setGiftFriend(null);
