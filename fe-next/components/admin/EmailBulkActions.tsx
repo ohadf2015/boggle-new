@@ -144,7 +144,7 @@ export function EmailBulkActions({
               onChange={(e) => setPlayerIdentifier(e.target.value)}
               placeholder="player@email.com or username"
               className="bg-neo-navy border-2 border-neo-black text-neo-white placeholder:text-slate-500 flex-1"
-              onKeyDown={(e) => e.key === 'Enter' && handleSendToPlayer()}
+              onKeyDown={(e) => e.key === 'Enter' && !e.nativeEvent.isComposing && e.keyCode !== 229 && handleSendToPlayer()}
             />
             <Button
               onClick={handleSendToPlayer}
