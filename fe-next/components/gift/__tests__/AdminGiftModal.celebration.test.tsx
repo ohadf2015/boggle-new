@@ -27,8 +27,8 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('AdminGiftModal celebration', () => {
   it('shows a closed gift box before claiming and opens it after', async () => {
-    const { container } = open();
-    const box = () => container.querySelector('.gift-box');
+    open();
+    const box = () => document.querySelector('.gift-box');
     expect(box()).toHaveAttribute('data-open', 'false');
     fireEvent.click(screen.getByRole('button', { name: /gift.claim/ }));
     await waitFor(() => expect(box()).toHaveAttribute('data-open', 'true'));
@@ -51,7 +51,7 @@ describe('AdminGiftModal celebration', () => {
   });
 
   it('shows an already-claimed gift as opened with a close-only action', () => {
-    const { container } = open({ gift: { ...gift, claimed: true } });
-    expect(container.querySelector('.gift-box')).toHaveAttribute('data-open', 'true');
+    open({ gift: { ...gift, claimed: true } });
+    expect(document.querySelector('.gift-box')).toHaveAttribute('data-open', 'true');
   });
 });

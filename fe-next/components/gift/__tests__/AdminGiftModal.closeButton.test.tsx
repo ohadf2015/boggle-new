@@ -135,8 +135,9 @@ describe('AdminGiftModal - Close Button Styling', () => {
 
     const closeButton = screen.getByLabelText(/close/i);
 
-    // Check positioning classes (top-3 = 12px, right-3 = 12px for LTR, left-3 for RTL)
-    expect(closeButton.className).toContain('top-3');
+    // Anchored below the status bar / notch, not a raw 12px that sits under it
+    // on the Android WebView (edge-to-edge).
+    expect(closeButton.className).toMatch(/safe-area-inset-top/);
     expect(closeButton.className).toMatch(/ltr:right-3|rtl:left-3/);
   });
 });

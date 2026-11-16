@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Gift, Sparkles, Coins, X } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
@@ -85,15 +86,42 @@ export function AdminGiftModal({
   const onDismissRef = useRef(onDismiss);
   onDismissRef.current = onDismiss;
   const boxRef = useRef<HTMLDivElement>(null);
+  const dismissGen = useRef(0);
+  const claimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clearClaimTimer = () => {
+    if (!claimTimerRef.current) return;
+    clearTimeout(claimTimerRef.current);
+    claimTimerRef.current = null;
+  };
+  const requestDismiss = () => {
+    dismissGen.current += 1;
+    clearClaimTimer();
+    onDismissRef.current();
+  };
+  const requestDismissRef = useRef(requestDismiss);
+  requestDismissRef.current = requestDismiss;
+
+  useEffect(() => {
+    if (!show || !gift) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') requestDismissRef.current();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [show, gift]);
+
+  useEffect(() => clearClaimTimer, []);
 
   const prevShow = useRef(show);
-  if (prevShow.current !== show) {
-    if (!show) setPhase('ready');
-    else {
+  const prevGiftId = useRef(gift?.id);
+  if (prevShow.current !== show || prevGiftId.current !== gift?.id) {
+    if (!show || prevGiftId.current !== gift?.id) setPhase('ready');
+    if (show) {
       startXpRef.current = currentXp;
       startCoinsRef.current = currentCoins;
     }
     prevShow.current = show;
+    prevGiftId.current = gift?.id;
   }
 
   const opened = phase === 'done' || !!gift?.claimed;
@@ -104,15 +132,18 @@ export function AdminGiftModal({
 
   const handleClaim = async () => {
     if (!gift || phase !== 'ready') return;
+    const gen = dismissGen.current;
     setPhase('claiming');
     try {
       await onClaim(gift.id);
     } catch (error) {
       console.error('Failed to claim gift:', error);
+      if (dismissGen.current !== gen) return;
       toast.error(t('gift.claimError'));
       setPhase('ready');
       return;
     }
+    if (dismissGen.current !== gen) return;
     setPhase('done');
     if (!prefersReducedMotion) {
       const r = boxRef.current?.getBoundingClientRect();
@@ -122,10 +153,14 @@ export function AdminGiftModal({
       fireConfetti({ particleCount: 90, spread: 80, colors: CONFETTI_COLORS, origin });
       setTimeout(() => fireConfetti({ particleCount: 40, spread: 120, colors: CONFETTI_COLORS, origin }), 220);
     }
-    setTimeout(() => onDismissRef.current(), 2200);
+    clearClaimTimer();
+    claimTimerRef.current = setTimeout(() => {
+      if (dismissGen.current !== gen) return;
+      onDismissRef.current();
+    }, 2200);
   };
 
-  if (!gift) return null;
+  if (!gift || !show) return null;
 
   const headerLine = {
     top_player: t('gift.topPlayerLine'),
@@ -135,32 +170,37 @@ export function AdminGiftModal({
   const senderName = gift.sender && (gift.sender.display_name || gift.sender.username);
   const rewardChip = 'gift-chip flex min-w-28 flex-col items-center rounded-neo border-3 px-4 py-2 shadow-hard-sm';
 
-  return (
-    show && (
-      <div role="dialog" aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/70 animate-in fade-in-0 duration-300" onClick={phase === 'ready' ? onDismiss : undefined} />
+  // X is a sibling of the card, anchored to this viewport dialog — not inside
+  // .gift-card. The card is transform-animated and overflow-clips; a long
+  // personal message made it taller than the phone, so the X (and the claim
+  // button) sat off-screen. Header is z-60, so this dialog is portaled above
+  // the bottom tabs (z-80); otherwise the only exit is switching tabs.
+  const dialog = (
+      <div role="dialog" aria-modal="true" className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/70 animate-in fade-in-0 duration-300" onClick={phase === 'ready' ? requestDismiss : undefined} />
 
-        <div ref={boxRef} className={cn('gift-card relative w-full max-w-sm overflow-hidden rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy shadow-hard-xl', className)}>
+        <button
+          type="button"
+          onClick={requestDismiss}
+          className={cn(
+            'absolute z-20',
+            'top-[max(0.75rem,var(--cap-safe-area-top,env(safe-area-inset-top,0px)))]',
+            'ltr:right-3 rtl:left-3',
+            'w-12 h-12 min-w-[48px] min-h-[48px] rounded-full',
+            'bg-neo-black/80 hover:bg-neo-black active:bg-neo-black',
+            'transition-colors duration-200 flex items-center justify-center',
+            'border-2 border-neo-cream/50 hover:border-neo-cream'
+          )}
+          aria-label={t('common.close')}
+        >
+          <X className="h-6 w-6 text-white" />
+        </button>
+
+        <div ref={boxRef} className={cn('gift-card relative w-full max-w-sm max-h-[calc(100dvh-6.5rem)] overflow-x-hidden overflow-y-auto rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy shadow-hard-xl', className)}>
           {/* Header strip */}
           <div className="relative flex min-h-[72px] items-center justify-center bg-neo-lime px-16 py-2 text-center font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-neo-black">
             {headerLine}
           </div>
-
-          {phase === 'ready' && (
-            <button
-              onClick={onDismiss}
-              className={cn(
-                'absolute top-3 ltr:right-3 rtl:left-3 z-20',
-                'w-12 h-12 min-w-[48px] min-h-[48px] rounded-full',
-                'bg-neo-black/80 hover:bg-neo-black active:bg-neo-black',
-                'transition-colors duration-200 flex items-center justify-center',
-                'border-2 border-neo-cream/50 hover:border-neo-cream'
-              )}
-              aria-label={t('common.close')}
-            >
-              <X className="h-6 w-6 text-white" />
-            </button>
-          )}
 
           <div className="relative px-6 pb-6 pt-8 text-center">
             {enableGlowEffects && <div aria-hidden className="gift-rays pointer-events-none absolute left-1/2 top-2 h-72 w-72 -translate-x-1/2" />}
@@ -248,6 +288,8 @@ export function AdminGiftModal({
           </div>
         </div>
       </div>
-    )
   );
+
+  if (typeof document === 'undefined') return dialog;
+  return createPortal(dialog, document.body);
 }
