@@ -233,7 +233,7 @@ export default function PracticeCompletionMoment({
                 style={filled ? STAR_KEY : undefined}
                 className={cn(
                   // A game-style rating: the middle star sits higher and larger.
-                  'flex items-center justify-center rounded-2xl',
+                  'flex items-center justify-center rounded-neo',
                   slot === 2 ? 'mb-2 h-16 w-16' : 'h-[52px] w-[52px]',
                   !filled && 'border-[3px] border-dashed border-neo-cream/35 bg-neo-black/20'
                 )}
