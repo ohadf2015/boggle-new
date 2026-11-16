@@ -54,4 +54,14 @@ describe('GET /api/subscription/status with a complimentary grant', () => {
     expect(body.portal_url).toBe('https://polar.sh/portal');
     expect(body.grant).toBeNull();
   });
+
+  it('a past_due teacher keeps the portal link after the in-app grace ends (fix the card, not a second checkout)', async () => {
+    checkTeacherSubscription.mockResolvedValue({
+      has_pro: false, tier: 'pro', status: 'past_due', source: 'polar', grant_expired: false,
+      current_period_end: '2026-12-09T00:00:00Z', cancel_at_period_end: false,
+    });
+    const body = await (await GET(req())).json();
+    expect(body.has_pro).toBe(false);
+    expect(body.portal_url).toBe('https://polar.sh/portal');
+  });
 });
