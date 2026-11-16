@@ -1,4 +1,4 @@
-/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + one Pro entry. */
+/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + the Teacher Pro offer. */
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
@@ -19,7 +19,7 @@ import { StudentCapMeter } from './StudentCapMeter';
 import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
 import { HomeDeskBoard } from './home/HomeDeskBoard';
-import { HomeClassInsightCard } from './home/HomeClassInsightCard';
+import { DashboardProOfferCard } from './home/DashboardProOfferCard';
 import { HomeOnboardingCard } from './home/HomeOnboardingCard';
 import { HomeOnboardingPractice } from './home/HomeOnboardingPractice';
 import { HomeHowItWorks } from './home/HomeHowItWorks';
@@ -47,7 +47,6 @@ import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/e
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 import { hasProAccess, isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
-import { freeInsightClassId } from '@/lib/education/pro/freeClassInsight';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
 
 export interface TeacherDashboardProps {
@@ -160,17 +159,18 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const nextStepShown = ready && !classroomsError && nextStep !== null && (!hasClasses || week.status !== 'loading');
   // With classes, Home's one Start button replaces the old "next step" strip; the full guide only shows before the first class.
   const onboardingCardShown = nextStepShown && !hasClasses;
-  // One ask per screen: the rail Pro card waits until onboarding is known, and yields to it and to account state.
+  // One ask per screen. Yield only to an ask that is actually on screen: a hidden
+  // next-step (teachers who already have a class) used to swallow the rail, so
+  // the Teacher Pro offer never mounted and edu_pro_offer_* went to zero.
   const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
   const freeTeacher = !proLoading && pro.known && !hasProAccess(pro, nowMs);
-  const insightClass = classrooms.find((c) => c.id === freeInsightClassId(classrooms)) ?? null;
   const railAsk = pickHomeAsk({
-    account: Boolean(accountBanner),
-    onboarding: !hasClasses || nextStepShown,
-    pro: freeTeacher && insightClass !== null,
+    account: Boolean(accountBanner) || Boolean(alert),
+    onboarding: onboardingCardShown,
+    pro: freeTeacher && hasClasses,
   });
-  const proCard = askSettled && railAsk === 'pro' && insightClass ? (
-    <HomeClassInsightCard classroomId={insightClass.id} className={insightClass.name} language={language} t={t} />
+  const proCard = askSettled && railAsk === 'pro' ? (
+    <DashboardProOfferCard language={language} t={t} />
   ) : null;
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);

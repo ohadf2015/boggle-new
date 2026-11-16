@@ -127,6 +127,6 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(screen.queryByTestId('home-week-games')).toBeNull();
     expect(screen.getByTestId('home-weekly-reports').closest('.max-lg\\:hidden')).toBeNull();
     expect(screen.getByTestId('home-desk-board')).toContainElement(screen.getByTestId('home-weekly-reports'));
-    expect(screen.getByTestId('home-class-insight').closest('.max-lg\\:hidden')).toBeNull();
+    expect(screen.getByTestId('dashboard-pro-offer').closest('.max-lg\\:hidden')).toBeNull();
   });
 });
