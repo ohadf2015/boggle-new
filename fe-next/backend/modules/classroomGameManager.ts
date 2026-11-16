@@ -226,6 +226,7 @@ async function removePlayerFromClassroomGameUnlocked(
     if (!game) return;
 
     game.players = game.players.filter(p => p.userId !== userId);
+    if (game.rosterUserIds) game.rosterUserIds = game.rosterUserIds.filter((id) => id !== userId);
 
     await redis.setex(
       `classroom_game:${gameCode}`,

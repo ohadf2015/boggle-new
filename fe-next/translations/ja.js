@@ -22314,6 +22314,7 @@ const ja = {
       "brand": "クラス",
       "joinAt": "参加はこちら",
       "joined": "{count}人参加",
+      "phonesConnected": "接続中のスマホ {count}台",
       "waitingTitle": "生徒の参加を待っています",
       "waitingHint": "QRを読み取るか、コードを入力して参加",
       "startBlocked": "生徒が1人参加するとスタートできます",

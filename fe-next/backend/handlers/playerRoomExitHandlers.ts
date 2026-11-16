@@ -40,6 +40,7 @@ import { handleLateJoin } from './playerReconnectHandler';
 import { ensurePlayerState } from './playerDataInit';
 import { removeMidRoundLeaver } from './midRoundLeave.js';
 import { sessionEndedNotice } from './classroomSessionEndedNotice';
+import { broadcastClassroomRoster } from './classroomRosterBroadcast.js';
 
 interface LeaveRoomPayload {
   gameCode: string;
@@ -163,6 +164,7 @@ export function registerPlayerRoomExitHandlers(io: Server, socket: Socket): void
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
+    if (game.isClassroom) broadcastClassroomRoster(io, gameCode);
     broadcastActiveRooms(io, getActiveRooms());
   });
 

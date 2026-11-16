@@ -148,7 +148,10 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     });
   }, [playersReady, username]);
   const playerCount = filteredPlayers.length;
-  const projectorStudents = useLobbyRoster(playersReady, username);
+  // Classroom rooms: the server pushes the JOINED roster (which survives socket
+  // drops) and this merges live connection onto it. Arcade rooms never receive
+  // that push — the socket-derived path below is untouched for them.
+  const projectorStudents = useLobbyRoster(playersReady, username, gameCode);
   const hostSelectedGameMode = useHostSelectedGameMode();
   const { setGameMode: setStoreGameMode, setHostSelectedGameMode } = useGameActions();
   const [localGameMode, setLocalGameMode] = useState<GameModeOption>(hostSelectedGameMode || 'random');
@@ -220,7 +223,9 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   };
   usePracticeBotsRefusal(socketCtx?.socket ?? null, soloDemoInProgress, failSoloDemo, () => {
     // Seated bots only stand in for a practice round while no real student is here; otherwise this would start the lesson.
-    if (realStudentCount(projectorStudents.filter((s) => !s.reconnecting)) > 0) {
+    // Classroom: a reconnecting phone already joined — do not treat the class as empty (REMAFZ). Arcade rooms keep the socket grace as their only signal.
+    const seated = isClassroomMode ? projectorStudents : projectorStudents.filter((s) => !s.reconnecting);
+    if (realStudentCount(seated) > 0) {
       failSoloDemo(practiceBotsRefusalKey('students_present'));
       return;
     }

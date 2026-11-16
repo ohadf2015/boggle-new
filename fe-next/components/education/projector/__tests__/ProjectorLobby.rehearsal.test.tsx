@@ -52,10 +52,11 @@ describe('ProjectorLobby — rehearsing before the class arrives', () => {
     expect(screen.getByTestId('projector-start')).toBeEnabled();
   });
 
-  it('Given the only student dropped and is reconnecting, Then the room counts as empty and the bots preview is offered again', () => {
+  it('Given the only student dropped and is reconnecting, Then they still count as joined and bots are not offered over the class', () => {
     render(<ProjectorLobby {...props} students={[{ username: 'Ben', reconnecting: true }]} />);
-    expect(screen.getByTestId('projector-practice-round')).toBeEnabled();
-    expect(screen.queryByTestId('projector-start-count')).toBeNull();
+    expect(screen.queryByTestId('projector-practice-round')).toBeNull();
+    expect(screen.getByTestId('projector-start-count')).toHaveTextContent('1');
+    expect(screen.getByTestId('projector-start')).toBeEnabled();
   });
 
   it('Given a mode bots cannot play, Then the lobby says so instead of offering a practice that never runs', () => {

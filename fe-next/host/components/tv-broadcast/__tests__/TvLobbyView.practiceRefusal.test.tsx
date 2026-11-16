@@ -4,7 +4,11 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const handlers = new Map<string, (p: unknown) => void>();
-const socket = { on: vi.fn((e: string, h: (p: unknown) => void) => { handlers.set(e, h); }), off: vi.fn((e: string) => { handlers.delete(e); }) };
+const socket = {
+  emit: vi.fn(),
+  on: vi.fn((e: string, h: (p: unknown) => void) => { handlers.set(e, h); }),
+  off: vi.fn((e: string) => { handlers.delete(e); }),
+};
 
 vi.mock('@/lib/education/rehearsalTelemetry', () => ({ trackEduRehearsalStarted: vi.fn() }));
 vi.mock('@/components/education/projector/ProjectorLobby', () => ({
@@ -66,6 +70,22 @@ describe('TvLobbyView — practice bots refused', () => {
         gameCode="AB12CD" roomLanguage="en" username="Teacher" t={(k: string) => k} timerValue={120} difficulty="medium"
         onStartGame={vi.fn()} onExitRoom={vi.fn()} tournamentCreating={false} isClassroomMode classroomGameMode="classic"
         playersReady={[{ username: 'Teacher', isHost: true }, { username: 'Bot Ada', isBot: true }, { username: 'Ana' }]}
+        onStartSoloDemoWithBots={() => begin}
+      />,
+    );
+    fireEvent.click(screen.getByTestId('practice'));
+    act(() => handlers.get('autoFillComplete')?.({ botsAdded: 0, alreadySeated: true }));
+    expect(begin).not.toHaveBeenCalled();
+    expect(screen.getByTestId('failed')).toHaveTextContent('tvLobby.practiceRefused.students_present');
+  });
+
+  it('Given the only student dropped and is reconnecting, When already-seated bots answer, Then the lesson does not start over the class', () => {
+    const begin = vi.fn();
+    render(
+      <TvLobbyView
+        gameCode="AB12CD" roomLanguage="en" username="Teacher" t={(k: string) => k} timerValue={120} difficulty="medium"
+        onStartGame={vi.fn()} onExitRoom={vi.fn()} tournamentCreating={false} isClassroomMode classroomGameMode="classic"
+        playersReady={[{ username: 'Teacher', isHost: true }, { username: 'Bot Ada', isBot: true }, { username: 'Ben', disconnected: true }]}
         onStartSoloDemoWithBots={() => begin}
       />,
     );

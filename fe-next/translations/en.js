@@ -21335,6 +21335,7 @@ const en = {
       "brand": "Class",
       "joinAt": "Join at",
       "joined": "{count} joined",
+      "phonesConnected": "{count} phones connected",
       "waitingTitle": "Waiting for students",
       "waitingHint": "Scan the QR or type the code to join",
       "startBlocked": "Start opens once a student joins",

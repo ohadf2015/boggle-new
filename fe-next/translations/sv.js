@@ -22314,6 +22314,7 @@ const sv = {
       "brand": "Klass",
       "joinAt": "Gå med på",
       "joined": "{count} med",
+      "phonesConnected": "{count} telefoner anslutna",
       "waitingTitle": "Väntar på elever",
       "waitingHint": "Skanna QR-koden eller skriv in koden för att gå med",
       "startBlocked": "Start går att trycka på när en elev är med",
