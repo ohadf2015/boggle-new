@@ -2273,6 +2273,7 @@ const en = {
       "label": "Up for grabs",
       "streak": "{count} in a row",
       "seconds": "{seconds}s",
+      "pointsNow": "+{points} pts",
       "timeUp": "Time's up"
     },
     "correctShort": "Nailed it!",
