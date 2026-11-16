@@ -236,11 +236,20 @@ export default function CookieConsent() {
         inGameSurface ? 'z-[60]' : 'z-[200]',
         'w-full max-w-4xl mx-auto',
         // No min-h-[280px]: that forced the fold-stealing ~350px band.
-        showDetails ? 'max-h-[50vh] overflow-y-auto' : 'overflow-visible',
-        'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-hard-lg',
-        dense ? 'px-2.5 py-1.5 sm:px-4 sm:py-2' : 'px-3 py-2 sm:px-4 sm:py-3',
+        showDetails ? 'max-h-[50vh] overflow-y-auto' : 'overflow-x-clip',
+        // Full-bleed bar. A down-and-sideways hard shadow painted past the
+        // screen edge on a 411px phone (6px, RTL). An upward shadow stays
+        // inside the viewport and still separates the bar.
+        'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-[0_-4px_0_0_#000]',
+        dense ? 'px-2.5 pt-1.5 sm:px-4 sm:pt-2' : 'px-3 pt-2 sm:px-4 sm:pt-3',
         'animate-slide-up pointer-events-auto'
       )}
+      style={{
+        // Edge-to-edge Android app: clear the gesture bar, or Accept/Decline
+        // sit under the system nav. offsetHeight includes this, so the
+        // --cookie-consent-height reservation still covers it.
+        paddingBottom: 'max(0.5rem, var(--cap-safe-area-bottom, env(safe-area-inset-bottom, 0px)))',
+      }}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
       <div className={cn('flex flex-col sm:flex-row sm:items-center sm:gap-3', dense ? 'gap-1.5' : 'gap-2')}>
