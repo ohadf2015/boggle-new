@@ -44,6 +44,8 @@ import { ClassroomReteachBox } from './results/ClassroomReteachBox';
 import { ResultsPrimaryActions } from './results/ResultsPrimaryActions';
 import { roundHardestWords } from './results/roundHardestWords';
 import { StudentNextActions } from './results/StudentNextActions';
+import { ClassModeBridgeCard } from './results/ClassModeBridgeCard';
+import { classModeBridgeOffer } from '@/lib/education/classModeBridge';
 import { useReteachLinks } from './results/useReteachLinks';
 import type { ClassroomSummary } from '@/shared/types/classroom';
 import type { ReteachStatus } from './live/useReteachRound';
@@ -129,6 +131,17 @@ export function ClassroomResultsCard({
   const myIndex = humans.findIndex(
     (p) => p.username.trim().toLowerCase() === username.trim().toLowerCase()
   );
+  // Same competition rank the outcome card prints (a tie is shared first). The
+  // bridge must not invent a second placing.
+  const myRank = myIndex >= 0 ? 1 + humans.filter((p) => p.score > humans[myIndex].score).length : null;
+  const bridge = classModeBridgeOffer({
+    isTeacher,
+    classId: summary.classroomId,
+    teacherName: summary.teacherName,
+    rank: myRank,
+    hideRank: hideClassPlacings,
+    locale: language,
+  });
   const { momentum } = useSessionRoundHistory({
     sessionKey: sessionKeyFor(summary),
     score: myIndex >= 0 ? humans[myIndex].score : 0,
@@ -316,6 +329,7 @@ export function ClassroomResultsCard({
       {!isTeacher && (
         <div className="mt-4">
           <StudentNextActions onPlayAgain={onPlayAgain} onPractice={onPractice} t={t} />
+          {bridge && <ClassModeBridgeCard offer={bridge} className="mt-3" />}
         </div>
       )}
     </div>

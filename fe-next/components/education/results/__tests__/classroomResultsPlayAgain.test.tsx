@@ -125,4 +125,24 @@ describe('ClassroomResultsCard — Student Play Again', () => {
     const waiting = screen.getByTestId('wait-for-teacher-message');
     expect(waiting).toBeInTheDocument();
   });
+
+  it('given a class id, when a student finishes, then the mode-bridge carries the class and a teacher never sees it', () => {
+    const classId = '11111111-1111-4111-8111-111111111111';
+    const summary = { ...mockSummary, classroomId: classId, teacherName: 'Ms. X' };
+    const standings = [
+      { username: 'Student 1', score: 100 },
+      { username: 'Student 2', score: 80 },
+    ];
+    const student = render(
+      <ClassroomResultsCard summary={summary} username="Student 2" isTeacher={false} standings={standings} />
+    );
+    expect(screen.getByTestId('class-mode-bridge-context')).toHaveTextContent("You were #2 in Ms. X's class");
+    expect(screen.getByRole('link', { name: 'Solo daily' }).getAttribute('href')).toContain(`class_id=${classId}`);
+    student.unmount();
+
+    render(
+      <ClassroomResultsCard summary={summary} username="Ms. X" isTeacher={true} standings={standings} onRematch={mockOnRematch} />
+    );
+    expect(screen.queryByTestId('class-mode-bridge')).toBeNull();
+  });
 });
