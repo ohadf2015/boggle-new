@@ -251,4 +251,15 @@ describe('EduStudentResults', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.queryByTestId('round-hardest-words')).toBeNull();
   });
+
+  it('given a class round ended, when my phone shows results, then I get one tap into a second mode that names my place', () => {
+    const summary = {
+      ...(props as { classroomSummary: object }).classroomSummary,
+      classroomId: '11111111-1111-4111-8111-111111111111',
+    };
+    render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    expect(screen.getByTestId('class-mode-bridge-context')).toHaveTextContent("You were #2 in Ms Cohen's class");
+    expect(screen.getByRole('link', { name: 'Solo daily' }).getAttribute('href')).toContain('class_id=11111111-1111-4111-8111-111111111111');
+    expect(screen.getByRole('link', { name: 'Quick play' }).getAttribute('href')).toContain('mode=quick_play');
+  });
 });

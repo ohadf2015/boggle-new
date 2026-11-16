@@ -41,6 +41,8 @@ import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 import { useClaimedLevelUp } from './useClaimedLevelUp';
 import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
+import { classModeBridgeOffer } from '@/lib/education/classModeBridge';
+import { ClassModeBridgeCard } from '@/components/education/results/ClassModeBridgeCard';
 
 const LevelUpCelebration = dynamic(() => import('@/components/education/LevelUpCelebration'), { ssr: false });
 
@@ -112,6 +114,14 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
   const [moreOpened, setMoreOpened] = useState(false);
   const hardest = useMemo(() => (summary && lessonWordsLanded(summary) ? roundHardestWords(summary) : []), [summary]);
+  const bridge = classModeBridgeOffer({
+    isTeacher: false,
+    classId: summary?.classroomId,
+    teacherName: teacher,
+    rank: placing?.rank ?? null,
+    hideRank: false,
+    locale: c.language,
+  });
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
 
@@ -153,6 +163,12 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                 chest={reveal ? <StudentChestBeat reveal={reveal} beat={beat} reduceMotion={reduceMotion} t={t} /> : null}
                 t={t}
               />
+            </div>
+          )}
+
+          {bridge && (
+            <div className={COLUMN}>
+              <ClassModeBridgeCard offer={bridge} />
             </div>
           )}
 
