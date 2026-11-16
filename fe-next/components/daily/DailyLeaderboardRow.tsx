@@ -138,12 +138,15 @@ function RowShell({
 
       <div className="relative shrink-0">
         <div className={`w-10 h-10 ${compact ? '' : 'sm:w-12 sm:h-12'} border-2 rounded-full overflow-hidden ${isCurrentUser ? 'border-neo-cyan' : 'border-neo-black'}`}>
+          {/* `!` fill beats Avatar's own size classes (`size="lg"` = w-12 h-12)
+              regardless of stylesheet order, so the tile always matches this
+              responsive circle instead of rendering 48px inside a 40px ring. */}
           <Avatar
             avatarImage={person.avatar_image ?? undefined}
             customAvatar={person.custom_avatar ?? undefined}
             userId={avatarSeed(person)}
             size="lg"
-            className="w-full h-full"
+            className="!w-full !h-full"
           />
         </div>
         {flag && (

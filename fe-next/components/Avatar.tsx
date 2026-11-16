@@ -264,7 +264,10 @@ const Avatar = memo<AvatarProps>((props) => {
       {...frameAttr}
     >
       <AvatarRendererGuard seed={fallbackSeed}>
-        <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
+        {/* Fill the container like the custom branch: AvatarArt writes fixed
+            width/height from `size`, so without these classes the SVG stays
+            top-left-anchored (and off-center) in a smaller caller circle. */}
+        <AvatarRenderer config={fallbackConfig} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} tierMarker={tierMarker} crop={crop} />
       </AvatarRendererGuard>
     </div>
   );
