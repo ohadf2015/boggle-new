@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState, type MouseEvent } from 'react';
 import { Users } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
@@ -20,6 +20,19 @@ import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
 
+/** Touch phone: ornamental loops must not run for the whole time the home sits open. */
+function useCoarsePointer(): boolean {
+  const [coarse, setCoarse] = useState(false);
+  useLayoutEffect(() => {
+    const mq = window.matchMedia('(hover: none) and (pointer: coarse)');
+    const apply = () => setCoarse(mq.matches);
+    apply();
+    mq.addEventListener?.('change', apply);
+    return () => mq.removeEventListener?.('change', apply);
+  }, []);
+  return coarse;
+}
+
 interface PlayHeroProps {
   lang: string;
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -36,7 +49,7 @@ interface PlayHeroProps {
   onPlay?: () => void;
 }
 
-function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'>) {
+function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroProps, 'avatar' | 'animate' | 't' | 'onAvatarSaved'> & { loop: boolean }) {
   // The avatar UI (Avatar.tsx → AvatarRenderer → avatar/parts, and the edit
   // button → AvatarBuilderModal) must stay OUT of the landing module graph —
   // LandingView.bundleGraph.test.ts. The stage publishes two bare slot <div>s
@@ -59,12 +72,12 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
   return (
     <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[440px] 2xl:h-[520px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
-        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={animate} compact />
+        <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={loop} compact />
       </div>
-      <SparkleLoop enabled={animate} />
+      <SparkleLoop enabled={loop} />
       <div className="relative z-10">
       <div className={`relative [@media(max-height:700px)]:scale-[0.7] ${animate ? 'animate-[qp-avatar-pop_0.7s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''}`}>
-        <div className={animate ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
+        <div className={loop ? 'animate-[qp-avatar-bob_2.8s_ease-in-out_0.9s_infinite]' : ''}>
           <div className="relative">
             {!avatar && (
               // Signed-in profile still loading and no avatar from last time:
@@ -72,7 +85,7 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
               <div
                 data-testid="hp-avatar-skeleton"
                 aria-hidden="true"
-                className={`absolute inset-0 rounded-full border-[3px] border-black/60 bg-neo-white/10 ${animate ? 'animate-pulse' : ''}`}
+                className={`absolute inset-0 rounded-full border-[3px] border-black/60 bg-neo-white/10 ${loop ? 'animate-pulse' : ''}`}
               />
             )}
             <div
@@ -85,14 +98,14 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
         <span
           aria-hidden="true"
           className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
-            animate ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
+            loop ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
           }`}
         />
         <span
           aria-hidden="true"
           className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[84px] lg:bottom-0 2xl:-start-[96px]"
         >
-          <span className={`block ${animate ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
+          <span className={`block ${loop ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
             <Image
               src="/mascot/hello-nobg.webp"
               alt=""
@@ -127,6 +140,8 @@ function AvatarStage({ avatar, animate, t, onAvatarSaved }: Pick<PlayHeroProps, 
 }
 
 export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, onAvatarSaved, onPlay }: PlayHeroProps) {
+  const coarse = useCoarsePointer();
+  const loop = animate && !coarse;
   // Funnel numerator for the landing PLAY→onboarding leak, restored: the
   // play-first redesign (#1706) replaced FreshHero — which fired
   // `fresh_hero_play` on this CTA — with this hero, and the event's main
@@ -165,7 +180,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
       data-testid="hp-hero"
     >
       <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-10">
-        <AvatarStage avatar={avatar} animate={animate} t={t} onAvatarSaved={onAvatarSaved} />
+        <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
 
         <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-6">
           <div className="text-center lg:text-start">
@@ -189,7 +204,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             onClick={handlePlayClick}
             className="group relative flex h-[58px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[52px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-24 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-28"
           >
-            {animate && (
+            {loop && (
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/45 animate-[qp-shine_4s_ease-in-out_1.6s_infinite_both]"

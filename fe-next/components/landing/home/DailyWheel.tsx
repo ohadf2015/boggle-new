@@ -29,7 +29,7 @@ export function DailyWheel({ className }: { className?: string }) {
             placeholder="blur"
             blurDataURL={CUBE_BLUR_DATA_URL}
             sizes="160px"
-            className="scale-125 object-contain drop-shadow-[0_3px_0_rgba(0,0,0,0.5)]"
+            className="scale-125 object-contain"
           />
         </span>
       </span>
