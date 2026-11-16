@@ -45,11 +45,15 @@ export function StreakWeekStrip({ week, size = 'md', tone = 'dark', className }:
   const todayText = tone === 'light' ? 'text-neo-black' : 'text-neo-lime';
   const dayText = tone === 'light' ? 'text-neo-black/60' : 'text-neo-cream/60';
   const { t, language } = useLanguage();
-  const box = size === 'sm' ? 'h-6 w-6 md:h-8 md:w-8' : 'h-9 w-9 md:h-10 md:w-10';
+  // `sm` lives in the home's daily ticket, whose text column can be ~180px on a
+  // 360px phone: the row is capped at its natural size (7 x 24px + gaps) and each
+  // day shrinks evenly below that, instead of a fixed 192px row spilling out.
+  const fluid = size === 'sm';
+  const box = fluid ? 'aspect-square w-full' : 'h-9 w-9 md:h-10 md:w-10';
   const icon = size === 'sm' ? 'h-3.5 w-3.5 md:h-4 md:w-4' : 'h-5 w-5';
 
   return (
-    <ol data-testid="streak-week" aria-label={t('dailyStreak.flame.week')} className={cn('flex items-end gap-1 md:gap-1.5', className)}>
+    <ol data-testid="streak-week" aria-label={t('dailyStreak.flame.week')} className={cn('flex items-end gap-1 md:gap-1.5', fluid && 'w-full max-w-[12rem] md:max-w-[16.25rem]', className)}>
       {week.map((day) => (
         <li
           key={day.date}
@@ -57,7 +61,7 @@ export function StreakWeekStrip({ week, size = 'md', tone = 'dark', className }:
           data-state={day.state}
           aria-current={day.isToday ? 'date' : undefined}
           aria-label={`${dayInitial(day.date, language)}: ${t(`dailyStreak.flame.day.${day.state}`)}`}
-          className="flex flex-col items-center gap-0.5"
+          className={cn('flex flex-col items-center gap-0.5', fluid && 'min-w-0 flex-1')}
         >
           <span
             aria-hidden="true"

@@ -86,9 +86,9 @@ export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk
           )}
           <Link
             href={`/${lang}/daily`}
-            className="mt-auto inline-flex items-center gap-1.5 lg:mt-2 self-start rounded-xl border-[3px] border-black bg-black px-2.5 py-2 font-neo-display text-sm whitespace-nowrap font-bold text-neo-yellow shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:px-5 lg:py-3 lg:text-lg"
+            className="mt-auto inline-flex max-w-full items-center gap-1.5 lg:mt-2 self-start rounded-xl border-[3px] border-black bg-black px-2.5 py-2 text-start font-neo-display text-sm leading-tight font-bold lg:whitespace-nowrap text-neo-yellow shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:px-5 lg:py-3 lg:text-lg"
           >
-            <Flame className="h-4 w-4 lg:h-5 lg:w-5" strokeWidth={2.75} aria-hidden="true" />
+            <Flame className="h-4 w-4 shrink-0 lg:h-5 lg:w-5" strokeWidth={2.75} aria-hidden="true" />
             {t('homeFresh.sections.daily.cta')}
             <ArrowRight className="hidden h-5 w-5 rtl:-scale-x-100 lg:block" strokeWidth={3} aria-hidden="true" />
           </Link>

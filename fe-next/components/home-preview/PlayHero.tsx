@@ -164,10 +164,10 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
       className="relative overflow-hidden border-b-[3px] border-black lg:rounded-[28px] lg:border-[3px] lg:bg-neo-navy-elevated lg:shadow-hard-xl"
       data-testid="hp-hero"
     >
-      <div className="relative mx-auto grid w-full max-w-md gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-10">
+      <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-10">
         <AvatarStage avatar={avatar} animate={animate} t={t} onAvatarSaved={onAvatarSaved} />
 
-        <div className="relative z-10 flex flex-col gap-3 lg:gap-6">
+        <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-6">
           <div className="text-center lg:text-start">
             <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-lg">
               {greeting}

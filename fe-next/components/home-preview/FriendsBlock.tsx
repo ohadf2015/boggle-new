@@ -65,7 +65,7 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 rounded-2xl border-[3px] border-black bg-neo-navy px-3 py-3 lg:px-6 lg:py-5">
+      <div className="flex items-center justify-between gap-2 rounded-2xl border-[3px] border-black bg-neo-navy px-2.5 py-3 sm:px-3 lg:px-6 lg:py-5">
         <div className="flex flex-col items-center gap-1">
           <div className="h-14 w-14 lg:h-20 lg:w-20">
             {showAvatars && <div ref={youSlotCallback} data-testid="hp-friend-you-slot" className="h-full w-full" />}
@@ -77,11 +77,11 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
           <span className="text-[10px] font-bold tracking-[0.2em] text-neo-white/60 uppercase lg:text-xs">
             {t('homeFresh.sections.friends.room')}
           </span>
-          <div className="flex gap-1.5" dir="ltr">
+          <div className="flex gap-1 sm:gap-1.5" dir="ltr">
             {ROOM_CODE.map((ch, i) => (
               <span
                 key={ch}
-                className={`flex h-9 w-8 items-center justify-center rounded-lg border-[3px] border-black bg-neo-cream font-neo-display text-lg font-bold text-black shadow-hard-sm lg:h-14 lg:w-12 lg:text-3xl ${TILE_TILT[i]}`}
+                className={`flex h-9 w-7 items-center justify-center rounded-lg sm:w-8 border-[3px] border-black bg-neo-cream font-neo-display text-lg font-bold text-black shadow-hard-sm lg:h-14 lg:w-12 lg:text-3xl ${TILE_TILT[i]}`}
               >
                 {ch}
               </span>
