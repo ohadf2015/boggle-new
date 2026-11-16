@@ -5,6 +5,8 @@ import { teacherTrialExpiry } from '@/lib/education/trial';
 import { DAY0_BRIDGE_PAYWALL_FROM_DAY } from '@/lib/education/day0FirstClassBridge';
 
 const shown = vi.hoisted(() => vi.fn());
+const opened = vi.hoisted(() => vi.fn());
+const completed = vi.hoisted(() => vi.fn());
 const pro = vi.hoisted(() => ({
   current: {
     hasPro: false,
@@ -23,6 +25,10 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => acc
 vi.mock('@/lib/education/firstRoundGuideTelemetry', () => ({
   trackFirstRoundGuideShown: (...args: unknown[]) => shown(...args),
 }));
+vi.mock('@/lib/education/teacherOnboardingGate', () => ({
+  captureTeacherOnboardingOpened: (...args: unknown[]) => opened(...args),
+  captureTeacherOnboardingCompleted: (...args: unknown[]) => completed(...args),
+}));
 vi.mock('@/components/education/results/ResultsTeacherProTrialCard', () => ({
   ResultsTeacherProTrialCard: () => <div data-testid="pro-trial-card" />,
   CLASS_CREATED_TRIAL_PLACEMENT: 'class_created',
@@ -36,6 +42,8 @@ const HREF = '/en/education/classroom-game?classroomId=c1&minutes=2';
 describe('ClassCreatedAsk', () => {
   beforeEach(() => {
     shown.mockClear();
+    opened.mockClear();
+    completed.mockClear();
     access.current = { latestRequest: null };
     pro.current = {
       hasPro: false,
@@ -54,6 +62,35 @@ describe('ClassCreatedAsk', () => {
     fireEvent.click(cta);
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(shown).toHaveBeenCalledWith({ surface: 'class_ready', locale: 'en', step: 'day0_bridge' });
+  });
+
+  it('fires opened on the bridge mount and completed on the CTA, with teacher and classroom ids', () => {
+    const onStart = vi.fn();
+    render(
+      <ClassCreatedAsk
+        language="en"
+        href={HREF}
+        onStart={onStart}
+        teacherId="teacher-1"
+        classroomId="class-9"
+      />,
+    );
+    expect(opened).toHaveBeenCalledWith({
+      teacherId: 'teacher-1',
+      classroomId: 'class-9',
+      step: 'day0_bridge',
+      surface: 'class_ready',
+      locale: 'en',
+    });
+    fireEvent.click(screen.getByTestId('day0-first-class-cta'));
+    expect(completed).toHaveBeenCalledWith({
+      teacherId: 'teacher-1',
+      classroomId: 'class-9',
+      step: 'day0_bridge',
+      surface: 'class_ready',
+      locale: 'en',
+    });
+    expect(onStart).toHaveBeenCalledTimes(1);
   });
 
   it('renders the Teacher Pro offer card again on day 3 and after the trial', () => {

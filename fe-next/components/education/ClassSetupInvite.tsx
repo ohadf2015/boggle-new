@@ -116,6 +116,7 @@ interface InviteReadyProps {
 }
 
 function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyProps) {
+  const { user } = useAuth();
   const { hasPro, status, loading: proLoading } = useTeacherPro();
   const { markInviteCopied } = useTeacherActivationProgress();
   const { playPlayerJoinedSound } = useSoundEffects();
@@ -212,7 +213,9 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
           <ClassCreatedAsk
             language={language}
             href={startHref}
-            onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'day0_bridge' })}
+            teacherId={user?.id}
+            classroomId={classroom.id}
+            onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'day0_bridge', teacherId: user?.id, classroomId: classroom.id })}
             className="w-full text-start lg:col-span-2 lg:mx-auto lg:max-w-xl"
           />
         }
