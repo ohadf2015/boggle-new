@@ -41,7 +41,9 @@ const STAGE_STYLE: React.CSSProperties = {
 function burstFrom(el: HTMLElement | null) {
   if (!el || typeof window === 'undefined') return;
   const r = el.getBoundingClientRect();
-  fireConfetti({
+  // Cosmetic only: a confetti failure must never cost the student their answer.
+  try {
+    fireConfetti({
     particleCount: 36,
     spread: 70,
     startVelocity: 32,
@@ -49,7 +51,10 @@ function burstFrom(el: HTMLElement | null) {
     ticks: 120,
     scalar: 0.8,
     origin: { x: (r.left + r.width / 2) / window.innerWidth, y: (r.top + r.height / 2) / window.innerHeight },
-  });
+    });
+  } catch {
+    /* no confetti this time */
+  }
 }
 
 export interface SpellingChallengePracticeProps {
@@ -192,12 +197,11 @@ function SpellingRound({
         next[answeredAt] = { correct: result.correct, attempt: inputValue.trim() };
         return next;
       });
-      if (result.correct) {
-        sfx.correct();
-        burstFrom(tilesRef.current);
-      } else sfx.wrong();
+      if (result.correct) sfx.correct();
+      else sfx.wrong();
       // Keep what they typed: seeing their own spelling next to the right one is the lesson.
       setFeedback({ ...result, attempt: inputValue.trim() });
+      if (result.correct) burstFrom(tilesRef.current);
       setInputValue('');
 
       if (result.correct) setTimeout(() => setFeedback(null), 1000);
