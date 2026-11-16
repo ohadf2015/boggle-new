@@ -10,7 +10,19 @@
 
 export type BragOutcome = 'won' | 'lost' | 'tie' | 'solo';
 
+export type BragKind = 'result' | 'record' | 'worldRecord' | 'achievement' | 'level';
+
+const BRAG_KINDS: ReadonlySet<string> = new Set<BragKind>(['result', 'record', 'worldRecord', 'achievement', 'level']);
+
 export interface BragOgModel {
+  kind: BragKind;
+  headline: string;
+  /** Sanitised, any script: safe for page metadata. */
+  title: string | null;
+  me: string | null;
+  /** Same text, or null when the image's default font has no glyphs for it. */
+  imageTitle: string | null;
+  imageMe: string | null;
   outcome: BragOutcome;
   score: number;
   rivalScore: number | null;
@@ -25,6 +37,8 @@ export interface BragOgModel {
 
 const MAX_SCORE = 9_999_999;
 const MAX_NAME = 16;
+const MAX_TITLE = 40;
+const MAX_ME = 24;
 /** A zero score still needs a visible stub, or the row reads as missing data. */
 export const BRAG_OG_MIN_BAR_PCT = 4;
 
@@ -41,7 +55,14 @@ const MODE_LABELS: Record<string, string> = {
   practice: 'PRACTICE',
   daily: 'DAILY',
   random: 'ARENA',
+  quickPlay: 'QUICK PLAY',
+  multiplayer: 'ARENA',
+  tower: 'WORD TOWER',
+  single: 'SOLO',
 };
+
+// The default OG font (Geist) covers Latin and Cyrillic; anything else renders as boxes.
+const IMAGE_SAFE = /^[\p{Script=Latin}\p{Script=Cyrillic}\p{Script=Common}\p{Script=Inherited}]+$/u;
 
 const EMOJI =
   /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{20E3}]/gu;
@@ -61,7 +82,7 @@ function cleanBestWord(raw: string | null): string | null {
   return stripped.toUpperCase();
 }
 
-function cleanName(raw: string | null): string | null {
+function cleanName(raw: string | null, max = MAX_NAME): string | null {
   if (!raw) return null;
   const stripped = raw
     .replace(EMOJI, '')
@@ -69,8 +90,25 @@ function cleanName(raw: string | null): string | null {
     .replace(/[\p{C}\p{Zl}\p{Zp}\s]+/gu, ' ')
     .trim();
   if (!stripped) return null;
-  return stripped.slice(0, MAX_NAME);
+  return stripped.slice(0, max).trim();
 }
+
+function imageSafe(text: string | null): string | null {
+  return text && IMAGE_SAFE.test(text) ? text : null;
+}
+
+const KIND_HEADLINES: Record<Exclude<BragKind, 'result' | 'level'>, string> = {
+  record: 'NEW RECORD',
+  worldRecord: 'WORLD RECORD',
+  achievement: 'ACHIEVEMENT UNLOCKED',
+};
+
+const OUTCOME_HEADLINES: Record<BragOutcome, string> = {
+  won: 'VICTORY',
+  lost: 'SO CLOSE',
+  tie: 'DEAD HEAT',
+  solo: 'FINAL SCORE',
+};
 
 function barPct(value: number, peak: number): number {
   if (peak <= 0) return BRAG_OG_MIN_BAR_PCT;
@@ -85,6 +123,10 @@ export function deriveBragOgModel(sp: URLSearchParams): BragOgModel {
   const bestWord = cleanBestWord(sp.get('best'));
 
   const modeLabel = MODE_LABELS[sp.get('mode') ?? ''] ?? 'ARENA';
+  const rawKind = sp.get('kind') ?? '';
+  const kind: BragKind = BRAG_KINDS.has(rawKind) ? (rawKind as BragKind) : 'result';
+  const title = cleanName(sp.get('title'), MAX_TITLE);
+  const me = cleanName(sp.get('me'), MAX_ME);
 
   let outcome: BragOutcome;
   if (rivalScore == null) outcome = 'solo';
@@ -97,7 +139,16 @@ export function deriveBragOgModel(sp: URLSearchParams): BragOgModel {
   // result looks like a dead heat.
   const peak = Math.max(score, rivalScore ?? 0);
 
+  const headline =
+    kind === 'result' ? OUTCOME_HEADLINES[outcome] : kind === 'level' ? `LEVEL ${score}` : KIND_HEADLINES[kind];
+
   return {
+    kind,
+    headline,
+    title,
+    me,
+    imageTitle: imageSafe(title),
+    imageMe: imageSafe(me),
     outcome,
     score,
     rivalScore,

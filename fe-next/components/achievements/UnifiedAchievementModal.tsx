@@ -25,6 +25,8 @@ import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
 import type { AdventureAchievementDef } from '@/utils/adventureAchievementUtils';
 import { SilentVideo } from '@/components/ui/SilentVideo';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { BragButton, useBragSharer } from '@/components/share/BragButton';
+import { getBragShareUrl } from '@/utils/share';
 
 // ==============================================
 // TYPES
@@ -82,6 +84,8 @@ const AUTO_DISMISS_MS = 3000;
 export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
   const { t } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
+  const { me } = useBragSharer();
+  const heldRef = useRef(false);
 
   // Normalize achievement data based on type
   const normalized = useMemo((): NormalizedAchievement | null => {
@@ -158,8 +162,9 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
   // Auto-close after timeout
   useEffect(() => {
     if (!unlockId) return;
+    heldRef.current = false;
     const timer = setTimeout(() => {
-      onCloseRef.current?.();
+      if (!heldRef.current) onCloseRef.current?.();
     }, AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
   }, [unlockId]);
@@ -266,6 +271,17 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         <p className="text-center text-neo-white text-sm animate-in fade-in-0 duration-300">
           {normalized.description}
         </p>
+
+        {props.type !== 'education' && (
+          <BragButton
+            surface="achievement"
+            kind="achievement"
+            className="mt-6 w-full"
+            text={t('brag2.text.achievement', { name: normalized.name })}
+            url={getBragShareUrl('me', { score: 0, kind: 'achievement', title: normalized.name, me })}
+            onShareStart={() => { heldRef.current = true; }}
+          />
+        )}
 
         {/* Continue Button - Neo-Lime (Green) */}
         <button

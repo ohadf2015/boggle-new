@@ -86,6 +86,9 @@ export interface BragShareParams {
   mode?: string | null;
   words?: number | null;
   best?: string | null;
+  kind?: 'result' | 'record' | 'worldRecord' | 'achievement' | 'level';
+  title?: string | null;
+  me?: string | null;
 }
 
 export const getBragShareUrl = (
@@ -113,6 +116,9 @@ export const getBragShareUrl = (
     if (brag.mode) params.set('mode', brag.mode);
     if (brag.words != null) params.set('words', String(Math.max(0, Math.round(brag.words))));
     if (brag.best) params.set('best', brag.best.slice(0, 20));
+    if (brag.kind && brag.kind !== 'result') params.set('kind', brag.kind);
+    if (brag.title) params.set('title', brag.title.slice(0, 40));
+    if (brag.me) params.set('me', brag.me.slice(0, 24));
   }
   params.set('utm_source', 'brag_card');
   params.set('utm_medium', 'referral');

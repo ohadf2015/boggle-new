@@ -478,7 +478,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
       />
       <ResultsMascotMoment celebration={celebration} nearMiss={nearMiss} t={t} />
       <SoloResultsOverlays
-        results={results} mode={mode} isWinner={isWinner} gameLanguage={gameLanguage}
+        results={results} mode={mode} isWinner={isWinner}
         showTomorrowPreview={showTomorrowPreview} onTomorrowDismiss={handleTomorrowDismiss}
         wordValidationQueue={wordValidationQueue} showWordValidation={showWordValidation}
         setShowWordValidation={setShowWordValidation} onWordVote={handleWordVote}

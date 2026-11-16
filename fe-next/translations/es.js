@@ -23037,6 +23037,68 @@ const es = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "Presumir"
+    },
+    "classWin": {
+      "button": "Compartir la victoria de la clase",
+      "copied": "Enlace copiado",
+      "pageCta": "Prueba LexiClash con tu clase",
+      "pageEyebrow": "Victoria de la clase",
+      "pageHeadline": "Una clase encontró {words} palabras en equipo",
+      "pageLesson": "{found} de {total} palabras de la lección",
+      "text": "¡Nuestra clase de {students} encontró {words} palabras en equipo en {mode}!",
+      "textNoMode": "¡Nuestra clase de {students} encontró {words} palabras en equipo en LexiClash!",
+      "title": "La victoria de nuestra clase en LexiClash"
+    },
+    "mode": {
+      "blast": "Blast",
+      "daily": "Diario",
+      "edu": "Práctica",
+      "multiplayer": "Multijugador",
+      "quickPlay": "Partida rápida",
+      "single": "Solo",
+      "tower": "Torre de Palabras"
+    },
+    "mp": {
+      "bragButton": "Presumir",
+      "signInToAdd": "Inicia sesión para añadir",
+      "winText": "Gané {score}–{rival} en LexiClash. Te toca",
+      "winTextSolo": "Gané con {score} puntos en LexiClash. Te toca"
+    },
+    "page": {
+      "ctaPlay": "Jugar ahora",
+      "title": {
+        "achievement": "Logro desbloqueado. Te toca.",
+        "level": "Subí de nivel. ¿Me alcanzas?",
+        "record": "Nuevo récord personal. ¿Crees que puedes superarlo?",
+        "worldRecord": "Nuevo récord mundial. ¿Crees que puedes superarlo?"
+      }
+    },
+    "profile": {
+      "metaTitle": "{name} en LexiClash",
+      "shareTextOther": "Mira las estadísticas de este jugador en LexiClash",
+      "shareTextOwn": "Mira mis estadísticas en LexiClash: nivel {level}, {achievements} logros"
+    },
+    "solo": {
+      "body": "Mándaselo a un amigo y rétalo a superarlo.",
+      "bragButton": "Presumir",
+      "notNow": "Ahora no",
+      "recordTitle": "¡Nuevo récord!",
+      "shareText": "Hice {score} puntos en LexiClash. ¿Puedes superarlo?",
+      "shareTextRecord": "Nuevo récord en LexiClash: {score}. ¿Puedes superarlo?",
+      "winTitle": "¡Ganaste!"
+    },
+    "text": {
+      "achievement": "Desbloqueé '{name}' en LexiClash",
+      "level": "Llegué al nivel {level} en LexiClash",
+      "record": "Nuevo récord personal: {score} en {mode} en LexiClash. A ver si lo superas",
+      "worldRecord": "Acabo de batir un récord mundial en LexiClash: {score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

@@ -23025,6 +23025,68 @@ const ja = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "自慢する"
+    },
+    "classWin": {
+      "button": "クラスの勝利をシェア",
+      "copied": "リンクをコピーしました",
+      "pageCta": "クラスでLexiClashを試す",
+      "pageEyebrow": "クラスの勝利",
+      "pageHeadline": "クラスで{words}語を見つけました",
+      "pageLesson": "授業の単語 {total}語中{found}語",
+      "text": "{students}人のクラスで、{mode}で{words}語を見つけました！",
+      "textNoMode": "{students}人のクラスで、LexiClashで{words}語を見つけました！",
+      "title": "LexiClashでのクラスの勝利"
+    },
+    "mode": {
+      "blast": "ブラスト",
+      "daily": "デイリー",
+      "edu": "練習",
+      "multiplayer": "マルチプレイ",
+      "quickPlay": "クイックプレイ",
+      "single": "ソロ",
+      "tower": "ワードタワー"
+    },
+    "mp": {
+      "bragButton": "自慢する",
+      "signInToAdd": "ログインして追加",
+      "winText": "LexiClashで{score}対{rival}で勝ったよ。次はきみの番",
+      "winTextSolo": "LexiClashで{score}点で勝ったよ。次はきみの番"
+    },
+    "page": {
+      "ctaPlay": "今すぐプレイ",
+      "title": {
+        "achievement": "実績を解除！次はきみの番。",
+        "level": "レベルアップ！追いつける？",
+        "record": "自己ベスト更新！超えられる？",
+        "worldRecord": "世界記録更新！超えられる？"
+      }
+    },
+    "profile": {
+      "metaTitle": "LexiClashの{name}",
+      "shareTextOther": "このプレイヤーのLexiClashの成績を見てみて",
+      "shareTextOwn": "LexiClashの成績：レベル{level}、実績{achievements}個"
+    },
+    "solo": {
+      "body": "友だちに送って、超えられるか挑戦しよう。",
+      "bragButton": "自慢する",
+      "notNow": "あとで",
+      "recordTitle": "ハイスコア更新！",
+      "shareText": "LexiClashで{score}点取ったよ。超えられる？",
+      "shareTextRecord": "LexiClashでハイスコア更新：{score}点。超えられる？",
+      "winTitle": "勝利！"
+    },
+    "text": {
+      "achievement": "LexiClashで「{name}」を解除したよ",
+      "level": "LexiClashでレベル{level}になったよ",
+      "record": "自己ベスト更新：LexiClashの{mode}で{score}。超えてみて",
+      "worldRecord": "LexiClashで世界記録を出したよ：{score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

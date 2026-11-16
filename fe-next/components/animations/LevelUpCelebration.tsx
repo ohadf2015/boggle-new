@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +27,8 @@ interface LevelUpCelebrationProps {
   };
   /** Title unlocked by this level-up, announced under the level */
   title?: string | null;
+  /** Extra control under the level (e.g. Brag); it must stop click propagation itself. */
+  action?: ReactNode;
   /** Additional className */
   className?: string;
 }
@@ -67,6 +69,7 @@ export function LevelUpCelebration({
   autoDismissAfter = 4000,
   rewards,
   title,
+  action,
   className,
 }: LevelUpCelebrationProps) {
   const { t } = useLanguage();
@@ -233,6 +236,7 @@ export function LevelUpCelebration({
           {rewards?.coins ? (
             <p className="text-neo-white mt-2">+{rewards.coins} {t('common.coins')}</p>
           ) : null}
+          {action && <div className="mt-4 flex justify-center">{action}</div>}
         </div>
       </div>
     );
@@ -367,6 +371,8 @@ export function LevelUpCelebration({
                 ))}
               </div>
             )}
+
+            {action && <div className="relative z-10 mt-4 flex justify-center">{action}</div>}
 
             {/* Tap to continue */}
             <m.p

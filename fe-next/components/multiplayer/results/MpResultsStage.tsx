@@ -14,7 +14,6 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import InlineSignupCard from '@/components/auth/InlineSignupCard';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useShareOpenGuard } from '@/hooks/useShareOpenGuard';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
@@ -34,7 +33,8 @@ import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import { WordShowdownPanel } from './WordShowdownPanel';
-import { MpBragStrip } from './MpBragStrip';
+import { MpBragStrip, useMpBrag } from './MpBragStrip';
+import { MpGuestAddPromptProvider } from './MpGuestAddChip';
 import MpResultsDetails from './MpResultsDetails';
 import { ChallengeInviteDialog } from '@/components/friends/ChallengeInviteDialog';
 import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
@@ -158,14 +158,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once per stage mount
   }, []);
 
-  // Win share prompt: once per room, and only after the show (never over it).
-  const { shouldFireShareOpen } = useShareOpenGuard();
   const { setShowShareModal } = c;
-  useEffect(() => {
-    if (!done || !iWon || !gameCode) return;
-    if (shouldFireShareOpen(gameCode)) setShowShareModal(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per room, after the reveal
-  }, [done, gameCode, iWon]);
 
   // The signup nudge waits a beat after the show, so it never lands on the verdict.
   const [nudgeReady, setNudgeReady] = useState(false);
@@ -227,6 +220,21 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   );
   const uniqueCount = useMemo(() => (username ? selectUniqueWords(c.allPlayerWords, username).length : 0), [c.allPlayerWords, username]);
   const rival = useMemo(() => calloutRival(boardRows), [boardRows]);
+  const rivalRow = rival ? boardRows.find((r) => r.username === rival.username) : undefined;
+  const bragInput = {
+    gameCode,
+    gameMode: c.resolvedGameMode,
+    language: c.language,
+    isWinner: iWon,
+    rank: myRank,
+    playerCount: data.sortedScores.length,
+    score: myScore,
+    wordsFound: (me?.allWords ?? []).filter((w) => w.validated && !w.isDuplicate).length,
+    longestWord: bestWord?.word,
+    opponent: rival ? { name: rival.username, score: rivalRow?.score ?? 0, avatar: rivalRow?.avatar } : undefined,
+  };
+  const brag = useMpBrag(bragInput, t);
+  const canBrag = (branch === 'final' || (branch === 'intermission' && iWon)) && !c.isClassroom && !hideOutcome && !!me && !!username && data.sortedScores.length >= 2;
   const h2hLive = useRivalHeadToHead(rival, c.isAuthenticated && !c.isGuest);
   const h2h = useFrozenAfter(h2hLive, seen('card'));
   // One H2H source: the shared rival card owns the record when meetings >= 2 so MpMyCard
@@ -419,26 +427,14 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             {...(showH2hStrip ? { rival: mpH2hRival(rival, h2h), onRematch: rematch } : {})}
           />
         )}
-        {branch === 'final' && seen('card') && !c.isClassroom && !hideOutcome && me && username && data.sortedScores.length >= 2 && (
+        {canBrag && seen('card') && me && username && (
           <MpBragStrip
             visible
-            gameCode={gameCode}
-            gameMode={c.resolvedGameMode}
-            language={c.language}
-            isWinner={iWon}
-            rank={myRank}
-            playerCount={data.sortedScores.length}
-            score={myScore}
-            wordsFound={(me.allWords ?? []).filter((w) => w.validated && !w.isDuplicate).length}
-            longestWord={bestWord?.word}
+            {...bragInput}
             current={{ name: username, avatar: me.avatar, score: myScore }}
-            opponent={rival ? {
-              name: rival.username,
-              score: boardRows.find((r) => r.username === rival.username)?.score ?? 0,
-              avatar: boardRows.find((r) => r.username === rival.username)?.avatar,
-            } : undefined}
             modeLabel={(c.resolvedGameMode || 'multiplayer').toUpperCase()}
             onChallenge={openChallenge}
+            onShareStart={auto.cancel}
             className={fx.cardIn}
             t={t}
           />
@@ -496,7 +492,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
-            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={() => setShowShareModal(true)} onChallenge={c.isClassroom ? undefined : openChallenge} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
+            <MpFinalFooter isHost={isHost} isReady={isReady} onRematch={rematch} onLeave={c.requestExit} onShare={canBrag ? () => { auto.cancel(); void brag.share('mp_results_footer'); } : () => setShowShareModal(true)} onChallenge={c.isClassroom ? undefined : openChallenge} leaveKey={exitCopy.leaveKey} auto={auto} t={t} />
           ) : (
             <MpIntermissionFooter
               isHost={isHost}
@@ -525,7 +521,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   );
 
   return (
-    <>
+    <MpGuestAddPromptProvider value={!c.isClassroom}>
       <MpScreen testId="mp-results" header={header} body={body} footer={footer} />
       {done && (
         <>
@@ -571,6 +567,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           allowedFlows={['live']}
         />
       )}
-    </>
+    </MpGuestAddPromptProvider>
   );
 }

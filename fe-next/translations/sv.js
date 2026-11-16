@@ -23025,6 +23025,68 @@ const sv = {
     }
   },
   // @publicName:end
+  // @brag2:start
+  "brag2": {
+    "button": {
+      "brag": "Skryt"
+    },
+    "classWin": {
+      "button": "Dela klassens vinst",
+      "copied": "Länken kopierad",
+      "pageCta": "Testa LexiClash med din klass",
+      "pageEyebrow": "Klassvinst",
+      "pageHeadline": "En klass hittade {words} ord tillsammans",
+      "pageLesson": "{found} av {total} ord från lektionen",
+      "text": "Vår klass på {students} hittade {words} ord tillsammans i {mode}!",
+      "textNoMode": "Vår klass på {students} hittade {words} ord tillsammans i LexiClash!",
+      "title": "Vår klass vinst i LexiClash"
+    },
+    "mode": {
+      "blast": "Blast",
+      "daily": "Dagens",
+      "edu": "Övning",
+      "multiplayer": "Flerspelare",
+      "quickPlay": "Snabbspel",
+      "single": "Solo",
+      "tower": "Ordtornet"
+    },
+    "mp": {
+      "bragButton": "Skryt",
+      "signInToAdd": "Logga in för att lägga till",
+      "winText": "Jag vann {score}–{rival} i LexiClash. Din tur",
+      "winTextSolo": "Jag vann med {score} poäng i LexiClash. Din tur"
+    },
+    "page": {
+      "ctaPlay": "Spela nu",
+      "title": {
+        "achievement": "Ny prestation upplåst. Din tur.",
+        "level": "Ny nivå. Hinner du ikapp?",
+        "record": "Nytt personbästa. Tror du att du kan slå det?",
+        "worldRecord": "Nytt världsrekord. Tror du att du kan slå det?"
+      }
+    },
+    "profile": {
+      "metaTitle": "{name} i LexiClash",
+      "shareTextOther": "Kolla in den här spelarens statistik i LexiClash",
+      "shareTextOwn": "Kolla min statistik i LexiClash: nivå {level}, {achievements} prestationer"
+    },
+    "solo": {
+      "body": "Skicka till en kompis och utmana hen att slå det.",
+      "bragButton": "Skryt",
+      "notNow": "Inte nu",
+      "recordTitle": "Nytt rekord!",
+      "shareText": "Jag fick {score} poäng i LexiClash. Kan du slå det?",
+      "shareTextRecord": "Nytt rekord i LexiClash: {score}. Kan du slå det?",
+      "winTitle": "Du vann!"
+    },
+    "text": {
+      "achievement": "Låste upp '{name}' i LexiClash",
+      "level": "Nådde nivå {level} i LexiClash",
+      "record": "Nytt personbästa: {score} i {mode} i LexiClash. Slå det om du kan",
+      "worldRecord": "Jag satte precis ett världsrekord i LexiClash: {score}"
+    }
+  },
+  // @brag2:end
   // @rivalPings:start
   "rivalPings": {
     "ping": {

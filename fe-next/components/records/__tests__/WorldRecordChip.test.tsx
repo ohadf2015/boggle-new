@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const capture = vi.fn();
 const state: { records: unknown[]; status: string; userId: string | null; name: string | null; loading: boolean } = { records: [], status: 'ready', userId: null, name: null, loading: false };
@@ -11,6 +11,9 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: state.userId ? { id: state.userId } : null, profile: state.userId ? { display_name: state.name } : null, loading: state.loading }),
 }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => capture(...a) } }));
+const share = vi.fn();
+vi.mock('@/utils/shareWithFallback', () => ({ shareWithFallback: (...a: unknown[]) => share(...a) }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/en/quick-play' }));
 vi.mock('@/lib/records/useWorldRecords', () => ({ useWorldRecords: () => ({ records: state.records, status: state.status, retry: vi.fn() }) }));
 
 import { WorldRecordChip } from '../WorldRecordChip';
@@ -44,9 +47,28 @@ describe('WorldRecordChip', () => {
     expect(screen.queryByText(/worldRecords.chip.gap/)).toBeNull();
   });
 
+  it('Given a signed-in named player over the record, Then Brag shares a world-record link', async () => {
+    state.userId = 'u5';
+    state.name = 'Noa';
+    share.mockReset().mockResolvedValue('shared');
+    Object.defineProperty(window, 'location', { value: { origin: 'https://lexiclash.live', pathname: '/en/quick-play' }, writable: true });
+    render(<WorldRecordChip mode="tower" score={4000.7} />);
+    fireEvent.click(screen.getByTestId('brag-button-world_record'));
+    await waitFor(() => expect(share).toHaveBeenCalled());
+    const { text, url } = share.mock.calls[0][0];
+    expect(text).toContain('brag2.text.worldRecord');
+    expect(text).toContain('worldRecords.metres');
+    const q = new URL(url).searchParams;
+    expect(q.get('kind')).toBe('worldRecord');
+    expect(q.get('score')).toBe('4001');
+    expect(q.get('mode')).toBe('tower');
+    expect(q.get('me')).toBe('Noa');
+  });
+
   it('Given a guest over the record, Then it tells them to sign in to claim it', () => {
     render(<WorldRecordChip mode="quickPlay" score={1000} />);
     expect(screen.getByText('worldRecords.chip.claimSignIn')).toBeTruthy();
+    expect(screen.queryByTestId('brag-button-world_record')).toBeNull();
   });
 
   it('Given a signed-in player with a generated name over the record, Then it asks for a real name', () => {
