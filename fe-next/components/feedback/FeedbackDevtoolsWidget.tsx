@@ -36,7 +36,9 @@
  */
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { runWhenScrollSettles } from '@/lib/perf/runWhenScrollSettles';
+import { isFeedbackWidgetHiddenPath } from '@/lib/feedback/feedbackWidgetRoutes';
 import {
     FEEDBACK_WIDGET_SRC,
     FEEDBACK_WIDGET_TOKEN,
@@ -148,9 +150,35 @@ function syncWidgetLocale(locale: string): void {
     api.init({ locale });
 }
 
+/**
+ * Student play pages and the projected class board run without the launcher
+ * (see feedbackWidgetRoutes). The widget survives client navigation, so leaving
+ * a teacher page for one of those destroys it, and coming back re-inits it.
+ */
+function syncWidgetVisibility(hidden: boolean, locale?: string): void {
+    const api = (window as unknown as { feedbackDevTools?: FeedbackWidgetApi }).feedbackDevTools;
+    if (!api || !document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) return;
+    if (hidden && api.active) api.destroy();
+    else if (!hidden && !api.active) api.init(locale ? { locale } : undefined);
+}
+
 export default function FeedbackDevtoolsWidget({ lang }: { lang?: string } = {}): ReactNode {
     const langRef = useRef(lang);
     langRef.current = lang;
+    const hidden = isFeedbackWidgetHiddenPath(usePathname());
+    const hiddenRef = useRef(hidden);
+    hiddenRef.current = hidden;
+    // The first gesture happened on a hidden page: inject on the first visible one.
+    const intentSeenRef = useRef(false);
+
+    useEffect(() => {
+        if (!isFeedbackWidgetEnabled()) return;
+        if (!hidden && intentSeenRef.current && !document.getElementById(FEEDBACK_WIDGET_SCRIPT_ID)) {
+            injectFeedbackWidget(langRef.current);
+            return;
+        }
+        syncWidgetVisibility(hidden, langRef.current);
+    }, [hidden]);
 
     useEffect(() => {
         if (lang) syncWidgetLocale(lang);
@@ -163,7 +191,10 @@ export default function FeedbackDevtoolsWidget({ lang }: { lang?: string } = {})
             for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
                 window.removeEventListener(ev, onIntent);
             }
-            cancelPending = runWhenScrollSettles(() => injectFeedbackWidget(langRef.current));
+            cancelPending = runWhenScrollSettles(() => {
+                intentSeenRef.current = true;
+                if (!hiddenRef.current) injectFeedbackWidget(langRef.current);
+            });
         };
         for (const ev of FEEDBACK_WIDGET_INTENT_EVENTS) {
             window.addEventListener(ev, onIntent, { once: true, passive: true });

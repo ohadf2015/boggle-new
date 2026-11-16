@@ -21649,7 +21649,9 @@ const sv = {
       "answerIs": "Det stavas",
       "youWrote": "Du skrev",
       "next": "Nästa ord",
-      "finish": "Se mitt resultat"
+      "finish": "Se mitt resultat",
+      "praise": "Klockrent!|Helt rätt!|Perfekt!|Du fixade det!|Lysande!",
+      "progress": "Ord {current} av {total}"
     },
     "cookie": {
       "message": "Vi använder kakor för att räkna spel och hålla spelet igång smidigt."
