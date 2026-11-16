@@ -952,6 +952,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, daily,
           canSwap={activeRack.length > 0 && canInteract}
           disabled={!canInteract || !dict}
           onSubmit={submitMoveWithTelemetry}
+          onSubmitBlocked={() => showClue(null, t('wordcraft.submitEmpty', 'Place a tile on the board first'))}
           onRecall={recallAllPending}
           onPass={() => {
             playPassSound();

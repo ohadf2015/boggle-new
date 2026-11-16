@@ -20623,6 +20623,7 @@ const he = {
     "bagRemaining": "שק",
     "yourRack": "האותיות שלכם",
     "submit": "שלחו",
+    "submitEmpty": "קודם מניחים אות על הלוח",
     "recall": "החזרה",
     "pass": "דילוג",
     "swap": "החלפה",

@@ -18756,6 +18756,7 @@ const en = {
     "bagRemaining": "Bag",
     "yourRack": "Your rack",
     "submit": "Submit",
+    "submitEmpty": "Place a tile on the board first",
     "recall": "Recall",
     "pass": "Pass",
     "swap": "Swap",

@@ -10,6 +10,8 @@ export interface WordCraftControlsProps {
   canSwap: boolean;
   disabled: boolean;
   onSubmit: () => void;
+  /** Tapped Submit with no move ready: lets the screen explain why nothing happened. */
+  onSubmitBlocked?: () => void;
   onRecall: () => void;
   onPass: () => void;
   onSwap: () => void;
@@ -41,20 +43,25 @@ function WordCraftControlsImpl({
   canSwap,
   disabled,
   onSubmit,
+  onSubmitBlocked,
   onRecall,
   onPass,
   onSwap,
   onClue,
   cluesRemaining,
   labels,
-}: WordCraftControlsProps) {
+}:WordCraftControlsProps) {
   const submitLive = canSubmit && !disabled;
   return (
     <div data-wc-controls className="flex gap-2 justify-center items-stretch shrink-0 pb-[max(0px,env(safe-area-inset-bottom))]">
       <button
         type="button"
-        onClick={onSubmit}
-        disabled={disabled || !canSubmit}
+        // With nothing placed the button stays tappable (aria-disabled, not
+        // `disabled`) so a tap can say why nothing happened; a natively
+        // disabled button swallows the click and reads as broken (rageclicks).
+        onClick={canSubmit || !onSubmitBlocked ? onSubmit : onSubmitBlocked}
+        disabled={disabled || (!canSubmit && !onSubmitBlocked)}
+        aria-disabled={!submitLive || undefined}
         aria-label={labels.submit}
         title={labels.submit}
         className={cn(
@@ -63,6 +70,7 @@ function WordCraftControlsImpl({
           'shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed',
           'flex items-center justify-center gap-2 transition-transform',
           'disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-hard-pressed',
+          !submitLive && 'opacity-40 shadow-hard-pressed',
           submitLive && 'wc-submit-pulse hover:-translate-y-0.5',
         )}
       >

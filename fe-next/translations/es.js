@@ -20457,6 +20457,7 @@ const es = {
     "bagRemaining": "Bolsa",
     "yourRack": "Tu atril",
     "submit": "Jugar",
+    "submitEmpty": "Primero coloca una ficha en el tablero",
     "recall": "Devolver",
     "pass": "Pasar",
     "swap": "Cambiar",

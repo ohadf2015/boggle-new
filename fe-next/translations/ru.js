@@ -17967,6 +17967,7 @@ const ru = {
     "bagRemaining": "Мешок",
     "yourRack": "Твои буквы",
     "submit": "Отправить",
+    "submitEmpty": "Сначала поставь плитку на поле",
     "recall": "Вернуть",
     "pass": "Пас",
     "swap": "Обменять",

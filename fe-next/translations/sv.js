@@ -20690,6 +20690,7 @@ const sv = {
     "bagRemaining": "Påse",
     "yourRack": "Ditt ställ",
     "submit": "Skicka",
+    "submitEmpty": "Placera en bricka på brädet först",
     "recall": "Ångra",
     "pass": "Passa",
     "swap": "Byt",

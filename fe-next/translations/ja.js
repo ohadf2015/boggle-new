@@ -20332,6 +20332,7 @@ const ja = {
     "bagRemaining": "袋",
     "yourRack": "あなたのラック",
     "submit": "決定",
+    "submitEmpty": "まずタイルをボードに置いてね",
     "recall": "戻す",
     "pass": "パス",
     "swap": "交換",
