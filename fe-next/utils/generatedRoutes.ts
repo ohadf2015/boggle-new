@@ -234,5 +234,6 @@ export const PUBLIC_ROUTES: string[] = [
   "/word-tower/daily",
   "/wordle-solver",
   "/words",
-  "/words-with-friends-alternative"
+  "/words-with-friends-alternative",
+  "/wordscapes-alternative"
 ];

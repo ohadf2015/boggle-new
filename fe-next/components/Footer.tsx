@@ -149,6 +149,9 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link prefetch={false} href={`/${language}/guides`} className={footerLinkClass}>{t('footer.guides', 'Guides')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/glossary`} className={footerLinkClass}>{t('footer.glossary', 'Glossary')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/tools/word-solver`} className={footerLinkClass}>{t('footer.wordSolver')}</Link></li>
+              {language === 'en' && (
+                <li><Link prefetch={false} href="/en/wordscapes-alternative" className={footerLinkClass}>Wordscapes Alternative</Link></li>
+              )}
               <li><Link prefetch={false} href={`/${language}/sitemap`} className={footerLinkClass}>{t('footer.sitemap', 'Sitemap')}</Link></li>
             </ul>
           </nav>

@@ -98,6 +98,7 @@ describe('sitemap', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     const required = [
       'https://www.lexiclash.live/en/words-with-friends-alternative',
+      'https://www.lexiclash.live/en/wordscapes-alternative',
       'https://www.lexiclash.live/en/online-word-games-with-friends',
       'https://www.lexiclash.live/en/free-multiplayer-word-game',
       'https://www.lexiclash.live/en/play-boggle-online-free',

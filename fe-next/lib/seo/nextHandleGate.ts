@@ -144,6 +144,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'word-tower',
   'words',
   'words-with-friends-alternative',
+  'wordscapes-alternative',
 ]);
 
 /**
