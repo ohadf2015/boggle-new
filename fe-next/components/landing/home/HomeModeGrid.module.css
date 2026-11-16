@@ -122,3 +122,12 @@
     transform: rotate(3deg) scale(1.08);
   }
 }
+
+/* Same rule as the daily wheel: a phone sitting on home stops ornamental
+   bobs after two beats so the GPU can clock down. Must follow the shorthands. */
+@media (hover: none) and (pointer: coarse) {
+  .art,
+  .featuredBadge {
+    animation-iteration-count: 2;
+  }
+}

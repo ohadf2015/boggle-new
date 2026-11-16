@@ -8,12 +8,28 @@
   transform: translate(-50%, -50%);
 }
 
+/* Yellow ring, not a fill. Opacity-only so the flash is a compositor layer;
+   a background-color / color loop on every letter forced a paint each frame. */
+.tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 3px #ffe135;
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .rim {
     animation: turn 24s linear infinite;
   }
   .tile {
     animation: lit 3.4s ease-out infinite both;
+    animation-delay: calc(var(--i, 0) * 260ms);
+  }
+  .tile::after {
+    animation: lamp 3.4s ease-out infinite both;
     animation-delay: calc(var(--i, 0) * 260ms);
   }
   .core {
@@ -28,27 +44,31 @@
 }
 
 @keyframes lit {
-  0% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
-    background-color: #1a1a2e;
-    color: #fffef0;
   }
   6% {
     transform: translate(-50%, -62%) scale(1.28);
-    background-color: #ffe135;
-    color: #1a1a2e;
   }
   14%,
   52% {
     transform: translate(-50%, -54%) scale(1.08);
-    background-color: #ffe135;
-    color: #1a1a2e;
   }
+  60% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes lamp {
+  0%,
   60%,
   100% {
-    transform: translate(-50%, -50%) scale(1);
-    background-color: #1a1a2e;
-    color: #fffef0;
+    opacity: 0;
+  }
+  6%,
+  52% {
+    opacity: 1;
   }
 }
 
@@ -163,5 +183,19 @@
   .heroCta {
     align-self: start;
     max-width: 34rem;
+  }
+}
+
+/* A phone left on home must be allowed to idle the GPU. Two beats, then the
+   resting frame. Desktop (fine pointer) keeps the loops. Must follow the
+   shorthands above or they reset the count. */
+@media (hover: none) and (pointer: coarse) {
+  .rim,
+  .tile,
+  .tile::after,
+  .core,
+  .nudge,
+  .cta::after {
+    animation-iteration-count: 2;
   }
 }
