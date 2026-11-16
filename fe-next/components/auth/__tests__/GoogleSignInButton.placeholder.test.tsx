@@ -35,4 +35,9 @@ describe('GoogleSignInButton placeholder (no layout jump while GSI loads)', () =
     render(<GoogleSignInButton />);
     await waitFor(() => expect(screen.queryByTestId('gsi-placeholder')).toBeNull());
   });
+
+  it('given the dark site theme, then the GSI container opts into light so the iframe gets no white backdrop', () => {
+    render(<GoogleSignInButton />);
+    expect(screen.getByTestId('gsi-button-container').style.colorScheme).toBe('light');
+  });
 });
