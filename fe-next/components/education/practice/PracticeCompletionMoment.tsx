@@ -238,12 +238,14 @@ export default function PracticeCompletionMoment({
         )}
 
         {stats && stats.length > 0 && (
-          <div className="grid w-full grid-cols-2 gap-2">
+          // Two per row, and an odd one out sits centred: a lone "Time" tile used to
+          // hug the start edge of a two-column grid with an empty cell beside it.
+          <div data-testid="practice-completion-stats" className="flex w-full flex-wrap justify-center gap-2">
             {stats.map((stat) => (
               <div
                 key={stat.key}
                 data-testid={`practice-completion-stat-${stat.key}`}
-                className="rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/25 px-2 py-1.5"
+                className="basis-[calc(50%-0.25rem)] rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/25 px-2 py-1.5"
               >
                 <p className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-cyan">
                   {stat.value}

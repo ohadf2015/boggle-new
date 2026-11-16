@@ -266,3 +266,21 @@ describe('PracticeCompletionMoment card edge', () => {
     expect(card.className).not.toContain('border-black');
   });
 });
+
+describe('PracticeCompletionMoment stats row', () => {
+  it('Given one stat, Then it sits centred instead of hugging one side of a two-column grid', () => {
+    render(
+      <PracticeCompletionMoment
+        correct={3}
+        total={10}
+        stats={[{ key: 'time', label: 'Time', value: '0:13' }]}
+        onAgain={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    const row = screen.getByTestId('practice-completion-stats');
+    expect(row.className).toContain('justify-center');
+    expect(row.className).not.toContain('grid-cols-2');
+    expect(screen.getByTestId('practice-completion-stat-time').className).toContain('basis-[calc(50%-0.25rem)]');
+  });
+});
