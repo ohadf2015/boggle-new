@@ -199,8 +199,11 @@ export default function PracticeCompletionMoment({
         </h2>
         {badge}
 
-        {/* Mascot reacts to the rank — celebration, trophy or a pat on the back. */}
-        <Mascot variant={plan.mascot} size="sm" animated clipBorder="none" />
+        {/* Mascot reacts to the rank — celebration, trophy or a pat on the back.
+            Every rank sits in the same round frame: the gold and silver art carry
+            a dark square of their own that showed as a box on this card, while
+            the bronze art was already circled. */}
+        <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" />
 
         <p className="font-neo-body text-sm font-bold text-neo-white/85 tabular-nums">
           {t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}

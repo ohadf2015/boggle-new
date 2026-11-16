@@ -40,7 +40,9 @@ vi.mock('@/components/motion/AdaptiveMotion', async () => {
 });
 
 vi.mock('@/components/ui/Mascot', () => ({
-  Mascot: ({ variant }: { variant: string }) => <div data-testid="mascot" data-variant={variant} />,
+  Mascot: ({ variant, clipShape }: { variant: string; clipShape?: string }) => (
+    <div data-testid="mascot" data-variant={variant} data-clip={clipShape} />
+  ),
 }));
 
 const baseProps = {
@@ -97,6 +99,14 @@ describe('PracticeCompletionMoment', () => {
   it('shows the mascot reacting to the rank', () => {
     render(<PracticeCompletionMoment {...baseProps} correct={1} total={10} />);
     expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+  });
+
+  it('frames every rank\'s mascot in the same circle, so dark art never shows as a box', () => {
+    for (const correct of [10, 8, 1]) {
+      const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
+      expect(screen.getByTestId('mascot')).toHaveAttribute('data-clip', 'circle');
+      unmount();
+    }
   });
 
   it('shows the XP payout when XP was earned', () => {
