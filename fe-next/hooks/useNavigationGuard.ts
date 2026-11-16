@@ -54,8 +54,24 @@ interface UseNavigationGuardOptions {
  * fires the pop is usually already unmounted when it lands.
  */
 let pendingPhantomPops = 0;
+/**
+ * Pops whose claim TTL already elapsed, but which the browser may still deliver
+ * when the next round plants its phantom (go(-1) deferred until the next
+ * history mutation). Dropping the claim on the TTL alone made that delivery
+ * look like Back: Word Hunt opened "Leave the Hunt?" at round start and Radix
+ * set pointer-events:none on the body, so the tiles could not be touched.
+ */
+let latePhantomSwallows = 0;
+/** Bumped by the test reset so a TTL callback from a previous case cannot arm a swallow. */
+let phantomEpoch = 0;
 /** A pop that never arrives must not swallow a real back press later. */
 const PHANTOM_POP_TTL_MS = 1000;
+/**
+ * After a new guard plants, how long to keep a late claim. A deferred go(-1)
+ * arrives in the same turn or the next frame; this is the slow-phone ceiling.
+ * Past it, the pop was lost and a real back press must still be guarded.
+ */
+const LATE_PHANTOM_AFTER_PLANT_MS = 1500;
 /**
  * How often a deferred plant re-checks whether the stack has settled.
  *
@@ -81,6 +97,8 @@ const PHANTOM_SETTLE_POLL_MS = 50;
  */
 export function resetPhantomPopStateForTests(): void {
   pendingPhantomPops = 0;
+  latePhantomSwallows = 0;
+  phantomEpoch += 1;
 }
 
 export function useNavigationGuard({
@@ -176,6 +194,16 @@ export function useNavigationGuard({
       phantomHrefRef.current = window.location.href;
       window.history.pushState({ gameGuard: true }, '', window.location.href);
       historyPushedRef.current = true;
+      // A claim the TTL already released may still pop when this pushState
+      // runs. Keep it only briefly after the plant — long enough for that
+      // deferred pop, not long enough to eat a real back press mid-round.
+      if (latePhantomSwallows > 0) {
+        const epoch = phantomEpoch;
+        setTimeout(() => {
+          if (epoch !== phantomEpoch) return;
+          if (latePhantomSwallows > 0) latePhantomSwallows--;
+        }, LATE_PHANTOM_AFTER_PLANT_MS);
+      }
     };
     plantPhantom();
 
@@ -183,6 +211,10 @@ export function useNavigationGuard({
       // Our own teardown's go(-1) coming home — not the user pressing back.
       if (pendingPhantomPops > 0) {
         pendingPhantomPops--;
+        return;
+      }
+      if (latePhantomSwallows > 0) {
+        latePhantomSwallows--;
         return;
       }
       // Prevent rapid-fire handling
@@ -229,10 +261,16 @@ export function useNavigationGuard({
       if (typeof window !== 'undefined' && window.location.href === phantomHref) {
         pendingPhantomPops++;
         window.history.go(-1);
-        // If the browser never delivers it (navigated away first), drop the
-        // claim so a later real back press is still guarded.
+        // If the browser never delivers it (navigated away first), stop blocking
+        // the next plant. Do not forget the pop: it can still arrive when the
+        // next round's pushState runs, and that must not open the quit dialog.
+        const epoch = phantomEpoch;
         setTimeout(() => {
-          if (pendingPhantomPops > 0) pendingPhantomPops--;
+          if (epoch !== phantomEpoch) return;
+          if (pendingPhantomPops > 0) {
+            pendingPhantomPops--;
+            latePhantomSwallows++;
+          }
         }, PHANTOM_POP_TTL_MS);
       }
     };
