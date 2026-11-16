@@ -21,7 +21,7 @@
  * reduced motion is a motion preference, not a silence preference.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { AdaptiveMotion, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -67,6 +67,48 @@ const RANK_ACCENT: Record<string, string> = {
   silver: 'bg-neo-cyan',
   bronze: 'bg-neo-lime',
 };
+
+/* The card's colour comes from the rank: a glow behind the stars, a matching
+   hard shadow, and sun rays behind the mascot. Static gradients, no blur. */
+const RANK_HUE: Record<string, string> = {
+  gold: 'var(--neo-yellow)',
+  silver: 'var(--neo-cyan)',
+  bronze: 'var(--neo-lime)',
+};
+const RANK_SHADOW: Record<string, string> = {
+  gold: 'shadow-hard-yellow-xl',
+  silver: 'shadow-hard-cyan-xl',
+  bronze: 'shadow-hard-lime-xl',
+};
+
+/* A filled star is a chunky gold key (the same candy face as the letter tiles). */
+const STAR_KEY: CSSProperties = {
+  background: '#FFD32A',
+  border: '3px solid #0b1530',
+  boxShadow: '0 4px 0 0 #0b1530, inset 0 3px 0 rgba(255,255,255,0.6), inset 0 -6px 0 #C98A00',
+};
+
+/** Count up from 0 to `to` over ~`ms`; lands on `to` at once when motion is skipped. */
+function useCountUp(to: number, ms: number, skip: boolean, delayMs = 0): number {
+  const [value, setValue] = useState(skip ? to : 0);
+  useEffect(() => {
+    if (skip || typeof requestAnimationFrame !== 'function') {
+      setValue(to);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const tick = (now: number) => {
+      if (!start) start = now + delayMs;
+      const k = Math.min(1, Math.max(0, (now - start) / ms));
+      setValue(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to, ms, skip, delayMs]);
+  return value;
+}
 
 export default function PracticeCompletionMoment({
   correct,
@@ -135,6 +177,9 @@ export default function PracticeCompletionMoment({
     playSound('coinCollect', { requiresGameActive: false, volume: 0.45 });
   }, [playSound]);
 
+  const shownCorrect = useCountUp(correct, 700, skipAnimations, 350);
+  const shownPercent = useCountUp(plan.percent, 700, skipAnimations, 350);
+
   const headline = plan.perfect
     ? t('student.practiceFun.headline.perfect')
     : t(`student.practiceFun.headline.${plan.rank}`);
@@ -145,10 +190,15 @@ export default function PracticeCompletionMoment({
       data-rank={plan.rank}
       dir={dir}
       className={cn(
-        'relative mx-auto w-full max-w-sm overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard-lg',
+        'relative mx-auto w-full max-w-sm overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-light',
+        RANK_SHADOW[plan.rank],
         className
       )}
+      style={{
+        backgroundImage: `radial-gradient(90% 45% at 50% 0%, color-mix(in srgb, ${RANK_HUE[plan.rank]} 30%, transparent), transparent 75%)`,
+      }}
     >
+      <style>{'@keyframes lc-rays{to{transform:rotate(360deg)}}@keyframes lc-cta-breathe{0%,100%{scale:1}50%{scale:1.03}}'}</style>
       <span className={cn('block h-2.5 w-full', RANK_ACCENT[plan.rank])} aria-hidden="true" />
 
       {/* Leaving is chrome, not a third button competing with the payoff. */}
@@ -167,7 +217,7 @@ export default function PracticeCompletionMoment({
         <div
           data-testid="practice-completion-stars"
           data-stars={plan.stars}
-          className="flex items-center justify-center gap-1.5"
+          className="flex items-end justify-center gap-2 pt-1"
           role="img"
           aria-label={t('student.practiceFun.starsEarned', { count: plan.stars })}
         >
@@ -180,13 +230,16 @@ export default function PracticeCompletionMoment({
                 initial={{ scale: 0.2, rotate: -25 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.12 * slot, type: 'spring', stiffness: 380, damping: 13 }}
+                style={filled ? STAR_KEY : undefined}
                 className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-neo border-[3px] border-neo-black',
-                  filled ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-navy/60 border-neo-black/40'
+                  // A game-style rating: the middle star sits higher and larger.
+                  'flex items-center justify-center rounded-2xl',
+                  slot === 2 ? 'mb-2 h-16 w-16' : 'h-[52px] w-[52px]',
+                  !filled && 'border-[3px] border-dashed border-neo-cream/35 bg-neo-black/20'
                 )}
               >
                 <Star
-                  className={cn('h-6 w-6', filled ? 'fill-neo-black text-neo-black' : 'text-neo-white/50')}
+                  className={cn(slot === 2 ? 'h-9 w-9' : 'h-7 w-7', filled ? 'fill-neo-navy text-neo-navy' : 'text-neo-white/35')}
                   aria-hidden="true"
                 />
               </AdaptiveMotion.div>
@@ -203,10 +256,26 @@ export default function PracticeCompletionMoment({
             Every rank sits in the same round frame: the gold and silver art carry
             a dark square of their own that showed as a box on this card, while
             the bronze art was already circled. */}
-        <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" />
+        <div className="relative flex items-center justify-center">
+          <span
+            aria-hidden="true"
+            data-testid="practice-completion-rays"
+            className="pointer-events-none absolute left-1/2 top-1/2 size-56 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 motion-safe:animate-[lc-rays_14s_linear_infinite]"
+            style={{
+              background: `repeating-conic-gradient(from 0deg, ${RANK_HUE[plan.rank]} 0deg 9deg, transparent 9deg 22deg)`,
+              maskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
+            }}
+          />
+          <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" className="relative" />
+        </div>
 
-        <p className="font-neo-body text-sm font-bold text-neo-white/85 tabular-nums">
-          {t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}
+        {/* The score counts up as the card lands; the final line is what assistive tech reads. */}
+        <p className="font-neo-display text-lg font-black text-neo-white tabular-nums">
+          <span className="sr-only">{t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}</span>
+          <span aria-hidden="true" data-testid="practice-completion-score">
+            {t('student.practiceFun.scoreLine', { correct: shownCorrect, total, percent: shownPercent })}
+          </span>
         </p>
 
         {xpEarned > 0 && (
@@ -272,7 +341,7 @@ export default function PracticeCompletionMoment({
             data-primary="true"
             data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
             onClick={onNext ?? onAgain}
-            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-hard transition hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-[0_6px_0_0_#0b1530,inset_0_2px_0_rgba(255,255,255,0.55),inset_0_-5px_0_rgba(0,0,0,0.18)] transition active:translate-y-[5px] active:shadow-[0_1px_0_0_#0b1530] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan motion-safe:animate-[lc-cta-breathe_2.4s_ease-in-out_1.2s_infinite]"
           >
             {onNext ? (
               <>

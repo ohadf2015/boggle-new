@@ -294,3 +294,18 @@ describe('PracticeCompletionMoment stats row', () => {
     expect(screen.getByTestId('practice-completion-stat-time').className).toContain('basis-[calc(50%-0.25rem)]');
   });
 });
+
+describe('PracticeCompletionMoment celebration', () => {
+  it('colours the card by rank and puts sun rays behind the mascot', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={10} total={10} />);
+    const card = screen.getByTestId('practice-completion');
+    expect(card.className).toContain('shadow-hard-yellow-xl');
+    expect(screen.getByTestId('practice-completion-rays')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('gives assistive tech the final score while the visible one counts up', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={8} total={10} />);
+    expect(screen.getByTestId('practice-completion-score')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('practice-completion-score').previousElementSibling).toHaveClass('sr-only');
+  });
+});
