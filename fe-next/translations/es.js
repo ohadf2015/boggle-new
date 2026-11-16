@@ -21660,7 +21660,9 @@ const es = {
       "answerIs": "Se escribe",
       "youWrote": "Escribiste",
       "next": "Siguiente palabra",
-      "finish": "Ver mis resultados"
+      "finish": "Ver mis resultados",
+      "praise": "¡Lo clavaste!|¡Exacto!|¡Perfecto!|¡Lo lograste!|¡Genial!",
+      "progress": "Palabra {current} de {total}"
     },
     "cookie": {
       "message": "Usamos cookies para contar partidas y que el juego funcione sin tropiezos."

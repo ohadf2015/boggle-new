@@ -20669,7 +20669,9 @@ const en = {
       "answerIs": "It's spelled",
       "youWrote": "You wrote",
       "next": "Next word",
-      "finish": "See my results"
+      "finish": "See my results",
+      "praise": "Nailed it!|Spot on!|Perfect!|You got it!|Brilliant!",
+      "progress": "Word {current} of {total}"
     },
     "cookie": {
       "message": "Cookies help us count plays and keep the game running smoothly."

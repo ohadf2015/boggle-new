@@ -44,14 +44,32 @@ export interface SpellingChallengePracticeProps {
  * - Auto-advance after answer (1s correct, 2s incorrect)
  * - Results display with PracticeResultsCard
  */
-export function SpellingChallengePractice({
+interface SpellingRoundProps extends SpellingChallengePracticeProps {
+  /** Start a fresh round: the full list (no argument) or only the words just missed. */
+  onNewRound: (words?: VocabularyWord[]) => void;
+}
+
+/**
+ * Each round is a fresh mount (the game hook fixes its word order on mount), so
+ * "Again" and "Practice these" both start clean: same list, or only the misses.
+ */
+export function SpellingChallengePractice(props: SpellingChallengePracticeProps) {
+  const [round, setRound] = useState<{ n: number; words: VocabularyWord[] | null }>({ n: 0, words: null });
+  const onNewRound = useCallback((retry?: VocabularyWord[]) => {
+    setRound((r) => ({ n: r.n + 1, words: retry && retry.length > 0 ? retry : null }));
+  }, []);
+  return <SpellingRound key={round.n} {...props} words={round.words ?? props.words} onNewRound={onNewRound} />;
+}
+
+function SpellingRound({
   words,
   onComplete,
   onBack,
   xpSessionData,
   onNext,
   nextLabel,
-}: SpellingChallengePracticeProps) {
+  onNewRound,
+}: SpellingRoundProps) {
   const { t, dir, language } = useLanguage();
   const isRTL = dir === 'rtl';
   const sfx = usePracticeSfx();
@@ -93,6 +111,8 @@ export function SpellingChallengePractice({
 
   const [inputValue, setInputValue] = useState('');
   const [feedback, setFeedback] = useState<{ correct: boolean; correctWord: string; attempt?: string } | null>(null);
+  // One entry per answered word: drives the progress track and the "catch these" list.
+  const [outcomes, setOutcomes] = useState<Array<{ correct: boolean; attempt: string }>>([]);
   const [showResults, setShowResults] = useState(false);
   const [totalHintsUsed, setTotalHintsUsed] = useState(0);
   const [timeSpent, setTimeSpent] = useState(0);
@@ -131,6 +151,12 @@ export function SpellingChallengePractice({
       if (!inputValue.trim() || feedback) return;
 
       const result = submitAnswer(inputValue);
+      const answeredAt = wordIndex;
+      setOutcomes((prev) => {
+        const next = [...prev];
+        next[answeredAt] = { correct: result.correct, attempt: inputValue.trim() };
+        return next;
+      });
       if (result.correct) sfx.correct();
       else sfx.wrong();
       // Keep what they typed: seeing their own spelling next to the right one is the lesson.
@@ -139,7 +165,7 @@ export function SpellingChallengePractice({
 
       if (result.correct) setTimeout(() => setFeedback(null), 1000);
     },
-    [inputValue, feedback, submitAnswer, sfx]
+    [inputValue, feedback, submitAnswer, sfx, wordIndex]
   );
 
   const handleNext = useCallback(() => {
@@ -149,13 +175,20 @@ export function SpellingChallengePractice({
 
   const handleRestart = useCallback(() => {
     resetGame();
-    setShowResults(false);
-    setFeedback(null);
-    setInputValue('');
-    setTotalHintsUsed(0);
-    setTimeSpent(0);
-    sessionStartRef.current = Date.now();
-  }, [resetGame]);
+    onNewRound();
+  }, [resetGame, onNewRound]);
+
+  const missed = useMemo(
+    () => sortedWords.filter((_, i) => outcomes[i] && !outcomes[i].correct),
+    [sortedWords, outcomes]
+  );
+
+  // "Nailed it!|Spot on!|…" — a different cheer per word, so a streak does not read as one stamp.
+  const praise = useMemo(() => {
+    const raw = t('eduStudent.practice.praise');
+    const list = typeof raw === 'string' && raw.includes('|') ? raw.split('|').filter(Boolean) : [];
+    return list.length > 0 ? list[wordIndex % list.length] : t('education.practice.correct');
+  }, [t, wordIndex]);
 
 
   // Track hints used across all words — intentionally fires on word transition only
@@ -184,6 +217,35 @@ export function SpellingChallengePractice({
           hintsUsed={totalHintsUsed}
           onNext={onNext}
           nextLabel={nextLabel}
+          footer={
+            missed.length > 0 ? (
+              <div data-testid="spelling-missed" className="mt-1 flex flex-col items-center gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
+                <p className="font-neo-display text-sm font-bold uppercase tracking-wide text-neo-cream">
+                  {t('eduStudent.results.missedTitle')}
+                </p>
+                <ul className="flex flex-wrap justify-center gap-2">
+                  {missed.map((w) => (
+                    <li
+                      key={w.word}
+                      dir="auto"
+                      className="rounded-neo border-[3px] border-neo-black bg-neo-cream px-2.5 py-0.5 font-neo-display text-base font-black tracking-[0.08em] text-neo-black shadow-hard-sm"
+                    >
+                      {w.word}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  data-testid="spelling-retry-missed"
+                  onClick={() => onNewRound(missed)}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-pink bg-neo-navy px-4 font-neo-body text-sm font-bold uppercase text-neo-pink transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                >
+                  {t('eduStudent.results.practiceThese')}
+                  <DirectionalIcon icon={ArrowRight} className="size-4" />
+                </button>
+              </div>
+            ) : undefined
+          }
         />
       </div>
     );
@@ -212,17 +274,50 @@ export function SpellingChallengePractice({
               <p className="text-neo-white font-neo-body" data-testid="progress-text">
                 {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
               </p>
-              <div className="h-1 w-20 bg-neo-black/30 rounded-neo overflow-hidden">
-                <AdaptiveMotion.div
-                  className="h-full bg-neo-cyan"
-                  animate={{ width: `${(wordIndex / totalWords) * 100}%` }}
-                  transition={{ duration: 0.3 }}
-                />
-              </div>
             </div>
           </div>
 
           <div className="w-10" />
+        </div>
+        {/*
+          One pip per word, filled lime or pink as it is answered: a round you can
+          see filling up, and the misses stay visible. The old 80px hairline bar
+          was hard to see at all. Long teacher lists fall back to a single bar.
+        */}
+        <div
+          role="progressbar"
+          aria-valuemin={0}
+          aria-valuemax={totalWords}
+          aria-valuenow={wordIndex}
+          aria-label={t('eduStudent.practice.progress', { current: Math.min(wordIndex + 1, totalWords), total: totalWords })}
+          data-testid="practice-progress-track"
+          className="mt-3 flex gap-1"
+        >
+          {totalWords <= 20 ? (
+            Array.from({ length: totalWords }, (_, i) => (
+              <span
+                key={i}
+                data-state={outcomes[i] ? (outcomes[i].correct ? 'hit' : 'miss') : i === wordIndex ? 'current' : 'todo'}
+                className={cn(
+                  'h-2.5 flex-1 rounded-full border-2 border-neo-black transition-colors duration-300',
+                  outcomes[i]
+                    ? outcomes[i].correct
+                      ? 'bg-neo-lime'
+                      : 'bg-neo-pink'
+                    : i === wordIndex
+                      ? 'bg-neo-cyan motion-safe:animate-pulse'
+                      : 'bg-neo-white/15'
+                )}
+              />
+            ))
+          ) : (
+            <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-white/15">
+              <span
+                className="block h-full bg-neo-cyan transition-[width] duration-300"
+                style={{ width: `${(wordIndex / totalWords) * 100}%` }}
+              />
+            </span>
+          )}
         </div>
       </div>
 
@@ -373,7 +468,7 @@ export function SpellingChallengePractice({
             <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}'}</style>
             <p className="flex items-center gap-2 font-neo-display text-xl font-black uppercase sm:text-2xl">
               {feedback.correct ? <Check className="size-7" strokeWidth={3.5} /> : <X className="size-7" strokeWidth={3.5} />}
-              {feedback.correct ? t('education.practice.correct') : t('education.practice.incorrect')}
+              {feedback.correct ? praise : t('education.practice.incorrect')}
             </p>
             {feedback.correct ? (
               <p className="font-neo-display text-xl font-black tracking-wider" dir="auto">{feedback.correctWord}</p>
