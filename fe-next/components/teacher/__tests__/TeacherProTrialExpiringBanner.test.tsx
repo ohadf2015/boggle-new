@@ -10,6 +10,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
 const capture = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture } }));
 
+const trackTeacherTrialBannerShown = vi.fn();
+const trackTeacherTrialUpgradeClicked = vi.fn();
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({
+  trackTeacherTrialBannerShown: (...a: unknown[]) => trackTeacherTrialBannerShown(...a),
+  trackTeacherTrialUpgradeClicked: (...a: unknown[]) => trackTeacherTrialUpgradeClicked(...a),
+}));
+
 const postTeacherProCheckout = vi.fn();
 vi.mock('@/lib/education/postTeacherProCheckout', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -22,26 +29,46 @@ const PORTAL = 'https://polar.sh/lexiclash/portal?customer_session_token=x';
 describe('TeacherProTrialExpiringBanner', () => {
   beforeEach(() => {
     capture.mockReset();
+    trackTeacherTrialBannerShown.mockReset();
+    trackTeacherTrialUpgradeClicked.mockReset();
     postTeacherProCheckout.mockReset();
   });
 
-  it('Given 3 days left, Then it says the card is charged after the trial and links to manage or cancel', () => {
+  it('Given 3 days left, Then it is the urgent variant and fires both shown events with days_remaining', () => {
     render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(3)} portalUrl={PORTAL} />);
     expect(screen.getByText('teacher.subscription.trialAutoRenewBody')).toBeInTheDocument();
+    expect(screen.getByTestId('teacher-pro-trial-expiring')).toHaveAttribute('data-tone', 'urgent');
+    expect(capture).toHaveBeenCalledWith('teacher_trial_expiring_shown', { days_remaining: 3 });
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledTimes(1);
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledWith({ days_remaining: 3, urgent: true });
+  });
+
+  it('Given 4 days left, Then the shown event is not marked urgent', () => {
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(4)} portalUrl={PORTAL} />);
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledWith({ days_remaining: 4, urgent: false });
+  });
+
+  it('Given the upgrade CTA, Then it links to the existing checkout path and tracks days_remaining', () => {
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={PORTAL} />);
+    const cta = screen.getByTestId('teacher-pro-trial-expiring-upgrade-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade?source=dashboard_trial_lifecycle');
+    fireEvent.click(cta);
+    expect(trackTeacherTrialUpgradeClicked).toHaveBeenCalledTimes(1);
+    expect(trackTeacherTrialUpgradeClicked).toHaveBeenCalledWith({ days_remaining: 2, urgent: true });
+    expect(postTeacherProCheckout).not.toHaveBeenCalled();
+  });
+
+  it('Given a trialing teacher, Then manage-or-cancel stays a secondary portal link, never a new checkout', () => {
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={PORTAL} />);
     const cta = screen.getByTestId('teacher-pro-trial-expiring-cta');
     expect(cta).toHaveTextContent('teacher.subscription.trialManageCta');
     expect(cta).toHaveAttribute('href', PORTAL);
     expect(cta).toHaveAttribute('target', '_blank');
-    expect(capture).toHaveBeenCalledWith('teacher_trial_expiring_shown', { days_remaining: 3 });
-  });
-
-  it('Given a trialing teacher taps the CTA, Then no second (paid) checkout starts', () => {
-    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={PORTAL} />);
-    fireEvent.click(screen.getByTestId('teacher-pro-trial-expiring-cta'));
+    fireEvent.click(cta);
     expect(postTeacherProCheckout).not.toHaveBeenCalled();
   });
 
-  it('Given no portal link yet, Then the CTA opens the plan page in-app', () => {
+  it('Given no portal link yet, Then the manage link opens the plan page in-app', () => {
     render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={null} />);
     const cta = screen.getByTestId('teacher-pro-trial-expiring-cta');
     expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');

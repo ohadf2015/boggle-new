@@ -316,6 +316,10 @@ export type GrowthEvent =
   | 'edu_pro_checkout_success_seen'
   | 'edu_trial_reminder_shown'
   | 'edu_trial_reminder_cta_click'
+  // Polar 14-day trial lifecycle banner on Teacher HQ (calm days 5-14) and its
+  // urgent variant (<=3 days, the day-10 expiring banner). days_remaining on both.
+  | 'teacher_trial_banner_shown'
+  | 'teacher_trial_upgrade_clicked'
   // Unconditional return-from-Polar signal (t: webhook-broken vs abandoned).
   // Fires on ?checkout=success regardless of entitlement, unlike
   // edu_pro_checkout_success_seen which waits for hasPro.

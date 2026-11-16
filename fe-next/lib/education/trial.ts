@@ -91,12 +91,14 @@ export function trialCountdownUnit(trial: TrialStatus, locale = 'en'): { key: st
   return { key: pluralKey(HOUR_FORMS, trial.hoursLeft, locale), count: trial.hoursLeft };
 }
 
-const DAY_FORMS = {
+// Exported so the Polar-trial countdown (lib/education/polarTrial.ts) phrases
+// its day/hour units with the exact same keys — the two badges cannot drift.
+export const DAY_FORMS = {
   one: 'education.trial.day_left',
   few: 'education.trial.days_left_few',
   other: 'education.trial.days_left',
 };
-const HOUR_FORMS = {
+export const HOUR_FORMS = {
   one: 'education.trial.hour_left',
   few: 'education.trial.hours_left_few',
   other: 'education.trial.hours_left',
