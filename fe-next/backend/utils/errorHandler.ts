@@ -73,6 +73,7 @@ export const ErrorCodes = {
   GAME_INVALID_CODE: 'GAME_INVALID_CODE',
   GAME_CLOSED: 'GAME_CLOSED',
   CLASSROOM_NOT_OPEN: 'CLASSROOM_NOT_OPEN',
+  CLASSROOM_SESSION_WAITING: 'CLASSROOM_SESSION_WAITING',
   ROOM_LOCKED: 'ROOM_LOCKED',
 
   // Player errors (2xxx)
@@ -176,6 +177,12 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   // client waits and re-joins, it is not a refusal (see classroomMissingRoom).
   [ErrorCodes.CLASSROOM_NOT_OPEN]: {
     message: 'Your teacher has not opened the game yet',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 409
+  },
+  // The class game ended. The student is enrolled and waits for the next one — not a dead room.
+  [ErrorCodes.CLASSROOM_SESSION_WAITING]: {
+    message: 'Waiting for your teacher to start the next game',
     severity: ErrorSeverity.LOW,
     httpStatus: 409
   },

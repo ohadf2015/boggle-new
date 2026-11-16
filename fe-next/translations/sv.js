@@ -21742,6 +21742,10 @@ const sv = {
       "lobbyBody": "Elever som redan har gått med lämnar rummet.",
       "lobbyConfirm": "Stäng rummet",
       "lobbyStay": "Låt det vara öppet",
+      "emptyTitle": "Ingen har gått med än",
+      "emptyBody": "Dela koden {{code}} så klassen kan komma in.",
+      "emptyStay": "Låt rummet vara öppet",
+      "emptyConfirm": "Avsluta ändå",
       "roundTitle": "Avsluta den här rundan?",
       "roundBody": "Alla ser resultatet nu.",
       "roundConfirm": "Avsluta rundan",
@@ -21798,7 +21802,9 @@ const sv = {
       "googleClassroom": "Lägg upp i Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "Väntar på elever"
+      "waitingForStudents": "Väntar på elever",
+      "lateJoins": "{{count}} elever försökte gå med efter att spelet tog slut. Starta ett nytt.",
+      "lateJoinsOne": "1 elev försökte gå med efter att spelet tog slut. Starta ett nytt."
     },
     "wordcraft": {
       "bingo": "BINGO – alla brickor!",

@@ -138,6 +138,8 @@ export function buildLiveGameEndedEvent(
       ...roundProps(game),
       // The Redis copy of a finished game has no live roster, so the recorded rounds' peak backs it up.
       roster_count: Math.max(classroomRosterCount(game), ctx.peakPlayers ?? 0),
+      // Who was actually seated when the room closed — 0 is the empty-lobby end this outage is about.
+      seated_count: classroomRosterCount(game),
       rounds_recorded: ctx.roundsRecorded,
       had_started: Number.isFinite(startedMs),
       duration_seconds: Number.isFinite(startedMs)

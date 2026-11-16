@@ -27,7 +27,7 @@ const { mockGetClassroomGame, mockEmitError } = vi.hoisted(() => ({
 vi.mock('../../modules/classroomGameManager', () => ({ getClassroomGame: mockGetClassroomGame }));
 vi.mock('../../utils/errorHandler', () => ({
   emitError: mockEmitError,
-  ErrorCodes: { GAME_NOT_FOUND: 'GAME_NOT_FOUND' },
+  ErrorCodes: { GAME_NOT_FOUND: 'GAME_NOT_FOUND', CLASSROOM_SESSION_WAITING: 'CLASSROOM_SESSION_WAITING' },
 }));
 vi.mock('../../utils/logger', () => ({
   default: { info: vi.fn(), warn: vi.fn(), error: vi.fn(), debug: vi.fn() },
@@ -51,7 +51,7 @@ describe('classroomSeatGate — one rule, every seating path', () => {
     const seat = await checkClassroomSeat(socket, 'ABC123', 'multiplayer');
 
     expect(seat.refused).toBe(true);
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'CLASSROOM_SESSION_WAITING', { details: { classroomId: 'c1' } });
     expect(socket.emit).not.toHaveBeenCalled();
   });
 
@@ -63,9 +63,10 @@ describe('classroomSeatGate — one rule, every seating path', () => {
 
     expect(seat.refused).toBe(true);
     expect(socket.emit).toHaveBeenCalledWith('classroomGameError', {
-      error: 'Game not found',
-      code: 'GAME_ENDED',
+      error: 'Waiting for your teacher to start the next game',
+      code: 'CLASSROOM_SESSION_WAITING',
       gameCode: 'ABC123',
+      classroomId: 'c1',
     });
     expect(mockEmitError).not.toHaveBeenCalled();
   });

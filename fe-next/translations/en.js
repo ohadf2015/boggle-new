@@ -20763,6 +20763,10 @@ const en = {
       "lobbyBody": "Students who already joined will be sent out of the room.",
       "lobbyConfirm": "Close room",
       "lobbyStay": "Keep it open",
+      "emptyTitle": "Nobody has joined yet",
+      "emptyBody": "Share code {{code}} so your class can get in.",
+      "emptyStay": "Keep the room open",
+      "emptyConfirm": "End anyway",
       "roundTitle": "End this round?",
       "roundBody": "Everyone sees the results now.",
       "roundConfirm": "End this round",
@@ -20819,7 +20823,9 @@ const en = {
       "googleClassroom": "Post to Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "Waiting for students"
+      "waitingForStudents": "Waiting for students",
+      "lateJoins": "{{count}} students tried to join after the game ended. Start a new game.",
+      "lateJoinsOne": "1 student tried to join after the game ended. Start a new game."
     },
     "wordcraft": {
       "bingo": "BINGO!",

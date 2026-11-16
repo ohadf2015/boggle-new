@@ -48,6 +48,7 @@ import type { Socket } from 'socket.io';
 
 import { captureJoinRefusal } from '../utils/eduLiveEvents';
 import { lateJoinStudentKey } from '@/lib/education/endedCodeTries';
+import { secondsSinceEnd } from '@/lib/education/secondsSinceEnd';
 import logger from '../utils/logger.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { getClassroomGame, type ClassroomGame } from '../modules/classroomGameManager.js';
@@ -86,7 +87,8 @@ export function refuseSeat(
   refusal: SeatRefusal,
   classroomId: string | null = null,
   /** The name the student typed, so a guest retrying counts once in the teacher's late-join tally. */
-  studentName: string | null = null
+  studentName: string | null = null,
+  endedAt: string | null = null
 ): void {
   if (refusal === 'ended') {
     logger.info('CLASSROOM_GAME', `Rejected join of ended game ${gameCode}`);
@@ -102,22 +104,26 @@ export function refuseSeat(
     {
       gameCode,
       classroomId,
-      reason: refusal === 'ended' ? 'SESSION_ENDED' : 'CODE_UNKNOWN',
+      reason: refusal === 'ended' ? 'SESSION_WAITING' : 'CODE_UNKNOWN',
       door: dialect === 'multiplayer' ? 'join' : 'classroomBanner',
       actorId,
+      secondsSinceEnd: refusal === 'ended' ? secondsSinceEnd(endedAt, new Date()) : null,
     },
     { studentKey: lateJoinStudentKey({ actorId, gameCode, username: studentName, socketId: socket.id }) }
   );
 
   if (dialect === 'multiplayer') {
-    emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+    emitError(socket, refusal === 'ended' ? ErrorCodes.CLASSROOM_SESSION_WAITING : ErrorCodes.GAME_NOT_FOUND, {
+      details: refusal === 'ended' && classroomId ? { classroomId } : undefined,
+    });
     return;
   }
 
   socket.emit('classroomGameError', {
-    error: 'Game not found',
-    code: refusal === 'ended' ? 'GAME_ENDED' : 'GAME_NOT_FOUND',
+    error: refusal === 'ended' ? 'Waiting for your teacher to start the next game' : 'Game not found',
+    code: refusal === 'ended' ? ErrorCodes.CLASSROOM_SESSION_WAITING : 'GAME_NOT_FOUND',
     gameCode,
+    ...(classroomId ? { classroomId } : {}),
   });
 }
 
@@ -154,7 +160,7 @@ export async function checkClassroomSeat(
 
   if (!isClassroomSessionEnded(game)) return { game, refused: false };
 
-  refuseSeat(socket, gameCode, dialect, 'ended', game.classroomId, studentName);
+  refuseSeat(socket, gameCode, dialect, 'ended', game.classroomId, studentName, game.endedAt);
   return { game, refused: true };
 }
 

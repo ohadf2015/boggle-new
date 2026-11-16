@@ -111,9 +111,10 @@ describe('joinClassroomGame — a code whose game has ended', () => {
     // Named with the game code — `classroomGameError` is a shared channel and
     // `ClassroomGameBanner` filters on that field before it shows anything.
     expect(socket.emit).toHaveBeenCalledWith('classroomGameError', {
-      error: 'Game not found',
-      code: 'GAME_ENDED',
+      error: 'Waiting for your teacher to start the next game',
+      code: 'CLASSROOM_SESSION_WAITING',
       gameCode: 'ABC123',
+      classroomId: CLASSROOM_ID,
     });
   });
 

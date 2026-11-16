@@ -208,7 +208,7 @@ describe('server-side join and end events', () => {
       event: 'edu_live_game_ended',
       properties: {
         classroom_id: 'class-1', game_code: 'ABC123', game_mode: 'wordcraft', lesson_count: 2,
-        roster_count: 2, rounds_recorded: 0, had_started: true, duration_seconds: 90, is_test_account: false,
+        roster_count: 2, seated_count: 2, rounds_recorded: 0, had_started: true, duration_seconds: 90, is_test_account: false,
       },
     });
   });

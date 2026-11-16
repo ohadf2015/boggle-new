@@ -21,6 +21,7 @@ import { useProjectorLobbyMode } from './useProjectorLobbyMode';
 import { useProjectorClassCode } from './useProjectorClassCode';
 import { WALL_SQUARE, WALL_STICKER } from './projectorNbStyles';
 import { markRoomPlayed, roomPlayed } from './roomPlayed';
+import { LobbyLateJoinNotice } from './LobbyLateJoinNotice';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 
@@ -160,6 +161,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
             {/* The padlock sits up here with the room's name, out of the Start row: Start is the one thing to press. */}
             <ProjectorLobbyLock gameCode={gameCode} t={t} className="ms-auto shrink-0" />
           </header>
+
+          <LobbyLateJoinNotice classroomId={lobby.classroomId} t={t} language={language} />
 
           <div style={delay(1)} className={cn('@5xl:row-start-2 @5xl:min-h-0', RISE)}>
             <ProjectorJoinPanel key={classCode ?? gameCode} gameCode={gameCode} classCode={classCode} language={language} baseUrl={baseUrl} t={t} waiting={students.length === 0} compact={hasWords} />

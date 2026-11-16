@@ -8,7 +8,7 @@
  * (e.g. "Cannot join ranked game in progress").
  */
 
-export type RoomErrorKind = 'notOpen' | 'locked' | 'gone' | 'codeExists' | 'usernameTaken' | 'rateLimited' | 'generic';
+export type RoomErrorKind = 'notOpen' | 'sessionWaiting' | 'locked' | 'gone' | 'codeExists' | 'usernameTaken' | 'rateLimited' | 'generic';
 
 interface RoomErrorPayload {
   code?: string;
@@ -22,6 +22,8 @@ export function classifyRoomError(data: RoomErrorPayload | null | undefined): Ro
   // A live classroom whose teacher has not tapped START yet. Checked first: it
   // is a wait, never a dead room — see backend/handlers/classroomMissingRoom.
   if (code === 'CLASSROOM_NOT_OPEN') return 'notOpen';
+  // Ended class: enroll and wait for the next game. Never a dead-room retry.
+  if (code === 'CLASSROOM_SESSION_WAITING') return 'sessionWaiting';
   // The teacher's padlock: the room is alive, so never run the room-gone path.
   if (code === 'ROOM_LOCKED') return 'locked';
 

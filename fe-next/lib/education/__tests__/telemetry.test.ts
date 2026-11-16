@@ -512,6 +512,7 @@ describe('education telemetry', () => {
       classroom_id: 'cls-1',
       source: 'create_room',
       lesson_count: 2,
+      seated_count: 0,
     });
   });
 
