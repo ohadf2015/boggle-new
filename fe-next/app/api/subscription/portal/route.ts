@@ -22,8 +22,10 @@ import logger from '@/utils/logger';
  */
 export async function GET(request: NextRequest) {
   const locale = billingPortalLocale(request.nextUrl.searchParams.get('locale'));
-  const home = new URL(`/${locale}/teacher`, request.nextUrl.origin);
-  const toHome = () => NextResponse.redirect(home, 303);
+  // Relative on purpose: behind the Railway proxy request.nextUrl.origin is the
+  // container's (localhost:3000), so an absolute URL built from it sends people nowhere.
+  const toHome = () =>
+    new NextResponse(null, { status: 303, headers: { Location: `/${locale}/teacher` } });
 
   try {
     if (isNativeAppUserAgent(request.headers.get('user-agent'))) return toHome();

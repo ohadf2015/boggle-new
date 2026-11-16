@@ -40,15 +40,15 @@ describe('GET /api/subscription/portal: a stable card-update link', () => {
     getAuthedUser.mockResolvedValue(null);
     const res = await GET(req('?locale=ja'));
     expect(res.status).toBe(303);
-    expect(res.headers.get('location')).toBe('https://www.lexiclash.live/ja/teacher');
+    expect(res.headers.get('location')).toBe('/ja/teacher');
     expect(createCustomerPortalUrl).not.toHaveBeenCalled();
   });
 
   it('a gifted (admin grant) or free teacher has no Polar customer: Teacher Home', async () => {
     checkTeacherSubscription.mockResolvedValue({ has_pro: true, status: 'active', source: 'admin_grant' });
-    expect((await GET(req())).headers.get('location')).toBe('https://www.lexiclash.live/he/teacher');
+    expect((await GET(req())).headers.get('location')).toBe('/he/teacher');
     checkTeacherSubscription.mockResolvedValue({ has_pro: false, status: 'active', source: 'polar' });
-    expect((await GET(req())).headers.get('location')).toBe('https://www.lexiclash.live/he/teacher');
+    expect((await GET(req())).headers.get('location')).toBe('/he/teacher');
     expect(createCustomerPortalUrl).not.toHaveBeenCalled();
   });
 
@@ -56,6 +56,13 @@ describe('GET /api/subscription/portal: a stable card-update link', () => {
     checkTeacherSubscription.mockResolvedValue({ has_pro: false, status: 'past_due', source: 'polar' });
     createCustomerPortalUrl.mockRejectedValue(new Error('polar down'));
     const res = await GET(req('?locale=xx'));
-    expect(res.headers.get('location')).toBe('https://www.lexiclash.live/en/teacher');
+    expect(res.headers.get('location')).toBe('/en/teacher');
+  });
+
+  it('never redirects to the container origin behind the proxy', async () => {
+    getAuthedUser.mockResolvedValue(null);
+    const r = await GET(new NextRequest('http://localhost:3000/api/subscription/portal?locale=he'));
+    expect(r.status).toBe(303);
+    expect(r.headers.get('location')).toBe('/he/teacher');
   });
 });
