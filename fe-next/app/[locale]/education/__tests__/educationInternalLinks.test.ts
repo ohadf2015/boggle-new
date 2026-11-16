@@ -27,9 +27,10 @@ const EDUCATION_DIR = join(__dirname, '..');
 /**
  * Routes under `/education` that are app surfaces, not SEO landing pages: the
  * signed-in classroom flows and the noindexed internal pages. They are excluded
- * from the registry on purpose and must stay excluded.
+ * from the registry on purpose and must stay excluded. `class-win` is the
+ * noindexed share target behind the teacher's "share the class win" card.
  */
-const NON_LANDING = new Set(['access', 'class-gap', 'classroom-addon', 'classroom-game', 'duels', 'unplugged-reteach', 'chatgpt-reteach', 'miss-gap-practice', 'miss-gap-assignment', 'miss-gap-grade-passback', 'miss-gap-whatsapp', 'unplugged-grade-passback', 'team-tiles-unplugged', 'classic-unplugged', 'help', 'live']);
+const NON_LANDING = new Set(['access', 'class-gap', 'class-win', 'classroom-addon', 'classroom-game', 'duels', 'unplugged-reteach', 'chatgpt-reteach', 'miss-gap-practice', 'miss-gap-assignment', 'miss-gap-grade-passback', 'miss-gap-whatsapp', 'unplugged-grade-passback', 'team-tiles-unplugged', 'classic-unplugged', 'help', 'live']);
 
 function landingDirs(): string[] {
   return readdirSync(EDUCATION_DIR, { withFileTypes: true })
