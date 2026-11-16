@@ -63,52 +63,64 @@ const EMPTY_STATE: UseStudentClassroomState = {
  * works when lessons have been assigned to the student.
  */
 export function useStudentClassroom(): UseStudentClassroomReturn {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading: authLoading = false } = useAuth();
   const isMounted = useMounted();
   const userId = user?.id ?? null;
+  const userIdRef = useRef(userId);
+  userIdRef.current = userId;
 
   const [state, setState] = useState<UseStudentClassroomState>(INITIAL_STATE);
   const preferredRef = useRef<string | null>(null);
 
   const fetchClassroom = useCallback(async () => {
+    // Auth still resolving: a null user is not "no class". Settling here is what
+    // painted the no-classroom panel for a student whose membership read had
+    // not started (Nov 13: has_class false, then true 600ms later).
+    if (authLoading) {
+      setState(INITIAL_STATE);
+      return;
+    }
     if (!isAuthenticated || !userId) {
       setState(EMPTY_STATE);
       return;
     }
 
+    const forUser = userId;
+    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
     try {
       const edu = await import('@/lib/supabase/education');
-      if (preferredRef.current === null) preferredRef.current = readPreferred(userId) ?? '';
+      if (!isMounted.current || userIdRef.current !== forUser) return;
+      if (preferredRef.current === null) preferredRef.current = readPreferred(forUser) ?? '';
       const [{ data, level, error }, classrooms] = await Promise.all([
-        edu.getStudentClassroom(userId, ...(preferredRef.current ? [preferredRef.current] : [])),
+        edu.getStudentClassroom(forUser, ...(preferredRef.current ? [preferredRef.current] : [])),
         // The switcher is optional: a failed list must not break the single-class flow.
         Promise.resolve()
-          .then(() => edu.getStudentClassrooms(userId))
+          .then(() => edu.getStudentClassrooms(forUser))
           .then((r) => (r.error ? [] : r.data))
           .catch(() => []),
       ]);
 
-      if (isMounted.current) {
-        if (error) {
-          setState({ ...EMPTY_STATE, error: error.message });
-        } else {
-          setState({
-            classroom: data,
-            classroomId: data?.id || null,
-            level: level ?? 'core',
-            isLoading: false,
-            error: null,
-            classrooms,
-          });
-        }
+      if (!isMounted.current || userIdRef.current !== forUser) return;
+      if (error) {
+        setState({ ...EMPTY_STATE, error: error.message });
+      } else {
+        setState({
+          classroom: data,
+          classroomId: data?.id || null,
+          level: level ?? 'core',
+          isLoading: false,
+          error: null,
+          classrooms,
+        });
       }
     } catch (err) {
       logger.error('Error in useStudentClassroom:', err);
-      if (isMounted.current) {
+      if (isMounted.current && userIdRef.current === forUser) {
         setState(prev => ({ ...prev, isLoading: false, error: 'Failed to load classroom' }));
       }
     }
-  }, [isAuthenticated, userId, isMounted]);
+  }, [authLoading, isAuthenticated, userId, isMounted]);
 
   const refresh = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true }));
@@ -125,12 +137,16 @@ export function useStudentClassroom(): UseStudentClassroomReturn {
   }, [userId, fetchClassroom]);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchClassroom();
+    if (authLoading) {
+      setState(INITIAL_STATE);
+      return;
+    }
+    if (isAuthenticated && userId) {
+      void fetchClassroom();
     } else {
       setState(EMPTY_STATE);
     }
-  }, [isAuthenticated, fetchClassroom]);
+  }, [authLoading, isAuthenticated, userId, fetchClassroom]);
 
   return {
     ...state,

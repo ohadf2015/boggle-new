@@ -64,7 +64,9 @@ describe('useJoinClassroom — guest (account-less) path', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, error: null });
+    mockCreateClient.mockReset();
+    mockCreateClient.mockImplementation(() => ({ __client: true }));
+    mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, accessToken: 'anon-token', error: null });
     mockWaitForProfile.mockResolvedValue(true);
     // The join now goes through the cap-enforcing server route.
     overrides = {};
@@ -99,6 +101,34 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     expect(url).toBe(JOIN_ROUTE);
     expect(JSON.parse(init.body)).toMatchObject({ joinCode: 'ABC123' });
     expect(res).toEqual({ success: true, classroomId: 'class-1' });
+  });
+
+  it('sends the signed-in session token so a leftover cookie cannot enrol someone else', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'real-1' } });
+    mockCreateClient.mockReturnValue({
+      auth: { getSession: async () => ({ data: { session: { access_token: 'signed-in-token' } } }) },
+    });
+    const { result } = renderHook(() => useJoinClassroom());
+
+    await result.current.joinClassroom('ABC123');
+
+    const joinCall = fetchMock.mock.calls.find((c) => String(c[0]).startsWith(JOIN_ROUTE));
+    expect(joinCall?.[1].headers.Authorization).toBe('Bearer signed-in-token');
+  });
+
+  it('sends the browser guest token so the route cannot mint a second identity', async () => {
+    mockUseAuth.mockReturnValue({ user: null });
+    mockSignInAsGuest.mockResolvedValue({
+      user: { id: 'anon-1' },
+      accessToken: 'browser-guest-token',
+      error: null,
+    });
+    const { result } = renderHook(() => useJoinClassroom());
+
+    await result.current.joinClassroom('ABC123', { guestName: 'Maya' });
+
+    const joinCall = fetchMock.mock.calls.find((c) => String(c[0]).startsWith(JOIN_ROUTE));
+    expect(joinCall?.[1].headers.Authorization).toBe('Bearer browser-guest-token');
   });
 
   it('logged-out student with a name signs in anonymously, awaits profile, then joins', async () => {

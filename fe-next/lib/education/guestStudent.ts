@@ -22,6 +22,8 @@ import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 export interface GuestSignInResult {
   user: User | null;
+  /** The session this browser must keep. The join route binds the membership to it. */
+  accessToken: string | null;
   error: string | null;
 }
 
@@ -83,15 +85,19 @@ export async function signInAsGuestStudent(
   name: string,
 ): Promise<GuestSignInResult> {
   const displayName = name.trim().slice(0, 40);
-  if (!displayName) return { user: null, error: 'NAME_REQUIRED' };
+  if (!displayName) return { user: null, accessToken: null, error: 'NAME_REQUIRED' };
 
   const data: Record<string, string> = { full_name: displayName };
   const username = deriveGuestUsername(displayName);
   if (username) data.username = username;
 
   const { data: res, error } = await supabase.auth.signInAnonymously({ options: { data } });
-  if (error) return { user: null, error: error.message };
-  return { user: res?.user ?? null, error: null };
+  if (error) return { user: null, accessToken: null, error: error.message };
+  return {
+    user: res?.user ?? null,
+    accessToken: res?.session?.access_token ?? null,
+    error: null,
+  };
 }
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
