@@ -23,7 +23,12 @@ function readString(catalogue: unknown, path: string, fallback: string): string 
   return typeof node === 'string' ? node : fallback;
 }
 
-const fill = (s: string, p: object) => s.replace(/\{(\w+)\}/g, (m, k) => (k in p ? String((p as Record<string, unknown>)[k]) : m));
+function fill(template: string, params: object): string {
+  const values = params as Record<string, unknown>;
+  return template.replace(/\{(\w+)\}/g, (match, key: string) =>
+    key in values ? String(values[key]) : match,
+  );
+}
 
 async function load(props: PageProps) {
   const [{ locale }, query] = await Promise.all([props.params, props.searchParams]);
