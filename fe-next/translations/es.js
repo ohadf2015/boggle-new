@@ -85,6 +85,7 @@ const es = {
         "tinfoilHat": "Gorro de papel aluminio",
         "vrHeadset": "Gafas VR",
         "earrings": "Aros de oro",
+        "goldNecklace": "Collar de oro",
         "samurai": "Casco samurái",
         "astronaut": "Casco de astronauta",
         "wizardHat": "Sombrero de mago",

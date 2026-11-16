@@ -166,6 +166,7 @@ export const AVATAR_ACCESSORIES = [
   'earrings', 'cape', 'wings',
   /* 2026-11 chest drop */
   'unicornHorn', 'dragonWings', 'flameAura',
+  'goldNecklace',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -269,7 +270,7 @@ export const PREMIUM_ACCESSORIES = [
   'gamerHeadset', 'cowboyHat', 'pirateHat', 'topHat', 'graduationCap',
   'tinfoilHat', 'duckHat', 'vrHeadset',
   // Premium overhaul (Rare tier)
-  'earrings',
+  'earrings', 'goldNecklace',
 ] as const;
 
 export const PREMIUM_HAIR_STYLES = [
@@ -373,6 +374,7 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'accessory:duckHat': 550,
   'accessory:vrHeadset': 700,
   'accessory:earrings': 400,
+  'accessory:goldNecklace': 450,
   // ── Hair (VIP) ──
   'hair:elvis': 600,
   'hair:ramen': 550,
@@ -518,7 +520,7 @@ const NEW_PARTS_MAP: Record<string, readonly string[]> = {
   // 2026-11 chest drop: redrawn + brand-new parts that now come out of reward chests.
   accessory: [
     'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat',
-    'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura',
+    'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace',
   ],
   eyes: [
     'money', 'alien', 'pixelEyes', 'targetEyes', 'catEye', 'sleepyEye', 'laserEye', 'glitchEyes',

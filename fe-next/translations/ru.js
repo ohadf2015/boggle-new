@@ -85,6 +85,7 @@ const ru = {
         "tinfoilHat": "Шапочка из фольги",
         "vrHeadset": "VR-шлем",
         "earrings": "Золотые кольца",
+        "goldNecklace": "Золотое ожерелье",
         "samurai": "Шлем самурая",
         "astronaut": "Шлем космонавта",
         "wizardHat": "Шляпа волшебника",

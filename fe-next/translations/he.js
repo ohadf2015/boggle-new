@@ -85,6 +85,7 @@ const he = {
         "tinfoilHat": "כובע אלומיניום",
         "vrHeadset": "משקפי VR",
         "earrings": "עגילי זהב",
+        "goldNecklace": "שרשרת זהב",
         "samurai": "קסדת סמוראי",
         "astronaut": "קסדת אסטרונאוט",
         "wizardHat": "כובע קוסם",

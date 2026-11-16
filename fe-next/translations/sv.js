@@ -85,6 +85,7 @@ const sv = {
         "tinfoilHat": "Foliehatt",
         "vrHeadset": "VR-glasögon",
         "earrings": "Guldringar",
+        "goldNecklace": "Guldhalsband",
         "samurai": "Samurajhjälm",
         "astronaut": "Astronauthjälm",
         "wizardHat": "Trollkarlshatt",

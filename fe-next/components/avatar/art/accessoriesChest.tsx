@@ -238,6 +238,24 @@ export const ACC_CHEST: Record<string, AccDef> = {
     ),
   },
 
+  goldNecklace: {
+    layer: 'neck',
+    render: ctx => {
+      const gem = accFill(ctx);
+      const chain = 'M35 67 Q38 79 50 81 Q62 79 65 67';
+      return (
+        <g>
+          <L d={chain} w={3.2} />
+          <L d={chain} w={1.7} c={GOLD} />
+          <path d="M37 71 Q40 77 45 79.4" fill="none" stroke={BRAND.goldLight} strokeWidth="0.8" strokeLinecap="round" />
+          <path d="M50 81 L55 86.6 L50 94 L45 86.6 Z" fill={GOLD} stroke={INK} strokeWidth={DETAIL} strokeLinejoin="round" />
+          <path d="M50 84 L52.8 87 L50 90.6 L47.2 87 Z" fill={gem} stroke={INK} strokeWidth="0.8" strokeLinejoin="round" />
+          <path d="M50 84 L47.2 87 L50 87 Z" fill={tint(gem, 0.6)} />
+          <circle cx="50" cy="81" r="1.5" fill={GOLD_D} stroke={INK} strokeWidth="0.8" />
+        </g>
+      );
+    },
+  },
   earrings: {
     layer: 'neck',
     render: ctx => {

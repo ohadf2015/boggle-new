@@ -85,6 +85,7 @@ const ja = {
         "tinfoilHat": "アルミホイル帽",
         "vrHeadset": "VRゴーグル",
         "earrings": "金のフープ",
+        "goldNecklace": "金のネックレス",
         "samurai": "侍のかぶと",
         "astronaut": "宇宙飛行士ヘルメット",
         "wizardHat": "魔法使いの帽子",

@@ -85,6 +85,7 @@ const en = {
         "tinfoilHat": "Tinfoil Hat",
         "vrHeadset": "VR Headset",
         "earrings": "Gold Hoops",
+        "goldNecklace": "Gold Necklace",
         "samurai": "Samurai Helmet",
         "astronaut": "Astronaut Helmet",
         "wizardHat": "Wizard Hat",
