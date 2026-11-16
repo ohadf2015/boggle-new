@@ -38,9 +38,10 @@ describe('Academy mascot ↔ hero button', () => {
     expect(screen.getByTestId('academy-mascot-line')).toHaveTextContent('academy.student.mascotStreakRisk');
   });
 
-  it('given nothing to do, Lexi never argues with the solo fallback', async () => {
+  it('given a class with nothing assigned and no live round, Lexi waits with the button', async () => {
     render(<StudentPageClient />);
     await screen.findByTestId('academy-cta');
-    expect(screen.getByTestId('academy-mascot-line')).toHaveTextContent('academy.student.mascotSolo');
+    expect(screen.getByTestId('academy-cta')).toHaveAttribute('data-kind', 'waiting');
+    expect(screen.getByTestId('academy-mascot-line')).toHaveTextContent('academy.student.arenaWaiting');
   });
 });
