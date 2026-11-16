@@ -37,10 +37,10 @@ export function ClassroomStrip({ lang, t }: { lang: string; t: (key: string) => 
           </div>
           <Link
             href={`/${lang}/education`}
-            className="inline-flex items-center gap-2 self-start rounded-xl border-[3px] border-black bg-neo-navy px-3 py-2 font-neo-display text-sm font-bold whitespace-nowrap text-neo-lime shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:self-center lg:px-6 lg:py-4 lg:text-xl"
+            className="inline-flex max-w-full items-center gap-2 self-start rounded-xl border-[3px] border-black bg-neo-navy px-3 py-2 font-neo-display text-sm leading-tight font-bold text-neo-lime lg:whitespace-nowrap shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:self-center lg:px-6 lg:py-4 lg:text-xl"
           >
             {t('homeFresh.sections.classrooms.cta')}
-            <ArrowRight className="h-4 w-4 rtl:-scale-x-100 lg:h-6 lg:w-6" strokeWidth={3} aria-hidden="true" />
+            <ArrowRight className="h-4 w-4 shrink-0 rtl:-scale-x-100 lg:h-6 lg:w-6" strokeWidth={3} aria-hidden="true" />
           </Link>
         </div>
       </div>

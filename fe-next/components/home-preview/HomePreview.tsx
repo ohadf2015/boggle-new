@@ -71,8 +71,15 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
         />
       </div>
 
-      <div className="mx-auto mt-8 grid w-full max-w-md gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14">
-        <div className="flex flex-col gap-4 lg:col-span-7">
+      {/* grid-cols-1, not an implicit column: an implicit `auto` track sizes itself
+          to its widest unbreakable content (a truncated crew line, the week strip),
+          grows past the phone, and overflow-x-clip above cuts every card on one edge.
+          min-w-0 on each cell lets truncate/wrap work inside the track. */}
+      <div
+        data-testid="hp-cards"
+        className="mx-auto mt-8 grid w-full max-w-md grid-cols-1 gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14"
+      >
+        <div className="flex min-w-0 flex-col gap-4 lg:col-span-7">
           <DailyBlock
             lang={language}
             t={tt}
@@ -89,13 +96,13 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           <StreakMilestoneCheer view={streakView} />
           <WeeklyThemeCard lang={language} t={tt} source="home" compact />
         </div>
-        <div className="lg:col-span-5">
+        <div className="min-w-0 lg:col-span-5">
           <FriendsBlock lang={language} t={tt} showAvatars={mounted} />
         </div>
-        <div className="lg:col-span-12">
+        <div className="min-w-0 lg:col-span-12">
           <HomeAdventureCard />
         </div>
-        <div className="lg:col-span-12">
+        <div className="min-w-0 lg:col-span-12">
           <MoreGames lang={language} t={tt} hideAdventure showCrossword={canSeeInWorkModes && hasCrosswordPuzzles(language)} />
         </div>
       </div>
