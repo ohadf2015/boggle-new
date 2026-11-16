@@ -28,6 +28,8 @@ import type { Server, Socket } from 'socket.io';
 
 import { getGame } from '../modules/gameStateManager.js';
 import { handleReconnection } from './playerReconnectHandler.js';
+import { getSocketById } from '../utils/socketHelpers.js';
+import { parkSameConnectionGhost } from './sameConnectionGhost.js';
 import logger from '../utils/logger.js';
 
 export interface HostReclaimRequest {
@@ -70,6 +72,32 @@ export function tryReclaimClassroomHostSeat(
   const hostUser = game.users?.[hostUsername];
   if (!hostUser?.authUserId) return false;
   if (hostUser.authUserId !== verifiedUserId) return false;
+
+  // Takeover guard: a second LIVE page of the same teacher (projector +
+  // laptop, a duplicated tab, the refused-frame's retry) re-emits createGame
+  // too. Handing it the seat here would flip hostSocketId off the board that
+  // is still connected and silently dead every teacher control on it — they
+  // all gate on `game.hostSocketId === socket.id` — while the class watches a
+  // frozen wall (race 3a1508b5, 2026-11-13 round-3 audit). The join path
+  // seats this page as the practice seat instead (teacherSecondPage in
+  // playerJoinIdentity); the create path has no practice seat to offer, so it
+  // refuses and lets the duplicate fall through to GAME_ALREADY_EXISTS — the
+  // client shows its "room already open" frame while the live board keeps
+  // hosting. A genuinely dead host socket (reload, network blip) fails the
+  // connected check and the reclaim proceeds as before; a same-connection
+  // ghost is parked, not obeyed.
+  const currentHostSocketId = game.hostSocketId;
+  if (currentHostSocketId && currentHostSocketId !== socket.id) {
+    const currentHostSocket = getSocketById(io, currentHostSocketId);
+    if (currentHostSocket?.connected && !parkSameConnectionGhost(currentHostSocket, socket)) {
+      logger.info(
+        'HOST',
+        `Refused host-seat takeover in ${gameCode}: the live host socket is still connected`,
+        { socketId: socket.id, hostSocketId: currentHostSocketId, gameCode }
+      );
+      return false;
+    }
+  }
 
   logger.info(
     'HOST',
