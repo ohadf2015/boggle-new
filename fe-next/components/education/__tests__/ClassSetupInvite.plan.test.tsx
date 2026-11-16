@@ -82,7 +82,7 @@ describe('ClassSetupInvite: what next with no students yet', () => {
     expect(follows(screen.getByTestId('setup-actions'), prompt)).toBe(true);
     expect(follows(screen.getByTestId('rehearse'), prompt)).toBe(true);
     expect(follows(screen.getByText('eduShell.setup.backHome'), prompt)).toBe(true);
-    expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'class_setup' });
+    await waitFor(() => expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'class_setup' }));
   });
 
   it('Given a class with no students, When the teacher saves tomorrow at 9, Then the plan is stored for this class with source class_setup', async () => {

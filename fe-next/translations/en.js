@@ -1367,6 +1367,8 @@ const en = {
       "title": "Word Academy",
       "rewardXp": "+{xp} XP",
       "arenaWaiting": "Your teacher hasn't started a live game yet. This island lights up when they do.",
+      "waitingForTeacher": "Waiting for your teacher",
+      "waitingOver": "Hold on",
       "bossLockedNote": "Master {count} more words to unlock the boss.",
       "level": "Level {level}",
       "xpToNext": "XP to next level",
@@ -16265,7 +16267,11 @@ const en = {
           "liveHint": "Your game is open and students can join now. Open the board to run it.",
           "startGame": "Start a game for this class",
           "openBoard": "Open the game board",
-          "openClass": "Open my class"
+          "openClass": "Open my class",
+          "joinAsStudent": "Join as a student on this device",
+          "joinAsStudentHint": "This signs the teacher out so a student can join from here.",
+          "joiningAsStudent": "Signing the teacher out…",
+          "joinAsStudentFailed": "Couldn't sign the teacher out. Try again."
         },
         "returning": {
           "title": "Continue as {name}?",
@@ -21550,6 +21556,8 @@ const en = {
       "greetEvening": "Good evening, {name}",
       "greetNoName": "Welcome back",
       "startWith": "Start a game with",
+      "waitingNudge": "{count} students are waiting — start a round",
+      "waitingNudgeOne": "1 student is waiting — start a round",
       "switchClass": "Choose a class",
       "startLive": "Start a game",
       "yourClasses": "Your classes",

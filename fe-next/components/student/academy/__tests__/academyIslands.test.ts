@@ -186,9 +186,9 @@ describe('pickNextAction — exactly one recommended thing', () => {
     expect(pickNextAction({ hasClass: true, live: false, ...r })).toEqual({ kind: 'workshop', nodeKey: 'workshop' });
   });
 
-  it('falls back to solo practice for a class with nothing assigned', () => {
+  it('waits for the teacher instead of sending an empty class into solo', () => {
     const r = islandsFor({ lessons: [], reviewLessonId: '' });
-    expect(pickNextAction({ hasClass: true, live: false, ...r })).toEqual({ kind: 'solo', nodeKey: null });
+    expect(pickNextAction({ hasClass: true, live: false, ...r })).toEqual({ kind: 'waiting', nodeKey: 'arena' });
   });
 });
 

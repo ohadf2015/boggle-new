@@ -71,7 +71,12 @@ export default function StudentPageClient() {
   // (Nov 9: all 26 students who joined a class fired it, then saw the class).
   useEffect(() => {
     if (isChecking || loading || classroomLoading) return;
-    if (!classroomId) posthog.capture('student_no_classroom_prompt_viewed');
+    if (!classroomId) {
+      posthog.capture('student_no_classroom_prompt_viewed', {
+        class_id: null,
+        has_class: false,
+      });
+    }
   }, [isChecking, loading, classroomLoading, classroomId]);
 
   // The wait above is correct but it had no floor. A profile read that fails any

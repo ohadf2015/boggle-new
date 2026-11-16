@@ -1367,6 +1367,8 @@ const es = {
       "title": "Academia de palabras",
       "rewardXp": "+{xp} XP",
       "arenaWaiting": "Tu profe aún no empezó una partida en vivo. Esta isla se enciende cuando lo haga.",
+      "waitingForTeacher": "Esperando a tu profe",
+      "waitingOver": "Espera",
       "bossLockedNote": "Para abrir al jefe, domina más palabras: {count}",
       "level": "Nivel {level}",
       "xpToNext": "XP para el siguiente nivel",
@@ -17918,7 +17920,11 @@ const es = {
           "liveHint": "Tu partida está abierta y los alumnos ya pueden entrar. Abre el tablero para dirigirla.",
           "startGame": "Empezar una partida con esta clase",
           "openBoard": "Abrir el tablero",
-          "openClass": "Abrir mi clase"
+          "openClass": "Abrir mi clase",
+          "joinAsStudent": "Entrar como alumno en este dispositivo",
+          "joinAsStudentHint": "Esto cierra la sesión del profesor para que un alumno pueda entrar desde aquí.",
+          "joiningAsStudent": "Cerrando la sesión del profesor…",
+          "joinAsStudentFailed": "No pudimos cerrar la sesión del profesor. Inténtalo de nuevo."
         },
         "returning": {
           "title": "¿Sigues como {name}?",
@@ -22541,6 +22547,8 @@ const es = {
       "greetEvening": "Buenas noches, {name}",
       "greetNoName": "Hola de nuevo",
       "startWith": "Empieza una partida con",
+      "waitingNudge": "{count} alumnos están esperando — empieza una ronda",
+      "waitingNudgeOne": "1 alumno está esperando — empieza una ronda",
       "switchClass": "Elegir clase",
       "startLive": "Empezar un juego",
       "yourClasses": "Tus clases",

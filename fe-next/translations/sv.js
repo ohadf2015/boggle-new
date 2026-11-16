@@ -1367,6 +1367,8 @@ const sv = {
       "title": "Ordakademin",
       "rewardXp": "+{xp} XP",
       "arenaWaiting": "Din lärare har inte startat ett livespel än. Den här ön tänds när det händer.",
+      "waitingForTeacher": "Väntar på din lärare",
+      "waitingOver": "Vänta",
       "bossLockedNote": "Lär dig {count} ord till för att låsa upp bossen.",
       "level": "Nivå {level}",
       "xpToNext": "XP till nästa nivå",
@@ -18295,7 +18297,11 @@ const sv = {
           "liveHint": "Ditt spel är öppet och eleverna kan gå med nu. Öppna spelplanen för att leda det.",
           "startGame": "Starta ett spel för klassen",
           "openBoard": "Öppna spelplanen",
-          "openClass": "Öppna min klass"
+          "openClass": "Öppna min klass",
+          "joinAsStudent": "Gå med som elev på den här enheten",
+          "joinAsStudentHint": "Det här loggar ut läraren så att en elev kan gå med härifrån.",
+          "joiningAsStudent": "Loggar ut läraren…",
+          "joinAsStudentFailed": "Vi kunde inte logga ut läraren. Försök igen."
         },
         "returning": {
           "title": "Fortsätta som {name}?",
@@ -22529,6 +22535,8 @@ const sv = {
       "greetEvening": "God kväll, {name}",
       "greetNoName": "Välkommen tillbaka",
       "startWith": "Starta ett spel med",
+      "waitingNudge": "{count} elever väntar — starta en runda",
+      "waitingNudgeOne": "1 elev väntar — starta en runda",
       "switchClass": "Välj klass",
       "startLive": "Starta ett spel",
       "yourClasses": "Dina klasser",

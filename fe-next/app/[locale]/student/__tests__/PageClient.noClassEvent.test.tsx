@@ -42,9 +42,10 @@ describe('StudentPageClient — student_no_classroom_prompt_viewed', () => {
     expect(noClassCalls()).toHaveLength(0);
   });
 
-  it('fires once the class read settles with no class', async () => {
+  it('fires once the class read settles with no class, and says so with class_id and has_class', async () => {
     classroom.current = { classroomId: null, isLoading: false };
     render(<StudentPageClient />);
     await waitFor(() => expect(noClassCalls()).toHaveLength(1));
+    expect(noClassCalls()[0][1]).toEqual({ class_id: null, has_class: false });
   });
 });

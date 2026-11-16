@@ -5,7 +5,7 @@
  *   live game → "JOIN LIVE GAME"   · no class → "Join your class"
  *   next lesson → "PLAY · <lesson>" · review due → "REVIEW · Missed Words" (+ due badge)
  *   boss unlocked → "FIGHT THE BOSS" · workshop → "PLAY · Word Workshop"
- *   nothing assigned → solo practice
+ *   nothing assigned and no live round → waiting for the teacher
  * Solo practice otherwise lives in a small secondary medallion beside it.
  */
 
@@ -13,7 +13,7 @@ import Image from 'next/image';
 import { m } from 'framer-motion';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { useCompositorLoop } from '@/lib/education/motion/compositorLoop';
-import { Loader2, Play, Sparkles, UserPlus } from 'lucide-react';
+import { Hourglass, Loader2, Play, Sparkles, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -46,7 +46,7 @@ const ART: Partial<Record<CtaKind, string>> = {
 
 /** The hero's colour — the spotlight over the island wears the same one. */
 export function ctaTone(kind: CtaKind): Tone {
-  return kind === 'live' ? 'pink' : kind === 'join-class' || kind === 'solo' ? 'teal' : 'gold';
+  return kind === 'live' ? 'pink' : kind === 'waiting' ? 'teal' : kind === 'join-class' || kind === 'solo' ? 'teal' : 'gold';
 }
 
 /**
@@ -65,6 +65,8 @@ export function useCtaOverline(kind: CtaKind): string {
             ? t('academy.student.ctaStart', 'Start here')
             : kind === 'solo'
               ? t('academy.student.ctaSoloOver', 'Warm up')
+              : kind === 'waiting'
+                ? t('academy.student.waitingOver', 'Hold on')
               : t('academy.student.ctaPlay', 'Play');
 }
 
@@ -94,14 +96,18 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
             ? t('academy.student.ctaBossTitle', 'Fight the boss')
             : kind === 'solo'
               ? t('student.dashboard.soloPractice', 'Solo Practice')
+              : kind === 'waiting'
+                ? t('academy.student.waitingForTeacher', 'Waiting for your teacher')
               : targetLabel;
 
   const sub =
     kind === 'live'
       ? t('student.activeGame.teacherStarted', '{teacher} started a classroom game', { teacher: activeGame?.teacherName ?? '' })
       : kind === 'join-class'
-        ? t('academy.student.ctaJoinSub', 'Type the code from your teacher')
-        : null;
+      ? t('academy.student.ctaJoinSub', 'Type the code from your teacher')
+      : kind === 'waiting'
+        ? t('academy.student.arenaWaiting', "Your teacher hasn't started a live game yet. This island lights up when they do.")
+      : null;
 
   const tone = ctaTone(kind);
   const art = kind === 'next' ? `/images/education/node-${target?.type ?? 'lesson'}.webp` : ART[kind];
@@ -123,12 +129,15 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         data-kind={kind}
         data-tone={tone}
         onClick={() => {
+          if (kind === 'waiting' || isJoining) return;
           sfx.playButtonClickSound?.();
           onPress();
         }}
         disabled={isJoining}
+        aria-disabled={kind === 'waiting' || undefined}
         className={cn(
           'icon-only relative flex w-full items-center gap-3 overflow-hidden rounded-[20px] border-3 border-neo-black ps-2 pe-2 text-start text-neo-black disabled:cursor-wait',
+          kind === 'waiting' && 'cursor-default',
           big ? 'min-h-[92px] gap-4 ps-3 pe-3' : compact ? 'h-14 gap-2' : 'min-h-[68px] sm:min-h-[76px]',
           sub && !compact && 'py-2',
         )}
@@ -163,6 +172,8 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
             <Medallion tone="night" size={compact ? 40 : 48}>
               {kind === 'join-class' ? (
                 <UserPlus className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
+              ) : kind === 'waiting' ? (
+                <Hourglass className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
               ) : (
                 <Sparkles className="h-6 w-6 fill-neo-yellow text-neo-black" strokeWidth={2} />
               )}

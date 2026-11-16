@@ -199,7 +199,7 @@ export function JoinFlow({
           ) : showSuccessCelebration ? (
             <JoinSuccessPanel mode="game" label={flow.target?.label} name={flow.name.trim() || undefined} />
           ) : flow.ownClass ? (
-            <TeacherOwnClassPanel classroomId={flow.ownClass.classroomId} liveGameCode={flow.ownClass.liveGameCode} />
+            <TeacherOwnClassPanel classroomId={flow.ownClass.classroomId} liveGameCode={flow.ownClass.liveGameCode} joinCode={flow.code} />
           ) : flow.ended ? (
             <JoinEndedPanel
               code={flow.code}

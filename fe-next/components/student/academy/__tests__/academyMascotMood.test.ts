@@ -49,4 +49,8 @@ describe('academyMascotMood', () => {
     expect(mood('workshop')).toMatchObject({ variant: 'gaming', lineKey: 'academy.student.mascotWorkshop' });
     expect(mood('solo')).toMatchObject({ variant: 'gaming', lineKey: 'academy.student.mascotSolo' });
   });
+
+  it('waves while an empty class waits for the teacher, and does not pitch solo', () => {
+    expect(mood('waiting')).toMatchObject({ variant: 'waving', lineKey: 'academy.student.arenaWaiting' });
+  });
 });

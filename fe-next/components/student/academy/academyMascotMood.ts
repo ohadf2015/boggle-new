@@ -34,6 +34,8 @@ export function academyMascotMood({ kind, streakAtRisk, streak, reviewCount }: A
       return { variant: 'gaming', lineKey: 'academy.student.mascotWorkshop' };
     case 'solo':
       return { variant: 'gaming', lineKey: 'academy.student.mascotSolo' };
+    case 'waiting':
+      return { variant: 'waving', lineKey: 'academy.student.arenaWaiting' };
     default:
       return { variant: 'happy', lineKey: 'academy.student.mascotNext' };
   }

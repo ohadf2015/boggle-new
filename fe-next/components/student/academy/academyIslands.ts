@@ -161,7 +161,7 @@ export function buildAcademyIslands(input: IslandInput): { islands: AcademyIslan
   return { islands, boss };
 }
 
-export type NextActionKind = 'live' | 'join-class' | 'next' | 'review' | 'boss' | 'workshop' | 'solo';
+export type NextActionKind = 'live' | 'join-class' | 'next' | 'review' | 'boss' | 'workshop' | 'solo' | 'waiting';
 
 export function pickNextAction(opts: {
   hasClass: boolean;
@@ -178,7 +178,8 @@ export function pickNextAction(opts: {
   if (review?.badge) return { kind: 'review', nodeKey: review.key };
   if (boss?.href) return { kind: 'boss', nodeKey: boss.key };
   if (islands.some((n) => n.kind === 'workshop')) return { kind: 'workshop', nodeKey: 'workshop' };
-  return { kind: 'solo', nodeKey: null };
+  // An empty class with no live round is waiting for the teacher, not a solo game.
+  return { kind: 'waiting', nodeKey: 'arena' };
 }
 
 /** The last `n` slots — the ones nearest the castle — so the path runs unbroken into the boss. */

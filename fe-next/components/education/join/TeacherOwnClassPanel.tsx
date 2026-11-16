@@ -1,18 +1,22 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Presentation } from 'lucide-react';
+import { Presentation, UserPlus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
 import { safeCapture } from '@/lib/education/telemetryCore';
 import { EDU_EVENTS } from '@/lib/analytics/eduEvents';
+import { signOut } from '@/lib/supabase';
+import { clearStoredProfile } from '@/utils/profileStorage';
 
 interface TeacherOwnClassPanelProps {
   classroomId: string;
   liveGameCode: string | null;
+  /** The code on this page, so a student on the teacher's device can rejoin after sign-out. */
+  joinCode?: string;
 }
 
 const ACTION =
@@ -23,9 +27,11 @@ export function teacherClassHref(locale: string, classroomId: string): string {
 }
 
 /** The teacher typed their own class code: they came to run the class, so show them how. */
-export function TeacherOwnClassPanel({ classroomId, liveGameCode }: TeacherOwnClassPanelProps) {
+export function TeacherOwnClassPanel({ classroomId, liveGameCode, joinCode }: TeacherOwnClassPanelProps) {
   const { t, language } = useLanguage();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveFailed, setLeaveFailed] = useState(false);
   useEffect(() => {
     headingRef.current?.focus();
   }, []);
@@ -40,6 +46,25 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode }: TeacherOwnCl
       action: live ? 'open_board' : 'start_game',
       has_live_room: live,
     });
+
+  const joinAsStudent = async () => {
+    if (leaving || !joinCode) return;
+    setLeaveFailed(false);
+    setLeaving(true);
+    const result = await signOut().catch(() => ({ error: { message: 'failed' } }));
+    if (result?.error) {
+      setLeaving(false);
+      setLeaveFailed(true);
+      return;
+    }
+    clearStoredProfile();
+    safeCapture(EDU_EVENTS.teacherOwnClassAction, {
+      classroom_id: classroomId,
+      action: 'join_as_student',
+      has_live_room: live,
+    });
+    window.location.assign(`/${language}/join/${encodeURIComponent(joinCode)}`);
+  };
 
   return (
     <section data-testid="join-own-class-panel" aria-labelledby="join-own-class-title" className="flex flex-col gap-5">
@@ -64,6 +89,31 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode }: TeacherOwnCl
         <Link href={teacherClassHref(language, classroomId)} data-testid="own-class-secondary" className={cn(ACTION, 'min-h-12 bg-neo-cream shadow-hard-sm')}>
           {t('education.student.join.ownClass.openClass')}
         </Link>
+        {joinCode ? (
+          <button
+            type="button"
+            data-testid="own-class-join-as-student"
+            onClick={() => { void joinAsStudent(); }}
+            disabled={leaving}
+            aria-busy={leaving || undefined}
+            className={cn(ACTION, 'min-h-12 bg-neo-cyan text-neo-navy shadow-hard-sm disabled:cursor-wait disabled:opacity-60')}
+          >
+            <UserPlus aria-hidden="true" className="me-2 size-5" strokeWidth={2.75} />
+            {leaving
+              ? t('education.student.join.ownClass.joiningAsStudent', 'Signing the teacher out…')
+              : t('education.student.join.ownClass.joinAsStudent', 'Join as a student on this device')}
+          </button>
+        ) : null}
+        {joinCode ? (
+          <p className="font-neo-body text-sm font-bold text-neo-cream/80">
+            {t('education.student.join.ownClass.joinAsStudentHint', 'This signs the teacher out so a student can join from here.')}
+          </p>
+        ) : null}
+        {leaveFailed ? (
+          <p role="alert" className="font-neo-body text-sm font-bold text-neo-red">
+            {t('education.student.join.ownClass.joinAsStudentFailed', "Couldn't sign the teacher out. Try again.")}
+          </p>
+        ) : null}
       </div>
     </section>
   );
