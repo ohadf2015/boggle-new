@@ -111,14 +111,12 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(screen.getByTestId('edu-results-more')).toContainElement(screen.getByTestId('report-pdf-export'));
   });
 
-  it('given a free teacher, then the one secondary is "Share with parents", labelled Pro with a crown, leading to the upgrade page in a new tab', () => {
+  it('given a free teacher, then there is NO "Share with parents" upsell mid-class: the ask is post-class only', () => {
     renderWall();
     openMore();
-    const share = screen.getByTestId('edu-results-parent-share');
-    expect(share).toHaveTextContent('eduLiveRoom.hostResults.shareParents');
-    expect(share.querySelector('[data-testid="pro-pill"]')).not.toBeNull();
-    expect(share).toHaveAttribute('href', expect.stringMatching(/^\/en\/teacher\/upgrade\?source=results_parent_share/));
-    expect(share).toHaveAttribute('target', '_blank');
+    // The free-teacher parent share linked to the upgrade page — a mid-class ask, removed.
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
+    expect(screen.queryByTestId('report-pdf-export')).toBeNull();
   });
 
   it('given a Pro teacher, then "Share with parents" opens the one Reports place', () => {
@@ -143,12 +141,15 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     }
   });
 
-  it('given a free teacher, then no trial card competes: the deeper report is one labelled Pro preview that never blurs or names a student', () => {
+  it('given a free teacher, then no trial card competes and the free report insight carries no Pro depth, pill or upgrade CTA mid-class', () => {
     renderWall();
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     openMore();
     const preview = screen.getByTestId('class-report-teaser');
-    expect(preview.querySelector('[data-testid="pro-pill"]')).not.toBeNull();
+    // The ask is suppressed on the live wall: no Pro pill, no locked-depth block, no offer CTA.
+    expect(preview.querySelector('[data-testid="pro-pill"]')).toBeNull();
+    expect(screen.queryByTestId('class-report-depth')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser-offer-title')).toBeNull();
     expect(preview.innerHTML).not.toMatch(/blur-/);
     expect(preview).not.toHaveTextContent(/Noa|Ido|Lia/);
   });
@@ -168,14 +169,15 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     expect(screen.getByTestId('edu-results-report')).toHaveAttribute('target', '_blank');
   });
 
-  it('given a class that found every word, then Play again is the primary and Share with parents stays the one secondary', () => {
+  it('given a class that found every word, then Play again is the primary and a free teacher gets no Share-with-parents upsell', () => {
     const nailed = { ...summary, missedWords: [], classFoundCount: 4, coverage: summary.coverage.map((c) => ({ ...c, foundBy: ['Noa', 'Ido', 'Lia'] })) } as ClassroomSummary;
     renderWall({ summary: nailed });
     expect(screen.queryByTestId('edu-reteach-words')).toBeNull();
     expect(screen.getByTestId('edu-results-play-again')).toHaveAttribute('data-results-primary');
     expect(document.querySelectorAll('[data-results-primary]')).toHaveLength(1);
     openMore();
-    expect(screen.getByTestId('edu-results-parent-share')).toBeInTheDocument();
+    // Free teacher: the parent-share upgrade CTA is a mid-class ask, so it stays off this wall.
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
   });
 
   it('given no rematch handler, then the missed words still show but no practice button promises a round it cannot start', () => {
