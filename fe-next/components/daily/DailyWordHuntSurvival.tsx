@@ -40,7 +40,6 @@ import { useHuntStage } from './survival/hunt/useHuntStage';
 import { useLiveWord } from './survival/hunt/liveWord';
 import { HuntFinishOverlay } from './survival/hunt/HuntFinishOverlay';
 import { HuntFeedbackPill } from './survival/hunt/HuntFeedbackPill';
-import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { HuntHintSlots } from './survival/hunt/HuntHintSlots';
 import { HuntRoundClock } from './survival/hunt/HuntRoundClock';
 import { useGameTimer } from '@/hooks/useGameTimer';
@@ -218,11 +217,11 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
     ) : null;
 
-  // Hide bottom navigation during active gameplay
+  // The finish hold keeps the nav hidden too: results unmounting this screen is what releases it.
   useEffect(() => {
-    setIsInGame(isGameActive);
+    setIsInGame(isGameActive || state.isGameOver);
     return () => setIsInGame(false);
-  }, [isGameActive, setIsInGame]);
+  }, [isGameActive, state.isGameOver, setIsInGame]);
 
   const { setLifeGainAmount } = actions;
   const handleLifeGainComplete = useCallback(() => {
@@ -284,10 +283,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       outcome={state.hasWon ? 'win' : 'loss'}
       targetWord={targetWord}
       language={language}
-      tier={state.hasWon ? wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length) : null}
+      tries={state.attempts.filter((a) => !a.isDiscovery).length}
       calm={calm}
       onSkip={actions.skipFinish}
-      sourcePath={state.hasWon ? stage.path : undefined}
       timedOut={timed && !state.hasWon && roundClock.remainingTime <= 0}
       t={t}
     />
@@ -402,6 +400,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           skipAnimations={calm}
           gameDir={actions.gameDir}
           explainRules={!timed}
+          solvedWord={state.isGameOver && state.hasWon ? targetWord : null}
+          language={language}
           matchesTargetLength={
             !state.isGameOver
             && (keyboardInput.typedWord ? keyboardInput.typedWord.length === targetWord.length : swipeMatchesTarget)

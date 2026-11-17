@@ -154,7 +154,7 @@ describe('DailyWordHuntSurvival word feedback', () => {
     fireEvent.keyDown(document, { key: 'Enter' });
     const finish = await screen.findByTestId('hunt-finish');
     expect(finish).toHaveAttribute('data-outcome', 'win');
-    expect(screen.getAllByTestId('hunt-finish-letter').map(el => el.textContent).join('')).toBe('HOUSE');
+    expect(screen.getAllByTestId('hunt-solved-letter').map(el => el.textContent).join('')).toBe('HOUSE');
     expect(onComplete).not.toHaveBeenCalled();
     fireEvent.click(finish);
     expect(onComplete).toHaveBeenCalledTimes(1);

@@ -10975,6 +10975,7 @@ const sv = {
       "wordsLabel": "Ord",
       "triesLeft": "försök kvar",
       "matchesTargetWarning": "Samma längd: att skicka kostar 1 försök",
+      "solved": {"title": "Löst!", "firstTry": "på första försöket", "inTries_one": "på {count} försök", "inTries_other": "på {count} försök"},
       "knownLetters": "Fel plats:",
       "syncingTarget": "Synkar målordet…",
       "healHint": "Alla ord läker. Hitta det dolda ordet för att vinna",

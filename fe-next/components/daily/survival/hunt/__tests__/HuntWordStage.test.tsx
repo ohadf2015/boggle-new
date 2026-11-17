@@ -96,16 +96,21 @@ describe('HuntWordStage', () => {
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('CAT');
   });
 
-  it('Given the hidden word is found, Then the stage cheers it like a good word and marks it as the target', () => {
+  it('Given the hidden word is found, Then the stage marks it as the target and shows its points', () => {
     stage({ phase: 'verdict', verdict: 'target', word: 'PLANE', points: 14 });
     expect(screen.getByTestId('hunt-stage').dataset.verdict).toBe('target');
     expect(screen.getByTestId('hunt-stage-points').textContent).toContain('+14');
-    expect(screen.getByText('wordHunt.survival.stage.praiseMid')).toBeTruthy();
   });
 
   it('keeps the released word up while the check is pending', () => {
     stage({ phase: 'pending', word: 'PLANE' });
     expect(screen.getByTestId('hunt-stage').dataset.phase).toBe('pending');
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('PLANE');
+  });
+
+  it('Given the hidden word itself, Then the stage gives it no ordinary praise sticker or burst: the solve has its own moment', () => {
+    stage({ phase: 'verdict', word: 'PLATE', verdict: 'target', points: 5 });
+    expect(screen.queryByText('wordHunt.survival.stage.praiseMid')).toBeNull();
+    expect(screen.queryByTestId('hunt-stage-burst')).toBeNull();
   });
 });

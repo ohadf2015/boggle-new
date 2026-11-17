@@ -9,6 +9,7 @@ import { useSurvivalGameLogic } from '../useSurvivalGameLogic';
 import * as MusicContextModule from '@/contexts/MusicContext';
 import * as GameMusicModule from '@/hooks/useGameMusic';
 import { SOLVE_CELEBRATION_MS, LOSS_REVEAL_MS } from '../constants';
+import { solvedRowDurationMs } from '../hunt/HuntSolvedRow';
 
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null, profile: null, isAuthenticated: false }),
@@ -120,7 +121,8 @@ describe('useSurvivalGameLogic - solve celebration (analytics never answers)', (
     expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it('keeps the win beat snappy', () => {
-    expect(SOLVE_CELEBRATION_MS).toBeLessThanOrEqual(1300);
+  it('keeps the win beat snappy, yet long enough for the longest word to finish turning over', () => {
+    expect(SOLVE_CELEBRATION_MS).toBeLessThanOrEqual(1800);
+    expect(SOLVE_CELEBRATION_MS).toBeGreaterThanOrEqual(solvedRowDurationMs(8) + 300);
   });
 });

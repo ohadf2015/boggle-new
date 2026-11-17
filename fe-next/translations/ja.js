@@ -10665,6 +10665,7 @@ const ja = {
       "wordsLabel": "単語",
       "triesLeft": "回残り",
       "matchesTargetWarning": "同じ文字数。送信すると1回消費",
+      "solved": {"title": "正解！", "firstTry": "一発で！", "inTries_one": "{count}回で", "inTries_other": "{count}回で"},
       "knownLetters": "位置違い:",
       "syncingTarget": "ターゲット同期中…",
       "healHint": "どんな単語でも回復。隠れた単語を当てれば勝ち",
