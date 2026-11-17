@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { timingSafeEqual } from 'crypto';
 import logger from '@/utils/logger';
 import { withCronLock } from '@/backend/redis/locking';
-import { EN_POSTS, HE_POSTS } from '@/lib/instagram/postCalendar';
+import { enPostFor, HE_POSTS } from '@/lib/instagram/postCalendar';
 
 export const maxDuration = 60;
 
@@ -115,7 +115,7 @@ export async function GET(request: NextRequest) {
 
       // Post EN
       if (!lang || lang === 'en') {
-        const post = EN_POSTS[dayOfWeek];
+        const post = enPostFor(new Date());
         const token = process.env.INSTAGRAM_ACCESS_TOKEN_EN;
         const accountId = process.env.INSTAGRAM_ACCOUNT_ID_EN;
 

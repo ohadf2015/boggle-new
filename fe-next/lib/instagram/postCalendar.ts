@@ -74,6 +74,31 @@ export const EN_POSTS: Record<number, InstagramPost> = {
   },
 };
 
+// Every other week these replace the EN post for that weekday, so the feed rotates fresh creatives.
+export const EN_ALT_WEEK_POSTS: Partial<Record<number, InstagramPost>> = {
+  1: {
+    image: 'lexiclash-insta-hero.jpg',
+    caption: `Live word battles with your friends ⚔️\n\nEveryone gets the same letters and the same clock. Swipe to make words, watch the scores move, and see who pulls ahead.\n\nWho would you challenge first? Tag them 👇\n\nPlay free in your browser at lexiclash.live (link in bio)`,
+    hashtags: '#wordgame #multiplayer #playwithfriends #wordbattle #gamenight #puzzlegame #lexiclash #wordnerd #browsergame #freegames #wordgames #wordlover #scrabble #wordle #indiegame',
+  },
+  3: {
+    image: 'lexiclash-insta-board.jpg',
+    caption: `Same letters, same clock. Who finds more words? 👀\n\nConnect neighbouring letters to build words. Longer and rarer words score more, and you can see your rivals' points climb while you play.\n\nDrop the longest word you can spot on this board in the comments 👇\n\nPlay unlimited boards free at lexiclash.live (link in bio)`,
+    hashtags: '#wordpuzzle #boggle #wordgame #canyousolveit #puzzletime #brainteaser #lexiclash #wordchallenge #commentbelow #wordnerd #wordsearch #wordgames #vocabulary #puzzlelover #wordle',
+  },
+  5: {
+    image: 'lexiclash-insta-modes.jpg',
+    caption: `Pick your mode 🎯\n\nBlast, Word Hunt and Wheel Rush each put a twist on the classic word grid, and the daily puzzle gives everyone the same board each day.\n\nWhich one are you trying first? 👇\n\nAll free at lexiclash.live (link in bio)`,
+    hashtags: '#wordgame #dailypuzzle #wordhunt #puzzlegame #lexiclash #wordnerd #casualgaming #brainteaser #freegames #playwithfriends #wordgames #puzzleoftheday #dailychallenge #wordlover #indiegame',
+  },
+};
+
+export function enPostFor(date: Date): InstagramPost | undefined {
+  const day = date.getDay();
+  const week = Math.floor(date.getTime() / (7 * 24 * 60 * 60 * 1000));
+  return (week % 2 === 1 && EN_ALT_WEEK_POSTS[day]) || EN_POSTS[day];
+}
+
 export const HE_POSTS: Record<number, InstagramPost> = {
   0: {
     image: 'lexiclash-insta-untranslatable-words-he.png',
