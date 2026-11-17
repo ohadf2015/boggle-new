@@ -520,7 +520,6 @@ describe('edu_trial_reminder events', () => {
   });
 });
 
-<<<<<<< HEAD
 describe('teacher_trial_banner events (Polar trial lifecycle banner)', () => {
   beforeEach(() => {
     captureMock.mockReset();
