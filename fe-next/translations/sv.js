@@ -2689,6 +2689,7 @@ const sv = {
     "subtitle": "Hitta ordet som kopplar ihop båda",
     "placeholder": "Skriv bryggordet...",
     "submit": "Skicka",
+    "typeHint": "Skriv med tangentbordet",
     "backspace": "Radera bokstav",
     "momentum": {
       "start": "Lös {goal} i rad för en bonus",
@@ -10205,6 +10206,7 @@ const sv = {
     "journeyStepOf": "Steg {n}/{total}",
     "journeyAllRequiredDone": "Dagens uppdrag är klara! Bonusrundorna är valfria",
     "backToDailyHub": "Tillbaka till dagens",
+    "alsoToday": "Också i dag",
     "skipOptional": "Hoppa över",
     "bonusQuest": "Bonus",
     "untimedQuest": "Utan timer",

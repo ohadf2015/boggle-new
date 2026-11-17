@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import {
   DAILY_MODES,
   dailyModeHref,
-  pickNextUnplayedMode,
+  pickUnplayedModes,
   playStateFromToday,
   type DailyModeId,
 } from '@/lib/dailyModes';
@@ -23,6 +23,7 @@ import { StreakMilestonePopup } from '@/components/streak/StreakMilestonePopup';
 import { claimPopupSlot, releasePopupSlot } from '@/components/daily/prize/dayPrizeStore';
 import { prizeToPop, finishingClearsDay } from '@/components/daily/prize/prizeEligibility';
 import type { DayPrizeKind } from '@/lib/daily/dayPrize';
+import { NextQuestMore } from './NextQuestMore';
 
 /** Let the results land before the prize box steps in. */
 export const PRIZE_POP_DELAY_MS = 700;
@@ -43,6 +44,8 @@ export interface NextQuestCtaProps {
    * so there is nothing to keep in sync.
    */
   className?: string;
+  /** Tight placements (an overlay bar) show only the headline, without the second row. */
+  compact?: boolean;
 }
 
 /* Motion only via WAAPI on the arrow chip: a full-width entrance flashes on mobile (rules/60 Class 5) and suites mock `m` as div-only. */
@@ -101,6 +104,7 @@ export function NextQuestCta({
   currentLanguage,
   source = 'daily_results',
   className,
+  compact = false,
 }: NextQuestCtaProps) {
   const { t } = useLanguage();
   const played = useDailyPlayedStatus();
@@ -147,17 +151,20 @@ export function NextQuestCta({
   // previous run spent seven rounds polishing.
   if (played.loading) {
     return (
-      <div
-        className={cn('w-full h-[120px] md:h-[148px] rounded-xl skeleton', className)}
-        aria-hidden="true"
-        data-testid="next-quest-loading"
-      />
+      <>
+        <div
+          className={cn('w-full h-[120px] md:h-[148px] rounded-xl skeleton', className)}
+          aria-hidden="true"
+          data-testid="next-quest-loading"
+        />
+        {!compact && <NextQuestMore modes={[]} currentLanguage={currentLanguage} source={source} loading />}
+      </>
     );
   }
 
   const state = playStateFromToday(played.today);
 
-  const nextId = pickNextUnplayedMode(state, justFinished);
+  const [nextId = null, ...others] = pickUnplayedModes(state, justFinished);
 
   if (!nextId) {
     // Every mode cleared. Still a link, not a dead end: the hub is where the
@@ -268,6 +275,7 @@ export function NextQuestCta({
         <ArrowRight className="w-7 h-7 @md:w-10 @md:h-10 rtl:rotate-180" strokeWidth={3.5} />
       </span>
     </Link>
+    {!compact && <NextQuestMore modes={others} currentLanguage={currentLanguage} source={source} />}
     </>
   );
 }

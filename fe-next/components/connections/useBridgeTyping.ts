@@ -1,14 +1,24 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   getKeyboardRows,
   appendLetter,
   backspace,
   localeNeedsIME,
   bridgeSlotCount,
-  normalizeTypedChar,
 } from '@/lib/connections/keyboard';
+import { letterFromKeyEvent } from '@/lib/connections/physicalKeys';
+
+/** Key ids the on-screen keyboard echoes besides letters. */
+export const ENTER_KEY = 'Enter';
+export const BACKSPACE_KEY = 'Backspace';
+const PRESS_ECHO_MS = 140;
+
+/** Callback ref: puts the caret in an IME guess field on desktop, never on touch (no surprise phone keyboard). */
+export function focusOnFinePointer(el: HTMLInputElement | null) {
+  if (el && window.matchMedia?.('(pointer: fine)').matches) el.focus({ preventScroll: true });
+}
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
 
 interface BridgeTypingOptions {
@@ -50,9 +60,17 @@ export function useBridgeTyping({
   // Held ref keeps the window listener stable without re-subscribing per keystroke.
   const inputRef = useRef(input);
   inputRef.current = input;
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
+  const pressTimer = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(pressTimer.current), []);
+
+  // The rejected guess still sits in the slots for the red flash; typing over it starts a new guess.
+  const deadGuess = useRef<string | null>(null);
+  const typingBase = (current: string) => (current === deadGuess.current ? '' : current);
 
   const handleLetter = (letter: string) => {
-    const next = appendLetter(input, letter, slotCap);
+    const base = typingBase(input);
+    const next = appendLetter(base, letter, slotCap);
     if (next !== input) onInputChange(next);
   };
   const handleBackspace = () => onInputChange(backspace(input));
@@ -69,22 +87,37 @@ export function useBridgeTyping({
       // lib/dom/isTypingTarget.ts.
       if (isTypingTarget(e)) return;
       if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const echo = (id: string) => {
+        setPressedKey(id);
+        window.clearTimeout(pressTimer.current);
+        pressTimer.current = window.setTimeout(() => setPressedKey(null), PRESS_ECHO_MS);
+      };
+      // Write the ref eagerly: a fast typist lands several keydowns before
+      // React re-renders, and each must build on the previous one.
+      const set = (next: string) => {
+        inputRef.current = next;
+        onInputChange(next);
+      };
       if (e.key === 'Enter') {
         if (inputRef.current.trim().length > 0) {
           e.preventDefault();
+          echo(ENTER_KEY);
           onSubmit();
         }
         return;
       }
       if (e.key === 'Backspace') {
         e.preventDefault();
-        onInputChange(backspace(inputRef.current));
+        echo(BACKSPACE_KEY);
+        set(backspace(inputRef.current));
         return;
       }
-      const letter = normalizeTypedChar(e.key, locale);
+      const letter = letterFromKeyEvent(e.key, e.code, locale);
       if (!letter) return;
-      const next = appendLetter(inputRef.current, letter, slotCap);
-      if (next !== inputRef.current) onInputChange(next);
+      e.preventDefault();
+      echo(letter);
+      const next = appendLetter(typingBase(inputRef.current), letter, slotCap);
+      if (next !== inputRef.current) set(next);
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
@@ -94,9 +127,16 @@ export function useBridgeTyping({
   // fresh instead of hand-deleting a dead guess.
   useEffect(() => {
     if (status !== 'wrong') return;
-    const timer = window.setTimeout(() => onInputChange(''), 650);
-    return () => window.clearTimeout(timer);
+    const dead = inputRef.current;
+    deadGuess.current = dead;
+    const timer = window.setTimeout(() => {
+      if (inputRef.current === dead) onInputChange('');
+    }, 650);
+    return () => {
+      window.clearTimeout(timer);
+      deadGuess.current = null;
+    };
   }, [status, wrongAttempts, onInputChange]);
 
-  return { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear };
+  return { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear, pressedKey };
 }

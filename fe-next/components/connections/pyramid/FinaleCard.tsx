@@ -11,7 +11,7 @@ import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
 import AnswerSlots from '../AnswerSlots';
-import { useBridgeTyping } from '../useBridgeTyping';
+import { useBridgeTyping, focusOnFinePointer } from '../useBridgeTyping';
 import HintButton from '../HintButton';
 
 interface FinaleCardProps {
@@ -71,7 +71,7 @@ export default function FinaleCard({
   const isResolved = isCorrect || isGaveUp;
   const isDisabled = isResolved;
 
-  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear } = useBridgeTyping({
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear, pressedKey } = useBridgeTyping({
     input,
     answer: pyramid.metaAnswer,
     locale: language,
@@ -210,6 +210,7 @@ export default function FinaleCard({
             !isDisabled && (
               <div className="flex flex-col gap-3">
                 <input
+                  ref={focusOnFinePointer}
                   type="text"
                   lang={language}
                   inputMode="text"
@@ -265,6 +266,9 @@ export default function FinaleCard({
                   submitLabel={t('connections.submit')}
                   canSubmit={input.trim().length > 0}
                   disabled={isDisabled}
+                  pressedKey={pressedKey}
+                  ready={!isWrong && input.length >= slotCap}
+                  typeHint={t('connections.typeHint')}
                 />
               )}
             </>

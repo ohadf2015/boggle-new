@@ -11,7 +11,7 @@ import ConnectionsMascot from './ConnectionsMascot';
 import AnswerSlots from './AnswerSlots';
 import BridgeStage from './BridgeStage';
 import { PuzzleActions, PuzzleResolution } from './PuzzleActions';
-import { useBridgeTyping } from './useBridgeTyping';
+import { useBridgeTyping, focusOnFinePointer } from './useBridgeTyping';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { BridgeSolveReveal } from './BridgeSolveReveal';
@@ -109,7 +109,7 @@ export default function PuzzleCard({
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls, reducedMotion]);
 
-  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear } = useBridgeTyping({
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear, pressedKey } = useBridgeTyping({
     input: state.input,
     answer: puzzle.bridge,
     locale: language,
@@ -293,6 +293,7 @@ export default function PuzzleCard({
               !isDisabled && (
                 <div className="flex items-stretch gap-2">
                   <input
+                    ref={focusOnFinePointer}
                     type="text"
                     lang={language}
                     inputMode="text"
@@ -340,6 +341,9 @@ export default function PuzzleCard({
                   submitLabel={t('connections.submit')}
                   canSubmit={state.input.trim().length > 0}
                   disabled={isDisabled}
+                  pressedKey={pressedKey}
+                  ready={!isWrong && state.input.length >= slotCap}
+                  typeHint={t('connections.typeHint')}
                 />
               )
             )}

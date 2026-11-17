@@ -9873,6 +9873,7 @@ const ja = {
     "journeyStepOf": "ステップ {n}/{total}",
     "journeyAllRequiredDone": "今日のクエストをクリア！ボーナスは自由参加です",
     "backToDailyHub": "デイリーに戻る",
+    "alsoToday": "今日のほかの挑戦",
     "skipOptional": "スキップ",
     "bonusQuest": "ボーナス",
     "untimedQuest": "フリークエスト",
@@ -20845,6 +20846,7 @@ const ja = {
     "subtitle": "両方をつなぐ言葉を見つけよう。",
     "placeholder": "つなぐ言葉を入力...",
     "submit": "送信",
+    "typeHint": "キーボードで入力できます",
     "backspace": "1文字削除",
     "momentum": {
       "start": "{goal}問連続で解いてボーナス",

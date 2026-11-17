@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
-import { Delete, CornerDownLeft } from 'lucide-react';
+import { Delete, CornerDownLeft, Keyboard } from 'lucide-react';
 import { useHoldToClear } from '@/hooks/useHoldToClear';
 import { ACTION_KEY_WIDTH, backspaceRowIndex, letterColumnCount } from '@/lib/connections/keyboard';
 
@@ -25,7 +25,16 @@ interface ConnectionsKeyboardProps {
   canSubmit?: boolean;
   /** Disable every key (e.g. between puzzles / resolved / out of lives). */
   disabled?: boolean;
+  /** Key a physical keypress just hit (letter, 'Enter' or 'Backspace'); shown pressed. */
+  pressedKey?: string | null;
+  /** Every slot is filled: the submit key lights up. */
+  ready?: boolean;
+  /** Fine-pointer only: tells desktop players they can type. */
+  typeHint?: string;
 }
+
+const PRESSED = 'translate-x-px translate-y-px shadow-hard-pressed';
+const KBD = 'rounded border-2 border-neo-cream/50 bg-neo-navy px-1.5 py-px font-mono text-[11px] font-bold text-neo-cream shadow-hard-sm';
 
 // Same visual language as the word-wheel letters / word-hunt tiles: 3px black
 // border, hard offset shadow that collapses on press with a 1px translate.
@@ -92,6 +101,9 @@ export default function ConnectionsKeyboard({
   submitLabel,
   canSubmit = false,
   disabled = false,
+  pressedKey = null,
+  ready = false,
+  typeHint,
 }: ConnectionsKeyboardProps) {
   const lastRow = rows.length - 1;
   const bsRow = backspaceRowIndex(rows);
@@ -111,6 +123,19 @@ export default function ConnectionsKeyboard({
       dir="ltr"
       className="flex w-full flex-col gap-1.5 sm:gap-2 sm:rounded-neo sm:border-2 sm:border-neo-cream/40 sm:bg-neo-navy-light sm:p-2 sm:shadow-hard"
     >
+      {typeHint && (
+        <p
+          data-testid="connections-type-hint"
+          dir="auto"
+          className="hidden items-center justify-center gap-2 text-xs font-bold text-neo-cream/80 pointer-fine:flex"
+        >
+          <Keyboard className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
+          <span>{typeHint}</span>
+          <span aria-hidden="true" className="text-neo-cream/40">·</span>
+          <kbd className={KBD}>Enter</kbd>
+          <span>{submitLabel}</span>
+        </p>
+      )}
       {rows.map((row, rowIdx) => (
         <m.div
           key={`row-${rowIdx}`}
@@ -132,10 +157,15 @@ export default function ConnectionsKeyboard({
               disabled={disabled || !canSubmit}
               aria-label={submitLabel}
               title={submitLabel}
+              data-pressed={pressedKey === 'Enter' || undefined}
+              data-ready={(ready && canSubmit) || undefined}
               style={actionStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-cyan text-neo-navy active:bg-neo-cyan-light`}
+              className={`${KEY_BASE} ${KEY_SIZE} gap-1.5 text-neo-navy ${
+                ready && canSubmit ? 'bg-neo-lime ring-4 ring-neo-lime/40 active:bg-neo-lime' : 'bg-neo-cyan active:bg-neo-cyan-light'
+              } ${pressedKey === 'Enter' ? PRESSED : ''}`}
             >
-              <CornerDownLeft className="h-5 w-5" strokeWidth={2.75} aria-hidden="true" />
+              <CornerDownLeft className="h-5 w-5 shrink-0" strokeWidth={2.75} aria-hidden="true" />
+              <span className="hidden truncate text-sm uppercase pointer-fine:inline">{submitLabel}</span>
             </button>
           )}
           {row.map((ch) => (
@@ -145,8 +175,11 @@ export default function ConnectionsKeyboard({
               onClick={() => onLetter(ch)}
               disabled={disabled}
               aria-label={ch}
+              data-pressed={pressedKey === ch || undefined}
               style={keyStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-white text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-cream active:bg-neo-lime/30`}
+              className={`${KEY_BASE} ${KEY_SIZE} text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-cream active:bg-neo-lime/30 ${
+                pressedKey === ch ? `${PRESSED} bg-neo-lime` : 'bg-neo-white'
+              }`}
             >
               {ch}
             </button>
@@ -158,8 +191,9 @@ export default function ConnectionsKeyboard({
               disabled={disabled}
               aria-label={backspaceLabel}
               title={backspaceLabel}
+              data-pressed={pressedKey === 'Backspace' || undefined}
               style={actionStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light`}
+              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
             >
               <Delete className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
             </button>

@@ -10013,6 +10013,7 @@ const es = {
     "journeyStepOf": "Paso {n}/{total}",
     "journeyAllRequiredDone": "¡Completaste las misiones de hoy! Las rondas extra son opcionales",
     "backToDailyHub": "Volver al reto diario",
+    "alsoToday": "También hoy",
     "skipOptional": "Saltar",
     "bonusQuest": "Extra",
     "untimedQuest": "Misión libre",
@@ -20891,6 +20892,7 @@ const es = {
     "subtitle": "Encuentra la palabra que conecta ambas",
     "placeholder": "Escribe la palabra puente...",
     "submit": "Enviar",
+    "typeHint": "Escribe con tu teclado",
     "backspace": "Borrar letra",
     "momentum": {
       "start": "Resuelve {goal} seguidas para un bono",

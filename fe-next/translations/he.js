@@ -9996,6 +9996,7 @@ const he = {
     "journeyStepOf": "שלב {n}/{total}",
     "journeyAllRequiredDone": "סיימתם את המשימות של היום! אפשר להמשיך לבונוס",
     "backToDailyHub": "חזרה לאתגר היומי",
+    "alsoToday": "עוד היום",
     "skipOptional": "דלגו",
     "bonusQuest": "בונוס",
     "untimedQuest": "משימה חופשית",
@@ -20311,6 +20312,7 @@ const he = {
     "subtitle": "מצאו את המילה המקשרת",
     "placeholder": "הקלידו את מילת הגשר...",
     "submit": "שלחו",
+    "typeHint": "אפשר להקליד במקלדת",
     "backspace": "מחיקת אות",
     "momentum": {
       "start": "פתרו {goal} ברצף לבונוס",

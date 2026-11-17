@@ -30,6 +30,7 @@ export function V2OverBar({ t, daily, language, onBadges, onRestart, onHome }: V
           currentLanguage={language as Language}
           source="word_tower_over_bar"
           className="py-2"
+          compact
         />
       ) : null}
       <div className="flex w-fit items-center gap-2">
