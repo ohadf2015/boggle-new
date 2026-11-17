@@ -347,8 +347,7 @@ describe('TodayGamesHistory', () => {
 
     render(<TodayGamesHistory authToken={mockAuthToken} />);
 
-    // Should show loading indicator (Loader dots variant)
-    const loadingElement = document.querySelector('[data-testid="page-loader"] .rounded-full');
+    const loadingElement = document.querySelector('[data-testid="page-loader"] [data-testid="loader-tile"]');
     expect(loadingElement).toBeInTheDocument();
   });
 

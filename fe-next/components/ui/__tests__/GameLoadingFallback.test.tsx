@@ -1,18 +1,23 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { GameLoadingFallback } from '../GameLoadingFallback';
 
-vi.mock('../PageLoader', () => ({
-  PageLoader: ({ size }: { size?: string }) => <div data-testid="page-loader" data-size={size} />,
-}));
-
 describe('GameLoadingFallback', () => {
-  it('renders PageLoader inside full-viewport neo-navy container', () => {
-    const { getByTestId, container } = render(<GameLoadingFallback />);
-    const loader = getByTestId('page-loader');
-    expect(loader.getAttribute('data-size')).toBe('md');
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('bg-neo-navy');
-    expect(wrapper.className).toContain('min-h-screen');
+  it('holds a full viewport so the game swapping in does not jump the layout', () => {
+    const { container } = render(<GameLoadingFallback />);
+    expect((container.firstChild as HTMLElement).className).toContain('min-h-[100svh]');
+  });
+
+  it('lets the body pattern show through: no background slab, no blurred backdrop', () => {
+    const { container } = render(<GameLoadingFallback />);
+    expect((container.firstChild as HTMLElement).className).not.toMatch(/\bbg-/);
+    expect(container.querySelectorAll('[data-testid="page-loader"]')).toHaveLength(1);
+    expect(container.innerHTML).not.toMatch(/blur/);
+  });
+
+  it('passes the mode pose and caption through to the loader', () => {
+    render(<GameLoadingFallback mascotVariant="bomber" text="Shuffling letters..." />);
+    expect(screen.getByTestId('loader-mascot')).toHaveAttribute('src', '/mascot/bomber-nobg.webp');
+    expect(screen.getByText('Shuffling letters...')).toBeInTheDocument();
   });
 });

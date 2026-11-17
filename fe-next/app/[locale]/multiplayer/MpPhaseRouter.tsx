@@ -10,8 +10,7 @@ import React, { type ComponentProps } from 'react';
 import nextDynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
-import { PageLoader } from '@/components/ui/PageLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import type { MpPagePhase } from '@/lib/multiplayer/mpPhase';
 import type { EntryScreenProps } from '@/components/multiplayer/entry/EntryScreen';
 import type { MpResultsScreenProps } from '@/components/multiplayer/results/MpResultsScreen';
@@ -22,12 +21,7 @@ import type { useMultiplayerGameFlow } from '@/hooks/useMultiplayerGameFlow';
 import type { useSeriesTracker } from '@/hooks/useSeriesTracker';
 
 function ViewLoadingSkeleton(): React.JSX.Element {
-  return (
-    <div className="flex-1 flex relative">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <PageLoader size="md" className="relative z-10" />
-    </div>
-  );
+  return <GameLoadingFallback />;
 }
 
 // Dynamic imports for code splitting

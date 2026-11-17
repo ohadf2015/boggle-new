@@ -16,7 +16,7 @@ export function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: Load
   const isRtl = locale === 'he';
 
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy" dir={isRtl ? 'rtl' : 'ltr'}>
+    <div className="flex-1 flex items-center justify-center" dir={isRtl ? 'rtl' : 'ltr'}>
       <div className="flex flex-col items-center gap-6">
         <PageLoader size="lg" text={t('auth.callback.completingSignIn')} />
 

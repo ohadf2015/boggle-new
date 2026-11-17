@@ -63,7 +63,7 @@ export default function GuestsPageClient() {
   if (authLoading || isProfileLoading || !authToken) {
     return (
       <div className="flex-1 bg-neo-navy text-neo-white flex items-center justify-center">
-        <PageLoader size="lg" text="Loading..." />
+        <PageLoader size="lg" />
       </div>
     );
   }

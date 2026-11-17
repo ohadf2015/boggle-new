@@ -241,7 +241,7 @@ export default function WebVitalsPageClient() {
   if (authLoading || loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy">
-        <PageLoader size="lg" text="Loading Web Vitals..." />
+        <PageLoader size="lg" />
       </div>
     );
   }

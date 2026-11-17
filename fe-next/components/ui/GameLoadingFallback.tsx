@@ -1,12 +1,17 @@
-'use client';
-
 import React from 'react';
 import { PageLoader } from './PageLoader';
+import type { MascotVariant } from './mascotData';
 
-export function GameLoadingFallback(): React.JSX.Element {
+interface GameLoadingFallbackProps {
+  text?: string;
+  mascotVariant?: MascotVariant;
+}
+
+/** Shared loading state for game modes and their lazy-loaded views; full height so the game swaps in without a jump. */
+export function GameLoadingFallback({ text, mascotVariant }: GameLoadingFallbackProps): React.JSX.Element {
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy min-h-screen">
-      <PageLoader size="md" />
+    <div className="flex flex-1 flex-col min-h-[100svh]">
+      <PageLoader size="lg" text={text} mascotVariant={mascotVariant} />
     </div>
   );
 }
