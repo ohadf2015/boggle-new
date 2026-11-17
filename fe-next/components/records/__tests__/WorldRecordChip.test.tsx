@@ -14,6 +14,10 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unkno
 const share = vi.fn();
 vi.mock('@/utils/shareWithFallback', () => ({ shareWithFallback: (...a: unknown[]) => share(...a) }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/en/quick-play' }));
+vi.mock('next/dynamic', () => ({
+  default: () => (props: { isOpen: boolean; initialMode?: string }) =>
+    props.isOpen ? <div data-testid="auth-modal" data-mode={props.initialMode} /> : null,
+}));
 vi.mock('@/lib/records/useWorldRecords', () => ({ useWorldRecords: () => ({ records: state.records, status: state.status, retry: vi.fn() }) }));
 
 import { WorldRecordChip } from '../WorldRecordChip';
@@ -106,4 +110,33 @@ describe('WorldRecordChip', () => {
     expect(container.innerHTML).toBe('');
     expect(capture).not.toHaveBeenCalled();
   });
+
+  it('Given a new record, Then it celebrates on a dark card with a crown badge, announced politely', () => {
+    state.userId = 'u5';
+    state.name = 'Noa';
+    render(<WorldRecordChip mode="quickPlay" score={1000} />);
+    const chip = screen.getByTestId('world-record-chip');
+    expect(chip).toHaveAttribute('data-state', 'new');
+    expect(chip).toHaveAttribute('role', 'status');
+    expect(screen.getByTestId('world-record-crown-badge')).toBeTruthy();
+  });
+
+  it('Given a guest over the record, When they tap the claim action, Then sign-up opens right there and the tap is counted', () => {
+    render(<WorldRecordChip mode="quickPlay" score={1000} />);
+    expect(screen.queryByTestId('auth-modal')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'worldRecords.chip.claimSignIn' }));
+    expect(screen.getByTestId('auth-modal')).toHaveAttribute('data-mode', 'signup');
+    expect(capture).toHaveBeenCalledWith('world_record_claim_tapped', { mode: 'quickPlay', record_key: 'qp_classic', state: 'claimSignIn' });
+  });
+
+  it('Given a generated name over the record, Then the claim action leads to the profile where the name is set', () => {
+    state.userId = 'u5';
+    state.name = 'Player_3fa2';
+    render(<WorldRecordChip mode="quickPlay" score={1000} />);
+    const link = screen.getByRole('link', { name: 'worldRecords.chip.claimName' });
+    expect(link).toHaveAttribute('href', '/en/profile');
+    fireEvent.click(link);
+    expect(capture).toHaveBeenCalledWith('world_record_claim_tapped', { mode: 'quickPlay', record_key: 'qp_classic', state: 'claimName' });
+  });
 });
+

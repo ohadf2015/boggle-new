@@ -1,3 +1,4 @@
+import logger from '@/utils/logger';
 import type { OfflineStore } from './storage';
 
 export interface PrefetchResult {
@@ -78,7 +79,10 @@ export async function prefetchDailyPuzzles(opts: PrefetchOptions): Promise<Prefe
     return { stored: 0, skipped: false };
   }
 
-  if (!response.ok) return { stored: 0, skipped: false };
+  if (!response.ok) {
+    logger.warn('[prefetchDaily] daily prefetch refused', { status: response.status, language });
+    return { stored: 0, skipped: false };
+  }
 
   let data: { puzzles: RemotePuzzle[] };
   try {

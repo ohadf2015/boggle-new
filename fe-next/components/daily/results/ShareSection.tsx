@@ -7,7 +7,7 @@
 
 import React, { useRef, useCallback, useState, useEffect } from 'react';
 import { m } from 'framer-motion';
-import { Share2, RotateCcw, Loader2, Play } from 'lucide-react';
+import { Share2, RotateCcw, Loader2, Play, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CoinBalanceBadge } from '@/components/ui/CoinBalanceBadge';
 import { cn } from '@/lib/utils';
@@ -94,6 +94,8 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
   canAffordRetry,
   retryCost,
   currentCoins,
+  onCopy,
+  copied,
   onSpendStart,
   t,
 }) => {
@@ -192,6 +194,26 @@ export const ShareSection: React.FC<ShareSectionProps> = ({
           {t('wordHunt.results.challengeFriends')}
         </Button>
         </m.div>
+      )}
+      {solved && (
+        <div className="grid w-full grid-cols-[1fr_auto] gap-2 sm:max-w-btn sm:mx-auto">
+          <button
+            type="button"
+            onClick={onShare}
+            className="h-11 rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black font-neo-display font-black text-sm uppercase shadow-hard-sm flex items-center justify-center gap-2 active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
+          >
+            <Share2 className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+            {t('wordHunt.results.shareResult')}
+          </button>
+          <button
+            type="button"
+            onClick={onCopy}
+            className="h-11 px-4 rounded-neo border-3 border-neo-black bg-neo-navy text-neo-white font-bold text-sm shadow-hard-sm flex items-center gap-2 active:shadow-hard-pressed active:translate-x-px active:translate-y-px"
+          >
+            {copied ? <Check className="w-4 h-4" aria-hidden /> : <Copy className="w-4 h-4" aria-hidden />}
+            {copied ? t('wordHunt.results.copied') : t('wordHunt.results.copyResult')}
+          </button>
+        </div>
       )}
     </div>
   );

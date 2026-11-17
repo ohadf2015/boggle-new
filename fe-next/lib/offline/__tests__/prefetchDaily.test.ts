@@ -2,6 +2,8 @@ import 'fake-indexeddb/auto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createWebStore, type OfflineStore } from '../storage';
 import { runMigrations } from '../migrations';
+vi.mock('@/utils/logger', () => ({ default: { warn: vi.fn(), error: vi.fn(), debug: vi.fn(), info: vi.fn(), log: vi.fn() } }));
+import logger from '@/utils/logger';
 import { prefetchDailyPuzzles, getCachedDailyPuzzle } from '../prefetchDaily';
 
 const SIX_HOURS_MS = 6 * 3600_000;
@@ -130,6 +132,14 @@ describe('prefetchDailyPuzzles', () => {
     await prefetchDailyPuzzles({ language: 'en', store, _fetchFn: fetchMock });
 
     expect(await store.kv.get('prefetch_last_en')).toBeNull();
+  });
+
+  it('reports a refused prefetch instead of dropping it', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{"error":"unauthorized"}', { status: 401 }));
+    const result = await prefetchDailyPuzzles({ language: 'en', store, _fetchFn: fetchMock });
+
+    expect(result.stored).toBe(0);
+    expect(logger.warn).toHaveBeenCalledWith('[prefetchDaily] daily prefetch refused', expect.objectContaining({ status: 401 }));
   });
 
   it('purges rows older than 7 days when prefetch runs', async () => {

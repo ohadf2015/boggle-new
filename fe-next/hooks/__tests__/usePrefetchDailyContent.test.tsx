@@ -6,6 +6,9 @@ vi.mock('@/hooks/useNetworkState', () => ({
   useNetworkState: vi.fn(() => ({ online: true, slow: false, type: 'wifi', rttMs: null })),
 }));
 vi.mock('@/lib/offline', () => ({ getOfflineStore: vi.fn(() => Promise.resolve({})) }));
+const authState = { isAuthenticated: true, loading: false };
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => authState }));
+vi.mock('@/utils/authFetch', () => ({ getWithAuth: vi.fn(() => Promise.resolve(new Response('{}'))) }));
 vi.mock('@/lib/offline/prefetchDaily', () => ({
   prefetchDailyPuzzles: vi.fn(() => Promise.resolve({ stored: 0, skipped: false })),
 }));
@@ -14,6 +17,7 @@ import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
 import { useNetworkState } from '@/hooks/useNetworkState';
 import { getOfflineStore } from '@/lib/offline';
 import { prefetchDailyPuzzles } from '@/lib/offline/prefetchDaily';
+import { getWithAuth } from '@/utils/authFetch';
 import { usePrefetchDailyContent } from '../usePrefetchDailyContent';
 
 function setOffline(offline: boolean) {
@@ -34,6 +38,8 @@ describe('usePrefetchDailyContent', () => {
     vi.clearAllMocks();
     setFlag(true);
     setOffline(false);
+    authState.isAuthenticated = true;
+    authState.loading = false;
   });
 
   afterEach(() => { vi.restoreAllMocks(); });
@@ -77,5 +83,33 @@ describe('usePrefetchDailyContent', () => {
     expect(() =>
       renderHook(() => usePrefetchDailyContent({ language: 'en' })),
     ).not.toThrow();
+  });
+
+  it('never calls the signed-in-only endpoint for a guest', async () => {
+    authState.isAuthenticated = false;
+    renderHook(() => usePrefetchDailyContent({ language: 'en' }));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(getOfflineStore).not.toHaveBeenCalled();
+    expect(prefetchDailyPuzzles).not.toHaveBeenCalled();
+  });
+
+  it('waits for auth to resolve before deciding', async () => {
+    authState.loading = true;
+    authState.isAuthenticated = false;
+    const { rerender } = renderHook(() => usePrefetchDailyContent({ language: 'en' }));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(prefetchDailyPuzzles).not.toHaveBeenCalled();
+    authState.loading = false;
+    authState.isAuthenticated = true;
+    rerender();
+    await vi.waitFor(() => expect(prefetchDailyPuzzles).toHaveBeenCalledOnce());
+  });
+
+  it('sends the session token so bearer-only sessions are not refused', async () => {
+    renderHook(() => usePrefetchDailyContent({ language: 'en' }));
+    await vi.waitFor(() => expect(prefetchDailyPuzzles).toHaveBeenCalledOnce());
+    const { _fetchFn } = vi.mocked(prefetchDailyPuzzles).mock.calls[0][0] as { _fetchFn: (u: string) => Promise<Response> };
+    await _fetchFn('/api/daily/prefetch?language=en&dates=2026-11-17');
+    expect(getWithAuth).toHaveBeenCalledWith('/api/daily/prefetch?language=en&dates=2026-11-17');
   });
 });
