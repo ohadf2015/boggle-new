@@ -26,6 +26,22 @@ export interface CompareRow {
   skill: string;
 }
 
+export interface HowToExample {
+  word1: string;
+  bridge: string;
+  word2: string;
+  left: string;
+  right: string;
+}
+
+export type ConnectionsModeKey = 'play' | 'daily' | 'pyramid' | 'community';
+
+export interface ModeLink {
+  key: ConnectionsModeKey;
+  title: string;
+  body: string;
+}
+
 export interface FaqEntry {
   q: string;
   a: string;
@@ -53,6 +69,12 @@ export interface ConnectionsLandingCopy {
     reveal: string;
     success: string;
   };
+  howTo: {
+    heading: string;
+    steps: string[];
+    examplesLabel: string;
+    examples: HowToExample[];
+  };
   samples: {
     heading: string;
     sub: string;
@@ -63,6 +85,10 @@ export interface ConnectionsLandingCopy {
   why: {
     heading: string;
     cards: BenefitCard[];
+  };
+  modes: {
+    heading: string;
+    items: ModeLink[];
   };
   heClassic: {
     badge: string;

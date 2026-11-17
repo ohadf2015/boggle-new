@@ -23,7 +23,7 @@ const DIFFICULTY_TEXT: Record<DemoPuzzle['difficulty'], string> = {
 
 export default function ConnectionsSampleStrip({ locale, copy }: Props): React.JSX.Element {
   return (
-    <section id="how-it-works" className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <h2 className="mb-2 font-neo-display text-2xl font-black sm:text-3xl">{copy.heading}</h2>
       <p className="mb-6 text-sm text-neo-gray-200">{copy.sub}</p>
 

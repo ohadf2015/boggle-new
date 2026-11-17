@@ -112,6 +112,7 @@ export default async function ConnectionsPage({ params }: PageProps) {
     // "和同開珎" / "Мост слов" / "Ordbron" to one entity instead of six.
     alternateName: [
       'Word Bridge',
+      'Missing Link Word Game',
       'rosh-zanav',
       'ראש זנב',
       'Ordbron',
@@ -119,6 +120,8 @@ export default async function ConnectionsPage({ params }: PageProps) {
       '和同開珎',
       'Palabra Puente',
       'Мост слов',
+      'Найди общее слово',
+      '漢字穴埋めクイズ',
     ],
     url: `${BASE_URL}/${locale}/connections`,
     description: copy.videoGameDescription,

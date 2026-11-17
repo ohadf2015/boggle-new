@@ -6,9 +6,12 @@ import { Pyramid, Trophy, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
 import ConnectionsGame from '@/components/connections/ConnectionsGame';
 import PyramidChallenge from '@/components/connections/pyramid/PyramidChallenge';
 import ConnectionsHero from '@/components/connections/landing/ConnectionsHero';
+import ConnectionsHowTo from '@/components/connections/landing/ConnectionsHowTo';
+import ConnectionsModes from '@/components/connections/landing/ConnectionsModes';
 import ConnectionsSampleStrip from '@/components/connections/landing/ConnectionsSampleStrip';
 import ConnectionsWhyPlay from '@/components/connections/landing/ConnectionsWhyPlay';
 import ConnectionsHEClassic from '@/components/connections/landing/ConnectionsHEClassic';
@@ -100,11 +103,18 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
           {t('connections.community.cta', locale === 'he' ? 'קהילה' : 'Community')}
         </Link>
       </div>
+      <ConnectionsHowTo copy={copy.howTo} />
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
+      <ConnectionsModes locale={locale} copy={copy.modes} />
       <ConnectionsWhyPlay copy={copy.why} />
       {locale === 'he' && copy.heClassic && <ConnectionsHEClassic copy={copy.heClassic} />}
       <ConnectionsCompare copy={copy.compare} />
       <ConnectionsFAQ locale={locale} copy={copy.faq} />
+      {locale === 'ru' && (
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <RuLandingLinks locale={locale} current="connections" />
+        </div>
+      )}
       <ConnectionsFooterCTA locale={locale} copy={copy.footerCta} />
 
       <ConnectionsStickyCTA
