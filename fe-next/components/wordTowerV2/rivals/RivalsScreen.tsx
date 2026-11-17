@@ -24,7 +24,7 @@ interface Props {
 /**
  * The rival board on its own screen, reachable from the game menu any time —
  * not only after a run ends. Your tower stands next to three real rivals';
- * tap one to see their building, buy a wrecking ball if you are out, and ruin it.
+ * tap one to swing the wrecking ball at their tower — buy a ball first if you are out.
  */
 export function RivalsScreen({ t, estate, myTower, myHeightM, balls, reducedMotion, onClose, onRaidOpen, dailyLanguage }: Props) {
   const [target, setTarget] = useState<{ rival: RivalView; revenge: RevengeEntry | null } | null>(null);
