@@ -249,6 +249,16 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
       submitting.current = true;
       holdCalmUntilResults();
       setResult(r);
+      // Fire at round end, before any await: the collection lookup and submit
+      // can take seconds, and a player who leaves (or a throw) in that window
+      // used to drop the event (64% of round starters never reported).
+      posthog.capture('quick_play_round_completed', {
+        mode: r.mode,
+        scorePct: r.scorePct,
+        coins: quickCoinsFor(r.scorePct),
+        xp: quickXpFor(r.scorePct),
+        roundIndex,
+      });
       try {
         // Local first: the day streak has no server home, and a signed-out
         // player's whole progression lives here (submit is auth-gated, so it
@@ -311,14 +321,6 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
         setOutcome(out);
         publishLevelUp((out as { levelUp?: LevelUpLike | null }).levelUp, 'quickPlay');
         if (out.totalPoints > 0) setTotalPoints(out.totalPoints);
-        posthog.capture('quick_play_round_completed', {
-          mode: r.mode,
-          scorePct: r.scorePct,
-          coins: out.coins,
-          xp: out.xp,
-          percentile: out.percentileToday,
-          roundIndex,
-        });
         if (challenge) {
           posthog.capture('quick_play_challenge_accepted', { mode: r.mode, seed: r.seed });
           setRival({
