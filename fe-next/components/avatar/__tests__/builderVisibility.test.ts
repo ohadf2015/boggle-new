@@ -35,20 +35,23 @@ function listedPartIds(tabs: EditorTab[]): Map<string, Set<string>> {
 }
 
 describe('avatar builder part reachability', () => {
-  it('lists goldNecklace as a paid (not free) accessory', () => {
-    expect(isPremiumPart('accessory', 'goldNecklace')).toBe(true);
-    expect(isChestOnlyPart('accessory', 'goldNecklace')).toBe(false);
-    expect(getPartPrice('accessory', 'goldNecklace')).toBeGreaterThan(0);
-    const part = getCatalogPart('accessory', 'goldNecklace');
-    expect(part, 'goldNecklace must exist in the catalog').toBeDefined();
-    expect(part!.isHidden).toBe(false);
-    expect(part!.price).toBeGreaterThan(0);
+  it('lists goldNecklace and goldChain as paid (not free) accessories', () => {
+    for (const id of ['goldNecklace', 'goldChain'] as const) {
+      expect(isPremiumPart('accessory', id)).toBe(true);
+      expect(isChestOnlyPart('accessory', id)).toBe(false);
+      expect(getPartPrice('accessory', id)).toBeGreaterThan(0);
+      const part = getCatalogPart('accessory', id);
+      expect(part, `${id} must exist in the catalog`).toBeDefined();
+      expect(part!.isHidden).toBe(false);
+      expect(part!.price).toBeGreaterThan(0);
+    }
   });
 
-  it('shows goldNecklace in the builder accessory grid when premium parts are offered', () => {
+  it('shows goldNecklace and goldChain in the builder accessory grid when premium parts are offered', () => {
     const tabs = getEditorTabs(DEFAULT_AVATAR_CONFIG, { showPremium: true });
     const listed = listedPartIds(tabs).get('accessory') ?? new Set();
     expect(listed.has('goldNecklace'), 'goldNecklace missing from the builder accessory grid').toBe(true);
+    expect(listed.has('goldChain'), 'goldChain missing from the builder accessory grid').toBe(true);
   });
 
   it('every non-hidden catalog part appears in the builder for a gender that can wear it', () => {
@@ -127,8 +130,9 @@ describe('avatar builder part reachability', () => {
     expect(missing, `purchasable parts missing from the builder:\n${missing.join('\n')}`).toEqual([]);
   });
 
-  it('neck-layer accessories (including goldNecklace) are still classified as neck, so thumbs can frame them', () => {
+  it('neck-layer accessories (including goldNecklace and goldChain) are still classified as neck, so thumbs can frame them', () => {
     expect(accDef('goldNecklace').layer).toBe('neck');
+    expect(accDef('goldChain').layer).toBe('neck');
     expect(accDef('scarf').layer).toBe('neck');
     expect(accDef('earrings').layer).toBe('neck');
   });

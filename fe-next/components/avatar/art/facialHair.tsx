@@ -10,6 +10,8 @@ type Part = (ctx: ArtCtx) => ReactNode;
 const STACHE = 'M41.5 59.4 Q45.5 55.2 50 57.4 Q54.5 55.2 58.5 59.4 Q55 60.6 50 59 Q45 60.6 41.5 59.4 Z';
 const JAW = 'M28.5 50 L31.5 50 Q33 64 42 66.5 Q50 63.5 58 66.5 Q67 64 68.5 50 L71.5 50 Q72.5 73 50 76 Q27.5 73 28.5 50 Z';
 const FULL = 'M28 48 L31.5 48 Q33 60 41 64.5 Q50 60.5 59 64.5 Q67 60 68.5 48 L72 48 Q74 70 64 78 Q57 84 50 84 Q43 84 36 78 Q26 70 28 48 Z';
+// Short, neat boxed beard: follows the jaw, ends just below the chin (not a chest-length full beard).
+const BOXED = 'M29 48.8 L33.6 48.8 Q34.4 55.5 37.2 60.2 Q42.2 66.4 50 66.8 Q57.8 66.4 62.8 60.2 Q65.6 55.5 66.4 48.8 L71 48.8 Q72.4 64.8 62 70.4 Q50 74 38 70.4 Q27.6 64.8 29 48.8 Z';
 
 function Stache({ ctx, name }: { ctx: ArtCtx; name: string }) {
   return <Shaded ctx={ctx} name={name} d={STACHE} fill={ctx.hair} shadeColor={ctx.hairShade} dx={0.8} dy={1} sw={DETAIL} />;
@@ -36,6 +38,14 @@ export const FACIAL_HAIR: Record<string, Part> = {
   shortBeard: ctx => (
     <g>
       <Shaded ctx={ctx} name="fh" d={JAW} fill={ctx.hair} shadeColor={ctx.hairShade} dx={1.4} dy={1.6} />
+      <Stache ctx={ctx} name="fh2" />
+    </g>
+  ),
+  boxedBeard: ctx => (
+    <g>
+      <Shaded ctx={ctx} name="fh" d={BOXED} fill={ctx.hair} shadeColor={ctx.hairShade} dx={1.2} dy={1.4}>
+        <path d="M36 62 Q40 67 45 68.5" stroke={ctx.hairLight} strokeWidth="1" fill="none" strokeLinecap="round" opacity="0.55" />
+      </Shaded>
       <Stache ctx={ctx} name="fh2" />
     </g>
   ),

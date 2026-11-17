@@ -36,8 +36,13 @@ describe('look presets', () => {
     const classic = ron.find(p => p.id === 'ron')!;
     expect(classic.labelKey).toBe('avatarBuilder.preset.ron');
     expect(classic.config.gender).toBe('male');
-    expect(classic.config.facialHair).toBe('fullBeard');
-    expect(classic.config.accessory).toBe('goldNecklace');
+    expect(classic.config.facialHair).toBe('boxedBeard');
+    expect(classic.config.accessory).toBe('goldChain');
+    expect(classic.config.hair).toBe('shortCrop');
+    expect(classic.config.eyes).toBe('friendly');
+    expect(classic.config.eyebrows).toBe('natural');
+    expect(classic.config.base).toBe('round');
+    expect(classic.config.mouth).toBe('smile');
     expect(classic.config.bodyStyle).toBe('default');
     // Olive / khaki-green tee
     expect(classic.config.shirtColor.toLowerCase()).toBe('#6b7f3b');
@@ -117,6 +122,19 @@ describe('look presets', () => {
         expect(String(value).trim().length, `${locale} empty ${key}`).toBeGreaterThan(0);
       }
     }
+    const partKeys = [
+      'avatarChest.parts.accessory.goldChain',
+      'avatarChest.parts.hair.shortCrop',
+      'avatarChest.parts.facialHair.boxedBeard',
+      'avatarChest.parts.eyes.friendly',
+    ];
+    for (const [locale, tree] of Object.entries(LOCALES)) {
+      for (const key of partKeys) {
+        const value = lookup(tree, key);
+        expect(typeof value, `${locale} missing ${key}`).toBe('string');
+        expect(String(value).trim().length, `${locale} empty ${key}`).toBeGreaterThan(0);
+      }
+    }
     expect(lookup(he, 'avatarBuilder.preset.ron')).toBe('פריסט רון');
     expect(lookup(en, 'avatarBuilder.preset.ron')).toBe('Ron preset');
   });
@@ -127,24 +145,26 @@ describe('look presets', () => {
       isPartUnlocked: () => false,
       coins: 0,
     });
-    expect(patch.accessory ?? 'none').not.toBe('goldNecklace');
-    expect(patch.facialHair).toBe('fullBeard');
+    expect(patch.accessory ?? 'none').not.toBe('goldChain');
+    expect(patch.facialHair).toBe('boxedBeard');
     expect(patch.shirtColor?.toLowerCase()).toBe('#6b7f3b');
-    expect(tryOn).toEqual({ key: 'accessory', value: 'goldNecklace' });
+    expect(tryOn).toEqual({ key: 'accessory', value: 'goldChain' });
   });
 
   it('splitLookPreset applies the necklace once it is already owned', () => {
     const ron = LOOK_PRESETS.find(p => p.id === 'ron')!;
     const { patch, tryOn } = splitLookPreset(ron, {
-      isPartUnlocked: (cat, id) => cat === 'accessory' && id === 'goldNecklace',
+      isPartUnlocked: (cat, id) => cat === 'accessory' && id === 'goldChain',
       coins: 9999,
     });
-    expect(patch.accessory).toBe('goldNecklace');
+    expect(patch.accessory).toBe('goldChain');
     expect(tryOn).toBeNull();
   });
 
   it('does not treat free signature parts as premium', () => {
-    expect(getPartRarity('facialHair', 'fullBeard')).toBe('common');
-    expect(getPartRarity('hair', 'buzz')).toBe('common');
+    expect(getPartRarity('facialHair', 'boxedBeard')).toBe('common');
+    expect(getPartRarity('hair', 'shortCrop')).toBe('common');
+    expect(getPartRarity('eyes', 'friendly')).toBe('common');
+    expect(getPartRarity('accessory', 'goldChain')).not.toBe('common');
   });
 });

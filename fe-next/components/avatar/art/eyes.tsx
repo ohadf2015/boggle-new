@@ -144,6 +144,11 @@ export const EYES_FREE: Record<string, EyeDef> = {
       </g>
     ),
   },
+  // Small open dark ovals — friendly, not closed happy-arcs and not oversized anime eyes.
+  friendly: {
+    blink: true,
+    render: ctx => Pair(ctx, { rx: 3.15, ry: 3.7, iris: 2.35, look: [0.1, 0.25] }),
+  },
   closed: {
     blink: false,
     render: () => (

@@ -17,7 +17,7 @@ export const AVATAR_SKIN_COLORS = [
 
 // ==================== Hair ====================
 export const AVATAR_HAIR_STYLES = [
-  'none', 'spiky', 'curly', 'long', 'buzz', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
+  'none', 'spiky', 'curly', 'long', 'buzz', 'shortCrop', 'mohawk', 'bob', 'ponytail', 'afro', 'wavy',
   'pigtails', 'topknot', 'sideshave', 'dreads', 'braids', 'bun', 'bangs', 'twintails',
   'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'highAndTight', 'elvis', 'ramen', 'flame', 'galaxy', 'neon',
   'pixie', 'undercut', 'spaceBuns', 'straight', 'fade', 'cornrows', 'wolfCut',
@@ -58,7 +58,7 @@ export const FEMALE_HAIR_STYLES = [
 
 /** Styles that look masculine — shown when gender is male. */
 export const MALE_HAIR_STYLES = [
-  'none', 'spiky', 'buzz', 'mohawk', 'topknot',
+  'none', 'spiky', 'buzz', 'shortCrop', 'mohawk', 'topknot',
   'mullet', 'combover', 'trumpSwoop', 'recedingHair', 'highAndTight', 'elvis', 'ramen',
   'undercut', 'fade', 'wolfCut', 'ponytail', 'bun',
   'flatTop', 'quiff', 'shag', 'sideSwept', 'fadeCurly',
@@ -98,7 +98,7 @@ export const AVATAR_EYE_COLORS = [
 
 // ==================== Eyes ====================
 export const AVATAR_EYE_STYLES = [
-  'none', 'round', 'sleepy', 'star', 'wink', 'happy', 'angry', 'cool', 'sparkle',
+  'none', 'round', 'sleepy', 'star', 'wink', 'happy', 'friendly', 'angry', 'cool', 'sparkle',
   'hearts', 'dizzy', 'cyclops', 'lashes', 'monocleEye', 'crossEyed', 'laser',
   'hypno', 'money', 'alien', 'crying', 'galaxy', 'flame', 'robot', 'void', 'infinity',
   'curious', 'determined', 'doe',
@@ -121,7 +121,7 @@ export const AVATAR_EYEBROW_STYLES = [
 
 // ==================== Facial Hair (male only) ====================
 export const AVATAR_FACIAL_HAIR_STYLES = [
-  'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard',
+  'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'boxedBeard', 'fullBeard',
   'soulPatch', 'chinStrap', 'muttonChops', 'vanDyke', 'handlebar',
   'wizardBeard', 'pencilMustache', 'braidedBeard', 'fuManchu', 'trimmedBeard',
   /* New epic facial hair */
@@ -167,6 +167,7 @@ export const AVATAR_ACCESSORIES = [
   /* 2026-11 chest drop */
   'unicornHorn', 'dragonWings', 'flameAura',
   'goldNecklace',
+  'goldChain',
 ] as const;
 
 export const AVATAR_ACCESSORY_COLORS = [
@@ -272,7 +273,7 @@ export const PREMIUM_ACCESSORIES = [
   'gamerHeadset', 'cowboyHat', 'pirateHat', 'topHat', 'graduationCap',
   'tinfoilHat', 'duckHat', 'vrHeadset',
   // Premium overhaul (Rare tier)
-  'earrings', 'goldNecklace',
+  'earrings', 'goldNecklace', 'goldChain',
 ] as const;
 
 export const PREMIUM_HAIR_STYLES = [
@@ -377,6 +378,7 @@ export const VIP_PART_PRICES: Record<string, number> = {
   'accessory:vrHeadset': 700,
   'accessory:earrings': 400,
   'accessory:goldNecklace': 450,
+  'accessory:goldChain': 400,
   // ── Hair (VIP) ──
   'hair:elvis': 600,
   'hair:ramen': 550,
@@ -522,7 +524,7 @@ const NEW_PARTS_MAP: Record<string, readonly string[]> = {
   // 2026-11 chest drop: redrawn + brand-new parts that now come out of reward chests.
   accessory: [
     'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat',
-    'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace',
+    'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace', 'goldChain',
   ],
   eyes: [
     'money', 'alien', 'pixelEyes', 'targetEyes', 'catEye', 'sleepyEye', 'laserEye', 'glitchEyes',

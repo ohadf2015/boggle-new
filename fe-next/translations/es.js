@@ -25,6 +25,7 @@ const es = {
     "parts": {
       "eyes": {
         "laser": "Ojos láser",
+        "friendly": "Ojos amables",
         "hypno": "Ojos hipnóticos",
         "money": "Ojos de dinero",
         "alien": "Ojos alienígenas",
@@ -86,6 +87,7 @@ const es = {
         "vrHeadset": "Gafas VR",
         "earrings": "Aros de oro",
         "goldNecklace": "Collar de oro",
+        "goldChain": "Cadena de oro",
         "samurai": "Casco samurái",
         "astronaut": "Casco de astronauta",
         "wizardHat": "Sombrero de mago",
@@ -104,6 +106,7 @@ const es = {
       },
       "hair": {
         "elvis": "Tupé de rockero",
+        "shortCrop": "Corte corto",
         "ramen": "Rizos de fideo",
         "twintails": "Coletas",
         "undercut": "Undercut",
@@ -133,6 +136,9 @@ const es = {
         "starBase": "Cabeza de estrella",
         "moonBase": "Cabeza de luna",
         "dragonHead": "Cabeza de dragón"
+      },
+      "facialHair": {
+        "boxedBeard": "Barba recortada"
       }
     }
   },
@@ -19486,7 +19492,7 @@ const es = {
       "neonSmile": "Una sonrisa que ilumina todo el tablero.",
       "ghostFace": "¡Bu! Tus rivales acaban de ver un fantasma.",
       "rainbowMohawk": "Pelo ruidoso. Victorias aún más ruidosas.",
-      "iceCrown": "Frío, sereno y coronado."
+      "iceCrown": "Frío, sereno y coronado.",
     },
     "parts": {
       "headphones": "Cascos Beat",
@@ -19507,7 +19513,11 @@ const es = {
       "neonSmile": "Sonrisa neón",
       "ghostFace": "Cara de fantasma",
       "rainbowMohawk": "Cresta arcoíris",
-      "iceCrown": "Corona de hielo"
+      "iceCrown": "Corona de hielo",
+      "goldChain": "Cadena de oro",
+      "shortCrop": "Corte corto",
+      "boxedBeard": "Barba recortada",
+      "friendly": "Ojos amables"
     }
   },
   "avatarLab": {
