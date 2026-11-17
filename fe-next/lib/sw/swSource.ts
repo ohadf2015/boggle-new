@@ -35,7 +35,7 @@ import { SW_WARM_SHELLS_MESSAGE_TYPE } from '@/lib/sw/messages';
  */
 const BUILD_STAMP =
   (process.env.NEXT_PUBLIC_BUILD_TIME || '').replace(/\D/g, '').slice(0, 14) || '20260605';
-export const SW_CACHE_NAME = `lexiclash-v9-${BUILD_STAMP}`;
+export const SW_CACHE_NAME = `lexiclash-v10-${BUILD_STAMP}`;
 
 /**
  * Route shells to precache so a cold (offline) launch has a cached document to
@@ -71,8 +71,9 @@ export const SHELLS_BY_LOCALE: Record<string, string[]> = Object.fromEntries(
 );
 
 export const SW_SOURCE = `// LexiClash Service Worker — generated from lib/sw/swSource.ts (do not edit served copy)
-// Strategy: cache-first for static assets, network-first for pages (with an
-// offline navigation fallback), stale-while-revalidate for everything else.
+// Strategy: cache-first for static assets, network-first for pages and RSC
+// payloads (cache only when offline), stale-while-revalidate for everything else.
+// Every lookup reads this build's cache only.
 const CACHE_NAME = '${SW_CACHE_NAME}';
 const OFFLINE_SHELL_ROUTES = ${JSON.stringify(OFFLINE_SHELL_ROUTES)};
 const SHELLS_BY_LOCALE = ${JSON.stringify(SHELLS_BY_LOCALE)};
@@ -191,9 +192,9 @@ self.addEventListener('message', (event) => {
 // launch (entry is '/' → uncacheable redirect) can still boot. Prefer a shell
 // whose locale matches the requested path, else any cached shell.
 async function navigationFallback(request) {
-  const exact = await caches.match(request);
-  if (exact) return exact;
   const cache = await caches.open(CACHE_NAME);
+  const exact = await cache.match(request);
+  if (exact) return exact;
   const path = new URL(request.url).pathname;
   const localeMatch = path.match(/^\\/([a-z]{2})(?:\\/|$)/);
   const locale = localeMatch ? localeMatch[1] : null;
@@ -240,18 +241,33 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // An RSC payload names the chunk ids of the build that rendered it, so a
+  // cached one from before a deploy boots old code on a fresh page.
+  if (url.searchParams.has('_rsc') || request.headers.get('rsc') === '1') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        fetch(request)
+          .then((response) => {
+            if (isCacheable(response)) safeCachePut(cache, request, response.clone());
+            return response;
+          })
+          .catch(() => cache.match(request).then((cached) => cached || Response.error()))
+      )
+    );
+    return;
+  }
+
   if (CACHE_FIRST_PATTERNS.some((p) => p.test(url.pathname))) {
     event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached) return cached;
-        return fetch(request).then((response) => {
-          if (isCacheable(response)) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => safeCachePut(cache, request, clone));
-          }
-          return response;
-        });
-      })
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(request).then((cached) => {
+          if (cached) return cached;
+          return fetch(request).then((response) => {
+            if (isCacheable(response)) safeCachePut(cache, request, response.clone());
+            return response;
+          });
+        })
+      )
     );
     return;
   }
@@ -281,18 +297,17 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request)
-        .then((response) => {
-          if (isCacheable(response)) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => safeCachePut(cache, request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached || Response.error());
-      return cached || fetchPromise;
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.match(request).then((cached) => {
+        const fetchPromise = fetch(request)
+          .then((response) => {
+            if (isCacheable(response)) safeCachePut(cache, request, response.clone());
+            return response;
+          })
+          .catch(() => cached || Response.error());
+        return cached || fetchPromise;
+      })
+    )
   );
 });
 `;
