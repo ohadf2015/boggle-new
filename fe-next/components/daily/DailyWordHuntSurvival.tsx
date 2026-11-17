@@ -12,12 +12,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
-import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
-import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
-import { buildQuitDialogConfig } from './survival/quitDialogConfig';
-import logger from '@/utils/logger';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 
 import type { LetterGrid, Language } from '@/types';
@@ -38,6 +34,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { SurvivalExtraLifeModal } from './survival/SurvivalExtraLifeModal';
 import { useSurvivalExtraLife, EXTRA_LIFE_RESTORE_AMOUNT, EXTRA_LIFE_COIN_COST } from './survival/useSurvivalExtraLife';
 import { useWordHuntFx } from './survival/useWordHuntFx';
+import { useHuntQuitFlow } from './survival/useHuntQuitFlow';
 import { HuntPlayfield } from './survival/hunt/HuntPlayfield';
 import { useHuntStage } from './survival/hunt/useHuntStage';
 import { useLiveWord } from './survival/hunt/liveWord';
@@ -172,23 +169,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
   const extraLifeModalOpen = extraLife.offerOpen && state.lifePoints === 0 && !state.isGameOver;
 
-  // Disarm the navigation guard the instant the player confirms a quit, so its
-  // beforeunload/popstate handlers don't fire during the exit nav (black-screen race).
-  const [quitting, setQuitting] = useState(false);
-
-  useNavigationGuard({
-    enabled: !state.isGameOver && !quitting,
-    // `leaving` tells the guard's teardown NOT to pop its phantom history entry:
-    // confirming quit fires router.push('/daily') in the same handler, and a
-    // go(-1) cleanup would race-cancel that push — black screen on native exit.
-    // Quick Play's onQuit stays on this page instead, so it needs the phantom
-    // popped (leaving=false) or every quit strands an extra history entry.
-    leaving: quitting && !quitStaysOnPage,
-    message: t('wordHunt.quitConfirmMessage'),
-    onNavigationAttempt: () => {
-      actions.setShowQuitConfirm(true);
-      return false;
-    },
+  const { handleQuitClick, quitDialog } = useHuntQuitFlow({
+    t,
+    practice,
+    language,
+    isGameOver: state.isGameOver,
+    showQuitConfirm: state.showQuitConfirm,
+    setShowQuitConfirm: actions.setShowQuitConfirm,
+    onQuit,
+    quitStaysOnPage,
   });
 
   const fx = useWordHuntFx(state, skipAnimations, calm);
@@ -235,48 +224,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     return () => setIsInGame(false);
   }, [isGameActive, setIsInGame]);
 
-  // Quit-confirmation copy, resolved defensively. A locale bundle that resolves
-  // one of these keys to a non-string would otherwise make React throw during
-  // render — and on this nav-hidden, guard-armed surface that throw presents as
-  // a black, frozen screen (the "exit Daily in Hebrew → black screen" report).
-  // buildQuitDialogConfig never throws: broken keys degrade to a generic config.
-  // In Quick Play (practice mode), use Word Hunt copy; in daily challenge use ad-gated copy.
-  const quitDialog = useMemo(() =>
-    buildQuitDialogConfig(t, practice ? {
-      titleKey: 'wordHunt.quitConfirmTitle',
-      descriptionKey: 'wordHunt.quitConfirmMessage',
-      confirmKey: 'daily.imSure',
-      cancelKey: 'common.cancel',
-    } : undefined),
-    [t, practice]
-  );
-
-  // Handle quit flow
-  const handleQuitConfirm = () => {
-    // Close the dialog and disarm the guard FIRST and unconditionally, so its
-    // teardown can't fire the history.go(-1) that blanks a Capacitor WebView.
-    actions.setShowQuitConfirm(false);
-    setQuitting(true); // disarm guard before the exit nav
-    try {
-      onQuit();
-    } catch (err) {
-      // A throw in the exit bookkeeping (analytics/nav) must never strand the
-      // player on a nav-hidden game screen. Force a hard navigation to the
-      // daily hub as a last-resort escape hatch instead of freezing black.
-      logger.error('Daily quit handler threw; forcing navigation to hub', err);
-      if (typeof window !== 'undefined') {
-        window.location.assign(`/${language}/daily`);
-      }
-    }
-  };
-
-  const { setLifeGainAmount, setShowQuitConfirm } = actions;
+  const { setLifeGainAmount } = actions;
   const handleLifeGainComplete = useCallback(() => {
     setLifeGainAmount(null);
   }, [setLifeGainAmount]);
-  const handleQuitClick = useCallback(() => {
-    setShowQuitConfirm(true);
-  }, [setShowQuitConfirm]);
 
   const extraLifeModal = extraLifeModalOpen ? (
     <SurvivalExtraLifeModal
@@ -349,21 +300,6 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       direction={actions.gameDir}
       t={t}
       language={language}
-    />
-  );
-
-  const quitConfirm = (orientation: 'landscape' | 'portrait') => (
-    <ConfirmationDialog
-      open={state.showQuitConfirm}
-      onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-      title={quitDialog.title}
-      description={quitDialog.description}
-      confirmText={quitDialog.confirmText}
-      cancelText={quitDialog.cancelText}
-      onConfirm={handleQuitConfirm}
-      variant="danger"
-      analyticsId="daily_survival_quit_confirm"
-      analyticsExtras={{ orientation }}
     />
   );
 
@@ -521,7 +457,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
 
       {!state.isGameOver && <HuntMascot feed={state} language={language} remainingTime={timed ? roundClock.remainingTime : null} />}
       {notifications}
-      {quitConfirm('portrait')}
+      {quitDialog}
       {extraLifeModal}
     </div>
     </GameShell>
