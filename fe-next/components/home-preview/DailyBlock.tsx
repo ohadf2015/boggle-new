@@ -92,6 +92,14 @@ export function DailyBlock({ lang, t, streak, streakLoading, freezes = 0, atRisk
             {t('homeFresh.sections.daily.cta')}
             <ArrowRight className="hidden h-5 w-5 rtl:-scale-x-100 lg:block" strokeWidth={3} aria-hidden="true" />
           </Link>
+          <Link
+            href={`/${lang}/word-tower/daily`}
+            data-testid="hp-daily-tower"
+            className="self-start text-xs font-bold leading-snug underline decoration-2 underline-offset-2 lg:text-base"
+          >
+            {t('wordTower.daily.questTitle')}
+            <span className="hidden font-medium lg:inline">: {t('wordTower.daily.questDesc')}</span>
+          </Link>
         </div>
       </div>
       <span aria-hidden="true" className="absolute start-[34%] -top-3 h-6 w-6 -translate-x-1/2 rounded-full border-[3px] border-black bg-neo-navy rtl:translate-x-1/2 lg:start-[30%]" />

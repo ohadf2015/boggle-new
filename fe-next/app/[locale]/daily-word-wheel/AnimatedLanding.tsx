@@ -12,6 +12,7 @@ interface AnimatedLandingProps {
   faqHeading: string;
   faqItems: Array<Record<string, string>>;
   finalCta: { heading: string; description: string; button: string };
+  tower: { title: string; desc: string };
 }
 
 const stagger = { hidden: {}, visible: { transition: { staggerChildren: 0.12 } } } as const;
@@ -104,7 +105,7 @@ function HeroWheel({ reducedMotion = false }: { reducedMotion?: boolean }) {
   );
 }
 
-export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading, faqItems, finalCta }: AnimatedLandingProps) {
+export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading, faqItems, finalCta, tower }: AnimatedLandingProps) {
   const isRtl = locale === 'he';
   const prefersReduced = useReducedMotion();
 
@@ -265,6 +266,12 @@ export function AnimatedLanding({ locale, hero, steps, stepsHeading, faqHeading,
             {finalCta.button}
           </Link>
         </m.div>
+        <m.p className="mt-6 text-neo-white" variants={fadeUp}>
+          <Link href={`/${locale}/word-tower/daily`} className="font-bold text-neo-cyan underline decoration-2 underline-offset-4">
+            {tower.title}
+          </Link>
+          : {tower.desc}
+        </m.p>
       </m.section>
     </div>
   );
