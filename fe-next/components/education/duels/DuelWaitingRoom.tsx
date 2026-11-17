@@ -53,7 +53,7 @@ export function DuelWaitingRoom({
       {/* The mascot waits with you rather than leaving you alone with a spinner. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- a 104px static webp; next/image adds a loader round-trip to a screen that must paint instantly */}
       <img
-        src="/mascot/waiting.webp"
+        src="/mascot/waiting-hop-nobg.webp"
         alt=""
         aria-hidden="true"
         width={120}

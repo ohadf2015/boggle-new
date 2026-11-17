@@ -180,7 +180,7 @@ export function ArenaList({
                   baked dark box lightens away against this group's own navy. */}
               <div className="mp-arena-tail-inner isolate flex w-full flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-cream/40 bg-neo-navy px-4 text-center">
                 <Image
-                  src="/mascot/waiting.webp"
+                  src="/mascot/waiting-hop-nobg.webp"
                   alt=""
                   aria-hidden="true"
                   width={176}
