@@ -1542,7 +1542,7 @@ const he = {
       "seeMore": "עוד {count}",
       "inLobby": "בלובי",
       "playingNow": "במשחק עכשיו",
-      "seen": "פעילות אחרונה: {when}",
+      "seen": "{when}",
       "youLead": "{score} לטובתך במשחקים",
       "theyLead": "{score} נגדך במשחקים",
       "tied": "תיקו {score} במשחקים",

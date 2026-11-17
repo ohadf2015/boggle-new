@@ -61,7 +61,8 @@ describe('statusLine', () => {
     expect(statusLine('in_lobby', null, NOW)).toEqual({ key: 'homePlay.crew.inLobby', params: {} });
     expect(statusLine('playing', null, NOW)).toEqual({ key: 'homePlay.crew.playingNow', params: {} });
     expect(statusLine('online', null, NOW)).toEqual({ key: 'friends.status.online', params: {} });
-    expect(statusLine('offline', ago(2 * 3_600_000), NOW)).toEqual({ key: 'homePlay.crew.seen', params: {}, when: { key: 'friends.status.hoursAgo', params: { count: 2 } } });
+    expect(statusLine('offline', ago(2 * 3_600_000), NOW)).toEqual({ key: 'friends.status.hoursAgo', params: { count: 2 } });
+    expect(statusLine('offline', ago(10 * 60_000), NOW)).toEqual({ key: 'friends.status.minutesAgo', params: { count: 10 } });
     expect(statusLine('offline', null, NOW)).toEqual({ key: 'friends.status.offline', params: {} });
   });
 });

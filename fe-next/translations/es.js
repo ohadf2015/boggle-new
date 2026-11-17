@@ -1542,7 +1542,7 @@ const es = {
       "seeMore": "Ver {count} más",
       "inLobby": "En una sala",
       "playingNow": "Jugando ahora",
-      "seen": "Visto {when}",
+      "seen": "{when}",
       "youLead": "Vas ganando {score} en partidas",
       "theyLead": "Te van ganando {score} en partidas",
       "tied": "Empate {score} en partidas",

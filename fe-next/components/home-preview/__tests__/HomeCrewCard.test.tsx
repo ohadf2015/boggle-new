@@ -24,6 +24,26 @@ vi.mock('@/components/rivals/RivalPingButton', () => ({
 }));
 
 import { HomeCrewCard } from '../HomeCrewCard';
+import { en } from '@/translations/en.js';
+import { he } from '@/translations/he.js';
+
+function lookup(obj: unknown, path: string): unknown {
+  return path.split('.').reduce<unknown>((acc, key) => (
+    acc && typeof acc === 'object' ? (acc as Record<string, unknown>)[key] : undefined
+  ), obj);
+}
+
+function realT(tree: Record<string, unknown>) {
+  return (key: string, params?: Record<string, unknown>) => {
+    let value = lookup(tree, key);
+    if (typeof value !== 'string') return key;
+    if (params) {
+      for (const [k, v] of Object.entries(params)) value = value.replaceAll(`{${k}}`, String(v));
+    }
+    return value;
+  };
+}
+
 
 const t = (k: string, p?: Record<string, unknown>) => (p && Object.keys(p).length ? `${k}:${JSON.stringify(p)}` : k);
 const friend = (userId: string, seenMsAgo: number, wins = 0, losses = 0) => ({ userId, name: userId.toUpperCase(), avatarImage: null, customAvatar: null, lastSeenAt: ago(seenMsAgo), wins, losses });
@@ -125,5 +145,25 @@ describe('HomeCrewCard', () => {
     render(<HomeCrewCard lang="en" t={t} />);
     expect(within(screen.getByTestId('crew-row')).getByText('friends.aPlayer')).toBeTruthy();
     expect(screen.getByText(/homePlay\.crew\.wantsToBeFriends:\{"name":"friends\.aPlayer"\}/)).toBeTruthy();
+  });
+
+  it('Given an offline friend, Then the row shows a compact relative time with no Last-active prefix', () => {
+    h.home.data = data({ friends: [friend('old', 2 * 3_600_000), friend('on', 60_000)], presence: [] });
+    render(<HomeCrewCard lang="en" t={realT(en)} />);
+    const offline = screen.getAllByTestId('crew-row').find((r) => r.getAttribute('data-user') === 'old')!;
+    const status = within(offline).getByTestId('crew-status');
+    expect(status.textContent).toBe('2h ago');
+    expect(status.textContent).not.toMatch(/Seen|Last active/i);
+    expect(status.className).toMatch(/shrink-0/);
+    const online = screen.getAllByTestId('crew-row').find((r) => r.getAttribute('data-user') === 'on')!;
+    expect(within(online).getByTestId('crew-status').textContent).toBe('Online');
+  });
+
+  it('Given Hebrew copy, Then last-seen is only the compact time, never the פעילות אחרונה prefix', () => {
+    h.home.data = data({ friends: [friend('old', 2 * 3_600_000)], presence: [] });
+    render(<HomeCrewCard lang="he" t={realT(he)} />);
+    const status = within(screen.getByTestId('crew-row')).getByTestId('crew-status');
+    expect(status.textContent).toBe('לפני 2 שע׳');
+    expect(status.textContent).not.toContain('פעילות אחרונה');
   });
 });

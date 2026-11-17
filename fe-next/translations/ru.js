@@ -1544,7 +1544,7 @@ const ru = {
       "seeMore": "Ещё {count}",
       "inLobby": "В лобби",
       "playingNow": "Играет сейчас",
-      "seen": "Активность: {when}",
+      "seen": "{when}",
       "youLead": "Ты ведёшь {score} по матчам",
       "theyLead": "Соперник ведёт {score} по матчам",
       "tied": "Ничья {score} по матчам",

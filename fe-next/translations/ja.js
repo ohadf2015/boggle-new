@@ -1542,7 +1542,7 @@ const ja = {
       "seeMore": "あと{count}人を見る",
       "inLobby": "ロビーにいます",
       "playingNow": "プレイ中",
-      "seen": "{when}にオンライン",
+      "seen": "{when}",
       "youLead": "対戦成績 {score} でリード",
       "theyLead": "対戦成績 {score} で負け越し",
       "tied": "対戦成績 {score} で互角",
