@@ -70,6 +70,8 @@ export const LANDING_NAMESPACES = [
 export const LANDING_EXTRA_KEYS = [
   'revealUnlock.profileEntry',
   'revealUnlock.levelShort',
+  'wordTower.daily.questTitle',
+  'wordTower.daily.questDesc',
   'quickPlay.solo.title',
   'quickPlay.solo.play',
   'quickPlay.solo.mode.classic',
