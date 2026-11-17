@@ -3,7 +3,7 @@
  * as were previously inline in DailyWordHuntResults.
  *
  * Post-gauntlet (2026-09-19): CatchUpSuggestion, both rewarded-ad buttons,
- * RivalCompareCard, MpModeCrossPromo, MoreOptionsAccordion and the heavy
+ * RivalCompareCard, MpModeCrossPromo, the more-options accordion and the heavy
  * DailyChallengeInlineSignup were removed from this screen; the guest signup
  * is now a one-line dismissible nudge (DismissibleSignupLine) that opens a
  * minimal ResultsSignupModal. See the "subtracted from this screen" test.
@@ -37,7 +37,6 @@ vi.mock('../results', () => ({
   DailyWordHuntFacts: () => <div data-testid="facts" />,
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
 }));
 vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard() { return <div data-testid="leaderboard" />; } }));
 // The heavy signup card is gone from this screen (replaced by DismissibleSignupLine
@@ -177,14 +176,13 @@ describe('WordHuntResultsContent', () => {
   });
 
   // Regression for the gauntlet subtraction: CatchUpSuggestion, RivalCompareCard,
-  // MpModeCrossPromo, MoreOptionsAccordion and the heavy DailyChallengeInlineSignup
+  // MpModeCrossPromo and the heavy DailyChallengeInlineSignup
   // were deliberately removed from this screen. Each is mocked above at its real
   // import path, so if a future edit re-adds one of these imports and renders it,
   // this test starts finding the mock's testid and fails — see mutation-check
   // notes in the gauntlet report for proof this actually catches a revert.
   it('does not mount the components subtracted from this screen by the gauntlet', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(screen.queryByTestId('more-options')).toBeNull();
     expect(screen.queryByTestId('catch-up')).toBeNull();
     expect(screen.queryByTestId('rival-compare')).toBeNull();
     expect(screen.queryByTestId('mp-cross-promo')).toBeNull();
@@ -217,8 +215,7 @@ describe('WordHuntResultsContent', () => {
 
     it('drops the account-only recap sections', () => {
       render(<WordHuntResultsContent {...guestProps} />);
-      expect(screen.queryByTestId('more-options')).toBeNull();
-      expect(screen.queryByTestId('past-performance-compare')).toBeNull();
+        expect(screen.queryByTestId('past-performance-compare')).toBeNull();
       expect(screen.queryByTestId('performance-section')).toBeNull();
       expect(screen.queryByTestId('facts')).toBeNull();
     });

@@ -11,8 +11,7 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
-import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
-import Link from 'next/link';
+import { Sparkles } from 'lucide-react';
 import DismissibleSignupLine, { isSignupLineDismissedLocally } from '@/components/daily/results/DismissibleSignupLine';
 import ResultsSignupModal from '@/components/daily/results/ResultsSignupModal';
 import { useIsGuest } from '@/hooks/useIsGuest';
@@ -21,8 +20,6 @@ import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import { SuggestWordCard } from './SuggestWordCard';
 import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
-import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
-import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { NextQuestCta } from './results/NextQuestCta';
 import { WordHuntResultsHero } from './results/WordHuntResultsHero';
@@ -141,32 +138,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
   // simplified screen at a logged-in player on first paint (rules/60 Class 1).
   const isGuest = useIsGuest(isAuthenticated);
-
-  // Word Wheel completion gate: localStorage-first (no first-paint flash) then
-  // server-of-record cross-device check — so a player who finished the wheel on
-  // another device sees "Back to Daily Hub", not a nag to replay it.
-  const wordWheelPlayed = useDailyModePlayed('word-wheel', language, {
-    isAuthenticated,
-    playerId: profile?.id,
-    guestFingerprint,
-  });
-  // Mirror for the Word Bridge (Connections) cross-promo — don't nudge a mode
-  // the player already finished today. Lazy-init avoids a first-paint flash.
-  // (localStorage-only is fine here: Connections is a separate daily system.)
-  const [connectionsPlayed, setConnectionsPlayed] = useState(() =>
-    typeof window === 'undefined' ? false : hasPlayedConnectionsToday(),
-  );
-  useEffect(() => {
-    const refresh = () => setConnectionsPlayed(hasPlayedConnectionsToday());
-    refresh();
-    const onVis = () => { if (!document.hidden) refresh(); };
-    document.addEventListener('visibilitychange', onVis);
-    window.addEventListener('focus', refresh);
-    return () => {
-      document.removeEventListener('visibilitychange', onVis);
-      window.removeEventListener('focus', refresh);
-    };
-  }, []);
 
   // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
   const { variant: hintVariant, trackExposure: trackHintExposure } =
@@ -424,53 +395,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
         {/* Minimal signup line — guests see this in the default scroll path */}
         {signupLineNode}
-
-        {/* Daily complete badge */}
-        {wordWheelPlayed && (
-          <div className="flex items-center gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-lime shadow-hard-lg">
-            <CheckCircle2 className="w-6 h-6 text-neo-black shrink-0" />
-            <div>
-              <span className="font-neo-display font-black text-neo-black text-sm">
-                {t('wordWheel.results.dailyComplete', 'Daily Challenge complete!')}
-              </span>
-              <p className="text-neo-black/70 text-xs">
-                {t('wordWheel.results.dailyCompleteDesc', 'Both games done. Come back tomorrow!')}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Connections cross-promo */}
-        {wordWheelPlayed && !connectionsPlayed && (language === 'en' || language === 'he') && (
-          <Link
-            href={`/${language}/connections/pyramid`}
-            data-testid="daily-connections-cross-promo"
-            onClick={() =>
-              trackGrowthEvent('cross_promo_click', {
-                target: 'connections',
-                source: 'word_hunt_results',
-                placement: 'post_daily_complete',
-                language,
-              })
-            }
-            className="flex items-center justify-between gap-3 w-full p-4 rounded-neo border-3 border-neo-black bg-neo-pink shadow-hard-lg hover:scale-[1.02] active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]"
-          >
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-12 h-12 rounded-neo border-2 border-neo-black bg-neo-navy shrink-0 font-neo-display font-black text-neo-white text-lg">
-                ↔
-              </div>
-              <div>
-                <span className="block font-neo-display font-black text-neo-white text-base leading-tight">
-                  {t('connections.landing.crossPromoTitle', language === 'he' ? 'נסה ראש זנב' : 'Try Word Bridge')}
-                </span>
-                <p className="text-neo-white text-xs mt-0.5">
-                  {t('connections.landing.crossPromoBody', language === 'he' ? 'שתי מילים, גשר אחד. חינם.' : 'Two words. One bridge. Free.')}
-                </p>
-              </div>
-            </div>
-            <ArrowRight className="w-6 h-6 text-neo-white shrink-0" />
-          </Link>
-        )}
 
         {/* Word Hunt facts */}
         {stats && (

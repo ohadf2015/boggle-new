@@ -12,7 +12,6 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { LeaderboardSkeleton } from './LeaderboardStates';
 import { PracticeBoardLink } from './survival/howto/PracticeBoardLink';
 import { CreateChallengeModal } from './CreateChallengeModal';
-import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
 import { LanguageDropdown } from './LanguageDropdown';
 import AuthModal from '../auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -78,7 +77,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Auto-open leaderboard if showLeaderboard query param is present
@@ -94,20 +92,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       }
     }
   }, [searchParams]);
-
-  // Auto-open CreateChallengeModal after successful authentication
-  useEffect(() => {
-    if (isAuthenticated && pendingCreateChallenge) {
-      setPendingCreateChallenge(false);
-      setShowCreateChallenge(true);
-    }
-  }, [isAuthenticated, pendingCreateChallenge]);
-
-  // Handler for when unauthenticated user tries to create a challenge
-  const handleAuthRequired = () => {
-    setPendingCreateChallenge(true);
-    setShowAuthModal(true);
-  };
 
   // Preload game music tracks while on ready screen
   // This ensures music starts instantly when game begins (no loading delay)
@@ -178,26 +162,16 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
         </div>
         <div className="flex justify-center empty:hidden"><QuestGoalChip screen="hunt" /></div>
 
-        {/* Guest Mode Notice - Show only for anonymous users */}
         {!isAuthenticated && !isOnCrazyGamesPlatform && (
-          <m.div
-            initial={{ y: -10, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
-            className="w-full max-w-sm mx-auto bg-neo-orange/10 rounded-neo border-2 border-neo-orange p-3 text-center cursor-pointer hover:bg-neo-orange/15 transition-colors"
+          <button
+            type="button"
+            data-testid="guest-save-line"
             onClick={() => setShowAuthModal(true)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowAuthModal(true); }}
+            className="mx-auto inline-flex items-center gap-1.5 text-xs font-bold text-neo-orange underline-offset-4 hover:underline"
           >
-            <div className="flex items-center justify-center gap-2 text-neo-orange text-sm font-bold">
-              <UserCircle2 className="w-4 h-4" />
-              <span>{t('daily.guestModeNotice')}</span>
-            </div>
-            <p className="text-xs text-neo-white/70 mt-1">
-              {t('daily.guestModeBenefits')}
-            </p>
-          </m.div>
+            <UserCircle2 className="w-4 h-4 shrink-0" aria-hidden="true" />
+            {t('daily.guestModeBenefits')}
+          </button>
         )}
 
         {/* Challenge Banner (when arriving via challenge link) */}
@@ -322,42 +296,31 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             />
           </m.div>
         ) : (
-          <>
-            {!isOnCrazyGamesPlatform && (
-              <m.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
-              >
-                <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
-              </m.div>
-            )}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
-              className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-2"
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
+            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-2"
+          >
+            <button
+              type="button"
+              onClick={() => setShowLeaderboard(!showLeaderboard)}
+              className="lg:hidden whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
             >
-              <button
-                type="button"
-                onClick={() => setShowLeaderboard(!showLeaderboard)}
-                className="lg:hidden whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
-              >
-                <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
-              </button>
-              <button
-                type="button"
-                onClick={onShowTutorial}
-                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
-              >
-                <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
-              </button>
-              <PracticeBoardLink
-                className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
-                iconClassName="w-3 h-3"
-              />
-            </m.div>
-          </>
+              <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
+            </button>
+            <button
+              type="button"
+              onClick={onShowTutorial}
+              className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+            >
+              <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
+            </button>
+            <PracticeBoardLink
+              className="whitespace-nowrap text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
+              iconClassName="w-3 h-3"
+            />
+          </m.div>
         )}
 
         {/* Collapsible Leaderboard */}

@@ -1,13 +1,8 @@
-/**
- * The Word Bridge (Connections) cross-promo on the Word Hunt results page must
- * NOT be shown when the player already played today's Connections daily.
- * Mirrors the wheel/hunt gating ("don't show a card for a mode already played").
- */
+/** NextQuestCta is the one next step on Hunt results: the recap holds no second quest link or day-complete badge. */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Wheel done → Connections cross-promo is eligible (en/he, after wheel).
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: () => true,
   hasPlayedWordHuntToday: () => false,
@@ -42,7 +37,6 @@ vi.mock('../results', () => ({
   DailyWordHuntFacts: () => <div data-testid="facts" />,
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze" />,
 }));
 vi.mock('../TabbedDailyLeaderboard', () => ({ default: () => <div data-testid="leaderboard" /> }));
@@ -101,25 +95,16 @@ const baseProps: WordHuntResultsContentProps = {
     typeof fallback === 'string' ? fallback : k) as WordHuntResultsContentProps['t'],
 };
 
-describe('WordHuntResultsContent — Connections cross-promo gating', () => {
+describe('WordHuntResultsContent — one next step', () => {
   beforeEach(() => { vi.clearAllMocks(); window.localStorage.clear(); });
 
-  /* The cross-promo now lives inside the "Full recap" disclosure rather than on
-     the first paint — the gating this test protects (offer it only when today's
-     Connections is unplayed) is unchanged, so the assertion opens the recap
-     first instead of expecting it immediately visible. */
-  it('offers the Connections cross-promo when it has NOT been played today', () => {
+  it('Given Wheel done and Connections unplayed, When the full recap opens, Then it holds no cross-promo and no day-complete badge', () => {
     mockHasPlayedConnections.mockReturnValue(false);
     render(<WordHuntResultsContent {...baseProps} />);
 
     fireEvent.click(screen.getByRole('button', { name: /full recap/i }));
 
-    expect(screen.getByTestId('daily-connections-cross-promo')).toBeInTheDocument();
-  });
-
-  it('hides the Connections cross-promo when already played today', () => {
-    mockHasPlayedConnections.mockReturnValue(true);
-    render(<WordHuntResultsContent {...baseProps} />);
     expect(screen.queryByTestId('daily-connections-cross-promo')).toBeNull();
+    expect(screen.queryByText('Daily Challenge complete!')).toBeNull();
   });
 });

@@ -148,7 +148,6 @@ vi.mock('../results', () => ({
   AttemptHistory: () => <div data-testid="attempt-history" />,
   StatsSection: () => <div data-testid="stats-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
 }));
@@ -157,12 +156,6 @@ vi.mock('../results', () => ({
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({
   default: function MockInlineSignup() {
     return <div data-testid="inline-signup" />;
-  },
-}));
-
-vi.mock('../StreakMilestoneCelebration', () => ({
-  default: function MockStreakMilestone() {
-    return <div data-testid="streak-milestone" />;
   },
 }));
 

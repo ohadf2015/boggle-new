@@ -1,6 +1,5 @@
 /**
- * Tests for neo-brutalist design fixes across achievement components
- * and GuestBrainScorePreview.
+ * Tests for neo-brutalist design fixes across achievement components.
  *
  * Validates:
  * 1. AchievementQueue inline toast uses shadow-hard-yellow class (no inline boxShadow)
@@ -8,7 +7,6 @@
  * 3. AchievementToast uses shadow-hard-yellow class (no inline boxShadow with tier border)
  * 4. AchievementToast achievement name uses neo-lime token class
  * 5. AchievementDock uses border-3 (not border-4)
- * 6. GuestBrainScorePreview has no backdrop-blur, uses neo tokens
  */
 
 import React from 'react';
@@ -166,29 +164,5 @@ describe('AchievementDock - neo-brutalist fixes', () => {
     const button = container.querySelector('button');
     expect(button?.className).toContain('border-3');
     expect(button?.className).not.toContain('border-4');
-  });
-});
-
-describe('GuestBrainScorePreview - neo-brutalist fixes', () => {
-  it('has no backdrop-blur-sm and uses neo tokens', async () => {
-    const { GuestBrainScorePreview } = await import('../../daily/results/GuestBrainScorePreview');
-
-    const { container } = render(
-      <GuestBrainScorePreview t={(k: string) => k} />
-    );
-
-    // No backdrop-blur-sm anywhere
-    expect(container.innerHTML).not.toContain('backdrop-blur-sm');
-
-    // No bg-white/30
-    expect(container.innerHTML).not.toContain('bg-white/30');
-
-    // Should have neo-cream token
-    expect(container.innerHTML).toContain('bg-neo-cream/30');
-
-    // Should use neo-purple tokens instead of purple-100/purple-800
-    expect(container.innerHTML).not.toContain('bg-purple-100');
-    expect(container.innerHTML).not.toContain('bg-purple-800/30');
-    expect(container.innerHTML).toContain('bg-neo-purple/20');
   });
 });
