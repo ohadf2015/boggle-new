@@ -65,10 +65,16 @@ function TowerMiniImpl({ tower, viewH, className, ghost, title, halfW, pick }: P
           const y = b.y - FLOOR_H / 2;
           const word = (b.word ?? '').toUpperCase();
           return (
-            <g key={`${i}-${b.word}`}>
+            <g key={`${i}-${b.word}`} opacity={pick && pick.selected != null && pick.selected !== i ? 0.72 : 1} data-testid={pick ? `tower-floor-${i}` : undefined} data-selected={pick && pick.selected === i ? "true" : undefined}>
               <rect x={x} y={y} width={w} height={FLOOR_H} rx={10} fill={hex(b.color, i)} stroke="#000" strokeWidth={9} />
-              <rect x={x + 26} y={y + 30} width={26} height={30} fill="#0f1b3d" opacity={0.55} />
-              <rect x={x + w - 52} y={y + 30} width={26} height={30} fill="#0f1b3d" opacity={0.55} />
+              {/* Windows only on board thumbnails. In pick mode the word is
+                  the floor — the dark window squares sat on top of it. */}
+              {!pick ? (
+                <>
+                  <rect x={x + 26} y={y + 30} width={26} height={30} fill="#0f1b3d" opacity={0.55} />
+                  <rect x={x + w - 52} y={y + 30} width={26} height={30} fill="#0f1b3d" opacity={0.55} />
+                </>
+              ) : null}
               {/* The floor's WORD, on the floor. Sixteen coloured chips with no
                   labels are sixteen identical chips — the judge called the
                   target screen "a choice with no visible stakes" for exactly
@@ -85,7 +91,7 @@ function TowerMiniImpl({ tower, viewH, className, ghost, title, halfW, pick }: P
                   strokeWidth={1}
                   fontSize={fontFor(word, w)}
                   fontWeight={900}
-                  letterSpacing={1}
+                  letterSpacing={/[A-Za-z]/.test(word) ? 1 : 0}
                   style={{ fontFamily: 'var(--font-fredoka), system-ui, sans-serif' }}
                 >
                   {word}
@@ -143,33 +149,12 @@ function TowerMiniImpl({ tower, viewH, className, ghost, title, halfW, pick }: P
  * middle of the slab — where its word is — clear.
  */
 function BracketMark({ x, y, w }: { x: number; y: number; w: number }) {
-  // The frame sits OUTSIDE the slab. Drawn on it, the corner arms covered the
-  // floor's own word — the one thing that makes this floor different from the
-  // fifteen below it.
-  const o = 13;
-  const bx = x - o;
-  const by = y - o;
-  const bw = w + o * 2;
-  const bh = FLOOR_H + o * 2;
-  const arm = Math.min(38, bw / 4);
-  const corners: Array<[number, number, number, number]> = [
-    [bx, by, 1, 1],
-    [bx + bw, by, -1, 1],
-    [bx, by + bh, 1, -1],
-    [bx + bw, by + bh, -1, -1],
-  ];
+  // A single thick gold ring outside the slab — no white corner arms, no
+  // side ticks. Those read as junk on a phone and covered the word.
+  const o = 14;
   return (
-    <g>
-      <rect x={bx} y={by} width={bw} height={bh} rx={12} fill="none" stroke="#ff2e88" strokeWidth={10} />
-      {corners.map(([cx, cy, sx, sy], i) => (
-        <g key={i} stroke="#fffef0" strokeWidth={10} strokeLinecap="square" fill="none">
-          <line x1={cx} y1={cy} x2={cx + sx * arm} y2={cy} />
-          <line x1={cx} y1={cy} x2={cx} y2={cy + sy * Math.min(34, bh / 3)} />
-        </g>
-      ))}
-      {[-1, 1].map((s) => (
-        <rect key={s} x={s < 0 ? bx - 46 : bx + bw + 12} y={by + bh / 2 - 6} width={34} height={12} fill="#ff2e88" stroke="#000" strokeWidth={5} />
-      ))}
+    <g data-testid="tower-floor-selected">
+      <rect x={x - o} y={y - o} width={w + o * 2} height={FLOOR_H + o * 2} rx={16} fill="rgba(255,217,61,0.16)" stroke="#ffd93d" strokeWidth={12} />
     </g>
   );
 }
