@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { SilentVideo } from '@/components/ui/SilentVideo';
+import { Loader } from '@/components/ui/Loader';
 
 interface QuickPlaySeekingOverlayProps {
   t: (key: string) => string;
@@ -36,10 +37,7 @@ export function QuickPlaySeekingOverlay({ t, onCancel }: QuickPlaySeekingOverlay
         <p className="font-neo-body text-sm text-neo-white/70">
           {t('quickPlay.seekingMatchSub')}
         </p>
-        <div
-          className="w-8 h-8 rounded-full border-4 border-neo-lime/30 border-t-neo-lime animate-spin"
-          aria-hidden="true"
-        />
+        <Loader size="md" />
         {onCancel && (
           <button
             type="button"

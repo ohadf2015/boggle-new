@@ -37,7 +37,7 @@ describe('player style registry', () => {
       expect(s.emoji.length).toBeGreaterThan(0);
       if (key !== 'default') {
         expect(s.musicFile).toBe(`/music/styles/${key}.mp3`);
-        expect(s.mascot).toBe(`/mascots/styles/${key}.png`);
+        expect(s.mascot).toBe(`/mascots/styles/${key}-nobg.webp`);
         expect(s.accentHex).toMatch(/^#[0-9a-fA-F]{6}$/);
       }
     }

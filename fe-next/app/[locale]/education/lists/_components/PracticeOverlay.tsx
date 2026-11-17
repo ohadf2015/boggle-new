@@ -7,6 +7,7 @@ import type { Language } from '@/types';
 import { SpellTilesPractice, type SpellLabels } from './SpellTilesPractice';
 import { hasTiles } from './spellPuzzle';
 import type { TeacherCta } from './SpellTilesCards';
+import { Loader } from '@/components/ui/Loader';
 
 export type PracticeMode = 'tiles' | 'grid' | 'spelling' | 'matching';
 
@@ -111,7 +112,7 @@ export default function PracticeOverlay({ locale, title, listTitle, lang, words,
         ) : (
           <Suspense
             fallback={
-              <div className="mx-auto mt-16 h-10 w-10 animate-spin rounded-full border-4 border-neo-white/30 border-t-neo-lime" />
+              <Loader size="lg" className="mt-16" />
             }
           >
             {/* The board measures its leftover height, so this column must fill the dialog. */}

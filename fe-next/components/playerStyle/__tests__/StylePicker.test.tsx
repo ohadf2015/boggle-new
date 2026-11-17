@@ -125,7 +125,7 @@ describe('StylePicker', () => {
     fireEvent.click(jazz);
     expect(jazz.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/jazz.webp');
     const rock = screen.getByRole('radio', { name: /playerStyle\.styles\.rock/ });
-    expect(rock.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/rock.png');
+    expect(rock.querySelector('img')?.getAttribute('src')).toBe('/mascots/styles/rock-nobg.webp');
   });
 
   it('the active (committed) style tile dances on mount without a click', () => {

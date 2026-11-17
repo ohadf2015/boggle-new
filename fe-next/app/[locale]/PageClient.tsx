@@ -17,6 +17,7 @@ import { dropLaunch, raiseLaunch } from '@/components/landing/home/launchStore';
 import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
+import { Loader } from '@/components/ui/Loader';
 
 // Denylist: allow only Latin/accented/Hebrew/Hiragana/Katakana + space/apostrophe/hyphen
 const HOST_NAME_ALLOWED = /[^A-Za-z0-9 '\-À-ɏ֐-׿぀-ヿ]/g;
@@ -289,7 +290,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return (
       <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
+          <Loader size="lg" />
           <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
         </div>
       </div>
@@ -302,7 +303,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return (
       <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 rounded-full border-4 border-neo-cyan border-t-transparent animate-spin" />
+          <Loader size="lg" />
           <span className="font-neo-body text-neo-cream text-sm">{t('daily.qrWelcome.warping')}</span>
         </div>
       </div>

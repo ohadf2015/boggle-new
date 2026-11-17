@@ -17,6 +17,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { Language } from '@/shared/types/game';
+import { Loader } from '@/components/ui/Loader';
 
 const SHOW_RECOVERY_MS = 8000;
 const STUCK_EVENT_MS = 15000;
@@ -117,7 +118,7 @@ export function BlastLoadingGate({
   return (
     <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-4 border-neo-lime border-t-transparent rounded-full animate-spin" />
+        <Loader size="lg" />
         <span className="text-neo-white text-sm font-bold">
           {t('blast.generating')}
         </span>

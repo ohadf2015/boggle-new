@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { PageLoader } from '@/components/ui/PageLoader';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
 import { io, type Socket } from 'socket.io-client';
 import type { WordCraftStatePayload } from '@/shared/types/wordcraft';
@@ -177,15 +177,7 @@ export default function WordCraftMPClient({ matchId }: WordCraftMPProps) {
 
   if (!isConnected || !gameState) {
     return (
-      <div className="flex flex-col w-full h-svh overflow-hidden relative bg-neo-navy texture-halftone">
-        <PlayfulBackground intensity="medium" colorScheme="game" />
-        <PageLoader size="md" className="relative z-10" />
-        <div className="relative z-10 text-center text-white">
-          <p className="mt-4">Connecting to WordCraft 1v1...</p>
-          <p className="text-sm text-gray-400 mt-2">Match: {matchId}</p>
-          <p className="text-sm text-gray-400">You are: {yourSeat || 'loading...'}</p>
-        </div>
-      </div>
+      <GameLoadingFallback text={t('joinView.connectingToRoom')} />
     );
   }
 

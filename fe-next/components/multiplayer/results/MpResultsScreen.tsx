@@ -8,6 +8,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useMpResultsController, type MpResultsProps, type MpResultsController } from './useMpResultsController';
 import { MpResultsStage } from './MpResultsStage';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
+import { Loader } from '@/components/ui/Loader';
 
 export type MpResultsScreenProps = MpResultsProps;
 
@@ -40,7 +41,7 @@ function MpResultsScreenInner(props: MpResultsScreenProps) {
     return (
       <div data-testid="results-next-round-wash" role="status" aria-live="polite" className="fixed inset-0 z-[9998] bg-neo-navy grid place-items-center">
         <div className="flex flex-col items-center gap-4 font-neo-display text-neo-white">
-          <div aria-hidden="true" className="w-12 h-12 rounded-full border-4 border-neo-pink border-t-transparent animate-spin" />
+          <Loader size="lg" />
           <div className="text-lg tracking-wide uppercase">{t('common.preparingGame')}</div>
         </div>
       </div>
@@ -65,7 +66,7 @@ function CalculatingScreen({ c }: { c: MpResultsController }) {
         body={
           <div data-testid="results-empty-state" className="flex-1 grid place-items-center px-6 text-center">
             <div className="flex flex-col items-center gap-4 max-w-md">
-              <div aria-hidden="true" className="w-12 h-12 rounded-full border-2 border-neo-cyan/40 border-t-neo-cyan animate-spin" />
+              <Loader size="lg" />
               <h2 className="font-neo-display font-bold text-2xl uppercase tracking-wide">{t('results.calculating', 'Calculating results')}</h2>
               <p className="text-sm opacity-70">{t('results.calculatingHint', 'Tallying scores and validating words — this only takes a moment.')}</p>
               {props.onReturnToRoom && (

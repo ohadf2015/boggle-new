@@ -59,7 +59,7 @@ describe('HeroStyleMascot', () => {
     animatedMap = {}; // no loop registered → CSS-dance fallback
     render(<HeroStyleMascot isMobilePortrait={false} />);
     const img = screen.getByTestId('hero-style-mascot');
-    expect(img).toHaveAttribute('src', '/mascots/styles/arcade.png');
+    expect(img).toHaveAttribute('src', '/mascots/styles/arcade-nobg.webp');
     expect(screen.getByTestId('hero-style-mascot-box').className).toContain('hero-dance-8bit');
   });
 
