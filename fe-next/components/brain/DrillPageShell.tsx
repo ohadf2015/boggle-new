@@ -23,6 +23,7 @@ import { DRILL_DOMAINS, type DrillType } from '@/shared/types/cognitive';
 import { BRAIN_CHECK_PROTOCOL, type BrainCheckAnalysis, type BrainCheckDrill } from '@/shared/utils/brainCheck';
 import type { LetterGrid, Language } from '@/types';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 /** Loose shape of every drill's onComplete payload. */
 type DrillRunResult = { score: number; timeSpent: number; level: number } & Record<string, number>;
@@ -45,13 +46,6 @@ const TO_SUBMISSION: Record<BrainCheckDrill, (r: DrillRunResult) => { wordsFound
   'memory-hunt': (r) => ({ wordsFound: r.wordsFound, extraData: { totalWords: r.totalWords, recalled: r.recalled } }),
   'combo-master': (r) => ({ wordsFound: r.wordsFound, extraData: { maxCombo: r.maxCombo } }),
   'rare-gems': (r) => ({ wordsFound: r.totalWordsFound, extraData: { rareWordsFound: r.rareWordsFound } }),
-};
-
-const SPINNER_COLOR: Record<BrainCheckDrill, string> = {
-  'lightning-round': 'border-neo-lime',
-  'memory-hunt': 'border-neo-purple',
-  'combo-master': 'border-neo-orange',
-  'rare-gems': 'border-neo-green',
 };
 
 interface Props {
@@ -213,12 +207,8 @@ export default function DrillPageShell({ drillType, Drill, isCheck = false }: Pr
 
   if (!gateResolved || isLoading || grid.length === 0) {
     return (
-      <div className={cn('flex-1 flex items-center justify-center', isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream')}>
-        <div
-          role="status"
-          aria-label={t('common.loading')}
-          className={cn('w-12 h-12 border-4 border-t-transparent rounded-full motion-safe:animate-spin', SPINNER_COLOR[drillType])}
-        />
+      <div className={cn('flex-1 flex', isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream')}>
+        <PageLoader size="md" mascotVariant="thinking" />
       </div>
     );
   }

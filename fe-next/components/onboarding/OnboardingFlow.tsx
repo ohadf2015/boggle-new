@@ -36,6 +36,7 @@ import CrazyGamesTutorial from './CrazyGamesTutorial';
 import AuthModal from '@/components/auth/AuthModal';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
+import { Loader } from '@/components/ui/Loader';
 
 
 interface OnboardingFlowProps {
@@ -554,10 +555,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, entry }) =>
               role="status"
               aria-live="polite"
             >
-              <div
-                className="w-12 h-12 border-neo-thick border-neo-lime border-t-transparent rounded-full animate-spin"
-                aria-hidden
-              />
+              <Loader size="lg" />
               <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
                 {t('onboarding.loading')}
               </p>
@@ -649,10 +647,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete, entry }) =>
             role="status"
             aria-live="polite"
           >
-            <div
-              className="w-12 h-12 border-neo-thick border-neo-lime border-t-transparent rounded-full animate-spin"
-              aria-hidden
-            />
+            <Loader size="lg" />
             <p className="mt-4 font-neo-display text-neo-white text-lg uppercase tracking-wide">
               {t('onboarding.loading')}
             </p>

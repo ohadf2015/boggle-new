@@ -3,7 +3,7 @@ import { getStyleDanceClass } from '@/lib/playerStyle/styleDance';
 import type { PlayerStyleKey } from '@/lib/playerStyle/styles';
 
 interface LoadingDancerProps {
-  /** A non-`default` style key — its static pose lives at /mascots/styles/<key>.png. */
+  /** A non-`default` style key — its transparent static pose lives at /mascots/styles/<key>-nobg.webp. */
   styleKey: PlayerStyleKey;
   /** Sizing / layout classes for the mascot box. */
   className?: string;
@@ -27,7 +27,7 @@ export function LoadingDancer({ styleKey, className }: LoadingDancerProps) {
       {/* eslint-disable-next-line @next/next/no-img-element -- static pose, no
           optimizer needed; a plain <img> keeps this a zero-JS component. */}
       <img
-        src={`/mascots/styles/${styleKey}.png`}
+        src={`/mascots/styles/${styleKey}-nobg.webp`}
         alt=""
         draggable={false}
         data-testid="dancing-mascot"

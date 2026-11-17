@@ -4,6 +4,7 @@ import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { buildEducationDuelsJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import PageClient from './PageClient';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,8 +25,8 @@ export default async function DuelsPage({ params }: { params: Promise<{ locale: 
       <script id="ld-edu-duels-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Suspense
         fallback={
-          <div className="flex h-[100dvh] items-center justify-center overflow-hidden bg-neo-navy">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-neo-cyan" />
+          <div className="flex h-[100dvh] overflow-hidden">
+            <PageLoader size="lg" priority={false} />
           </div>
         }
       >

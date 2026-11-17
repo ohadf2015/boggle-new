@@ -22,6 +22,7 @@ import { MpScreen } from './shell/MpScreen';
 import { useMultiplayerFlowState } from './useMultiplayerFlowState';
 import { useRoomEndedOffer } from './useRoomEndedOffer';
 import ClassroomWaitStalled from '@/components/education/live/ClassroomWaitStalled';
+import { Loader } from '@/components/ui/Loader';
 
 export interface MultiplayerFlowProps {
   // Callbacks
@@ -156,7 +157,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
                 </div>
               ) : (
                 <>
-                  <div className="w-10 h-10 rounded-full border-4 border-neo-cyan/30 border-t-neo-cyan animate-spin" aria-hidden="true" />
+                  <Loader size="md" />
                   <p className="text-sm sm:text-base">{t(waitingForTeacher ? 'education.studentPreview.waiting.title' : 'education.classroomGame.waitingForPlayers')}</p>
                 </>
               )}

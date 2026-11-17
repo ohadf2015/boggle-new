@@ -29,6 +29,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { QuickClassicLeftRail, QuickClassicRightRail } from './QuickClassicRails';
 import shellStyles from './quickClassicShell.module.css';
 import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
+import { Loader } from '@/components/ui/Loader';
 
 interface QuickClassicBoardProps {
   config: QuickRoundConfig;
@@ -189,8 +190,8 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
   // Hold until the board resolves — InGameScreen is built around a real grid.
   if (!core.grid) {
     return (
-      <div className="flex h-full min-h-0 w-full flex-1 items-center justify-center bg-neo-navy">
-        <span className="h-10 w-10 animate-spin rounded-full border-4 border-neo-cozy/30 border-t-neo-cozy" aria-label={t('common.loading')} />
+      <div role="status" aria-label={t('common.loading')} className="flex h-full min-h-0 w-full flex-1 items-center justify-center">
+        <Loader size="lg" />
       </div>
     );
   }

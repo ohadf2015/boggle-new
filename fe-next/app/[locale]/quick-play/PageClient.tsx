@@ -10,9 +10,10 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { QuickPlayHub } from '@/components/quick-play/QuickPlayHub';
 import { quickPlayBackHref } from '@/lib/navigation/eduExitTargets';
 import { parseQuickPlayStartMode } from '@/lib/quickPlay/startMode';
+import { PageLoader } from '@/components/ui/PageLoader';
 
 function LoadingFallback() {
-  return <div className="min-h-screen bg-neo-navy" />;
+  return <div className="flex min-h-dvh"><PageLoader priority={false} /></div>;
 }
 
 function QuickPlayGate() {

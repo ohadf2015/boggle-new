@@ -19,7 +19,11 @@ export function Loader({ size = 'md', text, className }: LoaderProps) {
   const s = SIZES[size];
 
   return (
-    <div role="status" aria-busy="true" className={cn('flex flex-col items-center justify-center', className)}>
+    <div
+      role={text ? 'status' : undefined}
+      aria-busy={text ? true : undefined}
+      className={cn('flex flex-col items-center justify-center', className)}
+    >
       <div aria-hidden className={cn('flex items-end pt-1.5', s.gap)}>
         {TILE_COLORS.map((color) => (
           <span

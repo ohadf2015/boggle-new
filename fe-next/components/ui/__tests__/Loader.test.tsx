@@ -2,9 +2,14 @@ import { render, screen } from '@testing-library/react';
 import { Loader } from '../Loader';
 
 describe('Loader', () => {
-  it('announces itself as a busy status', () => {
-    render(<Loader />);
+  it('announces its caption as a busy status', () => {
+    render(<Loader text="Shuffling letters..." />);
     expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
+  });
+
+  it('adds no empty live region when it has no caption, so a parent status stays the only one', () => {
+    render(<Loader />);
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   it('uses the same three bouncing tiles as the page loader', () => {

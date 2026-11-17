@@ -11,7 +11,7 @@
  * and existing users see zero change.
  *
  * Adding a new style later = drop `public/music/styles/<key>.mp3`, a
- * `public/mascots/styles/<key>.png`, one row here, and 5 i18n labels. Nothing else.
+ * `public/mascots/styles/<key>-nobg.webp` (transparent), one row here, and 5 i18n labels. Nothing else.
  */
 
 export type PlayerStyleKey =
@@ -73,7 +73,7 @@ const def = (
   labelKey: `playerStyle.styles.${key}`,
   accentHex,
   musicFile: key === 'default' ? null : `/music/styles/${key}.mp3`,
-  mascot: key === 'default' ? '/mascot-new-main.jpg' : `/mascots/styles/${key}.png`,
+  mascot: key === 'default' ? '/mascot-new-main.jpg' : `/mascots/styles/${key}-nobg.webp`,
   emoji,
 });
 
