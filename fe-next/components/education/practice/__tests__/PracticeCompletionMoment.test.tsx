@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PracticeCompletionMoment from '../PracticeCompletionMoment';
 
@@ -96,16 +96,49 @@ describe('PracticeCompletionMoment', () => {
     expect(playSound).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the mascot reacting to the rank', () => {
-    render(<PracticeCompletionMoment {...baseProps} correct={1} total={10} />);
-    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+  it('plays the animated mascot clip that matches the rank', () => {
+    const clipFor = (correct: number) => {
+      const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
+      const src = screen.getByTestId('practice-completion-mascot-clip').getAttribute('src') ?? '';
+      unmount();
+      return src.split('?')[0];
+    };
+    expect(clipFor(10)).toBe('/mascot/anim/joy-jump.webp');
+    expect(clipFor(8)).toBe('/mascot/anim/puffed-chest-smug.webp');
+    expect(clipFor(1)).toBe('/mascot/anim/faceplant-thumbsup.webp');
   });
 
-  it('frames every rank\'s mascot in the same circle, so dark art never shows as a box', () => {
-    for (const correct of [10, 8, 1]) {
-      const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
-      expect(screen.getByTestId('mascot')).toHaveAttribute('data-clip', 'circle');
-      unmount();
+  it('stamps a ring behind each earned star only', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={8} total={10} />);
+    const stars = Number(screen.getByTestId('practice-completion-stars').getAttribute('data-stars'));
+    expect(screen.getAllByTestId('practice-completion-stamp')).toHaveLength(stars);
+  });
+
+  describe('with motion off', () => {
+    beforeEach(() => { skipAnimations = true; });
+    afterEach(() => { skipAnimations = false; });
+
+    it('shows the still mascot reacting to the rank, no clip and no stamp rings', () => {
+      render(<PracticeCompletionMoment {...baseProps} correct={1} total={10} />);
+      expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+      expect(screen.queryByTestId('practice-completion-mascot-clip')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('practice-completion-stamp')).not.toBeInTheDocument();
+    });
+
+    it('frames every rank\'s still mascot in the same circle, so dark art never shows as a box', () => {
+      for (const correct of [10, 8, 1]) {
+        const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
+        expect(screen.getByTestId('mascot')).toHaveAttribute('data-clip', 'circle');
+        unmount();
+      }
+    });
+  });
+
+  it('every rank clip is a real file in public/', async () => {
+    const { existsSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    for (const f of ['joy-jump', 'puffed-chest-smug', 'faceplant-thumbsup']) {
+      expect(existsSync(resolve(__dirname, '../../../../public/mascot/anim', `${f}.webp`))).toBe(true);
     }
   });
 
