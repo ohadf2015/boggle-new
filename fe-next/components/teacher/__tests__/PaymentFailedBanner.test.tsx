@@ -1,10 +1,15 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PaymentFailedBanner } from '../PaymentFailedBanner';
 
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'he' }),
+}));
+
+const trackRecoveryClicked = vi.fn();
+vi.mock('@/lib/education/proFunnelTelemetry', () => ({
+  trackRecoveryClicked: (...args: unknown[]) => trackRecoveryClicked(...args),
 }));
 
 describe('PaymentFailedBanner', () => {
@@ -36,5 +41,17 @@ describe('PaymentFailedBanner', () => {
   it('falls back to the localized plan page when no portal URL came back', () => {
     render(<PaymentFailedBanner portalUrl={null} stillPro />);
     expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute('href', '/api/subscription/portal?locale=he');
+  });
+
+  it('emits recovery_clicked when the retry CTA is tapped — both portal branches', () => {
+    trackRecoveryClicked.mockClear();
+    const { unmount } = render(<PaymentFailedBanner portalUrl="https://polar.sh/portal/abc" stillPro />);
+    fireEvent.click(screen.getByTestId('payment-failed-cta'));
+    expect(trackRecoveryClicked).toHaveBeenCalledWith({ surface: 'payment_failed_banner' });
+    unmount();
+
+    render(<PaymentFailedBanner portalUrl={null} stillPro />);
+    fireEvent.click(screen.getByTestId('payment-failed-cta'));
+    expect(trackRecoveryClicked).toHaveBeenCalledTimes(2);
   });
 });
