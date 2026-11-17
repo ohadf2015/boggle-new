@@ -10062,6 +10062,7 @@ const en = {
       "wordsLabel": "Words",
       "triesLeft": "tries left",
       "matchesTargetWarning": "Same length. Submitting uses 1 try",
+      "solved": {"title": "Solved!", "firstTry": "on your first try", "inTries_one": "in {count} try", "inTries_other": "in {count} tries"},
       "knownLetters": "Wrong spot:",
       "syncingTarget": "Syncing target word…",
       "healHint": "Any word heals. Find the hidden word to win",

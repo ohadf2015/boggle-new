@@ -92,14 +92,14 @@ describe('GuestNameEditor — a guest who owns their name', () => {
 describe('GuestNameEditor — kept a generated name on an earlier finish', () => {
   beforeEach(() => markGuestNameChosen());
 
-  it('asks again, blocking, until they type a real name', async () => {
+  it('asks again until they type a real name', async () => {
     // Given a guest who kept "Sneaky Potato" before the prompt became mandatory
     fetchMock.mockResolvedValue(jsonResponse(200, { displayName: 'Ohad' }));
     const onRenamed = vi.fn();
     render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={onRenamed} t={t} />);
 
-    // Then the name dialog opens with an empty field
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    // Then the name card shows with an empty field
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
     expect(screen.getByRole('textbox')).toHaveValue('');
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
@@ -110,38 +110,64 @@ describe('GuestNameEditor — kept a generated name on an earlier finish', () =>
 
   it('spots a generated name from another language too', () => {
     render(<GuestNameEditor name="דונאט שובב" guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
   });
 
   it('even when they dismissed the old closable prompt earlier today', () => {
     localStorage.setItem('lexiclash_guest_name_prompt_dismissed_on', new Date().toISOString().slice(0, 10));
     render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Not now' })).not.toBeInTheDocument();
   });
 });
 
 describe('GuestNameEditor — first finish', () => {
-  it('opens on the guest\'s rank and shows a live preview of their leaderboard row', () => {
+  it('sits inline in the results, not as a dialog, and does not grab focus on arrival', () => {
     render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={4} totalPlayers={120} onRenamed={vi.fn()} t={t} />);
 
-    expect(screen.getByRole('dialog')).toHaveTextContent("You're #4 of 120 today!");
-    const preview = screen.getByTestId('guest-name-preview');
-    expect(preview).toHaveTextContent('#4');
-    expect(preview).toHaveTextContent('Your name');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).not.toHaveFocus();
+  });
 
-    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Ohad' } });
-    expect(preview).toHaveTextContent('Ohad');
+  it('has one field, styled as the guest\'s leaderboard row, with their rank beside it', () => {
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={4} totalPlayers={120} onRenamed={vi.fn()} t={t} />);
+
+    expect(screen.getAllByRole('textbox')).toHaveLength(1);
+    expect(screen.queryByTestId('guest-name-preview')).not.toBeInTheDocument();
+    const row = screen.getByTestId('guest-name-row');
+    expect(row).toHaveTextContent('#4');
+    expect(row).toContainElement(screen.getByRole('textbox'));
+  });
+
+  it('keeps one headline while the rank loads, and adds the rank line once it is known', () => {
+    const { rerender } = render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
+    const headline = screen.getByTestId('guest-name-headline').textContent;
+    expect(screen.queryByTestId('guest-name-rank-line')).toBeEmptyDOMElement();
+
+    rerender(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={2} totalPlayers={3} onRenamed={vi.fn()} t={t} />);
+
+    expect(screen.getByTestId('guest-name-headline').textContent).toBe(headline);
+    expect(screen.getByTestId('guest-name-rank-line')).toHaveTextContent("You're #2 of 3 today!");
   });
 
   it.each([
     [1, 50, "You're #1 today!"],
     [7, null, "You're #7 today!"],
-    [40, 50, "You made today's leaderboard!"],
-    [null, null, "You made today's leaderboard!"],
-  ])('rank %s of %s opens with "%s"', (rank, total, headline) => {
+  ])('rank %s of %s adds "%s"', (rank, total, line) => {
     render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={rank} totalPlayers={total} onRenamed={vi.fn()} t={t} />);
-    expect(screen.getByRole('dialog')).toHaveTextContent(headline);
+    expect(screen.getByTestId('guest-name-rank-line')).toHaveTextContent(line);
+  });
+
+  it('adds no rank line for a rank that is nothing to brag about', () => {
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} rank={40} totalPlayers={50} onRenamed={vi.fn()} t={t} />);
+    expect(screen.getByTestId('guest-name-rank-line')).toBeEmptyDOMElement();
+  });
+
+  it('uses brand colours: no yellow warning text, and the random-name fact is a quiet line', () => {
+    const { container } = render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
+    expect(container.innerHTML).not.toMatch(/neo-yellow/);
+    expect(screen.getByTestId('guest-name-default-hint').className).toMatch(/text-neo-white\/\d+/);
   });
 
   it('tells a guest on a generated name that it is random, with an empty field', () => {
@@ -194,19 +220,6 @@ describe('GuestNameEditor — first finish', () => {
     expect(hasChosenGuestName()).toBe(false);
   });
 
-  it('is a blocking dialog with no way to skip it', () => {
-    render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
-
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Keep this name' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /close/i })).not.toBeInTheDocument();
-
-    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
-
-    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
-    expect(hasChosenGuestName()).toBe(false);
-  });
-
   it('refuses to save a generated name as the chosen one', async () => {
     render(<GuestNameEditor name={CHOSEN} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
@@ -223,8 +236,19 @@ describe('GuestNameEditor — first finish', () => {
     render(<GuestNameEditor name={GENERATED} guestFingerprint={FP} onRenamed={vi.fn()} t={t} />);
 
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Show my name' }));
 
-    expect(screen.getByRole('button', { name: 'Show my name' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Show my name' })).not.toBeDisabled();
+    expect(screen.getByRole('textbox')).toHaveFocus();
     expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId('guest-name-prompt')).toBeInTheDocument();
+  });
+});
+
+describe('GuestNameEditor — generated-name nudge', () => {
+  it('uses brand colours, not a yellow warning banner', () => {
+    render(<GuestNameEditor name={GENERATED} guestFingerprint={null} onRenamed={vi.fn()} t={t} />);
+    const nudge = screen.getByTestId('guest-name-default-nudge');
+    expect(nudge.outerHTML).not.toMatch(/neo-yellow/);
   });
 });

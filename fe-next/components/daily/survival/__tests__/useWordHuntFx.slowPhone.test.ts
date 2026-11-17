@@ -51,10 +51,10 @@ describe('useWordHuntFx on a phone that runs slow', () => {
     expect(haptics.hapticError).toHaveBeenCalledTimes(1);
   });
 
-  it('Given the target word, Then it flashes gold', () => {
+  it('Given the target word, Then the phone buzzes but no screen flash fires: the board plays the one solve burst', () => {
     const fx = verdict('target-found', true, false);
-    expect(fx.flashTrigger).toBe(1);
-    expect(fx.flashColor).toBe('bg-neo-yellow/30');
+    expect(fx.flashTrigger).toBe(0);
+    expect(haptics.hapticWordAccepted).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -67,6 +67,18 @@ describe('useWordHuntFx with motion turned off', () => {
 });
 
 describe('useWordHuntFx on desktop', () => {
+  it('Given the run is won, Then no full-screen firework, flash or shake plays over the board confetti', () => {
+    const hook = renderHook(({ s }) => useWordHuntFx(s, false, false), { initialProps: { s: state(0, 'valid-word') } });
+    hook.rerender({ s: { ...state(0, 'valid-word'), hasWon: true, isGameOver: true } as SurvivalGameState });
+    expect(hook.result.current.pixiEffects.map((e) => e.type)).not.toContain('gameWon');
+  });
+
+  it('Given the target word, Then no second particle or reward burst stacks on the board confetti', () => {
+    const fx = verdict('target-found', false, false);
+    expect(fx.pixiEffects).toHaveLength(0);
+    expect(triggerReward).not.toHaveBeenCalled();
+  });
+
   it('Given a rejected word, Then no red flash or screen shake punishes the miss', () => {
     const fx = verdict('invalid-word', false, false);
     expect(fx.flashTrigger).toBe(0);

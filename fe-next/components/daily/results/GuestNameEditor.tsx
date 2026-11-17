@@ -53,7 +53,7 @@ export function GuestNameEditor({ name, guestFingerprint, rank, totalPlayers, on
       return (
         <div
           data-testid="guest-name-default-nudge"
-          className="w-full flex items-center gap-2 mb-2 px-3 py-2 rounded-neo border-2 border-neo-yellow bg-neo-yellow/10 text-sm text-neo-white"
+          className="w-full flex items-center gap-2 mb-2 px-3 py-2 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm text-sm text-neo-white"
         >
           <span className="min-w-0 flex-1">
             {t('wordHunt.results.guestNameDefaultNudge', "You're on the board as {name}, a random name. Make this score yours.", { name })}
@@ -62,7 +62,7 @@ export function GuestNameEditor({ name, guestFingerprint, rank, totalPlayers, on
             type="button"
             onClick={() => startEditing('nudge')}
             disabled={!guestFingerprint}
-            className="shrink-0 px-2 py-1 rounded-neo border-2 border-neo-black bg-neo-yellow text-neo-black text-xs font-bold shadow-hard-sm disabled:opacity-50"
+            className="shrink-0 px-2 py-1 rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black text-xs font-bold shadow-hard-sm disabled:opacity-50"
           >
             {t('wordHunt.results.guestNameUseMine', 'Use my name')}
           </button>

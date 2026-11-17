@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useGameRewards } from '@/hooks/useGameRewards';
-import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import type { WordHuntEffect } from '../WordHuntEffectsCanvas';
 import type { SurvivalGameState } from './useSurvivalGameLogic';
 import { LIFE_DRAIN_RATE } from './constants';
@@ -74,11 +73,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
       pushEffect({ type: 'wordValid', x: cx, y: cy, points: state.lastScoreIncrement ?? 1 });
     } else if (type === 'target-found') {
       hapticWordAccepted();
-      const tier = wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length);
-      flash(tier.tier <= 1 ? 'bg-neo-yellow/30' : 'bg-neo-lime/20');
-      if (skipAnimations) return;
-      triggerReward('levelUp');
-      pushEffect({ type: 'targetFound', x: cx, y: cy });
     } else if (type === 'invalid-word' || type === 'not-in-dictionary' || type === 'not-on-board') {
       // A miss only buzzes: red flashes and shakes read as punishment.
       hapticError();
@@ -94,7 +88,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
     state.feedbackSeq,
     state.feedbackType,
     state.lastScoreIncrement,
-    state.attempts,
     triggerReward,
     skipAnimations,
     calm,
@@ -131,17 +124,13 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
     prevClueGainingRef.current = state.isClueGaining;
   }, [state.isClueGaining, skipAnimations, pushEffect]);
 
-  const gameEndFiredRef = useRef<'won' | 'lost' | null>(null);
+  // A win's one burst is the finish overlay's confetti; only a loss gets a canvas beat.
+  const lossFiredRef = useRef(false);
   useEffect(() => {
-    if (skipAnimations) return;
-    if (state.hasWon && gameEndFiredRef.current !== 'won') {
-      pushEffect({ type: 'gameWon', score: state.liveScore });
-      gameEndFiredRef.current = 'won';
-    } else if (state.isGameOver && !state.hasWon && gameEndFiredRef.current !== 'lost') {
-      pushEffect({ type: 'gameLost' });
-      gameEndFiredRef.current = 'lost';
-    }
-  }, [state.hasWon, state.isGameOver, state.liveScore, skipAnimations, pushEffect]);
+    if (skipAnimations || lossFiredRef.current || !state.isGameOver || state.hasWon) return;
+    pushEffect({ type: 'gameLost' });
+    lossFiredRef.current = true;
+  }, [state.hasWon, state.isGameOver, skipAnimations, pushEffect]);
 
   return {
     containerRef,

@@ -15,7 +15,7 @@ export interface HuntFeedbackPillProps {
 }
 
 function tone(type: FeedbackType): string {
-  if (type === 'valid-word' || type === 'target-found') return 'bg-neo-lime/15 text-neo-lime';
+  if (type === 'valid-word') return 'bg-neo-lime/15 text-neo-lime';
   if (type === 'duplicate') return 'bg-neo-cyan/15 text-neo-cyan';
   if (type === 'unavailable') return 'bg-neo-yellow/15 text-neo-yellow';
   if (type === 'too-short' || type === 'too-long') return 'bg-neo-orange/15 text-neo-orange';
@@ -26,7 +26,7 @@ function tone(type: FeedbackType): string {
 export function HuntFeedbackPill({ seq, type, message, word, calm }: HuntFeedbackPillProps) {
   return (
     <div data-testid="hunt-feedback-row" className="shrink-0 h-6 flex items-center justify-center">
-      {type && message && (
+      {type && message && type !== 'target-found' && (
         <m.div
           key={seq}
           data-testid="hunt-feedback-pill"

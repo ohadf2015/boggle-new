@@ -2611,6 +2611,7 @@ const ru = {
       "wordsLabel": "Слова",
       "triesLeft": "попыток в запасе",
       "matchesTargetWarning": "Такая же длина: отправка стоит 1 попытку",
+      "solved": {"title": "Разгадано!", "firstTry": "с первой попытки", "inTries_one": "за {count} попытку", "inTries_few": "за {count} попытки", "inTries_many": "за {count} попыток", "inTries_other": "за {count} попытки"},
       "knownLetters": "Не на месте:",
       "syncingTarget": "Синхронизирую загаданное слово…",
       "healHint": "Любое слово лечит. Найди скрытое слово, чтобы выиграть",

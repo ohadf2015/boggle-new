@@ -8,6 +8,7 @@ import { Check, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
+import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { DAILY_MODES, type DailyModeDef, type DailyModeId } from '@/lib/dailyModes';
 import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -83,7 +84,9 @@ export function DailyResultsHero({
   const xp = useResultsXp(`daily:${mode}`);
   const def = DAILY_MODES.find(d => d.id === mode) as DailyModeDef;
   const accent = ACCENT[def.accent];
-  const [reduced] = useState(prefersReducedMotion);
+  const [osReduced] = useState(prefersReducedMotion);
+  const [effectsReduced] = useReducedEffects();
+  const reduced = osReduced || effectsReduced;
   const shared = useDailyReveal();
   const local = useRevealSequence(!shared.inProvider && celebrate && !reduced);
   const seq = shared.inProvider ? shared : local;
@@ -233,7 +236,10 @@ export function DailyResultsHero({
           </m.h2>
           {score != null && (
             <m.div className="flex items-baseline gap-1.5 mt-0.5 w-fit cursor-pointer select-none" {...pop(0.3)} {...tapFeel}>
-              <span data-testid="daily-results-score" className={cn('font-neo-display font-black text-4xl tabular-nums leading-none', accent.text)}>
+              <span
+                data-testid="daily-results-score"
+                className={cn('font-neo-display font-black text-4xl tabular-nums leading-none', accent.text, animateIn && !scoreGo && !seq.skipped && 'invisible')}
+              >
                 {shown}
               </span>
               <span className="text-xs font-bold uppercase tracking-wide text-neo-white/65">{scoreLabel ?? t('daily.results.heroScore')}</span>

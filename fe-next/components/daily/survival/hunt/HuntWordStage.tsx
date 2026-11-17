@@ -39,7 +39,7 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
   const showVerdict = phase === 'verdict' && verdict;
   const building = phase === 'live' || phase === 'pending';
   const bonus = building ? getLifeBonusForWord(letters.length) : 0;
-  const cheer = showVerdict && good ? praiseFor(shownWord, combo, lucky) : null;
+  const cheer = showVerdict && verdict === 'good' ? praiseFor(shownWord, combo, lucky) : null;
   const cheerParams: Record<string, number> | undefined = lucky ? { bonus: LUCKY_LIFE_BONUS } : combo >= 3 ? { count: combo } : undefined;
   const cheerText = cheer ? pickVariant(t(cheer.key, cheerParams), cheer.index) : '';
 

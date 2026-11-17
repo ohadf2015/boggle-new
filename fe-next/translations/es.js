@@ -10539,6 +10539,7 @@ const es = {
       "wordsLabel": "Palabras",
       "triesLeft": "intentos restantes",
       "matchesTargetWarning": "Misma longitud: enviar gasta 1 intento",
+      "solved": {"title": "¡Resuelto!", "firstTry": "a la primera", "inTries_one": "en {count} intento", "inTries_other": "en {count} intentos"},
       "knownLetters": "Mal ubicada:",
       "syncingTarget": "Sincronizando palabra…",
       "healHint": "Cualquier palabra cura. Adivina la oculta para ganar",

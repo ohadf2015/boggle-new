@@ -30,4 +30,10 @@ describe('HuntFeedbackPill', () => {
     const tones = new Set([toneOf('valid-word'), toneOf('not-in-dictionary'), toneOf('duplicate'), toneOf('unavailable')]);
     expect(tones.size).toBe(4);
   });
+
+  it('Given the hidden word is found, Then no small pill shows: the clue row and board carry the solve', () => {
+    render(<HuntFeedbackPill seq={3} type="target-found" message="You Found It!" word="PLATE" calm={false} />);
+    expect(screen.getByTestId('hunt-feedback-row')).toBeInTheDocument();
+    expect(screen.queryByTestId('hunt-feedback-pill')).toBeNull();
+  });
 });

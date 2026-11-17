@@ -10601,6 +10601,7 @@ const he = {
       "wordsLabel": "מילים",
       "triesLeft": "ניסיונות נותרו",
       "matchesTargetWarning": "אותו אורך: שליחה תעלה לכם ניסיון",
+      "solved": {"title": "נפתר!", "firstTry": "בניסיון הראשון", "inTries_one": "בניסיון אחד", "inTries_other": "ב-{count} ניסיונות"},
       "knownLetters": "מקום שגוי:",
       "syncingTarget": "מסנכרנים את מילת היעד…",
       "healHint": "כל מילה מרפאת. מצאו את המילה הנסתרת כדי לנצח",
