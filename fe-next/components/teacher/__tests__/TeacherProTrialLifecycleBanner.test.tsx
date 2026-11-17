@@ -10,9 +10,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-const trackEduProUpgradeClicked = vi.fn();
+const trackTeacherTrialBannerShown = vi.fn();
+const trackTeacherTrialUpgradeClicked = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
-  trackEduProUpgradeClicked: (...a: unknown[]) => trackEduProUpgradeClicked(...a),
+  trackTeacherTrialBannerShown: (...a: unknown[]) => trackTeacherTrialBannerShown(...a),
+  trackTeacherTrialUpgradeClicked: (...a: unknown[]) => trackTeacherTrialUpgradeClicked(...a),
 }));
 
 const goToPolarCheckout = vi.fn();
@@ -27,37 +29,66 @@ vi.mock('react-hot-toast', () => ({
   default: { error: vi.fn(), success: vi.fn() },
 }));
 
+const expiresIn = (days: number) => new Date(Date.now() + days * 86_400_000 - 60_000).toISOString();
+const PORTAL = 'https://polar.sh/lexiclash/portal?customer_session_token=x';
+
 describe('TeacherProTrialLifecycleBanner', () => {
   beforeEach(() => {
-    trackEduProUpgradeClicked.mockReset();
+    trackTeacherTrialBannerShown.mockReset();
+    trackTeacherTrialUpgradeClicked.mockReset();
     goToPolarCheckout.mockReset();
     postTeacherProCheckout.mockReset();
   });
 
-  it('shows days remaining', () => {
-    const trialExpires = new Date(Date.now() + 5 * 86400000).toISOString();
-    render(<TeacherProTrialLifecycleBanner trialExpires={trialExpires} />);
+  it('shows days remaining in the title and the countdown tile', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(5)} />);
     const banner = screen.getByTestId('teacher-pro-trial-lifecycle');
     expect(banner).toHaveAttribute('data-days', '5');
+    expect(banner).toHaveAttribute('data-tone', 'calm');
     expect(screen.getByText(/teacher.subscription.trialLifecycleTitle:5/)).toBeInTheDocument();
+    expect(screen.getByTestId('trial-count')).toHaveTextContent('5');
+  });
+
+  it('fires teacher_trial_banner_shown once per display with days_remaining', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(5)} />);
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledTimes(1);
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledWith({ days_remaining: 5, urgent: false });
+  });
+
+  it('uses the urgent variant at 3 days or fewer', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(3)} />);
+    expect(screen.getByTestId('teacher-pro-trial-lifecycle')).toHaveAttribute('data-tone', 'urgent');
+    expect(trackTeacherTrialBannerShown).toHaveBeenCalledWith({ days_remaining: 3, urgent: true });
   });
 
   it('uses the today title once the trial instant has passed', () => {
-    const trialExpires = new Date(Date.now() - 1000).toISOString();
-    render(<TeacherProTrialLifecycleBanner trialExpires={trialExpires} />);
+    render(<TeacherProTrialLifecycleBanner trialExpires={new Date(Date.now() - 1000).toISOString()} />);
     expect(screen.getByTestId('teacher-pro-trial-lifecycle')).toHaveAttribute('data-days', '0');
     expect(screen.getByText('teacher.subscription.trialLifecycleTitleToday')).toBeInTheDocument();
   });
 
-  it('says the card is charged after the trial and links to the Polar portal, not a new checkout', () => {
-    const portal = 'https://polar.sh/lexiclash/portal?customer_session_token=x';
-    const trialExpires = new Date(Date.now() + 5 * 86400000).toISOString();
-    render(<TeacherProTrialLifecycleBanner trialExpires={trialExpires} portalUrl={portal} />);
-    expect(screen.getByText('teacher.subscription.trialAutoRenewBody')).toBeInTheDocument();
-    const cta = screen.getByTestId('teacher-pro-trial-lifecycle-cta');
-    expect(cta).toHaveAttribute('href', portal);
+  it('leads with an upgrade CTA to the existing checkout path and tracks the click', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(5)} portalUrl={PORTAL} />);
+    const cta = screen.getByTestId('teacher-pro-trial-lifecycle-upgrade-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade?source=dashboard_trial_lifecycle');
     fireEvent.click(cta);
+    expect(trackTeacherTrialUpgradeClicked).toHaveBeenCalledTimes(1);
+    expect(trackTeacherTrialUpgradeClicked).toHaveBeenCalledWith({ days_remaining: 5, urgent: false });
+    // A trialing teacher must never be sent through a second checkout session.
     expect(postTeacherProCheckout).not.toHaveBeenCalled();
     expect(goToPolarCheckout).not.toHaveBeenCalled();
+  });
+
+  it('keeps manage-or-cancel as a secondary link to the Polar portal', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(5)} portalUrl={PORTAL} />);
+    const manage = screen.getByTestId('teacher-pro-trial-lifecycle-manage');
+    expect(manage).toHaveAttribute('href', PORTAL);
+    expect(manage).toHaveAttribute('target', '_blank');
+  });
+
+  it('with no expiry known, renders the active-trial title and fires nothing', () => {
+    render(<TeacherProTrialLifecycleBanner trialExpires={null} />);
+    expect(screen.getByText('teacher.plan.trialActive')).toBeInTheDocument();
+    expect(trackTeacherTrialBannerShown).not.toHaveBeenCalled();
   });
 });

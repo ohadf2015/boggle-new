@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   polarTrialDaysLeft,
+  polarTrialCountdown,
   polarTrialExpires,
   polarTrialUx,
   polarTrialChipUpgrade,
@@ -138,5 +139,35 @@ describe('isPolarTrialLapse', () => {
       status: 'active', trial: true, trial_end: END, current_period_end: END,
     })).toBe(false);
     expect(isPolarTrialLapse({ status: 'canceled', trial: false, trial_end: null, current_period_end: END })).toBe(false);
+  });
+});
+
+describe('polarTrialCountdown', () => {
+  const NOW = Date.parse('2026-10-01T00:00:00.000Z');
+
+  it('counts whole days while more than one day remains', () => {
+    const iso = new Date(NOW + 5 * 86_400_000).toISOString();
+    expect(polarTrialCountdown(iso, NOW, 'en')).toEqual({ key: 'education.trial.days_left', count: 5 });
+  });
+
+  it('switches to hours inside the final day, like the access-trial badge', () => {
+    const iso = new Date(NOW + 5 * 3_600_000).toISOString();
+    expect(polarTrialCountdown(iso, NOW, 'en')).toEqual({ key: 'education.trial.hours_left', count: 5 });
+  });
+
+  it('uses the singular form at one day/hour and plural rules for Russian', () => {
+    expect(polarTrialCountdown(new Date(NOW + 86_400_000).toISOString(), NOW, 'en'))
+      .toEqual({ key: 'education.trial.hours_left', count: 24 });
+    expect(polarTrialCountdown(new Date(NOW + 3_600_000).toISOString(), NOW, 'en'))
+      .toEqual({ key: 'education.trial.hour_left', count: 1 });
+    expect(polarTrialCountdown(new Date(NOW + 21 * 86_400_000).toISOString(), NOW, 'ru'))
+      .toEqual({ key: 'education.trial.day_left', count: 21 });
+  });
+
+  it('is null when the expiry is unknown, and 0 hours once it has passed', () => {
+    expect(polarTrialCountdown(null, NOW, 'en')).toBeNull();
+    expect(polarTrialCountdown('not-a-date', NOW, 'en')).toBeNull();
+    expect(polarTrialCountdown(new Date(NOW - 1000).toISOString(), NOW, 'en'))
+      .toEqual({ key: 'education.trial.hours_left', count: 0 });
   });
 });

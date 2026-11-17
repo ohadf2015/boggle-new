@@ -125,6 +125,30 @@ export function trackEduTrialReminderCtaClick(args: { days_remaining: number }):
   });
 }
 
+/**
+ * Polar 14-day trial lifecycle banner on Teacher HQ — impression.
+ * `urgent` marks the <=3-days variant (the day-10 expiring banner). Fires at
+ * most once per display (ref guard in the banner components).
+ */
+export function trackTeacherTrialBannerShown(args: { days_remaining: number; urgent: boolean }): void {
+  captureStep('teacher_trial_banner_shown', {
+    days_remaining: args.days_remaining,
+    urgent: args.urgent,
+    product: 'teacher_pro',
+    placement: 'dashboard_trial_lifecycle',
+  });
+}
+
+/** Polar trial lifecycle banner — upgrade CTA tap toward the checkout path. */
+export function trackTeacherTrialUpgradeClicked(args: { days_remaining: number; urgent: boolean }): void {
+  captureStep('teacher_trial_upgrade_clicked', {
+    days_remaining: args.days_remaining,
+    urgent: args.urgent,
+    product: 'teacher_pro',
+    placement: 'dashboard_trial_lifecycle',
+  });
+}
+
 export function trackEduProUpgradeClicked(args: { source: ProUpgradeSource }): void {
   captureStep('edu_pro_upgrade_clicked', { source: args.source });
   // Canonical conversion-funnel name (trial_start → checkout_open → checkout_complete → paid).

@@ -50,6 +50,8 @@ import {
   trackEduProCheckoutReturnLanded,
   trackEduTrialReminderShown,
   trackEduTrialReminderCtaClick,
+  trackTeacherTrialBannerShown,
+  trackTeacherTrialUpgradeClicked,
   trackRecoveryClicked,
 } from '../proFunnelTelemetry';
 
@@ -515,6 +517,48 @@ describe('edu_trial_reminder events', () => {
       throw new Error('growth error');
     });
     expect(() => trackEduTrialReminderCtaClick({ days_remaining: 2 })).not.toThrow();
+  });
+});
+
+describe('teacher_trial_banner events (Polar trial lifecycle banner)', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+    growthMock.mockReset();
+  });
+
+  it('Given trackTeacherTrialBannerShown, When tracked, Then PostHog and Growth Radar receive exact name and props', () => {
+    trackTeacherTrialBannerShown({ days_remaining: 7, urgent: false });
+    const expectedProps = {
+      days_remaining: 7,
+      urgent: false,
+      product: 'teacher_pro',
+      placement: 'dashboard_trial_lifecycle',
+    };
+    expect(captureMock).toHaveBeenCalledWith('teacher_trial_banner_shown', expectedProps);
+    expect(growthMock).toHaveBeenCalledWith('teacher_trial_banner_shown', expectedProps);
+  });
+
+  it('Given trackTeacherTrialUpgradeClicked, When tracked, Then PostHog and Growth Radar receive exact name and props', () => {
+    trackTeacherTrialUpgradeClicked({ days_remaining: 2, urgent: true });
+    const expectedProps = {
+      days_remaining: 2,
+      urgent: true,
+      product: 'teacher_pro',
+      placement: 'dashboard_trial_lifecycle',
+    };
+    expect(captureMock).toHaveBeenCalledWith('teacher_trial_upgrade_clicked', expectedProps);
+    expect(growthMock).toHaveBeenCalledWith('teacher_trial_upgrade_clicked', expectedProps);
+  });
+
+  it('Given capture throws, When tracked, Then it never bubbles or throws', () => {
+    captureMock.mockImplementationOnce(() => {
+      throw new Error('capture error');
+    });
+    expect(() => trackTeacherTrialBannerShown({ days_remaining: 1, urgent: true })).not.toThrow();
+    growthMock.mockImplementationOnce(() => {
+      throw new Error('growth error');
+    });
+    expect(() => trackTeacherTrialUpgradeClicked({ days_remaining: 1, urgent: true })).not.toThrow();
   });
 });
 

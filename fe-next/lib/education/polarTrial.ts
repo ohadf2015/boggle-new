@@ -11,6 +11,9 @@
  * second checkout cannot start another free 14 days.
  */
 
+import { pluralKey } from '@/lib/i18n/pluralKey';
+import { DAY_FORMS, HOUR_FORMS } from '@/lib/education/trial';
+
 export interface PolarTrialRow {
   tier: string;
   status: string;
@@ -68,6 +71,24 @@ export function polarTrialDaysLeft(iso: string | null | undefined, nowMs: number
   const ms = end - nowMs;
   if (ms <= 0) return 0;
   return Math.ceil(ms / 86_400_000);
+}
+
+/**
+ * Countdown tile for the HQ lifecycle banner: the same day/hour phrasing as
+ * the access-trial badge (`trialCountdownUnit`), so a trial with one day left
+ * counts hours. Null when the expiry is unknown.
+ */
+export function polarTrialCountdown(
+  iso: string | null | undefined,
+  nowMs: number,
+  locale = 'en',
+): { key: string; count: number } | null {
+  const days = polarTrialDaysLeft(iso, nowMs);
+  if (days === null) return null;
+  if (days > 1) return { key: pluralKey(DAY_FORMS, days, locale), count: days };
+  const ms = iso ? Date.parse(iso) - nowMs : 0;
+  const hours = Math.max(0, Math.ceil(ms / 3_600_000));
+  return { key: pluralKey(HOUR_FORMS, hours, locale), count: hours };
 }
 
 /** Chip upgrade CTA only when the trial is in its last 3 days (inclusive). */

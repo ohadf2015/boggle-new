@@ -14,21 +14,25 @@ export function TeacherProManageLink({
   portalUrl,
   testId,
   children,
+  className,
 }: {
   portalUrl: string | null | undefined;
   testId: string;
   children: ReactNode;
+  /** Override the chunky CTA look, e.g. a quiet secondary link next to an upgrade button. */
+  className?: string;
 }) {
   const { language } = useLanguage();
   const external = typeof portalUrl === 'string' && portalUrl.startsWith('https://');
+  const primary = !className;
   return (
     <a
       data-testid={testId}
       href={external ? portalUrl : `/${language}/teacher/upgrade`}
       {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      className={PRO_BANNER_CTA}
+      className={className ?? PRO_BANNER_CTA}
     >
-      <ProShine />
+      {primary ? <ProShine /> : null}
       {children}
     </a>
   );
