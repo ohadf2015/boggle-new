@@ -20672,6 +20672,7 @@ const en = {
       "next": "Next word",
       "finish": "See my results",
       "praise": "Nailed it!|Spot on!|Perfect!|You got it!|Brilliant!",
+      "enterHint": "Press Enter to check · type the whole word",
       "progress": "Word {current} of {total}"
     },
     "cookie": {

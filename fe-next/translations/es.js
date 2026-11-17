@@ -21663,6 +21663,7 @@ const es = {
       "next": "Siguiente palabra",
       "finish": "Ver mis resultados",
       "praise": "¡Lo clavaste!|¡Exacto!|¡Perfecto!|¡Lo lograste!|¡Genial!",
+      "enterHint": "Pulsa Intro para comprobar · escribe la palabra entera",
       "progress": "Palabra {current} de {total}"
     },
     "cookie": {

@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { ArrowLeft, ArrowRight, Lightbulb, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Lightbulb, Check, X, Star } from 'lucide-react';
 import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
@@ -21,6 +21,8 @@ import { fireConfetti } from '@/utils/confettiUtils';
 import { SpellingTiles, TILE_KEYFRAMES } from './spelling/SpellingTiles';
 import { StarTrack, STAR_KEYFRAMES } from './spelling/StarTrack';
 import { candyKey } from './spelling/candyKey';
+import { PracticeBuddy, BUDDY_KEYFRAMES, type BuddyReaction } from './spelling/PracticeBuddy';
+import { streakFlameStage } from '@/lib/education/practiceJuice';
 
 /*
  * The stage behind the drill: two soft brand-colour glows and a faint dot grid
@@ -158,6 +160,9 @@ function SpellingRound({
   const sessionStartRef = useRef<number>(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const tilesRef = useRef<HTMLDivElement>(null);
+  // The buddy's cue: one reaction per answer, plus a nod per keystroke.
+  const [buddyReaction, setBuddyReaction] = useState<BuddyReaction | null>(null);
+  const [typingTick, setTypingTick] = useState(0);
 
   // Initialize session start time — and open the round with a cue, so the
   // student hears that a drill has begun rather than just seeing a new card.
@@ -199,6 +204,14 @@ function SpellingRound({
       });
       if (result.correct) sfx.correct();
       else sfx.wrong();
+      // A right answer that lifts the streak flame to a new stage gets the strut, not the jump.
+      const nextStreak = result.correct ? currentStreak + 1 : 0;
+      const newStage = streakFlameStage(nextStreak).stage;
+      const hype = result.correct && newStage >= 2 && newStage > streakFlameStage(currentStreak).stage;
+      setBuddyReaction((prev) => ({
+        kind: result.correct ? (hype ? 'streak' : 'correct') : 'miss',
+        id: (prev?.id ?? 0) + 1,
+      }));
       // Keep what they typed: seeing their own spelling next to the right one is the lesson.
       setFeedback({ ...result, attempt: inputValue.trim() });
       if (result.correct) burstFrom(tilesRef.current);
@@ -206,7 +219,7 @@ function SpellingRound({
 
       if (result.correct) setTimeout(() => setFeedback(null), 1000);
     },
-    [inputValue, feedback, submitAnswer, sfx, wordIndex]
+    [inputValue, feedback, submitAnswer, sfx, wordIndex, currentStreak]
   );
 
   const handleNext = useCallback(() => {
@@ -293,10 +306,15 @@ function SpellingRound({
   }
 
   return (
-    <div className="min-h-full bg-neo-navy p-4" style={STAGE_STYLE} data-testid="spelling-stage" dir={isRTL ? 'rtl' : 'ltr'}>
-      <style>{TILE_KEYFRAMES + STAR_KEYFRAMES}</style>
+    <div
+      className="@container min-h-full bg-neo-navy p-4 @3xl:rounded-neo @3xl:border-[3px] @3xl:border-neo-cream/15 @3xl:px-8 @3xl:py-6"
+      style={STAGE_STYLE}
+      data-testid="spelling-stage"
+      dir={isRTL ? 'rtl' : 'ltr'}
+    >
+      <style>{TILE_KEYFRAMES + STAR_KEYFRAMES + BUDDY_KEYFRAMES + PLAY_KEYFRAMES}</style>
       {/* Header */}
-      <div className="max-w-2xl mx-auto mb-6">
+      <div className="mx-auto mb-6 max-w-2xl @3xl:max-w-4xl">
         <div className="flex items-center justify-between">
           <Button
             variant="ghost"
@@ -319,7 +337,15 @@ function SpellingRound({
             </div>
           </div>
 
-          <div className="w-10" />
+          {/* On a phone the buddy sits in the header's free corner, clear of the pips and the card. */}
+          <div className="relative w-10 self-stretch">
+            <PracticeBuddy
+              reaction={buddyReaction}
+              typing={inputValue.length > 0 && !feedback}
+              typingTick={typingTick}
+              className="absolute -top-2 end-0 z-20 size-16 @3xl:hidden"
+            />
+          </div>
         </div>
         {/* Stars to collect on the way to the trophy; misses stay visible as pink marks. */}
         <StarTrack
@@ -331,7 +357,12 @@ function SpellingRound({
       </div>
 
       {/* Main content */}
-      <div className="max-w-2xl mx-auto space-y-6">
+      {/*
+        On a wide screen the buddy gets its own column beside the round, big
+        enough to read its reactions; on a phone it lives in the header corner.
+      */}
+      <div className="mx-auto max-w-2xl @3xl:grid @3xl:max-w-4xl @3xl:grid-cols-[minmax(0,1fr)_15rem] @3xl:items-center @3xl:gap-8">
+      <div className="space-y-6">
         {/*
           The streak used to be a flat orange pill reading "4x streak". It is
           now a fire that visibly grows through four stages and stings when it
@@ -345,13 +376,15 @@ function SpellingRound({
         )}
 
         {/* Definition card */}
+        <div className="relative [perspective:900px]">
         <AdaptiveAnimatePresence mode="wait">
           <AdaptiveMotion.div
             key={wordIndex}
-            initial={{ x: isRTL ? -20 : 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: isRTL ? 20 : -20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            // Each new word flips in like a dealt card, on a spring.
+            initial={{ rotateX: -75, opacity: 0, y: 14 }}
+            animate={{ rotateX: 0, opacity: 1, y: 0 }}
+            exit={{ rotateX: 60, opacity: 0, y: -10, transition: { duration: 0.14, ease: 'easeIn' } }}
+            transition={{ type: 'spring', stiffness: 320, damping: 24, mass: 0.8 }}
             data-testid="definition-card"
             className={cn(
               'p-8 rounded-neo',
@@ -376,6 +409,7 @@ function SpellingRound({
             />
           </AdaptiveMotion.div>
         </AdaptiveAnimatePresence>
+        </div>
 
         {/* Hint display */}
         <div
@@ -388,7 +422,19 @@ function SpellingRound({
             chain stopped one level too early: an entry with no `word` threw
             and took the whole round down with it.
           */}
-          <div ref={tilesRef} className="flex w-full justify-center">
+          <div ref={tilesRef} className="relative flex w-full justify-center">
+            {/* A right answer sends a "+1 star" up toward the trail. */}
+            {feedback?.correct && (
+              <span
+                aria-hidden="true"
+                data-testid="spelling-fly-up"
+                style={candyKey('gold', 3)}
+                className="pointer-events-none absolute -top-2 left-1/2 z-10 flex items-center motion-reduce:hidden gap-1 rounded-full px-2.5 py-1 font-neo-display text-base font-black text-neo-navy motion-safe:animate-[lc-fly-up_900ms_cubic-bezier(.2,.8,.3,1)_both]"
+              >
+                +1
+                <Star className="size-4 fill-neo-navy" strokeWidth={2.5} />
+              </span>
+            )}
             <SpellingTiles
               length={sortedWords[wordIndex]?.word?.length ?? 0}
               hint={currentHint}
@@ -428,7 +474,10 @@ function SpellingRound({
             ref={inputRef}
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setTypingTick((n) => n + 1);
+            }}
             disabled={!!feedback || isComplete}
             autoComplete="off"
             autoCorrect="off"
@@ -482,7 +531,7 @@ function SpellingRound({
               feedback.correct ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black motion-safe:animate-neo-shake'
             )}
           >
-            <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}@keyframes lc-rays{to{transform:rotate(360deg)}}@keyframes lc-mascot-in{0%{transform:translateY(40%) scale(.6);opacity:0}100%{transform:none;opacity:1}}'}</style>
+            <style>{'@keyframes lc-verdict-in{0%{transform:scale(.85) rotate(-2deg)}100%{transform:scale(1) rotate(0)}}@keyframes lc-rays{to{transform:rotate(360deg)}}'}</style>
             {/* Sunburst behind a right answer: slow spin, still for reduced motion. */}
             {feedback.correct && (
               <span
@@ -495,17 +544,6 @@ function SpellingRound({
                 />
               </span>
             )}
-            {/* The mascot pops up to cheer, or to shrug kindly on a miss. */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- 20KB static art, decorative */}
-            <img
-              src={feedback.correct ? '/mascot/bridge-cheer-nobg.webp' : '/mascot/bridge-oops-nobg.webp'}
-              alt=""
-              aria-hidden="true"
-              width={64}
-              height={64}
-              data-testid="verdict-mascot"
-              className="pointer-events-none absolute bottom-0 end-1 size-14 object-contain motion-safe:animate-[lc-mascot-in_320ms_cubic-bezier(.34,1.56,.64,1)_both] sm:size-16"
-            />
             <p className="flex items-center gap-2 font-neo-display text-xl font-black uppercase sm:text-2xl">
               {feedback.correct ? <Check className="size-7" strokeWidth={3.5} /> : <X className="size-7" strokeWidth={3.5} />}
               {feedback.correct ? praise : t('education.practice.incorrect')}
@@ -541,9 +579,22 @@ function SpellingRound({
           </div>
         )}
         </div>
+        <p className="hidden text-center font-neo-body text-sm font-bold text-neo-cream/70 @3xl:block">
+          {t('eduStudent.practice.enterHint')}
+        </p>
+      </div>
+      <PracticeBuddy
+        reaction={buddyReaction}
+        typing={inputValue.length > 0 && !feedback}
+        typingTick={typingTick}
+        className="hidden size-60 @3xl:flex"
+      />
       </div>
     </div>
   );
 }
+
+const PLAY_KEYFRAMES =
+  '@keyframes lc-fly-up{0%{transform:translate(-50%,0) scale(.5);opacity:0}20%{transform:translate(-50%,-14px) scale(1.15);opacity:1}100%{transform:translate(-50%,-150px) scale(.8);opacity:0}}';
 
 export default SpellingChallengePractice;

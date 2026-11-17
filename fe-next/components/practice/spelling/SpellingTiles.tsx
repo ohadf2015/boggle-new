@@ -71,7 +71,9 @@ export function SpellingTiles({ length, hint, typed, state, answer }: SpellingTi
             }}
             className={cn(
               'relative flex aspect-square min-w-0 basis-11 items-center justify-center rounded-lg font-neo-display font-black uppercase leading-none text-neo-navy',
-              compact ? 'text-lg' : 'text-2xl',
+              compact ? 'text-lg @3xl:basis-12 @3xl:text-2xl' : 'text-2xl @3xl:basis-16 @3xl:text-4xl',
+              // A tile you can point at reacts, so the row feels touchable on desktop.
+              'transition-transform duration-150 hover:-translate-y-0.5',
               !hue && 'border-2 border-dashed border-neo-cream/50 bg-neo-white/5',
               // The typed / revealed letter is drawn here, so it never adds to the text content.
               shown && 'before:content-[attr(data-letter)]',

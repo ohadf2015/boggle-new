@@ -21651,6 +21651,7 @@ const ja = {
       "next": "次の単語",
       "finish": "結果を見る",
       "praise": "やったね！|ばっちり！|パーフェクト！|せいかい！|すごい！",
+      "enterHint": "Enter でチェック・単語をぜんぶ入力してね",
       "progress": "{total}語中{current}語目"
     },
     "cookie": {
