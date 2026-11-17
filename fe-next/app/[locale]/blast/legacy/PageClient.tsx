@@ -5,7 +5,7 @@ import nextDynamic from 'next/dynamic';
 import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
 function LoadingFallback(): React.JSX.Element {
-  return <GameLoadingFallback mascotVariant="bomber" />;
+  return <GameLoadingFallback mascotVariant="spectating" />;
 }
 
 const BlastView = nextDynamic(

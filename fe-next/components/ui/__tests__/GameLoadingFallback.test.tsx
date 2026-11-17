@@ -16,8 +16,8 @@ describe('GameLoadingFallback', () => {
   });
 
   it('passes the mode pose and caption through to the loader', () => {
-    render(<GameLoadingFallback mascotVariant="bomber" text="Shuffling letters..." />);
-    expect(screen.getByTestId('loader-mascot')).toHaveAttribute('src', '/mascot/bomber-nobg.webp');
+    render(<GameLoadingFallback mascotVariant="spectating" text="Shuffling letters..." />);
+    expect(screen.getByTestId('loader-mascot')).toHaveAttribute('src', '/mascot/popcorn-nobg.webp');
     expect(screen.getByText('Shuffling letters...')).toBeInTheDocument();
   });
 });

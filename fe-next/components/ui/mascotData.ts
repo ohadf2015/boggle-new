@@ -30,7 +30,7 @@ export type MascotVariant =
   | 'waving'      // waving.webp (white)
   | 'powerup'     // powerup-nobg.webp (nobg)
   | 'sleepy'      // ghostly.webp (dark)
-  | 'waiting'     // waiting.webp (dark)
+  | 'waiting'     // waiting-hop-nobg.webp (nobg)
   | 'gg'          // gg.webp (dark)
   | 'scholar'     // scholar.webp (dark)
   | 'rage'        // rage.webp (dark)
@@ -90,7 +90,7 @@ export const MASCOT_IMAGES: Record<MascotVariant, string> = {
   waving: '/mascot/waving.webp',
   powerup: '/mascot/powerup-nobg.webp',
   sleepy: '/mascot/ghostly.webp',
-  waiting: '/mascot/waiting.webp',
+  waiting: '/mascot/waiting-hop-nobg.webp',
   gg: '/mascot/gg.webp',
   scholar: '/mascot/scholar.webp',
   rage: '/mascot/rage.webp',
@@ -142,7 +142,7 @@ export const MASCOT_BG_TYPE: Record<MascotVariant, MascotBgType> = {
   waving: 'white',
   powerup: 'nobg',
   sleepy: 'dark',
-  waiting: 'dark',
+  waiting: 'nobg',
   gg: 'dark',
   scholar: 'dark',
   rage: 'dark',

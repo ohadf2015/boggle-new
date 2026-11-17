@@ -21,6 +21,8 @@ describe('PageLoader', () => {
     ['explorer', '/mascot/explorer-nobg.webp'],
     ['knight', '/mascot/hello-nobg.webp'],
     ['happy', '/mascot/hello-nobg.webp'],
+    ['spectating', '/mascot/popcorn-nobg.webp'],
+    ['waiting', '/mascot/waiting-hop-nobg.webp'],
   ] as const)('maps mascotVariant %s to transparent art', (variant, src) => {
     render(<PageLoader mascotVariant={variant} />);
     expect(mascotSrc()).toBe(src);
