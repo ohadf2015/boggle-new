@@ -3035,9 +3035,9 @@ const en = {
     },
     "daily": {
       "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzle | LexiClash",
-      "description": "Daily Word Wheel + Word Hunt — free, no signup. Same board worldwide, 10 attempts, share emoji results, global leaderboard. New puzzle every day.",
+      "description": "Daily Word Wheel + Word Hunt — free, no signup. Same board worldwide, 10 attempts, share your result, global leaderboard. New puzzle every day.",
       "ogTitle": "Daily Word Wheel — Today's Free Word Puzzle",
-      "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
+      "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share your result, build a streak. Free, no signup."
     },
     "multiplayer": {
       "title": "Free Multiplayer Word Game — 8 Modes, No Signup | LexiClash",

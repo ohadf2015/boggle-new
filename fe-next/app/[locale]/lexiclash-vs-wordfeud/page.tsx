@@ -181,7 +181,7 @@ export default async function LexiClashVsWordfeudPage({ params }: PageProps) {
                     <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Vad LexiClash Erbjuder Som Wordfeud Saknar</h2>
                     <div className="grid gap-4 sm:grid-cols-2">
                         {[
-                            { title: 'Daglig utmaning i Wordle-stil', desc: 'Word Hunt Survival och Daily Buzz — globala dagliga pussel med delbara emoji-resultat och streak-uppföljning. Wordfeud har inget motsvarande dagligt format.' },
+                            { title: 'Daglig utmaning i Wordle-stil', desc: 'Word Hunt Survival och Daily Buzz — globala dagliga pussel med resultat att dela och streak-uppföljning. Wordfeud har inget motsvarande dagligt format.' },
                             { title: 'Multiplayer för 20+ spelare', desc: 'Skapa ett rum, dela koden, få in hela klassen eller hela festen samtidigt på samma rutnät. Wordfeud är begränsat till 1 mot 1.' },
                             { title: 'Klassrumsläge för lärare', desc: 'Egna ordlistor från läroplanen, vokabulärduells, lärardashboard med elevernas framsteg. Helt gratis utan elevregistrering. Saknas i Wordfeud.' },
                             { title: 'Brain Drills (6 minispel)', desc: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Snabba kognitionsövningar — finns inte i Wordfeud.' },
