@@ -240,12 +240,9 @@ export function DailyChallengeLanding({
         {isNewcomer && primaryMode && <NewcomerTip modeTitle={t(primaryMode.titleKey)} />}
 
         {completedCount >= REQUIRED_COUNT && wordHuntStatus !== 'lost' && !dayCleared && (
-          <>
-            <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
-              {t('daily.hub.requiredDone')}
-            </p>
-            <TodayChestCard progress={chestProgress} />
-          </>
+          <p className="w-full text-center text-sm font-black text-neo-lime" data-testid="required-done-note">
+            {t('daily.hub.requiredDone')}
+          </p>
         )}
 
         {dayCleared && <DailyAllClearCard streak={streakView.current} />}
@@ -293,8 +290,8 @@ export function DailyChallengeLanding({
             ))}
         </div>
 
-        {/* Today's chest stays in sight while it is locked, saying what opens it. */}
-        {!(chestProgress.wordWheel && chestProgress.wordHunt) && <TodayChestCard progress={chestProgress} />}
+        {/* A cleared day shows its chest inside the all-clear card. */}
+        {!dayCleared && <TodayChestCard progress={chestProgress} />}
 
         {!isNewcomer && <StreakCardConnected source="daily_hub" className="w-full" />}
         </>
@@ -306,14 +303,14 @@ export function DailyChallengeLanding({
         </div>
       )}
 
-      {/* This week's themed board: same board for everyone, all week. */}
-      <WeeklyThemeCard lang={currentLanguage} t={t as never} source="daily_hub" />
-
       <LeaderboardTeaser
         key={day}
         onViewFull={() => setBoardOpen(true)}
       />
       <DailyBoardSheet open={boardOpen} onOpenChange={setBoardOpen} language={currentLanguage} />
+
+      {/* This week's themed board: same board for everyone, all week. */}
+      <WeeklyThemeCard lang={currentLanguage} t={t as never} source="daily_hub" />
 
       {/* Weekly Chest: 7-day progress + tier reward (authed, after a first daily) */}
       {showChest && (

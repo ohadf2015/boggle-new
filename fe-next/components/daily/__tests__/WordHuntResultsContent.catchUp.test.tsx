@@ -70,7 +70,6 @@ vi.mock('../results', () => ({
   DailyWordHuntFacts: () => <div data-testid="facts" />,
   ShareSection: () => <div data-testid="share-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
   StreakFreezeIndicator: () => <div data-testid="streak-freeze" />,
 }));
 

@@ -1,4 +1,4 @@
-/** The Word Hunt freeze modal and the home "freeze saved your streak" moment share one marker: only the first shows. */
+/** Hunt results run one popup chain (day prize, then milestone): a freeze save is the shared bottom toast, and no old modal stacks on top. */
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { freezeToastKey } from '@/lib/daily/streakToastOnce';
@@ -48,8 +48,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
     avatarColor: '#6366f1',
   }),
   getStreakMilestone: () => null,
-  getStreakMilestoneMessage: () => null,
-  shouldCelebrateStreakMilestone: () => false,
+  getStreakMilestoneMessage: (n: number) => (n === 30 ? { emoji: 'x', title: 't', subtitle: 's' } : null),
+  shouldCelebrateStreakMilestone: (n: number) => n === 30,
   findRarestWord: () => null,
 }));
 
@@ -134,7 +134,6 @@ vi.mock('../results', () => ({
   AttemptHistory: () => <div data-testid="attempt-history" />,
   StatsSection: () => <div data-testid="stats-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
@@ -145,12 +144,6 @@ vi.mock('../results', () => ({
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({
   default: function MockInlineSignup() {
     return <div data-testid="inline-signup" />;
-  },
-}));
-
-vi.mock('../StreakMilestoneCelebration', () => ({
-  default: function MockStreakMilestone() {
-    return <div data-testid="streak-milestone" />;
   },
 }));
 
@@ -247,9 +240,8 @@ vi.mock('@/components/practice/PracticeChainCta', () => ({
   default: () => <div data-testid="practice-chain-cta" />,
 }));
 
-// ── StreakSavedCelebration ────────────────────────────────────────────────
-vi.mock('../StreakSavedCelebration', () => ({
-  default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="streak-saved-celebration" /> : null),
+vi.mock('@/components/streak/StreakSavedMoment', () => ({
+  StreakSavedMoment: () => <div data-testid="streak-saved-moment" />,
 }));
 
 // ── Growth tracking ──────────────────────────────────────────────────────
@@ -342,7 +334,7 @@ const yesterdayUtc = () => {
   return d.toISOString().slice(0, 10);
 };
 
-describe('DailyWordHuntResults - freeze saved shows once', () => {
+describe('DailyWordHuntResults - one popup chain', () => {
   beforeEach(() => {
     vi.useFakeTimers();
     localStorage.clear();
@@ -350,19 +342,26 @@ describe('DailyWordHuntResults - freeze saved shows once', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('opens the freeze modal and claims the shared marker so the home moment stays quiet', () => {
+  it('Given a freeze bridged the streak, Then the shared toast shows (no modal) and claims the marker so home stays quiet', () => {
     render(<DailyWordHuntResults {...baseProps} />);
     act(() => captured.onFreezeBridged?.({ freezesRemaining: 1 }));
     act(() => vi.advanceTimersByTime(2000));
-    expect(screen.getByTestId('streak-saved-celebration')).toBeInTheDocument();
+    expect(screen.getByTestId('streak-saved-moment')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
     expect(localStorage.getItem(freezeToastKey('u1', yesterdayUtc()))).toBe('1');
   });
 
-  it('skips the modal when the home moment already showed this save', () => {
+  it('Given home already showed this save, Then results show nothing for it', () => {
     localStorage.setItem(freezeToastKey('u1', yesterdayUtc()), '1');
     render(<DailyWordHuntResults {...baseProps} />);
     act(() => captured.onFreezeBridged?.({ freezesRemaining: 1 }));
     act(() => vi.advanceTimersByTime(2000));
-    expect(screen.queryByTestId('streak-saved-celebration')).toBeNull();
+    expect(screen.queryByTestId('streak-saved-moment')).toBeNull();
+  });
+
+  it('Given a fresh solve on a 30-day streak, Then the old milestone modal never opens over the prize and milestone popups', () => {
+    render(<DailyWordHuntResults {...baseProps} isNewCompletion result={{ ...baseResult, streakDays: 30 }} />);
+    act(() => vi.advanceTimersByTime(3000));
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 });

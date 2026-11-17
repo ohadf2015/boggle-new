@@ -22,17 +22,14 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
-  getStreakMilestoneMessage,
-  shouldCelebrateStreakMilestone,
   findRarestWord,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import { trackGrowthEvent } from '@/utils/growthTracking';
-import StreakMilestoneCelebration from './StreakMilestoneCelebration';
-import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
-import { claimFreezeSaved } from '@/components/streak/freezeSavedOnce';
+import { bridgedDay } from '@/components/streak/freezeSavedOnce';
+import { StreakSavedToast } from '@/components/streak/StreakSavedToast';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
@@ -89,9 +86,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
-  const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
-  const [showStreakSaved, setShowStreakSaved] = useState(false);
-  const [streakSavedFreezesLeft, setStreakSavedFreezesLeft] = useState<number | undefined>(undefined);
+  const [freezeSaved, setFreezeSaved] = useState<{ date: string; freezesRemaining: number } | null>(null);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [_countryCode, setCountryCode] = useState<string | null>(null);
@@ -103,12 +98,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const streakSavedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (streakSavedTimer.current) clearTimeout(streakSavedTimer.current); }, []);
 
-  // Derived values
-  // Tracked at every milestone (analytics), celebrated on screen at only the rare
-  // ones — see CELEBRATED_STREAK_MILESTONES.
-  const milestoneMessage = shouldCelebrateStreakMilestone(result.streakDays)
-    ? getStreakMilestoneMessage(result.streakDays)
-    : null;
   const rarestWord = result.wordsDiscovered ? findRarestWord(result.wordsDiscovered, language) : null;
 
   const survivalBonusTime = useMemo(() => {
@@ -181,11 +170,10 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       fetchStats();
     },
     onFreezeBridged: ({ freezesRemaining }) => {
-      setStreakSavedFreezesLeft(freezesRemaining);
       // Let the hero's entrance settle, then reveal the save.
       if (streakSavedTimer.current) clearTimeout(streakSavedTimer.current);
       streakSavedTimer.current = setTimeout(() => {
-        if (claimFreezeSaved(user?.id)) setShowStreakSaved(true);
+        setFreezeSaved({ date: bridgedDay(), freezesRemaining: freezesRemaining ?? 0 });
       }, 1800);
     },
     extraTries: result.extraTries,
@@ -224,15 +212,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       fetchStats();
     }
   }, [isNewCompletion, fetchStats]);
-
-  // Milestone modal waits for the hero's count-up and confetti to land.
-  useEffect(() => {
-    if (isNewCompletion && milestoneMessage) {
-      const timer = setTimeout(() => setShowMilestoneCelebration(true), 1800);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isNewCompletion, milestoneMessage]);
 
   // Results content props for extracted component
   const resultsContentProps = {
@@ -387,25 +366,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         t={t}
       />
 
-      {/* Streak Milestone Celebration Modal */}
-      {milestoneMessage && (
-        <StreakMilestoneCelebration
-          isOpen={showMilestoneCelebration}
-          onClose={() => setShowMilestoneCelebration(false)}
-          streak={result.streakDays}
-          emoji={milestoneMessage.emoji}
-          title={milestoneMessage.title}
-          subtitle={milestoneMessage.subtitle}
-        />
-      )}
-
-      {/* Streak Saved (freeze bridge) Celebration Modal */}
-      <StreakSavedCelebration
-        isOpen={showStreakSaved}
-        onClose={() => setShowStreakSaved(false)}
-        freezesRemaining={streakSavedFreezesLeft}
-        t={t}
-      />
+      <StreakSavedToast saved={freezeSaved} />
 
       {/* Custom Puzzle Creator Modal */}
       <CustomPuzzleCreator

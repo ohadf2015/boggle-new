@@ -13,13 +13,10 @@
  * - useCoinActions.ts  - Coin spending actions hook
  * - ScoreBadge.tsx     - Header score badge component
  * - ResultDisplay.tsx  - Hero result display component
- * - ScoreBreakdownSection.tsx - Score formula breakdown
- * - CollapsibleDetails.tsx - Rewards and details section
  * - CoinUnlockCard.tsx - Coin-gated action cards
  * - ShareSection.tsx   - Share buttons section
  * - AttemptHistory.tsx - in-game attempt history (not the share card)
  * - StatsSection.tsx   - Statistics with histogram
- * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
  */
 
@@ -58,12 +55,6 @@ export type { ResultDisplayProps } from './ResultDisplay';
 export { ScoreGaugeRing } from './ScoreGaugeRing';
 export type { ScoreGaugeRingProps } from './ScoreGaugeRing';
 
-export { ScoreBreakdownSection } from './ScoreBreakdownSection';
-export type { ScoreBreakdownSectionProps } from './ScoreBreakdownSection';
-
-export { CollapsibleDetails } from './CollapsibleDetails';
-export type { CollapsibleDetailsProps } from './CollapsibleDetails';
-
 export { PerformanceSection } from './PerformanceSection';
 export type { PerformanceSectionProps } from './PerformanceSection';
 
@@ -82,22 +73,13 @@ export type { StatsSectionProps } from './StatsSection';
 export { StatsBlurb } from './StatsBlurb';
 export type { StatsBlurbProps } from './StatsBlurb';
 
-export { DesktopStatsCard } from './DesktopStatsCard';
-export type { DesktopStatsCardProps } from './DesktopStatsCard';
-
 export { RankBadge } from './RankBadge';
 export type { RankBadgeProps } from './RankBadge';
 
 export { PastPerformanceCompare } from './PastPerformanceCompare';
 export type { PastPerformanceCompareProps, PerformanceComparison } from './PastPerformanceCompare';
 
-export { TryAnotherLanguage } from './TryAnotherLanguage';
 export { SharePanel } from './SharePanel';
-export { GuestBrainScorePreview } from './GuestBrainScorePreview';
-export type { GuestBrainScorePreviewProps } from './GuestBrainScorePreview';
-export { MoreOptionsAccordion } from './MoreOptionsAccordion';
-export type { MoreOptionsAccordionProps } from './MoreOptionsAccordion';
-
 
 export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';
 

@@ -192,10 +192,10 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     expect(questCards.length).toBeGreaterThan(0);
   });
 
-  it('shows the streak in the same row as the title', () => {
+  it('shows the title without a second streak counter (the streak card owns the number)', () => {
     renderComponent();
     const header = screen.getByTestId('daily-hub-header');
     expect(header).toHaveTextContent(/today['\s]s quests/i);
-    expect(header).toHaveTextContent('7');
+    expect(screen.queryByTestId('streak-counter')).not.toBeInTheDocument();
   });
 });

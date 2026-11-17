@@ -135,7 +135,6 @@ vi.mock('../results', () => ({
   AttemptHistory: () => <div data-testid="attempt-history" />,
   StatsSection: () => <div data-testid="stats-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
-  MoreOptionsAccordion: () => <div data-testid="more-options" />,
   SharePanel: () => <div data-testid="share-panel" />,
   DailyWordHuntFacts: () => <div data-testid="daily-word-hunt-facts" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
@@ -146,12 +145,6 @@ vi.mock('../results', () => ({
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({
   default: function MockInlineSignup() {
     return <div data-testid="inline-signup" />;
-  },
-}));
-
-vi.mock('../StreakMilestoneCelebration', () => ({
-  default: function MockStreakMilestone() {
-    return <div data-testid="streak-milestone" />;
   },
 }));
 
@@ -246,11 +239,6 @@ vi.mock('@/hooks/usePracticeFlag', () => ({
 // ── PracticeChainCta ──────────────────────────────────────────────────────
 vi.mock('@/components/practice/PracticeChainCta', () => ({
   default: () => <div data-testid="practice-chain-cta" />,
-}));
-
-// ── StreakSavedCelebration ────────────────────────────────────────────────
-vi.mock('../StreakSavedCelebration', () => ({
-  default: () => <div data-testid="streak-saved-celebration" />,
 }));
 
 // ── Growth tracking ──────────────────────────────────────────────────────
