@@ -8,7 +8,7 @@ export function EducationRouteLoading() {
   const intent = useQuickLaunchIntent();
   if (intent) return <QuickLaunchStage />;
   return (
-    <div className="flex-1 flex flex-col bg-neo-navy page-content-safe min-h-[100svh]">
+    <div className="flex-1 flex flex-col page-content-safe min-h-[100svh]">
       <PageLoader priority={false} />
     </div>
   );

@@ -131,7 +131,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
     return (
       <div
         data-testid="duel-page-loading"
-        className="flex h-dvh items-center justify-center overflow-hidden bg-neo-navy"
+        className="flex h-dvh items-center justify-center overflow-hidden"
       >
         <PageLoader
           size="lg"

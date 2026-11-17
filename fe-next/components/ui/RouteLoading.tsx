@@ -14,7 +14,7 @@ export default function RouteLoading() {
   return (
     // min-h-[100svh], not h-full: a short loader leaves the footer in view and
     // the swap to real content shoves it (was CLS 1.0 on the landing page).
-    <div className="flex-1 flex flex-col bg-neo-navy page-content-safe min-h-[100svh]">
+    <div className="flex-1 flex flex-col page-content-safe min-h-[100svh]">
       <PageLoader priority={false} />
     </div>
   );

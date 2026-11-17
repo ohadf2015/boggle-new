@@ -13,8 +13,8 @@ interface PageParams {
 
 // Loading fallback component - flex-1 fills parent, PageLoader centers within
 const LoadingFallback = () => (
-  <div className="flex-1 flex items-center justify-center bg-neo-navy">
-    <PageLoader size="lg" text="Loading Custom Puzzle..." />
+  <div className="flex-1 flex items-center justify-center">
+    <PageLoader size="lg" />
   </div>
 );
 

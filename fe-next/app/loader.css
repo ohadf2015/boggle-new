@@ -1,0 +1,52 @@
+/* Shared loader motion (PageLoader, Loader). Transform-only so it stays on the
+   compositor; a short delayed entrance keeps sub-150ms loads from flashing. */
+
+.lc-loader-in {
+  animation: lc-loader-in 260ms cubic-bezier(0.34, 1.56, 0.64, 1) 140ms both;
+}
+
+.lc-loader-hop {
+  transform-origin: 50% 100%;
+  animation: lc-loader-hop 900ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.lc-loader-shadow {
+  animation: lc-loader-shadow 900ms cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.lc-loader-tile {
+  animation: lc-loader-tile 900ms cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+.lc-loader-tile:nth-child(2) { animation-delay: 120ms; }
+.lc-loader-tile:nth-child(3) { animation-delay: 240ms; }
+
+@keyframes lc-loader-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes lc-loader-hop {
+  0%, 100% { transform: translateY(0) scale(1.08, 0.9); }
+  12% { transform: translateY(0) scale(0.94, 1.08); }
+  45% { transform: translateY(-15%) scale(1, 1) rotate(-3deg); }
+  60% { transform: translateY(-15%) scale(1, 1) rotate(3deg); }
+  88% { transform: translateY(0) scale(0.97, 1.04); }
+}
+
+@keyframes lc-loader-shadow {
+  0%, 12%, 88%, 100% { transform: scaleX(1); }
+  45%, 60% { transform: scaleX(0.6); }
+}
+
+@keyframes lc-loader-tile {
+  0%, 55%, 100% { transform: translateY(0) rotate(0); }
+  22% { transform: translateY(-70%) rotate(-8deg); }
+  38% { transform: translateY(0) rotate(0) scale(1.1, 0.88); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lc-loader-in,
+  .lc-loader-hop,
+  .lc-loader-shadow,
+  .lc-loader-tile { animation: none; }
+}

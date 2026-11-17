@@ -2,23 +2,16 @@
 
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
-import { PageLoader } from '@/components/ui/PageLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useModeBed } from '@/hooks/useModeBed';
 
-// Loading fallback component with playful design
 function LoadingFallback(): React.JSX.Element {
   const { t } = useLanguageSafe();
   // The first-paint catalogue is a subset; until the full one lands t() echoes
   // the key. The mascot alone reads as loading — a raw "adventure.loading" does not.
   const caption = t('adventure.loading');
-  return (
-    <div className="flex-1 flex relative">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <PageLoader size="lg" text={caption === 'adventure.loading' ? undefined : caption} mascotVariant="explorer" className="relative z-10" />
-    </div>
-  );
+  return <GameLoadingFallback text={caption === 'adventure.loading' ? undefined : caption} mascotVariant="explorer" />;
 }
 
 // Dynamic import for code splitting

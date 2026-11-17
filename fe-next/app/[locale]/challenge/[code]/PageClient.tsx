@@ -7,8 +7,8 @@ import { PageLoader } from '@/components/ui/PageLoader';
 // Dynamic import for code splitting
 const ChallengeView = nextDynamic(() => import('@/components/challenge/ChallengeView'), {
   loading: () => (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy">
-      <PageLoader size="lg" text="Loading challenge..." />
+    <div className="flex-1 flex items-center justify-center">
+      <PageLoader size="lg" />
     </div>
   ),
   ssr: false,

@@ -2,16 +2,10 @@
 
 import React, { Suspense } from 'react';
 import nextDynamic from 'next/dynamic';
-import { PageLoader } from '@/components/ui/PageLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
 
 function LoadingFallback(): React.JSX.Element {
-  return (
-    <div className="flex-1 flex relative">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <PageLoader size="lg" text="Loading Blast Mode..." mascotVariant="bomber" className="relative z-10" />
-    </div>
-  );
+  return <GameLoadingFallback mascotVariant="bomber" />;
 }
 
 const BlastView = nextDynamic(

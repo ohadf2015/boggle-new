@@ -14,11 +14,11 @@ import CraftError from '../craft/error';
 import ReviewError from '../review/error';
 
 describe('student route boundaries', () => {
-  it('Given a slow student route, When it loads, Then the dark loader fills the viewport with no cream flash', () => {
+  it('Given a slow student route, When it loads, Then the loader fills the viewport over the page pattern with no slab of its own', () => {
     const { container } = render(<StudentLoading />);
     const root = container.firstElementChild as HTMLElement;
-    expect(root).toHaveClass('h-dvh', 'bg-neo-navy');
-    expect(root.className).not.toMatch(/cream/);
+    expect(root).toHaveClass('h-dvh');
+    expect(root.className).not.toMatch(/\bbg-/);
     expect(screen.getByTestId('page-loader')).toBeInTheDocument();
   });
 

@@ -1,79 +1,35 @@
-'use client';
-
-import { memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface LoaderProps {
-  /** Size of the loader dots */
   size?: 'sm' | 'md' | 'lg';
-  /** Optional text to display */
   text?: string;
-  /** Optional className */
   className?: string;
 }
 
-const SIZE_CLASSES = {
-  sm: 'w-2 h-2',
-  md: 'w-3 h-3',
-  lg: 'w-4 h-4',
-};
+const SIZES = {
+  sm: { tile: 'size-2 border-[1.5px]', gap: 'gap-1.5', text: 'text-xs' },
+  md: { tile: 'size-2.5 border-2', gap: 'gap-2', text: 'text-sm' },
+  lg: { tile: 'size-3.5 border-2', gap: 'gap-2', text: 'text-base' },
+} as const;
 
-const GAP_CLASSES = {
-  sm: 'gap-1',
-  md: 'gap-1.5',
-  lg: 'gap-2',
-};
+const TILE_COLORS = ['bg-neo-lime', 'bg-neo-pink', 'bg-neo-cyan'] as const;
 
-const TEXT_CLASSES = {
-  sm: 'text-xs',
-  md: 'text-sm',
-  lg: 'text-base',
-};
-
-/**
- * Simple inline loader with animated dots.
- * Neo-Brutalist styling with lime/cyan/pink colors.
- *
- * @example
- * // Simple usage
- * <Loader size="sm" />
- *
- * @example
- * // With text
- * <Loader size="md" text="Loading..." />
- */
-export const Loader = memo(function Loader({
-  size = 'md',
-  text,
-  className,
-}: LoaderProps) {
-  const dotSize = SIZE_CLASSES[size];
-  const gap = GAP_CLASSES[size];
+/** Inline loader: the page loader's three bouncing tiles without the mascot. */
+export function Loader({ size = 'md', text, className }: LoaderProps) {
+  const s = SIZES[size];
 
   return (
-    <div className={cn('flex flex-col items-center justify-center', className)}>
-      <div className={cn('flex items-center', gap)}>
-        <div
-          className={cn(dotSize, 'bg-neo-lime rounded-full animate-bounce')}
-          style={{ animationDelay: '0ms', animationDuration: '0.6s' }}
-        />
-        <div
-          className={cn(dotSize, 'bg-neo-cyan rounded-full animate-bounce')}
-          style={{ animationDelay: '150ms', animationDuration: '0.6s' }}
-        />
-        <div
-          className={cn(dotSize, 'bg-neo-pink rounded-full animate-bounce')}
-          style={{ animationDelay: '300ms', animationDuration: '0.6s' }}
-        />
+    <div role="status" aria-busy="true" className={cn('flex flex-col items-center justify-center', className)}>
+      <div aria-hidden className={cn('flex items-end pt-1.5', s.gap)}>
+        {TILE_COLORS.map((color) => (
+          <span
+            key={color}
+            data-testid="loader-tile"
+            className={cn('lc-loader-tile rounded-[2px] border-neo-black', s.tile, color)}
+          />
+        ))}
       </div>
-      {text && (
-        <p className={cn(
-          'font-neo-body text-neo-white mt-2',
-          TEXT_CLASSES[size]
-        )}>
-          {text}
-        </p>
-      )}
+      {text && <p className={cn('font-neo-body mt-2', s.text)}>{text}</p>}
     </div>
   );
-});
+}

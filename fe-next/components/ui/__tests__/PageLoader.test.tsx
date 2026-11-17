@@ -1,147 +1,66 @@
 import { render, screen } from '@testing-library/react';
 import { PageLoader } from '../PageLoader';
 
-// Mock Mascot component
-vi.mock('../Mascot', () => ({
-  Mascot: ({ variant, size }: { variant: string; size: string }) => (
-    <div data-testid="mascot" data-variant={variant} data-size={size} />
-  ),
-}));
-
-// Mock useDevicePerformance hook
-vi.mock('@/hooks/useDevicePerformance', () => ({
-  useDevicePerformance: () => ({
-    prefersReducedMotion: false,
-    enableComplexAnimations: true,
-  }),
-}));
-
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, className, ...props }: any) => (
-      <div className={className} {...props}>{children}</div>
-    ),
-    p: ({ children, className, ...props }: any) => (
-      <p className={className} {...props}>{children}</p>
-    ),
-  },
-}));
+const mascotSrc = () => (screen.getByTestId('loader-mascot') as HTMLImageElement).getAttribute('src');
 
 describe('PageLoader', () => {
-  it('should render with default props', () => {
+  it('renders the loader with a status role for screen readers', () => {
     render(<PageLoader />);
-
     const loader = screen.getByTestId('page-loader');
-    expect(loader).toBeInTheDocument();
+    expect(loader).toHaveAttribute('role', 'status');
+    expect(loader).toHaveAttribute('aria-busy', 'true');
   });
 
-  it('should render mascot by default', () => {
+  it('uses transparent mascot art so no dark square shows on the page pattern', () => {
     render(<PageLoader />);
-
-    const mascot = screen.getByTestId('mascot');
-    expect(mascot).toBeInTheDocument();
-    expect(mascot).toHaveAttribute('data-variant', 'happy');
+    expect(mascotSrc()).toMatch(/-nobg\.webp$/);
   });
 
-  it('should pass mascotVariant prop to Mascot', () => {
-    render(<PageLoader mascotVariant="thinking" />);
-
-    const mascot = screen.getByTestId('mascot');
-    expect(mascot).toHaveAttribute('data-variant', 'thinking');
+  it.each([
+    ['thinking', '/mascot/bridge-think-nobg.webp'],
+    ['explorer', '/mascot/explorer-nobg.webp'],
+    ['knight', '/mascot/hello-nobg.webp'],
+    ['happy', '/mascot/hello-nobg.webp'],
+  ] as const)('maps mascotVariant %s to transparent art', (variant, src) => {
+    render(<PageLoader mascotVariant={variant} />);
+    expect(mascotSrc()).toBe(src);
   });
 
-  it('should pass size prop correctly', () => {
-    render(<PageLoader size="md" />);
-
-    const loader = screen.getByTestId('page-loader');
-    expect(loader).toBeInTheDocument();
+  it('paints no background of its own, full-page or nested, so the body pattern runs unbroken', () => {
+    const { container, rerender } = render(<PageLoader />);
+    expect((container.firstChild as HTMLElement).className).not.toMatch(/\bbg-/);
+    rerender(<PageLoader nested />);
+    expect((container.firstChild as HTMLElement).className).not.toMatch(/\bbg-/);
   });
 
-  it('should render text when provided', () => {
+  it('fills its parent full-page, and may shrink when nested', () => {
+    const { container, rerender } = render(<PageLoader />);
+    const wrapper = () => container.firstChild as HTMLElement;
+    expect(wrapper()).toHaveClass('flex-1', 'flex', 'items-center', 'justify-center');
+    expect(wrapper()).not.toHaveClass('min-h-0');
+    rerender(<PageLoader nested />);
+    expect(wrapper()).toHaveClass('flex-1', 'min-h-0');
+  });
+
+  it('lets the caption inherit its surface text colour (white on navy, ink on cream cards)', () => {
     render(<PageLoader text="Loading profile..." />);
-
-    expect(screen.getByText('Loading profile...')).toBeInTheDocument();
+    expect(screen.getByText('Loading profile...').className).not.toMatch(/\btext-(neo-|white|black|foreground)/);
   });
 
-  it('should render full-page container with correct classes', () => {
-    const { container } = render(<PageLoader />);
-
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveClass('flex-1');
-    expect(wrapper).toHaveClass('flex');
-    expect(wrapper).toHaveClass('items-center');
-    expect(wrapper).toHaveClass('justify-center');
+  it('renders three bouncing tiles under the mascot', () => {
+    render(<PageLoader />);
+    expect(screen.getAllByTestId('loader-tile')).toHaveLength(3);
   });
 
-  it('should paint bg-neo-navy to block body halftone pattern on full-page loaders', () => {
-    const { container } = render(<PageLoader />);
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).toHaveClass('bg-neo-navy');
+  it('marks the mascot high priority by default and lets callers opt out', () => {
+    const { rerender } = render(<PageLoader />);
+    expect(screen.getByTestId('loader-mascot')).toHaveAttribute('fetchpriority', 'high');
+    rerender(<PageLoader priority={false} />);
+    expect(screen.getByTestId('loader-mascot')).not.toHaveAttribute('fetchpriority');
   });
 
-  it('should not paint bg-neo-navy in nested mode', () => {
-    const { container } = render(<PageLoader nested />);
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).not.toHaveClass('bg-neo-navy');
-  });
-
-  it('should render minimal loader without colorful spinner rings', () => {
-    const { container } = render(<PageLoader />);
-    const html = container.innerHTML;
-    expect(html).not.toMatch(/border-neo-cyan/);
-    expect(html).not.toMatch(/border-neo-pink/);
-    expect(html).not.toMatch(/border-t-neo-cyan/);
-    expect(html).not.toMatch(/border-r-neo-pink/);
-  });
-
-  it('should not use min-h-0 in non-nested mode (default)', () => {
-    const { container } = render(<PageLoader />);
-
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper).not.toHaveClass('min-h-0');
-  });
-
-  describe('nested mode (for Suspense fallbacks)', () => {
-    it('should use flex-1 with min-h-0 when nested=true', () => {
-      const { container } = render(<PageLoader nested />);
-
-      const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper).toHaveClass('flex-1');
-      expect(wrapper).toHaveClass('min-h-0');
-      expect(wrapper).toHaveClass('flex');
-      expect(wrapper).toHaveClass('items-center');
-      expect(wrapper).toHaveClass('justify-center');
-    });
-
-    it('should use min-h-0 to allow flex shrinking when nested', () => {
-      const { container } = render(<PageLoader nested />);
-
-      const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper).toHaveClass('min-h-0');
-    });
-
-    it('should still center content when nested', () => {
-      const { container } = render(<PageLoader nested />);
-
-      const wrapper = container.firstChild as HTMLElement;
-      expect(wrapper).toHaveClass('items-center');
-      expect(wrapper).toHaveClass('justify-center');
-    });
-  });
-
-  describe('reduced motion / low-end device fallback', () => {
-    it('should render simple dots loader when prefersReducedMotion is true', () => {
-      (globalThis as any).mockUseDevicePerformance.mockReturnValue({
-        ...(globalThis as any).defaultDevicePerformanceValue,
-        prefersReducedMotion: true,
-        enableComplexAnimations: true,
-      });
-
-      render(<PageLoader />);
-
-      const loader = screen.getByTestId('page-loader');
-      expect(loader).toBeInTheDocument();
-    });
+  it('merges a caller className onto the wrapper', () => {
+    const { container } = render(<PageLoader className="relative z-10" />);
+    expect(container.firstChild).toHaveClass('relative', 'z-10');
   });
 });

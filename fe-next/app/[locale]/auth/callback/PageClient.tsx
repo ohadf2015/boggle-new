@@ -456,7 +456,7 @@ function AuthCallbackContent(): React.JSX.Element {
 // Simple fallback for Suspense - no retry logic needed during initial load
 function SuspenseFallback(): React.JSX.Element {
   return (
-    <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <div className="flex-1 flex items-center justify-center">
       <PageLoader size="lg" />
     </div>
   );
