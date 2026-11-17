@@ -132,8 +132,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         setIsEditingGuestName(false);
     }, [editGuestNameValue]);
 
-    // Aggregate badge: gifts + notifications + completed quests
-    const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0) + completedCount;
+    // Aggregate badge: unclaimed gifts + unread notifications only.
+    // Completed daily missions are progress, not claimable rewards — counting
+    // them kept the hamburger badge lit after the rewards had already been paid.
+    const badgeCount = unclaimedCount + (isAuthenticated ? notificationCount : 0);
 
     // Badge is hidden when the user has already seen at least this many items.
     // New items pushing the count above the persisted high-water mark resurface it.

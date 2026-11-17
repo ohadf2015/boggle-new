@@ -112,3 +112,13 @@ export async function fetchOpenedToday(): Promise<DayPrizeClaimResponse | null |
     return undefined;
   }
 }
+
+/**
+ * Whether today's chest is already open, on this device or on the server.
+ * A failed server read returns false so a first-time claim can still pop.
+ */
+export async function todayChestAlreadyOpened(): Promise<boolean> {
+  if (readOpenedPrize('perfect') ?? readOpenedPrize('clear')) return true;
+  const server = await fetchOpenedToday();
+  return Boolean(server);
+}

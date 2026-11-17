@@ -86,12 +86,23 @@ describe('DayPrizeReveal', () => {
     expect(readOpenedPrize('clear')?.part?.key).toBe('eyes:moonEye');
   });
 
-  it('a common box gets a small burst; a repeat open pays no coin flight', async () => {
-    fx.postWithAuth.mockResolvedValue(res(200, { kind: 'perfect', tier: 'common', coins: 40, xp: 100, claimed: false }));
+  it('a common first open gets a small burst and coin flight', async () => {
+    fx.postWithAuth.mockResolvedValue(res(200, { kind: 'perfect', tier: 'common', coins: 40, xp: 100, claimed: true }));
     render(<DayPrizeReveal kind="perfect" source="test" onClose={() => {}} />);
     await openBox();
     expect(fx.postWithAuth).toHaveBeenCalledWith('/api/daily/all-clear/claim');
     expect(fx.fireConfetti).toHaveBeenCalled();
+    expect(fx.fireFireworks).not.toHaveBeenCalled();
+    expect(fx.emitCoinEarned).toHaveBeenCalledWith(40, undefined, { big: false });
+  });
+
+  it('a repeat open shows the prize but does not celebrate or pay again', async () => {
+    fx.postWithAuth.mockResolvedValue(res(200, { kind: 'perfect', tier: 'common', coins: 40, xp: 100, claimed: false }));
+    render(<DayPrizeReveal kind="perfect" source="test" onClose={() => {}} />);
+    await openBox();
+    expect(fx.postWithAuth).toHaveBeenCalledWith('/api/daily/all-clear/claim');
+    expect(screen.getByTestId('day-prize-reveal').getAttribute('data-phase')).toBe('open');
+    expect(fx.fireConfetti).not.toHaveBeenCalled();
     expect(fx.fireFireworks).not.toHaveBeenCalled();
     expect(fx.emitCoinEarned).not.toHaveBeenCalled();
   });

@@ -92,6 +92,25 @@ function attachClient() {
     supabase: {
       auth: { getUser: (...args: unknown[]) => mockGetUser(...args) },
       rpc: (...args: unknown[]) => mockRpc(...args),
+      from: (table: string) => {
+        if (table !== 'admin_gift_messages') {
+          throw new Error(`unexpected table ${table}`);
+        }
+        return {
+          select: () => ({
+            eq: (_col: string, id: string) => ({
+              maybeSingle: async () => {
+                const row = gifts[id];
+                if (!row) return { data: null, error: null };
+                return {
+                  data: { id, claimed: row.claimed, recipient_id: row.owner },
+                  error: null,
+                };
+              },
+            }),
+          }),
+        };
+      },
     },
   });
 }
@@ -152,14 +171,20 @@ describe('POST /api/player/gifts/[id]/claim', () => {
     expect(mockAwardCoinsServer).not.toHaveBeenCalled();
   });
 
-  it('does not credit twice — a second claim of the same gift is refused', async () => {
+  it('does not credit twice — a second claim of the same gift is idempotent and pays nothing', async () => {
     const first = await claim(GIFT);
     const second = await claim(GIFT);
 
     expect(first.status).toBe(200);
     expect(await grantedCoins(first)).toBe(COINS);
-    expect(second.status).toBe(400);
-    expect(await second.json()).toEqual({ error: 'Cannot claim gift' });
+    expect(second.status).toBe(200);
+    expect(await second.json()).toEqual({
+      success: true,
+      xpAwarded: 0,
+      coinsAwarded: 0,
+      alreadyClaimed: true,
+      levelUp: null,
+    });
     expect(gifts[GIFT].claimed).toBe(true);
     expect(mockRpc.mock.calls).toEqual([
       ['claim_admin_gift', { gift_id: GIFT }],
@@ -168,10 +193,16 @@ describe('POST /api/player/gifts/[id]/claim', () => {
     expect(mockAwardCoinsServer).not.toHaveBeenCalled();
   });
 
-  it('400 already-claimed — does not grant', async () => {
+  it('already-claimed is a 200 that pays nothing, so the client can drop it from the badge', async () => {
     const res = await claim('gift-already-claimed');
-    expect(res.status).toBe(400);
-    expect(await res.json()).toEqual({ error: 'Cannot claim gift' });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({
+      success: true,
+      xpAwarded: 0,
+      coinsAwarded: 0,
+      alreadyClaimed: true,
+      levelUp: null,
+    });
     expect(mockAwardCoinsServer).not.toHaveBeenCalled();
   });
 
@@ -243,9 +274,11 @@ describe('POST /api/player/gifts/[id]/claim', () => {
       expect(body.levelUp).toBeNull();
     });
 
-    it('is never sent for an already-claimed gift', async () => {
+    it('is null for an already-claimed gift (idempotent replay, no new XP)', async () => {
       const body = await (await claim('gift-already-claimed')).json();
-      expect(body).not.toHaveProperty('levelUp');
+      expect(body.levelUp).toBeNull();
+      expect(body.alreadyClaimed).toBe(true);
+      expect(body.xpAwarded).toBe(0);
     });
   });
 });
