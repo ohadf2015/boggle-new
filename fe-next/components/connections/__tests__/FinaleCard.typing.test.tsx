@@ -10,6 +10,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
 
+const setIsInGame = vi.fn();
+vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => setIsInGame }));
+
 vi.mock('@/hooks/useRewardedFeatureUnlock', () => ({
   useRewardedFeatureUnlock: () => ({ canShowAd: true, status: 'idle', offer: vi.fn() }),
 }));
@@ -61,5 +64,13 @@ describe('FinaleCard — slot typing', () => {
     const { onInputChange } = renderFinale('BALL');
     fireEvent.keyDown(window, { key: 's' });
     expect(onInputChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('FinaleCard — full-screen play', () => {
+  it('hides the bottom nav while the finale is up, like a base riddle, so it never covers the keys', () => {
+    setIsInGame.mockClear();
+    renderFinale();
+    expect(setIsInGame).toHaveBeenCalledWith(true);
   });
 });

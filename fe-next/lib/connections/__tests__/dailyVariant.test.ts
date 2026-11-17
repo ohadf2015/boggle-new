@@ -4,6 +4,7 @@
  */
 import { describe, it, expect } from 'vitest';
 import { dailyConnectionsVariant } from '@/lib/connections/dailyVariant';
+import { devVariantOverride } from '@/lib/connections/devVariantOverride';
 
 describe('dailyConnectionsVariant', () => {
   it('is a pure function of the date', () => {
@@ -39,5 +40,18 @@ describe('dailyConnectionsVariant', () => {
   it('falls back to regular on invalid input', () => {
     expect(dailyConnectionsVariant('not-a-date')).toBe('regular');
     expect(dailyConnectionsVariant('')).toBe('regular');
+  });
+});
+
+describe('devVariantOverride', () => {
+  it('forces a variant from ?variant= outside production', () => {
+    expect(devVariantOverride('?variant=pyramid', 'development')).toBe('pyramid');
+    expect(devVariantOverride('?variant=regular', 'test')).toBe('regular');
+  });
+
+  it('is ignored in production and for unknown values', () => {
+    expect(devVariantOverride('?variant=pyramid', 'production')).toBeNull();
+    expect(devVariantOverride('?variant=tower', 'development')).toBeNull();
+    expect(devVariantOverride('', 'development')).toBeNull();
   });
 });

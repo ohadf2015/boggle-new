@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
@@ -61,6 +62,11 @@ export default function FinaleCard({
   isAdmin,
 }: FinaleCardProps) {
   const { t, language } = useLanguage();
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
   const isRTL = language === 'he';
   const shakeControls = useAnimationControls();
   const prevStatus = useRef(status);
@@ -122,18 +128,18 @@ export default function FinaleCard({
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         {/* Finale prompt */}
-        <div className="mb-4 text-center">
+        <div className="mb-4 text-center [@container(max-height:42rem)]:mb-2">
           <h2 className="font-neo-display text-lg font-black text-neo-white">
             {t('connections.pyramid.finalePrompt')}
           </h2>
-          <p className="text-neo-white/50 text-sm font-neo-body mt-1">
+          <p className="text-neo-white/50 text-sm font-neo-body mt-1 [@container(max-height:42rem)]:hidden">
             {t('connections.pyramid.cluesLabel')}
           </p>
         </div>
 
         {/* 3 bridge clues */}
         <AnimatePresence mode="wait">
-          <div key="bridges" className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+          <div key="bridges" className="flex items-center justify-center gap-2 mb-4 flex-wrap [@container(max-height:42rem)]:mb-2">
             {bridges.map((bridge, idx) => (
               <m.span
                 key={`bridge-${idx}`}

@@ -37,8 +37,9 @@ describe('Word Bridge in-game title', () => {
     const { container } = render(<PyramidHeader daily state={initPyramidState(pyramid)} metaAnswer="STONE" />);
     expect(screen.getByTestId('daily-quest-heading')).toBeTruthy();
     expect(screen.queryByText('connections.pyramid.title')).toBeNull();
-    // One picture: the mode art in the title. The mascot lives on the riddle card.
-    expect(container.querySelectorAll('img')).toHaveLength(1);
+    // One picture outside the pyramid scene: the mode art in the title. The mascot lives on the riddle card.
+    const outsideScene = Array.from(container.querySelectorAll('img')).filter((img) => !img.closest('[data-testid="pyramid-scene"]'));
+    expect(outsideScene).toHaveLength(1);
   });
 
   it('Given the standalone pyramid, Then it keeps its own title', () => {

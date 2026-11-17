@@ -42,6 +42,8 @@ export default function PyramidDailyResults({ pyramid, state, outcomes, celebrat
           gaveUpBase={state.gaveUpBase}
           metaAnswer={pyramid.metaAnswer}
           won={won}
+          celebrate={celebrate}
+          size="trophy"
         />
       }
       celebrate={celebrate}

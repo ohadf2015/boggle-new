@@ -19,7 +19,7 @@ import { getKeyboardRows } from '@/lib/connections/keyboard';
  *  1. Every letter key carries a min-width floor so flex-shrink can never
  *     crush it below a tappable size, no matter how over-subscribed the row.
  *  2. SSR markup hydrates cleanly: no React hydration errors and the row
- *     structure (10/9/9 incl. action keys) survives hydration intact — a row
+ *     structure (10/9/7 letters + the 2-key action row) survives hydration intact — a row
  *     holding all 28 buttons is the corruption signature and must not recur.
  *
  * The third property — served markup never hides the keyboard behind
@@ -54,7 +54,7 @@ describe('ConnectionsKeyboard — t_55afcea2 hardening', () => {
     }
   });
 
-  it('hydrates the SSR markup with no errors and keeps the 10/9/9 row structure', async () => {
+  it('hydrates the SSR markup with no errors and keeps the 10/9/7 + actions row structure', async () => {
     const rows = getKeyboardRows('en');
     const tree = (
       <LazyMotion features={domMax}>
@@ -84,6 +84,6 @@ describe('ConnectionsKeyboard — t_55afcea2 hardening', () => {
     // buttons. The healthy shape is 10 / 9 / 7+2 action keys.
     const keyboardRoot = host.firstElementChild as HTMLElement;
     const rowEls = [...keyboardRoot.children];
-    expect(rowEls.map((r) => r.querySelectorAll('button').length)).toEqual([10, 9, 9]);
+    expect(rowEls.map((r) => r.querySelectorAll('button').length)).toEqual([10, 9, 7, 2]);
   });
 });

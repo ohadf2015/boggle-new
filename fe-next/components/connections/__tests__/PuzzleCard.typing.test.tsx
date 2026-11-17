@@ -136,6 +136,24 @@ describe('PuzzleCard — bridge connect moment', () => {
     expect(document.querySelector('[data-testid="puzzle-mascot"] img')?.getAttribute('src')).toBe('/mascot/bridge-think-nobg.webp');
   });
 
+  it('leaves the mascot to the host when the host already shows one', () => {
+    render(
+      <PuzzleCard
+        puzzle={puzzle}
+        state={makeState()}
+        isAdmin={false}
+        onInputChange={vi.fn()}
+        onSubmit={vi.fn()}
+        onGiveUp={vi.fn()}
+        onRevealHint={vi.fn()}
+        onRate={vi.fn()}
+        onNext={vi.fn()}
+        showMascot={false}
+      />,
+    );
+    expect(screen.queryByTestId('puzzle-mascot')).toBeNull();
+  });
+
   it('mascot reacts to a wrong guess', () => {
     renderCard(makeState({ status: 'wrong', input: 'WARM' }));
     expect(document.querySelector('[data-testid="puzzle-mascot"] img')?.getAttribute('src')).toBe('/mascot/bridge-oops-nobg.webp');
