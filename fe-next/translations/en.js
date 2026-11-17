@@ -25,6 +25,7 @@ const en = {
     "parts": {
       "eyes": {
         "laser": "Laser Eyes",
+        "friendly": "Friendly Eyes",
         "hypno": "Hypno Eyes",
         "money": "Money Eyes",
         "alien": "Alien Eyes",
@@ -86,6 +87,7 @@ const en = {
         "vrHeadset": "VR Headset",
         "earrings": "Gold Hoops",
         "goldNecklace": "Gold Necklace",
+        "goldChain": "Gold Chain",
         "samurai": "Samurai Helmet",
         "astronaut": "Astronaut Helmet",
         "wizardHat": "Wizard Hat",
@@ -104,6 +106,7 @@ const en = {
       },
       "hair": {
         "elvis": "Rock Star Quiff",
+        "shortCrop": "Short Crop",
         "ramen": "Noodle Curls",
         "twintails": "Twintails",
         "undercut": "Undercut",
@@ -133,6 +136,9 @@ const en = {
         "starBase": "Star Head",
         "moonBase": "Moon Head",
         "dragonHead": "Dragon Head"
+      },
+      "facialHair": {
+        "boxedBeard": "Boxed Beard"
       }
     }
   },
@@ -17799,7 +17805,7 @@ const en = {
       "neonSmile": "A grin bright enough to light up the board.",
       "ghostFace": "Boo! Your rivals just saw a ghost.",
       "rainbowMohawk": "Loud hair. Even louder wins.",
-      "iceCrown": "Cool, calm, and crowned."
+      "iceCrown": "Cool, calm, and crowned.",
     },
     "parts": {
       "headphones": "Beat Headphones",
@@ -17820,7 +17826,11 @@ const en = {
       "neonSmile": "Neon Smile",
       "ghostFace": "Ghost Face",
       "rainbowMohawk": "Rainbow Mohawk",
-      "iceCrown": "Ice Crown"
+      "iceCrown": "Ice Crown",
+      "goldChain": "Gold Chain",
+      "shortCrop": "Short Crop",
+      "boxedBeard": "Boxed Beard",
+      "friendly": "Friendly Eyes"
     }
   },
   "avatarLab": {

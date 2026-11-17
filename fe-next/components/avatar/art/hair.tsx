@@ -62,6 +62,24 @@ export const HAIR_FREE: Record<string, HairDef> = {
       </HairMass>
     ),
   },
+  // Close on the sides, a little volume and texture on top, natural hairline (not a flat cap).
+  shortCrop: {
+    front: ctx => (
+      // Crown path includes short tufts so the silhouette is not a smooth helmet
+      // (HairMass clips children, so texture has to live in the fill path).
+      <HairMass
+        ctx={ctx}
+        name="hf"
+        d="M29.4 43.8 Q27.6 35.5 29.2 28.2 Q31.2 19.8 38.2 15.2 Q43 12.8 47.2 13.4 Q50 11.8 52.8 13.4 Q57 12.8 61.8 15.2 Q68.8 19.8 70.8 28.2 Q72.4 35.5 70.6 43.8 L68.8 43.8 Q68.4 33.8 61.2 29.6 Q50 26.4 38.8 29.6 Q31.6 33.8 31.2 43.8 Z"
+        gloss="M37 21 Q44 16.2 50 16.4"
+      >
+        <path d="M34.5 29.2 Q42 26.8 50 27.4 Q58.5 26.6 65.5 29.2" fill="none" stroke={ctx.hairShade} strokeWidth="1" strokeLinecap="round" opacity="0.45" />
+        <g fill={ctx.hairShade} opacity="0.55">
+          <circle cx="39" cy="20.5" r="0.55" /><circle cx="46.5" cy="16.8" r="0.55" /><circle cx="54" cy="16.5" r="0.55" /><circle cx="61" cy="20.8" r="0.55" />
+        </g>
+      </HairMass>
+    ),
+  },
   spiky: {
     front: ctx => (
       <HairMass

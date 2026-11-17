@@ -185,6 +185,14 @@ describe('clean silhouette generation (anti-slop)', () => {
     expect(getSeededAvatarConfig(12345)).toEqual(getSeededAvatarConfig(12345));
   });
 
+  it('keeps likeness-only free parts out of the seed pool so guest faces stay stable', () => {
+    for (const c of configs) {
+      expect(c.hair).not.toBe('shortCrop');
+      expect(c.eyes).not.toBe('friendly');
+      expect(c.facialHair).not.toBe('boxedBeard');
+    }
+  });
+
   it('still produces accessory variety across the population', () => {
     const kinds = new Set(configs.map(c => c.accessory).filter(a => a !== 'none'));
     expect(kinds.size).toBeGreaterThan(3);

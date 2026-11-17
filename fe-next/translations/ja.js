@@ -25,6 +25,7 @@ const ja = {
     "parts": {
       "eyes": {
         "laser": "レーザーアイ",
+        "friendly": "やさしい目",
         "hypno": "さいみんアイ",
         "money": "お金アイ",
         "alien": "エイリアンアイ",
@@ -86,6 +87,7 @@ const ja = {
         "vrHeadset": "VRゴーグル",
         "earrings": "金のフープ",
         "goldNecklace": "金のネックレス",
+        "goldChain": "ゴールドチェーン",
         "samurai": "侍のかぶと",
         "astronaut": "宇宙飛行士ヘルメット",
         "wizardHat": "魔法使いの帽子",
@@ -104,6 +106,7 @@ const ja = {
       },
       "hair": {
         "elvis": "ロックスターヘア",
+        "shortCrop": "ショートクロップ",
         "ramen": "ヌードルカール",
         "twintails": "ツインテール",
         "undercut": "ツーブロック",
@@ -133,6 +136,9 @@ const ja = {
         "starBase": "スターヘッド",
         "moonBase": "ムーンヘッド",
         "dragonHead": "ドラゴンヘッド"
+      },
+      "facialHair": {
+        "boxedBeard": "ボックス髭"
       }
     }
   },
@@ -19433,7 +19439,7 @@ const ja = {
       "neonSmile": "ボードを照らす、まぶしい笑顔。",
       "ghostFace": "ばあっ！ライバルがおばけを見た。",
       "rainbowMohawk": "派手な髪に、もっと派手な勝利。",
-      "iceCrown": "クールに決めて、王冠をかぶる。"
+      "iceCrown": "クールに決めて、王冠をかぶる。",
     },
     "parts": {
       "headphones": "ビートヘッドホン",
@@ -19454,7 +19460,11 @@ const ja = {
       "neonSmile": "ネオンスマイル",
       "ghostFace": "おばけフェイス",
       "rainbowMohawk": "レインボーモヒカン",
-      "iceCrown": "氷の王冠"
+      "iceCrown": "氷の王冠",
+      "goldChain": "ゴールドチェーン",
+      "shortCrop": "ショートクロップ",
+      "boxedBeard": "ボックス髭",
+      "friendly": "やさしい目"
     }
   },
   "avatarLab": {

@@ -25,6 +25,7 @@ const sv = {
     "parts": {
       "eyes": {
         "laser": "Laserögon",
+        "friendly": "Vänliga ögon",
         "hypno": "Hypnosögon",
         "money": "Pengaögon",
         "alien": "Utomjordingsögon",
@@ -86,6 +87,7 @@ const sv = {
         "vrHeadset": "VR-glasögon",
         "earrings": "Guldringar",
         "goldNecklace": "Guldhalsband",
+        "goldChain": "Guldkedja",
         "samurai": "Samurajhjälm",
         "astronaut": "Astronauthjälm",
         "wizardHat": "Trollkarlshatt",
@@ -104,6 +106,7 @@ const sv = {
       },
       "hair": {
         "elvis": "Rockstjärnelugg",
+        "shortCrop": "Kortklippt",
         "ramen": "Nudellockar",
         "twintails": "Tvillingtofsar",
         "undercut": "Undercut",
@@ -133,6 +136,9 @@ const sv = {
         "starBase": "Stjärnhuvud",
         "moonBase": "Månhuvud",
         "dragonHead": "Drakhuvud"
+      },
+      "facialHair": {
+        "boxedBeard": "Kort boxat skägg"
       }
     }
   },
@@ -19792,7 +19798,7 @@ const sv = {
       "neonSmile": "Ett flin som lyser upp hela brädet.",
       "ghostFace": "Bu! Dina rivaler såg just ett spöke.",
       "rainbowMohawk": "Skrikigt hår. Ännu skrikigare vinster.",
-      "iceCrown": "Kall, lugn och krönt."
+      "iceCrown": "Kall, lugn och krönt.",
     },
     "parts": {
       "headphones": "Beat-lurar",
@@ -19813,7 +19819,11 @@ const sv = {
       "neonSmile": "Neonleende",
       "ghostFace": "Spökansikte",
       "rainbowMohawk": "Regnbågsirokes",
-      "iceCrown": "Iskrona"
+      "iceCrown": "Iskrona",
+      "goldChain": "Guldkedja",
+      "shortCrop": "Kortklippt",
+      "boxedBeard": "Kort boxat skägg",
+      "friendly": "Vänliga ögon"
     }
   },
   "avatarLab": {

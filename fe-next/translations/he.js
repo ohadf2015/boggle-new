@@ -25,6 +25,7 @@ const he = {
     "parts": {
       "eyes": {
         "laser": "עיני לייזר",
+        "friendly": "עיניים ידידותיות",
         "hypno": "עיני היפנוזה",
         "money": "עיני כסף",
         "alien": "עיני חייזר",
@@ -86,6 +87,7 @@ const he = {
         "vrHeadset": "משקפי VR",
         "earrings": "עגילי זהב",
         "goldNecklace": "שרשרת זהב",
+        "goldChain": "שרשרת זהב",
         "samurai": "קסדת סמוראי",
         "astronaut": "קסדת אסטרונאוט",
         "wizardHat": "כובע קוסם",
@@ -104,6 +106,7 @@ const he = {
       },
       "hair": {
         "elvis": "בלורית רוקסטאר",
+        "shortCrop": "תספורת קצרה",
         "ramen": "תלתלי נודלס",
         "twintails": "שני קוקיות",
         "undercut": "אנדרקאט",
@@ -133,6 +136,9 @@ const he = {
         "starBase": "ראש כוכב",
         "moonBase": "ראש ירח",
         "dragonHead": "ראש דרקון"
+      },
+      "facialHair": {
+        "boxedBeard": "זקן קצר ומסודר"
       }
     }
   },
@@ -19479,7 +19485,7 @@ const he = {
       "neonSmile": "חיוך שמאיר את כל הלוח.",
       "ghostFace": "בו! היריבים שלך ראו רוח רפאים.",
       "rainbowMohawk": "שיער רועש. ניצחונות רועשים יותר.",
-      "iceCrown": "קר, רגוע ומוכתר."
+      "iceCrown": "קר, רגוע ומוכתר.",
     },
     "parts": {
       "headphones": "אוזניות ביט",
@@ -19500,7 +19506,11 @@ const he = {
       "neonSmile": "חיוך ניאון",
       "ghostFace": "פרצוף רוח רפאים",
       "rainbowMohawk": "מוהוק קשת",
-      "iceCrown": "כתר קרח"
+      "iceCrown": "כתר קרח",
+      "goldChain": "שרשרת זהב",
+      "shortCrop": "תספורת קצרה",
+      "boxedBeard": "זקן קצר ומסודר",
+      "friendly": "עיניים ידידותיות"
     }
   },
   "avatarLab": {

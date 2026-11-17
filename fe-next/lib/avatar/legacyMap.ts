@@ -36,7 +36,7 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'shield', 'starBase', 'moonBase',
   ],
   hair: [
-    'none', 'buzz', 'spiky', 'sideSwept', 'mohawk', 'curly', 'afro', 'dreads', 'cornrows',
+    'none', 'buzz', 'shortCrop', 'spiky', 'sideSwept', 'mohawk', 'curly', 'afro', 'dreads', 'cornrows',
     'straight', 'wavy', 'long', 'bob', 'pixie', 'ponytail', 'bun', 'pigtails', 'braids',
     'cottonCandy', 'vaporwave', 'twintails', 'elvis', 'spaceBuns', 'undercut', 'longFlow',
     'lightning', 'rainbowMohawk', 'flame', 'galaxy',
@@ -46,7 +46,7 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'ramen', 'fadeCurly', 'twinTails', 'bobCut', 'pompadour', 'slickBack', 'neon', 'iceSpikes', 'aurora',
   ],
   eyes: [
-    'round', 'happy', 'sparkle', 'cool', 'sleepy', 'wink', 'wide', 'curious', 'lashes',
+    'round', 'happy', 'friendly', 'sparkle', 'cool', 'sleepy', 'wink', 'wide', 'curious', 'lashes',
     'closed', 'angry', 'sad', 'dizzy', 'hearts', 'star',
     'kawaii', 'animeEye', 'confident', 'cyclops', 'monocleEye', 'laser', 'hypno',
     'heartEye', 'starEye', 'flame', 'galaxy', 'robot', 'void',
@@ -69,7 +69,7 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'rainbowTongue', 'tongueOut', 'grimace', 'zen', 'diamond', 'openLaugh', 'toothyGrind',
   ],
   facialHair: [
-    'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'fullBeard', 'chinStrap',
+    'none', 'stubble', 'mustache', 'goatee', 'shortBeard', 'boxedBeard', 'fullBeard', 'chinStrap',
     'handlebar', 'vanDyke', 'trimmedBeard',
     'wizardBeard', 'braidedBeard', 'flameBeard',
   ],
@@ -83,7 +83,7 @@ export const CANONICAL_PARTS: Record<LegacyCategory, readonly string[]> = {
     'demonWings', 'cyberpunkVisor', 'samurai', 'flamingHalo',
     'phoenixCrown', 'crystalCrown', 'microphone', 'earsOut',
     // 2026-11 chest drop (redrawn + new)
-    'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat', 'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace',
+    'devilHorns', 'monocle', 'mask', 'sombrero', 'gamerHeadset', 'graduationCap', 'tinfoilHat', 'earrings', 'ninjaScarf', 'cape', 'wings', 'unicornHorn', 'dragonWings', 'flameAura', 'goldNecklace', 'goldChain',
   ],
   bodyStyle: ['default', 'hoodie', 'suit', 'turtleneck', 'offShoulder', 'cropTop'],
 };

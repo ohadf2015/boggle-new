@@ -256,6 +256,28 @@ export const ACC_CHEST: Record<string, AccDef> = {
       );
     },
   },
+  goldChain: {
+    layer: 'neck',
+    render: () => {
+      // Thin collar chain made of small links — no pendant.
+      const links: Array<[number, number, number]> = [
+        [36.6, 69.6, -40], [38.4, 71.8, -32], [40.4, 73.8, -24], [42.6, 75.6, -16],
+        [45.0, 77.0, -10], [47.5, 78.0, -4], [50.0, 78.4, 0], [52.5, 78.0, 4],
+        [55.0, 77.0, 10], [57.4, 75.6, 16], [59.6, 73.8, 24], [61.6, 71.8, 32], [63.4, 69.6, 40],
+      ];
+      return (
+        <g>
+          {links.map(([cx, cy, rot], i) => (
+            <g key={`gc${i}`} transform={`rotate(${rot} ${cx} ${cy})`}>
+              <ellipse cx={cx} cy={cy} rx="1.55" ry="0.95" fill="none" stroke={INK} strokeWidth="1.15" />
+              <ellipse cx={cx} cy={cy} rx="1.55" ry="0.95" fill="none" stroke={GOLD} strokeWidth="0.7" />
+            </g>
+          ))}
+          <path d="M38.2 71.6 Q42.4 76 47.2 77.6" fill="none" stroke={BRAND.goldLight} strokeWidth="0.45" strokeLinecap="round" />
+        </g>
+      );
+    },
+  },
   earrings: {
     layer: 'neck',
     render: ctx => {
