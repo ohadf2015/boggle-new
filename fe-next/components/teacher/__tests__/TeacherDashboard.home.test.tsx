@@ -26,6 +26,11 @@ vi.mock('@/components/teacher/LessonBuilder', () => ({
   default: ({ initialReviewWords }: { initialReviewWords: string[] }) => <div data-testid="lesson-builder">{initialReviewWords.join(',')}</div>,
 }));
 const viewed = vi.fn();
+const gateOpened = vi.fn();
+vi.mock('@/lib/education/teacherOnboardingGate', () => ({
+  captureTeacherOnboardingOpened: (...args: unknown[]) => gateOpened(...args),
+  captureTeacherOnboardingCompletedIfOpened: vi.fn(),
+}));
 vi.mock('@/lib/education/telemetry', async (orig) => ({
   ...(await orig<Record<string, unknown>>()),
   trackEduTeacherDashboardViewed: (s: unknown) => viewed(s),
@@ -63,6 +68,7 @@ afterEach(() => {
   cleanup();
   search = '';
   viewed.mockReset();
+  gateOpened.mockReset();
 });
 
 function openWeeklyReports() {
@@ -269,6 +275,13 @@ describe('Teacher Home', () => {
     expect(within(card).getByTestId('home-onboarding-cta')).toHaveAttribute('href', '/en/teacher/classroom/new');
     expect(screen.queryByTestId('home-week')).not.toBeInTheDocument();
     expect(screen.queryByTestId('home-hero')).not.toBeInTheDocument();
+    expect(gateOpened).toHaveBeenCalledWith({
+      teacherId: 'u1',
+      classroomId: null,
+      step: 'createClass',
+      surface: 'home',
+      locale: 'en',
+    });
   });
 
   it('Given no duplicate nav, Then Home mounts no tools dock', () => {

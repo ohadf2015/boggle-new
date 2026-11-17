@@ -30,11 +30,15 @@ export function trackFirstRoundGuideShown(args: {
   surface: FirstRoundGuideSurface;
   locale: string;
   step?: FirstRoundGuideStep;
+  teacherId?: string | null;
+  classroomId?: string | null;
 }): void {
   safeCapture(FIRST_ROUND_GUIDE_EVENTS.shown, {
     surface: args.surface,
     locale: args.locale,
     ...(args.step ? { step: args.step } : {}),
+    ...(args.teacherId ? { teacher_id: args.teacherId } : {}),
+    ...(args.classroomId ? { classroom_id: args.classroomId } : {}),
   });
 }
 
@@ -42,10 +46,14 @@ export function trackFirstRoundGuideClicked(args: {
   surface: FirstRoundGuideSurface;
   locale: string;
   step: FirstRoundGuideStep;
+  teacherId?: string | null;
+  classroomId?: string | null;
 }): void {
   safeCapture(FIRST_ROUND_GUIDE_EVENTS.clicked, {
     surface: args.surface,
     locale: args.locale,
     step: args.step,
+    ...(args.teacherId ? { teacher_id: args.teacherId } : {}),
+    ...(args.classroomId ? { classroom_id: args.classroomId } : {}),
   });
 }
