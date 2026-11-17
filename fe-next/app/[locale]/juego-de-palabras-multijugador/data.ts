@@ -117,7 +117,13 @@ export const FAQ_ACCENTS = [
   'border-neo-pink shadow-hard-pink',
 ];
 
+export const DIRECT_ANSWER = {
+  q: '¿Dónde jugar scrabble en español gratis en línea y sin registrarse?',
+  a: `En LexiClash, desde el navegador: pulsas Crear sala, mandas el enlace y tus amigos entran sin cuenta, sin email y sin descargar nada. No es Scrabble ni tiene relación con la marca, pero si buscas un juego de letras así en español, aquí lo tienes. El diccionario pasa de ${ES_DICT_FLOOR} palabras con variantes de España y Latinoamérica, en una sala caben de 2 a 50 jugadores y una ronda normal dura entre uno y dos minutos. Jugar no cuesta nada.`,
+};
+
 export const FAQS = [
+  DIRECT_ANSWER,
   {
     q: '¿Hay scrabble español online gratis sin registrarse?',
     a: 'Sí. LexiClash es scrabble español online gratis sin registrarse: abres el navegador, pulsas Crear sala y la partida empieza. No pide email ni contraseña. Si no tienes un nombre guardado, escribes un apodo — eso no crea una cuenta. Quien entra por el enlace de WhatsApp tampoco se registra.',
