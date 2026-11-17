@@ -110,7 +110,9 @@ export function VocabQuizStakesMeter({ clock, points, timeUp = false, t }: Vocab
             dir="ltr"
             className="font-neo-display text-xs font-black leading-none tabular-nums sm:text-sm"
           >
-            +{points.now}
+            {/* A bare "+125" under the clock read as a score, not an offer: say it is points, and what for. */}
+            <span className="sr-only">{t('vocabQuiz.stakes.label')} </span>
+            {t('vocabQuiz.stakes.pointsNow', { points: points.now })}
           </span>
         )
       )}

@@ -52,6 +52,7 @@ import {
   trackEduTrialReminderCtaClick,
   trackTeacherTrialBannerShown,
   trackTeacherTrialUpgradeClicked,
+  trackRecoveryClicked,
 } from '../proFunnelTelemetry';
 
 describe('trackEduProUpgradeClicked', () => {
@@ -519,6 +520,7 @@ describe('edu_trial_reminder events', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('teacher_trial_banner events (Polar trial lifecycle banner)', () => {
   beforeEach(() => {
     captureMock.mockReset();
@@ -558,5 +560,31 @@ describe('teacher_trial_banner events (Polar trial lifecycle banner)', () => {
       throw new Error('growth error');
     });
     expect(() => trackTeacherTrialUpgradeClicked({ days_remaining: 1, urgent: true })).not.toThrow();
+  });
+});
+
+describe('trackRecoveryClicked', () => {
+  beforeEach(() => {
+    captureMock.mockReset();
+  });
+
+  it('Given the past-due banner retry tap, When tracked, Then recovery_clicked fires with the surface', () => {
+    trackRecoveryClicked({ surface: 'payment_failed_banner' });
+    expect(captureMock).toHaveBeenCalledWith('recovery_clicked', {
+      surface: 'payment_failed_banner',
+      product: 'teacher_pro',
+      provider: 'polar',
+    });
+  });
+
+  it('Given no client PostHog key, When tracked, Then the beacon fallback carries the event', () => {
+    keyState.present = false;
+    trackRecoveryClicked({ surface: 'payment_failed_banner' });
+    expect(beaconMock).toHaveBeenCalledWith('recovery_clicked', {
+      surface: 'payment_failed_banner',
+      product: 'teacher_pro',
+      provider: 'polar',
+    });
+    keyState.present = true;
   });
 });

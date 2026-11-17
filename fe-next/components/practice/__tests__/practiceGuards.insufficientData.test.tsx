@@ -45,6 +45,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
   return {
     AdaptiveMotion: { div: Passthrough, span: Passthrough, button: Passthrough, p: Passthrough },
     AdaptiveAnimatePresence: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
+    useSkipAnimations: () => false,
   };
 });
 

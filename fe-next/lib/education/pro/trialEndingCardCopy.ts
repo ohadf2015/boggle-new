@@ -3,7 +3,8 @@
  *
  * In the free access trial: days left + keep class reports for $9/mo, and
  * "Keep Teacher Pro after your free trial" (no second trial). Trial already
- * ended: straight $9/mo. Never had a trial: the 14-day trial. Self-contained
+ * ended: straight $9/mo. Never had a trial: the 14-day trial. Never ran a class game:
+ * the 14 days start at the first class game (trialEndingWaitingCopy). Self-contained
  * per locale, same pattern as keepAfterTrialCopy.
  */
 import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
@@ -146,6 +147,55 @@ export function trialEndingNeverCopy(locale: string): TrialEndingCardCopy {
     cta: base.trialCta,
     note: base.trialNote,
   };
+}
+
+const WAITING: Record<string, TrialEndingCardCopy> = {
+  en: {
+    title: 'Your 14-day free trial starts at your first class game',
+    body: 'Run a live game with your class and Teacher Pro is free for 14 days from that moment.',
+    cta: 'Start a class game',
+    note: 'Keep Teacher Pro after your free trial for {price}/mo, or stay on the free plan.',
+  },
+  he: {
+    title: '14 ימי הניסיון החינמיים מתחילים במשחק הכיתתי הראשון שלך',
+    body: 'מריצים משחק חי עם הכיתה, ו-Teacher Pro חינם ל-14 יום מאותו רגע.',
+    cta: 'להתחיל משחק כיתתי',
+    note: 'אחרי תקופת הניסיון אפשר להמשיך עם Teacher Pro ב-{price} לחודש, או להישאר בתוכנית החינמית.',
+  },
+  es: {
+    title: 'Tu prueba gratis de 14 días empieza con tu primera partida en clase',
+    body: 'Juega una partida en vivo con tu clase y Teacher Pro es gratis durante 14 días desde ese momento.',
+    cta: 'Empezar una partida en clase',
+    note: 'Sigue con Teacher Pro después de tu prueba gratis por {price}/mes, o quédate en el plan gratuito.',
+  },
+  sv: {
+    title: 'Din 14 dagar långa gratisperiod börjar med din första klassmatch',
+    body: 'Kör en livematch med klassen så är Teacher Pro gratis i 14 dagar från det ögonblicket.',
+    cta: 'Starta en klassmatch',
+    note: 'Behåll Teacher Pro efter din gratisperiod för {price}/mån, eller stanna på gratisplanen.',
+  },
+  ja: {
+    title: '14日間の無料トライアルは、最初のクラスゲームから始まります',
+    body: 'クラスでライブゲームを始めると、その時点から14日間Teacher Proを無料で使えます。',
+    cta: 'クラスゲームを始める',
+    note: '無料トライアル後もTeacher Proを月{price}で続けるか、無料プランのまま使えます。',
+  },
+  ru: {
+    title: 'Ваши 14 бесплатных дней начнутся с первой игры с классом',
+    body: 'Запустите живую игру с классом, и Teacher Pro будет бесплатным 14 дней с этого момента.',
+    cta: 'Начать игру с классом',
+    note: 'Сохраните Teacher Pro после бесплатного периода за {price}/мес или оставайтесь на бесплатном плане.',
+  },
+};
+
+/**
+ * Never ran a class game: the free 14 days start at the first one (live or already-ended
+ * window alike), so no countdown and no "ended". The action is the class game itself.
+ */
+export function trialEndingWaitingCopy(locale: string): TrialEndingCardCopy {
+  const l = trialCopyBase(locale);
+  const w = WAITING[l] ?? WAITING.en;
+  return { ...w, note: fill(w.note, { price: wrapPrice(l) }) };
 }
 
 export const TRIAL_ENDING_CARD_PLACEMENT = 'trial_ending_card' as const;

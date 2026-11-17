@@ -6,14 +6,24 @@ const h = vi.hoisted(() => ({
   trialRow: null as null | { id: string; trial_expires_at: string | null; trial_reminders_sent: string[] | null },
   updates: [] as Array<{ table: string; patch: unknown; id: unknown }>,
   rehearsalIds: [] as string[],
+  subRow: null as null | Record<string, unknown>,
+  priorRestartEvents: [] as unknown[],
+  inserts: [] as Array<{ table: string; row: unknown }>,
+  setTrialEnd: vi.fn(async () => undefined),
 }));
 
 function from(table: string) {
   const c: Record<string, unknown> = {};
   const self = () => c;
   for (const m of ['select', 'eq', 'gte', 'in', 'order', 'limit']) c[m] = self;
-  c.insert = async () => ({ error: null });
-  c.maybeSingle = async () => ({ data: table === 'teacher_access_requests' ? h.trialRow : null, error: null });
+  c.insert = async (row: unknown) => {
+    h.inserts.push({ table, row });
+    return { error: null };
+  };
+  c.maybeSingle = async () => ({
+    data: table === 'teacher_access_requests' ? h.trialRow : table === 'subscriptions' ? h.subRow : null,
+    error: null,
+  });
   c.update = (patch: unknown) => ({
     eq: async (_col: string, id: unknown) => {
       h.updates.push({ table, patch, id });
@@ -26,12 +36,16 @@ function from(table: string) {
         ? { count: h.priorRealRounds, error: null }
         : table === 'classroom_memberships'
           ? { data: h.rehearsalIds.map((student_id) => ({ student_id })), error: null }
-          : { data: [], error: null },
+          : table === 'subscription_events'
+            ? { data: h.priorRestartEvents, error: null }
+            : { data: [], error: null },
     ).then(resolve);
   return c;
 }
 
 vi.mock('../../modules/supabase/client', () => ({ getSupabase: () => ({ from }) }));
+vi.mock('@/lib/polar', () => ({ getPolarClient: () => ({ setTrialEnd: h.setTrialEnd }) }));
+vi.mock('../../modules/supabase/teacherActivation', () => ({ markTeacherLiveStarted: vi.fn(async () => undefined) }));
 vi.mock('../../utils/educationTelemetry', () => ({ captureEduServerEvents: vi.fn() }));
 vi.mock('../../utils/logger', () => ({ default: { error: vi.fn(), info: vi.fn(), warn: vi.fn(), log: vi.fn() } }));
 
@@ -51,6 +65,10 @@ describe('recordClassroomRound: the access trial clock starts at the first real 
     h.updates = [];
     h.rehearsalIds = [];
     h.trialRow = { id: 'req-1', trial_expires_at: '2026-01-01T00:00:00Z', trial_reminders_sent: ['t-3'] };
+    h.subRow = null;
+    h.priorRestartEvents = [];
+    h.inserts = [];
+    h.setTrialEnd.mockClear();
   });
 
   it('restarts an expired access trial when the first 2-player round completes', async () => {
@@ -59,7 +77,8 @@ describe('recordClassroomRound: the access trial clock starts at the first real 
     expect(trialUpdate?.id).toBe('req-1');
     const patch = trialUpdate?.patch as { trial_expires_at: string; trial_reminders_sent: string[] };
     expect(Date.parse(patch.trial_expires_at)).toBeGreaterThan(Date.now() + 13 * 86_400_000);
-    expect(patch.trial_reminders_sent).toEqual([]);
+    expect(patch.trial_reminders_sent).toEqual(['first_game_restart']);
+    expect(h.setTrialEnd).not.toHaveBeenCalled();
   });
 
   it('does not start the clock when the second player is the phone test seat', async () => {
@@ -77,5 +96,37 @@ describe('recordClassroomRound: the access trial clock starts at the first real 
     h.priorRealRounds = 2;
     await recordClassroomRound(game, { playerIds: ['s1', 's2'], durationSeconds: 60, startedAt: null });
     expect(h.updates.filter((u) => u.table === 'teacher_access_requests')).toEqual([]);
+  });
+
+  it('a teacher who already got the restart never gets another 14 days', async () => {
+    h.trialRow = { id: 'req-1', trial_expires_at: '2026-01-01T00:00:00Z', trial_reminders_sent: ['first_game_restart'] };
+    await recordClassroomRound(game, { playerIds: ['s1', 's2'], durationSeconds: 60, startedAt: null });
+    expect(h.updates.filter((u) => u.table === 'teacher_access_requests')).toEqual([]);
+  });
+
+  it('a live card trial restarts on Polar (14 days from now), and the free window is not extended on top', async () => {
+    h.subRow = {
+      tier: 'pro', status: 'trialing', source: 'polar', current_period_end: new Date(Date.now() + 2 * 86_400_000).toISOString(),
+      cancel_at_period_end: false, lemon_squeezy_subscription_id: 'sub_9',
+    };
+    await recordClassroomRound(game, { playerIds: ['s1', 's2'], durationSeconds: 60, startedAt: null });
+    expect(h.setTrialEnd).toHaveBeenCalledTimes(1);
+    const [subId, end] = h.setTrialEnd.mock.calls[0] as unknown as [string, string];
+    expect(subId).toBe('sub_9');
+    expect(Date.parse(end)).toBeGreaterThan(Date.now() + 13.9 * 86_400_000);
+    expect(Date.parse(end)).toBeLessThan(Date.now() + 14.1 * 86_400_000);
+    const accessPatch = h.updates.find((u) => u.table === 'teacher_access_requests')?.patch as Record<string, unknown>;
+    expect(accessPatch).toEqual({ trial_reminders_sent: ['t-3', 'first_game_restart'] });
+    expect(h.inserts.some((i) => i.table === 'subscription_events' && (i.row as { event_type: string }).event_type === 'polar_trial_first_game_restart')).toBe(true);
+  });
+
+  it('a card trial that already restarted is left alone', async () => {
+    h.subRow = {
+      tier: 'pro', status: 'trialing', source: 'polar', current_period_end: new Date(Date.now() + 2 * 86_400_000).toISOString(),
+      cancel_at_period_end: false, lemon_squeezy_subscription_id: 'sub_9',
+    };
+    h.priorRestartEvents = [{ id: 'e1' }];
+    await recordClassroomRound(game, { playerIds: ['s1', 's2'], durationSeconds: 60, startedAt: null });
+    expect(h.setTrialEnd).not.toHaveBeenCalled();
   });
 });

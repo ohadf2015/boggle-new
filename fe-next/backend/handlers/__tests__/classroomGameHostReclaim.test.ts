@@ -27,15 +27,27 @@ vi.mock('../../modules/gameStateManager.js', () => ({
   getGame: vi.fn(),
 }));
 
+vi.mock('../../utils/socketHelpers.js', () => ({
+  getSocketById: vi.fn(),
+}));
+
+vi.mock('../sameConnectionGhost.js', () => ({
+  parkSameConnectionGhost: vi.fn(() => false),
+}));
+
 vi.mock('../playerReconnectHandler.js', () => ({
   handleReconnection: vi.fn(),
 }));
 
 import { getGame } from '../../modules/gameStateManager.js';
+import { getSocketById } from '../../utils/socketHelpers.js';
+import { parkSameConnectionGhost } from '../sameConnectionGhost.js';
 import { handleReconnection } from '../playerReconnectHandler.js';
 import { tryReclaimClassroomHostSeat } from '../classroomGameHostReclaim';
 
 const mockGetGame = getGame as unknown as Mock;
+const mockGetSocketById = getSocketById as unknown as Mock;
+const mockParkGhost = parkSameConnectionGhost as unknown as Mock;
 const mockHandleReconnection = handleReconnection as unknown as Mock;
 
 const TEACHER_ID = 'teacher-74f8f1ae';
@@ -214,5 +226,86 @@ describe('tryReclaimClassroomHostSeat', () => {
 
     expect(reclaimed).toBe(false);
     expect(mockHandleReconnection).not.toHaveBeenCalled();
+  });
+
+  describe('takeover guard (race 3a1508b5)', () => {
+    it('refuses a second live teacher page while the current host socket is still connected', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: 'sock-board' }));
+      mockGetSocketById.mockReturnValue({ id: 'sock-board', connected: true });
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(false);
+      expect(mockHandleReconnection).not.toHaveBeenCalled();
+    });
+
+    it('reclaims when the previous host socket is gone (reload already disconnected)', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: 'sock-gone' }));
+      mockGetSocketById.mockReturnValue(undefined);
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(true);
+      expect(mockHandleReconnection).toHaveBeenCalledTimes(1);
+    });
+
+    it('reclaims when the previous host socket exists but is disconnected (network blip)', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: 'sock-blip' }));
+      mockGetSocketById.mockReturnValue({ id: 'sock-blip', connected: false });
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(true);
+      expect(mockHandleReconnection).toHaveBeenCalledTimes(1);
+    });
+
+    it('re-seats when the SAME socket re-emits createGame (idempotent retry)', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: 'sock-new' }));
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(true);
+      expect(mockGetSocketById).not.toHaveBeenCalled();
+      expect(mockHandleReconnection).toHaveBeenCalledTimes(1);
+    });
+
+    it('parks a same-connection ghost and proceeds with the reclaim', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: 'sock-ghost' }));
+      mockGetSocketById.mockReturnValue({ id: 'sock-ghost', connected: true });
+      mockParkGhost.mockReturnValue(true);
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(true);
+      expect(mockParkGhost).toHaveBeenCalledTimes(1);
+      expect(mockHandleReconnection).toHaveBeenCalledTimes(1);
+    });
+
+    it('reclaims a room whose host socket id was never recorded', () => {
+      mockGetGame.mockReturnValue(makeClassroomGame({ hostSocketId: null }));
+
+      const reclaimed = tryReclaimClassroomHostSeat(io, makeSocket(TEACHER_ID), {
+        gameCode: 'VHT76G',
+        authUserId: TEACHER_ID,
+      });
+
+      expect(reclaimed).toBe(true);
+      expect(mockHandleReconnection).toHaveBeenCalledTimes(1);
+    });
   });
 });

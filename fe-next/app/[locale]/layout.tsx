@@ -201,6 +201,9 @@ export const viewport = {
     initialScale: 1,
     viewportFit: 'cover',
     themeColor: '#1a1a2e',
+    // Dark-only theme: emits <meta name="color-scheme" content="dark"> so the
+    // browser paints dark (canvas, scrollbars, form controls) before CSS loads.
+    colorScheme: 'dark' as const,
     // Let the soft keyboard SHRINK the layout viewport instead of overlaying it.
     // With this, a bottom-anchored element (e.g. the onboarding "Continue" CTA)
     // sits above the keyboard rather than behind it. Combined with 100dvh on the

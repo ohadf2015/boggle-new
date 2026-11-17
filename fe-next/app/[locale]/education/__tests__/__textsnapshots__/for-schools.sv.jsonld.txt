@@ -9,7 +9,7 @@
       "name": "Är LexiClash gratis för lärare?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, alla 8 spellägen, alla sex språken, inga annonser, ingen inloggning för elever, inget kreditkort. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
+        "text": "Ja. Varje lärare får en 14-dagars gratis provperiod av Teacher Pro: klassomfattande spel, alla 8 spellägen, alla sex språken, inga annonser, ingen inloggning för elever. Kort krävs för att starta provperioden, och sedan kostar det $9/mån om du inte avslutar. Efter provperioden förblir klassrumsspelet gratis för enskilda lärare — upp till 3 klasser med 50 elever vardera. Teacher Pro kostar $9/månad och lägger till statistik per klass, PDF/CSV-rapporter och obegränsat antal klasser."
       }
     },
     {

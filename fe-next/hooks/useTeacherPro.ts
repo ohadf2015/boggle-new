@@ -32,6 +32,8 @@ export interface TeacherProState {
   accessTrialExpires: string | null;
   /** The free access trial is known to have ended: no trial offer, straight to paid. */
   accessTrialEnded: boolean;
+  /** Has a free access window but never ran a class game: the 14 days start at the first one. */
+  accessTrialWaiting?: boolean;
   /** A Polar trial was started. Hides the free-trial CTA after it ends. */
   trialUsed: boolean;
   /** True only after a successful status read. A failure must not look like "never trialed". */
@@ -49,7 +51,7 @@ export interface TeacherProState {
 }
 
 const FREE: Omit<TeacherProState, 'loading' | 'refresh'> = {
-  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, cancelAtPeriodEnd: false, accessTrialExpires: null, accessTrialEnded: false, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null, pendingCheckout: false,
+  hasPro: false, source: 'polar', status: 'active', periodEnd: null, trialExpires: null, cancelAtPeriodEnd: false, accessTrialExpires: null, accessTrialEnded: false, accessTrialWaiting: false, trialUsed: false, known: false, grant: null, grantExpired: false, portalUrl: null, pendingCheckout: false,
 };
 
 // The dashboard mounts several consumers at once (plan badge, ProGate, the
@@ -91,6 +93,7 @@ function stateFrom(data: StatusBody): Omit<TeacherProState, 'loading' | 'refresh
     cancelAtPeriodEnd: data?.cancel_at_period_end === true,
     accessTrialExpires: typeof data?.access_trial_expires === 'string' ? data.access_trial_expires : null,
     accessTrialEnded: data?.has_pro === true ? false : data?.access_trial_ended === true,
+    accessTrialWaiting: data?.has_pro === true ? false : data?.access_trial_waiting === true,
     trialUsed: data?.trial_used === true || status === 'trialing',
     known: true,
     grant: (data?.grant as TeacherProGrant | null) ?? null,

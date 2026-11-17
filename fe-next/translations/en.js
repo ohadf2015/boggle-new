@@ -2273,6 +2273,7 @@ const en = {
       "label": "Up for grabs",
       "streak": "{count} in a row",
       "seconds": "{seconds}s",
+      "pointsNow": "+{points} pts",
       "timeUp": "Time's up"
     },
     "correctShort": "Nailed it!",
@@ -20669,7 +20670,10 @@ const en = {
       "answerIs": "It's spelled",
       "youWrote": "You wrote",
       "next": "Next word",
-      "finish": "See my results"
+      "finish": "See my results",
+      "praise": "Nailed it!|Spot on!|Perfect!|You got it!|Brilliant!",
+      "enterHint": "Press Enter to check · type the whole word",
+      "progress": "Word {current} of {total}"
     },
     "cookie": {
       "message": "Cookies help us count plays and keep the game running smoothly."

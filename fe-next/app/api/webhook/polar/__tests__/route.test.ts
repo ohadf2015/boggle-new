@@ -9,15 +9,23 @@ const upsertSubscription = vi.fn()
 const grantProFromOrder = vi.fn()
 const grantProFromCheckout = vi.fn()
 const logSubscriptionEvent = vi.fn()
+const subscriptionRowIsPastDue = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
+  subscriptionRowIsPastDue: (...args: unknown[]) => subscriptionRowIsPastDue(...args),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
 vi.mock('@/lib/education/dunning', () => ({
   maybeSendPaymentFailedEmail: (...args: unknown[]) => maybeSendPaymentFailedEmail(...args),
+}))
+// The chokepoint every education server event flows through — lets these tests
+// assert WHICH events the webhook emitted without a PostHog key.
+const captureEduServerEvents = vi.fn()
+vi.mock('@/backend/utils/educationTelemetry', () => ({
+  captureEduServerEvents: (...args: unknown[]) => captureEduServerEvents(...args),
 }))
 
 // static import is safe: vitest hoists the vi.mock calls above it
@@ -52,6 +60,9 @@ describe('polar webhook', () => {
     grantProFromOrder.mockClear()
     grantProFromCheckout.mockClear()
     logSubscriptionEvent.mockClear()
+    subscriptionRowIsPastDue.mockReset()
+    subscriptionRowIsPastDue.mockResolvedValue(false)
+    captureEduServerEvents.mockReset()
     signatureValid = true
     process.env.POLAR_PRO_PRODUCT_ID = PRO_PRODUCT_ID
     process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'
@@ -168,6 +179,50 @@ describe('polar webhook', () => {
     const res = await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due' }))
     expect(res.status).toBe(200)
     expect(await res.json()).toMatchObject({ received: true })
+  })
+
+  function emittedEventNames(): string[] {
+    return captureEduServerEvents.mock.calls.flatMap((call) =>
+      (call[0] as Array<{ event: string }>).map((e) => e.event)
+    )
+  }
+
+  it('emits subscription_past_due on the past_due webhook — the dunning funnel opener', async () => {
+    await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due' }))
+    expect(emittedEventNames()).toContain('subscription_past_due')
+    const ev = captureEduServerEvents.mock.calls
+      .flatMap((call) => call[0] as Array<{ event: string; properties: Record<string, unknown> }>)
+      .find((e) => e.event === 'subscription_past_due')
+    expect(ev?.properties).toMatchObject({ subscription_id: 'sub_1', product: 'teacher_pro', teacher_id: 'u1' })
+  })
+
+  it('does NOT emit subscription_past_due for a foreign product', async () => {
+    await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due', product_id: 'prod-imposketch-pack' }))
+    expect(emittedEventNames()).not.toContain('subscription_past_due')
+  })
+
+  it('emits payment_recovered when a past_due row flips back to active (subscription.updated)', async () => {
+    subscriptionRowIsPastDue.mockResolvedValue(true)
+    await POST(polarEvent('subscription.updated', subscriptionData))
+    expect(emittedEventNames()).toContain('payment_recovered')
+  })
+
+  it('emits payment_recovered when a past_due row flips back to active (subscription.uncanceled)', async () => {
+    subscriptionRowIsPastDue.mockResolvedValue(true)
+    await POST(polarEvent('subscription.uncanceled', subscriptionData))
+    expect(emittedEventNames()).toContain('payment_recovered')
+  })
+
+  it('does NOT emit payment_recovered when the row was never past_due', async () => {
+    subscriptionRowIsPastDue.mockResolvedValue(false)
+    await POST(polarEvent('subscription.updated', subscriptionData))
+    expect(emittedEventNames()).not.toContain('payment_recovered')
+  })
+
+  it('does NOT emit payment_recovered on a redelivered past_due (row still past_due)', async () => {
+    subscriptionRowIsPastDue.mockResolvedValue(true)
+    await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due' }))
+    expect(emittedEventNames()).not.toContain('payment_recovered')
   })
 
   describe('foreign products share the endpoint and must not touch a Teacher Pro row', () => {

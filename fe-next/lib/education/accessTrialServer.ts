@@ -1,4 +1,5 @@
 import { createAdminClient } from '@/utils/supabase/admin';
+import { REAL_CLASS_MIN_PLAYERS } from './teacherUsagePrompt';
 
 /**
  * End of the teacher's live ACCESS trial (the window stamped on approval), or null.
@@ -42,4 +43,25 @@ export async function accessTrialExpiryAny(userId: string): Promise<string | nul
 export async function teacherHasProAccess(userId: string, subscription: { has_pro: boolean }): Promise<boolean> {
   if (subscription.has_pro) return true;
   return (await liveAccessTrialExpiry(userId)) !== null;
+}
+
+/**
+ * True once the teacher ran a real class game (2+ real players), false if never, null when
+ * the read failed. Null is treated as "ran one" by callers, so a failed read never hides a
+ * real trial deadline.
+ */
+export async function teacherRanClassGame(userId: string): Promise<boolean | null> {
+  try {
+    const admin = createAdminClient();
+    if (!admin) return null;
+    const { count, error } = await admin
+      .from('classroom_rounds')
+      .select('id', { count: 'exact', head: true })
+      .eq('teacher_id', userId)
+      .gte('player_count', REAL_CLASS_MIN_PLAYERS);
+    if (error || typeof count !== 'number') return null;
+    return count > 0;
+  } catch {
+    return null;
+  }
 }

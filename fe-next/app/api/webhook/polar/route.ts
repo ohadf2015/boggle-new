@@ -12,12 +12,12 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
-import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
 import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
@@ -217,6 +217,7 @@ export async function POST(request: NextRequest) {
         } catch (err) {
           console.error('[Polar] dunning email threw:', err)
         }
+        trackPastDue(payload, userId)
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
@@ -334,6 +335,37 @@ function trackTrialExpired(payload: WebhookPayload, userId?: string) {
 }
 
 /**
+ * `subscription_past_due` — Polar flagged a Pro renewal past due. The dunning
+ * path's opening step in analytics: pairs with the `payment_recovered` that a
+ * fixed card produces, so the two measure dunning efficacy end to end.
+ * Never throws.
+ */
+function trackPastDue(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    const subId = String(payload?.data?.id ?? '')
+    captureFunnel(payload, userId, withRevenue(buildSubscriptionPastDueEvent(userId, subId), payload?.data))
+  } catch (err) {
+    console.error('[Polar] past_due telemetry threw:', err)
+  }
+}
+
+/**
+ * `payment_recovered` — a past_due Pro subscription flipped back to active.
+ * Fires only on the transition (the row read happened before the upsert), so
+ * Polar redeliveries stay silent. Never throws.
+ */
+function trackPaymentRecovered(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    const subId = String(payload?.data?.id ?? '')
+    captureFunnel(payload, userId, withRevenue(buildPaymentRecoveredEvent(userId, subId), payload?.data))
+  } catch (err) {
+    console.error('[Polar] recovery telemetry threw:', err)
+  }
+}
+
+/**
  * `polar_order_paid` — every paid Pro order (first payment and renewals) with
  * amount/currency/product and `revenue` in major units. Never throws.
  */
@@ -392,6 +424,7 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
     return
   }
   const data = payload?.data ?? {}
+  const wasPastDue = await subscriptionRowIsPastDue(userId)
   await upsertSubscription({
     userId,
     tier: getTierFromProductId(getProductId(payload)),
@@ -402,6 +435,7 @@ async function handleSubscriptionActive(payload: WebhookPayload, userId?: string
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
     eventAt: getEventAt(payload),
   })
+  if (wasPastDue && mapStatus(data.status) === 'active') trackPaymentRecovered(payload, userId)
   await tellAdminsAboutPro(payload, mapStatus(data.status) === 'trialing' ? 'trial' : 'paid')
 }
 
@@ -411,6 +445,7 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     return
   }
   const data = payload?.data ?? {}
+  const wasPastDue = await subscriptionRowIsPastDue(userId)
   await upsertSubscription({
     userId,
     tier: getTierFromProductId(getProductId(payload)),
@@ -421,6 +456,9 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
     eventAt: getEventAt(payload),
   })
+  // Polar's dunning retry that succeeds surfaces as subscription.updated with
+  // status active (not subscription.active), so recovery is detected here too.
+  if (wasPastDue && mapStatus(data.status) === 'active') trackPaymentRecovered(payload, userId)
 }
 
 /**

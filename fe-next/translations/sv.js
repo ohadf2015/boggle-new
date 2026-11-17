@@ -2273,6 +2273,7 @@ const sv = {
       "label": "Står på spel",
       "streak": "{count} i rad",
       "seconds": "{seconds} s",
+      "pointsNow": "+{points} p",
       "timeUp": "Tiden är ute"
     },
     "correctShort": "Snyggt!",
@@ -21648,7 +21649,10 @@ const sv = {
       "answerIs": "Det stavas",
       "youWrote": "Du skrev",
       "next": "Nästa ord",
-      "finish": "Se mitt resultat"
+      "finish": "Se mitt resultat",
+      "praise": "Klockrent!|Helt rätt!|Perfekt!|Du fixade det!|Lysande!",
+      "enterHint": "Tryck Enter för att rätta · skriv hela ordet",
+      "progress": "Ord {current} av {total}"
     },
     "cookie": {
       "message": "Vi använder kakor för att räkna spel och hålla spelet igång smidigt."

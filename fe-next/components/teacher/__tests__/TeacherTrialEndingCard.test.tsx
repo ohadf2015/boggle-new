@@ -20,6 +20,7 @@ const pro = vi.hoisted(() => ({
   trialUsed: false,
   accessTrialExpires: null as string | null,
   accessTrialEnded: false,
+  accessTrialWaiting: false,
 }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 't1' } }) }));
@@ -45,6 +46,7 @@ beforeEach(() => {
     trialUsed: false,
     accessTrialExpires: null,
     accessTrialEnded: false,
+    accessTrialWaiting: false,
   });
   funnel.trackTeacherProUpgradeClick.mockClear();
   beacon.mockClear();
@@ -158,3 +160,30 @@ describe('TeacherTrialEndingCard', () => {
     );
   });
 });
+
+describe('TeacherTrialEndingCard: never ran a class game (waiting for the first one)', () => {
+  it('ended window: says the 14 days start at the first class game, links to hosting, no pay ask', () => {
+    pro.accessTrialEnded = true;
+    pro.accessTrialWaiting = true;
+    const nowMs = Date.now();
+    render(<TeacherTrialEndingCard trial={teacherTrialStatus(new Date(nowMs - 5 * 86_400_000).toISOString(), nowMs)} />);
+    expect(screen.getByText('Your 14-day free trial starts at your first class game')).toBeInTheDocument();
+    expect(screen.queryByText(/has ended/)).toBeNull();
+    const cta = screen.getByTestId('teacher-trial-ending-cta');
+    expect(cta).toHaveAttribute('href', '/en/education/classroom-game');
+    expect(cta).toHaveTextContent('Start a class game');
+    fireEvent.click(cta);
+    expect(funnel.trackTeacherProUpgradeClick).not.toHaveBeenCalled();
+  });
+
+  it('live window: no countdown while waiting', () => {
+    pro.accessTrialWaiting = true;
+    const nowMs = Date.now();
+    const iso = new Date(nowMs + 2 * 86_400_000).toISOString();
+    pro.accessTrialExpires = iso;
+    render(<TeacherTrialEndingCard trial={teacherTrialStatus(iso, nowMs)} />);
+    expect(screen.getByText('Your 14-day free trial starts at your first class game')).toBeInTheDocument();
+    expect(screen.queryByText(/ends tomorrow|ends today|ends in/)).toBeNull();
+  });
+});
+

@@ -2273,6 +2273,7 @@ const he = {
       "label": "על הכף",
       "streak": "{count} ברצף",
       "seconds": "{seconds} שנ׳",
+      "pointsNow": "+{points} נק׳",
       "timeUp": "נגמר הזמן"
     },
     "correctShort": "יש!",
@@ -21609,7 +21610,10 @@ const he = {
       "answerIs": "ככה כותבים",
       "youWrote": "כתבת",
       "next": "למילה הבאה",
-      "finish": "לתוצאות שלי"
+      "finish": "לתוצאות שלי",
+      "praise": "בול!|מדויק!|מושלם!|הצלחת!|מבריק!",
+      "enterHint": "לחצו Enter לבדיקה · הקלידו את כל המילה",
+      "progress": "מילה {current} מתוך {total}"
     },
     "cookie": {
       "message": "אנחנו משתמשים בעוגיות כדי לספור משחקים ולשמור שהמשחק ירוץ חלק."
