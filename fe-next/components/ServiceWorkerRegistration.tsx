@@ -23,8 +23,9 @@ export function ServiceWorkerRegistration() {
       'serviceWorker' in navigator &&
       process.env.NODE_ENV === 'production'
     ) {
-      // Register service worker after page load
-      window.addEventListener('load', registerServiceWorker);
+      // A warm returning load often fires `load` before hydration runs this effect.
+      if (document.readyState === 'complete') void registerServiceWorker();
+      else window.addEventListener('load', registerServiceWorker);
       // Forward unexpected SW cache errors to Sentry (page-side init).
       const onSwMessage = (e: MessageEvent) => {
         const data = e.data as { type?: string; message?: string; url?: string } | undefined;
