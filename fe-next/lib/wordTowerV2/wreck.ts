@@ -137,8 +137,62 @@ export function buildWreckWorld(words: string[]): WreckWorld {
   return buildWreckWorldFromTower(towerFromWords(words));
 }
 
+
+/** Centre Y of floor `i` (0 = ground). Engine coords: up is negative. */
+export function floorCenterY(floorIndex: number): number {
+  return -(floorIndex * BLOCK_HEIGHT_PX + BLOCK_HEIGHT_PX / 2);
+}
+
+/**
+ * A slightly lower aim than the slab centre: the ball is fatter than half a
+ * floor, so a centre shot clips the floor above first and "picking floor 2"
+ * would actually ring the roof.
+ */
+export function aimYForFloor(floorIndex: number, centerY = floorCenterY(floorIndex)): number {
+  const clearance = Math.max(0, BALL_RADIUS_PX - BLOCK_HEIGHT_PX / 2 + 4);
+  return centerY + clearance;
+}
+
+
+/**
+ * Pivot that, when the ball is cut at the bottom of the swing, flies into
+ * `targetY`. The default mid-tower aim is `-(towerHeightPx * HIT_AT_TOWER_FRACTION)`.
+ */
+export function pivotForTargetY(maxHalfW: number, targetY: number, contactX = -maxHalfW): { x: number; y: number } {
+  const reach = CHAIN_PX * Math.sin(START_ANGLE);
+  const vBottom = CHAIN_PX * START_ANGLE * OMEGA;
+  const pivotX = -(maxHalfW + CLEAR_GAP_PX + BALL_RADIUS_PX + reach);
+  // Time until the ball's FACE (not its centre) first meets `contactX`.
+  const flightMs = Math.max(1, (contactX - pivotX) / vBottom);
+  const dropPx = 0.5 * GRAVITY_PX_PER_MS2 * flightMs ** 2;
+  return { x: pivotX, y: targetY - dropPx - CHAIN_PX };
+}
+
+/** X where a ball coming from the left first kisses the tower. */
+export function towerContactX(floors: Array<{ x: number; w: number }>): number {
+  if (!floors.length) return 0;
+  return Math.min(...floors.map((f) => f.x - f.w / 2)) - BALL_RADIUS_PX;
+}
+
+/** Re-aim an existing wreck so a bottom-of-swing cut heads at the called floor. */
+export function aimWreckAtFloor(w: WreckWorld, floorIndex: number | null | undefined): void {
+  const floors = w.floors.length;
+  if (floors <= 0) return;
+  const i =
+    floorIndex == null || !Number.isFinite(floorIndex)
+      ? null
+      : Math.max(0, Math.min(floors - 1, Math.floor(floorIndex)));
+  const maxHalfW = Math.max(...w.floors.map((f) => f.w / 2), 0);
+  const targetY = i == null ? -(w.towerHeightPx * HIT_AT_TOWER_FRACTION) : aimYForFloor(i, w.floors[i]?.y);
+  w.pivot = pivotForTargetY(maxHalfW, targetY, i == null ? undefined : towerContactX(w.floors));
+  if (w.chain && w.ball) {
+    const p = swingAt(w, w.swingMs);
+    Body.setPosition(w.ball, { x: p.x, y: p.y });
+  }
+}
+
 /** Raid round: the rival's ACTUAL building, floor for floor. */
-export function buildWreckWorldFromTower(blocks: TowerBlock[]): WreckWorld {
+export function buildWreckWorldFromTower(blocks: TowerBlock[], opts?: { aimFloor?: number | null }): WreckWorld {
   const floors = wreckableTower(blocks);
   const tower = createTowerWorld({ seed: 7 });
   const ids: string[] = [];
@@ -160,21 +214,24 @@ export function buildWreckWorldFromTower(blocks: TowerBlock[]): WreckWorld {
   for (let t = 0; t < SETTLE_MS_PER_BLOCK; t += 1000 / 120) stepWorld(tower, 1000 / 120);
 
   const towerHeightPx = floors.length * BLOCK_HEIGHT_PX;
-  const reach = CHAIN_PX * Math.sin(START_ANGLE);
-  // Cut at the lowest point, the ball crosses (reach + gap) sideways at the
-  // swing's peak speed while gravity pulls it down; aim that at mid-height, so
-  // the usable band of cut times spreads over the whole face of the building.
-  const vBottom = CHAIN_PX * START_ANGLE * OMEGA;
-  const pivotX = -(maxHalfW + CLEAR_GAP_PX + BALL_RADIUS_PX + reach);
-  const flightMs = (-pivotX - maxHalfW) / vBottom;
-  const dropPx = 0.5 * GRAVITY_PX_PER_MS2 * flightMs ** 2;
-  const bottomY = -(towerHeightPx * HIT_AT_TOWER_FRACTION) - dropPx;
+  // Default: mid-height, so a cut at the bottom of the swing still covers the
+  // face of the building. A called floor (the one picked on the reveal) aims
+  // the same cut at that slab — picking a floor used to only paint a ring.
+  const aimY =
+    opts?.aimFloor != null && floors[opts.aimFloor]
+      ? aimYForFloor(opts.aimFloor, floors[opts.aimFloor].y)
+      : -(towerHeightPx * HIT_AT_TOWER_FRACTION);
+  const pivot = pivotForTargetY(
+    maxHalfW,
+    aimY,
+    opts?.aimFloor != null ? towerContactX(floors) : undefined,
+  );
 
   const world: WreckWorld = {
     tower,
     ids,
     floors,
-    pivot: { x: pivotX, y: bottomY - CHAIN_PX },
+    pivot,
     ball: null,
     chain: false,
     swingMs: 0,

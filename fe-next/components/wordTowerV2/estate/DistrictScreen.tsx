@@ -34,7 +34,8 @@ interface Burst {
 /**
  * The empire screen: one district, five plots, one action. The diorama is the
  * art pack's backdrop with the five building sprites standing on its ground
- * line — one row at desktop/TV width, two rows on a phone so nothing scrolls.
+ * line — one row at desktop/TV width, two rows on a phone. The diorama
+ * scrolls if the rows would otherwise clip under the banners.
  */
 export function DistrictScreen({ t, estate: api, onClose }: Props) {
   const { estate, status } = api;
@@ -124,7 +125,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   const progress = districtProgress(estate);
   const levels = estate.plots.reduce((sum, p) => sum + p.level, 0);
   const row = (slots: PlotSlot[], size: 'back' | 'front' | 'wide', cls: string) => (
-    <div className={`flex w-full items-end justify-center gap-1.5 md:gap-6 ${cls}`}>
+    <div className={`flex w-full items-end justify-center gap-2 md:gap-6 ${cls}`}>
       {slots.map((s) => {
         const plot = estate.plots.find((p) => p.slot === s) ?? estate.plots[0];
         const check = canUpgrade(estate, s);
@@ -226,27 +227,28 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
         </div>
       ) : null}
 
-      <div className="relative flex-1 overflow-hidden">
+      {/* flex-1 + overflow-y-auto, not overflow-hidden: on a short phone the
+          two plot rows used to overflow the leftover height and the back-row
+          roofs were clipped by the news banner. A flex-1 spacer pins the lots
+          to the ground when they fit, and lets the whole diorama scroll when
+          they don't — tops stay visible. */}
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto" data-testid="estate-diorama">
         {/* `auto 100%` keeps the skyline's proportions and tiles sideways, so a
             1920 screen gets more CITY rather than a stretched one. */}
         <div
-          className="absolute inset-0 bg-bottom bg-repeat-x"
+          className="pointer-events-none absolute inset-0 z-0 bg-bottom bg-repeat-x"
           style={{ backgroundImage: `url(${backdropFor(estate.district)})`, backgroundSize: 'auto 100%' }}
           aria-hidden
         />
-        {/* The skyline is a MOOD, the five plots are the subject. Without this
-            the sunset backdrop is the loudest thing on screen and both the
-            buildings and the cyan plan-ghosts wash out against it. */}
-        <div className="pointer-events-none absolute inset-0 bg-neo-navy/55" aria-hidden />
-        {/* On a 1920 screen the backdrop's own sky reaches the header as a flat
-            band; fading it into the chrome keeps the seam off the screen. */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-neo-navy to-transparent" aria-hidden />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-neo-navy/90 via-neo-navy/45 to-transparent" aria-hidden />
-        {/* Both phone rows sit LOW: the back row on the skyline's roofline and
-            the front row on the ground band, so nothing floats in the sky. */}
-        <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end px-2 pb-2">
+        <div className="pointer-events-none absolute inset-0 z-0 bg-neo-navy/55" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-1/4 bg-gradient-to-b from-neo-navy to-transparent" aria-hidden />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-3/4 bg-gradient-to-t from-neo-navy/90 via-neo-navy/45 to-transparent" aria-hidden />
+        {/* Spacer grows so the plots sit on the ground; shrinks away (min-h-0)
+            when the rows need the full height, so the scroll starts at the top. */}
+        <div className="relative z-[1] min-h-4 flex-1" aria-hidden />
+        <div className="relative z-[1] flex shrink-0 flex-col items-center justify-end px-2 pb-3 pt-4">
           {row(PLOT_SLOTS.slice(0, 3), 'back', 'md:hidden')}
-          {row(PLOT_SLOTS.slice(3), 'front', 'md:hidden')}
+          {row(PLOT_SLOTS.slice(3), 'front', 'mt-3 md:hidden')}
           <div className="mx-auto hidden w-full max-w-[1700px] md:block">{row([...PLOT_SLOTS], 'wide', '')}</div>
         </div>
       </div>

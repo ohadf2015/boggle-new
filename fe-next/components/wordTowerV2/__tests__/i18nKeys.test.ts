@@ -128,6 +128,12 @@ const keys: string[] = [
     'built', 'repaired', 'guest', 'perksTitle', 'perksNone', 'newsRaids', 'newsAffordable', 'newsDamaged',
     'completeTitle', 'completeSub', 'completeNext', 'completeCta', 'reward',
   ].map((k) => `wordTowerV2.estate.${k}`),
+  ...[
+    'pickFloor', 'goalRevenge', 'goalRevengeBlocked', 'goalRaid', 'coachTip', 'coachGotIt',
+    'aimChip', 'shieldsN', 'aimAt', 'prizeShield', 'prizeLoot', 'wreckFloor', 'wreckName',
+    'revengeName', 'revengeBonus', 'revengeFree', 'revengeBodyBlocked', 'tauntRevenge',
+    'district', 'floors', 'back',
+  ].map((k) => `wordTowerV2.rivals.${k}`),
   ...PERKS.flatMap((p) => [`wordTowerV2.rush.perk.${p.id}.name`, `wordTowerV2.rush.perk.${p.id}.desc`]),
   ...RANK_TIERS.map((r) => `wordTowerV2.rush.rank.${r.id}`),
   ...RUSH_TRAITS.map((k) => `wordTowerV2.rush.trait.${k}`),

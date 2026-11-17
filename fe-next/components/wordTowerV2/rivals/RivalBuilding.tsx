@@ -9,10 +9,12 @@ import { TowerMini, boardViewH } from './TowerMini';
 import { type Grievance, grievanceLine } from './Payback';
 import { type T, rivalName } from './rivalUtils';
 import { revengePrize } from './revengePrize';
+import { dismissRivalCoach, shouldShowRivalCoach } from './rivalCoach';
 
 /**
- * Target reveal, Coin Master's beat: who they are, what they built, what it
- * would cost them — then one loud button. No form, no settings.
+ * Target reveal: who they are, what they built, which floor you will aim at,
+ * then one loud button. The close control sits at the start of a real header
+ * row so it never covers the payback banner or fights the mute FAB (end corner).
  */
 
 interface Props {
@@ -24,7 +26,7 @@ interface Props {
   /** Raids you may launch right now (one banked per run). */
   charges: number;
   busy: boolean;
-  /** The floor they called, so the swing can mark it. */
+  /** The floor they called, so the swing can mark it — and aim at it. */
   onWreck: (targetIndex: number | null) => void;
   onClose: () => void;
   /** Coins in the bank, and what a wrecking ball costs — the way past "no charges". */
@@ -36,6 +38,7 @@ interface Props {
 export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onWreck, onClose, coins = 0, ballCost = 0, onBuyBall }: Props) {
   const [buying, setBuying] = useState(false);
   const [buyError, setBuyError] = useState<string | null>(null);
+  const [showCoach, setShowCoach] = useState(false);
   const canBuy = !revenge && charges <= 0 && !!onBuyBall && ballCost > 0;
   const afford = coins >= ballCost;
   const buyBall = async () => {
@@ -47,68 +50,76 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
     if (!r.ok) setBuyError(r.reason === 'coins' ? 'wordTowerV2.dailyTower.ballPoor' : 'wordTowerV2.dailyTower.ballError');
   };
   const name = rivalName(rival, t);
-  // Exactly what the round will build — never a taller preview than the target.
   const tower = wreckableTower(rival.lastTower);
   const floors = tower.length;
-  // Payback is free: the raid they landed on you IS the charge, spent once and
-  // avenged server-side. Only an ordinary raid waits on a run's charge.
   const ready = (revenge || charges > 0) && floors > 0 && !busy;
-  // The bar lets you choose WHICH building to smash. Here that is which floor:
-  // the top one is pre-called (the one that hurts most) and a tap moves it.
   const [target, setTarget] = useState<number | null>(floors > 0 ? floors - 1 : null);
   const targetWord = target != null ? (tower[target]?.word ?? '').toUpperCase() : '';
-  // What the swing is worth, stated before it is taken — the server's own
-  // payout formula at zero accuracy, so it is a floor and not a promise.
   const prize = revengePrize(rival);
-  // Make the global mute FAB re-probe its corner — it only does so on mount and
-  // on resize, so it sat on top of this screen's close button in round 2.
+  const goal = revenge
+    ? grievance?.blocked
+      ? t('wordTowerV2.rivals.goalRevengeBlocked', { name })
+      : t('wordTowerV2.rivals.goalRevenge', { name })
+    : t('wordTowerV2.rivals.goalRaid', { name });
+
   useEffect(() => {
     window.dispatchEvent(new Event('resize'));
-    // Absolute, not fixed: opened from a scrolled board it rendered half off-screen.
     window.scrollTo({ top: 0, behavior: 'auto' });
+    setShowCoach(shouldShowRivalCoach());
   }, []);
 
-  return (
-    <div className={`absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy p-4 text-neo-cream ${revenge ? 'ring-inset ring-[6px] ring-neo-pink' : ''}`} role="dialog" aria-modal="true">
-      {/* Payback opens ON them. The bar's revenge screen is the attacker's own
-          village with crosshairs already on it — never a neutral target picker —
-          so the debt is restated over their building, in their colour. */}
-      {revenge ? (
-        <div className="mx-auto mb-2 flex w-full max-w-md items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-1.5 pe-14 text-neo-navy shadow-hard motion-safe:animate-neo-pop md:max-w-[78rem] md:pe-3">
-          <Swords className="h-5 w-5 shrink-0" aria-hidden />
-          {/* Three lines on a phone: at two, "ran off with 240 coins" clipped
-              mid-number and read as "with 24…". */}
-          <p className="min-w-0 flex-1 text-start font-neo-display text-xs font-black uppercase leading-tight tracking-wide [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden md:[-webkit-line-clamp:2] md:text-lg">
-            {grievance ? grievanceLine(t, grievance, name) : t('wordTowerV2.rivals.revengeTitle')}
-          </p>
-          {grievance && !grievance.blocked && grievance.coinsStolen > 0 ? (
-            <span dir="ltr" className="shrink-0 rounded-sm border-neo border-black bg-neo-navy px-1.5 font-neo-display text-sm font-black tabular-nums text-neo-yellow md:text-xl">
-              -{grievance.coinsStolen}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-      <button
-        type="button"
-        onClick={onClose}
-        aria-label={t('wordTowerV2.rivals.back')}
-        className="absolute end-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-      >
-        <X className="h-5 w-5" aria-hidden />
-      </button>
+  const hideCoach = () => {
+    dismissRivalCoach();
+    setShowCoach(false);
+  };
 
-      {/* Phone: one column, the tower taking every pixel left over. Desktop/TV:
-          the dossier down one side and the building big on the other, because a
-          single centred column leaves two thirds of a 1920 screen empty. */}
-      <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col md:max-w-[78rem] md:flex-row-reverse md:items-stretch md:gap-10 md:px-6">
-        {/* min-h-0 or the flex child refuses to shrink and the tower renders as
-            a thumbnail in a screenful of empty navy — round 2's reveal shot. */}
+  return (
+    <div
+      className={`absolute inset-0 z-50 flex flex-col overflow-hidden bg-neo-navy text-neo-cream ${revenge ? 'ring-inset ring-[6px] ring-neo-pink' : ''}`}
+      role="dialog"
+      aria-modal="true"
+      data-testid="rival-building"
+    >
+      {/* Close at START, mute FAB reserved at END. Never position the X over the banner. */}
+      <header className="flex items-start gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={t('wordTowerV2.rivals.back')}
+          data-testid="rival-building-close"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+        >
+          <X className="h-5 w-5" aria-hidden />
+        </button>
+        {revenge ? (
+          <div
+            data-testid="rival-building-banner"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-1.5 text-neo-navy shadow-hard motion-safe:animate-neo-pop"
+          >
+            <Swords className="h-5 w-5 shrink-0" aria-hidden />
+            <p className="min-w-0 flex-1 text-start font-neo-display text-xs font-black uppercase leading-tight tracking-wide md:text-lg">
+              {grievance ? grievanceLine(t, grievance, name) : t('wordTowerV2.rivals.revengeTitle')}
+            </p>
+            {grievance && !grievance.blocked && grievance.coinsStolen > 0 ? (
+              <span dir="ltr" className="shrink-0 rounded-sm border-neo border-black bg-neo-navy px-1.5 font-neo-display text-sm font-black tabular-nums text-neo-yellow md:text-xl">
+                -{grievance.coinsStolen}
+              </span>
+            ) : null}
+          </div>
+        ) : (
+          <div className="min-w-0 flex-1" />
+        )}
+        {/* Global in-game mute FAB is pinned to the end corner. */}
+        <div className="h-11 w-11 shrink-0" aria-hidden />
+      </header>
+
+      <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col px-3 md:max-w-[78rem] md:flex-row-reverse md:items-stretch md:gap-10 md:px-6">
         <div className="order-2 flex min-h-0 flex-1 items-stretch justify-center md:order-none md:py-4">
           {floors > 0 ? (
             <TowerMini
               tower={tower}
               viewH={boardViewH([tower])}
-              halfW={Math.max(...tower.map((b) => Math.abs(b.x) + b.w / 2)) + 62}
+              halfW={Math.max(...tower.map((b) => Math.abs(b.x) + b.w / 2)) + 28}
               className="h-full w-full motion-safe:animate-neo-pop"
               title={t('wordTowerV2.rivals.target', { name })}
               pick={{
@@ -122,11 +133,8 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
           )}
         </div>
 
-        {/* `contents` on phone: the header, the taunt and the CTA are direct
-            children of the column so the tower can own the space between them.
-            On desktop this becomes the left-hand dossier. */}
         <div className="contents md:order-none md:flex md:w-[24rem] md:shrink-0 md:flex-col md:justify-center md:gap-6 lg:w-[30rem]">
-          <div className="flex items-center gap-3 pe-12 md:pe-0">
+          <div className="flex items-center gap-3">
             <Avatar userId={rival.userId} customAvatar={rival.avatar.avatarConfig as never} size="lg" />
             <div className="min-w-0">
               <p className="truncate font-neo-display text-2xl font-black uppercase leading-none md:text-4xl">{name}</p>
@@ -146,40 +154,36 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
                 {rival.shields > 0 ? (
                   <span className="flex items-center gap-1 rounded-sm border-neo border-black bg-neo-purple px-1.5 py-0.5 text-neo-navy">
                     <Shield className="h-3 w-3 md:h-4 md:w-4" aria-hidden />
-                    {rival.shields}
+                    {t('wordTowerV2.rivals.shieldsN', { n: rival.shields })}
                   </span>
                 ) : null}
               </p>
             </div>
           </div>
 
-          {/* Their trash talk first — that is what makes this personal — then the
-              one instruction, small, under it. */}
-          <div className="mt-2 rounded-neo border-neo border-black bg-neo-navy-light px-12 py-1.5 text-center md:mt-0 md:px-4 md:py-4 md:text-start">
-            <p className="font-neo-display text-sm font-bold md:text-2xl md:leading-snug">
-              {revenge ? t('wordTowerV2.rivals.tauntRevenge', { name }) : t('wordTowerV2.rivals.taunt', { name })}
+          <div className="mt-2 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 text-center md:mt-0 md:px-4 md:py-4 md:text-start">
+            <p data-testid="rival-building-goal" className="font-neo-display text-sm font-bold md:text-2xl md:leading-snug">
+              {goal}
             </p>
             {floors > 0 ? (
-              <p className="mt-0.5 flex items-center justify-center gap-1.5 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-pink md:mt-2 md:justify-start md:text-base">
+              <p className="mt-1 flex items-center justify-center gap-1.5 font-neo-display text-xs font-bold uppercase tracking-wide text-neo-yellow md:mt-2 md:justify-start md:text-base">
                 <Crosshair className="h-3.5 w-3.5 shrink-0 md:h-5 md:w-5" aria-hidden />
                 {t('wordTowerV2.rivals.pickFloor')}
               </p>
             ) : null}
-            {/* Which floor is called, in words. The tower shows one bracket; this
-                says what is inside it, so the choice has a stated stake instead
-                of being a colour you tapped. */}
+            {showCoach && floors > 0 ? (
+              <p data-testid="rival-coach" className="mt-2 rounded-neo border-neo border-black bg-neo-cream px-2.5 py-1.5 text-start font-neo-display text-xs font-bold leading-snug text-neo-navy md:text-sm">
+                {t('wordTowerV2.rivals.coachTip')}{' '}
+                <button type="button" onClick={hideCoach} className="underline underline-offset-2">
+                  {t('wordTowerV2.rivals.coachGotIt')}
+                </button>
+              </p>
+            ) : null}
             {floors > 0 && target != null ? (
-              <p className="mt-1 flex flex-wrap items-center justify-center gap-1.5 md:mt-3 md:justify-start">
-                <span className="rounded-sm border-neo border-black bg-neo-pink px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase tabular-nums text-neo-navy md:text-sm" dir="ltr">
-                  {t('wordTowerV2.rivals.floorOf', { n: target + 1, total: floors })}
-                </span>
+              <p className="mt-2 flex flex-wrap items-center justify-center gap-1.5 md:justify-start">
                 <span className="max-w-full truncate rounded-sm border-neo border-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase text-neo-navy md:text-sm">
-                  {targetWord}
+                  {t('wordTowerV2.rivals.aimChip', { word: targetWord })}
                 </span>
-                {/* And what the swing pays. A shielded rival used to read as a
-                    wasted trip; it breaks their wall and still banks scrap. It
-                    rides with the stakes rather than under the CTA, where on a
-                    390px phone it pushed the price line off the bottom. */}
                 <span className="flex items-center gap-1 rounded-sm border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-display text-[11px] font-black uppercase text-neo-navy md:text-sm">
                   <Coins className="h-3.5 w-3.5 shrink-0 md:h-4 md:w-4" aria-hidden />
                   {prize.shielded
@@ -196,6 +200,7 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
               onClick={() => onWreck(target)}
               disabled={!ready}
               autoFocus
+              data-testid="rival-building-cta"
               className="flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-4 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50 disabled:shadow-none md:py-6 md:text-4xl"
             >
               <Hammer className="h-7 w-7 md:h-10 md:w-10" aria-hidden />
@@ -229,12 +234,8 @@ export function RivalBuilding({ t, rival, revenge, grievance, charges, busy, onW
                 ) : null}
               </>
             ) : null}
-            {/* Say the price out loud. On a payback it is "nothing, they
-                started it"; on an ordinary raid it is one banked run. */}
-            {/* The mute FAB floats over this corner on a phone, so the price
-                line keeps clear of it instead of being read half-covered. */}
             <p
-              className={`mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 pe-12 pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] text-center font-neo-display text-xs font-bold uppercase tracking-wide md:pe-0 md:pb-0 md:text-base ${
+              className={`mt-1.5 flex flex-wrap items-center justify-center gap-x-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] text-center font-neo-display text-xs font-bold uppercase tracking-wide md:pb-0 md:text-base ${
                 revenge ? 'text-neo-lime' : 'opacity-80'
               }`}
             >

@@ -39,8 +39,10 @@ interface Props {
 }
 
 const SPRITE_H: Record<Props['size'], string> = {
-  back: 'h-[clamp(90px,13vh,160px)]',
-  front: 'h-[clamp(112px,17vh,200px)]',
+  // Shorter than the previous 13vh/17vh clamps so two rows plus name plates
+  // fit under the news banners on a short phone without clipping roofs.
+  back: 'h-[clamp(84px,12vh,140px)]',
+  front: 'h-[clamp(104px,15vh,176px)]',
   wide: 'h-[clamp(150px,28vh,340px)]',
 };
 
@@ -108,8 +110,12 @@ export function PlotCard({ t, district, plot, material, name, cost, affordable, 
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
+      data-testid={`plot-card-${plot.slot}`}
+      data-selected={selected ? 'true' : undefined}
       aria-label={`${name} ${t('wordTowerV2.estate.level', { n: plot.level })}`}
-      className="group relative flex w-full flex-col items-center justify-end focus:outline-none"
+      className={`group relative flex w-full flex-col items-center justify-end rounded-neo px-0.5 pb-1.5 pt-2 focus:outline-none ${
+        selected ? 'bg-neo-yellow/20 ring-[4px] ring-neo-yellow' : 'ring-0'
+      }`}
     >
       <m.div
         className="relative flex w-full items-end justify-center"
@@ -149,16 +155,16 @@ export function PlotCard({ t, district, plot, material, name, cost, affordable, 
         </m.span>
       </m.div>
 
-      <div className={`-mt-1 flex items-center gap-1 rounded-neo border-neo px-1.5 py-0.5 font-neo-display text-[11px] font-black shadow-hard-sm md:text-sm ${TAG_CLS[id.state]}`}>
+      <div className={`mt-1.5 flex items-center gap-1 rounded-neo border-neo px-1.5 py-0.5 font-neo-display text-[11px] font-black shadow-hard-sm md:text-sm ${TAG_CLS[id.state]}`}>
         <Icon className="h-3.5 w-3.5 md:h-4 md:w-4" aria-hidden />
         <span className="tabular-nums">{tag.text}</span>
       </div>
 
-      <div className="mt-1 flex gap-[3px]" aria-hidden>
+      <div className="mt-1.5 flex gap-1" aria-hidden data-testid={`plot-pips-${plot.slot}`}>
         {Array.from({ length: MAX_PLOT_LEVEL }, (_, i) => (
           <span
             key={i}
-            className={`h-1.5 w-3 rounded-[2px] border-2 border-black md:w-5 ${i < plot.level ? (maxed ? 'bg-neo-yellow' : 'bg-neo-cyan') : 'bg-neo-navy-light'}`}
+            className={`h-2 w-3.5 rounded-[2px] border-2 border-black md:h-2.5 md:w-5 ${i < plot.level ? (maxed ? 'bg-neo-yellow' : 'bg-neo-cyan') : 'bg-neo-navy-light'}`}
           />
         ))}
       </div>

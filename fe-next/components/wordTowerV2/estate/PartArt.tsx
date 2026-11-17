@@ -104,7 +104,9 @@ export function PartArt({ slot, level, material, damaged, className }: Props) {
 
   return (
     <svg viewBox="0 0 120 120" className={className} aria-hidden>
-      <rect x={0} y={GROUND} width={120} height={28} fill="#141830" />
+      {/* A narrow lot under the tower — not a full-width black slab that
+          made every part look like it was floating on a tile. */}
+      <ellipse cx={60} cy={GROUND + 16} rx={44} ry={11} fill="#1c2448" opacity={0.95} />
       {FLOORS.map((y, i) => (
         <g key={y}>
           <rect x={X0} y={y} width={FW} height={16} fill={FLOOR} stroke={INK} strokeWidth={2} />

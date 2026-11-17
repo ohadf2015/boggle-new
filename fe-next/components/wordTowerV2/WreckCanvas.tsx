@@ -129,7 +129,9 @@ export default function WreckCanvas({ className, ...props }: Props) {
     });
     let app: Application | null = null;
 
-    const world: WreckWorld = buildWreckWorldFromTower(propsRef.current.tower);
+    const world: WreckWorld = buildWreckWorldFromTower(propsRef.current.tower, {
+      aimFloor: propsRef.current.targetIndex,
+    });
     let ballsLeft = propsRef.current.balls;
     let cutAt = 0;
     let spentAt = 0;
