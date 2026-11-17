@@ -205,6 +205,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     onWordSubmit: submitTypedWord,
     minWordLength: MIN_DISCOVERY_WORD_LENGTH,
     disablePathHighlighting: true,
+    submitOffGrid: true,
   });
 
   const pixiOverlay =
@@ -265,6 +266,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     stage,
     onLive: onStageLive,
     onRelease: onStageRelease,
+    onTooShort: actions.handleTooShort,
     typedWord: keyboardInput.typedWord,
     feedbackMessage: state.feedbackMessage,
     discoveredWords: state.discoveredWords,
@@ -444,7 +446,22 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <HuntPlayfield
           {...playfieldProps}
           size={inShell ? 'desktop' : 'phone'}
-          stageOverlay={rewardAnchor}
+          stageOverlay={
+            <>
+              {rewardAnchor}
+              {timed && stage.late && state.feedbackSeq === stage.late.seq && (
+                <div className="absolute inset-x-0 -top-7 z-10 pointer-events-none">
+                  <HuntFeedbackPill
+                    seq={stage.late.seq}
+                    type={state.feedbackType}
+                    message={state.feedbackMessage}
+                    word={state.feedbackWord}
+                    calm={calm}
+                  />
+                </div>
+              )}
+            </>
+          }
         />
         {finishOverlay}
       </div>

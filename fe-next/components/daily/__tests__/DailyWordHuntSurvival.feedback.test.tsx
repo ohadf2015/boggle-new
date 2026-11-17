@@ -124,6 +124,42 @@ describe('DailyWordHuntSurvival word feedback', () => {
     localStorage.removeItem('lexiclash_daily_challenge_progress');
   });
 
+  it('Given a typed word with a letter the board does not have, When Enter is pressed, Then the pill says it is not on the board', async () => {
+    localStorage.setItem('lexiclash_daily_challenge_progress', JSON.stringify({ challengesCompleted: 5 }));
+    renderHunt();
+    type('zap');
+    fireEvent.keyDown(document, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByTestId('hunt-feedback-pill')).toBeInTheDocument());
+    const pill = screen.getByTestId('hunt-feedback-pill');
+    expect(pill.getAttribute('data-type')).toBe('not-on-board');
+    expect(pill.textContent).toContain('ZAP');
+    localStorage.removeItem('lexiclash_daily_challenge_progress');
+  });
+
+  it('Given a timed round and a word still being checked, When the next word lands first and then the late verdict arrives, Then the late verdict still shows for its word', async () => {
+    let answer: (r: Response) => void = () => {};
+    global.fetch = vi.fn((url: string) =>
+      String(url).includes('/api/dictionary/check')
+        ? new Promise<Response>((resolve) => { answer = resolve; })
+        : Promise.resolve({ ok: false, json: async () => ({}) } as Response),
+    ) as unknown as typeof fetch;
+    render(
+      <DailyWordHuntSurvival grid={grid} puzzleNumber={1} language="en" targetWord="HOUSE" timeLimitSec={90} onComplete={vi.fn()} onQuit={vi.fn()} />,
+    );
+    type('sea');
+    fireEvent.keyDown(document, { key: 'Enter' });
+    type('ht');
+    fireEvent.keyDown(document, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByTestId('hunt-stage').getAttribute('data-verdict')).toBe('bad'));
+    expect(screen.queryByTestId('hunt-feedback-pill')).toBeNull();
+
+    answer(new Response(JSON.stringify({ isValid: false, source: 'dictionary' })));
+
+    const late = await screen.findByTestId('hunt-feedback-pill');
+    expect(late.getAttribute('data-type')).toBe('not-in-dictionary');
+    expect(late.textContent).toContain('SEA');
+  });
+
   it('Given a first game, When a word is not on the board, Then the pill names it without a life cost', async () => {
     localStorage.removeItem('lexiclash_daily_challenge_progress');
     renderHunt();

@@ -11,6 +11,7 @@ import {
   INVALID_WORD_PENALTY,
   NOT_IN_DICTIONARY_PENALTY,
   FEEDBACK_OVERLAY_DURATION,
+  WORD_CHECK_TIMEOUT_MS,
   getLifeBonusForWord,
 } from './constants';
 import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
@@ -58,6 +59,7 @@ type DiscoveryOutcome = 'accepted' | 'invalid' | 'unavailable' | 'rejected';
 export interface SurvivalWordSubmissionActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
+  handleTooShort: (word: string) => void;
   validateWordInDictionary: (word: string) => Promise<WordVerdict>;
 }
 
@@ -81,7 +83,7 @@ export function useSurvivalWordSubmission({
   forgiveMisses = false,
 }: UseSurvivalWordSubmissionProps): SurvivalWordSubmissionActions {
   // Callback refs for circular dependencies
-  const handleTargetAttemptRef = useRef<((word: string, target: string) => void) | null>(null);
+  const handleTargetAttemptRef = useRef<((word: string, target: string, missAlreadyNamed?: boolean) => void) | null>(null);
   const handleWordDiscoveryRef = useRef<((word: string) => Promise<DiscoveryOutcome>) | null>(null);
   const handleDiscoveryFeedbackRef = useRef<((word: string, target: string) => void) | null>(null);
 
@@ -108,7 +110,13 @@ export function useSurvivalWordSubmission({
 
   const validateWordInDictionary = useCallback(async (word: string): Promise<WordVerdict> => {
     if (word.toLowerCase() === targetWord.toLowerCase()) return 'valid';
-    return resolveWordVerdict(word.toLowerCase(), language);
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), WORD_CHECK_TIMEOUT_MS);
+    try {
+      return await resolveWordVerdict(word.toLowerCase(), language, { signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
   }, [language, targetWord]);
 
   // Handle word change from grid
@@ -117,7 +125,7 @@ export function useSurvivalWordSubmission({
   }, [dispatch]);
 
   // Handle target attempt
-  const handleTargetAttempt = useCallback((word: string, target: string) => {
+  const handleTargetAttempt = useCallback((word: string, target: string, missAlreadyNamed = false) => {
     const normalizedWord = normalizeWord(word, language);
     if (attemptsRef.current.some(a => normalizeWord(a.word, language) === normalizedWord)) {
       playWordRejectedSound?.();
@@ -156,6 +164,7 @@ export function useSurvivalWordSubmission({
     }
 
     dispatch({ type: 'ADJUST_LIFE', payload: { delta: -INVALID_WORD_PENALTY } });
+    if (!missAlreadyNamed) showToast('target-attempt', t('tutorial.wordHunt.lesson.guessWrong'), word);
 
     const targetAttemptCount = newAttempts.filter(a => !a.isDiscovery).length;
     if (targetAttemptCount >= MAX_ATTEMPTS) {
@@ -315,7 +324,7 @@ export function useSurvivalWordSubmission({
         // The guess is charged only once the dictionary has answered.
         void handleWordDiscoveryRef.current?.(displayWord).then((outcome) => {
           if (outcome === 'accepted' || outcome === 'invalid') {
-            handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase());
+            handleTargetAttemptRef.current?.(displayWord, targetWord.toUpperCase(), outcome === 'invalid');
           }
         });
       } else {
@@ -335,6 +344,12 @@ export function useSurvivalWordSubmission({
     }
   }, [isGameOver, targetWord, grid, language, showToast, t, chargeMiss, forgiveMisses]);
 
+  const handleTooShort = useCallback((word: string) => {
+    if (isGameOverRef.current) return;
+    playWordRejectedSound?.();
+    showToast('too-short', t('wordHunt.feedback.tooShort') || `Minimum ${MIN_DISCOVERY_WORD_LENGTH} letters`, word.toUpperCase());
+  }, [playWordRejectedSound, showToast, t]);
+
   // Keep callback refs in sync
   useEffect(() => {
     handleTargetAttemptRef.current = handleTargetAttempt;
@@ -351,6 +366,7 @@ export function useSurvivalWordSubmission({
   return {
     handleWordSubmit,
     handleWordChange,
+    handleTooShort,
     validateWordInDictionary,
   };
 }

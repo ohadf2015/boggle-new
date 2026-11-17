@@ -10,6 +10,10 @@ export interface HuntStageState {
   path: HuntCell[];
   verdict: HuntVerdict | null;
   releaseSeq: number;
+  /** Released words still waiting for their verdict, oldest first. */
+  waiting: string[];
+  /** A verdict that landed after the player moved on to another word. */
+  late: { word: string; verdict: HuntVerdict; seq: number } | null;
 }
 
 export type HuntStageEvent =
@@ -17,7 +21,8 @@ export type HuntStageEvent =
   | { type: 'release'; word: string; path: HuntCell[]; seq: number }
   /** `word` is the word the verdict is about; feedback about no word (hints, tokens) never lands on the stage. */
   | { type: 'feedback'; seq: number; verdict: HuntVerdict | null; word: string | null }
-  | { type: 'expire' };
+  | { type: 'expire' }
+  | { type: 'lateExpire' };
 
 export const VERDICT_HOLD_MS = 700;
 /** A rejection carries a reason (and usually a life cost): give it time to be read. */
@@ -30,10 +35,15 @@ export const initialHuntStage: HuntStageState = {
   path: [],
   verdict: null,
   releaseSeq: 0,
+  waiting: [],
+  late: null,
 };
 
-const GOOD: ReadonlySet<FeedbackType> = new Set(['valid-word', 'discovery', 'short-valid', 'target-attempt']);
-const BAD: ReadonlySet<FeedbackType> = new Set(['not-on-board', 'not-in-dictionary', 'invalid-word']);
+const MAX_WAITING = 4;
+const sameWord = (a: string, b: string) => a.toUpperCase() === b.toUpperCase();
+
+const GOOD: ReadonlySet<FeedbackType> = new Set(['valid-word', 'discovery', 'short-valid']);
+const BAD: ReadonlySet<FeedbackType> = new Set(['not-on-board', 'not-in-dictionary', 'invalid-word', 'target-attempt']);
 
 export function verdictFor(type: FeedbackType | null): HuntVerdict | null {
   if (!type) return null;
@@ -62,17 +72,40 @@ export function huntStageReducer(state: HuntStageState, event: HuntStageEvent): 
   switch (event.type) {
     case 'live':
       if (state.phase !== 'live' && state.phase !== 'idle' && event.word === state.word) return state;
-      if (event.word) return { ...initialHuntStage, phase: 'live', word: event.word };
-      return state.phase === 'live' ? initialHuntStage : state;
+      if (event.word) return { ...initialHuntStage, phase: 'live', word: event.word, waiting: state.waiting, late: state.late };
+      return state.phase === 'live' ? { ...initialHuntStage, waiting: state.waiting, late: state.late } : state;
     case 'release':
-      return { phase: 'pending', word: event.word, path: event.path, verdict: null, releaseSeq: event.seq };
-    case 'feedback':
-      if (state.phase !== 'pending' || event.seq <= state.releaseSeq || !event.verdict) return state;
+      return {
+        phase: 'pending',
+        word: event.word,
+        path: event.path,
+        verdict: null,
+        releaseSeq: event.seq,
+        waiting: [...state.waiting, event.word].slice(-MAX_WAITING),
+        late: state.late,
+      };
+    case 'feedback': {
+      const { word, verdict } = event;
+      if (!word || !verdict) return state;
+      if (state.phase === 'pending' && event.seq > state.releaseSeq && sameWord(word, state.word)) {
+        return { ...state, phase: 'verdict', verdict, waiting: state.waiting.filter((w) => !sameWord(w, word)) };
+      }
+      // One word can get a second verdict: a real word found on the board that was also a wrong guess.
+      if (state.phase === 'verdict' && event.seq > state.releaseSeq && sameWord(word, state.word) && verdict !== state.verdict) {
+        return { ...state, verdict };
+      }
       // A verdict for an earlier word that was still being checked must not land on this one.
-      if (!event.word || event.word.toUpperCase() !== state.word.toUpperCase()) return state;
-      return { ...state, phase: 'verdict', verdict: event.verdict };
+      if (!state.waiting.some((w) => sameWord(w, word))) return state;
+      return { ...state, waiting: state.waiting.filter((w) => !sameWord(w, word)), late: { word: word.toUpperCase(), verdict, seq: event.seq } };
+    }
     case 'expire':
-      return initialHuntStage;
+      return {
+        ...initialHuntStage,
+        waiting: state.phase === 'pending' ? state.waiting.filter((w) => !sameWord(w, state.word)) : state.waiting,
+        late: state.late,
+      };
+    case 'lateExpire':
+      return state.late ? { ...state, late: null } : state;
     default:
       return state;
   }

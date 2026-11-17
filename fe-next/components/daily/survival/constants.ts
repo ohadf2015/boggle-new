@@ -70,6 +70,9 @@ export const NOT_IN_DICTIONARY_PENALTY = 4;
  */
 export const FEEDBACK_OVERLAY_DURATION = 1200;
 
+/** Kept under the word stage's pending timeout, so a slow check still lands on the word it is about. */
+export const WORD_CHECK_TIMEOUT_MS = 5000;
+
 /**
  * Delay before gray (non-clue) letters fade to '?' in the feedback overlay.
  * Gray letters flash briefly so the player sees what they guessed,

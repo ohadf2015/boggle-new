@@ -25,6 +25,20 @@ function shuffleInPlace<T>(arr: T[], random: () => number): T[] {
   return arr;
 }
 
+const LETTER_CAP = 4;
+const TARGET_LETTER_CAP = 3;
+const PATH_SEARCH_BUDGET = 2000;
+const MIN_VOWEL_SHARE = 0.3;
+const VOWELS: Partial<Record<Language, string>> = {
+  en: 'AEIOU', sv: 'AEIOUYÅÄÖ', es: 'AEIOUÁÉÍÓÚÜ', ru: 'АЕЁИОУЫЭЮЯ',
+};
+
+function countLetters(cells: Iterable<string | null>): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const c of cells) if (c !== null) m.set(c, (m.get(c) ?? 0) + 1);
+  return m;
+}
+
 /** Encode row,col as a single number for fast Set operations */
 function cellKey(row: number, col: number, cols: number): number {
   return row * cols + col;
@@ -90,11 +104,12 @@ export function findWordPathInPartialGrid(
 ): Array<{ row: number; col: number }> | null {
   const path: Array<{ row: number; col: number }> = [];
   const visited = new Set<number>();
-  const dirScratch = directions.slice();
+  let budget = PATH_SEARCH_BUDGET;
 
   function dfs(row: number, col: number, charIndex: number): boolean {
     if (charIndex === word.length) return true;
     if (row < 0 || row >= rows || col < 0 || col >= cols) return false;
+    if (--budget < 0) return false;
 
     const key = cellKey(row, col, cols);
     if (visited.has(key)) return false;
@@ -108,9 +123,9 @@ export function findWordPathInPartialGrid(
 
     if (charIndex === word.length - 1) return true;
 
-    shuffleInPlace(dirScratch, random);
-    for (let d = 0; d < dirScratch.length; d++) {
-      if (dfs(row + dirScratch[d].dr, col + dirScratch[d].dc, charIndex + 1)) return true;
+    const dirs = shuffleInPlace(directions.slice(), random);
+    for (let d = 0; d < dirs.length; d++) {
+      if (dfs(row + dirs[d].dr, col + dirs[d].dc, charIndex + 1)) return true;
     }
 
     visited.delete(key);
@@ -233,7 +248,8 @@ export function embedMultipleWordsInGrid(
   rows: number,
   cols: number,
   random: () => number,
-  language: Language
+  language: Language,
+  balanced = false,
 ): LetterGrid {
   const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
   const usedCells = new Set<string>();
@@ -273,6 +289,27 @@ export function embedMultipleWordsInGrid(
     }
   }
 
+  // A board where the target's letters pile up gives the answer away before any guess.
+  const targetCounts = countLetters(targetUpper);
+  const capOf = (letter: string): number =>
+    (!balanced ? Infinity : targetCounts.has(letter) ? Math.max(TARGET_LETTER_CAP, targetCounts.get(letter)! + 1) : LETTER_CAP);
+  const onGrid = countLetters(grid.flat());
+  const vowels = VOWELS[language];
+  const isVowel = (l: string): boolean => vowels?.includes(l) ?? false;
+  const vowelTarget = balanced ? Math.ceil(rows * cols * MIN_VOWEL_SHARE) : 0;
+  const fitsCap = (word: string, path: Array<{ row: number; col: number }>): boolean => {
+    const added = new Map<string, number>();
+    path.forEach((p, i) => {
+      if (grid[p.row][p.col] === null) added.set(word[i], (added.get(word[i]) ?? 0) + 1);
+    });
+    for (const [l, n] of added) if ((onGrid.get(l) ?? 0) + n > capOf(l)) return false;
+    if (!vowels) return true;
+    let vowelsAfter = 0, filledAfter = 0;
+    for (const [l, n] of onGrid) { filledAfter += n; if (isVowel(l)) vowelsAfter += n; }
+    for (const [l, n] of added) { filledAfter += n; if (isVowel(l)) vowelsAfter += n; }
+    return vowelTarget - vowelsAfter <= rows * cols - filledAfter;
+  };
+
   // Embed bonus words — prefer starts where first letter already matches
   let embeddedCount = 0;
   let sameLengthEmbedded = 0;
@@ -299,8 +336,11 @@ export function embedMultipleWordsInGrid(
         wordUpper, start.row, start.col, rows, cols, random, EIGHT_DIRECTIONS, grid, usedCells
       );
 
-      if (path && path.length === wordUpper.length) {
+      if (path && path.length === wordUpper.length && fitsCap(wordUpper, path)) {
         for (let i = 0; i < path.length; i++) {
+          if (grid[path[i].row][path[i].col] === null) {
+            onGrid.set(wordUpper[i], (onGrid.get(wordUpper[i]) ?? 0) + 1);
+          }
           grid[path[i].row][path[i].col] = wordUpper[i];
           usedCells.add(`${path[i].row},${path[i].col}`);
         }
@@ -317,11 +357,23 @@ export function embedMultipleWordsInGrid(
     );
   }
 
-  // Fill remaining cells
+  let vowelsNeeded = Math.ceil(rows * cols * MIN_VOWEL_SHARE) - grid.flat().filter((c) => c !== null && isVowel(c)).length;
+  let emptyLeft = grid.flat().filter((c) => c === null).length;
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
       if (grid[i][j] === null) {
-        grid[i][j] = letters[Math.floor(random() * letters.length)];
+        const open = balanced
+          ? letters.filter((l) => !targetCounts.has(l) && (onGrid.get(l) ?? 0) < capOf(l))
+          : letters;
+        const openVowels = balanced && vowelsNeeded > 0 && (vowelsNeeded >= emptyLeft || random() < vowelsNeeded / emptyLeft)
+          ? letters.filter((l) => isVowel(l) && (onGrid.get(l) ?? 0) < capOf(l))
+          : [];
+        const pool = openVowels.length > 0 ? openVowels : open.length > 0 ? open : letters;
+        const letter = pool[Math.floor(random() * pool.length)];
+        grid[i][j] = letter;
+        onGrid.set(letter, (onGrid.get(letter) ?? 0) + 1);
+        if (isVowel(letter)) vowelsNeeded--;
+        emptyLeft--;
       }
     }
   }

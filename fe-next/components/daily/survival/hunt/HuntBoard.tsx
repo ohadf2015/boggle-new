@@ -20,6 +20,8 @@ export interface HuntBoardProps {
   onWordChange?: (word: string, count: number) => void;
   onLive: (word: string) => void;
   onRelease: (word: string, path: HuntCell[]) => void;
+  /** A tapped selection too short for the engine to submit, left idle. */
+  onTooShort?: (word: string) => void;
   phase: HuntPhase;
   verdict: HuntVerdict | null;
   heldPath: HuntCell[];
@@ -72,6 +74,7 @@ export function HuntBoard({
   onWordChange,
   onLive,
   onRelease,
+  onTooShort,
   phase,
   verdict,
   heldPath,
@@ -105,7 +108,14 @@ export function HuntBoard({
       window.clearTimeout(strayTimer.current);
       if (path.length > 0 && path.length < 3) {
         strayTimer.current = window.setTimeout(() => {
-          if (selection.current?.getMode() === 'click') selection.current.setPath([]);
+          if (selection.current?.getMode() !== 'click') return;
+          const stray = selection.current.getPath();
+          const strayWord = stray.map((c) => c.letter).join('');
+          if (onTooShort && strayWord) {
+            onRelease(strayWord, stray.map((c) => ({ row: c.row, col: c.col })));
+            onTooShort(strayWord);
+          }
+          selection.current.setPath([]);
         }, HUNT_IDLE_SUBMIT_MS);
       }
       const word = path.map((c) => c.letter).join('');

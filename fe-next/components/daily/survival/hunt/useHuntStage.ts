@@ -45,6 +45,14 @@ export function useHuntStage({
     return () => clearTimeout(id);
   }, [stage.phase, stage.releaseSeq, stage.word, stage.verdict]);
 
+  const lateSeq = stage.late?.seq;
+  const lateVerdict = stage.late?.verdict ?? null;
+  useEffect(() => {
+    if (lateSeq == null) return;
+    const id = setTimeout(() => dispatch({ type: 'lateExpire' }), verdictHoldMs(lateVerdict));
+    return () => clearTimeout(id);
+  }, [lateSeq, lateVerdict]);
+
   const live = useCallback((word: string) => {
     liveWord.set(word);
     // Mid-drag letters only change the live word; the stage moves on the first letter and on clear.

@@ -42,6 +42,8 @@ export interface UseKeyboardWordInputOptions {
   minWordLength?: number;
   /** Disable path highlighting (e.g. Word Hunt — showing the path reveals the answer) */
   disablePathHighlighting?: boolean;
+  /** Submit even a word the grid cannot hold, for games that answer every submit themselves (Word Hunt). */
+  submitOffGrid?: boolean;
 }
 
 export interface UseKeyboardWordInputReturn {
@@ -237,6 +239,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     onTypedWordChange,
     minWordLength = 2,
     disablePathHighlighting = false,
+    submitOffGrid = false,
   } = options;
 
   const [typedWord, setTypedWord] = useState('');
@@ -277,12 +280,12 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   // Submit typed word
   const submitTypedWord = useCallback(() => {
     const word = typedWordRef.current;
-    if (word.length >= minWordLength && isValidOnGrid) {
+    if (word.length >= minWordLength && (isValidOnGrid || submitOffGrid)) {
       onWordSubmit?.(word, { inputMethod: 'kb' });
       setTypedWord('');
       setIsTypingMode(false);
     }
-  }, [minWordLength, isValidOnGrid, onWordSubmit]);
+  }, [minWordLength, isValidOnGrid, submitOffGrid, onWordSubmit]);
 
   // Handle keyboard input
   useEffect(() => {

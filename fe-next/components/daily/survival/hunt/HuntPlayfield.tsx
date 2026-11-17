@@ -21,6 +21,7 @@ export interface HuntPlayfieldProps {
   liveWord?: LiveWordStore;
   onLive: (word: string) => void;
   onRelease: (word: string, path: HuntCell[]) => void;
+  onTooShort?: (word: string) => void;
   typedWord: string;
   feedbackMessage: string;
   discoveredWords: WordDiscovery[];
@@ -47,6 +48,7 @@ function HuntPlayfieldInner({
   liveWord,
   onLive,
   onRelease,
+  onTooShort,
   typedWord,
   feedbackMessage,
   discoveredWords,
@@ -98,6 +100,7 @@ function HuntPlayfieldInner({
           onWordChange={onWordChange}
           onLive={onLive}
           onRelease={onRelease}
+          onTooShort={onTooShort}
           phase={stage.phase}
           verdict={stage.verdict}
           heldPath={stage.path}

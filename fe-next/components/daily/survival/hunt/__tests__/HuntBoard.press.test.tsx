@@ -109,6 +109,25 @@ describe('HuntBoard tap to spell on a phone', () => {
     expect(getByTestId('grid-doubleclick-submit-hint').textContent).toBe('Tap the last letter again to submit');
   });
 
+  it('Given two tapped letters, When the finger rests past the idle window, Then the player is told the word is too short instead of it vanishing', () => {
+    vi.useFakeTimers();
+    const onTooShort = vi.fn();
+    const onRelease = vi.fn();
+    const { container } = render(
+      <HuntBoard
+        grid={grid} interactive eliminatedLetters={new Set()}
+        onWordSubmit={() => {}} onRelease={onRelease} onLive={() => {}} onTooShort={onTooShort}
+        phase="idle" verdict={null} heldPath={[]} calm={false} t={(k: string) => k}
+      />,
+    );
+    tap(container, 0, 0);
+    tap(container, 0, 1);
+    act(() => { vi.advanceTimersByTime(HUNT_IDLE_SUBMIT_MS + 50); });
+    expect(onTooShort).toHaveBeenCalledWith('CA');
+    expect(onRelease).toHaveBeenCalledWith('CA', [{ row: 0, col: 0 }, { row: 0, col: 1 }]);
+    expect(selectedKeys(container)).toEqual([]);
+  });
+
   it('Given a tapped word of three letters, When the finger rests, Then it submits on its own like a desktop click', () => {
     vi.useFakeTimers();
     const { container, onWordSubmit } = tapBoard();

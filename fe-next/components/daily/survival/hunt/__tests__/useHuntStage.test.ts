@@ -121,4 +121,17 @@ describe('useHuntStage live word', () => {
     act(() => result.current.live('D'));
     expect(result.current.stage.phase).toBe('live');
   });
+
+  it('Given a late verdict for an earlier word, When it has been shown long enough to read, Then it clears and the current word stays', () => {
+    vi.useFakeTimers();
+    const { result, rerender } = setup();
+    act(() => result.current.release('CAT', path));
+    act(() => result.current.live('D'));
+    rerender({ seq: 1, type: 'not-in-dictionary', word: 'CAT' });
+    expect(result.current.stage.late).toMatchObject({ word: 'CAT', verdict: 'bad' });
+
+    act(() => vi.advanceTimersByTime(verdictHoldMs('bad') + 10));
+    expect(result.current.stage.late).toBeNull();
+    expect(result.current.stage).toMatchObject({ phase: 'live', word: 'D' });
+  });
 });

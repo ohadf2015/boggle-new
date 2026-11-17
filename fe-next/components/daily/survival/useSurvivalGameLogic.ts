@@ -110,6 +110,7 @@ export interface SurvivalGameState {
 export interface SurvivalGameActions {
   handleWordSubmit: (word: string) => void;
   handleWordChange: (word: string, count: number) => void;
+  handleTooShort: (word: string) => void;
   showToast: (type: FeedbackType, message: string) => void;
   closeToast: () => void;
   setShowQuitConfirm: (show: boolean) => void;
@@ -451,6 +452,7 @@ export function useSurvivalGameLogic({
   const actions: SurvivalGameActions = {
     handleWordSubmit: wordSubmission.handleWordSubmit,
     handleWordChange: wordSubmission.handleWordChange,
+    handleTooShort: wordSubmission.handleTooShort,
     showToast,
     closeToast,
     setShowQuitConfirm,

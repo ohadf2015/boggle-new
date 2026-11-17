@@ -14,7 +14,7 @@ import {
 } from '../consts';
 import type { Language, LetterGrid } from '@/types';
 import type { DailyPuzzle, DailyTargetWord } from './types';
-import { SEED_SALT, normalizeHebrewFinalLetters, MIN_SAME_LENGTH_WORDS, MAX_TARGET_WORD_LENGTH } from './constants';
+import { SEED_SALT, normalizeHebrewFinalLetters, MAX_TARGET_WORD_LENGTH } from './constants';
 import { mulberry32, hashString } from './prng';
 import { getDailyChallengeDate, getPuzzleNumber } from './dateUtils';
 import {
@@ -34,6 +34,54 @@ import { generateSeededJapaneseGrid, generateJapaneseDailyPuzzle } from './gridG
 
 // Re-export for consumers
 export { isWordOnGrid } from './gridPathFinding';
+
+// English letter frequencies (as proportions, summing to ~100)
+// Derived from corpus analysis: E(12.7%), T(9%), A(8.2%), O(7.5%), I(7%), etc.
+const ENGLISH_WEIGHTED_LETTERS: string[] = [
+  // Vowels (38% total)
+  'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', // A: 8.2%
+  'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', // E: 12.7%
+  'I', 'I', 'I', 'I', 'I', 'I', 'I', // I: 7%
+  'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', // O: 7.5%
+  'U', 'U', 'U', // U: 2.8%
+  // High-frequency consonants
+  'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', // T: 9%
+  'R', 'R', 'R', 'R', 'R', 'R', // R: 6%
+  'S', 'S', 'S', 'S', 'S', 'S', // S: 6.3%
+  'N', 'N', 'N', 'N', 'N', 'N', 'N', // N: 6.7%
+  'L', 'L', 'L', 'L', 'L', // L: 4%
+  'D', 'D', 'D', 'D', // D: 4.3%
+  'H', 'H', 'H', 'H', // H: 3%
+  'C', 'C', 'C', // C: 2.8%
+  'M', 'M', 'M', // M: 2.4%
+  'P', 'P', 'P', // P: 1.9%
+  'G', 'G', 'G', // G: 2%
+  // Medium-frequency consonants
+  'F', 'F', // F: 2.2%
+  'B', 'B', // B: 1.5%
+  'Y', 'Y', // Y: 2%
+  'W', 'W', // W: 1.2%
+  'V', // V: 1%
+  'K', // K: 0.8%
+  'X', // X: 0.15% (rare)
+  'Z', // Z: 0.07% (rare)
+  'J', // J: 0.15%
+  'Q', // Q: 0.1% (very rare, almost always followed by U in English)
+];
+
+function weightedPool(weights: Record<string, number>): string[] {
+  return Object.entries(weights).flatMap(([letter, n]) => Array<string>(n).fill(letter));
+}
+
+const SPANISH_WEIGHTED_LETTERS = weightedPool({
+  E: 14, A: 13, O: 9, S: 8, R: 7, N: 7, I: 6, D: 6, L: 5, C: 5, T: 5, U: 4, M: 3, P: 3,
+  B: 2, G: 1, V: 1, Y: 1, Q: 1, H: 1, F: 1, Z: 1, J: 1, Ñ: 1, Á: 1, É: 1, Í: 1, Ó: 1, Ú: 1,
+});
+
+const SWEDISH_WEIGHTED_LETTERS = weightedPool({
+  E: 10, A: 9, N: 8, R: 8, T: 8, S: 7, I: 6, L: 5, D: 5, O: 5, M: 4, K: 3, G: 3, V: 2,
+  H: 2, F: 2, U: 2, P: 2, Ä: 2, B: 2, Å: 1, Ö: 1, J: 1, Y: 1,
+});
 
 // ==========================================
 // Basic Grid Generation
@@ -131,40 +179,8 @@ export function generateDailyGridWithWeightedLetters(
     cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
   }
 
-  // English letter frequencies (as proportions, summing to ~100)
-  // Derived from corpus analysis: E(12.7%), T(9%), A(8.2%), O(7.5%), I(7%), etc.
-  const weightedLetters = [
-    // Vowels (38% total)
-    'A', 'A', 'A', 'A', 'A', 'A', 'A', 'A', // A: 8.2%
-    'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', 'E', // E: 12.7%
-    'I', 'I', 'I', 'I', 'I', 'I', 'I', // I: 7%
-    'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', // O: 7.5%
-    'U', 'U', 'U', // U: 2.8%
-    // High-frequency consonants
-    'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', 'T', // T: 9%
-    'R', 'R', 'R', 'R', 'R', 'R', // R: 6%
-    'S', 'S', 'S', 'S', 'S', 'S', // S: 6.3%
-    'N', 'N', 'N', 'N', 'N', 'N', 'N', // N: 6.7%
-    'L', 'L', 'L', 'L', 'L', // L: 4%
-    'D', 'D', 'D', 'D', // D: 4.3%
-    'H', 'H', 'H', 'H', // H: 3%
-    'C', 'C', 'C', // C: 2.8%
-    'M', 'M', 'M', // M: 2.4%
-    'P', 'P', 'P', // P: 1.9%
-    'G', 'G', 'G', // G: 2%
-    // Medium-frequency consonants
-    'F', 'F', // F: 2.2%
-    'B', 'B', // B: 1.5%
-    'Y', 'Y', // Y: 2%
-    'W', 'W', // W: 1.2%
-    'V', // V: 1%
-    'K', // K: 0.8%
-    'X', // X: 0.15% (rare)
-    'Z', // Z: 0.07% (rare)
-    'J', // J: 0.15%
-    'Q', // Q: 0.1% (very rare, almost always followed by U in English)
-  ];
 
+  const weightedLetters = ENGLISH_WEIGHTED_LETTERS;
   const vowels = new Set(['A', 'E', 'I', 'O', 'U']);
   const grid: string[][] = [];
 
@@ -227,11 +243,11 @@ export function generateDailyPuzzle(
 
   let letters: string[];
   if (language === 'en') {
-    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    letters = ENGLISH_WEIGHTED_LETTERS;
   } else if (language === 'sv') {
-    letters = swedishLetters;
+    letters = SWEDISH_WEIGHTED_LETTERS;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = SPANISH_WEIGHTED_LETTERS;
   } else if (language === 'ru') {
     letters = russianLetterPool;
   } else if (language === 'ja') {
@@ -305,7 +321,7 @@ export function generateDailyPuzzle(
     [topBonus[i], topBonus[j]] = [topBonus[j], topBonus[i]];
   }
 
-  const sameLengthToEmbed = sameLengthWords.slice(0, Math.max(MIN_SAME_LENGTH_WORDS, 8));
+  const sameLengthToEmbed = sameLengthWords.slice(0, 60);
   const otherBonusToEmbed = topBonus.slice(0, 6);
 
   let bonusWordsToEmbed = [...sameLengthToEmbed, ...otherBonusToEmbed];
@@ -317,7 +333,7 @@ export function generateDailyPuzzle(
   }
 
   const grid = embedMultipleWordsInGrid(
-    normalizedTargetWord, bonusWordsToEmbed, letters, rows, cols, random, language
+    normalizedTargetWord, bonusWordsToEmbed, letters, rows, cols, random, language, true
   );
 
   return {

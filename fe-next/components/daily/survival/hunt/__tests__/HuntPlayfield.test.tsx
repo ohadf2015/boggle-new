@@ -69,7 +69,7 @@ describe('HuntPlayfield', () => {
 
   it('pays the life won by the released word once, on the stage only', () => {
     field(
-      { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
+      { ...initialHuntStage, phase: 'verdict', verdict: 'good', word: 'CAT', path },
       { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
     );
     expect(screen.getByTestId('hunt-stage-points').textContent).toContain('+12');
@@ -78,7 +78,7 @@ describe('HuntPlayfield', () => {
 
   it('pays the coins won by the released word next to the life', () => {
     field(
-      { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
+      { ...initialHuntStage, phase: 'verdict', verdict: 'good', word: 'CAT', path },
       { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 4, timestamp: 1 }] },
     );
     expect(screen.getByTestId('hunt-stage-coins').textContent).toContain('+4');
@@ -86,7 +86,7 @@ describe('HuntPlayfield', () => {
 
   it('leaves the coin chip out when the word paid no coins', () => {
     field(
-      { phase: 'verdict', verdict: 'good', word: 'CAT', path, releaseSeq: 0 },
+      { ...initialHuntStage, phase: 'verdict', verdict: 'good', word: 'CAT', path },
       { discoveredWords: [{ word: 'CAT', lifeGained: 12, tokensGained: 0, timestamp: 1 }] },
     );
     expect(screen.queryByTestId('hunt-stage-coins')).toBeNull();
@@ -94,7 +94,7 @@ describe('HuntPlayfield', () => {
 
   it('shows the life penalty for a non-word', () => {
     field(
-      { phase: 'verdict', verdict: 'bad', word: 'CTA', path, releaseSeq: 0 },
+      { ...initialHuntStage, phase: 'verdict', verdict: 'bad', word: 'CTA', path },
       { feedbackMessage: 'Not a word -4' },
     );
     expect(screen.queryByTestId('hunt-board-bubble')).toBeNull();
@@ -107,7 +107,7 @@ describe('HuntPlayfield', () => {
   });
 
   it('typing a new word takes over a word still waiting on its verdict', () => {
-    field({ phase: 'pending', verdict: null, word: 'CAT', path, releaseSeq: 0 }, { typedWord: 'TA' });
+    field({ ...initialHuntStage, phase: 'pending', verdict: null, word: 'CAT', path }, { typedWord: 'TA' });
     expect(screen.getByTestId('hunt-live-word').textContent).toBe('TA');
     expect(screen.getByTestId('hunt-stage').getAttribute('data-phase')).toBe('live');
   });

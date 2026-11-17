@@ -19,6 +19,9 @@ describe('verdictFor', () => {
     expect(verdictFor('not-in-dictionary')).toBe('bad');
     expect(verdictFor('invalid-word')).toBe('bad');
   });
+  it('Given a guess at the hidden word that missed, Then it reads as a miss, never as praise', () => {
+    expect(verdictFor('target-attempt')).toBe('bad');
+  });
   it('maps soft rejections to dupe', () => {
     expect(verdictFor('duplicate')).toBe('dupe');
     expect(verdictFor('too-short')).toBe('dupe');
@@ -113,6 +116,40 @@ describe('huntStageReducer', () => {
     let s = huntStageReducer(initialHuntStage, { type: 'release', word: 'cat', path, seq: 0 });
     s = huntStageReducer(s, { type: 'feedback', seq: 1, verdict: 'good', word: 'CAT' });
     expect(s.phase).toBe('verdict');
+  });
+});
+
+describe('huntStageReducer verdicts that land late', () => {
+  it('Given word A is still being checked, When the player starts word B and A\'s verdict lands, Then B stays on the stage and A\'s verdict is kept as a late flash', () => {
+    let s = huntStageReducer(initialHuntStage, { type: 'release', word: 'CAT', path, seq: 1 });
+    s = huntStageReducer(s, { type: 'live', word: 'D' });
+    s = huntStageReducer(s, { type: 'feedback', seq: 2, verdict: 'bad', word: 'CAT' });
+    expect(s).toMatchObject({ phase: 'live', word: 'D', late: { word: 'CAT', verdict: 'bad', seq: 2 } });
+    s = huntStageReducer(s, { type: 'lateExpire' });
+    expect(s.late).toBeNull();
+    expect(s).toMatchObject({ phase: 'live', word: 'D' });
+  });
+
+  it('Given word A is still being checked, When word B is released and A\'s verdict lands, Then B keeps waiting and A shows as a late flash', () => {
+    let s = huntStageReducer(initialHuntStage, { type: 'release', word: 'CAT', path, seq: 1 });
+    s = huntStageReducer(s, { type: 'release', word: 'DOG', path, seq: 1 });
+    s = huntStageReducer(s, { type: 'feedback', seq: 2, verdict: 'bad', word: 'CAT' });
+    expect(s).toMatchObject({ phase: 'pending', word: 'DOG', late: { word: 'CAT', verdict: 'bad' } });
+  });
+
+  it('Given a word that already had its verdict, When the same feedback arrives again later, Then no late flash appears', () => {
+    let s = huntStageReducer(initialHuntStage, { type: 'release', word: 'CAT', path, seq: 1 });
+    s = huntStageReducer(s, { type: 'feedback', seq: 2, verdict: 'bad', word: 'CAT' });
+    s = huntStageReducer(s, { type: 'live', word: 'D' });
+    s = huntStageReducer(s, { type: 'feedback', seq: 3, verdict: 'bad', word: 'CAT' });
+    expect(s.late).toBeNull();
+  });
+
+  it('Given a real word praised on the stage, When it turns out to be a wrong guess at the hidden word, Then the stage shows the miss', () => {
+    let s = huntStageReducer(initialHuntStage, { type: 'release', word: 'TRAIN', path, seq: 1 });
+    s = huntStageReducer(s, { type: 'feedback', seq: 2, verdict: 'good', word: 'TRAIN' });
+    s = huntStageReducer(s, { type: 'feedback', seq: 3, verdict: 'bad', word: 'TRAIN' });
+    expect(s).toMatchObject({ phase: 'verdict', verdict: 'bad', word: 'TRAIN' });
   });
 });
 
