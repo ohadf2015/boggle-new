@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import { saveClassRoundRating } from '@/lib/education/classRoundRatingWrite';
 import {
   noteGameSeen,
   canPromptGlobally,
@@ -35,6 +36,11 @@ export interface UseGameFeedbackArgs {
   language?: string;
   /** Disambiguates the per-session de-dupe key (room code, session id, date…). */
   throttleKey?: string;
+  /** Class attribution for the nightly digest. Omitted on non-class surfaces. */
+  classroomId?: string;
+  gameCode?: string;
+  /** Signed-in student. Required to persist a class rating; never guessed. */
+  studentId?: string;
 }
 
 export interface UseGameFeedbackResult {
@@ -49,6 +55,9 @@ export function useGameFeedback({
   gameMode,
   language,
   throttleKey,
+  classroomId,
+  gameCode,
+  studentId,
 }: UseGameFeedbackArgs): UseGameFeedbackResult {
   const [shouldShow, setShouldShow] = useState(false);
   const ran = useRef(false);
@@ -86,9 +95,20 @@ export function useGameFeedback({
         ratingValue: RATING_VALUE[rating],
         gameMode,
         language,
+        ...(classroomId ? { classroom_id: classroomId } : {}),
+        ...(gameCode ? { game_code: gameCode } : {}),
       });
+      if (surface === 'class_round') {
+        void saveClassRoundRating({
+          surface,
+          studentId,
+          classroomId,
+          gameCode,
+          rating,
+        });
+      }
     },
-    [surface, throttleKey, gameMode, language],
+    [surface, throttleKey, gameMode, language, classroomId, gameCode, studentId],
   );
 
   const dismiss = useCallback(() => {

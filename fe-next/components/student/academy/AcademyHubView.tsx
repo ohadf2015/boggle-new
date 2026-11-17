@@ -337,6 +337,9 @@ export function AcademyHubView(props: AcademyHubViewProps) {
             gameMode="classroom"
             language={language}
             throttleKey={playedGameCode}
+            classroomId={classroomId ?? undefined}
+            gameCode={playedGameCode}
+            studentId={isGuest ? undefined : userId}
           />
         </div>
       )}
