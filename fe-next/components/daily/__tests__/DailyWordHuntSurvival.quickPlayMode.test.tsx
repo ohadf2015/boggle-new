@@ -67,8 +67,7 @@ describe('DailyWordHuntSurvival - Quick Play mode (Bugs 1 & 3)', () => {
         />
       );
 
-      // The tier progress note should NOT be present in practice mode
-      expect(container.querySelector('[data-testid="tier-progress-note"]')).not.toBeInTheDocument();
+      expect(container.querySelector('[data-testid="score-display"]')).not.toBeInTheDocument();
     });
 
     it('should render AccumulatedScoreDisplay when practice=false (daily mode)', () => {
@@ -83,8 +82,7 @@ describe('DailyWordHuntSurvival - Quick Play mode (Bugs 1 & 3)', () => {
         />
       );
 
-      // The tier progress note SHOULD be present in daily mode
-      expect(container.querySelector('[data-testid="tier-progress-note"]')).toBeInTheDocument();
+      expect(container.querySelector('[data-testid="score-display"]')).toBeInTheDocument();
     });
 
     it('should render AccumulatedScoreDisplay by default (backward compatibility)', () => {
@@ -98,8 +96,7 @@ describe('DailyWordHuntSurvival - Quick Play mode (Bugs 1 & 3)', () => {
         />
       );
 
-      // The tier progress note SHOULD be present when practice is not specified
-      expect(container.querySelector('[data-testid="tier-progress-note"]')).toBeInTheDocument();
+      expect(container.querySelector('[data-testid="score-display"]')).toBeInTheDocument();
     });
   });
 });

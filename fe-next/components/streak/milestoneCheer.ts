@@ -24,11 +24,17 @@ export function cheerMilestone(current: number, playedToday: boolean, today: str
   return { days: reached.days, key: cheerKey(reached.days, shiftDate(lastDay, -(current - 1))) };
 }
 
+/** The once-per-run key for a milestone of the streak that is `current` days long. */
+export function milestoneRunKey(days: number, current: number, playedToday: boolean, today: string): string | null {
+  if (!Number.isFinite(current) || current < 1) return null;
+  const lastDay = playedToday ? today : shiftDate(today, -1);
+  return cheerKey(days, shiftDate(lastDay, -(current - 1)));
+}
+
 /** Another surface already celebrated this run's milestone; the home cheer must not repeat it. */
 export function markMilestoneCheered(days: number, current: number, playedToday: boolean, today: string): void {
-  if (!Number.isFinite(current) || current < 1) return;
-  const lastDay = playedToday ? today : shiftDate(today, -1);
-  claimOnce(cheerKey(days, shiftDate(lastDay, -(current - 1))));
+  const key = milestoneRunKey(days, current, playedToday, today);
+  if (key) claimOnce(key);
 }
 
 /** The flame-tier sticker for the milestone; 7-13 has no sticker of its own, so the on-fire pose stands in. */

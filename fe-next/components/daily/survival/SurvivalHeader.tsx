@@ -94,7 +94,6 @@ export const SurvivalHeader = memo<SurvivalHeaderProps>(({
             currentScore={liveScore}
             lastIncrement={lastScoreIncrement}
             isAnimating={isScoreAnimating}
-            t={t}
           />
         </div>
       )}

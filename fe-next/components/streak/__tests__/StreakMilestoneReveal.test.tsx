@@ -41,6 +41,19 @@ describe('StreakMilestoneReveal', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it('Given a guest cheer, nudges sign-up to keep the streak and still lets the player close it', () => {
+    const onSignup = vi.fn();
+    const onClose = vi.fn();
+    render(<StreakMilestoneReveal mode="cheer" milestone={{ days: 30, coins: 250 }} source="test" onClose={onClose} onSignup={onSignup} />);
+    expect(screen.getByRole('dialog')).toHaveTextContent('dailyStreak.flame.cheerBody:30');
+    expect(screen.getByRole('dialog')).toHaveTextContent('results.saveStreak.body');
+    expect(screen.queryByTestId('streak-milestone-cheer-close')).toBeNull();
+    fireEvent.click(screen.getByTestId('streak-milestone-signup'));
+    expect(onSignup).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByText('dailyStreak.flame.later'));
+    expect(onClose).toHaveBeenCalled();
+  });
+
   it('Given reduce effects, cheer mode holds a still mascot and fires no confetti', () => {
     mockReducedEffects = true;
     render(<StreakMilestoneReveal mode="cheer" milestone={{ days: 7, coins: 60 }} source="home" onClose={vi.fn()} />);

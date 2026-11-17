@@ -27,13 +27,15 @@ interface StreakMilestoneRevealProps {
   onClaimed?: () => void;
   /** `cheer`: the milestone moment with no coin claim (rewards not available or already handled). */
   mode?: 'claim' | 'cheer';
+  /** Cheer for a guest: the streak lives on this device, so the main action is an account that keeps it. */
+  onSignup?: () => void;
 }
 
 const reducedMotion = () =>
   typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 /** The milestone moment: the mascot on fire, the tier's flame, one big claim button. */
-export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed, mode = 'claim' }: StreakMilestoneRevealProps) {
+export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed, mode = 'claim', onSignup }: StreakMilestoneRevealProps) {
   const cheer = mode === 'cheer';
   const [reducedEffects] = useReducedEffects();
   const { t } = useLanguage();
@@ -129,7 +131,26 @@ export function StreakMilestoneReveal({ milestone, source, onClose, onClaimed, m
           {cheer ? t('dailyStreak.flame.cheerBody', { days: milestone.days }) : t('dailyStreak.flame.milestoneBody', { days: milestone.days })}
         </p>
 
-        {cheer ? (
+        {cheer && onSignup ? (
+          <>
+            <p className="font-neo-body text-xs font-bold text-neo-cyan">{t('results.saveStreak.body')}</p>
+            <button
+              type="button"
+              data-testid="streak-milestone-signup"
+              onClick={onSignup}
+              className="mt-1 h-12 w-full rounded-xl border-[3px] border-neo-black bg-neo-lime font-neo-display font-black uppercase text-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+            >
+              {t('results.saveStreak.title')}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="min-h-11 px-4 text-xs font-bold text-neo-white/70 underline-offset-4 hover:underline"
+            >
+              {t('dailyStreak.flame.later')}
+            </button>
+          </>
+        ) : cheer ? (
           <button
             type="button"
             data-testid="streak-milestone-cheer-close"

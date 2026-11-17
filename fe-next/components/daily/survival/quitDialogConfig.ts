@@ -35,7 +35,7 @@ export const GENERIC_QUIT_DIALOG: QuitDialogConfig = {
   cancelText: 'Cancel',
 };
 
-type TranslateFn = (
+export type TranslateFn = (
   key: string,
   fallbackOrParams?: string | Record<string, string | number>,
   paramsWhenFallback?: Record<string, string | number>,
