@@ -9,7 +9,7 @@ import {
 describe('connections page metadata', () => {
   it('returns indexable metadata for EN', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
-    expect(meta.title).toContain('Word Bridge');
+    expect(meta.title).toContain('Missing Link Word Game');
     expect(meta.robots).toMatchObject({ index: true, follow: true });
     expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/en/connections');
   });
@@ -59,7 +59,7 @@ describe('content module', () => {
 
   it('returns Hebrew copy for he', () => {
     const he = getConnectionsLandingCopy('he');
-    expect(he.h1Pre).toMatch(/שתי/);
+    expect(he.h1Pre).toMatch(/ראש זנב/);
     expect(he.heClassic).not.toBeNull();
   });
 });
