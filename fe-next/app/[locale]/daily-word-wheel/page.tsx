@@ -230,6 +230,10 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
           description: resolve('dailyWordWheelLanding.finalCta.description', 'The Daily Word Wheel resets every day.'),
           button: resolve('dailyWordWheelLanding.finalCta.button', 'Play Daily Word Wheel Now'),
         }}
+        tower={{
+          title: resolve('wordTower.daily.questTitle', 'Word Tower'),
+          desc: resolve('wordTower.daily.questDesc', 'Stack words sky-high. Same letters for everyone today.'),
+        }}
       />
     </main>
   );
