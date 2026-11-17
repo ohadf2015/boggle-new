@@ -3,7 +3,8 @@
 import React from 'react';
 import { Coins, Heart } from 'lucide-react';
 import { getLifeBonusForWord } from '../constants';
-import { isGoodVerdict, praiseKeyFor, type HuntPhase, type HuntVerdict } from './huntStage';
+import { isGoodVerdict, type HuntPhase, type HuntVerdict } from './huntStage';
+import { LUCKY_LIFE_BONUS, pickVariant, praiseFor } from './huntReward';
 import { useLiveWord, type LiveWordStore } from './liveWord';
 import styles from './HuntWordStage.module.css';
 
@@ -22,12 +23,15 @@ export interface HuntWordStageProps {
   live?: LiveWordStore;
   /** Replaces the idle swipe invite (first games: the word to try when stuck). */
   prompt?: string;
+  /** Words found in a row; three or more gets its own cheer. */
+  combo?: number;
+  lucky?: boolean;
   t: TFn;
 }
 
 const same = (w: string) => w;
 
-export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, prompt, t }: HuntWordStageProps) {
+export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, prompt, combo = 1, lucky = false, t }: HuntWordStageProps) {
   const liveWord = useLiveWord(live, same);
   const shownWord = phase === 'live' && live && liveWord ? liveWord : word;
   const letters = phase === 'idle' ? [] : Array.from(shownWord);
@@ -35,6 +39,9 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
   const showVerdict = phase === 'verdict' && verdict;
   const building = phase === 'live' || phase === 'pending';
   const bonus = building ? getLifeBonusForWord(letters.length) : 0;
+  const cheer = showVerdict && good ? praiseFor(shownWord, combo, lucky) : null;
+  const cheerParams: Record<string, number> | undefined = lucky ? { bonus: LUCKY_LIFE_BONUS } : combo >= 3 ? { count: combo } : undefined;
+  const cheerText = cheer ? pickVariant(t(cheer.key, cheerParams), cheer.index) : '';
 
   return (
     <div
@@ -43,6 +50,7 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
       data-verdict={showVerdict ? verdict : undefined}
       data-size={size}
       data-calm={calm ? 'true' : 'false'}
+      data-lucky={showVerdict && good && lucky ? 'true' : undefined}
       className={styles.stage}
       aria-live="polite"
     >
@@ -67,7 +75,8 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
             {t('wordHunt.survival.stage.longWord', { bonus })}
           </span>
         )}
-        {showVerdict && good && <span className={styles.praise}>{t(praiseKeyFor(letters.length))}</span>}
+        {cheer && <span className={styles.praise}>{cheerText}</span>}
+        {cheer && !calm && <span data-testid="hunt-stage-burst" aria-hidden="true" className={styles.burst} />}
       </div>
       {showVerdict && !good && message && (
         <span className={styles.reward}>

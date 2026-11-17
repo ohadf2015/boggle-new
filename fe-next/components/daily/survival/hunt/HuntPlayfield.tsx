@@ -84,6 +84,8 @@ function HuntPlayfieldInner({
           size={size}
           live={typing ? undefined : liveWord}
           prompt={guide?.prompt}
+          combo={reward?.combo}
+          lucky={reward?.lucky}
           t={t as (key: string, params?: Record<string, string | number>) => string}
         />
       </div>

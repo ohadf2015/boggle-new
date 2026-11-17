@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { X, Sparkles, Tag, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -16,7 +17,7 @@ export interface AutoClueNotificationProps {
 
 /**
  * Auto-Clue Notification Component
- * Toast dropped in from the top when an auto-clue unlocks; stacked by the parent's fixed container
+ * Toast that rises from the bottom when an auto-clue unlocks
  */
 export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   clueType,
@@ -46,21 +47,21 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
           icon: <Sparkles className="w-5 h-5" />,
           title: t('wordHunt.survival.clueRevealLetter'),
           cost: 3,
-          color: 'from-neo-cyan to-blue-400',
+          color: 'bg-neo-cyan',
         };
       case 'reveal_category':
         return {
           icon: <Tag className="w-5 h-5" />,
           title: t('wordHunt.survival.clueRevealCategory'),
           cost: 9,
-          color: 'from-neo-pink to-purple-400',
+          color: 'bg-neo-pink',
         };
       case 'example_sentence':
         return {
           icon: <FileText className="w-5 h-5" />,
           title: t('wordHunt.survival.clueExampleSentence'),
           cost: 15,
-          color: 'from-neo-orange to-yellow-400',
+          color: 'bg-neo-orange',
         };
     }
   };
@@ -72,14 +73,13 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
       layout
       role="status"
       data-testid="auto-clue-toast"
-      initial={{ y: -28, opacity: 0, scale: 0.9 }}
+      initial={{ y: 28, opacity: 0, scale: 0.9 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
-      exit={{ y: -16, opacity: 0, scale: 0.96, transition: { duration: 0.14, ease: [0.23, 1, 0.32, 1] } }}
+      exit={{ y: 16, opacity: 0, scale: 0.96, transition: { duration: 0.14, ease: [0.23, 1, 0.32, 1] } }}
       transition={{ type: 'spring', damping: 22, stiffness: 420, mass: 0.7 }}
       dir={direction}
       className={cn(
         'pointer-events-auto relative w-full max-w-xs overflow-hidden',
-        'bg-linear-to-r',
         content.color,
         'border-neo-thick border-neo-black',
         'rounded-neo',
@@ -131,5 +131,33 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
     </AdaptiveMotion.div>
   );
 };
+
+export interface AutoClueStackProps extends Omit<AutoClueNotificationProps, 'clueType' | 'onDismiss'> {
+  notifications: { id: string; clueType: AutoClueNotificationProps['clueType'] }[];
+  onDismiss: (id: string) => void;
+}
+
+// Bottom of the screen: the top holds the clue boxes this toast is announcing.
+export function AutoClueStack({ notifications, onDismiss, direction, t, language }: AutoClueStackProps) {
+  return (
+    <div
+      data-testid="auto-clue-stack"
+      className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0px)+5.5rem)] z-50 flex flex-col-reverse items-center gap-2 px-4"
+    >
+      <AnimatePresence mode="popLayout">
+        {notifications.map((n) => (
+          <AutoClueNotification
+            key={n.id}
+            clueType={n.clueType}
+            onDismiss={() => onDismiss(n.id)}
+            direction={direction}
+            t={t}
+            language={language}
+          />
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default AutoClueNotification;

@@ -141,23 +141,13 @@ describe('WordHuntEffectsCanvas', () => {
     vi.useRealTimers();
   });
 
-  it('plays error sparks + a faint red flash + shake on invalid', () => {
-    const effects: WordHuntEffect[] = [
-      { type: 'invalid', x: 50, y: 50 },
-    ];
-    render(<WordHuntEffectsCanvas {...baseProps} effects={effects} />);
-    expect(mockEngine.particles.burst).toHaveBeenCalled();
-    expect(mockEngine.flash.flash).toHaveBeenCalledWith(expect.objectContaining({ color: 0xff2200 }));
-    expect(mockEngine.shake.shake).toHaveBeenCalled();
-  });
-
   it.each([1, 3, 8, 15])(
-    'Given a %i-point word or a miss, when the verdict lands, then the screen flash stays faint and never a full-screen danger wash',
+    'Given a %i-point word, when the verdict lands, then the screen flash stays faint and never a full-screen danger wash',
     (points) => {
       render(
         <WordHuntEffectsCanvas
           {...baseProps}
-          effects={[{ type: 'wordValid', x: 1, y: 1, points }, { type: 'invalid', x: 1, y: 1 }]}
+          effects={[{ type: 'wordValid', x: 1, y: 1, points }]}
         />,
       );
       expect(mockEngine.flash.danger).not.toHaveBeenCalled();
@@ -166,21 +156,6 @@ describe('WordHuntEffectsCanvas', () => {
       }
     },
   );
-
-  it('starts persistent urgency emitter on lowLife (idempotent)', () => {
-    const { rerender } = render(
-      <WordHuntEffectsCanvas {...baseProps} effects={[{ type: 'lowLife' }]} />,
-    );
-    expect(mockEngine.particles.create).toHaveBeenCalledTimes(1);
-
-    rerender(
-      <WordHuntEffectsCanvas
-        {...baseProps}
-        effects={[{ type: 'lowLife' }, { type: 'lowLife' }]}
-      />,
-    );
-    expect(mockEngine.particles.create).toHaveBeenCalledTimes(1);
-  });
 
   it('shatters letter on letterEliminated', () => {
     const effects: WordHuntEffect[] = [

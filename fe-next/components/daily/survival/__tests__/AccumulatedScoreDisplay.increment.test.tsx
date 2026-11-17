@@ -30,10 +30,8 @@ describe('AccumulatedScoreDisplay — score delta chip', () => {
     expect(chip.className).not.toMatch(/-top-/);
   });
 
-  it('Given a loss, When it shows, Then it reads as a negative delta', () => {
+  it('Given the score slips as time passes, When it updates, Then no red minus chip flashes at the player', () => {
     render(<AccumulatedScoreDisplay currentScore={120} lastIncrement={-3} isAnimating t={t} />);
-    const chip = screen.getByTestId('score-increment');
-    expect(chip).toHaveTextContent('-3');
-    expect(chip).toHaveAttribute('data-sign', 'down');
+    expect(screen.queryByTestId('score-increment')).toBeNull();
   });
 });

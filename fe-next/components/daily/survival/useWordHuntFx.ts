@@ -10,8 +10,6 @@ import type { SurvivalGameState } from './useSurvivalGameLogic';
 import { LIFE_DRAIN_RATE } from './constants';
 import { hapticError, hapticWordAccepted } from '@/utils/haptics';
 
-const LOW_LIFE = 25;
-
 /** The per-second drain is shown by the life bar; only a penalty gets the screen shock. */
 export function isPenaltyDrop(drop: number): boolean {
   return drop > LIFE_DRAIN_RATE;
@@ -82,10 +80,8 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
       triggerReward('levelUp');
       pushEffect({ type: 'targetFound', x: cx, y: cy });
     } else if (type === 'invalid-word' || type === 'not-in-dictionary' || type === 'not-on-board') {
+      // A miss only buzzes: red flashes and shakes read as punishment.
       hapticError();
-      // Desktop gets a red flash from the particle layer; without it, flash in CSS.
-      if (skipAnimations) flash('bg-neo-red/15');
-      else pushEffect({ type: 'invalid', x: cx, y: cy });
       trackGrowthEvent('wordhunt_invalid_submitted', { feedbackType: type });
       trackClueShakeExposure();
       if (clueShakeVariant === 'clue-shake') {
@@ -110,7 +106,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
   ]);
 
   const prevLifeRef = useRef(state.lifePoints);
-  const lowLifeFiredRef = useRef(false);
   useEffect(() => {
     const prev = prevLifeRef.current;
     const curr = state.lifePoints;
@@ -118,12 +113,6 @@ export function useWordHuntFx(state: SurvivalGameState, skipAnimations: boolean,
     if (skipAnimations) return;
     if (curr > prev) pushEffect({ type: 'lifeGain', amount: curr - prev });
     else if (isPenaltyDrop(prev - curr)) pushEffect({ type: 'lifeDrop', amount: prev - curr });
-    if (curr > 0 && curr <= LOW_LIFE && !lowLifeFiredRef.current) {
-      pushEffect({ type: 'lowLife' });
-      lowLifeFiredRef.current = true;
-    } else if (curr > LOW_LIFE && lowLifeFiredRef.current) {
-      lowLifeFiredRef.current = false;
-    }
   }, [state.lifePoints, skipAnimations, pushEffect]);
 
   const prevEliminatedRef = useRef(state.eliminatedLetters.size);

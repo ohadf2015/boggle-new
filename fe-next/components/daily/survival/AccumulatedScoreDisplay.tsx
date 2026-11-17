@@ -140,10 +140,9 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
         }}
       >
         <AdaptiveAnimatePresence>
-          {lastIncrement !== null && lastIncrement !== 0 && (
+          {lastIncrement !== null && lastIncrement > 0 && (
             <AdaptiveMotion.div
               data-testid="score-increment"
-              data-sign={lastIncrement > 0 ? 'up' : 'down'}
               initial={{ opacity: 0, x: 14, scale: 0.6 }}
               animate={{ opacity: [0, 1, 1, 0], x: [14, -4, -6, -10], scale: [0.6, 1.15, 1, 0.9] }}
               exit={{ opacity: 0, scale: 0 }}
@@ -152,11 +151,10 @@ export const AccumulatedScoreDisplay = memo<AccumulatedScoreDisplayProps>(({
                 'absolute top-1/2 end-full me-2 -translate-y-1/2 pointer-events-none',
                 'px-2 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm',
                 'text-sm font-black font-neo-display tabular-nums whitespace-nowrap',
-                lastIncrement > 0 ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-white',
+                'bg-neo-lime text-neo-black',
               )}
             >
-              {lastIncrement > 0 ? '+' : ''}
-              {Math.round(lastIncrement)}
+              +{Math.round(lastIncrement)}
             </AdaptiveMotion.div>
           )}
         </AdaptiveAnimatePresence>

@@ -45,10 +45,9 @@ describe('useWordHuntFx on a phone that runs slow', () => {
     expect(haptics.hapticWordAccepted).toHaveBeenCalledTimes(1);
   });
 
-  it('Given a rejected word, Then a red flash stands in for the particle layer and the phone buzzes', () => {
+  it('Given a rejected word, Then the phone buzzes but the screen never flashes red', () => {
     const fx = verdict('not-in-dictionary', true, false);
-    expect(fx.flashTrigger).toBe(1);
-    expect(fx.flashColor).toBe('bg-neo-red/15');
+    expect(fx.flashTrigger).toBe(0);
     expect(haptics.hapticError).toHaveBeenCalledTimes(1);
   });
 
@@ -68,10 +67,16 @@ describe('useWordHuntFx with motion turned off', () => {
 });
 
 describe('useWordHuntFx on desktop', () => {
-  it('Given a rejected word, Then the particle layer owns the red flash, with no second CSS flash', () => {
+  it('Given a rejected word, Then no red flash or screen shake punishes the miss', () => {
     const fx = verdict('invalid-word', false, false);
     expect(fx.flashTrigger).toBe(0);
-    expect(fx.pixiEffects.map((e) => e.type)).toContain('invalid');
+    expect(fx.pixiEffects).toHaveLength(0);
+  });
+
+  it('Given life falls low, Then no alarm embers start', () => {
+    const hook = renderHook(({ s }) => useWordHuntFx(s, false, false), { initialProps: { s: state(0, 'valid-word') } });
+    hook.rerender({ s: { ...state(0, 'valid-word'), lifePoints: 20 } as SurvivalGameState });
+    expect(hook.result.current.pixiEffects.map((e) => e.type)).not.toContain('lowLife');
   });
 
   it('Given a found word, Then confetti and particles run', () => {
