@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/word-craft/run/PowerCardView.tsx, fe-next/components/word-craft/run/RunResultScene.tsx, fe-next/components/word-craft/run/__tests__/RunResultScene.test.tsx
+next_steps: node_modules/eslint was a broken symlink and vitest's local config errored under npx tonight (likely a concurrent-session node_modules clash per .claude/rules/60-recurring-pitfalls.md) — could not self-verify with the test runner, verified by manual diff read instead. Tomorrow's gate run is the first real tsc/test pass on this; if it fails, the fix is almost certainly import-path or JSX-only (2-line diff). STEP 1 landing-CVR fallback was not needed — STEP 0 mode-improvement path always has a target.
