@@ -176,6 +176,8 @@ export const AVATAR_ACCESSORY_COLORS = [
 // ==================== Shirt Colors ====================
 export const AVATAR_SHIRT_COLORS = [
   '#4A90D9', '#E85D9B', '#FF6B35', '#00897B', '#8B5CF6', '#C62828', '#FFD700', '#2C1B18',
+  /* Olive / khaki-green — used by the Ron preset */
+  '#6B7F3B',
 ] as const;
 
 // ==================== Body Styles ====================

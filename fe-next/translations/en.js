@@ -4364,6 +4364,24 @@ const en = {
       "facialHair": "Beard",
       "facialHairStyle": "Style",
       "colorTheme": "Color theme",
+      "presets": "Looks",
+      "presetGroup": {
+        "ron": "Ron",
+        "fun": "Funny & cute"
+      },
+      "preset": {
+        "ron": "Ron preset",
+        "ronCasual": "Ron Casual",
+        "ronCool": "Ron Cool",
+        "kitty": "Kitty",
+        "sleepyBunny": "Sleepy Bunny",
+        "partyPropeller": "Propeller Party",
+        "sunshine": "Sunshine",
+        "coolShades": "Cool Shades",
+        "frogPrince": "Frog Prince",
+        "spaceCadet": "Space Cadet",
+        "unicornSparkle": "Unicorn"
+      },
       "bodyStyle": "Outfit",
       "download": "Download",
       "expressions": "Expressions",
@@ -17874,6 +17892,24 @@ const en = {
     "expressions": "Expression",
     "facialHairStyle": "Style",
     "colorTheme": "Color theme",
+    "presets": "Looks",
+    "presetGroup": {
+      "ron": "Ron",
+      "fun": "Funny & cute"
+    },
+    "preset": {
+      "ron": "Ron preset",
+      "ronCasual": "Ron Casual",
+      "ronCool": "Ron Cool",
+      "kitty": "Kitty",
+      "sleepyBunny": "Sleepy Bunny",
+      "partyPropeller": "Propeller Party",
+      "sunshine": "Sunshine",
+      "coolShades": "Cool Shades",
+      "frogPrince": "Frog Prince",
+      "spaceCadet": "Space Cadet",
+      "unicornSparkle": "Unicorn"
+    },
     "bodyStyle": "Outfit",
     "bodyStyles": {
       "default": "Default",

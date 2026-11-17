@@ -86,4 +86,24 @@ describe('editorTabs — the editor view model over lib/avatar/catalog', () => {
     }
     for (const th of COLOR_THEMES) expect(getPartRarity('bgColor', th.colors.bgColor)).toBe('common');
   });
+
+  it('puts look presets at the top of the face tab (including Ron)', () => {
+    const face = getEditorTabs(male, { showPremium: true }).find(t => t.id === 'face')!;
+    const looks = face.sections.find(s => s.kind === 'looks');
+    expect(looks && looks.kind === 'looks').toBe(true);
+    if (looks && looks.kind === 'looks') {
+      expect(looks.presets.some(p => p.id === 'ron')).toBe(true);
+      expect(looks.presets.length).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  it('onboarding still offers free looks but hides looks that need a paid part', () => {
+    const face = getEditorTabs(male, { showPremium: false }).find(t => t.id === 'face')!;
+    const looks = face.sections.find(s => s.kind === 'looks');
+    expect(looks && looks.kind === 'looks').toBe(true);
+    if (looks && looks.kind === 'looks') {
+      expect(looks.presets.some(p => p.id === 'ron')).toBe(false);
+      expect(looks.presets.some(p => p.id === 'kitty')).toBe(true);
+    }
+  });
 });

@@ -23,6 +23,7 @@ import {
   type PaletteId,
   type PartCategoryId,
 } from '@/lib/avatar/catalog';
+import { visibleLookPresets, type LookPreset } from '@/lib/avatar/lookPresets';
 
 export interface GenderSection { kind: 'gender'; labelKey: string }
 export interface ColorSection { kind: 'colors'; palette: PaletteId; configKey: PaletteId; labelKey: string; colors: CatalogColor[] }
@@ -35,10 +36,11 @@ export interface PartsSection {
   labelKey: string;
   parts: CatalogPart[];
 }
+export interface LookSection { kind: 'looks'; labelKey: string; presets: LookPreset[] }
 export interface PresetSection { kind: 'expressions' | 'themes'; labelKey: string }
 
 export type PinnedSection = GenderSection | ColorSection;
-export type ScrollSection = PartsSection | ColorSection | PresetSection;
+export type ScrollSection = PartsSection | ColorSection | PresetSection | LookSection;
 
 export interface EditorTab {
   id: CatalogTabId;
@@ -97,6 +99,10 @@ export function getEditorTabs(config: CustomAvatarConfig, opts: EditorTabOptions
           parts,
         });
       }
+    }
+    if (tab.id === 'face') {
+      const looks = visibleLookPresets(opts.showPremium);
+      if (looks.length) sections.unshift({ kind: 'looks', labelKey: 'avatarBuilder.presets', presets: looks });
     }
     if (tab.id === 'eyes') sections.unshift({ kind: 'expressions', labelKey: 'avatarBuilder.expressions' });
     if (tab.id === 'background') sections.push({ kind: 'themes', labelKey: 'avatarBuilder.colorTheme' });

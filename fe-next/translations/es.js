@@ -4825,6 +4825,24 @@ const es = {
       "facialHair": "Barba",
       "facialHairStyle": "Estilo",
       "colorTheme": "Tema de color",
+      "presets": "Looks",
+      "presetGroup": {
+        "ron": "Ron",
+        "fun": "Divertidos y monísimos"
+      },
+      "preset": {
+        "ron": "Preset de Ron",
+        "ronCasual": "Ron informal",
+        "ronCool": "Ron cool",
+        "kitty": "Gatita",
+        "sleepyBunny": "Conejito dormilón",
+        "partyPropeller": "Fiesta hélice",
+        "sunshine": "Solecito",
+        "coolShades": "Gafas de sol",
+        "frogPrince": "Príncipe rana",
+        "spaceCadet": "Cadete espacial",
+        "unicornSparkle": "Unicornio"
+      },
       "bodyStyle": "Ropa",
       "download": "Descargar",
       "bodyStyles": {
@@ -19566,6 +19584,24 @@ const es = {
     "expressions": "Expresión",
     "facialHairStyle": "Estilo",
     "colorTheme": "Tema de color",
+    "presets": "Looks",
+    "presetGroup": {
+      "ron": "Ron",
+      "fun": "Divertidos y monísimos"
+    },
+    "preset": {
+      "ron": "Preset de Ron",
+      "ronCasual": "Ron informal",
+      "ronCool": "Ron cool",
+      "kitty": "Gatita",
+      "sleepyBunny": "Conejito dormilón",
+      "partyPropeller": "Fiesta hélice",
+      "sunshine": "Solecito",
+      "coolShades": "Gafas de sol",
+      "frogPrince": "Príncipe rana",
+      "spaceCadet": "Cadete espacial",
+      "unicornSparkle": "Unicornio"
+    },
     "bodyStyle": "Atuendo",
     "bodyStyles": {
       "default": "Predeterminado",

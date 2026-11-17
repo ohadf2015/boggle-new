@@ -5122,6 +5122,24 @@ const sv = {
       "facialHair": "Skägg",
       "facialHairStyle": "Stil",
       "colorTheme": "Färgtema",
+      "presets": "Looks",
+      "presetGroup": {
+        "ron": "Ron",
+        "fun": "Roliga och söta"
+      },
+      "preset": {
+        "ron": "Ron-preset",
+        "ronCasual": "Ron casual",
+        "ronCool": "Ron cool",
+        "kitty": "Kisse",
+        "sleepyBunny": "Sömnig kanin",
+        "partyPropeller": "Propellerfest",
+        "sunshine": "Solsken",
+        "coolShades": "Snygga solglasögon",
+        "frogPrince": "Grodprinsen",
+        "spaceCadet": "Rymdkadet",
+        "unicornSparkle": "Enhörning"
+      },
       "bodyStyle": "Kläder",
       "download": "Ladda ner",
       "expressions": "Uttryck",
@@ -19872,6 +19890,24 @@ const sv = {
     "expressions": "Uttryck",
     "facialHairStyle": "Stil",
     "colorTheme": "Färgtema",
+    "presets": "Looks",
+    "presetGroup": {
+      "ron": "Ron",
+      "fun": "Roliga och söta"
+    },
+    "preset": {
+      "ron": "Ron-preset",
+      "ronCasual": "Ron casual",
+      "ronCool": "Ron cool",
+      "kitty": "Kisse",
+      "sleepyBunny": "Sömnig kanin",
+      "partyPropeller": "Propellerfest",
+      "sunshine": "Solsken",
+      "coolShades": "Snygga solglasögon",
+      "frogPrince": "Grodprinsen",
+      "spaceCadet": "Rymdkadet",
+      "unicornSparkle": "Enhörning"
+    },
     "bodyStyle": "Kläder",
     "bodyStyles": {
       "default": "Standard",

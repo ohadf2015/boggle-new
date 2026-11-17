@@ -8010,6 +8010,24 @@ const ru = {
       "facialHair": "Борода",
       "facialHairStyle": "Стиль",
       "colorTheme": "Цветовая тема",
+      "presets": "Образы",
+      "presetGroup": {
+        "ron": "Рон",
+        "fun": "Смешные и милые"
+      },
+      "preset": {
+        "ron": "Пресет Рона",
+        "ronCasual": "Рон кэжуал",
+        "ronCool": "Крутой Рон",
+        "kitty": "Кошечка",
+        "sleepyBunny": "Сонный зайка",
+        "partyPropeller": "Вечеринка с пропеллером",
+        "sunshine": "Солнышко",
+        "coolShades": "Крутые очки",
+        "frogPrince": "Царевна-лягушка",
+        "spaceCadet": "Космический кадет",
+        "unicornSparkle": "Единорог"
+      },
       "bodyStyle": "Наряд",
       "download": "Скачать",
       "expressions": "Выражения",
@@ -18996,6 +19014,24 @@ const ru = {
     "expressions": "Выражение",
     "facialHairStyle": "Стиль",
     "colorTheme": "Цветовая тема",
+    "presets": "Образы",
+    "presetGroup": {
+      "ron": "Рон",
+      "fun": "Смешные и милые"
+    },
+    "preset": {
+      "ron": "Пресет Рона",
+      "ronCasual": "Рон кэжуал",
+      "ronCool": "Крутой Рон",
+      "kitty": "Кошечка",
+      "sleepyBunny": "Сонный зайка",
+      "partyPropeller": "Вечеринка с пропеллером",
+      "sunshine": "Солнышко",
+      "coolShades": "Крутые очки",
+      "frogPrince": "Царевна-лягушка",
+      "spaceCadet": "Космический кадет",
+      "unicornSparkle": "Единорог"
+    },
     "bodyStyle": "Наряд",
     "bodyStyles": {
       "default": "По умолчанию",
