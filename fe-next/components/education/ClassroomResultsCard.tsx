@@ -276,6 +276,8 @@ export function ClassroomResultsCard({
           onRematch={onRematch}
           hardestWords={roundHardestWords(summary)}
           t={t}
+          // This card IS the live round-end screen: no Pro ask while the game runs.
+          suppressOffer
         />
       )}
       {isTeacher && rematchOffline && (

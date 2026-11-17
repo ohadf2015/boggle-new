@@ -12976,6 +12976,7 @@ const sv = {
       "paying": "Betalande Pro",
       "trialing": "Provperioder",
       "granted": "Gratis Pro",
+      "churnedDormant": "Bortfallna (inaktiva 30+ dgr)",
       "offerwall": "Offerwall $ (30d)",
       "drillSignups": "Registreringar, vecka från",
       "drillPayers": "Pro-kunder",

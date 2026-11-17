@@ -47,6 +47,13 @@ export interface ClassReportButtonProps {
   proLabel?: string;
   /** This round's coverage, for the free word-by-student grid. Absent on older summaries. */
   round?: RoundWordGridInput;
+  /**
+   * Live game still running (the projector round-end wall): the free insight stays,
+   * the Pro ASK does not — no depth teaser, no upgrade CTA, no offer analytics. A
+   * mid-class tap never converts (ur-audit 2026-11-17: 3 clicks, 0 checkouts, all
+   * mid-class); the ask moved to post-class moments (Home, class summary, digest).
+   */
+  suppressOffer?: boolean;
   className?: string;
 }
 
@@ -60,7 +67,7 @@ export function ClassReportButton(props: ClassReportButtonProps) {
   return <FreeClassReport {...props} />;
 }
 
-function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, className }: ClassReportButtonProps) {
+function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, suppressOffer = false, className }: ClassReportButtonProps) {
   const { hasPro, loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -77,12 +84,12 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, c
   baseRef.current = base;
 
   useEffect(() => {
-    if (!show) return;
+    if (!show || suppressOffer) return;
     reportProOfferImpression({ ...baseRef.current, format: 'report_teaser', stage: 'rendered' }, { userId });
-  }, [show, userId]);
+  }, [show, suppressOffer, userId]);
   useUpsellImpression(
     depthRef,
-    show ? { cta: 'teacher_pro', placement: CLASS_REPORT_PLACEMENT } : null,
+    show && !suppressOffer ? { cta: 'teacher_pro', placement: CLASS_REPORT_PLACEMENT } : null,
     { locale: language },
     () => reportProOfferImpression({ ...baseRef.current, format: 'report_teaser', stage: 'viewed' }, { userId }),
   );
@@ -153,20 +160,22 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, c
             </p>
           </div>
         ) : null}
-        <div ref={depthRef} data-testid="class-report-depth" className="flex flex-col gap-0.5 border-t-2 border-dashed border-neo-cream/60 pt-2">
-          <p className="flex items-center gap-2 text-sm font-black text-neo-cream @[96rem]/results:text-lg">
-            <Lock className="size-[1em] shrink-0" aria-hidden="true" />
-            {t('eduProResults.proDepthTitle')}
-            <ProPill label={proLabel} />
-          </p>
-          <p className="text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-base">{t('eduProResults.proDepth')}</p>
-        </div>
-        {proOffer.title ? (
+        {!suppressOffer && (
+          <div ref={depthRef} data-testid="class-report-depth" className="flex flex-col gap-0.5 border-t-2 border-dashed border-neo-cream/60 pt-2">
+            <p className="flex items-center gap-2 text-sm font-black text-neo-cream @[96rem]/results:text-lg">
+              <Lock className="size-[1em] shrink-0" aria-hidden="true" />
+              {t('eduProResults.proDepthTitle')}
+              <ProPill label={proLabel} />
+            </p>
+            <p className="text-xs font-semibold text-neo-cream/80 @[96rem]/results:text-base">{t('eduProResults.proDepth')}</p>
+          </div>
+        )}
+        {!suppressOffer && proOffer.title ? (
           <p data-testid="class-report-teaser-offer-title" className="text-sm font-bold text-neo-cream @[96rem]/results:text-lg">
             {proOffer.title}
           </p>
         ) : null}
-        {trialOpen ? (
+        {suppressOffer ? null : trialOpen ? (
           <Link
             href={`/${language}/teacher/reports`}
             target="_blank"
@@ -208,7 +217,7 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, c
           language={language}
           round={round}
           proLabel={proLabel}
-          offer={trialOpen ? null : { href: upgradeHref, label: proOffer.label, note: proOffer.note, onClick: onUpgradeClick }}
+          offer={trialOpen || suppressOffer ? null : { href: upgradeHref, label: proOffer.label, note: proOffer.note, onClick: onUpgradeClick }}
           onClose={closeGrid}
         />
       ) : null}

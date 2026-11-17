@@ -2,8 +2,10 @@
 
 /**
  * The /education/live projector at round end: its own screen, built from the shared round-end pieces: the
- * staged podium, the winner bar, the class's numbers, the words the class missed, the boss verdict and one
- * labelled Teacher Pro preview (never after a bots-only practice round).
+ * staged podium, the winner bar, the class's numbers, the words the class missed, the boss verdict and the
+ * free class insight (never after a bots-only practice round). NO Teacher Pro ask here: this wall only
+ * exists mid-session and mid-class taps never converted (ur-audit 2026-11-17); the ask is post-class
+ * (Teacher Home when no game is live, the class summary, the weekly digest).
  * Mounts only in the host tree, so no student sees the report or the upsell; z-[75] clears the lobby's
  * z-[65]. Dark-only and painted from frame one: the reveal only swaps what is written inside (Class 5).
  * One primary (Practice these words when the class missed some, else Play again), a quiet Play again under
@@ -32,7 +34,6 @@ import { StrugglePreview } from '@/components/education/results/StrugglePreview'
 import { MissedWordsList } from '@/components/education/results/MissedWordsList';
 import { HardestWordsInsight } from '@/components/education/results/HardestWordsInsight';
 import { roundHardestWords } from '@/components/education/results/roundHardestWords';
-import { ProInsightLink } from '@/components/teacher/pro/ProInsightLink';
 import { ParentShareLink } from '@/components/education/results/ParentShareLink';
 import { reteachPanelWords } from '@/components/education/results/reteachPanelModel';
 import { ClassReportButton } from '@/components/education/results/ClassReportButton';
@@ -208,6 +209,11 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const practice = isRehearsalRound(players, searchParams?.get('practice') === '1' || undefined);
   const shortWall = bossOver;
   const classWin = practice ? null : buildClassWinShare({ summary, players, gameCode, locale: language, t: (key, params) => tf(key, CLASS_WIN_FALLBACK[key] ?? key, params) });
+  // No Pro ASK on this wall: it only exists while the live session runs, and a
+  // mid-class tap never converts (ur-audit 2026-11-17 — every edu_pro_offer_click
+  // was followed by live rounds, zero checkouts). The free class data (hardest
+  // words, struggle bars, the word grid) stays; the ask moved to post-class
+  // moments: Teacher Home once no game is live, the class summary, the digest.
   const proCard = !proLoading && !hasPro && !practice && summary.totalWords > 0;
   const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
@@ -224,14 +230,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const insight = hardest.length > 0 ? (
     <div data-testid="edu-results-hardest" className="flex flex-col gap-2">
       <HardestWordsInsight words={hardest} t={t} />
-      {!proLoading && !hasPro && !practice && (
-        <ProInsightLink
-          placement="results_hardest_words"
-          language={language}
-          label={tf('education.results.freeInsight.proLine', 'Full report for every student with Pro')}
-          proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')}
-        />
-      )}
     </div>
   ) : null;
   // The missed words grow to the podium's height on a wide wall, so the side column never ends in a blank half.
@@ -356,10 +354,11 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                     />
                   ) : null
                 }
-                proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} round={round} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} /> : null}
+                proSlot={proCard ? <ClassReportButton language={language} underHalf={studentsUnderHalf(summary)} bars={reportBars(summary)} round={round} proLabel={tf('eduLiveRoom.hostResults.proPill', 'Pro')} suppressOffer /> : null}
                 exportSlot={
-                  // Export class report (PDF): the real export for Pro, locked and straight to checkout for a free teacher.
-                  !proLoading && summary.totalWords > 0 && students > 0 && !practice ? (
+                  // Export class report (PDF): the real export for Pro. The locked free-teacher
+                  // variant is a checkout CTA — a mid-class ask, so it stays off this wall.
+                  !proLoading && hasPro && summary.totalWords > 0 && students > 0 && !practice ? (
                     <ReportPdfExportButton
                       language={language}
                       summary={summary}
@@ -370,7 +369,8 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
                   ) : null
                 }
                 secondary={
-                  students > 0 && !practice ? (
+                  // Share with parents links a free teacher to the upgrade page: mid-class ask, off.
+                  students > 0 && !practice && hasPro ? (
                     <ParentShareLink
                       language={language}
                       hasPro={hasPro}

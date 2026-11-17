@@ -30,13 +30,14 @@ const summary = {
 const players = [{ username: 'Noa', score: 30, wordsFoundCount: 6 }, { username: 'Ido', score: 10, wordsFoundCount: 2 }, { username: 'Lia', score: 0, wordsFoundCount: 0 }];
 
 describe('EduHostResults hardest words', () => {
-  it('given a live round with lesson data, then the hardest words lead the "Words your class missed" panel with the Pro line for a free teacher', () => {
+  it('given a live round with lesson data, then the hardest words lead the "Words your class missed" panel with NO Pro line for a free teacher (no mid-class ask)', () => {
     pro.hasPro = false;
     render(<EduHostResults summary={summary} players={players} t={t} onRematch={vi.fn()} />);
     const insight = screen.getByTestId('round-hardest-words');
     expect(screen.getByTestId('edu-reteach-words')).toContainElement(insight);
     expect(screen.getAllByTestId('round-hardest-word').length).toBeGreaterThan(0);
-    expect(screen.getByTestId('pro-insight-link-results_hardest_words')).toBeInTheDocument();
+    // The Pro ask moved to post-class moments; the live wall keeps only the free insight.
+    expect(screen.queryByTestId('pro-insight-link-results_hardest_words')).toBeNull();
   });
 
   it('given a Pro teacher, then the insight stays and no Pro line shows', () => {

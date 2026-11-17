@@ -37,6 +37,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
+import { useTeacherLiveGameRunning } from '@/hooks/useTeacherLiveGameRunning';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
@@ -169,10 +170,14 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   // the Teacher Pro offer never mounted and edu_pro_offer_* went to zero.
   const askSettled = ready && !classroomsError && (!hasClasses || week.status !== 'loading');
   const freeTeacher = !proLoading && pro.known && !hasProAccess(pro, nowMs);
+  // No Pro ask while a class is live: the teacher is mid-lesson, and every
+  // mid-class tap in the funnel died in the room (ur-audit 2026-11-17). Unknown
+  // (null) fails open — a broken status check must never hide the offer.
+  const liveGameRunning = useTeacherLiveGameRunning(hasClasses);
   const railAsk = pickHomeAsk({
     account: Boolean(accountBanner) || Boolean(alert),
     onboarding: onboardingCardShown,
-    pro: freeTeacher && hasClasses,
+    pro: freeTeacher && hasClasses && liveGameRunning !== true,
   });
   const proCard = askSettled && railAsk === 'pro' ? (
     <DashboardProOfferCard language={language} t={t} />

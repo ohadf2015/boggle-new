@@ -66,7 +66,8 @@ describe('ClassroomResultsCard free teacher round insight', () => {
     expect(words[0]).toContain('neutron');
     expect(words[1]).toContain('quark');
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
-    expect(screen.getByTestId('pro-insight-link-results_hardest_words')).toBeInTheDocument();
+    // This card is the live round-end screen: the free insight shows, the Pro ask does not (post-class only).
+    expect(screen.queryByTestId('pro-insight-link-results_hardest_words')).toBeNull();
   });
 
   it('given a student phone, when the round ends, then no teacher insight or Pro link renders', () => {

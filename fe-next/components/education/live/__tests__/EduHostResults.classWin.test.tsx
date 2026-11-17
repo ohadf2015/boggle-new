@@ -65,10 +65,11 @@ describe('EduHostResults share class win', () => {
     expect(ph.capture).toHaveBeenCalledWith('brag_share_tapped', { surface: 'edu_class_win', kind: 'class', result: 'copied' });
   });
 
-  it('given a round where nobody found a word, when More opens, then there is no class win to share', () => {
+  it('given a round where nobody found a word, then there is no class win to share — and nothing left behind More for a free teacher', () => {
     const silent = players.map((p) => ({ ...p, wordsFoundCount: 0, score: 0 }));
     render(<EduHostResults summary={summary} players={silent} t={t} onRematch={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(screen.queryByTestId('edu-results-share-class-win')).toBeNull();
+    // No class win, no parent-share upsell, no report slot (totalWords 0): the More row does not render.
+    expect(screen.queryByTestId('edu-results-more-toggle')).toBeNull();
   });
 });
