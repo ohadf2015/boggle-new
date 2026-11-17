@@ -129,8 +129,7 @@ const keys: string[] = [
     'completeTitle', 'completeSub', 'completeNext', 'completeCta', 'reward',
   ].map((k) => `wordTowerV2.estate.${k}`),
   ...[
-    'pickFloor', 'goalRevenge', 'goalRevengeBlocked', 'goalRaid', 'coachTip', 'coachGotIt',
-    'aimChip', 'shieldsN', 'aimAt', 'prizeShield', 'prizeLoot', 'wreckFloor', 'wreckName',
+    'shieldsN', 'prizeShield', 'prizeLoot', 'wreckName',
     'revengeName', 'revengeBonus', 'revengeFree', 'revengeBodyBlocked', 'tauntRevenge',
     'district', 'floors', 'back',
   ].map((k) => `wordTowerV2.rivals.${k}`),

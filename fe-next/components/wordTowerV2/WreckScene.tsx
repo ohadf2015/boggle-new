@@ -17,7 +17,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
  * do here — with a big labelled button for keyboard and screen readers.
  */
 export function WreckScene({
-  t, title, titleChip, words, tower, balls, reducedMotion, aftermath, overlay, targetIndex, targetWord, hideDamage, onShare, onFinish, onClose, closeLabel,
+  t, title, titleChip, subHud, words, tower, balls, reducedMotion, aftermath, overlay, targetIndex, targetWord, hideDamage, swingLocked, lockedCta, onShare, onFinish, onClose, closeLabel,
 }: {
   t: T;
   /** Already translated: "Dana's tower" or "Your tower". */
@@ -29,6 +29,12 @@ export function WreckScene({
    * rival named on the banner that started the flow.
    */
   titleChip?: React.ReactNode;
+  /** Compact raid info (prize, shields, payback bonus) under the name. */
+  subHud?: React.ReactNode;
+  /** Hold the cut until the player buys a ball (or similar). */
+  swingLocked?: boolean;
+  /** Shown in place of the cut button while the swing is held. */
+  lockedCta?: React.ReactNode;
   /** Share-link round: a friend's words. Ignored when `tower` is given. */
   words?: string[];
   /** Raid round: the rival's ACTUAL stored floors. */
@@ -153,45 +159,46 @@ export function WreckScene({
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-10 flex flex-col items-center gap-2 px-16">
-        {/* The target's face and name never fade: between the last ball settling
-            and the payout mounting there would otherwise be a stretch of screen
-            where the building being smashed belongs to nobody. */}
-        <div className="max-w-full opacity-100">
-          {titleChip ?? (
-            <h2 className="max-w-full truncate rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard">
-              {title}
-            </h2>
-          )}
-        </div>
-        <div className={`flex items-center gap-2 font-neo-display text-lg font-black text-neo-cream transition-opacity duration-300 ${closing && !state.impact ? 'opacity-0' : 'opacity-100'}`}>
-          <span className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 tabular-nums">
-            {state.wrecked}/{state.total}
-          </span>
-          {targetWord ? (
-            <span className="rounded-neo border-neo border-black bg-neo-pink px-2 text-neo-navy">
-              {t('wordTowerV2.rivals.calledShot', { word: targetWord })}
+      {/* Close at START, mute FAB reserved at END — never the same corner. */}
+      <header
+        data-testid="raid-strike-header"
+        className="pointer-events-none absolute inset-x-0 top-[max(0.75rem,env(safe-area-inset-top))] z-30 flex items-start gap-2 px-3"
+      >
+        {!state.done && !aftermath ? (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label={t('wordTowerV2.wreck.back')}
+            data-testid="wreck-close"
+            className="pointer-events-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
+          >
+            <X className="h-5 w-5" aria-hidden />
+          </button>
+        ) : (
+          <div className="h-11 w-11 shrink-0" aria-hidden />
+        )}
+        <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5">
+          <div className="max-w-full opacity-100">
+            {titleChip ?? (
+              <h2 className="max-w-full truncate rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-1 font-neo-display text-2xl font-black uppercase text-neo-navy shadow-hard">
+                {title}
+              </h2>
+            )}
+          </div>
+          {subHud}
+          <div className={`flex items-center gap-2 font-neo-display text-sm font-black text-neo-cream transition-opacity duration-300 md:text-lg ${closing && !state.impact ? 'opacity-0' : 'opacity-100'}`}>
+            <span className="rounded-neo border-neo border-neo-cream/40 bg-neo-navy/85 px-2 tabular-nums">
+              {state.wrecked}/{state.total}
             </span>
-          ) : null}
-          <span className="flex gap-1" aria-label={t('wordTowerV2.wreck.balls', { n: state.ballsLeft + (state.armed ? 1 : 0) })}>
-            {Array.from({ length: state.ballsLeft + (state.armed ? 1 : 0) }, (_, i) => (
-              <span key={i} className="h-5 w-5 rounded-full border-neo border-black bg-[#2b2f45] shadow-hard-sm" />
-            ))}
-          </span>
+            <span className="flex gap-1" aria-label={t('wordTowerV2.wreck.balls', { n: state.ballsLeft + (state.armed ? 1 : 0) })}>
+              {Array.from({ length: state.ballsLeft + (state.armed ? 1 : 0) }, (_, i) => (
+                <span key={i} className="h-5 w-5 rounded-full border-neo border-black bg-[#2b2f45] shadow-hard-sm" />
+              ))}
+            </span>
+          </div>
         </div>
-      </div>
-
-      {/* Always a way out (Escape too) — the round is a dialog, not a trap. */}
-      {!state.done && !aftermath ? (
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t('wordTowerV2.wreck.back')}
-          className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30 flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cream text-neo-navy shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
-        >
-          <X className="h-5 w-5" aria-hidden />
-        </button>
-      ) : null}
+        <div className="h-11 w-11 shrink-0" aria-hidden />
+      </header>
 
       {crash && !state.impact && !closing ? (
         <div
@@ -203,7 +210,11 @@ export function WreckScene({
         </div>
       ) : null}
 
-      {!state.done && !aftermath ? (
+      {!state.done && !aftermath && swingLocked ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center px-3 pb-[max(1.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))]">
+          <div className="pointer-events-auto w-full max-w-sm">{lockedCta}</div>
+        </div>
+      ) : !state.done && !aftermath ? (
         <button
           type="button"
           onClick={() => cutRef.current()}
