@@ -133,7 +133,8 @@ export function DayPrizeReveal({ kind, onClose, source }: DayPrizeRevealProps) {
     setFreshOpen(outcome.prize.claimed);
     setFixedMode(!!outcome.prize.fixed);
     setPhase('open');
-    celebrate(outcome.prize.tier);
+    // Replay of an already-opened box: show what it held, but don't celebrate again.
+    if (outcome.prize.claimed) celebrate(outcome.prize.tier);
     trackGrowthEvent('day_prize_opened', {
       kind,
       source,

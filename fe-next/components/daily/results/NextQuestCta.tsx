@@ -20,7 +20,7 @@ import { chainPips, markDailyHandoff, type ChainPip } from '@/components/daily/f
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 import { DayPrizeReveal } from '@/components/daily/prize/DayPrizeReveal';
 import { StreakMilestonePopup } from '@/components/streak/StreakMilestonePopup';
-import { claimPopupSlot, releasePopupSlot } from '@/components/daily/prize/dayPrizeStore';
+import { claimPopupSlot, releasePopupSlot, todayChestAlreadyOpened } from '@/components/daily/prize/dayPrizeStore';
 import { prizeToPop, finishingClearsDay } from '@/components/daily/prize/prizeEligibility';
 import type { DayPrizeKind } from '@/lib/daily/dayPrize';
 import { NextQuestMore } from './NextQuestMore';
@@ -125,10 +125,19 @@ export function NextQuestCta({
   const pending = signedIn && !played.loading && settled ? prizeToPop(playStateFromToday(played.today), justFinished) : null;
   useEffect(() => {
     if (!pending) return;
+    let cancelled = false;
     const timer = setTimeout(() => {
-      if (claimPopupSlot(pending)) setPrizeKind(pending);
+      void (async () => {
+        // Already opened on this device or another: do not pop the box again.
+        if (await todayChestAlreadyOpened()) return;
+        if (cancelled) return;
+        if (claimPopupSlot(pending)) setPrizeKind(pending);
+      })();
     }, PRIZE_POP_DELAY_MS);
-    return () => clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [pending]);
   const closePrize = () => {
     if (prizeKind) releasePopupSlot(prizeKind);

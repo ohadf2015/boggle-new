@@ -60,6 +60,25 @@ export async function POST(
     const claimResult = result as ClaimResult;
 
     if (!claimResult.success) {
+      // Second click, other tab, or a lost first response: the RPC refuses
+      // already-claimed gifts with the same payload as missing / not-yours.
+      // If this gift is ours and already claimed, treat it as a success so
+      // the client can drop it from the badge instead of showing an error
+      // and leaving it "waiting". Pays nothing.
+      const { data: existing } = await supabase
+        .from('admin_gift_messages')
+        .select('id, claimed, recipient_id')
+        .eq('id', giftId)
+        .maybeSingle();
+      if (existing?.claimed && existing.recipient_id === user.id) {
+        return NextResponse.json({
+          success: true,
+          xpAwarded: 0,
+          coinsAwarded: 0,
+          alreadyClaimed: true,
+          levelUp: null,
+        });
+      }
       return NextResponse.json(
         { error: 'Cannot claim gift' },
         { status: 400 }

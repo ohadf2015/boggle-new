@@ -99,16 +99,20 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
   });
 
   // Sync the server count into local state + localStorage. Once the list has loaded it
-  // owns the count (it knows about local claims), except when the server reports MORE
-  // than the list holds: a gift arrived after the list was fetched, so take that count
-  // and refetch the list, otherwise it stays hidden until a full reload.
+  // owns the count (it knows about local claims). A stale-high server count after a
+  // claim must not bump the badge back up — just refetch the list, which will surface
+  // a genuinely new gift and ignore ones we already claimed locally.
   useEffect(() => {
     if (!countQuery.data) return;
     const count = countQuery.data.count ?? 0;
-    if (giftsLoadedRef.current && count <= giftsCountRef.current) return;
+    if (giftsLoadedRef.current) {
+      if (count > giftsCountRef.current) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.gifts.list() });
+      }
+      return;
+    }
     setUnclaimedCount(count);
     setCachedCount(count);
-    if (giftsLoadedRef.current) queryClient.invalidateQueries({ queryKey: queryKeys.gifts.list() });
   }, [countQuery.data, setCachedCount, queryClient]);
 
   // Query: full gift list (only when count > 0)
@@ -120,7 +124,10 @@ export function useUnclaimedGifts(): UseUnclaimedGiftsReturn {
       if (!response.ok) throw new Error('Failed to fetch gifts');
       return response.json() as Promise<{ gifts: GiftMessage[] }>;
     },
-    enabled: isAuthenticated && unclaimedCount > 0,
+    // Stay enabled when the server still reports gifts, even if the displayed
+    // count is 0 after a local claim — otherwise a new gift after the last
+    // claim can never refetch (the list query would stay off).
+    enabled: isAuthenticated && (unclaimedCount > 0 || (countQuery.data?.count ?? 0) > 0),
     staleTime: CACHE_DURATION,
   });
 
