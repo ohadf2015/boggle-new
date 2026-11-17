@@ -564,13 +564,23 @@ export function visibleParts<T extends string>(category: HiddenCategory, all: re
 const isHidden = (cat: HiddenCategory, v: string) =>
   (HIDDEN_PARTS[cat] as readonly string[]).includes(v);
 
+// Free, builder-visible parts that must stay out of the seeded/random pools.
+// Adding a free style to those pools re-rolls every existing guest and bot face.
+const RANDOM_POOL_EXCLUDE: Partial<Record<HiddenCategory, readonly string[]>> = {
+  hair: ['shortCrop'],
+  eyes: ['friendly'],
+  facialHair: ['boxedBeard'],
+};
+const notInRandomPool = (cat: HiddenCategory, v: string) =>
+  (RANDOM_POOL_EXCLUDE[cat] ?? []).includes(v);
+
 // Free-only arrays (all premium+epic+hidden parts filtered out) for random generation
 // Also exclude 'none' from face parts so random avatars always have a complete face
 const FREE_BASES = AVATAR_BASES.filter(v => !PREMIUM_MAP.base.includes(v) && !isHidden('base', v));
-const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v) && !isHidden('eyes', v));
+const FREE_EYE_STYLES = AVATAR_EYE_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.eyes.includes(v) && !isHidden('eyes', v) && !notInRandomPool('eyes', v));
 const FREE_MOUTH_STYLES = AVATAR_MOUTH_STYLES.filter(v => v !== 'none' && !PREMIUM_MAP.mouth.includes(v) && !isHidden('mouth', v));
 const FREE_ACCESSORIES = AVATAR_ACCESSORIES.filter(v => !PREMIUM_MAP.accessory.includes(v) && !isHidden('accessory', v));
-const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v) && !isHidden('facialHair', v));
+const FREE_FACIAL_HAIR_STYLES = AVATAR_FACIAL_HAIR_STYLES.filter(v => !PREMIUM_MAP.facialHair.includes(v) && !isHidden('facialHair', v) && !notInRandomPool('facialHair', v));
 // "Real" (non-empty) variants — used so accessories/beards are an opt-IN highlight,
 // not a coin-flip that fills every slot (the generated-slop tell).
 const FREE_REAL_ACCESSORIES = FREE_ACCESSORIES.filter(v => v !== 'none');
@@ -578,8 +588,8 @@ const FREE_REAL_FACIAL_HAIR = FREE_FACIAL_HAIR_STYLES.filter(v => v !== 'none');
 const FREE_EYEBROW_STYLES = AVATAR_EYEBROW_STYLES.filter(v => !PREMIUM_MAP.eyebrows.includes(v) && !isHidden('eyebrows', v));
 const FREE_NOSE_STYLES = AVATAR_NOSE_STYLES.filter(v => !isHidden('noseStyle', v));
 // Gender-specific free hair lists prevent cross-gender style mismatch in random generation
-const FREE_FEMALE_HAIR_STYLES = FEMALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
-const FREE_MALE_HAIR_STYLES = MALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v));
+const FREE_FEMALE_HAIR_STYLES = FEMALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v) && !notInRandomPool('hair', v));
+const FREE_MALE_HAIR_STYLES = MALE_HAIR_STYLES.filter(v => v !== 'none' && !isPremiumPart('hair', v) && !isHidden('hair', v) && !notInRandomPool('hair', v));
 
 // Curated color vibes for random generation — pick a vibe first, then draw all colors from it.
 // This prevents jarring clashes (dark bg + near-black hair, warm skin + icy blue eyes, etc.).
