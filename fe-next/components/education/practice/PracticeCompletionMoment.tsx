@@ -81,6 +81,26 @@ const RANK_SHADOW: Record<string, string> = {
   bronze: 'shadow-hard-lime-xl',
 };
 
+/*
+  The hand-animated mascot clips (public/mascot/anim) answer the rank: a star
+  jump for gold, a proud strut for silver, and for bronze a pratfall that ends
+  on a thumbs-up, so a rough round still gets encouragement. With motion off
+  the still Mascot below stands in, and no clip is downloaded.
+*/
+const RANK_CLIP: Record<string, string> = {
+  gold: '/mascot/anim/joy-jump.webp',
+  silver: '/mascot/anim/puffed-chest-smug.webp',
+  bronze: '/mascot/anim/faceplant-thumbsup.webp',
+};
+
+/** When the n-th filled star (1-based) stamps down, in seconds. */
+const stampDelay = (slot: number) => 0.25 + 0.22 * (slot - 1);
+
+const REVEAL_KEYFRAMES =
+  '@keyframes lc-rays{to{transform:rotate(360deg)}}' +
+  '@keyframes lc-cta-breathe{0%,100%{scale:1}50%{scale:1.03}}' +
+  '@keyframes lc-stamp-ring{0%{transform:scale(.6);opacity:0}25%{opacity:.9}100%{transform:scale(1.9);opacity:0}}';
+
 /* A filled star is a chunky gold key (the same candy face as the letter tiles). */
 const STAR_KEY: CSSProperties = {
   background: '#FFD32A',
@@ -177,8 +197,15 @@ export default function PracticeCompletionMoment({
     playSound('coinCollect', { requiresGameActive: false, volume: 0.45 });
   }, [playSound]);
 
-  const shownCorrect = useCountUp(correct, 700, skipAnimations, 350);
-  const shownPercent = useCountUp(plan.percent, 700, skipAnimations, 350);
+  /*
+    The reveal runs in order: stars stamp down one by one, then the mascot
+    jumps in and the score counts up. Everything after the stars waits for them.
+  */
+  const afterStarsMs = Math.round((stampDelay(Math.max(plan.stars, 1)) + 0.25) * 1000);
+  const shownCorrect = useCountUp(correct, 700, skipAnimations, afterStarsMs);
+  const shownPercent = useCountUp(plan.percent, 700, skipAnimations, afterStarsMs);
+  // A fresh URL per card, so a replayed round's clip starts from its first frame.
+  const [clipNonce] = useState(() => Date.now().toString(36));
 
   const headline = plan.perfect
     ? t('student.practiceFun.headline.perfect')
@@ -190,7 +217,7 @@ export default function PracticeCompletionMoment({
       data-rank={plan.rank}
       dir={dir}
       className={cn(
-        'relative mx-auto w-full max-w-sm overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-light',
+        'relative mx-auto w-full max-w-sm overflow-hidden sm:max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light',
         RANK_SHADOW[plan.rank],
         className
       )}
@@ -198,7 +225,7 @@ export default function PracticeCompletionMoment({
         backgroundImage: `radial-gradient(90% 45% at 50% 0%, color-mix(in srgb, ${RANK_HUE[plan.rank]} 30%, transparent), transparent 75%)`,
       }}
     >
-      <style>{'@keyframes lc-rays{to{transform:rotate(360deg)}}@keyframes lc-cta-breathe{0%,100%{scale:1}50%{scale:1.03}}'}</style>
+      <style>{REVEAL_KEYFRAMES}</style>
       <span className={cn('block h-2.5 w-full', RANK_ACCENT[plan.rank])} aria-hidden="true" />
 
       {/* Leaving is chrome, not a third button competing with the payoff. */}
@@ -227,17 +254,30 @@ export default function PracticeCompletionMoment({
               <AdaptiveMotion.div
                 key={slot}
                 {...(filled ? { 'data-testid': `practice-completion-star-${slot}` } : {})}
-                initial={{ scale: 0.2, rotate: -25 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.12 * slot, type: 'spring', stiffness: 380, damping: 13 }}
+                // Earned stars stamp down from above, one after another; empty slots just appear.
+                initial={filled ? { scale: 2.4, rotate: -18, opacity: 0 } : { opacity: 0 }}
+                animate={filled ? { scale: 1, rotate: 0, opacity: 1 } : { opacity: 1 }}
+                transition={
+                  filled
+                    ? { delay: stampDelay(slot), type: 'spring', stiffness: 520, damping: 18 }
+                    : { delay: 0.15, duration: 0.2 }
+                }
                 style={filled ? STAR_KEY : undefined}
                 className={cn(
                   // A game-style rating: the middle star sits higher and larger.
-                  'flex items-center justify-center rounded-neo',
+                  'relative flex items-center justify-center rounded-neo',
                   slot === 2 ? 'mb-2 h-16 w-16' : 'h-[52px] w-[52px]',
                   !filled && 'border-[3px] border-dashed border-neo-cream/35 bg-neo-black/20'
                 )}
               >
+                {filled && !skipAnimations && (
+                  <span
+                    aria-hidden="true"
+                    data-testid="practice-completion-stamp"
+                    className="pointer-events-none absolute -inset-1 rounded-neo border-[3px] border-neo-yellow opacity-0 animate-[lc-stamp-ring_520ms_ease-out_both]"
+                    style={{ animationDelay: `${stampDelay(slot) + 0.08}s` }}
+                  />
+                )}
                 <Star
                   className={cn(slot === 2 ? 'h-9 w-9' : 'h-7 w-7', filled ? 'fill-neo-navy text-neo-navy' : 'text-neo-white/35')}
                   aria-hidden="true"
@@ -260,14 +300,35 @@ export default function PracticeCompletionMoment({
           <span
             aria-hidden="true"
             data-testid="practice-completion-rays"
-            className="pointer-events-none absolute left-1/2 top-1/2 size-56 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-45 motion-safe:animate-[lc-rays_14s_linear_infinite]"
+            className="pointer-events-none absolute left-1/2 top-1/2 size-56 -translate-x-1/2 sm:size-64 -translate-y-1/2 rounded-full opacity-45 motion-safe:animate-[lc-rays_14s_linear_infinite]"
             style={{
               background: `repeating-conic-gradient(from 0deg, ${RANK_HUE[plan.rank]} 0deg 9deg, transparent 9deg 22deg)`,
               maskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
               WebkitMaskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
             }}
           />
-          <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" className="relative" />
+          {skipAnimations ? (
+            <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" className="relative" />
+          ) : (
+            <AdaptiveMotion.div
+              className="relative"
+              initial={{ y: 36, scale: 0.6, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              transition={{ delay: afterStarsMs / 1000, type: 'spring', stiffness: 420, damping: 15 }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- animated webp must play as-is */}
+              <img
+                src={`${RANK_CLIP[plan.rank] ?? RANK_CLIP.bronze}?r=${clipNonce}`}
+                alt=""
+                aria-hidden="true"
+                data-testid="practice-completion-mascot-clip"
+                width={288}
+                height={244}
+                draggable={false}
+                className="h-36 w-auto select-none sm:h-44"
+              />
+            </AdaptiveMotion.div>
+          )}
         </div>
 
         {/* The score counts up as the card lands; the final line is what assistive tech reads. */}
