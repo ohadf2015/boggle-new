@@ -62,7 +62,7 @@ export type { SurvivalClueBoxesProps } from './SurvivalClueBoxes';
 export { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
 export type { AccumulatedScoreDisplayProps } from './AccumulatedScoreDisplay';
 
-export { AutoClueNotification } from './AutoClueNotification';
+export { AutoClueNotification, AutoClueStack } from './AutoClueNotification';
 export type { AutoClueNotificationProps } from './AutoClueNotification';
 
 export { useLiveScoreTracker } from './useLiveScoreTracker';

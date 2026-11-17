@@ -16,6 +16,7 @@ import {
 import { isWordOnBoard, normalizeWord } from '@/utils/clientWordValidator';
 import { MIN_DISCOVERY_WORD_LENGTH, MAX_DISCOVERY_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { formatRewardMessage } from '@/utils/formatRewardMessage';
+import { comboBonus, isLuckyWord, LUCKY_LIFE_BONUS, nextCombo, type ComboState } from './hunt/huntReward';
 import { recordNotOnBoard, recordNotInDictionary } from '@/utils/invalidWordTracker';
 import type { useSafeTimeout } from '@/hooks/useSafeTimeout';
 import { resolveWordVerdict, type WordVerdict } from '@/lib/dictionary/checkWordRemote';
@@ -85,6 +86,7 @@ export function useSurvivalWordSubmission({
   const handleDiscoveryFeedbackRef = useRef<((word: string, target: string) => void) | null>(null);
 
   // Latest state for async continuations and same-tick double submits; props lag a render behind.
+  const comboRef = useRef<ComboState | null>(null);
   const attemptsRef = useRef(attempts);
   const discoveredRef = useRef(discoveredWords);
   const isGameOverRef = useRef(isGameOver);
@@ -251,14 +253,20 @@ export function useSurvivalWordSubmission({
 
     const baseLifeGained = calculateLifeReward(word.length);
     const longWordBonus = getLifeBonusForWord(word.length);
-    const lifeGained = baseLifeGained + longWordBonus;
+    const now = Date.now();
+    const combo = nextCombo(comboRef.current, now);
+    comboRef.current = combo;
+    const lucky = isLuckyWord(targetWord, word);
+    const lifeGained = baseLifeGained + longWordBonus + comboBonus(combo.count) + (lucky ? LUCKY_LIFE_BONUS : 0);
     const tokensGained = calculateTokenReward(word.length);
 
     const discovery: WordDiscovery = {
       word,
       lifeGained,
       tokensGained,
-      timestamp: Date.now(),
+      timestamp: now,
+      combo: combo.count,
+      lucky,
     };
 
     discoveredRef.current = [...discoveredRef.current, discovery];
@@ -280,7 +288,7 @@ export function useSurvivalWordSubmission({
       : rewardMessage;
     showToast('valid-word', bonusMessage, word);
     return 'accepted';
-  }, [grid, language, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch, chargeMiss, notOnBoardMessage, forgiveMisses]);
+  }, [grid, language, targetWord, playWordAcceptedSound, playWordRejectedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch, chargeMiss, notOnBoardMessage, forgiveMisses]);
 
   // Handle word submission (main entry point)
   const handleWordSubmit = useCallback((word: string) => {

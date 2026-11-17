@@ -4,7 +4,7 @@
 // ─── Word Hunt Effects Canvas ───────────────────────────────────────
 // PixiJS particle/celebration layer for the Word Hunt Survival mode.
 // Renders transparently above the game DOM. Purely visual — no interactivity.
-// Survival flavor: heavier urgency embers, life-drop shock, target-found freeze.
+// Survival flavor: life-drop shock, target-found freeze.
 
 import { useEffect, useRef } from 'react';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine/GameCanvas';
@@ -21,8 +21,6 @@ import {
   WORD_MEDIUM_BURST,
   WORD_BIG_EXPLOSION,
   WORD_MASSIVE_BURST,
-  ERROR_SPARKS,
-  URGENCY_EMBERS,
   LETTER_SHATTER,
   CLUE_SPARKLE,
   LIFE_RISING_STARS,
@@ -39,12 +37,10 @@ export type WordHuntEffect =
   | { type: 'letterTap'; x: number; y: number }
   | { type: 'wordValid'; x: number; y: number; points: number }
   | { type: 'targetFound'; x: number; y: number }
-  | { type: 'invalid'; x: number; y: number }
   | { type: 'letterEliminated'; x: number; y: number }
   | { type: 'clueGain' }
   | { type: 'lifeGain'; amount: number }
   | { type: 'lifeDrop'; amount: number }
-  | { type: 'lowLife' }
   | { type: 'gameWon'; score: number }
   | { type: 'gameLost' };
 
@@ -61,7 +57,6 @@ const VERDICT_FLASH_MAX = 0.12;
 
 function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
   const { app, particles, shake, flash, timeDilation, width, height } = useGameEngine();
-  const urgencyEmitterRef = useRef<ReturnType<typeof particles.create> | null>(null);
   const lastEffectAt = useRef(0);
   const holdMs = useRef(0);
 
@@ -161,12 +156,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           break;
         }
 
-        // ── Invalid input ──
-        case 'invalid':
-          particles.burst(ERROR_SPARKS, effect.x, effect.y);
-          flash.flash({ color: 0xff2200, duration: 0.12, intensity: VERDICT_FLASH_MAX });
-          shake.shake({ intensity: 4, duration: 0.12, decay: 'exponential', frequency: 40 });
-          break;
 
         // ── Letter eliminated by enemy ──
         case 'letterEliminated':
@@ -207,16 +196,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           break;
         }
 
-        // ── Low life — start persistent urgency embers (idempotent) ──
-        case 'lowLife':
-          if (!urgencyEmitterRef.current) {
-            urgencyEmitterRef.current = particles.create({
-              ...URGENCY_EMBERS,
-              spawnConfig: { width, height: 12 },
-            });
-            urgencyEmitterRef.current.emit(width / 2, height - 18);
-          }
-          break;
 
         // ── Game won — multi-wave firework spectacular ──
         case 'gameWon': {
@@ -261,7 +240,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
             }, 1500);
           }
 
-          urgencyEmitterRef.current = null;
           break;
         }
 
@@ -274,7 +252,6 @@ function EffectsWorker({ effects, onEffectsConsumed }: EffectsWorkerProps) {
           shake.medium();
           timeDilation.slowDown(0.2, 0.6);
 
-          urgencyEmitterRef.current = null;
           break;
         }
       }

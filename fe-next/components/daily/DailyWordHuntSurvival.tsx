@@ -3,7 +3,6 @@
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
-import { AnimatePresence } from 'framer-motion';
 
 const WordHuntEffectsCanvas = dynamic(
   () => import('./WordHuntEffectsCanvas'),
@@ -31,7 +30,7 @@ import {
   SurvivalHeader,
   SurvivalLifeBar,
   SurvivalClueBoxes,
-  AutoClueNotification,
+  AutoClueStack,
 } from './survival';
 import { HuntLeftRail, HuntRightRail } from './survival/HuntShellRails';
 import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
@@ -344,20 +343,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   ) : null;
 
   const notifications = (
-    <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top,0px)+4.5rem)] z-50 flex flex-col items-center gap-2 px-4">
-      <AnimatePresence mode="popLayout">
-        {state.activeNotifications.map((notification) => (
-          <AutoClueNotification
-            key={notification.id}
-            clueType={notification.clueType}
-            onDismiss={() => actions.dismissNotification(notification.id)}
-            direction={actions.gameDir}
-            t={t}
-            language={language}
-          />
-        ))}
-      </AnimatePresence>
-    </div>
+    <AutoClueStack
+      notifications={state.activeNotifications}
+      onDismiss={actions.dismissNotification}
+      direction={actions.gameDir}
+      t={t}
+      language={language}
+    />
   );
 
   const quitConfirm = (orientation: 'landscape' | 'portrait') => (

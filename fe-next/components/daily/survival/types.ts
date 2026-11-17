@@ -32,6 +32,9 @@ export interface WordDiscovery {
   timestamp: number;
   lifeGained: number;
   tokensGained: number;
+  /** Words found in a row, each within the combo window of the last. */
+  combo?: number;
+  lucky?: boolean;
 }
 
 /**

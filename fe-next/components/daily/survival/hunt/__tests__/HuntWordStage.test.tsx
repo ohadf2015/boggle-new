@@ -48,6 +48,25 @@ describe('HuntWordStage', () => {
     expect(screen.getByText('wordHunt.survival.stage.praiseMid')).toBeTruthy();
   });
 
+  it('Given a lucky word, When it lands, Then a lucky sticker names the bonus', () => {
+    stage({ phase: 'verdict', verdict: 'good', word: 'MAT', points: 13, lucky: true });
+    expect(screen.getByTestId('hunt-stage').dataset.lucky).toBe('true');
+    expect(screen.getByText(/wordHunt.survival.stage.lucky/)).toBeTruthy();
+  });
+
+  it('Given a third quick word, When it lands, Then the cheer calls out the combo', () => {
+    stage({ phase: 'verdict', verdict: 'good', word: 'MAT', points: 9, combo: 3 });
+    expect(screen.getByText('wordHunt.survival.stage.combo:{"count":3}')).toBeTruthy();
+  });
+
+  it('Given a good word, Then a burst plays on every device unless motion is calmed', () => {
+    const { unmount } = stage({ phase: 'verdict', verdict: 'good', word: 'MAT', points: 5 });
+    expect(screen.getByTestId('hunt-stage-burst')).toBeTruthy();
+    unmount();
+    stage({ phase: 'verdict', verdict: 'good', word: 'MAT', points: 5, calm: true });
+    expect(screen.queryByTestId('hunt-stage-burst')).toBeNull();
+  });
+
   it('names the reason on a rejected word', () => {
     stage({ phase: 'verdict', verdict: 'bad', word: 'SFRK', message: 'Not a word -4' });
     expect(screen.getByTestId('hunt-stage').dataset.verdict).toBe('bad');
