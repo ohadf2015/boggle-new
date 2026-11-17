@@ -2944,6 +2944,7 @@ const ru = {
     "subtitle": "Найди слово, которое их соединяет",
     "placeholder": "Введи связующее слово...",
     "submit": "Отправить",
+    "typeHint": "Можно печатать на клавиатуре",
     "backspace": "Удалить букву",
     "momentum": {
       "start": "Решай {goal} подряд и получи бонус",
@@ -11349,6 +11350,7 @@ const ru = {
     "journeyStepOf": "Шаг {n}/{total}",
     "journeyAllRequiredDone": "Задания на сегодня выполнены! Бонусные раунды — по желанию",
     "backToDailyHub": "К заданиям дня",
+    "alsoToday": "Ещё сегодня",
     "skipOptional": "Пропустить",
     "bonusQuest": "Бонус",
     "untimedQuest": "Квест без таймера",

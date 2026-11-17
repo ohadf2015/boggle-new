@@ -159,7 +159,12 @@ export function pickNextUnplayedMode(
   // Word Wheel hands off to Connections and Connections to Word Tower regardless
   // of whether Word Hunt is still open. Earlier modes are only offered once
   // everything later is done.
+  return pickUnplayedModes(state, justFinished)[0] ?? null;
+}
+
+/** Every mode still open today, in hand-off order (see pickNextUnplayedMode). */
+export function pickUnplayedModes(state: DailyModePlayState, justFinished: DailyModeId): DailyModeId[] {
   const start = MODE_PRIORITY.indexOf(justFinished) + 1;
   const chain = [...MODE_PRIORITY.slice(start), ...MODE_PRIORITY.slice(0, start - 1)];
-  return chain.find((id) => !isModePlayed(state, id)) ?? null;
+  return chain.filter((id) => !isModePlayed(state, id));
 }

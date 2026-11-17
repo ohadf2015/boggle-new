@@ -9260,6 +9260,7 @@ const en = {
     "journeyStepOf": "Step {n}/{total}",
     "journeyAllRequiredDone": "Today's quests: cleared! Bonus rounds are extra",
     "backToDailyHub": "Back to daily",
+    "alsoToday": "Also today",
     "skipOptional": "Skip",
     "bonusQuest": "Bonus",
     "untimedQuest": "Untimed quest",
@@ -18526,6 +18527,7 @@ const en = {
     "subtitle": "Find the word that connects both.",
     "placeholder": "Type the bridge word...",
     "submit": "Check",
+    "typeHint": "Type with your keyboard",
     "backspace": "Delete letter",
     "momentum": {
       "start": "Solve {goal} in a row for a bonus",
