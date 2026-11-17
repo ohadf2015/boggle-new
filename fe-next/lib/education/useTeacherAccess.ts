@@ -17,6 +17,8 @@ interface UseTeacherAccessResult {
   latestRequest: TeacherAccessRequest | null;
   /** Trial countdown for the latest approved request, or null when none/active-unbounded. */
   trial: TrialStatus | null;
+  /** Never ran a class game: the free 14 days start at the first one (no countdown, no "ended"). */
+  trialWaiting?: boolean;
   isLoading: boolean;
   /** A lookup failed: show an error with retry, never the "no access" form. */
   error: TeacherAccessError;
@@ -29,6 +31,7 @@ export function useTeacherAccess(): UseTeacherAccessResult {
   const [attempt, setAttempt] = useState(0);
   const [answeredFor, setAnsweredFor] = useState<string | null>(null);
   const [requestFailed, setRequestFailed] = useState(false);
+  const [trialWaiting, setTrialWaiting] = useState(false);
   // Tick a clock so the trial countdown stays live without re-deriving Date.now()
   // impurely during render.
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -50,6 +53,7 @@ export function useTeacherAccess(): UseTeacherAccessResult {
       .then((j) => {
         if (!live) return;
         setLatestRequest(j?.row || null);
+        setTrialWaiting(j?.trial_waiting === true);
         setRequestFailed(false);
       })
       .catch(() => {
@@ -132,6 +136,7 @@ export function useTeacherAccess(): UseTeacherAccessResult {
     status,
     latestRequest,
     trial,
+    trialWaiting,
     isLoading: authLoading || reqLoading || profileLoading || profileStale,
     error: profileFailed ? 'profile' : requestFailed && !reqLoading ? 'request' : null,
     retry,

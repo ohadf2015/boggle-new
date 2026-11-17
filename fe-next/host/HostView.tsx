@@ -33,7 +33,7 @@ import { HostLobbyScreen } from '@/components/multiplayer/lobby/HostLobbyScreen'
 import { MpRoundScreen } from '@/components/multiplayer/round/MpRoundScreen';
 import { MpCountdown } from '@/components/multiplayer/round/MpCountdown';
 import { useHostPhase } from './hooks/useHostPhase';
-import { classroomExitPhase, classroomLobbyExitSkipsConfirm } from './components/exitConfirmModel';
+import { classroomExitPhase, emptyLobbyEndConfirm } from './components/exitConfirmModel';
 import { useRosterReceived } from './hooks/useRosterReceived';
 import { useEndRoundRequest } from './hooks/useEndRoundRequest';
 import { useSocket } from '@/utils/SocketContext';
@@ -71,9 +71,9 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
   const { manualReconnect } = useSocket();
   const endRound = useEndRoundRequest({ socket, roundRunning: !!roundRunning, onEnded: () => state.setShowExitConfirm(false), reconnect: manualReconnect });
   const rosterKnown = useRosterReceived(socket, gameCode, (props.initialPlayers?.length ?? 0) > 0);
-  const lobbyExit = classroomLobbyExitSkipsConfirm({ classroom: isClassroomMode, rosterKnown, players: players.playersReady })
-    ? actions.confirmExitRoom
-    : actions.handleExitRoom;
+  const emptyLobby = emptyLobbyEndConfirm({ classroom: isClassroomMode, rosterKnown, players: players.playersReady });
+  // Never leave an empty class lobby in one tap. That end is what students then hit as SESSION_ENDED.
+  const lobbyExit = actions.handleExitRoom;
 
   // Navigation hiding is managed by PageClient based on isActive/showResults
 
@@ -173,6 +173,8 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
         classroom={isClassroomMode}
         phase={classroomExitPhase({ inLobby, roundRunning: !!roundRunning || endRound.status === 'pending' })}
         endRound={endRound}
+        emptyLobby={emptyLobby}
+        gameCode={gameCode}
       />
 
       <SoloStartConfirmDialog

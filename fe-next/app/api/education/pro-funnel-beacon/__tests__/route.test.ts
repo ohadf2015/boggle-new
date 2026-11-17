@@ -95,4 +95,16 @@ describe('POST /api/education/pro-funnel-beacon', () => {
     const p = captureMock.mock.calls[0][0].properties;
     expect(p).toMatchObject({ product: 'teacher_pro', origin: 'client_beacon' });
   });
+
+  it('re-emits the dunning recovery click (recovery_clicked is an allowlisted funnel step)', async () => {
+    const res = await POST(
+      req(JSON.stringify({ event: 'recovery_clicked', props: { surface: 'payment_failed_banner' } })) as never,
+    );
+    expect(res.status).toBe(204);
+    expect(captureMock).toHaveBeenCalledTimes(1);
+    expect(captureMock.mock.calls[0][0]).toMatchObject({
+      event: 'recovery_clicked',
+      properties: { surface: 'payment_failed_banner', product: 'teacher_pro', origin: 'client_beacon' },
+    });
+  });
 });

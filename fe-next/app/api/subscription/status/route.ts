@@ -4,11 +4,13 @@ import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { polarTrialExpires } from '@/lib/education/polarTrial';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { accessTrialExpiryAny } from '@/lib/education/accessTrialServer';
+import { accessTrialExpiryAny, teacherRanClassGame } from '@/lib/education/accessTrialServer';
+import { isWaitingForFirstClassGame } from '@/lib/education/classGameHistory';
 import { hasPendingCheckout, type PendingCheckoutEventRow } from '@/lib/education/pendingCheckout';
 import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
+import { canUseBillingPortal } from '@/lib/education/billingPortal';
 
 const PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS = 800;
 
@@ -81,6 +83,7 @@ async function hasPolarTrialEvent(userId: string): Promise<boolean> {
  * Response:
  * - 200: { has_pro, tier, status, source, grant_expired, portal_url, current_period_end,
  *          cancel_at_period_end, trial_expires, trial_used, access_trial_expires, access_trial_ended,
+ *          access_trial_waiting (never ran a class game: the 14 days start at the first one),
  *          grant: { id, expires_at, days, note, welcomed } | null }
  *   trial_expires is the ISO trial end while status is trialing, else null.
  *   trial_used is true once a Polar trial has started (no second free trial).
@@ -99,8 +102,10 @@ export async function GET(request: NextRequest) {
 
     // Portal only for a provider subscription. A granted teacher has no Polar
     // customer, so the call could only fail and log a warning on every load.
+    // A past_due row keeps the portal after the in-app grace ends: updating the card is the
+    // one fix, and a new checkout would start a second subscription.
     let portalUrl: string | null = null;
-    if (subscription.has_pro && !isGrant) {
+    if (canUseBillingPortal(subscription)) {
       try {
         const client = getPolarClient();
         portalUrl = await client.createCustomerPortalUrl(user.id);
@@ -143,6 +148,12 @@ export async function GET(request: NextRequest) {
     const accessTrialExpires = accessTrialLiveNow ? accessTrialEnd : null;
     // Known to have had (and finished) the free access trial: no second trial is offered.
     const accessTrialEnded = accessTrialEnd !== null && !accessTrialLiveNow;
+    // Never ran a class game: their 14 days start at the first one, so the app says that
+    // instead of a countdown or "your trial has ended". Checkout eligibility is unchanged.
+    const accessTrialWaiting =
+      accessTrialEnd !== null && !onPolarTrial
+        ? isWaitingForFirstClassGame({ hasAccessWindow: true, ranClassGame: await teacherRanClassGame(user.id), onCardTrial: onPolarTrial })
+        : false;
     const pendingCheckout = subscription.has_pro ? false : await resolvePendingCheckout(user.id);
 
     return NextResponse.json({
@@ -158,6 +169,7 @@ export async function GET(request: NextRequest) {
       trial_used: trialUsed,
       access_trial_expires: accessTrialExpires,
       access_trial_ended: accessTrialEnded,
+      access_trial_waiting: accessTrialWaiting,
       pending_checkout: pendingCheckout,
       grant,
     });

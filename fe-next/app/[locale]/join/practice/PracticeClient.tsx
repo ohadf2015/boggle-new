@@ -41,7 +41,7 @@ export function GuestPracticeClient({ locale, pack }: GuestPracticeClientProps) 
           {t('education.student.deadEnd.enterCode')}
         </Link>
       </header>
-      <main className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-y-auto overscroll-contain px-3 py-4 sm:px-6">
+      <main className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col overflow-y-auto overscroll-contain px-3 py-4 sm:px-6 lg:max-w-5xl lg:py-8">
         <SpellingChallengePractice words={words} onComplete={() => undefined} onBack={() => router.push(joinHref)} />
       </main>
     </div>

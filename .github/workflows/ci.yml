@@ -275,7 +275,9 @@ jobs:
         run: |
           set +e
           OUT="$PWD/vitest-guards.json"
-          npx vitest run --config vitest.config.ts guard --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
+          # The education page suite also scans every page directory on disk (registry, related links,
+          # hardcoded English), so a new page breaks it without touching the test: run it on every PR.
+          npx vitest run --config vitest.config.ts guard "[locale]/education/__tests__/" --passWithNoTests --reporter=default --reporter=json --outputFile.json="$OUT"
           RC=$?
           set -e
           node scripts/ci/assert-vitest-passed.mjs "$OUT" "$RC"

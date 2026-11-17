@@ -2273,6 +2273,7 @@ const ja = {
       "label": "獲得チャンス",
       "streak": "{count}連続",
       "seconds": "{seconds}秒",
+      "pointsNow": "+{points}点",
       "timeUp": "時間切れ"
     },
     "correctShort": "せいかい！",
@@ -21651,7 +21652,10 @@ const ja = {
       "answerIs": "正しいつづりは",
       "youWrote": "あなたの答え",
       "next": "次の単語",
-      "finish": "結果を見る"
+      "finish": "結果を見る",
+      "praise": "やったね！|ばっちり！|パーフェクト！|せいかい！|すごい！",
+      "enterHint": "Enter でチェック・単語をぜんぶ入力してね",
+      "progress": "{total}語中{current}語目"
     },
     "cookie": {
       "message": "プレイ数の集計と、ゲームをスムーズに動かすためにクッキーを使います。"
@@ -21745,6 +21749,10 @@ const ja = {
       "lobbyBody": "参加済みの生徒はルームから退出します。",
       "lobbyConfirm": "ルームを閉じる",
       "lobbyStay": "開いたままにする",
+      "emptyTitle": "まだ誰も参加していません",
+      "emptyBody": "クラスが入るよう、コード {{code}} を共有してください。",
+      "emptyStay": "部屋を開いたままにする",
+      "emptyConfirm": "それでも終了する",
       "roundTitle": "このラウンドを終了しますか？",
       "roundBody": "全員にいますぐ結果が表示されます。",
       "roundConfirm": "ラウンドを終了",
@@ -21801,7 +21809,9 @@ const ja = {
       "googleClassroom": "Google Classroom に投稿"
     },
     "lobby": {
-      "waitingForStudents": "生徒の参加を待っています"
+      "waitingForStudents": "生徒の参加を待っています",
+      "lateJoins": "ゲーム終了後に {{count}} 人が参加しようとしました。新しいゲームを始めてください。",
+      "lateJoinsOne": "ゲーム終了後に 1 人が参加しようとしました。新しいゲームを始めてください。"
     },
     "wordcraft": {
       "bingo": "ビンゴ！",

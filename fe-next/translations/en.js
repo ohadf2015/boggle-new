@@ -2273,6 +2273,7 @@ const en = {
       "label": "Up for grabs",
       "streak": "{count} in a row",
       "seconds": "{seconds}s",
+      "pointsNow": "+{points} pts",
       "timeUp": "Time's up"
     },
     "correctShort": "Nailed it!",
@@ -20672,7 +20673,10 @@ const en = {
       "answerIs": "It's spelled",
       "youWrote": "You wrote",
       "next": "Next word",
-      "finish": "See my results"
+      "finish": "See my results",
+      "praise": "Nailed it!|Spot on!|Perfect!|You got it!|Brilliant!",
+      "enterHint": "Press Enter to check · type the whole word",
+      "progress": "Word {current} of {total}"
     },
     "cookie": {
       "message": "Cookies help us count plays and keep the game running smoothly."
@@ -20766,6 +20770,10 @@ const en = {
       "lobbyBody": "Students who already joined will be sent out of the room.",
       "lobbyConfirm": "Close room",
       "lobbyStay": "Keep it open",
+      "emptyTitle": "Nobody has joined yet",
+      "emptyBody": "Share code {{code}} so your class can get in.",
+      "emptyStay": "Keep the room open",
+      "emptyConfirm": "End anyway",
       "roundTitle": "End this round?",
       "roundBody": "Everyone sees the results now.",
       "roundConfirm": "End this round",
@@ -20822,7 +20830,9 @@ const en = {
       "googleClassroom": "Post to Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "Waiting for students"
+      "waitingForStudents": "Waiting for students",
+      "lateJoins": "{{count}} students tried to join after the game ended. Start a new game.",
+      "lateJoinsOne": "1 student tried to join after the game ended. Start a new game."
     },
     "wordcraft": {
       "bingo": "BINGO!",

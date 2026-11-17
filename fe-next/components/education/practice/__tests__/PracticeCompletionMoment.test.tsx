@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PracticeCompletionMoment from '../PracticeCompletionMoment';
 
@@ -40,7 +40,9 @@ vi.mock('@/components/motion/AdaptiveMotion', async () => {
 });
 
 vi.mock('@/components/ui/Mascot', () => ({
-  Mascot: ({ variant }: { variant: string }) => <div data-testid="mascot" data-variant={variant} />,
+  Mascot: ({ variant, clipShape }: { variant: string; clipShape?: string }) => (
+    <div data-testid="mascot" data-variant={variant} data-clip={clipShape} />
+  ),
 }));
 
 const baseProps = {
@@ -94,9 +96,50 @@ describe('PracticeCompletionMoment', () => {
     expect(playSound).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the mascot reacting to the rank', () => {
-    render(<PracticeCompletionMoment {...baseProps} correct={1} total={10} />);
-    expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+  it('plays the animated mascot clip that matches the rank', () => {
+    const clipFor = (correct: number) => {
+      const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
+      const src = screen.getByTestId('practice-completion-mascot-clip').getAttribute('src') ?? '';
+      unmount();
+      return src.split('?')[0];
+    };
+    expect(clipFor(10)).toBe('/mascot/anim/joy-jump.webp');
+    expect(clipFor(8)).toBe('/mascot/anim/puffed-chest-smug.webp');
+    expect(clipFor(1)).toBe('/mascot/anim/faceplant-thumbsup.webp');
+  });
+
+  it('stamps a ring behind each earned star only', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={8} total={10} />);
+    const stars = Number(screen.getByTestId('practice-completion-stars').getAttribute('data-stars'));
+    expect(screen.getAllByTestId('practice-completion-stamp')).toHaveLength(stars);
+  });
+
+  describe('with motion off', () => {
+    beforeEach(() => { skipAnimations = true; });
+    afterEach(() => { skipAnimations = false; });
+
+    it('shows the still mascot reacting to the rank, no clip and no stamp rings', () => {
+      render(<PracticeCompletionMoment {...baseProps} correct={1} total={10} />);
+      expect(screen.getByTestId('mascot')).toHaveAttribute('data-variant', 'encouraging');
+      expect(screen.queryByTestId('practice-completion-mascot-clip')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('practice-completion-stamp')).not.toBeInTheDocument();
+    });
+
+    it('frames every rank\'s still mascot in the same circle, so dark art never shows as a box', () => {
+      for (const correct of [10, 8, 1]) {
+        const { unmount } = render(<PracticeCompletionMoment {...baseProps} correct={correct} total={10} />);
+        expect(screen.getByTestId('mascot')).toHaveAttribute('data-clip', 'circle');
+        unmount();
+      }
+    });
+  });
+
+  it('every rank clip is a real file in public/', async () => {
+    const { existsSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    for (const f of ['joy-jump', 'puffed-chest-smug', 'faceplant-thumbsup']) {
+      expect(existsSync(resolve(__dirname, '../../../../public/mascot/anim', `${f}.webp`))).toBe(true);
+    }
   });
 
   it('shows the XP payout when XP was earned', () => {
@@ -264,5 +307,38 @@ describe('PracticeCompletionMoment card edge', () => {
     expect(card.className).toContain('border-neo-cream');
     expect(card.className).toContain('bg-neo-navy-light');
     expect(card.className).not.toContain('border-black');
+  });
+});
+
+describe('PracticeCompletionMoment stats row', () => {
+  it('Given one stat, Then it sits centred instead of hugging one side of a two-column grid', () => {
+    render(
+      <PracticeCompletionMoment
+        correct={3}
+        total={10}
+        stats={[{ key: 'time', label: 'Time', value: '0:13' }]}
+        onAgain={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    const row = screen.getByTestId('practice-completion-stats');
+    expect(row.className).toContain('justify-center');
+    expect(row.className).not.toContain('grid-cols-2');
+    expect(screen.getByTestId('practice-completion-stat-time').className).toContain('basis-[calc(50%-0.25rem)]');
+  });
+});
+
+describe('PracticeCompletionMoment celebration', () => {
+  it('colours the card by rank and puts sun rays behind the mascot', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={10} total={10} />);
+    const card = screen.getByTestId('practice-completion');
+    expect(card.className).toContain('shadow-hard-yellow-xl');
+    expect(screen.getByTestId('practice-completion-rays')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('gives assistive tech the final score while the visible one counts up', () => {
+    render(<PracticeCompletionMoment {...baseProps} correct={8} total={10} />);
+    expect(screen.getByTestId('practice-completion-score')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByTestId('practice-completion-score').previousElementSibling).toHaveClass('sr-only');
   });
 });

@@ -17,10 +17,12 @@ const SECONDARY_LINK =
 
 export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
   return (
-    <div data-testid="edu-live-no-room" className="relative flex min-h-[calc(100dvh-1rem)] flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream">
+    <div data-testid="edu-live-no-room" className="relative flex min-h-[calc(100dvh-1rem)] flex-1 flex-col overflow-hidden bg-neo-navy text-neo-cream lg:justify-center">
       <style>{LIVE_KEYFRAMES}</style>
 
-      <main className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-5 px-4 pt-10 text-center tv:max-w-2xl">
+      {/* A phone keeps the action in thumb reach at the bottom; a wide screen centres
+          the whole group, so the button does not sit a screen-height away from its line. */}
+      <main className="relative mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col items-center justify-center gap-5 px-4 pt-10 text-center lg:flex-none lg:pt-0 tv:max-w-2xl">
         <div
           data-testid="edu-live-no-room-bubble"
           className="relative max-w-[18rem] rounded-neo-lg border-4 border-neo-black bg-neo-cream px-5 py-3 text-neo-black shadow-hard motion-safe:animate-[edu-live-bob_3.2s_ease-in-out_infinite] tv:max-w-md tv:px-8 tv:py-5"
@@ -47,7 +49,7 @@ export function EduLiveNoRoom({ isHost, language, t }: EduLiveNoRoomProps) {
         </p>
       </main>
 
-      <footer className="relative mx-auto flex w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 tv:max-w-xl">
+      <footer className="relative mx-auto flex w-full max-w-md flex-col items-center gap-3 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 lg:pt-8 tv:max-w-xl">
         {isHost ? (
           <>
             <Link href={`/${language}/teacher`} data-testid="edu-live-no-room-cta" className={cn(PRIMARY_BUTTON, PRESS, 'min-h-14 w-full px-5 text-xl tv:min-h-16 tv:text-2xl')}>

@@ -32,6 +32,7 @@ import { getGame } from '../modules/gameStateManager.js';
 import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js';
 import { captureJoinRefusal } from '../utils/eduLiveEvents';
 import { lateJoinStudentKey } from '@/lib/education/endedCodeTries';
+import { secondsSinceEnd } from '@/lib/education/secondsSinceEnd';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { captureClassroomGameMoved, emitClassroomGameMoved, findNewerClassroomGame } from './classroomGameMove';
 import { getGameRoom } from '../utils/socketHelpers.js';
@@ -167,8 +168,19 @@ export async function answerMissingRoom(
     return;
   }
 
-  emitError(socket, ErrorCodes.GAME_NOT_FOUND);
-  if (!record) return;
+  if (!record) {
+    emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+    return;
+  }
+
+  // An ended class is not a missing room. Park the student on the class channel
+  // and tell the client to enroll and wait — re-asking this code is the retry loop.
+  if (isClassroomSessionEnded(record)) {
+    void socket.join(`classroom:${record.classroomId}`);
+    emitError(socket, ErrorCodes.CLASSROOM_SESSION_WAITING, { details: { classroomId: record.classroomId } });
+  } else {
+    emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+  }
 
   // Ending a session tears its room down, so an ended session lands here, not
   // at the seat gate; only a LIVE session without a room is a real ROOM_GONE.
@@ -178,9 +190,11 @@ export async function answerMissingRoom(
       {
         gameCode,
         classroomId: record.classroomId,
-        reason: isClassroomSessionEnded(record) ? 'SESSION_ENDED' : 'ROOM_GONE',
+        // Parked students are not refused. SESSION_ENDED is the dead-wall metric.
+        reason: isClassroomSessionEnded(record) ? 'SESSION_WAITING' : 'ROOM_GONE',
         door: 'join',
         actorId,
+        secondsSinceEnd: isClassroomSessionEnded(record) ? secondsSinceEnd(record.endedAt, new Date()) : null,
       },
       { studentKey: lateJoinStudentKey({ actorId, gameCode, username, socketId: socket.id }) }
     );

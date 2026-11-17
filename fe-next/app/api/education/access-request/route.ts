@@ -14,6 +14,7 @@ import type { TeacherAccessFormPayload } from '@/lib/education/types';
 import { notifyAdmins } from '@/lib/admin/adminNotifications';
 import { teacherRequestNotice } from '@/lib/admin/adminEvents';
 import { accessStanding, type HistoryRow } from '@/lib/education/accessStanding';
+import { teacherRanClassGame } from '@/lib/education/accessTrialServer';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -305,5 +306,12 @@ export async function GET(request: NextRequest) {
     console.error('[access-request] request lookup failed for', user.id, '-', error.message);
     return refuse('lookup_failed', 500);
   }
-  return NextResponse.json({ row: data ? applicantView(data as Record<string, unknown>) : null });
+  const row = data ? applicantView(data as Record<string, unknown>) : null;
+  // Approved with a free window but never ran a class game: the 14 days start at the first
+  // one, so the app shows that instead of a countdown or "trial ended". Only sent when true.
+  const raw = data as { status?: string; trial_expires_at?: string | null } | null;
+  if (raw?.status === 'approved' && raw.trial_expires_at && (await teacherRanClassGame(user.id)) === false) {
+    return NextResponse.json({ row, trial_waiting: true });
+  }
+  return NextResponse.json({ row });
 }

@@ -2273,6 +2273,7 @@ const he = {
       "label": "על הכף",
       "streak": "{count} ברצף",
       "seconds": "{seconds} שנ׳",
+      "pointsNow": "+{points} נק׳",
       "timeUp": "נגמר הזמן"
     },
     "correctShort": "יש!",
@@ -21612,7 +21613,10 @@ const he = {
       "answerIs": "ככה כותבים",
       "youWrote": "כתבת",
       "next": "למילה הבאה",
-      "finish": "לתוצאות שלי"
+      "finish": "לתוצאות שלי",
+      "praise": "בול!|מדויק!|מושלם!|הצלחת!|מבריק!",
+      "enterHint": "לחצו Enter לבדיקה · הקלידו את כל המילה",
+      "progress": "מילה {current} מתוך {total}"
     },
     "cookie": {
       "message": "אנחנו משתמשים בעוגיות כדי לספור משחקים ולשמור שהמשחק ירוץ חלק."
@@ -21706,6 +21710,10 @@ const he = {
       "lobbyBody": "תלמידים שכבר הצטרפו ייצאו מהחדר.",
       "lobbyConfirm": "סגירת החדר",
       "lobbyStay": "להשאיר פתוח",
+      "emptyTitle": "עדיין אף אחד לא הצטרף",
+      "emptyBody": "שתפו את הקוד {{code}} כדי שהכיתה תוכל להיכנס.",
+      "emptyStay": "השאירו את החדר פתוח",
+      "emptyConfirm": "לסיים בכל זאת",
       "roundTitle": "לסיים את הסיבוב?",
       "roundBody": "כולם יראו עכשיו את התוצאות.",
       "roundConfirm": "סיום הסיבוב",
@@ -21762,7 +21770,9 @@ const he = {
       "googleClassroom": "פרסום ב-Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "מחכים לתלמידים"
+      "waitingForStudents": "מחכים לתלמידים",
+      "lateJoins": "{{count}} תלמידים ניסו להצטרף אחרי שהמשחק נגמר. התחילו משחק חדש.",
+      "lateJoinsOne": "תלמיד אחד ניסה להצטרף אחרי שהמשחק נגמר. התחילו משחק חדש."
     },
     "wordcraft": {
       "bingo": "בינגו!",

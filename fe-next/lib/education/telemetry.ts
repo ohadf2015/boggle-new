@@ -266,6 +266,8 @@ export interface TeacherOnboardingChecklistStepArgs {
     | 'share_join_link'
     | 'start_live_class';
   action: TeacherOnboardingChecklistAction;
+  teacherId?: string | null;
+  classroomId?: string | null;
 }
 
 /**
@@ -278,6 +280,8 @@ export function trackTeacherOnboardingStep(args: TeacherOnboardingChecklistStepA
     flow: 'checklist',
     step: args.step,
     action: args.action,
+    ...(args.teacherId ? { teacher_id: args.teacherId } : {}),
+    ...(args.classroomId ? { classroom_id: args.classroomId } : {}),
   });
 }
 

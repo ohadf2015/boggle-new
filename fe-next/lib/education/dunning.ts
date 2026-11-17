@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/utils/supabase/admin';
-import { getPolarClient } from '@/lib/polar';
+import { billingPortalEmailUrl } from '@/lib/education/billingPortal';
 import { sendEmail } from '@/lib/email/send';
 import { teacherPaymentFailed } from '@/lib/email/templates/teacherPaymentFailed';
 import { logSubscriptionEvent } from '@/lib/subscriptions';
@@ -20,7 +20,6 @@ import logger from '@/utils/logger';
  * burning the one warning the teacher gets.
  */
 const DEDUPE_WINDOW_MS = 72 * 60 * 60 * 1000;
-const SITE = 'https://www.lexiclash.live';
 
 const VALID_LOCALES: TeacherLocale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
@@ -78,19 +77,10 @@ export async function maybeSendPaymentFailedEmail({
     locale = accessRow.locale as TeacherLocale;
   }
 
-  // One-click card update beats a maze: send them straight at the Polar
-  // customer portal. If the portal session fails, the dashboard still carries
-  // Manage Subscription — never a dead link in a dunning email.
-  let portalUrl = `${SITE}/${locale}/teacher`;
-  if (userId) {
-    try {
-      const client = getPolarClient();
-      const url = await client.createCustomerPortalUrl(userId);
-      if (url) portalUrl = url;
-    } catch (err) {
-      logger.warn('[Dunning] portal session failed, falling back to dashboard link:', err);
-    }
-  }
+  // One-click card update beats a maze. Polar portal sessions are short-lived, so a link
+  // minted now would be dead by the time the teacher opens the email. The stable route
+  // mints a fresh portal session at the click (signed out: Teacher Home, then the banner).
+  const portalUrl = billingPortalEmailUrl(locale);
 
   const tpl = teacherPaymentFailed({
     full_name: fullName,

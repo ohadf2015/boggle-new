@@ -7,6 +7,8 @@ export interface EduLiveGameStartedArgs {
   classroomId: string;
   source: LiveGameStartSource;
   lessonCount?: number;
+  /** Students seated when the room opened. 0 is a teacher testing alone. */
+  seatedCount?: number;
 }
 
 export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
@@ -15,6 +17,7 @@ export function trackEduLiveGameStarted(args: EduLiveGameStartedArgs): void {
     source: args.source,
   };
   if (args.lessonCount !== undefined) props.lesson_count = args.lessonCount;
+  props.seated_count = args.seatedCount ?? 0;
   captureActivation('edu_live_game_started', props);
   // The teacher launched a room; whether students actually played is stamped
   // server-side when the first real (2+ player) round completes.

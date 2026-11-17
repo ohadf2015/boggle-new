@@ -2875,3 +2875,35 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: needs per-function audit, same reason as above
   - recommended owner: self
+
+## 2026-11-17
+- [PostHog] TypeError "a.cd is not a function" (source=/gsi/client, issue 01a1e44e)
+  - first/last seen 2026-11-16 12:21-12:22, occurrences=3, users=1
+  - link: https://eu.posthog.com/project/151059/error-tracking/01a1e44e-8a94-7f10-998b-91dc077e5ab5
+  - status: deferred (no action)
+  - why: third-party Google Identity Services script (/gsi/client), not our bundle — nothing to patch
+  - recommended owner: none (noise)
+- [PostHog] Minified React error #418 (hydration mismatch), issue 01a1b58d
+  - first/last seen 2026-11-14→11-16, occurrences=4, users=1, trend=increasing
+  - link: https://eu.posthog.com/project/151059/error-tracking/01a1b58d-e596-7e62-a5ab-541139d3fea5
+  - status: deferred
+  - why: single user, minified chunk (3sbc40ptyk65b.js) with no sourcemap resolution available via MCP — can't safely root-cause which component mismatches without picking a wrong fix; needs a dev-mode repro or sourcemap lookup
+  - recommended owner: backend/frontend (dev-mode repro to get the real component name)
+- [PostHog] "need 3+ players" thrown-as-error, issue 01a18202
+  - occurrences=1, users=1, long-running (10-28→11-16)
+  - link: https://eu.posthog.com/project/151059/error-tracking/01a18202-28be-70e2-a953-a3112e117b56
+  - status: deferred (no action)
+  - why: looks like an intentional validation message (min-player-count check) surfacing as a tracked exception, not a bug — logging-noise candidate, not a fix
+  - recommended owner: none (possible telemetry noise, not urgent)
+- [Supabase] security_definer_view on public.public_profiles (ERROR level)
+  - status: deferred (no action — by design)
+  - why: migration 20261025300500 comment explicitly says "Do not set security_invoker = on"; deliberate colleague design (own-row RLS workaround for cross-player reads). Not reverting a deliberate choice off a linter finding alone.
+  - recommended owner: none (known intentional, matches memory supabase-advisor-cleanup)
+- [Supabase] anon/authenticated SECURITY DEFINER RPC EXECUTE warnings (7 anon-callable, 85 authenticated-callable)
+  - status: deferred (no action this run)
+  - why: matches known intentionally-kept bucket (memory: 69 authd-secdef kept 2026-04-29); count grew 69→85 since then but auditing each of 16+ new ones against codebase callsites doesn't fit tonight's remaining budget — needs a dedicated pass, not a rushed partial REVOKE that could break a real anon/authed caller
+  - recommended owner: self (lane 01, next run — diff against the 2026-04-29 baseline list first)
+- [PostHog] Dangling flag `exp-wordtower-placing-nudge-v1` (id 357738, created 2026-11-12, active, 100% rollout)
+  - status: deferred (no action this run)
+  - why: zero code references anywhere in fe-next — never wired, same root cause as `exp-wordtower-busy-tap-feedback-v1` was until tonight (lane 03 2026-11-17 finally wired the latter). Likely a dropped prior-night lane artifact (see nightly-learnings Headline 3).
+  - recommended owner: lane 03/07 — either wire a variant or disable the flag so it stops serving a no-op experiment

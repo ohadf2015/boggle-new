@@ -32,13 +32,13 @@ describe('answerMissingRoom - why a classroom join with no room was refused', ()
     captureJoinRefusal.mockClear();
   });
 
-  it('given the teacher ended the session (room torn down), then it is recorded as SESSION_ENDED, not ROOM_GONE', async () => {
+  it('given the teacher ended the session (room torn down), then it is recorded as SESSION_WAITING, not a dead-wall refusal', async () => {
     getClassroomGame.mockResolvedValue({ classroomId: 'cls-1', status: 'ended', endedAt: '2026-10-01T13:36:00Z' });
     const { socket } = fakeSocket();
 
     await answerMissingRoom(socket, 'SWYGBF', 'Pip');
 
-    expect(reasonRecorded()).toBe('SESSION_ENDED');
+    expect(reasonRecorded()).toBe('SESSION_WAITING');
   });
 
   it('given a live session whose room vanished, then it is still recorded as ROOM_GONE', async () => {
@@ -50,13 +50,14 @@ describe('answerMissingRoom - why a classroom join with no room was refused', ()
     expect(reasonRecorded()).toBe('ROOM_GONE');
   });
 
-  it('given either reason, then the student hears the same GAME_NOT_FOUND', async () => {
+  it('given an ended session with no newer game, then the student waits instead of hearing GAME_NOT_FOUND', async () => {
     getClassroomGame.mockResolvedValue({ classroomId: 'cls-1', status: 'ended', endedAt: 'x' });
     const { socket, emit } = fakeSocket();
 
     await answerMissingRoom(socket, 'SWYGBF', 'Pip');
 
     const codes = emit.mock.calls.map((c) => JSON.stringify(c));
-    expect(codes.some((c) => c.includes('GAME_NOT_FOUND'))).toBe(true);
+    expect(codes.some((c) => c.includes('CLASSROOM_SESSION_WAITING'))).toBe(true);
+    expect(codes.some((c) => c.includes('GAME_NOT_FOUND'))).toBe(false);
   });
 });

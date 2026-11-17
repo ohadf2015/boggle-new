@@ -21,7 +21,7 @@
  * reduced motion is a motion preference, not a silence preference.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { AdaptiveMotion, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -67,6 +67,68 @@ const RANK_ACCENT: Record<string, string> = {
   silver: 'bg-neo-cyan',
   bronze: 'bg-neo-lime',
 };
+
+/* The card's colour comes from the rank: a glow behind the stars, a matching
+   hard shadow, and sun rays behind the mascot. Static gradients, no blur. */
+const RANK_HUE: Record<string, string> = {
+  gold: 'var(--neo-yellow)',
+  silver: 'var(--neo-cyan)',
+  bronze: 'var(--neo-lime)',
+};
+const RANK_SHADOW: Record<string, string> = {
+  gold: 'shadow-hard-yellow-xl',
+  silver: 'shadow-hard-cyan-xl',
+  bronze: 'shadow-hard-lime-xl',
+};
+
+/*
+  The hand-animated mascot clips (public/mascot/anim) answer the rank: a star
+  jump for gold, a proud strut for silver, and for bronze a pratfall that ends
+  on a thumbs-up, so a rough round still gets encouragement. With motion off
+  the still Mascot below stands in, and no clip is downloaded.
+*/
+const RANK_CLIP: Record<string, string> = {
+  gold: '/mascot/anim/joy-jump.webp',
+  silver: '/mascot/anim/puffed-chest-smug.webp',
+  bronze: '/mascot/anim/faceplant-thumbsup.webp',
+};
+
+/** When the n-th filled star (1-based) stamps down, in seconds. */
+const stampDelay = (slot: number) => 0.25 + 0.22 * (slot - 1);
+
+const REVEAL_KEYFRAMES =
+  '@keyframes lc-rays{to{transform:rotate(360deg)}}' +
+  '@keyframes lc-cta-breathe{0%,100%{scale:1}50%{scale:1.03}}' +
+  '@keyframes lc-stamp-ring{0%{transform:scale(.6);opacity:0}25%{opacity:.9}100%{transform:scale(1.9);opacity:0}}';
+
+/* A filled star is a chunky gold key (the same candy face as the letter tiles). */
+const STAR_KEY: CSSProperties = {
+  background: '#FFD32A',
+  border: '3px solid #0b1530',
+  boxShadow: '0 4px 0 0 #0b1530, inset 0 3px 0 rgba(255,255,255,0.6), inset 0 -6px 0 #C98A00',
+};
+
+/** Count up from 0 to `to` over ~`ms`; lands on `to` at once when motion is skipped. */
+function useCountUp(to: number, ms: number, skip: boolean, delayMs = 0): number {
+  const [value, setValue] = useState(skip ? to : 0);
+  useEffect(() => {
+    if (skip || typeof requestAnimationFrame !== 'function') {
+      setValue(to);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const tick = (now: number) => {
+      if (!start) start = now + delayMs;
+      const k = Math.min(1, Math.max(0, (now - start) / ms));
+      setValue(Math.round(to * (1 - Math.pow(1 - k, 3))));
+      if (k < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [to, ms, skip, delayMs]);
+  return value;
+}
 
 export default function PracticeCompletionMoment({
   correct,
@@ -135,6 +197,16 @@ export default function PracticeCompletionMoment({
     playSound('coinCollect', { requiresGameActive: false, volume: 0.45 });
   }, [playSound]);
 
+  /*
+    The reveal runs in order: stars stamp down one by one, then the mascot
+    jumps in and the score counts up. Everything after the stars waits for them.
+  */
+  const afterStarsMs = Math.round((stampDelay(Math.max(plan.stars, 1)) + 0.25) * 1000);
+  const shownCorrect = useCountUp(correct, 700, skipAnimations, afterStarsMs);
+  const shownPercent = useCountUp(plan.percent, 700, skipAnimations, afterStarsMs);
+  // A fresh URL per card, so a replayed round's clip starts from its first frame.
+  const [clipNonce] = useState(() => Date.now().toString(36));
+
   const headline = plan.perfect
     ? t('student.practiceFun.headline.perfect')
     : t(`student.practiceFun.headline.${plan.rank}`);
@@ -145,10 +217,15 @@ export default function PracticeCompletionMoment({
       data-rank={plan.rank}
       dir={dir}
       className={cn(
-        'relative mx-auto w-full max-w-sm overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard-lg',
+        'relative mx-auto w-full max-w-sm overflow-hidden sm:max-w-md rounded-neo border-[3px] border-neo-cream bg-neo-navy-light',
+        RANK_SHADOW[plan.rank],
         className
       )}
+      style={{
+        backgroundImage: `radial-gradient(90% 45% at 50% 0%, color-mix(in srgb, ${RANK_HUE[plan.rank]} 30%, transparent), transparent 75%)`,
+      }}
     >
+      <style>{REVEAL_KEYFRAMES}</style>
       <span className={cn('block h-2.5 w-full', RANK_ACCENT[plan.rank])} aria-hidden="true" />
 
       {/* Leaving is chrome, not a third button competing with the payoff. */}
@@ -167,7 +244,7 @@ export default function PracticeCompletionMoment({
         <div
           data-testid="practice-completion-stars"
           data-stars={plan.stars}
-          className="flex items-center justify-center gap-1.5"
+          className="flex items-end justify-center gap-2 pt-1"
           role="img"
           aria-label={t('student.practiceFun.starsEarned', { count: plan.stars })}
         >
@@ -177,16 +254,32 @@ export default function PracticeCompletionMoment({
               <AdaptiveMotion.div
                 key={slot}
                 {...(filled ? { 'data-testid': `practice-completion-star-${slot}` } : {})}
-                initial={{ scale: 0.2, rotate: -25 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.12 * slot, type: 'spring', stiffness: 380, damping: 13 }}
+                // Earned stars stamp down from above, one after another; empty slots just appear.
+                initial={filled ? { scale: 2.4, rotate: -18, opacity: 0 } : { opacity: 0 }}
+                animate={filled ? { scale: 1, rotate: 0, opacity: 1 } : { opacity: 1 }}
+                transition={
+                  filled
+                    ? { delay: stampDelay(slot), type: 'spring', stiffness: 520, damping: 18 }
+                    : { delay: 0.15, duration: 0.2 }
+                }
+                style={filled ? STAR_KEY : undefined}
                 className={cn(
-                  'flex h-11 w-11 items-center justify-center rounded-neo border-[3px] border-neo-black',
-                  filled ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-navy/60 border-neo-black/40'
+                  // A game-style rating: the middle star sits higher and larger.
+                  'relative flex items-center justify-center rounded-neo',
+                  slot === 2 ? 'mb-2 h-16 w-16' : 'h-[52px] w-[52px]',
+                  !filled && 'border-[3px] border-dashed border-neo-cream/35 bg-neo-black/20'
                 )}
               >
+                {filled && !skipAnimations && (
+                  <span
+                    aria-hidden="true"
+                    data-testid="practice-completion-stamp"
+                    className="pointer-events-none absolute -inset-1 rounded-neo border-[3px] border-neo-yellow opacity-0 animate-[lc-stamp-ring_520ms_ease-out_both]"
+                    style={{ animationDelay: `${stampDelay(slot) + 0.08}s` }}
+                  />
+                )}
                 <Star
-                  className={cn('h-6 w-6', filled ? 'fill-neo-black text-neo-black' : 'text-neo-white/50')}
+                  className={cn(slot === 2 ? 'h-9 w-9' : 'h-7 w-7', filled ? 'fill-neo-navy text-neo-navy' : 'text-neo-white/35')}
                   aria-hidden="true"
                 />
               </AdaptiveMotion.div>
@@ -199,11 +292,51 @@ export default function PracticeCompletionMoment({
         </h2>
         {badge}
 
-        {/* Mascot reacts to the rank — celebration, trophy or a pat on the back. */}
-        <Mascot variant={plan.mascot} size="sm" animated clipBorder="none" />
+        {/* Mascot reacts to the rank — celebration, trophy or a pat on the back.
+            Every rank sits in the same round frame: the gold and silver art carry
+            a dark square of their own that showed as a box on this card, while
+            the bronze art was already circled. */}
+        <div className="relative flex items-center justify-center">
+          <span
+            aria-hidden="true"
+            data-testid="practice-completion-rays"
+            className="pointer-events-none absolute left-1/2 top-1/2 size-56 -translate-x-1/2 sm:size-64 -translate-y-1/2 rounded-full opacity-45 motion-safe:animate-[lc-rays_14s_linear_infinite]"
+            style={{
+              background: `repeating-conic-gradient(from 0deg, ${RANK_HUE[plan.rank]} 0deg 9deg, transparent 9deg 22deg)`,
+              maskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(circle, #000 35%, transparent 70%)',
+            }}
+          />
+          {skipAnimations ? (
+            <Mascot variant={plan.mascot} size="sm" animated clipShape="circle" clipBorder="pink" className="relative" />
+          ) : (
+            <AdaptiveMotion.div
+              className="relative"
+              initial={{ y: 36, scale: 0.6, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              transition={{ delay: afterStarsMs / 1000, type: 'spring', stiffness: 420, damping: 15 }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- animated webp must play as-is */}
+              <img
+                src={`${RANK_CLIP[plan.rank] ?? RANK_CLIP.bronze}?r=${clipNonce}`}
+                alt=""
+                aria-hidden="true"
+                data-testid="practice-completion-mascot-clip"
+                width={288}
+                height={244}
+                draggable={false}
+                className="h-36 w-auto select-none sm:h-44"
+              />
+            </AdaptiveMotion.div>
+          )}
+        </div>
 
-        <p className="font-neo-body text-sm font-bold text-neo-white/85 tabular-nums">
-          {t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}
+        {/* The score counts up as the card lands; the final line is what assistive tech reads. */}
+        <p className="font-neo-display text-lg font-black text-neo-white tabular-nums">
+          <span className="sr-only">{t('student.practiceFun.scoreLine', { correct, total, percent: plan.percent })}</span>
+          <span aria-hidden="true" data-testid="practice-completion-score">
+            {t('student.practiceFun.scoreLine', { correct: shownCorrect, total, percent: shownPercent })}
+          </span>
         </p>
 
         {xpEarned > 0 && (
@@ -238,12 +371,14 @@ export default function PracticeCompletionMoment({
         )}
 
         {stats && stats.length > 0 && (
-          <div className="grid w-full grid-cols-2 gap-2">
+          // Two per row, and an odd one out sits centred: a lone "Time" tile used to
+          // hug the start edge of a two-column grid with an empty cell beside it.
+          <div data-testid="practice-completion-stats" className="flex w-full flex-wrap justify-center gap-2">
             {stats.map((stat) => (
               <div
                 key={stat.key}
                 data-testid={`practice-completion-stat-${stat.key}`}
-                className="rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/25 px-2 py-1.5"
+                className="basis-[calc(50%-0.25rem)] rounded-neo border-[2px] border-neo-cream/40 bg-neo-black/25 px-2 py-1.5"
               >
                 <p className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-cyan">
                   {stat.value}
@@ -267,7 +402,7 @@ export default function PracticeCompletionMoment({
             data-primary="true"
             data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
             onClick={onNext ?? onAgain}
-            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-hard transition hover:shadow-hard-lg active:translate-y-[2px] active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-[0_6px_0_0_#0b1530,inset_0_2px_0_rgba(255,255,255,0.55),inset_0_-5px_0_rgba(0,0,0,0.18)] transition active:translate-y-[5px] active:shadow-[0_1px_0_0_#0b1530] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan motion-safe:animate-[lc-cta-breathe_2.4s_ease-in-out_1.2s_infinite]"
           >
             {onNext ? (
               <>

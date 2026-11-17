@@ -94,7 +94,7 @@ export const SuggestWordCard: React.FC<SuggestWordCardProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !loading) {
+    if (e.key === 'Enter' && !e.nativeEvent.isComposing && e.keyCode !== 229 && !loading) {
       handleSubmit();
     }
   };

@@ -1,7 +1,8 @@
 'use client';
 
 import { CreditCard, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+import { billingPortalPath } from '@/lib/education/billingPortal';
+import { trackRecoveryClicked } from '@/lib/education/proFunnelTelemetry';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PRO_BANNER_CTA, ProBanner } from './pro/ProBanner';
 
@@ -21,7 +22,7 @@ export interface PaymentFailedBannerProps {
  * and Polar flips the subscription back to active.
  *
  * The CTA opens the Polar customer portal in a new tab. Without a portal URL it
- * falls back to the plan page, which carries "Manage billing" when it can.
+ * goes to /api/subscription/portal, which mints a fresh portal session on the click.
  */
 export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBannerProps) {
   const { t, language } = useLanguage();
@@ -37,14 +38,28 @@ export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBanner
       lead={<CreditCard className="size-8 shrink-0 text-neo-pink" aria-hidden="true" />}
       action={
         portalUrl ? (
-          <a data-testid="payment-failed-cta" href={portalUrl} target="_blank" rel="noopener noreferrer" className={PRO_BANNER_CTA}>
+          <a
+            data-testid="payment-failed-cta"
+            href={portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={PRO_BANNER_CTA}
+            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
+          >
             {label}
             <ExternalLink className="size-4" aria-hidden="true" />
           </a>
         ) : (
-          <Link data-testid="payment-failed-cta" href={`/${language}/teacher/upgrade`} className={PRO_BANNER_CTA}>
+          // Never the upgrade page: a new checkout would be a second subscription while Polar
+          // retries this one. The stable route mints a fresh portal session on the click.
+          <a
+            data-testid="payment-failed-cta"
+            href={billingPortalPath(language)}
+            className={PRO_BANNER_CTA}
+            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
+          >
             {label}
-          </Link>
+          </a>
         )
       }
     />

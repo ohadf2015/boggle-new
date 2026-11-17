@@ -6,6 +6,10 @@ describe('classifyRoomError', () => {
     it('classifies CLASSROOM_NOT_OPEN as notOpen, not gone', () => {
       expect(classifyRoomError({ code: 'CLASSROOM_NOT_OPEN', message: 'Your teacher has not opened the game yet' })).toBe('notOpen');
     });
+
+    it('classifies CLASSROOM_SESSION_WAITING as sessionWaiting, never a dead-room retry', () => {
+      expect(classifyRoomError({ code: 'CLASSROOM_SESSION_WAITING', message: 'Waiting for your teacher to start the next game' })).toBe('sessionWaiting');
+    });
   });
 
   describe('room-gone (the dominant "room closed or inactive" complaint)', () => {

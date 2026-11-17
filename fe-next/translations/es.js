@@ -2273,6 +2273,7 @@ const es = {
       "label": "En juego",
       "streak": "{count} seguidas",
       "seconds": "{seconds} s",
+      "pointsNow": "+{points} pts",
       "timeUp": "Se acabó el tiempo"
     },
     "correctShort": "¡Bien hecho!",
@@ -21663,7 +21664,10 @@ const es = {
       "answerIs": "Se escribe",
       "youWrote": "Escribiste",
       "next": "Siguiente palabra",
-      "finish": "Ver mis resultados"
+      "finish": "Ver mis resultados",
+      "praise": "¡Lo clavaste!|¡Exacto!|¡Perfecto!|¡Lo lograste!|¡Genial!",
+      "enterHint": "Pulsa Intro para comprobar · escribe la palabra entera",
+      "progress": "Palabra {current} de {total}"
     },
     "cookie": {
       "message": "Usamos cookies para contar partidas y que el juego funcione sin tropiezos."
@@ -21757,6 +21761,10 @@ const es = {
       "lobbyBody": "El alumnado que ya entró saldrá de la sala.",
       "lobbyConfirm": "Cerrar sala",
       "lobbyStay": "Dejarla abierta",
+      "emptyTitle": "Todavía no se ha unido nadie",
+      "emptyBody": "Comparte el código {{code}} para que la clase pueda entrar.",
+      "emptyStay": "Dejar la sala abierta",
+      "emptyConfirm": "Terminar igual",
       "roundTitle": "¿Terminar esta ronda?",
       "roundBody": "Todo el mundo verá los resultados ahora.",
       "roundConfirm": "Terminar esta ronda",
@@ -21813,7 +21821,9 @@ const es = {
       "googleClassroom": "Publicar en Google Classroom"
     },
     "lobby": {
-      "waitingForStudents": "Esperando a los alumnos"
+      "waitingForStudents": "Esperando a los alumnos",
+      "lateJoins": "{{count}} estudiantes intentaron unirse después de que terminó el juego. Empieza uno nuevo.",
+      "lateJoinsOne": "1 estudiante intentó unirse después de que terminó el juego. Empieza uno nuevo."
     },
     "wordcraft": {
       "bingo": "¡BINGO!",

@@ -3,6 +3,7 @@ import type { ClassroomGameErrorCode } from '@/shared/constants/classroomGameErr
 /** Retry reasons get a Join-again message; terminal ones say who to ask. */
 export const CLASSROOM_JOIN_REFUSAL_KEYS = {
   ended: 'student.activeGame.joinEnded',
+  waiting: 'academy.student.waitingForTeacher',
   notMember: 'student.activeGame.joinNotMember',
   signIn: 'student.activeGame.joinSignIn',
   busy: 'student.activeGame.joinBusy',
@@ -32,6 +33,7 @@ export const REASON_BY_CODE: Record<ClassroomGameErrorCode | 'GAME_FULL' | 'PLAY
   // A room lost to a server restart reads "not found" too; joining again usually works.
   GAME_NOT_FOUND: 'retry',
   GAME_ENDED: 'ended',
+  CLASSROOM_SESSION_WAITING: 'waiting',
   GAME_ALREADY_STARTED: 'teacherOnly',
   ROOM_LOCKED: 'locked',
   JOIN_THREW: 'busy',
