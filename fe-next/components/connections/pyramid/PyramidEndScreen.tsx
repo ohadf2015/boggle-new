@@ -36,13 +36,15 @@ export default function PyramidEndScreen({ state, streak, copied, onShare, progr
           won ? 'border-neo-lime' : 'border-neo-red',
         ].join(' ')}
       >
-        <ConnectionsMascot status={state.status} className="mb-3 h-24 w-24" />
+        {!won && <ConnectionsMascot status={state.status} className="mb-3 h-24 w-24" />}
         <PyramidProgress
           stage={3}
           solvedBridges={state.solvedBridges}
           gaveUpBase={state.gaveUpBase}
           metaAnswer={pyramid.metaAnswer}
           won={won}
+          celebrate
+          size="trophy"
         />
         <h1 className="mt-4 font-neo-display text-2xl font-black text-neo-white">
           {won ? t('connections.pyramid.won') : t('connections.pyramid.lost')}

@@ -7,6 +7,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import ConnectionsDailyChallenge from '@/components/connections/ConnectionsDailyChallenge';
 import PyramidChallenge from '@/components/connections/pyramid/PyramidChallenge';
 import { dailyConnectionsVariant } from '@/lib/connections/dailyVariant';
+import { devVariantOverride } from '@/lib/connections/devVariantOverride';
 import { useDailyDate } from '@/hooks/useUtcDay';
 import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { loadDailyResult } from '@/lib/connections/dailyResultStore';
@@ -47,7 +48,7 @@ export default function DailyPageClient({ locale }: Props): React.JSX.Element {
   const [finished, setFinished] = useState(false);
   const [playedKind, setPlayedKind] = useState<string | null>(null);
   const today = useDailyDate(finished, () => { setFinished(false); setPlayedKind(null); });
-  const variant = dailyConnectionsVariant(today);
+  const variant = (typeof window !== 'undefined' && devVariantOverride(window.location.search)) || dailyConnectionsVariant(today);
   const hasPyramids = getPyramidsForLocale(locale).length > 0;
   // A result already played today (maybe in another language) decides the flavor, so a
   // language switch can't open the other variant as a fresh run.

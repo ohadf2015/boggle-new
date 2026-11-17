@@ -1,8 +1,7 @@
 /**
  * Phone layout of the pyramid play screen (2026-11-06 report, Hebrew phone):
- * - The lit beam pointed at the LEFT slot while the current slot (stage 1)
- *   sits on the RIGHT in RTL: the slot row follows the page direction, the
- *   beams SVG did not.
+ * - A lit beam once pointed at the wrong slot in RTL; the pyramid now stacks
+ *   its tiers vertically, so nothing depends on the row direction.
  * - On short screens (or an enlarged system font) the header pushed the
  *   keyboard below the fold. The play root is a size container and the header
  *   sheds the explainer, then the rank, then shrinks the pyramid.
@@ -38,32 +37,19 @@ function renderProgress() {
   );
 }
 
-describe('PyramidProgress beams', () => {
-  it('mirrors the beams in RTL, like the slot row they point at', () => {
+describe('PyramidProgress on short phones', () => {
+  it('shrinks the capstone spot and the tiers on short screens', () => {
     renderProgress();
-    expect(screen.getByTestId('pyramid-beams').getAttribute('class')).toContain('rtl:-scale-x-100');
+    expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:42rem)]:h-8');
+    for (const i of [0, 1, 2]) {
+      expect(screen.getByTestId(`pyramid-tier-${i}`).className).toContain('[@container(max-height:42rem)]:h-6');
+    }
   });
 
-  it('spans the beams across the slot row instead of a fixed width', () => {
+  it('stacks the tiers vertically, so the current tier reads the same in RTL', () => {
     renderProgress();
-    const beams = screen.getByTestId('pyramid-beams');
-    const cls = beams.getAttribute('class') ?? '';
-    expect(cls).toContain('min-w-full');
-    expect(cls).not.toContain('w-64');
-    // Same box as the slots, so the beam ends follow the slots when the rail zooms them.
-    expect(beams.parentElement?.contains(screen.getByTestId('pyramid-slot-current'))).toBe(true);
-  });
-
-  it('keeps unlit beams visible', () => {
-    const { container } = renderProgress();
-    const strokes = Array.from(container.querySelectorAll('line')).map((l) => l.getAttribute('stroke'));
-    expect(strokes).not.toContain('rgba(255,255,255,0.15)');
-  });
-
-  it('shrinks the apex and slots on short screens', () => {
-    renderProgress();
-    expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:42rem)]:h-9');
-    expect(screen.getByTestId('pyramid-slot-current').className).toContain('[@container(max-height:42rem)]:h-9');
+    expect(screen.queryByTestId('pyramid-beams')).toBeNull();
+    expect(screen.getByTestId('pyramid-tier-0').parentElement?.className).toContain('flex-col');
   });
 });
 

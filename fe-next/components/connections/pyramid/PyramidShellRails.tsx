@@ -15,7 +15,7 @@ export function PyramidLeftRail({ t, state, metaAnswer }: RailProps) {
   return (
     <>
       <ShellPanel title={t('connections.pyramid.railMap')}>
-        <PyramidHeader state={state} metaAnswer={metaAnswer} testId="pyramid-rail-map" className="px-3 pb-4 [&>:last-child]:[zoom:0.82] tv:[&>:last-child]:[zoom:1.2]" />
+        <PyramidHeader state={state} metaAnswer={metaAnswer} testId="pyramid-rail-map" className="px-3 pb-4 [&>:last-child]:[zoom:0.9] tv:[&>:last-child]:[zoom:1.2]" />
       </ShellPanel>
       <ShellKeysCard t={t} showClear={false} />
     </>

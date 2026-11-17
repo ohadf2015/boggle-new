@@ -66,7 +66,7 @@ describe('Pyramid — simplified, goal-first UI', () => {
 
   it('highlights the current base slot', () => {
     render(<PyramidChallenge />);
-    expect(screen.getByTestId('pyramid-slot-current')).toBeTruthy();
+    expect(screen.getByTestId('pyramid-tier-0').getAttribute('data-state')).toBe('current');
   });
 
   it('shows a one-line explainer during base stages', () => {
