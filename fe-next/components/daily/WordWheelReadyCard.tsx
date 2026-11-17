@@ -62,6 +62,7 @@ export default function WordWheelReadyCard({
   const [learned, setLearned] = useState(false);
   return (
     <div
+      data-daily-ready-content
       className={cn(
         'flex-1 w-full flex flex-col items-center gap-4 px-4 pt-6 pb-bottom-stack sm:pb-6 overflow-y-auto',
         wide && 'lg:flex-row lg:items-start lg:justify-center lg:gap-8 lg:pt-12',

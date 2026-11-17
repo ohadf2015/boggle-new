@@ -39,7 +39,8 @@ function triesLine(tries: number, language: Language, t: HuntFinishOverlayProps[
 
 /**
  * Locks the board at game over. A solve stamps "Solved!" and the tries it took (the clue boxes
- * above already turn over to the word); a loss reveals the word. Tap to go to results.
+ * above already turn over to the word); a loss reveals the word. It leaves for results on its own
+ * within two seconds, so a tap is only a shortcut and gets no printed hint.
  */
 export function HuntFinishOverlay({ outcome, targetWord, language, tries, calm, onSkip, timedOut = false, t }: HuntFinishOverlayProps) {
   const win = outcome === 'win';
@@ -106,7 +107,6 @@ export function HuntFinishOverlay({ outcome, targetWord, language, tries, calm, 
           </span>
         </>
       )}
-      <span className="relative mt-1 text-xs font-bold uppercase tracking-widest text-neo-white/60">{t('common.tapToContinue')}</span>
     </button>
   );
 }

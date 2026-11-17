@@ -3052,10 +3052,12 @@ html.has-cookie-consent {
 
 /* The feedback launcher is bottom-anchored and floats over the game surface — on
    crossword it sat on top of the bottom-left keyboard key, eating real taps. Every
-   full-screen game locks the body, so hide it there for all modes at once. It stays
-   available everywhere else in the app. */
+   full-screen game locks the body, so hide it there for all modes at once. A daily
+   ready screen's Play button sits at the same bottom-left spot on short phones. It
+   stays available everywhere else in the app. */
 body.screen-fit-locked #fdw-root,
-body.quick-results-open #fdw-root {
+body.quick-results-open #fdw-root,
+body:has([data-daily-ready-content]) #fdw-root {
   display: none;
 }
 

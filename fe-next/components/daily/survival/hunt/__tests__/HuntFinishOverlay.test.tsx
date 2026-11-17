@@ -65,6 +65,12 @@ describe('HuntFinishOverlay', () => {
     expect(onSkip).toHaveBeenCalledTimes(1);
   });
 
+  it.each(['win', 'loss'] as const)('Given a %s, Then no small "tap to continue" label is printed under the stamp; the tap shortcut stays for assistive tech', (outcome) => {
+    render(<HuntFinishOverlay outcome={outcome} targetWord="crane" language="en" tries={1} calm={false} onSkip={vi.fn()} t={t} />);
+    expect(screen.queryByText('common.tapToContinue')).toBeNull();
+    expect(screen.getByTestId('hunt-finish')).toHaveAttribute('aria-label', 'common.tapToContinue');
+  });
+
   it('Given a Hebrew word, When revealed, Then final letter forms are applied', () => {
     render(<HuntFinishOverlay outcome="loss" targetWord="שלומ" language="he" tries={10} calm onSkip={vi.fn()} t={t} />);
     expect(screen.getAllByTestId('hunt-finish-letter').map(el => el.textContent).join('')).toBe('שלום');
