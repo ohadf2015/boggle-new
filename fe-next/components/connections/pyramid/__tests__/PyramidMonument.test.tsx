@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import PyramidProgress from '../PyramidProgress';
+import { carvedWordSize } from '../pyramidFit';
 
 let reducedMotion = false;
 vi.mock('@/hooks/useReducedMotion', () => ({ useReducedMotion: () => reducedMotion }));
@@ -17,32 +18,69 @@ beforeEach(() => {
 });
 
 describe('PyramidProgress builds a real pyramid', () => {
-  it('stacks the capstone over three tiers, with stage 1 as the bottom tier', () => {
+  it('sets the capstone over one base row of three bricks, laid in stage order', () => {
     render(<PyramidProgress {...base} />);
     const order = Array.from(document.querySelectorAll('[data-testid^="pyramid-tier-"], [data-testid="pyramid-apex"]')).map((el) =>
       el.getAttribute('data-testid'),
     );
-    expect(order).toEqual(['pyramid-apex', 'pyramid-tier-2', 'pyramid-tier-1', 'pyramid-tier-0']);
+    expect(order).toEqual(['pyramid-apex', 'pyramid-tier-0', 'pyramid-tier-1', 'pyramid-tier-2']);
+    const row = screen.getByTestId('pyramid-tier-0').parentElement!;
+    expect(row).toBe(screen.getByTestId('pyramid-tier-2').parentElement);
+    expect(row.className).toContain('flex-row');
+    // The row follows the page direction, so Hebrew lays the first brick on the right.
+    expect(row.closest('[dir="ltr"]')).toBeNull();
   });
 
-  it('narrows each tier toward the top, brick by brick', () => {
-    render(<PyramidProgress {...base} solvedBridges={['OUT', 'HEART', 'DAY']} stage={3} />);
-    const bricks = [0, 1, 2].map((i) => screen.getByTestId(`pyramid-tier-${i}`).querySelectorAll('[data-brick]').length);
-    expect(bricks[0]).toBeGreaterThan(bricks[1]);
-    expect(bricks[1]).toBeGreaterThan(bricks[2]);
+  it('draws exactly one brick per riddle and no filler bricks, in every state', () => {
+    for (const props of [
+      base,
+      { ...base, stage: 1, solvedBridges: ['OUT'] },
+      { ...base, stage: 3, solvedBridges: ['OUT', 'HEART', 'DAY'], won: true },
+    ]) {
+      const { unmount } = render(<PyramidProgress {...props} />);
+      expect(document.querySelectorAll('[data-brick]')).toHaveLength(3);
+      unmount();
+    }
   });
 
-  it('carves each laid tier with its bridge word and leaves unbuilt tiers blank', () => {
+  it('carves every laid brick with its own bridge word', () => {
+    render(<PyramidProgress {...base} stage={3} solvedBridges={['OUT', 'HEART', 'DAY']} />);
+    expect([0, 1, 2].map((i) => screen.getByTestId(`pyramid-tier-${i}`).textContent)).toEqual(['OUT', 'HEART', 'DAY']);
+  });
+
+  it('shows unsolved stages as empty sockets, the current one marked with a "?"', () => {
     render(<PyramidProgress {...base} stage={1} solvedBridges={['OUT']} />);
-    expect(screen.getByTestId('pyramid-tier-0').textContent).toContain('OUT');
     expect(tierStates()).toEqual(['solved', 'current', 'locked']);
-    expect(screen.getByTestId('pyramid-tier-2').textContent).not.toMatch(/[A-Z]/);
+    expect(screen.getByTestId('pyramid-tier-1').textContent).toBe('?');
+    expect(screen.getByTestId('pyramid-tier-1').className).toContain('border-dashed');
+    expect(screen.getByTestId('pyramid-tier-2').textContent).toBe('');
   });
 
-  it('keeps a given-up tier in the pyramid, marked as cracked', () => {
+  it('keeps a given-up brick grey, with its word in red', () => {
     render(<PyramidProgress {...base} stage={1} solvedBridges={['OUT']} gaveUpBase={[true, false, false]} />);
+    const brick = screen.getByTestId('pyramid-tier-0');
     expect(tierStates()[0]).toBe('gaveUp');
-    expect(screen.getByTestId('pyramid-tier-0').textContent).toContain('OUT');
+    expect(brick.textContent).toBe('OUT');
+    expect(brick.querySelector('img')?.className).toContain('grayscale');
+    expect(brick.querySelector('[data-word]')?.className).toContain('text-neo-red');
+  });
+
+  it('fits a 10-letter word inside its brick instead of overflowing', () => {
+    render(<PyramidProgress {...base} stage={1} solvedBridges={['WATERMELON']} />);
+    const brick = screen.getByTestId('pyramid-tier-0');
+    const word = brick.querySelector<HTMLElement>('[data-word]')!;
+    expect(brick.className).toContain('[container-type:size]');
+    expect(word.className).toContain('whitespace-nowrap');
+    expect(word.style.getPropertyValue('--carve')).toBe(carvedWordSize('WATERMELON'));
+    expect(word.className).toContain('[font-size:var(--carve)]');
+  });
+
+  it('carves the word in the display font, engraved into the stone', () => {
+    render(<PyramidProgress {...base} stage={1} solvedBridges={['OUT']} />);
+    const word = screen.getByTestId('pyramid-tier-0').querySelector('[data-word]')!;
+    expect(word.className).toContain('font-neo-display');
+    expect(word.className).toContain('uppercase');
+    expect(word.className).toContain('[text-shadow:');
   });
 
   it('leaves the capstone spot empty until the pyramid is won', () => {
@@ -66,17 +104,26 @@ describe('PyramidProgress builds a real pyramid', () => {
     expect(apex.textContent).toContain('BREAK');
   });
 
-  it('stands the pyramid in a desert scene', () => {
+  it('fits a 10-letter top word on the capstone', () => {
+    render(<PyramidProgress {...base} stage={3} solvedBridges={['OUT', 'HEART', 'DAY']} metaAnswer="FIREWORKS!" won />);
+    const word = screen.getByTestId('pyramid-apex').querySelector<HTMLElement>('[data-word]')!;
+    expect(word.className).toContain('whitespace-nowrap');
+    expect(word.style.getPropertyValue('--carve')).toBe(carvedWordSize('FIREWORKS!', 'capstone'));
+    expect(word.className).toContain('[font-size:var(--carve)]');
+  });
+
+  it('stands the pyramid in a desert scene, on a sand ground line', () => {
     render(<PyramidProgress {...base} />);
     const backdrop = screen.getByTestId('pyramid-scene').querySelector('img[src="/daily/pyramid/desert-dusk.webp"]');
     expect(backdrop?.getAttribute('alt')).toBe('');
+    expect(screen.getByTestId('pyramid-ground')).toBeTruthy();
   });
 
-  it('puts the explorer on the highest laid tier', () => {
-    const { rerender } = render(<PyramidProgress {...base} />);
-    expect(screen.getByTestId('pyramid-explorer').getAttribute('data-on-tier')).toBe('ground');
-    rerender(<PyramidProgress {...base} stage={2} solvedBridges={['OUT', 'HEART']} />);
-    expect(screen.getByTestId('pyramid-explorer').getAttribute('data-on-tier')).toBe('1');
+  it('keeps the explorer on the ground beside the pyramid, never on a word', () => {
+    render(<PyramidProgress {...base} stage={2} solvedBridges={['OUT', 'HEART']} />);
+    const explorer = screen.getByTestId('pyramid-explorer');
+    expect(explorer.closest('[data-brick]')).toBeNull();
+    expect(explorer.closest('[data-testid="pyramid-apex"]')).toBeNull();
   });
 
   it('keeps the cheering explorer off a lost pyramid on the end screen', () => {
@@ -85,12 +132,21 @@ describe('PyramidProgress builds a real pyramid', () => {
     expect(screen.queryByTestId('pyramid-explorer')).toBeNull();
     unmount();
     render(<PyramidProgress {...lost} won />);
-    expect(screen.getByTestId('pyramid-explorer').getAttribute('data-on-tier')).toBe('2');
+    expect(screen.getByTestId('pyramid-explorer')).toBeTruthy();
   });
 
   it('names the progress for screen readers', () => {
     render(<PyramidProgress {...base} stage={1} solvedBridges={['OUT']} />);
     expect(screen.getByTestId('pyramid-scene').getAttribute('aria-label')).toBe('connections.pyramid.sceneLabel:{"count":1}');
+  });
+});
+
+describe('carvedWordSize', () => {
+  it('shrinks with length so a 10-letter word fits the brick width', () => {
+    // Fredoka black caps run about 0.72em wide; the word may use 88% of the brick.
+    const cqi = (word: string) => Number(/([\d.]+)cqi/.exec(carvedWordSize(word))![1]);
+    expect(cqi('WATERMELON') * 10 * 0.72).toBeLessThanOrEqual(88);
+    expect(cqi('OUT')).toBeGreaterThan(cqi('WATERMELON'));
   });
 });
 

@@ -1,7 +1,7 @@
 /**
  * Phone layout of the pyramid play screen (2026-11-06 report, Hebrew phone):
- * - A lit beam once pointed at the wrong slot in RTL; the pyramid now stacks
- *   its tiers vertically, so nothing depends on the row direction.
+ * - A lit beam once pointed at the wrong slot in RTL. The base row now follows
+ *   the page direction itself, so Hebrew lays the first brick on the right.
  * - On short screens (or an enlarged system font) the header pushed the
  *   keyboard below the fold. The play root is a size container and the header
  *   sheds the explainer, then the rank, then shrinks the pyramid.
@@ -38,18 +38,20 @@ function renderProgress() {
 }
 
 describe('PyramidProgress on short phones', () => {
-  it('shrinks the capstone spot and the tiers on short screens', () => {
+  it('shrinks the capstone spot and the bricks on short screens', () => {
     renderProgress();
-    expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:42rem)]:h-8');
+    expect(screen.getByTestId('pyramid-apex').className).toContain('[@container(max-height:42rem)]:h-11');
     for (const i of [0, 1, 2]) {
-      expect(screen.getByTestId(`pyramid-tier-${i}`).className).toContain('[@container(max-height:42rem)]:h-6');
+      expect(screen.getByTestId(`pyramid-tier-${i}`).className).toContain('[@container(max-height:42rem)]:h-9');
     }
   });
 
-  it('stacks the tiers vertically, so the current tier reads the same in RTL', () => {
+  it('lays the base row in the page direction, with no lit beam to point the wrong way', () => {
     renderProgress();
     expect(screen.queryByTestId('pyramid-beams')).toBeNull();
-    expect(screen.getByTestId('pyramid-tier-0').parentElement?.className).toContain('flex-col');
+    const row = screen.getByTestId('pyramid-tier-0').parentElement!;
+    expect(row.className).toContain('flex-row');
+    expect(row.getAttribute('dir')).toBeNull();
   });
 });
 

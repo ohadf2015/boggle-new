@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { Delete, CornerDownLeft, Keyboard } from 'lucide-react';
 import { useHoldToClear } from '@/hooks/useHoldToClear';
-import { ACTION_KEY_WIDTH, backspaceRowIndex, letterColumnCount } from '@/lib/connections/keyboard';
+import { letterColumnCount } from '@/lib/connections/keyboard';
 
 interface ConnectionsKeyboardProps {
   /** Keyboard rows in physical-layout order (see lib/connections/keyboard.ts). */
@@ -43,9 +43,9 @@ const KBD = 'rounded border-2 border-neo-cream/50 bg-neo-navy px-1.5 py-px font-
 const KEY_BASE =
   'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
-/** Shared key sizing; PuzzleCard's --conn-dock reserves 3 rows of exactly these heights. */
+/** Shared key sizing; PuzzleCard's --conn-dock reserves 3 rows of exactly these heights plus the action row. */
 const KEY_SIZE =
-  'h-12 [@media(max-height:700px)]:h-11 [@media(max-width:639px)_and_(min-height:780px)]:h-14 sm:[@media(max-height:700px)]:h-10 min-w-0';
+  'h-12 [@media(max-height:700px)]:h-10 [@media(max-width:639px)_and_(min-height:780px)]:h-14 min-w-0';
 
 /**
  * One letter-key width for the WHOLE keyboard. Every letter key gets this
@@ -53,9 +53,8 @@ const KEY_SIZE =
  * 10-key row (shorter rows just center) instead of each row stretching to its
  * own width.
  *
- * The column count comes from letterColumnCount, which reserves room for the
- * submit/backspace keys on whichever rows carry them (Hebrew moves backspace
- * to its short top row). See lib/connections/keyboard.ts.
+ * The column count is the longest row (lib/connections/keyboard.ts); submit and
+ * backspace live on their own row underneath.
  *
  * The minWidth floor is pure catastrophe insurance: it never binds in a
  * healthy layout (even a 12-key Russian row on a 280px Fold computes ~13px
@@ -73,22 +72,16 @@ function letterKeyStyle(columns: number): CSSProperties {
   };
 }
 
-/** Action keys take a fixed ACTION_KEY_WIDTH share of the same column grid. */
-function actionKeyStyle(columns: number): CSSProperties {
-  return {
-    flexBasis: `calc(${((100 * ACTION_KEY_WIDTH) / columns).toFixed(4)}% - 0.25rem)`,
-    flexGrow: 0,
-    flexShrink: 1,
-    minWidth: '2rem',
-  };
-}
+/** The action row is shorter than a letter row; PuzzleCard's --conn-dock reserves it too. */
+const ACTION_SIZE = 'h-11 [@media(max-height:700px)]:h-10 min-w-0';
 
 /**
  * On-screen keyboard for Word Bridge, laid out in the 3 physical-keyboard rows
  * players already know (QWERTY / standard Hebrew / ЙЦУКЕН) — Wordle-family
  * ergonomics. Hebrew players never need an IME: every key is a base letter and
- * sofit glyphs are rendered at word-end elsewhere. Submit + backspace flank the
- * bottom row, except where it is full (Hebrew: backspace sits top-right).
+ * sofit glyphs are rendered at word-end elsewhere. Submit (labelled, the wider
+ * key) and backspace get their own row under the letters, in the same place in
+ * every locale.
  * Neo-brutalist keys with a hard press-down feel.
  */
 export default function ConnectionsKeyboard({
@@ -105,11 +98,7 @@ export default function ConnectionsKeyboard({
   ready = false,
   typeHint,
 }: ConnectionsKeyboardProps) {
-  const lastRow = rows.length - 1;
-  const bsRow = backspaceRowIndex(rows);
-  const columns = letterColumnCount(rows);
-  const keyStyle = letterKeyStyle(columns);
-  const actionStyle = actionKeyStyle(columns);
+  const keyStyle = letterKeyStyle(letterColumnCount(rows));
   // Same as Word Tower: players hammer backspace to undo a whole wrong guess
   // (PostHog rage clicks, /he/connections/daily). Holding it clears the guess.
   const backspaceHold = useHoldToClear({ onTap: onBackspace, onHold: onClear });
@@ -150,24 +139,6 @@ export default function ConnectionsKeyboard({
           transition={{ delay: rowIdx * 0.06, type: 'spring', stiffness: 400, damping: 26 }}
           className="flex w-full min-w-0 items-stretch justify-center gap-1"
         >
-          {rowIdx === lastRow && (
-            <button
-              type="button"
-              onClick={onSubmit}
-              disabled={disabled || !canSubmit}
-              aria-label={submitLabel}
-              title={submitLabel}
-              data-pressed={pressedKey === 'Enter' || undefined}
-              data-ready={(ready && canSubmit) || undefined}
-              style={actionStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} gap-1.5 text-neo-navy ${
-                ready && canSubmit ? 'bg-neo-lime ring-4 ring-neo-lime/40 active:bg-neo-lime' : 'bg-neo-cyan active:bg-neo-cyan-light'
-              } ${pressedKey === 'Enter' ? PRESSED : ''}`}
-            >
-              <CornerDownLeft className="h-5 w-5 shrink-0" strokeWidth={2.75} aria-hidden="true" />
-              <span className="hidden truncate text-sm uppercase pointer-fine:inline">{submitLabel}</span>
-            </button>
-          )}
           {row.map((ch) => (
             <button
               key={ch}
@@ -184,22 +155,38 @@ export default function ConnectionsKeyboard({
               {ch}
             </button>
           ))}
-          {rowIdx === bsRow && (
-            <button
-              type="button"
-              {...backspaceHold}
-              disabled={disabled}
-              aria-label={backspaceLabel}
-              title={backspaceLabel}
-              data-pressed={pressedKey === 'Backspace' || undefined}
-              style={actionStyle}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
-            >
-              <Delete className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
-            </button>
-          )}
         </m.div>
       ))}
+      <div data-testid="keyboard-actions" className="flex w-full min-w-0 items-stretch justify-center gap-1.5">
+        <button
+          type="button"
+          onClick={onSubmit}
+          disabled={disabled || !canSubmit}
+          aria-label={submitLabel}
+          title={submitLabel}
+          data-pressed={pressedKey === 'Enter' || undefined}
+          data-ready={(ready && canSubmit) || undefined}
+          style={{ flex: '2 1 0%' }}
+          className={`${KEY_BASE} ${ACTION_SIZE} gap-2 px-3 text-neo-navy ${
+            ready && canSubmit ? 'bg-neo-lime ring-4 ring-neo-lime/40 active:bg-neo-lime' : 'bg-neo-cyan active:bg-neo-cyan-light'
+          } ${pressedKey === 'Enter' ? PRESSED : ''}`}
+        >
+          <CornerDownLeft className="h-5 w-5 shrink-0" strokeWidth={2.75} aria-hidden="true" />
+          <span className="truncate text-base uppercase leading-none rtl:normal-case">{submitLabel}</span>
+        </button>
+        <button
+          type="button"
+          {...backspaceHold}
+          disabled={disabled}
+          aria-label={backspaceLabel}
+          title={backspaceLabel}
+          data-pressed={pressedKey === 'Backspace' || undefined}
+          style={{ flex: '1 1 0%' }}
+          className={`${KEY_BASE} ${ACTION_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
+        >
+          <Delete className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }

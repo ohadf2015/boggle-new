@@ -32,6 +32,8 @@ interface PuzzleCardProps {
   showRating?: boolean;
   /** Daily only: after this many misses, a free skip when no ad reveal is available. */
   skipAfterMisses?: number;
+  /** False when the host already has a mascot on screen (the pyramid's explorer). */
+  showMascot?: boolean;
 }
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
@@ -63,6 +65,7 @@ export default function PuzzleCard({
   onNext,
   showRating = true,
   skipAfterMisses,
+  showMascot = true,
 }: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -158,9 +161,11 @@ export default function PuzzleCard({
           dir={isRTL ? 'rtl' : 'ltr'}
         >
           <div className="flex min-h-11 items-center gap-1.5">
-            <span data-testid="puzzle-mascot" className="pointer-events-none shrink-0 group-has-[input:focus]/card:hidden">
-              <ConnectionsMascot status={state.status} className="h-9 w-9 [@media(min-height:780px)]:h-12 [@media(min-height:780px)]:w-12 shell:h-14 shell:w-14" />
-            </span>
+            {showMascot && (
+              <span data-testid="puzzle-mascot" className="pointer-events-none shrink-0 group-has-[input:focus]/card:hidden">
+                <ConnectionsMascot status={state.status} className="h-9 w-9 [@media(min-height:780px)]:h-12 [@media(min-height:780px)]:w-12 shell:h-14 shell:w-14" />
+              </span>
+            )}
             {puzzle.difficulty && (
               <span
                 className={[
@@ -229,7 +234,7 @@ export default function PuzzleCard({
           <div
             ref={stageRef}
             data-testid="puzzle-stage"
-            className="relative flex min-h-[11rem] flex-1 flex-col [@container(36rem<height<=42rem)]:min-h-[8.5rem] [@container(height<=36rem)]:min-h-[6.5rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
             style={{ containerType: 'size' }}
           >
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
@@ -257,7 +262,7 @@ export default function PuzzleCard({
               min-height reserves two wrapped lines up front (so revealing it never moves
               the dock) and the bottom margin keeps the pill off the keys. */}
           {puzzle.hint && !isResolved && (
-            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@container(max-height:36rem)]:min-h-[2.75rem]">
+            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
               <AnimatePresence>
               {showHint && !isResolved && (
                 <m.p
@@ -280,7 +285,7 @@ export default function PuzzleCard({
               same reserved height, so the page never grows into a scroll. The one-line
               IME input skips the reservation so the plates get that room instead. */}
           <div
-            className={`flex shrink-0 flex-col justify-end [--conn-dock:9.75rem] sm:[--conn-dock:11.25rem] [@media(max-height:700px)]:[--conn-dock:9.25rem] [@media(max-width:639px)_and_(min-height:780px)]:[--conn-dock:11.25rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[var(--conn-dock)]'}`}
+            className={`flex shrink-0 flex-col justify-end [--conn-dock:12.875rem] sm:[--conn-dock:14.5rem] [@media(max-height:700px)]:[--conn-dock:11.125rem] [@media(max-width:639px)_and_(min-height:780px)]:[--conn-dock:14.375rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[var(--conn-dock)]'}`}
           >
             {isResolved ? (
               <div className="flex flex-col gap-2">

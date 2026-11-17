@@ -79,8 +79,8 @@ describe('Pyramid — simplified, goal-first UI', () => {
     expect(screen.getByTestId('pyramid-root').className).toContain('[container-type:size]');
     // The stage floor drops in steps, so the keyboard dock is never pushed off screen.
     const stage = screen.getByTestId('puzzle-stage').className;
-    expect(stage).toContain('[@container(36rem<height<=42rem)]:min-h-[8.5rem]');
-    expect(stage).toContain('[@container(height<=36rem)]:min-h-[6.5rem]');
+    expect(stage).toContain('[@container(36rem<height<=42rem)]:min-h-[7rem]');
+    expect(stage).toContain('[@container(height<=36rem)]:min-h-[6rem]');
   });
 
   it('renders no rating buttons in pyramid stages (dead CTA removed)', () => {

@@ -1,11 +1,13 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { PYRAMID_ART, type PyramidSize } from './pyramidArt';
+import { carvedWordSize } from './pyramidFit';
 
 const APEX_SIZE: Record<PyramidSize, string> = {
-  play: 'h-10 [@container(max-height:42rem)]:h-8',
-  trophy: 'h-16',
+  play: 'h-[3.25rem] [@container(max-height:42rem)]:h-11',
+  trophy: 'h-20',
 };
 
 const RAY_COUNT = 16;
@@ -33,7 +35,7 @@ export default function PyramidCapstone({ metaAnswer, won, finaleActive, drop, m
       data-testid="pyramid-apex"
       data-state={won ? 'won' : finaleActive ? 'finale' : 'locked'}
       data-drop={drop ? 'true' : 'false'}
-      className={`relative flex aspect-[360/314] items-end justify-center ${APEX_SIZE[size]}`}
+      className={`relative flex aspect-[360/314] items-end justify-center [container-type:size] ${APEX_SIZE[size]}`}
     >
       {won ? (
         <>
@@ -65,11 +67,13 @@ export default function PyramidCapstone({ metaAnswer, won, finaleActive, drop, m
               width={360}
               height={314}
               draggable={false}
-              className="h-full w-auto select-none drop-shadow-[3px_3px_0_var(--neo-black)]"
+              className="h-full w-auto select-none"
             />
             <span
+              data-word
               dir="auto"
-              className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md border-2 border-neo-black bg-neo-yellow px-1.5 py-0.5 font-neo-display text-xs font-black uppercase leading-none text-neo-navy shadow-hard-sm"
+              style={{ '--carve': carvedWordSize(metaAnswer, 'capstone') } as CSSProperties}
+              className="absolute bottom-[4%] left-1/2 -translate-x-1/2 whitespace-nowrap [font-size:var(--carve)] rounded-md border-2 border-neo-black bg-neo-yellow px-1.5 py-0.5 font-neo-display font-black uppercase leading-none text-neo-navy shadow-hard-sm"
             >
               {metaAnswer}
             </span>
@@ -91,7 +95,7 @@ export default function PyramidCapstone({ metaAnswer, won, finaleActive, drop, m
             />
           </svg>
           <span
-            className={`relative mb-[10%] font-neo-display text-lg font-black leading-none [@container(max-height:42rem)]:text-base ${
+            className={`relative mb-[12%] font-neo-display text-[34cqh] font-black leading-none ${
               finaleActive ? 'text-neo-cyan' : 'text-neo-purple-light'
             }`}
           >

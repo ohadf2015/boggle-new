@@ -1,35 +1,30 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { PYRAMID_ART, type PyramidSize } from './pyramidArt';
+import { carvedWordSize } from './pyramidFit';
 
 export type TierState = 'solved' | 'gaveUp' | 'current' | 'locked';
 
-const BRICKS_PER_TIER = [5, 4, 3] as const;
-
 // Written out in full so Tailwind's scanner sees them. The container variants
 // apply only inside the phone play screen's size container.
-const TIER_HEIGHT: Record<PyramidSize, string> = {
-  play: 'h-7 [@container(max-height:42rem)]:h-6',
-  trophy: 'h-[2.125rem]',
+const BRICK_HEIGHT: Record<PyramidSize, string> = {
+  play: 'h-10 [@container(max-height:42rem)]:h-9',
+  trophy: 'h-14',
 };
 
-const WORD_SIZE: Record<PyramidSize, string> = {
-  play: 'text-[0.8rem] [@container(max-height:42rem)]:text-[0.7rem]',
-  trophy: 'text-sm',
+const SOCKET: Record<'current' | 'locked', string> = {
+  current: 'border-neo-cyan bg-neo-navy/75 text-neo-cyan shadow-[0_0_0_3px_color-mix(in_srgb,var(--neo-cyan)_30%,transparent)]',
+  locked: 'border-neo-cream/60 bg-neo-navy/50',
 };
 
-const GHOST_BRICK: Record<'current' | 'locked', string> = {
-  current: 'border-neo-cyan bg-neo-navy/70',
-  locked: 'border-neo-cream/75 bg-neo-navy/45',
-};
+// Carved: dark sandstone ink, lit lip below, shadowed lip above.
+const ENGRAVED = '[text-shadow:0_1px_0_color-mix(in_srgb,var(--neo-cream)_75%,transparent),0_-1px_0_rgb(var(--neo-black)/0.35)]';
 
-const WORD_TONE: Record<TierState, string> = {
-  solved: 'text-neo-navy [text-shadow:0_1px_0_var(--neo-cream)]',
-  gaveUp: 'text-neo-red [text-shadow:0_1px_0_var(--neo-cream)]',
-  current: 'text-neo-cyan',
-  locked: '',
+const WORD_TONE: Record<'solved' | 'gaveUp', string> = {
+  solved: 'text-neo-navy/85',
+  gaveUp: 'text-neo-red',
 };
 
 interface PyramidTierProps {
@@ -38,50 +33,46 @@ interface PyramidTierProps {
   word?: string;
   size: PyramidSize;
   landing: boolean;
-  /** The explorer standing on this tier's step, if this is the highest laid tier. */
-  explorer?: ReactNode;
 }
 
-export default function PyramidTier({ index, state, word, size, landing, explorer }: PyramidTierProps) {
+/** One base brick: the bridge word of one riddle, carved into sandstone once it is solved. */
+export default function PyramidTier({ index, state, word = '', size, landing }: PyramidTierProps) {
   const laid = state === 'solved' || state === 'gaveUp';
   return (
     <m.div
       data-testid={`pyramid-tier-${index}`}
+      data-brick
       data-state={state}
       data-landing={landing ? 'true' : 'false'}
       initial={landing ? { y: -28 } : false}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 520, damping: 17 }}
-      className={`relative flex justify-center ${TIER_HEIGHT[size]}`}
+      className={`relative flex min-w-0 flex-1 items-center justify-center [container-type:size] ${BRICK_HEIGHT[size]} ${
+        laid ? '' : `rounded-md border-[3px] border-dashed ${SOCKET[state as 'current' | 'locked']}`
+      }`}
     >
-      {Array.from({ length: BRICKS_PER_TIER[index] }, (_, i) =>
-        laid ? (
-          // eslint-disable-next-line @next/next/no-img-element
+      {laid ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            key={i}
-            data-brick
             src={PYRAMID_ART.brick}
             alt=""
             width={480}
             height={285}
             draggable={false}
-            className={`h-full w-auto select-none ${state === 'gaveUp' ? 'grayscale-[0.7] brightness-90' : ''}`}
+            className={`absolute inset-0 h-full w-full select-none object-fill ${state === 'gaveUp' ? 'grayscale brightness-90' : ''}`}
           />
-        ) : (
           <span
-            key={i}
-            data-brick
-            className={`m-px aspect-[480/285] h-[calc(100%-2px)] rounded-md border-2 border-dashed ${GHOST_BRICK[state as 'current' | 'locked']}`}
-          />
-        ),
-      )}
-      {state !== 'locked' && (
-        <span
-          dir="auto"
-          className={`absolute inset-0 flex items-center justify-center px-3 text-center font-neo-display font-black uppercase leading-none tracking-wide ${WORD_SIZE[size]} ${WORD_TONE[state]}`}
-        >
-          {laid ? word : '···'}
-        </span>
+            data-word
+            dir="auto"
+            style={{ '--carve': carvedWordSize(word) } as CSSProperties}
+            className={`relative whitespace-nowrap [font-size:var(--carve)] px-1 pt-[6%] text-center font-neo-display font-black uppercase leading-none tracking-wide rtl:tracking-normal ${ENGRAVED} ${WORD_TONE[state as 'solved' | 'gaveUp']}`}
+          >
+            {word}
+          </span>
+        </>
+      ) : (
+        state === 'current' && <span className="font-neo-display text-[55cqh] font-black leading-none">?</span>
       )}
       {landing && laid && (
         <>
@@ -89,7 +80,6 @@ export default function PyramidTier({ index, state, word, size, landing, explore
           <DustPuff side="end" />
         </>
       )}
-      {explorer}
     </m.div>
   );
 }

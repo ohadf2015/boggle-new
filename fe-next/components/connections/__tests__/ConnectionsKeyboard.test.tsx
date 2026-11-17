@@ -30,34 +30,47 @@ describe('ConnectionsKeyboard', () => {
     expect(q.parentElement).not.toBe(a.parentElement);
   });
 
-  it('puts submit and backspace on the last row, flanking the letters', () => {
-    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
-    const z = screen.getByRole('button', { name: 'Z' });
-    const submit = screen.getByRole('button', { name: 'Submit' });
-    const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
-    expect(submit.parentElement).toBe(z.parentElement);
-    expect(backspaceKey.parentElement).toBe(z.parentElement);
+  it('gives submit and backspace their own row under the letters, in the same place for every locale', () => {
+    for (const locale of ['en', 'he', 'ru']) {
+      const { unmount } = render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows(locale)} canSubmit />);
+      const submit = screen.getByRole('button', { name: 'Submit' });
+      const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
+      const actions = screen.getByTestId('keyboard-actions');
+      expect(submit.parentElement).toBe(actions);
+      expect(backspaceKey.parentElement).toBe(actions);
+      expect(actions.querySelectorAll('button')).toHaveLength(2);
+      // Check on the start side, backspace at the end, like Wordle and a physical keyboard.
+      expect(actions.firstElementChild).toBe(submit);
+      expect(actions.lastElementChild).toBe(backspaceKey);
+      expect(actions.parentElement!.lastElementChild).toBe(actions);
+      unmount();
+    }
   });
 
-  it('gives every Hebrew letter key the same 9.5-column width', () => {
-    // Hebrew rows are 6/8/8: backspace moves to the short top row, submit stays
-    // on the last row, so the widest row is 8 + 1.5 = 9.5 columns (was 11,
-    // which rendered skinny pills). jsdom does not compute flex-shrink, so the
-    // divisor is what this pins.
+  it('labels the submit key with words on every device, not only with an icon', () => {
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    const label = screen.getByRole('button', { name: 'Submit' }).querySelector('span');
+    expect(label?.textContent).toBe('Submit');
+    expect(label?.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+  });
+
+  it('makes the submit key the wider of the two action keys', () => {
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    const grow = (name: string) => Number(screen.getByRole('button', { name }).style.flexGrow);
+    expect(grow('Submit')).toBeGreaterThan(grow('Delete letter'));
+  });
+
+  it('gives every Hebrew letter key the same 8-column width', () => {
+    // Hebrew rows are 6/8/8. With the action keys on their own row the letters
+    // size off the longest row alone, so they are wider than when backspace had
+    // to share the top row (9.5 columns). jsdom does not compute flex-shrink, so
+    // the divisor is what this pins.
     render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
     const firstRowKey = screen.getByRole('button', { name: 'ק' });
     const lastRowKey = screen.getByRole('button', { name: 'ת' });
-    const expected = `calc(${(100 / 9.5).toFixed(4)}% - 0.25rem)`;
+    const expected = `calc(${(100 / 8).toFixed(4)}% - 0.25rem)`;
     expect(firstRowKey.style.flexBasis).toBe(expected);
     expect(lastRowKey.style.flexBasis).toBe(expected);
-  });
-
-  it('puts Hebrew backspace on the top row and submit on the bottom row', () => {
-    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
-    const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
-    const submit = screen.getByRole('button', { name: 'Submit' });
-    expect(backspaceKey.parentElement).toBe(screen.getByRole('button', { name: 'ק' }).parentElement);
-    expect(submit.parentElement).toBe(screen.getByRole('button', { name: 'ת' }).parentElement);
   });
 
   it('renders the physical-layout keyboard left-to-right for Hebrew (ק top-left, not mirrored)', () => {

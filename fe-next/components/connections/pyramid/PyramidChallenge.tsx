@@ -20,16 +20,11 @@ import { stripEmoji } from '@/lib/share/stripEmoji';
 import { dailySubmitName } from '@/lib/connections/dailyDisplayName';
 import { getChosenGuestName } from '@/utils/guestManager';
 import type { GameState } from '@/lib/connections/types';
-import PyramidProgress from './PyramidProgress';
-import PyramidHeader from './PyramidHeader';
-import RankBadge from '../RankBadge';
 import ProgressCard from '../ProgressCard';
 import { useBridgeProgress } from '../useBridgeProgress';
-import { PyramidLeftRail, PyramidRightRail } from './PyramidShellRails';
-import { GameShell, SHELL_MEDIA } from '@/components/game/shell';
+import { SHELL_MEDIA } from '@/components/game/shell';
+import PyramidPlay from './PyramidPlay';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
-import FinaleCard from './FinaleCard';
-import PuzzleCard from '../PuzzleCard';
 import BridgeFinishBeat, { useFinishBeat } from '../BridgeFinishBeat';
 import PyramidDailyResults from './PyramidDailyResults';
 import PyramidEndScreen from './PyramidEndScreen';
@@ -440,59 +435,21 @@ function PyramidRun({
     );
   }
 
-  // Playing state
   return (
-    <GameShell
-      mode="word-chain"
-      accent="purple"
-      left={inShell ? <PyramidLeftRail t={t} state={pyramidState} metaAnswer={pyramid.metaAnswer} /> : null}
-      right={<PyramidRightRail t={t} state={pyramidState} />}
-    >
-    {/* A size container on phones: the header and stage read its height (in rem, so
-        an enlarged system font counts) and shed parts on short screens instead of
-        pushing the keyboard below the fold. The shell (desktop) layout opts out. */}
-    <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 py-3 [container-type:size] shell:max-w-none shell:px-0 shell:py-0 shell:[container-type:normal]" data-testid="pyramid-root">
-      {!inShell && (
-        <PyramidHeader
-          daily={Boolean(sharePath)}
-          state={pyramidState}
-          metaAnswer={pyramid.metaAnswer}
-          rankSlot={<RankBadge standing={progressApi.standing} rankUpId={progressApi.rankUpId} onRankUpShown={progressApi.dismissRankUp} />}
-        />
-      )}
-
-      {pyramidState.stage < 3 ? (
-        <>
-          <PuzzleCard
-            puzzle={currentPuzzle!}
-            state={synthGameState}
-            isAdmin={isAdmin}
-            onInputChange={handleInput}
-            onSubmit={handleSubmit}
-            onGiveUp={handleGiveUp}
-            onRevealHint={handleRevealHint}
-            onRate={() => {}}
-            onNext={handleAdvance}
-            showRating={false}
-          />
-        </>
-      ) : (
-        <FinaleCard
-          bridges={pyramidState.solvedBridges}
-          pyramid={pyramid}
-          input={input}
-          wrongAttempts={pyramidState.wrongAttempts}
-          hintRevealed={pyramidState.hintRevealed}
-          status={pyramidState.status}
-          onInputChange={handleInput}
-          onSubmit={handleSubmit}
-          onGiveUp={handleGiveUp}
-          onRevealHint={handleRevealHint}
-          onNext={handleAdvance}
-          isAdmin={isAdmin}
-        />
-      )}
-    </div>
-    </GameShell>
+    <PyramidPlay
+      inShell={inShell}
+      daily={Boolean(sharePath)}
+      state={pyramidState}
+      input={input}
+      isAdmin={isAdmin}
+      progressApi={progressApi}
+      currentPuzzle={currentPuzzle}
+      puzzleState={synthGameState}
+      onInputChange={handleInput}
+      onSubmit={handleSubmit}
+      onGiveUp={handleGiveUp}
+      onRevealHint={handleRevealHint}
+      onAdvance={handleAdvance}
+    />
   );
 }
