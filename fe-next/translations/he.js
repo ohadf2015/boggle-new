@@ -12207,6 +12207,7 @@ const he = {
       "paying": "לקוחות Pro משלמים",
       "trialing": "תקופות ניסיון",
       "granted": "Pro במתנה",
+      "churnedDormant": "נטשו (לא פעילים 30+ יום)",
       "offerwall": "Offerwall $ (30 יום)",
       "drillSignups": "הרשמות, שבוע של",
       "drillPayers": "לקוחות Pro",

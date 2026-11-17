@@ -12624,6 +12624,7 @@ const es = {
       "paying": "Pro de pago",
       "trialing": "Pruebas",
       "granted": "Pro regalados",
+      "churnedDormant": "Bajas (inactivos 30+ días)",
       "offerwall": "Offerwall $ (30d)",
       "drillSignups": "Registros, semana de",
       "drillPayers": "Clientes Pro",

@@ -184,4 +184,36 @@ describe('ClassReportButton (round results, free teacher)', () => {
     expect(screen.queryByTestId('class-report-teaser')).toBeNull();
     expect(reports.reportProOfferImpression).not.toHaveBeenCalled();
   });
+
+  describe('suppressOffer (live game still running)', () => {
+    it('keeps the free insight and grid, drops the ask: no CTA, no depth teaser, no analytics', () => {
+      render(<ClassReportButton language="en" underHalf={2} bars={[10, 40, 90]} round={ROUND} proLabel="Pro" suppressOffer />);
+      // Free class data stays
+      const teaser = screen.getByTestId('class-report-teaser');
+      expect(teaser).toHaveTextContent('2 students found under half the words this round');
+      expect(screen.getByTestId('class-report-open-grid')).toBeInTheDocument();
+      // The ask is gone
+      expect(screen.queryByTestId('class-report-depth')).toBeNull();
+      expect(screen.queryByTestId('class-report-teaser-cta')).toBeNull();
+      expect(screen.queryByTestId('class-report-teaser-open')).toBeNull();
+      expect(screen.queryByTestId('class-report-teaser-offer-title')).toBeNull();
+      expect(reports.reportProOfferImpression).not.toHaveBeenCalled();
+    });
+
+    it('the word grid dialog carries no upgrade offer when suppressed', () => {
+      render(<ClassReportButton language="en" underHalf={1} bars={[0, 50]} round={ROUND} suppressOffer />);
+      fireEvent.click(screen.getByTestId('class-report-open-grid'));
+      const dialog = screen.getByTestId('round-grid-dialog');
+      expect(dialog).toHaveTextContent('Noa');
+      expect(dialog.querySelector('a[href*="/teacher/upgrade"]')).toBeNull();
+    });
+
+    it('inside the access trial, suppression also drops the "report is open" link — mid-class is not the moment', () => {
+      pro.accessTrialExpires = new Date(Date.now() + 5 * DAY).toISOString();
+      render(<ClassReportButton language="en" underHalf={1} bars={[20]} suppressOffer />);
+      expect(screen.queryByTestId('class-report-teaser-open')).toBeNull();
+      expect(screen.queryByTestId('class-report-teaser-cta')).toBeNull();
+      expect(reports.reportProOfferImpression).not.toHaveBeenCalled();
+    });
+  });
 });

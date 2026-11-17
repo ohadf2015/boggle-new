@@ -93,15 +93,39 @@ describe('EduHostResults', () => {
     masteryByPlayer: { Noa: { found: 3, total: 10 }, Ido: { found: 1, total: 10 } },
   } as unknown as ClassroomSummary;
 
-  it('given a free teacher, when results show, then the labelled Pro preview is the one Pro slot and no trial card or second unlock ask competes', () => {
+  it('given a free teacher, when results show mid-class, then the free report card shows WITHOUT the Pro ask (ur-audit: no offer while the game runs)', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    // The free insight (bars, how many struggled, the word grid) stays...
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
+    // ...but nothing that asks for money: no depth teaser, no upgrade CTA, no locked PDF, no parent-share upsell.
+    expect(screen.queryByTestId('class-report-depth')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser-cta')).toBeNull();
+    expect(screen.queryByTestId('class-report-teaser-open')).toBeNull();
+    expect(screen.queryByTestId('report-pdf-locked')).toBeNull();
+    expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
+    expect(document.querySelector('a[href^="/he/teacher/upgrade"]')).toBeNull();
     expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
     expect(screen.queryByTestId('struggle-preview')).toBeNull();
     expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
+  });
+
+  it('given a free teacher, when the wall is mid-class, then no Pro offer impression or click analytics fire', () => {
+    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalled();
+  });
+
+  it('given a Pro teacher, when results show, then the real PDF export and parent share stay (features, not asks)', () => {
+    pro.hasPro = true;
+    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+    finishReveal();
+    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
+    expect(screen.getByTestId('report-pdf-export')).toHaveAttribute('data-locked', 'false');
+    expect(screen.getByTestId('edu-results-parent-share')).toBeInTheDocument();
   });
 
   it('Given a vocab-quiz round, When a free teacher opens the word grid, Then the cells read as quiz answers, not board finds', () => {
@@ -120,11 +144,10 @@ describe('EduHostResults', () => {
     expect(screen.getByTestId('round-grid-dialog').innerHTML).toContain('teacher.classReport.state.quizFound');
   });
 
-  it('given a free teacher, when they open "Share and export", then the Pro preview mounts and only then its impression fires', () => {
+  it('given a free teacher, when they open "Share and export", then no Pro offer impression fires — the ask is post-class, not mid-class', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
-    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button' }), expect.anything());
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
-    expect(proOffer.reportProOfferImpression).toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button', format: 'report_teaser', stage: 'rendered' }), expect.anything());
+    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalledWith(expect.objectContaining({ placement: 'class_report_button' }), expect.anything());
   });
 
   it('given a Pro teacher, when results show, then the live projector links straight to the class report and shows no upsell', () => {

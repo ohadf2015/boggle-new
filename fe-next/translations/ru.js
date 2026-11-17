@@ -10133,6 +10133,7 @@ const ru = {
       "paying": "Платящие Pro",
       "trialing": "Пробные",
       "granted": "Pro в подарок",
+      "churnedDormant": "Отток (не заходили 30+ дн.)",
       "offerwall": "Offerwall $ (30д)",
       "drillSignups": "Регистрации, неделя с",
       "drillPayers": "Клиенты Pro",

@@ -12,6 +12,8 @@ interface Revenue {
   paying?: number;
   trialing?: number;
   granted?: number;
+  /** past_due/canceled Polar Pro + no sign-in for 30d: churn, not dunning. */
+  churnedDormant?: number;
   checkoutsStarted30d?: number;
   paidOrders30d?: number;
   offerwallUsd30d?: number;
@@ -49,6 +51,7 @@ export function RevenuePanel({ authToken }: { authToken: string }) {
     { label: t('admin.kpi.paying'), value: rev?.paying ?? 0, target: { kind: 'payers' }, tone: 'text-neo-lime' },
     { label: t('admin.kpi.trialing'), value: rev?.trialing ?? 0, target: { kind: 'payers' }, tone: 'text-neo-cyan' },
     { label: t('admin.kpi.granted'), value: rev?.granted ?? 0, target: { kind: 'payers' }, tone: 'text-neo-purple' },
+    { label: t('admin.kpi.churnedDormant'), value: rev?.churnedDormant ?? 0, target: { kind: 'payers' }, tone: 'text-neo-pink' },
     { label: t('admin.kpi.offerwall'), value: `$${(rev?.offerwallUsd30d ?? 0).toFixed(2)}`, tone: 'text-neo-white' },
   ];
 

@@ -56,6 +56,12 @@ export interface ResultsPrimaryActionsProps {
   tone?: 'default' | 'quiet';
   /** This round's hardest words (roundHardestWords): the free teacher's insight in place of a locked report. */
   hardestWords?: MissedWord[];
+  /**
+   * Live game still running: keep the free hardest-words insight, drop the Pro
+   * link. Mid-class taps never converted (ur-audit 2026-11-17); the ask is
+   * post-class (Teacher Home, class summary, digest).
+   */
+  suppressOffer?: boolean;
 }
 
 export function ResultsPrimaryActions({
@@ -65,12 +71,15 @@ export function ResultsPrimaryActions({
   surface = 'teacher_card',
   tone = 'default',
   hardestWords = [],
+  suppressOffer = false,
 }: ResultsPrimaryActionsProps) {
   const { hasPro, loading } = useTeacherPro();
   const canOpenReport = hasPro && !loading;
-  const showUpgrade = !loading && !hasPro;
+  const showUpgrade = !loading && !hasPro && !suppressOffer;
+  // Suppressed mid-class: the free insight still shows, the Pro link does not.
+  const showFreeInsight = !loading && !hasPro;
 
-  if (!onRematch && !canOpenReport && !showUpgrade) return null;
+  if (!onRematch && !canOpenReport && !showFreeInsight) return null;
 
   // Stacked, not side by side: ONE loud action (rematch, full width), and the
   // report under it at half the weight. Two equal buttons in a row made the
@@ -113,16 +122,18 @@ export function ResultsPrimaryActions({
         </Link>
       )}
 
-      {showUpgrade ? (
+      {showFreeInsight ? (
         <>
           <HardestWordsInsight words={hardestWords} t={t} />
-          <ProInsightLink
-            placement="results_hardest_words"
-            language={language}
-            label={t('education.results.freeInsight.proLine')}
-            proLabel={t('eduShell.nav.pro')}
-            className="self-center"
-          />
+          {showUpgrade ? (
+            <ProInsightLink
+              placement="results_hardest_words"
+              language={language}
+              label={t('education.results.freeInsight.proLine')}
+              proLabel={t('eduShell.nav.pro')}
+              className="self-center"
+            />
+          ) : null}
         </>
       ) : null}
     </div>

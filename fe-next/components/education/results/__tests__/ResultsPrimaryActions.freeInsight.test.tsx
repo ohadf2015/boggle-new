@@ -57,4 +57,17 @@ describe('ResultsPrimaryActions free round insight', () => {
     expect(screen.queryByTestId('round-hardest-words')).toBeNull();
     expect(screen.queryByTestId(/pro-insight-link-/)).toBeNull();
   });
+
+  it('given the live game is still running (suppressOffer), when the round ends, then the free insight stays but NO Pro link shows', () => {
+    render(<ResultsPrimaryActions language="en" onRematch={vi.fn()} t={t} hardestWords={words} suppressOffer />);
+    expect(screen.getByTestId('round-hardest-words')).toBeInTheDocument();
+    expect(screen.queryByTestId(/pro-insight-link-/)).toBeNull();
+    expect(screen.getByTestId('rematch-same-list')).toBeInTheDocument();
+  });
+
+  it('given the live game is still running (suppressOffer), when nothing was missed and there is no rematch, then nothing renders', () => {
+    render(<ResultsPrimaryActions language="en" t={t} hardestWords={[]} suppressOffer />);
+    expect(screen.queryByTestId(/pro-insight-link-/)).toBeNull();
+    expect(screen.queryByTestId('round-hardest-words')).toBeNull();
+  });
 });

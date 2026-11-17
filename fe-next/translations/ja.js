@@ -12826,6 +12826,7 @@ const ja = {
       "paying": "有料Pro",
       "trialing": "トライアル",
       "granted": "Pro付与",
+      "churnedDormant": "解約扱い（30日以上未ログイン）",
       "offerwall": "Offerwall $（30日）",
       "drillSignups": "登録者、週の開始日",
       "drillPayers": "Proの顧客",

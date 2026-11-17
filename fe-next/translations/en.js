@@ -19584,6 +19584,7 @@ const en = {
       "paying": "Paying Pro",
       "trialing": "Trials",
       "granted": "Free Pro grants",
+      "churnedDormant": "Churned (dormant 30d+)",
       "offerwall": "Offerwall $ (30d)",
       "drillSignups": "Sign-ups, week of",
       "drillPayers": "Pro customers",
