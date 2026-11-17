@@ -88,12 +88,29 @@ describe('SpellingChallengePractice game feel', () => {
     fireEvent.change(screen.getByTestId('spelling-input'), { target: { value: 'zzz' } });
     fireEvent.submit(screen.getByTestId('spelling-input').closest('form')!);
     expect(fireConfetti).not.toHaveBeenCalled();
-    expect(screen.getByTestId('verdict-mascot')).toHaveAttribute('src', '/mascot/bridge-oops-nobg.webp');
+    // Both buddies (perched on phones, side column on desktop) answer the miss.
+    expect(screen.getAllByTestId('practice-buddy').map((b) => b.getAttribute('data-mood'))).toEqual(['miss', 'miss']);
     fireEvent.click(screen.getByRole('button', { name: /next|finish/i }));
     const next = (screen.getByTestId('definition-card').textContent ?? '').includes('another') ? 'dog' : 'cat';
     fireEvent.change(screen.getByTestId('spelling-input'), { target: { value: next } });
     fireEvent.submit(screen.getByTestId('spelling-input').closest('form')!);
     expect(fireConfetti).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('spelling-tiles')).toHaveAttribute('data-state', 'correct');
+    expect(screen.getAllByTestId('practice-buddy')[0]).toHaveAttribute('data-mood', 'correct');
+    expect(screen.getByTestId('spelling-fly-up')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('nods along while the student types', async () => {
+    const { SpellingChallengePractice } = await import('../SpellingChallengePractice');
+    render(
+      <SpellingChallengePractice
+        words={[{ word: 'cat', definition: 'a pet', canIntegrate: true }] as never}
+        onComplete={vi.fn()}
+        onBack={vi.fn()}
+      />
+    );
+    expect(screen.getAllByTestId('practice-buddy')[0]).toHaveAttribute('data-mood', 'idle');
+    fireEvent.change(screen.getByTestId('spelling-input'), { target: { value: 'c' } });
+    expect(screen.getAllByTestId('practice-buddy')[0]).toHaveAttribute('data-mood', 'typing');
   });
 });

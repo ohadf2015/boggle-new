@@ -21651,6 +21651,7 @@ const sv = {
       "next": "Nästa ord",
       "finish": "Se mitt resultat",
       "praise": "Klockrent!|Helt rätt!|Perfekt!|Du fixade det!|Lysande!",
+      "enterHint": "Tryck Enter för att rätta · skriv hela ordet",
       "progress": "Ord {current} av {total}"
     },
     "cookie": {
