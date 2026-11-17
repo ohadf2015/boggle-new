@@ -317,6 +317,30 @@ export async function upsertSubscription({
 }
 
 /**
+ * True when the stored row is a past_due provider subscription right now.
+ * The Polar webhook reads this BEFORE upserting a new status: past_due →
+ * active is the recovery the whole dunning path exists to produce, and
+ * `payment_recovered` must fire exactly once for it — a redelivery then reads
+ * an already-active row and stays silent. Never throws: a failed read must
+ * not block the state write; it only costs the analytics event.
+ */
+export async function subscriptionRowIsPastDue(userId: string): Promise<boolean> {
+  try {
+    const supabase = createAdminClient() ?? (await createClient())
+    const { data, error } = await supabase
+      .from('subscriptions')
+      .select('status')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error || !data) return false
+    return (data as { status?: string }).status === 'past_due'
+  } catch (err) {
+    console.error('[Subscription] subscriptionRowIsPastDue read failed:', err)
+    return false
+  }
+}
+
+/**
  * Belt-and-braces Pro grant from a paid ORDER event (order.paid).
  *
  * Order events arrive in the same burst as the subscription events, usually after

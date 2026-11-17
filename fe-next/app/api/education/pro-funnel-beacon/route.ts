@@ -45,6 +45,7 @@ const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   'trial_expired',
   'teacher_plan_gate_shown',
   'teacher_plan_gate_upgrade_click',
+  'recovery_clicked',
   'edu_pro_telemetry_client_key_missing',
 ]);
 

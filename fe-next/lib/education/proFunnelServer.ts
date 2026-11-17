@@ -260,6 +260,34 @@ export function buildTrialExpiredEvent(userId: string, subscriptionId: string): 
   };
 }
 
+/**
+ * Dunning step 1 — Polar flagged a Teacher Pro renewal past due. The row flip
+ * alone churns in silence; this is the analytics twin of the banner + dunning
+ * email that fire on the same webhook. Server-only: the webhook is the truth
+ * about money, a client step would count teachers who merely saw the banner.
+ */
+export function buildSubscriptionPastDueEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'subscription_past_due',
+    properties: { ...BASE, subscription_id: subscriptionId, teacher_id: userId },
+  };
+}
+
+/**
+ * Dunning success — a past_due Teacher Pro subscription flipped back to active
+ * (card fixed in the Polar portal, retry charge landed). Fires only on the
+ * past_due → active transition, so a redelivery reads an already-active row
+ * and stays silent: one recovery, one event.
+ */
+export function buildPaymentRecoveredEvent(userId: string, subscriptionId: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'payment_recovered',
+    properties: { ...BASE, subscription_id: subscriptionId, teacher_id: userId },
+  };
+}
+
 /** Day-10 Polar trial expiry email actually sent. */
 export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
   return {
