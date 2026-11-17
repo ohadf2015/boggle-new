@@ -119,7 +119,7 @@ export const FAQ_ACCENTS = [
 
 export const DIRECT_ANSWER = {
   q: '¿Dónde jugar scrabble en español gratis en línea y sin registrarse?',
-  a: `En LexiClash, desde el navegador: pulsas Crear sala, mandas el enlace y tus amigos entran sin cuenta, sin email y sin descargar nada. No es Scrabble ni tiene relación con la marca, pero si buscas un juego de letras así en español, aquí lo tienes. El diccionario pasa de ${ES_DICT_FLOOR} palabras con variantes de España y Latinoamérica, en una sala caben de 2 a 50 jugadores y cada ronda dura unos 3 minutos. Jugar no cuesta nada.`,
+  a: `En LexiClash, desde el navegador: pulsas Crear sala, mandas el enlace y tus amigos entran sin cuenta, sin email y sin descargar nada. No es Scrabble ni tiene relación con la marca, pero si buscas un juego de letras así en español, aquí lo tienes. El diccionario pasa de ${ES_DICT_FLOOR} palabras con variantes de España y Latinoamérica, en una sala caben de 2 a 50 jugadores y una ronda normal dura entre uno y dos minutos. Jugar no cuesta nada.`,
 };
 
 export const FAQS = [
@@ -151,6 +151,10 @@ export const FAQS = [
   {
     q: '¿Qué modos de juego multijugador hay?',
     a: 'Salas multijugador en tiempo real, desafíos diarios, cazadores de palabras, modo explosión, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
+  },
+  {
+    q: '¿Dónde puedo jugar Scrabble en línea gratis en español?',
+    a: `En LexiClash. Es una alternativa a Scrabble en línea, gratis y en español, jugable directamente en el navegador sin descargas ni registro. Más de ${ES_DICT_FLOOR} palabras en español validadas, salas multijugador en tiempo real (2-50 jugadores) y desafíos diarios con clasificación global. Para jugar Scrabble gratis en línea con amigos, simplemente comparte el enlace de tu sala.`,
   },
   {
     q: '¿Cuántos jugadores pueden jugar en la misma sala?',
