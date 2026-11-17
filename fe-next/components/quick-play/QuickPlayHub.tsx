@@ -127,8 +127,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
   }, [phase, config?.mode, announce, t]);
 
   // Loop closer: tell the challenger when someone answered their challenge.
+  const signedInId = user?.id ?? null;
   useEffect(() => {
-    if (challengeId) return;
+    if (challengeId || !signedInId) return;
     let cancelled = false;
     fetch(`/api/quick-play/challenge?mine=1&lang=${language}`)
       .then((r) => (r.ok ? r.json() : null))
@@ -144,7 +145,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     return () => {
       cancelled = true;
     };
-  }, [challengeId, language]);
+  }, [challengeId, language, signedInId]);
 
   // Challenge deep link: lock mode+seed to the friend's board
   useEffect(() => {
