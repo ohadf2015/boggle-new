@@ -64,8 +64,13 @@ export function useBridgeTyping({
   const pressTimer = useRef<number | undefined>(undefined);
   useEffect(() => () => window.clearTimeout(pressTimer.current), []);
 
+  // The rejected guess still sits in the slots for the red flash; typing over it starts a new guess.
+  const deadGuess = useRef<string | null>(null);
+  const typingBase = (current: string) => (current === deadGuess.current ? '' : current);
+
   const handleLetter = (letter: string) => {
-    const next = appendLetter(input, letter, slotCap);
+    const base = typingBase(input);
+    const next = appendLetter(base, letter, slotCap);
     if (next !== input) onInputChange(next);
   };
   const handleBackspace = () => onInputChange(backspace(input));
@@ -111,7 +116,7 @@ export function useBridgeTyping({
       if (!letter) return;
       e.preventDefault();
       echo(letter);
-      const next = appendLetter(inputRef.current, letter, slotCap);
+      const next = appendLetter(typingBase(inputRef.current), letter, slotCap);
       if (next !== inputRef.current) set(next);
     };
     window.addEventListener('keydown', onKeyDown);
@@ -122,8 +127,15 @@ export function useBridgeTyping({
   // fresh instead of hand-deleting a dead guess.
   useEffect(() => {
     if (status !== 'wrong') return;
-    const timer = window.setTimeout(() => onInputChange(''), 650);
-    return () => window.clearTimeout(timer);
+    const dead = inputRef.current;
+    deadGuess.current = dead;
+    const timer = window.setTimeout(() => {
+      if (inputRef.current === dead) onInputChange('');
+    }, 650);
+    return () => {
+      window.clearTimeout(timer);
+      deadGuess.current = null;
+    };
   }, [status, wrongAttempts, onInputChange]);
 
   return { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace, handleClear, pressedKey };

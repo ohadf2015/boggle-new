@@ -16,17 +16,18 @@ const DOT: Record<string, string> = {
   purple: 'border-neo-purple',
 };
 
-export const MORE_ROW_HEIGHT = 'min-h-10';
 
 interface NextQuestMoreProps {
   /** Unplayed modes other than the headline one, in hand-off order. */
   modes: readonly DailyModeId[];
   currentLanguage: Language;
   source: string;
+  /** Play state still loading: hold the chip block's space so the recap below doesn't jump. */
+  loading?: boolean;
 }
 
 /** Quiet second row under the headline CTA: the way back, plus any other challenge still open today. */
-export function NextQuestMore({ modes, currentLanguage, source }: NextQuestMoreProps) {
+export function NextQuestMore({ modes, currentLanguage, source, loading = false }: NextQuestMoreProps) {
   const { t } = useLanguage();
   const defs = modes.map((id) => DAILY_MODES.find((m) => m.id === id)).filter((m) => m !== undefined);
 
@@ -34,8 +35,9 @@ export function NextQuestMore({ modes, currentLanguage, source }: NextQuestMoreP
     <nav
       data-testid="next-quest-more"
       aria-label={t('daily.alsoToday')}
-      className={cn('flex w-full flex-col items-start gap-2', MORE_ROW_HEIGHT)}
+      className="flex w-full flex-col items-start gap-2"
     >
+      {loading && <div aria-hidden="true" data-testid="next-quest-more-loading" className="h-[4.25rem] w-full" />}
       {defs.length > 0 && (
         <div className="w-full">
           <p className="mb-1.5 text-[11px] font-black uppercase tracking-wider text-neo-cream/60 rtl:tracking-normal">

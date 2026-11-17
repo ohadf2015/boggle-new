@@ -267,7 +267,7 @@ export default function FinaleCard({
                   canSubmit={input.trim().length > 0}
                   disabled={isDisabled}
                   pressedKey={pressedKey}
-                  ready={input.length >= slotCap}
+                  ready={!isWrong && input.length >= slotCap}
                   typeHint={t('connections.typeHint')}
                 />
               )}

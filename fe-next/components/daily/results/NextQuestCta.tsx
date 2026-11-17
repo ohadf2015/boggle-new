@@ -23,7 +23,7 @@ import { StreakMilestonePopup } from '@/components/streak/StreakMilestonePopup';
 import { claimPopupSlot, releasePopupSlot } from '@/components/daily/prize/dayPrizeStore';
 import { prizeToPop, finishingClearsDay } from '@/components/daily/prize/prizeEligibility';
 import type { DayPrizeKind } from '@/lib/daily/dayPrize';
-import { NextQuestMore, MORE_ROW_HEIGHT } from './NextQuestMore';
+import { NextQuestMore } from './NextQuestMore';
 
 /** Let the results land before the prize box steps in. */
 export const PRIZE_POP_DELAY_MS = 700;
@@ -157,7 +157,7 @@ export function NextQuestCta({
           aria-hidden="true"
           data-testid="next-quest-loading"
         />
-        {!compact && <div aria-hidden="true" data-testid="next-quest-more-loading" className={MORE_ROW_HEIGHT} />}
+        {!compact && <NextQuestMore modes={[]} currentLanguage={currentLanguage} source={source} loading />}
       </>
     );
   }

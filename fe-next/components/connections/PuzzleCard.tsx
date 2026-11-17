@@ -342,7 +342,7 @@ export default function PuzzleCard({
                   canSubmit={state.input.trim().length > 0}
                   disabled={isDisabled}
                   pressedKey={pressedKey}
-                  ready={state.input.length >= slotCap}
+                  ready={!isWrong && state.input.length >= slotCap}
                   typeHint={t('connections.typeHint')}
                 />
               )

@@ -90,6 +90,7 @@ describe('NextQuestCta: every other unfinished challenge + the way back', () => 
     playedStatus.loading = true;
     renderCta();
     expect(screen.getByTestId('next-quest-more-loading')).toBeInTheDocument();
+    expect(screen.getByTestId('next-quest-back')).toHaveAttribute('href', '/en/daily');
   });
 
   it('compact placements skip the list', () => {

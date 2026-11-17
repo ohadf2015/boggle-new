@@ -3,14 +3,14 @@ import { render, act } from '@testing-library/react';
 import { createElement, useState } from 'react';
 import { useBridgeTyping } from '../useBridgeTyping';
 
-function Harness({ locale, answer }: { locale: string; answer: string }) {
-  const [input, setInput] = useState('');
+function Harness({ locale, answer, start = '', status = 'playing' }: { locale: string; answer: string; start?: string; status?: string }) {
+  const [input, setInput] = useState(start);
   const { pressedKey } = useBridgeTyping({
     input,
     answer,
     locale,
     disabled: false,
-    status: 'playing',
+    status,
     wrongAttempts: 0,
     onInputChange: setInput,
     onSubmit: () => {},
@@ -52,5 +52,11 @@ describe('useBridgeTyping physical keyboard', () => {
     const { getByTestId } = render(createElement(Harness, { locale: 'en', answer: 'GREEN' }));
     keys([['g', 'KeyG']]);
     expect(getByTestId('pressed').textContent).toBe('G');
+  });
+
+  it('starts a fresh guess when typing resumes before a wrong guess clears itself', () => {
+    const { getByTestId } = render(createElement(Harness, { locale: 'en', answer: 'GREEN', start: 'GRXEN', status: 'wrong' }));
+    keys([['b', 'KeyB'], ['r', 'KeyR']]);
+    expect(getByTestId('buffer').textContent).toBe('BR');
   });
 });
