@@ -4764,6 +4764,24 @@ const ja = {
       "facialHair": "ヒゲ",
       "facialHairStyle": "スタイル",
       "colorTheme": "カラーテーマ",
+      "presets": "プリセット",
+      "presetGroup": {
+        "ron": "ロン",
+        "fun": "おもしろ＆かわいい"
+      },
+      "preset": {
+        "ron": "ロンのプリセット",
+        "ronCasual": "カジュアルなロン",
+        "ronCool": "クールなロン",
+        "kitty": "ネコ",
+        "sleepyBunny": "ねむいウサギ",
+        "partyPropeller": "プロペラパーティー",
+        "sunshine": "サンシャイン",
+        "coolShades": "サングラス",
+        "frogPrince": "カエルの王子さま",
+        "spaceCadet": "宇宙カデット",
+        "unicornSparkle": "ユニコーン"
+      },
       "bodyStyle": "服装",
       "download": "ダウンロード",
       "expressions": "表情",
@@ -19513,6 +19531,24 @@ const ja = {
     "expressions": "表情",
     "facialHairStyle": "スタイル",
     "colorTheme": "カラーテーマ",
+    "presets": "プリセット",
+    "presetGroup": {
+      "ron": "ロン",
+      "fun": "おもしろ＆かわいい"
+    },
+    "preset": {
+      "ron": "ロンのプリセット",
+      "ronCasual": "カジュアルなロン",
+      "ronCool": "クールなロン",
+      "kitty": "ネコ",
+      "sleepyBunny": "ねむいウサギ",
+      "partyPropeller": "プロペラパーティー",
+      "sunshine": "サンシャイン",
+      "coolShades": "サングラス",
+      "frogPrince": "カエルの王子さま",
+      "spaceCadet": "宇宙カデット",
+      "unicornSparkle": "ユニコーン"
+    },
     "bodyStyle": "服装",
     "bodyStyles": {
       "default": "デフォルト",

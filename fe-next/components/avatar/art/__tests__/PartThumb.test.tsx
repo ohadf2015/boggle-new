@@ -34,3 +34,18 @@ describe('PartThumb (catalog thumbnail)', () => {
     expect(container.innerHTML.toLowerCase()).toContain('#c62828');
   });
 });
+
+  it('frames neck-layer accessories (gold necklace) on the collar, not the hat crop', () => {
+    const { container } = render(
+      <PartThumb category="accessory" id="goldNecklace" config={DEFAULT_AVATAR_CONFIG} size={72} />,
+    );
+    const svg = container.querySelector('svg');
+    expect(svg).not.toBeNull();
+    const box = (svg!.getAttribute('viewBox') ?? '').split(/\s+/).map(Number);
+    expect(box).toHaveLength(4);
+    const [, y, , h] = box;
+    // Hat-style crop starts at y=-4 and mostly shows the head; a neck crop must
+    // start lower and include the pendant (drawn around y=67–94).
+    expect(y, 'neck thumb should not use the hat-focused crop').toBeGreaterThanOrEqual(40);
+    expect(y + h).toBeGreaterThanOrEqual(94);
+  });

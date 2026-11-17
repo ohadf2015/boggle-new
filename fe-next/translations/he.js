@@ -4778,6 +4778,24 @@ const he = {
       "facialHair": "זקן",
       "facialHairStyle": "סגנון",
       "colorTheme": "ערכת צבעים",
+      "presets": "פריסטים",
+      "presetGroup": {
+        "ron": "רון",
+        "fun": "מצחיק וחמוד"
+      },
+      "preset": {
+        "ron": "פריסט רון",
+        "ronCasual": "רון קז'ואל",
+        "ronCool": "רון קול",
+        "kitty": "חתולה",
+        "sleepyBunny": "ארנב ישנוני",
+        "partyPropeller": "מסיבת מדחף",
+        "sunshine": "שמש",
+        "coolShades": "משקפי שמש",
+        "frogPrince": "נסיך הצפרדע",
+        "spaceCadet": "טייס חלל",
+        "unicornSparkle": "חד-קרן"
+      },
       "bodyStyle": "לבוש",
       "download": "הורדה",
       "bodyStyles": {
@@ -19559,6 +19577,24 @@ const he = {
     "expressions": "הבעה",
     "facialHairStyle": "סגנון",
     "colorTheme": "ערכת צבעים",
+    "presets": "פריסטים",
+    "presetGroup": {
+      "ron": "רון",
+      "fun": "מצחיק וחמוד"
+    },
+    "preset": {
+      "ron": "פריסט רון",
+      "ronCasual": "רון קז'ואל",
+      "ronCool": "רון קול",
+      "kitty": "חתולה",
+      "sleepyBunny": "ארנב ישנוני",
+      "partyPropeller": "מסיבת מדחף",
+      "sunshine": "שמש",
+      "coolShades": "משקפי שמש",
+      "frogPrince": "נסיך הצפרדע",
+      "spaceCadet": "טייס חלל",
+      "unicornSparkle": "חד-קרן"
+    },
     "bodyStyle": "תלבושת",
     "bodyStyles": {
       "default": "רגיל",

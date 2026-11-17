@@ -31,6 +31,7 @@ import { LobbyAvatarRewardButton } from './LobbyAvatarRewardButton';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
 import EditorStage from './editor/EditorStage';
 import EditorTabBar from './editor/EditorTabBar';
+import { splitLookPreset, type LookPreset } from '@/lib/avatar/lookPresets';
 import EditorPanel from './editor/EditorPanel';
 import UnlockPanel from './editor/UnlockPanel';
 import { UpNextRail } from '@/components/progression/UpNextRail';
@@ -112,6 +113,11 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
   const onPickColor = useCallback((s: ColorSection, c: CatalogColor) => pick(s.configKey, c.palette, c.hex), [pick]);
   const onGender = useCallback((g: CustomAvatarConfig['gender']) => set('gender', g), [set]);
   const onPatch = useCallback((patch: Partial<CustomAvatarConfig>) => setMany(patch, committed), [setMany, committed]);
+  const onApplyLook = useCallback((preset: LookPreset) => {
+    const { patch, tryOn: locked } = splitLookPreset(preset, premium);
+    if (Object.keys(patch).length > 0) setMany(patch, committed);
+    if (locked && premium) tryOnPart(locked.key, locked.value);
+  }, [premium, setMany, committed, tryOnPart]);
   const onRandomize = useCallback(() => replace(getRandomAvatarConfig()), [replace]);
   const onRestorePrevious = useCallback(() => {
     if (previousConfig) replace(previousConfig);
@@ -246,6 +252,7 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
               onPickColor={onPickColor}
               onGender={onGender}
               onPatch={onPatch}
+              onApplyLook={onApplyLook}
               onScrollMouseDown={e => { if (shouldSuppressPointerFocus(e.target)) e.preventDefault(); }}
               t={t}
               language={language}

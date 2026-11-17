@@ -10,6 +10,8 @@ import type { CatalogColor } from '@/lib/avatar/catalog';
 import { SwatchRow, GenderToggle } from '../AvatarBuilderColorControls';
 import EditorPartGrid from './EditorPartGrid';
 import { COLOR_THEMES, EXPRESSION_PRESETS, type EditorTab, type PartsSection, type ColorSection } from './editorTabs';
+import { LOOK_PRESET_GROUPS, type LookPreset } from '@/lib/avatar/lookPresets';
+import AvatarRendererSsr from '../AvatarRendererSsr';
 import type { LockPremium } from './partLock';
 import type { TryOn } from './editorState';
 
@@ -24,6 +26,7 @@ interface EditorPanelProps {
   onPickColor: (section: ColorSection, color: CatalogColor) => void;
   onGender: (g: CustomAvatarConfig['gender']) => void;
   onPatch: (patch: Partial<CustomAvatarConfig>) => void;
+  onApplyLook: (preset: LookPreset) => void;
   /** Suppress pointer focus-scroll jumps inside the grid. */
   onScrollMouseDown: (e: React.MouseEvent) => void;
   /** Rendered at the end of the scroll area (reward / glow-up). */
@@ -48,6 +51,7 @@ export default function EditorPanel({
   onPickColor,
   onGender,
   onPatch,
+  onApplyLook,
   onScrollMouseDown,
   footer,
   t,
@@ -110,6 +114,47 @@ export default function EditorPanel({
               );
             }
             if (s.kind === 'colors') return <div key={s.palette}>{swatches(s, true)}</div>;
+            if (s.kind === 'looks') {
+              return (
+                <section key="looks" data-testid="look-presets">
+                  {LOOK_PRESET_GROUPS.map(g => {
+                    const presets = s.presets.filter(p => p.group === g.id);
+                    if (presets.length === 0) return null;
+                    return (
+                      <div key={g.id} className="mb-3 last:mb-0">
+                        <SectionLabel>{t(g.labelKey)}</SectionLabel>
+                        <div className="flex gap-2 overflow-x-auto avatar-editor-noscrollbar py-1 -my-1">
+                          {presets.map(p => {
+                            const selected = Object.entries(p.config).every(([k, v]) =>
+                              v == null || committed[k as keyof CustomAvatarConfig] === v,
+                            );
+                            return (
+                              <button
+                                key={p.id}
+                                type="button"
+                                data-testid="look-preset"
+                                data-preset={p.id}
+                                aria-pressed={selected}
+                                aria-label={t(p.labelKey)}
+                                onClick={() => onApplyLook(p)}
+                                className={`${CHIP} shrink-0 flex-col !items-stretch !gap-1 !px-1.5 !py-1.5 min-w-[4.75rem] ${
+                                  selected ? 'border-neo-lime shadow-hard-lime' : ''
+                                }`}
+                              >
+                                <span className="block size-14 overflow-hidden rounded-neo border-2 border-black mx-auto">
+                                  <AvatarRendererSsr config={p.config} size={56} />
+                                </span>
+                                <span className="text-center leading-tight">{t(p.labelKey)}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </section>
+              );
+            }
             if (s.kind === 'expressions') {
               return (
                 <section key="expressions">

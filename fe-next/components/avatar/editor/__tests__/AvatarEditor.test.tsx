@@ -101,6 +101,21 @@ describe('Avatar editor — try-on is never saved (ownership is client-side only
   });
 });
 
+
+  it('applying the Ron preset commits the free look and only tries on the gold necklace', () => {
+    const { onSave } = open(premiumAt(1, 0));
+    fireEvent.click(screen.getByRole('button', { name: 'avatarBuilder.preset.ron' }));
+    expect(preview()).toHaveAttribute('data-accessory', 'goldNecklace');
+    expect(screen.getByTestId('editor-unlock-panel')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('avatarBuilder.save'));
+    const saved = onSave.mock.calls[0][0] as CustomAvatarConfig;
+    expect(saved.accessory).toBe('none');
+    expect(saved.facialHair).toBe('fullBeard');
+    expect(saved.hair).toBe('buzz');
+    expect(saved.shirtColor.toLowerCase()).toBe('#6b7f3b');
+    expect(saved.gender).toBe('male');
+  });
+
 describe('Avatar editor — locked parts are covetable, with a clear unlock path', () => {
   it('a level-ladder part shows an "Lv N" chip; a gold-only part shows its price', () => {
     open(premiumAt(1));

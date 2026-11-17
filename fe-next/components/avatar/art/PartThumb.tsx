@@ -42,6 +42,15 @@ const VIEW: Record<ThumbCategory, string> = {
   bodyStyle: '10 56 80 48',
 };
 
+/** Hats sit at the top of the canvas; neck-layer parts (necklace, scarf, earrings)
+ *  live around y=60–94 and disappear under the hat crop + the price badge. */
+const NECK_ACCESSORY_VIEW = '8 52 84 50';
+
+function thumbViewBox(category: ThumbCategory, id: string): string {
+  if (category === 'accessory' && accDef(id).layer === 'neck') return NECK_ACCESSORY_VIEW;
+  return VIEW[category];
+}
+
 function Face({ ctx, cfg, parts }: { ctx: ArtCtx; cfg: CustomAvatarConfig; parts: { eyes?: boolean; mouth?: boolean; brows?: boolean; nose?: boolean } }) {
   const head = headFor(cfg.base);
   return (
@@ -138,7 +147,7 @@ export const PartThumb = memo(function PartThumb({ category, id, config, size = 
   const ctx = buildCtx(cfg, uid, false);
   return (
     <svg
-      viewBox={VIEW[category]}
+      viewBox={thumbViewBox(category, drawnId)}
       width={size}
       height={size}
       className={className}
