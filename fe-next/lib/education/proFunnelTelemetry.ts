@@ -402,6 +402,20 @@ export function trackTrialExpiredShown(args: { source: 'dashboard_trial_ended' }
   });
 }
 
+/**
+ * Retry-payment tap on the past-due banner. The dunning path's one
+ * teacher-initiated step: pairs the server-side `subscription_past_due` /
+ * `payment_recovered` pair with "did the human actually click". Not mirrored:
+ * the Growth Radar funnel ends at conversion, recovery is a billing metric.
+ */
+export function trackRecoveryClicked(args: { surface: 'payment_failed_banner' }): void {
+  safeCapture('recovery_clicked', {
+    surface: args.surface,
+    product: 'teacher_pro',
+    provider: 'polar',
+  });
+}
+
 export type TeacherPlanGateShownArgs = {
   surface: 'classroom_create' | 'student_enroll';
   limit_type: 'classrooms' | 'students';

@@ -33,6 +33,8 @@ import {
   buildTrialExpiredEvent,
   buildPolarTrialDay10SentEvent,
   buildPolarTrialExpirySentEvent,
+  buildSubscriptionPastDueEvent,
+  buildPaymentRecoveredEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -193,6 +195,22 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'trial_expired',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9' },
+    });
+  });
+
+  it('Given Polar flags a renewal past due, When built, Then it is subscription_past_due with the subscription id', () => {
+    expect(buildSubscriptionPastDueEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'subscription_past_due',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9', teacher_id: 'u-1' },
+    });
+  });
+
+  it('Given a past_due subscription recovers, When built, Then it is payment_recovered with the subscription id', () => {
+    expect(buildPaymentRecoveredEvent('u-1', 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'payment_recovered',
+      properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9', teacher_id: 'u-1' },
     });
   });
 

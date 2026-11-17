@@ -18,6 +18,8 @@ vi.mock('@/lib/education/proFunnelServer', () => ({
   buildTrialExpiredEvent: () => ({}),
   buildTrialStartedEvent: () => ({}),
   buildTeacherProUpgradedEvent: () => ({}),
+  buildSubscriptionPastDueEvent: () => ({}),
+  buildPaymentRecoveredEvent: () => ({}),
   captureProFunnelServerEvent: () => {},
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
@@ -28,6 +30,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromOrder: vi.fn(),
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: vi.fn(),
+  subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
 }))
 
 import { POST } from '../route'

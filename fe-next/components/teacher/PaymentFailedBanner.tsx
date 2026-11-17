@@ -2,6 +2,7 @@
 
 import { CreditCard, ExternalLink } from 'lucide-react';
 import { billingPortalPath } from '@/lib/education/billingPortal';
+import { trackRecoveryClicked } from '@/lib/education/proFunnelTelemetry';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PRO_BANNER_CTA, ProBanner } from './pro/ProBanner';
 
@@ -37,14 +38,26 @@ export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBanner
       lead={<CreditCard className="size-8 shrink-0 text-neo-pink" aria-hidden="true" />}
       action={
         portalUrl ? (
-          <a data-testid="payment-failed-cta" href={portalUrl} target="_blank" rel="noopener noreferrer" className={PRO_BANNER_CTA}>
+          <a
+            data-testid="payment-failed-cta"
+            href={portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={PRO_BANNER_CTA}
+            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
+          >
             {label}
             <ExternalLink className="size-4" aria-hidden="true" />
           </a>
         ) : (
           // Never the upgrade page: a new checkout would be a second subscription while Polar
           // retries this one. The stable route mints a fresh portal session on the click.
-          <a data-testid="payment-failed-cta" href={billingPortalPath(language)} className={PRO_BANNER_CTA}>
+          <a
+            data-testid="payment-failed-cta"
+            href={billingPortalPath(language)}
+            className={PRO_BANNER_CTA}
+            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
+          >
             {label}
           </a>
         )

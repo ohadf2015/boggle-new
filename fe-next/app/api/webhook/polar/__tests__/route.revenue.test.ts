@@ -13,6 +13,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromOrder: vi.fn(),
   grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: (...a: unknown[]) => logSubscriptionEvent(...a),
+  subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
 const capture = vi.fn()

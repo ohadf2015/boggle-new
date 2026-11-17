@@ -43,13 +43,17 @@ import { useLessons } from '@/hooks/useVocabularyLesson';
 import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
 import { isPackLanguage } from '@/lib/education/themedPacks';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
-import { trackEduTeacherDashboardViewed } from '@/lib/education/telemetry';
+import { trackEduTeacherDashboardViewed, trackTeacherOnboardingStep } from '@/lib/education/telemetry';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { homeNextStep, homeOnboarding, type HomeOnboardingStepId } from '@/lib/education/homeOnboarding';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 import { hasProAccess, isDigestOverFreeTierCaps } from '@/lib/education/teacherPlanGate';
 import { trackFirstRoundGuideClicked, trackFirstRoundGuideShown } from '@/lib/education/firstRoundGuideTelemetry';
+import {
+  captureTeacherOnboardingCompletedIfOpened,
+  captureTeacherOnboardingOpened,
+} from '@/lib/education/teacherOnboardingGate';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
@@ -71,7 +75,7 @@ function greetingKey(hour: number): string {
 export default function TeacherDashboard({ banner, alert }: TeacherDashboardProps = {}) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
   const searchParams = useSearchParams();
   const deepLink = useTeacherDashboardDeepLink();
   const isRTL = language === 'he';
@@ -180,13 +184,60 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   ) : null;
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);
+  const checklistStep =
+    onboardingStep === 'createClass' ? 'create_classroom' : onboardingStep === 'shareCode' ? 'share_join_link' : 'start_live_class';
   useEffect(() => {
-    if (!onboardingCardShown || guideShownStep.current === onboardingStep) return;
+    const teacherId = user?.id;
+    if (!onboardingCardShown || !teacherId || guideShownStep.current === onboardingStep) return;
     guideShownStep.current = onboardingStep;
-    trackFirstRoundGuideShown({ surface: 'home', locale: language, step: onboardingStep });
-  }, [onboardingCardShown, onboardingStep, language]);
-  const onOnboardingStep = (step: HomeOnboardingStepId) =>
-    trackFirstRoundGuideClicked({ surface: 'home', locale: language, step });
+    trackFirstRoundGuideShown({
+      surface: 'home',
+      locale: language,
+      step: onboardingStep,
+      teacherId,
+    });
+    captureTeacherOnboardingOpened({
+      teacherId,
+      classroomId: effectiveId || null,
+      step: onboardingStep,
+      surface: 'home',
+      locale: language,
+    });
+    trackTeacherOnboardingStep({
+      step: checklistStep,
+      action: 'view',
+      teacherId,
+      classroomId: effectiveId || null,
+    });
+  }, [onboardingCardShown, onboardingStep, language, user?.id, effectiveId, checklistStep]);
+  useEffect(() => {
+    const teacherId = user?.id;
+    if (!ready || !teacherId || !onboarding.complete) return;
+    captureTeacherOnboardingCompletedIfOpened({
+      teacherId,
+      classroomId: effectiveId || null,
+      step: onboardingStep,
+      surface: 'home',
+      locale: language,
+    });
+  }, [ready, onboarding.complete, user?.id, effectiveId, onboardingStep, language]);
+  const onOnboardingStep = (step: HomeOnboardingStepId) => {
+    const teacherId = user?.id;
+    trackFirstRoundGuideClicked({
+      surface: 'home',
+      locale: language,
+      step,
+      ...(teacherId ? { teacherId } : {}),
+      ...(effectiveId ? { classroomId: effectiveId } : {}),
+    });
+    if (!teacherId) return;
+    trackTeacherOnboardingStep({
+      step: step === 'createClass' ? 'create_classroom' : step === 'shareCode' ? 'share_join_link' : 'start_live_class',
+      action: 'cta',
+      teacherId,
+      classroomId: effectiveId || null,
+    });
+  };
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpen, setReportsOpen] = useState(false);
   const hasRail = !ready || proCard !== null || (showWeek && classrooms.length > 1);
