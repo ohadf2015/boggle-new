@@ -1542,7 +1542,7 @@ const sv = {
       "seeMore": "Visa {count} till",
       "inLobby": "I en lobby",
       "playingNow": "Spelar nu",
-      "seen": "Sågs {when}",
+      "seen": "{when}",
       "youLead": "Du leder {score} i matcher",
       "theyLead": "De leder {score} i matcher",
       "tied": "Lika {score} i matcher",

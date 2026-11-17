@@ -79,5 +79,7 @@ export function statusLine(status: CrewStatus, lastSeenAt: string | null, now: n
   if (status === 'playing') return { key: 'homePlay.crew.playingNow', params: {} };
   if (status === 'online') return { key: 'friends.status.online', params: {} };
   if (!lastSeenAt) return { key: 'friends.status.offline', params: {} };
-  return { key: 'homePlay.crew.seen', params: {}, when: ago(lastSeenAt, now) };
+  // No "Last active:" / "Seen" prefix — just the compact relative time, so it fits on a narrow row.
+  const when = ago(lastSeenAt, now)!;
+  return { key: when.key, params: when.params };
 }

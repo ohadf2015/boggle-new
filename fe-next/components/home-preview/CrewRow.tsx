@@ -37,7 +37,7 @@ export function CrewRow({ person, presence, now, lang, t }: Props) {
   const record = h2hLine(person.wins, person.losses);
   const [refusal, setRefusal] = useState<RivalPingErrorCode | null>(null);
   const name = person.name ?? t('friends.aPlayer');
-  const statusText = line.when ? t(line.key, { when: t(line.when.key, line.when.params) }) : t(line.key, line.params);
+  const statusText = t(line.key, line.params);
 
   return (
     <li
@@ -54,10 +54,10 @@ export function CrewRow({ person, presence, now, lang, t }: Props) {
         {refusal ? (
           <p role="status" className="truncate text-xs font-bold">{t(pingErrorKey(refusal))}</p>
         ) : (
-          <p className="truncate text-xs font-medium">
-            <span>{statusText}</span>
-            <span aria-hidden="true"> · </span>
-            <bdi dir="auto">{t(record.key, record.params)}</bdi>
+          <p className="flex min-w-0 items-center gap-1 text-xs font-medium">
+            <span data-testid="crew-status" className="shrink-0">{statusText}</span>
+            <span aria-hidden="true" className="shrink-0">·</span>
+            <bdi dir="auto" className="min-w-0 truncate">{t(record.key, record.params)}</bdi>
           </p>
         )}
       </div>
