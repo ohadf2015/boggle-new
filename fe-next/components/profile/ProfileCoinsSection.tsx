@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Coins, Gamepad2, Trophy, BarChart3, Target } from 'lucide-react';
+import { Gamepad2, Trophy, BarChart3, Target } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { CoinBalance } from '@/components/CoinBalance';
 import { EarnCoinsOfferwallButton } from '@/components/ads/EarnCoinsOfferwall';
 import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';

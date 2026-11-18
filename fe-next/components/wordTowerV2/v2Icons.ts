@@ -1,4 +1,5 @@
-import { Anchor, ArrowDownToLine, Coins, Construction, MoveHorizontal, Shuffle, type LucideIcon } from 'lucide-react';
+import { Anchor, ArrowDownToLine, Construction, MoveHorizontal, Shuffle, type LucideIcon } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import type { RewardId } from '@/lib/wordTowerV2/rewards';
 import type { Tone } from '@/lib/wordTowerV2/celebrations';
 

@@ -24,6 +24,7 @@ function estate(rivals: ReturnType<typeof mk>[]) {
   return {
     status: 'ready',
     authed: true,
+    estate: { raidCharges: 1 },
     rivals: () => Promise.resolve({ rivals, revenge: [] }),
   } as never;
 }

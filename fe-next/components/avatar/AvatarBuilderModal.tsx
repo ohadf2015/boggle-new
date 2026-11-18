@@ -16,7 +16,8 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Coins, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { acquireModalOpen, releaseModalOpen } from '@/lib/native/modalOpenSignal';
 import { useLanguage } from '@/contexts/LanguageContext';

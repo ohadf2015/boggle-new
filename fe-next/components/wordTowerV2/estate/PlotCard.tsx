@@ -1,7 +1,8 @@
 'use client';
 
 import { m } from 'framer-motion';
-import { Coins, Construction, Crown, Hammer, Layers, type LucideIcon, Lock, Shield, Wrench } from 'lucide-react';
+import { Construction, Crown, Hammer, Layers, type LucideIcon, Lock, Shield, Wrench } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import type { Plot } from '@/lib/wordTowerV2/estate';
 import { MAX_PLOT_LEVEL, type PlotSlot } from '@/lib/wordTowerV2/estateCatalog';
 import type { Material } from '@/lib/wordTowerV2/gear';

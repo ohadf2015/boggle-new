@@ -11,8 +11,14 @@ export function comboTier(combo: number): ComboTier {
 const COMPACT_FROM = 10_000;
 
 /** Full digits under 10k, compact above, so a HUD chip never outgrows its slot. */
-export function formatHudCount(n: number, locale?: string): string {
+export function formatHudCount(n: number, locale: string | undefined = pageLocale()): string {
   const v = Math.max(0, Math.round(Number.isFinite(n) ? n : 0));
   if (v < COMPACT_FROM) return new Intl.NumberFormat(locale).format(v);
-  return new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }).format(v);
+  // Hebrew's short form is a Latin K or M, so it spells out אלף / מיליון instead.
+  const compactDisplay = locale?.startsWith('he') ? 'long' : 'short';
+  return new Intl.NumberFormat(locale, { notation: 'compact', compactDisplay, maximumFractionDigits: 1 }).format(v);
+}
+
+function pageLocale(): string | undefined {
+  return typeof document === 'undefined' ? undefined : document.documentElement.lang || undefined;
 }

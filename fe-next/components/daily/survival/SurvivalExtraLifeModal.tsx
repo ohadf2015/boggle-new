@@ -1,6 +1,7 @@
 'use client';
 
-import { Play, X, Heart, Coins } from 'lucide-react';
+import { Play, X, Heart } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';

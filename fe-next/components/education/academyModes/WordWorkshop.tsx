@@ -16,7 +16,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'framer-motion';
-import { Coins, Hammer, RotateCcw, Star } from 'lucide-react';
+import { Hammer, RotateCcw, Star } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { onWordCraftGameEnd, onWordCraftMove } from '@/components/word-craft/wordCraftTelemetry';

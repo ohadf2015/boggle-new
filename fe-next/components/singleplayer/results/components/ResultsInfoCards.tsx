@@ -1,7 +1,8 @@
 'use client';
 
 import { memo } from 'react';
-import { TrendingUp, TrendingDown, Minus, Coins, Flame, Lock, Trophy, Zap, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Flame, Lock, Trophy, Zap, BarChart3 } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';

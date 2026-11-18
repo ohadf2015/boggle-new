@@ -2,7 +2,8 @@
 
 import React, { useEffect } from 'react';
 import { m } from 'framer-motion';
-import { Coins, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 

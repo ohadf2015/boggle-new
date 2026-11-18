@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { Play, Coins, Loader2, CheckCircle } from 'lucide-react';
+import { Play, Loader2, CheckCircle } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';

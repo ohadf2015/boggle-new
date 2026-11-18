@@ -85,7 +85,7 @@ export function WorkshopCard({ t, estate, raids, onOpen }: WorkshopProps) {
           <span className="ms-auto flex shrink-0 items-center gap-1 font-neo-display text-xs font-black tabular-nums">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={ITEM.coin} alt="" aria-hidden className="h-4 w-4" />
-            {formatHudCount(estate.coins ?? 0)}
+            {t('wordTowerV2.coins.chip', { n: formatHudCount(estate.coins ?? 0) })}
           </span>
         </span>
         <span data-wt2-workshop-line className="mt-0.5 block text-sm font-bold leading-snug">

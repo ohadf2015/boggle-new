@@ -8,7 +8,8 @@
 
 import React from 'react';
 import { m } from 'framer-motion';
-import { Zap, Target, BookOpen, Coins, Lock, RotateCcw } from 'lucide-react';
+import { Zap, Target, BookOpen, Lock, RotateCcw } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { ScoreGaugeRing } from './ScoreGaugeRing';

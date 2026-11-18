@@ -2674,6 +2674,8 @@ const en = {
       "back": "Back",
       "raidFailed": "Raid didn't land",
       "raidError": "Something went sideways. Try again.",
+      "wreckedToday": "Hit today",
+      "alreadyWrecked": "You already hit this tower today. Come back tomorrow.",
       "revengeTitle": "Payback time",
       "revengeBody": "{name} smashed your {plot} and ran off with {coins} coins.",
       "revengeBodyBlocked": "{name} swung at your tower. Your shield held.",
@@ -2692,7 +2694,7 @@ const en = {
         "lot": "empty lot"
       }
     },
-    "coins": { "run": "{n} coins this run" },
+    "coins": { "run": "{n} coins this run", "chip": "{n}" },
     "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate.", "label": "Streak" },
     "milestone": { "floors": "Floors up!", "a11y": "{n} floors" },
     "chest": {
@@ -2742,6 +2744,9 @@ const en = {
       "perksNone": "Build your district to steady the tower",
       "newsRaids": "{n} raids on you while you were away",
       "newsAffordable": "{n} upgrades you can afford now",
+      "finishAll": "Finish {name}",
+      "finishConfirm": "Confirm",
+      "spendFailed": "That didn't go through. Try again.",
       "newsDamaged": "{n} plots need repair",
       "newsNone": "Every plot is quiet",
       "completeTitle": "{name} complete!",
@@ -2873,7 +2878,7 @@ const en = {
     "bestFlag": "BEST",
     "leaveConfirm": "Leave this climb? You can resume in this tab, but daily runs are one per day.",
     "leaveDaily": {"title": "Leave today's climb?", "desc": "Leaving ends today's climb. Your height counts on today's board. The next daily opens tomorrow."},
-    "leaveFree": {"title": "Leave this climb?", "desc": "Leaving ends this run and cashes out your coins. Start a new one anytime."},
+    "leaveFree": {"title": "Leave this climb?", "desc": "Your tower is saved. Leaving ends this run and cashes out its coins, and next time you keep building."},
     "leaveKeep": "Keep climbing",
     "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",

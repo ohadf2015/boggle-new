@@ -163,7 +163,7 @@ export default function WreckCanvas({ className, ...props }: Props) {
         autoDensity: true,
       });
       if (disposed) {
-        created.destroy(true);
+        created.destroy({ removeView: true });
         return;
       }
       app = created;
@@ -502,7 +502,7 @@ export default function WreckCanvas({ className, ...props }: Props) {
       disposed = true;
       keepAlive.stop();
       cancelAnimationFrame(raf);
-      app?.destroy(true, { children: true });
+      app?.destroy({ removeView: true }, { children: true });
     };
   }, []);
 

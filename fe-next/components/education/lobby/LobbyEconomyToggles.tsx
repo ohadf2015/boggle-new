@@ -1,6 +1,6 @@
 'use client';
 
-import { Coins } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { LobbyOptionGroup, LobbySwitchRow } from './LobbyOptionParts';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ClassroomEconomySnapshot } from '@/shared/constants/classroomEconomy';

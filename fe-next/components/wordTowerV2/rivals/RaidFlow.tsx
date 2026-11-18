@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Coins, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { wreckingBallCost } from '@/lib/wordTowerV2/estate';
 import { revengeLedger, wreckAccuracy, wreckableTower } from '@/lib/wordTowerV2/wreck';
@@ -56,8 +57,9 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
   const ballCost = wreckingBallCost(estate.estate.district);
   const coins = estate.estate.coins;
   const charges = estate.estate.raidCharges;
-  const canSwing = revenge || charges > 0;
-  const canBuy = !revenge && charges <= 0 && !!estate.buyCharge && ballCost > 0;
+  const alreadyWrecked = !revenge && !!rival.wreckedToday;
+  const canSwing = revenge || (charges > 0 && !alreadyWrecked);
+  const canBuy = !revenge && !alreadyWrecked && charges <= 0 && !!estate.buyCharge && ballCost > 0;
   const afford = coins >= ballCost;
   const prize = revengePrize(rival);
 
@@ -139,7 +141,9 @@ export function RaidFlow({ t, estate, rival, revenge, grievance, balls, reducedM
     </div>
   );
 
-  const lockedCta = canBuy ? (
+  const lockedCta = alreadyWrecked ? (
+    <p className="text-center font-neo-display text-sm font-black text-neo-yellow md:text-base">{t('wordTowerV2.rivals.alreadyWrecked')}</p>
+  ) : canBuy ? (
     <>
       <button
         type="button"

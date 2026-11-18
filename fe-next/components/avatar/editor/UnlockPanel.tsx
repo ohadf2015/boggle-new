@@ -6,7 +6,8 @@
  * Replaces the old full-screen purchase confirmation — the avatar wearing the
  * part IS the preview, so the decision happens in context.
  */
-import { Coins, Lock, X } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
 import { RarityChip } from '@/components/progression/RarityChip';
 import { getSetProgress, getSetsForPart } from '@/lib/avatar/avatarSets';

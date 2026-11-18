@@ -2,7 +2,8 @@
 
 import type { ReactNode } from 'react';
 import Image from 'next/image';
-import { Bomb, Coins, Gem, Trophy, type LucideIcon } from 'lucide-react';
+import { Bomb, Gem, Trophy, type LucideIcon } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';

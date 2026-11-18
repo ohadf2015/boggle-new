@@ -16,7 +16,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Coins } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useSkipAnimations } from '@/components/motion/AdaptiveMotion';

@@ -132,6 +132,8 @@ export interface TowerWorld {
   peakHeightPx: number;
   /** Tallest the tower has EVER stood this run — survives a reviveWorld. */
   runPeakPx: number;
+  /** Height a saved tower already had when this world rebuilt it. */
+  seededM?: number;
   collapsed: boolean;
   /** Time the tower has continuously been below its peak, ms. */
   collapseHeldMs: number;

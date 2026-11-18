@@ -1,4 +1,5 @@
-import { type LucideIcon, Bomb, Coins, Diamond } from 'lucide-react';
+import { type LucideIcon, Bomb, Diamond } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import type { BlastTileType } from './types';
 
 /* Candy key: crisp ink border, a hard ink drop, a top highlight and a deep

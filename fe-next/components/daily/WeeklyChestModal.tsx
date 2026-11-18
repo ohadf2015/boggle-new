@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { Coins, Award, X, Snowflake, Sparkles, Share2, Loader2 } from 'lucide-react'
+import { Award, X, Snowflake, Sparkles, Share2, Loader2 } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext'
 import { safeToLocaleString } from '@/utils/bcp47Locale'
 import { cn } from '@/lib/utils'
@@ -156,13 +157,13 @@ export default function WeeklyChestModal({ chest, streak = 0, onClose }: Props) 
   }, [chest.coins])
 
   // Modal opened (mount-time event)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     posthog.capture('growth:weekly_chest_modal_open', {
       tier: chest.tier,
       coins: chest.coins,
       streak,
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Close on Escape — only after the reveal is done.

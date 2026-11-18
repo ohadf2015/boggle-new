@@ -106,7 +106,7 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         resolution: Math.min(window.devicePixelRatio || 1, 2),
         autoDensity: true,
       });
-      if (disposed) { created.destroy(true); return; }
+      if (disposed) { created.destroy({ removeView: true }); return; }
 
       const { sprites: art } = propsRef.current;
       let heroTex: Texture;
@@ -122,10 +122,10 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
         // Never silent: without this the arena would simply not exist and the
         // screen would look "fine but empty" (recurring-pitfalls class 4).
         console.warn('[arena] sprite load failed, falling back to the static stage', art, err);
-        created.destroy(true);
+        created.destroy({ removeView: true });
         return;
       }
-      if (disposed) { created.destroy(true); return; }
+      if (disposed) { created.destroy({ removeView: true }); return; }
       const extra: Partial<Record<'attack' | 'enraged', Texture>> = {};
       for (const k of ['attack', 'enraged'] as const) {
         const url = k === 'attack' ? art.foeAttack : art.foeEnraged;
@@ -500,7 +500,7 @@ export default function ArenaCanvas({ sprites, rtl, queue, getFacts, blockLabel,
       timers.clear();
       io.disconnect();
       document.removeEventListener('visibilitychange', onVis);
-      app?.destroy(true, { children: true });
+      app?.destroy({ removeView: true }, { children: true });
     };
   }, [rtl]);
 

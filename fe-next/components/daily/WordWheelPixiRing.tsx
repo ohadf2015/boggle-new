@@ -82,7 +82,7 @@ export default function WordWheelPixiRing({
         autoDensity: true,
       });
 
-      if (destroyed) { try { app.destroy(true, { children: true }); } catch { /* already destroyed by cleanup */ } return; }
+      if (destroyed) { try { app.destroy({ removeView: true }, { children: true }); } catch { /* already destroyed by cleanup */ } return; }
       el.appendChild(app.canvas);
 
       // Pixi's TickerPlugin registers its OWN render-every-tick listener on
@@ -315,7 +315,7 @@ export default function WordWheelPixiRing({
       // on the destroyed-flag check inside it to win a race.
       if (rafId !== null) cancelAnimationFrame(rafId);
       try { app.ticker?.stop(); } catch { /* */ }
-      try { app.destroy(true, { children: true }); } catch { /* */ }
+      try { app.destroy({ removeView: true }, { children: true }); } catch { /* */ }
       while (el.firstChild) el.removeChild(el.firstChild);
     };
   }, [reducedMotion]);

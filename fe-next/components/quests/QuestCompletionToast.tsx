@@ -7,7 +7,8 @@
  */
 
 import toast from 'react-hot-toast';
-import { Trophy, Star, Sparkles, Crown, Coins, X, Swords } from 'lucide-react';
+import { Trophy, Star, Sparkles, Crown, X, Swords } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { fireVictoryConfetti, fireFireworks, fireStreakConfetti, fireLevelUpConfetti } from '@/utils/confettiUtils';
 import { trackGrowthEvent } from '@/utils/growthTracking';

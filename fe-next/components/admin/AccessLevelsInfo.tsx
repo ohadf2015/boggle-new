@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, Shield, GraduationCap, Languages, Trophy, Coins } from 'lucide-react';
+import { ChevronDown, Shield, GraduationCap, Languages, Trophy } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   CURATOR_TIER_CAPABILITIES,

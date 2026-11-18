@@ -73,7 +73,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
         return;
       }
       if (cancelled) {
-        app.destroy(true, { children: true, texture: true });
+        app.destroy({ removeView: true }, { children: true, texture: true });
         return;
       }
 
@@ -247,7 +247,7 @@ export function WordCraftCelebration({ kind, burstId, origin }: WordCraftCelebra
 
       cleanupFn = () => {
         try {
-          app.destroy(true, { children: true, texture: true });
+          app.destroy({ removeView: true }, { children: true, texture: true });
         } catch {}
         try {
           tileTexture.destroy();
