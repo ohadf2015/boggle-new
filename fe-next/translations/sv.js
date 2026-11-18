@@ -3725,7 +3725,10 @@ const sv = {
     "perkReminders": "Påminnelser så att du aldrig bryter din streak",
     "menuLabel": "Hämta appen",
     "pillLabel": "Hämta appen",
-    "pillClose": "Dölj app-bannern"
+    "pillClose": "Dölj app-bannern",
+    "qrTitle": "Skanna och installera på mobilen",
+    "qrHint": "Rikta Android-kameran hit så öppnas LexiClash på Google Play.",
+    "qrAlt": "QR-kod som öppnar LexiClash på Google Play"
   },
   "name": "Svenska",
   "direction": "ltr",

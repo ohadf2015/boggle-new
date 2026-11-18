@@ -30,6 +30,10 @@ export function trackInstallPromoShown(source: InstallSource): void {
   posthog.capture('android_install_promo_shown', { source });
 }
 
+export function trackInstallQrShown(source: InstallSource): void {
+  posthog.capture('android_install_promo_qr_shown', { source });
+}
+
 export function trackInstallClick(source: InstallSource): void {
   posthog.capture('android_install_promo_install_click', { source });
 }

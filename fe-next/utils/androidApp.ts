@@ -29,6 +29,12 @@ export function playStoreUrlWithReferrer(campaign: string, locale?: string): str
 
 type RelatedApp = { platform: string; id?: string; url?: string };
 
+/** A large screen driven by a mouse: the visitor needs a phone to install. */
+export function isDesktopInstallContext(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia?.('(min-width: 768px) and (hover: hover) and (pointer: fine)')?.matches === true;
+}
+
 /** True when running inside the Capacitor native shell (not a web browser). */
 export function isCapacitorNative(): boolean {
   if (typeof window === 'undefined') return false;

@@ -1,0 +1,61 @@
+.cta {
+  animation: cta-nudge 6.4s 2.3s infinite both;
+}
+
+.cta:hover {
+  animation: none;
+}
+
+.qrFrame {
+  position: relative;
+  flex: none;
+}
+
+.qrFrame::before,
+.qrFrame::after {
+  content: '';
+  position: absolute;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 3px solid rgb(var(--neo-black));
+  animation: qr-corner 1.6s ease-in-out infinite alternate;
+}
+
+.qrFrame::before {
+  inset: -5px auto auto -5px;
+  border-width: 3px 0 0 3px;
+}
+
+.qrFrame::after {
+  inset: auto -5px -5px auto;
+  border-width: 0 3px 3px 0;
+  animation-direction: alternate-reverse;
+}
+
+@keyframes cta-nudge {
+  0%,
+  8%,
+  100% {
+    transform: none;
+  }
+  2% {
+    transform: translate(-2px, -3px) rotate(-0.6deg);
+  }
+  5% {
+    transform: translate(1px, 1px) rotate(0.4deg);
+  }
+}
+
+@keyframes qr-corner {
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .qrFrame::before,
+  .qrFrame::after {
+    animation: none;
+  }
+}

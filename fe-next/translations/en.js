@@ -2968,7 +2968,10 @@ const en = {
     "perkReminders": "Streak reminders so you never break your run",
     "menuLabel": "Get the App",
     "pillLabel": "Get the App",
-    "pillClose": "Hide app banner"
+    "pillClose": "Hide app banner",
+    "qrTitle": "Scan to install on your phone",
+    "qrHint": "Point your Android camera here. It opens LexiClash on Google Play.",
+    "qrAlt": "QR code that opens LexiClash on Google Play"
   },
   "name": "English",
   "direction": "ltr",
