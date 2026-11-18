@@ -17,7 +17,6 @@ import { useIsVocabQuizRoom, quizOwnsRoundEnd } from '@/components/education/voc
 import { useQuizBossVerdict } from '@/components/education/boss/useQuizBossVerdict';
 import { resolveClassroomContext, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { classJoinPathForDeadCode } from '@/lib/education/classJoinPathForDeadCode';
-import { sessionWaitingHref } from '@/lib/education/sessionWaiting';
 import { AD_FREE_ROUTE_CLASS } from '@/lib/admob-routes';
 import { SocketContext } from '@/utils/SocketContext';
 import { clearSessionPreservingUsername } from '@/utils/session';
@@ -340,7 +339,7 @@ export function useMpPageState() {
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, onMatchStart: mpSounds.onMatchStart, roomWaitHold: roomWait.hold,
-    onSessionWaiting: (code) => router.push(sessionWaitingHref(code, language)),
+    onSessionWaiting: (href) => router.push(href),
     classroomContext, classroomDecisionRef, exitClassroomStudentToHub, offerQuickPlayRecovery, onRoomGone: noteRoomGone,
   });
 

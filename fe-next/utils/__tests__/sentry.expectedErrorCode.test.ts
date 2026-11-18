@@ -25,6 +25,7 @@ describe('isExpectedSocketErrorCode', () => {
       'AUTH_REQUIRED',
       'PLAYER_NOT_HOST',
       'VALIDATION_INVALID_PAYLOAD',
+      'CLASSROOM_SESSION_WAITING',
     ]) {
       expect(isExpectedSocketErrorCode(code)).toBe(true);
     }
