@@ -10,7 +10,7 @@ import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
 import { lobbySeats, readyTally, lobbyMax, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
-import { deskWall, tvWall, useHiddenAhead, useHiddenBelow } from './rosterLayout';
+import { deskWall, tvWall, useHiddenBelow } from './rosterLayout';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
@@ -61,11 +61,11 @@ const SEAT_NAME = 'max-w-full min-w-0 text-center line-clamp-2 text-balance [ove
 
 /**
  * The lobby seat grid: every player (at least 8 chairs) from `lobbySeats` → `toMpRoster`, the one
- * roster source. Phone lays them out as ONE row — my seat pinned, the rest
- * scrolling horizontally — so the roster stops spending two grid rows and the
- * battle-mode picker gets the space. Desktop/TV keeps the 4×2 grid (the
- * wrappers flatten via `display:contents`). A join pops a seat in, a ready
- * player gets a lime check stamp, the host's empty chairs are "+ BOT" buttons.
+ * roster source. Phone and desktop both use a 4-column grid so all 8 chairs
+ * stay on screen (a horizontal strip clipped the 4th "+ BOT" chair with no
+ * scroll cue). Bigger rooms wrap or, at ≥720px, scroll inside the height the
+ * mode picker leaves. A join pops a seat in, a ready player gets a lime check
+ * stamp, the host's empty chairs are "+ BOT" buttons.
  */
 export const PlayerRoster = memo(function PlayerRoster({
   players,
@@ -97,23 +97,13 @@ export const PlayerRoster = memo(function PlayerRoster({
   const dense = isTv && wall.dense;
   const wallHidden = isTv ? seats.length - wall.shown : 0;
   const botCount = seats.filter((s) => s.isBot).length;
-  // My seat stays pinned outside the phone scroller; the rest of the crew
-  // scrolls. Desktop renders both wrappers as `display:contents`, so order in
-  // the grid is me-first then the rest — pinned-you reads correctly there too.
+  // Me first, then everyone else — in RTL that puts the host on the right, matching reading order.
   const meSeat = seats.find((s) => s.id === username);
   // A TV wall past its tile cap keeps the newest joiners: they are the ones scanning for their face.
   const otherSeats = seats.filter((s) => s.id !== username).slice(wallHidden > 0 ? -wall.shown : 0);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const hiddenAhead = useHiddenAhead(stripRef, otherSeats.length + emptyCount);
   const gridRef = useRef<HTMLDivElement>(null);
   const seatsBelow = useHiddenBelow(gridRef, seats.length);
   const hiddenBelow = isTv ? 0 : seatsBelow;
-  const scrollAhead = () => {
-    const scroller = stripRef.current?.parentElement;
-    if (!scroller) return;
-    const rtl = scroller.closest('[dir]')?.getAttribute('dir') === 'rtl';
-    scroller.scrollBy({ left: (rtl ? -1 : 1) * scroller.clientWidth * 0.8, behavior: 'smooth' });
-  };
   const canAddBot = isHostView && seats.length < chairs && botCount < MAX_BOTS_PER_ROOM;
   // Ohad 2026-09-27: at most MAX_BOTS_PER_ROOM clickable "+ BOT" chairs — the
   // room cap stays 3; the leftover empty seats render as plain open chairs so
@@ -182,10 +172,7 @@ export const PlayerRoster = memo(function PlayerRoster({
         data-player={seat.id}
         data-me={String(isMe)}
         className={cn(
-          'group/seat relative flex flex-col items-center gap-1 min-w-0',
-          // Phone strip: fixed, non-shrinking column; ≥720px grid stretches it.
-          'max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0',
-          'min-[720px]:w-full',
+          'group/seat relative flex flex-col items-center gap-1 min-w-0 w-full',
           styles.seatIn,
         )}
       >
@@ -299,9 +286,8 @@ export const PlayerRoster = memo(function PlayerRoster({
           </span>
         )}
         {isMe && selfActions && (
-          // The emote trigger lives on MY seat, under my name — clearly mine,
-          // and the picker floats below it without ever clipping (my seat sits
-          // outside the phone scroller). The label makes it read as "emotes".
+          // The emote trigger lives on MY seat, under my name — clearly mine.
+          // The label makes it read as "emotes".
           <span data-testid="self-seat-actions" className="mt-0.5 flex flex-col items-center gap-0.5 min-[720px]:hidden">
             {selfActions}
             <span className="font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-pink">
@@ -342,7 +328,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           data-testid="lobby-seat-empty"
           onClick={addBot}
           aria-label={t('hostView.addBot')}
-          className={cn('flex flex-col items-center gap-1 min-w-0 max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0 rounded-neo focus-visible:outline-2 focus-visible:outline-neo-cyan', styles.emptySeat)}
+          className={cn('flex flex-col items-center gap-1 min-w-0 w-full rounded-neo focus-visible:outline-2 focus-visible:outline-neo-cyan', styles.emptySeat)}
         >
           {circle}
           <span className={labelClass}>+ {label}</span>
@@ -350,7 +336,7 @@ export const PlayerRoster = memo(function PlayerRoster({
       );
     }
     return (
-      <div key={`empty-${i}`} data-testid="lobby-seat-empty" className="flex flex-col items-center gap-1 min-w-0 max-[719px]:w-[calc(var(--seat)+8px)] max-[719px]:shrink-0">
+      <div key={`empty-${i}`} data-testid="lobby-seat-empty" className="flex flex-col items-center gap-1 min-w-0 w-full">
         {circle}
         <span className={labelClass}>{label}</span>
       </div>
@@ -400,56 +386,35 @@ export const PlayerRoster = memo(function PlayerRoster({
         )}
       </div>
       {/*
-       * Phone: ONE row — my seat pinned, the rest of the crew (+BOT chairs)
-       * scroll horizontally; ≥720px renders both wrappers as display:contents
-       * so the 4×2 grid sees every seat as a direct child.
+       * 4-column grid at every width so a standard 8-seat lobby shows every
+       * chair (and every "+ BOT" slot) without a clipped horizontal strip.
+       * ≥720px still uses deskWall (4-col, or auto-fill when the room grows);
+       * a TV wall past its tile cap collapses the overflow into one "+N" tile.
        */}
       <div
         ref={gridRef}
         data-testid="roster-grid"
         className={cn(
-          'flex items-start gap-2 pt-3 min-[720px]:grid min-[720px]:gap-x-2 min-[720px]:gap-y-3',
+          'grid max-[719px]:grid-cols-4 items-start gap-x-2 gap-y-3 pt-3',
           isTv ? wall.cols : desk.grid,
           dense && 'max-h-[42vh] overflow-hidden min-[720px]:gap-y-2',
           hiddenBelow > 0 && 'min-[720px]:[mask-image:linear-gradient(to_bottom,black_70%,transparent)]',
         )}
       >
         {meSeat ? renderSeat(meSeat) : null}
-        <div className="relative flex-1 min-w-0 min-[720px]:contents">
-          <div
-            className={cn(
-              'overflow-x-auto scrollbar-none min-[720px]:contents',
-              hiddenAhead > 0 && 'max-[719px]:[mask-image:linear-gradient(to_right,black_70%,transparent)] max-[719px]:rtl:[mask-image:linear-gradient(to_left,black_70%,transparent)]',
-            )}
-          >
-            <div ref={stripRef} data-testid="roster-strip" className="flex items-start gap-2 min-[720px]:contents">
-              {otherSeats.map(renderSeat)}
-              {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
-              {wallHidden > 0 && (
-                <div data-testid="roster-overflow-tile" className="flex flex-col items-center gap-1 min-w-0">
-                  <span
-                    className="flex items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-pink text-neo-black font-neo-display font-bold tabular-nums shadow-hard-sm text-[clamp(14px,2vh,24px)]"
-                    style={seatBox}
-                    dir="ltr"
-                  >
-                    +{wallHidden}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-          {hiddenAhead > 0 && (
-            <button
-              type="button"
-              data-testid="roster-more-cue"
-              onClick={scrollAhead}
-              aria-label={t('mpUi.lobby.morePlayers', { count: hiddenAhead })}
-              className="absolute end-0 top-[calc(var(--seat)/2)] -translate-y-1/2 min-w-9 rounded-full border-2 border-neo-black bg-neo-pink text-neo-black px-2 py-1 font-neo-display text-xs font-bold leading-none tabular-nums shadow-hard-sm min-[720px]:hidden"
+        {otherSeats.map(renderSeat)}
+        {Array.from({ length: emptyCount }, (_, i) => renderEmptySeat(i))}
+        {wallHidden > 0 && (
+          <div data-testid="roster-overflow-tile" className="flex flex-col items-center gap-1 min-w-0 w-full">
+            <span
+              className="flex items-center justify-center rounded-full border-[3px] border-neo-black bg-neo-pink text-neo-black font-neo-display font-bold tabular-nums shadow-hard-sm text-[clamp(14px,2vh,24px)]"
+              style={seatBox}
+              dir="ltr"
             >
-              <span dir="ltr">+{hiddenAhead}</span>
-            </button>
-          )}
-        </div>
+              +{wallHidden}
+            </span>
+          </div>
+        )}
       </div>
       {hiddenBelow > 0 && (
         <button

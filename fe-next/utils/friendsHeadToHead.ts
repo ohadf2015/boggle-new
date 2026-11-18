@@ -259,6 +259,7 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
       id,
       challenger_id,
       challenge_id,
+      challenge_type,
       message,
       status,
       created_at,
@@ -282,6 +283,7 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
     id: string;
     challenger_id: string;
     challenge_id: string;
+    challenge_type?: 'new_game' | 'join_room';
     message?: string;
     status: 'pending' | 'accepted' | 'declined' | 'expired' | 'completed';
     created_at: string;
@@ -304,6 +306,7 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
       challengerAvatarColor: challenger?.avatar_color || '#4F46E5',
       challengeId: c.challenge_id,
       challengeCode: c.challenge_id,
+      challengeType: c.challenge_type,
       message: c.message,
       status: c.status,
       createdAt: c.created_at,

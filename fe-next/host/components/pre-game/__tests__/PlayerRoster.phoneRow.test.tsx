@@ -15,41 +15,35 @@ const t = (k: string) => k;
 const room = [{ username: 'Host', isHost: true }, { username: 'Ada' }, { username: 'Bot1', isBot: true }];
 
 /**
- * Phone layout: ONE row of seats with horizontal scroll, so the roster stops
- * eating two grid rows and the battle-mode picker gets the vertical space
- * (Ohad, 2026-09-27). Desktop/TV keep the 4×2 grid via display:contents.
+ * Phone layout: a 4-column grid so all 8 chairs (and every "+ BOT" slot) fit
+ * without a clipped horizontal strip (Ohad, 2026-11-18). Desktop/TV keep their
+ * own column counts via min-[720px] / TV wall classes.
  */
-describe('PlayerRoster — phone one-row crew strip', () => {
+describe('PlayerRoster — phone 4-column crew grid', () => {
   beforeEach(() => emit.mockClear());
 
-  it('seats render exactly once — no duplicated DOM between the phone strip and the desktop grid', () => {
+  it('seats render exactly once — no duplicated DOM between phone and desktop layouts', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
     expect(screen.getAllByTestId('lobby-seat')).toHaveLength(3);
     expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(5);
   });
 
-  it('the other seats live in a horizontal scroller (one row), not a wrapping grid', () => {
+  it('the roster is a 4-column grid on the phone, not a horizontal scroller', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
-    const ada = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-player') === 'Ada')!;
-    const scroller = ada.closest('[class*="overflow-x-auto"]');
-    expect(scroller).not.toBeNull();
-    // Desktop flattens the wrappers back into the 4-column grid.
-    expect(scroller!.className).toContain('min-[720px]:contents');
-    expect(scroller!.className).not.toContain('grid-cols-4');
+    const grid = screen.getByTestId('roster-grid');
+    expect(grid.className).toMatch(/max-\[719px\]:grid-cols-4/);
+    expect(grid.className).not.toContain('overflow-x-auto');
+    expect(screen.queryByTestId('roster-strip')).toBeNull();
+    expect(screen.queryByTestId('roster-more-cue')).toBeNull();
   });
 
-  it('phone seats keep a fixed, non-shrinking width inside the scroller; the grid still stretches them at ≥720px', () => {
+  it('every seat, including empty "+ BOT" chairs, is a direct grid child so none clip off-screen', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
-    for (const seat of screen.getAllByTestId('lobby-seat')) {
-      expect(seat.className).toMatch(/max-\[719px\]:shrink-0/);
-      expect(seat.className).toMatch(/min-\[720px\]:w-full/);
+    const grid = screen.getByTestId('roster-grid');
+    for (const seat of [...screen.getAllByTestId('lobby-seat'), ...screen.getAllByTestId('lobby-seat-empty')]) {
+      expect(seat.parentElement).toBe(grid);
+      expect(seat.className).toMatch(/\bw-full\b/);
     }
-  });
-
-  it('my seat is pinned outside the scroller so it — and the emote popup anchored to it — is never scrolled away or clipped', () => {
-    render(<PlayerRoster players={room} username="Ada" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
-    const mine = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-me') === 'true')!;
-    expect(mine.closest('[class*="overflow-x-auto"]')).toBeNull();
   });
 
   it('self actions (the emote tray) sit on MY seat, under my name — not in the roster header row', () => {

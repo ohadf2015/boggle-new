@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect } from 'vitest';
 import React from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -15,30 +15,6 @@ const t = (k: string, p?: Record<string, string | number>) => (p && 'count' in p
 
 function room(n: number) {
   return [{ username: 'Host', isHost: true }, ...Array.from({ length: n - 1 }, (_, i) => ({ username: `P${i + 1}` }))];
-}
-
-type Entry = { target: Element; rootBounds: { left: number; right: number }; boundingClientRect: { left: number; right: number } };
-const observers: Array<{ cb: (entries: Entry[]) => void; els: Element[] }> = [];
-
-beforeEach(() => {
-  observers.length = 0;
-  vi.stubGlobal('IntersectionObserver', class {
-    els: Element[] = [];
-    constructor(public cb: (entries: Entry[]) => void) { observers.push(this); }
-    observe(el: Element) { this.els.push(el); }
-    disconnect() {}
-  });
-});
-afterEach(() => vi.unstubAllGlobals());
-
-/** Lay the strip's items out 70px apart in a 300px-wide scroller; `rtl` mirrors them leftwards. */
-function layOut(rtl = false) {
-  const io = observers[observers.length - 1];
-  act(() => io.cb(io.els.map((target, i) => ({
-    target,
-    rootBounds: { left: 0, right: 300 },
-    boundingClientRect: rtl ? { left: 236 - i * 70, right: 300 - i * 70 } : { left: i * 70, right: i * 70 + 64 },
-  }))));
 }
 
 describe('PlayerRoster — empty chairs never outnumber the gap to 8', () => {
@@ -99,40 +75,14 @@ describe('PlayerRoster — TV wall for a big room', () => {
   });
 });
 
-describe('PlayerRoster — phone strip says more players are off-screen', () => {
-  it('shows "+N" for seats past the end edge and fades the strip there', () => {
+describe('PlayerRoster — phone wraps a big room in the 4-column grid', () => {
+  it('a 12-player room draws every seat in the grid, with no horizontal clip cue', () => {
     render(<PlayerRoster players={room(12)} username="Host" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
-    layOut();
-    // 11 others at 70px steps in 300px: centres of items 0-3 are inside, 4+ are past the edge
-    const cue = screen.getByTestId('roster-more-cue');
-    expect(cue).toHaveTextContent('+7');
-    expect(cue).toHaveAttribute('aria-label', 'mpUi.lobby.morePlayers#7');
-    expect(cue.className).toMatch(/min-\[720px\]:hidden/);
-    const scroller = screen.getByTestId('roster-strip').parentElement!;
-    expect(scroller.className).toMatch(/mask-image/);
-  });
-
-  it('counts the left edge as the end in Hebrew (RTL)', () => {
-    render(<div dir="rtl"><PlayerRoster players={room(12)} username="Host" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" /></div>);
-    layOut(true);
-    expect(screen.getByTestId('roster-more-cue')).toHaveTextContent('+7');
-  });
-
-  it('no cue when every seat fits', () => {
-    render(<PlayerRoster players={room(3)} username="Host" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
-    layOut();
+    const grid = screen.getByTestId('roster-grid');
+    expect(grid.className).toMatch(/max-\[719px\]:grid-cols-4/);
+    expect(screen.getAllByTestId('lobby-seat')).toHaveLength(12);
+    expect(screen.queryByTestId('roster-strip')).toBeNull();
     expect(screen.queryByTestId('roster-more-cue')).toBeNull();
-    expect(screen.getByTestId('roster-strip').parentElement!.className).not.toMatch(/mask-image/);
-  });
-
-  it('tapping the cue scrolls the strip toward the hidden seats', () => {
-    render(<PlayerRoster players={room(12)} username="Host" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
-    layOut();
-    const scroller = screen.getByTestId('roster-strip').parentElement!;
-    const scrollBy = vi.fn();
-    Object.assign(scroller, { scrollBy });
-    fireEvent.click(screen.getByTestId('roster-more-cue'));
-    expect(scrollBy).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }));
   });
 });
 
@@ -142,7 +92,7 @@ describe('PlayerRoster — ≥720px host/guest grid for a big room', () => {
     const grid = screen.getByTestId('roster-grid');
     expect(grid.className).toMatch(/min-\[720px\]:grid-cols-\[repeat\(auto-fill/);
     expect(grid.className).toMatch(/min-\[720px\]:overflow-y-auto/);
-    expect(grid.className).not.toMatch(/grid-cols-4/);
+    expect(grid.className).toMatch(/max-\[719px\]:grid-cols-4/);
   });
 
   it('my emote trigger moves to the header at ≥720px so it never makes the first row taller', () => {
