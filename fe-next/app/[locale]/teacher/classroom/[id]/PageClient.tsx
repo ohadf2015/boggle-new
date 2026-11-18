@@ -20,6 +20,7 @@ import { HomeClassRoster } from '@/components/teacher/home/HomeClassRoster';
 import { useLastClassGame } from '@/components/teacher/home/useLastClassGame';
 import { HomeShareSheet } from '@/components/teacher/home/HomeShareSheet';
 import { ClassPageView } from '@/components/teacher/classroom/page/ClassPageView';
+import { ClassroomProOffer } from '@/components/teacher/classroom/ClassroomProOfferBanner';
 import { classWordLists } from '@/components/teacher/classroom/page/classWordLists';
 import { NB_PANEL, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
 
@@ -122,6 +123,7 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         lastGame={lastGame}
         onShare={() => setShareOpen(true)}
         onRequestDelete={() => setConfirmOpen(true)}
+        proOffer={<ClassroomProOffer />}
         t={t}
       />
       {error ? <p className="mt-2 text-center text-sm font-bold text-neo-red" role="alert">{error}</p> : null}

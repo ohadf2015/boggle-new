@@ -28,6 +28,8 @@ export interface ClassPageViewProps {
   onShare: () => void;
   onRequestDelete: () => void;
   t: T;
+  /** Free-teacher Pro offer. Never replaces Start a game. */
+  proOffer?: ReactNode;
 }
 
 const TILE = 'h-14 w-11 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream font-neo-display text-3xl font-black text-neo-black shadow-hard sm:h-16 sm:w-12 sm:text-4xl';
@@ -82,6 +84,8 @@ export function ClassPageView(props: ClassPageViewProps) {
           </Link>
         </div>
       </section>
+
+      {props.proOffer}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-5">
         <div className="order-2 min-w-0 lg:order-1">{props.roster}</div>

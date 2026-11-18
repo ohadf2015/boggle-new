@@ -17,4 +17,6 @@ export const PRO_OFFER_PLACEMENTS: ReadonlySet<string> = new Set([
   'trial_ending_card',
   // The trial-ending emails (t-3 / t-0 / t+3): the upgrade link opens checkout on arrival.
   'trial_reminder_email',
+  // Class page header: the screen an engaged teacher actually sits on, not the live projector.
+  'classroom_page',
 ]);
