@@ -5,6 +5,7 @@ import { escapeTelegramMarkdownV2, sendTelegramMessage } from '@/lib/telegram';
 import { captureApiError } from '@/utils/sentry';
 import logger from '@/utils/logger';
 import {
+  countGoogleSignupsSince,
   daytimeHoursEndingAt,
   shouldAlertGoogleSignupDrought,
 } from '@/lib/auth/googleSignupDrought';
@@ -14,7 +15,7 @@ const LOOKBACK_HOURS = 8;
 /**
  * POST /api/cron/google-signup-drought
  * Hourly 14:00–21:00 UTC (Israel afternoon). Alerts when 8 daytime hours have
- * 0 new Google accounts while the landing CTA is still being clicked.
+ * 0 new Google accounts while people are still arriving.
  * `?dry=1` evaluates and sends nothing.
  */
 export async function POST(request: NextRequest) {
@@ -29,12 +30,15 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = getSupabaseAdmin();
     if (!supabase) throw new Error('no service-role client');
-    const { data, error } = await supabase.rpc('google_signup_drought_counts', { p_since: since });
-    if (error || !data) throw new Error(error?.message ?? 'no counts');
-    const counts = data as { google_signups: number; games_started: number };
-    const landingCtaClicked = await landingCtaOrGames(since, counts.games_started);
+    const { count: gamesStarted, error: gamesError } = await supabase
+      .from('game_sessions')
+      .select('id', { count: 'exact', head: true })
+      .gte('started_at', since);
+    if (gamesError) throw new Error(gamesError.message);
+    const googleSignups = await countGoogleSignupsSince(supabase, since);
+    const landingCtaClicked = await landingCtaOrGames(since, gamesStarted ?? 0);
     const alert = shouldAlertGoogleSignupDrought({
-      googleSignups: Number(counts.google_signups) || 0,
+      googleSignups,
       landingCtaClicked,
       daytimeHours,
     });
@@ -48,7 +52,7 @@ export async function POST(request: NextRequest) {
       alert,
       dry,
       daytimeHours,
-      googleSignups: counts.google_signups,
+      googleSignups,
       landingCtaClicked,
       since,
     });
@@ -73,8 +77,9 @@ async function landingCtaOrGames(since: string, gamesStarted: number): Promise<n
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-  });
-  if (!res.ok) return gamesStarted;
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
+  if (!res?.ok) return gamesStarted;
   const json = await res.json() as { results?: Array<Array<number>> };
   const n = json.results?.[0]?.[0];
   return typeof n === 'number' ? n : gamesStarted;

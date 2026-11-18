@@ -72,11 +72,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const lastIntentAtRef = useRef(0);
   const redirectStartedRef = useRef(false);
 
-  // Sheet preloader can win the GSI script race, leaving this button as an inert
-  // placeholder. A tap must still reach Google via the redirect path (email
-  // already works; this is the same path Edge uses). Chunk skew that makes an
-  // imported tracker "not a function" must not throw out of the click handler
-  // ("a.cd is not a function" on multi_games_sheet).
+  // Until the GSI iframe paints, a tap has nothing to land on, so it takes the redirect path.
   const startRedirectFallback = useCallback(() => {
     if (redirectStartedRef.current || renderedRef.current) return;
     redirectStartedRef.current = true;
@@ -166,9 +162,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     setGsiRendered(true);
   }, [clientId, width, language, handlePromptClickIntent]);
 
-  // GIS may already be loaded (the sheet preloader or One Tap). The button's own
-  // Script onReady does not fire when another Script tag already loaded the same
-  // URL, so poll until the iframe can paint instead of giving up after one miss.
+  // Script onReady never fires when another tag already loaded the same GSI URL.
   useEffect(() => {
     if (!enabled) return;
     let attempts = 0;
