@@ -23,6 +23,9 @@ vi.mock('@/components/teacher/home/HomeRosterLive', () => ({ useHomeRoster: () =
 vi.mock('@/components/teacher/home/HomeClassRoster', () => ({ HomeClassRoster: () => <div data-testid="roster" /> }));
 vi.mock('@/components/teacher/home/useLastClassGame', () => ({ useLastClassGame: () => ({ status: 'ready', game: null }) }));
 vi.mock('@/components/teacher/home/HomeShareSheet', () => ({ HomeShareSheet: (p: { open: boolean }) => (p.open ? <div data-testid="share-sheet" /> : null) }));
+vi.mock('@/components/teacher/classroom/ClassroomProOfferBanner', () => ({
+  ClassroomProOffer: () => <div data-testid="classroom-pro-offer" />,
+}));
 vi.mock('@/utils/authFetch', () => ({ fetchWithAuth: fetchMock }));
 
 import ClassPageClient from '../PageClient';
@@ -41,6 +44,8 @@ describe('Class page', () => {
     expect(screen.getByRole('link', { name: /education.analytics.backToClassroom/ })).toHaveAttribute('href', '/en/teacher/classroom');
     expect(screen.getByTestId('roster')).toBeInTheDocument();
     expect(screen.getByTestId('class-page-start')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
+    expect(screen.getByTestId('class-page-start')).toHaveAttribute('data-hero', 'true');
+    expect(screen.getByTestId('classroom-pro-offer')).toBeInTheDocument();
   });
 
   it('When Share is tapped, Then the share sheet opens', () => {
@@ -68,6 +73,7 @@ describe('Class page', () => {
     render(<ClassPageClient classroomId="nope" />);
     expect(screen.getByRole('alert')).toHaveTextContent('education.classroomGame.classroomNotFound');
     expect(screen.queryByTestId('delete-class-affordance')).toBeNull();
+    expect(screen.queryByTestId('classroom-pro-offer')).toBeNull();
   });
 
   it('Given the class list fails to load, Then it says so with a retry instead of claiming the class is gone', () => {

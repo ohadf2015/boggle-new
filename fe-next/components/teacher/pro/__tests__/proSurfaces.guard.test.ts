@@ -11,6 +11,7 @@ const PRO_SURFACES = [
   'components/teacher/TeacherProTrialExpiringBanner.tsx',
   'components/teacher/TeacherProTrialChargeSoonBanner.tsx',
   'components/teacher/TeacherWinbackBanner.tsx',
+  'components/teacher/classroom/ClassroomProOfferBanner.tsx',
   'components/teacher/TeacherProManageLink.tsx',
   'components/teacher/PendingCheckoutBanner.tsx',
   'components/teacher/CheckoutReturnCapture.tsx',

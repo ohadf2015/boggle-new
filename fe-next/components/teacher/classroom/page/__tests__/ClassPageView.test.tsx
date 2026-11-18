@@ -54,6 +54,17 @@ describe('ClassPageView', () => {
     expect(screen.getByTestId('class-page-last-game')).toHaveTextContent('teacher.lastGame.emptyTitle');
   });
 
+  it('Given a Pro offer under the header, Then Start a game stays the only hero and the roster still shows', () => {
+    render(<ClassPageView {...props({ proOffer: <div data-testid="classroom-pro-offer" /> })} />);
+    const start = screen.getByTestId('class-page-start');
+    expect(start).toHaveAttribute('data-hero', 'true');
+    expect(document.querySelectorAll('[data-hero="true"]')).toHaveLength(1);
+    expect(screen.getByTestId('roster-slot')).toBeInTheDocument();
+    const offer = screen.getByTestId('classroom-pro-offer');
+    expect(start.compareDocumentPosition(offer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(offer.compareDocumentPosition(screen.getByTestId('roster-slot')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('Given the page, Then delete sits last in a danger zone and only asks to confirm', () => {
     const p = props();
     render(<ClassPageView {...p} />);

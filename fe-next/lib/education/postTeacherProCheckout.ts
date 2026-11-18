@@ -7,6 +7,7 @@
  */
 
 import { trackEduProCheckoutFailed, type EduProCheckoutFailReason } from '@/lib/education/proFunnelTelemetry';
+import { entrySourceTag } from '@/lib/education/pro/upgradeEntry';
 import { isNative } from '@/utils/platform';
 
 export type TeacherProCheckoutResult =
@@ -36,15 +37,16 @@ function reportFailure(reason: EduProCheckoutFailReason, placement: string, tria
 
 export async function postTeacherProCheckout(
   fetchFn: typeof fetch = fetch,
-  options: { trial?: boolean; locale?: string; placement?: string } = {},
+  options: { trial?: boolean; locale?: string; placement?: string; source?: string } = {},
 ): Promise<TeacherProCheckoutResult> {
   const trial = options.trial === true;
   const placement = options.placement ?? 'other';
+  const source = entrySourceTag(options.source);
   if (isCheckoutBlockedInApp()) {
     reportFailure('native_app', placement, trial);
     return { ok: false, status: 0, nativeApp: true };
   }
-  const hasOptions = options.trial !== undefined || options.locale !== undefined;
+  const hasOptions = options.trial !== undefined || options.locale !== undefined || source !== null;
   let response: Response;
   try {
     response = await fetchFn(
@@ -56,6 +58,7 @@ export async function postTeacherProCheckout(
             body: JSON.stringify({
               trial,
               ...(options.locale ? { locale: options.locale } : {}),
+              ...(source ? { source } : {}),
             }),
           }
         : { method: 'POST' },

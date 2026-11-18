@@ -37,6 +37,39 @@ describe('postTeacherProCheckout', () => {
     });
   });
 
+  it('tags the checkout with the offer the teacher came from', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ url: 'https://polar.sh/checkout/class' }),
+    });
+    await postTeacherProCheckout(fetchFn, {
+      trial: true,
+      locale: 'en',
+      placement: 'classroom_page',
+      source: 'classroom_page',
+    });
+    expect(fetchFn).toHaveBeenCalledWith('/api/subscription/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trial: true, locale: 'en', source: 'classroom_page' }),
+    });
+  });
+
+  it('drops an entry source that is not a plain tag', async () => {
+    const fetchFn = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ url: 'https://polar.sh/checkout/junk' }),
+    });
+    await postTeacherProCheckout(fetchFn, { trial: true, source: '<script>' });
+    expect(fetchFn).toHaveBeenCalledWith('/api/subscription/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ trial: true }),
+    });
+  });
+
   it('passes the locale through to the checkout body when provided', async () => {
     const fetchFn = vi.fn().mockResolvedValue({
       ok: true,
