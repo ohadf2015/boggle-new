@@ -5,6 +5,7 @@ vi.mock("@/utils/logger", () => ({ default: { error: vi.fn(), warn: vi.fn(), inf
 import logger from "@/utils/logger";
 import {
   PRACTICE_DAILY_XP_CAP,
+  PRACTICE_FIXED_COUNT_CEILING,
   PRACTICE_XP_LIMIT_TIMEOUT_MS,
   allowedPracticeXp,
   capPracticeXpInput,
@@ -43,7 +44,7 @@ afterEach(() => {
 });
 
 describe("capPracticeXpInput", () => {
-  it("GIVEN counts above a 10 word deck WHEN capped THEN every client count stops at the deck", () => {
+  it("GIVEN counts above a 10 word deck WHEN capped THEN every client count stops at twice the deck", () => {
     expect(capPracticeXpInput({
       cardsReviewed: 9999,
       cardsCorrect: 9999,
@@ -55,13 +56,24 @@ describe("capPracticeXpInput", () => {
       blitzMaxCombo: 500,
       vocabularyWordsFound: Array.from({ length: 40 }, (_, i) => `w${i}`),
     }, 10)).toMatchObject({
-      cardsReviewed: 10,
-      cardsCorrect: 10,
-      pairsMatched: 10,
-      totalPairs: 10,
-      wordsSpelled: 10,
-      spellingStreak: 10,
-      vocabularyWordsFound: expect.objectContaining({ length: 10 }),
+      cardsReviewed: 20,
+      cardsCorrect: 20,
+      pairsMatched: 20,
+      totalPairs: 20,
+      wordsSpelled: 20,
+      spellingStreak: 20,
+      vocabularyWordsFound: expect.objectContaining({ length: 20 }),
+    });
+  });
+
+  it("GIVEN a 5 word lesson WHEN a 10 card review repeats its words THEN all 10 count", () => {
+    expect(capPracticeXpInput({ cardsReviewed: 10, cardsCorrect: 10 }, 5)).toEqual({ cardsReviewed: 10, cardsCorrect: 10 });
+  });
+
+  it("GIVEN no usable word list WHEN capped THEN the fixed ceiling applies", () => {
+    expect(capPracticeXpInput({ cardsCorrect: 9999, cardsReviewed: 40 }, null)).toEqual({
+      cardsCorrect: PRACTICE_FIXED_COUNT_CEILING,
+      cardsReviewed: 40,
     });
   });
 
@@ -101,11 +113,21 @@ describe("readPracticeXpLimits", () => {
   });
 
   it.each([
-    ["the lesson read errors", { data: null, error: { message: "down" } }, { data: [], error: null }],
-    ["the lesson is missing", { data: null, error: null }, { data: [], error: null }],
-    ["the session read errors", { data: { words: [] }, error: null }, { data: null, error: { message: "down" } }],
-  ])("GIVEN %s WHEN read THEN limits are unknown and it is logged", async (_name, lesson, sessions) => {
-    const { client } = adminWith(lesson, sessions);
+    ["the lesson read errors", { data: null, error: { message: "down" } }],
+    ["the lesson is missing", { data: null, error: null }],
+    ["the word list is empty", { data: { words: [] }, error: null }],
+    ["the word list is not a list", { data: { words: "x" }, error: null }],
+    ["the lesson read hangs", "hang" as const],
+  ])("GIVEN %s WHEN read THEN the deck is unknown and the daily total still counts", async (_name, lesson) => {
+    vi.useFakeTimers();
+    const { client } = adminWith(lesson, { data: [{ xp_awarded: 70 }], error: null });
+    const pending = read(() => client);
+    await vi.advanceTimersByTimeAsync(PRACTICE_XP_LIMIT_TIMEOUT_MS);
+    await expect(pending).resolves.toEqual({ deckSize: null, xpLast24h: 70 });
+  });
+
+  it("GIVEN the daily read errors WHEN read THEN limits are unknown and it is logged", async () => {
+    const { client } = adminWith({ data: { words: ["a"] }, error: null }, { data: null, error: { message: "down" } });
     await expect(read(() => client)).resolves.toBeNull();
     expect(logger.error).toHaveBeenCalled();
   });

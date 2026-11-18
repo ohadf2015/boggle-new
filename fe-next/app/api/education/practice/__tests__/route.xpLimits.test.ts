@@ -70,13 +70,16 @@ const SESSION = '550e8400-e29b-41d4-a716-446655440001';
 const STUDENT = '550e8400-e29b-41d4-a716-446655440002';
 const LESSON = '550e8400-e29b-41d4-a716-446655440003';
 
-function limitsAdmin(deck: number, earned: number[], failing = false) {
+const DOWN = { data: null, error: { message: 'down' } };
+
+function limitsAdmin(deck: number | null, earned: number[], failing: 'all' | 'lesson' | null = null) {
   return {
     from(table: string) {
-      const answer = failing
-        ? { data: null, error: { message: 'down' } }
-        : table === 'vocabulary_lessons'
-          ? { data: { words: Array.from({ length: deck }, (_, i) => `w${i}`) }, error: null }
+      const isLesson = table === 'vocabulary_lessons';
+      const answer = failing === 'all' || (failing === 'lesson' && isLesson)
+        ? DOWN
+        : isLesson
+          ? { data: { words: deck === null ? null : Array.from({ length: deck }, (_, i) => `w${i}`) }, error: null }
           : { data: earned.map((xp_awarded) => ({ xp_awarded })), error: null };
       const builder: Record<string, unknown> = {};
       for (const method of ['select', 'eq', 'gte', 'gt', 'limit', 'abortSignal']) builder[method] = () => builder;
@@ -87,10 +90,10 @@ function limitsAdmin(deck: number, earned: number[], failing = false) {
   };
 }
 
-function studentClient() {
+function studentClient(practiceType = 'flashcard') {
   const writes: Array<Record<string, unknown>> = [];
   const rpc = vi.fn().mockResolvedValue({ data: null, error: null });
-  const existing = { id: SESSION, student_id: STUDENT, lesson_id: LESSON, practice_type: 'flashcard', completed_at: null };
+  const existing = { id: SESSION, student_id: STUDENT, lesson_id: LESSON, practice_type: practiceType, completed_at: null };
   (createClient as unknown as Mock).mockResolvedValue({
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: STUDENT } }, error: null }) },
     rpc,
@@ -128,13 +131,45 @@ const awarded = (rpc: Mock) => rpc.mock.calls.find((c) => c[0] === 'award_educat
 describe('PATCH /api/education/practice XP limits', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('GIVEN a 10 word deck WHEN a client claims 9999 correct THEN XP is scored as 10 of 10', async () => {
+  it('GIVEN a 10 word deck WHEN a client claims 9999 correct THEN XP stops at twice the deck', async () => {
     const { rpc, writes } = studentClient();
     mockAdmin.mockReturnValue(limitsAdmin(10, []));
     const { status } = await finish(9999, 9999);
     expect(status).toBe(200);
+    expect(awarded(rpc)).toBe(20 + 200 + 50 + 100);
+    expect(writes[0].xp_awarded).toBe(370);
+  });
+
+  it('GIVEN a 5 word lesson WHEN a 10 card review is all correct THEN it earns full XP', async () => {
+    const { rpc } = studentClient('vocab_focus');
+    mockAdmin.mockReturnValue(limitsAdmin(5, []));
+    await finish(10, 10);
     expect(awarded(rpc)).toBe(20 + 100 + 50 + 100);
-    expect(writes[0].xp_awarded).toBe(270);
+  });
+
+  it.each([
+    ['has no word list', limitsAdmin(null, [])],
+    ['has an empty word list', limitsAdmin(0, [])],
+    ['cannot be read', limitsAdmin(10, [], 'lesson')],
+  ])('GIVEN a lesson that %s WHEN a round completes THEN it still earns XP under the fixed ceiling', async (_name, admin) => {
+    const { rpc } = studentClient();
+    mockAdmin.mockReturnValue(admin);
+    await finish(10, 8);
+    expect(awarded(rpc)).toBe(20 + 80 + 30);
+  });
+
+  it('GIVEN no word list WHEN a client claims 9999 correct THEN the fixed ceiling limits XP', async () => {
+    const { rpc } = studentClient();
+    mockAdmin.mockReturnValue(limitsAdmin(null, []));
+    await finish(9999, 9999);
+    expect(awarded(rpc)).toBe(20 + 1600 + 50 + 100);
+  });
+
+  it.each(['solo_board', 'warmup'])('GIVEN a %s round with no word list WHEN it completes THEN it earns XP', async (type) => {
+    const { rpc } = studentClient(type);
+    mockAdmin.mockReturnValue(limitsAdmin(null, []));
+    await finish(0, 0);
+    expect(awarded(rpc)).toBe(20 + 50);
   });
 
   it('GIVEN an honest round WHEN it completes THEN its XP is unchanged', async () => {
@@ -154,11 +189,12 @@ describe('PATCH /api/education/practice XP limits', () => {
     expect(rpc).not.toHaveBeenCalled();
   });
 
-  it('GIVEN the limit read fails WHEN a session completes THEN it saves and grants no XP', async () => {
+  it('GIVEN the limit read fails WHEN a session completes THEN it saves and returns 0 XP', async () => {
     const { rpc, writes } = studentClient();
-    mockAdmin.mockReturnValue(limitsAdmin(10, [], true));
-    const { status } = await finish(10, 10);
+    mockAdmin.mockReturnValue(limitsAdmin(10, [], 'all'));
+    const { status, body } = await finish(10, 10);
     expect(status).toBe(200);
+    expect(body.session.xp_awarded).toBe(0);
     expect(writes[0]).toMatchObject({ xp_awarded: 0, completed_at: expect.any(String) });
     expect(rpc).not.toHaveBeenCalled();
   });

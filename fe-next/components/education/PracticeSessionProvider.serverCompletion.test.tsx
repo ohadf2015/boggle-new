@@ -15,6 +15,7 @@ import userEvent from '@testing-library/user-event';
 
 const {
   mockAwardPracticeXp,
+  mockReconcileAwardedXp,
   mockAcknowledgePersistence,
   mockCheckForUnlocks,
   mockAcknowledgeUnlock,
@@ -23,6 +24,7 @@ const {
 } = vi.hoisted(() => ({
   mockPublishLevelUp: vi.fn(),
   mockAwardPracticeXp: vi.fn(),
+  mockReconcileAwardedXp: vi.fn(() => 3),
   mockAcknowledgePersistence: vi.fn(),
   mockCheckForUnlocks: vi.fn(),
   mockAcknowledgeUnlock: vi.fn(),
@@ -55,6 +57,7 @@ vi.mock('@/hooks/useEducationXp', () => ({
     },
     streak: { currentStreak: 5, longestStreak: 10, lastPracticeDate: '2026-01-25' },
     awardPracticeXp: mockAwardPracticeXp,
+    reconcileAwardedXp: mockReconcileAwardedXp,
     acknowledgePersistence: mockAcknowledgePersistence,
     isLoading: false,
     error: null,
@@ -166,6 +169,7 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
     await user.click(screen.getByTestId('complete-btn'));
 
     await waitFor(() => expect(screen.getByTestId('session-xp')).toHaveTextContent('42'));
+    expect(mockReconcileAwardedXp).toHaveBeenCalledWith(100, 42);
   });
 
   it('GIVEN the server reports a player level-up WHEN the PATCH resolves THEN it is announced as practice', async () => {
@@ -218,9 +222,8 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
     await user.click(screen.getByTestId('complete-btn'));
 
     await waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
-    // Client-side XP display still updates — a persistence failure doesn't
-    // break the results UI.
-    expect(screen.getByTestId('session-xp')).toHaveTextContent('100');
+    expect(screen.getByTestId('session-xp')).toHaveTextContent('0');
+    expect(mockReconcileAwardedXp).toHaveBeenCalledWith(100, 0);
   });
 
   it('GIVEN the PATCH throws (network error) WHEN a session completes THEN the failure is logged and nothing throws', async () => {
@@ -237,7 +240,7 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
     await user.click(screen.getByTestId('complete-btn'));
 
     await waitFor(() => expect(mockLoggerError).toHaveBeenCalled());
-    expect(screen.getByTestId('session-xp')).toHaveTextContent('100');
+    expect(screen.getByTestId('session-xp')).toHaveTextContent('0');
   });
 
   it('GIVEN no sessionId on the completion payload WHEN it finishes THEN no PATCH is sent (guest / non-persistable rounds)', async () => {
@@ -266,6 +269,28 @@ describe('PracticeSessionProvider — server completion PATCH', () => {
 
     await waitFor(() => expect(mockAwardPracticeXp).toHaveBeenCalled());
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+});
+
+describe('PracticeSessionProvider — the server decides the XP shown', () => {
+  it('GIVEN the server grants 0 XP WHEN the round completes THEN the estimate is never shown or counted', async () => {
+    stubFetch(async () => ({
+      ok: true,
+      json: async () => ({ session: { id: 'session-0', completed_at: '2026-11-19T00:00:00Z', xp_awarded: 0 } }),
+    }));
+    const user = userEvent.setup();
+
+    render(
+      <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
+        <TestConsumer sessionId="session-0" />
+      </PracticeSessionProvider>
+    );
+
+    await user.click(screen.getByTestId('complete-btn'));
+
+    await waitFor(() => expect(mockReconcileAwardedXp).toHaveBeenCalledWith(100, 0));
+    expect(screen.getByTestId('session-xp')).toHaveTextContent('0');
+    await waitFor(() => expect(mockCheckForUnlocks).toHaveBeenCalledWith(expect.objectContaining({ totalXp: 500 })));
   });
 });
 

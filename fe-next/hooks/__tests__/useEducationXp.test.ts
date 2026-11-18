@@ -722,3 +722,18 @@ describe('useEducationXp', () => {
   });
 
 });
+
+describe("reconcileAwardedXp", () => {
+  it("GIVEN a local estimate WHEN the server grants less THEN total XP follows the server", async () => {
+    const { result } = renderHook(() => useEducationXp({ studentId: "s1", lessonId: "l1", initialXp: 500 }));
+    let estimated = 0;
+    await act(async () => {
+      estimated = (await result.current.awardPracticeXp({ type: "flashcard", sessionData: { cardsReviewed: 10, cardsCorrect: 10 } })).totalXp;
+    });
+    expect(result.current.totalXp).toBe(500 + estimated);
+    act(() => {
+      result.current.reconcileAwardedXp(estimated, 0);
+    });
+    expect(result.current.totalXp).toBe(500);
+  });
+});
