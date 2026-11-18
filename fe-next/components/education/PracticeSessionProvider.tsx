@@ -120,6 +120,7 @@ export function PracticeSessionProvider({
     xpProgress,
     streak,
     awardPracticeXp,
+    reconcileAwardedXp,
     isLoading: xpLoading,
   } = useEducationXp({
     studentId,
@@ -190,8 +191,12 @@ export function PracticeSessionProvider({
           streakDays: streak.currentStreak,
         });
 
-        // Update session state
-        setSessionXpEarned(result.totalXp);
+        // A saved round shows only what the server granted; a guest round has no server value.
+        const serverScored = !!sessionData.sessionId;
+        const firstSend = serverScored && !completedSessionIdsRef.current.has(sessionData.sessionId!);
+        let earnedXp = serverScored ? 0 : result.totalXp;
+        let reachedLevel = result.newLevel;
+        if (!serverScored || firstSend) setSessionXpEarned(earnedXp);
         setSessionMasteryMessage(result.masteryMessage);
 
         // XP persistence is handled server-side by PATCH /api/education/practice.
@@ -228,12 +233,10 @@ export function PracticeSessionProvider({
               // client-supplied amount, and an idempotent replay returns the
               // existing session with no re-award) — prefer its number over
               // the client-side estimate once it's back.
-              if (typeof data?.session?.xp_awarded === 'number') {
-                setSessionXpEarned(data.session.xp_awarded);
-              }
+              if (typeof data?.session?.xp_awarded === 'number') earnedXp = data.session.xp_awarded;
               // Recorded only as an ATTEMPT (Word Craft below the bar): no XP, and a replay may still finish this session.
               if (data?.session && data.session.completed_at == null) {
-                setSessionXpEarned(0);
+                earnedXp = 0;
                 completedSessionIdsRef.current.delete(sessionData.sessionId);
               }
               if (data?.session) outcome = { completed: data.session.completed_at != null, assignmentCompleted: data.assignmentCompleted === true };
@@ -246,6 +249,11 @@ export function PracticeSessionProvider({
           } catch (patchError) {
             logger.error('Error completing practice session on server:', patchError);
           }
+        }
+
+        if (serverScored) {
+          reachedLevel = reconcileAwardedXp(result.totalXp, earnedXp);
+          if (firstSend) setSessionXpEarned(earnedXp);
         }
 
         // Increment session counter
@@ -332,9 +340,9 @@ export function PracticeSessionProvider({
         // Fields not tracked in education context use 0 (won't falsely unlock)
         // rather than hardcoded 1 which could falsely unlock achievements.
         checkForUnlocks({
-          totalXp: totalXp + result.totalXp,
+          totalXp: totalXp + earnedXp,
           wordsMastered: newWordsMastered,
-          currentLevel: result.newLevel || currentLevel,
+          currentLevel: reachedLevel || currentLevel,
           currentStreak: streak.currentStreak,
           practiceSessions: newSessionCount,
           lessonsCompleted: newCompletedLessonsCount,
@@ -361,6 +369,7 @@ export function PracticeSessionProvider({
     },
     [
       awardPracticeXp,
+      reconcileAwardedXp,
       completedLessonsRef,
       modesTriedRef,
       uniqueWordsRef,

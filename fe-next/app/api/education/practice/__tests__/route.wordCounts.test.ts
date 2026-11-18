@@ -65,6 +65,11 @@ vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => mockAdmin(),
 }));
 
+vi.mock('@/lib/education/practiceXpLimits', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/practiceXpLimits')>()),
+  readPracticeXpLimits: vi.fn().mockResolvedValue({ deckSize: 100, xpLast24h: 0 }),
+}));
+
 import { NextRequest } from 'next/server';
 import { PATCH, POST } from '../route';
 import { createClient } from '@/utils/supabase/server';

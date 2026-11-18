@@ -15,13 +15,14 @@
 import React from 'react';
 import fs from 'node:fs';
 import path from 'node:path';
-import { render, screen, within } from '@testing-library/react';
+import { render, renderHook, screen, within } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
 
 import { MpSheet } from '../../shell/MpSheet';
 import { EntrySheet, EntrySheetCta, ENTRY_SHEET_BODY_CLASS, ENTRY_SHEET_AT_REST_CLASS } from '../EntrySheet';
+import { useSheetSide } from '../useSheetSide';
 
 function mockDesktop(matches: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -98,6 +99,17 @@ describe('EntrySheet', () => {
     expect(panel.getAttribute('data-side')).toBe('end');
     expect(panel.matches(AT_REST)).toBe(true);
     expect(screen.getByTestId('create-sheet')).toBeInTheDocument();
+  });
+
+  it('never renders a desktop sheet on the bottom side first', () => {
+    mockDesktop(true);
+    const sides: string[] = [];
+    renderHook(() => {
+      const side = useSheetSide();
+      sides.push(side);
+      return side;
+    });
+    expect(new Set(sides)).toEqual(new Set(['end']));
   });
 
   it('is a static bottom sheet on phone', () => {

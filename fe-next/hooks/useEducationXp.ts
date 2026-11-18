@@ -97,6 +97,8 @@ export interface UseEducationXpReturn {
   acknowledgePersistence: () => void;
 
   // Loading/error state
+  /** Replace a local estimate with the XP the server granted; returns the resulting level. */
+  reconcileAwardedXp: (estimatedXp: number, awardedXp: number) => number;
   /** Whether an XP calculation is in progress */
   isLoading: boolean;
   /** Error from last operation, if any */
@@ -275,6 +277,16 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
     [studentId, lessonId]
   );
 
+  const reconcileAwardedXp = useCallback((estimatedXp: number, awardedXp: number): number => {
+    const reconciledXp = Math.max(0, totalXpRef.current - estimatedXp + awardedXp);
+    const level = getLevelFromXp(reconciledXp);
+    totalXpRef.current = reconciledXp;
+    currentLevelRef.current = level;
+    setTotalXp(reconciledXp);
+    setCurrentLevel(level);
+    return level;
+  }, []);
+
   /**
    * Acknowledge that pending update was persisted to database
    * Call this after successfully saving to Supabase
@@ -294,6 +306,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 
     // Actions
     awardPracticeXp,
+    reconcileAwardedXp,
     acknowledgePersistence,
 
     // Loading/error state

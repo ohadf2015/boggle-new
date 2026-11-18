@@ -12,6 +12,7 @@ import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/educat
 import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 import { practiceWordCounts } from '@/lib/education/practiceWordCounts';
+import { allowedPracticeXp, capPracticeXpInput, readPracticeXpLimits } from '@/lib/education/practiceXpLimits';
 import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
 import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 
@@ -360,7 +361,7 @@ export async function PATCH(request: NextRequest) {
 
       // B1 fix: streak for the bonus. In the same wave: which assignment (if any)
       // this round satisfies — the teacher's tracking reads the stamp below.
-      const [{ data: progressData }, foundAssignment] = await Promise.all([
+      const [{ data: progressData }, foundAssignment, xpLimits] = await Promise.all([
         supabase.from('student_lesson_progress').select('current_streak')
           .eq('student_id', existing.student_id).eq('lesson_id', existing.lesson_id).single(),
         findSatisfiedAssignment(supabase, {
@@ -371,11 +372,21 @@ export async function PATCH(request: NextRequest) {
           vocabularyWordsFound: Array.isArray(merged.vocabulary_words_found) ? merged.vocabulary_words_found : [],
         })
           .catch((err) => { logger.error('Assignment lookup failed:', err); return null; }),
+        readPracticeXpLimits(createAdminClient, { studentId: existing.student_id, lessonId: existing.lesson_id, nowMs: Date.now() }),
       ]);
       satisfiedAssignment = foundAssignment;
 
       streakDays = progressData?.current_streak ?? 0;
-      serverCalculatedXp = calculatePracticeXp({ ...xpSession, streakDays }).totalXp;
+      serverCalculatedXp = xpLimits
+        ? allowedPracticeXp(
+            calculatePracticeXp({
+              ...xpSession,
+              sessionData: capPracticeXpInput(xpSession.sessionData, xpLimits.deckSize),
+              streakDays,
+            }).totalXp,
+            xpLimits.xpLast24h,
+          )
+        : 0;
 
       // Always write server-calculated XP (even if 0) to prevent client value sticking (B7 fix)
       updateObj.xp_awarded = serverCalculatedXp;
