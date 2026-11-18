@@ -10,10 +10,11 @@ type Db = Pick<SupabaseClient, 'from'>;
 
 export const FIRST_STUDENT_KIND = 'first_student';
 const BUDGET_MS = 8_000;
-const ROSTER_SCAN = 50;
+const MAX_REAL_STUDENTS = 5;
+const ROSTER_SCAN = 20;
 
 export type FirstStudentOutcome =
-  | 'sent' | 'rehearsal' | 'teacher' | 'test-account' | 'live-game' | 'not-first'
+  | 'sent' | 'rehearsal' | 'teacher' | 'test-account' | 'live-game' | 'class-started'
   | 'no-contact' | 'unsubscribed' | 'unreachable' | 'already-sent' | 'send-failed' | 'error';
 
 interface Args {
@@ -44,7 +45,7 @@ async function attempt(db: Db, a: Args): Promise<FirstStudentOutcome> {
   if (roster.error) throw new Error(`classroom_memberships read failed: ${roster.error.message}`);
   const real = ((roster.data ?? []) as Array<{ student_id: string; is_rehearsal: boolean | null }>)
     .filter((m) => !m.is_rehearsal && m.student_id !== teacherId);
-  if (real.length !== 1 || real[0].student_id !== a.studentId) return 'not-first';
+  if (real.length === 0 || real.length > MAX_REAL_STUDENTS || !real.some((m) => m.student_id === a.studentId)) return 'class-started';
 
   const teacher = await db.from('profiles').select('id, is_test_account').eq('id', teacherId).maybeSingle();
   if (teacher.error) throw new Error(`profiles read failed: ${teacher.error.message}`);

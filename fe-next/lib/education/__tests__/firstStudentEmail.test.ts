@@ -96,7 +96,7 @@ describe('notifyFirstStudent', () => {
     expect(db.tables.teacher_lifecycle_sends[0]).toMatchObject({ user_id: 't1', kind: 'first_student', period_key: 'c1' });
   });
 
-  it('Given a second real student is on the roster, When notified, Then nothing is sent', async () => {
+  it('Given a class of two joins nearly together, When both are notified, Then exactly one email goes out', async () => {
     const db = fakeDb(world({
       classroom_memberships: [
         { classroom_id: 'c1', student_id: 's1', is_rehearsal: false },
@@ -104,7 +104,33 @@ describe('notifyFirstStudent', () => {
       ],
     }));
 
-    expect(await run(db, args({ studentId: 's2' }))).toBe('not-first');
+    const results = await Promise.all([run(db, args({ studentId: 's1' })), run(db, args({ studentId: 's2' }))]);
+
+    expect(results.filter((r) => r === 'sent')).toHaveLength(1);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given five real students after this join, When notified, Then the email is still sent', async () => {
+    const db = fakeDb(world({
+      classroom_memberships: ['s1', 's2', 's3', 's4', 's5'].map((id) => ({ classroom_id: 'c1', student_id: id, is_rehearsal: false })),
+    }));
+
+    expect(await run(db, args({ studentId: 's5' }))).toBe('sent');
+  });
+
+  it('Given more than five real students, When notified, Then nothing is sent', async () => {
+    const db = fakeDb(world({
+      classroom_memberships: ['s1', 's2', 's3', 's4', 's5', 's6'].map((id) => ({ classroom_id: 'c1', student_id: id, is_rehearsal: false })),
+    }));
+
+    expect(await run(db, args({ studentId: 's6' }))).toBe('class-started');
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('Given the student is not on the roster, When notified, Then nothing is sent', async () => {
+    const db = fakeDb(world());
+
+    expect(await run(db, args({ studentId: 'ghost' }))).toBe('class-started');
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
@@ -166,15 +192,6 @@ describe('notifyFirstStudent', () => {
 
     expect(await run(db)).toBe('already-sent');
     expect(sendEmail).not.toHaveBeenCalled();
-  });
-
-  it('Given two joins race, When both notify, Then exactly one email goes out', async () => {
-    const db = fakeDb(world());
-
-    const results = await Promise.all([run(db), run(db)]);
-
-    expect(results.filter((r) => r === 'sent')).toHaveLength(1);
-    expect(sendEmail).toHaveBeenCalledTimes(1);
   });
 
   it('Given the send fails, When notified, Then it does not throw, logs, and releases the claim', async () => {
