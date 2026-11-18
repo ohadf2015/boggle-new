@@ -11,6 +11,7 @@ import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
 import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
+import BridgeSubmitButton from '../BridgeSubmitButton';
 import AnswerSlots from '../AnswerSlots';
 import { useBridgeTyping, focusOnFinePointer } from '../useBridgeTyping';
 import HintButton from '../HintButton';
@@ -214,7 +215,7 @@ export default function FinaleCard({
         <div className="flex flex-col gap-3" dir={isRTL ? 'rtl' : 'ltr'}>
           {needsIME ? (
             !isDisabled && (
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 px-1 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                 <input
                   ref={focusOnFinePointer}
                   type="text"
@@ -241,15 +242,11 @@ export default function FinaleCard({
                     isCorrect ? 'border-neo-lime' : isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-white/20',
                   ].join(' ')}
                 />
-                <m.button
-                  type="button"
-                  onClick={onSubmit}
-                  whileTap={{ scale: 0.97 }}
+                <BridgeSubmitButton
+                  label={t('connections.submit')}
+                  onSubmit={onSubmit}
                   disabled={input.trim().length === 0}
-                  className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-40"
-                >
-                  {t('connections.submit')}
-                </m.button>
+                />
               </div>
             )
           ) : (

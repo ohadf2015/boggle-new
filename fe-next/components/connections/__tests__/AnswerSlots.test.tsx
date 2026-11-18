@@ -48,4 +48,20 @@ describe('AnswerSlots', () => {
     render(<AnswerSlots value="של" slotCount={3} state="idle" dir="rtl" />);
     expect(screen.getByRole('group').getAttribute('dir')).toBe('rtl');
   });
+
+  it('fills Hebrew letters in writing order under dir=rtl (first letter is the start side)', () => {
+    render(<AnswerSlots value="זהב" slotCount={3} state="idle" dir="rtl" />);
+    const cells = screen.getAllByTestId('answer-slot');
+    expect(screen.getByRole('group').getAttribute('dir')).toBe('rtl');
+    expect(cells.map((c) => c.textContent)).toEqual(['ז', 'ה', 'ב']);
+  });
+
+  it('paints filled idle letters large and high-contrast on the cream plank tiles', () => {
+    render(<AnswerSlots value="זהב" slotCount={3} state="idle" dir="rtl" />);
+    const filled = screen.getAllByTestId('answer-slot')[0];
+    expect(filled.className).toContain('bg-neo-cream');
+    expect(filled.className).toMatch(/text-neo-(navy|black)/);
+    expect(filled.className).toContain('font-black');
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.8');
+  });
 });

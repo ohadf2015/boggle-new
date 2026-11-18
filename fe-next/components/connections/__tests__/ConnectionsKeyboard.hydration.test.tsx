@@ -54,7 +54,7 @@ describe('ConnectionsKeyboard — t_55afcea2 hardening', () => {
     }
   });
 
-  it('hydrates the SSR markup with no errors and keeps the 10/9/7 + actions row structure', async () => {
+  it('hydrates the SSR markup with no errors and keeps the 10/9/7 + backspace + submit structure', async () => {
     const rows = getKeyboardRows('en');
     const tree = (
       <LazyMotion features={domMax}>
@@ -81,9 +81,9 @@ describe('ConnectionsKeyboard — t_55afcea2 hardening', () => {
 
     expect(consoleErrors.filter((e) => /hydrat/i.test(e))).toEqual([]);
     // The corruption signature from production was rows holding 0 / 28 / 1
-    // buttons. The healthy shape is 10 / 9 / 7+2 action keys.
+    // buttons. The healthy shape is 10 / 9 / 7 letters, one backspace, one submit.
     const keyboardRoot = host.firstElementChild as HTMLElement;
     const rowEls = [...keyboardRoot.children];
-    expect(rowEls.map((r) => r.querySelectorAll('button').length)).toEqual([10, 9, 7, 2]);
+    expect(rowEls.map((r) => r.querySelectorAll('button').length)).toEqual([10, 9, 7, 1, 1]);
   });
 });
