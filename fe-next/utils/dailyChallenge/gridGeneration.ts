@@ -7,12 +7,12 @@
 import {
   hebrewLetters,
   swedishLetters,
-  spanishLetters,
   russianLetterPool,
   DIFFICULTIES,
   DEFAULT_DIFFICULTY,
 } from '../consts';
 import type { Language, LetterGrid } from '@/types';
+import { SPANISH_LETTER_POOL } from '@/shared/constants/spanishLetters';
 import type { DailyPuzzle, DailyTargetWord } from './types';
 import { SEED_SALT, normalizeHebrewFinalLetters, MAX_TARGET_WORD_LENGTH } from './constants';
 import { mulberry32, hashString } from './prng';
@@ -115,7 +115,7 @@ export function generateDailyGrid(
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = SPANISH_LETTER_POOL;
   } else if (language === 'ru') {
     letters = russianLetterPool;
   } else if (language === 'ja') {

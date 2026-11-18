@@ -8,11 +8,11 @@
 import {
   hebrewLetters,
   swedishLetters,
-  spanishLetters,
   russianLetterPool,
   japaneseLetters,
 } from './consts';
 import type { Language, LetterGrid } from '@/types';
+import { SPANISH_LETTER_POOL } from '@/shared/constants/spanishLetters';
 import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 import { normalizeHebrewFinalLetters } from './dailyChallenge/constants';
 
@@ -217,7 +217,7 @@ export function generateCustomChallengeGrid(
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = SPANISH_LETTER_POOL;
   } else if (language === 'ru') {
     letters = russianLetterPool;
   } else if (language === 'ja') {

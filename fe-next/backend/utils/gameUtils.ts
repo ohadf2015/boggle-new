@@ -20,8 +20,9 @@ import { placeWordPath } from '@/shared/utils/boardWordPath';
 
 // Japanese hiragana board pool — single source of truth shared with the frontend
 // grid, /api/dictionary-words, serverDicts validation, and the ja.dict.gz build.
-import { japaneseHiraganaFrequency, JAPANESE_HIRAGANA_POOL } from '@/shared/constants/japaneseLetters';
+import { japaneseHiraganaFrequency, JAPANESE_HIRAGANA_POOL, plantableJapaneseWords } from '@/shared/constants/japaneseLetters';
 import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
+import { SPANISH_LETTER_POOL } from '@/shared/constants/spanishLetters';
 
 // ==========================================
 // Type Definitions
@@ -49,14 +50,7 @@ const spanishBaseLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split('');
 export const spanishAccentedLetters: string[] = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
 export const spanishLetters: string[] = [...spanishBaseLetters, ...spanishAccentedLetters];
 
-// Weighted letter pool for Spanish board generation
-// Regular vowels appear 3x more often than accented vowels for better playability
-export const spanishLetterPool: string[] = [
-  ...spanishBaseLetters,
-  ...spanishBaseLetters.filter(l => 'AEIOU'.includes(l)),
-  ...spanishBaseLetters.filter(l => 'AEIOU'.includes(l)),
-  ...spanishAccentedLetters
-];
+export const spanishLetterPool: string[] = SPANISH_LETTER_POOL;
 
 // Russian (Cyrillic) — board uses UPPERCASE to match the en/sv/es convention;
 // the dictionary is lowercase and validation lowercases the guess (Russian has
@@ -255,7 +249,12 @@ export function generateRandomTable(
     cols = DIFFICULTIES[DEFAULT_DIFFICULTY].cols;
   }
 
-  if (language === 'ja') return generateJapaneseTable(rows, cols);
+  if (language === 'ja') {
+    const kanaWords = plantableJapaneseWords(wordsToEmbed);
+    return kanaWords.length > 0
+      ? generateTableWithEmbeddedWords(rows, cols, JAPANESE_HIRAGANA_POOL, kanaWords, language)
+      : generateJapaneseTable(rows, cols);
+  }
   const letters = boardLetterPool(language);
 
   // If we have words to embed, use enhanced generation
