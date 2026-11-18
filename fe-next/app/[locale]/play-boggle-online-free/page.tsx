@@ -234,8 +234,8 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              The loudest, fastest free Boggle alternative on the internet. Find words on a letter grid solo, or
-              throw 50 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
+              A free Boggle-style word game that runs in your browser, in 6 languages. Find words on a letter grid
+              solo, or throw up to 50 friends into a real-time word brawl. Open the browser. Start playing. That&apos;s it.
               If you searched for a boggle app free, this is the one that skips the store.
             </p>
 
