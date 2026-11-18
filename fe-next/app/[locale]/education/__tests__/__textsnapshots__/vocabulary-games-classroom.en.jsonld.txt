@@ -82,6 +82,14 @@
   "mainEntity": [
     {
       "@type": "Question",
+      "name": "What are vocabulary games?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Vocabulary games are short games where students use new words instead of only reading them. In LexiClash the whole class joins a live game with a code, or pairs up for 1v1 duels, and you can load your own word list. Rounds take 3–5 minutes and students never need an account."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Do students need to sign up?",
       "acceptedAnswer": {
         "@type": "Answer",
