@@ -18,6 +18,8 @@ export interface CachedUserProfile {
   avatarEmoji: string;
   avatarColor: string;
   avatarImage?: string;
+  /** Built avatar (avatar_config). Absent on caches written before this field existed. */
+  avatarConfig?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   lastSeenAt?: string;
 }
 

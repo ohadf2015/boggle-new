@@ -80,4 +80,48 @@ describe('getPendingChallenges — challenger profile embed', () => {
     expect(result).toHaveLength(1);
     expect(result[0].challengerUsername).toBe('Unknown');
   });
+
+  it('maps the challenger built avatar (avatar_config) onto the pending challenge', async () => {
+    const built = {
+      gender: 'male',
+      base: 'round',
+      skinColor: '#FFDBB4',
+      hair: 'spiky',
+      hairColor: '#2C1B18',
+      eyes: 'round',
+      eyeColor: '#4A6FA5',
+      noseStyle: 'button',
+      eyebrows: 'none',
+      mouth: 'smile',
+      accessory: 'none',
+      accessoryColor: '#000000',
+      bgColor: '#1a1a2e',
+      shirtColor: '#4A90D9',
+    };
+    mockOrder.mockResolvedValue({
+      data: [
+        {
+          id: 'challenge-uuid-3',
+          challenger_id: 'milo-1',
+          challenge_id: 'RHCA28',
+          challenge_type: 'join_room',
+          status: 'pending',
+          created_at: '2026-11-18T12:00:00Z',
+          profiles: {
+            username: 'Milo',
+            display_name: 'Milo',
+            avatar_emoji: '😊',
+            avatar_color: '#4F46E5',
+            avatar_image: null,
+            avatar_config: built,
+          },
+        },
+      ],
+      error: null,
+    });
+
+    const result = await getPendingChallenges();
+    expect(result[0].challengerCustomAvatar).toEqual(built);
+    expect(result[0].challengerUsername).toBe('Milo');
+  });
 });
