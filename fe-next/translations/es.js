@@ -22478,7 +22478,9 @@ const es = {
         "tooSoon": "Elige una hora dentro de al menos 30 minutos.",
         "tooFar": "Elige una fecha dentro de los próximos 60 días.",
         "setupTitle": "¿Cuándo es tu próxima clase con este grupo?",
-        "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase."
+        "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase.",
+        "homeTitle": "¿Cuándo es tu próxima clase con este grupo?",
+        "homeBody": "Dínoslo y te mandamos por correo el código y el juego una hora antes, para que lo abras directamente en clase."
       },
       "keepOpen": {
         "cta": "Dejarlo abierto como tarea una semana",

@@ -22466,7 +22466,9 @@ const sv = {
         "tooSoon": "Välj en tid minst 30 minuter fram.",
         "tooFar": "Välj en tid inom de närmaste 60 dagarna.",
         "setupTitle": "När har du nästa lektion med den här klassen?",
-        "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet."
+        "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet.",
+        "homeTitle": "När är nästa lektion med den här klassen?",
+        "homeBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, så att du kan öppna det direkt i klassrummet."
       },
       "keepOpen": {
         "cta": "Håll den öppen som läxa i en vecka",

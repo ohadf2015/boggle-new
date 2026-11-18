@@ -59,6 +59,13 @@ describe('<LessonPlanPrompt>', () => {
     expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'practice_results' });
   });
 
+  it('Given the teacher home source, When shown, Then uses the home copy and tracks that source', async () => {
+    render(<LessonPlanPrompt classroomId="class-1" source="teacher_home" />);
+    expect(await screen.findByRole('heading', { name: `${K}.homeTitle` })).toBeInTheDocument();
+    expect(screen.getByText(`${K}.homeBody`)).toBeInTheDocument();
+    expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'teacher_home' });
+  });
+
   it('Given the teacher taps tomorrow at 9, When the save succeeds, Then posts tomorrow 9:00 with the browser timezone, says when the email comes and tracks it', async () => {
     const at = defaultLessonAt(new Date());
     postMock.mockResolvedValue(okResponse(at.toISOString()));

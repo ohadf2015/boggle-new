@@ -21487,7 +21487,9 @@ const en = {
         "tooSoon": "Pick a time at least 30 minutes from now.",
         "tooFar": "Pick a time within the next 60 days.",
         "setupTitle": "When is your next lesson with this class?",
-        "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class."
+        "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class.",
+        "homeTitle": "When is your next lesson with this class?",
+        "homeBody": "Tell us and we'll email you the join code and the game an hour before, so you can open it in class."
       },
       "keepOpen": {
         "cta": "Keep it open as homework for a week",
