@@ -27,7 +27,7 @@ export interface RoundReportRow {
   studentId: string;
   name: string;
   score: number;
-  accuracyPct: number;
+  accuracyPct: number | null;
   cells: { word: string; state: RoundCellState }[];
 }
 
@@ -64,7 +64,7 @@ export function sortRoundRows(rows: RoundReportRow[], key: RoundSortKey): RoundR
   const byName = (a: RoundReportRow, b: RoundReportRow) => a.name.localeCompare(b.name);
   const compare: Record<RoundSortKey, (a: RoundReportRow, b: RoundReportRow) => number> = {
     score: (a, b) => b.score - a.score || byName(a, b),
-    accuracy: (a, b) => a.accuracyPct - b.accuracyPct || byName(a, b),
+    accuracy: (a, b) => (a.accuracyPct ?? -1) - (b.accuracyPct ?? -1) || byName(a, b),
     name: byName,
   };
   return [...rows].sort(compare[key]);

@@ -54,6 +54,7 @@ export function reteachVerdict(summary: ClassroomSummary): { kind: ReteachVerdic
   if (!summary.totalWords || studentNames(summary).length === 0) return { kind: 'none', words: [] };
   if (struggled.length === 0) return { kind: 'allFound', words: [] };
   if (struggled.length >= summary.totalWords) {
+    if (struggled.every((word) => word.notOnBoard)) return { kind: 'none', words: [] };
     return studentNames(summary).length < 2 ? { kind: 'none', words: [] } : { kind: 'wholeLesson', words: [] };
   }
   return { kind: 'replay', words: struggled };

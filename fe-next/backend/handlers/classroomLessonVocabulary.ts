@@ -119,6 +119,12 @@ export function restrictToAsked(vocab: LessonVocabulary, askedKeys: Set<string> 
   return { language: vocab.language, words };
 }
 
+/** Keep only the words a round really offered. Unlike the asked set, an empty result is a real answer. */
+export function restrictToOffered(vocab: LessonVocabulary, offeredWords: readonly string[]): LessonVocabulary {
+  const offered = new Set(offeredWords.map((word) => keyOf(word, vocab.language)));
+  return { language: vocab.language, words: new Map([...vocab.words].filter(([key]) => offered.has(key))) };
+}
+
 /** Split a lesson's words into found / missed (display form) for one player. */
 export function splitLessonWords(vocab: LessonVocabulary, foundKeys: Set<string>) {
   const found: string[] = [];

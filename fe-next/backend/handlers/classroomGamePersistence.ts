@@ -39,6 +39,7 @@ import {
   keyOf,
   loadLessonVocabulary,
   restrictToAsked,
+  restrictToOffered,
   splitLessonWords,
   upsertLessonProgress,
   type LessonVocabulary,
@@ -73,12 +74,12 @@ export interface ClassroomSessionResults {
   /**
    * The lesson words this game actually PUT IN FRONT of the student.
    *
-   * Absent for board modes, where the whole lesson is on the grid and every
-   * word really was attemptable. Present for a quiz, which asks a fixed number
-   * of questions from a possibly much longer list — without it, every unasked
-   * word lands in the teacher's "reteach these" column.
+   * Quiz only: its presence is what makes a row word-mastery evidence. Without
+   * it, every unasked word lands in the teacher's "reteach these" column.
    */
   lessonWordsAsked?: string[];
+  /** Lesson words a non-quiz round offered. Empty: none. Absent: older row or unknown. */
+  lessonWordsOffered?: string[];
   /** Per-question detail, when the mode has it. Quiz only today. */
   answers?: QuestionAnswer[];
   durationSeconds?: number;
@@ -102,6 +103,8 @@ export interface PersistClassroomOptions {
    * behaviour of treating every lesson word as attempted.
    */
   askedWords?: string[];
+  /** Lesson words the round offered. Empty means none; omit when unknown to count the whole lesson. */
+  offeredWords?: string[];
   /** Per-student per-question answers, keyed by Supabase auth id. */
   answersByUser?: Record<string, QuestionAnswer[]>;
   /** When this round began; `game.startedAt` is the first round of the room. */
@@ -283,7 +286,12 @@ export async function persistClassroomGameScores(
   const askedKeys = options.askedWords && options.askedWords.length > 0
     ? new Set(options.askedWords.map((w) => keyOf(w, unionLanguage)))
     : null;
-  const askedVocab = restrictToAsked(unionVocab, askedKeys);
+  const { offeredWords } = options;
+  const roundVocab = (vocab: LessonVocabulary): LessonVocabulary => {
+    const asked = restrictToAsked(vocab, askedKeys);
+    return offeredWords ? restrictToOffered(asked, offeredWords) : asked;
+  };
+  const askedVocab = roundVocab(unionVocab);
 
   const roundStartMs = options.roundStartedAtMs ?? (game.startedAt ? new Date(game.startedAt).getTime() : undefined);
   const durationSeconds = roundStartMs !== undefined
@@ -327,6 +335,7 @@ export async function persistClassroomGameScores(
         // Only when we truly know — an absent field tells the report to keep
         // its "may include unasked words" caveat for older rows.
         ...(askedKeys ? { lessonWordsAsked: [...askedVocab.words.values()] } : {}),
+        ...(offeredWords ? { lessonWordsOffered: [...askedVocab.words.values()] } : {}),
         ...(options.answersByUser?.[player.userId]
           ? { answers: options.answersByUser[player.userId] }
           : {}),
@@ -371,7 +380,7 @@ export async function persistClassroomGameScores(
         if (!lessonVocab || lessonVocab.words.size === 0) continue;
         // Unasked words get no words_attempted entry at all — "not attempted",
         // never "missed". That distinction is the whole point of the asked set.
-        const vocab = restrictToAsked(lessonVocab, askedKeys);
+        const vocab = roundVocab(lessonVocab);
         if (vocab.words.size === 0) continue;
         try {
           await retryDbWrite(() => upsertLessonProgress(supabase, player.userId, lessonId, vocab, foundKeys, now));

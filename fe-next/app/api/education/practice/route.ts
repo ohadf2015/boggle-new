@@ -11,6 +11,7 @@ import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
 import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
 import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
+import { practiceWordCounts } from '@/lib/education/practiceWordCounts';
 import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
 import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
 
@@ -378,6 +379,8 @@ export async function PATCH(request: NextRequest) {
 
       // Always write server-calculated XP (even if 0) to prevent client value sticking (B7 fix)
       updateObj.xp_awarded = serverCalculatedXp;
+      // After scoring: client-reported counts belong on the report, not in the XP input.
+      Object.assign(updateObj, practiceWordCounts(updateData));
     }
 
     // PERF: the session write and the two XP RPCs write to three independent

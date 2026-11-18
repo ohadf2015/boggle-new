@@ -70,6 +70,18 @@ describe('mostMissedWords', () => {
   });
 });
 
+describe('a round that offered no lesson words', () => {
+  it('GIVEN every word was never placed WHEN the verdict is read THEN no replay is suggested', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: mastery({ Ada: [0, 0], Ben: [0, 0] }),
+      coverage: [{ word: 'membrane', foundBy: [] }, { word: 'enzyme', foundBy: [] }],
+      neverPlacedWords: ['membrane', 'enzyme'],
+    } as Partial<ClassroomSummary>);
+    expect(reteachVerdict(summary)).toEqual({ kind: 'none', words: [] });
+  });
+});
+
 describe('studentsUnderHalf', () => {
   it('given a class, when some found under half the lesson, then it counts them without naming anyone', () => {
     const summary = summaryOf({ masteryByPlayer: mastery({ Ada: [3, 4], Ben: [1, 4], Cy: [2, 4], Dee: [0, 4] }) });

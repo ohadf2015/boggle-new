@@ -83,7 +83,7 @@ export function RoundStudentsTab({ report, sortId, onStudentClick }: RoundStuden
                   </span>
                 ))}
               </span>
-              <span className={cn('text-end text-sm font-black tabular-nums', TONE_TEXT[accuracyTone(row.accuracyPct)])}><bdi dir="ltr">{row.accuracyPct}%</bdi></span>
+              <span className={cn('text-end text-sm font-black tabular-nums', row.accuracyPct === null ? 'text-neo-white/70' : TONE_TEXT[accuracyTone(row.accuracyPct)])}><bdi dir="ltr">{row.accuracyPct === null ? '—' : `${row.accuracyPct}%`}</bdi></span>
               <span className="text-end text-sm font-black tabular-nums text-neo-white"><bdi dir="ltr">{row.score}</bdi></span>
             </>
           );

@@ -69,6 +69,14 @@ describe('<ClassroomCardActivity>', () => {
     expect(screen.getByTestId('classroom-card-last')).toHaveTextContent('teacher.pulse.state.neverPlayed');
   });
 
+  it('Given a last round that offered no lesson words, Then the line shows no accuracy number', () => {
+    pulse.mockReturnValue({ pulse: { ...base, averageAccuracyPct: null }, isLoading: false, error: null, refresh: vi.fn() });
+    render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
+    const line = screen.getByTestId('classroom-card-last').textContent;
+    expect(line).toContain('teacher.pulse.lastPlayedNoScoreDays');
+    expect(line).not.toContain('accuracy');
+  });
+
   it('Given the read is still open, Then it claims nothing yet', () => {
     pulse.mockReturnValue({ pulse: { ...base, state: 'neverPlayed' }, isLoading: true, error: null, refresh: vi.fn() });
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
