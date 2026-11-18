@@ -287,7 +287,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 /**
  * Daily Challenge page route
  * Same puzzle for everyone worldwide each day
- * Shareable emoji results like Wordle
+ * Shareable results
  *
  * useSearchParams is isolated behind nested empty Suspense inside the client
  * hub (DailyRedirect / DailyChallengeLanding). A page-level PageLoader

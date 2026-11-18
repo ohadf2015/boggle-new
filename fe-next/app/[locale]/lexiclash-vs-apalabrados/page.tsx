@@ -187,7 +187,7 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
                     <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Lo Que LexiClash Ofrece Que Apalabrados No</h2>
                     <div className="grid gap-4 sm:grid-cols-2">
                         {[
-                            { title: 'Desafío Diario Estilo Wordle', desc: 'Word Hunt Survival y Daily Buzz — puzles diarios globales con resultados emoji compartibles y seguimiento de rachas. Apalabrados no tiene formato diario equivalente.' },
+                            { title: 'Desafío Diario Estilo Wordle', desc: 'Word Hunt Survival y Daily Buzz — puzles diarios globales con resultados para compartir y seguimiento de rachas. Apalabrados no tiene formato diario equivalente.' },
                             { title: 'Multijugador Para 20+ Personas', desc: 'Crea una sala, comparte el código, mete a toda la clase o toda la fiesta a la vez en la misma cuadrícula. Apalabrados se limita a 1 contra 1.' },
                             { title: 'Modo Aula Para Profesores', desc: 'Listas de vocabulario propias del programa, duelos léxicos, panel docente con progreso. Completamente gratis sin registro de alumnos. No existe en Apalabrados.' },
                             { title: 'Brain Drills (6 Minijuegos)', desc: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Ejercicios cognitivos rápidos — no están en Apalabrados.' },

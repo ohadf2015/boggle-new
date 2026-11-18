@@ -74,7 +74,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'What is Word Hunt?',
         answer:
-          'Word Hunt is a daily word-search puzzle: you have 10 attempts to find the hidden word on the board. All players worldwide get the same board at midnight UTC. Share emoji results like Wordle. Play free on LexiClash — no download, no signup.',
+          'Word Hunt is a daily word-search puzzle: you have 10 attempts to find the hidden word on the board. All players worldwide get the same board at midnight UTC. Share your result with friends. Play free on LexiClash — no download, no signup.',
       },
       {
         question: 'What are the best free online word games in 2026?',
@@ -133,7 +133,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'Что такое Word Hunt (Охота на Слова)?',
         answer:
-          'Word Hunt — ежедневный паззл поиска слов: у тебя есть 10 попыток найти скрытое слово на доске. Все игроки мира получают одну и ту же доску в полночь UTC. Делись результатами эмодзи как в Wordle. Играй бесплатно в LexiClash — без скачивания и регистрации.',
+          'Word Hunt — ежедневный паззл поиска слов: у тебя есть 10 попыток найти скрытое слово на доске. Все игроки мира получают одну и ту же доску в полночь UTC. Делись результатом с друзьями. Играй бесплатно в LexiClash — без скачивания и регистрации.',
       },
       {
         question: 'Какие лучшие бесплатные словесные игры онлайн в 2026?',
@@ -192,7 +192,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'מה זה Word Hunt (חיפוש מילים)?',
         answer:
-          'Word Hunt הוא פאזל חיפוש מילים יומי: יש לכם 10 ניסיונות למצוא את המילה המוסתרת בלוח. כל העולם מקבל את אותו הלוח בחצות UTC. שתפו תוצאות אימוג\'י כמו Wordle. שחקו חינם בלקסיקלאש — ללא הורדה, ללא הרשמה.',
+          'Word Hunt הוא פאזל חיפוש מילים יומי: יש לכם 10 ניסיונות למצוא את המילה המוסתרת בלוח. כל העולם מקבל את אותו הלוח בחצות UTC. שתפו את התוצאה עם חברים. שחקו חינם בלקסיקלאש — ללא הורדה, ללא הרשמה.',
       },
       {
         question: 'מה הם משחקי המילים הטובים ביותר אונליין ב-2026?',
@@ -232,7 +232,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'Vad är Word Hunt (Ordjakt)?',
         answer:
-          'Word Hunt är ett dagligt ordpussel: du har 10 försök att hitta det dolda ordet på brädet. Alla spelare världen över får samma bräde vid midnatt UTC. Dela emoji-resultat som Wordle. Spela gratis på LexiClash — ingen nedladdning, ingen registrering.',
+          'Word Hunt är ett dagligt ordpussel: du har 10 försök att hitta det dolda ordet på brädet. Alla spelare världen över får samma bräde vid midnatt UTC. Dela ditt resultat med vänner. Spela gratis på LexiClash — ingen nedladdning, ingen registrering.',
       },
       {
         question: 'Vilka är de bästa gratis ordspelen online 2026?',
@@ -272,7 +272,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'ワードハントとは？',
         answer:
-          'ワードハントは毎日のワードサーチパズルです。10回の試行で隠された単語を見つけます。全プレイヤーが世界中でUTC午前0時に同じボードを受け取ります。Wordleのように絵文字で結果を共有できます。LexiClashで無料でプレイ — ダウンロード・登録不要。',
+          'ワードハントは毎日のワードサーチパズルです。10回の試行で隠された単語を見つけます。全プレイヤーが世界中でUTC午前0時に同じボードを受け取ります。結果を友達とシェアできます。LexiClashで無料でプレイ — ダウンロード・登録不要。',
       },
       {
         question: '2026年のおすすめ無料オンラインワードゲームは？',
@@ -317,7 +317,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: '¿Qué es Word Hunt (Caza de Palabras)?',
         answer:
-          'Word Hunt es un puzzle diario de búsqueda de palabras: tienes 10 intentos para encontrar la palabra oculta en el tablero. Todos los jugadores del mundo reciben el mismo tablero a medianoche UTC. Comparte resultados emoji como Wordle. Juega gratis en LexiClash — sin descargas, sin registro.',
+          'Word Hunt es un puzzle diario de búsqueda de palabras: tienes 10 intentos para encontrar la palabra oculta en el tablero. Todos los jugadores del mundo reciben el mismo tablero a medianoche UTC. Comparte tu resultado con amigos. Juega gratis en LexiClash — sin descargas, sin registro.',
       },
       {
         question: '¿Cuáles son los mejores juegos de palabras gratuitos en línea en 2026?',

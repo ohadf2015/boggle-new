@@ -55,7 +55,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "daily": {
         "title": "Daily Word Wheel & Word Puzzle - Free Challenge Like Wordle",
-        "description": "Play the daily word wheel — same puzzle for everyone worldwide. Share emoji results like Wordle, track streaks, and chase the world record. Free!",
+        "description": "Play the daily word wheel — same puzzle for everyone worldwide. Share your result, track streaks, and chase the world record. Free!",
         "ogTitle": "Daily Word Wheel Challenge - Same Puzzle Worldwide",
         "ogDescription": "Daily word wheel puzzle challenge - same board for everyone worldwide. Share your results and compete globally!"
       },
@@ -277,7 +277,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "daily": {
         "title": "Daglig Ordutmaning - Samma Pussel Världen Över",
-        "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela dina emoji-resultat som Wordle. Tävla globalt och följ dina dagliga serier.",
+        "description": "Spela LexiClash dagliga utmaning! Samma pussel för alla världen över varje dag. Dela ditt resultat med vänner. Tävla globalt och följ dina dagliga serier.",
         "ogTitle": "Daglig Utmaning - Samma Pussel Världen Över",
         "ogDescription": "Dagligt ordpussel - samma bräda för alla världen över. Dela dina resultat och tävla globalt!"
       },
@@ -388,7 +388,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "daily": {
         "title": "デイリーワードホイール＆ワードチャレンジ - 世界記録に挑戦",
-        "description": "LexiClashデイリーワードホイールチャレンジをプレイ！毎日同じパズルが世界中で出題。世界記録に挑戦しよう！ワードホイールで単語を見つけ、Wordleのように絵文字で結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
+        "description": "LexiClashデイリーワードホイールチャレンジをプレイ！毎日同じパズルが世界中で出題。世界記録に挑戦しよう！ワードホイールで単語を見つけ、結果をシェア。グローバルで競い合い、連続記録を追跡しよう。",
         "ogTitle": "デイリーワードホイール - 世界記録に挑戦",
         "ogDescription": "毎日のワードホイールチャレンジ - 世界中で同じボード。世界記録に挑戦して結果をシェア！"
       },
@@ -610,7 +610,7 @@ export const layoutTranslations: Record<string, any> = {
       },
       "daily": {
         "title": "Ежедневное колесо слов и словесная головоломка — бесплатное испытание как Wordle",
-        "description": "Играй в ежедневное испытание LexiClash Word Wheel! Одна головоломка для всех по всему миру каждый день. Найди слова из ежедневного колеса, делись результатами эмодзи как в Wordle. Соревнуйся глобально, отслеживай свои ежедневные серии и борись за мировой рекорд!",
+        "description": "Играй в ежедневное испытание LexiClash Word Wheel! Одна головоломка для всех по всему миру каждый день. Найди слова из ежедневного колеса, делись результатом с друзьями. Соревнуйся глобально, отслеживай свои ежедневные серии и борись за мировой рекорд!",
         "ogTitle": "Ежедневное испытание колеса слов — одна головоломка для всех",
         "ogDescription": "Ежедневная словесная головоломка — одно поле для всех по всему миру. Делись результатами и соревнуйся глобально!"
       },

@@ -3449,7 +3449,7 @@ const es = {
     },
     "daily": {
       "title": "Rueda & Caza de Palabras Diaria — Gratis | LexiClash",
-      "description": "Rueda & Caza de Palabras diarias gratis — mismo tablero mundial, 10 intentos, comparte emoji. Nuevo puzzle cada día, sin registro.",
+      "description": "Rueda & Caza de Palabras diarias gratis — mismo tablero mundial, 10 intentos, comparte tu resultado. Nuevo puzzle cada día, sin registro.",
       "ogTitle": "Palabra del Día — Puzzle Diario Gratis",
       "ogDescription": "Palabra del Día: Caza + Rueda de Palabras. Mismo puzzle mundial, comparte resultados, construye una racha diaria. Gratis, sin registro."
     },
