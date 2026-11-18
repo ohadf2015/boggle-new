@@ -54,7 +54,7 @@ import JoinFlow from '../JoinFlow';
 const codeField = () => screen.getByLabelText('education.student.join.codeLabel');
 const typeCode = (value: string) => fireEvent.change(codeField(), { target: { value } });
 const onNameStep = () => screen.queryByLabelText('education.student.join.nameLabel') !== null;
-const nextButton = () => screen.getByRole('button', { name: /education\.student\.join\.flow\.next/ });
+const submitCode = () => fireEvent.submit(screen.getByTestId('join-code-step'));
 const changeCodeButton = () =>
   screen.getByRole('button', { name: /education\.student\.join\.flow\.changeCode/ });
 
@@ -74,10 +74,10 @@ describe('<JoinFlow> — a code already known to be wrong', () => {
     mockResolve.mockResolvedValue({ verdict: 'invalid' });
   });
 
-  it('GIVEN the verdict is in WHEN the student presses NEXT again THEN they stay on the code step', async () => {
+  it('GIVEN the verdict is in WHEN the student submits it again THEN they stay on the code step', async () => {
     await backOnTheCodeStepWithARejectedCode();
 
-    fireEvent.click(nextButton());
+    submitCode();
 
     expect(onNameStep()).toBe(false);
   });
@@ -85,7 +85,7 @@ describe('<JoinFlow> — a code already known to be wrong', () => {
   it('GIVEN they stay THEN the reason is still on screen, not scrolled past', async () => {
     await backOnTheCodeStepWithARejectedCode();
 
-    fireEvent.click(nextButton());
+    submitCode();
 
     expect(screen.getByRole('alert')).toHaveTextContent('education.student.join.invalidCode');
   });
@@ -98,7 +98,7 @@ describe('<JoinFlow> — a code already known to be wrong', () => {
     await screen.findByRole('alert');
     if (onNameStep()) fireEvent.click(changeCodeButton());
 
-    fireEvent.click(nextButton());
+    submitCode();
 
     expect(onNameStep()).toBe(false);
   });
@@ -135,7 +135,7 @@ describe('<JoinFlow> — a verdict we do NOT have does not gate anything', () =>
     render(<JoinFlow initialCode="P45KRT" />);
     fireEvent.click(changeCodeButton());
 
-    fireEvent.click(nextButton());
+    submitCode();
 
     expect(onNameStep()).toBe(true);
   });

@@ -373,6 +373,7 @@ export async function calculateAndBroadcastFinalScores(
       const rewards = await persistClassroomGameScores(
         classroomGame,
         playerScoresFromGameResults(resultsWithIconAchievements, roomUsers, gameCode),
+        { roundStartedAtMs: game.gameStartedAt },
       );
       io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
     } catch (err) {

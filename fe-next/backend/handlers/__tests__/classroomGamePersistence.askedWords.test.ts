@@ -205,3 +205,16 @@ describe('a quiz that asked only some of the lesson', () => {
     expect(attemptedKeys()).toHaveLength(6);
   });
 });
+
+describe('round length', () => {
+  it('GIVEN a room open for 20 minutes WHEN a 3 minute round ends THEN the session records the round, not the room', async () => {
+    const now = Date.now();
+    await persistClassroomGameScores(
+      { ...game('classic'), startedAt: new Date(now - 20 * 60_000).toISOString() },
+      scores,
+      { roundStartedAtMs: now - 3 * 60_000 },
+    );
+    expect(sessionInserts[0].duration_seconds).toBeGreaterThanOrEqual(180);
+    expect(sessionInserts[0].duration_seconds).toBeLessThan(200);
+  });
+});

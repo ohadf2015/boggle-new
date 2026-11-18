@@ -104,6 +104,8 @@ export interface PersistClassroomOptions {
   askedWords?: string[];
   /** Per-student per-question answers, keyed by Supabase auth id. */
   answersByUser?: Record<string, QuestionAnswer[]>;
+  /** When this round began; `game.startedAt` is the first round of the room. */
+  roundStartedAtMs?: number;
 }
 
 /**
@@ -283,8 +285,9 @@ export async function persistClassroomGameScores(
     : null;
   const askedVocab = restrictToAsked(unionVocab, askedKeys);
 
-  const durationSeconds = game.startedAt
-    ? Math.max(0, Math.round((Date.now() - new Date(game.startedAt).getTime()) / 1000))
+  const roundStartMs = options.roundStartedAtMs ?? (game.startedAt ? new Date(game.startedAt).getTime() : undefined);
+  const durationSeconds = roundStartMs !== undefined
+    ? Math.max(0, Math.round((Date.now() - roundStartMs) / 1000))
     : undefined;
 
   for (const player of participants) {
@@ -411,9 +414,7 @@ export async function persistClassroomGameScores(
   if (sessionsWritten > 0) {
     await recordClassroomRound(game, {
       playerIds: participants.map((p) => p.userId),
-      durationSeconds: game.startedAt
-        ? Math.max(0, Math.round((Date.now() - new Date(game.startedAt).getTime()) / 1000))
-        : null,
+      durationSeconds: durationSeconds ?? null,
       startedAt: game.startedAt ? new Date(game.startedAt) : null,
     });
   }
