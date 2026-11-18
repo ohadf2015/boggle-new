@@ -3365,7 +3365,10 @@ const ja = {
     "perkReminders": "連続記録が途切れないようにリマインド",
     "menuLabel": "アプリを入手",
     "pillLabel": "アプリを入手",
-    "pillClose": "アプリのバナーを隠す"
+    "pillClose": "アプリのバナーを隠す",
+    "qrTitle": "スマホでスキャンしてインストール",
+    "qrHint": "Android のカメラをここに向けると、Google Play の LexiClash が開きます。",
+    "qrAlt": "Google Play の LexiClash を開く QR コード"
   },
   "name": "日本語",
   "direction": "ltr",

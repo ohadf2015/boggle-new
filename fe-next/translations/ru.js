@@ -14247,7 +14247,10 @@ const ru = {
     "perkReminders": "Напоминания о серии, чтобы не потерять её",
     "menuLabel": "Получить приложение",
     "pillLabel": "Получить приложение",
-    "pillClose": "Скрыть баннер приложения"
+    "pillClose": "Скрыть баннер приложения",
+    "qrTitle": "Отсканируй и установи на телефон",
+    "qrHint": "Наведи сюда камеру Android, и LexiClash откроется в Google Play.",
+    "qrAlt": "QR-код, который открывает LexiClash в Google Play"
   },
   "ads": {
     "thanks": {

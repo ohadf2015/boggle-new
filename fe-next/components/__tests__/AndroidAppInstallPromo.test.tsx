@@ -128,6 +128,32 @@ describe('AndroidAppInstallPromo', () => {
     expect(localStorage.getItem('android_app_install_promo_dismissed_until')).toBeTruthy();
   });
 
+  describe('install route by device', () => {
+    const setDesktop = (desktop: boolean) => {
+      vi.stubGlobal('matchMedia', (query: string) => ({ matches: desktop, media: query, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    };
+    afterEach(() => vi.unstubAllGlobals());
+
+    it('offers a QR code that opens the Play listing on desktop', () => {
+      setDesktop(true);
+      render(<AndroidAppInstallPromo />);
+      act(() => useAndroidInstallStore.getState().openPromo('menu'));
+      const qr = screen.getByRole('img', { name: 'androidAppPromo.qrAlt' });
+      expect(qr.getAttribute('data-qr-value')).toContain('id=live.lexiclash.app');
+      expect(qr.getAttribute('data-qr-value')).toContain('install_qr');
+      expect(screen.getByText('androidAppPromo.qrTitle')).toBeInTheDocument();
+      expect(screen.getByText('androidAppPromo.install')).toBeInTheDocument();
+    });
+
+    it('keeps the QR code off phones, where the store button is the route', () => {
+      setDesktop(false);
+      render(<AndroidAppInstallPromo />);
+      act(() => useAndroidInstallStore.getState().openPromo('menu'));
+      expect(screen.getByText('androidAppPromo.install')).toBeInTheDocument();
+      expect(screen.queryByText('androidAppPromo.qrTitle')).not.toBeInTheDocument();
+    });
+  });
+
   it('records a 14-day dismissal and collapses to the session pill on "not now"', async () => {
     render(<AndroidAppInstallPromo />);
     await act(async () => {

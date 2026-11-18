@@ -162,6 +162,9 @@ describe('AndroidInstallPill', () => {
     expect(bar.className).toContain('bottom-[calc(var(--bottom-stack-height)+0.75rem)]');
     expect(bar.className).toContain('md:top-1/2');
     expect(bar.className).not.toMatch(/(^|\s)top-1\/2/);
+    // On desktop it is a slim vertical tab, narrow enough for the page margin.
+    expect(bar.className).toContain('md:flex-col');
+    expect(screen.getByText('androidAppPromo.pillLabel').className).toContain('md:[writing-mode:vertical-rl]');
   });
 
   it('reopens the promo tagged as a pill re-entry when tapped', () => {

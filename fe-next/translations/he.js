@@ -3365,7 +3365,10 @@ const he = {
     "perkReminders": "תזכורות כדי לא לאבד את הרצף",
     "menuLabel": "הורדת האפליקציה",
     "pillLabel": "הורדת האפליקציה",
-    "pillClose": "הסתרת באנר האפליקציה"
+    "pillClose": "הסתרת באנר האפליקציה",
+    "qrTitle": "סרקו והתקינו בטלפון",
+    "qrHint": "כוונו לכאן את מצלמת האנדרואיד, והיא תפתח את LexiClash ב‑Google Play.",
+    "qrAlt": "קוד QR שפותח את LexiClash ב‑Google Play"
   },
   "name": "עברית",
   "direction": "rtl",

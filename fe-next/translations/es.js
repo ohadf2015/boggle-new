@@ -3364,7 +3364,10 @@ const es = {
     "perkReminders": "Recordatorios para no perder tu racha",
     "menuLabel": "Descargar la app",
     "pillLabel": "Descargar la app",
-    "pillClose": "Ocultar el banner de la app"
+    "pillClose": "Ocultar el banner de la app",
+    "qrTitle": "Escanea e instala en tu móvil",
+    "qrHint": "Apunta aquí con la cámara de tu Android y se abrirá LexiClash en Google Play.",
+    "qrAlt": "Código QR que abre LexiClash en Google Play"
   },
   "name": "Español",
   "direction": "ltr",
