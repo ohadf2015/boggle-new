@@ -15,6 +15,7 @@ import { FirstGameWords, PlayNowButton } from '@/components/teacher/setup/FirstG
 import { readPasted } from '@/components/teacher/setup/firstGameLaunch';
 import { packsForLanguage } from '@/components/teacher/setup/starterPackPick';
 import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
+import { NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -70,6 +71,7 @@ export default function ClassReadyPreview() {
               t={t}
             />
           }
+          rehearse={<button type="button" onClick={() => toast('Preview: bots')} className={NB_PRIMARY}>{t('eduShell.home.practice.cta')}</button>}
           play={<PlayNowButton onClick={() => toast('Preview: play now')} t={t} />}
           t={t}
         />
