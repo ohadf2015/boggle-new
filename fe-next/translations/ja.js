@@ -22629,6 +22629,7 @@ const ja = {
       "studentsOne": "生徒 1人",
       "classPage": "クラスページ",
       "notPlayedRecently": "30日間プレイなし",
+      "noGamesYet": "まだプレイなし",
       "roster": {
         "hide": "生徒リストを閉じる",
         "seeAll": "生徒全員を見る（{count}人）",

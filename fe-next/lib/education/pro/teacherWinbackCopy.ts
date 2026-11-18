@@ -50,8 +50,9 @@ const COPY: Record<string, Omit<TeacherWinbackCopy, 'dir'>> = {
   },
 };
 
-export function teacherWinbackCopy(locale: string): TeacherWinbackCopy {
+export function teacherWinbackCopy(locale: string, opts: { hasClass?: boolean } = {}): TeacherWinbackCopy {
   const base = trialCopyBase(locale);
   const row = COPY[base] ?? COPY.en;
-  return { ...row, dir: TRIAL_COPY_RTL.has(base) ? 'rtl' : undefined };
+  const title = opts.hasClass ? row.title.split(' — ')[0] : row.title;
+  return { ...row, title, dir: TRIAL_COPY_RTL.has(base) ? 'rtl' : undefined };
 }

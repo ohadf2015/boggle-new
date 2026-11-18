@@ -15,6 +15,7 @@ import { TeacherTrialEndingCard } from '@/components/teacher/TeacherTrialEndingC
 import { PendingCheckoutBanner } from '@/components/teacher/PendingCheckoutBanner';
 import { PaymentFailedBanner } from '@/components/teacher/PaymentFailedBanner';
 import { useTeacherBanner } from '@/components/teacher/home/useTeacherBanner';
+import { useClassrooms } from '@/hooks/useClassroom';
 import type { TeacherBillingBanner } from '@/components/teacher/home/teacherBannerSelect';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -40,6 +41,7 @@ function TeacherDashboardInner() {
   const { user } = useAuth();
   const { hasPro, loading: proLoading, status } = useTeacherPro();
   const b = useTeacherBanner();
+  const classroomsState = useClassrooms();
   const banner = b.selection.kind === 'show' ? b.selection.banner : null;
 
   useEffect(() => {
@@ -56,7 +58,7 @@ function TeacherDashboardInner() {
 
   return (
     <TeacherDashboard
-      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : banner === 'winback' ? <TeacherWinbackBanner approved={b.approved} onDismiss={b.dismissWinback} /> : undefined}
+      alert={banner === 'paymentFailed' ? <PaymentFailedBanner portalUrl={b.portalUrl} stillPro={b.hasPro} /> : banner === 'winback' ? <TeacherWinbackBanner approved={b.approved} hasClass={classroomsState.isLoading === true || (classroomsState.classrooms?.length ?? 0) > 0} onDismiss={b.dismissWinback} /> : undefined}
       banner={banner ? accountBanner(banner, b) : undefined}
     />
   );

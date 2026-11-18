@@ -22641,6 +22641,7 @@ const es = {
       "studentsOne": "1 alumno",
       "classPage": "Página de la clase",
       "notPlayedRecently": "Sin partidas en 30 días",
+      "noGamesYet": "Aún sin partidas",
       "roster": {
         "hide": "Ocultar la lista de alumnos",
         "seeAll": "Ver todos los alumnos ({count})",

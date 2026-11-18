@@ -133,10 +133,9 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
     if (shown.current) return;
     shown.current = true;
     document.getElementById('setup-ready-title')?.focus({ preventScroll: true });
-    markInviteCopied();
     trackEduJoinCodeShown({ classroomId: classroom.id });
     trackFirstRoundGuideShown({ surface: 'class_ready', locale: language });
-  }, [markInviteCopied, classroom.id, language]);
+  }, [classroom.id, language]);
 
   const lastCount = useRef<number | null>(null);
   useEffect(() => {
@@ -155,7 +154,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
     if (roster.arrivals.length > 0) playPlayerJoinedSound?.();
   }, [roster.arrivals, playPlayerJoinedSound]);
 
-  const share = useInviteShare(classroom, t);
+  const share = useInviteShare(classroom, t, markInviteCopied);
 
   const joinLocale = inviteLocale(classroom.language, language);
   const joinUrl = origin ? classroomJoinUrl(origin, joinLocale, classroom.join_code) : '';

@@ -22629,6 +22629,7 @@ const sv = {
       "studentsOne": "1 elev",
       "classPage": "Klassens sida",
       "notPlayedRecently": "Inga spel på 30 dagar",
+      "noGamesYet": "Inga spel än",
       "roster": {
         "hide": "Dölj elevlistan",
         "seeAll": "Visa alla elever ({count})",
