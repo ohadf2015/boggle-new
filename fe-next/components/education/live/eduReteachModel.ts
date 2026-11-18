@@ -53,7 +53,9 @@ export function reteachVerdict(summary: ClassroomSummary): { kind: ReteachVerdic
   const struggled = mostMissedWords(summary);
   if (!summary.totalWords || studentNames(summary).length === 0) return { kind: 'none', words: [] };
   if (struggled.length === 0) return { kind: 'allFound', words: [] };
-  if (struggled.length >= summary.totalWords) return { kind: 'wholeLesson', words: [] };
+  if (struggled.length >= summary.totalWords) {
+    return studentNames(summary).length < 2 ? { kind: 'none', words: [] } : { kind: 'wholeLesson', words: [] };
+  }
   return { kind: 'replay', words: struggled };
 }
 

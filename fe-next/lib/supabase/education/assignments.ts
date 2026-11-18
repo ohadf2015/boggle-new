@@ -344,7 +344,8 @@ export async function getClassroomAssignments(
     const { count: studentCount } = await supabase
       .from('classroom_memberships')
       .select('*', { count: 'exact', head: true })
-      .eq('classroom_id', classroomId);
+      .eq('classroom_id', classroomId)
+      .eq('is_rehearsal', false);
 
     // Get completion counts from student_lesson_progress (completed_at IS NOT NULL)
     const assignmentIds = assignments.map(a => a.id);

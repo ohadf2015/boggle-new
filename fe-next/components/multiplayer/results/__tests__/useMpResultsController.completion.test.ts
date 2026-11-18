@@ -94,6 +94,26 @@ describe('useMpResultsController — MP completion emit (t_d96d8d58)', () => {
     recordMpGame.mockClear();
   });
 
+  it('GIVEN a teacher previewing a class game with bots WHEN results mount THEN it is not recorded as their first game', async () => {
+    renderHook(() =>
+      useMpResultsController({
+        finalScores: [
+          { username: 'alice', score: 0, isHost: true },
+          { username: 'Word Pup Bot', score: 30, isBot: true },
+        ] as never,
+        classroomSummary: { teacherName: 'alice', totalWords: 4 } as never,
+        gameCode: 'ABCD',
+        username: 'alice',
+        socket: null,
+        isHost: true,
+        gameDuration: 90,
+      }),
+    );
+
+    await waitFor(() => expect(recordMpGame).toHaveBeenCalledWith('classic'));
+    expect(trackGameEnd).not.toHaveBeenCalled();
+  });
+
   it('calls trackGameEnd once with MP extras and roundId when results mount', async () => {
     renderHook(() =>
       useMpResultsController({

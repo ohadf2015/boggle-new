@@ -1,5 +1,6 @@
 'use client';
 
+import { isPracticeRound } from '@/components/education/results/isPracticeRound';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -159,6 +160,7 @@ export function useMpResultsController(props: MpResultsProps) {
     if (mpGameRecordedRef.current || !gameCode || !resolvedGameMode) return;
     mpGameRecordedRef.current = true;
     recordMpGame(resolvedGameMode);
+    if (isHost && classroomSummary && isPracticeRound(finalScores)) return;
 
     const score = currentPlayerData?.score ?? 0;
     const wordCount =
@@ -189,6 +191,7 @@ export function useMpResultsController(props: MpResultsProps) {
     gameSessionId,
     seriesRoundNumber,
     isHost,
+    classroomSummary,
     finalScores,
     playerCount,
     isCurrentUserWinner,
