@@ -1,16 +1,16 @@
-export interface BlitzRoundCounts {
+export interface PracticeRoundCounts {
   cardsReviewed?: number;
   cardsCorrect?: number;
 }
 
-export interface BlitzSessionColumns {
+export interface PracticeWordColumns {
   words_attempted?: number;
   words_correct?: number;
   accuracy?: number | null;
 }
 
-/** Blitz finishes with the shared card counts, but its row and XP are read from the word columns. */
-export function blitzSessionCounts({ cardsReviewed, cardsCorrect }: BlitzRoundCounts): BlitzSessionColumns {
+/** Report columns only. These counts are client-reported, so they must never feed XP. */
+export function practiceWordCounts({ cardsReviewed, cardsCorrect }: PracticeRoundCounts): PracticeWordColumns {
   if (cardsReviewed === undefined) return {};
   const attempted = Math.max(0, Math.floor(cardsReviewed));
   const correct = Math.min(attempted, Math.max(0, Math.floor(cardsCorrect ?? 0)));

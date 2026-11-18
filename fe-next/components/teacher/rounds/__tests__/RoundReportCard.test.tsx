@@ -141,6 +141,14 @@ describe('RoundReportCard', () => {
     expect(screen.queryByText('null%')).not.toBeInTheDocument();
   });
 
+  it('GIVEN a round with no average WHEN the stat renders THEN it is a plain dash with no danger tone', () => {
+    render(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, averageAccuracyPct: null }} hasPro />);
+    const stat = screen.getByTestId('round-report-accuracy');
+    expect(within(stat).getByText('—')).toBeInTheDocument();
+    expect(stat.textContent).not.toContain('%');
+    expect(stat.getAttribute('data-tone')).toBeNull();
+  });
+
   it('colours the accuracy stat by how well the class did, so a 0% never renders as a pale success colour', () => {
     const { rerender } = render(<RoundReportCard {...props} game={{ ...ROUND_FIXTURE, averageAccuracyPct: 0 }} hasPro />);
     expect(screen.getByTestId('round-report-accuracy').getAttribute('data-tone')).toBe('danger');

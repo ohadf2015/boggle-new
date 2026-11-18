@@ -17,6 +17,7 @@ function lastLine(t: T, pulse: ClassPulse, loading: boolean): string {
   if (loading) return t("teacher.pulse.state.loading");
   if (pulse.daysSinceLastGame === null)
     return t(`teacher.pulse.state.${pulse.state}`);
+  if (pulse.averageAccuracyPct === null) return "—";
   const key =
     pulse.daysSinceLastGame === 0
       ? "teacher.pulse.lastPlayedToday"
@@ -25,7 +26,7 @@ function lastLine(t: T, pulse: ClassPulse, loading: boolean): string {
         : "teacher.pulse.lastPlayedDays";
   return t(key, {
     days: pulse.daysSinceLastGame,
-    accuracy: pulse.averageAccuracyPct ?? '—',
+    accuracy: pulse.averageAccuracyPct,
   });
 }
 
