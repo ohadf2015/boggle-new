@@ -25,7 +25,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
   const { t } = useLanguage();
   const left = pyramidAttemptsLeft(state);
   return (
-    <header data-testid={testId} className={cn('flex flex-col gap-2 [@container(height<=36rem)]:gap-1', className)}>
+    <header data-testid={testId} className={cn('flex shrink-0 flex-col gap-2 [@container(height<=36rem)]:gap-1', className)}>
       {showTitle &&
         (daily ? (
           // pe-10: the global in-game mute button floats over the inline-end corner.

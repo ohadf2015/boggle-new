@@ -5,6 +5,7 @@ const h = vi.hoisted(() => ({
   subs: [] as unknown[],
   events: [] as unknown[],
   access: [] as unknown[],
+  eqs: [] as Array<[string, string]>,
   sendEmail: vi.fn(async () => ({ ok: true })),
   logSubscriptionEvent: vi.fn(async () => undefined),
   capture: vi.fn(),
@@ -14,7 +15,10 @@ const h = vi.hoisted(() => ({
 function chain(result: { data: unknown; error: null }) {
   const api = {
     select: () => api,
-    eq: () => api,
+    eq: (col: string, val: string) => {
+      h.eqs.push([col, val]);
+      return api;
+    },
     in: () => api,
     then: (resolve: (v: typeof result) => void, reject?: (e: unknown) => void) =>
       Promise.resolve(result).then(resolve, reject),
@@ -60,6 +64,7 @@ describe('teacher-pro-dunning cron', () => {
     h.subs = [];
     h.events = [];
     h.access = [];
+    h.eqs = [];
     h.sendEmail.mockResolvedValue({ ok: true });
   });
 
@@ -104,6 +109,9 @@ describe('teacher-pro-dunning cron', () => {
     expect(body.enqueued).toEqual([{ day: 5, subscriptionId: 'sub_123', userId: USER }]);
     expect(body.sent).toBe(0);
     expect(h.log).toHaveBeenCalledWith(`[Dunning] enqueued day-5 email subscription=sub_123 user=${USER}`);
+    expect(h.eqs).toContainEqual(['status', 'past_due']);
+    expect(h.eqs).toContainEqual(['tier', 'pro']);
+    expect(h.eqs.some(([, val]) => val === 'canceled' || val === 'cancelled')).toBe(false);
     expect(h.sendEmail).not.toHaveBeenCalled();
     expect(h.capture).not.toHaveBeenCalled();
   });

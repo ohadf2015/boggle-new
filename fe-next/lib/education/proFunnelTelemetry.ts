@@ -444,6 +444,8 @@ export function trackRecoveryClicked(args: { surface: 'payment_failed_banner' })
   safeCapture('recovery_cta_clicked', props);
 }
 
+export const trackRecoveryCtaClicked = trackRecoveryClicked;
+
 export type TeacherPlanGateShownArgs = {
   surface: 'classroom_create' | 'student_enroll';
   limit_type: 'classrooms' | 'students';

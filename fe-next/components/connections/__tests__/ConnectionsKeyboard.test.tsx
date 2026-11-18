@@ -30,19 +30,25 @@ describe('ConnectionsKeyboard', () => {
     expect(q.parentElement).not.toBe(a.parentElement);
   });
 
-  it('gives submit and backspace their own row under the letters, in the same place for every locale', () => {
+  it('puts backspace at the end of the last letter row and a full-width submit bar below, in every locale', () => {
     for (const locale of ['en', 'he', 'ru']) {
       const { unmount } = render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows(locale)} canSubmit />);
       const submit = screen.getByRole('button', { name: 'Submit' });
-      const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
-      const actions = screen.getByTestId('keyboard-actions');
-      expect(submit.parentElement).toBe(actions);
-      expect(backspaceKey.parentElement).toBe(actions);
-      expect(actions.querySelectorAll('button')).toHaveLength(2);
-      // Check on the start side, backspace at the end, like Wordle and a physical keyboard.
-      expect(actions.firstElementChild).toBe(submit);
-      expect(actions.lastElementChild).toBe(backspaceKey);
-      expect(actions.parentElement!.lastElementChild).toBe(actions);
+      const backspaceKey = screen.getByTestId('keyboard-backspace');
+      const dock = screen.getByTestId('keyboard-submit-dock');
+      const lastLetterRow = backspaceKey.parentElement!;
+      // Backspace is a last-row key, same height as the letters, not a tucked-under row.
+      expect(lastLetterRow.contains(backspaceKey)).toBe(true);
+      expect(lastLetterRow.lastElementChild).toBe(backspaceKey);
+      expect(backspaceKey.className).toMatch(/\bh-12\b/);
+      expect(screen.queryByTestId('keyboard-actions')).toBeNull();
+      expect(lastLetterRow.contains(submit)).toBe(false);
+      // Submit is a long, full-width bar pinned under the keyboard.
+      expect(dock.contains(submit)).toBe(true);
+      expect(submit.className).toMatch(/(?:^|\s)w-full(?:\s|$)/);
+      expect(dock.className).toMatch(/safe-area-inset-bottom/);
+      expect(dock.className).toMatch(/px-/);
+      expect(dock.parentElement!.lastElementChild).toBe(dock);
       unmount();
     }
   });
@@ -54,23 +60,39 @@ describe('ConnectionsKeyboard', () => {
     expect(label?.className).not.toMatch(/(^|\s)hidden(\s|$)/);
   });
 
-  it('makes the submit key the wider of the two action keys', () => {
-    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
-    const grow = (name: string) => Number(screen.getByRole('button', { name }).style.flexGrow);
-    expect(grow('Submit')).toBeGreaterThan(grow('Delete letter'));
+  it('makes the submit bar a full-width game button, disabled until there is a guess', () => {
+    const { rerender } = render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit={false} />);
+    const submit = screen.getByRole('button', { name: 'Submit' });
+    expect(submit.className).toMatch(/(?:^|\s)w-full(?:\s|$)/);
+    expect(submit.className).toContain('border-neo-black');
+    expect(submit.className).toContain('shadow-hard');
+    expect(submit.className).toContain('font-neo-display');
+    expect(submit).toHaveProperty('disabled', true);
+    rerender(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    expect(screen.getByRole('button', { name: 'Submit' })).toHaveProperty('disabled', false);
   });
 
-  it('gives every Hebrew letter key the same 8-column width', () => {
-    // Hebrew rows are 6/8/8. With the action keys on their own row the letters
-    // size off the longest row alone, so they are wider than when backspace had
-    // to share the top row (9.5 columns). jsdom does not compute flex-shrink, so
-    // the divisor is what this pins.
+  it('keeps English letters on a 10-column grid and makes backspace 1.5 keys wide', () => {
+    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    const letter = screen.getByRole('button', { name: 'Q' });
+    const backspace = screen.getByTestId('keyboard-backspace');
+    expect(letter.style.flexBasis).toBe(`calc(${(100 / 10).toFixed(4)}% - 0.25rem)`);
+    expect(backspace.style.flexBasis).toBe(`calc(${(150 / 10).toFixed(4)}% - 0.25rem)`);
+    expect(backspace.className).toMatch(/\bh-12\b/);
+  });
+
+  it('widens the Hebrew grid only enough for last-row backspace (9.5 columns)', () => {
+    // Hebrew rows are 6/8/8. Adding a 1.5-wide backspace to the last row needs
+    // 9.5 columns so the row does not overflow; letters stay equal width.
     render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('he')} canSubmit />);
     const firstRowKey = screen.getByRole('button', { name: 'ק' });
     const lastRowKey = screen.getByRole('button', { name: 'ת' });
-    const expected = `calc(${(100 / 8).toFixed(4)}% - 0.25rem)`;
+    const expected = `calc(${(100 / 9.5).toFixed(4)}% - 0.25rem)`;
     expect(firstRowKey.style.flexBasis).toBe(expected);
     expect(lastRowKey.style.flexBasis).toBe(expected);
+    expect(screen.getByTestId('keyboard-backspace').style.flexBasis).toBe(
+      `calc(${(150 / 9.5).toFixed(4)}% - 0.25rem)`,
+    );
   });
 
   it('renders the physical-layout keyboard left-to-right for Hebrew (ק top-left, not mirrored)', () => {

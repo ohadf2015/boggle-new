@@ -289,11 +289,20 @@ export function buildPaymentRecoveredEvent(userId: string, subscriptionId: strin
 }
 
 /** Grace-day dunning email actually left the queue. `day` is 1 or 5. */
-export function buildDunningEmailSentEvent(userId: string, day: number): EduServerEvent {
+export function buildDunningEmailSentEvent(
+  userId: string,
+  day: number,
+  subscriptionId?: string,
+): EduServerEvent {
   return {
     distinctId: userId,
     event: 'dunning_email_sent',
-    properties: { ...BASE, day, teacher_id: userId },
+    properties: {
+      ...BASE,
+      day,
+      ...(subscriptionId ? { subscription_id: subscriptionId } : {}),
+      teacher_id: userId,
+    },
   };
 }
 

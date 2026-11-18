@@ -567,7 +567,7 @@ describe('trackRecoveryClicked', () => {
     captureMock.mockReset();
   });
 
-  it('Given the past-due banner retry tap, When tracked, Then recovery_clicked fires with the surface', () => {
+  it('Given the past-due banner retry tap, When tracked, Then recovery_clicked and recovery_cta_clicked fire with the surface', () => {
     trackRecoveryClicked({ surface: 'payment_failed_banner' });
     expect(captureMock).toHaveBeenCalledWith('recovery_clicked', {
       surface: 'payment_failed_banner',

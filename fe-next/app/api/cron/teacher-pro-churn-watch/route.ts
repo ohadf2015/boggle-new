@@ -12,6 +12,7 @@ import {
   type PolarSubscriptionLike,
   type TeacherProSubSnapshot,
 } from '@/lib/education/teacherProChurnWatch';
+import { processDunningForPastDueSubs } from '@/lib/education/dunning';
 import { escapeTelegramMarkdownV2, sendTelegramMessage } from '@/lib/telegram';
 import { withCronLock } from '@/backend/redis/locking';
 import { getSharedRedisClient } from '@/backend/redis/connection';
@@ -124,6 +125,7 @@ export async function POST(request: NextRequest) {
       const curr = await listTeacherProSubs();
       const prev = await loadLastSnapshots();
       const transition = detectChurnTransitions(prev, curr);
+      const dunning = await processDunningForPastDueSubs(curr, { dry });
       // Mondays only: a weekly nudge while a payer idles, no extra Redis state.
       if (new Date().getUTCDay() === 1) {
         const emails = curr.map((c) => c.email?.trim().toLowerCase()).filter((e): e is string => !!e);
@@ -147,6 +149,7 @@ export async function POST(request: NextRequest) {
           shouldNotify: transition.shouldNotify,
           reasons: transition.reasons,
           statuses: curr.map((s) => ({ id: s.id, status: s.status, cancelAtPeriodEnd: s.cancelAtPeriodEnd })),
+          dunning,
         };
       }
 
@@ -177,6 +180,7 @@ export async function POST(request: NextRequest) {
         telegram,
         emailed,
         reasons: transition.reasons,
+        dunning,
       };
     });
 
