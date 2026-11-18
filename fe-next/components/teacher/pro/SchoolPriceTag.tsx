@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { SCHOOL_PRICING, schoolPriceLabel } from '@/lib/education/pro/schoolPricing';
+import { SCHOOL_PRICING, estimateSchoolAnnualUsd, schoolPriceLabel } from '@/lib/education/pro/schoolPricing';
 
 export function SchoolPriceTag({ className }: { className?: string }) {
   const { t } = useLanguage();
@@ -15,6 +15,12 @@ export function SchoolPriceTag({ className }: { className?: string }) {
       </p>
       <p data-testid="school-price-terms" className="mt-1.5 text-xs font-bold opacity-80">
         {t('eg2Pro.school.priceTerms', { min: SCHOOL_PRICING.minTeachers })}
+      </p>
+      <p data-testid="school-price-example" className="mt-1 text-xs font-bold opacity-80">
+        {t('eg2Pro.school.estimate', {
+          teachers: SCHOOL_PRICING.minTeachers,
+          total: `⁦$${estimateSchoolAnnualUsd(SCHOOL_PRICING.minTeachers)}⁩`,
+        })}
       </p>
     </div>
   );
