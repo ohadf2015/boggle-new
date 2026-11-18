@@ -115,6 +115,24 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
   // mounts can run before passive effects flush, and would read 'loading'.
   const phaseRef = useRef<HubPhase>('loading');
   phaseRef.current = phase;
+  // Same reason as phaseRef: the unmount cleanup below runs with []-deps and
+  // would otherwise read the first render's config (null).
+  const roundMetaRef = useRef<{ mode?: QuickMode; roundIndex: number }>({ roundIndex: 1 });
+  roundMetaRef.current = { mode: config?.mode, roundIndex };
+
+  // Leaving mid-round never reaches the adapter's onDone, so a board the player
+  // started but walked out of looked identical to one that never loaded. Its own
+  // event, never quick_play_round_completed: that one stays a real completion count.
+  // `submitting` matters because the phase stays 'playing' until handleDone's
+  // submit + rival fetches settle — a player who finishes and leaves during
+  // those would otherwise count as both completed and abandoned.
+  useEffect(
+    () => () => {
+      if (phaseRef.current !== 'playing' || submitting.current) return;
+      posthog.capture('quick_play_round_abandoned', { ...roundMetaRef.current, reason: 'teardown' });
+    },
+    []
+  );
 
   // Phase changes swap the whole screen with no page navigation, so screen
   // readers get no automatic signal and sighted keyboard focus is stranded
@@ -226,6 +244,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
       const elapsed = Date.now() - started;
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
+      // Pairs with quick_play_mode_selected (fired before the board fetch) so
+      // the funnel can tell a bail during loading from a bail during play.
+      posthog.capture('quick_play_round_started', { mode, method, roundIndex, challenge: Boolean(activeChallenge) });
       setPhase('playing');
     } catch {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
