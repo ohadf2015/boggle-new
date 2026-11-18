@@ -1,3 +1,5 @@
+import { isPastDailyDate } from '../../utils/dailyChallenge/constants';
+
 /**
  * Decide whether a request should reach Next's App Router.
  *
@@ -324,6 +326,9 @@ export function decideNextHandle(
     const second = parts[1];
     if (!KNOWN_APP_ROOT_SEGMENTS.has(second) && !REDIRECT_ONLY_SEGMENTS.has(second)) {
       return { action: 'drop', reason: 'unknown-segment' };
+    }
+    if (second === 'daily' && parts[2] === 'archive' && parts.length === 4 && !isPastDailyDate(parts[3])) {
+      return { action: 'drop', reason: 'cardinality' };
     }
     if (isSeoCrawler(userAgent) && HIGH_CARDINALITY_NOINDEX_RE.test(raw)) {
       return { action: 'drop', reason: 'cardinality' };
