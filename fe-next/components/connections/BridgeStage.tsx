@@ -106,8 +106,8 @@ export default function BridgeStage({ word1, word2, isCorrect, isGaveUp, isRTL =
           ].join(' ')}
           style={{
             // Tiles never grow taller than the stage allows (AnswerSlots reads these caps).
-            ['--cell-cap' as string]: 'min(3.25rem, 32cqh)',
-            ['--cell-cap-tall' as string]: 'min(3.75rem, 32cqh)',
+            ['--cell-cap' as string]: 'min(2.25rem, 22cqh)',
+            ['--cell-cap-tall' as string]: 'min(2.65rem, 24cqh)',
           }}
         >
           {/* Handrail: a thin cream rail along the deck's top edge. */}

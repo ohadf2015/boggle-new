@@ -44,14 +44,14 @@ describe('AnswerSlots — one row, always', () => {
   it('caps cell size so a short answer does not render giant cells', () => {
     render(<AnswerSlots {...base} slotCount={3} />);
     const cell = screen.getAllByTestId('answer-slot')[0];
-    expect(cell.className).toContain('min(3.25rem,');
+    expect(cell.className).toContain('min(2.25rem,');
   });
 
   it('lets a host cap the cell size (BridgeStage fits the tiles into a short stage)', () => {
     render(<AnswerSlots {...base} slotCount={3} />);
     const cell = screen.getAllByTestId('answer-slot')[0];
-    expect(cell.className).toContain('var(--cell-cap,3.25rem)');
-    expect(cell.className).toContain('var(--cell-cap-tall,3.75rem)');
+    expect(cell.className).toContain('var(--cell-cap,2.25rem)');
+    expect(cell.className).toContain('var(--cell-cap-tall,2.65rem)');
   });
 
   it('scales the letter with the cell instead of a fixed text size', () => {
@@ -74,16 +74,16 @@ describe('AnswerSlots — one row, always', () => {
 
   it('fills more of each tight cell with the letter so long answers stay legible', () => {
     const { unmount } = render(<AnswerSlots {...base} slotCount={12} />);
-    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.86');
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.8');
     unmount();
     render(<AnswerSlots {...base} slotCount={5} />);
-    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.8');
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.72');
     expect(screen.getAllByTestId('answer-slot')[0].className).toContain('*var(--fs)');
   });
 
   it('lets cells grow on tall phones where the row has room', () => {
     render(<AnswerSlots {...base} slotCount={5} />);
-    expect(screen.getAllByTestId('answer-slot')[0].className).toContain('[@media(min-height:780px)]:w-[min(3.75rem,');
+    expect(screen.getAllByTestId('answer-slot')[0].className).toContain('[@media(min-height:780px)]:w-[min(2.65rem,');
   });
 
   it('keeps the roomier gutter for short answers, which have space to spare', () => {
