@@ -12,11 +12,12 @@ import { PRESS } from '@/components/education/live/eduLiveStyles';
 
 const K = 'eduLiveRoom.hostResults.lessonPlan';
 
-export type LessonPlanSource = 'practice_results' | 'class_setup';
+export type LessonPlanSource = 'practice_results' | 'class_setup' | 'teacher_home';
 
 const COPY: Record<LessonPlanSource, { title: string; body: string }> = {
   practice_results: { title: 'eduLiveRoom.hostResults.lessonPlan.title', body: 'eduLiveRoom.hostResults.lessonPlan.body' },
   class_setup: { title: 'eduLiveRoom.hostResults.lessonPlan.setupTitle', body: 'eduLiveRoom.hostResults.lessonPlan.setupBody' },
+  teacher_home: { title: 'eduLiveRoom.hostResults.lessonPlan.homeTitle', body: 'eduLiveRoom.hostResults.lessonPlan.homeBody' },
 };
 
 const BUTTON_BASE = cn(

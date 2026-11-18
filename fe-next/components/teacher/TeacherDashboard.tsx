@@ -12,6 +12,7 @@ import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
 import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
+import { HomeNextLesson } from './home/HomeNextLesson';
 import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
 import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
@@ -360,6 +361,11 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 language={language}
                 t={t}
               />
+            </div>
+          ) : null}
+          {selectedClassroom ? (
+            <div data-tm className="empty:hidden">
+              <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
             </div>
           ) : null}
         </>
