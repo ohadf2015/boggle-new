@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Coins, Swords, X } from 'lucide-react';
+import { Swords, X } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import Avatar from '@/components/Avatar';
 import { wreckableTower } from '@/lib/wordTowerV2/wreck';
 import type { RevengeEntry, UseEstate } from '../useEstate';

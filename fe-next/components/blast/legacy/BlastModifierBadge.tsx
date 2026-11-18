@@ -1,6 +1,7 @@
 'use client';
 
-import { Coins, Link, Dices, Feather, Bomb, Sparkles, Zap, type LucideIcon } from 'lucide-react';
+import { Link, Dices, Feather, Bomb, Sparkles, Zap, type LucideIcon } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import type { BlastWaveModifier, BlastModifierId, BlastModifierColor } from './utils/blastModifiers';
 

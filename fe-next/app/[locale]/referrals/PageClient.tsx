@@ -5,13 +5,13 @@ import { m } from 'framer-motion';
 import {
   Users,
   UserCheck,
-  Coins,
   Copy,
   Check,
   Share2,
   Trophy,
   QrCode,
 } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import dynamic from 'next/dynamic';
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => ({ default: m.QRCodeSVG })), { ssr: false });
 import { useLanguage } from '@/contexts/LanguageContext';

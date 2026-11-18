@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
+import { Play, CheckCircle, AlertCircle } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd } from '@/hooks/useRewardedAd';

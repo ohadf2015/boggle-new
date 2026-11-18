@@ -9,7 +9,8 @@
 
 import { useId, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { Coins, Swords } from 'lucide-react';
+import { Swords } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { claimIntroEntrance } from '@/lib/education/introEntrance';

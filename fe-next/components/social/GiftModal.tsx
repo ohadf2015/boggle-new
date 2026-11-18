@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, Lightbulb, Shield, Coins } from 'lucide-react';
+import { X, Lightbulb, Shield } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { GIFT_TYPES, DAILY_GIFT_LIMIT, type GiftType, type GiftPayload } from '@/shared/utils/giftingRules';

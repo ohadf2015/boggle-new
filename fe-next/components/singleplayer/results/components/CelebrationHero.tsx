@@ -2,7 +2,8 @@
 
 import { memo, useCallback } from 'react';
 import { m } from 'framer-motion';
-import { Hash, Target, Coins, Sparkles, Trophy } from 'lucide-react';
+import { Hash, Target, Sparkles, Trophy } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';

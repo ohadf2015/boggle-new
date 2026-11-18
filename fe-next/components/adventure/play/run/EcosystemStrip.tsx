@@ -10,7 +10,8 @@
  * "nothing moved" is the common case, not an edge.
  */
 import { m, useReducedMotion } from 'framer-motion';
-import { Zap, Flame, Medal, Coins, PiggyBank, type LucideIcon } from 'lucide-react';
+import { Zap, Flame, Medal, PiggyBank, type LucideIcon } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { ecosystemGains, type Gain, type GainKind } from './ecosystemGains';
 import { useCountUp } from './GoldCounter';

@@ -9,7 +9,8 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { Coins, Sparkles, Gift, Share2, RotateCcw } from 'lucide-react';
+import { Sparkles, Gift, Share2, RotateCcw } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { SoloModifier } from '@/lib/solo/soloDaily';

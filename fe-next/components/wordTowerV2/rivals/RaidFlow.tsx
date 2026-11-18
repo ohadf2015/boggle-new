@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Coins, Shield } from 'lucide-react';
+import { Shield } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { wreckingBallCost } from '@/lib/wordTowerV2/estate';
 import { revengeLedger, wreckAccuracy, wreckableTower } from '@/lib/wordTowerV2/wreck';

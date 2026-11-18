@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Gift, Sparkles, Coins, X } from 'lucide-react';
+import { Gift, Sparkles, X } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import Image from 'next/image';
 import { toast } from 'react-hot-toast';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';

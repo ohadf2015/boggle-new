@@ -16,7 +16,7 @@
  */
 
 import { memo } from 'react';
-import { Coins } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 

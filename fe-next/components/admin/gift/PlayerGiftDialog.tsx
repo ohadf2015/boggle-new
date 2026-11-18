@@ -2,7 +2,8 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
-import { Send, Gift, Sparkles, Coins, Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send, Gift, Sparkles, Award, ChevronDown, ChevronUp } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import {
   Dialog,
   DialogContent,

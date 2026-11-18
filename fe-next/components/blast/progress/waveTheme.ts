@@ -1,4 +1,5 @@
-import { Bomb, Coins, Crown, Gem, Sparkles, Waves, type LucideIcon } from 'lucide-react';
+import { Bomb, Crown, Gem, Sparkles, Waves, type LucideIcon } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import type { MascotKey } from '@/components/blast/legacy/utils/blastMascot';
 import type { BlastWaveTheme, BlastWaveThemeId } from '@/components/blast/legacy/utils/blastWaveConfig';
 

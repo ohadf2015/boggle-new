@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Coins, Hammer, Sparkles, Wrench, Zap } from 'lucide-react';
+import { Hammer, Sparkles, Wrench, Zap } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { type Estate, type PlotSlot, canUpgrade, repairCost, upgradeCost } from '@/lib/wordTowerV2/estate';
 import { MAX_PLOT_LEVEL } from '@/lib/wordTowerV2/estateCatalog';
 import { finishDistrictPlan } from '@/lib/wordTowerV2/estateFinish';
@@ -89,7 +90,7 @@ export function PlotPanel({ t, estate, slot, name, districtName, busy, failed, o
             ) : (
               <Coins className="h-4 w-4" aria-hidden />
             )}
-            {useBrick ? t('wordTowerV2.estate.free') : fix.toLocaleString()}
+            {useBrick ? t('wordTowerV2.estate.free') : t('wordTowerV2.coins.chip', { n: fix.toLocaleString() })}
           </span>
         </button>
         {repairShort > 0 ? (
@@ -117,7 +118,7 @@ export function PlotPanel({ t, estate, slot, name, districtName, busy, failed, o
               ) : (
                 <Coins className="h-4 w-4" aria-hidden />
               )}
-              {useBlueprint ? t('wordTowerV2.estate.free') : cost.toLocaleString()}
+              {useBlueprint ? t('wordTowerV2.estate.free') : t('wordTowerV2.coins.chip', { n: cost.toLocaleString() })}
             </span>
           </button>
           {!check.ok && short > 0 ? (
@@ -147,7 +148,7 @@ export function PlotPanel({ t, estate, slot, name, districtName, busy, failed, o
             <span className="truncate">{armed ? t('wordTowerV2.estate.finishConfirm') : t('wordTowerV2.estate.finishAll', { name: districtName })}</span>
             <span className="flex shrink-0 items-center gap-1 rounded-neo border-neo border-black bg-neo-cream px-2 py-0.5 text-xs tabular-nums">
               <Coins className="h-3.5 w-3.5" aria-hidden />
-              {plan.coins.toLocaleString()}
+              {t('wordTowerV2.coins.chip', { n: plan.coins.toLocaleString() })}
             </span>
           </button>
           {finishShort > 0 ? (

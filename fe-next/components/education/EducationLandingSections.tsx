@@ -1,7 +1,6 @@
 import {
   BookOpen,
   Clock,
-  Coins,
   Globe,
   GraduationCap,
   LayoutGrid,
@@ -16,6 +15,7 @@ import {
   Wifi,
   Zap,
 } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import type { EducationAccent, EducationSection } from '@/lib/seo/educationLanding';
 import Link from 'next/link';
 import { ClassGameList } from '@/components/education/ClassGameList';

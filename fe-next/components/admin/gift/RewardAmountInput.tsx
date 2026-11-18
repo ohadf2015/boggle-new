@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Coins, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';

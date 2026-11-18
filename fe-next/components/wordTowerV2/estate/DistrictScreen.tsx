@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Coins, Swords, Wrench } from 'lucide-react';
+import { ArrowLeft, Swords, Wrench } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { type PlotSlot, canUpgrade, repairCost, upgradeCost } from '@/lib/wordTowerV2/estate';

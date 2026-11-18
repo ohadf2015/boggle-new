@@ -2,7 +2,8 @@
 
 import React, { memo } from 'react';
 import { m } from 'framer-motion';
-import { Coins, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
