@@ -158,6 +158,19 @@ describe('reteachVerdict — the one rule every results surface reads', () => {
     expect(reteachVerdict(summary)).toEqual({ kind: 'wholeLesson', words: [] });
   });
 
+  it('given one student who missed every word, when shown, then it does not speak for a whole class', () => {
+    const summary = summaryOf({
+      totalWords: 2,
+      masteryByPlayer: mastery({ Ada: [0, 2] }),
+      coverage: [
+        { word: 'osmosis', foundBy: [] },
+        { word: 'enzyme', foundBy: [] },
+      ],
+      missedWords: ['osmosis', 'enzyme'],
+    });
+    expect(reteachVerdict(summary).kind).toBe('none');
+  });
+
   it('given no lesson words or no students, when shown, then there is nothing to say', () => {
     expect(reteachVerdict(summaryOf({ totalWords: 0 })).kind).toBe('none');
     expect(reteachVerdict(summaryOf({ totalWords: 2, missedWords: ['osmosis'] })).kind).toBe('none');

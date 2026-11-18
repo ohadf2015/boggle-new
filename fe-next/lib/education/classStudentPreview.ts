@@ -19,6 +19,7 @@ export async function fetchClassStudentPreview(
   const read = client
     .from('classroom_memberships')
     .select('classroom_id, student_id')
+    .eq('is_rehearsal', false)
     .in('classroom_id', ids)
     .order('joined_at', { ascending: true })
     .limit(CLASS_PREVIEW_MAX_ROWS);

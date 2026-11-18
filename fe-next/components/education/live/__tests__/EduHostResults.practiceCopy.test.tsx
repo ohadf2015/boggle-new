@@ -53,7 +53,7 @@ const zeroLesson = (): ClassroomSummary =>
     classFoundCount: 0,
     coverage: ['atlas', 'basalt', 'crater', 'delta'].map((word) => ({ word, foundBy: [] })),
     missedWords: ['atlas', 'basalt', 'crater', 'delta'],
-    masteryByPlayer: { [TEACHER]: { found: 0, total: 4 }, Pupil: { found: 0, total: 4 } },
+    masteryByPlayer: { [TEACHER]: { found: 0, total: 4 }, Pupil: { found: 0, total: 4 }, Dan: { found: 0, total: 4 } },
     podium: [{ username: 'Pupil', score: 0, rank: 1, wordsFound: 0, totalWords: 4 }],
   });
 

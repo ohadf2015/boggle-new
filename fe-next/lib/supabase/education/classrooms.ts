@@ -32,6 +32,7 @@ export async function getClassrooms(teacherId: string): Promise<{ data: Classroo
     const { data: memberships, error: membershipsError } = await supabase
       .from('classroom_memberships')
       .select('classroom_id')
+      .eq('is_rehearsal', false)
       .in('classroom_id', classrooms.map(c => c.id));
 
     if (membershipsError) {
@@ -85,7 +86,8 @@ export async function getClassroom(classroomId: string): Promise<{ data: Classro
     const { count, error: countError } = await supabase
       .from('classroom_memberships')
       .select('*', { count: 'exact', head: true })
-      .eq('classroom_id', classroomId);
+      .eq('classroom_id', classroomId)
+      .eq('is_rehearsal', false);
 
     if (countError) {
       logger.error('Error counting members:', countError);
@@ -270,6 +272,7 @@ export async function getClassroomStudents(
       // workflow can lag the deploy). Absent → `core` via coerceLevel below.
       .select('*')
       .eq('classroom_id', classroomId)
+      .eq('is_rehearsal', false)
       .order('joined_at', { ascending: true });
 
     if (membershipError) {
