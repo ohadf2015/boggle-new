@@ -187,7 +187,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
      */
     challengeOverride?: ChallengeInfo | null,
     /** First auto-started round only: a coached or weekly board seed. */
-    variant?: 'coach' | 'weekly'
+    variant?: 'coach' | 'weekly',
+    /** True for the page-load auto-start: no user tapped a mode. */
+    auto?: boolean
   ) => {
     if (loadingRef.current) return;
     loadingRef.current = true;
@@ -204,7 +206,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     // The board's code downloads during the strike instead of on the clock.
     preloadQuickMode(mode);
     lastSelection.current = sel;
-    posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
+    posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex, auto: !!auto });
     if (sel === 'random' && !activeChallenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
@@ -241,7 +243,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     if (autoStarted.current || !challengeResolved) return;
     autoStarted.current = true;
     const variant = challengeId ? undefined : coachFirst ? 'coach' : weekly ? 'weekly' : undefined;
-    void handlePlay(variant ? 'classic' : startMode ?? 'random', 'tap', undefined, variant);
+    void handlePlay(variant ? 'classic' : startMode ?? 'random', 'tap', undefined, variant, true);
   }, [startMode, challengeResolved, handlePlay, coachFirst, weekly, challengeId]);
 
   const handleDone = useCallback(
@@ -250,6 +252,16 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
       submitting.current = true;
       holdCalmUntilResults();
       setResult(r);
+      // Fire before any await: the collection lookup and the submit fetch can
+      // be slow or never return, and a completed round must not vanish from
+      // the funnel when the player leaves meanwhile.
+      posthog.capture('quick_play_round_completed', {
+        mode: r.mode,
+        scorePct: r.scorePct,
+        coins: quickCoinsFor(r.scorePct),
+        xp: quickXpFor(r.scorePct),
+        roundIndex,
+      });
       try {
         // Local first: the day streak has no server home, and a signed-out
         // player's whole progression lives here (submit is auth-gated, so it
@@ -312,14 +324,6 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
         setOutcome(out);
         publishLevelUp((out as { levelUp?: LevelUpLike | null }).levelUp, 'quickPlay');
         if (out.totalPoints > 0) setTotalPoints(out.totalPoints);
-        posthog.capture('quick_play_round_completed', {
-          mode: r.mode,
-          scorePct: r.scorePct,
-          coins: out.coins,
-          xp: out.xp,
-          percentile: out.percentileToday,
-          roundIndex,
-        });
         if (challenge) {
           posthog.capture('quick_play_challenge_accepted', { mode: r.mode, seed: r.seed });
           setRival({

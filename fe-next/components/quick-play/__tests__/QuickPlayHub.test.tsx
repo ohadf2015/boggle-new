@@ -141,6 +141,32 @@ describe('QuickPlayHub', () => {
     expect(goBack).not.toHaveBeenCalled();
   });
 
+  it('fires round_completed immediately, even if the submit request never returns', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) return Promise.resolve({ ok: true, json: async () => roundPayload });
+      if (String(url).includes('/submit')) return new Promise(() => undefined);
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() =>
+      expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+        'quick_play_round_completed',
+        expect.objectContaining({ mode: 'blast', scorePct: 68 })
+      )
+    );
+  });
+
+  it('flags the page-load auto-start as auto, not a user mode tap', async () => {
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_mode_selected',
+      expect.objectContaining({ auto: true })
+    );
+  });
+
   it('a round that crossed a level publishes the level-up through the shared path', async () => {
     fetchMock.mockImplementation((url: string) => {
       if (String(url).includes('/round')) return Promise.resolve({ ok: true, json: async () => roundPayload });
