@@ -155,6 +155,12 @@ describe('<JoinFlow> — a code we are sure is wrong', () => {
     expect(alert).toHaveTextContent('education.student.join.invalidCode');
   });
 
+  it('does not offer NEXT again for the same refused code', async () => {
+    render(<JoinFlow initialCode="ZZZZZZ" />);
+    await screen.findByRole('alert');
+    expect(screen.getByTestId('join-code-step').querySelector('button[type="submit"]')).toBeNull();
+  });
+
   it('offers a one-tap way back to the code without wiping what they typed', async () => {
     render(<JoinFlow initialCode="ZZZZZZ" />);
     await screen.findByRole('alert');

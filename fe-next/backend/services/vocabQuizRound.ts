@@ -148,6 +148,7 @@ export async function finishQuiz(io: Server, gameCode: string): Promise<void> {
     const rewards = await persistClassroomGameScores(classroomGame, playerScores, {
       askedWords: askedWords(session),
       answersByUser: answersByUser(session),
+      roundStartedAtMs: session.startedAt,
     });
     io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
 

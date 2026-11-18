@@ -82,7 +82,7 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           )}
         </div>
 
-        <JoinPrimaryButton ref={nextRef}>{t(`${K}.flow.next`)}</JoinPrimaryButton>
+        {!wrongCode && <JoinPrimaryButton ref={nextRef}>{t(`${K}.flow.next`)}</JoinPrimaryButton>}
 
         <details className="group/where rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light/80">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-neo px-3 py-2 font-neo-body text-sm font-bold text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-base [&::-webkit-details-marker]:hidden">
