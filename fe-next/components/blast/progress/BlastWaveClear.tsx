@@ -131,10 +131,14 @@ export function BlastWaveClear({
           },
         });
       };
-      gsap
+      const onScreen = (selector: string) => !!rootRef.current?.querySelector(selector);
+      const timeline = gsap
         .timeline({ delay: 0.1 })
-        .from('[data-clear="mascot"]', { y: 30, scale: 0.4, rotate: -12, autoAlpha: 0, duration: 0.45, ease: 'back.out(2.2)' })
-        .from('[data-clear="confetti"]', { y: -30, autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, '<')
+        .from('[data-clear="mascot"]', { y: 30, scale: 0.4, rotate: -12, autoAlpha: 0, duration: 0.45, ease: 'back.out(2.2)' });
+      if (onScreen('[data-clear="confetti"]')) {
+        timeline.from('[data-clear="confetti"]', { y: -30, autoAlpha: 0, duration: 0.5, ease: 'power2.out' }, '<');
+      }
+      timeline
         .from('[data-clear="title"]', { scale: 1.8, autoAlpha: 0, duration: 0.25, ease: 'back.out(1.8)' }, '-=0.15')
         .from('[data-testid="blast-clear-star"]', {
           scale: 3, rotate: -50, autoAlpha: 0, duration: 0.28, ease: 'back.out(2.5)', stagger: 0.16,
@@ -142,10 +146,14 @@ export function BlastWaveClear({
         })
         .to('[data-clear="stars"]', { y: 4, duration: 0.05, yoyo: true, repeat: 3 }, '-=0.1')
         .from('[data-clear="card"]', { y: 30, scale: 0.92, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.6)' })
-        .from('[data-clear="goal"]', { x: -40, autoAlpha: 0, duration: 0.3, ease: 'back.out(1.5)' })
-        .from('[data-gem-slot]', { scale: 0, rotate: -40, autoAlpha: 0, duration: 0.32, stagger: 0.12, ease: 'back.out(2.6)' })
-        .to('[data-gem-found="true"]', { scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, stagger: 0.12, ease: 'power1.inOut' }, '<0.3')
-        .from('[data-reveal="tile"]', { y: 18, scale: 0.4, autoAlpha: 0, duration: 0.2, stagger: 0.05, ease: 'back.out(2)' })
+        .from('[data-gem-slot]', { scale: 0, rotate: -40, autoAlpha: 0, duration: 0.32, stagger: 0.12, ease: 'back.out(2.6)' });
+      if (onScreen('[data-gem-found="true"]')) {
+        timeline.to('[data-gem-found="true"]', { scale: 1.25, duration: 0.12, yoyo: true, repeat: 1, stagger: 0.12, ease: 'power1.inOut' }, '<0.3');
+      }
+      if (onScreen('[data-reveal="tile"]')) {
+        timeline.from('[data-reveal="tile"]', { y: 18, scale: 0.4, autoAlpha: 0, duration: 0.2, stagger: 0.05, ease: 'back.out(2)' });
+      }
+      timeline
         .from('[data-tally]', { y: 24, autoAlpha: 0, duration: 0.22, stagger: 0.08, ease: 'power2.out' })
         .add(flyTo('score'), '+=0.35')
         .add(flyTo('coins'), '+=0.12')
