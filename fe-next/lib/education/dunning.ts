@@ -13,12 +13,15 @@ import type { TeacherProSubSnapshot } from '@/lib/education/teacherProChurnWatch
 import logger from '@/utils/logger';
 
 /**
- * Dunning for Teacher Pro:
- * - Day 1: initial email when Polar flags a renewal past due (`teacher_payment_failed_email`).
- * - Day 5: escalation email warning access pauses in 2 days (`teacher_dunning_day5_email`).
+ * Dunning for Teacher Pro, day-1 only.
  *
- * Fires from the Polar webhook (`subscription.past_due` or `subscription.updated` with status=past_due)
- * AND on the daily churn watch cron sweep, so dropped webhooks or day-5 milestones never miss.
+ * The initial payment-failed note fires from the Polar webhook
+ * (`subscription.past_due`, or `subscription.updated` whose status is past_due)
+ * and from the churn-watch sweep when that webhook was missed.
+ *
+ * Day-5 escalation is NOT sent here. That template always says access pauses
+ * in 2 days, which is false on a catch-up day, and it would double-email the
+ * one-click card-update note owned by /api/cron/teacher-pro-dunning.
  */
 export const DEDUPE_WINDOW_MS = 72 * 60 * 60 * 1000;
 export const DAY_MS = 24 * 60 * 60 * 1000;
@@ -38,29 +41,28 @@ export interface DunningDecisionSignals {
 }
 
 /**
- * Pure decision: which dunning email is due for a past-due subscription.
- * - If Day 1 has not been sent: return 'day-1'.
- * - If Day 1 was sent and >= 5 days have elapsed without Day 5: return 'day-5'.
- * - Otherwise return null (deduped).
+ * Pure decision: which dunning email this module may send.
+ * Day-1 only, and only while the row is still past_due and inside the first
+ * 5 days. Day 5+ returns null so the teacher-pro-dunning cron is the only
+ * escalation sender. Canceled / revoked / active return null.
  */
 export function pickDunningStep(signals: DunningDecisionSignals): DunningStep | null {
   if (signals.status !== 'past_due') return null;
   const elapsedDays = Math.max(0, Math.floor((signals.nowMs - signals.pastDueOnsetMs) / DAY_MS));
+  if (elapsedDays >= 5) return null;
 
   const hasSentDay1 =
     signals.alreadySent.includes(EVENT_DAY1) || signals.alreadySent.includes('teacher_dunning_day1_email');
-  const hasSentDay5 = signals.alreadySent.includes(EVENT_DAY5);
-
-  if (elapsedDays >= 5) {
-    if (!hasSentDay5) return 'day-5';
-    return null;
-  }
-
-  if (!hasSentDay1) {
-    return 'day-1';
-  }
-
+  if (!hasSentDay1) return 'day-1';
   return null;
+}
+
+/** Status the auto-send path is allowed to treat as past_due. Never invent one. */
+export function dunningStatusFromPayload(payload: { type?: unknown; data?: { status?: unknown } }): string {
+  const raw = payload?.data?.status;
+  const status = typeof raw === 'string' ? raw : '';
+  if (status) return status;
+  return String(payload?.type ?? '') === 'subscription.past_due' ? 'past_due' : '';
 }
 
 export function resolvePastDueOnsetMs(
@@ -214,14 +216,17 @@ export async function maybeSendPaymentFailedEmail({
   const step: DunningStep | null =
     forceStep ??
     pickDunningStep({
-      status: 'past_due',
+      status: dunningStatusFromPayload(payload),
       pastDueOnsetMs,
       nowMs,
       alreadySent,
     });
 
   if (!step) {
-    return { sent: false, reason: 'deduped' };
+    return {
+      sent: false,
+      reason: dunningStatusFromPayload(payload) === 'past_due' ? 'deduped' : 'not-past-due',
+    };
   }
 
   return sendDunningEmail({
@@ -246,7 +251,7 @@ export interface DunningSweepItem {
 
 /**
  * Sweep past_due subscriptions during daily cron (teacher-pro-churn-watch)
- * to verifiably enqueue day-1 or day-5 dunning emails.
+ * for a missed day-1 note. Day-5 is not sent from this sweep.
  */
 export async function processDunningForPastDueSubs(
   subs: TeacherProSubSnapshot[],

@@ -143,35 +143,41 @@ describe('pickDunningStep pure function', () => {
     ).toBeNull();
   });
 
-  it('returns day-5 on or after day 5 when day-5 has not been sent', () => {
-    expect(
-      pickDunningStep({
-        status: 'past_due',
-        pastDueOnsetMs: onset,
-        nowMs: onset + 5 * ONE_DAY,
-        alreadySent: [EVENT_DAY1],
-      }),
-    ).toBe('day-5');
-
-    expect(
-      pickDunningStep({
-        status: 'past_due',
-        pastDueOnsetMs: onset,
-        nowMs: onset + 6 * ONE_DAY,
-        alreadySent: [],
-      }),
-    ).toBe('day-5');
+  it('does not pick day-5 — that escalation is the teacher-pro-dunning cron, not this module', () => {
+    // The local day-5 template always says "pauses in 2 days". Sending it on
+    // day 5, 6, or a 9-day catch-up would be false and would double-email the
+    // one-click escalation.
+    for (const days of [5, 6, 9]) {
+      expect(
+        pickDunningStep({
+          status: 'past_due',
+          pastDueOnsetMs: onset,
+          nowMs: onset + days * ONE_DAY,
+          alreadySent: [EVENT_DAY1],
+        }),
+      ).toBeNull();
+      expect(
+        pickDunningStep({
+          status: 'past_due',
+          pastDueOnsetMs: onset,
+          nowMs: onset + days * ONE_DAY,
+          alreadySent: [],
+        }),
+      ).toBeNull();
+    }
   });
 
-  it('returns null when day-5 was already sent', () => {
-    expect(
-      pickDunningStep({
-        status: 'past_due',
-        pastDueOnsetMs: onset,
-        nowMs: onset + 5.5 * ONE_DAY,
-        alreadySent: [EVENT_DAY1, EVENT_DAY5],
-      }),
-    ).toBeNull();
+  it('does not email a canceled or revoked subscription', () => {
+    for (const status of ['canceled', 'cancelled', 'revoked', 'active']) {
+      expect(
+        pickDunningStep({
+          status,
+          pastDueOnsetMs: onset,
+          nowMs: onset,
+          alreadySent: [],
+        }),
+      ).toBeNull();
+    }
   });
 
   it('returns null for non-past_due status', () => {
@@ -343,6 +349,18 @@ describe('maybeSendPaymentFailedEmail', () => {
     expect(vi.mocked(logSubscriptionEvent)).not.toHaveBeenCalled();
   });
 
+  it('does not send when the payload status is canceled, even if the event name is updated', async () => {
+    const result = await maybeSendPaymentFailedEmail({
+      payload: {
+        type: 'subscription.updated',
+        data: { ...payload.data, status: 'canceled' },
+      },
+      userId: 'u1',
+    });
+    expect(result).toEqual({ sent: false, reason: 'not-past-due' });
+    expect(vi.mocked(sendEmail)).not.toHaveBeenCalled();
+  });
+
   it('sends day-5 escalation when forced or elapsed >= 5 days', async () => {
     subEventsMock.mockResolvedValue({ data: [{ event_type: EVENT_DAY1 }] });
 
@@ -375,7 +393,7 @@ describe('processDunningForPastDueSubs cron sweep', () => {
     vi.mocked(sendEmail).mockResolvedValue({ ok: true } as any);
   });
 
-  it('dry run plans day-5 enqueue for a sub past_due for 5+ days without sending', async () => {
+  it('does not enqueue day-5 for a sub already 5+ days past_due', async () => {
     const subs = [
       {
         id: 'sub_past_due_5',
@@ -389,47 +407,33 @@ describe('processDunningForPastDueSubs cron sweep', () => {
       },
     ];
 
-    // Simulate now being 2026-11-14 (5 days after 2026-11-09)
-    const nowMs = Date.parse('2026-11-14T12:00:00.000Z');
-    subEventsMock.mockResolvedValue({ data: [{ event_type: EVENT_DAY1 }] });
-
-    const sweep = await processDunningForPastDueSubs(subs, { dry: true, nowMs });
-
-    expect(sweep.processed).toBe(1);
-    expect(sweep.items[0]).toEqual({
-      subscriptionId: 'sub_past_due_5',
-      userId: 'u-1',
-      email: 'teacher@school.org',
-      step: 'day-5',
-      sent: false,
-      reason: 'dry-run',
-    });
+    // 2026-11-14 is 5 days after onset; 2026-11-18 is the live 9-day catch-up.
+    for (const nowMs of [Date.parse('2026-11-14T12:00:00.000Z'), Date.parse('2026-11-18T08:00:00.000Z')]) {
+      subEventsMock.mockResolvedValue({ data: [{ event_type: EVENT_DAY1 }] });
+      const sweep = await processDunningForPastDueSubs(subs, { dry: false, nowMs });
+      expect(sweep).toEqual({ processed: 0, items: [] });
+    }
+    expect(teacherPaymentFailedDay5).not.toHaveBeenCalled();
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
-  it('live run sends day-5 escalation email and logs subscription_events', async () => {
-    const subs = [
-      {
-        id: 'sub_past_due_5',
-        status: 'past_due',
-        cancelAtPeriodEnd: false,
-        email: 'teacher@school.org',
-        amount: 900,
-        currency: 'usd',
-        currentPeriodEnd: '2026-11-09T00:00:00.000Z',
-        startedAt: '2026-09-09T00:00:00.000Z',
-      },
-    ];
-
-    const nowMs = Date.parse('2026-11-14T12:00:00.000Z');
-    subEventsMock.mockResolvedValue({ data: [{ event_type: EVENT_DAY1 }] });
-
-    const sweep = await processDunningForPastDueSubs(subs, { dry: false, nowMs });
-
-    expect(sweep.processed).toBe(1);
-    expect(sweep.items[0].sent).toBe(true);
-    expect(sweep.items[0].step).toBe('day-5');
-    expect(teacherPaymentFailedDay5).toHaveBeenCalled();
-    expect(sendEmail).toHaveBeenCalledWith(expect.objectContaining({ to: 'teacher@school.org' }));
+  it('skips canceled subs even if they are passed into the sweep', async () => {
+    const sweep = await processDunningForPastDueSubs(
+      [
+        {
+          id: 'sub_canceled',
+          status: 'canceled',
+          cancelAtPeriodEnd: false,
+          email: 'teacher@school.org',
+          amount: 900,
+          currency: 'usd',
+          currentPeriodEnd: '2026-11-09T00:00:00.000Z',
+          startedAt: '2026-09-09T00:00:00.000Z',
+        },
+      ],
+      { dry: false, nowMs: Date.parse('2026-11-18T08:00:00.000Z') },
+    );
+    expect(sweep).toEqual({ processed: 0, items: [] });
+    expect(sendEmail).not.toHaveBeenCalled();
   });
 });
