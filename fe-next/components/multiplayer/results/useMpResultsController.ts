@@ -160,7 +160,7 @@ export function useMpResultsController(props: MpResultsProps) {
     if (mpGameRecordedRef.current || !gameCode || !resolvedGameMode) return;
     mpGameRecordedRef.current = true;
     recordMpGame(resolvedGameMode);
-    if (isHost && classroomSummary && isPracticeRound(finalScores)) return;
+    if (isHost && classroomSummary && isPracticeRound(finalScores ?? undefined)) return;
 
     const score = currentPlayerData?.score ?? 0;
     const wordCount =
