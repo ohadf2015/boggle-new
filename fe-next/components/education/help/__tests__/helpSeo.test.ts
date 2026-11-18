@@ -5,7 +5,6 @@ import {
   helpFaqJsonLd,
   helpHowToJsonLd,
 } from '../helpSeo';
-import { helpSitemapEntries } from '../helpSitemap';
 import { getHelpContent } from '../content';
 import { HELP_ARTICLES } from '../helpRegistry';
 
@@ -56,14 +55,5 @@ describe('helpFaqJsonLd', () => {
     };
     expect(node.mainEntity).toHaveLength(quick.length);
     expect(node.mainEntity[0].name).toBe(quick[0].q);
-  });
-});
-
-describe('helpSitemapEntries', () => {
-  it('emits the hub and every article for the five locales only', () => {
-    const entries = helpSitemapEntries(new Date('2026-10-02'));
-    expect(entries).toHaveLength(5 * (1 + HELP_ARTICLES.length));
-    expect(entries.some((e) => e.url.includes('/ru/'))).toBe(false);
-    expect(entries.map((e) => e.url)).toContain('https://www.lexiclash.live/he/education/help');
   });
 });

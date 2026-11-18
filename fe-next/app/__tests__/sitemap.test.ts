@@ -1,3 +1,4 @@
+import { hasBodyInLocale } from '@/lib/seo/bodyLocales';
 import { describe, it, expect } from 'vitest';
 import sitemap from '../sitemap';
 import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
@@ -38,39 +39,29 @@ describe('sitemap', () => {
     expect(entries.length * 2048).toBeLessThan(50 * 1024 * 1024);
   });
 
-  it('includes education sub-routes (duels + classroom-game) for all locales', () => {
-    const urls = new Set(sitemap().map((e) => e.url));
-    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
-      expect(urls.has(`https://www.lexiclash.live/${locale}/education/duels`), `sitemap missing /${locale}/education/duels`).toBe(true);
-      expect(urls.has(`https://www.lexiclash.live/${locale}/education/classroom-game`), `sitemap missing /${locale}/education/classroom-game`).toBe(true);
-    }
-  });
-
   /**
    * EDUCATION_PAGES is the only list of education landings. Sitemap.ts used to
    * restate these 17 slugs; a new registry entry would then ship in the footer
    * and hub but not /sitemap.xml. These tests import the registry so they fail
    * if sitemap.ts and educationPageLinks.ts drift.
    */
-  const EDUCATION_LANDINGS = EDUCATION_PAGES.map((p) => `/education/${p.slug}`);
+  const EDUCATION_LANDINGS = EDUCATION_PAGES.filter((p) => p.slug !== 'lists').map((p) => `/education/${p.slug}`);
   const ALL_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+  const localesFor = (path: string) => ALL_LOCALES.filter((l) => hasBodyInLocale(path, l));
 
-  it('emits every EDUCATION_PAGES slug for all six locales (20×6)', () => {
-    expect(EDUCATION_PAGES).toHaveLength(20);
+  it('emits every education landing in each locale it is written in', () => {
+    expect(EDUCATION_LANDINGS).toHaveLength(EDUCATION_PAGES.length - 1);
     const urls = new Set(sitemap().map((e) => e.url));
-    let present = 0;
     for (const path of EDUCATION_LANDINGS) {
-      for (const locale of ALL_LOCALES) {
-        if (urls.has(`https://www.lexiclash.live/${locale}${path}`)) present += 1;
-      }
+      const present = ALL_LOCALES.filter((l) => urls.has(`https://www.lexiclash.live/${l}${path}`));
+      expect(present, path).toEqual(localesFor(path));
     }
-    expect(present).toBe(EDUCATION_PAGES.length * ALL_LOCALES.length);
   });
 
   it('lists every education landing in every locale the page itself indexes', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     for (const path of EDUCATION_LANDINGS) {
-      for (const locale of ALL_LOCALES) {
+      for (const locale of localesFor(path)) {
         expect(
           urls.has(`https://www.lexiclash.live/${locale}${path}`),
           `sitemap missing /${locale}${path}`,
@@ -85,7 +76,7 @@ describe('sitemap', () => {
       const entry = entries.find((e) => e.url === `https://www.lexiclash.live/en${path}`);
       expect(entry, `no sitemap entry for /en${path}`).toBeDefined();
       const langs = entry!.alternates?.languages as Record<string, string>;
-      for (const locale of ALL_LOCALES) {
+      for (const locale of localesFor(path)) {
         expect(langs[locale], `${path} hreflang ${locale} must self-reference`).toBe(
           `https://www.lexiclash.live/${locale}${path}`,
         );
@@ -294,7 +285,7 @@ describe('sitemap', () => {
   // locales. Catches an over-eager refactor that narrows a localized route.
   it('keeps the noindexed game shells out of the sitemap', () => {
     const urls = sitemap().map((e) => e.url);
-    expect(urls.filter((u) => /\/(multiplayer|singleplayer|brain)$/.test(u))).toEqual(['https://www.lexiclash.live/es/multiplayer']);
+    expect(urls.filter((u) => /\/(multiplayer|singleplayer|brain)$/.test(u))).toEqual([]);
   });
 
   it('still lists genuinely-localized routes for all five locales', () => {

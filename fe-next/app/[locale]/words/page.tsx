@@ -7,6 +7,7 @@ import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const description =
     'Explore the full LexiClash word dictionary. Browse valid words by length (3–8 letters) or starting letter (A–Z). Find high-scoring words, learn new vocabulary, and sharpen your word game skills.';
 
-  return {
+  return withBodyLocales({
     title,
     description,
     openGraph: {
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       ]),
     },
     robots: { index: true, follow: true },
-  };
+  }, '/words', locale);
 }
 
 const WORD_LENGTHS = [3, 4, 5, 6, 7, 8] as const;

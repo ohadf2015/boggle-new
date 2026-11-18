@@ -31,6 +31,7 @@ function langCopy(hub: LangHub, locale: string) {
 export function langHubMetadata(hub: LangHub, locale: string): Metadata {
   const c = langCopy(hub, locale);
   return wordListMetadata({
+    index: WORD_LIST_INDEXING.langHubs,
     locale,
     path: langHubPath(hub.lang),
     locales: hub.locales,
