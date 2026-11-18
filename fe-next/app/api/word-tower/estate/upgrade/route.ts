@@ -4,18 +4,19 @@ import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
-import { advanceDistrict, applyUpgrade, districtComplete, perksFromEstate } from '@/lib/wordTowerV2/estate';
+import { applyUpgrade, perksFromEstate } from '@/lib/wordTowerV2/estate';
 import { PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
+import { applyFinishDistrict, finishDistrictPlan, settleDistrict } from '@/lib/wordTowerV2/estateFinish';
 import { mutateEstate } from '@/lib/wordTowerV2/estateServer';
 
 export const runtime = 'nodejs';
 
 /**
- * POST /api/word-tower/estate/upgrade { plot } — spend a blueprint or coins on
- * one level. Finishing the fifth plot advances the district in the same write
- * (`districtCompleted: true` so the client can throw the party).
+ * POST /api/word-tower/estate/upgrade { plot } buys one level. { all: true, cost }
+ * finishes the district, refused if it now costs more than the price the player
+ * saw. Completion advances the district in the same write (`districtCompleted`).
  */
-const Body = z.object({ plot: z.enum(PLOT_SLOTS) });
+const Body = z.union([z.object({ plot: z.enum(PLOT_SLOTS) }), z.object({ all: z.literal(true), cost: z.number().int().min(0) })]);
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,15 +30,13 @@ export async function POST(request: NextRequest) {
     const db = getSupabaseAdmin();
     if (!db) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
+    const target = parsed.data;
     const res = await mutateEstate(db, user.id, (e) => {
-      const r = applyUpgrade(e, parsed.data.plot);
+      if ('all' in target && (finishDistrictPlan(e)?.coins ?? 0) > target.cost) return { ok: false, reason: 'price_changed' };
+      const r = 'plot' in target ? applyUpgrade(e, target.plot) : applyFinishDistrict(e);
       if (!r.ok) return r;
-      const completed = districtComplete(r.estate);
-      return {
-        ok: true,
-        estate: completed ? advanceDistrict(r.estate) : r.estate,
-        extra: { cost: r.cost, usedBlueprint: r.usedToken, districtCompleted: completed },
-      };
+      const { estate, completed } = settleDistrict(r.estate);
+      return { ok: true, estate, extra: { cost: r.cost, usedBlueprint: r.usedToken, districtCompleted: completed } };
     });
     if (!res.ok) {
       return NextResponse.json({ error: 'cannot upgrade', reason: res.reason }, { status: res.reason === 'conflict' ? 409 : 400 });

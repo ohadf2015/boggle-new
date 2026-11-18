@@ -3102,6 +3102,8 @@ const sv = {
       "back": "Tillbaka",
       "raidFailed": "Räden gick inte fram",
       "raidError": "Något gick snett. Försök igen.",
+      "wreckedToday": "Träffat idag",
+      "alreadyWrecked": "Du har redan träffat det här tornet idag. Kom tillbaka i morgon.",
       "revengeTitle": "Dags för hämnd",
       "revengeBody": "{name} krossade din {plot} och stack med {coins} mynt.",
       "revengeBodyBlocked": "{name} svingade mot ditt torn – din sköld höll.",
@@ -3120,7 +3122,7 @@ const sv = {
         "lot": "tom tomt"
       }
     },
-    "coins": { "run": "{n} mynt denna runda" },
+    "coins": { "run": "{n} mynt denna runda", "chip": "{n}" },
     "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda.", "label": "Svit" },
     "milestone": { "floors": "Våningar!", "a11y": "{n} våningar" },
     "chest": {
@@ -3170,6 +3172,9 @@ const sv = {
       "perksNone": "Bygg kvarteret så står tornet stadigare",
       "newsRaids": "{n} räder mot dig medan du var borta",
       "newsAffordable": "{n} uppgraderingar har du råd med",
+      "finishAll": "Bygg klart {name}",
+      "finishConfirm": "Bekräfta",
+      "spendFailed": "Det gick inte. Försök igen.",
       "newsDamaged": "{n} tomter behöver lagas",
       "newsNone": "Allt är lugnt i kvarteret",
       "completeTitle": "{name} klart!",
@@ -3301,7 +3306,7 @@ const sv = {
     "bestFlag": "REKORD",
     "leaveConfirm": "Lämna klättringen? Du kan återuppta den i den här fliken, men den dagliga går bara en gång per dag.",
 "leaveDaily": {"title": "Lämna dagens klättring?", "desc": "Dagens klättring avslutas. Din höjd räknas på dagens topplista. Nästa dagliga klättring öppnas i morgon."},
-"leaveFree": {"title": "Lämna klättringen?", "desc": "Klättringen avslutas och dina mynt betalas ut. Du kan starta en ny klättring när som helst."},
+"leaveFree": {"title": "Lämna klättringen?", "desc": "Ditt torn är sparat. När du lämnar betalas mynten från klättringen ut, och nästa gång bygger du vidare."},
     "leaveKeep": "Fortsätt klättra",
     "leaveGo": "Lämna",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",

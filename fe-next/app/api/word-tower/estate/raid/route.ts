@@ -6,7 +6,7 @@ import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { notifyWordTowerWreck } from '@/backend/modules/pushNotificationTriggers';
 import { perksFromEstate, raidOutcome } from '@/lib/wordTowerV2/estate';
-import { type Db, RAIDS, loadEstate } from '@/lib/wordTowerV2/estateServer';
+import { type Db, RAIDS, loadEstate, wreckedToday } from '@/lib/wordTowerV2/estateServer';
 import { claimOnce } from '@/lib/server/claimOnce';
 
 export const runtime = 'nodejs';
@@ -83,6 +83,11 @@ export async function POST(request: NextRequest) {
 
     if (!attacker || (attacker.estate.raidCharges < 1 && !revengeRaidId)) {
       return NextResponse.json({ error: 'no raid charges', reason: 'no_charges' }, { status: 409 });
+    }
+
+    // ponytail: read-then-write, so a same-instant double raid can slip through; move into the RPC if that shows up.
+    if (!revenge && (await wreckedToday(db, user.id)).has(defenderId)) {
+      return NextResponse.json({ error: 'already wrecked today', reason: 'already_wrecked' }, { status: 409 });
     }
 
     // Guard against retried raids crediting coins twice via claimOnce idempotency.

@@ -44,6 +44,7 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { useV2Exit } from './useV2Exit';
 import { useBankOnLeave } from './useBankOnLeave';
+import { useFreeTowerSave } from './useFreeTowerSave';
 import { TowerFeel } from './TowerFeel';
 import { useOverHold } from './useOverHold';
 import { dailyDateLabel } from './dailyDateLabel';
@@ -106,8 +107,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     restoreTower: game.restoreTower,
   });
   const { goalToast, dismissGoalToast } = useDailyGoalToast(daily, dailyTower.targetM, dailyTower.targetHit, playSound);
-  /** Floors standing right now: this run's plus the ones restored from earlier days. */
-  const towerFloors = run.floors + (daily ? dailyTower.restoredFloors : 0);
+  const freeTower = useFreeTowerSave({ enabled: !daily, language, phase, floors: run.floors, worldRef: game.worldRef, labelsRef: game.labelsRef, hangingIdRef, restoreTower: game.restoreTower, adoptBest: game.adoptBest });
+  /** Floors standing right now: this run's plus the ones restored from an earlier visit. */
+  const towerFloors = run.floors + (daily ? dailyTower.restoredFloors : freeTower.restoredFloors);
 
   const layout = useV2Layout({ withRails: daily });
   const { wide, rails, canvasClass } = layout;
@@ -182,7 +184,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
 
   const exitFlow = useV2Exit({
     phase,
-    floors: towerFloors,
+    floors: run.floors,
     daily,
     finish,
     bankRun,
@@ -232,8 +234,8 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     if (daily) {
       dailyTower.resume();
       refreshRank();
-    }
-  }, [restart, resetForRun, daily, dailyTower, refreshRank]);
+    } else freeTower.resume();
+  }, [restart, resetForRun, daily, dailyTower, freeTower, refreshRank]);
 
   // Smash round target: only the friend who sent the link. Wrecking your OWN
   // tower was removed — there is no reason to knock down what you just built.

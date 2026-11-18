@@ -2741,6 +2741,8 @@ const es = {
       "back": "Volver",
       "raidFailed": "El ataque no cuajó",
       "raidError": "Algo salió mal. Inténtalo otra vez.",
+      "wreckedToday": "Atacada hoy",
+      "alreadyWrecked": "Ya atacaste esta torre hoy. Vuelve mañana.",
       "revengeTitle": "Hora de la revancha",
       "revengeBody": "{name} destrozó tu {plot} y se llevó {coins} monedas.",
       "revengeBodyBlocked": "{name} atacó tu torre, pero tu escudo aguantó.",
@@ -2759,7 +2761,7 @@ const es = {
         "lot": "solar vacío"
       }
     },
-    "coins": { "run": "{n} monedas esta ronda" },
+    "coins": { "run": "{n} monedas esta ronda", "chip": "{n}" },
     "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara.", "label": "Racha" },
     "milestone": { "floors": "¡Pisos!", "a11y": "{n} pisos" },
     "chest": {
@@ -2809,6 +2811,9 @@ const es = {
       "perksNone": "Construye el barrio y la torre aguantará mejor",
       "newsRaids": "{n} asaltos contra ti mientras no estabas",
       "newsAffordable": "{n} mejoras que ya puedes pagar",
+      "finishAll": "Completar {name}",
+      "finishConfirm": "Confirmar",
+      "spendFailed": "No se pudo. Inténtalo otra vez.",
       "newsDamaged": "{n} parcelas necesitan reparación",
       "newsNone": "Todo tranquilo en el barrio",
       "completeTitle": "¡{name} completo!",
@@ -2940,7 +2945,7 @@ const es = {
     "bestFlag": "RÉCORD",
     "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el reto diario es solo una vez al día.",
 "leaveDaily": {"title": "¿Salir de la subida de hoy?", "desc": "Si sales, termina tu subida. Tu altura cuenta en la tabla de hoy. El próximo reto diario abre mañana."},
-"leaveFree": {"title": "¿Dejar esta subida?", "desc": "Si sales, termina esta subida y cobras tus monedas. Empieza otra cuando quieras."},
+"leaveFree": {"title": "¿Dejar esta subida?", "desc": "Tu torre queda guardada. Al salir cobras las monedas de esta subida y la próxima vez sigues construyendo."},
     "leaveKeep": "Seguir subiendo",
     "leaveGo": "Salir",
     "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",

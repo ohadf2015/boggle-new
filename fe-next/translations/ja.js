@@ -2742,6 +2742,8 @@ const ja = {
       "back": "戻る",
       "raidFailed": "襲撃は失敗",
       "raidError": "うまくいきませんでした。もう一度どうぞ。",
+      "wreckedToday": "今日攻撃済み",
+      "alreadyWrecked": "このタワーは今日もう攻撃しました。また明日どうぞ。",
       "revengeTitle": "仕返しの時間",
       "revengeBody": "{name}が君の{plot}を壊して{coins}コインを持ち去った。",
       "revengeBodyBlocked": "{name}が襲ってきたが、シールドが守り抜いた。",
@@ -2760,7 +2762,7 @@ const ja = {
         "lot": "空き地"
       }
     },
-    "coins": { "run": "今回のコイン {n}" },
+    "coins": { "run": "今回のコイン {n}", "chip": "{n}" },
     "streak": { "a11y": "パーフェクト連続 ×{n}", "toRare": "パーフェクト{n}回 → レアの箱", "crate": "箱", "meterA11y": "パーフェクト連続{n}、×{mult}。レアの箱まであと{rare}。" , "label": "ストリーク" },
     "milestone": { "floors": "階、達成!", "a11y": "{n}階" },
     "chest": {
@@ -2810,6 +2812,9 @@ const ja = {
       "perksNone": "街区を建ててタワーを安定させよう",
       "newsRaids": "留守中に{n}件のレイド",
       "newsAffordable": "今すぐ建てられる区画が{n}件",
+      "finishAll": "{name}を完成させる",
+      "finishConfirm": "確定",
+      "spendFailed": "うまくいきませんでした。もう一度どうぞ。",
       "newsDamaged": "{n}区画が修理待ち",
       "newsNone": "街区は平和です",
       "completeTitle": "{name} 完成！",
@@ -2941,7 +2946,7 @@ const ja = {
     "bestFlag": "ベスト",
     "leaveConfirm": "この登りを離れますか？このタブなら再開できますが、デイリーは1日1回です。",
 "leaveDaily": {"title": "今日の登りを離れますか？", "desc": "今日の登りが終わります。高さは今日のボードに記録され、新しいデイリーは明日開きます。"},
-"leaveFree": {"title": "この登りを離れますか？", "desc": "この登りが終わり、集めたコインが保存されます。いつでも新しく始められます。"},
+"leaveFree": {"title": "この登りを離れますか？", "desc": "タワーは保存されています。離れるとこの登りのコインを受け取り、次回は続きから建てられます。"},
     "leaveKeep": "登り続ける",
     "leaveGo": "離れる",
     "dailyPlayed": "今日のタワーは終了。また明日。",

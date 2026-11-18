@@ -23,6 +23,14 @@ describe('useRunPayout — leaving mid-run banks the run', () => {
     expect(reportRun).toHaveBeenCalledTimes(1);
   });
 
+  it('given a resumed tower with no new floor, when the run ends, then nothing is paid', async () => {
+    const reportRun = vi.fn().mockResolvedValue(paid);
+    const { result } = renderHook(() => useRunPayout({ over: true, ready: true, getSummary: () => summary(0), reportRun }));
+    await waitFor(() => expect(result.current.payoutStatus.status).toBe('none'));
+    expect(reportRun).not.toHaveBeenCalled();
+    expect(result.current.waiting).toBe(false);
+  });
+
   it('given nothing built yet, when the player leaves, then nothing is sent', async () => {
     const reportRun = vi.fn().mockResolvedValue(paid);
     const { result } = renderHook(() => useRunPayout({ over: false, ready: true, getSummary: () => summary(0), reportRun }));

@@ -36,6 +36,8 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick, dailyLanguag
   const [state, setState] = useState<{ rivals: RivalView[]; revenge: RevengeEntry[] } | null>(null);
   const [failed, setFailed] = useState(false);
   const { authed, rivals: fetchRivals } = estate;
+  // A raid spends a charge: re-read so the rival just hit shows as done.
+  const charges = estate.estate.raidCharges;
 
   useEffect(() => {
     if (!authed) return;
@@ -48,7 +50,7 @@ export function RivalBoard({ t, estate, myTower, myHeightM, onPick, dailyLanguag
     return () => {
       live = false;
     };
-  }, [authed, fetchRivals, dailyLanguage]);
+  }, [authed, fetchRivals, dailyLanguage, charges]);
 
   // Auth resolves late: show the board's own loading state until it settles, or
   // a signed-in player gets a flash of the guest sign-in pitch first.
@@ -194,7 +196,8 @@ function Column({
       <div className="rounded-neo border-neo border-neo-lime bg-neo-navy-light p-1.5 pb-2">{body}</div>
     );
   }
-  const canWreck = s.tower.length > 0;
+  const wrecked = !!s.rival?.wreckedToday;
+  const canWreck = s.tower.length > 0 && !wrecked;
   return (
     <button
       type="button"
@@ -204,9 +207,9 @@ function Column({
       className="w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy-light p-1.5 pb-2 text-start shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 motion-safe:hover:-translate-y-0.5"
     >
       {body}
-      <span className="mt-1 flex items-center justify-center gap-1 rounded-sm border-neo border-black bg-neo-pink px-1 py-0.5 font-neo-display text-[10px] font-black uppercase text-neo-navy">
+      <span className={`mt-1 flex items-center justify-center gap-1 rounded-sm border-neo border-black px-1 py-0.5 font-neo-display text-[10px] font-black uppercase text-neo-navy ${wrecked ? 'bg-neo-cream' : 'bg-neo-pink'}`}>
         <Hammer className="h-3 w-3" aria-hidden />
-        {t('wordTowerV2.rivals.wreck')}
+        {t(wrecked ? 'wordTowerV2.rivals.wreckedToday' : 'wordTowerV2.rivals.wreck')}
       </span>
     </button>
   );

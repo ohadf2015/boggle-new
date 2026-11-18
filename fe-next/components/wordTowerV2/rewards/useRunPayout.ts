@@ -96,9 +96,14 @@ export function useRunPayout({ over, ready, getSummary, reportRun }: Args): {
     wasOverRef.current = true;
     if (!ready || sentRef.current) return;
     sentRef.current = true;
+    const summary = summaryRef.current();
+    // A resumed tower cashed out with nothing new built has earned nothing.
+    if (summary.floors <= 0) {
+      setPayoutStatus({ status: 'none', coins: 0 });
+      return;
+    }
     setWaiting(true);
     setPayoutStatus({ status: 'pending', coins: 0 });
-    const summary = summaryRef.current();
     // Deliberately NOT cancelled on cleanup: StrictMode tears the first effect
     // down and the guard then blocks the retry, so a cancel would lose the only
     // report of the run.

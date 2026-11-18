@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clearRunSnapshot, loadRunSnapshot, saveRunSnapshot, shouldConfirmLeave, snapshotKey } from '../runPersist';
+import { clearRunSnapshot, loadRunSnapshot, saveRunSnapshot, snapshotKey } from '../runPersist';
 
 function mem(init: Record<string, string> = {}) {
   const store = { ...init };
@@ -16,12 +16,6 @@ function mem(init: Record<string, string> = {}) {
 }
 
 describe('runPersist', () => {
-  it('given a live climb, when the player tries to leave, then we ask them to confirm', () => {
-    expect(shouldConfirmLeave('composing', 3)).toBe(true);
-    expect(shouldConfirmLeave('over', 3)).toBe(false);
-    expect(shouldConfirmLeave('composing', 0)).toBe(false);
-  });
-
   it('given a daily snapshot, when saved and loaded the same UTC day, then it round-trips', () => {
     const d = new Date('2026-09-21T12:00:00Z');
     const storage = mem();

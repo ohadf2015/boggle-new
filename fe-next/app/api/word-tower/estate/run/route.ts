@@ -22,6 +22,7 @@ const Body = z.object({
   bestCombo: z.number().finite(),
   crates: z.number().finite(),
   heightM: z.number().finite(),
+  grownM: z.number().finite().optional(),
   braces: z.number().finite().optional(),
   snacks: z.number().finite().optional(),
   tower: z.array(z.unknown()).max(200).optional(),
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
       return { ok: true, estate: r.estate, extra: { coins: r.coins, chest: r.chest } };
     });
     if (!res.ok) return NextResponse.json({ error: 'busy, retry', reason: res.reason }, { status: 409 });
-    const xp = await grantTowerRunXp(db, user.id, summary.heightM);
+    const xp = await grantTowerRunXp(db, user.id, summary.grownM ?? summary.heightM);
     return NextResponse.json({ estate: res.estate, perks: perksFromEstate(res.estate), ...res.extra, ...xp });
   } catch (err) {
     captureApiError(err as Error, 'word-tower-estate-run');

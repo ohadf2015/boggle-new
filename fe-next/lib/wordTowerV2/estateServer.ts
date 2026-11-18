@@ -11,6 +11,7 @@
  * wallet on the next load.
  */
 import type { getSupabaseAdmin } from '@/lib/email';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { type Estate, emptyEstate, sanitizeEstate } from './estate';
 import { encodeTower } from './estateTower';
 import { type Wallet, dbWallet } from './estateWallet';
@@ -158,6 +159,18 @@ export async function mutateEstate<X>(
     return { ...res, estate: { ...res.estate, coins: balance } };
   }
   return { ok: false, reason: 'conflict' };
+}
+
+/** Rivals this player already wrecked today (UTC). Revenge hits do not count. */
+export async function wreckedToday(db: Db, attackerId: string): Promise<Set<string>> {
+  const { data, error } = await db
+    .from(RAIDS)
+    .select('defender_id')
+    .eq('attacker_id', attackerId)
+    .eq('revenge', false)
+    .gte('created_at', `${utcDateKey()}T00:00:00.000Z`);
+  if (error) throw error;
+  return new Set(((data as Row[] | null) ?? []).map((r) => String(r.defender_id)));
 }
 
 export interface PublicProfile {

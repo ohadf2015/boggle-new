@@ -8,7 +8,6 @@ import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
 import { rankFromDailyBoard } from '@/lib/wordTowerV2/daily';
 import { hasSavedDailyTower } from '@/lib/wordTowerV2/dailyTower';
-import { shouldConfirmLeave } from '@/lib/wordTowerV2/runPersist';
 import { useDailyTowerLifecycle } from './useDailyTowerLifecycle';
 import type { DailyBoardRow } from './dailyRails';
 
@@ -106,17 +105,6 @@ export function useV2Ready({
   });
   // After the start hook so this cleanup runs first and cancels its SPA abandon.
   const closeSession = useDailyTowerLifecycle({ daily, floors, peakM, heightM, score });
-
-  useEffect(() => {
-    const onLeave = (e: BeforeUnloadEvent) => {
-      // The daily tower saves itself as it grows: leaving loses nothing.
-      if (daily || !shouldConfirmLeave(phase, floors)) return;
-      e.preventDefault();
-      e.returnValue = '';
-    };
-    window.addEventListener('beforeunload', onLeave);
-    return () => window.removeEventListener('beforeunload', onLeave);
-  }, [daily, phase, floors]);
 
   return { dailyRank, dailyBoard, refreshRank: () => setRankTick((n) => n + 1), closeSession };
 }

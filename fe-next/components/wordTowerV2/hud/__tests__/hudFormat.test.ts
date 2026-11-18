@@ -29,6 +29,17 @@ describe('comboTier', () => {
 });
 
 describe('formatHudCount', () => {
+  it('spells out big Hebrew amounts instead of a Latin K or M', () => {
+    expect(formatHudCount(12_000, 'he')).toContain('12 אלף');
+    expect(formatHudCount(2_753_978, 'he')).toContain('2.8 מיליון');
+  });
+
+  it('follows the language of the page, not the device', () => {
+    document.documentElement.lang = 'he';
+    expect(formatHudCount(12_000)).toMatch(/אלף/);
+    document.documentElement.lang = '';
+  });
+
   it('given a count under 10,000, then every digit shows', () => {
     expect(formatHudCount(9999, 'en')).toBe('9,999');
   });

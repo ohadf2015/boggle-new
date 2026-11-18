@@ -142,7 +142,7 @@ describe('GET /api/word-tower/estate/rivals', () => {
     (getSupabaseAdmin as any).mockReturnValue(db.client);
     const b = await body(await getRivals(getReq()));
     expect(b.revenge).toEqual([expect.objectContaining({ raidId: 'raid-1', coinsStolen: 40, rival: expect.objectContaining({ userId: THEM }) })]);
-    const raidCall = db.calls.find((c) => c.table === 'word_tower_raids')!;
+    const raidCall = db.calls.find((c) => c.table === 'word_tower_raids' && has(c.ops, 'is', 'avenged_at', null))!;
     expect(has(raidCall.ops, 'eq', 'defender_id', ME)).toBe(true);
     expect(has(raidCall.ops, 'is', 'avenged_at', null)).toBe(true);
   });

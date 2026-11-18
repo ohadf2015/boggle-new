@@ -73,7 +73,7 @@ describe('V2TopBar combo meter', () => {
 describe('V2TopBar widths', () => {
   it('given a five-digit coin bank, then the chip shows a compact number', () => {
     render(bar({ coins: 88888 }));
-    expect(screen.getByText('88.9K')).toBeTruthy();
+    expect(screen.getByText('wordTowerV2.coins.chip:88.9K')).toBeTruthy();
     expect(screen.getByLabelText('wordTowerV2.coins.run:88888')).toBeTruthy();
   });
 

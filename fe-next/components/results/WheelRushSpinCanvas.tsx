@@ -52,7 +52,7 @@ export default function WheelRushSpinCanvas({ reducedMotion = false, settleAngle
       });
 
       if (destroyed) {
-        app.destroy(true, { children: true });
+        app.destroy({ removeView: true }, { children: true });
         return;
       }
       el.appendChild(app.canvas);
@@ -136,7 +136,7 @@ export default function WheelRushSpinCanvas({ reducedMotion = false, settleAngle
     return () => {
       destroyed = true;
       if (raf) cancelAnimationFrame(raf);
-      try { app.destroy(true, { children: true }); } catch { /* ignore */ }
+      try { app.destroy({ removeView: true }, { children: true }); } catch { /* ignore */ }
     };
   }, [reducedMotion, settleAngle]);
 

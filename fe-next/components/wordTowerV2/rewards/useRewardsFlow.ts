@@ -85,6 +85,7 @@ export function useRewardsFlow({ game, estateApi, run, heightM, phase, playSound
   const getSummary = useCallback(
     (): RunSummary => ({
       ...readSummary(worldRef.current.runPeakPx / PX_PER_M),
+      grownM: Math.max(0, worldRef.current.runPeakPx / PX_PER_M - (worldRef.current.seededM ?? 0)),
       braces: bracesRef.current.paid,
       tower: towerBlocksFrom(worldRef.current, labelsRef.current),
     }),

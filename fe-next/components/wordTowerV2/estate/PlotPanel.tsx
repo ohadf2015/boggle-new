@@ -1,8 +1,10 @@
 'use client';
 
-import { Coins, Hammer, Sparkles, Wrench } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Coins, Hammer, Sparkles, Wrench, Zap } from 'lucide-react';
 import { type Estate, type PlotSlot, canUpgrade, repairCost, upgradeCost } from '@/lib/wordTowerV2/estate';
 import { MAX_PLOT_LEVEL } from '@/lib/wordTowerV2/estateCatalog';
+import { finishDistrictPlan } from '@/lib/wordTowerV2/estateFinish';
 import { ITEM, nextPerkLine } from './estateArt';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -12,13 +14,16 @@ interface Props {
   estate: Estate;
   slot: PlotSlot;
   name: string;
+  districtName: string;
   busy: boolean;
+  failed: boolean;
   onUpgrade: () => void;
   onRepair: () => void;
+  onFinish: () => void;
 }
 
 /** What this plot gives next, and the one button that buys it. */
-export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: Props) {
+export function PlotPanel({ t, estate, slot, name, districtName, busy, failed, onUpgrade, onRepair, onFinish }: Props) {
   const plot = estate.plots.find((p) => p.slot === slot) ?? estate.plots[0];
   const maxed = plot.level >= MAX_PLOT_LEVEL;
   const check = canUpgrade(estate, slot);
@@ -28,6 +33,17 @@ export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: 
   const useBlueprint = check.ok && check.useBlueprint;
   const useBrick = plot.damaged && estate.bricks > 0;
   const short = Math.max(0, cost - estate.coins);
+  const repairShort = useBrick ? 0 : Math.max(0, fix - estate.coins);
+  const plan = finishDistrictPlan(estate);
+  const finishShort = plan ? Math.max(0, plan.coins - estate.coins) : 0;
+  // Spending a whole district takes a second tap: the first one only arms it.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => setArmed(false), [estate, slot]);
+  useEffect(() => {
+    if (!armed) return;
+    const id = window.setTimeout(() => setArmed(false), 4000);
+    return () => window.clearTimeout(id);
+  }, [armed]);
 
   return (
     <div className="mx-auto w-full max-w-md rounded-neo border-neo-thick border-black bg-neo-cream p-3 text-neo-navy shadow-hard md:max-w-3xl">
@@ -57,6 +73,7 @@ export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: 
       <p className="mt-1 font-neo-display text-xs font-bold leading-snug opacity-80 md:text-sm">{t(`wordTowerV2.gear.see.${slot}`)}</p>
 
       {plot.damaged ? (
+        <>
         <button
           type="button"
           disabled={busy || (!useBrick && estate.coins < fix)}
@@ -75,6 +92,10 @@ export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: 
             {useBrick ? t('wordTowerV2.estate.free') : fix.toLocaleString()}
           </span>
         </button>
+        {repairShort > 0 ? (
+          <p className="mt-1 text-center font-neo-display text-xs font-bold opacity-80">{t('wordTowerV2.estate.need', { n: repairShort.toLocaleString() })}</p>
+        ) : null}
+        </>
       ) : maxed ? (
         <div className="mt-3 rounded-neo border-neo border-black bg-neo-yellow px-4 py-3 text-center font-neo-display text-base font-black uppercase">
           {t('wordTowerV2.estate.maxed')}
@@ -109,6 +130,35 @@ export function PlotPanel({ t, estate, slot, name, busy, onUpgrade, onRepair }: 
           ) : null}
         </>
       )}
+
+      {plan && plan.levels + plan.repairs > 1 ? (
+        <>
+          <button
+            type="button"
+            disabled={busy || finishShort > 0}
+            onClick={() => {
+              if (!armed) return setArmed(true);
+              setArmed(false);
+              onFinish();
+            }}
+            className={`mt-2 flex w-full items-center justify-center gap-2 rounded-neo border-neo border-black px-3 py-2 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard-sm active:translate-x-[1px] active:translate-y-[1px] active:shadow-none disabled:bg-neo-cream disabled:opacity-60 disabled:shadow-none md:text-base ${armed ? 'bg-neo-pink' : 'bg-neo-yellow'}`}
+          >
+            <Zap className="h-4 w-4 shrink-0" aria-hidden />
+            <span className="truncate">{armed ? t('wordTowerV2.estate.finishConfirm') : t('wordTowerV2.estate.finishAll', { name: districtName })}</span>
+            <span className="flex shrink-0 items-center gap-1 rounded-neo border-neo border-black bg-neo-cream px-2 py-0.5 text-xs tabular-nums">
+              <Coins className="h-3.5 w-3.5" aria-hidden />
+              {plan.coins.toLocaleString()}
+            </span>
+          </button>
+          {finishShort > 0 ? (
+            <p className="mt-1 text-center font-neo-display text-xs font-bold opacity-80">{t('wordTowerV2.estate.need', { n: finishShort.toLocaleString() })}</p>
+          ) : null}
+        </>
+      ) : null}
+
+      {failed ? (
+        <p role="alert" className="mt-2 text-center font-neo-display text-xs font-black text-neo-red">{t('wordTowerV2.estate.spendFailed')}</p>
+      ) : null}
     </div>
   );
 }
