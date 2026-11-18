@@ -73,8 +73,8 @@ describe('<ClassroomCardActivity>', () => {
     pulse.mockReturnValue({ pulse: { ...base, averageAccuracyPct: null }, isLoading: false, error: null, refresh: vi.fn() });
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     const line = screen.getByTestId('classroom-card-last').textContent;
-    expect(line).toContain('—');
-    expect(line).not.toContain('teacher.pulse.lastPlayed');
+    expect(line).toContain('teacher.pulse.lastPlayedNoScoreDays');
+    expect(line).not.toContain('accuracy');
   });
 
   it('Given the read is still open, Then it claims nothing yet', () => {
