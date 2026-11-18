@@ -2,8 +2,16 @@
 
 import { useMemo } from 'react';
 import {
-  Calendar, Mail, Globe, ShieldCheck, Bomb, Coins, Sparkles, ExternalLink, BookOpen,
+  Calendar,
+  Mail,
+  Globe,
+  ShieldCheck,
+  Bomb,
+  Sparkles,
+  ExternalLink,
+  BookOpen,
 } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';

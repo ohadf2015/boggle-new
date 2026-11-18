@@ -31,6 +31,7 @@ import { JoinCodeTile } from "./JoinCodeTile";
 import { NeoButton } from '@/components/ui/button';
 
 export interface HqClassroom {
+  created_at?: string;
   id: string;
   name: string;
   join_code: string;

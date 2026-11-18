@@ -28,10 +28,10 @@ describe('SinDescargarSection — GR #3729 heading gaps', () => {
     expect(screen.getByRole('heading', { level: 3, name: /idiomas y puntos, sin la app/i })).toBeInTheDocument();
   });
 
-  it('publishes the measured dictionary floor and 0 MB, not a store size', () => {
+  it('publishes the measured dictionary floor and a no-install row, not a store size', () => {
     render(<SinDescargarSection locale="es" />);
-    const table = screen.getByRole('table', { name: /0 MB y el suelo del diccionario/i });
-    expect(within(table).getByRole('cell', { name: '0 MB' })).toBeInTheDocument();
+    const table = screen.getByRole('table', { name: /sin instalar nada, y publica el suelo del diccionario/i });
+    expect(within(table).getByRole('cell', { name: 'Nada que instalar' })).toBeInTheDocument();
     expect(within(table).getByRole('cell', { name: `${ES_DICT_FLOOR}+` })).toBeInTheDocument();
     expect(screen.queryByText(/158/)).not.toBeInTheDocument();
   });

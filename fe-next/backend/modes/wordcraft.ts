@@ -21,6 +21,8 @@ import logger from '../utils/logger';
 export const wordcraftMode: GameModeModule = {
   id: 'wordcraft',
 
+  lessonWordsOffered: (game) => game.wordcraftState?.targets ?? [],
+
   initRound({ game, gameCode, language, playerUsernames, classroomGame }) {
     const start = resolveWordcraftClassroomStart({
       resolvedMode: 'wordcraft',

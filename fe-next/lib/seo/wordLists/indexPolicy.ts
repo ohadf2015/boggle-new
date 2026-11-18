@@ -12,11 +12,12 @@
  *
  * The pages stay live and linked — teachers use them — they just stop asking
  * to be indexed (noindex,follow) and leave the sitemap. The library hub and
- * the per-language hubs, which carry the editorial copy, stay indexed.
+ * the per-language hubs followed on 2026-11-18: 19 URLs earned 1 search click
+ * in 90 days and 16 had no impressions at all.
  * Flip a flag back to true to re-list a tier.
  */
 export const WORD_LIST_INDEXING = {
-  langHubs: true,
+  langHubs: false,
   gradeHubs: false,
   topicHubs: false,
   lists: false,

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Coins, Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { getLifeBonusForWord } from '../constants';
 import { isGoodVerdict, type HuntPhase, type HuntVerdict } from './huntStage';
 import { LUCKY_LIFE_BONUS, pickVariant, praiseFor } from './huntReward';

@@ -36,12 +36,12 @@ export function WordCraftPixiStage({ boardRef, reducedMotion, onReady }: Props) 
           autoDensity: true,
         });
         if (cancelled) {
-          app.destroy(true);
+          app.destroy({ removeView: true });
           return;
         }
         const holder = canvasHolderRef.current;
         if (!holder) {
-          app.destroy(true);
+          app.destroy({ removeView: true });
           return;
         }
         holder.appendChild(app.canvas);

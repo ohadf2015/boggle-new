@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { applyRepair, perksFromEstate } from '@/lib/wordTowerV2/estate';
 import { PLOT_SLOTS } from '@/lib/wordTowerV2/estateCatalog';
+import { settleDistrict } from '@/lib/wordTowerV2/estateFinish';
 import { mutateEstate } from '@/lib/wordTowerV2/estateServer';
 
 export const runtime = 'nodejs';
@@ -27,7 +28,9 @@ export async function POST(request: NextRequest) {
 
     const res = await mutateEstate(db, user.id, (e) => {
       const r = applyRepair(e, parsed.data.plot);
-      return r.ok ? { ok: true, estate: r.estate, extra: { cost: r.cost, usedBrick: r.usedToken } } : r;
+      if (!r.ok) return r;
+      const { estate, completed } = settleDistrict(r.estate);
+      return { ok: true, estate, extra: { cost: r.cost, usedBrick: r.usedToken, districtCompleted: completed } };
     });
     if (!res.ok) {
       return NextResponse.json({ error: 'cannot repair', reason: res.reason }, { status: res.reason === 'conflict' ? 409 : 400 });

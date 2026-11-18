@@ -7,7 +7,7 @@
 
 import React, { useRef, useCallback } from 'react';
 import { m } from 'framer-motion';
-import { Coins } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 
 export interface CoinUnlockCardProps {

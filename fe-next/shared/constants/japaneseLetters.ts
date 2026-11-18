@@ -81,3 +81,10 @@ export function extractHiraganaWords(content: string): string[] {
   }
   return out;
 }
+
+const BOARD_KANA = new Set(japaneseHiragana);
+
+/** Lesson words a hiragana board can carry: kanji and katakana have no tile to sit on. */
+export function plantableJapaneseWords(words: readonly string[]): string[] {
+  return words.filter((w) => [...w].length >= 2 && [...w].every((ch) => BOARD_KANA.has(ch)));
+}

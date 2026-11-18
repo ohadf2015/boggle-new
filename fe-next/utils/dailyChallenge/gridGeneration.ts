@@ -7,7 +7,7 @@
 import {
   hebrewLetters,
   swedishLetters,
-  spanishLetters,
+  SPANISH_SEEDED_LEGACY_POOL,
   russianLetterPool,
   DIFFICULTIES,
   DEFAULT_DIFFICULTY,
@@ -115,7 +115,7 @@ export function generateDailyGrid(
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = SPANISH_SEEDED_LEGACY_POOL;
   } else if (language === 'ru') {
     letters = russianLetterPool;
   } else if (language === 'ja') {

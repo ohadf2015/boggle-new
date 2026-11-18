@@ -1629,7 +1629,7 @@ const sv = {
     "sections": {
       "daily": {
         "title": "Ett pussel om dagen. Håll sviten vid liv.",
-        "line": "En ny bräda varje morgon. Alla får samma bokstäver, så ni kan jämföra poäng.",
+        "line": "En ny bräda varje dag vid midnatt UTC. Alla får samma bokstäver, så ni kan jämföra poäng.",
         "cta": "Spela dagens pussel",
         "streak": "dagars svit"
       },
@@ -3102,6 +3102,8 @@ const sv = {
       "back": "Tillbaka",
       "raidFailed": "Räden gick inte fram",
       "raidError": "Något gick snett. Försök igen.",
+      "wreckedToday": "Träffat idag",
+      "alreadyWrecked": "Du har redan träffat det här tornet idag. Kom tillbaka i morgon.",
       "revengeTitle": "Dags för hämnd",
       "revengeBody": "{name} krossade din {plot} och stack med {coins} mynt.",
       "revengeBodyBlocked": "{name} svingade mot ditt torn – din sköld höll.",
@@ -3120,7 +3122,7 @@ const sv = {
         "lot": "tom tomt"
       }
     },
-    "coins": { "run": "{n} mynt denna runda" },
+    "coins": { "run": "{n} mynt denna runda", "chip": "{n}" },
     "streak": { "a11y": "Perfekt svit ×{n}", "toRare": "{n} perfekta → sällsynt låda", "crate": "LÅDA", "meterA11y": "Perfekt svit {n}, ger ×{mult}. {rare} till för en sällsynt låda.", "label": "Svit" },
     "milestone": { "floors": "Våningar!", "a11y": "{n} våningar" },
     "chest": {
@@ -3170,6 +3172,9 @@ const sv = {
       "perksNone": "Bygg kvarteret så står tornet stadigare",
       "newsRaids": "{n} räder mot dig medan du var borta",
       "newsAffordable": "{n} uppgraderingar har du råd med",
+      "finishAll": "Bygg klart {name}",
+      "finishConfirm": "Bekräfta",
+      "spendFailed": "Det gick inte. Försök igen.",
       "newsDamaged": "{n} tomter behöver lagas",
       "newsNone": "Allt är lugnt i kvarteret",
       "completeTitle": "{name} klart!",
@@ -3301,7 +3306,7 @@ const sv = {
     "bestFlag": "REKORD",
     "leaveConfirm": "Lämna klättringen? Du kan återuppta den i den här fliken, men den dagliga går bara en gång per dag.",
 "leaveDaily": {"title": "Lämna dagens klättring?", "desc": "Dagens klättring avslutas. Din höjd räknas på dagens topplista. Nästa dagliga klättring öppnas i morgon."},
-"leaveFree": {"title": "Lämna klättringen?", "desc": "Klättringen avslutas och dina mynt betalas ut. Du kan starta en ny klättring när som helst."},
+"leaveFree": {"title": "Lämna klättringen?", "desc": "Ditt torn är sparat. När du lämnar betalas mynten från klättringen ut, och nästa gång bygger du vidare."},
     "leaveKeep": "Fortsätt klättra",
     "leaveGo": "Lämna",
     "dailyPlayed": "Dagens torn är klart. Kom tillbaka i morgon.",
@@ -3725,7 +3730,10 @@ const sv = {
     "perkReminders": "Påminnelser så att du aldrig bryter din streak",
     "menuLabel": "Hämta appen",
     "pillLabel": "Hämta appen",
-    "pillClose": "Dölj app-bannern"
+    "pillClose": "Dölj app-bannern",
+    "qrTitle": "Skanna och installera på mobilen",
+    "qrHint": "Rikta Android-kameran hit så öppnas LexiClash på Google Play.",
+    "qrAlt": "QR-kod som öppnar LexiClash på Google Play"
   },
   "name": "Svenska",
   "direction": "ltr",
@@ -15075,6 +15083,9 @@ const sv = {
       "lastPlayedToday": "Spelade i dag · {{accuracy}}% i snitt",
       "lastPlayedDays": "Spelade för {{days}} dagar sedan · {{accuracy}}% i snitt",
       "lastPlayedOneDay": "Spelade i går · {{accuracy}}% i snitt",
+      "lastPlayedNoScoreToday": "Spelade i dag",
+      "lastPlayedNoScoreDays": "Spelade för {{days}} dagar sedan",
+      "lastPlayedNoScoreOneDay": "Spelade i går",
       "strugglingOne": "{{names}} kämpar",
       "struggling": "{{count}} kämpar: {{names}}",
       "regionLabel": "Klasstatus för {{classroom}}",
@@ -22458,7 +22469,9 @@ const sv = {
         "tooSoon": "Välj en tid minst 30 minuter fram.",
         "tooFar": "Välj en tid inom de närmaste 60 dagarna.",
         "setupTitle": "När har du nästa lektion med den här klassen?",
-        "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet."
+        "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet.",
+        "homeTitle": "När är nästa lektion med den här klassen?",
+        "homeBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, så att du kan öppna det direkt i klassrummet."
       },
       "keepOpen": {
         "cta": "Håll den öppen som läxa i en vecka",
@@ -22621,6 +22634,7 @@ const sv = {
       "studentsOne": "1 elev",
       "classPage": "Klassens sida",
       "notPlayedRecently": "Inga spel på 30 dagar",
+      "noGamesYet": "Inga spel än",
       "roster": {
         "hide": "Dölj elevlistan",
         "seeAll": "Visa alla elever ({count})",
@@ -22822,6 +22836,22 @@ const sv = {
       "startNow": "Starta ett spel nu",
       "startQuick": "Starta ett snabbt spel",
       "joinedNone": "Väntar på första eleven…",
+      "guide": {
+        "stepClass": "Klassen klar",
+        "stepReady": "Förbered",
+        "stepPlay": "Första spelet",
+        "askTitle": "Var är du just nu?",
+        "withStudents": "Med mina elever",
+        "withStudentsBody": "Släpp in dem med koden. Inget spel startar förrän du säger till.",
+        "alone": "Förbereder mig själv",
+        "aloneBody": "Testa i lugn och ro och planera nästa lektion. Eleverna ser ingenting.",
+        "tryTitle": "Testa först, bara du",
+        "tryBody": "Du spelar mot övningsbotar. Ingen elev kan se det eller gå med.",
+        "skipTry": "Hoppa till nästa lektion",
+        "waitingBody": "Visa koden på tavlan. Spelet öppnas så fort första eleven är med.",
+        "startAnyway": "Öppna spelet utan att vänta",
+        "back": "Mina elever är med mig nu"
+      },
       "joinedOne": "1 elev har anslutit",
       "joinedMany": "{count} elever har anslutit",
       "shareWhatsapp": "WhatsApp",

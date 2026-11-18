@@ -204,7 +204,16 @@ export async function POST(request: NextRequest) {
       case 'subscription.cycled':
       case 'subscription.paused':
         await handleSubscriptionUpdated(payload, userId)
-        trackProTrial(payload, userId)
+        if (mapStatus(payload?.data?.status) === 'past_due') {
+          try {
+            await maybeSendPaymentFailedEmail({ payload, userId })
+          } catch (err) {
+            console.error('[Polar] dunning email threw:', err)
+          }
+          trackPastDue(payload, userId)
+        } else {
+          trackProTrial(payload, userId)
+        }
         break
       case 'subscription.past_due':
         await handleSubscriptionUpdated(payload, userId)

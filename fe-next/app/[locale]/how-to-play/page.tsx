@@ -7,6 +7,7 @@ import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
     const pageContent = getHowToPlayContent(validLocale);
     const baseSeo = t?.seo || enT.seo;
 
-    return {
+    return withBodyLocales({
         title: pageContent.pageTitle,
         description: pageContent.pageDescription,
         openGraph: {
@@ -78,7 +79,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
             },
         },
         robots: { index: true, follow: true },
-    };
+    }, '/how-to-play', locale);
 }
 
 const howToPlaySeoContent: Record<string, {

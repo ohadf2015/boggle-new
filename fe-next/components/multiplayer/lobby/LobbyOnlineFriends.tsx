@@ -35,14 +35,20 @@ function OnlineFriendsRow({ gameCode, onMore, className }: Props) {
       className={cn('flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-navy-light/70 px-2 py-1.5 shadow-hard-sm', className)}
     >
       <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full border border-neo-black bg-neo-lime" />
-      <ul className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
+      <p className="shrink-0 font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-lime">
+        {t('friendSocial.onlineNowLabel')}
+      </p>
+      <ul className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto scrollbar-none">
         {online.slice(0, SHOWN).map((f) => {
           const name = f.displayName || f.username;
           const state = states[f.odUserId] ?? 'idle';
           return (
-            <li key={f.odUserId} className="flex min-w-0 items-center gap-1">
+            <li key={f.odUserId} className="flex min-w-0 shrink-0 items-center gap-1.5">
               <span className="h-8 w-8 shrink-0 overflow-hidden rounded-full border-2 border-neo-black">
                 <Avatar avatarImage={f.avatarImage} customAvatar={f.customAvatar} userId={f.odUserId} size="sm" className="h-full w-full" />
+              </span>
+              <span dir="auto" className="max-w-[7rem] truncate text-xs font-bold text-neo-white">
+                {name}
               </span>
               <button
                 type="button"
@@ -50,13 +56,16 @@ function OnlineFriendsRow({ gameCode, onMore, className }: Props) {
                 disabled={state !== 'idle'}
                 aria-label={t('friendSocial.inviteName', { name })}
                 className={cn(
-                  'inline-flex h-8 min-w-[44px] items-center justify-center rounded-neo border-2 border-neo-black px-2 shadow-hard-sm transition-[transform,box-shadow] active:translate-y-0.5 active:shadow-none',
+                  'inline-flex h-8 min-w-[44px] items-center justify-center gap-1 rounded-neo border-2 border-neo-black px-2 shadow-hard-sm transition-[transform,box-shadow] active:translate-y-0.5 active:shadow-none',
                   state === 'sent' ? 'bg-neo-navy-elevated text-neo-lime shadow-none' : 'bg-neo-pink text-neo-black',
                 )}
               >
                 {state === 'busy' ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
                   : state === 'sent' ? <Check aria-hidden className="h-4 w-4" strokeWidth={3} />
                   : <Send aria-hidden className="h-4 w-4 rtl:-scale-x-100" />}
+                <span className="font-neo-display text-[11px] font-bold uppercase">
+                  {state === 'sent' ? t('friendSocial.invited') : t('friendSocial.invite')}
+                </span>
               </button>
             </li>
           );

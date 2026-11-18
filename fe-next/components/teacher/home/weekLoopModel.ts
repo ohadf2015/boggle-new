@@ -67,7 +67,7 @@ export function readyForTest(game: RecentClassroomGame | null): ReadyForTest | n
   if (!game) return null;
   const rated = game.players.filter((p) => p.lessonWordsFound.length + p.lessonWordsMissed.length > 0);
   if (rated.length === 0) return { kind: 'noResults' };
-  return { kind: 'counts', ready: rated.filter((p) => p.accuracyPct >= READY_PCT).length, rated: rated.length };
+  return { kind: 'counts', ready: rated.filter((p) => (p.accuracyPct ?? 0) >= READY_PCT).length, rated: rated.length };
 }
 
 export function missedLastGame(game: RecentClassroomGame | null): string[] {

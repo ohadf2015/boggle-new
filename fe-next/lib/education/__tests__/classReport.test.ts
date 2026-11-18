@@ -347,3 +347,24 @@ describe('buildNotesText', () => {
     expect(text).toContain('The class found every word.');
   });
 });
+
+describe('GIVEN a round that offered no lesson words', () => {
+  const unrated = game({
+    gameMode: 'wheel-rush',
+    players: [{ ...player('s1', 'Alice', [], [], 120), accuracyPct: null }],
+    missedWords: [],
+    totalLessonWords: 0,
+    wordsNobodyFound: [],
+    averageAccuracyPct: null,
+  });
+
+  it('WHEN the grid is built THEN the student has no accuracy instead of 0%', () => {
+    expect(buildClassReportGrid(unrated).columns[0].accuracyPct).toBeNull();
+  });
+
+  it('WHEN the printout is built THEN the student is not on the check-in list', () => {
+    const text = buildNotesText(unrated, buildClassReportGrid(unrated), labels);
+    expect(text).toContain(labels.everyoneOk);
+    expect(text).not.toContain('Alice — 0%');
+  });
+});

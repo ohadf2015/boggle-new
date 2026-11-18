@@ -13,6 +13,7 @@ function clientFor(rows: Row[] | null, error: unknown = null, delayMs = 0) {
   let ids: string[] = [];
   const q: Record<string, unknown> = {
     select: () => q,
+    eq: () => q,
     in: (_col: string, v: string[]) => ((ids = v), q),
     order: () => q,
     limit: (n: number) => {

@@ -247,7 +247,7 @@ export default function TowerCanvas(props: Props) {
       });
 
       if (disposed) {
-        created.destroy(true);
+        created.destroy({ removeView: true });
         return;
       }
 
@@ -707,7 +707,7 @@ export default function TowerCanvas(props: Props) {
       host.removeEventListener('pointercancel', onPointerUp);
       host.removeEventListener('wheel', onWheel);
       propsRef.current.registerProjector?.(null);
-      app?.destroy(true, { children: true });
+      app?.destroy({ removeView: true }, { children: true });
     };
   }, []);
 

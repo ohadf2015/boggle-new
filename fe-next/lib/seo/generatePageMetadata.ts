@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
+import { withBodyLocales } from './bodyLocales';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -100,7 +101,7 @@ export async function generatePageMetadata({
     alternateLanguages[ext] = `${BASE_URL}/${base}${path}`;
   }
 
-  return {
+  return withBodyLocales({
     title: seo.title,
     description: seo.description,
     openGraph: {
@@ -132,5 +133,5 @@ export async function generatePageMetadata({
     // noindex,follow (not nofollow): keeps outbound links passing crawl signal
     // from noindexed shells — same convention as /anagram/[letters].
     robots: noIndex ? { index: false, follow: true } : { index: true, follow: true },
-  };
+  }, path, locale);
 }

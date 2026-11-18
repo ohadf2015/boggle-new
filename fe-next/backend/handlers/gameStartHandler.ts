@@ -66,7 +66,7 @@ import {
   emitTotalBoardWords,
   installBoard,
   pickGoldenLetters,
-  recordClassroomWordBank,
+  settleClassroomRoundWords,
   scheduleSpecialWords,
 } from './gameStartRound.js';
 import { tryAcquireGameStart, releaseGameStart } from './gameStartMutex.js';
@@ -214,6 +214,7 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       }
       transitioned = true;
       resetRoundSocial(io, gameCode, game);
+      game.classroomOfferedWords = undefined;
 
       // ---- Live Vocab Quiz ----
       // DO NOT MOVE THIS BLOCK: it must stay AFTER the START transition (so
@@ -299,7 +300,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const lessonVocabulary = classroomGame?.vocabularyWords
         ? buildLessonVocabulary(classroomGame.vocabularyWords, gameLang)
         : undefined;
-      const vocabToEmbed = game.lessonCrossword ? [] : embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
+      const stagedWords = !!game.lessonCrossword;
+      const vocabToEmbed = stagedWords ? [] : embeddableLessonWords(classroomGame?.vocabularyWords ?? [], gameLang);
 
       // SECURITY: the server deals the board for every competitive (2+) game —
       // a client grid would let the host rig it. Solo keeps the client grid,
@@ -383,9 +385,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       updateGame(gameCode, { goldenLetters });
 
       // Lesson words the FINAL board carries — only now is the grid the one the class sees.
-      const placedLessonWords = classroomGame && vocabToEmbed.length > 0
-        ? recordClassroomWordBank(io, gameCode, game, letterGrid, gameLang, vocabToEmbed, classroomGame.teacherId)
-        : [];
+      const placedLessonWords = settleClassroomRoundWords({
+        io, gameCode, game, letterGrid, language: gameLang, mode: resolvedMode, vocabToEmbed, classroomGame, stagedWords,
+      });
 
       const bossId = resolvedMode === 'classic' ? classroomGame?.settings?.classroomBossId : undefined;
       armRoomBoss(io, gameCode, game, { bossId, students: playerUsernames.length, roundSeconds: validTimer });

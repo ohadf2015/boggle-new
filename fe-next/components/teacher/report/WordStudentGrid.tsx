@@ -184,7 +184,7 @@ export function WordStudentGrid({
                   data-testid="report-column-total"
                   className="px-1 py-2 text-center tabular-nums font-black text-black text-xs"
                 >
-                  {col.played ? `${col.accuracyPct}%` : '—'}
+                  {col.played && col.accuracyPct !== null ? `${col.accuracyPct}%` : '—'}
                 </td>
               ))}
             </tr>

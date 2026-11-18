@@ -18,6 +18,7 @@ import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
 import { rosterSeedFromJoined } from '@/lib/multiplayer/roster';
 import { resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
 import { hostTransferAction, roomGoneAction, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { sessionWaitingHref } from '@/lib/education/sessionWaiting';
 import { trackInviteRoomDead, trackInviteConsumed, trackGrowthEvent } from '@/utils/growthTracking';
 import { shouldOfferQuickPlayRecovery, consumeRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
@@ -81,7 +82,7 @@ export interface MpRoomSocketContext {
   /** Early classroom joiner: hold on the teacher's code instead of bouncing. */
   roomWaitHold: (code: string) => void;
   /** Ended class code: enroll via the join page and wait. Do not re-emit join. */
-  onSessionWaiting?: (code: string) => void;
+  onSessionWaiting?: (href: string) => void;
   /** Tri-state classroom detection — 'pending' defers the irreversible decisions. */
   classroomContext: ClassroomContext;
   classroomDecisionRef: MutableRefObject<{ context: ClassroomContext; isHost: boolean }>;
@@ -225,7 +226,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
         setAttemptingReconnect(false);
         setShouldAutoJoin(false);
         clearSessionPreservingUsername();
-        if (waitingCode) ctx.onSessionWaiting?.(waitingCode);
+        if (waitingCode) ctx.onSessionWaiting?.(sessionWaitingHref(waitingCode, language, classroomDecisionRef.current.isHost));
         return;
       }
       if (kind === 'notOpen') { setError(''); roomWait.hold(waitingCode); return; }

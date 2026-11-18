@@ -21,7 +21,7 @@ describe('Vocabulary Games Classroom Content', () => {
       expect(content).toHaveProperty('whyTitle');
       expect(content).toHaveProperty('faqTitle');
       expect(content.whyPoints).toHaveLength(4);
-      expect(content.faqs).toHaveLength(6);
+      expect(content.faqs).toHaveLength(7);
     });
   });
 

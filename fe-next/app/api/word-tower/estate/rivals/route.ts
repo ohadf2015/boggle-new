@@ -11,6 +11,7 @@ import {
   loadOrCreateEstate,
   profilesByIds,
   rowToEstate,
+  wreckedToday,
 } from '@/lib/wordTowerV2/estateServer';
 
 export const runtime = 'nodejs';
@@ -35,7 +36,7 @@ async function rows(q: PromiseLike<{ data: unknown; error: unknown }>): Promise<
   return (data as Row[] | null) ?? [];
 }
 
-async function nearest(db: Db, me: string, district: number, bestM: number): Promise<Row[]> {
+async function nearest(db: Db, me: string, district: number, bestM: number, wrecked: Set<string>): Promise<Row[]> {
   // PostgREST can't ORDER BY abs(best_m - x): take the closest few above and below, merge.
   const [up, down] = await Promise.all([
     rows(db.from(ESTATES).select(ESTATE_COLS).eq('district', district).neq('player_id', me).gte('best_m', bestM).order('best_m', { ascending: true }).limit(RIVALS + 1)),
@@ -43,7 +44,8 @@ async function nearest(db: Db, me: string, district: number, bestM: number): Pro
   ]);
   const picked = [...up, ...down]
     .map((r, i) => ({ r, d: Math.abs(Number(r.best_m) - bestM), i }))
-    .sort((a, b) => a.d - b.d || a.i - b.i)
+    // Rivals already hit today go last, so a player with balls left still has a target.
+    .sort((a, b) => Number(wrecked.has(String(a.r.player_id))) - Number(wrecked.has(String(b.r.player_id))) || a.d - b.d || a.i - b.i)
     .slice(0, RIVALS)
     .map((x) => x.r);
   if (picked.length >= RIVALS) return picked;
@@ -94,10 +96,11 @@ export async function GET(request: NextRequest) {
     if (!db) return NextResponse.json({ error: 'db unavailable' }, { status: 503 });
 
     const { estate: mine } = await loadOrCreateEstate(db, user.id);
+    const wrecked = await wreckedToday(db, user.id);
     const dailyLang = new URL(request.url).searchParams.get('daily')?.slice(0, 8) || null;
     const today = dailyLang ? await todaysRivals(db, user.id, dailyLang) : { picked: [], dailyM: new Map<string, number>() };
     const [nearby, raids] = await Promise.all([
-      nearest(db, user.id, mine.district, mine.bestM),
+      nearest(db, user.id, mine.district, mine.bestM, wrecked),
       rows(
         db.from(RAIDS)
           .select('id, attacker_id, coins_stolen, blocked, plot, created_at')
@@ -171,6 +174,7 @@ export async function GET(request: NextRequest) {
         bestM: e?.bestM ?? 0,
         lastTower: e?.lastTower ?? [],
         ruins: ruinsOf(id),
+        wreckedToday: wrecked.has(id),
         dailyM: today.dailyM.get(id) ?? null,
       };
     };

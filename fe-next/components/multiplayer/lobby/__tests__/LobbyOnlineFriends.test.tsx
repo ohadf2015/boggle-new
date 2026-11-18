@@ -59,4 +59,12 @@ describe('LobbyOnlineFriends', () => {
     const { container } = render(<LobbyOnlineFriends gameCode="ABCD" onMore={vi.fn()} />);
     expect(container.innerHTML).toBe('');
   });
+
+  it('Given one online friend, Then shows their name and an Invite label so the row is not an empty bar', () => {
+    state.friends = [f('pal', true)];
+    render(<LobbyOnlineFriends gameCode="ABCD" onMore={vi.fn()} />);
+    expect(screen.getByText('friendSocial.onlineNowLabel')).toBeInTheDocument();
+    expect(screen.getByText('pal')).toBeInTheDocument();
+    expect(screen.getByText('friendSocial.invite')).toBeInTheDocument();
+  });
 });

@@ -32,6 +32,8 @@ export interface BuildClassroomRoundSummaryArgs {
   participationBonus: number;
   /** Lesson words the round could have produced; defaults to the board's placed set. */
   placedWords?: string[];
+  /** Lesson words this round offered. Empty means none, so every missed word was never placed. */
+  offeredWords?: string[];
   /** The round's own mode; the room setting can lag it (a quiz round in a board room). */
   gameMode?: string;
 }
@@ -42,7 +44,8 @@ export async function buildClassroomRoundSummary({
   classroomGame,
   players,
   participationBonus,
-  placedWords = classroomGame.placedVocabulary,
+  offeredWords,
+  placedWords = offeredWords ?? classroomGame.placedVocabulary,
   gameMode,
 }: BuildClassroomRoundSummaryArgs): Promise<ClassroomSummary | undefined> {
   const classroomSettings = classroomGame.settings;
@@ -58,6 +61,15 @@ export async function buildClassroomRoundSummary({
   if (!summary) return undefined;
   if (classroomGame.classroomId) summary.classroomId = classroomGame.classroomId;
   summary.gameMode = gameMode ?? classroomSettings?.gameMode ?? 'classic';
+
+  const neverPlaced = offeredWords?.length === 0
+    ? summary.missedWords
+    : splitNeverPlacedWords({ missedWords: summary.missedWords, placedWords, language });
+  if (neverPlaced.length > 0) summary.neverPlacedWords = neverPlaced;
+  if (offeredWords) {
+    const offeredCount = summary.totalWords - neverPlaced.length;
+    for (const mastery of Object.values(summary.masteryByPlayer)) mastery.total = offeredCount;
+  }
 
   if (classroomSettings?.playStyle === 'teams') {
     const humanNames = players.filter((p) => !p.isBot).map((p) => p.username);
@@ -99,8 +111,6 @@ export async function buildClassroomRoundSummary({
   // fire-and-forget write here loses the race and drops the period standings.
   await saveClassroomSessionScores(gameCode, sessionScores, roundsPlayed);
 
-  const neverPlaced = splitNeverPlacedWords({ missedWords: summary.missedWords, placedWords, language });
-  if (neverPlaced.length > 0) summary.neverPlacedWords = neverPlaced;
   const accessibility = classroomSettings?.accessibility;
   if (accessibility?.largeText || accessibility?.audioCues) {
     summary.accessibility = { largeText: !!accessibility.largeText, audioCues: !!accessibility.audioCues };

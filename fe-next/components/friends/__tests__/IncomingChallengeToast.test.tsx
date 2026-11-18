@@ -6,7 +6,11 @@ const t = (key: string, a?: unknown, b?: unknown) => {
   return params ? `${key}|${Object.values(params).join(',')}` : key;
 };
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t, language: 'he' }) }));
-vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
+vi.mock('@/components/Avatar', () => ({
+  default: ({ customAvatar, userId }: { customAvatar?: { hair?: string }; userId?: string }) => (
+    <span data-testid="avatar" data-has-custom={customAvatar ? 'yes' : 'no'} data-userid={userId ?? ''} data-hair={customAvatar?.hair ?? ''} />
+  ),
+}));
 const toastMock = vi.hoisted(() => Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: toastMock }));
 const nav = vi.hoisted(() => ({ pathname: '/he/daily', push: vi.fn() }));
@@ -42,7 +46,7 @@ let socket = makeSocket();
 let hasSocket = true;
 vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => (hasSocket ? { socket, isConnected: true } : null) }));
 
-import IncomingChallengeToast from '../IncomingChallengeToast';
+import IncomingChallengeToast, { challengeFromSocket } from '../IncomingChallengeToast';
 
 async function renderToast() {
   const r = render(<IncomingChallengeToast />);
@@ -142,14 +146,31 @@ describe('IncomingChallengeToast — challenge received', () => {
     expect(screen.queryByText('friends.challenges.toast.title|Maya')).toBeNull();
   });
 
-  it('Given a round on screen, Then the card is held until it ends', async () => {
+  it('Given a round on screen, Then the invite card still appears so an in-app friend can Join without only getting a push', async () => {
     pending.list = [challenge()];
     inGame.value = true;
-    const { rerender } = await renderToast();
-    expect(screen.queryByText('friends.challenges.toast.title|Maya')).toBeNull();
-    inGame.value = false;
-    rerender(<IncomingChallengeToast />);
+    await renderToast();
     expect(screen.getByText('friends.challenges.toast.title|Maya')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'friends.challenges.acceptAndPlay' })).toBeTruthy();
+  });
+
+  it('Given a connected socket, When friends:challengeReceived fires, Then the card appears without a pending-list refetch', async () => {
+    await renderToast();
+    expect(screen.queryByTestId('incoming-challenge-toast')).toBeNull();
+    await act(async () => {
+      socket.fire('friends:challengeReceived', {
+        challengeId: 'ch-live',
+        fromUserId: 'maya-id',
+        fromUsername: 'maya',
+        fromDisplayName: 'Maya',
+        challengeType: 'join_room',
+        roomCode: 'RHCA28',
+        createdAt: Date.now(),
+      });
+    });
+    expect(pending.fetch).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('friends.invitedByTitle|Maya')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'friends.challenges.acceptAndPlay' })).toBeTruthy();
   });
 
   it('Given a challenge older than the live window, Then no card (it stays on /friends)', async () => {
@@ -216,5 +237,77 @@ describe('IncomingChallengeToast — my challenge was accepted', () => {
     for (const ev of ['friends:challengeAccepted', 'friends:challengeDeclined', 'friends:challengeResult']) {
       expect(socket.handlers.get(ev)?.size).toBe(1);
     }
+  });
+});
+
+describe('challengeFromSocket — built avatar', () => {
+  const built = {
+    gender: 'male' as const,
+    base: 'round' as const,
+    skinColor: '#FFDBB4',
+    hair: 'spiky' as const,
+    hairColor: '#2C1B18',
+    eyes: 'round' as const,
+    eyeColor: '#4A6FA5',
+    noseStyle: 'button' as const,
+    eyebrows: 'none' as const,
+    mouth: 'smile' as const,
+    accessory: 'none' as const,
+    accessoryColor: '#000000',
+    bgColor: '#1a1a2e',
+    shirtColor: '#4A90D9',
+  };
+
+  it('maps fromAvatar.customAvatar onto challengerCustomAvatar', () => {
+    const c = challengeFromSocket({
+      challengeId: 'ch-live',
+      fromUserId: 'milo-1',
+      fromUsername: 'milo',
+      fromDisplayName: 'Milo',
+      fromAvatar: { emoji: '😊', color: '#4F46E5', customAvatar: built },
+      challengeType: 'join_room',
+      roomCode: 'RHCA28',
+      createdAt: Date.now(),
+    });
+    expect(c.challengerCustomAvatar).toEqual(built);
+    expect(c.challengerId).toBe('milo-1');
+  });
+});
+
+describe('IncomingChallengeToast — built avatar face', () => {
+  it('Given a live room invite with a built avatar, Then the card renders that custom face not a generated placeholder', async () => {
+    const built = {
+      gender: 'male',
+      base: 'round',
+      skinColor: '#FFDBB4',
+      hair: 'spiky',
+      hairColor: '#2C1B18',
+      eyes: 'round',
+      eyeColor: '#4A6FA5',
+      noseStyle: 'button',
+      eyebrows: 'none',
+      mouth: 'smile',
+      accessory: 'none',
+      accessoryColor: '#000000',
+      bgColor: '#1a1a2e',
+      shirtColor: '#4A90D9',
+    };
+    await renderToast();
+    await act(async () => {
+      socket.fire('friends:challengeReceived', {
+        challengeId: 'ch-live',
+        fromUserId: 'milo-1',
+        fromUsername: 'milo',
+        fromDisplayName: 'Milo',
+        fromAvatar: { emoji: '😊', color: '#4F46E5', customAvatar: built },
+        challengeType: 'join_room',
+        roomCode: 'RHCA28',
+        createdAt: Date.now(),
+      });
+    });
+    const face = screen.getByTestId('avatar');
+    expect(face.getAttribute('data-has-custom')).toBe('yes');
+    expect(face.getAttribute('data-hair')).toBe('spiky');
+    expect(face.getAttribute('data-userid')).toBe('milo-1');
   });
 });

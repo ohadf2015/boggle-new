@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins, Trophy, Sparkles, Feather, FlaskConical } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Trophy, Sparkles, Feather, FlaskConical } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';

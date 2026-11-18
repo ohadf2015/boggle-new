@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Coins } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { CoinRewardTier } from '@/lib/audio/coinSoundPlan';

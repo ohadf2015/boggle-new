@@ -11,4 +11,9 @@ describe('session waiting — an ended class code is not a retry', () => {
   it('sends the student to the class join, which enrolls them and waits for the next game', () => {
     expect(sessionWaitingHref(' abc123 ', 'he')).toBe('/he/join/ABC123');
   });
+
+  it('sends the teacher to their dashboard, because the join page is for students', () => {
+    expect(sessionWaitingHref('abc123', 'he', true)).toBe('/he/teacher');
+    expect(sessionWaitingHref('abc123', '', true)).toBe('/en/teacher');
+  });
 });

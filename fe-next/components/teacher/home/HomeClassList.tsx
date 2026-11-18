@@ -75,6 +75,7 @@ export function HomeClassMeta({
   previewIds,
   memberCount,
   played,
+  createdAt,
   pending,
   failed,
   language,
@@ -84,6 +85,7 @@ export function HomeClassMeta({
   previewIds: readonly string[];
   memberCount: number;
   played: string | undefined;
+  createdAt?: string;
   pending: boolean;
   failed: boolean;
   language: string;
@@ -99,7 +101,7 @@ export function HomeClassMeta({
       </span>
       <span data-testid="home-desk-last-game" className="inline-flex items-center gap-1.5">
         <CalendarDays className="size-4" aria-hidden="true" />
-        <LastPlayed played={played} pending={pending} failed={failed} language={language} nowMs={nowMs} t={t} labelKey="eduShell.home.lastGameAt" />
+        <LastPlayed played={played} createdAt={createdAt} pending={pending} failed={failed} language={language} nowMs={nowMs} t={t} labelKey="eduShell.home.lastGameAt" />
       </span>
     </div>
   );
@@ -181,7 +183,7 @@ export function HomeClassList({
                     </span>
                     <span className="inline-flex items-center gap-1">
                       <CalendarDays className="size-3.5 sm:size-4" aria-hidden="true" />
-                      <LastPlayed played={played} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
+                      <LastPlayed played={played} createdAt={c.created_at} pending={lastPlayedAt === null && !activityFailed} failed={activityFailed} language={language} nowMs={nowMs} t={t} />
                     </span>
                   </span>
                   {(c.member_count ?? 0) > 0 ? <ClassStreakLine classroomId={c.id} className="mt-1 self-start" /> : null}
@@ -222,8 +224,16 @@ export function HomeClassList({
   );
 }
 
+const ACTIVITY_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+export function noPlaysKey(createdAt: string | undefined, nowMs: number): string {
+  const created = createdAt ? Date.parse(createdAt) : NaN;
+  return nowMs - created < ACTIVITY_WINDOW_MS ? 'eduShell.home.noGamesYet' : 'eduShell.home.notPlayedRecently';
+}
+
 function LastPlayed({
   played,
+  createdAt,
   pending,
   failed,
   language,
@@ -232,6 +242,7 @@ function LastPlayed({
   labelKey,
 }: {
   played: string | undefined;
+  createdAt?: string;
   pending: boolean;
   failed: boolean;
   language: string;
@@ -242,7 +253,7 @@ function LastPlayed({
 }) {
   if (pending) return <span aria-hidden="true" className={cn(SKELETON, 'inline-block h-3 w-16')} />;
   if (failed) return <span>-</span>;
-  if (!played) return <span>{t('eduShell.home.notPlayedRecently')}</span>;
+  if (!played) return <span>{t(noPlaysKey(createdAt, nowMs))}</span>;
   const when = lastPlayedLabel(played, language, nowMs);
   return <span>{labelKey ? t(labelKey, { when }) : when}</span>;
 }

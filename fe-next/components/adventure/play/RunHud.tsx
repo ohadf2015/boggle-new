@@ -22,7 +22,8 @@
  * where the grid can least afford it.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Clock, Coins, Heart, Shield, Volume2, VolumeX } from 'lucide-react';
+import { Clock, Heart, Shield, Volume2, VolumeX } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { useMasterMute } from '@/hooks/useMasterMute';

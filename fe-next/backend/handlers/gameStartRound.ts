@@ -21,7 +21,7 @@ import { setClassroomGamePlacedVocabulary, saveClassroomTeams, type ClassroomGam
 import { buildClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import { classroomTeamAbilities } from '../modules/classroomLevelCache.js';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
-import { getGameModeRules } from '../modes/index.js';
+import { getGameModeModule, getGameModeRules } from '../modes/index.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -162,6 +162,32 @@ export function recordClassroomWordBank(io: Server, gameCode: string, game: Game
     logger.warn('CLASSROOM_GAME', `Word-bank refresh failed for ${gameCode}: ${err}`);
   });
   return placedVocabulary;
+}
+
+export interface SettleClassroomRoundWordsArgs {
+  io: Server;
+  gameCode: string;
+  game: GameState;
+  letterGrid: LetterGrid;
+  language: Language;
+  mode: GameMode;
+  vocabToEmbed: string[];
+  classroomGame: ClassroomGame | null;
+  /** The mode staged its own lesson words before the board was dealt. */
+  stagedWords: boolean;
+}
+
+/** The one per-round write of what this classroom round offers; a later round never inherits it. */
+export function settleClassroomRoundWords({ io, gameCode, game, letterGrid, language, mode, vocabToEmbed, classroomGame, stagedWords }: SettleClassroomRoundWordsArgs): string[] {
+  if (!classroomGame) {
+    game.classroomOfferedWords = undefined;
+    return [];
+  }
+  const placedOnBoard = stagedWords
+    ? []
+    : recordClassroomWordBank(io, gameCode, game, letterGrid, language, vocabToEmbed, classroomGame.teacherId);
+  game.classroomOfferedWords = getGameModeModule(mode).lessonWordsOffered?.(game, placedOnBoard) ?? [];
+  return placedOnBoard;
 }
 
 /**

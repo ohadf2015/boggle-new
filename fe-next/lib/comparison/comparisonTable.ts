@@ -27,7 +27,7 @@ export const WORDLE_ROW_DEFS: readonly ComparisonRowDef[] = [
   { featureKey: 'dailyChallenge', lexi: 'Yes + global leaderboard', competitor: 'Yes' },
   { featureKey: 'brainTraining', lexi: '5 drill modes', competitor: 'None' },
   { featureKey: 'streakSystem', lexi: 'Yes + streak freeze', competitor: 'Yes' },
-  { featureKey: 'shareableResults', lexi: 'Emoji grid + challenge link', competitor: 'Emoji grid only' },
+  { featureKey: 'shareableResults', lexi: 'Share card + challenge link', competitor: 'Emoji grid only' },
   { featureKey: 'accountRequired', lexi: 'No', competitor: 'No (optional NYT)' },
 ];
 

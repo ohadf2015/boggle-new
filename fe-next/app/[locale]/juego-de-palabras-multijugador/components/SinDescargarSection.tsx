@@ -13,7 +13,7 @@ import { ES_DICT_FLOOR } from '../data';
  * inverse, not copied. Title and meta description stay frozen until 2026-11-19.
  *
  * Unique artifact none of those pages publish: our validation-Set floor
- * next to a 0 MB install. They publish a store listing; we publish the Set.
+ * next to a no-install browser game. They publish a store listing; we publish the Set.
  */
 const QUERY = 'apalabrados online gratis sin descargar';
 
@@ -43,7 +43,7 @@ export function SinDescargarSection({ locale }: { locale: string }) {
       <div className="mb-6 overflow-x-auto rounded-neo border-3 border-neo-black shadow-hard-lg">
         <table className="w-full min-w-[28rem] border-collapse bg-neo-navy-light/40 text-left">
           <caption className="sr-only">
-            Apalabrados pide una app. LexiClash mide 0 MB y el suelo del diccionario español.
+            Apalabrados pide una app. LexiClash se juega en el navegador, sin instalar nada, y publica el suelo del diccionario español.
           </caption>
           <thead>
             <tr className="border-b-3 border-neo-black">
@@ -62,7 +62,7 @@ export function SinDescargarSection({ locale }: { locale: string }) {
             <tr className="border-b-2 border-neo-white/10">
               <th scope="row" className="p-3 text-sm font-bold text-neo-white">Instalación</th>
               <td className="p-3 text-sm text-neo-gray-200">Tienda o APK</td>
-              <td className="p-3 text-sm font-bold text-neo-lime">0 MB</td>
+              <td className="p-3 text-sm font-bold text-neo-lime">Nada que instalar</td>
             </tr>
             <tr className="border-b-2 border-neo-white/10">
               <th scope="row" className="p-3 text-sm font-bold text-neo-white">Cuenta</th>

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render as rtlRender, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const tel = vi.hoisted(() => ({ shown: vi.fn(), shared: vi.fn(), copied: vi.fn(), first: vi.fn() }));
@@ -54,6 +54,16 @@ const savedPlan = { current: null as string | null };
 
 const follows = (a: Element, b: Element) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 const openCalendar = async () => fireEvent.click(await screen.findByTestId('setup-plan-calendar-toggle'));
+
+function render(ui: Parameters<typeof rtlRender>[0]) {
+  const result = rtlRender(ui);
+  const withStudents = screen.queryByTestId('setup-together-now') as HTMLButtonElement | null;
+  if (withStudents && !withStudents.disabled) {
+    fireEvent.click(withStudents);
+    fireEvent.click(screen.getByTestId('setup-start-anyway'));
+  }
+  return result;
+}
 
 describe('ClassSetupInvite: what next with no students yet', () => {
   beforeEach(() => {

@@ -21,9 +21,7 @@
  */
 
 import { useEffect } from 'react';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Zap, WifiOff, Bell } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { isOverlayQuietZoneActive } from '@/lib/overlayQuietZone';
@@ -32,6 +30,7 @@ import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import {
   hasLexiClashInstalled,
   isCapacitorNative,
+  isDesktopInstallContext,
   isStandaloneDisplay,
   playStoreUrlWithReferrer,
   shouldShowAndroidInstallPromo,
@@ -51,14 +50,9 @@ import {
   trackInstallDismissed,
   trackInstallPromoShown,
 } from '@/lib/androidInstall/installTracking';
-import GooglePlayMark from '@/components/android-install/GooglePlayMark';
-import {
-  Dialog,
-  DialogContent,
-  DialogBody,
-  DialogFooter,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import InstallPromoCard from '@/components/android-install/InstallPromoCard';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 const SESSION_FLAG = 'android_app_install_promo_shown';
 const SHOW_DELAY_MS = 12_000;
@@ -223,11 +217,7 @@ export default function AndroidAppInstallPromo() {
     window.location.href = playStoreUrlWithReferrer('install_popup', language);
   };
 
-  const perks = [
-    { Icon: Zap, text: t('androidAppPromo.perkFaster') },
-    { Icon: WifiOff, text: t('androidAppPromo.perkOffline') },
-    { Icon: Bell, text: t('androidAppPromo.perkReminders') },
-  ];
+  const wide = open && isDesktopInstallContext();
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && handleDismiss()}>
@@ -235,65 +225,9 @@ export default function AndroidAppInstallPromo() {
         thickBorder
         noDescription
         closeButtonLabel={t('androidAppPromo.close')}
-        className="max-w-md p-0 gap-0 overflow-hidden bg-neo-navy text-neo-white"
+        className={cn('gap-0 overflow-hidden bg-neo-navy p-0 text-neo-white', wide ? 'max-w-[54rem]' : 'max-w-md')}
       >
-        <div className="relative w-full aspect-[3/2] border-b-3 border-neo-black bg-neo-navy-light">
-          <Image
-            src="/images/promo/android-app-promo.jpg"
-            alt={t('androidAppPromo.imageAlt')}
-            fill
-            sizes="(max-width: 640px) 100vw, 28rem"
-            className="object-cover"
-            // Eager: the dialog only opens post-interaction (see the LCP guard
-            // above), so lazy's near-viewport deferral just adds a visible
-            // pop-in inside an already-open modal.
-            loading="eager"
-          />
-        </div>
-
-        <DialogBody className="text-center">
-          <DialogTitle className="text-neo-lime">{t('androidAppPromo.title')}</DialogTitle>
-          <p dir="auto" className="mt-2 text-sm sm:text-base font-medium text-neo-white">
-            {t('androidAppPromo.subtitle')}
-          </p>
-
-          <ul className="mt-4 flex flex-col gap-2 text-start">
-            {perks.map(({ Icon, text }) => (
-              <li key={text} dir="auto" className="flex items-center gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black">
-                  <Icon className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-                </span>
-                <span className="text-sm font-semibold text-neo-white">{text}</span>
-              </li>
-            ))}
-          </ul>
-        </DialogBody>
-
-        <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <button
-            type="button"
-            onClick={handleInstall}
-            aria-label={`${t('androidAppPromo.install')} — Google Play`}
-            className="group w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-neo-black text-neo-white border-3 border-neo-black rounded-neo shadow-hard-sm transition-all duration-100 hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-          >
-            <GooglePlayMark size={26} />
-            <span className="flex flex-col items-start leading-none">
-              <span className="text-[10px] font-bold uppercase tracking-widest text-neo-lime">
-                {t('androidAppPromo.installEyebrow')}
-              </span>
-              <span className="font-neo-display text-lg font-black tracking-tight">
-                {t('androidAppPromo.install')}
-              </span>
-            </span>
-          </button>
-          <button
-            type="button"
-            onClick={handleDismiss}
-            className="w-full px-4 py-2 text-sm font-bold uppercase tracking-wide text-neo-white/70 transition-colors hover:text-neo-white"
-          >
-            {t('androidAppPromo.dismiss')}
-          </button>
-        </DialogFooter>
+        {open && <InstallPromoCard wide={wide} source={source} onInstall={handleInstall} onDismiss={handleDismiss} />}
       </DialogContent>
     </Dialog>
   );

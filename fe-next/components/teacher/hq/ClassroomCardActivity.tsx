@@ -17,15 +17,17 @@ function lastLine(t: T, pulse: ClassPulse, loading: boolean): string {
   if (loading) return t("teacher.pulse.state.loading");
   if (pulse.daysSinceLastGame === null)
     return t(`teacher.pulse.state.${pulse.state}`);
+  const scored = pulse.averageAccuracyPct !== null;
   const key =
     pulse.daysSinceLastGame === 0
-      ? "teacher.pulse.lastPlayedToday"
+      ? scored ? "teacher.pulse.lastPlayedToday" : "teacher.pulse.lastPlayedNoScoreToday"
       : pulse.daysSinceLastGame === 1
-        ? "teacher.pulse.lastPlayedOneDay"
-        : "teacher.pulse.lastPlayedDays";
+        ? scored ? "teacher.pulse.lastPlayedOneDay" : "teacher.pulse.lastPlayedNoScoreOneDay"
+        : scored ? "teacher.pulse.lastPlayedDays" : "teacher.pulse.lastPlayedNoScoreDays";
+  if (!scored) return t(key, { days: pulse.daysSinceLastGame });
   return t(key, {
     days: pulse.daysSinceLastGame,
-    accuracy: pulse.averageAccuracyPct ?? 0,
+    accuracy: pulse.averageAccuracyPct as number,
   });
 }
 

@@ -22,6 +22,8 @@ export function crosswordRoomSeed(key: string): number {
 export const crosswordMode: GameModeModule = {
   id: 'crossword',
 
+  lessonWordsOffered: (game) => Object.values(game.crosswordMpState?.lessonWordBySlot ?? {}),
+
   prepareRound(io, gameCode, game) {
     return stageClassroomCrossword(io, gameCode, game);
   },

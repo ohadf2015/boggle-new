@@ -457,7 +457,6 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
     setRunBadges([]);
     setPhase('composing');
   }, [dailySeed, resetRush, setBanners, setRunBadges]);
-
   /** The server's best wins when higher: the device copy is lost with a cleared cache or a new phone. */
   const adoptBest = useCallback((m: number) => {
     if (!(m > bestRef.current)) return;
@@ -474,7 +473,8 @@ export function useTowerRun(opts?: { seed?: number; scriptedSwing?: boolean; rus
   /** A seeded tower is not climbed this run: no drafts or overtakes for floors already there. */
   const adoptSeededTower = useCallback(() => {
     baseIdRef.current = 'r0-b0';
-    rushRef.current?.baseline(seededPeakM(worldRef.current, dropCountRef.current));
+    worldRef.current.seededM = seededPeakM(worldRef.current, dropCountRef.current);
+    rushRef.current?.baseline(worldRef.current.seededM);
   }, [rushRef]);
 
   /** Review hook (`?demo=1`, optionally `&words=a,b,c` to see another script). */

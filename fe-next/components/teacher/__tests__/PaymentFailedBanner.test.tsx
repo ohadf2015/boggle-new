@@ -22,6 +22,21 @@ describe('PaymentFailedBanner', () => {
     expect(cta).toHaveTextContent('teacher.subscription.paymentFailedCta');
   });
 
+  it('deep-links a Polar portal session to the payment-update page, keeping the session', () => {
+    render(
+      <PaymentFailedBanner
+        portalUrl="https://polar.sh/lexiclash/portal?customer_session_token=abc&email=t%40school.org"
+        stillPro
+      />,
+    );
+    const href = screen.getByTestId('payment-failed-cta').getAttribute('href')!;
+    const url = new URL(href);
+    expect(url.pathname).toBe('/lexiclash/portal/settings');
+    expect(url.searchParams.get('customer_session_token')).toBe('abc');
+    expect(url.searchParams.get('email')).toBe('t@school.org');
+    expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute('target', '_blank');
+  });
+
   it('is a status region with no dismiss: it is account state, not an ad', () => {
     render(<PaymentFailedBanner portalUrl={null} stillPro />);
     expect(screen.getByTestId('payment-failed-banner')).toHaveAttribute('role', 'status');
@@ -38,9 +53,12 @@ describe('PaymentFailedBanner', () => {
     expect(screen.getByText('teacher.subscription.paymentFailedBodyPaused')).toBeInTheDocument();
   });
 
-  it('falls back to the localized plan page when no portal URL came back', () => {
+  it('falls back to the portal route that opens the card form when no session was minted', () => {
     render(<PaymentFailedBanner portalUrl={null} stillPro />);
-    expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute('href', '/api/subscription/portal?locale=he');
+    expect(screen.getByTestId('payment-failed-cta')).toHaveAttribute(
+      'href',
+      '/api/subscription/portal?locale=he&intent=update-card',
+    );
   });
 
   it('emits recovery_clicked when the retry CTA is tapped — both portal branches', () => {

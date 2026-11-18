@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
+import { hasBodyInLocale } from '@/lib/seo/bodyLocales';
 import { hreflangAlternates } from '@/lib/seo/hreflang';
 import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
-import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
-import { helpSitemapEntries } from '@/components/education/help/helpSitemap';
+import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
 import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 import buildInfo from '@/lib/seo/buildInfo.generated.json';
 
@@ -103,8 +103,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   });
 
   // ─── Core game mode pages ───
-  // /multiplayer (except the Spanish lobby) and /singleplayer are noindexed game shells with no visible copy.
-  addForLocaleOnly(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 }, 'es');
+  // /multiplayer and /singleplayer are noindexed game shells with no visible copy.
   addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   // /blast, /word-craft, /daily/word-hunt, /daily/word-wheel are near-empty
   // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed
@@ -167,9 +166,6 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
   // /education/access — form/redeem page, noindexed (AdSense thin-page sweep 2026-06-17),
   // so omitted from the sitemap to avoid GSC "Submitted URL marked noindex".
-  addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
-  addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
-  routes.push(...helpSitemapEntries(LAST_DEPLOYED));
 
   // ─── Teacher Pro pricing (the paywall's front door) ───
   // Fully SSR'd (price, features, FAQ in raw HTML) and carries Product+Offer
@@ -187,7 +183,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // from /sitemap.xml. addForAllLocales emits all six locales because these
   // pages set robots: { index: true } + self-referencing hreflang in
   // generateMetadata. Priority stays 0.85 (teacher-intent; do not demote).
-  EDUCATION_PAGES.forEach((page) => {
+  EDUCATION_PAGES.filter((page) => page.slug !== 'lists').forEach((page) => {
     addForAllLocales(routes, `/education/${page.slug}`, {
       lastModified: LAST_DEPLOYED,
       changeFrequency: 'weekly',
@@ -196,9 +192,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     });
   });
 
-  // ─── Public word lists (/education/lists/**): hubs + one page per curated list ───
-  // The library hub itself is in EDUCATION_PAGES above. Locales and alternates come
-  // from the same cluster function as each page's own head.
+  // ─── Public word lists: empty while every tier in indexPolicy is off ───
   routes.push(...wordListSitemapRoutes(WORD_LISTS_GENERATED_AT));
 
   // ─── WordCraft marketing landing (English-only target; non-EN hreflang → the
@@ -523,7 +517,6 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/contact', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.5 });
   // /profile is noindexed — excluded from sitemap to avoid wasting crawl budget
   addForAllLocales(routes, '/accessibility', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
-  addForAllLocales(routes, '/sitemap', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.4 });
 
   // ─── Legal pages ───
   addForAllLocales(routes, '/legal', { lastModified: LEGAL_UPDATED, changeFrequency: 'monthly', priority: 0.4 });
@@ -745,10 +738,24 @@ function pruneUnconfirmedAlternates(routes: MetadataRoute.Sitemap): MetadataRout
   return routes;
 }
 
+function hasBody(url: string): boolean {
+  const [locale, ...rest] = url.replace(`${BASE_URL}/`, '').split('/');
+  return hasBodyInLocale(rest.length ? `/${rest.join('/')}` : '', locale);
+}
+
+function keepPagesWithBody(routes: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  const kept = routes.filter((route) => hasBody(route.url));
+  for (const route of kept) {
+    const langs = route.alternates?.languages as Record<string, string> | undefined;
+    if (langs?.['x-default'] && !hasBody(langs['x-default'])) langs['x-default'] = route.url;
+  }
+  return kept;
+}
+
 // Single sitemap at /sitemap.xml. ~410 URLs × ~2KB hreflangs ≈ 820KB —
 // well under Google's 50MB / 50k URL limit. generateSitemaps() chunks to
 // /sitemap/[id].xml but does NOT auto-create an index at /sitemap.xml,
 // which then collides with the [locale] catch-all and serves HTML.
 export default function sitemap(): MetadataRoute.Sitemap {
-  return pruneUnconfirmedAlternates(getAllRoutes());
+  return pruneUnconfirmedAlternates(keepPagesWithBody(getAllRoutes()));
 }

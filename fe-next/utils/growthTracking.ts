@@ -355,6 +355,7 @@ export type GrowthEvent =
   | 'edu_first_assignment_cta_clicked'
   | 'edu_digest_viewed'
   | 'edu_digest_upgrade_cta_clicked'
+  | 'class_ready_together'
   | 'lesson_plan_prompt_shown'
   | 'lesson_planned'
   // Student join funnel — mirrored from lib/education/telemetry.ts

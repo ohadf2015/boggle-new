@@ -41,6 +41,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!isPageLocale(locale)) return {};
   const c = hubCopy(locale);
   return wordListMetadata({
+    index: false,
     locale,
     path: LISTS_PATH,
     locales: hubLocales(),

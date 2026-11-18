@@ -35,6 +35,7 @@ import {
   buildPolarTrialExpirySentEvent,
   buildSubscriptionPastDueEvent,
   buildPaymentRecoveredEvent,
+  buildDunningEmailSentEvent,
   captureProFunnelServerEvent,
 } from '../proFunnelServer';
 
@@ -211,6 +212,19 @@ describe('Pro funnel server events', () => {
       distinctId: 'u-1',
       event: 'payment_recovered',
       properties: { product: 'teacher_pro', provider: 'polar', subscription_id: 'sub-9', teacher_id: 'u-1' },
+    });
+  });
+
+  it('Given a dunning email sent on day 1 or day 5, When built, Then it is dunning_email_sent with the day', () => {
+    expect(buildDunningEmailSentEvent('u-1', 1, 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'dunning_email_sent',
+      properties: { product: 'teacher_pro', provider: 'polar', day: 1, subscription_id: 'sub-9', teacher_id: 'u-1' },
+    });
+    expect(buildDunningEmailSentEvent('u-1', 5, 'sub-9')).toEqual({
+      distinctId: 'u-1',
+      event: 'dunning_email_sent',
+      properties: { product: 'teacher_pro', provider: 'polar', day: 5, subscription_id: 'sub-9', teacher_id: 'u-1' },
     });
   });
 

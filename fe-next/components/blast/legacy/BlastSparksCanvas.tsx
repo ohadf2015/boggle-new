@@ -65,7 +65,7 @@ export default function BlastSparksCanvas() {
         return; // WebGL unavailable — silently skip the garnish.
       }
       if (destroyed) {
-        application.destroy(true, { children: true });
+        application.destroy({ removeView: true }, { children: true });
         return;
       }
       app = application;
@@ -131,7 +131,7 @@ export default function BlastSparksCanvas() {
       destroyed = true;
       ro.disconnect();
       if (app) {
-        app.destroy(true, { children: true });
+        app.destroy({ removeView: true }, { children: true });
         app = null;
       }
     };

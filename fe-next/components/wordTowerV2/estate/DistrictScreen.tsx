@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Coins, Swords, Wrench } from 'lucide-react';
+import { ArrowLeft, Swords, Wrench } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { type PlotSlot, canUpgrade, repairCost, upgradeCost } from '@/lib/wordTowerV2/estate';
-import { MAX_DISTRICT, PLOT_SLOTS, districtDef } from '@/lib/wordTowerV2/estateCatalog';
+import { MAX_DISTRICT, MAX_PLOT_LEVEL, PLOT_SLOTS, districtDef } from '@/lib/wordTowerV2/estateCatalog';
+import { finishDistrictPlan, nextPlotAfterBuild } from '@/lib/wordTowerV2/estateFinish';
 import type { UseEstate } from '../useEstate';
 import { BuildBurst } from './BuildBurst';
 import { DistrictComplete } from './DistrictComplete';
@@ -44,6 +46,8 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   const [slot, setSlot] = useState<PlotSlot>('foundation');
   const [burst, setBurst] = useState<Burst | null>(null);
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const followBuild = useRef(false);
   const [completed, setCompleted] = useState<number | null>(null);
   /**
    * Raids waiting when this screen opened. markSeen() empties the live inbox
@@ -74,7 +78,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
     if (opened.current || status === 'loading') return;
     opened.current = true;
     setRaidsOnOpen(api.inbox.length);
-    setSlot(news.damaged[0] ?? news.affordable[0] ?? 'foundation');
+    setSlot(news.damaged[0] ?? news.affordable[0] ?? estate.plots.find((p) => p.level < MAX_PLOT_LEVEL)?.slot ?? 'foundation');
     playSound('menuOpen', { volume: 0.5 });
     void api.refresh();
     if (api.inbox.length > 0) void api.markSeen();
@@ -83,6 +87,14 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   }, [status]);
 
   useEffect(() => () => window.clearTimeout(burstTimer.current), []);
+
+  // A maxed plot has no button left: move on so the next tap can keep building.
+  useEffect(() => {
+    if (!followBuild.current) return;
+    followBuild.current = false;
+    const next = nextPlotAfterBuild(estate, slot);
+    if (next) setSlot(next);
+  }, [estate, slot]);
 
   const showBurst = useCallback((next: Burst) => {
     setBurst(next);
@@ -96,22 +108,32 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
   const gear = gearFromEstate(estate);
 
   const act = useCallback(
-    async (kind: 'build' | 'repair') => {
+    async (kind: 'build' | 'repair' | 'finish') => {
       if (busy) return;
       const plot = estate.plots.find((p) => p.slot === slot);
       if (!plot) return;
       const before = estate.district;
-      const cost = kind === 'build' ? upgradeCost(estate.district, slot, plot.level) : repairCost(estate.district, slot, plot.level);
+      const cost =
+        kind === 'finish'
+          ? (finishDistrictPlan(estate)?.coins ?? 0)
+          : kind === 'build'
+            ? upgradeCost(estate.district, slot, plot.level)
+            : repairCost(estate.district, slot, plot.level);
       setBusy(true);
-      const res = kind === 'build' ? await api.upgrade(slot) : await api.repair(slot);
+      setFailed(false);
+      followBuild.current = kind === 'build';
+      const spend = kind === 'finish' ? api.finishDistrict() : kind === 'build' ? api.upgrade(slot) : api.repair(slot);
+      const res = await spend.catch(() => ({ ok: false as const, reason: 'error' }));
       setBusy(false);
       if (!res.ok) {
+        followBuild.current = false;
+        setFailed(true);
         playSound('wordRejected', { volume: 0.4 });
         return;
       }
-      playSound(kind === 'build' ? 'upgradePurchase' : 'questComplete', { volume: 0.6 });
+      playSound(kind === 'repair' ? 'questComplete' : 'upgradePurchase', { volume: 0.6 });
       playSound('coinCollect', { volume: 0.35 });
-      showBurst({ slot, kind, cost, key: Date.now() });
+      showBurst({ slot, kind: kind === 'repair' ? 'repair' : 'build', cost, key: Date.now() });
       if (res.districtCompleted && before < MAX_DISTRICT) {
         window.setTimeout(() => {
           setCompleted(before);
@@ -148,6 +170,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
               reducedMotion={reducedMotion}
               onSelect={() => {
                 setSlot(s);
+                setFailed(false);
                 playSound('buttonClick', { volume: 0.3 });
               }}
             />
@@ -254,7 +277,7 @@ export function DistrictScreen({ t, estate: api, onClose }: Props) {
       </div>
 
       <div className="border-t-4 border-black bg-neo-navy px-3 pb-[max(0.5rem,env(safe-area-inset-bottom),var(--cap-safe-area-bottom,0px))] pt-2">
-        <PlotPanel t={t} estate={estate} slot={slot} name={nameOf(slot)} busy={busy} onUpgrade={() => void act('build')} onRepair={() => void act('repair')} />
+        <PlotPanel t={t} estate={estate} slot={slot} name={nameOf(slot)} districtName={districtName} busy={busy} failed={failed} onUpgrade={() => void act('build')} onRepair={() => void act('repair')} onFinish={() => void act('finish')} />
         {!api.authed ? (
           <p className="mx-auto mt-1.5 max-w-md text-center font-neo-display text-[11px] font-bold text-neo-cream/60">{t('wordTowerV2.estate.guest')}</p>
         ) : null}

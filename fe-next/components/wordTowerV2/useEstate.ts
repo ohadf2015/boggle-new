@@ -14,17 +14,16 @@ import {
   NEUTRAL_PERKS,
   type Perks,
   type RunSummary,
-  advanceDistrict,
   applyBuyCharge,
   applyRepair,
   applyRun,
   applyUpgrade,
-  districtComplete,
   emptyEstate,
   perksFromEstate,
   sanitizeEstate,
 } from '@/lib/wordTowerV2/estate';
 import type { PlotSlot } from '@/lib/wordTowerV2/estateCatalog';
+import { applyFinishDistrict, settleDistrict } from '@/lib/wordTowerV2/estateFinish';
 import type { TowerBlock } from '@/lib/wordTowerV2/estateTower';
 
 /**
@@ -69,6 +68,8 @@ export interface RivalView {
   shields: number;
   bestM: number;
   lastTower: TowerBlock[];
+  /** Already hit by me today (UTC): the server refuses another swing. */
+  wreckedToday?: boolean;
   /** Recent damaging raids on this tower — visible to everyone who battled it. */
   ruins?: { count: number; by: string[]; byYou: boolean };
   /** Metres they grew on today's daily, when the board asked for daily rivals. */
@@ -106,6 +107,8 @@ export interface UseEstate {
   reportRun: (summary: RunSummary, opts?: { keepalive?: boolean }) => Promise<{ coins: number; chest: ChestRoll } | null>;
   upgrade: (slot: PlotSlot) => Promise<SpendOutcome>;
   repair: (slot: PlotSlot) => Promise<SpendOutcome>;
+  /** Every remaining level and repair of this district, for one quoted price. */
+  finishDistrict: () => Promise<SpendOutcome>;
   /** Coins -> one more wrecking ball (raid charge). Signed in only: guests cannot raid. */
   buyCharge: () => Promise<{ ok: true } | { ok: false; reason: string }>;
   /** null for guests (show the sign-in CTA). */
@@ -162,6 +165,8 @@ export function useEstate(): UseEstate {
   const estateRef = useRef(estate);
   /** Claim + replay in flight (see refresh). */
   const syncingRef = useRef(false);
+  /** Bumped by every write, so a read that started earlier cannot undo it on screen. */
+  const writesRef = useRef(0);
 
   const setEstate = useCallback((e: Estate) => {
     estateRef.current = e;
@@ -193,17 +198,19 @@ export function useEstate(): UseEstate {
       setStatus('ready');
       return;
     }
+    const writesAtStart = writesRef.current;
     const res = await getWithAuth(API, { requireSession: true }).catch(() => null);
     const body = res?.ok ? await readJson(res) : null;
+    const stale = writesRef.current !== writesAtStart;
     if (!body) {
       // A failed read must not look like a wiped bank: show the last copy.
       const cached = readJsonKey<unknown>(accountKey(uid), null);
-      if (cached) setEstate(sanitizeEstate(cached));
+      if (cached && !stale) setEstate(sanitizeEstate(cached));
       setStatus('error');
       return;
     }
     const adopt = fromServer;
-    adopt(body.estate);
+    if (!stale) adopt(body.estate);
     setInbox(Array.isArray(body.raids) ? (body.raids as EstateRaid[]) : []);
     setStatus('ready');
 
@@ -263,6 +270,7 @@ export function useEstate(): UseEstate {
         return { coins: r.coins, chest: r.chest };
       }
       publishResultsXp('tower:run', null);
+      writesRef.current += 1;
       // keepalive: a run banked on the way out (pagehide) must outlive the page.
       const res = await postWithAuth(`${API}/run`, summary, { requireSession: true, keepalive: opts?.keepalive }).catch(() => null);
       const body = res?.ok ? await readJson(res) : null;
@@ -284,38 +292,33 @@ export function useEstate(): UseEstate {
 
   /** Optimistic spend: apply the pure step now, then adopt the server's copy (or roll back to it). */
   const spend = useCallback(
-    async (kind: 'upgrade' | 'repair', slot: PlotSlot): Promise<SpendOutcome> => {
+    async (kind: 'upgrade' | 'repair' | 'finish', slot?: PlotSlot): Promise<SpendOutcome> => {
       if (loading) return { ok: false, reason: 'loading' };
-      const local = kind === 'upgrade' ? applyUpgrade(estateRef.current, slot) : applyRepair(estateRef.current, slot);
+      const before = estateRef.current;
+      const local =
+        kind === 'finish' ? applyFinishDistrict(before) : kind === 'upgrade' ? applyUpgrade(before, slot!) : applyRepair(before, slot!);
       if (!local.ok) return { ok: false, reason: local.reason };
-      const completed = kind === 'upgrade' && districtComplete(local.estate);
-      const optimistic = completed ? advanceDistrict(local.estate) : local.estate;
-      setEstate(optimistic);
+      const settled = settleDistrict(local.estate);
+      writesRef.current += 1;
+      setEstate(settled.estate);
+      const bought = () => {
+        if (kind !== 'repair') trackGrowthEvent('wt2_upgrade_bought', { upgrade: slot ?? 'all', cost: local.cost ?? 0 });
+      };
       if (!isAuthenticated) {
-        writeLocal(optimistic);
-        // Track upgrade for guests too
-        if (kind === 'upgrade') {
-          trackGrowthEvent('wt2_upgrade_bought', {
-            upgrade: slot,
-            cost: local.cost ?? 0,
-          });
-        }
-        return { ok: true, districtCompleted: completed };
+        writeLocal(settled.estate);
+        bought();
+        return { ok: true, districtCompleted: settled.completed };
       }
-      const res = await postWithAuth(`${API}/${kind}`, { plot: slot }, { requireSession: true });
-      const body = await readJson(res);
-      if (!res.ok || !body?.estate) {
-        await refresh();
+      const path = kind === 'repair' ? 'repair' : 'upgrade';
+      const res = await postWithAuth(`${API}/${path}`, slot ? { plot: slot } : { all: true, cost: local.cost }, { requireSession: true }).catch(() => null);
+      const body = res ? await readJson(res) : null;
+      if (!res?.ok || !body?.estate) {
+        setEstate(before);
+        await refresh().catch(() => undefined);
         return { ok: false, reason: String(body?.reason ?? 'error') };
       }
       fromServer(body.estate);
-      // Track upgrade on server success
-      if (kind === 'upgrade') {
-        trackGrowthEvent('wt2_upgrade_bought', {
-          upgrade: slot,
-          cost: local.cost ?? 0,
-        });
-      }
+      bought();
       return { ok: true, districtCompleted: body.districtCompleted === true };
     },
     [loading, isAuthenticated, refresh, setEstate, fromServer],
@@ -324,13 +327,16 @@ export function useEstate(): UseEstate {
   const buyCharge = useCallback(async (): Promise<{ ok: true } | { ok: false; reason: string }> => {
     if (loading) return { ok: false, reason: 'loading' };
     if (!isAuthenticated) return { ok: false, reason: 'guest' };
-    const local = applyBuyCharge(estateRef.current);
+    const before = estateRef.current;
+    const local = applyBuyCharge(before);
     if (!local.ok) return { ok: false, reason: local.reason };
+    writesRef.current += 1;
     setEstate(local.estate);
-    const res = await postWithAuth(`${API}/charge`, {}, { requireSession: true });
-    const body = await readJson(res);
-    if (!res.ok || !body?.estate) {
-      await refresh();
+    const res = await postWithAuth(`${API}/charge`, {}, { requireSession: true }).catch(() => null);
+    const body = res ? await readJson(res) : null;
+    if (!res?.ok || !body?.estate) {
+      setEstate(before);
+      await refresh().catch(() => undefined);
       return { ok: false, reason: String(body?.reason ?? 'error') };
     }
     fromServer(body.estate);
@@ -340,6 +346,7 @@ export function useEstate(): UseEstate {
 
   const upgrade = useCallback((slot: PlotSlot) => spend('upgrade', slot), [spend]);
   const repair = useCallback((slot: PlotSlot) => spend('repair', slot), [spend]);
+  const finishDistrict = useCallback(() => spend('finish'), [spend]);
 
   const rivals = useCallback<UseEstate['rivals']>(async (dailyLanguage) => {
     if (!authed) return null;
@@ -357,6 +364,7 @@ export function useEstate(): UseEstate {
     async (defenderId, accuracy, revenge = false) => {
       if (!authed) return null;
       // Generate a nonce for retry idempotency (same raid attempt across network retries)
+      writesRef.current += 1;
       const nonce = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `raid-${Date.now()}-${Math.random()}`;
       const res = await postWithAuth(`${API}/raid`, { defenderId, accuracy, nonce, revenge }, { requireSession: true });
       const body = await readJson(res);
@@ -401,6 +409,7 @@ export function useEstate(): UseEstate {
     reportRun,
     upgrade,
     repair,
+    finishDistrict,
     buyCharge,
     rivals,
     raid,

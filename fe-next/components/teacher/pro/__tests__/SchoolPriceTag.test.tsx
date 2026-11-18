@@ -31,6 +31,15 @@ describe('SchoolPriceTag', () => {
     expect(screen.getByTestId('school-price-terms')).toHaveTextContent('invoice or purchase order');
   });
 
+  it('shows what the minimum school pays in total', () => {
+    dict = en;
+    render(<SchoolPriceTag />);
+    const total = SCHOOL_PRICING.minTeachers * SCHOOL_PRICING.perTeacherYearUsd;
+    const example = screen.getByTestId('school-price-example');
+    expect(example).toHaveTextContent(`${SCHOOL_PRICING.minTeachers} teachers`);
+    expect(example).toHaveTextContent(`$${total}`);
+  });
+
   it('keeps the price bidi-safe in Hebrew', () => {
     dict = he;
     render(<SchoolPriceTag />);

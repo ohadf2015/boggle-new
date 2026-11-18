@@ -14,6 +14,15 @@ import type { Language } from '@/types';
 // Puzzle #1 = 2025-12-30, Puzzle #2 = 2025-12-31
 export const DAILY_CHALLENGE_EPOCH = new Date('2025-12-30T00:00:00Z');
 
+/** True for a real calendar date from the first puzzle through yesterday (UTC). */
+export function isPastDailyDate(dateStr: string, now = new Date()): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const date = new Date(`${dateStr}T00:00:00Z`);
+  if (isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== dateStr) return false;
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return date >= DAILY_CHALLENGE_EPOCH && date.getTime() < today;
+}
+
 // Salt for seeding (prevents reverse-engineering grids)
 export const SEED_SALT = 'lexiclash-daily-v1';
 

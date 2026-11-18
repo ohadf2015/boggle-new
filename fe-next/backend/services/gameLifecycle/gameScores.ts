@@ -225,16 +225,18 @@ export async function calculateAndBroadcastFinalScores(
   // Built server-side: `lessonGameData` lives only in the TEACHER's
   // sessionStorage, so a client-side recap is empty for every student.
   let classroomSummary;
+  const crossword = classroomGame && game.gameMode === 'crossword'
+    ? crosswordClassroomWords(game.crosswordMpState, classroomGame.vocabularyWords ?? [])
+    : null;
   try {
     if (classroomGame) {
-      const crossword = game.gameMode === 'crossword' ? crosswordClassroomWords(game.crosswordMpState, classroomGame.vocabularyWords ?? []) : null;
       classroomSummary = await buildClassroomRoundSummary({
         gameCode,
         language,
         classroomGame,
         participationBonus,
         gameMode: game.gameMode,
-        ...(crossword ? { placedWords: crossword.placedWords } : {}),
+        ...(crossword ? { placedWords: crossword.placedWords } : { offeredWords: game.classroomOfferedWords }),
         players: resultsWithIconAchievements.map((p) => ({
           username: p.username,
           totalScore: p.totalScore,
@@ -370,9 +372,13 @@ export async function calculateAndBroadcastFinalScores(
         logger.info('CLASSROOM_GAME', `Game ${gameCode}: practice round (teacher and bots only) — nothing to record`);
         return;
       }
+      const roundResults = crossword
+        ? resultsWithIconAchievements.map((p) => ({ ...p, wordDetails: crossword.wordDetailsFor(p.username) }))
+        : resultsWithIconAchievements;
       const rewards = await persistClassroomGameScores(
         classroomGame,
-        playerScoresFromGameResults(resultsWithIconAchievements, roomUsers, gameCode),
+        playerScoresFromGameResults(roundResults, roomUsers, gameCode),
+        { roundStartedAtMs: game.gameStartedAt, offeredWords: game.classroomOfferedWords },
       );
       io.to(`classroom:${classroomGame.classroomId}`).emit('classroomGameEnded', { gameCode, rewards });
     } catch (err) {

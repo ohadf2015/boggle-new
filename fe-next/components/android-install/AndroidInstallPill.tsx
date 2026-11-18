@@ -15,7 +15,7 @@
  *
  * Anchored to the inline-end EDGE. Phones: just above the bottom nav + ad stack
  * (`--bottom-stack-height`), since mid-screen it sat on the home hub's mode
- * tiles. From md: vertically centred, clear of header and banner band.
+ * tiles. From md: a vertical tab, centred in the page margin so it clears content.
  * `end-*` auto-flips for RTL.
  */
 
@@ -141,20 +141,20 @@ export default function AndroidInstallPill() {
   };
 
   return (
-    <div data-install-pill className="fixed end-0 bottom-[calc(var(--bottom-stack-height)+0.75rem)] z-[55] flex items-stretch md:bottom-auto md:top-1/2 md:-translate-y-1/2">
+    <div data-install-pill className="fixed end-0 bottom-[calc(var(--bottom-stack-height)+0.75rem)] z-[55] flex items-stretch md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:flex-col">
       <button
         type="button"
         onClick={handleOpen}
-        className="flex min-h-11 items-center gap-2 rounded-s-neo border-3 border-e-0 border-neo-black bg-neo-lime py-2 ps-3 pe-2 font-neo-display text-sm font-black uppercase tracking-tight text-neo-black shadow-hard-sm transition-transform duration-100 hover:-translate-x-px active:translate-x-[1px]"
+        className="flex min-h-11 items-center gap-2 rounded-s-neo border-3 border-e-0 border-neo-black bg-neo-lime py-2 ps-3 pe-2 md:flex-col md:rounded-es-none md:px-1.5 md:py-3 font-neo-display text-sm font-black uppercase tracking-tight text-neo-black shadow-hard-sm transition-transform duration-100 hover:-translate-x-px active:translate-x-[1px]"
       >
         <Smartphone className="h-4 w-4 stroke-[2.5]" aria-hidden="true" />
-        <span className="sr-only sm:not-sr-only">{t('androidAppPromo.pillLabel')}</span>
+        <span className="sr-only sm:not-sr-only md:[writing-mode:vertical-rl]">{t('androidAppPromo.pillLabel')}</span>
       </button>
       <button
         type="button"
         onClick={handleClose}
         aria-label={t('androidAppPromo.pillClose')}
-        className="flex min-h-11 min-w-11 items-center justify-center border-3 border-s-0 border-neo-black bg-neo-navy text-neo-white/80 transition-colors hover:text-neo-white"
+        className="flex min-h-11 min-w-11 items-center justify-center border-3 border-s-0 border-neo-black bg-neo-navy md:min-h-9 md:min-w-0 md:rounded-es-neo md:border-s-3 md:border-e-0 md:border-t-0 text-neo-white/80 transition-colors hover:text-neo-white"
       >
         <X className="h-3.5 w-3.5 stroke-[3]" aria-hidden="true" />
       </button>

@@ -4,12 +4,12 @@ interface Props {
   locale: string;
 }
 
-type LocaleKey = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type LocaleKey = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 const STRATEGY_GUIDES = [
-  { href: '/en/guides/classic-strategy', label: { en: 'Classic strategy', he: 'אסטרטגיית קלאסי', sv: 'Klassisk strategi', ja: 'クラシック攻略', es: 'Estrategia Clásico' } },
-  { href: '/en/guides/blast-strategy',   label: { en: 'Blast strategy',   he: 'אסטרטגיית בלאסט', sv: 'Blast-strategi',   ja: 'ブラスト攻略',   es: 'Estrategia Blast'   } },
-  { href: '/en/guides/word-hunt-strategy', label: { en: 'Word Hunt strategy', he: 'אסטרטגיית ציד מילים', sv: 'Word Hunt-strategi', ja: 'ワードハント攻略', es: 'Estrategia Word Hunt' } },
+  { href: '/en/guides/classic-strategy', label: { en: 'Classic strategy', he: 'אסטרטגיית קלאסי', sv: 'Klassisk strategi', ja: 'クラシック攻略', es: 'Estrategia Clásico', ru: 'Стратегия для Классики' } },
+  { href: '/en/guides/blast-strategy',   label: { en: 'Blast strategy',   he: 'אסטרטגיית בלאסט', sv: 'Blast-strategi',   ja: 'ブラスト攻略',   es: 'Estrategia Blast', ru: 'Стратегия для Blast' } },
+  { href: '/en/guides/word-hunt-strategy', label: { en: 'Word Hunt strategy', he: 'אסטרטגיית ציד מילים', sv: 'Word Hunt-strategi', ja: 'ワードハント攻略', es: 'Estrategia Word Hunt', ru: 'Стратегия для Word Hunt' } },
 ] as const;
 
 const CONTENT: Record<LocaleKey, { title: string; tagline: string; cta: string }> = {
@@ -37,6 +37,11 @@ const CONTENT: Record<LocaleKey, { title: string; tagline: string; cta: string }
     title: '¿Quieres mejorar tu puntuación?',
     tagline: 'Guías de estrategia para Clásico, Blast y Word Hunt.',
     cta: 'Ver todas las guías →',
+  },
+  ru: {
+    title: 'Хотите набирать больше очков?',
+    tagline: 'Подробные гайды по режимам Классика, Blast и Word Hunt.',
+    cta: 'Все гайды →',
   },
 };
 

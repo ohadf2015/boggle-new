@@ -30,12 +30,14 @@ describe('getClassroomStudents — level on the roster', () => {
             selectCalls.push(cols);
             return {
               eq: () => ({
-                order: async () => ({
-                  data: [
-                    { id: 'm1', student_id: 's1', classroom_id: 'c1', joined_at: '2025-01-01', level: 'support' },
-                    { id: 'm2', student_id: 's2', classroom_id: 'c1', joined_at: '2025-01-02' }, // pre-migration shape
-                  ],
-                  error: null,
+                eq: () => ({
+                  order: async () => ({
+                    data: [
+                      { id: 'm1', student_id: 's1', classroom_id: 'c1', joined_at: '2025-01-01', level: 'support' },
+                      { id: 'm2', student_id: 's2', classroom_id: 'c1', joined_at: '2025-01-02' }, // pre-migration shape
+                    ],
+                    error: null,
+                  }),
                 }),
               }),
             };

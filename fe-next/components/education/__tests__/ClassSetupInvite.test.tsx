@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render as rtlRender, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { QUICK_LAUNCH_KEY } from '@/components/teacher/dashboard/quickLaunchIntent';
@@ -13,9 +13,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k) }),
 }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playPlayerJoinedSound: vi.fn() }) }));
+const markInviteCopied = vi.hoisted(() => vi.fn());
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: classrooms.current, isLoading: false }) }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState.current }));
-vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => ({ markInviteCopied: vi.fn() }) }));
+vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => ({ markInviteCopied }) }));
 vi.mock('@/components/teacher/hq/useClassRoster', () => ({ useClassRoster: () => roster.current }));
 vi.mock('@/lib/education/telemetry', () => ({
   trackEduJoinCodeShown: tel.shown,
@@ -55,6 +56,16 @@ const TEN = 'apple, banana, cherry, grape, lemon\nmango\npeach\npear\nplum\nmelo
 const LOBBY = '/en/education/classroom-game?flow=quickLaunch';
 const storedIntent = () => JSON.parse(sessionStorage.getItem(QUICK_LAUNCH_KEY) ?? '{}');
 
+function render(ui: Parameters<typeof rtlRender>[0]) {
+  const result = rtlRender(ui);
+  const withStudents = screen.queryByTestId('setup-together-now') as HTMLButtonElement | null;
+  if (withStudents && !withStudents.disabled) {
+    fireEvent.click(withStudents);
+    fireEvent.click(screen.getByTestId('setup-start-anyway'));
+  }
+  return result;
+}
+
 describe('ClassSetupInvite', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -85,7 +96,8 @@ describe('ClassSetupInvite', () => {
     single.getClassroom.mockResolvedValue({ data: { id: 'new2', name: 'Grade 5', join_code: 'NEW5CD' }, error: null });
     render(<ClassSetupInvite classroomId="new2" />);
     expect(screen.queryByText('education.classroomGame.classroomNotFound')).toBeNull();
-    expect(await screen.findByTestId('setup-join-code')).toHaveTextContent('NEW5CD');
+    fireEvent.click(await screen.findByTestId('setup-together-now'));
+    expect(screen.getByTestId('setup-join-code')).toHaveTextContent('NEW5CD');
     expect(single.getClassroom).toHaveBeenCalledWith('new2');
   });
 
@@ -93,6 +105,12 @@ describe('ClassSetupInvite', () => {
     classrooms.current = [];
     render(<ClassSetupInvite classroomId="gone" />);
     expect(await screen.findByText('education.classroomGame.classroomNotFound')).toBeInTheDocument();
+  });
+
+  it('Given the ready screen just opened, Then no invite is recorded as shared', () => {
+    markInviteCopied.mockClear();
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(markInviteCopied).not.toHaveBeenCalled();
   });
 
   it('Given a new class, Then the code, QR and every share channel are on the one screen and the view is recorded once', () => {

@@ -83,7 +83,7 @@ export function RaidResultCard({ t, rival, result, error, floorsKnocked, floorsT
         <div className="w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-cream p-5 text-center text-neo-navy shadow-hard-lg animate-neo-pop">
           <h2 className="font-neo-display text-2xl font-black uppercase">{t('wordTowerV2.rivals.raidFailed')}</h2>
           <p className="mt-2 font-neo-display text-sm font-bold">
-            {error === 'no_charges' ? t('wordTowerV2.rivals.noCharges') : t('wordTowerV2.rivals.raidError')}
+            {t(error === 'no_charges' ? 'wordTowerV2.rivals.noCharges' : error === 'already_wrecked' ? 'wordTowerV2.rivals.alreadyWrecked' : 'wordTowerV2.rivals.raidError')}
           </p>
           <BackButton t={t} onClose={onClose} />
         </div>

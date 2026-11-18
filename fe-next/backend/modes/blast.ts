@@ -9,6 +9,8 @@ import { blastCollectionScore } from '@/shared/utils/blastCollectionScore';
 export const blastMode: GameModeModule = {
   id: 'blast',
 
+  lessonWordsOffered: (_game, placedOnBoard) => placedOnBoard,
+
   initRound({ game, gameCode, letterGrid, playerUsernames }) {
     const wave = playerUsernames.length >= 2 ? 3 : 1;
     // Room + this round's letters: one layout for every player, a new one each round.

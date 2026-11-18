@@ -31,7 +31,7 @@ const FOR_SCHOOLS_CTA: Record<string, string> = {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'educationClassroomGame', path: '/education/classroom-game', locale });
+  return generatePageMetadata({ seoKey: 'educationClassroomGame', path: '/education/classroom-game', noIndex: true, locale });
 }
 
 export default async function ClassroomGamePage({ params }: { params: Promise<{ locale: string }> }) {

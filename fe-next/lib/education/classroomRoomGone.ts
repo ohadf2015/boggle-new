@@ -95,6 +95,11 @@ export function roomGoneAction({ context, isHost }: { context: ClassroomContext;
   return 'arcade-feedback';
 }
 
+/** A classroom's host is its teacher, whose home is the dashboard. */
+export function classroomTeacherHomePath(locale: string): string {
+  return `/${locale || 'en'}/teacher`;
+}
+
 /** Where a classroom student goes when the room is gone. */
 export function classroomStudentHomePath(locale: string): string {
   return `/${locale || 'en'}/student`;

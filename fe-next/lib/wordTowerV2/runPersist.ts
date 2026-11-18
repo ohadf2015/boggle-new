@@ -3,6 +3,8 @@ import { utcDateKey } from '@/lib/wordTower/dailySeed';
 export interface RunSnapshot {
   daily: boolean;
   date: string;
+  /** Free towers are per language: another alphabet's floors are not this player's climb. */
+  language?: string;
   words: string[];
   peakM: number;
   floors: number;
@@ -10,10 +12,6 @@ export interface RunSnapshot {
 
 export function snapshotKey(daily: boolean, date: Date = new Date()): string {
   return daily ? `wt2-session-daily-${utcDateKey(date)}` : 'wt2-session';
-}
-
-export function shouldConfirmLeave(phase: string, floors: number): boolean {
-  return phase !== 'over' && floors > 0;
 }
 
 export function saveRunSnapshot(

@@ -47,6 +47,8 @@ export interface GameModeModule {
   id: GameMode;
   /** Runs before the round is announced; 'refused' leaves the room in the lobby (the mode already told the host why). */
   prepareRound?(io: Server, gameCode: string, game: GameState): Promise<'refused' | unknown>;
+  /** Lesson words this round really puts in front of students, read after `initRound`. Absent means none. */
+  lessonWordsOffered?(game: GameState, placedOnBoard: string[]): string[];
   /** Create the mode's round state on `ctx.game`. */
   initRound?(ctx: ModeRoundContext): ModeRoundResult | void | Promise<ModeRoundResult | void>;
   /** Mode fields on every startGame-shaped payload (start, retry, reconnect, late join, recovery). */

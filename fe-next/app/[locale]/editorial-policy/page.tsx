@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,7 +13,7 @@ const SITE_URL = 'https://www.lexiclash.live';
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { locale } = await params;
   const url = `${SITE_URL}/${locale}/editorial-policy`;
-  return {
+  return withBodyLocales({
     title: 'Editorial Policy & Standards - LexiClash',
     description:
       'How LexiClash researches, writes, fact-checks, reviews and updates every article. Our editorial standards, sourcing policy, corrections process, and AI disclosure.',
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     robots: { index: true, follow: true },
-  };
+  }, '/editorial-policy', locale);
 }
 
 export default async function EditorialPolicyPage({ params }: PageProps) {

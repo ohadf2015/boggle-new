@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 const SITE_URL = 'https://www.lexiclash.live';
 
@@ -205,7 +206,7 @@ export function generateBlogMetadata({
     const imageUrl = getBlogImage(slug);
     const articleUrl = `https://www.lexiclash.live/${locale}/blog/${slug}`;
 
-    return {
+    return withBodyLocales({
         title,
         description,
         openGraph: {
@@ -259,5 +260,5 @@ export function generateBlogMetadata({
             },
         },
         robots: hasTranslation ? { index: true, follow: true } : { index: false, follow: true },
-    };
+    }, `/blog/${slug}`, locale);
 }

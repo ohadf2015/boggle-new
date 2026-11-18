@@ -27,15 +27,17 @@ export const TEACHER_WINBACK_PLACEMENT = 'dashboard_teacher_winback';
  */
 export function TeacherWinbackBanner({
   approved,
+  hasClass,
   onDismiss,
 }: {
   approved: boolean;
+  hasClass?: boolean;
   onDismiss?: () => void;
 }) {
   const { t, language } = useLanguage();
   const [pending, setPending] = useState(false);
   const shownRef = useRef(false);
-  const copy = teacherWinbackCopy(language);
+  const copy = teacherWinbackCopy(language, { hasClass });
 
   useEffect(() => {
     if (!approved || shownRef.current) return;

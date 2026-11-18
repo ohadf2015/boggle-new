@@ -1629,7 +1629,7 @@ const es = {
     "sections": {
       "daily": {
         "title": "Un reto al día. Mantén tu racha.",
-        "line": "Un tablero nuevo cada mañana. Todos tienen las mismas letras, así que puedes comparar puntos.",
+        "line": "Un tablero nuevo cada día a medianoche UTC. Todos tienen las mismas letras, así que puedes comparar puntos.",
         "cta": "Jugar el reto de hoy",
         "streak": "días de racha"
       },
@@ -2741,6 +2741,8 @@ const es = {
       "back": "Volver",
       "raidFailed": "El ataque no cuajó",
       "raidError": "Algo salió mal. Inténtalo otra vez.",
+      "wreckedToday": "Atacada hoy",
+      "alreadyWrecked": "Ya atacaste esta torre hoy. Vuelve mañana.",
       "revengeTitle": "Hora de la revancha",
       "revengeBody": "{name} destrozó tu {plot} y se llevó {coins} monedas.",
       "revengeBodyBlocked": "{name} atacó tu torre, pero tu escudo aguantó.",
@@ -2759,7 +2761,7 @@ const es = {
         "lot": "solar vacío"
       }
     },
-    "coins": { "run": "{n} monedas esta ronda" },
+    "coins": { "run": "{n} monedas esta ronda", "chip": "{n}" },
     "streak": { "a11y": "Racha perfecta ×{n}", "toRare": "{n} perfectos → caja rara", "crate": "CAJA", "meterA11y": "Racha perfecta {n}, paga ×{mult}. Faltan {rare} para una caja rara.", "label": "Racha" },
     "milestone": { "floors": "¡Pisos!", "a11y": "{n} pisos" },
     "chest": {
@@ -2809,6 +2811,9 @@ const es = {
       "perksNone": "Construye el barrio y la torre aguantará mejor",
       "newsRaids": "{n} asaltos contra ti mientras no estabas",
       "newsAffordable": "{n} mejoras que ya puedes pagar",
+      "finishAll": "Completar {name}",
+      "finishConfirm": "Confirmar",
+      "spendFailed": "No se pudo. Inténtalo otra vez.",
       "newsDamaged": "{n} parcelas necesitan reparación",
       "newsNone": "Todo tranquilo en el barrio",
       "completeTitle": "¡{name} completo!",
@@ -2940,7 +2945,7 @@ const es = {
     "bestFlag": "RÉCORD",
     "leaveConfirm": "¿Salir de esta subida? Puedes reanudarla en esta pestaña, pero el reto diario es solo una vez al día.",
 "leaveDaily": {"title": "¿Salir de la subida de hoy?", "desc": "Si sales, termina tu subida. Tu altura cuenta en la tabla de hoy. El próximo reto diario abre mañana."},
-"leaveFree": {"title": "¿Dejar esta subida?", "desc": "Si sales, termina esta subida y cobras tus monedas. Empieza otra cuando quieras."},
+"leaveFree": {"title": "¿Dejar esta subida?", "desc": "Tu torre queda guardada. Al salir cobras las monedas de esta subida y la próxima vez sigues construyendo."},
     "leaveKeep": "Seguir subiendo",
     "leaveGo": "Salir",
     "dailyPlayed": "La torre de hoy ya está. Vuelve mañana.",
@@ -3364,7 +3369,10 @@ const es = {
     "perkReminders": "Recordatorios para no perder tu racha",
     "menuLabel": "Descargar la app",
     "pillLabel": "Descargar la app",
-    "pillClose": "Ocultar el banner de la app"
+    "pillClose": "Ocultar el banner de la app",
+    "qrTitle": "Escanea e instala en tu móvil",
+    "qrHint": "Apunta aquí con la cámara de tu Android y se abrirá LexiClash en Google Play.",
+    "qrAlt": "Código QR que abre LexiClash en Google Play"
   },
   "name": "Español",
   "direction": "ltr",
@@ -3449,7 +3457,7 @@ const es = {
     },
     "daily": {
       "title": "Rueda & Caza de Palabras Diaria — Gratis | LexiClash",
-      "description": "Rueda & Caza de Palabras diarias gratis — mismo tablero mundial, 10 intentos, comparte emoji. Nuevo puzzle cada día, sin registro.",
+      "description": "Rueda & Caza de Palabras diarias gratis — mismo tablero mundial, 10 intentos, comparte tu resultado. Nuevo puzzle cada día, sin registro.",
       "ogTitle": "Palabra del Día — Puzzle Diario Gratis",
       "ogDescription": "Palabra del Día: Caza + Rueda de Palabras. Mismo puzzle mundial, comparte resultados, construye una racha diaria. Gratis, sin registro."
     },
@@ -14712,6 +14720,9 @@ const es = {
       "lastPlayedToday": "Jugaron hoy · {{accuracy}} % de media",
       "lastPlayedDays": "Jugaron hace {{days}} días · {{accuracy}} % de media",
       "lastPlayedOneDay": "Jugaron ayer · {{accuracy}} % de media",
+      "lastPlayedNoScoreToday": "Jugaron hoy",
+      "lastPlayedNoScoreDays": "Jugaron hace {{days}} días",
+      "lastPlayedNoScoreOneDay": "Jugaron ayer",
       "strugglingOne": "{{names}} tiene dificultades",
       "struggling": "{{count}} con dificultades: {{names}}",
       "regionLabel": "Estado de la clase {{classroom}}",
@@ -22470,7 +22481,9 @@ const es = {
         "tooSoon": "Elige una hora dentro de al menos 30 minutos.",
         "tooFar": "Elige una fecha dentro de los próximos 60 días.",
         "setupTitle": "¿Cuándo es tu próxima clase con este grupo?",
-        "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase."
+        "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase.",
+        "homeTitle": "¿Cuándo es tu próxima clase con este grupo?",
+        "homeBody": "Dínoslo y te mandamos por correo el código y el juego una hora antes, para que lo abras directamente en clase."
       },
       "keepOpen": {
         "cta": "Dejarlo abierto como tarea una semana",
@@ -22633,6 +22646,7 @@ const es = {
       "studentsOne": "1 alumno",
       "classPage": "Página de la clase",
       "notPlayedRecently": "Sin partidas en 30 días",
+      "noGamesYet": "Aún sin partidas",
       "roster": {
         "hide": "Ocultar la lista de alumnos",
         "seeAll": "Ver todos los alumnos ({count})",
@@ -22834,6 +22848,22 @@ const es = {
       "startNow": "Empezar una partida ya",
       "startQuick": "Empezar una partida rápida",
       "joinedNone": "Esperando a tu primer alumno…",
+      "guide": {
+        "stepClass": "Clase lista",
+        "stepReady": "Prepárate",
+        "stepPlay": "Primer juego",
+        "askTitle": "¿Dónde estás ahora?",
+        "withStudents": "Con mis estudiantes",
+        "withStudentsBody": "Hazlos entrar con el código. Ningún juego empieza hasta que tú lo decidas.",
+        "alone": "Preparándome por mi cuenta",
+        "aloneBody": "Pruébalo en privado y planifica tu próxima clase. Tus estudiantes no verán nada.",
+        "tryTitle": "Pruébalo primero, solo tú",
+        "tryBody": "Juegas contra bots de práctica. Ningún estudiante puede verlo ni entrar.",
+        "skipTry": "Ir a mi próxima clase",
+        "waitingBody": "Muestra el código en la pizarra. El juego se abre cuando entre tu primer estudiante.",
+        "startAnyway": "Abrir el juego sin esperar",
+        "back": "Mis estudiantes ya están conmigo"
+      },
       "joinedOne": "1 alumno se ha unido",
       "joinedMany": "{count} alumnos se han unido",
       "shareWhatsapp": "WhatsApp",

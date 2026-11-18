@@ -134,7 +134,7 @@ export function dailyTargetM(baselineTotalM: number, dayKey: string): number {
 const num = (v: unknown, hi = MAX_HEIGHT_M): number =>
   typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(0, v)) : 0;
 
-function cleanWords(raw: unknown): string[] {
+export function cleanWords(raw: unknown): string[] {
   if (!Array.isArray(raw)) return [];
   const out: string[] = [];
   for (const w of raw) {

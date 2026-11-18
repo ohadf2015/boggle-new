@@ -239,7 +239,7 @@ export const V2TopBar = memo(function V2TopBar({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={ITEM.coin} alt="" aria-hidden className="h-3.5 w-3.5 lg:h-5 lg:w-5" />
           <span className="font-neo-display text-xs font-black tabular-nums lg:text-lg" aria-hidden>
-            {formatHudCount(coins)}
+            {t('wordTowerV2.coins.chip', { n: formatHudCount(coins) })}
           </span>
         </div>
 

@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { Coins, Hammer, Home, Medal, Send, Target, X } from 'lucide-react';
+import { Hammer, Home, Medal, Send, Target, X } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { DailyResultsHero } from '@/components/daily/results/DailyResultsHero';
 import { DailyResultsFrame } from '@/components/daily/results/DailyResultsFrame';

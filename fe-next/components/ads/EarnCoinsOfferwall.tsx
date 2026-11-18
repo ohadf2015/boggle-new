@@ -3,7 +3,8 @@
 import React, { useState, useCallback } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/navigation';
-import { Coins, X, Gift } from 'lucide-react';
+import { X, Gift } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useAuth } from '@/contexts/AuthContext';

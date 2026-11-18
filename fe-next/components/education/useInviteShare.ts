@@ -9,11 +9,12 @@ import type { InviteChannel } from './ClassSetupInviteCode';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 /** The share channels behind every "share the code" surface (ready screen, Home share sheet). */
-export function useInviteShare(classroom: { id: string; name: string }, t: T) {
+export function useInviteShare(classroom: { id: string; name: string }, t: T, onShared?: () => void) {
   return useCallback(
     async (channel: InviteChannel, payload: { url: string; text: string }) => {
       if (channel === 'whatsapp' || channel === 'google_classroom') {
         trackEduJoinCodeShared({ classroomId: classroom.id, method: channel });
+        onShared?.();
         return;
       }
       if (channel === 'copy') {
@@ -21,6 +22,7 @@ export function useInviteShare(classroom: { id: string; name: string }, t: T) {
           await navigator.clipboard.writeText(payload.url);
           toast.success(t('eduShell.setup.copied'));
           trackEduJoinCodeCopied({ classroomId: classroom.id });
+          onShared?.();
         } catch {
           toast.error(t('eduShell.setup.copyFailed'));
         }
@@ -33,7 +35,8 @@ export function useInviteShare(classroom: { id: string; name: string }, t: T) {
         toast.success(t('eduShell.setup.copied'));
       }
       if (result === 'failed') toast.error(t('eduShell.setup.copyFailed'));
+      else if (result === 'shared' || result === 'copied') onShared?.();
     },
-    [classroom.id, classroom.name, t],
+    [classroom.id, classroom.name, t, onShared],
   );
 }

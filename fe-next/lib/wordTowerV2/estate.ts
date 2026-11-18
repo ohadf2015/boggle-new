@@ -50,6 +50,8 @@ export interface RunSummary {
   bestCombo: number;
   crates: number;
   heightM: number;
+  /** Metres built this session; a resumed tower's old floors earn no XP again. */
+  grownM?: number;
   /** Emergency braces BOUGHT this run (free ones are not counted); priced by `braceCost`. */
   braces?: number;
   /** Floating snacks tapped this run. Capped by floors: you see the sky by climbing. */
@@ -174,6 +176,7 @@ export function clampRunSummary(raw: Partial<RunSummary>): RunSummary {
     bestCombo: clampInt(raw.bestCombo, 0, perfects),
     crates: clampInt(raw.crates, 0, Math.min(MAX_CRATES, floors)),
     heightM: Math.round(heightM * 10) / 10,
+    ...(raw.grownM === undefined ? {} : { grownM: Math.round(Math.min(heightM, Math.max(0, Number(raw.grownM) || 0)) * 10) / 10 }),
     braces: clampInt(raw.braces, 0, MAX_BRACES),
     ...(raw.snacks ? { snacks: clampInt(raw.snacks, 0, Math.min(MAX_SNACKS, floors)) } : {}),
     ...(raw.tower ? { tower: decodeTower(raw.tower) } : {}),

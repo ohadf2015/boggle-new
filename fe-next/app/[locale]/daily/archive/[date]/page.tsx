@@ -7,7 +7,7 @@ import { isCatchUpDate } from '@/utils/dailyChallenge/catchUp';
 import { catchUpPlayHref } from '@/utils/dailyChallenge/missedDayAction';
 import { archiveCopy } from '../archiveCopy';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
-import { DAILY_CHALLENGE_EPOCH } from '@/utils/dailyChallenge/constants';
+import { DAILY_CHALLENGE_EPOCH, isPastDailyDate } from '@/utils/dailyChallenge/constants';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
 import { safeToLocaleDateString, safeToLocaleString } from '@/utils/bcp47Locale';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
@@ -20,16 +20,6 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {
   params: Promise<{ locale: string; date: string }>;
-}
-
-function isValidArchiveDate(dateStr: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
-  const date = new Date(dateStr + 'T00:00:00Z');
-  if (isNaN(date.getTime())) return false;
-  const yesterday = new Date();
-  yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-  yesterday.setUTCHours(23, 59, 59, 999);
-  return date >= DAILY_CHALLENGE_EPOCH && date <= yesterday;
 }
 
 async function fetchPuzzleStats(date: string, language: string) {
@@ -57,7 +47,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
 
-  if (!isValidArchiveDate(date)) {
+  if (!isPastDailyDate(date)) {
     return { title: 'Not Found' };
   }
 
@@ -129,7 +119,7 @@ export default async function DailyArchiveDatePage({ params }: PageParams) {
   const validLocale: Locale = LOCALES.includes(locale as Locale) ? (locale as Locale) : 'en';
   const tx = archiveCopy(await loadTranslation(validLocale) as Record<string, unknown>);
 
-  if (!isValidArchiveDate(date)) {
+  if (!isPastDailyDate(date)) {
     return (
       <div className="min-h-screen bg-neo-navy text-neo-white flex items-center justify-center">
         <div className="text-center">

@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { m } from 'framer-motion';
-import { Coins, Sparkles } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { Coins } from '@/components/ui/CoinsIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti, fireFireworks, fireVictoryConfetti } from '@/utils/confettiUtils';

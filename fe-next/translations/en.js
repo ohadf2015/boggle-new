@@ -1629,7 +1629,7 @@ const en = {
     "sections": {
       "daily": {
         "title": "One puzzle a day. Keep your streak.",
-        "line": "A fresh board every morning. Everyone gets the same letters, so you can compare scores.",
+        "line": "A fresh board every day at midnight UTC. Everyone gets the same letters, so you can compare scores.",
         "cta": "Play today's puzzle",
         "streak": "day streak"
       },
@@ -2674,6 +2674,8 @@ const en = {
       "back": "Back",
       "raidFailed": "Raid didn't land",
       "raidError": "Something went sideways. Try again.",
+      "wreckedToday": "Hit today",
+      "alreadyWrecked": "You already hit this tower today. Come back tomorrow.",
       "revengeTitle": "Payback time",
       "revengeBody": "{name} smashed your {plot} and ran off with {coins} coins.",
       "revengeBodyBlocked": "{name} swung at your tower. Your shield held.",
@@ -2692,7 +2694,7 @@ const en = {
         "lot": "empty lot"
       }
     },
-    "coins": { "run": "{n} coins this run" },
+    "coins": { "run": "{n} coins this run", "chip": "{n}" },
     "streak": { "a11y": "Perfect streak ×{n}", "toRare": "{n} perfect → rare crate", "crate": "CRATE", "meterA11y": "Perfect streak {n}, paying ×{mult}. {rare} more for a rare crate.", "label": "Streak" },
     "milestone": { "floors": "Floors up!", "a11y": "{n} floors" },
     "chest": {
@@ -2742,6 +2744,9 @@ const en = {
       "perksNone": "Build your district to steady the tower",
       "newsRaids": "{n} raids on you while you were away",
       "newsAffordable": "{n} upgrades you can afford now",
+      "finishAll": "Finish {name}",
+      "finishConfirm": "Confirm",
+      "spendFailed": "That didn't go through. Try again.",
       "newsDamaged": "{n} plots need repair",
       "newsNone": "Every plot is quiet",
       "completeTitle": "{name} complete!",
@@ -2873,7 +2878,7 @@ const en = {
     "bestFlag": "BEST",
     "leaveConfirm": "Leave this climb? You can resume in this tab, but daily runs are one per day.",
     "leaveDaily": {"title": "Leave today's climb?", "desc": "Leaving ends today's climb. Your height counts on today's board. The next daily opens tomorrow."},
-    "leaveFree": {"title": "Leave this climb?", "desc": "Leaving ends this run and cashes out your coins. Start a new one anytime."},
+    "leaveFree": {"title": "Leave this climb?", "desc": "Your tower is saved. Leaving ends this run and cashes out its coins, and next time you keep building."},
     "leaveKeep": "Keep climbing",
     "leaveGo": "Leave",
     "dailyPlayed": "Today's tower is done. Come back tomorrow.",
@@ -2968,7 +2973,10 @@ const en = {
     "perkReminders": "Streak reminders so you never break your run",
     "menuLabel": "Get the App",
     "pillLabel": "Get the App",
-    "pillClose": "Hide app banner"
+    "pillClose": "Hide app banner",
+    "qrTitle": "Scan to install on your phone",
+    "qrHint": "Point your Android camera here. It opens LexiClash on Google Play.",
+    "qrAlt": "QR code that opens LexiClash on Google Play"
   },
   "name": "English",
   "direction": "ltr",
@@ -3035,9 +3043,9 @@ const en = {
     },
     "daily": {
       "title": "Daily Word Wheel & Word Hunt — Free Daily Puzzle | LexiClash",
-      "description": "Daily Word Wheel + Word Hunt — free, no signup. Same board worldwide, 10 attempts, share emoji results, global leaderboard. New puzzle every day.",
+      "description": "Daily Word Wheel + Word Hunt — free, no signup. Same board worldwide, 10 attempts, share your result, global leaderboard. New puzzle every day.",
       "ogTitle": "Daily Word Wheel — Today's Free Word Puzzle",
-      "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share emoji results, build a streak. Free, no signup."
+      "ogDescription": "Daily Word Wheel + Word Hunt. Same puzzle worldwide, share your result, build a streak. Free, no signup."
     },
     "multiplayer": {
       "title": "Free Multiplayer Word Game — 8 Modes, No Signup | LexiClash",
@@ -13050,6 +13058,9 @@ const en = {
       "lastPlayedToday": "Played today · {{accuracy}}% average",
       "lastPlayedDays": "Played {{days}}d ago · {{accuracy}}% average",
       "lastPlayedOneDay": "Played yesterday · {{accuracy}}% average",
+      "lastPlayedNoScoreToday": "Played today",
+      "lastPlayedNoScoreDays": "Played {{days}}d ago",
+      "lastPlayedNoScoreOneDay": "Played yesterday",
       "strugglingOne": "{{names}} is struggling",
       "struggling": "{{count}} struggling: {{names}}",
       "regionLabel": "Class status for {{classroom}}",
@@ -21479,7 +21490,9 @@ const en = {
         "tooSoon": "Pick a time at least 30 minutes from now.",
         "tooFar": "Pick a time within the next 60 days.",
         "setupTitle": "When is your next lesson with this class?",
-        "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class."
+        "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class.",
+        "homeTitle": "When is your next lesson with this class?",
+        "homeBody": "Tell us and we'll email you the join code and the game an hour before, so you can open it in class."
       },
       "keepOpen": {
         "cta": "Keep it open as homework for a week",
@@ -21642,6 +21655,7 @@ const en = {
       "studentsOne": "1 student",
       "classPage": "Class page",
       "notPlayedRecently": "No games in 30 days",
+      "noGamesYet": "No games yet",
       "roster": {
         "hide": "Hide the student list",
         "seeAll": "See all students ({count})",
@@ -21843,6 +21857,22 @@ const en = {
       "startNow": "Start a game now",
       "startQuick": "Start a quick game",
       "joinedNone": "Waiting for your first student…",
+      "guide": {
+        "stepClass": "Class ready",
+        "stepReady": "Get ready",
+        "stepPlay": "First game",
+        "askTitle": "Where are you right now?",
+        "withStudents": "With my students",
+        "withStudentsBody": "Bring them in with the code. No game starts until you say so.",
+        "alone": "Getting ready on my own",
+        "aloneBody": "Try it privately and plan your next lesson. Students won't see anything.",
+        "tryTitle": "Try it first, just you",
+        "tryBody": "You play against practice bots. No student can see it or join.",
+        "skipTry": "Skip to my next lesson",
+        "waitingBody": "Put the code on the board. The game opens as soon as your first student joins.",
+        "startAnyway": "Open the game without waiting",
+        "back": "My students are with me now"
+      },
       "joinedOne": "1 student joined",
       "joinedMany": "{count} students joined",
       "shareWhatsapp": "WhatsApp",

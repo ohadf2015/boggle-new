@@ -16,7 +16,7 @@
  * than inside PageClient, which is a provider-wrapped app shell no unit test can
  * render. Same reasoning as `lib/education/classroomRoomGone.ts`.
  */
-import { classroomStudentHomePath, type ClassroomContext } from '@/lib/education/classroomRoomGone';
+import { classroomStudentHomePath, classroomTeacherHomePath, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { isClassroomLivePathname } from '@/lib/education/classroomLivePath';
 
 export interface MultiplayerExitParams {
@@ -49,7 +49,7 @@ export function multiplayerExitDestination({
   // teacher dashboard — derived from the role, so a second launch surface (the
   // full setup page as well as quick launch) returns to the same place without
   // either call site naming a route.
-  if (isHost) return `/${locale || 'en'}/teacher`;
+  if (isHost) return classroomTeacherHomePath(locale);
   return classroomStudentHomePath(locale);
 }
 
