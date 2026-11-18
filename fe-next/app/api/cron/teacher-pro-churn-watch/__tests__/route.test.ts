@@ -20,6 +20,11 @@ const h = vi.hoisted(() => ({
   telegramOk: true,
   sendTelegram: vi.fn(async () => true),
   sendEmail: vi.fn(async () => ({ ok: true })),
+  processDunning: vi.fn(async () => ({ processed: 0, items: [] })),
+}));
+
+vi.mock('@/lib/education/dunning', () => ({
+  processDunningForPastDueSubs: (...args: unknown[]) => h.processDunning(...args),
 }));
 
 vi.mock('@/lib/polar', () => ({
@@ -151,5 +156,25 @@ describe('/api/cron/teacher-pro-churn-watch', () => {
     const body = await res.json();
     expect(body.emailed).toBe(true);
     expect(h.sendEmail).toHaveBeenCalledTimes(1);
+  });
+
+  it('runs the dunning sweep for past_due subscriptions during the churn watch', async () => {
+    h.processDunning.mockResolvedValue({
+      processed: 1,
+      items: [{ subscriptionId: 'sub_1', email: 'teacher@school.org', step: 'day-5', sent: true }],
+    });
+    h.listLive = [];
+    h.listInactive = [{ ...liveSub, status: 'past_due' }];
+    const res = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(h.processDunning).toHaveBeenCalledWith(
+      expect.arrayContaining([expect.objectContaining({ status: 'past_due' })]),
+      { dry: false },
+    );
+    expect(body.dunning).toEqual({
+      processed: 1,
+      items: [{ subscriptionId: 'sub_1', email: 'teacher@school.org', step: 'day-5', sent: true }],
+    });
   });
 });

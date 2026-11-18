@@ -306,6 +306,15 @@ export function buildPolarTrialExpirySentEvent(userId: string, bucket: PolarTria
   };
 }
 
+/** Dunning email sent (day 1 initial notice, day 5 escalation). */
+export function buildDunningEmailSentEvent(userId: string, day: number, subscriptionId?: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'dunning_email_sent',
+    properties: { ...BASE, day, subscription_id: subscriptionId, teacher_id: userId },
+  };
+}
+
 /** Measurable gate step: teacher access request row durably created. */
 export function buildEduAccessRequestCreatedEvent(
   userId: string,

@@ -438,7 +438,14 @@ export function trackRecoveryClicked(args: { surface: 'payment_failed_banner' })
     product: 'teacher_pro',
     provider: 'polar',
   });
+  safeCapture('recovery_cta_clicked', {
+    surface: args.surface,
+    product: 'teacher_pro',
+    provider: 'polar',
+  });
 }
+
+export const trackRecoveryCtaClicked = trackRecoveryClicked;
 
 export type TeacherPlanGateShownArgs = {
   surface: 'classroom_create' | 'student_enroll';

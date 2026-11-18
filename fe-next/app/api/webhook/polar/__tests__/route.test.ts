@@ -174,6 +174,15 @@ describe('polar webhook', () => {
     expect(maybeSendPaymentFailedEmail).not.toHaveBeenCalled()
   })
 
+  it('fires dunning when subscription.updated carries status past_due', async () => {
+    maybeSendPaymentFailedEmail.mockClear()
+    await POST(polarEvent('subscription.updated', { ...subscriptionData, status: 'past_due' }))
+    expect(maybeSendPaymentFailedEmail).toHaveBeenCalledWith({
+      payload: expect.objectContaining({ type: 'subscription.updated' }),
+      userId: 'u1',
+    })
+  })
+
   it('a dunning failure still acks the webhook — state write already landed', async () => {
     maybeSendPaymentFailedEmail.mockRejectedValueOnce(new Error('resend down'))
     const res = await POST(polarEvent('subscription.past_due', { ...subscriptionData, status: 'past_due' }))
