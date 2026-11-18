@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
@@ -15,6 +15,7 @@ import { foldJoinCode } from '@/lib/education/joinCodeInput';
 import { honorRehearsalJoin } from '@/lib/education/paidDay0';
 import { joinNameLocale, moderateJoinName } from '@/lib/education/joinNameModeration';
 import { deriveGuestUsername } from '@/lib/education/guestStudent';
+import { notifyFirstStudent } from '@/lib/education/firstStudentEmail';
 
 const TEACHER_OWN_CLASS = 'TEACHER_OWN_CLASS';
 
@@ -295,6 +296,14 @@ export async function POST(request: NextRequest) {
     if (!isRehearsal) {
       await captureStudentJoinEvents(createAdminClient(), { classroomId: classroom.id, studentId: userId });
     }
+    afterResponse(() =>
+      notifyFirstStudent(admin, {
+        classroomId: classroom.id,
+        studentId: userId!,
+        isRehearsal,
+        liveGameCode: ownLiveGameCode,
+      }),
+    );
     if (lockedOutOfLiveGame) return lockedOut();
 
     return NextResponse.json(
@@ -314,6 +323,16 @@ export async function POST(request: NextRequest) {
       { error: 'Internal server error' },
       { status: 500 }
     );
+  }
+}
+
+/** Runs after the response is sent; outside a request scope (tests, scripts) it runs detached. Never throws. */
+function afterResponse(task: () => Promise<unknown>): void {
+  const run = () => task().catch((err) => logger.error('classroom join: post-join task failed:', err));
+  try {
+    after(run);
+  } catch {
+    void run();
   }
 }
 
