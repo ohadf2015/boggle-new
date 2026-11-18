@@ -59,6 +59,18 @@ describe('GET /api/subscription/portal: a stable card-update link', () => {
     expect(res.headers.get('location')).toBe('/en/teacher');
   });
 
+  it('rewrites a portal session onto the card form when the banner asks to update the card', async () => {
+    checkTeacherSubscription.mockResolvedValue({ has_pro: false, status: 'past_due', source: 'polar' });
+    createCustomerPortalUrl.mockResolvedValue(
+      'https://polar.sh/lexiclash/portal?customer_session_token=abc&email=t%40school.org',
+    );
+    const res = await GET(req('?locale=he&intent=update-card'));
+    expect(res.status).toBe(303);
+    const dest = new URL(res.headers.get('location')!);
+    expect(dest.pathname).toBe('/lexiclash/portal/settings');
+    expect(dest.searchParams.get('customer_session_token')).toBe('abc');
+  });
+
   it('never redirects to the container origin behind the proxy', async () => {
     getAuthedUser.mockResolvedValue(null);
     const r = await GET(new NextRequest('http://localhost:3000/api/subscription/portal?locale=he'));

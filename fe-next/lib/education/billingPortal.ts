@@ -24,6 +24,33 @@ export function billingPortalEmailUrl(locale: string): string {
   return `${SITE}${billingPortalPath(locale)}`;
 }
 
+/** Hosted Polar customer portal only. Never an open redirect. */
+export function isPolarHostedUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return u.protocol === 'https:' && (u.hostname === 'polar.sh' || u.hostname.endsWith('.polar.sh'));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Polar's customer_portal_url lands on /{org}/portal (overview). The card form
+ * is /{org}/portal/settings, and that page reads the same customer_session_token.
+ * A URL that is not that portal root is refused rather than guessed.
+ */
+export function polarPaymentUpdateUrl(portalUrl: string): string | null {
+  if (!isPolarHostedUrl(portalUrl)) return null;
+  const u = new URL(portalUrl);
+  const root = u.pathname.match(/^\/([^/]+)\/portal\/?$/);
+  if (root) {
+    u.pathname = `/${root[1]}/portal/settings`;
+    return u.toString();
+  }
+  if (/^\/[^/]+\/portal\/settings\/?$/.test(u.pathname)) return u.toString();
+  return null;
+}
+
 export interface PortalSubscriptionLike {
   has_pro: boolean;
   status: string;

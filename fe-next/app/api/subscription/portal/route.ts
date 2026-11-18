@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getPolarClient } from '@/lib/polar';
-import { billingPortalLocale, canUseBillingPortal } from '@/lib/education/billingPortal';
+import { billingPortalLocale, canUseBillingPortal, polarPaymentUpdateUrl } from '@/lib/education/billingPortal';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import logger from '@/utils/logger';
 
@@ -12,6 +12,9 @@ import logger from '@/utils/logger';
  * One stable link to the Polar customer portal (update the card, cancel, invoices) for
  * emails and in-app fallbacks. Polar portal sessions are short-lived, so this mints a
  * fresh one at the moment of the click and redirects to it.
+ *
+ * `intent=update-card` rewrites a real /{org}/portal session onto /portal/settings,
+ * the payment-update page. Other callers still land on the portal overview.
  *
  * - Signed out: Teacher Home (sign-in there, then the payment banner carries a live link).
  * - No Polar subscription, native app, or Polar error: Teacher Home. Never a checkout,
@@ -37,7 +40,10 @@ export async function GET(request: NextRequest) {
 
     const url = await getPolarClient().createCustomerPortalUrl(user.id);
     if (!url || !url.startsWith('https://')) return toHome();
-    return NextResponse.redirect(url, 303);
+    const updateCard = request.nextUrl.searchParams.get('intent') === 'update-card';
+    const dest = updateCard ? polarPaymentUpdateUrl(url) || url : url;
+    if (!dest.startsWith('https://')) return toHome();
+    return NextResponse.redirect(dest, 303);
   } catch (err) {
     logger.warn('[Portal] could not open the Polar customer portal:', err);
     return toHome();
