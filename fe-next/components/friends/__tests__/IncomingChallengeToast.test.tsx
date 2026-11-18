@@ -6,7 +6,11 @@ const t = (key: string, a?: unknown, b?: unknown) => {
   return params ? `${key}|${Object.values(params).join(',')}` : key;
 };
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t, language: 'he' }) }));
-vi.mock('@/components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }));
+vi.mock('@/components/Avatar', () => ({
+  default: ({ customAvatar, userId }: { customAvatar?: { hair?: string }; userId?: string }) => (
+    <span data-testid="avatar" data-has-custom={customAvatar ? 'yes' : 'no'} data-userid={userId ?? ''} data-hair={customAvatar?.hair ?? ''} />
+  ),
+}));
 const toastMock = vi.hoisted(() => Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: toastMock }));
 const nav = vi.hoisted(() => ({ pathname: '/he/daily', push: vi.fn() }));
@@ -42,7 +46,7 @@ let socket = makeSocket();
 let hasSocket = true;
 vi.mock('@/utils/SocketContext', () => ({ useSocketOptional: () => (hasSocket ? { socket, isConnected: true } : null) }));
 
-import IncomingChallengeToast from '../IncomingChallengeToast';
+import IncomingChallengeToast, { challengeFromSocket } from '../IncomingChallengeToast';
 
 async function renderToast() {
   const r = render(<IncomingChallengeToast />);
@@ -233,5 +237,77 @@ describe('IncomingChallengeToast — my challenge was accepted', () => {
     for (const ev of ['friends:challengeAccepted', 'friends:challengeDeclined', 'friends:challengeResult']) {
       expect(socket.handlers.get(ev)?.size).toBe(1);
     }
+  });
+});
+
+describe('challengeFromSocket — built avatar', () => {
+  const built = {
+    gender: 'male' as const,
+    base: 'round' as const,
+    skinColor: '#FFDBB4',
+    hair: 'spiky' as const,
+    hairColor: '#2C1B18',
+    eyes: 'round' as const,
+    eyeColor: '#4A6FA5',
+    noseStyle: 'button' as const,
+    eyebrows: 'none' as const,
+    mouth: 'smile' as const,
+    accessory: 'none' as const,
+    accessoryColor: '#000000',
+    bgColor: '#1a1a2e',
+    shirtColor: '#4A90D9',
+  };
+
+  it('maps fromAvatar.customAvatar onto challengerCustomAvatar', () => {
+    const c = challengeFromSocket({
+      challengeId: 'ch-live',
+      fromUserId: 'milo-1',
+      fromUsername: 'milo',
+      fromDisplayName: 'Milo',
+      fromAvatar: { emoji: '😊', color: '#4F46E5', customAvatar: built },
+      challengeType: 'join_room',
+      roomCode: 'RHCA28',
+      createdAt: Date.now(),
+    });
+    expect(c.challengerCustomAvatar).toEqual(built);
+    expect(c.challengerId).toBe('milo-1');
+  });
+});
+
+describe('IncomingChallengeToast — built avatar face', () => {
+  it('Given a live room invite with a built avatar, Then the card renders that custom face not a generated placeholder', async () => {
+    const built = {
+      gender: 'male',
+      base: 'round',
+      skinColor: '#FFDBB4',
+      hair: 'spiky',
+      hairColor: '#2C1B18',
+      eyes: 'round',
+      eyeColor: '#4A6FA5',
+      noseStyle: 'button',
+      eyebrows: 'none',
+      mouth: 'smile',
+      accessory: 'none',
+      accessoryColor: '#000000',
+      bgColor: '#1a1a2e',
+      shirtColor: '#4A90D9',
+    };
+    await renderToast();
+    await act(async () => {
+      socket.fire('friends:challengeReceived', {
+        challengeId: 'ch-live',
+        fromUserId: 'milo-1',
+        fromUsername: 'milo',
+        fromDisplayName: 'Milo',
+        fromAvatar: { emoji: '😊', color: '#4F46E5', customAvatar: built },
+        challengeType: 'join_room',
+        roomCode: 'RHCA28',
+        createdAt: Date.now(),
+      });
+    });
+    const face = screen.getByTestId('avatar');
+    expect(face.getAttribute('data-has-custom')).toBe('yes');
+    expect(face.getAttribute('data-hair')).toBe('spiky');
+    expect(face.getAttribute('data-userid')).toBe('milo-1');
   });
 });

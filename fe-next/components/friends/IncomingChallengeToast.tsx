@@ -60,7 +60,7 @@ type ChallengeReceivedPayload = {
   fromUserId: string;
   fromUsername: string;
   fromDisplayName?: string | null;
-  fromAvatar?: { image?: string | null; emoji?: string; color?: string };
+  fromAvatar?: { image?: string | null; emoji?: string; color?: string; customAvatar?: FriendChallenge['challengerCustomAvatar'] };
   challengeType?: 'new_game' | 'join_room';
   roomCode: string;
   createdAt?: number;
@@ -75,6 +75,7 @@ export function challengeFromSocket(data: ChallengeReceivedPayload): FriendChall
     challengerAvatarImage: data.fromAvatar?.image ?? undefined,
     challengerAvatarEmoji: data.fromAvatar?.emoji || '',
     challengerAvatarColor: data.fromAvatar?.color || '',
+    challengerCustomAvatar: data.fromAvatar?.customAvatar,
     challengeId: data.roomCode,
     challengeCode: data.roomCode,
     challengeType: data.challengeType,

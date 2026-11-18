@@ -14,6 +14,12 @@ import {
   cacheUserProfile,
   type CachedUserProfile,
 } from '../redis';
+import { isValidCustomAvatar, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+
+/** Accept a stored avatar_config only when it is a full built-avatar object. */
+export function asCustomAvatar(value: unknown): CustomAvatarConfig | undefined {
+  return isValidCustomAvatar(value) ? value : undefined;
+}
 
 // ==================== Auth ====================
 
@@ -52,6 +58,7 @@ export interface UserProfile {
     emoji: string;
     color: string;
     image?: string | null;
+    customAvatar?: CustomAvatarConfig;
   };
   isOnline: boolean;
 }
@@ -63,7 +70,9 @@ export interface UserProfile {
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     const cached = await getCachedUserProfile(userId);
-    if (cached) {
+    // Caches written before avatarConfig was stored must refetch so a built
+    // avatar is not dropped for a seeded random face on live invites.
+    if (cached && 'avatarConfig' in cached) {
       const isOnline = cached.lastSeenAt
         ? new Date(cached.lastSeenAt) > new Date(Date.now() - 5 * 60 * 1000)
         : false;
@@ -75,6 +84,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
           emoji: cached.avatarEmoji,
           color: cached.avatarColor,
           image: cached.avatarImage,
+          customAvatar: asCustomAvatar(cached.avatarConfig),
         },
         isOnline,
       };
@@ -88,12 +98,13 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
     const { data } = await supabase
       .from('profiles')
-      .select('username, display_name, avatar_emoji, avatar_color, avatar_image, last_seen_at')
+      .select('username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, last_seen_at')
       .eq('id', userId)
       .single();
 
     if (!data) return null;
 
+    const customAvatar = asCustomAvatar(data.avatar_config);
     const profileToCache: CachedUserProfile = {
       userId,
       username: data.username,
@@ -101,6 +112,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
       avatarEmoji: data.avatar_emoji || '👤',
       avatarColor: data.avatar_color || '#808080',
       avatarImage: data.avatar_image,
+      avatarConfig: customAvatar ?? null,
       lastSeenAt: data.last_seen_at,
     };
     await cacheUserProfile(profileToCache);
@@ -117,6 +129,7 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
         emoji: data.avatar_emoji || '👤',
         color: data.avatar_color || '#808080',
         image: data.avatar_image,
+        customAvatar,
       },
       isOnline,
     };

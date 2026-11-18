@@ -4,6 +4,7 @@
  */
 
 import { loadSupabaseClient } from '@/utils/supabase/loadClient';
+import { isValidCustomAvatar } from '@/shared/types/customAvatar';
 import logger from '@/utils/logger';
 import { shouldWriteOnlineStatus } from './onlineStatusThrottle';
 import { PUBLIC_PROFILES_TABLE, PUBLIC_PROFILE_COLUMNS } from './publicProfiles';
@@ -267,7 +268,9 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
         username,
         display_name,
         avatar_emoji,
-        avatar_color
+        avatar_color,
+        avatar_image,
+        avatar_config
       )
     `)
     .eq('challenged_id', uid)
@@ -293,17 +296,22 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
       display_name?: string | null;
       avatar_emoji?: string;
       avatar_color?: string;
+      avatar_image?: string | null;
+      avatar_config?: unknown;
     } | null;
   }
   return (challenges as unknown as ChallengeWithRelations[]).map((c: ChallengeWithRelations) => {
     const challenger = c.profiles;
+    const built = challenger?.avatar_config;
     return {
       id: c.id,
       challengerId: c.challenger_id,
       challengerUsername: challenger?.username || 'Unknown',
       challengerDisplayName: challenger?.display_name ?? undefined,
+      challengerAvatarImage: challenger?.avatar_image ?? undefined,
       challengerAvatarEmoji: challenger?.avatar_emoji || '😊',
       challengerAvatarColor: challenger?.avatar_color || '#4F46E5',
+      challengerCustomAvatar: isValidCustomAvatar(built) ? built : undefined,
       challengeId: c.challenge_id,
       challengeCode: c.challenge_id,
       challengeType: c.challenge_type,

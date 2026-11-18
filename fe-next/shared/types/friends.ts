@@ -30,6 +30,7 @@ export interface FriendRequest {
     emoji: string;
     color: string;
     image?: string;
+    customAvatar?: import('./customAvatar').CustomAvatarConfig;
   };
   toUserId: string;
   toUsername: string;
@@ -77,6 +78,7 @@ export interface Challenge {
     emoji: string;
     color: string;
     image?: string;
+    customAvatar?: import('./customAvatar').CustomAvatarConfig;
   };
   toUserId: string;
   toUsername: string;
