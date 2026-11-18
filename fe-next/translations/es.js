@@ -1629,7 +1629,7 @@ const es = {
     "sections": {
       "daily": {
         "title": "Un reto al día. Mantén tu racha.",
-        "line": "Un tablero nuevo cada mañana. Todos tienen las mismas letras, así que puedes comparar puntos.",
+        "line": "Un tablero nuevo cada día a medianoche UTC. Todos tienen las mismas letras, así que puedes comparar puntos.",
         "cta": "Jugar el reto de hoy",
         "streak": "días de racha"
       },

@@ -1629,7 +1629,7 @@ const en = {
     "sections": {
       "daily": {
         "title": "One puzzle a day. Keep your streak.",
-        "line": "A fresh board every morning. Everyone gets the same letters, so you can compare scores.",
+        "line": "A fresh board every day at midnight UTC. Everyone gets the same letters, so you can compare scores.",
         "cta": "Play today's puzzle",
         "streak": "day streak"
       },

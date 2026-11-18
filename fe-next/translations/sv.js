@@ -1629,7 +1629,7 @@ const sv = {
     "sections": {
       "daily": {
         "title": "Ett pussel om dagen. Håll sviten vid liv.",
-        "line": "En ny bräda varje morgon. Alla får samma bokstäver, så ni kan jämföra poäng.",
+        "line": "En ny bräda varje dag vid midnatt UTC. Alla får samma bokstäver, så ni kan jämföra poäng.",
         "cta": "Spela dagens pussel",
         "streak": "dagars svit"
       },
