@@ -73,32 +73,31 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const redirectStartedRef = useRef(false);
 
   // Until the GSI iframe paints, a tap has nothing to land on, so it takes the redirect path.
+  // Bound to click: a pointerdown also starts every scroll of the sheet.
   const startRedirectFallback = useCallback(() => {
     if (redirectStartedRef.current || renderedRef.current) return;
     redirectStartedRef.current = true;
+    const fail = (message: string, showToast = true) => {
+      redirectStartedRef.current = false;
+      if (showToast) neoErrorToast(t('errors.signInFailedRetry'));
+      trackSignupFailed('oauth_redirect_error', { source: sourceRef.current, message });
+    };
     void loadAuthClient()
-      .then(({ signInWithGoogle }) => {
+      .then(async ({ signInWithGoogle }) => {
         if (typeof signInWithGoogle !== 'function') {
-          trackSignupFailed('oauth_redirect_error', {
-            source: sourceRef.current,
-            message: 'signInWithGoogle is not a function',
-          });
-          return undefined;
+          fail('signInWithGoogle is not a function');
+          return;
         }
-        return signInWithGoogle();
-      })
-      .then((res) => {
+        const res = await signInWithGoogle();
         const err = (res as { error?: { message?: string } | null } | undefined)?.error;
-        if (err) trackSignupFailed('oauth_redirect_error', { source: sourceRef.current, message: err.message });
+        if (err) fail(err.message ?? 'Google sign-in failed');
       })
       .catch((e: unknown) => {
-        if (e instanceof AuthClientLoadError) window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
-        trackSignupFailed('oauth_redirect_error', {
-          source: sourceRef.current,
-          message: e instanceof Error ? e.message : String(e),
-        });
+        const loadFailed = e instanceof AuthClientLoadError;
+        if (loadFailed) window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
+        fail(e instanceof Error ? e.message : String(e), !loadFailed);
       });
-  }, []);
+  }, [t]);
 
   const handlePromptClickIntent = useCallback(() => {
     const source = sourceRef.current;
@@ -118,8 +117,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
         message: e instanceof Error ? e.message : String(e),
       });
     }
-    if (!renderedRef.current) startRedirectFallback();
-  }, [startRedirectFallback]);
+  }, []);
 
   useEffect(() => {
     const showLoadFailure = () => neoErrorToast(t('errors.signInFailedRetry'));
@@ -244,6 +242,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       <div
         data-testid="gsi-frame"
         onPointerDown={handlePromptClickIntent}
+        onClick={startRedirectFallback}
         className="relative flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
       >
         {!gsiRendered && (

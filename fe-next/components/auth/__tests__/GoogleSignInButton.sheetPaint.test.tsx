@@ -14,11 +14,20 @@ vi.mock('@/lib/auth/googleOneTap', () => ({
 }));
 
 const signInWithGoogle = vi.fn().mockResolvedValue({ error: null });
-vi.mock('@/lib/auth/loadAuthClient', () => ({
-  loadAuthClient: () => Promise.resolve({ signInWithGoogle }),
-  isAuthClientConfigured: () => true,
+const { loadAuthClient, AuthClientLoadError } = vi.hoisted(() => ({
+  loadAuthClient: vi.fn(),
   AuthClientLoadError: class AuthClientLoadError extends Error {},
+}));
+vi.mock('@/lib/auth/loadAuthClient', () => ({
+  loadAuthClient,
+  isAuthClientConfigured: () => true,
+  AuthClientLoadError,
   AUTH_CLIENT_LOAD_FAILED_EVENT: 'lc:auth-client-load-failed',
+}));
+
+const neoErrorToast = vi.fn();
+vi.mock('@/components/NeoToast', () => ({
+  neoErrorToast: (...args: unknown[]) => neoErrorToast(...args),
 }));
 
 const trackSignupFailed = vi.fn();
@@ -35,8 +44,10 @@ describe('GoogleSignInButton sheet paint (t_de3e790a)', () => {
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://x.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid.apps.googleusercontent.com');
-    signInWithGoogle.mockClear();
+    signInWithGoogle.mockReset().mockResolvedValue({ error: null });
+    loadAuthClient.mockReset().mockResolvedValue({ signInWithGoogle });
     trackSignupFailed.mockClear();
+    neoErrorToast.mockClear();
     delete (window as unknown as { google?: unknown }).google;
   });
   afterEach(() => {
@@ -62,7 +73,52 @@ describe('GoogleSignInButton sheet paint (t_de3e790a)', () => {
 
   it('a tap before the iframe exists starts the redirect OAuth path instead of dying on the placeholder', async () => {
     render(<GoogleSignInButton analyticsSource="multi_games_sheet" />);
-    fireEvent.pointerDown(screen.getByTestId('gsi-frame'));
+    fireEvent.click(screen.getByTestId('gsi-frame'));
     await waitFor(() => expect(signInWithGoogle).toHaveBeenCalledTimes(1));
+  });
+
+  it('a pointerdown alone, as when a scroll starts on the button, does not open Google', async () => {
+    render(<GoogleSignInButton analyticsSource="multi_games_sheet" />);
+    fireEvent.pointerDown(screen.getByTestId('gsi-frame'));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(loadAuthClient).not.toHaveBeenCalled();
+    expect(signInWithGoogle).not.toHaveBeenCalled();
+  });
+
+  it('a second tap while the redirect is starting does not start another', async () => {
+    render(<GoogleSignInButton />);
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(signInWithGoogle).toHaveBeenCalledTimes(1));
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(signInWithGoogle).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows the error toast and allows a retry when sign-in returns an error', async () => {
+    signInWithGoogle.mockResolvedValueOnce({ error: { message: 'nope' } });
+    render(<GoogleSignInButton />);
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(neoErrorToast).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(signInWithGoogle).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows the error toast and allows a retry when sign-in throws', async () => {
+    signInWithGoogle.mockRejectedValueOnce(new Error('boom'));
+    render(<GoogleSignInButton />);
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(neoErrorToast).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(signInWithGoogle).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows one toast when the auth client fails to load', async () => {
+    loadAuthClient.mockRejectedValueOnce(new AuthClientLoadError('chunk'));
+    render(<GoogleSignInButton />);
+    fireEvent.click(screen.getByTestId('gsi-frame'));
+    await waitFor(() => expect(trackSignupFailed).toHaveBeenCalled());
+    expect(neoErrorToast).toHaveBeenCalledTimes(1);
   });
 });

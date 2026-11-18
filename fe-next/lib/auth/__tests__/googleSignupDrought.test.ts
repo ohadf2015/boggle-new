@@ -9,15 +9,15 @@ describe('shouldAlertGoogleSignupDrought', () => {
   it('alerts when 8 daytime hours have 0 Google signups and the landing CTA was clicked', () => {
     expect(shouldAlertGoogleSignupDrought({
       googleSignups: 0,
-      landingCtaClicked: 11,
+      arrivals: 11,
       daytimeHours: 8,
     })).toBe(true);
   });
 
   it('stays quiet overnight, when Google still converts, or when nobody is clicking', () => {
-    expect(shouldAlertGoogleSignupDrought({ googleSignups: 0, landingCtaClicked: 40, daytimeHours: 7 })).toBe(false);
-    expect(shouldAlertGoogleSignupDrought({ googleSignups: 1, landingCtaClicked: 40, daytimeHours: 8 })).toBe(false);
-    expect(shouldAlertGoogleSignupDrought({ googleSignups: 0, landingCtaClicked: 10, daytimeHours: 8 })).toBe(false);
+    expect(shouldAlertGoogleSignupDrought({ googleSignups: 0, arrivals: 40, daytimeHours: 7 })).toBe(false);
+    expect(shouldAlertGoogleSignupDrought({ googleSignups: 1, arrivals: 40, daytimeHours: 8 })).toBe(false);
+    expect(shouldAlertGoogleSignupDrought({ googleSignups: 0, arrivals: 10, daytimeHours: 8 })).toBe(false);
   });
 
   it('counts only Israel daytime hours in an 8-hour lookback', () => {

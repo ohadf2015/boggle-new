@@ -21,14 +21,14 @@ export interface AuthUserLister {
 export interface GoogleSignupDroughtInput {
   /** New non-anonymous Google accounts in the window. */
   googleSignups: number;
-  /** Landing CTA clicks in the same window, or games started when those are unavailable. */
-  landingCtaClicked: number;
+  /** Landing CTA clicks in the same window, or games started when those cannot be read. */
+  arrivals: number;
   /** Hours of the window that fall in local daytime (08:00–24:00). */
   daytimeHours: number;
 }
 
 export function shouldAlertGoogleSignupDrought(input: GoogleSignupDroughtInput): boolean {
-  return input.daytimeHours >= 8 && input.googleSignups === 0 && input.landingCtaClicked > 10;
+  return input.daytimeHours >= 8 && input.googleSignups === 0 && input.arrivals > 10;
 }
 
 /** Hours in the lookback whose local time is 08:00–23:59. Night hours do not count. */
