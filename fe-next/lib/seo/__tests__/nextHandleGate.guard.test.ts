@@ -49,6 +49,16 @@ describe('decideNextHandle', () => {
     expect(decideNextHandle('/favicon.ico')).toEqual({ action: 'pass' });
   });
 
+  it('returns 404 for daily archive dates that have no puzzle', () => {
+    const drop = { action: 'drop', reason: 'cardinality' };
+    expect(decideNextHandle('/en/daily/archive/2019-01-01')).toEqual(drop);
+    expect(decideNextHandle('/he/daily/archive/not-a-date')).toEqual(drop);
+    expect(decideNextHandle('/en/daily/archive/2999-01-01')).toEqual(drop);
+    expect(decideNextHandle('/en/daily/archive/2026-02-30')).toEqual(drop);
+    expect(decideNextHandle('/en/daily/archive/2026-03-17')).toEqual({ action: 'pass' });
+    expect(decideNextHandle('/en/daily/archive')).toEqual({ action: 'pass' });
+  });
+
   it('drops scanner probes before App Router (same family as proxy PROBE_RE)', () => {
     expect(decideNextHandle('/.env')).toEqual({ action: 'drop', reason: 'probe' });
     expect(decideNextHandle('/wp-admin/install.php')).toEqual({ action: 'drop', reason: 'probe' });
