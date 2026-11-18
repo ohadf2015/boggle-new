@@ -57,8 +57,8 @@ export interface ReportColumn {
   score: number;
   foundCount: number;
   missedCount: number;
-  /** found / lesson words, as a rounded percentage. 0 for an absentee. */
-  accuracyPct: number;
+  /** found / offered lesson words, as a rounded percentage. 0 for an absentee; null when none were offered. */
+  accuracyPct: number | null;
 }
 
 export interface ReportRow {
@@ -106,7 +106,7 @@ export interface StudentDrillDown {
   studentId: string;
   name: string;
   played: boolean;
-  accuracyPct: number;
+  accuracyPct: number | null;
   foundCount: number;
   /** Worst-first, matching the grid's row order. */
   missedWords: string[];
@@ -212,7 +212,8 @@ export function buildClassReportGrid(game: RecentClassroomGame): ClassReportGrid
   // to columns, and sorting rows never reorders columns.
 
   for (const col of columns) {
-    col.accuracyPct = pct(col.foundCount, col.foundCount + col.missedCount);
+    const offered = col.foundCount + col.missedCount;
+    col.accuracyPct = col.played && offered === 0 ? null : pct(col.foundCount, offered);
   }
 
   const isQuiz = game.gameMode === QUIZ_MODE;
@@ -376,7 +377,7 @@ export function buildNotesText(
 
   // ---- Students below the line ----
   lines.push(labels.checkIn);
-  const behind = grid.columns.filter((c) => c.played && c.accuracyPct < CHECK_IN_ACCURACY_PCT);
+  const behind = grid.columns.filter((c) => c.played && c.accuracyPct !== null && c.accuracyPct < CHECK_IN_ACCURACY_PCT);
   if (behind.length === 0) {
     lines.push(`  ${labels.everyoneOk}`);
   } else {

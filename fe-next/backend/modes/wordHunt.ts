@@ -27,6 +27,8 @@ const MIN_DISPLAY_WORD_LENGTH = 5;
 export const wordHuntMode: GameModeModule = {
   id: 'word-hunt',
 
+  lessonWordsOffered: (_game, placedOnBoard) => placedOnBoard,
+
   async initRound({ game, gameCode, language, letterGrid, gridRows, gridCols, playerUsernames, vocabToEmbed, classroomGame }) {
     const recentTargets = getRecentMpTargets(language);
     // TARGET-FIRST (fail-closed): pick a clean curated word, then rebuild the

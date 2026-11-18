@@ -250,3 +250,22 @@ describe('deriveClassPulse', () => {
     });
   });
 });
+
+describe('GIVEN a last round that offered no lesson words', () => {
+  it('WHEN the pulse is derived THEN nobody is struggling and there is no average', () => {
+    const pulse = deriveClassPulse({
+      rosterCount: 2,
+      lastGame: lastGame({
+        averageAccuracyPct: null,
+        participation: { played: 2, roster: 2 },
+        players: [
+          { studentId: 's1', name: 'Ada', accuracyPct: null },
+          { studentId: 's2', name: 'Blaise', accuracyPct: null },
+        ],
+      }),
+      now: NOW,
+    });
+    expect(pulse.averageAccuracyPct).toBeNull();
+    expect(pulse.struggling).toEqual([]);
+  });
+});

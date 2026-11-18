@@ -131,6 +131,8 @@ export interface GameState {
    * on non-classroom rooms.
    */
   classroomRoundExtras?: Record<string, unknown>;
+  /** Lesson words this classroom round offered. Empty: none. Undefined: unknown. */
+  classroomOfferedWords?: string[];
   /** Lesson Word Race for this round; null when off (no deck, fewer than 2 students, or a mode outside the race). */
   lessonClaims?: import('../lessonClaims').LessonClaimsState | null;
   allowLateJoin: boolean;

@@ -23,8 +23,8 @@ export interface LastGamePlayer {
   score: number;
   lessonWordsFound: string[];
   lessonWordsMissed: string[];
-  /** found / (found + missed) as a rounded percentage; 0 when no lesson words. */
-  accuracyPct: number;
+  /** found / (found + missed) as a rounded percentage; null when the round offered this student no lesson words. */
+  accuracyPct: number | null;
 }
 
 export interface LastGameMissedWord {
@@ -61,8 +61,8 @@ export interface RecentClassroomGame {
   wordsNobodyFound: string[];
   /** Share of lesson words found by at least one student. */
   coveragePct: number;
-  /** Mean of the players' `accuracyPct`. */
-  averageAccuracyPct: number;
+  /** Mean of the rated players' `accuracyPct`; null when nobody was offered a lesson word. */
+  averageAccuracyPct: number | null;
   participation: { played: number; roster: number };
   /**
    * Roster students with no session row for this game. Always set by
@@ -120,7 +120,7 @@ function buildGame(
       score: row.score ?? row.total_score ?? 0,
       lessonWordsFound: found,
       lessonWordsMissed: missed,
-      accuracyPct: pct(found.length, found.length + missed.length),
+      accuracyPct: found.length + missed.length > 0 ? pct(found.length, found.length + missed.length) : null,
     };
   });
   players.sort((a, b) => b.score - a.score);
@@ -150,10 +150,10 @@ function buildGame(
     .sort((a, b) => b.pct - a.pct || a.word.localeCompare(b.word));
 
   const wordsNobodyFound = missedWords.filter((w) => w.missedBy === total && total > 0).map((w) => w.word);
-  const rated = players.filter((p) => p.lessonWordsFound.length + p.lessonWordsMissed.length > 0);
+  const rated = players.flatMap((p) => (p.accuracyPct === null ? [] : [p.accuracyPct]));
   const averageAccuracyPct = rated.length
-    ? Math.round(rated.reduce((sum, p) => sum + p.accuracyPct, 0) / rated.length)
-    : 0;
+    ? Math.round(rated.reduce((sum, accuracy) => sum + accuracy, 0) / rated.length)
+    : null;
 
   const played = new Set(rows.map((r) => r.student_id));
 

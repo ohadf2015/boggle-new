@@ -66,7 +66,7 @@ export function buildClassroomPodium({
       };
       // A late joiner has no mastery row. Omitting the counts renders "no
       // sub-line"; sending 0/N would accuse them of finding nothing.
-      if (mastery) {
+      if (mastery && mastery.total > 0) {
         entry.wordsFound = mastery.found;
         entry.totalWords = mastery.total;
       }

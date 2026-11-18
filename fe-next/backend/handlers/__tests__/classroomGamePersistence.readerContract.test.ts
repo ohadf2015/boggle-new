@@ -234,3 +234,50 @@ describe('a quiz round the writer persists is a round the Review tab can read', 
     expect(data[0].participation.played).toBe(2);
   });
 });
+
+describe('a round that offered no lesson words stays on the teacher report', () => {
+  it('GIVEN a Wheel Rush round WHEN the Review tab reads it THEN it is listed with no accuracy and no missed words', async () => {
+    await persistClassroomGameScores(
+      { ...quizGame, settings: { gameMode: 'wheel-rush' } } as never,
+      quizScores,
+      { offeredWords: [] },
+    );
+
+    mockReaderTables({
+      practice_sessions: { data: sessionInserts.map(asReadRow) },
+      classroom_memberships: {
+        data: [
+          { student_id: 'student-a', joined_at: null },
+          { student_id: 'student-b', joined_at: null },
+        ],
+        count: 2,
+      },
+      public_profiles: { data: [] },
+    });
+
+    const { data } = await getRecentClassroomGames(CLASSROOM_ID, 5);
+
+    expect(data).toHaveLength(1);
+    expect(data[0].participation.played).toBe(2);
+    expect(data[0].averageAccuracyPct).toBeNull();
+    expect(data[0].players.map((p) => p.accuracyPct)).toEqual([null, null]);
+    expect(data[0].missedWords).toEqual([]);
+  });
+
+  it('GIVEN an old row holding the whole lesson as missed WHEN read THEN it keeps its 0%', async () => {
+    await persistClassroomGameScores({ ...quizGame, settings: { gameMode: 'wheel-rush' } } as never, [
+      { userId: 'student-a', score: 10, wordsFound: [] },
+    ]);
+
+    mockReaderTables({
+      practice_sessions: { data: sessionInserts.map(asReadRow) },
+      classroom_memberships: { data: [{ student_id: 'student-a', joined_at: null }], count: 1 },
+      public_profiles: { data: [] },
+    });
+
+    const { data } = await getRecentClassroomGames(CLASSROOM_ID, 5);
+
+    expect(data[0].players[0].accuracyPct).toBe(0);
+    expect(data[0].averageAccuracyPct).toBe(0);
+  });
+});

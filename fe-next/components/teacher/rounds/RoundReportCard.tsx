@@ -53,6 +53,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
   const when = new Date(game.playedAt).toLocaleString(language, { weekday: 'short', hour: 'numeric', minute: '2-digit' });
   const missed = missedThisRound(game).slice(0, MISSED_SHOWN);
   const namesById = new Map(report.rows.map((r) => [r.studentId, r.name]));
+  const averageAccuracy = game.averageAccuracyPct ?? 0;
 
   return (
     <article data-testid="round-report" data-round-print="" className="rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-sm sm:p-6">
@@ -93,14 +94,14 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
       ) : (
         <>
           <div className="mt-4 grid grid-cols-2 gap-3">
-            <div data-testid="round-report-accuracy" data-tone={accuracyTone(game.averageAccuracyPct)} className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
+            <div data-testid="round-report-accuracy" data-tone={accuracyTone(averageAccuracy)} className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">
               <p className="flex items-center gap-1.5 text-xs font-bold text-neo-white/80">
                 <Target className="size-4 shrink-0" aria-hidden />
                 {t('teacher.lastGame.avgAccuracy')}
               </p>
-              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', TONE_TEXT[accuracyTone(game.averageAccuracyPct)])}>{game.averageAccuracyPct}%</p>
+              <p className={cn('mt-1 font-neo-display text-3xl font-black tabular-nums leading-none', TONE_TEXT[accuracyTone(averageAccuracy)])}>{averageAccuracy}%</p>
               <div aria-hidden className="mt-3 h-1.5 overflow-hidden rounded-full bg-neo-cream/20">
-                <div className="h-full rounded-full bg-current" style={{ width: `${Math.min(100, Math.max(0, game.averageAccuracyPct))}%` }} />
+                <div className="h-full rounded-full bg-current" style={{ width: `${Math.min(100, Math.max(0, averageAccuracy))}%` }} />
               </div>
             </div>
             <div data-testid="round-report-review-count" className="rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 sm:p-4">

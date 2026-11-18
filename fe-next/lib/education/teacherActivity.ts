@@ -87,7 +87,7 @@ export interface ClassroomGameSummary {
   playerCount: number;
   rosterCount: number | null;
   coveragePct: number;
-  averageAccuracyPct: number;
+  averageAccuracyPct: number | null;
   topPlayers: Array<{ name: string; score: number }>;
   /** Highest miss-rate lesson words first, capped. */
   missedWords: string[];
@@ -107,7 +107,7 @@ export function slimClassroomGame(game: {
   players: Array<{ name: string; score: number }>;
   participation: { played: number; roster: number };
   coveragePct: number;
-  averageAccuracyPct: number;
+  averageAccuracyPct: number | null;
   missedWords: Array<{ word: string }>;
 }): ClassroomGameSummary {
   return {

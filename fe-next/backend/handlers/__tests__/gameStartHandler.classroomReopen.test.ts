@@ -153,15 +153,13 @@ describe('game start reopens the classroom code', () => {
   });
 
   it('reopens a classroom game that carries no lesson words', async () => {
-    // The placed-vocabulary write is guarded by `vocabToEmbed.length > 0`.
-    // Hanging the reopen off that guard would leave this game's code dead.
     mockBeginRound.mockResolvedValue({
       gameCode: 'GAME1', classroomId: 'c1', vocabularyWords: [],
     } as never);
 
     await startHandlers()['startGame'](START_PAYLOAD);
 
-    expect(mockSetPlaced).not.toHaveBeenCalled();
+    expect(mockSetPlaced).toHaveBeenCalledWith('GAME1', []);
     expect(mockBeginRound).toHaveBeenCalledWith('GAME1');
   });
 

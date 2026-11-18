@@ -25,7 +25,7 @@ function lastLine(t: T, pulse: ClassPulse, loading: boolean): string {
         : "teacher.pulse.lastPlayedDays";
   return t(key, {
     days: pulse.daysSinceLastGame,
-    accuracy: pulse.averageAccuracyPct ?? 0,
+    accuracy: pulse.averageAccuracyPct ?? '—',
   });
 }
 

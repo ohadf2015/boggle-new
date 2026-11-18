@@ -55,8 +55,8 @@ export interface ClassPulseLastGame {
   playedAt: string;
   gameMode: string;
   participation: { played: number; roster: number };
-  averageAccuracyPct: number;
-  players: ClassPulsePlayer[];
+  averageAccuracyPct: number | null;
+  players: Array<Omit<ClassPulsePlayer, 'accuracyPct'> & { accuracyPct: number | null }>;
   missedWords: Array<{ word: string; pct: number }>;
 }
 
@@ -165,7 +165,7 @@ export function deriveClassPulse({
   }
 
   const struggling = lastGame.players
-    .filter((p) => p.accuracyPct < STRUGGLING_ACCURACY_PCT)
+    .flatMap((p) => (p.accuracyPct !== null && p.accuracyPct < STRUGGLING_ACCURACY_PCT ? [{ ...p, accuracyPct: p.accuracyPct }] : []))
     .sort((a, b) => a.accuracyPct - b.accuracyPct);
 
   const topMissedWords = lastGame.missedWords
