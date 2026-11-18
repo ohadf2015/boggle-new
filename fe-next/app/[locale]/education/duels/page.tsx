@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'educationDuels', path: '/education/duels', locale });
+  return generatePageMetadata({ seoKey: 'educationDuels', path: '/education/duels', locale, noIndex: true });
 }
 
 export default async function DuelsPage({ params }: { params: Promise<{ locale: string }> }) {

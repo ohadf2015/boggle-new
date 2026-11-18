@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import type { ReactNode } from 'react';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 interface LayoutParams {
     params: Promise<{ locale: string }>;
@@ -42,7 +43,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     const localePath = `/${locale}`;
     const meta = rulesMetadata[locale] || rulesMetadata.en;
 
-    return {
+    return withBodyLocales({
         title: meta.title,
         description: meta.description,
         openGraph: {
@@ -90,7 +91,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
             index: true,
             follow: true,
         },
-    };
+    }, '/rules', locale);
 }
 
 interface RulesLayoutProps {

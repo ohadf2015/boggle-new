@@ -3,6 +3,7 @@ import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import GuidesIndexPageClient from './PageClient';
 import { encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const revalidate = 86400;
 
@@ -119,7 +120,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return {
+  return withBodyLocales({
     title, description,
     openGraph: { images: defaultOgImages(locale), type: 'website', title, description, url: `${SITE_URL}/${locale}/guides`, siteName: 'LexiClash' },
     twitter: { images: [defaultOgImageUrl(locale)], card: 'summary_large_image', title, description },
@@ -142,7 +143,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     robots: { index: true, follow: true },
-  };
+  }, '/guides', locale);
 }
 
 export default async function GuidesIndexPage({ params }: PageProps) {

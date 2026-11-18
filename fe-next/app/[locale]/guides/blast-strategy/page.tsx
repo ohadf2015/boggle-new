@@ -3,6 +3,7 @@ import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BlastStrategyPageClient from './PageClient';
 import { contentByLocale } from './content';
+import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return {
+  return withBodyLocales({
     title,
     description,
     openGraph: {
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       },
     },
     robots: { index: true, follow: true },
-  };
+  }, `/guides/${SLUG}`, locale);
 }
 
 export default async function BlastStrategyPage({ params }: PageProps) {
