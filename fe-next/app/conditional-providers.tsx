@@ -27,6 +27,7 @@ import { eduSectionOf, type EduSection } from '@/lib/navigation/eduSections';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
 const IncomingChallengeToast = nextDynamic(() => import('@/components/friends/IncomingChallengeToast'), { ssr: false });
+const InAppNotificationHost = nextDynamic(() => import('@/components/notifications/InAppNotificationHost'), { ssr: false });
 const LaunchHost = lazy(() => import('@/components/landing/home/LaunchHost').then((m) => ({ default: m.LaunchHost })));
 // Named chunk so `/` does not parse socket/howler/game providers. Rendered
 // only when needsGameProviders is true; ssr stays on so game routes still SSR.
@@ -121,7 +122,12 @@ export function ConditionalProviders({ children, lang }: ConditionalProvidersPro
   }, [heavy]);
   const showChromeWidgets = !heavy || chromeEngaged;
   // Inside the game stack so it shares the room socket; classroom pages never get friend challenges.
-  const challengeToast = showChromeWidgets && !eduSectionOf(pathname) ? <IncomingChallengeToast /> : null;
+  const challengeToast = showChromeWidgets && !eduSectionOf(pathname) ? (
+    <>
+      <IncomingChallengeToast />
+      <InAppNotificationHost />
+    </>
+  ) : null;
 
   // ALWAYS wrap with EssentialProviders first (never remounts on navigation)
   // Conditionally add game-specific providers inside

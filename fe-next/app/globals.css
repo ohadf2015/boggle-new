@@ -3113,6 +3113,23 @@ html:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.edu-
   padding-bottom: min(var(--admob-banner-height, 0px), 120px);
 }
 
+/* Same opt-out for the multiplayer shell. /multiplayer (lobby + play) sets
+   both `body.screen-fit-locked` (isInGame, including the entry flag) and
+   `body.mp-shell-locked` (MpScreen). The generic rules above still padded
+   those 100dvh locked bodies by --bottom-stack-height / the cookie sheet,
+   so the START/INVITE footer floated mid-screen over an empty navy band
+   and the mode cards were clipped above it (Ohad, 2026-11-18, 412px RTL
+   lobby). Banner-allow-in-game surfaces (adventure) still reserve the
+   live --admob-banner-height; a suppressed banner is 0px. */
+html.has-cookie-consent body.screen-fit-locked,
+html.has-cookie-consent body.mp-shell-locked {
+  padding-bottom: 0;
+}
+html:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.screen-fit-locked,
+html:is(.has-global-bottom-nav, .has-admob-banner, .has-web-anchor-ad) body.mp-shell-locked {
+  padding-bottom: min(var(--admob-banner-height, 0px), 120px);
+}
+
 /* Ad-free routes never show a banner; beats the inline var primed from a previous session's banner height. */
 html.ad-free-route {
   --admob-banner-height: 0px !important;

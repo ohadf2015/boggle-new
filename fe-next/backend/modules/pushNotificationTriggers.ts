@@ -5,6 +5,7 @@
  */
 
 import logger from '../utils/logger';
+import { emitLiveNotice, userHasLiveSocket } from '../utils/liveNotice';
 import { translatePush, type PushLocale, isPushLocale, countryToLocale } from '../utils/pushTranslations';
 import { resolveRivalDisplayName } from '@/lib/pushDisplayName';
 import { sendToUser, type FCMPayload } from './fcmService';
@@ -299,9 +300,22 @@ async function triggerPush(
 ): Promise<void> {
   try {
     const jobs: Promise<unknown>[] = [];
+    // In-app toast on every connected socket in `user:<id>` (Redis adapter).
+    // Skip FCM when they're already in the app so they don't also get a push
+    // banner; background clients have no socket (mobile disconnects on hide).
+    if (mode !== 'push_only') {
+      emitLiveNotice(userId, {
+        type,
+        title: payload.title,
+        body: payload.body,
+        deepLink: payload.data?.deepLink,
+        senderId,
+      });
+    }
     if (mode !== 'in_app_only') {
       const allowed = await isPushAllowed(userId, type);
-      if (allowed) jobs.push(sendToUser(userId, payload));
+      const live = userHasLiveSocket(userId);
+      if (allowed && !live) jobs.push(sendToUser(userId, payload));
     }
     if (mode !== 'push_only') {
       jobs.push(saveNotificationHistory(userId, type, payload, payload.data?.deepLink, senderId, relatedEntityType));

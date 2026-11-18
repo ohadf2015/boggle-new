@@ -114,6 +114,8 @@ export interface FriendChallenge {
   challengerCustomAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
   challengeId: string;
   challengeCode: string;
+  /** Present on live socket invites and refreshed pending rows. */
+  challengeType?: 'new_game' | 'join_room';
   message?: string;
   status: 'pending' | 'accepted' | 'declined' | 'expired' | 'completed';
   createdAt: string;

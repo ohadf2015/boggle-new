@@ -55,8 +55,36 @@ function isLive(c: FriendChallenge, now: number) {
   return c.status === 'pending' && now - new Date(c.createdAt).getTime() < LIVE_WINDOW_MS;
 }
 
-/** Friend challenges on any page: Join/Not now for the invitee, routing (or a Join card mid-round) for the challenger. */
-// Limit: the challenger hears accepted/declined/result only on pages with a socket (game routes); elsewhere, push only.
+type ChallengeReceivedPayload = {
+  challengeId: string;
+  fromUserId: string;
+  fromUsername: string;
+  fromDisplayName?: string | null;
+  fromAvatar?: { image?: string | null; emoji?: string; color?: string };
+  challengeType?: 'new_game' | 'join_room';
+  roomCode: string;
+  createdAt?: number;
+};
+
+export function challengeFromSocket(data: ChallengeReceivedPayload): FriendChallenge {
+  return {
+    id: data.challengeId,
+    challengerId: data.fromUserId,
+    challengerUsername: data.fromUsername,
+    challengerDisplayName: data.fromDisplayName ?? undefined,
+    challengerAvatarImage: data.fromAvatar?.image ?? undefined,
+    challengerAvatarEmoji: data.fromAvatar?.emoji || '',
+    challengerAvatarColor: data.fromAvatar?.color || '',
+    challengeId: data.roomCode,
+    challengeCode: data.roomCode,
+    challengeType: data.challengeType,
+    status: 'pending',
+    createdAt: new Date(data.createdAt ?? Date.now()).toISOString(),
+  };
+}
+
+/** Friend challenges and room invites on any page, including mid-round: Join/Not now for the invitee, routing (or a Join card) for the challenger. */
+// Limit: the challenger hears accepted/declined/result only on pages with a socket (game routes); elsewhere, the in-app host + push cover it.
 export function IncomingChallengeToast() {
   const { isAuthenticated, profile } = useAuth();
   const me = isAuthenticated ? profile?.id ?? null : null;
@@ -126,6 +154,22 @@ function ChallengeCards({ me }: { me: string }) {
     [me, load],
   );
 
+  // Live socket path: the invitee is already in the app (lobby, daily, a round).
+  // Don't wait for a Supabase row + refetch — the server already broadcast this
+  // to `user:<id>` across Redis-adapted nodes.
+  useEffect(() => {
+    if (!socket) return;
+    const onReceived = (data: ChallengeReceivedPayload) => {
+      if (!data?.challengeId || !data.roomCode) return;
+      const next = challengeFromSocket(data);
+      setPendingChallenges((prev) => (prev.some((c) => c.id === next.id) ? prev : [next, ...prev]));
+    };
+    socket.on('friends:challengeReceived', onReceived);
+    return () => {
+      socket.off('friends:challengeReceived', onReceived);
+    };
+  }, [socket]);
+
   useEffect(() => {
     if (!socket) return;
     const id = takeDeferredAccept();
@@ -175,12 +219,15 @@ function ChallengeCards({ me }: { me: string }) {
     );
   }
 
-  if (!incoming || inGame) return null;
+  if (!incoming) return null;
   const name = resolveDisplayName([incoming.challengerDisplayName, incoming.challengerUsername], t('friends.aPlayer'));
+  const inviteTitle = incoming.challengeType === 'join_room'
+    ? t('friends.invitedByTitle', { name })
+    : t('friends.challenges.toast.title', { name });
 
   return (
     <Card
-      label={t('friends.challenges.toast.title', { name })}
+      label={inviteTitle}
       onClose={() => dismiss(incoming.id)}
       closeLabel={t('friends.challenges.toast.close')}
       avatar={

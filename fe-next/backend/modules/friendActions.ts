@@ -55,7 +55,7 @@ export async function runFriendAction(
         emitToUser(actorId, 'friends:requestAccepted', ids);
         notifyFriendAccepted(target, actorName, actorId).catch(() => {});
       } else {
-        emitToUser(target, 'friends:requestReceived', ids);
+        emitToUser(target, 'friends:requestReceived', { ...ids, fromName: actorName });
         emitToUser(actorId, 'friends:requestSent', ids);
         notifyFriendRequest(target, actorName, actorId).catch(() => {});
       }

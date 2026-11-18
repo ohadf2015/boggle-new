@@ -142,14 +142,31 @@ describe('IncomingChallengeToast — challenge received', () => {
     expect(screen.queryByText('friends.challenges.toast.title|Maya')).toBeNull();
   });
 
-  it('Given a round on screen, Then the card is held until it ends', async () => {
+  it('Given a round on screen, Then the invite card still appears so an in-app friend can Join without only getting a push', async () => {
     pending.list = [challenge()];
     inGame.value = true;
-    const { rerender } = await renderToast();
-    expect(screen.queryByText('friends.challenges.toast.title|Maya')).toBeNull();
-    inGame.value = false;
-    rerender(<IncomingChallengeToast />);
+    await renderToast();
     expect(screen.getByText('friends.challenges.toast.title|Maya')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'friends.challenges.acceptAndPlay' })).toBeTruthy();
+  });
+
+  it('Given a connected socket, When friends:challengeReceived fires, Then the card appears without a pending-list refetch', async () => {
+    await renderToast();
+    expect(screen.queryByTestId('incoming-challenge-toast')).toBeNull();
+    await act(async () => {
+      socket.fire('friends:challengeReceived', {
+        challengeId: 'ch-live',
+        fromUserId: 'maya-id',
+        fromUsername: 'maya',
+        fromDisplayName: 'Maya',
+        challengeType: 'join_room',
+        roomCode: 'RHCA28',
+        createdAt: Date.now(),
+      });
+    });
+    expect(pending.fetch).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('friends.invitedByTitle|Maya')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'friends.challenges.acceptAndPlay' })).toBeTruthy();
   });
 
   it('Given a challenge older than the live window, Then no card (it stays on /friends)', async () => {
