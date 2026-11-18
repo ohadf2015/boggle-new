@@ -1,4 +1,6 @@
-import { hebrewLetters, swedishLetters, spanishLetters, russianLetterPool, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
+import { hebrewLetters, swedishLetters, russianLetterPool, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
+import { SPANISH_LETTER_POOL } from "@/shared/constants/spanishLetters";
+import { JAPANESE_HIRAGANA_POOL, plantableJapaneseWords } from "@/shared/constants/japaneseLetters";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 import { ENGLISH_LETTER_POOL } from '@/shared/constants/englishLetters';
 import { placeWordPath } from '@/shared/utils/boardWordPath';
@@ -183,12 +185,14 @@ export function generateRandomTable(
     } else if (language === 'sv') {
       letters = swedishLetters;
     } else if (language === 'es') {
-      letters = spanishLetters;
+      letters = SPANISH_LETTER_POOL;
     } else if (language === 'ru') {
       letters = russianLetterPool;
     } else if (language === 'ja') {
-      // For Japanese, generate a board with embedded Kanji compounds
-      return generateJapaneseTable(rows, cols);
+      const kanaWords = plantableJapaneseWords(wordsToEmbed);
+      return kanaWords.length > 0
+        ? generateTableWithEmbeddedWords(rows, cols, JAPANESE_HIRAGANA_POOL, kanaWords, language)
+        : generateJapaneseTable(rows, cols);
     } else if (language === 'he') {
       letters = hebrewLetters;
     } else {

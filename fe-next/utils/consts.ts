@@ -212,3 +212,5 @@ export function sanitizeRoomName(name: string): string {
 export function sanitizeUsername(name: string): string {
   return sanitizeRoomName(name).slice(0, USERNAME_SOCKET_MAX).trim();
 }
+
+export const SPANISH_SEEDED_LEGACY_POOL: string[] = spanishLetters;

@@ -8,7 +8,7 @@
 import {
   hebrewLetters,
   swedishLetters,
-  spanishLetters,
+  SPANISH_SEEDED_LEGACY_POOL,
   russianLetterPool,
   japaneseLetters,
 } from './consts';
@@ -217,7 +217,7 @@ export function generateCustomChallengeGrid(
   } else if (language === 'sv') {
     letters = swedishLetters;
   } else if (language === 'es') {
-    letters = spanishLetters;
+    letters = SPANISH_SEEDED_LEGACY_POOL;
   } else if (language === 'ru') {
     letters = russianLetterPool;
   } else if (language === 'ja') {
