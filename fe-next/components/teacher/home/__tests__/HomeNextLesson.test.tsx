@@ -17,11 +17,10 @@ afterEach(() => {
 });
 
 describe('<HomeNextLesson>', () => {
-  it('Given a class with no students, When it mounts before the saved plan arrives, Then a placeholder holds the space', () => {
+  it('Given a class with no students, When it mounts before the saved plan arrives, Then nothing renders so no sibling moves', () => {
     vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
-    render(<HomeNextLesson classroomId="c1" memberCount={0} />);
-    expect(screen.getByTestId('lesson-plan-placeholder')).toBeInTheDocument();
-    expect(screen.queryByTestId('lesson-plan')).toBeNull();
+    const { container } = render(<HomeNextLesson classroomId="c1" memberCount={0} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('Given a class with no students and no plan, When the plan resolves, Then the reminder prompt is offered', async () => {

@@ -331,11 +331,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
             />
           </div>
           {selectedClassroom ? (
-            <div data-tm className="empty:hidden">
-              <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
-            </div>
-          ) : null}
-          {selectedClassroom ? (
             <div data-tm>
               <HomeDeskBoard
                 key={selectedClassroom.id}
@@ -366,6 +361,11 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 language={language}
                 t={t}
               />
+            </div>
+          ) : null}
+          {selectedClassroom ? (
+            <div data-tm className="empty:hidden">
+              <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
             </div>
           ) : null}
         </>
