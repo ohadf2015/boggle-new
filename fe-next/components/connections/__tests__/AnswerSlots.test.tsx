@@ -62,6 +62,6 @@ describe('AnswerSlots', () => {
     expect(filled.className).toContain('bg-neo-cream');
     expect(filled.className).toMatch(/text-neo-(navy|black)/);
     expect(filled.className).toContain('font-black');
-    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.8');
+    expect(screen.getByRole('group').style.getPropertyValue('--fs')).toBe('0.72');
   });
 });

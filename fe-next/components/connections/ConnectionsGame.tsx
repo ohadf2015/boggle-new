@@ -443,7 +443,7 @@ export default function ConnectionsGame() {
   }
 
   return (
-    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 px-3 py-2 sm:px-4 sm:py-3 [@media(max-height:800px)]:py-1.5 shell:max-w-3xl" translate="no">
+    <div ref={containerRef} dir={isRTL ? 'rtl' : 'ltr'} className="relative mx-auto flex min-h-0 w-full max-w-xl flex-1 flex-col gap-2 px-3 py-2 sm:px-4 sm:py-3 [@media(max-height:700px)]:py-1.5 shell:max-w-3xl" translate="no">
       <ConnectionsEffectsCanvas width={canvasSize.width} height={canvasSize.height} />
 
       <PlayHud

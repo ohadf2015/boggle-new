@@ -61,6 +61,7 @@ export default function PyramidPlay({
       >
         {!inShell && (
           <PyramidHeader
+            testId="pyramid-header"
             daily={daily}
             state={state}
             metaAnswer={pyramid.metaAnswer}

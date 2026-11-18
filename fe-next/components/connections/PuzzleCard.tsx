@@ -233,7 +233,7 @@ export default function PuzzleCard({
           <div
             ref={stageRef}
             data-testid="puzzle-stage"
-            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:800px)]:min-h-[9rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
             style={{ containerType: 'size' }}
           >
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
@@ -261,7 +261,7 @@ export default function PuzzleCard({
               min-height reserves two wrapped lines up front (so revealing it never moves
               the dock) and the bottom margin keeps the pill off the keys. */}
           {puzzle.hint && !isResolved && (
-            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:800px)]:mb-1 [@media(max-height:800px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
+            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
               <AnimatePresence>
               {showHint && !isResolved && (
                 <m.p
@@ -284,7 +284,7 @@ export default function PuzzleCard({
               same reserved height, so the page never grows into a scroll. The one-line
               IME input skips the reservation so the plates get that room instead. */}
           <div
-            className={`flex shrink-0 flex-col justify-end [--conn-dock:16.125rem] sm:[--conn-dock:17.5rem] [@media(max-height:800px)]:[--conn-dock:14.125rem] [@media(max-width:639px)_and_(min-height:801px)]:[--conn-dock:17.875rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[calc(var(--conn-dock)+max(0.75rem,env(safe-area-inset-bottom,0px)))] [html.has-global-bottom-nav_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-admob-banner_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-web-anchor-ad_&]:min-h-[calc(var(--conn-dock)+0.75rem)]'}`}
+            className={`flex shrink-0 flex-col justify-end [--conn-dock:13.375rem] sm:[--conn-dock:15.25rem] [@media(max-height:700px)]:[--conn-dock:11.625rem] [@media(max-width:639px)_and_(min-height:780px)]:[--conn-dock:14.875rem] [@container(max-height:42rem)]:[--conn-dock:11.625rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[calc(var(--conn-dock)+max(0.75rem,env(safe-area-inset-bottom,0px)))] [html.has-global-bottom-nav_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-admob-banner_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-web-anchor-ad_&]:min-h-[calc(var(--conn-dock)+0.75rem)]'}`}
           >
             {isResolved ? (
               <div className="flex flex-col gap-2">

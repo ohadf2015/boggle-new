@@ -31,7 +31,7 @@ export function PlayHud({ isRTL, lives, level, totalLevels, streak, score, onBac
       animate={{ y: 0 }}
       transition={{ type: 'spring' as const, stiffness: 280, damping: 24, delay: 0.1 }}
       // pe-14: the global in-game mute button floats over the inline-end corner.
-      className="sticky top-0 z-30 -mx-3 flex items-center gap-2.5 border-b-2 border-neo-purple/40 bg-neo-navy/90 py-2 ps-3 pe-14 backdrop-blur-sm sm:-mx-4 sm:ps-4 [@media(max-height:800px)]:py-1.5"
+      className="sticky top-0 z-30 -mx-3 flex items-center gap-2.5 border-b-2 border-neo-purple/40 bg-neo-navy/90 py-2 ps-3 pe-14 backdrop-blur-sm sm:-mx-4 sm:ps-4 [@media(max-height:700px)]:py-1.5"
       dir={isRTL ? 'rtl' : 'ltr'}
     >
       <button
@@ -122,9 +122,9 @@ export function PlayHud({ isRTL, lives, level, totalLevels, streak, score, onBac
 }
 
 const LINK =
-  'relative inline-flex min-w-0 items-center justify-center gap-1.5 rounded-neo border-neo border-black px-2.5 py-1 font-neo-body text-xs font-bold shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 before:absolute before:-inset-y-2 before:inset-x-0 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed [@media(max-height:800px)]:h-9 [@media(max-height:800px)]:w-9 [@media(max-height:800px)]:shrink-0 [@media(max-height:800px)]:px-0 [@media(max-height:800px)]:before:-inset-1';
+  'relative inline-flex min-w-0 items-center justify-center gap-1.5 rounded-neo border-neo border-black px-2.5 py-1 font-neo-body text-xs font-bold shadow-hard-sm transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-100 before:absolute before:-inset-y-2 before:inset-x-0 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed [@media(max-height:700px)]:h-9 [@media(max-height:700px)]:w-9 [@media(max-height:700px)]:shrink-0 [@media(max-height:700px)]:px-0 [@media(max-height:700px)]:before:-inset-1';
 // Short screens fold the links into icon squares beside the momentum chip, keeping the name for screen readers.
-const LINK_LABEL = 'truncate [@media(max-height:800px)]:sr-only';
+const LINK_LABEL = 'truncate [@media(max-height:700px)]:sr-only';
 
 interface PlayModeRowProps {
   language: string;
@@ -147,11 +147,11 @@ export function PlayModeRow({ language, momentum, xpEarned }: PlayModeRowProps) 
   ].filter((link) => !!link);
 
   return (
-    <div className="flex flex-col gap-2 [@media(max-height:800px)]:flex-row [@media(max-height:800px)]:items-center">
-      <div className="flex min-w-0 justify-center gap-1.5 [@media(max-height:800px)]:order-last">
+    <div className="flex flex-col gap-2 [@media(max-height:700px)]:flex-row [@media(max-height:700px)]:items-center">
+      <div className="flex min-w-0 justify-center gap-1.5 [@media(max-height:700px)]:order-last">
         {links.map(({ href, label, Icon, tone }) => (
           <Link key={href} href={href} title={label} className={`${LINK} ${tone}`}>
-            <Icon className="h-3.5 w-3.5 shrink-0 [@media(max-height:800px)]:h-4 [@media(max-height:800px)]:w-4" strokeWidth={2.5} aria-hidden="true" />
+            <Icon className="h-3.5 w-3.5 shrink-0 [@media(max-height:700px)]:h-4 [@media(max-height:700px)]:w-4" strokeWidth={2.5} aria-hidden="true" />
             <span className={LINK_LABEL}>{label}</span>
           </Link>
         ))}
@@ -172,7 +172,7 @@ export function PlayModeRow({ language, momentum, xpEarned }: PlayModeRowProps) 
               className="shrink-0 rounded-full border border-neo-lime/40 bg-neo-lime/10 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-lime tabular-nums"
             >
               +{xpEarned}
-              <span className="[@media(max-height:800px)]:sr-only"> {t('connections.xpEarned')}</span>
+              <span className="[@media(max-height:700px)]:sr-only"> {t('connections.xpEarned')}</span>
             </m.span>
           )}
         </AnimatePresence>

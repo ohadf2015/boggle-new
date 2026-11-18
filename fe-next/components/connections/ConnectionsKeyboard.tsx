@@ -44,9 +44,9 @@ const KBD = 'rounded border-2 border-neo-cream/50 bg-neo-navy px-1.5 py-px font-
 const KEY_BASE =
   'inline-flex items-center justify-center rounded-neo border-3 border-neo-black font-neo-display font-black select-none touch-manipulation transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] duration-75 shadow-hard active:shadow-hard-pressed active:translate-x-px active:translate-y-px disabled:opacity-40 disabled:cursor-default';
 
-/** Shared key sizing; PuzzleCard's --conn-dock reserves 3 letter rows, the backspace row, and the submit bar. */
+/** Shared key sizing; PuzzleCard's --conn-dock reserves 3 letter rows (backspace sits on the last one) plus the submit bar. */
 const KEY_SIZE =
-  'h-12 [@media(max-height:800px)]:h-10 [@media(max-width:639px)_and_(min-height:780px)]:h-14 min-w-0';
+  'h-12 [@media(max-height:700px)]:h-10 [@media(max-width:639px)_and_(min-height:780px)]:h-14 min-w-0';
 
 /**
  * One letter-key width for the WHOLE keyboard. Every letter key gets this
@@ -54,8 +54,10 @@ const KEY_SIZE =
  * 10-key row (shorter rows just center) instead of each row stretching to its
  * own width.
  *
- * The column count is the longest row (lib/connections/keyboard.ts); backspace
- * lives on its own row underneath, and a full-width submit bar sits below that.
+ * The column count is the longest letter row, or the last row plus a 1.5-wide
+ * backspace key when that would be wider, so the last row never overflows and
+ * letters on shorter rows stay the same width. A full-width submit bar sits
+ * below the letters.
  *
  * The minWidth floor is pure catastrophe insurance: it never binds in a
  * healthy layout (even a 12-key Russian row on a 280px Fold computes ~13px
@@ -64,24 +66,29 @@ const KEY_SIZE =
  * of crushing letters to their 6px borders — overflow is visible and
  * debuggable, a 6px pill is not (t_55afcea2).
  */
-function letterKeyStyle(columns: number): CSSProperties {
+function letterKeyStyle(columns: number, units = 1): CSSProperties {
   return {
-    flexBasis: `calc(${(100 / columns).toFixed(4)}% - 0.25rem)`,
+    flexBasis: `calc(${((100 * units) / columns).toFixed(4)}% - 0.25rem)`,
     flexGrow: 0,
     flexShrink: 1,
-    minWidth: '0.875rem',
+    minWidth: units > 1 ? '1.25rem' : '0.875rem',
   };
 }
 
-/** The backspace row is a hair shorter than a letter row; PuzzleCard's --conn-dock reserves it too. */
-const ACTION_SIZE = 'h-11 [@media(max-height:800px)]:h-10 min-w-0';
+/** Letter columns, or last-row letters + a 1.5-wide backspace when that is wider. */
+function keyboardColumnCount(rows: readonly (readonly string[])[]): number {
+  const letters = letterColumnCount(rows);
+  const last = rows[rows.length - 1]?.length ?? 0;
+  return Math.max(letters, last + 1.5);
+}
 
 /**
  * On-screen keyboard for Word Bridge, laid out in the 3 physical-keyboard rows
  * players already know (QWERTY / standard Hebrew / ЙЦУКЕН) — Wordle-family
  * ergonomics. Hebrew players never need an IME: every key is a base letter and
- * sofit glyphs are rendered at word-end elsewhere. Backspace sits under the
- * letters; a long, full-width submit bar is pinned below that, with inset from
+ * sofit glyphs are rendered at word-end elsewhere. Backspace sits at the end
+ * of the last letter row, the same height as a letter and about one and a half
+ * keys wide. A long, full-width submit bar is pinned below, with inset from
  * the screen edge and the home indicator, in the same place in every locale.
  * Neo-brutalist keys with a hard press-down feel.
  */
@@ -99,7 +106,8 @@ export default function ConnectionsKeyboard({
   ready = false,
   typeHint,
 }: ConnectionsKeyboardProps) {
-  const keyStyle = letterKeyStyle(letterColumnCount(rows));
+  const columns = keyboardColumnCount(rows);
+  const keyStyle = letterKeyStyle(columns);
   // Same as Word Tower: players hammer backspace to undo a whole wrong guess
   // (PostHog rage clicks, /he/connections/daily). Holding it clears the guess.
   const backspaceHold = useHoldToClear({ onTap: onBackspace, onHold: onClear });
@@ -156,22 +164,23 @@ export default function ConnectionsKeyboard({
               {ch}
             </button>
           ))}
+          {rowIdx === rows.length - 1 && (
+            <button
+              type="button"
+              {...backspaceHold}
+              disabled={disabled}
+              aria-label={backspaceLabel}
+              title={backspaceLabel}
+              data-testid="keyboard-backspace"
+              data-pressed={pressedKey === 'Backspace' || undefined}
+              style={letterKeyStyle(columns, 1.5)}
+              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
+            >
+              <Delete className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
+            </button>
+          )}
         </m.div>
       ))}
-      <div data-testid="keyboard-actions" className="flex w-full min-w-0 items-stretch justify-end gap-1.5">
-        <button
-          type="button"
-          {...backspaceHold}
-          disabled={disabled}
-          aria-label={backspaceLabel}
-          title={backspaceLabel}
-          data-pressed={pressedKey === 'Backspace' || undefined}
-          style={{ flex: '0 0 30%', maxWidth: '8rem', minWidth: '4.5rem' }}
-          className={`${KEY_BASE} ${ACTION_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
-        >
-          <Delete className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
-        </button>
-      </div>
       <div
         data-testid="keyboard-submit-dock"
         className="w-full px-1 pt-1 pb-3 [html:not(.has-global-bottom-nav):not(.has-admob-banner):not(.has-web-anchor-ad)_&]:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] sm:px-0 sm:pb-1"

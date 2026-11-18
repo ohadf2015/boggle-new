@@ -83,6 +83,16 @@ describe('Pyramid — simplified, goal-first UI', () => {
     expect(stage).toContain('[@container(height<=36rem)]:min-h-[6rem]');
   });
 
+  it('keeps the sunset pyramid scene visible instead of letting the keyboard dock squeeze it away', () => {
+    render(<PyramidChallenge />);
+    const header = screen.getByTestId('pyramid-header');
+    const scene = screen.getByTestId('pyramid-scene');
+    expect(header.contains(scene)).toBe(true);
+    expect(header.className).toMatch(/\bshrink-0\b/);
+    // The scene itself is never display:hidden on a normal phone; short screens shrink it.
+    expect(scene.className).not.toMatch(/(?:^|\s)hidden(?:\s|$)/);
+  });
+
   it('renders no rating buttons in pyramid stages (dead CTA removed)', () => {
     render(<PyramidChallenge />);
     expect(screen.queryByLabelText('connections.like')).toBeNull();

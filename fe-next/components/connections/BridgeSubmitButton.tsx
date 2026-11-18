@@ -20,7 +20,7 @@ const PRESSED = 'translate-x-px translate-y-px shadow-hard-pressed';
  */
 export const BRIDGE_SUBMIT_CLASS = [
   'inline-flex w-full min-h-12 items-center justify-center gap-2',
-  '[@media(max-height:800px)]:min-h-11',
+  '[@media(max-height:700px)]:min-h-11',
   'rounded-neo border-neo-thick border-neo-black px-4',
   'font-neo-display text-lg font-black uppercase leading-none text-neo-navy rtl:normal-case',
   'shadow-hard touch-manipulation select-none',
