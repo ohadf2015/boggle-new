@@ -257,6 +257,7 @@ const EXPECTED_SOCKET_ERROR_CODES = new Set([
   "AUTH_REQUIRED",
   "PLAYER_NOT_HOST",
   "VALIDATION_INVALID_PAYLOAD",
+  "CLASSROOM_SESSION_WAITING",
 ]);
 
 /** Locale-independent expectedness check for a typed socket error code. */
