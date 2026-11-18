@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/ideas/2026-11-18.md, docs/nightly/ideas/2026-11-18-reddit.md, docs/nightly/reports/2026-11-18.md (append), docs/nightly/artifacts/lane-04-competitor-2026-11-18.md
+next_steps: Reddit OAuth helper (scripts/nightly/lib/reddit-fetch.sh) returned "jq parse failed" on every call tonight — check if it's still broken next run; if broken 2+ nights running, flag to human queue (creds likely rotated/expired), it's not lane-fixable (no-code rule). Idea ledger now carries 2 fresh polish pitches (Twin Drill / brain-drill, Class-Level Mystery Score / word-craft) — next run should check founder verdict via feedback ndjson before re-pitching either.
