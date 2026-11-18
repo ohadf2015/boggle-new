@@ -36,6 +36,7 @@ import { firstGameIntent, readPasted, sameWords, type FirstGameChoice } from '@/
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
 import { useInviteShare } from './useInviteShare';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
 
@@ -188,6 +189,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
             onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
           />
         }
+        onTogetherChoice={(choice) => trackGrowthEvent('class_ready_together', { choice })}
         plan={
           <ClassSetupInvitePlan
             classroomId={classroom.id}

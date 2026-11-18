@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const search = vi.hoisted(() => ({ value: 'preview=ready&words=apple,banana,cherry,grape&count=0' }));
@@ -16,6 +16,8 @@ describe('ClassReadyPreview (dev only)', () => {
   it('Given words in the URL, Then the real ready screen shows a code, those words counted and Play now, with no network', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch');
     render(<ClassReadyPreview />);
+    fireEvent.click(screen.getByTestId('setup-together-now'));
+    fireEvent.click(screen.getByTestId('setup-start-anyway'));
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent(/\w{4,}/);
     expect(screen.getByTestId('first-game-count')).toHaveTextContent('eduShell.setup.words.count:{"count":4}');
     expect(screen.getByTestId('setup-play-now')).toBeInTheDocument();
