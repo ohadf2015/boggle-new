@@ -6,7 +6,7 @@ import { isMicrosoftSsoEnabled } from '@/components/auth/shared/authModalProvide
 import { isNative } from '@/utils/platform';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { trackSignupPromptClicked } from '@/utils/growthTracking';
+import { trackSignupFailed, trackSignupPromptClicked } from '@/utils/growthTracking';
 
 export type OAuthSignInProvider = 'google' | 'discord' | 'apple' | 'microsoft';
 
@@ -202,6 +202,9 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         const errorMessage = result.error.message || 'Sign in failed';
         setError(errorMessage);
         onError?.(errorMessage);
+        if (typeof trackSignupFailed === 'function') {
+          trackSignupFailed('oauth_redirect_error', { source: analyticsSource, message: errorMessage });
+        }
       }
       // On success, Supabase will redirect to the callback URL
     } catch (err) {
@@ -210,6 +213,12 @@ export function useOAuthSignIn(options: UseOAuthSignInOptions = {}): UseOAuthSig
         : err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(errorMessage);
       onError?.(errorMessage);
+      if (typeof trackSignupFailed === 'function') {
+        trackSignupFailed('oauth_redirect_error', {
+          source: analyticsSource,
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
     } finally {
       setLoadingProvider(null);
     }

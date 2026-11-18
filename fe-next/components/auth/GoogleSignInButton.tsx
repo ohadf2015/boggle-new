@@ -70,15 +70,60 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const sourceRef = useRef(analyticsSource);
   sourceRef.current = analyticsSource;
   const lastIntentAtRef = useRef(0);
+  const redirectStartedRef = useRef(false);
+
+  // Sheet preloader can win the GSI script race, leaving this button as an inert
+  // placeholder. A tap must still reach Google via the redirect path (email
+  // already works; this is the same path Edge uses). Chunk skew that makes an
+  // imported tracker "not a function" must not throw out of the click handler
+  // ("a.cd is not a function" on multi_games_sheet).
+  const startRedirectFallback = useCallback(() => {
+    if (redirectStartedRef.current || renderedRef.current) return;
+    redirectStartedRef.current = true;
+    void loadAuthClient()
+      .then(({ signInWithGoogle }) => {
+        if (typeof signInWithGoogle !== 'function') {
+          trackSignupFailed('oauth_redirect_error', {
+            source: sourceRef.current,
+            message: 'signInWithGoogle is not a function',
+          });
+          return undefined;
+        }
+        return signInWithGoogle();
+      })
+      .then((res) => {
+        const err = (res as { error?: { message?: string } | null } | undefined)?.error;
+        if (err) trackSignupFailed('oauth_redirect_error', { source: sourceRef.current, message: err.message });
+      })
+      .catch((e: unknown) => {
+        if (e instanceof AuthClientLoadError) window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
+        trackSignupFailed('oauth_redirect_error', {
+          source: sourceRef.current,
+          message: e instanceof Error ? e.message : String(e),
+        });
+      });
+  }, []);
+
   const handlePromptClickIntent = useCallback(() => {
     const source = sourceRef.current;
-    if (!source) return;
-    const now = Date.now();
-    if (now - lastIntentAtRef.current < 1500) return;
-    lastIntentAtRef.current = now;
-    trackSignupPromptClicked(source);
-    latchSignupSource(source);
-  }, []);
+    try {
+      if (source) {
+        const now = Date.now();
+        if (now - lastIntentAtRef.current >= 1500) {
+          lastIntentAtRef.current = now;
+          if (typeof trackSignupPromptClicked === 'function') trackSignupPromptClicked(source);
+          if (typeof latchSignupSource === 'function') latchSignupSource(source);
+          else trackSignupFailed('click_handler_throw', { source, message: 'latchSignupSource is not a function' });
+        }
+      }
+    } catch (e) {
+      trackSignupFailed('click_handler_throw', {
+        source,
+        message: e instanceof Error ? e.message : String(e),
+      });
+    }
+    if (!renderedRef.current) startRedirectFallback();
+  }, [startRedirectFallback]);
 
   useEffect(() => {
     const showLoadFailure = () => neoErrorToast(t('errors.signInFailedRetry'));
@@ -121,10 +166,28 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     setGsiRendered(true);
   }, [clientId, width, language, handlePromptClickIntent]);
 
-  // GIS may already be loaded (the global One Tap initializer pulls it in) — render
-  // immediately rather than waiting for a fresh onReady.
+  // GIS may already be loaded (the sheet preloader or One Tap). The button's own
+  // Script onReady does not fire when another Script tag already loaded the same
+  // URL, so poll until the iframe can paint instead of giving up after one miss.
   useEffect(() => {
-    if (enabled) void renderButton();
+    if (!enabled) return;
+    let attempts = 0;
+    let timer = 0;
+    const tick = () => {
+      if (renderedRef.current) return;
+      void renderButton();
+      attempts += 1;
+      if (!renderedRef.current && attempts < 40) {
+        timer = window.setTimeout(tick, 200);
+      } else if (!renderedRef.current) {
+        trackSignupFailed('gsi_render_timeout', {
+          source: sourceRef.current,
+          message: 'GSI button did not paint',
+        });
+      }
+    };
+    timer = window.setTimeout(tick, 0);
+    return () => window.clearTimeout(timer);
   }, [enabled, renderButton]);
 
   // Edge browser: GSI iframe + third-party cookie blocking breaks the flow.
@@ -187,13 +250,13 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       <div
         data-testid="gsi-frame"
         onPointerDown={handlePromptClickIntent}
-        className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
+        className="relative flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
       >
         {!gsiRendered && (
           <div
             data-testid="gsi-placeholder"
             aria-hidden="true"
-            className="pointer-events-none flex items-center justify-center gap-2 text-sm font-medium text-white"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 text-sm font-medium text-white"
           >
             <GoogleIcon className="w-[18px] h-[18px]" />
             <span>{t('auth.continueWithGoogle', 'Continue with Google')}</span>
@@ -206,7 +269,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
           than the button (margin -10px), so a white strip stuck out of the dark
           frame on both sides. Matching schemes keeps the backdrop transparent.
         */}
-        <div ref={containerRef} data-testid="gsi-button-container" style={{ colorScheme: 'light' }} />
+        <div ref={containerRef} data-testid="gsi-button-container" className="w-full shrink-0 min-h-[44px]" style={{ colorScheme: 'light' }} />
       </div>
     </div>
   );
