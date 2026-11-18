@@ -22590,6 +22590,7 @@ const he = {
       "studentsOne": "תלמיד אחד",
       "classPage": "עמוד הכיתה",
       "notPlayedRecently": "אין משחקים ב‑30 הימים האחרונים",
+      "noGamesYet": "עוד אין משחקים",
       "roster": {
         "hide": "להסתיר את רשימת התלמידים",
         "seeAll": "כל התלמידים ({count})",

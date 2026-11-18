@@ -21650,6 +21650,7 @@ const en = {
       "studentsOne": "1 student",
       "classPage": "Class page",
       "notPlayedRecently": "No games in 30 days",
+      "noGamesYet": "No games yet",
       "roster": {
         "hide": "Hide the student list",
         "seeAll": "See all students ({count})",

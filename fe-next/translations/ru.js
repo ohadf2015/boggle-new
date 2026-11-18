@@ -22329,6 +22329,7 @@ const ru = {
       "studentsOne": "1 ученик",
       "classPage": "Страница класса",
       "notPlayedRecently": "Нет игр за 30 дней",
+      "noGamesYet": "Игр пока нет",
       "roster": {
         "hide": "Скрыть список учеников",
         "seeAll": "Все ученики ({count})",

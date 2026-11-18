@@ -13,9 +13,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string, p?: Record<string, unknown>) => (p ? `${k}:${JSON.stringify(p)}` : k) }),
 }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playPlayerJoinedSound: vi.fn() }) }));
+const markInviteCopied = vi.hoisted(() => vi.fn());
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: classrooms.current, isLoading: false }) }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => proState.current }));
-vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => ({ markInviteCopied: vi.fn() }) }));
+vi.mock('@/hooks/useTeacherActivationProgress', () => ({ useTeacherActivationProgress: () => ({ markInviteCopied }) }));
 vi.mock('@/components/teacher/hq/useClassRoster', () => ({ useClassRoster: () => roster.current }));
 vi.mock('@/lib/education/telemetry', () => ({
   trackEduJoinCodeShown: tel.shown,
@@ -93,6 +94,12 @@ describe('ClassSetupInvite', () => {
     classrooms.current = [];
     render(<ClassSetupInvite classroomId="gone" />);
     expect(await screen.findByText('education.classroomGame.classroomNotFound')).toBeInTheDocument();
+  });
+
+  it('Given the ready screen just opened, Then no invite is recorded as shared', () => {
+    markInviteCopied.mockClear();
+    render(<ClassSetupInvite classroomId="c1" />);
+    expect(markInviteCopied).not.toHaveBeenCalled();
   });
 
   it('Given a new class, Then the code, QR and every share channel are on the one screen and the view is recorded once', () => {

@@ -315,6 +315,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                 <HomeClassMeta
                   previewIds={studentPreview?.[selectedClassroom.id] ?? []}
                   memberCount={selectedClassroom.member_count ?? 0}
+                  createdAt={selectedClassroom.created_at}
                   played={week.summary?.lastPlayedAt[selectedClassroom.id]}
                   pending={week.status === 'loading'}
                   failed={week.status === 'error'}

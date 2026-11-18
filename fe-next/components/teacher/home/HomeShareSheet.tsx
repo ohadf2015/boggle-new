@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { NeoButton } from '@/components/ui/button';
 import { ClassSetupInviteCode } from '@/components/education/ClassSetupInviteCode';
 import { useInviteShare } from '@/components/education/useInviteShare';
+import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import { classroomJoinUrl, inviteLocale, joinAddressForDisplay } from '@/lib/education/classroomInvitePayload';
 
@@ -25,7 +26,8 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
   const [origin, setOrigin] = useState('');
   const [boardOpen, setBoardOpen] = useState(false);
   useEffect(() => setOrigin(window.location.origin), []);
-  const share = useInviteShare(classroom, t);
+  const { markInviteCopied } = useTeacherActivationProgress();
+  const share = useInviteShare(classroom, t, markInviteCopied);
   const locale = inviteLocale(classroom.language, uiLanguage);
   const language = uiLanguage;
   const joinUrl = origin ? classroomJoinUrl(origin, locale, classroom.join_code) : '';
