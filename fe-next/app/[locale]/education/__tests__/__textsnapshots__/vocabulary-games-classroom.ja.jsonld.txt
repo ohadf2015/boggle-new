@@ -82,6 +82,14 @@
   "mainEntity": [
     {
       "@type": "Question",
+      "name": "語彙ゲームとは何ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "語彙ゲームは、新しい単語を読むだけでなく実際に使う短いゲームです。LexiClashでは、クラス全員がコードで参加するライブゲームや1対1の対戦ができ、自分の単語リストも読み込めます。1ラウンドは3〜5分で、生徒のアカウントは不要です。"
+      }
+    },
+    {
+      "@type": "Question",
       "name": "生徒は登録が必要ですか？",
       "acceptedAnswer": {
         "@type": "Answer",

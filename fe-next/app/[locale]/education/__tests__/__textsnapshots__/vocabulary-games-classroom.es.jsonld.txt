@@ -82,6 +82,14 @@
   "mainEntity": [
     {
       "@type": "Question",
+      "name": "¿Qué son los juegos de vocabulario?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Los juegos de vocabulario son partidas cortas en las que los estudiantes usan palabras nuevas en lugar de solo leerlas. En LexiClash toda la clase entra a una partida en vivo con un código, o se juntan en duelos 1v1, y puedes cargar tu propia lista de palabras. Cada ronda dura 3–5 minutos y los estudiantes no necesitan cuenta."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "¿Necesitan registrarse los estudiantes?",
       "acceptedAnswer": {
         "@type": "Answer",

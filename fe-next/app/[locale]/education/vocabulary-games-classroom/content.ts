@@ -168,6 +168,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Frequently Asked Questions',
     faqs: [
       {
+        q: 'What are vocabulary games?',
+        a: 'Vocabulary games are short games where students use new words instead of only reading them. In LexiClash the whole class joins a live game with a code, or pairs up for 1v1 duels, and you can load your own word list. Rounds take 3–5 minutes and students never need an account.',
+      },
+      {
         q: 'Do students need to sign up?',
         a: 'No. Students join with a 6-character code and play in any browser: no sign-up, no email. Only the teacher has an account.',
       },
@@ -338,6 +342,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     faqTitle: 'שאלות נפוצות',
     faqs: [
+      {
+        q: 'מהם משחקי אוצר מילים?',
+        a: 'משחקי אוצר מילים הם משחקים קצרים שבהם התלמידים משתמשים במילים חדשות במקום רק לקרוא אותן. ב-LexiClash כל הכיתה מצטרפת למשחק חי עם קוד, או מתחלקת לדו-קרבות אחד על אחד, ואפשר לטעון רשימת מילים משלכם. סבב אורך 3–5 דקות ותלמידים לא צריכים חשבון.',
+      },
       {
         q: 'האם תלמידים צריכים להירשם?',
         a: 'לא. התלמידים נכנסים עם קוד בן 6 תווים ומשחקים מכל דפדפן: בלי הרשמה ובלי מייל. רק למורה יש חשבון.',
@@ -510,6 +518,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'Preguntas Frecuentes',
     faqs: [
       {
+        q: '¿Qué son los juegos de vocabulario?',
+        a: 'Los juegos de vocabulario son partidas cortas en las que los estudiantes usan palabras nuevas en lugar de solo leerlas. En LexiClash toda la clase entra a una partida en vivo con un código, o se juntan en duelos 1v1, y puedes cargar tu propia lista de palabras. Cada ronda dura 3–5 minutos y los estudiantes no necesitan cuenta.',
+      },
+      {
         q: '¿Necesitan registrarse los estudiantes?',
         a: 'No. Entran con un código de 6 caracteres y juegan en cualquier navegador: sin registro ni correo. Solo el docente tiene cuenta.',
       },
@@ -680,6 +692,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     faqTitle: 'Vanliga Frågor',
     faqs: [
+      {
+        q: 'Vad är ordförrådsspel?',
+        a: 'Ordförrådsspel är korta spel där eleverna använder nya ord i stället för att bara läsa dem. I LexiClash går hela klassen med i ett livespel med en kod, eller möts i 1v1-dueller, och du kan ladda in din egen ordlista. En runda tar 3–5 minuter och eleverna behöver inget konto.',
+      },
       {
         q: 'Måste studenter registrera sig?',
         a: 'Nej. Eleverna ansluter med en kod på 6 tecken och spelar i valfri webbläsare: ingen registrering, ingen mejl. Bara läraren har ett konto.',
@@ -852,6 +868,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     faqTitle: 'よくある質問',
     faqs: [
       {
+        q: '語彙ゲームとは何ですか？',
+        a: '語彙ゲームは、新しい単語を読むだけでなく実際に使う短いゲームです。LexiClashでは、クラス全員がコードで参加するライブゲームや1対1の対戦ができ、自分の単語リストも読み込めます。1ラウンドは3〜5分で、生徒のアカウントは不要です。',
+      },
+      {
         q: '生徒は登録が必要ですか？',
         a: 'いいえ。生徒は6文字のコードで参加し、どのブラウザでも遊べます。登録もメールも不要です。アカウントが必要なのは先生だけです。',
       },
@@ -1022,6 +1042,10 @@ const CONTENT: Record<EducationLocale, LocaleContent> = {
     },
     faqTitle: 'Часто задаваемые вопросы',
     faqs: [
+      {
+        q: 'Что такое игры для изучения слов?',
+        a: 'Игры для изучения слов — это короткие игры, в которых ученики используют новые слова, а не только читают их. В LexiClash весь класс заходит в живую игру по коду или играет дуэли 1 на 1, а список слов можно загрузить свой. Раунд длится 3–5 минут, аккаунт ученикам не нужен.',
+      },
       {
         q: 'Нужна ли регистрация ученикам?',
         a: 'Нет. Ученики входят по коду из 6 символов и играют в любом браузере: без регистрации и почты. Аккаунт нужен только учителю.',

@@ -82,6 +82,14 @@
   "mainEntity": [
     {
       "@type": "Question",
+      "name": "Vad är ordförrådsspel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ordförrådsspel är korta spel där eleverna använder nya ord i stället för att bara läsa dem. I LexiClash går hela klassen med i ett livespel med en kod, eller möts i 1v1-dueller, och du kan ladda in din egen ordlista. En runda tar 3–5 minuter och eleverna behöver inget konto."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "Måste studenter registrera sig?",
       "acceptedAnswer": {
         "@type": "Answer",
