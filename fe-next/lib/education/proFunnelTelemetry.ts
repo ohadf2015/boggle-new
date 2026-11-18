@@ -433,11 +433,15 @@ export function trackTrialExpiredShown(args: { source: 'dashboard_trial_ended' }
  * the Growth Radar funnel ends at conversion, recovery is a billing metric.
  */
 export function trackRecoveryClicked(args: { surface: 'payment_failed_banner' }): void {
-  safeCapture('recovery_clicked', {
+  const props = {
     surface: args.surface,
     product: 'teacher_pro',
     provider: 'polar',
-  });
+  };
+  safeCapture('recovery_clicked', props);
+  // The name the recovery dashboard counts. Keep recovery_clicked so the
+  // existing banner series does not go dark.
+  safeCapture('recovery_cta_clicked', props);
 }
 
 export type TeacherPlanGateShownArgs = {

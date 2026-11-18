@@ -288,6 +288,32 @@ export function buildPaymentRecoveredEvent(userId: string, subscriptionId: strin
   };
 }
 
+/** Grace-day dunning email actually left the queue. `day` is 1 or 5. */
+export function buildDunningEmailSentEvent(userId: string, day: number): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'dunning_email_sent',
+    properties: { ...BASE, day, teacher_id: userId },
+  };
+}
+
+/** Teacher opened the one-click card update. Server twin of the banner tap. */
+export function buildRecoveryCtaClickedEvent(
+  userId: string,
+  args: { surface: string; day?: number },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'recovery_cta_clicked',
+    properties: {
+      ...BASE,
+      surface: args.surface,
+      ...(args.day == null ? {} : { day: args.day }),
+      teacher_id: userId,
+    },
+  };
+}
+
 /** Day-10 Polar trial expiry email actually sent. */
 export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
   return {

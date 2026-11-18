@@ -574,12 +574,22 @@ describe('trackRecoveryClicked', () => {
       product: 'teacher_pro',
       provider: 'polar',
     });
+    expect(captureMock).toHaveBeenCalledWith('recovery_cta_clicked', {
+      surface: 'payment_failed_banner',
+      product: 'teacher_pro',
+      provider: 'polar',
+    });
   });
 
   it('Given no client PostHog key, When tracked, Then the beacon fallback carries the event', () => {
     keyState.present = false;
     trackRecoveryClicked({ surface: 'payment_failed_banner' });
     expect(beaconMock).toHaveBeenCalledWith('recovery_clicked', {
+      surface: 'payment_failed_banner',
+      product: 'teacher_pro',
+      provider: 'polar',
+    });
+    expect(beaconMock).toHaveBeenCalledWith('recovery_cta_clicked', {
       surface: 'payment_failed_banner',
       product: 'teacher_pro',
       provider: 'polar',

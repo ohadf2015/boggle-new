@@ -1,7 +1,7 @@
 'use client';
 
 import { CreditCard, ExternalLink } from 'lucide-react';
-import { billingPortalPath } from '@/lib/education/billingPortal';
+import { billingPortalPath, polarPaymentUpdateUrl } from '@/lib/education/billingPortal';
 import { trackRecoveryClicked } from '@/lib/education/proFunnelTelemetry';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PRO_BANNER_CTA, ProBanner } from './pro/ProBanner';
@@ -21,12 +21,17 @@ export interface PaymentFailedBannerProps {
  * like the pending-checkout banner: it clears on its own once the card is fixed
  * and Polar flips the subscription back to active.
  *
- * The CTA opens the Polar customer portal in a new tab. Without a portal URL it
- * goes to /api/subscription/portal, which mints a fresh portal session on the click.
+ * The CTA opens the Polar payment-update page (/{org}/portal/settings) in a new tab
+ * when a live session URL is available. Without one it goes to
+ * /api/subscription/portal?intent=update-card, which mints a fresh session and
+ * lands on that same card form. Never a new checkout.
  */
 export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBannerProps) {
   const { t, language } = useLanguage();
   const label = t('teacher.subscription.paymentFailedCta');
+  const deepLink = portalUrl ? polarPaymentUpdateUrl(portalUrl) : null;
+  const href = deepLink || portalUrl || `${billingPortalPath(language)}&intent=update-card`;
+  const external = Boolean(deepLink || portalUrl);
   return (
     <ProBanner
       testId="payment-failed-banner"
@@ -37,30 +42,17 @@ export function PaymentFailedBanner({ portalUrl, stillPro }: PaymentFailedBanner
       body={t(stillPro ? 'teacher.subscription.paymentFailedBody' : 'teacher.subscription.paymentFailedBodyPaused')}
       lead={<CreditCard className="size-8 shrink-0 text-neo-pink" aria-hidden="true" />}
       action={
-        portalUrl ? (
-          <a
-            data-testid="payment-failed-cta"
-            href={portalUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={PRO_BANNER_CTA}
-            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
-          >
-            {label}
-            <ExternalLink className="size-4" aria-hidden="true" />
-          </a>
-        ) : (
-          // Never the upgrade page: a new checkout would be a second subscription while Polar
-          // retries this one. The stable route mints a fresh portal session on the click.
-          <a
-            data-testid="payment-failed-cta"
-            href={billingPortalPath(language)}
-            className={PRO_BANNER_CTA}
-            onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
-          >
-            {label}
-          </a>
-        )
+        <a
+          data-testid="payment-failed-cta"
+          href={href}
+          target={external ? '_blank' : undefined}
+          rel={external ? 'noopener noreferrer' : undefined}
+          className={PRO_BANNER_CTA}
+          onClick={() => trackRecoveryClicked({ surface: 'payment_failed_banner' })}
+        >
+          {label}
+          {external ? <ExternalLink className="size-4" aria-hidden="true" /> : null}
+        </a>
       }
     />
   );
