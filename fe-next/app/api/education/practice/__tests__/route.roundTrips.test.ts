@@ -53,6 +53,11 @@ vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
 
+vi.mock('@/lib/education/practiceXpLimits', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/education/practiceXpLimits')>()),
+  readPracticeXpLimits: vi.fn().mockResolvedValue({ deckSize: 100, xpLast24h: 0 }),
+}));
+
 import { NextRequest } from 'next/server';
 import { PATCH } from '../route';
 import { createClient } from '@/utils/supabase/server';
