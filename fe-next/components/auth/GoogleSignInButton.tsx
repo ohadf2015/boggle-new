@@ -70,14 +70,53 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const sourceRef = useRef(analyticsSource);
   sourceRef.current = analyticsSource;
   const lastIntentAtRef = useRef(0);
+  const redirectStartedRef = useRef(false);
+
+  // Until the GSI iframe paints, a tap has nothing to land on, so it takes the redirect path.
+  // Bound to click: a pointerdown also starts every scroll of the sheet.
+  const startRedirectFallback = useCallback(() => {
+    if (redirectStartedRef.current || renderedRef.current) return;
+    redirectStartedRef.current = true;
+    const fail = (message: string, showToast = true) => {
+      redirectStartedRef.current = false;
+      if (showToast) neoErrorToast(t('errors.signInFailedRetry'));
+      trackSignupFailed('oauth_redirect_error', { source: sourceRef.current, message });
+    };
+    void loadAuthClient()
+      .then(async ({ signInWithGoogle }) => {
+        if (typeof signInWithGoogle !== 'function') {
+          fail('signInWithGoogle is not a function');
+          return;
+        }
+        const res = await signInWithGoogle();
+        const err = (res as { error?: { message?: string } | null } | undefined)?.error;
+        if (err) fail(err.message ?? 'Google sign-in failed');
+      })
+      .catch((e: unknown) => {
+        const loadFailed = e instanceof AuthClientLoadError;
+        if (loadFailed) window.dispatchEvent(new Event(AUTH_CLIENT_LOAD_FAILED_EVENT));
+        fail(e instanceof Error ? e.message : String(e), !loadFailed);
+      });
+  }, [t]);
+
   const handlePromptClickIntent = useCallback(() => {
     const source = sourceRef.current;
-    if (!source) return;
-    const now = Date.now();
-    if (now - lastIntentAtRef.current < 1500) return;
-    lastIntentAtRef.current = now;
-    trackSignupPromptClicked(source);
-    latchSignupSource(source);
+    try {
+      if (source) {
+        const now = Date.now();
+        if (now - lastIntentAtRef.current >= 1500) {
+          lastIntentAtRef.current = now;
+          if (typeof trackSignupPromptClicked === 'function') trackSignupPromptClicked(source);
+          if (typeof latchSignupSource === 'function') latchSignupSource(source);
+          else trackSignupFailed('click_handler_throw', { source, message: 'latchSignupSource is not a function' });
+        }
+      }
+    } catch (e) {
+      trackSignupFailed('click_handler_throw', {
+        source,
+        message: e instanceof Error ? e.message : String(e),
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -121,10 +160,26 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     setGsiRendered(true);
   }, [clientId, width, language, handlePromptClickIntent]);
 
-  // GIS may already be loaded (the global One Tap initializer pulls it in) — render
-  // immediately rather than waiting for a fresh onReady.
+  // Script onReady never fires when another tag already loaded the same GSI URL.
   useEffect(() => {
-    if (enabled) void renderButton();
+    if (!enabled) return;
+    let attempts = 0;
+    let timer = 0;
+    const tick = () => {
+      if (renderedRef.current) return;
+      void renderButton();
+      attempts += 1;
+      if (!renderedRef.current && attempts < 40) {
+        timer = window.setTimeout(tick, 200);
+      } else if (!renderedRef.current) {
+        trackSignupFailed('gsi_render_timeout', {
+          source: sourceRef.current,
+          message: 'GSI button did not paint',
+        });
+      }
+    };
+    timer = window.setTimeout(tick, 0);
+    return () => window.clearTimeout(timer);
   }, [enabled, renderButton]);
 
   // Edge browser: GSI iframe + third-party cookie blocking breaks the flow.
@@ -187,13 +242,14 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
       <div
         data-testid="gsi-frame"
         onPointerDown={handlePromptClickIntent}
-        className="flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
+        onClick={startRedirectFallback}
+        className="relative flex w-full min-h-[48px] items-center justify-center overflow-visible rounded-xl border-3 border-neo-black bg-[#131314] shadow-hard"
       >
         {!gsiRendered && (
           <div
             data-testid="gsi-placeholder"
             aria-hidden="true"
-            className="pointer-events-none flex items-center justify-center gap-2 text-sm font-medium text-white"
+            className="pointer-events-none absolute inset-0 flex items-center justify-center gap-2 text-sm font-medium text-white"
           >
             <GoogleIcon className="w-[18px] h-[18px]" />
             <span>{t('auth.continueWithGoogle', 'Continue with Google')}</span>
@@ -206,7 +262,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
           than the button (margin -10px), so a white strip stuck out of the dark
           frame on both sides. Matching schemes keeps the backdrop transparent.
         */}
-        <div ref={containerRef} data-testid="gsi-button-container" style={{ colorScheme: 'light' }} />
+        <div ref={containerRef} data-testid="gsi-button-container" className="w-full shrink-0 min-h-[44px]" style={{ colorScheme: 'light' }} />
       </div>
     </div>
   );
