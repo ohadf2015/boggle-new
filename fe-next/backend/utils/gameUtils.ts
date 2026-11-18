@@ -327,7 +327,7 @@ function attemptGenerateBoard(
   let embeddedCount = 0;
   for (const word of sortedWords) {
     if (embeddedCount >= targetWords) break;
-    if (word.length > Math.max(rows, cols)) continue;
+    if (word.length > rows * cols) continue;
 
     if (tryEmbedWord(grid, word, rows, cols, usedCells, language)) {
       embeddedWords.push(word);
@@ -361,7 +361,7 @@ function generateVerifiedBoard(
   const usedCells = new Set<string>();
 
   for (const word of sortedWords) {
-    if (word.length > Math.max(rows, cols)) continue;
+    if (word.length > rows * cols) continue;
 
     const gridCopy = grid.map(row => [...row]);
     const usedCellsCopy = new Set(usedCells);
