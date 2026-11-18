@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import AnswerSlots from '../AnswerSlots';
 import BridgeStage from '../BridgeStage';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
+import BridgeSubmitButton from '../BridgeSubmitButton';
 import { BridgeSolveReveal } from '../BridgeSolveReveal';
 import { useBridgeTyping } from '../useBridgeTyping';
 import { tutorialPuzzle } from './tutorialGate';
@@ -197,13 +198,11 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
                   placeholder={t('connections.placeholder')}
                   className="min-h-[3.25rem] w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-4 py-3 font-neo-display text-lg font-bold text-neo-white outline-none focus:border-neo-cyan"
                 />
-                <button
-                  type="button"
-                  onClick={submit}
-                  className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard"
-                >
-                  {t('connections.submit')}
-                </button>
+                <BridgeSubmitButton
+                  label={t('connections.submit')}
+                  onSubmit={submit}
+                  disabled={input.trim().length === 0}
+                />
               </div>
             ) : (
               <ConnectionsKeyboard

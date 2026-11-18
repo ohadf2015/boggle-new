@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
+import BridgeSubmitButton from './BridgeSubmitButton';
 import ConnectionsMascot from './ConnectionsMascot';
 import AnswerSlots from './AnswerSlots';
 import BridgeStage from './BridgeStage';
@@ -153,9 +154,7 @@ export default function PuzzleCard({
           exit={{ opacity: 0, y: -16, scale: 0.97, transition: { duration: 0.18 } }}
           transition={reducedMotion ? { duration: 0 } : CARD_SPRING}
           className={[
-            'group/card relative flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-2 pb-2.5 pt-1.5 shadow-hard transition-colors duration-200 sm:px-3 sm:pb-3 sm:pt-2 shell:px-6 shell:pb-5 shell:pt-4',
-            // Nav and banner already reserve the home-indicator band; only claim it when neither is up.
-            '[html:not(.has-global-bottom-nav):not(.has-admob-banner):not(.has-web-anchor-ad)_&]:mb-[env(safe-area-inset-bottom,0px)]',
+            'group/card relative flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-2 pb-1.5 pt-1.5 shadow-hard transition-colors duration-200 sm:px-3 sm:pb-3 sm:pt-2 shell:px-6 shell:pb-5 shell:pt-4',
             STATUS_BORDER[state.status] ?? STATUS_BORDER.playing,
           ].join(' ')}
           dir={isRTL ? 'rtl' : 'ltr'}
@@ -234,7 +233,7 @@ export default function PuzzleCard({
           <div
             ref={stageRef}
             data-testid="puzzle-stage"
-            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:800px)]:min-h-[9rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
             style={{ containerType: 'size' }}
           >
             <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
@@ -262,7 +261,7 @@ export default function PuzzleCard({
               min-height reserves two wrapped lines up front (so revealing it never moves
               the dock) and the bottom margin keeps the pill off the keys. */}
           {puzzle.hint && !isResolved && (
-            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
+            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:800px)]:mb-1 [@media(max-height:800px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
               <AnimatePresence>
               {showHint && !isResolved && (
                 <m.p
@@ -285,7 +284,7 @@ export default function PuzzleCard({
               same reserved height, so the page never grows into a scroll. The one-line
               IME input skips the reservation so the plates get that room instead. */}
           <div
-            className={`flex shrink-0 flex-col justify-end [--conn-dock:12.875rem] sm:[--conn-dock:14.5rem] [@media(max-height:700px)]:[--conn-dock:11.125rem] [@media(max-width:639px)_and_(min-height:780px)]:[--conn-dock:14.375rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[var(--conn-dock)]'}`}
+            className={`flex shrink-0 flex-col justify-end [--conn-dock:16.125rem] sm:[--conn-dock:17.5rem] [@media(max-height:800px)]:[--conn-dock:14.125rem] [@media(max-width:639px)_and_(min-height:801px)]:[--conn-dock:17.875rem] shell:mx-auto shell:w-full shell:max-w-[40rem] ${needsIME && !isResolved ? '' : 'min-h-[calc(var(--conn-dock)+max(0.75rem,env(safe-area-inset-bottom,0px)))] [html.has-global-bottom-nav_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-admob-banner_&]:min-h-[calc(var(--conn-dock)+0.75rem)] [html.has-web-anchor-ad_&]:min-h-[calc(var(--conn-dock)+0.75rem)]'}`}
           >
             {isResolved ? (
               <div className="flex flex-col gap-2">
@@ -296,7 +295,7 @@ export default function PuzzleCard({
               /* Scripts like Japanese can't fit an on-screen keyboard — use the
                  device's native IME via a real text input. */
               !isDisabled && (
-                <div className="flex items-stretch gap-2">
+                <div className="flex flex-col gap-2 px-1 pb-3 [html:not(.has-global-bottom-nav):not(.has-admob-banner):not(.has-web-anchor-ad)_&]:pb-[max(0.75rem,env(safe-area-inset-bottom,0px))]">
                   <input
                     ref={focusOnFinePointer}
                     type="text"
@@ -318,20 +317,16 @@ export default function PuzzleCard({
                     }}
                     placeholder={t('connections.placeholder')}
                     className={[
-                      'min-h-[3.25rem] min-w-0 flex-1 rounded-neo border-2 bg-neo-navy px-3 py-2.5 text-lg shadow-hard',
+                      'min-h-[3.25rem] w-full min-w-0 rounded-neo border-2 bg-neo-navy px-3 py-2.5 text-lg shadow-hard',
                       'font-neo-display font-bold text-neo-white outline-none transition-colors duration-200 placeholder:font-neo-body placeholder:font-normal placeholder:text-neo-white/40 focus:border-neo-cyan',
                       isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-cream/40',
                     ].join(' ')}
                   />
-                  <m.button
-                    type="button"
-                    onClick={onSubmit}
-                    whileTap={{ scale: 0.97 }}
+                  <BridgeSubmitButton
+                    label={t('connections.submit')}
+                    onSubmit={onSubmit}
                     disabled={state.input.trim().length === 0}
-                    className="shrink-0 rounded-neo border-neo-thick border-neo-black bg-neo-cyan px-4 font-neo-display font-black text-neo-navy shadow-hard active:translate-y-px active:shadow-hard-pressed disabled:cursor-not-allowed disabled:opacity-40"
-                  >
-                    {t('connections.submit')}
-                  </m.button>
+                  />
                 </div>
               )
             ) : (

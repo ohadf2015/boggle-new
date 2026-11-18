@@ -30,19 +30,23 @@ describe('ConnectionsKeyboard', () => {
     expect(q.parentElement).not.toBe(a.parentElement);
   });
 
-  it('gives submit and backspace their own row under the letters, in the same place for every locale', () => {
+  it('keeps backspace under the letters and a full-width submit bar below, in every locale', () => {
     for (const locale of ['en', 'he', 'ru']) {
       const { unmount } = render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows(locale)} canSubmit />);
       const submit = screen.getByRole('button', { name: 'Submit' });
       const backspaceKey = screen.getByRole('button', { name: 'Delete letter' });
       const actions = screen.getByTestId('keyboard-actions');
-      expect(submit.parentElement).toBe(actions);
+      const dock = screen.getByTestId('keyboard-submit-dock');
+      // Backspace stays on the key grid so it does not shrink letter keys.
       expect(backspaceKey.parentElement).toBe(actions);
-      expect(actions.querySelectorAll('button')).toHaveLength(2);
-      // Check on the start side, backspace at the end, like Wordle and a physical keyboard.
-      expect(actions.firstElementChild).toBe(submit);
-      expect(actions.lastElementChild).toBe(backspaceKey);
-      expect(actions.parentElement!.lastElementChild).toBe(actions);
+      expect(actions.contains(submit)).toBe(false);
+      expect(actions.querySelectorAll('button')).toHaveLength(1);
+      // Submit is a long, full-width bar pinned under the keyboard, last in the dock.
+      expect(dock.contains(submit)).toBe(true);
+      expect(submit.className).toMatch(/(?:^|\s)w-full(?:\s|$)/);
+      expect(dock.className).toMatch(/safe-area-inset-bottom/);
+      expect(dock.className).toMatch(/px-/);
+      expect(actions.parentElement!.lastElementChild).toBe(dock);
       unmount();
     }
   });
@@ -54,10 +58,16 @@ describe('ConnectionsKeyboard', () => {
     expect(label?.className).not.toMatch(/(^|\s)hidden(\s|$)/);
   });
 
-  it('makes the submit key the wider of the two action keys', () => {
-    render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
-    const grow = (name: string) => Number(screen.getByRole('button', { name }).style.flexGrow);
-    expect(grow('Submit')).toBeGreaterThan(grow('Delete letter'));
+  it('makes the submit bar a full-width game button, disabled until there is a guess', () => {
+    const { rerender } = render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit={false} />);
+    const submit = screen.getByRole('button', { name: 'Submit' });
+    expect(submit.className).toMatch(/(?:^|\s)w-full(?:\s|$)/);
+    expect(submit.className).toContain('border-neo-black');
+    expect(submit.className).toContain('shadow-hard');
+    expect(submit.className).toContain('font-neo-display');
+    expect(submit).toHaveProperty('disabled', true);
+    rerender(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    expect(screen.getByRole('button', { name: 'Submit' })).toHaveProperty('disabled', false);
   });
 
   it('gives every Hebrew letter key the same 8-column width', () => {
