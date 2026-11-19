@@ -6,6 +6,7 @@ import { AdaptiveAnimatePresence, AdaptiveMotion } from '@/components/motion/Ada
 import { BlastMascotHud } from '@/components/blast/legacy/BlastMascotHud';
 import { useBlastMascot } from '@/lib/blast/useBlastMascot';
 import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
+import { isClassroomLiveNow } from '@/lib/education/classroomLivePath';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { comboTier, escalationMotion } from '@/lib/blast/mascotState';
 import { createVoiceHistory, pickVoice, SIGNATURE_CRY, type MascotVoice } from '@/lib/mascot/voice';
@@ -56,7 +57,11 @@ const STAGE_SLOT = 'bottom-1 end-1';
 const STAGE_LAYER = 'absolute inset-0 overflow-x-clip pointer-events-none [&_*]:pointer-events-none';
 const TIMER_SCALE = 0.7;
 
-export function GameMascotReactions({
+export function GameMascotReactions(props: GameMascotReactionsProps) {
+  return isClassroomLiveNow() ? null : <MascotReactions {...props} />;
+}
+
+function MascotReactions({
   mode,
   comboLevel,
   personality = 'quiet',

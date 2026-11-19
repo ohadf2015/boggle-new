@@ -1,5 +1,5 @@
 import React from 'react';
-import { vi, describe, beforeEach, it, expect } from 'vitest';
+import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 
 const { trackGrowthEvent, reduced } = vi.hoisted(() => ({
@@ -75,5 +75,17 @@ describe('GameMascotReactions', () => {
         vi.useRealTimers();
       }
     });
+  });
+});
+
+describe('GameMascotReactions in a classroom game', () => {
+  beforeEach(() => _resetMascotBus());
+  afterEach(() => window.history.pushState({}, '', '/'));
+
+  it.each(['/en/education/live', '/he/education/live/host'])('given %s, when a word lands, then no mascot appears', (path) => {
+    window.history.pushState({}, '', path);
+    render(<GameMascotReactions mode="classic" comboLevel={0} persistent />);
+    act(() => emitMascotEvent({ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false }));
+    expect(screen.queryByTestId('blast-mascot-hud')).toBeNull();
   });
 });

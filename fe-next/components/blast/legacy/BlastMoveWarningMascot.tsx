@@ -2,6 +2,7 @@
 import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { MASCOT_IMAGES } from './utils/blastMascot';
+import { isClassroomLiveNow } from '@/lib/education/classroomLivePath';
 
 interface BlastMoveWarningMascotProps {
   movesRemaining: number;
@@ -10,7 +11,7 @@ interface BlastMoveWarningMascotProps {
 
 export function BlastMoveWarningMascot({ movesRemaining, t }: BlastMoveWarningMascotProps) {
   // Show only during the critical 1-3 window. At 0, the dead-end finale owns the screen.
-  if (movesRemaining <= 0 || movesRemaining > 3) return null;
+  if (movesRemaining <= 0 || movesRemaining > 3 || isClassroomLiveNow()) return null;
 
   const mascotSrc = MASCOT_IMAGES.sweating;
   const label = t('blast.moveWarning.label', '');

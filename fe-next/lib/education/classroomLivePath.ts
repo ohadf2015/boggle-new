@@ -27,6 +27,11 @@ export function isClassroomLivePathname(pathname: string | null | undefined): bo
   return !!pathname && LIVE_PATH_RE.test(pathname);
 }
 
+/** Read at render by in-game effects, which only mount in the browser after the round starts. */
+export function isClassroomLiveNow(): boolean {
+  return typeof window !== 'undefined' && isClassroomLivePathname(window.location.pathname);
+}
+
 function isHostParam(value: string | null): boolean {
   return value === '1' || value === 'true';
 }
