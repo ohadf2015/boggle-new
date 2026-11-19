@@ -8,9 +8,11 @@ import { teacherPaymentFailed } from '@/lib/email/templates/teacherPaymentFailed
 import { teacherDunningEscalation } from '@/lib/email/templates/teacherDunningEscalation';
 import { billingPortalEmailUrl } from '@/lib/education/billingPortal';
 import {
+  dunningDayFromEventType,
   dunningEmailEventType,
   dunningOnset,
   dunningRecoverEmailUrl,
+  DUNNING_SENT_EVENT_TYPES,
   pickDunningDay,
   type DunningDay,
 } from '@/lib/education/dunningEscalation';
@@ -73,7 +75,7 @@ export interface DunningEnqueue {
 function sentDays(subId: string | null, userId: string, events: EventRow[]): number[] {
   const days = new Set<number>();
   for (const ev of events) {
-    const day = ev.event_type === dunningEmailEventType(1) ? 1 : ev.event_type === dunningEmailEventType(5) ? 5 : 0;
+    const day = dunningDayFromEventType(ev.event_type);
     if (!day) continue;
     if (subId ? ev.subscription_id === subId : ev.user_id === userId) days.add(day);
   }
@@ -99,7 +101,7 @@ async function run(dry: boolean, nowMs: number) {
     const ev = await admin
       .from('subscription_events')
       .select('subscription_id, user_id, event_type')
-      .in('event_type', [dunningEmailEventType(1), dunningEmailEventType(5)]);
+      .in('event_type', [...DUNNING_SENT_EVENT_TYPES]);
     if (ev.error) throw new Error(`subscription_events select failed: ${ev.error.message}`);
     events = (ev.data ?? []) as EventRow[];
   }
