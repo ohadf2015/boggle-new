@@ -25,8 +25,18 @@ function renderSetup(over: Partial<React.ComponentProps<typeof LobbyHostSetup>> 
 }
 
 describe('LobbyHostSetup first frame', () => {
-  it('Given the lobby opens, Then it shows the word list, three preset cards with the active one checked, and the options line', () => {
+  it('Given the lobby opens, Then only the class and list line and one closed More games fold show', () => {
     renderSetup();
+    expect(screen.getByTestId('lesson-step')).toBeInTheDocument();
+    expect(screen.getByTestId('lobby-more-games')).toHaveTextContent('eduShell.host.moreGames');
+    expect(screen.queryByRole('radiogroup', { name: 'teacher.classroom.presets.title' })).toBeNull();
+    expect(screen.queryByTestId('lobby-setup-summary')).toBeNull();
+    expect(screen.getByTestId('lobby-host-setup')).not.toHaveAttribute('data-lobby-expanded');
+  });
+
+  it('Given the fold is open, Then it shows three preset cards with the active one checked, the options line and the games, and marks the lobby expanded', () => {
+    renderSetup({ gamesOpen: true });
+    expect(screen.getByTestId('lobby-host-setup')).toHaveAttribute('data-lobby-expanded');
     expect(screen.getByTestId('lesson-step')).toBeInTheDocument();
     const group = screen.getByRole('radiogroup', { name: 'teacher.classroom.presets.title' });
     const cards = within(group).getAllByRole('radio');
@@ -53,7 +63,7 @@ describe('LobbyHostSetup first frame', () => {
   });
 
   it('Given a teacher taps a preset card, Then that preset is applied', () => {
-    const { onApplyPreset } = renderSetup({ activePreset: null });
+    const { onApplyPreset } = renderSetup({ activePreset: null, gamesOpen: true });
     expect(screen.queryByTestId('preset-check')).toBeNull();
     fireEvent.click(screen.getByTestId('preset-friday-battle'));
     expect(onApplyPreset).toHaveBeenCalledWith('friday-battle');

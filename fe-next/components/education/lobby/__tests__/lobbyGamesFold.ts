@@ -24,3 +24,16 @@ export function modeGrid(): HTMLElement {
   showGames();
   return screen.getByTestId('lobby-mode-grid');
 }
+
+/** Opens the one fold, then returns the Game options door inside it. */
+export function gameOptions(): HTMLElement {
+  showGames();
+  return screen.getByTestId('lobby-setup-summary');
+}
+
+/** Opens the class and list line, then returns the class picker inside it. */
+export function classPicker(): HTMLElement {
+  const line = screen.queryByTestId('lobby-lesson-toggle');
+  if (line?.getAttribute('aria-expanded') === 'false') fireEvent.click(line);
+  return screen.getByTestId('lobby-class-picker');
+}

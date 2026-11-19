@@ -53,7 +53,7 @@ vi.mock('@/utils/supabase/client', () => ({
 
 import { catalogueModes } from '../ClassroomModeCatalogueData';
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import { gameTile, modeGrid, showGames } from '../lobby/__tests__/lobbyGamesFold';
+import { gameOptions, gameTile, modeGrid, showGames } from '../lobby/__tests__/lobbyGamesFold';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
 const mockSocket = {
@@ -165,12 +165,18 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     }
   });
 
-  it('orders the word list, then the presets, then one closed Game options door that says what it holds, then the folded games', async () => {
+  it('shows one class and list line and one closed fold; the fold holds the presets, then the Game options door, then the games', async () => {
     await renderLobby();
     const step = screen.getByTestId('lobby-lesson-step');
+    const fold = screen.getByTestId('lobby-more-games');
+    expect(fold).toHaveAttribute('aria-expanded', 'false');
+    expect(fold).toHaveTextContent('eduShell.host.moreGames');
+    expect(step.compareDocumentPosition(fold) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId('preset-standard')).toBeNull();
+    expect(screen.queryByTestId('lobby-setup-summary')).toBeNull();
+
+    const summary = gameOptions();
     const preset = screen.getByTestId('preset-standard');
-    const summary = screen.getByTestId('lobby-setup-summary');
-    expect(step.compareDocumentPosition(preset) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(preset.compareDocumentPosition(summary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(summary.compareDocumentPosition(modeGrid()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(summary).toHaveAttribute('aria-expanded', 'false');

@@ -14,6 +14,7 @@ import * as supabaseTeacher from '@/lib/supabase/education';
 import { io } from 'socket.io-client';
 import { DEFAULT_CLASSROOM_PRESSURE } from '@/shared/utils/classroomPressure';
 import type { Mock } from 'vitest';
+import { gameOptions } from '../lobby/__tests__/lobbyGamesFold';
 
 const { mockToastError } = vi.hoisted(() => ({ mockToastError: vi.fn() }));
 vi.mock('react-hot-toast', () => ({
@@ -86,8 +87,8 @@ const mockClassrooms = [{ id: 'class-1', name: 'Class A', member_count: 24 }];
 
 async function renderAndLaunch() {
   render(<ClassroomGameLobby onBack={vi.fn()} />);
-  await waitFor(() => expect(screen.getByTestId('lobby-setup-summary')).toBeInTheDocument());
-  fireEvent.click(screen.getByTestId('lobby-setup-summary'));
+  await waitFor(() => expect(gameOptions()).toBeInTheDocument());
+  fireEvent.click(gameOptions());
   return screen;
 }
 

@@ -20,7 +20,7 @@ const trackEduLiveGameStarted = vi.fn();
 vi.mock('@/lib/education/telemetry', () => ({ trackEduLiveGameStarted: (...a: unknown[]) => trackEduLiveGameStarted(...a) }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import { modeGrid } from '../lobby/__tests__/lobbyGamesFold';
+import { classPicker, modeGrid } from '../lobby/__tests__/lobbyGamesFold';
 import { writeRehearseIntent } from '@/lib/education/rehearsal';
 
 const handlers: Record<string, (data?: unknown) => void> = {};
@@ -122,7 +122,7 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
     fireEvent.click(screen.getByTestId('lobby-more-options'));
 
     expect(modeGrid()).toBeInTheDocument();
-    expect(screen.getByTestId('lobby-class-picker')).toBeInTheDocument();
+    expect(classPicker()).toBeInTheDocument();
     expect(screen.getByTestId('lobby-lesson-step')).toBeInTheDocument();
     await tapGoLiveAndConfirm();
     expect(trackEduLiveGameStarted).toHaveBeenCalledWith(expect.objectContaining({ source: 'hq_express' }));

@@ -25,7 +25,7 @@ let socketState: Record<string, unknown>;
 vi.mock('../lobby/useClassroomLaunchSocket', () => ({ useClassroomLaunchSocket: () => socketState }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import { gameTile } from '../lobby/__tests__/lobbyGamesFold';
+import { classPicker, gameOptions, gameTile } from '../lobby/__tests__/lobbyGamesFold';
 
 const LESSON = { id: 'l1', name: 'Animals', language: 'en', words: [{ word: 'tiger' }, { word: 'zebra' }] };
 
@@ -53,9 +53,10 @@ afterEach(() => {
 });
 
 describe('host flow', () => {
-  it('Given two classes, Then the class is the first visible choice, and tapping one picks it', async () => {
+  it('Given two classes, Then the class line names the class and opens a picker where tapping one picks it', async () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
-    const picker = screen.getByTestId('lobby-class-picker');
+    expect(screen.getByTestId('lobby-lesson-toggle')).toHaveTextContent('5B');
+    const picker = classPicker();
     expect(within(picker).getByRole('radio', { name: '5B' })).toHaveAttribute('aria-checked', 'true');
     await userEvent.click(within(picker).getByRole('radio', { name: '4A' }));
     expect(setSelectedClassroomId).toHaveBeenCalledWith('c2');
@@ -82,7 +83,7 @@ describe('host flow', () => {
 
   it('Given Options, When late join is switched off, Then the room is created with late join off', async () => {
     render(<ClassroomGameLobby onBack={vi.fn()} initialMode="classic" />);
-    await userEvent.click(screen.getByTestId('lobby-setup-summary'));
+    await userEvent.click(gameOptions());
     await userEvent.click(screen.getByRole('switch', { name: 'eduShell.host.lateJoin' }));
     await userEvent.click(screen.getByTestId('lobby-setup-done'));
     await userEvent.click(screen.getAllByTestId('lobby-go-live')[0]);

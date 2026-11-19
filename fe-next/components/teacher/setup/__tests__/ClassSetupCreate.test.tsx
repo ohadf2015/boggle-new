@@ -124,7 +124,10 @@ describe('ClassSetupCreate', () => {
     expect(api.assign).toHaveBeenCalledTimes(1);
   });
   describe('the teacher pastes their own words', () => {
-    const paste = (text: string) => fireEvent.change(screen.getByTestId('setup-own-words'), { target: { value: text } });
+    const paste = (text: string) => {
+      fireEvent.click(screen.getByTestId('setup-advanced-toggle'));
+      fireEvent.change(screen.getByTestId('setup-own-words'), { target: { value: text } });
+    };
 
     it('Given enough valid words, When "Start live" is tapped, Then those words become the class list instead of the starter pack, and the invite opens on that list with no pack', async () => {
       render(<ClassSetupCreate />);

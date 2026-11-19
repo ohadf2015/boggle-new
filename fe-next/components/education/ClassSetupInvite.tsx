@@ -36,6 +36,8 @@ import { firstGameIntent, readPasted, sameWords, type FirstGameChoice } from '@/
 import { ClassCreatedAsk } from '@/components/education/ClassCreatedAsk';
 import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
 import { useInviteShare } from './useInviteShare';
+import { useDay0Start } from './ClassSetupInviteDay0';
+import { NB_BLOCK, NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ClassSetupInviteView } from './ClassSetupInviteView';
 import { firstStudentSeen } from './lobby/inviteLinks';
@@ -43,6 +45,7 @@ import { firstStudentSeen } from './lobby/inviteLinks';
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const JOIN_POLL_MS = 5_000;
+const TRY_HERO = cn(NB_PRIMARY, NB_BLOCK.pink, 'min-h-[64px] w-full text-xl');
 
 export interface ClassSetupInviteProps {
   classroomId: string;
@@ -156,12 +159,25 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
   }, [roster.arrivals, playPlayerJoinedSound]);
 
   const share = useInviteShare(classroom, t, markInviteCopied);
+  const rehearse = (buttonClassName?: string) => (
+    <RehearseWithBotsButton
+      classroomId={classroom.id}
+      source="class"
+      language={language}
+      t={t}
+      withSeat
+      label={t('eduShell.home.practice.cta')}
+      buttonClassName={buttonClassName}
+      onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
+    />
+  );
 
   const joinLocale = inviteLocale(classroom.language, language);
   const joinUrl = origin ? classroomJoinUrl(origin, joinLocale, classroom.join_code) : '';
   const displayHost = origin ? `${joinAddressForDisplay(origin)}/${joinLocale}/join` : '';
   const startHref = `/${language}/education/classroom-game?flow=${QUICK_LAUNCH_FLOW}`;
-  const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language });
+  const day0 = useDay0Start({ language, teacherId: user?.id, classroomId: classroom.id });
+  const firstGame = useFirstGame({ classroom, packKey, lessonId, t, language, onStarted: day0.onStart });
   const hasWordList = useClassHasWordList(classroom.id, Boolean(lessonId));
 
   return (
@@ -171,24 +187,15 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
         roster={roster}
         joinUrl={joinUrl}
         displayHost={displayHost}
-        startHref={startHref}
         homeHref={`/${language}/teacher`}
         reduced={reduced}
         onShare={(c, p) => void share(c, p)}
         onOpenProjector={() => setProjectorOpen(true)}
         words={firstGame.words}
+        wordsAttention={firstGame.attention}
         play={firstGame.play}
-        rehearse={
-          <RehearseWithBotsButton
-            classroomId={classroom.id}
-            source="class"
-            language={language}
-            t={t}
-            withSeat
-            label={t('eduShell.home.practice.cta')}
-            onStart={() => trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'practice_bots' })}
-          />
-        }
+        rehearse={rehearse()}
+        tryAsStudent={rehearse(TRY_HERO)}
         onTogetherChoice={(choice) => trackGrowthEvent('class_ready_together', { choice })}
         plan={
           <ClassSetupInvitePlan
@@ -211,7 +218,7 @@ function InviteReady({ classroom, packKey, lessonId, t, language }: InviteReadyP
           />
         }
         footer={
-          <ClassCreatedAsk
+          day0.bridge ? null : <ClassCreatedAsk
             language={language}
             href={startHref}
             teacherId={user?.id}
@@ -253,7 +260,7 @@ async function lessonExists(id: string): Promise<boolean> {
   return Boolean(data);
 }
 
-function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom: InviteReadyProps['classroom']; packKey: string | null; lessonId: string | null; t: T; language: string }) {
+function useFirstGame({ classroom, packKey, lessonId, t, language, onStarted }: { classroom: InviteReadyProps['classroom']; packKey: string | null; lessonId: string | null; t: T; language: string; onStarted: () => void }) {
   const router = useRouter();
   const { user } = useAuth();
   const { createLesson } = useLessons();
@@ -286,12 +293,13 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
     const blocked: FirstGameError = skipped > 0 && words.length === 0 ? 'phrasesOnly' : words.length > 0 && words.length < MIN_PASTED_WORDS ? 'tooFew' : null;
     if (blocked) {
       setError(blocked);
-      box.current?.focus();
+      requestAnimationFrame(() => box.current?.focus());
       return;
     }
     inFlight.current = true;
     setBusy(true);
     trackFirstRoundGuideClicked({ surface: 'class_ready', locale: language, step: 'start_round' });
+    onStarted();
     const ownTitle = t('eduShell.setup.words.listName', { date: new Date().toLocaleDateString(language, { month: 'short', day: 'numeric' }) });
     const untouched = saved.status === 'ready' && sameWords(words, saved.words);
     const choice: FirstGameChoice =
@@ -346,6 +354,7 @@ function useFirstGame({ classroom, packKey, lessonId, t, language }: { classroom
         t={t}
       />
     ),
+    attention: error !== null,
     play: <PlayNowButton busy={busy} onClick={() => void onPlay()} t={t} />,
   };
 }

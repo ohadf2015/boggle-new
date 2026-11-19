@@ -32,7 +32,6 @@ function renderView(list: RosterStudent[], arrivals: string[] = [], reduced = fa
       roster={{ students: list, arrivals, loading: false }}
       joinUrl="https://x.test/en/join/BLDA7Q"
       displayHost="x.test/en/join"
-      startHref="#"
       homeHref="/en/teacher"
       reduced={reduced}
       onShare={vi.fn()}

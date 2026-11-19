@@ -264,7 +264,7 @@ describe('ClassSetupInvite', () => {
       expect(storedIntent()).toMatchObject({ language: 'he', mode: 'classic' });
     });
 
-    it('Given only two words, When Play now is tapped, Then it says what is missing, keeps the words and nothing launches', () => {
+    it('Given only two words, When Play now is tapped, Then it says what is missing, keeps the words and nothing launches', async () => {
       render(<ClassSetupInvite classroomId="c1" packKey={enPack.nameKey} lessonId="L-pack" />);
       const box = screen.getByTestId('first-game-words');
       fireEvent.change(box, { target: { value: 'cat, dog' } });
@@ -273,12 +273,13 @@ describe('ClassSetupInvite', () => {
       fireEvent.click(play);
       expect(screen.getByRole('alert')).toHaveTextContent('eduShell.setup.words.tooFew');
       expect(box).toHaveValue('cat, dog');
+      act(() => (vi.mocked(requestAnimationFrame).mock.calls.at(-1)![0] as FrameRequestCallback)(0));
       expect(document.activeElement).toBe(box);
       expect(nav.push).not.toHaveBeenCalled();
       expect(lessons.createLesson).not.toHaveBeenCalled();
     });
 
-    it('Given only phrases pasted, When Play now is tapped, Then it says phrases cannot go on the board, offers no pack and nothing launches', () => {
+    it('Given only phrases pasted, When Play now is tapped, Then it says phrases cannot go on the board, offers no pack and nothing launches', async () => {
       render(<ClassSetupInvite classroomId="c1" packKey={enPack.nameKey} lessonId="L-pack" />);
       const box = screen.getByTestId('first-game-words');
       fireEvent.change(box, { target: { value: 'rely on\nlook up' } });
@@ -286,6 +287,7 @@ describe('ClassSetupInvite', () => {
       expect(screen.getByTestId('first-game-skipped')).toHaveTextContent('eduShell.setup.words.skipped:{"count":2}');
       fireEvent.click(screen.getByTestId('setup-play-now'));
       expect(screen.getByRole('alert')).toHaveTextContent('eduShell.setup.words.phrasesOnly');
+      act(() => (vi.mocked(requestAnimationFrame).mock.calls.at(-1)![0] as FrameRequestCallback)(0));
       expect(document.activeElement).toBe(box);
       expect(nav.push).not.toHaveBeenCalled();
       expect(lessons.createLesson).not.toHaveBeenCalled();

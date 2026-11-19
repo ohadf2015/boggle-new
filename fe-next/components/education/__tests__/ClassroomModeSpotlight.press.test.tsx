@@ -35,8 +35,8 @@ describe('<ClassroomModeSpotlight> press and swap motion', () => {
     expect(text.getAttribute('style') ?? '').not.toMatch(/opacity|blur/);
   });
 
-  it('Given the art, When rendered, Then it fills the spare panel height on the two-column lobby', () => {
+  it('Given the art, When rendered, Then it fills the spare panel height', () => {
     setup();
-    expect(screen.getByTestId('spotlight-art').className).toContain('@4xl/lobby:flex-1');
+    expect(screen.getByTestId('spotlight-art').className).toContain('flex-1');
   });
 });

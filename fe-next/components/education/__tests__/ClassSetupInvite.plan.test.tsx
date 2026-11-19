@@ -57,11 +57,8 @@ const openCalendar = async () => fireEvent.click(await screen.findByTestId('setu
 
 function render(ui: Parameters<typeof rtlRender>[0]) {
   const result = rtlRender(ui);
-  const withStudents = screen.queryByTestId('setup-together-now') as HTMLButtonElement | null;
-  if (withStudents && !withStudents.disabled) {
-    fireEvent.click(withStudents);
-    fireEvent.click(screen.getByTestId('setup-start-anyway'));
-  }
+  const alone = screen.queryByTestId('setup-together-later') as HTMLButtonElement | null;
+  if (alone && !alone.disabled) fireEvent.click(alone);
   return result;
 }
 
@@ -84,14 +81,15 @@ describe('ClassSetupInvite: what next with no students yet', () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it('Given a class with no students, Then the lesson reminder asks when the next lesson with this class is, after the code, the actions and the rehearse door', async () => {
+  it('Given a teacher preparing alone, Then the lesson reminder leads, asks when the next lesson with this class is, and the private try and the way home follow it', async () => {
     render(<ClassSetupInvite classroomId="c1" />);
     const prompt = await screen.findByTestId('lesson-plan');
     expect(prompt).toHaveTextContent(`${LP}.setupTitle`);
     expect(prompt).not.toHaveTextContent(`${LP}.title`);
-    expect(follows(screen.getByTestId('setup-actions'), prompt)).toBe(true);
-    expect(follows(screen.getByTestId('rehearse'), prompt)).toBe(true);
-    expect(follows(screen.getByText('eduShell.setup.backHome'), prompt)).toBe(true);
+    expect(screen.getByTestId('setup-plan-lead')).toContainElement(prompt);
+    expect(screen.queryByTestId('setup-play-now')).toBeNull();
+    expect(follows(prompt, screen.getByTestId('rehearse'))).toBe(true);
+    expect(follows(prompt, screen.getByText('eduShell.setup.backHome'))).toBe(true);
     await waitFor(() => expect(track).toHaveBeenCalledWith('lesson_plan_prompt_shown', { source: 'class_setup' }));
   });
 
