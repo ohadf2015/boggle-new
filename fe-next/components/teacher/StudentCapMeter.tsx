@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
+import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { hasProAccess, isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMilestone';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -67,7 +67,9 @@ export function StudentCapMeter({
   if (pro.loading || hasPro) return null;
 
   const ctaClass = 'inline-flex min-h-11 items-center text-start font-neo-body text-sm font-bold text-neo-cream underline decoration-2 underline-offset-4 hover:text-neo-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream';
-  const ctaLabel = t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports');
+  const ctaLabel = atCap
+    ? t('academy.classes.proCta', 'Get Pro: {{price}}/mo', { price: `$${TEACHER_PRO_PRICE_USD}` })
+    : t('academy.classes.proUnlocks', 'Pro adds class analytics + printable reports');
 
   return (
     <div

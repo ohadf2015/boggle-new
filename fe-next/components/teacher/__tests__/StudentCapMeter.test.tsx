@@ -149,6 +149,13 @@ describe('StudentCapMeter', () => {
     expect(cta.className).toMatch(/underline/);
   });
 
+  it('at the cap, labels the button with the plan ask that matches the student-limit sheet it opens', () => {
+    render(<StudentCapMeter studentCount={FREE_TIER_LIMITS.studentsPerClass} />);
+    const cta = screen.getByTestId('student-cap-upgrade-cta');
+    expect(cta).toHaveTextContent('academy.classes.proCta');
+    expect(cta).not.toHaveTextContent('academy.classes.proUnlocks');
+  });
+
   it('is one plain line: no panel, no fill, no badge', () => {
     const { container } = render(<StudentCapMeter studentCount={3} />);
     const meter = screen.getByTestId('student-cap-meter');
