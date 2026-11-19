@@ -49,7 +49,7 @@ vi.mock('../lobby/useClassroomLaunchSocket', () => ({
 }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import { gameTile } from '../lobby/__tests__/lobbyGamesFold';
+import { gameOptions, gameTile } from '../lobby/__tests__/lobbyGamesFold';
 
 describe('ClassroomGameLobby — launching from the catalogue', () => {
   beforeEach(() => {
@@ -104,7 +104,7 @@ describe('ClassroomGameLobby — launching from the catalogue', () => {
   it('hides the treasure-chest switch for Boss Battle, which never deals chests', () => {
     render(<ClassroomGameLobby onBack={vi.fn()} />);
     fireEvent.click(gameTile('vocab-quiz'));
-    fireEvent.click(screen.getByTestId('lobby-setup-summary'));
+    fireEvent.click(gameOptions());
     expect(screen.getByText('vocabQuiz.setup.treasureChests')).toBeInTheDocument();
     fireEvent.click(gameTile('boss-battle'));
     expect(screen.queryByText('vocabQuiz.setup.treasureChests')).not.toBeInTheDocument();

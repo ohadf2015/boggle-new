@@ -34,7 +34,6 @@ describe('ClassroomLobbyShell — the launch stage', () => {
   it('sizes its columns from its own width, so a preview frame or the TV zoom lays out like the page', () => {
     render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('classroom-lobby-shell').className).toContain('@container/lobby');
-    expect(screen.getByTestId('lobby-columns').className).toContain('@4xl/lobby:grid');
     expect(screen.getByTestId('lobby-columns').className).not.toMatch(/(^|\s)lg:/);
   });
 
@@ -42,6 +41,14 @@ describe('ClassroomLobbyShell — the launch stage', () => {
     render(<ClassroomLobbyShell pinned={<div />}>body</ClassroomLobbyShell>);
     expect(screen.getByTestId('classroom-lobby-shell').className).toContain('overflow-hidden');
     expect(screen.getByTestId('lobby-scroll').className).toContain('overflow-y-auto');
+  });
+
+  it('Given the fold is closed, Then the ready panel takes the height; once anything in the scroller expands, the scroller takes it instead', () => {
+    render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
+    expect(screen.getByTestId('classroom-lobby-shell').className).toContain('group/lobby');
+    expect(screen.getByTestId('lobby-aside').className).toContain('flex-1');
+    expect(screen.getByTestId('lobby-aside').className).toContain('group-has-[[data-lobby-expanded]]/lobby:flex-none');
+    expect(screen.getByTestId('lobby-scroll').className).toContain('group-has-[[data-lobby-expanded]]/lobby:flex-1');
   });
 
   it('puts the ready panel beside the one scroller, outside it, and never scrolls it', () => {

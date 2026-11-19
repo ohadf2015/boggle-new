@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { BookOpen, ChevronDown, TriangleAlert } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -19,10 +19,14 @@ export interface LobbyLessonStepProps {
   boardLanguage?: string | null;
   activePreset: ClassroomPresetId | null;
   className?: string;
+  /** Named first on the line, so the teacher sees which class is about to play. */
+  classroomName?: string;
+  /** The class picker, shown in the opened line (it renders nothing for one class). */
+  classPicker?: ReactNode;
 }
 
-/** The word list: one confirm-at-a-glance row, with the picker one tap away and open when nothing is chosen. */
-export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLanguage, createHref, wordCount, boardLanguage, activePreset, className }: LobbyLessonStepProps) {
+/** The class and its word list: one confirm-at-a-glance line, with the pickers one tap away and open when nothing is chosen. */
+export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLanguage, createHref, wordCount, boardLanguage, activePreset, className, classroomName, classPicker }: LobbyLessonStepProps) {
   const { t } = useLanguage();
   const [opened, setOpened] = useState(false);
   const missing = selectedLessonIds.length === 0 || wordCount === 0;
@@ -30,7 +34,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
   const names = lessons.filter((l) => selectedLessonIds.includes(l.id)).map((l) => l.name).join(', ');
 
   return (
-    <section data-testid="lobby-lesson-step" className={cn('flex flex-col gap-3', className)}>
+    <section data-testid="lobby-lesson-step" data-lobby-expanded={open || undefined} className={cn('flex flex-col gap-3', className)}>
       <button
         type="button"
         data-testid="lobby-lesson-toggle"
@@ -38,7 +42,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
         disabled={missing}
         onClick={() => setOpened((v) => !v)}
         className={cn(
-          'flex min-h-11 w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 px-3 py-1.5 text-start font-neo-body text-sm font-bold transition-colors',
+          'flex min-h-12 w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 px-3 py-1.5 text-start font-neo-body text-sm font-bold transition-colors',
           'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           missing
             ? 'border-neo-pink bg-neo-navy-light text-neo-white'
@@ -56,7 +60,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
           className="min-w-0 flex-[1_1_auto]"
           dir="auto"
         >
-          {missing ? t('education.modePicker.needsLesson') : names}
+          {missing ? t('education.modePicker.needsLesson') : classroomName ? `${classroomName} · ${names}` : names}
         </span>
         {!missing && (
           <span className="shrink-0 font-normal text-neo-cream/70">{t('education.classroomGame.words', { count: wordCount })}</span>
@@ -66,14 +70,15 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
         )}
         {!missing && (
           <span className="inline-flex shrink-0 items-center gap-1 rounded-neo border-2 border-neo-cream/50 px-2.5 py-1 font-neo-body text-xs font-bold text-neo-cream">
-            {t(open ? 'eduShell.host.listDone' : 'eduShell.host.changeList')}
+            {t(open ? 'eduShell.host.listDone' : classPicker ? 'eduShell.host.gameOptionsChange' : 'eduShell.host.changeList')}
             <ChevronDown className={cn('size-3.5 transition-transform duration-200 motion-reduce:transition-none', open && 'rotate-180')} strokeWidth={3} aria-hidden="true" />
           </span>
         )}
       </button>
 
       {open && (
-        <div data-testid="lobby-lesson-body" className="rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3">
+        <div data-testid="lobby-lesson-body" className="flex flex-col gap-3 rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light p-3">
+          {classPicker}
           <LessonPicker
             mode="multi"
             lessons={lessons}

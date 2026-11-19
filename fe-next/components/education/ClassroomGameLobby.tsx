@@ -305,11 +305,7 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
 
   return (
     <ClassroomLobbyShell
-      pinned={
-        quickView ? null : (
-          <LobbyClassPicker classrooms={classrooms} selectedId={selectedClassroomId} onSelect={setSelectedClassroomId} label={t('eduShell.host.classLabel')} />
-        )
-      }
+      pinned={null}
       aside={
         <>
           <ClassroomModeCatalogue
@@ -345,7 +341,10 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
           lessons={selectedLessons}
           wordCount={allPlayableWords.length}
           boardLanguage={lessonLanguage}
-          onMoreOptions={() => setShowQuick(false)}
+          onMoreOptions={() => {
+            setShowQuick(false);
+            setGamesOpen(true);
+          }}
         />
       ) : (
         <LobbyHostSetup
@@ -361,6 +360,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
               wordCount={allPlayableWords.length}
               boardLanguage={lessonLanguage}
               activePreset={opts.activePreset}
+              classroomName={classroom?.name}
+              classPicker={<LobbyClassPicker classrooms={classrooms} selectedId={selectedClassroomId} onSelect={setSelectedClassroomId} label={t('eduShell.host.classLabel')} />}
             />
             </div>
           }

@@ -26,6 +26,7 @@ export interface ClassroomModeSpotlightProps {
 
 const CHIP =
   'inline-flex min-w-0 items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/35 px-2 py-0.5 font-neo-body text-xs font-bold text-neo-cream/80 @4xl/lobby:text-sm';
+const EXPANDED_HIDE = 'group-has-[[data-lobby-expanded]]/lobby:hidden';
 
 function Spec({ testId, icon: Icon, label, value, className }: { testId: string; icon: typeof Clock; label: string; value: string; className?: string }) {
   return (
@@ -38,144 +39,125 @@ function Spec({ testId, icon: Icon, label, value, className }: { testId: string;
 }
 
 /**
- * The ready panel: what is about to go live, and the one GO LIVE.
- * Phones get a dock (thumb, name, minutes, button) under the picker; from lg it is
- * a column with the mode's cover, a short description and the steps when there is room.
+ * The ready panel: the game about to go live, big, and the one Start.
+ * Cover art beside the name from a wide lobby, above it on a phone; specs and steps wait behind How it plays.
+ * While the setup above it is expanded, the panel shrinks to the name and Start.
  */
 export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blockedKey, onGoLive, t }: ClassroomModeSpotlightProps) {
   const [stepsOpen, setStepsOpen] = useState(false);
   const reduced = useReducedMotionSafe();
   const name = t(keys.name);
+  const minutesLabel = t('education.modePicker.minutes', { count: minutes });
   return (
     <section
       data-testid="mode-spotlight"
       dir={dir}
       aria-live="polite"
-      className="flex flex-col gap-2 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-2.5 shadow-hard @4xl/lobby:h-full @4xl/lobby:gap-3 @4xl/lobby:p-4"
+      className="flex min-h-0 flex-1 flex-col gap-3 rounded-neo-xl border-[3px] border-neo-cream/40 bg-neo-navy-light p-3 shadow-hard-xl @4xl/lobby:flex-row @4xl/lobby:gap-8 @4xl/lobby:p-6 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:p-4"
     >
-      {/* In the two-column lobby the middle is a size container: art, best-for and steps step aside by the panel height, which stays true under the TV zoom. */}
-      <div className="flex min-w-0 flex-col gap-2 @4xl/lobby:min-h-0 @4xl/lobby:flex-1 @4xl/lobby:gap-3 @4xl/lobby:overflow-hidden @4xl/lobby:[container-type:size]">
-        <div
-          data-testid="spotlight-art"
-          data-accent-decor
-          className={cn('hidden rounded-neo border-2 border-neo-black p-3 @4xl/lobby:block @4xl/lobby:min-h-[8rem] @4xl/lobby:flex-1 [@container(max-height:419px)]:hidden', ARCADE_BLOCK[modeArcadeAccent(mode.id)])}
-        >
-          <m.img
-            key={mode.id}
-            src={mode.cover}
-            alt=""
-            aria-hidden="true"
-            initial={reduced ? false : { scale: 0.92, rotate: -4 }}
-            animate={{ scale: 1, rotate: -1 }}
-            transition={reduced ? { duration: 0 } : EDU_MOTION.spring.pop}
-            className="aspect-[16/9] max-h-full w-full rounded-neo border-2 border-neo-black object-cover object-[50%_28%] shadow-hard @4xl/lobby:aspect-auto @4xl/lobby:h-full [@container(max-height:519px)]:aspect-[5/2]"
-          />
-        </div>
+      <div
+        data-testid="spotlight-art"
+        data-accent-decor
+        className={cn('relative min-h-24 flex-1 overflow-hidden rounded-neo-lg border-2 border-neo-black', ARCADE_BLOCK[modeArcadeAccent(mode.id)], EXPANDED_HIDE)}
+      >
+        <m.img
+          key={mode.id}
+          src={mode.cover}
+          alt=""
+          aria-hidden="true"
+          initial={reduced ? false : { scale: 0.92, rotate: -4 }}
+          animate={{ scale: 1, rotate: -1 }}
+          transition={reduced ? { duration: 0 } : EDU_MOTION.spring.pop}
+          className="absolute inset-2 size-[calc(100%-1rem)] object-contain @4xl/lobby:inset-4 @4xl/lobby:size-[calc(100%-2rem)]"
+        />
+      </div>
 
+      <div className="flex min-h-0 shrink-0 flex-col gap-3 @4xl/lobby:w-[46%] @4xl/lobby:justify-center group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:w-full group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:flex-row group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:items-center">
         <m.div
           key={mode.id}
           data-testid="spotlight-text"
           initial={reduced ? false : { y: EDU_MOTION.reveal.y }}
           animate={{ y: 0 }}
           transition={reduced ? { duration: 0 } : EDU_MOTION.spring.settle}
-          className="flex min-w-0 shrink-0 items-center gap-2.5 text-start @4xl/lobby:flex-col @4xl/lobby:items-stretch @4xl/lobby:gap-2"
+          className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-y-auto text-start @4xl/lobby:gap-2.5 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:flex-1"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static poster cover */}
-          <img
-            src={mode.cover}
-            alt=""
-            aria-hidden="true"
-            className="size-11 shrink-0 rounded-neo border border-neo-cream/35 object-cover object-[50%_28%] @4xl/lobby:hidden"
-          />
-          <div className="flex min-w-0 flex-1 flex-col gap-1 @4xl/lobby:gap-2">
-            <span data-testid="spotlight-category" className="hidden font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 @4xl/lobby:block">{t(keys.category)}</span>
-            <h2 className="font-neo-display text-lg font-bold leading-tight text-neo-cream @4xl/lobby:text-3xl">{name}</h2>
-            <p data-testid="spotlight-how" className="hidden font-neo-body text-sm leading-snug text-neo-cream/80 @4xl/lobby:block @4xl/lobby:text-base">
-              <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
-            </p>
-            <div className="flex min-w-0 flex-wrap gap-1.5">
-              <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={t('education.modePicker.minutes', { count: minutes })} />
-              <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} className="hidden @4xl/lobby:inline-flex" />
-              <Spec testId="spec-style" icon={Gamepad2} label={t('eg2Modes.spec.style')} value={t(keys.style)} className="hidden @4xl/lobby:inline-flex" />
-            </div>
-          </div>
+          <span data-testid="spotlight-category" className={cn('font-neo-body text-xs font-black uppercase tracking-[0.08em] text-neo-cream/60 @4xl/lobby:text-sm', EXPANDED_HIDE)}>{t(keys.category)}</span>
+          <h2 className="font-neo-display text-2xl font-bold leading-tight text-neo-cream @4xl/lobby:text-5xl">{name}</h2>
+          <p data-testid="spotlight-how" className={cn('font-neo-body text-sm leading-snug text-neo-cream/80 @4xl/lobby:text-lg', EXPANDED_HIDE)}>
+            <span className="line-clamp-2 @4xl/lobby:line-clamp-none">{t(keys.how)}</span>
+          </p>
           <button
             type="button"
             data-testid="how-it-plays-toggle"
             aria-expanded={stepsOpen}
-            aria-label={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
+            aria-controls="how-it-plays"
             title={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             onClick={() => setStepsOpen((v) => !v)}
-            className="grid size-11 shrink-0 place-items-center self-center rounded-neo border-2 border-neo-cream/35 text-neo-cream transition-colors duration-150 hover:border-neo-cream/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream @4xl/lobby:hidden"
+            className={cn('inline-flex min-h-11 items-center gap-1 self-start rounded-neo px-1 font-neo-body text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream', EXPANDED_HIDE)}
           >
-            {stepsOpen ? <ChevronUp className="size-5" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-5" strokeWidth={3} aria-hidden="true" />}
+            {t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
+            {stepsOpen ? <ChevronUp className="size-4" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-4" strokeWidth={3} aria-hidden="true" />}
           </button>
+          {stepsOpen ? (
+            <div id="how-it-plays-details" className={cn('flex flex-col gap-2.5', EXPANDED_HIDE)}>
+              <div className="flex min-w-0 flex-wrap gap-1.5">
+                <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={minutesLabel} />
+                <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} />
+                <Spec testId="spec-style" icon={Gamepad2} label={t('eg2Modes.spec.style')} value={t(keys.style)} />
+              </div>
+              <div data-testid="spotlight-best-for" className="flex flex-wrap items-center gap-1.5">
+                <span className="font-neo-body text-sm font-bold text-neo-cream/60">{t('eg2Modes.bestForLabel')}</span>
+                {keys.bestFor.map((k) => (
+                  <span key={k} data-testid="best-for-chip" className={CHIP}>
+                    {t(k)}
+                  </span>
+                ))}
+              </div>
+              <ol id="how-it-plays" data-testid="how-it-plays" aria-label={t('eg2Modes.howItPlays')} className="grid gap-1.5 text-start">
+                {keys.steps.map((k, i) => (
+                  <li key={k} className="flex items-start gap-2 font-neo-body text-sm leading-snug text-neo-cream/90">
+                    <StepNumber n={i + 1} />
+                    {t(k)}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ) : null}
         </m.div>
 
-        <div data-testid="spotlight-best-for" className="hidden shrink-0 flex-wrap items-center gap-1.5 @4xl/lobby:flex [@container(max-height:519px)]:hidden">
-          <span className="font-neo-body text-sm font-bold text-neo-cream/60">{t('eg2Modes.bestForLabel')}</span>
-          {keys.bestFor.map((k) => (
-            <span key={k} data-testid="best-for-chip" className={CHIP}>
-              {t(k)}
-            </span>
-          ))}
-        </div>
-
-        {stepsOpen && (
-          <ol data-testid="how-it-plays" className="grid gap-1.5 @4xl/lobby:hidden">
-            {keys.steps.map((k, i) => (
-              <li key={k} className="flex items-start gap-2 font-neo-body text-xs font-bold leading-snug text-neo-cream/90">
-                <StepNumber n={i + 1} />
-                {t(k)}
-              </li>
-            ))}
-          </ol>
-        )}
-
-        <ol
-          data-testid="how-it-plays-inline"
-          aria-label={t('eg2Modes.howItPlays')}
-          className="hidden shrink-0 flex-col gap-2 text-start @4xl/lobby:flex [@container(max-height:559px)]:hidden"
-        >
-          {keys.steps.map((k, i) => (
-            <li key={k} className="flex items-start gap-2.5 font-neo-body text-sm leading-snug text-neo-cream/85">
-              <StepNumber n={i + 1} />
-              {t(k)}
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <div className="flex shrink-0 flex-col gap-1.5">
-        {blockedKey && (
-          <p data-testid="go-live-blocked" role="status" className="text-center font-neo-body text-xs font-bold text-neo-cream/80 @4xl/lobby:text-sm">
-            {t(blockedKey)}
-          </p>
-        )}
-        <m.button
-          type="button"
-          data-testid="lobby-go-live"
-          aria-label={t('education.modePicker.launch', { mode: name })}
-          onClick={onGoLive}
-          disabled={!!blockedKey || busy}
-          {...(blockedKey || busy ? {} : pressMotion(reduced))}
-          className={cn(
-            'mb-1 flex min-h-14 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black px-4 py-1.5 @4xl/lobby:min-h-16',
-            'bg-neo-lime font-neo-display text-neo-black',
-            pressClasses(4),
-            'disabled:cursor-not-allowed disabled:border-neo-cream/20 disabled:bg-neo-navy-light disabled:text-neo-cream/70',
+        <div className="flex shrink-0 flex-col gap-1.5 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:w-[24rem]">
+          {blockedKey && (
+            <p data-testid="go-live-blocked" role="status" className="text-center font-neo-body text-sm font-bold text-neo-cream/80">
+              {t(blockedKey)}
+            </p>
           )}
-        >
-          <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full border-2 border-neo-cream/40 bg-neo-black/10 @4xl/lobby:size-10">
-            <Play className={cn('size-5 shrink-0 fill-current', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
-          </span>
-          <span className="flex min-w-0 flex-col items-start leading-tight">
-            <span data-testid="go-live-label" className="whitespace-nowrap text-xl font-black tracking-[0.01em] @4xl/lobby:text-2xl">
-              {t('eduShell.home.startLive')}
+          <m.button
+            type="button"
+            data-testid="lobby-go-live"
+            aria-label={t('education.modePicker.launch', { mode: name })}
+            onClick={onGoLive}
+            disabled={!!blockedKey || busy}
+            {...(blockedKey || busy ? {} : pressMotion(reduced))}
+            className={cn(
+              'mb-1 flex min-h-[72px] w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black px-4 py-2 @4xl/lobby:min-h-[88px]',
+              'bg-neo-lime font-neo-display text-neo-black',
+              pressClasses(4),
+              'disabled:cursor-not-allowed disabled:border-neo-cream/20 disabled:bg-neo-navy-light disabled:text-neo-cream/70',
+            )}
+          >
+            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full border-2 border-neo-cream/40 bg-neo-black/10 @4xl/lobby:size-12">
+              <Play className={cn('size-5 shrink-0 fill-current @4xl/lobby:size-6', !reduced && !blockedKey && 'animate-pulse')} strokeWidth={3} />
             </span>
-            <span className="font-neo-body text-xs font-bold opacity-80 @4xl/lobby:text-sm">{name}</span>
-          </span>
-        </m.button>
+            <span className="flex min-w-0 flex-col items-start leading-tight">
+              <span data-testid="go-live-label" className="whitespace-nowrap text-2xl font-black tracking-[0.01em] @4xl/lobby:text-3xl">
+                {t('eduShell.home.startLive')}
+              </span>
+              <span className="font-neo-body text-sm font-bold opacity-80">
+                {name} · {minutesLabel}
+              </span>
+            </span>
+          </m.button>
+        </div>
       </div>
     </section>
   );
@@ -183,7 +165,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
 
 function StepNumber({ n }: { n: number }) {
   return (
-    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-neo-cream/40 font-neo-body text-xs font-bold text-neo-cream @4xl/lobby:size-6 @4xl/lobby:text-xs">
+    <span className="grid size-5 shrink-0 place-items-center rounded-full border border-neo-cream/40 font-neo-body text-xs font-bold text-neo-cream @4xl/lobby:size-6">
       {n}
     </span>
   );

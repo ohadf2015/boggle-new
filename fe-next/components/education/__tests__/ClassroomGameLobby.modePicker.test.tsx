@@ -53,7 +53,7 @@ vi.mock('@/utils/supabase/client', () => ({
 }));
 
 import { ClassroomGameLobby } from '../ClassroomGameLobby';
-import { gameTile, modeGrid } from '../lobby/__tests__/lobbyGamesFold';
+import { gameOptions, gameTile, modeGrid } from '../lobby/__tests__/lobbyGamesFold';
 
 const socketHandlers: Record<string, (data?: unknown) => void> = {};
 const mockSocket = {
@@ -165,7 +165,7 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
     fireEvent.click(gameTile('word-hunt'));
     // Open the fine-tuning; Word Hunt's target picker is a control only that
     // mode has, and it must be there under a picker still on screen.
-    fireEvent.click(screen.getByTestId('lobby-setup-summary'));
+    fireEvent.click(gameOptions());
 
     expect(screen.getByTestId('lobby-go-live-panel')).toBeInTheDocument();
     expect(gameTile('word-hunt')).toHaveAttribute('data-selected', 'true');
@@ -239,8 +239,8 @@ describe('ClassroomGameLobby — the picker is the first thing and the launch bu
   it('GIVEN a tall spotlight (Boss Battle on a laptop) WHEN the lobby lays out THEN GO LIVE and the poster sit in the ready panel; the mode grid and options share the one scroller', async () => {
     await renderLobby('lesson-defs');
     const scroller = screen.getByTestId('lobby-scroll');
+    expect(scroller).toContainElement(gameOptions());
     expect(scroller).toContainElement(modeGrid());
-    expect(scroller).toContainElement(screen.getByTestId('lobby-setup-summary'));
     expect(scroller).not.toContainElement(screen.getByTestId('lobby-go-live'));
   });
 

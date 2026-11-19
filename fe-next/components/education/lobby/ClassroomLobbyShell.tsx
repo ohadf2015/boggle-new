@@ -1,6 +1,7 @@
 /**
  * The lobby's frame: the shell locks and exactly one region scrolls (`<body>` is `.screen-fit` app-wide).
- * Columns follow the shell's own width (`@container/lobby`), so a preview frame or the TV zoom lays out right.
+ * One column: a short setup line on top, the ready panel filling the rest. Anything in the scroller that
+ * marks itself `data-lobby-expanded` flips that: the scroller takes the height and the panel shrinks to its Start.
  */
 
 'use client';
@@ -21,7 +22,7 @@ export interface ClassroomLobbyShellProps {
    * nothing to put here — one whole bar of height given back to the picker.
    */
   footer?: ReactNode;
-  /** The ready panel: a side column from lg, a dock under the scroller on phones. Never scrolls, never hides. */
+  /** The ready panel under the scroller. Never scrolls, never hides. */
   aside?: ReactNode;
   className?: string;
 }
@@ -32,9 +33,9 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
     <div
       data-testid="classroom-lobby-shell"
       dir={dir}
-      className={cn('@container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy', className)}
+      className={cn('group/lobby @container/lobby relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-neo-navy', className)}
     >
-      <div className="mx-auto flex w-full max-w-[1400px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
+      <div className="mx-auto flex w-full max-w-[1200px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
         {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
         <header className="flex shrink-0 justify-center text-center @4xl/lobby:justify-start @4xl/lobby:text-start">
           <h1 data-testid="lobby-stage-title" className="sr-only">
@@ -48,21 +49,25 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
           </p>
         </header>
 
-        <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:grid @4xl/lobby:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] @4xl/lobby:gap-5">
-          <div className="flex min-h-0 flex-1 flex-col gap-2 @4xl/lobby:gap-3">
-            <div data-testid="lobby-pinned" className="shrink-0 empty:hidden">
-              {pinned}
-            </div>
-            <div
-              data-testid="lobby-scroll"
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-0.5 pb-2 [container:lobby-fill/size]"
-            >
-              {children}
-            </div>
+        <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-3">
+          <div data-testid="lobby-pinned" className="shrink-0 empty:hidden">
+            {pinned}
+          </div>
+          <div
+            data-testid="lobby-scroll"
+            className={cn(
+              'min-h-0 overflow-y-auto overscroll-contain px-0.5 pb-1',
+              aside ? 'flex-[0_1_auto] group-has-[[data-lobby-expanded]]/lobby:flex-1 group-has-[[data-lobby-expanded]]/lobby:[container:lobby-fill/size]' : 'flex-1 [container:lobby-fill/size]',
+            )}
+          >
+            {children}
           </div>
 
           {aside ? (
-            <div data-testid="lobby-aside" className="shrink-0 @4xl/lobby:flex @4xl/lobby:min-h-0 @4xl/lobby:flex-col">
+            <div
+              data-testid="lobby-aside"
+              className="flex min-h-0 flex-1 flex-col group-has-[[data-lobby-expanded]]/lobby:flex-none [&>*:first-child]:min-h-0 [&>*:first-child]:flex-1"
+            >
               {aside}
             </div>
           ) : null}

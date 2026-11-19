@@ -44,11 +44,14 @@ describe('<ClassroomModeCatalogue>', () => {
     expect(within(finish).getByTestId('mode-tile-vocab-quiz')).toBeInTheDocument();
   });
 
-  it('spotlights the selected mode: name, mechanic, duration, complexity, style and best-for', () => {
+  it('spotlights the selected mode: name, mechanic and minutes up front; complexity, style and best-for one tap away', () => {
     setup({ selected: 'classic', minutes: 5 });
     const spot = screen.getByTestId('mode-spotlight');
     expect(spot).toHaveTextContent('teacher.classroom.gameModes.classic');
     expect(spot).toHaveTextContent('education.modePicker.how.classic');
+    expect(screen.getByTestId('lobby-go-live')).toHaveTextContent('education.modePicker.minutes|{"count":5}');
+    expect(screen.queryByTestId('spec-complexity')).toBeNull();
+    fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     expect(within(spot).getByTestId('spec-duration')).toHaveTextContent('education.modePicker.minutes|{"count":5}');
     expect(within(spot).getByTestId('spec-complexity')).toHaveTextContent('eg2Modes.complexity.');
     expect(within(spot).getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.ffa');
@@ -57,23 +60,18 @@ describe('<ClassroomModeCatalogue>', () => {
 
   it('says Teams in the style chip when the teacher set teams on a team-capable mode', () => {
     setup({ selected: 'classic', playStyle: 'teams' });
+    fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     expect(screen.getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.teams');
   });
 
-  it('lays the three steps out on the wide screen without a tap', () => {
-    setup({ selected: 'blast' });
-    const inline = within(screen.getByTestId('how-it-plays-inline')).getAllByRole('listitem');
-    expect(inline.map((li) => li.textContent)).toEqual([1, 2, 3].map((n) => `${n}eg2Modes.steps.blast.${n}`));
-  });
-
-  it('shows the selected mode cover and can open the three-step how-it-plays on a phone', () => {
+  it('shows the selected mode cover and opens the three numbered steps behind How it plays', () => {
     setup({ selected: 'blast' });
     expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('blast')!.cover);
     expect(screen.queryByTestId('how-it-plays')).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     const steps = within(screen.getByTestId('how-it-plays')).getAllByRole('listitem');
     expect(steps).toHaveLength(3);
-    expect(steps[0]).toHaveTextContent('eg2Modes.steps.blast.1');
+    expect(steps.map((li) => li.textContent)).toEqual([1, 2, 3].map((n) => `${n}eg2Modes.steps.blast.${n}`));
   });
 
   it('selects on a card tap and never launches from it', () => {
@@ -121,6 +119,7 @@ describe('<ClassroomModeCatalogue>', () => {
     setup({ selected: 'boss-battle' });
     expect(screen.getByTestId('mode-spotlight')).toHaveTextContent('eg2Modes.boss.name');
     expect(screen.getByTestId('spotlight-art').querySelector('img')?.getAttribute('src')).toBe(catalogueEntry('boss-battle')!.cover);
+    fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
     expect(screen.getByTestId('spec-style')).toHaveTextContent('eg2Modes.style.class');
   });
 

@@ -15,7 +15,8 @@ import { FirstGameWords, PlayNowButton } from '@/components/teacher/setup/FirstG
 import { readPasted } from '@/components/teacher/setup/firstGameLaunch';
 import { packsForLanguage } from '@/components/teacher/setup/starterPackPick';
 import { ClassSetupInvitePlan } from '@/components/education/ClassSetupInvitePlan';
-import { NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_LINK, NB_PRIMARY } from '@/components/teacher/nb/nbStyles';
+import { cn } from '@/lib/utils';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -43,7 +44,6 @@ export default function ClassReadyPreview() {
           roster={{ students, arrivals: [], loading: false }}
           joinUrl={origin ? classroomJoinUrl(origin, language, CLASSROOM.join_code) : ''}
           displayHost={origin ? `${joinAddressForDisplay(origin)}/${language}/join` : ''}
-          startHref="#"
           homeHref={`/${language}/teacher`}
           reduced={false}
           onShare={() => toast('Preview: share')}
@@ -71,7 +71,8 @@ export default function ClassReadyPreview() {
               t={t}
             />
           }
-          rehearse={<button type="button" onClick={() => toast('Preview: bots')} className={NB_PRIMARY}>{t('eduShell.home.practice.cta')}</button>}
+          rehearse={<button type="button" onClick={() => toast('Preview: bots')} className={NB_LINK}>{t('eduShell.home.practice.cta')}</button>}
+          tryAsStudent={<button type="button" onClick={() => toast('Preview: bots')} className={cn(NB_PRIMARY, NB_BLOCK.pink, 'min-h-[64px] w-full text-xl')}>{t('eduShell.home.practice.cta')}</button>}
           play={<PlayNowButton onClick={() => toast('Preview: play now')} t={t} />}
           t={t}
         />

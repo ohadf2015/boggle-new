@@ -4,7 +4,7 @@
  */
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ClassroomModeSpotlight } from '../ClassroomModeSpotlight';
 import { catalogueEntry, catalogueKeys } from '../ClassroomModeCatalogueData';
@@ -28,11 +28,11 @@ function setup(dir?: 'rtl' | 'ltr') {
 }
 
 describe('<ClassroomModeSpotlight> ready panel', () => {
-  it('Given the art, When rendered, Then it is the mode cover on desktop only: no fake UI preview, no floating mascot', () => {
+  it('Given the art, When rendered, Then it is the mode cover on every screen, steps aside while the lobby is expanded, with no fake UI preview or floating mascot', () => {
     setup();
     const art = screen.getByTestId('spotlight-art');
-    expect(art.className).toMatch(/(^|\s)hidden(\s|$)/);
-    expect(art.className).toContain('@4xl/lobby:block');
+    expect(art.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+    expect(art.className).toContain('group-has-[[data-lobby-expanded]]/lobby:hidden');
     expect(within(art).getByRole('presentation', { hidden: true }).getAttribute('src')).toBe(catalogueEntry('vocab-quiz')!.cover);
     expect(screen.queryByTestId('mode-preview')).toBeNull();
     expect(screen.getByTestId('mode-spotlight').innerHTML).not.toMatch(/animate-avatar-float/);
@@ -44,10 +44,13 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(title.className).not.toMatch(/uppercase|truncate/);
   });
 
-  it('Given the specs, best-for and steps, When rendered, Then they are neutral outlines, no accent fills', () => {
+  it('Given the first frame, Then no chip row competes with Start: specs, best-for and steps wait behind How it plays, as neutral outlines', () => {
     setup();
-    const text = screen.getByTestId('spotlight-text');
-    for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) expect(within(text).getByTestId(id)).toBeInTheDocument();
+    expect(screen.queryByTestId('spec-complexity')).toBeNull();
+    expect(screen.queryByTestId('spotlight-best-for')).toBeNull();
+    fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
+    for (const id of ['spec-duration', 'spec-complexity', 'spec-style']) expect(screen.getByTestId(id)).toBeInTheDocument();
+    expect(screen.getAllByTestId('best-for-chip').length).toBeGreaterThan(0);
     const html = screen.getByTestId('mode-spotlight').innerHTML;
     expect(html.match(/(?<![\w:-])bg-neo-lime(?![\w/-])/g)).toHaveLength(1);
     const decor = [...screen.getByTestId('mode-spotlight').querySelectorAll('[data-accent-decor]')];
@@ -55,40 +58,40 @@ describe('<ClassroomModeSpotlight> ready panel', () => {
     expect(html.replace(decor[0].outerHTML, '')).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
   });
 
-  it('Given the start button, When rendered, Then it is the last control and says "Start a game" on one line with the mode under it', () => {
+  it('Given the start button, When rendered, Then it is the last control, huge, and says "Start a game" on one line with the mode and minutes under it', () => {
     setup();
     const buttons = within(screen.getByTestId('mode-spotlight')).getAllByRole('button');
     const go = buttons[buttons.length - 1];
     expect(go).toHaveAttribute('data-testid', 'lobby-go-live');
     expect(go).toHaveAttribute('aria-label', 'education.modePicker.launch');
+    expect(go.className).toContain('min-h-[72px]');
     const label = within(go).getByTestId('go-live-label');
     expect(label).toHaveTextContent('eduShell.home.startLive');
     expect(label.className).toContain('whitespace-nowrap');
     expect(go.innerHTML).not.toMatch(/truncate|uppercase/);
     expect(go).toHaveTextContent('teacher.classroom.gameModes.vocabQuiz');
+    expect(go).toHaveTextContent('education.modePicker.minutes');
   });
 
-  it('Given a Hebrew page, When rendered, Then the spotlight carries dir="rtl" and start-aligned text', () => {
+  it('Given a Hebrew page, When rendered, Then the spotlight carries dir="rtl" and start-aligned steps', () => {
     setup('rtl');
-    const spot = screen.getByTestId('mode-spotlight');
-    expect(spot).toHaveAttribute('dir', 'rtl');
-    expect(screen.getByTestId('how-it-plays-inline').className).toContain('text-start');
+    expect(screen.getByTestId('mode-spotlight')).toHaveAttribute('dir', 'rtl');
+    fireEvent.click(screen.getByTestId('how-it-plays-toggle'));
+    expect(screen.getByTestId('how-it-plays').className).toContain('text-start');
   });
 
-  it('Given the phone dock, When rendered, Then the dock is just the game and Start: the blurb and who it suits wait for the wide panel or the steps toggle', () => {
+  it('Given the blurb, Then it shows on every screen and steps aside while the lobby is expanded', () => {
     setup();
     const how = screen.getByTestId('spotlight-how');
     expect(how).toHaveTextContent(catalogueKeys(catalogueEntry('vocab-quiz')!).how);
-    expect(how.className).toMatch(/(^|\s)hidden(\s|$)/);
-    expect(how.className).not.toContain('min-height:740px');
-    expect(how.className).toContain('@4xl/lobby:block');
-    const bestFor = screen.getByTestId('spotlight-best-for');
-    expect(bestFor.className).not.toContain('min-height:740px');
-    expect(bestFor.className).toContain('@4xl/lobby:flex');
+    expect(how.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+    expect(how.className).toContain('group-has-[[data-lobby-expanded]]/lobby:hidden');
   });
 
-  it('Given the phone dock, Then the icon-only steps toggle explains itself on hover too', () => {
+  it('Given the steps toggle, Then it names itself and explains itself on hover too', () => {
     setup();
-    expect(screen.getByTestId('how-it-plays-toggle')).toHaveAttribute('title', 'eg2Modes.howItPlays');
+    const toggle = screen.getByTestId('how-it-plays-toggle');
+    expect(toggle).toHaveAttribute('title', 'eg2Modes.howItPlays');
+    expect(toggle).toHaveTextContent('eg2Modes.howItPlays');
   });
 });
