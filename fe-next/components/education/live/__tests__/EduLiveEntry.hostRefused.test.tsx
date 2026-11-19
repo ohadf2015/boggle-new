@@ -4,11 +4,13 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/components/multiplayer/useMultiplayerFlowState', () => ({ useMultiplayerFlowState: () => ({ entryView: 'classroom-waiting' }) }));
-vi.mock('next/link', () => ({ default: ({ href, children }: { href: string; children: React.ReactNode }) => <a href={href}>{children}</a> }));
+vi.mock('next/link', () => ({ default: ({ href, children, ...rest }: { href: string; children: React.ReactNode } & Record<string, unknown>) => <a href={href} {...rest}>{children}</a> }));
 vi.mock('@/utils/profileStorage', () => ({ getStoredUsername: () => '' }));
+vi.mock('@/utils/session', () => ({ clearSession: vi.fn() }));
 
 import EduLiveEntry from '@/components/education/live/EduLiveEntry';
 import { clearHostCreateRefusal, setHostCreateRefusal } from '@/app/[locale]/multiplayer/hostCreateRefusal';
+import { clearSession } from '@/utils/session';
 
 const t = (key: string) => key;
 
@@ -37,6 +39,20 @@ describe('EduLiveEntry — teacher whose room could not be reopened', () => {
     act(() => setHostCreateRefusal({ code: 'AB12CD', reason: 'AUTH_REQUIRED' }));
     render(<EduLiveEntry entry={makeEntry({ isJoining: true })} urlRoom="AB12CD" isHost language="en" t={t} />);
     expect(screen.getByTestId('edu-live-connecting')).toBeInTheDocument();
+  });
+
+  it('given the code has already ended, then start-a-new-game replaces retry-the-same-code', () => {
+    const entry = makeEntry();
+    act(() => setHostCreateRefusal({ code: 'AB12CD', reason: 'GAME_ENDED' }));
+    render(<EduLiveEntry entry={entry} urlRoom="AB12CD" isHost language="en" t={t} />);
+
+    expect(screen.getByTestId('edu-live-host-ended')).toHaveTextContent('eduLiveRoom.entry.hostEndedTitle');
+    expect(screen.queryByTestId('edu-live-host-retry')).not.toBeInTheDocument();
+    const cta = screen.getByTestId('edu-live-host-start-new');
+    expect(cta).toHaveAttribute('href', '/en/education/classroom-game');
+    fireEvent.click(cta);
+    expect(clearSession).toHaveBeenCalled();
+    expect((entry as { handleJoin: ReturnType<typeof vi.fn> }).handleJoin).not.toHaveBeenCalled();
   });
 
   it('given a student, then a host refusal is never shown to them', () => {

@@ -51,6 +51,16 @@ import type { ClassroomGamePlayer, ClassroomGameSettings, ClassroomGame, CreateC
  * Create a new classroom game
  */
 export async function createClassroomGame(data: CreateClassroomGameData): Promise<void> {
+  const existing = await getClassroomGame(data.gameCode);
+  // Same rule as markRoundLive / lookupLiveClassroomGame: a dead PIN is not a
+  // free code. Overwriting the ended record would let a stale host tab
+  // resurrect the room under the code students were told had expired.
+  if (existing && isClassroomSessionEnded(existing)) {
+    const error = new Error(`Classroom game code ${data.gameCode} has ended`);
+    (error as Error & { code: string }).code = 'GAME_ENDED';
+    throw error;
+  }
+
   const game: ClassroomGame = {
     ...data,
     players: [],

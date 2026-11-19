@@ -209,6 +209,11 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
       const classroomGate = await decideClassroomHost(socket, gameCode, requestedPrivate === true);
       if (!classroomGate.allowed) {
+        if (classroomGate.reason === 'ended') {
+          logger.info('SOCKET', `Refused createGame on ended classroom code ${gameCode}`, { socketId: socket.id });
+          emitError(socket, ErrorCodes.GAME_ENDED, { message: 'This game has ended. Start a new game for a fresh code.' });
+          return;
+        }
         logger.warn('SOCKET', `Refused createGame on classroom code ${gameCode}: socket is not the classroom teacher`, { socketId: socket.id });
         emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'Only the teacher can open this classroom game' });
         return;

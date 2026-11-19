@@ -45,7 +45,7 @@ export function useClassroomLaunchSocket(t: Translate) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [isStarting, setIsStarting] = useState(false);
   const [startError, setStartError] = useState<string | null>(null);
-  const [gameCode] = useState<string>(() => randomGameCode());
+  const [gameCode, setGameCode] = useState<string>(() => randomGameCode());
   const [roomCreatedGameCode, setRoomCreatedGameCode] = useState<string | null>(null);
   // True while a pressure write awaits its ack; the caller holds navigation so a refusal is still shown.
   const [pressurePending, setPressurePending] = useState(false);
@@ -125,8 +125,14 @@ export function useClassroomLaunchSocket(t: Translate) {
         }
       });
       // The server's text is internal English; it is logged, the teacher gets their language.
-      socketInstance.on('classroomGameError', (data: { error: string }) => {
+      socketInstance.on('classroomGameError', (data: { error: string; code?: string }) => {
         logger.error('Classroom game create rejected:', data?.error);
+        if (data?.code === 'GAME_ENDED') {
+          setGameCode(randomGameCode());
+          setPressurePending(false);
+          fail('education.classroomGame.gameEnded');
+          return;
+        }
         if (isClassroomIdentityRefusal(data)) {
           setPressurePending(false);
           fail(data.error);
