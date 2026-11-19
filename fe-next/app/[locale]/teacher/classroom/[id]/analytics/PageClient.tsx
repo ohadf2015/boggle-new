@@ -61,6 +61,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const [tab, setTab] = useState('pulse');
   const revealRef = useTeacherReveal<HTMLDivElement>();
   const [classroomName, setClassroomName] = useState('');
+  const [memberCount, setMemberCount] = useState<number | undefined>(undefined);
   const [openStudentId, setOpenStudentId] = useState<string | null>(null);
   const [weekStatus, setWeekStatus] = useState<FreeWeekStatus>('pending');
 
@@ -68,7 +69,9 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
     let cancelled = false;
     getClassroom(classroomId)
       .then(({ data }) => {
-        if (!cancelled && data?.name) setClassroomName(data.name);
+        if (cancelled || !data) return;
+        if (data.name) setClassroomName(data.name);
+        if (typeof data.member_count === 'number') setMemberCount(data.member_count);
       })
       .catch(() => {});
     return () => {
@@ -136,6 +139,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           <ClassReportHeader
             eyebrow={t('teacher.classroom.cardClassReport', 'Class report')}
             name={classroomName || t('education.analytics.title')}
+            memberCount={memberCount}
             onBack={handleBackToClassroom}
             link={{ href: teacherResultsHref(locale, classroomId), label: t('eduShell.home.allResults'), testId: 'analytics-results-hub' }}
           >
@@ -163,7 +167,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           whileChecking={proPending}
         >
           <div data-testid="analytics-pro-body" className="space-y-3">
-            <ClassOverview classroomId={classroomId} classroomName={classroomName} openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
+            <ClassOverview classroomId={classroomId} classroomName={classroomName} surface="class_report" openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
 
             <Tabs value={tab} onValueChange={setTab} className="space-y-3">
               <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy p-1.5 shadow-hard">

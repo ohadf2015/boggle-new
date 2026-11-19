@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { ResultsSurface } from '@/components/education/results/trackResultsAction';
 import { PANEL_TITLE } from '@/components/teacher/analytics/overview/overviewParts';
 import { pct } from '@/components/teacher/analytics/overview/overviewModel';
 import { ReteachPracticeAction, ReteachStartGame, ReteachWordRows, snapshotWords } from './reteachParts';
@@ -15,7 +16,17 @@ interface FallbackWord {
 const FALLBACK_SHOWN = 4;
 
 /** "Which words" and the page's one main action. Practice is offered only on words the assign endpoint will accept. */
-export function ClassFocusWords({ classroomId, classroomName, fallback }: { classroomId: string; classroomName: string; fallback: readonly FallbackWord[] }) {
+export function ClassFocusWords({
+  classroomId,
+  classroomName,
+  fallback,
+  surface,
+}: {
+  classroomId: string;
+  classroomName: string;
+  fallback: readonly FallbackWord[];
+  surface: ResultsSurface;
+}) {
   const { t } = useLanguage();
   const state = useWordMasteryReport(classroomId);
 
@@ -33,7 +44,7 @@ export function ClassFocusWords({ classroomId, classroomName, fallback }: { clas
           {title}
           <ReteachWordRows words={words} />
         </div>
-        <ReteachPracticeAction classroomId={classroomId} classroomName={classroomName} words={words.map((w) => w.word)} />
+        <ReteachPracticeAction classroomId={classroomId} classroomName={classroomName} words={words.map((w) => w.word)} surface={surface} />
       </div>
     );
   }

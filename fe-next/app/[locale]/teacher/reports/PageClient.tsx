@@ -269,6 +269,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <ClassReportHeader
             eyebrow={t('teacher.reports.title')}
             name={selectedClassroom?.name ?? t('teacher.reports.title')}
+            memberCount={selectedClassroom?.member_count}
             onBack={() => router.push(`/${language}/teacher/classroom/${selectedClassroomId}`)}
             link={{
               href: `/${language}/teacher/classroom/${selectedClassroomId}/analytics`,
@@ -284,6 +285,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
         <ClassOverview
           classroomId={selectedClassroomId}
           classroomName={selectedClassroom?.name ?? ''}
+          surface="reports"
           onOpenChange={(id) => {
             if (id) handleStudentClick(id);
           }}

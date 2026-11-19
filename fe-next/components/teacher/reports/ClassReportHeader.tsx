@@ -14,11 +14,12 @@ interface ClassReportHeaderProps {
   name: string;
   onBack: () => void;
   link: { href: string; label: string; testId: string };
+  memberCount?: number;
   children?: ReactNode;
 }
 
 /** One header for both halves of a class's results, so moving between them reads as one report. */
-export function ClassReportHeader({ eyebrow, name, onBack, link, children }: ClassReportHeaderProps) {
+export function ClassReportHeader({ eyebrow, name, onBack, link, memberCount, children }: ClassReportHeaderProps) {
   const { t } = useLanguage();
   const backLabel = t('eduShell.home.classPage');
   return (
@@ -37,6 +38,11 @@ export function ClassReportHeader({ eyebrow, name, onBack, link, children }: Cla
         <h1 data-wipe className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-cream md:text-3xl">
           <bdi>{name}</bdi>
         </h1>
+        {typeof memberCount === 'number' ? (
+          <p data-testid="class-report-size" className="font-neo-body text-sm font-bold text-neo-cream/70">
+            {memberCount === 1 ? t('teacher.classroom.member') : t('teacher.classroom.members', { count: memberCount })}
+          </p>
+        ) : null}
       </div>
       <NeoButton asChild variant="outline" className="shrink-0">
         <Link href={link.href} data-testid={link.testId}>{link.label}</Link>

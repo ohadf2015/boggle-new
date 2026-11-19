@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherFacingName } from '@/lib/education/rosterName';
@@ -12,6 +12,7 @@ import { REPORT_HERO_PANEL } from '@/components/teacher/reports/reteachParts';
 import { Dialog } from '@/components/ui/dialog';
 import { NbDialogBody, NbDialogContent, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import type { StudentStatus } from '@/lib/education/pro/classInsights';
+import type { ResultsSurface } from '@/components/education/results/trackResultsAction';
 import { useProClassAnalytics } from '../useProClassAnalytics';
 import { ATTENTION, STATUSES, pct } from './overviewModel';
 import { ActivityBars, PANEL, PANEL_TITLE, StatusLine, StatusStrip, StudentRow } from './overviewParts';
@@ -23,12 +24,14 @@ const MOSTLY_ZERO = 3;
 interface Props {
   classroomId: string;
   classroomName: string;
+  /** Where a practice tap is reported from. */
+  surface?: ResultsSurface;
   /** Opens the drill-down for this student from outside (e.g. the roster tab). */
   openStudentId?: string | null;
   onOpenChange?: (studentId: string | null) => void;
 }
 
-export function ClassOverview({ classroomId, classroomName, openStudentId, onOpenChange }: Props) {
+export function ClassOverview({ classroomId, classroomName, surface = 'class_report', openStudentId, onOpenChange }: Props) {
   const { t, language } = useLanguage();
   const { metrics, isLoading, error, refresh } = useProClassAnalytics({ classroomId });
   const [names, setNames] = useState<Map<string, string>>(new Map());
@@ -53,11 +56,21 @@ export function ClassOverview({ classroomId, classroomName, openStudentId, onOpe
     return c;
   }, [students]);
 
+  const focusWords = (
+    <ClassFocusWords classroomId={classroomId} classroomName={classroomName} fallback={metrics?.commonMistakes ?? []} surface={surface} />
+  );
+  const withFocus = (status: ReactNode) => (
+    <div className="space-y-3">
+      {status}
+      <div data-testid="overview-focus" className={REPORT_HERO_PANEL}>{focusWords}</div>
+    </div>
+  );
+
   if (isLoading) {
-    return <div aria-busy="true" className="h-40 rounded-neo-lg bg-neo-cream/10 motion-safe:animate-pulse" />;
+    return withFocus(<div aria-busy="true" className="h-16 rounded-neo-lg bg-neo-cream/10 motion-safe:animate-pulse" />);
   }
   if (error || !metrics) {
-    return (
+    return withFocus(
       <div className={PANEL} role="alert">
         <p className="font-neo-body font-bold text-neo-cream">{t('education.analytics.error')}</p>
         <button type="button" onClick={refresh} className="mt-2 min-h-11 rounded-neo border-2 border-neo-cream/60 px-4 font-neo-body font-bold text-neo-cream">
@@ -67,7 +80,7 @@ export function ClassOverview({ classroomId, classroomName, openStudentId, onOpe
     );
   }
   if (students.length === 0) {
-    return <p className={`${PANEL} font-neo-body text-neo-cream`}>{t('education.analytics.noData')}</p>;
+    return withFocus(<p className="font-neo-body text-neo-cream">{t('education.analytics.noData')}</p>);
   }
 
   const today = metrics.dailyActive[metrics.dailyActive.length - 1]?.day ?? '';
@@ -92,7 +105,7 @@ export function ClassOverview({ classroomId, classroomName, openStudentId, onOpe
             <ul className="mt-2 space-y-1.5 max-sm:[&>li:nth-child(n+4)]:hidden">{attention.slice(0, ATTENTION_SHOWN).map(row)}</ul>
           </section>
         ) : null}
-        <ClassFocusWords classroomId={classroomId} classroomName={classroomName} fallback={metrics.commonMistakes} />
+        {focusWords}
       </div>
 
       {hasActivity || stars.length > 0 ? (

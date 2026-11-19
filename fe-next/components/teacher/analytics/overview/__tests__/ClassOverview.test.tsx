@@ -26,9 +26,15 @@ const analytics = {
   ],
 };
 
+const hook = vi.hoisted(() => ({ fail: false }));
 vi.mock('../../useProClassAnalytics', () => ({
-  useProClassAnalytics: () => ({ metrics: analytics, isLoading: false, error: null, refresh: vi.fn() }),
+  useProClassAnalytics: () =>
+    hook.fail
+      ? { metrics: null, isLoading: false, error: new Error('down'), refresh: vi.fn() }
+      : { metrics: analytics, isLoading: false, error: null, refresh: vi.fn() },
 }));
+const tracked = vi.fn();
+vi.mock('@/components/education/results/trackResultsAction', () => ({ trackReteachStarted: (p: unknown) => tracked(p) }));
 
 vi.mock('@/lib/supabase/education/classrooms', () => ({
   getClassroomStudents: vi.fn().mockResolvedValue({
@@ -63,10 +69,34 @@ const baseline = { students: analytics.students, dailyActive: analytics.dailyAct
 afterEach(() => {
   Object.assign(analytics, baseline);
   mastery.state = { status: 'error' };
+  hook.fail = false;
+  tracked.mockClear();
 });
 
 describe('ClassOverview, focused on who needs the teacher and which words', () => {
   const missed = { word: 'storm', display: 'storm', attempts: 4, missed: 3, missRate: 75, studentsMissing: 3, studentsAsked: 4 };
+
+  it('given the class numbers fail to load, then the error shows and practice on missed words is still offered', async () => {
+    hook.fail = true;
+    mastery.state = { status: 'ready', report: { hardestWords: [missed] }, insights: null };
+    render(<ClassOverview classroomId="c1" classroomName="5B" />);
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    expect(await screen.findByTestId('practice')).toHaveAttribute('data-words', 'storm');
+  });
+
+  it('given no students on record yet, then starting a game is still the main action', async () => {
+    analytics.students = [] as never;
+    render(<ClassOverview classroomId="c1" classroomName="5B" />);
+    expect(screen.getByText('education.analytics.noData')).toBeInTheDocument();
+    expect(await screen.findByTestId('class-focus-start')).toBeInTheDocument();
+  });
+
+  it.each(['reports', 'class_report'] as const)('given the %s surface, then a practice tap is reported from it', async (surface) => {
+    mastery.state = { status: 'ready', report: { hardestWords: [missed] }, insights: null };
+    render(<ClassOverview classroomId="c1" classroomName="5B" surface={surface} />);
+    fireEvent.click(await screen.findByTestId('practice'));
+    expect(tracked).toHaveBeenCalledWith({ surface, words: 1, plan: 'pro' });
+  });
 
   it('given most statuses at zero, then one line lists only the others and still filters', async () => {
     analytics.students = [pulse('h', 'needsHelp'), pulse('t', 'thriving')] as never;

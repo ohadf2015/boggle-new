@@ -3,7 +3,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { ClassReportHeader } from '../ClassReportHeader';
 
 vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (key: string) => key, dir: 'ltr' }),
+  useLanguage: () => ({
+    t: (key: string, params?: Record<string, unknown>) => (params ? `${key}:${JSON.stringify(params)}` : key),
+    dir: 'ltr',
+  }),
 }));
 
 const props = {
@@ -30,5 +33,14 @@ describe('ClassReportHeader', () => {
     render(<ClassReportHeader {...props} />);
     expect(screen.getByTestId('header-link')).toHaveAttribute('href', props.link.href);
     expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('states the class size as a plain fact when it is known', () => {
+    const { rerender } = render(<ClassReportHeader {...props} memberCount={12} />);
+    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members:{"count":12}');
+    rerender(<ClassReportHeader {...props} memberCount={1} />);
+    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.member');
+    rerender(<ClassReportHeader {...props} />);
+    expect(screen.queryByTestId('class-report-size')).toBeNull();
   });
 });

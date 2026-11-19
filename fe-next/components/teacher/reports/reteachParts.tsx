@@ -5,7 +5,7 @@ import { Play } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
-import { trackReteachStarted } from '@/components/education/results/trackResultsAction';
+import { trackReteachStarted, type ResultsSurface } from '@/components/education/results/trackResultsAction';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
 import { cn } from '@/lib/utils';
@@ -53,14 +53,24 @@ export function ReteachWordRows({ words, columns = false }: { words: readonly Ha
   );
 }
 
-export function ReteachPracticeAction({ classroomId, classroomName, words }: { classroomId: string; classroomName: string; words: string[] }) {
+export function ReteachPracticeAction({
+  classroomId,
+  classroomName,
+  words,
+  surface,
+}: {
+  classroomId: string;
+  classroomName: string;
+  words: string[];
+  surface: ResultsSurface;
+}) {
   const { hasPro } = useTeacherPro();
   return (
     <div
       className="min-w-0"
       onClickCapture={(e) => {
         if ((e.target as HTMLElement).closest('button:not([disabled])')) {
-          trackReteachStarted({ surface: 'reports', words: words.length, plan: hasPro ? 'pro' : 'free' });
+          trackReteachStarted({ surface, words: words.length, plan: hasPro ? 'pro' : 'free' });
         }
       }}
     >

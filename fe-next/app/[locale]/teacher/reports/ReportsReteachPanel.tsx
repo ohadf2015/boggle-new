@@ -141,6 +141,7 @@ function PrimaryAction({ snapshot, example, startClassId }: { snapshot: ClassEvi
         classroomId={snapshot.classroomId}
         classroomName={snapshot.classroomName}
         words={snapshotWords(snapshot.words).map((w) => w.word)}
+        surface="reports"
       />
     );
   }

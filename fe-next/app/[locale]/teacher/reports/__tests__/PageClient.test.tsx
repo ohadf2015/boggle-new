@@ -15,8 +15,8 @@ import ReportsPageClient from '../PageClient';
 // back, which these screens used to lack entirely. It pulls MusicContext in,
 // which this suite has no provider for and no interest in.
 vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
-  ClassOverview: ({ classroomName, onOpenChange }: { classroomName: string; onOpenChange?: (id: string | null) => void }) => (
-    <button type="button" data-testid="class-overview" data-class={classroomName} onClick={() => onOpenChange?.('student-9')} />
+  ClassOverview: ({ classroomName, surface, onOpenChange }: { classroomName: string; surface?: string; onOpenChange?: (id: string | null) => void }) => (
+    <button type="button" data-testid="class-overview" data-class={classroomName} data-surface={surface} onClick={() => onOpenChange?.('student-9')} />
   ),
 }));
 
@@ -238,6 +238,7 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
       expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('English 101');
       expect(screen.getByTestId('class-overview')).toHaveAttribute('data-class', 'English 101');
+      expect(screen.getByTestId('class-overview')).toHaveAttribute('data-surface', 'reports');
       expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
       expect(screen.getByTestId('reports-class-report-link')).toHaveAttribute('href', '/en/teacher/classroom/classroom-1/analytics');
     });
@@ -375,6 +376,7 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
       expect(screen.queryByTestId('reports-class-empty')).not.toBeInTheDocument();
       expect(screen.getByRole('tablist')).toBeInTheDocument();
+      expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members');
     });
 
     it('Given a free teacher at the lock, Then the page says the missed words stay free on every game\'s results', () => {
