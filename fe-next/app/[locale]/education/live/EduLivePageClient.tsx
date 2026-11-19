@@ -100,7 +100,7 @@ function EduLiveRoom(): React.JSX.Element {
                   gameCode={practiceRoom}
                   language={s.language}
                   joined={practiceJoined}
-                  started={s.gameActive || s.showResults}
+                  started={s.teacherStrip.visible || s.showResults}
                   ended={s.showResults}
                   open={practiceViewOpen}
                   onOpenChange={setPracticeViewOpen}

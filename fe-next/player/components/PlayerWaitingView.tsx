@@ -53,6 +53,7 @@ import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQui
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
 import { useEduLiveSurfaces } from '@/components/education/live/eduLiveSurfaces';
 import { AvatarQuickPick } from '@/components/student/live/AvatarQuickPick';
+import { isPracticeSeatPage } from '@/utils/practiceSeatStorage';
 import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
@@ -124,10 +125,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const avatarPremium = useAvatarPremium();
   const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
   const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
-    setStoredCustomAvatar(config);
     setCurrentAvatar(config);
     onAvatarChange?.(config);
     setIsAvatarBuilderOpen(false);
+    // A teacher's practice seat is signed in as the teacher: its look must not become their real avatar.
+    if (isPracticeSeatPage()) return;
+    setStoredCustomAvatar(config);
     await updateProfile({ avatar_config: config }).catch(() => {});
   }, [onAvatarChange, updateProfile]);
   const openAvatarBuilder = useCallback(() => setIsAvatarBuilderOpen(true), []);
