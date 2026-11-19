@@ -191,6 +191,7 @@ describe('ClassCard menu', () => {
     render(<ClassCard {...fullProps} />);
     await openMenu();
     expect(screen.getByTestId('classroom-card-students')).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
+    expect(screen.getByTestId('classroom-card-students')).toHaveAttribute('aria-haspopup', 'dialog');
     expect(screen.getByTestId('classroom-card-report')).toHaveAttribute('href', '/r');
     expect(screen.getByTestId('classroom-card-assign')).toHaveAttribute('href', '/a');
     expect(screen.getByRole('menuitem', { name: /googleClassroom/i }).tagName).toBe('A');

@@ -40,6 +40,19 @@ export default function MyListCard({
   const [assigning, setAssigning] = useState(false);
   const isPublic = lesson.is_public === true;
   const accent = arcadeAccentAt(index);
+  const total = lesson.words.length;
+  const defCount = lesson.words.filter((w) => w.definition).length;
+  const remix = lesson.remixed_from_title
+    ? lesson.remixed_from_author
+      ? t('eduLibrary.remixedFrom', { title: lesson.remixed_from_title, author: lesson.remixed_from_author })
+      : t('eduLibrary.remixedFromNoAuthor', { title: lesson.remixed_from_title })
+    : null;
+  const menuHeader = (
+    <div role="none" data-testid={`lesson-menu-header-${lesson.id}`} className="space-y-0.5 px-3 pb-2 pt-1.5 font-neo-body text-xs font-bold text-neo-cream/70">
+      <p>{t('teacher.lesson.definitionCoverage', { count: defCount, total })}</p>
+      {remix ? <p className="[overflow-wrap:anywhere]">{remix}</p> : null}
+    </div>
+  );
 
   return (
     <ListCard
@@ -57,7 +70,7 @@ export default function MyListCard({
       factTestId={`lesson-fact-${lesson.id}`}
       fact={
         <span>
-          {t('eduLibrary.card.words', { count: lesson.words.length })}
+          {t('eduLibrary.card.words', { count: total })}
           {' · '}
           {classroomName ? (
             <bdi data-testid={`lesson-classroom-${lesson.id}`}>{classroomName}</bdi>
@@ -67,7 +80,7 @@ export default function MyListCard({
         </span>
       }
       menu={
-        <CardOverflowMenu label={t('eduLibrary.card.actions')} testId={`lesson-menu-${lesson.id}`}>
+        <CardOverflowMenu label={t('eduLibrary.card.actions')} testId={`lesson-menu-${lesson.id}`} header={menuHeader}>
           <CardMenuAction icon={Pencil} testId={`lesson-edit-${lesson.id}`} onSelect={onEdit}>{t('teacher.lesson.editLesson')}</CardMenuAction>
           <CardMenuAction icon={ClipboardList} testId={`lesson-assign-${lesson.id}`} onSelect={() => setAssigning(true)}>{t('eduShell.home.focus.assign')}</CardMenuAction>
           <CardMenuAction icon={BookOpen} testId={`lesson-practice-${lesson.id}`} onSelect={onPractice}>{t('education.practice.title')}</CardMenuAction>

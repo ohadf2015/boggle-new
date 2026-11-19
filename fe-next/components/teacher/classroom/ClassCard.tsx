@@ -167,7 +167,7 @@ export function ClassCard({
             </CardMenuLink>
           ) : null}
           <CardMenuDivider />
-          <CardMenuAction icon={Users} testId="classroom-card-students" onSelect={onToggleExpanded}>{studentsLabel}</CardMenuAction>
+          <CardMenuAction icon={Users} testId="classroom-card-students" onSelect={onToggleExpanded} hasPopup="dialog">{studentsLabel}</CardMenuAction>
           {insightHref ? (
             <CardMenuLink icon={Lightbulb} testId="classroom-card-insight" href={insightHref}>{t('teacher.weekInsight.title')}</CardMenuLink>
           ) : null}

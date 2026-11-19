@@ -100,6 +100,20 @@ describe('MyListCard menu', () => {
     expect(share).toHaveTextContent('eduLibrary.share.shared');
   });
 
+  it('Given definitions and a remix source, Then the menu header shows coverage and attribution', async () => {
+    renderCard({ lesson: { ...(lesson as object), words: [{ word: 'photon', definition: 'light' }, { word: 'orbit' }], remixed_from_title: 'Space', remixed_from_author: 'Ms. Lee' } as never });
+    await openMenu();
+    const header = screen.getByTestId('lesson-menu-header-L1');
+    expect(header).toHaveTextContent('teacher.lesson.definitionCoverage:{"count":1,"total":2}');
+    expect(header).toHaveTextContent('eduLibrary.remixedFrom:{"title":"Space","author":"Ms. Lee"}');
+  });
+
+  it('Given a remix with no author, Then the header uses the no-author line', async () => {
+    renderCard({ lesson: { ...(lesson as object), remixed_from_title: 'Space' } as never });
+    await openMenu();
+    expect(screen.getByTestId('lesson-menu-header-L1')).toHaveTextContent('eduLibrary.remixedFromNoAuthor:{"title":"Space"}');
+  });
+
   it('Given sharing is in flight, Then the share item is disabled', async () => {
     renderCard({ sharing: true });
     await openMenu();

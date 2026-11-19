@@ -55,6 +55,7 @@ export function CardMenuAction({
   danger = false,
   disabled = false,
   checked,
+  hasPopup,
   children,
 }: {
   icon: MenuIcon;
@@ -63,11 +64,12 @@ export function CardMenuAction({
   danger?: boolean;
   disabled?: boolean;
   checked?: boolean;
+  hasPopup?: 'dialog';
   children: ReactNode;
 }) {
   const toggle = checked === undefined ? {} : { role: 'menuitemcheckbox', 'aria-checked': checked };
   return (
-    <DropdownMenuItem data-testid={testId} disabled={disabled} onSelect={onSelect} className={cn(ITEM, danger && 'text-neo-pink')} {...toggle}>
+    <DropdownMenuItem data-testid={testId} disabled={disabled} onSelect={onSelect} aria-haspopup={hasPopup} className={cn(ITEM, danger && 'text-neo-pink')} {...toggle}>
       <ItemBody icon={icon}>{children}</ItemBody>
       {checked ? <Check className="size-4 shrink-0 text-neo-lime" strokeWidth={3} aria-hidden="true" /> : null}
     </DropdownMenuItem>
