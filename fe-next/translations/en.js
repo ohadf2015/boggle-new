@@ -1126,7 +1126,8 @@ const en = {
       "copies": "{count} copies",
       "copiesOne": "{count} copy",
       "results": "Results",
-      "use": "Use list"
+      "use": "Use list",
+      "actions": "List actions"
     },
     "badge": {
       "verified": "Verified",
@@ -1159,7 +1160,8 @@ const en = {
       "tryAllLanguages": "Show all languages",
       "shareFirst": "Share a list",
       "beFirstTitle": "Be the first teacher here.",
-      "beFirstHint": "Share one of your lists and every teacher in this language will see it."
+      "beFirstHint": "Share one of your lists and every teacher in this language will see it.",
+      "hint": "Ready-made word lists from LexiClash and other teachers"
     },
     "preview": {
       "host": "Host live",

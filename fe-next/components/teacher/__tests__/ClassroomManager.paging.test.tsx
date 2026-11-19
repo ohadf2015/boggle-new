@@ -72,13 +72,13 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     Element.prototype.scrollIntoView = scrollIntoView;
   });
 
-  it('Given three classes, Then every card sits in one grid, each with its own color band, and no carousel', () => {
+  it('Given three classes, Then every card sits in one grid, each with its own small accent, and no carousel', () => {
     render(<ClassroomManager />);
     const grid = screen.getByTestId('classroom-grid');
     expect(grid.querySelectorAll('[data-testid="classroom-card"]')).toHaveLength(3);
     expect(screen.queryByTestId('class-carousel-track')).toBeNull();
-    const bands = screen.getAllByTestId('classroom-card-band').map((b) => b.className.match(/bg-neo-[a-z]+/)?.[0]);
-    expect(new Set(bands).size).toBe(3);
+    const accents = screen.getAllByTestId('list-card-accent').map((b) => b.className.match(/bg-neo-[a-z]+/)?.[0]);
+    expect(new Set(accents).size).toBe(3);
   });
 
   it('Given one class, Then there is no arrow nav at all', () => {
@@ -95,8 +95,6 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(seat).toHaveAttribute('href', '/en/teacher/classroom/new');
     expect(seat).toHaveTextContent('eduShell.home.newClass');
     expect(seat).toHaveTextContent('teacher.classroom.newClassHint');
-    expect(seat.className).toContain('self-start');
-    expect(seat.className).not.toContain('border-dashed');
     expect(seat.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
     expect(screen.queryByTestId('classroom-create-link')).toBeNull();
   });
@@ -111,11 +109,11 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(screen.queryByTestId('classroom-new-card')).toBeNull();
   });
 
-  it('Given several classes, Then neighbouring cards wear different header colors', () => {
+  it('Given several classes, Then no card is a full-colour block', () => {
     mq.wide = true;
     render(<ClassroomManager />);
-    const colors = screen.getAllByTestId('classroom-card-band').map((b) => b.className.match(/bg-neo-(\w+)/)?.[1]);
-    expect(new Set(colors).size).toBe(3);
+    expect(screen.queryByTestId('classroom-card-band')).toBeNull();
+    for (const card of screen.getAllByTestId('classroom-card')) expect(card.className).toContain('bg-neo-navy-light');
   });
 
   it('Given three classes on a desktop row, Then they all fit and there is no arrow nav', () => {

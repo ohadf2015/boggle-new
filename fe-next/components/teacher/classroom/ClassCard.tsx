@@ -1,20 +1,18 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { m, AnimatePresence } from 'framer-motion';
 import {
-  Copy,
-  Share2,
-  Edit2,
-  Trash2,
-  ChevronRight,
-  GraduationCap,
-  MoreHorizontal,
-  Play,
-  MonitorPlay,
-  ClipboardList,
   BarChart3,
+  ClipboardList,
+  Copy,
+  Edit2,
+  GraduationCap,
+  Lightbulb,
+  MonitorPlay,
+  Play,
+  Share2,
+  Trash2,
   Users,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -22,14 +20,13 @@ import { cn } from '@/lib/utils';
 import { LANGUAGE_LABEL_KEYS } from '@/lib/i18n/languageLabels';
 import { Dialog } from '@/components/ui/dialog';
 import { NbDialogBody, NbDialogContent, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { NB_BLOCK, NB_DARK_EDGE, NB_PANEL, NB_PRIMARY, NB_SMALL, NB_STICKER, type NbColor } from '../nb/nbStyles';
-import { slideUp } from '../teacherDashboardTabs';
-import { NeoButton } from '@/components/ui/button';
+import { NB_PRIMARY, NB_SECONDARY, type NbColor } from '../nb/nbStyles';
+import { LIST_CARD_TITLE, ListCard } from '../ListCard';
+import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
 
 export interface ClassCardData {
   id: string;
@@ -52,38 +49,37 @@ export interface ClassCardProps {
   onDelete: () => void;
   /** The last game line. */
   activity?: ReactNode;
-  /** A few student faces beside the roster button. */
+  /** A few student faces beside the fact line. */
   studentPreview?: ReactNode;
   /** Opens Pick-a-game with this class preselected. */
   startGameHref?: string;
-  /** Quiet private practice with bots, under Pick a game. */
+  /** Quiet private practice with bots. */
   rehearse?: ReactNode;
   assignHref?: string;
   reportHref?: string;
   onOpenProjector?: () => void;
   /** The class page; the name links there. */
   classHref?: string;
-  /** Free teacher's one class with this week's insight: "Who needs help this week" replaces a bare Pro ask. */
+  /** Free teacher's one class with this week's insight. */
   insightHref?: string;
-  /** The color block on the card's header band; the list rotates it so each class has its own. */
+  /** The card's thin edge; the list rotates it so classes are easy to tell apart. */
   color?: NbColor;
+  /** The one card on the screen whose Start is the lime primary action. */
+  featured?: boolean;
 }
 
-// Below 24rem the code takes its own row so six letters never run under the buttons.
-const ICON_SIZE = 'h-12 min-h-12 flex-1 shrink-0 px-0 @[24rem]:w-12 @[24rem]:flex-none';
-const ICON_ACTION = cn(NB_SMALL, NB_BLOCK.cream, ICON_SIZE);
+const ACCENT: Record<NbColor, string> = {
+  lime: 'bg-neo-lime',
+  pink: 'bg-neo-pink',
+  cyan: 'bg-neo-cyan',
+  yellow: 'bg-neo-yellow',
+  purple: 'bg-neo-purple',
+  orange: 'bg-neo-orange',
+  cream: 'bg-neo-cream',
+  navy: 'bg-neo-navy-light',
+};
 
-const MENU_ITEM =
-  'flex min-h-12 w-full items-center gap-3 rounded-neo-lg border-2 border-neo-black bg-neo-white px-3 text-start font-neo-display text-[15px] font-black text-neo-black shadow-hard transition-transform hover:-translate-y-px focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan motion-reduce:transition-none';
-const MENU_ICON = 'grid size-8 shrink-0 place-items-center rounded-neo border-2 border-neo-black';
-
-/**
- * One class on the Classes tab, in the game's chunky look: a color band with the
- * class name, the join code on cream tiles, and ONE main button (Start a game).
- * Everything rarer (students, homework, report, practice, rename, Google
- * Classroom, delete) sits behind the "…" menu, so the card stays short and the
- * whole list fits a phone screen.
- */
+/** One class on the Classes tab: its name, one fact, Start a game, and a menu with everything else. */
 export function ClassCard({
   classroom,
   expanded,
@@ -103,210 +99,101 @@ export function ClassCard({
   classHref,
   insightHref,
   color = 'pink',
+  featured = false,
 }: ClassCardProps) {
   const { t } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
   const count = classroom.member_count || 0;
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  // A document listener, not a `fixed inset-0` backdrop: the card animates in
-  // with a transform, which turns `fixed` into "fixed to the card".
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onDown = (e: PointerEvent) => {
-      if (!menuRef.current?.contains(e.target as Node)) setMenuOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMenuOpen(false);
-    };
-    document.addEventListener('pointerdown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('pointerdown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [menuOpen]);
-  const pick = (fn: () => void) => () => {
-    setMenuOpen(false);
-    fn();
-  };
   const languageKey = LANGUAGE_LABEL_KEYS[classroom.language as keyof typeof LANGUAGE_LABEL_KEYS];
-  const actionsLabel = t('academy.teacher.classActions', 'Class actions');
   const studentsLabel =
     count === 0 ? t('teacher.classrooms.students.noneYet') : t('teacher.classroom.cardSeeAllStudents', { count });
 
+  const fact =
+    count === 0 ? (
+      <span>
+        {t('teacher.pulse.state.noRoster')}
+        {' · '}
+        <code dir="ltr" className="font-neo-display font-black tracking-wider text-neo-cream">{classroom.join_code}</code>
+      </span>
+    ) : (
+      <>
+        {studentPreview}
+        {activity ?? <span>{t('teacher.classroom.studentCountPro', { count: String(count) })}</span>}
+      </>
+    );
+
+  const menuHeader = (
+    <div role="none" className="px-3 pb-2 pt-1.5">
+      <p className="font-neo-body text-xs font-bold text-neo-cream/70">
+        {t('academy.hq.classCode', 'Class code')}
+        {' · '}
+        <span data-testid="classroom-card-language">{languageKey ? t(languageKey) : classroom.language}</span>
+      </p>
+      <code data-testid="classroom-join-code" dir="ltr" className="block font-neo-display text-2xl font-black tracking-wider text-neo-cream">
+        {classroom.join_code}
+      </code>
+    </div>
+  );
+
   return (
-    <m.div
-      variants={slideUp}
+    <ListCard
       data-testid="classroom-card"
       data-color={color}
-      className={cn(NB_PANEL, '@container relative flex w-full flex-col bg-neo-navy-light')}
-    >
-      <div
-        data-testid="classroom-card-band"
-        className={cn(
-          'flex items-center gap-2 rounded-t-[13px] border-b-[3px] border-neo-black px-3.5 py-2.5',
-          NB_BLOCK[color],
-        )}
-      >
-        <h3
-          title={classroom.name}
-          className="min-w-0 flex-1 line-clamp-2 font-neo-display text-xl font-black leading-tight @[24rem]:text-2xl"
-        >
-          {classHref ? (
-            <Link href={classHref} data-testid="classroom-card-open" className="-my-1 inline-flex min-h-11 items-center gap-1 rounded-neo decoration-2 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan">
-              <bdi className="line-clamp-2">{classroom.name}</bdi>
-              <DirectionalIcon icon={ChevronRight} className="size-5 shrink-0" />
-            </Link>
-          ) : (
+      accentClass={ACCENT[color]}
+      titleText={classroom.name}
+      title={
+        classHref ? (
+          <Link href={classHref} data-testid="classroom-card-open" className={LIST_CARD_TITLE}>
             <bdi>{classroom.name}</bdi>
-          )}
-        </h3>
-        <span data-testid="classroom-card-language" className={cn(NB_STICKER, NB_BLOCK.cream, 'shrink-0')}>
-          {languageKey ? t(languageKey) : classroom.language}
-        </span>
-        <div ref={menuRef} className="relative shrink-0">
-          <NeoButton
-            variant="small"
-            tone="navy"
-            data-testid="classroom-card-menu"
-            onClick={() => setMenuOpen((o) => !o)}
-            aria-haspopup="menu"
-            aria-expanded={menuOpen}
-            aria-label={actionsLabel}
-            title={actionsLabel}
-            className="size-11 min-h-11 px-0"
-          >
-            <MoreHorizontal className="size-6" aria-hidden="true" />
-          </NeoButton>
-          <AnimatePresence>
-            {menuOpen ? (
-              <m.div
-                key="menu"
-                role="menu"
-                data-testid="classroom-card-menu-panel"
-                initial={{ opacity: 0, scale: 0.95, y: -4 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: -4 }}
-                transition={{ duration: 0.15, ease: [0.23, 1, 0.32, 1] }}
-                className="absolute end-0 top-full z-30 mt-2 flex w-72 origin-top-right flex-col gap-2 rounded-neo-xl border-[3px] border-neo-black bg-neo-cream p-2.5 shadow-hard-xl rtl:origin-top-left"
-              >
-                <button type="button" role="menuitem" data-testid="classroom-card-students" onClick={pick(onToggleExpanded)} aria-haspopup="dialog" aria-expanded={expanded} className={MENU_ITEM}>
-                  <span className={cn(MENU_ICON, NB_BLOCK.cyan)}><Users className="size-4" aria-hidden="true" /></span>
-                  <span className="min-w-0 flex-1">{studentsLabel}</span>
-                  <DirectionalIcon icon={ChevronRight} className="size-4 shrink-0" />
-                </button>
-                {assignHref ? (
-                  <Link href={assignHref} role="menuitem" data-testid="classroom-card-assign" onClick={() => setMenuOpen(false)} className={MENU_ITEM}>
-                    <span className={cn(MENU_ICON, NB_BLOCK.lime)}><ClipboardList className="size-4" aria-hidden="true" /></span>
-                    {t('eduShell.home.focus.assign')}
-                  </Link>
-                ) : null}
-                {reportHref ? (
-                  <Link href={reportHref} role="menuitem" data-testid="classroom-card-report" onClick={() => setMenuOpen(false)} className={MENU_ITEM}>
-                    <span className={cn(MENU_ICON, NB_BLOCK.yellow)}><BarChart3 className="size-4" aria-hidden="true" /></span>
-                    {t('teacher.classroom.cardClassReport', 'Class report')}
-                  </Link>
-                ) : null}
-                {rehearse ? (
-                  <div data-testid="classroom-card-rehearse" className={cn(MENU_ITEM, '[&_button]:min-h-0 [&_button]:px-0 [&_button]:text-neo-black [&_button]:no-underline')}>
-                    {rehearse}
-                  </div>
-                ) : null}
-                <button type="button" role="menuitem" onClick={pick(onEdit)} className={MENU_ITEM}>
-                  <span className={cn(MENU_ICON, NB_BLOCK.orange)}><Edit2 className="size-4" aria-hidden="true" /></span>
-                  {t('teacher.classroom.edit')}
-                </button>
-                {googleHref ? (
-                  <a
-                    href={googleHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    role="menuitem"
-                    data-testid="share-to-google-classroom"
-                    onClick={() => setMenuOpen(false)}
-                    className={MENU_ITEM}
-                  >
-                    <span className={cn(MENU_ICON, NB_BLOCK.purple)}><GraduationCap className="size-4" aria-hidden="true" /></span>
-                    {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
-                  </a>
-                ) : null}
-                <button type="button" role="menuitem" onClick={pick(onDelete)} className={cn(MENU_ITEM, 'text-neo-pink')}>
-                  <span className={cn(MENU_ICON, 'bg-neo-white')}><Trash2 className="size-4" aria-hidden="true" /></span>
-                  {t('teacher.classroom.delete')}
-                </button>
-              </m.div>
-            ) : null}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col gap-3 p-3.5">
-        <div className="flex min-h-9 flex-wrap items-center gap-x-3 gap-y-1">
-          {studentPreview}
-          <span data-testid="classroom-card-count" className="font-neo-body text-sm font-black text-neo-cream">
-            {studentsLabel}
-          </span>
-          {activity}
-        </div>
-
-        <section aria-labelledby={`class-code-${classroom.id}`} className="flex flex-wrap items-stretch gap-2 @[24rem]:flex-nowrap">
-          <p id={`class-code-${classroom.id}`} data-testid="invite-students-label" className="sr-only">
-            {t('academy.hq.classCode', 'Class code')}
-          </p>
-          <div
-            data-testid="join-code-plate"
-            className="flex min-h-14 min-w-0 basis-full items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 shadow-hard-lg @[24rem]:min-h-0 @[24rem]:flex-1 @[24rem]:basis-0"
-          >
-            <code
-              data-testid="classroom-join-code"
-              dir="ltr"
-              className="block whitespace-nowrap text-center font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black @[24rem]:@max-[28rem]:text-2xl"
-            >
-              {classroom.join_code}
-            </code>
-          </div>
-          <button type="button" data-testid="copy-join-code" onClick={onCopy} aria-label={t('teacher.classroom.copyCode')} title={t('teacher.classroom.copyCode')} className={ICON_ACTION}>
-            <Copy className="size-5" aria-hidden="true" />
-          </button>
-          <button type="button" data-testid="share-join-code" onClick={onShare} aria-label={t('teacher.classroom.share')} title={t('teacher.classroom.share')} className={ICON_ACTION}>
-            <Share2 className="size-5" aria-hidden="true" />
-          </button>
-          {onOpenProjector ? (
-            <NeoButton
-              variant="small"
-              tone="navy"
-              data-testid="classroom-card-projector"
-              onClick={onOpenProjector}
-              aria-label={t('academy.hq.openProjector', 'Show code on board')}
-              title={t('academy.hq.openProjector', 'Show code on board')}
-              className={ICON_SIZE}
-            >
-              <MonitorPlay className="size-5" aria-hidden="true" />
-            </NeoButton>
-          ) : null}
-        </section>
-
-        {hasPro || proLoading ? null : <StudentCapMeter studentCount={count} source="classroom_card" />}
-
-        {insightHref ? (
-          <Link href={insightHref} data-testid="classroom-card-insight" className={cn(NB_SMALL, NB_BLOCK.navy, 'min-h-11 w-full justify-between border-neo-cream/60 px-3 text-sm')}>
-            <span className="inline-flex min-w-0 items-center gap-2">
-              <Users className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
-              <span className="truncate">{t('teacher.weekInsight.title')}</span>
-            </span>
-            <DirectionalIcon icon={ChevronRight} className="size-4 shrink-0" />
           </Link>
-        ) : null}
-
-        {startGameHref ? (
-          <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(NB_PRIMARY, 'mt-auto w-full')}>
+        ) : (
+          <bdi>{classroom.name}</bdi>
+        )
+      }
+      factTestId="classroom-card-fact"
+      fact={fact}
+      menu={
+        <CardOverflowMenu label={t('academy.teacher.classActions', 'Class actions')} testId="classroom-card-menu" header={menuHeader}>
+          <CardMenuAction icon={Copy} testId="copy-join-code" onSelect={onCopy}>{t('teacher.classroom.copyCode')}</CardMenuAction>
+          <CardMenuAction icon={Share2} testId="share-join-code" onSelect={onShare}>{t('teacher.classroom.share')}</CardMenuAction>
+          {onOpenProjector ? (
+            <CardMenuAction icon={MonitorPlay} testId="classroom-card-projector" onSelect={onOpenProjector}>
+              {t('academy.hq.openProjector', 'Show code on board')}
+            </CardMenuAction>
+          ) : null}
+          {googleHref ? (
+            <CardMenuLink icon={GraduationCap} testId="share-to-google-classroom" href={googleHref} external>
+              {t('teacher.classroom.googleClassroom', 'Post to Google Classroom')}
+            </CardMenuLink>
+          ) : null}
+          <CardMenuDivider />
+          <CardMenuAction icon={Users} testId="classroom-card-students" onSelect={onToggleExpanded}>{studentsLabel}</CardMenuAction>
+          {insightHref ? (
+            <CardMenuLink icon={Lightbulb} testId="classroom-card-insight" href={insightHref}>{t('teacher.weekInsight.title')}</CardMenuLink>
+          ) : null}
+          {assignHref ? (
+            <CardMenuLink icon={ClipboardList} testId="classroom-card-assign" href={assignHref}>{t('eduShell.home.focus.assign')}</CardMenuLink>
+          ) : null}
+          {reportHref ? (
+            <CardMenuLink icon={BarChart3} testId="classroom-card-report" href={reportHref}>
+              {t('teacher.classroom.cardClassReport', 'Class report')}
+            </CardMenuLink>
+          ) : null}
+          {rehearse ? <CardMenuControl testId="classroom-card-rehearse">{rehearse}</CardMenuControl> : null}
+          <CardMenuDivider />
+          <CardMenuAction icon={Edit2} testId="classroom-card-edit" onSelect={onEdit}>{t('teacher.classroom.edit')}</CardMenuAction>
+          <CardMenuAction icon={Trash2} testId="classroom-card-delete" onSelect={onDelete} danger>{t('teacher.classroom.delete')}</CardMenuAction>
+        </CardOverflowMenu>
+      }
+      action={
+        startGameHref ? (
+          <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(featured ? NB_PRIMARY : NB_SECONDARY, 'min-h-14 w-full text-lg')}>
             <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
             {t('eduShell.home.startLive', 'Start a game')}
           </Link>
-        ) : null}
-      </div>
-
+        ) : null
+      }
+    >
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
         <NbDialogContent size="lg" phone="full">
           <NbDialogHeader
@@ -315,12 +202,13 @@ export function ClassCard({
             closeLabel={t('common.close')}
           />
           <NbDialogBody>
+            {hasPro || proLoading ? null : <StudentCapMeter studentCount={count} source="classroom_card" className="mb-3" />}
             <ClassroomStudentList classroomId={classroom.id} joinCode={classroom.join_code} />
             <GoogleClassroomRosterImport classroomId={classroom.id} />
           </NbDialogBody>
         </NbDialogContent>
       </Dialog>
-    </m.div>
+    </ListCard>
   );
 }
 

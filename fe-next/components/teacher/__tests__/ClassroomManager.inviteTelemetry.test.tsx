@@ -81,23 +81,28 @@ beforeEach(() => {
   Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn().mockResolvedValue(undefined) }, configurable: true });
 });
 
+async function pickFromMenu(testId: string) {
+  await userEvent.click(screen.getByTestId('classroom-card-menu'));
+  await userEvent.click(await screen.findByTestId(testId));
+}
+
 describe('ClassroomManager invite telemetry', () => {
   it('When the card copies the code, Then edu_join_code_copied fires for that class', async () => {
     render(<ClassroomManager />);
-    await userEvent.click(screen.getByTestId('copy-join-code'));
+    await pickFromMenu('copy-join-code');
     await vi.waitFor(() => expect(telemetry.copied).toHaveBeenCalledWith({ classroomId: 'c1' }));
   });
 
   it('When the card shares natively or falls back to copy, Then edu_join_code_shared carries the method', async () => {
     render(<ClassroomManager />);
     shareWithFallback.mockResolvedValueOnce('shared');
-    await userEvent.click(screen.getByTestId('share-join-code'));
+    await pickFromMenu('share-join-code');
     await vi.waitFor(() => expect(telemetry.shared).toHaveBeenLastCalledWith({ classroomId: 'c1', method: 'native' }));
     shareWithFallback.mockResolvedValueOnce('copied');
-    await userEvent.click(screen.getByTestId('share-join-code'));
+    await pickFromMenu('share-join-code');
     await vi.waitFor(() => expect(telemetry.shared).toHaveBeenLastCalledWith({ classroomId: 'c1', method: 'copy_fallback' }));
     shareWithFallback.mockResolvedValueOnce('cancelled');
-    await userEvent.click(screen.getByTestId('share-join-code'));
+    await pickFromMenu('share-join-code');
     expect(telemetry.shared).toHaveBeenCalledTimes(2);
   });
 });

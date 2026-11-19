@@ -34,8 +34,7 @@ import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
 import { NewClassSeat } from './classroom/NewClassSeat';
 import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL, type NbColor } from './nb/nbStyles';
 
-// Each class gets its own color band, in the game's order, so a teacher can find a class by color.
-// No lime: lime is kept for the one Start a game button on each card.
+// No lime in the rotation: lime belongs to the one Start a game on the first card.
 const CARD_COLORS = ['pink', 'cyan', 'yellow', 'purple', 'orange'] as const satisfies readonly NbColor[];
 import { ClassroomCardActivity } from './hq/ClassroomCardActivity';
 import { HqProjectorSheet } from './hq/HqProjectorSheet';
@@ -167,7 +166,8 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   }
 
   const topActions = (
-    <div className="flex shrink-0 items-center gap-2">
+    <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+      <ClassCapMeter count={classrooms.length} className="min-w-0" />
       {isEligibleForTeacherProUpgradeCta({ trial, hasPro, proLoading, accessLoading, trialUsed: pro.known ? pro.trialUsed : undefined }) ? (
         <Link
           href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
@@ -196,15 +196,9 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
       </div>
 
       {classrooms.length === 0 ? (
-        <>
-          <ClassCapMeter count={classrooms.length} />
-          <ClassroomEmptyState createHref={newClassHref} />
-        </>
+        <ClassroomEmptyState createHref={newClassHref} />
       ) : (
         <m.div ref={revealRef} variants={stagger} initial="hidden" animate="visible">
-          <div className="mb-3">
-            <ClassCapMeter count={classrooms.length} />
-          </div>
           <ul
             data-testid="classroom-grid"
             aria-label={t('academy.teacher.classesTitle', 'Your classes')}
@@ -217,6 +211,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                 <ClassCard
                   classroom={classroom}
                   color={CARD_COLORS[i % CARD_COLORS.length]}
+                  featured={i === 0}
                   expanded={expandedId === classroom.id}
                   onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
                   onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
@@ -247,7 +242,6 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   href={newClassHref}
                   label={t('eduShell.home.newClass', 'New class')}
                   hint={t('teacher.classroom.newClassHint')}
-                  perView={pageSize}
                   accent={CARD_COLORS[classrooms.length % CARD_COLORS.length]}
                 />
               </li>

@@ -61,8 +61,14 @@ describe('ClassCard with real StudentCapMeter', () => {
     proState = { hasPro: false, loading: false, source: 'polar', periodEnd: null, grant: null, grantExpired: false, refresh: vi.fn() };
   });
 
-  it('renders real StudentCapMeter on classroom card with real count and fires impression with source="student_cap_classroom_card"', () => {
+  it('keeps the cap off the card face', () => {
     render(<ClassCard {...baseProps} />);
+    expect(screen.queryByTestId('student-cap-meter')).toBeNull();
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('iap_viewed', expect.anything());
+  });
+
+  it('shows the real cap meter on the roster it limits, with the real count and source="student_cap_classroom_card"', () => {
+    render(<ClassCard {...baseProps} expanded />);
 
     // Meter is rendered
     expect(screen.getByTestId('student-cap-meter')).toBeInTheDocument();
@@ -93,9 +99,9 @@ describe('ClassCard with real StudentCapMeter', () => {
     });
   });
 
-  it('hides the cap meter on classroom card for a Pro teacher', () => {
+  it('hides the cap meter on the roster for a Pro teacher', () => {
     proState = { ...proState, hasPro: true };
-    render(<ClassCard {...baseProps} />);
+    render(<ClassCard {...baseProps} expanded />);
     expect(screen.queryByTestId('student-cap-meter')).toBeNull();
     expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('iap_viewed', expect.anything());
   });

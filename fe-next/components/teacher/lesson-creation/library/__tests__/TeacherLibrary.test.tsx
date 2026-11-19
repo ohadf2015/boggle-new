@@ -5,12 +5,13 @@ import type { LibraryItem } from '@/lib/education/libraryTypes';
 const mockPush = vi.fn();
 const mockReplace = vi.fn();
 const myLessons: { id: string; name: string }[] = [];
+const search = { value: 'tab=discover' };
 const copyToMine = vi.fn();
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
   usePathname: () => '/en/teacher/curriculum',
-  useSearchParams: () => new URLSearchParams('tab=discover'),
+  useSearchParams: () => new URLSearchParams(search.value),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
@@ -26,15 +27,22 @@ vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() 
 vi.mock('@/hooks/useVocabularyLesson', () => ({
   useLessons: () => ({ lessons: myLessons, isLoading: false }),
 }));
-vi.mock('@/components/teacher/LessonBuilder', () => ({
-  default: () => (
-    <ul data-testid="my-lists">
-      {myLessons.map((l) => (
-        <li key={l.id}>{l.name}</li>
-      ))}
-    </ul>
-  ),
-}));
+vi.mock('@/components/teacher/LessonBuilder', async () => {
+  const { useEffect } = await import('react');
+  return {
+    default: function MockLessonBuilder({ onListCount }: { onListCount?: (count: number) => void }) {
+      const count = myLessons.length;
+      useEffect(() => onListCount?.(count), [count, onListCount]);
+      return (
+        <ul data-testid="my-lists">
+          {myLessons.map((l) => (
+            <li key={l.id}>{l.name}</li>
+          ))}
+        </ul>
+      );
+    },
+  };
+});
 vi.mock('@/lib/education/libraryClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/education/libraryClient')>()),
   copyToMine: (...args: unknown[]) => copyToMine(...args),
@@ -80,6 +88,8 @@ describe('TeacherLibrary', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     myLessons.length = 0;
+    search.value = 'tab=discover';
+    Element.prototype.scrollIntoView = vi.fn();
     copyToMine.mockImplementation(async () => {
       const lesson = { id: 'copy-1', name: 'Ocean Animals' };
       myLessons.push(lesson);
@@ -106,6 +116,33 @@ describe('TeacherLibrary', () => {
     expect(mockReplace).toHaveBeenCalledTimes(1);
     expect(mockReplace).toHaveBeenCalledWith(expect.stringContaining('tab=mine'), { scroll: false });
     expect(mockReplace).not.toHaveBeenCalledWith(expect.stringContaining('/lesson/'), expect.anything());
+  });
+
+  it('Given a teacher with lists, Then Discover is one closed row until it is opened', () => {
+    search.value = '';
+    myLessons.push({ id: 'l1', name: 'Mine' });
+    render(<TeacherLibrary teacherId="teacher-1" />);
+    const toggle = screen.getByTestId('library-discover-toggle');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('library-card')).toBeNull();
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('library-card')).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.queryByTestId('library-card')).toBeNull();
+  });
+
+  it('Given a teacher with no lists yet, Then Discover starts open', () => {
+    search.value = '';
+    render(<TeacherLibrary teacherId="teacher-1" />);
+    expect(screen.getByTestId('library-discover-toggle')).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('library-card')).toBeInTheDocument();
+  });
+
+  it('Given a link to Discover, Then it opens even for a teacher with lists', () => {
+    myLessons.push({ id: 'l1', name: 'Mine' });
+    render(<TeacherLibrary teacherId="teacher-1" />);
+    expect(screen.getByTestId('library-card')).toBeInTheDocument();
   });
 
   it('Given the library, Then the teacher\'s own lists come first and Discover sits below them, with no tabs to switch', () => {

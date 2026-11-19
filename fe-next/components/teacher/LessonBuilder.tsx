@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Compass, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -15,7 +15,6 @@ import { ListGridSkeleton } from '@/components/teacher/routeLoading/TeacherSkele
 import { createLessonAndAssign } from '@/lib/education/createLessonWithAssignment';
 import { publishList } from '@/lib/education/libraryClient';
 import { paginate } from '@/lib/education/library';
-import { useFitPageSize } from './lesson-creation/library/useFitPageSize';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import LessonBuilderDraftPrompt from './LessonBuilderDraftPrompt';
 import ListEditorSheet, { emptyListDraft, type ListDraft } from './lesson-creation/ListEditorSheet';
@@ -29,14 +28,15 @@ export interface LessonBuilderProps {
   initialReviewWords?: string[];
   onBrowseDiscover?: () => void;
   hideDiscoverLink?: boolean;
+  /** The page title, set in the New list row. */
+  heading?: ReactNode;
+  onListCount?: (count: number) => void;
 }
 
-const PAGE_SIZE = 9;
-const LIST_CARD_H = 180;
-const PAGER_RESERVE = 60;
+const PAGE_SIZE = 6;
 const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 font-bold text-neo-white hover:border-neo-cream disabled:opacity-40';
 
-export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hideDiscoverLink }: LessonBuilderProps = {}) {
+export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hideDiscoverLink, heading, onListCount }: LessonBuilderProps = {}) {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { lessons, isLoading, createLesson, updateLesson } = useLessons();
@@ -161,8 +161,11 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
   );
 
   const browseDiscover = onBrowseDiscover ?? (() => router.push(`/${language}/teacher/curriculum?tab=discover`));
-  const [gridRef, pageSize] = useFitPageSize(LIST_CARD_H, PAGER_RESERVE, PAGE_SIZE);
-  const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, pageSize), [lessons, page, pageSize]);
+  const paged = useMemo(() => paginate(lessons as LibraryLesson[], page, PAGE_SIZE), [lessons, page]);
+
+  useEffect(() => {
+    if (!isLoading) onListCount?.(lessons.length);
+  }, [isLoading, lessons.length, onListCount]);
 
   if (isLoading) {
     return <ListGridSkeleton />;
@@ -171,10 +174,8 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="sr-only">{t('teacher.lesson.sectionTitle')}</h2>
-          <p className="max-w-prose text-sm text-neo-cream/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
-        </div>
+        {heading}
+        <h2 className="sr-only">{t('teacher.lesson.sectionTitle')}</h2>
         <div className="flex flex-wrap gap-2">
           {!hideDiscoverLink && <button
             type="button"
@@ -199,6 +200,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
           </button>
         </div>
       </div>
+      <p className="max-w-prose text-sm text-neo-cream/80 text-pretty max-sm:hidden">{t('teacher.lesson.sectionHint')}</p>
 
       {lessons.length === 0 ? (
         <div className={cn('space-y-4', isCreatingFromPack && 'pointer-events-none opacity-60')}>
@@ -210,7 +212,8 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
         </div>
       ) : (
         <>
-          <div ref={gridRef} data-testid="my-lists-grid" className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-3">
+          <div className="@container">
+          <div data-testid="my-lists-grid" className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
             {paged.items.map((lesson, i) => (
               <MyListCard
                 key={lesson.id}
@@ -235,6 +238,7 @@ export default function LessonBuilder({ initialReviewWords, onBrowseDiscover, hi
                 onToggleShare={() => void handleToggleShare(lesson)}
               />
             ))}
+          </div>
           </div>
           {paged.pageCount > 1 && (
             <nav className="flex items-center justify-center gap-3" aria-label={t('eduLibrary.pager.label')}>
