@@ -6,6 +6,8 @@ import { clearRehearseIntent, peekRehearseIntentForRoom, type RehearseIntent } f
 export const PRACTICE_SEAT_TIMEOUT_MS = 12_000;
 export const PRACTICE_SEAT_RETRY_EVENT = 'lexiclash:practice-seat-retry';
 export const PRACTICE_SKIP_TO_GAME_EVENT = 'lexiclash:practice-skip-to-game';
+/** The round cannot start by itself: the reason and the way forward are on the board. */
+export const PRACTICE_NEEDS_BOARD_EVENT = 'lexiclash:practice-needs-board';
 
 interface Args {
   /** This room: only a rehearsal launched into it (the launch's claim) auto-starts here. */
@@ -58,6 +60,7 @@ export function useRehearseAutoStart({ gameCode, enabled, hostSeated, practiceSe
     setSeatTimedOut(false);
     clearRehearseIntent();
     if (botsAllowed) startRef.current(intent);
+    else if (intent.withSeat) window.dispatchEvent(new Event(PRACTICE_NEEDS_BOARD_EVENT));
   }, [gameCode, enabled, hostSeated, practiceSeated, practiceReady, skipped, botsAllowed]);
 
   // A seat that never joins must not leave the teacher in a silent lobby.

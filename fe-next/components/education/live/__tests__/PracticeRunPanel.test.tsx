@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { act, render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { Howler } from "howler";
-import { PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from "@/host/hooks/useRehearseAutoStart";
+import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from "@/host/hooks/useRehearseAutoStart";
 import { PracticeRunPanel } from "@/components/education/live/PracticeRunPanel";
 
 vi.mock("howler", () => ({ Howler: { mute: vi.fn() } }));
@@ -66,6 +66,13 @@ describe("PracticeRunPanel", () => {
     expect(Howler.mute).toHaveBeenLastCalledWith(false);
   });
 
+  it("given the round cannot start, then the teacher view opens so its explanation is visible", () => {
+    const onOpenChange = vi.fn();
+    render(<Panel onOpenChange={onOpenChange} />);
+    act(() => { window.dispatchEvent(new Event(PRACTICE_NEEDS_BOARD_EVENT)); });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
   describe("when the student page never joins", () => {
     beforeEach(() => vi.useFakeTimers());
     afterEach(() => vi.useRealTimers());
@@ -77,6 +84,22 @@ describe("PracticeRunPanel", () => {
       act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
       fireEvent.click(screen.getByTestId("practice-run-retry"));
       expect(screen.getByTestId("practice-run-frame")).not.toBe(before);
+      expect(screen.queryByTestId("practice-run-retry")).toBeNull();
+    });
+
+    it("given the timeout, then the teacher can reach the board and its bots-only start", () => {
+      const onOpenChange = vi.fn();
+      render(<Panel joined={false} onOpenChange={onOpenChange} />);
+      act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
+      fireEvent.click(screen.getByTestId("practice-run-timeout-teacher-view"));
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("given a seat that joined late and then dropped, then the wait starts over instead of failing at once", () => {
+      const { rerender } = render(<Panel joined={false} />);
+      act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
+      rerender(<Panel joined />);
+      rerender(<Panel joined={false} />);
       expect(screen.queryByTestId("practice-run-retry")).toBeNull();
     });
 

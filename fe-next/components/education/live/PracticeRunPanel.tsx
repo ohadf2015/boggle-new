@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import { Howler } from 'howler';
 import { LogOut, MonitorSmartphone, Presentation, RotateCw, SkipForward } from 'lucide-react';
-import { PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from '@/host/hooks/useRehearseAutoStart';
+import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from '@/host/hooks/useRehearseAutoStart';
 import { cn } from '@/lib/utils';
 import { practiceSeatPath } from '@/lib/education/classroomLivePath';
 import { NB_BLOCK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
@@ -40,7 +40,16 @@ export function PracticeRunPanel({ gameCode, language, joined, started, ended, o
   }, []);
 
   useEffect(() => {
-    if (joined) return;
+    const showBoard = () => onOpenChange(false);
+    window.addEventListener(PRACTICE_NEEDS_BOARD_EVENT, showBoard);
+    return () => window.removeEventListener(PRACTICE_NEEDS_BOARD_EVENT, showBoard);
+  }, [onOpenChange]);
+
+  useEffect(() => {
+    if (joined) {
+      setTimedOut(false);
+      return;
+    }
     const id = setTimeout(() => setTimedOut(true), PRACTICE_SEAT_TIMEOUT_MS);
     return () => clearTimeout(id);
   }, [joined, frameKey]);
@@ -95,6 +104,10 @@ export function PracticeRunPanel({ gameCode, language, joined, started, ended, o
               <button type="button" data-testid="practice-run-retry" onClick={() => window.dispatchEvent(new Event(PRACTICE_SEAT_RETRY_EVENT))} className={cn(NB_SMALL, NB_BLOCK.lime)}>
                 <RotateCw className="size-4" aria-hidden="true" />
                 {t('eduLiveRoom.practice.retry')}
+              </button>
+              <button type="button" data-testid="practice-run-timeout-teacher-view" onClick={() => onOpenChange(false)} className={cn(NB_SMALL, NB_BLOCK.navy)}>
+                <Presentation className="size-4" aria-hidden="true" />
+                {t('eduLiveRoom.practice.teacherView')}
               </button>
             </div>
           )}

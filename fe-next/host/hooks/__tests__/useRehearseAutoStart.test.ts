@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { writeRehearseIntent, peekRehearseIntent, claimRehearseIntentForLaunch, type RehearseIntent } from '@/lib/education/rehearsal';
-import { PRACTICE_SKIP_TO_GAME_EVENT, PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
+import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SKIP_TO_GAME_EVENT, PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
 
 function armRehearsal(intent: RehearseIntent, gameCode = 'ROOM1') {
   claimRehearseIntentForLaunch(gameCode, writeRehearseIntent(intent));
@@ -80,6 +80,17 @@ describe('useRehearseAutoStart', () => {
     act(() => { window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT)); });
     act(() => { window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT)); });
     expect(start).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a practice run in a mode bots cannot play, When the teacher is ready, Then the board is brought back to explain why', () => {
+    armRehearsal({ source: 'hq', classExists: true, withSeat: true });
+    const heard = vi.fn();
+    window.addEventListener(PRACTICE_NEEDS_BOARD_EVENT, heard);
+    const start = vi.fn();
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: true, practiceReady: true, botsAllowed: false, start }));
+    window.removeEventListener(PRACTICE_NEEDS_BOARD_EVENT, heard);
+    expect(start).not.toHaveBeenCalled();
+    expect(heard).toHaveBeenCalledTimes(1);
   });
 
   it('Given the student seat has not joined, When skip is pressed, Then nothing starts without the teacher in the room', () => {
