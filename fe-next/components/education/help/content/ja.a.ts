@@ -66,7 +66,7 @@ export const jaA: HelpLocaleContent = {
       {
         t: 'steps',
         items: [
-          { title: 'コードを見える場所に出す', body: '先生HQの[[academy.hq.getStudentsIn]]カードにコードが表示されます。[[academy.hq.openProjector]]で全画面表示、[[academy.hq.qr]]で読み取り用のコード、[[academy.hq.copyLink]]でクラスのチャットや学習管理システムに貼るリンクが出せます。', shot: 'hq-get-students-in' },
+          { title: 'コードを見える場所に出す', body: '先生ホームのクラスパネルに参加コードが表示され、その横に[[eduShell.home.shareCode]]ボタンがあります。ここからQRコード、クラスのチャットや学習管理システムに貼るリンク、全画面表示の[[academy.hq.openProjector]]、印刷用の参加シートを使えます。' },
           { title: '生徒が参加ページを開く', body: '生徒は **lexiclash.live/join** を開いて6文字を入力します。リンクを開くかQRを読み取れば、コードは自動で入力されます。' },
           { title: '生徒が名前を決める', body: '参加するクラス名を確認し、名前を入力して（サイコロをタップするとランダムな名前になります）[[education.student.join.flow.go]]を押せば完了です。', shot: 'student-join' },
           { title: '名簿が埋まっていくのを確認', body: '参加した生徒は先生の画面に順に表示されます。この方法でクラスに参加した生徒はクラスの名簿に追加され、結果もレポートに反映されます。' },

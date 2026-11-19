@@ -66,7 +66,7 @@ export const enA: HelpLocaleContent = {
       {
         t: 'steps',
         items: [
-          { title: 'Put the code where they can see it', body: 'In Teacher HQ, the [[academy.hq.getStudentsIn]] card shows your code. Use [[academy.hq.openProjector]] for a big full-screen version, [[academy.hq.qr]] for a scannable code, or [[academy.hq.copyLink]] to paste the link into your class chat or LMS.', shot: 'hq-get-students-in' },
+          { title: 'Put the code where they can see it', body: 'On Teacher Home, your class panel shows the join code with a [[eduShell.home.shareCode]] button beside it. It opens the QR code, the link to paste into your class chat or LMS, [[academy.hq.openProjector]] for a big full-screen version, and a printable join sheet.' },
           { title: 'Students open the join page', body: 'They go to **lexiclash.live/join** and type the six characters, or they open your link or scan the QR, which fills the code in for them.' },
           { title: 'Students pick a name', body: 'They see which class they are joining, type a name (or tap the dice for a random one) and press [[education.student.join.flow.go]]. That is it.', shot: 'student-join' },
           { title: 'Watch the roster fill', body: 'Each student appears on your screen as they arrive. Students who join a class this way are added to its roster, so their results land in your reports.' },

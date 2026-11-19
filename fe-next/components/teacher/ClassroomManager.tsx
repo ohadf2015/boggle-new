@@ -42,7 +42,6 @@ import type { HqClassroom } from './hq/GetStudentsInCard';
 import { CLASS_GRID_QUERIES, classesPerView } from './hq/classPaging';
 import { ClassroomFormDialog } from './ClassroomFormDialog';
 import { stagger } from './teacherDashboardTabs';
-import { ProBadge } from '@/components/ui/ProBadge';
 
 // Re-exported for the existing contract test; the map itself is shared with the
 // lobby language chips (lib/i18n/languageLabels.ts) so it can only drift once.
@@ -174,7 +173,6 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
           data-testid="classrooms-upgrade-teacher-pro"
           className={cn(OUTLINE_BUTTON, 'max-sm:px-2')}
         >
-          <ProBadge size="xs" label={t('teacher.lastGame.proBadge')} />
           {teacherProUpgradeCtaLabel(language)}
         </Link>
       ) : null}

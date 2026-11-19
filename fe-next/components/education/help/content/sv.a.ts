@@ -66,7 +66,7 @@ export const svA: HelpLocaleContent = {
       {
         t: 'steps',
         items: [
-          { title: 'Visa koden där alla ser den', body: 'I Lärarbasen visar kortet [[academy.hq.getStudentsIn]] koden. [[academy.hq.openProjector]] ger en stor helskärmsversion, [[academy.hq.qr]] en kod att skanna och [[academy.hq.copyLink]] en länk till klasschatten eller lärplattformen.', shot: 'hq-get-students-in' },
+          { title: 'Visa koden där alla ser den', body: 'På lärarens startsida visar klasspanelen anslutningskoden med knappen [[eduShell.home.shareCode]] bredvid. Där finns QR-koden, länken att klistra in i klasschatten eller lärplattformen, [[academy.hq.openProjector]] i helskärm och ett utskrivbart anslutningsblad.' },
           { title: 'Eleverna öppnar sidan', body: 'De går till **lexiclash.live/join** och skriver de sex tecknen, eller öppnar länken eller skannar QR-koden, som fyller i koden åt dem.' },
           { title: 'Eleverna väljer ett namn', body: 'De ser vilken klass de går med i, skriver ett namn (eller trycker på tärningen för ett slumpat) och trycker [[education.student.join.flow.go]]. Klart.', shot: 'student-join' },
           { title: 'Se listan fyllas på', body: 'Varje elev dyker upp på din skärm. Elever som går med i en klass på det här sättet hamnar på klassens elevlista, så deras resultat kommer med i dina rapporter.' },

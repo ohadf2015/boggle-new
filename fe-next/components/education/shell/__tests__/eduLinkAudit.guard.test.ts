@@ -66,7 +66,7 @@ const NEW_TAB_SCAN = [
 ];
 const newTabFiles = read(NEW_TAB_SCAN);
 // An open peer PR is rewriting these; skipped rather than pinned so either merge order stays green.
-const PEER_PR_FILES = new Set(['components/teacher/SubscriptionStatusCard.tsx']);
+const PEER_PR_FILES = new Set<string>();
 const CONSUMER_HREF = /href=\{?\s*[`'"][^`'"]*\/(legal|contact)(?![\w-])/g;
 
 function sameTabConsumerLinks(src: string): string[] {

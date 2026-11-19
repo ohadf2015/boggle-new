@@ -153,9 +153,9 @@ describe('LobbyPressureDials — monetization visibility (round 2)', () => {
   it.each([
     ['a Pro teacher', { hasPro: true, loading: false }],
     ['a free teacher', { hasPro: false, loading: false }],
-  ])('labels the dials Pro for %s, so the gate is never a surprise', (_who, state) => {
+  ])('has no standalone Pro badge for %s; the lock carries the mark', (_who, state) => {
     mockProState = state;
     setup();
-    expect(screen.getByTestId('pressure-pro-badge')).toHaveTextContent('eduShell.host.proBadge');
+    expect(screen.queryByTestId('pressure-pro-badge')).toBeNull();
   });
 });
