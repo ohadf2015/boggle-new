@@ -531,7 +531,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             levelUp={{ levelUpData: socketEvents.levelUpData, showLevelUpCelebration: socketEvents.showLevelUpCelebration, setShowLevelUpCelebration: socketEvents.setShowLevelUpCelebration, setLevelUpData: socketEvents.setLevelUpData }}
             authModal={{ showAuthModal: c.sideEffects.showAuthModal, setShowAuthModal: c.sideEffects.setShowAuthModal }}
             firstWinModal={{ showFirstWinModal: c.sideEffects.showFirstWinModal, setShowFirstWinModal: c.sideEffects.setShowFirstWinModal }}
-            shareModal={{ showShareModal: c.showShareModal, setShowShareModal, gameCode }}
+            shareModal={{ showShareModal: c.showShareModal, setShowShareModal, gameCode, userRequested: true }}
             t={t}
             language={c.language}
           />

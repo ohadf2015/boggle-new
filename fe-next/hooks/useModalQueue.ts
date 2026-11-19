@@ -7,6 +7,13 @@ interface QueuedModal {
   id: string;
   priority: number;
   isReady: boolean;
+  /**
+   * Opened by the player's own tap (a Challenge / Share button), not by the
+   * results flow. The quiet zone defers prompts that would cover a payoff; it
+   * must not swallow a request the player just made. MP results hold the zone
+   * for the whole screen, so without this those buttons did nothing.
+   */
+  userRequested?: boolean;
 }
 
 interface UseModalQueueOptions {
@@ -45,11 +52,9 @@ export function useModalQueue({ modals }: UseModalQueueOptions): {
   // the display waits, so each caller's own `show*` flag survives untouched.
   const quietZone = useOverlayQuietZone();
 
-  const activeModalId = quietZone
-    ? null
-    : modals
-        .filter((m) => m.isReady && !dismissedIds.has(m.id))
-        .sort((a, b) => a.priority - b.priority)[0]?.id ?? null;
+  const activeModalId = modals
+    .filter((m) => m.isReady && !dismissedIds.has(m.id) && (!quietZone || m.userRequested))
+    .sort((a, b) => a.priority - b.priority)[0]?.id ?? null;
 
   const dismiss = useCallback((id: string) => {
     setDismissedIds((prev) => new Set(prev).add(id));
