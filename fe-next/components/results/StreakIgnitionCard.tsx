@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useRef } from 'react';
-import { Flame } from 'lucide-react';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
@@ -30,8 +30,8 @@ const STREAK_DAYS = 7;
  * IGNITE". It reflects the EXISTING streak mechanic truthfully (product
  * decision, t_1d5371ad) — visibility fix, not an economy change.
  *
- * Neo-brutalist per .impeccable.md, no new dependencies, no images (lucide
- * Flame + CSS pulse). Mounted via dynamic(ssr:false) by the parent. The day
+ * Neo-brutalist per .impeccable.md, no new dependencies, no images (the shared
+ * StreakFlame). Mounted via dynamic(ssr:false) by the parent. The day
  * row inherits `dir` — do NOT hardcode ltr (RTL: the row flows right-to-left).
  */
 const StreakIgnitionCard: React.FC<StreakIgnitionCardProps> = memo(({
@@ -77,10 +77,11 @@ const StreakIgnitionCard: React.FC<StreakIgnitionCardProps> = memo(({
             won ? 'bg-neo-red' : 'bg-neo-navy',
           )}
         >
-          <Flame
-            className={cn('h-5 w-5', won ? 'text-neo-black motion-safe:animate-pulse' : 'text-neo-red')}
-            aria-hidden
-          />
+          {isLoaded ? (
+            <StreakFlame days={Math.max(1, currentStreak)} size={22} mood={won ? 'happy' : 'worried'} animated={won} />
+          ) : (
+            <span data-testid="streak-ignition-flame-slot" aria-hidden="true" className="inline-block h-[22px] w-[17.6px]" />
+          )}
         </span>
         <h3 className="font-neo-display text-lg sm:text-xl font-black uppercase tracking-wide text-neo-white">
           {t(won ? 'results.streakIgnition.titleWon' : 'results.streakIgnition.titleLost')}
@@ -107,7 +108,7 @@ const StreakIgnitionCard: React.FC<StreakIgnitionCardProps> = memo(({
                   : 'bg-neo-navy text-neo-white/40',
               )}
             >
-              {lit ? <Flame className="h-4 w-4" aria-hidden /> : day}
+              {lit ? <StreakFlame days={currentStreak} size={24} animated={false} /> : day}
             </div>
           );
         })}

@@ -1,9 +1,10 @@
 'use client';
 
-import { Flame, Snowflake } from 'lucide-react';
+import { Snowflake } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAccountStreak } from '@/hooks/useAccountStreak';
 import { useRetentionStreak } from '@/hooks/useRetentionStreak';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 /**
  * Header streak chip — constant awareness of the daily habit loop.
@@ -36,7 +37,7 @@ export default function StreakBadge() {
       title={freezeLabel || label}
       className="flex items-center gap-1 px-2 py-0.5 rounded-full border-2 border-neo-black bg-neo-orange/90 text-neo-black text-xs font-neo-display font-black shadow-hard-sm select-none"
     >
-      <Flame className="w-3.5 h-3.5" strokeWidth={2.5} aria-hidden />
+      <StreakFlame days={streak} size={16} />
       <span>{streak}</span>
       {freezeAvailable && (
         <Snowflake

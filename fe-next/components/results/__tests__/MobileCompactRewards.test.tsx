@@ -15,7 +15,7 @@ describe('MobileCompactRewards', () => {
     render(<MobileCompactRewards winStreak={3} />);
 
     expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('🔥')).toBeInTheDocument();
+    expect(screen.getByTestId('streak-flame')).toHaveAttribute('data-tier', 'flame');
   });
 
   it('renders coins when provided', () => {

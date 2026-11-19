@@ -32,6 +32,7 @@ import {
 } from '../results';
 import { CatalystTeaser } from './CatalystTeaser';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 // SignupPromptHost owns the post-game prompt (t_4833c3cd). PracticeResults
 // only renders a non-blocking inline card so guests see value without a
@@ -380,7 +381,7 @@ const PracticeResults = memo(function PracticeResults({
                 className="mt-3 inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-orange px-3 py-1 font-black text-neo-black"
                 aria-label={`Practice streak: ${practiceStreak} days`}
               >
-                <span aria-hidden>🔥</span>
+                <StreakFlame days={practiceStreak} size={18} />
                 <span className="text-sm">×{practiceStreak}</span>
               </m.div>
             )}

@@ -16,7 +16,8 @@
 
 import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { Swords, Trophy, X, Minus, Flame } from 'lucide-react';
+import { Swords, Trophy, X, Minus } from 'lucide-react';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
   getDuelHistory,
@@ -167,7 +168,7 @@ export function DuelHistory({ studentId, className }: DuelHistoryProps) {
             data-testid="duel-streak-chip"
             className="ms-auto inline-flex items-center gap-1.5 rounded-neo border-[2px] border-neo-black bg-neo-orange px-2.5 py-1 shadow-hard-sm"
           >
-            <Flame className="h-4 w-4 text-neo-black" aria-hidden="true" />
+            <StreakFlame days={stats.winStreak} size={18} />
             <span className="font-neo-display text-lg font-black tabular-nums leading-none text-neo-black">
               {stats.winStreak}
             </span>

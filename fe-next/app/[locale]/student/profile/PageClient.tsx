@@ -23,6 +23,7 @@ import logger from '@/utils/logger';
 import { getXpProgress } from '@/backend/modules/xpManager';
 import { transformAchievementRow } from './achievementTransform';
 import Avatar from '@/components/Avatar';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 export default function StudentProfilePageClient() {
   const { user, profile, loading } = useAuth();
@@ -165,8 +166,9 @@ export default function StudentProfilePageClient() {
                   {totalXp} {t('education.xp.totalXp')}
                 </div>
                 {currentStreak > 0 && (
-                  <div className="px-3 py-1 bg-neo-orange text-neo-black font-neo-display font-bold text-sm sm:text-base rounded-neo border-2 border-neo-black shadow-hard-sm tabular-nums">
-                    🔥 {currentStreak} {t('education.xp.streak')}
+                  <div className="px-3 py-1 bg-neo-orange text-neo-black font-neo-display font-bold text-sm sm:text-base rounded-neo border-2 border-neo-black shadow-hard-sm tabular-nums inline-flex items-center gap-1.5">
+                    <StreakFlame days={currentStreak} size={18} />
+                    {currentStreak} {t('education.xp.streak')}
                   </div>
                 )}
               </div>

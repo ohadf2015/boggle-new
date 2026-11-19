@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { CheckCheck, Flame } from 'lucide-react';
+import { CheckCheck } from 'lucide-react';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { triggerHaptic } from '@/utils/hapticFeedback';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -9,6 +9,7 @@ import { TodayChestCard } from '../prize/TodayChestCard';
 
 const ALL_DONE = { wordWheel: true, wordHunt: true, wordTower: true, connections: true };
 import { getDailyChallengeDate } from '@/utils/dailyChallenge/dateUtils';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface DailyAllClearCardProps {
   /** Current daily streak; the streak line is omitted at 0. */
@@ -74,7 +75,7 @@ export function DailyAllClearCard({ streak }: DailyAllClearCardProps) {
       </div>
       {streak > 0 && (
         <p className="flex items-center gap-1.5 text-xs font-black text-neo-yellow" data-testid="all-clear-streak">
-          <Flame className="w-4 h-4 shrink-0 text-neo-orange" aria-hidden="true" />
+          <StreakFlame days={streak} size={16} />
           {t('daily.allClear.streak', { n: streak })}
         </p>
       )}

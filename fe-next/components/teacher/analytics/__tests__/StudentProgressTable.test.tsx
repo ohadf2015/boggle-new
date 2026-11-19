@@ -89,6 +89,14 @@ describe('StudentProgressTable', () => {
     vi.clearAllMocks();
   });
 
+  it('shows a still tiered flame beside streaks of 3 or more only', () => {
+    mockUseStudentProgressMetrics.mockReturnValue({ students: mockStudents, isLoading: false, error: null, refresh: vi.fn() });
+    render(<StudentProgressTable classroomId="classroom-1" />);
+    const flames = screen.getAllByTestId('streak-flame');
+    expect(flames).toHaveLength(2);
+    flames.forEach((flame) => expect(flame.querySelector('[data-animated]')).toBeNull());
+  });
+
   it('should render loading state', () => {
     // GIVEN: Loading state
     mockUseStudentProgressMetrics.mockReturnValue({

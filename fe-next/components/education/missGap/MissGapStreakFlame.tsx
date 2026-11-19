@@ -13,11 +13,11 @@
 'use client';
 
 import Image from 'next/image';
-import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { getStreakHeat, streakHeatGradient } from '@/lib/streakHeat';
 import { MASCOT_IMAGES } from '@/components/ui/mascotData';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 export interface MissGapStreakFlameProps {
   streak: number;
@@ -49,7 +49,7 @@ export function MissGapStreakFlame({
           className,
         )}
       >
-        <Flame className="w-4 h-4" aria-hidden />
+        <StreakFlame days={days} size={18} />
         <span data-testid="miss-gap-streak-pill-count">{days}</span>
       </span>
     );

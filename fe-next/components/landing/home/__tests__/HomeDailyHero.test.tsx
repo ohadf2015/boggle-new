@@ -121,6 +121,16 @@ describe('HomeDailyHero — CTA hydration gate', () => {
     expect(screen.queryByText('PLAY')).not.toBeInTheDocument();
   });
 
+  it('shows the tiered streak flame beside the day streak, and none at 0', () => {
+    mockStats = baseStats({ streak: 8 });
+    const { unmount } = render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 8, loading: false }} />);
+    expect(screen.getByTestId('streak-flame')).toHaveAttribute('data-tier', 'blue');
+    unmount();
+    mockStats = baseStats({ streak: 0 });
+    render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: false }} />);
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
+  });
+
   it('renders PLAY once a not-yet-played daily resolves', () => {
     mockStats = baseStats({ loading: false, hasPlayed: false, hasSolved: false });
     render(<HomeDailyHero preloadedStats={{ hasPlayed: false, hasSolved: null, currentStreak: 0, loading: false }} />);

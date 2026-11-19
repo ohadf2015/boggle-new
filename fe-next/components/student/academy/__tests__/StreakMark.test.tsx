@@ -26,6 +26,25 @@ describe('<StreakMark> one streak flame for the whole Academy', () => {
     expect(within(mark).getByText('academy.student.streakAtRiskAria')).toHaveClass('sr-only');
   });
 
+  it('Given a live streak, Then the tiered flame moves and a risky one looks worried', () => {
+    const { rerender } = render(<StreakMark streak={4} still={false} size={28} t={t} />);
+    let flame = screen.getByTestId('streak-flame');
+    expect(flame).toHaveAttribute('data-tier', 'flame');
+    expect(flame).toHaveAttribute('data-mood', 'happy');
+    expect(flame.querySelector('[data-animated]')).not.toBeNull();
+    rerender(<StreakMark streak={4} atRisk still={false} size={28} t={t} />);
+    flame = screen.getByTestId('streak-flame');
+    expect(flame).toHaveAttribute('data-mood', 'worried');
+  });
+
+  it('Given calm or no streak, Then the flame stands still', () => {
+    const { rerender } = render(<StreakMark streak={4} still size={28} t={t} />);
+    expect(screen.getByTestId('streak-flame').querySelector('[data-animated]')).toBeNull();
+    rerender(<StreakMark streak={0} still={false} size={28} t={t} />);
+    expect(screen.getByTestId('streak-flame')).toHaveAttribute('data-tier', 'none');
+    expect(screen.getByTestId('streak-flame').querySelector('[data-animated]')).toBeNull();
+  });
+
   it('Given a calm streak, Then there is no warning text', () => {
     render(<StreakMark streak={4} still size={28} t={t} />);
     expect(screen.queryByText('academy.student.streakAtRiskAria')).toBeNull();

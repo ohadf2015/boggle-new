@@ -81,7 +81,9 @@ describe('WordWheelReadyCard', () => {
   it('shows the streak only when there is one', () => {
     const { rerender } = render(<WordWheelReadyCard {...base} />);
     expect(screen.queryByTestId('ready-streak')).toBeNull();
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
     rerender(<WordWheelReadyCard {...base} streakDays={4} />);
+    expect(screen.getByTestId('ready-streak').querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
     expect(screen.getByTestId('ready-streak').textContent).toContain('"count":4');
   });
 

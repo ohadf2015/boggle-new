@@ -95,4 +95,16 @@ describe('CrazyGamesRetentionCard', () => {
     await waitFor(() => expect(screen.getByTestId('cg-retention-card')).toBeInTheDocument());
     expect(screen.getByTestId('cg-retention-message')).toBeInTheDocument();
   });
+
+  it('shows the streak flame once the streak passes day one, a star on day one', async () => {
+    mockLoad.mockResolvedValue(makeCloudSave({ lastPlayedDate: isoOffset(-1), cgStreak: 4 }));
+    const { unmount } = render(<CrazyGamesRetentionCard />);
+    await waitFor(() => expect(screen.getByTestId('cg-retention-card')).toBeInTheDocument());
+    expect(screen.getByTestId('streak-flame')).toHaveAttribute('data-tier', 'flame');
+    unmount();
+    mockLoad.mockResolvedValue(null);
+    render(<CrazyGamesRetentionCard />);
+    await waitFor(() => expect(screen.getByTestId('cg-retention-card')).toBeInTheDocument());
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
+  });
 });

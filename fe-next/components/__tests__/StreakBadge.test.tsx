@@ -41,10 +41,19 @@ describe('StreakBadge', () => {
     expect(screen.queryByText('3')).toBeNull();
   });
 
+  it('shows the tiered streak flame instead of an icon', () => {
+    mockAccountStreak = { streak: 8, loading: false };
+    render(<StreakBadge />);
+    const flame = screen.getByTestId('streak-flame');
+    expect(flame).toHaveAttribute('data-tier', 'blue');
+    expect(screen.getByTestId('streak-badge')).toContainElement(flame);
+  });
+
   it('self-hides at 0 days', () => {
     mockAccountStreak = { streak: 0, loading: false };
     render(<StreakBadge />);
     expect(screen.queryByTestId('streak-badge')).toBeNull();
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
   });
 
   it('self-hides while the account streak is still loading, instead of flashing 0', () => {

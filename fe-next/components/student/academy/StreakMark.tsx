@@ -1,8 +1,8 @@
 'use client';
 
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
-import { Flame } from 'lucide-react';
 import { Medallion } from './chrome';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 type T = (key: string, fallback?: string) => string;
 
@@ -20,7 +20,7 @@ export function StreakMark({ streak, atRisk = false, still, size, t }: { streak:
         style={!calm && alive ? { animation: warn ? 'academy-flame-risk 0.9s ease-in-out infinite' : 'academy-flame-calm 2.6s ease-in-out infinite' } : undefined}
       >
         <Medallion tone="ember" size={size} shadow={1}>
-          <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
+          <StreakFlame days={streak} size={18} mood={warn ? 'worried' : 'happy'} animated={!calm && alive} />
         </Medallion>
       </span>
       {warn && (

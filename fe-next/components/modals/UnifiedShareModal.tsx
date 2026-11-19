@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
 import { Reveal } from '@/components/ui/Reveal';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, MessageCircle, Trophy, Flame, Check, Target, Mail, MessageSquare } from 'lucide-react';
+import { Copy, MessageCircle, Trophy, Check, Target, Mail, MessageSquare } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { addCoins } from '@/utils/coinManager';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 /**
  * Share context determines the modal's appearance and behavior
@@ -311,7 +312,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     <div className="w-0.5 h-10 rounded-full bg-white/20" />
                     <div className="text-center px-3">
                       <div className="text-2xl font-black text-orange-400 flex items-center gap-1">
-                        <Flame className="w-5 h-5" /> {gameResult.streakDays}
+                        <StreakFlame days={gameResult.streakDays} size={22} /> {gameResult.streakDays}
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
                         {t('share.streak')}

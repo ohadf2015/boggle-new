@@ -20,7 +20,7 @@ describe('HomeTopBar streak flame', () => {
     vi.mocked(useAccountStreak).mockReturnValue({ streak: 3, loading: false });
   });
 
-  it('flickers the flame only under motion-safe so reduced-motion users get a still icon', () => {
+  it('shows the tiered streak flame in the chip instead of an icon', () => {
     render(
       <HomeTopBar
         profile={null}
@@ -30,8 +30,17 @@ describe('HomeTopBar streak flame', () => {
       />,
     );
     const chip = screen.getByTestId('home-streak-chip');
-    const flame = chip.querySelector('svg');
-    expect(flame).not.toBeNull();
-    expect(flame?.getAttribute('class')).toContain('motion-safe:animate-streak-flicker');
+    expect(chip.querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
+  });
+
+  it('shows no sleeping flame while the streak is still loading', () => {
+    // Given a returning player whose streak has not resolved
+    vi.mocked(useAccountStreak).mockReturnValue({ streak: 0, loading: true });
+    // When the bar renders
+    render(<HomeTopBar profile={null} language="en" t={t as never} profileLoading={false} />);
+    // Then the chip keeps its space without implying the streak is out
+    const chip = screen.getByTestId('home-streak-chip');
+    expect(chip.querySelector('[data-testid="streak-flame"]')).toBeNull();
+    expect(chip.querySelector('[data-testid="home-streak-flame-slot"]')).not.toBeNull();
   });
 });

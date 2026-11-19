@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite from '@/components/AvatarLite';
 import { NeoSkeleton } from '@/components/ui/skeleton';
@@ -12,6 +11,7 @@ import { resolveDisplayTitle, titleLabelKey } from '@/lib/titles/playerTitles';
 import { useAccountStreak } from '@/hooks/useAccountStreak';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { CoinArt } from '@/components/ui/CoinArt';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 /** localStorage key — a stable per-device seed so a guest's random avatar is the
  *  same across reloads (and matches whatever they later see pre-sign-in). */
@@ -155,11 +155,11 @@ export function HomeTopBar({
           data-testid="home-streak-chip"
           className="inline-flex items-center gap-1 rounded-neo-pill border-2 border-neo-cream/40 bg-neo-navy-light py-1 pe-2.5 ps-[7px] shadow-hard-sm"
         >
-          <Flame
-            className="h-[15px] w-[15px] text-neo-orange motion-safe:animate-streak-flicker"
-            strokeWidth={2.2}
-            aria-hidden="true"
-          />
+          {showStreakSkeleton ? (
+            <span data-testid="home-streak-flame-slot" aria-hidden="true" className="inline-block h-[18px] w-[14.4px] shrink-0" />
+          ) : (
+            <StreakFlame days={liveStreak} size={18} />
+          )}
           {showStreakSkeleton ? (
             <NeoSkeleton variant="text" width={14} height={14} />
           ) : (

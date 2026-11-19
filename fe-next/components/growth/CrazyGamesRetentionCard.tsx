@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { loadFromCloud, saveToCloud, type SaveData } from '@/utils/crazygames/cloudSave';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface RetentionState {
   streak: number;
@@ -84,9 +85,13 @@ export const CrazyGamesRetentionCard: React.FC = () => {
       className="flex flex-col items-center gap-2 w-full rounded-neo border-neo border-black bg-neo-navy-light p-4 shadow-hard text-center"
     >
       <div className="flex items-center gap-2">
-        <span className="text-2xl" aria-hidden="true">
-          {state.streak > 1 ? '🔥' : '⭐'}
-        </span>
+        {state.streak > 1 ? (
+          <StreakFlame days={state.streak} size={28} />
+        ) : (
+          <span className="text-2xl" aria-hidden="true">
+            ⭐
+          </span>
+        )}
         <span className="font-neo-display text-xl text-neo-orange font-bold">
           {t('crazygames.retention.streakDay', { n: state.streak })}
         </span>

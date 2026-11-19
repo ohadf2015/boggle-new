@@ -9,10 +9,10 @@
 
 import Image from 'next/image';
 import type { ReactNode } from 'react';
-import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InkPanel, Medallion, Ribbon, INK_TEXT } from './chrome';
 import type { AcademyIsland } from './academyIslands';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface Props {
   title: string;
@@ -38,7 +38,7 @@ export function AcademySidePanel({ title, streak, boss, chest }: Props) {
           {/* Streak: this week as seven flames. */}
           <div className="flex items-center gap-2">
             <Medallion tone="ember" size={38} shadow={1}>
-              <Flame className="h-4 w-4 fill-neo-yellow text-neo-black" strokeWidth={2.5} />
+              <StreakFlame days={streak} size={20} />
             </Medallion>
             <div className="min-w-0">
               <p dir="auto" className={`font-neo-display text-base font-black leading-tight text-neo-white ${INK_TEXT}`}>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { m } from 'framer-motion';
-import { Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DAILY_MODES } from '@/lib/dailyModes';
 import WheelHowTo from './wheel/WheelHowTo';
 import { useWheelHowTo } from './wheel/useWheelHowTo';
 import { scoreForLength } from '@/utils/dailyChallenge/wordWheelScoring';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -135,7 +135,7 @@ export default function WordWheelReadyCard({
 
         {streakDays >= 1 && (
           <p data-testid="ready-streak" className="mt-3 flex items-center justify-center gap-1.5 text-neo-orange font-neo-display font-black text-sm uppercase tracking-wide">
-            <Flame className="w-4 h-4" strokeWidth={2.5} aria-hidden />
+            <StreakFlame days={streakDays} size={16} />
             {t('wordWheel.results.streakChip', { count: streakDays })}
           </p>
         )}

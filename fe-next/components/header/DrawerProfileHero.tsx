@@ -2,13 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ChevronRight, Flame } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { CoinBalance } from '../CoinBalance';
 import { RankTierChip } from '../seasons/RankTierChip';
 import { tierVisual, type TierId } from '@/lib/seasons/scoreTier';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface DrawerProfileHeroProps {
   /** Localized link to the profile page. */
@@ -93,7 +94,7 @@ export function DrawerProfileHero({
             <div className="flex items-center gap-2 text-[11px] font-bold mt-0.5">
               {hasStreak && (
                 <span className="inline-flex items-center gap-1 text-neo-orange">
-                  <Flame className="w-3.5 h-3.5 fill-current" aria-hidden="true" />
+                  <StreakFlame days={streak} size={16} />
                   {streak}
                 </span>
               )}
