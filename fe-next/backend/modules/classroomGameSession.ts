@@ -45,7 +45,7 @@
 
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
-import { getClassroomGame, updateClassroomGameStatus } from './classroomGameManager';
+import { CLASSROOM_GAME_TTL, getClassroomGame, updateClassroomGameStatus } from './classroomGameManager';
 import { isClassroomSessionEnded } from './classroomGameSessionState';
 
 export { isClassroomSessionEnded } from './classroomGameSessionState';
@@ -78,6 +78,35 @@ export async function endClassroomGameSession(gameCode: string): Promise<void> {
       'CLASSROOM_GAME',
       `Failed to end classroom session for ${gameCode}: ${(error as Error).message}`
     );
+  }
+}
+
+/**
+ * The teacher came back to the code already on the board. A round start must
+ * not do this — that would resurrect a dead PIN under the class — but the
+ * teacher opening their own ended code is asking for that door again.
+ * Returns false when there is nothing to revive or the caller is not the teacher.
+ */
+export async function reviveClassroomGameSession(gameCode: string, teacherId: string): Promise<boolean> {
+  try {
+    const redis = getRedisClient();
+    if (!redis || !teacherId) return false;
+    const game = await getClassroomGame(gameCode);
+    if (!game || !isClassroomSessionEnded(game) || game.teacherId !== teacherId) return false;
+    const { endedAt: _ended, ...rest } = game;
+    await redis.setex(
+      `classroom_game:${gameCode}`,
+      CLASSROOM_GAME_TTL,
+      JSON.stringify({ ...rest, status: 'waiting' })
+    );
+    await redis.sadd(`classroom_games:${game.classroomId}`, gameCode);
+    return true;
+  } catch (error) {
+    logger.error(
+      'CLASSROOM_GAME',
+      `Failed to revive classroom session for ${gameCode}: ${(error as Error).message}`
+    );
+    return false;
   }
 }
 

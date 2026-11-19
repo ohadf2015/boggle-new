@@ -48,6 +48,7 @@ vi.mock('../../utils/logger', () => ({
 import {
   endClassroomGameSession,
   isClassroomSessionEnded,
+  reviveClassroomGameSession,
 } from '../classroomGameSession';
 import { beginClassroomRound, getActiveClassroomGames } from '../classroomGameManager';
 import { isClassroomGameJoinable } from '../../handlers/classroomGameJoinGate';
@@ -196,6 +197,26 @@ describe('an ended session is terminal', () => {
 
     expect(mockRedis.setex).not.toHaveBeenCalled();
     expect(mockRedis.sadd).not.toHaveBeenCalled();
+  });
+
+  it('the teacher reopening their own ended code makes that same code joinable again', async () => {
+    mockRedis.get.mockResolvedValue(record({ status: 'ended', endedAt: 'x', teacherId: 't1' }));
+
+    await expect(reviveClassroomGameSession(CODE, 't1')).resolves.toBe(true);
+
+    const saved = written();
+    expect(saved.status).toBe('waiting');
+    expect(saved.endedAt).toBeUndefined();
+    expect(isClassroomSessionEnded(saved)).toBe(false);
+    expect(mockRedis.sadd).toHaveBeenCalledWith(`classroom_games:${CLASSROOM}`, CODE);
+  });
+
+  it('refuses to revive a code for anyone but its teacher', async () => {
+    mockRedis.get.mockResolvedValue(record({ status: 'ended', endedAt: 'x', teacherId: 't1' }));
+
+    await expect(reviveClassroomGameSession(CODE, 'someone-else')).resolves.toBe(false);
+
+    expect(mockRedis.setex).not.toHaveBeenCalled();
   });
 });
 

@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { checkRateLimitRedis, RATE_LIMIT_KEYS } from '@/backend/redis/rateLimit';
-import { readEndedClassroomSession } from '@/app/api/education/classroom/join/endedSessionCode';
+import { readEndedClassroomSession, lookupHistoricalClassroomCode } from '@/app/api/education/classroom/join/endedSessionCode';
 
 const CODE_RE = /^[A-Z0-9]{6}$/;
 const LOOKUPS_PER_MINUTE = 20;
@@ -21,7 +21,14 @@ export async function endedJoinCodeStatus(code: string): Promise<EndedJoinCodeSt
   // A class behind one school IP trips this; "could not check" must never read as "wrong code".
   if (limited) return 'unverified';
   try {
-    return (await readEndedClassroomSession(normalized)) !== null ? 'ended' : 'not_ended';
+    if ((await readEndedClassroomSession(normalized)) !== null) return 'ended';
+  } catch {
+    return 'unverified';
+  }
+  // Redis forgot the code after four hours. A finished round still names the class,
+  // and a guest must not be told that whiteboard code is a typo before the join runs.
+  try {
+    return (await lookupHistoricalClassroomCode(normalized)) ? 'ended' : 'not_ended';
   } catch {
     return 'unverified';
   }

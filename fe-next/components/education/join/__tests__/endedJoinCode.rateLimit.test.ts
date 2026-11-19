@@ -8,6 +8,7 @@ const { mockLookup, mockLimit, mockHeaders } = vi.hoisted(() => ({
 vi.mock('@/app/api/education/classroom/join/endedSessionCode', () => ({
   lookupEndedClassroomSession: mockLookup,
   readEndedClassroomSession: mockLookup,
+  lookupHistoricalClassroomCode: vi.fn(async () => null),
 }));
 vi.mock('@/backend/redis/rateLimit', () => ({
   checkRateLimitRedis: mockLimit,

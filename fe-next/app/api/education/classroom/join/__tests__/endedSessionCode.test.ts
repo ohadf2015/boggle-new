@@ -16,6 +16,26 @@ const redis = {
 };
 vi.mock('@/backend/cache/redisCache', () => ({ getCacheClient: () => redis }));
 
+const rounds = { classroomId: null as string | null };
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({
+    from: () => ({
+      select: () => ({
+        eq: () => ({
+          order: () => ({
+            limit: () => ({
+              maybeSingle: async () => ({
+                data: rounds.classroomId ? { classroom_id: rounds.classroomId } : null,
+                error: null,
+              }),
+            }),
+          }),
+        }),
+      }),
+    }),
+  }),
+}));
+
 import {
   lookupEndedClassroomSession,
   readEndedClassroomSession,
@@ -27,6 +47,7 @@ import {
 beforeEach(() => {
   store.clear();
   sets.clear();
+  rounds.classroomId = null;
   vi.clearAllMocks();
 });
 
@@ -44,6 +65,17 @@ describe('lookupEndedClassroomSession', () => {
   it('given a live session, then it is not an ended one', async () => {
     store.set('classroom_game:ABC123', JSON.stringify({ classroomId: 'c1', status: 'playing' }));
     await expect(lookupEndedClassroomSession('ABC123')).resolves.toBeNull();
+  });
+
+  it('given redis forgot the code but a finished round still names the class, then the whiteboard code still belongs to that class', async () => {
+    rounds.classroomId = 'c-old';
+    await expect(lookupEndedClassroomSession('DD293R')).resolves.toEqual({ classroomId: 'c-old' });
+  });
+
+  it('given a live redis record, then an older round of the same code is not treated as ended', async () => {
+    store.set('classroom_game:DD293R', JSON.stringify({ classroomId: 'c-live', status: 'playing' }));
+    rounds.classroomId = 'c-old';
+    await expect(lookupEndedClassroomSession('DD293R')).resolves.toBeNull();
   });
 
   it('given no record or a broken one, then null and no throw', async () => {
