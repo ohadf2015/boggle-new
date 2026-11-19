@@ -22442,6 +22442,9 @@ const es = {
       "joined": "¡{name} ya está aquí!",
       "youreIn": "¡Ya estás dentro!",
       "watchBoard": "Mira la pantalla. Tu profe empieza el juego.",
+      "waitPractice": "Practica mientras tu profe prepara el juego.",
+      "waitReady": "Pulsa el botón para avisar. Tu profe empieza el juego.",
+      "skipPractice": "Saltar la práctica",
       "inClass": "{count} en clase",
       "changeLook": "Cambiar look",
       "leave": "Salir"
@@ -22538,7 +22541,8 @@ const es = {
       "calculating": "Contando las palabras…",
       "classGoal": "Botín de la clase: {found}/{total} palabras",
       "waitNext": "Tu profe decide qué sigue. Calienta mientras esperas.",
-      "moreFromRound": "Más de esta ronda"
+      "moreFromRound": "Más de esta ronda",
+      "backToResults": "Volver a los resultados"
     }
   }
   // @eduLiveRoom:end

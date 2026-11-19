@@ -3,14 +3,13 @@
 /** Behaviour (XP, coins, game record, exit) stays in the shared results controller so it cannot drift from /multiplayer. */
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import { classroomRival } from '@/lib/rivals/pickers';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useReducedMotion } from 'framer-motion';
-import { ChevronDown, LogOut, Star } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { useMpResultsController, type MpResultsProps } from '@/components/multiplayer/results/useMpResultsController';
-import { useOpenLessonPractice } from '@/components/multiplayer/results/useOpenLessonPractice';
 import { useRoundReward } from '@/components/education/economy/useRoundReward';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
@@ -34,7 +33,9 @@ import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import type { PlayerResult } from '@/types/components';
 import { studentGap, studentPlacing } from './eduResultsModel';
-import { EduMissedRecall, missedDefinitions } from './EduMissedRecall';
+import { missedDefinitions } from './EduMissedRecall';
+import { EduStudentResultsMore } from './EduStudentResultsMore';
+import { EduStudentResultsPractice, missedPracticeKind } from './EduStudentResultsPractice';
 import { useRival } from './useRival';
 import { EduStudentShareButton } from './EduStudentShareButton';
 import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
@@ -66,13 +67,12 @@ function ResultsSkeleton() {
   );
 }
 
-const COLUMN = 'w-full max-w-md';
+const COLUMN = 'w-full max-w-xl';
 
 function EduStudentResultsInner(props: EduStudentResultsProps) {
   const c = useMpResultsController(props);
   const { t } = c;
   const reduceMotion = !!useReducedMotion();
-  const openLessonPractice = useOpenLessonPractice();
   const summary = props.classroomSummary;
   const teacher = summary?.teacherName ?? '';
   const scores = (c.data.sortedScores as PlayerResult[] | undefined) ?? [];
@@ -90,7 +90,9 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const missed = useMemo(() => myMissedWords(summary, props.username), [summary, props.username]);
   const deck = useStudyDeck((state) => deckCardsFor(state, props.gameCode));
   const definitions = useMemo(() => missedDefinitions(missed, deck), [missed, deck]);
-  const lessonId = summary?.lessonIds?.[0];
+  const practiceKind = missedPracticeKind(missed, deck);
+  const [practising, setPractising] = useState(false);
+  const scrollRef = useRef<HTMLElement>(null);
   const exitCopy = resultsExitCopy({ isClassroom: true, isHost: false });
   // The same session story the /multiplayer card banks, under the same key: only one of the two ever mounts on a phone.
   const { momentum } = useSessionRoundHistory({
@@ -112,7 +114,6 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const verdict = placing ? studentVerdict({ ...placing, rivalDiff: rivalOutcome?.diff ?? null, gapKind: gap?.kind ?? null }) : 'lost';
   const classFound = summary?.classFoundCount;
   const classTotal = typeof classFound === 'number' ? (summary?.totalWords ?? 0) : 0;
-  const [moreOpened, setMoreOpened] = useState(false);
   const hardest = useMemo(() => (summary && lessonWordsLanded(summary) ? roundHardestWords(summary) : []), [summary]);
   const bridge = classModeBridgeOffer({
     isTeacher: false,
@@ -122,6 +123,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
     hideRank: false,
     locale: c.language,
   });
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [practising]);
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
 
@@ -146,65 +151,44 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
         <ResultsSkeleton />
       ) : (
         <main
+          ref={scrollRef}
           data-testid="edu-student-results-scroll"
-          className="flex min-h-0 flex-1 flex-col items-center gap-2.5 overflow-y-auto px-4 pb-6 pt-1.5"
+          className="flex min-h-0 flex-1 flex-col items-center gap-3 overflow-y-auto px-4 pb-6 pt-1.5"
         >
-          {placing && (
-            <div className={COLUMN}>
-              <StudentRevealHero
-                rank={placing.rank}
-                total={placing.total}
-                score={placing.score}
-                verdict={verdict}
-                beat={beat}
-                rival={rivalOutcome}
-                gap={gap}
-                reduceMotion={reduceMotion}
-                chest={reveal ? <StudentChestBeat reveal={reveal} beat={beat} reduceMotion={reduceMotion} t={t} /> : null}
-                t={t}
-              />
-            </div>
+          {practising && practiceKind && (
+            <EduStudentResultsPractice kind={practiceKind} missed={missed} deck={deck} username={props.username} onBack={() => setPractising(false)} t={t} />
           )}
 
-          {bridge && (
+          {/* Hidden, not unmounted: the chest reveal must not replay when the student comes back. */}
+          <div hidden={practising} className={practising ? undefined : 'contents'}>
+            {placing && (
+              <div className={COLUMN}>
+                <StudentRevealHero
+                  rank={placing.rank}
+                  total={placing.total}
+                  score={placing.score}
+                  verdict={verdict}
+                  beat={beat}
+                  rival={rivalOutcome}
+                  gap={gap}
+                  reduceMotion={reduceMotion}
+                  chest={reveal ? <StudentChestBeat reveal={reveal} beat={beat} reduceMotion={reduceMotion} t={t} /> : null}
+                  t={t}
+                />
+              </div>
+            )}
+
+            <BossOutcomeCard size="phone" density="compact" className={cn(COLUMN, 'rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg')} />
+
+            {(summary?.coverage?.length ?? 0) > 0 && (
+              <div className={COLUMN}>
+                <StudentMissedWords words={missed} definitions={definitions} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
+              </div>
+            )}
+
             <div className={COLUMN}>
-              <ClassModeBridgeCard offer={bridge} />
-            </div>
-          )}
-
-          <div className={COLUMN}><ResultsSocialSlot mode="edu" score={placing?.score} rival={classroomRival(scores.filter((s) => s.username !== teacher), props.username)} /></div>
-
-          <div className={COLUMN}>
-            <StudentRoundPair bestWord={best} lesson={lesson} t={t} />
-          </div>
-
-          {hardest.length > 0 && (
-            <div className={COLUMN}>
-              <HardestWordsInsight words={hardest} t={t} />
-            </div>
-          )}
-
-          {props.gameCode && (
-            <div className={COLUMN}>
-              <RoundShop compact gameCode={props.gameCode} />
-            </div>
-          )}
-
-          <BossOutcomeCard size="phone" density="compact" className={cn(COLUMN, 'rounded-neo-lg border-[3px] border-neo-cream/50 shadow-hard-lg')} />
-
-          <div className={COLUMN}>
-            <details
-              data-testid="edu-student-more"
-              onToggle={(e) => e.currentTarget.open && setMoreOpened(true)}
-              className="group rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-elevated shadow-hard">
-              <summary
-                data-testid="edu-student-more-summary"
-                className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 py-2 font-neo-display text-lg font-black [&::-webkit-details-marker]:hidden"
-              >
-                <span>{t('eduLiveRoom.studentResults.moreFromRound')}</span>
-                <ChevronDown className="size-5 shrink-0 transition-transform duration-200 ease-out group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
-              </summary>
-              {moreOpened && <div className="flex flex-col gap-3 px-3 pb-3">
+              <EduStudentResultsMore words={words} t={t}>
+                <StudentRoundPair bestWord={best} lesson={lesson} t={t} />
                 {xpGained && xpGained.newTotalXp > 0 && <EduStudentXpBar totalXp={xpGained.newTotalXp} />}
                 {(classTotal > 0 || momentum) && (
                   <div className="flex flex-wrap gap-1.5">
@@ -212,34 +196,12 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                     {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
                   </div>
                 )}
-                <h2 className="flex items-baseline justify-between gap-2 font-neo-display text-base font-black">
-                  {t('eduLiveRoom.studentResults.yourWords')}
-                  {words.length > 0 && <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{words.length}</span>}
-                </h2>
-                {words.length > 0 ? (
-                  <ul className="flex flex-wrap gap-1.5">
-                    {words.map((w, i) => (
-                      <li
-                        key={w.word}
-                        data-testid="edu-student-word"
-                        dir="auto"
-                        className={cn(
-                          'inline-flex items-center gap-1 rounded-full border-2 border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black uppercase text-neo-black',
-                          i === 0 ? 'bg-neo-yellow shadow-hard-sm' : 'bg-neo-lime'
-                        )}
-                      >
-                        {i === 0 && <Star className="size-3.5 fill-neo-black" aria-hidden="true" />}
-                        {w.word}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('eduLiveRoom.studentResults.noWords')}</p>
-                )}
-                <StudentMissedWords words={missed} definitions={definitions} language={props.roomLanguage ?? c.language} t={t} className="w-full" />
-                <EduMissedRecall missed={missed} deck={deck} t={t} />
-              </div>}
-            </details>
+                {props.gameCode && <RoundShop compact gameCode={props.gameCode} />}
+                {hardest.length > 0 && <HardestWordsInsight words={hardest} t={t} />}
+                <ResultsSocialSlot mode="edu" score={placing?.score} rival={classroomRival(scores.filter((s) => s.username !== teacher), props.username)} />
+                {bridge && <ClassModeBridgeCard offer={bridge} />}
+              </EduStudentResultsMore>
+            </div>
           </div>
         </main>
       )}
@@ -247,7 +209,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       {scores.length > 0 && (
         <footer data-testid="edu-student-results-bar" className="flex shrink-0 justify-center border-t-2 border-neo-cream/50 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2.5">
           <div className={COLUMN}>
-            <StudentWaitBar onPractice={lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined} t={t} />
+            <StudentWaitBar onPractice={practiceKind && !practising ? () => setPractising(true) : undefined} t={t} />
           </div>
         </footer>
       )}

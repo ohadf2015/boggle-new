@@ -4,8 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import Avatar from '@/components/Avatar';
 import type { WaitingClassmate } from '@/components/education/lobby/ClassroomWaitingStage';
 import type { EduT } from '@/components/education/lobby/eduText';
-import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { cn } from '@/lib/utils';
+import { EduStudentLobbyFold } from './EduStudentLobbyFold';
 import { newArrivals } from './lobbyArrivals';
 
 const MAX_FACES = 11;
@@ -31,7 +31,7 @@ function useArrivals(names: string[]): { latest: string | null; fresh: ReadonlyS
   return state;
 }
 
-/** Classmates wall: everyone waiting, each arrival pops in with a bounce and a "Noa joined!" line. */
+/** Arrivals stay on screen; the classmates wall folds away so it never competes with practice. */
 export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: WaitingClassmate[]; statusSlot?: ReactNode; t: EduT }) {
   const faces = others.slice(0, MAX_FACES);
   const hidden = others.length - faces.length;
@@ -39,19 +39,9 @@ export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: Waitin
   const { latest, fresh } = useArrivals(others.map((o) => o.username));
 
   return (
-    <section
-      data-testid="edu-student-crowd"
-      className="flex w-full max-w-md shrink-0 flex-col gap-2.5 rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy-light p-3 shadow-hard"
-    >
-      <div className="flex items-center gap-2.5">
-        {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
-        <img src={EDU_MASCOT.gameStart} alt="" aria-hidden="true" className="size-11 shrink-0 select-none motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
-        <p role="status" className="min-w-0 flex-1 font-neo-body text-sm font-bold leading-snug text-neo-cream">
-          {t('eduLiveRoom.student.watchBoard')}
-        </p>
-      </div>
+    <>
       {statusSlot}
-      <p aria-live="polite" className="empty:-mt-2.5">
+      <p aria-live="polite" className="pb-2 empty:hidden">
         {latest && (
           <span
             key={latest}
@@ -62,6 +52,10 @@ export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: Waitin
           </span>
         )}
       </p>
+      <EduStudentLobbyFold
+        testId="edu-student-crowd"
+        label={<>{t('academy.waiting.classmates')} <span dir="ltr" className="tabular-nums text-neo-cream/70">{others.length}</span></>}
+      >
       {faces.length === 0 && <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('academy.waiting.firstIn')}</p>}
       <ul aria-label={t('academy.waiting.classmates')} className="grid grid-cols-4 content-start gap-x-2 gap-y-3">
         {faces.map((mate) => {
@@ -98,6 +92,7 @@ export function EduStudentLobbyCrowd({ others, statusSlot, t }: { others: Waitin
           </li>
         )}
       </ul>
-    </section>
+      </EduStudentLobbyFold>
+    </>
   );
 }

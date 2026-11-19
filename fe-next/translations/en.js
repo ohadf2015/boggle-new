@@ -21451,6 +21451,9 @@ const en = {
       "joined": "{name} joined!",
       "youreIn": "You're in!",
       "watchBoard": "Watch the board. Your teacher starts the game.",
+      "waitPractice": "Practice these while your teacher sets up the game.",
+      "waitReady": "Press the button when you're ready. Your teacher starts the game.",
+      "skipPractice": "Skip practice",
       "inClass": "{count} in class",
       "changeLook": "Change look",
       "leave": "Leave"
@@ -21547,7 +21550,8 @@ const en = {
       "calculating": "Counting up the words…",
       "classGoal": "Class haul: {found}/{total} words",
       "waitNext": "Your teacher picks what's next. Warm up while you wait.",
-      "moreFromRound": "More from this round"
+      "moreFromRound": "More from this round",
+      "backToResults": "Back to results"
     }
   }
   // @eduLiveRoom:end

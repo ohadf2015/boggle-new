@@ -39,6 +39,7 @@ vi.mock('@/components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () =>
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => capture(...a), register: vi.fn() } }));
 
 import EduStudentResults from '@/components/education/live/EduStudentResults';
+import { openMore } from './openStudentMore';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 
@@ -91,7 +92,8 @@ describe('EduStudentResults — one next step', () => {
     render(<EduStudentResults {...(withMissed as never)} />);
     expect(missedProps.current?.onPractice).toBeUndefined();
     fireEvent.click(screen.getByTestId('practice-missed-button'));
-    expect(openPractice).toHaveBeenCalledWith('l1');
+    expect(openPractice).not.toHaveBeenCalled();
+    expect(screen.getByTestId('edu-student-practice')).toBeInTheDocument();
   });
 
   it('Given a class round, When results show, Then no "come back tomorrow" line competes with the teacher-paced next round', () => {
@@ -102,6 +104,7 @@ describe('EduStudentResults — one next step', () => {
   it('Given the chest and the shop, When results show, Then the chest is a beat of the reveal and the shop its slim row', () => {
     render(<EduStudentResults {...(withMissed as never)} />);
     expect(chestProps.current?.beat).toBeDefined();
+    openMore();
     expect(shopProps.current?.compact).toBe(true);
     expect(screen.queryByText('eduLiveRoom.studentResults.nextRound')).toBeNull();
   });

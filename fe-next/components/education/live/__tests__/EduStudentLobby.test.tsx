@@ -50,7 +50,7 @@ describe('EduStudentLobby', () => {
   it("given a seated student, when the phone lobby shows, then it says you're in and that the teacher starts the game", () => {
     render(<EduStudentLobby {...base} />);
     expect(screen.getByTestId('edu-student-lobby')).toHaveTextContent('eduLiveRoom.student.youreIn');
-    expect(screen.getByTestId('edu-student-crowd')).toHaveTextContent('eduLiveRoom.student.watchBoard');
+    expect(screen.getByTestId('edu-student-waiting')).toHaveTextContent('eduLiveRoom.student.waitReady');
     expect(screen.getByTestId('name-slot')).toBeInTheDocument();
   });
 

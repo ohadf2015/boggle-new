@@ -57,11 +57,11 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
       data-kind="tap"
       data-variant="hero"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className="w-full max-w-md rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-3 shadow-hard-lg"
+      className="w-full"
     >
       <style>{WARM_UP_KEYFRAMES + HERO_KEYFRAMES}</style>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <p className="min-w-0 font-neo-display text-sm font-black uppercase leading-tight tracking-wide text-neo-cream">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <p className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-cream lg:text-4xl">
           {tr(t, 'academy.live.warmUpHint', 'Warm-up: tap the glowing letter!')}
         </p>
         <div className="flex shrink-0 items-center gap-2">
@@ -102,7 +102,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
               onClick={() => tap(i)}
               className={cn(
                 FOCUS,
-                'relative grid h-16 place-items-center rounded-neo border-[3px] font-neo-display text-3xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none motion-safe:active:scale-90',
+                'relative grid h-16 place-items-center rounded-neo border-[3px] font-neo-display text-3xl lg:h-24 lg:text-5xl font-black leading-none transition-transform duration-100 motion-reduce:transition-none motion-safe:active:scale-90',
                 mine === 'miss'
                   ? 'border-neo-black bg-neo-pink text-neo-black motion-safe:animate-[lc-tile-shake_260ms_ease-out]'
                   : mine === 'hit'

@@ -21,7 +21,6 @@ vi.mock('@/components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () =>
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn(), register: vi.fn() } }));
 
 import EduStudentResults from '@/components/education/live/EduStudentResults';
-import { openMore } from './openStudentMore';
 import { useStudyDeck } from '@/lib/education/studyDeckStore';
 
 const t = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
@@ -66,26 +65,24 @@ describe('EduStudentResults missed-word recall', () => {
   beforeEach(() => {
     controller.current = makeController();
     sessionStorage.clear();
-    act(() => useStudyDeck.getState().clear());
+    act(() => useStudyDeck.setState({ gameCode: null, cards: [], studied: false, kept: null }));
   });
 
   it('given a deck with meanings, when results show, then missed words carry their meaning', () => {
     act(() => useStudyDeck.getState().setDeck('AB12CD', deck));
     render(<EduStudentResults {...(props as never)} />);
-    openMore();
     expect(missedProps.current?.words).toEqual(['apple', 'cloud']);
     expect(missedProps.current?.definitions).toEqual({ apple: 'A red fruit' });
   });
 
-  it('given a reconnect cleared the live deck, when quick recall runs, then the student builds the missed word from its meaning', () => {
+  it('given a reconnect cleared the live deck, when practice runs, then the student builds the missed word from its meaning', () => {
     act(() => {
       useStudyDeck.getState().setDeck('AB12CD', deck);
       useStudyDeck.getState().clear();
     });
     render(<EduStudentResults {...(props as never)} />);
-    openMore();
 
-    fireEvent.click(screen.getByTestId('missed-recall-start'));
+    fireEvent.click(screen.getByTestId('practice-missed-button'));
     expect(screen.getByTestId('recall-definition')).toHaveTextContent('A red fruit');
     const tiles = () => within(screen.getByTestId('recall-spell-tiles')).getAllByRole('button');
     for (const letter of 'APPLE') fireEvent.click(tiles().find((b) => b.dataset.letter === letter && b.dataset.used === 'false')!);
@@ -94,18 +91,18 @@ describe('EduStudentResults missed-word recall', () => {
     expect(useStudyDeck.getState().studied).toBe(false);
   });
 
-  it('given no missed word has a meaning, when results show, then there is no quick recall', () => {
+  it('given no missed word has a meaning, when results show, then practice is spelling, not a quiz', () => {
     act(() => useStudyDeck.getState().setDeck('AB12CD', deck.map((c) => ({ word: c.word }))));
     render(<EduStudentResults {...(props as never)} />);
-    openMore();
-    expect(screen.queryByTestId('missed-recall-start')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('practice-missed-button'));
+    expect(screen.queryByTestId('missed-recall')).not.toBeInTheDocument();
     expect(missedProps.current?.definitions).toEqual({});
   });
 
-  it('given the deck belongs to another room, when results show, then there is no quick recall', () => {
+  it('given the deck belongs to another room, when results show, then its meanings are not quizzed', () => {
     act(() => useStudyDeck.getState().setDeck('ZZ99ZZ', deck));
     render(<EduStudentResults {...(props as never)} />);
-    openMore();
-    expect(screen.queryByTestId('missed-recall-start')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('practice-missed-button'));
+    expect(screen.queryByTestId('missed-recall')).not.toBeInTheDocument();
   });
 });

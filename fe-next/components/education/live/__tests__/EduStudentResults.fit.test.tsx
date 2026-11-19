@@ -80,20 +80,20 @@ describe('EduStudentResults on a 390x844 phone', () => {
     expect(more.tagName).toBe('DETAILS');
     expect(more).not.toHaveAttribute('open');
     expect(screen.queryAllByTestId('edu-student-word')).toHaveLength(0);
-    expect(screen.queryByTestId('missed')).toBeNull();
+    expect(screen.queryByTestId('round-shop')).toBeNull();
     openMore();
     expect(more).toContainElement(screen.getAllByTestId('edu-student-word')[0]);
-    expect(more).toContainElement(screen.getByTestId('missed'));
-    for (const id of ['edu-student-hero', 'wait-for-teacher-message', 'chest-cta', 'round-shop']) {
+    expect(more).toContainElement(screen.getByTestId('round-shop'));
+    for (const id of ['edu-student-hero', 'wait-for-teacher-message', 'chest-cta']) {
       expect(more).not.toContainElement(screen.getByTestId(id));
     }
     expect(screen.getByTestId('edu-student-more-summary')).toHaveTextContent('eduLiveRoom.studentResults.moreFromRound');
   });
 
-  it('given a round reward, when results show, then the order is the reveal (with its chest), the best-word pair, the shop, then the wait bar, and the chest is not in the header', () => {
+  it('given a round reward, when results show, then the order is the reveal (with its chest), the fold, then the wait bar, and the chest is not in the header', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('chest-cta'));
-    const order = ['edu-student-hero', 'edu-student-best-word', 'round-shop', 'wait-for-teacher-message'].map((id) => screen.getByTestId(id));
+    const order = ['edu-student-hero', 'edu-student-more', 'wait-for-teacher-message'].map((id) => screen.getByTestId(id));
     for (let i = 1; i < order.length; i++) {
       expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
