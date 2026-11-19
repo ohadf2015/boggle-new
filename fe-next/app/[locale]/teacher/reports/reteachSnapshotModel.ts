@@ -1,6 +1,7 @@
 import type { HardWord } from '@/lib/education/wordMasteryReport';
+import { snapshotWords } from '@/components/teacher/reports/reteachParts';
 
-export const SNAPSHOT_WORDS = 4;
+export { SNAPSHOT_WORDS, snapshotWords } from '@/components/teacher/reports/reteachParts';
 export const SNAPSHOT_CLASS_CAP = 6;
 
 export interface ClassEvidence {
@@ -26,13 +27,6 @@ export function classesToFetch<C extends FetchableClass>(classes: readonly C[], 
     .filter((c) => (c.member_count ?? 0) > 0)
     .sort((a, b) => (b.member_count ?? 0) - (a.member_count ?? 0))
     .slice(0, cap);
-}
-
-export function snapshotWords(words: readonly HardWord[], limit = SNAPSHOT_WORDS): HardWord[] {
-  return words
-    .filter((w) => w.missRate > 0)
-    .sort((a, b) => b.missRate - a.missRate)
-    .slice(0, limit);
 }
 
 export function pickSnapshot(list: readonly ClassEvidence[]): ClassEvidence | null {

@@ -13,7 +13,7 @@ import { EducationShell } from '@/components/education/shell/EducationShell';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ClipboardList, Send } from 'lucide-react';
+import { ArrowLeft, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
@@ -27,7 +27,6 @@ import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomR
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { TeacherPlanBadge } from '@/components/teacher/TeacherPlanBadge';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { REPORTS_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
@@ -37,7 +36,9 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
 import { RoundReports } from '@/components/teacher/rounds/RoundReports';
 import { ROUND_FIXTURE } from '@/components/teacher/rounds/roundFixture';
-import { ClassroomPicker, ClassHero } from '@/components/teacher/reports/ClassroomPicker';
+import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
+import { ClassReportHeader } from '@/components/teacher/reports/ClassReportHeader';
+import { ClassOverview } from '@/components/teacher/analytics/overview/ClassOverview';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
 import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -46,7 +47,6 @@ import { StudentParentPreview } from '@/components/teacher/reports/StudentParent
 import { ReportsClassEmpty } from './ReportsClassEmpty';
 import { ReportsReteachPanel } from './ReportsReteachPanel';
 import { ReportsProGate } from './ReportsGate';
-import { NeoButton } from '@/components/ui/button';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -58,7 +58,7 @@ const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
  * Classroom picker → class report → student report, one level at a time.
  */
 function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: boolean }) {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -205,18 +205,15 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 data-wipe className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
-            {t('teacher.reports.title')}
-          </h1>
-          {hasPro ? <TeacherPlanBadge /> : null}
-        </div>
-        <p data-testid="reports-value-line" dir="auto" className="-mt-3 mb-6 max-w-prose text-sm leading-snug text-neo-cream sm:text-base">
+        <h1 data-wipe className="mb-2 font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
+          {t('teacher.reports.title')}
+        </h1>
+        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-neo-cream/85 max-sm:hidden">
           {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
         </p>
 
         {classrooms && classrooms.length > 0 ? (
-          <ReportsReteachPanel classrooms={classrooms} onOpenClass={handleClassroomSelect} />
+          <ReportsReteachPanel classrooms={classrooms} />
         ) : null}
 
         <h2 className="mb-3 text-base font-bold text-neo-cream">{t('teacher.reports.selectClassroom')}</h2>
@@ -268,25 +265,29 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
     const classIsEmpty = selectedClassroom?.member_count === 0;
     view = (
       <div className="space-y-4 sm:space-y-5">
-        <div className="flex flex-wrap items-stretch gap-3">
-          <div data-tm className="min-w-0 flex-1">
-            <ClassHero name={selectedClassroom?.name ?? t('teacher.reports.title')} memberCount={selectedClassroom?.member_count} />
-          </div>
-          {hasPro ? <TeacherPlanBadge /> : null}
+        <div data-tm>
+          <ClassReportHeader
+            eyebrow={t('teacher.reports.title')}
+            name={selectedClassroom?.name ?? t('teacher.reports.title')}
+            onBack={() => router.push(`/${language}/teacher/classroom/${selectedClassroomId}`)}
+            link={{
+              href: `/${language}/teacher/classroom/${selectedClassroomId}/analytics`,
+              label: t('teacher.classroom.cardClassReport', 'Class report'),
+              testId: 'reports-class-report-link',
+            }}
+          />
         </div>
-        {classIsEmpty ? null : (
-          <NeoButton variant="small" tone="lime" data-testid="reports-homework-shortcut" onClick={() => setSection('homework')}>
-            <ClipboardList className="size-4" aria-hidden="true" />
-            {t('teacher.reports.homeworkShortcut')}
-          </NeoButton>
-        )}
         {classIsEmpty ? (
           <ReportsClassEmpty classroomId={selectedClassroomId} />
         ) : (
         <>
-        {classrooms ? (
-          <ReportsReteachPanel classrooms={classrooms} onOpenClass={handleClassroomSelect} focusClassroomId={selectedClassroomId} />
-        ) : null}
+        <ClassOverview
+          classroomId={selectedClassroomId}
+          classroomName={selectedClassroom?.name ?? ''}
+          onOpenChange={(id) => {
+            if (id) handleStudentClick(id);
+          }}
+        />
         <Tabs value={section} onValueChange={setSection} className="space-y-3">
           <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
             {REPORT_TABS.map((id) => (

@@ -14,6 +14,12 @@ import ReportsPageClient from '../PageClient';
 // The page now mounts the shared education header — a compact bar with a way
 // back, which these screens used to lack entirely. It pulls MusicContext in,
 // which this suite has no provider for and no interest in.
+vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
+  ClassOverview: ({ classroomName, onOpenChange }: { classroomName: string; onOpenChange?: (id: string | null) => void }) => (
+    <button type="button" data-testid="class-overview" data-class={classroomName} onClick={() => onOpenChange?.('student-9')} />
+  ),
+}));
+
 vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
@@ -221,10 +227,30 @@ describe('ReportsPageClient', () => {
       mockSearchParams.set('classroomId', 'classroom-1');
     });
 
-    it('puts Homework results one tap from the top of the class results', async () => {
+    it('keeps Homework one tap away as a tab, with no second button for it', async () => {
       render(<ReportsPageClient />);
-      await userEvent.setup().click(screen.getByTestId('reports-homework-shortcut'));
+      expect(screen.queryByTestId('reports-homework-shortcut')).toBeNull();
+      await openSection('homework');
       expect(screen.getByRole('tab', { name: 'teacher.reports.tabs.homework' })).toHaveAttribute('data-state', 'active');
+    });
+
+    it('leads with who needs the teacher and which words, under the same header as the class report', () => {
+      render(<ReportsPageClient />);
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('English 101');
+      expect(screen.getByTestId('class-overview')).toHaveAttribute('data-class', 'English 101');
+      expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
+      expect(screen.getByTestId('reports-class-report-link')).toHaveAttribute('href', '/en/teacher/classroom/classroom-1/analytics');
+    });
+
+    it('opens a student picked in the summary as the full student report', async () => {
+      render(<ReportsPageClient />);
+      await userEvent.setup().click(screen.getByTestId('class-overview'));
+      expect(await screen.findByTestId('student-progress-report')).toHaveAttribute('data-student-id', 'student-9');
+    });
+
+    it('shows no plan pill in the class header', () => {
+      render(<ReportsPageClient />);
+      expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
     });
 
     it('opens straight on homework from a ?section=homework link', () => {
@@ -324,6 +350,11 @@ describe('ReportsPageClient', () => {
     it('Given the class list, Then one line says what a report is for, in plain words', () => {
       render(<ReportsPageClient />);
       expect(screen.getByTestId('reports-value-line')).toHaveTextContent('teacher.reports.valueLine');
+    });
+
+    it('Given the class list, Then the header carries no plan pill', () => {
+      render(<ReportsPageClient />);
+      expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
     });
 
     it('Given a class nobody has played in yet, Then an empty state says why and offers one action: start a game for that class', () => {

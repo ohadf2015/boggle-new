@@ -66,11 +66,10 @@ describe('WordMasteryReport — Pro', () => {
     expect(fetchMock.mock.calls[0][0]).toBe(`/api/education/classroom/${CLASSROOM}/word-mastery`);
   });
 
-  it('marks Pro with the small gold badge and a normal-case section heading, never a lime pill', async () => {
+  it('spends no space on a Pro tag for a teacher who already has Pro, and keeps a normal-case heading', async () => {
     renderReport();
-    const badge = await screen.findByTestId('mastery-pro-badge');
-    expect(badge.getAttribute('data-pro-badge')).toBe('xs');
-    expect(badge.className).not.toMatch(/\bbg-neo-lime\b/);
+    await screen.findByTestId('mastery-stat-accuracy');
+    expect(screen.queryByTestId('mastery-pro-badge')).toBeNull();
     expect(screen.getByTestId('word-mastery-report').innerHTML).not.toMatch(/\buppercase\b/);
   });
 

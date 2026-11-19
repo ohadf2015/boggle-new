@@ -7,6 +7,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
 let search = '';
+vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
+  ClassOverview: ({ classroomName, onOpenChange }: { classroomName: string; onOpenChange?: (id: string | null) => void }) => (
+    <button type="button" data-testid="class-overview" data-class={classroomName} onClick={() => onOpenChange?.('student-9')} />
+  ),
+}));
+
 vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(search),
   useRouter: () => ({ push: vi.fn() }),

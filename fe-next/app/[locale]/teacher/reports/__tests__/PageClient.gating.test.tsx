@@ -14,6 +14,12 @@ import ReportsPageClient from '../PageClient';
 // The page now mounts the shared education header — a compact bar with a way
 // back, which these screens used to lack entirely. It pulls MusicContext in,
 // which this suite has no provider for and no interest in.
+vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
+  ClassOverview: ({ classroomName, onOpenChange }: { classroomName: string; onOpenChange?: (id: string | null) => void }) => (
+    <button type="button" data-testid="class-overview" data-class={classroomName} onClick={() => onOpenChange?.('student-9')} />
+  ),
+}));
+
 vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
@@ -313,7 +319,7 @@ describe('ReportsPageClient', () => {
       mockSearchParams.set('classroomId', 'classroom-1');
       render(<ReportsPageClient />);
 
-      expect(screen.getByTestId('teacher-plan-badge')).toBeInTheDocument();
+      expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
       await openSection('more');
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
