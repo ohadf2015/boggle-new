@@ -8,9 +8,9 @@ import { homeCoachCue, homeSessionRail } from '@/lib/education/homeSessionRail';
 import { homeOnboarding } from '@/lib/education/homeOnboarding';
 import { isPackLanguage } from '@/lib/education/themedPacks';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
-import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './TeacherHomeView';
+import { TeacherHomeView } from './TeacherHomeView';
 import { HomeHero } from './HomeHero';
-import { HomeClassMeta, HomeNewClass } from './HomeClassList';
+import { HomeClassMeta } from './HomeClassList';
 import { HomeDeskBoard } from './HomeDeskBoard';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { rosterRows } from './rosterModel';
@@ -18,8 +18,8 @@ import { rosterFixture } from './rosterFixture';
 import { HomeOnboardingCard } from './HomeOnboardingCard';
 import { HomeHowItWorks } from './HomeHowItWorks';
 import { HomeSessionRail } from './HomeSessionRail';
-import { HomeWeekClasses } from './HomeWeekClasses';
-import { weekClassRows } from './weekClassRows';
+import { RehearseWithBotsButton } from './RehearseWithBotsButton';
+import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from './homeStyles';
 import { weekLoopFixture } from './weekLoopFixture';
 import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
 import { previewBanner } from './TeacherProBannersPreview';
@@ -35,7 +35,6 @@ const CLASSES = [
   { id: 'p4a', name: '4A - Reading', member_count: 26, join_code: 'ZT4H9N' },
   { id: 'p6c', name: '6C - Spelling', member_count: 24, join_code: 'M3XPRA' },
 ];
-const WEEK_ROWS = 4;
 const noopSubscribe = () => () => undefined;
 const PLAYS: [string, number][] = [['p5b', 3], ['p5b', 26], ['p4a', 50], ['p5b', 74], ['p6c', 98], ['p4a', 122]];
 
@@ -48,12 +47,12 @@ function activity(nowMs: number): TeacherActivityRow[] {
 }
 
 /** Dev-only: the real Home grid on fixture data, so the signed-in screen can be captured without an account. */
-export function TeacherHomePreview({ state, banner, insight = false, pro = !insight }: { state: TeacherHomePreviewState; banner?: string; insight?: boolean; pro?: boolean }) {
+export function TeacherHomePreview({ state, banner, insight = false, pro = !insight, classes: fixture = CLASSES }: { state: TeacherHomePreviewState; banner?: string; insight?: boolean; pro?: boolean; classes?: typeof CLASSES }) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const [nowMs] = useState(() => Date.now());
-  const [selectedId, setSelectedId] = useState(CLASSES[0].id);
-  const classes = state === 'classes' ? CLASSES : [];
+  const [selectedId, setSelectedId] = useState(fixture[0].id);
+  const classes = state === 'classes' ? fixture : [];
   // Skeleton until mounted: the insight cursor and clock differ between server and browser.
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const ready = mounted && state !== 'loading';
@@ -82,8 +81,6 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
       t={t}
       isRTL={language === 'he'}
       greeting={t('eduShell.home.greetMorning', { name: 'Dana' })}
-      cue={ready && hasClasses ? (cue ? t(cue.key) : '') : null}
-      hasPro={false}
       ready={ready}
       error={false}
       onRetry={() => undefined}
@@ -91,19 +88,21 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
       onboarding={<div className="flex min-w-0 flex-col gap-4"><HomeOnboardingCard onboarding={onboarding} hrefs={hrefs} variant="full" t={t} /><HomeHowItWorks t={t} /></div>}
       desk={selected ? (
         <>
-        <div data-tm>
+        <div data-tm className="flex min-h-0 flex-1 flex-col">
           <HomeHero
             classrooms={classes}
             selectedId={selected.id}
             onSelect={setSelectedId}
             language={language}
             t={t}
-            corner={<HomeNewClass href={newClassHref} count={classes.length} limit={null} t={t} />}
+            eyebrow={t('eduShell.home.greetMorning', { name: 'Dana' })}
+            cue={cue ? t(cue.key) : null}
+            newClassHref={newClassHref}
+            rehearse={<RehearseWithBotsButton classroomId={selected.id} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
             capLabel={t('eduShell.setup.capMeter', { count: classes.length, limit: FREE_TIER_LIMITS.classes })}
             meta={
               <HomeClassMeta previewIds={[]} memberCount={selected.member_count} played={lastPlayedIso} pending={false} failed={false} language={language} nowMs={nowMs} t={t} />
             }
-            showCode
             replay={replay ? { kind: 'ready', href: replay.href, detail: replayDetail(replay, t) } : undefined}
           />
         </div>
@@ -127,7 +126,6 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
       sessions={ready && selected ? (
         <HomeSessionRail
           key={selected.id}
-          className={SESSIONS_BESIDE_RAIL}
           compact={!pro}
           classroomId={selected.id}
           languages={[railLanguage]}
@@ -141,16 +139,6 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
       ) : null}
       accountBanner={banner === 'pastDue' ? null : previewBanner(banner)}
       alert={banner === 'pastDue' ? previewBanner(banner) : null}
-      hasRail={!ready || hasClasses}
-      week={hasClasses ? {
-        summary,
-        status: 'ready',
-        classCount: classes.length,
-        classes: classes.length > 1 ? (
-          <HomeWeekClasses {...weekClassRows(classes, summary.lastPlayedAt, nowMs, WEEK_ROWS, selectedId)} selectedId={selectedId} onSelect={setSelectedId} moreHref={`/${language}/teacher/classroom`} language={language} nowMs={nowMs} t={t} />
-        ) : null,
-      } : null}
-      fillHeight={pro}
       footer={pro || !selected ? null : (
         <div data-testid="dashboard-student-cap-meters">
           <StudentCapMeter key={selected.id} classroomName={selected.name} studentCount={selected.member_count} source="dashboard" />

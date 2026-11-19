@@ -63,9 +63,10 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(limeFills(screen.getByTestId('teacher-home'))).toEqual([screen.getByTestId('home-start-live')]);
   });
 
-  it('Then the hero is one bold color block', () => {
+  it('Then the hero is one calm panel, with pink kept for the one big secondary action', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(screen.getByTestId('home-hero').className).not.toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(screen.getByTestId('rehearse-with-bots').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
   });
 
   it('Given three classes, Then the hero switcher picks the class and no class list stacks under the sessions', () => {
@@ -77,7 +78,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(within(screen.getByTestId('home-hero')).getByRole('button', { name: 'eduShell.home.switchClass' })).toBeInTheDocument();
     const rail = screen.getByTestId('home-session-rail');
     const after = Array.from(home.children).slice(Array.from(home.children).indexOf(rail) + 1);
-    expect(after.every((el) => el.tagName === 'ASIDE' || el.getAttribute('data-testid') === 'home-footer')).toBe(true);
+    expect(after.every((el) => ['home-below', 'home-footer'].includes(el.getAttribute('data-testid') ?? ''))).toBe(true);
     expect(limeFills(home)).toEqual([screen.getByTestId('home-start-live')]);
   });
 
@@ -94,11 +95,11 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(screen.getByTestId('home-hero').innerHTML).not.toMatch(/animate-\[edu-mascot-bob/);
   });
 
-  it('Then the class name is white on the color block, not a giant lime headline', () => {
+  it('Then the class name is white on the panel, not a lime headline', () => {
     render(<TeacherDashboard />);
     const title = screen.getByRole('heading', { level: 2, name: '5B - English' });
     expect(title.className).toContain('text-white');
-    expect(title.className).not.toMatch(/text-neo-lime|text-5xl/);
+    expect(title.className).not.toMatch(/text-neo-lime/);
   });
 
   it('Then the hero carries no insight line or free-class count, only the class and its one Start button', () => {
@@ -115,14 +116,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(within(rail).queryByTestId('home-session-card')).toBeNull();
   });
 
-  it('Given a free desk with the slim games strip, Then nothing stretches, so the seat meter sits right under the strip with no empty band', () => {
-    render(<TeacherDashboard />);
-    const home = screen.getByTestId('teacher-home');
-    expect(home.className).not.toContain('lg:min-h-full');
-    expect(home.className).not.toMatch(/lg:grid-rows-\[auto_1fr/);
-  });
-
-  it('Then the rail carries no week stats block, while the one Results tile sits under the desk on every screen', () => {
+  it('Then no week stats block shows, while the one Results row sits under the desk on every screen', () => {
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('home-week-games')).toBeNull();
     expect(screen.getByTestId('home-weekly-reports').closest('.max-lg\\:hidden')).toBeNull();

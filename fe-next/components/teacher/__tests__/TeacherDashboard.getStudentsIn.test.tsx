@@ -56,40 +56,36 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe('Teacher Home: get students in', () => {
-  it('Given the class has no students, Then the code, one QR, copy link and projector share actions render', () => {
+  it('Given the class has no students, Then the hero shows the code in one row with Share and the goal under it', () => {
     render(<TeacherDashboard />);
-    const card = screen.getByTestId('hq-get-students-in');
-    expect(within(card).getByTestId('hq-join-code')).toHaveTextContent('PLSB66');
-    expect(within(card).getByTestId('hq-copy-link')).toBeInTheDocument();
-    expect(within(card).getByTestId('hq-first-student-qr')).toBeInTheDocument();
-    expect(within(card).queryByTestId('hq-open-qr')).toBeNull();
-    expect(within(card).getByTestId('hq-open-projector')).toBeInTheDocument();
+    const row = screen.getByTestId('home-join-row');
+    expect(within(row).getByTestId('home-desk-code')).toHaveTextContent('PLSB66');
+    expect(within(row).getByTestId('home-share-code')).toBeInTheDocument();
+    expect(within(row).getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
+    expect(screen.queryByTestId('hq-get-students-in')).not.toBeInTheDocument();
   });
 
-  it('Then it shows students joined against the goal', () => {
-    render(<TeacherDashboard />);
-    const goal = screen.getByTestId('hq-joined-goal');
-    expect(within(goal).getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
-  });
-
-  it('Given the share step is the next onboarding step, Then the card replaces the onboarding nudge', () => {
+  it('Given the share step is the next onboarding step, Then the join row replaces the onboarding nudge', () => {
     activationProgress = { inviteCopied: false, liveStarted: false, roomOpened: false, dismissed: false };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('hq-get-students-in')).toBeInTheDocument();
+    expect(screen.getByTestId('home-join-row')).toBeInTheDocument();
     expect(screen.queryByTestId('home-onboarding')).not.toBeInTheDocument();
   });
 
-  it('When projector is tapped, Then the projector sheet opens for that class', () => {
+  it('When Share is tapped, Then copy, the projector and the print sheet are all one tap away', () => {
     render(<TeacherDashboard />);
-    fireEvent.click(screen.getByTestId('hq-open-projector'));
+    fireEvent.click(screen.getByTestId('home-share-code'));
+    expect(screen.getByTestId('setup-copy-link')).toBeInTheDocument();
+    expect(screen.getByTestId('home-share-print')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('home-share-board'));
     expect(screen.getByTestId('projector-sheet')).toHaveTextContent('PLSB66');
   });
 
-  it('Given the class has reached the goal, Then the card steps aside for the game hero', () => {
+  it('Given the class has reached the goal, Then the goal line steps aside and the code stays', () => {
     classroomsState = { ...classroomsState, classrooms: [FULL_CLASS] };
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('hq-get-students-in')).not.toBeInTheDocument();
-    expect(screen.getByTestId('home-hero')).toBeInTheDocument();
+    expect(screen.queryByTestId('hq-joined-goal')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-desk-code')).toHaveTextContent('K7Q2AA');
   });
 
   it('Given students tried an ended code, Then the teacher is told and offered a new game', async () => {
@@ -114,14 +110,5 @@ describe('Teacher Home: get students in', () => {
     render(<TeacherDashboard />);
     await waitFor(() => expect(fetchWithAuth).toHaveBeenCalledWith('/api/education/classroom/c1/ended-code-tries'));
     expect(screen.queryByTestId('hq-ended-code-tries')).not.toBeInTheDocument();
-  });
-
-  it('Given an empty class, Then the join card sits in the hero code slot, above one Start live, with no second stacked card', () => {
-    render(<TeacherDashboard />);
-    const hero = screen.getByTestId('home-hero');
-    const card = within(hero).getByTestId('hq-get-students-in');
-    const start = within(hero).getByTestId('home-start-live');
-    expect(card.compareDocumentPosition(start) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getAllByTestId('hq-get-students-in')).toHaveLength(1);
   });
 });

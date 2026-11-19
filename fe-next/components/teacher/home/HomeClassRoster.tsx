@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 import { ClipboardList, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
@@ -39,14 +39,14 @@ export interface HomeClassRosterProps {
   onAssign?: (row: RosterRow) => void;
   /** Opens the assign flow for everyone who still needs to play; shown once, beside the Behind count. */
   onAssignAll?: () => void;
-  /** Show only one status; the counts still cover the whole class. */
-  filter?: RosterStatus | null;
-  onClearFilter?: () => void;
+  /** The header counts become buttons that narrow the list to one status. */
+  filterable?: boolean;
 }
 
 /** The class desk roster: who played this week, who is behind, who has not started; a row opens that student. */
-export function HomeClassRoster({ rows, failed, language, nowMs, t, className, onAssign, onAssignAll, filter = null, onClearFilter }: HomeClassRosterProps) {
+export function HomeClassRoster({ rows, failed, language, nowMs, t, className, onAssign, onAssignAll, filterable = false }: HomeClassRosterProps) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<RosterStatus | null>(null);
   const wide = useMediaQuery('(min-width: 1024px)');
   const open = rows?.find((r) => r.id === openId) ?? null;
   const counts = rows ? rosterCounts(rows) : null;
@@ -62,29 +62,44 @@ export function HomeClassRoster({ rows, failed, language, nowMs, t, className, o
         </h2>
         {counts && rows && rows.length > 0 ? (
           <p data-testid="home-roster-summary" className="flex flex-wrap items-center gap-x-3 gap-y-1 font-neo-body text-xs font-bold text-neo-cream/80 sm:text-sm">
-            {STATUSES.map((s) => (
-              <Fragment key={s}>
-                <span className="inline-flex items-center gap-1.5">
+            {STATUSES.filter((s) => counts[s] > 0).map((s) => {
+              const label = (
+                <>
                   <StatusDot status={s} />
                   {t(`eduShell.home.roster.count.${s}`, { count: counts[s] })}
-                </span>
-                {s === 'late' && bulk ? (
-                  <button
-                    type="button"
-                    data-testid="home-roster-assign-all"
-                    onClick={onAssignAll}
-                    className={cn(OUTLINE_BUTTON, 'min-h-11 px-2.5 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8')}
-                  >
-                    <ClipboardList className="size-4 shrink-0" aria-hidden="true" />
-                    {t('eduShell.home.focus.assign')}
-                  </button>
-                ) : null}
-              </Fragment>
-            ))}
+                </>
+              );
+              return filterable ? (
+                <button
+                  key={s}
+                  type="button"
+                  data-testid="home-roster-filter"
+                  data-status={s}
+                  aria-pressed={filter === s}
+                  onClick={() => setFilter(filter === s ? null : s)}
+                  className={cn(GHOST_BUTTON, 'min-h-11 gap-1.5 px-2 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8', filter === s && 'bg-neo-cream/15 text-neo-cream')}
+                >
+                  {label}
+                </button>
+              ) : (
+                <span key={s} className="inline-flex items-center gap-1.5">{label}</span>
+              );
+            })}
+            {bulk ? (
+              <button
+                type="button"
+                data-testid="home-roster-assign-all"
+                onClick={onAssignAll}
+                className={cn(OUTLINE_BUTTON, 'min-h-11 px-2.5 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8')}
+              >
+                <ClipboardList className="size-4 shrink-0" aria-hidden="true" />
+                {t('eduShell.home.focus.assign')}
+              </button>
+            ) : null}
           </p>
         ) : null}
-        {filter && onClearFilter ? (
-          <button type="button" data-testid="home-roster-show-all" onClick={onClearFilter} className={cn(GHOST_BUTTON, 'min-h-11 px-2.5 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8')}>
+        {filter ? (
+          <button type="button" data-testid="home-roster-show-all" onClick={() => setFilter(null)} className={cn(GHOST_BUTTON, 'min-h-11 px-2.5 text-xs sm:text-sm [@media(pointer:fine)]:min-h-8')}>
             {t('eduShell.home.rail.seeAll')}
           </button>
         ) : null}

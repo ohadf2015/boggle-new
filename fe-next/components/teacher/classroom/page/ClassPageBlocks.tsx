@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { BarChart3, ChevronRight, ClipboardList, Plus, Trash2, Trophy } from 'lucide-react';
+import { ChevronDown, ChevronRight, ClipboardList, Plus, Trash2, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { NeoButton } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { NB_BLOCK, NB_ICON_TILE, NB_PANEL, NB_SMALL, NB_STICKER } from '../../nb/nbStyles';
+import { HOME_ROW, OUTLINE_BUTTON, PANEL, QUIET_LINK } from '../../home/homeStyles';
 import type { ClassWordList } from './classWordLists';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 
@@ -23,75 +22,77 @@ export interface ClassLastGameState {
   game: ClassLastGameSummary | null;
 }
 
-const CARD = cn(NB_PANEL, 'flex min-w-0 flex-col gap-3 p-4');
-const HEAD = 'flex items-center gap-2 font-neo-display text-lg font-black leading-tight text-neo-cream';
+const TITLE = 'font-neo-display text-base font-black leading-tight text-neo-cream';
+const LINE = 'truncate font-neo-body text-xs font-bold text-neo-cream/75';
 
+/** The last class game as one row that opens its results; hidden until a game exists. */
 export function ClassLastGame({ state, resultsHref, language, t }: { state: ClassLastGameState; resultsHref: string; language: string; t: T }) {
   const game = state.game;
-  const top = game?.players[0];
+  if (state.status === 'loading' || state.status === 'idle') {
+    return <div data-testid="class-page-last-game" aria-busy="true" className={cn(PANEL, 'h-[60px] motion-safe:animate-pulse')} />;
+  }
+  if (state.status === 'error') {
+    return (
+      <p data-testid="class-page-last-game" className={cn(PANEL, 'px-4 py-3 font-neo-body text-sm font-bold text-neo-cream/80')}>
+        {t('teacher.lastGame.error')}
+      </p>
+    );
+  }
+  if (!game) return null;
+  const top = game.players[0];
+  const facts = [
+    new Date(game.playedAt).toLocaleDateString(language, { weekday: 'short', month: 'short', day: 'numeric' }),
+    top ? `${top.name} · ${top.score}` : null,
+    t('teacher.lastGame.playersPlayed', { count: game.participation.played }),
+    t('teacher.classPage.coverage', { pct: Math.round(game.coveragePct) }),
+  ].filter(Boolean).join(' · ');
   return (
-    <section data-testid="class-page-last-game" aria-labelledby="class-last-game-title" className={CARD}>
-      <h2 id="class-last-game-title" className={HEAD}>
-        <span className={cn(NB_ICON_TILE, NB_BLOCK.yellow)} aria-hidden="true"><Trophy className="size-5" /></span>
-        {t('teacher.lastGame.title')}
-      </h2>
-      {state.status === 'loading' || state.status === 'idle' ? (
-        <div aria-busy="true" className="h-16 rounded-neo-lg bg-neo-cream/10 motion-safe:animate-pulse" />
-      ) : game ? (
-        <>
-          <p className="font-neo-body text-sm font-bold text-neo-cream/75">
-            {new Date(game.playedAt).toLocaleDateString(language, { weekday: 'short', month: 'short', day: 'numeric' })}
-          </p>
-          <div className="flex flex-wrap items-center gap-2">
-            {top ? (
-              <span className={cn(NB_STICKER, NB_BLOCK.yellow, 'text-sm')}>
-                <Trophy className="size-4" aria-hidden="true" />
-                <bdi>{top.name}</bdi> · {top.score}
-              </span>
-            ) : null}
-            <span className={cn(NB_STICKER, NB_BLOCK.cream, 'text-sm')}>{t('teacher.lastGame.playersPlayed', { count: game.participation.played })}</span>
-            <span className={cn(NB_STICKER, NB_BLOCK.cyan, 'text-sm')}>{t('teacher.classPage.coverage', { pct: Math.round(game.coveragePct) })}</span>
-          </div>
-          <Link href={resultsHref} className={cn(NB_SMALL, NB_BLOCK.navy, 'self-start')}>
-            <BarChart3 className="size-4" aria-hidden="true" />
-            {t('eduShell.home.seeResults')}
-            <DirectionalIcon icon={ChevronRight} className="size-4" />
-          </Link>
-        </>
-      ) : (
-        <p className="font-neo-body text-sm font-bold text-neo-cream/80">
-          {t(state.status === 'error' ? 'teacher.lastGame.error' : 'teacher.lastGame.emptyTitle')}
-        </p>
-      )}
-    </section>
+    <div data-testid="class-page-last-game">
+      <Link href={resultsHref} className={HOME_ROW}>
+        <Trophy className="size-6 shrink-0 text-neo-yellow" strokeWidth={2.5} aria-hidden="true" />
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className={TITLE}>{t('teacher.lastGame.title')}</span>
+          <bdi className={LINE}>{facts}</bdi>
+        </span>
+        <DirectionalIcon icon={ChevronRight} className="size-5 shrink-0" />
+      </Link>
+    </div>
   );
 }
 
+/** The class's word lists, folded; with none yet, only the way to make one. */
 export function ClassWordLists({ lists, loading, libraryHref, t }: { lists: readonly ClassWordList[]; loading: boolean; libraryHref: string; t: T }) {
+  const create = (
+    <Link href={libraryHref} className={cn(QUIET_LINK, 'self-start')}>
+      <Plus className="size-4" aria-hidden="true" />
+      {t('eduLibrary.editor.createTitle')}
+    </Link>
+  );
   return (
-    <section data-testid="class-page-lists" aria-labelledby="class-lists-title" className={CARD}>
-      <h2 id="class-lists-title" className={HEAD}>
-        <span className={cn(NB_ICON_TILE, NB_BLOCK.cyan)} aria-hidden="true"><ClipboardList className="size-5" /></span>
-        {t('eduHq.lists.label')}
-      </h2>
+    <section data-testid="class-page-lists" aria-label={t('eduHq.lists.label')} className="min-w-0">
       {loading ? (
-        <div aria-busy="true" className="h-12 rounded-neo-lg bg-neo-cream/10 motion-safe:animate-pulse" />
+        <div aria-busy="true" className={cn(PANEL, 'h-[60px] motion-safe:animate-pulse')} />
       ) : lists.length > 0 ? (
-        <ul className="flex flex-col gap-2">
-          {lists.slice(0, 5).map((l) => (
-            <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 rounded-neo-lg border-2 border-neo-cream/50 bg-neo-navy px-3 py-2">
-              <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream" />
-              <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t('eduLibrary.card.words', { count: l.wordCount })}</span>
-            </li>
-          ))}
-        </ul>
+        <details data-testid="class-page-lists-fold" className={cn(PANEL, 'group')}>
+          <summary className="flex min-h-[60px] cursor-pointer list-none items-center gap-3 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
+            <ClipboardList className="size-6 shrink-0 text-neo-cyan" strokeWidth={2.5} aria-hidden="true" />
+            <span className={cn(TITLE, 'flex-1')}>{t('eduHq.lists.label')}</span>
+            <span className="font-neo-body text-sm font-bold tabular-nums text-neo-cream/70">{lists.length}</span>
+            <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+          </summary>
+          <ul className="flex flex-col divide-y divide-neo-cream/10 border-t-2 border-neo-cream/10 px-4">
+            {lists.slice(0, 5).map((l) => (
+              <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 py-1">
+                <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream" />
+                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t('eduLibrary.card.words', { count: l.wordCount })}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="px-2 pb-2">{create}</div>
+        </details>
       ) : (
-        <p className="font-neo-body text-sm font-bold text-neo-cream/80">{t('teacher.classPage.noLists')}</p>
+        create
       )}
-      <Link href={libraryHref} className={cn(NB_SMALL, NB_BLOCK.navy, 'self-start')}>
-        <Plus className="size-4" aria-hidden="true" />
-        {t('eduLibrary.editor.createTitle')}
-      </Link>
     </section>
   );
 }
@@ -102,21 +103,13 @@ export function ClassDangerZone({ onRequestDelete, t }: { onRequestDelete: () =>
       id="delete"
       data-testid="class-page-danger"
       aria-labelledby="class-danger-title"
-      className="flex flex-col gap-3 rounded-neo-xl border-[3px] border-dashed border-neo-red/70 p-4 sm:flex-row sm:items-center sm:justify-between"
+      className="flex items-center justify-between gap-3 border-t-2 border-neo-cream/10 pt-4"
     >
-      <div className="min-w-0">
-        <h2 id="class-danger-title" className="font-neo-display text-base font-black text-neo-cream">{t('settings.dangerZone')}</h2>
-        <p className="font-neo-body text-sm font-semibold text-neo-cream/75">{t('teacher.classroom.confirmDelete')}</p>
-      </div>
-      <NeoButton
-        variant="small"
-        onClick={onRequestDelete}
-        data-testid="delete-class-affordance"
-        className="min-h-12 shrink-0 self-start border-neo-black bg-neo-red px-4 text-base text-neo-white sm:self-auto"
-      >
+      <h2 id="class-danger-title" className="font-neo-body text-sm font-bold text-neo-cream/70">{t('settings.dangerZone')}</h2>
+      <button type="button" onClick={onRequestDelete} data-testid="delete-class-affordance" className={cn(OUTLINE_BUTTON, 'min-h-11 shrink-0 px-3 text-neo-red hover:text-neo-red')}>
         <Trash2 className="size-4" aria-hidden="true" />
         {t('teacher.classroom.delete')}
-      </NeoButton>
+      </button>
     </section>
   );
 }

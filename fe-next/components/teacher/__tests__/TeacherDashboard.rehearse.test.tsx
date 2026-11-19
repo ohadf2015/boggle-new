@@ -58,7 +58,7 @@ afterEach(() => {
 });
 
 describe('Teacher Home — rehearse with bots', () => {
-  it('Given a teacher with a class, Then the hero offers a quiet rehearsal beside the one primary Start', () => {
+  it('Given a teacher with a class, Then the hero offers the rehearsal as the one big secondary under Start', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
     expect(within(hero).getByTestId('rehearse-with-bots')).toBeInTheDocument();

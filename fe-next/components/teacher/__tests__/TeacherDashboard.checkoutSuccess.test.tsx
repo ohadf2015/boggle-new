@@ -63,7 +63,7 @@ describe('<TeacherDashboard> after Polar checkout', () => {
   it('celebrates once the paid entitlement is visible', () => {
     proState = { ...PAID, refresh: vi.fn() };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
+    expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'teacher.proWelcome.title' })).toBeInTheDocument();
     expect(screen.getByText('teacher.proWelcome.paidBody')).toBeInTheDocument();
   });
@@ -82,7 +82,7 @@ describe('<TeacherDashboard> after Polar checkout', () => {
     search = '';
     proState = { ...PAID, refresh: vi.fn() };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
+    expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
