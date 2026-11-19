@@ -1126,7 +1126,8 @@ const ja = {
       "copies": "{count}回コピー",
       "copiesOne": "{count}回コピー",
       "results": "結果",
-      "use": "このリストを使う"
+      "use": "このリストを使う",
+      "actions": "リストの操作"
     },
     "badge": {
       "verified": "公式",
@@ -1159,7 +1160,8 @@ const ja = {
       "tryAllLanguages": "すべての言語を表示",
       "shareFirst": "リストを共有",
       "beFirstTitle": "最初の先生になろう。",
-      "beFirstHint": "リストを1つ共有すると、この言語のすべての先生に表示されます。"
+      "beFirstHint": "リストを1つ共有すると、この言語のすべての先生に表示されます。",
+      "hint": "LexiClashや他の先生が作った単語リスト"
     },
     "preview": {
       "host": "ライブで開始",

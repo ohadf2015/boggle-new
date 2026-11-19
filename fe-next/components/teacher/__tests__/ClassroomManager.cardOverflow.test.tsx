@@ -1,17 +1,6 @@
-/**
- * ClassroomManager — the invite actions must survive a narrow card.
- *
- * Measured live at 1280x800 with three classes and the shell's sidebar: the
- * grid gives each card ~300px, COPY CODE and SHARE sit in one non-wrapping
- * flex row, and the card carries `overflow-hidden` — so SHARE rendered as
- * "SHAR" with its right edge sliced off. jsdom cannot measure that, so what
- * this pins is the layout contract that prevents it. Copy and share are now
- * icon-only buttons beside the code, so the code plate is the part that gives
- * way (min-w-0) and the buttons keep their size.
- */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
@@ -57,33 +46,16 @@ vi.mock('@/components/teacher/classroom/ClassAvatarStack', () => ({
 
 import ClassroomManager from '../ClassroomManager';
 
-describe('ClassroomManager — invite actions in a narrow card', () => {
+describe('ClassroomManager: invite actions', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('keeps the code and its icon actions together: in a narrow card the code takes its own row, and the buttons never shrink', () => {
+  it('keeps invite actions off the card face and names them in its menu', async () => {
     render(<ClassroomManager />);
-
-    const plate = screen.getByTestId('join-code-plate');
-    expect(plate.className).toContain('min-w-0');
-    expect(plate.className).toContain('flex-1');
-    const row = plate.parentElement!;
-    for (const id of ['copy-join-code', 'share-join-code']) {
-      const button = screen.getByTestId(id);
-      expect(row.contains(button)).toBe(true);
-      expect(button.className).toContain('shrink-0');
-    }
-  });
-
-  it('names each icon-only invite action for screen readers and on hover', () => {
-    render(<ClassroomManager />);
-
-    for (const [id, key] of [
-      ['copy-join-code', 'teacher.classroom.copyCode'],
-      ['share-join-code', 'teacher.classroom.share'],
-    ]) {
-      const button = screen.getByTestId(id);
-      expect(button).toHaveAttribute('aria-label', expect.stringContaining(key));
-      expect(button).toHaveAttribute('title', expect.stringContaining(key));
-    }
+    expect(screen.queryByTestId('copy-join-code')).toBeNull();
+    expect(screen.queryByTestId('share-join-code')).toBeNull();
+    await userEvent.click(screen.getByTestId('classroom-card-menu'));
+    expect(screen.getByTestId('classroom-join-code')).toHaveTextContent('DECK01');
+    expect(screen.getByTestId('copy-join-code')).toHaveTextContent('teacher.classroom.copyCode');
+    expect(screen.getByTestId('share-join-code')).toHaveTextContent('teacher.classroom.share');
   });
 });

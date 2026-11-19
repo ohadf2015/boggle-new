@@ -1126,7 +1126,8 @@ const es = {
       "copies": "{count} copias",
       "copiesOne": "{count} copia",
       "results": "Resultados",
-      "use": "Usar lista"
+      "use": "Usar lista",
+      "actions": "Acciones de la lista"
     },
     "badge": {
       "verified": "Verificada",
@@ -1159,7 +1160,8 @@ const es = {
       "tryAllLanguages": "Ver todos los idiomas",
       "shareFirst": "Compartir una lista",
       "beFirstTitle": "Sé el primer docente aquí.",
-      "beFirstHint": "Comparte una de tus listas y la verán todos los docentes de este idioma."
+      "beFirstHint": "Comparte una de tus listas y la verán todos los docentes de este idioma.",
+      "hint": "Listas de palabras ya preparadas por LexiClash y otros docentes"
     },
     "preview": {
       "host": "Jugar en vivo",

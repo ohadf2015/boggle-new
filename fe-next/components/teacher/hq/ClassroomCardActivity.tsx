@@ -1,6 +1,5 @@
 "use client";
 
-import { History } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useClassPulse } from "@/hooks/useClassPulse";
 import type { ClassPulse } from "@/lib/education/classPulse";
@@ -40,17 +39,8 @@ export function ClassroomCardActivity({
   const { pulse, isLoading } = useClassPulse({ classroomId, rosterCount });
 
   return (
-    <p
-      data-testid="classroom-card-last"
-      className="flex min-w-0 items-start gap-1.5 font-neo-body text-sm font-semibold text-neo-cream/85"
-    >
-      <History className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-      <span className="min-w-0">
-        <span className="text-neo-cream/70">
-          {t("teacher.playNow.shortcutLastGame")}:
-        </span>{" "}
-        {lastLine(t, pulse, isLoading)}
-      </span>
+    <p data-testid="classroom-card-last" className="min-w-0">
+      {lastLine(t, pulse, isLoading)}
     </p>
   );
 }

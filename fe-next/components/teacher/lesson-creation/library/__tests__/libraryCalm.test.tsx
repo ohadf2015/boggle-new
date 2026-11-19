@@ -38,64 +38,51 @@ const filters = { language: 'en', query: '', grade: null, topic: null, source: '
 
 afterEach(cleanup);
 
-const ACCENT_FILL = /(^|\s)sm:bg-neo-(cyan|pink|purple|yellow|orange)(\s|$)/;
-const LIME_FILL = /(^|:|\s)bg-neo-lime\b/;
-
-describe('Library game cards', () => {
+describe('Library cards', () => {
   it.each([
-    ['verified', { source: 'verified' as const }, 'eduLibrary.badge.verified', /\bbg-neo-cream\b/],
-    ['teacher', { source: 'teacher' as const, authorName: 'Ms. Rivera', copyCount: 0, playCount: 0 }, 'eduLibrary.badge.byTeacher', /\bborder-neo-cream\b/],
-  ])('Given a %s list card, Then it wears an arcade color band, the sample word is a cream letter tile, and nothing is lime', (_l, patch, badgeKey, badgeLook) => {
+    ['verified', { source: 'verified' as const }, 'eduLibrary.badge.verified'],
+    ['teacher', { source: 'teacher' as const, authorName: 'Ms. Rivera', copyCount: 0, playCount: 0 }, 'eduLibrary.badge.byTeacher'],
+  ])('Given a %s list, Then the card is calm navy with one small accent and no colored fill elsewhere', (_l, patch, badgeKey) => {
     render(<LibraryCard item={{ ...base, ...patch }} index={0} onOpen={vi.fn()} />);
     const card = screen.getByTestId('library-card');
-    expect(within(card).getByTestId('library-card-band').className).toMatch(ACCENT_FILL);
-    const tile = within(card).getByTestId('library-card-sample');
-    expect(tile).toHaveTextContent('whale');
-    expect(tile.className).toMatch(/\bbg-neo-cream\b/);
-    expect(tile.className).toMatch(/shadow/);
-    expect(Array.from(card.querySelectorAll('[class]')).filter((el) => LIME_FILL.test(el.getAttribute('class') ?? ''))).toEqual([]);
+    expect(card.className).toContain('bg-neo-navy-light');
+    expect(within(card).getByTestId('library-card-badge')).toHaveTextContent(badgeKey);
+    const accent = within(card).getByTestId('list-card-accent');
+    expect(fills(card)).toEqual([accent]);
+    expect(accent.className).toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)/);
     expect(card.querySelectorAll('.uppercase')).toHaveLength(0);
-    const badge = within(card).getByTestId('library-card-badge');
-    expect(badge).toHaveTextContent(badgeKey);
-    expect(badge.className).toMatch(badgeLook);
   });
 
   it('Given the same list at two grid positions, Then it keeps one accent color', () => {
-    const band = (index: number) => {
+    const accent = (index: number) => {
       const { unmount } = render(<LibraryCard item={{ ...base, id: 'pub-42' }} index={index} onOpen={vi.fn()} />);
-      const cls = screen.getByTestId('library-card-band').className.match(ACCENT_FILL)?.[2];
+      const cls = screen.getByTestId('list-card-accent').className.match(/bg-neo-\w+/)?.[0];
       unmount();
       return cls;
     };
-    expect(band(0)).toBeDefined();
-    expect(band(7)).toBe(band(0));
+    expect(accent(0)).toBeDefined();
+    expect(accent(7)).toBe(accent(0));
   });
 
-  it('Given a list with more words, Then the next words peek behind the sample tile, hidden from assistive tech', () => {
-    render(<LibraryCard item={{ ...base, words: [{ word: 'whale' }, { word: 'squid' }, { word: 'crab' }] }} index={0} onOpen={vi.fn()} />);
-    const fan = screen.getAllByTestId('library-card-fan-tile');
-    expect(fan.map((el) => el.textContent)).toEqual(['squid', 'crab']);
-    fan.forEach((el) => expect(el.closest('[aria-hidden="true"]')).not.toBeNull());
-  });
-
-  it('Given reduced motion, Then every animation and hover tilt on the card is gated behind motion-safe or reset by motion-reduce', () => {
-    render(<LibraryCard item={base} index={0} onOpen={vi.fn()} />);
-    const classes = Array.from(screen.getByTestId('library-card').querySelectorAll<HTMLElement>('[class]'))
-      .concat(screen.getByTestId('library-card'))
-      .flatMap((el) => (el.getAttribute('class') ?? '').split(/\s+/));
-    expect(classes.filter((c) => /^animate-/.test(c))).toEqual([]);
-    const card = screen.getByTestId('library-card').className;
-    expect(card).toMatch(/motion-reduce:hover:rotate-0/);
-  });
-
-  it('Given a list card, Then it names the language as text and shows what a tap does', () => {
+  it('Given a list, Then the card is one control with the name, one fact line and what a tap does', () => {
     const onOpen = vi.fn();
     render(<LibraryCard item={base} index={0} onOpen={onOpen} />);
     const card = screen.getByTestId('library-card');
-    expect(card).toHaveTextContent('עברית');
+    expect(card.tagName).toBe('BUTTON');
+    expect(card.querySelectorAll('button, a')).toHaveLength(0);
+    expect(card).toHaveTextContent('Ocean Animals');
+    expect(within(card).getByTestId('library-card-fact')).toHaveTextContent('eduLibrary.card.words');
+    expect(within(card).getByTestId('library-card-fact')).toHaveTextContent('עברית');
     expect(card).toHaveTextContent('eduLibrary.card.use');
+    expect(screen.queryByTestId('library-card-sample')).toBeNull();
     fireEvent.click(card);
     expect(onOpen).toHaveBeenCalled();
+  });
+
+  it('Given reduced motion, Then the entrance is motion-safe only', () => {
+    render(<LibraryCard item={base} index={0} onOpen={vi.fn()} />);
+    const classes = (screen.getByTestId('library-card').getAttribute('class') ?? '').split(/\s+/);
+    expect(classes.filter((c) => /^animate-/.test(c))).toEqual([]);
   });
 
   it('Given the filters, Then nothing is a colored fill, the language is a plain picker, and the selected source wears a lime ring', () => {
@@ -140,16 +127,6 @@ describe('Library game cards', () => {
       <ListPreviewSheet item={base} onClose={vi.fn()} busy={null} copied onHost={vi.fn()} onAssign={vi.fn()} onCopy={vi.fn()} onOpenMyLists={vi.fn()} onReport={vi.fn()} />,
     );
     expect(fills(screen.getByTestId('list-preview-sheet'))).toEqual([screen.getByTestId('preview-host')]);
-  });
-});
-
-describe('LibraryCard on a phone', () => {
-  it('Then the title gets its own full row between the sample/count row and the meta row', () => {
-    render(<LibraryCard item={{ ...base, name: 'If you are reading this, a long list name' }} index={0} onOpen={() => {}} />);
-    const title = screen.getByTitle('If you are reading this, a long list name');
-    expect(title.className).toMatch(/(^|\s)col-span-3(\s|$)/);
-    expect(title.className).toMatch(/(^|\s)row-start-2(\s|$)/);
-    expect(screen.getByTestId('library-card').className).not.toMatch(/(^|\s)h-\[78px\](\s|$)/);
   });
 });
 

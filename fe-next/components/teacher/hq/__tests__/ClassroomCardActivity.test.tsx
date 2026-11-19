@@ -42,7 +42,7 @@ describe('<ClassroomCardActivity>', () => {
   it('Given a recent game, Then one plain line says when and how well', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     const last = screen.getByTestId('classroom-card-last');
-    expect(last).toHaveTextContent('teacher.playNow.shortcutLastGame');
+    expect(last).not.toHaveTextContent('teacher.playNow.shortcutLastGame');
     expect(last).toHaveTextContent('teacher.pulse.lastPlayedDays');
     expect(last).toHaveTextContent('"days":2');
   });

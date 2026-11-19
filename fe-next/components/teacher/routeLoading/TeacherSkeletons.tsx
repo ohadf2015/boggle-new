@@ -64,17 +64,19 @@ export function ClassesSkeleton() {
   );
 }
 
-/** My lists grid, as LessonBuilder lays it out: list cards at the fitted 180px, 1 / 2 / 3 columns. */
+/** My lists grid, as LessonBuilder lays it out: 224px list cards, 1 / 2 / 3 columns by container width. */
 export function ListGridSkeleton() {
   return (
     <div data-testid="my-lists-skeleton" aria-hidden="true" className="space-y-3">
       <div className="flex flex-wrap items-center justify-end gap-2">
         <span className={cn(SKELETON, 'h-11 w-32')} />
       </div>
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 2xl:grid-cols-3">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className={cn(SKELETON, 'h-[180px] rounded-neo-lg', i === 2 && 'hidden 2xl:block')} />
-        ))}
+      <div className="@container">
+        <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @5xl:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <span key={i} className={cn(SKELETON, 'h-56 rounded-neo-lg', i === 2 && 'hidden @5xl:block')} />
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 const push = vi.fn();
 
@@ -37,9 +38,11 @@ const LESSON = {
 
 const ASSIGNED_LESSON = { ...LESSON, id: 'lesson-2', classroom_id: 'c1' };
 
+let lessons: (typeof LESSON)[] = [LESSON, ASSIGNED_LESSON];
+
 vi.mock('@/hooks/useVocabularyLesson', () => ({
   useLessons: () => ({
-    lessons: [LESSON, ASSIGNED_LESSON],
+    lessons,
     isLoading: false,
     createLesson: vi.fn(),
     updateLesson: vi.fn(),
@@ -63,8 +66,35 @@ vi.mock('../StarterPacksSection', () => ({ StarterPacksSection: () => null }));
 
 import LessonBuilder from '../LessonBuilder';
 
+async function pick(lessonId: string, testId: string) {
+  await userEvent.click(screen.getByTestId(`lesson-menu-${lessonId}`));
+  await userEvent.click(await screen.findByTestId(testId));
+}
+
 describe('LessonBuilder — lesson card actions', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    lessons = [LESSON, ASSIGNED_LESSON];
+  });
+
+  it('Given more than six lists, Then one page shows six and the pager reaches the rest', () => {
+    lessons = Array.from({ length: 8 }, (_, i) => ({ ...LESSON, id: `l${i}`, name: `List ${i}` }));
+    render(<LessonBuilder />);
+    expect(screen.getByTestId('my-lists-grid').children).toHaveLength(6);
+    fireEvent.click(screen.getByRole('button', { name: 'eduLibrary.pager.next' }));
+    expect(screen.getByTestId('my-lists-grid').children).toHaveLength(2);
+  });
+
+  it('Given a heading, Then it shares the top row with New list', () => {
+    render(<LessonBuilder heading={<h1 data-testid="library-heading">Library</h1>} />);
+    expect(screen.getByTestId('library-heading').parentElement).toContainElement(screen.getByTestId('lessons-create'));
+  });
+
+  it('Reports how many lists the teacher has once they load', () => {
+    const onListCount = vi.fn();
+    render(<LessonBuilder onListCount={onListCount} />);
+    expect(onListCount).toHaveBeenCalledWith(2);
+  });
 
   it('hosts the lesson straight from its card', () => {
     render(<LessonBuilder />);
@@ -72,21 +102,21 @@ describe('LessonBuilder — lesson card actions', () => {
     expect(push).toHaveBeenCalledWith('/en/education/classroom-game?lessonId=lesson-1');
   });
 
-  it('sends students to self-paced practice for that lesson', () => {
+  it('sends students to self-paced practice for that lesson', async () => {
     render(<LessonBuilder />);
-    fireEvent.click(screen.getByTestId('lesson-practice-lesson-1'));
+    await pick('lesson-1', 'lesson-practice-lesson-1');
     expect(push).toHaveBeenCalledWith('/en/student/lessons/lesson-1');
   });
 
-  it('opens the reports picker for a lesson with no classroom', () => {
+  it('opens the reports picker for a lesson with no classroom', async () => {
     render(<LessonBuilder />);
-    fireEvent.click(screen.getByTestId('lesson-results-lesson-1'));
+    await pick('lesson-1', 'lesson-results-lesson-1');
     expect(push).toHaveBeenCalledWith('/en/teacher/reports');
   });
 
-  it("opens that lesson's classroom report directly when it has one", () => {
+  it("opens that lesson's classroom report directly when it has one", async () => {
     render(<LessonBuilder />);
-    fireEvent.click(screen.getByTestId('lesson-results-lesson-2'));
+    await pick('lesson-2', 'lesson-results-lesson-2');
     expect(push).toHaveBeenCalledWith('/en/teacher/reports?classroomId=c1');
   });
 

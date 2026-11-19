@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
@@ -28,16 +29,18 @@ describe('ClassCard class page and weekly insight', () => {
     expect(screen.getByRole('link', { name: 'Period 3' })).toHaveAttribute('href', '/en/teacher/classroom/cls-1');
   });
 
-  it('Given the free weekly insight for this class, Then the card links to "Who needs help this week" and keeps the cap meter', () => {
+  it('Given the free weekly insight for this class, Then the menu links to "Who needs help this week"', async () => {
     render(<ClassCard {...props} insightHref="/en/teacher/classroom/cls-1/analytics" />);
+    expect(screen.queryByTestId('classroom-card-insight')).toBeNull();
+    await userEvent.click(screen.getByTestId('classroom-card-menu'));
     const link = screen.getByTestId('classroom-card-insight');
     expect(link).toHaveAttribute('href', '/en/teacher/classroom/cls-1/analytics');
     expect(link).toHaveTextContent('teacher.weekInsight.title');
-    expect(screen.getByTestId('student-cap-meter')).toBeInTheDocument();
   });
 
-  it('Given no insight link, Then the card shows none', () => {
+  it('Given no insight link, Then the menu shows none', async () => {
     render(<ClassCard {...props} />);
+    await userEvent.click(screen.getByTestId('classroom-card-menu'));
     expect(screen.queryByTestId('classroom-card-insight')).toBeNull();
   });
 });

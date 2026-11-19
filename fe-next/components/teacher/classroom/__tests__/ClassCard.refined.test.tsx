@@ -1,16 +1,9 @@
 /**
- * ClassCard — the refined-surfaces contract for one class on the Classes tab.
- *
- * The bar is Kahoot's Kahoots page: ONE primary verb in the spotlight (Start
- * a game), the join code readable from the back row (ink-on-cream plate),
- * copy/share as icon buttons beside it, and everything rare (students,
- * homework, report, rename, delete, Google Classroom) behind a "…" menu.
- * The look is the chunky neo-brutalist one the teacher approved (Nov 6): a
- * colored band with the class name, a dark body with a visible cream
- * outline, and lime kept for the one Start a game button.
+ * One class on the Classes tab: name, one fact, one primary action, one menu.
+ * Everything else a teacher can do with the class lives in the menu.
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -39,13 +32,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro, loadin
 
 import { ClassCard } from '../ClassCard';
 
-const CLASSROOM = {
-  id: 'cls-1',
-  name: 'Period 3',
-  language: 'en',
-  join_code: 'ABC123',
-  member_count: 12,
-};
+const CLASSROOM = { id: 'cls-1', name: 'Period 3', language: 'en', join_code: 'ABC123', member_count: 12 };
 
 const baseProps = {
   classroom: CLASSROOM,
@@ -57,122 +44,163 @@ const baseProps = {
   onEdit: vi.fn(),
   onDelete: vi.fn(),
   startGameHref: '/en/teacher?classroomId=cls-1',
+  classHref: '/en/teacher/classroom/cls-1',
 };
 
-describe('ClassCard — refined surfaces', () => {
+const fullProps = {
+  ...baseProps,
+  assignHref: '/a',
+  reportHref: '/r',
+  insightHref: '/i',
+  onOpenProjector: vi.fn(),
+  rehearse: <button type="button" data-testid="rehearse-button">rehearse</button>,
+};
+
+const openMenu = () => userEvent.click(screen.getByTestId('classroom-card-menu'));
+
+describe('ClassCard face', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     hasPro = false;
   });
 
-  it('Given a free teacher, Then the card shows the student cap meter', () => {
-    render(<ClassCard {...baseProps} />);
-    const meter = screen.getByTestId('student-cap-meter');
-    expect(meter).toBeInTheDocument();
-    expect(meter).toHaveAttribute('data-source', 'classroom_card');
-    expect(meter).toHaveAttribute('data-count', '12');
-  });
-
-  it('Given a Pro teacher, Then no cap meter repeats the student count the roster toggle already shows', () => {
-    hasPro = true;
-    render(<ClassCard {...baseProps} />);
-    expect(screen.queryByTestId('student-cap-meter')).toBeNull();
-  });
-
-  it('is a chunky dark panel with a visible cream outline and a colored name band', () => {
-    render(<ClassCard {...baseProps} color="cyan" />);
-    const cls = screen.getByTestId('classroom-card').className.toString();
-    expect(cls).toContain('bg-neo-navy-light');
-    expect(cls).toContain('border-[3px]');
-    expect(cls).toContain('border-neo-cream/50');
-    expect(cls).not.toContain('border-neo-black');
-    const band = screen.getByTestId('classroom-card-band');
-    expect(band.className).toContain('bg-neo-cyan');
-    expect(band).toContainElement(screen.getByRole('heading', { name: 'Period 3' }));
-  });
-
-  it('keeps the join code on an ink-on-cream plate, readable from the back row', () => {
-    render(<ClassCard {...baseProps} />);
-    const code = screen.getByTestId('classroom-join-code');
-    expect(code).toHaveTextContent('ABC123');
-    expect(code.className).toMatch(/text-3xl|text-4xl|text-5xl/);
-    const plate = code.closest('[data-testid="join-code-plate"]');
-    expect(plate).not.toBeNull();
-    expect(plate!.className).toContain('bg-neo-cream');
-  });
-
-  it('keeps lime for the Start-a-game hero alone; the band carries the class color', () => {
-    render(<ClassCard {...baseProps} />);
-    const start = screen.getByTestId('classroom-card-start-game');
-    expect(start.className).toContain('bg-neo-lime');
-    expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
+  it('Given every action exists, Then the card still shows only the name, the menu and Start', () => {
+    render(<ClassCard {...fullProps} />);
     const card = screen.getByTestId('classroom-card');
-    const lime = Array.from(card.querySelectorAll('*')).filter((el) =>
-      /bg-neo-lime(\/|\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
-    );
-    expect(lime).toEqual([start]);
-    expect(screen.getByTestId('classroom-card-band').className).toContain('bg-neo-pink');
+    const controls = Array.from(card.querySelectorAll('a, button')).map((el) => el.getAttribute('data-testid'));
+    expect(controls).toEqual(['classroom-card-open', 'classroom-card-menu', 'classroom-card-start-game']);
   });
 
-  it('keeps copy and share visible as the secondary pair beside the code', () => {
+  it('is one calm navy surface with a small accent instead of a color band', () => {
+    render(<ClassCard {...baseProps} color="cyan" />);
+    const card = screen.getByTestId('classroom-card');
+    expect(card.className).toContain('bg-neo-navy-light');
+    expect(screen.queryByTestId('classroom-card-band')).toBeNull();
+    expect(within(card).getByTestId('list-card-accent').className).toContain('bg-neo-cyan');
+  });
+
+  it('Given the featured card, Then Start is lime; any other card gets the quiet button', () => {
+    const { rerender } = render(<ClassCard {...baseProps} featured />);
+    expect(screen.getByTestId('classroom-card-start-game').className).toContain('bg-neo-lime');
+    rerender(<ClassCard {...baseProps} />);
+    const start = screen.getByTestId('classroom-card-start-game');
+    expect(start.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
+    expect(start).toHaveTextContent('eduShell.home.startLive');
+  });
+
+  it('Given students and activity, Then the fact is the activity line with the faces beside it', () => {
+    render(<ClassCard {...baseProps} activity={<span>played</span>} studentPreview={<span data-testid="faces" />} />);
+    const fact = screen.getByTestId('classroom-card-fact');
+    expect(fact).toHaveTextContent('played');
+    expect(within(fact).getByTestId('faces')).toBeInTheDocument();
+  });
+
+  it('Given students but no activity line, Then the fact is the student count', () => {
     render(<ClassCard {...baseProps} />);
-    expect(screen.getByTestId('copy-join-code')).toBeInTheDocument();
-    expect(screen.getByTestId('share-join-code')).toBeInTheDocument();
+    expect(screen.getByTestId('classroom-card-fact')).toHaveTextContent('teacher.classroom.studentCountPro');
   });
 
-  it('demotes rename, delete and Google Classroom behind the "…" menu', async () => {
-    const user = userEvent.setup();
-    render(<ClassCard {...baseProps} />);
-
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-
-    await user.click(screen.getByTestId('classroom-card-menu'));
-
-    expect(screen.getByRole('menuitem', { name: 'teacher.classroom.edit' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'teacher.classroom.delete' })).toBeInTheDocument();
-    const google = screen.getByRole('menuitem', { name: /googleClassroom/i });
-    expect(google.tagName).toBe('A');
-  });
-
-  it('runs edit/delete through the menu callbacks and closes the menu', async () => {
-    const user = userEvent.setup();
-    const onEdit = vi.fn();
-    render(<ClassCard {...baseProps} onEdit={onEdit} />);
-
-    await user.click(screen.getByTestId('classroom-card-menu'));
-    await user.click(screen.getByRole('menuitem', { name: 'teacher.classroom.edit' }));
-
-    expect(onEdit).toHaveBeenCalledTimes(1);
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
-  });
-
-  it('names the class in a quiet sentence-case title, not the hero treatment', () => {
-    render(<ClassCard {...baseProps} />);
-    const title = screen.getByRole('heading', { name: 'Period 3' });
-    expect(title.className).not.toMatch(/uppercase/);
-    expect(title.className).not.toMatch(/text-shadow/);
+  it('Given no students, Then the fact says so and shows the code instead of the activity', () => {
+    render(<ClassCard {...baseProps} classroom={{ ...CLASSROOM, member_count: 0 }} activity={<span>played</span>} />);
+    const fact = screen.getByTestId('classroom-card-fact');
+    expect(fact).toHaveTextContent('teacher.pulse.state.noRoster');
+    expect(fact).toHaveTextContent('ABC123');
+    expect(fact).not.toHaveTextContent('played');
   });
 
   it('keeps long class names recoverable: full name in title, two-line clamp', () => {
     const longName = 'Advanced Placement English Literature and Composition';
     render(<ClassCard {...baseProps} classroom={{ ...CLASSROOM, name: longName }} />);
-
     const title = screen.getByRole('heading', { name: longName });
     expect(title).toHaveAttribute('title', longName);
     expect(title.className).toContain('line-clamp-2');
-    expect(title.className).not.toMatch(/(^|\s)truncate(\s|$)/);
+    expect(title.className).not.toMatch(/(^|\s)(truncate|uppercase)(\s|$)/);
   });
 
-  it('asks to see the whole roster from the students row', async () => {
-    const user = userEvent.setup();
-    const onToggleExpanded = vi.fn();
-    render(<ClassCard {...baseProps} onToggleExpanded={onToggleExpanded} />);
+  it('gives the icon-only menu button a name and a tooltip', () => {
+    render(<ClassCard {...baseProps} />);
+    const menu = screen.getByTestId('classroom-card-menu');
+    expect(menu).toHaveAttribute('aria-label', 'academy.teacher.classActions');
+    expect(menu).toHaveAttribute('title', 'academy.teacher.classActions');
+  });
+});
 
-    await user.click(screen.getByTestId('classroom-card-menu'));
-    const students = screen.getByTestId('classroom-card-students');
-    expect(students).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
-    await user.click(students);
-    expect(onToggleExpanded).toHaveBeenCalledTimes(1);
+describe('ClassCard menu', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    hasPro = false;
+  });
+
+  it('is closed until asked for', () => {
+    render(<ClassCard {...fullProps} />);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('holds every class action, so nothing left the card for good', async () => {
+    render(<ClassCard {...fullProps} />);
+    await openMenu();
+    for (const id of [
+      'copy-join-code',
+      'share-join-code',
+      'classroom-card-projector',
+      'share-to-google-classroom',
+      'classroom-card-students',
+      'classroom-card-assign',
+      'classroom-card-report',
+      'classroom-card-insight',
+      'classroom-card-rehearse',
+      'classroom-card-edit',
+      'classroom-card-delete',
+    ]) {
+      expect(screen.getByTestId(id)).toBeInTheDocument();
+    }
+  });
+
+  it('opens with the join code and the class language', async () => {
+    render(<ClassCard {...baseProps} />);
+    await openMenu();
+    expect(screen.getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
+    expect(screen.getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
+  });
+
+  it.each([
+    ['copy-join-code', 'onCopy'],
+    ['share-join-code', 'onShare'],
+    ['classroom-card-projector', 'onOpenProjector'],
+    ['classroom-card-students', 'onToggleExpanded'],
+    ['classroom-card-edit', 'onEdit'],
+    ['classroom-card-delete', 'onDelete'],
+  ] as const)('When %s is picked, Then %s runs and the menu closes', async (id, handler) => {
+    render(<ClassCard {...fullProps} />);
+    await openMenu();
+    await userEvent.click(screen.getByTestId(id));
+    expect(fullProps[handler]).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('When rehearse is picked, Then the rehearse button itself runs', async () => {
+    const onRehearse = vi.fn();
+    render(<ClassCard {...fullProps} rehearse={<button type="button" onClick={onRehearse}>rehearse</button>} />);
+    await openMenu();
+    await userEvent.click(screen.getByTestId('classroom-card-rehearse'));
+    expect(onRehearse).toHaveBeenCalledTimes(1);
+  });
+
+  it('names the students, and keeps links as links', async () => {
+    render(<ClassCard {...fullProps} />);
+    await openMenu();
+    expect(screen.getByTestId('classroom-card-students')).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
+    expect(screen.getByTestId('classroom-card-students')).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(screen.getByTestId('classroom-card-report')).toHaveAttribute('href', '/r');
+    expect(screen.getByTestId('classroom-card-assign')).toHaveAttribute('href', '/a');
+    expect(screen.getByRole('menuitem', { name: /googleClassroom/i }).tagName).toBe('A');
+  });
+});
+
+describe('ClassCard roster dialog', () => {
+  beforeEach(() => {
+    hasPro = false;
   });
 
   it('opens the full roster in a dialog, so the page itself never grows', () => {
@@ -182,77 +210,16 @@ describe('ClassCard — refined surfaces', () => {
     expect(screen.getByTestId('classroom-card')).not.toContainElement(screen.getByTestId('classroom-student-list'));
   });
 
-  it('shows a short student preview beside the roster button', () => {
-    render(<ClassCard {...baseProps} studentPreview={<span data-testid="avatar-stack" />} />);
-    expect(screen.getByTestId('avatar-stack')).toBeInTheDocument();
+  it('Given a free teacher, Then the student cap sits on the roster, not on the card', () => {
+    render(<ClassCard {...baseProps} expanded />);
+    const meter = within(screen.getByRole('dialog')).getByTestId('student-cap-meter');
+    expect(meter).toHaveAttribute('data-source', 'classroom_card');
+    expect(meter).toHaveAttribute('data-count', '12');
   });
 
-  it('labels the one primary action the same as Teacher home: Pick a game', () => {
-    render(<ClassCard {...baseProps} />);
-    const start = screen.getByTestId('classroom-card-start-game');
-    expect(start).toHaveTextContent('eduShell.home.startLive');
-    expect(start.className).not.toMatch(/(^|\s)uppercase(\s|$)/);
-  });
-
-  it('never shouts: no uppercase micro-labels anywhere on the card', () => {
-    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" onOpenProjector={vi.fn()} />);
-    const card = screen.getByTestId('classroom-card');
-    const loud = [card, ...Array.from(card.querySelectorAll('*'))].filter((el) =>
-      /(^|\s)uppercase(\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
-    );
-    expect(loud).toHaveLength(0);
-  });
-
-  it('names the class language in words, not a two-letter code', () => {
-    render(<ClassCard {...baseProps} />);
-    expect(screen.getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
-  });
-
-  it('puts only the code on its plate; copy, share and show-on-board are named icon buttons beside it', () => {
-    render(<ClassCard {...baseProps} onOpenProjector={vi.fn()} />);
-    const plate = screen.getByTestId('join-code-plate');
-    for (const id of ['copy-join-code', 'share-join-code', 'classroom-card-projector']) {
-      const btn = screen.getByTestId(id);
-      expect(plate).not.toContainElement(btn);
-      expect(btn.getAttribute('aria-label')).toBeTruthy();
-      expect(btn).toHaveAttribute('title', btn.getAttribute('aria-label'));
-    }
-    expect(screen.getByTestId('classroom-card-projector')).toHaveAttribute('aria-label', 'academy.hq.openProjector');
-  });
-
-  it('never cuts a label with an ellipsis', () => {
-    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" onOpenProjector={vi.fn()} />);
-    const card = screen.getByTestId('classroom-card');
-    const cut = Array.from(card.querySelectorAll('*')).filter((el) =>
-      /(^|\s)truncate(\s|$)/.test((el as HTMLElement).className?.toString?.() ?? ''),
-    );
-    expect(cut).toHaveLength(0);
-  });
-
-  it('labels the menu links in teacher words', async () => {
-    const user = userEvent.setup();
-    render(<ClassCard {...baseProps} reportHref="/r" assignHref="/a" />);
-    await user.click(screen.getByTestId('classroom-card-menu'));
-    expect(screen.getByTestId('classroom-card-report')).toHaveTextContent('teacher.classroom.cardClassReport');
-    expect(screen.getByTestId('classroom-card-assign')).toHaveTextContent('eduShell.home.focus.assign');
-  });
-
-  it('gives the icon-only menu button a name and a tooltip', () => {
-    render(<ClassCard {...baseProps} />);
-    const menu = screen.getByTestId('classroom-card-menu');
-    expect(menu).toHaveAttribute('aria-label', 'academy.teacher.classActions');
-    expect(menu).toHaveAttribute('title', 'academy.teacher.classActions');
-  });
-
-  it('Given a phone-width card, Then the code plate takes its own row and the three buttons share the row under it', () => {
-    render(<ClassCard {...baseProps} onOpenProjector={vi.fn()} />);
-    const plate = screen.getByTestId('join-code-plate');
-    expect(plate.className).toMatch(/(^|\s)basis-full(\s|$)/);
-    expect(plate.parentElement!.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
-    for (const id of ['copy-join-code', 'share-join-code', 'classroom-card-projector']) {
-      expect(screen.getByTestId(id).className).toMatch(/(^|\s)flex-1(\s|$)/);
-      expect(screen.getByTestId(id).className).toMatch(/(^|\s)min-h-12(\s|$)/);
-    }
+  it('Given a Pro teacher, Then the roster has no cap meter', () => {
+    hasPro = true;
+    render(<ClassCard {...baseProps} expanded />);
+    expect(screen.queryByTestId('student-cap-meter')).toBeNull();
   });
 });
-

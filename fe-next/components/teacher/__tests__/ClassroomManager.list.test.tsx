@@ -109,16 +109,27 @@ describe('ClassroomManager — class list', () => {
       expect(wrapper).toHaveAttribute('data-tm');
     });
 
-    it('Then each card carries name, roster state, big join code, and activity', () => {
+    it('Then a class with no students says so and shows the code to share', () => {
       render(<ClassroomManager />);
       const card = screen.getByTestId('classroom-card');
       expect(within(card).getByText('Period 3')).toBeInTheDocument();
-      expect(within(card).getByText('teacher.classrooms.students.noneYet')).toBeInTheDocument();
-      const code = within(card).getByTestId('classroom-join-code');
-      expect(code).toHaveTextContent('ABC123');
-      expect(code.className).toMatch(/(^|\s)text-(2xl|3xl)(\s|$)/);
-      expect(within(card).getByTestId('copy-join-code')).toBeInTheDocument();
-      expect(within(card).getByTestId('card-activity')).toHaveTextContent('cls-1');
+      const fact = within(card).getByTestId('classroom-card-fact');
+      expect(fact).toHaveTextContent('teacher.pulse.state.noRoster');
+      expect(fact).toHaveTextContent('ABC123');
+      expect(within(card).queryByTestId('card-activity')).toBeNull();
+    });
+
+    it('Then a class with students shows its last game as the one fact', () => {
+      state.classrooms = [mk(1, { member_count: 4 })];
+      render(<ClassroomManager />);
+      expect(within(screen.getByTestId('classroom-card-fact')).getByTestId('card-activity')).toHaveTextContent('cls-1');
+    });
+
+    it('Then only the first card wears the lime Start, so the screen has one primary action', () => {
+      state.classrooms = [mk(1), mk(2), mk(3)];
+      render(<ClassroomManager />);
+      const lime = screen.getAllByTestId('classroom-card-start-game').filter((a) => /(^|\s)bg-neo-lime(\s|$)/.test(a.className));
+      expect(lime).toEqual([screen.getAllByTestId('classroom-card-start-game')[0]]);
     });
 
     it('Then the card leads with Start a game and keeps Assign and Report in its menu', async () => {
@@ -144,6 +155,7 @@ describe('ClassroomManager — class list', () => {
       const user = userEvent.setup();
       render(<ClassroomManager />);
       expect(screen.queryByTestId('projector-sheet')).toBeNull();
+      await user.click(screen.getByTestId('classroom-card-menu'));
       await user.click(screen.getByTestId('classroom-card-projector'));
       expect(screen.getByTestId('projector-sheet')).toHaveTextContent('ABC123');
       await user.click(screen.getByText('close-projector'));

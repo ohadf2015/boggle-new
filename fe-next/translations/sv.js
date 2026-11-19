@@ -1126,7 +1126,8 @@ const sv = {
       "copies": "{count} kopior",
       "copiesOne": "{count} kopia",
       "results": "Resultat",
-      "use": "Använd listan"
+      "use": "Använd listan",
+      "actions": "Liståtgärder"
     },
     "badge": {
       "verified": "Verifierad",
@@ -1159,7 +1160,8 @@ const sv = {
       "tryAllLanguages": "Visa alla språk",
       "shareFirst": "Dela en lista",
       "beFirstTitle": "Bli först här.",
-      "beFirstHint": "Dela en av dina listor så syns den för alla lärare på det här språket."
+      "beFirstHint": "Dela en av dina listor så syns den för alla lärare på det här språket.",
+      "hint": "Färdiga ordlistor från LexiClash och andra lärare"
     },
     "preview": {
       "host": "Kör live",
