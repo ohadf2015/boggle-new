@@ -436,4 +436,81 @@ describe('processDunningForPastDueSubs cron sweep', () => {
     expect(sweep).toEqual({ processed: 0, items: [] });
     expect(sendEmail).not.toHaveBeenCalled();
   });
+
+  it('recovers the missed-webhook teacher within 5 days: day-1 sent exactly once across two cron firings', async () => {
+    // Stateful subscription_events store: the sweep reads it before deciding and
+    // logSubscriptionEvent appends the marker a real send writes.
+    const sentEvents: { event_type: string; created_at: string }[] = [];
+    subEventsMock.mockImplementation(async () => ({ data: [...sentEvents] }));
+    vi.mocked(logSubscriptionEvent).mockImplementation(
+      async (args: { eventType: string }) => {
+        sentEvents.push({ event_type: args.eventType, created_at: '2026-11-10T09:50:00.000Z' });
+      },
+    );
+
+    // Onset 2026-11-09 (subscriptionsMock provider_event_at), now day 1 — the
+    // Polar webhook missed subscription.updated, so no marker exists yet.
+    const nowMs = Date.parse('2026-11-10T09:50:00.000Z');
+    const subs = [
+      {
+        id: 'sub_recover_1',
+        status: 'past_due',
+        cancelAtPeriodEnd: false,
+        email: 'lessons.wings@example.com',
+        amount: 900,
+        currency: 'usd',
+        currentPeriodEnd: '2026-11-09T00:00:00.000Z',
+        startedAt: '2026-09-09T00:00:00.000Z',
+      },
+    ];
+
+    // First firing: the missed day-1 note goes out and the dedupe marker is written.
+    const first = await processDunningForPastDueSubs(subs, { dry: false, nowMs });
+    expect(first.processed).toBe(1);
+    expect(first.items).toEqual([
+      expect.objectContaining({
+        subscriptionId: 'sub_recover_1',
+        email: 'lessons.wings@example.com',
+        step: 'day-1',
+        sent: true,
+      }),
+    ]);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(teacherPaymentFailed).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(logSubscriptionEvent).mock.calls[0]?.[0]).toEqual(
+      expect.objectContaining({ eventType: EVENT_DAY1, subscriptionId: 'sub_recover_1' }),
+    );
+
+    // Second firing the same day (retry/double-schedule): the marker dedupes.
+    const second = await processDunningForPastDueSubs(subs, { dry: false, nowMs });
+    expect(second.processed).toBe(0);
+    expect(second.items).toEqual([]);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(logSubscriptionEvent)).toHaveBeenCalledTimes(1);
+
+    sentEvents.length = 0;
+    vi.mocked(logSubscriptionEvent).mockImplementation(async () => undefined);
+  });
+
+  it('leaves a 9-days past_due teacher to the escalation cron: no day-1 from this sweep', async () => {
+    // Audit 2026-11-17 seat: 9 days past onset is outside the 5-day day-1
+    // backfill window; teacher-pro-dunning owns catch-up through day 14.
+    const sweep = await processDunningForPastDueSubs(
+      [
+        {
+          id: 'sub_recover_9d',
+          status: 'past_due',
+          cancelAtPeriodEnd: false,
+          email: 'lessons.wings@example.com',
+          amount: 900,
+          currency: 'usd',
+          currentPeriodEnd: '2026-11-09T00:00:00.000Z',
+          startedAt: '2026-09-09T00:00:00.000Z',
+        },
+      ],
+      { dry: false, nowMs: Date.parse('2026-11-18T08:00:00.000Z') },
+    );
+    expect(sweep).toEqual({ processed: 0, items: [] });
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
 });

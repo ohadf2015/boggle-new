@@ -16,7 +16,12 @@ const h = vi.hoisted(() => ({
   listInactive: [] as unknown[],
   listError: null as null | Error,
   redisRaw: null as string | null,
-  redisSet: vi.fn(async () => 'OK'),
+  // Stateful like the real cron: set() writes the snapshot get() reads back,
+  // so a second firing sees the first run's saved state.
+  redisSet: vi.fn(async (_key: string, value: string) => {
+    h.redisRaw = value;
+    return 'OK';
+  }),
   telegramOk: true,
   sendTelegram: vi.fn(async () => true),
   sendEmail: vi.fn(async () => ({ ok: true })),
@@ -42,6 +47,7 @@ vi.mock('@/lib/telegram', () => ({
 }));
 vi.mock('@/lib/email/send', () => ({ sendEmail: (...args: unknown[]) => h.sendEmail(...args) }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
+vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: () => null }));
 vi.mock('@/backend/redis/locking', () => ({
   withCronLock: async (_n: string, _ms: number, fn: () => Promise<unknown>) => ({
     status: 'ran',
@@ -99,6 +105,34 @@ describe('/api/cron/teacher-pro-churn-watch', () => {
     const res = await POST(makeRequest());
     expect(res.status).toBe(401);
     expect(h.sendTelegram).not.toHaveBeenCalled();
+  });
+
+  it('rejects a wrong cron secret', async () => {
+    const res = await POST(makeRequest({ authorization: 'Bearer not-the-secret' }));
+    expect(res.status).toBe(401);
+    expect(h.sendTelegram).not.toHaveBeenCalled();
+    expect(h.processDunning).not.toHaveBeenCalled();
+  });
+
+  it('does not re-alert when the cron fires twice on the same past_due snapshot', async () => {
+    h.listLive = [];
+    h.listInactive = [{ ...liveSub, status: 'past_due' }];
+
+    // First firing with no stored snapshot: past_due on the baseline run alerts.
+    const first = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(first.status).toBe(200);
+    expect((await first.json()).shouldNotify).toBe(true);
+    expect(h.sendTelegram).toHaveBeenCalledTimes(1);
+
+    // Second firing reads back the snapshot the first run saved: same
+    // fingerprint means the transition already alerted — stay silent.
+    const second = await POST(makeRequest({ authorization: `Bearer ${CRON_SECRET}` }));
+    expect(second.status).toBe(200);
+    const body = await second.json();
+    expect(body.shouldNotify).toBe(false);
+    expect(body.notified).toBe(false);
+    expect(h.sendTelegram).toHaveBeenCalledTimes(1);
+    expect(h.sendEmail).not.toHaveBeenCalled();
   });
 
   it('baselines a healthy first run without Telegram', async () => {
