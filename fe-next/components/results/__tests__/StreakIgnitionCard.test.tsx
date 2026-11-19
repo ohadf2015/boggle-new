@@ -67,6 +67,26 @@ describe('StreakIgnitionCard', () => {
     expect(screen.getByTestId('streak-day-4')).toHaveAttribute('data-lit', 'false');
   });
 
+  it('won variant: header and lit cells carry the tiered flame, unlit cells carry none', () => {
+    render(<StreakIgnitionCard won currentStreak={3} isLoaded />);
+    expect(screen.getByTestId('streak-day-1').querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
+    expect(screen.getByTestId('streak-day-4').querySelector('[data-testid="streak-flame"]')).toBeNull();
+    expect(screen.getAllByTestId('streak-flame')).toHaveLength(4);
+  });
+
+  it('not loaded: shows no flame, so nothing flips from asleep to lit', () => {
+    render(<StreakIgnitionCard won currentStreak={5} isLoaded={false} />);
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
+    expect(screen.getByTestId('streak-ignition-flame-slot')).toBeInTheDocument();
+  });
+
+  it('lost variant: the header flame stays visible and looks worried', () => {
+    render(<StreakIgnitionCard won={false} currentStreak={0} isLoaded />);
+    const flame = screen.getByTestId('streak-flame');
+    expect(flame).toHaveAttribute('data-tier', 'ember');
+    expect(flame).toHaveAttribute('data-mood', 'worried');
+  });
+
   it('lost variant: shows the one-win-to-ignite copy with nothing lit', () => {
     render(<StreakIgnitionCard won={false} currentStreak={0} isLoaded />);
 

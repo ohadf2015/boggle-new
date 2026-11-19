@@ -9,6 +9,7 @@ import React from 'react';
 import { Trophy, X } from 'lucide-react';
 import { GameBadge } from '@/components/ui/GameBadge';
 import type { Language } from '@/types';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 export interface ScoreBadgeProps {
   solved: boolean;
@@ -48,7 +49,8 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
         className="text-xs"
         transition={{ type: 'spring', delay: 0.25 }}
       >
-        🔥{streakDays}
+        <StreakFlame days={streakDays} size={16} />
+        {streakDays}
       </GameBadge>
     )}
   </div>

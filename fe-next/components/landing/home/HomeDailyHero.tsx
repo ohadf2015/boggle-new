@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Flame, ArrowRight, ArrowLeft, Check } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -15,6 +15,7 @@ import type { Language } from '@/types';
 import { DailyWheel } from './DailyWheel';
 import wheelStyles from './DailyWheel.module.css';
 import { useHomeLaunch } from './HomeLaunch';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 const CTA_BAR = cn(
   wheelStyles.cta,
@@ -115,7 +116,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
           ))}
           {streak > 0 && (
             <span className="ms-1.5 inline-flex items-center gap-1 font-neo-display text-[11px] font-semibold text-neo-yellow md:text-base">
-              <Flame className="h-3 w-3 text-neo-orange md:h-5 md:w-5" strokeWidth={2.4} aria-hidden="true" />
+              <StreakFlame days={streak} size={16} />
               {t('landing.home.dayStreak', { n: streak })}
             </span>
           )}

@@ -283,6 +283,15 @@ describe('PracticeResults — Celebratory Redesign', () => {
       expect(mockPush).toHaveBeenCalledWith('/en/daily/word-hunt?from=practice_results');
     });
 
+    it('shows the tiered streak flame in the practice streak chip', () => {
+      mockPracticeStreak = 8;
+      render(<PracticeResults {...defaultProps} />);
+      const flame = screen.getByTestId('streak-flame');
+      expect(flame).toHaveAttribute('data-tier', 'blue');
+      expect(flame.parentElement).toHaveTextContent('×8');
+      expect(flame.parentElement?.textContent).not.toContain('🔥');
+    });
+
     it('shows already-played state when daily was completed today', () => {
       mockHasPlayedWordHuntToday.mockReturnValue(true);
       render(<PracticeResults {...defaultProps} />);

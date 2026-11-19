@@ -4,7 +4,7 @@ import { useResultsXp } from '@/components/progression/resultsXpStore';
 import { ResultsSocialSlot } from '@/components/results/ResultsSocialSlot';
 import React, { useEffect, useRef, useState } from 'react';
 import { m, animate as fmAnimate } from 'framer-motion';
-import { Check, Flame } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyPlayedStatus } from '@/hooks/useDailyPlayedStatus';
@@ -19,6 +19,7 @@ import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
 import { useDailyReveal, useMountedAfterReveal } from './reveal/DailyRevealContext';
 import { REVEAL, useRevealSequence, type RevealStage } from './reveal/revealSequence';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 export interface DailyResultsStat {
   value: React.ReactNode;
@@ -198,7 +199,7 @@ export function DailyResultsHero({
             aria-label={t('daily.results.heroStreak', { n: streak })}
             className="ms-auto flex items-center gap-1 px-2 py-0.5 rounded-full border-2 border-neo-black bg-neo-orange text-neo-black text-sm font-black tabular-nums"
           >
-            <Flame className="w-4 h-4" strokeWidth={2.75} aria-hidden />
+            <StreakFlame days={streak} size={16} />
             {streak}
           </span>
         )}

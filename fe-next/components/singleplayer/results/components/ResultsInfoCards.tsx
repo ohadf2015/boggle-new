@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { TrendingUp, TrendingDown, Minus, Flame, Lock, Trophy, Zap, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus, Lock, Trophy, Zap, BarChart3 } from 'lucide-react';
 import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,6 +14,7 @@ import type { PlayerArchetype } from '@/utils/playerArchetypes';
 import type { Participant } from '../useResultsData';
 import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 import type { WinStreakDisplayData } from '../hooks/useWinStreakTracking';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface ResultsInfoCardsProps {
   // Performance card
@@ -223,7 +224,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
           {streak > 0 && (
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo border-2 border-neo-orange/30 bg-neo-orange/20 text-neo-orange flex items-center justify-center">
-                <Flame className="w-5 h-5" />
+                <StreakFlame days={streak} size={24} />
               </div>
               <div>
                 <span className="font-black text-lg text-neo-orange">{streak}</span>

@@ -35,6 +35,8 @@ describe('<ClassStreakLine>', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/education/classroom/c1/streak');
     expect(line).toHaveAttribute('data-state', 'kept');
     expect(line).toHaveTextContent('teacher.classStreak.kept:{"count":4}');
+    expect(line.querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
+    expect(line.querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-mood', 'happy');
   });
 
   it('Given no game yet today, Then the at-risk prompt asks the teacher to play today', async () => {

@@ -17,7 +17,7 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import AvatarLite from '@/components/AvatarLite';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Users, Flame, Trophy } from 'lucide-react';
+import { Users, Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { cn } from '@/lib/utils';
@@ -25,6 +25,7 @@ import { Loader } from '@/components/ui/Loader';
 import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { LeaderboardEntryWithDelta, LeaderboardTimeScope, LeaderboardVisibility } from '@/lib/supabase/education/types';
 import { RankDeltaIndicator, TierBadge, TimeScopeTabs } from './ClassroomLeaderboardParts';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 // ============================================
 // ANIMATED XP COUNTER
@@ -156,7 +157,7 @@ const LeaderboardEntryRow = memo<LeaderboardEntryRowProps>(
                 data-testid="streak-badge"
                 className="whitespace-nowrap px-2 py-0.5 text-xs font-neo-body bg-neo-pink text-neo-black rounded flex items-center gap-1"
               >
-                <Flame className="w-4 h-4 inline" /> {currentStreak}
+                <StreakFlame days={currentStreak} size={16} animated={false} /> {currentStreak}
               </span>
             )}
 

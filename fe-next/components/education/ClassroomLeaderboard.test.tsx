@@ -437,6 +437,7 @@ describe('ClassroomLeaderboard', () => {
       const badge = screen.getByTestId('streak-badge');
       expect(badge).toBeInTheDocument();
       expect(badge).toHaveTextContent('5');
+      expect(badge.querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
     });
 
     it('does not show streak badge for streak < 3', () => {

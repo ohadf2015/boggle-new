@@ -65,6 +65,7 @@ describe('DailyResultsHero', () => {
   it('Given a live streak, When the hero renders, Then the streak comes from the same played-status source the hub uses', () => {
     renderHero();
     expect(screen.getByTestId('daily-results-streak')).toHaveTextContent('4');
+    expect(screen.getByTestId('daily-results-streak').querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
   });
 
   it('Given mode stats, When the hero renders, Then every stat cell shows value and label', () => {

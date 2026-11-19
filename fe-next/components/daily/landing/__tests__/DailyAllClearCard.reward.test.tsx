@@ -28,6 +28,7 @@ describe('DailyAllClearCard: today\'s one chest', () => {
 
   it('does not pay on show: the one chest, the big one, waits for a tap', () => {
     render(<DailyAllClearCard streak={2} />);
+    expect(screen.getByTestId('all-clear-streak').querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'ember');
     expect(screen.getByTestId('today-chest-ready').getAttribute('data-kind')).toBe('perfect');
     expect(screen.getAllByRole('button')).toHaveLength(1);
     expect(postWithAuth).not.toHaveBeenCalled();
@@ -43,6 +44,7 @@ describe('DailyAllClearCard: today\'s one chest', () => {
     expect(opened.getAttribute('data-tier')).toBe('jackpot');
     expect(opened.textContent).toContain('"coins":150');
     expect(screen.queryByTestId('all-clear-streak')).toBeNull();
+    expect(screen.queryByTestId('streak-flame')).toBeNull();
   });
 
   it('tapping the perfect box opens the reveal', () => {

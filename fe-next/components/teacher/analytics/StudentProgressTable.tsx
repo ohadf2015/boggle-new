@@ -17,6 +17,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { ShareParentReportButton } from './ShareParentReportButton';
 import type { StudentProgressSummary } from '@/lib/supabase/analytics';
 import { useFitPageSize } from '@/components/teacher/lesson-creation/library/useFitPageSize';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 const ROW_H = 52;
 const PAGER_RESERVE = 72;
@@ -114,7 +115,7 @@ export function StudentProgressTable({ classroomId, onStudentClick, pageSizeFall
         const streak = getValue();
         return (
           <>
-            {streak >= 3 && <span className="me-1">🔥</span>}
+            {streak >= 3 && <StreakFlame days={streak} size={16} animated={false} className="me-1 align-middle" />}
             {streak}
           </>
         );

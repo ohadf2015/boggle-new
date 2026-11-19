@@ -1,17 +1,18 @@
 'use client';
 
 import React from 'react';
-import { BookOpenText, Flame, Gamepad2, Percent, Trophy } from 'lucide-react';
+import { BookOpenText, Gamepad2, Percent, Trophy } from 'lucide-react';
 import { useCountUp } from '@/hooks/useCountUp';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { HeadlineStat, HeadlineStatId } from './profileShowcaseModel';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
-const META: Record<HeadlineStatId, { Icon: typeof Trophy; color: string; shadow: string }> = {
+const META: Record<HeadlineStatId, { Icon: typeof Trophy | null; color: string; shadow: string }> = {
   bestWord: { Icon: BookOpenText, color: 'text-neo-lime', shadow: 'shadow-hard-lime' },
   wins: { Icon: Trophy, color: 'text-neo-yellow', shadow: 'shadow-hard-yellow' },
-  streak: { Icon: Flame, color: 'text-neo-orange', shadow: 'shadow-hard-orange' },
+  streak: { Icon: null, color: 'text-neo-orange', shadow: 'shadow-hard-orange' },
   games: { Icon: Gamepad2, color: 'text-neo-cyan', shadow: 'shadow-hard-cyan' },
   winRate: { Icon: Percent, color: 'text-neo-pink', shadow: 'shadow-hard-pink' },
 };
@@ -41,7 +42,11 @@ export function StageStatTile({ stat }: { stat: HeadlineStat }): React.ReactElem
       )}
     >
       <span className={cn('inline-flex items-center gap-1', color)}>
-        <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={2.75} aria-hidden />
+        {Icon ? (
+          <Icon className="w-3.5 h-3.5 shrink-0" strokeWidth={2.75} aria-hidden />
+        ) : (
+          <StreakFlame days={Number(stat.value) || 0} size={16} className="-my-px" />
+        )}
       </span>
       <span
         className={cn(

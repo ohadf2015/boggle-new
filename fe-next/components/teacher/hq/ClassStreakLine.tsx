@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Flame } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { classStreakStatus, type ClassStreak } from '@/lib/education/classroomHub';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 const COPY = {
   kept: { one: 'teacher.classStreak.keptOne', many: 'teacher.classStreak.kept' },
@@ -44,11 +44,7 @@ export function ClassStreakLine({ classroomId, className }: { classroomId: strin
         className,
       )}
     >
-      <Flame
-        aria-hidden="true"
-        className={cn('size-4 shrink-0', status === 'atRisk' ? 'text-neo-black' : 'text-neo-orange')}
-        strokeWidth={3}
-      />
+      <StreakFlame days={streak.streak} size={16} mood={status === 'atRisk' ? 'worried' : 'happy'} />
       <span className="min-w-0">
         {streak.streak === 1 ? t(copy.one) : t(copy.many, { count: streak.streak })}
       </span>

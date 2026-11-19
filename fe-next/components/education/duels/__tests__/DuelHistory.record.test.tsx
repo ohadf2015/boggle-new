@@ -60,6 +60,7 @@ describe('DuelHistory — one record strip', () => {
     await waitFor(() =>
       expect(screen.getByTestId('duel-streak-chip')).toHaveTextContent('4')
     );
+    expect(screen.getByTestId('duel-streak-chip').querySelector('[data-testid="streak-flame"]')).toHaveAttribute('data-tier', 'flame');
   });
 
   it('drops the five-colour stat grid entirely', async () => {

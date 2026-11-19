@@ -30,12 +30,13 @@ describe('ScoreBadge', () => {
 
   it('shows a streak pill when streakDays > 0', () => {
     render(<ScoreBadge {...baseProps} solved streakDays={5} />);
-    expect(screen.getByText('🔥5')).toBeInTheDocument();
+    expect(screen.getByTestId('streak-flame')).toHaveAttribute('data-tier', 'flame');
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
   it('omits the streak pill when streakDays is 0', () => {
     render(<ScoreBadge {...baseProps} solved streakDays={0} />);
-    expect(screen.queryByText(/🔥/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('streak-flame')).not.toBeInTheDocument();
   });
 
   it('fires onClick when clicked', () => {

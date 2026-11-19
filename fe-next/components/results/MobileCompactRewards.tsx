@@ -5,6 +5,7 @@ import { Coins } from '@/components/ui/CoinsIcon';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 interface MobileCompactRewardsProps {
   /** Current win streak (0 = no streak) */
@@ -46,7 +47,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
       {/* Win Streak */}
       {hasStreak && (
         <div className="flex items-center gap-1.5">
-          <span className="text-lg">🔥</span>
+          <StreakFlame days={winStreak} size={22} />
           <span className="text-base font-black text-neo-orange">{winStreak}</span>
           <span className="text-xs text-white font-bold">
             {t('results.winStreak')}

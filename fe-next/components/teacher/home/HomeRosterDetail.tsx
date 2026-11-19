@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { m } from 'framer-motion';
-import { BookOpenCheck, CalendarDays, ClipboardList, Flame, Star, Target, X, Zap } from 'lucide-react';
+import { BookOpenCheck, CalendarDays, ClipboardList, Star, Target, X, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import AvatarLite, { type AvatarLiteConfig } from '@/components/AvatarLite';
 import { EDU_MOTION, useReducedMotionSafe } from '@/components/education/motion';
@@ -12,6 +12,7 @@ import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL } from '@/components/teacher/nb/nbStyl
 import { lastPlayedLabel } from './HomeClassList';
 import type { RosterRow, RosterStatus } from './rosterModel';
 import { NeoButton } from '@/components/ui/button';
+import { StreakFlame } from '@/components/streak/StreakFlame';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -112,7 +113,7 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
         <h4 className="mb-1.5 font-neo-display text-sm font-black text-neo-cream">{t('eduShell.home.roster.recent')}</h4>
         <ul data-testid="home-roster-activity" className={cn('divide-y-2 divide-neo-cream/15 rounded-neo-lg border-[3px] bg-neo-navy-light', NB_DARK_EDGE)}>
           <Activity icon={<CalendarDays className="size-4" aria-hidden="true" />} text={t('eduShell.home.roster.lastPlayed', { when: played })} />
-          <Activity icon={<Flame className="size-4" aria-hidden="true" />} text={row.streak > 0 ? t('eduShell.home.roster.streak', { count: row.streak }) : t('eduShell.home.roster.noStreak')} />
+          <Activity icon={<StreakFlame days={row.streak} size={16} animated={false} />} text={row.streak > 0 ? t('eduShell.home.roster.streak', { count: row.streak }) : t('eduShell.home.roster.noStreak')} />
           <Activity
             icon={<Target className="size-4" aria-hidden="true" />}
             text={row.wordsAttempted > 0 ? t('eduShell.home.roster.accuracy', { count: Math.round(row.accuracy) }) : t('eduShell.home.roster.noWordsYet')}
