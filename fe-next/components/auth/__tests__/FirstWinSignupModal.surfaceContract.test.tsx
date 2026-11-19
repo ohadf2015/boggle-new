@@ -105,7 +105,7 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
     expect(container.querySelector('[data-testid="first-win-signup-sheet"]')).toBeNull();
     expect(document.querySelector('[data-testid="first-win-signup-sheet"]')).not.toBeNull();
     expect(mockUseOAuthSignIn).toHaveBeenCalledWith(
-      expect.objectContaining({ analyticsSource: 'first_win_sheet' })
+      expect.objectContaining({ analyticsSource: 'soft-sheet' })
     );
   });
 
@@ -122,7 +122,7 @@ describe('FirstWinSignupModal — surface contract (t_da22db9a)', () => {
 
     expect(container.querySelector('[data-testid="first-win-signup-modal"]')).not.toBeNull();
     expect(mockUseOAuthSignIn).toHaveBeenCalledWith(
-      expect.objectContaining({ analyticsSource: 'multi_games_dialog' })
+      expect.objectContaining({ analyticsSource: 'control' })
     );
   });
 

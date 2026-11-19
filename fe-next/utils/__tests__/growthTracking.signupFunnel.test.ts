@@ -148,17 +148,19 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
-  it('trackSignupPromptClicked carries surface = source (t_ac5ac2f7: one per-surface shown→clicked→completed query)', () => {
+  it('trackSignupPromptClicked collapses multi_games_sheet onto soft-sheet', () => {
+    trackSignupPromptClicked('multi_games_sheet');
+    expect(mockCapture).toHaveBeenCalledWith(
+      'growth:signup_prompt_clicked',
+      expect.objectContaining({ source: 'soft-sheet', surface: 'soft-sheet' })
+    );
+  });
+
+  it('trackSignupPromptClicked keeps a surface that already matches shown', () => {
     trackSignupPromptClicked('mp_sheet');
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:signup_prompt_clicked',
       expect.objectContaining({ source: 'mp_sheet', surface: 'mp_sheet' })
-    );
-    mockCapture.mockClear();
-    trackSignupPromptClicked('results_inline');
-    expect(mockCapture).toHaveBeenCalledWith(
-      'growth:signup_prompt_clicked',
-      expect.objectContaining({ source: 'results_inline', surface: 'results_inline' })
     );
   });
 
@@ -172,17 +174,17 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     );
   });
 
-  it('prompt_shown keeps an explicit surface and falls back to the funnel default', () => {
+  it('prompt_shown collapses a click-only alias onto the shown id (t_39705c3f)', () => {
     trackSignupFunnel('prompt_shown', true, { surface: 'first_win_sheet' });
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:signup_prompt_shown',
-      expect.objectContaining({ surface: 'first_win_sheet', is_first_win: true })
+      expect.objectContaining({ surface: 'soft-sheet', source: 'soft-sheet', is_first_win: true })
     );
     mockCapture.mockClear();
     trackSignupFunnel('prompt_shown', false);
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:signup_prompt_shown',
-      expect.objectContaining({ surface: 'soft_sheet' })
+      expect.objectContaining({ surface: 'soft-sheet', source: 'soft-sheet' })
     );
   });
 
@@ -196,7 +198,7 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     trackSignupFunnel('dismissed', true);
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:signup_dismissed',
-      expect.objectContaining({ source: 'first_win_sheet', surface: 'first_win_sheet' })
+      expect.objectContaining({ source: 'soft-sheet', surface: 'soft-sheet' })
     );
   });
 
@@ -205,7 +207,7 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
     trackSignupFunnel('dismissed', false);
     expect(mockCapture).toHaveBeenCalledWith(
       'growth:signup_dismissed',
-      expect.objectContaining({ source: 'results_inline', surface: 'soft_sheet' })
+      expect.objectContaining({ source: 'results_inline', surface: 'soft-sheet' })
     );
     // peek, not consume: the completion path still sees the latch
     expect(window.sessionStorage.getItem('lexiclash_signup_source_pending')).toBe('results_inline');
@@ -230,7 +232,7 @@ describe('trackSignupFunnel — props merge + pending latch (t_da22db9a)', () =>
 
   it('signup_prompt_shown carries a per-session impression_seq (t_147a0f0c)', () => {
     window.sessionStorage.removeItem('lexiclash_signup_impression_seq');
-    trackSignupFunnel('prompt_shown', false, { surface: 'soft_sheet' });
+    trackSignupFunnel('prompt_shown', false, { surface: 'soft-sheet' });
     trackSignupFunnel('prompt_shown', false, { surface: 'mp_sheet' });
     const seqs = mockCapture.mock.calls
       .filter(([e]) => e === 'growth:signup_prompt_shown')

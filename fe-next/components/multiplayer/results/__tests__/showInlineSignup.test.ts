@@ -3,9 +3,9 @@ import { showInlineSignup } from '../mpResultsView';
 
 const base = { isGuest: true, isClassroom: false, footerShown: true, branch: 'final' as const };
 
-describe('showInlineSignup (series-end only, below the primary)', () => {
-  it('a guest sees it on the series-end screen once the footer is up', () => {
-    expect(showInlineSignup(base)).toBe(true);
+describe('showInlineSignup', () => {
+  it('never shows the results_inline card — 0 signups from 39 guests (t_39705c3f)', () => {
+    expect(showInlineSignup(base)).toBe(false);
   });
 
   it('never in the gap between rounds', () => {

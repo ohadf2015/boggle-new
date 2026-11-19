@@ -36,6 +36,8 @@ describe('buildEmailSignupMetadata', () => {
       intendedRole: 'admin' as 'teacher',
     })).toEqual({ signup_surface: 'header_or_menu' });
     expect(normalizeSurface('results_inline')).toBe('results_inline');
+    expect(normalizeSurface('soft-sheet')).toBe('soft-sheet');
+    expect(normalizeSurface('multi_games_sheet')).toBe('soft-sheet');
     expect(normalizeLanguage('HE')).toBe('he');
     expect(normalizeCountry('t1')).toBeNull();
   });

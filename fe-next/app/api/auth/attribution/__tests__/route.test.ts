@@ -212,6 +212,15 @@ describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)
     expect(captureEduServerEvents).not.toHaveBeenCalled();
   });
 
+  it('writes the canonical surface and stamps it on growth:signup_completed', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    const res = await POST(req({ signup_surface: 'multi_games_sheet' }));
+    expect(res.status).toBe(200);
+    expect(state.updates[0].signup_surface).toBe('soft-sheet');
+    const [events] = captureEduServerEvents.mock.calls[0];
+    expect(events[0].properties).toMatchObject({ source: 'soft-sheet', surface: 'soft-sheet' });
+  });
+
   it('emits nothing when there is nothing to write (reload of an attributed account)', async () => {
     getUser.mockResolvedValue(AUTHED);
     state.profile = { ...EMPTY_PROFILE, signup_surface: 'results_inline' };

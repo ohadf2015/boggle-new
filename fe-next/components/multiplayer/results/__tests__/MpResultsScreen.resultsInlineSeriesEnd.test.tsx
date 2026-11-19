@@ -143,20 +143,17 @@ describe('MpResultsScreen results_inline signup is series-end only', () => {
     expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
-  it('the CTA renders on the series-end / Leave screen', () => {
+  it('the CTA does not render on the series-end screen (results_inline removed)', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
     skipReveal();
-    expect(screen.getByTestId('inline-signup-card')).toBeTruthy();
+    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
-  it('series end: the CTA is laid out (hidden, held) from the first frame, so its arrival never squeezes the screen', () => {
+  it('series end: no inline signup card is laid out', () => {
     renderScreen({ seriesRoundNumber: 5, seriesTotalGames: 5 });
-    const card = screen.getByTestId('inline-signup-card');
-    expect(card.className).toMatch(/\binvisible\b/);
-    expect(card.getAttribute('data-held')).toBe('true');
+    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
     skipReveal();
-    expect(screen.getByTestId('inline-signup-card').className).not.toMatch(/\binvisible\b/);
-    expect(screen.getByTestId('inline-signup-card').getAttribute('data-held')).toBe('false');
+    expect(screen.queryByTestId('inline-signup-card')).toBeNull();
   });
 
   it('between rounds: no CTA is laid out, even during TIME!', () => {
