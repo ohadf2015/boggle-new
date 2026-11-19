@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const controller = vi.hoisted(() => ({ current: null as unknown }));
 const push = vi.hoisted(() => vi.fn());
+const openLesson = vi.hoisted(() => vi.fn());
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, replace: push }), usePathname: () => '/en/education/live', useSearchParams: () => new URLSearchParams() }));
 vi.mock('@/components/multiplayer/results/useMpResultsController', () => ({ useMpResultsController: () => controller.current }));
 vi.mock('@/components/results/ResultsFriendStatus', () => ({ ResultsFriendStatusProvider: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
@@ -13,6 +14,7 @@ vi.mock('@/components/education/economy/useRoundReward', () => ({ useRoundReward
 vi.mock('@/components/education/economy/RoundShop', () => ({ default: () => <div data-testid="round-shop" /> }));
 vi.mock('@/components/education/results/ClassModeBridgeCard', () => ({ ClassModeBridgeCard: () => <div data-testid="class-mode-bridge" /> }));
 vi.mock('@/components/education/live/useRival', () => ({ useRival: () => ({ rivalOutcome: null }) }));
+vi.mock('@/components/multiplayer/results/useOpenLessonPractice', () => ({ useOpenLessonPractice: () => openLesson }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ language: 'en', t: (key: string) => key }) }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ playTileSelectSound: vi.fn(), playStreakMilestoneSound: vi.fn() }) }));
 vi.mock('@/components/ui/ConfirmationDialog', () => ({ ConfirmationDialog: () => null }));
@@ -44,6 +46,7 @@ const DECK = [{ word: 'apple', definition: 'A red fruit' }, { word: 'dream', def
 describe('EduStudentResults: how you did, words to practise, what happens next', () => {
   beforeEach(() => {
     push.mockClear();
+    openLesson.mockClear();
     sessionStorage.clear();
     controller.current = {
       t,
@@ -87,8 +90,31 @@ describe('EduStudentResults: how you did, words to practise, what happens next',
     expect(within(screen.getByTestId('edu-student-practice')).getByTestId('waiting-warmup')).toHaveAttribute('data-kind', 'spell');
   });
 
-  it('given missed words that cannot be quizzed or spelled, then no practice button promises anything', () => {
+  it('given missed words that cannot be practised here but a lesson exists, then practice opens the lesson as before', () => {
     render(<EduStudentResults {...(withCoverage([{ word: '勉強', foundBy: [] }]) as never)} />);
+    fireEvent.click(screen.getByTestId('practice-missed-button'));
+    expect(openLesson).toHaveBeenCalledWith('l1');
+    expect(screen.queryByTestId('edu-student-practice')).toBeNull();
+  });
+
+  it('given practice is open, when the words can no longer be practised here, then the results come back instead of a blank screen', () => {
+    act(() => useStudyDeck.getState().setDeck('AB12CD', DECK));
+    const { rerender } = render(<EduStudentResults {...(props as never)} />);
+    fireEvent.click(screen.getByTestId('practice-missed-button'));
+    rerender(<EduStudentResults {...(withCoverage([{ word: '勉強', foundBy: [] }]) as never)} />);
+    expect(screen.queryByTestId('edu-student-practice')).toBeNull();
+    expect(screen.getByTestId('edu-student-hero')).toBeVisible();
+  });
+
+  it('given round coins to spend, then the shop stays on the results, outside More', () => {
+    render(<EduStudentResults {...(props as never)} />);
+    expect(screen.getByTestId('round-shop')).toBeInTheDocument();
+    expect(screen.getByTestId('edu-student-more')).not.toContainElement(screen.getByTestId('round-shop'));
+  });
+
+  it('given missed words that cannot be practised and no lesson, then no practice button promises anything', () => {
+    const noLesson = { ...props, classroomSummary: { ...props.classroomSummary, lessonIds: [], coverage: [{ word: '勉強', foundBy: [] }] } };
+    render(<EduStudentResults {...(noLesson as never)} />);
     expect(screen.getByTestId('student-missed-words')).toHaveTextContent('勉強');
     expect(screen.queryByTestId('practice-missed-button')).toBeNull();
   });
@@ -106,11 +132,11 @@ describe('EduStudentResults: how you did, words to practise, what happens next',
     expect(screen.queryByTestId('student-missed-words')).toBeNull();
   });
 
-  it('given the extras, then shop, best word, class offers and social wait closed under More', () => {
+  it('given the extras, then best word, class offers and social wait closed under More', () => {
     render(<EduStudentResults {...(props as never)} />);
-    for (const id of ['round-shop', 'edu-student-best-word', 'edu-student-lesson', 'class-mode-bridge', 'social-slot']) expect(screen.queryByTestId(id)).toBeNull();
+    for (const id of ['edu-student-best-word', 'edu-student-lesson', 'class-mode-bridge', 'social-slot']) expect(screen.queryByTestId(id)).toBeNull();
     openMore();
     const more = screen.getByTestId('edu-student-more');
-    for (const id of ['round-shop', 'edu-student-best-word', 'edu-student-lesson', 'class-mode-bridge', 'social-slot']) expect(more).toContainElement(screen.getByTestId(id));
+    for (const id of ['edu-student-best-word', 'edu-student-lesson', 'class-mode-bridge', 'social-slot']) expect(more).toContainElement(screen.getByTestId(id));
   });
 });

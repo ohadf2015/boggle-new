@@ -10,6 +10,7 @@ import { LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ResultsFriendStatusProvider } from '@/components/results/ResultsFriendStatus';
 import { useMpResultsController, type MpResultsProps } from '@/components/multiplayer/results/useMpResultsController';
+import { useOpenLessonPractice } from '@/components/multiplayer/results/useOpenLessonPractice';
 import { useRoundReward } from '@/components/education/economy/useRoundReward';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
@@ -92,6 +93,10 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
   const definitions = useMemo(() => missedDefinitions(missed, deck), [missed, deck]);
   const practiceKind = missedPracticeKind(missed, deck);
   const [practising, setPractising] = useState(false);
+  const showPractice = practising && !!practiceKind;
+  if (practising && !practiceKind) setPractising(false);
+  const lessonId = summary?.lessonIds?.[0];
+  const openLessonPractice = useOpenLessonPractice();
   const scrollRef = useRef<HTMLElement>(null);
   const exitCopy = resultsExitCopy({ isClassroom: true, isHost: false });
   // The same session story the /multiplayer card banks, under the same key: only one of the two ever mounts on a phone.
@@ -126,7 +131,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [practising]);
+  }, [showPractice]);
 
   if (c.isExiting) return <div data-testid="results-exit-wash" className="fixed inset-0 z-[9999] bg-neo-navy" />;
 
@@ -155,12 +160,12 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           data-testid="edu-student-results-scroll"
           className="flex min-h-0 flex-1 flex-col items-center gap-3 overflow-y-auto px-4 pb-6 pt-1.5"
         >
-          {practising && practiceKind && (
+          {showPractice && practiceKind && (
             <EduStudentResultsPractice kind={practiceKind} missed={missed} deck={deck} username={props.username} onBack={() => setPractising(false)} t={t} />
           )}
 
           {/* Hidden, not unmounted: the chest reveal must not replay when the student comes back. */}
-          <div hidden={practising} className={practising ? undefined : 'contents'}>
+          <div hidden={showPractice} className={showPractice ? undefined : 'contents'}>
             {placing && (
               <div className={COLUMN}>
                 <StudentRevealHero
@@ -186,6 +191,12 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
               </div>
             )}
 
+            {props.gameCode && (
+              <div className={COLUMN}>
+                <RoundShop compact gameCode={props.gameCode} />
+              </div>
+            )}
+
             <div className={COLUMN}>
               <EduStudentResultsMore words={words} t={t}>
                 <StudentRoundPair bestWord={best} lesson={lesson} t={t} />
@@ -196,7 +207,6 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
                     {momentum && <StudentMomentumChips momentum={momentum} t={t} className="contents" />}
                   </div>
                 )}
-                {props.gameCode && <RoundShop compact gameCode={props.gameCode} />}
                 {hardest.length > 0 && <HardestWordsInsight words={hardest} t={t} />}
                 <ResultsSocialSlot mode="edu" score={placing?.score} rival={classroomRival(scores.filter((s) => s.username !== teacher), props.username)} />
                 {bridge && <ClassModeBridgeCard offer={bridge} />}
@@ -209,7 +219,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
       {scores.length > 0 && (
         <footer data-testid="edu-student-results-bar" className="flex shrink-0 justify-center border-t-2 border-neo-cream/50 px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2.5">
           <div className={COLUMN}>
-            <StudentWaitBar onPractice={practiceKind && !practising ? () => setPractising(true) : undefined} t={t} />
+            <StudentWaitBar onPractice={practiceKind ? (showPractice ? undefined : () => setPractising(true)) : lessonId && missed.length > 0 ? () => openLessonPractice(lessonId) : undefined} t={t} />
           </div>
         </footer>
       )}
