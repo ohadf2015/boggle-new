@@ -165,10 +165,11 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
   });
 
-  it('Given a teacher with classes, Then the greeting is the line above the class name, with no separate bubble', () => {
+  it('Given a teacher with classes, Then the mascot greets in a bubble above the desk', () => {
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-greeting-row')).toBeNull();
-    expect(within(screen.getByTestId('home-hero')).getByRole('heading', { level: 1 })).toHaveTextContent('eduShell.home.greet');
+    const greeting = screen.getByTestId('home-greeting-row');
+    expect(within(greeting).getByRole('heading', { level: 1 })).toHaveTextContent('eduShell.home.greet');
+    expect(Boolean(greeting.compareDocumentPosition(screen.getByTestId('home-hero')) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
   });
 
   it('Given a class, Then the week challenge stays on the desk under the board, before the ready-made games', () => {

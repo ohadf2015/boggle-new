@@ -99,9 +99,10 @@ describe('<HomeDeskBoard>', () => {
     expect(onOpenResults).toHaveBeenCalledTimes(1);
   });
 
-  it('Then the results entry is a calm row, not a colored tile', () => {
+  it('Then the results entry is one purple row', () => {
     render(<HomeDeskBoard {...props()} />);
-    expect(within(screen.getByTestId('home-weekly-reports')).getByRole('button').className).not.toMatch(/bg-neo-(purple|yellow|pink)/);
+    expect(within(screen.getByTestId('home-weekly-reports')).getAllByRole('button')).toHaveLength(1);
+    expect(within(screen.getByTestId('home-weekly-reports')).getByRole('button').className).toMatch(/(^|\s)bg-neo-purple(\s|$)/);
   });
 
   it('Given a free teacher, Then no roster shows; who missed the last game gets practice in one tap', () => {
