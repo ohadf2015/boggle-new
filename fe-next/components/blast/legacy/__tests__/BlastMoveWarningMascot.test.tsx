@@ -43,3 +43,13 @@ describe('BlastMoveWarningMascot', () => {
     expect(screen.getByText('LOW MOVES!')).toBeInTheDocument();
   });
 });
+
+describe('BlastMoveWarningMascot in a classroom game', () => {
+  afterEach(() => window.history.pushState({}, '', '/'));
+
+  it('given few moves left in a class round, then no mascot warning appears', () => {
+    window.history.pushState({}, '', '/en/education/live');
+    render(<BlastMoveWarningMascot movesRemaining={2} t={(_key, fallback) => fallback} />);
+    expect(screen.queryByTestId('blast-move-warning-mascot')).toBeNull();
+  });
+});

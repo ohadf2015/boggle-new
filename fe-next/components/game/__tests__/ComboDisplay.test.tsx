@@ -233,3 +233,13 @@ describe('ComboDisplay', () => {
     });
   });
 });
+
+describe('ComboDisplay in a classroom game', () => {
+  afterEach(() => window.history.pushState({}, '', '/'));
+
+  it('given a high combo in a class round, then the combo shows without the mascot', () => {
+    window.history.pushState({}, '', '/en/education/live');
+    const { container } = render(<ComboDisplay comboLevel={6} comboMultiplier={2} timeLeft={3} maxTime={5} />);
+    expect(container.querySelector('[data-testid="combo-mascot"]')).toBeNull();
+  });
+});

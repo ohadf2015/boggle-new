@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { isClassroomLiveNow } from '@/lib/education/classroomLivePath';
 import type { Socket } from 'socket.io-client';
 import { useGameMode } from '@/hooks/gameState/store';
 import { cn } from '@/lib/utils';
@@ -286,7 +287,7 @@ const TvActivityPanel = memo<TvActivityPanelProps>(({
 
       {/* Hype mascot — pops in during intense action bursts (uses existing game mascot) */}
       <AnimatePresence>
-        {showHypeMascot && !reducedMotion && (
+        {showHypeMascot && !reducedMotion && !isClassroomLiveNow() && (
           <m.div
             initial={{ y: 100, opacity: 0, scale: 0.5 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}

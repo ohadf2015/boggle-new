@@ -7,6 +7,7 @@ import { getComboColors } from '../grid/comboColors';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import FloatingCoinAnimation from './FloatingCoinAnimation';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
+import { isClassroomLiveNow } from '@/lib/education/classroomLivePath';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsSelecting } from '@/hooks/useSelectionStore';
 
@@ -145,7 +146,7 @@ const ComboDisplay = memo<ComboDisplayProps>(({
   const isInsaneCombo = comboLevel >= 10;
   const isMediumCombo = comboLevel >= 3;
   const isRainbow = comboColors.isRainbow;
-  const showMascot = isHighCombo && !compact;
+  const showMascot = isHighCombo && !compact && !isClassroomLiveNow();
   // Pause infinite ornamental motion while the user is mid-drag — frame budget
   // belongs to grid rendering, not HUD decoration. Resumes the instant the
   // selection clears (mirrors the deferred-leaderboard freeze pattern).
