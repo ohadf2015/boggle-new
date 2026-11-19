@@ -4,6 +4,14 @@
  */
 
 import { isAuthProviderMounted } from '@/lib/auth/authProviderMounted';
+import {
+  canonicalSignupSurface,
+  clearShownSurface,
+  consumeSignupSurface,
+  latchSignupSurface,
+  peekSignupSurface,
+  rememberShownSurface,
+} from '@/lib/auth/signupSurface';
 import { shouldDeferLandingGotrue } from '@/lib/auth/landingGotrueDefer';
 import { getAnalyticsSessionToken } from '@/utils/analyticsAuthToken';
 import logger from '@/utils/logger';
@@ -1163,6 +1171,16 @@ function readSignupFunnelPending(): string | null {
   }
 }
 
+/** One id per surface. Omitted props fall back to the post-game sheet, not a click-only alias. */
+function signupSurfaceFromProps(
+  props: Record<string, unknown> | undefined,
+  _isFirstWin: boolean,
+): string {
+  const explicit = props?.surface ?? props?.trigger;
+  const canonical = canonicalSignupSurface(typeof explicit === 'string' ? explicit : null);
+  return canonical ?? 'soft-sheet';
+}
+
 /**
  * Track signup funnel.
  *
@@ -1194,14 +1212,12 @@ export const trackSignupFunnel = (
     latchSignupFunnelPending(null);
   }
   if (step === 'prompt_shown') {
-    // t_ac5ac2f7: shown must carry the same `surface` as clicked/dismissed so
-    // per-surface shown→clicked→completed is one PostHog query. The mp_sheet
-    // call site passed only `trigger`; derive surface the way dismissed does.
-    if (merged.surface == null) {
-      merged.surface =
-        (props?.trigger as string | undefined) ??
-        (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
-    }
+    // t_39705c3f: one id per surface. Click aliases (multi_games_sheet,
+    // first_win_sheet) collapse onto the id shown already fires.
+    merged.surface = signupSurfaceFromProps(props, isFirstWin);
+    if (merged.source == null) merged.source = merged.surface;
+    else merged.source = canonicalSignupSurface(String(merged.source)) ?? merged.source;
+    rememberShownSurface(String(merged.surface));
     trackGrowthEvent('signup_prompt_shown', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_shown', merged);
   } else if (step === 'completed') {
@@ -1217,14 +1233,13 @@ export const trackSignupFunnel = (
   } else {
     // t_147a0f0c: dismissals carry the surface/source that served the prompt so
     // dismiss rate can be split per surface like shown/clicked.
-    const surface =
-      (props?.surface as string | undefined) ??
-      (props?.trigger as string | undefined) ??
-      (isFirstWin ? 'first_win_sheet' : 'soft_sheet');
+    const surface = signupSurfaceFromProps(props, isFirstWin);
     merged.surface = surface;
+    clearShownSurface();
     // `source` is the attribution key shared with prompt_shown/clicked/failed/
     // completed; prefer an explicit one, then the tap latch, then the surface.
     if (merged.source == null) merged.source = peekSignupSource() ?? surface;
+    else merged.source = canonicalSignupSurface(String(merged.source)) ?? merged.source;
     trackGrowthEvent('signup_dismissed', merged);
     if (isFirstWin) trackGrowthEvent('first_win_signup_dismissed', merged);
   }
@@ -1298,40 +1313,19 @@ export const __resetGameCompletedSignalForTests = (): void => {
 export const SIGNUP_SOURCE_PENDING_KEY = 'lexiclash_signup_source_pending';
 
 export const latchSignupSource = (source: string): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    sessionStorage.setItem(SIGNUP_SOURCE_PENDING_KEY, source);
-  } catch {
-    /* noop */
-  }
+  latchSignupSurface(source);
 };
 
 /** Read the latched signup source without clearing it (dismiss/failure tagging). */
-export const peekSignupSource = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    return sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY) || null;
-  } catch {
-    return null;
-  }
-};
+export const peekSignupSource = (): string | null => peekSignupSurface();
 
-export const consumeSignupSource = (): string | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    const v = sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY);
-    if (v) sessionStorage.removeItem(SIGNUP_SOURCE_PENDING_KEY);
-    return v || null;
-  } catch {
-    return null;
-  }
-};
+export const consumeSignupSource = (): string | null => consumeSignupSurface();
 
 export const trackSignupPromptClicked = (source: string): void => {
-  // t_ac5ac2f7: carry `surface` alongside `source` (kept for back-compat) so
-  // shown→clicked→completed per surface is one PostHog query — the clicked
-  // event used to be the only funnel step without a surface.
-  trackGrowthEvent('signup_prompt_clicked', { source, surface: source });
+  // t_39705c3f: surface and source are the same canonical id shown already fired.
+  const id = canonicalSignupSurface(source) ?? source;
+  latchSignupSurface(id);
+  trackGrowthEvent('signup_prompt_clicked', { source: id, surface: id });
 };
 
 /**
@@ -1344,7 +1338,7 @@ export const trackSignupFailed = (
   reason: string,
   props: { source?: string | null; provider?: string; message?: string } = {},
 ): void => {
-  const source = props.source ?? peekSignupSource() ?? 'unknown';
+  const source = canonicalSignupSurface(props.source ?? peekSignupSource()) ?? props.source ?? peekSignupSource() ?? 'unknown';
   trackGrowthEvent('signup_failed', {
     source,
     reason,
@@ -1386,7 +1380,8 @@ export const consumePendingSignupCompletion = (): void => {
  * dual-emit whitelist, so PostHog dashboards are unchanged.
  */
 export const trackSignupCompleted = (source: string = 'unknown'): void => {
-  trackGrowthEvent('signup_completed', { source }, { mirror: false, posthogGrowth: false });
+  const surface = canonicalSignupSurface(source) ?? source;
+  trackGrowthEvent('signup_completed', { source: surface, surface }, { mirror: false, posthogGrowth: false });
 };
 
 /** localStorage key holding the JSON array of userIds already counted as a

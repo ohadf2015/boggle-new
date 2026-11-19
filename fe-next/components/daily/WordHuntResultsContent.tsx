@@ -160,7 +160,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
   // Signup card state: check both session dismiss (prop) AND localStorage persistence
   const locallyDismissed = isSignupLineDismissedLocally();
-  const shouldShowSignupLine = !isAuthenticated && !inlineSignupDismissed && !locallyDismissed;
+  const shouldShowSignupLine = isGuest && !inlineSignupDismissed && !locallyDismissed;
   const [showSignupModal, setShowSignupModal] = useState(false);
 
   const shareNode = (

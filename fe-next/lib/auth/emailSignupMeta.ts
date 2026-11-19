@@ -9,14 +9,15 @@
  * Nulls are dropped — an absent key is cleaner than an empty string.
  */
 
+import { canonicalSignupSurface, peekShownSurface, peekSignupSurface } from '@/lib/auth/signupSurface';
+
 export const SUPPORTED_SIGNUP_LANGUAGES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 
-/** Must match growthTracking SIGNUP_SOURCE_PENDING_KEY. Duplicated so the
- *  signup path does not import the 2k-line analytics module. */
-const SIGNUP_SOURCE_PENDING_KEY = 'lexiclash_signup_source_pending';
+/** Must match growthTracking SIGNUP_FUNNEL_PENDING_KEY. The click latch lives
+ *  in signupSurface so an OAuth return can read localStorage too. */
 const SIGNUP_FUNNEL_PENDING_KEY = 'lexiclash_signup_funnel_pending';
 
-const SURFACE_RE = /^[a-z0-9_]{1,100}$/;
+const SURFACE_RE = /^[a-z0-9_-]{1,100}$/;
 
 export interface EmailSignupTouch {
   utm_source?: string | null;
@@ -50,9 +51,9 @@ export function normalizeCountry(value: string | null | undefined): string | nul
 }
 
 export function normalizeSurface(value: string | null | undefined): string | null {
-  if (!value) return null;
-  const trimmed = value.trim().toLowerCase();
-  return SURFACE_RE.test(trimmed) ? trimmed : null;
+  const canonical = canonicalSignupSurface(value);
+  if (!canonical) return null;
+  return SURFACE_RE.test(canonical) ? canonical : null;
 }
 
 function clip(value: string | null | undefined, max: number): string | null {
@@ -86,15 +87,16 @@ export function buildEmailSignupMetadata(input: EmailSignupMetaInput): Record<st
   );
 }
 
-/** Latched surface, without consuming it — AuthProvider still owns the consume. */
+/** Latched click, else the surface still showing. AuthProvider still owns the consume. */
 export function peekClientSignupSurface(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    const latched = normalizeSurface(sessionStorage.getItem(SIGNUP_SOURCE_PENDING_KEY));
+    const latched = peekSignupSurface();
     if (latched) return latched;
-    const pending = sessionStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
-    if (pending === 'first_win') return 'first_win_prompt';
-    if (pending === 'multi_game') return 'multi_game_prompt';
+    const shown = peekShownSurface();
+    if (shown) return shown;
+    const pending = sessionStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY) || localStorage.getItem(SIGNUP_FUNNEL_PENDING_KEY);
+    if (pending === 'first_win' || pending === 'multi_game') return 'soft-sheet';
   } catch {
     /* private mode */
   }

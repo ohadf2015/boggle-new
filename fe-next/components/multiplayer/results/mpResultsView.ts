@@ -173,11 +173,13 @@ export function nextModeForViewer<M extends string>({ isHost, hostPick }: { isHo
   return isHost ? hostPick : null;
 }
 
-export function showInlineSignup({ isGuest, isClassroom, footerShown, branch }: {
+export function showInlineSignup(_input: {
   isGuest: boolean;
   isClassroom: boolean;
   footerShown: boolean;
   branch: 'intermission' | 'final' | null;
 }): boolean {
-  return isGuest && !isClassroom && footerShown && branch === 'final';
+  // t_39705c3f: results_inline converted 0 of 39 guests in 14d. The post-game
+  // ask is the soft sheet (non-MP) or mp_sheet — not a second inline card.
+  return false;
 }

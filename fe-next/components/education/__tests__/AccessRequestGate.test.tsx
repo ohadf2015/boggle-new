@@ -12,8 +12,11 @@ const resendMock = vi.fn(async () => ({ data: {}, error: null }));
 vi.mock('@/lib/supabase', () => ({ resendEmailVerification: (...a: any[]) => resendMock(...a) }));
 
 const mockTrackGrowthEvent = vi.fn();
+const mockTrackSignupFunnel = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
+  trackSignupFunnel: (...args: unknown[]) => mockTrackSignupFunnel(...args),
+  latchSignupSource: vi.fn(),
 }));
 
 // Stub the heavy form + modal so the gate is tested in isolation.
@@ -41,6 +44,7 @@ describe('<AccessRequestGate>', () => {
     vi.clearAllMocks();
     mockAuth = { user: null, loading: false };
     mockTrackGrowthEvent.mockClear();
+    mockTrackSignupFunnel.mockClear();
   });
 
   it('re-checks verification when the teacher returns to the tab after confirming', () => {
@@ -69,6 +73,10 @@ describe('<AccessRequestGate>', () => {
     expect(screen.getByText('education.access.auth_required_title')).toBeInTheDocument();
     expect(screen.queryByTestId('access-form')).not.toBeInTheDocument();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_gate_viewed', { state: 'auth_required' });
+    expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false, {
+      surface: 'edu_access',
+      source: 'edu_access',
+    });
   });
 
   it('puts Google first for a signed-out visitor and reports the tap', async () => {

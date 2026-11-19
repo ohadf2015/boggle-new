@@ -12,6 +12,7 @@ import {
   type SignupUser,
 } from '@/lib/auth/signupAttributionApply';
 import { normalizeCountry, normalizeLanguage } from '@/lib/auth/emailSignupMeta';
+import { canonicalSignupSurface } from '@/lib/auth/signupSurface';
 
 /**
  * POST /api/auth/attribution (t_a80f937b, email parity t_9eb9ad5f)
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
     utm_campaign: body.utm_campaign ?? metaString(meta, 'utm_campaign'),
     referrer: referrerRaw ? sanitizeReferrerDomain(referrerRaw) : null,
     landing_path: landingRaw ? sanitizeLandingPath(landingRaw) : null,
-    signup_surface: body.signup_surface ?? metaString(meta, 'signup_surface'),
+    signup_surface: canonicalSignupSurface(body.signup_surface ?? metaString(meta, 'signup_surface')),
     language: normalizeLanguage(body.language ?? metaString(meta, 'language')),
     country_code: normalizeCountry(body.country_code ?? metaString(meta, 'country_code') ?? countryFromRequestHeaders(request)),
   };
@@ -146,6 +147,7 @@ export async function POST(request: Request) {
         event: 'growth:signup_completed',
         properties: {
           source: decision.source,
+          surface: decision.source,
           method: decision.method,
           utm_source: decision.update.utm_source ?? (profile.utm_source as string | null) ?? null,
           utm_medium: decision.update.utm_medium ?? (profile.utm_medium as string | null) ?? null,

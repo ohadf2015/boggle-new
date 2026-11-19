@@ -5,7 +5,7 @@ import { Mail, MailCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { resendEmailVerification } from '@/lib/supabase';
-import { latchSignupSource, trackGrowthEvent } from '@/utils/growthTracking';
+import { latchSignupSource, trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
 import { AccessRequestForm } from './AccessRequestForm';
 import { AccessRequestGoogleButton } from './AccessRequestGoogleButton';
 import type { AccessApproval } from './AccessRequestHandoff';
@@ -52,6 +52,9 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
     lastEmittedState.current = gateState;
     try {
       trackGrowthEvent('edu_access_gate_viewed', { state: gateState });
+      if (gateState === 'auth_required') {
+        trackSignupFunnel('prompt_shown', false, { surface: 'edu_access', source: 'edu_access' });
+      }
     } catch {
       /* telemetry must never break access request */
     }

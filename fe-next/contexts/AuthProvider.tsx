@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, ReactNode } from 'react';
 import { setSentryUser, clearSentryUser } from '@/utils/sentry';
 import { syncAuthAnalyticsTransition } from '@/utils/authAnalytics';
 import { consumePendingSignupCompletion, consumeSignupSource, isRecentAccount, maybeTrackSignupCompleted, setAnalyticsIdentity } from '@/utils/growthTracking';
+import { consumeShownSurface, resolveSignupSource } from '@/lib/auth/signupSurface';
 import { markAuthProviderMounted } from '@/lib/auth/authProviderMounted';
 import { persistProfileAttribution } from '@/utils/profileAttribution';
 import { emailSignupNeedsCatchup, metaString } from '@/lib/auth/signupAttributionApply';
@@ -144,19 +145,18 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
         // sessionStorage key so the prompt path keeps its attribution.
         const pending =
           typeof window !== 'undefined'
-            ? sessionStorage.getItem('lexiclash_signup_funnel_pending')
+            ? sessionStorage.getItem('lexiclash_signup_funnel_pending') ||
+              localStorage.getItem('lexiclash_signup_funnel_pending')
             : null;
-        // results_inline: a tap on the post-results inline card latches its
-        // own source and wins attribution over the sheet funnel variant.
-        const latchedSource = consumeSignupSource();
         const meta = (user.user_metadata ?? null) as Record<string, unknown> | null;
-        const stashedSurface = metaString(meta, 'signup_surface');
-        const source = latchedSource ??
-          (pending === 'first_win'
-            ? 'first_win_prompt'
-            : pending === 'multi_game'
-            ? 'multi_game_prompt'
-            : stashedSurface ?? 'header_or_menu');
+        // Click latch wins. If the Google tap never fired a click, the surface
+        // remembered at shown time still rides the OAuth return (session + local).
+        const source = resolveSignupSource({
+          latched: consumeSignupSource(),
+          shown: consumeShownSurface(),
+          stashed: metaString(meta, 'signup_surface'),
+          funnelPending: pending,
+        });
         const recent = isRecentAccount(user.created_at, Date.now());
         // Re-fire-proof: only fires for a *just-created* account, deduped per
         // user per device. A restored session on cold load (returning user)
