@@ -39,16 +39,36 @@ function renderDetails(overrides: Partial<Parameters<typeof ClassSetupDetails>[0
 const openFold = () => fireEvent.click(screen.getByTestId('setup-advanced-toggle'));
 
 describe('ClassSetupDetails first frame', () => {
-  it('Given a new class, Then one name field and one Create button lead, with no step rail, join-code preview or word box', () => {
+  it('Given a new class, Then one name field and one Create button lead, with no step rail or word box', () => {
     renderDetails({ ownWords: { text: '', onTextChange: vi.fn(), count: 0, dropped: 0, min: 4 } });
     expect(screen.getByLabelText('eduShell.setup.nameLabel')).toBeInTheDocument();
     expect(screen.getByTestId('setup-start-live')).toBeInTheDocument();
     expect(document.querySelectorAll('[data-hero="true"]')).toHaveLength(1);
     expect(screen.queryByTestId('setup-step')).toBeNull();
-    expect(screen.queryByTestId('setup-code-preview')).toBeNull();
     expect(screen.queryByTestId('setup-own-words')).toBeNull();
     expect(screen.queryByTestId('setup-grade-k2')).toBeNull();
     expect(screen.queryAllByRole('radio').filter((r) => r.hasAttribute('data-pack'))).toHaveLength(0);
+  });
+
+  it('Given a name typed, Then the join-code card shows that name over placeholder tiles, never a code a teacher could copy', () => {
+    renderDetails({ name: '5B English' });
+    const card = screen.getByTestId('setup-code-preview');
+    expect(card).toHaveTextContent('5B English');
+    expect(card.textContent).not.toMatch(/[A-Z0-9]{6}/);
+    expect(screen.getAllByTestId('setup-code-placeholder')).toHaveLength(6);
+    expect(card.querySelector('button, a, input')).toBeNull();
+  });
+
+  it('Given no name yet, Then the join-code card shows the suggested name', () => {
+    renderDetails();
+    expect(screen.getByTestId('setup-code-preview')).toHaveTextContent('eduShell.setup.namePlaceholder');
+  });
+
+  it('Given the fold is closed, Then its summary stickers are not buttons of their own inside the toggle', () => {
+    renderDetails();
+    const summary = screen.getByTestId('setup-advanced-summary');
+    expect(summary.querySelectorAll('button')).toHaveLength(0);
+    expect(summary.querySelectorAll('[data-sticker]')).toHaveLength(3);
   });
 
   it('Given the fold is closed, Then its one line still says which language, word list and grade the class gets', () => {

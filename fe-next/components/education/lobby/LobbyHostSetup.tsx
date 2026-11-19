@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useRef, type ReactNode } from 'react';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { ClassroomPresetId } from '@/lib/education/classroomPresets';
 import { LobbyPresetCards } from './LobbyPresetCards';
+import { catalogueModes } from '../ClassroomModeCatalogueData';
+
+const COVERS = catalogueModes().slice(0, 5).map((m) => m.cover);
 
 export interface LobbyHostSetupProps {
   flowStrip?: ReactNode;
@@ -47,13 +50,26 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
           aria-controls="lobby-more-games-panel"
           onClick={() => onGamesOpenChange(!gamesOpen)}
           className={cn(
-            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-neo-cream/45 px-4 text-start',
+            'flex min-h-12 shrink-0 items-center justify-between gap-3 rounded-neo-lg border-[3px] border-dashed border-neo-cream/45 px-3 py-1.5 text-start',
             'font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream/80 motion-reduce:transition-none',
             'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
           )}
         >
-          <span className="inline-flex items-center gap-2">
-            <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
+          <span className="inline-flex items-center gap-3">
+            <span data-testid="lobby-more-games-covers" aria-hidden="true" className="flex shrink-0 -space-x-3">
+              {COVERS.map((src, i) => (
+                // eslint-disable-next-line @next/next/no-img-element -- static poster cover, same file as the grid
+                <img
+                  key={src}
+                  src={src}
+                  alt=""
+                  className={cn(
+                    'size-9 rounded-neo border-2 border-neo-black object-cover object-[50%_28%] shadow-hard-sm',
+                    i % 2 ? 'rotate-3' : '-rotate-3',
+                  )}
+                />
+              ))}
+            </span>
             {t('eduShell.host.moreGames')}
           </span>
           <ChevronDown className={cn('size-5 shrink-0 transition-transform motion-reduce:transition-none', gamesOpen && 'rotate-180')} strokeWidth={3} aria-hidden="true" />

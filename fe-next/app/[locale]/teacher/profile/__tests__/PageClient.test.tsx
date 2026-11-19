@@ -127,12 +127,12 @@ describe('TeacherProfilePageClient', () => {
     expect(within(school).getByRole('link', { name: /teacher.profile.schoolCta/ })).toHaveAttribute('href', '/en/education/for-schools');
   });
 
-  test('is one calm panel: no stat tiles, role sticker or coloured plan card', () => {
+  test('is one panel with the teacher sticker, and a free plan row stays dark', () => {
     render(<TeacherProfilePageClient />);
     const page = screen.getByTestId('teacher-profile-page');
     expect(page.querySelectorAll('section')).toHaveLength(1);
-    expect(page).not.toHaveTextContent('teacher.profile.teacherBadge');
-    expect(page.innerHTML).not.toMatch(/bg-neo-cyan/);
+    expect(page).toHaveTextContent('teacher.profile.teacherBadge');
+    expect(screen.getByTestId('subscription-card').className).not.toMatch(/bg-neo-cyan/);
     expect(screen.getByTestId('classroom-count').closest('dl')).toHaveTextContent('teacher.profile.classrooms');
   });
 
@@ -141,6 +141,8 @@ describe('TeacherProfilePageClient', () => {
     render(<TeacherProfilePageClient />);
     const plan = screen.getByTestId('subscription-card');
     expect(plan).toHaveAttribute('data-plan', 'pro');
+    expect(plan.className).toMatch(/bg-neo-cyan/);
+    expect(plan).toHaveTextContent('teacher.subscription.giftedBadge');
     expect(plan).toHaveTextContent('eduPlans.manage.gifted');
     expect(plan).toHaveTextContent('eduPlans.manage.giftedNote');
     expect(plan).not.toHaveTextContent('teacher.subscription.proPlanName');

@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Zap } from 'lucide-react';
+import { ExternalLink, Gift, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { cn } from '@/lib/utils';
-import { NB_BLOCK, NB_LINK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_LINK, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { proPlanStatusLine } from '@/components/teacher/pro/proPlanStatus';
 
 const ROW = 'flex flex-col gap-3 border-t-2 border-neo-cream/15 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6';
@@ -39,14 +39,36 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
   const title = !pro.hasPro ? t('teacher.subscription.freePlanName') : gifted ? status : t('teacher.subscription.proPlanName');
   const detail = !pro.hasPro ? usage ?? t('teacher.subscription.freeForever') : gifted ? t('eduPlans.manage.giftedNote') : status;
 
+  const onCyan = pro.hasPro;
+
   return (
-    <div data-testid="subscription-card" data-plan={pro.hasPro ? 'pro' : 'free'} className={ROW}>
+    <div
+      data-testid="subscription-card"
+      data-plan={pro.hasPro ? 'pro' : 'free'}
+      className={cn(ROW, onCyan && 'border-y-[3px] border-neo-black bg-neo-cyan text-neo-black')}
+    >
       <div className="min-w-0">
-        <h2 className="font-neo-display text-xl font-black leading-tight text-neo-cream">{title}</h2>
-        <p data-testid={!pro.hasPro && usage ? 'subscription-usage' : undefined} className="mt-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <h2 className={cn('font-neo-display text-xl font-black leading-tight', onCyan ? 'text-neo-black' : 'text-neo-cream')}>{title}</h2>
+          {gifted ? (
+            <span className={cn(NB_STICKER, NB_BLOCK.lime)}>
+              <Gift className="size-3.5" aria-hidden="true" />
+              {t('teacher.subscription.giftedBadge')}
+            </span>
+          ) : null}
+        </div>
+        <p
+          data-testid={!pro.hasPro && usage ? 'subscription-usage' : undefined}
+          className={cn('mt-1 font-neo-body text-sm font-semibold leading-snug', onCyan ? 'text-neo-black/80' : 'text-neo-cream/80')}
+        >
           {detail}
         </p>
-        <Link href={`/${language}/legal/refund`} target="_blank" rel="noopener noreferrer" className={cn(NB_LINK, '-ms-2')}>
+        <Link
+          href={`/${language}/legal/refund`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(NB_LINK, '-ms-2', onCyan && 'text-neo-black/85 hover:text-neo-black focus-visible:ring-neo-black focus-visible:ring-offset-neo-cyan')}
+        >
           {t('legal.refundPolicy')}
         </Link>
       </div>
