@@ -30,11 +30,13 @@ export function ClassGridSkeleton({ columns }: { columns: number }) {
     >
       {Array.from({ length: columns }, (_, i) => (
         <li key={i} className="flex">
-          <div className={cn(GAME_CARD, 'flex h-[12.5rem] w-full flex-col gap-3 p-4')}>
-            <span className={cn(SKELETON, 'h-7 w-2/3')} />
-            <span className={cn(SKELETON, 'h-4 w-1/2')} />
-            <span className={cn(SKELETON, 'h-10 w-full')} />
-            <span className={cn(SKELETON, 'mt-auto h-10 w-full')} />
+          <div className={cn(GAME_CARD, 'flex h-[16.5rem] w-full flex-col overflow-hidden')}>
+            <span className="h-14 shrink-0 bg-neo-cream/10" />
+            <div className="flex flex-1 flex-col gap-3 p-3.5">
+              <span className={cn(SKELETON, 'h-4 w-1/2')} />
+              <span className={cn(SKELETON, 'h-16 w-full')} />
+              <span className={cn(SKELETON, 'mt-auto h-14 w-full')} />
+            </div>
           </div>
         </li>
       ))}

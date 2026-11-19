@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { BarChart3, BookOpen, ClipboardList, Globe2, Pencil, Play } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
 import { LIST_CARD_TITLE, ListCard } from '@/components/teacher/ListCard';
 import { CardMenuAction, CardOverflowMenu } from '@/components/teacher/CardOverflowMenu';
-import { ARCADE_BLOCK, arcadeAccentAt } from '@/lib/education/arcadeAccent';
+import { arcadeAccentAt } from '@/lib/education/arcadeAccent';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import AssignListDialog from './library/AssignListDialog';
@@ -24,7 +24,9 @@ interface MyListCardProps {
   onToggleShare: () => void;
 }
 
-/** One of the teacher's word lists: its name, one fact, Start a game, and a menu with everything else. */
+const CHIPS = 6;
+
+/** One of the teacher's word lists: a color band with its count and name, its first words, Start a game, and a menu with everything else. */
 export default function MyListCard({
   lesson,
   classroomName,
@@ -60,24 +62,27 @@ export default function MyListCard({
       data-accent={accent}
       style={{ animationDelay: `${Math.min(index, 8) * 40}ms` }}
       className="motion-safe:animate-pop-in [animation-fill-mode:both]"
-      accentClass={ARCADE_BLOCK[accent]}
+      color={accent}
       titleText={lesson.name}
       title={
         <button type="button" data-testid={`lesson-open-${lesson.id}`} onClick={onEdit} className={LIST_CARD_TITLE}>
           <bdi>{lesson.name}</bdi>
         </button>
       }
-      factTestId={`lesson-fact-${lesson.id}`}
-      fact={
-        <span>
-          {t('eduLibrary.card.words', { count: total })}
-          {' · '}
+      lead={
+        <span className="inline-flex shrink-0 -rotate-6 flex-col items-center self-start rounded-neo border-[3px] border-neo-black bg-neo-black px-2 py-0.5 leading-none text-neo-cream shadow-hard">
+          <span className="font-neo-display text-xl font-black tabular-nums" aria-hidden="true">{total}</span>
+        </span>
+      }
+      sub={
+        <p data-testid={`lesson-fact-${lesson.id}`} className="mt-0.5 font-neo-body text-xs font-bold opacity-85">
+          <span className="sr-only">{t('eduLibrary.card.words', { count: total })} · </span>
           {classroomName ? (
             <bdi data-testid={`lesson-classroom-${lesson.id}`}>{classroomName}</bdi>
           ) : (
             <span lang={lesson.language}>{nativeLanguageName(lesson.language)}</span>
           )}
-        </span>
+        </p>
       }
       menu={
         <CardOverflowMenu label={t('eduLibrary.card.actions')} testId={`lesson-menu-${lesson.id}`} header={menuHeader}>
@@ -91,12 +96,31 @@ export default function MyListCard({
         </CardOverflowMenu>
       }
       action={
-        <button type="button" data-testid={`lesson-host-${lesson.id}`} onClick={onHost} className={cn(NB_SECONDARY, 'min-h-14 w-full text-lg')}>
+        <button type="button" data-testid={`lesson-host-${lesson.id}`} onClick={onHost} className={cn(NB_SECONDARY, NB_BLOCK[accent], 'min-h-14 w-full text-lg')}>
           <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
           {t('eduShell.home.startLive')}
         </button>
       }
     >
+      <ul className="flex flex-wrap gap-1.5" dir="auto">
+        {lesson.words.slice(0, CHIPS).map((w, i) => (
+          <li
+            key={`${w.word}-${i}`}
+            data-testid="word-tile"
+            className={cn(
+              'rounded-neo border-2 border-neo-black bg-neo-cream px-2 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard',
+              i % 2 ? 'rotate-1' : '-rotate-1',
+            )}
+          >
+            {w.word}
+          </li>
+        ))}
+        {total > CHIPS ? (
+          <li className="rounded-neo border-2 border-dashed border-neo-cream/50 px-2 py-0.5 font-neo-display text-sm font-black text-neo-cream/70">
+            +{total - CHIPS}
+          </li>
+        ) : null}
+      </ul>
       {assigning ? <AssignListDialog lessonId={lesson.id} onClose={() => setAssigning(false)} /> : null}
     </ListCard>
   );

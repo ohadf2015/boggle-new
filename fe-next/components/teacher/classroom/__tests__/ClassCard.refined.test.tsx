@@ -71,20 +71,27 @@ describe('ClassCard face', () => {
     expect(controls).toEqual(['classroom-card-open', 'classroom-card-menu', 'classroom-card-start-game']);
   });
 
-  it('is one calm navy surface with a small accent instead of a color band', () => {
+  it('wears a full color band with the name, the language and the menu', () => {
     render(<ClassCard {...baseProps} color="cyan" />);
-    const card = screen.getByTestId('classroom-card');
-    expect(card.className).toContain('bg-neo-navy-light');
-    expect(screen.queryByTestId('classroom-card-band')).toBeNull();
-    expect(within(card).getByTestId('list-card-accent').className).toContain('bg-neo-cyan');
+    const band = screen.getByTestId('list-card-band');
+    expect(band.className).toContain('bg-neo-cyan');
+    expect(within(band).getByRole('heading', { name: 'Period 3' })).toBeInTheDocument();
+    expect(within(band).getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
+    expect(within(band).getByTestId('classroom-card-menu')).toBeInTheDocument();
   });
 
-  it('Given the featured card, Then Start is lime; any other card gets the quiet button', () => {
-    const { rerender } = render(<ClassCard {...baseProps} featured />);
-    expect(screen.getByTestId('classroom-card-start-game').className).toContain('bg-neo-lime');
-    rerender(<ClassCard {...baseProps} />);
+  it('shows the join code on a big cream plate that is not a control', () => {
+    render(<ClassCard {...baseProps} />);
+    const plate = screen.getByTestId('join-code-plate');
+    expect(plate.className).toContain('bg-neo-cream');
+    expect(within(plate).getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
+    expect(plate.querySelector('a, button')).toBeNull();
+  });
+
+  it('Given any card, Then Start is the lime primary into the host flow', () => {
+    render(<ClassCard {...baseProps} />);
     const start = screen.getByTestId('classroom-card-start-game');
-    expect(start.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    expect(start.className).toContain('bg-neo-lime');
     expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
     expect(start).toHaveTextContent('eduShell.home.startLive');
   });
@@ -101,11 +108,11 @@ describe('ClassCard face', () => {
     expect(screen.getByTestId('classroom-card-fact')).toHaveTextContent('teacher.classroom.studentCountPro');
   });
 
-  it('Given no students, Then the fact says so and shows the code instead of the activity', () => {
+  it('Given no students, Then the fact says so instead of the activity, and the plate carries the code', () => {
     render(<ClassCard {...baseProps} classroom={{ ...CLASSROOM, member_count: 0 }} activity={<span>played</span>} />);
     const fact = screen.getByTestId('classroom-card-fact');
     expect(fact).toHaveTextContent('teacher.pulse.state.noRoster');
-    expect(fact).toHaveTextContent('ABC123');
+    expect(fact).not.toHaveTextContent('ABC123');
     expect(fact).not.toHaveTextContent('played');
   });
 
@@ -155,13 +162,6 @@ describe('ClassCard menu', () => {
     ]) {
       expect(screen.getByTestId(id)).toBeInTheDocument();
     }
-  });
-
-  it('opens with the join code and the class language', async () => {
-    render(<ClassCard {...baseProps} />);
-    await openMenu();
-    expect(screen.getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
-    expect(screen.getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
   });
 
   it.each([

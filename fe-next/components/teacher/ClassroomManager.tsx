@@ -209,7 +209,6 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                 <ClassCard
                   classroom={classroom}
                   color={CARD_COLORS[i % CARD_COLORS.length]}
-                  featured={i === 0}
                   expanded={expandedId === classroom.id}
                   onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
                   onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
