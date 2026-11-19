@@ -11,16 +11,19 @@ import { HOME_FIRST_FRAME, HOME_GRID_BASE, HOME_MAIN_COLUMN } from './homeLayout
 export function HomeSkeleton() {
   return (
     <div data-testid="home-skeleton" aria-hidden="true" className="flex min-h-0 flex-1 flex-col gap-3 sm:gap-4">
+      <div className="flex items-center gap-5">
+        <span className={cn(SKELETON, 'size-[72px] shrink-0 rounded-full lg:size-20')} />
+        <span className={cn(SKELETON, 'h-16 w-full max-w-md')} />
+      </div>
       <div className={cn(NB_PANEL, 'flex flex-1 flex-col justify-center @container/skel')}>
-        <div className="grid gap-4 p-4 sm:p-6 @3xl/skel:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @3xl/skel:gap-10 @3xl/skel:p-8">
-          <span className={cn(SKELETON, 'hidden size-44 place-self-center rounded-full @3xl/skel:block')} />
+        <div className="grid gap-4 p-3 sm:gap-5 sm:p-6 @3xl/skel:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] @3xl/skel:gap-x-8 @3xl/skel:p-8">
           <div className="flex flex-col gap-4">
-            <span className={cn(SKELETON, 'h-4 w-1/3')} />
             <span className={cn(SKELETON, 'h-11 w-2/3')} />
+            <span className={cn(SKELETON, 'h-5 w-1/2')} />
             <span className={cn(SKELETON, 'h-[72px] w-full sm:h-[84px]')} />
             <span className={cn(SKELETON, 'h-[60px] w-full sm:h-[68px]')} />
-            <span className={cn(SKELETON, 'h-16 w-full')} />
           </div>
+          <span className={cn(SKELETON, 'h-36 w-full self-center sm:h-44')} />
         </div>
       </div>
       <span className={cn(SKELETON, 'h-[60px] w-full shrink-0')} />

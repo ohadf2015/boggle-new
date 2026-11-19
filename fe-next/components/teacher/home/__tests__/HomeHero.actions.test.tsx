@@ -13,7 +13,7 @@ const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.
 const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4, language: 'he' };
 
 describe('<HomeHero> actions', () => {
-  it('Given a class, Then the desk offers Start and Share once each, with the code as plain text in one compact row', () => {
+  it('Given a class, Then the desk offers Start and Share once each, with each code letter on its own tile', () => {
     render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} />);
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
     expect(screen.getAllByTestId('home-share-code')).toHaveLength(1);
@@ -21,7 +21,7 @@ describe('<HomeHero> actions', () => {
     const row = screen.getByTestId('home-join-row');
     expect(within(row).getByTestId('home-desk-code')).toHaveTextContent('AB12CD');
     expect(within(row).getByTestId('home-share-code')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-desk-code-tile')).toBeNull();
+    expect(within(row).getAllByTestId('home-desk-code-tile').map((el) => el.textContent).join('')).toBe('AB12CD');
   });
 
   it('When the teacher taps Share code, Then the one share sheet opens', () => {

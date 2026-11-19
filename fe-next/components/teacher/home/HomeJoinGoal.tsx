@@ -59,7 +59,7 @@ export function HomeJoinGoal({ classroom, track = true }: { classroom: { id: str
   }, [track, loading, count, classroom.id, language, hasPro, status, proLoading]);
 
   return (
-    <p data-testid="hq-joined-goal" aria-live="polite" className="min-h-5 font-neo-body text-sm font-bold leading-tight text-neo-cream/80">
+    <p data-testid="hq-joined-goal" aria-live="polite" className="min-h-5 font-neo-body text-sm font-bold leading-tight text-neo-black/80">
       {loading ? null : (
         <span data-testid="hq-joined-goal-count" className="tabular-nums">
           {count < STUDENT_GOAL ? t('academy.hq.joinedGoal', { count: shown, goal: STUDENT_GOAL }) : `${shown} ${t('academy.hq.joinedLabel')}`}

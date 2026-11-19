@@ -50,10 +50,10 @@ describe('ClassPageView', () => {
     expect(within(last).getByRole('link')).toHaveAttribute('href', '/en/teacher/classroom/c1/analytics');
   });
 
-  it('Given the class page, Then it uses the Home hero: a calm panel, the class name, the code row and the big secondary', () => {
+  it('Given the class page, Then it uses the Home hero in purple: the class name, the join card and the big secondary', () => {
     render(<ClassPageView {...props({ rehearse: <button type="button" data-testid="rehearse-slot" /> })} />);
     const hero = screen.getByTestId('home-hero');
-    expect(hero.className).not.toMatch(/bg-neo-purple/);
+    expect(hero.className).toMatch(/(^|\s)bg-neo-purple(\s|$)/);
     expect(within(hero).getByTestId('home-join-row')).toContainElement(screen.getByTestId('class-page-code'));
     expect(within(hero).getByTestId('rehearse-slot')).toBeInTheDocument();
     expect(hero).toHaveTextContent('languages.english');

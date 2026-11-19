@@ -36,7 +36,7 @@ export const STICKER =
   'inline-flex -rotate-2 items-center gap-1.5 whitespace-nowrap rounded-neo border-[3px] border-neo-black px-2.5 py-0.5 font-neo-display text-sm font-black text-neo-black shadow-hard';
 
 /** The hero's one big secondary action, sized to sit under the primary. */
-export const HERO_SECONDARY = cn(NEO_BUTTON.secondary, NEO_BLOCK_TONES.pink, 'min-h-[60px] w-full px-4 text-lg sm:min-h-[68px] sm:text-xl [&_svg]:size-6');
+export const HERO_SECONDARY = cn(NEO_BUTTON.secondary, NEO_BLOCK_TONES.cyan, 'min-h-[60px] w-full px-4 text-lg sm:min-h-[68px] sm:text-xl [&_svg]:size-6');
 export const HERO_SECONDARY_WRAP = 'w-full items-stretch';
 
 /** A calm one-line row under the hero: icon, words, chevron. */

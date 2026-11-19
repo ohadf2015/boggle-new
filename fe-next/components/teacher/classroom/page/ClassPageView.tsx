@@ -54,6 +54,7 @@ export function ClassPageView(props: ClassPageViewProps) {
         language={language}
         t={t}
         titleLevel={1}
+        tone="purple"
         eyebrow={languageKey ? t(languageKey) : null}
         classPageLink={false}
         startHref={props.startHref}

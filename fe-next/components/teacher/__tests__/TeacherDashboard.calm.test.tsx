@@ -63,10 +63,10 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(limeFills(screen.getByTestId('teacher-home'))).toEqual([screen.getByTestId('home-start-live')]);
   });
 
-  it('Then the hero is one calm panel, with pink kept for the one big secondary action', () => {
+  it('Then the desk is pink and the one big secondary is cyan so it stands out on it', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-hero').className).not.toMatch(/(^|\s)bg-neo-pink(\s|$)/);
-    expect(screen.getByTestId('rehearse-with-bots').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(screen.getByTestId('rehearse-with-bots').className).toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
   });
 
   it('Given three classes, Then the hero switcher picks the class and no class list stacks under the sessions', () => {

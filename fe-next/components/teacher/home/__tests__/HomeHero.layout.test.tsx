@@ -38,11 +38,15 @@ describe('<HomeHero> layout', () => {
     expect(before(second, join)).toBe(true);
   });
 
-  it('Then the hero is one calm navy panel with no colored panel inside it', () => {
+  it('Then the desk is pink on Home and holds the yellow join card', () => {
     renderHero();
-    const hero = screen.getByTestId('home-hero');
-    expect(hero.className).not.toMatch(/(^|\s)bg-neo-(pink|purple|yellow)(\s|$)/);
-    expect(screen.getByTestId('home-join-row').className).not.toMatch(/bg-neo-(yellow|pink|purple|cyan)/);
+    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(screen.getByTestId('home-join-row').className).toMatch(/(^|\s)bg-neo-yellow(\s|$)/);
+  });
+
+  it('Given the purple tone, Then the desk is purple', () => {
+    renderHero({ tone: 'purple', titleLevel: 1 });
+    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-purple(\s|$)/);
   });
 
   it('Then Start spans the column and the secondary sits in the same stack', () => {
@@ -77,18 +81,17 @@ describe('<HomeHero> layout', () => {
     expect(screen.getByText('English').tagName).toBe('P');
   });
 
-  it('Given a cue, Then the mascot says it on wide screens only', () => {
-    renderHero({ cue: 'Autumn words are ready' });
-    const cue = screen.getByTestId('home-coach-cue');
-    expect(cue).toHaveTextContent('Autumn words are ready');
-    expect(cue.closest('[data-testid="home-hero-art"]')?.className).toMatch(/(^|\s)hidden(\s|$)/);
+  it('Given a greeting and a cue, Then the mascot says both in one bubble above the desk, on every width', () => {
+    renderHero({ eyebrow: 'Good morning, Dana', cue: 'Autumn words are ready' });
+    const bubble = screen.getByTestId('home-greeting-row');
+    expect(within(bubble).getByTestId('home-coach-cue')).toHaveTextContent('Autumn words are ready');
+    expect(bubble.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+    expect(screen.getByTestId('home-hero')).not.toContainElement(bubble);
   });
 
-  it('Given a cue, Then narrow screens read it as the line under the class, hidden once the art column shows', () => {
-    renderHero({ cue: 'Autumn words are ready' });
-    const line = screen.getByTestId('home-coach-cue-line');
-    expect(line).toHaveTextContent('Autumn words are ready');
-    expect(line.className).toMatch(/@3xl\/hero:hidden/);
+  it('Given the class page, Then no mascot bubble shows', () => {
+    renderHero({ eyebrow: 'English', titleLevel: 1 });
+    expect(screen.queryByTestId('home-greeting-row')).toBeNull();
   });
 
   it('Given a class below its goal, Then the join row says who joined and is headed Get students in', () => {
