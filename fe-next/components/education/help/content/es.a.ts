@@ -66,7 +66,7 @@ export const esA: HelpLocaleContent = {
       {
         t: 'steps',
         items: [
-          { title: 'Pon el código a la vista', body: 'En la Central del profe, la tarjeta [[academy.hq.getStudentsIn]] muestra tu código. Usa [[academy.hq.openProjector]] para verlo a pantalla completa, [[academy.hq.qr]] para un código escaneable o [[academy.hq.copyLink]] para pegar el enlace en el chat de la clase o en tu plataforma.', shot: 'hq-get-students-in' },
+          { title: 'Pon el código a la vista', body: 'En el inicio del profe, el panel de tu clase muestra el código con un botón [[eduShell.home.shareCode]] al lado. Ahí encuentras el código QR, el enlace para pegar en el chat de la clase o en tu plataforma, [[academy.hq.openProjector]] para verlo a pantalla completa y una hoja imprimible.' },
           { title: 'El alumnado abre la página', body: 'Entran en **lexiclash.live/join** y escriben los seis caracteres, o abren tu enlace o escanean el QR, que rellenan el código por ellos.' },
           { title: 'Cada alumno elige un nombre', body: 'Ven a qué clase se unen, escriben un nombre (o tocan el dado para uno al azar) y pulsan [[education.student.join.flow.go]]. Listo.', shot: 'student-join' },
           { title: 'Mira cómo se llena la lista', body: 'Cada alumno aparece en tu pantalla al llegar. Quien se une a una clase así queda en su lista, y sus resultados llegan a tus informes.' },

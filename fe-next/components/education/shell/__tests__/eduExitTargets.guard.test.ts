@@ -34,7 +34,7 @@ const EDU_AREAS = new Set(['teacher', 'education', 'student', 'join', 'api']);
 const ALLOWED_OUTSIDE = [/^legal\//, /^contact(?:[/?#]|$)/];
 
 // Files an open peer PR is rewriting; skipped rather than pinned so either merge order stays green.
-const SAME_TAB_PENDING = new Set(['components/teacher/SubscriptionStatusCard.tsx']);
+const SAME_TAB_PENDING = new Set<string>();
 
 // `area` is narrowed to teacher|student by its own parser; navItems tests pin the hrefs.
 const DYNAMIC_OK: Record<string, string> = {
