@@ -181,7 +181,7 @@ describe('GET /api/education/lesson-plan', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(NOW);
     getAuthedUser.mockResolvedValue({ id: 't1' });
-    db.classroom = { data: { id: CLASS, teacher_id: 't1' }, error: null };
+    db.classroom = { data: { id: CLASS, teacher_id: 't1', name: 'Room 4B', join_code: 'ABC123' }, error: null };
     db.plan = { data: null, error: null };
     db.planFilters = [];
     logError.mockClear();
@@ -210,7 +210,7 @@ describe('GET /api/education/lesson-plan', () => {
     db.plan = { data: { lesson_at: '2026-11-12T07:00:00+00:00' }, error: null };
     const res = await get(`classroomId=${CLASS}`);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true, lessonAt: TOMORROW });
+    expect(await res.json()).toEqual({ ok: true, lessonAt: TOMORROW, classroom: { name: 'Room 4B', joinCode: 'ABC123' } });
     expect(db.planFilters).toEqual(
       expect.arrayContaining([
         ['eq', 'classroom_id', CLASS],
@@ -221,7 +221,12 @@ describe('GET /api/education/lesson-plan', () => {
   });
 
   it('Given no plan, When asked, Then lessonAt is null', async () => {
-    expect(await (await get(`classroomId=${CLASS}`)).json()).toEqual({ ok: true, lessonAt: null });
+    expect(await (await get(`classroomId=${CLASS}`)).json()).toEqual({ ok: true, lessonAt: null, classroom: { name: 'Room 4B', joinCode: 'ABC123' } });
+  });
+
+  it('Given a class without a join code, When asked, Then no class details ride along', async () => {
+    db.classroom = { data: { id: CLASS, teacher_id: 't1', name: 'Room 4B', join_code: null }, error: null };
+    expect(await (await get(`classroomId=${CLASS}`)).json()).toEqual({ ok: true, lessonAt: null, classroom: null });
   });
 
   it('Given the plan read fails, When asked, Then 500 and logged', async () => {

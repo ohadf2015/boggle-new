@@ -22467,8 +22467,8 @@ const sv = {
     },
     "hostResults": {
       "lessonPlan": {
-        "title": "Det där var generalrepetitionen. När är den riktiga lektionen?",
-        "body": "Säg till, så mejlar vi dig spelet en timme innan, redo att öppna.",
+        "title": "Planera din första lektion",
+        "body": "Välj när du spelar med klassen. Du får en kalenderinbjudan, klasslänken och ett mejl en timme innan.",
         "tomorrow": "I morgon kl. 9.00",
         "pickLabel": "Eller välj en tid",
         "remind": "Påminn mig",
@@ -22481,7 +22481,12 @@ const sv = {
         "setupTitle": "När har du nästa lektion med den här klassen?",
         "setupBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, redo att öppna i klassrummet.",
         "homeTitle": "När är nästa lektion med den här klassen?",
-        "homeBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, så att du kan öppna det direkt i klassrummet."
+        "homeBody": "Säg till, så mejlar vi dig koden och spelet en timme innan, så att du kan öppna det direkt i klassrummet.",
+        "booked": "Bokad",
+        "linkLabel": "Eleverna går med här, inget konto behövs",
+        "copyLink": "Kopiera länken",
+        "copied": "Länken kopierad",
+        "nextTitle": "Din nästa lektion"
       },
       "keepOpen": {
         "cta": "Håll den öppen som läxa i en vecka",

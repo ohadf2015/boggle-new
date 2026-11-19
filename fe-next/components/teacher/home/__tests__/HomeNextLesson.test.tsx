@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1' } }) }));
@@ -37,12 +37,21 @@ describe('<HomeNextLesson>', () => {
     expect(screen.queryByTestId('lesson-plan-tomorrow')).toBeNull();
   });
 
-  it('Given a class with a student, When it mounts, Then nothing renders and nothing is fetched', () => {
+  it('Given a class with students and nothing booked, When the plan resolves, Then nothing renders (no ask for a running class)', async () => {
     const fetchMock = lessonAt(null);
     vi.stubGlobal('fetch', fetchMock);
     const { container } = render(<HomeNextLesson classroomId="c1" memberCount={1} />);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    await new Promise((r) => setTimeout(r, 0));
     expect(container).toBeEmptyDOMElement();
-    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('Given a class with students and a booked lesson, When the plan resolves, Then the booked class shows on the home card', async () => {
+    vi.stubGlobal('fetch', lessonAt(new Date(Date.now() + 86_400_000).toISOString()));
+    render(<HomeNextLesson classroomId="c1" memberCount={12} />);
+    expect(await screen.findByTestId('lesson-plan-saved')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'eduLiveRoom.hostResults.lessonPlan.nextTitle' })).toBeInTheDocument();
+    expect(screen.queryByTestId('lesson-plan-tomorrow')).toBeNull();
   });
 
   it('Given a member count that is not known yet, When it mounts, Then nothing renders', () => {

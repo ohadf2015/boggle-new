@@ -297,6 +297,8 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
           )}
 
           <div className={cn('flex flex-col gap-2 @5xl/results:min-h-0 @5xl/results:gap-3 @[96rem]/results:gap-4 [&>*]:shrink-0', hasStage ? '@5xl/results:col-span-2 @[96rem]/results:col-span-1' : '@5xl/results:col-span-5 @5xl/results:mx-auto @5xl/results:w-full @5xl/results:max-w-4xl @[96rem]/results:col-span-3')}>
+            {/* After a rehearsal the next step is the real class, so planning it leads the column, above the replay buttons. */}
+            {summary.classroomId && practice ? <LessonPlanPrompt classroomId={summary.classroomId} className="@max-[64rem]/results:order-first" /> : null}
             {!pulseBesideStage && pulse}
             {summary.totalWords > 0 && missed.length === 0 && (
               <TvCoveragePanel
@@ -383,7 +385,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               {summary.classroomId && summary.lessonIds?.[0] && students > 0 && !practice ? (
                 <KeepOpenHomework classroomId={summary.classroomId} lessonId={summary.lessonIds[0]} />
               ) : null}
-              {summary.classroomId && practice ? <LessonPlanPrompt classroomId={summary.classroomId} /> : null}
             </div>
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>
