@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { Howler } from 'howler';
 import { LogOut, MonitorSmartphone, Presentation, RotateCw, SkipForward } from 'lucide-react';
 import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from '@/host/hooks/useRehearseAutoStart';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { cn } from '@/lib/utils';
 import { practiceSeatPath } from '@/lib/education/classroomLivePath';
 import { NB_BLOCK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
@@ -29,6 +30,9 @@ interface PracticeRunPanelProps {
 export function PracticeRunPanel({ gameCode, language, joined, started, ended, open, onOpenChange, onExit, t }: PracticeRunPanelProps) {
   const [frameKey, setFrameKey] = useState(0);
   const [timedOut, setTimedOut] = useState(false);
+  const [hasStarted, setHasStarted] = useState(started);
+  if (started && !hasStarted) setHasStarted(true);
+  useRegisterHeaderAudioControl();
 
   useEffect(() => {
     const reload = () => {
@@ -66,7 +70,7 @@ export function PracticeRunPanel({ gameCode, language, joined, started, ended, o
         <header className="flex shrink-0 items-center gap-2 border-b-[3px] border-neo-cream bg-neo-navy-light px-2 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
           <h2 className="min-w-0 truncate font-neo-display text-base font-black text-neo-cream max-sm:sr-only">{t('eduLiveRoom.practice.title')}</h2>
           <div className="ms-auto flex items-center gap-2">
-            {joined && !started && (
+            {joined && !hasStarted && (
               <button type="button" data-testid="practice-run-skip" onClick={() => window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT))} className={cn(NB_SMALL, NB_BLOCK.cyan)}>
                 <SkipForward className="size-4 rtl:-scale-x-100" aria-hidden="true" />
                 {t('eduLiveRoom.practice.skip')}

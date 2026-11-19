@@ -4,6 +4,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+const { updateProfile } = vi.hoisted(() => ({ updateProfile: vi.fn(async () => ({})) }));
+
 vi.mock('framer-motion', () => ({
   m: {
     div: React.forwardRef(({ children }: React.PropsWithChildren, ref: React.Ref<HTMLDivElement>) => (
@@ -54,7 +56,7 @@ vi.mock('../../../utils/SocketContext', () => ({
   useSocketOptional: () => ({ socket: { emit: vi.fn(), on: vi.fn(), off: vi.fn() } }),
 }));
 vi.mock('../../../contexts/AuthContext', () => ({
-  useAuth: () => ({ isAuthenticated: false, updateProfile: vi.fn(async () => ({})) }),
+  useAuth: () => ({ isAuthenticated: false, updateProfile }),
 }));
 vi.mock('@/hooks/gameState', () => ({
   useGameMode: () => 'classic',
@@ -100,6 +102,18 @@ describe('PlayerWaitingView - the classroom student waiting room', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode onAvatarChange={onAvatarChange} />);
     fireEvent.click(screen.getAllByTestId('avatar-quick-option')[0]);
     expect(onAvatarChange).toHaveBeenCalledTimes(1);
+  });
+
+  it('given a teacher trying the game as a student, when they pick a look, then the seat changes and their real profile does not', () => {
+    const win = window as unknown as { __LC_PRACTICE_SEAT__?: boolean };
+    win.__LC_PRACTICE_SEAT__ = true;
+    updateProfile.mockClear();
+    const onAvatarChange = vi.fn();
+    render(<PlayerWaitingView {...defaultProps} isClassroomMode onAvatarChange={onAvatarChange} />);
+    fireEvent.click(screen.getAllByTestId('avatar-quick-option')[0]);
+    delete win.__LC_PRACTICE_SEAT__;
+    expect(onAvatarChange).toHaveBeenCalledTimes(1);
+    expect(updateProfile).not.toHaveBeenCalled();
   });
 
   it('Given the student is ready, Then the stage shows it on their face', () => {

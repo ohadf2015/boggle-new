@@ -5,6 +5,7 @@ import "@testing-library/jest-dom";
 import { Howler } from "howler";
 import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from "@/host/hooks/useRehearseAutoStart";
 import { PracticeRunPanel } from "@/components/education/live/PracticeRunPanel";
+import NavigationContext from "@/contexts/NavigationContext";
 
 vi.mock("howler", () => ({ Howler: { mute: vi.fn() } }));
 
@@ -48,6 +49,19 @@ describe("PracticeRunPanel", () => {
     expect(screen.queryByTestId("practice-run-skip")).toBeNull();
     rerender(<Panel started />);
     expect(screen.queryByTestId("practice-run-skip")).toBeNull();
+  });
+
+  it("given the round has started once, then skip never comes back between rounds", () => {
+    const { rerender } = render(<Panel started />);
+    rerender(<Panel started={false} />);
+    expect(screen.queryByTestId("practice-run-skip")).toBeNull();
+  });
+
+  it("given the student view, then the page's floating sound button stands down for the game's own", () => {
+    const registerHeaderAudioControl = vi.fn(() => () => {});
+    const value = { registerHeaderAudioControl } as unknown as React.ContextType<typeof NavigationContext>;
+    render(<NavigationContext.Provider value={value}><Panel /></NavigationContext.Provider>);
+    expect(registerHeaderAudioControl).toHaveBeenCalledTimes(1);
   });
 
   it("given the round is over, then the way out reads as going back to the class", () => {
