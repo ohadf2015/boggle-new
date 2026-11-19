@@ -145,6 +145,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
               data-testid="setup-words-toggle"
               aria-expanded={wordsShown}
               aria-controls="setup-words-body"
+              disabled={wordsAttention}
               onClick={() => setWordsOpen((open) => !open)}
               className={NB_ADVANCED}
             >

@@ -293,7 +293,6 @@ function useFirstGame({ classroom, packKey, lessonId, t, language, onStarted }: 
     const blocked: FirstGameError = skipped > 0 && words.length === 0 ? 'phrasesOnly' : words.length > 0 && words.length < MIN_PASTED_WORDS ? 'tooFew' : null;
     if (blocked) {
       setError(blocked);
-      box.current?.focus();
       requestAnimationFrame(() => box.current?.focus());
       return;
     }
@@ -331,8 +330,7 @@ function useFirstGame({ classroom, packKey, lessonId, t, language, onStarted }: 
         onChangeWords={() => {
           if (saved.status === 'ready') setText(saved.words.join(', '));
           setChanging(true);
-          box.current?.focus();
-      requestAnimationFrame(() => box.current?.focus());
+          requestAnimationFrame(() => box.current?.focus());
         }}
         t={t}
       />

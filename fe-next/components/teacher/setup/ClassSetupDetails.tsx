@@ -93,7 +93,8 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             data-testid="setup-advanced-toggle"
             aria-expanded={foldOpen}
             aria-controls="setup-advanced"
-            onClick={() => !ownIncomplete && setAdvancedOpen((open) => !open)}
+            disabled={ownIncomplete}
+            onClick={() => setAdvancedOpen((open) => !open)}
             className={cn(NB_ADVANCED, 'min-h-[56px] py-2')}
           >
             <span className="flex min-w-0 flex-col">

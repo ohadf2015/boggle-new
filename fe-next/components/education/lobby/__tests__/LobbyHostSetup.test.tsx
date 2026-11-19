@@ -25,10 +25,10 @@ function renderSetup(over: Partial<React.ComponentProps<typeof LobbyHostSetup>> 
 }
 
 describe('LobbyHostSetup first frame', () => {
-  it('Given the lobby opens, Then only the class and list line and one closed More options fold show', () => {
+  it('Given the lobby opens, Then only the class and list line and one closed More games fold show', () => {
     renderSetup();
     expect(screen.getByTestId('lesson-step')).toBeInTheDocument();
-    expect(screen.getByTestId('lobby-more-games')).toHaveTextContent('eduShell.host.moreOptions');
+    expect(screen.getByTestId('lobby-more-games')).toHaveTextContent('eduShell.host.moreGames');
     expect(screen.queryByRole('radiogroup', { name: 'teacher.classroom.presets.title' })).toBeNull();
     expect(screen.queryByTestId('lobby-setup-summary')).toBeNull();
     expect(screen.getByTestId('lobby-host-setup')).not.toHaveAttribute('data-lobby-expanded');

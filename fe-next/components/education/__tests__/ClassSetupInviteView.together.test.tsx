@@ -132,6 +132,7 @@ describe('class-ready guide', () => {
     fireEvent.click(toggle);
     rerender(view(withStudent, true));
     expect(screen.getByTestId('setup-words-toggle')).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByTestId('setup-words-toggle')).toBeDisabled();
     expect(screen.getByTestId('setup-words-body')).not.toHaveClass('hidden');
   });
 });

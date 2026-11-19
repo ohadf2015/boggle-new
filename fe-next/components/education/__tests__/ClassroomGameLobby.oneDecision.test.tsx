@@ -170,7 +170,7 @@ describe('ClassroomGameLobby — one screen, one decision', () => {
     const step = screen.getByTestId('lobby-lesson-step');
     const fold = screen.getByTestId('lobby-more-games');
     expect(fold).toHaveAttribute('aria-expanded', 'false');
-    expect(fold).toHaveTextContent('eduShell.host.moreOptions');
+    expect(fold).toHaveTextContent('eduShell.host.moreGames');
     expect(step.compareDocumentPosition(fold) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByTestId('preset-standard')).toBeNull();
     expect(screen.queryByTestId('lobby-setup-summary')).toBeNull();

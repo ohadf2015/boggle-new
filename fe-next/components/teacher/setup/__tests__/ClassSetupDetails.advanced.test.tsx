@@ -123,6 +123,7 @@ describe('ClassSetupDetails own words field', () => {
     renderDetails({ ownWords: own(2) });
     const toggle = screen.getByTestId('setup-advanced-toggle');
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toBeDisabled();
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByTestId('setup-own-words-status')).toHaveTextContent('eduShell.setup.ownWords.needMore:{"count":2}');

@@ -54,7 +54,7 @@ export function LobbyHostSetup({ flowStrip, lessonStep, activePreset, onApplyPre
         >
           <span className="inline-flex items-center gap-2">
             <SlidersHorizontal className="size-4 shrink-0" strokeWidth={3} aria-hidden="true" />
-            {t('eduShell.host.moreOptions')}
+            {t('eduShell.host.moreGames')}
           </span>
           <ChevronDown className={cn('size-5 shrink-0 transition-transform motion-reduce:transition-none', gamesOpen && 'rotate-180')} strokeWidth={3} aria-hidden="true" />
         </button>

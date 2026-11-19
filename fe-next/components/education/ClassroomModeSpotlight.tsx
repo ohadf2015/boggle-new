@@ -90,7 +90,7 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             type="button"
             data-testid="how-it-plays-toggle"
             aria-expanded={stepsOpen}
-            aria-controls="how-it-plays"
+            aria-controls="how-it-plays-details"
             title={t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             onClick={() => setStepsOpen((v) => !v)}
             className={cn('inline-flex min-h-11 items-center gap-1 self-start rounded-neo px-1 font-neo-body text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream', EXPANDED_HIDE)}
@@ -98,8 +98,9 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
             {t(stepsOpen ? 'eg2Modes.hideHowItPlays' : 'eg2Modes.howItPlays')}
             {stepsOpen ? <ChevronUp className="size-4" strokeWidth={3} aria-hidden="true" /> : <ChevronDown className="size-4" strokeWidth={3} aria-hidden="true" />}
           </button>
+          <div id="how-it-plays-details" className={cn('flex flex-col gap-2.5 empty:hidden', EXPANDED_HIDE)}>
           {stepsOpen ? (
-            <div id="how-it-plays-details" className={cn('flex flex-col gap-2.5', EXPANDED_HIDE)}>
+            <>
               <div className="flex min-w-0 flex-wrap gap-1.5">
                 <Spec testId="spec-duration" icon={Clock} label={t('eg2Modes.spec.duration')} value={minutesLabel} />
                 <Spec testId="spec-complexity" icon={Puzzle} label={t('eg2Modes.spec.complexity')} value={t(keys.complexity)} />
@@ -121,8 +122,9 @@ export function ClassroomModeSpotlight({ mode, keys, minutes, dir, busy, blocked
                   </li>
                 ))}
               </ol>
-            </div>
+            </>
           ) : null}
+          </div>
         </m.div>
 
         <div className="flex shrink-0 flex-col gap-1.5 group-has-[[data-lobby-expanded]]/lobby:@4xl/lobby:w-[24rem]">
