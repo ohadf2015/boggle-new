@@ -1,23 +1,16 @@
 'use client';
 
 /**
- * Practice run: the teacher's board, with their own student view beside it.
- * The student view is the real student page in a same-origin frame
- * (?practiceSeat=1): the teacher's account, but its own practice seat, never the
- * host seat and never a student (utils/practiceSeatStorage, backend/handlers/practiceSeat).
- * The round starts by itself once that seat joins, so the frame is the only thing to act on.
- *
- * Wide screens get the frame beside the board. Phones and portrait tablets get one
- * button that opens the student view in a new tab, and no frame at all: a hidden
- * frame still loads, joins the seat and starts the round where nobody can see it.
+ * Practice run: the teacher plays the real student page (?practiceSeat=1), full screen at every width.
+ * The host board stays mounted underneath because it owns the room, the bots and the round start.
  */
 import { useEffect, useState } from 'react';
-import { PRACTICE_SEAT_RETRY_EVENT } from '@/host/hooks/useRehearseAutoStart';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
-import { Check, ExternalLink, MonitorSmartphone, X } from 'lucide-react';
+import { Howler } from 'howler';
+import { LogOut, MonitorSmartphone, Presentation, RotateCw, SkipForward } from 'lucide-react';
+import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from '@/host/hooks/useRehearseAutoStart';
 import { cn } from '@/lib/utils';
 import { practiceSeatPath } from '@/lib/education/classroomLivePath';
-import { NB_BLOCK, NB_PANEL, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { NB_BLOCK, NB_SMALL } from '@/components/teacher/nb/nbStyles';
 import type { Translate } from './eduLiveStyles';
 
 interface PracticeRunPanelProps {
@@ -25,101 +18,113 @@ interface PracticeRunPanelProps {
   language: string;
   /** The practice seat is in the room. */
   joined: boolean;
+  started: boolean;
+  ended: boolean;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onExit: () => void;
   t: Translate;
 }
 
-export function PracticeRunPanel({ gameCode, language, joined, t }: PracticeRunPanelProps) {
-  const [open, setOpen] = useState(true);
-  const wide = useMediaQuery('(min-width: 1024px)');
+export function PracticeRunPanel({ gameCode, language, joined, started, ended, open, onOpenChange, onExit, t }: PracticeRunPanelProps) {
   const [frameKey, setFrameKey] = useState(0);
+  const [timedOut, setTimedOut] = useState(false);
+
   useEffect(() => {
-    const reload = () => setFrameKey((n) => n + 1);
+    const reload = () => {
+      setTimedOut(false);
+      setFrameKey((n) => n + 1);
+    };
     window.addEventListener(PRACTICE_SEAT_RETRY_EVENT, reload);
     return () => window.removeEventListener(PRACTICE_SEAT_RETRY_EVENT, reload);
   }, []);
-  const path = practiceSeatPath(language, gameCode);
 
-  const status = (
-    <span data-testid="practice-run-status" className={cn(NB_STICKER, joined ? NB_BLOCK.lime : NB_BLOCK.yellow)}>
-      {joined ? <Check className="size-3.5" aria-hidden="true" /> : <span aria-hidden="true" className="size-2 rounded-full bg-neo-black motion-safe:animate-pulse" />}
-      {t(joined ? 'eduLiveRoom.practice.joined' : 'eduLiveRoom.practice.joining')}
-    </span>
-  );
+  useEffect(() => {
+    const showBoard = () => onOpenChange(false);
+    window.addEventListener(PRACTICE_NEEDS_BOARD_EVENT, showBoard);
+    return () => window.removeEventListener(PRACTICE_NEEDS_BOARD_EVENT, showBoard);
+  }, [onOpenChange]);
 
-  const openTab = (
-    <a href={path} target="_blank" rel="noopener" data-testid="practice-run-open-tab" className={cn(NB_SMALL, NB_BLOCK.cream)}>
-      <ExternalLink className="size-4" aria-hidden="true" />
-      {t('eduLiveRoom.practice.openTab')}
-    </a>
-  );
+  useEffect(() => {
+    if (joined) {
+      setTimedOut(false);
+      return;
+    }
+    const id = setTimeout(() => setTimedOut(true), PRACTICE_SEAT_TIMEOUT_MS);
+    return () => clearTimeout(id);
+  }, [joined, frameKey]);
 
-  if (!open) {
-    return (
-      <button
-        type="button"
-        data-testid="practice-run-show"
-        onClick={() => setOpen(true)}
-        className={cn(NB_SMALL, NB_BLOCK.cyan, 'fixed bottom-4 end-4 z-40')}
-      >
-        <MonitorSmartphone className="size-4" aria-hidden="true" />
-        {t('eduLiveRoom.practice.show')}
-      </button>
-    );
-  }
+  // The frame plays its own sound; the board behind it would double every effect.
+  useEffect(() => {
+    Howler.mute(open);
+    return () => { Howler.mute(false); };
+  }, [open]);
 
-  const hide = (
-    <button
-      type="button"
-      data-testid="practice-run-hide"
-      onClick={() => setOpen(false)}
-      aria-label={t('eduLiveRoom.practice.hide')}
-      title={t('eduLiveRoom.practice.hide')}
-      className={cn(NB_SMALL, NB_BLOCK.navy, 'min-w-11 px-0')}
-    >
-      <X className="size-4" aria-hidden="true" />
-    </button>
-  );
-
-  if (wide) {
-    return (
-      <aside
-        data-testid="practice-run-panel"
-        aria-labelledby="practice-run-title"
-        className={cn(NB_PANEL, 'm-3 ms-0 flex w-[min(25rem,32vw)] shrink-0 flex-col gap-3 p-3')}
-      >
-        <div className="flex flex-col items-start gap-1.5">
-          <h2 id="practice-run-title" className="min-w-0 font-neo-display text-xl font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
-          {status}
-        </div>
-        <div className="relative min-h-0 flex-1 overflow-hidden rounded-[1.75rem] border-[5px] border-neo-cream bg-neo-navy shadow-hard-lg">
+  return (
+    <>
+      <div data-testid="practice-run-panel" className={cn('fixed inset-0 z-[65] flex-col bg-neo-navy', open ? 'flex' : 'hidden')}>
+        <header className="flex shrink-0 items-center gap-2 border-b-[3px] border-neo-cream bg-neo-navy-light px-2 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]">
+          <h2 className="min-w-0 truncate font-neo-display text-base font-black text-neo-cream max-sm:sr-only">{t('eduLiveRoom.practice.title')}</h2>
+          <div className="ms-auto flex items-center gap-2">
+            {joined && !started && (
+              <button type="button" data-testid="practice-run-skip" onClick={() => window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT))} className={cn(NB_SMALL, NB_BLOCK.cyan)}>
+                <SkipForward className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+                {t('eduLiveRoom.practice.skip')}
+              </button>
+            )}
+            <button
+              type="button"
+              data-testid="practice-run-teacher-view"
+              onClick={() => onOpenChange(false)}
+              aria-label={t('eduLiveRoom.practice.teacherView')}
+              title={t('eduLiveRoom.practice.teacherView')}
+              className={cn(NB_SMALL, NB_BLOCK.navy, 'max-sm:min-w-11 max-sm:px-0')}
+            >
+              <Presentation className="size-4" aria-hidden="true" />
+              <span className="max-sm:hidden">{t('eduLiveRoom.practice.teacherView')}</span>
+            </button>
+            <button type="button" data-testid="practice-run-exit" onClick={onExit} className={cn(NB_SMALL, ended ? NB_BLOCK.lime : NB_BLOCK.cream)}>
+              <LogOut className="size-4 rtl:-scale-x-100" aria-hidden="true" />
+              {t(ended ? 'eduLiveRoom.practice.backToClass' : 'eduLiveRoom.practice.end')}
+            </button>
+          </div>
+        </header>
+        <div className="relative min-h-0 flex-1">
           <iframe
             key={frameKey}
             data-testid="practice-run-frame"
-            src={path}
+            src={practiceSeatPath(language, gameCode)}
             title={t('eduLiveRoom.practice.frameTitle')}
             allow="clipboard-write"
             className="absolute inset-0 size-full border-0"
           />
+          {timedOut && !joined && (
+            <div role="alert" className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-neo-navy p-6 text-center">
+              <p className="max-w-sm font-neo-display text-lg font-black text-neo-cream">{t('eduLiveRoom.practice.seatRetry')}</p>
+              <button type="button" data-testid="practice-run-retry" onClick={() => window.dispatchEvent(new Event(PRACTICE_SEAT_RETRY_EVENT))} className={cn(NB_SMALL, NB_BLOCK.lime)}>
+                <RotateCw className="size-4" aria-hidden="true" />
+                {t('eduLiveRoom.practice.retry')}
+              </button>
+              <button type="button" data-testid="practice-run-timeout-teacher-view" onClick={() => onOpenChange(false)} className={cn(NB_SMALL, NB_BLOCK.navy)}>
+                <Presentation className="size-4" aria-hidden="true" />
+                {t('eduLiveRoom.practice.teacherView')}
+              </button>
+            </div>
+          )}
         </div>
-        {/* The close sits down here: the top corner belongs to the page's sound button. */}
-        <div className="flex items-center justify-between gap-2">{openTab}{hide}</div>
-      </aside>
-    );
-  }
-
-  return (
-    <section
-      data-testid="practice-run-card"
-      aria-labelledby="practice-run-card-title"
-      className={cn(NB_PANEL, NB_BLOCK.navy, 'order-last m-3 mt-0 mb-[calc(var(--lc-teacher-bar-h,0px)+0.75rem)] flex shrink-0 flex-wrap items-center gap-3 p-3')}
-    >
-      <h2 id="practice-run-card-title" className="min-w-0 flex-1 font-neo-display text-lg font-black leading-tight">{t('eduLiveRoom.practice.title')}</h2>
-      {status}
-      <div className="flex w-full items-center gap-2">
-        <div className="flex-1 [&>a]:w-full">{openTab}</div>
-        {hide}
       </div>
-    </section>
+      {!open && (
+        <button
+          type="button"
+          data-testid="practice-run-show"
+          onClick={() => onOpenChange(true)}
+          className={cn(NB_SMALL, NB_BLOCK.cyan, 'fixed bottom-[calc(var(--lc-teacher-bar-h,0px)+0.75rem)] end-3 z-[71]')}
+        >
+          <MonitorSmartphone className="size-4" aria-hidden="true" />
+          {t('eduLiveRoom.practice.show')}
+        </button>
+      )}
+    </>
   );
 }
 

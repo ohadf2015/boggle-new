@@ -7,6 +7,7 @@ import {
   realStudentCount,
   writeRehearseIntent,
   claimRehearseIntentForLaunch,
+  rehearseLaunchPending,
 } from '../rehearsal';
 
 describe('realStudentCount', () => {
@@ -82,5 +83,25 @@ describe('rehearse intent claim', () => {
   it('Given an older rehearse tap, When a launch carries a different entry, Then it is not a rehearsal', () => {
     writeRehearseIntent({ source: 'hq', classExists: true }, 1_000);
     expect(claimRehearseIntentForLaunch('REAL02', 'some-other-entry', 2_000)).toBe(false);
+  });
+});
+
+describe('rehearseLaunchPending', () => {
+  beforeEach(() => sessionStorage.clear());
+
+  it('Given a fresh rehearse tap, Then its lobby still has to launch', () => {
+    expect(rehearseLaunchPending(writeRehearseIntent({ source: 'class', classExists: true }))).toBe(true);
+  });
+
+  it('Given no entry or another tap\'s entry, Then nothing launches by itself', () => {
+    writeRehearseIntent({ source: 'class', classExists: true });
+    expect(rehearseLaunchPending(undefined)).toBe(false);
+    expect(rehearseLaunchPending('other')).toBe(false);
+  });
+
+  it('Given the tap already launched a room, When the lobby reloads, Then no second room opens', () => {
+    const entry = writeRehearseIntent({ source: 'class', classExists: true });
+    claimRehearseIntentForLaunch('ROOM1', entry);
+    expect(rehearseLaunchPending(entry)).toBe(false);
   });
 });

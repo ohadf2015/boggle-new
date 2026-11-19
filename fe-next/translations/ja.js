@@ -22384,15 +22384,16 @@ const ja = {
     "practice": {
       "seatName": "練習用の生徒",
       "title": "生徒として試す",
-      "joining": "生徒として参加中…",
-      "joined": "参加しました。ここで遊べます。",
-      "openTab": "新しいタブで開く",
-      "hide": "隠す",
       "show": "生徒として試す",
       "frameTitle": "生徒として試す",
       "seatTimeout": "生徒としての参加ができませんでした。ボットだけで始めるか、もう一度試してください。",
       "botsOnly": "ボットだけで始める",
-      "retry": "もう一度試す"
+      "retry": "もう一度試す",
+      "skip": "ゲームへ進む",
+      "teacherView": "先生の画面",
+      "end": "練習を終了",
+      "backToClass": "クラスに戻る",
+      "seatRetry": "生徒の画面を読み込めませんでした。"
     },
     "round": {
       "boardLabel": "クラスの盤面",

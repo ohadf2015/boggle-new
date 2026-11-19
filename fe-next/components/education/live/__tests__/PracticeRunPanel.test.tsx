@@ -1,90 +1,113 @@
-import React from 'react';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { act, render, screen, fireEvent } from '@testing-library/react';
-import { PRACTICE_SEAT_RETRY_EVENT } from '@/host/hooks/useRehearseAutoStart';
-import '@testing-library/jest-dom';
-import { PracticeRunPanel } from '@/components/education/live/PracticeRunPanel';
+import React from "react";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { act, render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import { Howler } from "howler";
+import { PRACTICE_NEEDS_BOARD_EVENT, PRACTICE_SEAT_RETRY_EVENT, PRACTICE_SEAT_TIMEOUT_MS, PRACTICE_SKIP_TO_GAME_EVENT } from "@/host/hooks/useRehearseAutoStart";
+import { PracticeRunPanel } from "@/components/education/live/PracticeRunPanel";
+
+vi.mock("howler", () => ({ Howler: { mute: vi.fn() } }));
 
 const t = (key: string) => key;
 
-function setViewport(wide: boolean) {
-  window.matchMedia = ((query: string) => ({
-    matches: wide && query.includes('min-width: 1024px'),
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => false,
-  })) as unknown as typeof window.matchMedia;
+function Panel(props: Partial<React.ComponentProps<typeof PracticeRunPanel>>) {
+  return <PracticeRunPanel gameCode="AB12CD" language="he" joined started={false} ended={false} open onOpenChange={vi.fn()} onExit={vi.fn()} t={t} {...props} />;
 }
 
-describe('PracticeRunPanel on a phone', () => {
-  beforeEach(() => setViewport(false));
+describe("PracticeRunPanel", () => {
+  beforeEach(() => vi.clearAllMocks());
 
-  it('given a phone, then no student page loads in a hidden frame; the card offers a new tab instead', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined={false} t={t} />);
-    expect(screen.queryByTestId('practice-run-frame')).toBeNull();
-    expect(screen.queryByTestId('practice-run-panel')).toBeNull();
-    expect(screen.getByTestId('practice-run-open-tab')).toHaveAttribute('href', '/en/education/live?room=AB12CD&practiceSeat=1');
+  it("given a practice run, then the real student page fills the screen as a practice seat, with no new-tab detour", () => {
+    render(<Panel />);
+    expect(screen.getByTestId("practice-run-frame")).toHaveAttribute("src", "/he/education/live?room=AB12CD&practiceSeat=1");
+    expect(screen.getByTestId("practice-run-panel").className).toContain("inset-0");
+    expect(screen.queryByTestId("practice-run-open-tab")).toBeNull();
   });
 
-  it('given a phone, then the practice card sits above the fixed teacher bar instead of under it', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
-    expect(screen.getByTestId('practice-run-card').className).toContain('--lc-teacher-bar-h');
-  });
-});
-
-describe('PracticeRunPanel', () => {
-  beforeEach(() => setViewport(true));
-
-  it('given a practice run, when the board opens, then the student page sits beside it as a practice seat, never a host page', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="he" joined={false} t={t} />);
-    const frame = screen.getByTestId('practice-run-frame');
-    expect(frame).toHaveAttribute('src', '/he/education/live?room=AB12CD&practiceSeat=1');
-    expect(frame.getAttribute('src')).not.toContain('host=1');
-    expect(screen.getAllByTestId('practice-run-open-tab')[0]).toHaveAttribute('href', '/he/education/live?room=AB12CD&practiceSeat=1');
-    expect(screen.getAllByTestId('practice-run-status')[0]).toHaveTextContent('eduLiveRoom.practice.joining');
+  it("given the teacher switches to the teacher view, then the student game stays loaded and one button brings it back", () => {
+    const onOpenChange = vi.fn();
+    const { rerender } = render(<Panel onOpenChange={onOpenChange} />);
+    const frame = screen.getByTestId("practice-run-frame");
+    fireEvent.click(screen.getByTestId("practice-run-teacher-view"));
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    rerender(<Panel open={false} onOpenChange={onOpenChange} />);
+    expect(screen.getByTestId("practice-run-frame")).toBe(frame);
+    expect(screen.getByTestId("practice-run-panel").className).toContain("hidden");
+    fireEvent.click(screen.getByTestId("practice-run-show"));
+    expect(onOpenChange).toHaveBeenCalledWith(true);
   });
 
-  it('given the practice seat joined, then the panel says so', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
-    expect(screen.getAllByTestId('practice-run-status')[0]).toHaveTextContent('eduLiveRoom.practice.joined');
+  it("given the student is in the lobby, then skip asks the room to start; before they join or once playing it is gone", () => {
+    const heard = vi.fn();
+    window.addEventListener(PRACTICE_SKIP_TO_GAME_EVENT, heard);
+    const { rerender } = render(<Panel />);
+    fireEvent.click(screen.getByTestId("practice-run-skip"));
+    expect(heard).toHaveBeenCalledTimes(1);
+    window.removeEventListener(PRACTICE_SKIP_TO_GAME_EVENT, heard);
+    rerender(<Panel joined={false} />);
+    expect(screen.queryByTestId("practice-run-skip")).toBeNull();
+    rerender(<Panel started />);
+    expect(screen.queryByTestId("practice-run-skip")).toBeNull();
   });
 
-  it('given the teacher hides the student view, then one button brings it back', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
-    fireEvent.click(screen.getAllByTestId('practice-run-hide')[0]);
-    expect(screen.queryByTestId('practice-run-frame')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('practice-run-show'));
-    expect(screen.getByTestId('practice-run-frame')).toBeInTheDocument();
+  it("given the round is over, then the way out reads as going back to the class", () => {
+    const onExit = vi.fn();
+    render(<Panel started ended onExit={onExit} />);
+    const exit = screen.getByTestId("practice-run-exit");
+    expect(exit).toHaveTextContent("eduLiveRoom.practice.backToClass");
+    fireEvent.click(exit);
+    expect(onExit).toHaveBeenCalledTimes(1);
   });
 
-  it('given the practice run, then it shows one status and the student view, with no step list, body copy or QR to read first', () => {
-    const { container } = render(<PracticeRunPanel gameCode="AB12CD" language="en" joined={false} t={t} />);
-    expect(container.textContent).not.toMatch(/eduLiveRoom\.practice\.(step\d|body|phoneTitle|phoneHint)/);
-    expect(container.querySelector('svg[role="img"], canvas')).toBeNull();
-    expect(container.querySelectorAll('svg path[d^="M0 0h"]').length).toBe(0);
+  it("given the student view is showing, then the hidden board stays silent, and its sound returns with the teacher view", () => {
+    const { rerender } = render(<Panel />);
+    expect(Howler.mute).toHaveBeenLastCalledWith(true);
+    rerender(<Panel open={false} />);
+    expect(Howler.mute).toHaveBeenLastCalledWith(false);
   });
 
-  it('given the wide panel, then its status sits under the title, clear of the page sound button in the top corner', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
-    const header = document.getElementById('practice-run-title')?.parentElement as HTMLElement;
-    expect(header.className).toContain('flex-col');
+  it("given the round cannot start, then the teacher view opens so its explanation is visible", () => {
+    const onOpenChange = vi.fn();
+    render(<Panel onOpenChange={onOpenChange} />);
+    act(() => { window.dispatchEvent(new Event(PRACTICE_NEEDS_BOARD_EVENT)); });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('given the seat timed out and the teacher tries again, then the student page reloads', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined={false} t={t} />);
-    const before = screen.getByTestId('practice-run-frame');
-    act(() => {
-      window.dispatchEvent(new Event(PRACTICE_SEAT_RETRY_EVENT));
+  describe("when the student page never joins", () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it("given the timeout, then the teacher sees a retry that reloads the student page", () => {
+      render(<Panel joined={false} />);
+      const before = screen.getByTestId("practice-run-frame");
+      expect(screen.queryByTestId("practice-run-retry")).toBeNull();
+      act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
+      fireEvent.click(screen.getByTestId("practice-run-retry"));
+      expect(screen.getByTestId("practice-run-frame")).not.toBe(before);
+      expect(screen.queryByTestId("practice-run-retry")).toBeNull();
     });
-    expect(screen.getByTestId('practice-run-frame')).not.toBe(before);
-  });
 
-  it('given a wide screen, then only the side panel renders, not a second hidden phone card', () => {
-    render(<PracticeRunPanel gameCode="AB12CD" language="en" joined t={t} />);
-    expect(screen.queryByTestId('practice-run-card')).toBeNull();
+    it("given the timeout, then the teacher can reach the board and its bots-only start", () => {
+      const onOpenChange = vi.fn();
+      render(<Panel joined={false} onOpenChange={onOpenChange} />);
+      act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
+      fireEvent.click(screen.getByTestId("practice-run-timeout-teacher-view"));
+      expect(onOpenChange).toHaveBeenCalledWith(false);
+    });
+
+    it("given a seat that joined late and then dropped, then the wait starts over instead of failing at once", () => {
+      const { rerender } = render(<Panel joined={false} />);
+      act(() => { vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS); });
+      rerender(<Panel joined />);
+      rerender(<Panel joined={false} />);
+      expect(screen.queryByTestId("practice-run-retry")).toBeNull();
+    });
+
+    it("given the board asks for a retry, then the student page reloads", () => {
+      render(<Panel joined={false} />);
+      const before = screen.getByTestId("practice-run-frame");
+      act(() => { window.dispatchEvent(new Event(PRACTICE_SEAT_RETRY_EVENT)); });
+      expect(screen.getByTestId("practice-run-frame")).not.toBe(before);
+    });
   });
 });

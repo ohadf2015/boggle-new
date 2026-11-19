@@ -25,7 +25,7 @@ import { LobbySettingsSummary } from '@/components/multiplayer/lobby/LobbySettin
 import { readLocalGameMode } from '@/components/education/lobby/useClassroomModeSwitch';
 import { modeAllowsRehearsalBots, realStudentCount, type RehearseIntent, type RehearsalSource } from '@/lib/education/rehearsal';
 import { trackEduRehearsalStarted } from '@/lib/education/rehearsalTelemetry';
-import { useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
+import { PRACTICE_NEEDS_BOARD_EVENT, useRehearseAutoStart } from '../../hooks/useRehearseAutoStart';
 import { PracticeSeatTimeoutNotice } from '@/components/education/live/PracticeSeatTimeoutNotice';
 import { PRACTICE_BOTS_FALLBACK_KEY, practiceBotsRefusalKey, usePracticeBotsRefusal } from '@/components/education/lobby/practiceBotsRefusal';
 
@@ -215,6 +215,9 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
     }, SOLO_DEMO_FILL_TIMEOUT_MS);
     return () => clearTimeout(timeout);
   }, [soloDemoInProgress]);
+  useEffect(() => {
+    if (soloDemoFailed) window.dispatchEvent(new Event(PRACTICE_NEEDS_BOARD_EVENT));
+  }, [soloDemoFailed]);
   const failSoloDemo = (key: string) => {
     setSoloDemoInProgress(false);
     setSoloDemoCallback(null);
@@ -244,12 +247,13 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   };
 
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
-  const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
+  const practiceSeat = playersReady.find((p): p is Exclude<typeof p, string> => typeof p === 'object' && p.isPractice === true && !p.disconnected);
   const practiceRun = useRehearseAutoStart({
     gameCode,
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
-    practiceSeated,
+    practiceSeated: !!practiceSeat,
+    practiceReady: !!practiceSeat && readyUsernames.includes(practiceSeat.username),
     botsAllowed: modeAllowsRehearsalBots(readLocalGameMode() ?? classroomGameMode),
     start: handleSoloDemoClick,
   });

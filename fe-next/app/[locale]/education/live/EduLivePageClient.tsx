@@ -61,6 +61,8 @@ function EduLiveRoom(): React.JSX.Element {
   const isTeacher = s.isHost || s.isClassroomHost;
   const practiceRoom = isTeacher && readClassroomLiveFlags(pathname, searchParams).isPracticeRun ? s.gameCode || urlRoom : null;
   const practiceJoined = s.playersInRoom.some((p) => p.isPractice === true);
+  const [practiceViewOpen, setPracticeViewOpen] = React.useState(true);
+  const studentView = !!practiceRoom && practiceViewOpen;
 
   const leaveFromBanner = () => {
     if (isTeacher) {
@@ -76,14 +78,14 @@ function EduLiveRoom(): React.JSX.Element {
       <MpExitProvider value={s.exitMp}>
         <ErrorBoundary>
           <div data-testid="edu-live-root" tabIndex={-1} className="flex w-full min-h-0 flex-1 flex-col overflow-x-clip bg-neo-navy">
-            {s.isActive ? <ConnectionBanner showScoreSafe onLeaveGame={leaveFromBanner} /> : <ConnectionDot />}
+            {s.isActive ? <ConnectionBanner showScoreSafe onLeaveGame={leaveFromBanner} /> : !studentView && <ConnectionDot />}
             {s.isActive && s.isConnected && (
               <div className="pointer-events-none fixed end-2 top-14 z-40">
                 <ConnectionQualityChip />
               </div>
             )}
-            <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-              <div className="flex min-h-0 min-w-0 flex-1 flex-col" style={s.classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div inert={studentView} className="flex min-h-0 min-w-0 flex-1 flex-col" style={s.classroomAccessibility?.largeText ? { zoom: 1.2 } : undefined}>
                 <EduLivePhaseRouter
                   routerProps={s.routerProps}
                   urlRoom={urlRoom || s.gameCode || null}
@@ -94,7 +96,17 @@ function EduLiveRoom(): React.JSX.Element {
                 />
               </div>
               {practiceRoom && (
-                <PracticeRunPanel gameCode={practiceRoom} language={s.language} joined={practiceJoined} t={s.t as (key: string, params?: Record<string, string | number>) => string} />
+                <PracticeRunPanel
+                  gameCode={practiceRoom}
+                  language={s.language}
+                  joined={practiceJoined}
+                  started={s.gameActive || s.showResults}
+                  ended={s.showResults}
+                  open={practiceViewOpen}
+                  onOpenChange={setPracticeViewOpen}
+                  onExit={() => { s.handleExitToLobby(); }}
+                  t={s.t as (key: string, params?: Record<string, string | number>) => string}
+                />
               )}
             </div>
             {isTeacher && !s.showResults && (
@@ -102,9 +114,8 @@ function EduLiveRoom(): React.JSX.Element {
             )}
             {s.isActive && s.gameActive && !s.showResults && s.isPaused && <GamePausedOverlay isHost={s.isHost} />}
             {s.isActive && s.gameActive && !s.showResults && <StudentWordBank level={s.classroomLevel} words={s.classroomWordBank} me={isTeacher ? undefined : s.username} />}
-            {s.teacherStrip.visible && (
+            {s.teacherStrip.visible && !studentView && (
               <TeacherLiveControls
-                sidePanelOpen={!!practiceRoom}
                 isPaused={s.isPaused || s.teacherStrip.quizPaused} gameMode={s.liveGameMode} isQuizRound={s.teacherStrip.quizRound}
                 onPause={s.pauseGame} onResume={s.resumeGame} onExtendTime={s.extendTime}
                 onEndRound={s.endRoundNow} onSkipWord={s.skipTargetWord}
