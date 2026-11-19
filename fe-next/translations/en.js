@@ -21405,15 +21405,16 @@ const en = {
     "practice": {
       "seatName": "Practice student",
       "title": "Try it as a student",
-      "joining": "Joining as a student…",
-      "joined": "You're in. Play right here.",
-      "openTab": "Open in a new tab",
-      "hide": "Hide",
       "show": "Try it as a student",
       "frameTitle": "Try it as a student",
       "seatTimeout": "Your student seat didn't join. Start with bots only, or try again.",
       "botsOnly": "Start with bots only",
-      "retry": "Try again"
+      "retry": "Try again",
+      "skip": "Skip to the game",
+      "teacherView": "Teacher view",
+      "end": "End practice",
+      "backToClass": "Back to my class",
+      "seatRetry": "Your student screen didn't load."
     },
     "round": {
       "boardLabel": "Class board",

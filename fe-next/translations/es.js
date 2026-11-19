@@ -22396,15 +22396,16 @@ const es = {
     "practice": {
       "seatName": "Estudiante de práctica",
       "title": "Pruébalo como estudiante",
-      "joining": "Entrando como estudiante…",
-      "joined": "¡Ya estás dentro! Juega aquí.",
-      "openTab": "Abrir en una pestaña nueva",
-      "hide": "Ocultar",
       "show": "Pruébalo como estudiante",
       "frameTitle": "Pruébalo como estudiante",
       "seatTimeout": "Tu puesto de estudiante no entró. Empieza solo con bots o inténtalo otra vez.",
       "botsOnly": "Empezar solo con bots",
-      "retry": "Reintentar"
+      "retry": "Reintentar",
+      "skip": "Ir al juego",
+      "teacherView": "Vista de docente",
+      "end": "Terminar la práctica",
+      "backToClass": "Volver a mi clase",
+      "seatRetry": "No se cargó tu pantalla de alumno."
     },
     "round": {
       "boardLabel": "Tablero de la clase",

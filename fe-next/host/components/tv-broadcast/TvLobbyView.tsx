@@ -244,12 +244,13 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
   };
 
   const hostSeated = playersReady.some((p) => (typeof p === 'string' ? p === username : p.isHost || p.username === username));
-  const practiceSeated = playersReady.some((p) => typeof p === 'object' && p.isPractice === true && !p.disconnected);
+  const practiceSeat = playersReady.find((p): p is Exclude<typeof p, string> => typeof p === 'object' && p.isPractice === true && !p.disconnected);
   const practiceRun = useRehearseAutoStart({
     gameCode,
     enabled: isClassroomMode && !!onStartSoloDemoWithBots,
     hostSeated,
-    practiceSeated,
+    practiceSeated: !!practiceSeat,
+    practiceReady: !!practiceSeat && readyUsernames.includes(practiceSeat.username),
     botsAllowed: modeAllowsRehearsalBots(readLocalGameMode() ?? classroomGameMode),
     start: handleSoloDemoClick,
   });

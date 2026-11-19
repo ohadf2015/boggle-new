@@ -22384,15 +22384,16 @@ const sv = {
     "practice": {
       "seatName": "Övningselev",
       "title": "Testa som elev",
-      "joining": "Går med som elev…",
-      "joined": "Du är med! Spela här.",
-      "openTab": "Öppna i ny flik",
-      "hide": "Dölj",
       "show": "Testa som elev",
       "frameTitle": "Testa som elev",
       "seatTimeout": "Din elevplats kom inte in. Starta med bara bottar eller försök igen.",
       "botsOnly": "Starta med bara bottar",
-      "retry": "Försök igen"
+      "retry": "Försök igen",
+      "skip": "Hoppa till spelet",
+      "teacherView": "Lärarvy",
+      "end": "Avsluta övningen",
+      "backToClass": "Tillbaka till klassen",
+      "seatRetry": "Elevskärmen kunde inte laddas."
     },
     "round": {
       "boardLabel": "Klassens bräde",

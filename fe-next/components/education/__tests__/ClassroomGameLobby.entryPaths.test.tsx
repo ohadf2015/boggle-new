@@ -98,11 +98,12 @@ describe('ClassroomGameLobby: both entry paths launch through the one launcher',
     await waitFor(() => expect(stableRouter.replace).toHaveBeenCalledWith(expect.stringContaining('/en/')));
   });
 
-  it('Given a rehearse tap\'s lobby, When GO LIVE is tapped, Then the room is created as a rehearsal', async () => {
+  it('Given a rehearse tap, Then the room opens by itself as a rehearsal, once, with no second Start tap', async () => {
     const entry = writeRehearseIntent({ source: 'hq', classExists: true });
     render(<ClassroomGameLobby quick rehearseEntry={entry} initialClassroomId="class-2" initialLessonId="lesson-2" initialMode="classic" onBack={vi.fn()} />);
-    await screen.findByTestId('lobby-go-live');
-    const payload = (await tapGoLiveAndConfirm()) as unknown as { settings: { rehearsal?: boolean } };
+    await waitFor(() => expect(creates()).toHaveLength(1));
+    expect(screen.queryByTestId('lobby-go-live')).not.toBeInTheDocument();
+    const [, payload] = creates()[0] as [string, { settings: { rehearsal?: boolean } }];
     expect(payload.settings.rehearsal).toBe(true);
   });
 

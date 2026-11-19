@@ -15,7 +15,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { StarterPacksSection } from '@/components/teacher/StarterPacksSection';
 import { socketTeacherName } from '@/lib/education/classroomGameHandoff';
 import { classroomLivePath } from '@/lib/education/classroomLivePath';
-import { peekRehearseIntent } from '@/lib/education/rehearsal';
+import { peekRehearseIntent, rehearseLaunchPending } from '@/lib/education/rehearsal';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
 import { cefrLessonPack, type CefrLevel } from '@/lib/education/eslCefrDemo';
 import { VOCAB_QUIZ_MODE, type ClassroomGameMode } from '@/shared/types/vocabQuiz';
@@ -263,6 +263,8 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
   );
 
   const goLive = () => startGame(gameMode, vocabQuizVariant, classroomBossId);
+  const [rehearsePending] = useState(() => rehearseLaunchPending(rehearseEntry));
+  const autoLaunched = useRef(false);
 
   // Why GO LIVE is greyed, said before the tap (pitfall class 4).
   const blockedKey = cannotStart
@@ -273,8 +275,15 @@ export function ClassroomGameLobby({ initialLessonId, initialClassroomId, initia
         ? WORDCRAFT_BLOCK_GO_LIVE_KEY[wordcraftBlock]
         : null;
 
+  const autoLaunching = rehearsePending && !startError && !cannotStart && !blockedKey;
+  useEffect(() => {
+    if (!autoLaunching || autoLaunched.current || isLoading || repeatPending || sessionPending || proLoading) return;
+    autoLaunched.current = true;
+    goLive();
+  });
+
   // `repeatPending` gates paint: the restored list decides which poster leads (pitfall class 1).
-  if (roomCreatedGameCode || isLoading || repeatPending || sessionPending) {
+  if (roomCreatedGameCode || isLoading || repeatPending || sessionPending || autoLaunching) {
     return <PageLoader text={t('teacher.classroom.settingUp')} size="lg" nested />;
   }
 

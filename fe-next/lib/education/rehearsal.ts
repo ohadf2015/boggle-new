@@ -65,6 +65,17 @@ export function peekRehearseIntentForRoom(gameCode: string, now = Date.now()): R
   }
 }
 
+/** This tap has not opened its room yet, so its lobby launches by itself; a reload after the launch finds it claimed. */
+export function rehearseLaunchPending(entry: string | null | undefined, now = Date.now()): boolean {
+  if (!entry || !peekRehearseIntent(now)) return false;
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(INTENT_KEY) ?? '{}') as { entry?: unknown; gameCode?: unknown };
+    return parsed.entry === entry && parsed.gameCode === undefined;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Bind the intent to the room it launches. Only the launch that came from the rehearse tap
  * (same entry) claims it; any other launch, or a second room, finds an abandoned intent and clears it.

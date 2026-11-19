@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { writeRehearseIntent, peekRehearseIntent, claimRehearseIntentForLaunch, type RehearseIntent } from '@/lib/education/rehearsal';
-import { PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
+import { PRACTICE_SKIP_TO_GAME_EVENT, PRACTICE_SEAT_TIMEOUT_MS, useRehearseAutoStart } from '../useRehearseAutoStart';
 
 function armRehearsal(intent: RehearseIntent, gameCode = 'ROOM1') {
   claimRehearseIntentForLaunch(gameCode, writeRehearseIntent(intent));
@@ -56,18 +56,38 @@ describe('useRehearseAutoStart', () => {
     expect(start).not.toHaveBeenCalled();
     expect(peekRehearseIntent()).toBeNull();
   });
-  it('Given a practice run, When the host is seated but the teacher has not joined as a student yet, Then the round waits for that seat', () => {
+  it('Given a practice run, When the teacher joins as a student, Then the round waits until that student presses READY', () => {
     armRehearsal({ source: 'hq', classExists: true, withSeat: true });
     const start = vi.fn();
-    const { rerender } = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
-      initialProps: { practiceSeated: false },
+    const { rerender } = renderHook((p: { practiceSeated: boolean; practiceReady: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, practiceReady: p.practiceReady, botsAllowed: true, start }), {
+      initialProps: { practiceSeated: false, practiceReady: false },
     });
+    expect(start).not.toHaveBeenCalled();
+
+    rerender({ practiceSeated: true, practiceReady: false });
     expect(start).not.toHaveBeenCalled();
     expect(peekRehearseIntent()).not.toBeNull();
 
-    rerender({ practiceSeated: true });
+    rerender({ practiceSeated: true, practiceReady: true });
     expect(start).toHaveBeenCalledTimes(1);
     expect(start).toHaveBeenCalledWith({ source: 'hq', classExists: true, withSeat: true });
+  });
+
+  it('Given a seated teacher still in the pre-game practice, When they skip to the game, Then the round starts once', () => {
+    armRehearsal({ source: 'hq', classExists: true, withSeat: true });
+    const start = vi.fn();
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: true, practiceReady: false, botsAllowed: true, start }));
+    act(() => { window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT)); });
+    act(() => { window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT)); });
+    expect(start).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given the student seat has not joined, When skip is pressed, Then nothing starts without the teacher in the room', () => {
+    armRehearsal({ source: 'hq', classExists: true, withSeat: true });
+    const start = vi.fn();
+    renderHook(() => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: false, practiceReady: false, botsAllowed: true, start }));
+    act(() => { window.dispatchEvent(new Event(PRACTICE_SKIP_TO_GAME_EVENT)); });
+    expect(start).not.toHaveBeenCalled();
   });
 
   describe('when the practice seat never joins', () => {
@@ -77,8 +97,8 @@ describe('useRehearseAutoStart', () => {
     const run = (practiceSeated = false) => {
       armRehearsal({ source: 'hq', classExists: true, withSeat: true });
       const start = vi.fn();
-      const hook = renderHook((p: { practiceSeated: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, botsAllowed: true, start }), {
-        initialProps: { practiceSeated },
+      const hook = renderHook((p: { practiceSeated: boolean; practiceReady?: boolean }) => useRehearseAutoStart({ gameCode: 'ROOM1', enabled: true, hostSeated: true, practiceSeated: p.practiceSeated, practiceReady: p.practiceReady, botsAllowed: true, start }), {
+        initialProps: { practiceSeated } as { practiceSeated: boolean; practiceReady?: boolean },
       });
       return { start, ...hook };
     };
@@ -106,7 +126,7 @@ describe('useRehearseAutoStart', () => {
       act(() => vi.advanceTimersByTime(PRACTICE_SEAT_TIMEOUT_MS));
       act(() => result.current.retry());
       expect(result.current.seatTimedOut).toBe(false);
-      rerender({ practiceSeated: true });
+      rerender({ practiceSeated: true, practiceReady: true });
       expect(start).toHaveBeenCalledTimes(1);
     });
 
