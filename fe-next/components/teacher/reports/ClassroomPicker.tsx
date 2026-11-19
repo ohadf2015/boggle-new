@@ -88,33 +88,3 @@ export function ClassroomPicker({
     </ul>
   );
 }
-
-/** Class report header: the picker's badge carried over so the drill-down reads as one object. */
-export function ClassHero({ name, memberCount }: { name: string; memberCount?: number }) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      initial={reduce ? false : { opacity: 0, scale: 0.97 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={SPRING}
-      className="flex items-center gap-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-3 shadow-hard sm:gap-4 sm:p-4"
-    >
-      <span
-        aria-hidden="true"
-        className="grid size-12 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/50 bg-neo-navy font-neo-display text-xl font-black text-neo-cream sm:size-14 sm:text-2xl"
-      >
-        <bdi>{classBadge(name)}</bdi>
-      </span>
-      <div className="min-w-0 flex-1">
-        <h1 className="break-words font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">
-          <bdi>{name}</bdi>
-        </h1>
-        {typeof memberCount === 'number' && (
-          <span className="mt-1.5 block">
-            <StudentCount count={memberCount} />
-          </span>
-        )}
-      </div>
-    </m.div>
-  );
-}

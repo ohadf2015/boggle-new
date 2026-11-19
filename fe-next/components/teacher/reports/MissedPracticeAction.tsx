@@ -29,11 +29,14 @@ export function MissedPracticeAction({
   classroomName,
   locked,
   words,
+  hero = false,
 }: {
   classroomId: string;
   classroomName: string;
   locked: boolean;
   words?: string[];
+  /** The screen's main action: full width, with its explanation inside the button. */
+  hero?: boolean;
 }) {
   const { t, language } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -113,25 +116,32 @@ export function MissedPracticeAction({
             </ol>
           </m.div>
         ) : (
-          <m.div key="cta" className="flex flex-wrap items-center gap-3">
+          <m.div key="cta" className={hero ? undefined : 'flex flex-wrap items-center gap-3'}>
             <button
               type="button"
               onClick={assign}
               disabled={status.kind === 'saving'}
               className={cn(
-                'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard',
+                hero
+                  ? 'flex min-h-16 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 py-3 text-start font-neo-display text-xl font-black text-neo-black shadow-hard'
+                  : 'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-4 py-2 font-neo-display text-sm font-black text-neo-black shadow-hard',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-70',
                 PRESS,
               )}
             >
               {status.kind === 'saving' ? (
-                <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+                <Loader2 className={cn(hero ? 'size-6' : 'size-4', 'shrink-0 animate-spin motion-reduce:animate-none')} aria-hidden="true" />
               ) : (
-                <Sparkles className="size-4" aria-hidden="true" />
+                <Sparkles className={cn(hero ? 'size-6' : 'size-4', 'shrink-0')} aria-hidden="true" />
               )}
-              {status.kind === 'saving' ? t('eduPro.practice.assigning') : t('eduPro.practice.cta')}
+              {hero ? (
+                <span className="min-w-0">
+                  <span className="block">{status.kind === 'saving' ? t('eduPro.practice.assigning') : t('eduPro.practice.cta')}</span>
+                  <span className="block font-neo-body text-xs font-bold leading-snug text-neo-black/75 sm:text-sm">{t('eduPro.practice.hint')}</span>
+                </span>
+              ) : status.kind === 'saving' ? t('eduPro.practice.assigning') : t('eduPro.practice.cta')}
             </button>
-            <span className="text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>
+            {hero ? null : <span className="text-xs font-bold text-neo-cream/70">{t('eduPro.practice.hint')}</span>}
           </m.div>
         )}
       </AnimatePresence>

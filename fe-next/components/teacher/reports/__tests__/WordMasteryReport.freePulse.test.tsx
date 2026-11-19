@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { buildClassMastery } from '@/lib/education/wordMasteryTrend';
 import { buildWordMasteryReport, toFreePreview } from '@/lib/education/wordMasteryReport';
 
@@ -16,7 +16,7 @@ vi.mock('@/utils/authFetch', () => ({
   getWithAuth: (url: string, init?: RequestInit) => fetch(url, init),
   fetchWithAuth: (url: string, init?: RequestInit) => fetch(url, init),
 }));
-vi.mock('@/lib/supabase/education/classrooms', () => ({ getClassroomStudents: vi.fn() }));
+vi.mock('@/lib/supabase/education/classrooms', () => ({ getClassroomStudents: vi.fn(async () => ({ data: [] })) }));
 
 import { WordMasteryReport } from '../WordMasteryReport';
 
@@ -59,11 +59,12 @@ describe('WordMasteryReport: the class pulse summary is free', () => {
     expect(await heading()).not.toHaveTextContent('eduPro.mastery.proBadge');
   });
 
-  it('Given a Pro teacher, Then the full report keeps its PRO badge', async () => {
+  it('Given a Pro teacher, Then the full report spends no space on a PRO badge', async () => {
     const report = buildWordMasteryReport(
       buildClassMastery([{ studentId: 'a', startedAt: '2026-09-01T10:00:00Z', results: { gameCode: 'G', lessonWordsAsked: words(4), lessonWordsFound: [] } }]),
     );
     renderWith(200, { ok: true, locked: false, report, insights: null });
-    await waitFor(async () => expect(await heading()).toHaveTextContent('eduPro.mastery.proBadge'));
+    await screen.findByTestId('mastery-stat-accuracy');
+    expect(await heading()).not.toHaveTextContent('eduPro.mastery.proBadge');
   });
 });

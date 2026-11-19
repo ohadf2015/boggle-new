@@ -17,7 +17,6 @@ import { ReportShareActions, ReportPrintStyles, buildReportSummary } from './Rep
 import { ReportEmptyState } from './ReportEmptyState';
 import type { ClassInsights, WordState } from './classInsights';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
-import { ProBadge } from '@/components/ui/ProBadge';
 
 export interface WordMasteryReportProps {
   classroomId: string;
@@ -73,7 +72,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   const notFound = notFoundWords.length > 0 ? <NotFoundBlock words={notFoundWords} /> : null;
   if (totals.sessions === 0) {
     return (
-      <Shell pro={state.status === 'ready' && notFound !== null}>
+      <Shell>
         {notFound ?? <ReportEmptyState classroomId={classroomId} />}
       </Shell>
     );
@@ -116,7 +115,7 @@ export function WordMasteryReport({ classroomId, classroomName, onStudentClick }
   const summary = () => buildReportSummary({ t, classroomName, report, insights, names });
 
   return (
-    <Shell pro actions={<ReportShareActions summary={summary} />}>
+    <Shell actions={<ReportShareActions summary={summary} />}>
       <div className="space-y-4">
         <MasteryStatCards totals={totals} insights={insights} />
         {insights ? (
@@ -235,7 +234,7 @@ function NotFoundBlock({ words }: { words: HardWord[] }) {
   );
 }
 
-function Shell({ children, pro = false, actions }: { children: React.ReactNode; pro?: boolean; actions?: React.ReactNode }) {
+function Shell({ children, actions }: { children: React.ReactNode; actions?: React.ReactNode }) {
   const { t } = useLanguage();
   return (
     <section
@@ -247,12 +246,7 @@ function Shell({ children, pro = false, actions }: { children: React.ReactNode; 
       {actions && <ReportPrintStyles />}
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="min-w-0">
-          <h2 className="flex items-center gap-2 font-neo-display text-xl font-bold text-neo-white sm:text-2xl">
-            {t('eg2Rep.report.title')}
-            {pro && (
-              <ProBadge data-testid="mastery-pro-badge" size="xs" label={t('eduPro.mastery.proBadge')} />
-            )}
-          </h2>
+          <h2 className="font-neo-display text-xl font-bold text-neo-white sm:text-2xl">{t('eg2Rep.report.title')}</h2>
           <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
         </div>
         {actions}

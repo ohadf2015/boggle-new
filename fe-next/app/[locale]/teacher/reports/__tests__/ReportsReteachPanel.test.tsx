@@ -33,8 +33,8 @@ vi.mock('@/components/teacher/reports/useWordMasteryReport', () => ({
 }));
 
 vi.mock('@/components/teacher/reports/MissedPracticeAction', () => ({
-  MissedPracticeAction: ({ words }: { words?: string[] }) => (
-    <button type="button" data-testid="missed-practice" data-words={(words ?? []).join(',')}>
+  MissedPracticeAction: ({ words, hero }: { words?: string[]; hero?: boolean }) => (
+    <button type="button" data-testid="missed-practice" data-hero={String(!!hero)} data-words={(words ?? []).join(',')}>
       practice
     </button>
   ),
@@ -85,7 +85,7 @@ describe('ReportsReteachPanel', () => {
 
   it('given a class that played, when shown, then it lists its missed words with miss rates and who needs help', () => {
     snapshotState.value = { status: 'ready', snapshot: real() };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     const panel = screen.getByTestId('reports-reteach-panel');
     expect(within(panel).queryByTestId('reteach-example-pill')).toBeNull();
     const rows = within(panel).getAllByTestId('reteach-word');
@@ -97,13 +97,13 @@ describe('ReportsReteachPanel', () => {
 
   it('given a Latin class name in a Hebrew sentence, when shown, then the name is bidi-isolated so its digits stay in place', () => {
     snapshotState.value = { status: 'ready', snapshot: real() };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     expect(screen.getByTestId('reports-reteach-panel')).toHaveTextContent('Words ⁨Grade 4 Room 12⁩ missed most');
   });
 
   it('given five students below the goal, when shown, then three names fit one row and the rest is a count', () => {
     snapshotState.value = { status: 'ready', snapshot: real({ needsHelp: ['s1', 's2', 's3', 's4', 's5'] }) };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     const help = screen.getByTestId('reteach-needs-help');
     expect(help).toHaveTextContent('Maya');
     expect(help).toHaveTextContent('Noa');
@@ -114,28 +114,29 @@ describe('ReportsReteachPanel', () => {
   it('given the roster has not loaded, when shown, then no bare "+N more" stands in for the names', () => {
     roster.names = {};
     snapshotState.value = { status: 'ready', snapshot: real({ needsHelp: ['s1', 's2', 's3', 's4', 's5'] }) };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     expect(screen.getByTestId('reteach-needs-help')).not.toHaveTextContent(/more/);
   });
 
   it('given the practice tap, when pressed, then edu_reteach_started fires from reports', async () => {
     snapshotState.value = { status: 'ready', snapshot: real() };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     await userEvent.click(screen.getByTestId('missed-practice'));
     expect(tracked).toHaveBeenCalledWith({ surface: 'reports', words: 2, plan: 'free' });
   });
 
-  it('given the secondary action, when pressed, then it opens that class report', async () => {
-    const onOpenClass = vi.fn();
+  it('given a class that played, when shown, then practice is the only action in the panel', () => {
     snapshotState.value = { status: 'ready', snapshot: real() };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={onOpenClass} />);
-    await userEvent.click(screen.getByTestId('reteach-open-class'));
-    expect(onOpenClass).toHaveBeenCalledWith('c1');
+    render(<ReportsReteachPanel classrooms={classes} />);
+    const panel = screen.getByTestId('reports-reteach-panel');
+    expect(within(panel).getAllByRole('button')).toHaveLength(1);
+    expect(within(panel).queryAllByRole('link')).toHaveLength(0);
+    expect(within(panel).getByTestId('missed-practice')).toHaveAttribute('data-hero', 'true');
   });
 
   it('given a free answer, when shown, then who needs help is a labelled Pro preview and practice starts a game', () => {
     snapshotState.value = { status: 'ready', snapshot: real({ locked: true, needsHelp: [] }) };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     const help = screen.getByTestId('reteach-needs-help');
     expect(within(help).getByTestId('pro-pill')).toBeInTheDocument();
     expect(screen.queryByTestId('missed-practice')).toBeNull();
@@ -144,7 +145,7 @@ describe('ReportsReteachPanel', () => {
 
   it('given no class has played, when shown, then a clearly labelled example shows what a report holds', () => {
     snapshotState.value = { status: 'ready', snapshot: null };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     const panel = screen.getByTestId('reports-reteach-panel');
     expect(within(panel).getByTestId('reteach-example-pill')).toHaveTextContent('Example');
     expect(within(panel).getAllByTestId('reteach-word').length).toBeGreaterThanOrEqual(3);
@@ -157,30 +158,21 @@ describe('ReportsReteachPanel', () => {
 
   it('given no classes at all, when shown, then the example has no action of its own', () => {
     snapshotState.value = { status: 'ready', snapshot: null };
-    render(<ReportsReteachPanel classrooms={[]} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={[]} />);
     expect(screen.getByTestId('reteach-example-pill')).toBeInTheDocument();
     expect(screen.queryByTestId('reteach-start-game')).toBeNull();
   });
 
   it('given evidence still loading, when shown, then the panel holds its space without fake words', () => {
     snapshotState.value = { status: 'loading' };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     expect(screen.getByTestId('reports-reteach-panel')).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryAllByTestId('reteach-word')).toHaveLength(0);
   });
 
-  it('given a class report, when focused on that class, then only it is read and the open-report action is gone', () => {
-    snapshotState.value = { status: 'ready', snapshot: real() };
-    const two = [...classes, { id: 'c2', name: 'Other', member_count: 9 }];
-    render(<ReportsReteachPanel classrooms={two} onOpenClass={vi.fn()} focusClassroomId="c1" />);
-    expect(hookInput).toHaveBeenLastCalledWith([classes[0]]);
-    expect(screen.queryByTestId('reteach-open-class')).toBeNull();
-    expect(screen.getByTestId('missed-practice')).toBeInTheDocument();
-  });
-
   it('given no class could be read, when shown, then nothing renders instead of a misleading example', () => {
     snapshotState.value = { status: 'error' };
-    render(<ReportsReteachPanel classrooms={classes} onOpenClass={vi.fn()} />);
+    render(<ReportsReteachPanel classrooms={classes} />);
     expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
     expect(screen.queryByTestId('reteach-example-pill')).toBeNull();
   });

@@ -40,6 +40,37 @@ export function StatusStrip({
   );
 }
 
+/** The status tiles' job in one line, for a class where most tiles would read 0. */
+export function StatusLine({
+  counts, active, onToggle,
+}: { counts: Record<StudentStatus, number>; active: StudentStatus | null; onToggle: (s: StudentStatus) => void }) {
+  const { t } = useLanguage();
+  return (
+    <div data-testid="overview-status-line" className="flex flex-wrap items-center gap-x-1 gap-y-1" role="group" aria-label={t('education.analytics.overview.statusTitle')}>
+      {STATUSES.filter((s) => counts[s] > 0).map((s) => {
+        const { icon: Icon, text } = STATUS_VIEW[s];
+        return (
+          <button
+            key={s}
+            type="button"
+            data-testid={`status-${s}`}
+            aria-pressed={active === s}
+            onClick={() => onToggle(s)}
+            className={cn(
+              'inline-flex min-h-11 items-center gap-1.5 rounded-neo px-2 font-neo-body text-base font-bold text-neo-cream hover:bg-neo-cream/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              active === s && 'ring-2 ring-neo-cream',
+            )}
+          >
+            <Icon aria-hidden className={cn('size-5 shrink-0', text)} />
+            <span className="font-neo-display font-black">{counts[s]}</span>
+            {t(`education.analytics.overview.status.${s}`)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function ActivityBars({ days, locale }: { days: DailyActive[]; locale: string }) {
   const max = Math.max(1, ...days.map((d) => d.count));
   return (

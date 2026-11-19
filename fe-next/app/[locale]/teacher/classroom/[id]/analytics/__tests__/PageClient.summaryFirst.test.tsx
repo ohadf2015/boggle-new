@@ -24,7 +24,7 @@ vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => teacherPro }));
 
 vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => null }));
 
-type OverviewProps = { openStudentId?: string | null; onOpenChange?: (id: string | null) => void };
+type OverviewProps = { classroomName?: string; surface?: string; openStudentId?: string | null; onOpenChange?: (id: string | null) => void };
 const overview: { props: OverviewProps } = { props: {} };
 vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
   ClassOverview: (props: OverviewProps) => {
@@ -49,7 +49,7 @@ vi.mock('@/components/teacher/reports/WordMasteryReport', () => ({
   ),
 }));
 vi.mock('@/lib/supabase/education/classrooms', () => ({
-  getClassroom: vi.fn(async () => ({ data: { id: 'classroom-1', name: 'Room 4' }, error: null })),
+  getClassroom: vi.fn(async () => ({ data: { id: 'classroom-1', name: 'Room 4', member_count: 7 }, error: null })),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
@@ -89,6 +89,22 @@ describe('analytics page: summary first, every control does something', () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
     await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Room 4'));
     expect(screen.getByText('teacher.classroom.cardClassReport')).toBeInTheDocument();
+  });
+
+  it('hands the summary the class name, so practice rounds are named after the class', async () => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    await waitFor(() => expect(overview.props.classroomName).toBe('Room 4'));
+    expect(overview.props.surface).toBe('class_report');
+  });
+
+  it('states the class size under the class name', async () => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(await screen.findByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members');
+  });
+
+  it.each(['pulse', 'students', 'lessons', 'words', 'homework'])('keeps the %s tab', (id) => {
+    render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
+    expect(screen.getByRole('tab', { name: `education.analytics.tabs.${id}` })).toBeInTheDocument();
   });
 
   it('shows no "live" box while no student is playing', () => {

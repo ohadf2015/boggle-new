@@ -36,14 +36,10 @@ import { AssignmentTrackingPanel } from '@/components/teacher/assignments';
 import { teacherAssignHref } from '@/hooks/useTeacherDashboardDeepLink';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { NeoButton } from '@/components/ui/button';
+import { ClassReportHeader } from '@/components/teacher/reports/ClassReportHeader';
 import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 import { cn } from '@/lib/utils';
 import { EducationShell } from '@/components/education/shell/EducationShell';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { OUTLINE_BUTTON } from '@/components/teacher/home/homeStyles';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -65,6 +61,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
   const [tab, setTab] = useState('pulse');
   const revealRef = useTeacherReveal<HTMLDivElement>();
   const [classroomName, setClassroomName] = useState('');
+  const [memberCount, setMemberCount] = useState<number | undefined>(undefined);
   const [openStudentId, setOpenStudentId] = useState<string | null>(null);
   const [weekStatus, setWeekStatus] = useState<FreeWeekStatus>('pending');
 
@@ -72,7 +69,9 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
     let cancelled = false;
     getClassroom(classroomId)
       .then(({ data }) => {
-        if (!cancelled && data?.name) setClassroomName(data.name);
+        if (cancelled || !data) return;
+        if (data.name) setClassroomName(data.name);
+        if (typeof data.member_count === 'number') setMemberCount(data.member_count);
       })
       .catch(() => {});
     return () => {
@@ -136,35 +135,25 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
 
   return (
     <div ref={revealRef} className="mx-auto max-w-7xl space-y-4 md:space-y-5">
-        <div data-tm className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
-          <button
-            type="button"
-            onClick={handleBackToClassroom}
-            title={t('eduShell.home.classPage')}
-            className={cn(OUTLINE_BUTTON, 'shrink-0 max-sm:size-11 max-sm:px-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan')}
+        <div data-tm>
+          <ClassReportHeader
+            eyebrow={t('teacher.classroom.cardClassReport', 'Class report')}
+            name={classroomName || t('education.analytics.title')}
+            memberCount={memberCount}
+            onBack={handleBackToClassroom}
+            link={{ href: teacherResultsHref(locale, classroomId), label: t('eduShell.home.allResults'), testId: 'analytics-results-hub' }}
           >
-            <DirectionalIcon icon={ArrowLeft} className="size-4" />
-            <span className="max-sm:sr-only">{t('eduShell.home.classPage')}</span>
-          </button>
-          <div className="min-w-0 flex-1">
-            <p className="font-neo-body text-sm font-bold text-neo-cream/70">{t('teacher.classroom.cardClassReport', 'Class report')}</p>
-            <h1 data-wipe className="font-neo-display text-2xl font-bold leading-tight text-neo-cream md:text-3xl">
-              <bdi>{classroomName || t('education.analytics.title')}</bdi>
-            </h1>
-          </div>
-          <NeoButton asChild variant="outline" className="shrink-0">
-            <Link href={teacherResultsHref(locale, classroomId)} data-testid="analytics-results-hub">{t('eduShell.home.allResults')}</Link>
-          </NeoButton>
-          {(connectionStatus === 'connected' || connectionStatus === 'connecting') && activeStudentsCount === 0 ? null : (
-            <div data-testid="analytics-live" className="rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard">
-              <LiveActivityIndicator
-                isConnected={isConnected}
-                activeStudentsCount={activeStudentsCount}
-                lastUpdate={lastUpdate}
-                connectionStatus={connectionStatus}
-              />
-            </div>
-          )}
+            {(connectionStatus === 'connected' || connectionStatus === 'connecting') && activeStudentsCount === 0 ? null : (
+              <div data-testid="analytics-live" className="rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy-light px-3 py-2 shadow-hard">
+                <LiveActivityIndicator
+                  isConnected={isConnected}
+                  activeStudentsCount={activeStudentsCount}
+                  lastUpdate={lastUpdate}
+                  connectionStatus={connectionStatus}
+                />
+              </div>
+            )}
+          </ClassReportHeader>
         </div>
 
         {/* One gate over the dashboard AND the detail tabs — the tabs are the analytics
@@ -178,7 +167,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
           whileChecking={proPending}
         >
           <div data-testid="analytics-pro-body" className="space-y-3">
-            <ClassOverview classroomId={classroomId} openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
+            <ClassOverview classroomId={classroomId} classroomName={classroomName} surface="class_report" openStudentId={openStudentId} onOpenChange={setOpenStudentId} />
 
             <Tabs value={tab} onValueChange={setTab} className="space-y-3">
               <TabsList aria-label={t('education.analytics.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy p-1.5 shadow-hard">

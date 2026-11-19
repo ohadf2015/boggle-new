@@ -5,7 +5,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, dir: 'ltr' }),
 }));
 
-import { ClassroomPicker, ClassHero, accentFor } from '../ClassroomPicker';
+import { ClassroomPicker, accentFor } from '../ClassroomPicker';
 
 const classes = [
   { id: 'a', name: '5B English', member_count: 3 },
@@ -33,18 +33,5 @@ describe('<ClassroomPicker>', () => {
   it('Given more classes than accents, Then colors cycle', () => {
     expect(accentFor(0)).toBe(accentFor(4));
     expect(accentFor(0)).not.toBe(accentFor(1));
-  });
-});
-
-describe('<ClassHero>', () => {
-  it('Given a class, Then it renders the name and member count', () => {
-    render(<ClassHero name="5B English" memberCount={3} />);
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('5B English');
-    expect(screen.getByText('3')).toBeInTheDocument();
-  });
-
-  it('Given the report header, Then the class badge is a neutral navy tile, not a lime fill', () => {
-    const { container } = render(<ClassHero name="5B English" memberCount={3} />);
-    expect(container.innerHTML).not.toMatch(/(^|\s)bg-neo-(lime|yellow|cyan|pink)(\s|")/);
   });
 });
