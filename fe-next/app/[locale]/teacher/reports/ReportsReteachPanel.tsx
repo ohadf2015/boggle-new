@@ -1,9 +1,11 @@
 'use client';
 
+import { Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRosterNames } from '@/components/teacher/reports/useWordMasteryReport';
 import { ProPill } from '@/components/education/results/ProPill';
 import {
+  IconBadge,
   REPORT_HERO_PANEL,
   ReteachPracticeAction,
   ReteachStartGame,
@@ -54,7 +56,8 @@ export function ReportsReteachPanel({ classrooms }: { classrooms: readonly Picke
 
   return (
     <section data-testid="reports-reteach-panel" aria-labelledby="reports-reteach-title" className={cn(REPORT_HERO_PANEL, 'mb-6')}>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <IconBadge icon={Target} tone="pink" />
         <h2 id="reports-reteach-title" dir="auto" className="font-neo-display text-2xl font-black leading-tight text-neo-white sm:text-3xl">
           {t('teacher.reports.reteach.title', 'What to reteach')}
         </h2>
@@ -65,20 +68,23 @@ export function ReportsReteachPanel({ classrooms }: { classrooms: readonly Picke
           >
             {t('teacher.reports.reteach.exampleBadge', 'Example')}
           </span>
-        ) : null}
+        ) : (
+          <span
+            data-testid="reteach-accuracy"
+            dir="auto"
+            className="ms-auto rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-0.5 text-xs font-black tabular-nums text-neo-black shadow-hard-sm sm:text-sm"
+          >
+            {t('teacher.reports.reteach.accuracy', 'Class accuracy {pct}%', { pct: snapshot.classAccuracy })}
+          </span>
+        )}
       </div>
-      <p dir="auto" className="mt-1 max-w-prose text-sm leading-snug text-neo-cream/85 sm:text-base">
+      <p dir="auto" className="mt-2 max-w-prose text-sm leading-snug text-neo-cream/85 sm:text-base">
         {example
           ? t(
               'teacher.reports.reteach.exampleBody',
               'After your first game, this shows the words your class missed and who needs help. Sample data below.'
             )
-          : (
-            <>
-              {t('teacher.reports.reteach.fromClass', 'Words {name} missed most in its games so far.', { name: `\u2068${snapshot.classroomName}\u2069` })}{' '}
-              <span className="font-bold tabular-nums">{t('teacher.reports.reteach.accuracy', 'Class accuracy {pct}%', { pct: snapshot.classAccuracy })}</span>
-            </>
-          )}
+          : t('teacher.reports.reteach.fromClass', 'Words {name} missed most in its games so far.', { name: `\u2068${snapshot.classroomName}\u2069` })}
       </p>
 
       <ReteachWordRows words={snapshotWords(snapshot.words)} columns />
@@ -116,11 +122,15 @@ function NeedsHelp({ snapshot, example }: { snapshot: ClassEvidence; example: bo
         <span aria-hidden="true" className="h-7 w-32 rounded-full bg-neo-cream/10 motion-safe:animate-pulse" />
       ) : (
         <>
-          <span dir="auto" className="text-sm font-bold text-neo-yellow">
-            {names.slice(0, NAMES_SHOWN).map((name, i) => (
-              <span key={name}>{i > 0 ? ', ' : ''}<bdi>{name}</bdi></span>
-            ))}
-          </span>
+          {names.slice(0, NAMES_SHOWN).map((name) => (
+            <bdi
+              key={name}
+              data-testid="reteach-needs-help-name"
+              className="rounded-full border-2 border-neo-black bg-neo-yellow px-2.5 py-0.5 text-sm font-black text-neo-black shadow-hard-sm"
+            >
+              {name}
+            </bdi>
+          ))}
           {extra > 0 ? (
             <span dir="auto" className="text-sm font-bold text-neo-cream/80">
               {t('teacher.reports.reteach.moreStudents', '+{count} more', { count: extra })}

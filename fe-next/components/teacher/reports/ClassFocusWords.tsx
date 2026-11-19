@@ -1,10 +1,11 @@
 'use client';
 
+import { Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ResultsSurface } from '@/components/education/results/trackResultsAction';
 import { PANEL_TITLE } from '@/components/teacher/analytics/overview/overviewParts';
 import { pct } from '@/components/teacher/analytics/overview/overviewModel';
-import { ReteachPracticeAction, ReteachStartGame, ReteachWordRows, snapshotWords } from './reteachParts';
+import { IconBadge, ReteachPracticeAction, ReteachStartGame, ReteachWordRows, snapshotWords } from './reteachParts';
 import { useWordMasteryReport } from './useWordMasteryReport';
 
 interface FallbackWord {
@@ -35,7 +36,12 @@ export function ClassFocusWords({
   }
 
   const words = state.status === 'ready' ? snapshotWords(state.report.hardestWords) : [];
-  const title = <h2 className={PANEL_TITLE}>{t('education.analytics.overview.hardWordsTitle')}</h2>;
+  const title = (
+    <div className="flex items-center gap-2.5">
+      <IconBadge icon={Target} tone="pink" />
+      <h2 className={PANEL_TITLE}>{t('education.analytics.overview.hardWordsTitle')}</h2>
+    </div>
+  );
 
   if (words.length > 0) {
     return (

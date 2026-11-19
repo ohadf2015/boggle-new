@@ -10,7 +10,8 @@ import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { languageFlag } from '@/lib/i18n/languageLabels';
 import { EduMascot } from '@/components/education/EduMascot';
-import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PANEL, NB_PRIMARY, NB_SECONDARY } from '../nb/nbStyles';
+import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PANEL_POP, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
+import { SetupCodePreview } from './SetupCodePreview';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
 import { StarterPackRow } from './StarterPackRow';
 import { SETUP_FIELD_LABEL, SetupOwnWordsField, type SetupOwnWords } from './SetupOwnWordsField';
@@ -65,7 +66,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       }}
       className="flex flex-col gap-3"
     >
-      <div className={cn(NB_PANEL, 'flex flex-col gap-5 p-4 sm:gap-6 sm:p-8')}>
+      <div className={cn(NB_PANEL_POP.cyan, 'flex flex-col gap-5 p-4 sm:gap-6 sm:p-8')}>
         <div className="flex items-center gap-3">
           <EduMascot moment="success" size={96} className="size-14 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-20" />
           <h1 data-wipe className="font-neo-display text-4xl font-black leading-none text-neo-cream sm:text-5xl">{t('eduShell.setup.title')}</h1>
@@ -87,6 +88,8 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           />
         </div>
 
+        <SetupCodePreview name={name} placeholder={placeholder} t={t} />
+
         <div className="flex flex-col gap-3">
           <button
             type="button"
@@ -95,12 +98,14 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             aria-controls="setup-advanced"
             disabled={ownIncomplete}
             onClick={() => setAdvancedOpen((open) => !open)}
-            className={cn(NB_ADVANCED, 'min-h-[56px] py-2')}
+            className={cn(NB_ADVANCED, 'min-h-[56px] py-2.5')}
           >
             <span className="flex min-w-0 flex-col">
               <span>{t(foldOpen ? 'eduShell.setup.advancedClose' : 'eduShell.setup.advancedOpen')}</span>
-              <span data-testid="setup-advanced-summary" className="truncate text-xs font-semibold text-neo-cream/65">
-                {languageFlag(language)} {nativeLanguageName(language)} · {listLabel} · {grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}
+              <span data-testid="setup-advanced-summary" className="mt-1.5 flex min-w-0 flex-wrap gap-1.5">
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream)}>{languageFlag(language)} {nativeLanguageName(language)}</span>
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cyan, 'min-w-0 truncate')}>{listLabel}</span>
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream)}>{grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}</span>
               </span>
             </span>
             <ChevronDown className={cn('size-5 shrink-0 transition-transform motion-reduce:transition-none', foldOpen && 'rotate-180')} aria-hidden="true" />

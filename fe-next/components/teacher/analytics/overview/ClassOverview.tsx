@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Users } from 'lucide-react';
+import { AlertTriangle, CalendarDays, Sparkles, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { teacherFacingName } from '@/lib/education/rosterName';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
 import { ClassFocusWords } from '@/components/teacher/reports/ClassFocusWords';
 import { ReportDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
-import { REPORT_HERO_PANEL } from '@/components/teacher/reports/reteachParts';
+import { IconBadge, REPORT_HERO_PANEL } from '@/components/teacher/reports/reteachParts';
 import { Dialog } from '@/components/ui/dialog';
 import { NbDialogBody, NbDialogContent, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import type { StudentStatus } from '@/lib/education/pro/classInsights';
@@ -101,7 +101,10 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
       <div data-testid="overview-focus" className={`${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`}>
         {attention.length > 0 ? (
           <section data-testid="overview-attention" aria-labelledby="ov-attn" className="min-w-0">
-            <h2 id="ov-attn" className={PANEL_TITLE}>{t('education.analytics.overview.attentionTitle')}</h2>
+            <div className="flex items-center gap-2.5">
+              <IconBadge icon={AlertTriangle} tone="red" />
+              <h2 id="ov-attn" className={PANEL_TITLE}>{t('education.analytics.overview.attentionTitle')}</h2>
+            </div>
             <ul className="mt-2 space-y-1.5 max-sm:[&>li:nth-child(n+4)]:hidden">{attention.slice(0, ATTENTION_SHOWN).map(row)}</ul>
           </section>
         ) : null}
@@ -112,14 +115,20 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
         <div className="grid gap-3 lg:grid-cols-2 [&>:only-child]:lg:col-span-2">
           {hasActivity ? (
             <section data-testid="overview-activity" aria-labelledby="ov-act" className={PANEL}>
-              <h3 id="ov-act" className={PANEL_TITLE}>{t('education.analytics.overview.activityTitle')}</h3>
-              <p className="mb-2 font-neo-body text-xs text-neo-cream/80">{t('education.analytics.overview.activityHint')}</p>
+              <div className="flex items-center gap-2.5">
+                <IconBadge icon={CalendarDays} tone="cyan" />
+                <h3 id="ov-act" className={PANEL_TITLE}>{t('education.analytics.overview.activityTitle')}</h3>
+              </div>
+              <p className="mb-2 mt-1 font-neo-body text-xs text-neo-cream/80">{t('education.analytics.overview.activityHint')}</p>
               <ActivityBars days={metrics.dailyActive} locale={language} />
             </section>
           ) : null}
           {stars.length > 0 ? (
             <section data-testid="overview-stars" aria-labelledby="ov-stars" className={PANEL}>
-              <h3 id="ov-stars" className={PANEL_TITLE}>{t('education.analytics.overview.starsTitle')}</h3>
+              <div className="flex items-center gap-2.5">
+                <IconBadge icon={Sparkles} tone="lime" />
+                <h3 id="ov-stars" className={PANEL_TITLE}>{t('education.analytics.overview.starsTitle')}</h3>
+              </div>
               <ul className="mt-2 space-y-1.5">{stars.map(row)}</ul>
             </section>
           ) : null}
