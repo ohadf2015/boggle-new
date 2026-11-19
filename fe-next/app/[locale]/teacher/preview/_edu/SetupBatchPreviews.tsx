@@ -46,7 +46,6 @@ export function InvitePreview({ v }: { v?: string }) {
             roster={{ students, arrivals: [], loading: false }}
             joinUrl={`${origin}/${language}/join/BLDA7Q`}
             displayHost={`lexiclash.live/${language}/join`}
-            startHref="#"
             homeHref={`/${language}/teacher`}
             reduced
             onShare={noop}

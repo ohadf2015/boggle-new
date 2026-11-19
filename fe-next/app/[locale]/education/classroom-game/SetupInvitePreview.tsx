@@ -42,7 +42,6 @@ export function SetupInvitePreview() {
         roster={roster}
         joinUrl={origin ? classroomJoinUrl(origin, language, CLASSROOM.join_code) : ''}
         displayHost={origin ? `${joinAddressForDisplay(origin)}/${language}/join` : ''}
-        startHref="#"
         homeHref={`/${language}/teacher`}
         reduced={false}
         onShare={() => toast('Preview: share')}
