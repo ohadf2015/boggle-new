@@ -66,7 +66,7 @@ export function ProBanner({
       data-tone={tone}
       role={role}
       {...data}
-      className={cn(NB_PANEL, 'relative mt-3 overflow-visible p-4 pt-6 sm:p-5 sm:pt-6')}
+      className={cn(NB_PANEL, 'relative mt-3 p-4 pt-5 sm:p-5 sm:pt-6')}
     >
       <span
         aria-hidden="true"
@@ -74,12 +74,6 @@ export function ProBanner({
           'edu-stripes pointer-events-none absolute inset-x-0 top-0 h-2 rounded-t-[13px]',
           tone === 'urgent' ? 'bg-neo-pink' : 'bg-neo-yellow',
         )}
-      />
-      <ProBadge
-        data-testid={`${testId}-sticker`}
-        size="sm"
-        label={proLabel}
-        className="absolute -top-3.5 start-4 -rotate-3"
       />
       {onDismiss ? (
         <button
@@ -99,7 +93,10 @@ export function ProBanner({
         <div className={cn('flex min-w-0 flex-1 items-center gap-4', onDismiss && 'pe-12 sm:pe-0')}>
           {lead}
           <div className="min-w-0">
-            <h3 className="font-neo-display text-lg font-black leading-snug text-neo-cream sm:text-xl">{title}</h3>
+            <h3 className="font-neo-display text-lg font-black leading-snug text-neo-cream sm:text-xl">
+              {title}
+              <ProBadge aria-hidden="true" data-testid={`${testId}-sticker`} size="xs" label={proLabel} className="ms-2 align-middle" />
+            </h3>
             {body ? <div className="mt-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{body}</div> : null}
             {children}
           </div>

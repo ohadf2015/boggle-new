@@ -19,17 +19,20 @@ import { TeacherWhatsNewDialog } from '@/components/teacher/TeacherWhatsNew';
 import AvatarLite from '@/components/AvatarLite';
 import { NB_MENU, NB_MENU_ITEM } from '@/components/teacher/nb/nbDialogStyles';
 import { ProBadge } from '@/components/ui/ProBadge';
+import type { TeacherPlan } from './EducationNav';
 
 export interface TeacherAccountMenuProps {
   proHref: string;
   profileHref: string;
   /** `row` = sidebar footer (avatar + name); `icon` = phone top bar (avatar only). */
   variant?: 'row' | 'icon';
+  /** Row only: a paid plan shows here, once. */
+  plan?: TeacherPlan;
 }
 
 const ITEM = NB_MENU_ITEM;
 
-export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: TeacherAccountMenuProps) {
+export function TeacherAccountMenu({ proHref, profileHref, variant = 'row', plan }: TeacherAccountMenuProps) {
   const { t, language } = useLanguage();
   const { profile, user } = useAuth();
   const router = useRouter();
@@ -63,6 +66,15 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
               <span dir="auto" className="min-w-0 flex-1 truncate font-neo-body text-sm font-bold text-neo-cream">
                 {name || t('eduShell.account.fallbackName')}
               </span>
+              {plan === 'pro' || plan === 'trial' ? (
+                <ProBadge
+                  data-testid="teacher-account-plan"
+                  size="xs"
+                  crown={plan === 'pro'}
+                  className="shrink-0"
+                  label={t(plan === 'pro' ? 'eduShell.nav.pro' : 'teacher.plan.trialActive')}
+                />
+              ) : null}
               <ChevronsUpDown className="size-4 shrink-0 text-neo-cream/70" aria-hidden="true" />
             </>
           ) : null}
@@ -78,11 +90,10 @@ export function TeacherAccountMenu({ proHref, profileHref, variant = 'row' }: Te
               {t('eduShell.account.profile')}
             </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem asChild className={cn(ITEM, 'lg:hidden')}>
+          <DropdownMenuItem asChild className={ITEM}>
             <Link href={proHref}>
               <Crown className="size-4" aria-hidden="true" />
               {t('eduShell.account.plans')}
-              <ProBadge data-testid="teacher-account-pro-badge" size="xs" crown={false} className="ms-auto" label={t('eduShell.nav.pro')} />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild className={ITEM}>

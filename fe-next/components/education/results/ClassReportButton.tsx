@@ -217,6 +217,7 @@ function FreeClassReport({ language, underHalf, bars, proLabel = 'Pro', round, s
           language={language}
           round={round}
           proLabel={proLabel}
+          upsell={!suppressOffer}
           offer={trialOpen || suppressOffer ? null : { href: upgradeHref, label: proOffer.label, note: proOffer.note, onClick: onUpgradeClick }}
           onClose={closeGrid}
         />

@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { Check, Crown, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
-import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
+import { proPlanStatusLine } from './proPlanStatus';
 
 export interface ProPlanPanelProps {
   status?: string | null;
@@ -15,27 +14,12 @@ export interface ProPlanPanelProps {
   included: string[];
 }
 
-function formatDate(iso: string | null | undefined, language: string): string | null {
-  if (!iso) return null;
-  const ms = Date.parse(iso);
-  if (!Number.isFinite(ms)) return null;
-  return new Intl.DateTimeFormat(language, { day: 'numeric', month: 'long', year: 'numeric' }).format(ms);
-}
-
 /** "You're on Pro": what the plan is, when it renews or ends, and where billing lives. No pitch. */
 export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUrl, included }: ProPlanPanelProps) {
   const { t, language } = useLanguage();
   const [nowMs] = useState(() => Date.now());
-  const price = `$${TEACHER_PRO_PRICE_USD}`;
   const gifted = source === 'admin_grant';
-  const date = formatDate(periodEnd, language);
-
-  let line: string;
-  if (gifted) line = date ? t('eduPlans.manage.gifted', { date }) : t('eduPlans.manage.giftedOpen');
-  else if (status === 'trialing') line = t('eduPlans.manage.trialing', { days: polarTrialDaysLeft(trialExpires ?? periodEnd, nowMs) ?? 0, price });
-  else if (status === 'canceled' && date) line = t('eduPlans.manage.ends', { date });
-  else if (status === 'past_due') line = t('eduPlans.manage.pastDue');
-  else line = date ? t('eduPlans.manage.renews', { date, price }) : t('eduPlans.manage.active', { price });
+  const line = proPlanStatusLine({ t, language, nowMs, status, source, trialExpires, periodEnd });
 
   return (
     <section data-testid="pro-plan-panel" aria-labelledby="pro-plan-title" className="rounded-neo border-3 border-neo-black bg-neo-yellow p-4 text-neo-navy shadow-hard sm:p-6">

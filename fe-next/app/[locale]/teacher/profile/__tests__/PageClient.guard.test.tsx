@@ -57,9 +57,8 @@ vi.mock('@/lib/education/useTeacherAccess', () => ({
 vi.mock('@/components/education/EducationHeader', () => ({
   EducationHeader: () => <div data-testid="education-header" />,
 }));
-vi.mock('@/components/teacher/SubscriptionStatusCard', () => ({
-  __esModule: true,
-  default: () => <div data-testid="subscription-card" />,
+vi.mock('@/hooks/useTeacherPro', () => ({
+  useTeacherPro: () => ({ hasPro: false, loading: true, known: false, source: 'polar', status: 'active', grant: null, periodEnd: null, trialExpires: null, cancelAtPeriodEnd: false, portalUrl: null }),
 }));
 
 import TeacherProfilePageClient from '../PageClient';

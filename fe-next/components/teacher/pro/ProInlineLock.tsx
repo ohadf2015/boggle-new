@@ -39,13 +39,13 @@ export function ProInlineLock({ feature, label, className }: { feature: ProFeatu
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-lime bg-neo-navy px-4 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard-sm',
+          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 px-3 py-2 font-neo-display text-sm font-bold text-neo-cream',
           PRESS,
         )}
       >
         <Lock className="size-4" aria-hidden="true" />
         {label}
-        <ProBadge size="xs" label={t('eduShell.nav.pro')} />
+        <ProBadge size="xs" crown={false} label={t('eduShell.nav.pro')} />
       </button>
       {open && (
         <div

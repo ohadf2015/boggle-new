@@ -35,7 +35,7 @@ export function ParentShareLink({ language, hasPro, label, proLabel, className }
     >
       <Send className="size-[1em] shrink-0" aria-hidden="true" />
       <span className="min-w-0">{label}</span>
-      <ProPill label={proLabel} />
+      {hasPro ? null : <ProPill label={proLabel} />}
     </Link>
   );
 }

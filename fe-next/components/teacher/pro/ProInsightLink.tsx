@@ -63,12 +63,12 @@ export function ProInsightLink({ placement, language, label, proLabel, href, act
       data-testid={`pro-insight-link-${placement}`}
       onClick={onClick}
       className={cn(
-        'inline-flex min-h-11 items-center gap-2 self-start rounded-neo border-[2px] border-neo-cream/60 px-3 py-1 font-neo-body text-sm font-bold text-neo-cream transition-colors hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        'inline-flex min-h-11 items-center gap-2 self-start rounded-neo font-neo-body text-sm font-bold text-neo-cream/85 transition-colors hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
         className,
       )}
     >
       <ProBadge size="xs" label={proLabel} />
-      <span className="min-w-0">{label}</span>
+      <span className="min-w-0 underline decoration-2 underline-offset-4">{label}</span>
       <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
     </Link>
   );

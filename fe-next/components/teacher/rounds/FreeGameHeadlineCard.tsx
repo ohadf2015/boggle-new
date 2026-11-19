@@ -30,7 +30,7 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
       aria-labelledby="free-game-headline-title"
       className="rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 shadow-hard-lg sm:p-4"
     >
-      <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+      <header className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         <h2 id="free-game-headline-title" className="font-neo-display text-lg font-bold text-neo-cream">
           {t('teacher.lastGame.freeHeadlineTitle')}
           <span className="ms-2 text-sm font-bold text-neo-cream/70">{t(roundTitleKey(headline.gameMode))}</span>
@@ -39,14 +39,29 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
           <Users className="size-4" aria-hidden />
           {t('teacher.lastGame.playersPlayed', { count: headline.players })}
         </p>
+        <Link
+          href={`/${language}/teacher/upgrade`}
+          data-testid="free-headline-pro"
+          onClick={() => {
+            try {
+              trackTeacherProUpgradeClick({ page: window.location.pathname, locale: language, placement: 'analytics_free_headline' });
+            } catch {
+              /* analytics must never block */
+            }
+          }}
+          className="inline-flex min-h-11 items-center gap-2 text-sm font-bold text-neo-cream/85 underline decoration-2 underline-offset-4 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
+        >
+          <ProBadge size="xs" label={t('teacher.lastGame.proBadge')} />
+          {t('teacher.lastGame.proLine')}
+        </Link>
       </header>
 
       <div className="mt-3 grid grid-cols-[auto_1fr] items-start gap-2">
-        <div data-testid="free-headline-average" className="max-w-[9rem] rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-3 py-2">
+        <div data-testid="free-headline-average" className="max-w-[9rem] pe-3">
           <p className="font-neo-display text-2xl font-black tabular-nums text-neo-cream">{headline.classAverage}</p>
           <p className="text-xs font-bold text-neo-cream/70">{t('teacher.lastGame.classAverage')}</p>
         </div>
-        <div className="min-w-0 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-3 py-2">
+        <div className="min-w-0">
           <p className="mb-1.5 text-xs font-bold text-neo-cream/70">{t('teacher.lastGame.topMissed')}</p>
           {headline.topMissed.length === 0 ? (
             <p className="text-sm font-bold text-neo-cream/80">{t('teacher.lastGame.nothingToReview')}</p>
@@ -62,21 +77,6 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
         </div>
       </div>
 
-      <Link
-        href={`/${language}/teacher/upgrade`}
-        data-testid="free-headline-pro"
-        onClick={() => {
-          try {
-            trackTeacherProUpgradeClick({ page: window.location.pathname, locale: language, placement: 'analytics_free_headline' });
-          } catch {
-            /* analytics must never block */
-          }
-        }}
-        className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-neo border-[3px] border-neo-cream/50 bg-neo-navy px-3 text-sm font-bold shadow-hard text-neo-cream hover:border-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream"
-      >
-        <ProBadge size="xs" label={t('teacher.lastGame.proBadge')} />
-        {t('teacher.lastGame.proLine')}
-      </Link>
     </section>
   );
 }

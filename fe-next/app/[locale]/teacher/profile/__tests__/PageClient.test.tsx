@@ -4,7 +4,7 @@ import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TeacherProfilePageClient from '../PageClient';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,6 +15,8 @@ import { useRouter } from 'next/navigation';
 vi.mock('@/contexts/AuthContext');
 vi.mock('@/contexts/LanguageContext');
 vi.mock('@/hooks/useClassroom');
+const pro = vi.hoisted(() => ({ current: {} as Record<string, unknown> }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro.current }));
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(),
   usePathname: () => '/en/teacher/profile',
@@ -37,6 +39,7 @@ const mockUseClassrooms = useClassrooms as MockedFunction<typeof useClassrooms>;
 const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
 const mockPush = vi.fn();
+const FREE_PLAN = { hasPro: false, loading: false, known: true, source: 'polar', status: 'active', grant: null, periodEnd: null, trialExpires: null, cancelAtPeriodEnd: false, portalUrl: null };
 
 describe('TeacherProfilePageClient', () => {
   const mockTeacherProfile = {
@@ -55,6 +58,7 @@ describe('TeacherProfilePageClient', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    pro.current = { ...FREE_PLAN };
 
     mockUseRouter.mockReturnValue({ push: mockPush } as any);
 
@@ -115,9 +119,61 @@ describe('TeacherProfilePageClient', () => {
     expect(screen.getByTestId('total-student-count')).toHaveTextContent('20');
   });
 
-  test('offers the school plan, not an admin-access help box', () => {
+  test('offers the school plan as one short row', () => {
     render(<TeacherProfilePageClient />);
-    expect(screen.getByTestId('contact-admin-section')).toHaveTextContent('teacher.profile.schoolTitle');
+    const school = screen.getByTestId('contact-admin-section');
+    expect(school).toHaveTextContent('teacher.profile.schoolTitle');
+    expect(school).not.toHaveTextContent('teacher.profile.schoolBody');
+    expect(within(school).getByRole('link', { name: /teacher.profile.schoolCta/ })).toHaveAttribute('href', '/en/education/for-schools');
+  });
+
+  test('is one calm panel: no stat tiles, role sticker or coloured plan card', () => {
+    render(<TeacherProfilePageClient />);
+    const page = screen.getByTestId('teacher-profile-page');
+    expect(page.querySelectorAll('section')).toHaveLength(1);
+    expect(page).not.toHaveTextContent('teacher.profile.teacherBadge');
+    expect(page.innerHTML).not.toMatch(/bg-neo-cyan/);
+    expect(screen.getByTestId('classroom-count').closest('dl')).toHaveTextContent('teacher.profile.classrooms');
+  });
+
+  test('a gifted teacher reads the plan once, with no billing action', () => {
+    pro.current = { ...FREE_PLAN, hasPro: true, source: 'admin_grant', grant: { expires_at: '2027-09-16T12:00:00Z' } };
+    render(<TeacherProfilePageClient />);
+    const plan = screen.getByTestId('subscription-card');
+    expect(plan).toHaveAttribute('data-plan', 'pro');
+    expect(plan).toHaveTextContent('eduPlans.manage.gifted');
+    expect(plan).toHaveTextContent('eduPlans.manage.giftedNote');
+    expect(plan).not.toHaveTextContent('teacher.subscription.proPlanName');
+    expect(plan).not.toHaveTextContent('teacher.subscription.manageSubscription');
+    expect(within(plan).getByRole('link', { name: 'legal.refundPolicy' })).toHaveAttribute('href', '/en/legal/refund');
+  });
+
+  test('a paying teacher gets the plan name, its status and the billing link', () => {
+    pro.current = { ...FREE_PLAN, hasPro: true, periodEnd: '2027-01-01T12:00:00Z', portalUrl: 'https://billing.test/portal' };
+    render(<TeacherProfilePageClient />);
+    const plan = screen.getByTestId('subscription-card');
+    expect(plan).toHaveTextContent('teacher.subscription.proPlanName');
+    expect(plan).toHaveTextContent('eduPlans.manage.renews');
+    expect(within(plan).getByRole('link', { name: /teacher.subscription.manageSubscription/ })).toHaveAttribute('href', 'https://billing.test/portal');
+    expect(screen.queryByTestId('subscription-upgrade')).not.toBeInTheDocument();
+  });
+
+  test('a free teacher sees their usage and one upgrade', () => {
+    render(<TeacherProfilePageClient />);
+    const plan = screen.getByTestId('subscription-card');
+    expect(plan).toHaveAttribute('data-plan', 'free');
+    expect(plan).toHaveTextContent('teacher.subscription.freePlanName');
+    expect(screen.getByTestId('subscription-usage')).toHaveTextContent('eduShell.setup.capMeter');
+    expect(screen.getByTestId('subscription-upgrade')).toHaveAttribute('href', '/en/teacher/upgrade');
+  });
+
+  test('while the plan is unknown it claims nothing and offers no upgrade', () => {
+    pro.current = { ...FREE_PLAN, loading: true, known: false };
+    render(<TeacherProfilePageClient />);
+    const plan = screen.getByTestId('subscription-card');
+    expect(plan).not.toHaveAttribute('data-plan');
+    expect(plan).not.toHaveTextContent('teacher.subscription.freePlanName');
+    expect(screen.queryByTestId('subscription-upgrade')).not.toBeInTheDocument();
   });
 
   test('shows the email once, in the header, with no separate role card', () => {

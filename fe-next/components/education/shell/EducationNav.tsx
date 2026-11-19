@@ -5,8 +5,6 @@ import Link from 'next/link';
 import {
   BarChart3,
   BookOpen,
-  Check,
-  ChevronRight,
   Crown,
   Dumbbell,
   Home,
@@ -17,8 +15,6 @@ import {
   Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { ProBadge } from '@/components/ui/ProBadge';
 import type { EducationNavItem, ResolvedEducationNav } from './navItems';
 import './eduNav.css';
 
@@ -43,6 +39,8 @@ const ICONS = {
   users: Users,
 } as const;
 
+export type TeacherPlan = 'free' | 'trial' | 'pro';
+
 export interface EducationNavProps {
   nav: ResolvedEducationNav;
   /** Passed in so this file stays free of context and unit-tests bare. */
@@ -50,10 +48,10 @@ export interface EducationNavProps {
   variant: 'tabs' | 'sidebar';
   /** Sidebar only: the brand lockup at the top. */
   brand?: ReactNode;
-  /** Sidebar only: the avatar/account menu under the Pro link. */
+  /** Sidebar only: the avatar/account menu, which also states a paid plan. */
   account?: ReactNode;
-  /** Sidebar only: the teacher's plan, so the Pro link states it. Unknown (undefined) = plain link. */
-  plan?: 'free' | 'pro' | 'trial';
+  /** Sidebar only: a free teacher gets the one Upgrade link. */
+  plan?: TeacherPlan;
   className?: string;
 }
 
@@ -182,45 +180,19 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
         {brand ? <div className="mb-4 px-1">{brand}</div> : null}
         {links}
         <div className="mt-auto flex flex-col gap-2 border-t-[2px] border-neo-cream/15 pt-3">
-          {nav.proHref ? (
+          {nav.proHref && plan === 'free' ? (
             <Link
               href={nav.proHref}
               data-testid="education-side-pro"
               className={cn(
-                'group flex min-h-[44px] w-full items-center gap-2 rounded-neo px-3 py-2',
-                'font-neo-display text-[15px] font-bold text-neo-cream transition-[colors,transform] duration-150',
-                'hover:bg-neo-navy-light active:scale-[0.97]',
+                'flex min-h-[44px] w-full items-center gap-2 rounded-neo px-3 py-2',
+                'font-neo-display text-sm font-bold text-neo-cream/85 transition-[colors,transform] duration-150',
+                'hover:bg-neo-navy-light hover:text-neo-cream active:scale-[0.97]',
                 FOCUS,
               )}
             >
-              {plan === 'pro' ? (
-                // A paying teacher wears the gold badge itself, not a plain label.
-                <span className="min-w-0 flex-1">
-                  <ProBadge data-testid="education-side-pro-owned" size="md" label={t('eduShell.nav.pro')} />
-                </span>
-              ) : (
-                <>
-                  <Crown data-testid="education-side-pro-crown" className="h-5 w-5 shrink-0 text-neo-yellow" aria-hidden />
-                  <span className="line-clamp-2 min-w-0 flex-1 leading-tight">{t(plan === 'free' ? 'teacher.plan.free' : 'eduShell.nav.pro')}</span>
-                </>
-              )}
-              {plan === 'free' || plan === 'trial' ? (
-                <span
-                  data-testid="education-side-pro-pill"
-                  className="shrink-0 rounded-neo border-[2px] border-neo-cream/40 px-2 py-0.5 text-xs font-black text-neo-cream"
-                >
-                  {t(plan === 'free' ? 'teacher.plan.upgrade' : 'teacher.plan.trialActive')}
-                </span>
-              ) : plan === 'pro' ? (
-                <span
-                  data-testid="education-side-pro-pill"
-                  aria-label={t('teacher.plan.pro')}
-                  className="grid size-5 shrink-0 place-items-center rounded-full border-[2px] border-neo-cream/60 text-neo-cream"
-                >
-                  <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden />
-                </span>
-              ) : null}
-              {plan === 'free' || plan === 'trial' ? null : <DirectionalIcon icon={ChevronRight} className="h-4 w-4 shrink-0" />}
+              <Crown className="h-4 w-4 shrink-0 text-neo-yellow" aria-hidden />
+              <span className="min-w-0">{t('teacher.plan.upgrade')}</span>
             </Link>
           ) : null}
           {account}
