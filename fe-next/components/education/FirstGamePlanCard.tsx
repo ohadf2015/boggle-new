@@ -11,6 +11,7 @@ import {
   fromDatetimeLocal,
   toDatetimeLocal,
 } from '@/lib/education/firstGamePlan';
+import { downloadIcs } from '@/lib/education/downloadIcs';
 import { trackFirstGameScheduled, trackHomePracticeLinkSent, type FirstGameCalendarTarget } from '@/lib/education/firstGamePlanTelemetry';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -24,22 +25,6 @@ export interface FirstGamePlanCardProps {
   className?: string;
   /** Present when the class already has a word list: students who join from home get it as practice. */
   onSendHomeLink?: () => void;
-}
-
-function downloadIcs(content: string, filename: string): void {
-  try {
-    const url = URL.createObjectURL(new Blob([content], { type: 'text/calendar;charset=utf-8' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  } catch {
-    // Download blocked: the Google link is still there.
-  }
 }
 
 /**

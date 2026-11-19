@@ -26,21 +26,29 @@ async function readJson(request: NextRequest): Promise<unknown> {
 
 type Db = Awaited<ReturnType<typeof createClient>>;
 
-async function ownershipError(supabase: Db, classroomId: string, userId: string): Promise<NextResponse | null> {
+type OwnedClassroom = { id: string; teacher_id: string | null; name?: string | null; join_code?: string | null };
+
+/** The teacher's own class, or the response that refuses it. */
+async function loadOwnedClassroom(supabase: Db, classroomId: string, userId: string): Promise<{ classroom: OwnedClassroom } | { denied: NextResponse }> {
   const { data: classroom, error } = await supabase
     .from('classrooms')
-    .select('id, teacher_id')
+    .select('id, teacher_id, name, join_code')
     .eq('id', classroomId)
     .maybeSingle();
   if (error) {
     logger.error('[lesson-plan] classroom lookup failed', error);
-    return NextResponse.json({ error: 'lookup_failed' }, { status: 500 });
+    return { denied: NextResponse.json({ error: 'lookup_failed' }, { status: 500 }) };
   }
-  if (!classroom) return NextResponse.json({ error: 'not_found' }, { status: 404 });
-  if ((classroom as { teacher_id: string | null }).teacher_id !== userId) {
-    return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  if (!classroom) return { denied: NextResponse.json({ error: 'not_found' }, { status: 404 }) };
+  if ((classroom as OwnedClassroom).teacher_id !== userId) {
+    return { denied: NextResponse.json({ error: 'forbidden' }, { status: 403 }) };
   }
-  return null;
+  return { classroom: classroom as OwnedClassroom };
+}
+
+async function ownershipError(supabase: Db, classroomId: string, userId: string): Promise<NextResponse | null> {
+  const owned = await loadOwnedClassroom(supabase, classroomId, userId);
+  return 'denied' in owned ? owned.denied : null;
 }
 
 export async function GET(request: NextRequest) {
@@ -51,8 +59,11 @@ export async function GET(request: NextRequest) {
   if (!parsed.success) return NextResponse.json({ error: 'invalid_query' }, { status: 400 });
 
   const supabase = await createClient();
-  const denied = await ownershipError(supabase, parsed.data.classroomId, user.id);
-  if (denied) return denied;
+  const owned = await loadOwnedClassroom(supabase, parsed.data.classroomId, user.id);
+  if ('denied' in owned) return owned.denied;
+  const { name, join_code: joinCode } = owned.classroom;
+  // Name and join code ride along so the booked card can build the calendar invite and the class link.
+  const classroom = joinCode ? { name: name ?? '', joinCode } : null;
 
   const { data, error } = await supabase
     .from('teacher_lesson_plans')
@@ -66,7 +77,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'read_failed' }, { status: 500 });
   }
   const lessonAt = (data as { lesson_at?: string } | null)?.lesson_at;
-  return NextResponse.json({ ok: true, lessonAt: lessonAt ? new Date(lessonAt).toISOString() : null });
+  return NextResponse.json({ ok: true, lessonAt: lessonAt ? new Date(lessonAt).toISOString() : null, classroom });
 }
 
 export async function POST(request: NextRequest) {

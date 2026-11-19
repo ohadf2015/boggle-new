@@ -9,6 +9,8 @@ import { defaultLessonAt, formatLessonTime, validateLessonAt } from '@/lib/educa
 import { fromDatetimeLocal, toDatetimeLocal } from '@/lib/education/firstGamePlan';
 import { cn } from '@/lib/utils';
 import { PRESS } from '@/components/education/live/eduLiveStyles';
+import { NB_BLOCK, NB_ICON_TILE, NB_INPUT, NB_PANEL_POP } from '@/components/teacher/nb/nbStyles';
+import { LessonPlanBooked } from '@/components/education/LessonPlanBooked';
 
 const K = 'eduLiveRoom.hostResults.lessonPlan';
 
@@ -24,8 +26,13 @@ const BUTTON_BASE = cn(
   PRESS,
   'inline-flex min-h-11 items-center justify-center gap-2 rounded-neo-lg border-[3px] px-3 text-center font-neo-display text-sm font-black normal-case shadow-hard transition-[transform,box-shadow] duration-150 hover:-translate-y-px active:translate-x-[2px] active:translate-y-[2px] active:shadow-none motion-reduce:transition-none @5xl/results:text-base'
 );
-const PRIMARY = cn(BUTTON_BASE, 'w-full border-neo-black bg-neo-cyan text-neo-navy');
-const QUIET = cn(BUTTON_BASE, 'shrink-0 border-neo-cream/50 bg-neo-navy text-neo-cream');
+const PRIMARY = cn(BUTTON_BASE, 'min-h-12 w-full border-neo-black bg-neo-lime text-neo-black text-base');
+const QUIET = cn(BUTTON_BASE, 'min-h-[52px] shrink-0 border-neo-black bg-neo-cream text-neo-black');
+
+/** The class-ready screen has its own calendar card, so only the rehearsal end and Teacher Home carry the invite here. */
+const INVITE_SOURCES: ReadonlySet<LessonPlanSource> = new Set(['practice_results', 'teacher_home']);
+
+type PlanClassroom = { name: string; joinCode: string };
 
 type Status = 'loading' | 'idle' | 'saving' | 'saved' | 'error';
 type ErrorKey = 'error' | 'tooSoon' | 'tooFar';
@@ -43,12 +50,15 @@ export function LessonPlanPrompt({
   source = 'practice_results',
   className,
   reserveSpace = false,
+  bookedOnly = false,
 }: {
   classroomId: string;
   source?: LessonPlanSource;
   className?: string;
   /** Hold the idle card's height while the saved time loads, so nothing below it moves. */
   reserveSpace?: boolean;
+  /** Show only an already booked class (Teacher Home for a class with students): no ask when nothing is booked. */
+  bookedOnly?: boolean;
 }) {
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -58,15 +68,20 @@ export function LessonPlanPrompt({
   const [status, setStatus] = useState<Status>('loading');
   const [errorKey, setErrorKey] = useState<ErrorKey>('error');
   const [savedAt, setSavedAt] = useState<Date | null>(null);
+  const [classroom, setClassroom] = useState<PlanClassroom | null>(null);
+  const [origin, setOrigin] = useState('');
   const lastAttempt = useRef<Date | null>(null);
   const shown = useRef(false);
+  const everBooked = useRef(false);
 
   const userId = user?.id ?? null;
   useEffect(() => {
     if (!userId) return;
     let live = true;
-    const settle = (lessonAt: string | null) => {
+    setOrigin(typeof window !== 'undefined' ? window.location.origin : '');
+    const settle = (lessonAt: string | null, room: PlanClassroom | null = null) => {
       if (!live) return;
+      setClassroom(room);
       if (lessonAt) {
         setSavedAt(new Date(lessonAt));
         setStatus('saved');
@@ -76,8 +91,10 @@ export function LessonPlanPrompt({
     };
     fetch(`/api/education/lesson-plan?classroomId=${encodeURIComponent(classroomId)}`)
       .then(async (res) => {
-        const body = (await res.json().catch(() => null)) as { ok?: boolean; lessonAt?: string | null } | null;
-        settle(res.ok && body?.ok === true && body.lessonAt ? body.lessonAt : null);
+        const body = (await res.json().catch(() => null)) as { ok?: boolean; lessonAt?: string | null; classroom?: PlanClassroom | null } | null;
+        const ok = res.ok && body?.ok === true;
+        const room = ok && body?.classroom?.joinCode ? { name: body.classroom.name ?? '', joinCode: body.classroom.joinCode } : null;
+        settle(ok && body?.lessonAt ? body.lessonAt : null, room);
       })
       .catch(() => settle(null));
     return () => {
@@ -86,12 +103,15 @@ export function LessonPlanPrompt({
   }, [userId, classroomId]);
 
   useEffect(() => {
-    if (status !== 'idle' || shown.current) return;
+    if (status !== 'idle' || shown.current || bookedOnly) return;
     shown.current = true;
     trackGrowthEvent('lesson_plan_prompt_shown', { source });
-  }, [status, source]);
+  }, [status, source, bookedOnly]);
 
   if (!user) return null;
+  if (status === 'saved') everBooked.current = true;
+  // Booked-only stays up while the teacher changes the time, but never asks a class that booked nothing.
+  if (bookedOnly && !everBooked.current) return null;
   if (status === 'loading') {
     return reserveSpace ? (
       <div
@@ -139,24 +159,39 @@ export function LessonPlanPrompt({
   const saving = status === 'saving';
   const picked = fromDatetimeLocal(when);
 
+  const showInvite = INVITE_SOURCES.has(source) && !!classroom && !!origin;
+
   return (
     <section
       data-testid="lesson-plan"
       aria-labelledby={titleId}
       aria-busy={saving}
-      className={cn('flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light p-3 text-neo-cream shadow-hard @5xl/results:p-4', className)}
+      className={cn(NB_PANEL_POP.cyan, 'flex flex-col gap-3 p-4 @5xl/results:p-5', className)}
     >
-      <div className="flex items-start gap-2">
-        <CalendarClock className="mt-0.5 size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
+      <div className="flex items-start gap-3">
+        <span className={cn(NB_ICON_TILE, NB_BLOCK.cyan)} aria-hidden="true">
+          <CalendarClock className="size-5" />
+        </span>
         <div className="min-w-0">
-          <h2 id={titleId} className="font-neo-display text-base font-black leading-tight @5xl/results:text-lg">
-            {t(COPY[source].title)}
+          <h2 id={titleId} className="font-neo-display text-lg font-black leading-tight @5xl/results:text-xl">
+            {t(status === 'saved' && source === 'teacher_home' ? `${K}.nextTitle` : COPY[source].title)}
           </h2>
           {status !== 'saved' && <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/80">{t(COPY[source].body)}</p>}
         </div>
       </div>
 
-      {status === 'saved' && savedAt ? (
+      {status === 'saved' && savedAt && showInvite && classroom ? (
+        <LessonPlanBooked
+          lessonAt={savedAt}
+          when={formatLessonTime(savedAt, timezone, language)}
+          classroom={{ id: classroomId, name: classroom.name, joinCode: classroom.joinCode }}
+          origin={origin}
+          language={language}
+          source={source}
+          onChange={() => setStatus('idle')}
+          t={t}
+        />
+      ) : status === 'saved' && savedAt ? (
         <div data-testid="lesson-plan-saved" role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <p className="flex min-w-0 items-start gap-2 font-neo-body text-sm font-bold text-neo-cream">
             <Check className="mt-0.5 size-4 shrink-0 text-neo-lime" aria-hidden="true" />
@@ -193,7 +228,7 @@ export function LessonPlanPrompt({
                 type="datetime-local"
                 value={when}
                 onChange={(e) => setWhen(e.target.value)}
-                className="min-h-11 min-w-0 grow basis-48 rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy px-2 font-neo-body text-sm font-bold text-neo-cream [color-scheme:dark] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                className={cn(NB_INPUT, 'min-w-0 grow basis-48 text-sm shadow-hard [color-scheme:light] w-auto')}
               />
               <button
                 type="button"

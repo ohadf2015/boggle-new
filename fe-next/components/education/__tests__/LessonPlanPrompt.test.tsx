@@ -217,4 +217,60 @@ describe('<LessonPlanPrompt>', () => {
       expect(await screen.findByTestId('lesson-plan')).toHaveClass('lg:col-span-2');
     });
   });
+
+  describe('Plan your first class: the booked invite', () => {
+    const withClass = (lessonAt: string | null) =>
+      getMock.mockResolvedValue({ ok: true, status: 200, json: async () => ({ ok: true, lessonAt, classroom: { name: 'Room 4B', joinCode: 'ABC123' } }) });
+
+    it('Given the rehearsal ends and the teacher books tomorrow at 9, When it saves, Then the calendar invite and class link appear', async () => {
+      withClass(null);
+      const at = defaultLessonAt(new Date());
+      postMock.mockResolvedValue(okResponse(at.toISOString()));
+      render(<LessonPlanPrompt classroomId="class-1" />);
+      fireEvent.click(await screen.findByTestId('lesson-plan-tomorrow'));
+      expect(await screen.findByTestId('lesson-plan-invite')).toBeInTheDocument();
+      expect(screen.getByTestId('lesson-plan-google')).toBeInTheDocument();
+      expect(screen.getByTestId('lesson-plan-link')).toHaveTextContent('/en/join/ABC123');
+    });
+
+    it('Given a class already booked, When the rehearsal ends, Then the booked invite shows straight away and no ask is tracked', async () => {
+      withClass(new Date(Date.now() + 86_400_000).toISOString());
+      render(<LessonPlanPrompt classroomId="class-1" />);
+      expect(await screen.findByTestId('lesson-plan-invite')).toBeInTheDocument();
+      expect(track).not.toHaveBeenCalledWith('lesson_plan_prompt_shown', expect.anything());
+    });
+
+    it('Given the class-ready screen, When booked, Then no second invite (that screen has its own calendar card)', async () => {
+      withClass(new Date(Date.now() + 86_400_000).toISOString());
+      render(<LessonPlanPrompt classroomId="class-1" source="class_setup" />);
+      expect(await screen.findByTestId('lesson-plan-saved')).toBeInTheDocument();
+      expect(screen.queryByTestId('lesson-plan-invite')).toBeNull();
+    });
+
+    it('Given the class details are missing, When booked, Then the plain saved line shows', async () => {
+      render(<LessonPlanPrompt classroomId="class-1" />);
+      await screen.findByTestId('lesson-plan-tomorrow');
+      postMock.mockResolvedValue(okResponse(defaultLessonAt(new Date()).toISOString()));
+      fireEvent.click(screen.getByTestId('lesson-plan-tomorrow'));
+      expect(await screen.findByTestId('lesson-plan-saved')).toBeInTheDocument();
+      expect(screen.queryByTestId('lesson-plan-invite')).toBeNull();
+    });
+
+    it('Given booked-only and nothing booked, When loaded, Then renders nothing and tracks nothing', async () => {
+      withClass(null);
+      const { container } = render(<LessonPlanPrompt classroomId="class-1" source="teacher_home" bookedOnly />);
+      await waitFor(() => expect(getMock).toHaveBeenCalled());
+      await new Promise((r) => setTimeout(r, 0));
+      expect(container).toBeEmptyDOMElement();
+      expect(track).not.toHaveBeenCalled();
+    });
+
+    it('Given booked-only and a booked class, When the teacher taps Change, Then the time picker stays open', async () => {
+      withClass(new Date(Date.now() + 86_400_000).toISOString());
+      render(<LessonPlanPrompt classroomId="class-1" source="teacher_home" bookedOnly />);
+      expect(await screen.findByTestId('lesson-plan-invite')).toBeInTheDocument();
+      fireEvent.click(screen.getByRole('button', { name: `${K}.change` }));
+      expect(screen.getByTestId('lesson-plan-remind')).toBeInTheDocument();
+    });
+  });
 });

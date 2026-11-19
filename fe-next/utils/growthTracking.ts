@@ -366,6 +366,8 @@ export type GrowthEvent =
   | 'class_ready_together'
   | 'lesson_plan_prompt_shown'
   | 'lesson_planned'
+  | 'lesson_plan_invite_added'
+  | 'lesson_plan_link_copied'
   // Student join funnel — mirrored from lib/education/telemetry.ts
   // (trackStudentJoinStarted + the student_join_completed branch of
   // trackEduClassroomJoin) with identical props. NOT in CANONICAL_DUAL_EMIT:

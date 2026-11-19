@@ -21488,8 +21488,8 @@ const en = {
     },
     "hostResults": {
       "lessonPlan": {
-        "title": "That was the rehearsal. When is the real lesson?",
-        "body": "Tell us and we'll email you this game an hour before, ready to open.",
+        "title": "Plan your first class",
+        "body": "Pick when you'll play it with your class. You get a calendar invite, the class link, and an email an hour before.",
         "tomorrow": "Tomorrow at 9:00",
         "pickLabel": "Or pick the time",
         "remind": "Remind me",
@@ -21502,7 +21502,12 @@ const en = {
         "setupTitle": "When is your next lesson with this class?",
         "setupBody": "Tell us and we'll email you the join code and the game an hour before, so it's ready to open in class.",
         "homeTitle": "When is your next lesson with this class?",
-        "homeBody": "Tell us and we'll email you the join code and the game an hour before, so you can open it in class."
+        "homeBody": "Tell us and we'll email you the join code and the game an hour before, so you can open it in class.",
+        "booked": "Booked",
+        "linkLabel": "Students join here, no account needed",
+        "copyLink": "Copy link",
+        "copied": "Link copied",
+        "nextTitle": "Your next lesson"
       },
       "keepOpen": {
         "cta": "Keep it open as homework for a week",

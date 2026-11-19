@@ -127,6 +127,16 @@ describe('EduHostResults practice rounds, rematch and lesson honesty', () => {
     expect(screen.queryByTestId('keep-open-homework')).toBeNull();
   });
 
+  it('given a bots-only practice round in a class, when results show, then planning the first class comes before the replay buttons', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ ok: true, lessonAt: null }) })));
+    render(<EduHostResults summary={summary({ classroomId: 'class-1' })} players={bots} t={t} onRematch={vi.fn()} />);
+    await act(async () => {});
+    vi.unstubAllGlobals();
+    const plan = screen.getByTestId('lesson-plan');
+    const actions = screen.getByTestId('edu-results-actions');
+    expect(plan.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('given a real class round, when results show, then no lesson-plan prompt', () => {
     render(<EduHostResults summary={summary({ classroomId: 'class-1' })} players={students} t={t} onRematch={vi.fn()} />);
     expect(screen.queryByTestId('lesson-plan')).toBeNull();

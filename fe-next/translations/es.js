@@ -22479,8 +22479,8 @@ const es = {
     },
     "hostResults": {
       "lessonPlan": {
-        "title": "Esto fue el ensayo. ¿Cuándo es la clase de verdad?",
-        "body": "Dínoslo y te mandamos este juego por correo una hora antes, listo para abrir.",
+        "title": "Planea tu primera clase",
+        "body": "Elige cuándo jugarás con tu clase. Recibes una invitación de calendario, el enlace de la clase y un correo una hora antes.",
         "tomorrow": "Mañana a las 9:00",
         "pickLabel": "O elige la hora",
         "remind": "Avísame",
@@ -22493,7 +22493,12 @@ const es = {
         "setupTitle": "¿Cuándo es tu próxima clase con este grupo?",
         "setupBody": "Dínoslo y te mandamos por correo el código para unirse y el juego una hora antes, listo para abrir en clase.",
         "homeTitle": "¿Cuándo es tu próxima clase con este grupo?",
-        "homeBody": "Dínoslo y te mandamos por correo el código y el juego una hora antes, para que lo abras directamente en clase."
+        "homeBody": "Dínoslo y te mandamos por correo el código y el juego una hora antes, para que lo abras directamente en clase.",
+        "booked": "Reservada",
+        "linkLabel": "Los alumnos entran aquí, sin cuenta",
+        "copyLink": "Copiar enlace",
+        "copied": "Enlace copiado",
+        "nextTitle": "Tu próxima clase"
       },
       "keepOpen": {
         "cta": "Dejarlo abierto como tarea una semana",
