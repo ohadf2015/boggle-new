@@ -57,6 +57,28 @@ export function dunningEmailEventType(day: DunningDay): string {
   return `teacher_dunning_email_day_${day}`;
 }
 
+/** Every marker either cron may have written for a day-1 or day-5 note. */
+export const DUNNING_SENT_EVENT_TYPES = [
+  'teacher_dunning_email_day_1',
+  'teacher_dunning_email_day_5',
+  'teacher_payment_failed_email',
+  'teacher_dunning_day1_email',
+  'teacher_dunning_day5_email',
+] as const;
+
+/** Map a stored event onto the day it already covered, including the churn-watch names. */
+export function dunningDayFromEventType(eventType: string): DunningDay | null {
+  if (
+    eventType === dunningEmailEventType(1) ||
+    eventType === 'teacher_payment_failed_email' ||
+    eventType === 'teacher_dunning_day1_email'
+  ) {
+    return 1;
+  }
+  if (eventType === dunningEmailEventType(5) || eventType === 'teacher_dunning_day5_email') return 5;
+  return null;
+}
+
 function b64url(buf: Buffer): string {
   return buf.toString('base64url');
 }

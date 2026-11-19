@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 
 const sql = readFileSync(
@@ -17,5 +17,12 @@ describe('teacher-pro-churn-watch pg_cron migration', () => {
     expect(sql).toContain('x-cron-secret');
     expect(sql).toContain("vault.decrypted_secrets WHERE name = 'cron_secret'");
     expect(sql).toContain('timeout_milliseconds := 60000');
+  });
+
+  it('does not declare the job in vercel.json — Railway does not run Vercel crons', () => {
+    // cd0555c0c removed fe-next/vercel.json because production is Railway.
+    // A Vercel cron entry would be declared and never applied.
+    const vercelJson = join(__dirname, '../../vercel.json');
+    expect(existsSync(vercelJson)).toBe(false);
   });
 });

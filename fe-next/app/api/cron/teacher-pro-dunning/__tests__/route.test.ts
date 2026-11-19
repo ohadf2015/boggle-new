@@ -19,7 +19,15 @@ function chain(result: { data: unknown; error: null }) {
       h.eqs.push([col, val]);
       return api;
     },
-    in: () => api,
+    in: (col: string, vals: string[]) => {
+      if (col === 'event_type' && Array.isArray(result.data)) {
+        return chain({
+          data: (result.data as { event_type?: string }[]).filter((row) => vals.includes(String(row.event_type))),
+          error: null,
+        });
+      }
+      return api;
+    },
     then: (resolve: (v: typeof result) => void, reject?: (e: unknown) => void) =>
       Promise.resolve(result).then(resolve, reject),
   };
@@ -160,6 +168,24 @@ describe('teacher-pro-dunning cron', () => {
     const body = await res.json();
     expect(body.enqueued).toEqual([]);
     expect(h.log).not.toHaveBeenCalled();
+    expect(h.sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('does not send a second day-1 when churn-watch already logged teacher_payment_failed_email', async () => {
+    h.subs = [{
+      user_id: USER,
+      source: 'polar',
+      provider_event_at: new Date(Date.now() - 2 * DAY).toISOString(),
+      current_period_end: null,
+      lemon_squeezy_subscription_id: 'sub_123',
+    }];
+    h.events = [{ subscription_id: 'sub_123', user_id: USER, event_type: 'teacher_payment_failed_email' }];
+    h.access = [{ user_id: USER, email: 'teacher@school.org', full_name: 'Dana', locale: 'en', created_at: '2026-09-01T00:00:00Z' }];
+
+    const res = await POST(req('/api/cron/teacher-pro-dunning'));
+    const body = await res.json();
+    expect(body.enqueued).toEqual([]);
+    expect(body.sent).toBe(0);
     expect(h.sendEmail).not.toHaveBeenCalled();
   });
 });

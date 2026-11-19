@@ -10,6 +10,7 @@ import {
 } from '@/lib/education/proFunnelServer';
 import type { TeacherLocale } from '@/lib/education/types';
 import type { TeacherProSubSnapshot } from '@/lib/education/teacherProChurnWatch';
+import { DUNNING_SENT_EVENT_TYPES, dunningDayFromEventType } from '@/lib/education/dunningEscalation';
 import logger from '@/utils/logger';
 
 /**
@@ -51,8 +52,7 @@ export function pickDunningStep(signals: DunningDecisionSignals): DunningStep | 
   const elapsedDays = Math.max(0, Math.floor((signals.nowMs - signals.pastDueOnsetMs) / DAY_MS));
   if (elapsedDays >= 5) return null;
 
-  const hasSentDay1 =
-    signals.alreadySent.includes(EVENT_DAY1) || signals.alreadySent.includes('teacher_dunning_day1_email');
+  const hasSentDay1 = signals.alreadySent.some((eventType) => dunningDayFromEventType(eventType) === 1);
   if (!hasSentDay1) return 'day-1';
   return null;
 }
@@ -200,7 +200,7 @@ export async function maybeSendPaymentFailedEmail({
       .from('subscription_events')
       .select('event_type, created_at')
       .eq('subscription_id', subscriptionId)
-      .in('event_type', [EVENT_DAY1, EVENT_DAY5, 'teacher_dunning_day1_email']);
+      .in('event_type', [...DUNNING_SENT_EVENT_TYPES]);
 
     if (recent) {
       for (const r of recent) {
@@ -249,6 +249,44 @@ export interface DunningSweepItem {
   reason?: string;
 }
 
+const inFlightDunningSends = new Set<string>();
+const CLOSED_SUBSCRIPTION_STATUSES = new Set(['canceled', 'cancelled', 'revoked']);
+
+function tryClaimDunningSend(subscriptionId: string, step: string): boolean {
+  const key = `${subscriptionId}:${step}`;
+  if (inFlightDunningSends.has(key)) return false;
+  inFlightDunningSends.add(key);
+  return true;
+}
+
+function releaseDunningSend(subscriptionId: string, step: string): void {
+  inFlightDunningSends.delete(`${subscriptionId}:${step}`);
+}
+
+type AdminClient = NonNullable<ReturnType<typeof createAdminClient>>;
+
+/**
+ * Polar says past_due but the webhook never wrote it. Stamp the row so
+ * teacher-pro-dunning (the day-5 sender) can see the seat. Do not invent a
+ * status when the row is already closed.
+ */
+async function repairMissedPastDue(
+  admin: AdminClient,
+  sub: TeacherProSubSnapshot,
+  subRow: { status?: string | null } | null,
+  nowMs: number,
+): Promise<void> {
+  const status = subRow?.status;
+  if (!status || status === 'past_due' || CLOSED_SUBSCRIPTION_STATUSES.has(status)) return;
+  const periodEndMs = sub.currentPeriodEnd ? Date.parse(sub.currentPeriodEnd) : NaN;
+  const onset = Number.isFinite(periodEndMs) && periodEndMs <= nowMs ? sub.currentPeriodEnd : new Date(nowMs).toISOString();
+  const { error } = await admin
+    .from('subscriptions')
+    .update({ status: 'past_due', provider_event_at: onset })
+    .eq('lemon_squeezy_subscription_id', sub.id);
+  if (error) logger.warn('[Dunning Sweep] could not stamp missed past_due', { subId: sub.id, error });
+}
+
 /**
  * Sweep past_due subscriptions during daily cron (teacher-pro-churn-watch)
  * for a missed day-1 note. Day-5 is not sent from this sweep.
@@ -280,10 +318,14 @@ export async function processDunningForPastDueSubs(
     // Lookup in subscriptions table by provider_subscription_id
     const { data: subRow } = await admin
       .from('subscriptions')
-      .select('user_id, provider_event_at, current_period_end')
+      .select('user_id, status, provider_event_at, current_period_end')
       .eq('lemon_squeezy_subscription_id', sub.id)
       .limit(1)
       .maybeSingle();
+
+    if (!options?.dry) {
+      await repairMissedPastDue(admin, sub, subRow, nowMs);
+    }
 
     if (subRow?.user_id) userId = subRow.user_id;
 
@@ -313,7 +355,7 @@ export async function processDunningForPastDueSubs(
       .from('subscription_events')
       .select('event_type, created_at')
       .eq('subscription_id', sub.id)
-      .in('event_type', [EVENT_DAY1, EVENT_DAY5, 'teacher_dunning_day1_email']);
+      .in('event_type', [...DUNNING_SENT_EVENT_TYPES]);
 
     const alreadySent = (events ?? []).map((e) => e.event_type);
     let pastDueOnsetMs = resolvePastDueOnsetMs(
@@ -352,24 +394,40 @@ export async function processDunningForPastDueSubs(
       continue;
     }
 
-    const res = await sendDunningEmail({
-      subscriptionId: sub.id,
-      userId,
-      email,
-      fullName,
-      locale,
-      step,
-      renewalDate: sub.currentPeriodEnd,
-    });
+    if (!tryClaimDunningSend(sub.id, step)) {
+      items.push({
+        subscriptionId: sub.id,
+        userId,
+        email,
+        step,
+        sent: false,
+        reason: 'deduped',
+      });
+      continue;
+    }
 
-    items.push({
-      subscriptionId: sub.id,
-      userId,
-      email,
-      step,
-      sent: res.sent,
-      reason: res.reason,
-    });
+    try {
+      const res = await sendDunningEmail({
+        subscriptionId: sub.id,
+        userId,
+        email,
+        fullName,
+        locale,
+        step,
+        renewalDate: sub.currentPeriodEnd,
+      });
+
+      items.push({
+        subscriptionId: sub.id,
+        userId,
+        email,
+        step,
+        sent: res.sent,
+        reason: res.reason,
+      });
+    } finally {
+      releaseDunningSend(sub.id, step);
+    }
   }
 
   return { processed: items.length, items };

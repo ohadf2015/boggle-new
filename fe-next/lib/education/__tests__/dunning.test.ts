@@ -17,6 +17,7 @@ import { getPolarClient } from '@/lib/polar';
 const subEventsMock = vi.fn();
 const accessMaybeSingleMock = vi.fn();
 const subscriptionsMock = vi.fn();
+const subscriptionUpdateMock = vi.fn(async (_patch: Record<string, unknown>) => ({ error: null }));
 const createCustomerPortalUrlMock = vi.fn();
 
 vi.mock('@/utils/supabase/admin', () => ({
@@ -49,6 +50,9 @@ vi.mock('@/utils/supabase/admin', () => ({
             eq: () => ({
               limit: () => ({ maybeSingle: subscriptionsMock }),
             }),
+          }),
+          update: (patch: Record<string, unknown>) => ({
+            eq: () => subscriptionUpdateMock(patch),
           }),
         };
       }
@@ -139,6 +143,17 @@ describe('pickDunningStep pure function', () => {
         pastDueOnsetMs: onset,
         nowMs: onset + 1 * ONE_DAY,
         alreadySent: [EVENT_DAY1],
+      }),
+    ).toBeNull();
+  });
+
+  it('treats the teacher-pro-dunning day-1 marker as already sent', () => {
+    expect(
+      pickDunningStep({
+        status: 'past_due',
+        pastDueOnsetMs: onset,
+        nowMs: onset + 1 * ONE_DAY,
+        alreadySent: ['teacher_dunning_email_day_1'],
       }),
     ).toBeNull();
   });
@@ -417,6 +432,64 @@ describe('processDunningForPastDueSubs cron sweep', () => {
     expect(sendEmail).not.toHaveBeenCalled();
   });
 
+  it('does not email again when teacher-pro-dunning already logged day-1', async () => {
+    subEventsMock.mockResolvedValue({
+      data: [{ event_type: 'teacher_dunning_email_day_1', created_at: '2026-11-10T00:00:00.000Z' }],
+    });
+    const sweep = await processDunningForPastDueSubs(
+      [
+        {
+          id: 'sub_past_due_1',
+          status: 'past_due',
+          cancelAtPeriodEnd: false,
+          email: 'teacher@school.org',
+          amount: 900,
+          currency: 'usd',
+          currentPeriodEnd: '2026-12-09T00:00:00.000Z',
+          startedAt: '2026-09-09T00:00:00.000Z',
+        },
+      ],
+      { dry: false, nowMs: Date.parse('2026-11-11T08:00:00.000Z') },
+    );
+    expect(sweep.items).toEqual([]);
+    expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('sends day-1 once when two sweeps overlap before the marker is visible', async () => {
+    let releaseSend: () => void = () => {};
+    const gate = new Promise<void>((resolve) => {
+      releaseSend = resolve;
+    });
+    vi.mocked(sendEmail).mockImplementation(async () => {
+      await gate;
+      return { ok: true } as any;
+    });
+    subEventsMock.mockResolvedValue({ data: [] });
+    subscriptionsMock.mockResolvedValue({
+      data: { user_id: 'u-1', status: 'past_due', provider_event_at: '2026-11-10T00:00:00.000Z' },
+    });
+    const subs = [
+      {
+        id: 'sub_overlap',
+        status: 'past_due',
+        cancelAtPeriodEnd: false,
+        email: 'teacher@school.org',
+        amount: 900,
+        currency: 'usd',
+        currentPeriodEnd: '2026-12-10T00:00:00.000Z',
+        startedAt: '2026-09-09T00:00:00.000Z',
+      },
+    ];
+    const nowMs = Date.parse('2026-11-11T08:00:00.000Z');
+    const first = processDunningForPastDueSubs(subs, { dry: false, nowMs });
+    const second = processDunningForPastDueSubs(subs, { dry: false, nowMs });
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    releaseSend();
+    const [a, b] = await Promise.all([first, second]);
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(a.items.filter((item) => item.sent).length + b.items.filter((item) => item.sent).length).toBe(1);
+  });
+
   it('skips canceled subs even if they are passed into the sweep', async () => {
     const sweep = await processDunningForPastDueSubs(
       [
@@ -435,5 +508,38 @@ describe('processDunningForPastDueSubs cron sweep', () => {
     );
     expect(sweep).toEqual({ processed: 0, items: [] });
     expect(sendEmail).not.toHaveBeenCalled();
+  });
+
+  it('stamps a webhook-missed past_due row so the day-5 cron can see it, without sending the false day-5 note', async () => {
+    subscriptionsMock.mockResolvedValue({
+      data: {
+        user_id: 'u-1',
+        status: 'active',
+        provider_event_at: '2026-09-09T00:00:00.000Z',
+        current_period_end: '2026-11-09T00:00:00.000Z',
+      },
+    });
+    subEventsMock.mockResolvedValue({ data: [{ event_type: EVENT_DAY1, created_at: '2026-11-09T01:05:37.000Z' }] });
+    const sweep = await processDunningForPastDueSubs(
+      [
+        {
+          id: 'sub_missed_webhook',
+          status: 'past_due',
+          cancelAtPeriodEnd: false,
+          email: 'teacher@school.org',
+          amount: 900,
+          currency: 'usd',
+          currentPeriodEnd: '2026-11-09T00:00:00.000Z',
+          startedAt: '2026-09-09T00:00:00.000Z',
+        },
+      ],
+      { dry: false, nowMs: Date.parse('2026-11-18T08:00:00.000Z') },
+    );
+    expect(sweep.items).toEqual([]);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(teacherPaymentFailedDay5).not.toHaveBeenCalled();
+    expect(subscriptionUpdateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 'past_due', provider_event_at: '2026-11-09T00:00:00.000Z' }),
+    );
   });
 });

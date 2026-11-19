@@ -177,4 +177,28 @@ describe('/api/cron/teacher-pro-churn-watch', () => {
       items: [{ subscriptionId: 'sub_1', email: 'teacher@school.org', step: 'day-5', sent: true }],
     });
   });
+
+  it('accepts the x-cron-secret header pg_cron sends', async () => {
+    const res = await POST({
+      headers: { get: (name: string) => (name.toLowerCase() === 'x-cron-secret' ? CRON_SECRET : null) },
+      nextUrl: { searchParams: new URLSearchParams() },
+    } as any);
+    expect(res.status).toBe(200);
+    expect(h.sendTelegram).not.toHaveBeenCalled();
+  });
+
+  it('a second fire of the same past_due snapshot does not Telegram again', async () => {
+    h.listLive = [];
+    h.listInactive = [{ ...liveSub, status: 'past_due' }];
+    const headers = { get: (name: string) => (name.toLowerCase() === 'x-cron-secret' ? CRON_SECRET : null) };
+    const first = await POST({ headers, nextUrl: { searchParams: new URLSearchParams() } } as any);
+    expect(first.status).toBe(200);
+    expect(h.sendTelegram).toHaveBeenCalledTimes(1);
+    const saved = h.redisSet.mock.calls.at(-1)?.[1];
+    h.redisRaw = typeof saved === 'string' ? saved : null;
+    h.sendTelegram.mockClear();
+    const second = await POST({ headers, nextUrl: { searchParams: new URLSearchParams() } } as any);
+    expect(second.status).toBe(200);
+    expect(h.sendTelegram).not.toHaveBeenCalled();
+  });
 });
