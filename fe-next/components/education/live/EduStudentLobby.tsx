@@ -87,7 +87,7 @@ export function EduStudentLobby({
       <main className="relative flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-3 [container-type:size]">
         <div
           data-testid="edu-student-panel"
-          className="mx-auto my-auto grid w-full max-w-lg shrink-0 grid-cols-1 gap-4 rounded-neo-lg border-4 border-neo-black bg-neo-navy-light p-4 shadow-hard-lg lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:p-8 tv:max-w-6xl"
+          className="mx-auto my-auto grid w-full max-w-lg shrink-0 grid-cols-1 gap-4 rounded-neo-lg border-4 border-neo-cream bg-neo-navy-light p-4 shadow-hard-lg lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr] lg:gap-x-10 lg:p-8 tv:max-w-6xl"
         >
           <div className="grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 lg:col-start-2 lg:row-start-1 lg:self-start">
             <div className="relative row-span-2 shrink-0">
@@ -163,7 +163,7 @@ export function EduStudentLobby({
 
       <footer
         data-testid="edu-student-lobby-bar"
-        className="shrink-0 border-t-[3px] border-neo-black bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
+        className="shrink-0 border-t-[3px] border-neo-cream bg-neo-navy-light px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
       >
         <div className="mx-auto flex w-full max-w-lg flex-col gap-2">
           <p
