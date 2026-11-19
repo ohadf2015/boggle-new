@@ -14,8 +14,8 @@ import { useHqJuice } from '../hq/useHqJuice';
 import { useRisingCount } from '../hq/useRisingCount';
 import { STUDENT_GOAL } from '../hq/studentGoal';
 
-/** The live "1 joined, aim for 3" line for a class still filling up, with its join sound and funnel events. */
-export function HomeJoinGoal({ classroom }: { classroom: { id: string } }) {
+/** The live "1 joined, aim for 3" line for a class still filling up, with its join sound and (on Home only) funnel events. */
+export function HomeJoinGoal({ classroom, track = true }: { classroom: { id: string }; track?: boolean }) {
   const { t: rawT, language } = useLanguage();
   const t = rawT as (key: string, params?: Record<string, string | number>) => string;
   const { reduced, sfx } = useHqJuice();
@@ -41,14 +41,14 @@ export function HomeJoinGoal({ classroom }: { classroom: { id: string } }) {
     prevCount.current = null;
   }
   useEffect(() => {
-    if (loading || count > 0 || shownFor.current === classroom.id) return;
+    if (!track || loading || count > 0 || shownFor.current === classroom.id) return;
     shownFor.current = classroom.id;
     trackEduJoinCodeShown({ classroomId: classroom.id });
-  }, [loading, count, classroom.id]);
+  }, [track, loading, count, classroom.id]);
 
   useEffect(() => {
     if (loading) return;
-    if (prevCount.current === 0 && count >= 1) {
+    if (track && prevCount.current === 0 && count >= 1) {
       trackEduFirstStudentJoined({ classroomId: classroom.id });
       captureTeacherOnboardingFunnel(TEACHER_ONBOARDING_FUNNEL_EVENTS.studentJoined, {
         locale: language,
@@ -56,7 +56,7 @@ export function HomeJoinGoal({ classroom }: { classroom: { id: string } }) {
       });
     }
     prevCount.current = count;
-  }, [loading, count, classroom.id, language, hasPro, status, proLoading]);
+  }, [track, loading, count, classroom.id, language, hasPro, status, proLoading]);
 
   return (
     <p data-testid="hq-joined-goal" aria-live="polite" className="min-h-5 font-neo-body text-sm font-bold leading-tight text-neo-cream/80">

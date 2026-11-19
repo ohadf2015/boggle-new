@@ -308,6 +308,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               cue={week.status !== 'loading' && cue ? t(cue.key) : null}
               rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
               newClassHref={newClassHref}
+              classesHref={`/${language}/teacher/classroom`}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
               meta={selectedClassroom ? (
                 <HomeClassMeta
@@ -344,24 +345,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               />
             </div>
           ) : null}
-        </>
-      }
-      sessions={showSessions ? (
-        <HomeSessionRail
-          key={effectiveId}
-          compact={!rosterShown}
-          classroomId={effectiveId}
-          languages={railLanguages(classLanguage, lessonProfile.languages)}
-          gradeBand={lessonProfile.gradeBand}
-          nowMs={nowMs}
-          lastPlayedMs={lastPlayedMs}
-          ready={railReady}
-          locale={language}
-          t={t}
-        />
-      ) : null}
-      below={
-        <>
           {selectedClassroom ? (
             <div data-tm>
               <HomeWeekChallenge
@@ -384,9 +367,23 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
           ) : null}
         </>
       }
+      sessions={showSessions ? (
+        <HomeSessionRail
+          key={effectiveId}
+          compact={!rosterShown}
+          classroomId={effectiveId}
+          languages={railLanguages(classLanguage, lessonProfile.languages)}
+          gradeBand={lessonProfile.gradeBand}
+          nowMs={nowMs}
+          lastPlayedMs={lastPlayedMs}
+          ready={railReady}
+          locale={language}
+          t={t}
+        />
+      ) : null}
       accountBanner={accountBanner}
       proCard={proCard}
-      footer={selectedClassroom ? (
+      footer={selectedClassroom && !hasPro ? (
         <div data-testid="dashboard-student-cap-meters">
           <StudentCapMeter key={selectedClassroom.id} classroomName={classrooms.length > 1 ? selectedClassroom.name : undefined} studentCount={selectedClassroom.member_count ?? 0} source="dashboard" />
         </div>

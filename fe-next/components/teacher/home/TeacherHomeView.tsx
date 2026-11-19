@@ -23,8 +23,6 @@ export interface TeacherHomeViewProps {
   onboarding: ReactNode;
   desk: ReactNode;
   sessions: ReactNode | null;
-  /** After the ready-made games: the week challenge and the next-lesson prompt. */
-  below?: ReactNode;
   accountBanner: ReactNode | null;
   /** Billing trouble (declined renewal): before the desk, never below the fold. */
   alert?: ReactNode | null;
@@ -37,7 +35,7 @@ export interface TeacherHomeViewProps {
 
 export function TeacherHomeView({
   t, isRTL, revealRef, greeting, ready, error, onRetry, hasClasses, onboarding, desk,
-  sessions, below, accountBanner, alert = null, proCard, footer, welcome, children,
+  sessions, accountBanner, alert = null, proCard, footer, welcome, children,
 }: TeacherHomeViewProps) {
   const deskShown = ready && !error && hasClasses;
   return (
@@ -68,7 +66,6 @@ export function TeacherHomeView({
         </div>
 
         {sessions}
-        {deskShown && below ? <div data-testid="home-below" className="flex min-w-0 flex-col gap-3 empty:hidden sm:gap-4">{below}</div> : null}
         {deskShown && accountBanner ? <div data-testid="home-account-banner" className="min-w-0">{accountBanner}</div> : null}
         {deskShown && footer ? <div data-testid="home-footer" className="min-w-0">{footer}</div> : null}
       </div>

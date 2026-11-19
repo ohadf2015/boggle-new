@@ -171,9 +171,18 @@ describe('Teacher Home', () => {
     expect(within(screen.getByTestId('home-hero')).getByRole('heading', { level: 1 })).toHaveTextContent('eduShell.home.greet');
   });
 
-  it('Given a class, Then the week challenge waits below the ready-made games, outside the first screen', () => {
+  it('Given a class, Then the week challenge stays on the desk under the board, before the ready-made games', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-first-frame')).not.toContainElement(screen.getByTestId('home-below'));
+    const frame = screen.getByTestId('home-first-frame');
+    expect(frame).toContainElement(screen.getByTestId('home-desk-board'));
+    expect(frame).not.toContainElement(screen.getByTestId('home-session-rail'));
+    expect(screen.queryByTestId('home-below')).toBeNull();
+  });
+
+  it('Given a Pro teacher, Then no empty seat-meter wrapper is left on Home', () => {
+    proState = PRO;
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('dashboard-student-cap-meters')).toBeNull();
   });
 
   it('Given an insight, Then the hero stays on the class and its Start button, with no filler line', () => {

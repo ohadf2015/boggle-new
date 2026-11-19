@@ -84,6 +84,13 @@ describe('<HomeHero> layout', () => {
     expect(cue.closest('[data-testid="home-hero-art"]')?.className).toMatch(/(^|\s)hidden(\s|$)/);
   });
 
+  it('Given a cue, Then narrow screens read it as the line under the class, hidden once the art column shows', () => {
+    renderHero({ cue: 'Autumn words are ready' });
+    const line = screen.getByTestId('home-coach-cue-line');
+    expect(line).toHaveTextContent('Autumn words are ready');
+    expect(line.className).toMatch(/@3xl\/hero:hidden/);
+  });
+
   it('Given a class below its goal, Then the join row says who joined and is headed Get students in', () => {
     renderHero({ joinGoal: <span data-testid="goal">1 joined</span> });
     const row = screen.getByTestId('home-join-row');

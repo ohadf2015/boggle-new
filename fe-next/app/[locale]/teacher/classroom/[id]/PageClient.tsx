@@ -121,13 +121,13 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         startHref={teacherHostHref(language, { classroomId: classroom.id })}
         resultsHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
         libraryHref={`/${language}/teacher/curriculum`}
-        roster={<HomeRosterFold rows={roster.rows} failed={roster.failed} language={language} nowMs={nowMs} t={t} />}
+        roster={<HomeRosterFold rows={roster.rows} failed={roster.failed} filterable language={language} nowMs={nowMs} t={t} />}
         lists={lists}
         listsLoading={assignmentsLoading || lessonsLoading}
         lastGame={loop.last}
         replay={loop.replay}
         rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
-        joinGoal={belowStudentGoal(classroom.member_count ?? undefined) ? <HomeJoinGoal classroom={classroom} /> : undefined}
+        joinGoal={belowStudentGoal(classroom.member_count ?? undefined) ? <HomeJoinGoal classroom={classroom} track={false} /> : undefined}
         onShare={() => setShareOpen(true)}
         onRequestDelete={() => setConfirmOpen(true)}
         proOffer={<ClassroomProOffer />}

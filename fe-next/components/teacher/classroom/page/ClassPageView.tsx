@@ -59,7 +59,7 @@ export function ClassPageView(props: ClassPageViewProps) {
         startHref={props.startHref}
         onShare={props.onShare}
         rehearse={props.rehearse}
-        replay={props.replay}
+        replay={props.replay?.kind === 'ready' ? props.replay : undefined}
         joinGoal={props.joinGoal}
         testIds={{ start: 'class-page-start', code: 'class-page-code', share: 'class-page-share' }}
         meta={

@@ -13,7 +13,7 @@ const openMenu = () => fireEvent.pointerDown(screen.getByTestId('home-class-swit
 
 describe('<HomeHero> class menu', () => {
   it('Given a selected class, Then the class page and New class live in the menu on the class name, not on the desk', () => {
-    render(<HomeHero classrooms={[A, B]} selectedId="c2" onSelect={vi.fn()} language="he" t={t} newClassHref="/he/teacher/classroom/new" meta={<span data-testid="meta">4</span>} />);
+    render(<HomeHero classrooms={[A, B]} selectedId="c2" onSelect={vi.fn()} language="he" t={t} newClassHref="/he/teacher/classroom/new" classesHref="/he/teacher/classroom" meta={<span data-testid="meta">4</span>} />);
     expect(screen.queryByTestId('home-class-page')).toBeNull();
     expect(screen.queryByTestId('home-new-class')).toBeNull();
     expect(screen.getByTestId('home-hero-meta-row')).toContainElement(screen.getByTestId('meta'));
@@ -21,6 +21,13 @@ describe('<HomeHero> class menu', () => {
     expect(screen.getByTestId('home-class-page')).toHaveAttribute('href', '/he/teacher/classroom/c2');
     expect(screen.getByTestId('home-class-page')).toHaveTextContent('eduShell.home.classPage');
     expect(screen.getByTestId('home-new-class')).toHaveAttribute('href', '/he/teacher/classroom/new');
+    expect(screen.getByTestId('home-all-classes')).toHaveAttribute('href', '/he/teacher/classroom');
+  });
+
+  it('Given one class, Then the heading is named by the class, not by the menu', () => {
+    render(<HomeHero classrooms={[A]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} newClassHref="/en/teacher/classroom/new" />);
+    expect(screen.getByRole('heading', { level: 2 })).toHaveAccessibleName('Period 3');
+    expect(screen.getByTestId('home-class-switcher')).not.toHaveAttribute('aria-label');
   });
 
   it('Given one class, Then the same menu still reaches its page and New class, with no class list', () => {

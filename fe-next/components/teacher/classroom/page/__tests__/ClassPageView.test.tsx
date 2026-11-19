@@ -59,6 +59,12 @@ describe('ClassPageView', () => {
     expect(hero).toHaveTextContent('languages.english');
   });
 
+  it('Given the last game is still being read, Then Start shows at once instead of a spinner', () => {
+    render(<ClassPageView {...props({ replay: { kind: 'pending' } })} />);
+    expect(screen.getByTestId('class-page-start')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
+    expect(screen.queryByTestId('home-start-pending')).toBeNull();
+  });
+
   it('Given a last game, Then it is one quiet row that opens the results', () => {
     render(<ClassPageView {...props()} />);
     const last = screen.getByTestId('class-page-last-game');

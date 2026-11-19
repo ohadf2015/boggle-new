@@ -48,4 +48,9 @@ describe('<HomeHero> actions', () => {
     expect(screen.getByTestId('class-page-code')).toHaveTextContent('AB12CD');
     expect(screen.getByTestId('class-page-share')).toBeInTheDocument();
   });
+
+  it('Given the class page and a replay, Then Play again carries the page start id', () => {
+    render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} replay={{ kind: 'ready', href: '/r', detail: 'x' }} testIds={{ start: 'class-page-start' }} />);
+    expect(screen.getByTestId('class-page-start')).toHaveAttribute('href', '/r');
+  });
 });

@@ -2,7 +2,7 @@
 
 import { createElement, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { Check, ChevronDown, ExternalLink, Loader2, Play, Plus, RotateCcw, Share2 } from 'lucide-react';
+import { Check, ChevronDown, ExternalLink, Loader2, Play, Plus, RotateCcw, Share2, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -51,6 +51,8 @@ export interface HomeHeroProps {
   /** 2 on Home, where the greeting is the page heading; 1 on the class page. */
   titleLevel?: 1 | 2;
   newClassHref?: string;
+  /** The full classes list, offered in the class menu. */
+  classesHref?: string;
   /** False on the class page itself. */
   classPageLink?: boolean;
   /** The live joined-vs-goal line for a class still filling up. */
@@ -68,7 +70,7 @@ export interface HomeHeroProps {
 /** The class desk: one calm panel with the class, one huge Start, one big secondary and the join code in a compact row. */
 export function HomeHero({
   classrooms, selectedId, onSelect, onStart, language, t, rehearse, meta, eyebrow, cue, titleLevel = 2,
-  newClassHref, classPageLink = true, joinGoal, capLabel, replay, startHref, onShare, testIds,
+  newClassHref, classesHref, classPageLink = true, joinGoal, capLabel, replay, startHref, onShare, testIds,
 }: HomeHeroProps) {
   const selected = classrooms.find((c) => c.id === selectedId) ?? classrooms[0];
   const [pending, setPending] = useState(false);
@@ -107,9 +109,10 @@ export function HomeHero({
             {createElement(
               `h${titleLevel}`,
               { id: 'home-hero-title', className: 'min-w-0 font-neo-display text-3xl font-black leading-tight text-white sm:text-5xl [@media(max-height:820px)]:sm:text-4xl' },
-              <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
+              <ClassMenu classrooms={classrooms} selected={selected} onSelect={onSelect} capLabel={capLabel} newClassHref={newClassHref} classesHref={classesHref} classPageHref={classPageLink && selected ? `/${language}/teacher/classroom/${selected.id}` : undefined} t={t} />,
             )}
             {meta ? <div data-testid="home-hero-meta-row" className="mt-1 text-neo-cream/80">{meta}</div> : null}
+            {cue ? <p data-testid="home-coach-cue-line" suppressHydrationWarning className="font-neo-body text-sm font-semibold text-neo-cream/80 @3xl/hero:hidden">{cue}</p> : null}
           </div>
 
           <div data-testid="home-hero-start-row" className="flex flex-col items-stretch gap-3">
@@ -119,7 +122,7 @@ export function HomeHero({
                 <span className="sr-only">{t('eduShell.home.loop.loading')}</span>
               </div>
             ) : replay?.kind === 'ready' ? (
-              <Link href={replay.href} data-testid="home-play-again" data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin} className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}>
+              <Link href={replay.href} data-testid={testIds?.start ?? 'home-play-again'} data-hero="true" data-magnet aria-busy={pending || undefined} onClick={begin} className={cn(PRIMARY_SLOT, 'group animate-edu-shine')}>
                 <span aria-hidden="true" className="edu-shine-track" />
                 {pending ? (
                   <Loader2 className="size-6 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
@@ -190,25 +193,26 @@ export function HomeHero({
   );
 }
 
-function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, classPageHref, t }: {
+function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, classesHref, classPageHref, t }: {
   classrooms: readonly HomeHeroClass[];
   selected: HomeHeroClass | undefined;
   onSelect: (id: string) => void;
   capLabel?: string;
   newClassHref?: string;
+  classesHref?: string;
   classPageHref?: string;
   t: T;
 }) {
   const label = <span dir="auto" className="min-w-0 break-words">{selected?.name}</span>;
   const several = classrooms.length > 1;
-  if (!several && !newClassHref && !classPageHref) {
+  if (!several && !newClassHref && !classPageHref && !classesHref) {
     return <span data-testid="home-class-switcher" className="inline-flex min-w-0 max-w-full">{label}</span>;
   }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         data-testid="home-class-switcher"
-        aria-label={several ? t('eduShell.home.switchClass') : t('eduShell.home.classPage')}
+        aria-label={several ? t('eduShell.home.switchClass') : undefined}
         className="inline-flex min-h-[44px] min-w-0 max-w-full items-center gap-1 rounded-neo text-start transition-colors duration-150 hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream"
       >
         {label}
@@ -221,7 +225,7 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
             <span dir="auto" className="truncate">{c.name}</span>
           </DropdownMenuItem>
         )) : null}
-        {several && (classPageHref || newClassHref) ? <DropdownMenuSeparator className="bg-neo-cream/10" /> : null}
+        {several && (classPageHref || newClassHref || classesHref) ? <DropdownMenuSeparator className="bg-neo-cream/10" /> : null}
         {classPageHref ? (
           <DropdownMenuItem asChild className={MENU_ROW}>
             <Link href={classPageHref} data-testid="home-class-page">
@@ -235,6 +239,14 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
             <Link href={newClassHref} data-testid="home-new-class">
               <Plus className="size-4 shrink-0" aria-hidden="true" />
               {t('eduShell.home.newClass')}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+        {classesHref ? (
+          <DropdownMenuItem asChild className={MENU_ROW}>
+            <Link href={classesHref} data-testid="home-all-classes">
+              <Users className="size-4 shrink-0" aria-hidden="true" />
+              {t('eduShell.home.yourClasses')}
             </Link>
           </DropdownMenuItem>
         ) : null}

@@ -56,4 +56,14 @@ describe('<HomeJoinGoal>', () => {
     expect(screen.queryByTestId('hq-joined-goal-count')).toBeNull();
     expect(shown).not.toHaveBeenCalled();
   });
+
+  it('Given a surface that does not count the funnel, Then no join events fire but the line still shows', () => {
+    const { rerender } = render(<HomeJoinGoal classroom={CLASS} track={false} />);
+    roster.value = { students: [{ id: 's1' }], arrivals: ['s1'], loading: false };
+    rerender(<HomeJoinGoal classroom={CLASS} track={false} />);
+    expect(shown).not.toHaveBeenCalled();
+    expect(joined).not.toHaveBeenCalled();
+    expect(funnel).not.toHaveBeenCalled();
+    expect(screen.getByTestId('hq-joined-goal-count')).toBeInTheDocument();
+  });
 });

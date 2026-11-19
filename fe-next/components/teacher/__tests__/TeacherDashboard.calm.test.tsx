@@ -78,7 +78,7 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(within(screen.getByTestId('home-hero')).getByRole('button', { name: 'eduShell.home.switchClass' })).toBeInTheDocument();
     const rail = screen.getByTestId('home-session-rail');
     const after = Array.from(home.children).slice(Array.from(home.children).indexOf(rail) + 1);
-    expect(after.every((el) => ['home-below', 'home-footer'].includes(el.getAttribute('data-testid') ?? ''))).toBe(true);
+    expect(after.every((el) => ['home-footer'].includes(el.getAttribute('data-testid') ?? ''))).toBe(true);
     expect(limeFills(home)).toEqual([screen.getByTestId('home-start-live')]);
   });
 
