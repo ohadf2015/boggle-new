@@ -40,6 +40,11 @@ describe('<ProInlineLock>: a locked inline Pro action previews before it asks', 
     expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
 
+  it('sits quietly on what it locks: no lime outline competing with the page action', () => {
+    render(<ProInlineLock feature="missedPractice" label="Spaced practice" />);
+    expect(screen.getByTestId('pro-inline-lock-missedPractice').className).not.toMatch(/neo-lime|shadow-hard/);
+  });
+
   it('starts checkout from this page and remembers it for the return', () => {
     render(<ProInlineLock feature="missedPractice" label="Spaced practice" />);
     fireEvent.click(screen.getByTestId('pro-inline-lock-missedPractice'));

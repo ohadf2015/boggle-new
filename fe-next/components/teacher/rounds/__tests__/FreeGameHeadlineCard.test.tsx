@@ -64,6 +64,16 @@ describe('FreeGameHeadlineCard', () => {
     expect(upsell.getAttribute('href')).toBe('/en/teacher/upgrade');
   });
 
+  it('Given a free teacher, when shown, then the Pro line sits in the header as a text link and nothing is boxed inside the card', () => {
+    render(<FreeGameHeadlineCard classroomId="c1" />);
+    const card = screen.getByTestId('free-game-headline');
+    const upsell = within(card).getByTestId('free-headline-pro');
+    expect(card.querySelector('header')).toContainElement(upsell);
+    expect(upsell.className).not.toMatch(/border|shadow/);
+    expect(upsell.className).toMatch(/min-h-11/);
+    expect(within(card).getByTestId('free-headline-average').className).not.toMatch(/border|bg-neo/);
+  });
+
   it('Given the same game, when the round report renders, then its first missed words are the headline words (one shared list)', () => {
     render(
       <>

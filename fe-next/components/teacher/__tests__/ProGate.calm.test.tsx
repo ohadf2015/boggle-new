@@ -41,7 +41,31 @@ describe('ProGate calm tone (reports)', () => {
     expect(container.querySelectorAll('.uppercase')).toHaveLength(0);
   });
 
-  it('Given a teacher on a live access trial, Then the strip upgrade button is outlined, not a colored fill', () => {
+  it('Given a locked page, Then the Pro mark sits on the title line, not on a row of its own', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, known: true, status: 'active', trialUsed: false });
+    render(
+      <ProGate feature="reports" tone="calm">
+        <div>paid</div>
+      </ProGate>,
+    );
+    const heading = screen.getByRole('heading', { name: 'teacher.proGate.reports.title' });
+    expect(screen.getByTestId('pro-gate-pill').parentElement).toContainElement(heading);
+  });
+
+  it('Given a live access trial, Then the strip is one plain line with a link-styled upgrade', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 5 * 864e5).toISOString() });
+    render(
+      <ProGate feature="reports" tone="calm">
+        <div>paid</div>
+      </ProGate>,
+    );
+    expect(screen.getByTestId('pro-trial-preview').className).not.toMatch(/border|shadow|bg-neo/);
+    const upgrade = screen.getByTestId('pro-trial-preview-upgrade');
+    expect(upgrade.className).toMatch(/underline/);
+    expect(upgrade.className).toMatch(/min-h-11/);
+  });
+
+  it('Given a teacher on a live access trial, Then the strip upgrade button is not a colored fill', () => {
     mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: false, accessTrialExpires: new Date(Date.now() + 5 * 864e5).toISOString() });
     render(
       <ProGate feature="reports" tone="calm">

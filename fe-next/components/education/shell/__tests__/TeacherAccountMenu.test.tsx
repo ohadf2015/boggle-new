@@ -58,7 +58,7 @@ describe('<TeacherAccountMenu>', () => {
     expect(screen.getByRole('menuitem', { name: /eduShell.account.profile/ })).toHaveAttribute('href', '/he/teacher/profile');
     expect(screen.getByRole('menuitem', { name: /eduShell.account.help/ })).toHaveAttribute('href', '/he/education/help');
     expect(screen.getByRole('menuitem', { name: /eduShell.account.whatsNew/ })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: /eduShell.nav.pro/ })).toHaveAttribute('href', '/he/teacher/upgrade');
+    expect(screen.getByRole('menuitem', { name: /eduShell.account.plans/ })).toHaveAttribute('href', '/he/teacher/upgrade');
     expect(screen.getByRole('menuitem', { name: /auth.signOut/ })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: /education.header.exitEducation/ })).toBeNull();
     const hrefs = Array.from(document.querySelectorAll('a[href]')).map((a) => a.getAttribute('href'));
@@ -79,12 +79,32 @@ describe('<TeacherAccountMenu>', () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith('/he/education'));
     expect(signOut).toHaveBeenCalled();
   });
-  it('When opened, Then the Pro item is a neutral row that names plans and carries only a small PRO badge', async () => {
-    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" />);
+  it('When opened, Then Plans is a plain row on every screen size, with no Pro badge', async () => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" plan="pro" />);
     await openMenu();
     const item = screen.getByRole('menuitem', { name: /eduShell.account.plans/ });
     expect(item).toHaveAttribute('href', '/he/teacher/upgrade');
-    expect(item.className).not.toContain('text-neo-yellow');
-    expect(item.querySelector('[data-testid="teacher-account-pro-badge"]')).toHaveTextContent('eduShell.nav.pro');
+    expect(item.className).not.toContain('lg:hidden');
+    expect(item.querySelector('[data-pro-badge]')).toBeNull();
+  });
+
+  it.each([
+    ['pro', 'eduShell.nav.pro'],
+    ['trial', 'teacher.plan.trialActive'],
+  ] as const)('Given a %s teacher, When the account row shows, Then it carries the plan mark and nothing clickable inside', (plan, label) => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" plan={plan} />);
+    const trigger = screen.getByTestId('teacher-account-trigger');
+    expect(screen.getByTestId('teacher-account-plan')).toHaveTextContent(label);
+    expect(trigger).toContainElement(screen.getByTestId('teacher-account-plan'));
+    expect(trigger.querySelector('a,button')).toBeNull();
+  });
+
+  it.each([
+    ['free', 'row'],
+    [undefined, 'row'],
+    ['pro', 'icon'],
+  ] as const)('Given plan %s in the %s variant, Then the trigger shows no plan mark', (plan, variant) => {
+    render(<TeacherAccountMenu proHref="/he/teacher/upgrade" profileHref="/he/teacher/profile" plan={plan} variant={variant} />);
+    expect(screen.queryByTestId('teacher-account-plan')).toBeNull();
   });
 });

@@ -206,6 +206,8 @@ describe('ClassReportButton (round results, free teacher)', () => {
       const dialog = screen.getByTestId('round-grid-dialog');
       expect(dialog).toHaveTextContent('Noa');
       expect(dialog.querySelector('a[href*="/teacher/upgrade"]')).toBeNull();
+      expect(screen.queryByTestId('round-grid-depth')).toBeNull();
+      expect(dialog.querySelector('[data-testid="pro-pill"]')).toBeNull();
     });
 
     it('inside the access trial, suppression also drops the "report is open" link — mid-class is not the moment', () => {

@@ -152,10 +152,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
         <div
           data-testid="pro-trial-preview"
           role="status"
-          className={cn(
-            'mb-4 flex flex-col gap-2 rounded-neo p-3 sm:flex-row sm:items-center sm:justify-between',
-            'rounded-neo-lg border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-lg',
-          )}
+          className="mb-4 flex flex-col gap-x-3 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="min-w-0">
             <p className="text-sm font-bold text-neo-white">{t('teacher.proGate.trialPreview', { days: previewDaysLeft })}</p>
@@ -169,10 +166,7 @@ export function ProGate({ feature, children, active = true, whileChecking = null
               trackProTrialPreviewUpgradeClicked({ feature, days_left: previewDaysLeft });
               startFromHere(start);
             }}
-            className={cn(
-              'shrink-0 rounded-neo px-4 py-2 text-sm font-black disabled:opacity-60',
-              'border-2 border-neo-cream text-neo-cream hover:bg-neo-cream/10',
-            )}
+            className={cn(QUIET_CTA, 'shrink-0 self-start text-sm')}
           >
             {t('teacher.proGate.trialPreviewCta')}
           </button>}
@@ -202,15 +196,17 @@ export function ProGate({ feature, children, active = true, whileChecking = null
         </div>
         {/* Phones: the pitch and its button lead, the sample sits under them instead of pushing the button off screen. */}
         <div data-testid="pro-gate-pitch" className="text-center max-md:order-first md:text-start">
-          <ProBadge
-            data-testid="pro-gate-pill"
-            size={arcade ? 'md' : 'sm'}
-            label={t('eduShell.nav.pro')}
-            className={cn('mb-2', arcade && 'sm:-rotate-2')}
-          />
-          <h3 className={cn('mb-2 font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
-            {t(`teacher.proGate.${feature}.title`)}
-          </h3>
+          <div className="mb-2 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+            <h3 className={cn('font-neo-display font-black text-neo-white', arcade ? 'text-xl sm:text-2xl' : 'text-xl')}>
+              {t(`teacher.proGate.${feature}.title`)}
+            </h3>
+            <ProBadge
+              data-testid="pro-gate-pill"
+              size={arcade ? 'md' : 'sm'}
+              label={t('eduShell.nav.pro')}
+              className={cn(arcade && 'sm:-rotate-2')}
+            />
+          </div>
           <p className="mb-4 text-sm font-bold leading-relaxed text-neo-white/80">
             {t(`teacher.proGate.${feature}.body`)}
           </p>

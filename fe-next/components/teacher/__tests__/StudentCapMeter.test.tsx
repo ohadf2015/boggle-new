@@ -104,7 +104,7 @@ describe('StudentCapMeter', () => {
     expect(screen.queryByTestId('student-cap-upgrade-cta')).toBeNull();
   });
 
-  it('hides the CTA for a Pro teacher', () => {
+  it('renders nothing for a Pro teacher: no plan talk and no second student count', () => {
     mockUseTeacherPro.mockReturnValue({
       hasPro: true,
       loading: false,
@@ -114,12 +114,14 @@ describe('StudentCapMeter', () => {
       grantExpired: false,
       refresh: vi.fn(),
     });
-    render(<StudentCapMeter studentCount={12} />);
-    expect(screen.queryByTestId('student-cap-upgrade-cta')).toBeNull();
-    expect(screen.getByTestId('student-cap-count').textContent).toContain('12');
-    expect(screen.getByTestId('student-cap-count').textContent).not.toContain(
-      String(FREE_TIER_LIMITS.studentsPerClass),
-    );
+    const { container } = render(<StudentCapMeter studentCount={12} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders nothing until the plan is known, so a paying teacher never sees the free cap', () => {
+    mockUseTeacherPro.mockReturnValue({ hasPro: false, loading: true, refresh: vi.fn() });
+    const { container } = render(<StudentCapMeter studentCount={12} />);
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('hides the CTA while entitlement is loading', () => {
@@ -136,39 +138,23 @@ describe('StudentCapMeter', () => {
     expect(screen.queryByTestId('student-cap-upgrade-cta')).toBeNull();
   });
 
-  // Round 2 (critic cp1): "Unlock this with Pro — $9/month" right under
-  // "3 / 50 students" read as "Pro raises the cap" — it does not (free and Pro
-  // are both 50 per class). The ask names what Pro actually unlocks; the link,
-  // its tracking and when it shows are unchanged (tests above).
-  it('names what Pro actually unlocks instead of implying a bigger student cap', () => {
+  // "Get Pro: $9" right under "3 / 50 students" read as "Pro raises the cap". It does not.
+  it('makes the ask one inline link naming what Pro adds, in the count row', () => {
     render(<StudentCapMeter studentCount={3} />);
-    expect(screen.getByTestId('student-cap-pro-unlocks')).toHaveTextContent('academy.classes.proUnlocks');
     const cta = screen.getByTestId('student-cap-upgrade-cta');
     expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
-    expect(cta.textContent).not.toContain('teacher.proGate.cta');
-    expect(cta.textContent).toContain('academy.classes.proCta');
+    expect(cta).toHaveTextContent('academy.classes.proUnlocks');
+    expect(cta.parentElement).toContainElement(screen.getByTestId('student-cap-count'));
+    expect(cta.className).toMatch(/min-h-11/);
+    expect(cta.className).toMatch(/underline/);
   });
 
-  it('is a quiet outlined line on navy: no cream slab, no cyan button, no shouting', () => {
+  it('is one plain line: no panel, no fill, no badge', () => {
     const { container } = render(<StudentCapMeter studentCount={3} />);
-    const classes = [container.firstElementChild, ...Array.from(container.querySelectorAll('*'))]
-      .map((el) => (el as HTMLElement | null)?.className?.toString?.() ?? '')
-      .join(' ');
-    expect(classes).not.toMatch(/(^|\s)bg-neo-(cream|cyan|white|lime)(\s|$)/);
-    expect(classes).not.toMatch(/(^|\s)uppercase(\s|$)/);
-    expect(screen.getByTestId('student-cap-meter').className).toMatch(/border-neo-cream/);
-  });
-
-  it('marks the ask with the small gold Pro badge', () => {
-    render(<StudentCapMeter studentCount={3} />);
-    const badge = screen.getByTestId('student-cap-pro-badge');
-    expect(badge.getAttribute('data-pro-badge')).toBe('xs');
-    expect(badge).toHaveTextContent('teacher.lastGame.proBadge');
-  });
-
-  it('keeps the Pro line out of the meter when there is no ask', () => {
-    render(<StudentCapMeter studentCount={2} />);
-    expect(screen.queryByTestId('student-cap-pro-unlocks')).toBeNull();
+    const meter = screen.getByTestId('student-cap-meter');
+    expect(meter.className).not.toMatch(/border|shadow|bg-neo/);
+    expect(container.querySelector('[data-pro-badge]')).toBeNull();
+    expect(container.innerHTML).not.toMatch(/bg-neo-(yellow|cream|cyan|white|lime)/);
   });
 
   it('fires iap_viewed impression and landing_cta_clicked on dashboard path with source student_cap_dashboard', () => {

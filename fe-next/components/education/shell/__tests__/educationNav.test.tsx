@@ -238,58 +238,22 @@ describe('EducationNav — the lg handover', () => {
 describe('EducationNav — teacher sidebar extras', () => {
   const t = (k: string) => k;
 
-  it('pins a neutral Pro link to the bottom of the teacher sidebar, yellow only on the small crown', () => {
+  it('gives a free teacher one quiet Upgrade link and never names the free plan', () => {
     const nav = resolveEducationNav('/en/teacher/classroom')!;
-    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
-    const pro = getByTestId('education-side-pro');
-    expect(pro.getAttribute('href')).toBe('/en/teacher/upgrade');
-    expect(pro.className).toContain('text-neo-cream');
-    expect(pro.className).not.toMatch(/neo-yellow/);
-    expect(getByTestId('education-side-pro-crown').getAttribute('class')).toContain('text-neo-yellow');
-    expect(pro.textContent).toContain('eduShell.nav.pro');
+    const { getByTestId, queryByText, queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
+    const link = getByTestId('education-side-pro');
+    expect(link.getAttribute('href')).toBe('/en/teacher/upgrade');
+    expect(link.textContent).toBe('teacher.plan.upgrade');
+    expect(link.className).toContain('min-h-[44px]');
+    expect(link.className).not.toMatch(/neo-yellow/);
+    expect(queryByText('teacher.plan.free')).toBeNull();
+    expect(queryByTestId('education-side-pro-pill')).toBeNull();
   });
 
-  it('says Free plan with an Upgrade pill while the teacher is on the free plan', () => {
+  it.each(['pro', 'trial', undefined] as const)('gives plan %s no row of its own: the account row carries it', (plan) => {
     const nav = resolveEducationNav('/en/teacher/classroom')!;
-    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="free" />);
-    const pro = getByTestId('education-side-pro');
-    expect(pro.textContent).toContain('teacher.plan.free');
-    const pill = getByTestId('education-side-pro-pill');
-    expect(pill.textContent).toBe('teacher.plan.upgrade');
-    expect(pill.className).toContain('border-neo-cream/40');
-    expect(pill.className).not.toMatch(/neo-(lime|yellow)/);
-  });
-
-  it('drops the chevron beside an Upgrade or trial pill so a long plan label (ja) is never cut', () => {
-    const nav = resolveEducationNav('/ja/teacher')!;
-    for (const plan of ['free', 'trial'] as const) {
-      const { getByTestId, unmount } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan={plan} />);
-      expect(getByTestId('education-side-pro').querySelectorAll('svg')).toHaveLength(1);
-      unmount();
-    }
-    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
-    expect(getByTestId('education-side-pro').querySelectorAll('svg')).toHaveLength(2);
-  });
-
-  it('shows an outlined check, not an ask, once the teacher is on Pro', () => {
-    const nav = resolveEducationNav('/en/teacher/classroom')!;
-    const { getByTestId, queryByText } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="pro" />);
-    expect(getByTestId('education-side-pro').textContent).toContain('eduShell.nav.pro');
-    expect(getByTestId('education-side-pro-pill').getAttribute('aria-label')).toBe('teacher.plan.pro');
-    expect(queryByText('teacher.plan.upgrade')).toBeNull();
-  });
-
-  it('dresses a paying teacher in the gold Pro badge instead of a plain label', () => {
-    const nav = resolveEducationNav('/en/teacher/classroom')!;
-    const { getByTestId, queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="pro" />);
-    expect(getByTestId('education-side-pro-owned').getAttribute('data-pro-badge')).toBe('md');
-    expect(queryByTestId('education-side-pro-crown')).toBeNull();
-  });
-
-  it('labels a Polar trial in the pill', () => {
-    const nav = resolveEducationNav('/en/teacher/classroom')!;
-    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan="trial" />);
-    expect(getByTestId('education-side-pro-pill').textContent).toBe('teacher.plan.trialActive');
+    const { queryByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" plan={plan} />);
+    expect(queryByTestId('education-side-pro')).toBeNull();
   });
 
   it('never shows the Pro link to students', () => {

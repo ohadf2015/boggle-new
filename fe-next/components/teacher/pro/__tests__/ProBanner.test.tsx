@@ -17,6 +17,14 @@ describe('ProBanner', () => {
     expect(screen.getByRole('button', { name: 'Keep Pro' })).toBeInTheDocument();
   });
 
+  it('wears the Pro mark inline on the title line, out of its accessible name', () => {
+    render(<ProBanner testId="b" title="Your trial ends soon" proLabel="Pro" />);
+    const sticker = screen.getByTestId('b-sticker');
+    const heading = screen.getByRole('heading', { name: 'Your trial ends soon' });
+    expect(sticker.className).not.toMatch(/absolute/);
+    expect(heading).toContainElement(sticker);
+  });
+
   it('shows a dismiss button only when onDismiss is passed', () => {
     const onDismiss = vi.fn();
     const { rerender } = render(<ProBanner testId="b" title="t" proLabel="Pro" />);

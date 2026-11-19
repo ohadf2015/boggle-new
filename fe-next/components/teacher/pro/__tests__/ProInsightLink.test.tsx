@@ -39,6 +39,13 @@ describe('ProInsightLink', () => {
     expect(vi.mocked(reportProOfferClick).mock.calls[0][0]).toMatchObject({ placement: 'analytics_week_insight', locale: 'he' });
   });
 
+  it('given a free insight, when rendered, then the Pro line is a plain text link with a real touch target', () => {
+    render(<ProInsightLink placement="results_hardest_words" language="en" label="See the full report" proLabel="Pro" />);
+    const link = screen.getByRole('link', { name: /See the full report/ });
+    expect(link.className).not.toMatch(/border/);
+    expect(link.className).toMatch(/min-h-11/);
+  });
+
   it('given it is inactive (inside a closed panel), when rendered, then no impression is sent', () => {
     render(<ProInsightLink placement="home_class_insight" language="en" label="x" proLabel="Pro" active={false} />);
     expect(reportProOfferImpression).not.toHaveBeenCalled();

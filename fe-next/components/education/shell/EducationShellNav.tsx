@@ -4,22 +4,21 @@ import Link from 'next/link';
 import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { EducationNav } from './EducationNav';
+import { ProBadge } from '@/components/ui/ProBadge';
+import { EducationNav, type TeacherPlan } from './EducationNav';
 import { TeacherAccountMenu } from './TeacherAccountMenu';
 import { TeacherBrand } from './TeacherBrand';
 import { cn } from '@/lib/utils';
 import type { ResolvedEducationNav } from './navItems';
 
-type Plan = 'free' | 'trial' | 'pro';
-
-const PLAN_LABEL: Record<Plan, string> = {
-  free: 'teacher.plan.free',
+const CHIP_LABEL: Record<TeacherPlan, string> = {
+  free: 'teacher.plan.upgrade',
   trial: 'teacher.plan.trialActive',
   pro: 'teacher.plan.pro',
 };
 
-/** Phone/tablet plan status; the desktop sidebar states it beside the Pro link instead. */
-function TeacherPlanChip({ plan, href, t }: { plan: Plan; href: string; t: (key: string) => string }) {
+/** Phone/tablet plan indicator; on desktop the account row and sidebar carry it. */
+function TeacherPlanChip({ plan, href, t }: { plan: TeacherPlan; href: string; t: (key: string) => string }) {
   return (
     <Link
       href={href}
@@ -30,10 +29,14 @@ function TeacherPlanChip({ plan, href, t }: { plan: Plan; href: string; t: (key:
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
       )}
     >
-      <span className="inline-flex min-w-0 items-center gap-1 rounded-neo-pill border-2 border-neo-black bg-neo-cream px-2.5 py-1 font-neo-display text-sm font-black text-neo-black shadow-hard">
-        <Crown className="size-4 shrink-0 text-neo-purple" aria-hidden="true" />
-        <span className="truncate">{t(PLAN_LABEL[plan])}</span>
-      </span>
+      {plan === 'pro' ? (
+        <ProBadge size="sm" label={t(CHIP_LABEL.pro)} />
+      ) : (
+        <span className="inline-flex min-w-0 items-center gap-1 rounded-neo-pill border-2 border-neo-cream/40 px-2.5 py-1 font-neo-display text-sm font-bold text-neo-cream">
+          <Crown className="size-4 shrink-0 text-neo-yellow" aria-hidden="true" />
+          <span className="truncate">{t(CHIP_LABEL[plan])}</span>
+        </span>
+      )}
     </Link>
   );
 }
@@ -53,7 +56,7 @@ export function EducationShellNav({
   const { t } = useLanguage();
   const { hasPro, loading, known, status } = useTeacherPro();
   // Nothing is claimed until the entitlement read lands: no false "Free plan" for a paying teacher.
-  const plan: Plan | undefined = nav.kind !== 'teacher' || loading || !known ? undefined : !hasPro ? 'free' : status === 'trialing' ? 'trial' : 'pro';
+  const plan: TeacherPlan | undefined = nav.kind !== 'teacher' || loading || !known ? undefined : !hasPro ? 'free' : status === 'trialing' ? 'trial' : 'pro';
   const teacher = nav.kind === 'teacher' && nav.proHref && nav.profileHref;
   const home = `/${nav.locale}/${nav.kind}`;
 
@@ -81,7 +84,7 @@ export function EducationShellNav({
       plan={plan}
       brand={teacher ? <TeacherBrand href={home} t={t} /> : undefined}
       account={
-        teacher ? <TeacherAccountMenu proHref={nav.proHref!} profileHref={nav.profileHref!} /> : undefined
+        teacher ? <TeacherAccountMenu proHref={nav.proHref!} profileHref={nav.profileHref!} plan={plan} /> : undefined
       }
     />
   );
