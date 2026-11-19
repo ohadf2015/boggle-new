@@ -116,6 +116,12 @@ interface ShareModalState {
   setShowShareModal: (show: boolean) => void;
   /** Game code for share URL */
   gameCode?: string;
+  /**
+   * The share modal only ever opens from the player's own tap (MP results:
+   * Challenge / Share), so it may open while the overlay quiet zone is up.
+   * Leave unset where the share prompt auto-opens.
+   */
+  userRequested?: boolean;
   /** Game result data for "Beat My Score" challenges */
   gameResult?: GameResultForShare;
   /** Room name for pre-game share context */
@@ -177,12 +183,12 @@ export function ResultsModals({
     //    Eligible should be true ONLY AFTER rematch CTA is visible and accessible.
     //    For SP: eligible after first game. For MP: eligible after 3rd game in session.
 
-    const baseModals: Array<{ id: string; priority: number; isReady: boolean }> = [
+    const baseModals: Array<{ id: string; priority: number; isReady: boolean; userRequested?: boolean }> = [
       // Readiness must drop once closed, or the queue's reset never fires.
       { id: 'levelUp', priority: 1, isReady: unlockReveal !== null },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
-      { id: 'share', priority: 4, isReady: shareModal?.showShareModal ?? false },
+      { id: 'share', priority: 4, isReady: shareModal?.showShareModal ?? false, userRequested: shareModal?.userRequested },
       { id: 'auth', priority: 5, isReady: !hideExternal && authModal.showAuthModal },
       { id: 'wordFeedback', priority: 6, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
     ];
@@ -203,6 +209,7 @@ export function ResultsModals({
     authModal.showAuthModal,
     wordFeedback.showWordFeedback, wordFeedback.wordToVote,
     shareModal?.showShareModal,
+    shareModal?.userRequested,
     gameFeedback,
     hideExternal,
   ]);

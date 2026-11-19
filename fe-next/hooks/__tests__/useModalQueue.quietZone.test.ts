@@ -67,4 +67,34 @@ describe('useModalQueue — overlay quiet zone', () => {
 
     expect(result.current.activeModalId).toBeNull();
   });
+
+  // MP results keep `screen-fit-locked` on <body> for the whole results screen,
+  // so the zone never clears there. A modal the player opened with their own tap
+  // (Challenge / Share) was held back forever: 9 dead clicks on the MP results
+  // Challenge button in one week. The zone guards against prompts covering a
+  // payoff; it must never swallow the player's own request.
+  it('opens a modal the player asked for even while the zone is up', () => {
+    const release = claimOverlayQuietZone('classroom-results');
+    const { result } = renderHook(() =>
+      useModalQueue({ modals: [{ id: 'share', priority: 4, isReady: true, userRequested: true }] }),
+    );
+    expect(result.current.activeModalId).toBe('share');
+    release();
+  });
+
+  it('still holds the automatic prompts back behind a requested one', () => {
+    const release = claimOverlayQuietZone('classroom-results');
+    const { result } = renderHook(() =>
+      useModalQueue({
+        modals: [
+          { id: 'firstWin', priority: 3, isReady: true },
+          { id: 'share', priority: 4, isReady: true, userRequested: true },
+        ],
+      }),
+    );
+    expect(result.current.activeModalId).toBe('share');
+    act(() => result.current.dismiss('share'));
+    expect(result.current.activeModalId).toBeNull();
+    release();
+  });
 });
