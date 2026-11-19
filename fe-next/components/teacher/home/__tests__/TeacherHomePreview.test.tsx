@@ -41,21 +41,14 @@ describe('TeacherHomePreview', () => {
     expect(play.getAttribute('href')).toContain('mode=word-hunt');
     expect(screen.queryByTestId('home-start-live')).toBeNull();
     expect(screen.getByTestId('home-ready-chip')).toBeInTheDocument();
-    expect(screen.getAllByTestId('home-status-tile')).toHaveLength(3);
+    expect(screen.queryByTestId('home-status-tile')).toBeNull();
   });
 
-  it('Given the free-teacher desk, Then absentees get practice in one tap and no per-student tiles show', () => {
+  it('Given the free-teacher desk, Then absentees get practice in one tap and no per-student roster shows', () => {
     render(<TeacherHomePreview state="classes" insight />);
     expect(screen.getByTestId('home-homework')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-status-tile')).toBeNull();
+    expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
     expect(screen.getAllByTestId('home-class-insight')).toHaveLength(1);
-  });
-
-  it('Given the class desk state, Then This week lists every class with the desk class pressed', () => {
-    render(<TeacherHomePreview state="classes" />);
-    const roster = screen.getByTestId('home-week-classes');
-    expect(within(roster).getAllByRole('button')).toHaveLength(3);
-    expect(within(roster).getByRole('button', { name: /5B - English/ })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('Given the class desk state, Then a roster lists every student of the desk class with a status', () => {

@@ -17,9 +17,10 @@ vi.mock('@/components/ui/ConfirmationDialog', () => ({
   },
 }));
 vi.mock('@/hooks/useClassroom', () => ({ useClassrooms: () => ({ classrooms: classes.list, isLoading: false, error: classes.error, refresh: classes.refresh }) }));
+vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => true }));
 vi.mock('@/hooks/useAssignments', () => ({ useAssignments: () => ({ assignments: [], isLoading: false }) }));
 vi.mock('@/hooks/useVocabularyLesson', () => ({ useLessons: () => ({ lessons: [], isLoading: false }) }));
-vi.mock('@/components/teacher/home/HomeRosterLive', () => ({ useHomeRoster: () => ({ rows: [], failed: false }) }));
+vi.mock('@/components/teacher/home/HomeRosterLive', () => ({ useHomeRoster: () => ({ rows: [{ id: 's1', name: 'Noa', status: 'done' }], failed: false }) }));
 vi.mock('@/components/teacher/home/HomeClassRoster', () => ({ HomeClassRoster: () => <div data-testid="roster" /> }));
 vi.mock('@/components/teacher/home/useLastClassGame', () => ({ useLastClassGame: () => ({ status: 'ready', game: null }) }));
 vi.mock('@/components/teacher/home/HomeShareSheet', () => ({ HomeShareSheet: (p: { open: boolean }) => (p.open ? <div data-testid="share-sheet" /> : null) }));
@@ -54,12 +55,11 @@ describe('Class page', () => {
     expect(screen.getByTestId('share-sheet')).toBeInTheDocument();
   });
 
-  it('Given the danger zone, Then delete stays the one red action and runs only after the confirm', async () => {
+  it('Given the danger zone, Then delete is a quiet red-text action that runs only after the confirm', async () => {
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({}) });
     render(<ClassPageClient classroomId="c1" />);
     const del = screen.getByTestId('delete-class-affordance');
-    expect(del.className).toMatch(/(^|\s)bg-neo-red(\s|$)/);
-    expect(del.className).toMatch(/border-neo-black/);
+    expect(del.className).toMatch(/(^|\s)text-neo-red(\s|$)/);
     expect(confirm.open).toBe(false);
     fireEvent.click(del);
     expect(confirm.open).toBe(true);

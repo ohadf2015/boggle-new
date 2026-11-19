@@ -103,19 +103,18 @@ describe('Teacher Home', () => {
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
   });
 
-  it('Then the hero shows the class join code as letter tiles, and Share code opens one sheet that also puts it on the board', () => {
+  it('Then the hero shows the class join code in one row, and Share code opens one sheet that also puts it on the board', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
     const code = within(hero).getByTestId('home-desk-code');
     expect(code).toHaveTextContent('K7Q2');
-    expect(within(code).getAllByTestId('home-desk-code-tile')).toHaveLength(4);
     act(() => within(hero).getByTestId('home-share-code').click());
     expect(screen.getByTestId('setup-share-row')).toBeInTheDocument();
     act(() => screen.getByTestId('home-share-board').click());
     expect(screen.getByTestId('hq-projector-qr')).toBeInTheDocument();
   });
 
-  it('Then Home has one results entry, the tile under the desk, and one Try it as a student link', () => {
+  it('Then Home has one results entry, the row under the desk, and one Try it as a student link', () => {
     render(<TeacherDashboard />);
     const hero = screen.getByTestId('home-hero');
     expect(screen.queryByTestId('home-see-results')).toBeNull();
@@ -126,18 +125,19 @@ describe('Teacher Home', () => {
     expect(screen.queryByTestId('home-practice-card')).toBeNull();
   });
 
-  it('Given a new class still below the student goal, Then the join code shows once: the share card owns it, not the hero', () => {
+  it('Given a new class still below the student goal, Then the join code shows once, in the hero row', () => {
     classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], member_count: 0 }] };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('hq-join-code')).toBeInTheDocument();
-    expect(screen.queryByTestId('home-desk-code')).toBeNull();
+    expect(screen.getAllByTestId('home-desk-code')).toHaveLength(1);
+    expect(screen.queryByTestId('hq-join-code')).toBeNull();
   });
 
   it('Given one class, Then the class list does not repeat the hero, and New class stays in reach', () => {
     classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
     render(<TeacherDashboard />);
     expect(screen.queryAllByTestId('home-class-row')).toHaveLength(0);
-    expect(screen.getByTestId('home-new-class')).toHaveAttribute('href');
+    fireEvent.pointerDown(screen.getByTestId('home-class-switcher'), { button: 0, ctrlKey: false, pointerType: 'mouse' });
+    expect(screen.getByTestId('home-new-class')).toHaveAttribute('href', '/en/teacher/classroom/new');
   });
 
   it('Given several classes, Then the hero switcher replaces a class list and a requested class retargets Start live', () => {
@@ -149,25 +149,40 @@ describe('Teacher Home', () => {
     expect(screen.queryAllByTestId('home-class-row')).toHaveLength(0);
   });
 
-  it('Given several classes, Then This week breaks down by class and picking a row puts that class on the desk', () => {
+  it('Given several classes, Then picking one in the class menu puts it on the desk and no class rail repeats the list', () => {
     render(<TeacherDashboard />);
-    const roster = screen.getByTestId('home-week-classes');
-    expect(within(roster).getByRole('button', { name: /5B - English/ })).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(within(roster).getByRole('button', { name: /4A - Reading/ }));
+    expect(screen.queryByTestId('home-week-classes')).toBeNull();
+    expect(screen.queryByLabelText('eduShell.home.railLabel')).toBeNull();
+    fireEvent.pointerDown(screen.getByTestId('home-class-switcher'), { button: 0, ctrlKey: false, pointerType: 'mouse' });
+    fireEvent.click(screen.getAllByTestId('home-class-option')[1]);
     expect(within(screen.getByTestId('home-hero')).getByTestId('home-start-live')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c4a');
   });
 
-  it('Given the desktop rail, Then it starts below the greeting row so Your classes lines up with the hero, not the mascot', () => {
+  it('Given a Pro teacher, Then no plan row sits on Home', () => {
+    proState = PRO;
     render(<TeacherDashboard />);
-    const rail = screen.getByTestId('home-week').parentElement as HTMLElement;
-    expect(rail.className).toContain('lg:pt-24');
-    expect(rail.className).not.toMatch(/\b(pl|pr|ml|mr)-/);
+    expect(screen.queryByTestId('home-greeting-stats')).toBeNull();
+    expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
   });
 
-  it('Given one class, Then This week shows no per-class rows that would repeat the hero', () => {
-    classroomsState = { ...classroomsState, classrooms: [CLASSES[0]] };
+  it('Given a teacher with classes, Then the greeting is the line above the class name, with no separate bubble', () => {
     render(<TeacherDashboard />);
-    expect(screen.queryByTestId('home-week-classes')).toBeNull();
+    expect(screen.queryByTestId('home-greeting-row')).toBeNull();
+    expect(within(screen.getByTestId('home-hero')).getByRole('heading', { level: 1 })).toHaveTextContent('eduShell.home.greet');
+  });
+
+  it('Given a class, Then the week challenge stays on the desk under the board, before the ready-made games', () => {
+    render(<TeacherDashboard />);
+    const frame = screen.getByTestId('home-first-frame');
+    expect(frame).toContainElement(screen.getByTestId('home-desk-board'));
+    expect(frame).not.toContainElement(screen.getByTestId('home-session-rail'));
+    expect(screen.queryByTestId('home-below')).toBeNull();
+  });
+
+  it('Given a Pro teacher, Then no empty seat-meter wrapper is left on Home', () => {
+    proState = PRO;
+    render(<TeacherDashboard />);
+    expect(screen.queryByTestId('dashboard-student-cap-meters')).toBeNull();
   });
 
   it('Given an insight, Then the hero stays on the class and its Start button, with no filler line', () => {
@@ -176,10 +191,11 @@ describe('Teacher Home', () => {
     expect(within(screen.getByTestId('home-hero')).queryByTestId('home-insight')).toBeNull();
   });
 
-  it('Given a Pro teacher, Then the desk holds three status tiles while the students load, with the roster folded', () => {
+  it('Given a Pro teacher on a phone, Then the roster is one folded line while the students load', () => {
     proState = PRO;
     render(<TeacherDashboard />);
-    expect(screen.getAllByTestId('home-status-tile-loading')).toHaveLength(3);
+    expect(screen.getByTestId('home-roster-see-all')).toBeInTheDocument();
+    expect(screen.queryByTestId('home-status-tile')).toBeNull();
     expect(screen.queryByTestId('home-roster')).toBeNull();
   });
 
@@ -201,10 +217,10 @@ describe('Teacher Home', () => {
   it('Given a free teacher, Then the per-student roster stays behind Pro like the class analytics page', () => {
     render(<TeacherDashboard />);
     expect(screen.queryByTestId('home-roster')).toBeNull();
-    expect(screen.queryByTestId('home-status-tile-loading')).toBeNull();
+    expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
   });
 
-  it('Given a free teacher with classes, Then the rail mounts the Teacher Pro offer card, not an analytics-only insight', () => {
+  it('Given a free teacher with classes, Then Home mounts the Teacher Pro offer card, not an analytics-only insight', () => {
     classroomsState = { ...classroomsState, classrooms: [{ ...CLASSES[0], created_at: '2026-10-02T00:00:00Z' }, { ...CLASSES[1], created_at: '2026-09-01T00:00:00Z' }] };
     render(<TeacherDashboard />);
     const cards = screen.getAllByTestId('dashboard-pro-offer');

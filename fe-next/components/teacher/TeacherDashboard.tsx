@@ -1,4 +1,4 @@
-/** Teacher Home: greeting + coach cue, the class desk hero, ready-to-run sessions, your classes, and a rail with this week + the Teacher Pro offer. */
+/** Teacher Home: the class desk hero, results and roster, the Teacher Pro offer, then ready-to-run sessions and the week challenge. */
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
@@ -11,11 +11,11 @@ import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
-import { HomeGetStudentsIn } from './home/HomeGetStudentsIn';
+import { HomeJoinGoal } from './home/HomeJoinGoal';
 import { HomeNextLesson } from './home/HomeNextLesson';
 import { EndedCodeTriesNotice } from './hq/EndedCodeTriesNotice';
 import { belowStudentGoal } from './hq/studentGoal';
-import { HomeClassMeta, HomeNewClass } from './home/HomeClassList';
+import { HomeClassMeta } from './home/HomeClassList';
 import { StudentCapMeter } from './StudentCapMeter';
 import { HomeWeekChallenge } from './home/HomeWeekChallenge';
 import { useHomeRoster } from './home/HomeRosterLive';
@@ -29,11 +29,10 @@ import { useAssignCreator } from './home/useAssignCreator';
 import { useCheckoutReturn } from './home/useCheckoutReturn';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
+import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from './home/homeStyles';
 import { WaitingStudentsNudge } from './home/WaitingStudentsNudge';
-import { SESSIONS_BESIDE_RAIL, TeacherHomeView } from './home/TeacherHomeView';
-import { HomeWeekClasses } from './home/HomeWeekClasses';
+import { TeacherHomeView } from './home/TeacherHomeView';
 import { useHomeWeekLoop } from './home/useHomeWeekLoop';
-import { weekClassRows } from './home/weekClassRows';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -64,8 +63,6 @@ export interface TeacherDashboardProps {
 }
 
 type T = (key: string, params?: Record<string, string | number>) => string;
-
-const WEEK_ROWS = 4;
 
 function greetingKey(hour: number): string {
   if (hour < 12) return 'eduShell.home.greetMorning';
@@ -151,7 +148,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
 
   const accountBanner = hasClasses ? (banner ?? null) : null;
 
-  const showWeek = hasClasses && !(week.summary && Object.keys(week.summary.lastPlayedAt).length === 0);
   const selectedClassroom = classrooms.find((c) => c.id === effectiveId) ?? null;
   const shareCardShown = selectedClassroom !== null && belowStudentGoal(selectedClassroom.member_count);
   const rosterShown = hasPro && selectedClassroom !== null && (selectedClassroom.member_count ?? 0) > 0;
@@ -241,7 +237,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   };
   const revealRef = useTeacherReveal<HTMLDivElement>(`${ready}-${hasClasses}-${Boolean(classroomsError)}`);
   const [reportsOpen, setReportsOpen] = useState(false);
-  const hasRail = !ready || proCard !== null || (showWeek && classrooms.length > 1);
   const showSessions = ready && !classroomsError && hasClasses && Boolean(effectiveId);
   const rawClassLanguage = selectedClassroom?.language;
   const classLanguage = isPackLanguage(rawClassLanguage) ? rawClassLanguage : isPackLanguage(language) ? language : 'en';
@@ -264,15 +259,15 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     ? homeCoachCue({ nowMs, lastPlayedMs, everPlayed, rail: homeSessionRail({ language: classLanguage, gradeBand: null, nowMs, lastPlayedMs }) })
     : null;
 
+  const greeting = firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName');
+
   return (
     <TeacherHomeView
       alert={alert ?? null}
       t={t}
       isRTL={isRTL}
       revealRef={revealRef}
-      greeting={firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName')}
-      cue={ready && hasClasses && !classroomsError ? (cue ? t(cue.key) : '') : null}
-      hasPro={hasPro}
+      greeting={greeting}
       ready={ready}
       error={Boolean(classroomsError)}
       onRetry={() => void classroomsState.refresh?.()}
@@ -302,15 +297,18 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               t={t}
             />
           ) : null}
-          <div data-tm>
+          <div data-tm className="flex min-h-0 flex-1 flex-col">
             <HomeHero
               classrooms={classrooms}
               selectedId={effectiveId}
               onSelect={setSelectedId}
               language={language}
               t={t}
-              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} />}
-              corner={<HomeNewClass href={newClassHref} count={classrooms.length} limit={null} t={t} />}
+              eyebrow={greeting}
+              cue={week.status !== 'loading' && cue ? t(cue.key) : null}
+              rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
+              newClassHref={newClassHref}
+              classesHref={`/${language}/teacher/classroom`}
               capLabel={!proLoading && !hasPro ? t('eduShell.setup.capMeter', { count: classrooms.length, limit: FREE_TIER_LIMITS.classes }) : undefined}
               meta={selectedClassroom ? (
                 <HomeClassMeta
@@ -325,9 +323,8 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
                   t={t}
                 />
               ) : null}
-              showCode={!shareCardShown}
               replay={loop.replay}
-              codeSlot={selectedClassroom && shareCardShown ? <HomeGetStudentsIn classroom={selectedClassroom} /> : undefined}
+              joinGoal={selectedClassroom && shareCardShown ? <HomeJoinGoal key={selectedClassroom.id} classroom={selectedClassroom} /> : undefined}
             />
           </div>
           {selectedClassroom ? (
@@ -373,7 +370,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
       sessions={showSessions ? (
         <HomeSessionRail
           key={effectiveId}
-          className={hasRail ? SESSIONS_BESIDE_RAIL : undefined}
           compact={!rosterShown}
           classroomId={effectiveId}
           languages={railLanguages(classLanguage, lessonProfile.languages)}
@@ -386,18 +382,8 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
         />
       ) : null}
       accountBanner={accountBanner}
-      hasRail={hasRail}
-      week={showWeek ? {
-        summary: week.summary,
-        status: week.status,
-        classCount: classrooms.length,
-        classes: classrooms.length > 1 && week.summary ? (
-          <HomeWeekClasses {...weekClassRows(classrooms, week.summary.lastPlayedAt, nowMs, WEEK_ROWS, effectiveId)} selectedId={effectiveId} onSelect={setSelectedId} moreHref={`/${language}/teacher/classroom`} language={language} nowMs={nowMs} t={t} />
-        ) : null,
-      } : null}
       proCard={proCard}
-      fillHeight={rosterShown}
-      footer={selectedClassroom ? (
+      footer={selectedClassroom && !hasPro ? (
         <div data-testid="dashboard-student-cap-meters">
           <StudentCapMeter key={selectedClassroom.id} classroomName={classrooms.length > 1 ? selectedClassroom.name : undefined} studentCount={selectedClassroom.member_count ?? 0} source="dashboard" />
         </div>

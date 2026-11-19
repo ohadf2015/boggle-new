@@ -16,8 +16,12 @@ import { useAssignments } from '@/hooks/useAssignments';
 import { useLessons } from '@/hooks/useVocabularyLesson';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { useHomeRoster } from '@/components/teacher/home/HomeRosterLive';
-import { HomeClassRoster } from '@/components/teacher/home/HomeClassRoster';
-import { useLastClassGame } from '@/components/teacher/home/useLastClassGame';
+import { HomeRosterFold } from '@/components/teacher/home/HomeRosterFold';
+import { useHomeWeekLoop } from '@/components/teacher/home/useHomeWeekLoop';
+import { HomeJoinGoal } from '@/components/teacher/home/HomeJoinGoal';
+import { RehearseWithBotsButton } from '@/components/teacher/home/RehearseWithBotsButton';
+import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from '@/components/teacher/home/homeStyles';
+import { belowStudentGoal } from '@/components/teacher/hq/studentGoal';
 import { HomeShareSheet } from '@/components/teacher/home/HomeShareSheet';
 import { ClassPageView } from '@/components/teacher/classroom/page/ClassPageView';
 import { ClassroomProOffer } from '@/components/teacher/classroom/ClassroomProOfferBanner';
@@ -67,7 +71,7 @@ function ClassPage({ classroomId }: { classroomId: string }) {
 }
 
 interface LoadedProps {
-  classroom: { id: string; name: string; join_code: string; language?: string | null; member_count?: number | null };
+  classroom: { id: string; name: string; join_code: string; language?: string | null; member_count?: number | null; created_at?: string };
   t: T;
   language: string;
 }
@@ -78,7 +82,7 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
   const roster = useHomeRoster(classroom.id, nowMs);
   const { assignments, isLoading: assignmentsLoading } = useAssignments(classroom.id);
   const { lessons, isLoading: lessonsLoading } = useLessons();
-  const lastGame = useLastClassGame(classroom.id, t('teacher.lastGame.studentFallback'));
+  const loop = useHomeWeekLoop({ classroomId: classroom.id, fresh: false, lessons, lessonsReady: !lessonsLoading, language, nowMs, t });
   const lists = useMemo(() => classWordLists(assignments, lessons, classroom.id), [assignments, lessons, classroom.id]);
   const [shareOpen, setShareOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -117,10 +121,13 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         startHref={teacherHostHref(language, { classroomId: classroom.id })}
         resultsHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
         libraryHref={`/${language}/teacher/curriculum`}
-        roster={<HomeClassRoster rows={roster.rows} failed={roster.failed} language={language} nowMs={nowMs} t={t} />}
+        roster={<HomeRosterFold rows={roster.rows} failed={roster.failed} filterable language={language} nowMs={nowMs} t={t} />}
         lists={lists}
         listsLoading={assignmentsLoading || lessonsLoading}
-        lastGame={lastGame}
+        lastGame={loop.last}
+        replay={loop.replay}
+        rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
+        joinGoal={belowStudentGoal(classroom.member_count ?? undefined) ? <HomeJoinGoal classroom={classroom} track={false} /> : undefined}
         onShare={() => setShareOpen(true)}
         onRequestDelete={() => setConfirmOpen(true)}
         proOffer={<ClassroomProOffer />}

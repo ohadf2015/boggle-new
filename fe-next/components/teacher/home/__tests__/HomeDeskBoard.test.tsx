@@ -19,6 +19,7 @@ const ROWS = rosterRows([
   { ...base, studentId: 'c', displayName: 'Cy', totalXp: 0, lastPracticeDate: null },
   { ...base, studentId: 'd', displayName: 'Dee', totalXp: 50, lastPracticeDate: new Date(NOW - 2 * DAY).toISOString() },
 ], NOW);
+const ALL_DONE = rosterRows([{ ...base, studentId: 'a', displayName: 'Ava', totalXp: 9, lastPracticeDate: new Date(NOW - DAY).toISOString() }], NOW);
 
 const props = (over: Partial<HomeDeskBoardProps> = {}): HomeDeskBoardProps => ({
   roster: { rows: ROWS, failed: false },
@@ -36,47 +37,58 @@ afterEach(() => {
 });
 
 describe('<HomeDeskBoard>', () => {
-  it('Given a Pro class, Then three status tiles and one Results tile show, with the roster folded behind See all', () => {
+  it('Then no status tile row shows, on any screen', () => {
+    wide.value = true;
     render(<HomeDeskBoard {...props()} />);
-    const tiles = screen.getAllByTestId('home-status-tile');
-    expect(tiles.map((el) => el.getAttribute('data-status'))).toEqual(['done', 'late', 'idle']);
-    expect(tiles[0]).toHaveTextContent('2');
-    expect(tiles[1]).toHaveTextContent('1');
-    expect(tiles[2]).toHaveTextContent('1');
-    expect(screen.queryByTestId('home-roster')).toBeNull();
-    expect(screen.getByTestId('home-roster-see-all')).toHaveTextContent('eduShell.home.roster.seeAll:{"count":4}');
-    expect(within(screen.getByTestId('home-weekly-reports')).getByRole('button')).toHaveAttribute('aria-haspopup', 'dialog');
-  });
-
-  it('When the teacher taps Behind, Then the roster opens on just the students who are behind', () => {
-    render(<HomeDeskBoard {...props()} />);
-    const late = screen.getAllByTestId('home-status-tile')[1];
-    fireEvent.click(late);
-    expect(late).toHaveAttribute('aria-expanded', 'true');
-    const rows = within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row');
-    expect(rows).toHaveLength(1);
-    expect(rows[0]).toHaveTextContent('Ben');
-  });
-
-  it('When the teacher taps the same tile again, Then the roster folds away', () => {
-    render(<HomeDeskBoard {...props()} />);
-    const late = screen.getAllByTestId('home-status-tile')[1];
-    fireEvent.click(late);
-    fireEvent.click(late);
-    expect(screen.queryByTestId('home-roster')).toBeNull();
-    expect(late).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('When the teacher taps See all, Then every student shows', () => {
-    render(<HomeDeskBoard {...props()} />);
-    fireEvent.click(screen.getByTestId('home-roster-see-all'));
-    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(4);
-  });
-
-  it('Given the student read is in flight, Then the tiles hold their shape without numbers', () => {
-    render(<HomeDeskBoard {...props({ roster: { rows: null, failed: false } })} />);
-    expect(screen.getAllByTestId('home-status-tile-loading')).toHaveLength(3);
     expect(screen.queryByTestId('home-status-tile')).toBeNull();
+  });
+
+  it('Given a phone, Then the roster folds behind one line that says who played', () => {
+    render(<HomeDeskBoard {...props()} />);
+    expect(screen.queryByTestId('home-roster')).toBeNull();
+    const toggle = screen.getByTestId('home-roster-see-all');
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(toggle).toHaveTextContent('eduShell.home.roster.count.done:{"count":2}');
+    expect(toggle).toHaveTextContent('eduShell.home.roster.count.late:{"count":1}');
+  });
+
+  it('Given a phone line where nobody is behind, Then the zero is left out', () => {
+    render(<HomeDeskBoard {...props({ roster: { rows: ALL_DONE, failed: false }, memberCount: 1 })} />);
+    const toggle = screen.getByTestId('home-roster-see-all');
+    expect(toggle).toHaveTextContent('eduShell.home.roster.count.done:{"count":1}');
+    expect(toggle).not.toHaveTextContent('eduShell.home.roster.count.late');
+    expect(toggle).not.toHaveTextContent('eduShell.home.roster.count.idle');
+  });
+
+  it('When the teacher taps that line, Then every student shows, and a second tap folds them away', () => {
+    render(<HomeDeskBoard {...props()} />);
+    const toggle = screen.getByTestId('home-roster-see-all');
+    fireEvent.click(toggle);
+    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(4);
+    fireEvent.click(toggle);
+    expect(screen.queryByTestId('home-roster')).toBeNull();
+  });
+
+  it('Given a desktop screen, Then the whole roster is open with no fold control', () => {
+    wide.value = true;
+    render(<HomeDeskBoard {...props()} />);
+    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(4);
+    expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
+  });
+
+  it('Given a desktop screen, When the teacher taps Behind in the roster header, Then the list narrows to who is behind', () => {
+    wide.value = true;
+    render(<HomeDeskBoard {...props()} />);
+    const late = screen.getAllByTestId('home-roster-filter').find((el) => el.getAttribute('data-status') === 'late') as HTMLElement;
+    fireEvent.click(late);
+    expect(late).toHaveAttribute('aria-pressed', 'true');
+    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(1);
+  });
+
+  it('Given the student read is in flight on desktop, Then the roster holds its place with placeholder rows', () => {
+    wide.value = true;
+    render(<HomeDeskBoard {...props({ roster: { rows: null, failed: false } })} />);
+    expect(screen.getByTestId('home-roster-loading')).toBeInTheDocument();
   });
 
   it('When the teacher taps Results, Then the one results entry opens and shows the ready count', () => {
@@ -87,52 +99,28 @@ describe('<HomeDeskBoard>', () => {
     expect(onOpenResults).toHaveBeenCalledTimes(1);
   });
 
-  it('Given a free teacher, Then no per-student tiles show; who missed the last game gets practice in one tap', () => {
+  it('Then the results entry is a calm row, not a colored tile', () => {
+    render(<HomeDeskBoard {...props()} />);
+    expect(within(screen.getByTestId('home-weekly-reports')).getByRole('button').className).not.toMatch(/bg-neo-(purple|yellow|pink)/);
+  });
+
+  it('Given a free teacher, Then no roster shows; who missed the last game gets practice in one tap', () => {
     const onHomework = vi.fn();
     render(<HomeDeskBoard {...props({ roster: null, missed: { count: 6, onHomework } })} />);
-    expect(screen.queryByTestId('home-status-tile')).toBeNull();
     expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
     fireEvent.click(screen.getByTestId('home-homework'));
     expect(onHomework).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('home-weekly-reports')).toBeInTheDocument();
   });
 
-  it('Given a class with no students yet, Then no status tiles show', () => {
+  it('Given a class with no students yet, Then no roster line shows', () => {
     render(<HomeDeskBoard {...props({ roster: { rows: [], failed: false }, memberCount: 0 })} />);
-    expect(screen.queryByTestId('home-status-tile')).toBeNull();
     expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
-  });
-
-  it('Given no status tiles and nobody missed a game, Then the Results tile takes the whole row instead of half', () => {
-    render(<HomeDeskBoard {...props({ roster: null, missed: null })} />);
-    expect(screen.getByTestId('home-weekly-reports')).toHaveClass('sm:col-span-2');
-  });
-
-  it('Given nobody is behind, Then that tile shows 0 and does not open an empty list', () => {
-    const allDone = rosterRows([{ ...base, studentId: 'a', displayName: 'Ava', totalXp: 9, lastPracticeDate: new Date(NOW - DAY).toISOString() }], NOW);
-    render(<HomeDeskBoard {...props({ roster: { rows: allDone, failed: false }, memberCount: 1 })} />);
-    const late = screen.getAllByTestId('home-status-tile')[1];
-    expect(late).toBeDisabled();
-    fireEvent.click(late);
     expect(screen.queryByTestId('home-roster')).toBeNull();
   });
 
-  it('Given a desktop screen, Then the whole roster is open under the tiles and the toggle folds it', () => {
-    wide.value = true;
-    render(<HomeDeskBoard {...props()} />);
-    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(4);
-    const toggle = screen.getByTestId('home-roster-see-all');
-    expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(toggle).toHaveTextContent('eduShell.home.roster.hide');
-    fireEvent.click(toggle);
-    expect(screen.queryByTestId('home-roster')).toBeNull();
-    expect(toggle).toHaveAttribute('aria-expanded', 'false');
-  });
-
-  it('Given a desktop screen, When the teacher taps Behind, Then the open roster narrows to who is behind', () => {
-    wide.value = true;
-    render(<HomeDeskBoard {...props()} />);
-    fireEvent.click(screen.getAllByTestId('home-status-tile')[1]);
-    expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(1);
+  it('Given the student read failed, Then it says so instead of showing an empty class', () => {
+    render(<HomeDeskBoard {...props({ roster: { rows: null, failed: true } })} />);
+    expect(screen.getByTestId('home-roster-error')).toBeInTheDocument();
   });
 });

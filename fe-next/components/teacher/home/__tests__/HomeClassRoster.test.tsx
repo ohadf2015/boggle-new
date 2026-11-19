@@ -90,14 +90,13 @@ describe('<HomeClassRoster>', () => {
     expect(screen.getByTestId('home-roster-assign').parentElement).not.toHaveClass('invisible');
   });
 
-  it('Given students who still need to play, Then one bulk Assign practice sits in the header beside the Behind count', () => {
+  it('Given students who still need to play, Then one bulk Assign practice sits in the header with the counts', () => {
     const onAssignAll = vi.fn();
     render(<HomeClassRoster rows={ROWS} failed={false} language="en" nowMs={NOW} t={t} onAssign={vi.fn()} onAssignAll={onAssignAll} />);
     const summary = screen.getByTestId('home-roster-summary');
     const bulk = within(summary).getByTestId('home-roster-assign-all');
     expect(bulk).toHaveAccessibleName('eduShell.home.focus.assign');
     expect(bulk).not.toHaveClass('bg-neo-yellow');
-    expect(bulk.previousElementSibling).toHaveTextContent('eduShell.home.roster.count.late');
     fireEvent.click(bulk);
     expect(onAssignAll).toHaveBeenCalledTimes(1);
   });
@@ -251,12 +250,26 @@ describe('<HomeClassRoster>', () => {
     expect(screen.queryByTestId('home-roster-empty')).not.toBeInTheDocument();
   });
 
-  it('Given a status filter, Then only those rows list while the summary still counts the whole class', () => {
-    const onClearFilter = vi.fn();
-    render(<HomeClassRoster rows={ROWS} failed={false} language="en" nowMs={NOW} t={t} filter="late" onClearFilter={onClearFilter} />);
+  it('Given a filterable roster, When a count is tapped, Then only those rows list while the summary still counts the whole class', () => {
+    render(<HomeClassRoster rows={ROWS} failed={false} language="en" nowMs={NOW} t={t} filterable />);
+    const late = screen.getAllByTestId('home-roster-filter').find((el) => el.getAttribute('data-status') === 'late') as HTMLElement;
+    fireEvent.click(late);
     expect(screen.getAllByTestId('home-roster-row')).toHaveLength(1);
     expect(screen.getByTestId('home-roster-summary')).toHaveTextContent('eduShell.home.roster.count.done:{"count":1}');
     fireEvent.click(screen.getByTestId('home-roster-show-all'));
-    expect(onClearFilter).toHaveBeenCalledTimes(1);
+    expect(screen.getAllByTestId('home-roster-row')).toHaveLength(ROWS.length);
+  });
+
+  it('Given a count of zero, Then the header leaves it out', () => {
+    render(<HomeClassRoster rows={ROWS.filter((r) => r.status === 'done')} failed={false} language="en" nowMs={NOW} t={t} filterable />);
+    const summary = screen.getByTestId('home-roster-summary');
+    expect(summary).toHaveTextContent('eduShell.home.roster.count.done');
+    expect(summary).not.toHaveTextContent('eduShell.home.roster.count.late');
+    expect(summary).not.toHaveTextContent('eduShell.home.roster.count.idle');
+  });
+
+  it('Given a roster that is not filterable, Then the counts are plain text', () => {
+    render(<HomeClassRoster rows={ROWS} failed={false} language="en" nowMs={NOW} t={t} />);
+    expect(screen.queryByTestId('home-roster-filter')).toBeNull();
   });
 });

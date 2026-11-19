@@ -3,6 +3,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ClassPageView, type ClassPageViewProps } from '../ClassPageView';
 
+vi.mock('@/components/teacher/home/HomeShareSheet', () => ({ HomeShareSheet: () => null }));
+
 const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.stringify(p)}` : k);
 
 function props(over: Partial<ClassPageViewProps> = {}): ClassPageViewProps {
@@ -48,10 +50,50 @@ describe('ClassPageView', () => {
     expect(within(last).getByRole('link')).toHaveAttribute('href', '/en/teacher/classroom/c1/analytics');
   });
 
-  it('Given no lists and no game yet, Then each block says so in one line with a way forward', () => {
+  it('Given the class page, Then it uses the Home hero: a calm panel, the class name, the code row and the big secondary', () => {
+    render(<ClassPageView {...props({ rehearse: <button type="button" data-testid="rehearse-slot" /> })} />);
+    const hero = screen.getByTestId('home-hero');
+    expect(hero.className).not.toMatch(/bg-neo-purple/);
+    expect(within(hero).getByTestId('home-join-row')).toContainElement(screen.getByTestId('class-page-code'));
+    expect(within(hero).getByTestId('rehearse-slot')).toBeInTheDocument();
+    expect(hero).toHaveTextContent('languages.english');
+  });
+
+  it('Given the last game is still being read, Then Start shows at once instead of a spinner', () => {
+    render(<ClassPageView {...props({ replay: { kind: 'pending' } })} />);
+    expect(screen.getByTestId('class-page-start')).toHaveAttribute('href', '/en/education/classroom-game?classroomId=c1');
+    expect(screen.queryByTestId('home-start-pending')).toBeNull();
+  });
+
+  it('Given a last game, Then it is one quiet row that opens the results', () => {
+    render(<ClassPageView {...props()} />);
+    const last = screen.getByTestId('class-page-last-game');
+    expect(within(last).getAllByRole('link')).toHaveLength(1);
+    expect(last.innerHTML).not.toMatch(/bg-neo-(yellow|cyan|cream)/);
+  });
+
+  it('Given word lists, Then they sit folded in one closed disclosure', () => {
+    render(<ClassPageView {...props()} />);
+    const fold = within(screen.getByTestId('class-page-lists')).getByTestId('class-page-lists-fold');
+    expect(fold.tagName).toBe('DETAILS');
+    expect(fold).not.toHaveAttribute('open');
+  });
+
+  it('Given no lists and no game yet, Then the last game hides and lists offer only the way forward', () => {
     render(<ClassPageView {...props({ lists: [], lastGame: { status: 'ready', game: null } })} />);
     expect(within(screen.getByTestId('class-page-lists')).getByRole('link')).toHaveAttribute('href', '/en/teacher/curriculum');
-    expect(screen.getByTestId('class-page-last-game')).toHaveTextContent('teacher.lastGame.emptyTitle');
+    expect(screen.getByTestId('class-page-lists')).not.toHaveTextContent('teacher.classPage.noLists');
+    expect(screen.queryByTestId('class-page-last-game')).toBeNull();
+  });
+
+  it('Given the last game read failed, Then the row says so', () => {
+    render(<ClassPageView {...props({ lastGame: { status: 'error', game: null } })} />);
+    expect(screen.getByTestId('class-page-last-game')).toHaveTextContent('teacher.lastGame.error');
+  });
+
+  it('Given the danger zone, Then it is a quiet row with no red frame', () => {
+    render(<ClassPageView {...props()} />);
+    expect(screen.getByTestId('class-page-danger').className).not.toMatch(/border-neo-red|border-dashed/);
   });
 
   it('Given a Pro offer under the header, Then Start a game stays the only hero and the roster still shows', () => {

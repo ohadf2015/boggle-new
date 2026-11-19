@@ -128,11 +128,12 @@ describe('Teacher Home ready-to-run rail', () => {
     expect(screen.getByTestId('home-session-all')).toBeInTheDocument();
   });
 
-  it('Given a Pro desk with the roster, Then on desktop the sessions row takes the leftover height instead of leaving an empty band', () => {
+  it('Given any desk, Then its column fills the first screen, so the ready-made games always start below the fold', () => {
     render(<TeacherDashboard />);
-    const home = screen.getByTestId('teacher-home');
-    expect(home.className).toContain('lg:min-h-full');
-    expect(home.className).toMatch(/lg:grid-rows-\[auto_1fr(_auto)?\]/);
+    const column = screen.getByTestId('home-hero').closest('[data-testid="home-first-frame"]') as HTMLElement;
+    expect(column.className).toContain('min-h-[calc(100dvh-9rem)]');
+    expect(column.className).toContain('lg:min-h-[calc(100dvh-2.5rem)]');
+    expect(column).not.toContainElement(screen.getByTestId('home-session-rail'));
   });
 });
 
@@ -142,13 +143,11 @@ describe('Teacher Home greeting cue, week mascot and Pro strip', () => {
     expect(screen.getByTestId('home-coach-cue').textContent).toMatch(/^eduShell\.home\.cue\.season\./);
   });
 
-  it('Given a free teacher, Then the Teacher Pro offer is one compact strip at the bottom of the rail with no bullet list', () => {
+  it('Given a free teacher, Then the Teacher Pro offer is one compact strip under the desk with no bullet list', () => {
     render(<TeacherDashboard />);
     const strip = screen.getByTestId('dashboard-pro-offer');
-    const rail = strip.parentElement?.closest('aside');
-    expect(rail).not.toBeNull();
-    expect(rail?.getAttribute('aria-label')).toBe('eduShell.home.railLabel');
-    expect(rail?.lastElementChild?.contains(strip)).toBe(true);
+    expect(strip.closest('[aria-label="eduShell.home.railLabel"]')).toBeNull();
+    expect(screen.getByTestId('home-first-frame')).toContainElement(strip);
     expect(within(strip).queryAllByRole('listitem')).toHaveLength(0);
     expect(within(strip).getByTestId('dashboard-pro-offer-cta')).toBeInTheDocument();
   });

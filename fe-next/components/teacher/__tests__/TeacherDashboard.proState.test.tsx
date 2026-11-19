@@ -34,25 +34,25 @@ vi.mock('@/components/teacher/digest/WeeklyProgressDigestCard', () => ({
 const grant = { id: 'g1', expires_at: '2027-09-05T12:00:00Z', days: 365, note: 'Sorry about Thursday.', welcomed: false };
 
 /**
- * The dashboard is where a gifted teacher finds out the gift took: a PRO chip in
- * the header and, the first time only, the celebration.
+ * The dashboard is where a gifted teacher finds out the gift took: the first time only, the
+ * celebration. The plan chip itself lives in the shell's account row and top bar, not on Home.
  */
 describe('<TeacherDashboard> Pro state', () => {
   const originalFetch = global.fetch;
   beforeEach(() => { global.fetch = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) }) as unknown as typeof fetch; });
   afterEach(() => { global.fetch = originalFetch; });
 
-  it('shows the PRO chip and the one-time celebration for a freshly gifted teacher', () => {
+  it('leaves the plan chip to the shell and shows the one-time celebration for a freshly gifted teacher', () => {
     proState = { hasPro: true, loading: false, source: 'admin_grant', periodEnd: grant.expires_at, grant, grantExpired: false, refresh: vi.fn() };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
+    expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'teacher.proWelcome.title' })).toBeInTheDocument();
   });
 
-  it('shows the PRO chip but no celebration once it has been seen', () => {
+  it('shows no celebration once it has been seen', () => {
     proState = { hasPro: true, loading: false, source: 'admin_grant', periodEnd: grant.expires_at, grant: { ...grant, welcomed: true }, grantExpired: false, refresh: vi.fn() };
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('teacher-plan-badge')).toHaveAttribute('data-plan', 'pro');
+    expect(screen.queryByTestId('teacher-plan-badge')).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 

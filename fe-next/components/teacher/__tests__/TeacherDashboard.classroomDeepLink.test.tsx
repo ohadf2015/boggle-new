@@ -54,7 +54,7 @@ beforeEach(() => {
 });
 afterEach(() => cleanup());
 
-const shownCode = () => within(screen.getByTestId('hq-get-students-in')).getByTestId('hq-join-code').textContent;
+const shownCode = () => within(screen.getByTestId('home-join-row')).getByTestId('home-desk-code').textContent;
 
 describe('Teacher Home: ?classroomId deep link', () => {
   it('Given classroomId names one of the teacher classes, When Home renders, Then that class is selected on the first paint', () => {
