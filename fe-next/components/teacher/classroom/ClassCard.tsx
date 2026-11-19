@@ -24,7 +24,7 @@ import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { NB_PRIMARY, NB_SECONDARY, type NbColor } from '../nb/nbStyles';
+import { NB_BLOCK, NB_PRIMARY, NB_STICKER, type NbColor } from '../nb/nbStyles';
 import { LIST_CARD_TITLE, ListCard } from '../ListCard';
 import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
 
@@ -62,24 +62,11 @@ export interface ClassCardProps {
   classHref?: string;
   /** Free teacher's one class with this week's insight. */
   insightHref?: string;
-  /** The card's thin edge; the list rotates it so classes are easy to tell apart. */
+  /** The band color; the list rotates it so classes are easy to tell apart. */
   color?: NbColor;
-  /** The one card on the screen whose Start is the lime primary action. */
-  featured?: boolean;
 }
 
-const ACCENT: Record<NbColor, string> = {
-  lime: 'bg-neo-lime',
-  pink: 'bg-neo-pink',
-  cyan: 'bg-neo-cyan',
-  yellow: 'bg-neo-yellow',
-  purple: 'bg-neo-purple',
-  orange: 'bg-neo-orange',
-  cream: 'bg-neo-cream',
-  navy: 'bg-neo-navy-light',
-};
-
-/** One class on the Classes tab: its name, one fact, Start a game, and a menu with everything else. */
+/** One class on the Classes tab: a color band with its name, the join code, Start a game, and a menu with everything else. */
 export function ClassCard({
   classroom,
   expanded,
@@ -99,7 +86,6 @@ export function ClassCard({
   classHref,
   insightHref,
   color = 'pink',
-  featured = false,
 }: ClassCardProps) {
   const { t } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -110,11 +96,7 @@ export function ClassCard({
 
   const fact =
     count === 0 ? (
-      <span>
-        {t('teacher.pulse.state.noRoster')}
-        {' · '}
-        <code dir="ltr" className="font-neo-display font-black tracking-wider text-neo-cream">{classroom.join_code}</code>
-      </span>
+      <span>{t('teacher.pulse.state.noRoster')}</span>
     ) : (
       <>
         {studentPreview}
@@ -122,24 +104,11 @@ export function ClassCard({
       </>
     );
 
-  const menuHeader = (
-    <div role="none" className="px-3 pb-2 pt-1.5">
-      <p className="font-neo-body text-xs font-bold text-neo-cream/70">
-        {t('academy.hq.classCode', 'Class code')}
-        {' · '}
-        <span data-testid="classroom-card-language">{languageKey ? t(languageKey) : classroom.language}</span>
-      </p>
-      <code data-testid="classroom-join-code" dir="ltr" className="block font-neo-display text-2xl font-black tracking-wider text-neo-cream">
-        {classroom.join_code}
-      </code>
-    </div>
-  );
-
   return (
     <ListCard
       data-testid="classroom-card"
       data-color={color}
-      accentClass={ACCENT[color]}
+      color={color}
       titleText={classroom.name}
       title={
         classHref ? (
@@ -150,10 +119,13 @@ export function ClassCard({
           <bdi>{classroom.name}</bdi>
         )
       }
-      factTestId="classroom-card-fact"
-      fact={fact}
+      tag={
+        <span data-testid="classroom-card-language" className={cn(NB_STICKER, NB_BLOCK.cream, 'shrink-0')}>
+          {languageKey ? t(languageKey) : classroom.language}
+        </span>
+      }
       menu={
-        <CardOverflowMenu label={t('academy.teacher.classActions', 'Class actions')} testId="classroom-card-menu" header={menuHeader}>
+        <CardOverflowMenu label={t('academy.teacher.classActions', 'Class actions')} testId="classroom-card-menu">
           <CardMenuAction icon={Copy} testId="copy-join-code" onSelect={onCopy}>{t('teacher.classroom.copyCode')}</CardMenuAction>
           <CardMenuAction icon={Share2} testId="share-join-code" onSelect={onShare}>{t('teacher.classroom.share')}</CardMenuAction>
           {onOpenProjector ? (
@@ -187,13 +159,26 @@ export function ClassCard({
       }
       action={
         startGameHref ? (
-          <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(featured ? NB_PRIMARY : NB_SECONDARY, 'min-h-14 w-full text-lg')}>
+          <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(NB_PRIMARY, 'min-h-14 w-full text-lg')}>
             <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
             {t('eduShell.home.startLive', 'Start a game')}
           </Link>
         ) : null
       }
     >
+      <div data-testid="classroom-card-fact" className="flex min-h-9 min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-neo-body text-sm font-bold text-neo-cream/85">
+        {fact}
+      </div>
+      <div
+        data-testid="join-code-plate"
+        aria-label={t('academy.hq.classCode', 'Class code')}
+        role="group"
+        className="flex min-h-16 items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 shadow-hard-lg"
+      >
+        <code data-testid="classroom-join-code" dir="ltr" className="whitespace-nowrap font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black">
+          {classroom.join_code}
+        </code>
+      </div>
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
         <NbDialogContent size="lg" phone="full">
           <NbDialogHeader

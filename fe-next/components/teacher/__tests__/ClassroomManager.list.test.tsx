@@ -115,7 +115,7 @@ describe('ClassroomManager — class list', () => {
       expect(within(card).getByText('Period 3')).toBeInTheDocument();
       const fact = within(card).getByTestId('classroom-card-fact');
       expect(fact).toHaveTextContent('teacher.pulse.state.noRoster');
-      expect(fact).toHaveTextContent('ABC123');
+      expect(within(card).getByTestId('join-code-plate')).toHaveTextContent('ABC123');
       expect(within(card).queryByTestId('card-activity')).toBeNull();
     });
 
@@ -125,11 +125,13 @@ describe('ClassroomManager — class list', () => {
       expect(within(screen.getByTestId('classroom-card-fact')).getByTestId('card-activity')).toHaveTextContent('cls-1');
     });
 
-    it('Then only the first card wears the lime Start, so the screen has one primary action', () => {
+    it('Then every card has one lime Start as its only primary action', () => {
       state.classrooms = [mk(1), mk(2), mk(3)];
       render(<ClassroomManager />);
-      const lime = screen.getAllByTestId('classroom-card-start-game').filter((a) => /(^|\s)bg-neo-lime(\s|$)/.test(a.className));
-      expect(lime).toEqual([screen.getAllByTestId('classroom-card-start-game')[0]]);
+      for (const card of screen.getAllByTestId('classroom-card')) {
+        const lime = Array.from(card.querySelectorAll('a, button')).filter((a) => /(^|\s)bg-neo-lime(\s|$)/.test(a.className));
+        expect(lime).toEqual([within(card).getByTestId('classroom-card-start-game')]);
+      }
     });
 
     it('Then the card leads with Start a game and keeps Assign and Report in its menu', async () => {

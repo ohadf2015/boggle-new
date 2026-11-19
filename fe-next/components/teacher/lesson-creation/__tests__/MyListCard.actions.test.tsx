@@ -26,18 +26,31 @@ describe('MyListCard face', () => {
     expect(screen.getByTestId('lesson-host-L1')).toHaveTextContent('eduShell.home.startLive');
   });
 
-  it('Given a list, Then Start is not lime, because New list is the page primary', () => {
+  it('Given a list, Then Start wears the card color, never lime, because New list is the page primary', () => {
     renderCard();
-    expect(screen.getByTestId('lesson-host-L1').className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
+    const accent = screen.getByTestId('my-list-L1').getAttribute('data-accent');
+    const start = screen.getByTestId('lesson-host-L1').className;
+    expect(start).toContain(`bg-neo-${accent}`);
+    expect(screen.getByTestId('list-card-band').className).toContain(`bg-neo-${accent}`);
+    expect(start).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
   });
 
-  it('Given a list, Then the one fact is its word count and language, with no word chips or definitions meter', () => {
+  it('Given a list, Then the band carries the word count badge and language, and the body its first words', () => {
     renderCard();
+    const band = screen.getByTestId('list-card-band');
+    expect(band).toHaveTextContent('2');
     const fact = screen.getByTestId('lesson-fact-L1');
     expect(fact).toHaveTextContent('eduLibrary.card.words:{"count":2}');
     expect(fact).toHaveTextContent('English');
-    expect(screen.queryByTestId('word-tile')).toBeNull();
+    expect(screen.getAllByTestId('word-tile').map((w) => w.textContent)).toEqual(['photon', 'orbit']);
     expect(screen.getByTestId('my-list-L1')).not.toHaveTextContent('teacher.lesson.definitionCoverage');
+  });
+
+  it('Given a long list, Then six words show and the rest is a +N chip', () => {
+    const words = Array.from({ length: 9 }, (_, i) => ({ word: `w${i}` }));
+    renderCard({ lesson: { ...(lesson as object), words } as never });
+    expect(screen.getAllByTestId('word-tile')).toHaveLength(6);
+    expect(screen.getByTestId('my-list-L1')).toHaveTextContent('+3');
   });
 
   it('Given a list given to a class, Then the fact names the class', () => {
@@ -45,7 +58,7 @@ describe('MyListCard face', () => {
     expect(within(screen.getByTestId('lesson-fact-L1')).getByTestId('lesson-classroom-L1')).toHaveTextContent('7B');
   });
 
-  it('Given neighbouring cards, Then each keeps its own small accent on one calm surface', () => {
+  it('Given neighbouring cards, Then each wears its own color over a navy body', () => {
     const { rerender } = renderCard();
     const card = screen.getByTestId('my-list-L1');
     const first = card.getAttribute('data-accent');
