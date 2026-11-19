@@ -22431,6 +22431,9 @@ const sv = {
       "joined": "{name} är med!",
       "youreIn": "Du är med!",
       "watchBoard": "Titta på tavlan. Läraren startar spelet.",
+      "waitPractice": "Öva medan läraren gör spelet klart.",
+      "waitReady": "Tryck på knappen när du är redo. Läraren startar spelet.",
+      "skipPractice": "Hoppa över övningen",
       "inClass": "{count} i klassen",
       "changeLook": "Byt utseende",
       "leave": "Lämna"
@@ -22530,7 +22533,8 @@ const sv = {
       "calculating": "Räknar orden…",
       "classGoal": "Klassens fångst: {found}/{total} ord",
       "waitNext": "Läraren väljer vad som händer sen. Värm upp medan du väntar.",
-      "moreFromRound": "Mer från den här rundan"
+      "moreFromRound": "Mer från den här rundan",
+      "backToResults": "Tillbaka till resultaten"
     }
   }
   // @eduLiveRoom:end

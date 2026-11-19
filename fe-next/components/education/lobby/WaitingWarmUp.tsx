@@ -36,7 +36,7 @@ function seedFor(name: string): number {
 export function WaitingWarmUp({ username, words, t, hero = false }: { username: string; words?: readonly string[]; t: EduT; hero?: boolean }) {
   const deck = useStudyDeck((s) => s.cards);
   const spellable = useMemo(() => spellableWords(words ?? deck.map((c) => c.word)), [words, deck]);
-  if (spellable.length > 0) return <WarmUpSpellTiles key={spellable.map((w) => w.join('')).join('|')} words={spellable} seed={seedFor(username)} t={t} />;
+  if (spellable.length > 0) return <WarmUpSpellTiles key={spellable.map((w) => w.join('')).join('|')} words={spellable} seed={seedFor(username)} t={t} bare={hero} />;
   if (hero) return <WaitingWarmUpHero username={username} seed={seedFor(username)} t={t} />;
   return <NameTapWarmUp username={username} t={t} />;
 }

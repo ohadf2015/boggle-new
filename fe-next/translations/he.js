@@ -22392,6 +22392,9 @@ const he = {
       "joined": "{name} בפנים!",
       "youreIn": "אתם בפנים!",
       "watchBoard": "תסתכלו על הלוח. המשחק יתחיל עוד רגע.",
+      "waitPractice": "מתרגלים עכשיו, ואות הפתיחה יגיע מהמורה.",
+      "waitReady": "כשמוכנים לוחצים על הכפתור, ואז מחכים לאות הפתיחה מהמורה.",
+      "skipPractice": "דילוג על התרגול",
       "inClass": "{count} בכיתה",
       "changeLook": "החלפת מראה",
       "leave": "יציאה"
@@ -22491,7 +22494,8 @@ const he = {
       "calculating": "סופרים את המילים…",
       "classGoal": "השלל של הכיתה: {found}/{total} מילים",
       "waitNext": "מה הלאה? זה אצל המורה. בינתיים, חימום!",
-      "moreFromRound": "עוד מהסבב הזה"
+      "moreFromRound": "עוד מהסבב הזה",
+      "backToResults": "חזרה לתוצאות"
     }
   }
   // @eduLiveRoom:end

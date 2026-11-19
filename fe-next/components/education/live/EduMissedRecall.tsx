@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Brain, PartyPopper, RotateCcw } from 'lucide-react';
+import { PartyPopper, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StudyCard } from '@/shared/utils/studyCards';
 import type { EduT } from '@/components/education/lobby/eduText';
@@ -27,25 +27,27 @@ export function missedDefinitions(missed: readonly string[], deck: readonly Stud
   return out;
 }
 
+function missedItems(missed: readonly string[], deck: readonly StudyCard[]) {
+  const wanted = new Set(missed.map((w) => w.toLowerCase()));
+  return quizzableCards(deck).filter((i) => wanted.has(i.word.toLowerCase()));
+}
+
+const deckPool = (deck: readonly StudyCard[]) => [...new Set(deck.map((c) => c.word.toLowerCase()))];
+
+export function canRecallMissed(missed: readonly string[], deck: readonly StudyCard[]): boolean {
+  return missedItems(missed, deck).length > 0 && deckPool(deck).length >= 2;
+}
+
 export function EduMissedRecall({ missed, deck, t }: EduMissedRecallProps) {
-  const items = useMemo(() => {
-    const wanted = new Set(missed.map((w) => w.toLowerCase()));
-    return quizzableCards(deck).filter((i) => wanted.has(i.word.toLowerCase()));
-  }, [missed, deck]);
-  const pool = useMemo(() => [...new Set(deck.map((c) => c.word.toLowerCase()))], [deck]);
-  const [phase, setPhase] = useState<'idle' | 'quiz' | 'done'>('idle');
+  const items = useMemo(() => missedItems(missed, deck), [missed, deck]);
+  const pool = useMemo(() => deckPool(deck), [deck]);
+  const [phase, setPhase] = useState<'quiz' | 'done'>('quiz');
   const [round, setRound] = useState(0);
 
   if (items.length === 0 || pool.length < 2) return null;
 
   return (
     <section data-testid="missed-recall" className="flex w-full flex-col gap-2">
-      {phase === 'idle' && (
-        <button type="button" data-testid="missed-recall-start" onClick={() => setPhase('quiz')} className={cn(BUTTON, PRESS, 'bg-neo-cyan text-neo-black')}>
-          <Brain className="size-5" aria-hidden="true" />
-          {t('eduStudent.recall.quickRecall')}
-        </button>
-      )}
       {phase === 'quiz' && (
         <RecallQuiz key={round} items={items} pool={deck.map((c) => c.word)} target={1} onFinish={() => setPhase('done')} t={t} />
       )}

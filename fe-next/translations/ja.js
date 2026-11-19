@@ -22431,6 +22431,9 @@ const ja = {
       "joined": "{name}が参加！",
       "youreIn": "参加できました！",
       "watchBoard": "大きな画面を見てね。先生がゲームを始めます。",
+      "waitPractice": "先生の準備ができるまで練習しよう。",
+      "waitReady": "準備ができたらボタンを押してね。先生がゲームを始めます。",
+      "skipPractice": "練習をスキップ",
       "inClass": "クラス{count}人",
       "changeLook": "見た目を変える",
       "leave": "退出"
@@ -22530,7 +22533,8 @@ const ja = {
       "calculating": "単語を集計中…",
       "classGoal": "クラスの合計：{found}/{total}語",
       "waitNext": "次は先生が決めるよ。待つ間にウォームアップ！",
-      "moreFromRound": "このラウンドの詳細"
+      "moreFromRound": "このラウンドの詳細",
+      "backToResults": "結果に戻る"
     }
   }
   // @eduLiveRoom:end

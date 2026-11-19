@@ -17,7 +17,7 @@ export const WARM_UP_KEYFRAMES =
 const FOCUS = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black';
 
 /** A list word's letters dealt scrambled; tap them back in order. A wrong tap shakes the tile and costs nothing. */
-export function WarmUpSpellTiles({ words, seed, t }: { words: string[][]; seed: number; t: EduT }) {
+export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: string[][]; seed: number; t: EduT; bare?: boolean }) {
   const [state, setState] = useState(() => initialSpell(words, seed));
   const [missTile, setMissTile] = useState(-1);
   const sfx = useSoundEffects();
@@ -46,7 +46,7 @@ export function WarmUpSpellTiles({ words, seed, t }: { words: string[][]; seed: 
       data-testid="waiting-warmup"
       data-kind="spell"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className="w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard"
+      className={bare ? 'w-full' : 'w-full max-w-sm rounded-neo-lg border-[3px] border-neo-cream bg-neo-navy/90 p-2 shadow-hard'}
     >
       <style>{WARM_UP_KEYFRAMES}</style>
       <div className="mb-1.5 flex items-center justify-between gap-2">

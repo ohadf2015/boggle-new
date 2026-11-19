@@ -90,6 +90,7 @@ describe('EduStudentResults', () => {
     render(<EduStudentResults {...(props as object)} />);
     expect(reward.args).toEqual(['AB12CD', '77']);
     expect(screen.getByTestId('edu-student-hero')).toContainElement(screen.getByTestId('chest-cta'));
+    openMore();
     expect(screen.getByTestId('round-shop')).toBeInTheDocument();
   });
 
@@ -117,6 +118,7 @@ describe('EduStudentResults', () => {
   it('given my round, when results show, then the gap line is my verdict and the chips collapse to best word beside lesson words', () => {
     controller.current = makeController({ socketEvents: { xpGainedData: { xpEarned: 45 } }, sideEffects: { coinReward: { awarded: 12 } } });
     render(<EduStudentResults {...(props as object)} />);
+    openMore();
     expect(screen.getByTestId('edu-student-best-word')).toHaveTextContent('tame');
     expect(screen.getByTestId('edu-student-best-word')).toHaveTextContent('+4');
     expect(screen.queryByTestId('edu-student-xp')).toBeNull();
@@ -132,6 +134,7 @@ describe('EduStudentResults', () => {
   it('given my lesson-word tally, when results show, then it is the second tile of the pair', () => {
     const withMastery = { ...(props as object), classroomSummary: { teacherName: 'Ms Cohen', missedWords: [], lessonIds: [], masteryByPlayer: { Maya: { found: 3, total: 8 } } } };
     render(<EduStudentResults {...(withMastery as never)} />);
+    openMore();
     expect(screen.getByTestId('edu-student-lesson')).toHaveTextContent('3/8');
   });
 
@@ -243,6 +246,7 @@ describe('EduStudentResults', () => {
       masteryByPlayer: { Noa: { found: 2, total: 3 }, Maya: { found: 1, total: 3 } },
     };
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    openMore();
     expect(screen.getAllByTestId('round-hardest-word').map((el) => el.querySelector('bdi')?.textContent)).toContain('fog');
     expect(screen.queryByTestId('pro-insight-link-results_hardest_words')).toBeNull();
   });
@@ -252,12 +256,13 @@ describe('EduStudentResults', () => {
     expect(screen.queryByTestId('round-hardest-words')).toBeNull();
   });
 
-  it('given a class round ended, when my phone shows results, then I get one tap into a second mode that names my place', () => {
+  it('given a class round ended, when my phone shows results, then More offers one tap into a second mode that names my place', () => {
     const summary = {
       ...(props as { classroomSummary: object }).classroomSummary,
       classroomId: '11111111-1111-4111-8111-111111111111',
     };
     render(<EduStudentResults {...({ ...(props as object), classroomSummary: summary } as never)} />);
+    openMore();
     expect(screen.getByTestId('class-mode-bridge-context')).toHaveTextContent("You were #2 in Ms Cohen's class");
     expect(screen.getByRole('link', { name: 'Solo daily' }).getAttribute('href')).toContain('class_id=11111111-1111-4111-8111-111111111111');
     expect(screen.getByRole('link', { name: 'Quick play' }).getAttribute('href')).toContain('mode=quick_play');

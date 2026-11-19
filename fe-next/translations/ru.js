@@ -22131,6 +22131,9 @@ const ru = {
       "joined": "{name} в игре!",
       "youreIn": "Ты в игре!",
       "watchBoard": "Смотри на экран. Учитель запустит игру.",
+      "waitPractice": "Потренируйся, пока учитель готовит игру.",
+      "waitReady": "Нажми кнопку, и учитель увидит, что можно начинать.",
+      "skipPractice": "Пропустить тренировку",
       "inClass": "В классе: {count}",
       "changeLook": "Сменить образ",
       "leave": "Выйти"
@@ -22230,7 +22233,8 @@ const ru = {
       "calculating": "Считаем слова…",
       "classGoal": "Улов класса: {found}/{total} слов",
       "waitNext": "Что дальше, решает учитель. А пока разомнись.",
-      "moreFromRound": "Ещё об этом раунде"
+      "moreFromRound": "Ещё об этом раунде",
+      "backToResults": "Назад к результатам"
     }
   }
   // @eduLiveRoom:end

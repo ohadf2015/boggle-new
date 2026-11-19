@@ -12,20 +12,21 @@ interface LobbyWordStudyProps {
   cards: StudyCard[];
   studied: boolean;
   onDone: () => void;
+  quiet?: boolean;
   t: EduT;
 }
 
 const NAV = 'inline-flex min-h-12 items-center justify-center gap-1.5 rounded-neo border-[3px] px-4 font-neo-display text-base font-black uppercase shadow-hard-sm disabled:opacity-40 disabled:shadow-none';
 
-export function LobbyWordStudy({ cards, studied, onDone, t }: LobbyWordStudyProps) {
+export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: LobbyWordStudyProps) {
   const [index, setIndex] = useState(0);
   const card = cards[Math.min(index, cards.length - 1)];
   const last = index >= cards.length - 1;
 
   return (
-    <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full max-w-sm flex-col gap-2">
+    <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h2 id="lobby-word-study-title" className="font-neo-display text-lg font-black text-neo-cream">
+        <h2 id="lobby-word-study-title" className="font-neo-display text-2xl font-black text-neo-cream lg:text-4xl">
           {t('eduStudent.lobby.studyTitle')}
         </h2>
         {studied ? (
@@ -60,7 +61,7 @@ export function LobbyWordStudy({ cards, studied, onDone, t }: LobbyWordStudyProp
           {t('eduStudent.lobby.studyBack')}
         </button>
         {last && !studied ? (
-          <button type="button" data-testid="study-done" onClick={onDone} className={cn(NAV, PRESS, 'flex-[2] border-neo-black bg-neo-lime text-neo-black')}>
+          <button type="button" data-testid="study-done" onClick={onDone} className={cn(NAV, PRESS, 'flex-[2]', quiet ? 'border-neo-cream/40 bg-neo-navy text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black')}>
             <Check className="size-5" aria-hidden="true" />
             {t('eduStudent.lobby.studyDone')}
           </button>

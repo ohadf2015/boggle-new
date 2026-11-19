@@ -132,10 +132,8 @@ describe('PlayerWaitingView — the classroom lobby fits a 390x844 phone', () =>
     expect(allClassNames(container).filter((c) => /min-h-\[\d+vh\]/.test(c))).toEqual([]);
   });
 
-  it('fills the freed space with Lexi rather than a second scroll region', () => {
+  it('keeps a single scroll region so the pinned READY bar never scrolls away', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode classroomGameMode="vocab-quiz" />);
-    const art = screen.getByTestId('edu-student-crowd').querySelector('img')!;
-    expect(art).toHaveAttribute('alt', '');
     expect(screen.getByTestId('edu-student-lobby').querySelectorAll('[class*="overflow-y-auto"]')).toHaveLength(1);
   });
 

@@ -59,7 +59,7 @@ export function StudentWaitBar({ onPractice, t }: { onPractice?: () => void; t: 
             trackResultsAction('practice', 'student');
             onPractice();
           }}
-          className="flex min-h-12 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-cyan px-4 py-2.5 font-neo-display text-lg font-black text-neo-black shadow-hard-lg transition-transform duration-150 ease-out active:translate-x-0.5 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="flex min-h-14 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-4 py-2.5 font-neo-display text-xl font-black text-neo-black shadow-hard-lg transition-transform duration-150 ease-out active:translate-x-0.5 active:translate-y-0.5 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           <BookOpen className="size-5 shrink-0" aria-hidden="true" />
           {t('education.results.practiceMissed')}

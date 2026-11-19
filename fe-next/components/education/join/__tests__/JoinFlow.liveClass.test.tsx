@@ -3,14 +3,16 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
-const { mockJoin, mockResolve, mockUseAuth, mockStoredName } = vi.hoisted(() => ({
+const { mockJoin, mockResolve, mockUseAuth, mockStoredName, mockSaveName, mockPush } = vi.hoisted(() => ({
+  mockSaveName: vi.fn(),
+  mockPush: vi.fn(),
   mockStoredName: vi.fn(() => null as string | null),
   mockJoin: vi.fn(),
   mockResolve: vi.fn(),
   mockUseAuth: vi.fn(),
 }));
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ push: mockPush }) }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (k: string, params?: Record<string, string>) =>
@@ -25,7 +27,7 @@ vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), tr
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: mockStoredName,
-  setStoredUsername: vi.fn(),
+  setStoredUsername: mockSaveName,
 }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 
@@ -53,5 +55,18 @@ describe('<JoinFlow> a code whose class is playing right now', () => {
     render(<JoinFlow initialCode="P45KRT" />);
     const card = await screen.findByTestId('join-target-card');
     expect(card).toHaveTextContent('education.student.join.preview.gameConfirm');
+  });
+
+  it('Given a guest names themselves here, When they walk into the live room, Then the name is saved first so the room never asks again', async () => {
+    mockResolve.mockResolvedValue({ verdict: 'game', label: '7B English', classroomId: 'c1', gameCode: 'P45KRT' });
+    mockJoin.mockResolvedValue({ success: true, gameCode: 'P45KRT', classroomId: 'c1' });
+    render(<JoinFlow initialCode="P45KRT" />);
+    await screen.findByTestId('join-target-card');
+    fireEvent.change(screen.getByLabelText('education.student.join.nameLabel'), { target: { value: 'Maya' } });
+    await waitFor(() => expect(screen.getByLabelText('education.student.join.nameLabel')).toHaveValue('Maya'));
+    fireEvent.submit(screen.getByTestId('join-name-step'));
+    await waitFor(() => expect(mockPush).toHaveBeenCalled(), { timeout: 3000 });
+    expect(mockSaveName).toHaveBeenCalledWith('Maya');
+    expect(mockSaveName.mock.invocationCallOrder[0]).toBeLessThan(mockPush.mock.invocationCallOrder[0]);
   });
 });
