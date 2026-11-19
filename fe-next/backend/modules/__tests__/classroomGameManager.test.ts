@@ -46,6 +46,7 @@ beforeAll(() => {
 describe('ClassroomGameManager', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRedis.get.mockResolvedValue(null);
   });
 
   describe('createClassroomGame', () => {
@@ -81,6 +82,28 @@ describe('ClassroomGameManager', () => {
         `classroom_games:${gameData.classroomId}`,
         gameData.gameCode
       );
+    });
+
+    it('refuses to overwrite a classroom code whose session has already ended', async () => {
+      mockRedis.get.mockResolvedValue(JSON.stringify({
+        gameCode: '4BH936',
+        classroomId: 'classroom-1',
+        status: 'ended',
+        endedAt: '2026-11-19T04:14:26.000Z',
+      }));
+
+      await expect(createClassroomGame({
+        gameCode: '4BH936',
+        classroomId: 'classroom-1',
+        teacherId: 'teacher-1',
+        teacherName: 'Teacher',
+        lessonIds: [],
+        lessonNames: [],
+        vocabularyWords: [],
+        settings: {},
+      })).rejects.toMatchObject({ code: 'GAME_ENDED' });
+
+      expect(mockRedis.setex).not.toHaveBeenCalled();
     });
 
     it('should persist classroomId and lessonIds in Redis', async () => {

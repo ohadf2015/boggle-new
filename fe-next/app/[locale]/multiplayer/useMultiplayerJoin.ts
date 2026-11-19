@@ -23,6 +23,7 @@ import { practiceSeatJoinFlag } from '@/utils/practiceSeatStorage';
 import { classroomHostJoinFlag } from '@/lib/education/classroomLivePath';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { clearHostCreateRefusal, setHostCreateRefusal } from './hostCreateRefusal';
+import { clearSession } from '@/utils/session';
 import { waitForSignedInUser } from './classroomHostSignIn';
 import type { Language, Avatar } from '@/shared/types/game';
 import { redialSocket } from '@/lib/multiplayer/redialSocket';
@@ -190,7 +191,11 @@ export function useMultiplayerJoin({
         isFirstOutcome = !joinOutcomeEmitted;
         if (joinOutcomeEmitted) return;
         joinOutcomeEmitted = true;
-        if (isClassroomHost && outcome !== 'joined') setHostCreateRefusal({ code: attemptCode, reason: reason || outcome });
+        if (isClassroomHost && outcome !== 'joined') {
+          const refusalReason = reason || outcome;
+          setHostCreateRefusal({ code: attemptCode, reason: refusalReason });
+          if (refusalReason === 'GAME_ENDED') clearSession();
+        }
         trackGrowthEvent('mp_join_outcome', {
           outcome,
           wait_ms: Date.now() - joinStartedAt,

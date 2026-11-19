@@ -72,6 +72,7 @@ export const ErrorCodes = {
   GAME_FULL: 'GAME_FULL',
   GAME_INVALID_CODE: 'GAME_INVALID_CODE',
   GAME_CLOSED: 'GAME_CLOSED',
+  GAME_ENDED: 'GAME_ENDED',
   CLASSROOM_NOT_OPEN: 'CLASSROOM_NOT_OPEN',
   CLASSROOM_SESSION_WAITING: 'CLASSROOM_SESSION_WAITING',
   ROOM_LOCKED: 'ROOM_LOCKED',
@@ -170,6 +171,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   },
   [ErrorCodes.GAME_CLOSED]: {
     message: 'Game room has been closed',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 410
+  },
+  [ErrorCodes.GAME_ENDED]: {
+    message: 'This game has ended. Start a new game for a fresh code.',
     severity: ErrorSeverity.LOW,
     httpStatus: 410
   },

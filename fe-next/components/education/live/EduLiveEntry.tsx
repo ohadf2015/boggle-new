@@ -7,6 +7,8 @@ import { useMultiplayerFlowState } from '@/components/multiplayer/useMultiplayer
 import type { MultiplayerFlowProps } from '@/components/multiplayer/MultiplayerFlow';
 import { getStoredUsername } from '@/utils/profileStorage';
 import { useHostCreateRefusal } from '@/app/[locale]/multiplayer/hostCreateRefusal';
+import { teacherHostHref } from '@/lib/education/teacherHostHref';
+import { clearSession } from '@/utils/session';
 import { cn } from '@/lib/utils';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
 import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
@@ -51,6 +53,23 @@ function ActiveEntry({ entry, isHost, language, t }: Omit<EduLiveEntryProps, 'ur
   }
 
   if (isHost && refusal && !entry.isJoining && refusal.code.toUpperCase() === room.toUpperCase()) {
+    const ended = refusal.reason === 'GAME_ENDED';
+    if (ended) {
+      return (
+        <Frame testId="edu-live-host-ended" mascot={EDU_MASCOT.tip}>
+          <h1 role="alert" className="font-neo-display text-2xl font-black">{t('eduLiveRoom.entry.hostEndedTitle')}</h1>
+          <p className="font-neo-body text-base font-bold text-neo-cream/80">{t('eduLiveRoom.entry.hostEndedHint')}</p>
+          <Link
+            href={teacherHostHref(language, {})}
+            data-testid="edu-live-host-start-new"
+            onClick={() => clearSession()}
+            className={cn(PRIMARY_BUTTON, PRESS, 'min-h-12 w-full px-5 text-lg')}
+          >
+            {t('eduLiveRoom.entry.hostStartNew')}
+          </Link>
+        </Frame>
+      );
+    }
     const name = entry.displayName || getStoredUsername() || '';
     return (
       <Frame testId="edu-live-host-refused" mascot={EDU_MASCOT.tip}>

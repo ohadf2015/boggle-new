@@ -17,6 +17,7 @@ import {
   updateClassroomGameStatus,
   type CreateClassroomGameData,
 } from '../modules/classroomGameManager.js';
+import { isClassroomSessionEnded } from '../modules/classroomGameSessionState.js';
 import { bindSocketToGame, gameExists, getGameUsers } from '../modules/gameStateManager.js';
 import { getGameRoom } from '../utils/socketHelpers.js';
 import {
@@ -114,6 +115,16 @@ export function registerClassroomGameHandlers(io: Server, socket: Socket): void 
     }
     if (teacherCheck === 'no') {
       socket.emit('classroomGameError', { error: 'You are not the teacher of this classroom', code: 'NOT_TEACHER' });
+      return;
+    }
+
+    const existingClassroomGame = await getClassroomGame(payload.gameCode);
+    if (existingClassroomGame && isClassroomSessionEnded(existingClassroomGame)) {
+      logger.info('CLASSROOM_GAME', `Refused createClassroomGame on ended code ${payload.gameCode}`);
+      socket.emit('classroomGameError', {
+        error: 'This game has ended. Start a new game for a fresh code.',
+        code: 'GAME_ENDED',
+      });
       return;
     }
 
