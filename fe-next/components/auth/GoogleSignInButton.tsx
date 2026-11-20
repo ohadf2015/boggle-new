@@ -11,12 +11,12 @@ import {
 } from '@/lib/auth/loadAuthClient';
 import { neoErrorToast } from '@/components/NeoToast';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
+import { gsiClientSrc } from '@/lib/auth/gsiSrc';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { latchSignupSource, trackSignupFailed, trackSignupPromptClicked } from '@/utils/growthTracking';
 import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
-const GSI_SRC = 'https://accounts.google.com/gsi/client';
 const GSI_MAX_WIDTH = 400; // GIS hard cap
 
 interface GoogleSignInButtonProps {
@@ -230,7 +230,7 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   // a browser set to e.g. Arabic renders an Arabic button even on the English
   // site. `renderButton`'s own `locale` option only sticks if it matches the
   // locale the library was loaded with, so both must agree.
-  const gsiSrc = `${GSI_SRC}?hl=${language}`;
+  const gsiSrc = gsiClientSrc(language);
 
   return (
     <div ref={wrapperRef} className={cn('flex justify-center', className)}>
