@@ -7,7 +7,7 @@
 
 import type { Language, LetterGrid } from '@/types';
 import type { DailyPuzzle } from './types';
-import { getPuzzleNumber } from './dateUtils';
+import { getPuzzleNumber, getDailyChallengeDate } from './dateUtils';
 import { generateDailyPuzzle, isWordOnGrid } from './gridGeneration';
 import { MAX_TARGET_WORD_LENGTH } from './constants';
 import { loadNounList, createSafeReadFile } from '@/backend/dictionaryLoaders';
@@ -79,7 +79,8 @@ async function saveGridToDatabase(
   dateString: string,
   language: Language,
   grid: LetterGrid,
-  targetWord: string
+  targetWord: string,
+  replaceTarget = false
 ): Promise<boolean> {
   try {
     // Dynamic import to prevent bundling server-only code
@@ -108,6 +109,7 @@ async function saveGridToDatabase(
           grid,
           grid_generated_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          ...(replaceTarget ? { override_word: targetWord, meaning: null } : {}),
         })
         .eq('puzzle_date', dateString)
         .eq('language', language);
@@ -188,8 +190,9 @@ export async function generateDailyPuzzleAsync(
   // Legacy DB rows (or admin imports from before the cap tightened) may hold
   // words longer than MAX_TARGET_WORD_LENGTH — fall through to deterministic
   // regeneration instead of serving an oversized target to players.
+  // Today and past days keep their word: people already played them.
   const storedTargetTooLong =
-    !!puzzleData && puzzleData.targetWord.length > MAX_TARGET_WORD_LENGTH;
+    !!puzzleData && dateString > getDailyChallengeDate() && puzzleData.targetWord.length > MAX_TARGET_WORD_LENGTH;
   if (storedTargetTooLong) {
     console.warn(
       `[Daily Puzzle] Stored target "${puzzleData!.targetWord}" for ${dateString}/${language} exceeds ${MAX_TARGET_WORD_LENGTH} chars - regenerating deterministically`
@@ -242,7 +245,7 @@ export async function generateDailyPuzzleAsync(
   const puzzle = generateDailyPuzzle(dateString, language, undefined, undefined, undefined, nounWords);
 
   // Try to save the generated grid
-  const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord);
+  const saved = await saveGridToDatabase(dateString, language, puzzle.grid, puzzle.targetWord, storedTargetTooLong);
   if (saved) {
     logger.log(`[Daily Puzzle] Saved generated grid for ${dateString}/${language}`);
   }

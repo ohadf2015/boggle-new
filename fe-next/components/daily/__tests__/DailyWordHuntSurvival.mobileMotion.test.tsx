@@ -68,7 +68,7 @@ vi.mock('@/contexts/MusicContext', () => ({
 }));
 
 
-const perf = vi.hoisted(() => ({ isLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false }));
+const perf = vi.hoisted(() => ({ isLowEnd: false, staticLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false }));
 vi.mock('@/hooks/useDevicePerformance', () => ({ useDevicePerformance: () => perf }));
 
 const effects = vi.hoisted(() => ({ reduced: false }));
@@ -101,7 +101,7 @@ function calmFlags() {
 
 describe('Word Hunt motion on phones', () => {
   beforeEach(() => {
-    Object.assign(perf, { isLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false });
+    Object.assign(perf, { isLowEnd: false, staticLowEnd: false, enableComplexAnimations: true, prefersReducedMotion: false });
     effects.reduced = false;
     global.fetch = vi.fn().mockResolvedValue({ ok: false, json: async () => ({}) }) as unknown as typeof fetch;
   });
@@ -144,8 +144,14 @@ describe('Word Hunt motion on phones', () => {
       expect(await screen.findByTestId('hunt-fx-canvas')).toBeInTheDocument();
     });
 
-    it('Given a phone flagged low-end, Then the particle layer stays off while the board animates', () => {
-      Object.assign(perf, { isLowEnd: true, enableComplexAnimations: false });
+    it('Given a phone slowed to 30fps at runtime (Low Power Mode), Then the particle layer stays on', async () => {
+      Object.assign(perf, { isLowEnd: true, staticLowEnd: false, enableComplexAnimations: false });
+      renderHunt();
+      expect(await screen.findByTestId('hunt-fx-canvas')).toBeInTheDocument();
+    });
+
+    it('Given a weak phone by its hardware, Then the particle layer stays off while the board animates', () => {
+      Object.assign(perf, { isLowEnd: true, staticLowEnd: true, enableComplexAnimations: false });
       renderHunt();
       expect(screen.queryByTestId('hunt-fx-canvas')).toBeNull();
       expect(calmFlags().board).toBe('false');

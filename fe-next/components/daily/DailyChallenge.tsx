@@ -111,7 +111,8 @@ const DailyChallenge: React.FC = () => {
   // True when the player bailed mid-game today (no saved result). Re-entry is
   // ad-gated on native; on web it degrades to a free replay.
   const [forfeitedToday, setForfeitedToday] = useState(false);
-  const [wasReset, setWasReset] = useState(false);
+  const [resetCount, setResetCount] = useState(0);
+  const setWasReset = useCallback(() => setResetCount((n) => n + 1), []);
   // Today's date, moved to the new day for a page left open past midnight UTC, never mid-run.
   const today = useDailyDate(
     !isPractice && !isCatchup && phase !== 'playing' && phase !== 'completed',
@@ -157,7 +158,7 @@ const DailyChallenge: React.FC = () => {
   // Track previous values for smarter re-initialization
   const gameStartedAtRef = useRef<number>(0);
   useWordHuntPuzzleInit({
-    gameLanguage, today, wasReset, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
+    gameLanguage, today, resetCount, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
     setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
   });
 
@@ -284,27 +285,13 @@ const DailyChallenge: React.FC = () => {
     startPlaying();
   }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, startPlaying]);
 
-  // Returning players ("already play this kind of challenge") don't need the
-  // intro/ready page — jump straight into gameplay. First-time players and
-  // incoming friend-challenge deep links still see the ready screen (the
-  // challenge banner needs to render). Guarded by a ref so it only fires once
-  // per puzzle load, not on every re-render while phase stays 'ready'.
+  // The ready screen only earns its place for a friend challenge (who to beat). Everyone else
+  // goes straight in; a first-time player gets the lesson first, and closing it starts the run.
+  const hasValidChallenge = !!challengeData && challengeData.puzzleNumber === puzzleNumber;
   const autoSkippedReadyRef = useRef(false);
   useEffect(() => {
-    autoSkippedReadyRef.current = false;
-  }, [gameLanguage, catchupDate]);
-
-  useEffect(() => {
-    if (phase !== 'ready') return;
-    if (isPractice || isCatchup) return;
-    if (autoSkippedReadyRef.current) return;
-    const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
-    if (isValidChallenge) return;
-    if (!hasEverPlayedWordHunt(gameLanguage)) return;
-
-    autoSkippedReadyRef.current = true;
-    handleStartGame();
-  }, [phase, isPractice, isCatchup, challengeData, puzzleNumber, gameLanguage, handleStartGame]);
+    if (phase !== 'ready') autoSkippedReadyRef.current = false;
+  }, [phase, gameLanguage, catchupDate]);
 
   // A reload or app kill mid-run is then treated like a confirmed quit on the next load.
   useEffect(() => {
@@ -317,18 +304,21 @@ const DailyChallenge: React.FC = () => {
     gameStartedAtRef, recordStreak, showInterstitial, setGameResult, setStoredResult, onShowResults: showResults, t,
   });
 
-  // First visit: the interactive how-to-play opens once and replaces the in-game coach card.
   const [onboardedThisVisit, setOnboardedThisVisit] = useState(false);
   const [tutorialSource, setTutorialSource] = useState<HuntTutorialSource>('daily_help');
   useEffect(() => {
-    if (phase !== 'ready' || onboardedThisVisit || hasEverPlayedWordHunt(gameLanguage)) return;
+    if (phase !== 'ready' || hasValidChallenge || autoSkippedReadyRef.current) return;
+    autoSkippedReadyRef.current = true;
     const storage = typeof window !== 'undefined' ? window.localStorage : null;
-    if (!storage || hasSeenCoach('wordHunt', COACH_VERSION, storage)) return;
-    markCoachSeen('wordHunt', COACH_VERSION, storage);
-    setOnboardedThisVisit(true);
-    setTutorialSource('daily_first_visit');
-    setShowTutorial(true);
-  }, [phase, onboardedThisVisit, gameLanguage]);
+    if (!onboardedThisVisit && !hasEverPlayedWordHunt(gameLanguage) && storage && !hasSeenCoach('wordHunt', COACH_VERSION, storage)) {
+      markCoachSeen('wordHunt', COACH_VERSION, storage);
+      setOnboardedThisVisit(true);
+      setTutorialSource('daily_first_visit');
+      setShowTutorial(true);
+      return;
+    }
+    handleStartGame();
+  }, [phase, hasValidChallenge, onboardedThisVisit, gameLanguage, handleStartGame]);
 
   // The first-visit lesson replaces the ready screen: closing it starts the run instead of revealing a second intro.
   const closeTutorial = useCallback(() => {
@@ -380,7 +370,13 @@ const DailyChallenge: React.FC = () => {
           </m.div>
         )}
 
-        {phase === 'ready' && (
+        {phase === 'ready' && !hasValidChallenge && (
+          <m.div key="starting" className="flex-1 flex items-center justify-center">
+            <PageLoader size="lg" text={t('daily.loading')} />
+          </m.div>
+        )}
+
+        {phase === 'ready' && hasValidChallenge && (
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}

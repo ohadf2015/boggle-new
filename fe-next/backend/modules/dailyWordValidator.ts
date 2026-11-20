@@ -222,7 +222,7 @@ export async function runUpcomingWordValidation(options: RunOptions = {}): Promi
   const suggestions = await processSuggestions(buildSuggestionDeps(supabase, from), { languages });
 
   // 2) Quality-gate every upcoming served word + backfill meanings.
-  const summary = await validateUpcomingWords(buildDeps(supabase), { languages, dates });
+  const summary = await validateUpcomingWords(buildDeps(supabase), { languages, dates, today: isoDate(from) });
 
   logger.info('DAILY_WORD_VALIDATOR', 'Run complete', { ...summary, suggestions });
 

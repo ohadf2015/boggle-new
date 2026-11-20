@@ -8,6 +8,7 @@
  */
 
 import type { Language } from '@/types';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 
 /** Validation status for words (especially Wikipedia-sourced) */
 export type ValidationStatus = 'pending' | 'approved' | 'rejected';
@@ -22,24 +23,17 @@ export interface WordBankEntry {
   category?: string;
 }
 
-// Word length constraints by language — the filter the word-bank importer
-// applies before inserting words as status='active'. MUST match the DB
-// `check_word_length` constraint (migration 20260625000000_enforce_word_hunt_
-// target_5to7): active words are ja 2-4, everything else 5-7. Previously 4-6 —
-// a stale range predating that migration, so the importer both attempted
-// illegal 4-letter inserts (Postgres 23514 → Sentry JAVASCRIPT-NEXTJS-1QT
-// "AMUN") AND starved the valid 7-letter band. Aligned to 5-7 to match the DB,
-// MAX_TARGET_WORD_LENGTH (7) in utils/dailyChallenge/constants.ts, and the
-// bulk-generate route's copy. Japanese uses kanji compounds (2-4 chars).
+// Must stay inside the DB `check_word_length` constraint (ja 2-4, others 5-7).
+const TARGET_RANGE = { min: 5, max: MAX_TARGET_WORD_LENGTH };
 export const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
-  en: { min: 5, max: 7 },
-  he: { min: 5, max: 7 },
-  sv: { min: 5, max: 7 },
+  en: TARGET_RANGE,
+  he: TARGET_RANGE,
+  sv: TARGET_RANGE,
   ja: { min: 2, max: 4 },
-  es: { min: 5, max: 7 },
-  fr: { min: 5, max: 7 },
-  de: { min: 5, max: 7 },
-  ru: { min: 5, max: 7 },
+  es: TARGET_RANGE,
+  fr: TARGET_RANGE,
+  de: TARGET_RANGE,
+  ru: TARGET_RANGE,
 };
 
 // Expanded static fallback word lists by language

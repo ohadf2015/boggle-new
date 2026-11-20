@@ -11,14 +11,11 @@
  * never trusted.
  */
 
-import {
-  HUNT_TARGET_MIN_LENGTH,
-  HUNT_TARGET_MAX_LENGTH,
-} from '../constants/wordHuntMultiplayerConstants';
+import { HUNT_TARGET_MIN_LENGTH } from '../constants/wordHuntMultiplayerConstants';
 
-// Re-exported so a picker UI can explain the band without reaching past this
-// module for the numbers it enforces.
-export { HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH };
+// A teacher's lesson word may run one letter past the auto-picked 6-letter cap.
+export const CLASSROOM_HUNT_TARGET_MAX_LENGTH = 7;
+export { HUNT_TARGET_MIN_LENGTH };
 
 /** Letters only — a hyphen or space can't be traced as one path on the board. */
 const SINGLE_WORD = /^\p{L}+$/u;
@@ -27,7 +24,7 @@ export function isEligibleHuntTarget(word: string): boolean {
   const trimmed = word.trim();
   if (!SINGLE_WORD.test(trimmed)) return false;
   return (
-    trimmed.length >= HUNT_TARGET_MIN_LENGTH && trimmed.length <= HUNT_TARGET_MAX_LENGTH
+    trimmed.length >= HUNT_TARGET_MIN_LENGTH && trimmed.length <= CLASSROOM_HUNT_TARGET_MAX_LENGTH
   );
 }
 

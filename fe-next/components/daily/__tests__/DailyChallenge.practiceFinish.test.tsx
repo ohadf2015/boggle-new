@@ -148,12 +148,11 @@ describe('DailyChallenge — practice finish', () => {
     vi.clearAllMocks();
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
   it('Given a practice board with no saved daily, When the run ends, Then results show and nothing is saved', async () => {
     render(<DailyChallenge />);
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('play-button'));
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
 
     fireEvent.click(screen.getByTestId('finish'));

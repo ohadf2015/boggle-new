@@ -137,7 +137,7 @@ describe('DailyChallenge — first-visit how-to-play', () => {
   it('Given a returning player, When the page loads, Then the how-to-play stays closed', async () => {
     mockEverPlayed = true;
     render(<DailyChallenge />);
-    await settle();
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     expect(screen.queryByTestId('tutorial')).toBeNull();
   });
 
@@ -152,16 +152,16 @@ describe('DailyChallenge — first-visit how-to-play', () => {
     mockEverPlayed = false;
     window.localStorage.setItem('lc_coach_wordHunt', '1');
     render(<DailyChallenge />);
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     await settle();
     expect(screen.queryByTestId('tutorial')).toBeNull();
+    expect(screen.queryByTestId('ready-screen')).toBeNull();
   });
 
   it('Given the how-to-play was just shown, When the game starts, Then the in-game coach card stays hidden', async () => {
     mockEverPlayed = false;
     render(<DailyChallenge />);
     fireEvent.click(await screen.findByTestId('tutorial-done'));
-    fireEvent.click(screen.getByTestId('play-button'));
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     expect(survivalProps.at(-1)?.hideModeCoach).toBe(true);
   });

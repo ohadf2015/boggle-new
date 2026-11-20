@@ -19,7 +19,7 @@ describe('useWordHuntPuzzleInit catch-up day already played on this device', () 
     const setPhase = vi.fn();
     const setStoredResult = vi.fn();
     renderHook(() => useWordHuntPuzzleInit({
-      gameLanguage: 'en', today: '2026-11-13', wasReset: false, isAuthenticated: false, profileId: null,
+      gameLanguage: 'en', today: '2026-11-13', resetCount: 0, isAuthenticated: false, profileId: null,
       catchupDate: '2026-11-11', isPractice: false, online: true, setPhase, setPuzzleDate: vi.fn(),
       setPuzzleNumber: vi.fn(), setForfeitedToday: vi.fn(), setStoredResult, setGrid: vi.fn(),
       setTargetWord: vi.fn(), setMeaning: vi.fn(),

@@ -25,7 +25,8 @@ export interface WordHuntPuzzleInitDeps {
   gameLanguage: Language;
   /** Today's daily date (UTC); a change re-runs the load for the new day. */
   today: string;
-  wasReset: boolean;
+  /** Bumped on every reset; each bump reloads the puzzle. */
+  resetCount: number;
   isAuthenticated: boolean;
   profileId: string | null;
   catchupDate: string | null;
@@ -43,22 +44,22 @@ export interface WordHuntPuzzleInitDeps {
 
 /** Loads today's (or a catch-up day's) Word Hunt puzzle, or routes to the saved result if already played. */
 export function useWordHuntPuzzleInit({
-  gameLanguage, today, wasReset, isAuthenticated, profileId, catchupDate, isPractice, online,
+  gameLanguage, today, resetCount, isAuthenticated, profileId, catchupDate, isPractice, online,
   setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
 }: WordHuntPuzzleInitDeps) {
   const isCatchup = !!catchupDate;
   const prevGameLanguageRef = useRef<Language | null>(null);
-  const prevWasResetRef = useRef<boolean>(false);
+  const prevResetCountRef = useRef(0);
 
   useEffect(() => {
     let isMounted = true;
 
     const languageChanged = prevGameLanguageRef.current !== null && prevGameLanguageRef.current !== gameLanguage;
-    const wasJustReset = wasReset && !prevWasResetRef.current;
+    const wasJustReset = resetCount !== prevResetCountRef.current;
     const needsFullReload = languageChanged || wasJustReset || prevGameLanguageRef.current === null;
 
     prevGameLanguageRef.current = gameLanguage;
-    prevWasResetRef.current = wasReset;
+    prevResetCountRef.current = resetCount;
 
     if (needsFullReload) setPhase('loading');
 
@@ -164,5 +165,5 @@ export function useWordHuntPuzzleInit({
     initializePuzzle();
     return () => { isMounted = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameLanguage, wasReset, isAuthenticated, profileId, catchupDate, today]);
+  }, [gameLanguage, resetCount, isAuthenticated, profileId, catchupDate, today]);
 }

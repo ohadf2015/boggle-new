@@ -88,7 +88,7 @@ export function useRetryChallenge({
       setStoredResult(null);
       setGameResult(null);
       setWasReset(true);
-      setPhase('ready');
+      setPhase('loading');
 
       neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 3000 });
     } catch (error) {

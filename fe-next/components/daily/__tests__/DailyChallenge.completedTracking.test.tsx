@@ -151,13 +151,12 @@ describe('DailyChallenge — daily_challenge_completed funnel event', () => {
     mockDateParam = null;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
   it('emits daily_challenge_completed once when the daily challenge is finished', async () => {
     render(<DailyChallenge />);
 
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('play-button'));
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
 
     fireEvent.click(screen.getByTestId('finish'));

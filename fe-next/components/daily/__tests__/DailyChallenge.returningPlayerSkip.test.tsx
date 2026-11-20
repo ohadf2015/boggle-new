@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   m: {
@@ -73,10 +73,12 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 }));
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
-  useSearchParams: () => ({ get: vi.fn(), toString: () => '' }),
+  useSearchParams: () => ({ get: (k: string) => (k === 'challenge' ? mockChallengeParam() : null), toString: () => '' }),
 }));
 
 const mockHasEverPlayedWordHunt = vi.fn(() => false);
+const mockChallengeParam = vi.fn((): string | null => null);
+const mockParseChallenge = vi.fn((..._a: unknown[]): unknown => null);
 const mockHasPlayedToday = vi.fn(() => false);
 const mockTodaysResult = vi.fn((): unknown => null);
 
@@ -96,8 +98,8 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getTodaysWordHuntResult: (...args: unknown[]) => mockTodaysResult(...args),
   saveWordHuntResult: vi.fn(),
   getDailyStreak: vi.fn(() => 0),
-  parseChallengeParam: vi.fn(() => null),
-  clearWordHuntResultForRetry: vi.fn(),
+  parseChallengeParam: (...a: unknown[]) => mockParseChallenge(...a),
+  clearWordHuntResultForRetry: vi.fn(() => true),
   markWordHuntForfeitToday: vi.fn(),
   hasWordHuntForfeitToday: vi.fn(() => false),
   clearWordHuntForfeitToday: vi.fn(),
@@ -117,10 +119,16 @@ vi.mock('../DailyWordHuntSurvival', () => ({
   __esModule: true,
   default: () => <div data-testid="survival-game" />,
 }));
-vi.mock('../DailyWordHuntResults', () => ({ __esModule: true, default: () => <div data-testid="results-screen" /> }));
+vi.mock('../DailyWordHuntResults', () => ({
+  __esModule: true,
+  default: ({ onRetry }: { onRetry: () => void }) => (
+    <div data-testid="results-screen"><button data-testid="retry" onClick={onRetry}>Retry</button></div>
+  ),
+}));
+const readyMounts = vi.hoisted(() => vi.fn(() => null));
 vi.mock('../DailyReadyScreen', () => ({
   __esModule: true,
-  default: ({ onStart }: { onStart: () => void }) => (
+  default: ({ onStart }: { onStart: () => void }) => readyMounts() || (
     <div data-testid="ready-screen">
       <button onClick={onStart} data-testid="play-button">Play</button>
     </div>
@@ -138,6 +146,7 @@ global.fetch = vi.fn(() =>
 vi.mock('@/hooks/useInterstitialAd', () => ({ useInterstitialAd: () => ({ showInterstitial: () => Promise.resolve() }) }));
 import DailyChallenge from '../DailyChallenge';
 
+
 describe('DailyChallenge — returning player skips the ready screen', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -146,16 +155,59 @@ describe('DailyChallenge — returning player skips the ready screen', () => {
     mockHasEverPlayedWordHunt.mockReturnValue(false);
     mockHasPlayedToday.mockReturnValue(false);
     mockTodaysResult.mockReturnValue(null);
+    mockChallengeParam.mockReturnValue(null);
+    mockParseChallenge.mockReturnValue(null);
   });
 
-  it('GIVEN a first-time player THEN the ready screen is shown', async () => {
+  it('GIVEN a first-time player THEN the tutorial opens and the ready screen never renders', async () => {
     mockHasEverPlayedWordHunt.mockReturnValue(false);
+    render(<DailyChallenge />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('tutorial')).toBeInTheDocument();
+    });
+    expect(readyMounts).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('survival-game')).not.toBeInTheDocument();
+  });
+
+  it('GIVEN a player who saw the tutorial but never finished a run THEN gameplay starts with no ready screen', async () => {
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
+    render(<DailyChallenge />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('survival-game')).toBeInTheDocument();
+    });
+    expect(readyMounts).not.toHaveBeenCalled();
+  });
+
+  it('GIVEN a finished run WHEN the player retries THEN a fresh run starts instead of a stuck loader', async () => {
+    mockHasEverPlayedWordHunt.mockReturnValue(true);
+    mockHasPlayedToday.mockReturnValue(true);
+    mockTodaysResult.mockReturnValue({ date: '2024-01-01', puzzleNumber: 1, result: { solved: true, attemptsUsed: 2 } });
+    render(<DailyChallenge />);
+
+    await waitFor(() => expect(screen.getByTestId('results-screen')).toBeInTheDocument());
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, hasPlayed: false }) })) as unknown as typeof fetch;
+    mockHasPlayedToday.mockReturnValue(false);
+    mockTodaysResult.mockReturnValue(null);
+    fireEvent.click(screen.getByTestId('retry'));
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
+  });
+
+  it('GIVEN a friend challenge for today THEN the ready screen shows who to beat and waits for Play', async () => {
+    mockHasEverPlayedWordHunt.mockReturnValue(true);
+    mockChallengeParam.mockReturnValue('abc');
+    mockParseChallenge.mockReturnValue({ puzzleNumber: 1, attemptsUsed: 3, solved: true, efficiencyScore: 80, wordsDiscovered: 6 });
     render(<DailyChallenge />);
 
     await waitFor(() => {
       expect(screen.getByTestId('ready-screen')).toBeInTheDocument();
     });
     expect(screen.queryByTestId('survival-game')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('play-button'));
+    await waitFor(() => {
+      expect(screen.getByTestId('survival-game')).toBeInTheDocument();
+    });
   });
 
   it('GIVEN a player who has played Word Hunt before THEN gameplay starts immediately, no ready screen', async () => {
@@ -165,7 +217,7 @@ describe('DailyChallenge — returning player skips the ready screen', () => {
     await waitFor(() => {
       expect(screen.getByTestId('survival-game')).toBeInTheDocument();
     });
-    expect(screen.queryByTestId('ready-screen')).not.toBeInTheDocument();
+    expect(readyMounts).not.toHaveBeenCalled();
   });
 
   it('GIVEN a player who already finished today THEN results show and the site header never mounts', async () => {

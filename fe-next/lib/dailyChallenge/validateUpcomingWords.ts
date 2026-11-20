@@ -15,6 +15,7 @@
  */
 
 import type { DailyWordVerdict } from '@/lib/ai-service/dailyWordJudge';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 
 export interface UpcomingRow {
   targetWord: string | null;
@@ -43,6 +44,8 @@ export interface ValidateDeps {
 export interface ValidateOptions {
   languages: readonly string[];
   dates: readonly string[];
+  /** Today's daily date. Over-cap words are swapped only after it: today and past were already played. */
+  today?: string;
   /** max candidate words to try before giving up on a slot (default 12) */
   maxCandidatesPerSlot?: number;
 }
@@ -58,7 +61,7 @@ export interface ValidateSummary {
 const LEN: Record<string, { min: number; max: number }> = {
   ja: { min: 2, max: 4 },
 };
-const DEFAULT_LEN = { min: 5, max: 7 }; // 5..7 letters; <= MAX_TARGET_WORD_LENGTH avoids serve-time grid fallthrough
+const DEFAULT_LEN = { min: 5, max: MAX_TARGET_WORD_LENGTH };
 
 function lenOk(word: string, language: string): boolean {
   const { min, max } = LEN[language] || DEFAULT_LEN;
@@ -93,22 +96,27 @@ export async function validateUpcomingWords(
       if (!served) continue;
       const servedUpper = served.toUpperCase();
 
+      // The server never serves an over-cap word, so even a human override must be swapped.
+      const tooLong = !!opts.today && date > opts.today && served.length > (LEN[language] || DEFAULT_LEN).max;
+
       // Idempotent: already judged this exact word (no newer overwrite) and has a meaning.
-      if (row.validatedAt && row.meaning && ms(row.updatedAt) <= ms(row.validatedAt)) {
+      if (!tooLong && row.validatedAt && row.meaning && ms(row.updatedAt) <= ms(row.validatedAt)) {
         usedThisRun.add(servedUpper);
         continue;
       }
 
-      let verdict: DailyWordVerdict;
-      try {
-        verdict = await deps.judge(served, language);
-      } catch (e) {
-        summary.skipped++;
-        summary.failures.push(`${language} ${date}: judge failed on "${served}" (${errMsg(e)})`);
-        continue;
+      let verdict: DailyWordVerdict = { ok: false, reason: 'too long', meaning: '' };
+      if (!tooLong) {
+        try {
+          verdict = await deps.judge(served, language);
+        } catch (e) {
+          summary.skipped++;
+          summary.failures.push(`${language} ${date}: judge failed on "${served}" (${errMsg(e)})`);
+          continue;
+        }
       }
 
-      const humanOverride = !!row.overrideBy;
+      const humanOverride = !!row.overrideBy && !tooLong;
       if (verdict.ok || humanOverride) {
         // Keep the word. Respect human overrides even if the judge dislikes them.
         await deps.saveMeaning(language, date, served, verdict.meaning || '');
@@ -118,7 +126,7 @@ export async function validateUpcomingWords(
       }
 
       // BAD machine-picked word → block it and find a clean replacement from the bank.
-      await deps.blockBankWord(language, servedUpper);
+      if (!tooLong) await deps.blockBankWord(language, servedUpper);
       const exclude = new Set<string>([servedUpper, ...usedThisRun]);
       let chosen: { word: string; meaning: string } | null = null;
       let tries = 0;

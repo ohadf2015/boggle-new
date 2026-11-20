@@ -9,6 +9,7 @@ import { getRedisClient } from '../redisClient';
 import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger';
 import { requireAdminClient } from '@/utils/supabase/admin';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 
 // Wikipedia API User-Agent (required by Wikimedia guidelines)
 const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
@@ -617,11 +618,11 @@ export async function storeWikipediaWordCandidates(
     // real columns, so Supabase rejected every upsert (Sentry: "[Wikipedia]
     // Batch upsert error" + "Stored 0/50 candidates" for en/es/sv/he).
     // Filter to words within the DB check_word_length constraint before upserting.
-    // ja: 2-4 chars; all others: 5-7 chars (mirrors wordBankData.WORD_LENGTH_RANGE).
+    // Mirrors wordBankData.WORD_LENGTH_RANGE.
     const insertData = candidates
       .filter(c => {
         const len = c.word.length;
-        return language === 'ja' ? len >= 2 && len <= 4 : len >= 5 && len <= 7;
+        return language === 'ja' ? len >= 2 && len <= 4 : len >= 5 && len <= MAX_TARGET_WORD_LENGTH;
       })
       .map(c => ({
         word: c.word.toUpperCase(),

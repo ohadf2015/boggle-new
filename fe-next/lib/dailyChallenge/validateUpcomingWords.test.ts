@@ -55,15 +55,43 @@ describe('validateUpcomingWords', () => {
       .mockResolvedValueOnce(bad('a name'))     // cand1
       .mockResolvedValueOnce(ok('a star'));     // cand2
     const deps = makeDeps({
-      loadRow: vi.fn().mockResolvedValue(row({ targetWord: 'יעילותו' })),
+      loadRow: vi.fn().mockResolvedValue(row({ targetWord: 'יעילות' })),
       judge,
-      getCandidates: vi.fn().mockResolvedValue(['סבסטיאן', 'כוכבים']),
+      getCandidates: vi.fn().mockResolvedValue(['סבסטין', 'כוכבים']),
     });
     const s = await validateUpcomingWords(deps, opts);
-    expect(deps.blockBankWord).toHaveBeenCalledWith('he', 'יעילותו');
-    expect(deps.blockBankWord).toHaveBeenCalledWith('he', 'סבסטיאן');
+    expect(deps.blockBankWord).toHaveBeenCalledWith('he', 'יעילות');
+    expect(deps.blockBankWord).toHaveBeenCalledWith('he', 'סבסטין');
     expect(deps.saveReplacement).toHaveBeenCalledWith('he', '2026-07-01', 'כוכבים', 'a star');
     expect(s.replaced).toBe(1);
+  });
+
+  it('replaces a served word longer than 6 letters without judging it, even a human override', async () => {
+    const judge = vi.fn().mockResolvedValue(ok('a star'));
+    const deps = makeDeps({
+      loadRow: vi.fn().mockResolvedValue(row({
+        targetWord: 'פדרליות', overrideBy: 'admin', meaning: 'x',
+        validatedAt: '2026-07-01T00:00:00Z',
+      })),
+      judge,
+      getCandidates: vi.fn().mockResolvedValue(['מתנפחים', 'כוכבים']),
+    });
+    const s = await validateUpcomingWords(deps, { ...opts, today: '2026-06-30' });
+    expect(judge).toHaveBeenCalledTimes(1);
+    expect(judge).toHaveBeenCalledWith('כוכבים', 'he');
+    expect(deps.blockBankWord).not.toHaveBeenCalled();
+    expect(deps.saveReplacement).toHaveBeenCalledWith('he', '2026-07-01', 'כוכבים', 'a star');
+    expect(s.replaced).toBe(1);
+  });
+
+  it('leaves an over-cap word alone on today, which players may already have finished', async () => {
+    const deps = makeDeps({
+      loadRow: vi.fn().mockResolvedValue(row({ targetWord: 'פדרליות' })),
+      judge: vi.fn().mockResolvedValue(ok('x')),
+    });
+    await validateUpcomingWords(deps, { ...opts, today: '2026-07-01' });
+    expect(deps.saveReplacement).not.toHaveBeenCalled();
+    expect(deps.saveMeaning).toHaveBeenCalledWith('he', '2026-07-01', 'פדרליות', 'x');
   });
 
   it('is idempotent: skips a row already validated with a meaning and no newer update', async () => {
@@ -76,7 +104,7 @@ describe('validateUpcomingWords', () => {
 
   it('never replaces a human override; stores meaning only', async () => {
     const deps = makeDeps({
-      loadRow: vi.fn().mockResolvedValue(row({ overrideWord: 'ירושלים', overrideBy: 'admin-uuid' })),
+      loadRow: vi.fn().mockResolvedValue(row({ overrideWord: 'נתניה', overrideBy: 'admin-uuid' })),
       judge: vi.fn().mockResolvedValue(bad('city')),
     });
     await validateUpcomingWords(deps, opts);

@@ -3,6 +3,7 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
+import { WORD_LENGTH_RANGE } from '@/lib/dailyChallenge/wordBankData';
 import { gameAIService } from '@/lib/ai-service';
 import {
   getWordsFromWordBank,
@@ -15,22 +16,6 @@ export const maxDuration = 120; // 120 seconds for bulk generation with retries
 
 const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
 const NO_REPEAT_DAYS = 30;
-
-// Word length range by language (min, max)
-// Target words live in the fun-to-reveal 5-7 band: long enough to not feel
-// trivial, short enough to stay common. Max must stay <= MAX_TARGET_WORD_LENGTH (7).
-// Japanese is the exception (kanji compounds are 2-4 characters).
-const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
-  en: { min: 5, max: 7 },
-  he: { min: 5, max: 7 },
-  sv: { min: 5, max: 7 },
-  ja: { min: 2, max: 4 }, // Japanese uses kanji compounds (2-4 characters)
-  es: { min: 5, max: 7 },
-  fr: { min: 5, max: 7 },
-  de: { min: 5, max: 7 },
-  ru: { min: 5, max: 7 },
-};
-
 
 /**
  * POST /api/admin/daily-word/bulk-generate
@@ -417,7 +402,7 @@ async function generateWordsWithAI(
   excludedWords: Set<string>,
   existingWordList: string[]
 ): Promise<Array<{ date: string; word: string; reason: string }>> {
-  const lengthRange = WORD_LENGTH_RANGE[language] || { min: 4, max: 8 };
+  const lengthRange = WORD_LENGTH_RANGE[language];
 
   try {
     // Use the AI service's bulk generation method with retry logic

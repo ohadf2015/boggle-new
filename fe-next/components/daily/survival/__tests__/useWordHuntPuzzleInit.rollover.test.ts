@@ -21,7 +21,7 @@ describe('useWordHuntPuzzleInit day change', () => {
     const setPuzzleDate = vi.fn();
     const setPhase = vi.fn();
     const props = {
-      gameLanguage: 'he' as const, wasReset: false, isAuthenticated: false, profileId: null, catchupDate: null,
+      gameLanguage: 'he' as const, resetCount: 0, isAuthenticated: false, profileId: null, catchupDate: null,
       isPractice: false, online: true, setPhase, setPuzzleDate, setPuzzleNumber: vi.fn(), setForfeitedToday: vi.fn(),
       setStoredResult: vi.fn(), setGrid: vi.fn(), setTargetWord: vi.fn(), setMeaning: vi.fn(),
     };
