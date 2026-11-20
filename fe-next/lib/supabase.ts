@@ -8,6 +8,7 @@ import { captureUserLoggedOut } from '@/utils/authAnalytics';
 import { locales } from './i18n';
 import { isNative } from '@/utils/platform';
 import { nativeOAuthNext, rememberAuthOrigin } from '@/lib/navigation/authReturnPath';
+import { latchOAuthProvider } from '@/lib/auth/oauthProviderLatch';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -71,16 +72,11 @@ function nativeCallbackUrl(currentLocale: string | null): string {
 export async function signInWithGoogle() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 
-  // Include current locale in the callback URL so we can redirect back correctly
-  const currentLocale = getCurrentLocale();
-
-  // Use deep link scheme for native apps, web URL for browser
-  // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
-  // Include locale in the URL path so proxy.ts preserves it (not as query param)
-  const locale = currentLocale || 'en';
+  const locale = getCurrentLocale() || 'en';
   const redirectUrl = isNative()
-    ? nativeCallbackUrl(currentLocale)
+    ? nativeCallbackUrl(getCurrentLocale())
     : appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
+  latchOAuthProvider('google');
 
   return supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -91,14 +87,11 @@ export async function signInWithGoogle() {
 export async function signInWithDiscord() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 
-  const currentLocale = getCurrentLocale();
-
-  // Note: On mobile, useOAuthSignIn uses performMobileOAuth instead of this function
-  // Include locale in the URL path so proxy.ts preserves it (not as query param)
-  const locale = currentLocale || 'en';
+  const locale = getCurrentLocale() || 'en';
   const redirectUrl = isNative()
-    ? nativeCallbackUrl(currentLocale)
+    ? nativeCallbackUrl(getCurrentLocale())
     : appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
+  latchOAuthProvider('discord');
 
   return supabase.auth.signInWithOAuth({
     provider: 'discord',
@@ -110,6 +103,7 @@ export async function signInWithDiscord() {
 export async function signInWithMicrosoft() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
   const locale = getCurrentLocale() || 'en';
+  latchOAuthProvider('azure');
   return supabase.auth.signInWithOAuth({
     provider: 'azure',
     options: { scopes: 'email', redirectTo: appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin)) },
@@ -176,6 +170,7 @@ export async function signInWithMagicLink(email: string) {
   // Include current locale in the URL path so proxy.ts preserves it (not as query param)
   const currentLocale = getCurrentLocale();
   const locale = currentLocale || 'en';
+  latchOAuthProvider('email');
   const redirectUrl = appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
 
   return supabase.auth.signInWithOtp({

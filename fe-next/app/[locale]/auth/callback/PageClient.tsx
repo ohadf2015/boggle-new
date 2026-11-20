@@ -27,6 +27,8 @@ import {
 import { LoadingUI } from './CallbackLoadingUI';
 import { clearSupabaseAuthData } from './clearSupabaseAuthData';
 import { isBareCallbackVisit } from './noSessionReport';
+import { reportCallbackNoSession } from './reportCallbackNoSession';
+import { clearOAuthProvider } from '@/lib/auth/oauthProviderLatch';
 
 // Timeout constants
 const CODE_EXCHANGE_TIMEOUT = 15000; // 15 seconds timeout for code exchange
@@ -101,6 +103,7 @@ function AuthCallbackContent(): React.JSX.Element {
     if (hasNavigated.current) return;
     hasNavigated.current = true;
     if (!url.includes('auth_error=')) forgetEduAuthOrigin();
+    clearOAuthProvider();
     // Clean up all listeners
     cleanupFunctions.current.forEach(fn => fn());
     cleanupFunctions.current = [];
@@ -233,6 +236,7 @@ function AuthCallbackContent(): React.JSX.Element {
             description: oauthErrorDescription
           });
           broadcastAuthFailed(errorMessage);
+          reportCallbackNoSession();
           safeRedirect(failureHref(oauthError));
           return;
         }
@@ -270,6 +274,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 return;
               }
               logger.debug('Auth callback: Timed out waiting for session from other tab');
+              reportCallbackNoSession('other_tab_timeout');
               safeRedirect(failureHref());
             }
             return;
@@ -288,6 +293,7 @@ function AuthCallbackContent(): React.JSX.Element {
                 return;
               }
               broadcastAuthFailed('Timed out waiting for other tab');
+              reportCallbackNoSession('other_tab_timeout');
               safeRedirect(failureHref());
             }
             return;
@@ -332,6 +338,7 @@ function AuthCallbackContent(): React.JSX.Element {
             const logExchange = /code verifier not found/i.test(authMessage) ? logger.log : logger.error;
             logExchange.call(logger, 'Auth callback: Code exchange error:', authMessage);
             broadcastAuthFailed(authMessage);
+            reportCallbackNoSession('code_exchange_error');
             safeRedirect(failureHref());
             return;
           }
@@ -376,6 +383,7 @@ function AuthCallbackContent(): React.JSX.Element {
             const authError = sessionError as SupabaseAuthError;
             logger.error('Auth callback: Error setting session from hash tokens:', getAuthErrorMessage(authError));
             broadcastAuthFailed(getAuthErrorMessage(authError));
+            reportCallbackNoSession('hash_no_session');
             safeRedirect(failureHref());
             return;
           }
@@ -412,6 +420,7 @@ function AuthCallbackContent(): React.JSX.Element {
           logger.warn('Auth callback: No session found, redirecting with error', noSessionDiag);
         }
         broadcastAuthFailed('No session found');
+        reportCallbackNoSession();
         safeRedirect(failureHref('no_session'));
       } catch (err) {
         logger.error('Auth callback exception:', err);
@@ -430,6 +439,7 @@ function AuthCallbackContent(): React.JSX.Element {
         }
 
         broadcastAuthFailed(err instanceof Error ? err.message : 'Unknown error');
+        reportCallbackNoSession('callback_exception');
         safeRedirect(failureHref());
       }
     };

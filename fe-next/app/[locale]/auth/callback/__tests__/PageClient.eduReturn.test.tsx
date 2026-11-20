@@ -3,6 +3,11 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 
 const replace = vi.fn();
 let query = '';
+const trackGrowthEvent = vi.hoisted(() => vi.fn());
+
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => trackGrowthEvent(...args),
+}));
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace }),
@@ -30,8 +35,10 @@ import AuthCallbackPageClient from '../PageClient';
 describe('auth callback keeps a classroom sign-in in the classroom', () => {
   beforeEach(() => {
     replace.mockClear();
+    trackGrowthEvent.mockClear();
     getSession.mockResolvedValue({ data: { session: null } });
     document.cookie = 'lexi_edu_auth_origin=; Path=/; Max-Age=0';
+    sessionStorage.clear();
   });
 
   it('a sign-in that lost its next lands back on the edu page it started from', async () => {
@@ -70,6 +77,18 @@ describe('auth callback keeps a classroom sign-in in the classroom', () => {
     query = 'error=access_denied&next=%2Fen%2Fdaily';
     render(<AuthCallbackPageClient />);
     await waitFor(() => expect(replace).toHaveBeenCalledWith('/en?auth_error=true&reason=access_denied'));
+  });
+
+  it('a provider error logs a distinct callback loss, not signup_failed', async () => {
+    window.history.replaceState(null, '', '/en/auth/callback?error=access_denied&next=%2Fen%2Feducation%2Faccess');
+    sessionStorage.setItem('lexiclash_oauth_provider_pending', 'google');
+    query = 'error=access_denied&next=%2Fen%2Feducation%2Faccess';
+    render(<AuthCallbackPageClient />);
+    await waitFor(() => expect(trackGrowthEvent).toHaveBeenCalledWith(
+      'auth_callback_no_session',
+      expect.objectContaining({ reason: 'access_denied', provider: 'google' }),
+    ));
+    expect(trackGrowthEvent.mock.calls.map((call) => call[0])).not.toContain('signup_failed');
   });
 
   it('a successful sign-in with a foreign-locale next does not double the locale', async () => {

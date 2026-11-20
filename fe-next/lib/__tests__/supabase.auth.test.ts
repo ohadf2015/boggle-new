@@ -156,6 +156,7 @@ describe('signInWithGoogle', () => {
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
       provider: 'google', options: { redirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer' },
     });
+    expect(sessionStorage.getItem('lexiclash_oauth_provider_pending')).toBe('google');
   });
 });
 

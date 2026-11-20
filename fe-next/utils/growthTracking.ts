@@ -223,6 +223,9 @@ export type GrowthEvent =
   | 'signup_completed'
   | 'signup_dismissed'
   | 'signup_failed'
+  // OAuth return that finished with no session. Not a signup_failed reason:
+  // Edge gsi_render_timeout and this loss must stay out of the silence funnel.
+  | 'auth_callback_no_session'
   | 'first_win_signup_shown'
   | 'first_win_signup_completed'
   | 'first_win_signup_dismissed'

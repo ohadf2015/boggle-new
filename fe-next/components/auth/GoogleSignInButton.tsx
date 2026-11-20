@@ -59,7 +59,8 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   const containerRef = useRef<HTMLDivElement>(null);
   const renderedRef = useRef(false);
 
-  const enabled = !isNative() && !!clientId && isAuthClientConfigured();
+  const edgeFallback = isEdgeBrowser();
+  const enabled = !isNative() && !edgeFallback && !!clientId && isAuthClientConfigured();
 
   // GSI iframe swallows clicks — pointerdown on our chrome is the last
   // reliable signal that the soft-sheet Google CTA was engaged.
@@ -161,8 +162,10 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
   }, [clientId, width, language, handlePromptClickIntent]);
 
   // Script onReady never fires when another tag already loaded the same GSI URL.
+  // Edge never mounts containerRef (redirect fallback below). Running this loop
+  // there paints nothing for 8s and then logs a false gsi_render_timeout.
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || edgeFallback) return;
     let attempts = 0;
     let timer = 0;
     const tick = () => {
@@ -180,11 +183,11 @@ export default function GoogleSignInButton({ className, width, analyticsSource }
     };
     timer = window.setTimeout(tick, 0);
     return () => window.clearTimeout(timer);
-  }, [enabled, renderButton]);
+  }, [enabled, edgeFallback, renderButton]);
 
   // Edge browser: GSI iframe + third-party cookie blocking breaks the flow.
   // Render a fallback button that triggers Supabase's redirect-based OAuth.
-  if (isEdgeBrowser()) {
+  if (edgeFallback) {
     return (
       <div className={cn('flex justify-center', className)}>
         <button
