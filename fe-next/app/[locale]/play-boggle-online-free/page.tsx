@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-en.webp`,
+          url: `${BASE_URL}/en/play-boggle-online-free/opengraph-image?v=2`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Play Boggle Online Free No Download',
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Play Boggle Online Free - No Download | LexiClash',
       description: 'Play boggle free online — no download, no signup. Solo or with friends!',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [`${BASE_URL}/en/play-boggle-online-free/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,

@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       description: content.metaDescription,
       siteName: 'LexiClash',
       images: [{
-        url: `${BASE_URL}/og-image.jpg`,
+        url: `${BASE_URL}/${validLocale}/tools/word-solver/opengraph-image?v=2`,
         width: 1200,
         height: 630,
         alt: 'LexiClash Word Solver - Find words from any letters',
@@ -82,7 +82,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       card: 'summary_large_image',
       title: metaTitle,
       description: content.metaDescription,
-      images: [`${BASE_URL}/og-image.jpg`],
+      images: [`${BASE_URL}/${validLocale}/tools/word-solver/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,

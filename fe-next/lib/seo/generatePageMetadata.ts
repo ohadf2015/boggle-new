@@ -78,8 +78,8 @@ export async function generatePageMetadata({
   const fullPath = `/${locale}${path}`;
 
   const ogImageMap: Record<string, string> = {
-    en: 'og-image-en.webp', he: 'og-image-he.webp',
-    sv: 'og-image-sv.webp', ja: 'og-image-ja.webp', es: 'og-image-es.webp',
+    en: 'og-image-en.webp', he: 'og-image-he.webp?v=2',
+    sv: 'og-image-sv.webp?v=2', ja: 'og-image-ja.webp?v=2', es: 'og-image-es.webp?v=2',
   };
   const ogImage = `https://www.lexiclash.live/${ogImageMap[validLocale] || 'og-image-en.webp'}`;
 

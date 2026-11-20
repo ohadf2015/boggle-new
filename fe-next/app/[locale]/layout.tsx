@@ -63,11 +63,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
 
     // Use locale-specific OG image (WebP format for faster loading)
     const ogImageMap: Record<string, string> = {
-        he: 'https://www.lexiclash.live/og-image-he.webp',
+        he: 'https://www.lexiclash.live/og-image-he.webp?v=2',
         en: 'https://www.lexiclash.live/og-image-en.webp',
-        sv: 'https://www.lexiclash.live/og-image-sv.webp',
-        ja: 'https://www.lexiclash.live/og-image-ja.webp',
-        es: 'https://www.lexiclash.live/og-image-es.webp',
+        sv: 'https://www.lexiclash.live/og-image-sv.webp?v=2',
+        ja: 'https://www.lexiclash.live/og-image-ja.webp?v=2',
+        es: 'https://www.lexiclash.live/og-image-es.webp?v=2',
     };
     const ogImageAltMap: Record<string, string> = {
         he: 'לקסי קלאש - משחק מילים מרובה משתתפים',

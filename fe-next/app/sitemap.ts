@@ -82,7 +82,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   const commonImages = [
     `${BASE_URL}/og-image-en.webp`,
-    `${BASE_URL}/og-image-he.webp`,
+    `${BASE_URL}/og-image-he.webp?v=2`,
     `${BASE_URL}/favicon.ico`,
     `${BASE_URL}/icon-192.png`,
     `${BASE_URL}/icon-512.png`,
@@ -233,7 +233,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
         'en-IL': `${BASE_URL}/en/education/vocabulary-games-classroom`,
       },
     },
-    images: [`${BASE_URL}/og-image-he.webp`],
+    images: [`${BASE_URL}/og-image-he.webp?v=2`],
   });
 
   // ─── Hebrew competitor-comparison landing (targets "Wordwall/Quizlet חלופה", "השוואת משחקים לכיתה") ───
@@ -251,7 +251,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
         'he-IL': `${BASE_URL}/he/lexiclash-vs-wordwall-kahoot-quizlet`,
       },
     },
-    images: [`${BASE_URL}/og-image-he.webp`],
+    images: [`${BASE_URL}/og-image-he.webp?v=2`],
   });
 
   // ─── Hebrew dedicated daily-word landing (targets "המילה היומית" / מילת היום) ───
@@ -268,7 +268,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
         'he-IL': `${BASE_URL}/he/hamila-hayomit`,
       },
     },
-    images: [`${BASE_URL}/og-image-he.webp`],
+    images: [`${BASE_URL}/og-image-he.webp?v=2`],
   });
 
   routes.push({
@@ -283,7 +283,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
         'he-IL': `${BASE_URL}/he/mischaqey-safa-imun-kogniti`,
       },
     },
-    images: [`${BASE_URL}/og-image-he.webp`],
+    images: [`${BASE_URL}/og-image-he.webp?v=2`],
   });
 
   // ─── Spanish dedicated education landing ───
@@ -307,7 +307,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
         'es-US': `${BASE_URL}/es/juegos-vocabulario-aula`,
       },
     },
-    images: [`${BASE_URL}/og-image-es.webp`],
+    images: [`${BASE_URL}/og-image-es.webp?v=2`],
   });
 
   // ─── Content pages ───

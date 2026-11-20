@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       siteName: 'LexiClash',
       images: [
         {
-          url: 'https://www.lexiclash.live/og-image.jpg',
+          url: 'https://www.lexiclash.live/og-image.jpg?v=2',
           width: 1200,
           height: 630,
           alt: 'LexiClash - Multiplayer Word Game',
@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
       card: 'summary_large_image',
       title: seo.ogTitle,
       description: seo.ogDescription,
-      images: ['https://www.lexiclash.live/og-image.jpg'],
+      images: ['https://www.lexiclash.live/og-image.jpg?v=2'],
     },
     alternates: {
       canonical: `https://www.lexiclash.live${localePath}/profile`,

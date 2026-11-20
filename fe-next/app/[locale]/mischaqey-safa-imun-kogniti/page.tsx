@@ -36,13 +36,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'he_IL',
       type: 'article',
       url: CANONICAL,
-      images: [{ url: `${BASE_URL}/og-image-he.webp`, width: 1200, height: 630, alt: 'משחקי שפה לאימון קוגניטיבי — LexiClash' }],
+      images: [{ url: `${BASE_URL}/og-image-he.webp?v=2`, width: 1200, height: 630, alt: 'משחקי שפה לאימון קוגניטיבי — LexiClash' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'משחקי שפה לאימון קוגניטיבי | LexiClash',
       description: META_DESCRIPTION,
-      images: [`${BASE_URL}/og-image-he.webp`],
+      images: [`${BASE_URL}/og-image-he.webp?v=2`],
     },
     alternates: {
       canonical: CANONICAL,

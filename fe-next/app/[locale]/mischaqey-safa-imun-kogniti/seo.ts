@@ -104,7 +104,7 @@ export function buildJsonLd(): Array<Record<string, unknown>> {
       mainEntityOfPage: CANONICAL,
       author: { '@type': 'Person', name: 'Ohad Fisher', url: `${BASE_URL}/en/about/ohad-fisher` },
       publisher: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
-      image: `${BASE_URL}/og-image-he.webp`,
+      image: `${BASE_URL}/og-image-he.webp?v=2`,
     },
     {
       '@context': 'https://schema.org',
