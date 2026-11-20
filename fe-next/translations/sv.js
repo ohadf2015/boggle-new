@@ -5303,6 +5303,10 @@ const sv = {
     },
     "hostTransferredAnnouncement": "{previousHost} lämnade. {newHost} är nu värd.",
     "hostTransferredAfterGrace": "{previousHost} kom inte tillbaka. {newHost} är nu värd.",
+    "kickedModal": {
+      "title": "Borttagen från rummet",
+      "leavingIn": "Lämnar om {{seconds}} s"
+    },
     "hostLeftModal": {
       "title": "Värden lämnade",
       "body": "Rummet stängs. Du återgår till lobbyn om några sekunder, eller tryck nedan för att lämna nu.",
@@ -5474,6 +5478,7 @@ const sv = {
     "playerKicked": "{{name}} sparkades från rummet",
     "youWereKicked": "Du sparkades från rummet",
     "youWereKickedInactive": "Du togs bort på grund av inaktivitet",
+    "removedByTeacher": "Din lärare tog bort dig från det här spelet.",
     "afkWarning": "Du tas bort om {{seconds}}s på grund av inaktivitet. Tryck var som helst för att stanna.",
     "shareCodeHint": "Dela rumskoden ovan så att vännerna kan gå med.",
     "sendLinkToFriends": "Skicka den här länken till vänner så de kan gå med i ditt spel",

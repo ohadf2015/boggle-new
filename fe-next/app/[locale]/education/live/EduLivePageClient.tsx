@@ -129,6 +129,8 @@ function EduLiveRoom(): React.JSX.Element {
               isOpen={!!s.hostLeftState}
               seconds={10}
               reason={s.hostLeftState?.reason}
+              message={s.hostLeftState?.kicked === 'host' ? s.t('hostView.removedByTeacher') : s.hostLeftState?.message}
+              kicked={!!s.hostLeftState?.kicked}
               onExit={() => {
                 if (s.classroomDecisionRef.current.isHost) s.handleExitToLobby();
                 else s.exitClassroomStudentToHub();

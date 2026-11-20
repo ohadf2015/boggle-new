@@ -4953,6 +4953,10 @@ const he = {
     "hostTransferredAnnouncement": "{previousHost} עזב. {newHost} הוא המארח החדש.",
     "hostTransferredAfterGrace": "{previousHost} לא חזר. {newHost} הוא המארח החדש.",
     "inviteFriend": "הזמינו חבר",
+    "kickedModal": {
+      "title": "הוסרת מהחדר",
+      "leavingIn": "יוצאים בעוד {{seconds}} שניות"
+    },
     "hostLeftModal": {
       "title": "המארח עזב",
       "body": "החדר נסגר. חוזרים ללובי בעוד כמה שניות, או לחצו כאן כדי לצאת עכשיו.",
@@ -5168,6 +5172,7 @@ const he = {
     "playerKicked": "{{name}} הוסר מהחדר",
     "youWereKicked": "הוסרת מהחדר",
     "youWereKickedInactive": "הוסרת בגלל חוסר פעילות",
+    "removedByTeacher": "יצאת מהמשחק לבקשת המורה.",
     "afkWarning": "תוסרו מהחדר בעוד {{seconds}} שניות בגלל חוסר פעילות. לחצו כדי להישאר",
     "shareCodeHint": "שתפו את קוד החדר למעלה כדי שחברים יצטרפו",
     "sendLinkToFriends": "שלחו את הלינק הזה לחברים כדי שיצטרפו למשחק",

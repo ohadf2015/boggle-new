@@ -4534,6 +4534,10 @@ const en = {
     },
     "rejoinedRoom": "Back in! Rejoined room {code}",
     "rejoinedGame": "Back in the game!",
+    "kickedModal": {
+      "title": "Removed from the room",
+      "leavingIn": "Leaving in {{seconds}}s"
+    },
     "hostLeftModal": {
       "title": "Host left",
       "body": "The room is closing. Returning to the lobby in a few seconds, or tap below to leave now.",
@@ -4714,6 +4718,7 @@ const en = {
     "playerKicked": "{{name}} got the boot!",
     "youWereKicked": "You got kicked!",
     "youWereKickedInactive": "Kicked for going AFK!",
+    "removedByTeacher": "Your teacher took you out of this game.",
     "afkWarning": "You'll be removed in {{seconds}}s for inactivity. Tap anywhere to stay.",
     "shareCodeHint": "Share the room code above so friends can join.",
     "battleMode": "Battle mode",

@@ -5001,6 +5001,10 @@ const es = {
     },
     "hostTransferredAnnouncement": "{previousHost} se fue. {newHost} es ahora el anfitrión.",
     "hostTransferredAfterGrace": "{previousHost} no volvió. {newHost} es ahora el anfitrión.",
+    "kickedModal": {
+      "title": "Saliste de la sala",
+      "leavingIn": "Saliendo en {{seconds}} s"
+    },
     "hostLeftModal": {
       "title": "El anfitrión se fue",
       "body": "La sala se está cerrando. Volviendo al lobby en unos segundos, o toca abajo para salir ahora.",
@@ -5172,6 +5176,7 @@ const es = {
     "playerKicked": "{{name}} fue expulsado de la sala",
     "youWereKicked": "Fuiste expulsado de la sala",
     "youWereKickedInactive": "Fuiste removido por inactividad",
+    "removedByTeacher": "Tu profe te sacó de este juego.",
     "afkWarning": "Te sacaremos en {{seconds}}s por inactividad. Toca la pantalla para quedarte.",
     "shareCodeHint": "Comparte el código de arriba para que tus amigos se unan",
     "sendLinkToFriends": "Envía este enlace a tus amigos para que se unan a tu partida",

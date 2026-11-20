@@ -191,7 +191,8 @@ function MultiplayerPageFrame(): React.JSX.Element {
           <HostLeftGraceModal
             isOpen={!!hostLeftState}
             reason={hostLeftState?.reason}
-            message={hostLeftState?.message}
+            message={inClassroom && hostLeftState?.kicked === 'host' ? t('hostView.removedByTeacher') : hostLeftState?.message}
+            kicked={!!hostLeftState?.kicked}
             onExit={() => {
               // Same native-safe in-place reset as the results "Exit" button,
               // then clear the grace modal — except for a classroom student,

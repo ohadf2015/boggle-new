@@ -12,7 +12,16 @@
  * This module is specifically for guest/unauthenticated profile data persistence.
  */
 
-import { getFromStorage, saveToStorage, removeFromStorage } from '@/utils/storageHelpers';
+import {
+  getFromStorage,
+  saveToStorage,
+  removeFromStorage,
+  getJsonFromStorage,
+  saveJsonToStorage,
+  removeFromLocalStorage,
+} from '@/utils/storageHelpers';
+import { GUEST_DAILY_PLAYER_KEY } from '@/utils/dailyChallenge/constants';
+import { GUEST_STORAGE_KEYS } from '@/utils/guestStorageKeys';
 import { type CustomAvatarConfig, isValidCustomAvatar, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { getRandomDefaultNameWithAvatar } from '@/utils/defaultNames';
 import { validateUsername } from '@/utils/validation';
@@ -174,13 +183,20 @@ export function saveStoredProfile(profile: Partial<GuestProfileData>): void {
   }
 }
 
-/**
- * Clear all guest profile data from storage
- */
+function clearGuestStatsName(): void {
+  const stats = getJsonFromStorage<Record<string, unknown> | null>(GUEST_STORAGE_KEYS.GUEST_STATS, null);
+  if (stats?.guestName) saveJsonToStorage(GUEST_STORAGE_KEYS.GUEST_STATS, { ...stats, guestName: null });
+}
+
+/** ensureGuestDisplayName copies any surviving name copy back into the username on the next page load. */
 export function clearStoredProfile(): void {
   clearStoredUsername();
   clearStoredAvatarId();
   clearStoredCustomAvatar();
+  removeFromStorage(GUEST_STORAGE_KEYS.GUEST_NAME);
+  removeFromLocalStorage(GUEST_STORAGE_KEYS.GUEST_NAME_CHOSEN);
+  removeFromLocalStorage(GUEST_DAILY_PLAYER_KEY);
+  clearGuestStatsName();
 }
 
 /**

@@ -46,6 +46,7 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
         if (!pending) return;
 
         logger.info('Found pending daily result for user:', userId);
+        const guestPlayer = await getGuestDailyPlayer();
 
         // Check if this is a brand new user who hasn't customized their profile yet
         // If so, trigger the winner onboarding flow instead of immediate submission
@@ -94,9 +95,6 @@ export function usePendingDailyResult(): PendingDailyResultSubmission {
 
         // Returning user or no trigger - submit immediately as before
         logger.info('Submitting pending daily result immediately');
-
-        // Get guest player info for fallback
-        const guestPlayer = await getGuestDailyPlayer();
 
         const bodyData: Record<string, unknown> = {
           puzzleDate: pending.puzzleDate,

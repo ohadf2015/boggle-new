@@ -20,6 +20,7 @@ interface HostLeftGraceModalProps {
   reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
   /** Already-translated server notice; shown when there is no reason (class ended, kicked). */
   message?: string;
+  kicked?: boolean;
 }
 
 const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, string> = {
@@ -39,7 +40,7 @@ const REASON_TO_KEY: Record<NonNullable<HostLeftGraceModalProps['reason']>, stri
  * classroom hub). The server only emits the room-CLOSING case today; there is
  * no "you're the host now" event wired, so this banner has one variant.
  */
-export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, onExit, seconds = 10, reason, message }) => {
+export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, onExit, seconds = 10, reason, message, kicked = false }) => {
   const { t, dir } = useLanguage();
   const [remaining, setRemaining] = useState<number>(seconds);
   const firedRef = useRef<boolean>(false);
@@ -103,10 +104,10 @@ export const HostLeftGraceModal: React.FC<HostLeftGraceModalProps> = ({ isOpen, 
         <div role="alert" className="min-w-0 flex-1">
           <p className="flex items-center gap-1.5 font-neo-display text-base font-bold uppercase leading-tight tracking-tight">
             <DoorOpen aria-hidden="true" className="h-4 w-4 shrink-0" />
-            <span className="truncate">{t('multiplayerFlow.hostLeftModal.title')}</span>
+            <span className="truncate">{t(kicked ? 'multiplayerFlow.kickedModal.title' : 'multiplayerFlow.hostLeftModal.title')}</span>
           </p>
           <p className="text-xs font-bold leading-snug line-clamp-2">{body}</p>
-          <p className="text-[11px] font-neo-body opacity-80">{t('mpUi.entry.hostLeftIn', { seconds: remaining })}</p>
+          <p className="text-[11px] font-neo-body opacity-80">{t(kicked ? 'multiplayerFlow.kickedModal.leavingIn' : 'mpUi.entry.hostLeftIn', { seconds: remaining })}</p>
         </div>
         <button
           data-testid="host-left-exit-now"
