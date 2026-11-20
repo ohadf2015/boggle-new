@@ -13,8 +13,7 @@
 import Script from 'next/script';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
-
-const GSI_SRC = 'https://accounts.google.com/gsi/client';
+import { gsiClientSrc } from '@/lib/auth/gsiSrc';
 
 export function GsiClientPreloader() {
   const { language } = useLanguage();
@@ -25,7 +24,7 @@ export function GsiClientPreloader() {
   return (
     <Script
       id="google-gsi-client-preload"
-      src={`${GSI_SRC}?hl=${language}`}
+      src={gsiClientSrc(language)}
       strategy="afterInteractive"
       data-testid="gsi-client-preload"
     />

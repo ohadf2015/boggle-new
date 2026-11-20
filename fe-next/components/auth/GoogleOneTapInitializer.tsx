@@ -14,13 +14,12 @@ import {
   shouldEnableGoogleOneTap,
   type GoogleIdServices,
 } from '@/lib/auth/googleOneTap';
+import { gsiClientSrc } from '@/lib/auth/gsiSrc';
 import {
   SIGNUP_PROMPT_ACTIVE_EVENT,
   shouldSuppressOneTapForSignupFunnel,
   type SignupPromptActiveDetail,
 } from '@/lib/auth/signupPromptCoordination';
-
-const GSI_SRC = 'https://accounts.google.com/gsi/client';
 
 /** Pointer-only: PSI/Lighthouse scroll must not pull GSI (~100KiB) into the LCP window. */
 const LANDING_GSI_EVENTS = ['pointerdown', 'keydown', 'touchstart'] as const;
@@ -130,7 +129,7 @@ export default function GoogleOneTapInitializer() {
   // without it, One Tap falls back to the browser/OS locale instead of the site's.
   return (
     <Script
-      src={`${GSI_SRC}?hl=${language}`}
+      src={gsiClientSrc(language)}
       // lazyOnload: the gsi client + its iframe + Google Sans font (~200KB,
       // plus main-thread init) were competing with LCP on the landing page.
       // One Tap appearing a few seconds later is an acceptable tradeoff.

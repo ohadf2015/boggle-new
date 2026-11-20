@@ -7,6 +7,7 @@ import {
   ensureGoogleIdInitialized,
   __resetGoogleIdInitForTests,
 } from '../googleOneTap';
+import { gsiClientSrc, __resetGsiClientSrcForTests } from '../gsiSrc';
 
 async function sha256Hex(input: string): Promise<string> {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(input));
@@ -166,5 +167,14 @@ describe('shouldEnableGoogleOneTap', () => {
 
   it.each(['/en', '/en/education', '/reports', '/en/reporting'])('still prompts on %s', (pathname) => {
     expect(shouldEnableGoogleOneTap({ ...base, pathname })).toBe(true);
+  });
+});
+
+describe('gsiClientSrc', () => {
+  beforeEach(() => __resetGsiClientSrcForTests());
+
+  it('keeps the first language for the page so a language switch never loads a second GSI copy', () => {
+    expect(gsiClientSrc('en')).toBe('https://accounts.google.com/gsi/client?hl=en');
+    expect(gsiClientSrc('es')).toBe('https://accounts.google.com/gsi/client?hl=en');
   });
 });
