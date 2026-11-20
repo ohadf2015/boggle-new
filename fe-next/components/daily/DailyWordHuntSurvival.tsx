@@ -337,6 +337,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     />
   ) : lifeBar;
 
+  const hintSlots = (
+    <HuntHintSlots
+      showCategory={state.showCategory}
+      category={state.category}
+      showExample={state.showExample}
+      exampleSentence={state.exampleSentence}
+      targetWord={targetWord}
+      t={t}
+    />
+  );
+
   // One tree for every screen; on desktop the GameShell frames it with rails.
   // pt-3 ensures game header doesn't overlap with the sticky app header on mobile
   return (
@@ -352,6 +363,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           attempts={state.attempts}
           rivals={rivals}
           daily={puzzleDate ? { puzzleDate, language, currentPlayerId: currentPlayerId ?? null, currentGuestFingerprint: currentGuestFingerprint ?? null } : undefined}
+          hints={inShell ? hintSlots : undefined}
         />
       }
       right={<HuntRightRail t={t} words={state.discoveredWords} />}
@@ -404,10 +416,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* A timed round needs every pixel for the board: the word stage above
-          the board already shows each verdict and its reason, and the hint
-          rows only take room once a hint is actually showing. */}
-      {!timed && (
+      {/* The word stage above the board already shows each verdict and its reason,
+          so a timed round and the desktop shell give this row and the hints to the board. */}
+      {!timed && !inShell && (
         <HuntFeedbackPill
           seq={state.feedbackSeq}
           type={state.feedbackType}
@@ -417,16 +428,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       )}
 
-      {(!timed || state.showCategory || state.showExample) && (
-        <HuntHintSlots
-          showCategory={state.showCategory}
-          category={state.category}
-          showExample={state.showExample}
-          exampleSentence={state.exampleSentence}
-          targetWord={targetWord}
-          t={t}
-        />
-      )}
+      {!inShell && (!timed || state.showCategory || state.showExample) && hintSlots}
 
       {!inShell && (
         <div data-testid={timed ? 'hunt-clock-row' : 'hunt-life-row'} className="shrink-0 overflow-x-clip">

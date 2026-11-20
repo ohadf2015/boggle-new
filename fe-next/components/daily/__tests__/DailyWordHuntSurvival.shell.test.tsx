@@ -142,6 +142,25 @@ describe('DailyWordHuntSurvival in the desktop game shell', () => {
       expect(within(screen.getByTestId('game-shell-left')).getByText('Ada')).toBeInTheDocument();
       expect(screen.queryByTestId('survival-rank-indicator')).toBeNull();
     });
+
+    it('Given a desktop screen, Then the board column holds no feedback row or hint slots, and the hints sit on the start rail', () => {
+      renderHunt({ puzzleDate: '2026-10-10' });
+      const stage = screen.getByTestId('game-shell-stage');
+      expect(within(stage).queryByTestId('hunt-feedback-row')).toBeNull();
+      expect(within(stage).queryByTestId('wordhunt-category-slot')).toBeNull();
+      expect(within(stage).queryByTestId('wordhunt-example-slot')).toBeNull();
+      const left = screen.getByTestId('game-shell-left');
+      expect(within(left).getByTestId('wordhunt-category-slot')).toBeInTheDocument();
+      expect(within(left).getByTestId('wordhunt-example-slot')).toBeInTheDocument();
+    });
+  });
+
+  it('Given a phone, Then the feedback row and both hint slots stay reserved above the board', () => {
+    renderHunt();
+    const stage = screen.getByTestId('game-shell-stage');
+    expect(within(stage).getByTestId('hunt-feedback-row')).toBeInTheDocument();
+    expect(within(stage).getByTestId('wordhunt-category-slot')).toBeInTheDocument();
+    expect(within(screen.getByTestId('game-shell-left')).queryByTestId('wordhunt-category-slot')).toBeNull();
   });
 
   it('given a phone, then the life bar keeps its own row under the clues', () => {

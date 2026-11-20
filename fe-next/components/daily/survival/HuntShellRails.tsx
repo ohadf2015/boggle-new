@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, type ReactNode } from 'react';
 import { ShellKeysCard, ShellStandings, ShellStats, ShellWordFeed, type ShellStat, type ShellT } from '@/components/game/shell';
 import { SurvivalLiveRanks } from './SurvivalLiveRanks';
 import { MAX_ATTEMPTS } from './constants';
@@ -16,9 +16,10 @@ interface HuntLeftRailProps {
   rivals?: ReadonlyArray<{ username: string; score: number }>;
   /** Daily: the live leaderboard for this puzzle. */
   daily?: { puzzleDate: string; language: string; currentPlayerId: string | null; currentGuestFingerprint: string | null };
+  hints?: ReactNode;
 }
 
-export const HuntLeftRail = memo(function HuntLeftRail({ t, liveScore, lifePoints, hintStage, attempts, rivals, daily }: HuntLeftRailProps) {
+export const HuntLeftRail = memo(function HuntLeftRail({ t, liveScore, lifePoints, hintStage, attempts, rivals, daily, hints }: HuntLeftRailProps) {
   const triesLeft = Math.max(0, MAX_ATTEMPTS - attempts.filter((a) => !a.isDiscovery).length);
   const stats = useMemo<ShellStat[]>(
     () => [
@@ -52,6 +53,7 @@ export const HuntLeftRail = memo(function HuntLeftRail({ t, liveScore, lifePoint
         </section>
       )}
       <ShellStats title={t('gameShell.round') ?? ''} stats={stats} />
+      {hints}
       <ShellKeysCard t={t} />
     </>
   );
