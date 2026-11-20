@@ -13,9 +13,9 @@ const renderBar = (onChallenge: () => Promise<unknown>, isGuest = false) =>
   );
 
 describe('QuickResultsCtaBar share', () => {
-  it('Given a guest, When the bar renders, Then the side button offers to share the result', () => {
+  it('Given a guest, When the bar renders, Then the side button is still a same-board challenge', () => {
     renderBar(vi.fn().mockResolvedValue('shared'), true);
-    expect(screen.getByTestId('quick-results-challenge')).toHaveAccessibleName('quickPlay.solo.shareResult');
+    expect(screen.getByTestId('quick-results-challenge')).toHaveAccessibleName('quickPlay.solo.challengeFriend');
   });
 
   it('Given a signed-in player, When the bar renders, Then the side button is the same-board challenge', () => {

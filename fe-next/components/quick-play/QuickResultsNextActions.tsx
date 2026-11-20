@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, RotateCcw, Share2, Swords } from 'lucide-react';
+import { Check, RotateCcw, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { ResultsNextBar } from '@/components/results/stage/ResultsNextBar';
@@ -21,7 +21,6 @@ export function QuickResultsCtaBar({
   onNextRound,
   onChallenge,
   shine,
-  isGuest = false,
 }: {
   /** The mode just played; when given, the next-mode chips pin above the button. */
   currentMode?: QuickMode;
@@ -29,7 +28,7 @@ export function QuickResultsCtaBar({
   /** Resolves with the share outcome so the bar can confirm a copy. */
   onChallenge: () => Promise<unknown> | void;
   shine: boolean;
-  /** Guests can't create a challenge row, so their button shares the result link. */
+  /** Accepted so existing callers keep compiling. Guests share a seeded board too. */
   isGuest?: boolean;
 }) {
   const { t } = useLanguage();
@@ -47,7 +46,7 @@ export function QuickResultsCtaBar({
     if (next) clearTimer.current = setTimeout(() => setShareNote(null), 2500);
   }, [onChallenge]);
 
-  const ShareIcon = shareNote === 'copied' ? Check : isGuest ? Share2 : Swords;
+  const ShareIcon = shareNote === 'copied' ? Check : Swords;
   const note = shareNote === 'copied' ? t('quickPlay.solo.copied') : shareNote === 'failed' ? t('quickPlay.solo.shareFailed') : '';
   return (
     <ResultsNextBar
@@ -66,8 +65,8 @@ export function QuickResultsCtaBar({
         testId: 'quick-results-next',
       }}
       secondary={{
-        label: isGuest ? t('quickPlay.solo.shareResult') : t('quickPlay.solo.challengeFriend'),
-        title: isGuest ? t('quickPlay.solo.shareResultHint') : t('quickPlay.solo.challengeHint'),
+        label: t('quickPlay.solo.challengeFriend'),
+        title: t('quickPlay.solo.challengeHint'),
         onClick: () => void handleShare(),
         testId: 'quick-results-challenge',
         icon: <ShareIcon className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />,
