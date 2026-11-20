@@ -58,8 +58,14 @@ describe('shareQuickResult', () => {
     expect(out).toBe('shared');
     expect(fetchMock).toHaveBeenCalledWith('/api/quick-play/challenge', expect.objectContaining({ method: 'POST' }));
     const payload = shareMock.mock.calls[0][0];
-    expect(payload.url).toContain('/en/quick-play?challenge=ch-1');
+    expect(payload.url).toContain('/en/quick-play?');
+    expect(payload.url).toContain('cseed=seed-x');
+    expect(payload.url).toContain('challenge=ch-1');
     expect(payload.text).toContain('quickPlay.solo.recap.header');
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'challenge_created',
+      expect.objectContaining({ mode: 'word-hunt', seed: 'seed-x', has_row: true })
+    );
     expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
       'quick_play_challenge_shared',
       expect.objectContaining({ mode: 'word-hunt', seed: 'seed-x' })
@@ -67,11 +73,19 @@ describe('shareQuickResult', () => {
     expect(trackShareCompleted).toHaveBeenCalledWith('web_share_api', { surface: 'quick_results', mode: 'word-hunt' });
   });
 
-  it('Given a guest, When sharing, Then no challenge row is requested and the plain result link is shared', async () => {
+  it('Given a guest, When sharing, Then no challenge row is requested and the link still seeds that board', async () => {
     const out = await shareQuickResult({ result, locale: 'he', t, isGuest: true, dayStreak: 0 });
     expect(out).toBe('shared');
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(shareMock.mock.calls[0][0].url).toMatch(/\/he\/quick-play\?mode=word-hunt&utm_source=share&utm_medium=quick_results&utm_campaign=word-hunt$/);
+    const url = shareMock.mock.calls[0][0].url as string;
+    expect(url).toContain('/he/quick-play?');
+    expect(url).toContain('cseed=seed-x');
+    expect(url).toContain('cmode=word-hunt');
+    expect(url).not.toContain('challenge=');
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'challenge_created',
+      expect.objectContaining({ seed: 'seed-x', signed_in: false, has_row: false })
+    );
     expect(trackShareCompleted).toHaveBeenCalledWith('web_share_api', { surface: 'quick_results', mode: 'word-hunt' });
   });
 
@@ -79,7 +93,7 @@ describe('shareQuickResult', () => {
     fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
     const out = await shareQuickResult({ result, locale: 'en', t, isGuest: false, dayStreak: 0 });
     expect(out).toBe('shared');
-    expect(shareMock.mock.calls[0][0].url).toContain('utm_campaign=word-hunt');
+    expect(shareMock.mock.calls[0][0].url).toContain('cseed=seed-x');
   });
 
   it('Given the challenge request throws, When sharing, Then it falls back to the result link', async () => {
@@ -95,7 +109,8 @@ describe('shareQuickResult', () => {
     expect(out).toBe('copied');
     const copied = writeText.mock.calls[0][0] as string;
     expect(copied).toContain('quickPlay.solo.recap.streak');
-    expect(copied).toMatch(/\nhttps?:\/\/\S+\/en\/quick-play\?mode=word-hunt&utm_source=share/);
+    expect(copied).toMatch(/\nhttps?:\/\/\S+\/en\/quick-play\?/);
+    expect(copied).toContain('cseed=seed-x');
     expect(trackShareCompleted).toHaveBeenCalledWith('clipboard', { surface: 'quick_results', mode: 'word-hunt' });
   });
 

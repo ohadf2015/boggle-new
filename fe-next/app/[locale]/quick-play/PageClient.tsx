@@ -10,6 +10,7 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import { QuickPlayHub } from '@/components/quick-play/QuickPlayHub';
 import { quickPlayBackHref } from '@/lib/navigation/eduExitTargets';
 import { parseQuickPlayStartMode } from '@/lib/quickPlay/startMode';
+import { parseSeededChallenge } from '@/lib/quickPlay/seededChallengeLink';
 import { PageLoader } from '@/components/ui/PageLoader';
 
 function LoadingFallback() {
@@ -22,6 +23,7 @@ function QuickPlayGate() {
 
   const backHref = quickPlayBackHref(language, searchParams.get('academy') === '1');
   const [startMode] = useState(() => parseQuickPlayStartMode(searchParams.get('mode')));
+  const [seeded] = useState(() => parseSeededChallenge(searchParams));
   // Coached first game: `?coach=1` (home PLAY, onboarding, /practice) or the
   // legacy `/singleplayer?autoStart=coach` link, which 308s here with its query.
   const [coach] = useState(() => searchParams.get('coach') === '1' || searchParams.get('autoStart') === 'coach');
@@ -35,6 +37,7 @@ function QuickPlayGate() {
   return (
     <QuickPlayHub
       challengeId={searchParams.get('challenge')}
+      seeded={seeded}
       backHref={backHref}
       startMode={startMode ?? (coach || weekly ? 'classic' : null)}
       coach={coach}

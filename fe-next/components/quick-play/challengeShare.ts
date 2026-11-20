@@ -1,5 +1,7 @@
-// Challenge rows need sign-in, so guests and failed rows share the plain Quick Play link instead.
+// Challenge rows need sign-in. The board seed still rides in the URL, so a
+// guest share opens the same board for a signed-out friend.
 import posthog from '@/lib/analytics/lazyPosthog';
+import { RESULTS_LOOP_EVENTS, buildSeededChallengeUrl } from '@/lib/quickPlay/seededChallengeLink';
 import { trackShareCompleted, type ShareMethod } from '@/utils/share';
 import { shareWithFallback, type ShareResult } from '@/utils/shareWithFallback';
 import { buildQuickShareText } from './quickShareText';
@@ -53,7 +55,26 @@ export async function shareQuickResult({
   dayStreak,
 }: ShareQuickResultInput): Promise<ShareResult> {
   const challengeId = isGuest ? null : await createChallengeId(result);
-  const url = challengeId ? buildChallengeUrl(challengeId, locale) : buildResultUrl(result.mode, locale);
+  // Seed rides in the URL. A signed-out friend plays this board even when no
+  // challenge row exists (guest sender, or the row API failed).
+  const url = buildSeededChallengeUrl({
+    origin: siteOrigin(),
+    locale,
+    mode: result.mode,
+    seed: result.seed,
+    score: result.score,
+    scorePct: result.scorePct,
+    challengeId,
+  });
+  posthog.capture(RESULTS_LOOP_EVENTS.created, {
+    mode: result.mode,
+    seed: result.seed,
+    score: result.score,
+    score_pct: result.scorePct,
+    signed_in: !isGuest,
+    has_row: Boolean(challengeId),
+    surface: 'quick_results',
+  });
   const text = `${buildQuickShareText({
     mode: result.mode,
     score: result.score,

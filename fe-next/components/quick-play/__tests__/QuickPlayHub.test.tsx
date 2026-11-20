@@ -215,6 +215,26 @@ describe('QuickPlayHub', () => {
     await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
   });
 
+  it('a seeded share link plays that board for a signed-out recipient, with no challenge row', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return Promise.resolve({ ok: true, json: async () => ({ ...roundPayload, mode: 'classic', seed: 'shared-seed' }) });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub seeded={{ mode: 'classic', seed: 'shared-seed', score: 90, scorePct: 40, name: 'Maya' }} />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    expect(screen.getByTestId('quick-score-to-beat')).toBeTruthy();
+    const roundCalls = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'));
+    expect(roundCalls).toHaveLength(1);
+    expect(JSON.parse(roundCalls[0][1].body as string)).toMatchObject({ mode: 'classic', seed: 'shared-seed' });
+    expect(fetchMock.mock.calls.some((c) => String(c[0]).includes('/challenge?id='))).toBe(false);
+    expect(posthog.capture).toHaveBeenCalledWith(
+      'challenge_opened',
+      expect.objectContaining({ seed: 'shared-seed', source: 'link', surface: 'quick_play' }),
+    );
+  });
+
   it('results screen persists until player explicitly leaves (no auto-dismiss after timer)', async () => {
     render(<QuickPlayHub />);
     await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });

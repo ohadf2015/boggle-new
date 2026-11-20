@@ -57,6 +57,8 @@ import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { startSameRoomRematch } from '@/lib/quickPlay/seededChallengeLink';
 import { useMpExit } from '@/hooks/useMpExit';
 import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
@@ -198,8 +200,10 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     handleMarkReady();
   }, [auto, handleMarkReady]);
   const rematch = useCallback(() => {
-    if (isHost) handleNewSeries();
-    else handleMarkReady();
+    startSameRoomRematch(isHost ? 'host' : 'player', () => {
+      if (isHost) handleNewSeries();
+      else handleMarkReady();
+    }, (event, props) => posthog.capture(event, props));
   }, [isHost, handleNewSeries, handleMarkReady]);
 
   const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });

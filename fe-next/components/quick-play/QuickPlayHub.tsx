@@ -22,6 +22,7 @@ import { getQuickPlayWordProgress } from '@/lib/quickPlay/wordCollection';
 import { updateGuestStatsAfterGame } from '@/utils/guestManager';
 import { useQuickResultsCalmBridge } from '@/lib/quickPlay/resultsCalm';
 import { shareQuickResult } from './challengeShare';
+import { RESULTS_LOOP_EVENTS, seededRoundRequest, type SeededChallengeLink } from '@/lib/quickPlay/seededChallengeLink';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
@@ -59,8 +60,20 @@ interface ChallengeInfo {
   challengerScorePct: number;
 }
 
+function challengeFromLink(link: SeededChallengeLink): ChallengeInfo {
+  return {
+    id: '',
+    mode: link.mode,
+    seed: link.seed,
+    challengerName: link.name ?? '',
+    challengerScorePct: link.scorePct,
+  };
+}
+
 interface QuickPlayHubProps {
   challengeId?: string | null;
+  /** Parsed from the share URL. Plays that board with no account and no row fetch. */
+  seeded?: SeededChallengeLink | null;
   backHref?: string;
   startMode?: WheelSelection | null;
   /**
@@ -81,7 +94,7 @@ function randomSeedId(): string {
   }
 }
 
-export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, weekly = false }: QuickPlayHubProps) {
+export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, coach = false, weekly = false }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
   const { announce } = useAnnouncer();
@@ -91,16 +104,16 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
   const [result, setResult] = useState<QuickRoundResult | null>(null);
   const [outcome, setOutcome] = useState<QuickSubmitOutcome | null>(null);
   const [rival, setRival] = useState<QuickRival | null>(null);
-  const [challenge, setChallenge] = useState<ChallengeInfo | null>(null);
+  const [challenge, setChallenge] = useState<ChallengeInfo | null>(() => (seeded ? challengeFromLink(seeded) : null));
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
   const [collected, setCollected] = useState<CollectedWord[]>([]);
   const [collectionTotal, setCollectionTotal] = useState(0);
   const [dayStreak, setDayStreak] = useState(0);
-  const [challengeResolved, setChallengeResolved] = useState(!challengeId);
+  const [challengeResolved, setChallengeResolved] = useState(!challengeId || !!seeded);
   const lastSelection = useRef<WheelSelection>(startMode ?? 'random');
   // Decided once per mount: the coached board only for a true first-timer.
-  const [coachFirst] = useState(() => coach && !challengeId && quickRoundsPlayed() === 0);
+  const [coachFirst] = useState(() => coach && !challengeId && !seeded && quickRoundsPlayed() === 0);
   // Best raw score on the mode BEFORE the round that just ended (near-miss line).
   const [prevBest, setPrevBest] = useState(0);
   const goBack = useBackOneLevel(backHref);
@@ -162,6 +175,15 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
           challengerName: d.challengerName,
           challengerScorePct: Number(d.challenger_score_pct),
         });
+        if (!seeded) {
+          posthog.capture(RESULTS_LOOP_EVENTS.opened, {
+            mode: d.mode,
+            seed: d.seed,
+            score_pct: Number(d.challenger_score_pct),
+            source: 'row',
+            surface: 'quick_play',
+          });
+        }
       })
       .catch(() => undefined)
       .finally(() => {
@@ -170,7 +192,21 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     return () => {
       cancelled = true;
     };
-  }, [challengeId, language]);
+  }, [challengeId, language, seeded]);
+
+  const openedLink = useRef(false);
+  useEffect(() => {
+    if (!seeded || openedLink.current) return;
+    openedLink.current = true;
+    posthog.capture(RESULTS_LOOP_EVENTS.opened, {
+      mode: seeded.mode,
+      seed: seeded.seed,
+      score: seeded.score,
+      score_pct: seeded.scorePct,
+      source: 'link',
+      surface: 'quick_play',
+    });
+  }, [seeded]);
 
   // Tapping a mode node or releasing the drag knob fires an electric strike
   // toward that mode, holds a visible loading state on the wheel, then enters
@@ -192,14 +228,26 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     if (loadingRef.current) return;
     loadingRef.current = true;
     const activeChallenge = challengeOverride === undefined ? challenge : challengeOverride;
+    const fromLink = activeChallenge
+      ? seededRoundRequest(
+          {
+            mode: activeChallenge.mode,
+            seed: activeChallenge.seed,
+            score: 0,
+            scorePct: activeChallenge.challengerScorePct,
+            name: activeChallenge.challengerName || null,
+          },
+          language,
+        )
+      : null;
     const mode: QuickMode = variant
       ? 'classic'
-      : activeChallenge?.mode ??
+      : fromLink?.mode ??
         (sel === 'random'
           ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
           : sel);
     const seed =
-      activeChallenge?.seed ??
+      fromLink?.seed ??
       (variant === 'coach' ? `${COACH_SEED_PREFIX}${randomSeedId()}`.slice(0, 64) : variant === 'weekly' ? weeklySeed() : undefined);
     // The board's code downloads during the strike instead of on the clock.
     preloadQuickMode(mode);
@@ -240,9 +288,9 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
     // A challenge link waits for its board; if it can't load, play anyway.
     if (autoStarted.current || !challengeResolved) return;
     autoStarted.current = true;
-    const variant = challengeId ? undefined : coachFirst ? 'coach' : weekly ? 'weekly' : undefined;
+    const variant = challengeId || seeded ? undefined : coachFirst ? 'coach' : weekly ? 'weekly' : undefined;
     void handlePlay(variant ? 'classic' : startMode ?? 'random', 'tap', undefined, variant);
-  }, [startMode, challengeResolved, handlePlay, coachFirst, weekly, challengeId]);
+  }, [startMode, challengeResolved, handlePlay, coachFirst, weekly, challengeId, seeded]);
 
   const handleDone = useCallback(
     async (r: QuickRoundResult) => {
@@ -301,7 +349,7 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
               score: r.score,
               wordsFound: r.wordsFound,
               durationMs: r.durationMs,
-              challengeId: challenge?.id,
+              challengeId: challenge?.id || undefined,
             }),
           });
           if (res.ok) out = await res.json();
@@ -441,7 +489,20 @@ export function QuickPlayHub({ challengeId, backHref, startMode, coach = false, 
           </div>
         }
       >
-        <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleQuit} />
+        <div className="relative flex min-h-0 flex-1 flex-col">
+          {challenge && (
+            <p
+              data-testid="quick-score-to-beat"
+              className="pointer-events-none absolute inset-x-3 top-2 z-20 rounded-full border-2 border-black bg-neo-cozy px-3 py-1 text-center font-neo-display text-xs font-bold text-black shadow-hard-sm"
+            >
+              {t('quickPlay.solo.challengeBanner', '{name}: {pct}% on this board. Beat it!', {
+                name: challenge.challengerName || t('common.guest', 'A friend'),
+                pct: String(challenge.challengerScorePct),
+              })}
+            </p>
+          )}
+          <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleQuit} />
+        </div>
       </BaseErrorBoundary>
     );
   }
