@@ -14,11 +14,12 @@ import { createServiceClient } from '@/lib/ai-service/client';
 import { assignYearAhead, type YearAheadDeps, type YearAheadSummary } from '@/lib/dailyChallenge/assignYearAhead';
 import { sendTelegramMessage, isTelegramConfigured, escapeTelegramMarkdownV2 } from '@/lib/telegram';
 import logger from '@/backend/utils/logger';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const YEAR_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const; // ru excluded: no approved pool yet
 const LEN: Record<string, { min: number; max: number }> = { ja: { min: 2, max: 4 } };
-const DEFAULT_LEN = { min: 5, max: 7 };
+const DEFAULT_LEN = { min: 5, max: MAX_TARGET_WORD_LENGTH };
 const HORIZON_DAYS = 365;
 const NO_REPEAT_DAYS = 365;
 

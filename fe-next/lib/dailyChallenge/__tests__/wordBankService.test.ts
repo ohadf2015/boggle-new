@@ -5,11 +5,10 @@ import { vi, type Mock, } from 'vitest';
  * Tests for Wikipedia word import functionality with language-specific
  * length filtering requirements.
  *
- * Requirements (must mirror the DB check_word_length constraint,
- * migration 20260625000000_enforce_word_hunt_target_5to7):
+ * Requirements (inside the DB check_word_length constraint):
  * - Filter words by language-specific length constraints
  * - Japanese: min 2, max 4 characters
- * - Other languages: min 5, max 7 characters
+ * - Other languages: min 5, max 6 characters (daily target cap)
  * - Use 'wikipedia' as source
  */
 
@@ -55,20 +54,19 @@ describe('importWikipediaWordsToBank', () => {
       expect(upsertedWords).toEqual(['HELLO', 'WONDER']);
     });
 
-    it('should filter out words longer than 7 characters', async () => {
+    it('should filter out words longer than 6 characters', async () => {
       const words = ['hello', 'wonder', 'awesome', 'wonderful', 'extraordinary']; // 5, 6, 7, 9, 13 chars
 
       await importWikipediaWordsToBank(mockSupabaseClient, language, words);
 
-      // Should only upsert words with 5-7 characters (hello, wonder, awesome = 3 calls)
-      expect(mockUpsert).toHaveBeenCalledTimes(3);
+      expect(mockUpsert).toHaveBeenCalledTimes(2);
 
       const upsertedWords = mockUpsert.mock.calls.map(call => call[0].word);
-      expect(upsertedWords).toEqual(['HELLO', 'WONDER', 'AWESOME']);
+      expect(upsertedWords).toEqual(['HELLO', 'WONDER']);
     });
 
-    it('should pass all valid words (5-7 characters)', async () => {
-      const words = ['hello', 'world', 'wonder', 'awesome']; // 5, 5, 6, 7 chars
+    it('should pass all valid words (5-6 characters)', async () => {
+      const words = ['hello', 'world', 'wonder', 'thirds']; // 5, 5, 6, 6 chars
 
       await importWikipediaWordsToBank(mockSupabaseClient, language, words);
 
@@ -76,7 +74,7 @@ describe('importWikipediaWordsToBank', () => {
       expect(mockUpsert).toHaveBeenCalledTimes(4);
 
       const upsertedWords = mockUpsert.mock.calls.map(call => call[0].word);
-      expect(upsertedWords).toEqual(['HELLO', 'WORLD', 'WONDER', 'AWESOME']);
+      expect(upsertedWords).toEqual(['HELLO', 'WORLD', 'WONDER', 'THIRDS']);
     });
   });
 
@@ -183,7 +181,7 @@ describe('importWikipediaWordsToBank', () => {
 
   describe('Return value', () => {
     it('should return correct counts', async () => {
-      const words = ['hello', 'world', 'wonder', 'awesome']; // 5, 5, 6, 7 chars
+      const words = ['hello', 'world', 'wonder', 'thirds']; // 5, 5, 6, 6 chars
 
       const result = await importWikipediaWordsToBank(mockSupabaseClient, 'en', words);
 
@@ -224,11 +222,11 @@ describe('importWikipediaWordsToBank', () => {
   describe('Language-specific length ranges', () => {
     it('should respect WORD_LENGTH_RANGE configuration', () => {
       // Verify the expected length ranges are configured (mirror DB check_word_length)
-      expect(WORD_LENGTH_RANGE.en).toEqual({ min: 5, max: 7 });
-      expect(WORD_LENGTH_RANGE.he).toEqual({ min: 5, max: 7 });
-      expect(WORD_LENGTH_RANGE.sv).toEqual({ min: 5, max: 7 });
+      expect(WORD_LENGTH_RANGE.en).toEqual({ min: 5, max: 6 });
+      expect(WORD_LENGTH_RANGE.he).toEqual({ min: 5, max: 6 });
+      expect(WORD_LENGTH_RANGE.sv).toEqual({ min: 5, max: 6 });
       expect(WORD_LENGTH_RANGE.ja).toEqual({ min: 2, max: 4 });
-      expect(WORD_LENGTH_RANGE.es).toEqual({ min: 5, max: 7 });
+      expect(WORD_LENGTH_RANGE.es).toEqual({ min: 5, max: 6 });
     });
 
     it('should apply different length filters for different languages', async () => {

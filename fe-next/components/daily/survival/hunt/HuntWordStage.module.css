@@ -43,6 +43,7 @@
   letter-spacing: 0.02em;
   text-overflow: ellipsis;
   white-space: nowrap;
+  animation: promptIn 240ms ease-out both;
 }
 
 /* First games: the word to try is a call to action, not a placeholder. */
@@ -308,6 +309,10 @@
   .stage *, .stage .pill { animation: none !important; transition: none !important; }
 }
 
+@keyframes promptIn {
+  from { opacity: 0; scale: 0.85; }
+  to { opacity: 1; scale: 1; }
+}
 @keyframes letterIn {
   0% { transform: translateY(10px) scale(0.4); }
   60% { transform: translateY(-4px) scale(1.2); }

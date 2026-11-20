@@ -164,12 +164,11 @@ describe('DailyChallenge — level-up from the daily fires the avatar unlock rev
     mockDateParam = null;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
   it('given a solved daily that levels the player up, when record-game answers, then the reveal is published', async () => {
     render(<DailyChallenge />);
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('play-button'));
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
 
     fireEvent.click(screen.getByTestId('finish'));

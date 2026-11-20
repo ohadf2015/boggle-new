@@ -584,9 +584,9 @@ describe('wordHuntManager', () => {
   // huntTargetBand — lang-aware target length
   // ==========================================
   describe('huntTargetBand', () => {
-    it('defaults to the 5-7 band', () => {
-      expect(huntTargetBand('en')).toEqual([5, 7]);
-      expect(huntTargetBand('he')).toEqual([5, 7]);
+    it('defaults to the 5-6 band', () => {
+      expect(huntTargetBand('en')).toEqual([5, 6]);
+      expect(huntTargetBand('he')).toEqual([5, 6]);
     });
 
     it('uses a shorter band for Japanese (words are short in kana/kanji)', () => {

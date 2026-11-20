@@ -75,7 +75,8 @@ function weightedPool(weights: Record<string, number>): string[] {
 
 const SPANISH_WEIGHTED_LETTERS = weightedPool({
   E: 14, A: 13, O: 9, S: 8, R: 7, N: 7, I: 6, D: 6, L: 5, C: 5, T: 5, U: 4, M: 3, P: 3,
-  B: 2, G: 1, V: 1, Y: 1, Q: 1, H: 1, F: 1, Z: 1, J: 1, Ñ: 1, Á: 1, É: 1, Í: 1, Ó: 1, Ú: 1,
+  B: 2, G: 1, V: 1, Y: 1, H: 1, F: 1, Z: 1, J: 1, Ñ: 1,
+  // ponytail: accents and Q arrive only inside embedded words; as filler they make no word.
 });
 
 const SWEDISH_WEIGHTED_LETTERS = weightedPool({

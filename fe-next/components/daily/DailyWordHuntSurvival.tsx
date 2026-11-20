@@ -115,21 +115,13 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   const inShell = useMediaQuery(SHELL_MEDIA);
   const setIsInGame = useHideNavigation();
 
-  // Two levers. `calm` is motion the player asked to stop (the in-game effects
-  // toggle or the OS reduced-motion setting): the board, word stage, feedback pill
-  // and finish all hold still. `skipAnimations` adds the device tier on top and only
-  // drops the heavy layers (particles, flashes, confetti, framer extras). Phones are
-  // flagged low-end far more often (Low Power Mode / battery saver caps frames at
-  // 30fps and trips the runtime frame watch; Data Saver and 2GB phones trip the
-  // static check), and the tile lift, path pop, pill, clue flips, life bar and
-  // screen flash are cheap animations, so a low-end flag must not freeze them.
-  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
+  // `calm` is motion the player asked to stop (effects toggle or OS reduced motion): everything holds still.
+  // `skipAnimations` also drops the particle layer on weak hardware. A phone slowed to 30fps at runtime
+  // (Low Power Mode) keeps it: the layer sleeps between bursts, and without it the game reads flat.
+  const { staticLowEnd, prefersReducedMotion } = useDevicePerformance();
   const [effectsReduced] = useReducedEffects();
   const calm = effectsReduced || prefersReducedMotion;
-  const skipAnimations = useMemo(
-    () => calm || isLowEnd || !enableComplexAnimations,
-    [calm, isLowEnd, enableComplexAnimations]
-  );
+  const skipAnimations = calm || !!staticLowEnd;
 
   const extraLife = useSurvivalExtraLife({ practice });
   const { rescueMethodRef } = extraLife;

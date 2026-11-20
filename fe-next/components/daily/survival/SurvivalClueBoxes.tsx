@@ -1,6 +1,6 @@
 'use client';
 
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect, useRef } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import type { LetterFeedback } from '@/utils/wordHuntFeedback';
@@ -101,6 +101,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   solvedWord = null,
   language,
 }, ref) => {
+  const shownRef = useRef<string[]>([]);
   if (!currentHint) return null;
 
   const showMatchWarning = matchesTargetLength && !showFeedbackOverlay;
@@ -206,6 +207,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               revealedLetters={revealedLetters}
               attempts={attempts}
               compact={compact}
+              shownRef={shownRef}
             />
           )}
         </AdaptiveAnimatePresence>
@@ -345,6 +347,8 @@ interface HintBoxesProps {
   revealedLetters: Set<number>;
   attempts: TargetAttempt[];
   compact?: boolean;
+  /** What each box showed last time; the row remounts after every guess and only changed boxes may pop. */
+  shownRef: React.MutableRefObject<string[]>;
 }
 
 const HintBoxes: React.FC<HintBoxesProps> = ({
@@ -354,8 +358,11 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   revealedLetters,
   attempts,
   compact,
+  shownRef,
 }) => {
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
+  const shownNow: string[] = [];
+  useEffect(() => { shownRef.current = shownNow; });
   const wordLength = hintChars.length;
 
   // Determine letter counts: exact when target is known, inferred from feedback when unknown (MP)
@@ -373,7 +380,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   return (
     <AdaptiveMotion.div
       key="hint-boxes"
-      initial={{ opacity: 0, scale: 0.9 }}
+      initial={shownRef.current.length ? false : { opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15 }}
@@ -416,15 +423,16 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;
+        shownNow[idx] = displayChar;
 
         return (
           <AdaptiveMotion.div
             key={`hint-${idx}`}
             data-testid={`clue-box-${idx}`}
             data-state={clueType ?? 'unknown'}
-            initial={{ scale: 0, opacity: 0 }}
+            initial={shownRef.current[idx] === displayChar ? false : { scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: idx * 0.03, type: "spring", stiffness: 300 }}
+            transition={{ delay: shownRef.current.length ? 0 : idx * 0.03, type: "spring", stiffness: 300 }}
             className={cn(
               "flex items-center justify-center border-2 rounded-neo font-bold",
               sizeClass,

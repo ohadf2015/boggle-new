@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import {
   eligibleHuntTargets,
   HUNT_TARGET_MIN_LENGTH,
-  HUNT_TARGET_MAX_LENGTH,
+  CLASSROOM_HUNT_TARGET_MAX_LENGTH,
 } from '@/shared/utils/classroomHuntTarget';
 import { VocabQuizFocusPicker } from '../vocabQuiz/VocabQuizFocusPicker';
 import { LobbyChoiceRow, CALM_SELECTED, CALM_IDLE, CALM_FOCUS } from './LobbyChoiceRow';
@@ -160,7 +160,7 @@ export function LobbyRoundSettings({
             <p className="rounded-neo border-2 border-neo-cream/35 bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-cream/85">
               {t('teacher.classroom.huntTarget.noneEligible', {
                 min: HUNT_TARGET_MIN_LENGTH,
-                max: HUNT_TARGET_MAX_LENGTH,
+                max: CLASSROOM_HUNT_TARGET_MAX_LENGTH,
               })}
             </p>
           ) : (

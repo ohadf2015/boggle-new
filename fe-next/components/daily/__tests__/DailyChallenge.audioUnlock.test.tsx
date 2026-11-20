@@ -245,47 +245,30 @@ describe('DailyChallenge - Audio Unlock on Game Start', () => {
     // Reset localStorage mock
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
-  it('should call unlockAudio synchronously when Play button is clicked', async () => {
-    render(<DailyChallenge />);
-
-    // Wait for loading to complete and ready screen to show
-    await waitFor(() => {
-      expect(screen.getByTestId('ready-screen')).toBeInTheDocument();
-    });
-
-    // Click the Play button
-    const playButton = screen.getByTestId('play-button');
-    fireEvent.click(playButton);
-
-    // unlockAudio should be called IMMEDIATELY (synchronously)
-    // This is critical for browser autoplay policy compliance
-    expect(mockUnlockAudio).toHaveBeenCalledTimes(1);
-  });
-
-  it('should call unlockAudio on every Play button click (idempotent)', async () => {
+  it('should call unlockAudio when the run starts, with no Play tap', async () => {
     render(<DailyChallenge />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('ready-screen')).toBeInTheDocument();
+      expect(screen.getByTestId('survival-game')).toBeInTheDocument();
     });
 
-    const playButton = screen.getByTestId('play-button');
-
-    // The invariant is "every click unlocks audio inside the gesture", NOT a call count.
-    // handleStartGame unlocks synchronously at gesture time (DailyChallenge.tsx:365) — the one that
-    // actually satisfies the browser autoplay policy, since everything after it is behind an await —
-    // and the shared startPlaying tail (:301) unlocks again for the paths that arrive without a
-    // gesture at all (rewarded-ad callbacks). unlockAudio is idempotent, so both firing is by
-    // design; pinning the count to 1 pinned an implementation detail and turned a real invariant
-    // into a false failure that blocked every push from this repo.
-    fireEvent.click(playButton);
     expect(mockUnlockAudio).toHaveBeenCalled();
+  });
 
-    // Clicking again re-unlocks (a player can navigate back and start once more).
+  it('should unlock audio again on every fresh start (idempotent)', async () => {
+    // Both handleStartGame and the shared startPlaying tail unlock; unlockAudio is idempotent, so the
+    // invariant is "every start unlocks audio", not a call count.
+    const first = render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
+    expect(mockUnlockAudio).toHaveBeenCalled();
+    first.unmount();
+
     vi.clearAllMocks();
-    fireEvent.click(playButton);
+    render(<DailyChallenge />);
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     expect(mockUnlockAudio).toHaveBeenCalled();
   });
 });
@@ -300,11 +283,12 @@ describe('DailyChallenge - music stops when leaving the daily flow', () => {
     vi.clearAllMocks();
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
   it('given the player leaves the word-hunt route, stops the music', async () => {
     const { unmount } = render(<DailyChallenge />);
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     expect(mockStopMusic).not.toHaveBeenCalled();
 
     unmount();
@@ -314,7 +298,7 @@ describe('DailyChallenge - music stops when leaving the daily flow', () => {
 
   it('given a re-render mid-flow, keeps the music playing', async () => {
     const { rerender } = render(<DailyChallenge />);
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
 
     rerender(<DailyChallenge />);
 

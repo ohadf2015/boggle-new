@@ -16,7 +16,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 // Keep real framer-motion (so m.<tag>, useMotionValue, etc. all work in jsdom)
 // but make AnimatePresence pass children through synchronously — mode="wait"
@@ -117,6 +116,7 @@ vi.mock('@/components/daily/DailyWordHuntResults', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  window.localStorage.setItem('lc_coach_wordHunt', '1');
   // Puzzle endpoint returns 200 but an EMPTY payload — the production trigger.
   global.fetch = vi.fn((url) => {
     if (typeof url === 'string' && url.includes('/check-played/')) {
@@ -136,16 +136,8 @@ beforeEach(() => {
 });
 
 describe('Daily Challenge - empty puzzle payload resilience', () => {
-  it('falls through to a real generated grid and never blanks after Start', async () => {
-    const user = userEvent.setup();
+  it('falls through to a real generated grid and never blanks on auto-start', async () => {
     render(<DailyChallenge />);
-
-    // Ready screen appears (loading resolved)
-    await waitFor(() => {
-      expect(screen.getByText('daily.start')).toBeInTheDocument();
-    });
-
-    await user.click(screen.getByText('daily.start'));
 
     // The game must render with a real, non-empty grid + targetWord.
     await waitFor(() => {

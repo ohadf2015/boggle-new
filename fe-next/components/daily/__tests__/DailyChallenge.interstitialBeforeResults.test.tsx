@@ -151,8 +151,6 @@ import { saveWordHuntResult } from '@/utils/dailyChallenge';
 
 async function finishGame() {
   render(<DailyChallenge />);
-  await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-  fireEvent.click(screen.getByTestId('play-button'));
   await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
   fireEvent.click(screen.getByTestId('finish'));
 }
@@ -163,6 +161,7 @@ describe('DailyChallenge — interstitial before results', () => {
     mockDateParam = null;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
   it('saves the result immediately but holds the results screen until the ad settles', async () => {

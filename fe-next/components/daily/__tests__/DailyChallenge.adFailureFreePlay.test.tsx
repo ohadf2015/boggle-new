@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 // Mutable per-test controls for the module mocks below.
 let mockDateParam: string | null = null;
@@ -137,16 +137,13 @@ describe('DailyChallenge — rewarded ad failure degrades to free play (no stran
     mockAdShows = 0;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
+    vi.spyOn(window.localStorage, 'getItem').mockImplementation((k: string) => (k === 'lc_coach_wordHunt' ? '1' : null));
   });
 
-  it('GIVEN a missed-daily (catch-up) on native with an ad ready WHEN Play is tapped THEN the game starts with no ad', async () => {
+  it('GIVEN a missed-daily (catch-up) on native with an ad ready THEN the game starts on its own with no ad and no tap', async () => {
     mockDateParam = '2024-01-09'; // within the 3-day catch-up window of 2024-01-10
 
     render(<DailyChallenge />);
-
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByTestId('play-button'));
 
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
     expect(mockAdShows).toBe(0);
@@ -156,10 +153,6 @@ describe('DailyChallenge — rewarded ad failure degrades to free play (no stran
     mockForfeit = true; // today's daily was forfeited → retry gate is active
 
     render(<DailyChallenge />);
-
-    await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByTestId('play-button'));
 
     await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
   });

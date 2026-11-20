@@ -36,6 +36,8 @@ interface NavigatorWithMemory {
 export interface DevicePerformanceConfig {
   /** Device is considered low-end and should use simplified rendering */
   isLowEnd: boolean;
+  /** Low-end by hardware hints alone, ignoring the runtime frame watch (a 30fps Low Power Mode phone is not this). */
+  staticLowEnd?: boolean;
   /** Target frames per second (30 for low-end, 60 for capable devices) */
   targetFPS: 30 | 60;
   /** Throttle interval in ms for event handlers */
@@ -101,6 +103,7 @@ function detectIsMobile(): boolean {
 // capabilities in an effect.
 const SSR_CAPABLE_FALLBACK: Omit<DevicePerformanceConfig, 'prefersReducedMotion'> = {
   isLowEnd: false,
+  staticLowEnd: false,
   targetFPS: 60,
   throttleMs: 16,
   enableComplexAnimations: true,
@@ -151,6 +154,7 @@ function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReduc
   if (isLowEnd) {
     return {
       isLowEnd: true,
+      staticLowEnd: true,
       targetFPS: 30,
       throttleMs: 33, // ~30fps
       enableComplexAnimations: false,
