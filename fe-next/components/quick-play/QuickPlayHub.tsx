@@ -70,6 +70,9 @@ function challengeFromLink(link: SeededChallengeLink): ChallengeInfo {
   };
 }
 
+/** Cap per board-fetch attempt so a hung request can't pin the loading state. */
+const BOARD_FETCH_TIMEOUT_MS = 10000;
+
 interface QuickPlayHubProps {
   challengeId?: string | null;
   /** Parsed from the share URL. Plays that board with no account and no row fetch. */
@@ -260,16 +263,40 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
     try {
-      const res = await fetch('/api/quick-play/round', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        // recentPct lets the server aim the rival field at THIS player: without
-        // it a beginner passes nobody and a strong player passes everyone,
-        // every round. Local history, so guests are covered too; 0 = unknown.
-        body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
-      });
-      if (!res.ok) throw new Error(`round fetch ${res.status}`);
-      const round = (await res.json()) as QuickRoundConfig;
+      // One silent retry: a transient 5xx/network blip or a hung request was
+      // dead-ending mode selections. Each attempt is capped so a stalled fetch
+      // can't leave "Building your board…" up forever.
+      let round: QuickRoundConfig | null = null;
+      let lastErr: unknown;
+      for (let attempt = 1; attempt <= 2 && !round; attempt++) {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), BOARD_FETCH_TIMEOUT_MS);
+        try {
+          const res = await fetch('/api/quick-play/round', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: ctrl.signal,
+            // recentPct lets the server aim the rival field at THIS player: without
+            // it a beginner passes nobody and a strong player passes everyone,
+            // every round. Local history, so guests are covered too; 0 = unknown.
+            body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
+          });
+          if (!res.ok) throw new Error(`round fetch ${res.status}`);
+          round = (await res.json()) as QuickRoundConfig;
+          posthog.capture('quick_play_board_loaded', { mode, attempt, ms: Date.now() - started });
+        } catch (err) {
+          lastErr = err;
+          posthog.capture('quick_play_board_failed', {
+            mode,
+            attempt,
+            ms: Date.now() - started,
+            reason: err instanceof Error ? err.message : 'unknown',
+          });
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+      if (!round) throw lastErr;
       if (variant === 'coach') round.coach = true;
       const elapsed = Date.now() - started;
       if (elapsed < hold) await sleep(hold - elapsed);

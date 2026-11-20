@@ -123,7 +123,23 @@ describe('QuickPlayHub', () => {
     fireEvent.click(screen.getByTestId('quick-load-retry'));
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     const bodies = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round')).map((c) => JSON.parse(c[1].body).mode);
-    expect(bodies).toEqual(['blast', 'blast']);
+    expect(bodies).toEqual(['blast', 'blast', 'blast']); // 2 auto attempts + manual retry
+  });
+
+  it('a transient board fetch failure is retried automatically without showing the error', async () => {
+    let calls = 0;
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        calls++;
+        if (calls === 1) return Promise.resolve({ ok: false, json: async () => ({}) });
+        return Promise.resolve({ ok: true, json: async () => roundPayload });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
+    expect(screen.queryByTestId('quick-load-error')).toBeNull();
+    expect(calls).toBe(2);
   });
 
   it('round completion shows results, and Next round starts another round instead of a picker', async () => {
