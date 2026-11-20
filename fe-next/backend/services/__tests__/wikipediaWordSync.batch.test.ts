@@ -45,9 +45,9 @@ describe('Wikipedia Word Sync Batching', () => {
   });
 
   it('should batch large datasets to prevent timeout', async () => {
-    // GIVEN: A large dataset with 2687 words (similar to en.json), all valid 5-7 chars
+    // GIVEN: A large dataset with 2687 words (similar to en.json), all valid 5-6 chars
     const largeWordList = Array.from({ length: 2687 }, (_, i) => ({
-      word: `WORD${i % 1000}`, // 5-7 chars: WORD0-WORD999
+      word: `W${String(i % 1000).padStart(4, '0')}`, // 5 chars: W0000-W0999
       source: 'test_source',
       url: `https://example.com/${i}`,
       score: 50 + (i % 50)
@@ -78,7 +78,7 @@ describe('Wikipedia Word Sync Batching', () => {
   it('should process small datasets in single batch', async () => {
     // GIVEN: A small dataset with 50 words
     const smallWordList = Array.from({ length: 50 }, (_, i) => ({
-      word: `SMALL${i}`,
+      word: `S${String(i).padStart(4, "0")}`,
       source: 'test_source',
       score: 50
     }));
@@ -120,23 +120,23 @@ describe('Wikipedia Word Sync Batching', () => {
    * Valid candidates are inserted, invalid ones are logged + dropped.
    */
   it('should filter candidates violating word length constraint before upsert', async () => {
-    // GIVEN: 5 valid EN words (5-7 chars) + 1 too-short (4 chars) + 1 too-long (8 chars)
+    // GIVEN: valid EN words (5-6 chars) + too-short (4 chars) + too-long (7 and 8 chars)
     const candidatesWithInvalid = [
       { word: 'hello', source: 'wikipedia' },  // 5 chars, VALID
       { word: 'tests', source: 'wikipedia' },  // 5 chars, VALID
       { word: 'test', source: 'wikipedia' },   // 4 chars, INVALID (too short)
       { word: 'checking', source: 'wikipedia' }, // 8 chars, INVALID (too long)
       { word: 'coming', source: 'wikipedia' },  // 6 chars, VALID
-      { word: 'wording', source: 'wikipedia' }, // 7 chars, VALID
+      { word: 'wording', source: 'wikipedia' }, // 7 chars, INVALID (over the 6-letter cap)
     ];
 
     // WHEN: Store candidates with mixed validity
     await storeWikipediaWordCandidates('en', new Date(), candidatesWithInvalid);
 
-    // THEN: Only valid words (5-7 chars) should be in the upsert call
+    // THEN: Only valid words (5-6 chars) should be in the upsert call
     expect(upsertCalls.length).toBe(1);
     const upsertedWords = (upsertCalls[0].data as Array<Record<string, string>>).map(r => r.word);
-    expect(upsertedWords.sort()).toEqual(['COMING', 'HELLO', 'TESTS', 'WORDING']);
+    expect(upsertedWords.sort()).toEqual(['COMING', 'HELLO', 'TESTS']);
 
     // Verify that invalid words are NOT in the upsert
     expect(upsertedWords).not.toContain('TEST');   // 4 chars, too short
