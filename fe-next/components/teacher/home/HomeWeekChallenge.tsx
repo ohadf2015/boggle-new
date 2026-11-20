@@ -74,7 +74,6 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
   const next = nextWordSet(lessons, challenge?.lessonId ?? null, classroomId, classLanguage);
   const first = challenge ? null : firstWordSet(lessons, preferredLessonId, classroomId, classLanguage);
 
-  const runAgain = () => (next ? assign(next, 'run_again') : onPickList());
   const start = () => (first ? assign(first, 'start') : onPickList());
 
   const busyIcon = <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />;
@@ -132,10 +131,12 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
             <ChevronRight className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden="true" />
           </Link>
         ) : null}
-        <button type="button" data-testid="home-challenge-run-again" disabled={saving} aria-busy={saving} onClick={runAgain} className={cn(PILL, NB_BLOCK.cyan)}>
-          {saving ? busyIcon : <RefreshCw className="size-4 shrink-0" aria-hidden="true" />}
-          {next ? t(`${K}.runAgain`, { list: next.name }) : t(`${K}.pick`)}
-        </button>
+        {next ? (
+          <button type="button" data-testid="home-challenge-run-again" disabled={saving} aria-busy={saving} onClick={() => assign(next, 'run_again')} className={cn(PILL, NB_BLOCK.cyan)}>
+            {saving ? busyIcon : <RefreshCw className="size-4 shrink-0" aria-hidden="true" />}
+            {t(`${K}.runAgain`, { list: next.name })}
+          </button>
+        ) : null}
       </div>
       {noteLine}
     </section>
