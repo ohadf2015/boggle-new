@@ -18,3 +18,16 @@ describe('google-signup-drought migration', () => {
     expect(sql).not.toMatch(/CREATE (OR REPLACE )?FUNCTION/i);
   });
 });
+
+describe('google-signup-drought alert inputs', () => {
+  const route = readFileSync(
+    join(__dirname, '../../app/api/cron/google-signup-drought/route.ts'),
+    'utf8',
+  );
+
+  it('counts accounts and traffic, not signup_failed or an Edge GSI paint timeout', () => {
+    const code = route.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+    expect(code).not.toMatch(/signup_failed|gsi_render_timeout/);
+    expect(route).toContain('countGoogleSignupsSince');
+  });
+});

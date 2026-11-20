@@ -29,6 +29,8 @@ interface Traffic {
  * POST /api/cron/google-signup-drought
  * Hourly 14:00–21:00 UTC (Israel afternoon). Alerts at most once per UTC day when 8 daytime
  * hours have 0 new Google accounts while people are still arriving.
+ * Counts Auth accounts and landing traffic, never growth:signup_failed.
+ * Edge gsi_render_timeout is a false paint alarm and must not feed this alert.
  * `?dry=1` evaluates and sends nothing.
  */
 export async function POST(request: NextRequest) {
