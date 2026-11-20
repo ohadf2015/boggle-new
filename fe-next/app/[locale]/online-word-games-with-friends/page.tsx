@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { EducationIntentCta } from '@/components/education/EducationIntentCta';
 import { ApalabradosSinDescargarLink } from '@/components/seo/ApalabradosSinDescargarLink';
@@ -107,17 +108,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
           notice. LexiClash is that same itch scratched at full speed: everyone plays the same letter grid
           at the same time, live, and the bragging rights settle in 3 minutes instead of 3 weeks.
         </p>
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
-          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;{' '}
-          If the game you wanted is Boggle, you can{' '}
-          <Link href={`/${locale}/play-boggle-online-free`} className="text-neo-cyan underline">
-            play Boggle with friends online
-          </Link>{' '}
-          the same way: a room code, a QR, or the share button.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <section className="mb-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={`/${locale}/multiplayer`}
             className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
@@ -131,6 +122,34 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
             Practice Solo First
           </Link>
         </section>
+
+        <figure className="relative mx-auto mb-10 aspect-[16/9] w-full max-w-2xl rotate-[-1.5deg] rounded-neo border-4 border-neo-black bg-neo-navy-light shadow-hard-xl">
+          <Image
+            src="/landing/play-boggle-multiplayer.webp"
+            alt="Three LexiClash mascots racing to find words on the same letter grid"
+            fill
+            priority
+            sizes="(min-width: 768px) 672px, 100vw"
+            className="rounded-neo object-cover"
+          />
+          <span className="absolute -left-3 -top-3 rotate-[-10deg] border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-navy shadow-hard">
+            Live
+          </span>
+          <span className="absolute -bottom-3 -right-3 rotate-[7deg] border-3 border-neo-black bg-neo-pink px-3 py-1 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard">
+            Up to 50 friends
+          </span>
+        </figure>
+
+        <p className="mb-12 text-lg leading-relaxed text-neo-gray-200">
+          Create a room, share one link, and up to 50 friends join instantly from any browser — phone,
+          laptop, whatever they&apos;re holding. No download, no account, no &quot;your move... eventually.&quot;{' '}
+          If the game you wanted is Boggle, you can{' '}
+          <Link href={`/${locale}/play-boggle-online-free`} className="text-neo-cyan underline">
+            play Boggle with friends online
+          </Link>{' '}
+          the same way: a room code, a QR, or the share button.
+        </p>
+
 
         <section className="mb-12">
           <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">How to Play With Friends</h2>
