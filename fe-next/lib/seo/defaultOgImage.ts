@@ -14,10 +14,14 @@ export const OG_IMAGE_BY_LOCALE: Record<string, string> = {
   sv: 'og-image-sv.webp',
   ja: 'og-image-ja.webp',
   es: 'og-image-es.webp',
+  ru: 'og-image-ru.webp',
 };
 
+/** Bump when the images change so link-preview caches (WhatsApp, Facebook, X) refetch. */
+const OG_VERSION = '2';
+
 export function defaultOgImageUrl(locale?: string): string {
-  return `${SITE}/${OG_IMAGE_BY_LOCALE[locale ?? 'en'] ?? OG_IMAGE_BY_LOCALE.en}`;
+  return `${SITE}/${OG_IMAGE_BY_LOCALE[locale ?? 'en'] ?? OG_IMAGE_BY_LOCALE.en}?v=${OG_VERSION}`;
 }
 
 export function defaultOgImages(locale?: string, alt = 'LexiClash - Multiplayer Word Game') {

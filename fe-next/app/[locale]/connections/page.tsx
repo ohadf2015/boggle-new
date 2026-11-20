@@ -28,9 +28,9 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 const OG_IMAGE: Record<string, string> = {
   en: 'og-image-en.webp',
-  he: 'og-image-he.webp',
+  he: 'og-image-he.webp?v=2',
   sv: 'og-image-en.webp',
-  ja: 'og-image-ja.webp',
+  ja: 'og-image-ja.webp?v=2',
   es: 'og-image-en.webp',
   ru: 'og-image-en.webp',
 };

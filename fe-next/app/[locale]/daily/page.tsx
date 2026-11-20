@@ -238,11 +238,11 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 
   // Default metadata (no share parameter) - use locale-specific static OG images
   const ogImageMap: Record<string, string> = {
-    he: `${baseUrl}/og-image-he.webp`,
+    he: `${baseUrl}/og-image-he.webp?v=2`,
     en: `${baseUrl}/og-image-en.webp`,
-    sv: `${baseUrl}/og-image-sv.webp`,
-    ja: `${baseUrl}/og-image-ja.webp`,
-    es: `${baseUrl}/og-image-es.webp`,
+    sv: `${baseUrl}/og-image-sv.webp?v=2`,
+    ja: `${baseUrl}/og-image-ja.webp?v=2`,
+    es: `${baseUrl}/og-image-es.webp?v=2`,
   };
   const ogImage = ogImageMap[validLocale] || ogImageMap.en;
 

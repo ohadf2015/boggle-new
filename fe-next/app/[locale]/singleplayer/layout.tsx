@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
 
   const localePath = `/${locale}`;
   const ogImage = locale === 'he'
-    ? 'https://www.lexiclash.live/og-image-he.webp'
+    ? 'https://www.lexiclash.live/og-image-he.webp?v=2'
     : 'https://www.lexiclash.live/og-image-en.webp';
 
   return {

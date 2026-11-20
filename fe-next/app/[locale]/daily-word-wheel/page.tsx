@@ -119,13 +119,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
       url: pageUrl,
       siteName: 'LexiClash',
-      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`, width: 1200, height: 630, alt: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle) }],
+      images: [{ url: `${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image?v=2`, width: 1200, height: 630, alt: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle) }],
     },
     twitter: {
       card: 'summary_large_image',
       title: resolve('meta.dailyWordWheel.ogTitle', fallback.ogTitle),
       description: resolve('meta.dailyWordWheel.ogDescription', fallback.ogDescription),
-      images: [`${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image`],
+      images: [`${BASE_URL}/${validLocale}/daily-word-wheel/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,

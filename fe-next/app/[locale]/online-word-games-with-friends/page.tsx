@@ -28,13 +28,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-en.webp`, width: 1200, height: 630, alt: 'LexiClash - Online Word Games With Friends' }],
+      images: [{ url: `${BASE_URL}/en/online-word-games-with-friends/opengraph-image?v=2`, width: 1200, height: 630, alt: 'LexiClash - Online Word Games With Friends' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Words With Friends Online Free — Real-Time, No App | LexiClash',
       description: 'Real-time word battles with friends. No app, no account. Create a room, share the link, play instantly!',
-      images: [`${BASE_URL}/og-image-en.webp`],
+      images: [`${BASE_URL}/en/online-word-games-with-friends/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,

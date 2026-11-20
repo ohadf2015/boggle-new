@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-sv.webp`,
+          url: `${BASE_URL}/sv/swedish-multiplayer-word-game/opengraph-image?v=2`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Multiplayer Ordspel på Svenska',
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: SV_TITLE,
       description: SV_DESCRIPTION,
-      images: [`${BASE_URL}/og-image-sv.webp`],
+      images: [`${BASE_URL}/sv/swedish-multiplayer-word-game/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,
