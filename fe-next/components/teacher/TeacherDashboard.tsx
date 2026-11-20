@@ -54,6 +54,8 @@ import {
   captureTeacherOnboardingCompletedIfOpened,
   captureTeacherOnboardingOpened,
 } from '@/lib/education/teacherOnboardingGate';
+import { isTeacherProfile } from '@/lib/education/teacherRole';
+import { TeacherWorkspaceProCard } from '@/components/education/TeacherWorkspaceProCard';
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */
@@ -179,6 +181,22 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const proCard = askSettled && railAsk === 'pro' ? (
     <DashboardProOfferCard language={language} t={t} />
   ) : null;
+  // Desk checkout CTA for the realized-value moment: a free approved teacher
+  // with at least one student joined. Defers to every other ask on Home (the
+  // pickHomeAsk order above: account surfaces, the rail Pro offer) and never
+  // shows mid-lesson — one Pro ask per screen.
+  const realizedValue = classrooms.some((c) => (c.member_count ?? 0) > 0);
+  const approvedTeacher = !!user && user.is_anonymous !== true && isTeacherProfile(profile);
+  const workspaceProCard =
+    askSettled && freeTeacher && realizedValue && liveGameRunning !== true && proCard === null && accountBanner === null && !alert ? (
+      <TeacherWorkspaceProCard
+        locale={language}
+        className="w-full"
+        isApprovedTeacher={approvedTeacher}
+        classrooms={classrooms}
+        isFreeTeacher={freeTeacher}
+      />
+    ) : null;
   const onboardingStep = onboarding.current ?? 'tryDemo';
   const guideShownStep = useRef<string | null>(null);
   const checklistStep =
@@ -363,6 +381,11 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
           {selectedClassroom ? (
             <div data-tm className="empty:hidden">
               <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
+            </div>
+          ) : null}
+          {workspaceProCard ? (
+            <div data-tm className="empty:hidden">
+              {workspaceProCard}
             </div>
           ) : null}
         </>
