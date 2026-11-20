@@ -78,12 +78,11 @@ describe('HomeWeekChallenge', () => {
     expect(capture).toHaveBeenCalledWith('edu_week_challenge_set', { surface: 'teacher_home', action: 'run_again', outcome: 'created', days: 7 });
   });
 
-  it('given no other word list, then run again opens the list picker instead', () => {
+  it('given no other word list, then there is no run-again button sending the teacher into the homework dialog', () => {
     hook.assignments = [open];
     view({ lessons: [lessons[0]] });
-    fireEvent.click(screen.getByTestId('home-challenge-run-again'));
-    expect(onPickList).toHaveBeenCalled();
-    expect(hook.createAssignment).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('home-challenge-run-again')).toBeNull();
+    expect(onPickList).not.toHaveBeenCalled();
   });
 
   it('given no challenge, then one tap opens the class list for the week', async () => {
