@@ -155,10 +155,13 @@ const DailyChallenge: React.FC = () => {
 
 
 
+  const phaseRef = useRef(phase);
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
+  const isRunLive = useCallback(() => phaseRef.current === 'playing', []);
   // Track previous values for smarter re-initialization
   const gameStartedAtRef = useRef<number>(0);
   useWordHuntPuzzleInit({
-    gameLanguage, today, resetCount, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
+    gameLanguage, today, resetCount, isRunLive, isAuthenticated, profileId: profile?.id ?? null, catchupDate, isPractice, online,
     setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
   });
 
@@ -370,13 +373,13 @@ const DailyChallenge: React.FC = () => {
           </m.div>
         )}
 
-        {phase === 'ready' && !hasValidChallenge && (
+        {phase === 'ready' && !hasValidChallenge && !forfeitedToday && (
           <m.div key="starting" className="flex-1 flex items-center justify-center">
             <PageLoader size="lg" text={t('daily.loading')} />
           </m.div>
         )}
 
-        {phase === 'ready' && hasValidChallenge && (
+        {phase === 'ready' && (hasValidChallenge || forfeitedToday) && (
           <DailyReadyScreen
             puzzleNumber={puzzleNumber}
             puzzleDate={puzzleDate}

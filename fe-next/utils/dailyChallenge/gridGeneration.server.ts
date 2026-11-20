@@ -109,7 +109,7 @@ async function saveGridToDatabase(
           grid,
           grid_generated_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-          ...(replaceTarget ? { override_word: targetWord, meaning: null } : {}),
+          ...(replaceTarget ? { override_word: targetWord, override_by: null, meaning: null } : {}),
         })
         .eq('puzzle_date', dateString)
         .eq('language', language);

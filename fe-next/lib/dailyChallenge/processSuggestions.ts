@@ -10,6 +10,7 @@
  */
 
 import type { DailyWordVerdict } from '@/lib/ai-service/dailyWordJudge';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
 
 export interface SuggestionRow {
   id: string;
@@ -47,7 +48,7 @@ export interface SuggestionSummary {
 }
 
 const LEN: Record<string, { min: number; max: number }> = { ja: { min: 2, max: 4 } };
-const DEFAULT_LEN = { min: 5, max: 7 };
+const DEFAULT_LEN = { min: 5, max: MAX_TARGET_WORD_LENGTH };
 
 function lenOk(word: string, language: string): boolean {
   const { min, max } = LEN[language] || DEFAULT_LEN;

@@ -27,6 +27,8 @@ export interface WordHuntPuzzleInitDeps {
   today: string;
   /** Bumped on every reset; each bump reloads the puzzle. */
   resetCount: number;
+  /** A run on screen: a late sign-in must not reload it or count it as abandoned. */
+  isRunLive?: () => boolean;
   isAuthenticated: boolean;
   profileId: string | null;
   catchupDate: string | null;
@@ -44,7 +46,7 @@ export interface WordHuntPuzzleInitDeps {
 
 /** Loads today's (or a catch-up day's) Word Hunt puzzle, or routes to the saved result if already played. */
 export function useWordHuntPuzzleInit({
-  gameLanguage, today, resetCount, isAuthenticated, profileId, catchupDate, isPractice, online,
+  gameLanguage, today, resetCount, isRunLive, isAuthenticated, profileId, catchupDate, isPractice, online,
   setPhase, setPuzzleDate, setPuzzleNumber, setForfeitedToday, setStoredResult, setGrid, setTargetWord, setMeaning,
 }: WordHuntPuzzleInitDeps) {
   const isCatchup = !!catchupDate;
@@ -60,6 +62,7 @@ export function useWordHuntPuzzleInit({
 
     prevGameLanguageRef.current = gameLanguage;
     prevResetCountRef.current = resetCount;
+    if (!needsFullReload && isRunLive?.()) return;
 
     if (needsFullReload) setPhase('loading');
 
