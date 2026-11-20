@@ -26,13 +26,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'he_IL',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-he.webp`, width: 1200, height: 630, alt: 'LexiClash מול Wordwall, Kahoot ו-Quizlet' }],
+      images: [{ url: `${BASE_URL}/og-image-he.webp?v=2`, width: 1200, height: 630, alt: 'LexiClash מול Wordwall, Kahoot ו-Quizlet' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'LexiClash מול Wordwall, Kahoot ו-Quizlet',
       description: 'השוואה כנה למורים: משחקי מילים לכיתה בעברית. מה כל כלי עושה הכי טוב.',
-      images: [`${BASE_URL}/og-image-he.webp`],
+      images: [`${BASE_URL}/og-image-he.webp?v=2`],
     },
     alternates: {
       canonical: pageUrl,

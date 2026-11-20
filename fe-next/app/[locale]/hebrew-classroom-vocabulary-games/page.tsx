@@ -33,13 +33,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: OG_LOCALE[locale] ?? 'en_US',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-he.webp`, width: 1200, height: 630, alt: c.ogTitle }],
+      images: [{ url: `${BASE_URL}/og-image-he.webp?v=2`, width: 1200, height: 630, alt: c.ogTitle }],
     },
     twitter: {
       card: 'summary_large_image',
       title: c.twitterTitle,
       description: c.twitterDescription,
-      images: [`${BASE_URL}/og-image-he.webp`],
+      images: [`${BASE_URL}/og-image-he.webp?v=2`],
     },
     alternates: {
       canonical: `${BASE_URL}/he${PAGE_PATH}`,

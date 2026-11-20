@@ -37,9 +37,10 @@ describe('page-level openGraph metadata keeps a share image', () => {
     for (const file of Object.values(OG_IMAGE_BY_LOCALE)) {
       expect(existsSync(join(FE_ROOT, 'public', file)), file).toBe(true);
     }
-    expect(defaultOgImageUrl('he')).toBe('https://www.lexiclash.live/og-image-he.webp');
-    expect(defaultOgImageUrl('ru')).toBe('https://www.lexiclash.live/og-image-en.webp');
-    expect(defaultOgImageUrl(undefined)).toBe('https://www.lexiclash.live/og-image-en.webp');
+    expect(defaultOgImageUrl('he')).toBe('https://www.lexiclash.live/og-image-he.webp?v=2');
+    expect(defaultOgImageUrl('ru')).toBe('https://www.lexiclash.live/og-image-ru.webp?v=2');
+    expect(defaultOgImageUrl('xx')).toBe('https://www.lexiclash.live/og-image-en.webp?v=2');
+    expect(defaultOgImageUrl(undefined)).toBe('https://www.lexiclash.live/og-image-en.webp?v=2');
     expect(defaultOgImages('sv')[0]).toMatchObject({ width: 1200, height: 630 });
   });
 });

@@ -7,11 +7,11 @@ const BASE_URL = 'https://www.lexiclash.live';
 
 // Russian ships no OG art of its own; the English card is the deliberate fallback.
 const OG_IMAGES: Record<string, string> = {
-  he: `${BASE_URL}/og-image-he.webp`,
+  he: `${BASE_URL}/og-image-he.webp?v=2`,
   en: `${BASE_URL}/og-image-en.webp`,
-  sv: `${BASE_URL}/og-image-sv.webp`,
-  ja: `${BASE_URL}/og-image-ja.webp`,
-  es: `${BASE_URL}/og-image-es.webp`,
+  sv: `${BASE_URL}/og-image-sv.webp?v=2`,
+  ja: `${BASE_URL}/og-image-ja.webp?v=2`,
+  es: `${BASE_URL}/og-image-es.webp?v=2`,
 };
 
 /**

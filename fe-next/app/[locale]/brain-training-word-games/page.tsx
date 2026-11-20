@@ -12,9 +12,9 @@ const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 const OG_IMAGE: Record<string, string> = {
   en: 'og-image-en.webp',
-  he: 'og-image-he.webp',
+  he: 'og-image-he.webp?v=2',
   sv: 'og-image-en.webp',
-  ja: 'og-image-ja.webp',
+  ja: 'og-image-ja.webp?v=2',
   es: 'og-image-en.webp',
 };
 

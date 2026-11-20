@@ -44,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       images: [
         {
-          url: `${BASE_URL}/og-image-es-multiplayer.webp`,
+          url: `${BASE_URL}/es/juego-de-palabras-multijugador/opengraph-image?v=2`,
           width: 1200,
           height: 630,
           alt: 'LexiClash - Scrabble Online en Español Multijugador',
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: 'Scrabble Online en Español Gratis — Sin Registro | LexiClash',
       description: 'Juega scrabble online gratis — sin registro ni descargas. Crea sala, invita amigos y compite en tiempo real. Hasta 50 jugadores. ¡Empieza ya! →',
-      images: [`${BASE_URL}/og-image-es-multiplayer.webp`],
+      images: [`${BASE_URL}/es/juego-de-palabras-multijugador/opengraph-image?v=2`],
     },
     alternates: {
       canonical: pageUrl,

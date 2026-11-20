@@ -36,13 +36,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'he_IL',
       type: 'website',
       url: CANONICAL,
-      images: [{ url: `${BASE_URL}/og-image-he.webp`, width: 1200, height: 630, alt: 'המילה היומית — LexiClash' }],
+      images: [{ url: `${BASE_URL}/og-image-he.webp?v=2`, width: 1200, height: 630, alt: 'המילה היומית — LexiClash' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'המילה היומית — פאזל המילים של היום | LexiClash',
       description,
-      images: [`${BASE_URL}/og-image-he.webp`],
+      images: [`${BASE_URL}/og-image-he.webp?v=2`],
     },
     alternates: {
       // Self-referencing Hebrew cluster — the page is Hebrew-only by intent.

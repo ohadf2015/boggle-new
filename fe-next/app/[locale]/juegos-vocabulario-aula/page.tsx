@@ -22,13 +22,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'es_ES',
       type: 'website',
       url: pageUrl,
-      images: [{ url: `${BASE_URL}/og-image-es.webp`, width: 1200, height: 630, alt: 'LexiClash juegos de vocabulario aula' }],
+      images: [{ url: `${BASE_URL}/og-image-es.webp?v=2`, width: 1200, height: 630, alt: 'LexiClash juegos de vocabulario aula' }],
     },
     twitter: {
       card: 'summary_large_image',
       title: 'Juegos de Vocabulario para el Aula | LexiClash',
       description: 'Gratis, sin registro, juego instantáneo.',
-      images: [`${BASE_URL}/og-image-es.webp`],
+      images: [`${BASE_URL}/og-image-es.webp?v=2`],
     },
     alternates: {
       canonical: pageUrl,
