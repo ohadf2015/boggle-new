@@ -91,3 +91,7 @@ export const SOLVER_CTA: Record<OgLang, string> = {
   es: 'Resolver letras',
   ru: 'Решить буквы',
 };
+
+export function solverCard(lang: OgLang, page: { title: string; subtitle: string }): CardCopy {
+  return { kicker: SOLVER_KICKER[lang], title: page.title, line: page.subtitle, cta: SOLVER_CTA[lang] };
+}
