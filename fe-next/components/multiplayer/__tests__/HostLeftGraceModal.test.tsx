@@ -35,6 +35,16 @@ describe('HostLeftGraceModal (UX audit 2026-05-04 #2)', () => {
     expect(screen.getByTestId('host-left-banner').textContent).toContain('multiplayerFlow.hostLeftModal.body');
   });
 
+  it('a kicked player reads that they were removed, not that the host left', () => {
+    render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} kicked message="Your teacher took you out of this game." />);
+    const text = screen.getByTestId('host-left-banner').textContent ?? '';
+    expect(text).toContain('multiplayerFlow.kickedModal.title');
+    expect(text).toContain('multiplayerFlow.kickedModal.leavingIn');
+    expect(text).toContain('Your teacher took you out of this game.');
+    expect(text).not.toContain('multiplayerFlow.hostLeftModal.title');
+    expect(text).not.toContain('mpUi.entry.hostLeftIn');
+  });
+
   it('renders the resolved server message when there is no reason (class ended, kicked)', () => {
     render(<HostLeftGraceModal isOpen={true} onExit={vi.fn()} message="Your class game ended." />);
     expect(screen.getByTestId('host-left-banner').textContent).toContain('Your class game ended.');

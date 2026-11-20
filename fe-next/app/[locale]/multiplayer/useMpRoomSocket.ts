@@ -42,6 +42,7 @@ export type MpRoomPlayer = {
 export interface MpHostLeftState {
   reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
   message: string;
+  kicked?: 'host' | 'inactive';
 }
 
 type Setter<T> = Dispatch<SetStateAction<T>>;
@@ -292,6 +293,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       setHostLeftState({
         reason: data.reason,
         message: data.resolvedMessage || data.message || t('multiplayerFlow.roomClosed'),
+        kicked: data.kicked,
       });
     },
     onSessionMigrated: () => {

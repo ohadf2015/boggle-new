@@ -4942,6 +4942,10 @@ const ja = {
     "hostTransferredAnnouncement": "{previousHost}が退出しました。{newHost}が新しいホストです。",
     "hostTransferredAfterGrace": "{previousHost}が戻りませんでした。{newHost}が新しいホストです。",
     "inviteFriend": "友達を招待",
+    "kickedModal": {
+      "title": "ルームから外れました",
+      "leavingIn": "{{seconds}}秒後に移動します"
+    },
     "hostLeftModal": {
       "title": "ホストが退出しました",
       "body": "ルームを閉じています。数秒後にロビーへ戻ります。すぐ戻るには下をタップ。",
@@ -5114,6 +5118,7 @@ const ja = {
     "playerKicked": "{{name}}がルームから追放されました",
     "youWereKicked": "ルームから追放されました",
     "youWereKickedInactive": "非アクティブのため退出されました",
+    "removedByTeacher": "先生がこのゲームからあなたを外しました。",
     "afkWarning": "{{seconds}}秒後に非アクティブで退出になるよ。タップして残ろう",
     "shareCodeHint": "上のルームコードを共有して友達を招待しよう",
     "sendLinkToFriends": "このリンクを友達に送って一緒にプレイしよう",

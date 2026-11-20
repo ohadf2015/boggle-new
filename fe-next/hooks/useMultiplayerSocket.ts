@@ -90,6 +90,7 @@ interface UseMultiplayerSocketOptions {
     i18nParams?: Record<string, string | number>;
     reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
     resolvedMessage?: string;
+    kicked?: 'host' | 'inactive';
   }) => void;
   onSessionMigrated: (data: { message?: string }) => void;
   onRateLimited: () => void;
@@ -160,7 +161,6 @@ export function useMultiplayerSocket(
   const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
   const reconnectFallbackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const notSeatedRejoinAtRef = useRef(0);
-  const kickedReloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Latest-ref pattern: keeps a stable ref to the latest options so socket
@@ -586,11 +586,8 @@ export function useMultiplayerSocket(
       const message = data.reason === 'inactive'
         ? opts.t('hostView.youWereKickedInactive')
         : opts.t('hostView.youWereKicked');
-      toast.error(message, { icon: '🚫', duration: 5000 });
       clearSessionPreservingUsername(opts.username);
-      opts.onHostLeftRoomClosing({ message });
-      // Same as host-left: drop query (?classroom=true) so the lobby renders cleanly.
-      kickedReloadTimerRef.current = setTimeout(() => { window.location.href = window.location.pathname; }, 2000);
+      opts.onHostLeftRoomClosing({ kicked: data.reason, message });
     });
 
     listen('afkWarning', (data: { secondsRemaining: number }) => {
@@ -730,10 +727,6 @@ export function useMultiplayerSocket(
       if (reconnectFallbackTimerRef.current) {
         clearTimeout(reconnectFallbackTimerRef.current);
         reconnectFallbackTimerRef.current = null;
-      }
-      if (kickedReloadTimerRef.current) {
-        clearTimeout(kickedReloadTimerRef.current);
-        kickedReloadTimerRef.current = null;
       }
       owned.forEach(([event, fn]) => socketInstance.off(event, fn));
       // Remove ONLY our connection-lifecycle handlers by reference so

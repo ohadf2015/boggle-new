@@ -6,18 +6,19 @@
 import logger from '@/utils/logger';
 import { getFromStorage, saveToStorage, removeFromStorage, getJsonFromStorage, saveJsonToStorage } from '@/utils/storageHelpers';
 import { getOrCreateStoredUsername, getStoredUsername, setStoredUsername } from '@/utils/profileStorage';
+import { GUEST_STORAGE_KEYS } from '@/utils/guestStorageKeys';
 import { updateGuestDailyPlayer } from '@/utils/dailyChallenge/guestPlayer';
 import { CARRYOVER_GUEST_SESSION_KEY } from '@/utils/dailyChallenge/constants';
 import { markPostGameCompleted } from '@/lib/auth/signupPromptCoordination';
 import { isDefaultPlayerName } from '@/utils/defaultPlayerNames';
 
 const GUEST_SESSION_KEY = 'boggle_guest_session_id';
-const GUEST_STATS_KEY = 'boggle_guest_stats';
-const GUEST_NAME_KEY = 'boggle_guest_name';
+const GUEST_STATS_KEY = GUEST_STORAGE_KEYS.GUEST_STATS;
+const GUEST_NAME_KEY = GUEST_STORAGE_KEYS.GUEST_NAME;
 // Set once the guest typed a name or explicitly kept the suggested one. Every
 // guest gets an auto-generated name, so the stores alone can't tell a real
 // name from a random one.
-const GUEST_NAME_CHOSEN_KEY = 'lexiclash_guest_name_chosen';
+const GUEST_NAME_CHOSEN_KEY = GUEST_STORAGE_KEYS.GUEST_NAME_CHOSEN;
 
 export interface GuestStats {
   games: number;
