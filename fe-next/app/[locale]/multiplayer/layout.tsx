@@ -2,6 +2,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
+import { defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
@@ -18,15 +19,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
   const baseSeo = t?.seo ?? (await loadTranslation('en') as Record<string, any>).seo;
 
   const localePath = `/${locale}`;
-  const ogImageMap: Record<string, string> = {
-    he: 'https://www.lexiclash.live/og-image-he.webp?v=2',
-    en: 'https://www.lexiclash.live/og-image-en.webp',
-    sv: 'https://www.lexiclash.live/og-image-sv.webp?v=2',
-    ja: 'https://www.lexiclash.live/og-image-ja.webp?v=2',
-    es: 'https://www.lexiclash.live/og-image-es.webp?v=2',
-    // ru has no dedicated OG image yet → falls back to en below.
-  };
-  const ogImage = ogImageMap[locale] || ogImageMap.en;
+  const ogImage = defaultOgImageUrl(locale);
 
   return {
     title: seo.title,

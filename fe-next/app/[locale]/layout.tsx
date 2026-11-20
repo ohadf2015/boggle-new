@@ -19,6 +19,7 @@ import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
 import SrSiteNav from './SrSiteNav';
 import LocaleBodyChrome from './LocaleBodyChrome';
+import { defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic, unboundedLatin, unboundedCyrillic, unboundedLatinForCyrillic } from '../fonts';
 import Script from "next/script";
@@ -61,14 +62,6 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
 
-    // Use locale-specific OG image (WebP format for faster loading)
-    const ogImageMap: Record<string, string> = {
-        he: 'https://www.lexiclash.live/og-image-he.webp?v=2',
-        en: 'https://www.lexiclash.live/og-image-en.webp',
-        sv: 'https://www.lexiclash.live/og-image-sv.webp?v=2',
-        ja: 'https://www.lexiclash.live/og-image-ja.webp?v=2',
-        es: 'https://www.lexiclash.live/og-image-es.webp?v=2',
-    };
     const ogImageAltMap: Record<string, string> = {
         he: 'לקסי קלאש - משחק מילים מרובה משתתפים',
         en: 'LexiClash - Multiplayer Word Game',
@@ -76,7 +69,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         ja: 'LexiClash - マルチプレイヤーワードゲーム',
         es: 'LexiClash - Juego de Palabras Multijugador',
     };
-    const ogImage = ogImageMap[locale] || ogImageMap.en;
+    const ogImage = defaultOgImageUrl(locale);
     const ogImageAlt = ogImageAltMap[locale] || ogImageAltMap.en;
 
     return {
