@@ -126,6 +126,36 @@ describe('QuickPlayHub', () => {
     expect(bodies).toEqual(['blast', 'blast']);
   });
 
+  it('a failed round fetch reports quick_play_board_fetch_failed with the reason', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) return Promise.resolve({ ok: false, status: 503, json: async () => ({}) });
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_fetch_failed',
+      expect.objectContaining({ mode: 'blast', reason: 'round fetch 503' })
+    );
+  });
+
+  it('a round fetch that never answers is aborted and shows the error with retry', async () => {
+    fetchMock.mockImplementation((url: string, init?: any) => {
+      if (String(url).includes('/round')) {
+        return new Promise((_res, rej) => {
+          init?.signal?.addEventListener('abort', () => rej(new DOMException('aborted', 'AbortError')));
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy(), { timeout: 8000 });
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_fetch_failed',
+      expect.objectContaining({ mode: 'blast', reason: 'timeout' })
+    );
+  }, 10000);
+
   it('round completion shows results, and Next round starts another round instead of a picker', async () => {
     render(<QuickPlayHub />);
     await waitFor(() => screen.getByTestId('mock-finish'));

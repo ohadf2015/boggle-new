@@ -33,6 +33,9 @@ import type { WheelSelection } from './wheelGeometry';
 import { strikeHoldMs } from './lightningPath';
 import { QUICK_MODES, roundTarget, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
 
+/** A board fetch slower than this is treated as failed so the player gets the retry screen. */
+const ROUND_FETCH_TIMEOUT_MS = 5000;
+
 type HubPhase = 'loading' | 'error' | 'playing' | 'results';
 
 function roundTargetWords(config: QuickRoundConfig): number {
@@ -259,8 +262,16 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
+    // A board that never answers must not leave the wheel spinning forever.
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, ROUND_FETCH_TIMEOUT_MS);
     try {
       const res = await fetch('/api/quick-play/round', {
+        signal: controller.signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // recentPct lets the server aim the rival field at THIS player: without
@@ -275,11 +286,17 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
       setPhase('playing');
-    } catch {
+    } catch (err) {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
       // tap is indistinguishable from a bug).
+      posthog.capture('quick_play_board_fetch_failed', {
+        mode,
+        roundIndex,
+        reason: timedOut ? 'timeout' : err instanceof Error ? err.message : 'unknown',
+      });
       setPhase('error');
     } finally {
+      clearTimeout(timer);
       loadingRef.current = false;
     }
   }, [challenge, language, roundIndex]);
