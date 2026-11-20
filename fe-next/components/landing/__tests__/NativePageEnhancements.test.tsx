@@ -46,11 +46,6 @@ describe('NativePageEnhancements', () => {
     expect(screen.getByText(/8 modes, not 1\./i)).toBeInTheDocument();
   });
 
-  it('shows native-review flag on non-English locales', () => {
-    render(<NativePageEnhancements locale="he" />);
-    expect(screen.getByText(/דורש סקירה/)).toBeInTheDocument();
-  });
-
   it('does not show review flag on English locale', () => {
     render(<NativePageEnhancements locale="en" />);
     expect(screen.queryByText(/needs native review/i)).not.toBeInTheDocument();
@@ -80,5 +75,15 @@ describe('NativePageEnhancements', () => {
     render(<NativePageEnhancements locale="he" />);
     const partyLink = screen.getAllByRole('link').find((a) => a.getAttribute('href')?.startsWith('/he/'));
     expect(partyLink).toBeDefined();
+  });
+
+  it.each(['en', 'he', 'sv', 'ja', 'es'])('never shows a translator review note to %s visitors', (locale) => {
+    const { container } = render(<NativePageEnhancements locale={locale} />);
+    expect(container.textContent).not.toMatch(/översättning|translation|תרגום|翻訳|traducción/i);
+  });
+
+  it('names the Swedish modes in Swedish', () => {
+    const { container } = render(<NativePageEnhancements locale="sv" />);
+    expect(container.textContent).not.toMatch(/Word Hunt Survival|Ordduel\b/);
   });
 });

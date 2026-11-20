@@ -164,6 +164,21 @@ export default async function SwedishMultiplayerWordGamePage({ params }: PagePro
           på samma bokstavsrutnät. Över 10 000 svenska ord, matcher på 2–3 minuter. Starta direkt.
         </p>
 
+        <div className="mb-12 flex flex-col gap-3 sm:flex-row">
+          <Link
+            href={`/${locale}/multiplayer`}
+            className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl"
+          >
+            ▶ Spela gratis nu
+          </Link>
+          <Link
+            href={`/${locale}/daily/word-wheel`}
+            className="rounded-neo border-4 border-neo-lime px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+          >
+            ★ Dagens ordhjul
+          </Link>
+        </div>
+
         <section className="mb-12">
           <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{SCRABBLE_SV_QUESTION}</h2>
           <p className="mb-4 leading-relaxed text-neo-gray-200" data-speakable="true">{SCRABBLE_SV_ANSWER}</p>

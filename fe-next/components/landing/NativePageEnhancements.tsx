@@ -33,7 +33,6 @@ interface LocaleStrings {
   ctaSecondary: string;
   modes: ModeRow[];
   bestFor: BestForRow[];
-  reviewNote?: string;
 }
 
 const accentBorder: Record<ModeRow['accent'], string> = {
@@ -88,7 +87,6 @@ const he: LocaleStrings = {
   ctaBody: 'בלי הורדה, בלי הרשמה. פותחים קישור, שולחים לחברים, משחקים תוך 30 שניות.',
   ctaPrimary: 'שחקו בריבוי משתתפים — חינם',
   ctaSecondary: 'אתגר יומי',
-  reviewNote: 'תרגום עברי דורש סקירה של דובר שפת אם',
   modes: [
     { mode: 'קרב מילים מרובה משתתפים', tag: 'ליבה', desc: 'קרב מילים בזמן אמת — 2-20 שחקנים מתחרים על אותו לוח במשך 2-3 דקות.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
     { mode: 'ציד מילים יומי', tag: 'יומי', desc: 'מילון פוגש בוגל. מצאו מילה נסתרת בת 4-6 אותיות תוך 10 ניסיונות.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
@@ -118,20 +116,19 @@ const sv: LocaleStrings = {
   ctaBody: 'Ingen nedladdning, ingen registrering. Öppna länken, dela med vänner, spela på 30 sekunder.',
   ctaPrimary: 'Spela multiplayer gratis',
   ctaSecondary: 'Daglig utmaning',
-  reviewNote: 'Svensk översättning behöver granskning av modersmålstalare',
   modes: [
-    { mode: 'Multiplayer-rutbatalj', tag: 'KÄRNA', desc: 'Realtidsordkamp — 2-20+ spelare tävlar på samma rutnät i 2-3 minuter.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
-    { mode: 'Word Hunt Survival', tag: 'DAGLIG', desc: 'Wordle möter Boggle. Hitta ett dolt 4-6 bokstäver långt målord på 10 försök.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
+    { mode: 'Ordstrid i realtid', tag: 'KÄRNA', desc: 'Realtidsordkamp — 2-20+ spelare tävlar på samma rutnät i 2-3 minuter.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
+    { mode: 'Ordjakt', tag: 'DAGLIG', desc: 'Wordle möter Boggle. Hitta ett dolt 4-6 bokstäver långt målord på 10 försök.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
     { mode: 'Dagligt Ordhjul', tag: 'DAGLIG', desc: 'Ett bokstavshjul, hela världen spelar. Använd mittbokstaven, klättra på topplistan.', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
     { mode: 'Äventyr', tag: 'STORY', desc: 'Roguelike-ordresa. Bossstrider, förmågor, byte. 5-8 rum per körning.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
     { mode: 'Blast', tag: 'JUICE', desc: 'Snabba kaskadkombos. Brickor faller, kedjor exploderar. Den arkadiga.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
     { mode: 'Hjärnträning', tag: 'TRÄNA', desc: 'Snabba ordförrådsövningar: anagram, definitioner, stavningssprint. 60-sekunders set.', href: 'brain', mascot: '/mascot/flexing.webp', accent: 'purple' },
-    { mode: 'Ordduel', tag: 'EDU', desc: '1v1 elev-mot-elev ordförrådsstrider. Lärardashboard + anpassade ordlistor.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
+    { mode: 'Ordduell', tag: 'EDU', desc: '1v1 elev-mot-elev ordförrådsstrider. Lärardashboard + anpassade ordlistor.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
     { mode: 'Festspel', tag: 'FEST', desc: 'TV + telefonhybrid. Wheel Rush, Connections, Codenames-stilade gruppspel.', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
   ],
   bestFor: [
     { tag: 'FESTER', title: 'Bäst för fester & grupper', desc: '20+ spelare i ett rum. Dela en QR, alla spelar samtidigt. Ingen app, ingen installation.', cta: 'Starta ett festrum', href: 'multiplayer', color: 'pink' },
-    { tag: 'KLASSRUM', title: 'Bäst för klassrum', desc: 'Ordduel, anpassade ordlistor, lärardashboard. Gratis, inga elevkonton behövs.', cta: 'Öppna utbildning', href: 'education', color: 'lime' },
+    { tag: 'KLASSRUM', title: 'Bäst för klassrum', desc: 'Ordduell, anpassade ordlistor, lärardashboard. Gratis, inga elevkonton behövs.', cta: 'Öppna utbildning', href: 'education', color: 'lime' },
     { tag: 'FAMILJ', title: 'Bäst för familjekvällen', desc: 'Telefon + surfplatta + TV. Samma spel överallt. Åldrar 6+, alla nivåer.', cta: 'Spela med familjen', href: 'multiplayer', color: 'cyan' },
     { tag: 'ASYNK', title: 'Bäst som Words With Friends-ersättare', desc: 'Dagliga utmaningar håller streaken vid liv. Snabba 2-min sessioner istället för dagars väntan.', cta: 'Prova Dagligt', href: 'daily', color: 'lime' },
     { tag: 'TEAM', title: 'Bäst för fjärrteambuilding', desc: 'Skicka en Slack-länk. 5-min isbrytare. Ingen nedladdning, inget IT-godkännande, ingen friktion.', cta: 'Starta ett rum', href: 'multiplayer', color: 'pink' },
@@ -148,7 +145,6 @@ const ja: LocaleStrings = {
   ctaBody: 'ダウンロード不要、登録不要。リンクを開いて、友達と共有、30秒でプレイ開始。',
   ctaPrimary: 'マルチプレイヤーを無料で',
   ctaSecondary: 'デイリーチャレンジ',
-  reviewNote: '日本語翻訳はネイティブレビューが必要です',
   modes: [
     { mode: 'マルチプレイヤーグリッド対戦', tag: 'コア', desc: 'リアルタイム単語バトル — 2-20+人が同じグリッドで2-3分間競う。', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
     { mode: 'ワードハント・サバイバル', tag: 'デイリー', desc: 'WordleとBoggleの融合。隠された4-6文字のターゲット語を10回で見つける。', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
@@ -178,7 +174,6 @@ const es: LocaleStrings = {
   ctaBody: 'Sin descarga, sin registro. Abre el enlace, comparte con amigos, juega en 30 segundos.',
   ctaPrimary: 'Jugar Multijugador Gratis',
   ctaSecondary: 'Desafío Diario',
-  reviewNote: 'La traducción al español necesita revisión de un hablante nativo',
   modes: [
     { mode: 'Batalla de Cuadrícula Multijugador', tag: 'PRINCIPAL', desc: 'Pelea de palabras en tiempo real — 2-20+ jugadores compiten en la misma cuadrícula durante 2-3 min.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
     { mode: 'Caza de Palabras Diaria', tag: 'DIARIO', desc: 'Wordle se encuentra con Boggle. Encuentra una palabra objetivo oculta de 4-6 letras en 10 intentos.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
@@ -274,9 +269,6 @@ export default function NativePageEnhancements({ locale }: Props) {
               <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">▶ {c.ctaPrimary}</Link>
               <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">★ {c.ctaSecondary}</Link>
             </div>
-            {c.reviewNote && (
-              <p className="mt-3 text-[10px] uppercase tracking-widest opacity-60">{c.reviewNote}</p>
-            )}
           </div>
         </div>
       </section>

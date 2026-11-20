@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import WordSolverPageClient from './PageClient';
 import { getContent, type Locale } from './content';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { SOLVER_EXAMPLES } from './examples';
 import { SolverExamplesSection } from './SolverExamplesSection';
@@ -154,12 +153,6 @@ export default async function WordSolverPage({ params }: PageParams) {
       ))}
       <WordSolverPageClient />
       {examples && <SolverExamplesSection examples={examples} />}
-      <GamePageSeoContent
-        title={content.title}
-        description={content.metaDescription}
-        features={content.howToSteps}
-        faq={content.faqs}
-      />
       <div className="mx-auto max-w-4xl px-4">
         {locale === 'en' && (
           <p className="text-neo-white text-sm mb-4">
