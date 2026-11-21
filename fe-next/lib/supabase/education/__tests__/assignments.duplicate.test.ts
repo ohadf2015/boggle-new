@@ -46,12 +46,18 @@ function mockTable(existing: unknown, updateError: unknown = null) {
     maybeSingle,
   };
   const update = vi.fn().mockReturnValue(filter);
-  // The activation-funnel gate counts with select('id', { count }). That chain
-  // must not share `eqs` — the reassign assertion pins those pairs exactly.
+  // The first-assignment gate lists classroom ids (select 'id') then counts
+  // assignments. Neither chain may share `eqs` — the reassign assertion pins
+  // those pairs exactly. lesson_assignments has no teacher_id.
   const select = vi.fn((...args: unknown[]) => {
+    const cols = args[0];
     const opts = args[1] as { count?: string } | undefined;
-    if (opts?.count) {
-      return { eq: vi.fn(async () => ({ count: 3, error: null })) };
+    if (opts?.count || cols === 'id') {
+      const quiet = {
+        eq: vi.fn(async () => ({ count: 3, data: [{ id: 'c1' }], error: null })),
+        in: vi.fn(async () => ({ count: 3, error: null })),
+      };
+      return quiet;
     }
     return filter;
   });

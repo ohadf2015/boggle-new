@@ -11,6 +11,7 @@ import {
 } from '@/lib/education/teacherActivationFunnel';
 import type { TeacherPlan } from '@/lib/education/teacherOnboardingFunnel';
 import { ASSIGNMENT_LIMIT_REACHED, isAssignmentLimitError } from '@/lib/education/assignmentLimit';
+import { beaconTeacherFunnelStep } from '@/lib/education/teacherFunnelStepBeacon';
 
 /**
  * Assign a lesson to a classroom (legacy - kept for backward compatibility)
@@ -193,12 +194,15 @@ const UNIQUE_VIOLATION = '23505';
 async function countTeacherLessonAssignments(teacherId: string): Promise<number | null> {
   if (!supabase) return null;
   try {
-    const { count, error } = await supabase
-      .from('lesson_assignments')
-      .select('id', { count: 'exact', head: true })
+    // lesson_assignments has no teacher_id. Querying that column always errored,
+    // the gate returned null, and the first-assignment step never fired.
+    const { data, error } = await supabase
+      .from('classrooms')
+      .select('id')
       .eq('teacher_id', teacherId);
     if (error) return null;
-    return typeof count === 'number' ? count : null;
+    const ids = ((data ?? []) as { id: string }[]).map((row) => row.id);
+    return countClassroomsLessonAssignments(ids);
   } catch {
     return null;
   }
@@ -250,6 +254,7 @@ async function emitFirstAssignmentFunnel(
 ): Promise<void> {
   try {
     captureTeacherActivationFunnelStep('first_assignment', funnel);
+    beaconTeacherFunnelStep('first_assignment_created');
     const classroomCount = await countTeacherClassrooms(teacherId);
     if (classroomCount !== null && classroomCount >= 1) {
       captureTeacherActivationFunnelCompleted(funnel);

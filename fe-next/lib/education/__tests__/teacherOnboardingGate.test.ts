@@ -31,6 +31,7 @@ describe('teacher onboarding gate telemetry', () => {
   beforeEach(() => {
     captureMock.mockClear();
     localStorage.clear();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
   });
 
   it('opened fires teacher_onboarding_opened with teacher_id and classroom_id', () => {
@@ -89,6 +90,13 @@ describe('teacher onboarding gate telemetry', () => {
       surface: 'class_ready',
       locale: 'en',
     });
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/education/teacher/funnel-step',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ step: 'onboarding_completed' }),
+      }),
+    );
   });
 
   it('dashboard completion does not fire unless this browser already opened the gate', () => {

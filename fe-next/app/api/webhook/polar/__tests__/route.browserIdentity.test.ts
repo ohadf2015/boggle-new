@@ -65,6 +65,17 @@ describe('polar webhook — browser identity from checkout metadata', () => {
     await POST(polarEvent('subscription.active', sub({ status: 'trialing', metadata: { user_id: 'u1', trial: true, posthog_distinct_id: 'anon-b1' } })))
     expect(capture.mock.calls.length).toBeGreaterThan(0)
     for (const [ev] of capture.mock.calls) expect(ev.distinctId).toBe('anon-b1')
+    const funnel = capture.mock.calls.map(([ev]) => ev).filter((ev) => ev.event === 'teacher_funnel_step')
+    expect(funnel).toEqual([
+      expect.objectContaining({
+        distinctId: 'anon-b1',
+        properties: expect.objectContaining({
+          step: 'trial_started',
+          teacher_id: 'u1',
+          analytics_identity_source: 'polar_metadata',
+        }),
+      }),
+    ])
   })
 
   it('Given a payload whose signature fails, When it carries a browser id, Then nothing is captured under that id', async () => {

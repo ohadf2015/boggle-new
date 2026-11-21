@@ -49,11 +49,18 @@ describe('captureStudentJoinEvents', () => {
     expect(named('edu_student_joined')[0].properties).toMatchObject({ classroom_id: 'c1', is_test_account: false });
     expect(named('edu_first_student_joined')).toHaveLength(1);
     expect(named('edu_first_student_joined')[0]).toMatchObject({ distinctId: 't1', properties: { classroom_id: 'c1', is_test_account: false } });
+    expect(named('teacher_funnel_step')).toHaveLength(1);
+    expect(named('growth:teacher_funnel_step')).toHaveLength(1);
+    expect(named('teacher_funnel_step')[0]).toMatchObject({
+      distinctId: 't1',
+      properties: { step: 'students_joined', step_index: 5, classroom_id: 'c1', is_test_account: false, $host: expect.any(String) },
+    });
   });
 
   it('Given a second student joins, Then no first_student_joined fires', async () => {
     await captureStudentJoinEvents(fakeAdmin({ teacherId: 't1', flagged: [], roster: ['s0', 's1'] }) as never, { classroomId: 'c1', studentId: 's1' });
     expect(named('edu_first_student_joined')).toHaveLength(0);
+    expect(named('teacher_funnel_step')).toHaveLength(0);
   });
 
   it('Given an anonymous guest joins a QA teacher class, Then both events are tagged as test traffic', async () => {

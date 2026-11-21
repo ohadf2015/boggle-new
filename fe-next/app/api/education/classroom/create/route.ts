@@ -12,6 +12,7 @@ import {
   buildTeacherActivationFunnelStepEvent,
   resolveTeacherActivationPlan,
 } from '@/lib/education/teacherActivationFunnelServer';
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer';
 import { EDUCATION_LANGUAGES } from '@/lib/supabase/education/types';
 import { parseCapDetail } from '@/lib/education/capDetail';
 
@@ -137,6 +138,13 @@ export async function POST(request: NextRequest) {
           isTestAccount,
         }),
       ]);
+      emitTeacherFunnelStep({
+        teacherId: user.id,
+        step: 'classroom_created',
+        isTestAccount,
+        locale: language,
+        classroomId: classroom.id,
+      });
     }
 
     return NextResponse.json(

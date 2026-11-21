@@ -6,9 +6,11 @@
  * class-ready bridge are the gates that actually mount. They fire these two
  * names, with teacher_id and classroom_id, so the funnel can be measured.
  *
- * Client-only. Never throws.
+ * Client gate. The completed step also beacons the server funnel route so a
+ * network that blocks PostHog still records onboarding_completed. Never throws.
  */
 import { safeCapture } from './telemetryCore';
+import { beaconTeacherFunnelStep } from './teacherFunnelStepBeacon';
 
 export const TEACHER_ONBOARDING_GATE_EVENTS = {
   opened: 'teacher_onboarding_opened',
@@ -77,6 +79,7 @@ export function captureTeacherOnboardingOpened(props: TeacherOnboardingGateProps
 export function captureTeacherOnboardingCompleted(props: TeacherOnboardingGateProps): boolean {
   if (storageGet(completedKey(props.teacherId))) return false;
   safeCapture(TEACHER_ONBOARDING_GATE_EVENTS.completed, payload(props));
+  beaconTeacherFunnelStep('onboarding_completed');
   storageSet(completedKey(props.teacherId));
   return true;
 }

@@ -4,6 +4,8 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { sendEmail } from '@/lib/email/send';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
 import { approvalTrialExpiry } from '@/lib/education/trial';
+import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer';
 
 export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
@@ -47,6 +49,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
     if (r.error) return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
     if (!r.data?.length) {
       return NextResponse.json({ ok: false, error: 'profile not promoted' }, { status: 500 });
+    }
+    if (row.status !== 'approved') {
+      emitTeacherFunnelStep({
+        teacherId: row.user_id,
+        step: 'teacher_approved',
+        isTestAccount: isQaEmail(row.email),
+        locale: row.locale,
+      });
     }
   } else {
     const r = await sb.from('teacher_access_allowlist').insert({
