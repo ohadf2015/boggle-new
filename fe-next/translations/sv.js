@@ -1309,7 +1309,7 @@ const sv = {
         "emptyTitle": "Inget att repetera",
         "emptyBody": "Spela ett klasspel eller en lektion, så dyker orden du missar upp här för en returmatch.",
         "introTitle": "{count} ord vill ha returmatch",
-        "introBody": "10 snabba kort. Håll sviten vid liv och öppna kistan.",
+        "introBody": "{n} snabba kort, sedan öppnar du kistan.",
         "start": "Starta",
         "score": "{correct} / {total}",
         "bestStreak": "Bästa svit {streak} · {points} p",
@@ -1482,7 +1482,14 @@ const sv = {
       "awardsAllMaxed": "Alla utmärkelser maxade!",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "Klara: {done}/{total}",
-      "lessonsRegion": "Dina lektioner"
+      "lessonsRegion": "Dina lektioner",
+      "awardNew": "Ny!",
+      "awardsShowMore": "Fler utmärkelser att vinna: {count}",
+      "awardsHideMore": "Dölj resten",
+      "profileFirstTitle": "Din första lektion startar din nivå",
+      "profileFirstBody": "Spela en runda så dyker din XP, dina ord och dina utmärkelser upp här.",
+      "profileNextAward": "Närmaste utmärkelse: {name}. {how}",
+      "profileNoAwardsYet": "Vinn din första utmärkelse genom att slutföra en lektion."
     }
   },
   // @academy:end
@@ -15096,7 +15103,8 @@ const sv = {
       "strugglingOne": "{{names}} kämpar",
       "struggling": "{{count}} kämpar: {{names}}",
       "regionLabel": "Klasstatus för {{classroom}}",
-      "switcherLabel": "Vilken klass"
+      "switcherLabel": "Vilken klass",
+      "classAccuracy": "klassens träffsäkerhet {{accuracy}}%"
     },
     "activation": {
       "shareTitle": "Eleverna går med via den här länken",
@@ -15786,7 +15794,9 @@ const sv = {
         "personalHint": "Varje elev ser bara sin egen XP och placering.",
         "off": "Av",
         "offHint": "Ingen topplista. XP, nivåer och märken räknas ändå."
-      }
+      },
+      "tapToCopy": "Tryck för att kopiera",
+      "codeCopiedShort": "Kopierad"
     },
     "classrooms": {
       "students": {
@@ -16124,7 +16134,8 @@ const sv = {
         "openClass": "Öppna klassrapporten",
         "startFirstGame": "Starta ditt första spel",
         "exampleWords": "åska,bris,frost,moln",
-        "exampleNames": "Maja,Leo"
+        "exampleNames": "Maja,Leo",
+        "singleStudent": "Bara en elev har spelat hittills, så det här är hens missar."
       },
       "arc": {
         "title": "Inlärningsbåge",
@@ -16387,6 +16398,9 @@ const sv = {
         "errorUngraded": "Den här Classroom-uppgiften har inga poäng och kan därför inte betygsättas.",
         "errorNotPro": "Att skicka betyg till Google Classroom ingår i Teacher Pro.",
         "errorGeneric": "Något gick fel i kontakten med Google Classroom. Försök igen."
+      },
+      "picker": {
+        "showing": "Visas ovan"
       }
     },
     "curriculum": {
@@ -17429,7 +17443,8 @@ const sv = {
       "toNext": "{{percent}}% till {{tier}}",
       "unlocked": "Upplåst!",
       "unpin": "Avfäst",
-      "upgraded": "Medalj uppgraderad till {{tier}}!"
+      "upgraded": "Medalj uppgraderad till {{tier}}!",
+      "pinInvite": "Fäst upp till {{max}} favoriter"
     },
     "mastery": {
       "flashcardPerfect": "Perfekt, du behärskar alla {{count}} ord!",
@@ -18391,7 +18406,8 @@ const sv = {
           "stepOf": "Steg {{current}} av {{total}}",
           "successGame": "Tar dig in i spelet…",
           "yourClass": "Din klass",
-          "findingAssignment": "Letar upp din uppgift…"
+          "findingAssignment": "Letar upp din uppgift…",
+          "retypeCode": "Skriv koden igen"
         },
         "heroLine": "Fråga din lärare om klasskoden",
         "preparing": "Gör i ordning – ett ögonblick.",
@@ -22933,7 +22949,8 @@ const sv = {
         "sticker": "Dina ord · {count}",
         "needMore": "Lägg till {count} till för att använda dina egna ord.",
         "dropped": "Utelämnade: {count}. Bara enstaka ord på klassens språk räknas."
-      }
+      },
+      "codePending": "Din kod dyker upp när du skapar klassen"
     },
     "host": {
       "roundGroup": "Omgång",

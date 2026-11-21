@@ -1309,7 +1309,7 @@ const he = {
         "emptyTitle": "אין על מה לחזור",
         "emptyBody": "שחקו משחק כיתתי או שיעור, והמילים שתפספסו יחכו כאן לרוונש.",
         "introTitle": "מילים שרוצות רוונש: {count}",
-        "introBody": "10 כרטיסים מהירים. שמרו על הרצף ופתחו את התיבה.",
+        "introBody": "{n} כרטיסים מהירים, ואז פותחים את התיבה.",
         "start": "התחילו",
         "score": "{correct} / {total}",
         "bestStreak": "רצף שיא {streak} · {points} נק׳",
@@ -1482,7 +1482,14 @@ const he = {
       "awardsAllMaxed": "כל ההישגים בדרגה המקסימלית!",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "הושלמו: {done}/{total}",
-      "lessonsRegion": "השיעורים שלכם"
+      "lessonsRegion": "השיעורים שלכם",
+      "awardNew": "חדש!",
+      "awardsShowMore": "עוד פרסים לזכות בהם: {count}",
+      "awardsHideMore": "הסתירו את השאר",
+      "profileFirstTitle": "השיעור הראשון מתחיל את הרמה שלך",
+      "profileFirstBody": "שחקו סיבוב אחד וה-XP, המילים והפרסים שלכם יופיעו כאן.",
+      "profileNextAward": "הפרס הכי קרוב: {name}. {how}",
+      "profileNoAwardsYet": "סיימו שיעור כדי לזכות בפרס הראשון."
     }
   },
   // @academy:end
@@ -14671,7 +14678,8 @@ const he = {
       "strugglingOne": "{{names}} מתקשה",
       "struggling": "{{count}} מתקשים: {{names}}",
       "regionLabel": "מצב הכיתה {{classroom}}",
-      "switcherLabel": "איזו כיתה"
+      "switcherLabel": "איזו כיתה",
+      "classAccuracy": "דיוק הכיתה {{accuracy}}%"
     },
     "activation": {
       "shareTitle": "התלמידים מצטרפים עם הקישור הזה",
@@ -15361,7 +15369,9 @@ const he = {
         "personalHint": "כל תלמיד רואה רק את ה-XP והמקום שלו.",
         "off": "כבוי",
         "offHint": "בלי דירוג. XP, רמות ותגים עדיין נספרים."
-      }
+      },
+      "tapToCopy": "הקישו להעתקה",
+      "codeCopiedShort": "הועתק"
     },
     "classrooms": {
       "students": {
@@ -15699,7 +15709,8 @@ const he = {
         "openClass": "לדוח הכיתה",
         "startFirstGame": "להתחיל את המשחק הראשון",
         "exampleWords": "רעם,בריזה,כפור,ענן",
-        "exampleNames": "מאיה,נועם"
+        "exampleNames": "מאיה,נועם",
+        "singleStudent": "עד כה שיחק תלמיד אחד בלבד, ולכן אלה המילים שפוספסו."
       },
       "arc": {
         "title": "קשת הלמידה",
@@ -15962,6 +15973,9 @@ const he = {
         "errorUngraded": "למטלה הזו ב-Classroom אין ניקוד, ולכן אי אפשר לתת בה ציון.",
         "errorNotPro": "שליחת ציונים ל-Google Classroom היא חלק מפרו למורים.",
         "errorGeneric": "משהו השתבש בתקשורת עם Google Classroom. נסו שוב."
+      },
+      "picker": {
+        "showing": "מוצגת למעלה"
       }
     },
     "curriculum": {
@@ -17004,7 +17018,8 @@ const he = {
       "toNext": "{{percent}}% ל{{tier}}",
       "unlocked": "נפתח!",
       "unpin": "שחררו",
-      "upgraded": "התג שודרג לדרגת {{tier}}!"
+      "upgraded": "התג שודרג לדרגת {{tier}}!",
+      "pinInvite": "נעצו עד {{max}} מועדפים"
     },
     "mastery": {
       "flashcardPerfect": "מושלם, שלטתם בכל {{count}} המילים!",
@@ -17965,7 +17980,8 @@ const he = {
           "stepOf": "שלב {{current}} מתוך {{total}}",
           "successGame": "נכנסים למשחק…",
           "yourClass": "הכיתה שלך",
-          "findingAssignment": "מחפשים את המטלה…"
+          "findingAssignment": "מחפשים את המטלה…",
+          "retypeCode": "להקליד את הקוד מחדש"
         },
         "heroLine": "בקשו מהמורה את קוד הכיתה",
         "preparing": "רגע, מתכוננים…",
@@ -22894,7 +22910,8 @@ const he = {
         "sticker": "המילים שלכם · {count}",
         "needMore": "הוסיפו עוד {count} כדי להשתמש במילים שלכם.",
         "dropped": "לא נכללו: {count}. נחשבות רק מילים בודדות בשפת הכיתה."
-      }
+      },
+      "codePending": "הקוד שלכם יופיע ברגע שתיצרו את הכיתה"
     },
     "host": {
       "roundGroup": "סבב",

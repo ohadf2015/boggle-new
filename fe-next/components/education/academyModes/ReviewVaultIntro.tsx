@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { claimIntroEntrance } from '@/lib/education/introEntrance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
 import { REVIEW_MASCOT_ART } from '@/lib/education/academyReactions';
+import { REVIEW_RUN_SIZE } from '@/lib/education/missedWordsReview';
 import { cn } from '@/lib/utils';
 import { ACADEMY_ART } from './AcademyChrome';
 import { INTRO_COPY, INTRO_CTA, INTRO_HERO, INTRO_KICKER, INTRO_LAYOUT, INTRO_TITLE } from './introLayout';
@@ -168,7 +169,7 @@ export function ReviewVaultIntro({
           {loading ? t('common.loading', 'Loading…') : t('academy.modes.review.vaultTitle', '{count} words locked in the vault', { count: words.length })}
         </h2>
         <p className="mb-3 font-neo-body text-sm text-neo-cream sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:mb-[clamp(1rem,3.5vh,2rem)] lg:text-[clamp(1rem,min(1.6vw,2.6vh),1.75rem)]">
-          {t('academy.modes.review.introBody', '10 quick cards. Keep the streak alive, open the chest.')}
+          {t('academy.modes.review.introBody', '{n} quick cards, then open the chest.', { n: REVIEW_RUN_SIZE })}
         </p>
         <m.button
           type="button"
