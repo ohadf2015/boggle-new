@@ -143,6 +143,10 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     expect(res.status).toBe(200)
     const events = capture.mock.calls.map((c) => c[0].event)
     expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated', 'trial_start', 'teacher_trial_started', 'trial_started', 'teacher_funnel_step', 'growth:teacher_funnel_step'])
+    expect(capture.mock.calls.find((c) => c[0].event === 'teacher_funnel_step')?.[0]).toMatchObject({
+      distinctId: 'u1',
+      properties: { step: 'trial_started', step_index: 6 },
+    })
     expect(capture.mock.calls[0][0].properties.subscription_id).toBe('sub_1')
     expect(capture.mock.calls[0][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
     expect(capture.mock.calls[1][0].properties.$host).toBe(EDU_ANALYTICS_HOST)
