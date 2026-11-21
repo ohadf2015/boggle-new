@@ -23,6 +23,8 @@ describe('EducationIntentCta', () => {
     render(<EducationIntentCta locale="en" variant="teachers" />);
     const hrefs = screen.getAllByRole('link').map((a) => a.getAttribute('href') || '');
     expect(hrefs).toContain('/en/education');
+    expect(hrefs).toContain('/en/education/esl-word-games');
+    expect(hrefs).toContain('/en/education/vocabulary-games-classroom');
     expect(hrefs.some((h) => h.includes('/en/education/'))).toBe(true);
   });
 });

@@ -102,14 +102,14 @@ export type EducationLocale = (typeof EDUCATION_LOCALES)[number];
 
 const CONTENT: Record<EducationLocale, LocaleContent> = {
   en: {
-    metaTitle: 'Free Classroom Vocabulary Games — Live Multiplayer, 6 Languages | LexiClash',
+    metaTitle: 'Vocabulary Games Online Free for Classrooms | LexiClash',
     metaDescription:
-      'Free vocabulary games for the classroom. Live whole-class multiplayer, 1v1 vocabulary duels, and custom curriculum word lists. Supports 6 languages including Hebrew and Russian. Runs in any browser. Free to start.',
-    ogTitle: 'Free Vocabulary Games for Classrooms',
+      'Vocabulary games online free. Run a live multiplayer round on your own word lists, or a 1v1 duel. Six languages, any browser, students never create an account.',
+    ogTitle: 'Vocabulary Games Online Free',
     ogDescription:
-      'Live multiplayer vocabulary games for teachers. Whole-class challenges, 1v1 duels, custom word lists, 6 languages. Student accounts always free.',
+      'Vocabulary games online free for classrooms. Live multiplayer on your word lists, or a 1v1 duel. No student account.',
     twitterDescription:
-      'The classroom vocabulary game teachers actually use. Live multiplayer, 1v1 duels, your word lists, six languages — student accounts are always free.',
+      'Vocabulary games online free for classrooms. Live multiplayer, your word lists, six languages — no student account.',
     heroTag: '★ For Teachers ★ Free to Start ★',
     heroH1: {
       line1: 'Free',

@@ -14646,7 +14646,7 @@ const en = {
     "intentCta": {
       "forTeachers": "For teachers / learn English",
       "eslBody": "Running a class, or learning English by playing? Open the ESL word-games page: teacher-led rounds, six dictionaries, no student accounts.",
-      "eslLink": "ESL word games for the classroom",
+      "eslLink": "Vocabulary games for the classroom",
       "teachersBody": "Teachers and English learners: free classroom games, topic lists, and a whole-class board you run from the projector.",
       "hubLink": "Education hub",
       "elementaryLink": "English games for elementary"

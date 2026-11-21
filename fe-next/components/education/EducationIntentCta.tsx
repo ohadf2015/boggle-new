@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { educationPageLabel } from '@/lib/seo/educationPageLinks';
 
 type Variant = 'esl' | 'teachers';
 
@@ -13,6 +14,7 @@ export function EducationIntentCta({ locale, variant }: { locale: string; varian
   const { t } = useLanguage();
   const hub = `/${locale}/education`;
   const esl = `/${locale}/education/esl-word-games`;
+  const vocab = `/${locale}/education/vocabulary-games-classroom`;
   const elementary = `/${locale}/education/english-games-elementary`;
 
   if (variant === 'esl') {
@@ -51,6 +53,18 @@ export function EducationIntentCta({ locale, variant }: { locale: string; varian
           className="font-bold text-neo-lime underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
         >
           {t('education.intentCta.elementaryLink')}
+        </Link>
+        <Link
+          href={esl}
+          className="font-bold text-neo-yellow underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        >
+          {t('education.intentCta.eslLink')}
+        </Link>
+        <Link
+          href={vocab}
+          className="font-bold text-neo-pink underline underline-offset-2 hover:text-neo-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+        >
+          {educationPageLabel('vocabulary-games-classroom', locale)}
         </Link>
       </div>
     </section>

@@ -38,8 +38,8 @@ describe('vocabulary-games-classroom page', () => {
   describe('English locale rendering', () => {
     it('renders English metadata and content when locale=en', async () => {
       const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
-      expect(meta.title).toContain('Free Classroom Vocabulary Games');
-      expect(meta.description).toContain('Free vocabulary games for the classroom');
+      expect(meta.title).toContain('Vocabulary Games Online Free');
+      expect(meta.description).toContain('Vocabulary games online free');
     });
   });
 

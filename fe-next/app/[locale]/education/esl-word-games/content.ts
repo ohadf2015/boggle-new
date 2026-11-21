@@ -88,7 +88,7 @@ const content: Record<EducationLocale, LocaleContent> = {
     twitterDescription: 'Free ESL/EFL word games for the classroom. Live multiplayer, 6 languages, teacher dashboard.',
     heroTag: '★ ESL / EFL ★ Free To Start ★',
     heroH1: {
-      highlight: 'ESL Word Games',
+      highlight: 'Vocabulary Games',
       rest1: 'for the',
       rest2: 'Classroom.',
     },
