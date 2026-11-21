@@ -1,3 +1,5 @@
+import { resolveDisplayName } from '@/lib/displayName';
+
 interface NameProfile {
   display_name?: string | null;
   username?: string | null;
@@ -13,5 +15,5 @@ export function dailySubmitName({
   chosenGuestName: string | null;
   fallback: string;
 }): string {
-  return profile?.display_name || profile?.username || chosenGuestName || fallback;
+  return resolveDisplayName([profile?.display_name, profile?.username, chosenGuestName], fallback);
 }

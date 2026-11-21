@@ -26,7 +26,9 @@ export function isPlaceholderName(name: string | null | undefined): boolean {
   const trimmed = name.trim();
   if (trimmed === '') return true;
   // Player_<hex>, Player-XXXX, Guest_1234, or bare "Guest".
-  return /^(player[_-]|guest($|[_-]))/i.test(trimmed);
+  if (/^(player[_-]|guest($|[_-]))/i.test(trimmed)) return true;
+  // Signup copies the email prefix into display_name; relay addresses make that an id.
+  return /^[0-9a-f-]{12,}$/i.test(trimmed) && /\d/.test(trimmed);
 }
 
 /**

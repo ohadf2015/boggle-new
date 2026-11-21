@@ -21,6 +21,18 @@ describe('isPlaceholderName', () => {
     expect(isPlaceholderName('Guestavo')).toBe(false);
     expect(isPlaceholderName('Maya')).toBe(false);
   });
+
+  it('treats a machine id (email relay prefix, uuid, long digit run) as placeholder', () => {
+    expect(isPlaceholderName('ead1596a19eb4b79')).toBe(true);
+    expect(isPlaceholderName('44a8bb33-6ff2-4aa2-8180-8f6fad66815b')).toBe(true);
+    expect(isPlaceholderName('972541234567')).toBe(true);
+  });
+
+  it('keeps short or letter-only hex-looking names as real', () => {
+    expect(isPlaceholderName('cafe1234')).toBe(false);
+    expect(isPlaceholderName('deadbeefcafe')).toBe(false);
+    expect(isPlaceholderName('dana1990')).toBe(false);
+  });
 });
 
 describe('resolveDisplayName', () => {

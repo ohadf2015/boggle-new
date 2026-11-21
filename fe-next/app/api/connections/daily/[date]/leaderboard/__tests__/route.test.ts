@@ -126,4 +126,19 @@ describe('GET /api/connections/daily/[date]/leaderboard', () => {
     expect(json.leaderboard).toHaveLength(1);
     expect(db.calls.some((c) => c[0] === 'connections_daily_scores' && c.some((x) => x.startsWith('in:player_id')))).toBe(false);
   });
+
+  it('never shows a machine id or placeholder as a name: a stable readable name stands in', async () => {
+    db.top = [
+      { rank_position: 1, display_name: 'ead1596a19eb4b79', score: 9, time_taken_seconds: 1, created_at: 'x', language: 'ja' },
+      { rank_position: 2, display_name: 'Player_44a8bb33', score: 8, time_taken_seconds: 1, created_at: 'y', language: 'ja' },
+      { rank_position: 3, display_name: 'Maya', score: 7, time_taken_seconds: 1, created_at: 'z', language: 'ja' },
+    ];
+    const names = (await (await get('2026-09-08')).json()).leaderboard.map((r: Row) => r.display_name);
+    const again = (await (await get('2026-09-08')).json()).leaderboard.map((r: Row) => r.display_name);
+    expect(names[0]).not.toBe('ead1596a19eb4b79');
+    expect(names[1]).not.toMatch(/^Player_/);
+    expect(names[2]).toBe('Maya');
+    expect(new Set(names).size).toBe(3);
+    expect(again).toEqual(names);
+  });
 });

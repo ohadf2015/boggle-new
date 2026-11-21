@@ -7,6 +7,8 @@ import { captureApiError } from '@/utils/sentry';
 import { pyramidLocalesOn } from '@/lib/connections/daily';
 import { scopeDailyBoard } from '@/lib/connections/dailyBoard';
 import { fetchTestAccountIds } from '@/lib/leaderboard/testAccountIds';
+import { isPlaceholderName } from '@/lib/displayName';
+import { friendlyPlayerName } from '@/lib/friendlyPlayerName';
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const QA_HEADROOM = 20;
@@ -75,10 +77,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     ]);
     if (error) throw error;
     // The view ranks every row of the date (pyramid runs and QA included), so renumber.
-    const leaderboard = ((top ?? []) as Array<Record<string, unknown> & RankKey>)
+    const kept = ((top ?? []) as Array<Record<string, unknown> & RankKey>)
       .filter((row) => !qaRows.some((qa) => sameRow(qa, row)))
-      .slice(0, limit)
-      .map(({ created_at: _createdAt, ...row }, i) => ({ ...row, rank_position: i + 1 }));
+      .slice(0, limit);
+    const taken = new Set(kept.map((r) => r.display_name as string).filter((n) => !isPlaceholderName(n)));
+    const leaderboard = kept.map(({ created_at: createdAt, ...row }, i) => ({
+      ...row,
+      display_name: isPlaceholderName(row.display_name as string)
+        ? friendlyPlayerName(`${row.display_name ?? ''}|${createdAt}`, (row.language as string) || 'en', taken)
+        : row.display_name,
+      rank_position: i + 1,
+    }));
     const totalPlayers = Math.max(0, (totalCount ?? 0) - qaRows.length);
 
     const guestId = user ? null : readGuestId(request);
