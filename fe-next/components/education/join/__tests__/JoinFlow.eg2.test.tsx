@@ -26,6 +26,8 @@ vi.mock('@/lib/education/telemetry', () => ({ trackEduClassroomJoin: vi.fn(), tr
 vi.mock('react-hot-toast', () => ({ default: mockToast }));
 vi.mock('../joinTarget', () => ({ resolveJoinTarget: mockResolve }));
 
+// The sixth-character beat has its own test (JoinFlow.codeBeat); these assert the step logic.
+vi.mock('@/lib/education/motion/useEduReducedMotion', () => ({ useEduReducedMotion: () => true }));
 import JoinFlow from '../JoinFlow';
 
 const codeField = () => screen.getByLabelText('education.student.join.codeLabel');

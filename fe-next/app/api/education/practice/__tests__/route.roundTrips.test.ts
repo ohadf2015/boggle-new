@@ -5,7 +5,8 @@ import { vi } from 'vitest';
  * A student finishing a practice session is the most frequent write in the
  * education module and the moment they are staring at a spinner on a school
  * Chromebook. Every awaited Supabase hop is a serial network round trip on
- * district Wi-Fi, so the handler has a budget: at most 4 sequential waves.
+ * district Wi-Fi, so the handler has a budget: at most 4 sequential waves, plus a
+ * fifth for award and streak writes, which must wait until the XP RPC has committed.
  *
  * "Wave" = a group of operations issued before any earlier operation has
  * resolved. Operations inside one wave travel concurrently, so they cost one
@@ -46,12 +47,12 @@ vi.mock('@/utils/logger', () => ({
 vi.mock('@/backend/modules/educationXpManager', () => ({
   calculatePracticeXp: vi.fn(() => ({ totalXp: 120, breakdown: {}, masteryMessage: 'Great!' })),
 }));
-vi.mock('@/lib/supabase/education/challengeProgress', () => ({
-  updateEducationChallengeProgress: vi.fn().mockResolvedValue({ updated: 0 }),
-}));
 vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));
+
+let adminClient: unknown = null;
+vi.mock('@/utils/supabase/admin', () => ({ createAdminClient: () => adminClient }));
 
 vi.mock('@/lib/education/practiceXpLimits', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/education/practiceXpLimits')>()),
@@ -119,7 +120,7 @@ function createHarness(overrides: { existing?: Record<string, unknown> } = {}) {
     ...(overrides.existing ?? {}),
   };
 
-  function makeBuilder<T>(label: string, value: T) {
+  function makeBuilder<T>(label: string, value: T, listValue: unknown = value) {
     const self: Record<string, unknown> = {
       select: () => self,
       eq: () => self,
@@ -127,9 +128,10 @@ function createHarness(overrides: { existing?: Record<string, unknown> } = {}) {
       in: () => self,
       order: () => self,
       limit: () => self,
+      abortSignal: () => self,
       single: () => track(`${label}:single`, value),
     };
-    const thenable = track(label, value);
+    const thenable = track(label, listValue);
     self.then = thenable.then;
     self.catch = thenable.catch;
     self.finally = thenable.finally;
@@ -140,9 +142,10 @@ function createHarness(overrides: { existing?: Record<string, unknown> } = {}) {
     select: () => {
       const data =
         table === 'student_lesson_progress'
-          ? { current_streak: 3 }
+          ? { current_streak: 3, longest_streak: 3, last_practice_date: new Date().toISOString().slice(0, 10) }
           : existingRow;
-      return makeBuilder(`${table}.select`, { data, error: null });
+      const list = { student_lesson_progress: [], student_achievements: [], achievement_definitions: [{ id: 'def-first', key: 'first_lesson' }] }[table];
+      return makeBuilder(`${table}.select`, { data, error: null }, { data: list ?? data, error: null });
     },
     update: (payload: Record<string, unknown>) => {
       updateCalls.push({ table, payload });
@@ -209,6 +212,26 @@ describe('PATCH /api/education/practice — round-trip budget', () => {
     await PATCH(completionRequest());
 
     expect(harness.waves()).toBeLessThanOrEqual(4);
+  });
+
+  it('a completion that grants an award reads before the XP RPC, writes after it, and fits in 5 round trips', async () => {
+    const harness = createHarness();
+    adminClient = harness.client;
+    (createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(harness.client);
+    try {
+      await PATCH(completionRequest());
+    } finally {
+      adminClient = null;
+    }
+    const wave = (label: string) => harness.ops.find(o => o.label === label)?.wave;
+    const rpcWave = wave('rpc.award_education_xp')!;
+    const awardRead = harness.ops.filter(o => o.label === 'student_achievements.select');
+    const awardWrite = harness.ops.filter(o => o.label === 'student_achievements.upsert');
+    expect(awardRead.length).toBeGreaterThan(0);
+    expect(awardWrite.length).toBeGreaterThan(0);
+    expect(Math.max(...awardRead.map(o => o.wave))).toBeLessThan(rpcWave);
+    expect(Math.min(...awardWrite.map(o => o.wave))).toBeGreaterThan(rpcWave);
+    expect(harness.waves()).toBeLessThanOrEqual(5);
   });
 
   it('writes the practice session exactly once (xp_awarded merged into the completion write)', async () => {

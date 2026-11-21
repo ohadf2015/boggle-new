@@ -2,6 +2,7 @@
 
 import { BadgeCheck, ChevronRight, Copy, Play, User } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { BidiText } from '@/components/teacher/classroom/BidiText';
 import { cn } from '@/lib/utils';
 import type { LibraryItem } from '@/lib/education/libraryTypes';
 import { countKey } from '@/lib/education/library';
@@ -95,8 +96,8 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
       )}
     >
       <span aria-hidden="true" data-testid="list-card-accent" className={cn(LIST_CARD_ACCENT, ARCADE_BLOCK[accent])} />
-      <span dir="auto" title={item.name} className="line-clamp-2 font-neo-display text-lg font-bold leading-tight text-neo-white">
-        {item.name}
+      <span title={item.name} className="line-clamp-2 font-neo-display text-lg font-bold leading-tight text-neo-white">
+        <BidiText>{item.name}</BidiText>
       </span>
       <span data-testid="library-card-fact" className="truncate text-sm font-semibold text-neo-cream/80" dir="auto">
         {t('eduLibrary.card.words', { count: item.wordCount })}

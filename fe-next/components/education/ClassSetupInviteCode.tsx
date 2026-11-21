@@ -1,8 +1,8 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, GraduationCap, Link2, MessageCircle, Share2, type LucideIcon } from 'lucide-react';
+import { Check, Copy, GraduationCap, Link2, MessageCircle, Share2, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { buildGoogleClassroomShareUrl } from '@/lib/education/googleClassroomShare';
 import { pressClasses } from '@/components/education/motion';
@@ -17,7 +17,8 @@ export interface ClassSetupInviteCodeProps {
   /** Empty until the browser origin is known: the QR and links wait rather than guess. */
   joinUrl: string;
   displayHost: string;
-  onShare: (channel: InviteChannel, payload: { url: string; text: string }) => void;
+  /** Resolves true once the link really reached the clipboard or the share sheet. */
+  onShare: (channel: InviteChannel, payload: { url: string; text: string }) => void | boolean | Promise<void | boolean>;
   t: T;
 }
 
@@ -60,6 +61,27 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
   const text = t('teacher.classroom.shareInviteText', { name: className, code });
   const google = joinUrl ? googleHref(joinUrl, className, t) : null;
   const payload = { url: joinUrl, text };
+  const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+  }, []);
+  const copy = async () => {
+    const ok = await onShare('copy', payload);
+    if (ok !== true) return;
+    setCopied(true);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setCopied(false), 2000);
+  };
+  const codeText = (
+    <span
+      data-testid="setup-join-code"
+      dir="ltr"
+      className="whitespace-nowrap font-neo-display font-black leading-none tracking-[0.04em] tabular-nums text-neo-black [font-size:clamp(2rem,17cqi,5.5rem)] lg:[font-size:clamp(2rem,17cqi,8rem)]"
+    >
+      {code}
+    </span>
+  );
 
   return (
     <div
@@ -69,13 +91,19 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-start sm:gap-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-5 lg:py-2 lg:text-center">
         <div className="@container flex w-full min-w-0 flex-col gap-1 lg:items-center">
           <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">{t('eduShell.setup.joinCode')}</span>
-          <span
-            data-testid="setup-join-code"
-            dir="ltr"
-            className="whitespace-nowrap font-neo-display font-black leading-none tracking-[0.04em] tabular-nums text-neo-black [font-size:clamp(2rem,17cqi,5.5rem)] lg:[font-size:clamp(2rem,17cqi,8rem)]"
-          >
-            {code}
-          </span>
+          {joinUrl ? (
+            <button
+              type="button"
+              data-testid="setup-code-copy"
+              onClick={() => void copy()}
+              aria-label={t('eduShell.setup.copyLink')}
+              className={cn('min-h-11 self-start rounded-neo px-1 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-black lg:self-center', pressClasses(2))}
+            >
+              {codeText}
+            </button>
+          ) : (
+            codeText
+          )}
           {displayHost ? (
             <span dir="ltr" className="mt-1 inline-flex min-w-0 items-center gap-1 font-neo-body text-xs font-bold text-neo-black/80 min-[400px]:text-sm">
               <Link2 className="size-4 shrink-0" aria-hidden="true" />
@@ -107,8 +135,8 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
 
       {joinUrl ? (
         <div data-testid="setup-share-row" className="grid grid-cols-4 gap-2 border-t-2 border-dashed border-neo-black/25 pt-3">
-          <button type="button" data-testid="setup-copy-link" onClick={() => onShare('copy', payload)} className={CHIP.copy}>
-            <ChipBody icon={Copy} label={t('eduShell.setup.copyLink')} />
+          <button type="button" data-testid="setup-copy-link" onClick={() => void copy()} className={CHIP.copy}>
+            <ChipBody icon={copied ? Check : Copy} label={t(copied ? 'eduShell.setup.copied' : 'eduShell.setup.copyLink')} />
           </button>
           <a
             data-testid="setup-share-whatsapp"

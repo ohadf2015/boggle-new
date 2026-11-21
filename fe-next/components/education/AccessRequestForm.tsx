@@ -1,7 +1,7 @@
 'use client';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
@@ -182,6 +182,9 @@ export function AccessRequestForm({
           rows={3}
           value={useCase}
           onChange={(e) => setUseCase(e.target.value)}
+          aria-describedby={error ? 'tar-error' : undefined}
+          aria-invalid={error ? true : undefined}
+          readOnly={submitting}
           placeholder={t('education.access.use_case_placeholder')}
           className="mt-2 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white placeholder:text-neo-white/50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         />
@@ -221,11 +224,12 @@ export function AccessRequestForm({
       </fieldset>
 
       {error && (
-        <p role="alert" aria-live="polite" className="mt-4 font-semibold text-neo-red">
+        <p id="tar-error" role="alert" aria-live="polite" className="mt-4 font-semibold text-neo-red">
           {error}
         </p>
       )}
-      <button type="submit" disabled={submitting || !useCaseOk} className={`mt-6 ${PRIMARY_CTA_CLASS}`}>
+      <button type="submit" disabled={submitting || !useCaseOk} aria-busy={submitting || undefined} className={`mt-6 ${PRIMARY_CTA_CLASS}`}>
+        {submitting && <Loader2 className="size-5 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />}
         {submitting
           ? t('education.access.class_ready_creating')
           : t('education.trial.cta')}

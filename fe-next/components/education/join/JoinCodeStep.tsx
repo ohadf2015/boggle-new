@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { JoinCodeField } from './JoinCodeField';
 import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
@@ -11,6 +12,8 @@ import { JoinWrongCodeHelp } from './JoinWrongCodeHelp';
 import type { JoinFlowState } from './joinFlowState';
 
 const K = 'education.student.join';
+/** Six tiles at 45ms apart plus the last pop's first frames. */
+const WAVE_MS = 300;
 
 interface JoinCodeStepProps {
   flow: JoinFlowState;
@@ -24,6 +27,35 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
   const nextRef = useRef<HTMLButtonElement>(null);
   useKeepInView(formRef, nextRef);
   const [stripped, setStripped] = useState(false);
+  const reduced = useEduReducedMotion();
+  const [waving, setWaving] = useState(false);
+  const waveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const cancelWave = () => {
+    if (waveTimer.current) clearTimeout(waveTimer.current);
+    waveTimer.current = null;
+    setWaving(false);
+  };
+  useEffect(() => () => {
+    if (waveTimer.current) clearTimeout(waveTimer.current);
+  }, []);
+  // An edit during the beat withdraws it: the code on screen is no longer the one accepted.
+  useEffect(() => {
+    if (waveTimer.current && flow.code.length < 6) cancelWave();
+  }, [flow.code]);
+  const completeCode = (next: string) => {
+    if (reduced) return flow.advance(next);
+    if (waveTimer.current) return;
+    setWaving(true);
+    waveTimer.current = setTimeout(() => {
+      waveTimer.current = null;
+      setWaving(false);
+      flow.advance(next);
+    }, WAVE_MS);
+  };
+  const retype = () => {
+    flow.setCode('');
+    formRef.current?.querySelector<HTMLInputElement>('[data-testid="join-code-input"]')?.focus();
+  };
   const refused = !!flow.codeErrorKey || flow.codeRejected;
   const wrongCode = flow.codeErrorKey ? flow.codeErrorKey === `${K}.invalidCode` : flow.codeRejected;
 
@@ -50,7 +82,8 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
         <JoinCodeField
           value={flow.code}
           onChange={flow.setCode}
-          onComplete={(next) => flow.advance(next)}
+          onComplete={completeCode}
+          wave={waving}
           onPaste={onPaste}
           onOverflow={flow.refuseTooLong}
           onStripped={setStripped}
@@ -82,7 +115,15 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
           )}
         </div>
 
-        {!wrongCode && <JoinPrimaryButton ref={nextRef}>{t(`${K}.flow.next`)}</JoinPrimaryButton>}
+        {wrongCode ? (
+          <JoinPrimaryButton type="button" onClick={retype}>
+            {t(`${K}.flow.retypeCode`)}
+          </JoinPrimaryButton>
+        ) : (
+          <JoinPrimaryButton ref={nextRef} disabled={waving} aria-busy={waving || undefined}>
+            {t(`${K}.flow.next`)}
+          </JoinPrimaryButton>
+        )}
 
         <details className="group/where rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light/80">
           <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-neo px-3 py-2 font-neo-body text-sm font-bold text-neo-cyan focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-neo-cyan lg:text-base [&::-webkit-details-marker]:hidden">

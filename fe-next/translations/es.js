@@ -1309,7 +1309,7 @@ const es = {
         "emptyTitle": "Nada que repasar",
         "emptyBody": "Juega una partida de clase o una lección, y las palabras que falles aparecerán aquí para la revancha.",
         "introTitle": "Palabras que quieren revancha: {count}",
-        "introBody": "10 tarjetas rápidas. Mantén la racha y abre el cofre.",
+        "introBody": "{n} tarjetas rápidas y luego abres el cofre.",
         "start": "Empezar",
         "score": "{correct} / {total}",
         "bestStreak": "Mejor racha {streak} · {points} pts",
@@ -1482,7 +1482,14 @@ const es = {
       "awardsAllMaxed": "¡Todos tus logros al máximo!",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "Hechas: {done}/{total}",
-      "lessonsRegion": "Tus lecciones"
+      "lessonsRegion": "Tus lecciones",
+      "awardNew": "¡Nuevo!",
+      "awardsShowMore": "Más premios por ganar: {count}",
+      "awardsHideMore": "Ocultar el resto",
+      "profileFirstTitle": "Tu primera lección pone en marcha tu nivel",
+      "profileFirstBody": "Juega una ronda y tu XP, tus palabras y tus premios aparecerán aquí.",
+      "profileNextAward": "Premio más cercano: {name}. {how}",
+      "profileNoAwardsYet": "Gana tu primer premio terminando una lección."
     }
   },
   // @academy:end
@@ -14733,7 +14740,8 @@ const es = {
       "strugglingOne": "{{names}} tiene dificultades",
       "struggling": "{{count}} con dificultades: {{names}}",
       "regionLabel": "Estado de la clase {{classroom}}",
-      "switcherLabel": "Qué clase"
+      "switcherLabel": "Qué clase",
+      "classAccuracy": "{{accuracy}} % de acierto de la clase"
     },
     "activation": {
       "shareTitle": "El alumnado entra con este enlace",
@@ -15403,7 +15411,9 @@ const es = {
         "personalHint": "Cada alumno ve solo su XP y su puesto.",
         "off": "Desactivada",
         "offHint": "Sin clasificación. La XP, los niveles y las insignias siguen contando."
-      }
+      },
+      "tapToCopy": "Toca para copiar",
+      "codeCopiedShort": "Copiado"
     },
     "classrooms": {
       "students": {
@@ -15589,7 +15599,8 @@ const es = {
         "openClass": "Abrir el informe de la clase",
         "startFirstGame": "Empieza tu primera partida",
         "exampleWords": "trueno,brisa,escarcha,nube",
-        "exampleNames": "Lucía,Mateo"
+        "exampleNames": "Lucía,Mateo",
+        "singleStudent": "Por ahora solo ha jugado un estudiante, así que estos son sus fallos."
       },
       "arc": {
         "title": "Arco de aprendizaje",
@@ -15852,6 +15863,9 @@ const es = {
         "errorUngraded": "Esta tarea de Classroom no tiene puntos, así que no admite nota.",
         "errorNotPro": "Enviar notas a Google Classroom forma parte de Teacher Pro.",
         "errorGeneric": "Algo falló al comunicarse con Google Classroom. Inténtalo de nuevo."
+      },
+      "picker": {
+        "showing": "Se muestra arriba"
       }
     },
     "teacher": {
@@ -16104,6 +16118,7 @@ const es = {
       "startGame": "Empezar una partida",
       "proLine": "Con Pro ves todas las semanas y a cada estudiante",
       "homeTitle": "¿Quién necesita ayuda en {{name}} esta semana?",
+      "homeTitleGames": "Partidas en {{name}} esta semana: {{count}}. ¿Quién necesita ayuda?",
       "homeBody": "Gratis para una clase. Pro añade las semanas anteriores, un informe por estudiante y todas tus clases.",
       "homeCta": "Ver esta semana"
     }
@@ -17066,7 +17081,8 @@ const es = {
       "toNext": "{{percent}}% para {{tier}}",
       "unlocked": "¡Desbloqueado!",
       "unpin": "Desfijar",
-      "upgraded": "¡Insignia mejorada a {{tier}}!"
+      "upgraded": "¡Insignia mejorada a {{tier}}!",
+      "pinInvite": "Fija hasta {{max}} insignias favoritas"
     },
     "mastery": {
       "flashcardPerfect": "¡Perfecto! Dominaste {{count}} palabras.",
@@ -18042,7 +18058,8 @@ const es = {
           "stepOf": "Paso {{current}} de {{total}}",
           "successGame": "Entrando en la partida…",
           "yourClass": "Tu clase",
-          "findingAssignment": "Buscando tu tarea…"
+          "findingAssignment": "Buscando tu tarea…",
+          "retypeCode": "Escribe el código otra vez"
         },
         "heroLine": "Pide a tu profe el código de la clase",
         "preparing": "Preparando todo, un momento.",
@@ -22517,6 +22534,8 @@ const es = {
       "more": "Más",
       "missedTitle": "Palabras que tu clase falló",
       "practiceWords": "Practicar estas palabras ({count})",
+      "streakKept": "{count} días seguidos",
+      "streakInvite": "Otra partida mañana y la clase empieza una racha",
       "shareParents": "Compartir con las familias",
       "proPill": "Pro",
       "invitePrompt": "¿Conoces a un docente a quien le gustaría?",
@@ -22942,7 +22961,8 @@ const es = {
         "sticker": "Tus palabras · {count}",
         "needMore": "Añade {count} más para usar tus propias palabras.",
         "dropped": "Se quedaron fuera: {count}. Solo cuentan palabras sueltas en el idioma de la clase."
-      }
+      },
+      "codePending": "Tu código aparece cuando creas la clase"
     },
     "host": {
       "roundGroup": "Ronda",

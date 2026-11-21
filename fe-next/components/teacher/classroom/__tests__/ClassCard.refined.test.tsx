@@ -64,11 +64,11 @@ describe('ClassCard face', () => {
     hasPro = false;
   });
 
-  it('Given every action exists, Then the card still shows only the name, the menu and Start', () => {
+  it('Given every action exists, Then the card still shows only the name, the menu, the code plate and Start', () => {
     render(<ClassCard {...fullProps} />);
     const card = screen.getByTestId('classroom-card');
     const controls = Array.from(card.querySelectorAll('a, button')).map((el) => el.getAttribute('data-testid'));
-    expect(controls).toEqual(['classroom-card-open', 'classroom-card-menu', 'classroom-card-start-game']);
+    expect(controls).toEqual(['classroom-card-open', 'classroom-card-menu', 'join-code-plate', 'classroom-card-start-game']);
   });
 
   it('wears a full color band with the name, the language and the menu', () => {
@@ -80,12 +80,23 @@ describe('ClassCard face', () => {
     expect(within(band).getByTestId('classroom-card-menu')).toBeInTheDocument();
   });
 
-  it('shows the join code on a big cream plate that is not a control', () => {
-    render(<ClassCard {...baseProps} />);
+  it('shows the join code on a big cream plate that copies when tapped', async () => {
+    const onCopy = vi.fn().mockResolvedValue(true);
+    render(<ClassCard {...baseProps} onCopy={onCopy} />);
     const plate = screen.getByTestId('join-code-plate');
     expect(plate.className).toContain('bg-neo-cream');
     expect(within(plate).getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
-    expect(plate.querySelector('a, button')).toBeNull();
+    expect(plate.tagName).toBe('BUTTON');
+    expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.tapToCopy');
+    await userEvent.click(plate);
+    expect(onCopy).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.codeCopiedShort');
+  });
+
+  it('When the clipboard refuses, Then the plate does not claim the code was copied', async () => {
+    render(<ClassCard {...baseProps} onCopy={vi.fn().mockResolvedValue(false)} />);
+    await userEvent.click(screen.getByTestId('join-code-plate'));
+    expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.tapToCopy');
   });
 
   it('Given any card, Then Start is the lime primary into the host flow', () => {

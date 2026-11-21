@@ -316,10 +316,12 @@ export default function EducationBadgeGrid({
           'text-sm font-neo-body',
           canPinMore ? 'text-neo-white' : 'text-neo-lime'
         )}>
-          {t('education.achievements.pinLimit', {
-            current: pinCount,
-            max: maxPins,
-          })}
+          {pinCount === 0
+            ? t('education.achievements.pinInvite', { max: maxPins })
+            : t('education.achievements.pinLimit', {
+                current: pinCount,
+                max: maxPins,
+              })}
         </p>
       </div>
 

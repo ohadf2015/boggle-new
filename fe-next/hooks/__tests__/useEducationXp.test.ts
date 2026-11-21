@@ -323,86 +323,25 @@ describe('useEducationXp', () => {
       expect(result.current.totalXp).toBe(180);
     });
 
-    it('should update streak after practice', async () => {
-      mockCalculatePracticeXp.mockReturnValue({
-        totalXp: 100,
-        breakdown: { flashcardCorrect: 80, dailyPractice: 20 },
-        masteryMessage: 'You learned 8 words!',
-      });
-      mockUpdateDailyStreak.mockReturnValue({
-        currentStreak: 3,
-        longestStreak: 3,
-        lastPlayedDate: '2026-01-25',
-        totalDailiesCompleted: 3,
-      });
-
-      const { result } = renderHook(() =>
-        useEducationXp({
-          studentId: 'student-1',
-          lessonId: 'lesson-1',
-        })
-      , { wrapper });
-
-      const session: PracticeSessionXp = {
-        type: 'flashcard',
-        sessionData: {
-          cardsReviewed: 10,
-          cardsCorrect: 8,
-        },
-      };
+    it('given a completed practice, when XP is awarded, then the Daily Challenge streak is left alone', async () => {
+      mockCalculatePracticeXp.mockReturnValue({ totalXp: 100, breakdown: { dailyPractice: 20 }, masteryMessage: 'Nice' });
+      const { result } = renderHook(() => useEducationXp({ studentId: 'student-1', lessonId: 'lesson-1', initialStreak: 2 }), { wrapper });
 
       await act(async () => {
-        await result.current.awardPracticeXp(session);
+        await result.current.awardPracticeXp({ type: 'flashcard', sessionData: { cardsReviewed: 10, cardsCorrect: 8 } });
       });
 
-      expect(mockUpdateDailyStreak).toHaveBeenCalled();
-      expect(result.current.streak.currentStreak).toBe(3);
+      expect(mockUpdateDailyStreak).not.toHaveBeenCalled();
+      expect(mockGetDailyStreak).not.toHaveBeenCalled();
+      expect(result.current.streak.currentStreak).toBe(2);
     });
 
-    it('should detect streak milestone', async () => {
-      mockCalculatePracticeXp.mockReturnValue({
-        totalXp: 100,
-        breakdown: { flashcardCorrect: 80, dailyPractice: 20 },
-        masteryMessage: 'You learned words!',
-      });
-      mockUpdateDailyStreak.mockReturnValue({
-        currentStreak: 7,
-        longestStreak: 7,
-        lastPlayedDate: '2026-01-25',
-        totalDailiesCompleted: 7,
-      });
-      mockGetStreakMilestone.mockReturnValue(7);
-      mockGetStreakMilestoneMessage.mockReturnValue({
-        emoji: '🔥',
-        title: '1 WEEK STREAK!',
-        subtitle: 'A full week of word hunting!',
-      });
+    it('given the server returned the lesson streak, when applied, then the hook shows that number', () => {
+      const { result } = renderHook(() => useEducationXp({ studentId: 'student-1', lessonId: 'lesson-1' }), { wrapper });
 
-      const { result } = renderHook(() =>
-        useEducationXp({
-          studentId: 'student-1',
-          lessonId: 'lesson-1',
-        })
-      , { wrapper });
+      act(() => result.current.applyServerStreak({ current: 4, longest: 9 }));
 
-      const session: PracticeSessionXp = {
-        type: 'flashcard',
-        sessionData: {
-          cardsReviewed: 10,
-          cardsCorrect: 8,
-        },
-      };
-
-      let awardResult: Awaited<ReturnType<typeof result.current.awardPracticeXp>>;
-      await act(async () => {
-        awardResult = await result.current.awardPracticeXp(session);
-      });
-
-      expect(awardResult!.streakMilestone).toEqual({
-        emoji: '🔥',
-        title: '1 WEEK STREAK!',
-        subtitle: 'A full week of word hunting!',
-      });
+      expect(result.current.streak).toEqual({ currentStreak: 4, longestStreak: 9 });
     });
   });
 

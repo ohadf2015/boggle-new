@@ -1309,7 +1309,7 @@ const en = {
         "emptyTitle": "Nothing to review",
         "emptyBody": "Play a class game or a lesson, and the words you miss will show up here for a rematch.",
         "introTitle": "{count} words want a rematch",
-        "introBody": "10 quick cards. Keep the streak alive, open the chest.",
+        "introBody": "{n} quick cards, then open the chest.",
         "start": "Start run",
         "score": "{correct} / {total}",
         "bestStreak": "Best streak {streak} · {points} pts",
@@ -1482,7 +1482,14 @@ const en = {
       "awardsAllMaxed": "Every award maxed out!",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "{done}/{total} done",
-      "lessonsRegion": "Your lessons"
+      "lessonsRegion": "Your lessons",
+      "awardNew": "New!",
+      "awardsShowMore": "More awards to win: {count}",
+      "awardsHideMore": "Hide the rest",
+      "profileFirstTitle": "Your first lesson starts your level",
+      "profileFirstBody": "Play one round and your XP, words and awards show up here.",
+      "profileNextAward": "Closest award: {name}. {how}",
+      "profileNoAwardsYet": "Win your first award by finishing a lesson."
     }
   },
   // @academy:end
@@ -13071,7 +13078,8 @@ const en = {
       "strugglingOne": "{{names}} is struggling",
       "struggling": "{{count}} struggling: {{names}}",
       "regionLabel": "Class status for {{classroom}}",
-      "switcherLabel": "Which class"
+      "switcherLabel": "Which class",
+      "classAccuracy": "{{accuracy}}% class accuracy"
     },
     "activation": {
       "shareTitle": "Students join with this link",
@@ -13545,7 +13553,9 @@ const en = {
         "personalHint": "Each student sees only their own XP and rank.",
         "off": "Off",
         "offHint": "No standings. XP, levels and badges still count."
-      }
+      },
+      "tapToCopy": "Tap to copy",
+      "codeCopiedShort": "Copied"
     },
     "classrooms": {
       "students": {
@@ -13883,7 +13893,8 @@ const en = {
         "openClass": "Open class report",
         "startFirstGame": "Start your first game",
         "exampleWords": "thunder,breeze,frost,cloud",
-        "exampleNames": "Maya,Leo"
+        "exampleNames": "Maya,Leo",
+        "singleStudent": "Only one student has played so far, so these are their misses."
       },
       "arc": {
         "title": "Learning arc",
@@ -14146,6 +14157,9 @@ const en = {
         "errorUngraded": "This Classroom assignment has no points, so it can’t take a grade.",
         "errorNotPro": "Sending grades to Google Classroom is part of Teacher Pro.",
         "errorGeneric": "Couldn't talk to Google Classroom. Try again."
+      },
+      "picker": {
+        "showing": "Shown above"
       }
     },
     "curriculum": {
@@ -14441,6 +14455,7 @@ const en = {
       "startGame": "Start a game",
       "proLine": "See every week and each student with Pro",
       "homeTitle": "Who needs help in {{name}} this week?",
+      "homeTitleGames": "Games in {{name}} this week: {{count}}. Who needs help?",
       "homeBody": "Free for one class. Pro adds past weeks, a report for each student and all your classes.",
       "homeCta": "See this week"
     }
@@ -15394,7 +15409,8 @@ const en = {
       "toNext": "{{percent}}% to {{tier}}",
       "unlocked": "Unlocked!",
       "unpin": "Unpin",
-      "upgraded": "Badge Upgraded to {{tier}}!"
+      "upgraded": "Badge Upgraded to {{tier}}!",
+      "pinInvite": "Pin up to {{max}} favorites"
     },
     "mastery": {
       "flashcardPerfect": "Perfect. You mastered all {{count}} words.",
@@ -16356,7 +16372,8 @@ const en = {
           "stepOf": "Step {{current}} of {{total}}",
           "successGame": "Taking you into the game…",
           "yourClass": "Your class",
-          "findingAssignment": "Finding your assignment…"
+          "findingAssignment": "Finding your assignment…",
+          "retypeCode": "Type the code again"
         },
         "heroLine": "Ask your teacher for the class code",
         "preparing": "Getting things ready. One moment.",
@@ -21526,6 +21543,8 @@ const en = {
       "more": "More",
       "missedTitle": "Words your class missed",
       "practiceWords": "Practice these words ({count})",
+      "streakKept": "{count} days in a row",
+      "streakInvite": "Play again tomorrow to start a class streak",
       "shareParents": "Share with parents",
       "proPill": "Pro",
       "invitePrompt": "Know a teacher who'd like this?",
@@ -21951,7 +21970,8 @@ const en = {
         "sticker": "Your words · {count}",
         "needMore": "Add {count} more to use your own words.",
         "dropped": "Left out: {count}. Only single words in the class language count."
-      }
+      },
+      "codePending": "Your code appears when you create the class"
     },
     "host": {
       "roundGroup": "Round",

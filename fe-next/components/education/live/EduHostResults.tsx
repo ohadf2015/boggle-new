@@ -25,6 +25,7 @@ import { BossOutcomeCard } from '@/components/education/boss/BossOutcomeCard';
 import { useClassroomBossStore } from '@/stores/classroomBossStore';
 import { PodiumStage } from '@/components/education/results/PodiumStage';
 import { ClassChest } from '@/components/education/results/ClassChest';
+import { ClassStreakCue } from '@/components/education/results/ClassStreakCue';
 import { WinnerSpotlight } from '@/components/education/results/WinnerSpotlight';
 import { CelebrationLoop } from '@/components/education/results/CelebrationLoop';
 import { ClassPulse } from '@/components/education/results/ClassPulse';
@@ -298,6 +299,7 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
             {/* After a rehearsal the next step is the real class, so planning it leads the column, above the replay buttons. */}
             {summary.classroomId && practice ? <LessonPlanPrompt classroomId={summary.classroomId} className="@max-[64rem]/results:order-first" /> : null}
             {!pulseBesideStage && pulse}
+            <ClassStreakCue classroomId={practice ? undefined : summary.classroomId} revealed={isRevealed(1, stage)} t={tf} />
             {summary.totalWords > 0 && missed.length === 0 && (
               <TvCoveragePanel
                 summary={summary}

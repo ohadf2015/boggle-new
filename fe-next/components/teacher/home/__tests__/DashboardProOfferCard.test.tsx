@@ -58,4 +58,47 @@ describe('DashboardProOfferCard', () => {
     expect(start).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('link', { name: /analytics/i })).not.toBeInTheDocument();
   });
+
+  describe('class insight', () => {
+    const tp = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
+
+    it('Given games this week in the class, Then the title is the specific line with that count', () => {
+      render(<DashboardProOfferCard language="en" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames: 3 }} />);
+      const title = screen.getByRole('heading');
+      expect(title).toHaveTextContent('teacher.weekInsight.homeTitleGames');
+      expect(title).toHaveTextContent('"count":3');
+    });
+
+    it.each([0, undefined])('Given no games this week (%s), Then the title stays the generic offer title', (weekGames) => {
+      render(<DashboardProOfferCard language="en" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames }} />);
+      expect(screen.getByRole('heading').textContent).not.toContain('homeTitleGames');
+    });
+
+    it('Given a class that has played, Then a secondary link opens its insight page, below the checkout button', () => {
+      render(<DashboardProOfferCard language="he" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames: 2 }} />);
+      const link = screen.getByTestId('dashboard-class-insight-link');
+      expect(link).toHaveAttribute('href', '/he/teacher/classroom/c1/analytics');
+      expect(link).toHaveTextContent('teacher.weekInsight.homeCta');
+      expect(screen.getByTestId('dashboard-pro-offer-cta').compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('Given no played class, Then there is no insight link', () => {
+      render(<DashboardProOfferCard language="en" t={tp} />);
+      expect(screen.queryByTestId('dashboard-class-insight-link')).not.toBeInTheDocument();
+    });
+
+    it('Given a played class, Then the checkout button still starts the trial and the link does not', () => {
+      render(<DashboardProOfferCard language="en" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames: 2 }} />);
+      fireEvent.click(screen.getByTestId('dashboard-class-insight-link'));
+      expect(start).not.toHaveBeenCalled();
+      fireEvent.click(screen.getByTestId('dashboard-pro-offer-cta'));
+      expect(start).toHaveBeenCalledTimes(1);
+    });
+
+    it('Given the link is tapped, Then the home_class_insight click is reported', () => {
+      render(<DashboardProOfferCard language="en" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames: 2 }} />);
+      fireEvent.click(screen.getByTestId('dashboard-class-insight-link'));
+      expect(navigator.sendBeacon).toHaveBeenCalledWith('/api/education/pro-offer-click', expect.anything());
+    });
+  });
 });

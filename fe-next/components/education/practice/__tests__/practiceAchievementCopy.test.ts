@@ -11,13 +11,13 @@
  * completion card — the same class of defect that disqualified the previous
  * round, and in six locales at once.
  *
- * The definitions live in backend/modules/educationAchievementManager.ts, so
+ * The definitions live in backend/modules/educationAchievementDefinitions.ts, so
  * adding an achievement there without copy would silently reintroduce it. This
  * test walks the definitions rather than a hand-written list.
  */
 
 import { describe, it, expect } from 'vitest';
-import { ACHIEVEMENT_DEFINITIONS } from '@/backend/modules/educationAchievementManager';
+import { ACHIEVEMENT_DEFINITIONS } from '@/backend/modules/educationAchievementDefinitions';
 
 import { en } from '@/translations/en';
 import { he } from '@/translations/he';

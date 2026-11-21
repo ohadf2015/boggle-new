@@ -23,12 +23,9 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
-import useEducationXp, {
-  type XpProgress,
-  type DailyStreak,
-} from '@/hooks/useEducationXp';
-import useAchievementUnlock from '@/hooks/useAchievementUnlock';
-import { useAchievementTracking } from '@/hooks/useAchievementTracking';
+import useEducationXp, { type XpProgress, type LessonStreak } from '@/hooks/useEducationXp';
+import type { PracticeStreak } from '@/lib/education/practiceStreak';
+import useAchievementUnlock, { type UnlockPayload } from '@/hooks/useAchievementUnlock';
 import { UnifiedAchievementModal } from '@/components/achievements/UnifiedAchievementModal';
 // supabase import removed — XP persistence handled server-side only
 import type { VocabFocus } from '@/lib/education/vocabFocus';
@@ -62,6 +59,11 @@ export interface CompletePracticeSessionData {
   masteryLevel?: 'not_started' | 'started' | 'practicing' | 'mastered';
 }
 
+export interface ServerRewards {
+  newAwards?: UnlockPayload[] | null;
+  practiceStreak?: PracticeStreak | null;
+}
+
 export interface PracticeServerOutcome {
   completed: boolean;
   assignmentCompleted: boolean;
@@ -72,7 +74,7 @@ export interface PracticeSessionContextValue {
   totalXp: number;
   currentLevel: number;
   xpProgress: XpProgress;
-  streak: DailyStreak;
+  streak: LessonStreak;
 
   // Session tracking
   sessionXpEarned: number;
@@ -81,6 +83,8 @@ export interface PracticeSessionContextValue {
   // Actions
   /** Resolves with the server's verdict on the round, or null when no session was patched. */
   completePracticeSession: (sessionData: CompletePracticeSessionData) => Promise<PracticeServerOutcome | null>;
+  /** For rounds that PATCH the practice route themselves: apply the awards and streak it returned. */
+  applyServerRewards: (body: ServerRewards) => void;
 
   // Loading state
   isLoading: boolean;
@@ -120,6 +124,7 @@ export function PracticeSessionProvider({
     xpProgress,
     streak,
     awardPracticeXp,
+    applyServerStreak,
     reconcileAwardedXp,
     isLoading: xpLoading,
   } = useEducationXp({
@@ -131,27 +136,23 @@ export function PracticeSessionProvider({
   });
 
   // Achievement unlock detection
-  const { currentUnlock, acknowledgeUnlock, checkForUnlocks } = useAchievementUnlock({
+  const { currentUnlock, acknowledgeUnlock, enqueueUnlocks } = useAchievementUnlock({
     studentId,
     enabled: true,
   });
+
+  const applyServerRewards = useCallback(
+    ({ newAwards, practiceStreak }: ServerRewards) => {
+      if (Array.isArray(newAwards)) enqueueUnlocks(newAwards);
+      if (practiceStreak) applyServerStreak(practiceStreak);
+    },
+    [enqueueUnlocks, applyServerStreak],
+  );
 
   // Session-specific state
   const [sessionXpEarned, setSessionXpEarned] = useState<number>(0);
   const [sessionMasteryMessage, setSessionMasteryMessage] = useState<string | null>(null);
   const [isPersisting, setIsPersisting] = useState<boolean>(false);
-  const [totalPracticeSessions, setTotalPracticeSessions] = useState<number>(0);
-  const [totalWordsMastered, setTotalWordsMastered] = useState<number>(0);
-
-  // Achievement tracking state — persisted to localStorage per student
-  const {
-    perfectGames,
-    morningPractices,
-    modesTriedRef,
-    completedLessonsRef,
-    uniqueWordsRef,
-    practiceDaysThisMonth,
-  } = useAchievementTracking(studentId);
 
   // Guards the server PATCH against a double-send (e.g. a fast double-tap on
   // the same completion). Independent of the server's own idempotency guard
@@ -179,11 +180,6 @@ export function PracticeSessionProvider({
         */
         const payload = practiceXpPayload(sessionData);
 
-        // Achievement metrics below still key off the card-quiz modes only —
-        // "words mastered" and "perfect game" have always meant a reviewed/
-        // correct pair, and widening them here would silently inflate badges.
-        const isCardQuiz = sessionData.type === 'flashcard' || sessionData.type === 'vocab_focus';
-
         // Award XP via hook
         const result = await awardPracticeXp({
           type: payload.type,
@@ -195,7 +191,6 @@ export function PracticeSessionProvider({
         const serverScored = !!sessionData.sessionId;
         const firstSend = serverScored && !completedSessionIdsRef.current.has(sessionData.sessionId!);
         let earnedXp = serverScored ? 0 : result.totalXp;
-        let reachedLevel = result.newLevel;
         if (!serverScored || firstSend) setSessionXpEarned(earnedXp);
         setSessionMasteryMessage(result.masteryMessage);
 
@@ -240,6 +235,7 @@ export function PracticeSessionProvider({
                 completedSessionIdsRef.current.delete(sessionData.sessionId);
               }
               if (data?.session) outcome = { completed: data.session.completed_at != null, assignmentCompleted: data.assignmentCompleted === true };
+              applyServerRewards(data ?? {});
             } else {
               logger.error('Failed to complete practice session on server', {
                 sessionId: sessionData.sessionId,
@@ -252,79 +248,9 @@ export function PracticeSessionProvider({
         }
 
         if (serverScored) {
-          reachedLevel = reconcileAwardedXp(result.totalXp, earnedXp);
+          reconcileAwardedXp(result.totalXp, earnedXp);
           if (firstSend) setSessionXpEarned(earnedXp);
         }
-
-        // Increment session counter
-        const newSessionCount = totalPracticeSessions + 1;
-        setTotalPracticeSessions(newSessionCount);
-
-        // Track total words mastered (estimate from flashcard correct answers)
-        let newWordsMastered = totalWordsMastered;
-        if (isCardQuiz && sessionData.cardsCorrect) {
-          newWordsMastered = totalWordsMastered + sessionData.cardsCorrect;
-          setTotalWordsMastered(newWordsMastered);
-        }
-
-        // --- Compute real achievement metrics ---
-
-        // wordsInGame: words found this session
-        const wordsInGame = sessionData.vocabularyWordsFound?.length
-          || sessionData.wordsFound?.length || 0;
-
-        // perfectGames: increment if 100% accuracy on flashcard session
-        let newPerfectGames = perfectGames;
-        if (
-          isCardQuiz &&
-          sessionData.cardsReviewed &&
-          sessionData.cardsReviewed > 0 &&
-          sessionData.cardsCorrect === sessionData.cardsReviewed
-        ) {
-          newPerfectGames = perfectGames + 1;
-          try { localStorage.setItem(`edu_perfect_games_${studentId}`, String(newPerfectGames)); } catch { /* noop */ }
-        }
-
-        // morningPractices: before 9 AM
-        let newMorningPractices = morningPractices;
-        if (new Date().getHours() < 9) {
-          newMorningPractices = morningPractices + 1;
-          try { localStorage.setItem(`edu_morning_practices_${studentId}`, String(newMorningPractices)); } catch { /* noop */ }
-        }
-
-        // completedLessons: track unique lesson IDs finished when a lesson is mastered
-        if (sessionData.masteryLevel === 'mastered') {
-          completedLessonsRef.current.add(lessonId);
-          try { localStorage.setItem(`education_completed_lessons_${studentId}`, JSON.stringify([...completedLessonsRef.current])); } catch { /* noop */ }
-        }
-        const newCompletedLessonsCount = completedLessonsRef.current.size;
-
-        // modesTried: track unique practice mode types
-        modesTriedRef.current.add(sessionData.type);
-        const newModesTriedCount = modesTriedRef.current.size;
-        try { localStorage.setItem(`education_modes_tried_${studentId}`, JSON.stringify([...modesTriedRef.current])); } catch { /* noop */ }
-
-        // uniqueWords: cumulative unique words across sessions
-        const sessionWords = sessionData.vocabularyWordsFound || sessionData.wordsFound || [];
-        for (const word of sessionWords) {
-          uniqueWordsRef.current.add(word);
-        }
-        const newUniqueWordsCount = uniqueWordsRef.current.size;
-        try { localStorage.setItem(`education_unique_words_${studentId}`, JSON.stringify([...uniqueWordsRef.current])); } catch { /* noop */ }
-
-        // daysThisMonth: record today's practice date
-        let newDaysThisMonth = practiceDaysThisMonth;
-        try {
-          const now = new Date();
-          const todayKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-          const storedDays: string[] = JSON.parse(localStorage.getItem(`edu_practice_days_${studentId}`) || '[]');
-          if (!storedDays.includes(todayKey)) {
-            storedDays.push(todayKey);
-            localStorage.setItem(`edu_practice_days_${studentId}`, JSON.stringify(storedDays));
-          }
-          const thisMonthPrefix = `${now.getFullYear()}-${now.getMonth()}`;
-          newDaysThisMonth = storedDays.filter((d: string) => d.startsWith(thisMonthPrefix)).length;
-        } catch { /* noop */ }
 
         // F1: announce session completion to PostHog so we can build
         // funnels (D1/D7 return, mode mix, drop-off step) without inventing
@@ -334,30 +260,6 @@ export function PracticeSessionProvider({
           practiceType: sessionData.type,
           cardsReviewed: sessionData.cardsReviewed,
           cardsCorrect: sessionData.cardsCorrect,
-        });
-
-        // Check for achievement unlocks after XP is awarded.
-        // Fields not tracked in education context use 0 (won't falsely unlock)
-        // rather than hardcoded 1 which could falsely unlock achievements.
-        checkForUnlocks({
-          totalXp: totalXp + earnedXp,
-          wordsMastered: newWordsMastered,
-          currentLevel: reachedLevel || currentLevel,
-          currentStreak: streak.currentStreak,
-          practiceSessions: newSessionCount,
-          lessonsCompleted: newCompletedLessonsCount,
-          wordsInGame,
-          perfectGames: newPerfectGames,
-          bossesDefeated: 0,
-          combosAchieved: 0,
-          morningPractices: newMorningPractices,
-          daysThisMonth: newDaysThisMonth,
-          weeksWith5Days: 0,
-          longestStreak: streak.longestStreak || 0,
-          modesTried: newModesTriedCount,
-          lessonsCollected: newCompletedLessonsCount,
-          classroomsJoined: 0,
-          uniqueWords: newUniqueWordsCount,
         });
       } catch (error) {
         logger.error('Error completing practice session:', error);
@@ -370,19 +272,8 @@ export function PracticeSessionProvider({
     [
       awardPracticeXp,
       reconcileAwardedXp,
-      completedLessonsRef,
-      modesTriedRef,
-      uniqueWordsRef,
       streak,
-      currentLevel,
-      totalXp,
-      checkForUnlocks,
-      totalPracticeSessions,
-      totalWordsMastered,
-      perfectGames,
-      morningPractices,
-      practiceDaysThisMonth,
-      studentId,
+      applyServerRewards,
       lessonId,
     ]
   );
@@ -402,6 +293,7 @@ export function PracticeSessionProvider({
 
       // Actions
       completePracticeSession,
+      applyServerRewards,
 
       // Loading state
       isLoading: xpLoading || isPersisting,
@@ -414,6 +306,7 @@ export function PracticeSessionProvider({
       sessionXpEarned,
       sessionMasteryMessage,
       completePracticeSession,
+      applyServerRewards,
       xpLoading,
       isPersisting,
     ]

@@ -17,7 +17,7 @@ import { completionPatchBody, recordedXpFrom } from '@/lib/education/practiceCom
 import { publishLevelUp } from '@/lib/avatar/revealTrigger';
 
 export function useRecordedXp(): (data: CompletePracticeSessionData) => Promise<number | null> {
-  const { completePracticeSession } = usePracticeSession();
+  const { completePracticeSession, applyServerRewards } = usePracticeSession();
   return useCallback(
     async (data: CompletePracticeSessionData) => {
       const { sessionId, ...clientSide } = data;
@@ -31,11 +31,12 @@ export function useRecordedXp(): (data: CompletePracticeSessionData) => Promise<
         });
         const body = res.ok ? await res.json() : null;
         if (body?.levelUp) publishLevelUp(body.levelUp, 'practice');
+        if (body) applyServerRewards(body);
         return recordedXpFrom(res.ok, body);
       } catch {
         return null;
       }
     },
-    [completePracticeSession],
+    [completePracticeSession, applyServerRewards],
   );
 }

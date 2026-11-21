@@ -10,30 +10,32 @@ import { ClassSetupDetails } from '../ClassSetupDetails';
 
 const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.stringify(p)}` : k);
 
-function renderDetails(overrides: Partial<Parameters<typeof ClassSetupDetails>[0]> = {}) {
+function detailsProps(overrides: Partial<Parameters<typeof ClassSetupDetails>[0]> = {}): Parameters<typeof ClassSetupDetails>[0] {
   const pack = recommendedPack('en', null);
-  return render(
-    <ClassSetupDetails
-      name=""
-      onNameChange={vi.fn()}
-      grade={null}
-      onGradeChange={vi.fn()}
-      language="en"
-      onLanguageChange={vi.fn()}
-      packs={packsForLanguage('en')}
-      pack={pack}
-      recommendedKey={pack.nameKey}
-      onPackChange={vi.fn()}
-      cap={null}
-      busy={null}
-      errorKey={null}
-      onStartLive={vi.fn()}
-      onCreateOnly={vi.fn()}
-      skipHref="/en/teacher"
-      t={t}
-      {...overrides}
-    />,
-  );
+  return {
+    name: '',
+    onNameChange: vi.fn(),
+    grade: null,
+    onGradeChange: vi.fn(),
+    language: 'en',
+    onLanguageChange: vi.fn(),
+    packs: packsForLanguage('en'),
+    pack,
+    recommendedKey: pack.nameKey,
+    onPackChange: vi.fn(),
+    cap: null,
+    busy: null,
+    errorKey: null,
+    onStartLive: vi.fn(),
+    onCreateOnly: vi.fn(),
+    skipHref: '/en/teacher',
+    t,
+    ...overrides,
+  };
+}
+
+function renderDetails(overrides: Partial<Parameters<typeof ClassSetupDetails>[0]> = {}) {
+  return render(<ClassSetupDetails {...detailsProps(overrides)} />);
 }
 
 const openFold = () => fireEvent.click(screen.getByTestId('setup-advanced-toggle'));
@@ -59,9 +61,40 @@ describe('ClassSetupDetails first frame', () => {
     expect(card.querySelector('button, a, input')).toBeNull();
   });
 
-  it('Given no name yet, Then the join-code card shows the suggested name', () => {
+  it('Given no name yet, Then the join-code card never shows the name example as if it were the code', () => {
     renderDetails();
-    expect(screen.getByTestId('setup-code-preview')).toHaveTextContent('eduShell.setup.namePlaceholder');
+    const card = screen.getByTestId('setup-code-preview');
+    expect(card).not.toHaveTextContent('eduShell.setup.namePlaceholder');
+    expect(card).toHaveTextContent('eduShell.setup.joinCode');
+    expect(card).toHaveTextContent('eduShell.setup.codePending');
+    expect(screen.getAllByTestId('setup-code-placeholder')).toHaveLength(6);
+  });
+
+  it('Given the grade picks a suggested name, Then the card still never echoes it before the teacher types', () => {
+    renderDetails({ grade: 'g35' });
+    expect(screen.getByTestId('setup-code-preview')).not.toHaveTextContent('eduShell.setup.gradeName.g35');
+  });
+
+  it('Given a name typed, Then the tiles turn solid so the card answers the typing', () => {
+    const { rerender } = renderDetails();
+    expect(screen.getAllByTestId('setup-code-placeholder')[0].className).toContain('border-dashed');
+    rerender(<ClassSetupDetails {...detailsProps({ name: 'A' })} />);
+    expect(screen.getAllByTestId('setup-code-placeholder')[0].className).toContain('border-solid');
+  });
+
+  it('Create class has one label per state: ready, busy (disabled, busy), done (disabled)', () => {
+    const { rerender } = renderDetails();
+    const btn = () => screen.getByTestId('setup-start-live');
+    expect(btn()).toBeEnabled();
+    expect(btn()).toHaveTextContent('eduShell.setup.createClass');
+    rerender(<ClassSetupDetails {...detailsProps({ busy: 'live' })} />);
+    expect(btn()).toBeDisabled();
+    expect(btn()).toHaveAttribute('aria-busy', 'true');
+    expect(btn()).toHaveTextContent('eduShell.setup.creating');
+    rerender(<ClassSetupDetails {...detailsProps({ busy: 'done' })} />);
+    expect(btn()).toBeDisabled();
+    expect(btn()).not.toHaveAttribute('aria-busy');
+    expect(btn()).toHaveTextContent('eduShell.setup.readyTitle');
   });
 
   it('Given the fold is closed, Then its summary stickers are not buttons of their own inside the toggle', () => {

@@ -76,4 +76,13 @@ describe('ClassSetupInviteView roster seats', () => {
     renderView(students(2), ['s1'], true);
     expect(screen.queryAllByTestId('edu-burst-piece')).toHaveLength(0);
   });
+
+  it('Given students in, Then the joined count pops when it changes and stays still under reduced motion', () => {
+    setWide(false);
+    const { unmount } = renderView(students(2));
+    expect(screen.getByTestId('setup-joined-count').querySelector('span')?.className).toMatch(/animate-neo-pop/);
+    unmount();
+    renderView(students(2), [], true);
+    expect(screen.getByTestId('setup-joined-count').querySelector('span')?.className).not.toMatch(/animate-neo-pop/);
+  });
 });

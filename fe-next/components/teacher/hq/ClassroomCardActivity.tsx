@@ -11,23 +11,23 @@ export interface ClassroomCardActivityProps {
 
 type T = ReturnType<typeof useLanguage>["t"];
 
-/** "Played 2d ago · 78% average" — or the honest state when there is no game to report. */
+/** "Played 2d ago · 78% class accuracy", or just when it was played: a bare or zero percentage is no data. */
 function lastLine(t: T, pulse: ClassPulse, loading: boolean): string {
   if (loading) return t("teacher.pulse.state.loading");
   if (pulse.daysSinceLastGame === null)
     return t(`teacher.pulse.state.${pulse.state}`);
-  const scored = pulse.averageAccuracyPct !== null;
-  const key =
-    pulse.daysSinceLastGame === 0
-      ? scored ? "teacher.pulse.lastPlayedToday" : "teacher.pulse.lastPlayedNoScoreToday"
-      : pulse.daysSinceLastGame === 1
-        ? scored ? "teacher.pulse.lastPlayedOneDay" : "teacher.pulse.lastPlayedNoScoreOneDay"
-        : scored ? "teacher.pulse.lastPlayedDays" : "teacher.pulse.lastPlayedNoScoreDays";
-  if (!scored) return t(key, { days: pulse.daysSinceLastGame });
-  return t(key, {
-    days: pulse.daysSinceLastGame,
-    accuracy: pulse.averageAccuracyPct as number,
-  });
+  const days = pulse.daysSinceLastGame;
+  const when = t(
+    days === 0
+      ? "teacher.pulse.lastPlayedNoScoreToday"
+      : days === 1
+        ? "teacher.pulse.lastPlayedNoScoreOneDay"
+        : "teacher.pulse.lastPlayedNoScoreDays",
+    { days },
+  );
+  const accuracy = pulse.averageAccuracyPct;
+  if (accuracy === null || accuracy <= 0) return when;
+  return `${when} · ${t("teacher.pulse.classAccuracy", { accuracy })}`;
 }
 
 /** The class card's last-game line, read from the same class pulse as the HQ Tools sheet. Pessimistic while loading. */

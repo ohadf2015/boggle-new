@@ -30,6 +30,15 @@ describe('<ClassroomPicker>', () => {
     for (const arrow of arrows) expect(arrow.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
   });
 
+  it('Given one class is on show above, Then its tile says so and the rest do not', () => {
+    render(<ClassroomPicker classrooms={classes} onSelect={vi.fn()} shownId="a" />);
+    const tiles = screen.getAllByRole('button');
+    expect(tiles[0]).toHaveAttribute('aria-current', 'true');
+    expect(tiles[0]).toHaveTextContent('teacher.reports.picker.showing');
+    expect(tiles[1]).not.toHaveAttribute('aria-current');
+    expect(tiles[1]).not.toHaveTextContent('teacher.reports.picker.showing');
+  });
+
   it('Given more classes than accents, Then colors cycle', () => {
     expect(accentFor(0)).toBe(accentFor(4));
     expect(accentFor(0)).not.toBe(accentFor(1));

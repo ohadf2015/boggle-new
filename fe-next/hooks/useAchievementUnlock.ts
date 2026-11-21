@@ -1,35 +1,11 @@
 'use client';
 
 /**
- * useAchievementUnlock Hook
- *
- * Manages achievement unlock detection and celebration queue.
- * Integrates with educationAchievementManager for unlock detection.
- *
- * Design:
- * - FIFO queue for multiple simultaneous unlocks
- * - localStorage persistence to prevent re-showing
- * - Disabled state support for opt-out scenarios
- *
- * Usage:
- * const { currentUnlock, acknowledgeUnlock, checkForUnlocks } = useAchievementUnlock({
- *   studentId: 'student-123'
- * });
- *
- * // After XP gain or progress update
- * checkForUnlocks(newProgressData);
- *
- * // When user dismisses celebration modal
- * acknowledgeUnlock();
+ * Celebration queue for awards the server granted (PATCH /api/education/practice returns them).
+ * Each achievement tier shows once per student: it is remembered in localStorage when shown.
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-import {
-  calculateNewUnlocks,
-  checkAchievementProgress,
-  type StudentProgressData,
-  type AchievementProgress,
-} from '@/backend/modules/educationAchievementManager';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -52,8 +28,7 @@ export interface UseAchievementUnlockReturn {
   pendingUnlocks: UnlockPayload[];
   currentUnlock: UnlockPayload | null;
   acknowledgeUnlock: () => void;
-  checkForUnlocks: (newProgress: StudentProgressData) => void;
-  isChecking: boolean;
+  enqueueUnlocks: (unlocks: UnlockPayload[]) => void;
 }
 
 // ============================================
@@ -108,23 +83,6 @@ function saveAcknowledged(studentId: string, unlockKey: string): void {
 // HOOK IMPLEMENTATION
 // ============================================
 
-/**
- * Achievement unlock detection and celebration queue hook
- *
- * @param options - Configuration options
- * @returns Unlock state and actions
- *
- * @example
- * const { currentUnlock, acknowledgeUnlock, checkForUnlocks } = useAchievementUnlock({
- *   studentId: 'student-123',
- * });
- *
- * // After XP gain
- * checkForUnlocks(newProgressData);
- *
- * // In modal onClose
- * acknowledgeUnlock();
- */
 export function useAchievementUnlock(
   options: UseAchievementUnlockOptions
 ): UseAchievementUnlockReturn {
@@ -133,10 +91,6 @@ export function useAchievementUnlock(
   // ==================== State ====================
 
   const [pendingUnlocks, setPendingUnlocks] = useState<UnlockPayload[]>([]);
-  const [isChecking, setIsChecking] = useState<boolean>(false);
-
-  // Store current progress to compare on next check
-  const previousProgressRef = useRef<AchievementProgress[] | null>(null);
 
   // Load acknowledged unlocks on mount
   const acknowledgedRef = useRef<Set<string>>(new Set());
@@ -150,74 +104,38 @@ export function useAchievementUnlock(
   // Current unlock is first in queue (FIFO)
   const currentUnlock = pendingUnlocks.length > 0 ? pendingUnlocks[0] : null;
 
+  // Remembered when shown, not when dismissed: a reload mid-celebration must not replay it.
+  useEffect(() => {
+    if (!currentUnlock) return;
+    const unlockKey = getUnlockKey(currentUnlock);
+    if (acknowledgedRef.current.has(unlockKey)) return;
+    acknowledgedRef.current.add(unlockKey);
+    saveAcknowledged(studentId, unlockKey);
+  }, [currentUnlock, studentId]);
+
   // ==================== Actions ====================
 
-  /**
-   * Check for new achievement unlocks
-   * Compares current progress with previous, detects new unlocks
-   */
-  const checkForUnlocks = useCallback(
-    (newProgress: StudentProgressData): void => {
-      // Early return if disabled
+  const enqueueUnlocks = useCallback(
+    (unlocks: UnlockPayload[]): void => {
       if (!enabled) return;
-
-      setIsChecking(true);
-
-      try {
-        // Calculate current achievement progress
-        const currentProgress = checkAchievementProgress(newProgress);
-
-        // If no previous progress, store current and exit
-        // (First call - no baseline for comparison)
-        if (previousProgressRef.current === null) {
-          previousProgressRef.current = currentProgress;
-          setIsChecking(false);
-          return;
-        }
-
-        // Compare with previous to find new unlocks
-        const newUnlocks = calculateNewUnlocks(previousProgressRef.current, currentProgress);
-
-        // Filter out already acknowledged unlocks
-        const unacknowledged = newUnlocks.filter((unlock) => {
-          const unlockKey = getUnlockKey(unlock);
-          return !acknowledgedRef.current.has(unlockKey);
+      const known = loadAcknowledged(studentId);
+      setPendingUnlocks((prev) => {
+        const queued = new Set(prev.map(getUnlockKey));
+        const fresh = unlocks.filter((u) => {
+          const key = getUnlockKey(u);
+          if (known.has(key) || acknowledgedRef.current.has(key) || queued.has(key)) return false;
+          queued.add(key);
+          return true;
         });
-
-        // Update previous progress for next comparison
-        previousProgressRef.current = currentProgress;
-
-        // Add new unlocks to queue
-        if (unacknowledged.length > 0) {
-          setPendingUnlocks((prev) => [...prev, ...unacknowledged]);
-        }
-
-        setIsChecking(false);
-      } catch (error) {
-        console.error('[useAchievementUnlock] Error checking for unlocks:', error);
-        setIsChecking(false);
-      }
+        return fresh.length ? [...prev, ...fresh] : prev;
+      });
     },
-    [enabled]
+    [enabled, studentId]
   );
 
-  /**
-   * Acknowledge current unlock (dismiss modal)
-   * Removes current from queue, shows next, persists acknowledgment
-   */
   const acknowledgeUnlock = useCallback((): void => {
-    if (pendingUnlocks.length === 0) return;
-
-    const [current, ...remaining] = pendingUnlocks;
-
-    // Persist acknowledgment
-    const unlockKey = getUnlockKey(current);
-    saveAcknowledged(studentId, unlockKey);
-    acknowledgedRef.current.add(unlockKey);
-
-    // Remove from queue
-    setPendingUnlocks(remaining);
-  }, [pendingUnlocks, studentId]);
+    setPendingUnlocks((prev) => prev.slice(1));
+  }, []);
 
   // ==================== Return ====================
 
@@ -225,8 +143,7 @@ export function useAchievementUnlock(
     pendingUnlocks,
     currentUnlock,
     acknowledgeUnlock,
-    checkForUnlocks,
-    isChecking,
+    enqueueUnlocks,
   };
 }
 

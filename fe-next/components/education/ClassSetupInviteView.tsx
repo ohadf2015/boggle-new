@@ -131,7 +131,7 @@ export function ClassSetupInviteView({ classroom, roster, joinUrl, displayHost, 
         {focused ? null : <div data-testid="invite-roster" className={cn(NB_PANEL_POP.pink, 'relative flex flex-col gap-2 p-3 sm:gap-3 sm:p-4', play && 'max-sm:hidden')}>
           <p data-testid="setup-joined-count" aria-live="polite" className="inline-flex items-center gap-2 font-neo-display text-lg font-bold text-neo-cream">
             <UsersRound className={cn('size-5 shrink-0', studentsIn ? 'text-neo-lime' : 'text-neo-cream/70')} aria-hidden="true" />
-            {joinedText(joined, t)}
+            <span key={joined ?? 'loading'} className={cn('inline-block tabular-nums', !reduced && studentsIn && 'motion-safe:animate-neo-pop')}>{joinedText(joined, t)}</span>
           </p>
           {joined === 0 ? null : <RosterSeats students={roster.students} arrivals={roster.arrivals} seats={seats} size={40} reduced={reduced} showNames className="min-h-[56px]" />}
           {newest && !reduced ? <CelebrationBurst playing burstKey={newest} variant="sparkle" /> : null}

@@ -27,7 +27,7 @@ describe('AwardsHero', () => {
   });
 
   it('given earned awards, when rendered, then it shows the earned count landed and the total', () => {
-    render(<AwardsHero achievements={{ x: a(1), y: a(20), z: a(0) }} />);
+    render(<AwardsHero achievements={{ first_lesson: a(1), lesson_collector: a(10), practice_veteran: a(0) }} />);
     expect(screen.getByTestId('awards-hero-earned')).toHaveTextContent('2');
     expect(screen.getByTestId('awards-hero')).toHaveAttribute('data-total', '3');
   });
@@ -45,7 +45,7 @@ describe('AwardsHero', () => {
     const next = screen.getByTestId('awards-next');
     expect(next).toHaveTextContent('achievements.near.name');
     expect(next).toHaveTextContent('13 / 15');
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '13');
+    expect(screen.getAllByRole('progressbar')[0]).toHaveAttribute('aria-valuenow', '13');
   });
 
   it('given a next award, when rendered, then Next up sits inside the one summary card so the badge wall stays in view on a phone', () => {

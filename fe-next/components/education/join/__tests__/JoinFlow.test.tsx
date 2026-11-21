@@ -44,6 +44,8 @@ vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: () => null,
 }));
 
+// The sixth-character beat has its own test (JoinFlow.codeBeat); these assert the step logic.
+vi.mock('@/lib/education/motion/useEduReducedMotion', () => ({ useEduReducedMotion: () => true }));
 import JoinFlow from '../JoinFlow';
 
 const codeField = () => screen.getByLabelText('education.student.join.codeLabel');

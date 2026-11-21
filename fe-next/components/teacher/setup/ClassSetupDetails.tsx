@@ -18,7 +18,7 @@ import { SETUP_FIELD_LABEL, SetupOwnWordsField, type SetupOwnWords } from './Set
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
-export type SetupBusy = 'live' | 'create' | null;
+export type SetupBusy = 'live' | 'create' | 'done' | null;
 
 export interface ClassSetupDetailsProps {
   name: string;
@@ -88,7 +88,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           />
         </div>
 
-        <SetupCodePreview name={name} placeholder={placeholder} t={t} />
+        <SetupCodePreview name={name} t={t} />
 
         <div className="flex flex-col gap-3">
           <button
@@ -174,10 +174,15 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           data-hero="true"
           disabled={busy !== null}
           aria-busy={busy === 'live' || undefined}
-          className={cn(NB_PRIMARY, 'min-h-[72px] w-full text-3xl')}
+          className={cn(NB_PRIMARY, 'min-h-[72px] w-full text-3xl', busy === 'done' && 'disabled:opacity-100')}
         >
           {busy === 'live' ? <Loader2 className="size-7 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
-          {t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createClass')}
+          {busy === 'done' ? <Check className="size-7" strokeWidth={3} aria-hidden="true" /> : null}
+          {busy === 'live'
+            ? t('eduShell.setup.creating')
+            : busy === 'done'
+              ? t('eduShell.setup.readyTitle')
+              : t(errorKey ? 'eduShell.setup.retry' : 'eduShell.setup.createClass')}
         </button>
         {props.onCreateOnly ? (
           <button

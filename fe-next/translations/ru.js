@@ -1311,7 +1311,7 @@ const ru = {
         "emptyTitle": "Повторять нечего",
         "emptyBody": "Сыграй в игру класса или пройди урок — слова, которые ты пропустишь, будут ждать здесь реванша.",
         "introTitle": "Слова для реванша: {count}",
-        "introBody": "10 быстрых карточек. Держи серию и открой сундук.",
+        "introBody": "{n} быстрых карточек, а потом открой сундук.",
         "start": "Начать",
         "score": "{correct} / {total}",
         "bestStreak": "Лучшая серия {streak} · {points} очк.",
@@ -1484,7 +1484,14 @@ const ru = {
       "awardsAllMaxed": "Все награды на максимуме!",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "Пройдено: {done}/{total}",
-      "lessonsRegion": "Твои уроки"
+      "lessonsRegion": "Твои уроки",
+      "awardNew": "Новое!",
+      "awardsShowMore": "Ещё наград впереди: {count}",
+      "awardsHideMore": "Скрыть остальные",
+      "profileFirstTitle": "Первый урок запускает твой уровень",
+      "profileFirstBody": "Сыграй один раунд, и здесь появятся твои XP, слова и награды.",
+      "profileNextAward": "Ближайшая награда: {name}. {how}",
+      "profileNoAwardsYet": "Закончи урок и получи первую награду."
     }
   },
   // @academy:end
@@ -4911,7 +4918,8 @@ const ru = {
       "toNext": "{{percent}}% до {{tier}}",
       "unlocked": "Разблокировано!",
       "unpin": "Открепить",
-      "upgraded": "Значок повышен до {{tier}}!"
+      "upgraded": "Значок повышен до {{tier}}!",
+      "pinInvite": "Закрепи до {{max}} любимых значков"
     },
     "mastery": {
       "flashcardPerfect": "Отлично! Все {{count}} слов освоены!",
@@ -5874,7 +5882,8 @@ const ru = {
           "stepOf": "Шаг {{current}} из {{total}}",
           "successGame": "Заходим в игру…",
           "yourClass": "Твой класс",
-          "findingAssignment": "Ищем задание…"
+          "findingAssignment": "Ищем задание…",
+          "retypeCode": "Ввести код заново"
         },
         "heroLine": "Спроси у учителя код класса",
         "preparing": "Секунду, готовим всё…",
@@ -14463,7 +14472,8 @@ const ru = {
       "strugglingOne": "{{names}} испытывает трудности",
       "struggling": "{{count}} испытывают трудности: {{names}}",
       "regionLabel": "Состояние класса {{classroom}}",
-      "switcherLabel": "Какой класс"
+      "switcherLabel": "Какой класс",
+      "classAccuracy": "точность класса {{accuracy}}%"
     },
     "activation": {
       "shareTitle": "Ученики входят по этой ссылке",
@@ -15153,7 +15163,9 @@ const ru = {
         "personalHint": "Каждый ученик видит только свои XP и место.",
         "off": "Выключен",
         "offHint": "Без рейтинга. XP, уровни и значки всё равно засчитываются."
-      }
+      },
+      "tapToCopy": "Нажмите, чтобы скопировать",
+      "codeCopiedShort": "Скопировано"
     },
     "classrooms": {
       "students": {
@@ -15491,7 +15503,8 @@ const ru = {
         "openClass": "Открыть отчёт класса",
         "startFirstGame": "Начать первую игру",
         "exampleWords": "гром,ветерок,иней,облако",
-        "exampleNames": "Маша,Лёва"
+        "exampleNames": "Маша,Лёва",
+        "singleStudent": "Пока сыграл только один ученик, так что это его ошибки."
       },
       "arc": {
         "title": "Динамика обучения",
@@ -15754,6 +15767,9 @@ const ru = {
         "errorUngraded": "У этого задания в Classroom нет баллов, поэтому оценку поставить нельзя.",
         "errorNotPro": "Отправка оценок в Google Classroom входит в Teacher Pro.",
         "errorGeneric": "Не удалось связаться с Google Classroom. Попробуйте ещё раз."
+      },
+      "picker": {
+        "showing": "Показан выше"
       }
     },
     "curriculum": {
@@ -15833,6 +15849,7 @@ const ru = {
       "startGame": "Начать игру",
       "proLine": "С Pro видно каждую неделю и каждого ученика",
       "homeTitle": "Кому в классе {{name}} нужна помощь на этой неделе?",
+      "homeTitleGames": "Игр в классе {{name}} на этой неделе: {{count}}. Кому нужна помощь?",
       "homeBody": "Бесплатно для одного класса. В Pro — прошлые недели, отчёт по каждому ученику и все ваши классы.",
       "homeCta": "Смотреть эту неделю"
     }
@@ -22205,6 +22222,8 @@ const ru = {
       "more": "Ещё",
       "missedTitle": "Слова, которые класс пропустил",
       "practiceWords": "Потренировать эти слова ({count})",
+      "streakKept": "Дней подряд: {count}",
+      "streakInvite": "Сыграйте завтра ещё раз, и у класса начнётся серия",
       "shareParents": "Поделиться с родителями",
       "proPill": "Pro",
       "invitePrompt": "Знаете учителя, которому это понравится?",
@@ -22630,7 +22649,8 @@ const ru = {
         "sticker": "Ваши слова · {count}",
         "needMore": "Добавьте ещё {count}, чтобы играть своими словами.",
         "dropped": "Не вошло: {count}. Подходят только отдельные слова на языке класса."
-      }
+      },
+      "codePending": "Код появится, как только вы создадите класс"
     },
     "host": {
       "roundGroup": "Раунд",

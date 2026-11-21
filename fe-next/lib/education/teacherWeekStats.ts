@@ -24,6 +24,8 @@ export interface TeacherWeekSummary {
   activeClasses: number;
   /** Most recent live game per class within the activity window. */
   lastPlayedAt: Record<string, string>;
+  /** Distinct games per class in the last 7 days; a class with none is absent, never 0. */
+  weekGamesByClass: Record<string, number>;
 }
 
 export function summarizeTeacherWeek(
@@ -36,6 +38,7 @@ export function summarizeTeacherWeek(
   const allGames = new Set<string>();
   const active = new Set<string>();
   const lastPlayedAt: Record<string, string> = {};
+  const weekByClass: Record<string, Set<string>> = {};
   for (const row of rows) {
     if (!row.game_code) continue;
     allGames.add(`${row.classroom_id}:${row.game_code}`);
@@ -44,6 +47,7 @@ export function summarizeTeacherWeek(
     if (Date.parse(row.completed_at) >= weekStart) {
       games.add(`${row.classroom_id}:${row.game_code}`);
       active.add(row.classroom_id);
+      (weekByClass[row.classroom_id] ??= new Set()).add(row.game_code);
     }
   }
   return {
@@ -52,6 +56,7 @@ export function summarizeTeacherWeek(
     totalStudents: classrooms.reduce((n, c) => n + (c.member_count ?? 0), 0),
     activeClasses: active.size,
     lastPlayedAt,
+    weekGamesByClass: Object.fromEntries(Object.entries(weekByClass).map(([id, g]) => [id, g.size])),
   };
 }
 

@@ -46,23 +46,28 @@ function FillBar({ pct, className, children }: { pct: number; className?: string
   );
 }
 
-function NextUpCard({ next, t }: { next: NextAward; t: T }) {
+function NextUpCard({ next, t, lead = true }: { next: NextAward; t: T; lead?: boolean }) {
   const icon = getTierDisplay(next.nextTier)?.icon;
   return (
-    <div data-testid="awards-next" className={cn(WELL, 'grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1.5')}>
-      <Medallion tone="gold" size={40} shadow={2} className="row-span-2 self-start">
+    <div data-testid={lead ? 'awards-next' : 'awards-next-more'} className={cn(WELL, 'grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1.5')}>
+      <Medallion tone="gold" size={lead ? 44 : 32} shadow={2} className="row-span-2 self-start">
         <span className="text-xl leading-none">{next.award.icon}</span>
       </Medallion>
       <div className="min-w-0">
         <p className="flex items-baseline gap-2">
-          <span dir="auto" className={cn(CAPS, 'shrink-0 text-neo-lime')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>
+          {lead && <span dir="auto" className={cn(CAPS, 'shrink-0 text-neo-lime')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>}
           <span dir="auto" className="ms-auto truncate font-neo-body text-xs font-bold text-neo-white/80">
             {t('academy.pages.awardsToTier', '{left} more for {tier}', { left: next.left, tier: tierLabel(t, next.nextTier) })}
           </span>
         </p>
-        <p dir="auto" className={cn('truncate font-neo-display text-base font-black leading-tight text-neo-white sm:text-lg', INK_TEXT)}>
+        <p dir="auto" className={cn('truncate font-neo-display font-black leading-tight text-neo-white', lead ? 'text-lg sm:text-xl' : 'text-sm', INK_TEXT)}>
           {t(next.award.nameKey)}
         </p>
+        {lead && (
+          <p data-testid="awards-next-how" dir="auto" className="font-neo-body text-sm font-bold leading-snug text-neo-white/85">
+            {t(next.award.descriptionKey)}
+          </p>
+        )}
       </div>
       <div className="col-start-2 flex items-center gap-2">
         <span
@@ -73,7 +78,7 @@ function NextUpCard({ next, t }: { next: NextAward; t: T }) {
           aria-label={t(next.award.nameKey)}
           className="min-w-0 flex-1"
         >
-          <FillBar pct={next.pct} className="h-6">
+          <FillBar pct={next.pct} className={lead ? 'h-6' : 'h-5'}>
             <bdi>{next.count} / {next.threshold}</bdi>
           </FillBar>
         </span>
@@ -86,13 +91,13 @@ function NextUpCard({ next, t }: { next: NextAward; t: T }) {
 }
 
 // Duolingo-style summary above the wall, in ONE card so the badge wall still shows on a short phone.
-export function AwardsHero({ achievements }: { achievements: Record<string, Achievement> }) {
+export function AwardsHero({ achievements, celebrate = false }: { achievements: Record<string, Achievement>; celebrate?: boolean }) {
   const { t: rawT } = useLanguage();
   const t = rawT as unknown as T;
   const summary = useMemo(() => summarizeAwards(achievements), [achievements]);
   const [landed, setLanded] = useState(false);
   if (summary.total === 0) return null;
-  const { earned, total, tiers, next } = summary;
+  const { earned, total, tiers, next, nexts } = summary;
 
   return (
     <div data-testid="awards-hero" data-total={total} className="mb-3">
@@ -123,7 +128,7 @@ export function AwardsHero({ achievements }: { achievements: Record<string, Achi
                 </div>
               </div>
             </div>
-            <ul className="grid grid-cols-4 gap-2">
+            {earned > 0 && <ul className="grid grid-cols-4 gap-2">
               {TIERS.map(({ tier, tone }) => {
                 const n = tiers[tier];
                 return (
@@ -139,16 +144,21 @@ export function AwardsHero({ achievements }: { achievements: Record<string, Achi
                   </li>
                 );
               })}
-            </ul>
+            </ul>}
           </div>
           {next ? (
-            <NextUpCard next={next} t={t} />
+            <div className="flex min-w-0 flex-col gap-2 order-first">
+              <NextUpCard next={next} t={t} />
+              {nexts.slice(1).map((n) => (
+                <NextUpCard key={n.id} next={n} t={t} lead={false} />
+              ))}
+            </div>
           ) : (
             <p dir="auto" className={cn(WELL, 'flex items-center justify-center text-center font-neo-display text-base font-black text-neo-yellow', INK_TEXT)}>
               {t('academy.pages.awardsAllMaxed', 'Every award maxed out!')}
             </p>
           )}
-          <CelebrationBurst playing={landed && earned > 0} burstKey={earned} count={12} />
+          <CelebrationBurst playing={landed && celebrate && earned > 0} burstKey={earned} count={12} />
         </div>
       </Reveal>
     </div>

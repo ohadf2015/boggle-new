@@ -1309,7 +1309,7 @@ const ja = {
         "emptyTitle": "復習する単語はないよ",
         "emptyBody": "クラスゲームやレッスンで遊ぶと、ミスした単語がここでリベンジを待ってるよ。",
         "introTitle": "{count}語がリベンジを待ってる！",
-        "introBody": "サクッと10枚。連続正解をキープして宝箱を開けよう。",
+        "introBody": "サクッと{n}枚、そのあと宝箱を開けよう。",
         "start": "スタート",
         "score": "{correct} / {total}",
         "bestStreak": "最高連続 {streak} · {points}pt",
@@ -1482,7 +1482,14 @@ const ja = {
       "awardsAllMaxed": "すべてのトロフィーが最高ランク！",
       "awardsTierCount": "{tier}: {count}",
       "lessonsDone": "{done}/{total} クリア",
-      "lessonsRegion": "マイレッスン"
+      "lessonsRegion": "マイレッスン",
+      "awardNew": "NEW!",
+      "awardsShowMore": "まだ獲得できるバッジ: {count}",
+      "awardsHideMore": "ほかを隠す",
+      "profileFirstTitle": "最初のレッスンでレベルが動き出します",
+      "profileFirstBody": "1ラウンド遊ぶと、XPや覚えた単語、バッジがここに表示されます。",
+      "profileNextAward": "いちばん近いバッジ: {name}。{how}",
+      "profileNoAwardsYet": "レッスンを終えると最初のバッジがもらえます。"
     }
   },
   // @academy:end
@@ -14786,7 +14793,8 @@ const ja = {
       "strugglingOne": "{{names}}が苦戦しています",
       "struggling": "{{count}}人が苦戦: {{names}}",
       "regionLabel": "{{classroom}}のクラス状況",
-      "switcherLabel": "どのクラス"
+      "switcherLabel": "どのクラス",
+      "classAccuracy": "クラス正答率 {{accuracy}}%"
     },
     "activation": {
       "shareTitle": "生徒はこのリンクで参加します",
@@ -15476,7 +15484,9 @@ const ja = {
         "personalHint": "各生徒は自分のXPと順位だけを見られます。",
         "off": "オフ",
         "offHint": "ランキングなし。XP・レベル・バッジは引き続きたまります。"
-      }
+      },
+      "tapToCopy": "タップしてコピー",
+      "codeCopiedShort": "コピーしました"
     },
     "classrooms": {
       "students": {
@@ -15814,7 +15824,8 @@ const ja = {
         "openClass": "クラスのレポートを開く",
         "startFirstGame": "最初のゲームを始める",
         "exampleWords": "かみなり,そよかぜ,しも,くも",
-        "exampleNames": "ゆい,はると"
+        "exampleNames": "ゆい,はると",
+        "singleStudent": "まだ1人の生徒しか遊んでいないため、これはその生徒の間違いです。"
       },
       "arc": {
         "title": "学習の軌跡",
@@ -16077,6 +16088,9 @@ const ja = {
         "errorUngraded": "この Classroom の課題には配点がないため、成績を付けられません。",
         "errorNotPro": "Google Classroom への成績送信は Teacher Pro の機能です。",
         "errorGeneric": "Google Classroom との通信で問題が発生しました。もう一度お試しください。"
+      },
+      "picker": {
+        "showing": "上に表示中"
       }
     },
     "curriculum": {
@@ -16156,6 +16170,7 @@ const ja = {
       "startGame": "ゲームを始める",
       "proLine": "Proなら毎週の記録と生徒一人ひとりを確認できます",
       "homeTitle": "今週、{{name}}でサポートが必要なのは？",
+      "homeTitleGames": "今週の{{name}}のゲーム：{{count}}回。サポートが必要なのは誰？",
       "homeBody": "1クラスは無料。Proなら過去の週、生徒ごとのレポート、すべてのクラスが見られます。",
       "homeCta": "今週を見る"
     }
@@ -17118,7 +17133,8 @@ const ja = {
       "toNext": "{{tier}}まで{{percent}}%",
       "unlocked": "アンロック！",
       "unpin": "ピン解除",
-      "upgraded": "バッジが{{tier}}にランクアップ！"
+      "upgraded": "バッジが{{tier}}にランクアップ！",
+      "pinInvite": "お気に入りを最大{{max}}個までピン留めできます"
     },
     "mastery": {
       "flashcardPerfect": "完璧！{{count}}個の単語をマスター",
@@ -17970,7 +17986,8 @@ const ja = {
           "stepOf": "ステップ {{current}} / {{total}}",
           "successGame": "ゲームに入ります…",
           "yourClass": "あなたのクラス",
-          "findingAssignment": "課題を探しています…"
+          "findingAssignment": "課題を探しています…",
+          "retypeCode": "もう一度コードを入力"
         },
         "heroLine": "先生にクラスコードを聞いてね",
         "preparing": "準備しています。少しお待ちください。",
@@ -22505,6 +22522,8 @@ const ja = {
       "more": "その他",
       "missedTitle": "クラスが見逃した単語",
       "practiceWords": "この単語を練習する（{count}）",
+      "streakKept": "{count}日連続",
+      "streakInvite": "明日もう一度遊んで、クラスの連続記録を始めよう",
       "shareParents": "保護者に共有",
       "proPill": "Pro",
       "invitePrompt": "気に入りそうな先生はいますか？",
@@ -22930,7 +22949,8 @@ const ja = {
         "sticker": "自分の単語 · {count}",
         "needMore": "自分の単語を使うには、あと{count}語追加してください。",
         "dropped": "除外：{count}件。使えるのはクラスの言語の1語だけの単語です。"
-      }
+      },
+      "codePending": "クラスを作るとコードが表示されます"
     },
     "host": {
       "roundGroup": "ラウンド",

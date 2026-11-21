@@ -23,6 +23,7 @@ vi.mock('../../contexts/LanguageContext', () => ({
         'education.achievements.earned': '{count}/{total} earned',
         'education.achievements.secretRemaining': '{count} secret badges remain hidden...',
         'education.achievements.pinLimit': '{current}/{max} pinned',
+        'education.achievements.pinInvite': 'Pin up to {max} favorites',
         'education.achievements.maxPinsReached': 'Unpin another badge first',
         'education.achievements.word_master.name': 'Word Master',
         'education.achievements.first_lesson.name': 'First Lesson',
@@ -274,6 +275,22 @@ describe('EducationBadgeGrid', () => {
   });
 
   describe('Pin Logic', () => {
+    it('invites the student to pin when nothing is pinned yet', () => {
+      setMockPinnedKeys([]);
+
+      render(<EducationBadgeGrid studentId="student-123" achievements={mockAchievements} />);
+
+      expect(screen.getByText('Pin up to 3 favorites')).toBeInTheDocument();
+      expect(screen.queryByText('0/3 pinned')).not.toBeInTheDocument();
+    });
+
+    it('keeps the count line once something is pinned', () => {
+      render(<EducationBadgeGrid studentId="student-123" achievements={mockAchievements} />);
+
+      expect(screen.getByText('1/3 pinned')).toBeInTheDocument();
+      expect(screen.queryByText('Pin up to 3 favorites')).not.toBeInTheDocument();
+    });
+
     it('enforces max 3 pins', () => {
       // Set 3 achievements as pinned via the mock
       setMockPinnedKeys(['word_master', 'first_lesson', 'speed_demon']);

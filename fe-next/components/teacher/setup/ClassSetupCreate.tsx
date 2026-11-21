@@ -100,6 +100,7 @@ export function ClassSetupCreate() {
         } else {
           toast.error(t('eduShell.setup.assignFailed'));
         }
+        setBusy('done');
         const savedLessonId = assigned.success ? assigned.lesson?.id : null;
         const href = inviteHref(language, classroomId, ownList ? null : pack.nameKey);
         router.replace(savedLessonId ? `${href}&lessonId=${encodeURIComponent(savedLessonId)}` : href, { scroll: false });

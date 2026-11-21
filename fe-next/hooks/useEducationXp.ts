@@ -6,7 +6,7 @@
  * Manages XP state for education practice activities.
  * Integrates with:
  * - calculatePracticeXp from educationXpManager (XP calculation)
- * - streak functions from streaks.ts (streak tracking)
+ * - the lesson practice streak the server returns (never the Daily Challenge streak)
  * - xpManager (level progression)
  *
  * Design: Mastery-focused (research pitfall 1 - intrinsic > extrinsic)
@@ -29,13 +29,7 @@ import {
   type XpProgress,
   type LevelUpResult,
 } from '@/backend/modules/xpManager';
-import {
-  getDailyStreak,
-  updateDailyStreak,
-  getStreakMilestone,
-  getStreakMilestoneMessage,
-} from '@/utils/dailyChallenge/streaks';
-import type { DailyStreak } from '@/utils/dailyChallenge/types';
+import type { PracticeStreak } from '@/lib/education/practiceStreak';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -54,10 +48,9 @@ export interface UseEducationXpOptions {
   initialStreak?: number;
 }
 
-export interface StreakMilestoneInfo {
-  emoji: string;
-  title: string;
-  subtitle: string;
+export interface LessonStreak {
+  currentStreak: number;
+  longestStreak: number;
 }
 
 export interface AwardPracticeXpResult extends PracticeXpResult {
@@ -67,8 +60,6 @@ export interface AwardPracticeXpResult extends PracticeXpResult {
   newLevel?: number;
   /** Titles unlocked from leveling up */
   newTitles: string[];
-  /** Streak milestone info if hit */
-  streakMilestone?: StreakMilestoneInfo | null;
 }
 
 export interface PendingXpUpdate {
@@ -76,7 +67,7 @@ export interface PendingXpUpdate {
   lessonId: string;
   totalXp: number;
   currentLevel: number;
-  streak: DailyStreak;
+  streak: LessonStreak;
 }
 
 export interface UseEducationXpReturn {
@@ -87,12 +78,13 @@ export interface UseEducationXpReturn {
   currentLevel: number;
   /** Detailed XP progress information */
   xpProgress: XpProgress;
-  /** Current streak information */
-  streak: DailyStreak;
+  /** The lesson practice streak, as last reported by the server */
+  streak: LessonStreak;
 
   // Actions
   /** Award XP for a practice session */
   awardPracticeXp: (session: PracticeSessionXp) => Promise<AwardPracticeXpResult>;
+  applyServerStreak: (streak: PracticeStreak) => void;
   /** Acknowledge that pending update was persisted */
   acknowledgePersistence: () => void;
 
@@ -151,16 +143,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
   const currentLevelRef = useRef<number>(0);
   currentLevelRef.current = currentLevel;
   totalXpRef.current = totalXp;
-  const [streak, setStreak] = useState<DailyStreak>(() => {
-    const currentStreak = getDailyStreak();
-    if (initialStreak !== undefined) {
-      return {
-        ...currentStreak,
-        currentStreak: initialStreak,
-      };
-    }
-    return currentStreak;
-  });
+  const [streak, setStreak] = useState<LessonStreak>({ currentStreak: initialStreak ?? 0, longestStreak: initialStreak ?? 0 });
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -179,9 +162,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
    * Award XP for a practice session
    * Handles:
    * - XP calculation via calculatePracticeXp
-   * - Streak update
    * - Level up detection
-   * - Streak milestone detection
    */
   const awardPracticeXp = useCallback(
     async (session: PracticeSessionXp): Promise<AwardPracticeXpResult> => {
@@ -208,16 +189,6 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         // Calculate XP (includes streak bonus if applicable)
         const xpResult = calculatePracticeXp(session);
 
-        // Update streak
-        const updatedStreak = updateDailyStreak();
-        setStreak(updatedStreak);
-
-        // Check for streak milestone
-        const milestoneDay = getStreakMilestone(updatedStreak.currentStreak);
-        const streakMilestone = milestoneDay
-          ? getStreakMilestoneMessage(milestoneDay)
-          : null;
-
         // BUG-05: read from ref to avoid stale closure on consecutive awards
         const newTotalXp = totalXpRef.current + xpResult.totalXp;
         const oldLevel = currentLevelRef.current;
@@ -239,7 +210,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
           lessonId,
           totalXp: newTotalXp,
           currentLevel: newLevel,
-          streak: updatedStreak,
+          streak,
         };
         setPendingUpdate(update);
 
@@ -254,7 +225,6 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
           leveledUp: levelUpResult.leveledUp,
           newLevel: levelUpResult.newLevel,
           newTitles: levelUpResult.newTitles,
-          streakMilestone: streakMilestone ?? undefined,
         };
 
         setIsLoading(false);
@@ -274,8 +244,12 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
         };
       }
     },
-    [studentId, lessonId]
+    [studentId, lessonId, streak]
   );
+
+  const applyServerStreak = useCallback((next: PracticeStreak) => {
+    setStreak({ currentStreak: next.current, longestStreak: next.longest });
+  }, []);
 
   const reconcileAwardedXp = useCallback((estimatedXp: number, awardedXp: number): number => {
     const reconciledXp = Math.max(0, totalXpRef.current - estimatedXp + awardedXp);
@@ -306,6 +280,7 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 
     // Actions
     awardPracticeXp,
+    applyServerStreak,
     reconcileAwardedXp,
     acknowledgePersistence,
 
@@ -321,6 +296,6 @@ export function useEducationXp(options: UseEducationXpOptions): UseEducationXpRe
 // ==================== EXPORTS ====================
 
 export { EDUCATION_XP_CONFIG };
-export type { PracticeSessionXp, PracticeXpResult, DailyStreak, XpProgress };
+export type { PracticeSessionXp, PracticeXpResult, XpProgress };
 
 export default useEducationXp;

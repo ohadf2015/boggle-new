@@ -99,6 +99,24 @@ describe('ClassroomManager — swipe carousel instead of page scroll', () => {
     expect(screen.queryByTestId('classroom-create-link')).toBeNull();
   });
 
+  it('Given four classes on a three-wide row, Then a New class card closes the second row instead of leaving a hole', () => {
+    mq.wide = true;
+    state.classrooms = [mk(1), mk(2), mk(3), mk(4)];
+    render(<ClassroomManager />);
+    expect(screen.getAllByTestId('classroom-new-card')).toHaveLength(1);
+    expect(screen.queryByTestId('classroom-create-link')).toBeNull();
+  });
+
+  it('Given twelve classes on a three-wide row, Then the row is full and the top New class button is the one entry, a chunky secondary', () => {
+    mq.wide = true;
+    state.classrooms = Array.from({ length: 12 }, (_, i) => mk(i + 1));
+    render(<ClassroomManager />);
+    expect(screen.queryByTestId('classroom-new-card')).toBeNull();
+    const link = screen.getByTestId('classroom-create-link');
+    expect(link.className).toContain('min-h-[48px]');
+    expect(link.className).toContain('border-[3px]');
+  });
+
   it('Given as many classes as the row holds, or a phone, Then no New class card takes a seat', () => {
     mq.wide = true;
     render(<ClassroomManager />);

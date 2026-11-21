@@ -228,44 +228,6 @@ export interface LeaderboardSnapshotRow {
   created_at: string;
 }
 
-export type ChallengeTier = 'easy' | 'medium' | 'hard';
-
-export interface DailyChallengeRow {
-  id: string;
-  player_id: string;
-  challenge_date: string;
-  challenge_type: string;
-  challenge_tier: ChallengeTier;
-  title: string;
-  description: string;
-  target_value: number;
-  current_value: number;
-  xp_reward: number;
-  bonus_reward: { coins?: number } | null;
-  completed: boolean;
-  completed_at: string | null;
-  claimed: boolean;
-  claimed_at: string | null;
-  created_at: string;
-}
-
-export interface WeeklyQuestRow {
-  id: string;
-  player_id: string;
-  week_start: string;
-  quest_type: string;
-  title: string;
-  description: string;
-  requirements: Record<string, unknown>;
-  current_progress: Record<string, unknown>;
-  xp_reward: number;
-  bonus_rewards: { coins?: number } | null;
-  completed: boolean;
-  completed_at: string | null;
-  claimed: boolean;
-  created_at: string;
-}
-
 export interface MilestoneLevel {
   level: number;
   title: string | null;

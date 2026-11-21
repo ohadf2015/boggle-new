@@ -43,8 +43,16 @@ describe('<ClassroomCardActivity>', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     const last = screen.getByTestId('classroom-card-last');
     expect(last).not.toHaveTextContent('teacher.playNow.shortcutLastGame');
-    expect(last).toHaveTextContent('teacher.pulse.lastPlayedDays');
-    expect(last).toHaveTextContent('"days":2');
+    expect(last).toHaveTextContent('teacher.pulse.lastPlayedNoScoreDays:{"days":2}');
+    expect(last).toHaveTextContent('teacher.pulse.classAccuracy:{"accuracy":78}');
+  });
+
+  it('Given a zero average, Then the line does not show a 0% that only means no data', () => {
+    pulse.mockReturnValue({ pulse: { ...base, averageAccuracyPct: 0 }, isLoading: false, error: null, refresh: vi.fn() });
+    render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
+    const line = screen.getByTestId('classroom-card-last');
+    expect(line).toHaveTextContent('teacher.pulse.lastPlayedNoScoreDays');
+    expect(line).not.toHaveTextContent('classAccuracy');
   });
 
   it('is calm: no white slab, no uppercase micro-label, no cut-off text', () => {
@@ -74,7 +82,7 @@ describe('<ClassroomCardActivity>', () => {
     render(<ClassroomCardActivity classroomId="c1" rosterCount={3} />);
     const line = screen.getByTestId('classroom-card-last').textContent;
     expect(line).toContain('teacher.pulse.lastPlayedNoScoreDays');
-    expect(line).not.toContain('accuracy');
+    expect(line).not.toContain('classAccuracy');
   });
 
   it('Given the read is still open, Then it claims nothing yet', () => {
