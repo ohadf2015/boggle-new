@@ -213,10 +213,14 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-neo-cream/20 pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-neo-cream/20 pt-4">
           <p className="text-xs text-neo-white">
             {t('legal.copyright', { year: new Date().getFullYear() })}
           </p>
+          <a href="https://oddities.app/app/lexiclash?ref=badge">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://oddities.app/badge/lexiclash" alt="LexiClash on Oddities" height="20" width="204" loading="lazy" decoding="async" className="opacity-80 hover:opacity-100 transition-opacity" />
+          </a>
         </div>
         </>
         )}
