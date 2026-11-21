@@ -191,6 +191,35 @@ describe('buildEducationLandingJsonLd', () => {
   });
 });
 
+describe('query-grounded English ESL snippet', () => {
+  it('replaces the English SERP title and leaves the Spanish snippet alone', () => {
+    const en = buildEducationLandingMetadata({
+      locale: 'en',
+      path: '/education/esl-word-games',
+      content: content(),
+    });
+    expect(en.title).toBe('Vocabulary Games for the Classroom — Free ESL | LexiClash');
+    expect(String(en.description)).toContain('Vocabulary games for the classroom');
+    expect(en.openGraph?.title).toBe('Vocabulary Games for the Classroom');
+
+    const es = buildEducationLandingMetadata({
+      locale: 'es',
+      path: '/education/esl-word-games',
+      content: content(),
+    });
+    expect(es.title).toBe('TITLE_HE');
+
+    const ld = buildEducationLandingJsonLd({
+      locale: 'en',
+      path: '/education/esl-word-games',
+      content: content({ extraJsonLd: [{ '@type': 'Course', name: 'OLD', description: 'OLD' }] }),
+    });
+    expect(ld[0].name).toBe('Vocabulary Games for the Classroom — Free ESL | LexiClash');
+    const course = ld.find((n) => n['@type'] === 'Course');
+    expect(course?.name).toBe('Vocabulary Games for the Classroom — Free ESL | LexiClash');
+  });
+});
+
 describe('hreflang agreement between the page and the sitemap', () => {
   it('emits exactly the alternates the sitemap declares for the same path', async () => {
     // Two sources of truth for the same annotation is the bug this whole file

@@ -203,7 +203,55 @@ function heroImage(locale: string): string {
   return `${EDUCATION_BASE_URL}/images/education-hero-${asset}.webp`;
 }
 
-export function buildEducationLandingMetadata({ locale, path, content }: BuildArgs): Metadata {
+/**
+ * SERP snippet for /en/education/esl-word-games.
+ *
+ * Not in that page's content.ts: the same file holds the Spanish snippet, and
+ * seo-freeze.json freezes /es/education/esl-word-games until 2026-11-28. The
+ * freeze checker matches the shared route directory, so a title line there
+ * fails CI even when only the English block changes. Spanish copy in
+ * content.ts stays byte-identical until that freeze lifts.
+ *
+ * GSC 2026-11-21: the English URL has 2,522 impressions at position 7.1 for
+ * "vocabulary games" and 0 clicks. The title it was showing did not contain
+ * that query.
+ */
+const EN_ESL_CTR = {
+  title: 'Vocabulary Games for the Classroom — Free ESL | LexiClash',
+  description:
+    'Vocabulary games for the classroom. English learners join with a code — no student accounts. Free ESL rounds, and you set a level per student.',
+  ogTitle: 'Vocabulary Games for the Classroom',
+  ogDescription:
+    'Free vocabulary games for the classroom. English learners join with a code, no student accounts, board on the projector.',
+  twitterDescription:
+    'Free vocabulary games for the classroom. English learners join with a code — no student accounts.',
+} as const;
+
+function withQueryGroundedSnippet(args: BuildArgs): BuildArgs {
+  if (args.locale !== 'en' || args.path !== '/education/esl-word-games') return args;
+  return {
+    ...args,
+    content: {
+      ...args.content,
+      meta: {
+        ...args.content.meta,
+        title: EN_ESL_CTR.title,
+        description: EN_ESL_CTR.description,
+        ogTitle: EN_ESL_CTR.ogTitle,
+        ogDescription: EN_ESL_CTR.ogDescription,
+        twitterDescription: EN_ESL_CTR.twitterDescription,
+      },
+      extraJsonLd: args.content.extraJsonLd?.map((node) => ({
+        ...node,
+        ...(typeof node.name === 'string' ? { name: EN_ESL_CTR.title } : {}),
+        ...(typeof node.description === 'string' ? { description: EN_ESL_CTR.description } : {}),
+      })),
+    },
+  };
+}
+
+export function buildEducationLandingMetadata(input: BuildArgs): Metadata {
+  const { locale, path, content } = withQueryGroundedSnippet(input);
   const supported = isEducationLocale(locale);
   const url = localeUrl(locale, path);
   const image = heroImage(locale);
@@ -242,7 +290,8 @@ export function buildEducationLandingMetadata({ locale, path, content }: BuildAr
 
 type JsonLdNode = Record<string, unknown> & { '@type': string; '@id': string };
 
-export function buildEducationLandingJsonLd({ locale, path, content }: BuildArgs): JsonLdNode[] {
+export function buildEducationLandingJsonLd(input: BuildArgs): JsonLdNode[] {
+  const { locale, path, content } = withQueryGroundedSnippet(input);
   const url = localeUrl(locale, path);
   const lang = isEducationLocale(locale) ? locale : 'en';
   const { breadcrumb, learning, answer, faqs, meta } = content;
