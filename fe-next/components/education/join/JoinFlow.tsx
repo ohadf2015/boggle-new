@@ -19,6 +19,7 @@ import { TeacherOwnClassPanel } from './TeacherOwnClassPanel';
 import { BoundedConfettiBurst } from '@/components/motion/BoundedConfettiBurst';
 import { UnconfirmedJoinEmail } from './UnconfirmedJoinEmail';
 import { JoinReturningStep } from './JoinReturningStep';
+import { extractJoinCode } from './joinCodeFromLink';
 import { useReturningStudent } from './useReturningStudent';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 
@@ -120,12 +121,13 @@ export function JoinFlow({
   const handlePaste = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      if (joinCodeOverflows(text)) {
+      const linked = extractJoinCode(text);
+      if (!linked && joinCodeOverflows(text)) {
         setPasteNoteKey(null);
         flow.refuseTooLong();
         return;
       }
-      const cleaned = sanitizeJoinCode(text);
+      const cleaned = linked ?? sanitizeJoinCode(text);
       if (!cleaned) {
         setPasteNoteKey(`${K}.emptyClipboard`);
         return;

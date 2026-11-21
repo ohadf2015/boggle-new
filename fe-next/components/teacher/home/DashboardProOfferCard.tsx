@@ -12,6 +12,7 @@ import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/r
 import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
+import { DashboardClassInsightLink } from './DashboardClassInsightLink';
 import { PRO_BANNER_CTA, ProBanner, ProShine } from '../pro/ProBanner';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -24,7 +25,14 @@ export const DASHBOARD_PRO_PLACEMENT = 'dashboard' as const;
  * half on screen fires `edu_pro_offer_impression`. The button starts Polar
  * checkout (trial or $9/mo — resolveProOffer decides, never a second trial).
  */
-export function DashboardProOfferCard({ language, t }: { language: string; t: T }) {
+export interface DashboardClassInsight {
+  classroomId: string;
+  className: string;
+  /** Distinct games this class ran in the last 7 days; absent or 0 keeps the generic title. */
+  weekGames?: number;
+}
+
+export function DashboardProOfferCard({ language, t, insight }: { language: string; t: T; insight?: DashboardClassInsight }) {
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const { loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
@@ -71,7 +79,11 @@ export function DashboardProOfferCard({ language, t }: { language: string; t: T 
       <ProBanner
         testId="dashboard-pro-offer"
         proLabel={t('eduShell.nav.pro')}
-        title={lines.title}
+        title={
+          insight?.weekGames
+            ? t('teacher.weekInsight.homeTitleGames', { name: `\u2068${insight.className}\u2069`, count: insight.weekGames })
+            : lines.title
+        }
         body={lines.body}
         data={{ 'data-placement': DASHBOARD_PRO_PLACEMENT, 'data-offer': proOffer.offer, 'data-variant': variant }}
       >
@@ -94,6 +106,9 @@ export function DashboardProOfferCard({ language, t }: { language: string; t: T 
           {trial.pending ? <Loader2 className="relative size-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           <span className="relative">{proOffer.label}</span>
         </button>
+        {insight ? (
+          <DashboardClassInsightLink classroomId={insight.classroomId} language={language} label={t('teacher.weekInsight.homeCta')} />
+        ) : null}
       </ProBanner>
     </div>
   );

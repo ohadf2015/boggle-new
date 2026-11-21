@@ -11,9 +11,9 @@ import type { DeadEndState } from './deadEndPractice';
 
 const LOOK = {
   primary:
-    'flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 text-neo-navy shadow-hard transition-transform active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-lime',
+    'flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-2 text-neo-navy shadow-hard transition-transform duration-100 motion-safe:active:translate-x-[2px] motion-safe:active:translate-y-[2px] active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-lime',
   quiet:
-    'inline-flex min-h-11 items-center gap-2 self-start rounded-neo border-2 border-neo-lime/70 bg-neo-navy px-3 py-1.5 text-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-lime',
+    'inline-flex min-h-11 items-center gap-2 self-start rounded-neo border-2 transition-transform duration-100 motion-safe:active:translate-y-0.5 border-neo-lime/70 bg-neo-navy px-3 py-1.5 text-neo-lime focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-lime',
 } as const;
 
 interface DeadEndPracticeLinkProps {

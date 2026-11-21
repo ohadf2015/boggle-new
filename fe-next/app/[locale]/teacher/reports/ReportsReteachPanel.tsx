@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRosterNames } from '@/components/teacher/reports/useWordMasteryReport';
@@ -25,9 +26,13 @@ interface PickerClass {
 const NAMES_SHOWN = 3;
 const splitList = (value: string) => value.split(',').map((s) => s.trim()).filter(Boolean);
 
-export function ReportsReteachPanel({ classrooms }: { classrooms: readonly PickerClass[] }) {
+export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: readonly PickerClass[]; onShown?: (classroomId: string | null) => void }) {
   const { t } = useLanguage();
   const state = useReteachSnapshot(classrooms);
+  const shownId = state.status === 'ready' ? (state.snapshot?.classroomId ?? null) : null;
+  useEffect(() => {
+    onShown?.(shownId);
+  }, [onShown, shownId]);
 
   if (state.status === 'loading') {
     return (
@@ -58,7 +63,7 @@ export function ReportsReteachPanel({ classrooms }: { classrooms: readonly Picke
     <section data-testid="reports-reteach-panel" aria-labelledby="reports-reteach-title" className={cn(REPORT_HERO_PANEL, 'mb-6')}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <IconBadge icon={Target} tone="pink" />
-        <h2 id="reports-reteach-title" dir="auto" className="font-neo-display text-2xl font-black leading-tight text-neo-white sm:text-3xl">
+        <h2 id="reports-reteach-title" dir="auto" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-white sm:text-3xl">
           {t('teacher.reports.reteach.title', 'What to reteach')}
         </h2>
         {example ? (
@@ -72,7 +77,7 @@ export function ReportsReteachPanel({ classrooms }: { classrooms: readonly Picke
           <span
             data-testid="reteach-accuracy"
             dir="auto"
-            className="ms-auto rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-0.5 text-xs font-black tabular-nums text-neo-black shadow-hard-sm sm:text-sm"
+            className="whitespace-nowrap max-sm:basis-full max-sm:w-fit sm:ms-auto rounded-full border-2 border-neo-black bg-neo-cyan px-2.5 py-0.5 text-xs font-black tabular-nums text-neo-black shadow-hard-sm sm:text-sm"
           >
             {t('teacher.reports.reteach.accuracy', 'Class accuracy {pct}%', { pct: snapshot.classAccuracy })}
           </span>
@@ -87,7 +92,7 @@ export function ReportsReteachPanel({ classrooms }: { classrooms: readonly Picke
           : t('teacher.reports.reteach.fromClass', 'Words {name} missed most in its games so far.', { name: `\u2068${snapshot.classroomName}\u2069` })}
       </p>
 
-      <ReteachWordRows words={snapshotWords(snapshot.words)} columns />
+      <ReteachWordRows words={snapshotWords(snapshot.words)} columns noteSingleStudent={!example} />
       <NeedsHelp snapshot={snapshot} example={example} />
 
       <div className="mt-5">

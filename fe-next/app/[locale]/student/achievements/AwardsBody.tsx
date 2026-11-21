@@ -5,8 +5,10 @@ import { AwardsGrid, type AwardsFilter } from '@/components/student/pages/Awards
 import { Reveal } from '@/components/education/motion';
 import { AwardsHero } from './AwardsHero';
 import { AwardsEmpty } from './AwardsEmpty';
+import { useUnseenAwards } from './useUnseenAwards';
 
-export function AwardsBody({ achievements, filter }: { achievements: Record<string, Achievement>; filter: AwardsFilter }) {
+export function AwardsBody({ achievements, filter, studentId = null }: { achievements: Record<string, Achievement>; filter: AwardsFilter; studentId?: string | null }) {
+  const fresh = useUnseenAwards(studentId, achievements);
   if (Object.keys(achievements).length === 0) {
     return (
       <div data-testid="student-awards-content" className="h-full">
@@ -16,9 +18,9 @@ export function AwardsBody({ achievements, filter }: { achievements: Record<stri
   }
   return (
     <div data-testid="student-awards-content">
-      {filter === 'all' && <AwardsHero achievements={achievements} />}
+      {filter === 'all' && <AwardsHero achievements={achievements} celebrate={fresh.size > 0} />}
       <Reveal delay={0.16}>
-        <AwardsGrid achievements={achievements} filter={filter} />
+        <AwardsGrid achievements={achievements} filter={filter} fresh={fresh} />
       </Reveal>
     </div>
   );

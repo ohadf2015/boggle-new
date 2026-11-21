@@ -79,7 +79,7 @@ export default function StudentAchievementsPageClient() {
       {!ready || isLoadingAchievements ? (
         <FrameSkeleton rows={8} grid />
       ) : (
-        <AwardsBody achievements={achievements} filter={filter} />
+        <AwardsBody achievements={achievements} filter={filter} studentId={userId} />
       )}
     </AcademyPageFrame>
   );

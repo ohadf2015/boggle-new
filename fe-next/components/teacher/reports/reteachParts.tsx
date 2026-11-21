@@ -46,37 +46,50 @@ export function IconBadge({ icon: Icon, tone, className }: { icon: LucideIcon; t
   );
 }
 
-export function ReteachWordRows({ words, columns = false }: { words: readonly HardWord[]; columns?: boolean }) {
+export function ReteachWordRows({ words, columns = false, noteSingleStudent = false }: { words: readonly HardWord[]; columns?: boolean; noteSingleStudent?: boolean }) {
   const { t } = useLanguage();
+  // One student's misses are not a class pattern: say so once instead of a 100% bar per word.
+  const single = noteSingleStudent && words.length > 0 && words.every((w) => w.studentsAsked === 1);
   return (
-    <ul className={cn('mt-2', columns && 'sm:grid sm:grid-cols-2 sm:gap-x-8')}>
-      {words.map((w) => (
-        <li
-          key={w.word}
-          data-testid="reteach-word"
-          data-word={w.word}
-          className="border-b-2 border-neo-cream/15 py-2 max-sm:[&:nth-child(n+4)]:hidden"
-        >
-          <div className="flex items-baseline justify-between gap-3">
-            <span dir="auto" className="min-w-0 truncate font-neo-display text-xl font-black text-neo-white">{w.display}</span>
-            <span className="shrink-0 text-end">
-              <span dir="auto" className="block text-sm font-black tabular-nums text-neo-pink">
-                {t('teacher.reports.reteach.missRate', '{pct}% missed', { pct: w.missRate })}
-              </span>
-              <span dir="auto" className="block text-xs font-bold text-neo-cream/70">
-                {t('teacher.reports.reteach.studentsMissed', '{missing} of {asked} students missed it', {
-                  missing: w.studentsMissing,
-                  asked: w.studentsAsked,
-                })}
-              </span>
-            </span>
-          </div>
-          <div aria-hidden="true" className="mt-1.5 h-2 overflow-hidden rounded-full bg-neo-black/50">
-            <div className="h-full rounded-full bg-neo-pink" style={{ inlineSize: `${w.missRate}%` }} />
-          </div>
-        </li>
-      ))}
-    </ul>
+    <>
+      {single ? (
+        <p data-testid="reteach-single-sample" dir="auto" className="mt-3 text-sm font-bold text-neo-cream/80">
+          {t('teacher.reports.reteach.singleStudent', 'Only one student has played so far, so these are their misses.')}
+        </p>
+      ) : null}
+      <ul className={cn('mt-2', columns && 'sm:grid sm:grid-cols-2 sm:gap-x-8')}>
+        {words.map((w) => (
+          <li
+            key={w.word}
+            data-testid="reteach-word"
+            data-word={w.word}
+            className="border-b-2 border-neo-cream/15 py-2 max-sm:[&:nth-child(n+4)]:hidden"
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <span dir="auto" className="min-w-0 truncate font-neo-display text-xl font-black text-neo-white">{w.display}</span>
+              {single ? null : (
+                <span className="shrink-0 text-end">
+                  <span dir="auto" className="block text-sm font-black tabular-nums text-neo-pink">
+                    {t('teacher.reports.reteach.missRate', '{pct}% missed', { pct: w.missRate })}
+                  </span>
+                  <span dir="auto" className="block text-xs font-bold text-neo-cream/70">
+                    {t('teacher.reports.reteach.studentsMissed', '{missing} of {asked} students missed it', {
+                      missing: w.studentsMissing,
+                      asked: w.studentsAsked,
+                    })}
+                  </span>
+                </span>
+              )}
+            </div>
+            {single ? null : (
+              <div aria-hidden="true" className="mt-1.5 h-2 overflow-hidden rounded-full bg-neo-black/50">
+                <div className="h-full rounded-full bg-neo-pink" style={{ inlineSize: `${w.missRate}%` }} />
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

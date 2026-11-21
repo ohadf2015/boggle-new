@@ -38,15 +38,20 @@ function StudentCount({ count }: { count: number }) {
 export function ClassroomPicker({
   classrooms,
   onSelect,
+  shownId,
 }: {
   classrooms: readonly PickerClass[];
   onSelect: (id: string) => void;
+  /** The class whose report leads the page above; its tile is marked. */
+  shownId?: string | null;
 }) {
+  const { t } = useLanguage();
   const reduce = useReducedMotion();
   return (
     <ul className="grid gap-4 sm:grid-cols-2">
       {classrooms.map((c, i) => {
         const accent = accentFor(i);
+        const shown = c.id === shownId;
         return (
           <m.li
             key={c.id}
@@ -57,10 +62,11 @@ export function ClassroomPicker({
             <m.button
               type="button"
               onClick={() => onSelect(c.id)}
+              aria-current={shown ? 'true' : undefined}
               whileHover={reduce ? undefined : { y: -4, rotate: i % 2 ? 0.6 : -0.6 }}
               whileTap={reduce ? undefined : { y: 2, scale: 0.98 }}
               transition={SPRING}
-              className={`group relative flex min-h-28 w-full items-center gap-4 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 text-start shadow-hard transition-shadow duration-150 ${accent.glow} focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan`}
+              className={`group relative flex min-h-28 w-full items-center gap-4 rounded-neo-lg border-2 ${shown ? 'border-neo-lime' : 'border-neo-cream/40'} bg-neo-navy-light/95 p-4 text-start shadow-hard transition-shadow duration-150 ${accent.glow} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan`}
             >
               <span
                 aria-hidden="true"
@@ -72,6 +78,11 @@ export function ClassroomPicker({
                 <span className="block break-words font-neo-display text-xl font-bold leading-tight text-neo-white">
                   <bdi>{c.name}</bdi>
                 </span>
+                {shown ? (
+                  <span data-testid="picker-shown-sticker" className="mt-1 inline-block rounded-neo-pill border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-body text-xs font-black text-neo-black">
+                    {t('teacher.reports.picker.showing')}
+                  </span>
+                ) : null}
                 {typeof c.member_count === 'number' && (
                   <span className="mt-2 block">
                     <StudentCount count={c.member_count} />

@@ -45,3 +45,30 @@ describe('summarizeAwards', () => {
     expect(summarizeAwards({ b: a(1), a: a(1) }).next?.id).toBe('a');
   });
 });
+
+describe('summarizeAwards with the real per-award ladders', () => {
+  it('given xp_collector at 264, when summarized, then it is judged on its own ladder, not 1/15/75/300', () => {
+    const s = summarizeAwards({ xp_collector: a(264), first_lesson: a(0) });
+    expect(s.tiers.PLATINUM).toBe(0);
+    expect(s.earned).toBe(0);
+    const xp = s.nexts.find((n) => n.id === 'xp_collector');
+    expect(xp).toMatchObject({ count: 264, threshold: 500, nextTier: 'BRONZE' });
+  });
+
+  it('given first_lesson at 3, when summarized, then silver is earned (3) and gold (10) is next', () => {
+    const s = summarizeAwards({ first_lesson: a(3) });
+    expect(s.tiers.SILVER).toBe(1);
+    expect(s.next).toMatchObject({ id: 'first_lesson', threshold: 10, nextTier: 'GOLD', left: 7 });
+  });
+
+  it('given awards nothing can earn yet, when summarized, then they are neither counted nor offered as next', () => {
+    const s = summarizeAwards({ boss_slayer: a(0), blitz_champion: a(0), first_lesson: a(0) });
+    expect(s.total).toBe(1);
+    expect(s.nexts.map((n) => n.id)).toEqual(['first_lesson']);
+  });
+
+  it('given many in progress, when summarized, then up to three are offered, closest first', () => {
+    const s = summarizeAwards({ a1: a(2), a2: a(13), a3: a(5), a4: a(1) });
+    expect(s.nexts.map((n) => n.id)).toEqual(['a2', 'a3', 'a1']);
+  });
+});

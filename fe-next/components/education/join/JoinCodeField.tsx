@@ -5,6 +5,7 @@ import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { foldJoinCode, joinCodeStripped } from '@/lib/education/joinCodeInput';
+import { extractJoinCode } from './joinCodeFromLink';
 
 export const JOIN_CODE_LENGTH = 6;
 
@@ -32,6 +33,8 @@ interface JoinCodeFieldProps {
   onOverflow?: () => void;
   /** Whether the last keystroke lost characters no keyboard layout maps. */
   onStripped?: (stripped: boolean) => void;
+  /** The tiles pop in a wave: the code was accepted and the step is about to move. */
+  wave?: boolean;
 }
 
 /**
@@ -61,6 +64,7 @@ export function JoinCodeField({
   onPaste,
   onOverflow,
   onStripped,
+  wave = false,
 }: JoinCodeFieldProps) {
   const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -70,8 +74,9 @@ export function JoinCodeField({
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const raw = e.target.value;
-      if (value.length === JOIN_CODE_LENGTH && joinCodeOverflows(raw)) return;
-      const next = sanitizeJoinCode(raw);
+      const linked = extractJoinCode(raw);
+      if (value.length === JOIN_CODE_LENGTH && joinCodeOverflows(raw) && !linked) return;
+      const next = linked ?? sanitizeJoinCode(raw);
       onStripped?.(joinCodeStripped(raw));
       onChange(next);
       // Fires on the sixth character AND on a six-character paste, so the two
@@ -85,6 +90,13 @@ export function JoinCodeField({
   const handleNativePaste = useCallback(
     (e: React.ClipboardEvent<HTMLInputElement>) => {
       const raw = e.clipboardData.getData('text');
+      const linked = extractJoinCode(raw);
+      if (linked) {
+        e.preventDefault();
+        onChange(linked);
+        onComplete?.(linked);
+        return;
+      }
       if (joinCodeOverflows(raw)) {
         if (!onOverflow) return;
         e.preventDefault();
@@ -116,7 +128,7 @@ export function JoinCodeField({
     >
       <div className="flex items-center gap-2 lg:gap-3">
         <div className="@container relative flex-1">
-          <div className="grid grid-cols-6 gap-[clamp(0.25rem,2cqi,0.75rem)]">
+          <div data-testid="join-code-cells" className={cn('grid grid-cols-6 gap-[clamp(0.25rem,2cqi,0.75rem)]', invalid && 'motion-safe:animate-neo-shake')}>
             {cells.map((char, i) => {
               const filled = char !== '';
               const isActive = !invalid && i === activeIndex && value.length < JOIN_CODE_LENGTH;
@@ -136,7 +148,13 @@ export function JoinCodeField({
                   )}
                 >
                   {filled ? (
-                    <span className="motion-safe:animate-neo-pop">{char}</span>
+                    <span
+                      key={wave ? 'wave' : 'rest'}
+                      style={wave ? { animationDelay: `${i * 45}ms`, animationFillMode: 'both' } : undefined}
+                      className="motion-safe:animate-neo-pop"
+                    >
+                      {char}
+                    </span>
                   ) : isActive ? (
                     <span className="hidden h-[45%] w-1.5 rounded-full bg-neo-navy group-focus-within:block motion-safe:animate-pulse" />
                   ) : null}
@@ -175,7 +193,7 @@ export function JoinCodeField({
           <button
             type="button"
             onClick={onPaste}
-            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-hard transition-transform active:translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
+            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-hard transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
             aria-label={t('joinView.pasteCode')}
             title={t('joinView.pasteCode')}
           >

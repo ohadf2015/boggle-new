@@ -28,6 +28,7 @@ import { buildClassArcRows, pickFollowUpWords, type ArcRosterEntry } from '@/lib
 import type { Language } from '@/lib/supabase/education/types';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
+import { isolateBidi } from '@/components/teacher/classroom/BidiText';
 import logger from '@/utils/logger';
 
 export interface ClassArcPanelProps {
@@ -93,7 +94,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
       const result = await createLessonAndAssign({
         lesson: {
           name: t('teacher.reports.arc.followUpName', {
-            classroom: classroomName,
+            classroom: isolateBidi(classroomName),
             date: new Date().toLocaleDateString(language),
           }),
           language: classroomLanguage,

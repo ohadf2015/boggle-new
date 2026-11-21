@@ -16156,6 +16156,7 @@ const ja = {
       "startGame": "ゲームを始める",
       "proLine": "Proなら毎週の記録と生徒一人ひとりを確認できます",
       "homeTitle": "今週、{{name}}でサポートが必要なのは？",
+      "homeTitleGames": "今週の{{name}}のゲーム：{{count}}回。サポートが必要なのは誰？",
       "homeBody": "1クラスは無料。Proなら過去の週、生徒ごとのレポート、すべてのクラスが見られます。",
       "homeCta": "今週を見る"
     }
@@ -22505,6 +22506,8 @@ const ja = {
       "more": "その他",
       "missedTitle": "クラスが見逃した単語",
       "practiceWords": "この単語を練習する（{count}）",
+      "streakKept": "{count}日連続",
+      "streakInvite": "明日もう一度遊んで、クラスの連続記録を始めよう",
       "shareParents": "保護者に共有",
       "proPill": "Pro",
       "invitePrompt": "気に入りそうな先生はいますか？",

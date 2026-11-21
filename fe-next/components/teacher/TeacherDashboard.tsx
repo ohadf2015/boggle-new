@@ -178,9 +178,16 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     onboarding: onboardingCardShown,
     pro: freeTeacher && hasClasses && liveGameRunning !== true,
   });
-  const proCard = askSettled && railAsk === 'pro' ? (
-    <DashboardProOfferCard language={language} t={t} />
-  ) : null;
+  // The class's own week leads the offer (title and a link to its insight page); checkout stays the button.
+  const insight =
+    selectedClassroom && week.summary?.lastPlayedAt?.[selectedClassroom.id]
+      ? {
+          classroomId: selectedClassroom.id,
+          className: selectedClassroom.name,
+          weekGames: week.summary.weekGamesByClass?.[selectedClassroom.id],
+        }
+      : undefined;
+  const proCard = askSettled && railAsk === 'pro' ? <DashboardProOfferCard language={language} t={t} insight={insight} /> : null;
   // Desk checkout CTA for the realized-value moment: a free approved teacher
   // with at least one student joined. Defers to every other ask on Home (the
   // pickHomeAsk order above: account surfaces, the rail Pro offer) and never

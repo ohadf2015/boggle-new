@@ -145,7 +145,7 @@ export function PageClient() {
       )}
 
       {!isLoading && showPitch && (
-        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 shadow-hard-lg sm:p-7">
+        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-lg sm:p-7">
           <AccessRequestGate onApproved={setApproval} />
         </div>
       )}
@@ -188,7 +188,7 @@ export function PageClient() {
     <EducationShell header={<LandingHeader showStart={false} />}>
       <main className="text-neo-white">
         <section
-          className={`mx-auto px-4 py-10 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
+          className={`mx-auto px-4 py-5 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
         >
           <div
             className={
@@ -201,12 +201,12 @@ export function PageClient() {
               <h1 className="text-balance font-neo-poster text-[clamp(1.75rem,5vw,2.9rem)] font-extrabold leading-[1.08] tracking-[-0.015em] [overflow-wrap:anywhere]">
                 {t('education.access.h1')}
               </h1>
-              <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85">
+              <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85 max-sm:hidden">
                 {t('teacher.classroom.wizard.subtitle')}
               </p>
 
               {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
-              <div className="mt-6">{statusCard}</div>
+              <div className="mt-3 sm:mt-6">{statusCard}</div>
 
               {/* Only for someone who still has to apply — an approved teacher who
                   happens to carry a `from` needs their status, not this. */}

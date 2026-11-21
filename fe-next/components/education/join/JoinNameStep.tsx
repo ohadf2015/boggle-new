@@ -54,7 +54,7 @@ export function JoinNameStep({ flow, nameRef, goRef }: JoinNameStepProps) {
           onClick={flow.backToCode}
           aria-label={t(`${K}.flow.changeCode`)}
           title={t(`${K}.flow.changeCode`)}
-          className="flex min-h-11 items-center gap-3 self-start rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
+          className="flex min-h-11 items-center gap-3 self-start rounded-neo border-3 border-neo-cream bg-neo-navy-light px-3 py-2 shadow-hard transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"
         >
           <DirectionalIcon icon={ArrowLeft} className="h-4 w-4 text-neo-cyan" />
           <span dir="ltr" className="font-neo-display text-2xl font-black tracking-[0.2em] text-neo-lime">

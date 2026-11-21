@@ -16466,6 +16466,7 @@ const sv = {
       "startGame": "Starta ett spel",
       "proLine": "Med Pro ser du varje vecka och varje elev",
       "homeTitle": "Vem i {{name}} behöver hjälp den här veckan?",
+      "homeTitleGames": "Spel i {{name}} den här veckan: {{count}}. Vem behöver hjälp?",
       "homeBody": "Gratis för en klass. Pro lägger till tidigare veckor, en rapport per elev och alla dina klasser.",
       "homeCta": "Se veckan"
     }
@@ -22505,6 +22506,8 @@ const sv = {
       "more": "Mer",
       "missedTitle": "Ord som klassen missade",
       "practiceWords": "Öva på de här orden ({count})",
+      "streakKept": "{count} dagar i rad",
+      "streakInvite": "Spela igen i morgon, så startar klassen en svit",
       "shareParents": "Dela med föräldrar",
       "proPill": "Pro",
       "invitePrompt": "Känner du en lärare som skulle gilla det här?",

@@ -95,11 +95,11 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
         <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
           {t('education.access.auth_required_title')}
         </h2>
-        <p className="mt-2 text-neo-white/80">{t('education.access.auth_required_body')}</p>
-        <div className="mt-5">
+        <p className="mt-2 text-neo-white/80 max-sm:hidden">{t('education.access.auth_required_body')}</p>
+        <div className="mt-3 sm:mt-5">
           <AccessRequestGoogleButton onTap={() => tapped('google')} />
         </div>
-        <div className="my-4 flex items-center gap-3" aria-hidden="true">
+        <div className="my-3 flex items-center gap-3 sm:my-4" aria-hidden="true">
           <span className="h-0.5 flex-1 bg-neo-cream/25" />
           <span className="text-xs font-bold uppercase tracking-wider text-neo-white/60">
             {t('auth.magicLink.divider')}
@@ -119,6 +119,9 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
             {t('education.access.auth_required_cta')}
           </span>
         </button>
+        <p className="mt-2 text-center text-sm font-semibold text-neo-white/60">
+          {t('education.access.cta_micro')}
+        </p>
         <button
           type="button"
           onClick={() => {
@@ -129,9 +132,6 @@ export function AccessRequestGate({ onApproved }: { onApproved?: (approval: Acce
         >
           {t('education.access.auth_signin_cta')}
         </button>
-        <p className="mt-2 text-center text-sm font-semibold text-neo-white/60">
-          {t('education.access.cta_micro')}
-        </p>
         {authMode && <AuthModal isOpen onClose={() => setAuthMode(null)} initialMode={authMode} audience="teacher" />}
       </div>
     );

@@ -10,6 +10,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { LandingHeader } from '@/components/education/landing/LandingHeader';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
@@ -100,6 +101,8 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   }, [entrySource, viewer, blockedInApp, showTrial, handleUpgrade]);
   // Signed in and waiting on the entitlement: a skeleton, not a trial offer that flips away.
   const resolvingPlan = viewer === 'loading' && (Boolean(user) || hasSession);
+  // The teacher app nav only links to signed-in screens; a visitor gets the public header instead.
+  const publicVisitor = !user && !hasSession;
 
   const openSchool = () => {
     setTab('school');
@@ -195,6 +198,8 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   return (
     <EducationShell
       data-testid="education-shell"
+      chromeFree={publicVisitor}
+      header={publicVisitor ? <LandingHeader /> : undefined}
       contentClassName={cn('w-full px-4 lg:px-6', isRTL && 'rtl')}
       className="bg-neo-navy"
     >

@@ -10,6 +10,7 @@ import { CardMenuAction, CardOverflowMenu } from '@/components/teacher/CardOverf
 import { arcadeAccentAt } from '@/lib/education/arcadeAccent';
 import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
+import { BidiText } from '@/components/teacher/classroom/BidiText';
 import AssignListDialog from './library/AssignListDialog';
 
 interface MyListCardProps {
@@ -66,7 +67,7 @@ export default function MyListCard({
       titleText={lesson.name}
       title={
         <button type="button" data-testid={`lesson-open-${lesson.id}`} onClick={onEdit} className={LIST_CARD_TITLE}>
-          <bdi>{lesson.name}</bdi>
+          <BidiText>{lesson.name}</BidiText>
         </button>
       }
       lead={
@@ -78,7 +79,7 @@ export default function MyListCard({
         <p data-testid={`lesson-fact-${lesson.id}`} className="mt-0.5 font-neo-body text-xs font-bold opacity-85">
           <span className="sr-only">{t('eduLibrary.card.words', { count: total })} · </span>
           {classroomName ? (
-            <bdi data-testid={`lesson-classroom-${lesson.id}`}>{classroomName}</bdi>
+            <BidiText data-testid={`lesson-classroom-${lesson.id}`}>{classroomName}</BidiText>
           ) : (
             <span lang={lesson.language}>{nativeLanguageName(lesson.language)}</span>
           )}

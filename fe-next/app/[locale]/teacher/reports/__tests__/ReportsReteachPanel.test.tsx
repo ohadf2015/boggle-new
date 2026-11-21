@@ -101,6 +101,39 @@ describe('ReportsReteachPanel', () => {
     expect(screen.getByTestId('reports-reteach-panel')).toHaveTextContent('Words ⁨Grade 4 Room 12⁩ missed most');
   });
 
+  it('given one student played, when shown, then the sample is named once and no row repeats 100% missed', () => {
+    const solo = (w: string): HardWord => ({ ...word(w, 100), studentsMissing: 1, studentsAsked: 1 });
+    snapshotState.value = { status: 'ready', snapshot: real({ words: [solo('thunder'), solo('breeze'), solo('frost'), solo('cloud')], needsHelp: [] }) };
+    render(<ReportsReteachPanel classrooms={classes} />);
+    const panel = screen.getByTestId('reports-reteach-panel');
+    expect(within(panel).getAllByTestId('reteach-word')).toHaveLength(4);
+    expect(within(panel).getAllByTestId('reteach-single-sample')).toHaveLength(1);
+    expect(panel).not.toHaveTextContent('100% missed');
+    expect(panel).not.toHaveTextContent('1 of 1 students');
+    expect(panel.querySelectorAll('[data-testid="reteach-word"] [aria-hidden="true"].h-2')).toHaveLength(0);
+  });
+
+  it('given several students, when shown, then rows keep their miss rates and no single-sample note appears', () => {
+    snapshotState.value = { status: 'ready', snapshot: real() };
+    render(<ReportsReteachPanel classrooms={classes} />);
+    expect(screen.queryByTestId('reteach-single-sample')).toBeNull();
+  });
+
+  it('given a snapshot, when shown, then the page learns which class is on show', () => {
+    const onShown = vi.fn();
+    snapshotState.value = { status: 'ready', snapshot: real() };
+    render(<ReportsReteachPanel classrooms={classes} onShown={onShown} />);
+    expect(onShown).toHaveBeenLastCalledWith('c1');
+  });
+
+  it('given the accuracy chip, when shown on a phone, then it never wraps its own words', () => {
+    snapshotState.value = { status: 'ready', snapshot: real() };
+    render(<ReportsReteachPanel classrooms={classes} />);
+    const chip = screen.getByTestId('reteach-accuracy');
+    expect(chip.className).toContain('whitespace-nowrap');
+    expect(chip.className).toContain('max-sm:basis-full');
+  });
+
   it('given five students below the goal, when shown, then three names fit one row and the rest is a count', () => {
     snapshotState.value = { status: 'ready', snapshot: real({ needsHelp: ['s1', 's2', 's3', 's4', 's5'] }) };
     render(<ReportsReteachPanel classrooms={classes} />);

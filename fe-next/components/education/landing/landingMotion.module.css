@@ -51,14 +51,16 @@
       animation-timing-function: linear;
       animation-fill-mode: both;
       animation-timeline: view();
-      animation-range: entry calc(var(--i, 0) * 12%) cover calc(28% + var(--i, 0) * 8%);
+      /* Done by the time the card is fully in view: a card still offset while
+         readable sits on top of whatever is below it. */
+      animation-range: entry calc(var(--i, 0) * 12%) entry min(100%, calc(76% + var(--i, 0) * 12%));
     }
   }
 }
 
 @keyframes edu-reveal {
   from {
-    transform: translateY(40px) rotate(calc(-2deg + var(--i, 0) * 2deg)) scale(0.95);
+    transform: translateY(12px) rotate(calc(-2deg + var(--i, 0) * 2deg)) scale(0.95);
   }
   to {
     transform: none;

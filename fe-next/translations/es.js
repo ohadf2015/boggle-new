@@ -16104,6 +16104,7 @@ const es = {
       "startGame": "Empezar una partida",
       "proLine": "Con Pro ves todas las semanas y a cada estudiante",
       "homeTitle": "¿Quién necesita ayuda en {{name}} esta semana?",
+      "homeTitleGames": "Partidas en {{name}} esta semana: {{count}}. ¿Quién necesita ayuda?",
       "homeBody": "Gratis para una clase. Pro añade las semanas anteriores, un informe por estudiante y todas tus clases.",
       "homeCta": "Ver esta semana"
     }
@@ -22517,6 +22518,8 @@ const es = {
       "more": "Más",
       "missedTitle": "Palabras que tu clase falló",
       "practiceWords": "Practicar estas palabras ({count})",
+      "streakKept": "{count} días seguidos",
+      "streakInvite": "Otra partida mañana y la clase empieza una racha",
       "shareParents": "Compartir con las familias",
       "proPill": "Pro",
       "invitePrompt": "¿Conoces a un docente a quien le gustaría?",

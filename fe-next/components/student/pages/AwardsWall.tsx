@@ -7,11 +7,14 @@
  * chips sit in the frame's toolbar and the badges scroll inside the panel.
  */
 
-import { Lock } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
 import type { AchievementCategory } from '@/lib/supabase/education/types';
-import { getTierProgress, getTierDisplay } from '@/utils/achievementTiers';
+import { getTierDisplay } from '@/utils/achievementTiers';
+import { awardTier, isEarnableAward } from '@/app/[locale]/student/achievements/awardsSummary';
+import { pressClasses } from '@/components/education/motion';
 import { Medallion, INK_TEXT, toneStyle } from '@/components/student/academy/chrome';
 import { cn } from '@/lib/utils';
 
@@ -60,18 +63,24 @@ export function AwardsFilterBar({ active, onChange, compact }: { active: AwardsF
   );
 }
 
-function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
-  const earned = a.count > 0;
-  const tier = getTierProgress(a.count);
+function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t: T; fresh?: boolean }) {
+  const tier = awardTier(id, a.count);
+  const earned = tier.currentTier !== null;
   const display = getTierDisplay(tier.currentTier);
   const name = a.isSecret && !earned ? '???' : t(a.nameKey);
   return (
     <li
       data-testid="student-award"
       data-award={id}
-      className="flex flex-col items-center gap-1.5 rounded-[16px] border-3 border-neo-black p-2.5 text-center"
+      data-fresh={fresh || undefined}
+      className="relative flex flex-col items-center gap-1.5 rounded-[16px] border-3 border-neo-black p-2.5 text-center"
       style={toneStyle(earned ? 'plum' : 'night', { shadow: 3, trim: 2 })}
     >
+      {fresh && (
+        <span data-testid="award-new" className="absolute -top-2 end-2 rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-xs font-black text-neo-black" style={toneStyle('lime', { shadow: 2, trim: 1 })}>
+          {t('academy.pages.awardNew', 'New!')}
+        </span>
+      )}
       <Medallion tone={earned ? 'gold' : 'night'} size={56} shadow={2} className={earned ? undefined : 'grayscale'}>
         <span className={cn('text-[28px] leading-none', !earned && 'opacity-60')} aria-hidden="true">
           {a.isSecret && !earned ? '?' : a.icon}
@@ -80,6 +89,11 @@ function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
       <span dir="auto" className={cn('line-clamp-2 min-h-[2.4em] font-neo-display text-sm font-black leading-tight text-neo-white', INK_TEXT)}>
         {name}
       </span>
+      {!earned && (
+        <span data-testid="award-how" dir="auto" className="line-clamp-3 font-neo-body text-xs font-bold leading-snug text-neo-white/85">
+          {t(a.descriptionKey)}
+        </span>
+      )}
       {tier.isMaxTier ? (
         <span className="rounded-full border-2 border-neo-black px-2 py-0.5 font-neo-display text-xs font-black text-neo-black" style={toneStyle('gold', { shadow: 0, trim: 1 })}>
           {t('academy.pages.maxTier', 'MAX')}
@@ -114,9 +128,10 @@ function AwardCard({ id, a, t }: { id: string; a: Achievement; t: T }) {
   );
 }
 
-export function AwardsGrid({ achievements, filter }: { achievements: Record<string, Achievement>; filter: AwardsFilter }) {
+export function AwardsGrid({ achievements, filter, fresh }: { achievements: Record<string, Achievement>; filter: AwardsFilter; fresh?: ReadonlySet<string> }) {
   const { t } = useLanguage() as unknown as { t: T };
-  const entries = orderAwards(Object.entries(achievements).filter(([, a]) => filter === 'all' || a.category === filter));
+  const [open, setOpen] = useState(false);
+  const entries = orderAwards(Object.entries(achievements).filter(([id, a]) => isEarnableAward(id) && (filter === 'all' || a.category === filter)));
   if (entries.length === 0) {
     return (
       <p dir="auto" className="py-10 text-center font-neo-body text-sm font-bold text-neo-white/85">
@@ -124,24 +139,41 @@ export function AwardsGrid({ achievements, filter }: { achievements: Record<stri
       </p>
     );
   }
-  const noneYet = !Object.values(achievements).some((a) => a.count > 0);
+  const won = entries.filter(([id, a]) => awardTier(id, a.count).currentTier);
+  const toWin = entries.filter(([id, a]) => !awardTier(id, a.count).currentTier);
   return (
     <>
-      {noneYet && (
-        <p
-          dir="auto"
-          data-testid="student-awards-first"
-          className="mb-3 rounded-[14px] border-2 border-neo-black px-3 py-2 font-neo-display text-sm font-black text-neo-black"
-          style={toneStyle('gold', { shadow: 2, trim: 1 })}
-        >
-          {t('academy.pages.firstAward', 'Finish a lesson to win your first award!')}
-        </p>
+      {won.length > 0 && (
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+          {won.map(([id, a]) => (
+            <AwardCard key={id} id={id} a={a} t={t} fresh={fresh?.has(id)} />
+          ))}
+        </ul>
       )}
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
-        {entries.map(([id, a]) => (
-          <AwardCard key={id} id={id} a={a} t={t} />
-        ))}
-      </ul>
+      {toWin.length > 0 && (
+        <>
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+            className={cn(
+              pressClasses(2),
+              'mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-[14px] border-3 border-neo-black px-4 font-neo-display text-sm font-black text-neo-black',
+            )}
+            style={toneStyle('gold', { shadow: 2, trim: 1 })}
+          >
+            <bdi>{open ? t('academy.pages.awardsHideMore', 'Hide the rest') : t('academy.pages.awardsShowMore', 'More awards to win: {count}', { count: toWin.length })}</bdi>
+            <ChevronDown className={cn('size-4 motion-safe:transition-transform', open && 'rotate-180')} aria-hidden="true" />
+          </button>
+          {open && (
+            <ul className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+              {toWin.map(([id, a]) => (
+                <AwardCard key={id} id={id} a={a} t={t} />
+              ))}
+            </ul>
+          )}
+        </>
+      )}
     </>
   );
 }

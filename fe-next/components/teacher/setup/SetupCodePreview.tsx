@@ -1,13 +1,14 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { Pop } from '@/components/education/motion/Pop';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
 const SLOTS = 6;
 
 /** What students will see: the class name as it is typed, over the code's empty tiles, which fill in after Create. */
-export function SetupCodePreview({ name, placeholder, t }: { name: string; placeholder: string; t: T }) {
+export function SetupCodePreview({ name, t }: { name: string; t: T }) {
   const typed = name.trim();
   return (
     <div
@@ -18,25 +19,26 @@ export function SetupCodePreview({ name, placeholder, t }: { name: string; place
       <div className="min-w-0">
         <p className="font-neo-body text-[0.7rem] font-black uppercase tracking-wide text-neo-black/60">{t('eduShell.setup.joinCode')}</p>
         <p dir="auto" className={cn('line-clamp-1 font-neo-display text-lg font-black leading-tight [overflow-wrap:anywhere] sm:line-clamp-2 sm:text-2xl', !typed && 'text-neo-black/40')}>
-          {typed || placeholder}
+          {typed || t('eduShell.setup.codePending')}
         </p>
         <p className="mt-0.5 hidden font-neo-body text-xs font-bold text-neo-black/65 sm:block">{t('eduShell.setup.side.step2')}</p>
       </div>
-      <div dir="ltr" className="flex shrink-0 gap-1">
-        {Array.from({ length: SLOTS }, (_, i) => (
-          <span
-            key={i}
-            data-testid="setup-code-placeholder"
-            style={{ animationDelay: `${i * 90}ms` }}
-            className={cn(
-              'grid h-9 w-6 place-items-center rounded-neo border-2 border-dashed border-neo-black/60 font-neo-display text-base font-black text-neo-black/30 sm:h-12 sm:w-9 sm:text-xl',
-              typed && 'border-solid bg-neo-white motion-safe:animate-pulse',
-            )}
-          >
-            ?
-          </span>
-        ))}
-      </div>
+      <Pop pulseKey={typed ? typed.length : 0} className="shrink-0">
+        <div dir="ltr" className="flex gap-1">
+          {Array.from({ length: SLOTS }, (_, i) => (
+            <span
+              key={i}
+              data-testid="setup-code-placeholder"
+              className={cn(
+                'grid h-9 w-6 place-items-center rounded-neo border-2 border-dashed border-neo-black/60 font-neo-display text-base font-black text-neo-black/30 transition-[background-color] duration-150 motion-reduce:transition-none sm:h-12 sm:w-9 sm:text-xl',
+                typed && 'border-solid bg-neo-white',
+              )}
+            >
+              ?
+            </span>
+          ))}
+        </div>
+      </Pop>
     </div>
   );
 }

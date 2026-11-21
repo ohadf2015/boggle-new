@@ -1,9 +1,10 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import {
   BarChart3,
+  Check,
   ClipboardList,
   Copy,
   Edit2,
@@ -24,7 +25,7 @@ import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { NB_BLOCK, NB_PRIMARY, NB_STICKER, type NbColor } from '../nb/nbStyles';
+import { NB_BLOCK, NB_PRIMARY, NB_SECONDARY, NB_STICKER, type NbColor } from '../nb/nbStyles';
 import { LIST_CARD_TITLE, ListCard } from '../ListCard';
 import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
 
@@ -41,8 +42,11 @@ export interface ClassCardProps {
   /** The full roster dialog is open. */
   expanded: boolean;
   onToggleExpanded: () => void;
-  onCopy: () => void;
+  /** Resolves false when the clipboard refused, so the plate never claims a copy that did not happen. */
+  onCopy: () => void | boolean | Promise<void | boolean>;
   onShare: () => void;
+  /** Opens the same share sheet as Teacher Home's Share code. Empty classes lead with it. */
+  onInvite?: () => void;
   /** Google Classroom share URL, or null when it cannot be built (SSR). */
   googleHref: string | null;
   onEdit: () => void;
@@ -73,6 +77,7 @@ export function ClassCard({
   onToggleExpanded,
   onCopy,
   onShare,
+  onInvite,
   googleHref,
   onEdit,
   onDelete,
@@ -90,6 +95,16 @@ export function ClassCard({
   const { t } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
   const count = classroom.member_count || 0;
+  const [copied, setCopied] = useState(false);
+  useEffect(() => {
+    if (!copied) return;
+    const id = window.setTimeout(() => setCopied(false), 1600);
+    return () => window.clearTimeout(id);
+  }, [copied]);
+  const copyFromPlate = async () => {
+    if ((await onCopy()) !== false) setCopied(true);
+  };
+  const startGameCls = count === 0 ? NB_SECONDARY : NB_PRIMARY;
   const languageKey = LANGUAGE_LABEL_KEYS[classroom.language as keyof typeof LANGUAGE_LABEL_KEYS];
   const studentsLabel =
     count === 0 ? t('teacher.classrooms.students.noneYet') : t('teacher.classroom.cardSeeAllStudents', { count });
@@ -158,27 +173,46 @@ export function ClassCard({
         </CardOverflowMenu>
       }
       action={
-        startGameHref ? (
-          <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(NB_PRIMARY, 'min-h-14 w-full text-lg')}>
-            <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
-            {t('eduShell.home.startLive', 'Start a game')}
-          </Link>
-        ) : null
+        <div className="flex flex-col gap-2">
+          {count === 0 ? (
+            <button
+              type="button"
+              data-testid="classroom-card-invite"
+              aria-haspopup="dialog"
+              onClick={onInvite ?? onShare}
+              className={cn(NB_PRIMARY, 'min-h-14 w-full text-lg')}
+            >
+              <Share2 className="size-5 shrink-0" aria-hidden="true" />
+              {t('eduShell.home.shareCode', 'Share code')}
+            </button>
+          ) : null}
+          {startGameHref ? (
+            <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(startGameCls, 'min-h-14 w-full text-lg')}>
+              <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
+              {t('eduShell.home.startLive', 'Start a game')}
+            </Link>
+          ) : null}
+        </div>
       }
     >
       <div data-testid="classroom-card-fact" className="flex min-h-9 min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-neo-body text-sm font-bold text-neo-cream/85">
         {fact}
       </div>
-      <div
+      <button
+        type="button"
         data-testid="join-code-plate"
-        aria-label={t('academy.hq.classCode', 'Class code')}
-        role="group"
-        className="flex min-h-16 items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 shadow-hard-lg"
+        aria-label={`${t('teacher.classroom.copyCode')}: ${classroom.join_code}`}
+        onClick={() => void copyFromPlate()}
+        className="flex min-h-16 w-full flex-col items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 py-1 shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         <code data-testid="classroom-join-code" dir="ltr" className="whitespace-nowrap font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black">
           {classroom.join_code}
         </code>
-      </div>
+        <span data-testid="join-code-plate-caption" aria-live="polite" className="inline-flex items-center gap-1 font-neo-body text-xs font-black text-neo-black/65">
+          {copied ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : <Copy className="size-3.5" strokeWidth={3} aria-hidden="true" />}
+          {copied ? t('teacher.classroom.codeCopiedShort') : t('teacher.classroom.tapToCopy')}
+        </span>
+      </button>
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
         <NbDialogContent size="lg" phone="full">
           <NbDialogHeader

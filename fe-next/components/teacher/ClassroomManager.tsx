@@ -29,10 +29,11 @@ import { useTeacherReveal } from './motion/useTeacherReveal';
 import { ClassCard } from './classroom/ClassCard';
 import { ClassAvatarStack } from './classroom/ClassAvatarStack';
 import { OUTLINE_BUTTON } from './home/homeStyles';
+import { HomeShareSheet } from './home/HomeShareSheet';
 import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { ClassroomEmptyState } from './classroom/ClassroomEmptyState';
 import { NewClassSeat } from './classroom/NewClassSeat';
-import { NB_BLOCK, NB_DARK_EDGE, NB_SMALL, type NbColor } from './nb/nbStyles';
+import { NB_SECONDARY, type NbColor } from './nb/nbStyles';
 
 // No lime in the rotation: lime belongs to the one Start a game on the first card.
 const CARD_COLORS = ['pink', 'cyan', 'yellow', 'purple', 'orange'] as const satisfies readonly NbColor[];
@@ -69,6 +70,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [projector, setProjector] = useState<HqClassroom | null>(null);
+  const [sharing, setSharing] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   const isSm = useMediaQuery(CLASS_GRID_QUERIES.sm);
@@ -78,9 +80,10 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   const revealRef = useTeacherReveal<HTMLDivElement>(`${pageSize}-${classrooms.length}`);
 
   const newClassHref = `/${language}/teacher/classroom/new`;
-  // A wide row with fewer classes than seats ends in a New class card instead of empty space.
-  const seatFree = classrooms.length > 0 && pageSize > classrooms.length;
+  // A row that would end part empty (1 of 3, 4 of 3) ends in a New class card instead of a hole.
+  const seatFree = classrooms.length > 0 && classrooms.length % pageSize !== 0;
   const editing = classrooms.find((c) => c.id === editingId);
+  const sharingClassroom = classrooms.find((c) => c.id === sharing && c.join_code);
 
   const handleEdit = async (name: string, classroomLanguage: Language, leaderboard?: LeaderboardVisibility) => {
     if (!editingId) return;
@@ -113,15 +116,18 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
   };
 
   // The code alone, pasted into a class chat, leaves a student with nowhere to type it.
-  const copyJoinCode = (classroomId: string, code: string) => {
+  const copyJoinCode = (classroomId: string, code: string): Promise<boolean> =>
     navigator.clipboard
       .writeText(classroomInvitePayload(window.location.origin, language, code))
       .then(() => {
         toast.success(t('teacher.classroom.codeCopied'));
         trackEduJoinCodeCopied({ classroomId });
+        return true;
       })
-      .catch(() => toast.error(t('share.codeCopyError')));
-  };
+      .catch(() => {
+        toast.error(t('share.codeCopyError'));
+        return false;
+      });
 
   const shareInvite = async (classroomId: string, name: string, code: string) => {
     const url = `${window.location.origin}/${language}/join/${code}`;
@@ -178,7 +184,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
       ) : null}
       {/* One "New class" entry: the seat card when the row has an empty seat, else this quiet link (lime stays Start a game's). */}
       {classrooms.length > 0 && !seatFree ? (
-        <Link href={newClassHref} data-testid="classroom-create-link" className={cn(NB_SMALL, NB_BLOCK.navy, NB_DARK_EDGE, SHORT_LANDSCAPE_BUTTON)}>
+        <Link href={newClassHref} data-testid="classroom-create-link" className={cn(NB_SECONDARY, SHORT_LANDSCAPE_BUTTON)}>
           <Plus className="size-4" aria-hidden="true" />
           {t('eduShell.home.newClass', 'New class')}
         </Link>
@@ -213,6 +219,7 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   onToggleExpanded={() => setExpandedId(expandedId === classroom.id ? null : classroom.id)}
                   onCopy={() => copyJoinCode(classroom.id, classroom.join_code)}
                   onShare={() => shareInvite(classroom.id, classroom.name, classroom.join_code)}
+                  onInvite={() => setSharing(classroom.id)}
                   googleHref={googleClassroomHref(classroom.name, classroom.join_code)}
                   onEdit={() => setEditingId(classroom.id)}
                   onDelete={() => setDeletingId(classroom.id)}
@@ -271,6 +278,18 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
         onConfirm={handleDelete}
         variant="danger"
       />
+
+      {sharingClassroom ? (
+        <HomeShareSheet
+          classroom={sharingClassroom}
+          open
+          onOpenChange={(open) => {
+            if (!open) setSharing(null);
+          }}
+          uiLanguage={language}
+          t={t}
+        />
+      ) : null}
 
       {projector ? <HqProjectorSheet classroom={projector} onClose={() => setProjector(null)} /> : null}
     </div>

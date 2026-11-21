@@ -61,7 +61,19 @@ describe('summarizeTeacherWeek', () => {
       totalStudents: 54,
       activeClasses: 0,
       lastPlayedAt: {},
+      weekGamesByClass: {},
     });
+  });
+
+  it('Given games across classes and weeks, Then each class counts its own distinct games from the last 7 days only', () => {
+    const rows = [
+      { classroom_id: 'a', completed_at: daysAgo(1), game_code: 'G1' },
+      { classroom_id: 'a', completed_at: daysAgo(1), game_code: 'G1' },
+      { classroom_id: 'a', completed_at: daysAgo(3), game_code: 'G2' },
+      { classroom_id: 'a', completed_at: daysAgo(12), game_code: 'OLD' },
+      { classroom_id: 'b', completed_at: daysAgo(20), game_code: 'OLD2' },
+    ];
+    expect(summarizeTeacherWeek(rows, classrooms, NOW).weekGamesByClass).toEqual({ a: 2 });
   });
 });
 

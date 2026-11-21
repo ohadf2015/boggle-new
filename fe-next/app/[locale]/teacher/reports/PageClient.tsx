@@ -73,6 +73,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   // One class means nothing to pick: open its report directly.
   const onlyClassroomId = !classroomsLoading && classrooms?.length === 1 ? classrooms[0].id : null;
   const selectedClassroomId = pickedClassroomId ?? onlyClassroomId;
+  const [shownClassId, setShownClassId] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
   const [section, setSection] = useState<string>(() => {
@@ -213,7 +214,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
         </p>
 
         {classrooms && classrooms.length > 0 ? (
-          <ReportsReteachPanel classrooms={classrooms} />
+          <ReportsReteachPanel classrooms={classrooms} onShown={setShownClassId} />
         ) : null}
 
         <h2 className="mb-3 text-base font-bold text-neo-cream">{t('teacher.reports.selectClassroom')}</h2>
@@ -228,7 +229,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             ))}
           </div>
         ) : classrooms && classrooms.length > 0 ? (
-          <div data-tm><ClassroomPicker classrooms={classrooms} onSelect={handleClassroomSelect} /></div>
+          <div data-tm><ClassroomPicker classrooms={classrooms} onSelect={handleClassroomSelect} shownId={shownClassId} /></div>
         ) : (
           <ReportsNoClasses />
         )}
