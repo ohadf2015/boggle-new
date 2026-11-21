@@ -81,14 +81,14 @@ export type EducationLocale = typeof EDUCATION_LOCALES[number];
 
 const content: Record<EducationLocale, LocaleContent> = {
   en: {
-    metaTitle: 'ESL Word Games for the Classroom — Teacher-Led, 6 Languages | LexiClash',
-    metaDescription: 'ESL word games you run for a whole class of English learners: students join from their phones with a six-character code, the board goes on the projector, and you set Support, Core or Challenge per student. Six languages, no student accounts, free for 3 classes of 50.',
-    ogTitle: 'ESL Word Games for the Classroom',
-    ogDescription: 'Live multiplayer word games for the classroom. Free student accounts, 6 dictionaries, teacher dashboard.',
-    twitterDescription: 'Free ESL/EFL word games for the classroom. Live multiplayer, 6 languages, teacher dashboard.',
+    metaTitle: 'Vocabulary Games for the Classroom — Free ESL | LexiClash',
+    metaDescription: 'Vocabulary games for the classroom. English learners join with a code — no student accounts. Free ESL rounds, and you set a level per student.',
+    ogTitle: 'Vocabulary Games for the Classroom',
+    ogDescription: 'Free vocabulary games for the classroom. English learners join with a code, no student accounts, board on the projector.',
+    twitterDescription: 'Free vocabulary games for the classroom. English learners join with a code — no student accounts.',
     heroTag: '★ ESL / EFL ★ Free To Start ★',
     heroH1: {
-      highlight: 'ESL Word Games',
+      highlight: 'Vocabulary Games',
       rest1: 'for the',
       rest2: 'Classroom.',
     },
@@ -373,11 +373,11 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos de palabras en inglés para el aula | LexiClash',
-    metaDescription: 'Juegos de vocabulario en inglés para toda la clase: los alumnos entran con un código desde el móvil, sin cuenta, y el tablero va al proyector. Gratis.',
+    metaTitle: 'Juegos de palabras en inglés gratis para el aula | LexiClash',
+    metaDescription: 'Juegos de palabras en inglés para el aula, gratis. La clase entra con un código desde el móvil, sin cuenta, y el tablero va al proyector.',
     ogTitle: 'Juegos de palabras en inglés para el aula',
-    ogDescription: 'Juegos de vocabulario en inglés para toda la clase: código al móvil, tablero en el proyector, nivel por alumno. Gratis.',
-    twitterDescription: 'Juegos de palabras en inglés para el aula: código, proyector, nivel por alumno. Gratis.',
+    ogDescription: 'Juegos de palabras en inglés para el aula, gratis. Código al móvil, tablero en el proyector, sin cuenta.',
+    twitterDescription: 'Juegos de palabras en inglés para el aula, gratis. Código, proyector, sin cuenta.',
     heroTag: '★ Inglés ESL/EFL ★ Gratis Siempre ★',
     heroH1: {
       highlight: 'Juegos de palabras en inglés',

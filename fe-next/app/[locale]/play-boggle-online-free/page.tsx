@@ -426,7 +426,11 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           <p className="text-sm leading-relaxed text-neo-white sm:text-base">
             Teachers use LexiClash as a free classroom Boggle game — no accounts, no downloads, no setup. Spin up a
             room in seconds, share the link or QR code, and up to 50 students compete live on the same word grid. Great
-            for vocabulary practice, spelling drills, and ESL classes. See the{' '}
+            for vocabulary practice, spelling drills, and ESL classes. Run{' '}
+            <Link href={`/${locale}/education/esl-word-games`} className="text-neo-yellow underline">
+              vocabulary games for the classroom
+            </Link>
+            , see the{' '}
             <Link href={`/${locale}/education/boggle-for-the-classroom`} className="text-neo-cyan underline">
               step-by-step classroom guide
             </Link>{' '}
