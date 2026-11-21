@@ -64,6 +64,8 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   '/japanese-word-game',
   '/juego-de-palabras-multijugador',
   '/juegos-vocabulario-aula',
+  '/laabat-kalimat-arabiya',
+  '/arabic-word-game',
   // Education keyword landings
   '/vocabulary-games-for-middle-school',
   '/word-games-for-the-classroom',

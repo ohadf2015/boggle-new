@@ -724,7 +724,7 @@ export async function getSubscriberRecipients(
 
   const { data, error } = await supabase
     .from('email_subscribers')
-    .select('id, email, language, unsubscribe_token, last_campaign_email_sent_at')
+    .select('id, email, language, source, unsubscribe_token, last_campaign_email_sent_at')
     .eq('is_active', true)
     .or(`last_campaign_email_sent_at.is.null,last_campaign_email_sent_at.lte.${cutoff}`);
 
@@ -733,8 +733,10 @@ export async function getSubscriberRecipients(
     return [];
   }
 
+  // Waitlist signups agreed to a single launch email, not to campaigns.
   return data.filter(
-    (s: { email: string }) => !registeredEmails.has(s.email)
+    (s: { email: string; source?: string | null }) =>
+      !registeredEmails.has(s.email) && !s.source?.includes('waitlist')
   ) as SubscriberRecipient[];
 }
 

@@ -7,6 +7,7 @@ import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { HeroAnimated } from './components/HeroAnimated';
 import { MultijugadorIntent } from './components/MultijugadorIntent';
 import { DosJugadoresSection } from './components/DosJugadoresSection';
+import { LatamSection } from './components/LatamSection';
 import { FeatureGrid } from './components/FeatureGrid';
 import { StepsSection } from './components/StepsSection';
 import { ModesShowcase } from './components/ModesShowcase';
@@ -176,6 +177,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
         </section>
         <MultijugadorIntent locale={locale} />
         <DosJugadoresSection locale={locale} />
+        <LatamSection locale={locale} />
 
         {/* PC DOWNLOAD INTENT — GR #12022. Extend this page; do not publish a second URL. */}
         <section className="mb-14 max-w-3xl" data-seo="descargar-pc">

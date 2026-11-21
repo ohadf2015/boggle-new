@@ -1,0 +1,58 @@
+.arabic {
+  font-family: system-ui, -apple-system, 'SF Arabic', 'Geeza Pro', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.dots {
+  background-image: radial-gradient(circle at 1px 1px, color-mix(in srgb, currentColor 9%, transparent) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+@keyframes trace-pop {
+  0%,
+  22%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  8% {
+    transform: translateY(-6px) scale(1.08);
+  }
+}
+
+@keyframes stamp-in {
+  from {
+    transform: rotate(-24deg) scale(1.6);
+  }
+  to {
+    transform: rotate(-8deg) scale(1);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .traceTile {
+    animation: trace-pop 4.2s ease-in-out infinite;
+  }
+
+  .stamp {
+    animation: stamp-in 420ms cubic-bezier(0.2, 1.4, 0.4, 1) 200ms both;
+  }
+
+  .mascot {
+    animation: bob 3.2s ease-in-out infinite;
+  }
+}
+
+.stamp {
+  transform: rotate(-8deg);
+}

@@ -301,3 +301,20 @@ describe('sitemap', () => {
     }
   });
 });
+
+describe('sitemap: Arabic waitlist pair', () => {
+  const routes = sitemap();
+  const AR = 'https://www.lexiclash.live/en/laabat-kalimat-arabiya';
+  const EN = 'https://www.lexiclash.live/en/arabic-word-game';
+
+  it.each([AR, EN])('lists %s once, with reciprocal ar/en alternates', (url) => {
+    const hits = routes.filter((r) => r.url === url);
+    expect(hits).toHaveLength(1);
+    expect(hits[0].alternates?.languages).toMatchObject({ ar: AR, en: EN, 'x-default': EN });
+  });
+
+  it('lists no other locale copy of them', () => {
+    const stray = routes.filter((r) => /\/(he|sv|ja|es|ru)\/(laabat-kalimat-arabiya|arabic-word-game)$/.test(r.url));
+    expect(stray).toHaveLength(0);
+  });
+});

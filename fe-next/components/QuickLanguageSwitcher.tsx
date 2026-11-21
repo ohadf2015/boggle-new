@@ -12,6 +12,8 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { trackLanguageChanged } from '@/utils/growthTracking';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { assignLocation } from '@/lib/navigation/assignLocation';
 import type { Language } from '@/types';
 
 interface LanguageOption {
@@ -28,6 +30,11 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
   { code: 'ru', flag: '🇷🇺', labelKey: 'joinView.russian' },
 ];
+
+// Not a locale yet: a waitlist entry that measures Arabic demand. Shown as an endonym in every UI language.
+const ARABIC_SOON_VALUE = 'ar-soon';
+const ARABIC_SOON_LABEL = 'العربية · قريبًا';
+const ARABIC_WAITLIST_PATH = '/en/laabat-kalimat-arabiya';
 
 interface QuickLanguageSwitcherProps {
   /** Additional CSS classes */
@@ -68,6 +75,11 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
       dir={dir}
       value={language}
       onValueChange={(val) => {
+        if (val === ARABIC_SOON_VALUE) {
+          posthog.capture('waitlist_entry_clicked', { language: 'ar', from: language, surface: 'language_switcher' });
+          assignLocation(ARABIC_WAITLIST_PATH);
+          return;
+        }
         trackLanguageChanged(language, val);
         setLanguage(val as Language);
       }}
@@ -148,6 +160,19 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
             </div>
           </SelectItem>
         ))}
+        <SelectItem
+          value={ARABIC_SOON_VALUE}
+          className={cn(
+            "cursor-pointer rounded-neo px-3 py-2.5",
+            "font-bold text-neo-black/70 dark:text-white/70",
+            "hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden"
+          )}
+        >
+          <div className="flex items-center gap-3" lang="ar" dir="rtl">
+            <span className="text-xl leading-none" aria-hidden="true">🌐</span>
+            <span className="font-bold">{ARABIC_SOON_LABEL}</span>
+          </div>
+        </SelectItem>
       </SelectContent>
     </Select>
   );

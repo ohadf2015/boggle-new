@@ -693,6 +693,21 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     });
   });
 
+  // Arabic has no locale yet: an Arabic waitlist page and its English twin live under /en.
+  const arWaitlist = {
+    ar: `${BASE_URL}/en/laabat-kalimat-arabiya`,
+    en: `${BASE_URL}/en/arabic-word-game`,
+  };
+  for (const url of [arWaitlist.ar, arWaitlist.en]) {
+    routes.push({
+      url,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+      alternates: { languages: { ...arWaitlist, 'x-default': arWaitlist.en } },
+    });
+  }
+
   return routes;
 }
 

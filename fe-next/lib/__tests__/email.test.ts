@@ -124,6 +124,21 @@ describe('getSubscriberRecipients', () => {
     expect(result[0].unsubscribe_token).toBe('tok-1');
   });
 
+  it('never returns waitlist signups (they only agreed to one launch email)', async () => {
+    subscribersChain.chain.or = vi.fn().mockResolvedValue({
+      data: [
+        { id: 1, email: 'daily@test.com', language: 'en', source: 'footer_newsletter', unsubscribe_token: 't1', last_campaign_email_sent_at: null },
+        { id: 2, email: 'ar@test.com', language: 'ar', source: 'ar_waitlist_ar', unsubscribe_token: 't2', last_campaign_email_sent_at: null },
+        { id: 3, email: 'ar-en@test.com', language: 'en', source: 'ar_waitlist_en', unsubscribe_token: 't3', last_campaign_email_sent_at: null },
+      ],
+      error: null,
+    });
+
+    const result = await getSubscriberRecipients(new Set());
+
+    expect(result.map((r) => r.email)).toEqual(['daily@test.com']);
+  });
+
   it('returns empty array when all subscribers are registered users', async () => {
     subscribersChain.chain.or = vi.fn().mockResolvedValue({
       data: [
