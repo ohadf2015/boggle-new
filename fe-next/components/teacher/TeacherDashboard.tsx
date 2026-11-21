@@ -31,6 +31,7 @@ import { RehearseWithBotsButton } from './home/RehearseWithBotsButton';
 import { HomeSessionRail } from './home/HomeSessionRail';
 import { HERO_SECONDARY, HERO_SECONDARY_WRAP } from './home/homeStyles';
 import { WaitingStudentsNudge } from './home/WaitingStudentsNudge';
+import { ClassroomWeekPanel } from './digest/ClassroomWeekPanel';
 import { TeacherHomeView } from './home/TeacherHomeView';
 import { useHomeWeekLoop } from './home/useHomeWeekLoop';
 import { useClassrooms } from '@/hooks/useClassroom';
@@ -318,6 +319,15 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
             <WaitingStudentsNudge
               classroomIds={classrooms.map((c) => c.id)}
               selectedId={effectiveId}
+              language={language}
+              t={t}
+            />
+          ) : null}
+          {selectedClassroom ? (
+            <ClassroomWeekPanel
+              classroomIds={classrooms.map((c) => c.id)}
+              focusId={selectedClassroom.id}
+              focusName={selectedClassroom.name}
               language={language}
               t={t}
             />
