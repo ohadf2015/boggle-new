@@ -26,6 +26,7 @@ import { ReportsHomeworkTab } from '@/components/teacher/reports/ReportsHomework
 import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomRosterProgress';
 import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
 import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
+import { ClassroomWeekPanel } from '@/components/teacher/digest/ClassroomWeekPanel';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
@@ -202,6 +203,19 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
     }),
   };
 
+  const weekFocus = selectedClassroomId
+    ? classrooms?.find((c) => c.id === selectedClassroomId) ?? null
+    : classrooms?.find((c) => c.id === shownClassId) ?? classrooms?.[0] ?? null;
+  const weekPanel = weekFocus && classrooms && classrooms.length > 0 ? (
+    <ClassroomWeekPanel
+      classroomIds={classrooms.map((c) => c.id)}
+      focusId={weekFocus.id}
+      focusName={weekFocus.name}
+      language={language}
+      t={t}
+    />
+  ) : null;
+
   let view: React.ReactNode;
   if (!selectedClassroomId) {
     view = (
@@ -212,6 +226,8 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
         <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-neo-cream/85 max-sm:hidden">
           {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
         </p>
+
+        {weekPanel}
 
         {classrooms && classrooms.length > 0 ? (
           <ReportsReteachPanel classrooms={classrooms} onShown={setShownClassId} />
@@ -279,6 +295,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
             }}
           />
         </div>
+        {weekPanel}
         {classIsEmpty ? (
           <ReportsClassEmpty classroomId={selectedClassroomId} />
         ) : (
