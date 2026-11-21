@@ -141,9 +141,10 @@ describe('EduHostResults: the words to reteach lead the wall', () => {
     }
   });
 
-  it('given a free teacher, then no trial card competes and the free report insight carries no Pro depth, pill or upgrade CTA mid-class', () => {
+  it('given a free teacher, then the Teacher Pro upsell card renders in the column, while the free report insight carries no duplicate Pro depth mid-class', () => {
     renderWall();
-    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
+    expect(screen.getByTestId('results-teacher-pro-trial-card')).toBeInTheDocument();
+    expect(screen.getByTestId('results-teacher-pro-trial-cta')).toHaveAttribute('href', '/en/teacher/upgrade?source=classroom_results');
     openMore();
     const preview = screen.getByTestId('class-report-teaser');
     // The ask is suppressed on the live wall: no Pro pill, no locked-depth block, no offer CTA.

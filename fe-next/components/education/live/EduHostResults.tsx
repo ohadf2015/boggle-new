@@ -40,6 +40,7 @@ import { ClassReportButton } from '@/components/education/results/ClassReportBut
 import { ReportPdfExportButton } from '@/components/education/results/ReportPdfExportButton';
 import { ResultsMoreTools } from '@/components/education/results/ResultsMoreTools';
 import { ZeroRoundNote } from '@/components/education/results/ZeroRoundNote';
+import { ResultsTeacherProTrialCard } from '@/components/education/results/ResultsTeacherProTrialCard';
 import { TeacherInviteNudge, showTeacherInvite } from '@/components/education/results/TeacherInviteNudge';
 import { EmptyRoundCard } from '@/components/education/results/EmptyRoundCard';
 import { useRoundEndReveal } from '@/components/education/results/useRoundEndReveal';
@@ -209,11 +210,8 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
   const practice = isRehearsalRound(players, searchParams?.get('practice') === '1' || undefined);
   const shortWall = bossOver;
   const classWin = practice ? null : buildClassWinShare({ summary, players, gameCode, locale: language, t: (key, params) => tf(key, CLASS_WIN_FALLBACK[key] ?? key, params) });
-  // No Pro ASK on this wall: it only exists while the live session runs, and a
-  // mid-class tap never converts (ur-audit 2026-11-17 — every edu_pro_offer_click
-  // was followed by live rounds, zero checkouts). The free class data (hardest
-  // words, struggle bars, the word grid) stays; the ask moved to post-class
-  // moments: Teacher Home once no game is live, the class summary, the digest.
+  // Free teacher upsell card on completed real rounds: Teacher Pro unlocks advanced
+  // reports, who-struggled depth, and more classes/students, deep-linking to Polar checkout.
   const proCard = !proLoading && !hasPro && !practice && summary.totalWords > 0;
   const round = { gameMode: summary.gameMode ?? 'classic', coverage: summary.coverage, masteryByPlayer: summary.masteryByPlayer, hostName: summary.teacherName };
   // On the wall the class numbers stand under the winner, so the side column holds coverage, actions and the Pro card.
@@ -385,6 +383,9 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               {summary.classroomId && summary.lessonIds?.[0] && students > 0 && !practice ? (
                 <KeepOpenHomework classroomId={summary.classroomId} lessonId={summary.lessonIds[0]} />
               ) : null}
+              {proCard && (
+                <ResultsTeacherProTrialCard language={language} className="w-full" />
+              )}
             </div>
             {!proLoading && hasPro && summary.totalWords > 0 && (
               <div className={cn((shortWall || phone) && '[@container_results_(height<56.25rem)]:hidden')}>

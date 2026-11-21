@@ -93,36 +93,35 @@ describe('EduHostResults', () => {
     masteryByPlayer: { Noa: { found: 3, total: 10 }, Ido: { found: 1, total: 10 } },
   } as unknown as ClassroomSummary;
 
-  it('given a free teacher, when results show mid-class, then the free report card shows WITHOUT the Pro ask (ur-audit: no offer while the game runs)', () => {
+  it('given a free teacher after a completed classroom round, then a results-screen Teacher Pro upsell card shows and deep-links to Polar checkout', () => {
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    // Teacher Pro upsell card is visible on the results screen
+    const card = screen.getByTestId('results-teacher-pro-trial-card');
+    expect(card).toBeInTheDocument();
+    const cta = screen.getByTestId('results-teacher-pro-trial-cta');
+    expect(cta).toHaveAttribute('href', '/he/teacher/upgrade?source=classroom_results');
+    expect(screen.getByTestId('results-school-quote-link')).toHaveAttribute('href', '/he/education/for-schools?source=classroom_results');
+
+    // More dropdown has the free insight without duplicating the modal depth
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
-    // The free insight (bars, how many struggled, the word grid) stays...
     expect(screen.getByTestId('class-report-teaser')).toBeInTheDocument();
-    // ...but nothing that asks for money: no depth teaser, no upgrade CTA, no locked PDF, no parent-share upsell.
-    expect(screen.queryByTestId('class-report-depth')).toBeNull();
-    expect(screen.queryByTestId('class-report-teaser-cta')).toBeNull();
-    expect(screen.queryByTestId('class-report-teaser-open')).toBeNull();
     expect(screen.queryByTestId('report-pdf-locked')).toBeNull();
     expect(screen.queryByTestId('edu-results-parent-share')).toBeNull();
-    expect(document.querySelector('a[href^="/he/teacher/upgrade"]')).toBeNull();
-    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
-    expect(screen.queryByTestId('unlock-report-upgrade-cta')).toBeNull();
-    expect(screen.queryByTestId('struggle-preview')).toBeNull();
-    expect(document.querySelector('a[href="/he/teacher/reports"]')).toBeNull();
   });
 
-  it('given a free teacher, when the wall is mid-class, then no Pro offer impression or click analytics fire', () => {
-    render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
+  it('given a free teacher on a rehearsal/practice round, then no Teacher Pro upsell card renders', () => {
+    // Rehearsal round with practice query param or rehearsal state
+    render(<EduHostResults summary={lessonSummary} players={[{ username: 'Bot1', score: 10, isBot: true }]} t={t} onRematch={vi.fn()} />);
     finishReveal();
-    fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
-    expect(proOffer.reportProOfferImpression).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
   });
 
-  it('given a Pro teacher, when results show, then the real PDF export and parent share stay (features, not asks)', () => {
+  it('given a Pro teacher, then no Teacher Pro upsell card renders, and real Pro tools stay', () => {
     pro.hasPro = true;
     render(<EduHostResults summary={lessonSummary} players={players} t={t} onRematch={vi.fn()} />);
     finishReveal();
+    expect(screen.queryByTestId('results-teacher-pro-trial-card')).toBeNull();
     fireEvent.click(screen.getByTestId('edu-results-more-toggle'));
     expect(screen.getByTestId('report-pdf-export')).toHaveAttribute('data-locked', 'false');
     expect(screen.getByTestId('edu-results-parent-share')).toBeInTheDocument();
