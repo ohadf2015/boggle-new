@@ -40,32 +40,40 @@ function mockFunnelTables(args: { assignmentCount: number | 'error'; classroomCo
   const countOf = (n: number | 'error'): CountResult =>
     n === 'error' ? { count: null, error: { message: 'rls' } } : { count: n, error: null };
 
-  const countSelect = (result: CountResult) =>
-    vi.fn().mockReturnValue({ eq: vi.fn().mockResolvedValue(result) });
-
-  const assignmentCountSelect = countSelect(countOf(args.assignmentCount));
-  const classroomCountSelect = countSelect(countOf(args.classroomCount));
-
+  const assignmentIn = vi.fn().mockResolvedValue(countOf(args.assignmentCount));
   const insert = vi.fn().mockReturnValue({
     select: vi.fn().mockReturnValue({
       single: vi.fn().mockResolvedValue({ data: { id: 'a-new' }, error: null }),
     }),
   });
 
-  (supabase.from as ReturnType<typeof vi.fn>).mockImplementation((table: string) =>
-    table === 'classrooms'
-      ? { select: classroomCountSelect }
-      : { insert, select: assignmentCountSelect }
-  );
+  (supabase.from as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
+    if (table === 'classrooms') {
+      return {
+        select: (_cols: string, opts?: { head?: boolean }) => ({
+          eq: vi.fn().mockResolvedValue(
+            opts?.head
+              ? countOf(args.classroomCount)
+              : { data: [{ id: 'c1' }], error: null },
+          ),
+        }),
+      };
+    }
+    return { insert, select: () => ({ in: assignmentIn, eq: assignmentIn }) };
+  });
 
-  return { insert, assignmentCountSelect, classroomCountSelect };
+  return { insert, assignmentIn };
 }
 
 const STEP_PROPS = { step: 'first_assignment', step_index: 3, locale: 'he', plan: 'trial' } as const;
 
 describe('createAssignment — activation funnel gates', () => {
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    fetchMock.mockClear();
+    vi.stubGlobal('fetch', fetchMock);
   });
 
   it('count 0 + insert success: fires the step AND completed (bare + growth twin) and inserts the same row as before', async () => {
@@ -90,6 +98,14 @@ describe('createAssignment — activation funnel gates', () => {
     expect(growthMock).toHaveBeenNthCalledWith(2, 'teacher_activation_funnel_completed', { locale: 'he', plan: 'trial' });
     expect(captureMock).toHaveBeenCalledTimes(2);
     expect(growthMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/education/teacher/funnel-step',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ step: 'first_assignment_created' }),
+        credentials: 'same-origin',
+      }),
+    );
   });
 
   it('count 0 but classroom count 0: fires the step only, NOT completed', async () => {
@@ -124,6 +140,7 @@ describe('createAssignment — activation funnel gates', () => {
     expect(insert).toHaveBeenCalledWith({ classroom_id: 'c1', lesson_id: 'l1', due_date: null });
     expect(captureMock).not.toHaveBeenCalled();
     expect(growthMock).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('the assignment count cannot be read: fires nothing and the insert still succeeds', async () => {
@@ -138,11 +155,11 @@ describe('createAssignment — activation funnel gates', () => {
   });
 
   it('counts BEFORE the insert', async () => {
-    const { insert, assignmentCountSelect } = mockFunnelTables({ assignmentCount: 5, classroomCount: 0 });
+    const { insert, assignmentIn } = mockFunnelTables({ assignmentCount: 5, classroomCount: 0 });
 
     await createAssignment({ classroom_id: 'c1', lesson_id: 'l1', teacher_id: 't1' });
 
-    expect(assignmentCountSelect.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(assignmentIn.mock.invocationCallOrder[0]).toBeLessThan(
       insert.mock.invocationCallOrder[0]
     );
   });

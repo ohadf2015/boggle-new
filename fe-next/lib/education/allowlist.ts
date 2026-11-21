@@ -1,4 +1,6 @@
 import { createAdminClient } from '@/utils/supabase/admin';
+import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer';
 
 export interface ConsumeAllowlistResult {
   consumed: boolean;
@@ -58,5 +60,10 @@ export async function consumeTeacherAllowlist(
   if (stamped.error) return { consumed: false, error: stamped.error.message };
   if (!stamped.data?.length) return { consumed: false, error: 'allowlist entry not marked consumed' };
 
+  emitTeacherFunnelStep({
+    teacherId: userId,
+    step: 'teacher_approved',
+    isTestAccount: isQaEmail(normalized),
+  });
   return { consumed: true };
 }

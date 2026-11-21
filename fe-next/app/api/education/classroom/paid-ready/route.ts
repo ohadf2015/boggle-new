@@ -12,6 +12,7 @@ import {
   buildTeacherActivationFunnelStepEvent,
   resolveTeacherActivationPlan,
 } from '@/lib/education/teacherActivationFunnelServer';
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer';
 import logger from '@/utils/logger';
 
 /**
@@ -107,5 +108,12 @@ async function createFirstClass(
     logger.error('[paid-ready] activation step skipped', err instanceof Error ? err.message : err);
   }
   captureEduServerEvents(events);
+  emitTeacherFunnelStep({
+    teacherId,
+    step: 'classroom_created',
+    isTestAccount,
+    locale: language,
+    classroomId: data.id,
+  });
   return data;
 }

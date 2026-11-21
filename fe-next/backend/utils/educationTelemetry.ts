@@ -202,6 +202,8 @@ const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
   'edu_classroom_created',
   'edu_first_student_joined',
   'edu_teacher_second_live_game_day',
+  // Paying-teacher funnel. Server-only, same chokepoint as signup_completed.
+  'teacher_funnel_step',
 ]);
 
 /**

@@ -18,6 +18,7 @@ import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubs
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
 import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
@@ -314,6 +315,12 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
     captureFunnel(payload, userId, withRevenue(buildTrialStartEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTeacherTrialStartedEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTrialStartedEvent(userId, subId, getLocale(payload)), payload?.data))
+    emitTeacherFunnelStep({
+      teacherId: userId,
+      step: 'trial_started',
+      isTestAccount: false,
+      locale: getLocale(payload),
+    })
   } catch (err) {
     console.error('[Polar] trial telemetry threw:', err)
   }

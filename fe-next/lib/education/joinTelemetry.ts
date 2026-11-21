@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import { captureEduServerEvents, type EduServerEvent } from '@/backend/utils/educationTelemetry';
 import { buildFirstStudentJoinedEvent, buildStudentJoinedEvent } from '@/backend/utils/educationRoundTelemetry';
+import { buildTeacherFunnelStepEvent } from '@/lib/education/teacherFunnelStepServer';
 import { loadTestAccountIds } from './eduTestAccount';
 
 /** A guest student has no email, so the teacher's flag is what marks a QA rig's students. */
@@ -28,6 +29,12 @@ export async function captureStudentJoinEvents(
       if (error) throw new Error(error.message);
       if (count === 1) {
         events.push(buildFirstStudentJoinedEvent({ teacherId, classroomId: args.classroomId, isTestAccount }));
+        events.push(buildTeacherFunnelStepEvent({
+          teacherId,
+          step: 'students_joined',
+          isTestAccount,
+          classroomId: args.classroomId,
+        }));
       }
     }
   } catch (err) {

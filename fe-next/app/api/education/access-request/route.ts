@@ -10,6 +10,7 @@ import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { isPaidMedium } from '@/lib/education/paidDay0';
 import { testEmailReason } from '@/lib/education/checkoutTrafficTags';
 import { buildEduAccessRequestCreatedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
+import { emitTeacherFunnelStep } from '@/lib/education/teacherFunnelStepServer';
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 import { notifyAdmins } from '@/lib/admin/adminNotifications';
 import { teacherRequestNotice } from '@/lib/admin/adminEvents';
@@ -273,6 +274,14 @@ export async function POST(req: Request) {
         destination: paidDay0 ? 'paid_class' : 'class_setup',
         is_test_account: testEmailReason(email) !== null,
       },
+    });
+    // The approval write won and the role is promoted. This is the live door
+    // (access is granted on submit). Re-submits return alreadyApproved above.
+    emitTeacherFunnelStep({
+      teacherId: user.id,
+      step: 'teacher_approved',
+      isTestAccount: testEmailReason(email) !== null,
+      locale,
     });
   } catch {
     /* telemetry failure must never break access request */

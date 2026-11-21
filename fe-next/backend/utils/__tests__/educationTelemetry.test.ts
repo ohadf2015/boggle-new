@@ -321,7 +321,7 @@ describe('normalizeAnalyticsHost', () => {
 });
 
 describe('captureEduServerEvents — server-canonical activation steps get growth twins', () => {
-  it.each(['edu_classroom_created', 'edu_first_student_joined', 'edu_teacher_second_live_game_day'])(
+  it.each(['edu_classroom_created', 'edu_first_student_joined', 'edu_teacher_second_live_game_day', 'teacher_funnel_step'])(
     'Given %s, When captured, Then a growth: twin rides with it',
     (event) => {
       captureEduServerEvents([{ distinctId: 't1', event, properties: { classroom_id: 'c1' } }]);
