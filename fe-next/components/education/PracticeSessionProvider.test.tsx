@@ -13,14 +13,14 @@ import userEvent from '@testing-library/user-event';
 const {
   mockAwardPracticeXp,
   mockAcknowledgePersistence,
-  mockCheckForUnlocks,
+  mockEnqueueUnlocks,
   mockAcknowledgeUnlock,
   mockSupabaseUpsert,
   mockUseAchievementUnlock,
 } = vi.hoisted(() => ({
   mockAwardPracticeXp: vi.fn(),
   mockAcknowledgePersistence: vi.fn(),
-  mockCheckForUnlocks: vi.fn(),
+  mockEnqueueUnlocks: vi.fn(),
   mockAcknowledgeUnlock: vi.fn(),
   mockSupabaseUpsert: vi.fn().mockResolvedValue({ data: null, error: null }),
   mockUseAchievementUnlock: vi.fn(),
@@ -94,8 +94,7 @@ mockUseAchievementUnlock.mockReturnValue({
   pendingUnlocks: [],
   currentUnlock: null,
   acknowledgeUnlock: mockAcknowledgeUnlock,
-  checkForUnlocks: mockCheckForUnlocks,
-  isChecking: false,
+  enqueueUnlocks: mockEnqueueUnlocks,
 });
 vi.mock('@/hooks/useAchievementUnlock', () => ({
   __esModule: true,
@@ -408,11 +407,11 @@ describe('PracticeSessionProvider', () => {
 
   describe('Achievement Integration', () => {
     beforeEach(() => {
-      mockCheckForUnlocks.mockClear();
+      mockEnqueueUnlocks.mockClear();
       mockAcknowledgeUnlock.mockClear();
     });
 
-    it('calls checkForUnlocks after XP is awarded', async () => {
+    it('celebrates nothing when the server returns no awards', async () => {
       const user = userEvent.setup();
 
       render(
@@ -423,164 +422,8 @@ describe('PracticeSessionProvider', () => {
 
       await user.click(screen.getByTestId('complete-btn'));
 
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalled();
-      });
-    });
-
-    it('passes correct progress data to checkForUnlocks', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            totalXp: 600, // 500 initial + 100 earned
-            currentLevel: 3,
-            currentStreak: 5,
-            practiceSessions: 1,
-          })
-        );
-      });
-    });
-
-    it('increments total practice sessions on each completion', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      // First completion
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            practiceSessions: 1,
-          })
-        );
-      });
-
-      // Second completion
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            practiceSessions: 2,
-          })
-        );
-      });
-    });
-
-    it('does not count flashcard sessions as completed lessons', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <PracticeSessionProvider studentId="student-lc-1" lessonId="lesson-A">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            practiceSessions: 1,
-            lessonsCompleted: 0,
-            lessonsCollected: 0,
-          })
-        );
-      });
-    });
-
-    it('counts distinct lesson IDs on lesson_completion sessions', async () => {
-      try { localStorage.removeItem('education_completed_lessons_student-lc-2'); } catch { /* noop */ }
-
-      function LessonCompletionConsumer() {
-        const ctx = usePracticeSession();
-        return (
-          <button
-            data-testid="lc-btn"
-            onClick={() => ctx.completePracticeSession({ type: 'lesson_completion', masteryLevel: 'mastered' })}
-          >
-            Complete Lesson
-          </button>
-        );
-      }
-
-      const user = userEvent.setup();
-
-      const { unmount } = render(
-        <PracticeSessionProvider studentId="student-lc-2" lessonId="lesson-A">
-          <LessonCompletionConsumer />
-        </PracticeSessionProvider>
-      );
-
-      // Complete lesson-A twice — should count as 1 distinct lesson
-      await user.click(screen.getByTestId('lc-btn'));
-      await user.click(screen.getByTestId('lc-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            lessonsCompleted: 1,
-            lessonsCollected: 1,
-          })
-        );
-      });
-
-      unmount();
-
-      // Now complete a different lesson — should become 2 distinct
-      render(
-        <PracticeSessionProvider studentId="student-lc-2" lessonId="lesson-B">
-          <LessonCompletionConsumer />
-        </PracticeSessionProvider>
-      );
-
-      await user.click(screen.getByTestId('lc-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenLastCalledWith(
-          expect.objectContaining({
-            lessonsCompleted: 2,
-            lessonsCollected: 2,
-          })
-        );
-      });
-    });
-
-    it('tracks total words mastered from flashcard sessions', async () => {
-      const user = userEvent.setup();
-
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      // Complete flashcard with 9 correct
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            wordsMastered: 9, // cardsCorrect from first session
-          })
-        );
-      });
+      await waitFor(() => expect(mockAwardPracticeXp).toHaveBeenCalled());
+      expect(mockEnqueueUnlocks).not.toHaveBeenCalled();
     });
 
     it('renders AchievementUnlockModal when currentUnlock is set', () => {
@@ -596,8 +439,7 @@ describe('PracticeSessionProvider', () => {
           isUpgrade: false,
         },
         acknowledgeUnlock: mockAcknowledgeUnlock,
-        checkForUnlocks: mockCheckForUnlocks,
-        isChecking: false,
+        enqueueUnlocks: mockEnqueueUnlocks,
       });
 
       render(
@@ -609,37 +451,7 @@ describe('PracticeSessionProvider', () => {
       expect(screen.getByTestId('achievement-modal')).toBeInTheDocument();
     });
 
-    it('updates level in progress data when leveling up', async () => {
-      const user = userEvent.setup();
-
-      // Configure mock to return level up
-      mockAwardPracticeXp.mockResolvedValueOnce({
-        totalXp: 200,
-        breakdown: {},
-        masteryMessage: 'Level up!',
-        leveledUp: true,
-        newLevel: 4,
-        newTitles: ['Word Master'],
-      });
-
-      render(
-        <PracticeSessionProvider studentId="student-1" lessonId="lesson-1">
-          <TestConsumer />
-        </PracticeSessionProvider>
-      );
-
-      await user.click(screen.getByTestId('complete-btn'));
-
-      await waitFor(() => {
-        expect(mockCheckForUnlocks).toHaveBeenCalledWith(
-          expect.objectContaining({
-            currentLevel: 4, // New level from XP award
-          })
-        );
-      });
-    });
-
-    it('does not re-trigger achievement check if XP award fails', async () => {
+    it('celebrates nothing if the XP award fails', async () => {
       const user = userEvent.setup();
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
@@ -657,8 +469,8 @@ describe('PracticeSessionProvider', () => {
         expect(consoleSpy).toHaveBeenCalled();
       });
 
-      // Should not call checkForUnlocks when award fails
-      expect(mockCheckForUnlocks).not.toHaveBeenCalled();
+      // Nothing is celebrated when the award fails
+      expect(mockEnqueueUnlocks).not.toHaveBeenCalled();
 
       consoleSpy.mockRestore();
     });

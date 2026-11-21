@@ -1,6 +1,7 @@
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
 import { ACHIEVEMENT_DEFINITIONS } from '@/backend/modules/educationAchievementDefinitions';
 import { TIER_THRESHOLDS, type TierName, type TierProgress } from '@/utils/achievementTiers';
+import { SERVER_AWARD_KEYS } from '@/lib/education/studentAwards';
 
 export interface NextAward {
   id: string;
@@ -32,15 +33,7 @@ const LADDERS = new Map(
   ]),
 );
 
-// Nothing feeds these today: the practice flow sends 0 for four inputs and nothing computes the ten DB-only awards.
-// Showing them would be a wall of awards no student can earn.
-const NOT_EARNABLE = new Set([
-  'boss_slayer', 'combo_master', 'weekly_warrior', 'classroom_contributor',
-  'blitz_champion', 'comeback_king', 'duel_champion', 'duel_streak', 'duel_veteran',
-  'matching_master', 'mode_master', 'practice_streak', 'speed_dueler', 'spelling_ace',
-]);
-
-export const isEarnableAward = (id: string) => !NOT_EARNABLE.has(id);
+const GRANTABLE = new Set<string>(SERVER_AWARD_KEYS);
 
 /** Each award has its own ladder (First Lesson 1/3/10/25, XP Collector 500+); unknown ids use the generic one. */
 export function awardTier(id: string, count: number): TierProgress {
@@ -56,11 +49,14 @@ export function awardTier(id: string, count: number): TierProgress {
   return { currentTier, nextTier, currentCount: safe, nextThreshold, progress, isMaxTier: !nextTier };
 }
 
+// A tier the student already holds stays on the wall even when nothing grants that award any more.
+export const isEarnableAward = (id: string, count: number) => GRANTABLE.has(id) || awardTier(id, count).currentTier !== null;
+
 export function summarizeAwards(achievements: Record<string, Achievement>): AwardsSummary {
   const tiers: Record<TierName, number> = { BRONZE: 0, SILVER: 0, GOLD: 0, PLATINUM: 0 };
   const candidates: NextAward[] = [];
   let earned = 0;
-  const entries = Object.entries(achievements).filter(([id]) => isEarnableAward(id));
+  const entries = Object.entries(achievements).filter(([id, award]) => isEarnableAward(id, award.count));
 
   for (const [id, award] of entries) {
     const p = awardTier(id, award.count);

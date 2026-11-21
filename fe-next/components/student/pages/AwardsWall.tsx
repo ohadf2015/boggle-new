@@ -131,7 +131,7 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
 export function AwardsGrid({ achievements, filter, fresh }: { achievements: Record<string, Achievement>; filter: AwardsFilter; fresh?: ReadonlySet<string> }) {
   const { t } = useLanguage() as unknown as { t: T };
   const [open, setOpen] = useState(false);
-  const entries = orderAwards(Object.entries(achievements).filter(([id, a]) => isEarnableAward(id) && (filter === 'all' || a.category === filter)));
+  const entries = orderAwards(Object.entries(achievements).filter(([id, a]) => isEarnableAward(id, a.count) && (filter === 'all' || a.category === filter)));
   if (entries.length === 0) {
     return (
       <p dir="auto" className="py-10 text-center font-neo-body text-sm font-bold text-neo-white/85">

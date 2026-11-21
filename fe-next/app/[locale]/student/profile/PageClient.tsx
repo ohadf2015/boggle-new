@@ -170,7 +170,7 @@ export default function StudentProfilePageClient() {
               </div>
               <Link
                 href={nextHref}
-                className={cn(pressClasses(3), 'inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase text-neo-black')}
+                className={cn(pressClasses(2), 'inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 font-neo-display text-sm font-black uppercase text-neo-black')}
               >
                 <Play className="size-4 rtl:-scale-x-100" aria-hidden />
                 {t('academy.pages.awardsEmptyCta', 'Play a lesson')}

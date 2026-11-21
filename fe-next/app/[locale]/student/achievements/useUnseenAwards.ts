@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
-import { awardTier, isEarnableAward } from './awardsSummary';
+import { awardTier } from './awardsSummary';
 
 // Same store the practice unlock modal writes, so a badge celebrated there is not celebrated again here.
 const storeKey = (studentId: string) => `achievement-acknowledged-${studentId}`;
@@ -21,7 +21,6 @@ export function useUnseenAwards(studentId: string | null, achievements: Record<s
     if (!studentId || typeof window === 'undefined') return { unseen, marks };
     const seen = read(studentId);
     for (const [id, a] of Object.entries(achievements)) {
-      if (!isEarnableAward(id)) continue;
       const tier = awardTier(id, a.count).currentTier;
       if (!tier) continue;
       const mark = `${id}:${tier.toLowerCase()}`;

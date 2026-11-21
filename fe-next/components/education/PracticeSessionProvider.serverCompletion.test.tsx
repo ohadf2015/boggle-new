@@ -17,7 +17,7 @@ const {
   mockAwardPracticeXp,
   mockReconcileAwardedXp,
   mockAcknowledgePersistence,
-  mockCheckForUnlocks,
+  mockEnqueueUnlocks,
   mockAcknowledgeUnlock,
   mockLoggerError,
   mockPublishLevelUp,
@@ -26,7 +26,7 @@ const {
   mockAwardPracticeXp: vi.fn(),
   mockReconcileAwardedXp: vi.fn(() => 3),
   mockAcknowledgePersistence: vi.fn(),
-  mockCheckForUnlocks: vi.fn(),
+  mockEnqueueUnlocks: vi.fn(),
   mockAcknowledgeUnlock: vi.fn(),
   mockLoggerError: vi.fn(),
 }));
@@ -71,8 +71,7 @@ vi.mock('@/hooks/useAchievementUnlock', () => ({
     pendingUnlocks: [],
     currentUnlock: null,
     acknowledgeUnlock: mockAcknowledgeUnlock,
-    checkForUnlocks: mockCheckForUnlocks,
-    isChecking: false,
+    enqueueUnlocks: mockEnqueueUnlocks,
   })),
 }));
 
@@ -290,7 +289,7 @@ describe('PracticeSessionProvider — the server decides the XP shown', () => {
 
     await waitFor(() => expect(mockReconcileAwardedXp).toHaveBeenCalledWith(100, 0));
     expect(screen.getByTestId('session-xp')).toHaveTextContent('0');
-    await waitFor(() => expect(mockCheckForUnlocks).toHaveBeenCalledWith(expect.objectContaining({ totalXp: 500 })));
+    expect(mockEnqueueUnlocks).not.toHaveBeenCalled();
   });
 });
 

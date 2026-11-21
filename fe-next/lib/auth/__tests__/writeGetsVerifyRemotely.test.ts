@@ -11,8 +11,6 @@ const WRITING_GETS = [
   'word-tower/wreck',
   'word-tower/estate',
   'word-tower/estate/rivals',
-  'education/challenges/daily',
-  'education/challenges/weekly',
   'subscription/status',
 ];
 

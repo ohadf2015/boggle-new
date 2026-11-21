@@ -37,9 +37,6 @@ const mockCalculatePracticeXp = vi.fn(() => ({ totalXp: 50, breakdown: {}, maste
 vi.mock('@/backend/modules/educationXpManager', () => ({
   calculatePracticeXp: (...args: unknown[]) => mockCalculatePracticeXp(...(args as [])),
 }));
-vi.mock('@/lib/supabase/education/challengeProgress', () => ({
-  updateEducationChallengeProgress: vi.fn().mockResolvedValue(undefined),
-}));
 vi.mock('@/lib/apiRateLimit', () => ({
   checkApiRateLimit: vi.fn().mockReturnValue({ success: true }),
 }));

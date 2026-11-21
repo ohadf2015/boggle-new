@@ -4,7 +4,6 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import logger from '@/utils/logger';
 import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/educationXpManager';
-import { updateEducationChallengeProgress } from '@/lib/supabase/education/challengeProgress';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
@@ -15,6 +14,9 @@ import { practiceWordCounts } from '@/lib/education/practiceWordCounts';
 import { allowedPracticeXp, capPracticeXpInput, readPracticeXpLimits } from '@/lib/education/practiceXpLimits';
 import { startSessionSchema, tooManyRequests, updateSessionSchema } from '@/lib/education/practiceSessionSchemas';
 import { grantPlayerXp, levelUpOf } from '@/backend/modules/xpGrant';
+import { readAwardState, type AwardState } from '@/lib/education/grantStudentAwards';
+import { grantPracticeRewards } from '@/lib/education/practiceRewards';
+import { nextPracticeStreak, utcDay, type PracticeStreak } from '@/lib/education/practiceStreak';
 
 /**
  * GET /api/education/practice
@@ -331,6 +333,8 @@ export async function PATCH(request: NextRequest) {
     let serverCalculatedXp = 0;
     let streakDays = 0;
     let satisfiedAssignment: { id: string; classroomId: string | null } | null = null;
+    let awardState: AwardState | null = null;
+    let nextStreak: PracticeStreak | null = null;
 
     if (completed) {
       const merged = { ...existing, ...updateObj } as typeof existing & Record<string, unknown>;
@@ -361,8 +365,8 @@ export async function PATCH(request: NextRequest) {
 
       // B1 fix: streak for the bonus. In the same wave: which assignment (if any)
       // this round satisfies — the teacher's tracking reads the stamp below.
-      const [{ data: progressData }, foundAssignment, xpLimits] = await Promise.all([
-        supabase.from('student_lesson_progress').select('current_streak')
+      const [{ data: progressData }, foundAssignment, xpLimits, awardsBefore] = await Promise.all([
+        supabase.from('student_lesson_progress').select('current_streak, longest_streak, last_practice_date')
           .eq('student_id', existing.student_id).eq('lesson_id', existing.lesson_id).single(),
         findSatisfiedAssignment(supabase, {
           lessonId: existing.lesson_id,
@@ -373,10 +377,13 @@ export async function PATCH(request: NextRequest) {
         })
           .catch((err) => { logger.error('Assignment lookup failed:', err); return null; }),
         readPracticeXpLimits(createAdminClient, { studentId: existing.student_id, lessonId: existing.lesson_id, nowMs: Date.now() }),
+        readAwardState(createAdminClient, existing.student_id),
       ]);
       satisfiedAssignment = foundAssignment;
+      awardState = awardsBefore;
 
-      streakDays = progressData?.current_streak ?? 0;
+      nextStreak = nextPracticeStreak(progressData, utcDay(Date.now()));
+      streakDays = nextStreak.current;
       serverCalculatedXp = xpLimits
         ? allowedPracticeXp(
             calculatePracticeXp({
@@ -454,20 +461,14 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    if (completed) {
-      // B12 fix: Update daily challenge progress after practice completion
-      // Fire-and-forget — don't block the response
-      updateEducationChallengeProgress(existing.student_id, 'practice_session', 1).catch(err =>
-        logger.error('Failed to update challenge progress:', err)
-      );
-      if (serverCalculatedXp > 0) {
-        updateEducationChallengeProgress(existing.student_id, 'xp_earned', serverCalculatedXp).catch(err =>
-          logger.error('Failed to update XP challenge progress:', err)
-        );
-      }
-    }
+    const xpSaved = shouldAwardXp && !xpResult?.error;
+    const rewards = completed && (xpSaved || !shouldAwardXp)
+      ? await grantPracticeRewards({ getAdmin: createAdminClient, awardState, studentId: existing.student_id,
+          lessonId: existing.lesson_id, xp: xpSaved ? serverCalculatedXp : 0, streak: xpSaved ? nextStreak : null })
+      : null;
 
-    return NextResponse.json({ session, assignmentCompleted: stamped === true, levelUp: levelUpOf(profileXp) });
+    return NextResponse.json({ session, assignmentCompleted: stamped === true, levelUp: levelUpOf(profileXp),
+      newAwards: rewards?.newAwards ?? null, practiceStreak: rewards?.practiceStreak ?? null });
   } catch (error) {
     logger.error('PATCH practice error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

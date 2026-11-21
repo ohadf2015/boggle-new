@@ -27,7 +27,7 @@ describe('AwardsHero', () => {
   });
 
   it('given earned awards, when rendered, then it shows the earned count landed and the total', () => {
-    render(<AwardsHero achievements={{ x: a(1), y: a(20), z: a(0) }} />);
+    render(<AwardsHero achievements={{ first_lesson: a(1), lesson_collector: a(10), practice_veteran: a(0) }} />);
     expect(screen.getByTestId('awards-hero-earned')).toHaveTextContent('2');
     expect(screen.getByTestId('awards-hero')).toHaveAttribute('data-total', '3');
   });

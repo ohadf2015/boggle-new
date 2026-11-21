@@ -4,8 +4,8 @@ import {
   PROGRESS_UPSERT_CONFLICT,
   buildAchievementsRecord,
   toProgressUpsertRows,
+  type AchievementProgress,
 } from '../achievementProgress';
-import type { AchievementProgress } from '@/backend/modules/educationAchievementManager';
 
 /**
  * Sentry JAVASCRIPT-NEXTJS-243: the student achievements page selected a column

@@ -16,7 +16,7 @@ const a = (count: number, descriptionKey = 'd'): Achievement => ({ count, catego
 
 describe('Awards wall', () => {
   it('given nothing earned, when rendered, then no locked tile shows until the student opens the rest', () => {
-    render(<AwardsGrid achievements={{ first_lesson: a(0), word_master: a(0) }} filter="all" />);
+    render(<AwardsGrid achievements={{ first_lesson: a(0), lesson_collector: a(0) }} filter="all" />);
     expect(screen.queryAllByTestId('student-award')).toHaveLength(0);
     fireEvent.click(screen.getByRole('button', { name: /awardsShowMore/ }));
     expect(screen.getAllByTestId('student-award')).toHaveLength(2);

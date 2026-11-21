@@ -10,9 +10,17 @@
  * every upsert failed and progress never persisted. Reader and writer share
  * these helpers so the column names cannot drift apart again.
  */
-import type { AchievementProgress } from '@/backend/modules/educationAchievementManager';
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
 import type { AchievementCategory } from '@/lib/supabase/education/types';
+
+export interface AchievementProgress {
+  key: string;
+  current_tier: 'bronze' | 'silver' | 'gold' | 'platinum' | null;
+  progress_value: number;
+  next_threshold: number | null;
+  percent_complete: number;
+  isSecret: boolean;
+}
 
 export const STUDENT_PROGRESS_SELECT = 'achievement_key, current_count';
 export const PROGRESS_UPSERT_CONFLICT = 'student_id,achievement_key,tier';
