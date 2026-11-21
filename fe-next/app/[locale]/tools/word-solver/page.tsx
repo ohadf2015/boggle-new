@@ -158,6 +158,10 @@ export default async function WordSolverPage({ params }: PageParams) {
           <p className="text-neo-white text-sm mb-4">
             Need letters in fixed positions, a pattern like c_a_e, or blank tiles? Use the{' '}
             <Link href="/en/word-finder" className="text-neo-cyan underline">Word Finder</Link>.
+            Teaching the words you just found? Run{' '}
+            <Link href="/en/education/esl-word-games" className="text-neo-yellow underline">vocabulary games for the classroom</Link>
+            {' '}or{' '}
+            <Link href="/en/education/vocabulary-games-classroom" className="text-neo-pink underline">vocabulary games online free</Link>.
           </p>
         )}
         <GuidesCalloutLink locale={locale} />
