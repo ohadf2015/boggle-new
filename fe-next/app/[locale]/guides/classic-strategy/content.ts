@@ -78,7 +78,7 @@ Oh, and the letter S. Never forget S. Any word you already found might have an S
         title: 'How I Actually Spend My Time (The 3 Phases)',
         content: `I wasted so many games before I figured out pacing. I'd either blow all my time hunting for one big word, or I'd frantically submit tiny words the whole round and miss the good stuff. Turns out there's a rhythm to it.
 
-First 30% of the clock - just go. Submit everything. See THE? Submit. See AT? Submit. Don't think about whether a 3-letter word is "worth it." It is. You're banking points and getting the lay of the land at the same time. My fingers are basically on autopilot during this phase.
+First 30% of the clock - just go. Submit everything. See THE? Submit. See ATE? Submit. Don't think about whether a 3-letter word is "worth it." It is. You're banking points and getting the lay of the land at the same time. My fingers are basically on autopilot during this phase.
 
 Middle 40% - now slow down. This is your hunting phase. Apply the prefix/suffix stuff. Look at clusters you haven't touched. Try weird diagonal paths. I find most of my 5+ letter words here. It's the part of the game that actually feels like a puzzle.
 
