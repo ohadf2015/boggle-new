@@ -78,6 +78,23 @@ describe('board release effects', () => {
     expect(glyph(board, '0-1').getAttribute('data-fx')).toBe('ok');
   });
 
+  it('given reduced motion, then an accepted word keeps its verdict colour but bursts nothing', () => {
+    const mm = vi.spyOn(window, 'matchMedia').mockImplementation((q: string) => ({ matches: q.includes('reduce') }) as MediaQueryList);
+    const { board, send } = mount();
+    send();
+    feedbackFx(board, 'ok', 10, 'cat');
+    expect(glyph(board, '0-1').getAttribute('data-fx')).toBe('ok');
+    expect(board.querySelector('[data-shard], [data-ring]')).toBeNull();
+    mm.mockRestore();
+  });
+
+  it('given motion is allowed, then an accepted word bursts shards', () => {
+    const { board, send } = mount();
+    send();
+    feedbackFx(board, 'ok', 10, 'cat');
+    expect(board.querySelectorAll('[data-shard]').length).toBeGreaterThan(0);
+  });
+
   it('given the word was rejected, then the verdict is bad', () => {
     const { board, send } = mount();
     send();

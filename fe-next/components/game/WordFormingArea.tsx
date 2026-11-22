@@ -277,14 +277,14 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
               opacity: 1,
               scale: 1,
               x: showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
-                ? [0, -10, 10, 0] : 0,
+                ? [0, -6, 6, 0] : 0,
             }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{
               layout: SPRING_PRESETS.snappy,
               opacity: { duration: 0.15 },
               scale: SPRING_PRESETS.snappy,
-              x: { duration: 0.5, ease: 'easeInOut' }
+              x: { duration: 0.28, ease: 'easeInOut' }
             }}
             className={cn(
               'relative border-3 border-neo-black rounded-neo shadow-hard flex items-center gap-1.5 sm:gap-2 whitespace-nowrap overflow-visible',
@@ -300,14 +300,12 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
                   initial={{ scale: 0, rotate: visibleFeedback?.type === 'accepted' ? -180 : 0 }}
                   animate={{
                     scale: 1,
-                    rotate: (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate' || visibleFeedback?.type === 'foundByOther')
-                      ? [0, -15, 15, -15, 0] : 0
+                    rotate: 0
                   }}
                   exit={{ scale: 0 }}
                   transition={{
                     default: { type: 'tween' },
                     scale: SPRING_PRESETS.snappy,
-                    rotate: { type: 'tween', duration: 0.4, ease: 'easeInOut' }
                   }}
                   className={cn(
                     'font-black',

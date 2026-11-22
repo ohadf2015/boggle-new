@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -130,7 +130,7 @@ vi.mock('@/components/game/ComboMilestoneAnnouncement', () => ({
   ComboMilestoneAnnouncement: () => null,
 }));
 vi.mock('@/components/game/ScreenFlashOverlay', () => ({
-  ScreenFlashOverlay: () => null,
+  ScreenFlashOverlay: ({ trigger }: { trigger: number }) => <div data-testid="flash" data-trigger={trigger} />,
 }));
 vi.mock('@/components/game/keyboardTrailsUtils', () => ({
   shouldShowKeyboardTrails: () => false,
@@ -328,5 +328,37 @@ describe('PortraitLayout Haptic Feedback', () => {
       render(<PortraitLayout {...baseProps} inDesktopShell={true} />);
       expect(screen.queryByTestId('circular-timer')).toBeNull();
     });
+  });
+
+  it('does not flash on accepted words, only on combo milestones', () => {
+    const { rerender } = render(<PortraitLayout {...baseProps} comboLevel={1} foundWords={[]} />);
+    rerender(<PortraitLayout {...baseProps} comboLevel={2} foundWords={[{ word: 'CAT' } as never]} />);
+    expect(screen.getByTestId('flash').dataset.trigger).toBe('0');
+    rerender(<PortraitLayout {...baseProps} comboLevel={3} foundWords={[{ word: 'CAT' } as never, { word: 'DOG' } as never]} />);
+    expect(screen.getByTestId('flash').dataset.trigger).toBe('1');
+  });
+
+  it('flashes at most once per 600ms', () => {
+    vi.useFakeTimers();
+    const { rerender } = render(<PortraitLayout {...baseProps} comboLevel={4} />);
+    rerender(<PortraitLayout {...baseProps} comboLevel={5} />);
+    rerender(<PortraitLayout {...baseProps} comboLevel={6} />);
+    rerender(<PortraitLayout {...baseProps} comboLevel={7} />);
+    expect(screen.getByTestId('flash').dataset.trigger).toBe('1');
+    vi.advanceTimersByTime(600);
+    rerender(<PortraitLayout {...baseProps} comboLevel={10} />);
+    expect(screen.getByTestId('flash').dataset.trigger).toBe('2');
+    vi.useRealTimers();
+  });
+
+  it('replays the mythic shake: class leaves on animation end and returns on the next trigger', () => {
+    const { container, rerender } = render(<PortraitLayout {...baseProps} comboLevel={6} />);
+    rerender(<PortraitLayout {...baseProps} comboLevel={7} />);
+    const shaking = () => container.querySelector('.animate-combo-shake') as HTMLElement | null;
+    expect(shaking()).not.toBeNull();
+    fireEvent.animationEnd(shaking()!);
+    expect(shaking()).toBeNull();
+    rerender(<PortraitLayout {...baseProps} comboLevel={8} />);
+    expect(shaking()).not.toBeNull();
   });
 });

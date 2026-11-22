@@ -173,6 +173,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
   // Floating "+N" on every accepted word.
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [floatingFire, setFloatingFire] = useState(false);
+  const [floatingPopKey, setFloatingPopKey] = useState(0);
   const prevFeedbackRef = useRef(currentFeedback);
   useEffect(() => {
     if (currentFeedback === prevFeedbackRef.current) return;
@@ -180,6 +181,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
     if (currentFeedback?.type !== 'accepted') return;
     if (currentFeedback.score) {
       setFloatingScore(currentFeedback.score);
+      setFloatingPopKey((k) => k + 1);
       setFloatingFire(currentFeedback.fireRoundActive ?? false);
     }
     if (hapticsEnabled) vibrateWordSubmit(currentFeedback.word?.length ?? 0, comboLevel, fireRoundActive);
@@ -208,7 +210,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
       {playing && !soloLessonActive && <ComboMilestoneAnnouncement comboLevel={comboLevel} />}
       {playing && !soloLessonActive && <GameMascotReactions mode="singleplayer" comboLevel={comboLevel} personality="full" language={language} remainingTime={remainingTime} score={score} personalBest={personalBest} stages={mascotStages} timerAnchor={mascotTimer} />}
       {playing && !soloLessonActive && (
-        <FloatingScoreAnimation score={floatingScore} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
+        <FloatingScoreAnimation score={floatingScore} popKey={floatingPopKey} isFireRound={floatingFire} onAnimationComplete={clearFloating} />
       )}
       <GameOverlays
         earthquakeState={earthquakeState}

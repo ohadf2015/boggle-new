@@ -1,17 +1,16 @@
 'use client';
 
-import React, { useEffect, useState, useMemo, memo } from 'react';
-import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import React, { useEffect, useState, useMemo, useRef, memo } from 'react';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-
-// Pre-allocated index arrays — prevents [...Array(N)] allocation on every render
-const SPARKLE_INDICES = [0, 1, 2, 3, 4, 5] as const;
-const TRAIL_INDICES = [0, 1, 2] as const;
+import { jitter } from '@/lib/animation/variety';
 
 interface FloatingScoreAnimationProps {
   /** Score to display (triggers animation when changes to > 0) */
   score: number | null;
+  /** Changes on every accepted word so equal scores still pop separately */
+  popKey?: number;
   /** Position to start from (default: center of viewport) */
   startPosition?: { x: number; y: number };
   /** Position to end at (default: top-right for score display) */
@@ -24,12 +23,32 @@ interface FloatingScoreAnimationProps {
   isFireRound?: boolean;
 }
 
+interface Pop {
+  id: number;
+  score: number;
+  isFireRound: boolean;
+  tilt: number;
+  drift: number;
+  peak: number;
+}
+
+const POP_LIFE_MS = 600;
+const POP_SHADOW = '2px 2px 0 rgb(var(--neo-black))';
+
+const pillColor = (score: number, fire: boolean) =>
+  fire ? 'bg-neo-orange text-neo-black'
+    : score >= 20 ? 'bg-neo-yellow text-neo-black'
+    : score >= 11 ? 'bg-neo-pink text-neo-black'
+    : score >= 6 ? 'bg-neo-cyan text-neo-black'
+    : 'bg-neo-lime text-neo-black';
+
 /**
  * FloatingScoreAnimation - Animated score flying from word area to score display
- * Used to show points being earned with satisfying visual feedback
+ * Each pop has its own id so same-score words and rapid words never merge or queue.
  */
 const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
   score,
+  popKey,
   startPosition,
   endPosition,
   onAnimationComplete,
@@ -38,9 +57,18 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
 }) => {
   const prefersReducedMotion = useReducedMotion();
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
-  const [showAnimation, setShowAnimation] = useState(false);
-  const [displayScore, setDisplayScore] = useState<number | null>(null);
-  const [animationKey, setAnimationKey] = useState(0);
+  const [pops, setPops] = useState<Pop[]>([]);
+  const nextIdRef = useRef(0);
+  const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const onCompleteRef = useRef(onAnimationComplete);
+  useEffect(() => {
+    onCompleteRef.current = onAnimationComplete;
+  });
+
+  useEffect(() => {
+    const timers = timersRef.current;
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   // Pre-compute target position to avoid calc() in animation (causes jank)
   const targetOffset = useMemo(() => {
@@ -61,192 +89,92 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
   // Skip complex animation on low-end devices
   const skipComplexAnimation = isLowEnd || !enableComplexAnimations;
 
-  // Trigger animation when score changes to a positive value
+  // A new pop on every score or popKey change (popKey separates equal scores)
   useEffect(() => {
-    if (score !== null && score > 0) {
-      setDisplayScore(score);
-      setAnimationKey((prev) => prev + 1);
-      setShowAnimation(true);
+    if (score === null || score <= 0) return;
+    const id = nextIdRef.current++;
+    setPops((prev) => [...prev, { id, score, isFireRound, tilt: jitter(0, 6), drift: jitter(0, 18), peak: jitter(1.3, 0.1) }]);
+    const timer = setTimeout(() => {
+      timersRef.current.delete(timer);
+      setPops((prev) => prev.filter((p) => p.id !== id));
+      onCompleteRef.current?.();
+    }, POP_LIFE_MS);
+    timersRef.current.add(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- isFireRound is read at trigger time only
+  }, [score, popKey]);
 
-      // Auto-dismiss after animation completes
-      const timer = setTimeout(() => {
-        setShowAnimation(false);
-        onAnimationComplete?.();
-      }, 1200);
+  if (pops.length === 0) return null;
 
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [score, onAnimationComplete]);
+  const left = startPosition?.x ?? '50%';
 
-  if (!showAnimation || displayScore === null || displayScore <= 0) {
-    return null;
-  }
-
-  // For reduced motion or low-end devices, show a simple fade animation
+  // Reduced motion: fade only. Low-end: a short rise without the flight.
   if (prefersReducedMotion || skipComplexAnimation) {
     return (
-      <AdaptiveMotion.div
-        key={animationKey}
-        className={`fixed z-[100] pointer-events-none ${className || ''}`}
-        style={{
-          left: startPosition?.x ?? '50%',
-          top: startPosition?.y ?? '40%',
-          transform: 'translate(-50%, -50%)',
-        }}
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1, y: -20 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-bold shadow-lg ${
-            isFireRound
-              ? 'bg-linear-to-r from-orange-500 to-red-500 text-white'
-              : 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black'
-          }`}
-        >
-          <span>+{displayScore}</span>
-          {isFireRound && <span>🔥</span>}
-        </div>
-      </AdaptiveMotion.div>
+      <>
+        {pops.map((pop) => (
+          <AdaptiveMotion.div
+            key={pop.id}
+            className={`fixed z-[100] pointer-events-none ${className || ''}`}
+            style={{
+              left,
+              top: startPosition?.y ?? '40%',
+              transform: 'translate(-50%, -50%)',
+            }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div
+              data-tier
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-bold shadow-hard border-3 border-neo-black ${pillColor(pop.score, pop.isFireRound)}`}
+            >
+              <span>+{pop.score}</span>
+              {pop.isFireRound && <span>🔥</span>}
+            </div>
+          </AdaptiveMotion.div>
+        ))}
+      </>
     );
   }
 
   return (
-    <AdaptiveAnimatePresence mode="wait">
-      <div
-        key={animationKey}
-        className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden ${className || ''}`}
-      >
-        {/* Main floating score */}
+    <div className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden ${className || ''}`}>
+      {pops.map((pop) => (
         <AdaptiveMotion.div
+          key={pop.id}
           className="absolute flex items-center gap-1.5"
           style={{
-            left: startPosition?.x ?? '50%',
+            left,
             top: startPosition?.y ?? '35%',
             transform: 'translate(-50%, -50%)',
           }}
-          initial={{
-            scale: 0,
-            opacity: 0,
-            x: 0,
-            y: 0,
-          }}
+          initial={{ scale: 0, opacity: 0, x: 0, y: 0, rotate: 0 }}
           animate={{
-            scale: [0, 1.4, 1, 0.8],
+            scale: [0, pop.peak, 1, 0.8],
             opacity: [0, 1, 1, 0],
-            x: [0, 0, targetOffset.x * 0.3, targetOffset.x],
+            rotate: [0, pop.tilt, pop.tilt, pop.tilt / 2],
+            x: [0, pop.drift, targetOffset.x * 0.3 + pop.drift, targetOffset.x],
             y: [0, -15, targetOffset.y * 0.5, targetOffset.y],
           }}
           transition={{
-            duration: 1.0,
+            duration: POP_LIFE_MS / 1000,
             times: [0, 0.2, 0.6, 1],
-            ease: [0.25, 0.1, 0.25, 1],
+            ease: [0.22, 1, 0.36, 1],
           }}
         >
-          <AdaptiveMotion.div
-            className={`px-4 py-2 rounded-full font-black text-xl shadow-xl border-3 border-neo-black ${
-              isFireRound
-                ? 'bg-linear-to-r from-orange-400 via-red-400 to-orange-400 text-white'
-                : 'bg-linear-to-r from-neo-lime via-neo-cyan to-neo-lime text-neo-black'
-            }`}
-            style={{
-              filter: isFireRound
-                ? 'drop-shadow(0 0 12px rgba(251, 146, 60, 0.6))'
-                : 'drop-shadow(0 0 12px rgba(191, 255, 0, 0.6))',
-            }}
-            animate={{
-              boxShadow: isFireRound
-                ? [
-                    '0 0 0 0 rgba(251, 146, 60, 0.4)',
-                    '0 0 0 12px rgba(251, 146, 60, 0)',
-                  ]
-                : [
-                    '0 0 0 0 rgba(191, 255, 0, 0.4)',
-                    '0 0 0 12px rgba(191, 255, 0, 0)',
-                  ],
-            }}
-            transition={{
-              duration: 0.5,
-            }}
+          <div
+            data-tier
+            className={`px-4 py-2 rounded-full font-black text-xl shadow-hard border-3 border-neo-black ${pillColor(pop.score, pop.isFireRound)}`}
+            style={{ textShadow: POP_SHADOW }}
           >
             <span className="flex items-center gap-2">
-              <AdaptiveMotion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.3, 1] }}
-                transition={{ duration: 0.3 }}
-              >
-                +{displayScore}
-              </AdaptiveMotion.span>
-              {isFireRound && (
-                <AdaptiveMotion.span
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ type: 'tween', duration: 0.3, repeat: 2 }}
-                >
-                  🔥
-                </AdaptiveMotion.span>
-              )}
+              <span>+{pop.score}</span>
+              {pop.isFireRound && <span>🔥</span>}
             </span>
-          </AdaptiveMotion.div>
+          </div>
         </AdaptiveMotion.div>
-
-        {/* Sparkle burst at start position — static array to avoid allocation per render */}
-        {SPARKLE_INDICES.map((i) => (
-          <AdaptiveMotion.div
-            key={`sparkle-${i}`}
-            className={`absolute w-2 h-2 rounded-full ${
-              isFireRound ? 'bg-orange-400' : 'bg-neo-lime'
-            }`}
-            style={{
-              left: startPosition?.x ?? '50%',
-              top: startPosition?.y ?? '35%',
-              filter: 'blur(1px)',
-            }}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{
-              x: Math.cos((i * 60) * (Math.PI / 180)) * 50,
-              y: Math.sin((i * 60) * (Math.PI / 180)) * 50,
-              scale: [0, 1.5, 0],
-              opacity: [0, 1, 0],
-            }}
-            transition={{
-              duration: 0.5,
-              delay: 0.1 + i * 0.03,
-              ease: 'easeOut',
-            }}
-          />
-        ))}
-
-        {/* Plus particles trailing behind — static array to avoid allocation per render */}
-        {TRAIL_INDICES.map((i) => (
-          <AdaptiveMotion.div
-            key={`trail-${i}`}
-            className={`absolute text-lg font-bold ${
-              isFireRound ? 'text-orange-400' : 'text-neo-lime'
-            }`}
-            style={{
-              left: startPosition?.x ?? '50%',
-              top: startPosition?.y ?? '35%',
-            }}
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{
-              x: [0, targetOffset.x * (0.2 + i * 0.2)],
-              y: [0, targetOffset.y * (0.2 + i * 0.2)],
-              scale: [0, 1, 0],
-              opacity: [0, 0.7, 0],
-            }}
-            transition={{
-              duration: 0.6,
-              delay: 0.2 + i * 0.1,
-              ease: 'easeOut',
-            }}
-          >
-            +
-          </AdaptiveMotion.div>
-        ))}
-      </div>
-    </AdaptiveAnimatePresence>
+      ))}
+    </div>
   );
 });
 

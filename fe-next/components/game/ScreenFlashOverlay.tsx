@@ -4,7 +4,7 @@ import { m, AnimatePresence } from 'framer-motion';
 
 interface ScreenFlashOverlayProps {
   trigger: number;
-  /** Flash color — defaults to white. Use Tailwind bg-* class. */
+  /** Flash color — defaults to a neo token. Use Tailwind bg-* class. */
   colorClass?: string;
 }
 
@@ -13,7 +13,7 @@ interface ScreenFlashOverlayProps {
  * (via `key={trigger}`) and re-runs the initial→animate flash. Stateless —
  * purely derived from props so React Compiler / set-state-in-effect is clean.
  */
-export function ScreenFlashOverlay({ trigger, colorClass = 'bg-white' }: ScreenFlashOverlayProps) {
+export function ScreenFlashOverlay({ trigger, colorClass = 'bg-neo-cyan' }: ScreenFlashOverlayProps) {
   return (
     <AnimatePresence>
       {trigger > 0 && (

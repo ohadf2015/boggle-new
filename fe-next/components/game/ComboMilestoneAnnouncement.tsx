@@ -1,19 +1,26 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { MILESTONE_KEYS } from './comboMilestones';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { jitter, pickOther, sign } from '@/lib/animation/variety';
 
-const MILESTONE_KEYS: Record<number, string> = {
-  3: 'combo.milestones.nice',
-  5: 'combo.milestones.fire',
-  7: 'combo.milestones.mythic',
-  10: 'combo.milestones.godlike',
-  15: 'combo.milestones.legendary',
-  20: 'combo.milestones.mythicStreak',
-  25: 'combo.milestones.transcendent',
+const ENTRANCES = {
+  drop: (t: number) => ({ opacity: 0, y: -28, scale: 0.9, rotate: -t }),
+  slam: (t: number) => ({ opacity: 0, scale: 1.8, rotate: t * 2 }),
+  tilt: (t: number) => ({ opacity: 0, scale: 0.5, rotate: -t * 4 }),
 };
+type Entrance = keyof typeof ENTRANCES;
+const ENTRANCE_NAMES = Object.keys(ENTRANCES) as Entrance[];
+
+interface Shown {
+  text: string;
+  entrance: Entrance;
+  tilt: number;
+  stiffness: number;
+}
 
 interface ComboMilestoneAnnouncementProps {
   comboLevel: number;
@@ -25,45 +32,48 @@ interface ComboMilestoneAnnouncementProps {
  */
 export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnouncementProps) {
   const { t } = useLanguage();
-  const [milestone, setMilestone] = useState<string | null>(null);
+  const reducedMotion = useReducedMotion();
+  const [milestone, setMilestone] = useState<Shown | null>(null);
+  const lastEntranceRef = useRef<Entrance | undefined>(undefined);
   const prevComboRef = useRef(comboLevel);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const key = MILESTONE_KEYS[comboLevel];
     if (comboLevel > prevComboRef.current && key) {
-      setMilestone(t(key));
-      const timer = setTimeout(() => setMilestone(null), 1200);
-      prevComboRef.current = comboLevel;
-      return () => clearTimeout(timer);
+      const entrance = pickOther(ENTRANCE_NAMES, lastEntranceRef.current);
+      lastEntranceRef.current = entrance;
+      setMilestone({ text: t(key), entrance, tilt: sign() * jitter(3.5, 1.5), stiffness: jitter(420, 60) });
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => setMilestone(null), 1200);
     }
     prevComboRef.current = comboLevel;
-    return undefined;
   }, [comboLevel, t]);
+
+  useEffect(() => () => clearTimeout(hideTimerRef.current), []);
 
   return (
     <AnimatePresence>
       {milestone && (
         <m.div
-          initial={{ opacity: 0, scale: 0.5, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 1.5, y: -10 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          data-entrance={reducedMotion ? 'fade' : milestone.entrance}
+          initial={reducedMotion ? { opacity: 0 } : ENTRANCES[milestone.entrance](milestone.tilt)}
+          animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1, rotate: milestone.tilt }}
+          exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 1.3, y: -10 }}
+          transition={{ type: 'spring', stiffness: milestone.stiffness, damping: 24, mass: 0.8 }}
           className="absolute top-40 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           role="status"
-          aria-live="assertive"
-          aria-label={`Combo ${comboLevel}x - ${milestone}`}
+          aria-live="polite"
         >
           <div className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',
-            comboLevel >= 25 ? 'bg-linear-to-r from-neo-lime-light via-neo-cream to-neo-lime-light text-neo-black animate-pulse' :
-            comboLevel >= 20 ? 'bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple text-neo-white' :
-            comboLevel >= 15 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 10 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 7 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 5 ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black' :
+            comboLevel >= 25 ? 'bg-neo-lime text-neo-black animate-pulse' :
+            comboLevel >= 20 ? 'bg-neo-purple text-neo-white' :
+            comboLevel >= 7 ? 'bg-neo-pink text-neo-black' :
+            comboLevel >= 5 ? 'bg-neo-lime text-neo-black' :
             'bg-neo-cyan text-neo-black'
           )}>
-            {milestone}
+            {milestone.text}
           </div>
         </m.div>
       )}
