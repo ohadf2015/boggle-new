@@ -48,8 +48,15 @@ import { PostHogProvider, _resetPostHogInit } from '../PostHogProvider';
 
 const ph = posthog as unknown as Record<string, ReturnType<typeof vi.fn>>;
 
+// Init is idle-deferred on every route; fire the idle callback synchronously
+// so the consent/init assertions below stay in the same tick.
+const realRIC = window.requestIdleCallback;
+const realCancelRIC = window.cancelIdleCallback;
+
 describe('PostHogProvider', () => {
   beforeEach(() => {
+    window.requestIdleCallback = ((cb: IdleRequestCallback) => { cb({ didTimeout: false, timeRemaining: () => 50 }); return 1; }) as typeof window.requestIdleCallback;
+    window.cancelIdleCallback = (() => {}) as typeof window.cancelIdleCallback;
     vi.clearAllMocks();
     mockHasConsentValue = false;
     mockOnConsentChangeCallbacks.length = 0;
@@ -62,6 +69,19 @@ describe('PostHogProvider', () => {
   afterEach(() => {
     delete process.env.NEXT_PUBLIC_POSTHOG_KEY;
     delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
+    window.requestIdleCallback = realRIC;
+    window.cancelIdleCallback = realCancelRIC;
+  });
+
+  it('defers init to idle time so posthog-js eval leaves the first-interaction window', () => {
+    const idleCbs: Array<() => void> = [];
+    window.requestIdleCallback = ((cb: IdleRequestCallback) => { idleCbs.push(() => cb({ didTimeout: false, timeRemaining: () => 50 })); return 1; }) as typeof window.requestIdleCallback;
+
+    render(<PostHogProvider><div>child</div></PostHogProvider>);
+    expect(ph.init).not.toHaveBeenCalled();
+
+    act(() => idleCbs.forEach((cb) => cb()));
+    expect(ph.init).toHaveBeenCalledWith('test-key', expect.objectContaining({ capture_pageview: false }));
   });
 
   it('initializes PostHog with consent-gated capturing (opt-out by default)', () => {
