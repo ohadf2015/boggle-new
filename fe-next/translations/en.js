@@ -5216,8 +5216,8 @@ const en = {
       "quip1": "I saved you the comfy seat.",
       "quip2": "Send the code to a friend, I promise I'll be nice.",
       "quip3": "Stretching my letters while we wait.",
-      "quip4": "The bots are getting cocky. Just saying.",
-      "quip5": "Snacks? Check. Friends? Any second now.",
+      "quip4": "The bots are getting a little too confident, if you ask me.",
+      "quip5": "I've got the snacks ready, we just need your friends now.",
       "quip6": "Practicing my victory dance over here."
     },
     "emote": {

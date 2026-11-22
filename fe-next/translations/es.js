@@ -5675,8 +5675,8 @@ const es = {
       "quip1": "Te guardé el asiento más cómodo.",
       "quip2": "Mándale el código a un amigo, prometo portarme bien.",
       "quip3": "Estirando las letras mientras esperamos.",
-      "quip4": "Los bots se están poniendo chulitos. Solo digo.",
-      "quip5": "¿Snacks? Listos. ¿Amigos? Ya casi.",
+      "quip4": "Si me preguntas, los bots se están creyendo demasiado.",
+      "quip5": "Ya tengo los snacks listos, solo faltan tus amigos.",
       "quip6": "Aquí ensayando mi baile de la victoria."
     },
     "emote": {

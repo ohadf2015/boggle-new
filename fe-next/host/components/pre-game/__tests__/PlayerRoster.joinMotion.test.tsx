@@ -89,4 +89,10 @@ describe('PlayerRoster — join motion', () => {
     render(roster([host], 'guest'));
     expect(screen.queryByTestId('waiting-game-chip')).toBeNull();
   });
+
+  it('Given a classroom room, Then the teacher roster offers no waiting game', () => {
+    reduceMotion(false);
+    render(<PlayerRoster players={[host]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} waitingGame={false} />);
+    expect(screen.queryByTestId('waiting-game-chip')).toBeNull();
+  });
 });

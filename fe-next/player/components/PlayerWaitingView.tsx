@@ -238,10 +238,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   );
 
   // DJ Lexi holds the floor while the host sets up: the card fills the body's
-  // free height (no dead band above READY) but never shrinks below its content;
-  // a short phone scrolls the stack instead of clipping the card.
+  // free height (no dead band above READY). On a phone it never shrinks below
+  // its content (the stack scrolls); on desktop it scrolls inside its column.
   const waitingCard = (howTo: { pill?: React.ReactNode; accordion?: React.ReactNode }) => (
-    <div data-testid="waiting-status" className={cn(CARD, 'flex-[1_0_auto] flex flex-col items-center justify-center gap-3 text-center')}>
+    <div data-testid="waiting-status" className={cn(CARD, 'flex flex-col items-center justify-center-safe gap-3 text-center', wide ? 'flex-1 min-h-0 overflow-y-auto overscroll-contain' : 'flex-[1_0_auto]')}>
       <div className="w-full max-w-md flex items-center justify-center gap-3">
         {!gameOpen && (
           <DJMascot size="xs" className="!w-[min(calc(120px*var(--mp-u,1)),12vh)] !h-[min(calc(120px*var(--mp-u,1)),12vh)] min-h-14 min-w-14 shrink-0 -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />

@@ -215,6 +215,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
         canEditSelfName={!isAuthenticated}
         selfActions={emote}
         headerExtra={headerExtra}
+        waitingGame={!isClassroomRoom}
       />
     </div>
   );

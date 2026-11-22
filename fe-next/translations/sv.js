@@ -5977,8 +5977,8 @@ const sv = {
       "quip1": "Jag har sparat den skönaste platsen åt dig.",
       "quip2": "Skicka koden till en kompis, jag lovar att vara snäll.",
       "quip3": "Jag stretchar bokstäverna medan vi väntar.",
-      "quip4": "Bottarna börjar bli kaxiga. Bara så du vet.",
-      "quip5": "Snacks? Klart. Kompisar? Vilken sekund som helst.",
+      "quip4": "Om du frågar mig börjar bottarna bli lite väl kaxiga.",
+      "quip5": "Snacksen är fixade, nu saknas bara dina kompisar.",
       "quip6": "Jag övar på min segerdans här borta."
     },
     "emote": {

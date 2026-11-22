@@ -48,6 +48,8 @@ interface PlayerRosterProps {
    * `tv`: read-only projector seats at couch-distance size.
    */
   variant?: 'host' | 'guest' | 'tv';
+  /** Host "Play while you wait" chip under the seats (off for classroom rooms). */
+  waitingGame?: boolean;
   className?: string;
 }
 
@@ -85,6 +87,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   selfActions,
   readyUsernames = [],
   variant = 'host',
+  waitingGame = true,
   className,
 }: PlayerRosterProps): React.ReactElement {
   const { socket } = useSocket();
@@ -428,7 +431,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           </div>
         )}
       </div>
-      {isHostView && <WaitingGameDock t={t} onOpenChange={setGameOpen} className="mt-1" />}
+      {isHostView && waitingGame && <WaitingGameDock t={t} onOpenChange={setGameOpen} className="mt-1" />}
       {hiddenBelow > 0 && (
         <button
           type="button"
