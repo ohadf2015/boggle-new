@@ -4043,6 +4043,7 @@ const es = {
     "afk": "Lejos del teclado"
   },
   "nav": {
+    "admin": "Admin",
     "bottomNavigation": "Navegación inferior",
     "gameNavigation": "Navegación del juego",
     "home": "Inicio",

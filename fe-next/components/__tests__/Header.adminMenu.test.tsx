@@ -152,6 +152,8 @@ describe('Header Admin Menu', () => {
       const adminLink = adminLinks.find(link => link.getAttribute('href')?.includes('/admin'));
       expect(adminLink).toBeInTheDocument();
       expect(adminLink).toHaveAttribute('href', '/en/admin');
+      // Phones reach admin from the bottom tab; the drawer row is desktop-only.
+      expect(screen.getByTestId('drawer-admin')).toHaveClass('hidden', 'sm:flex');
     });
 
     it('hides admin link for non-admin users', async () => {

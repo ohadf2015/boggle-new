@@ -745,6 +745,29 @@ describe('GlobalBottomNav', () => {
         });
     });
 
+    describe('Admin tab', () => {
+        it('Given an admin, Then the bar has an Admin tab that opens the admin dashboard', () => {
+            (useAuth as Mock).mockReturnValue({ isAuthenticated: true, isAdmin: true });
+            render(<GlobalBottomNav />);
+            fireEvent.click(screen.getByRole('button', { name: 'nav.admin' }));
+            expect(mockPush).toHaveBeenCalledWith('/en/admin');
+        });
+
+        it('Given a player, Then the bar has no Admin tab', () => {
+            (useAuth as Mock).mockReturnValue({ isAuthenticated: true, isAdmin: false });
+            render(<GlobalBottomNav />);
+            expect(screen.queryByRole('button', { name: 'nav.admin' })).toBeNull();
+        });
+
+        it('Given an admin on a page with a contextual tab, Then Home stays rightmost', () => {
+            (useAuth as Mock).mockReturnValue({ isAuthenticated: true, isAdmin: true });
+            (usePathname as Mock).mockReturnValue('/en/multiplayer');
+            render(<GlobalBottomNav />);
+            const names = screen.getAllByRole('button').map((b) => b.getAttribute('aria-label'));
+            expect(names).toEqual(['nav.admin', 'Quests', 'Friends', 'Play', 'Home']);
+        });
+    });
+
     describe('Neo-Brutalist Styling', () => {
         it('should apply hard shadow styling', () => {
             const { container } = render(<GlobalBottomNav />);

@@ -161,3 +161,32 @@ describe('HeaderMobileMenu — classroom entry in the drawer', () => {
     expect(link).toHaveAttribute('href', href);
   });
 });
+
+describe('HeaderMobileMenu — organized drawer', () => {
+  it('Given a player, When the drawer opens, Then the main destinations sit together as tiles at the top', async () => {
+    auth({ user_role: 'student' });
+    renderMenu();
+    fireEvent.click(await screen.findByLabelText(t('common.openMenu')));
+    const tiles = await screen.findByTestId('drawer-quick-nav');
+    const hrefs = Array.from(tiles.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['/en/quests', '/en/friends', '/en/leaderboard', '/en/community']);
+  });
+
+  it('Given an admin, Then the drawer admin entry shows on desktop only (phones use the bottom tab)', async () => {
+    auth({ user_role: 'student', is_admin: true });
+    renderMenu();
+    fireEvent.click(await screen.findByLabelText(t('common.openMenu')));
+    const admin = await screen.findByTestId('drawer-admin');
+    expect(admin.className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(admin.className).toContain('sm:flex');
+    expect(admin.querySelector('a')).toHaveAttribute('href', '/en/admin');
+  });
+
+  it('Given a player, Then the drawer has no admin entry', async () => {
+    auth({ user_role: 'student' });
+    renderMenu();
+    fireEvent.click(await screen.findByLabelText(t('common.openMenu')));
+    await screen.findByTestId('drawer-quick-nav');
+    expect(screen.queryByTestId('drawer-admin')).toBeNull();
+  });
+});

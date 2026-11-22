@@ -4056,6 +4056,7 @@ const he = {
     "afk": "לא ליד המכשיר"
   },
   "nav": {
+    "admin": "ניהול",
     "bottomNavigation": "ניווט תחתון",
     "gameNavigation": "ניווט משחק",
     "home": "בית",

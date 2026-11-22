@@ -8290,6 +8290,7 @@ const ru = {
     }
   },
   "nav": {
+    "admin": "Админ",
     "bottomNavigation": "Нижняя навигация",
     "gameNavigation": "Навигация игры",
     "home": "Главная",

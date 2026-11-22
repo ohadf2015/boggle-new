@@ -3660,6 +3660,7 @@ const en = {
     "afk": "Away from keyboard"
   },
   "nav": {
+    "admin": "Admin",
     "bottomNavigation": "Bottom navigation",
     "gameNavigation": "Game navigation",
     "home": "Home",

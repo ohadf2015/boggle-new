@@ -7,7 +7,7 @@ import {
     Home, Swords, ScrollText, Users,
     Brain, CalendarDays, Zap,
     Trophy, User as UserIcon, Settings as SettingsIcon, Users2, Gift, Target,
-    BookOpen, Map as MapIcon,
+    BookOpen, Map as MapIcon, ShieldCheck,
 } from 'lucide-react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '../lib/utils';
@@ -32,7 +32,7 @@ const QUEST_TOTAL = 3;
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 
-type TabId = 'home' | 'quests' | 'friends' | 'dynamic';
+type TabId = 'home' | 'quests' | 'friends' | 'dynamic' | 'admin';
 
 interface TabConfig {
     id: TabId;
@@ -55,12 +55,16 @@ const TABS_BASE: TabConfig[] = [
     { id: 'home',    labelKey: 'nav.home',    icon: Home,       color: 'text-neo-cyan', glowColor: 'bg-neo-cyan/15' },
 ];
 
+// Admins only, leftmost so it stays clear of Home. Never active: the bar hides on /admin.
+const ADMIN_TAB: TabConfig = { id: 'admin', labelKey: 'nav.admin', icon: ShieldCheck, color: 'text-neo-purple', glowColor: 'bg-neo-purple/15' };
+
 // Color map for the sliding indicator pill
 const INDICATOR_COLORS: Record<TabId, string> = {
     home: 'bg-neo-cyan',
     quests: 'bg-neo-lime',
     friends: 'bg-neo-pink',
     dynamic: 'bg-neo-cyan',
+    admin: 'bg-neo-purple',
 };
 
 // Optional `targetPath` lets a contextual tab navigate elsewhere instead of
@@ -170,7 +174,7 @@ function resolveDynamic(cleanPath: string): DynamicSpec | null {
 export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { t, language } = useLanguage();
     const { isInGame } = useNavigation();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAdmin } = useAuth();
     const { isOnCrazyGamesPlatform } = useCrazyGames();
     const router = useRouter();
     const pathname = usePathname();
@@ -271,15 +275,16 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
 
     // Compose visible tabs: insert dynamic slot just before Home when applicable.
     const tabs = useMemo<TabConfig[]>(() => {
-        if (!dynamicSpec) return TABS_BASE;
-        const homeIdx = TABS_BASE.findIndex(t => t.id === 'home');
+        const base = isAdmin ? [ADMIN_TAB, ...TABS_BASE] : TABS_BASE;
+        if (!dynamicSpec) return base;
+        const homeIdx = base.findIndex(t => t.id === 'home');
         const dynamicTab: TabConfig = { id: 'dynamic', ...dynamicSpec };
         return [
-            ...TABS_BASE.slice(0, homeIdx),
+            ...base.slice(0, homeIdx),
             dynamicTab,
-            ...TABS_BASE.slice(homeIdx),
+            ...base.slice(homeIdx),
         ];
-    }, [dynamicSpec]);
+    }, [dynamicSpec, isAdmin]);
 
     const navigate = useCallback((tab: TabId) => {
         if (tab === 'dynamic') {
@@ -297,6 +302,7 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             return;
         }
         const routes: Record<Exclude<TabId, 'dynamic'>, string> = {
+            admin: `/${language}/admin`,
             home: `/${language}`,
             quests: `/${language}/quests`,
             friends: `/${language}/friends`,

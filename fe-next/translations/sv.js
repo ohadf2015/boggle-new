@@ -4404,6 +4404,7 @@ const sv = {
     "afk": "Borta från tangentbordet"
   },
   "nav": {
+    "admin": "Admin",
     "bottomNavigation": "Nedre navigering",
     "gameNavigation": "Spelnavigering",
     "home": "Hem",

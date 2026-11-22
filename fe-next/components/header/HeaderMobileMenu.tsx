@@ -1,8 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, Sparkles, User, Bell, BellOff, ChevronDown, Check, Pencil, Bug, GraduationCap } from 'lucide-react';
-import Link from 'next/link';
+import { LazyMotion, domAnimation, m } from 'framer-motion';
+import { Menu, X, Gift, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -16,15 +15,9 @@ import { scoreTier } from '@/lib/seasons/scoreTier';
 import { DrawerProfileHero } from './DrawerProfileHero';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
-import { NotificationItem } from '../notifications/NotificationItem';
 import type { NotificationData } from '../notifications/types';
-import { InstagramIcon } from '@/components/icons/SocialIcons';
-import { ManageCookiesButton } from '@/components/CookieConsent';
-import GetAppMenuRow from '@/components/android-install/GetAppMenuRow';
 import { teacherMenuEntry } from '@/lib/education/teacherRole';
-import AvatarLite from '@/components/AvatarLite';
 import { getStoredCustomAvatar } from '../../utils/profileStorage';
-import { saveGuestNameEverywhere, ensureGuestDisplayName, markGuestNameChosen } from '../../utils/guestManager';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
 import { useRealtimeNotifications } from '@/hooks/useRealtimeNotifications';
@@ -33,7 +26,9 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useFriends } from '@/hooks/useFriends';
 import { useFriendMessages } from '@/hooks/useFriendMessages';
 import { queryKeys } from '@/lib/queryKeys';
-import { notificationListScrollClass } from '@/lib/header/notificationScroll';
+import { DrawerNotifications } from './drawer/DrawerNotifications';
+import { DrawerNavSections } from './drawer/DrawerNavSections';
+import { DrawerGuestHero } from './drawer/DrawerGuestHero';
 
 interface HeaderMobileMenuProps {
     unclaimedCount: number;
@@ -62,19 +57,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         previousNotifications,
         isLoadingPrevious,
     } = useRealtimeNotifications();
-    const [showAllNotifications, setShowAllNotifications] = useState(false);
-    const [showPreviousNotifications, setShowPreviousNotifications] = useState(false);
-    const [hasFetchedPrevious, setHasFetchedPrevious] = useState(false);
-
-    const togglePreviousNotifications = useCallback(async () => {
-        const next = !showPreviousNotifications;
-        setShowPreviousNotifications(next);
-        if (next && !hasFetchedPrevious) {
-            setHasFetchedPrevious(true);
-            await fetchPreviousNotifications();
-        }
-    }, [showPreviousNotifications, hasFetchedPrevious, fetchPreviousNotifications]);
-
     // Filter out gift notifications when the gift button is already visible (prevents duplication)
     const filteredNotifications = (unclaimedCount > 0
         ? ((notifications ?? []) as NotificationData[]).filter(n => n.notification_type !== 'gift')
@@ -92,19 +74,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     });
     const [giftBannerDismissed, setGiftBannerDismissed] = useState(false);
 
-    // Guest name editing
-    const [guestName, setGuestNameState] = useState<string>('');
-    const [isEditingGuestName, setIsEditingGuestName] = useState(false);
-    const [editGuestNameValue, setEditGuestNameValue] = useState('');
-    const guestNameInputRef = useRef<HTMLInputElement>(null);
-
-    // Refresh guest name when menu opens
-    useEffect(() => {
-        if (showMobileMenu && !isAuthenticated) {
-            setGuestNameState(ensureGuestDisplayName(language) || '');
-        }
-    }, [showMobileMenu, isAuthenticated, language]);
-
     // Keep the native AdMob banner BEHIND the open side menu. The banner is a
     // native platform view that composites above the WebView, so no z-index can
     // cover it — instead we flag <html> while the drawer is open. AnchoredNativeBanner
@@ -115,22 +84,6 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
         root.classList.toggle('mobile-drawer-open', showMobileMenu);
         return () => { root.classList.remove('mobile-drawer-open'); };
     }, [showMobileMenu]);
-
-    const handleStartEditGuestName = useCallback(() => {
-        setEditGuestNameValue(guestName);
-        setIsEditingGuestName(true);
-        setTimeout(() => guestNameInputRef.current?.focus(), 50);
-    }, [guestName]);
-
-    const handleSaveGuestName = useCallback(() => {
-        const trimmed = editGuestNameValue.trim().slice(0, 20);
-        if (trimmed) {
-            saveGuestNameEverywhere(trimmed);
-            markGuestNameChosen();
-            setGuestNameState(trimmed);
-        }
-        setIsEditingGuestName(false);
-    }, [editGuestNameValue]);
 
     // Aggregate badge: unclaimed gifts + unread notifications only.
     // Completed daily missions are progress, not claimable rewards — counting
@@ -242,6 +195,15 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const handleSignIn = useCallback(() => { closeMenu(); onSignIn(); }, [closeMenu, onSignIn]);
     const handleSignUp = useCallback(() => { closeMenu(); onSignUp(); }, [closeMenu, onSignUp]);
     const handleOpenGift = useCallback(() => { closeMenu(); onOpenGiftModal(); }, [closeMenu, onOpenGiftModal]);
+    const dismissGiftBanner = useCallback(() => {
+        setGiftBannerDismissed(true);
+        fetch('/api/player/gifts/dismiss-modal', { method: 'POST' })
+            .then(() => queryClient.invalidateQueries({ queryKey: queryKeys.gifts._def }))
+            .catch(() => {});
+        (notifications as NotificationData[])
+            .filter(n => n.notification_type === 'gift')
+            .forEach(n => dismissNotification(n.id));
+    }, [queryClient, notifications, dismissNotification]);
 
     // Swipe-to-close (RTL-aware) — passive touch tracking, NOT framer `drag`.
     // A framer drag gesture on the drawer fights vertical scrolling: any
@@ -367,97 +329,72 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             {/* Mobile Menu Slide-out Pane (also hidden on CrazyGames) */}
             {!isCrazyGames && mounted && createPortal(
                 <LazyMotion features={domAnimation}>
-                <>
                     {showMobileMenu && (
                         <>
-                            {/* Backdrop */}
                             <div
                                 className="fixed inset-0 bg-neo-black/60 backdrop-blur-[2px] z-70 animate-in fade-in-0 duration-200"
                                 onClick={closeMenu}
                             />
 
-                            {/* Slide-out pane with swipe-to-close */}
+                            {/* Non-scrolling shell; swipe-to-close is passive touch tracking (no framer drag,
+                                which fights vertical scroll). max-h-[100dvh] keeps it viewport-bound even if a
+                                lingering transform on <html> becomes the containing block. */}
                             <div
                                 ref={mobileMenuRef}
                                 onTouchStart={handleTouchStart}
                                 onTouchEnd={handleTouchEnd}
                                 data-testid="mobile-menu-drawer"
+                                role="dialog"
+                                aria-modal="true"
+                                aria-label={t('common.menu', 'Menu')}
                                 className={cn(
-                                    "fixed top-0 bottom-0 w-[320px] sm:w-[360px] max-w-[88vw] z-80",
-                                    // Viewport-relative height cap. The drawer is `fixed top-0
-                                    // bottom-0`, so it sizes to its containing block — normally the
-                                    // viewport. But the native WebView repaint hack briefly sets
-                                    // `transform: translateZ(0)` on <html>; if that transform lingers
-                                    // (rAF starved under native-ad compositing), <html> becomes the
-                                    // containing block and the drawer grows to the DOCUMENT height.
-                                    // Its overflow-y-auto body then fits all content without
-                                    // overflowing, so the menu can't scroll while still looking full.
-                                    // `max-h-[100dvh]` keeps it bounded to the visible viewport
-                                    // regardless of which ancestor is the containing block.
+                                    "fixed top-0 bottom-0 w-[320px] sm:w-[380px] max-w-[88vw] z-80",
                                     "max-h-[100dvh]",
-                                    "bg-neo-navy border-neo-cream/40",
-                                    // Non-scrolling shell. Vertical scrolling lives on the inner
-                                    // body below; swipe-to-close is handled by the passive touch
-                                    // handlers above (no framer `drag`, so nothing fights scroll).
+                                    "bg-neo-navy",
                                     "shadow-hard-xl overflow-hidden flex flex-col",
                                     'animate-in duration-300',
                                     isRtl
-                                        ? "left-0 border-r-4 border-neo-cream/40 rounded-r-neo-lg slide-in-from-left-full"
-                                        : "right-0 border-l-4 border-neo-cream/40 rounded-l-neo-lg slide-in-from-right-full"
+                                        ? "left-0 border-r-4 border-neo-black slide-in-from-left-full"
+                                        : "right-0 border-l-4 border-neo-black slide-in-from-right-full"
                                 )}
                             >
-                              {/* ── Scrollable body — owns vertical scroll, decoupled from the
-                                  swipe-to-close drag layer so native touch scroll works. ── */}
                               <div
                                 data-testid="mobile-menu-scroll"
                                 className={cn(
                                     "relative flex-1 min-h-0",
                                     "overflow-y-auto overflow-x-hidden overscroll-contain",
-                                    "pb-[max(env(safe-area-inset-bottom),1rem)]"
+                                    "pb-[max(env(safe-area-inset-bottom),1.25rem)]"
                                 )}
                                 style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
                               >
-                                {/* ── Close button (top corner) ── */}
+                                {/* ── Hero ── */}
                                 <div
-                                    className={cn(
-                                        "absolute z-10",
-                                        isRtl ? "right-3" : "left-3"
-                                    )}
-                                    style={{ top: 'max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.25rem))' }}
+                                    className="relative bg-neo-navy-light border-b-3 border-neo-black px-4 pb-5"
+                                    style={{ paddingTop: 'max(3.25rem, calc(env(safe-area-inset-top, 0px) + 2.5rem))' }}
                                 >
+                                    <div
+                                        className="absolute inset-x-0 top-0 h-1.5 flex"
+                                        aria-hidden="true"
+                                    >
+                                        <span className="flex-1 bg-neo-lime" />
+                                        <span className="flex-1 bg-neo-pink" />
+                                        <span className="flex-1 bg-neo-cyan" />
+                                        <span className="flex-1 bg-neo-purple" />
+                                    </div>
                                     <button
                                         onClick={closeMenu}
                                         className={cn(
-                                            "flex items-center justify-center",
-                                            "w-9 h-9",
-                                            "bg-neo-white/10 text-neo-white",
-                                            "border-2 border-neo-cream/40",
-                                            "rounded-full",
-                                            "hover:bg-neo-white/20 hover:text-neo-white",
-                                            "active:scale-90",
-                                            "transition duration-100"
+                                            "absolute flex items-center justify-center w-10 h-10",
+                                            "bg-neo-cream text-neo-black border-2 border-neo-black rounded-neo shadow-hard-sm",
+                                            "hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none",
+                                            "transition-[transform,box-shadow] duration-100",
+                                            isRtl ? "left-3" : "right-3"
                                         )}
+                                        style={{ top: 'max(0.75rem, calc(env(safe-area-inset-top, 0px) + 0.5rem))' }}
                                         aria-label={t('common.closeMenu')}
                                     >
-                                        <X size={16} />
+                                        <X size={18} strokeWidth={3} />
                                     </button>
-                                </div>
-
-                                {/* ── Profile Hero Section ── */}
-                                <div
-                                    className={cn(
-                                        "relative px-5 pb-5",
-                                        "bg-neo-navy-light",
-                                        "border-b-3 border-neo-cream/25"
-                                    )}
-                                    style={{ paddingTop: 'max(3rem, calc(env(safe-area-inset-top, 0px) + 2.25rem))' }}
-                                >
-                                    {/* Decorative dots */}
-                                    <div className="absolute top-2 right-4 flex gap-1 opacity-30">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-pink" />
-                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-cyan" />
-                                        <div className="w-1.5 h-1.5 rounded-full bg-neo-lime" />
-                                    </div>
 
                                     {isAuthenticated && profile ? (
                                         <DrawerProfileHero
@@ -476,45 +413,70 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                             isRtl={isRtl}
                                         />
                                     ) : (
-                                        <div className="flex flex-col gap-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="rounded-full border-3 border-neo-cream/40 shadow-hard-sm p-0.5 bg-neo-navy">
-                                                    <AvatarLite
-                                                        customAvatar={avatarConfig}
-                                                        userId="guest"
-                                                        size="lg"
-                                                    />
-                                                </div>
-                                                {isEditingGuestName ? (
-                                                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                                                        <input
-                                                            ref={guestNameInputRef}
-                                                            type="text"
-                                                            value={editGuestNameValue}
-                                                            onChange={(e) => setEditGuestNameValue(e.target.value)}
-                                                            maxLength={20}
-                                                            className="bg-neo-navy/80 text-neo-white border-2 border-neo-cyan rounded-neo px-2 py-1 text-base font-bold focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[160px]"
-                                                            onKeyDown={(e) => {
-                                                                if (e.nativeEvent.isComposing || e.keyCode === 229) return;
-                                                                if (e.key === 'Enter') handleSaveGuestName();
-                                                                if (e.key === 'Escape') setIsEditingGuestName(false);
-                                                            }}
-                                                            onBlur={handleSaveGuestName}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        type="button"
-                                                        onClick={handleStartEditGuestName}
-                                                        className="flex items-center gap-2 group min-w-0"
-                                                    >
-                                                        <span className="text-base font-black text-neo-white group-hover:text-neo-cyan transition-colors truncate">
-                                                            {guestName || t('common.guest')}
-                                                        </span>
-                                                        <Pencil className="w-3.5 h-3.5 text-neo-white group-hover:text-neo-cyan shrink-0 transition-colors" />
-                                                    </button>
+                                        <DrawerGuestHero
+                                            avatarConfig={avatarConfig}
+                                            closeMenu={closeMenu}
+                                            onSignIn={handleSignIn}
+                                            onSignUp={handleSignUp}
+                                        />
+                                    )}
+                                </div>
+
+                                <div className="flex flex-col gap-5 px-4 pt-4">
+                                    {isAuthenticated && unclaimedCount > 0 && !giftBannerDismissed && (
+                                        <div className="relative">
+                                            <button
+                                                onClick={handleOpenGift}
+                                                className={cn(
+                                                    "flex items-center gap-3 w-full px-3 py-3 text-sm font-black rounded-neo text-start",
+                                                    "bg-neo-yellow text-neo-black border-3 border-neo-black shadow-hard-sm",
+                                                    "hover:-translate-y-px hover:shadow-hard active:translate-y-px active:shadow-none",
+                                                    "transition-[transform,box-shadow] duration-100"
                                                 )}
-                                            </div>
+                                            >
+                                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border-2 border-neo-black bg-neo-cream">
+                                                    <Gift className="w-4 h-4" aria-hidden="true" />
+                                                </span>
+                                                <span className="flex-1">{t('gift.youHaveGifts')}</span>
+                                                <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
+                                            </button>
+                                            <button
+                                                onClick={dismissGiftBanner}
+                                                className="absolute -top-2 -inset-e-2 w-6 h-6 rounded-full bg-neo-black border-2 border-neo-cream flex items-center justify-center text-neo-white z-10"
+                                                aria-label={t('notifications.dismiss')}
+                                            >
+                                                <X size={12} />
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    <DrawerNavSections
+                                        closeMenu={closeMenu}
+                                        isAuthenticated={isAuthenticated}
+                                        isAdmin={isAdmin}
+                                        teacherEntry={teacherEntry}
+                                        friendsBadgeCount={friendsBadgeCount}
+                                        missions={missions}
+                                        completedCount={completedCount}
+                                        isGrandSlam={isGrandSlam}
+                                        notificationsSlot={isAuthenticated && (
+                                            <DrawerNotifications
+                                                notifications={filteredNotifications}
+                                                unreadCount={notificationCount}
+                                                previous={previousNotifications as NotificationData[]}
+                                                isLoadingPrevious={isLoadingPrevious}
+                                                fetchPrevious={fetchPreviousNotifications}
+                                                markAsRead={markAsRead}
+                                                markAllAsRead={markAllAsRead}
+                                                dismiss={dismissNotification}
+                                                closeMenu={closeMenu}
+                                            />
+                                        )}
+                                        onReportBug={() => { closeMenu(); setShowBugReport(true); }}
+                                    />
+
+                                    {isAuthenticated && (
+                                        <div className="border-t-2 border-neo-white/10 pt-4">
                                             <AuthButton
                                                 inline
                                                 onClose={closeMenu}
@@ -524,469 +486,10 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         </div>
                                     )}
                                 </div>
-
-                                {/* Daily Missions (expanded) */}
-                                {isAuthenticated && missions.length > 0 && (
-                                    <div className="mx-4 mt-2 space-y-2">
-                                        <div className="flex items-center justify-between px-1">
-                                            <div className="flex items-center gap-2">
-                                                <Trophy className="w-4 h-4 text-neo-lime shrink-0" />
-                                                <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
-                                                    {t('dailyMissions.title')}
-                                                </span>
-                                            </div>
-                                            <span className={cn(
-                                                "text-xs font-black",
-                                                isGrandSlam ? "text-neo-lime" : "text-neo-white"
-                                            )}>
-                                                {completedCount}/{missions.length}
-                                            </span>
-                                        </div>
-                                        {missions.map((m) => (
-                                            <Link
-                                                key={m.type}
-                                                href={`/${language}/quests`}
-                                                onClick={closeMenu}
-                                                className={cn(
-                                                    "flex items-center gap-2.5 px-3 py-2 rounded-neo",
-                                                    m.completed
-                                                        ? "bg-neo-lime/10 border border-neo-lime/30"
-                                                        : "bg-neo-white/5 border border-neo-white/10 hover:border-neo-lime/30",
-                                                    "transition-colors"
-                                                )}
-                                            >
-                                                <div className={cn(
-                                                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0",
-                                                    m.completed ? "border-neo-lime bg-neo-lime/20" : "border-neo-white/20"
-                                                )}>
-                                                    {m.completed && <Check size={10} className="text-neo-lime" />}
-                                                </div>
-                                                <span className={cn(
-                                                    "text-xs font-bold flex-1",
-                                                    m.completed ? "text-neo-lime/80 line-through" : "text-neo-white"
-                                                )}>
-                                                    {t(m.titleKey)}
-                                                </span>
-                                            </Link>
-                                        ))}
-                                        <Link
-                                            href={`/${language}/quests`}
-                                            onClick={closeMenu}
-                                            className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-neo-cyan hover:text-neo-lime transition-colors"
-                                        >
-                                            <Sparkles size={10} />
-                                            {t('quests.title')}
-                                        </Link>
-                                    </div>
-                                )}
-
-                                {/* ── Notifications Section (in-menu) ── */}
-                                {isAuthenticated && (
-                                    <div className="mx-4 mt-2">
-                                        <div className="flex items-center justify-between mb-1.5">
-                                            <div className="flex items-center gap-2">
-                                                <Bell className="w-3.5 h-3.5 text-neo-lime" />
-                                                <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
-                                                    {t('notifications.title')}
-                                                </span>
-                                                {notificationCount > 0 && (
-                                                    <span className="min-w-[16px] h-4 px-1 flex items-center justify-center bg-neo-lime rounded-full border border-black text-[9px] font-black text-black">
-                                                        {notificationCount}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {notificationCount > 0 && (
-                                                <button
-                                                    onClick={() => markAllAsRead()}
-                                                    className="flex items-center gap-1 text-[10px] text-neo-cyan hover:text-neo-lime transition-colors font-bold"
-                                                >
-                                                    <Check size={10} />
-                                                    {t('notifications.markAllRead')}
-                                                </button>
-                                            )}
-                                        </div>
-                                        {filteredNotifications.length > 0 ? (
-                                            <>
-                                                <div className={cn(
-                                                    "rounded-neo border-2 border-neo-white/10",
-                                                    "bg-neo-white/5",
-                                                    notificationListScrollClass(
-                                                        showAllNotifications ? filteredNotifications.length : Math.min(3, filteredNotifications.length),
-                                                        "max-h-72"
-                                                    )
-                                                )}>
-                                                    {(showAllNotifications
-                                                        ? filteredNotifications
-                                                        : filteredNotifications.slice(0, 3)
-                                                    ).map((n) => (
-                                                        <NotificationItem
-                                                            key={n.id}
-                                                            notification={n}
-                                                            onClick={() => {
-                                                                if (n.notification_type === 'gift') {
-                                                                    closeMenu();
-                                                                    window.dispatchEvent(new CustomEvent('openGiftModal', {
-                                                                        detail: { giftId: n.related_entity_id },
-                                                                    }));
-                                                                } else if (n.action_url) {
-                                                                    closeMenu();
-                                                                    const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
-                                                                    window.location.href = url;
-                                                                }
-                                                            }}
-                                                            onMarkAsRead={() => markAsRead(n.id)}
-                                                            onDismiss={() => dismissNotification(n.id)}
-                                                        />
-                                                    ))}
-                                                </div>
-                                                {filteredNotifications.length > 3 && (
-                                                    <button
-                                                        onClick={() => setShowAllNotifications(!showAllNotifications)}
-                                                        className="w-full mt-1 text-center text-[10px] text-neo-white/70 hover:text-neo-white transition-colors font-bold py-1"
-                                                    >
-                                                        {showAllNotifications
-                                                            ? t('common.showLess')
-                                                            : t('notifications.viewAll') + ` (${filteredNotifications.length})`
-                                                        }
-                                                    </button>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <div className="flex flex-col items-center gap-1.5 rounded-neo border-2 border-dashed border-neo-white/15 bg-neo-white/[0.03] py-5 px-3 text-center">
-                                                <BellOff className="w-5 h-5 text-neo-white/40" aria-hidden="true" />
-                                                <span className="text-[11px] font-bold text-neo-white/60">
-                                                    {t('notifications.empty')}
-                                                </span>
-                                            </div>
-                                        )}
-                                        <button
-                                            onClick={togglePreviousNotifications}
-                                            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-white/10 bg-neo-white/5 py-2 text-[10px] font-bold text-neo-white/70 hover:text-neo-white hover:border-neo-white/20 transition-colors"
-                                            aria-expanded={showPreviousNotifications}
-                                        >
-                                            {showPreviousNotifications
-                                                ? t('notifications.hidePrevious')
-                                                : t('notifications.showPrevious')}
-                                            <ChevronDown
-                                                className={cn(
-                                                    'w-3 h-3 transition-transform duration-200',
-                                                    showPreviousNotifications && 'rotate-180',
-                                                )}
-                                                aria-hidden="true"
-                                            />
-                                        </button>
-                                        {showPreviousNotifications && (
-                                            <div className={cn(
-                                                "mt-1 rounded-neo border-2 border-neo-white/10",
-                                                "bg-neo-white/5",
-                                                notificationListScrollClass(previousNotifications.length, "max-h-64")
-                                            )}>
-                                                {isLoadingPrevious ? (
-                                                    <div className="text-[11px] text-neo-white/50 text-center py-3 font-bold">
-                                                        …
-                                                    </div>
-                                                ) : previousNotifications.length === 0 ? (
-                                                    <div className="text-[11px] text-neo-white/60 text-center py-3 font-bold">
-                                                        {t('notifications.noPrevious')}
-                                                    </div>
-                                                ) : (
-                                                    previousNotifications.map((n) => (
-                                                        <NotificationItem
-                                                            key={`prev-${n.id}`}
-                                                            notification={n as NotificationData}
-                                                            onClick={() => {
-                                                                if (n.action_url) {
-                                                                    closeMenu();
-                                                                    const url = n.action_url.startsWith('/') ? `/${language}${n.action_url}` : n.action_url;
-                                                                    window.location.href = url;
-                                                                }
-                                                            }}
-                                                            onMarkAsRead={() => markAsRead(n.id)}
-                                                            onDismiss={() => dismissNotification(n.id)}
-                                                        />
-                                                    ))
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* ── Menu Items (Staggered) ── */}
-                                <div
-                                    className="flex flex-col gap-1.5 p-4"
-                                >
-                                    {/* Gift Notification - highlighted */}
-                                    {isAuthenticated && unclaimedCount > 0 && !giftBannerDismissed && (
-                                        <div>
-                                            <div className="relative">
-                                                <button
-                                                    onClick={handleOpenGift}
-                                                    className={cn(
-                                                        "relative flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
-                                                        "bg-amber-400 text-neo-black",
-                                                        "border-3 border-neo-black shadow-hard-sm",
-                                                        "hover:shadow-hard hover:-translate-y-px",
-                                                        "active:translate-y-px active:shadow-none",
-                                                        "transition duration-100"
-                                                    )}
-                                                >
-                                                    <MenuIcon className="bg-white/30 border-neo-black/30">
-                                                        <Gift className="w-4 h-4" aria-hidden="true" />
-                                                    </MenuIcon>
-                                                    <span>{t('gift.youHaveGifts') || `You have ${unclaimedCount} gift${unclaimedCount !== 1 ? 's' : ''}`}</span>
-                                                    <GiftNotificationBadge count={unclaimedCount} className="relative top-0 right-0" />
-                                                    <Sparkles className="absolute top-1 right-2 w-3 h-3 text-white animate-pulse" aria-hidden="true" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setGiftBannerDismissed(true);
-                                                        // Persist dismissal to DB so it doesn't reappear on refresh
-                                                        fetch('/api/player/gifts/dismiss-modal', { method: 'POST' })
-                                                            .then(() => {
-                                                                // Invalidate gift queries so unclaimedCount updates
-                                                                queryClient.invalidateQueries({ queryKey: queryKeys.gifts._def });
-                                                            })
-                                                            .catch(() => {});
-                                                        // Also dismiss any gift-type notifications from the notification list
-                                                        (notifications as NotificationData[])
-                                                            .filter(n => n.notification_type === 'gift')
-                                                            .forEach(n => dismissNotification(n.id));
-                                                    }}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-neo-black/80 border-2 border-neo-cream/40 flex items-center justify-center text-neo-white hover:text-neo-white hover:bg-neo-black transition-colors z-10"
-                                                    aria-label={t('notifications.dismiss')}
-                                                >
-                                                    <X size={12} />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* ─ Get the App (durable Android install re-entry; self-hides off Android) ─ */}
-                                    <div>
-                                        <GetAppMenuRow onNavigate={closeMenu} />
-                                    </div>
-
-                                    {/* ─ Settings Section ─ */}
-                                    <div>
-                                        <SectionLabel>{t('settings.title')}</SectionLabel>
-                                    </div>
-
-                                    <div>
-                                        <div className={cn(
-                                            "flex items-center gap-3 px-4 py-3 rounded-neo",
-                                            "bg-neo-white/5 border-2 border-neo-white/10"
-                                        )}>
-                                            <span className="text-sm font-bold text-neo-white">
-                                                {t('settings.language')}
-                                            </span>
-                                            <div className="ms-auto">
-                                                <QuickLanguageSwitcher showLabel />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <MenuLink href={`/${language}/settings#accessibility`} onClick={closeMenu} accentColor="cyan">
-                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
-                                                <Accessibility className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t('settings.accessibility')}</span>
-                                        </MenuLink>
-                                    </div>
-
-                                    <div>
-                                        <MenuLink href={`/${language}/settings`} onClick={closeMenu} accentColor="cyan">
-                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
-                                                <Settings className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t('settings.moreSettings')}</span>
-                                        </MenuLink>
-                                    </div>
-
-                                    {/* ─ Community ─ */}
-                                    <div>
-                                        <SectionLabel>{t('ugc.nav.community')}</SectionLabel>
-                                    </div>
-
-                                    <div>
-                                        <MenuLink href={`/${language}/community`} onClick={closeMenu} accentColor="pink">
-                                            <MenuIcon className="bg-neo-pink/20 border-neo-pink/40">
-                                                <Users className="w-4 h-4 text-neo-pink" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t('ugc.nav.community')}</span>
-                                        </MenuLink>
-                                    </div>
-
-                                    <div className="relative">
-                                        <MenuLink href={`/${language}/friends`} onClick={closeMenu} accentColor="cyan">
-                                            <MenuIcon className="bg-neo-cyan/20 border-neo-cyan/40">
-                                                <UserPlus className="w-4 h-4 text-neo-cyan" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t('nav.friends')}</span>
-                                        </MenuLink>
-                                        <GiftNotificationBadge count={friendsBadgeCount} />
-                                    </div>
-
-                                    {/* ─ Teachers ─
-                                        An approved teacher previously had NO way back to
-                                        /teacher except the original approval email. */}
-                                    <div>
-                                        <SectionLabel>{t('education.nav.section')}</SectionLabel>
-                                    </div>
-                                    <div>
-                                        <MenuLink
-                                            href={`/${language}${teacherEntry.href}`}
-                                            onClick={closeMenu}
-                                            accentColor="lime"
-                                        >
-                                            <MenuIcon className="bg-neo-lime/20 border-neo-lime/40">
-                                                <GraduationCap className="w-4 h-4 text-neo-lime" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t(teacherEntry.labelKey)}</span>
-                                        </MenuLink>
-                                    </div>
-
-                                    {/* ─ Admin ─ */}
-                                    {isAdmin && (
-                                        <>
-                                            <div>
-                                                <SectionLabel>{t('common.admin')}</SectionLabel>
-                                            </div>
-                                            <div>
-                                                <Link
-                                                    href={`/${language}/admin`}
-                                                    onClick={closeMenu}
-                                                    className={cn(
-                                                        "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
-                                                        "bg-neo-pink/10 text-neo-white",
-                                                        "border-2 border-neo-pink",
-                                                        "hover:bg-neo-pink/20",
-                                                        "active:scale-[0.98]",
-                                                        "transition duration-100"
-                                                    )}
-                                                >
-                                                    <MenuIcon className="bg-neo-pink/30 border-neo-pink">
-                                                        <Sparkles className="w-4 h-4 text-neo-pink" aria-hidden="true" />
-                                                    </MenuIcon>
-                                                    <span>{t('common.adminDashboard')}</span>
-                                                </Link>
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {/* ─ Info Links ─ */}
-                                    <div>
-                                        <SectionLabel>{t('common.info')}</SectionLabel>
-                                    </div>
-
-                                    {/* Report a Bug — promoted to a prominent full-width action so
-                                        players can flag issues from anywhere. Routes to /api/feedback
-                                        (Supabase + Telegram + email). */}
-                                    <div>
-                                        <button
-                                            type="button"
-                                            onClick={() => { closeMenu(); setShowBugReport(true); }}
-                                            className={cn(
-                                                "flex items-center gap-3 w-full px-4 py-3 text-sm font-bold rounded-neo",
-                                                "bg-neo-pink/10 text-neo-white",
-                                                "border-2 border-neo-pink",
-                                                "hover:bg-neo-pink/20",
-                                                "active:scale-[0.98]",
-                                                "transition duration-100"
-                                            )}
-                                        >
-                                            <MenuIcon className="bg-neo-pink/30 border-neo-pink">
-                                                <Bug className="w-4 h-4 text-neo-pink" aria-hidden="true" />
-                                            </MenuIcon>
-                                            <span>{t('bugReport.menuLabel')}</span>
-                                        </button>
-                                    </div>
-
-                                    <div>
-                                        <div className="grid grid-cols-2 gap-1.5">
-                                            <InfoLink href={`/${language}/about`} onClick={closeMenu} icon={<Info className="w-3.5 h-3.5" />} color="bg-neo-cyan/20 text-neo-cyan">{t('footer.about')}</InfoLink>
-                                            <InfoLink href={`/${language}/faq`} onClick={closeMenu} icon={<HelpCircle className="w-3.5 h-3.5" />} color="bg-neo-purple/20 text-neo-purple">{t('footer.faq')}</InfoLink>
-                                            <InfoLink href={`/${language}/leaderboard`} onClick={closeMenu} icon={<Trophy className="w-3.5 h-3.5" />} color="bg-neo-lime/20 text-neo-lime">{t('footer.leaderboard')}</InfoLink>
-                                            <InfoLink href={`/${language}/contact`} onClick={closeMenu} icon={<Mail className="w-3.5 h-3.5" />} color="bg-neo-white/10 text-neo-white">{t('footer.contact')}</InfoLink>
-                                            <InfoLink href={`/${language}/legal`} onClick={closeMenu} icon={<ScrollText className="w-3.5 h-3.5" />} color="bg-neo-pink/20 text-neo-pink-light">{t('legal.title')}</InfoLink>
-                                            <InfoLinkExternal href="https://ko-fi.com/lexiclash" onClick={closeMenu} icon={<Coffee className="w-3.5 h-3.5" />} color="bg-neo-pink/30 text-neo-pink" label={t('common.opensInNewTab')}>{t('support.kofiFooter')}</InfoLinkExternal>
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <div className="flex items-center gap-1.5">
-                                            <a
-                                                href="https://www.instagram.com/lexi.clash"
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                onClick={closeMenu}
-                                                aria-label="Instagram"
-                                                className={cn(
-                                                    "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo",
-                                                    "bg-neo-purple/15 text-neo-white",
-                                                    "border-2 border-neo-purple",
-                                                    "hover:bg-neo-purple/25 hover:text-neo-white",
-                                                    "transition duration-100"
-                                                )}
-                                            >
-                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-purple text-white">
-                                                    <InstagramIcon className="w-3 h-3" size="0.75em" />
-                                                </span>
-                                                <span>Instagram</span>
-                                            </a>
-                                            <div
-                                                role="button"
-                                                tabIndex={0}
-                                                onClick={closeMenu}
-                                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeMenu(); } }}
-                                                className={cn(
-                                                    "flex items-center gap-2 flex-1 px-3 py-2 text-xs font-bold rounded-neo cursor-pointer",
-                                                    "bg-neo-white/5 text-neo-white",
-                                                    "border-2 border-neo-white/10",
-                                                    "hover:border-neo-white/20 hover:text-neo-white",
-                                                    "transition duration-100"
-                                                )}
-                                            >
-                                                <span className="flex items-center justify-center w-5 h-5 rounded-md bg-neo-lime/20 text-neo-lime">
-                                                    <Cookie className="w-3 h-3" aria-hidden="true" />
-                                                </span>
-                                                <ManageCookiesButton />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* ─ Account (Login/Logout) ─ */}
-                                    {isAuthenticated && (
-                                        <>
-                                            <div>
-                                                <SectionLabel>{t('common.account')}</SectionLabel>
-                                            </div>
-                                            <div>
-                                                <AuthButton
-                                                    inline
-                                                    onClose={closeMenu}
-                                                    onSignInClick={handleSignIn}
-                                                    onSignUpClick={handleSignUp}
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-
-                                    {/* Swipe hint */}
-                                    <div className="flex justify-center pt-2 pb-1">
-                                        <span className="text-[10px] text-neo-white font-bold">
-                                            {isRtl ? '← ' : ''}
-                                            {t('common.swipeToClose', 'Swipe to close')}
-                                            {!isRtl ? ' →' : ''}
-                                        </span>
-                                    </div>
-                                </div>
                               </div>
                             </div>
                         </>
                     )}
-                </>
                 </LazyMotion>,
                 document.body
             )}
@@ -1001,119 +504,3 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 HeaderMobileMenu.displayName = 'HeaderSideMenu';
 
 export default HeaderMobileMenu;
-
-// --- Helper sub-components ---
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-    return (
-        <div className="flex items-center gap-2 pt-3 pb-1 px-1">
-            <span className="text-[10px] font-black text-neo-white uppercase tracking-widest">
-                {children}
-            </span>
-            <div className="flex-1 h-px bg-neo-white/10" />
-        </div>
-    );
-}
-
-function MenuIcon({ className, children }: { className: string; children: React.ReactNode }) {
-    return (
-        <span className={cn(
-            "flex items-center justify-center w-7 h-7 rounded-lg border-2 shrink-0",
-            className
-        )}>
-            {children}
-        </span>
-    );
-}
-
-function MenuLink({ href, onClick, accentColor, children }: {
-    href: string;
-    onClick: () => void;
-    accentColor: 'cyan' | 'pink' | 'lime' | 'purple';
-    children: React.ReactNode;
-}) {
-    const hoverColors = {
-        cyan: 'hover:border-neo-cyan/40',
-        pink: 'hover:border-neo-pink/40',
-        lime: 'hover:border-neo-lime/40',
-        purple: 'hover:border-neo-purple/40',
-    };
-
-    return (
-        <Link
-            href={href}
-            onClick={onClick}
-            className={cn(
-                "flex items-center gap-3 px-4 py-3 text-sm font-bold rounded-neo w-full",
-                "bg-neo-white/5 text-neo-white",
-                "border-2 border-neo-white/10",
-                hoverColors[accentColor],
-                "hover:bg-neo-white/8",
-                "active:scale-[0.98]",
-                "transition duration-100"
-            )}
-        >
-            {children}
-        </Link>
-    );
-}
-
-function InfoLink({ href, onClick, icon, color, children }: {
-    href: string;
-    onClick: () => void;
-    icon: React.ReactNode;
-    color: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <Link
-            href={href}
-            onClick={onClick}
-            className={cn(
-                "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
-                "bg-neo-white/5 text-neo-white",
-                "border-2 border-neo-white/10",
-                "hover:border-neo-white/20 hover:text-neo-white",
-                "active:scale-[0.97]",
-                "transition duration-100"
-            )}
-        >
-            <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>
-                {icon}
-            </span>
-            <span className="truncate">{children}</span>
-        </Link>
-    );
-}
-
-function InfoLinkExternal({ href, onClick, icon, color, label, children }: {
-    href: string;
-    onClick: () => void;
-    icon: React.ReactNode;
-    color: string;
-    label: string;
-    children: React.ReactNode;
-}) {
-    return (
-        <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={onClick}
-            aria-label={`${children} (${label})`}
-            className={cn(
-                "flex items-center gap-2 px-3 py-2.5 text-xs font-bold rounded-neo",
-                "bg-neo-white/5 text-neo-white",
-                "border-2 border-neo-white/10",
-                "hover:border-neo-white/20 hover:text-neo-white",
-                "active:scale-[0.97]",
-                "transition duration-100"
-            )}
-        >
-            <span className={cn("flex items-center justify-center w-5 h-5 rounded-md", color)}>
-                {icon}
-            </span>
-            <span className="truncate">{children}</span>
-        </a>
-    );
-}

@@ -4044,6 +4044,7 @@ const ja = {
     "afk": "離席中"
   },
   "nav": {
+    "admin": "管理",
     "bottomNavigation": "下部ナビゲーション",
     "gameNavigation": "ゲームナビ",
     "home": "ホーム",
