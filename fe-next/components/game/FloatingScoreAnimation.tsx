@@ -4,6 +4,7 @@ import React, { useEffect, useState, useMemo, useRef, memo } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { jitter } from '@/lib/animation/variety';
 
 interface FloatingScoreAnimationProps {
   /** Score to display (triggers animation when changes to > 0) */
@@ -26,10 +27,20 @@ interface Pop {
   id: number;
   score: number;
   isFireRound: boolean;
+  tilt: number;
+  drift: number;
+  peak: number;
 }
 
 const POP_LIFE_MS = 600;
 const POP_SHADOW = '2px 2px 0 rgb(var(--neo-black))';
+
+const pillColor = (score: number, fire: boolean) =>
+  fire ? 'bg-neo-orange text-neo-black'
+    : score >= 20 ? 'bg-neo-yellow text-neo-black'
+    : score >= 11 ? 'bg-neo-pink text-neo-black'
+    : score >= 6 ? 'bg-neo-cyan text-neo-black'
+    : 'bg-neo-lime text-neo-black';
 
 /**
  * FloatingScoreAnimation - Animated score flying from word area to score display
@@ -82,7 +93,7 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
   useEffect(() => {
     if (score === null || score <= 0) return;
     const id = nextIdRef.current++;
-    setPops((prev) => [...prev, { id, score, isFireRound }]);
+    setPops((prev) => [...prev, { id, score, isFireRound, tilt: jitter(0, 6), drift: jitter(0, 18), peak: jitter(1.3, 0.1) }]);
     const timer = setTimeout(() => {
       timersRef.current.delete(timer);
       setPops((prev) => prev.filter((p) => p.id !== id));
@@ -94,11 +105,9 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
 
   if (pops.length === 0) return null;
 
-  const pillColor = (fire: boolean) =>
-    fire ? 'bg-neo-orange text-neo-black' : 'bg-neo-lime text-neo-black';
   const left = startPosition?.x ?? '50%';
 
-  // For reduced motion or low-end devices, show a simple fade animation
+  // Reduced motion: fade only. Low-end: a short rise without the flight.
   if (prefersReducedMotion || skipComplexAnimation) {
     return (
       <>
@@ -111,12 +120,13 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
               top: startPosition?.y ?? '40%',
               transform: 'translate(-50%, -50%)',
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1, y: -20 }}
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.8 }}
+            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: -20 }}
             transition={{ duration: 0.3 }}
           >
             <div
-              className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-bold shadow-hard border-3 border-neo-black ${pillColor(pop.isFireRound)}`}
+              data-tier
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full font-bold shadow-hard border-3 border-neo-black ${pillColor(pop.score, pop.isFireRound)}`}
             >
               <span>+{pop.score}</span>
               {pop.isFireRound && <span>🔥</span>}
@@ -138,21 +148,23 @@ const FloatingScoreAnimation = memo<FloatingScoreAnimationProps>(({
             top: startPosition?.y ?? '35%',
             transform: 'translate(-50%, -50%)',
           }}
-          initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
+          initial={{ scale: 0, opacity: 0, x: 0, y: 0, rotate: 0 }}
           animate={{
-            scale: [0, 1.3, 1, 0.8],
+            scale: [0, pop.peak, 1, 0.8],
             opacity: [0, 1, 1, 0],
-            x: [0, 0, targetOffset.x * 0.3, targetOffset.x],
+            rotate: [0, pop.tilt, pop.tilt, pop.tilt / 2],
+            x: [0, pop.drift, targetOffset.x * 0.3 + pop.drift, targetOffset.x],
             y: [0, -15, targetOffset.y * 0.5, targetOffset.y],
           }}
           transition={{
             duration: POP_LIFE_MS / 1000,
             times: [0, 0.2, 0.6, 1],
-            ease: [0.25, 0.1, 0.25, 1],
+            ease: [0.22, 1, 0.36, 1],
           }}
         >
           <div
-            className={`px-4 py-2 rounded-full font-black text-xl shadow-hard border-3 border-neo-black ${pillColor(pop.isFireRound)}`}
+            data-tier
+            className={`px-4 py-2 rounded-full font-black text-xl shadow-hard border-3 border-neo-black ${pillColor(pop.score, pop.isFireRound)}`}
             style={{ textShadow: POP_SHADOW }}
           >
             <span className="flex items-center gap-2">

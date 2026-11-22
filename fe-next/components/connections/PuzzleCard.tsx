@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { m, AnimatePresence, useAnimationControls, useReducedMotion } from 'framer-motion';
 import { Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -18,6 +18,7 @@ import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { BridgeSolveReveal } from './BridgeSolveReveal';
 import BridgeCelebration from './BridgeCelebration';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { jitter, sign } from '@/lib/animation/variety';
 
 interface PuzzleCardProps {
   puzzle: ConnectionPuzzle;
@@ -38,6 +39,23 @@ interface PuzzleCardProps {
 }
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
+
+/** The "correct" verdict pops in with a fresh tilt and overshoot each solve. */
+export function CorrectVerdict({ label }: { label: string }) {
+  const reducedMotion = useReducedMotion();
+  const [pop] = useState(() => ({ scale: jitter(0.6, 0.12), rotate: sign() * jitter(4.5, 1.5), stiffness: jitter(350, 50) }));
+  return (
+    <m.p
+      initial={reducedMotion ? false : { scale: pop.scale, rotate: pop.rotate }}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: pop.stiffness, damping: 22, mass: 0.8 }}
+      className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
+    >
+      {label}
+      <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+    </m.p>
+  );
+}
 
 const STATUS_BORDER: Record<string, string> = {
   correct: 'border-neo-lime',
@@ -194,18 +212,7 @@ export default function PuzzleCard({
                 never shares a row with the hint and never shifts the stage or keyboard. */}
             <div data-testid="puzzle-verdict" className="flex h-6 shrink-0 items-center justify-center" aria-live="polite">
               <AnimatePresence mode="wait">
-                {isCorrect && (
-                  <m.p
-                    key="correct"
-                    initial={{ scale: 0.6 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 14 }}
-                    className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
-                  >
-                    {t('connections.correct')}
-                    <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
-                  </m.p>
-                )}
+                {isCorrect && <CorrectVerdict key="correct" label={t('connections.correct')} />}
                 {isWrong && (
                   <m.p key="wrong" initial={{ y: -4 }} animate={{ y: 0 }} className="text-center text-sm font-bold text-neo-red">
                     {t('connections.wrong')}

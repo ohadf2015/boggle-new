@@ -14,6 +14,7 @@ import {
   type CelebrationIntensity,
 } from '@/lib/cosy/celebrationScale';
 import { emitQuietFeedback } from '@/lib/cosy/quietFeedback';
+import { jitter, pick } from '@/lib/animation/variety';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;
@@ -91,6 +92,35 @@ export const NEO_BRUTALIST_DEFAULTS: Partial<Options> = {
   gravity: 1.2,
   ticks: 150,
 };
+
+/** canvas-confetti parses hex only, so these mirror the six neo accent tokens. */
+const VARIETY_COLORS = ['#BFFF00', '#FF1493', '#00FFFF', '#8B5CF6', '#FFE135', '#FF6B35'];
+const SHAPE_MIXES: Shape[][] = [NEO_BRUTALIST_SHAPES, ['square'], ['square', 'circle']];
+
+const rotate = <T,>(items: T[], by: number) => items.map((_, i) => items[(i + by) % items.length]);
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
+
+/**
+ * Every volley rolls its palette, shape mix, spread, angle and origin a little, so no two look alike.
+ * A caller's own palette (rank, quest tier) keeps its colours; particle counts are never touched.
+ */
+function vary(options: Options): Options {
+  const own = options.colors && options.colors !== NEO_BRUTALIST_COLORS;
+  const colors = own
+    ? rotate(options.colors!, Math.floor(Math.random() * options.colors!.length))
+    : rotate(VARIETY_COLORS, Math.floor(Math.random() * VARIETY_COLORS.length)).slice(0, 3 + Math.floor(Math.random() * 3));
+  const shapes = !options.shapes || options.shapes === NEO_BRUTALIST_SHAPES ? pick(SHAPE_MIXES) : options.shapes;
+  const spread = options.spread ?? 45;
+  const origin = options.origin ?? {};
+  return {
+    ...options,
+    colors,
+    shapes,
+    spread: jitter(spread, spread * 0.15),
+    angle: jitter(options.angle ?? 90, 8),
+    origin: { x: clamp01(jitter(origin.x ?? 0.5, 0.04)), y: clamp01(jitter(origin.y ?? 0.5, 0.03)) },
+  };
+}
 
 /**
  * Get or create the confetti canvas with proper attributes
@@ -201,7 +231,7 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
       {
         zIndex: 10000,
         ...NEO_BRUTALIST_DEFAULTS,
-        ...options,
+        ...vary(options),
       },
       celebrationIntensity,
     );
