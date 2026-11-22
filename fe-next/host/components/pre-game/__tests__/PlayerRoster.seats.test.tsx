@@ -17,10 +17,16 @@ const room = [{ username: 'Host', isHost: true }, { username: 'Ada' }, { usernam
 describe('PlayerRoster — the 8-seat lobby grid', () => {
   beforeEach(() => emit.mockClear());
 
-  it('always shows 8 chairs: players first, then dashed empty seats', () => {
+  it('shows empty chairs only to finish the current row of four, so the lobby fits without scrolling', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
     expect(screen.getAllByTestId('lobby-seat')).toHaveLength(3);
-    expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(5);
+    expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(1);
+  });
+
+  it('a fifth player opens the second row of chairs', () => {
+    const five = [...room, { username: 'Bo' }, { username: 'Cy' }];
+    render(<PlayerRoster players={five} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
+    expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(3);
   });
 
   it('squad header shows the real room cap once a big room outgrows 8 chairs (prod read "SQUAD 11/8")', () => {
@@ -54,9 +60,16 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     render(<PlayerRoster players={room} username="Ada" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" />);
     const empty = screen.getAllByTestId('lobby-seat-empty');
     expect(empty[0].tagName).not.toBe('BUTTON');
-    expect(screen.getAllByText('common.join').length).toBe(5);
+    expect(screen.getAllByText('common.join').length).toBe(1);
     expect(screen.queryByLabelText('hostView.kickPlayer')).toBeNull();
     expect(screen.queryByLabelText('hostView.removeBot')).toBeNull();
+  });
+
+  it('long locale labels never overflow at 375px: the ready word is screen-reader-only on phones and chair labels truncate', () => {
+    render(<PlayerRoster players={room} username="Ada" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" readyUsernames={['Ada']} />);
+    const ready = screen.getByText('hostView.playersReady');
+    expect(ready.className).toMatch(/max-\[479px\]:sr-only/);
+    expect(screen.getByText('common.join').className).toMatch(/\btruncate\b/);
   });
 
   it('a long name is clipped to its own column instead of running into the next seat (390px phone)', () => {

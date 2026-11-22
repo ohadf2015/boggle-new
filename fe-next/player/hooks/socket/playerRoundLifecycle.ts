@@ -127,5 +127,5 @@ export function resetRoundStoreForNewGame(a: GameActions): void {
   blast.setBlastTotalTilesCleared(0);
   blast.setBlastSeed(null);
   blast.setBlastComboSync(null);
-  useGameStore.setState({ blastOpponentActivity: [] });
+  useGameStore.setState({ blastOpponentActivity: [], blastBoardUpdate: null });
 }

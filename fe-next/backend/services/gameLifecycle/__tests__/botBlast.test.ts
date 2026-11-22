@@ -174,6 +174,7 @@ vi.mock('../botWheelRush', () => ({
 
 vi.mock('../../../dictionary', () => ({
   ensureLanguageLoaded: mocks.ensureLanguageLoaded,
+  isValidWord: () => true,
 }));
 
 // ==========================================

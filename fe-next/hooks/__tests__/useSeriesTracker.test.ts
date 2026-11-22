@@ -289,6 +289,11 @@ describe('useSeriesTracker', () => {
   });
 
   describe('series length', () => {
+    it('plays a 3-round series by default', () => {
+      const { result } = renderHook(() => useSeriesTracker());
+      expect(result.current.totalGames).toBe(3);
+    });
+
     it('should expose totalGames constant', () => {
       const { result } = renderHook(() => useSeriesTracker());
       expect(result.current.totalGames).toBeGreaterThan(0);

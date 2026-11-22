@@ -10,7 +10,7 @@ import type { Avatar } from '@/shared/types/game';
 
 type AvatarLike = Avatar;
 
-export const SERIES_TOTAL_GAMES = 5;
+export const SERIES_TOTAL_GAMES = 3;
 
 export interface SeriesStanding {
   username: string;

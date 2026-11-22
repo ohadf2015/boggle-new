@@ -56,6 +56,8 @@ export interface BoardSelectionApi {
 type Mode = 'idle' | 'press' | 'drag' | 'click';
 
 const COMBO_CHAIN_MS = 500;
+/** A locked-board hint reads once, then gets out of the way of the tiles. */
+const LOCKED_HINT_MS = 1400;
 
 /**
  * One selection engine for every letter board. Pointer events (mouse, touch
@@ -242,6 +244,7 @@ function bindBoard(
     return n;
   };
 
+  let lockedTimer: ReturnType<typeof setTimeout> | undefined;
   const showLocked = () => {
     const n = noteTap('locked');
     const hint = o().lockedHint || '';
@@ -251,6 +254,8 @@ function bindBoard(
       banner.hidden = false;
       banner.setAttribute('data-show', String(n));
       banner.animate?.([{ transform: 'scale(0.96)' }, { transform: 'scale(1)' }], { duration: 180 });
+      clearTimeout(lockedTimer);
+      lockedTimer = setTimeout(() => { banner.hidden = true; }, LOCKED_HINT_MS);
     }
   };
 
@@ -398,6 +403,7 @@ function bindBoard(
   };
 
   return () => {
+    clearTimeout(lockedTimer);
     stopResume();
     clearTimers();
     if (raf) win.cancelAnimationFrame(raf);
