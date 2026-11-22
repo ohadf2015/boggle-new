@@ -7,7 +7,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { isNative } from '@/utils/platform';
-import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
+import { isOneTapBlockedPath, oneTapMayPrompt } from '@/lib/auth/oneTapGate';
+import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
 import { isAuthClientConfigured } from '@/lib/auth/loadAuthClient';
 import {
@@ -65,6 +66,9 @@ export default function GoogleOneTapInitializer() {
   const { isInGame } = useNavigation();
   const inGameRef = useRef(isInGame);
   inGameRef.current = isInGame;
+  const consentDecided = useConsentDecided();
+  const consentRef = useRef(consentDecided);
+  consentRef.current = consentDecided;
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
   // Landing (`/` `/en`): same class as the deleted AdSense loader — GSI was
@@ -93,6 +97,8 @@ export default function GoogleOneTapInitializer() {
 
   const initOneTap = useCallback(async () => {
     if (promptedRef.current || !clientId || inGameRef.current) return;
+    const isPhone = window.matchMedia?.('(max-width: 639px)').matches ?? false;
+    if (!oneTapMayPrompt({ isPhone, consentDecided: consentRef.current })) return;
     // Post-game funnel owns auth — do not prompt One Tap over soft-sheet.
     if (shouldSuppressOneTapForSignupFunnel()) return;
     const google = (window as unknown as { google?: GoogleIdServices }).google;
@@ -121,6 +127,11 @@ export default function GoogleOneTapInitializer() {
     return () => window.removeEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, onPromptActive);
   }, []);
 
+  // A phone visitor who answers the cookie bar after the script loaded gets the prompt now.
+  useEffect(() => {
+    if (consentDecided) void initOneTap();
+  }, [consentDecided, initOneTap]);
+
   // A sign-in sheet over a live board covers the keyboard and controls.
   useEffect(() => {
     if (isInGame) cancelOneTapPrompt();
@@ -131,7 +142,7 @@ export default function GoogleOneTapInitializer() {
   if (!enabled) return null;
   // Fullscreen game routes: GSI (~100KiB) was unused JS #1 on /singleplayer PSI.
   // One Tap is not useful over the board; GoogleSignInButton still loads GSI on demand.
-  if (isHeavyGamePath(pathname) || isInGame) return null;
+  if (isOneTapBlockedPath(pathname) || isInGame) return null;
   if (deferForPsi && !landingGsiArmed) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
