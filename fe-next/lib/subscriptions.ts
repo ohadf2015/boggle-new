@@ -340,6 +340,27 @@ export async function subscriptionRowIsPastDue(userId: string): Promise<boolean>
   }
 }
 
+// Only the Polar webhook logs subscription.* rows, so one already carrying trial=true means this trial was counted.
+export async function subscriptionTrialAlreadyCounted(userId: string, providerSubscriptionId: string): Promise<boolean> {
+  if (!providerSubscriptionId) return false
+  try {
+    const supabase = createAdminClient() ?? (await createClient())
+    const { data, error } = await supabase
+      .from('subscription_events')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('subscription_id', providerSubscriptionId)
+      .like('event_type', 'subscription.%')
+      .contains('payload', { trial: true })
+      .limit(1)
+    if (error) return false
+    return Array.isArray(data) && data.length > 0
+  } catch (err) {
+    console.error('[Subscription] subscriptionTrialAlreadyCounted read failed:', err)
+    return false
+  }
+}
+
 /**
  * Belt-and-braces Pro grant from a paid ORDER event (order.paid).
  *

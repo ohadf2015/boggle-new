@@ -479,8 +479,9 @@ export function snapshotFor(
  * found/missed, so every word a 10-question round never showed lands in the
  * teacher's reteach column.
  */
+// A quiz the teacher ends early only showed questions up to `index`; the rest never reached the class.
 export function askedWords(session: VocabQuizSession): string[] {
-  return session.questions.map((q) => q.word);
+  return session.questions.slice(0, session.index + 1).map((q) => q.word);
 }
 
 export type QuizAnswerRecord = { word: string; choiceIndex: number; correct: boolean; ms: number };

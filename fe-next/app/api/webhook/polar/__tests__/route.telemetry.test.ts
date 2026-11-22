@@ -17,7 +17,9 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionTrialAlreadyCounted: (...args: unknown[]) => subscriptionTrialAlreadyCounted(...args),
 }))
+const subscriptionTrialAlreadyCounted = vi.fn()
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
 const capture = vi.fn()
 let posthogThrows = false
@@ -46,6 +48,7 @@ const sub = (over: Record<string, unknown> = {}) => ({
 describe('polar webhook — edu_pro_checkout_succeeded', () => {
   beforeEach(() => {
     upsertSubscription.mockReset()
+    subscriptionTrialAlreadyCounted.mockReset().mockResolvedValue(false)
     capture.mockReset()
     posthogThrows = false
     process.env.POLAR_PRO_PRODUCT_ID = PRO
@@ -157,6 +160,16 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const events = capture.mock.calls.map((c) => c[0].event)
     expect(events).toEqual(['edu_pro_trial_succeeded', 'trial_activated', 'trial_start', 'teacher_trial_started', 'trial_started', 'teacher_funnel_step', 'growth:teacher_funnel_step'])
   })
+
+  it.each(['subscription.active', 'subscription.updated', 'subscription.created'])(
+    'Given the row already trials this subscription, When %s arrives still trialing, Then no trial event fires again',
+    async (type) => {
+      subscriptionTrialAlreadyCounted.mockResolvedValue(true)
+      await POST(polarEvent(type, sub({ status: 'trialing' })))
+      expect(subscriptionTrialAlreadyCounted).toHaveBeenCalledWith('u1', 'sub_1')
+      expect(capture).not.toHaveBeenCalled()
+    }
+  )
 
   it('Given a non-Pro product, When active, Then nothing fires', async () => {
     await POST(polarEvent('subscription.active', sub({ product_id: 'other' })))

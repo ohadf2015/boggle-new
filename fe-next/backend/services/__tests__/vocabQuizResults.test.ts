@@ -39,6 +39,7 @@ function session(questionCount = 4) {
   maya.score = 400;
   maya.correctWords = [s.questions[0].word];
   s.shellSessionId = 'QUIZ01:123';
+  s.index = s.questions.length - 1;
   return s;
 }
 
@@ -85,6 +86,16 @@ describe('buildQuizResultsPayload', () => {
 
     expect(payload!.classroomSummary.roundsPlayed).toBe(3);
     expect(payload!.classroomSummary.sessionStandings?.[0]).toMatchObject({ username: 'leo', totalScore: 650 });
+  });
+
+  it('Given the teacher ends the quiz on question 1, When the recap builds, Then the unseen questions go under never-asked', async () => {
+    const s = session(4);
+    s.index = 0;
+    s.players.get('leo')!.correctWords = [s.questions[0].word];
+    const payload = await buildQuizResultsPayload({ session: s, gameCode: 'QUIZ01', classroomGame: classroomGame(), room: {} });
+    const never = payload!.classroomSummary.neverPlacedWords ?? [];
+    expect(never).toEqual(expect.arrayContaining(s.questions.slice(1).map((q) => q.word)));
+    expect(never).not.toContain(s.questions[0].word);
   });
 
   it('carries a Boss Battle verdict so the recap can tell it', async () => {

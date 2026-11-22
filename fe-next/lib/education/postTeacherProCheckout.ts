@@ -18,6 +18,7 @@ export type TeacherProCheckoutResult =
 export function checkoutFailureKey(result: { ok: false; status: number; nativeApp?: true }): string {
   if (result.nativeApp) return 'teacher.subscription.notInApp';
   if (result.status === 401) return 'teacher.subscription.signInRequired';
+  if (result.status === 409) return 'teacher.subscription.alreadySubscribed';
   if (result.status === 503) return 'teacher.subscription.checkoutUnavailable';
   return 'teacher.subscription.checkoutError';
 }

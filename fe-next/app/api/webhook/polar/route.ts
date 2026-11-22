@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
-import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, subscriptionTrialAlreadyCounted, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
@@ -196,14 +196,17 @@ export async function POST(request: NextRequest) {
       case 'subscription.created':
       case 'subscription.active':
       case 'subscription.uncanceled':
-      case 'subscription.resumed':
+      case 'subscription.resumed': {
+        const trialCounted = await trialAlreadyCounted(payload, userId)
         await handleSubscriptionActive(payload, userId)
         if (eventType === 'subscription.active') trackProConversion(payload, userId)
-        trackProTrial(payload, userId)
+        if (!trialCounted) trackProTrial(payload, userId)
         break
+      }
       case 'subscription.updated':
       case 'subscription.cycled':
-      case 'subscription.paused':
+      case 'subscription.paused': {
+        const trialCounted = await trialAlreadyCounted(payload, userId)
         await handleSubscriptionUpdated(payload, userId)
         if (mapStatus(payload?.data?.status) === 'past_due') {
           try {
@@ -212,10 +215,11 @@ export async function POST(request: NextRequest) {
             console.error('[Polar] dunning email threw:', err)
           }
           trackPastDue(payload, userId)
-        } else {
+        } else if (!trialCounted) {
           trackProTrial(payload, userId)
         }
         break
+      }
       case 'subscription.past_due':
         await handleSubscriptionUpdated(payload, userId)
         // Churn guard: the row flip alone tells nobody. Email the teacher a
@@ -297,6 +301,12 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
   } catch (err) {
     console.error('[Polar] conversion telemetry threw:', err)
   }
+}
+
+// Polar sends created, active and updated for one new trial within seconds; only the first may count it.
+async function trialAlreadyCounted(payload: WebhookPayload, userId?: string): Promise<boolean> {
+  if (!userId || mapStatus(payload?.data?.status) !== 'trialing') return false
+  return subscriptionTrialAlreadyCounted(userId, String(payload?.data?.id ?? ''))
 }
 
 /**
