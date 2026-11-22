@@ -40,7 +40,6 @@ export function HintPromptButton({
       <AdaptiveMotion.button
         onClick={handleClick}
         whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
         animate={{
           scale: [1, 1.03, 1],
         }}
@@ -49,7 +48,7 @@ export function HintPromptButton({
           repeat: Infinity,
           ease: 'easeInOut',
         }}
-        className="flex items-center gap-2 px-6 py-3 border-3 border-neo-black text-neo-black hover:brightness-110 rounded-full font-black text-sm uppercase tracking-wide shadow-hard"
+        className="flex items-center gap-2 px-6 py-3 border-3 border-neo-black text-neo-black hover:brightness-110 rounded-full font-black text-sm uppercase tracking-wide shadow-hard active:translate-x-px active:translate-y-px"
         style={{
           background: 'linear-gradient(135deg, #00FFFF 0%, #40E0D0 50%, #00CED1 100%)',
           boxShadow: '4px 4px 0px rgb(0,0,0), 0 0 20px rgba(0, 255, 255, 0.4)',

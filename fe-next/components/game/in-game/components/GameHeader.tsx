@@ -38,10 +38,10 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
 }) {
   const isMobile = variant === 'mobile';
 
-  // Mobile header
+  // Mobile header; pe-12 keeps the disabled hint button (invisible to the FAB's hit probe) out from under the floating mute FAB
   if (isMobile) {
     return (
-      <div className="lg:hidden w-full flex items-center justify-between px-2 py-0.5 shrink-0">
+      <div className={`lg:hidden w-full flex items-center justify-between px-2 py-0.5 shrink-0${hints?.isSinglePlayer ? ' pe-12' : ''}`}>
         <div className="flex items-center gap-1.5">
           {onExitRoom && (
             <ExitRoomButton
@@ -53,8 +53,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
           {onShowTutorial && (
             <AdaptiveMotion.button
               onClick={onShowTutorial}
-              whileTap={{ scale: 0.95 }}
-              className="w-11 h-11 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
+              className="w-11 h-11 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
               aria-label={t('help.viewTutorial')}
             >
               <HelpCircle className="w-5 h-5 text-neo-white" />
@@ -64,8 +63,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
             <AdaptiveMotion.button
               data-testid="game-header-pause"
               onClick={onPauseToggle}
-              whileTap={{ scale: 0.95 }}
-              className="w-11 h-11 bg-neo-navy-light border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center"
+              className="w-11 h-11 bg-neo-navy-light border-2 border-neo-black rounded-full shadow-hard-sm flex items-center justify-center active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
               aria-label={isPaused ? t('common.resume') : t('common.pause')}
             >
               {isPaused
@@ -109,8 +107,7 @@ export const GameHeader = memo<GameHeaderProps>(function GameHeader({
       {onShowTutorial && (
         <AdaptiveMotion.button
           onClick={onShowTutorial}
-          whileTap={{ scale: 0.95 }}
-          className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition-colors"
+          className="w-9 h-9 md:w-10 md:h-10 bg-neo-pink/90 border-2 border-neo-black rounded-full shadow-hard flex items-center justify-center hover:bg-neo-pink transition active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
           aria-label={t('help.viewTutorial')}
         >
           <HelpCircle className="w-4 h-4 md:w-5 md:h-5 text-neo-white" />
