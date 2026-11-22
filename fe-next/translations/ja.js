@@ -11921,6 +11921,8 @@ const ja = {
       "nextRound": "次のラウンドへ",
       "challengeFriend": "友達に挑戦状：同じボード",
       "challengeHint": "友達はあなたと同じボードをプレイ。そのスコアが次のライバルに。",
+      "loadRateLimited": "続けて遊びすぎです。少し待ってからもう一度どうぞ",
+      "challengeShort": "挑戦",
       "challengeBanner": "{name}はこのボードで{pct}%。超えられる？",
       "answeredBanner": "{name}が挑戦に応えた: {theirPct}%（あなたは{yourPct}%）",
       "loadError": "ボードを準備できませんでした。接続を確認してもう一度試してください",

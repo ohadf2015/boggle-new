@@ -66,6 +66,7 @@ export function QuickResultsCtaBar({
       }}
       secondary={{
         label: t('quickPlay.solo.challengeFriend'),
+        shortLabel: t('quickPlay.solo.challengeShort'),
         title: t('quickPlay.solo.challengeHint'),
         onClick: () => void handleShare(),
         testId: 'quick-results-challenge',
@@ -103,9 +104,11 @@ export function QuickResultsModeSwitch({
       <span className="font-neo-display text-[10px] uppercase tracking-[0.18em] text-neo-white/55">
         {t('quickPlay.solo.pickNextMode', 'Next round')}
       </span>
-      <div className="grid grid-cols-4 gap-2">
+      <div className={`grid gap-2 ${compact ? 'grid-cols-3' : 'grid-cols-4'}`}>
         {QUICK_MODES.map((mode) => {
           const isCurrent = mode === currentMode;
+          // NEXT BOARD already replays the current mode.
+          if (isCurrent && compact) return null;
           return (
             <button
               key={mode}

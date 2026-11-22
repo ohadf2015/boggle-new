@@ -318,8 +318,10 @@ describe('QuickPlayResults — mascot, standings and words', () => {
         onChallenge={vi.fn()}
       />
     );
-    screen.getByTestId('quick-next-mode-blast').click();
-    expect(onNextRound).toHaveBeenCalledWith('blast');
+    screen.getByTestId('quick-next-mode-classic').click();
+    expect(onNextRound).toHaveBeenCalledWith('classic');
+    // The current mode has no chip: NEXT BOARD is that action.
+    expect(screen.queryByTestId('quick-next-mode-blast')).toBeNull();
     // The primary CTA is "Next board": a fresh board in the SAME mode, no menu.
     screen.getByTestId('quick-results-next').click();
     expect(onNextRound).toHaveBeenLastCalledWith('blast');

@@ -12922,6 +12922,8 @@ const es = {
       "nextRound": "Girar otra ronda",
       "challengeFriend": "Reta a un amigo con el mismo tablero",
       "challengeHint": "Jugará exactamente tu tablero. Su puntuación será tu próximo rival.",
+      "loadRateLimited": "Demasiadas partidas seguidas. Inténtalo de nuevo en un momento.",
+      "challengeShort": "Retar",
       "challengeBanner": "{name}: {pct}% en este tablero. ¡Supéralo!",
       "answeredBanner": "{name} respondió a tu reto: {theirPct}% frente a tu {yourPct}%",
       "loadError": "No pudimos preparar tu tablero. Revisa tu conexión e inténtalo de nuevo",

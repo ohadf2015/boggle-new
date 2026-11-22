@@ -14,6 +14,8 @@ interface ResultsNextBarProps {
   secondary?: BarAction & {
     icon: ReactNode;
     title?: string;
+    /** Visible caption under the icon, so the icon-only button reads without a long-press. */
+    shortLabel?: string;
     /** Short feedback after the action (e.g. "Copied"); '' keeps the live region mounted but silent. */
     note?: string;
   };
@@ -83,9 +85,14 @@ export function ResultsNextBar({
             onClick={secondary.onClick}
             aria-label={secondary.label}
             title={secondary.title ?? secondary.label}
-            className="flex h-[56px] min-h-[44px] w-[56px] shrink-0 items-center justify-center rounded-2xl border-[3px] border-neo-white/25 text-neo-cream active:translate-y-0.5"
+            className={`flex h-[56px] min-h-[44px] shrink-0 items-center justify-center rounded-2xl border-[3px] border-neo-white/25 text-neo-cream active:translate-y-0.5 ${secondary.shortLabel ? 'min-w-[64px] flex-col gap-0.5 px-2' : 'w-[56px]'}`}
           >
             {secondary.icon}
+            {secondary.shortLabel && (
+              <span className="max-w-[72px] truncate font-neo-display text-[10px] font-bold uppercase leading-none tracking-wide">
+                {secondary.shortLabel}
+              </span>
+            )}
           </button>
         )}
         <button

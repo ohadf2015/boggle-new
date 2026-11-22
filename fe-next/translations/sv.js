@@ -13278,6 +13278,8 @@ const sv = {
       "nextRound": "Snurra nästa runda",
       "challengeFriend": "Utmana en vän med samma bräde",
       "challengeHint": "De spelar exakt ditt bräde. Deras resultat blir din nästa rival.",
+      "loadRateLimited": "För många spel på rad. Försök igen om en stund.",
+      "challengeShort": "Utmana",
       "challengeBanner": "{name}: {pct}% på det här brädet. Slå det!",
       "answeredBanner": "{name} svarade på din utmaning: {theirPct}% mot dina {yourPct}%",
       "loadError": "Kunde inte bygga brädet. Kolla anslutningen och försök igen",

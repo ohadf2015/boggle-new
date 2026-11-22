@@ -12860,6 +12860,8 @@ const he = {
       "nextRound": "סיבוב נוסף",
       "challengeFriend": "אתגרו חברים: אותו לוח",
       "challengeHint": "מי שמקבל את הקישור משחק בדיוק באותו לוח, והתוצאה תהפוך ליריב הבא שלכם.",
+      "loadRateLimited": "יותר מדי משחקים ברצף. נסו שוב בעוד רגע.",
+      "challengeShort": "אתגר",
       "challengeBanner": "{name}: {pct}% בלוח הזה. עכשיו תורכם!",
       "answeredBanner": "יש תגובה לאתגר שלכם מ{name}: {theirPct}% מול {yourPct}% שלכם",
       "loadError": "לא הצלחנו להכין את הלוח. בדקו את החיבור ונסו שוב",

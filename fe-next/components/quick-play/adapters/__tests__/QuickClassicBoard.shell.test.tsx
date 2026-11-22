@@ -74,6 +74,12 @@ describe('QuickClassicBoard — desktop shell', () => {
     expect(boardProps.at(-1)?.inDesktopShell).toBe(true);
   });
 
+  it('given a quick round, then the header gets no hint control and the coach intro sits below the timer ring', () => {
+    render(<QuickClassicBoard config={{ ...config, coach: true } as QuickRoundConfig} onDone={vi.fn()} onQuit={vi.fn()} />);
+    expect((boardProps.at(-1)?.hints as { isSinglePlayer: boolean }).isSinglePlayer).toBe(false);
+    expect(screen.getByTestId('quick-coach-intro').className).toContain('top-[27%]');
+  });
+
   it('given a phone, then the board keeps its own clock because there are no rails', () => {
     setViewport(false);
     render(<QuickClassicBoard config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
