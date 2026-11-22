@@ -31,6 +31,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 
 import { POST } from '../route'

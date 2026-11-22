@@ -86,7 +86,7 @@ describe('<TeacherDashboard> after Polar checkout', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('shows days remaining + upgrade CTA after a Polar trial checkout, not the paid celebration', () => {
+  it('shows the trial welcome without a second checkout after a Polar trial checkout, not the paid celebration', () => {
     const trialExpires = new Date(Date.now() + 14 * 86400000).toISOString();
     proState = {
       ...PAID,
@@ -97,7 +97,7 @@ describe('<TeacherDashboard> after Polar checkout', () => {
     };
     render(<TeacherDashboard />);
     expect(screen.getByTestId('teacher-trial-welcome')).toBeInTheDocument();
-    expect(screen.getByTestId('teacher-trial-welcome-upgrade')).toBeInTheDocument();
+    expect(screen.queryByTestId('teacher-trial-welcome-upgrade')).not.toBeInTheDocument();
     expect(screen.queryByText('teacher.proWelcome.paidBody')).not.toBeInTheDocument();
   });
 

@@ -4,20 +4,16 @@ import { isCheckoutRedirectPending } from '@/lib/education/checkoutReturn';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
-import { TeacherProCheckoutButton } from '@/components/teacher/TeacherProCheckoutButton';
 import { cn } from '@/lib/utils';
 import { NB_DIALOG_BODY, NB_DIALOG_FOOTER, NB_DIALOG_TITLE, NB_OVERLAY_LAYER, NB_OVERLAY_PANEL, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
-import { NB_BLOCK, NB_SECONDARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
-
-/** The checkout button takes no className; restyle it from here as this sheet's one lime action. */
-const LIME_CTA = '[&>button]:min-h-14 [&>button]:w-full [&>button]:rounded-neo-lg [&>button]:border-[3px] [&>button]:border-neo-black [&>button]:bg-neo-lime [&>button]:text-lg [&>button]:text-neo-black [&>button]:shadow-hard-xl';
+import { NB_BLOCK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 
 /**
  * HQ welcome after Polar opens the 14-day Teacher Pro trial.
  *
- * Distinct from `ProWelcomeCelebration` (paid / grant). Days remaining + the
- * same paid Polar checkout CTA the lifecycle banner uses — convert now, or
- * dismiss and keep using Pro for the rest of the trial.
+ * Distinct from `ProWelcomeCelebration` (paid / grant). The trial was started
+ * with a card and converts on its own, so there is nothing to buy here: a
+ * second checkout would be a second subscription.
  */
 export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { trialExpires: string | null; onReturnPage?: boolean }) {
   const { t, language } = useLanguage();
@@ -77,14 +73,9 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
           </p>
         </div>
         <div className={NB_DIALOG_FOOTER}>
-          <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={close} className={NB_SECONDARY}>
+          <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={close} className={NB_PRIMARY}>
             {t('teacher.proWelcome.cta')}
           </button>
-          <span className={cn('flex', LIME_CTA)}>
-            <TeacherProCheckoutButton source="dashboard_trial_lifecycle" testId="teacher-trial-welcome-upgrade">
-              {t('teacher.subscription.trialLifecycleCta')}
-            </TeacherProCheckoutButton>
-          </span>
         </div>
       </div>
     </div>

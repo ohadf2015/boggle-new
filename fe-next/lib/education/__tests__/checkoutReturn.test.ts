@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
+  isFreshCheckoutLanding,
   GRANT_POLL_MAX_TRIES,
   RETURN_INTENT_KEY,
   RETURN_INTENT_TTL_MS,
@@ -114,5 +115,32 @@ describe('checkoutReturnPhase', () => {
     expect(checkoutReturnPhase({
       active: true, hasPro: false, loading: false, attempts: GRANT_POLL_MAX_TRIES,
     })).toBe('failure');
+  });
+});
+
+describe('isFreshCheckoutLanding', () => {
+  const ID = '52e32342-5f87-49e6-ac1c-7c636b5192ff';
+  const search = `?checkout=success&checkout_id=${ID}`;
+  const store = () => {
+    const m = new Map<string, string>();
+    return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) };
+  };
+
+  it('Given a first landing, When asked twice in the same moment, Then both surfaces count it as fresh', () => {
+    const s = store();
+    expect(isFreshCheckoutLanding(s, search, 1_000)).toBe(true);
+    expect(isFreshCheckoutLanding(s, search, 1_500)).toBe(true);
+  });
+
+  it('Given it was shown a minute ago, When the same checkout lands again, Then it is not fresh', () => {
+    const s = store();
+    isFreshCheckoutLanding(s, search, 1_000);
+    expect(isFreshCheckoutLanding(s, search, 61_000)).toBe(false);
+  });
+
+  it('Given no checkout id or no storage, When asked, Then it stays fresh', () => {
+    expect(isFreshCheckoutLanding(store(), '?checkout=success', 0)).toBe(true);
+    const broken = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+    expect(isFreshCheckoutLanding(broken, search, 0)).toBe(true);
   });
 });

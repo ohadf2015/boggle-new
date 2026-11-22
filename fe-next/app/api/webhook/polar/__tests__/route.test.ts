@@ -16,6 +16,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
   subscriptionRowIsPastDue: (...args: unknown[]) => subscriptionRowIsPastDue(...args),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
 vi.mock('@/lib/education/dunning', () => ({
