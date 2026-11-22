@@ -98,14 +98,9 @@ describe('PlayHero', () => {
     expect(screen.getByTestId('hp-play').className).not.toMatch(/\bbg-neo-(lime|pink|orange)\b/);
   });
 
-  it('given the hero, when "Join with a code" is tapped, then it opens the multiplayer lobby and is tracked', () => {
-    mockTrackCta.mockClear();
-    renderHero({ lang: 'he' });
-    const join = screen.getByTestId('hp-join-code');
-    expect(join.getAttribute('href')).toBe('/he/multiplayer');
-    expect(join.textContent).toBe(en.homePlay.friendsJoin);
-    fireEvent.click(join);
-    expect(mockTrackCta).toHaveBeenCalledWith('home_join_code');
+  it('given the hero, then there is no separate "Join with a code" button (the multiplayer page has the code entry)', () => {
+    renderHero();
+    expect(screen.queryByTestId('hp-join-code')).toBeNull();
   });
 
   it('given the hero, then the random round is labelled as a quick game with a surprise mode, not a bare PLAY', () => {

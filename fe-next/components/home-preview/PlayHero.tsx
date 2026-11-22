@@ -221,7 +221,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           </div>
 
           <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
-            <div data-hero-row className="flex flex-col gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:gap-4">
+            <div data-hero-row>
               <Link
                 href={`/${lang}/multiplayer?autoCreate=true`}
                 data-testid="hp-play-friends"
@@ -236,14 +236,6 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                   <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t('homePlay.friendsPlay')}</span>
                   <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t('homePlay.friendsSub')}</span>
                 </span>
-              </Link>
-              <Link
-                href={`/${lang}/multiplayer`}
-                data-testid="hp-join-code"
-                onClick={() => trackLandingCtaClick('home_join_code')}
-                className={`flex h-10 items-center justify-center rounded-xl border-[3px] border-black bg-neo-cream px-3 text-center font-neo-display text-sm leading-tight font-bold text-black shadow-hard-sm ${PRESS} lg:h-auto lg:w-40 lg:rounded-3xl lg:text-lg`}
-              >
-                {t('homePlay.friendsJoin')}
               </Link>
             </div>
 
