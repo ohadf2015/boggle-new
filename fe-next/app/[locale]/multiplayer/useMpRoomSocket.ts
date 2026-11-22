@@ -23,7 +23,7 @@ import { trackInviteRoomDead, trackInviteConsumed, trackGrowthEvent } from '@/ut
 import { shouldOfferQuickPlayRecovery, consumeRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
-import type { Language, ActiveRoom, Avatar } from '@/shared/types/game';
+import type { Language, ActiveRoom, Avatar, RoomVisibility } from '@/shared/types/game';
 
 /** One `updateUsers` / `joined.users` row, as PageClient stores it. */
 // A type alias (not an interface) so it stays assignable to index-signature shapes like host/PlayerView's `Player`.
@@ -61,6 +61,7 @@ export interface MpRoomSocketContext {
   setIsHost: Setter<boolean>;
   setIsActive: Setter<boolean>;
   setIsPrivate: Setter<boolean>;
+  setRoomVisibility: Setter<RoomVisibility>;
   setError: Setter<string>;
   setIsJoining: Setter<boolean>;
   setShouldAutoJoin: (v: boolean) => void;
@@ -122,7 +123,7 @@ function reportInviteConsumed(roomCode: string): void {
 export function useMpRoomSocket(ctx: MpRoomSocketContext) {
   const {
     language, gameCode, username, roomName, isActive, isHost, roomLanguage, prefilledRoomCode, t,
-    setIsHost, setIsActive, setIsPrivate, setError, setIsJoining, setShouldAutoJoin, setPrefilledRoomCode,
+    setIsHost, setIsActive, setIsPrivate, setRoomVisibility, setError, setIsJoining, setShouldAutoJoin, setPrefilledRoomCode,
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, classroomContext, classroomDecisionRef, exitClassroomStudentToHub,
@@ -165,6 +166,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       setIsHost(data.isHost);
       setIsActive(true);
       setIsPrivate(!!data.isPrivate);
+      setRoomVisibility(data.visibility ?? 'public');
       setError('');
       setAttemptingReconnect(false);
       if (rejoin) toast(t(rejoin.key, rejoin.params), { duration: 3000, icon: rejoin.icon, id: MP_TOAST_IDS.rejoined });

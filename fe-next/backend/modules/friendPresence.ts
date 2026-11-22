@@ -1,8 +1,11 @@
 import type { FriendPresence, FriendPresenceStatus } from '@/shared/types/friends';
+import type { RoomVisibility } from '@/shared/types/game';
 
 export interface PresenceGame {
   gameState: string;
   isPrivate?: boolean;
+  visibility?: RoomVisibility;
+  hostUsername?: string | null;
   isClassroom?: boolean;
   isRanked?: boolean;
   tournamentId?: string | null;
@@ -23,7 +26,9 @@ export function presenceForGame(
 ): { status: FriendPresenceStatus; gameCode?: string } {
   if (!game || !Object.prototype.hasOwnProperty.call(game.users ?? {}, username)) return { status: null };
   if (game.isClassroom) return { status: null };
-  if (game.isPrivate) return { status: 'private' };
+  if (game.isPrivate || game.visibility === 'private') return { status: 'private' };
+  // Friends-only rooms reach the host's friends, not every guest's friends.
+  if (game.visibility === 'friends' && game.hostUsername !== username) return { status: 'private' };
   const restricted = !!game.isRanked || !!game.tournamentId;
   if (game.gameState === 'waiting') return restricted ? { status: 'in_lobby' } : { status: 'in_lobby', gameCode };
   if (game.gameState === 'in-progress' && !restricted && game.allowLateJoin !== false) {

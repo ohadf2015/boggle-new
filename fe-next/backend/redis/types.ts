@@ -1,5 +1,6 @@
 // types.ts - Redis type definitions
 import type { Redis as RedisClient } from 'ioredis';
+import type { RoomVisibility } from '@/shared/types/game';
 
 export type { RedisClient };
 
@@ -32,6 +33,7 @@ export interface GameStateData {
   isPrivate?: boolean;
   isClassroom?: boolean;
   isQuickPlay?: boolean;
+  visibility?: RoomVisibility;
   classroomOfferedWords?: string[];
   allowLateJoin?: boolean;
   chatHistory?: unknown[];
@@ -133,6 +135,7 @@ export interface GameDataInput {
   isPrivate?: boolean;
   isClassroom?: boolean;
   isQuickPlay?: boolean;
+  visibility?: RoomVisibility;
   classroomOfferedWords?: string[];
   allowLateJoin?: boolean;
   chatHistory?: unknown[];

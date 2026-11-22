@@ -52,3 +52,14 @@ describe('useMultiplayerJoin — Quick Play rooms say so on createGame', () => {
     expect(createPayload(socket)).not.toHaveProperty('isQuickPlay');
   });
 });
+
+describe('useMultiplayerJoin — the host room visibility reaches createGame', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('Given the host picked Private, When the room is created, Then createGame says private', async () => {
+    const socket = makeSocket();
+    const { result } = renderHook(() => useMultiplayerJoin(options(socket) as never));
+    await act(async () => { await result.current(true, 'en', 'ABCD12', 'Room', 'Tester', { visibility: 'private' }); });
+    expect(createPayload(socket)).toMatchObject({ visibility: 'private' });
+  });
+});

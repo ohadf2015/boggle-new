@@ -6,18 +6,20 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_CONFIG } from '@/lib/languageConfig';
 import { BOARD_LANGUAGES } from './arenaLanguage';
 import { sanitizeRoomName } from '@/utils/consts';
-import type { Language } from '@/shared/types/game';
+import type { Language, RoomVisibility } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { cn } from '@/lib/utils';
 import { defaultRoomName } from './defaultRoomName';
 import { EntrySheet, EntrySheetCta } from './EntrySheet';
 import { SheetIdentityRow } from './SheetIdentityRow';
 import { useSheetIdentity } from './useSheetIdentity';
+import { RoomVisibilityPicker, readStoredVisibility, storeVisibility } from './RoomVisibilityPicker';
 
 export interface CreateRoomConfig {
   hostUsername: string;
   roomName: string;
   language: Language;
+  visibility: RoomVisibility;
 }
 
 export interface CreateSheetProps {
@@ -55,12 +57,16 @@ export default function CreateSheet({
   const [language, setLanguage] = useState<Language>(defaultLanguage);
   const [roomName, setRoomName] = useState('');
   const [namingRoom, setNamingRoom] = useState(false);
+  const [savedVisibility, setSavedVisibility] = useState<RoomVisibility>('public');
+  // Auth resolves late: a saved "friends" shows as private until it does, and is never overwritten by that fallback.
+  const visibility = savedVisibility === 'friends' && !isAuthenticated ? 'private' : savedVisibility;
 
   useEffect(() => {
     if (!isOpen) return;
     setLanguage(defaultLanguage);
     setRoomName('');
     setNamingRoom(false);
+    setSavedVisibility(readStoredVisibility());
   }, [isOpen, defaultLanguage]);
 
   const create = () => {
@@ -68,7 +74,7 @@ export default function CreateSheet({
     const host = id.commit();
     if (!host) return;
     const typed = sanitizeRoomName(roomName.trim());
-    onCreate({ hostUsername: host, roomName: typed || defaultRoomName(t, host), language });
+    onCreate({ hostUsername: host, roomName: typed || defaultRoomName(t, host), language, visibility });
   };
 
   return (
@@ -100,6 +106,16 @@ export default function CreateSheet({
           })}
         </div>
       </div>
+
+      <RoomVisibilityPicker
+        value={visibility}
+        friendsLocked={!isAuthenticated}
+        onChange={(v) => {
+          setSavedVisibility(v);
+          storeVisibility(v);
+        }}
+        t={t}
+      />
 
       {namingRoom ? (
         <label className="block">

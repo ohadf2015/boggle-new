@@ -27,6 +27,18 @@ describe('presenceForGame', () => {
     expect(presenceForGame(game({ isPrivate: true }), 'bea', 'ABCD')).toEqual({ status: 'private' });
   });
 
+  it('Given a link-only private room, Then the status is private with no code', () => {
+    expect(presenceForGame(game({ visibility: 'private' }), 'bea', 'ABCD')).toEqual({ status: 'private' });
+  });
+
+  it('Given a friends-only room and the friend is its host, Then the code is shared', () => {
+    expect(presenceForGame(game({ visibility: 'friends', hostUsername: 'bea' }), 'bea', 'ABCD')).toEqual({ status: 'in_lobby', gameCode: 'ABCD' });
+  });
+
+  it('Given a friends-only room and the friend is only a guest in it, Then no code leaks to their friends', () => {
+    expect(presenceForGame(game({ visibility: 'friends', hostUsername: 'host', users: { bea: {}, host: {} } }), 'bea', 'ABCD')).toEqual({ status: 'private' });
+  });
+
   it('Given a public game in progress that allows late join, Then playing with the code', () => {
     expect(presenceForGame(game({ gameState: 'in-progress' }), 'bea', 'ABCD')).toEqual({ status: 'playing', gameCode: 'ABCD' });
   });

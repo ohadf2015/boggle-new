@@ -39,7 +39,12 @@ vi.mock('../JoinSheet', () => ({
   default: ({ isOpen, room }: { isOpen: boolean; room: { gameCode: string } | null }) =>
     isOpen ? <div data-testid="join-room-modal">{room?.gameCode}</div> : null,
 }));
-vi.mock('../CreateSheet', () => ({ __esModule: true, default: () => null }));
+vi.mock('../CreateSheet', () => ({
+  __esModule: true,
+  default: (p: { isOpen: boolean; onCreate: (c: object) => void }) => (p.isOpen
+    ? <button data-testid="create-start-battle" onClick={() => p.onCreate({ hostUsername: 'Host', roomName: 'Room', language: 'en', visibility: 'private' })} />
+    : null),
+}));
 vi.mock('../../MatchmakingOverlay', () => ({ MatchmakingOverlay: () => null }));
 
 import MultiplayerFlow from '../../MultiplayerFlow';
@@ -80,6 +85,16 @@ describe('MultiplayerFlow entry frame', () => {
     expect(props.handleJoin).toHaveBeenCalledWith(
       expect.any(Boolean), expect.anything(), expect.any(String), expect.anything(), expect.any(String),
       expect.objectContaining({ quickPlay: true }),
+    );
+  });
+
+  it('CREATE hands the picked visibility to the room create', () => {
+    render(<MultiplayerFlow {...props} />);
+    fireEvent.click(screen.getByTestId('arena-create-room'));
+    fireEvent.click(screen.getByTestId('create-start-battle'));
+    expect(props.handleJoin).toHaveBeenCalledWith(
+      true, expect.anything(), expect.any(String), expect.any(String), expect.any(String),
+      expect.objectContaining({ visibility: 'private' }),
     );
   });
 

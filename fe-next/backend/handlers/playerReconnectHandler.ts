@@ -230,6 +230,7 @@ function handleReconnection(io: Server, socket: Socket, game: GameState, gameCod
     roomName: game.roomName,
     language: game.language,
     isPrivate: game.isPrivate || false,
+    visibility: game.visibility || 'public',
     reconnected: true,
     users: getGameUsers(gameCode)
   });

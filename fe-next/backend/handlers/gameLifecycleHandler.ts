@@ -4,7 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Language, Avatar } from '@/shared/types';
+import type { Language, Avatar, RoomVisibility } from '@/shared/types';
 import type { GameState } from '../modules/gameState/types.js';
 
 import {
@@ -97,6 +97,7 @@ interface CreateGamePayload {
   isPrivate?: boolean;
   isClassroom?: boolean;
   isQuickPlay?: boolean;
+  visibility?: RoomVisibility;
 }
 
 interface StartGameAckPayload {
@@ -156,7 +157,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate: requestedPrivate, isQuickPlay } = validation.data as CreateGamePayload;
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate: requestedPrivate, isQuickPlay, visibility: requestedVisibility } = validation.data as CreateGamePayload;
 
       // Ranked rooms: never trust client isRanked alone. Require explicit
       // server opt-in + a short-lived match ticket stamped by matchmaking
@@ -219,6 +220,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
       const { isClassroom, isPrivate } = classroomGate;
+      // A guest has no friends list, so "friends" fails closed to link-only.
+      const visibility: RoomVisibility = requestedVisibility === 'friends' && !getAuthUserId(socket) ? 'private' : requestedVisibility ?? 'public';
       const accountId = !isClassroom && inClassroomElsewhere(io, socket, authUserId, gameCode) ? undefined : authUserId;
 
       if (accountId) {
@@ -246,6 +249,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         isPrivate,
         isClassroom,
         isQuickPlay: isQuickPlay || false,
+        visibility,
         allowLateJoin: isRanked ? false : true
       });
 
@@ -280,6 +284,7 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         roomName: roomName || gameCode,
         language: roomLanguage,
         isPrivate,
+        visibility,
         users: getGameUsers(gameCode)
       });
 

@@ -27,6 +27,7 @@ import { AdvancedSettingsModal } from './pre-game/AdvancedSettingsModal';
 import { LobbyAudioButton } from './pre-game/LobbyAudioButton';
 import { DesktopLobbyLayout, InviteCard } from './pre-game/desktop';
 import { LobbyOnlineFriends } from '@/components/multiplayer/lobby/LobbyOnlineFriends';
+import { LobbyVisibilityChip } from '@/components/multiplayer/lobby/LobbyVisibilityChip';
 import TvTutorialOverlay from './tv-broadcast/TvTutorialOverlay';
 import { useHostLobby, LOBBY_MAX_PLAYERS, type HostLobbyPlayer } from '@/components/multiplayer/lobby/useHostLobby';
 import { HostStatusLane } from '@/components/multiplayer/lobby/HostStatusLane';
@@ -41,7 +42,7 @@ import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { cn } from '@/lib/utils';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import type { Language, LetterGrid, DifficultyLevel } from '@/shared/types/game';
+import type { Language, LetterGrid, DifficultyLevel, RoomVisibility } from '@/shared/types/game';
 import type { GameModeOption } from '@/components/GameModeSelector';
 
 const AvatarBuilderModal = dynamic(() => import('@/components/avatar/AvatarBuilderModal'), { ssr: false });
@@ -110,6 +111,7 @@ interface HostPreGameViewProps {
   onAvatarChange?: (config: CustomAvatarConfig) => void;
   /** Quick Play / classroom: no invite or share affordances. */
   isPrivate?: boolean;
+  roomVisibility?: RoomVisibility;
   /** Quick Play: auto-fill bots + start. */
   isQuickPlay?: boolean;
 }
@@ -122,7 +124,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   const {
     gameCode, roomLanguage, username, timerValue, setTimerValue, difficulty, setDifficulty, minWordLength, setMinWordLength,
     hostPlaying, setHostPlaying, playersReady, readyUsernames = [], readyTotal = 0, autoStartSecondsLeft = null, onCancelAutoStart,
-    onExitRoom, tournamentCreating, lessonData, onNameChange, onAvatarChange, isPrivate = false, isQuickPlay = false,
+    onExitRoom, tournamentCreating, lessonData, onNameChange, onAvatarChange, isPrivate = false, roomVisibility = 'public', isQuickPlay = false,
   } = props;
   const t = props.t as T;
   const lobby = useHostLobby({
@@ -157,6 +159,7 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
 
   // A classroom room's mode was fixed in the setup wizard: no picker here.
   const isClassroomRoom = Boolean(lessonData);
+  const invitePrimary = roomVisibility === 'private';
   const onlineFriends = !isPrivate && !isClassroomRoom && <LobbyOnlineFriends gameCode={gameCode} onMore={() => setSheet('invite')} />;
   const seats = lobbySeats(lobby.seatedPlayers, username, readyUsernames);
   // "Everyone's in" is the server's call (playersReadyUpdate totals), not a
@@ -273,7 +276,12 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           center={
             isPrivate
               ? <LobbyCountPill count={seats.length} max={lobbyMax(seats.length)} />
-              : <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[length:calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
+              : (
+                <div className="flex min-w-0 items-center justify-center gap-2">
+                  <MpRoomCode code={gameCode} size="chip" onCopy={() => setSheet('invite')} className="px-2 text-[24px] tracking-[0.1em] [&>svg]:hidden min-[720px]:text-[length:calc(28px*var(--mp-u,1))] min-[720px]:tracking-[0.2em] min-[720px]:[&>svg]:inline" />
+                  <LobbyVisibilityChip visibility={roomVisibility} t={t} />
+                </div>
+              )
           }
           end={
             <>
@@ -351,10 +359,17 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                 type="button"
                 onClick={() => setSheet('invite')}
                 data-testid="lobby-invite-button"
-                className="shrink-0 w-20 flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-cyan bg-neo-navy text-neo-cyan font-neo-display text-xs font-bold uppercase shadow-hard-sm hover:bg-neo-cyan/10 active:translate-y-0.5 active:shadow-none"
+                // A private room is never listed, so the link is the only way in.
+                data-primary={invitePrimary || undefined}
+                className={cn(
+                  'flex items-center justify-center rounded-neo border-3 font-neo-display font-bold uppercase shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+                  invitePrimary
+                    ? 'flex-1 min-w-0 gap-2 border-neo-black bg-neo-cyan text-neo-black text-sm'
+                    : 'shrink-0 w-20 flex-col gap-0.5 border-neo-cyan bg-neo-navy text-neo-cyan text-xs hover:bg-neo-cyan/10',
+                )}
               >
                 <UserPlus aria-hidden="true" className="w-6 h-6" />
-                {t('mpUi.lobby.invite')}
+                {t(invitePrimary ? 'mpUi.lobby.inviteTitle' : 'mpUi.lobby.invite')}
               </button>
             )}
             <div className="flex-1 min-w-0">{startButton}</div>

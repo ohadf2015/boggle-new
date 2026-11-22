@@ -226,6 +226,38 @@ describe('createGame on a non-classroom code', () => {
   });
 });
 
+describe('createGame room visibility', () => {
+  beforeEach(() => mockGetClassroomGame.mockResolvedValue(null));
+  const joinedPayload = (socket: ReturnType<typeof createSocket>) =>
+    socket.emit.mock.calls.find(([event]) => event === 'joined')?.[1];
+
+  it('Given an older client with no visibility, When the room is created, Then it is public', async () => {
+    const socket = createSocket();
+    await create(socket, {});
+    expect(createdOptions()).toMatchObject({ visibility: 'public' });
+    expect(joinedPayload(socket)).toMatchObject({ visibility: 'public' });
+  });
+
+  it('Given a signed-in host asking for friends only, When created, Then the room is friends only', async () => {
+    const socket = createSocket('user-1');
+    await create(socket, { visibility: 'friends', authUserId: 'user-1' });
+    expect(createdOptions()).toMatchObject({ visibility: 'friends' });
+    expect(joinedPayload(socket)).toMatchObject({ visibility: 'friends' });
+  });
+
+  it('Given a guest asking for friends only, When created, Then it falls back to link only, never public', async () => {
+    const socket = createSocket();
+    await create(socket, { visibility: 'friends', authUserId: 'forged-id' });
+    expect(createdOptions()).toMatchObject({ visibility: 'private' });
+  });
+
+  it('Given a private room, When created, Then the host is told it is private', async () => {
+    const socket = createSocket();
+    await create(socket, { visibility: 'private' });
+    expect(joinedPayload(socket)).toMatchObject({ visibility: 'private' });
+  });
+});
+
 describe('host reclaim on an existing classroom room', () => {
   it('still hands the seat back before any classroom record lookup', async () => {
     mockGameExists.mockReturnValue(true);

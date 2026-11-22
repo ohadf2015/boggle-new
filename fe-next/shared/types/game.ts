@@ -21,6 +21,9 @@ export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
  * - Standalone modes (daily / adventure / endless / drill / single player)
  *   which have their own local types in their respective modules.
  */
+/** Who can find a room: everyone (open games list), the host's friends, or only people with the code/link. */
+export type RoomVisibility = 'public' | 'friends' | 'private';
+
 export type GameMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush' | 'word-tower' | 'crossword' | 'wordcraft';
 export type GameModeSelection = GameMode | 'random';
 
@@ -230,6 +233,7 @@ export interface Game {
   isClassroom?: boolean;
   /** Quick Play made this room (the duo bot only joins these). */
   isQuickPlay?: boolean;
+  visibility?: RoomVisibility;
   allowLateJoin: boolean;
   createdAt: number;
   lastActivity: number;

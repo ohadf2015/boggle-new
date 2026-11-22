@@ -144,6 +144,7 @@ vi.mock('../entry/CreateSheet', () => ({
               avatarId: 'avatar-1',
               roomName: 'Test Room',
               language: defaultLanguage,
+              visibility: 'public',
             })
           }
         >
@@ -334,12 +335,9 @@ describe('MultiplayerFlow', () => {
         'en',
         expect.any(String),
         'Test Room',
-        'HostPlayer'
+        'HostPlayer',
+        { visibility: 'public' }
       );
-      // Default visibility = public: no isPrivate option ever passed
-      const createCalls = (defaultProps.handleJoin as ReturnType<typeof vi.fn>).mock.calls;
-      const opts = createCalls[createCalls.length - 1]?.[5];
-      expect(opts?.isPrivate).toBeUndefined();
     });
 
     it('should generate valid 6-character game code', async () => {

@@ -32,7 +32,7 @@ function ctx(overrides: Partial<MpRoomSocketContext> = {}): MpRoomSocketContext 
   return {
     language: 'en', gameCode: 'ABC123', username: 'me', roomName: '', isActive: false, isHost: false,
     roomLanguage: null, prefilledRoomCode: '', t: (k: string) => k,
-    setIsHost: noop, setIsActive: noop, setIsPrivate: noop, setError: noop, setIsJoining: noop,
+    setIsHost: noop, setIsActive: noop, setIsPrivate: noop, setRoomVisibility: noop, setError: noop, setIsJoining: noop,
     setShouldAutoJoin: noop, setPrefilledRoomCode: noop, setRoomLanguage: noop, setUsername: noop,
     setGameCode: noop, setRoomName: noop, setActiveRooms: noop, setIsSpectator: noop, setSpectators: noop,
     setPlayersInRoom: vi.fn(), setPlayersInRoomThrottled: Object.assign(vi.fn(), { cancel: vi.fn() }),
@@ -62,6 +62,15 @@ describe('useMpRoomSocket — onJoined seeds the roster', () => {
     captured!.onJoined({ gameCode: 'ABC123', isHost: true, username: 'me' });
     expect(c.setPlayersInRoom).not.toHaveBeenCalled();
     expect(c.setIsActive).toHaveBeenCalledWith(true);
+  });
+
+  it('Given joined says the room is private, Then the lobby is told; an older server defaults to public', () => {
+    const setRoomVisibility = vi.fn();
+    renderHook(() => useMpRoomSocket(ctx({ setRoomVisibility })));
+    captured!.onJoined({ gameCode: 'ABC123', isHost: true, username: 'me', visibility: 'private' });
+    expect(setRoomVisibility).toHaveBeenLastCalledWith('private');
+    captured!.onJoined({ gameCode: 'ABC123', isHost: true, username: 'me' });
+    expect(setRoomVisibility).toHaveBeenLastCalledWith('public');
   });
 
   it('updateUsers still flows through the throttle', () => {

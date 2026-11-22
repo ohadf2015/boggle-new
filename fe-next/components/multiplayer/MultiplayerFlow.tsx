@@ -6,7 +6,7 @@ import JoinRoomModal from './entry/JoinSheet';
 import CreateRoomModal from './entry/CreateSheet';
 import CgLobbyHero from './CgLobbyHero';
 import ArenaCTAStrip from './ArenaCTAStrip';
-import type { Language, ActiveRoom } from '@/shared/types/game';
+import type { Language, ActiveRoom, RoomVisibility } from '@/shared/types/game';
 import { getStoredUsername } from '@/utils/profileStorage';
 import ClassroomJoinNamePrompt from './ClassroomJoinNamePrompt';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -32,7 +32,7 @@ export interface MultiplayerFlowProps {
     gameCode?: string,
     roomName?: string,
     overrideUsername?: string,
-    options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; isRanked?: boolean },
+    options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; isRanked?: boolean; visibility?: RoomVisibility },
   ) => void;
   refreshRooms: () => void;
 
