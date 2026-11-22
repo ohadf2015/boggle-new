@@ -1579,6 +1579,7 @@ const sv = {
     "friendsPlay": "Spela med vänner",
     "friendsSub": "Skapa ett rum och dela koden",
     "quickGame": "Snabbspel med överraskningsläge",
+    "random": "Slumpa",
     "dailyDone": "Klart",
     "dailyNextIn": "Nästa pussel om {time}"
   },

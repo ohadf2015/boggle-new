@@ -1579,6 +1579,7 @@ const en = {
     "friendsPlay": "Play with friends",
     "friendsSub": "Make a room, share the code",
     "quickGame": "Quick game, surprise mode",
+    "random": "Random",
     "dailyDone": "Done",
     "dailyNextIn": "Next puzzle in {time}"
   },

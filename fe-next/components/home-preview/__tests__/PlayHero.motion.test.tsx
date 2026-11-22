@@ -34,7 +34,7 @@ describe('PlayHero motion', () => {
   it('given motion is on, then the action rows rise in a 70ms stagger using transform only', () => {
     renderHero();
     const e = entrances();
-    expect(e.map((c) => c.opts.delay)).toEqual([0, 70, 140]);
+    expect(e.map((c) => c.opts.delay)).toEqual([0, 70]);
     for (const c of e) for (const f of c.frames) expect(Object.keys(f).filter((k) => k !== 'offset')).toEqual(['transform']);
   });
 

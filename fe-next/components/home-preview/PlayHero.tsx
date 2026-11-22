@@ -221,7 +221,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           </div>
 
           <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
-            <div data-hero-row className="flex flex-col gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:gap-4">
+            <div data-hero-row>
               <Link
                 href={`/${lang}/multiplayer?autoCreate=true`}
                 data-testid="hp-play-friends"
@@ -237,36 +237,17 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                   <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t('homePlay.friendsSub')}</span>
                 </span>
               </Link>
-              <Link
-                href={`/${lang}/multiplayer`}
-                data-testid="hp-join-code"
-                onClick={() => trackLandingCtaClick('home_join_code')}
-                className={`flex h-10 items-center justify-center rounded-xl border-[3px] border-black bg-neo-cream px-3 text-center font-neo-display text-sm leading-tight font-bold text-black shadow-hard-sm ${PRESS} lg:h-auto lg:w-40 lg:rounded-3xl lg:text-lg`}
-              >
-                {t('homePlay.friendsJoin')}
-              </Link>
             </div>
 
             <div data-hero-row>
               <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} playedToday={playedToday} />
             </div>
 
-            <div data-hero-row>
-              <Link
-                href={playHref}
-                data-testid="hp-play"
-                onClick={handlePlayClick}
-                className={`flex h-[44px] items-center justify-center gap-2 rounded-2xl border-2 border-neo-lime px-3 text-neo-lime ${PRESS} lg:h-14`}
-              >
-                <RandomGlyph size={20} className="shrink-0 lg:h-7 lg:w-7" />
-                <span className="truncate font-neo-display text-[15px] font-bold lg:text-xl">{t('homePlay.quickGame')}</span>
-              </Link>
-            </div>
           </div>
 
           <div>
             <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
-            <ul className="grid grid-cols-4 gap-2.5 lg:gap-3" data-testid="hp-keycaps">
+            <ul className="grid grid-cols-5 gap-2 lg:gap-3" data-testid="hp-keycaps">
               {MODES.map((mode, i) => (
                 <li key={mode}>
                   <Link
@@ -277,12 +258,26 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                     style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}
                   >
                     <ModeGlyph mode={mode} size={30} className="lg:h-10 lg:w-10" />
-                    <span className="font-neo-display text-[13px] font-bold leading-none lg:text-base">
+                    <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">
                       {t(`quickPlay.solo.mode.${mode}`)}
                     </span>
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href={playHref}
+                  data-testid="hp-play"
+                  onClick={handlePlayClick}
+                  className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black bg-neo-yellow text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${KEY_TILT[MODES.length % KEY_TILT.length]} ${
+                    animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
+                  }`}
+                  style={animate ? { animationDelay: `${300 + MODES.length * 90}ms` } : undefined}
+                >
+                  <RandomGlyph size={30} className="lg:h-10 lg:w-10" />
+                  <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">{t('homePlay.random')}</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

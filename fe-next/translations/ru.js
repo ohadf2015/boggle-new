@@ -1581,6 +1581,7 @@ const ru = {
     "friendsPlay": "Играть с друзьями",
     "friendsSub": "Создай комнату и поделись кодом",
     "quickGame": "Быстрая игра, режим наугад",
+    "random": "Наугад",
     "dailyDone": "Готово",
     "dailyNextIn": "Новый пазл через {time}"
   },
