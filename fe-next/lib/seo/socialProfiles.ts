@@ -9,4 +9,6 @@ export const LEXICLASH_SAME_AS: readonly string[] = [
   'https://www.threads.com/@lexi.clash',
   'https://www.tiktok.com/@lexiclash',
   'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+  'https://make.rs/project/12379-lexiclash',
+  'https://www.indiexpo.net/en/games/lexiclash',
 ];
