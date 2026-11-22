@@ -8,6 +8,8 @@ const lang = vi.hoisted(() => ({ value: 'en' }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: lang.value, dir: 'ltr', t: (k: string) => k }),
 }));
+const setInGame = vi.hoisted(() => vi.fn());
+vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => setInGame }));
 vi.mock('@/hooks/useReducedMotion', () => ({ useReducedMotion: () => true }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({ playMatchFoundSound: vi.fn(), playErrorSound: vi.fn() }),
@@ -70,6 +72,25 @@ describe('BridgeTutorial — learn by doing', () => {
     expect(screen.getByTestId('tutorial-solved')).toBeTruthy();
     expect(gameListener).not.toHaveBeenCalled();
     window.removeEventListener('keydown', gameListener);
+  });
+
+  it('Given the lesson on a phone, Then the bottom nav is hidden like real play and restored after', () => {
+    setInGame.mockClear();
+    const { unmount } = render(<BridgeTutorial onDone={vi.fn()} />);
+    expect(setInGame).toHaveBeenLastCalledWith(true);
+    unmount();
+    expect(setInGame).toHaveBeenLastCalledWith(false);
+  });
+
+  it('Given a short phone, Then the riddle area shrinks and the keyboard with its submit bar stays outside it', () => {
+    render(<BridgeTutorial onDone={vi.fn()} />);
+    const root = screen.getByTestId('bridge-tutorial');
+    const area = screen.getByTestId('tutorial-play-area');
+    expect(root.className).toMatch(/\bflex-1\b/);
+    expect(root.className).toMatch(/\bmin-h-0\b/);
+    expect(area.className).toMatch(/\bmin-h-0\b/);
+    expect(area.contains(screen.getByTestId('bridge-stage'))).toBe(true);
+    expect(area.contains(screen.getByTestId('keyboard-submit-dock'))).toBe(false);
   });
 
   it('Given skip, Then the tutorial closes', () => {

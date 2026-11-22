@@ -85,4 +85,21 @@ describe('PuzzleCard — hint and wrong-answer layout', () => {
     expect(screen.getByTestId('puzzle-hint-row').className).toMatch(/min-h-/);
     expect(screen.queryByText(puzzle.hint as string)).toBeNull();
   });
+
+  it('Given a short phone, Then the stage area shrinks and clips before the keyboard dock is pushed off screen', () => {
+    renderCard({});
+    const area = screen.getByTestId('puzzle-play-area');
+    const dock = screen.getByTestId('keyboard-submit-dock');
+    expect(area.contains(screen.getByTestId('puzzle-stage'))).toBe(true);
+    expect(area.contains(screen.getByTestId('puzzle-hint-row'))).toBe(true);
+    expect(area.contains(dock)).toBe(false);
+    expect(area.className).toMatch(/\bmin-h-0\b/);
+    expect(area.className).toMatch(/\bflex-1\b/);
+    expect(area.className).toMatch(/\boverflow-y-clip\b/);
+  });
+
+  it('Given a very short host, Then the unrevealed hint row stops reserving space', () => {
+    renderCard({ hintRevealed: false });
+    expect(screen.getByTestId('puzzle-hint-row').className).toContain('[@container(max-height:36rem)]:min-h-0');
+  });
 });

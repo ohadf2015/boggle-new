@@ -64,6 +64,11 @@ describe('PyramidHeader on short phones', () => {
     expect(rank.textContent).toBe('rank');
   });
 
+  it('drops the daily heading on the shortest phones so the keyboard dock stays on screen', () => {
+    render(<PyramidHeader daily state={initPyramidState(pyramid as never)} metaAnswer="STONE" />);
+    expect(screen.getByTestId('daily-quest-heading').className).toContain('[@container(height<=36rem)]:hidden');
+  });
+
   it('renders no empty rank wrapper when there is no rank', () => {
     render(<PyramidHeader state={initPyramidState(pyramid as never)} metaAnswer="STONE" />);
     expect(screen.queryByTestId('pyramid-rank-slot')).toBeNull();

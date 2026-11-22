@@ -29,7 +29,7 @@ export default function PyramidHeader({ state, metaAnswer, className, testId, ra
       {showTitle &&
         (daily ? (
           // pe-10: the global in-game mute button floats over the inline-end corner.
-          <DailyQuestHeading className="pe-10" />
+          <DailyQuestHeading className="pe-10 [@container(height<=36rem)]:hidden" />
         ) : (
           <h1 className="text-center font-neo-display text-lg font-black text-neo-white">{t('connections.pyramid.title')}</h1>
         ))}

@@ -6,6 +6,7 @@ import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { checkGuess } from '@/lib/connections/gameLogic';
 import { appendLetter, backspace, normalizeTypedChar } from '@/lib/connections/keyboard';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
@@ -38,6 +39,11 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
   const [misses, setMisses] = useState(0);
   const solved = status === 'correct';
   const isRTL = language === 'he';
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const submit = useCallback(() => {
     if (solved || input.trim().length === 0) return;
@@ -96,7 +102,7 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
     <section
       data-testid="bridge-tutorial"
       dir={isRTL ? 'rtl' : 'ltr'}
-      className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 pb-6 pt-2"
+      className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-2 [@media(max-height:700px)]:gap-2"
     >
       <header className="flex items-center justify-between gap-2">
         <h1 className="font-neo-display text-2xl font-black text-neo-white">{t('daily.howToPlay')}</h1>
@@ -133,56 +139,60 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
       <m.div
         animate={shake}
         className={cn(
-          'rounded-neo border-neo-thick bg-neo-navy-light px-3 pb-4 pt-4 shadow-hard transition-colors duration-200',
+          'flex min-h-0 flex-1 flex-col rounded-neo border-neo-thick bg-neo-navy-light px-3 pb-3 pt-3 shadow-hard transition-colors duration-200',
           solved ? 'border-neo-lime' : status === 'wrong' ? 'border-neo-red' : 'border-neo-cream/40',
         )}
       >
-        <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={solved} isGaveUp={false}>
-          {typing.needsIME ? (
-            <p className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream">
-              {solved ? puzzle.bridge : input || <span className="text-neo-cream/40">?</span>}
-            </p>
-          ) : (
-            <AnswerSlots
-              value={slotsValue}
-              slotCount={typing.slotCap}
-              state={solved ? 'correct' : status === 'wrong' ? 'wrong' : 'idle'}
-              dir={isRTL ? 'rtl' : 'ltr'}
-              label={t('connections.placeholder')}
-            />
-          )}
-        </BridgeStage>
+        <div data-testid="tutorial-play-area" className="flex min-h-0 flex-1 flex-col overflow-y-clip">
+          <div className="relative flex min-h-0 flex-1 flex-col justify-center-safe" style={{ containerType: 'size' }}>
+            <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={solved} isGaveUp={false}>
+              {typing.needsIME ? (
+                <p className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream">
+                  {solved ? puzzle.bridge : input || <span className="text-neo-cream/40">?</span>}
+                </p>
+              ) : (
+                <AnswerSlots
+                  value={slotsValue}
+                  slotCount={typing.slotCap}
+                  state={solved ? 'correct' : status === 'wrong' ? 'wrong' : 'idle'}
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  label={t('connections.placeholder')}
+                />
+              )}
+            </BridgeStage>
+          </div>
 
-        <div className="mt-3 flex min-h-[2rem] items-center justify-center gap-3" aria-live="polite">
-          {status === 'wrong' && <p className="text-sm font-bold text-neo-red">{t('connections.tutorial.tryAgain')}</p>}
-          {!solved && misses >= SHOW_ME_AFTER && (
-            <button
-              type="button"
-              data-testid="tutorial-show-me"
-              onClick={showMe}
-              className="text-sm font-black text-neo-cyan underline underline-offset-2"
-            >
-              {t('connections.tutorial.showMe')}
-            </button>
-          )}
-          {solved && (
-            <m.p
-              data-testid="tutorial-solved"
-              initial={reduced ? false : { scale: 0.6 }}
-              animate={{ scale: 1 }}
-              transition={SPRING_PRESETS.bouncy}
-              className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
-            >
-              {t('connections.correct')}
-              <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
-            </m.p>
-          )}
+          <div className="mt-3 flex min-h-[2rem] items-center justify-center gap-3" aria-live="polite">
+            {status === 'wrong' && <p className="text-sm font-bold text-neo-red">{t('connections.tutorial.tryAgain')}</p>}
+            {!solved && misses >= SHOW_ME_AFTER && (
+              <button
+                type="button"
+                data-testid="tutorial-show-me"
+                onClick={showMe}
+                className="text-sm font-black text-neo-cyan underline underline-offset-2"
+              >
+                {t('connections.tutorial.showMe')}
+              </button>
+            )}
+            {solved && (
+              <m.p
+                data-testid="tutorial-solved"
+                initial={reduced ? false : { scale: 0.6 }}
+                animate={{ scale: 1 }}
+                transition={SPRING_PRESETS.bouncy}
+                className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
+              >
+                {t('connections.correct')}
+                <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+              </m.p>
+            )}
+          </div>
+
+          {solved && <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect />}
         </div>
 
-        {solved && <BridgeSolveReveal puzzle={puzzle} language={language} isCorrect />}
-
         {!solved && (
-          <div className="mt-2">
+          <div className="mt-2 shrink-0">
             {typing.needsIME ? (
               <div className="flex flex-col gap-3">
                 <input
@@ -228,7 +238,7 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
           initial={reduced ? false : { scale: 0.85, y: 8 }}
           animate={{ scale: 1, y: 0 }}
           transition={{ ...SPRING_PRESETS.bouncy, delay: 0.35 }}
-          className="rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3.5 font-neo-display text-lg font-black text-neo-black shadow-hard"
+          className="shrink-0 rounded-neo border-3 border-neo-black bg-neo-lime px-5 py-3.5 font-neo-display text-lg font-black text-neo-black shadow-hard"
         >
           {t('connections.tutorial.start')}
         </m.button>

@@ -23,6 +23,11 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({}),
 }));
 
+const mockInGame = vi.fn(() => false);
+vi.mock('@/contexts/NavigationContext', () => ({
+  useNavigation: () => ({ isInGame: mockInGame() }),
+}));
+
 // Render next/script as a plain tag so we can assert it mounts.
 vi.mock('next/script', () => ({
   // data-src (not src) so the @next/next/no-sync-scripts lint rule doesn't fire on the mock
@@ -36,6 +41,7 @@ describe('GoogleOneTapInitializer', () => {
     mockIsNative.mockReturnValue(false);
     mockUseAuth.mockReturnValue({ user: null, isAuthenticated: false });
     mockPathname.mockReturnValue('/en/how-to-play');
+    mockInGame.mockReturnValue(false);
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', 'https://x.supabase.co');
     vi.stubEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY', 'anon');
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid-123.apps.googleusercontent.com');
@@ -125,6 +131,24 @@ describe('GoogleOneTapInitializer', () => {
       new CustomEvent('lexiclash:signup-prompt-active', { detail: { active: true } }),
     );
     expect(cancel).toHaveBeenCalledTimes(1);
+    delete (window as unknown as { google?: unknown }).google;
+  });
+
+  it('Given a round is being played, Then One Tap is not loaded over the board', () => {
+    mockInGame.mockReturnValue(true);
+    render(<GoogleOneTapInitializer />);
+    expect(screen.queryByTestId('gsi-script')).toBeNull();
+  });
+
+  it('Given One Tap is showing, When a round starts, Then the prompt is cancelled', () => {
+    const cancel = vi.fn();
+    (window as unknown as { google: { accounts: { id: { cancel: typeof cancel } } } }).google = {
+      accounts: { id: { cancel } },
+    };
+    const { rerender } = render(<GoogleOneTapInitializer />);
+    mockInGame.mockReturnValue(true);
+    rerender(<GoogleOneTapInitializer />);
+    expect(cancel).toHaveBeenCalled();
     delete (window as unknown as { google?: unknown }).google;
   });
 });
