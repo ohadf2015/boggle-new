@@ -78,6 +78,7 @@ export function LevelUpCelebration({
   const containerRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
   const timelineRef = useRef<{ kill: () => void } | null>(null);
+  const dismissTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [phase, setPhase] = useState<'flash' | 'badge' | 'reveal' | 'rewards' | 'done'>('flash');
 
   // Get icon based on level milestone
@@ -98,7 +99,8 @@ export function LevelUpCelebration({
         onComplete: () => {
           setPhase('done');
           if (autoDismissAfter > 0 && onDismiss) {
-            setTimeout(onDismiss, autoDismissAfter - 2500);
+            clearTimeout(dismissTimerRef.current);
+            dismissTimerRef.current = setTimeout(onDismiss, autoDismissAfter - 2500);
           }
         },
       });
@@ -187,6 +189,7 @@ export function LevelUpCelebration({
     }); // end dynamic import
 
     return () => {
+      clearTimeout(dismissTimerRef.current);
       ctx?.revert();
       timelineRef.current?.kill();
     };
@@ -251,14 +254,12 @@ export function LevelUpCelebration({
             'fixed inset-0 z-60 flex items-center justify-center',
             className
           )}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
           onClick={onDismiss}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-neo-black/85 backdrop-blur-xs" />
+          <div className="absolute inset-0 bg-neo-navy" />
 
           {/* Flash overlay */}
           <div
@@ -281,7 +282,12 @@ export function LevelUpCelebration({
           )}
 
           {/* Main content */}
-          <div className="relative z-10 text-center px-4">
+          <m.div
+            className="relative z-10 text-center px-4"
+            initial={prefersReducedMotion ? false : { y: 24, scale: 0.96 }}
+            animate={{ y: 0, scale: 1 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
             {/* Badge container */}
             <div ref={badgeRef} className="level-badge relative inline-block mb-6">
               {/* Rotating ring */}
@@ -379,7 +385,7 @@ export function LevelUpCelebration({
               className="text-neo-white text-sm mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 2 }}
+              transition={{ delay: 1 }}
             >
               {t('common.tapToContinue')}
             </m.p>
@@ -396,7 +402,7 @@ export function LevelUpCelebration({
                 />
               </div>
             )}
-          </div>
+          </m.div>
         </m.div>
       )}
     </AnimatePresence>
