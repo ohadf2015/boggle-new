@@ -21,6 +21,12 @@ const KEYWORDS =
  * hero highlights the middle one. The rendered characters are identical — only
  * which phrase carries the block colour changes.
  */
+function proseSection(answer?: { heading: string; paragraphs: string[] }) {
+  if (!answer) return [];
+  const { heading: title, paragraphs } = answer;
+  return [{ kind: 'prose' as const, title, paragraphs }];
+}
+
 export function getEslWordGamesLanding(locale: string): EducationLandingContent {
   const c = getEslWordGamesContent(locale);
   const bc = educationBreadcrumbLabels(locale);
@@ -47,6 +53,7 @@ export function getEslWordGamesLanding(locale: string): EducationLandingContent 
       subtitle: c.heroSubtitle,
     },
     sections: [
+      ...proseSection(c.vocabAnswer),
       { kind: 'playable', title: playableCopy(locale).title, intro: playableCopy(locale).intro },
       { kind: 'classgames', section: getEslClassGames(locale) },
       { kind: 'features', title: c.sections.builtFor, items: c.features },

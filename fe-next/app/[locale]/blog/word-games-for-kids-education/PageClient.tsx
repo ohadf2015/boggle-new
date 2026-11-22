@@ -193,7 +193,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
                   <span className="mt-2 block text-xs text-neo-navy/80">No signup, 6 languages, free to start.</span>
                 </Link>
                 <Link href={`/${locale}/education/esl-word-games`} className="group rounded-neo border-3 border-neo-black bg-neo-pink p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">ESL Word Games Online</span>
+                  <span className="block font-neo-display text-sm font-black uppercase tracking-widest text-neo-white">ESL Vocabulary Games Online</span>
                   <span className="mt-2 block text-xs text-neo-white">Three levels, 6 dictionaries, no student accounts.</span>
                 </Link>
                 <Link href={`/${locale}/education/games-for-teachers`} className="group rounded-neo border-3 border-neo-black bg-neo-purple p-4 shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
