@@ -70,7 +70,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
   }, [avatar, t, onAvatarSaved]);
 
   return (
-    <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[440px] 2xl:h-[520px]">
+    <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[300px] 2xl:h-[340px]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
         <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={loop} compact />
       </div>
@@ -91,19 +91,19 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
             <div
               ref={avatar ? avatarSlotCallback : undefined}
               data-testid="hp-avatar-slot"
-              className="h-[108px] w-[108px] lg:h-[260px] lg:w-[260px] 2xl:h-[300px] 2xl:w-[300px]"
+              className="h-[108px] w-[108px] lg:h-[190px] lg:w-[190px] 2xl:h-[220px] 2xl:w-[220px]"
             />
           </div>
         </div>
         <span
           aria-hidden="true"
-          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-48 ${
+          className={`absolute -bottom-2 left-1/2 -z-10 h-3 w-20 -translate-x-1/2 rounded-[50%] bg-black/45 lg:w-36 ${
             loop ? 'animate-[qp-shadow-bob_2.8s_ease-in-out_0.9s_infinite]' : ''
           }`}
         />
         <span
           aria-hidden="true"
-          className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[84px] lg:bottom-0 2xl:-start-[96px]"
+          className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[60px] lg:bottom-0 2xl:-start-[70px]"
         >
           <span className={`block ${loop ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
             <Image
@@ -114,7 +114,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
               data-testid="hp-mascot"
               loading="eager"
               unoptimized
-              className="h-[64px] w-[64px] drop-shadow-[0_3px_0_black] lg:h-[136px] lg:w-[136px] 2xl:h-[160px] 2xl:w-[160px]"
+              className="h-[64px] w-[64px] drop-shadow-[0_3px_0_black] lg:h-[96px] lg:w-[96px] 2xl:h-[112px] 2xl:w-[112px]"
             />
           </span>
         </span>
@@ -123,7 +123,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
         // The pencil sits just outside the face's lower-end rim, never on it. On a
         // short phone the avatar renders at 0.7 (its circle is inset ~16px in the
         // unscaled box), so the badge steps in with it, still outside the circle.
-        <div className="absolute -end-3 -bottom-3 z-20 [@media(max-height:700px)]:end-0 [@media(max-height:700px)]:bottom-0 lg:-end-4 lg:bottom-6">
+        <div className="absolute -end-3 -bottom-3 z-20 [@media(max-height:700px)]:end-0 [@media(max-height:700px)]:bottom-0 lg:-end-24 lg:-bottom-7">
           <div ref={editSlotCallback} data-testid="hp-edit-avatar-slot" />
         </div>
       )}
@@ -131,7 +131,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
       <span
         aria-hidden="true"
         data-testid="hp-timer-badge"
-        className="absolute end-[10%] top-2 z-20 rotate-6 whitespace-nowrap rounded-full border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display text-sm font-bold leading-none text-black shadow-hard-sm lg:end-[12%] lg:top-[14%] lg:border-[3px] lg:px-4 lg:py-2 lg:text-2xl lg:shadow-hard"
+        className="absolute end-[10%] top-2 z-20 rotate-6 whitespace-nowrap rounded-full border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display text-sm font-bold leading-none text-black shadow-hard-sm lg:end-[14%] lg:top-[10%] lg:border-[3px] lg:px-3 lg:py-1.5 lg:text-xl lg:shadow-hard"
       >
         {t('homePlay.timerBadge')}
       </span>
@@ -179,81 +179,68 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
       className="relative overflow-hidden border-b-[3px] border-black lg:rounded-[28px] lg:border-[3px] lg:bg-neo-navy-elevated lg:shadow-hard-xl"
       data-testid="hp-hero"
     >
-      <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-10 lg:px-14 lg:py-10">
+      <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-8 lg:px-12 lg:py-7">
         <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
 
-        <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-6">
+        <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-4">
           <div className="text-center lg:text-start">
-            <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-lg">
+            <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-base">
               {greeting}
             </p>
             <h1
               id="hp-play-title"
-              className="mt-0.5 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-5xl 2xl:text-6xl"
+              className="mt-0.5 font-neo-display text-[21px] font-bold [@media(max-height:700px)]:text-[19px] leading-[1.15] text-neo-cream [text-shadow:0_2px_0_black] lg:text-4xl 2xl:text-5xl"
             >
               {t('homePlay.heroLine')}
             </h1>
-            <p className="mx-auto mt-1 max-w-sm text-[13px] leading-snug text-neo-white/70 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-4 lg:max-w-xl lg:text-lg">
+            <p className="mx-auto mt-1 max-w-sm text-[13px] leading-snug text-neo-white/70 [@media(max-height:700px)]:text-xs lg:mx-0 lg:mt-2 lg:max-w-xl lg:text-base">
               {t('homePlay.intro')}
             </p>
           </div>
 
-          <Link
-            href={playHref}
-            data-testid="hp-play"
-            onClick={handlePlayClick}
-            className="group relative flex h-[58px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[52px] overflow-hidden rounded-2xl border-[3px] border-black bg-neo-lime px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-24 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-28"
-          >
-            {loop && (
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-white/45 animate-[qp-shine_4s_ease-in-out_1.6s_infinite_both]"
-              />
-            )}
-            <RandomGlyph size={28} className="relative shrink-0 lg:h-12 lg:w-12" />
-            <span className="relative flex flex-col items-start leading-none">
-              <span className="font-neo-display text-[24px] font-bold tracking-[0.1em] lg:text-4xl">
+          {/* Today's puzzle leads: the daily habit is the one tap we want most. */}
+          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} shine={loop} />
+
+          <div className="grid grid-cols-2 gap-2.5 lg:gap-4">
+            <Link
+              href={playHref}
+              data-testid="hp-play"
+              onClick={handlePlayClick}
+              className="flex h-[52px] items-center justify-center gap-2 rounded-2xl border-[3px] border-neo-lime bg-neo-navy-elevated px-3 text-neo-lime shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed [@media(max-height:700px)]:h-[46px] lg:h-16 lg:gap-3 lg:shadow-hard"
+            >
+              <RandomGlyph size={22} className="shrink-0 lg:h-8 lg:w-8" />
+              <span className="truncate font-neo-display text-[17px] font-bold tracking-[0.06em] lg:text-2xl">
                 {t('quickPlay.solo.play')}
               </span>
-              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-70 lg:text-base">{t('homePlay.playSub')}</span>
-            </span>
-          </Link>
+            </Link>
 
-          {/* Multiplayer sits right under PLAY, same button family, so the hero
-              reads as two ways to play: alone now, or live with friends. */}
-          <Link
-            href={`/${lang}/multiplayer`}
-            data-testid="hp-play-friends"
-            onClick={() => trackLandingCtaClick('home_play_friends')}
-            className="relative flex h-[54px] items-center justify-center gap-3 [@media(max-height:700px)]:h-[48px] rounded-2xl border-[3px] border-black bg-neo-pink px-4 text-black shadow-hard active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:h-20 lg:rounded-3xl lg:shadow-hard-lg 2xl:h-24"
-          >
-            <Users className="h-6 w-6 shrink-0 lg:h-10 lg:w-10" strokeWidth={2.75} aria-hidden="true" />
-            <span className="flex flex-col items-start leading-none">
-              <span className="font-neo-display text-[19px] font-bold tracking-[0.04em] lg:text-3xl">
+            <Link
+              href={`/${lang}/multiplayer`}
+              data-testid="hp-play-friends"
+              onClick={() => trackLandingCtaClick('home_play_friends')}
+              className="flex h-[52px] items-center justify-center gap-2 rounded-2xl border-[3px] border-black bg-neo-pink px-3 text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed [@media(max-height:700px)]:h-[46px] lg:h-16 lg:gap-3 lg:shadow-hard"
+            >
+              <Users className="h-5 w-5 shrink-0 lg:h-8 lg:w-8" strokeWidth={2.75} aria-hidden="true" />
+              <span className="text-center font-neo-display text-[15px] font-bold leading-tight lg:text-2xl">
                 {t('homePlay.friendsPlay')}
               </span>
-              {/* opacity-80, not 70: black at 70% on the pink fill is 4.2:1, under AA for 12px text. */}
-              <span className="mt-0.5 text-xs font-bold tracking-wide opacity-80 lg:text-base">{t('homePlay.friendsPlaySub')}</span>
-            </span>
-          </Link>
-
-          {/* Daily puzzle: one tap, right under the two ways to play. */}
-          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} />
+            </Link>
+          </div>
 
           <div>
             <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
-            <ul className="grid grid-cols-4 gap-2.5 lg:gap-4" data-testid="hp-keycaps">
+            <ul className="grid grid-cols-4 gap-2.5 lg:gap-3" data-testid="hp-keycaps">
               {MODES.map((mode, i) => (
                 <li key={mode}>
                   <Link
                     href={quickPlayHref(lang, mode)}
-                    className={`flex aspect-square flex-col items-center justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
+                    className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
                       animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
                     }`}
                     style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}
                   >
-                    <ModeGlyph mode={mode} size={30} className="lg:h-14 lg:w-14" />
-                    <span className="font-neo-display text-[13px] font-bold leading-none lg:text-xl">
+                    <ModeGlyph mode={mode} size={30} className="lg:h-10 lg:w-10" />
+                    <span className="font-neo-display text-[13px] font-bold leading-none lg:text-base">
                       {t(`quickPlay.solo.mode.${mode}`)}
                     </span>
                   </Link>
