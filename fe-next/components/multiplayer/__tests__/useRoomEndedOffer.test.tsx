@@ -58,6 +58,16 @@ describe('useRoomEndedOffer', () => {
     expect(consumeRoomEndedRecoveryAccepted()).toBe(true);
   });
 
+  it('GIVEN the player typed the code THEN says no room has that code (a typo reads the same as an ended room) and resets the flag', () => {
+    const typedCodeRef = { current: true };
+    renderHook(() => useRoomEndedOffer({ offer: { seq: 1 }, onShown: vi.fn(), onPlayNow: vi.fn(), t, typedCodeRef }));
+    const renderToast = toast.mock.calls[0][0] as (tt: { id: string }) => React.ReactElement;
+    render(renderToast({ id: 'toast-1' }));
+    expect(screen.getByText('multiplayerFlow.roomEnded.noRoom')).toBeTruthy();
+    expect(screen.queryByText('multiplayerFlow.roomEnded.line')).toBeNull();
+    expect(typedCodeRef.current).toBe(false);
+  });
+
   it('GIVEN a second dead room THEN shows the offer again', () => {
     const view = renderHook((p: Props) => useRoomEndedOffer({ offer: p.offer, onShown: vi.fn(), onPlayNow: vi.fn(), t }), {
       initialProps: { offer: { seq: 1 } },

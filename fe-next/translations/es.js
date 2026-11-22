@@ -4995,7 +4995,8 @@ const es = {
     "roomTimedOut": "Tu sala expiró. Volviendo al lobby.",
     "roomEnded": {
       "line": "Esa sala ya terminó. ¿Te unes a una partida nueva?",
-      "playNow": "Jugar ya"
+      "playNow": "Jugar ya",
+      "noRoom": "No hay ninguna sala con ese código, o ya terminó. Revisa el código e inténtalo de nuevo."
     },
     "rejoinedRoom": "¡De vuelta! Reconectado a la sala {code}",
     "rejoinedGame": "¡De vuelta al juego!",

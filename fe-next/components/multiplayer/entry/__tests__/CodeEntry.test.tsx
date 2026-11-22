@@ -80,14 +80,14 @@ describe('CodeEntry', () => {
     boxes().forEach((b) => expect(b).toBeDisabled());
   });
 
-  it('a join that fails (busy ends while still on entry) clears the boxes and refocuses the first', () => {
+  it('a join that fails (busy ends while still on entry) keeps the typed code and focuses the last box to fix a character', () => {
     const onSubmit = vi.fn();
     const { rerender } = render(<CodeEntry onSubmit={onSubmit} />);
     paste(boxes()[0], 'XWUCT4');
     rerender(<CodeEntry onSubmit={onSubmit} busy />);
     rerender(<CodeEntry onSubmit={onSubmit} busy={false} />);
-    expect(boxes().map((b) => b.value).join('')).toBe('');
-    expect(document.activeElement).toBe(boxes()[0]);
+    expect(boxes().map((b) => b.value).join('')).toBe('XWUCT4');
+    expect(document.activeElement).toBe(boxes()[5]);
   });
 
   it('labels every box for screen readers', () => {
@@ -120,7 +120,7 @@ describe('CodeEntry', () => {
     inside.focus();
     rerender(<CodeEntry onSubmit={onSubmit} busy />);
     rerender(<CodeEntry onSubmit={onSubmit} busy={false} />);
-    expect(boxes().map((b) => b.value).join('')).toBe('');
+    expect(boxes().map((b) => b.value).join('')).toBe('XWUCT4');
     expect(document.activeElement).toBe(inside);
     dialog.remove();
   });
@@ -131,7 +131,7 @@ describe('CodeEntry', () => {
     for (const box of boxes()) expect(box.getAttribute('aria-describedby')).toBe(hint.id);
   });
 
-  it('a failed join on a touch screen clears the boxes without popping the keyboard back up', () => {
+  it('a failed join on a touch screen keeps the boxes without popping the keyboard back up', () => {
     const matchMedia = vi.spyOn(window, 'matchMedia').mockImplementation(
       (q: string) => ({ matches: q.includes('coarse'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList,
     );
@@ -141,7 +141,7 @@ describe('CodeEntry', () => {
     (document.activeElement as HTMLElement | null)?.blur();
     rerender(<CodeEntry onSubmit={onSubmit} busy />);
     rerender(<CodeEntry onSubmit={onSubmit} busy={false} />);
-    expect(boxes().map((b) => b.value).join('')).toBe('');
+    expect(boxes().map((b) => b.value).join('')).toBe('XWUCT4');
     expect(boxes()).not.toContain(document.activeElement);
     matchMedia.mockRestore();
   });

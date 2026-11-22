@@ -5297,7 +5297,8 @@ const sv = {
     "roomTimedOut": "Ditt rum gick ut. Tillbaka till lobbyn.",
     "roomEnded": {
       "line": "Det rummet har avslutats. Hoppa in i ett nytt spel?",
-      "playNow": "Spela nu"
+      "playNow": "Spela nu",
+      "noRoom": "Inget rum har den koden, eller så har det avslutats. Kolla koden och försök igen."
     },
     "rejoinedRoom": "Du är tillbaka i rum {code}",
     "rejoinedGame": "Tillbaka i spelet!",

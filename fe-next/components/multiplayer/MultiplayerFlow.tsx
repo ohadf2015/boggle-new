@@ -113,7 +113,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = (props) => {
   const { variant: rankedFlag } = useExperiment('ranked-public-v1');
   const [showRankedAuth, setShowRankedAuth] = useState(false);
   const s = useMultiplayerFlowState(props);
-  useRoomEndedOffer({ offer: props.roomEndedOffer ?? null, onShown: props.onRoomEndedOfferShown, onPlayNow: s.handleQuickPlay, t });
+  useRoomEndedOffer({ offer: props.roomEndedOffer ?? null, onShown: props.onRoomEndedOfferShown, onPlayNow: s.handleQuickPlay, t, typedCodeRef: s.typedCodeRef });
   const {
     refreshRooms, activeRooms, roomsLoading, isJoining, isAuthenticated, displayName, prefilledRoom,
     defaultLanguage, waitingForTeacher, profileAvatar, header,
