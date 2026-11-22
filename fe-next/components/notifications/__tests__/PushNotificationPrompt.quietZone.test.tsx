@@ -52,9 +52,13 @@ vi.mock('@/hooks/useConsentDecided', () => ({ useConsentDecided: () => true }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 
 import { PushNotificationPrompt } from '../PushNotificationPrompt';
+import { incrementGamesPlayed } from '@/utils/pushNotifications/categoryPreferences';
+
+const finishGame = () => act(() => { incrementGamesPlayed(); });
 
 describe('PushNotificationPrompt — overlay quiet zone', () => {
   beforeEach(() => {
+    sessionStorage.clear();
     vi.useFakeTimers();
     resetOverlayQuietZoneForTests();
     mockShouldShow.mockReturnValue(true);
@@ -68,6 +72,7 @@ describe('PushNotificationPrompt — overlay quiet zone', () => {
 
   it('shows when nothing is being covered (control)', () => {
     render(<PushNotificationPrompt />);
+    finishGame();
     expect(screen.getByText('notifications.prompt.enable')).toBeInTheDocument();
   });
 
@@ -84,6 +89,7 @@ describe('PushNotificationPrompt — overlay quiet zone', () => {
   it('evaluates again once the zone clears', () => {
     const release = claimOverlayQuietZone('classroom-results');
     render(<PushNotificationPrompt />);
+    finishGame();
     expect(screen.queryByText('notifications.prompt.enable')).not.toBeInTheDocument();
 
     act(() => {

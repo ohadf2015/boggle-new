@@ -1,4 +1,5 @@
 import { redialSocket } from '@/lib/multiplayer/redialSocket';
+import { sendTeacherControl } from '@/lib/education/sendTeacherControl';
 /**
  * Socket.IO connection and event handling for multiplayer games
  * Manages connection lifecycle, room events, and error handling
@@ -539,7 +540,7 @@ export function useMultiplayerSocket(
     // Host-only: an authorized control that could not be applied (already
     // paused, no alternative target, …). Silent no-ops are pitfall #4.
     listen('teacherControlRejected', () => {
-      toast.error(optionsRef.current.t('education.liveControls.controlFailedToast'), { duration: 3000 });
+      toast.error(optionsRef.current.t('education.liveControls.controlFailedToast'), { id: 'teacher-control-rejected', duration: 3000 });
     });
 
     // ---- Classroom differentiation: per-socket, emitted from the server `join`
@@ -793,11 +794,16 @@ export function useMultiplayerSocket(
   // ---- Teacher live controls (host, classroom rooms) ----
   // Authorization lives server-side (host + isClassroom); these are thin emitters.
   const isPaused = useTeacherPaused();
-  const pauseGame = useCallback(() => { socketRef.current?.emit('pauseGame'); }, []);
-  const resumeGame = useCallback(() => { socketRef.current?.emit('resumeGame'); }, []);
-  const extendTime = useCallback((seconds: number) => { socketRef.current?.emit('extendTime', { seconds }); }, []);
-  const endRoundNow = useCallback(() => { socketRef.current?.emit('endRoundNow'); }, []);
-  const skipTargetWord = useCallback(() => { socketRef.current?.emit('skipTargetWord'); }, []);
+  const sendControl = useCallback((event: string, payload?: unknown) => {
+    sendTeacherControl(socketRef.current, event, payload, () => {
+      toast.error(optionsRef.current.t('education.liveControls.offlineToast'), { id: 'teacher-control-offline', duration: 3000 });
+    });
+  }, []);
+  const pauseGame = useCallback(() => sendControl('pauseGame'), [sendControl]);
+  const resumeGame = useCallback(() => sendControl('resumeGame'), [sendControl]);
+  const extendTime = useCallback((seconds: number) => sendControl('extendTime', { seconds }), [sendControl]);
+  const endRoundNow = useCallback(() => sendControl('endRoundNow'), [sendControl]);
+  const skipTargetWord = useCallback(() => sendControl('skipTargetWord'), [sendControl]);
 
   return {
     socket,

@@ -16527,7 +16527,8 @@ const es = {
       "pausedBodyHost": "La clase está en pausa. Toca Reanudar cuando quieras continuar.",
       "timeAddedToast": "Tu profe añadió {{seconds}} segundos",
       "wordSkippedToast": "Tu profe eligió una palabra nueva para buscar",
-      "controlFailedToast": "No se pudo hacer eso ahora mismo"
+      "controlFailedToast": "No se pudo hacer eso ahora mismo",
+      "offlineToast": "Sin conexión. Vuelve a intentarlo cuando vuelvas a estar en línea."
     },
     "wordBank": {
       "title": "Banco de palabras ({{count}})",

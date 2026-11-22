@@ -15,6 +15,7 @@ import {
 import { FIRST_WIN_PROMPT_PENDING_KEY } from '@/lib/retention/firstWin';
 
 const GAMES_PLAYED_KEY = 'lexiclash_games_played';
+const PLAYED_THIS_VISIT_KEY = 'lexiclash_played_this_visit';
 
 /**
  * Load category preferences from localStorage
@@ -148,12 +149,23 @@ export function incrementGamesPlayed(): void {
   try {
     const current = parseInt(localStorage.getItem(GAMES_PLAYED_KEY) || '0', 10);
     localStorage.setItem(GAMES_PLAYED_KEY, String(current + 1));
+    sessionStorage.setItem(PLAYED_THIS_VISIT_KEY, '1');
   } catch {
     // localStorage not available
   }
   // Let a mounted PushNotificationPrompt re-check the threshold now —
   // its own mount effect only ran once, before this game was played.
   window.dispatchEvent(new Event(GAMES_PLAYED_EVENT));
+}
+
+/** The prompt unmounts during a round, so "a game finished this visit" lives in the tab session. */
+export function playedThisVisit(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return sessionStorage.getItem(PLAYED_THIS_VISIT_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 export function dismissPushPrompt(): void {

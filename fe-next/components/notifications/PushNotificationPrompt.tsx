@@ -22,6 +22,8 @@ import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { FIRST_WIN_EVENT } from '@/lib/retention/firstWin';
+import { GAMES_PLAYED_EVENT } from '@/utils/pushNotifications/types';
+import { playedThisVisit } from '@/utils/pushNotifications/categoryPreferences';
 import { useOverlayQuietZone, isOverlayQuietZoneActive } from '@/lib/overlayQuietZone';
 
 type PromptTrigger = 'games_threshold' | 'first_win';
@@ -62,7 +64,8 @@ export function PushNotificationPrompt() {
       trackGrowthEvent('push_prompt_shown', { trigger: 'first_win' });
       return true;
     }
-    if (shouldShowPushPrompt()) {
+    // Asking on arrival, before any play, was dismissed almost every time.
+    if (playedThisVisit() && shouldShowPushPrompt()) {
       setTrigger('games_threshold');
       setVisible(true);
       trackGrowthEvent('push_prompt_shown', { trigger: 'games_threshold' });
@@ -89,8 +92,15 @@ export function PushNotificationPrompt() {
     const onFirstWin = () => {
       if (!visibleRef.current) evaluate();
     };
+    const onGameFinished = () => {
+      if (!visibleRef.current) evaluate();
+    };
     window.addEventListener(FIRST_WIN_EVENT, onFirstWin);
-    return () => window.removeEventListener(FIRST_WIN_EVENT, onFirstWin);
+    window.addEventListener(GAMES_PLAYED_EVENT, onGameFinished);
+    return () => {
+      window.removeEventListener(FIRST_WIN_EVENT, onFirstWin);
+      window.removeEventListener(GAMES_PLAYED_EVENT, onGameFinished);
+    };
   }, [consentDecided, evaluate]);
 
   // Belt and braces: the zone can re-open (a rematch starts) while the prompt is

@@ -61,6 +61,33 @@ describe('makeOffer', () => {
   });
 });
 
+describe('makeOffer at full health', () => {
+  it('given hearts already full, when offered, then no heal card is in the draft', () => {
+    const owned = RELIC_IDS.slice(0, RELIC_IDS.length - 1);
+    for (const seed of 'abcdefghijklmnop'.split('')) {
+      for (const relics of [[], owned]) {
+        const offer = makeOffer(seed, 3, relics, 4, { hpFull: true });
+        expect(offer.some((o) => o.type === 'heal')).toBe(false);
+        expect(offer).toHaveLength(4);
+      }
+    }
+  });
+
+  it('given hearts not full, when the run ends a level, then heal can still be offered', () => {
+    const seeds = 'abcdefghijklmnopqrstuvwxyz'.split('');
+    expect(seeds.some((seed) => makeOffer(seed, 3, [], 4).some((o) => o.type === 'heal'))).toBe(true);
+  });
+
+  it('given a level won at full health, when advancing, then the draft holds no heal', () => {
+    for (const seed of 'abcdefghij'.split('')) {
+      const run = { ...freshRun(1, 'u', seed), step: 2 };
+      const next = advanceRun(run, { hpLeft: run.maxHp, potionsUsed: {}, score: 100, reviveUsed: false });
+      expect(next.hp).toBe(next.maxHp);
+      expect(next.offer?.some((o) => o.type === 'heal')).toBe(false);
+    }
+  });
+});
+
 describe('applyPick', () => {
   const withOffer = (offer: RunPayload['offer']): RunPayload => ({ ...freshRun(1, 'u', 's'), step: 2, hp: 2, offer });
 

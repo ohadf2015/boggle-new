@@ -16464,7 +16464,8 @@ const he = {
       "pausedBodyHost": "הכיתה מוקפאת. לחצו על ״המשך״ כשתהיו מוכנים להמשיך.",
       "timeAddedToast": "המורה הוסיף {{seconds}} שניות",
       "wordSkippedToast": "המורה בחר מילה חדשה לחיפוש",
-      "controlFailedToast": "לא ניתן לבצע זאת כרגע"
+      "controlFailedToast": "לא ניתן לבצע זאת כרגע",
+      "offlineToast": "אין חיבור. נסו שוב כשהחיבור יחזור."
     },
     "wordBank": {
       "title": "בנק מילים ({{count}})",

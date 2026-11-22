@@ -16579,7 +16579,8 @@ const ja = {
       "pausedBodyHost": "クラス全員が停止中です。続けるときは「再開」をタップしてください。",
       "timeAddedToast": "先生が{{seconds}}秒追加しました",
       "wordSkippedToast": "先生が新しいお題の単語を選びました",
-      "controlFailedToast": "今は実行できませんでした"
+      "controlFailedToast": "今は実行できませんでした",
+      "offlineToast": "オフラインです。接続が戻ったらもう一度お試しください。"
     },
     "wordBank": {
       "title": "単語バンク（{{count}}）",

@@ -14864,7 +14864,8 @@ const en = {
       "pausedBodyHost": "The class is frozen. Tap Resume when you're ready to keep going.",
       "timeAddedToast": "Your teacher added {{seconds}} seconds",
       "wordSkippedToast": "Your teacher picked a new word to hunt",
-      "controlFailedToast": "Couldn't do that right now"
+      "controlFailedToast": "Couldn't do that right now",
+      "offlineToast": "You're offline. Try again once you're back."
     },
     "wordBank": {
       "title": "Word bank ({{count}})",
