@@ -44,6 +44,8 @@ export interface HowToPlayContent {
     };
 }
 
+import { ruContent } from './content.ru';
+
 const content: Record<string, HowToPlayContent> = {
     en: {
         pageTitle: 'How to Play LexiClash - Complete Guide to All Game Modes',
@@ -425,6 +427,7 @@ const content: Record<string, HowToPlayContent> = {
             multiplayer: 'Multijugador',
         },
     },
+    ru: ruContent,
 };
 
 // Fallback to English for unsupported locales

@@ -9,6 +9,8 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useAdventureInventory } from './useAdventureInventory';
 
 const mockFetch = vi.fn();
+const mockAuth = vi.hoisted(() => ({ isAuthenticated: true }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => mockAuth }));
 
 function mockFetchItems(items: unknown[]) {
   mockFetch.mockResolvedValueOnce({
@@ -25,6 +27,14 @@ describe('useAdventureInventory', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', mockFetch);
     vi.clearAllMocks();
+    mockAuth.isAuthenticated = true;
+  });
+
+  it('does not request the inventory for a signed-out visitor', async () => {
+    mockAuth.isAuthenticated = false;
+    const { result } = renderHook(() => useAdventureInventory());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   it('starts in loading state with empty inventory', () => {

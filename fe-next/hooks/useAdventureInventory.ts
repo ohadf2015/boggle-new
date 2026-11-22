@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchWithAuth } from '@/utils/authFetch';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface InventoryItem {
   item_id: string;
@@ -33,8 +34,13 @@ export function useAdventureInventory(): UseAdventureInventoryReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const mountedRef = useRef(true);
+  const { isAuthenticated } = useAuth();
 
   const fetchInventory = useCallback(async () => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
@@ -57,7 +63,7 @@ export function useAdventureInventory(): UseAdventureInventoryReturn {
         setIsLoading(false);
       }
     }
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     mountedRef.current = true;

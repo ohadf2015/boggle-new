@@ -29,6 +29,11 @@ describe('useWheelGoldenWord', () => {
     expect(result.current('RETAINS')).toBe(false);
   });
 
+  it('Given a quick-play puzzle id, Then nothing is fetched', () => {
+    renderHook(() => useWheelGoldenWord('quick-3f2a9c1e', 'en', true));
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('reports golden_word_found once per day and language', () => {
     reportGoldenWordFound(DATE, 'en', 'in_game');
     reportGoldenWordFound(DATE, 'en', 'results');

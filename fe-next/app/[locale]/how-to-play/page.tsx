@@ -182,11 +182,27 @@ const howToPlaySeoContent: Record<string, {
       },
     ],
   },
+  ru: {
+    title: 'Как играть в LexiClash: правила, режимы и подсчёт очков',
+    description: 'Узнайте, как играть в LexiClash, шаг за шагом. Руководство охватывает классический режим, Blast и Word Hunt, с правилами и советами.',
+    features: [
+      'Классический режим: ищите слова на поле 4x4 или 5x5, пока не вышло время',
+      'Режим Blast: составляйте цепочки слов с множителями комбо',
+      'Word Hunt: ежедневная головоломка с цветными подсказками и 10 попытками',
+      'Подсчёт очков: баллы за длину слова, бонусы за комбо и множители',
+    ],
+    faq: [
+      {
+        question: 'Каковы основные правила?',
+        answer: 'Находите слова, соединяя соседние буквы на поле. Слово должно состоять минимум из 3 букв. Каждую букву можно использовать в слове только один раз.',
+      },
+    ],
+  },
 };
 
 export default async function HowToPlayPage({ params }: PageParams) {
     const { locale } = await params;
-    const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
+    const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as Locale;
     const content = howToPlaySeoContent[validLocale] ?? howToPlaySeoContent.en;
     const breadcrumbItems = [
       { name: 'LexiClash', url: `https://www.lexiclash.live/${locale}` },

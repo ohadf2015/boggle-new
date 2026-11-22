@@ -32,7 +32,7 @@
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "Sight Words Practice Online",
+      "name": "Träna sight words online",
       "item": "https://www.lexiclash.live/sv/education/sight-words-practice"
     }
   ]

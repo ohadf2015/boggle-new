@@ -130,12 +130,14 @@ function FAQSection({ title, items }: { title: string; items: FAQItem[] }) {
     );
 }
 
+const BREADCRUMB_NAMES: Record<string, string> = { he: 'איך לשחק', ru: 'Как играть' };
+
 export default function HowToPlayPageClient({ locale }: HowToPlayPageClientProps) {
     const c = getHowToPlayContent(locale);
 
     const breadcrumbs = [
         { name: 'Home', url: `${SITE_URL}/${locale}` },
-        { name: c.gameModes.classic.title.includes('קלאסי') ? 'איך לשחק' : 'How to Play', url: `${SITE_URL}/${locale}/how-to-play` },
+        { name: BREADCRUMB_NAMES[locale] ?? 'How to Play', url: `${SITE_URL}/${locale}/how-to-play` },
     ];
 
     return (

@@ -14,9 +14,6 @@
  * label in this file was invented by the tooling that assembled it — which is the
  * rule for this repo, where a subagent once shipped fabricated Swedish word lists.
  *
- * `sight-words-practice` is English in all six columns on purpose: its content
- * module has no per-locale blocks and its non-EN routes are noindex.
- *
  * `app/[locale]/education/__tests__/educationInternalLinks.test.ts` asserts this
  * registry covers every directory that has a `page.tsx`, so a new landing page
  * cannot ship orphaned the way the last six did.
@@ -40,7 +37,7 @@ const LABELS: Record<string, Record<EducationLinkLocale, string>> = {
   'games-for-teachers': { en: 'Free Word Games for Teachers', he: 'משחקי מילים חינמיים למורים', es: 'Juegos gratis para maestros', sv: 'Gratis ordspel för lärare', ja: '無料単語ゲーム', ru: 'Бесплатные словесные игры для учителей' },
   'for-schools': { en: 'Free Vocabulary & ESL Word Games for Schools', he: 'משחקי אוצר מילים ואנגלית לבתי ספר', es: 'Juegos de vocabulario y ESL gratis para escuelas', sv: 'Gratis ordförråds- och ESL-ordspel för skolor', ja: '学校向け無料語彙・ESL単語ゲーム', ru: 'Бесплатные игры на словарный запас для школ' },
   'spelling-bee-practice': { en: 'Spelling Bee Practice Online', he: 'תרגול איות חינם', es: 'Práctica de Ortografía Online', sv: 'Stavningspraktik Online', ja: 'スペリング練習オンライン', ru: 'Практика орфографии бесплатно' },
-  'sight-words-practice': { en: 'Sight Words Practice Online', he: 'Sight Words Practice Online', es: 'Sight Words Practice Online', sv: 'Sight Words Practice Online', ja: 'Sight Words Practice Online', ru: 'Sight Words Practice Online' },
+  'sight-words-practice': { en: 'Sight Words Practice Online', he: 'תרגול מילות ראייה אונליין', es: 'Práctica de palabras de uso frecuente online', sv: 'Träna sight words online', ja: 'サイトワード練習オンライン', ru: 'Тренировка часто встречающихся слов онлайн' },
   'brain-breaks-word-games': { en: 'Brain breaks for classrooms', he: 'הפסקות קשב', es: 'Pausas de concentración', sv: 'Hjärnpauser', ja: '脳トレ休憩', ru: 'Физминутки' },
   'indoor-recess-games': { en: 'Indoor recess games', he: 'משחקי הפסקה בתוך הכיתה', es: 'Juegos para recreo cubierto', sv: 'Inomhusspel för rast', ja: '室内休み時間ゲーム', ru: 'Игры для переменки в помещении' },
   'early-finishers-activities': { en: 'Early finishers activities', he: 'פעילויות לתלמידים שמסיימים מוקדם', es: 'Actividades para estudiantes que terminan primero', sv: 'Aktiviteter för elever som är klara först', ja: '課題を終わらせた生徒向けアクティビティ', ru: 'Занятия для учеников, закончивших раньше' },

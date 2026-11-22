@@ -18,26 +18,26 @@ const difficultyColors: Record<string, string> = {
 };
 
 const difficultyLabels: Record<string, Record<string, string>> = {
-  easy: { en: 'Easy', he: 'קל', sv: 'Latt', ja: '簡単', es: 'Facil' },
-  medium: { en: 'Medium', he: 'בינוני', sv: 'Medel', ja: '中級', es: 'Medio' },
-  hard: { en: 'Hard', he: 'קשה', sv: 'Svar', ja: '難しい', es: 'Dificil' },
+  easy: { en: 'Easy', he: 'קל', sv: 'Latt', ja: '簡単', es: 'Facil', ru: 'Легко' },
+  medium: { en: 'Medium', he: 'בינוני', sv: 'Medel', ja: '中級', es: 'Medio', ru: 'Средне' },
+  hard: { en: 'Hard', he: 'קשה', sv: 'Svar', ja: '難しい', es: 'Dificil', ru: 'Сложно' },
 };
 
 const sectionLabels: Record<string, Record<string, string>> = {
-  wordOfTheDay: { en: 'Word of the Day', he: 'המילה היומית', sv: 'Dagens Ord', ja: '今日の言葉', es: 'Palabra del Dia' },
-  definition: { en: 'Definition', he: 'הגדרה', sv: 'Definition', ja: '定義', es: 'Definicion' },
-  etymology: { en: 'Etymology', he: 'אטימולוגיה', sv: 'Etymologi', ja: '語源', es: 'Etimologia' },
-  example: { en: 'Example', he: 'דוגמה', sv: 'Exempel', ja: '例文', es: 'Ejemplo' },
-  funFact: { en: 'Fun Fact', he: 'עובדה מעניינת', sv: 'Roligt Fakta', ja: '豆知識', es: 'Dato Curioso' },
-  previousWords: { en: 'Previous Words', he: 'מילים קודמות', sv: 'Tidigare Ord', ja: '過去の言葉', es: 'Palabras Anteriores' },
-  practiceNow: { en: 'Practice this word in LexiClash', he: 'תרגלו מילה זו ב-LexiClash', sv: 'Ova detta ord i LexiClash', ja: 'LexiClashでこの言葉を練習', es: 'Practica esta palabra en LexiClash' },
-  playNow: { en: 'Found a great word? Play LexiClash now!', he: 'מצאתם מילה מעולה? שחקו עכשיו!', sv: 'Hittade du ett bra ord? Spela LexiClash nu!', ja: '素敵な言葉を見つけた？今すぐプレイ！', es: 'Encontraste una gran palabra? Juega ahora!' },
-  share: { en: 'Share', he: 'שתפו', sv: 'Dela', ja: 'シェア', es: 'Compartir' },
-  copied: { en: 'Copied!', he: 'הועתק!', sv: 'Kopierat!', ja: 'コピー済み！', es: 'Copiado!' },
-  partOfSpeech: { en: 'Part of Speech', he: 'חלק דיבור', sv: 'Ordklass', ja: '品詞', es: 'Categoria' },
-  embedWidget: { en: 'Embed this widget', he: 'הטמיעו את הווידג\'ט', sv: 'Bädda in widgeten', ja: 'ウィジェットを埋め込む', es: 'Inserta este widget' },
-  embedSnippet: { en: 'Copy the code below to embed this Word of the Day widget on your website', he: 'העתיקו את הקוד הבא להטמעת הווידג\'ט על האתר שלכם', sv: 'Kopiera koden nedan för att bädda in denna widget på din webbplats', ja: 'このウィジェットをあなたのWebサイトに埋め込むには、下のコードをコピーしてください', es: 'Copie el código a continuación para insertar este widget en su sitio web' },
-  embedCopyButton: { en: 'Copy Code', he: 'העתק קוד', sv: 'Kopiera Kod', ja: 'コードをコピー', es: 'Copiar Código' },
+  wordOfTheDay: { en: 'Word of the Day', he: 'המילה היומית', sv: 'Dagens Ord', ja: '今日の言葉', es: 'Palabra del Dia', ru: 'Слово дня' },
+  definition: { en: 'Definition', he: 'הגדרה', sv: 'Definition', ja: '定義', es: 'Definicion', ru: 'Значение' },
+  etymology: { en: 'Etymology', he: 'אטימולוגיה', sv: 'Etymologi', ja: '語源', es: 'Etimologia', ru: 'Этимология' },
+  example: { en: 'Example', he: 'דוגמה', sv: 'Exempel', ja: '例文', es: 'Ejemplo', ru: 'Пример' },
+  funFact: { en: 'Fun Fact', he: 'עובדה מעניינת', sv: 'Roligt Fakta', ja: '豆知識', es: 'Dato Curioso', ru: 'Интересный факт' },
+  previousWords: { en: 'Previous Words', he: 'מילים קודמות', sv: 'Tidigare Ord', ja: '過去の言葉', es: 'Palabras Anteriores', ru: 'Прошлые слова' },
+  practiceNow: { en: 'Practice this word in LexiClash', he: 'תרגלו מילה זו ב-LexiClash', sv: 'Ova detta ord i LexiClash', ja: 'LexiClashでこの言葉を練習', es: 'Practica esta palabra en LexiClash', ru: 'Потренируйте это слово в LexiClash' },
+  playNow: { en: 'Found a great word? Play LexiClash now!', he: 'מצאתם מילה מעולה? שחקו עכשיו!', sv: 'Hittade du ett bra ord? Spela LexiClash nu!', ja: '素敵な言葉を見つけた？今すぐプレイ！', es: 'Encontraste una gran palabra? Juega ahora!', ru: 'Нашли отличное слово? Играйте в LexiClash прямо сейчас!' },
+  share: { en: 'Share', he: 'שתפו', sv: 'Dela', ja: 'シェア', es: 'Compartir', ru: 'Поделиться' },
+  copied: { en: 'Copied!', he: 'הועתק!', sv: 'Kopierat!', ja: 'コピー済み！', es: 'Copiado!', ru: 'Скопировано!' },
+  partOfSpeech: { en: 'Part of Speech', he: 'חלק דיבור', sv: 'Ordklass', ja: '品詞', es: 'Categoria', ru: 'Часть речи' },
+  embedWidget: { en: 'Embed this widget', he: 'הטמיעו את הווידג\'ט', sv: 'Bädda in widgeten', ja: 'ウィジェットを埋め込む', es: 'Inserta este widget', ru: 'Встроить виджет' },
+  embedSnippet: { en: 'Copy the code below to embed this Word of the Day widget on your website', he: 'העתיקו את הקוד הבא להטמעת הווידג\'ט על האתר שלכם', sv: 'Kopiera koden nedan för att bädda in denna widget på din webbplats', ja: 'このウィジェットをあなたのWebサイトに埋め込むには、下のコードをコピーしてください', es: 'Copie el código a continuación para insertar este widget en su sitio web', ru: 'Скопируйте код ниже, чтобы встроить виджет «Слово дня» на свой сайт' },
+  embedCopyButton: { en: 'Copy Code', he: 'העתק קוד', sv: 'Kopiera Kod', ja: 'コードをコピー', es: 'Copiar Código', ru: 'Скопировать код' },
 };
 
 function label(key: string, locale: string): string {
