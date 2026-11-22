@@ -12,6 +12,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false, accessTrialExpires: null }) }));
 vi.mock('@/utils/authFetch', () => ({
   getWithAuth: (url: string, init?: RequestInit) => fetch(url, init),
   fetchWithAuth: (url: string, init?: RequestInit) => fetch(url, init),
@@ -58,6 +59,7 @@ describe('WordMasteryReport — Pro', () => {
   it('leads with summary cards, then the ranked hardest words with raw counts', async () => {
     renderReport();
     expect(await screen.findByTestId('mastery-stat-accuracy')).toBeInTheDocument();
+    expect(screen.getAllByTestId('pro-powered-chip')).toHaveLength(1);
     const list = await screen.findByTestId('mastery-hardest-list');
     const rows = within(list).getAllByTestId('mastery-hardest-row');
     expect(rows).toHaveLength(5);

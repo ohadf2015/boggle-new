@@ -20,6 +20,7 @@ import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { buildTeacherFunnelStepEvent } from '@/lib/education/teacherFunnelStepServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
+import { firstWebhookTelemetry } from '@/lib/education/pro/webhookTelemetryOnce'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
 
@@ -289,8 +290,8 @@ export async function POST(request: NextRequest) {
 function trackProConversion(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
-    if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
+    if (mapStatus(payload?.data?.status) === 'trialing' || !firstWebhookTelemetry(`paid:${subId || userId}`)) return
     captureFunnel(payload, userId, withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildPaidEvent(userId, subId), payload?.data))
@@ -310,16 +311,14 @@ async function trialAlreadyCounted(payload: WebhookPayload, userId?: string): Pr
 }
 
 /**
- * `edu_pro_trial_succeeded` + `trial_activated` + `teacher_trial_started` —
- * Polar granted the 14-day trial and upserted the teacher row. Distinct from
- * paid conversion. Polar's activation webhook is `subscription.active`
- * (status=trialing). Never throws.
+ * `edu_pro_trial_succeeded` + `trial_activated` + `teacher_trial_started` — Polar granted
+ * the 14-day trial; once per subscription across Polar's event burst. Never throws.
  */
 function trackProTrial(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
-    if (mapStatus(payload?.data?.status) !== 'trialing') return
     const subId = String(payload?.data?.id ?? '')
+    if (mapStatus(payload?.data?.status) !== 'trialing' || !firstWebhookTelemetry(`trial:${subId || userId}`)) return
     captureFunnel(payload, userId, withRevenue(buildProTrialSucceededEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTrialActivatedEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTrialStartEvent(userId, subId), payload?.data))

@@ -1129,7 +1129,10 @@ const ru = {
       "copiesFew": "{count} копии",
       "results": "Итоги",
       "use": "Использовать",
-      "actions": "Действия со списком"
+      "actions": "Действия со списком",
+      "words_one": "{count} слово",
+      "words_other": "{count} слов",
+      "words_few": "{count} слова"
     },
     "badge": {
       "verified": "Проверено",
@@ -4069,7 +4072,16 @@ const ru = {
       "gradeOnTime": "Вовремя — серия класса в безопасности.",
       "teacherLoadFailed": "Не удалось загрузить список. Попробуйте через минуту.",
       "teacherOnTime": "В срок",
-      "teacherLate": "С опозданием"
+      "teacherLate": "С опозданием",
+      "introTitle_one": "{{count}} слово, которое класс не нашёл",
+      "introTitle_other": "{{count}} слов, которые класс не нашёл",
+      "introTitle_few": "{{count}} слова, которые класс не нашёл",
+      "studentTitle_one": "{{count}} слово, которое нужно вернуть",
+      "studentTitle_other": "{{count}} слов, которые нужно вернуть",
+      "studentTitle_few": "{{count}} слова, которые нужно вернуть",
+      "startCta_one": "Начать — {{count}} слово",
+      "startCta_other": "Начать — {{count}} слов",
+      "startCta_few": "Начать — {{count}} слова"
     },
     "modePicker": {
       "title": "Выберите игру",
@@ -4233,7 +4245,13 @@ const ru = {
         "spelling": "Добавьте слова в урок, чтобы открыть",
         "flashcard": "Добавьте слова в урок, чтобы открыть",
         "word_list": "Добавьте слова в урок, чтобы открыть"
-      }
+      },
+      "words_one": "{{count}} слово",
+      "words_other": "{{count}} слов",
+      "words_few": "{{count}} слова",
+      "questions_one": "{{count}} вопрос",
+      "questions_other": "{{count}} вопросов",
+      "questions_few": "{{count}} вопроса"
     },
     "produce": {
       "title": "Кузница слов",
@@ -5017,7 +5035,10 @@ const ru = {
         "today": "Сегодня",
         "openReport": "Открыть отчёт: {{name}}",
         "unnamed": "Ученик",
-        "drillDescription": "Подробный отчёт о прогрессе ученика"
+        "drillDescription": "Подробный отчёт о прогрессе ученика",
+        "hardWordsMeta_one": "{{count}} ученик · {{pct}}% ошибок",
+        "hardWordsMeta_other": "{{count}} учеников · {{pct}}% ошибок",
+        "hardWordsMeta_few": "{{count}} ученика · {{pct}}% ошибок"
       },
       "studentProgress": "Прогресс ученика",
       "students": "Ученики",
@@ -5108,7 +5129,10 @@ const ru = {
       "title": "Игра класса",
       "waitingForPlayers": "Подготовка к игре класса...",
       "waitingForStudents": "Ожидание учеников",
-      "words": "{{count}} слов"
+      "words": "{{count}} слов",
+      "words_one": "{{count}} слово",
+      "words_other": "{{count}} слов",
+      "words_few": "{{count}} слова"
     },
     "header": {
       "breadcrumbs": {
@@ -14620,7 +14644,11 @@ const ru = {
         "wordHunt": "Охота за словами",
         "wheelRush": "Колесо",
         "vocabQuiz": "Викторина по словам"
-      }
+      },
+      "playersPlayed_one": "Играл {{count}} ученик",
+      "playersPlayed_other": "Играли {{count}} учеников",
+      "playersPlayed_few": "Играли {{count}} ученика",
+      "topScorer": "Лучший результат: {name}, {score}"
     },
     "classReport": {
       "title": "Слово и ученик",
@@ -14805,7 +14833,19 @@ const ru = {
       "scheduleReteachHint": "Соберите трудные слова заново и сыграйте ещё раз примерно через две недели — интервальное повторение, которое закрепляет.",
       "unpluggedReteachLiveCta": "Начать Unplugged reteach Live",
       "reteachLiveCta": "Начать 3-мин reteach Live",
-      "unpluggedReteachLiveFoil": "Сегодня у учеников нет устройств? Выведите ошибки на экран — ученики отвечают на бумаге."
+      "unpluggedReteachLiveFoil": "Сегодня у учеников нет устройств? Выведите ошибки на экран — ученики отвечают на бумаге.",
+      "moodGreat_one": "{{count}} ученик оценил последний раунд как отличный.",
+      "moodGreat_other": "{{count}} учеников оценили последний раунд как отличный.",
+      "moodGreat_few": "{{count}} ученика оценили последний раунд как отличный.",
+      "moodMixed_one": "{{count}} ученик оценил последний раунд как смешанный.",
+      "moodMixed_other": "{{count}} учеников оценили последний раунд как смешанный.",
+      "moodMixed_few": "{{count}} ученика оценили последний раунд как смешанный.",
+      "moodRough_one": "{{count}} ученик оценил последний раунд как тяжёлый.",
+      "moodRough_other": "{{count}} учеников оценили последний раунд как тяжёлый.",
+      "moodRough_few": "{{count}} ученика оценили последний раунд как тяжёлый.",
+      "weeklyInactiveCount_one": "{{count}} ученик неактивен 7 дней",
+      "weeklyInactiveCount_other": "{{count}} учеников неактивны 7 дней",
+      "weeklyInactiveCount_few": "{{count}} ученика неактивны 7 дней"
     },
     "windowProgress": {
       "activeLine": "{{active}} из {{roster}} учеников играли",
@@ -15187,7 +15227,16 @@ const ru = {
         "offHint": "Без рейтинга. XP, уровни и значки всё равно засчитываются."
       },
       "tapToCopy": "Нажмите, чтобы скопировать",
-      "codeCopiedShort": "Скопировано"
+      "codeCopiedShort": "Скопировано",
+      "studentCountPro_one": "{{count}} ученик",
+      "studentCountPro_other": "{{count}} учеников",
+      "studentCountPro_few": "{{count}} ученика",
+      "cardSeeAllStudents_one": "Все ученики ({{count}})",
+      "cardSeeAllStudents_other": "Все ученики ({{count}})",
+      "cardSeeAllStudents_few": "Все ученики ({{count}})",
+      "members_one": "{{count}} ученик",
+      "members_other": "{{count}} учеников",
+      "members_few": "{{count}} ученика"
     },
     "classrooms": {
       "students": {
@@ -15288,7 +15337,10 @@ const ru = {
       "resumeDraftButton": "Возобновить",
       "discardDraftButton": "Удалить",
       "startFromTemplate": "Начать с шаблона",
-      "templateLoaded": "Шаблон загружен: {{count}} слов"
+      "templateLoaded": "Шаблон загружен: {{count}} слов",
+      "words_one": "{{count}} слово",
+      "words_other": "{{count}} слов",
+      "words_few": "{{count}} слова"
     },
     "lessons": {
       "assign": {
@@ -15311,7 +15363,10 @@ const ru = {
         "help": "Выберите один навык для отработки или оставьте выбор ученикам. Доступны только навыки, для которых в уроке хватает слов.",
         "any": "Любая практика",
         "anyHint": "Ученики сами выбирают режим",
-        "questionCount": "{{count}} вопросов · {{skill}}"
+        "questionCount": "{{count}} вопросов · {{skill}}",
+        "questionCount_one": "{{count}} вопрос · {{skill}}",
+        "questionCount_other": "{{count}} вопросов · {{skill}}",
+        "questionCount_few": "{{count}} вопроса · {{skill}}"
       },
       "createTitle": "Создать задание",
       "create": "Создать задание",
@@ -15410,7 +15465,10 @@ const ru = {
         "g68GeographyDesc": "Рельеф, климат и слова для работы с картой",
         "g68Science": "6–8 класс, естествознание: тело и энергия",
         "g68ScienceDesc": "Термины естествознания для средней школы с простыми толкованиями"
-      }
+      },
+      "findNWords_one": "Найди {{count}} слово",
+      "findNWords_other": "Найди {{count}} слов",
+      "findNWords_few": "Найди {{count}} слова"
     },
     "completion": {
       "overallProgress": "Общий прогресс",
@@ -15572,7 +15630,8 @@ const ru = {
         "games": "Игры",
         "pulse": "Пульс класса",
         "homework": "Домашка",
-        "more": "Ещё"
+        "more": "Ещё",
+        "words": "Слова"
       },
       "noClassroomsFound": "Классы не найдены",
       "error": "Не удалось загрузить отчёт",
@@ -15788,11 +15847,21 @@ const ru = {
         "errorNotFound": "Класс или задание не найдены. Возможно, они удалены.",
         "errorUngraded": "У этого задания в Classroom нет баллов, поэтому оценку поставить нельзя.",
         "errorNotPro": "Отправка оценок в Google Classroom входит в Teacher Pro.",
-        "errorGeneric": "Не удалось связаться с Google Classroom. Попробуйте ещё раз."
+        "errorGeneric": "Не удалось связаться с Google Classroom. Попробуйте ещё раз.",
+        "updated_one": "Оценён {{count}} ученик",
+        "updated_other": "Оценено {{count}} учеников",
+        "updated_few": "Оценено {{count}} ученика",
+        "skipped_one": "Пропущен {{count}} ученик — ещё не занимался этим уроком",
+        "skipped_other": "Пропущено {{count}} учеников — ещё не занимались этим уроком",
+        "skipped_few": "Пропущено {{count}} ученика — ещё не занимались этим уроком"
       },
       "picker": {
         "showing": "Показан выше"
-      }
+      },
+      "ownPreview": {"title": "{{class}}: по каждому ученику", "line": "С Pro у каждого ученика своя строка: точность, сколько слов он уже знает и какие именно слова пропустил.", "columns": {"student": "Ученик", "accuracy": "Точность", "mastered": "Выучено слов", "missed": "Пропущенные слова"}, "locked": "Видно в Pro", "more_one": "Ещё учеников: {{count}}", "more_other": "Ещё учеников: {{count}}"},
+      "streakDays_one": "{{count}} день",
+      "streakDays_other": "{{count}} дней",
+      "streakDays_few": "{{count}} дня"
     },
     "curriculum": {
       "title": "Библиотека",
@@ -15874,7 +15943,9 @@ const ru = {
       "homeTitleGames": "Игр в классе {{name}} на этой неделе: {{count}}. Кому нужна помощь?",
       "homeBody": "Бесплатно для одного класса. В Pro — прошлые недели, отчёт по каждому ученику и все ваши классы.",
       "homeCta": "Смотреть эту неделю"
-    }
+    },
+    "proPowered": {"hint": "Входит в ваш тариф Teacher Pro"},
+    "trialUsage": {"lead": "За пробный период:", "games_one": "{count} игра с классом", "games_few": "{count} игры с классом", "games_many": "{count} игр с классом", "games_other": "{count} игры с классом", "students_one": "{count} ученик под наблюдением", "students_few": "{count} ученика под наблюдением", "students_many": "{count} учеников под наблюдением", "students_other": "{count} ученика под наблюдением", "practice_one": "{count} тренировка", "practice_few": "{count} тренировки", "practice_many": "{count} тренировок", "practice_other": "{count} тренировки"}
   },
   "ugc": {
     "createBoard": "Создать доску",
@@ -21443,7 +21514,10 @@ const ru = {
       "studyBack": "Назад",
       "studyNext": "Дальше",
       "studyDone": "Я их знаю",
-      "studyReadyLocked": "Пройди все слова ({count}), чтобы нажать «Готов»"
+      "studyReadyLocked": "Пройди все слова ({count}), чтобы нажать «Готов»",
+      "studyLearned_one": "Выучено {count} слово",
+      "studyLearned_other": "Выучено {count} слов",
+      "studyLearned_few": "Выучено {count} слова"
     },
     "recall": {
       "intro": "Прочитай слова, а потом короткий тест проверит, запомнились ли они.",
@@ -21735,7 +21809,13 @@ const ru = {
       "nothing": "Пока нет слов с ошибками для повторения.",
       "inDays": "через {count} дн.",
       "tomorrow": "Завтра",
-      "whyNote": "Интервальное повторение работает лучше одного долгого: каждый раунд возвращается, когда слово начинает забываться."
+      "whyNote": "Интервальное повторение работает лучше одного долгого: каждый раунд возвращается, когда слово начинает забываться.",
+      "assignedBody_one": "{count} слово, три раунда. Ученики найдут его в своих уроках.",
+      "assignedBody_other": "{count} слов, три раунда. Ученики найдут их в своих уроках.",
+      "assignedBody_few": "{count} слова, три раунда. Ученики найдут их в своих уроках.",
+      "inDays_one": "через {count} день",
+      "inDays_other": "через {count} дней",
+      "inDays_few": "через {count} дня"
     },
     "reports": {
       "classEyebrow": "Отчёт по классу",
@@ -21746,7 +21826,8 @@ const ru = {
       "arcTitle": "По каждому ученику",
       "arcHint": "Кто растёт, кто застрял и какие слова мешают.",
       "digestTitle": "Последняя игра класса",
-      "digestHint": "Что произошло в последней игре — коротко и наглядно."
+      "digestHint": "Что произошло в последней игре — коротко и наглядно.",
+      "lessonsHint": "По каким спискам слов класс учится лучше всего."
     },
     "upgrade": {
       "featureMastery": "Топ-10 слов с ошибками + карта «ученик × слово»",
@@ -22403,7 +22484,7 @@ const ru = {
         "playAgain": "Сыграть ещё раз",
         "pickGame": "Выбрать другую игру",
         "loading": "Проверяем последнюю игру",
-        "ready": "Готовы к тесту: {ready} из {total}",
+        "ready": "В последней игре: {ready} из {total} набрали 80% и больше по словам списка",
         "readyEmpty": "Результаты по словам появятся после следующей игры",
         "missed": "Пропустили: {count} · задать практику"
       },
@@ -22433,7 +22514,7 @@ const ru = {
         "colName": "Имя",
         "colXp": "XP",
         "colWords": "Слова",
-        "colAccuracy": "Точность",
+        "colAccuracy": "Точность (за всё время)",
         "colWeek": "Эта неделя",
         "status": {
           "done": "Играл на этой неделе",
@@ -22457,7 +22538,7 @@ const ru = {
         "lastPlayed": "Последняя игра: {when}",
         "notYet": "ещё нет",
         "streak": "Серия: {count} дн.",
-        "accuracy": "Верных ответов: {count}%",
+        "accuracy": "Верных ответов за всё время: {count}%",
         "noStreak": "Сейчас нет серии",
         "noWordsYet": "Ещё не тренировал слова",
         "empty": "Учеников пока нет. Поделитесь кодом класса, и они появятся здесь.",

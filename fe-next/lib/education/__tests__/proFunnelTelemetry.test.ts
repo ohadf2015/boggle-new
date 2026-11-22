@@ -259,16 +259,11 @@ describe('trackEduProCheckoutReturnLanded', () => {
     localStorage.clear();
   });
 
-  it('Given a checkout return, When tracked, Then both names fire once, the server return endpoint is POSTed, and the webhook name does not', () => {
+  it('Given a checkout return, When tracked, Then only the server return endpoint records the PostHog names (one event per checkout), plus the Growth mirror', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
     try {
       expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
-      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
-      expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
-        product: 'teacher_pro',
-        provider: 'polar',
-      });
-      expect(captureMock.mock.calls.map((c) => c[0])).not.toContain('edu_pro_checkout_succeeded');
+      expect(captureMock).not.toHaveBeenCalled();
       expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
       expect(fetchSpy).toHaveBeenCalledWith(
         '/api/subscription/checkout-return',
@@ -287,20 +282,15 @@ describe('trackEduProCheckoutReturnLanded', () => {
   it('Given a reload that keeps ?checkout=success, When tracked again, Then it does not fire twice', () => {
     trackEduProCheckoutReturnLanded(1_000);
     expect(trackEduProCheckoutReturnLanded(2_000)).toBe(false);
-    expect(captureMock).toHaveBeenCalledTimes(2);
+    expect(growthMock).toHaveBeenCalledTimes(1);
   });
 
-  it('Given the Polar success redirect carries a checkout_id, When tracked, Then both names and the server beacon carry it', () => {
+  it('Given the Polar success redirect carries a checkout_id, When tracked, Then the Growth mirror and the server beacon carry it', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
     const checkoutId = '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a';
     try {
       expect(trackEduProCheckoutReturnLanded(1_000, { checkoutId, url: null })).toBe(true);
-      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', { checkout_id: checkoutId });
-      expect(captureMock).toHaveBeenCalledWith('checkout_return_landed', {
-        product: 'teacher_pro',
-        provider: 'polar',
-        checkout_id: checkoutId,
-      });
+      expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', { checkout_id: checkoutId });
       const body = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
       expect(body.checkout_id).toBe(checkoutId);
     } finally {
@@ -312,7 +302,7 @@ describe('trackEduProCheckoutReturnLanded', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
     try {
       expect(trackEduProCheckoutReturnLanded(1_000, { checkoutId: 'garbage', url: null })).toBe(true);
-      expect(captureMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
+      expect(growthMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
       const body = JSON.parse(String(fetchSpy.mock.calls[0][1]?.body));
       expect(body).not.toHaveProperty('checkout_id');
     } finally {
@@ -395,16 +385,12 @@ describe('durable server fallback when the client PostHog key is absent', () => 
     });
   });
 
-  it('Given no client key, When the return step is tracked, Then BOTH names beacon AND the durable checkout-return POST still fires', () => {
+  it('Given no client key, When the return step is tracked, Then nothing is beaconed twice and the durable checkout-return POST still fires', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({ ok: true } as Response);
     try {
       expect(trackEduProCheckoutReturnLanded(1_000)).toBe(true);
       expect(captureMock).not.toHaveBeenCalled();
-      expect(beaconMock).toHaveBeenCalledWith('edu_pro_checkout_return_landed', {});
-      expect(beaconMock).toHaveBeenCalledWith('checkout_return_landed', {
-        product: 'teacher_pro',
-        provider: 'polar',
-      });
+      expect(beaconMock).not.toHaveBeenCalled();
       expect(fetchSpy).toHaveBeenCalledWith(
         '/api/subscription/checkout-return',
         expect.objectContaining({ method: 'POST', keepalive: true }),

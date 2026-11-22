@@ -11,43 +11,25 @@ import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import React, { useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
+import { REPORTS_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { resolveDisplayName } from '@/lib/displayName';
-import { StudentProgressReport } from '@/components/teacher/reports/StudentProgressReport';
-import { ClassProgressReport } from '@/components/teacher/reports/ClassProgressReport';
-import { ClassArcPanel } from '@/components/teacher/reports/ClassArcPanel';
-import { StudentArcView } from '@/components/teacher/reports/StudentArcView';
-import { ReportsHomeworkTab } from '@/components/teacher/reports/ReportsHomeworkTab';
-import { ClassroomRosterProgress } from '@/components/teacher/reports/ClassroomRosterProgress';
-import { GoogleClassroomGradePassback } from '@/components/teacher/reports/GoogleClassroomGradePassback';
-import { ProgressDigestDashboard } from '@/components/teacher/digest/ProgressDigestDashboard';
 import { ClassroomWeekPanel } from '@/components/teacher/digest/ClassroomWeekPanel';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { ExportAllClassesButton } from '@/components/teacher/reports/ExportAllClassesButton';
 import { TeacherGate } from '@/components/education/TeacherGate';
-import { REPORTS_CONTENT_CLASS } from '@/components/teacher/routeLoading/routeShellClasses';
 import { ReportsSkeleton } from '@/components/teacher/routeLoading/TeacherSkeletons';
 import { trackEduReportsViewed } from '@/lib/education/telemetry';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { WordMasteryReport } from '@/components/teacher/reports/WordMasteryReport';
-import { RoundReports } from '@/components/teacher/rounds/RoundReports';
-import { ROUND_FIXTURE } from '@/components/teacher/rounds/roundFixture';
 import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
-import { ClassReportHeader } from '@/components/teacher/reports/ClassReportHeader';
-import { ClassOverview } from '@/components/teacher/analytics/overview/ClassOverview';
 import { ReportsNoClasses } from '@/components/teacher/reports/ReportsNoClasses';
-import { FullReportDisclosure, ReportDisclosure, SectionDisclosure } from '@/components/teacher/reports/FullReportDisclosure';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
-import { StudentParentPreview } from '@/components/teacher/reports/StudentParentPreview';
-import { ReportsClassEmpty } from './ReportsClassEmpty';
 import { ReportsReteachPanel } from './ReportsReteachPanel';
 import { ReportsProGate } from './ReportsGate';
+import { ReportsClassView } from './ReportsClassView';
+import { ReportsStudentView } from './ReportsStudentView';
+import { reportId, resolveReportTab, type ReportTab } from './reportParams';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -66,8 +48,8 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const { classrooms, isLoading: classroomsLoading } = useClassrooms();
   const reduceMotion = useReducedMotion();
 
-  const classroomIdFromUrl = searchParams.get('classroomId');
-  const studentIdFromUrl = searchParams.get('studentId');
+  const classroomIdFromUrl = reportId(searchParams.get('classroomId'));
+  const studentIdFromUrl = classroomIdFromUrl ? reportId(searchParams.get('studentId')) : null;
 
   // Local state so a click switches views without waiting on navigation...
   const [pickedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
@@ -77,10 +59,9 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const [shownClassId, setShownClassId] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
-  const [section, setSection] = useState<string>(() => {
+  const [section, setSection] = useState<ReportTab>(() => {
     if (searchParams?.get('roundPreview')) return 'games';
-    const asked = searchParams?.get('section');
-    return asked && (REPORT_TABS as readonly string[]).includes(asked) ? asked : 'students';
+    return resolveReportTab(searchParams?.get('section')) ?? 'students';
   });
 
   // ...but the URL stays the source of truth: browser Back/Forward change it,
@@ -253,142 +234,25 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
     );
   } else if (selectedStudentId) {
     view = (
-      <div className="space-y-5">
-        <button
-          type="button"
-          onClick={handleBackToClass}
-          className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
-          aria-label={t('teacher.reports.backToClass')}
-        >
-          <DirectionalIcon icon={ArrowLeft} className="size-5" />
-          <span>{t('teacher.reports.backToClass')}</span>
-        </button>
-        <StudentArcView
-          studentId={selectedStudentId}
-          classroomId={selectedClassroomId}
-          studentName={selectedStudentName ?? undefined}
-        />
-        <StudentParentPreview
-          classroomId={selectedClassroomId}
-          studentId={selectedStudentId}
-          studentName={selectedStudentName ?? undefined}
-        />
-        <StudentProgressReport studentId={selectedStudentId} classroomId={selectedClassroomId} />
-      </div>
+      <ReportsStudentView
+        classroomId={selectedClassroomId}
+        studentId={selectedStudentId}
+        studentName={selectedStudentName}
+        onBack={handleBackToClass}
+      />
     );
   } else {
-    const selectedClassroom = classrooms?.find((c) => c.id === selectedClassroomId);
-    // No one has joined, so no game has been played: tabs of empty panels would only say "nothing" five ways.
-    const classIsEmpty = selectedClassroom?.member_count === 0;
     view = (
-      <div className="space-y-4 sm:space-y-5">
-        <div data-tm>
-          <ClassReportHeader
-            eyebrow={t('teacher.reports.title')}
-            name={selectedClassroom?.name ?? t('teacher.reports.title')}
-            memberCount={selectedClassroom?.member_count}
-            onBack={() => router.push(`/${language}/teacher/classroom/${selectedClassroomId}`)}
-            link={{
-              href: `/${language}/teacher/classroom/${selectedClassroomId}/analytics`,
-              label: t('teacher.classroom.cardClassReport', 'Class report'),
-              testId: 'reports-class-report-link',
-            }}
-          />
-        </div>
-        {weekPanel}
-        {classIsEmpty ? (
-          <ReportsClassEmpty classroomId={selectedClassroomId} />
-        ) : (
-        <>
-        <ClassOverview
-          classroomId={selectedClassroomId}
-          classroomName={selectedClassroom?.name ?? ''}
-          surface="reports"
-          onOpenChange={(id) => {
-            if (id) handleStudentClick(id);
-          }}
-        />
-        <Tabs value={section} onValueChange={setSection} className="space-y-3">
-          <TabsList aria-label={t('teacher.reports.tabs.label')} className="grid h-auto w-full grid-cols-5 gap-1.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy p-1.5">
-            {REPORT_TABS.map((id) => (
-              <TabsTrigger key={id} value={id} className={REPORT_TAB}>
-                {t(`teacher.reports.tabs.${id}`)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-
-          <TabsContent value="students">
-            <ClassroomRosterProgress
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-            />
-          </TabsContent>
-
-          <TabsContent value="games">
-            <RoundReports
-              collapsed
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-              onStudentClick={handleStudentClick}
-              {...roundPreviewProps(searchParams?.get('roundPreview'))}
-            />
-          </TabsContent>
-
-          <TabsContent value="pulse">
-            <WordMasteryReport
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-              onStudentClick={handleStudentClick}
-            />
-          </TabsContent>
-
-          <ReportsHomeworkTab
-            classroomId={selectedClassroomId}
-            classroomName={selectedClassroom?.name ?? ''}
-          />
-
-          <TabsContent value="more" className="space-y-2.5">
-            <SectionDisclosure section="arc">
-              <ClassArcPanel
-                classroomId={selectedClassroomId}
-                classroomName={selectedClassroom?.name ?? ''}
-                classroomLanguage={selectedClassroom?.language ?? 'en'}
-                onStudentClick={handleStudentClick}
-                embedded
-              />
-            </SectionDisclosure>
-          <SectionDisclosure section="digest">
-            <ProgressDigestDashboard
-              classroomId={selectedClassroomId}
-              classroomName={selectedClassroom?.name ?? ''}
-              rosterCount={selectedClassroom?.member_count ?? 0}
-            />
-          </SectionDisclosure>
-            <ReportDisclosure
-              testId="parent-reports-disclosure"
-              icon={Send}
-              accent="cyan"
-              title={t('parentReportsFlow.title')}
-              hint={t('parentReportsFlow.disclosureHint')}
-            >
-              {(open) => (open ? <ParentReportPack classroomId={selectedClassroomId} /> : null)}
-            </ReportDisclosure>
-            <FullReportDisclosure>
-              {() => (
-                <div className="space-y-4">
-                  <div className="flex justify-end">
-                    <ExportAllClassesButton />
-                  </div>
-                  <GoogleClassroomGradePassback classroomId={selectedClassroomId} enabled={gradePassbackEnabled} />
-                  <ClassProgressReport classroomId={selectedClassroomId} onStudentClick={handleStudentClick} />
-                </div>
-              )}
-            </FullReportDisclosure>
-          </TabsContent>
-        </Tabs>
-        </>
-        )}
-      </div>
+      <ReportsClassView
+        classroomId={selectedClassroomId}
+        classroom={classrooms?.find((c) => c.id === selectedClassroomId)}
+        section={section}
+        onSectionChange={setSection}
+        weekPanel={weekPanel}
+        roundPreview={searchParams?.get('roundPreview')}
+        gradePassbackEnabled={gradePassbackEnabled}
+        onStudentClick={handleStudentClick}
+      />
     );
   }
 
@@ -420,25 +284,10 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   );
 }
 
-const REPORT_TABS = ['students', 'games', 'pulse', 'homework', 'more'] as const;
-
-// Selected = lime ring on navy-light; unselected keeps a cream edge so it reads as tappable.
-const REPORT_TAB =
-  'min-h-11 h-auto min-w-0 whitespace-normal rounded-neo border-[2px] px-1 py-1.5 font-neo-body text-xs font-bold leading-tight sm:text-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan data-[state=inactive]:border-neo-cream/40 data-[state=inactive]:text-neo-cream data-[state=active]:border-neo-lime data-[state=active]:bg-neo-navy-light data-[state=active]:text-neo-cream data-[state=active]:ring-2 data-[state=active]:ring-neo-lime';
-
-// Dev-only fixture so the round report can be judged without a played round.
-function roundPreviewProps(value: string | null | undefined) {
-  if (process.env.NODE_ENV === 'production' || !value) return {};
-  const previewGames = value === 'dense'
-    ? Array.from({ length: 12 }, (_, i) => ({ ...ROUND_FIXTURE, gameCode: `FIX${String(i + 1).padStart(3, '0')}` }))
-    : [ROUND_FIXTURE];
-  return { previewGames, previewPro: value === 'pro' || value === 'dense' };
-}
-
 /**
  * The shell wraps BOTH gates. Reports has five states a teacher can land on —
  * the role loader, the role denial, the Pro upsell, the class picker, a report —
- * and only the last two are this file's own markup. Measured live as a free
+ * and only the last two are the page's own markup. Measured live as a free
  * teacher on `/en/teacher/reports`: the upsell rendered with no shell at all and
  * `body` back to plain `.screen-fit`, i.e. the page scrolling again on the one
  * screen we sell Pro from. One shell, above everything, so all five are held.
@@ -454,7 +303,7 @@ function ReportsShell({ children }: { children: ReactNode }) {
       {/* Calm canvas (Teacher HQ recipe): flat navy, no full-bleed illustration
           behind a working deck. Dark-only surface (pitfall 5). */}
       {/* On a phone the trial strip's full-width button would be the first tap and push the reteach action below the fold. */}
-      <div className="relative max-sm:flex max-sm:flex-col [&>[data-testid=pro-gate-lock]]:mx-auto [&>[data-testid=pro-gate-lock]]:max-w-5xl [&_[data-testid=pro-gate-preview]]:hidden [&_[data-testid=pro-gate-lock]>div]:block [&>[data-testid=pro-trial-preview]]:mx-auto [&>[data-testid=pro-trial-preview]]:max-w-5xl max-sm:[&>[data-testid=pro-trial-preview]]:order-last max-sm:[&>[data-testid=pro-trial-preview]]:mb-0 max-sm:[&>[data-testid=pro-trial-preview]]:mt-4">
+      <div className="relative max-sm:flex max-sm:flex-col [&>[data-testid=pro-gate-lock]]:mx-auto [&>[data-testid=pro-gate-lock]]:max-w-5xl [&_[data-testid=pro-gate-preview]]:hidden [&_[data-testid=pro-gate-lock]>div]:block [&:has([data-testid=own-class-pro-preview])_[data-testid=free-week-sample]]:hidden [&:has([data-testid=own-class-pro-preview])_[data-testid=free-week-insight][data-state=empty]]:block [&>[data-testid=pro-trial-preview]]:mx-auto [&>[data-testid=pro-trial-preview]]:max-w-5xl max-sm:[&>[data-testid=pro-trial-preview]]:order-last max-sm:[&>[data-testid=pro-trial-preview]]:mb-0 max-sm:[&>[data-testid=pro-trial-preview]]:mt-4">
         {children}
       </div>
     </EducationShell>
@@ -472,3 +321,5 @@ export default function TeacherReportsPage({ gradePassbackEnabled = false }: { g
     </ReportsShell>
   );
 }
+
+export { ReportsShell };

@@ -87,15 +87,6 @@ export function trackEduFirstAssignmentCreated(args: EduFirstAssignmentCtaArgs):
   safeCapture('edu_first_assignment_created', { classroom_id: args.classroomId });
 }
 
-/** Class-detail empty state: 0 assignments. Distinct from the HQ panel events. */
-export function trackTeacherFirstAssignmentCtaViewed(args: EduFirstAssignmentCtaArgs): void {
-  safeCapture('teacher_first_assignment_cta_viewed', { classroom_id: args.classroomId });
-}
-
-export function trackTeacherFirstAssignmentCtaClicked(args: EduFirstAssignmentCtaArgs): void {
-  safeCapture('teacher_first_assignment_cta_clicked', { classroom_id: args.classroomId });
-}
-
 export interface EduAssignmentReminderArgs {
   assignmentId: string;
   classroomId?: string | null;
@@ -126,15 +117,6 @@ export function trackEduAssignmentOverdue(args: EduAssignmentReminderArgs & { da
   };
   if (args.classroomId) props.classroom_id = args.classroomId;
   safeCapture('assignment_overdue', props);
-}
-
-export interface EduStartLiveClassArgs {
-  classroomId: string;
-}
-
-/** Assignment/classroom view: start the existing live-room flow. */
-export function trackEduAssignmentStartLiveClicked(args: EduStartLiveClassArgs): void {
-  safeCapture('edu_assignment_start_live_clicked', { classroom_id: args.classroomId });
 }
 
 export interface TeacherHqProgressViewedArgs {

@@ -55,6 +55,7 @@ import {
   WORD_COUNT_DEFAULT,
   type WordGoalKind,
 } from '@/lib/education/wordGoalAssignment';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface AssignmentCreatorProps {
   classroomId: string;
@@ -200,7 +201,7 @@ export default function AssignmentCreator({
         teacherId: user.id,
         language: classroomLanguage,
         createLesson,
-        findNWordsLabel: (n) => t('teacher.assignment.findNWords', { count: n }),
+        findNWordsLabel: (n) => t(pluralKeyOf('teacher.assignment.findNWords', n, language), { count: n }),
         // UI locale, not the class language. Plan is mapped inside
         // createWordGoalAssignment so this path cannot stamp trial as pro.
         funnel: { locale: language, hasPro, status, loading: proLoading },
@@ -403,7 +404,7 @@ export default function AssignmentCreator({
                   t={t}
                 />
                 {selectedType === 'practice' && selectedLesson && (
-                  <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} t={t} />
+                  <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} language={language} t={t} />
                 )}
                 <div>
                   <label htmlFor="assignment-instructions" className="mb-2 block font-neo-body text-sm font-bold text-neo-cream">

@@ -33,6 +33,7 @@ import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProChec
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface WeeklyProgressDigestCardProps {
   classroomId: string;
@@ -217,7 +218,7 @@ export function WeeklyProgressDigestCard({
             </ul>
           </div>
           <p data-testid="weekly-progress-digest-inactive" className="text-sm font-semibold text-neo-cream/80">
-            {t('teacher.digest.weeklyInactiveCount', { count: inactive.length })}
+            {t(pluralKeyOf('teacher.digest.weeklyInactiveCount', inactive.length, language), { count: inactive.length })}
             {inactive.length > 0 ? `: ${inactive.slice(0, 8).map((s) => s.name).join(', ')}${inactive.length > 8 ? ` +${inactive.length - 8}` : ''}` : ''}
           </p>
         </>

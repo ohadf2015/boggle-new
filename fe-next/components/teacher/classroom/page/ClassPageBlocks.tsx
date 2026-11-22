@@ -7,6 +7,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { HOME_ROW, OUTLINE_BUTTON, PANEL, QUIET_LINK } from '../../home/homeStyles';
 import type { ClassWordList } from './classWordLists';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -15,6 +16,7 @@ export interface ClassLastGameSummary {
   players: readonly { name: string; score: number }[];
   participation: { played: number; roster: number };
   coveragePct: number;
+  totalLessonWords: number;
 }
 
 export interface ClassLastGameState {
@@ -42,9 +44,9 @@ export function ClassLastGame({ state, resultsHref, language, t }: { state: Clas
   const top = game.players[0];
   const facts = [
     new Date(game.playedAt).toLocaleDateString(language, { weekday: 'short', month: 'short', day: 'numeric' }),
-    top ? `${top.name} · ${top.score}` : null,
-    t('teacher.lastGame.playersPlayed', { count: game.participation.played }),
-    t('teacher.classPage.coverage', { pct: Math.round(game.coveragePct) }),
+    top && top.score > 0 ? t('teacher.lastGame.topScorer', { name: top.name, score: top.score }) : null,
+    t(pluralKeyOf('teacher.lastGame.playersPlayed', game.participation.played, language), { count: game.participation.played }),
+    game.totalLessonWords > 0 ? t('teacher.classPage.coverage', { pct: Math.round(game.coveragePct) }) : null,
   ].filter(Boolean).join(' · ');
   return (
     <div data-testid="class-page-last-game">
@@ -61,7 +63,7 @@ export function ClassLastGame({ state, resultsHref, language, t }: { state: Clas
 }
 
 /** The class's word lists, folded; with none yet, only the way to make one. */
-export function ClassWordLists({ lists, loading, libraryHref, t }: { lists: readonly ClassWordList[]; loading: boolean; libraryHref: string; t: T }) {
+export function ClassWordLists({ lists, loading, libraryHref, language, t }: { lists: readonly ClassWordList[]; loading: boolean; libraryHref: string; language: string; t: T }) {
   const create = (
     <Link href={libraryHref} className={cn(QUIET_LINK, 'self-start')}>
       <Plus className="size-4" aria-hidden="true" />
@@ -84,7 +86,7 @@ export function ClassWordLists({ lists, loading, libraryHref, t }: { lists: read
             {lists.slice(0, 5).map((l) => (
               <li key={l.id} className="flex min-h-11 items-center justify-between gap-3 py-1">
                 <ListNameButton lessonId={l.id} name={l.name} className="min-w-0 truncate font-neo-body text-sm font-black text-neo-cream" />
-                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t('eduLibrary.card.words', { count: l.wordCount })}</span>
+                <span className="shrink-0 font-neo-body text-xs font-bold tabular-nums text-neo-cream/70">{t(pluralKeyOf('eduLibrary.card.words', l.wordCount, language), { count: l.wordCount })}</span>
               </li>
             ))}
           </ul>

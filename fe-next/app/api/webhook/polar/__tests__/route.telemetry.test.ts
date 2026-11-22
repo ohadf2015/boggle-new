@@ -32,6 +32,7 @@ vi.mock('@/lib/posthog', () => ({
 
 import { POST } from '../route'
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO = 'prod-pro-1'
 function polarEvent(type: string, data: Record<string, unknown>) {
@@ -50,6 +51,7 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     upsertSubscription.mockReset()
     subscriptionTrialAlreadyCounted.mockReset().mockResolvedValue(false)
     capture.mockReset()
+    resetWebhookTelemetryOnce()
     posthogThrows = false
     process.env.POLAR_PRO_PRODUCT_ID = PRO
     process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'

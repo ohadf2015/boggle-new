@@ -3,17 +3,19 @@
 import { Crosshair, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { VOCAB_FOCUSES, MIN_WORDS_PER_FOCUS, type PracticeFocusSetting, type VocabFocus } from '@/lib/education/vocabFocus';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface AssignmentFocusPickerProps {
   focus: PracticeFocusSetting;
   onFocus: (focus: PracticeFocusSetting) => void;
   supportedFocuses: readonly VocabFocus[];
   focusCounts: Partial<Record<VocabFocus, number>> | null | undefined;
+  language: string;
   t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 /** Practice-only vocabulary focus choice: "any" or one skill the chosen lesson has enough words for. */
-export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusCounts, t }: AssignmentFocusPickerProps) {
+export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusCounts, language, t }: AssignmentFocusPickerProps) {
   return (
     <div>
       <label className="block text-sm font-neo-body text-neo-white mb-1">
@@ -66,7 +68,7 @@ export function AssignmentFocusPicker({ focus, onFocus, supportedFocuses, focusC
               </span>
               <span className="text-xs opacity-80 block">
                 {supported
-                  ? t('teacher.assignment.focus.questionCount', {
+                  ? t(pluralKeyOf('teacher.assignment.focus.questionCount', focusCounts?.[option] ?? 0, language), {
                       count: focusCounts?.[option] ?? 0,
                       skill: t(`education.vocabFocus.instructions.${option}`),
                     })

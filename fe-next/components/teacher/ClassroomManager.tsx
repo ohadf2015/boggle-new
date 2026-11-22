@@ -43,6 +43,7 @@ import type { HqClassroom } from './hq/GetStudentsInCard';
 import { CLASS_GRID_QUERIES, classesPerView } from './hq/classPaging';
 import { ClassroomFormDialog } from './ClassroomFormDialog';
 import { stagger } from './teacherDashboardTabs';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 
 // Re-exported for the existing contract test; the map itself is shared with the
 // lobby language chips (lib/i18n/languageLabels.ts) so it can only drift once.
@@ -228,9 +229,9 @@ export default function ClassroomManager({ heading }: ClassroomManagerProps = {}
                   startGameHref={teacherHostHref(language, { classroomId: classroom.id })}
                   rehearse={<RehearseWithBotsButton classroomId={classroom.id} source="class" language={language} t={t} />}
                   assignHref={teacherAssignHref(language, classroom.id)}
-                  reportHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+                  reportHref={teacherResultsHref(language, classroom.id)}
                   classHref={`/${language}/teacher/classroom/${classroom.id}`}
-                  insightHref={insightClassId === classroom.id ? `/${language}/teacher/classroom/${classroom.id}/analytics` : undefined}
+                  insightHref={insightClassId === classroom.id ? teacherResultsHref(language, classroom.id) : undefined}
                   onOpenProjector={
                     classroom.join_code
                       ? () => setProjector({ id: classroom.id, name: classroom.name, join_code: classroom.join_code, member_count: classroom.member_count })

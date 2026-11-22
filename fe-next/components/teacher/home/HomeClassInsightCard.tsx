@@ -6,6 +6,7 @@ import { ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useProInsightOffer } from '@/components/teacher/pro/ProInsightLink';
 import { PRO_BANNER_CTA, ProBanner, ProShine } from '../pro/ProBanner';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -29,7 +30,7 @@ export function HomeClassInsightCard({ classroomId, className, language, t }: Ho
     >
       <Link
         ref={ref}
-        href={`/${language}/teacher/classroom/${classroomId}/analytics`}
+        href={teacherResultsHref(language, classroomId)}
         data-testid="home-class-insight-cta"
         onClick={onClick}
         className={cn(PRO_BANNER_CTA, 'mt-3 w-full whitespace-normal px-3 text-sm leading-tight')}

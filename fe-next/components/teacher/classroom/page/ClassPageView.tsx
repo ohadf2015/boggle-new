@@ -84,7 +84,7 @@ export function ClassPageView(props: ClassPageViewProps) {
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:items-start">
         <ClassLastGame state={lastGame} resultsHref={props.resultsHref} language={language} t={t} />
-        <ClassWordLists lists={props.lists} loading={props.listsLoading} libraryHref={props.libraryHref} t={t} />
+        <ClassWordLists lists={props.lists} loading={props.listsLoading} libraryHref={props.libraryHref} language={language} t={t} />
       </div>
 
       <ClassDangerZone onRequestDelete={props.onRequestDelete} t={t} />

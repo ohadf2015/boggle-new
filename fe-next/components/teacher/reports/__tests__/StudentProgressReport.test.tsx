@@ -72,7 +72,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.columns.attempts': 'COL_ATTEMPTS',
         'teacher.reports.mastery.mastered': 'MASTERED_LBL',
         'teacher.reports.mastery.practicing': 'PRACTICING_LBL',
-        'teacher.reports.streakDays': '{{count}} DAYS_LBL',
+        'teacher.reports.streakDays_other': '{{count}} DAYS_LBL',
         'teacher.reports.practiceDuration': '{{hours}}H {{minutes}}M_LBL',
         'teacher.reports.practiceDurationMinutesOnly': '{{minutes}}M_ONLY_LBL',
         'teacher.reports.recommendations.lowAccuracyFocus': 'REC_LOW_ACCURACY_LBL',

@@ -1127,7 +1127,9 @@ const ja = {
       "copiesOne": "{count}回コピー",
       "results": "結果",
       "use": "このリストを使う",
-      "actions": "リストの操作"
+      "actions": "リストの操作",
+      "words_one": "{count}語",
+      "words_other": "{count}語"
     },
     "badge": {
       "verified": "公式",
@@ -14961,7 +14963,10 @@ const ja = {
         "wordHunt": "ワードハント",
         "wheelRush": "ホイールラッシュ",
         "vocabQuiz": "単語クイズ"
-      }
+      },
+      "playersPlayed_one": "{{count}}人の生徒が参加",
+      "playersPlayed_other": "{{count}}人の生徒が参加",
+      "topScorer": "最高得点：{name}、{score}点"
     },
     "classReport": {
       "title": "単語 × 生徒",
@@ -15146,7 +15151,15 @@ const ja = {
       "scheduleReteachHint": "苦手な語を組み直して、約2週間後にもう一度。間隔を空けると定着します。",
       "unpluggedReteachLiveCta": "端末なしの再指導Liveを開始",
       "reteachLiveCta": "3分の再指導Liveを開始",
-      "unpluggedReteachLiveFoil": "今日は生徒の端末が使えませんか？ ミスした語を映して、紙で答えてもらいましょう。"
+      "unpluggedReteachLiveFoil": "今日は生徒の端末が使えませんか？ ミスした語を映して、紙で答えてもらいましょう。",
+      "moodGreat_one": "{{count}}人の生徒が、最後のラウンドは最高だったと答えました。",
+      "moodGreat_other": "{{count}}人の生徒が、最後のラウンドは最高だったと答えました。",
+      "moodMixed_one": "{{count}}人の生徒が、最後のラウンドはまちまちだったと答えました。",
+      "moodMixed_other": "{{count}}人の生徒が、最後のラウンドはまちまちだったと答えました。",
+      "moodRough_one": "{{count}}人の生徒が、最後のラウンドはいまいちだったと答えました。",
+      "moodRough_other": "{{count}}人の生徒が、最後のラウンドはいまいちだったと答えました。",
+      "weeklyInactiveCount_one": "7日間未活動の生徒 {{count}} 人",
+      "weeklyInactiveCount_other": "7日間未活動の生徒 {{count}} 人"
     },
     "windowProgress": {
       "activeLine": "{{roster}}人中{{active}}人がプレイ",
@@ -15528,7 +15541,13 @@ const ja = {
         "offHint": "ランキングなし。XP・レベル・バッジは引き続きたまります。"
       },
       "tapToCopy": "タップしてコピー",
-      "codeCopiedShort": "コピーしました"
+      "codeCopiedShort": "コピーしました",
+      "studentCountPro_one": "生徒 {{count}} 人",
+      "studentCountPro_other": "生徒 {{count}} 人",
+      "cardSeeAllStudents_one": "生徒 {{count}} 人をすべて見る",
+      "cardSeeAllStudents_other": "生徒 {{count}} 人をすべて見る",
+      "members_one": "{{count}}人の生徒",
+      "members_other": "{{count}}人の生徒"
     },
     "classrooms": {
       "students": {
@@ -15629,7 +15648,9 @@ const ja = {
       "resumeDraftButton": "再開",
       "discardDraftButton": "破棄",
       "startFromTemplate": "テンプレートから開始",
-      "templateLoaded": "テンプレート読み込み完了：{{count}}語"
+      "templateLoaded": "テンプレート読み込み完了：{{count}}語",
+      "words_one": "{{count}}単語",
+      "words_other": "{{count}}単語"
     },
     "lessons": {
       "assign": {
@@ -15652,7 +15673,9 @@ const ja = {
         "help": "集中して練習するスキルを1つ選ぶか、生徒に任せます。このレッスンに十分な単語があるスキルだけ選べます。",
         "any": "自由に練習",
         "anyHint": "生徒が自分でモードを選びます",
-        "questionCount": "{{count}}問 · {{skill}}"
+        "questionCount": "{{count}}問 · {{skill}}",
+        "questionCount_one": "{{count}}問 · {{skill}}",
+        "questionCount_other": "{{count}}問 · {{skill}}"
       },
       "createTitle": "課題を作成",
       "create": "課題を作成",
@@ -15751,7 +15774,9 @@ const ja = {
         "g68GeographyDesc": "地形・気候と地図を読むことば",
         "g68Science": "小6〜中2 理科：生き物と大地",
         "g68ScienceDesc": "中学理科の用語を、わかりやすい説明つきで"
-      }
+      },
+      "findNWords_one": "{{count}}語見つけよう",
+      "findNWords_other": "{{count}}語見つけよう"
     },
     "completion": {
       "overallProgress": "全体的な進捗",
@@ -15913,7 +15938,8 @@ const ja = {
         "games": "ゲーム",
         "pulse": "クラスの様子",
         "homework": "宿題",
-        "more": "その他"
+        "more": "その他",
+        "words": "単語"
       },
       "noClassroomsFound": "クラスルームが見つかりません",
       "error": "レポートの読み込みエラー",
@@ -16129,11 +16155,18 @@ const ja = {
         "errorNotFound": "クラスまたは課題が見つかりません。削除された可能性があります。",
         "errorUngraded": "この Classroom の課題には配点がないため、成績を付けられません。",
         "errorNotPro": "Google Classroom への成績送信は Teacher Pro の機能です。",
-        "errorGeneric": "Google Classroom との通信で問題が発生しました。もう一度お試しください。"
+        "errorGeneric": "Google Classroom との通信で問題が発生しました。もう一度お試しください。",
+        "updated_one": "{{count}} 人の生徒を採点しました",
+        "updated_other": "{{count}} 人の生徒を採点しました",
+        "skipped_one": "{{count}} 人はスキップ：このレッスンをまだ練習していません",
+        "skipped_other": "{{count}} 人はスキップ：このレッスンをまだ練習していません"
       },
       "picker": {
         "showing": "上に表示中"
-      }
+      },
+      "ownPreview": {"title": "{{class}}:生徒ひとりずつ", "line": "Proなら名簿の生徒一人ひとりに、正答率、覚えた単語の数、まちがえた単語がそのまま表示されます。", "columns": {"student": "生徒", "accuracy": "正答率", "mastered": "覚えた単語", "missed": "まちがえた単語"}, "locked": "Proで表示", "more_one": "ほか{{count}}人", "more_other": "ほか{{count}}人"},
+      "streakDays_one": "{{count}}日",
+      "streakDays_other": "{{count}}日"
     },
     "curriculum": {
       "title": "ライブラリ",
@@ -16215,7 +16248,9 @@ const ja = {
       "homeTitleGames": "今週の{{name}}のゲーム：{{count}}回。サポートが必要なのは誰？",
       "homeBody": "1クラスは無料。Proなら過去の週、生徒ごとのレポート、すべてのクラスが見られます。",
       "homeCta": "今週を見る"
-    }
+    },
+    "proPowered": {"hint": "Teacher Pro プランの機能です"},
+    "trialUsage": {"lead": "お試し期間中の利用:", "games_one": "クラスゲーム{count}回", "games_other": "クラスゲーム{count}回", "students_one": "生徒{count}人を記録", "students_other": "生徒{count}人を記録", "practice_one": "練習{count}回", "practice_other": "練習{count}回"}
   },
   "education": {
     "race": {
@@ -16315,7 +16350,13 @@ const ja = {
       "gradeOnTime": "期限内。クラスの連続記録は守られたよ。",
       "teacherLoadFailed": "プレイ状況を読み込めませんでした。少し待って再試行してください。",
       "teacherOnTime": "期限内",
-      "teacherLate": "遅れ"
+      "teacherLate": "遅れ",
+      "introTitle_one": "クラスが間違えた{{count}}語",
+      "introTitle_other": "クラスが間違えた{{count}}語",
+      "studentTitle_one": "とりかえす単語は{{count}}コ",
+      "studentTitle_other": "とりかえす単語は{{count}}コ",
+      "startCta_one": "スタート（{{count}}語）",
+      "startCta_other": "スタート（{{count}}語）"
     },
     "modePicker": {
       "title": "ゲームを選ぶ",
@@ -16478,7 +16519,11 @@ const ja = {
         "spelling": "このレッスンに単語を追加すると使えます",
         "flashcard": "このレッスンに単語を追加すると使えます",
         "word_list": "このレッスンに単語を追加すると使えます"
-      }
+      },
+      "words_one": "{{count}}語",
+      "words_other": "{{count}}語",
+      "questions_one": "{{count}}問",
+      "questions_other": "{{count}}問"
     },
     "produce": {
       "title": "ワードフォージ",
@@ -17271,7 +17316,9 @@ const ja = {
         "today": "今日",
         "openReport": "{{name}}さんのレポートを開く",
         "unnamed": "生徒",
-        "drillDescription": "この生徒の詳しい進捗レポート"
+        "drillDescription": "この生徒の詳しい進捗レポート",
+        "hardWordsMeta_one": "{{count}}人・誤答{{pct}}%",
+        "hardWordsMeta_other": "{{count}}人・誤答{{pct}}%"
       },
       "studentProgress": "生徒の進捗",
       "students": "生徒",
@@ -17362,7 +17409,9 @@ const ja = {
       "title": "クラスゲーム",
       "waitingForPlayers": "クラスゲームの準備中...",
       "waitingForStudents": "生徒を待機中",
-      "words": "{{count}}語"
+      "words": "{{count}}語",
+      "words_one": "{{count}}語",
+      "words_other": "{{count}}語"
     },
     "header": {
       "exitEducation": "教育モードを終了",
@@ -21743,7 +21792,9 @@ const ja = {
       "studyBack": "もどる",
       "studyNext": "つぎへ",
       "studyDone": "おぼえた！",
-      "studyReadyLocked": "{count}語ぜんぶ見たら「準備OK」を押せるよ"
+      "studyReadyLocked": "{count}語ぜんぶ見たら「準備OK」を押せるよ",
+      "studyLearned_one": "{count}語おぼえた",
+      "studyLearned_other": "{count}語おぼえた"
     },
     "recall": {
       "intro": "まず目を通して、そのあと短いクイズで覚えたかチェックしよう。",
@@ -22035,7 +22086,11 @@ const ja = {
       "nothing": "練習するミス単語はまだありません。",
       "inDays": "{count}日後",
       "tomorrow": "明日",
-      "whyNote": "まとめて復習するより、間隔をあけて思い出すほうが定着します。各ラウンドは忘れかけたころに戻ってきます。"
+      "whyNote": "まとめて復習するより、間隔をあけて思い出すほうが定着します。各ラウンドは忘れかけたころに戻ってきます。",
+      "assignedBody_one": "{count}語・3ラウンド。生徒のレッスン一覧に表示されます。",
+      "assignedBody_other": "{count}語・3ラウンド。生徒のレッスン一覧に表示されます。",
+      "inDays_one": "{count}日後",
+      "inDays_other": "{count}日後"
     },
     "reports": {
       "classEyebrow": "クラスレポート",
@@ -22046,7 +22101,8 @@ const ja = {
       "arcTitle": "生徒ひとりずつ",
       "arcHint": "伸びている子、つまずいている子、そのつまずきの原因になっている単語。",
       "digestTitle": "前回のクラスゲーム",
-      "digestHint": "直近のゲームで何が起きたかをひと目で。"
+      "digestHint": "直近のゲームで何が起きたかをひと目で。",
+      "lessonsHint": "クラスがいちばん覚えやすい単語リストがわかります。"
     },
     "upgrade": {
       "featureMastery": "ミスの多い上位10語+生徒×単語ヒートマップ",
@@ -22703,7 +22759,7 @@ const ja = {
         "playAgain": "もう一度遊ぶ",
         "pickGame": "別のゲームを選ぶ",
         "loading": "前回のゲームを確認中",
-        "ready": "テストの準備OK {ready}/{total}人",
+        "ready": "前回のゲーム：{total}人中{ready}人がリストの単語で80%以上",
         "readyEmpty": "単語ごとの結果は次のゲームのあとに表示されます",
         "missed": "欠席 {count}人 · 練習を割り当てる"
       },
@@ -22733,7 +22789,7 @@ const ja = {
         "colName": "名前",
         "colXp": "XP",
         "colWords": "単語",
-        "colAccuracy": "正答率",
+        "colAccuracy": "正答率（累計）",
         "colWeek": "今週",
         "status": {
           "done": "今週プレイ済み",
@@ -22757,7 +22813,7 @@ const ja = {
         "lastPlayed": "最後のプレイ：{when}",
         "notYet": "まだ",
         "streak": "{count}日連続",
-        "accuracy": "正答率{count}%",
+        "accuracy": "累計正答率{count}%",
         "noStreak": "現在連続記録なし",
         "noWordsYet": "まだ単語の練習なし",
         "empty": "まだ生徒がいません。クラスコードを共有するとここに表示されます。",

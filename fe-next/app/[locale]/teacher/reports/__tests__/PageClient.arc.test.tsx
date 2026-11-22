@@ -29,7 +29,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({
-    classrooms: [{ id: 'c1', name: 'Band 2', member_count: 2, language: 'en' }],
+    classrooms: [{ id: '11111111-1111-4111-8111-111111111111', name: 'Band 2', member_count: 2, language: 'en' }],
     isLoading: false,
   }),
 }));
@@ -72,7 +72,7 @@ vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
 vi.mock('@/components/teacher/reports/ClassArcPanel', () => ({
   ClassArcPanel: ({ onStudentClick }: { onStudentClick: (id: string, name?: string) => void }) => (
     <div data-testid="class-arc-panel">
-      <button type="button" onClick={() => onStudentClick('s1', 'Sam')}>pick</button>
+      <button type="button" onClick={() => onStudentClick('33333333-3333-4333-8333-333333333333', 'Sam')}>pick</button>
     </div>
   ),
 }));
@@ -121,7 +121,7 @@ describe('<TeacherReportsPage> arc gating', () => {
   });
 
   it('shows the class arc panel alongside the full class report', async () => {
-    search = 'classroomId=c1';
+    search = 'classroomId=11111111-1111-4111-8111-111111111111';
     render(<TeacherReportsPage />);
     await userEvent.setup().click(screen.getByRole('tab', { name: 'teacher.reports.tabs.more' }));
     expect(screen.getByTestId('class-arc-panel')).toBeInTheDocument();
@@ -129,7 +129,7 @@ describe('<TeacherReportsPage> arc gating', () => {
   });
 
   it('shows the student arc above the deep student report', () => {
-    search = 'classroomId=c1&studentId=s1';
+    search = 'classroomId=11111111-1111-4111-8111-111111111111&studentId=33333333-3333-4333-8333-333333333333';
     render(<TeacherReportsPage />);
     const arc = screen.getByTestId('student-arc-view');
     const report = screen.getByTestId('student-progress-report');
@@ -137,7 +137,7 @@ describe('<TeacherReportsPage> arc gating', () => {
   });
 
   it('hands the clicked student name through to the arc header', async () => {
-    search = 'classroomId=c1';
+    search = 'classroomId=11111111-1111-4111-8111-111111111111';
     const { findByTestId, findAllByText } = render(<TeacherReportsPage />);
     await userEvent.setup().click(screen.getByRole('tab', { name: 'teacher.reports.tabs.more' }));
     const panel = await findByTestId('class-arc-panel');
@@ -147,12 +147,12 @@ describe('<TeacherReportsPage> arc gating', () => {
 
   it('resolves the student name from the roster on a deep link', async () => {
     getClassroomStudents.mockResolvedValue({
-      data: [{ student_id: 's1', profiles: { display_name: 'Noa', username: 'Player_x' } }],
+      data: [{ student_id: '33333333-3333-4333-8333-333333333333', profiles: { display_name: 'Noa', username: 'Player_x' } }],
       error: null,
     });
-    search = 'classroomId=c1&studentId=s1';
+    search = 'classroomId=11111111-1111-4111-8111-111111111111&studentId=33333333-3333-4333-8333-333333333333';
     const { findByTestId } = render(<TeacherReportsPage />);
-    await waitFor(() => expect(getClassroomStudents).toHaveBeenCalledWith('c1'));
+    await waitFor(() => expect(getClassroomStudents).toHaveBeenCalledWith('11111111-1111-4111-8111-111111111111'));
     expect((await findByTestId('student-arc-view')).textContent).toBe('Noa');
   });
 });

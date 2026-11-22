@@ -8,19 +8,20 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { NeoButton } from '@/components/ui/button';
 import { OUTLINE_BUTTON } from '@/components/teacher/home/homeStyles';
 import { cn } from '@/lib/utils';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface ClassReportHeaderProps {
   eyebrow: string;
   name: string;
   onBack: () => void;
-  link: { href: string; label: string; testId: string };
+  link?: { href: string; label: string; testId: string };
   memberCount?: number;
   children?: ReactNode;
 }
 
 /** One header for both halves of a class's results, so moving between them reads as one report. */
 export function ClassReportHeader({ eyebrow, name, onBack, link, memberCount, children }: ClassReportHeaderProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const backLabel = t('eduShell.home.classPage');
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-4">
@@ -40,13 +41,15 @@ export function ClassReportHeader({ eyebrow, name, onBack, link, memberCount, ch
         </h1>
         {typeof memberCount === 'number' ? (
           <p data-testid="class-report-size" className="font-neo-body text-sm font-bold text-neo-cream/70">
-            {memberCount === 1 ? t('teacher.classroom.member') : t('teacher.classroom.members', { count: memberCount })}
+            {t(pluralKeyOf('teacher.classroom.members', memberCount, language), { count: memberCount })}
           </p>
         ) : null}
       </div>
-      <NeoButton asChild variant="outline" className="shrink-0">
-        <Link href={link.href} data-testid={link.testId}>{link.label}</Link>
-      </NeoButton>
+      {link ? (
+        <NeoButton asChild variant="outline" className="shrink-0">
+          <Link href={link.href} data-testid={link.testId}>{link.label}</Link>
+        </NeoButton>
+      ) : null}
       {children}
     </div>
   );

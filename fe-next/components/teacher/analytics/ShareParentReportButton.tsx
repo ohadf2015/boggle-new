@@ -16,9 +16,7 @@ interface ShareParentReportButtonProps {
  * student in ONE classroom (Teacher Pro) and hands it to the share sheet
  * (WhatsApp, Messages…), the clipboard, or, failing both, shows it to copy.
  *
- * Lives inside `StudentProgressTable`, which is already rendered behind
- * `<ProGate feature="analytics">` — no extra gating needed here. The API
- * route enforces ownership/membership/Pro server-side regardless.
+ * The API route enforces ownership/membership/Pro server-side.
  */
 export function ShareParentReportButton({ classroomId, studentId }: ShareParentReportButtonProps) {
   const { t, language } = useLanguage();

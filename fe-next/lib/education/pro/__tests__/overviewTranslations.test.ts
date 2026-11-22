@@ -15,6 +15,6 @@ describe('class overview translations', () => {
   it('Given the six locales, Then each carries the same overview keys as English', () => {
     const ref = flat(overview(en)).sort();
     expect(ref.length).toBeGreaterThan(20);
-    for (const l of [he, es, sv, ja, ru]) expect(flat(overview(l)).sort()).toEqual(ref);
+    for (const l of [he, es, sv, ja, ru]) expect(flat(overview(l)).filter((k) => !/_(few|many)$/.test(k)).sort()).toEqual(ref);
   });
 });

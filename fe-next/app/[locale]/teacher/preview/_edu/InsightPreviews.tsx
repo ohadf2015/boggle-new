@@ -1,15 +1,16 @@
 'use client';
 
-import { useMemo, type ReactNode } from 'react';
+import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { EducationShell } from '@/components/education/shell/EducationShell';
 import { ProGate } from '@/components/teacher/ProGate';
 import { FreeWeekCard } from '@/components/teacher/analytics/free/FreeWeekInsight';
 import { ClassroomPicker } from '@/components/teacher/reports/ClassroomPicker';
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import UpgradePricingPageClient from '@/app/[locale]/teacher/upgrade/PageClient';
 import { ReportsFreeInsightsView } from '@/app/[locale]/teacher/reports/ReportsFreeInsights';
-import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
+import { OwnClassProPreviewView } from '@/app/[locale]/teacher/reports/OwnClassProPreview';
+import { ReportsShell } from '@/app/[locale]/teacher/reports/PageClient';
+import { ClassReportHeader } from '@/components/teacher/reports/ClassReportHeader';
 import { buildStudentPulses, type PulseRow } from '@/lib/education/pro/classInsights';
 import { rankWeekHardestWords, toFreeClassPulse, type FreeClassInsight } from '@/lib/education/pro/freeClassInsight';
 import type { ClassAnalytics } from '@/lib/education/pro/classAnalyticsServer';
@@ -73,25 +74,35 @@ function useInsightFixture(empty: boolean) {
   return { t: rawT as T, language, f, insight, names };
 }
 
-/** Free analytics page body: the weekly card alone (no second Pro pitch); v=empty is the one-card empty state. */
+/** The old analytics link now lands on Reports' free class view: own week, own roster locked, one Pro lock. v=empty is a class with no games this week. */
 export function AnalyticsInsightPreview({ v }: { v?: string }) {
   const { t, language, f, insight, names } = useInsightFixture(v === 'empty');
+  const students = [...names].map(([id, name]) => ({ id, name }));
   return (
-    <EducationShell scrollRegionLabel={t('teacher.shell.analyticsLabel')} contentClassName="p-4 md:px-8 md:py-6">
-      <div className="mx-auto max-w-7xl space-y-4 md:space-y-5">
-        <div>
-          <p className="font-neo-body text-sm font-bold text-neo-cream/70">{t('teacher.classroom.cardClassReport')}</p>
-          <h1 className="font-neo-display text-2xl font-bold leading-tight text-neo-cream md:text-3xl">{f.className}</h1>
+    <ReportsShell>
+      <ProGate feature="reports" ctaKey="teacher.proGate.reports.cta" tone="calm" quiet={v === 'empty'} lockedTitle={
+        <div className="mx-auto mb-4 flex w-full max-w-5xl flex-col gap-4 sm:mb-6">
+          <ClassReportHeader
+            eyebrow={t('teacher.reports.title')}
+            name={f.className}
+            memberCount={students.length}
+            onBack={noop}
+            link={{ href: '#', label: t('teacher.weekInsight.startGame'), testId: 'reports-start-game' }}
+          />
+          <FreeWeekCard classroomId="p5b" locale={language} insight={insight} names={names} t={t} />
+          <OwnClassProPreviewView className={f.className} students={students} />
         </div>
-        <FreeWeekCard classroomId="p5b" locale={language} insight={insight} names={names} t={t} />
-      </div>
-    </EducationShell>
+      }>
+        {null}
+      </ProGate>
+    </ReportsShell>
   );
 }
 
 /** Reports: v=free (real week for the oldest class, other classes named, compact Pro lock), v=empty, v=pro (class picker). */
 export function ReportsPreview({ v }: { v?: string }) {
   const { t, language, f, insight, names } = useInsightFixture(v === 'empty');
+  const students = [...names].map(([id, name]) => ({ id, name }));
   const classes = [
     { id: 'c1', name: f.className },
     { id: 'c2', name: language === 'he' ? 'ח2 אנגלית' : '8C English' },
@@ -123,6 +134,7 @@ export function ReportsPreview({ v }: { v?: string }) {
             <ReportsFreeInsightsView free={classes[0]} others={classes.slice(1)}>
               <FreeWeekCard classroomId="c1" locale={language} insight={insight} names={names} t={t} proLine={false} />
             </ReportsFreeInsightsView>
+            <OwnClassProPreviewView className={classes[0].name} students={students} />
           </div>
         }
       >
@@ -139,14 +151,5 @@ export function UpgradePreview({ v }: { v?: string }) {
       <UpgradePricingPageClient />
       {v === 'explainer' ? <PreCheckoutExplainer mode="trial" pending={false} onConfirm={noop} onBack={noop} /> : null}
     </>
-  );
-}
-
-function ReportsShell({ children }: { children: ReactNode }) {
-  const { t } = useLanguage();
-  return (
-    <EducationShell className={TEACHER_TV_SCALE} scrollRegionLabel={t('teacher.reports.title')} contentClassName="relative p-4 sm:p-6 lg:p-8">
-      {children}
-    </EducationShell>
   );
 }

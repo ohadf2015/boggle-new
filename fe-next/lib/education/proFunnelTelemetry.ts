@@ -10,18 +10,19 @@
  *   trial_activated                server  — Polar webhook status=trialing (teacher row upgraded)
  *   edu_pro_upgrade_clicked        client  — pricing page or dashboard *paid* CTA tap
  *   edu_pro_checkout_started       server  — /api/subscription/checkout made a paid Polar checkout
- *   checkout_return_landed         server+client — teacher landed back with ?checkout=success, REGARDLESS
+ *   checkout_return_landed         server  — teacher landed back with ?checkout=success, REGARDLESS
  *                                             of entitlement (not gated behind grant success)
  *   checkout_complete              server  — Polar webhook `subscription.active` not trialing
  *   edu_pro_checkout_succeeded     server  — Polar webhook `subscription.active` (authoritative)
  *   edu_pro_checkout_success_seen  client  — teacher landed back on Teacher HQ, Pro welcome shown
- *   edu_pro_checkout_return_landed server+client — teacher landed back with ?checkout=success, REGARDLESS
+ *   edu_pro_checkout_return_landed server  — teacher landed back with ?checkout=success, REGARDLESS
  *                                             of entitlement. Compares against edu_pro_checkout_succeeded
  *                                             (webhook) to tell "webhook broken" from "user abandoned".
  *
- * The last one deliberately does NOT reuse the server's name: the webhook is the
- * truth about money, the client step is only "the teacher saw it land". One
- * name for both would count every conversion twice.
+ * `edu_pro_checkout_success_seen` deliberately does NOT reuse the webhook's name: the
+ * webhook is the truth about money, the client step is only "the teacher saw it land".
+ * The two return-landed names come only from /api/subscription/checkout-return, which
+ * fires without cookie consent; this module mirrors them to Growth Radar and POSTs there.
  *
  * Never throws — a telemetry failure must never block a checkout click.
  *
@@ -247,8 +248,8 @@ export function trackEduProCheckoutSuccessSeen(now: number = Date.now()): boolea
  * `hasPro`, so a broken webhook means it never fires), this always fires —
  * the only way to tell "webhook never landed" from "user abandoned on Polar".
  *
- * Two PostHog names, one step: `edu_pro_checkout_return_landed` is the funnel
- * name, `checkout_return_landed` is the name QA counts. Neither is the webhook
+ * Two PostHog names, one step, both emitted by the server endpoint only:
+ * `edu_pro_checkout_return_landed` is the funnel name, `checkout_return_landed` the QA one. Neither is the webhook
  * grant (`edu_pro_checkout_succeeded`), so a return is not a second conversion.
  * A reload inside 24h does not count again.
  */
@@ -292,8 +293,7 @@ export function trackEduProCheckoutReturnLanded(
     ...(checkoutId ? { checkout_id: checkoutId } : {}),
   };
 
-  captureStep('edu_pro_checkout_return_landed', attributionProps);
-  safeCapture('checkout_return_landed', { product: 'teacher_pro', provider: 'polar', ...attributionProps });
+  mirrorToGrowth('edu_pro_checkout_return_landed', attributionProps);
   try {
     if (typeof fetch === 'function') {
       const path = typeof window !== 'undefined' ? window.location?.pathname : undefined;

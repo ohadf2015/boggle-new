@@ -18,6 +18,7 @@ const download = vi.fn();
 vi.mock('@/lib/education/assignmentProgressReport', () => ({ downloadCsvFile: (...a: unknown[]) => download(...a) }));
 vi.mock('react-hot-toast', () => ({ default: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: true, loading: false, accessTrialExpires: null }) }));
 
 import { ParentReportPack } from '../ParentReportPack';
 

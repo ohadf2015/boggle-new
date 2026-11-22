@@ -7,6 +7,7 @@ import { PANEL_TITLE } from '@/components/teacher/analytics/overview/overviewPar
 import { pct } from '@/components/teacher/analytics/overview/overviewModel';
 import { IconBadge, ReteachPracticeAction, ReteachStartGame, ReteachWordRows, snapshotWords } from './reteachParts';
 import { useWordMasteryReport } from './useWordMasteryReport';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface FallbackWord {
   word: string;
@@ -28,7 +29,7 @@ export function ClassFocusWords({
   fallback: readonly FallbackWord[];
   surface: ResultsSurface;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const state = useWordMasteryReport(classroomId);
 
   if (state.status === 'loading') {
@@ -65,7 +66,7 @@ export function ClassFocusWords({
               <li key={m.word} className="flex items-baseline justify-between gap-3 border-b-2 border-neo-cream/15 py-2 max-sm:[&:nth-child(n+4)]:hidden">
                 <bdi className="min-w-0 truncate font-neo-display text-xl font-black text-neo-white">{m.word}</bdi>
                 <span className="shrink-0 font-neo-body text-xs font-bold text-neo-cream/70">
-                  {t('education.analytics.overview.hardWordsMeta', { count: m.studentCount, pct: pct(m.errorRate) })}
+                  {t(pluralKeyOf('education.analytics.overview.hardWordsMeta', m.studentCount, language), { count: m.studentCount, pct: pct(m.errorRate) })}
                 </span>
               </li>
             ))}

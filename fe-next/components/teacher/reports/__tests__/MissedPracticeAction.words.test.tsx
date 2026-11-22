@@ -29,4 +29,10 @@ describe('MissedPracticeAction words', () => {
     await waitFor(() => expect(fetchWithAuth).toHaveBeenCalled());
     expect(sentBody()).not.toHaveProperty('words');
   });
+
+  it('given the server assigned one word, then the confirmation uses the singular form', async () => {
+    render(<MissedPracticeAction classroomId="c1" classroomName="7B" locked={false} words={['enormous']} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(await screen.findByText('eduPro.practice.assignedBody_one')).toBeInTheDocument();
+  });
 });

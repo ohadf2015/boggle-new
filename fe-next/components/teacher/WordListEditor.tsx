@@ -19,6 +19,7 @@ import {
 import WordSkillFields, { parseSenses } from './lesson-creation/WordSkillFields';
 import logger from '@/utils/logger';
 import { SINGLE_WORDS_ONLY_KEY, formatRejectedTerms, isMultiWordTerm } from '@/lib/education/singleWordTerm';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface WordListEditorProps {
   words: VocabularyWord[];
@@ -55,7 +56,7 @@ export default function WordListEditor({
   maxHeight = 'max-h-60',
   showAiFill = true,
 }: WordListEditorProps) {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
   const { checkWordIntegration } = useWordIntegration();
   const [currentWord, setCurrentWord] = useState('');
   const [addError, setAddError] = useState<string | null>(null);
@@ -200,7 +201,7 @@ export default function WordListEditor({
     <div>
       <div className="flex items-center justify-between mb-2">
         <label className="text-sm font-neo-body text-neo-white">
-          {t('teacher.lesson.words', { count: words.length })} ({words.length})
+          {t(pluralKeyOf('teacher.lesson.words', words.length, uiLanguage), { count: words.length })}
         </label>
         {showBulkImport && (
           <Button

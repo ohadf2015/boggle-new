@@ -8,6 +8,7 @@ import { SPED_VOCAB_CAP, type ClassroomPresetId } from '@/lib/education/classroo
 import type { VocabularyLesson } from '@/lib/supabase/education';
 import { LessonPicker } from '../pickers/LessonPicker';
 import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface LobbyLessonStepProps {
   lessons: VocabularyLesson[];
@@ -27,7 +28,7 @@ export interface LobbyLessonStepProps {
 
 /** The class and its word list: one confirm-at-a-glance line, with the pickers one tap away and open when nothing is chosen. */
 export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLanguage, createHref, wordCount, boardLanguage, activePreset, className, classroomName, classPicker }: LobbyLessonStepProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [opened, setOpened] = useState(false);
   const missing = selectedLessonIds.length === 0 || wordCount === 0;
   const open = opened || missing;
@@ -63,7 +64,7 @@ export function LobbyLessonStep({ lessons, selectedLessonIds, onChange, classLan
           {missing ? t('education.modePicker.needsLesson') : classroomName ? `${classroomName} · ${names}` : names}
         </span>
         {!missing && (
-          <span className="shrink-0 font-normal text-neo-cream/70">{t('education.classroomGame.words', { count: wordCount })}</span>
+          <span className="shrink-0 font-normal text-neo-cream/70">{t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
         )}
         {boardLanguage && !missing && (
           <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />

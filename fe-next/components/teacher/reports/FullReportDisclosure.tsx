@@ -16,12 +16,13 @@ interface ReportDisclosureProps {
   icon: LucideIcon;
   accent: keyof typeof ACCENTS;
   title: string;
+  badge?: React.ReactNode;
   hint: string;
   children: (open: boolean) => React.ReactNode;
 }
 
 /** Detail on demand: a closed row that keeps a long section one tap away instead of a screen of scroll. */
-export function ReportDisclosure({ testId, icon: Icon, accent, title, hint, children }: ReportDisclosureProps) {
+export function ReportDisclosure({ testId, icon: Icon, accent, title, badge, hint, children }: ReportDisclosureProps) {
   const [open, setOpen] = useState(false);
   return (
     <details
@@ -34,7 +35,7 @@ export function ReportDisclosure({ testId, icon: Icon, accent, title, hint, chil
           <Icon className="size-4" aria-hidden="true" />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-neo-display text-base sm:text-lg font-bold text-neo-white leading-snug">{title}</span>
+          <span className="block font-neo-display text-base sm:text-lg font-bold text-neo-white leading-snug">{title}{badge}</span>
           <span className="block text-xs font-bold text-neo-cream/70 leading-snug">{hint}</span>
         </span>
         <ChevronDown className="size-5 shrink-0 text-neo-cream/80 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />

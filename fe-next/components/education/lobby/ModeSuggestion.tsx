@@ -2,11 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { hasProAccess } from '@/lib/education/teacherPlanGate';
 import { launchOf, type ClassroomCatalogueId } from '@/lib/education/classroomCatalogueId';
 import { fetchRecentTeacherRounds } from '@/lib/education/recentTeacherRounds';
-import { isRehearsing, PRO_ONLY_MODES, suggestNextMode, type SuggestionRound } from '@/lib/education/modeSuggestion';
+import { isRehearsing, suggestNextMode, type SuggestionRound } from '@/lib/education/modeSuggestion';
 import { trackModeSuggestionAccepted, trackModeSuggestionShown } from '@/lib/education/modeSuggestionTelemetry';
 import { modeAllowsRehearsalBots, peekRehearseIntent } from '@/lib/education/rehearsal';
 import { catalogueModes } from '../ClassroomModeCatalogueData';
@@ -27,7 +25,6 @@ interface Suggestion {
 /** One mode a teacher stuck on the same games has not tried; the grid tags its tile, picking it only selects. */
 export function useModeSuggestion({ selected, isBlocked, ready = true }: ModeSuggestionArgs) {
   const { user } = useAuth();
-  const entitlement = useTeacherPro();
   const [rounds, setRounds] = useState<SuggestionRound[] | null>(null);
   const [suggestion, setSuggestion] = useState<Suggestion | null>(null);
   const [accepted, setAccepted] = useState(false);
@@ -45,26 +42,24 @@ export function useModeSuggestion({ selected, isBlocked, ready = true }: ModeSug
     };
   }, [teacherId]);
 
-  // Decided once, after rounds AND the Pro check resolve, so the chip never swaps under the teacher's finger.
+  // Decided once, after rounds resolve, so the chip never swaps under the teacher's finger.
   useEffect(() => {
-    if (!ready || decided.current || !rounds || entitlement.loading) return;
+    if (!ready || decided.current || !rounds) return;
     decided.current = true;
     const intent = peekRehearseIntent() !== null;
     const id = suggestNextMode({
       rounds,
       candidates: catalogueModes().map((m) => m.id),
       selected,
-      hasPro: hasProAccess(entitlement, Date.now()),
       rehearseIntent: intent,
       isBlocked,
-      isProOnly: (mode) => PRO_ONLY_MODES.has(mode),
       botCapable: (mode) => modeAllowsRehearsalBots(launchOf(mode).gameMode),
     });
     if (!id) return;
     const next = { id, from: selected, rehearsing: isRehearsing(rounds, intent) };
     setSuggestion(next);
     trackModeSuggestionShown({ suggestedMode: id, selectedMode: selected, rehearsing: next.rehearsing });
-  }, [ready, rounds, entitlement, selected, isBlocked]);
+  }, [ready, rounds, selected, isBlocked]);
 
   const onPicked = useCallback(
     (id: ClassroomCatalogueId) => {
