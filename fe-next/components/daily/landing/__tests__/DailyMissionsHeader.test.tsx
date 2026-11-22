@@ -32,6 +32,12 @@ describe('DailyMissionsHeader', () => {
     vi.useRealTimers();
   });
 
+  test('progress label wraps instead of truncating on a narrow phone', () => {
+    renderWithProviders(<DailyMissionsHeader completedCount={0} />);
+    const label = screen.getByRole('heading', { level: 2 });
+    expect(label.className).not.toContain('truncate');
+  });
+
   test('renders progress bar with 0 completed', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={0} />);
 

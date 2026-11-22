@@ -95,7 +95,7 @@ export function DailyMissionsHeader({ completedCount, total = 2, ready = true }:
       {/* Middle: segmented missions progress */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1.5">
-          <h2 className="text-xs font-black text-neo-lime uppercase tracking-wider truncate">
+          <h2 className="text-xs font-black text-neo-lime uppercase tracking-wide leading-tight">
             {t('daily.hub.progressLabel')}
           </h2>
           <span className={cn(

@@ -9796,7 +9796,7 @@ const es = {
       "badge": "Escaneado",
       "line": "Código escaneado: el puzle de hoy ya está listo."
     },
-    "todaysPuzzles": "Los retos de hoy",
+    "todaysPuzzles": "Los puzzles de hoy",
     "results": {
       "fullRecap": "Resumen completo",
       "fullRecapSummary": "Tu puesto, tu palabra más rara, tus monedas y a quién ganaste",
@@ -10208,7 +10208,7 @@ const es = {
 "requiredDone": "¡Listos los dos de hoy! Los acertijos extra son opcionales.",
 "pastPuzzles": "¿Te perdiste un día? Acertijos anteriores"
 },
-"archivePage": { "backToHub": "Volver a los retos de hoy",
+"archivePage": { "backToHub": "Volver a los puzzles de hoy",
 "title": "Acertijos anteriores",
 "subtitle": "¿Te perdiste un día? Los últimos tres todavía se pueden jugar, gratis. En los acertijos más antiguos ves cómo les fue a todos.",
 "count": "{n} acertijos",

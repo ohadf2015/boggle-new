@@ -124,9 +124,9 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
     vi.useRealTimers();
   });
 
-  it('should render "Today\'s quests" header at the top', () => {
+  it('should render "Today\'s puzzles" header at the top', () => {
     renderComponent();
-    expect(screen.getByText(/today['\s]s quests/i)).toBeInTheDocument();
+    expect(screen.getByText(/today['\s]s puzzles/i)).toBeInTheDocument();
   });
 
   it('shows the date once, on the date card, not as a raw ISO string', () => {
@@ -195,7 +195,7 @@ describe('DailyChallengeLanding — Hub Redesign', () => {
   it('shows the title without a second streak counter (the streak card owns the number)', () => {
     renderComponent();
     const header = screen.getByTestId('daily-hub-header');
-    expect(header).toHaveTextContent(/today['\s]s quests/i);
+    expect(header).toHaveTextContent(/today['\s]s puzzles/i);
     expect(screen.queryByTestId('streak-counter')).not.toBeInTheDocument();
   });
 });

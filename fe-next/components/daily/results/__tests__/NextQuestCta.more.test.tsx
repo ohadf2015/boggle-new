@@ -61,6 +61,12 @@ describe('NextQuestCta: every other unfinished challenge + the way back', () => 
     expect(screen.getByTestId('next-quest-back')).toHaveTextContent('Back to daily');
   });
 
+  it('hideBack drops the back link when the page already has one', () => {
+    renderCta({ hideBack: true });
+    expect(screen.getByTestId('next-quest-more')).toBeInTheDocument();
+    expect(screen.queryByTestId('next-quest-back')).not.toBeInTheDocument();
+  });
+
   it('shows only the back link when the headline is the last one left', () => {
     playedStatus.today = { wordHunt: false, wordWheel: true, wordTower: true, connections: true };
     renderCta();

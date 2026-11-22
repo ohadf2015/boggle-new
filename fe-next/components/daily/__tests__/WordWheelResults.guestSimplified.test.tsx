@@ -49,6 +49,15 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: null, profile: null, isAuthenticated: false, loading: false }),
 }));
 
+vi.mock('../results/NextQuestCta', () => ({
+  NextQuestCta: () => <div data-testid="next-quest-cta" />,
+}));
+
+vi.mock('../WordWheelSignupCta', () => ({
+  __esModule: true,
+  default: () => <div data-testid="wheel-signup-cta" />,
+}));
+
 vi.mock('../DailyInsightStack', () => ({
   __esModule: true,
   default: () => <div data-testid="insight-stack" />,
@@ -106,5 +115,13 @@ describe('WordWheelResults — guest simplification', () => {
     expect(screen.getByTestId('insight-stack')).toBeInTheDocument();
     expect(screen.getByTestId('catch-up')).toBeInTheDocument();
     expect(screen.getByText('wordWheel.foundWords')).toBeInTheDocument();
+  });
+
+  it('puts the next step before the single signup card for a guest', () => {
+    renderResults(false);
+    const next = screen.getByTestId('next-quest-cta');
+    const signup = screen.getByTestId('wheel-signup-cta');
+    expect(next.compareDocumentPosition(signup) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getAllByTestId('wheel-signup-cta')).toHaveLength(1);
   });
 });

@@ -7,6 +7,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import WordWheelReadyCard from '../WordWheelReadyCard';
+import { overlayQuietZoneReason, resetOverlayQuietZoneForTests } from '@/lib/overlayQuietZone';
 
 const t = (key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key;
@@ -21,7 +22,23 @@ const base = {
 };
 
 describe('WordWheelReadyCard', () => {
-  beforeEach(() => { localStorage.clear(); });
+  beforeEach(() => { localStorage.clear(); resetOverlayQuietZoneForTests(); });
+
+  it('Given the how-to is open, When it shows, Then the cookie sheet is held back so it cannot cover the swipe prompt', () => {
+    render(<WordWheelReadyCard {...base} />);
+    expect(overlayQuietZoneReason()).toBeNull();
+    fireEvent.click(screen.getByTestId('ready-howto-link'));
+    expect(overlayQuietZoneReason()).toBe('wheel-howto');
+  });
+
+  it('keeps PLAY pinned to the bottom of the scroll area so it never sits below the fold', () => {
+    render(<WordWheelReadyCard {...base} />);
+    const footer = screen.getByRole('button', { name: 'daily.play' }).parentElement!;
+    expect(footer.className).toContain('sticky');
+    expect(footer.className).toContain('bottom-0');
+    // overflow-hidden on an ancestor would become sticky's scrollport and pin it to nothing
+    expect(footer.closest('section')!.className).not.toContain('overflow-hidden');
+  });
 
   it('names its place in the daily trail', () => {
     render(<WordWheelReadyCard {...base} />);
