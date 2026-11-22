@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
+  BLAST_REGEN_CLEARED_BY,
   BLAST_RESYNC_CLEARED_BY,
   INITIAL_BLAST_SYNC,
+  pickQueuedBoard,
   blastSubmitPayload,
   noteBlastResyncRequested,
   noteBlastSubmit,
@@ -49,9 +51,9 @@ describe('receiveBlastBoard', () => {
     expect(r.state.pending).toBe(0);
   });
 
-  it('applies a fresh board only when nothing is in flight', () => {
+  it('applies a fresh board even with a word in flight: that word was aimed at the old board and is never acked', () => {
     expect(receiveBlastBoard(INITIAL_BLAST_SYNC, '__board_regenerated__', ME).apply).toBe(true);
-    expect(receiveBlastBoard(noteBlastSubmit(INITIAL_BLAST_SYNC), '__board_regenerated__', ME).apply).toBe(false);
+    expect(receiveBlastBoard(noteBlastSubmit(INITIAL_BLAST_SYNC), '__board_regenerated__', ME).apply).toBe(true);
   });
 });
 
@@ -71,5 +73,26 @@ describe('blastSubmitPayload', () => {
 
   it('omits the path when there is none, so the server falls back to its own route', () => {
     expect(blastSubmitPayload('ca', null)).toEqual({ word: 'ca', comboType: null });
+  });
+});
+
+describe('board regeneration and queued snapshots', () => {
+  it('a regenerated board applies even with a word in flight, and clears the pending count', () => {
+    const s = noteBlastSubmit(INITIAL_BLAST_SYNC);
+    const { apply, state } = receiveBlastBoard(s, BLAST_REGEN_CLEARED_BY, ME);
+    expect(apply).toBe(true);
+    expect(state).toEqual(INITIAL_BLAST_SYNC);
+  });
+
+  it('after a cascade, a queued snapshot applies only while no newer word is waiting', () => {
+    const ack = { clearedBy: ME, board: 'ack' };
+    expect(pickQueuedBoard([ack], true)).toBe(ack);
+    expect(pickQueuedBoard([ack], false)).toBeNull();
+  });
+
+  it('a queued regenerated board always wins over newer optimistic pops', () => {
+    const regen = { clearedBy: BLAST_REGEN_CLEARED_BY, board: 'regen' };
+    const ack = { clearedBy: ME, board: 'ack' };
+    expect(pickQueuedBoard([regen, ack], false)).toBe(regen);
   });
 });

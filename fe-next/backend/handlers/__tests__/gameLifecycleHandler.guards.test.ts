@@ -11,7 +11,9 @@ const {
   mockGetGame,
   mockGetGameBySocketId,
   mockAddUserToGame,
+  mockRefreshDeadEnd,
 } = vi.hoisted(() => ({
+  mockRefreshDeadEnd: vi.fn().mockReturnValue('solo'),
   mockAddUserToGame: vi.fn(),
   mockEndGame: vi.fn(),
   mockGetGame: vi.fn(),
@@ -72,6 +74,7 @@ vi.mock('../../../backend/utils/socketHelpers', () => ({
   disconnectSocket: vi.fn(),
   LOBBY_ROOM: 'lobby',
 }));
+vi.mock('../../../backend/modules/blastBoardRegen', () => ({ refreshBlastBoardOnDeadEnd: mockRefreshDeadEnd }));
 vi.mock('../../../backend/handlers/shared', () => ({ startGameTimer: vi.fn(), endGame: mockEndGame }));
 vi.mock('../../../backend/handlers/vocabQuizHandler', () => ({
   handleQuizRequestResults: vi.fn(),
@@ -284,6 +287,13 @@ describe('blastDeadEnd', () => {
   it('ends a blast round that is in progress', () => {
     fire('in-progress');
     expect(mockEndGame).toHaveBeenCalledWith(fakeIo, 'BLAST1');
+  });
+
+  it('in a room with other players, refreshes only the reporter\'s board and keeps the round going', () => {
+    mockRefreshDeadEnd.mockReturnValueOnce('regenerated');
+    fire('in-progress');
+    expect(mockRefreshDeadEnd).toHaveBeenCalledWith(expect.objectContaining({ gameCode: 'BLAST1' }));
+    expect(mockEndGame).not.toHaveBeenCalled();
   });
 
   it.each(['finished', 'waiting'])('ignores a late dead-end report once the room is %s', (state) => {

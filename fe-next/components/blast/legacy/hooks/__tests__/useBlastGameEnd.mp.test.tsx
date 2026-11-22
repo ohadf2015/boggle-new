@@ -57,29 +57,42 @@ describe('useBlastGameEnd — multiplayer end signals', () => {
   beforeEach(() => { vi.useFakeTimers(); });
   afterEach(() => { vi.useRealTimers(); });
 
-  it('on full board clear in MP, signals the server to end the room and fires the board-cleared celebration', async () => {
+  it('on full board clear in MP, celebrates but never ends the room: the server already refreshes an exhausted board', async () => {
     const deps = makeMpDeps({ isComplete: true });
     renderHook(() => useBlastGameEnd(deps));
 
     await act(async () => { await vi.runAllTimersAsync(); });
 
-    // Server-end signal fires so the whole room ends (was previously dead — !isMultiplayer guard).
-    expect(deps.onMPDeadEnd).toHaveBeenCalledTimes(1);
-    // Win-flavored local celebration callback fires.
     expect(deps.onMPBoardCleared).toHaveBeenCalledTimes(1);
-    // MP never advances SP waves or shows the SP game-end card.
+    expect(deps.onMPDeadEnd).not.toHaveBeenCalled();
     expect(deps.onWaveComplete).not.toHaveBeenCalled();
     expect(deps.onGameEnd).not.toHaveBeenCalled();
   });
 
-  it('on full board clear in MP without an onMPBoardCleared callback, still ends the room without crashing', async () => {
+  it('on full board clear in MP without an onMPBoardCleared callback, does not crash', async () => {
     const deps = makeMpDeps({ isComplete: true });
     const { onMPBoardCleared: _omit, ...depsNoCb } = deps;
     renderHook(() => useBlastGameEnd(depsNoCb as typeof deps));
 
     await act(async () => { await vi.runAllTimersAsync(); });
 
+    expect(deps.onMPDeadEnd).not.toHaveBeenCalled();
+  });
+
+  it('a second dead end on the fresh board the server sent is reported again', async () => {
+    const deps = makeMpDeps({ isDeadEnd: true });
+    const { rerender } = renderHook((d) => useBlastGameEnd(d), { initialProps: deps });
+    await act(async () => { await vi.runAllTimersAsync(); });
     expect(deps.onMPDeadEnd).toHaveBeenCalledTimes(1);
+
+    const fresh = { ...deps, engine: { ...deps.engine, gameState: { ...deps.engine.gameState, isDeadEnd: false } } };
+    rerender(fresh);
+    await act(async () => { await vi.runAllTimersAsync(); });
+    const stuckAgain = { ...fresh, engine: { ...fresh.engine, gameState: { ...fresh.engine.gameState, isDeadEnd: true } } };
+    rerender(stuckAgain);
+    await act(async () => { await vi.runAllTimersAsync(); });
+
+    expect(deps.onMPDeadEnd).toHaveBeenCalledTimes(2);
   });
 
   it('on dead end in MP, signals server end but does NOT fire the board-cleared celebration', async () => {
