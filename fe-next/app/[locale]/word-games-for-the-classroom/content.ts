@@ -153,7 +153,7 @@ const sv: LocaleContent = {
     },
     {
       title: 'Bygg fran dina egna ord',
-      desc: 'Ladda upp en CSV-fil, klistra in en lista eller valj fran vara inbyggda samlingar. Samma spel, din laroplан.'
+      desc: 'Ladda upp en CSV-fil, klistra in en lista eller valj fran vara inbyggda samlingar. Samma spel, din laroplan.'
     },
     {
       title: 'Realtidsfeedback',

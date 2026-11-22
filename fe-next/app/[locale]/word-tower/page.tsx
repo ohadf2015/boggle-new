@@ -97,7 +97,7 @@ const seoContent: Record<string, { title: string; description: string; features:
     ],
   },
   sv: {
-    title: 'Word Tower - Staplа ord för att bygga ditt torn | Gratis spel',
+    title: 'Word Tower - Stapla ord för att bygga ditt torn | Gratis spel',
     description:
       'Stava ord för att bygga det högsta tornet! Word Tower är ett snabbt ordpusselspel där du staplar ord, tjänar mynt, låser upp uppgraderingar och klättrar på den dagliga topplistan. Gratis att spela, ingen nedladdning krävs. Tävla med vänner och rivaler världen över.',
     features: [
