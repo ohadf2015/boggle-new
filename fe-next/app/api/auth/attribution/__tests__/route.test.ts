@@ -41,7 +41,28 @@ const state = {
   profile: null as ProfileRow | null,
   updates: [] as Array<Record<string, string>>,
   updateError: null as { message: string } | null,
+  flagWrites: [] as Array<{ id: string; attrs: Record<string, unknown>; boundUrl: string }>,
+  flagWriteError: null as { message: string } | null,
+  flagWriteThrow: null as string | null,
 };
+
+/** Mirrors GoTrueAdminApi: the method reads this.url / this.fetch. */
+class FakeGoTrueAdmin {
+  url = 'https://auth.example/auth/v1';
+  fetch = globalThis.fetch;
+  async updateUserById(
+    id: string,
+    attrs: { user_metadata?: Record<string, unknown>; data?: Record<string, unknown> },
+  ) {
+    if (!this?.url || typeof this.fetch !== 'function') {
+      throw new TypeError('updateUserById lost this (this.url / this.fetch undefined)');
+    }
+    state.flagWrites.push({ id, attrs, boundUrl: this.url });
+    if (state.flagWriteThrow) throw new Error(state.flagWriteThrow);
+    if (state.flagWriteError) return { data: { user: null }, error: state.flagWriteError };
+    return { data: { user: { id } }, error: null };
+  }
+}
 
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -61,6 +82,7 @@ vi.mock('@/utils/supabase/admin', () => ({
         }),
       };
     },
+    auth: { admin: new FakeGoTrueAdmin() },
   }),
 }));
 
@@ -96,6 +118,9 @@ describe('POST /api/auth/attribution', () => {
     state.profile = { ...EMPTY_PROFILE };
     state.updates = [];
     state.updateError = null;
+    state.flagWrites = [];
+    state.flagWriteError = null;
+    state.flagWriteThrow = null;
   });
 
   it('rejects unauthenticated callers', async () => {
@@ -181,6 +206,9 @@ describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)
     state.profile = { ...EMPTY_PROFILE };
     state.updates = [];
     state.updateError = null;
+    state.flagWrites = [];
+    state.flagWriteError = null;
+    state.flagWriteThrow = null;
   });
 
   it('emits growth:signup_completed exactly when the signup_surface write wins', async () => {
@@ -237,6 +265,97 @@ describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)
     expect(await res.json()).toMatchObject({ ok: true, applied: [] });
     expect(state.updates).toHaveLength(0);
     expect(captureEduServerEvents).not.toHaveBeenCalled();
+  });
+
+  it('writes signup_completed_emitted on the admin object, not an unbound data payload', async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          app_metadata: { provider: 'email' },
+          user_metadata: { signup_surface: 'header_or_menu' },
+        },
+      },
+      error: null,
+    });
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'header_or_menu' };
+    const res = await POST(req({ language: 'en' }));
+    expect(res.status).toBe(200);
+    expect(captureEduServerEvents).toHaveBeenCalledTimes(1);
+    expect(state.flagWrites).toEqual([{
+      id: 'user-1',
+      attrs: { user_metadata: { signup_completed_emitted: true } },
+      boundUrl: 'https://auth.example/auth/v1',
+    }]);
+  });
+
+  it('logs a returned flag-write error and still returns 200', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    state.flagWriteError = { message: 'auth admin rejected metadata' };
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          app_metadata: { provider: 'email' },
+          user_metadata: { signup_surface: 'header_or_menu' },
+        },
+      },
+      error: null,
+    });
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'header_or_menu' };
+    const res = await POST(req({ language: 'en' }));
+    expect(res.status).toBe(200);
+    expect(captureEduServerEvents).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      '[attribution] signup flag write failed:',
+      'auth admin rejected metadata',
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('logs a returned flag-write error even when the message is empty', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    state.flagWriteError = { message: '' };
+    getUser.mockResolvedValue(AUTHED);
+    const res = await POST(req({ signup_surface: 'header_or_menu' }));
+    expect(res.status).toBe(200);
+    expect(errorSpy).toHaveBeenCalledWith(
+      '[attribution] signup flag write failed:',
+      expect.anything(),
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('logs a thrown flag write and does not fail the attribution response', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    state.flagWriteThrow = 'this.fetch is not a function';
+    getUser.mockResolvedValue(AUTHED);
+    const res = await POST(req({ signup_surface: 'header_or_menu' }));
+    expect(res.status).toBe(200);
+    expect(captureEduServerEvents).toHaveBeenCalledTimes(1);
+    expect(errorSpy).toHaveBeenCalledWith(
+      '[attribution] signup flag write threw:',
+      'this.fetch is not a function',
+    );
+    errorSpy.mockRestore();
+  });
+
+  it('does not emit or rewrite the flag once signup_completed_emitted is set', async () => {
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'user-1',
+          app_metadata: { provider: 'email' },
+          user_metadata: { signup_surface: 'header_or_menu', signup_completed_emitted: true },
+        },
+      },
+      error: null,
+    });
+    state.profile = { ...EMPTY_PROFILE, signup_surface: 'header_or_menu' };
+    const res = await POST(req({ signup_surface: 'header_or_menu' }));
+    expect(res.status).toBe(200);
+    expect(captureEduServerEvents).not.toHaveBeenCalled();
+    expect(state.flagWrites).toEqual([]);
   });
 
   it('email catch-up: trigger already wrote the surface, so this session still emits once with method=email', async () => {
