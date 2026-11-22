@@ -62,7 +62,7 @@ export type LocaleContent = {
    * twenty-four games — and it is the honest answer to the query behind the click.
    */
   arcadeNote: { heading: string; body: string; href: string; cta: string };
-  vocabAnswer?: { title: string; paragraphs: string[] };
+  vocabAnswer?: { heading: string; paragraphs: string[] };
   faqTitle: string;
   faqs: Array<{ q: string; a: string }>;
   features: Array<{ icon: string; text: string }>;
@@ -166,7 +166,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       ],
     },
     vocabAnswer: {
-      title: 'Vocabulary games you can play free in the browser',
+      heading: 'Vocabulary games you can play free in the browser',
       paragraphs: [
         'A vocabulary game gets students using new words instead of only reading them. They find the words on a letter board, spell them against a clock, match each one to its meaning or solve a crossword built from them. LexiClash has 20 of these, all built from a word list you choose: 7 you run live for the whole class and 13 a student can play alone.',
         'To play together, you put a six-character code on the projector and the class joins from phones, tablets or Chromebooks, with no student accounts. To practise at home, a student opens any free word list from Grade 1 to Grade 12 and presses Practice solo. The free plan covers 3 classes of 50 students.',
