@@ -1660,7 +1660,16 @@ const es = {
       "classrooms": {
         "title": "Llévalo a tu clase",
         "line": "Organiza un juego de palabras en vivo. Tus alumnos se unen con un código desde cualquier dispositivo.",
-        "cta": "Crea una clase gratis"
+        "cta": "Crea una clase gratis",
+        "myTitle": "Mi clase",
+        "studentsCount": "Alumnos: {count}",
+        "copyCode": "Copiar código de acceso",
+        "copied": "Copiado",
+        "startGame": "Empezar un juego en clase",
+        "openClassroom": "Abrir la clase",
+        "simpleLine": "Tus clases, juegos e informes, todo en un mismo sitio.",
+        "studentTitle": "Mi clase",
+        "openMyClass": "Abrir mi clase"
       }
     },
     "close": {
