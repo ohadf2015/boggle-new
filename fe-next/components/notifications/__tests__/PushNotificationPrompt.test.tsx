@@ -3,10 +3,16 @@
  * Tests for the engagement-triggered push notification permission prompt
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { PushNotificationPrompt } from '../PushNotificationPrompt';
 import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
 import type { ReactNode } from 'react';
+import { incrementGamesPlayed } from '@/utils/pushNotifications/categoryPreferences';
+
+function finishGame() {
+  act(() => { incrementGamesPlayed(); });
+}
+
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -78,6 +84,7 @@ describe('PushNotificationPrompt', () => {
   let originalNotification: typeof Notification;
 
   beforeEach(() => {
+    sessionStorage.clear();
     vi.clearAllMocks();
     originalNotification = window.Notification;
     mockShouldShow.mockReturnValue(true);
@@ -100,6 +107,7 @@ describe('PushNotificationPrompt', () => {
 
       // WHEN
       render(<PushNotificationPrompt />);
+      finishGame();
 
       // THEN
       expect(screen.getByText('Stay in the Game!')).toBeInTheDocument();
@@ -143,6 +151,7 @@ describe('PushNotificationPrompt', () => {
 
       // WHEN
       render(<PushNotificationPrompt />);
+      finishGame();
 
       // THEN
       expect(screen.getByText('Enable Notifications')).toBeInTheDocument();
@@ -155,6 +164,7 @@ describe('PushNotificationPrompt', () => {
       // GIVEN
       mockShouldShow.mockReturnValue(true);
       render(<PushNotificationPrompt />);
+      finishGame();
 
       // WHEN
       fireEvent.click(screen.getByText('Not Now'));
@@ -171,6 +181,7 @@ describe('PushNotificationPrompt', () => {
       mockShouldShow.mockReturnValue(true);
 
       render(<PushNotificationPrompt />);
+      finishGame();
 
       // WHEN
       fireEvent.click(screen.getByText('Enable Notifications'));
@@ -179,6 +190,29 @@ describe('PushNotificationPrompt', () => {
       await waitFor(() => {
         expect(registerPushToken).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('games-threshold timing', () => {
+    it('does not open on arrival: it waits until a game finishes in this visit', () => {
+      mockShouldShow.mockReturnValue(true);
+      const { container } = render(<PushNotificationPrompt />);
+      expect(container.firstChild).toBeNull();
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('push_prompt_shown', expect.anything());
+
+      finishGame();
+
+      expect(screen.getByText('Stay in the Game!')).toBeInTheDocument();
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('push_prompt_shown', { trigger: 'games_threshold' });
+    });
+
+    it('opens when it mounts again after a round it was hidden for', () => {
+      mockShouldShow.mockReturnValue(true);
+      act(() => { incrementGamesPlayed(); });
+
+      render(<PushNotificationPrompt />);
+
+      expect(screen.getByText('Stay in the Game!')).toBeInTheDocument();
     });
   });
 
@@ -249,6 +283,7 @@ describe('PushNotificationPrompt', () => {
       mockShouldShow.mockReturnValue(true);
 
       render(<PushNotificationPrompt />);
+      finishGame();
 
       expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
         'push_prompt_shown',
@@ -271,6 +306,7 @@ describe('PushNotificationPrompt', () => {
       mockShouldShow.mockReturnValue(true);
 
       render(<PushNotificationPrompt />);
+      finishGame();
       fireEvent.click(screen.getByText('Not Now'));
 
       expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
@@ -283,6 +319,7 @@ describe('PushNotificationPrompt', () => {
       mockShouldShow.mockReturnValue(true);
 
       render(<PushNotificationPrompt />);
+      finishGame();
       fireEvent.click(screen.getByText('Enable Notifications'));
 
       await waitFor(() => {

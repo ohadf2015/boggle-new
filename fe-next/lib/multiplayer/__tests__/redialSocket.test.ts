@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { redialSocket } from '../redialSocket';
+import { redialSocket, redialSocketNow } from '../redialSocket';
 
 type State = 'opening' | 'open' | 'closed';
 const fakeSocket = (connected: boolean, active: boolean, readyState: State) =>
@@ -28,5 +28,28 @@ describe('redialSocket', () => {
     const socket = fakeSocket(false, true, 'closed');
     redialSocket(socket);
     expect(socket.connect).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('redialSocketNow with a real socket.io client', () => {
+  it('Given a retry waiting out its backoff, When a person asks to reconnect, Then it dials now instead of after the wait', async () => {
+    const { io } = await vi.importActual<typeof import('socket.io-client')>('socket.io-client');
+    const socket = io('http://127.0.0.1:9', {
+      transports: ['websocket'],
+      reconnectionDelay: 60_000,
+      reconnectionDelayMax: 60_000,
+      randomizationFactor: 0,
+      timeout: 200,
+    });
+    try {
+      const manager = socket.io as unknown as { _reconnecting: boolean; _readyState: string };
+      await vi.waitFor(() => expect(manager._reconnecting && manager._readyState === 'closed').toBe(true), { timeout: 3000 });
+      redialSocket(socket);
+      expect(manager._readyState).toBe('closed');
+      redialSocketNow(socket);
+      expect(manager._readyState).toBe('opening');
+    } finally {
+      socket.close();
+    }
   });
 });

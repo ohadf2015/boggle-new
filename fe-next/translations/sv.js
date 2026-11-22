@@ -16889,7 +16889,8 @@ const sv = {
       "pausedBodyHost": "Klassen är pausad. Tryck på Fortsätt när du vill köra vidare.",
       "timeAddedToast": "Din lärare lade till {{seconds}} sekunder",
       "wordSkippedToast": "Din lärare valde ett nytt ord att leta efter",
-      "controlFailedToast": "Det gick inte just nu"
+      "controlFailedToast": "Det gick inte just nu",
+      "offlineToast": "Du är offline. Försök igen när du är tillbaka."
     },
     "wordBank": {
       "title": "Ordbank ({{count}})",

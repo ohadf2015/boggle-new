@@ -383,7 +383,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
         role={copy.isUpdate ? 'status' : 'alert'}
         aria-live={copy.isUpdate ? 'polite' : 'assertive'}
       >
-        <div className="container mx-auto px-4 py-3">
+        <div className="container mx-auto px-4 pe-14 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             {/* Status message */}
             <div className="flex items-center gap-3">

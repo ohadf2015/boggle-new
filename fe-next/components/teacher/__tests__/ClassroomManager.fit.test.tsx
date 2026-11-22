@@ -26,6 +26,8 @@ const mk = (n: number) => ({
 });
 const state = { classrooms: [mk(1), mk(2), mk(3)] };
 
+// The upgrade beacon's fetch is aborted by happy-dom at teardown and surfaces as an unhandled rejection under load.
+vi.mock('@/lib/education/teacherProUpgradeBeacon', () => ({ beaconTeacherProUpgradeShown: vi.fn(), beaconTeacherProUpgradeClicked: vi.fn() }));
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ hasPro: false, loading: false }) }));
 vi.mock('@/lib/education/useTeacherAccess', () => ({ useTeacherAccess: () => ({ trial: null, isLoading: false }) }));
 

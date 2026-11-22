@@ -41,10 +41,17 @@ describe('useMultiplayerSocket — teacher live controls', () => {
     for (const key of ['isPaused', 'pauseGame', 'resumeGame', 'extendTime', 'endRoundNow', 'skipTargetWord']) {
       expect(ret).toMatch(new RegExp(`\\b${key}\\b`));
     }
-    expect(source).toMatch(/emit\('pauseGame'\)/);
-    expect(source).toMatch(/emit\('resumeGame'\)/);
-    expect(source).toMatch(/emit\('extendTime',\s*\{\s*seconds/);
-    expect(source).toMatch(/emit\('endRoundNow'\)/);
-    expect(source).toMatch(/emit\('skipTargetWord'\)/);
+    expect(source).toMatch(/sendControl\('pauseGame'\)/);
+    expect(source).toMatch(/sendControl\('resumeGame'\)/);
+    expect(source).toMatch(/sendControl\('extendTime',\s*\{\s*seconds/);
+    expect(source).toMatch(/sendControl\('endRoundNow'\)/);
+    expect(source).toMatch(/sendControl\('skipTargetWord'\)/);
+  });
+
+  it('routes every control through the offline guard and keeps one rejection toast on screen', () => {
+    expect(source).toMatch(/sendTeacherControl\(socketRef\.current/);
+    expect(source).not.toMatch(/socketRef\.current\?\.emit\('(pauseGame|resumeGame|extendTime|endRoundNow|skipTargetWord)'/);
+    const handler = source.slice(source.indexOf("listen('teacherControlRejected'"));
+    expect(handler.slice(0, 300)).toMatch(/id: 'teacher-control-rejected'/);
   });
 });

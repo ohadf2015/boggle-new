@@ -140,7 +140,7 @@ const RARITY_WEIGHT: Record<Rarity, number> = { common: 6, rare: 3, epic: 1 };
 const offerKey = (o: OfferItem) => `${o.type}:${'id' in o ? o.id : ''}`;
 
 /** Deterministic pick-1-of-N from `seed + step`. Always leads with a relic while any are left. */
-export function makeOffer(seed: string, step: number, relicsOwned: readonly RelicId[], size: number): OfferItem[] {
+export function makeOffer(seed: string, step: number, relicsOwned: readonly RelicId[], size: number, opts: { hpFull?: boolean } = {}): OfferItem[] {
   const rand = makeRng(`${seed}:offer:${step}`);
   const pool = RELIC_IDS.filter((id) => !relicsOwned.includes(id));
   const out: OfferItem[] = [];
@@ -162,14 +162,18 @@ export function makeOffer(seed: string, step: number, relicsOwned: readonly Reli
   const other = (): OfferItem => {
     const r = rand();
     if (r < 0.45) return { type: 'potion', id: POTION_IDS[Math.floor(rand() * POTION_IDS.length)] };
-    if (r < 0.75) return { type: 'heal', amount: 2 };
+    if (r < 0.75 && !opts.hpFull) return { type: 'heal', amount: 2 };
     return { type: 'gold', amount: 20 + step * 5 };
   };
 
   push(relic());
   for (let tries = 0; out.length < size && tries < 40; tries++) push(rand() < 0.55 ? relic() : other());
   // Exhausted pool edge case: fill with the non-relic basics in a fixed order.
-  const fillers: OfferItem[] = [{ type: 'heal', amount: 2 }, { type: 'gold', amount: 20 + step * 5 }, ...POTION_IDS.map((id) => ({ type: 'potion' as const, id }))];
+  const fillers: OfferItem[] = [
+    ...(opts.hpFull ? [] : [{ type: 'heal' as const, amount: 2 }]),
+    { type: 'gold', amount: 20 + step * 5 },
+    ...POTION_IDS.map((id) => ({ type: 'potion' as const, id })),
+  ];
   for (const f of fillers) if (out.length < size) push(f);
   return out.slice(0, size);
 }
@@ -240,7 +244,7 @@ export function advanceRun(run: RunPayload, { hpLeft, potionsUsed, score, revive
     relics,
     potions,
     gold: grantGold(run, goldForScore(score)).gold,
-    offer: makeOffer(run.seed, depth, relics, draftSize(relics)),
+    offer: makeOffer(run.seed, depth, relics, draftSize(relics), { hpFull: hp >= maxHp }),
   };
 }
 

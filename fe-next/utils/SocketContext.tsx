@@ -1,6 +1,6 @@
 'use client';
 
-import { redialSocket } from '@/lib/multiplayer/redialSocket';
+import { redialSocket, redialSocketNow } from '@/lib/multiplayer/redialSocket';
 import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode, useMemo } from 'react';
 import { io, Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
@@ -257,7 +257,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
       logger.log('[SOCKET.IO] Manual reconnection triggered');
       reconnectAttemptRef.current = 0;
       setConnectionError(null);
-      redialSocket(socketInstance);
+      redialSocketNow(socketInstance);
     }
   }, []);
 
@@ -431,8 +431,11 @@ export function SocketProvider({ children }: SocketProviderProps) {
     // When the app is backgrounded (tab hidden, app minimized), disconnect the socket
     // to save battery and mobile data. Reconnect when returning to foreground.
     // This is critical for Android WebView where the OS may throttle background timers.
+    const mobile = isMobileApp() || isMobileBrowser();
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
+        // Desktop keeps its connection while hidden; only the return redials.
+        if (!mobile) return;
         // A fullscreen ad (AdMob Activity / adBreak) hides the page without the
         // player leaving: disconnecting here killed the room connection mid-ad
         // (the "ad between games → disconnected" report). Keep the socket — the
@@ -455,19 +458,16 @@ export function SocketProvider({ children }: SocketProviderProps) {
           clearTimeout(bgTimerRef.current);
           bgTimerRef.current = null;
         }
-        if (!socketInstance.connected) {
+        // Desktop: only a dropped transport (still `active`), never a kicked or left socket.
+        if (!socketInstance.connected && (mobile || socketInstance.active)) {
           logger.log('[SOCKET.IO] App foregrounded — reconnecting');
           // auth() re-reads a fresh token (and guest age) on reconnect; just connect.
-          redialSocket(socketInstance);
+          redialSocketNow(socketInstance);
         }
       }
     };
 
-    // Only add visibility listener on mobile (desktop users expect persistent connections)
-    const mobile = isMobileApp() || isMobileBrowser();
-    if (mobile) {
-      document.addEventListener('visibilitychange', handleVisibilityChange);
-    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     // Handle network status changes (mobile network switches: WiFi→cellular, etc.)
     const handleOnline = () => {
@@ -491,12 +491,10 @@ export function SocketProvider({ children }: SocketProviderProps) {
       socketInstance.off('reconnect_failed', handleReconnectFailed);
       socketInstance.off('serverShutdown', handleServerShutdown);
       socketInstance.off('error', handleError);
-      if (mobile) {
-        document.removeEventListener('visibilitychange', handleVisibilityChange);
-        if (bgTimerRef.current) {
-          clearTimeout(bgTimerRef.current);
-          bgTimerRef.current = null;
-        }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (bgTimerRef.current) {
+        clearTimeout(bgTimerRef.current);
+        bgTimerRef.current = null;
       }
       // Cancel any pending deploy-reconnect so it can't fire connect() on a
       // socket we're about to release.

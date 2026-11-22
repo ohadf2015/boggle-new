@@ -289,3 +289,15 @@ describe('categoryPreferences', () => {
     });
   });
 });
+
+describe('incrementGamesPlayed announces the finished game', () => {
+  it('dispatches GAMES_PLAYED_EVENT so a waiting prompt can open at that moment', async () => {
+    const { incrementGamesPlayed } = await import('../categoryPreferences');
+    const { GAMES_PLAYED_EVENT } = await import('../types');
+    const heard = vi.fn();
+    window.addEventListener(GAMES_PLAYED_EVENT, heard);
+    incrementGamesPlayed();
+    window.removeEventListener(GAMES_PLAYED_EVENT, heard);
+    expect(heard).toHaveBeenCalledTimes(1);
+  });
+});

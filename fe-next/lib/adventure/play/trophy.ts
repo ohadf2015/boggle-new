@@ -24,11 +24,12 @@ export function withEliteTrophy(run: RunPayload, kind: NodeKind): RunPayload {
   if (!id) return run;
   const relics = [...run.relics, id];
   const maxHp = maxHpOf({ relics, bhp: run.bhp });
+  const hp = Math.min(maxHp, run.hp + (maxHp - run.maxHp));
   return {
     ...run,
     relics,
     maxHp,
-    hp: Math.min(maxHp, run.hp + (maxHp - run.maxHp)),
-    offer: makeOffer(run.seed, run.path.length, relics, draftSize(relics)),
+    hp,
+    offer: makeOffer(run.seed, run.path.length, relics, draftSize(relics), { hpFull: hp >= maxHp }),
   };
 }
