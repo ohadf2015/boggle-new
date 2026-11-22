@@ -3,6 +3,8 @@
 import { memo } from 'react';
 import { Bot } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import Mascot from '@/components/ui/Mascot';
+import { LobbyQuip } from '@/components/multiplayer/lobby/LobbyQuip';
 
 interface SoloPlayPromptProps {
   /** Omitted when START itself already starts vs bots: one action, not two. */
@@ -12,22 +14,22 @@ interface SoloPlayPromptProps {
 }
 
 /**
- * Solo-host rescue, as one quiet status line: "No one here yet?" + a
- * PLAY VS BOTS chip that starts at once (the tap is the consent — no dialog).
- * It sits in the lobby's status lane, never as a banner competing with START.
+ * Solo-host rescue in the status lane: the hopping mascot, "No one here yet?"
+ * with a rotating one-liner, and a PLAY VS BOTS chip that starts at once (the
+ * tap is the consent, no dialog). Never a banner competing with START.
  */
 export const SoloPlayPrompt = memo<SoloPlayPromptProps>(function SoloPlayPrompt({ onPlayVsBots, t, className = '' }) {
   return (
     <div
       data-testid="solo-play-prompt"
-      className={cn('flex items-center gap-2 min-w-0 rounded-neo border-2 border-neo-cyan/60 bg-neo-navy-light px-2 py-1.5', className)}
+      className={cn('flex items-center gap-2 min-w-0 rounded-neo border-2 border-neo-black bg-neo-navy-light ps-1 pe-2 py-1 shadow-hard-sm', className)}
     >
-      <Bot className="w-5 h-5 text-neo-cyan shrink-0" aria-hidden="true" />
+      <span data-testid="solo-mascot" className="shrink-0 -rotate-6">
+        <Mascot variant="waiting" size="xs" animated={false} alt="" className="!w-[calc(40px*var(--mp-u,1))] !h-[calc(40px*var(--mp-u,1))]" />
+      </span>
       <div className="flex-1 min-w-0">
         <p className="font-neo-display font-bold text-[length:calc(14px*var(--mp-u,1))] leading-tight text-neo-white truncate">{t('hostView.soloPrompt.title')}</p>
-        <p className="font-neo-body text-[length:calc(11px*var(--mp-u,1))] leading-tight text-neo-white/70 truncate hidden desktop-tall:block">
-          {t('hostView.soloPrompt.subtitle')}
-        </p>
+        <LobbyQuip t={t} className="font-neo-body font-bold text-[length:calc(12px*var(--mp-u,1))] leading-tight text-neo-cyan truncate" />
       </div>
       {onPlayVsBots && (
       <button

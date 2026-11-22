@@ -4710,7 +4710,6 @@ const en = {
     "startVsBots": "Start vs bots",
     "soloPrompt": {
       "title": "No one here yet?",
-      "subtitle": "Jump in against bots now, or share your code and wait for friends to join.",
       "cta": "Play vs bots"
     },
     "allReadyAutoStart": "Everyone's ready. Starting in {seconds}…",
@@ -5201,6 +5200,26 @@ const en = {
     }
   },
   "lobby": {
+    "fun": {
+      "play": "Play while you wait",
+      "best": "Best {score}",
+      "title": "Bubble Pop",
+      "howTo": "Pop the bubbles before they float away. Quick pops build a combo!",
+      "go": "Let's pop",
+      "again": "Again!",
+      "combo": "Combo ×{count}",
+      "seconds": "{seconds}s",
+      "close": "Close game",
+      "paused": "Paused",
+      "bubble": "Bubble",
+      "newBest": "New best!",
+      "quip1": "I saved you the comfy seat.",
+      "quip2": "Send the code to a friend, I promise I'll be nice.",
+      "quip3": "Stretching my letters while we wait.",
+      "quip4": "The bots are getting a little too confident, if you ask me.",
+      "quip5": "I've got the snacks ready, we just need your friends now.",
+      "quip6": "Practicing my victory dance over here."
+    },
     "emote": {
       "title": "React",
       "laugh": "Laugh",

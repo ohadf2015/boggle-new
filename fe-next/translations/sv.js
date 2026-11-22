@@ -5470,7 +5470,6 @@ const sv = {
     "startVsBots": "Starta mot bottar",
     "soloPrompt": {
       "title": "Ingen här än?",
-      "subtitle": "Kör mot bottar direkt, eller dela din kod och vänta på vänner.",
       "cta": "Spela mot bottar"
     },
     "allReadyAutoStart": "Alla är redo. Startar om {seconds}…",
@@ -5962,6 +5961,26 @@ const sv = {
     }
   },
   "lobby": {
+    "fun": {
+      "play": "Spela medan du väntar",
+      "best": "Rekord {score}",
+      "title": "Bubbelpop",
+      "howTo": "Poppa bubblorna innan de flyger iväg. Snabba poppar ger combo!",
+      "go": "Kör!",
+      "again": "Igen!",
+      "combo": "Combo ×{count}",
+      "seconds": "{seconds} s",
+      "close": "Stäng spelet",
+      "paused": "Pausat",
+      "bubble": "Bubbla",
+      "newBest": "Nytt rekord!",
+      "quip1": "Jag har sparat den skönaste platsen åt dig.",
+      "quip2": "Skicka koden till en kompis, jag lovar att vara snäll.",
+      "quip3": "Jag stretchar bokstäverna medan vi väntar.",
+      "quip4": "Om du frågar mig börjar bottarna bli lite väl kaxiga.",
+      "quip5": "Snacksen är fixade, nu saknas bara dina kompisar.",
+      "quip6": "Jag övar på min segerdans här borta."
+    },
     "emote": {
       "title": "Reagera",
       "laugh": "Skratt",
