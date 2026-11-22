@@ -29,7 +29,6 @@ import {
 import { filterEmptyException } from '@/utils/posthogExceptionFilter';
 import { installAbandonOnPagehide } from '@/utils/abandonOnPagehide';
 import { installInpAttributionTracker } from '@/utils/inpAttribution';
-import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { surfaceOf } from '@/lib/navigation/eduSections';
 
 let posthogInitialized = false;
@@ -143,21 +142,22 @@ function PostHogPageView() {
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // Game routes: posthog-js parse + surveys.js fetch competed with LCP/TBT
-    // (chunk boot 1.2–1.7s). Idle-defer init; capture calls queue on the lazy
-    // proxy until then. Home/SEO routes still init immediately.
+    // ALL routes idle-defer posthog-js init. The SDK is ~173KB decoded; on
+    // home/SEO routes its parse+eval ran inside the first-interaction window
+    // right after hydration, which is exactly when field INP is recorded
+    // (growth-radar rec 100142: /es p75 INP 328ms). Queued captures are not
+    // lost: every capture before init buffers on the lazy proxy
+    // (lib/analytics/lazyPosthog) and flushes when init lands — the same
+    // trade heavy game paths already take. requestIdleCallback's 4s timeout
+    // bounds the delay even on a busy main thread; a setTimeout fallback
+    // covers engines without rIC (older Safari).
     let idleId: number | undefined;
     let bootTimer: ReturnType<typeof setTimeout> | undefined;
     const boot = () => initPostHog();
-    const path = typeof window !== 'undefined' ? window.location.pathname : '';
-    if (typeof window !== 'undefined' && isHeavyGamePath(path)) {
-      if (typeof window.requestIdleCallback === 'function') {
-        idleId = window.requestIdleCallback(boot, { timeout: 4000 });
-      } else {
-        bootTimer = setTimeout(boot, 2000);
-      }
+    if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(boot, { timeout: 4000 });
     } else {
-      boot();
+      bootTimer = setTimeout(boot, 2000);
     }
 
     let platformRecheckId: ReturnType<typeof setTimeout> | null = null;

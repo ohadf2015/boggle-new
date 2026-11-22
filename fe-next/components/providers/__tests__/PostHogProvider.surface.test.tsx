@@ -29,6 +29,9 @@ const ph = posthog as unknown as Record<string, ReturnType<typeof vi.fn>>;
 
 describe('PostHog surface super-property', () => {
   beforeEach(() => {
+    // Init is idle-deferred on every route; fire the idle callback
+    // synchronously so init-dependent captures land in the same tick.
+    window.requestIdleCallback = ((cb: IdleRequestCallback) => { cb({ didTimeout: false, timeRemaining: () => 50 }); return 1; }) as typeof window.requestIdleCallback;
     vi.clearAllMocks();
     _resetPostHogInit();
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'test-key';
