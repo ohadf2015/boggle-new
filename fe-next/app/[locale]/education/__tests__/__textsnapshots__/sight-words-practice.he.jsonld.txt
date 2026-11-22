@@ -32,7 +32,7 @@
     {
       "@type": "ListItem",
       "position": 3,
-      "name": "Sight Words Practice Online",
+      "name": "תרגול מילות ראייה אונליין",
       "item": "https://www.lexiclash.live/he/education/sight-words-practice"
     }
   ]

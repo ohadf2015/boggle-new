@@ -29,6 +29,8 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Mock fetch
 const mockFetch = vi.fn();
+const mockAuth = vi.hoisted(() => ({ isAuthenticated: true }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => mockAuth }));
 
 function mockFetchGet(counts: Record<string, number>) {
   mockFetch.mockResolvedValueOnce({
@@ -50,6 +52,14 @@ describe('useAdventureAchievements', () => {
     vi.stubGlobal('fetch', mockFetch);
     localStorageMock.clear();
     vi.clearAllMocks();
+    mockAuth.isAuthenticated = true;
+  });
+
+  it('never calls the server for a signed-out visitor, earning stays local', () => {
+    mockAuth.isAuthenticated = false;
+    const { result } = renderHook(() => useAdventureAchievements());
+    act(() => { result.current.earnAchievement('BOSS_SLAYER' as never); });
+    expect(mockFetch).not.toHaveBeenCalled();
   });
 
   describe('initial state', () => {

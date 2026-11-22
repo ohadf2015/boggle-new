@@ -55,11 +55,11 @@ describe('registry coverage', () => {
     }
   });
 
-  it('localizes labels — only the English-bodied page repeats the English label', () => {
+  it('localizes labels — no page repeats the English label in every locale', () => {
     const englishEverywhere = EDUCATION_PAGES.filter((p) =>
       EDUCATION_LINK_LOCALES.every((l) => p.label[l] === p.label.en),
     ).map((p) => p.slug);
-    expect(englishEverywhere).toEqual(['sight-words-practice']);
+    expect(englishEverywhere).toEqual([]);
   });
 });
 

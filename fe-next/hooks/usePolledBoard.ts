@@ -41,7 +41,7 @@ export function usePolledBoard<T>(
       setState({ data, loading: false, error: false });
     } catch (err) {
       if (id !== seq.current || controller.signal.aborted) return;
-      console.error('Failed to load leaderboard:', err);
+      console.warn('Failed to load leaderboard:', err);
       setState((s) => ({ ...s, loading: false, error: true }));
     }
   }, []);

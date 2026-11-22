@@ -15,7 +15,8 @@ export function useWheelGoldenWord(puzzleDate: string | null | undefined, langua
 
   useEffect(() => {
     setKey(null);
-    if (!enabled || !puzzleDate) return undefined;
+    // quick-play rounds pass `quick-<uuid>`, which the endpoint rejects with a 400
+    if (!enabled || !puzzleDate || !/^\d{4}-\d{2}-\d{2}$/.test(puzzleDate)) return undefined;
     let cancelled = false;
     void fetch(`/api/daily-challenge/word-wheel/golden/${puzzleDate}/${language}`)
       .then((res) => (res.ok ? res.json() : null))

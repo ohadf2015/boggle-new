@@ -20,6 +20,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   ADVENTURE_ACHIEVEMENTS,
   type AdventureAchievementId,
@@ -116,6 +117,7 @@ async function postServerCounts(counts: Record<string, number>): Promise<void> {
 // ==============================================
 
 export function useAdventureAchievements(): UseAdventureAchievementsReturn {
+  const { isAuthenticated } = useAuth();
   const [achievementCounts, setAchievementCounts] = useState<
     Record<AdventureAchievementId, number>
   >(loadFromStorage);
@@ -126,6 +128,7 @@ export function useAdventureAchievements(): UseAdventureAchievementsReturn {
 
   // On mount: fetch server counts and merge
   useEffect(() => {
+    if (!isAuthenticated) return undefined;
     let cancelled = false;
 
     fetchServerCounts().then((serverCounts) => {
@@ -138,7 +141,7 @@ export function useAdventureAchievements(): UseAdventureAchievementsReturn {
     });
 
     return () => { cancelled = true; };
-  }, []);
+  }, [isAuthenticated]);
 
   // Persist to localStorage on changes
   useEffect(() => {
@@ -175,11 +178,11 @@ export function useAdventureAchievements(): UseAdventureAchievementsReturn {
       const isNewTier = newTier !== currentTier;
 
       // Sync to server (best-effort, non-blocking)
-      postServerCounts(newCounts);
+      if (isAuthenticated) postServerCounts(newCounts);
 
       return currentCount === 0 || isNewTier;
     },
-    [] // stable — reads from ref
+    [isAuthenticated] // counts are read from a ref
   );
 
   const isEarned = useCallback(
