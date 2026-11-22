@@ -105,6 +105,8 @@ describe('MpResultsStage layout', () => {
   it('Given a tall results column on a phone, When it renders, Then the body scrolls instead of clipping', () => {
     renderAt(1, true);
     expect(screen.getByTestId('mp-results-body').className).toMatch(/overflow-y-auto/);
+    // Desktop: both columns start at the top, so the standings never begin at the fold of a scrolled body.
+    expect(screen.getByTestId('mp-results-stage').className).toMatch(/lg:items-start/);
   });
 
   it('Given the host on an intermission, When it renders, Then NEXT MODE comes before the secondary cards', async () => {

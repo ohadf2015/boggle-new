@@ -106,7 +106,7 @@ vi.mock('../../../backend/utils/errorHandler', async () => {
 });
 
 import { registerGameLifecycleHandlers } from '../gameLifecycleHandler';
-import { getAuthUserConnection, deleteGame, removeUserFromGame } from '../../modules/gameStateManager';
+import { getAuthUserConnection, deleteGame, removeUserFromGame, getUsernameBySocketId } from '../../modules/gameStateManager';
 import { safeEmit, broadcastToRoom, getSocketById } from '../../utils/socketHelpers';
 import { ErrorCodes } from '../../utils/errorHandler';
 
@@ -276,8 +276,9 @@ describe('host reclaim on an existing classroom room', () => {
 });
 
 describe('blastDeadEnd', () => {
-  function fire(gameState: string) {
+  function fire(gameState: string, username: string | null = 'Ada') {
     mockGetGameBySocketId.mockReturnValue('BLAST1');
+    vi.mocked(getUsernameBySocketId).mockReturnValue(username as never);
     mockGetGame.mockReturnValue({ gameMode: 'blast', gameState });
     const socket = createSocket();
     registerGameLifecycleHandlers(fakeIo, socket as never);
@@ -293,6 +294,12 @@ describe('blastDeadEnd', () => {
     mockRefreshDeadEnd.mockReturnValueOnce('regenerated');
     fire('in-progress');
     expect(mockRefreshDeadEnd).toHaveBeenCalledWith(expect.objectContaining({ gameCode: 'BLAST1' }));
+    expect(mockEndGame).not.toHaveBeenCalled();
+  });
+
+  it('ignores a report from a socket with no seat (never builds a board for a blank name)', () => {
+    fire('in-progress', null);
+    expect(mockRefreshDeadEnd).not.toHaveBeenCalled();
     expect(mockEndGame).not.toHaveBeenCalled();
   });
 

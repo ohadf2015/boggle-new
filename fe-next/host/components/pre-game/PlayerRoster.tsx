@@ -323,7 +323,7 @@ export const PlayerRoster = memo(function PlayerRoster({
     );
     const label = i < botSlots ? t('hostView.bot') : isHostView ? null : t('common.join');
     const labelClass = cn(
-      'font-neo-display font-bold uppercase tracking-wide leading-tight',
+      'block max-w-full truncate font-neo-display font-bold uppercase tracking-wide leading-tight',
       variant === 'tv' ? 'text-lg' : 'text-[11px] desktop-tall:text-[length:calc(12px*var(--mp-u,1))]',
       i < botSlots ? 'text-neo-cyan' : 'text-neo-white/40',
       i > 0 && 'opacity-40',
@@ -370,14 +370,14 @@ export const PlayerRoster = memo(function PlayerRoster({
             <span
               data-testid="roster-ready-count"
               className={cn(
-                'inline-flex items-center gap-1 rounded-full border-2 border-neo-black leading-none shadow-hard-sm normal-case tracking-normal',
+                'inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-black leading-none shadow-hard-sm normal-case tracking-normal',
                 // The TV chip is read from the couch: projector clamp, not the phone's 11px.
                 variant === 'tv' ? 'px-3 py-1.5 gap-2 text-[clamp(16px,2.2vh,24px)]' : 'px-2 py-0.5 text-[11px]',
                 tally.allReady ? 'bg-neo-lime text-neo-black' : 'bg-neo-navy-light text-neo-white',
               )}
             >
               <Check aria-hidden="true" className={cn('stroke-[3]', variant === 'tv' ? 'w-5 h-5' : 'w-3 h-3')} />
-              {tally.ready}/{tally.total} {t('hostView.playersReady')}
+              {tally.ready}/{tally.total} <span className={variant === 'tv' ? undefined : 'max-[479px]:sr-only'}>{t('hostView.playersReady')}</span>
             </span>
           )}
         </h2>

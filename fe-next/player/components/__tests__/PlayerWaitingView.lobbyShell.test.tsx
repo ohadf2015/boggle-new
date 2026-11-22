@@ -94,6 +94,11 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
     expect(phone().getByText('mpUi.lobby.howToPlay')).toBeInTheDocument();
   });
 
+  it('on narrow phones the language chip keeps its flag and the name goes to screen readers (ru INVITE pushed it under EXIT)', () => {
+    render(<PlayerWaitingView {...props} />);
+    expect(screen.getByTestId('lobby-language-name').className).toMatch(/max-\[419px\]:sr-only/);
+  });
+
   it('desktop keeps the room chat in the right rail', () => {
     setLobbyViewport('desktop');
     onTestFinished(() => setLobbyViewport('phone'));

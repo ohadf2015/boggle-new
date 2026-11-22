@@ -432,7 +432,8 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     if (!gameCode) return;
     const game = getGame(gameCode);
     if (!game || game.gameMode !== 'blast' || !isInProgress(game.gameState)) return;
-    const username = getUsernameBySocketId(socket.id) ?? '';
+    const username = getUsernameBySocketId(socket.id);
+    if (!username) return;
     if (refreshBlastBoardOnDeadEnd({ io, gameCode, game, username, socket, now: Date.now() }) === 'solo') endGame(io, gameCode);
   });
 

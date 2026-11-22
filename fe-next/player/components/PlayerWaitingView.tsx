@@ -286,7 +286,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
             gameLanguage ? (
               <span className="inline-flex items-center gap-1.5 h-10 px-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard-sm min-w-0">
                 <span aria-hidden="true" className="text-base leading-none">{languageFlag(gameLanguage)}</span>
-                <span className="truncate text-xs font-bold uppercase tracking-wider text-neo-lime">{t(languageLabelKey(gameLanguage))}</span>
+                <span data-testid="lobby-language-name" className="truncate text-xs font-bold uppercase tracking-wider text-neo-lime max-[419px]:sr-only">{t(languageLabelKey(gameLanguage))}</span>
               </span>
             ) : null
           }

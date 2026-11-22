@@ -65,6 +65,13 @@ describe('PlayerRoster — the 8-seat lobby grid', () => {
     expect(screen.queryByLabelText('hostView.removeBot')).toBeNull();
   });
 
+  it('long locale labels never overflow at 375px: the ready word is screen-reader-only on phones and chair labels truncate', () => {
+    render(<PlayerRoster players={room} username="Ada" gameCode="ABCD" maxPlayers={8} t={t} variant="guest" readyUsernames={['Ada']} />);
+    const ready = screen.getByText('hostView.playersReady');
+    expect(ready.className).toMatch(/max-\[479px\]:sr-only/);
+    expect(screen.getByText('common.join').className).toMatch(/\btruncate\b/);
+  });
+
   it('a long name is clipped to its own column instead of running into the next seat (390px phone)', () => {
     // Given a seat whose name is wider than a quarter of a phone card
     render(<PlayerRoster players={[...room, { username: 'Puzzle Pro Bot 87', isBot: true }]} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
