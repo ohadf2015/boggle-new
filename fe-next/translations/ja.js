@@ -1666,7 +1666,6 @@ const ja = {
         "copyCode": "参加コードをコピー",
         "copied": "コピーしました",
         "startGame": "クラスでゲームを始める",
-        "startShort": "開始",
         "openClassroom": "クラスを開く",
         "simpleLine": "クラス、ゲーム、レポートをまとめて管理できます。",
         "studentTitle": "自分のクラス",

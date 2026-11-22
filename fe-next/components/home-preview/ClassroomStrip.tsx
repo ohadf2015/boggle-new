@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Check, Copy } from 'lucide-react';
+import { ArrowRight, Check, Copy, GraduationCap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { useScrollReveal } from '@/lib/animation/useScrollReveal';
@@ -66,30 +66,46 @@ const TITLES: Record<Variant, string> = {
   student: 'homeFresh.sections.classrooms.studentTitle',
 };
 
-/** One frame for every variant, so the resolved card swaps content in place instead of shifting the page. */
+/** One full-bleed band for every variant, so the resolved content swaps in place instead of shifting the page. */
 export function Frame({ variant, lang, t, mascot = 'edu-firstClass', children }: Props & { variant: Variant; mascot?: string; children?: ReactNode }) {
   const [ref, visible] = useScrollReveal<HTMLDivElement>();
   const loading = variant === 'loading';
+  const pitch = variant === 'pitch';
+  // Transform-only reveal: the band's pieces arrive in a short stagger; reduced motion shows the final state.
+  const rise = (delay: string) =>
+    cn('transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none motion-reduce:translate-y-0', delay, visible ? 'translate-y-0' : 'translate-y-5');
   return (
     <section
+      ref={ref}
       aria-labelledby={loading ? undefined : 'hp-class-title'}
       aria-busy={loading || undefined}
       data-testid="hp-classroom"
       data-variant={variant}
-      className="mx-auto flex min-h-[220px] w-full flex-col max-w-md px-4 lg:min-h-[248px] lg:max-w-[1600px] lg:px-14"
+      className="relative overflow-hidden border-y-[3px] border-black bg-neo-lime text-black"
     >
       <div
-        ref={ref}
+        aria-hidden="true"
         className={cn(
-          'flex flex-1 items-center gap-3 rounded-3xl border-[3px] border-black bg-neo-lime p-4 text-black shadow-hard-lg lg:gap-10 lg:px-10 lg:py-8',
-          'transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:translate-y-0 motion-reduce:transition-none',
-          visible ? 'translate-y-0' : 'translate-y-6'
+          'pointer-events-none absolute -inset-x-16 inset-y-0 opacity-15 [background-image:repeating-linear-gradient(-45deg,black_0_2px,transparent_2px_14px)]',
+          'transition-transform duration-[1200ms] ease-out motion-reduce:transition-none motion-reduce:translate-x-0',
+          visible ? 'translate-x-0' : '-translate-x-12'
         )}
-      >
+      />
+      <div className="relative mx-auto flex min-h-[150px] w-full max-w-md items-center gap-3 px-4 py-5 lg:min-h-[248px] lg:max-w-[1600px] lg:gap-10 lg:px-14 lg:py-10">
         {loading ? (
-          <span aria-hidden="true" className="h-16 w-16 shrink-0 rounded-2xl bg-black/10 lg:h-40 lg:w-40" />
+          <span aria-hidden="true" className="h-24 w-24 shrink-0 rounded-2xl bg-black/10 lg:h-44 lg:w-44" />
         ) : (
-          <Image src={`/mascot/edu/${mascot}-512.webp`} alt="" width={512} height={512} className={cn('h-16 w-16 shrink-0 -rotate-3 lg:block lg:h-40 lg:w-40')} />
+          <Image
+            src={`/mascot/edu/${mascot}-512.webp`}
+            alt=""
+            width={512}
+            height={512}
+            className={cn(
+              'h-24 w-24 shrink-0 lg:h-44 lg:w-44',
+              'transition-transform duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none motion-reduce:-rotate-3 motion-reduce:translate-y-0 motion-reduce:scale-100',
+              visible ? '-rotate-3 translate-y-0 scale-100' : 'rotate-[-14deg] translate-y-6 scale-90'
+            )}
+          />
         )}
         <div className="min-w-0 flex-1 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-x-10">
           {loading ? (
@@ -99,24 +115,36 @@ export function Frame({ variant, lang, t, mascot = 'edu-firstClass', children }:
             </div>
           ) : (
             <>
-              <h2
-                id="hp-class-title"
-                className={cn(
-                  'font-neo-display font-bold',
-                  variant === 'pitch' ? 'text-lg leading-tight lg:text-4xl lg:leading-tight' : 'text-sm leading-tight tracking-wide uppercase lg:text-base'
-                )}
-              >
-                {t(TITLES[variant])}
-              </h2>
-              {children}
-              {variant === 'pitch' ? (
-                <>
-                  <p className="mt-1 hidden text-lg font-medium lg:block">{t('homeFresh.sections.classrooms.line')}</p>
-                  <Link href={`/${lang}/education`} className={cn(PRIMARY, ACTIONS)}>
+              <div className={rise('delay-100')}>
+                {pitch ? (
+                  <p className="inline-flex items-center gap-1.5 rounded-md border-2 border-black bg-neo-navy px-2 py-0.5 font-neo-display text-[11px] font-bold tracking-widest text-neo-lime uppercase rtl:tracking-normal lg:text-sm">
+                    <GraduationCap className="h-3.5 w-3.5 lg:h-4 lg:w-4" strokeWidth={2.75} aria-hidden="true" />
+                    {t('footer.forTeachers')}
+                  </p>
+                ) : null}
+                <h2
+                  id="hp-class-title"
+                  className={cn(
+                    'font-neo-display font-bold',
+                    pitch ? 'mt-1.5 text-lg leading-tight lg:text-4xl lg:leading-tight' : 'text-sm leading-tight tracking-wide uppercase lg:text-base'
+                  )}
+                >
+                  {t(TITLES[variant])}
+                </h2>
+                {pitch ? <p className="mt-1 hidden text-lg font-medium lg:block">{t('homeFresh.sections.classrooms.line')}</p> : null}
+                {children}
+              </div>
+              {pitch ? (
+                <div className={rise('delay-200')}>
+                  <Link
+                    href={`/${lang}/education`}
+                    onClick={() => trackLandingCtaClick('home_classroom_pitch')}
+                    className={cn(PRIMARY, ACTIONS, 'group/cta hover:-translate-y-0.5 transition-transform')}
+                  >
                     {t('homeFresh.sections.classrooms.cta')}
-                    <ArrowRight className="h-5 w-5 shrink-0 rtl:-scale-x-100" strokeWidth={3} aria-hidden="true" />
+                    <ArrowRight className="h-5 w-5 shrink-0 transition-transform group-hover/cta:translate-x-1 rtl:-scale-x-100 rtl:group-hover/cta:-translate-x-1" strokeWidth={3} aria-hidden="true" />
                   </Link>
-                </>
+                </div>
               ) : null}
             </>
           )}

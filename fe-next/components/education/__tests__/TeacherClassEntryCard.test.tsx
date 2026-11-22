@@ -25,18 +25,19 @@ describe('TeacherClassEntryCard (top of home)', () => {
     expect(track).toHaveBeenCalledWith('education_strip', { role: 'teacher', target: 'teacher', placement: 'top' });
   });
 
-  it('Given a class, Then it shows the class name, the join code to copy and a Start game button to the class host', () => {
+  it('Given a class, Then it shows the class name, the join code to copy and an Open classroom button (the bar opens /teacher)', () => {
     rooms.value = { classrooms: [CLASS], isLoading: false };
     render(<TeacherClassEntryCard trial={null} />);
     expect(screen.getByTestId('home-teacher-class-name')).toHaveTextContent('5B English');
     expect(screen.getByRole('button', { name: 'homeFresh.sections.classrooms.copyCode' })).toHaveTextContent('QX7K2P');
-    const start = screen.getByTestId('home-teacher-class-start');
-    expect(start).toHaveAttribute('href', '/he/education/classroom-game?classroomId=c1');
+    expect(screen.getByTestId('home-teacher-class-open')).toHaveTextContent('homeFresh.sections.classrooms.openClassroom');
+    expect(screen.queryByTestId('home-teacher-class-start')).toBeNull();
+    expect(screen.getByTestId('home-teacher-class-entry')).toHaveAttribute('href', '/he/teacher');
   });
 
   it('Given no class yet, Then it stays a single compact row with no extra button row', () => {
     render(<TeacherClassEntryCard trial={null} />);
-    expect(screen.queryByTestId('home-teacher-class-start')).toBeNull();
+    expect(screen.queryByTestId('home-teacher-class-open')).toBeNull();
     expect(screen.queryByTestId('home-teacher-class-entry-cta')).toBeNull();
   });
 

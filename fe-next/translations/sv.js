@@ -1666,7 +1666,6 @@ const sv = {
         "copyCode": "Kopiera klasskoden",
         "copied": "Kopierad",
         "startGame": "Starta ett klasspel",
-        "startShort": "Starta",
         "openClassroom": "Öppna klassrummet",
         "simpleLine": "Dina klasser, spel och rapporter på ett ställe.",
         "studentTitle": "Min klass",

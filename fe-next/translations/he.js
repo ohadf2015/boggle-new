@@ -1666,7 +1666,6 @@ const he = {
         "copyCode": "העתקת קוד ההצטרפות",
         "copied": "הועתק",
         "startGame": "התחילו משחק כיתתי",
-        "startShort": "התחילו",
         "openClassroom": "לכיתה",
         "simpleLine": "הכיתות, המשחקים והדוחות שלכם במקום אחד.",
         "studentTitle": "הכיתה שלי",

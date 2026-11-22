@@ -88,7 +88,7 @@ describe('ClassroomStrip — role-aware My classroom card', () => {
     rerender(<ClassroomStrip lang="en" t={t} />);
     expect(section()).toBe(frame);
     expect(variant()).toBe('pitch');
-    expect(section().className).toContain('min-h-');
+    expect(section().innerHTML).toContain('min-h-[150px]');
   });
 
   it('Given a teacher, then this lower card renders nothing (their class is in the top bar)', () => {

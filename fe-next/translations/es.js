@@ -1666,7 +1666,6 @@ const es = {
         "copyCode": "Copiar código de acceso",
         "copied": "Copiado",
         "startGame": "Empezar un juego en clase",
-        "startShort": "Empezar",
         "openClassroom": "Abrir la clase",
         "simpleLine": "Tus clases, juegos e informes, todo en un mismo sitio.",
         "studentTitle": "Mi clase",

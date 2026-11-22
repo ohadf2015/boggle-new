@@ -1668,7 +1668,6 @@ const ru = {
         "copyCode": "Скопировать код класса",
         "copied": "Скопировано",
         "startGame": "Начать игру с классом",
-        "startShort": "Начать",
         "openClassroom": "Открыть класс",
         "simpleLine": "Ваши классы, игры и отчёты в одном месте.",
         "studentTitle": "Мой класс",

@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, GraduationCap, Play } from 'lucide-react';
+import { ArrowRight, GraduationCap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
-import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { CopyCode } from '@/components/home-preview/ClassroomStrip';
 import type { TrialStatus } from '@/lib/education/trial';
@@ -32,7 +31,7 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
     <div
       data-testid="home-teacher-class-card"
       className={cn(
-        'group relative flex w-full items-center gap-3 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-2.5 text-neo-black shadow-hard',
+        'group relative flex w-full flex-wrap items-center gap-x-3 gap-y-2.5 rounded-neo border-[3px] border-neo-black bg-neo-cyan px-3 py-2.5 text-neo-black shadow-hard',
         'motion-safe:transition-transform motion-safe:duration-150 motion-safe:hover:-translate-y-0.5 active:translate-y-px'
       )}
     >
@@ -65,15 +64,14 @@ export function TeacherClassEntryCard({ trial, previewClass }: TeacherClassEntry
       </div>
       {trial ? <TrialPill trial={trial} t={t} language={language} showOnPhones /> : null}
       {newest ? (
-        <Link
-          href={teacherHostHref(language, { classroomId: newest.id })}
-          data-testid="home-teacher-class-start"
-          onClick={() => trackLandingCtaClick('home_my_class_start', { role: 'teacher', placement: 'top' })}
-          className="relative z-10 inline-flex shrink-0 items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
+        <span
+          aria-hidden="true"
+          data-testid="home-teacher-class-open"
+          className="inline-flex w-full items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2 font-neo-display text-sm font-black text-neo-lime shadow-hard-sm sm:w-auto sm:shrink-0"
         >
-          <Play className="h-4 w-4 fill-current" strokeWidth={2.5} aria-hidden="true" />
-          {t('homeFresh.sections.classrooms.startShort')}
-        </Link>
+          {t('homeFresh.sections.classrooms.openClassroom')}
+          <DirectionalIcon icon={ArrowRight} className="h-4 w-4" />
+        </span>
       ) : (
         <DirectionalIcon icon={ArrowRight} className="h-5 w-5 shrink-0" />
       )}
