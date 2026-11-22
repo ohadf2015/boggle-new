@@ -10,6 +10,7 @@
 import type { Howl as HowlType, HowlOptions } from 'howler';
 import logger from '@/utils/logger';
 import { getAssetUrl } from '@/lib/assets/cdn';
+import { mediaVolumeIsReadOnly, routeHtml5VolumeThroughGain } from './html5VolumeBridge';
 
 // Re-export the Howl type so consumers can reference it without importing howler directly.
 export type { HowlType };
@@ -34,6 +35,7 @@ export async function ensureHowl(): Promise<(typeof import('howler'))['Howl']> {
       patchHowlerStaleSoundListeners(mod);
       patchHowlerLoadQueueRecursion(_HowlCtor);
       patchHowlerPlayReentry(_HowlCtor);
+      if (mediaVolumeIsReadOnly()) routeHtml5VolumeThroughGain(mod.Howler as unknown as Parameters<typeof routeHtml5VolumeThroughGain>[0]);
       return _HowlCtor;
     });
   }

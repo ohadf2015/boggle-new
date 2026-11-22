@@ -220,7 +220,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
         logger.log(`[Music] Failed to play ${key}:`, err);
         if (retryingPlayRef.current.has(key)) return;
         getHowler().then((H) => {
-          if (H.ctx && H.ctx.state === 'suspended') {
+          if (H.ctx && H.ctx.state !== 'running' && H.ctx.state !== 'closed') {
             H.ctx.resume()
               .then(() => {
                 retryingPlayRef.current.add(key);
@@ -300,7 +300,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
     logger.log('[Music] unlockAudio called, unlocking audio...');
 
     getHowler().then((H) => {
-      if (H.ctx && H.ctx.state === 'suspended') {
+      if (H.ctx && H.ctx.state !== 'running' && H.ctx.state !== 'closed') {
         try {
           const result = H.ctx.resume();
           if (result && typeof result.catch === 'function') {
@@ -501,7 +501,7 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       }
 
       getHowler().then((H) => {
-        if (H.ctx && H.ctx.state === 'suspended') H.ctx.resume().catch(() => {});
+        if (H.ctx && H.ctx.state !== 'running' && H.ctx.state !== 'closed') H.ctx.resume().catch(() => {});
       }).catch((err) => { logger.log('[Music] Failed to resume AudioContext:', err); });
 
       cleanup();
