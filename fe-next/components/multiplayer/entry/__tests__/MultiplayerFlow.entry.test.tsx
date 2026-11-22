@@ -90,9 +90,17 @@ describe('MultiplayerFlow entry frame', () => {
     expect(props.handleJoin).toHaveBeenCalledWith(false, null, 'ABC123', undefined, 'StoredPlayer');
   });
 
-  it('a typed code without a profile opens the join sheet for that code', () => {
+  it('a guest typing a code without a complete profile joins with the name the entry shows, no sheet', () => {
     completeProfile = false;
     render(<MultiplayerFlow {...props} />);
+    fireEvent.click(screen.getByText('code'));
+    expect(screen.queryByTestId('join-room-modal')).toBeNull();
+    expect(props.handleJoin).toHaveBeenCalledWith(false, null, 'ABC123', undefined, expect.any(String));
+  });
+
+  it('a signed-in player with no display name still gets the join sheet for a typed code', () => {
+    completeProfile = false;
+    render(<MultiplayerFlow {...props} isAuthenticated displayName="" />);
     fireEvent.click(screen.getByText('code'));
     expect(props.handleJoin).not.toHaveBeenCalled();
     expect(screen.getByTestId('join-room-modal').textContent).toBe('ABC123');

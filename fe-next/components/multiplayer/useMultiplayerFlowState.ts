@@ -9,6 +9,7 @@
 import { useState, useCallback, useEffect, useReducer, useRef } from 'react';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import {
+  getOrCreateStoredUsername,
   getStoredUsername,
   hasCompleteStoredProfile,
   setStoredUsername as persistStoredUsername,
@@ -213,6 +214,16 @@ export function useMultiplayerFlowState({
     [prefilledRoom, defaultLanguage, handleJoin, setGameCode, setUsername, setRoomName, setHostUsername, host]
   );
 
+  // The join in flight came from the code boxes (see useRoomEndedOffer). Any
+  // other join that starts clears it, so a later dead link keeps its own line.
+  const typedCodeRef = useRef(false);
+  const typedJoinPendingRef = useRef(false);
+  useEffect(() => {
+    if (!isJoining) return;
+    if (!typedJoinPendingRef.current) typedCodeRef.current = false;
+    typedJoinPendingRef.current = false;
+  }, [isJoining]);
+
   // JOIN BY CODE from the entry: the same join an invite link takes for a
   // player (profile → join, otherwise the join sheet for that code) — but a
   // typed code always JOINS. It never takes the classroom-host branch of
@@ -221,12 +232,16 @@ export function useMultiplayerFlowState({
     (raw: string) => {
       const code = sanitizeGameCode(raw).toUpperCase();
       if (!code) return;
-      if (hasProfile()) {
-        const profile = getProfileData();
-        if (!isAuthenticated) trackGuestJoin(profile.username, code, defaultLanguage);
+      // hasProfile wants a legacy avatar id the entry never writes; join with the name the entry already shows.
+      const guestName = !isAuthenticated && !hasProfile() ? getOrCreateStoredUsername(defaultLanguage) : '';
+      if (hasProfile() || guestName) {
+        const username = guestName || getProfileData().username;
+        if (!isAuthenticated) trackGuestJoin(username, code, defaultLanguage);
+        typedJoinPendingRef.current = true;
+        typedCodeRef.current = true;
         setGameCode(code);
-        setUsername(profile.username);
-        handleJoin(false, null, code, undefined, profile.username);
+        setUsername(username);
+        handleJoin(false, null, code, undefined, username);
         return;
       }
       dispatchFlow({ type: 'OPEN_JOIN', room: codeTicket(code, defaultLanguage) });
@@ -364,7 +379,7 @@ export function useMultiplayerFlowState({
     entryView, flowView: flow.view, selectedRoom, joinTarget, matchmaking, joiningRoomCode, roomFetchTimedOut,
     isQuickPlayPending, showCgHero, heroExpanded, heroVariant,
     openCreate: handleCreateClick, handleModalClose, handleRoomClick, handleJoinFromModal, handleCreateFromModal,
-    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking, handleCodeJoin,
+    handleQuickPlay, handleClassroomNameSubmit, dismissSeeking, handleCodeJoin, typedCodeRef,
     onHeroPlay: () => { heroVariant.markSeen(); handleQuickPlay(); },
     onHeroBrowse: () => { heroVariant.markSeen(); setHeroExpanded(true); setHeroDismissed(true); },
   };

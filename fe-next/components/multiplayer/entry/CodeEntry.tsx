@@ -24,8 +24,8 @@ interface CodeEntryProps {
  * JOIN BY CODE (DESIGN §b.1): six boxes that auto-advance, accept a paste, and
  * submit on the sixth character. A pasted code LONGER than six (the server
  * accepts up to ten) is submitted whole — never cut to six and fired. If the
- * join fails (busy ends and we are still on the entry), the boxes shake, clear
- * and refocus the first.
+ * join fails (busy ends and we are still on the entry), the boxes shake, keep the
+ * typed code and focus the last box.
  */
 export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps) {
   const { t } = useLanguage();
@@ -52,17 +52,16 @@ export function CodeEntry({ onSubmit, busy = false, className }: CodeEntryProps)
     wasBusy.current = false;
     if (!submitted.current) return;
     submitted.current = false;
-    setChars(EMPTY);
     setShake((s) => s + 1);
   }, [busy]);
 
-  // After a failed join the row re-mounts (to replay the shake) — focus the new
-  // first box, unless the player is working in a dialog (a sheet over the entry).
+  // After a failed join the row re-mounts (to replay the shake) and KEEPS the code so a
+  // typo is one fix away — focus the last box, unless the player is working in a dialog (a sheet over the entry).
   useEffect(() => {
     if (shake === 0) return;
     if (document.activeElement?.closest?.('[role="dialog"]')) return;
     if (window.matchMedia?.('(pointer: coarse)').matches) return;
-    refs.current[0]?.focus();
+    refs.current[CODE_LENGTH - 1]?.focus();
   }, [shake]);
 
   const focus = (i: number) => refs.current[Math.max(0, Math.min(CODE_LENGTH - 1, i))]?.focus();

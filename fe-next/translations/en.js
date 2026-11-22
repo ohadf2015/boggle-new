@@ -4535,7 +4535,8 @@ const en = {
     "roomTimedOut": "Your room timed out. Back to the lobby.",
     "roomEnded": {
       "line": "That room has ended. Jump into a new game?",
-      "playNow": "Play now"
+      "playNow": "Play now",
+      "noRoom": "No room with that code, or it has ended. Check the code and try again."
     },
     "rejoinedRoom": "Back in! Rejoined room {code}",
     "rejoinedGame": "Back in the game!",

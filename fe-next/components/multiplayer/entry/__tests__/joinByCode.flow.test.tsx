@@ -90,8 +90,7 @@ describe('join sheet room — one source for every path', () => {
     const fromCard = ticket();
     unmount();
 
-    render(<MultiplayerFlow {...props} />);
-    fireEvent.click(screen.getByText('typed-listed'));
+    render(<MultiplayerFlow {...props} prefilledRoom="CN2T8U" />);
     expect(ticket()).toEqual(fromCard);
     expect(fromCard).toEqual({ code: 'CN2T8U', name: 'Turbo Salmonʼs Room', seats: '1/50', lang: 'en', unlisted: 'false' });
   });
@@ -103,20 +102,27 @@ describe('join sheet room — one source for every path', () => {
 
   it('the open sheet follows the listing (seats taken while it is open)', () => {
     const { rerender } = render(<MultiplayerFlow {...props} />);
-    fireEvent.click(screen.getByText('typed-listed'));
+    fireEvent.click(screen.getByText('card'));
     rerender(<MultiplayerFlow {...props} activeRooms={[{ ...listed, playerCount: 7 }]} />);
     expect(ticket().seats).toBe('7/50');
   });
 
   it('a code nobody lists opens an honest code ticket', () => {
-    render(<MultiplayerFlow {...props} />);
-    fireEvent.click(screen.getByText('typed-unlisted'));
+    render(<MultiplayerFlow {...props} prefilledRoom="ZZ9QX2" />);
     expect(ticket()).toMatchObject({ code: 'ZZ9QX2', name: '', unlisted: 'true' });
   });
 
-  it('JOIN from a typed-code sheet joins that code (upper-cased, as typed)', () => {
+  it('a guest typing a code joins at once with the name already shown — no name-confirm sheet', () => {
     render(<MultiplayerFlow {...props} />);
     fireEvent.click(screen.getByText('typed-listed'));
+    expect(screen.queryByTestId('join-room-modal')).toBeNull();
+    expect(props.handleJoin).toHaveBeenCalledWith(false, null, 'CN2T8U', undefined, 'Sly Fox');
+    expect(props.setUsername).toHaveBeenCalledWith('Sly Fox');
+  });
+
+  it('JOIN from the sheet joins that room (upper-cased, as typed)', () => {
+    render(<MultiplayerFlow {...props} />);
+    fireEvent.click(screen.getByText('card'));
     expect(props.handleJoin).not.toHaveBeenCalled();
     fireEvent.click(screen.getByText('sheet-join'));
     expect(props.handleJoin).toHaveBeenCalledWith(false, null, 'CN2T8U', undefined, 'Sly Fox');
