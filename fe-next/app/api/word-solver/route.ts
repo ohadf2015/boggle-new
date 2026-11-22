@@ -10,6 +10,7 @@ import { normalizeHebrewWord, applyHebrewFinalLetters } from '@/shared/utils/wor
 import { BLANK_CHARS, MAX_BLANKS, MAX_RESULTS, buildMatcher, parsePattern, type FinderQuery } from './matcher';
 import { foldJapaneseInput } from './japaneseInput';
 import { foldYo, solveRussian } from './russianSolver';
+import { buildWordIndex, searchWordIndex, type WordIndex } from './wordIndex';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -34,17 +35,15 @@ const RATE_LIMIT_CONFIG = {
   blockDurationMs: 300000,
 };
 
-// Module-level dictionary cache
-const dictionaryCache: Record<string, Set<string>> = {};
+const indexCache: Partial<Record<SolverLanguage, WordIndex>> = {};
 
-async function getDictionary(language: SolverLanguage): Promise<Set<string>> {
-  if (dictionaryCache[language]) return dictionaryCache[language];
-
+async function getWordIndex(language: SolverLanguage): Promise<WordIndex> {
+  const cached = indexCache[language];
+  if (cached) return cached;
   const { loadDictionaryWords } = await import('./dictionaryLoader');
-  const words = await loadDictionaryWords(language);
-  const wordSet = new Set(words);
-  dictionaryCache[language] = wordSet;
-  return wordSet;
+  const index = buildWordIndex(await loadDictionaryWords(language), (word) => normalizeWord(word, language));
+  indexCache[language] = index;
+  return index;
 }
 
 function normalizeInput(letters: string, language: SolverLanguage): string {
@@ -150,19 +149,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(solveRussian(query));
     }
 
-    const dictionary = await getDictionary(language);
-    const matches = buildMatcher(query);
+    const index = await getWordIndex(language);
     // Set: the Hebrew dictionary stores sofit-folded forms, so restoring the
     // final letter can collapse two entries into one display word.
     const found = new Set<string>();
-
-    for (const word of dictionary) {
-      if (matches(normalizeWord(word, language))) {
-        // he: dictionary words end in the regular form (שלומ); show the real
-        // spelling with a final letter (שלום).
-        found.add(language === 'he' ? applyHebrewFinalLetters(word) : word);
-      }
-    }
+    searchWordIndex(index, query, buildMatcher(query), (word) => {
+      // he: dictionary words end in the regular form (שלומ); show the real
+      // spelling with a final letter (שלום).
+      found.add(language === 'he' ? applyHebrewFinalLetters(word) : word);
+    });
     const results = Array.from(found);
 
     // Sort by length descending, then alphabetically
