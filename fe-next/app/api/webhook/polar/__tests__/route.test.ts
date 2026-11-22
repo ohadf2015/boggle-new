@@ -31,6 +31,7 @@ vi.mock('@/backend/utils/educationTelemetry', () => ({
 
 // static import is safe: vitest hoists the vi.mock calls above it
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO_PRODUCT_ID = 'prod-pro-1'
 
@@ -57,6 +58,7 @@ const subscriptionData = {
 
 describe('polar webhook', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     upsertSubscription.mockClear()
     grantProFromOrder.mockClear()
     grantProFromCheckout.mockClear()

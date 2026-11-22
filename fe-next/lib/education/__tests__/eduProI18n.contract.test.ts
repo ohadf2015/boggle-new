@@ -23,6 +23,8 @@ const USERS = [
   'components/teacher/reports/FullReportDisclosure.tsx',
   'components/teacher/assignments/AssignmentCreatorDueDate.tsx',
   'app/[locale]/teacher/reports/PageClient.tsx',
+  'app/[locale]/teacher/reports/ReportsClassView.tsx',
+  'app/[locale]/teacher/reports/OwnClassProPreview.tsx',
   'app/[locale]/teacher/upgrade/PageClient.tsx',
 ];
 
@@ -68,7 +70,9 @@ describe('eduPro copy contract', () => {
   it('gives every locale the same eduPro key set as English', () => {
     const english = leaves((en as Record<string, unknown>).eduPro, 'eduPro').sort();
     for (const [locale, dict] of Object.entries(LOCALES)) {
-      expect(leaves((dict as Record<string, unknown>).eduPro, 'eduPro').sort(), locale).toEqual(english);
+      // ru alone has the extra few/many plural forms
+      const own = leaves((dict as Record<string, unknown>).eduPro, 'eduPro').filter((k) => !/_(few|many)$/.test(k));
+      expect(own.sort(), locale).toEqual(english);
     }
   });
 
@@ -86,6 +90,8 @@ describe('eduPro copy contract', () => {
       const vars = ((resolve(en, key) as string).match(/\{\w+\}/g) ?? []).sort();
       for (const [locale, dict] of Object.entries(LOCALES)) {
         const got = ((resolve(dict, key) as string).match(/\{\w+\}/g) ?? []).sort();
+        // a singular form may spell the count out ("one student")
+        if (key.endsWith('_one') && got.length === 0) continue;
         expect(got, `${locale} ${key}`).toEqual(vars);
       }
     }

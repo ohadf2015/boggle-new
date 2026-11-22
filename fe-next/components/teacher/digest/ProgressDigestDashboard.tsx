@@ -25,6 +25,7 @@ import { Stat } from '@/components/ui/Stat';
 import { NeoPanel } from '@/components/ui/panel';
 import { ScheduleReteachLiveButton } from '@/components/teacher/digest/ScheduleReteachLiveButton';
 import { MissGapUnpluggedReteachLiveCta } from '@/components/teacher/digest/MissGapUnpluggedReteachLiveCta';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface ProgressDigestDashboardProps {
   classroomId: string;
@@ -178,7 +179,7 @@ export function ProgressDigestDashboard({
               data-count={mood.count}
               className="text-sm font-bold text-neo-white/85"
             >
-              {t(moodCopyKey(mood.mood), { count: mood.count })}
+              {t(pluralKeyOf(moodCopyKey(mood.mood), mood.count, language), { count: mood.count })}
             </p>
           )}
         </>

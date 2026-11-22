@@ -9,6 +9,7 @@ import type { ClassroomPlayerMastery } from '@/shared/types/classroom';
 import { trackResultsAction } from './trackResultsAction';
 import { RoundWordGridDialog } from './RoundWordGridDialog';
 import type { RoundWordGridInput } from './roundWordGrid';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 export interface StrugglePreviewProps {
   masteryByPlayer: Record<string, ClassroomPlayerMastery>;
@@ -52,8 +53,9 @@ export function StrugglePreview({ masteryByPlayer, teacherName, language, t, max
         ))}
       </ul>
       <div className="flex min-w-0 flex-col items-start gap-2">
-        <p className="font-neo-display text-base font-black leading-tight text-neo-cream @[96rem]/results:text-xl">
+        <p className="flex flex-wrap items-center gap-2 font-neo-display text-base font-black leading-tight text-neo-cream @[96rem]/results:text-xl">
           {t('eduPlans.reports.title')}
+          <ProPoweredChip />
         </p>
         <Link
           href={`/${language}/teacher/reports`}

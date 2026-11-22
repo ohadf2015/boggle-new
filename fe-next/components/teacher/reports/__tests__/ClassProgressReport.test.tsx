@@ -71,7 +71,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'teacher.reports.issue.lowAccuracy': 'LOW_ACCURACY_LBL',
         'teacher.reports.issue.inactive': 'INACTIVE_LBL',
         'teacher.reports.viewStudentProgress': 'VIEW_PROGRESS_OF {{name}}',
-        'education.classroomGame.words': '{{count}} WORDS_LBL',
+        'education.classroomGame.words_other': '{{count}} WORDS_LBL',
       };
       let value = translations[key] || key;
       if (params) {

@@ -12,3 +12,8 @@ function pluralCategory(count: number, locale: string): Intl.LDMLPluralRule {
 export function pluralKey(forms: PluralForms, count: number, locale: string): string {
   return forms[pluralCategory(count, locale)] ?? forms.other;
 }
+
+/** `pluralKey` for keys named `<base>_one` / `_few` / `_other`. */
+export function pluralKeyOf(base: string, count: number, locale: string): string {
+  return pluralKey({ one: `${base}_one`, few: `${base}_few`, other: `${base}_other` }, count, locale);
+}

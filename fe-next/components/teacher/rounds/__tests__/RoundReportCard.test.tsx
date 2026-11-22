@@ -15,6 +15,7 @@ vi.mock('@/components/teacher/reports/MissedPracticeAction', () => ({
     return <div data-testid="practice-action" data-locked={String(p.locked)} />;
   },
 }));
+vi.mock('@/components/teacher/pro/ProPoweredChip', () => ({ ProPoweredChip: () => <span data-testid="pro-powered-chip" /> }));
 
 import { RoundReportCard } from '../RoundReportCard';
 import { ROUND_FIXTURE } from '../roundFixture';
@@ -93,11 +94,13 @@ describe('RoundReportCard', () => {
   it('free: practising the missed words is the Pro step, locked', () => {
     render(<RoundReportCard {...props} hasPro={false} />);
     expect(screen.getByTestId('practice-action')).toHaveAttribute('data-locked', 'true');
+    expect(screen.queryByTestId('pro-powered-chip')).toBeNull();
   });
 
   it('Pro: one tap practices exactly this round\'s missed words', () => {
     render(<RoundReportCard {...props} hasPro />);
     expect(screen.getByTestId('practice-action')).toHaveAttribute('data-locked', 'false');
+    expect(within(screen.getByTestId('round-report-footer')).getByTestId('pro-powered-chip')).toBeInTheDocument();
     expect(practice).toHaveBeenLastCalledWith(expect.objectContaining({ words: ['enormous', 'fragile', 'ancient'] }));
   });
 

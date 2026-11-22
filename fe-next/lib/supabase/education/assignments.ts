@@ -394,7 +394,7 @@ export async function getAssignmentCompletions(
   try {
     const { data: completions, error } = await supabase
       .from('student_lesson_progress')
-      // Named, not `*`: every caller (CompletionTracker, AssignmentProgressReport,
+      // Named, not `*`: every caller (AssignmentProgressReport,
       // ClassAssignmentGrid) is listed here so this select can never silently
       // drop a column one of them starts reading. `score`/`accuracy` don't exist
       // on this table —

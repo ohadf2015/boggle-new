@@ -21,6 +21,7 @@ import {
   type AttentionIssue,
   type ReportT,
 } from './reportLabels';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 // =============================================
 // TYPES
@@ -238,7 +239,7 @@ function StudentReport({ data, t, language, s }: { data: StudentReportPDFData; t
           { label: t('teacher.reports.metrics.wordsLearned'), value: `${metrics.wordsLearned} / ${metrics.totalWords}` },
           { label: t('teacher.reports.metrics.accuracy'), value: metrics.accuracy === null ? t('parentReport.noValue') : `${metrics.accuracy}%` },
           { label: t('teacher.reports.metrics.practiceTime'), value: formatPracticeMinutes(t, metrics.practiceTimeMinutes) },
-          { label: t('teacher.reports.metrics.currentStreak'), value: t('teacher.reports.streakDays', { count: metrics.currentStreak }) },
+          { label: t('teacher.reports.metrics.currentStreak'), value: t(pluralKeyOf('teacher.reports.streakDays', metrics.currentStreak, language), { count: metrics.currentStreak }) },
         ]}
       />
 
@@ -254,7 +255,7 @@ function StudentReport({ data, t, language, s }: { data: StudentReportPDFData; t
           {[
             `${t('teacher.reports.metrics.sessionsCompleted')}: ${metrics.sessionsCompleted}`,
             `${t('teacher.reports.metrics.averageScore')}: ${metrics.averageScore ?? t('parentReport.noValue')}`,
-            `${t('teacher.reports.metrics.longestStreak')}: ${t('teacher.reports.streakDays', { count: metrics.longestStreak })}`,
+            `${t('teacher.reports.metrics.longestStreak')}: ${t(pluralKeyOf('teacher.reports.streakDays', metrics.longestStreak, language), { count: metrics.longestStreak })}`,
           ].map((line) => (
             <View key={line} style={s.grow}>
               <Text style={s.inlineStat}>{line}</Text>
@@ -349,7 +350,7 @@ function ClassReport({ data, t, language, s }: { data: ClassReportPDFData; t: Re
                 <View style={s.grow}>
                   <Text style={s.podiumName}>{p.studentName}</Text>
                   <Text style={s.podiumStat}>
-                    {`${p.accuracy}% · ${t('education.classroomGame.words', { count: p.wordsLearned })}`}
+                    {`${p.accuracy}% · ${t(pluralKeyOf('education.classroomGame.words', p.wordsLearned, language), { count: p.wordsLearned })}`}
                   </Text>
                 </View>
               </View>

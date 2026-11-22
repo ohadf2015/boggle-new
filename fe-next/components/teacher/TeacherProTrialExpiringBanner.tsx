@@ -9,6 +9,7 @@ import { trackTeacherTrialBannerShown, trackTeacherTrialUpgradeClicked } from '@
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 import { PRO_BANNER_CTA, ProBanner, ProShine } from './pro/ProBanner';
 import { TeacherProManageLink } from './TeacherProManageLink';
+import { TrialUsageRecap } from './pro/TrialUsageRecap';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
 
@@ -82,7 +83,12 @@ export function TeacherProTrialExpiringBanner({
       tone="urgent"
       proLabel={t('eduShell.nav.pro')}
       title={polarTrialDaysTitle(t, daysRemaining)}
-      body={t('teacher.subscription.trialAutoRenewBody')}
+      body={
+        <>
+          <span>{t('teacher.subscription.trialAutoRenewBody')}</span>
+          <TrialUsageRecap trialExpires={trialExpires} />
+        </>
+      }
       onDismiss={handleDismiss}
       dismissLabel={t('common.close')}
       dismissTestId="teacher-pro-trial-expiring-dismiss"

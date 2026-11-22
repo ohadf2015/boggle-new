@@ -12,6 +12,7 @@ import type { LibraryLesson } from '@/lib/education/libraryTypes';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { BidiText } from '@/components/teacher/classroom/BidiText';
 import AssignListDialog from './library/AssignListDialog';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface MyListCardProps {
   lesson: LibraryLesson;
@@ -39,7 +40,7 @@ export default function MyListCard({
   onEdit,
   onToggleShare,
 }: MyListCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [assigning, setAssigning] = useState(false);
   const isPublic = lesson.is_public === true;
   const accent = arcadeAccentAt(index);
@@ -77,7 +78,7 @@ export default function MyListCard({
       }
       sub={
         <p data-testid={`lesson-fact-${lesson.id}`} className="mt-0.5 font-neo-body text-xs font-bold opacity-85">
-          <span className="sr-only">{t('eduLibrary.card.words', { count: total })} · </span>
+          <span className="sr-only">{t(pluralKeyOf('eduLibrary.card.words', total, language), { count: total })} · </span>
           {classroomName ? (
             <BidiText data-testid={`lesson-classroom-${lesson.id}`}>{classroomName}</BidiText>
           ) : (

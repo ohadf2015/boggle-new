@@ -21,6 +21,7 @@ const capture = vi.fn()
 vi.mock('@/lib/posthog', () => ({ getPostHogServer: () => ({ capture: (...a: unknown[]) => capture(...a) }) }))
 
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry'
 
 const PRO = 'prod-pro-1'
@@ -35,6 +36,7 @@ const events = () => capture.mock.calls.map((c) => c[0])
 
 describe('polar webhook — revenue telemetry', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     capture.mockReset()
     logSubscriptionEvent.mockReset()
     process.env.POLAR_PRO_PRODUCT_ID = PRO

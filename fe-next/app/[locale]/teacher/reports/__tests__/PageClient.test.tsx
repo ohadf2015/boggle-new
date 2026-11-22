@@ -35,7 +35,7 @@ vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
   ClassProgressReport: ({ classroomId, onStudentClick }: { classroomId: string; onStudentClick?: (id: string) => void }) => (
     <div data-testid="class-progress-report" data-classroom-id={classroomId}>
       Class Progress Report Mock
-      <button onClick={() => onStudentClick?.('student-123')}>Click Student</button>
+      <button onClick={() => onStudentClick?.('33333333-3333-4333-8333-333333333333')}>Click Student</button>
     </div>
   ),
 }));
@@ -116,8 +116,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 // Mock useClassrooms hook
 const mockClassrooms = [
-  { id: 'classroom-1', name: 'English 101', created_at: '2024-01-01' },
-  { id: 'classroom-2', name: 'English 102', created_at: '2024-01-02' },
+  { id: '11111111-1111-4111-8111-111111111111', name: 'English 101', created_at: '2024-01-01' },
+  { id: '22222222-2222-4222-8222-222222222222', name: 'English 102', created_at: '2024-01-02' },
 ];
 
 vi.mock('@/hooks/useClassroom', () => ({
@@ -194,9 +194,9 @@ describe('ReportsPageClient', () => {
     it('Given one class, Then the report opens on it instead of asking to pick', async () => {
       render(<ReportsPageClient />);
       expect(screen.queryByText('Select a Classroom')).not.toBeInTheDocument();
-      expect(screen.getByTestId('classroom-roster-progress')).toHaveTextContent('classroom-1');
+      expect(screen.getByTestId('classroom-roster-progress')).toHaveTextContent('11111111-1111-4111-8111-111111111111');
       await openSection('more');
-      expect(screen.getByTestId('class-progress-report')).toHaveAttribute('data-classroom-id', 'classroom-1');
+      expect(screen.getByTestId('class-progress-report')).toHaveAttribute('data-classroom-id', '11111111-1111-4111-8111-111111111111');
     });
   });
 
@@ -224,7 +224,7 @@ describe('ReportsPageClient', () => {
 
   describe('Class Report View', () => {
     beforeEach(() => {
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
     });
 
     it('keeps Homework one tap away as a tab, with no second button for it', async () => {
@@ -240,7 +240,7 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('class-overview')).toHaveAttribute('data-class', 'English 101');
       expect(screen.getByTestId('class-overview')).toHaveAttribute('data-surface', 'reports');
       expect(screen.queryByTestId('reports-reteach-panel')).toBeNull();
-      expect(screen.getByTestId('reports-class-report-link')).toHaveAttribute('href', '/en/teacher/classroom/classroom-1/analytics');
+      expect(screen.queryByTestId('reports-class-report-link')).toBeNull();
     });
 
     it('opens a student picked in the summary as the full student report', async () => {
@@ -268,7 +268,7 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('class-progress-report')).toHaveAttribute(
         'data-classroom-id',
-        'classroom-1'
+        '11111111-1111-4111-8111-111111111111'
       );
     });
 
@@ -289,8 +289,8 @@ describe('ReportsPageClient', () => {
 
   describe('Student Report View', () => {
     beforeEach(() => {
-      mockSearchParams.set('classroomId', 'classroom-1');
-      mockSearchParams.set('studentId', 'student-123');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
+      mockSearchParams.set('studentId', '33333333-3333-4333-8333-333333333333');
     });
 
     it('displays student report when student is selected', () => {
@@ -299,7 +299,7 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('student-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('student-progress-report')).toHaveAttribute(
         'data-student-id',
-        'student-123'
+        '33333333-3333-4333-8333-333333333333'
       );
     });
 
@@ -360,23 +360,25 @@ describe('ReportsPageClient', () => {
 
     it('Given a class nobody has played in yet, Then an empty state says why and offers one action: start a game for that class', () => {
       (mockClassrooms[0] as { member_count?: number }).member_count = 0;
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
       const empty = screen.getByTestId('reports-class-empty');
       expect(empty).toHaveTextContent('teacher.reports.emptyClass.title');
       const links = within(empty).getAllByRole('link');
       expect(links).toHaveLength(1);
-      expect(links[0]).toHaveAttribute('href', '/en/education/classroom-game?classroomId=classroom-1');
+      expect(links[0]).toHaveAttribute('href', '/en/education/classroom-game?classroomId=11111111-1111-4111-8111-111111111111');
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('reports-start-game')).toBeNull();
     });
 
     it('Given a class with students, Then the report tabs show and no empty state', () => {
       (mockClassrooms[0] as { member_count?: number }).member_count = 12;
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
       expect(screen.queryByTestId('reports-class-empty')).not.toBeInTheDocument();
       expect(screen.getByRole('tablist')).toBeInTheDocument();
       expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members');
+      expect(screen.getByTestId('reports-start-game')).toBeInTheDocument();
     });
 
     it('Given a free teacher at the lock, Then the page says the missed words stay free on every game\'s results', () => {
@@ -386,11 +388,30 @@ describe('ReportsPageClient', () => {
     });
   });
 
+  describe('A link with a broken id', () => {
+    it('Given ?classroomId=null, Then the class list shows and no class is read', () => {
+      mockSearchParams.set('classroomId', 'null');
+      mockSearchParams.set('studentId', 'undefined');
+      render(<ReportsPageClient />);
+      expect(screen.getByText('Select a Classroom')).toBeInTheDocument();
+      expect(screen.queryByTestId('student-progress-report')).toBeNull();
+      expect(getClassroomStudents).not.toHaveBeenCalledWith('null');
+    });
+
+    it('Given a class id with a broken student id, Then the class report shows', () => {
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
+      mockSearchParams.set('studentId', 'null');
+      render(<ReportsPageClient />);
+      expect(screen.queryByTestId('student-progress-report')).toBeNull();
+      expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
+    });
+  });
+
   describe('Browser history', () => {
     it('follows the URL when the teacher presses browser Back', () => {
       // GIVEN the student view opened from a URL
-      mockSearchParams.set('classroomId', 'classroom-1');
-      mockSearchParams.set('studentId', 'student-123');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
+      mockSearchParams.set('studentId', '33333333-3333-4333-8333-333333333333');
       const { rerender } = render(<ReportsPageClient />);
       expect(screen.getByTestId('student-progress-report')).toBeInTheDocument();
 

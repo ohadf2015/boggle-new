@@ -12,6 +12,7 @@ import { SocketContext } from '@/utils/SocketContext';
 import { useIsVocabQuizRoom } from './vocabQuiz/useIsVocabQuizRoom';
 import { useClassroomSeatCapNotice } from './controls/useClassroomSeatCapNotice';
 import { StudentModeStrip } from './ClassroomModeBannerStudent';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface LessonData {
   lessonId: string;
@@ -94,7 +95,7 @@ export function ClassroomModeBanner({
   liveGame = null,
   showResults = false,
 }: ClassroomModeBannerProps) {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
 
   // Two sources, and only one of them exists on any given client: `lessonData`
   // is the teacher's own sessionStorage, `liveGame` is what the server says
@@ -173,7 +174,7 @@ export function ClassroomModeBanner({
           <>
             <span className="text-neo-white" aria-hidden="true">|</span>
             <span className="text-neo-white">
-              {t('education.classroomGame.words', { count: wordCount })}
+              {t(pluralKeyOf('education.classroomGame.words', wordCount, uiLanguage), { count: wordCount })}
             </span>
           </>
         )}

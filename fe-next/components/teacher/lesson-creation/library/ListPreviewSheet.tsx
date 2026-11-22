@@ -9,6 +9,7 @@ import { ItemStats, SourceBadge } from './LibraryCard';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { NbDialogBody, NbDialogContent, NbDialogFooter, NbDialogHeader } from '@/components/teacher/nb/NbDialog';
 import { NB_BLOCK, NB_LINK, NB_PRIMARY, NB_SECONDARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export type PreviewBusy = 'host' | 'assign' | 'copy' | null;
 
@@ -27,7 +28,7 @@ interface ListPreviewSheetProps {
 const SECOND = cn(NB_SECONDARY, 'min-w-0 px-3 text-sm sm:text-base');
 
 export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, onAssign, onCopy, onOpenMyLists, onReport }: ListPreviewSheetProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const author = item ? (item.source === 'verified' ? 'LexiClash' : item.authorName ?? t('eduLibrary.card.aTeacher')) : '';
 
   return (
@@ -43,7 +44,7 @@ export default function ListPreviewSheet({ item, onClose, busy, copied, onHost, 
                   <SourceBadge item={item} />
                   <span dir="auto">{t('eduLibrary.card.by', { author })}</span>
                   <span lang={item.language} className={cn(NB_STICKER, NB_BLOCK.navy)}>{nativeLanguageName(item.language)}</span>
-                  <span className={cn(NB_STICKER, NB_BLOCK.navy, 'tabular-nums')}>{t('eduLibrary.card.words', { count: item.wordCount })}</span>
+                  <span className={cn(NB_STICKER, NB_BLOCK.navy, 'tabular-nums')}>{t(pluralKeyOf('eduLibrary.card.words', item.wordCount, language), { count: item.wordCount })}</span>
                   <ItemStats item={item} verbose />
                 </span>
               }

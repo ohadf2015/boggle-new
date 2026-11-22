@@ -35,7 +35,7 @@ vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
   ClassProgressReport: ({ classroomId, onStudentClick }: { classroomId: string; onStudentClick?: (id: string) => void }) => (
     <div data-testid="class-progress-report" data-classroom-id={classroomId}>
       Class Progress Report Mock
-      <button onClick={() => onStudentClick?.('student-123')}>Click Student</button>
+      <button onClick={() => onStudentClick?.('33333333-3333-4333-8333-333333333333')}>Click Student</button>
     </div>
   ),
 }));
@@ -116,8 +116,8 @@ vi.mock('@/contexts/AuthContext', () => ({
 
 // Mock useClassrooms hook
 const mockClassrooms = [
-  { id: 'classroom-1', name: 'English 101', created_at: '2024-01-01' },
-  { id: 'classroom-2', name: 'English 102', created_at: '2024-01-02' },
+  { id: '11111111-1111-4111-8111-111111111111', name: 'English 101', created_at: '2024-01-01' },
+  { id: '22222222-2222-4222-8222-222222222222', name: 'English 102', created_at: '2024-01-02' },
 ];
 
 vi.mock('@/hooks/useClassroom', () => ({
@@ -169,6 +169,10 @@ vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
 
+vi.mock('../OwnClassProPreview', () => ({
+  OwnClassProPreview: ({ classroomId }: { classroomId: string }) => <section data-testid={`own-preview-${classroomId}`} />,
+}));
+
 const weekStats: { summary: Record<string, unknown> | null; status: string } = {
   summary: { gamesPlayed: 3, gamesLast30d: 7, totalStudents: 24, activeClasses: 2, lastPlayedAt: {} },
   status: 'ready',
@@ -207,21 +211,20 @@ describe('ReportsPageClient', () => {
     ];
     const expectNoReportData = () => {
       for (const id of REPORT_SURFACES) expect(screen.queryByTestId(id)).not.toBeInTheDocument();
-      expect(screen.queryAllByText('English 101').every((n) => n.closest('[data-testid=reports-free-insights]'))).toBe(true);
-      expect(getClassroomStudents).not.toHaveBeenCalled();
+      expect(screen.queryAllByText('English 101').every((n) => n.closest('[data-testid=reports-free-insights],[data-testid=reports-free-class]'))).toBe(true);
       expect(getRecentClassroomGames).not.toHaveBeenCalled();
     };
 
     it.each([
       ['the picker', ''],
-      ['a class deep link', 'classroomId=classroom-1'],
-      ['a student deep link', 'classroomId=classroom-1&studentId=student-123'],
+      ['a class deep link', 'classroomId=11111111-1111-4111-8111-111111111111'],
+      ['a student deep link', 'classroomId=11111111-1111-4111-8111-111111111111&studentId=33333333-3333-4333-8333-333333333333'],
     ])('shows a never-trial free teacher the Pro lock on %s, with no student results', (_label, query) => {
       proState.hasPro = false;
       for (const [k, v] of new URLSearchParams(query)) mockSearchParams.set(k, v);
       render(<ReportsPageClient />);
 
-      expect(screen.getByRole('heading', { level: 1, name: 'Progress Reports' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(query ? 'English 101' : 'Progress Reports');
       expect(screen.getByTestId('pro-gate-preview')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-pill')).toBeInTheDocument();
       expect(screen.getByTestId('pro-gate-upgrade-reports')).toHaveTextContent('teacher.proGate.reports.cta');
@@ -234,13 +237,75 @@ describe('ReportsPageClient', () => {
       render(<ReportsPageClient />);
       const insights = screen.getByTestId('reports-free-insights');
       expect(within(insights).getByText('English 101')).toBeInTheDocument();
-      expect(within(insights).getByTestId('free-week-classroom-1')).toBeInTheDocument();
-      expect(freeWeek.mounted.every((p) => p.classroomId === 'classroom-1' && p.proLine === false)).toBe(true);
+      expect(within(insights).getByTestId('free-week-11111111-1111-4111-8111-111111111111')).toBeInTheDocument();
+      expect(freeWeek.mounted.every((p) => p.classroomId === '11111111-1111-4111-8111-111111111111' && p.proLine === false)).toBe(true);
       const others = screen.getByTestId('reports-free-other-classes');
       expect(others).toHaveTextContent('teacher.reports.freeOtherClasses');
       expect(others).toHaveTextContent('English 102');
       expect(insights.compareDocumentPosition(screen.getByTestId('pro-gate-lock')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       expect(screen.queryByTestId('reports-free-summary')).toBeNull();
+    });
+
+    describe('a free teacher on one class', () => {
+      afterEach(() => {
+        for (const c of mockClassrooms) delete (c as { member_count?: number }).member_count;
+      });
+
+      it('Given a class link, Then that class\'s own week leads, its own roster preview follows, and the Pro lock comes last', () => {
+        proState.hasPro = false;
+        freeWeek.mounted = [];
+        mockSearchParams.set('classroomId', '22222222-2222-4222-8222-222222222222');
+        render(<ReportsPageClient />);
+        const view = screen.getByTestId('reports-free-class');
+        expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('English 102');
+        const week = within(view).getByTestId('free-week-22222222-2222-4222-8222-222222222222');
+        const own = within(view).getByTestId('own-preview-22222222-2222-4222-8222-222222222222');
+        expect(freeWeek.mounted.every((p) => p.classroomId === '22222222-2222-4222-8222-222222222222' && p.proLine !== false)).toBe(true);
+        expect(week.compareDocumentPosition(own) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(own.compareDocumentPosition(screen.getByTestId('pro-gate-lock')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        expect(screen.queryByTestId('reports-free-insights')).toBeNull();
+        expect(screen.getAllByTestId('pro-gate-upgrade-reports')).toHaveLength(1);
+      });
+
+      it('Given ?classroomId=null, Then the free class list shows instead', () => {
+        proState.hasPro = false;
+        mockSearchParams.set('classroomId', 'null');
+        render(<ReportsPageClient />);
+        expect(screen.queryByTestId('reports-free-class')).toBeNull();
+        expect(screen.getByTestId('reports-free-insights')).toBeInTheDocument();
+        expect(getClassroomStudents).not.toHaveBeenCalledWith('null');
+      });
+
+      it('Given the class list and a class with students, Then the own-class preview stands in for the sample', () => {
+        proState.hasPro = false;
+        (mockClassrooms[0] as { member_count?: number }).member_count = 0;
+        (mockClassrooms[1] as { member_count?: number }).member_count = 4;
+        render(<ReportsPageClient />);
+        const own = screen.getByTestId('own-preview-22222222-2222-4222-8222-222222222222');
+        expect(own.compareDocumentPosition(screen.getByTestId('pro-gate-lock')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      });
+
+      it('Given the class list and the oldest class has students, Then the preview is that class', () => {
+        proState.hasPro = false;
+        (mockClassrooms[0] as { member_count?: number }).member_count = 3;
+        (mockClassrooms[1] as { member_count?: number }).member_count = 4;
+        render(<ReportsPageClient />);
+        expect(screen.getByTestId('own-preview-11111111-1111-4111-8111-111111111111')).toBeInTheDocument();
+        expect(screen.queryByTestId('own-preview-22222222-2222-4222-8222-222222222222')).toBeNull();
+      });
+
+      it('Given a quiet week beside the own roster, Then the shell hides the empty card\'s sample so only the teacher\'s own class shows', () => {
+        proState.hasPro = false;
+        render(<ReportsPageClient />);
+        const frame = screen.getByTestId('pro-gate-lock').parentElement!;
+        expect(frame.className).toContain('[&:has([data-testid=own-class-pro-preview])_[data-testid=free-week-sample]]:hidden');
+      });
+
+      it('Given no class has students, Then there is no roster preview', () => {
+        proState.hasPro = false;
+        render(<ReportsPageClient />);
+        expect(screen.queryByTestId(/^own-preview-/)).toBeNull();
+      });
     });
 
     it('shows a Pro teacher no free insight', () => {
@@ -269,7 +334,7 @@ describe('ReportsPageClient', () => {
     it('locks the page again once the access trial has expired, keeping nothing on screen', () => {
       proState.hasPro = false;
       proState.accessTrialExpires = inDays(-1);
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
 
       expect(screen.getByTestId('pro-gate-upgrade-reports')).toBeInTheDocument();
@@ -278,7 +343,7 @@ describe('ReportsPageClient', () => {
 
     it('shows neither reports nor the lock while the entitlement resolves', () => {
       proState.loading = true;
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       const { container } = render(<ReportsPageClient />);
 
       expect(screen.getByTestId('education-shell-scroll')).toBeInTheDocument();
@@ -291,7 +356,7 @@ describe('ReportsPageClient', () => {
     it('gives a teacher on a live access trial the full reports with one Pro strip', async () => {
       proState.hasPro = false;
       proState.accessTrialExpires = inDays(9);
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
 
       expect(screen.getAllByTestId('pro-trial-preview')).toHaveLength(1);
@@ -316,7 +381,7 @@ describe('ReportsPageClient', () => {
     });
 
     it('gives a paying teacher every report and no lock or strip', async () => {
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
 
       expect(screen.queryByTestId('teacher-plan-badge')).toBeNull();
@@ -324,7 +389,7 @@ describe('ReportsPageClient', () => {
       expect(screen.getByTestId('class-progress-report')).toBeInTheDocument();
       expect(screen.getByTestId('progress-digest-dashboard')).toBeInTheDocument();
       await openSection('games');
-      expect(getRecentClassroomGames).toHaveBeenCalledWith('classroom-1', expect.any(Number), expect.anything());
+      expect(getRecentClassroomGames).toHaveBeenCalledWith('11111111-1111-4111-8111-111111111111', expect.any(Number), expect.anything());
       expect(screen.queryByTestId('pro-gate-preview')).not.toBeInTheDocument();
       expect(screen.queryByTestId('pro-trial-preview')).not.toBeInTheDocument();
     });
@@ -346,10 +411,10 @@ describe('ReportsPageClient', () => {
     });
 
     it('includes classroom scope when the URL already selects a class', () => {
-      mockSearchParams.set('classroomId', 'classroom-1');
+      mockSearchParams.set('classroomId', '11111111-1111-4111-8111-111111111111');
       render(<ReportsPageClient />);
       expect(trackEduReportsViewed).toHaveBeenCalledWith({
-        classroomId: 'classroom-1',
+        classroomId: '11111111-1111-4111-8111-111111111111',
       });
     });
 

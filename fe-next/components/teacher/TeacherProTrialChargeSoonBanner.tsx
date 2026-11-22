@@ -3,6 +3,7 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ProBanner } from './pro/ProBanner';
 import { TeacherProManageLink } from './TeacherProManageLink';
+import { TrialUsageRecap } from './pro/TrialUsageRecap';
 
 const DATE_LOCALE: Record<string, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
@@ -34,7 +35,12 @@ export function TeacherProTrialChargeSoonBanner({
       tone="urgent"
       proLabel={t('eduShell.nav.pro')}
       title={t('teacher.subscription.trialChargeSoonTitle')}
-      body={t('teacher.subscription.trialChargeSoonBody', { date })}
+      body={
+        <>
+          <span>{t('teacher.subscription.trialChargeSoonBody', { date })}</span>
+          <TrialUsageRecap trialExpires={chargeAt} />
+        </>
+      }
       action={
         <TeacherProManageLink portalUrl={portalUrl} testId="teacher-pro-trial-charge-soon-cta">
           {t('teacher.subscription.trialManageCta')}

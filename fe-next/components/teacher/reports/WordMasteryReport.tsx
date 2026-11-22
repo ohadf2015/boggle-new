@@ -17,6 +17,7 @@ import { ReportShareActions, ReportPrintStyles, buildReportSummary } from './Rep
 import { ReportEmptyState } from './ReportEmptyState';
 import type { ClassInsights, WordState } from './classInsights';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 export interface WordMasteryReportProps {
   classroomId: string;
@@ -246,7 +247,10 @@ function Shell({ children, actions }: { children: React.ReactNode; actions?: Rea
       {actions && <ReportPrintStyles />}
       <div className="mb-4 flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
         <div className="min-w-0">
-          <h2 className="font-neo-display text-xl font-bold text-neo-white sm:text-2xl">{t('eg2Rep.report.title')}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-neo-display text-xl font-bold text-neo-white sm:text-2xl">{t('eg2Rep.report.title')}</h2>
+            <ProPoweredChip />
+          </div>
           <p className="mt-0.5 text-sm text-neo-cream/70">{t('eg2Rep.report.subtitle')}</p>
         </div>
         {actions}

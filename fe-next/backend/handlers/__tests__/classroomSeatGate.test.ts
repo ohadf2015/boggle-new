@@ -98,7 +98,7 @@ describe('classroomSeatGate — one rule, every seating path', () => {
 
     const seat = await checkClassroomSeat(socket, 'ABC123', 'multiplayer');
 
-    expect(seat).toEqual({ game: null, refused: false });
+    expect(seat).toEqual({ game: null, refused: false, unread: true });
     expect(mockEmitError).not.toHaveBeenCalled();
   });
 

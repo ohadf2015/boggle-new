@@ -23,10 +23,10 @@ const studyEmits = () => safeEmit.mock.calls.filter((c) => c[1] === 'classroomSt
 describe('emitClassroomContext study deck', () => {
   beforeEach(() => safeEmit.mockReset());
 
-  it('sends a student the stored cards after their context', async () => {
+  it('sends a student the stored cards before the level lookup, so a slow one never leaves the lobby ungated', async () => {
     const cards = [{ word: 'sun', definition: 'Our star' }];
     await emitClassroomContext(socket(), 'ABCD', 'student', { game: game({ studyCards: cards }) });
-    expect(safeEmit.mock.calls.map((c) => c[1])).toEqual(['classroomContext', 'classroomStudyCards']);
+    expect(safeEmit.mock.calls.map((c) => c[1])).toEqual(['classroomStudyCards', 'classroomContext']);
     expect(studyEmits()[0][2]).toEqual({ gameCode: 'ABCD', cards });
   });
 

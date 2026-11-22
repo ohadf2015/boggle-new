@@ -7,6 +7,7 @@ import type { RecentClassroomGame } from '@/lib/supabase/analyticsLastGame';
 import { buildClassReportGrid } from '@/lib/education/classReport';
 import { missedThisRound } from '@/lib/education/freeGameHeadline';
 import { MissedPracticeAction } from '@/components/teacher/reports/MissedPracticeAction';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 import { WordStudentGrid } from '@/components/teacher/report/WordStudentGrid';
 import { cn } from '@/lib/utils';
 import { accuracyTone, activeLineParams, buildRoundReport, roundTitleKey, sortRoundRows, TONE_TEXT } from './roundReport';
@@ -170,6 +171,7 @@ export function RoundReportCard({ game, hasPro, classroomId, classroomName, onSt
           </section>
 
           <div data-testid="round-report-footer" className="mt-6 border-t-2 border-neo-cream/20 pt-5 print:hidden">
+            {hasPro ? <ProPoweredChip className="mb-3" /> : null}
             <MissedPracticeAction classroomId={classroomId} classroomName={classroomName} locked={!hasPro} words={report.practiceWords} />
           </div>
         </>
