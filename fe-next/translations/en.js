@@ -17494,7 +17494,7 @@ const en = {
     },
     "connections": {
       "title": "Find the Links",
-      "step1": "Group four words that belong together",
+      "step1": "Find the word that links both",
       "step2": "Each wrong guess costs a try",
       "scoreTip": "Solve it with no mistakes"
     },

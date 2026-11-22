@@ -18877,7 +18877,7 @@ const es = {
     },
     "connections": {
       "title": "Halla los vínculos",
-      "step1": "Agrupa cuatro del mismo grupo",
+      "step1": "Halla la palabra que une ambas",
       "step2": "Los errores cuestan caro",
       "scoreTip": "Perfecto: cero errores"
     },
