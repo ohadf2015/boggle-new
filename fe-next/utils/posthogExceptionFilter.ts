@@ -30,6 +30,8 @@ const NOISE_VALUE_PATTERNS: RegExp[] = [
   // validators). Not first-party code — no application code calls .toLowerCase()
   // on @context. Mirrors the same suppression in lib/sentry/clientInit.ts.
   /\["@context"\]\.toLowerCase/i,
+  // Browser refused to open an audio device; Sentry drops it too (lib/sentry/clientInit.ts).
+  /Failed to start the audio device/i,
 ];
 
 // Multi-tab Supabase auth-token lock contention. Three observed shapes:

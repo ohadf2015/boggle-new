@@ -177,4 +177,23 @@ describe('filterEmptyException', () => {
     };
     expect(filterEmptyException(event as never)).toBe(event);
   });
+  it('drops the browser refusing to open an audio device', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [{ type: 'DOMException', value: 'InvalidStateError: Failed to start the audio device' }],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
+  it('keeps other InvalidStateError failures', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [{ type: 'DOMException', value: "InvalidStateError: Failed to execute 'transaction' on 'IDBDatabase'" }],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBe(event);
+  });
 });
