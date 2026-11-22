@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useEffect, useLayoutEffect, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
 import { Users } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
@@ -19,6 +19,8 @@ import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
+const EASE_OUT = 'cubic-bezier(0.22,1,0.36,1)';
+const PRESS = 'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
 
 /** Touch phone: ornamental loops must not run for the whole time the home sits open. */
 function useCoarsePointer(): boolean {
@@ -45,6 +47,7 @@ interface PlayHeroProps {
   atRisk?: boolean;
   /** Banked streak freezes, shown on the daily chip. */
   freezes?: number;
+  playedToday?: boolean;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
   onPlay?: () => void;
 }
@@ -139,9 +142,28 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, onAvatarSaved, onPlay }: PlayHeroProps) {
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
   const coarse = useCoarsePointer();
   const loop = animate && !coarse;
+  const actionsRef = useRef<HTMLDivElement>(null);
+  const pulsed = useRef(false);
+
+  useEffect(() => {
+    if (!animate) return;
+    actionsRef.current?.querySelectorAll('[data-hero-row]').forEach((row, i) => {
+      row.animate?.([{ transform: 'translateY(14px)' }, { transform: 'none' }], { duration: 360, delay: i * 70, easing: EASE_OUT, fill: 'backwards' });
+    });
+  }, [animate]);
+
+  // Daily status resolves after first paint; pulse once when it is known to be unplayed.
+  useEffect(() => {
+    if (!animate || streakLoading || pulsed.current) return;
+    pulsed.current = true;
+    if (playedToday) return;
+    actionsRef.current
+      ?.querySelector('[data-testid="hp-chip-daily"]')
+      ?.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 520, delay: 480, easing: EASE_OUT });
+  }, [animate, streakLoading, playedToday]);
   // Funnel numerator for the landing PLAY→onboarding leak, restored: the
   // play-first redesign (#1706) replaced FreshHero — which fired
   // `fresh_hero_play` on this CTA — with this hero, and the event's main
@@ -198,33 +220,48 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </p>
           </div>
 
-          {/* Today's puzzle leads: the daily habit is the one tap we want most. */}
-          <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} shine={loop} />
+          <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
+            <div data-hero-row className="flex flex-col gap-2 lg:grid lg:grid-cols-[1fr_auto] lg:gap-4">
+              <Link
+                href={`/${lang}/multiplayer?autoCreate=true`}
+                data-testid="hp-play-friends"
+                data-hero-primary
+                onClick={() => trackLandingCtaClick('home_play_friends')}
+                className={`flex h-[68px] min-w-0 items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-pink ps-2.5 pe-3 text-black shadow-hard-lg ${PRESS} [@media(max-height:700px)]:h-[64px] lg:h-[96px] lg:gap-4 lg:rounded-3xl lg:ps-4`}
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-black text-neo-pink lg:h-16 lg:w-16 lg:rounded-2xl">
+                  <Users className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
+                </span>
+                <span className="flex min-w-0 flex-col items-start leading-none">
+                  <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t('homePlay.friendsPlay')}</span>
+                  <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t('homePlay.friendsSub')}</span>
+                </span>
+              </Link>
+              <Link
+                href={`/${lang}/multiplayer`}
+                data-testid="hp-join-code"
+                onClick={() => trackLandingCtaClick('home_join_code')}
+                className={`flex h-10 items-center justify-center rounded-xl border-[3px] border-black bg-neo-cream px-3 text-center font-neo-display text-sm leading-tight font-bold text-black shadow-hard-sm ${PRESS} lg:h-auto lg:w-40 lg:rounded-3xl lg:text-lg`}
+              >
+                {t('homePlay.friendsJoin')}
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-2 gap-2.5 lg:gap-4">
-            <Link
-              href={playHref}
-              data-testid="hp-play"
-              onClick={handlePlayClick}
-              className="flex h-[52px] items-center justify-center gap-2 rounded-2xl border-[3px] border-neo-lime bg-neo-navy-elevated px-3 text-neo-lime shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed [@media(max-height:700px)]:h-[46px] lg:h-16 lg:gap-3 lg:shadow-hard"
-            >
-              <RandomGlyph size={22} className="shrink-0 lg:h-8 lg:w-8" />
-              <span className="truncate font-neo-display text-[17px] font-bold tracking-[0.06em] lg:text-2xl">
-                {t('quickPlay.solo.play')}
-              </span>
-            </Link>
+            <div data-hero-row>
+              <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} playedToday={playedToday} />
+            </div>
 
-            <Link
-              href={`/${lang}/multiplayer`}
-              data-testid="hp-play-friends"
-              onClick={() => trackLandingCtaClick('home_play_friends')}
-              className="flex h-[52px] items-center justify-center gap-2 rounded-2xl border-[3px] border-black bg-neo-pink px-3 text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed [@media(max-height:700px)]:h-[46px] lg:h-16 lg:gap-3 lg:shadow-hard"
-            >
-              <Users className="h-5 w-5 shrink-0 lg:h-8 lg:w-8" strokeWidth={2.75} aria-hidden="true" />
-              <span className="text-center font-neo-display text-[15px] font-bold leading-tight lg:text-2xl">
-                {t('homePlay.friendsPlay')}
-              </span>
-            </Link>
+            <div data-hero-row>
+              <Link
+                href={playHref}
+                data-testid="hp-play"
+                onClick={handlePlayClick}
+                className={`flex h-[44px] items-center justify-center gap-2 rounded-2xl border-2 border-neo-lime px-3 text-neo-lime ${PRESS} lg:h-14`}
+              >
+                <RandomGlyph size={20} className="shrink-0 lg:h-7 lg:w-7" />
+                <span className="truncate font-neo-display text-[15px] font-bold lg:text-xl">{t('homePlay.quickGame')}</span>
+              </Link>
+            </div>
           </div>
 
           <div>
@@ -234,7 +271,7 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
                 <li key={mode}>
                   <Link
                     href={quickPlayHref(lang, mode)}
-                    className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
+                    className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
                       animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
                     }`}
                     style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}

@@ -66,6 +66,7 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           streakLoading={streakLoading}
           atRisk={streakView.atRisk}
           freezes={freezes}
+          playedToday={streakView.playedToday}
           onAvatarSaved={setGuestAvatar}
           onPlay={onPlay}
         />
