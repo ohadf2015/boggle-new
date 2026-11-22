@@ -151,6 +151,16 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [isExceptional, isPractice, playSound]);
 
+  const nextQuest = (
+    <NextQuestCta
+      justFinished="word-wheel"
+      currentLanguage={language}
+      source={isGuest ? 'word_wheel_results_guest' : 'word_wheel_results'}
+      className={isGuest ? 'w-full' : STICKY_CTA_WORD_WHEEL}
+      hideBack
+    />
+  );
+
   /* No `overflow-hidden` on any wrapper: an overflow-hidden ancestor becomes the
      scrollport for `position: sticky` and would silently pin the CTA to nothing. */
   return (
@@ -231,6 +241,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           </div>
         )}
 
+        {!isPractice && isGuest && nextQuest}
+
         {/* Guest signup conversion — Word Wheel bypasses the generic guest-stats
             signup gate, so this restores a value-led signup surface for the mode.
             Experiment-gated (wheel-signup-offer-v1); framing via selectWheelSignupOffer. */}
@@ -284,14 +296,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             screen whose whole job is "what next", and would leave Word Wheel
             behaving differently from Word Hunt for the same player (rules/60
             Class 3). */}
-        {!isPractice && (
-          <NextQuestCta
-            justFinished="word-wheel"
-            currentLanguage={language}
-            source={isGuest ? 'word_wheel_results_guest' : 'word_wheel_results'}
-            className={isGuest ? 'w-full' : STICKY_CTA_WORD_WHEEL}
-          />
-        )}
+        {!isPractice && !isGuest && nextQuest}
     </DailyResultsFrame>
     </DailyRevealProvider>
   );

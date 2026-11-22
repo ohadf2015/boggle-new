@@ -24,10 +24,12 @@ interface NextQuestMoreProps {
   source: string;
   /** Play state still loading: hold the chip block's space so the recap below doesn't jump. */
   loading?: boolean;
+  /** The page already carries a back link (flow chrome), so a second one would only repeat it. */
+  hideBack?: boolean;
 }
 
 /** Quiet second row under the headline CTA: the way back, plus any other challenge still open today. */
-export function NextQuestMore({ modes, currentLanguage, source, loading = false }: NextQuestMoreProps) {
+export function NextQuestMore({ modes, currentLanguage, source, loading = false, hideBack = false }: NextQuestMoreProps) {
   const { t } = useLanguage();
   const defs = modes.map((id) => DAILY_MODES.find((m) => m.id === id)).filter((m) => m !== undefined);
 
@@ -73,6 +75,7 @@ export function NextQuestMore({ modes, currentLanguage, source, loading = false 
         </div>
       )}
 
+      {!hideBack && (
       <Link
         href={`/${currentLanguage}/daily`}
         data-testid="next-quest-back"
@@ -81,6 +84,7 @@ export function NextQuestMore({ modes, currentLanguage, source, loading = false 
         <ArrowLeft className="h-4 w-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
         {t('daily.backToDailyHub')}
       </Link>
+      )}
     </nav>
   );
 }

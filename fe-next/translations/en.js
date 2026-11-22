@@ -9245,7 +9245,7 @@ const en = {
       "badge": "Scanned",
       "line": "You scanned in. Today’s puzzle is ready."
     },
-    "todaysPuzzles": "Today's quests",
+    "todaysPuzzles": "Today's puzzles",
     "results": {
       "fullRecap": "Full recap",
       "fullRecapSummary": "Your rank, your rarest word, your coins, and who you beat",
@@ -9634,7 +9634,7 @@ const en = {
 "requiredDone": "Today's two are done! The bonus puzzles are extra.",
 "pastPuzzles": "Missed a day? Past puzzles"
 },
-"archivePage": { "backToHub": "Back to today's quests",
+"archivePage": { "backToHub": "Back to today's puzzles",
 "title": "Past puzzles",
 "subtitle": "Missed a day? You can still play the last three, free. Older puzzles show how everyone did.",
 "count": "{n} puzzles",

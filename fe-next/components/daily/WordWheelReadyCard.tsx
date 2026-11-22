@@ -6,6 +6,7 @@ import { DAILY_MODES } from '@/lib/dailyModes';
 import WheelHowTo from './wheel/WheelHowTo';
 import { useWheelHowTo } from './wheel/useWheelHowTo';
 import { scoreForLength } from '@/utils/dailyChallenge/wordWheelScoring';
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { StreakFlame } from '@/components/streak/StreakFlame';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -60,6 +61,7 @@ export default function WordWheelReadyCard({
   const { language } = useLanguage();
   const howTo = useWheelHowTo(autoShowHowTo);
   const [learned, setLearned] = useState(false);
+  useOverlayQuietZoneClaim(howTo.open, 'wheel-howto');
   return (
     <div
       data-daily-ready-content
@@ -68,7 +70,7 @@ export default function WordWheelReadyCard({
         wide && 'lg:flex-row lg:items-start lg:justify-center lg:gap-8 lg:pt-12',
       )}
     >
-      <section className="w-full max-w-sm shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg overflow-hidden">
+      <section className="w-full max-w-sm shrink-0 rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard-lg">
         <div className="px-5 pt-5 text-center">
           <span className="block text-[11px] font-black uppercase tracking-[0.2em] text-neo-lime/80">
             {!isPractice && (
@@ -140,7 +142,7 @@ export default function WordWheelReadyCard({
           </p>
         )}
 
-        <div className="p-5">
+        <div className="sticky bottom-0 z-10 rounded-b-neo bg-neo-navy-light px-5 pb-4 pt-3">
           <m.button
             type="button"
             onClick={onPlay}

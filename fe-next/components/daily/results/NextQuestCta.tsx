@@ -46,6 +46,8 @@ export interface NextQuestCtaProps {
   className?: string;
   /** Tight placements (an overlay bar) show only the headline, without the second row. */
   compact?: boolean;
+  /** Drop the "back to daily" link when the page already shows one. */
+  hideBack?: boolean;
 }
 
 /* Motion only via WAAPI on the arrow chip: a full-width entrance flashes on mobile (rules/60 Class 5) and suites mock `m` as div-only. */
@@ -105,6 +107,7 @@ export function NextQuestCta({
   source = 'daily_results',
   className,
   compact = false,
+  hideBack = false,
 }: NextQuestCtaProps) {
   const { t } = useLanguage();
   const played = useDailyPlayedStatus();
@@ -166,7 +169,7 @@ export function NextQuestCta({
           aria-hidden="true"
           data-testid="next-quest-loading"
         />
-        {!compact && <NextQuestMore modes={[]} currentLanguage={currentLanguage} source={source} loading />}
+        {!compact && <NextQuestMore modes={[]} currentLanguage={currentLanguage} source={source} loading hideBack={hideBack} />}
       </>
     );
   }
@@ -284,7 +287,7 @@ export function NextQuestCta({
         <ArrowRight className="w-7 h-7 @md:w-10 @md:h-10 rtl:rotate-180" strokeWidth={3.5} />
       </span>
     </Link>
-    {!compact && <NextQuestMore modes={others} currentLanguage={currentLanguage} source={source} />}
+    {!compact && <NextQuestMore modes={others} currentLanguage={currentLanguage} source={source} hideBack={hideBack} />}
     </>
   );
 }
