@@ -75,31 +75,64 @@ describe('PlayHero', () => {
     expect(mascot.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('given the hero, then the quick-links row holds the daily puzzle only (multiplayer has its own big button)', () => {
+  it('given the hero, then exactly one action is marked primary and it is "Play with friends", opening a new room', () => {
     renderHero({ lang: 'he' });
-    const row = screen.getByTestId('hp-quick-links');
-    const hrefs = Array.from(row.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(['/he/daily']);
-    expect(screen.queryByTestId('hp-chip-mp')).toBeNull();
+    const primaries = document.querySelectorAll('[data-hero-primary]');
+    expect(primaries).toHaveLength(1);
+    const friends = screen.getByTestId('hp-play-friends');
+    expect(primaries[0]).toBe(friends);
+    expect(friends.getAttribute('href')).toBe('/he/multiplayer?autoCreate=true');
+    expect(friends.textContent).toContain(en.homePlay.friendsPlay);
+    expect(friends.className).toContain('bg-neo-pink');
+    expect(friends.className).toContain('shadow-hard-lg');
   });
 
-  it('given the hero, then the daily puzzle is the big first button and PLAY + friends share one smaller row', () => {
+  it('given the hero, then the order is friends, daily, quick game, then the mode keys', () => {
+    renderHero();
+    const order = ['hp-play-friends', 'hp-chip-daily', 'hp-play', 'hp-keycaps'].map((id) => screen.getByTestId(id));
+    for (let i = 1; i < order.length; i++) {
+      expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
+    // Daily steps down from the primary's weight; quick game is an outline.
+    expect(screen.getByTestId('hp-chip-daily').className).not.toContain('shadow-hard-lg');
+    expect(screen.getByTestId('hp-play').className).not.toMatch(/\bbg-neo-(lime|pink|orange)\b/);
+  });
+
+  it('given the hero, when "Join with a code" is tapped, then it opens the multiplayer lobby and is tracked', () => {
+    mockTrackCta.mockClear();
     renderHero({ lang: 'he' });
+    const join = screen.getByTestId('hp-join-code');
+    expect(join.getAttribute('href')).toBe('/he/multiplayer');
+    expect(join.textContent).toBe(en.homePlay.friendsJoin);
+    fireEvent.click(join);
+    expect(mockTrackCta).toHaveBeenCalledWith('home_join_code');
+  });
+
+  it('given the hero, then the random round is labelled as a quick game with a surprise mode, not a bare PLAY', () => {
+    renderHero();
+    expect(screen.getByTestId('hp-play').textContent).toBe(en.homePlay.quickGame);
+  });
+
+  it('given today\'s daily is not played, then the daily card offers to play and shows no countdown', () => {
+    renderHero({ playedToday: false });
     const daily = screen.getByTestId('hp-chip-daily');
-    const play = screen.getByTestId('hp-play');
-    const friends = screen.getByTestId('hp-play-friends');
-    const keycaps = screen.getByTestId('hp-keycaps');
-    expect(friends.getAttribute('href')).toBe('/he/multiplayer');
-    expect(friends.textContent).toBe(en.homePlay.friendsPlay);
-    expect(daily.compareDocumentPosition(play) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(play.compareDocumentPosition(friends) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(friends.compareDocumentPosition(keycaps) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(play.parentElement).toBe(friends.parentElement);
-    expect(daily.className).toContain('bg-neo-orange');
-    expect(daily.className).toContain('shadow-hard');
-    // Quick play steps back: outlined on the dark surface, not a lime slab.
-    expect(play.className).not.toContain('bg-neo-lime');
-    expect(friends.className).toContain('bg-neo-pink');
+    expect(daily.getAttribute('href')).toBe('/en/daily');
+    expect(daily.textContent).toContain(en.quickLoop.daily.play);
+    expect(screen.queryByTestId('hp-daily-next')).toBeNull();
+  });
+
+  it('given today\'s daily is done, then the card says so and counts down to the next puzzle', () => {
+    renderHero({ streak: 5, playedToday: true });
+    const daily = screen.getByTestId('hp-chip-daily');
+    expect(daily.textContent).toContain(en.homePlay.dailyDone);
+    expect(daily.textContent).not.toContain(en.quickLoop.daily.play);
+    expect(screen.getByTestId('hp-daily-next').textContent).toMatch(/^Next puzzle in \d{2}:\d{2}:\d{2}$/);
+  });
+
+  it('given the streak is still loading, then the daily card shows neither done nor a countdown', () => {
+    renderHero({ streakLoading: true, playedToday: true });
+    expect(screen.getByTestId('hp-chip-daily').textContent).not.toContain(en.homePlay.dailyDone);
+    expect(screen.queryByTestId('hp-daily-next')).toBeNull();
   });
 
   it('given the hero, when "Play with friends" is tapped, then the click is tracked', () => {
