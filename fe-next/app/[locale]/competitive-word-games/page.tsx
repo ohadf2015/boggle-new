@@ -259,7 +259,7 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
               <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, free</p>
             </Link>
             <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-yellow/40">
-              <h3 className="font-bold text-neo-yellow">Vocabulary-Building Word Games</h3>
+              <h3 className="font-bold text-neo-yellow">Vocabulary Games for the Classroom</h3>
               <p className="mt-1 text-xs text-neo-gray-200">ESL & classroom vocabulary practice mode</p>
             </Link>
             <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">

@@ -47,6 +47,7 @@ export function getEslWordGamesLanding(locale: string): EducationLandingContent 
       subtitle: c.heroSubtitle,
     },
     sections: [
+      ...(c.vocabAnswer ? [{ kind: 'prose' as const, ...c.vocabAnswer }] : []),
       { kind: 'playable', title: playableCopy(locale).title, intro: playableCopy(locale).intro },
       { kind: 'classgames', section: getEslClassGames(locale) },
       { kind: 'features', title: c.sections.builtFor, items: c.features },
