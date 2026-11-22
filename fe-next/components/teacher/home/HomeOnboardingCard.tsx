@@ -133,18 +133,18 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
           <X className="size-5" aria-hidden="true" />
         </button>
       ) : null}
-      <div className="flex min-w-0 flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
         <div className="flex items-center gap-3">
-          <EduMascot moment="firstClass" size={72} className="size-[72px] shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:hidden" />
-          <div className="min-w-0 pe-10">
-            <h2 id="home-onboarding-title" className="font-neo-display text-3xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
+          <EduMascot moment="firstClass" size={72} className="size-14 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:hidden" />
+          <div className={cn('min-w-0', copy.onDismiss && 'pe-10')}>
+            <h2 id="home-onboarding-title" className="font-neo-display text-2xl font-black leading-tight text-white sm:text-4xl lg:text-5xl">
               {copy.heading}
             </h2>
             <p className="mt-1 font-neo-body text-sm font-bold text-white/85">{progress}</p>
           </div>
         </div>
 
-        <ol className="flex flex-wrap gap-2">
+        <ol className="flex flex-wrap gap-1.5 sm:gap-2">
           {copy.steps.map((s, i) => (
             <li
               key={s.id}
@@ -152,8 +152,8 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
               data-status={s.done ? 'done' : s.current ? 'current' : 'todo'}
               aria-current={s.current ? 'step' : undefined}
               className={cn(
-                'flex min-h-[44px] items-center gap-2 rounded-neo-pill border-[3px] border-neo-black py-1 pe-3 ps-1 shadow-hard-lg',
-                s.current ? 'bg-neo-yellow text-neo-black' : 'bg-neo-navy-light text-neo-cream',
+                'flex min-h-9 items-center gap-2 rounded-neo-pill border-2 py-0.5 pe-3 ps-1 sm:min-h-[44px]',
+                s.current ? 'border-[3px] border-neo-black bg-neo-yellow text-neo-black shadow-hard-lg' : 'border-neo-cream/40 bg-neo-navy-light text-neo-cream',
               )}
             >
               <span
@@ -170,9 +170,9 @@ export function HomeOnboardingCard(props: HomeOnboardingCardProps) {
           ))}
         </ol>
 
-        {copy.body ? <p className="font-neo-body text-base font-semibold text-white/90">{copy.body}</p> : null}
+        {copy.body ? <p className="font-neo-body text-sm font-semibold text-white/90 sm:text-base">{copy.body}</p> : null}
 
-        <Link href={copy.href} data-testid="home-onboarding-cta" onClick={copy.onClick} className={cn(NB_PRIMARY, 'min-h-[60px] w-full text-2xl sm:w-auto sm:self-start sm:px-8')}>
+        <Link href={copy.href} data-testid="home-onboarding-cta" onClick={copy.onClick} className={cn(NB_PRIMARY, 'min-h-[56px] w-full px-3 text-xl sm:min-h-[60px] sm:w-auto sm:self-start sm:px-8 sm:text-2xl')}>
           {copy.cta}
         </Link>
         {secondary}
