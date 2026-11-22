@@ -10,10 +10,11 @@ export interface LockedUnlockThumbProps {
   unlock: LevelUnlock;
   config?: CustomAvatarConfig | null;
   size?: number;
+  showLock?: boolean;
 }
 
 /** A locked part as a dark silhouette on a rarity-tinted tile: you can tell what it is, not what it looks like. */
-export function LockedUnlockThumb({ unlock, config, size = 48 }: LockedUnlockThumbProps) {
+export function LockedUnlockThumb({ unlock, config, size = 48, showLock = true }: LockedUnlockThumbProps) {
   const hex = RARITY_TOKENS[unlock.rarity].hex;
   return (
     <span
@@ -29,11 +30,13 @@ export function LockedUnlockThumb({ unlock, config, size = 48 }: LockedUnlockThu
           <PartThumb category={unlock.category} id={unlock.partId} config={config ?? DEFAULT_AVATAR_CONFIG} size={size} />
         )}
       </span>
-      <Lock
-        className="absolute -bottom-1 -end-1 h-4 w-4 rounded-full border-2 border-neo-black bg-neo-navy p-0.5"
-        style={{ color: hex }}
-        aria-hidden="true"
-      />
+      {showLock && (
+        <Lock
+          className="absolute -bottom-1 -end-1 h-4 w-4 rounded-full border-2 border-neo-black bg-neo-navy p-0.5"
+          style={{ color: hex }}
+          aria-hidden="true"
+        />
+      )}
     </span>
   );
 }

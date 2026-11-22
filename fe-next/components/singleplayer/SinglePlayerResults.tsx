@@ -73,7 +73,6 @@ const HIDE_SAME = ['rematch-same'] as const;
 import { MissionsCompletedNote, RecordBadges } from './results/components/RecordBadges';
 import type { DifficultyLevel } from '@/shared/types/game';
 
-const InlineSignupCard = dynamic(() => import('@/components/auth/InlineSignupCard'), { ssr: false });
 const MobileCompactLeaderboard = dynamic(() => import('@/components/results/MobileCompactLeaderboard'), { ssr: false });
 
 interface SinglePlayerResultsProps {
@@ -316,16 +315,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   ) : null;
 
   // Zero words + no coins = three empty tiles; the hero already says 0.
-  const signupBlock = !isAuthenticated && !authLoading ? (
-    <InlineSignupCard
-      isAuthenticated={isAuthenticated}
-      titleKey="results.saveStreak.title"
-      bodyKey="results.saveStreak.body"
-      onCTAClick={() => trackGrowthEvent('save_streak_clicked', { source: 'solo_results' })}
-      analyticsSource="results_inline"
-    />
-  ) : null;
-
   const retentionBlock = (
     <SoloRetentionBlock won={mode === 'practice' ? true : isWinner} currentStreak={currentStreak} isStreakLoaded={isStreakLoaded} />
   );
@@ -400,10 +389,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
                 {!showShareImmediate && shareBlock}
                 {achievementsBlock}
                 {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
-                {/* Signup is demoted below the return CTAs and reframed as
-                    streak insurance (t_89663cfc) — the screen asks for a
-                    RETURN first, an account second. */}
-                {signupBlock}
               </div>
             </div>
             <div className="mt-6">{retentionBlock}</div>
@@ -441,12 +426,6 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
             {globalRank && (
               <RevealIn delay={0.46}>
                 <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
-              </RevealIn>
-            )}
-            {/* Signup reframed as streak insurance (t_89663cfc): ask for the RETURN first. */}
-            {signupBlock && (
-              <RevealIn delay={0.48}>
-                {signupBlock}
               </RevealIn>
             )}
             {/* Inline banner ad (web iframe; native shows no inline banner) */}

@@ -24,7 +24,15 @@ export const SIGNUP_PROMPT_ACTIVE_EVENT = 'lexiclash:signup-prompt-active';
 
 export type SignupPromptActiveDetail = { active: boolean };
 
+let signupPromptActive = false;
+
+/** Whether the post-game signup sheet is open now, for surfaces that mount after it opened. */
+export function isSignupPromptActive(): boolean {
+  return signupPromptActive;
+}
+
 export function emitSignupPromptActive(active: boolean): void {
+  signupPromptActive = active;
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
     new CustomEvent<SignupPromptActiveDetail>(SIGNUP_PROMPT_ACTIVE_EVENT, {

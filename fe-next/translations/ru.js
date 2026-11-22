@@ -23051,6 +23051,7 @@ const ru = {
     },
     "unlock": {
       "signInToUnlock": "Войди, чтобы открывать вещи для аватара",
+      "moreWaysToSignIn": "Другие способы войти",
       "levelPath": "Ур. {from} → Ур. {to}",
       "unlocksItem": "откроет: {item}",
       "xpToGo": "ещё {xp} XP",

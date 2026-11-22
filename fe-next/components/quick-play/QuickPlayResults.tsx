@@ -392,7 +392,7 @@ export function QuickPlayResults({
         </div>
 
         <section
-          className="mx-auto grid w-full max-w-5xl gap-3 px-4 pb-4 lg:grid-cols-2 lg:items-start"
+          className="mx-auto grid w-full max-w-5xl grid-cols-[minmax(0,1fr)] gap-3 px-4 pb-4 lg:grid-cols-2 lg:items-start"
           data-testid="quick-results-details"
         >
           <div className="flex flex-col gap-3">

@@ -35,6 +35,11 @@ describe('canonicalSignupSurface', () => {
     expect(canonicalSignupSurface('header_or_menu')).toBe('header_or_menu');
   });
 
+  it('keeps the results card id, whatever its case', () => {
+    expect(canonicalSignupSurface(' Results_Card ')).toBe('results_card');
+    expect(resolveSignupSource({ latched: 'results_card', shown: 'soft-sheet', stashed: null })).toBe('results_card');
+  });
+
   it('drops garbage and blank values', () => {
     expect(canonicalSignupSurface('Teacher Page!')).toBeNull();
     expect(canonicalSignupSurface('  ')).toBeNull();

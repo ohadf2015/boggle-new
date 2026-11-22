@@ -22372,6 +22372,7 @@ const en = {
     },
     "unlock": {
       "signInToUnlock": "Sign in to start unlocking avatar gear",
+      "moreWaysToSignIn": "More ways to sign in",
       "levelPath": "Lv {from} → Lv {to}",
       "unlocksItem": "unlocks {item}",
       "xpToGo": "{xp} XP to go",
