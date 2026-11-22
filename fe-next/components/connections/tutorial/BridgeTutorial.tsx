@@ -104,7 +104,7 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
       dir={isRTL ? 'rtl' : 'ltr'}
       className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col gap-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom,0px))] pt-2 [@media(max-height:700px)]:gap-2"
     >
-      <header className="flex items-center justify-between gap-2">
+      <header className="flex items-center justify-between gap-2 pe-12">
         <h1 className="font-neo-display text-2xl font-black text-neo-white">{t('daily.howToPlay')}</h1>
         <button
           type="button"

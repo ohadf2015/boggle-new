@@ -101,7 +101,7 @@ export default function PyramidProgress({
         draggable={false}
         className="pointer-events-none absolute inset-0 -z-20 h-full w-full select-none object-cover object-bottom"
       />
-      {corner && <div className="absolute end-1.5 top-1.5 z-10">{corner}</div>}
+      {corner && <div data-testid="pyramid-corner" className="absolute end-1.5 top-1.5 z-10 [@container(height<=36rem)]:end-auto [@container(height<=36rem)]:start-1.5">{corner}</div>}
       <m.div animate={shake} className={`relative flex w-[calc(100%-4.5rem)] max-w-[24rem] flex-col items-center ${STRUCTURE_INSET[size]}`}>
         <svg
           data-testid="pyramid-body"

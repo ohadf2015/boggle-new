@@ -46,6 +46,15 @@ describe('PyramidProgress on short phones', () => {
     }
   });
 
+  it('moves the tries to the top-start corner on the shortest phones, clear of the floating mute button', () => {
+    render(
+      <PyramidProgress stage={0} solvedBridges={[]} gaveUpBase={[false, false, false]} metaAnswer="STONE" won={false} corner={<span>tries</span>} />,
+    );
+    const cls = screen.getByTestId('pyramid-corner').className;
+    expect(cls).toContain('[@container(height<=36rem)]:start-1.5');
+    expect(cls).toContain('[@container(height<=36rem)]:end-auto');
+  });
+
   it('lays the base row in the page direction, with no lit beam to point the wrong way', () => {
     renderProgress();
     expect(screen.queryByTestId('pyramid-beams')).toBeNull();
