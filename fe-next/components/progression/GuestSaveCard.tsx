@@ -9,7 +9,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { revealPartNameKey } from '@/lib/avatar/revealTrigger';
 import { jitter, sign } from '@/lib/animation/variety';
-import { SIGNUP_PROMPT_ACTIVE_EVENT, type SignupPromptActiveDetail } from '@/lib/auth/signupPromptCoordination';
+import { SIGNUP_PROMPT_ACTIVE_EVENT, isSignupPromptActive, type SignupPromptActiveDetail } from '@/lib/auth/signupPromptCoordination';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { isNative } from '@/utils/platform';
 import { latchSignupSource, trackGrowthEvent, trackSignupPromptClicked } from '@/utils/growthTracking';
@@ -26,7 +27,7 @@ const ENTER_DELAY_MS = 600;
 const SPRING = { type: 'spring', stiffness: 380, damping: 24 } as const;
 
 function useSignupSheetActive(): boolean {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(isSignupPromptActive);
   useEffect(() => {
     const on = (e: Event) => setActive(!!(e as CustomEvent<SignupPromptActiveDetail>).detail?.active);
     window.addEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, on);
@@ -38,6 +39,9 @@ function useSignupSheetActive(): boolean {
 /** Guest results card: what this game would keep and unlock, with Google sign-in inline. */
 export function GuestSaveCard({ gained }: { gained: number }) {
   const { t, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // GSI fixes its width once at render; measured inside a results grid that is still sizing, it held the card wider than a 360px phone.
+  const [googleWidth] = useState(() => (typeof window === 'undefined' ? 320 : Math.max(200, Math.min(320, window.innerWidth - 80))));
   const reduced = usePrefersReducedMotion();
   const quiet = useSignupSheetActive();
   const [entered, setEntered] = useState(false);
@@ -70,6 +74,7 @@ export function GuestSaveCard({ gained }: { gained: number }) {
     setAuthOpen(true);
   };
 
+  if (isOnCrazyGamesPlatform) return null;
   return (
     <>
       <m.section
@@ -132,7 +137,7 @@ export function GuestSaveCard({ gained }: { gained: number }) {
           </div>
         )}
 
-        {googleInline && <GoogleSignInButton analyticsSource={SOURCE} className="w-full" />}
+        {googleInline && <GoogleSignInButton analyticsSource={SOURCE} width={googleWidth} className="w-full" />}
         <button
           type="button"
           data-testid="guest-save-more-ways"

@@ -223,6 +223,11 @@ describe('QuickPlayResults freshen', () => {
     expect(screen.getByTestId('quick-results-details')).toContainElement(screen.getByTestId('quick-rank-bar'));
   });
 
+  it('Given a 360px phone, Then the details grid column can shrink to the screen instead of growing to its widest child', () => {
+    renderResults();
+    expect(screen.getByTestId('quick-results-details').className).toContain('grid-cols-[minmax(0,1fr)]');
+  });
+
   it('lifts the pinned bar above the native ad band as well as the tab bar', () => {
     renderResults();
     expect(screen.getByTestId('quick-results-cta-bar').className).toContain('var(--admob-banner-height');

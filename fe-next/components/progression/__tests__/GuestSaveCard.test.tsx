@@ -2,7 +2,7 @@ import React from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { SIGNUP_PROMPT_ACTIVE_EVENT } from '@/lib/auth/signupPromptCoordination';
+import { SIGNUP_PROMPT_ACTIVE_EVENT, emitSignupPromptActive } from '@/lib/auth/signupPromptCoordination';
 
 const reduced = vi.hoisted(() => ({ value: false }));
 vi.mock('@/hooks/usePrefersReducedMotion', () => ({ usePrefersReducedMotion: () => reduced.value }));
@@ -20,6 +20,8 @@ const tracking = vi.hoisted(() => ({
 }));
 vi.mock('@/utils/growthTracking', () => tracking);
 const native = vi.hoisted(() => ({ value: false }));
+const cg = vi.hoisted(() => ({ value: false }));
+vi.mock('@/components/CrazyGamesSDK', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: cg.value }) }));
 vi.mock('@/utils/platform', () => ({ isNative: () => native.value }));
 vi.mock('@/components/avatar/art/PartThumb', () => ({ PartThumb: () => <svg data-testid="part-thumb" /> }));
 vi.mock('@/components/auth/GoogleSignInButton', () => ({
@@ -103,6 +105,20 @@ describe('GuestSaveCard', () => {
     expect(screen.getByTestId('guest-save-thumb').className).not.toContain('quick-node-float');
     act(() => { window.dispatchEvent(new CustomEvent(SIGNUP_PROMPT_ACTIVE_EVENT, { detail: { active: false } })); });
     expect(screen.getByTestId('next-unlock-guest')).toHaveAttribute('data-quiet', 'false');
+  });
+
+  it('Given the sheet was already open before the card mounted, Then the card starts quiet', () => {
+    emitSignupPromptActive(true);
+    render(<GuestSaveCard gained={10} />);
+    expect(screen.getByTestId('next-unlock-guest')).toHaveAttribute('data-quiet', 'true');
+    emitSignupPromptActive(false);
+  });
+
+  it('Given CrazyGames (no outside sign-in allowed), Then no card renders', () => {
+    cg.value = true;
+    const { container } = render(<GuestSaveCard gained={10} />);
+    expect(container.firstChild).toBeNull();
+    cg.value = false;
   });
 
   it('Given no inline Google (native app), Then "more ways" becomes the primary button', () => {
