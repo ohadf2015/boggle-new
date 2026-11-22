@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { getWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
 
@@ -21,9 +22,11 @@ interface FeedEntry {
 
 export function QuestFeed() {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [entries, setEntries] = useState<FeedEntry[]>([]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     let alive = true;
     // getWithAuth sends the Bearer token so the route's local JWT verify fast-path
     // fires (plain fetch → no header → server falls back to slow remote verify).
@@ -38,7 +41,7 @@ export function QuestFeed() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [isAuthenticated]);
 
   if (entries.length === 0) return null;
 

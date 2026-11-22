@@ -16,7 +16,7 @@ export const BODY_LOCALES: Record<string, readonly BodyLocale[]> = {
   '/guides/blast-strategy': ['en', 'he', 'sv', 'ja', 'es'],
   '/guides/classic-strategy': ['en', 'he', 'sv', 'ja', 'es'],
   '/guides/word-hunt-strategy': ['en', 'he', 'sv', 'ja', 'es'],
-  '/how-to-play': ['en', 'he', 'sv', 'ja', 'es'],
+  '/how-to-play': ['en', 'he', 'sv', 'ja', 'es', 'ru'],
   '/leaderboard': ['en', 'he', 'sv', 'ja', 'es'],
   '/rules': ['en', 'he', 'sv', 'ja', 'es'],
   '/words': ['en'],

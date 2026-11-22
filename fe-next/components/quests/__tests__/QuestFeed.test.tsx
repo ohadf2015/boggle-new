@@ -13,6 +13,9 @@ vi.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
+const auth = vi.hoisted(() => ({ isAuthenticated: true }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
+
 const { getWithAuth } = vi.hoisted(() => ({ getWithAuth: vi.fn() }));
 vi.mock('@/utils/authFetch', () => ({ getWithAuth }));
 
@@ -24,7 +27,17 @@ function mockFetch(entries: unknown[]) {
 }
 
 describe('QuestFeed', () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    auth.isAuthenticated = true;
+  });
+
+  it('Given a signed-out guest, Then the feed is not requested (no 401)', () => {
+    auth.isAuthenticated = false;
+    mockFetch([]);
+    render(<QuestFeed />);
+    expect(getWithAuth).not.toHaveBeenCalled();
+  });
   afterEach(() => vi.restoreAllMocks());
 
   it('renders nothing when the feed is empty', async () => {

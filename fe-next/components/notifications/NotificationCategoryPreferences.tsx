@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { Bell, BellOff, Calendar, Flame, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import {
   loadCategoryPreferences,
@@ -61,9 +62,11 @@ function CategoryToggle({ label, checked, onChange, icon, disabled }: CategoryTo
 
 export function NotificationCategoryPreferences() {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const [prefs, setPrefs] = useState<CategoryPrefs>(loadCategoryPreferences);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     let cancelled = false;
     fetchWithAuth('/api/notifications/preferences')
       .then((r) => (r.ok ? r.json() : null))
@@ -86,7 +89,7 @@ export function NotificationCategoryPreferences() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isAuthenticated]);
 
   function handleToggle(key: keyof CategoryPrefs, value: boolean) {
     const updated = { ...prefs, [key]: value };

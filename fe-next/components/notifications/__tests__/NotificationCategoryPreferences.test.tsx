@@ -37,6 +37,11 @@ vi.mock('@/contexts/LanguageContext', () => ({
 const mockLoad = vi.fn();
 const mockSave = vi.fn();
 
+const fetchWithAuth = vi.hoisted(() => vi.fn(() => Promise.resolve({ ok: false })));
+vi.mock('@/utils/authFetch', () => ({ fetchWithAuth }));
+const auth = vi.hoisted(() => ({ isAuthenticated: false }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
+
 vi.mock('@/utils/pushNotifications', () => ({
   loadCategoryPreferences: (...args: unknown[]) => mockLoad(...args),
   saveCategoryPreferences: (...args: unknown[]) => mockSave(...args),
@@ -114,5 +119,19 @@ describe('NotificationCategoryPreferences', () => {
         expect.objectContaining({ weeklySummary: true })
       );
     });
+  });
+
+  it('Given a signed-out guest, Then server preferences are not requested (no 401)', () => {
+    auth.isAuthenticated = false;
+    fetchWithAuth.mockClear();
+    render(<NotificationCategoryPreferences />);
+    expect(fetchWithAuth).not.toHaveBeenCalledWith('/api/notifications/preferences');
+  });
+
+  it('Given a signed-in player, Then server preferences are loaded', () => {
+    auth.isAuthenticated = true;
+    fetchWithAuth.mockClear();
+    render(<NotificationCategoryPreferences />);
+    expect(fetchWithAuth).toHaveBeenCalledWith('/api/notifications/preferences');
   });
 });
