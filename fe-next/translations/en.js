@@ -1601,7 +1601,7 @@ const en = {
       "items": {
         "adventure": {
           "title": "Adventure",
-          "line": "100 levels across 10 worlds. See how far you get."
+          "line": "70 levels across 10 worlds. See how far you get."
         },
         "wordTowerV2": {
           "title": "Word Tower",
@@ -3110,9 +3110,9 @@ const en = {
     },
     "adventure": {
       "title": "Word Adventure Game - RPG Word Puzzle Free",
-      "description": "Battle bosses across 100 levels & 10 themed worlds. Free RPG word puzzle with fire tiles, power-ups & skill tree. No download, no signup needed.",
+      "description": "Battle word bosses across 70 levels in 10 worlds, with a new rule in every world. A free RPG word puzzle with no download and no signup.",
       "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
-      "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!",
+      "ogDescription": "Battle bosses in an epic word adventure! 70 levels, 10 worlds, special tiles and power-ups. Free to play!",
       "playLabel": "Play"
     },
     "wordTowerV2": {
@@ -7414,7 +7414,7 @@ const en = {
         "intro": "LexiClash is not just another word game. We have designed every aspect of the experience to be original, inclusive, and deeply engaging. Here is what sets us apart from other word games on the market:",
         "gameModes": {
           "title": "Original Game Modes",
-          "content": "From Blast Mode — where tiles explode and cascade in chain reactions — to Word Hunt, where players race to find specific target words, and Daily Challenges that give every player the same puzzle to solve each day. Our Adventure Mode features 100 levels across 10 themed worlds with boss battles, special tiles, and power-ups."
+          "content": "From Blast Mode — where tiles explode and cascade in chain reactions — to Word Hunt, where players race to find specific target words, and Daily Challenges that give every player the same puzzle to solve each day. Our Adventure Mode features 70 levels across 10 themed worlds with boss battles, special tiles, and power-ups."
         },
         "multilingual": {
           "title": "True Multilingual Support",
@@ -8642,7 +8642,7 @@ const en = {
     "brainTraining": "Brain Training",
     "brainTrainingDesc": "See your brain progress",
     "adventureMode": "Adventure",
-    "adventureModeDesc": "100 levels across 10 worlds",
+    "adventureModeDesc": "70 levels across 10 worlds",
     "adventureResumeA11y": "Continue your adventure run: world {world}, node {step}, {hp} hearts left",
     "quickPlayMode": "Quick Play",
     "quickPlayModeDesc": "Spin the wheel, beat the board",
@@ -8736,13 +8736,13 @@ const en = {
       "feature2Title": "Daily Challenges",
       "feature2Desc": "Same puzzle for everyone worldwide, every day. Keep your streak going and send your score to friends to see who did better.",
       "feature3Title": "Adventure Mode",
-      "feature3Desc": "100 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.",
+      "feature3Desc": "70 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.",
       "feature4Title": "6 languages",
       "feature4TitleShort": "Blast Mode",
       "feature4Desc": "Play in English, Hebrew, Swedish, Japanese, Spanish, or Russian. Switch anytime and challenge friends across languages.",
       "modeTagMultiplayer": "2-20 players",
       "modeTagDaily": "New puzzle daily",
-      "modeTagAdventure": "100 levels",
+      "modeTagAdventure": "70 levels",
       "modeTagBlast": "Chain reactions",
       "feature5Title": "Community Boards",
       "modeTagCommunity": "Player-made puzzles",
@@ -8763,7 +8763,7 @@ const en = {
       "gameModesMultiplayer": "Multiplayer Rooms: create a private room and share the code with up to 20 friends. Everyone sees the same letter grid and races to find words before time runs out. The player with the highest score wins. Perfect for parties, classrooms, and remote team-building.",
       "gameModesSingle": "Single Player vs. Bots: practice your word-finding skills against AI opponents of varying difficulty. Set personal records, earn achievements, and sharpen your strategy without the pressure of live competition.",
       "gameModesDaily": "Daily Challenge: a fresh puzzle every day, identical for all players worldwide. Complete it to maintain your streak and compare your score with the global community. Share your result with friends and dare them to beat it.",
-      "gameModesAdventure": "Adventure Mode: play through 10 themed worlds with 100 levels of increasing difficulty. Encounter special tile types like ice, fire, bombs, and rainbow tiles. Defeat bosses using word power and unlock new worlds as you progress.",
+      "gameModesAdventure": "Adventure Mode: play through 10 themed worlds with 70 levels of increasing difficulty. Each world adds a new rule, like fog that hides the board or bombs you have to defuse. Defeat bosses using word power and unlock new worlds as you progress.",
       "educationTitle": "Built for learning",
       "educationContent": "Word games are one of the most effective ways to build vocabulary and improve spelling. Research published in AIMS Neuroscience shows that word puzzles activate multiple brain regions simultaneously, including areas responsible for language processing, working memory, and executive function. LexiClash takes this further by offering gameplay in six languages, making it a practical tool for language learners. Teachers use LexiClash in classrooms across three continents to make vocabulary drills engaging. The multiplayer format creates healthy competition that motivates students to expand their word knowledge naturally.",
       "faqTitle": "Frequently Asked Questions",
@@ -20469,7 +20469,7 @@ const en = {
     "title": "Two new ways to play",
     "description": "A quest across ten worlds, and a tower that can topple.",
     "adventureTitle": "Adventure",
-    "adventureLine": "10 worlds, 100 levels and a word-hungry dragon at the top.",
+    "adventureLine": "10 worlds, 70 levels and a word-hungry dragon at the top.",
     "wordTowerTitle": "Word Tower",
     "wordTowerLine": "Stack words sky-high. One shaky word and it all comes down.",
     "playAdventure": "Start the quest",

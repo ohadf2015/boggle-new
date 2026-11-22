@@ -34,7 +34,7 @@ export type LocaleContent = {
 export const COMPARISON_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type ComparisonLocale = typeof COMPARISON_LOCALES[number];
 
-const contentMap: Record<ComparisonLocale, LocaleContent> = {
+const contentMap: Partial<Record<ComparisonLocale, LocaleContent>> & { en: LocaleContent } = {
   en: {
     metaTitle: 'LexiClash vs VocabularySpellingCity — Free Multiplayer Alternative (2026) | LexiClash',
     metaDescription:
@@ -57,11 +57,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Free tier (full features)', '✓ Whole class free (50)', '✗ Premium for most games'],
       ['No student login', '✓ 6-character join code', '✗ Student accounts'],
       ['Core format', 'Live multiplayer word games', 'Individual self-paced games'],
-      ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ Solo practice model'],
+      ['Live whole-class multiplayer', '✓ Free, up to 50', '✗ Solo practice model'],
       ['1v1 duels with student pairing', '✓', '✗'],
       ['Spelling + vocabulary focus', '✓ Word game core', '✓ Spelling-first'],
       ['Custom curriculum word lists', '✓', '✓'],
-      ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'English spelling-first'],
+      ['6 languages with native dictionaries', '✓ EN/HE/SV/JA/ES/RU', 'English spelling-first'],
       ['Class analytics dashboard', '✓ Free', '✓ (Premium)'],
       ['Best grade band', 'Upper-elem → adult ESL', 'K-5 heavy'],
       ['Best for', 'Engaging review games', 'Individual spelling practice'],
@@ -79,7 +79,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Free, full features',
-        desc: 'Most SpellingCity games sit behind Premium. LexiClash classroom features are free, up to 30 students, no upsell.',
+        desc: 'Most SpellingCity games sit behind Premium. LexiClash runs 3 classes of up to 50 students free, and Teacher Pro adds unlimited classes.',
       },
       {
         title: '1v1 duels',
@@ -157,11 +157,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['רמה חינמית (כל התכונות)', '✓ הכל בחינם', '✗ Premium לרוב המשחקים'],
       ['ללא התחברות תלמיד', '✓ קוד הצטרפות ל-6 תווים', '✗ חשבונות תלמידים'],
       ['פורמט ליבה', 'משחקי מילים בחיים מרובי שחקנים', 'משחקים אישיים בקצב עצמי'],
-      ['מרובה שחקנים בחיים לכל הכיתה', '✓ בחינם, עד 30', '✗ מודל תרגול בודד'],
+      ['מרובה שחקנים בחיים לכל הכיתה', '✓ בחינם, עד 50', '✗ מודל תרגול בודד'],
       ['דו-קרבות 1v1 עם זיווג תלמידים', '✓', '✗'],
       ['מיקוד כתיב + אוצר מילים', '✓ ליבת משחק מילים', '✓ כתיב ראשון'],
       ['רשימות מילים של תכנית לימודים מותאמות', '✓', '✓'],
-      ['6 שפות עם מילונים מקוריים', '✓ EN/HE/SV/JA/ES', 'כתיב אנגלית ראשון'],
+      ['6 שפות עם מילונים מקוריים', '✓ EN/HE/SV/JA/ES/RU', 'כתיב אנגלית ראשון'],
       ['לוח בקרה עם ניתוח נתוני הכיתה', '✓ בחינם', '✓ (Premium)'],
       ['רצועת כיתה הטובה ביותר', 'חטיבה עליונה → ESL למבוגרים', 'כיתות א-ה כבדות'],
       ['הטוב ביותר עבור', 'משחקי ביקורת משכנעים', 'תרגול כתיב אישי'],
@@ -179,7 +179,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'בחינם, כל התכונות',
-        desc: 'רוב משחקי SpellingCity יושבים מאחורי Premium. תכונות כיתה של LexiClash בחינם, עד 30 תלמידים, ללא מכירה נוספת.',
+        desc: 'רוב משחקי SpellingCity יושבים מאחורי Premium. ב-LexiClash מריצים בחינם 3 כיתות של עד 50 תלמידים, ו-Teacher Pro מוסיף כיתות ללא הגבלה.',
       },
       {
         title: 'דו-קרבות 1v1',
@@ -235,206 +235,6 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       'העלו את רשימת הכתיב של השבוע הזה, הקרינו את קוד ההצטרפות, והשאירו את כל הכיתה למשחק בבת אחת. ללא התחברויות לספקו, ללא מכירה Premium, ללא כרטיס אשראי — חמש דקות כדי לראות אם ישיר מנצח בודד לתלמידים שלכם.',
     finalCta: 'התחל משחק כיתה בחינם',
   },
-  sv: {
-    metaTitle: 'LexiClash vs VocabularySpellingCity — Gratis multiplayer-alternativ (2026) | LexiClash',
-    metaDescription:
-      'LexiClash vs VocabularySpellingCity jamfort: live multiplayer-ordspel for hela klassen mot individuell stavningstraning. Ingen elevloggning, gratis, 5 sprak, anpassade ordlistor. Det kostnadsfria SpellingCity-alternativet for stavning och ordforrad.',
-    ogTitle: 'LexiClash vs VocabularySpellingCity — Det kostnadsfria alternativet',
-    ogDescription:
-      'Live multiplayer-ordspel slar solo-stavningsovningar nar det galler engagemang. Ingen inloggning. 5 sprak. For alltid gratis.',
-    twitterTitle: 'LexiClash vs SpellingCity — Gratis alternativ',
-    twitterDescription: 'Multiplayer stavning + ordforradordspel. Ingen inloggning. 5 sprak. Gratis.',
-    heroTitle: 'SpellingCity ovar ensamt. LexiClash spelar hela klassen.',
-    intro:
-      'VocabularySpellingCity byggde ett omfattande bibliotek med stavnings- och ordforradsordspel som eleverna arbetar genom ett och ett pa sina enheter. Det fungerar — men det ar en solo-, inloggnings-, mestadels Premium-modell. LexiClash tar samma anpassade ordlistor och forvandlar dem till live, ingen-inloggning multiplayer: helklassspel och 1v1-dueller pa Boggle-liknande rutnät, anagram och hjul, gratis, pa fem sprak. Trana samma ord; ersätt solo-traning med konkurrenskraftig repetition.',
-    ctaStart: 'Prova LexiClash gratis',
-    ctaSpelling: 'Stavningstraning',
-    ctaDuels: 'Ordforraadsdueller',
-    compareTitle: 'Sida vid sida, ingen spin',
-    compareFootnote:
-      'VocabularySpellingCity nivaafunktioner och prisstättning fran 2026 — kontrollera leverantoren for aktuella Premium-planer.',
-    compareRows: [
-      ['Gratis niva (alla funktioner)', '✓ Allt gratis', '✗ Premium for de flesta spel'],
-      ['Ingen elevloggning', '✓ Anslutningskod på sex tecken', '✗ Elevkonton'],
-      ['Kärnformat', 'Live multiplayer-ordspel', 'Individuella självstudier'],
-      ['Live helklassmultiplayer', '✓ Gratis, upp till 30', '✗ Solo-övningsmodell'],
-      ['1v1-dueller med elevparning', '✓', '✗'],
-      ['Stavnings- + ordförrådfokus', '✓ Ordspelskärna', '✓ Stavnings-först'],
-      ['Anpassade curriculumordlistor', '✓', '✓'],
-      ['5 sprak med infödda ordlistor', '✓ EN/HE/SV/JA/ES', 'Engelsk stavning-först'],
-      ['Klassanalytikdashboard', '✓ Gratis', '✓ (Premium)'],
-      ['Bästa årskurs', 'Mellanstadiet → vuxen-ESL', 'Mellanstadiet tung'],
-      ['Bäst för', 'Engagerande återhopp', 'Individuell stavningstraning'],
-      ['Starttid', 'Under 60 sekunder', 'Bygg lista + tilldela'],
-    ] as const,
-    beatsTitle: 'Nar LexiClash slar SpellingCity',
-    beats: [
-      {
-        title: 'Helklassengagemang',
-        desc: 'SpellingCity är individuell traning. LexiClash är live multiplayer — energin fran hela klassen som spelar samma ordlista pa en gang.',
-      },
-      {
-        title: 'Ingen elevloggning',
-        desc: 'En anslutningskod på sex tecken betyder ingen kontoprovisioning. Varje elev spelar pa sekunder, inklusive de utan rostered loggning.',
-      },
-      {
-        title: 'Gratis, alla funktioner',
-        desc: 'De flesta SpellingCity-spel ligger bakom Premium. LexiClash klassrumsfunktioner är gratis, upp till 30 elever, ingen uppgradering.',
-      },
-      {
-        title: '1v1-dueller',
-        desc: 'Para ihop elever sinsemellan pa din ordlista for ett snabbt, konkurrenskraftigt repetitionsformat som SpellingCity inte erbjuder.',
-      },
-      {
-        title: 'Omfattar äldre + ESL-elever',
-        desc: 'Fullständiga ordlistor passar mellanstadiet och vuxen-ESL, inte bara mellanstadiet stavning.',
-      },
-      {
-        title: '5 infödda-ordlistassprak',
-        desc: 'EN/HE/ES/SV/JA/RU ordvalidering for tvasprakiga och sprakprogram. SpellingCity är engelsk stavning-först.',
-      },
-    ],
-    stillWinsTitle: 'Nar SpellingCity fortfarande vinner',
-    stillWinsBody:
-      'Om du undervisar tidiga mellanstadieelever och behover strukturerad, självstuderad stavnings- och blickordtraning med ljud fran varje ord last hogt, är VocabularySpellingCity\'s mellanstadiebibliotek och per-elevstatistik byggt for det. LexiClash är starkare for mellanstadiet genom vuxen-ESL och for live, helklassrepetition. Manga larare tilldelar SpellingCity for individuell traning och kor LexiClash for klassrummets repetitionsspel.',
-    faqTitle: 'Vanliga fragor',
-    faqs: [
-      {
-        q: 'Är LexiClash ett kostnadsfritt alternativ till VocabularySpellingCity?',
-        a: 'Ja — LexiClash är helt gratis utan premiumniva. VocabularySpellingCity (del av Learning A-Z / Vocabulary A-Z-familjen) har en gratis niva men låser de flesta spel, statistik och klasshantering bakom ett betalt Premium-medlemskap. LexiClash låser aldrig klassrumsfunktioner.',
-      },
-      {
-        q: 'Vad är huvudskillnaden?',
-        a: 'VocabularySpellingCity är byggt runt individuella, självstuderade stavnings- och ordforraadsordspel som eleverna arbetar genom pa sina enheter. LexiClash är live och socialt — helklassmultiplayer och 1v1-dueller pa Boggle-liknande rutnät, anagram och ordhjul. Samma stavnings-/ordforraadsmal, men engagemang kommer fran realtidskompetition snarare än solo-traning.',
-      },
-      {
-        q: 'Behover elever loggning pa LexiClash?',
-        a: 'Nej. Elever ansluter med en kod på sex tecken som visas av lararen — inga individuella konton. SpellingCity-elever loggar vanligtvis in pa tilldelade konton for att spara sin traning.',
-      },
-      {
-        q: 'Kan jag anvanda mina egna stavningslistor?',
-        a: 'Ja pa båda. LexiClash-larare laddar upp anpassade ordlistor fran vilken enhet som helst och spelar dem i dueller, helklassspel eller traning. SpellingCity är också byggt runt anpassade listor — skillnaden är multiplayer och noll inloggning pa LexiClash.',
-      },
-      {
-        q: 'Är LexiClash bara for äldre elever?',
-        a: 'LexiClash är starkast for mellanstadiet genom vuxen-ESL — dess fullständiga ordlistor stracker sig fran nybörjare till avancerad. SpellingCity lutar mot mellanstadiet. For tidigt mellanstadiestavningstraning kan SpellingCity passa bättre; for mellanstadiet, ESL och repetitionsspel passar LexiClash bättre.',
-      },
-      {
-        q: 'Stoder LexiClash andra sprak?',
-        a: 'Ja — infödda ordlistor for engelska, hebreiska (RTL), spanska, svenska, japanska och ryska. SpellingCity är engelsk stavning-fokuserad.',
-      },
-    ],
-    moreTitle: 'Fler jamforelser',
-    moreCards: [
-      { title: 'LexiClash vs Quizlet', sub: 'Ordspel vs laroeflashcards. Gratis.' },
-      { title: 'LexiClash vs Flocabulary', sub: 'Spela ord vs titta pa videor' },
-      { title: 'Utbildningshubben', sub: 'Alla klassrumordspel' },
-    ],
-    finalTitle: 'Prova det fore nästa lektion',
-    finalBody:
-      'Ladda upp denna veckas stavningslista, projicera anslutningskoden och lat hela klassen spela pa en gang. Ingen loggning att tillhandahala, ingen Premium-uppgradering, inget kreditkort — fem minuter for att se om live slar solo for dina elever.',
-    finalCta: 'Starta ett klassrumsspel gratis',
-  },
-  ja: {
-    metaTitle: 'LexiClash vs VocabularySpellingCity — muryou maruchipurei daieteinan (2026nen) | LexiClash',
-    metaDescription:
-      'LexiClash vs VocabularySpellingCity hikaku: raibu zenukurasu maruchipurei tanngogemu vs kobetsu supeingu renshuu. gakusei roguin fujuyo, muryou, 5gengo, kasutamu tanngoriisuto. supeingu tanngogemu gakushuu muke no muryou SpellingCity daieteinan.',
-    ogTitle: 'LexiClash vs VocabularySpellingCity — muryou daieteinan',
-    ogDescription:
-      'raibu maruchipurei tanngogemu wa, engejimento ni kanshite wa, soro supeingu renshuu wo ututimasu. roguin fujuyo. 5gengo. eien ni muryou.',
-    twitterTitle: 'LexiClash vs SpellingCity — muryou daieteinan',
-    twitterDescription: 'maruchipurei supeingu + gochuubuiryoku tanngogemu. roguin fujuyo. 5gengo. muryou.',
-    heroTitle: 'SpellingCity wa tandoku de renshuu shimasu. LexiClash wa kurasu zenkaisi de purei shimasu.',
-    intro:
-      'VocabularySpellingCity wa, gakusei ga jibun no debaisu de hitori zutsu susumeru, supeingu tanngogemu to gochuubuiryoku gemu no fukai raiburari wo kouchiku shimashita. sore wa kinoo shimasu — shikashi, sore wa tandoku de, roguin, hotondo puremiamu moderu desu. LexiClash wa onaji kasutamu tanngoriisuto wo shutoku shi, sore wo raibu, nan-roguin maruchipurei ni henkan shimasu: zenukurasu gemu to 1tai1 dyueru, Boggle sutairu guriddo, anaguramu, oyobi 5tsu no gengo de jiyuu no kuruuma ni tsuite. onaji tanngoto renshuu shimasu; tandoku doriru wo kyousougekiteki rebyu ni okikae shimasu.',
-    ctaStart: 'LexiClash muryou de tameshite mite kudasai',
-    ctaSpelling: 'supeingu renshuu',
-    ctaDuels: 'gochuubuiryoku dyueru',
-    compareTitle: 'narande, suppin nashi',
-    compareFootnote:
-      '2026nen no jiten de no VocabularySpellingCity tiashuukino to nedan setei — genzai no puremiamu puran ni tsuite wa, bendaa wo gokakurenin kudasai.',
-    compareRows: [
-      ['muryou tiashu (subete no kinoo)', 'subete muryou', 'hotondo no gemu ni taisuru puremiamu'],
-      ['gakusei roguin fujuyo', '4keta sanka kodo', 'gakusei akkaunto'],
-      ['koa format', 'raibu maruchipurei tanngogemu', 'kobetsu no serepesu gemu'],
-      ['raibu zenukurasu maruchipurei', 'muryou, saidai 30', 'soro purakutisu moderu'],
-      ['gakusei pairingu zuki 1tai1 dyueru', 'ok', 'x'],
-      ['supeingu + gochuubuiryoku fokarasu', 'tanngogemu koa', 'supeingu daiyon'],
-      ['kasutamu karikyuramu tanngoriisuto', 'ok', 'ok'],
-      ['neitibu jisho zuki 5 gengo', 'en/he/sv/ja/es', 'eigo supeingu daiyon'],
-      ['kurasu bunseki dashubodo', 'muryou', 'puremiamu'],
-      ['saidai gakugari', 'ueyoushougaku - seijin esl', 'shougaku chuushin'],
-      ['saidai', 'engejingu rebyu gemu', 'kobetsu supeingu renshuu'],
-      ['setei jikan', '60byou ika', 'riisuto kasetsuritsu + wariate'],
-    ] as const,
-    beatsTitle: 'LexiClash ga SpellingCity wo tatsu baai',
-    beats: [
-      {
-        title: 'Zenukurasu engejimento',
-        desc: 'SpellingCity wa kobetsu no purakutisu desu. LexiClash wa raibu maruchipurei — onaji tanngoriisuto wo ichido ni suru kurasu zenkaisi no enerugii.',
-      },
-      {
-        title: 'Gakusei roguin fujuyo',
-        desc: '4keta no sanka kodo wa, akkaunto kyokyu ga fujuyo desu. subete no gakusei wa suurisukan de purei dekimasu, rosutado roguin no nai gakusei mo fukumarete imasu.',
-      },
-      {
-        title: 'Muryou, subete no kinoo',
-        desc: 'hotondo no SpellingCity gemu wa puremiamu no ushiro ni arimasu. LexiClash kurasu kinoo wa muryou, saidai 30 jinno gakusei, baikyaku nashi.',
-      },
-      {
-        title: '1tai1 dyueru',
-        desc: 'gakusei wo tanngoriisuto de 1tai1 de pea ringu shite, SpellingCity ga teikyo shinai hayai, kyousouryokuteki na rebyu format wo teikyo shimasu.',
-      },
-      {
-        title: 'Toshin + esl gakushachasain o soumatomeru',
-        desc: 'kanzen na jisho wa chuugakkoutou to seijin esl ni tekigou suru, shougaku supeingu dake de wa arimasen.',
-      },
-      {
-        title: '5 neitibu jisho gengo',
-        desc: 'en/he/es/sv/ja tanngoshoumei nisoku gengo puroguramu no tame. SpellingCity wa eigo supeingu daiyon desu.',
-      },
-    ],
-    stillWinsTitle: 'SpellingCity ga mada katsu baai',
-    stillWinsBody:
-      'Shoki no shougaku o oshiete ite, kouzoukaiserareta, jisoku no supeingu to genten no tango renshuu audio ga hitsuyouna baai, VocabularySpellingCity\'s shougaku raiburari to gakusei goto no kirokugaeri wa sono tame ni kasetsuritsuされ te imasu. LexiClash wa toshin shougaku kara seijin esl made oyobi raibu, zenukurasu shousai no hou ga tsuyoi desu. takusan no kyoushi wa kobetsu purakutisu no tame ni SpellingCity o wariate shi, kurashitsu rebyu gemu no tame ni LexiClash o jikkou shimasu.',
-    faqTitle: 'yoku aru shitumon',
-    faqs: [
-      {
-        q: 'LexiClash wa VocabularySpellingCity no muryou daieteinan desu ka?',
-        a: 'hai — LexiClash wa puremiamu so nashi de kanzen ni muryou desu. VocabularySpellingCity (learning a-z / vocabulary a-z famiri no ichibu) wa muryou so ga arimasu ga, hotondo no gemu, kirokugaeri, kurasu kanri wo shibarou puremiamu menbashippunosirona de rokku shimasu. LexiClash wa kurasu kinoo wo rokku shimasen.',
-      },
-      {
-        q: 'shuyounacha wa nani desu ka?',
-        a: 'VocabularySpellingCity wa, gakusei ga jibun no debaisu de kaiten suru kobetsu no jisoku supeingu oyobi gochuubuiryoku gemu no mawari ni kouchiku sarete imasu. LexiClash wa raibu de sousharu desu — zenukurasu maruchipurei oyobi 1tai1 dyueru boggle sutairu guriddo, anaguramu, oyobi tanngosharin de. onaji supeingu / gochuubuiryoku mokuteki desu ga, engejimento wa jisoku purakutisu de wa naku rearyutaimukompetisyon kara kimasu.',
-      },
-      {
-        q: 'LexiClash de gakusei wa roguin ga hitsuyou desu ka?',
-        a: 'iie. gakusei wa kyoushi ga shimeshita 4keta no kodo de sanka shimasu — akkaunto nashi. SpellingCity gakusei wa tutayou wariate akkaunto ni roguin shimasu.',
-      },
-      {
-        q: 'jibun no supeingu riisuto o tsukau koto ga dekimasu ka?',
-        a: 'hai tsuyoi. LexiClash kyoushi wa dotoshit tasu kara kasutamu tanngoriisuto o apu robado shi, dyueru, zenukurasu gemu, oyobi purakutisu de saiseigen shimasu. SpellingCity wa kasutamu riisuto no mawari ni mo kouchiku sarete imasu — sa wa maruchipurei to zero roguin desu.',
-      },
-      {
-        q: 'LexiClash wa toshin gakusei dake no tame desu ka?',
-        a: 'LexiClash wa toshin shougaku kara seijin esl made saikou desu — sono kanzen na jisho wa shosinsha kara joushou made no han i desu. spellingcity wa shougaku skyu shimasu. shoki no shougaku genten no tango doriru no tame ni, spellingcity ga yori yoku tekigou suru kamo shiremaseN; chuugakkoutou, esl, oyobi rebyu gemu, lexiclash wa yori yoku tekigou shimasu.',
-      },
-      {
-        q: 'LexiClash wa ta no gengo o sapoto shimasu ka?',
-        a: 'hai — eigo, heburugo (rtl), supeingo, suweeden, oyobi nihongo no neitibu jisho. spellingcity wa eigo supeingu fokarasu desu.',
-      },
-    ],
-    moreTitle: 'mora kurabeteka',
-    moreCards: [
-      { title: 'LexiClash vs Quizlet', sub: 'furashukado vs tanngogemu. muryou.' },
-      { title: 'LexiClash vs Flocabulary', sub: 'bideo o mite purei tanngogo' },
-      { title: 'kyouikutanto', sub: 'kurashitsu tanngogemu subete' },
-    ],
-    finalTitle: 'tsugi no kurasu mae ni tameshite mite kudasai',
-    finalBody:
-      'kono shuukan no supeingu riisuto o apu robado shi, sanka kodo o tousui shi, kurasu zenkaisi ga ichido ni purei deki masu. sokoku suru roguin nashi, puremiamu baikyaku nashi, kureditokado nashi — raibu ga tannsoku no gakusei no tame ni uchikateiru ka douka kakunin suru tame no go fun.',
-    finalCta: 'kurasu roomugemu o muryou de kaishi shimasu',
-  },
   es: {
     metaTitle: 'LexiClash vs VocabularySpellingCity — Alternativa gratuita multijugador (2026) | LexiClash',
     metaDescription:
@@ -457,11 +257,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Nivel gratuito (todas las caracteristicas)', 'Todo gratis', 'Premium para la mayoria de juegos'],
       ['Sin inicio de sesion de estudiante', 'Codigo de union de 6-characteros', 'Cuentas de estudiante'],
       ['Formato central', 'Juegos de palabras multijugador en vivo', 'Juegos individuales a su propio ritmo'],
-      ['Multijugador de clase completa en vivo', 'Gratis, hasta 30', 'Modelo de practica solo'],
+      ['Multijugador de clase completa en vivo', 'Gratis, hasta 50', 'Modelo de practica solo'],
       ['Duelos 1v1 con emparejamiento de estudiantes', 'ok', 'x'],
       ['Foco de ortografia + vocabulario', 'Nucleo de juego de palabras', 'Ortografia primero'],
       ['Listas de palabras curriculares personalizadas', 'ok', 'ok'],
-      ['6 idiomas con diccionarios nativos', 'EN/HE/SV/JA/ES', 'Ortografia inglesa primero'],
+      ['6 idiomas con diccionarios nativos', 'EN/HE/SV/JA/ES/RU', 'Ortografia inglesa primero'],
       ['Panel de analisis de clase', 'Gratis', 'Premium'],
       ['Mejor banda de grado', 'Primaria superior → ESL adulto', 'Primaria pesada'],
       ['Mejor para', 'Juegos de revision atractivos', 'Practica de ortografia individual'],
@@ -479,7 +279,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Gratis, todas las caracteristicas',
-        desc: 'La mayoria de los juegos de SpellingCity estan detras de Premium. Las caracteristicas del aula de LexiClash son gratuitas, hasta 30 estudiantes, sin venta adicional.',
+        desc: 'La mayoria de los juegos de SpellingCity estan detras de Premium. LexiClash permite 3 clases gratis de hasta 50 estudiantes, y Teacher Pro añade clases ilimitadas.',
       },
       {
         title: 'Duelos 1v1',
@@ -557,11 +357,11 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       ['Бесплатный уровень (все функции)', '✓ Всё бесплатно', '✗ Premium для большинства игр'],
       ['Без входа учащегося', '✓ код из 6 символов присоединения', '✗ Учетные записи учащихся'],
       ['Основной формат', 'Живые многопользовательские словесные игры', 'Индивидуальные игры с собственным темпом'],
-      ['Живая многопользовательская игра для всего класса', '✓ Бесплатно, до 30', '✗ Модель отдельных упражнений'],
+      ['Живая многопользовательская игра для всего класса', '✓ Бесплатно, до 50', '✗ Модель отдельных упражнений'],
       ['Дуэли 1v1 с парованием учащихся', '✓', '✗'],
       ['Фокус на орфографию + словарный запас', '✓ Суть словесной игры', '✓ Орфография в первую очередь'],
       ['Пользовательские списки слов программы', '✓', '✓'],
-      ['6 языков с собственными словарями', '✓ EN/HE/SV/JA/ES', 'Английская орфография в первую очередь'],
+      ['6 языков с собственными словарями', '✓ EN/HE/SV/JA/ES/RU', 'Английская орфография в первую очередь'],
       ['Панель аналитики класса', '✓ Бесплатно', '✓ (Premium)'],
       ['Лучший диапазон классов', 'Старшие классы начальной школы → ESL для взрослых', 'Начальные классы, основной акцент'],
       ['Лучше всего для', 'Увлекательные игры на повторение', 'Отдельные упражнения по орфографии'],
@@ -579,7 +379,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
       },
       {
         title: 'Бесплатно, все функции',
-        desc: 'Большинство игр SpellingCity находятся за платным планом. Функции класса LexiClash бесплатны, до 30 учащихся, без дополнительных платежей.',
+        desc: 'Большинство игр SpellingCity находятся за платным планом. В LexiClash бесплатно доступны 3 класса до 50 учащихся, а Teacher Pro добавляет неограниченное число классов.',
       },
       {
         title: 'Дуэли 1v1',
