@@ -158,7 +158,7 @@ const InGameAudioButton: React.FC = memo(() => {
         // is the only mute control on every game screen it appears on.
         'rounded-full border-2 border-neo-cream bg-neo-black/55 text-neo-white',
         'backdrop-blur-sm shadow-hard-sm',
-        'hover:bg-neo-black/75 active:scale-95 transition-all duration-150',
+        'hover:bg-neo-black/75 active:translate-x-px active:translate-y-px active:shadow-hard-pressed transition-all duration-150',
       ].join(' ')}
     >
       {allMuted

@@ -25,9 +25,9 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
       onClick={onClick}
       variant="ghost"
       size="sm"
-      className={`min-h-[36px] min-w-[36px] w-9 h-9 p-0 rounded-full bg-neo-white/10 border-2 border-neo-white/20 shadow-none
+      className={`relative min-h-[36px] min-w-[36px] w-9 h-9 p-0 before:absolute before:-inset-1 before:content-[''] rounded-full bg-neo-white/10 border-2 border-neo-white/20 shadow-none
         hover:bg-neo-red/80 hover:border-neo-red hover:shadow-hard-sm
-        active:scale-95 active:shadow-none
+        active:translate-x-px active:translate-y-px active:shadow-none
         font-black transition-all ${className}`}
       aria-label={label}
     >
