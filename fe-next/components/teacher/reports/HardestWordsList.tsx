@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import type { HardWord } from '@/lib/education/wordMasteryReport';
 import { cn } from '@/lib/utils';
 import type { WordState } from './classInsights';
@@ -35,7 +36,7 @@ export function HardestWordsList({
   states?: Record<string, WordState>;
   notFound?: boolean;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const reduceMotion = useReducedMotion();
   const [showAll, setShowAll] = useState(false);
   const visible = showAll ? words : words.slice(0, HARDEST_VISIBLE);
@@ -87,7 +88,7 @@ export function HardestWordsList({
               <span className="mt-0.5 block truncate text-[11px] font-bold text-neo-cream/70 tabular-nums">
                 {t(notFound ? 'eduPro.mastery.notFound.of' : 'eduPro.mastery.missedOf', { missed: w.missed, attempts: w.attempts })}
                 {' · '}
-                {t('eduPro.mastery.studentsMissing', { count: w.studentsMissing, total: w.studentsAsked })}
+                {t(pluralKeyOf('eduPro.mastery.studentsMissing', w.studentsAsked, language), { count: w.studentsMissing, total: w.studentsAsked })}
               </span>
             </span>
             <span

@@ -22030,6 +22030,8 @@ const ja = {
       "hardestTitle": "いちばん難しい単語",
       "missedOf": "{attempts}回中{missed}回ミス",
       "studentsMissing": "{total}人中{count}人",
+      "studentsMissing_one": "{total}人中{count}人",
+      "studentsMissing_other": "{total}人中{count}人",
       "noneMissed": "まだ2回ミスした単語はありません。いい調子です。",
       "notFound": {
         "title": "ゲームで見つからなかった単語",
