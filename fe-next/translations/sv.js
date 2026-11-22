@@ -2578,7 +2578,7 @@ const sv = {
   },
     "connections": {
       "title": "Hitta länken",
-      "step1": "Gruppera fyra relaterade ord",
+      "step1": "Hitta ordet som länkar båda",
       "step2": "Fel gissning = ett försök mindre",
       "scoreTip": "Lös felfritt för poäng"
     },

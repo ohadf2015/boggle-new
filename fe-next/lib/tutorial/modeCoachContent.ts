@@ -114,7 +114,7 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     accent: 'purple',
     titleKey: 'modeCoach.connections.title',
     steps: [
-      { demo: 'connectGroup', captionKey: 'modeCoach.connections.step1' },
+      { demo: 'icon', emoji: '🌉', captionKey: 'modeCoach.connections.step1' },
       { demo: 'icon', emoji: '🎯', captionKey: 'modeCoach.connections.step2' },
     ],
     scoreTipKey: 'modeCoach.connections.scoreTip',
