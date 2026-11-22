@@ -8,7 +8,7 @@ import { vi } from 'vitest';
  * a "N/M Ready" header chip. Bots auto-count as ready; the host is excluded.
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { PlayerRoster } from '../PlayerRoster';
 
@@ -82,6 +82,9 @@ describe('PlayerRoster — join motion', () => {
     reduceMotion(false);
     const { unmount } = render(roster([host]));
     expect(screen.getByTestId('waiting-game-chip')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('waiting-game-chip'));
+    // HostPreGameView keys "keep the roster card whole" off this flag.
+    expect(screen.getByTestId('bubble-pop').closest('section')).toHaveAttribute('data-game-open', 'true');
     unmount();
     render(roster([host], 'guest'));
     expect(screen.queryByTestId('waiting-game-chip')).toBeNull();

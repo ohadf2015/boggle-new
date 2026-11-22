@@ -119,6 +119,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   // the strip doesn't look like a wall of bot buttons.
   const botSlots = canAddBot ? Math.min(MAX_BOTS_PER_ROOM - botCount, emptyCount) : 0;
 
+  const [gameOpen, setGameOpen] = useState(false);
   const [isEditingSelfName, setIsEditingSelfName] = useState(false);
   const [selfNameDraft, setSelfNameDraft] = useState(username);
   // { name, description } keeps the dialog text stable through its exit.
@@ -355,7 +356,7 @@ export const PlayerRoster = memo(function PlayerRoster({
   };
 
   return (
-    <section className={cn('relative flex flex-col gap-2 min-w-0', isTv ? wall.seat : desk.seat, className)}>
+    <section data-game-open={gameOpen || undefined} className={cn('relative flex flex-col gap-2 min-w-0', isTv ? wall.seat : desk.seat, className)}>
       <div className="flex items-center justify-between gap-2 min-h-11">
         <h2 className={cn('flex items-center gap-2 font-neo-display font-bold uppercase tracking-wider text-neo-white/80', variant === 'tv' ? 'text-[clamp(18px,2.6vh,28px)]' : 'text-[length:calc(14px*var(--mp-u,1))]')}>
           <span>{t('mpUi.lobby.squad')}</span>
@@ -427,7 +428,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           </div>
         )}
       </div>
-      {isHostView && <WaitingGameDock t={t} className="mt-1" />}
+      {isHostView && <WaitingGameDock t={t} onOpenChange={setGameOpen} className="mt-1" />}
       {hiddenBelow > 0 && (
         <button
           type="button"

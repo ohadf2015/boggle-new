@@ -35,12 +35,14 @@ export function BubblePopGame({ t, best, onBest, onClose }: BubblePopGameProps) 
   const [paused, setPaused] = useState(false);
   const [spawns, setSpawns] = useState(0);
   const [newBest, setNewBest] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const popRef = useRef(START);
   const leftRef = useRef(ROUND_MS);
   leftRef.current = left;
   const live = phase === 'playing' && !paused;
 
   useEffect(() => {
+    rootRef.current?.scrollIntoView?.({ block: 'nearest' });
     const sync = () => setPaused(document.hidden);
     document.addEventListener('visibilitychange', sync);
     return () => document.removeEventListener('visibilitychange', sync);
@@ -100,7 +102,7 @@ export function BubblePopGame({ t, best, onBest, onClose }: BubblePopGameProps) 
   };
 
   return (
-    <div data-testid="bubble-pop" className="flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-navy p-2 shadow-hard-sm">
+    <div ref={rootRef} data-testid="bubble-pop" className="flex flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-navy p-2 shadow-hard-sm">
       <div className="flex items-center gap-2 font-neo-display font-bold text-sm text-neo-white">
         <span className="truncate text-neo-pink uppercase tracking-wide">{t('lobby.fun.title')}</span>
         {pop.combo >= 2 && (

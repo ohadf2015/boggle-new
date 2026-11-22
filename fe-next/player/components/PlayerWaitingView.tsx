@@ -237,24 +237,29 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     </div>
   );
 
-  // DJ Lexi holds the floor while the host sets up: the card takes the body's
-  // free height, so the phone never shows a dead band above READY.
+  // DJ Lexi holds the floor while the host sets up: the card fills the body's
+  // free height (no dead band above READY) but never shrinks below its content;
+  // a short phone scrolls the stack instead of clipping the card.
   const waitingCard = (howTo: { pill?: React.ReactNode; accordion?: React.ReactNode }) => (
-    <div data-testid="waiting-status" className={cn(CARD, 'flex-1 min-h-0 flex flex-col items-center justify-center gap-3 text-center overflow-hidden')}>
-      {!gameOpen && (
-        <>
-          <DJMascot size="xs" className="!w-[min(calc(168px*var(--mp-u,1)),22vh)] !h-[min(calc(168px*var(--mp-u,1)),22vh)] min-h-12 min-w-12 shrink -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
-          <LobbyQuip t={t} className="max-w-xs rounded-neo border-2 border-neo-black bg-neo-cream px-3 py-1 font-neo-body text-[length:calc(13px*var(--mp-u,1))] font-bold leading-snug text-neo-black shadow-hard-sm rotate-1" />
-        </>
-      )}
+    <div data-testid="waiting-status" className={cn(CARD, 'flex-[1_0_auto] flex flex-col items-center justify-center gap-3 text-center')}>
+      <div className="w-full max-w-md flex items-center justify-center gap-3">
+        {!gameOpen && (
+          <DJMascot size="xs" className="!w-[min(calc(120px*var(--mp-u,1)),12vh)] !h-[min(calc(120px*var(--mp-u,1)),12vh)] min-h-14 min-w-14 shrink-0 -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
+        )}
+        <div className={cn('min-w-0 flex flex-col items-center gap-2', gameOpen && 'w-full')}>
+          {!gameOpen && (
+            <LobbyQuip t={t} className="rounded-neo border-2 border-neo-black bg-neo-cream px-3 py-1.5 text-start font-neo-body text-[length:calc(13px*var(--mp-u,1))] font-bold leading-snug text-neo-black shadow-hard-sm rotate-1" />
+          )}
+          <WaitingGameDock t={t} onOpenChange={setGameOpen} className="w-full" />
+        </div>
+      </div>
       {/* The shared status line truncates to one line; here it has room to wrap. */}
       <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
         <ReadyMeter seats={seats} meId={username} />
         {status}
-        {!gameOpen && pickRow}
-        {!gameOpen && howTo.pill}
       </div>
-      <WaitingGameDock t={t} onOpenChange={setGameOpen} className="w-full max-w-md shrink-0" />
+      {!gameOpen && pickRow}
+      {!gameOpen && howTo.pill}
       {!gameOpen && howTo.accordion}
     </div>
   );
@@ -333,7 +338,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           </div>
         ) : (
           <div data-testid="lobby-phone" className="flex flex-col flex-1 min-h-0">
-            <div className="flex-1 min-h-0 flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
               {roster}
               {waitingCard({ pill: howToPill })}
             </div>
