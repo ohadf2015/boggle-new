@@ -56,16 +56,36 @@ type AdminWithAuth = {
     select: (cols: string) => { eq: (col: string, val: string) => { maybeSingle: () => Promise<{ data: Record<string, unknown> | null; error: { message: string } | null }> } };
     update: (values: Record<string, string>) => { eq: (col: string, val: string) => Promise<{ error: { message: string } | null }> };
   };
-  auth?: { admin?: { updateUserById?: (id: string, attrs: { data: Record<string, unknown> }) => Promise<unknown> } };
+  auth?: {
+    admin?: {
+      updateUserById?: (
+        id: string,
+        attrs: { user_metadata: Record<string, unknown> },
+      ) => Promise<{ error?: { message?: string } | null } | null | void>;
+    };
+  };
 };
 
 async function markSignupEventEmitted(admin: AdminWithAuth, userId: string): Promise<void> {
-  const updateUser = admin.auth?.admin?.updateUserById;
-  if (!updateUser) return;
+  const adminApi = admin.auth?.admin;
+  if (!adminApi?.updateUserById) {
+    console.error('[attribution] signup flag write skipped: admin.updateUserById missing');
+    return;
+  }
   try {
-    await updateUser(userId, { data: { [SIGNUP_EVENT_FLAG]: true } });
-  } catch {
-    // A missed flag can double-emit the same distinctId. Persons stay unique.
+    // Must be a method call. Pulling updateUserById off GoTrueAdminApi
+    // drops `this` (this.fetch / this.url), the call throws, and a bare
+    // catch used to hide it — so signup_completed_emitted never landed
+    // and email catch-up re-fired on every attribution POST.
+    // AdminUserAttributes uses user_metadata, not the client `data` key.
+    // GoTrue merges that object; it does not replace the rest of the metadata.
+    const result = await adminApi.updateUserById(userId, {
+      user_metadata: { [SIGNUP_EVENT_FLAG]: true },
+    });
+    const error = result && typeof result === 'object' ? result.error : undefined;
+    if (error) console.error('[attribution] signup flag write failed:', error.message || error);
+  } catch (err) {
+    console.error('[attribution] signup flag write threw:', err instanceof Error ? err.message : err);
   }
 }
 

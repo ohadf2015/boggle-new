@@ -76,6 +76,23 @@ describe('decideAttributionWrite', () => {
     expect(d.update).toEqual({});
   });
 
+  it('still emits a late email confirm; age is not the dedupe', () => {
+    const createdAt = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    const user = {
+      app_metadata: { provider: 'email' as const },
+      created_at: createdAt,
+      user_metadata: { signup_surface: 'header_or_menu' },
+    };
+    const d = decideAttributionWrite({
+      profile: { ...EMPTY, signup_surface: 'header_or_menu' },
+      incoming: { signup_surface: 'header_or_menu' },
+      user,
+    });
+    expect(d.emit).toBe(true);
+    expect(d.method).toBe('email');
+    expect(emailSignupNeedsCatchup(user)).toBe(true);
+  });
+
   it('never demotes a teacher and never trusts a non-teacher metadata role', () => {
     const teacher = decideAttributionWrite({
       profile: { ...EMPTY, user_role: 'teacher' },

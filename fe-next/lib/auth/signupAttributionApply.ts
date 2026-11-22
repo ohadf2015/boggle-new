@@ -9,6 +9,11 @@
  * Catch-up only runs when user_metadata.signup_surface was stashed by the
  * new email signup path — old accounts must not be backfilled into today's
  * funnel. Deduped by user_metadata.signup_completed_emitted.
+ *
+ * Age is not a second dedupe. Email confirm can land hours after created_at
+ * (the client still POSTs those; see AuthProvider). A short "created more
+ * than 10 minutes ago" skip would drop that first event. The flag write is
+ * the once-only gate; a missed flag is logged, not swallowed.
  */
 
 export const SIGNUP_EVENT_FLAG = 'signup_completed_emitted';
