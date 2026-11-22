@@ -22042,6 +22042,8 @@ const es = {
       "hardestTitle": "Palabras más difíciles",
       "missedOf": "falló {missed} de {attempts}",
       "studentsMissing": "{count} de {total} alumnos",
+      "studentsMissing_one": "{count} de {total} alumno",
+      "studentsMissing_other": "{count} de {total} alumnos",
       "noneMissed": "Nadie ha fallado una palabra dos veces todavía. Bien.",
       "notFound": {
         "title": "No encontradas en los juegos",

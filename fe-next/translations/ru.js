@@ -21753,6 +21753,9 @@ const ru = {
       "hardestTitle": "Самые трудные слова",
       "missedOf": "ошибок: {missed} из {attempts}",
       "studentsMissing": "{count} из {total} учеников",
+      "studentsMissing_one": "{count} из {total} ученика",
+      "studentsMissing_few": "{count} из {total} учеников",
+      "studentsMissing_other": "{count} из {total} учеников",
       "noneMissed": "Пока никто не ошибся в слове дважды. Отлично.",
       "notFound": {
         "title": "Не нашли в играх",

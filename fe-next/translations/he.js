@@ -21991,6 +21991,8 @@ const he = {
       "hardestTitle": "המילים הקשות ביותר",
       "missedOf": "פוספסה {missed} מתוך {attempts}",
       "studentsMissing": "{count} מתוך {total} תלמידים",
+      "studentsMissing_one": "{count} מתוך תלמיד אחד",
+      "studentsMissing_other": "{count} מתוך {total} תלמידים",
       "noneMissed": "אף אחד עוד לא פספס מילה פעמיים. יפה.",
       "notFound": {
         "title": "לא נמצאו במשחקים",

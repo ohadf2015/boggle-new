@@ -21051,6 +21051,8 @@ const en = {
       "hardestTitle": "Hardest words",
       "missedOf": "missed {missed} of {attempts}",
       "studentsMissing": "{count} of {total} students",
+      "studentsMissing_one": "{count} of {total} student",
+      "studentsMissing_other": "{count} of {total} students",
       "noneMissed": "Nobody has missed a word twice yet. Nice.",
       "notFound": {
         "title": "Not found in games",

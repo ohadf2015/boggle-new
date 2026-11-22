@@ -22030,6 +22030,8 @@ const sv = {
       "hardestTitle": "Svåraste orden",
       "missedOf": "missat {missed} av {attempts}",
       "studentsMissing": "{count} av {total} elever",
+      "studentsMissing_one": "{count} av {total} elev",
+      "studentsMissing_other": "{count} av {total} elever",
       "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt.",
       "notFound": {
         "title": "Hittades inte i spelen",
