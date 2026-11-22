@@ -75,4 +75,25 @@ describe('useCountUp', () => {
     act(() => { vi.advanceTimersByTime(1100); });
     expect(result.current).toBe(200);
   });
+
+  it('tweens from the displayed value when the target changes, never back to 0', () => {
+    const { result, rerender } = renderHook(
+      ({ target }) => useCountUp({ target, duration: 1000 }),
+      { initialProps: { target: 100 } }
+    );
+    act(() => { vi.advanceTimersByTime(1100); });
+    rerender({ target: 200 });
+    act(() => { vi.advanceTimersByTime(100); });
+    expect(result.current).toBeGreaterThanOrEqual(100);
+    expect(result.current).toBeLessThan(200);
+  });
+
+  it('jumps straight to the target under prefers-reduced-motion', () => {
+    const mm = vi.spyOn(window, 'matchMedia').mockImplementation(
+      (q: string) => ({ matches: q.includes('reduce'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }) as unknown as MediaQueryList
+    );
+    const { result } = renderHook(() => useCountUp({ target: 750, duration: 1000 }));
+    expect(result.current).toBe(750);
+    mm.mockRestore();
+  });
 });
