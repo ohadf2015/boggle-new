@@ -188,97 +188,101 @@ export default function PuzzleCard({
             </div>
           </div>
 
-          {/* Verdict line (correct / wrong / gave up) gets its own fixed slot above the stage, so it
-              never shares a row with the hint and never shifts the stage or keyboard. */}
-          <div data-testid="puzzle-verdict" className="flex h-6 shrink-0 items-center justify-center" aria-live="polite">
-            <AnimatePresence mode="wait">
-              {isCorrect && (
-                <m.p
-                  key="correct"
-                  initial={{ scale: 0.6 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: 'spring', stiffness: 350, damping: 14 }}
-                  className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
-                >
-                  {t('connections.correct')}
-                  <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
-                </m.p>
-              )}
-              {isWrong && (
-                <m.p key="wrong" initial={{ y: -4 }} animate={{ y: 0 }} className="text-center text-sm font-bold text-neo-red">
-                  {t('connections.wrong')}
-                </m.p>
-              )}
-              {isGaveUp && (
-                <m.p
-                  key="gaveUp"
-                  initial={{ y: -6 }}
-                  animate={{ y: 0 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 18 }}
-                  className="text-center text-sm font-bold text-neo-red"
-                >
-                  {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
-                </m.p>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Size container: BridgeStage caps its plates, tiles and river by this box's
-              height (cqh), so they shrink to fit instead of spilling over the action row
-              above or the feedback line below. `safe` centering never pushes content
-              past the top edge; the floor keeps a readable stage if a host ever
-              leaves this box without a flex height. A host that is a height
-              container (the pyramid's phone root) lowers the floor on short
-              screens, so the keyboard dock is never pushed below the fold. */}
-          <div
-            ref={stageRef}
-            data-testid="puzzle-stage"
-            className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
-            style={{ containerType: 'size' }}
-          >
-            <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
-              {needsIME ? (
-                <p
-                  data-testid="ime-echo"
-                  className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream"
-                >
-                  {isResolved ? puzzle.bridge : state.input || <span className="text-neo-cream/40">?</span>}
-                </p>
-              ) : (
-                <AnswerSlots
-                  value={slotsValue}
-                  slotCount={slotCap}
-                  state={slotState}
-                  dir={isRTL ? 'rtl' : 'ltr'}
-                  label={t('connections.placeholder')}
-                />
-              )}
-            </BridgeStage>
-            {isCorrect && <BridgeCelebration streak={state.streak} points={solvePoints} />}
-          </div>
-
-          {/* Hint: its own full-width row between the stage and the keyboard dock. The
-              min-height reserves two wrapped lines up front (so revealing it never moves
-              the dock) and the bottom margin keeps the pill off the keys. */}
-          {puzzle.hint && !isResolved && (
-            <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-[2.5rem]">
-              <AnimatePresence>
-              {showHint && !isResolved && (
-                <m.p
-                  key="hint"
-                  initial={reducedMotion ? false : { y: -8, scale: 0.9 }}
-                  animate={{ y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 18 }}
-                  className="inline-flex w-full max-w-full items-center justify-center gap-2 rounded-2xl border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1 text-center text-sm font-bold leading-tight text-neo-yellow"
-                >
-                  <Lightbulb className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span className="line-clamp-2">{puzzle.hint}</span>
-                </m.p>
-              )}
+          {/* Everything above the dock shrinks, then clips, before the dock leaves the screen. */}
+          <div data-testid="puzzle-play-area" className="flex min-h-0 flex-1 flex-col overflow-y-clip">
+            {/* Verdict line (correct / wrong / gave up) gets its own fixed slot above the stage, so it
+                never shares a row with the hint and never shifts the stage or keyboard. */}
+            <div data-testid="puzzle-verdict" className="flex h-6 shrink-0 items-center justify-center" aria-live="polite">
+              <AnimatePresence mode="wait">
+                {isCorrect && (
+                  <m.p
+                    key="correct"
+                    initial={{ scale: 0.6 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 14 }}
+                    className="inline-flex items-center gap-2 font-neo-display text-xl font-black text-neo-lime"
+                  >
+                    {t('connections.correct')}
+                    <Check className="h-5 w-5" strokeWidth={3} aria-hidden="true" />
+                  </m.p>
+                )}
+                {isWrong && (
+                  <m.p key="wrong" initial={{ y: -4 }} animate={{ y: 0 }} className="text-center text-sm font-bold text-neo-red">
+                    {t('connections.wrong')}
+                  </m.p>
+                )}
+                {isGaveUp && (
+                  <m.p
+                    key="gaveUp"
+                    initial={{ y: -6 }}
+                    animate={{ y: 0 }}
+                    transition={{ type: 'spring', stiffness: 320, damping: 18 }}
+                    className="text-center text-sm font-bold text-neo-red"
+                  >
+                    {t('connections.solutionIs')}: <span className="text-neo-white">{puzzle.bridge}</span>
+                  </m.p>
+                )}
               </AnimatePresence>
             </div>
-          )}
+
+            {/* Size container: BridgeStage caps its plates, tiles and river by this box's
+                height (cqh), so they shrink to fit instead of spilling over the action row
+                above or the feedback line below. `safe` centering never pushes content
+                past the top edge; the floor keeps a readable stage if a host ever
+                leaves this box without a flex height. A host that is a height
+                container (the pyramid's phone root) lowers the floor on short
+                screens, so the keyboard dock is never pushed below the fold. */}
+            <div
+              ref={stageRef}
+              data-testid="puzzle-stage"
+              className="relative flex min-h-[11rem] flex-1 flex-col [@media(max-height:700px)]:min-h-[7rem] [@container(42rem<height<=54rem)]:min-h-[8.5rem] [@container(36rem<height<=42rem)]:min-h-[7rem] [@container(height<=36rem)]:min-h-[6rem] justify-center-safe py-2 group-has-[input:focus]/card:py-0 shell:py-4"
+              style={{ containerType: 'size' }}
+            >
+              <BridgeStage word1={puzzle.word1} word2={puzzle.word2} isCorrect={isCorrect} isGaveUp={isGaveUp} isRTL={isRTL}>
+                {needsIME ? (
+                  <p
+                    data-testid="ime-echo"
+                    className="min-h-[3rem] py-1 text-center font-neo-display text-3xl font-black leading-[3rem] text-neo-cream"
+                  >
+                    {isResolved ? puzzle.bridge : state.input || <span className="text-neo-cream/40">?</span>}
+                  </p>
+                ) : (
+                  <AnswerSlots
+                    value={slotsValue}
+                    slotCount={slotCap}
+                    state={slotState}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    label={t('connections.placeholder')}
+                  />
+                )}
+              </BridgeStage>
+              {isCorrect && <BridgeCelebration streak={state.streak} points={solvePoints} />}
+            </div>
+
+            {/* Hint: its own full-width row between the stage and the keyboard dock. The
+                min-height reserves two wrapped lines up front (so revealing it never moves
+                the dock) and the bottom margin keeps the pill off the keys. */}
+            {puzzle.hint && !isResolved && (
+              <div data-testid="puzzle-hint-row" className="mb-2 flex min-h-[3rem] w-full shrink-0 items-center justify-center [@media(max-height:700px)]:mb-1 [@media(max-height:700px)]:min-h-[2.5rem] [@container(max-height:36rem)]:min-h-0 [@container(max-height:36rem)]:mb-1">
+                <AnimatePresence>
+                {showHint && !isResolved && (
+                  <m.p
+                    key="hint"
+                    initial={reducedMotion ? false : { y: -8, scale: 0.9 }}
+                    animate={{ y: 0, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                    className="inline-flex w-full max-w-full items-center justify-center gap-2 rounded-2xl border-2 border-neo-yellow bg-neo-yellow/10 px-3 py-1 text-center text-sm font-bold leading-tight text-neo-yellow"
+                  >
+                    <Lightbulb className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span className="line-clamp-2">{puzzle.hint}</span>
+                  </m.p>
+                )}
+                </AnimatePresence>
+              </div>
+            )}
+
+          </div>
 
           {/* The dock: keyboard while playing, the payoff + Next once resolved —
               same reserved height, so the page never grows into a scroll. The one-line

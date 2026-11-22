@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useNavigation } from '@/contexts/NavigationContext';
 import { isNative } from '@/utils/platform';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
 import { isLandingPath } from '@/lib/i18n/isLandingPath';
@@ -61,6 +62,9 @@ export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const pathname = usePathname();
+  const { isInGame } = useNavigation();
+  const inGameRef = useRef(isInGame);
+  inGameRef.current = isInGame;
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
   // Landing (`/` `/en`): same class as the deleted AdSense loader — GSI was
@@ -88,7 +92,7 @@ export default function GoogleOneTapInitializer() {
   });
 
   const initOneTap = useCallback(async () => {
-    if (promptedRef.current || !clientId) return;
+    if (promptedRef.current || !clientId || inGameRef.current) return;
     // Post-game funnel owns auth — do not prompt One Tap over soft-sheet.
     if (shouldSuppressOneTapForSignupFunnel()) return;
     const google = (window as unknown as { google?: GoogleIdServices }).google;
@@ -97,7 +101,7 @@ export default function GoogleOneTapInitializer() {
 
     await ensureGoogleIdInitialized(google, clientId);
     // Re-check after idle/init — soft-sheet may have opened meanwhile.
-    if (shouldSuppressOneTapForSignupFunnel()) {
+    if (shouldSuppressOneTapForSignupFunnel() || inGameRef.current) {
       cancelOneTapPrompt();
       return;
     }
@@ -117,12 +121,17 @@ export default function GoogleOneTapInitializer() {
     return () => window.removeEventListener(SIGNUP_PROMPT_ACTIVE_EVENT, onPromptActive);
   }, []);
 
+  // A sign-in sheet over a live board covers the keyboard and controls.
+  useEffect(() => {
+    if (isInGame) cancelOneTapPrompt();
+  }, [isInGame]);
+
   // Do NOT gate the Script mount on signup-funnel suppress (that reads localStorage
   // and would hydrate-mismatch). Suppress is enforced inside initOneTap + cancel.
   if (!enabled) return null;
   // Fullscreen game routes: GSI (~100KiB) was unused JS #1 on /singleplayer PSI.
   // One Tap is not useful over the board; GoogleSignInButton still loads GSI on demand.
-  if (isHeavyGamePath(pathname)) return null;
+  if (isHeavyGamePath(pathname) || isInGame) return null;
   if (deferForPsi && !landingGsiArmed) return null;
 
   // hl on the script URL controls GSI's rendered language (see GoogleSignInButton) —
