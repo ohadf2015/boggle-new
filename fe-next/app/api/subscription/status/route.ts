@@ -11,8 +11,30 @@ import { withTimeout } from '@/lib/server/routeTimeout';
 import logger from '@/utils/logger';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import { canUseBillingPortal } from '@/lib/education/billingPortal';
+import { recordTeacherTrialFunnelStep, TEACHER_TRIAL_ACTIVE_EVENT } from '@/lib/education/teacherTrialFunnel';
 
 const PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS = 800;
+
+/**
+ * Durable funnel step: a trialing teacher came back to the product (this route
+ * backs every Teacher surface). Written once per teacher, never blocks the
+ * status answer, and skipped for QA accounts.
+ */
+async function recordTrialActive(userId: string): Promise<void> {
+  try {
+    if (await profileIsTestAccount(userId)) return;
+    await withTimeout(
+      recordTeacherTrialFunnelStep({
+        userId,
+        eventType: TEACHER_TRIAL_ACTIVE_EVENT,
+        dedupe: 'ever',
+      }),
+      PENDING_CHECKOUT_LOOKUP_TIMEOUT_MS,
+    );
+  } catch {
+    /* funnel telemetry must never break the status route */
+  }
+}
 
 async function profileIsTestAccount(userId: string): Promise<boolean> {
   const admin = createAdminClient();
@@ -143,6 +165,7 @@ export async function GET(request: NextRequest) {
       subscription.source !== 'admin_grant'
     );
     const trialUsed = onPolarTrial || await hasPolarTrialEvent(user.id);
+    if (onPolarTrial) await recordTrialActive(user.id);
     const accessTrialEnd = subscription.has_pro ? null : await accessTrialExpiryAny(user.id);
     const accessTrialLiveNow = accessTrialEnd !== null && Date.parse(accessTrialEnd) > Date.now();
     const accessTrialExpires = accessTrialLiveNow ? accessTrialEnd : null;

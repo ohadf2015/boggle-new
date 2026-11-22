@@ -10,8 +10,9 @@ import { trackEduProUpgradeClicked, trackTeacherProUpgradeClick } from '@/lib/ed
 import { SCHOOL_PRICING, schoolMonthlyParams } from '@/lib/education/pro/schoolPricing';
 import { SchoolPriceTag } from './SchoolPriceTag';
 import type { UpgradeViewer } from '@/lib/education/pro/upgradeViewer';
-import { accessTrialLive, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
+import { accessTrialLive, freeWindowCopy, keepAfterTrialCopy } from '@/lib/education/pro/keepAfterTrialCopy';
 import { trialEndedCopy } from '@/lib/education/pro/trialEndedCopy';
+import type { TrialCardAskTiming } from '@/lib/education/pro/accessTrialCheckout';
 
 export interface UpgradePlanCardsProps {
   viewer: UpgradeViewer;
@@ -34,6 +35,13 @@ export interface UpgradePlanCardsProps {
   accessTrialEndsAt?: string | null;
   /** The free access trial has ended: no trial wording, a straight "Continue with Teacher Pro". */
   accessTrialEnded?: boolean;
+  /**
+   * trialCardAskTiming of the teacher's access window. 'too_early' (free window
+   * live with days to spare) replaces BOTH checkout CTAs with the truthful
+   * free-window state — the measured 0%-conversion card ask waits for the
+   * window's last days.
+   */
+  cardAskTiming?: TrialCardAskTiming;
 }
 
 /** Pro's strongest four outcomes stay in view; the rest fold under "N more". */
@@ -128,9 +136,17 @@ export function UpgradePlanCards({
   manageBillingHref,
   accessTrialEndsAt = null,
   accessTrialEnded = false,
+  cardAskTiming = 'no_access_window',
 }: UpgradePlanCardsProps) {
   const { t, language } = useLanguage();
-  const keep = showTrial && accessTrialLive(accessTrialEndsAt) ? keepAfterTrialCopy(language, accessTrialEndsAt) : null;
+  const freeWindow =
+    cardAskTiming === 'too_early' && viewer !== 'pro' && accessTrialLive(accessTrialEndsAt)
+      ? freeWindowCopy(language, accessTrialEndsAt)
+      : null;
+  const keep =
+    !freeWindow && showTrial && accessTrialLive(accessTrialEndsAt)
+      ? keepAfterTrialCopy(language, accessTrialEndsAt)
+      : null;
   const ended = !showTrial && viewer !== 'pro' && accessTrialEnded ? trialEndedCopy(language) : null;
   const perMonth = t('teacher.subscription.perMonth');
   const price = `$${TEACHER_PRO_PRICE_USD}`;
@@ -196,7 +212,7 @@ export function UpgradePlanCards({
       >
         <span className="absolute -top-3 start-4 inline-flex items-center gap-1 rounded-neo border-2 border-neo-black bg-neo-pink px-2.5 py-0.5 font-neo-display text-xs font-black text-neo-black">
           <Sparkles className="h-3 w-3" strokeWidth={3} aria-hidden />
-          {keep ? keep.badge : ended ? ended.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
+          {freeWindow ? freeWindow.badge : keep ? keep.badge : ended ? ended.badge : showTrial ? t('eg2Pro.plans.trialBadge', { days: TEACHER_PRO_TRIAL_DAYS }) : t('eg2Pro.plans.recommended')}
         </span>
         <h2 className="mt-1 font-neo-display text-lg font-black text-neo-black">{t('teacher.subscription.proPlanName')}</h2>
         <p className="mb-3 text-xs font-bold text-neo-black/75">{t('teacher.subscription.unlimitedAccess')}</p>
@@ -216,6 +232,11 @@ export function UpgradePlanCards({
                 </a>
               )}
             </>
+          ) : freeWindow ? (
+            <div data-testid="pricing-free-window" className="rounded-neo border-2 border-dashed border-neo-black/60 px-3 py-2.5">
+              <p className="text-sm font-bold leading-snug text-neo-black">{freeWindow.body}</p>
+              <p className="mt-1 text-xs font-bold text-neo-black/70">{freeWindow.note}</p>
+            </div>
           ) : (
             <>
               {showTrial && (

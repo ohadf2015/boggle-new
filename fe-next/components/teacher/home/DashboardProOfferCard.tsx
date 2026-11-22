@@ -9,6 +9,7 @@ import { resolveProOffer } from '@/lib/education/pro/proOfferCopy';
 import { proCopyLines, proCopyVariant } from '@/lib/education/pro/proCopyExperiment';
 import { resultsTrialCopy } from '@/lib/education/pro/trialCtaCopy';
 import { reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
+import { showProCardAsk, trialCardAskTiming } from '@/lib/education/pro/accessTrialCheckout';
 import { useProOfferSlot } from '@/lib/education/pro/useProOfferSlot';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
 import { ProOfferCompactLink } from '@/components/education/results/ProOfferCompactLink';
@@ -36,6 +37,10 @@ export function DashboardProOfferCard({ language, t, insight }: { language: stri
   const { user } = useAuth();
   const userId = user?.id ?? null;
   const { loading, known, trialUsed, accessTrialExpires, accessTrialEnded } = useTeacherPro();
+  // No card ask while the free access window has days to spare: the measured
+  // conversion of that ask is 0% (both Oct 2026 trial checkouts abandoned at
+  // the card wall minutes after approval). The ask returns for the last days.
+  const cardAskOpen = showProCardAsk(trialCardAskTiming(accessTrialExpires));
   const proOffer = resolveProOffer(language, { known, trialUsed, accessTrialExpires, accessTrialEnded }, resultsTrialCopy(language));
   const variant = proCopyVariant(userId);
   const lines = proCopyLines(language, variant, proOffer, { accessTrialExpires, placement: DASHBOARD_PRO_PLACEMENT });
@@ -47,15 +52,17 @@ export function DashboardProOfferCard({ language, t, insight }: { language: stri
   const trial = useStartTeacherProTrial(t, language, 'dashboard_trial_offer', { trial: proOffer.checkoutTrial });
 
   useEffect(() => {
-    if (!full) return;
+    if (!full || !cardAskOpen) return;
     reportProOfferImpression({ ...offerRef.current, stage: 'rendered' }, { userId });
-  }, [full, userId]);
+  }, [full, userId, cardAskOpen]);
   useUpsellImpression(
     cardRef,
-    full ? { cta: proOffer.cta, placement: DASHBOARD_PRO_PLACEMENT } : null,
+    full && cardAskOpen ? { cta: proOffer.cta, placement: DASHBOARD_PRO_PLACEMENT } : null,
     { locale: language },
     () => reportProOfferImpression({ ...offerRef.current, stage: 'viewed' }, { userId }),
   );
+
+  if (!cardAskOpen) return null;
 
   if (!full) {
     if (slot !== 'compact') return null;

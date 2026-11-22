@@ -59,6 +59,21 @@ describe('DashboardProOfferCard', () => {
     expect(screen.queryByRole('link', { name: /analytics/i })).not.toBeInTheDocument();
   });
 
+  it('makes no card ask at all while the free access window has days to spare (measured 0% conversion)', () => {
+    pro.accessTrialExpires = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
+    const { container } = render(<DashboardProOfferCard language="en" t={t} />);
+    expect(screen.queryByTestId('dashboard-pro-offer')).not.toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
+    expect(posts()).toEqual([]);
+    expect(screen.queryByTestId('dashboard-pro-compact')).not.toBeInTheDocument();
+  });
+
+  it('shows the card again in the last days of the free window', () => {
+    pro.accessTrialExpires = new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString();
+    render(<DashboardProOfferCard language="en" t={t} />);
+    expect(screen.getByTestId('dashboard-pro-offer')).toBeInTheDocument();
+  });
+
   describe('class insight', () => {
     const tp = (key: string, params?: Record<string, string | number>) => (params ? `${key}:${JSON.stringify(params)}` : key);
 

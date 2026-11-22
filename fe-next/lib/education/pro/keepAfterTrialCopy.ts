@@ -102,3 +102,63 @@ export function accessTrialLive(accessTrialEndsAt: string | null | undefined, no
 }
 
 export const KEEP_AFTER_TRIAL_LOCALES = Object.keys(COPY);
+
+/**
+ * The free-window state that REPLACES the card ask while the access trial has
+ * more than a few days left (trialCardAskTiming === 'too_early'). Measured:
+ * every teacher who met the card wall in the first days of the free window
+ * abandoned (0/2 completed, 2026-10-24/26), so the ask now waits for the last
+ * days, and this says the truth instead: Pro is already on, no card today.
+ */
+export type FreeWindowCopy = {
+  /** Replaces the plan-card badge. */
+  badge: string;
+  /** Replaces the checkout buttons. */
+  body: string;
+  /** Single low-key line under the body. */
+  note: string;
+};
+
+const FREE_WINDOW: Record<string, FreeWindowCopy> = {
+  en: {
+    badge: 'Included in your free trial',
+    body: 'Teacher Pro is already on for your class until {date} — no card needed today.',
+    note: "We'll email you before the trial ends if you want to keep Pro.",
+  },
+  he: {
+    badge: 'כלול בתקופת הניסיון',
+    body: 'פרו למורים כבר פעיל לכיתה שלך עד {date} — לא צריך כרטיס היום.',
+    note: 'נשלח מייל לפני שהניסיון מסתיים אם תרצו להמשיך עם פרו.',
+  },
+  es: {
+    badge: 'Incluido en tu prueba gratis',
+    body: 'Teacher Pro ya está activo para tu clase hasta el {date} — hoy no hace falta tarjeta.',
+    note: 'Te avisaremos por correo antes de que termine la prueba por si quieres seguir con Pro.',
+  },
+  sv: {
+    badge: 'Ingår i din gratisperiod',
+    body: 'Teacher Pro är redan på för din klass till {date} — inget kort behövs i dag.',
+    note: 'Vi mejlar dig innan perioden tar slut om du vill behålla Pro.',
+  },
+  ja: {
+    badge: '無料トライアルに含まれています',
+    body: 'Teacher Proは{date}までクラスですでに有効です — 今日カードは必要ありません。',
+    note: 'トライアル終了前にメールでお知らせします。',
+  },
+  ru: {
+    badge: 'Включено в пробный период',
+    body: 'Teacher Pro уже включён для вашего класса до {date} — карта сегодня не нужна.',
+    note: 'Мы напомним по почте до конца пробного периода, если захотите оставить Pro.',
+  },
+};
+
+export function freeWindowCopy(locale: string, accessTrialEndsAt: string): FreeWindowCopy {
+  const l = trialCopyBase(locale);
+  const raw = FREE_WINDOW[l] ?? FREE_WINDOW.en;
+  const rtl = TRIAL_COPY_RTL.has(l);
+  const wrap = (s: string) => (rtl ? `${LRI}${s}${PDI}` : s);
+  const date = wrap(formatTrialEnd(accessTrialEndsAt, FREE_WINDOW[l] ? l : 'en'));
+  const fill = (s: string) => s.replace(/\{(\w+)\}/g, (m, k: string) => (k === 'date' ? date : m));
+  return { badge: fill(raw.badge), body: fill(raw.body), note: fill(raw.note) };
+}
+

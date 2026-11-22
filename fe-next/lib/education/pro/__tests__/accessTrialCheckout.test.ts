@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { polarTrialPlan } from '../accessTrialCheckout';
+import {
+  polarTrialPlan,
+  showProCardAsk,
+  trialCardAskTiming,
+  TRIAL_CARD_ASK_LAST_DAYS,
+} from '../accessTrialCheckout';
 
 const DAY = 24 * 60 * 60 * 1000;
 const NOW = Date.parse('2026-10-25T10:00:00.000Z');
@@ -33,5 +38,29 @@ describe('polarTrialPlan', () => {
 
   it('never hands out more than the standard length', () => {
     expect(polarTrialPlan(endsIn(40), NOW)).toEqual({ days: 14, source: 'access_trial' });
+  });
+});
+
+describe('card-ask timing (measured drop-off fix)', () => {
+  it('suppresses the ask while the free window has more than the last days left', () => {
+    expect(trialCardAskTiming(endsIn(60), NOW)).toBe('too_early');
+    expect(trialCardAskTiming(endsIn(TRIAL_CARD_ASK_LAST_DAYS + 0.5), NOW)).toBe('too_early');
+    expect(showProCardAsk('too_early')).toBe(false);
+  });
+
+  it('opens the ask in the last days of the window, when it ends, and when there is none', () => {
+    expect(trialCardAskTiming(endsIn(TRIAL_CARD_ASK_LAST_DAYS), NOW)).toBe('ending_soon');
+    expect(trialCardAskTiming(endsIn(0.2), NOW)).toBe('ending_soon');
+    expect(trialCardAskTiming(endsIn(-1), NOW)).toBe('access_ended');
+    expect(trialCardAskTiming(null, NOW)).toBe('no_access_window');
+    expect(trialCardAskTiming(undefined, NOW)).toBe('no_access_window');
+    expect(trialCardAskTiming('junk', NOW)).toBe('no_access_window');
+    expect(showProCardAsk('ending_soon')).toBe(true);
+    expect(showProCardAsk('access_ended')).toBe(true);
+    expect(showProCardAsk('no_access_window')).toBe(true);
+  });
+
+  it('is stable: a teacher deep in the window never sees the ask early', () => {
+    expect(showProCardAsk(trialCardAskTiming(endsIn(90), NOW))).toBe(false);
   });
 });

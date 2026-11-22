@@ -20,6 +20,12 @@ import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { buildTeacherFunnelStepEvent } from '@/lib/education/teacherFunnelStepServer'
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
+import {
+  recordTeacherTrialFunnelStep,
+  TEACHER_TRIAL_STARTED_EVENT,
+  TEACHER_TRIAL_EXPIRED_EVENT,
+  TEACHER_SUBSCRIPTION_ACTIVE_EVENT,
+} from '@/lib/education/teacherTrialFunnel'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
 
@@ -198,8 +204,8 @@ export async function POST(request: NextRequest) {
       case 'subscription.uncanceled':
       case 'subscription.resumed':
         await handleSubscriptionActive(payload, userId)
-        if (eventType === 'subscription.active') trackProConversion(payload, userId)
-        trackProTrial(payload, userId)
+        if (eventType === 'subscription.active') await trackProConversion(payload, userId)
+        await trackProTrial(payload, userId)
         break
       case 'subscription.updated':
       case 'subscription.cycled':
@@ -213,7 +219,7 @@ export async function POST(request: NextRequest) {
           }
           trackPastDue(payload, userId)
         } else {
-          trackProTrial(payload, userId)
+          await trackProTrial(payload, userId)
         }
         break
       case 'subscription.past_due':
@@ -231,12 +237,12 @@ export async function POST(request: NextRequest) {
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
-        trackTrialExpired(payload, userId)
+        await trackTrialExpired(payload, userId)
         trackSubscriptionEnded('canceled', payload, userId)
         break
       case 'subscription.revoked':
         await handleSubscriptionRevoked(payload, userId)
-        trackTrialExpired(payload, userId)
+        await trackTrialExpired(payload, userId)
         trackSubscriptionEnded('revoked', payload, userId)
         break
       case 'order.created':
@@ -253,7 +259,7 @@ export async function POST(request: NextRequest) {
         trackCheckoutStatus(eventType, payload, userId)
         if (isCheckoutSuccess(eventType, payload)) {
           await handleCheckoutCompleted(payload, userId)
-          trackCheckoutGrant(payload, userId)
+          await trackCheckoutGrant(payload, userId)
         }
         break
       default:
@@ -282,11 +288,19 @@ export async function POST(request: NextRequest) {
  * product. Never throws: a 500 here would make Polar redeliver and re-run
  * the state writes.
  */
-function trackProConversion(payload: WebhookPayload, userId?: string) {
+async function trackProConversion(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
+    // Durable funnel terminal step (subscription_events), first paid activation only.
+    await recordTeacherTrialFunnelStep({
+      userId,
+      eventType: TEACHER_SUBSCRIPTION_ACTIVE_EVENT,
+      subscriptionId: subId,
+      payload: { trial_converted: trialMarker(payload?.data).trial, locale: getLocale(payload) ?? null },
+      dedupe: 'ever',
+    })
     captureFunnel(payload, userId, withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildPaidEvent(userId, subId), payload?.data))
@@ -305,11 +319,20 @@ function trackProConversion(payload: WebhookPayload, userId?: string) {
  * paid conversion. Polar's activation webhook is `subscription.active`
  * (status=trialing). Never throws.
  */
-function trackProTrial(payload: WebhookPayload, userId?: string) {
+async function trackProTrial(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) !== 'trialing') return
     const subId = String(payload?.data?.id ?? '')
+    // Durable funnel step (subscription_events): the 14-day Polar trial actually
+    // started. Once per teacher — subscription.updated redeliveries stay silent.
+    await recordTeacherTrialFunnelStep({
+      userId,
+      eventType: TEACHER_TRIAL_STARTED_EVENT,
+      subscriptionId: subId,
+      payload: { trial_end: trialMarker(payload?.data).trial_end, locale: getLocale(payload) ?? null },
+      dedupe: 'ever',
+    })
     captureFunnel(payload, userId, withRevenue(buildProTrialSucceededEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTrialActivatedEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTrialStartEvent(userId, subId), payload?.data))
@@ -337,7 +360,7 @@ function trackProTrial(payload: WebhookPayload, userId?: string) {
  * Canceled/revoked only. A later paid cancel is not a lapse
  * (`isPolarTrialLapse`). Never throws.
  */
-function trackTrialExpired(payload: WebhookPayload, userId?: string) {
+async function trackTrialExpired(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     const data = payload?.data ?? {}
@@ -350,6 +373,14 @@ function trackTrialExpired(payload: WebhookPayload, userId?: string) {
       current_period_end: periodEnd,
     })) return
     const subId = String(data?.id ?? '')
+    // Durable funnel step: the trial lapsed without converting (once per teacher).
+    await recordTeacherTrialFunnelStep({
+      userId,
+      eventType: TEACHER_TRIAL_EXPIRED_EVENT,
+      subscriptionId: subId,
+      payload: { trial_end: marker.trial_end, status: String(data?.status ?? '') },
+      dedupe: 'ever',
+    })
     captureFunnel(payload, userId, withRevenue(buildTrialExpiredEvent(userId, subId), data))
   } catch (err) {
     console.error('[Polar] trial_expired telemetry threw:', err)
@@ -572,7 +603,7 @@ async function handleCheckoutCompleted(payload: WebhookPayload, userId?: string)
  * Uses subscription_id when Polar sent one (data.id on this event is the
  * checkout id). Never throws.
  */
-function trackCheckoutGrant(payload: WebhookPayload, userId?: string) {
+async function trackCheckoutGrant(payload: WebhookPayload, userId?: string) {
   const data = payload?.data ?? {}
   const subscriptionId = data.subscription_id != null && String(data.subscription_id)
     ? String(data.subscription_id)
@@ -582,6 +613,6 @@ function trackCheckoutGrant(payload: WebhookPayload, userId?: string) {
     ...payload,
     data: { ...data, id: subscriptionId, status: marker.trial ? 'trialing' : 'active' },
   }
-  if (marker.trial) trackProTrial(shaped, userId)
-  else trackProConversion(shaped, userId)
+  if (marker.trial) await trackProTrial(shaped, userId)
+  else await trackProConversion(shaped, userId)
 }

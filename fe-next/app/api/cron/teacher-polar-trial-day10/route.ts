@@ -20,6 +20,10 @@ import {
   buildPolarTrialDay10SentEvent,
   captureProFunnelServerEvent,
 } from '@/lib/education/proFunnelServer';
+import {
+  recordTeacherTrialFunnelStep,
+  TEACHER_TRIAL_EXPIRING_EVENT,
+} from '@/lib/education/teacherTrialFunnel';
 import { captureApiError } from '@/utils/sentry';
 import { withCronLock } from '@/backend/redis/locking';
 
@@ -215,6 +219,15 @@ export async function POST(request: NextRequest) {
         if (markError) {
           logger.error(`[Polar Day10] sent to ${sub.user_id} but could not mark it: ${markError.message}`);
         }
+        // Durable funnel step: the trial entered its expiring window (the notice
+        // above is the proof). Deduped per teacher per day — the send ledger
+        // already guarantees one notice per run bucket.
+        await recordTeacherTrialFunnelStep({
+          userId: sub.user_id,
+          eventType: TEACHER_TRIAL_EXPIRING_EVENT,
+          payload: { bucket, days_left: daysLeft },
+          dedupe: { withinMs: 24 * 60 * 60 * 1000 },
+        });
         try {
           if (!isDayBefore) captureProFunnelServerEvent(buildPolarTrialDay10SentEvent(sub.user_id, daysLeft));
         } catch {
