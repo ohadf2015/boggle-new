@@ -14284,6 +14284,8 @@ const en = {
       "weeklyTrialHint": "You're on a Teacher Pro trial. Keep reports and unlimited classes.",
       "weeklyOverCapCta": "Upgrade to Teacher Pro: {{price}}/mo",
       "weeklyOverCapHint": "You're over the free class or student cap. Teacher Pro lifts it.",
+      "weeklyPracticeCta": "Upgrade to Teacher Pro: {{price}}/mo",
+      "weeklyPracticeHint": "Your students practiced this week! Keep the momentum with unlimited classes and analytics.",
       "classroomWeekTitle": "This week in your classroom",
       "classroomWeekSubtitle": "Practice totals for students active in the last 7 days.",
       "classroomWeekRegion": "This week in {{classroom}}",

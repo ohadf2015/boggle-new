@@ -84,14 +84,16 @@ export function shouldShowDigestUpgradeCta({
   isTrialing,
   trialExpired,
   overFreeTierCaps,
+  hasPracticedThisWeek = false,
 }: {
   isPaidPro: boolean;
   isTrialing: boolean;
   trialExpired: boolean;
   overFreeTierCaps: boolean;
+  hasPracticedThisWeek?: boolean;
 }): boolean {
   if (isPaidPro) return false;
-  return isTrialing || trialExpired || overFreeTierCaps;
+  return isTrialing || trialExpired || overFreeTierCaps || Boolean(hasPracticedThisWeek);
 }
 
 const pct = (num: number, den: number): number | null =>

@@ -1,11 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Crown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import {
+  beaconTeacherProUpgradeShown,
+  beaconTeacherProUpgradeClicked,
+} from '@/lib/education/teacherProUpgradeBeacon';
 import { cn } from '@/lib/utils';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 import { hasProAccess } from '@/lib/education/teacherPlanGate';
@@ -17,8 +21,21 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
   const pro = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
   const limit = FREE_TIER_LIMITS.classes;
-  if (pro.loading || hasProAccess(pro, nowMs) || count < limit - 1) return null;
-  const full = count >= limit;
+  const isBlocked = pro.loading || hasProAccess(pro, nowMs) || count < limit - 1;
+  const full = !isBlocked && count >= limit;
+
+  useEffect(() => {
+    if (!full) return;
+    beaconTeacherProUpgradeShown({
+      placement: 'class_cap_meter',
+      reason: 'free_tier_limit',
+      count,
+      limit,
+      locale: language,
+    });
+  }, [full, count, limit, language]);
+
+  if (isBlocked) return null;
 
   return (
     <div
@@ -58,7 +75,16 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
           href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
           data-testid="class-cap-cta"
           title={t('eduPlans.cap.cta')}
-          onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'class_cap_meter' })}
+          onClick={() => {
+            trackGrowthEvent('landing_cta_clicked', { cta: 'class_cap_meter' });
+            beaconTeacherProUpgradeClicked({
+              placement: 'class_cap_meter',
+              reason: 'free_tier_limit',
+              count,
+              limit,
+              locale: language,
+            });
+          }}
           className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 max-sm:min-h-9 max-sm:min-w-9 max-sm:px-0 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
         >
           <Crown className="size-4 text-neo-yellow" aria-hidden="true" />

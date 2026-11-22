@@ -15023,6 +15023,8 @@ const es = {
       "weeklyTrialHint": "Estás en la prueba de Teacher Pro. Conserva informes y clases ilimitadas.",
       "weeklyOverCapCta": "Mejora a Teacher Pro — {{price}}/mes",
       "weeklyOverCapHint": "Superaste el límite gratis de clases o estudiantes. Teacher Pro lo quita.",
+      "weeklyPracticeCta": "Mejora a Teacher Pro — {{price}}/mes",
+      "weeklyPracticeHint": "¡Tus estudiantes practicaron esta semana! Mantén el ritmo con clases ilimitadas y analíticas.",
       "classroomWeekTitle": "Esta semana en tu clase",
       "classroomWeekSubtitle": "Totales de práctica de los alumnos activos en los últimos 7 días.",
       "classroomWeekRegion": "Esta semana en {{classroom}}",

@@ -15075,6 +15075,8 @@ const ja = {
       "weeklyTrialHint": "Teacher Proトライアル中です。レポートと無制限クラスを維持できます。",
       "weeklyOverCapCta": "Teacher Proにアップグレード — {{price}}/月",
       "weeklyOverCapHint": "無料のクラスまたは生徒上限を超えています。Teacher Proで解除できます。",
+      "weeklyPracticeCta": "Teacher Proにアップグレード — {{price}}/月",
+      "weeklyPracticeHint": "今週生徒が練習しました！無制限のクラスと詳細な分析で学習を継続しましょう。",
       "classroomWeekTitle": "今週のクラス",
       "classroomWeekSubtitle": "過去7日に練習した生徒の累計です。",
       "classroomWeekRegion": "{{classroom}}の今週",

@@ -204,6 +204,9 @@ const GROWTH_TWIN_EVENTS: ReadonlySet<string> = new Set([
   'edu_teacher_second_live_game_day',
   // Paying-teacher funnel. Server-only, same chokepoint as signup_completed.
   'teacher_funnel_step',
+  // Teacher Pro upgrade demonstrated-value CTAs.
+  'teacher_pro_upgrade_shown',
+  'teacher_pro_upgrade_clicked',
 ]);
 
 /**

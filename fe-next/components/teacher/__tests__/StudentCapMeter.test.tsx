@@ -19,6 +19,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
 const mockTrackGrowthEvent = vi.mocked(trackGrowthEvent);
+const mockBeaconShown = vi.fn();
+const mockBeaconClicked = vi.fn();
+vi.mock('@/lib/education/teacherProUpgradeBeacon', () => ({
+  beaconTeacherProUpgradeShown: (...args: unknown[]) => mockBeaconShown(...args),
+  beaconTeacherProUpgradeClicked: (...args: unknown[]) => mockBeaconClicked(...args),
+}));
 vi.mock('@/components/teacher/ClassLimitUpsellModal', () => ({
   default: ({ isOpen, reason }: { isOpen: boolean; reason?: string }) =>
     isOpen ? <div data-testid="plan-gate-sheet" data-reason={reason ?? ''} /> : null,
@@ -59,6 +65,8 @@ describe('shouldShowStudentCapUpgradeCta', () => {
 describe('StudentCapMeter', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
+    mockBeaconShown.mockClear();
+    mockBeaconClicked.mockClear();
     mockUseTeacherPro.mockReturnValue({
       hasPro: false,
       loading: false,
@@ -87,9 +95,21 @@ describe('StudentCapMeter', () => {
   it('opens the Polar plan-gate sheet at the student cap instead of linking away', () => {
     render(<StudentCapMeter studentCount={FREE_TIER_LIMITS.studentsPerClass} />);
     expect(screen.getByTestId('student-cap-meter')).toHaveAttribute('data-at-cap', 'true');
+    expect(mockBeaconShown).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'student_cap_dashboard',
+      reason: 'free_tier_limit',
+      count: FREE_TIER_LIMITS.studentsPerClass,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+    }));
     const cta = screen.getByTestId('student-cap-upgrade-cta');
     expect(cta).not.toHaveAttribute('href');
     fireEvent.click(cta);
+    expect(mockBeaconClicked).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'student_cap_dashboard',
+      reason: 'free_tier_limit',
+      count: FREE_TIER_LIMITS.studentsPerClass,
+      limit: FREE_TIER_LIMITS.studentsPerClass,
+    }));
     expect(screen.getByTestId('plan-gate-sheet')).toHaveAttribute('data-reason', 'student_limit');
   });
 

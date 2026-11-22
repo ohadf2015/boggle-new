@@ -14960,6 +14960,8 @@ const he = {
       "weeklyTrialHint": "אתם בניסיון פרו למורים. שמרו על דוחות וכיתות ללא הגבלה.",
       "weeklyOverCapCta": "שדרוג לפרו למורים — {{price}} לחודש",
       "weeklyOverCapHint": "עברתם את מגבלת הכיתות או התלמידים בחינם. פרו למורים מסיר אותה.",
+      "weeklyPracticeCta": "שדרוג לפרו למורים — {{price}} לחודש",
+      "weeklyPracticeHint": "התלמידים שלכם התאמנו השבוע! המשיכו את התנופה עם כיתות ללא הגבלה ואנליטיקה.",
       "classroomWeekTitle": "השבוע בכיתה שלך",
       "classroomWeekSubtitle": "סיכום תרגול של תלמידים שהיו פעילים ב-7 הימים האחרונים.",
       "classroomWeekRegion": "השבוע ב{{classroom}}",
