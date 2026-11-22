@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { LineChart, Send } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import type { Language } from '@/lib/supabase/education/types';
 import { useRealtimeClassroomProgress } from '@/hooks/useRealtimeClassroomProgress';
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { ClassReportHeader } from '@/components/teacher/reports/ClassReportHeader';
@@ -30,7 +31,7 @@ import { REPORT_TABS, type ReportTab } from './reportParams';
 
 interface ReportsClassViewProps {
   classroomId: string;
-  classroom: { name: string; member_count?: number; language?: string } | undefined;
+  classroom: { name: string; member_count?: number; language?: Language } | undefined;
   section: ReportTab;
   onSectionChange: (tab: ReportTab) => void;
   weekPanel: ReactNode;

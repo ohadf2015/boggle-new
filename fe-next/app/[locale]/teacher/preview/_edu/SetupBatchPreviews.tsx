@@ -77,6 +77,7 @@ export function ClassPagePreview({ v }: { v?: string }) {
     players: [{ name: f.me, score: 64 }, { name: f.shortRival, score: 60 }],
     participation: { played: 11, roster: 12 },
     coveragePct: 83,
+    totalLessonWords: 12,
   };
   return (
     <PreviewTeacherAuth>
