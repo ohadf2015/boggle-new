@@ -11,7 +11,6 @@ import HeaderLogo from './header/HeaderLogo';
 import HeaderBackButton from './header/HeaderBackButton';
 import HeaderDesktopControls from './header/HeaderDesktopControls';
 import HeaderMobileMenu from './header/HeaderMobileMenu';
-import HeaderClassButton from './header/HeaderClassButton';
 
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
 const AdminGiftModal = dynamic(() => import('./gift/AdminGiftModal').then(m => m.AdminGiftModal), { ssr: false });
@@ -141,9 +140,6 @@ const Header = memo<HeaderProps>(({ className = '' }) => {
                         onSignIn={openSignIn}
                         onSignUp={openSignUp}
                     />
-
-                    {/* Teachers: one-tap way into the class dashboard on phones. */}
-                    <HeaderClassButton />
 
                     <HeaderProfileEntry />
 

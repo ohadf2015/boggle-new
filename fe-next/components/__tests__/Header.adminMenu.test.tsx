@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Header from '../Header';
@@ -43,6 +43,7 @@ const mockAuthContext = {
   isAuthenticated: true,
   isAdmin: true,
   profile: {
+    user_role: 'student' as string,
     username: 'ohad',
     total_coins: 1000,
     total_xp: 500,
@@ -121,6 +122,19 @@ describe('Header Admin Menu', () => {
     // Reset mocks
     vi.clearAllMocks();
     mockAuthContext.isAdmin = true;
+    mockAuthContext.profile.user_role = 'student';
+  });
+
+  it('Given a teacher, Then the bar has no class button and the drawer links to their classroom', async () => {
+    mockAuthContext.profile.user_role = 'teacher';
+    const user = userEvent.setup();
+    render(<Header />);
+    expect(screen.queryByTestId('header-my-class')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: /common.openMenu/i }));
+    const drawer = await screen.findByTestId('mobile-menu-drawer');
+    const link = within(drawer).getByText('education.nav.myClassroom').closest('a');
+    expect(link).toHaveAttribute('href', '/en/teacher');
   });
 
   describe('Unified side-drawer menu (mobile + desktop)', () => {
