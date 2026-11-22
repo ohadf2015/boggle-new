@@ -1,7 +1,7 @@
 'use client';
 
 import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
-import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject } from 'react';
+import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject, type AnimationEvent } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
 import { StudentRankRail } from '@/components/education/StudentRankRail';
@@ -48,6 +48,7 @@ import { WordHuntTargetArea } from '../../WordHuntTargetArea';
 import { WordHuntLifeBar } from '../../WordHuntLifeBar';
 import { WordHuntPlayerLives } from '../../WordHuntPlayerLives';
 import { ComboMilestoneAnnouncement } from '../../ComboMilestoneAnnouncement';
+import { MILESTONE_KEYS } from '../../comboMilestones';
 import { ScreenFlashOverlay } from '../../ScreenFlashOverlay';
 import { useHapticsEnabled, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
@@ -319,23 +320,36 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
+  const [floatingPopKey, setFloatingPopKey] = useState(0);
 
   // Mythic combo screen shake — triggers a brief shake on the game container
   // when combo reaches 7+ (mythic tier). The effect fires on each combo level
   // increase while in the mythic range, not just the first time.
   const prevComboRef = useRef(comboLevel);
-  const [comboShakeKey, setComboShakeKey] = useState(0);
+  const [isComboShaking, setIsComboShaking] = useState(false);
+  // Flash only on combo milestones, at most once per 600ms (WCAG 2.3.1)
+  const [comboFlashKey, setComboFlashKey] = useState(0);
+  const lastFlashAtRef = useRef(0);
   useEffect(() => {
-    if (comboLevel >= 7 && comboLevel > prevComboRef.current && !reduceMotion) {
-      setComboShakeKey(k => k + 1);
+    if (comboLevel > prevComboRef.current && !reduceMotion) {
+      if (comboLevel >= 7) setIsComboShaking(true);
+      const now = Date.now();
+      if (comboLevel in MILESTONE_KEYS && now - lastFlashAtRef.current >= 600) {
+        lastFlashAtRef.current = now;
+        setComboFlashKey(k => k + 1);
+      }
     }
     prevComboRef.current = comboLevel;
   }, [comboLevel, reduceMotion]);
+  const handleComboShakeEnd = useCallback((e: AnimationEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) setIsComboShaking(false);
+  }, []);
 
   // Trigger floating score animation when word is accepted
   useEffect(() => {
     if (currentFeedback?.type === 'accepted' && currentFeedback.score) {
       setFloatingScore(currentFeedback.score);
+      setFloatingPopKey(k => k + 1);
       setIsFireRoundScore(currentFeedback.fireRoundActive ?? false);
     }
   }, [currentFeedback]);
@@ -412,7 +426,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       {isPlaying && !mpChrome && (
         <>
           <ComboMilestoneAnnouncement comboLevel={comboLevel} />
-          {!reduceMotion && <ScreenFlashOverlay trigger={foundWords.length} />}
+          {!reduceMotion && <ScreenFlashOverlay trigger={comboFlashKey} />}
         </>
       )}
 
@@ -422,6 +436,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       {isPlaying && !mpChrome && (
         <FloatingScoreAnimation
           score={floatingScore}
+          popKey={floatingPopKey}
           isFireRound={isFireRoundScore}
           onAnimationComplete={handleScoreAnimationComplete}
         />
@@ -443,14 +458,14 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         t={t}
       />
 
-      <div className={mpChrome ? cn(MP_CHROME_ROOT_CLASS, comboShakeKey > 0 && 'animate-combo-shake') : cn(
+      <div className={mpChrome ? cn(MP_CHROME_ROOT_CLASS, isComboShaking && 'animate-combo-shake') : cn(
         'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-[gap,padding,transform,opacity] duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
         // In the MP shell the canvas is just the board column — don't run the
         // internal lg: 3-column split (the shell supplies the side rails).
         !inDesktopShell && 'lg:flex-row lg:items-stretch lg:justify-center',
         // Screen shake on mythic combo (7+)
-        comboShakeKey > 0 && 'animate-combo-shake',
-      )}>
+        isComboShaking && 'animate-combo-shake',
+      )} onAnimationEnd={handleComboShakeEnd}>
         {/* Mobile Header */}
         {!mpChrome && <GameHeader
           onExitRoom={onExitRoom}

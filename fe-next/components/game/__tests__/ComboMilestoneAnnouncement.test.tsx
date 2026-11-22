@@ -68,6 +68,35 @@ describe('ComboMilestoneAnnouncement', () => {
     expect(screen.queryByText('NICE!')).not.toBeInTheDocument();
   });
 
+  it('hides 1200ms after the latest milestone even when combo changes again before it ends', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={3} />);
+    act(() => { vi.advanceTimersByTime(600); });
+    rerender(<ComboMilestoneAnnouncement comboLevel={4} />);
+    act(() => { vi.advanceTimersByTime(600); });
+    expect(screen.queryByText('NICE!')).not.toBeInTheDocument();
+  });
+
+  it('restarts the hide timer on a new milestone', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={3} />);
+    act(() => { vi.advanceTimersByTime(1000); });
+    rerender(<ComboMilestoneAnnouncement comboLevel={5} />);
+    act(() => { vi.advanceTimersByTime(1000); });
+    expect(screen.getByText('FIRE!')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.queryByText('FIRE!')).not.toBeInTheDocument();
+  });
+
+  it('uses solid colors (no gradients) and a polite live region', () => {
+    const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
+    rerender(<ComboMilestoneAnnouncement comboLevel={25} />);
+    const milestone = screen.getByText('TRANSCENDENT!');
+    expect(milestone.className).not.toContain('gradient');
+    expect(milestone.className).toContain('shadow-hard');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+  });
+
   it('applies neo-brutalist gradient styling', () => {
     const { rerender } = render(<ComboMilestoneAnnouncement comboLevel={0} />);
     rerender(<ComboMilestoneAnnouncement comboLevel={10} />);

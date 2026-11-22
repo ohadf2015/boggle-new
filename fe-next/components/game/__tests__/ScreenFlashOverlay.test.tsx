@@ -40,6 +40,13 @@ describe('ScreenFlashOverlay', () => {
     expect(flash.className).toContain('pointer-events-none');
   });
 
+  it('defaults to a neo token, not raw white', () => {
+    render(<ScreenFlashOverlay trigger={1} />);
+    const cls = screen.getByTestId('screen-flash').className;
+    expect(cls).toContain('bg-neo-');
+    expect(cls).not.toContain('bg-white');
+  });
+
   it('applies custom colorClass', () => {
     render(<ScreenFlashOverlay trigger={1} colorClass="bg-red-500" />);
     expect(screen.getByTestId('screen-flash').className).toContain('bg-red-500');

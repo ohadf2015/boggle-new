@@ -3,17 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { MILESTONE_KEYS } from './comboMilestones';
 import { useLanguage } from '@/contexts/LanguageContext';
-
-const MILESTONE_KEYS: Record<number, string> = {
-  3: 'combo.milestones.nice',
-  5: 'combo.milestones.fire',
-  7: 'combo.milestones.mythic',
-  10: 'combo.milestones.godlike',
-  15: 'combo.milestones.legendary',
-  20: 'combo.milestones.mythicStreak',
-  25: 'combo.milestones.transcendent',
-};
 
 interface ComboMilestoneAnnouncementProps {
   comboLevel: number;
@@ -27,18 +18,19 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
   const { t } = useLanguage();
   const [milestone, setMilestone] = useState<string | null>(null);
   const prevComboRef = useRef(comboLevel);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const key = MILESTONE_KEYS[comboLevel];
     if (comboLevel > prevComboRef.current && key) {
       setMilestone(t(key));
-      const timer = setTimeout(() => setMilestone(null), 1200);
-      prevComboRef.current = comboLevel;
-      return () => clearTimeout(timer);
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = setTimeout(() => setMilestone(null), 1200);
     }
     prevComboRef.current = comboLevel;
-    return undefined;
   }, [comboLevel, t]);
+
+  useEffect(() => () => clearTimeout(hideTimerRef.current), []);
 
   return (
     <AnimatePresence>
@@ -50,17 +42,14 @@ export function ComboMilestoneAnnouncement({ comboLevel }: ComboMilestoneAnnounc
           transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="absolute top-40 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
           role="status"
-          aria-live="assertive"
-          aria-label={`Combo ${comboLevel}x - ${milestone}`}
+          aria-live="polite"
         >
           <div className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard font-black text-lg uppercase tracking-wider',
-            comboLevel >= 25 ? 'bg-linear-to-r from-neo-lime-light via-neo-cream to-neo-lime-light text-neo-black animate-pulse' :
-            comboLevel >= 20 ? 'bg-linear-to-r from-neo-purple via-neo-pink to-neo-purple text-neo-white' :
-            comboLevel >= 15 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 10 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 7 ? 'bg-linear-to-r from-neo-pink via-neo-cyan to-neo-lime text-neo-black' :
-            comboLevel >= 5 ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black' :
+            comboLevel >= 25 ? 'bg-neo-lime text-neo-black animate-pulse' :
+            comboLevel >= 20 ? 'bg-neo-purple text-neo-white' :
+            comboLevel >= 7 ? 'bg-neo-pink text-neo-black' :
+            comboLevel >= 5 ? 'bg-neo-lime text-neo-black' :
             'bg-neo-cyan text-neo-black'
           )}>
             {milestone}
