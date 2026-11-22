@@ -76,7 +76,7 @@ describe('ClassroomStrip — role-aware My classroom card', () => {
     expect(useStudentSpy).not.toHaveBeenCalled();
     auth = teacher;
     rerender(<ClassroomStrip lang="en" t={t} />);
-    expect(variant()).toBe('teacher');
+    expect(screen.queryByTestId('hp-classroom')).toBeNull();
   });
 
   it('Given a guest, then the frame element is the same one across loading → pitch (no remount, no layout jump)', () => {
@@ -91,55 +91,10 @@ describe('ClassroomStrip — role-aware My classroom card', () => {
     expect(section().className).toContain('min-h-');
   });
 
-  it('Given a teacher with classes, then My classroom shows the newest class, students, code, Start and Open', () => {
+  it('Given a teacher, then this lower card renders nothing (their class is in the top bar)', () => {
     auth = teacher;
     render(<ClassroomStrip lang="en" t={t} />);
-    expect(variant()).toBe('teacher');
-    expect(screen.getByRole('heading')).toHaveTextContent('homeFresh.sections.classrooms.myTitle');
-    expect(screen.getByText('5B Words')).toBeInTheDocument();
-    expect(screen.getByText('homeFresh.sections.classrooms.studentsCount:24')).toBeInTheDocument();
-    expect(screen.getByText('QX7K2P')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /homeFresh.sections.classrooms.startGame/ })).toHaveAttribute(
-      'href',
-      '/en/education/classroom-game?classroomId=c1'
-    );
-    expect(screen.getByRole('link', { name: /homeFresh.sections.classrooms.openClassroom/ })).toHaveAttribute('href', '/en/teacher');
-  });
-
-  it('Given a teacher, when they tap Start, then home_my_class_start is tracked', () => {
-    auth = teacher;
-    render(<ClassroomStrip lang="en" t={t} />);
-    fireEvent.click(screen.getByRole('link', { name: /homeFresh.sections.classrooms.startGame/ }));
-    expect(track).toHaveBeenCalledWith('home_my_class_start', { role: 'teacher' });
-  });
-
-  it('Given a teacher, when they copy the join code, then the clipboard gets it and the chip says copied', async () => {
-    auth = teacher;
-    const writeText = vi.fn().mockResolvedValue(undefined);
-    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
-    render(<ClassroomStrip lang="en" t={t} />);
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'homeFresh.sections.classrooms.copyCode' }));
-    });
-    expect(writeText).toHaveBeenCalledWith('QX7K2P');
-    expect(screen.getByRole('button')).toHaveTextContent('homeFresh.sections.classrooms.copied');
-  });
-
-  it('Given a teacher whose class list is loading, then the skeleton holds the frame', () => {
-    auth = teacher;
-    classrooms = { classrooms: [], isLoading: true, error: null };
-    render(<ClassroomStrip lang="en" t={t} />);
-    expect(variant()).toBe('loading');
-  });
-
-  it('Given a teacher with no classes (or a failed read), then a simple My classroom + Open classroom card shows', () => {
-    auth = teacher;
-    classrooms = { classrooms: [], isLoading: false, error: 'boom' };
-    render(<ClassroomStrip lang="en" t={t} />);
-    expect(variant()).toBe('teacher-simple');
-    expect(screen.getByRole('heading')).toHaveTextContent('homeFresh.sections.classrooms.myTitle');
-    expect(screen.getByRole('link', { name: /homeFresh.sections.classrooms.openClassroom/ })).toHaveAttribute('href', '/en/teacher');
-    expect(screen.queryByRole('link', { name: /startGame/ })).toBeNull();
+    expect(screen.queryByTestId('hp-classroom')).toBeNull();
   });
 
   it('Given a student in a class, then My class shows the class name and Open my class', () => {

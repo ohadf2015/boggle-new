@@ -1666,6 +1666,7 @@ const en = {
         "copyCode": "Copy join code",
         "copied": "Copied",
         "startGame": "Start a class game",
+        "startShort": "Start",
         "openClassroom": "Open classroom",
         "simpleLine": "Your classes, games and reports, all in one place.",
         "studentTitle": "My class",

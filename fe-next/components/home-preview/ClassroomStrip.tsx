@@ -3,18 +3,16 @@
 import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Check, Copy, Users } from 'lucide-react';
+import { ArrowRight, Check, Copy } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useClassrooms } from '@/hooks/useClassroom';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { useScrollReveal } from '@/lib/animation/useScrollReveal';
-import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
-export type Variant = 'loading' | 'pitch' | 'teacher' | 'teacher-simple' | 'student';
+export type Variant = 'loading' | 'pitch' | 'student';
 interface Props { lang: string; t: T }
 
 const noopSubscribe = () => () => {};
@@ -26,51 +24,17 @@ const PRIMARY = cn(
   PRESS
 );
 
-/** The homepage's classroom card: a teacher's own class, a student's class, or the teacher pitch for everyone else. */
+/** The homepage's lower classroom card: a student's class, or the teacher pitch for everyone else. */
 export function ClassroomStrip({ lang, t }: Props) {
   const { isAuthenticated, isTeacher, isAdmin, profile } = useAuth();
   // false on the server and during hydration, so both renders agree (skeleton); the real value lands right after.
   const noStoredSession = useSyncExternalStore(noopSubscribe, () => !hasSupabaseSession(), () => false);
 
-  if (isAuthenticated && profile && (isTeacher || isAdmin)) return <TeacherCard lang={lang} t={t} />;
+  // Teachers get their class in the top bar (TeacherClassEntryCard), so nothing here.
+  if (isAuthenticated && profile && (isTeacher || isAdmin)) return null;
   if (isAuthenticated && profile) return <StudentCard lang={lang} t={t} />;
   // A stored session (or a profile still on its way) may be a teacher: hold the frame, never flash the pitch.
   return <Frame variant={!isAuthenticated && noStoredSession ? 'pitch' : 'loading'} lang={lang} t={t} />;
-}
-
-function TeacherCard({ lang, t }: Props) {
-  const { classrooms, isLoading } = useClassrooms();
-  if (isLoading) return <Frame variant="loading" lang={lang} t={t} />;
-  // Ordered newest-created first.
-  const newest = classrooms[0];
-  if (!newest) return <Frame variant="teacher-simple" lang={lang} t={t} />;
-  return <TeacherClassView lang={lang} t={t} classroom={newest} />;
-}
-
-export function TeacherClassView({ lang, t, classroom: newest }: Props & { classroom: { id: string; name: string; join_code: string; member_count: number } }) {
-  return (
-    <Frame variant="teacher" lang={lang} t={t} mascot="edu-gameStart">
-      <p className="mt-0.5 truncate font-neo-display text-xl font-bold leading-tight lg:text-3xl">{newest.name}</p>
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        <span className="inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-neo-cream px-2 py-1 text-sm font-bold">
-          <Users className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
-          {t('homeFresh.sections.classrooms.studentsCount', { count: newest.member_count })}
-        </span>
-        <CopyCode code={newest.join_code} t={t} />
-      </div>
-      <div className={cn(ACTIONS, 'flex flex-wrap items-center gap-x-4 gap-y-2')}>
-        <Link
-          href={teacherHostHref(lang, { classroomId: newest.id })}
-          onClick={() => trackLandingCtaClick('home_my_class_start', { role: 'teacher' })}
-          className={PRIMARY}
-        >
-          {t('homeFresh.sections.classrooms.startGame')}
-          <ArrowRight className="h-5 w-5 shrink-0 rtl:-scale-x-100" strokeWidth={3} aria-hidden="true" />
-        </Link>
-        <OpenLink href={`/${lang}/teacher`} role="teacher">{t('homeFresh.sections.classrooms.openClassroom')}</OpenLink>
-      </div>
-    </Frame>
-  );
 }
 
 function StudentCard({ lang, t }: Props) {
@@ -99,8 +63,6 @@ export function StudentClassView({ lang, t, name }: Props & { name: string | nul
 const TITLES: Record<Variant, string> = {
   loading: '',
   pitch: 'homeFresh.sections.classrooms.title',
-  teacher: 'homeFresh.sections.classrooms.myTitle',
-  'teacher-simple': 'homeFresh.sections.classrooms.myTitle',
   student: 'homeFresh.sections.classrooms.studentTitle',
 };
 
@@ -127,7 +89,7 @@ export function Frame({ variant, lang, t, mascot = 'edu-firstClass', children }:
         {loading ? (
           <span aria-hidden="true" className="h-16 w-16 shrink-0 rounded-2xl bg-black/10 lg:h-40 lg:w-40" />
         ) : (
-          <Image src={`/mascot/edu/${mascot}-512.webp`} alt="" width={512} height={512} className={cn('h-16 w-16 shrink-0 -rotate-3 lg:block lg:h-40 lg:w-40', variant === 'teacher' && 'hidden')} />
+          <Image src={`/mascot/edu/${mascot}-512.webp`} alt="" width={512} height={512} className={cn('h-16 w-16 shrink-0 -rotate-3 lg:block lg:h-40 lg:w-40')} />
         )}
         <div className="min-w-0 flex-1 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-x-10">
           {loading ? (
@@ -156,19 +118,6 @@ export function Frame({ variant, lang, t, mascot = 'edu-firstClass', children }:
                   </Link>
                 </>
               ) : null}
-              {variant === 'teacher-simple' ? (
-                <>
-                  <p className="mt-1 text-sm font-medium lg:text-lg">{t('homeFresh.sections.classrooms.simpleLine')}</p>
-                  <Link
-                    href={`/${lang}/teacher`}
-                    onClick={() => trackLandingCtaClick('home_my_class_open', { role: 'teacher' })}
-                    className={cn(PRIMARY, ACTIONS)}
-                  >
-                    {t('homeFresh.sections.classrooms.openClassroom')}
-                    <ArrowRight className="h-5 w-5 shrink-0 rtl:-scale-x-100" strokeWidth={3} aria-hidden="true" />
-                  </Link>
-                </>
-              ) : null}
             </>
           )}
         </div>
@@ -177,19 +126,7 @@ export function Frame({ variant, lang, t, mascot = 'edu-firstClass', children }:
   );
 }
 
-function OpenLink({ href, role, children }: { href: string; role: string; children: ReactNode }) {
-  return (
-    <Link
-      href={href}
-      onClick={() => trackLandingCtaClick('home_my_class_open', { role })}
-      className="font-neo-display text-base font-bold underline decoration-[3px] underline-offset-4 lg:text-lg"
-    >
-      {children}
-    </Link>
-  );
-}
-
-function CopyCode({ code, t }: { code: string; t: T }) {
+export function CopyCode({ code, t, compact = false }: { code: string; t: T; compact?: boolean }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
     void navigator.clipboard?.writeText(code).then(() => setCopied(true), () => {});
@@ -199,7 +136,7 @@ function CopyCode({ code, t }: { code: string; t: T }) {
       type="button"
       onClick={copy}
       aria-label={t('homeFresh.sections.classrooms.copyCode')}
-      className={cn('inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-neo-navy px-2 py-1 text-sm font-bold text-neo-cream', PRESS)}
+      className={cn('inline-flex items-center gap-1.5 rounded-lg border-2 border-black bg-neo-navy font-bold text-neo-cream', compact ? 'px-1.5 py-0.5 text-xs' : 'px-2 py-1 text-sm', PRESS)}
     >
       <span dir="ltr" className="font-mono tracking-widest">{code}</span>
       <span aria-live="polite" className="inline-flex items-center gap-1 text-neo-lime">
