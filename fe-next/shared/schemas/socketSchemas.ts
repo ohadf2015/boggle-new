@@ -168,6 +168,7 @@ export const CreateGameSchema = z.object({
   // friend rooms are public in code too, and friends playing 1v1 did not ask
   // for a third seat.
   isQuickPlay: z.boolean().optional().default(false),
+  visibility: z.enum(['public', 'friends', 'private']).optional().default('public'),
 });
 
 /**

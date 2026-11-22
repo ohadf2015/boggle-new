@@ -43,7 +43,7 @@ import { readPreviousInAppPath, useHeldMpExit } from '@/hooks/useMpExit';
 import { resolveMpPagePhase } from '@/lib/multiplayer/mpPhase';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { ENTRY_HIDES_GLOBAL_CHROME } from '@/components/multiplayer/entry/entryChrome';
-import type { Language, ActiveRoom, GameMode } from '@/shared/types/game';
+import type { Language, ActiveRoom, GameMode, RoomVisibility } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
 import { useMultiplayerJoin } from './useMultiplayerJoin';
 import { useQuickPlayIntent } from './useQuickPlayIntent';
@@ -75,6 +75,7 @@ export function useMpPageState() {
   // Classroom flows create rooms with `isPrivate=true`; the server echoes the
   // flag in `joined` so the lobby can hide invite/share UI for them.
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const [roomVisibility, setRoomVisibility] = useState<RoomVisibility>('public');
   const [error, setError] = useState<string>('');
   const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
   const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
@@ -335,7 +336,7 @@ export function useMpPageState() {
   } = useMpRoomSocket({
     language: language as Language, gameCode, username, roomName, isActive, isHost, roomLanguage,
     prefilledRoomCode, t,
-    setIsHost, setIsActive, setIsPrivate, setError, setIsJoining, setShouldAutoJoin, setPrefilledRoomCode,
+    setIsHost, setIsActive, setIsPrivate, setRoomVisibility, setError, setIsJoining, setShouldAutoJoin, setPrefilledRoomCode,
     setRoomLanguage, setUsername, setGameCode, setRoomName, setActiveRooms, setIsSpectator, setSpectators,
     setPlayersInRoom, setPlayersInRoomThrottled, setPendingGameStart, setGameStartTime, setShowResults,
     setResultsData, setHostLeftState, onMatchStart: mpSounds.onMatchStart, roomWaitHold: roomWait.hold,
@@ -451,7 +452,7 @@ export function useMpPageState() {
       setGameCode, setUsername, setRoomName, setHostUsername,
     },
     playersInRoom, handleShowResults, pendingGameStart, handleGameStartConsumed, lessonData,
-    isPrivate, quickPlay, classroomLive,
+    isPrivate, roomVisibility, quickPlay, classroomLive,
   };
 
   return {

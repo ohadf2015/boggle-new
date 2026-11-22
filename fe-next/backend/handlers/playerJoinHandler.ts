@@ -313,6 +313,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       roomName: game.roomName,
       language: game.language,
       isPrivate: game.isPrivate || false,
+      visibility: game.visibility || 'public',
       users: getGameUsers(gameCode),
       gameInProgress
     });

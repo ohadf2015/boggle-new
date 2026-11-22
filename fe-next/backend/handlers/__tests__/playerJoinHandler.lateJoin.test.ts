@@ -305,6 +305,14 @@ describe('PlayerJoinHandler — joining while the results screen is up (session 
     expect(joined![1]).toMatchObject({ success: true, gameInProgress: false });
     expect(handleLateJoin).not.toHaveBeenCalled();
   });
+
+  it('Given a friends-only room, When a player joins by code, Then joined carries the same visibility the host got', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'finished', visibility: 'friends' }));
+    const { socket, join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Straggler' });
+    const joined = (socket.emit as ReturnType<typeof vi.fn>).mock.calls.find((c) => c[0] === 'joined');
+    expect(joined![1]).toMatchObject({ visibility: 'friends' });
+  });
 });
 
 describe('PlayerJoinHandler — late-join recovery flag', () => {

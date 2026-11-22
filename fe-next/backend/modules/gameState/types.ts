@@ -3,7 +3,7 @@
  * Centralized type definitions for game state management
  */
 
-import type { LetterGrid, Language, GameMode, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
+import type { LetterGrid, Language, GameMode, RoomVisibility, BlastModeState as SharedBlastModeState, WordHuntModeState as SharedWordHuntModeState, WheelRushModeState as SharedWheelRushModeState, CrosswordMpModeState as SharedCrosswordMpModeState } from '@/shared/types/game';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { VersusMatchState } from '@/lib/wordTower/versusMatch';
 import type { WordcraftLiveSession } from '../wordcraftClassroomManager';
@@ -117,6 +117,7 @@ export interface GameState {
   isClassroom: boolean;
   /** Quick Play made this room (the duo bot only joins these). */
   isQuickPlay?: boolean;
+  visibility: RoomVisibility;
   /**
    * The teacher's pressure dials, resolved once at round start from the
    * classroom record and stashed HERE so every start-shaped payload of the
@@ -209,6 +210,7 @@ export interface GameCreationData {
   isClassroom?: boolean;
   /** Quick Play made this room (the duo bot only joins these). */
   isQuickPlay?: boolean;
+  visibility?: RoomVisibility;
   allowLateJoin?: boolean;
 }
 

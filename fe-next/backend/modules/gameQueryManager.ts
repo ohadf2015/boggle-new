@@ -4,7 +4,7 @@
  * Extracted from gameStateManager.ts for better modularity
  */
 
-import type { Language, GameMode, GameUser, Spectator, LetterGrid } from '@/shared/types/game';
+import type { Language, GameMode, GameUser, Spectator, LetterGrid, RoomVisibility } from '@/shared/types/game';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
 
 // Game state type
@@ -20,6 +20,7 @@ export interface QueryGameBase {
   isRanked: boolean;
   isPrivate: boolean;
   isClassroom?: boolean;
+  visibility?: RoomVisibility;
   createdAt: number;
   timerSeconds: number;
   lastActivity: number;
@@ -180,7 +181,7 @@ export function getActiveRooms(games: Record<string, QueryGameBase>): GameSummar
     }
 
     if (humanCount === 0) continue;
-    if (game.isPrivate || game.isClassroom) continue;
+    if (game.isPrivate || game.isClassroom || (game.visibility && game.visibility !== 'public')) continue;
 
     result.push({
       gameCode: game.gameCode,

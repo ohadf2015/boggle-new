@@ -86,6 +86,8 @@ export async function saveGameState(gameCode: string, gameData: GameDataInput): 
     isClassroom: String(gameData.isClassroom ?? false),
     // The duo bot only joins Quick Play rooms; a restore must keep that.
     isQuickPlay: String(gameData.isQuickPlay ?? false),
+    // Lost on restore = a private room reappears in the public list.
+    visibility: gameData.visibility || 'public',
     classroomOfferedWords: JSON.stringify(gameData.classroomOfferedWords ?? null),
     allowLateJoin: String(gameData.allowLateJoin ?? true),
     chatHistory: JSON.stringify(gameData.chatHistory || []),
@@ -185,6 +187,7 @@ export async function getGameState(gameCode: string): Promise<GameStateData | nu
       // an arcade room wrongly flagged classroom would wedge host migration.
       isClassroom: data.isClassroom === 'true',
       isQuickPlay: data.isQuickPlay === 'true',
+      visibility: data.visibility === 'friends' || data.visibility === 'private' ? data.visibility : 'public',
       classroomOfferedWords: safeJsonParse<string[] | null>(data.classroomOfferedWords, null, 'classroomOfferedWords', gameCode) ?? undefined,
       allowLateJoin: data.allowLateJoin !== 'false',
       chatHistory: data.chatHistory ? safeJsonParse<unknown[]>(data.chatHistory, [], 'chatHistory', gameCode) : undefined,

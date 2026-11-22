@@ -3,7 +3,7 @@
  * so its phase hooks can share them).
  */
 import type { Language } from '@/types';
-import type { GameMode } from '@/shared/types/game';
+import type { GameMode, RoomVisibility } from '@/shared/types/game';
 import type { ClassroomGameMode } from '@/shared/types/vocabQuiz';
 import type { Player } from './hooks';
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
@@ -61,6 +61,7 @@ export interface HostViewProps {
   autoStart?: boolean;
   /** Private rooms (Quick Play / classroom) hide invite + share affordances. */
   isPrivate?: boolean;
+  roomVisibility?: RoomVisibility;
   /** Quick Play: auto-fill bots + start the moment the lobby mounts. */
   isQuickPlay?: boolean;
   /** SPA reset to lobby (no reload) — see useHostGameActions.onExitToLobby. */

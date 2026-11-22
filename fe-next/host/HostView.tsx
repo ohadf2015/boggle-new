@@ -45,7 +45,7 @@ export type { HostViewProps } from './hostViewTypes';
 
 const HostView: React.FC<HostViewProps> = memo((props) => {
   const {
-    gameCode, username, lessonData, classroomLive = null, isPrivate = false, isQuickPlay = false,
+    gameCode, username, lessonData, classroomLive = null, isPrivate = false, roomVisibility = 'public', isQuickPlay = false,
     isClassroomMode = false,
   } = props;
   const {
@@ -230,6 +230,7 @@ const HostView: React.FC<HostViewProps> = memo((props) => {
           onNameChange={handleHostNameChange}
           onAvatarChange={handleHostAvatarChange}
           isPrivate={isPrivate}
+          roomVisibility={roomVisibility}
           isQuickPlay={isQuickPlay}
         />
         </HostLobbyScreen>

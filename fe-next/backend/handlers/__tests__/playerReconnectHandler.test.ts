@@ -538,6 +538,12 @@ describe('handleReconnection', () => {
       })
     );
   });
+
+  it('Given a private room, When a player reconnects, Then joined still says the room is private', () => {
+    const socket = createMockSocket('socket-new');
+    handleReconnection(mockIo, socket, makeGame({ visibility: 'private' } as any), 'GAME1', 'Player1');
+    expect(socket.emit).toHaveBeenCalledWith('joined', expect.objectContaining({ visibility: 'private' }));
+  });
 });
 
 describe('handleLateJoin', () => {

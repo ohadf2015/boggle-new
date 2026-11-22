@@ -85,6 +85,7 @@ export interface MpPhaseRouterProps {
   handleGameStartConsumed: () => void;
   lessonData: HostViewProps['lessonData'];
   isPrivate: boolean;
+  roomVisibility: HostViewProps['roomVisibility'];
   quickPlay: boolean;
   classroomLive: HostViewProps['classroomLive'];
 }
@@ -119,7 +120,7 @@ export function MpPhaseRouter({
   phase, gameCode, username, isHost, socket, roomLanguage, isClassroomMode, classroomGameMode,
   onExitToLobby, onUsernameChange, resultsData, handleReturnToRoom, gameDuration, seriesTracker, entry,
   playersInRoom, handleShowResults, pendingGameStart, handleGameStartConsumed, lessonData, isPrivate,
-  quickPlay, classroomLive,
+  roomVisibility, quickPlay, classroomLive,
 }: MpPhaseRouterProps): React.JSX.Element {
   if (phase === 'results') {
     const results = buildMpResultsProps({
@@ -151,6 +152,7 @@ export function MpPhaseRouter({
           onGameStartConsumed={handleGameStartConsumed} lessonData={lessonData}
           onUsernameChange={onUsernameChange} autoStart={false}
           isPrivate={isPrivate}
+          roomVisibility={roomVisibility}
           isQuickPlay={quickPlay}
           onExitToLobby={onExitToLobby}
           isClassroomMode={isClassroomMode}

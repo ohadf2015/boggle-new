@@ -31,7 +31,7 @@ import { ingestLessonClaim, ingestLessonClaimsRound } from '@/components/educati
 import { LESSON_WORD_CLAIMED_EVENT } from '@/shared/types/lessonClaims';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { captureSocketError, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
-import type { ActiveRoom, Language, Avatar } from '@/shared/types/game';
+import type { ActiveRoom, Language, Avatar, RoomVisibility } from '@/shared/types/game';
 import { setTeacherPaused, useTeacherPaused } from '@/hooks/useTeacherPause';
 import { useGameStore } from '@/hooks/gameState/store';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
@@ -62,6 +62,7 @@ interface UseMultiplayerSocketOptions {
     language?: Language;
     roomName?: string;
     isPrivate?: boolean;
+    visibility?: RoomVisibility;
     /** The room's seat list — every server `joined` emit carries it (getGameUsers). */
     users?: Array<{ username: string; score?: number; avatar?: Avatar; isHost?: boolean; isBot?: boolean; presenceStatus?: string; isWindowFocused?: boolean }>;
     reconnected?: boolean;

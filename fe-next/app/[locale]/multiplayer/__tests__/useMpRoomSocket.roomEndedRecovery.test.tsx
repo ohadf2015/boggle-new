@@ -44,7 +44,7 @@ function ctx(context: ClassroomContext, overrides: Partial<MpRoomSocketContext> 
   return {
     language: 'en', gameCode: 'ABC123', username: 'me', roomName: '', isActive: false, isHost,
     roomLanguage: null, prefilledRoomCode: '', t: (k: string) => k,
-    setIsHost: vi.fn(), setIsActive: vi.fn(), setIsPrivate: vi.fn(), setError: vi.fn(), setIsJoining: vi.fn(),
+    setIsHost: vi.fn(), setIsActive: vi.fn(), setIsPrivate: vi.fn(), setRoomVisibility: vi.fn(), setError: vi.fn(), setIsJoining: vi.fn(),
     setShouldAutoJoin: vi.fn(), setPrefilledRoomCode: vi.fn(), setRoomLanguage: vi.fn(), setUsername: vi.fn(),
     setGameCode: vi.fn(), setRoomName: vi.fn(), setActiveRooms: vi.fn(), setIsSpectator: vi.fn(), setSpectators: vi.fn(),
     setPlayersInRoom: vi.fn(), setPlayersInRoomThrottled: Object.assign(vi.fn(), { cancel: vi.fn() }),

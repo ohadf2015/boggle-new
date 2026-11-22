@@ -41,6 +41,15 @@ describe('getActiveRooms (the public room list every lobby socket receives)', ()
     expect(codes([game('PUB'), game('PRIV', { isPrivate: true })])).toEqual(['PUB']);
   });
 
+  it('Given friends-only and private rooms, When listed, Then only the public room is listed', () => {
+    expect(codes([
+      game('PUB', { visibility: 'public' }),
+      game('FRND', { visibility: 'friends' }),
+      game('PRIV2', { visibility: 'private' }),
+      game('OLD'),
+    ])).toEqual(['PUB', 'OLD']);
+  });
+
   it('Given a classroom room that is somehow not private, When listed, Then it is still left out', () => {
     expect(codes([game('PUB'), game('CLASS', { isClassroom: true, isPrivate: false })])).toEqual(['PUB']);
   });

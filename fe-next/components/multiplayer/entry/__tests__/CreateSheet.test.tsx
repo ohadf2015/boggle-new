@@ -62,7 +62,7 @@ describe('CreateSheet (via the CreateRoomModal re-export)', () => {
     expect(screen.queryByRole('textbox', { name: en('mpUi.entry.nameAria') })).toBeNull();
     expect(screen.getByText('Guesty')).toBeInTheDocument();
     fireEvent.click(startBattle());
-    expect(onCreate).toHaveBeenCalledWith({ hostUsername: 'Guesty', roomName: 'Guestyʼs Room', language: 'en' });
+    expect(onCreate).toHaveBeenCalledWith({ hostUsername: 'Guesty', roomName: 'Guestyʼs Room', language: 'en', visibility: 'public' });
     expect(setStoredUsername).toHaveBeenCalledWith('Guesty');
     expect(setStoredCustomAvatar).toHaveBeenCalledWith(CFG);
   });

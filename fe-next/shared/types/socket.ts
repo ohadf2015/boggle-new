@@ -5,6 +5,7 @@
 
 import type {
   Language,
+  RoomVisibility,
   LetterGrid,
   Avatar,
   GameUser,
@@ -365,6 +366,7 @@ export interface CreateGamePayload {
   isRanked?: boolean;
   isPrivate?: boolean;
   isClassroom?: boolean;
+  visibility?: RoomVisibility;
 }
 
 export interface JoinGamePayload {
@@ -394,6 +396,8 @@ export interface JoinedPayload {
   roomName: string;
   language: Language;
   users: GameUser[];
+  isPrivate?: boolean;
+  visibility?: RoomVisibility;
   reconnected?: boolean;
   /** True when joining a game already in progress (late join). Lets the client
    *  arm the lost-`startGame` recovery fallback, same as a reconnection. */

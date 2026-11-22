@@ -8,6 +8,7 @@
  */
 import { useState, useCallback, useEffect, useReducer, useRef } from 'react';
 import type { Language, ActiveRoom } from '@/shared/types/game';
+import type { CreateRoomConfig } from './entry/CreateSheet';
 import {
   getOrCreateStoredUsername,
   getStoredUsername,
@@ -304,15 +305,14 @@ export function useMultiplayerFlowState({
 
   // Create from the create sheet
   const handleCreateFromModal = useCallback(
-    (config: { hostUsername: string; roomName: string; language: Language }) => {
+    (config: CreateRoomConfig) => {
       const gameCode = generateGameCode();
       setGameCode(gameCode);
       setRoomName(config.roomName);
       setHostUsername(config.hostUsername);
       setUsername(config.hostUsername);
-      // Username as override avoids a stale closure in handleJoin. Default
-      // visibility = public; private is reserved for the classroom host flow.
-      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername);
+      // Username as override avoids a stale closure in handleJoin.
+      handleJoin(true, config.language, gameCode, config.roomName, config.hostUsername, { visibility: config.visibility });
       // Show CrazyGames invite button so host can invite friends
       cgShowInvite(gameCode);
     },

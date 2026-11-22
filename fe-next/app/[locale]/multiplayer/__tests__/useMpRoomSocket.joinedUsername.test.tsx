@@ -28,7 +28,7 @@ function ctx(overrides: Partial<MpRoomSocketContext> = {}): MpRoomSocketContext 
   return {
     language: 'en', gameCode: 'ABC123', username: 'Noa', roomName: '', isActive: false, isHost: false,
     roomLanguage: null, prefilledRoomCode: '', t: (k: string) => k,
-    setIsHost: noop, setIsActive: noop, setIsPrivate: noop, setError: noop, setIsJoining: noop,
+    setIsHost: noop, setIsActive: noop, setIsPrivate: noop, setRoomVisibility: noop, setError: noop, setIsJoining: noop,
     setShouldAutoJoin: noop, setPrefilledRoomCode: noop, setRoomLanguage: noop, setUsername: vi.fn(),
     setGameCode: noop, setRoomName: noop, setActiveRooms: noop, setIsSpectator: noop, setSpectators: noop,
     setPlayersInRoom: vi.fn(), setPlayersInRoomThrottled: Object.assign(vi.fn(), { cancel: vi.fn() }),

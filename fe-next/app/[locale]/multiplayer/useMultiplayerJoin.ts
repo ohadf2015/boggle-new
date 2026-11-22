@@ -25,7 +25,7 @@ import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { clearHostCreateRefusal, setHostCreateRefusal } from './hostCreateRefusal';
 import { clearSession } from '@/utils/session';
 import { waitForSignedInUser } from './classroomHostSignIn';
-import type { Language, Avatar } from '@/shared/types/game';
+import type { Language, Avatar, RoomVisibility } from '@/shared/types/game';
 import { redialSocket } from '@/lib/multiplayer/redialSocket';
 
 // Hex color validation pattern (must match backend schema)
@@ -113,7 +113,7 @@ export type HandleJoinFn = (
   overrideGameCode?: string,
   overrideRoomName?: string,
   overrideUsername?: string,
-  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean },
+  options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean; visibility?: RoomVisibility },
 ) => Promise<void>;
 
 export function useMultiplayerJoin({
@@ -154,7 +154,7 @@ export function useMultiplayerJoin({
       overrideGameCode?: string,
       overrideRoomName?: string,
       overrideUsername?: string,
-      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean },
+      options?: { isPrivate?: boolean; isClassroom?: boolean; quickPlay?: boolean; autoRetry?: boolean; isRanked?: boolean; visibility?: RoomVisibility },
     ) => {
       if (process.env.NODE_ENV === 'development') {
         console.log(`[JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socketFromProps?.connected}`);
@@ -442,6 +442,7 @@ export function useMultiplayerJoin({
           // The duo bot only joins rooms Quick Play made, never a friend's room.
           ...(options?.quickPlay && { isQuickPlay: true }),
           ...(options?.isRanked && { isRanked: true }),
+          ...(options?.visibility && { visibility: options.visibility }),
         });
 
         // Remember how to get back into this room after a socket reconnect
