@@ -83,20 +83,23 @@ describe('PlayHero', () => {
     expect(screen.queryByTestId('hp-chip-mp')).toBeNull();
   });
 
-  it('given the hero, then "Play with friends" is a big button right after PLAY, before the solo modes', () => {
+  it('given the hero, then the daily puzzle is the big first button and PLAY + friends share one smaller row', () => {
     renderHero({ lang: 'he' });
-    const friends = screen.getByTestId('hp-play-friends');
-    expect(friends.getAttribute('href')).toBe('/he/multiplayer');
-    expect(friends.textContent).toContain(en.homePlay.friendsPlay);
-    expect(friends.textContent).toContain(en.homePlay.friendsPlaySub);
+    const daily = screen.getByTestId('hp-chip-daily');
     const play = screen.getByTestId('hp-play');
+    const friends = screen.getByTestId('hp-play-friends');
     const keycaps = screen.getByTestId('hp-keycaps');
-    // Document order: PLAY, then friends, then the solo mode keys.
+    expect(friends.getAttribute('href')).toBe('/he/multiplayer');
+    expect(friends.textContent).toBe(en.homePlay.friendsPlay);
+    expect(daily.compareDocumentPosition(play) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(play.compareDocumentPosition(friends) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(friends.compareDocumentPosition(keycaps) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    // Same hard-shadow button family as PLAY, in the multiplayer pink.
+    expect(play.parentElement).toBe(friends.parentElement);
+    expect(daily.className).toContain('bg-neo-orange');
+    expect(daily.className).toContain('shadow-hard');
+    // Quick play steps back: outlined on the dark surface, not a lime slab.
+    expect(play.className).not.toContain('bg-neo-lime');
     expect(friends.className).toContain('bg-neo-pink');
-    expect(friends.className).toContain('shadow-hard');
   });
 
   it('given the hero, when "Play with friends" is tapped, then the click is tracked', () => {
@@ -178,12 +181,11 @@ describe('PlayHero', () => {
   // Small bold sub-lines are normal text for WCAG, so they need 4.5:1. The text is
   // black faded by an opacity-NN class over the button's solid fill.
   it.each([
-    ['hp-play', 'homePlay.playSub', '#bfff00'],
-    ['hp-play-friends', 'homePlay.friendsPlaySub', '#ff1493'],
+    ['hp-chip-daily', 'homePlay.chipStreak', '#ff6b35'],
   ])('given the %s button, then its sub-line reaches 4.5:1 contrast on the button fill', (testId, key, fill) => {
-    renderHero();
-    const sub = screen.getByTestId(testId).querySelector('span span:last-child') as HTMLElement;
-    expect(sub.textContent).toBe(t(key));
+    renderHero({ streak: 3 });
+    const sub = screen.getByTestId(testId).querySelector('[data-sub]') as HTMLElement;
+    expect(sub.textContent).toBe(t(key, { n: 3 }));
     const match = sub.className.match(/(?:^|\s)opacity-(\d+)(?:\s|$)/);
     const alpha = match ? Number(match[1]) / 100 : 1;
     expect(contrastOfFadedBlack(alpha, fill)).toBeGreaterThanOrEqual(4.5);
