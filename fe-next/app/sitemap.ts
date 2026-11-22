@@ -535,6 +535,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   const seoLandings = [
     { locale: 'en', path: '/daily-word-wheel', img: 'en' },
     { locale: 'en', path: '/words-with-friends-alternative', img: 'en' },
+    { locale: 'en', path: '/boggle-with-friends-alternative', img: 'en' },
     { locale: 'en', path: '/online-word-games-with-friends', img: 'en' },
     { locale: 'en', path: '/free-multiplayer-word-game', img: 'en' },
     { locale: 'en', path: '/play-boggle-online-free', img: 'en' },

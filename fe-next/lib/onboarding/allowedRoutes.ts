@@ -54,6 +54,7 @@ const MARKETING_LANDING_PREFIXES: ReadonlyArray<string> = [
   '/multiplayer-word-game-online',
   '/online-word-games-with-friends',
   '/words-with-friends-alternative',
+  '/boggle-with-friends-alternative',
   '/free-multiplayer-word-game',
   '/scrabble-alternative-online',
   '/word-craft-landing',

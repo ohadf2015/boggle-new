@@ -35,6 +35,7 @@ export const KNOWN_APP_ROOT_SEGMENTS: ReadonlySet<string> = new Set([
   'best-online-word-games',
   'blast',
   'blog',
+  'boggle-with-friends-alternative',
   'boggle-word-shake-free',
   'brag',
   'brain',

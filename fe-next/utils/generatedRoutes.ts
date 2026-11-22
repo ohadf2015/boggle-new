@@ -46,6 +46,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/blog/word-games-and-mental-health",
   "/blog/word-games-for-brain-training",
   "/blog/word-games-for-kids-education",
+  "/boggle-with-friends-alternative",
   "/boggle-word-shake-free",
   "/brain",
   "/brain-training-word-games",

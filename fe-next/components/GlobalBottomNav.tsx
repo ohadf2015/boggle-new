@@ -109,6 +109,7 @@ const MP_LANDING_PREFIXES: ReadonlyArray<string> = [
     '/multiplayer-word-game-online',
     '/online-word-games-with-friends',
     '/words-with-friends-alternative',
+    '/boggle-with-friends-alternative',
     '/hebrew-multiplayer-word-game',
     '/swedish-multiplayer-word-game',
     '/juego-de-palabras-multijugador',
