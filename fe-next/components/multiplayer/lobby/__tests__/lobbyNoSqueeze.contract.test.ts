@@ -49,8 +49,9 @@ describe('host lobby no-squeeze contract', () => {
     expect(hostView).toContain("cn(CARD, 'flex-[1_0_auto] flex flex-col')");
   });
 
-  it('mode grid rows may stretch into free height but never compress below tile content', () => {
-    expect(battleModeCard).toContain("fill && 'flex-1 auto-rows-fr'");
+  it('mode grid rows keep their content height: never stretched apart, never compressed', () => {
+    expect(battleModeCard).toContain("fill && 'flex-1 content-center'");
+    expect(battleModeCard).not.toContain('auto-rows-fr');
     // The overlap enabler: min-h-0 on the fr-row grid. Never reintroduce it.
     expect(battleModeCard).not.toContain("fill && 'flex-1 min-h-0 auto-rows-fr'");
     const gridLine = battleModeCard.split('\n').find((l) => l.includes('grid-cols-3'));

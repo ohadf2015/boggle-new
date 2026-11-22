@@ -16,7 +16,7 @@
 import { vi, describe, it, expect, beforeEach, onTestFinished } from 'vitest';
 /* eslint-disable react/display-name */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('framer-motion', () => ({
@@ -151,6 +151,7 @@ describe('PlayerWaitingView — classroom students get no host controls', () => 
     setLobbyViewport('desktop');
     onTestFinished(() => setLobbyViewport('phone'));
     render(<PlayerWaitingView {...defaultProps} />);
+    fireEvent.click(screen.getByText('mpUi.lobby.howToPlay'));
     expect(screen.getAllByTestId('game-instructions')[0].getAttribute('data-mode')).toBe('classic');
   });
 });

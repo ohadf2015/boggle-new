@@ -64,6 +64,13 @@ describe('HostPreGameView — desktop right rail', () => {
     expect(within(screen.getByTestId('lobby-chat-sheet')).getByTestId('room-chat')).toBeInTheDocument();
   });
 
+  it('the START strip is pinned below the scroll region, so it never scrolls away on a short laptop', () => {
+    render(<HostPreGameView {...props} />);
+    const footer = screen.getByTestId('lobby-wide-footer');
+    expect(footer.closest('main')).toBeNull();
+    expect(within(footer).getByRole('button', { name: /start/i })).toBeInTheDocument();
+  });
+
   it('the rail shows the invite and the round settings at a glance', () => {
     render(<HostPreGameView {...props} />);
     expect(rail().getByTestId('invite-card')).toBeInTheDocument();

@@ -104,7 +104,7 @@ export function BattleModeCard({
        * on short phones. fill only stretches the grid into FREE height — it
        * can never shrink below the tiles' min-h.
        */}
-      <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 auto-rows-fr')}>
+      <div className={cn('grid grid-cols-3 gap-2 desktop-tall:gap-[calc(10px*var(--mp-u,1))]', fill && 'flex-1 content-center')}>
         {modes.map(({ mode, nameKey }) => {
           const isActive = selectedGameMode === mode;
           const family = FAMILY[getModePresentation(mode).color];
@@ -118,7 +118,7 @@ export function BattleModeCard({
               aria-pressed={isActive}
               className={cn(
                 styles.modeTile,
-                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
+                'group flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] [@media(max-height:760px)]:min-h-[58px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 text-center',
                 'transition-[transform,background-color,border-color,box-shadow] duration-150 active:translate-y-0.5 active:shadow-none',
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                 isActive
@@ -131,7 +131,7 @@ export function BattleModeCard({
                 mode={mode}
                 className={cn(
                   styles.modeArt,
-                  'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]',
+                  'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] max-[719px]:max-h-[40px] [@media(max-height:760px)]:max-h-[30px] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]',
                   family.icon,
                   isActive && styles.modeArtOn,
                 )}
@@ -149,12 +149,12 @@ export function BattleModeCard({
             data-testid="lobby-how-to-play"
             className={cn(
               styles.modeTile,
-              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
+              'flex flex-col items-center justify-center gap-1 min-w-0 min-h-[72px] tall:min-h-[80px] [@media(max-height:760px)]:min-h-[58px] max-h-[calc(150px*var(--mp-u,1))] px-1.5 pt-1.5 pb-2 rounded-neo border-2 border-dashed border-neo-cyan/60 bg-neo-navy text-neo-cyan text-center',
               'transition-[transform,border-color] duration-150 hover:border-neo-cyan active:translate-y-0.5',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
             )}
           >
-            <HowToArt className={cn(styles.modeArt, 'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]')} />
+            <HowToArt className={cn(styles.modeArt, 'block w-full flex-1 min-h-0 max-h-[calc(72px*var(--mp-u,1))] max-[719px]:max-h-[40px] [@media(max-height:760px)]:max-h-[30px] desktop-medium-short:max-h-[calc(52px*var(--mp-u,1))]')} />
             <span className="shrink-0 max-w-full font-neo-display text-[11px] tall:text-xs desktop-tall:text-[length:calc(14px*var(--mp-u,1))] font-bold uppercase leading-[1.1] line-clamp-2 break-words">
               {t('mpUi.lobby.howToPlay')}
             </span>

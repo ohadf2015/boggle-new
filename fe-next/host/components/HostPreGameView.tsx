@@ -202,9 +202,8 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
   );
 
   const roster = (headerExtra?: React.ReactNode) => (
-    // Wide: the roster card is the one that gives up height (its grid scrolls) so the mode picker stays whole.
-    // An open waiting game keeps the card whole; the column scrolls instead.
-    <div className={cn(CARD, 'min-[720px]:min-h-[9rem] min-[720px]:flex min-[720px]:flex-col has-[[data-game-open]]:shrink-0')}>
+    // Never squeezed: a big room's grid caps and scrolls itself (deskWall), so seat names are never cut.
+    <div className={cn(CARD, 'min-[720px]:flex min-[720px]:flex-col shrink-0')}>
       <PlayerRoster
         className="min-[720px]:min-h-0 min-[720px]:flex-1"
         players={lobby.seatedPlayers}
@@ -336,9 +335,6 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
                 </div>
               }
             />
-            <div className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
-              <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
-            </div>
           </div>
         ) : (
           <div data-testid="lobby-phone" className="flex flex-col">
@@ -352,7 +348,12 @@ function HostPreGameView(props: HostPreGameViewProps): React.ReactElement {
           </div>
         )}
       </main>
-      {/* Pinned sibling after the scroll region, so the phone CTA never scrolls away. */}
+      {/* Pinned siblings after the scroll region, so the CTA never scrolls away. */}
+      {wide && (
+        <div data-testid="lobby-wide-footer" className="shrink-0 px-6 py-3 border-t-3 border-neo-black bg-neo-navy">
+          <div className="mx-auto w-full max-w-[480px] tv:max-w-[720px]">{startButton}</div>
+        </div>
+      )}
       {!wide && (
         <div data-testid="lobby-phone-footer" className="shrink-0 px-3 pt-1.5 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
           <div className="max-w-[600px] mx-auto flex items-stretch gap-2">

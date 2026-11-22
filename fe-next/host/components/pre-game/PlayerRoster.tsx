@@ -97,9 +97,12 @@ export const PlayerRoster = memo(function PlayerRoster({
   const tally = readyTally(seats);
   const isHostView = variant === 'host';
   const chairs = Math.min(maxPlayers, LOBBY_SEATS);
-  const emptyCount = Math.max(0, chairs - seats.length);
-  const capShown = seats.length > chairs ? lobbyMax(seats.length) : chairs;
   const isTv = variant === 'tv';
+  // Off the TV wall, chairs only finish the current row of four (plus one free row once it is full):
+  // a second row of empty chairs pushed the phone lobby into scrolling.
+  const shownChairs = isTv ? chairs : Math.min(chairs, Math.ceil((seats.length + 1) / 4) * 4);
+  const emptyCount = Math.max(0, shownChairs - seats.length);
+  const capShown = seats.length > chairs ? lobbyMax(seats.length) : chairs;
   const wall = tvWall(seats.length);
   const desk = deskWall(seats.length);
   const dense = isTv && wall.dense;
@@ -300,16 +303,6 @@ export const PlayerRoster = memo(function PlayerRoster({
             <SeatNameText name={seat.name} />
           </span>
         )}
-        {isMe && selfActions && (
-          // The emote trigger lives on MY seat, under my name — clearly mine.
-          // The label makes it read as "emotes".
-          <span data-testid="self-seat-actions" className="mt-0.5 flex flex-col items-center gap-0.5 min-[720px]:hidden">
-            {selfActions}
-            <span className="font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-pink">
-              {t('lobby.emote.title')}
-            </span>
-          </span>
-        )}
       </div>
     );
   };
@@ -391,7 +384,7 @@ export const PlayerRoster = memo(function PlayerRoster({
         {(headerExtra || (selfActions && !isTv)) && (
           <div className="flex items-center gap-2 shrink-0">
             {selfActions && !isTv && (
-              <span data-testid="self-header-actions" className="flex items-center gap-1.5 max-[719px]:hidden">
+              <span data-testid="self-header-actions" className="flex items-center gap-1.5">
                 <span className="font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-pink">{t('lobby.emote.title')}</span>
                 {selfActions}
               </span>

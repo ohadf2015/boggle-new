@@ -5,7 +5,7 @@
  *   header  [exit] [board language] … [invite] [chat] [sound]
  *   body    8-seat grid (same `lobbySeats` source as the host) · DJ Lexi + status
  *   footer  READY toggle
- * Desktop (≥720px): seats + DJ Lexi status (rules accordion) left; invite +
+ * Desktop (≥720px): seats + DJ Lexi status (rules pill) left; invite +
  * chat right — the base suite pins chat and rules as mounted on the joiner's
  * desktop, so they stay there (the host's rail follows DESIGN §3: launcher).
  * A classroom student gets EduStudentLobby instead (unchanged contract).
@@ -152,7 +152,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     ? (classroomGameMode && classroomGameMode !== VOCAB_QUIZ_MODE ? (classroomGameMode as GameModeOption) : null)
     : (hostPick?.mode ?? ((gameMode || 'classic') as GameModeOption));
   const pickRow = hostPick && (
-    <div data-testid="lobby-host-pick" className="w-full max-w-md flex flex-col items-center gap-2">
+    <div data-testid="lobby-host-pick" className="w-full max-w-md flex flex-wrap items-center justify-center gap-2">
       <LobbyModeChip mode={hostPick.mode} t={t} />
       <LobbySettingsSummary timerValue={hostPick.timerSeconds / 60} difficulty={hostPick.difficulty} minWordLength={hostPick.minWordLength} t={t} />
       {!isClassroomMode && <QuestGoalChip screen="multiplayer" />}
@@ -237,10 +237,22 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
     </div>
   );
 
+  // The how-to pill opens the rules sheet at every width; an inline accordion overflowed the 720p card.
+  const howToPill = howToMode && (
+    <button
+      type="button"
+      onClick={() => setSheet('howto')}
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
+    >
+      <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
+      {t('mpUi.lobby.howToPlay')}
+    </button>
+  );
+
   // DJ Lexi holds the floor while the host sets up: the card fills the body's
   // free height (no dead band above READY). On a phone it never shrinks below
   // its content (the stack scrolls); on desktop it scrolls inside its column.
-  const waitingCard = (howTo: { pill?: React.ReactNode; accordion?: React.ReactNode }) => (
+  const waitingCard = (
     <div data-testid="waiting-status" className={cn(CARD, 'flex flex-col items-center justify-center-safe gap-3 text-center', wide ? 'flex-1 min-h-0 overflow-y-auto overscroll-contain' : 'flex-[1_0_auto]')}>
       <div className="w-full max-w-md flex items-center justify-center gap-3">
         {!gameOpen && (
@@ -259,28 +271,10 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
         {status}
       </div>
       {!gameOpen && pickRow}
-      {!gameOpen && howTo.pill}
-      {!gameOpen && howTo.accordion}
+      {!gameOpen && howToPill}
     </div>
   );
 
-  // One how-to control per layout: the pill opens the sheet on phone; desktop
-  // has the room for the collapsed rules accordion right in the card.
-  const howToPill = howToMode && (
-    <button
-      type="button"
-      onClick={() => setSheet('howto')}
-      className="inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-navy px-3 py-1 text-xs font-bold text-neo-cyan shadow-hard-sm active:translate-y-0.5"
-    >
-      <HelpCircle aria-hidden="true" className="w-3.5 h-3.5" />
-      {t('mpUi.lobby.howToPlay')}
-    </button>
-  );
-  const howToAccordion = howToMode && (
-    <div className="w-full max-w-md text-start">
-      <GameInstructions selectedGameMode={howToMode} t={t} lang={lang} defaultOpen={false} />
-    </div>
-  );
 
   return (
     <div className="flex-1 flex flex-col min-h-0 w-full bg-neo-navy text-neo-white relative lg:max-w-[calc(1280px*var(--mp-u,1))] lg:mx-auto">
@@ -313,7 +307,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
               leftContent={
                 <>
                   {roster}
-                  {waitingCard({ accordion: howToAccordion })}
+                  {waitingCard}
                 </>
               }
               rightContent={
@@ -340,7 +334,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
           <div data-testid="lobby-phone" className="flex flex-col flex-1 min-h-0">
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain flex flex-col gap-3 px-3 py-3 w-full max-w-[600px] mx-auto">
               {roster}
-              {waitingCard({ pill: howToPill })}
+              {waitingCard}
             </div>
             {readyButton && (
               <div className="shrink-0 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] border-t-3 border-neo-black bg-neo-navy">
