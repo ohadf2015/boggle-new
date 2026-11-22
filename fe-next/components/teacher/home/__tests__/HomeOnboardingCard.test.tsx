@@ -22,6 +22,17 @@ describe('<HomeOnboardingCard>', () => {
     expect(screen.queryByTestId('home-onboarding-dismiss')).toBeNull();
   });
 
+  it('Given a teacher with no class on a phone, Then the steps are labels, not buttons: only the current step is raised and the CTA is phone-sized', () => {
+    render(<HomeOnboardingCard onboarding={fresh} hrefs={HREFS} variant="full" t={t} />);
+    const shadowed = screen.getAllByTestId(/^home-onboarding-step-/).filter((el) => /(^|\s)shadow-hard/.test(el.className));
+    expect(shadowed).toEqual([screen.getByTestId('home-onboarding-step-createClass')]);
+    const cta = screen.getByTestId('home-onboarding-cta').className.split(/\s+/);
+    expect(cta).toContain('text-xl');
+    const heading = screen.getByRole('heading', { name: 'eduShell.onboarding.title' }).className.split(/\s+/);
+    expect(heading).toContain('text-2xl');
+    expect(screen.getByRole('heading', { name: 'eduShell.onboarding.title' }).parentElement?.className).not.toMatch(/(^|\s)pe-10(\s|$)/);
+  });
+
   it('Given a class with the code shared, Then the one list is create class, share code, play first game', () => {
     render(<HomeOnboardingCard onboarding={shared} hrefs={HREFS} variant="full" t={t} />);
     const ids = screen.getAllByTestId(/^home-onboarding-step-/).map((el) => el.getAttribute('data-testid'));
