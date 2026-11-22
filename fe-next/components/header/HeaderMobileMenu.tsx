@@ -274,15 +274,16 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
 
     return (
         <>
-            {/* Mobile-only inline strip: Volume + Lang + Auth.
+            {/* Mobile-only inline strip: Volume + Auth.
                 Desktop already renders these via HeaderDesktopControls,
-                so we keep the trio gated `sm:hidden` to avoid duplicates. */}
+                so we keep it gated `sm:hidden` to avoid duplicates. */}
             <div className="sm:hidden flex items-center gap-1.5 min-w-0 shrink-0">
                 <MusicControls compact />
 
-                {/* Quick UI-language pill — always visible on mobile (incl. CrazyGames),
-                    so embed players can switch language without the hamburger menu. */}
-                <QuickLanguageSwitcher compact className="w-9 h-9 border-2" />
+                {/* Language lives in the drawer; CrazyGames has no drawer, so it keeps the pill. */}
+                {mounted && isCrazyGames && (
+                    <QuickLanguageSwitcher compact className="w-9 h-9 border-2" />
+                )}
 
                 {/* Unified auth button for guests (hidden on CrazyGames).
                     Also gated on `cgLoading` so the button does not flash

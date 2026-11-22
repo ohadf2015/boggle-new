@@ -32,17 +32,26 @@ describe('HeaderLogo', () => {
     expect(screen.getByRole('button', { name: /LexiClash/ })).toBeTruthy();
   });
 
-  it('draws "Lexi" as one game tile per letter, hidden from screen readers', () => {
-    render(<HeaderLogo />);
-    const tiles = screen.getByTestId('logo-tiles');
-    expect(tiles.closest('[aria-hidden="true"]')).not.toBeNull();
-    expect(Array.from(tiles.children).map((c) => c.textContent)).toEqual(['L', 'e', 'x', 'i']);
+  it.each([
+    ['en', en, 'LexiClash'],
+    ['he', he, 'לקסיקלאש'],
+  ])('given %s, then the wordmark is plain text with no letter tiles or bolt', (lang, d, word) => {
+    language = lang;
+    dict = d;
+    const { container } = render(<HeaderLogo />);
+    const mark = screen.getByTestId('logo-wordmark');
+    expect(mark.closest('[aria-hidden="true"]')).not.toBeNull();
+    expect(mark.textContent).toBe(word);
+    expect(mark.children).toHaveLength(1);
+    expect(screen.queryByTestId('logo-tiles')).toBeNull();
+    expect(container.querySelector('svg')).toBeNull();
   });
 
-  it('given Hebrew, then tiles follow the localized brand letters', () => {
+  it('given a click outside a room, then it goes home in the current language', () => {
     language = 'he';
     dict = he;
     render(<HeaderLogo />);
-    expect(Array.from(screen.getByTestId('logo-tiles').children).map((c) => c.textContent).join('')).toBe('לקסי');
+    screen.getByRole('button').click();
+    expect(push).toHaveBeenCalledWith('/he');
   });
 });
