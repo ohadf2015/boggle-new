@@ -15858,7 +15858,7 @@ const ru = {
       "picker": {
         "showing": "Показан выше"
       },
-      "ownPreview": {"title": "{{class}}: по каждому ученику", "line": "С Pro у каждого ученика своя строка: точность, сколько слов он уже знает и какие именно слова пропустил.", "columns": {"student": "Ученик", "accuracy": "Точность", "mastered": "Выучено слов", "missed": "Пропущенные слова"}, "locked": "Видно в Pro", "more_one": "Ещё учеников: {{count}}", "more_other": "Ещё учеников: {{count}}"},
+      "ownPreview": {"title": "{{class}}: по каждому ученику", "line": "С Pro у каждого ученика своя строка: точность, сколько слов он уже знает и какие именно слова пропустил.", "columns": {"student": "Ученик", "accuracy": "Точность", "mastered": "Выучено слов", "missed": "Пропущенные слова"}, "locked": "Видно в Pro", "more_one": "Ещё учеников: {{count}}", "more_few": "Ещё учеников: {{count}}", "more_other": "Ещё учеников: {{count}}"},
       "streakDays_one": "{{count}} день",
       "streakDays_other": "{{count}} дней",
       "streakDays_few": "{{count}} дня"

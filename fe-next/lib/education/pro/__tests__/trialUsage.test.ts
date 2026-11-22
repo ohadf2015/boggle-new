@@ -10,7 +10,7 @@ function fakeDb(tables: Record<string, Result>) {
       const entry = { table, ops: [] as Array<[string, unknown[]]> };
       calls.push(entry);
       const builder: Record<string, unknown> = {};
-      for (const op of ['select', 'eq', 'in', 'gte', 'limit', 'is']) {
+      for (const op of ['select', 'eq', 'in', 'gte', 'lt', 'limit', 'is']) {
         builder[op] = (...args: unknown[]) => {
           entry.ops.push([op, args]);
           return builder;
@@ -41,6 +41,9 @@ describe('readTrialUsage', () => {
     expect(practice.ops).toContainEqual(['in', ['classroom_id', ['c1', 'c2']]]);
     expect(practice.ops).toContainEqual(['gte', ['completed_at', SINCE]]);
     expect(practice.ops).toContainEqual(['is', ['results->>gameCode', null]]);
+    const trialEnd = new Date(Date.parse(SINCE) + 14 * 24 * 60 * 60 * 1000).toISOString();
+    expect(rounds.ops).toContainEqual(['lt', ['completed_at', trialEnd]]);
+    expect(practice.ops).toContainEqual(['lt', ['completed_at', trialEnd]]);
     expect(calls.find((c) => c.table === 'classrooms')!.ops).toContainEqual(['eq', ['teacher_id', 't1']]);
   });
 

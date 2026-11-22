@@ -15,3 +15,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function reportId(value: string | null | undefined): string | null {
   return value && UUID.test(value) ? value : null;
 }
+
+/** A class id from the URL that is not in the teacher's own list opens the picker, not an empty report. */
+export function ownedClassroomId(
+  id: string | null,
+  classrooms: readonly { id: string }[] | undefined,
+  loading: boolean,
+): string | null {
+  if (!id || loading || !classrooms) return id;
+  return classrooms.some((c) => c.id === id) ? id : null;
+}

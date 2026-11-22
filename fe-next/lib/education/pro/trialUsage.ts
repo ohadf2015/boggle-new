@@ -33,12 +33,14 @@ export async function readTrialUsage(db: TrialUsageDb, teacherId: string, sinceI
   const classes = await db.from('classrooms').select('id').eq('teacher_id', teacherId);
   if (classes.error) fail(classes.error);
   const ids = ((classes.data ?? []) as Array<{ id: string }>).map((c) => c.id);
+  const untilIso = new Date(Date.parse(sinceIso) + TEACHER_PRO_TRIAL_DAYS * DAY_MS).toISOString();
 
   const rounds = db
     .from('classroom_rounds')
     .select('id', { count: 'exact', head: true })
     .eq('teacher_id', teacherId)
-    .gte('completed_at', sinceIso);
+    .gte('completed_at', sinceIso)
+    .lt('completed_at', untilIso);
   if (ids.length === 0) {
     const r = await rounds;
     if (r.error) fail(r.error);
@@ -53,6 +55,7 @@ export async function readTrialUsage(db: TrialUsageDb, teacherId: string, sinceI
       .select('id', { count: 'exact', head: true })
       .in('classroom_id', ids)
       .gte('completed_at', sinceIso)
+      .lt('completed_at', untilIso)
       // Live-game seats are practice_sessions rows too; they are already counted as games.
       .is('results->>gameCode', null),
   ]);

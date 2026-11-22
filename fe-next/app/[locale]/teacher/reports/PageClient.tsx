@@ -29,7 +29,7 @@ import { ReportsReteachPanel } from './ReportsReteachPanel';
 import { ReportsProGate } from './ReportsGate';
 import { ReportsClassView } from './ReportsClassView';
 import { ReportsStudentView } from './ReportsStudentView';
-import { reportId, resolveReportTab, type ReportTab } from './reportParams';
+import { ownedClassroomId, reportId, resolveReportTab, type ReportTab } from './reportParams';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -55,7 +55,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   const [pickedClassroomId, setSelectedClassroomId] = useState<string | null>(classroomIdFromUrl);
   // One class means nothing to pick: open its report directly.
   const onlyClassroomId = !classroomsLoading && classrooms?.length === 1 ? classrooms[0].id : null;
-  const selectedClassroomId = pickedClassroomId ?? onlyClassroomId;
+  const selectedClassroomId = ownedClassroomId(pickedClassroomId, classrooms, classroomsLoading) ?? onlyClassroomId;
   const [shownClassId, setShownClassId] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(studentIdFromUrl);
   const [selectedStudentName, setSelectedStudentName] = useState<string | null>(null);
