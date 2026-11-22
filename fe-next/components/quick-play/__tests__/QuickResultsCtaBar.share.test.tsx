@@ -13,6 +13,13 @@ const renderBar = (onChallenge: () => Promise<unknown>, isGuest = false) =>
   );
 
 describe('QuickResultsCtaBar share', () => {
+  it('Given the bar renders, Then the challenge button carries a visible label and the current mode has no chip', () => {
+    renderBar(vi.fn().mockResolvedValue('shared'));
+    expect(screen.getByTestId('quick-results-challenge')).toHaveTextContent('quickPlay.solo.challengeShort');
+    expect(screen.queryByTestId('quick-next-mode-word-hunt')).toBeNull();
+    expect(screen.getByTestId('quick-next-mode-blast')).toBeTruthy();
+  });
+
   it('Given a guest, When the bar renders, Then the side button is still a same-board challenge', () => {
     renderBar(vi.fn().mockResolvedValue('shared'), true);
     expect(screen.getByTestId('quick-results-challenge')).toHaveAccessibleName('quickPlay.solo.challengeFriend');

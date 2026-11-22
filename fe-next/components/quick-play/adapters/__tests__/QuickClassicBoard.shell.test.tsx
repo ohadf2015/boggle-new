@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { QuickClassicBoard } from '../QuickClassicBoard';
+import { QuickCoachIntro } from '../QuickRoundPops';
 import type { QuickRoundConfig } from '../../types';
 
 const boardProps: Array<Record<string, unknown>> = [];
@@ -72,6 +73,16 @@ describe('QuickClassicBoard — desktop shell', () => {
     expect(screen.getByTestId('game-shell').getAttribute('data-game-shell')).toBe('quick-classic');
     expect(within(screen.getByTestId('game-shell-stage')).getByTestId('in-game-screen')).toBeInTheDocument();
     expect(boardProps.at(-1)?.inDesktopShell).toBe(true);
+  });
+
+  it('given a quick round, then the header gets no hint control', () => {
+    render(<QuickClassicBoard config={{ ...config, coach: true } as QuickRoundConfig} onDone={vi.fn()} onQuit={vi.fn()} />);
+    expect((boardProps.at(-1)?.hints as { isSinglePlayer: boolean }).isSinglePlayer).toBe(false);
+  });
+
+  it('given the coach intro, then it sits below the timer ring', () => {
+    render(<QuickCoachIntro t={(k: string) => k} />);
+    expect(screen.getByTestId('quick-coach-intro').className).toContain('top-[27%]');
   });
 
   it('given a phone, then the board keeps its own clock because there are no rails', () => {

@@ -66,6 +66,7 @@ vi.mock('../QuickPlayResults', () => ({
 }));
 
 import posthog from '@/lib/analytics/lazyPosthog';
+import { OVERLAY_QUIET_ZONE_ATTR } from '@/lib/overlayQuietZone';
 
 const roundPayload = {
   mode: 'blast', seed: 's-1', language: 'en', durationSec: 60,
@@ -124,6 +125,25 @@ describe('QuickPlayHub', () => {
     await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     const bodies = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round')).map((c) => JSON.parse(c[1].body).mode);
     expect(bodies).toEqual(['blast', 'blast']);
+  });
+
+  it('holds the overlay quiet zone while results are on screen so the cookie bar stays off NEXT BOARD', async () => {
+    render(<QuickPlayHub />);
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    expect(document.body.getAttribute(OVERLAY_QUIET_ZONE_ATTR) ?? '').not.toContain('quick-results');
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => screen.getByTestId('mock-results'));
+    expect(document.body.getAttribute(OVERLAY_QUIET_ZONE_ATTR)).toContain('quick-results');
+  });
+
+  it('a 429 on the round fetch says too many games, not a connection problem', async () => {
+    fetchMock.mockImplementation((url: string) =>
+      String(url).includes('/round')
+        ? Promise.resolve({ ok: false, status: 429, json: async () => ({}) })
+        : Promise.resolve({ ok: true, json: async () => ({}) })
+    );
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toHaveTextContent('quickPlay.solo.loadRateLimited'));
   });
 
   it('round completion shows results, and Next round starts another round instead of a picker', async () => {

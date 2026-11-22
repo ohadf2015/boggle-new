@@ -11317,6 +11317,8 @@ const en = {
       "nextRound": "Spin next round",
       "challengeFriend": "Challenge a friend: same board",
       "challengeHint": "They play your exact board. Their score becomes your next rival.",
+      "loadRateLimited": "Too many games in a row. Try again in a moment.",
+      "challengeShort": "Challenge",
       "challengeBanner": "{name}: {pct}% on this board. Beat it!",
       "answeredBanner": "{name} answered your challenge: {theirPct}% vs your {yourPct}%",
       "loadError": "Couldn't build your board. Check your connection and try again.",

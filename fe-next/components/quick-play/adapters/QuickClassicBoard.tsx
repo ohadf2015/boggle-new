@@ -37,7 +37,7 @@ interface QuickClassicBoardProps {
   onQuit: () => void;
 }
 
-/** Hints are off in a quick solo round — disabled state, no request path. */
+/** Hints are off in a quick solo round; isSinglePlayer false keeps the header from drawing a dead HINT pill. */
 const DISABLED_HINTS: HintsState = {
   hint: null,
   hintType: null,
@@ -45,7 +45,7 @@ const DISABLED_HINTS: HintsState = {
   isLoading: false,
   error: null,
   isAvailable: false,
-  isSinglePlayer: true,
+  isSinglePlayer: false,
   requestHint: () => undefined,
   clearHint: () => undefined,
 };

@@ -8,6 +8,7 @@
 import { publishLevelUp, type LevelUpLike } from '@/lib/avatar/revealTrigger';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useOverlayQuietZoneClaim } from '@/lib/overlayQuietZone';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
@@ -119,6 +120,8 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
   const goBack = useBackOneLevel(backHref);
   const submitting = useRef(false);
   const holdCalmUntilResults = useQuickResultsCalmBridge(phase === 'results');
+  useOverlayQuietZoneClaim(phase === 'results', 'quick-results');
+  const [rateLimited, setRateLimited] = useState(false);
   const loadingRef = useRef(false);
   const autoStarted = useRef(false);
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
@@ -256,6 +259,7 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     if (sel === 'random' && !activeChallenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
+    setRateLimited(false);
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
@@ -268,7 +272,10 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
         // every round. Local history, so guests are covered too; 0 = unknown.
         body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
       });
-      if (!res.ok) throw new Error(`round fetch ${res.status}`);
+      if (!res.ok) {
+        setRateLimited(res.status === 429);
+        throw new Error(`round fetch ${res.status}`);
+      }
       const round = (await res.json()) as QuickRoundConfig;
       if (variant === 'coach') round.coach = true;
       const elapsed = Date.now() - started;
@@ -599,7 +606,7 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
               data-testid="quick-load-error"
               role="alert"
             >
-              {t('quickPlay.solo.loadError')}
+              {t(rateLimited ? 'quickPlay.solo.loadRateLimited' : 'quickPlay.solo.loadError')}
             </div>
             <button
               type="button"

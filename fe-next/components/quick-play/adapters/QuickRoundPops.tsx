@@ -64,9 +64,10 @@ export function QuickCoachIntro({ t }: { t: T }) {
   return (
     <div
       data-testid="quick-coach-intro"
-      className="pointer-events-none absolute inset-x-0 top-[12%] z-30 flex justify-center px-4"
+      // Starts under the timer ring (bottom edge ~26%), above the board (top edge ~35%).
+      className="pointer-events-none absolute inset-x-0 top-[27%] z-30 flex justify-center px-4"
     >
-      <p className="max-w-xs rounded-2xl border-[3px] border-black bg-neo-navy-elevated px-4 py-2 text-center font-neo-display text-sm font-bold text-neo-cream shadow-hard">
+      <p className="max-w-xs rounded-2xl border-[3px] border-black bg-neo-navy-elevated px-3 py-1.5 text-center font-neo-display text-xs font-bold text-neo-cream shadow-hard">
         {t('quickLoop.coach.intro')}
       </p>
     </div>
