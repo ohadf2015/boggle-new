@@ -17,7 +17,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'ltr',
   }),
 }));
-vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn(), trackSignupPromptClicked: vi.fn(), latchSignupSource: vi.fn() }));
+vi.mock('@/components/auth/GoogleSignInButton', () => ({ default: () => <div data-testid="google-btn" /> }));
 vi.mock('@/components/avatar/art/PartThumb', () => ({ PartThumb: () => <svg data-testid="part-thumb" /> }));
 vi.mock('../LevelUpWatcher', () => ({ LevelUpWatcher: () => <div data-testid="level-up-watcher" /> }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: () => null }));
@@ -41,6 +42,8 @@ describe('NextUnlockTeaser', () => {
     auth.value = { loading: false, user: null, profile: null, isGuest: true };
     render(<NextUnlockTeaser />);
     expect(screen.getByTestId('next-unlock-guest')).toHaveTextContent('progression.unlock.signInToUnlock');
+    expect(screen.getByTestId('guest-save-more-ways')).toBeInTheDocument();
+    expect(screen.queryByTestId('next-unlock-teaser')).toBeNull();
   });
 
   it('signed-in players see Lv now -> Lv unlock with rarity and an XP bar', () => {

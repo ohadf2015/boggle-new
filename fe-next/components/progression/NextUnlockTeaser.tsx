@@ -1,21 +1,18 @@
 'use client';
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
-import dynamic from 'next/dynamic';
-import { LogIn } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { RARITY_TOKENS } from '@/lib/avatar/rarity';
 import { revealPartNameKey } from '@/lib/avatar/revealTrigger';
 import { getPendingLevelUp, subscribeLevelUp } from '@/lib/levelUp/levelUpBus';
 import type { ResultsMode } from '@/lib/rivals/types';
+import { GuestSaveCard } from './GuestSaveCard';
 import { LockedUnlockThumb } from './LockedUnlockThumb';
 import { RarityChip } from './RarityChip';
 import { XpMomentMeter } from './XpMomentMeter';
 import { buildNextUnlockTeaser } from './nextUnlockModel';
 import { buildXpMoment } from './xpMomentModel';
-
-const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 /** XP this game earned; `total` is the server's new total XP when the response carried it. */
 export interface ResultsXp {
@@ -57,7 +54,6 @@ function useTrustedTotal(xp: ResultsXp | null | undefined, signedIn: boolean): n
 export function NextUnlockTeaser({ mode, xp }: NextUnlockTeaserProps = {}) {
   const { user, profile, loading } = useAuth();
   const { t, language } = useLanguage();
-  const [authOpen, setAuthOpen] = useState(false);
   const levelUp = useSyncExternalStore(subscribeLevelUp, getPendingLevelUp, none);
   const signedIn = !loading && !!user;
   const trustedTotal = useTrustedTotal(xp, signedIn);
@@ -67,24 +63,7 @@ export function NextUnlockTeaser({ mode, xp }: NextUnlockTeaserProps = {}) {
   const gained = Math.max(0, xp?.gained ?? 0);
   let body: ReactNode = null;
   if (!loading && !user) {
-    const xpText = gained.toLocaleString(language);
-    body = (
-      <>
-        {gained > 0 && (
-          <XpMomentMeter moment={buildXpMoment(gained, gained)} saved={false} />
-        )}
-        <button
-          type="button"
-          data-testid="next-unlock-guest"
-          onClick={() => setAuthOpen(true)}
-          className="flex w-full items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-navy-light px-3 py-2 text-start text-sm font-bold text-neo-white shadow-hard-sm hover:-translate-y-px active:translate-y-px"
-        >
-          <LogIn className="h-4 w-4 shrink-0 text-neo-lime rtl:rotate-180" aria-hidden="true" />
-          {gained > 0 ? t('progression.xp.signInToKeep', { xp: xpText }) : t('progression.unlock.signInToUnlock')}
-        </button>
-        {authOpen && <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} initialMode="signup" />}
-      </>
-    );
+    body = <GuestSaveCard gained={gained} />;
   } else if (!loading && profile) {
     const total = trustedTotal ?? profile.total_xp ?? 0;
     const moment = gained > 0 && trustedTotal != null ? buildXpMoment(gained, trustedTotal) : null;

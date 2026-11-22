@@ -23285,6 +23285,7 @@ const he = {
     },
     "unlock": {
       "signInToUnlock": "התחברו כדי להתחיל לפתוח פריטים לאווטאר",
+      "moreWaysToSignIn": "עוד דרכים להתחבר",
       "levelPath": "רמה {from} ← רמה {to}",
       "unlocksItem": "פותחת: {item}",
       "xpToGo": "עוד {xp} XP",

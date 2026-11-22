@@ -23324,6 +23324,7 @@ const sv = {
     },
     "unlock": {
       "signInToUnlock": "Logga in för att börja låsa upp avatarprylar",
+      "moreWaysToSignIn": "Fler sätt att logga in",
       "levelPath": "Nv {from} → Nv {to}",
       "unlocksItem": "låser upp {item}",
       "xpToGo": "{xp} XP kvar",

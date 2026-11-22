@@ -23336,6 +23336,7 @@ const es = {
     },
     "unlock": {
       "signInToUnlock": "Inicia sesión para empezar a desbloquear objetos de avatar",
+      "moreWaysToSignIn": "Otras formas de iniciar sesión",
       "levelPath": "Nv {from} → Nv {to}",
       "unlocksItem": "desbloquea {item}",
       "xpToGo": "faltan {xp} XP",

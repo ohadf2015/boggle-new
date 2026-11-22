@@ -23324,6 +23324,7 @@ const ja = {
     },
     "unlock": {
       "signInToUnlock": "ログインしてアバターのアイテムを解放しよう",
+      "moreWaysToSignIn": "ほかの方法でログイン",
       "levelPath": "Lv {from} → Lv {to}",
       "unlocksItem": "{item}を解放",
       "xpToGo": "あと{xp} XP",

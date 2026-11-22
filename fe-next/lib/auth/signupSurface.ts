@@ -28,6 +28,7 @@ const ALIASES: Record<string, string> = {
   mp_sheet: 'mp_sheet',
   edu_access: 'edu_access',
   header_or_menu: 'header_or_menu',
+  results_card: 'results_card',
 };
 
 /** Map a raw analytics string to the one id that surface uses everywhere. */
