@@ -55,7 +55,7 @@ describe('FreeGameHeadlineCard', () => {
   it('Given a free teacher after a real game, when shown, then players, class average, three missed words and a labelled Pro line appear', () => {
     render(<FreeGameHeadlineCard classroomId="c1" />);
     const card = screen.getByTestId('free-game-headline');
-    expect(within(card).getByTestId('free-headline-players').textContent).toBe('teacher.lastGame.playersPlayed|2');
+    expect(within(card).getByTestId('free-headline-players').textContent).toBe('teacher.lastGame.playersPlayed_other|2');
     expect(within(card).getByTestId('free-headline-average').textContent).toContain('251');
     expect(within(card).getAllByTestId('free-headline-missed').map((n) => n.textContent)).toEqual(['vast', 'keen', 'bold']);
     const upsell = within(card).getByTestId('free-headline-pro');

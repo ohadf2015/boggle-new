@@ -132,13 +132,19 @@ describe('ProgressDigestDashboard', () => {
     expect(mockMood).toHaveBeenCalledWith({ classroomId: 'c1', gameCode: 'ABC123' });
   });
 
+  it('Given one student rated, Then the mood line uses the singular form', () => {
+    mockMood.mockReturnValue({ count: 1, mood: 'rough' });
+    render(<ProgressDigestDashboard classroomId="c1" classroomName="Year 7" rosterCount={10} />);
+    expect(screen.getByTestId('progress-digest-mood')).toHaveTextContent('teacher.digest.moodRough_one');
+  });
+
   it('prints the last-round mood above the Pro CTA when students rated', () => {
     mockMood.mockReturnValue({ count: 5, mood: 'great' });
     render(<ProgressDigestDashboard classroomId="c1" classroomName="Year 7" rosterCount={10} />);
     const line = screen.getByTestId('progress-digest-mood');
     expect(line).toHaveAttribute('data-mood', 'great');
     expect(line).toHaveAttribute('data-count', '5');
-    expect(line).toHaveTextContent('teacher.digest.moodGreat');
+    expect(line).toHaveTextContent('teacher.digest.moodGreat_other');
     const cta = screen.getByTestId('progress-digest-pro-cta');
     expect(line.compareDocumentPosition(cta) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });

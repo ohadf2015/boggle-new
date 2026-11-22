@@ -11,6 +11,8 @@ import { LobbyWordStudy } from './LobbyWordStudy';
 import { RecallQuiz } from './RecallQuiz';
 import { trackEduStudyCompleted } from '@/lib/education/studyTelemetry';
 import { PRESS } from './eduLiveStyles';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 interface LobbyLearnRecallProps {
   cards: StudyCard[];
@@ -34,6 +36,7 @@ export function canRecall(cards: readonly StudyCard[]): boolean {
 }
 
 export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, username, t }: LobbyLearnRecallProps) {
+  const { language } = useLanguageSafe();
   const items = useMemo(() => quizzableCards(cards), [cards]);
   const pool = useMemo(() => cards.map((c) => c.word), [cards]);
   const [phase, setPhase] = useState<Phase>(studied ? 'learned' : 'meet');
@@ -59,7 +62,7 @@ export function LobbyLearnRecall({ cards, studied, onDone, quiet = false, userna
         {phase === 'learned' && (
           <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-neo-lime">
             <CheckCircle2 className="size-4" aria-hidden="true" />
-            {t('eduStudent.lobby.studyLearned', { count: items.length })}
+            {t(pluralKeyOf('eduStudent.lobby.studyLearned', items.length, language), { count: items.length })}
           </span>
         )}
       </div>

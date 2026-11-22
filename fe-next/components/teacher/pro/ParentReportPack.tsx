@@ -11,6 +11,7 @@ import { downloadCsvFile } from '@/lib/education/assignmentProgressReport';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { parentLinksToCsv, parentLinksToText, absoluteReportUrl, PARENT_LINK_DAYS, type ParentLink } from '@/lib/education/pro/parentLinks';
 import { ParentStudentSelect, type SelectableStudent } from './ParentStudentSelect';
+import { ProPoweredChip } from './ProPoweredChip';
 
 interface ClassOption { id: string; name: string; member_count: number }
 
@@ -135,14 +136,20 @@ export function ParentReportPack({ classroomId: fixedClassId }: ParentReportPack
   return (
     <section data-testid="parent-report-pack" className="rounded-neo border-3 border-neo-black bg-neo-cream p-4 text-neo-black shadow-hard sm:p-5">
       {fixedClassId ? (
-        <p className="text-sm font-bold text-neo-black/75">{t('parentReportsFlow.lead')}</p>
+        <p className="text-sm font-bold text-neo-black/75">
+          <ProPoweredChip className="me-2 align-middle" />
+          {t('parentReportsFlow.lead')}
+        </p>
       ) : (
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-2 border-neo-black bg-neo-cyan">
             <Users className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <h2 className="font-neo-display text-lg font-black">{t('parentReportsFlow.title')}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="font-neo-display text-lg font-black">{t('parentReportsFlow.title')}</h2>
+              <ProPoweredChip />
+            </div>
             <p className="text-sm font-bold text-neo-black/75">{t('parentReportsFlow.lead')}</p>
           </div>
         </div>

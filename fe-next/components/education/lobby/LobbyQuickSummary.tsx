@@ -4,6 +4,7 @@ import { BookOpen, SlidersHorizontal, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BoardLanguageChip } from '../pickers/BoardLanguageChip';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface LobbyQuickSummaryProps {
   classroomName: string;
@@ -15,7 +16,7 @@ export interface LobbyQuickSummaryProps {
 
 /** A quick launch arrives decided: say what is about to go live, and keep every other choice one tap away. */
 export function LobbyQuickSummary({ classroomName, lessons, wordCount, boardLanguage, onMoreOptions }: LobbyQuickSummaryProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <section data-testid="lobby-quick-summary" className="flex flex-col gap-2 @2xl/lobby:flex-row @2xl/lobby:items-center">
       <p className="flex min-h-12 min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-s-[6px] border-neo-cream/35 border-s-neo-cyan bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm font-bold text-neo-cream">
@@ -25,7 +26,7 @@ export function LobbyQuickSummary({ classroomName, lessons, wordCount, boardLang
         <span className="flex min-w-0 flex-wrap gap-x-2" dir="auto">
           {lessons.map((l) => <ListNameButton key={l.id} lessonId={l.id} name={l.name} />)}
         </span>
-        <span className="shrink-0 font-normal text-neo-cream/70">· {t('education.classroomGame.words', { count: wordCount })}</span>
+        <span className="shrink-0 font-normal text-neo-cream/70">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>
         {boardLanguage && <BoardLanguageChip language={boardLanguage} className="rounded-full border border-neo-cream/35 bg-transparent font-normal text-neo-cream/80" />}
       </p>
       <button

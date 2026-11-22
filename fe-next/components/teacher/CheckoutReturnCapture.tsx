@@ -14,6 +14,7 @@ import {
   clearReturnIntent,
   forgetCheckoutOriginAwayFrom,
   isCheckoutSuccessSearch,
+  isFreshCheckoutLanding,
   markCheckoutRedirect,
   readReturnIntent,
   rememberReturnIntent,
@@ -47,6 +48,7 @@ export function CheckoutReturnCapture() {
   useLayoutEffect(() => {
     const search = window.location.search;
     if (isCheckoutSuccessSearch(search)) {
+      if (!isFreshCheckoutLanding(window.localStorage, search)) return;
       rememberReturnIntent(window.sessionStorage);
       trackEduProCheckoutReturnLanded();
       const origin = takeCheckoutOrigin(window.sessionStorage, {
@@ -110,7 +112,9 @@ function CheckoutReturnBanner() {
 
   const copy = {
     activating: ['teacher.checkoutReturn.activatingTitle', 'teacher.checkoutReturn.activatingBody'],
-    success: ['teacher.checkoutReturn.successTitle', 'teacher.checkoutReturn.successBody'],
+    success: pro.status === 'trialing'
+      ? ['teacher.checkoutReturn.trialSuccessTitle', 'teacher.checkoutReturn.trialSuccessBody']
+      : ['teacher.checkoutReturn.successTitle', 'teacher.checkoutReturn.successBody'],
     failure: ['teacher.checkoutReturn.failureTitle', 'teacher.checkoutReturn.failureBody'],
   }[phase];
 

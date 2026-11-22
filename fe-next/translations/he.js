@@ -1127,7 +1127,9 @@ const he = {
       "copiesOne": "העתקה אחת",
       "results": "תוצאות",
       "use": "להשתמש ברשימה",
-      "actions": "פעולות לרשימה"
+      "actions": "פעולות לרשימה",
+      "words_one": "מילה אחת",
+      "words_other": "{count} מילים"
     },
     "badge": {
       "verified": "מאומת",
@@ -14846,7 +14848,10 @@ const he = {
         "wordHunt": "ציד מילים",
         "wheelRush": "גלגל המזל",
         "vocabQuiz": "חידון מילים"
-      }
+      },
+      "playersPlayed_one": "תלמיד אחד שיחק",
+      "playersPlayed_other": "{{count}} תלמידים שיחקו",
+      "topScorer": "הניקוד הגבוה: {name}, {score}"
     },
     "classReport": {
       "title": "מילה מול תלמיד",
@@ -14899,6 +14904,8 @@ const he = {
       "activatingBody": "התשלום התקבל. מאשרים גישה — זה לוקח בדרך כלל כמה שניות.",
       "successTitle": "פרו למורים פעיל",
       "successBody": "הגישה פעילה. אישור התשלום כבר בחשבון.",
+      "trialSuccessTitle": "תקופת הניסיון של פרו למורים התחילה",
+      "trialSuccessBody": "היום לא חויבתם בכלום. בסוף הניסיון הכרטיס יחויב ב-9$ לחודש, ואפשר לבטל בכל רגע עד אז.",
       "failureTitle": "עדיין לא אישרנו את פרו",
       "failureBody": "אם חויבת, הגישה מגיעה בדרך כלל תוך דקה. בדקו שוב, או כתבו לנו אם זה עדיין חסר.",
       "retry": "בדקו שוב",
@@ -15029,7 +15036,15 @@ const he = {
       "scheduleReteachHint": "בונים מחדש את המילים הקשות ומשחקים שוב בעוד כשבועיים: חזרה מרווחת שנשארת בראש.",
       "unpluggedReteachLiveCta": "התחלת Unplugged Live לחיזוק",
       "reteachLiveCta": "התחלת Live חיזוק ל־3 דקות",
-      "unpluggedReteachLiveFoil": "אין היום מכשירים לתלמידים? מקרינים את הפספוסים והתלמידים עונים על דף."
+      "unpluggedReteachLiveFoil": "אין היום מכשירים לתלמידים? מקרינים את הפספוסים והתלמידים עונים על דף.",
+      "moodGreat_one": "תלמיד אחד דירג את הסיבוב האחרון כמצוין.",
+      "moodGreat_other": "{{count}} תלמידים דירגו את הסיבוב האחרון כמצוין.",
+      "moodMixed_one": "תלמיד אחד דירג את הסיבוב האחרון כמעורב.",
+      "moodMixed_other": "{{count}} תלמידים דירגו את הסיבוב האחרון כמעורב.",
+      "moodRough_one": "תלמיד אחד דירג את הסיבוב האחרון כקשה.",
+      "moodRough_other": "{{count}} תלמידים דירגו את הסיבוב האחרון כקשה.",
+      "weeklyInactiveCount_one": "תלמיד אחד לא פעיל 7 ימים",
+      "weeklyInactiveCount_other": "{{count}} תלמידים לא פעילים 7 ימים"
     },
     "windowProgress": {
       "activeLine": "{{active}} מתוך {{roster}} תלמידים שיחקו",
@@ -15120,6 +15135,7 @@ const he = {
       "districtSubtitle": "מנהלים כמה מורים או כיתות? אנחנו מציעים תמחור גמיש לבתי ספר ורשויות חינוך.",
       "districtCta": "צרו קשר לתמחור לבתי ספר",
       "checkoutUnavailable": "התשלום סגור כרגע ולא חויבתם. נסו שוב עוד מעט.",
+      "alreadySubscribed": "כבר יש לכם פרו למורים, אז אין מה לשלם שוב. אפשר לנהל או לבטל את המנוי בעמוד התוכנית.",
       "notInApp": "אי אפשר לרכוש את פרו למורים באפליקציה.",
       "featureOutcome1": "להעביר כל כיתה שאתם מלמדים, בלי תקרה",
       "featureOutcome2": "להוסיף את כל הכיתות שאתם מלמדים, לא רק 3 הראשונות",
@@ -15410,7 +15426,13 @@ const he = {
         "offHint": "בלי דירוג. XP, רמות ותגים עדיין נספרים."
       },
       "tapToCopy": "הקישו להעתקה",
-      "codeCopiedShort": "הועתק"
+      "codeCopiedShort": "הועתק",
+      "studentCountPro_one": "תלמיד אחד",
+      "studentCountPro_other": "{{count}} תלמידים",
+      "cardSeeAllStudents_one": "לתלמיד",
+      "cardSeeAllStudents_other": "לכל {{count}} התלמידים",
+      "members_one": "תלמיד אחד",
+      "members_other": "{{count}} תלמידים"
     },
     "classrooms": {
       "students": {
@@ -15511,7 +15533,9 @@ const he = {
       "resumeDraftButton": "המשיכו",
       "discardDraftButton": "מחקו",
       "startFromTemplate": "התחילו מתבנית",
-      "templateLoaded": "התבנית נטענה: {{count}} מילים"
+      "templateLoaded": "התבנית נטענה: {{count}} מילים",
+      "words_one": "מילה אחת",
+      "words_other": "{{count}} מילים"
     },
     "lessons": {
       "assign": {
@@ -15534,7 +15558,9 @@ const he = {
         "help": "בחרו מיומנות אחת לתרגול, או תנו לתלמידים לבחור. זמינות רק מיומנויות שיש בשיעור מספיק מילים עבורן.",
         "any": "כל תרגול",
         "anyHint": "התלמידים בוחרים מצב בעצמם",
-        "questionCount": "{{count}} שאלות · {{skill}}"
+        "questionCount": "{{count}} שאלות · {{skill}}",
+        "questionCount_one": "שאלה אחת · {{skill}}",
+        "questionCount_other": "{{count}} שאלות · {{skill}}"
       },
       "createTitle": "צרו משימה",
       "create": "צרו משימה",
@@ -15633,7 +15659,9 @@ const he = {
         "g68GeographyDesc": "תבליט, אקלים ומילים לקריאת מפה",
         "g68Science": "כיתות ו–ח מדעים: גוף ואנרגיה",
         "g68ScienceDesc": "מושגי מדע לחטיבה עם הסבר פשוט"
-      }
+      },
+      "findNWords_one": "מצאו מילה אחת",
+      "findNWords_other": "מצאו {{count}} מילים"
     },
     "completion": {
       "overallProgress": "התקדמות כללית",
@@ -15795,7 +15823,8 @@ const he = {
         "games": "משחקים",
         "pulse": "דופק הכיתה",
         "homework": "שיעורי בית",
-        "more": "עוד"
+        "more": "עוד",
+        "words": "מילים"
       },
       "noClassroomsFound": "לא נמצאו כיתות",
       "error": "לא הצלחנו לטעון את הדוח",
@@ -16011,11 +16040,18 @@ const he = {
         "errorNotFound": "הכיתה או המטלה לא נמצאו. ייתכן שנמחקו.",
         "errorUngraded": "למטלה הזו ב-Classroom אין ניקוד, ולכן אי אפשר לתת בה ציון.",
         "errorNotPro": "שליחת ציונים ל-Google Classroom היא חלק מפרו למורים.",
-        "errorGeneric": "משהו השתבש בתקשורת עם Google Classroom. נסו שוב."
+        "errorGeneric": "משהו השתבש בתקשורת עם Google Classroom. נסו שוב.",
+        "updated_one": "תלמיד אחד קיבל ציון",
+        "updated_other": "{{count}} תלמידים קיבלו ציון",
+        "skipped_one": "תלמיד אחד דולג: עוד לא תרגל את השיעור",
+        "skipped_other": "{{count}} תלמידים דולגו: עוד לא תרגלו את השיעור"
       },
       "picker": {
         "showing": "מוצגת למעלה"
-      }
+      },
+      "ownPreview": {"title": "{{class}}, תלמיד אחרי תלמיד", "line": "עם פרו, לכל תלמיד ברשימה יש שורה משלו: אחוז הדיוק, כמה מילים כבר שולטות אצלו, ואילו מילים בדיוק פספס.", "columns": {"student": "תלמיד/ה", "accuracy": "דיוק", "mastered": "מילים שנלמדו", "missed": "מילים שפוספסו"}, "locked": "מוצג בפרו", "more_one": "ועוד תלמיד/ה אחד/ת", "more_other": "ועוד {{count}} תלמידים", "more_few": "ועוד {{count}} תלמידים"},
+      "streakDays_one": "יום אחד",
+      "streakDays_other": "{{count}} ימים"
     },
     "curriculum": {
       "title": "ספרייה",
@@ -16097,7 +16133,9 @@ const he = {
       "homeTitleGames": "משחקים השבוע בכיתה {{name}}: {{count}}. מי צריך עזרה?",
       "homeBody": "חינם לכיתה אחת. בפרו מקבלים גם שבועות קודמים, דוח לכל תלמיד ואת כל הכיתות.",
       "homeCta": "לצפייה בשבוע הזה"
-    }
+    },
+    "proPowered": {"hint": "חלק מתוכנית פרו למורים שלך"},
+    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"}
   },
   "education": {
     "race": {
@@ -16197,7 +16235,13 @@ const he = {
       "gradeOnTime": "הוגש בזמן. רצף הכיתה שמור.",
       "teacherLoadFailed": "לא הצלחנו לטעון מי שיחק. נסו שוב עוד רגע.",
       "teacherOnTime": "בזמן",
-      "teacherLate": "באיחור"
+      "teacherLate": "באיחור",
+      "introTitle_one": "מילה אחת שהכיתה פספסה",
+      "introTitle_other": "{{count}} מילים שהכיתה פספסה",
+      "studentTitle_one": "מילה אחת להחזיר",
+      "studentTitle_other": "{{count}} מילים להחזיר",
+      "startCta_one": "מתחילים: מילה אחת",
+      "startCta_other": "מתחילים: {{count}} מילים"
     },
     "modePicker": {
       "title": "בוחרים משחק",
@@ -16360,7 +16404,11 @@ const he = {
         "spelling": "הוסיפו מילים לשיעור כדי לפתוח",
         "flashcard": "הוסיפו מילים לשיעור כדי לפתוח",
         "word_list": "הוסיפו מילים לשיעור כדי לפתוח"
-      }
+      },
+      "words_one": "מילה אחת",
+      "words_other": "{{count}} מילים",
+      "questions_one": "שאלה אחת",
+      "questions_other": "{{count}} שאלות"
     },
     "produce": {
       "title": "בית המלאכה למילים",
@@ -17153,7 +17201,9 @@ const he = {
         "today": "היום",
         "openReport": "פתחו את הדוח של {{name}}",
         "unnamed": "תלמיד",
-        "drillDescription": "דוח התקדמות מפורט לתלמיד"
+        "drillDescription": "דוח התקדמות מפורט לתלמיד",
+        "hardWordsMeta_one": "תלמיד אחד · {{pct}}% טעויות",
+        "hardWordsMeta_other": "{{count}} תלמידים · {{pct}}% טעויות"
       },
       "studentProgress": "התקדמות תלמידים",
       "students": "תלמידים",
@@ -17244,7 +17294,9 @@ const he = {
       "title": "משחק כיתתי",
       "waitingForPlayers": "מכינים את משחק הכיתה שלך...",
       "waitingForStudents": "ממתין לתלמידים",
-      "words": "{{count}} מילים"
+      "words": "{{count}} מילים",
+      "words_one": "מילה אחת",
+      "words_other": "{{count}} מילים"
     },
     "header": {
       "exitEducation": "יציאה מאזור החינוך",
@@ -21701,7 +21753,9 @@ const he = {
       "studyBack": "הקודם",
       "studyNext": "הבא",
       "studyDone": "סיימתי ללמוד",
-      "studyReadyLocked": "קודם עוברים על כל {count} המילים, ואז אפשר ללחוץ 'מוכן'"
+      "studyReadyLocked": "קודם עוברים על כל {count} המילים, ואז אפשר ללחוץ 'מוכן'",
+      "studyLearned_one": "מילה אחת נלמדה",
+      "studyLearned_other": "{count} מילים נלמדו"
     },
     "recall": {
       "intro": "קראו אותן, ואז חידון קצר יבדוק שהן אצלכם.",
@@ -21937,6 +21991,8 @@ const he = {
       "hardestTitle": "המילים הקשות ביותר",
       "missedOf": "פוספסה {missed} מתוך {attempts}",
       "studentsMissing": "{count} מתוך {total} תלמידים",
+      "studentsMissing_one": "{count} מתוך {total} תלמיד",
+      "studentsMissing_other": "{count} מתוך {total} תלמידים",
       "noneMissed": "אף אחד עוד לא פספס מילה פעמיים. יפה.",
       "notFound": {
         "title": "לא נמצאו במשחקים",
@@ -21993,7 +22049,11 @@ const he = {
       "nothing": "עוד אין מילים שפוספסו לתרגול.",
       "inDays": "בעוד {count} ימים",
       "tomorrow": "מחר",
-      "whyNote": "שליפה מרווחת עדיפה על חזרה אחת ארוכה: כל סבב חוזר בדיוק כשהמילה מתחילה להישכח."
+      "whyNote": "שליפה מרווחת עדיפה על חזרה אחת ארוכה: כל סבב חוזר בדיוק כשהמילה מתחילה להישכח.",
+      "assignedBody_one": "מילה אחת, שלושה סבבים. התלמידים ימצאו אותה בשיעורים שלהם.",
+      "assignedBody_other": "{count} מילים, שלושה סבבים. התלמידים ימצאו אותם בשיעורים שלהם.",
+      "inDays_one": "בעוד יום אחד",
+      "inDays_other": "בעוד {count} ימים"
     },
     "reports": {
       "classEyebrow": "דוח כיתה",
@@ -22004,7 +22064,8 @@ const he = {
       "arcTitle": "תלמיד אחרי תלמיד",
       "arcHint": "מי מתקדם, מי נתקע, ואילו מילים מעכבות אותו.",
       "digestTitle": "המשחק האחרון בכיתה",
-      "digestHint": "מה קרה במשחק האחרון שלכם, במבט אחד."
+      "digestHint": "מה קרה במשחק האחרון שלכם, במבט אחד.",
+      "lessonsHint": "מאילו רשימות מילים הכיתה לומדת הכי טוב."
     },
     "upgrade": {
       "featureMastery": "10 המילים שהכי מפוספסות + מפת חום תלמיד × מילה",
@@ -22661,7 +22722,7 @@ const he = {
         "playAgain": "לשחק שוב",
         "pickGame": "לבחור משחק אחר",
         "loading": "בודקים את המשחק האחרון",
-        "ready": "{ready} מתוך {total} מוכנים למבחן",
+        "ready": "במשחק האחרון: {ready} מתוך {total} הגיעו ל-80% ומעלה במילות הרשימה",
         "readyEmpty": "תוצאות לפי מילה יופיעו אחרי המשחק הבא",
         "missed": "{count} לא היו · שליחת תרגול"
       },
@@ -22691,7 +22752,7 @@ const he = {
         "colName": "שם",
         "colXp": "XP",
         "colWords": "מילים",
-        "colAccuracy": "דיוק",
+        "colAccuracy": "דיוק כולל",
         "colWeek": "השבוע",
         "status": {
           "done": "שיחק השבוע",
@@ -22715,7 +22776,7 @@ const he = {
         "lastPlayed": "משחק אחרון: {when}",
         "notYet": "עוד לא",
         "streak": "רצף של {count} ימים",
-        "accuracy": "{count}% תשובות נכונות",
+        "accuracy": "{count}% תשובות נכונות בסך הכול",
         "noStreak": "אין רצף כרגע",
         "noWordsYet": "עוד לא תרגל מילים",
         "empty": "עוד אין תלמידים. שתפו את קוד הכיתה והם יופיעו כאן.",

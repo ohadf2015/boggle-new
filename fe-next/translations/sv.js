@@ -1127,7 +1127,9 @@ const sv = {
       "copiesOne": "{count} kopia",
       "results": "Resultat",
       "use": "Använd listan",
-      "actions": "Liståtgärder"
+      "actions": "Liståtgärder",
+      "words_one": "{count} ord",
+      "words_other": "{count} ord"
     },
     "badge": {
       "verified": "Verifierad",
@@ -15271,7 +15273,10 @@ const sv = {
         "wordHunt": "Ordjakt",
         "wheelRush": "Hjulrush",
         "vocabQuiz": "Ordquiz"
-      }
+      },
+      "playersPlayed_one": "{{count}} elev spelade",
+      "playersPlayed_other": "{{count}} elever spelade",
+      "topScorer": "Högsta poäng: {name}, {score}"
     },
     "classReport": {
       "title": "Ord per elev",
@@ -15324,6 +15329,8 @@ const sv = {
       "activatingBody": "Betalningen är mottagen. Bekräftar åtkomst — det tar oftast några sekunder.",
       "successTitle": "Teacher Pro är på",
       "successBody": "Åtkomsten finns redan på kontot.",
+      "trialSuccessTitle": "Din provperiod för Teacher Pro har börjat",
+      "trialSuccessBody": "Inget dras i dag. Kortet debiteras 9 $/mån när provperioden är slut, och du kan avsluta när du vill innan dess.",
       "failureTitle": "Pro är inte bekräftat ännu",
       "failureBody": "Om du blev debiterad brukar åtkomsten komma inom en minut. Kontrollera igen, eller skriv till oss om den fortfarande saknas.",
       "retry": "Kontrollera igen",
@@ -15454,7 +15461,15 @@ const sv = {
       "scheduleReteachHint": "Bygg om de svåra orden och spela igen om ungefär två veckor – utspridd repetition som fastnar.",
       "unpluggedReteachLiveCta": "Starta Unplugged reteach Live",
       "reteachLiveCta": "Starta 3-minuters reteach Live",
-      "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper."
+      "unpluggedReteachLiveFoil": "Inga elevenheter i dag? Projicera missarna – eleverna svarar på papper.",
+      "moodGreat_one": "{{count}} elev betygsatte senaste omgången som toppen.",
+      "moodGreat_other": "{{count}} elever betygsatte senaste omgången som toppen.",
+      "moodMixed_one": "{{count}} elev betygsatte senaste omgången som blandad.",
+      "moodMixed_other": "{{count}} elever betygsatte senaste omgången som blandad.",
+      "moodRough_one": "{{count}} elev betygsatte senaste omgången som tuff.",
+      "moodRough_other": "{{count}} elever betygsatte senaste omgången som tuff.",
+      "weeklyInactiveCount_one": "{{count}} elev inaktiv i 7 dagar",
+      "weeklyInactiveCount_other": "{{count}} elever inaktiva i 7 dagar"
     },
     "windowProgress": {
       "activeLine": "{{active}} av {{roster}} elever spelade",
@@ -15545,6 +15560,7 @@ const sv = {
       "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
       "districtCta": "Kontakta oss för skolpriser",
       "checkoutUnavailable": "Kassan är stängd just nu. Inget har debiterats. Försök igen om en stund.",
+      "alreadySubscribed": "Du har redan Teacher Pro, så du behöver inte betala igen. Du kan hantera eller avsluta det på din plansida.",
       "notInApp": "Teacher Pro går inte att köpa i appen.",
       "featureOutcome1": "Kör alla klasser du undervisar, utan tak",
       "featureOutcome2": "Lägg till alla klasser du undervisar, inte bara de tre första",
@@ -15835,7 +15851,13 @@ const sv = {
         "offHint": "Ingen topplista. XP, nivåer och märken räknas ändå."
       },
       "tapToCopy": "Tryck för att kopiera",
-      "codeCopiedShort": "Kopierad"
+      "codeCopiedShort": "Kopierad",
+      "studentCountPro_one": "{{count}} elev",
+      "studentCountPro_other": "{{count}} elever",
+      "cardSeeAllStudents_one": "Visa eleven",
+      "cardSeeAllStudents_other": "Visa alla {{count}} elever",
+      "members_one": "{{count}} elev",
+      "members_other": "{{count}} elever"
     },
     "classrooms": {
       "students": {
@@ -15936,7 +15958,9 @@ const sv = {
       "resumeDraftButton": "Återuppta",
       "discardDraftButton": "Släng",
       "startFromTemplate": "Börja från mall",
-      "templateLoaded": "Mall laddad: {{count}} ord"
+      "templateLoaded": "Mall laddad: {{count}} ord",
+      "words_one": "{{count}} ord",
+      "words_other": "{{count}} ord"
     },
     "lessons": {
       "assign": {
@@ -15959,7 +15983,9 @@ const sv = {
         "help": "Välj en färdighet att öva, eller låt eleverna välja själva. Bara färdigheter som lektionen har tillräckligt många ord för går att välja.",
         "any": "Valfri övning",
         "anyHint": "Eleverna väljer läge själva",
-        "questionCount": "{{count}} frågor · {{skill}}"
+        "questionCount": "{{count}} frågor · {{skill}}",
+        "questionCount_one": "{{count}} fråga · {{skill}}",
+        "questionCount_other": "{{count}} frågor · {{skill}}"
       },
       "createTitle": "Skapa uppgift",
       "create": "Skapa uppgift",
@@ -16058,7 +16084,9 @@ const sv = {
         "g68GeographyDesc": "Landskap, klimat och kartord",
         "g68Science": "Åk 6–8 NO: Kropp och energi",
         "g68ScienceDesc": "NO-begrepp för högstadiet med enkla förklaringar"
-      }
+      },
+      "findNWords_one": "Hitta {{count}} ord",
+      "findNWords_other": "Hitta {{count}} ord"
     },
     "completion": {
       "overallProgress": "Övergripande framsteg",
@@ -16220,7 +16248,8 @@ const sv = {
         "games": "Spel",
         "pulse": "Klassens puls",
         "homework": "Läxor",
-        "more": "Mer"
+        "more": "Mer",
+        "words": "Ord"
       },
       "noClassroomsFound": "Inga klassrum hittades",
       "error": "Kunde inte ladda rapporten",
@@ -16436,11 +16465,18 @@ const sv = {
         "errorNotFound": "Klassen eller uppgiften hittades inte. Den kan ha tagits bort.",
         "errorUngraded": "Den här Classroom-uppgiften har inga poäng och kan därför inte betygsättas.",
         "errorNotPro": "Att skicka betyg till Google Classroom ingår i Teacher Pro.",
-        "errorGeneric": "Något gick fel i kontakten med Google Classroom. Försök igen."
+        "errorGeneric": "Något gick fel i kontakten med Google Classroom. Försök igen.",
+        "updated_one": "{{count}} elev fick betyg",
+        "updated_other": "{{count}} elever fick betyg",
+        "skipped_one": "{{count}} elev hoppades över: har inte övat på lektionen än",
+        "skipped_other": "{{count}} elever hoppades över: har inte övat på lektionen än"
       },
       "picker": {
         "showing": "Visas ovan"
-      }
+      },
+      "ownPreview": {"title": "{{class}}, elev för elev", "line": "Med Pro får varje elev i klassen en egen rad: träffsäkerhet, hur många ord eleven kan och exakt vilka ord som missades.", "columns": {"student": "Elev", "accuracy": "Träffsäkerhet", "mastered": "Ord som sitter", "missed": "Missade ord"}, "locked": "Visas med Pro", "more_one": "+{{count}} elev till", "more_other": "+{{count}} elever till", "more_few": "+{{count}} elever till"},
+      "streakDays_one": "{{count}} dag",
+      "streakDays_other": "{{count}} dagar"
     },
     "curriculum": {
       "title": "Bibliotek",
@@ -16522,7 +16558,9 @@ const sv = {
       "homeTitleGames": "Spel i {{name}} den här veckan: {{count}}. Vem behöver hjälp?",
       "homeBody": "Gratis för en klass. Pro lägger till tidigare veckor, en rapport per elev och alla dina klasser.",
       "homeCta": "Se veckan"
-    }
+    },
+    "proPowered": {"hint": "Ingår i din Teacher Pro-plan"},
+    "trialUsage": {"lead": "Under din provperiod:", "games_one": "{count} klassmatch", "games_other": "{count} klassmatcher", "students_one": "{count} elev följs", "students_other": "{count} elever följs", "practice_one": "{count} övningspass", "practice_other": "{count} övningspass"}
   },
   "education": {
     "race": {
@@ -16622,7 +16660,13 @@ const sv = {
       "gradeOnTime": "I tid. Klassens svit är räddad.",
       "teacherLoadFailed": "Vi kunde inte hämta vilka som spelat. Försök igen om en stund.",
       "teacherOnTime": "I tid",
-      "teacherLate": "Sent"
+      "teacherLate": "Sent",
+      "introTitle_one": "{{count}} ord klassen missade",
+      "introTitle_other": "{{count}} ord klassen missade",
+      "studentTitle_one": "{{count}} ord att ta tillbaka",
+      "studentTitle_other": "{{count}} ord att ta tillbaka",
+      "startCta_one": "Starta ({{count}} ord)",
+      "startCta_other": "Starta ({{count}} ord)"
     },
     "modePicker": {
       "title": "Välj spelet",
@@ -16785,7 +16829,11 @@ const sv = {
         "spelling": "Lägg till ord i lektionen för att låsa upp",
         "flashcard": "Lägg till ord i lektionen för att låsa upp",
         "word_list": "Lägg till ord i lektionen för att låsa upp"
-      }
+      },
+      "words_one": "{{count}} ord",
+      "words_other": "{{count}} ord",
+      "questions_one": "{{count}} fråga",
+      "questions_other": "{{count}} frågor"
     },
     "produce": {
       "title": "Ordsmedjan",
@@ -17578,7 +17626,9 @@ const sv = {
         "today": "Idag",
         "openReport": "Öppna {{name}}s rapport",
         "unnamed": "Elev",
-        "drillDescription": "Detaljerad framstegsrapport för eleven"
+        "drillDescription": "Detaljerad framstegsrapport för eleven",
+        "hardWordsMeta_one": "{{count}} elev · {{pct}} % fel",
+        "hardWordsMeta_other": "{{count}} elever · {{pct}} % fel"
       },
       "studentProgress": "Elevframsteg",
       "students": "Elever",
@@ -17669,7 +17719,9 @@ const sv = {
       "title": "Klassrumsspel",
       "waitingForPlayers": "Förbereder klassrumsspelet...",
       "waitingForStudents": "Väntar på elever",
-      "words": "{{count}} ord"
+      "words": "{{count}} ord",
+      "words_one": "{{count}} ord",
+      "words_other": "{{count}} ord"
     },
     "header": {
       "exitEducation": "Lämna utbildningsläget",
@@ -21740,7 +21792,9 @@ const sv = {
       "studyBack": "Tillbaka",
       "studyNext": "Nästa",
       "studyDone": "Jag kan dem",
-      "studyReadyLocked": "Gå igenom alla {count} ord för att bli redo"
+      "studyReadyLocked": "Gå igenom alla {count} ord för att bli redo",
+      "studyLearned_one": "{count} ord klart",
+      "studyLearned_other": "{count} ord klara"
     },
     "recall": {
       "intro": "Läs igenom dem, sen kollar ett snabbt quiz att de sitter.",
@@ -21976,6 +22030,8 @@ const sv = {
       "hardestTitle": "Svåraste orden",
       "missedOf": "missat {missed} av {attempts}",
       "studentsMissing": "{count} av {total} elever",
+      "studentsMissing_one": "{count} av {total} elev",
+      "studentsMissing_other": "{count} av {total} elever",
       "noneMissed": "Ingen har missat ett ord två gånger än. Snyggt.",
       "notFound": {
         "title": "Hittades inte i spelen",
@@ -22032,7 +22088,11 @@ const sv = {
       "nothing": "Inga missade ord att öva på än.",
       "inDays": "om {count} dagar",
       "tomorrow": "I morgon",
-      "whyNote": "Utspridd repetition slår en lång genomgång: varje omgång kommer tillbaka precis när ordet börjar blekna."
+      "whyNote": "Utspridd repetition slår en lång genomgång: varje omgång kommer tillbaka precis när ordet börjar blekna.",
+      "assignedBody_one": "{count} ord, tre omgångar. Eleverna hittar det bland sina lektioner.",
+      "assignedBody_other": "{count} ord, tre omgångar. Eleverna hittar dem bland sina lektioner.",
+      "inDays_one": "om {count} dag",
+      "inDays_other": "om {count} dagar"
     },
     "reports": {
       "classEyebrow": "Klassrapport",
@@ -22043,7 +22103,8 @@ const sv = {
       "arcTitle": "Elev för elev",
       "arcHint": "Vem som klättrar, vem som fastnat och vilka ord som sätter stopp.",
       "digestTitle": "Senaste klasspelet",
-      "digestHint": "Vad som hände i ert senaste spel, i en snabb överblick."
+      "digestHint": "Vad som hände i ert senaste spel, i en snabb överblick.",
+      "lessonsHint": "Vilka ordlistor klassen lär sig bäst av."
     },
     "upgrade": {
       "featureMastery": "Topp 10 missade ord + värmekarta elev × ord",
@@ -22700,7 +22761,7 @@ const sv = {
         "playAgain": "Spela igen",
         "pickGame": "Välj ett annat spel",
         "loading": "Kollar ert senaste spel",
-        "ready": "{ready} av {total} redo för provet",
+        "ready": "Senaste spelet: {ready} av {total} nådde 80 % eller mer på listans ord",
         "readyEmpty": "Resultat per ord visas efter nästa spel",
         "missed": "{count} missade det · tilldela övning"
       },
@@ -22730,7 +22791,7 @@ const sv = {
         "colName": "Namn",
         "colXp": "XP",
         "colWords": "Ord",
-        "colAccuracy": "Träffsäkerhet",
+        "colAccuracy": "Träffsäkerhet (totalt)",
         "colWeek": "Den här veckan",
         "status": {
           "done": "Spelat den här veckan",
@@ -22754,7 +22815,7 @@ const sv = {
         "lastPlayed": "Senast spelat: {when}",
         "notYet": "inte än",
         "streak": "{count} dagar i rad",
-        "accuracy": "{count}% rätt svar",
+        "accuracy": "{count}% rätt svar totalt",
         "noStreak": "Ingen svit just nu",
         "noWordsYet": "Har inte övat på ord än",
         "empty": "Inga elever än. Dela klasskoden så dyker de upp här.",

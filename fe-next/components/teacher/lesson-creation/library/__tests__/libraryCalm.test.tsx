@@ -71,7 +71,7 @@ describe('Library cards', () => {
     expect(card.tagName).toBe('BUTTON');
     expect(card.querySelectorAll('button, a')).toHaveLength(0);
     expect(card).toHaveTextContent('Ocean Animals');
-    expect(within(card).getByTestId('library-card-fact')).toHaveTextContent('eduLibrary.card.words');
+    expect(within(card).getByTestId('library-card-fact')).toHaveTextContent('eduLibrary.card.words_other');
     expect(within(card).getByTestId('library-card-fact')).toHaveTextContent('עברית');
     expect(card).toHaveTextContent('eduLibrary.card.use');
     expect(screen.queryByTestId('library-card-sample')).toBeNull();

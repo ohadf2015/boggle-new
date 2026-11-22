@@ -59,9 +59,6 @@ import {
   trackEduFirstAssignmentCtaShown,
   trackEduFirstAssignmentCtaClicked,
   trackEduFirstAssignmentCreated,
-  trackTeacherFirstAssignmentCtaViewed,
-  trackTeacherFirstAssignmentCtaClicked,
-  trackEduAssignmentStartLiveClicked,
   trackEduAssignmentReminderShown,
   trackEduAssignmentOverdue,
   trackTeacherHqProgressViewed,
@@ -578,22 +575,7 @@ describe('education telemetry', () => {
     });
   });
 
-  it('class-detail empty-state CTA events keep teacher_first_assignment_cta_* names', () => {
-    trackTeacherFirstAssignmentCtaViewed({ classroomId: 'cls-1' });
-    expect(captureMock).toHaveBeenLastCalledWith('teacher_first_assignment_cta_viewed', {
-      classroom_id: 'cls-1',
-    });
-    trackTeacherFirstAssignmentCtaClicked({ classroomId: 'cls-1' });
-    expect(captureMock).toHaveBeenLastCalledWith('teacher_first_assignment_cta_clicked', {
-      classroom_id: 'cls-1',
-    });
-  });
-
-  it('start-live-class CTA events keep the two funnel names and omit the join code', () => {
-    trackEduAssignmentStartLiveClicked({ classroomId: 'cls-1' });
-    expect(captureMock).toHaveBeenLastCalledWith('edu_assignment_start_live_clicked', {
-      classroom_id: 'cls-1',
-    });
+  it('join-code copy event keeps its funnel name and omits the join code', () => {
     trackEduJoinCodeCopied({ classroomId: 'cls-1' });
     expect(captureMock).toHaveBeenLastCalledWith('edu_join_code_copied', {
       classroom_id: 'cls-1',

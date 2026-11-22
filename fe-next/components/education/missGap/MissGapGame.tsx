@@ -40,6 +40,7 @@ import { useMissGapSound } from './missGapSound';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { EduMascotReactions } from '@/components/education/EduMascotReactions';
 import { buildMissGapProgressUrl } from './useMissGapProgress';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 const REVEAL_MS = 950;
 const STREAK_SOUND_AT = 3;
@@ -80,7 +81,7 @@ export function MissGapGame({
   finishActions,
   onFinished,
 }: MissGapGameProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const playSound = useMissGapSound();
 
   const [phase, setPhase] = useState<'intro' | 'play' | 'done'>('intro');
@@ -351,7 +352,7 @@ export function MissGapGame({
                 className="w-28 h-28 drop-shadow-[4px_4px_0_rgba(0,0,0,0.4)]"
               />
               <h2 className="font-neo-display font-bold text-2xl text-neo-white leading-tight">
-                {t('education.homework.introTitle', { count: rounds.length })}
+                {t(pluralKeyOf('education.homework.introTitle', rounds.length, language), { count: rounds.length })}
               </h2>
               <p className="font-neo-body text-sm text-neo-cream">
                 {t('education.homework.introSubtitle')}

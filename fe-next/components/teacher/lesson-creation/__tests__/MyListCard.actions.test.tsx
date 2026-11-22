@@ -40,7 +40,7 @@ describe('MyListCard face', () => {
     const band = screen.getByTestId('list-card-band');
     expect(band).toHaveTextContent('2');
     const fact = screen.getByTestId('lesson-fact-L1');
-    expect(fact).toHaveTextContent('eduLibrary.card.words:{"count":2}');
+    expect(fact).toHaveTextContent('eduLibrary.card.words_other:{"count":2}');
     expect(fact).toHaveTextContent('English');
     expect(screen.getAllByTestId('word-tile').map((w) => w.textContent)).toEqual(['photon', 'orbit']);
     expect(screen.getByTestId('my-list-L1')).not.toHaveTextContent('teacher.lesson.definitionCoverage');

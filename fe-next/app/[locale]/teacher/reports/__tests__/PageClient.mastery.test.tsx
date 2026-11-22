@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
 
 let search = '';
 vi.mock('@/components/teacher/analytics/overview/ClassOverview', () => ({
@@ -25,7 +25,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/hooks/useClassroom', () => ({
   useClassrooms: () => ({
-    classrooms: [{ id: 'c1', name: 'Band 2', member_count: 2, language: 'en' }],
+    classrooms: [{ id: '11111111-1111-4111-8111-111111111111', name: 'Band 2', member_count: 2, language: 'en' }],
     isLoading: false,
   }),
 }));
@@ -68,7 +68,7 @@ vi.mock('@/components/teacher/reports/ClassProgressReport', () => ({
 vi.mock('@/components/teacher/reports/ClassArcPanel', () => ({
   ClassArcPanel: ({ onStudentClick }: { onStudentClick: (id: string, name?: string) => void }) => (
     <div data-testid="class-arc-panel">
-      <button type="button" onClick={() => onStudentClick('s1', 'Sam')}>pick</button>
+      <button type="button" onClick={() => onStudentClick('33333333-3333-4333-8333-333333333333', 'Sam')}>pick</button>
     </div>
   ),
 }));
@@ -112,12 +112,26 @@ vi.mock('@/components/teacher/reports/WordMasteryReport', () => ({
   WordMasteryReport: ({ classroomId }: { classroomId: string }) => <div data-testid="word-mastery-report">{classroomId}</div>,
 }));
 
+vi.mock('@/components/teacher/analytics/VocabularyHeatmap', () => ({
+  VocabularyHeatmap: ({ classroomId }: { classroomId: string }) => <div data-testid="vocabulary-heatmap">{classroomId}</div>,
+}));
+vi.mock('next/dynamic', () => ({
+  default: () => ({ classroomId }: { classroomId: string }) => <div data-testid="lesson-effectiveness">{classroomId}</div>,
+}));
+const live = vi.hoisted(() => ({ connectionStatus: 'connected', activeStudentsCount: 0, isConnected: true }));
+vi.mock('@/hooks/useRealtimeClassroomProgress', () => ({
+  useRealtimeClassroomProgress: () => ({ ...live, lastUpdate: null, recentActivity: [] }),
+}));
+vi.mock('@/components/teacher/analytics/LiveActivityIndicator', () => ({
+  LiveActivityIndicator: ({ activeStudentsCount }: { activeStudentsCount: number }) => <div data-testid="live-indicator">{activeStudentsCount}</div>,
+}));
+
 import userEvent from '@testing-library/user-event';
 import TeacherReportsPage from '../PageClient';
 
 describe('<TeacherReportsPage> class view — summary first, detail on demand', () => {
   beforeEach(() => {
-    search = 'classroomId=c1';
+    search = 'classroomId=11111111-1111-4111-8111-111111111111';
   });
 
   it('names the class once, as the page heading', () => {
@@ -134,17 +148,56 @@ describe('<TeacherReportsPage> class view — summary first, detail on demand', 
   it('opens on the roster, with the other sections one tab away and not mounted', () => {
     render(<TeacherReportsPage />);
     const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
-    expect(tabs).toEqual(['students', 'games', 'pulse', 'homework', 'more'].map((id) => `teacher.reports.tabs.${id}`));
+    expect(tabs).toEqual(['students', 'games', 'words', 'homework', 'more'].map((id) => `teacher.reports.tabs.${id}`));
     expect(screen.getByRole('tab', { selected: true })).toHaveTextContent('teacher.reports.tabs.students');
     expect(screen.getByTestId('classroom-roster-progress')).toBeInTheDocument();
     expect(screen.queryByTestId('word-mastery-report')).toBeNull();
     expect(screen.queryByTestId('class-arc-panel')).toBeNull();
   });
 
-  it('shows the word mastery report on the class pulse tab', async () => {
+  it('shows the word mastery report with the vocabulary heatmap under it on the words tab', async () => {
     render(<TeacherReportsPage />);
-    await openTab('pulse');
-    expect(await screen.findByTestId('word-mastery-report')).toHaveTextContent('c1');
+    await openTab('words');
+    const mastery = await screen.findByTestId('word-mastery-report');
+    expect(mastery).toHaveTextContent('11111111-1111-4111-8111-111111111111');
+    const heatmap = screen.getByTestId('vocabulary-heatmap');
+    expect(mastery.compareDocumentPosition(heatmap) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('Given an old ?section=pulse link, Then the words tab opens', () => {
+    search = 'classroomId=11111111-1111-4111-8111-111111111111&section=pulse';
+    render(<TeacherReportsPage />);
+    expect(screen.getByRole('tab', { selected: true })).toHaveTextContent('teacher.reports.tabs.words');
+  });
+
+  it('keeps lesson effectiveness folded on the more tab and mounts it only when opened', async () => {
+    render(<TeacherReportsPage />);
+    await openTab('more');
+    const lessons = screen.getByTestId('lessons-disclosure') as HTMLDetailsElement;
+    expect(within(lessons).getByTestId('pro-powered-chip')).toBeInTheDocument();
+    expect(screen.queryByTestId('lesson-effectiveness')).toBeNull();
+    act(() => {
+      lessons.open = true;
+      lessons.dispatchEvent(new Event('toggle'));
+    });
+    expect(screen.getByTestId('lesson-effectiveness')).toHaveTextContent('11111111-1111-4111-8111-111111111111');
+  });
+
+  it('shows who is playing right now only while students are live', () => {
+    live.activeStudentsCount = 0;
+    const { unmount } = render(<TeacherReportsPage />);
+    expect(screen.queryByTestId('live-indicator')).toBeNull();
+    unmount();
+    live.activeStudentsCount = 3;
+    render(<TeacherReportsPage />);
+    expect(screen.getByTestId('live-indicator')).toHaveTextContent('3');
+    live.activeStudentsCount = 0;
+  });
+
+  it('has no link to a second class report page', () => {
+    render(<TeacherReportsPage />);
+    expect(screen.queryByTestId('reports-class-report-link')).toBeNull();
+    expect(document.querySelector('a[href*="/analytics"]')).toBeNull();
   });
 
   it('shows the class assignment grid open on the homework tab, with the per-assignment reports folded under it', async () => {

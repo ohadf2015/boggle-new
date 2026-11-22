@@ -31,7 +31,6 @@ const SCREENS: readonly [string, string][] = [
   ['/teacher/classroom/new (ready)', 'components/education/ClassSetupInvite.tsx'],
   ['/teacher/curriculum', 'app/[locale]/teacher/curriculum/PageClient.tsx'],
   ['/teacher/reports', 'app/[locale]/teacher/reports/PageClient.tsx'],
-  ['/teacher/classroom/[id]/analytics', 'app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx'],
   ['/teacher/profile', 'app/[locale]/teacher/profile/PageClient.tsx'],
 ];
 

@@ -1,8 +1,7 @@
 /**
  * useAssignments — two instances for one classroom stay in sync.
- * TeacherDashboard mounts the AssignmentCreator and the AssignmentTrackingPanel
- * with separate hook instances; a created assignment used to stay invisible in
- * the panel ("All (0)") until a page reload.
+ * Separate hook instances for one classroom must see a created assignment
+ * without a page reload.
  */
 import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';

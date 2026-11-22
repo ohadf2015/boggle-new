@@ -25,6 +25,7 @@ import { Lock, Zap } from 'lucide-react';
 import { practiceTileArt, practiceTileAccent } from '@/lib/education/practiceTileArt';
 import { practiceXpRate } from '@/lib/education/practiceJuice';
 import type { PracticeTile } from '@/lib/education/practicePicker';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface PracticePickerTileProps {
   tile: PracticeTile;
@@ -32,15 +33,15 @@ export interface PracticePickerTileProps {
 }
 
 export default function PracticePickerTile({ tile, onSelect }: PracticePickerTileProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const art = practiceTileArt(tile.id);
   const accent = practiceTileAccent(tile.id);
   const xp = practiceXpRate(tile.id);
 
   const countLabel =
     tile.countKind === 'questions'
-      ? t('education.practicePicker.questions', { count: tile.count })
-      : t('education.practicePicker.words', { count: tile.count });
+      ? t(pluralKeyOf('education.practicePicker.questions', tile.count, language), { count: tile.count })
+      : t(pluralKeyOf('education.practicePicker.words', tile.count, language), { count: tile.count });
 
   return (
     <button

@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { GraduationCap, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomAssignments } from '@/lib/supabase/education/assignments';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 interface Course { id: string; name: string }
 interface CourseWork { id: string; title: string; maxPoints?: number; associatedWithDeveloper?: boolean }
@@ -59,7 +60,7 @@ const btn =
 const selectCls = 'min-h-11 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white';
 
 export function GoogleClassroomGradePassback({ classroomId, enabled }: { classroomId: string; enabled: boolean }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState<string | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -322,8 +323,8 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
       {phase === 'done' && summary && (
         <div className="space-y-2 text-sm text-neo-white" data-testid="gc-grade-summary">
           <h3 className="font-bold">{t('teacher.reports.googleClassroom.resultTitle')}</h3>
-          <p>{t('teacher.reports.googleClassroom.updated', { count: summary.updated })}</p>
-          {summary.skipped.length > 0 && <p>{t('teacher.reports.googleClassroom.skipped', { count: summary.skipped.length })}</p>}
+          <p>{t(pluralKeyOf('teacher.reports.googleClassroom.updated', summary.updated, language), { count: summary.updated })}</p>
+          {summary.skipped.length > 0 && <p>{t(pluralKeyOf('teacher.reports.googleClassroom.skipped', summary.skipped.length, language), { count: summary.skipped.length })}</p>}
           {summary.notReturned && summary.notReturned.length > 0 && (
             <div>
               <p className="font-bold">{t('teacher.reports.googleClassroom.notReturnedTitle')}</p>

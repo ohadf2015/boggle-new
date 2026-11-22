@@ -90,10 +90,10 @@ describe('GoogleClassroomGradePassback', () => {
 
     await userEvent.click(screen.getByRole('button', { name: `${K}.confirm` }));
 
-    expect(await screen.findByText(`${K}.updated 3`)).toBeInTheDocument();
+    expect(await screen.findByText(`${K}.updated_other 3`)).toBeInTheDocument();
     expect(screen.getByText(/Guest Fox/)).toBeInTheDocument();
     expect(screen.getByText(/Noa/)).toBeInTheDocument();
-    expect(screen.getByText(`${K}.skipped 1`)).toBeInTheDocument();
+    expect(screen.getByText(`${K}.skipped_one 1`)).toBeInTheDocument();
 
     const [url, init] = fetchMock.mock.calls[2];
     expect(url).toBe('/api/education/google-classroom/grades');

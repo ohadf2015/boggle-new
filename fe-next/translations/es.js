@@ -1127,7 +1127,9 @@ const es = {
       "copiesOne": "{count} copia",
       "results": "Resultados",
       "use": "Usar lista",
-      "actions": "Acciones de la lista"
+      "actions": "Acciones de la lista",
+      "words_one": "{count} palabra",
+      "words_other": "{count} palabras"
     },
     "badge": {
       "verified": "Verificada",
@@ -14908,7 +14910,10 @@ const es = {
         "wordHunt": "Caza de palabras",
         "wheelRush": "Rueda veloz",
         "vocabQuiz": "Concurso de palabras"
-      }
+      },
+      "playersPlayed_one": "{{count}} estudiante jugó",
+      "playersPlayed_other": "{{count}} estudiantes jugaron",
+      "topScorer": "Mejor puntaje: {name}, {score}"
     },
     "classReport": {
       "title": "Palabra por estudiante",
@@ -14961,6 +14966,8 @@ const es = {
       "activatingBody": "Pago recibido. Confirmando el acceso — suele tardar unos segundos.",
       "successTitle": "Teacher Pro está activo",
       "successBody": "El acceso ya está en tu cuenta.",
+      "trialSuccessTitle": "Tu prueba de Teacher Pro ha empezado",
+      "trialSuccessBody": "Hoy no se te cobra nada. Cuando termine la prueba, se cobrarán 9 $/mes a tu tarjeta, y puedes cancelar cuando quieras antes.",
       "failureTitle": "Aún no confirmamos Pro",
       "failureBody": "Si te cobramos, el acceso suele llegar en un minuto. Vuelve a comprobarlo, o escríbenos si sigue faltando.",
       "retry": "Comprobar de nuevo",
@@ -15092,7 +15099,15 @@ const es = {
       "scheduleReteachHint": "Reconstruye las palabras difíciles y vuelve a jugar en unas dos semanas: repaso espaciado que se queda.",
       "unpluggedReteachLiveCta": "Empezar Unplugged reteach Live",
       "reteachLiveCta": "Empezar reteach Live de 3 min",
-      "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel."
+      "unpluggedReteachLiveFoil": "¿Hoy sin dispositivos para el alumnado? Proyecta los fallos y que respondan en papel.",
+      "moodGreat_one": "{{count}} estudiante calificó la última ronda como genial.",
+      "moodGreat_other": "{{count}} estudiantes calificaron la última ronda como genial.",
+      "moodMixed_one": "{{count}} estudiante calificó la última ronda como mixta.",
+      "moodMixed_other": "{{count}} estudiantes calificaron la última ronda como mixta.",
+      "moodRough_one": "{{count}} estudiante calificó la última ronda como dura.",
+      "moodRough_other": "{{count}} estudiantes calificaron la última ronda como dura.",
+      "weeklyInactiveCount_one": "{{count}} estudiante inactivo 7 días",
+      "weeklyInactiveCount_other": "{{count}} estudiantes inactivos 7 días"
     },
     "windowProgress": {
       "activeLine": "{{active}} de {{roster}} estudiantes jugaron",
@@ -15183,6 +15198,7 @@ const es = {
       "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
       "districtCta": "Contáctanos para precios escolares",
       "checkoutUnavailable": "El pago está cerrado ahora mismo; no se ha cobrado nada. Inténtalo de nuevo en un rato.",
+      "alreadySubscribed": "Ya tienes Teacher Pro, así que no hace falta pagar otra vez. Puedes gestionarlo o cancelarlo desde la página de tu plan.",
       "notInApp": "Teacher Pro no se puede comprar en la app.",
       "featureOutcome1": "Gestiona todas las clases que das, sin tope",
       "featureOutcome2": "Añade todas tus secciones, no solo las primeras 3 clases",
@@ -15452,7 +15468,13 @@ const es = {
         "offHint": "Sin clasificación. La XP, los niveles y las insignias siguen contando."
       },
       "tapToCopy": "Toca para copiar",
-      "codeCopiedShort": "Copiado"
+      "codeCopiedShort": "Copiado",
+      "studentCountPro_one": "{{count}} alumno",
+      "studentCountPro_other": "{{count}} alumnos",
+      "cardSeeAllStudents_one": "Ver al alumno",
+      "cardSeeAllStudents_other": "Ver los {{count}} alumnos",
+      "members_one": "{{count}} estudiante",
+      "members_other": "{{count}} estudiantes"
     },
     "classrooms": {
       "students": {
@@ -15553,7 +15575,9 @@ const es = {
       "resumeDraftButton": "Continuar",
       "discardDraftButton": "Descartar",
       "startFromTemplate": "Empezar desde una plantilla",
-      "templateLoaded": "Plantilla cargada: {{count}} palabras"
+      "templateLoaded": "Plantilla cargada: {{count}} palabras",
+      "words_one": "{{count}} palabra",
+      "words_other": "{{count}} palabras"
     },
     "lessons": {
       "assign": {
@@ -15685,7 +15709,8 @@ const es = {
         "games": "Partidas",
         "pulse": "Pulso de la clase",
         "homework": "Tareas",
-        "more": "Más"
+        "more": "Más",
+        "words": "Palabras"
       },
       "noClassroomsFound": "No se encontraron aulas",
       "error": "No se pudo cargar el informe",
@@ -15901,11 +15926,18 @@ const es = {
         "errorNotFound": "No se encontró la clase o la tarea. Puede que se haya eliminado.",
         "errorUngraded": "Esta tarea de Classroom no tiene puntos, así que no admite nota.",
         "errorNotPro": "Enviar notas a Google Classroom forma parte de Teacher Pro.",
-        "errorGeneric": "Algo falló al comunicarse con Google Classroom. Inténtalo de nuevo."
+        "errorGeneric": "Algo falló al comunicarse con Google Classroom. Inténtalo de nuevo.",
+        "updated_one": "{{count}} alumno calificado",
+        "updated_other": "{{count}} alumnos calificados",
+        "skipped_one": "{{count}} alumno omitido: aún no ha practicado esta lección",
+        "skipped_other": "{{count}} alumnos omitidos: aún no han practicado esta lección"
       },
       "picker": {
         "showing": "Se muestra arriba"
-      }
+      },
+      "ownPreview": {"title": "{{class}}, alumno por alumno", "line": "Con Pro, cada alumno de tu lista tiene su fila: su precisión, cuántas palabras domina y qué palabras exactas falló.", "columns": {"student": "Alumno", "accuracy": "Precisión", "mastered": "Palabras dominadas", "missed": "Palabras falladas"}, "locked": "Se ve con Pro", "more_one": "+{{count}} alumno más", "more_other": "+{{count}} alumnos más", "more_few": "+{{count}} alumnos más"},
+      "streakDays_one": "{{count}} día",
+      "streakDays_other": "{{count}} días"
     },
     "teacher": {
       "activeGames": "Partidas activas",
@@ -15987,7 +16019,9 @@ const es = {
         "help": "Elige una habilidad para practicar o deja que el alumnado elija. Solo están disponibles las habilidades para las que la lección tiene suficientes palabras.",
         "any": "Cualquier práctica",
         "anyHint": "Cada estudiante elige su modo",
-        "questionCount": "{{count}} preguntas · {{skill}}"
+        "questionCount": "{{count}} preguntas · {{skill}}",
+        "questionCount_one": "{{count}} pregunta · {{skill}}",
+        "questionCount_other": "{{count}} preguntas · {{skill}}"
       },
       "createTitle": "Crear tarea",
       "create": "Crear tarea",
@@ -16086,7 +16120,9 @@ const es = {
         "g68GeographyDesc": "Relieve, clima y palabras para leer mapas",
         "g68Science": "6.º–8.º Ciencias: cuerpo y energía",
         "g68ScienceDesc": "Términos de ciencias de secundaria con significados claros"
-      }
+      },
+      "findNWords_one": "Encuentra {{count}} palabra",
+      "findNWords_other": "Encuentra {{count}} palabras"
     },
     "completion": {
       "overallProgress": "Progreso general",
@@ -16160,7 +16196,9 @@ const es = {
       "homeTitleGames": "Partidas en {{name}} esta semana: {{count}}. ¿Quién necesita ayuda?",
       "homeBody": "Gratis para una clase. Pro añade las semanas anteriores, un informe por estudiante y todas tus clases.",
       "homeCta": "Ver esta semana"
-    }
+    },
+    "proPowered": {"hint": "Incluido en tu plan Teacher Pro"},
+    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"}
   },
   "education": {
     "race": {
@@ -16260,7 +16298,13 @@ const es = {
       "gradeOnTime": "A tiempo: la racha de la clase está a salvo.",
       "teacherLoadFailed": "No pudimos cargar quién ha jugado. Inténtalo en un momento.",
       "teacherOnTime": "A tiempo",
-      "teacherLate": "Tarde"
+      "teacherLate": "Tarde",
+      "introTitle_one": "{{count}} palabra que se le escapó a la clase",
+      "introTitle_other": "{{count}} palabras que se le escaparon a la clase",
+      "studentTitle_one": "{{count}} palabra por recuperar",
+      "studentTitle_other": "{{count}} palabras por recuperar",
+      "startCta_one": "Empezar ({{count}} palabra)",
+      "startCta_other": "Empezar ({{count}} palabras)"
     },
     "modePicker": {
       "title": "Elige el juego",
@@ -16423,7 +16467,11 @@ const es = {
         "spelling": "Añade palabras a esta lección para desbloquear",
         "flashcard": "Añade palabras a esta lección para desbloquear",
         "word_list": "Añade palabras a esta lección para desbloquear"
-      }
+      },
+      "words_one": "{{count}} palabra",
+      "words_other": "{{count}} palabras",
+      "questions_one": "{{count}} pregunta",
+      "questions_other": "{{count}} preguntas"
     },
     "produce": {
       "title": "Forja de palabras",
@@ -17216,7 +17264,9 @@ const es = {
         "today": "Hoy",
         "openReport": "Abrir el informe de {{name}}",
         "unnamed": "Alumno",
-        "drillDescription": "Informe de progreso detallado de este alumno"
+        "drillDescription": "Informe de progreso detallado de este alumno",
+        "hardWordsMeta_one": "{{count}} alumno · {{pct}} % de fallos",
+        "hardWordsMeta_other": "{{count}} alumnos · {{pct}} % de fallos"
       },
       "studentProgress": "Progreso",
       "students": "Estudiantes",
@@ -17307,7 +17357,9 @@ const es = {
       "title": "Juego en vivo",
       "waitingForPlayers": "Preparando tu juego de clase...",
       "waitingForStudents": "Esperando a los estudiantes",
-      "words": "{{count}} palabras"
+      "words": "{{count}} palabras",
+      "words_one": "{{count}} palabra",
+      "words_other": "{{count}} palabras"
     },
     "header": {
       "breadcrumbs": {
@@ -21752,7 +21804,9 @@ const es = {
       "studyBack": "Atrás",
       "studyNext": "Siguiente",
       "studyDone": "Ya me las sé",
-      "studyReadyLocked": "Repasa las {count} palabras para poder marcar listo"
+      "studyReadyLocked": "Repasa las {count} palabras para poder marcar listo",
+      "studyLearned_one": "{count} palabra aprendida",
+      "studyLearned_other": "{count} palabras aprendidas"
     },
     "recall": {
       "intro": "Léelas una vez y luego un quiz rápido comprueba que te las sabes.",
@@ -21988,6 +22042,8 @@ const es = {
       "hardestTitle": "Palabras más difíciles",
       "missedOf": "falló {missed} de {attempts}",
       "studentsMissing": "{count} de {total} alumnos",
+      "studentsMissing_one": "{count} de {total} alumno",
+      "studentsMissing_other": "{count} de {total} alumnos",
       "noneMissed": "Nadie ha fallado una palabra dos veces todavía. Bien.",
       "notFound": {
         "title": "No encontradas en los juegos",
@@ -22044,7 +22100,11 @@ const es = {
       "nothing": "Todavía no hay palabras falladas que practicar.",
       "inDays": "en {count} días",
       "tomorrow": "Mañana",
-      "whyNote": "Recordar a intervalos funciona mejor que un repaso largo: cada ronda vuelve justo cuando la palabra empieza a olvidarse."
+      "whyNote": "Recordar a intervalos funciona mejor que un repaso largo: cada ronda vuelve justo cuando la palabra empieza a olvidarse.",
+      "assignedBody_one": "{count} palabra, tres rondas. Tus alumnos la verán en sus lecciones.",
+      "assignedBody_other": "{count} palabras, tres rondas. Tus alumnos las verán en sus lecciones.",
+      "inDays_one": "en {count} día",
+      "inDays_other": "en {count} días"
     },
     "reports": {
       "classEyebrow": "Informe de la clase",
@@ -22055,7 +22115,8 @@ const es = {
       "arcTitle": "Alumno por alumno",
       "arcHint": "Quién avanza, quién se ha atascado y qué palabras lo frenan.",
       "digestTitle": "Última partida de la clase",
-      "digestHint": "Lo que pasó en tu partida más reciente, de un vistazo."
+      "digestHint": "Lo que pasó en tu partida más reciente, de un vistazo.",
+      "lessonsHint": "Con qué listas de palabras aprende mejor tu clase."
     },
     "upgrade": {
       "featureMastery": "Las 10 palabras más falladas + mapa alumno × palabra",
@@ -22712,7 +22773,7 @@ const es = {
         "playAgain": "Jugar otra vez",
         "pickGame": "Elegir otro juego",
         "loading": "Revisando tu última partida",
-        "ready": "{ready} de {total} listos para el examen",
+        "ready": "Último juego: {ready} de {total} con 80 % o más en las palabras de la lista",
         "readyEmpty": "Los resultados por palabra aparecen después de tu próxima partida",
         "missed": "Faltaron: {count} · asignar práctica"
       },
@@ -22742,7 +22803,7 @@ const es = {
         "colName": "Nombre",
         "colXp": "XP",
         "colWords": "Palabras",
-        "colAccuracy": "Precisión",
+        "colAccuracy": "Precisión (total)",
         "colWeek": "Esta semana",
         "status": {
           "done": "Jugó esta semana",
@@ -22766,7 +22827,7 @@ const es = {
         "lastPlayed": "Última partida: {when}",
         "notYet": "todavía no",
         "streak": "Racha de {count} días",
-        "accuracy": "{count}% de aciertos",
+        "accuracy": "{count}% de aciertos en total",
         "noStreak": "Sin racha ahora mismo",
         "noWordsYet": "Aún no ha practicado palabras",
         "empty": "Aún no hay alumnos. Comparte el código de la clase y aparecerán aquí.",

@@ -87,4 +87,23 @@ describe('TeacherProTrialExpiringBanner', () => {
     expect(onDismiss).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId('teacher-pro-trial-expiring')).toBeNull();
   });
+
+  it('Given trial usage, When the banner shows, Then it names what the teacher ran during the trial', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      json: async () => ({ ok: true, usage: { games: 7, students: 42, practice: 90 } }),
+    } as Response);
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(3)} portalUrl={PORTAL} />);
+    expect(await screen.findByTestId('trial-usage-recap')).toHaveTextContent('teacher.trialUsage.lead');
+    spy.mockRestore();
+  });
+
+  it('Given the usage read fails, When the banner shows, Then the banner stays without the recap', async () => {
+    const spy = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('offline'));
+    render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(3)} portalUrl={PORTAL} />);
+    await vi.waitFor(() => expect(spy).toHaveBeenCalled());
+    expect(screen.getByTestId('teacher-pro-trial-expiring')).toBeInTheDocument();
+    expect(screen.queryByTestId('trial-usage-recap')).toBeNull();
+    spy.mockRestore();
+  });
 });

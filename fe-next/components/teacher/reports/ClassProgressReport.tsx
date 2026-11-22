@@ -28,6 +28,7 @@ import {
   useReportData,
   useReportExport,
 } from './ReportChrome';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface ClassProgressReportProps {
   classroomId: string;
@@ -137,7 +138,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
                 <div className="min-w-0">
                   {studentName(performer.studentId, performer.studentName)}
                   <p className="text-sm text-neo-cream/75 tabular-nums">
-                    {`${performer.accuracy}% · ${t('education.classroomGame.words', { count: performer.wordsLearned })}`}
+                    {`${performer.accuracy}% · ${t(pluralKeyOf('education.classroomGame.words', performer.wordsLearned, language), { count: performer.wordsLearned })}`}
                   </p>
                 </div>
               </li>

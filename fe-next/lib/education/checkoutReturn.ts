@@ -13,6 +13,8 @@ export const RETURN_INTENT_KEY = 'lexi_edu_checkout_return_intent';
 export const RETURN_INTENT_TTL_MS = 30 * 60 * 1000;
 export const GRANT_POLL_INTERVAL_MS = 2_000;
 export const GRANT_POLL_MAX_TRIES = 8;
+const WELCOMED_KEY_PREFIX = 'lexi_edu_checkout_welcomed:';
+const LANDING_WINDOW_MS = 10_000;
 
 export type CheckoutReturnPhase = 'idle' | 'activating' | 'success' | 'failure';
 
@@ -44,6 +46,25 @@ export function checkoutIdFromSearch(search: string): string | null {
   const raw = search.startsWith('?') ? search.slice(1) : search;
   if (!raw) return null;
   return normalizeCheckoutId(new URLSearchParams(raw).get('checkout_id'));
+}
+
+/**
+ * True only while this checkout's success landing is new: every surface mounting
+ * for it (and a StrictMode re-run) agrees, while Back to the same URL a minute
+ * later re-welcomes nobody. Marked at show-time, not dismiss-time.
+ */
+export function isFreshCheckoutLanding(storage: GetStorage & SetStorage, search: string, now: number = Date.now()): boolean {
+  const id = checkoutIdFromSearch(search);
+  if (!id) return true;
+  try {
+    const key = `${WELCOMED_KEY_PREFIX}${id}`;
+    const first = Number(storage.getItem(key));
+    if (Number.isFinite(first) && first > 0) return now - first < LANDING_WINDOW_MS;
+    storage.setItem(key, String(now));
+    return true;
+  } catch {
+    return true;
+  }
 }
 
 const MAX_RETURN_PATH = 512;

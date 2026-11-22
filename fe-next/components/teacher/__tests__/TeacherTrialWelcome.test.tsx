@@ -36,21 +36,13 @@ describe('TeacherTrialWelcome', () => {
     window.history.replaceState(null, '', '/en/teacher?checkout=success');
   });
 
-  it('shows days remaining and an Upgrade CTA that POSTs paid Polar checkout', async () => {
-    postTeacherProCheckout.mockResolvedValue({ ok: true, url: 'https://polar.sh/c/1' });
+  it('Given a card trial just started, When the welcome shows, Then it shows days left and offers no second checkout', () => {
     const trialExpires = new Date(Date.now() + 14 * 86400000).toISOString();
     render(<TeacherTrialWelcome trialExpires={trialExpires} />);
-    const dialog = screen.getByTestId('teacher-trial-welcome');
-    expect(dialog).toHaveAttribute('data-days', '14');
-    expect(screen.getByTestId('teacher-trial-welcome-days')).toHaveTextContent(
-      'teacher.plan.trialDaysLeft:14',
-    );
-    fireEvent.click(screen.getByTestId('teacher-trial-welcome-upgrade'));
-    await waitFor(() => {
-      expect(postTeacherProCheckout).toHaveBeenCalledTimes(1);
-    });
-    expect(trackEduProUpgradeClicked).toHaveBeenCalledWith({ source: 'dashboard_trial_lifecycle' });
-    expect(goToPolarCheckout).toHaveBeenCalledWith('https://polar.sh/c/1');
+    expect(screen.getByTestId('teacher-trial-welcome')).toHaveAttribute('data-days', '14');
+    expect(screen.getByTestId('teacher-trial-welcome-days')).toHaveTextContent('teacher.plan.trialDaysLeft:14');
+    expect(screen.queryByTestId('teacher-trial-welcome-upgrade')).not.toBeInTheDocument();
+    expect(postTeacherProCheckout).not.toHaveBeenCalled();
   });
 
   it('strips ?checkout=success on dismiss so a reload does not re-welcome', () => {

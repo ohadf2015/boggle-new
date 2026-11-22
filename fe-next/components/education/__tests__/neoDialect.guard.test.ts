@@ -25,11 +25,8 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
   borderBlack: {
     'components/teacher/TeacherPlanBadge.tsx': 1,
     'components/teacher/assignments/AssignmentCreatorDueDate.tsx': 1,
-    'components/teacher/assignments/AssignmentResultsView.tsx': 1,
     'components/teacher/assignments/AssignmentStep.tsx': 1,
     'components/teacher/assignments/AssignmentWordcraftOption.tsx': 1,
-    'components/teacher/assignments/CompletionTracker.tsx': 1,
-    'components/teacher/assignments/CreateFirstAssignmentCta.tsx': 1,
     'components/teacher/classroom/RosterNameEditor.tsx': 1,
     'components/teacher/classroom/RosterRemoveButton.tsx': 1,
     'components/teacher/digest/MissGapUnpluggedReteachLiveCta.tsx': 2,
@@ -38,7 +35,6 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
     'components/teacher/digest/WeeklyEmailReport.tsx': 1,
     'components/teacher/digest/WeeklyProgressDigestCard.tsx': 1,
     'components/teacher/hq/HqLoadError.tsx': 1,
-    'components/teacher/hq/StartLiveClassCta.tsx': 2,
     'components/teacher/pro/ProInlineLock.tsx': 1,
     // print: variant only.
     'components/teacher/report/WordStudentGrid.tsx': 1,

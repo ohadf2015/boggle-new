@@ -147,17 +147,13 @@ describe('free tier limits', () => {
   it('refuses the class overview to free teachers everywhere it renders', () => {
     // A gate on only one render site is the asymmetric-path bug this repo keeps shipping:
     // one entry paywalls while a direct URL stays open. Add every new site here.
-    const sites = [
-      '../../../app/[locale]/teacher/classroom/[id]/analytics/PageClient.tsx',
-    ];
-    for (const site of sites) {
-      const src = readFileSync(join(__dirname, site), 'utf8');
-      const render = src.indexOf('<ClassOverview');
-      expect(render, `${site} no longer renders the class overview`).toBeGreaterThan(-1);
-      const gate = src.indexOf('<ProGate');
-      expect(gate, `${site} renders the class overview without a ProGate`).toBeGreaterThan(-1);
-      expect(gate, `${site} mounts the class overview outside its ProGate`).toBeLessThan(render);
-    }
+    const view = readFileSync(join(__dirname, '../../../app/[locale]/teacher/reports/ReportsClassView.tsx'), 'utf8');
+    expect(view, 'ReportsClassView no longer renders the class overview').toContain('<ClassOverview');
+    const page = readFileSync(join(__dirname, '../../../app/[locale]/teacher/reports/PageClient.tsx'), 'utf8');
+    const gate = page.indexOf('<ReportsProGate>');
+    const inner = page.indexOf('<TeacherReportsInner');
+    expect(gate, 'reports PageClient renders the class view without ReportsProGate').toBeGreaterThan(-1);
+    expect(gate, 'reports PageClient mounts the class view outside its ReportsProGate').toBeLessThan(inner);
   });
 
   it('does not give away on the pricing page what ProGate refuses in the product', () => {

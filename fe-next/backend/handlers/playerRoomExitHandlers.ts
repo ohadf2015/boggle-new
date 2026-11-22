@@ -41,6 +41,7 @@ import { ensurePlayerState } from './playerDataInit';
 import { removeMidRoundLeaver } from './midRoundLeave.js';
 import { sessionEndedNotice } from './classroomSessionEndedNotice';
 import { broadcastClassroomRoster } from './classroomRosterBroadcast.js';
+import { emitClassroomContext } from '../modules/classroomGameContext.js';
 
 interface LeaveRoomPayload {
   gameCode: string;
@@ -221,6 +222,9 @@ export function registerPlayerRoomExitHandlers(io: Server, socket: Socket): void
       isHost: false,
       lateJoin: isLateJoin
     });
+    if (game.isClassroom) {
+      void emitClassroomContext(socket, gameCode, ((socket.data as Record<string, unknown>)?.verifiedUserId as string) || undefined);
+    }
 
     // If game is in progress, initialize player data and send current state
     if (isLateJoin) {

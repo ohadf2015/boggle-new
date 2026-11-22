@@ -11,6 +11,7 @@ import { freeGameHeadline } from '@/lib/education/freeGameHeadline';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import { roundTitleKey } from './roundReport';
 import { ProBadge } from '@/components/ui/ProBadge';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 /** A free teacher's headline for their latest real class game; per-student and weekly views stay behind Pro. */
 export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
@@ -37,7 +38,7 @@ export function FreeGameHeadlineCard({ classroomId }: { classroomId: string }) {
         </h2>
         <p data-testid="free-headline-players" className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-cream/85">
           <Users className="size-4" aria-hidden />
-          {t('teacher.lastGame.playersPlayed', { count: headline.players })}
+          {t(pluralKeyOf('teacher.lastGame.playersPlayed', headline.players, language), { count: headline.players })}
         </p>
         <Link
           href={`/${language}/teacher/upgrade`}

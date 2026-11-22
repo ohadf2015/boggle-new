@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pluralKey } from '../pluralKey';
+import { pluralKeyOf, pluralKey } from '../pluralKey';
 
 const FORMS = { one: 'k.one', few: 'k.few', other: 'k.other' };
 
@@ -22,5 +22,12 @@ describe('pluralKey', () => {
 
   it('Given an unknown locale tag, When picking, Then it does not throw', () => {
     expect(pluralKey(FORMS, 1, 'xx-invalid-!!')).toBe('k.one');
+  });
+});
+
+describe('pluralKeyOf', () => {
+  it('Given a base key, When counting in English and Russian, Then the _one/_few/_other sibling is picked', () => {
+    expect([1, 3].map((n) => pluralKeyOf('k', n, 'en'))).toEqual(['k_one', 'k_other']);
+    expect([1, 2, 5].map((n) => pluralKeyOf('k', n, 'ru'))).toEqual(['k_one', 'k_few', 'k_other']);
   });
 });

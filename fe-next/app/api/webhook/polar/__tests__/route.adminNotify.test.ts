@@ -11,6 +11,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
 vi.mock('@/lib/posthog', () => ({ getPostHogServer: () => ({ capture: vi.fn() }) }))
@@ -18,6 +19,7 @@ const notifyAdmins = vi.fn(async (_n: unknown) => true)
 vi.mock('@/lib/admin/adminNotifications', () => ({ notifyAdmins: (n: unknown) => notifyAdmins(n) }))
 
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO = 'prod-pro-1'
 const event = (type: string, data: Record<string, unknown>) =>
@@ -29,6 +31,7 @@ const event = (type: string, data: Record<string, unknown>) =>
 
 describe('polar webhook — admin notifications', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     notifyAdmins.mockClear()
     process.env.POLAR_PRO_PRODUCT_ID = PRO
     process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'

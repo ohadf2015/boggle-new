@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { isFreshCheckoutLanding } from '@/lib/education/checkoutReturn';
 import type { useTeacherPro } from '@/hooks/useTeacherPro';
 import { polarCheckoutWelcomeKind } from '@/lib/education/polarTrial';
 import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTelemetry';
@@ -8,8 +9,12 @@ import { trackEduProCheckoutReturnLanded } from '@/lib/education/proFunnelTeleme
 type Pro = ReturnType<typeof useTeacherPro>;
 
 /** Back from Polar checkout: the webhook can land after the redirect, so Pro is re-read until it shows. */
-export function useCheckoutReturn(checkoutSuccess: boolean, pro: Pro) {
+export function useCheckoutReturn(landedFromCheckout: boolean, pro: Pro) {
   const { hasPro, loading: proLoading, refresh: refreshPro } = pro;
+  const [fresh] = useState(
+    () => typeof window === 'undefined' || isFreshCheckoutLanding(window.localStorage, window.location.search),
+  );
+  const checkoutSuccess = landedFromCheckout && fresh;
 
   // Fires whether or not entitlement lands: "webhook broken" (this fires, checkout_complete never does)
   // vs "abandoned on Polar" (neither fires).

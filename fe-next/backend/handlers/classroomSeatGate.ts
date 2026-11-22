@@ -72,6 +72,8 @@ export interface ClassroomSeat {
   game: ClassroomGame | null;
   /** True when the caller must return NOW — the socket has already been told. */
   refused: boolean;
+  /** The read failed: `game: null` means "unknown", not "not a classroom". */
+  unread?: true;
 }
 
 /**
@@ -151,7 +153,7 @@ export async function checkClassroomSeat(
       'CLASSROOM_GAME',
       `Seat gate could not read ${gameCode}, treating as live: ${(err as Error)?.message ?? err}`
     );
-    return { game: null, refused: false };
+    return { game: null, refused: false, unread: true };
   }
 
   // Not a classroom code at all. An ordinary multiplayer room reaches here and

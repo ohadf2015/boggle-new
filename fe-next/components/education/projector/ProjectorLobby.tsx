@@ -24,6 +24,7 @@ import { markRoomPlayed, roomPlayed } from './roomPlayed';
 import { LobbyLateJoinNotice } from './LobbyLateJoinNotice';
 import { EduPhoneTestPrompt } from '@/components/education/live/EduPhoneTestPrompt';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface ProjectorLobbyProps {
   gameCode: string;
@@ -155,7 +156,7 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               <span data-testid="projector-session-chip" className={CHIP}>
                 <BookOpen className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
                 <span dir="auto" className="min-w-0 break-words">{lesson}</span>
-                {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-neo-cream/75 @max-5xl:hidden">· {t('education.classroomGame.words', { count: wordCount })}</span>}
+                {wordCount > 0 && <span className="shrink-0 font-neo-body font-bold text-neo-cream/75 @max-5xl:hidden">· {t(pluralKeyOf('education.classroomGame.words', wordCount, language), { count: wordCount })}</span>}
               </span>
             )}
             {/* The padlock sits up here with the room's name, out of the Start row: Start is the one thing to press. */}

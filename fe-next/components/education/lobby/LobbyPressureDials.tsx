@@ -28,6 +28,7 @@ import {
   normalizeClassroomPressure,
 } from '@/shared/utils/classroomPressure';
 import type { ClassroomPressure } from '@/shared/types/classroom';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 const LEADERBOARD_CHOICES = ['full', 'top3', 'hidden'] as const;
 const TIMER_CHOICES = ['full', 'gentle', 'off'] as const;
@@ -66,6 +67,7 @@ export function LobbyPressureDials({ pressure, onChange, access }: LobbyPressure
           <Gauge className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
         </span>
+        {!locked && <ProPoweredChip />}
         {!loading && locked && (
           <ProInlineLock feature="pressureDials" label={t('teacher.proGate.pressureDials.title')} />
         )}

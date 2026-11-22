@@ -51,6 +51,10 @@ export async function emitClassroomContext(
   try {
     const classroomGame = preloaded ? preloaded.game : await getClassroomGame(gameCode);
     if (!classroomGame) return;
+    const isTeacher = !!authUserId && authUserId === classroomGame.teacherId;
+    // Before the level read: the deck needs no membership lookup, and a cold or failing one must not leave the lobby ungated.
+    const cards = classroomGame.studyCards ?? buildStudyCards(classroomGame.vocabularyWords ?? [], []);
+    if (!isTeacher && cards.length) safeEmit(socket, 'classroomStudyCards', { gameCode, cards });
     const classroomLevel = authUserId
       ? await getClassroomLevelCached(authUserId, classroomGame.classroomId)
       : 'core';
@@ -69,14 +73,11 @@ export async function emitClassroomContext(
     // demote a support student to core mid-round.
     (socket.data as Record<string, unknown>).classroomLevel = classroomLevel;
     // The bank is a student's hunt list; on the teacher's projector it would paint over the board.
-    const isTeacher = !!authUserId && authUserId === classroomGame.teacherId;
     (socket.data as Record<string, unknown>).classroomIsTeacher = isTeacher;
     safeEmit(socket, 'classroomContext', {
       classroomLevel,
       classroomWordBank: isTeacher ? [] : wordBank,
     });
-    const cards = classroomGame.studyCards ?? buildStudyCards(classroomGame.vocabularyWords ?? [], []);
-    if (!isTeacher && cards.length) safeEmit(socket, 'classroomStudyCards', { gameCode, cards });
   } catch (err) {
     logger.warn('CLASSROOM_GAME', `classroomContext lookup failed for ${gameCode}: ${(err as Error)?.message ?? err}`);
   }

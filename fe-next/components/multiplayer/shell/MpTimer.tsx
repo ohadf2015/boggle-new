@@ -10,7 +10,9 @@ export type MpTimerColor = 'lime' | 'pink' | 'cyan' | 'purple';
 export type MpTimerSize = 'sm' | 'md' | 'lg' | 'xl';
 
 /** Ring diameter per size token: phone HUD 44, desktop HUD 72, TV 96. */
-export const MP_TIMER_PX: Record<MpTimerSize, number> = { sm: 32, md: 44, lg: 72, xl: 96 };
+export const MP_TIMER_PX: Record<MpTimerSize, number> = { sm: 32, md: 52, lg: 72, xl: 96 };
+
+const DIGIT_TEXT: Record<MpTimerSize, string> = { sm: 'text-[10px]', md: 'text-sm', lg: 'text-xl', xl: 'text-2xl' };
 
 /** Seconds at or below which the timer turns urgent (pink ring, digit punch). */
 export const MP_TIMER_URGENT_SEC = 10;
@@ -30,6 +32,7 @@ export interface ShellBadgeTimerProps {
   size?: number;
   /** Per-mode ring color (classic=cyan, blast=lime, wheel-rush=pink, …). */
   colorFamily?: MpTimerColor;
+  hideLabel?: boolean;
 }
 
 /**
@@ -38,7 +41,7 @@ export interface ShellBadgeTimerProps {
  * `remainingTime` drifts past tolerance — a reconnect resend or a throttled
  * tab. Never `components/CircularTimer.tsx` (its framer pulses repeat forever).
  */
-function ShellBadgeTimerImpl({ remainingTime, totalTime, size = 80, colorFamily = 'cyan' }: ShellBadgeTimerProps) {
+function ShellBadgeTimerImpl({ remainingTime, totalTime, size = 80, colorFamily = 'cyan', hideLabel }: ShellBadgeTimerProps) {
   const stateRef = useRef<TimerRingState | null>(null);
   // Pure + idempotent: a Strict-Mode double render lands on the same state.
   stateRef.current = reconcileTimerRing(stateRef.current, remainingTime);
@@ -51,6 +54,7 @@ function ShellBadgeTimerImpl({ remainingTime, totalTime, size = 80, colorFamily 
       isPlaying
       size={size}
       colorFamily={colorFamily}
+      hideLabel={hideLabel}
     />
   );
 }
@@ -87,13 +91,14 @@ function MpTimerImpl({ remainingSec, totalSec, size, colorFamily = 'cyan', hideD
       data-urgent={String(urgent)}
       role="timer"
       aria-label={t('mpUi.shell.timeLeft', { seconds: whole })}
-      className={cn('inline-flex items-center gap-2', className)}
+      className={cn('relative inline-flex items-center justify-center', className)}
     >
       <ShellBadgeTimer
         remainingTime={remainingSec}
         totalTime={totalSec}
         size={MP_TIMER_PX[size]}
         colorFamily={urgent ? 'pink' : colorFamily}
+        hideLabel
       />
       {!hideDigits && (
         <span
@@ -101,8 +106,8 @@ function MpTimerImpl({ remainingSec, totalSec, size, colorFamily = 'cyan', hideD
           data-testid="mp-timer-digits"
           aria-hidden="true"
           className={cn(
-            'font-neo-display font-bold tabular-nums leading-none',
-            size === 'sm' || size === 'md' ? 'text-lg' : 'text-3xl',
+            'absolute inset-0 flex items-center justify-center font-neo-display font-bold tabular-nums leading-none',
+            DIGIT_TEXT[size],
             urgent ? 'text-neo-pink animate-mp-punch' : 'text-neo-white',
           )}
         >

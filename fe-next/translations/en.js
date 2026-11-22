@@ -1127,7 +1127,9 @@ const en = {
       "copiesOne": "{count} copy",
       "results": "Results",
       "use": "Use list",
-      "actions": "List actions"
+      "actions": "List actions",
+      "words_one": "{count} word",
+      "words_other": "{count} words"
     },
     "badge": {
       "verified": "Verified",
@@ -13246,7 +13248,10 @@ const en = {
         "wordHunt": "Word Hunt",
         "wheelRush": "Wheel Rush",
         "vocabQuiz": "Vocab Quiz"
-      }
+      },
+      "playersPlayed_one": "{{count}} student played",
+      "playersPlayed_other": "{{count}} students played",
+      "topScorer": "Top score: {name}, {score}"
     },
     "classReport": {
       "title": "Word by student",
@@ -13299,6 +13304,8 @@ const en = {
       "activatingBody": "Payment received. Confirming access. This usually takes a few seconds.",
       "successTitle": "Teacher Pro is on",
       "successBody": "Your payment went through and Pro is active on your account.",
+      "trialSuccessTitle": "Your Teacher Pro trial is on",
+      "trialSuccessBody": "Nothing is charged today. Your card is billed $9/mo when the trial ends, and you can cancel any time before that.",
       "failureTitle": "Pro is not confirmed yet",
       "failureBody": "If you were charged, access usually arrives within a minute. Check again, or write to us if it is still missing.",
       "retry": "Check again",
@@ -13581,7 +13588,13 @@ const en = {
         "offHint": "No standings. XP, levels and badges still count."
       },
       "tapToCopy": "Tap to copy",
-      "codeCopiedShort": "Copied"
+      "codeCopiedShort": "Copied",
+      "studentCountPro_one": "{{count}} student",
+      "studentCountPro_other": "{{count}} students",
+      "cardSeeAllStudents_one": "See the student",
+      "cardSeeAllStudents_other": "See all {{count}} students",
+      "members_one": "{{count}} student",
+      "members_other": "{{count}} students"
     },
     "classrooms": {
       "students": {
@@ -13682,7 +13695,9 @@ const en = {
       "resumeDraftButton": "Resume",
       "discardDraftButton": "Discard",
       "startFromTemplate": "Start from template",
-      "templateLoaded": "Template loaded: {{count}} words"
+      "templateLoaded": "Template loaded: {{count}} words",
+      "words_one": "{{count}} word",
+      "words_other": "{{count}} words"
     },
     "lessons": {
       "assign": {
@@ -13705,7 +13720,9 @@ const en = {
         "help": "Pick one skill to drill, or let students choose. Only skills this lesson has enough words for are available.",
         "any": "Any practice",
         "anyHint": "Students pick their own mode",
-        "questionCount": "{{count}} questions · {{skill}}"
+        "questionCount": "{{count}} questions · {{skill}}",
+        "questionCount_one": "{{count}} question · {{skill}}",
+        "questionCount_other": "{{count}} questions · {{skill}}"
       },
       "createTitle": "Create assignment",
       "create": "Create assignment",
@@ -13804,7 +13821,9 @@ const en = {
         "g68GeographyDesc": "Relief, climate and map-reading words",
         "g68Science": "6–8 Science: Body and energy",
         "g68ScienceDesc": "Middle-school science terms with plain meanings"
-      }
+      },
+      "findNWords_one": "Find {{count}} word",
+      "findNWords_other": "Find {{count}} words"
     },
     "completion": {
       "overallProgress": "Overall progress",
@@ -13966,7 +13985,8 @@ const en = {
         "games": "Games",
         "pulse": "Class pulse",
         "homework": "Homework",
-        "more": "More"
+        "more": "More",
+        "words": "Words"
       },
       "noClassroomsFound": "No classrooms found",
       "error": "Couldn't load the report",
@@ -14182,11 +14202,18 @@ const en = {
         "errorNotFound": "That class or assignment wasn’t found. It may have been deleted.",
         "errorUngraded": "This Classroom assignment has no points, so it can’t take a grade.",
         "errorNotPro": "Sending grades to Google Classroom is part of Teacher Pro.",
-        "errorGeneric": "Couldn't talk to Google Classroom. Try again."
+        "errorGeneric": "Couldn't talk to Google Classroom. Try again.",
+        "updated_one": "{{count}} student graded",
+        "updated_other": "{{count}} students graded",
+        "skipped_one": "{{count}} student skipped: no practice on this lesson yet",
+        "skipped_other": "{{count}} students skipped: no practice on this lesson yet"
       },
       "picker": {
         "showing": "Shown above"
-      }
+      },
+      "ownPreview": {"title": "{{class}}, student by student", "line": "With Pro, every student on your roster gets a row: their accuracy, how many words they've mastered, and the exact words they missed.", "columns": {"student": "Student", "accuracy": "Accuracy", "mastered": "Words mastered", "missed": "Missed words"}, "locked": "Shown with Pro", "more_one": "+{{count}} more student", "more_other": "+{{count}} more students", "more_few": "+{{count}} more students"},
+      "streakDays_one": "{{count}} day",
+      "streakDays_other": "{{count}} days"
     },
     "curriculum": {
       "title": "Library",
@@ -14353,7 +14380,15 @@ const en = {
       "scheduleReteachHint": "Rebuild the hard words and replay in about two weeks. Spaced reteach that sticks.",
       "unpluggedReteachLiveCta": "Start Unplugged reteach Live",
       "reteachLiveCta": "Start 3-min reteach Live",
-      "unpluggedReteachLiveFoil": "No student devices today? Project the misses. Students answer on paper."
+      "unpluggedReteachLiveFoil": "No student devices today? Project the misses. Students answer on paper.",
+      "moodGreat_one": "{{count}} student rated the last round great.",
+      "moodGreat_other": "{{count}} students rated the last round great.",
+      "moodMixed_one": "{{count}} student rated the last round mixed.",
+      "moodMixed_other": "{{count}} students rated the last round mixed.",
+      "moodRough_one": "{{count}} student rated the last round rough.",
+      "moodRough_other": "{{count}} students rated the last round rough.",
+      "weeklyInactiveCount_one": "{{count}} student inactive 7 days",
+      "weeklyInactiveCount_other": "{{count}} students inactive 7 days"
     },
     "windowProgress": {
       "activeLine": "{{active}} of {{roster}} students played",
@@ -14444,6 +14479,7 @@ const en = {
       "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
       "districtCta": "Get in touch for school pricing",
       "checkoutUnavailable": "Checkout is closed right now. Nothing was charged. Try again shortly.",
+      "alreadySubscribed": "You already have Teacher Pro, so there's nothing more to pay. You can manage or cancel it from your plan page.",
       "notInApp": "Teacher Pro can't be bought in the app.",
       "featureOutcome1": "Run every class you teach, no cap",
       "featureOutcome2": "Add every section you teach, not just the first 3 classes",
@@ -14497,7 +14533,9 @@ const en = {
       "homeTitleGames": "Games in {{name}} this week: {{count}}. Who needs help?",
       "homeBody": "Free for one class. Pro adds past weeks, a report for each student and all your classes.",
       "homeCta": "See this week"
-    }
+    },
+    "proPowered": {"hint": "Part of your Teacher Pro plan"},
+    "trialUsage": {"lead": "During your trial:", "games_one": "{count} class game", "games_other": "{count} class games", "students_one": "{count} student tracked", "students_other": "{count} students tracked", "practice_one": "{count} practice session", "practice_other": "{count} practice sessions"}
   },
   "education": {
     "race": {
@@ -14597,7 +14635,13 @@ const en = {
       "gradeOnTime": "On time. The class streak is safe.",
       "teacherLoadFailed": "We couldn't load who played. Try again in a moment.",
       "teacherOnTime": "On time",
-      "teacherLate": "Late"
+      "teacherLate": "Late",
+      "introTitle_one": "{{count}} word your class missed",
+      "introTitle_other": "{{count}} words your class missed",
+      "studentTitle_one": "{{count}} word to win back",
+      "studentTitle_other": "{{count}} words to win back",
+      "startCta_one": "Start: {{count}} word",
+      "startCta_other": "Start: {{count}} words"
     },
     "modePicker": {
       "title": "Pick the game",
@@ -14760,7 +14804,11 @@ const en = {
         "spelling": "Add words to this lesson to unlock",
         "flashcard": "Add words to this lesson to unlock",
         "word_list": "Add words to this lesson to unlock"
-      }
+      },
+      "words_one": "{{count}} word",
+      "words_other": "{{count}} words",
+      "questions_one": "{{count}} question",
+      "questions_other": "{{count}} questions"
     },
     "produce": {
       "title": "Word Forge",
@@ -15544,7 +15592,9 @@ const en = {
         "today": "Today",
         "openReport": "Open {{name}}'s report",
         "unnamed": "Student",
-        "drillDescription": "Detailed progress report for this student"
+        "drillDescription": "Detailed progress report for this student",
+        "hardWordsMeta_one": "{{count}} student · {{pct}}% wrong",
+        "hardWordsMeta_other": "{{count}} students · {{pct}}% wrong"
       },
       "studentProgress": "Student progress",
       "students": "Students",
@@ -15635,7 +15685,9 @@ const en = {
       "title": "Classroom Game",
       "waitingForPlayers": "Setting up your classroom game...",
       "waitingForStudents": "Waiting for students",
-      "words": "{{count}} words"
+      "words": "{{count}} words",
+      "words_one": "{{count}} word",
+      "words_other": "{{count}} words"
     },
     "header": {
       "breadcrumbs": {
@@ -20761,7 +20813,9 @@ const en = {
       "studyBack": "Back",
       "studyNext": "Next",
       "studyDone": "I know these",
-      "studyReadyLocked": "Go through all {count} words to get ready"
+      "studyReadyLocked": "Go through all {count} words to get ready",
+      "studyLearned_one": "{count} word learned",
+      "studyLearned_other": "{count} words learned"
     },
     "recall": {
       "intro": "Read through them, then a quick quiz checks you've got them.",
@@ -20997,6 +21051,8 @@ const en = {
       "hardestTitle": "Hardest words",
       "missedOf": "missed {missed} of {attempts}",
       "studentsMissing": "{count} of {total} students",
+      "studentsMissing_one": "{count} of {total} student",
+      "studentsMissing_other": "{count} of {total} students",
       "noneMissed": "Nobody has missed a word twice yet. Nice.",
       "notFound": {
         "title": "Not found in games",
@@ -21053,7 +21109,11 @@ const en = {
       "nothing": "No missed words to practice yet.",
       "inDays": "in {count} days",
       "tomorrow": "Tomorrow",
-      "whyNote": "Spaced retrieval beats one long review: each round comes back just as the word starts to fade."
+      "whyNote": "Spaced retrieval beats one long review: each round comes back just as the word starts to fade.",
+      "assignedBody_one": "{count} word, three rounds. Students find it in their lessons.",
+      "assignedBody_other": "{count} words, three rounds. Students find them in their lessons.",
+      "inDays_one": "in {count} day",
+      "inDays_other": "in {count} days"
     },
     "reports": {
       "classEyebrow": "Class report",
@@ -21064,7 +21124,8 @@ const en = {
       "arcTitle": "Student by student",
       "arcHint": "Who's climbing, who's stuck, and the words holding them back.",
       "digestTitle": "Last class game",
-      "digestHint": "What happened in your most recent game, at a glance."
+      "digestHint": "What happened in your most recent game, at a glance.",
+      "lessonsHint": "Which word lists your class learns best from."
     },
     "upgrade": {
       "featureMastery": "Top 10 missed words + a student × word heatmap",
@@ -21721,7 +21782,7 @@ const en = {
         "playAgain": "Play again",
         "pickGame": "Pick a different game",
         "loading": "Checking your last game",
-        "ready": "{ready} of {total} ready for the test",
+        "ready": "Last game: {ready} of {total} scored 80%+ on the list words",
         "readyEmpty": "Word results show up after your next game",
         "missed": "{count} missed it · assign practice"
       },
@@ -21751,7 +21812,7 @@ const en = {
         "colName": "Name",
         "colXp": "XP",
         "colWords": "Words",
-        "colAccuracy": "Accuracy",
+        "colAccuracy": "Accuracy (all time)",
         "colWeek": "This week",
         "status": {
           "done": "Played this week",
@@ -21775,7 +21836,7 @@ const en = {
         "lastPlayed": "Last played: {when}",
         "notYet": "not yet",
         "streak": "{count}-day streak",
-        "accuracy": "{count}% answers right",
+        "accuracy": "{count}% answers right, all time",
         "noStreak": "No streak right now",
         "noWordsYet": "No words practised yet",
         "empty": "No students yet. Share the class code and they show up here.",

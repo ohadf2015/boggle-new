@@ -38,6 +38,7 @@ import type { PlayerResult } from '@/types/components';
 import { buildRoundReportPdfData } from './roundReportPdfData';
 import { ProPill } from './ProPill';
 import { ResultsSchoolQuoteLink } from './ResultsSchoolQuoteLink';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 export const REPORT_PDF_PLACEMENT = 'results_report_pdf' as const;
 
@@ -169,6 +170,7 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
         >
           {busy ? <Loader2 className="size-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Download className="size-4 shrink-0" aria-hidden="true" />}
           {busy ? copy.preparing : copy.button}
+          <ProPoweredChip />
         </button>
         {state === 'failed' && (
           <p role="alert" data-testid="report-pdf-export-failed" className="text-center text-xs font-semibold text-neo-pink-light">

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { deckCardsFor, useStudyDeck } from '../studyDeckStore';
 
 const cards = [{ word: 'sun' }, { word: 'moon' }];
@@ -60,4 +60,18 @@ describe('studyDeckStore', () => {
     useStudyDeck.getState().resetForJoin('ROOM2');
     expect(useStudyDeck.getState()).toMatchObject({ gameCode: null, cards: [] });
   });
+
+  it('given a finished deck with no session storage, when the server re-sends it on reconnect, then the student stays studied', () => {
+    const setItem = vi.spyOn(sessionStorage, 'setItem').mockImplementation(() => {
+      throw new Error('private mode');
+    });
+    useStudyDeck.getState().setDeck('ROOM1', cards);
+    useStudyDeck.getState().markStudied();
+    useStudyDeck.getState().resetForJoin('ROOM1');
+    useStudyDeck.getState().setDeck('ROOM1', [...cards]);
+    expect(setItem).toHaveBeenCalled();
+    expect(useStudyDeck.getState().studied).toBe(true);
+    setItem.mockRestore();
+  });
 });
+
