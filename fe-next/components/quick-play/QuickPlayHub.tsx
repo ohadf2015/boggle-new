@@ -36,6 +36,29 @@ import { QUICK_MODES, roundTarget, type QuickMode, type QuickRoundConfig, type Q
 
 type HubPhase = 'loading' | 'error' | 'playing' | 'results';
 
+/**
+ * A round fetch with no deadline is the dead wait between tapping a mode and
+ * seeing a board: the mascot dances forever, and `loadingRef` stays latched so
+ * even the retry button does nothing. The rejection is what releases both.
+ */
+export const ROUND_FETCH_TIMEOUT_MS = 8_000;
+
+/**
+ * Safari 16 / Chrome 103 for `AbortSignal.timeout`. Built here rather than
+ * inline because the call sits inside the try: on an older WebView the
+ * TypeError would be caught as a failed round and no board would ever load.
+ */
+function roundDeadline(): AbortSignal | undefined {
+  return typeof AbortSignal?.timeout === 'function' ? AbortSignal.timeout(ROUND_FETCH_TIMEOUT_MS) : undefined;
+}
+
+/** Which half of the wait failed — a cut-off request reads nothing like a 429. */
+function roundFailureReason(error: unknown, status: number): 'timeout' | 'http' | 'network' {
+  if (status > 0) return 'http';
+  if (error instanceof DOMException && (error.name === 'TimeoutError' || error.name === 'AbortError')) return 'timeout';
+  return 'network';
+}
+
 function roundTargetWords(config: QuickRoundConfig): number {
   return roundTarget(config).words;
 }
@@ -124,6 +147,9 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
   const [rateLimited, setRateLimited] = useState(false);
   const loadingRef = useRef(false);
   const autoStarted = useRef(false);
+  // When this round's mode was chosen — the clock the board's mount is measured
+  // against, so the mode-tap → board-on-screen wait has one number.
+  const selectedAtRef = useRef(0);
   // Track current phase for handleNextRound to guard against stale adapter onQuit calls.
   // If an adapter timer fires onQuit after the game has ended (phase !== 'playing'),
   // the call should be ignored so results don't auto-dismiss.
@@ -263,6 +289,9 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
+    selectedAtRef.current = started;
+    const deadline = roundDeadline();
+    let status = 0;
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
@@ -271,8 +300,10 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
         // it a beginner passes nobody and a strong player passes everyone,
         // every round. Local history, so guests are covered too; 0 = unknown.
         body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
+        signal: deadline,
       });
       if (!res.ok) {
+        status = res.status;
         setRateLimited(res.status === 429);
         throw new Error(`round fetch ${res.status}`);
       }
@@ -282,9 +313,17 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
       setPhase('playing');
-    } catch {
+    } catch (error) {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
-      // tap is indistinguishable from a bug).
+      // tap is indistinguishable from a bug). `ms` is what tells a real dead
+      // request apart from a slow one the 8s deadline cut off too early.
+      posthog.capture('quick_play_board_fetch_failed', {
+        mode,
+        reason: roundFailureReason(error, status),
+        status,
+        ms: Date.now() - started,
+        roundIndex,
+      });
       setPhase('error');
     } finally {
       loadingRef.current = false;
@@ -508,7 +547,12 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
               })}
             </p>
           )}
-          <QuickModeAdapter config={config} onDone={handleDone} onQuit={handleQuit} />
+          <QuickModeAdapter
+            config={config}
+            onDone={handleDone}
+            onQuit={handleQuit}
+            selectedAt={selectedAtRef.current}
+          />
         </div>
       </BaseErrorBoundary>
     );

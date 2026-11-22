@@ -20,6 +20,7 @@ import { fromWordWheel, fromSurvival } from './normalizeResult';
 import { ghostsToWheelRivals } from '@/lib/quickPlay/ghostRivals';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 // Classic runs the multiplayer board (InGameScreen) solo for everyone.
 const QuickClassicBoard = dynamic(() => import('./QuickClassicBoard'), { ssr: false });
@@ -54,9 +55,11 @@ interface QuickModeAdapterProps {
   config: QuickRoundConfig;
   onDone: (result: QuickRoundResult) => void;
   onQuit: () => void;
+  /** When the player picked this mode, for the tap → board-on-screen wait. */
+  selectedAt?: number;
 }
 
-export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterProps) {
+export function QuickModeAdapter({ config, onDone, onQuit, selectedAt }: QuickModeAdapterProps) {
   const { t } = useLanguage();
   const doneRef = useRef(false);
   const wordSet = useRef<Set<string> | null>(null);
@@ -67,6 +70,25 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  /* The funnel's only "a board appeared" signal was the engine's
+     singleplayer_grid_ready, which only classic routes through — wheel-rush,
+     word-hunt and blast could never fire it, so their rounds read as drop-off.
+     This is the one mount all four share, so it is the numerator for
+     mode tap → round entered. It marks the stage, not the first painted tile:
+     the mode components are dynamic imports, so a chunk still in flight is
+     counted as entered (grid_ready still times classic's own board deal). */
+  const reported = useRef(false);
+  useEffect(() => {
+    if (reported.current) return;
+    reported.current = true;
+    posthog.capture('quick_play_board_loaded', {
+      mode: config.mode,
+      language: config.language,
+      seed: config.seed,
+      ms: selectedAt ? Date.now() - selectedAt : undefined,
+    });
+  }, [config.mode, config.language, config.seed, selectedAt]);
 
   const finish = useCallback(
     (result: QuickRoundResult) => {
