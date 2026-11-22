@@ -16049,7 +16049,7 @@ const he = {
       "picker": {
         "showing": "מוצגת למעלה"
       },
-      "ownPreview": {"title": "{{class}}, תלמיד אחרי תלמיד", "line": "עם פרו, לכל תלמיד ברשימה יש שורה משלו: אחוז הדיוק, כמה מילים כבר שולטות אצלו, ואילו מילים בדיוק פספס.", "columns": {"student": "תלמיד/ה", "accuracy": "דיוק", "mastered": "מילים שנלמדו", "missed": "מילים שפוספסו"}, "locked": "מוצג בפרו", "more_one": "ועוד תלמיד/ה אחד/ת", "more_other": "ועוד {{count}} תלמידים"},
+      "ownPreview": {"title": "{{class}}, תלמיד אחרי תלמיד", "line": "עם פרו, לכל תלמיד ברשימה יש שורה משלו: אחוז הדיוק, כמה מילים כבר שולטות אצלו, ואילו מילים בדיוק פספס.", "columns": {"student": "תלמיד/ה", "accuracy": "דיוק", "mastered": "מילים שנלמדו", "missed": "מילים שפוספסו"}, "locked": "מוצג בפרו", "more_one": "ועוד תלמיד/ה אחד/ת", "more_other": "ועוד {{count}} תלמידים", "more_few": "ועוד {{count}} תלמידים"},
       "streakDays_one": "יום אחד",
       "streakDays_other": "{{count}} ימים"
     },
@@ -16134,7 +16134,7 @@ const he = {
       "homeBody": "חינם לכיתה אחת. בפרו מקבלים גם שבועות קודמים, דוח לכל תלמיד ואת כל הכיתות.",
       "homeCta": "לצפייה בשבוע הזה"
     },
-    "proPowered": {"hint": "חלק מתוכנית Teacher Pro שלך"},
+    "proPowered": {"hint": "חלק מתוכנית פרו למורים שלך"},
     "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"}
   },
   "education": {

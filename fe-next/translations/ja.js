@@ -16164,7 +16164,7 @@ const ja = {
       "picker": {
         "showing": "上に表示中"
       },
-      "ownPreview": {"title": "{{class}}:生徒ひとりずつ", "line": "Proなら名簿の生徒一人ひとりに、正答率、覚えた単語の数、まちがえた単語がそのまま表示されます。", "columns": {"student": "生徒", "accuracy": "正答率", "mastered": "覚えた単語", "missed": "まちがえた単語"}, "locked": "Proで表示", "more_one": "ほか{{count}}人", "more_other": "ほか{{count}}人"},
+      "ownPreview": {"title": "{{class}}:生徒ひとりずつ", "line": "Proなら名簿の生徒一人ひとりに、正答率、覚えた単語の数、まちがえた単語がそのまま表示されます。", "columns": {"student": "生徒", "accuracy": "正答率", "mastered": "覚えた単語", "missed": "まちがえた単語"}, "locked": "Proで表示", "more_one": "ほか{{count}}人", "more_other": "ほか{{count}}人", "more_few": "ほか{{count}}人"},
       "streakDays_one": "{{count}}日",
       "streakDays_other": "{{count}}日"
     },

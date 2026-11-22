@@ -15935,7 +15935,7 @@ const es = {
       "picker": {
         "showing": "Se muestra arriba"
       },
-      "ownPreview": {"title": "{{class}}, alumno por alumno", "line": "Con Pro, cada alumno de tu lista tiene su fila: su precisión, cuántas palabras domina y qué palabras exactas falló.", "columns": {"student": "Alumno", "accuracy": "Precisión", "mastered": "Palabras dominadas", "missed": "Palabras falladas"}, "locked": "Se ve con Pro", "more_one": "+{{count}} alumno más", "more_other": "+{{count}} alumnos más"},
+      "ownPreview": {"title": "{{class}}, alumno por alumno", "line": "Con Pro, cada alumno de tu lista tiene su fila: su precisión, cuántas palabras domina y qué palabras exactas falló.", "columns": {"student": "Alumno", "accuracy": "Precisión", "mastered": "Palabras dominadas", "missed": "Palabras falladas"}, "locked": "Se ve con Pro", "more_one": "+{{count}} alumno más", "more_other": "+{{count}} alumnos más", "more_few": "+{{count}} alumnos más"},
       "streakDays_one": "{{count}} día",
       "streakDays_other": "{{count}} días"
     },

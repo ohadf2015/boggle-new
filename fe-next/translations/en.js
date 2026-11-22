@@ -14211,7 +14211,7 @@ const en = {
       "picker": {
         "showing": "Shown above"
       },
-      "ownPreview": {"title": "{{class}}, student by student", "line": "With Pro, every student on your roster gets a row: their accuracy, how many words they've mastered, and the exact words they missed.", "columns": {"student": "Student", "accuracy": "Accuracy", "mastered": "Words mastered", "missed": "Missed words"}, "locked": "Shown with Pro", "more_one": "+{{count}} more student", "more_other": "+{{count}} more students"},
+      "ownPreview": {"title": "{{class}}, student by student", "line": "With Pro, every student on your roster gets a row: their accuracy, how many words they've mastered, and the exact words they missed.", "columns": {"student": "Student", "accuracy": "Accuracy", "mastered": "Words mastered", "missed": "Missed words"}, "locked": "Shown with Pro", "more_one": "+{{count}} more student", "more_other": "+{{count}} more students", "more_few": "+{{count}} more students"},
       "streakDays_one": "{{count}} day",
       "streakDays_other": "{{count}} days"
     },

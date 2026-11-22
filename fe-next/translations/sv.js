@@ -16474,7 +16474,7 @@ const sv = {
       "picker": {
         "showing": "Visas ovan"
       },
-      "ownPreview": {"title": "{{class}}, elev för elev", "line": "Med Pro får varje elev i klassen en egen rad: träffsäkerhet, hur många ord eleven kan och exakt vilka ord som missades.", "columns": {"student": "Elev", "accuracy": "Träffsäkerhet", "mastered": "Ord som sitter", "missed": "Missade ord"}, "locked": "Visas med Pro", "more_one": "+{{count}} elev till", "more_other": "+{{count}} elever till"},
+      "ownPreview": {"title": "{{class}}, elev för elev", "line": "Med Pro får varje elev i klassen en egen rad: träffsäkerhet, hur många ord eleven kan och exakt vilka ord som missades.", "columns": {"student": "Elev", "accuracy": "Träffsäkerhet", "mastered": "Ord som sitter", "missed": "Missade ord"}, "locked": "Visas med Pro", "more_one": "+{{count}} elev till", "more_other": "+{{count}} elever till", "more_few": "+{{count}} elever till"},
       "streakDays_one": "{{count}} dag",
       "streakDays_other": "{{count}} dagar"
     },

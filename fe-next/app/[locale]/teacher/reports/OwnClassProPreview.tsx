@@ -5,7 +5,13 @@ import { Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getClassroomStudents } from '@/lib/supabase/education/classrooms';
 import { teacherFacingName } from '@/lib/education/rosterName';
-import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { pluralKey } from '@/lib/i18n/pluralKey';
+
+const MORE_KEYS = {
+  one: 'teacher.reports.ownPreview.more_one',
+  few: 'teacher.reports.ownPreview.more_few',
+  other: 'teacher.reports.ownPreview.more_other',
+};
 
 const ROWS_SHOWN = 6;
 const COLUMNS = ['accuracy', 'mastered', 'missed'] as const;
@@ -79,7 +85,7 @@ export function OwnClassProPreviewView({ className, students }: { className: str
       </div>
       {hidden > 0 ? (
         <p data-testid="own-preview-more" className="mt-2 font-neo-body text-xs font-bold text-neo-cream/80">
-          {t(pluralKeyOf('teacher.reports.ownPreview.more', hidden, language), { count: hidden })}
+          {t(pluralKey(MORE_KEYS, hidden, language), { count: hidden })}
         </p>
       ) : null}
     </section>
