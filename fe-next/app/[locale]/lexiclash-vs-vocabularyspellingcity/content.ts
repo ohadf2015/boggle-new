@@ -396,7 +396,7 @@ const contentMap: Record<ComparisonLocale, LocaleContent> = {
     ],
     stillWinsTitle: 'SpellingCity ga mada katsu baai',
     stillWinsBody:
-      'Shoki no shougaku o oshiete ite, kouzoukaiserarета, jisoku no supeingu to genten no tango renshuu audio ga hitsuyouna baai, VocabularySpellingCity\'s shougaku raiburari to gakusei goto no kirokugaeri wa sono tame ni kasetsuritsuされ te imasu. LexiClash wa toshin shougaku kara seijin esl made oyobi raibu, zenukurasu shousai no hou ga tsuyoi desu. takusan no kyoushi wa kobetsu purakutisu no tame ni SpellingCity o wariate shi, kurashitsu rebyu gemu no tame ni LexiClash o jikkou shimasu.',
+      'Shoki no shougaku o oshiete ite, kouzoukaiserareta, jisoku no supeingu to genten no tango renshuu audio ga hitsuyouna baai, VocabularySpellingCity\'s shougaku raiburari to gakusei goto no kirokugaeri wa sono tame ni kasetsuritsuされ te imasu. LexiClash wa toshin shougaku kara seijin esl made oyobi raibu, zenukurasu shousai no hou ga tsuyoi desu. takusan no kyoushi wa kobetsu purakutisu no tame ni SpellingCity o wariate shi, kurashitsu rebyu gemu no tame ni LexiClash o jikkou shimasu.',
     faqTitle: 'yoku aru shitumon',
     faqs: [
       {

@@ -112,7 +112,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
     description: 'Gratis ord- och ordförrådsspel för klassrummet — inga elevkonton, inga annonser och inga nedladdningar. Använd egna ordlistor, kör multiplayer för hela klassen i valfri webbläsare och undervisa ordförråd på 6 språk inklusive hebreiska och japanska. Byggt för lärare, gratis att börja.',
     features: [
       'Klassrumsordspel designade för elevengagemang och inlärningsresultat',
-      'Liveспel för hela klassen: brädan på projektorn, eleverna på sina egna enheter',
+      'Livespel för hela klassen: brädan på projektorn, eleverna på sina egna enheter',
       'Lärarpanel för att skapa uppgifter och övervaka elevernas framsteg',
       'Läroplansanpassade ordövningar för alla ämnen och årskurser',
       'Topplistor i realtid för att motivera och belöna elevernas prestationer',
