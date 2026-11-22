@@ -98,9 +98,7 @@ export function GamePageSeoContent({
               key={i}
               className="flex items-start gap-2 rounded-neo border-2 border-neo-black bg-neo-navy px-3 py-2 text-sm leading-snug text-neo-cream/90 shadow-hard-sm"
             >
-              <span aria-hidden className="mt-0.5 shrink-0 font-black text-neo-lime">
-                ▪
-              </span>
+              <span aria-hidden className="mt-1.5 size-1.5 shrink-0 bg-neo-lime" />
               <span>{f}</span>
             </li>
           ))}

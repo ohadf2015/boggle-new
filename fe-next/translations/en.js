@@ -7396,7 +7396,7 @@ const en = {
       "title": "About LexiClash",
       "whoWeAre": {
         "title": "Who We Are",
-        "content": "LexiClash is a real-time multiplayer word strategy game developed by LexiClash Ltd, based in Israel. We create engaging, educational, and competitive word games for players of all ages — from young learners to seasoned word enthusiasts — across multiple languages and cultures.",
+        "content": "LexiClash is a real-time multiplayer word strategy game developed by LexiClash Ltd, based in Israel. You can play it in six languages (English, Hebrew, Swedish, Japanese, Spanish and Russian) with friends, against a bot, or as a whole class with a teacher running the game.",
         "content2": "What started as a small passion project has grown into a platform that serves thousands of players worldwide. Our team combines deep expertise in game design, education technology, and multilingual software development to deliver a word gaming experience unlike any other. We are committed to making every game session fun, fair, and enriching."
       },
       "story": {
