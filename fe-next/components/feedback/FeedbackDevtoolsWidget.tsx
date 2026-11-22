@@ -126,6 +126,8 @@ function injectFeedbackWidget(locale?: string): void {
     s.src = FEEDBACK_WIDGET_SRC;
     s.setAttribute('data-token', FEEDBACK_WIDGET_TOKEN);
     s.setAttribute('data-side', 'left');
+    // Phones have no free corner: a floating launcher always covers content or a tab. Report a bug lives in the menu.
+    if (window.matchMedia?.('(max-width: 639px)').matches) s.setAttribute('data-hide-on-routes', '/');
     s.setAttribute('data-theme', LEXICLASH_THEME);
     s.setAttribute('data-dir', 'auto');
     if (locale) s.setAttribute('data-locale', locale);

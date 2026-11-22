@@ -93,6 +93,29 @@ describe('<FeedbackDevtoolsWidget>', () => {
         expect(src).not.toContain('?v=');
     });
 
+    it('Given a phone, Then the floating launcher is hidden so it covers nothing (Report a bug stays in the menu)', async () => {
+        const original = window.matchMedia;
+        window.matchMedia = ((q: string) => ({ matches: q.includes('max-width'), media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {}, onchange: null, dispatchEvent: () => false })) as typeof window.matchMedia;
+        render(<FeedbackDevtoolsWidget />);
+        await flushEffects();
+        await act(async () => {
+            window.dispatchEvent(new Event('pointerdown'));
+        });
+        settle();
+        expect(widgetScript()?.getAttribute('data-hide-on-routes')).toBe('/');
+        window.matchMedia = original;
+    });
+
+    it('Given a desktop, Then the launcher shows on every route', async () => {
+        render(<FeedbackDevtoolsWidget />);
+        await flushEffects();
+        await act(async () => {
+            window.dispatchEvent(new Event('pointerdown'));
+        });
+        settle();
+        expect(widgetScript()?.getAttribute('data-hide-on-routes')).toBeNull();
+    });
+
     it('carries the current LexiClash project ingest token after intent', async () => {
         render(<FeedbackDevtoolsWidget />);
         await flushEffects();
