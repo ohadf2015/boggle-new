@@ -15,6 +15,10 @@ import {
   trackTeacherPlanGateShown,
   trackTeacherPlanGateUpgradeClick,
 } from '@/lib/education/proFunnelTelemetry';
+import {
+  beaconTeacherProUpgradeShown,
+  beaconTeacherProUpgradeClicked,
+} from '@/lib/education/teacherProUpgradeBeacon';
 import { teacherProUpgradeCtaLabel } from '@/components/education/TeacherProCheckoutCta';
 import { Dialog } from '@/components/ui/dialog';
 import { Zap } from 'lucide-react';
@@ -75,8 +79,15 @@ export default function ClassLimitUpsellModal({
       } catch {
         /* analytics must never block the till */
       }
+      beaconTeacherProUpgradeShown({
+        placement: `${source}_modal`,
+        reason: 'free_tier_limit',
+        count: currentCount,
+        limit,
+        locale: language,
+      });
     }
-  }, [isOpen, currentCount, limit, source, isTrialExpired, reason]);
+  }, [isOpen, currentCount, limit, source, isTrialExpired, reason, language]);
 
   const startPolarCheckout = useCallback(async () => {
     if (pending) return;
@@ -84,6 +95,15 @@ export default function ClassLimitUpsellModal({
       trackTeacherPlanGateUpgradeClick(gateArgs(reason));
     } catch {
       /* analytics must never block the till */
+    }
+    if (!isTrialExpired) {
+      beaconTeacherProUpgradeClicked({
+        placement: `${source}_modal`,
+        reason: 'free_tier_limit',
+        count: currentCount,
+        limit,
+        locale: language,
+      });
     }
     trackGrowthEvent('landing_cta_clicked', {
       cta: 'teacher_pro',

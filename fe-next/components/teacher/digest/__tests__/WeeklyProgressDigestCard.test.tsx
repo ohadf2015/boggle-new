@@ -30,9 +30,15 @@ vi.mock('@/lib/education/polarTrial', () => ({
 
 const trackDigest = vi.fn();
 const trackCta = vi.fn();
+const beaconShown = vi.fn();
+const beaconClicked = vi.fn();
 vi.mock('@/lib/education/telemetry', () => ({
   trackTeacherDigestViewed: (args: unknown) => trackDigest(args),
   trackTeacherDigestUpgradeCtaClicked: (args: unknown) => trackCta(args),
+}));
+vi.mock('@/lib/education/teacherProUpgradeBeacon', () => ({
+  beaconTeacherProUpgradeShown: (...args: unknown[]) => beaconShown(...args),
+  beaconTeacherProUpgradeClicked: (...args: unknown[]) => beaconClicked(...args),
 }));
 
 function week() {
@@ -245,5 +251,58 @@ describe('WeeklyProgressDigestCard', () => {
     expect(grid.className).toContain('grid-cols-2');
     expect(grid.className).toContain('@md:grid-cols-4');
     expect(grid.className).not.toMatch(/(^|\s)md:grid-cols-4/);
+  });
+
+  it('surfaces practice CTA when students practiced this week, and emits teacher_pro_upgrade_shown and teacher_pro_upgrade_clicked on click', () => {
+    proState.hasPro = false;
+    proState.trialUsed = false;
+    proState.status = 'active';
+    daysLeftMock = null;
+    render(
+      <WeeklyProgressDigestCard
+        classroomId="c1"
+        classroomName="Year 7"
+      />,
+    );
+    expect(screen.getByTestId('weekly-progress-digest-practice-cta')).toBeInTheDocument();
+    expect(beaconShown).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'weekly_digest',
+      reason: 'practice',
+    }));
+    const link = screen.getByTestId('weekly-progress-digest-pro-link');
+    fireEvent.click(link);
+    expect(beaconClicked).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'weekly_digest',
+      reason: 'practice',
+    }));
+  });
+
+  it('hides CTA when students did not practice this week and teacher is not over cap or trialing', () => {
+    proState.hasPro = false;
+    proState.trialUsed = false;
+    proState.status = 'active';
+    daysLeftMock = null;
+    metricsMock.mockReturnValue({
+      metrics: {
+        ...week(),
+        thisWeek: {
+          studentsActive: 0,
+          rosterCount: 10,
+          gamesCompleted: 0,
+          wordsCompleted: 0,
+          assignmentCompleted: 0,
+          assignmentExpected: 0,
+          assignmentCompletionPct: null,
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh,
+      assignmentCount: 0,
+    });
+    render(
+      <WeeklyProgressDigestCard classroomId="c1" classroomName="Year 7" />,
+    );
+    expect(screen.queryByTestId('weekly-progress-digest-pro-link')).not.toBeInTheDocument();
   });
 });

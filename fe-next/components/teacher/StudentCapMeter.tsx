@@ -20,6 +20,10 @@ import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTie
 import { hasProAccess, isFreePlanUsageBlocked } from '@/lib/education/teacherPlanGate';
 import { TEACHER_PRO_MILESTONE_MIN_STUDENTS } from '@/lib/education/teacherProMilestone';
 import { trackGrowthEvent } from '@/utils/growthTracking';
+import {
+  beaconTeacherProUpgradeShown,
+  beaconTeacherProUpgradeClicked,
+} from '@/lib/education/teacherProUpgradeBeacon';
 import { cn } from '@/lib/utils';
 import ClassLimitUpsellModal from '@/components/teacher/ClassLimitUpsellModal';
 
@@ -62,7 +66,16 @@ export function StudentCapMeter({
       limit,
       atCap,
     });
-  }, [showCta, source, count, limit, atCap]);
+    if (atCap) {
+      beaconTeacherProUpgradeShown({
+        placement: `student_cap_${source}`,
+        reason: 'free_tier_limit',
+        count,
+        limit,
+        locale: language,
+      });
+    }
+  }, [showCta, source, count, limit, atCap, language]);
 
   if (pro.loading || hasPro) return null;
 
@@ -101,6 +114,13 @@ export function StudentCapMeter({
                   studentCount: count,
                   limit,
                   atCap: true,
+                });
+                beaconTeacherProUpgradeClicked({
+                  placement: `student_cap_${source}`,
+                  reason: 'free_tier_limit',
+                  count,
+                  limit,
+                  locale: language,
                 });
                 setGateOpen(true);
               }}

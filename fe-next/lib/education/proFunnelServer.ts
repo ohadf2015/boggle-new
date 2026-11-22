@@ -355,6 +355,83 @@ export function buildEduAccessRequestCreatedEvent(
 
 export const buildAccessRequestCreatedEvent = buildEduAccessRequestCreatedEvent;
 
+/** Surface a Teacher Pro upgrade CTA at demonstrated-value moments. */
+export function buildTeacherProUpgradeShownEvent(
+  teacherId: string,
+  properties: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: teacherId,
+    event: 'teacher_pro_upgrade_shown',
+    properties: {
+      ...BASE,
+      teacher_id: teacherId,
+      ...properties,
+    },
+  };
+}
+
+export function buildTeacherProUpgradeClickedEvent(
+  teacherId: string,
+  properties: Record<string, unknown> = {},
+): EduServerEvent {
+  return {
+    distinctId: teacherId,
+    event: 'teacher_pro_upgrade_clicked',
+    properties: {
+      ...BASE,
+      teacher_id: teacherId,
+      ...properties,
+    },
+  };
+}
+
+export function emitTeacherProUpgradeShown(args: {
+  teacherId?: string | null;
+  placement: string;
+  reason?: string;
+  count?: number;
+  limit?: number | null;
+  locale?: string | null;
+  isTestAccount?: boolean;
+}): void {
+  const distinctId = args.teacherId || 'anonymous-teacher';
+  captureProFunnelServerEvent(
+    buildTeacherProUpgradeShownEvent(distinctId, {
+      placement: args.placement,
+      source: args.placement,
+      reason: args.reason,
+      count: args.count,
+      limit: args.limit,
+      locale: args.locale,
+      is_test_account: args.isTestAccount ?? false,
+    }),
+  );
+}
+
+export function emitTeacherProUpgradeClicked(args: {
+  teacherId?: string | null;
+  placement: string;
+  reason?: string;
+  count?: number;
+  limit?: number | null;
+  locale?: string | null;
+  isTestAccount?: boolean;
+}): void {
+  const distinctId = args.teacherId || 'anonymous-teacher';
+  captureProFunnelServerEvent(
+    buildTeacherProUpgradeClickedEvent(distinctId, {
+      placement: args.placement,
+      source: args.placement,
+      reason: args.reason,
+      count: args.count,
+      limit: args.limit,
+      locale: args.locale,
+      is_test_account: args.isTestAccount ?? false,
+    }),
+  );
+}
+
 /** Never throws: a dead analytics endpoint must never fail a checkout or a webhook. */
 export function captureProFunnelServerEvent(event: EduServerEvent): void {
   try {

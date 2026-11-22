@@ -25,6 +25,10 @@ import {
   trackTeacherDigestUpgradeCtaClicked,
   trackTeacherDigestViewed,
 } from '@/lib/education/telemetry';
+import {
+  beaconTeacherProUpgradeShown,
+  beaconTeacherProUpgradeClicked,
+} from '@/lib/education/teacherProUpgradeBeacon';
 import { TEACHER_PRO_CHECKOUT_PATH } from '@/components/education/TeacherProCheckoutCta';
 import { FREE_TIER_LIMITS, TEACHER_PRO_PRICE_USD } from '@/lib/education/freeTierLimits';
 import { Stat } from '@/components/ui/Stat';
@@ -59,6 +63,18 @@ export function WeeklyProgressDigestCard({
   const trialExpired = isPolarTrialExpiryConversion(hasPro, trialUsed === true);
   const isTrialing = daysLeft !== null || status === 'trialing';
   const isPaidPro = hasPro && !isTrialing;
+  const week = metrics?.thisWeek;
+  const wow = metrics?.wow;
+  const students = metrics?.students ?? [];
+  const inactive = students.filter((s) => s.inactive7d);
+  const movers = students.filter((s) => !s.inactive7d).slice(0, 8);
+  const hasPracticedThisWeek = Boolean(
+    week &&
+      ((week.studentsActive ?? 0) > 0 ||
+        (week.gamesCompleted ?? 0) > 0 ||
+        (week.wordsCompleted ?? 0) > 0 ||
+        (week.assignmentCompleted ?? 0) > 0),
+  );
   const overCap =
     overFreeTierCaps || assignmentCount >= FREE_TIER_LIMITS.assignmentsPerClass;
   const showCta = shouldShowDigestUpgradeCta({
@@ -66,12 +82,8 @@ export function WeeklyProgressDigestCard({
     isTrialing,
     trialExpired,
     overFreeTierCaps: overCap,
+    hasPracticedThisWeek,
   });
-  const week = metrics?.thisWeek;
-  const wow = metrics?.wow;
-  const students = metrics?.students ?? [];
-  const inactive = students.filter((s) => s.inactive7d);
-  const movers = students.filter((s) => !s.inactive7d).slice(0, 8);
 
   useEffect(() => {
     if (isLoading || proLoading || !week) return;
@@ -90,7 +102,15 @@ export function WeeklyProgressDigestCard({
         ? Math.round((assignmentSubmitted / expected) * 100)
         : null;
 
-  const ctaKind = trialExpired ? 'expiry' : overCap && !isTrialing ? 'overcap' : trialDay7 ? 'day7' : 'trial';
+  const ctaKind = trialExpired
+    ? 'expiry'
+    : overCap && !isTrialing
+      ? 'overcap'
+      : trialDay7
+        ? 'day7'
+        : hasPracticedThisWeek && !isTrialing
+          ? 'practice'
+          : 'trial';
   const ctaHintKey =
     ctaKind === 'expiry'
       ? 'teacher.digest.weeklyExpiryHint'
@@ -98,7 +118,9 @@ export function WeeklyProgressDigestCard({
         ? 'teacher.digest.weeklyOverCapHint'
         : ctaKind === 'day7'
           ? 'teacher.digest.weeklyDay7Hint'
-          : 'teacher.digest.weeklyTrialHint';
+          : ctaKind === 'practice'
+            ? 'teacher.digest.weeklyPracticeHint'
+            : 'teacher.digest.weeklyTrialHint';
   const ctaLabelKey =
     ctaKind === 'expiry'
       ? 'teacher.digest.weeklyExpiryCta'
@@ -106,7 +128,18 @@ export function WeeklyProgressDigestCard({
         ? 'teacher.digest.weeklyOverCapCta'
         : ctaKind === 'day7'
           ? 'teacher.digest.weeklyDay7Cta'
-          : 'teacher.digest.weeklyTrialCta';
+          : ctaKind === 'practice'
+            ? 'teacher.digest.weeklyPracticeCta'
+            : 'teacher.digest.weeklyTrialCta';
+
+  useEffect(() => {
+    if (isLoading || proLoading || !showCta) return;
+    beaconTeacherProUpgradeShown({
+      placement: 'weekly_digest',
+      reason: ctaKind,
+      locale: language,
+    });
+  }, [isLoading, proLoading, showCta, ctaKind, language]);
 
   return (
     <section
@@ -199,14 +232,19 @@ export function WeeklyProgressDigestCard({
           <Link
             href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
             data-testid="weekly-progress-digest-pro-link"
-            onClick={() =>
+            onClick={() => {
               trackTeacherDigestUpgradeCtaClicked({
                 hasPro,
                 trialDay7,
                 trialExpired,
                 overCap,
-              })
-            }
+              });
+              beaconTeacherProUpgradeClicked({
+                placement: 'weekly_digest',
+                reason: ctaKind,
+                locale: language,
+              });
+            }}
             className="inline-flex min-h-11 items-center rounded-neo border-neo bg-neo-cyan px-6 py-3 font-black text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg"
           >
             {t(ctaLabelKey, { price: `$${TEACHER_PRO_PRICE_USD}` })}

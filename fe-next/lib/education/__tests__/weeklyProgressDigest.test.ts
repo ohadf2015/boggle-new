@@ -83,6 +83,12 @@ describe('deriveWeeklyProgressDigest', () => {
     expect(
       shouldShowDigestUpgradeCta({ isPaidPro: false, isTrialing: false, trialExpired: false, overFreeTierCaps: true }),
     ).toBe(true);
+    expect(
+      shouldShowDigestUpgradeCta({ isPaidPro: false, isTrialing: false, trialExpired: false, overFreeTierCaps: false, hasPracticedThisWeek: true }),
+    ).toBe(true);
+    expect(
+      shouldShowDigestUpgradeCta({ isPaidPro: false, isTrialing: false, trialExpired: false, overFreeTierCaps: false, hasPracticedThisWeek: false }),
+    ).toBe(false);
   });
 
   it('leaves assignment pct null when nothing was assigned', () => {

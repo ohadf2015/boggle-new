@@ -45,6 +45,8 @@ const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   'trial_expired',
   'teacher_plan_gate_shown',
   'teacher_plan_gate_upgrade_click',
+  'teacher_pro_upgrade_shown',
+  'teacher_pro_upgrade_clicked',
   'recovery_clicked',
   'recovery_cta_clicked',
   'dunning_email_sent',

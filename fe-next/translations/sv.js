@@ -15385,6 +15385,8 @@ const sv = {
       "weeklyTrialHint": "Du är på en Teacher Pro-provperiod. Behåll rapporter och obegränsade klasser.",
       "weeklyOverCapCta": "Uppgradera till Teacher Pro — {{price}}/mån",
       "weeklyOverCapHint": "Du har passerat gratisgränsen för klasser eller elever. Teacher Pro tar bort den.",
+      "weeklyPracticeCta": "Uppgradera till Teacher Pro — {{price}}/mån",
+      "weeklyPracticeHint": "Dina elever övade denna vecka! Håll farten uppe med obegränsade klasser och analys.",
       "classroomWeekTitle": "Den här veckan i klassrummet",
       "classroomWeekSubtitle": "Övningstotaler för elever som varit aktiva de senaste 7 dagarna.",
       "classroomWeekRegion": "Den här veckan i {{classroom}}",

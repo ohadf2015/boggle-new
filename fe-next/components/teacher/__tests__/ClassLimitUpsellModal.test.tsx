@@ -9,9 +9,15 @@ vi.mock('@/utils/growthTracking', () => ({
 
 const trackShown = vi.fn();
 const trackClick = vi.fn();
+const mockBeaconShown = vi.fn();
+const mockBeaconClicked = vi.fn();
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
   trackTeacherPlanGateShown: (...args: unknown[]) => trackShown(...args),
   trackTeacherPlanGateUpgradeClick: (...args: unknown[]) => trackClick(...args),
+}));
+vi.mock('@/lib/education/teacherProUpgradeBeacon', () => ({
+  beaconTeacherProUpgradeShown: (...args: unknown[]) => mockBeaconShown(...args),
+  beaconTeacherProUpgradeClicked: (...args: unknown[]) => mockBeaconClicked(...args),
 }));
 
 const goToPolarCheckout = vi.fn();
@@ -56,6 +62,8 @@ vi.mock('@/contexts/LanguageContext', () => ({
 describe('ClassLimitUpsellModal', () => {
   beforeEach(() => {
     mockTrackGrowthEvent.mockClear();
+    mockBeaconShown.mockClear();
+    mockBeaconClicked.mockClear();
     trackShown.mockClear();
     trackClick.mockClear();
     goToPolarCheckout.mockClear();
@@ -151,6 +159,12 @@ describe('ClassLimitUpsellModal', () => {
       surface: 'student_enroll',
       limit_type: 'students',
     });
+    expect(mockBeaconShown).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'student_limit_modal',
+      reason: 'free_tier_limit',
+      count: 50,
+      limit: 50,
+    }));
 
     fireEvent.click(screen.getByTestId('plan-gate-upgrade'));
 
@@ -159,6 +173,12 @@ describe('ClassLimitUpsellModal', () => {
         surface: 'student_enroll',
         limit_type: 'students',
       });
+      expect(mockBeaconClicked).toHaveBeenCalledWith(expect.objectContaining({
+        placement: 'student_limit_modal',
+        reason: 'free_tier_limit',
+        count: 50,
+        limit: 50,
+      }));
     });
     expect(postTeacherProCheckout).toHaveBeenCalledWith(fetch, { trial: false, locale: 'en', placement: 'student_limit_modal' });
   });

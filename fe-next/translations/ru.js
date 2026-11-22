@@ -14754,6 +14754,8 @@ const ru = {
       "weeklyTrialHint": "У вас пробный Teacher Pro. Сохраните отчёты и безлимитные классы.",
       "weeklyOverCapCta": "Перейти на Teacher Pro — {{price}}/мес",
       "weeklyOverCapHint": "Вы превысили бесплатный лимит классов или учеников. Teacher Pro снимает его.",
+      "weeklyPracticeCta": "Перейти на Teacher Pro — {{price}}/мес",
+      "weeklyPracticeHint": "Ваши ученики тренировались на этой неделе! Продолжайте с безлимитными классами и аналитикой.",
       "classroomWeekTitle": "Эта неделя в вашем классе",
       "classroomWeekSubtitle": "Итоги практики учеников, активных за последние 7 дней.",
       "classroomWeekRegion": "Эта неделя в {{classroom}}",

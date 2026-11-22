@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/contexts/LanguageContext', () => ({
@@ -11,13 +11,23 @@ vi.mock('next/link', () => ({
 const pro: { hasPro: boolean; loading: boolean; accessTrialExpires?: string | null } = { hasPro: false, loading: false };
 vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => pro }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+const mockBeaconShown = vi.fn();
+const mockBeaconClicked = vi.fn();
+vi.mock('@/lib/education/teacherProUpgradeBeacon', () => ({
+  beaconTeacherProUpgradeShown: (...args: unknown[]) => mockBeaconShown(...args),
+  beaconTeacherProUpgradeClicked: (...args: unknown[]) => mockBeaconClicked(...args),
+}));
 
 import { ClassCapMeter } from '../ClassCapMeter';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
 
 const LIMIT = FREE_TIER_LIMITS.classes;
 
-beforeEach(() => Object.assign(pro, { hasPro: false, loading: false, accessTrialExpires: null }));
+beforeEach(() => {
+  mockBeaconShown.mockClear();
+  mockBeaconClicked.mockClear();
+  Object.assign(pro, { hasPro: false, loading: false, accessTrialExpires: null });
+});
 
 describe('ClassCapMeter', () => {
   it('stays hidden for a teacher on a live access trial, matching the server cap', () => {
@@ -37,11 +47,25 @@ describe('ClassCapMeter', () => {
     expect(screen.queryByTestId('class-cap-cta')).toBeNull();
   });
 
-  it('at the cap, says so and offers Pro once, pointing at the plan page', () => {
+  it('at the cap, says so, emits shown event, and offers Pro once with click tracking', () => {
     render(<ClassCapMeter count={LIMIT} />);
     expect(screen.getByTestId('class-cap-meter').textContent).toContain(`eduPlans.cap.full|${LIMIT}`);
-    expect(screen.getByTestId('class-cap-cta')).toHaveAttribute('href', '/en/teacher/upgrade');
+    expect(mockBeaconShown).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'class_cap_meter',
+      reason: 'free_tier_limit',
+      count: LIMIT,
+      limit: LIMIT,
+    }));
+    const cta = screen.getByTestId('class-cap-cta');
+    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
     expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', String(LIMIT));
+    fireEvent.click(cta);
+    expect(mockBeaconClicked).toHaveBeenCalledWith(expect.objectContaining({
+      placement: 'class_cap_meter',
+      reason: 'free_tier_limit',
+      count: LIMIT,
+      limit: LIMIT,
+    }));
   });
 
   it('never shows for Pro or while the plan is loading', () => {
