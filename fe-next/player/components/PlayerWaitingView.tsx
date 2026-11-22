@@ -41,6 +41,8 @@ import { MpHudBar } from '@/components/multiplayer/shell/MpHudBar';
 import { lobbySeats, readyTally, LOBBY_SEATS } from '@/components/multiplayer/lobby/lobbySeats';
 import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
 import { ReadyMeter } from '@/components/multiplayer/lobby/ReadyMeter';
+import { LobbyQuip } from '@/components/multiplayer/lobby/LobbyQuip';
+import { WaitingGameDock } from '@/components/multiplayer/lobby/waitingGame/WaitingGameDock';
 import { useChatUnread } from '@/components/multiplayer/lobby/useChatUnread';
 import { useLobbyWide } from '@/components/multiplayer/lobby/useLobbyWide';
 import { LobbyExitButton, LobbyChatButton, LobbyChatPanel, HowToPlaySheet, ChatSheet } from '@/components/multiplayer/lobby/LobbyChrome';
@@ -117,6 +119,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   const hostPick = useLobbySettingsFor(gameCode);
 
   const [sheet, setSheet] = useState<'howto' | 'chat' | null>(null);
+  const [gameOpen, setGameOpen] = useState(false);
   const closeSheet = useCallback(() => setSheet(null), []);
   const unread = useChatUnread({ socket, username, open: sheet === 'chat' });
   const wide = useLobbyWide();
@@ -238,15 +241,21 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = (props): React.React
   // free height, so the phone never shows a dead band above READY.
   const waitingCard = (howTo: { pill?: React.ReactNode; accordion?: React.ReactNode }) => (
     <div data-testid="waiting-status" className={cn(CARD, 'flex-1 min-h-0 flex flex-col items-center justify-center gap-3 text-center overflow-hidden')}>
-      <DJMascot size="xs" className="!w-[min(calc(168px*var(--mp-u,1)),22vh)] !h-[min(calc(168px*var(--mp-u,1)),22vh)] min-h-12 min-w-12 shrink -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
+      {!gameOpen && (
+        <>
+          <DJMascot size="xs" className="!w-[min(calc(168px*var(--mp-u,1)),22vh)] !h-[min(calc(168px*var(--mp-u,1)),22vh)] min-h-12 min-w-12 shrink -rotate-3 rounded-neo-lg border-3 border-neo-black shadow-hard overflow-hidden" alt="" />
+          <LobbyQuip t={t} className="max-w-xs rounded-neo border-2 border-neo-black bg-neo-cream px-3 py-1 font-neo-body text-[length:calc(13px*var(--mp-u,1))] font-bold leading-snug text-neo-black shadow-hard-sm rotate-1" />
+        </>
+      )}
       {/* The shared status line truncates to one line; here it has room to wrap. */}
       <div className="min-w-0 max-w-md flex flex-col items-center gap-2 [&_p]:whitespace-normal [&_p]:line-clamp-3 [&_p]:text-neo-white/85 [&_p]:font-bold [&_p]:text-[length:calc(15px*var(--mp-u,1))]">
         <ReadyMeter seats={seats} meId={username} />
         {status}
-        {pickRow}
-        {howTo.pill}
+        {!gameOpen && pickRow}
+        {!gameOpen && howTo.pill}
       </div>
-      {howTo.accordion}
+      <WaitingGameDock t={t} onOpenChange={setGameOpen} className="w-full max-w-md shrink-0" />
+      {!gameOpen && howTo.accordion}
     </div>
   );
 

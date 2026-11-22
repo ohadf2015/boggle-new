@@ -253,6 +253,25 @@ describe('PlayerWaitingView - Command Center Style', () => {
     });
   });
 
+  describe('Waiting fun', () => {
+    it('Given a guest waiting on the host, Then the mascot has a playful line and the game waits behind a chip', () => {
+      render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
+      const card = screen.getByTestId('waiting-status');
+      expect(card).toContainElement(screen.getByTestId('lobby-quip'));
+      expect(card).toContainElement(screen.getByTestId('waiting-game-chip'));
+      expect(screen.queryByTestId('bubble-pop')).toBeNull();
+    });
+
+    it('When the guest opens the game, Then it takes the mascot spot in the card and the status stays', () => {
+      render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });
+      fireEvent.click(screen.getByTestId('waiting-game-chip'));
+      const card = screen.getByTestId('waiting-status');
+      expect(card).toContainElement(screen.getByTestId('bubble-pop'));
+      expect(screen.queryByTestId('lobby-quip')).toBeNull();
+      expect(screen.getAllByText('playerView.hostWillStart').length).toBeGreaterThan(0);
+    });
+  });
+
   describe('Exit Confirmation', () => {
     it('should not show exit dialog when showExitConfirm is false', () => {
       render(<PlayerWaitingView {...defaultProps} />, { wrapper: createWrapper() });

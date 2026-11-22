@@ -5168,7 +5168,6 @@ const es = {
     "startVsBots": "Jugar contra bots",
     "soloPrompt": {
       "title": "¿Aún no hay nadie?",
-      "subtitle": "Empieza ya contra bots, o comparte tu código y espera a que se unan tus amigos.",
       "cta": "Jugar contra bots"
     },
     "allReadyAutoStart": "¡Todos listos! Empezando en {seconds}…",
@@ -5660,6 +5659,26 @@ const es = {
     }
   },
   "lobby": {
+    "fun": {
+      "play": "Juega mientras esperas",
+      "best": "Récord {score}",
+      "title": "Revienta burbujas",
+      "howTo": "Revienta las burbujas antes de que se escapen. ¡Si vas rápido sumas combo!",
+      "go": "¡Vamos!",
+      "again": "¡Otra!",
+      "combo": "Combo ×{count}",
+      "seconds": "{seconds} s",
+      "close": "Cerrar juego",
+      "paused": "En pausa",
+      "bubble": "Burbuja",
+      "newBest": "¡Nuevo récord!",
+      "quip1": "Te guardé el asiento más cómodo.",
+      "quip2": "Mándale el código a un amigo, prometo portarme bien.",
+      "quip3": "Estirando las letras mientras esperamos.",
+      "quip4": "Los bots se están poniendo chulitos. Solo digo.",
+      "quip5": "¿Snacks? Listos. ¿Amigos? Ya casi.",
+      "quip6": "Aquí ensayando mi baile de la victoria."
+    },
     "emote": {
       "title": "Reacciona",
       "laugh": "Risa",

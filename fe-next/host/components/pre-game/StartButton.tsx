@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { MpPrimaryCta } from '@/components/multiplayer/shell/MpPrimaryCta';
 import { cn } from '../../../lib/utils';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
@@ -42,7 +42,20 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
   sublabel,
   celebrate = false,
 }) {
+  const [seen, setSeen] = useState(playerCount);
+  const [pulse, setPulse] = useState(false);
+  if (seen !== playerCount) {
+    setSeen(playerCount);
+    if (seen < 2 && playerCount >= 2) setPulse(true);
+  }
   return (
+    // The pulse lives on a wrapper: the button's own transform belongs to the press and the all-ready wiggle.
+    <div
+      data-testid="lobby-start-pulse"
+      data-pulse={pulse || undefined}
+      className={cn(pulse && styles.readyPulse)}
+      onAnimationEnd={(e) => { if (e.target === e.currentTarget) setPulse(false); }}
+    >
     <MpPrimaryCta
       testId="lobby-start"
       tone="lime"
@@ -51,13 +64,14 @@ export const StartButton = memo<StartButtonProps>(function StartButton({
       onPress={onStartGame}
       disabled={disabled}
       className={cn(
-        'border-3 border-neo-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
+        'border-3 border-neo-black shadow-hard transition-transform duration-75 active:translate-y-0.5 ltr:active:translate-x-0.5 rtl:active:-translate-x-0.5 active:shadow-none',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         celebrate && styles.goWiggle,
         className,
       )}
     />
+    </div>
   );
 });
 

@@ -12,6 +12,11 @@ import { SeatNameText } from '@/components/multiplayer/lobby/SeatName';
 import { lobbySeats, readyTally, lobbyMax, LOBBY_SEATS, type LobbyPlayerInput, type LobbySeat } from '@/components/multiplayer/lobby/lobbySeats';
 import { deskWall, tvWall, useHiddenBelow } from './rosterLayout';
 import styles from '@/components/multiplayer/lobby/lobby.module.css';
+import { JoinBurst, seatMotionStyle, useArrivals } from '@/components/multiplayer/lobby/seatMotion';
+import { WaitingGameDock } from '@/components/multiplayer/lobby/waitingGame/WaitingGameDock';
+import { lowEndMotion } from '@/lib/animation/variety';
+import useReducedMotion from '@/hooks/useReducedMotion';
+import useCalmMotion from '@/hooks/useCalmMotion';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
 
@@ -97,6 +102,10 @@ export const PlayerRoster = memo(function PlayerRoster({
   const dense = isTv && wall.dense;
   const wallHidden = isTv ? seats.length - wall.shown : 0;
   const botCount = seats.filter((s) => s.isBot).length;
+  const arrivals = useArrivals(seats.map((s) => s.id));
+  const reducedMotion = useReducedMotion();
+  const calmMotion = useCalmMotion();
+  const bob = !calmMotion && !isTv && !lowEndMotion();
   // Me first, then everyone else — in RTL that puts the host on the right, matching reading order.
   const meSeat = seats.find((s) => s.id === username);
   // A TV wall past its tile cap keeps the newest joiners: they are the ones scanning for their face.
@@ -175,8 +184,10 @@ export const PlayerRoster = memo(function PlayerRoster({
           'group/seat relative flex flex-col items-center gap-1 min-w-0 w-full',
           styles.seatIn,
         )}
+        style={seatMotionStyle(seat.id)}
       >
-        <div className="relative shrink-0" style={seatBox}>
+        <div className={cn('relative shrink-0', bob && styles.bob)} data-bob={bob || undefined} style={seatBox}>
+          {!reducedMotion && !isMe && arrivals.has(seat.id) && <JoinBurst />}
           {isMe && onSelfAvatarClick ? (
             <button
               type="button"
@@ -416,6 +427,7 @@ export const PlayerRoster = memo(function PlayerRoster({
           </div>
         )}
       </div>
+      {isHostView && <WaitingGameDock t={t} className="mt-1" />}
       {hiddenBelow > 0 && (
         <button
           type="button"

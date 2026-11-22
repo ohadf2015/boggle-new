@@ -1,18 +1,53 @@
 /*
  * Lobby juice. Transform/opacity only (DESIGN e.1); every effect collapses to an
- * instant state under prefers-reduced-motion. One-shot animations only — no
- * infinite loops except the empty-seat "breathing" dash, which is a 2-frame
- * opacity-free transform and stops under reduced motion.
+ * instant state under prefers-reduced-motion. One-shot animations, except the
+ * seated avatars' idle bob, which JS also drops for calm mode and low-end devices.
  */
 
 /* A seat pops in when a player joins (scale 0.6 → 1, springy overshoot). */
 @keyframes seat-pop {
-  0% { transform: scale(0.6) rotate(-6deg); }
-  60% { transform: scale(1.08) rotate(2deg); }
+  0% { transform: scale(0.6) rotate(var(--seat-tilt, -6deg)); }
+  60% { transform: scale(1.08) rotate(calc(var(--seat-tilt, -6deg) * -0.35)); }
   100% { transform: scale(1) rotate(0deg); }
 }
 .seatIn {
   animation: seat-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Seated avatars breathe, each on its own phase (--bob-delay). */
+@keyframes seat-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+.bob {
+  animation: seat-bob 2.4s ease-in-out var(--bob-delay, 0s) infinite;
+}
+
+/* A seat that just filled throws six sparks outward, once. */
+@keyframes spark {
+  0% { transform: rotate(var(--spark-angle)) translateY(0) scale(1); opacity: 1; }
+  100% { transform: rotate(var(--spark-angle)) translateY(calc(var(--seat) * -0.75)) scale(0.3); opacity: 0; }
+}
+.spark {
+  position: absolute;
+  top: calc(var(--seat) / 2 - 5px);
+  left: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgb(var(--neo-black));
+  background: var(--spark-tone);
+  opacity: 0;
+  animation: spark 560ms cubic-bezier(0.22, 1, 0.36, 1) 120ms;
+}
+
+/* START: one "ready to go" pulse when the room first has company. */
+@keyframes ready-pulse {
+  0%, 100% { transform: scale(1); }
+  35% { transform: scale(1.045); }
+  65% { transform: scale(0.99); }
+}
+.readyPulse {
+  animation: ready-pulse 480ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Ready check stamps on (rotate −8° → 0°). */
@@ -94,6 +129,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .seatIn,
+  .bob,
+  .spark,
+  .readyPulse,
   .stamp,
   .chipPunch,
   .laneIn,
