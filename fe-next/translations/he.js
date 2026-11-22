@@ -1579,6 +1579,7 @@ const he = {
     "friendsPlay": "שחקו עם חברים",
     "friendsSub": "פותחים חדר ושולחים קוד",
     "quickGame": "משחק מהיר, מצב בהפתעה",
+    "random": "אקראי",
     "dailyDone": "סיימת",
     "dailyNextIn": "החידה הבאה בעוד {time}"
   },

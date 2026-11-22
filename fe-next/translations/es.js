@@ -1579,6 +1579,7 @@ const es = {
     "friendsPlay": "Juega con amigos",
     "friendsSub": "Crea una sala y comparte el código",
     "quickGame": "Partida rápida en modo sorpresa",
+    "random": "Al azar",
     "dailyDone": "Hecho",
     "dailyNextIn": "Siguiente reto en {time}"
   },

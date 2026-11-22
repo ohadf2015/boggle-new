@@ -87,15 +87,13 @@ describe('PlayHero', () => {
     expect(friends.className).toContain('shadow-hard-lg');
   });
 
-  it('given the hero, then the order is friends, daily, quick game, then the mode keys', () => {
+  it('given the hero, then the order is friends, daily, then the mode keys', () => {
     renderHero();
-    const order = ['hp-play-friends', 'hp-chip-daily', 'hp-play', 'hp-keycaps'].map((id) => screen.getByTestId(id));
+    const order = ['hp-play-friends', 'hp-chip-daily', 'hp-keycaps'].map((id) => screen.getByTestId(id));
     for (let i = 1; i < order.length; i++) {
       expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     }
-    // Daily steps down from the primary's weight; quick game is an outline.
     expect(screen.getByTestId('hp-chip-daily').className).not.toContain('shadow-hard-lg');
-    expect(screen.getByTestId('hp-play').className).not.toMatch(/\bbg-neo-(lime|pink|orange)\b/);
   });
 
   it('given the hero, then there is no separate "Join with a code" button (the multiplayer page has the code entry)', () => {
@@ -103,9 +101,12 @@ describe('PlayHero', () => {
     expect(screen.queryByTestId('hp-join-code')).toBeNull();
   });
 
-  it('given the hero, then the random round is labelled as a quick game with a surprise mode, not a bare PLAY', () => {
+  it('given the hero, then the random round is a fifth mode key labelled Random, with no separate quick-game row', () => {
     renderHero();
-    expect(screen.getByTestId('hp-play').textContent).toBe(en.homePlay.quickGame);
+    const random = screen.getByTestId('hp-play');
+    expect(screen.getByTestId('hp-keycaps').contains(random)).toBe(true);
+    expect(screen.getByTestId('hp-keycaps').querySelectorAll('li')).toHaveLength(5);
+    expect(random.textContent).toBe(en.homePlay.random);
   });
 
   it('given today\'s daily is not played, then the daily card offers to play and shows no countdown', () => {
@@ -176,6 +177,7 @@ describe('PlayHero', () => {
       '/he/quick-play?mode=blast',
       '/he/quick-play?mode=word-hunt',
       '/he/quick-play?mode=wheel-rush',
+      '/he/quick-play?mode=random',
     ]);
   });
 

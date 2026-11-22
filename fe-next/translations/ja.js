@@ -1579,6 +1579,7 @@ const ja = {
     "friendsPlay": "友だちと遊ぶ",
     "friendsSub": "ルームを作ってコードを送ろう",
     "quickGame": "クイックゲーム（モードはおまかせ）",
+    "random": "おまかせ",
     "dailyDone": "クリア",
     "dailyNextIn": "次のパズルまで {time}"
   },
