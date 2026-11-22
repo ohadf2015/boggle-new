@@ -121,7 +121,7 @@ export function useMusicFocusManager({
       }
     };
 
-    if (H?.ctx && H.ctx.state === 'suspended' && audioUnlockedRef.current) {
+    if (H?.ctx && H.ctx.state !== 'running' && H.ctx.state !== 'closed' && audioUnlockedRef.current) {
       try {
         const result = H.ctx.resume();
         if (result && typeof result.then === 'function') {
