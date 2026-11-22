@@ -9,6 +9,7 @@ export interface LocaleContent {
   intro: string;
   /** H2 for the extractable GEO answer block; body reuses `intro`. */
   geoQuestion: string;
+  spellingListAnswer?: { question: string; paragraphs: string[] };
   ctaStart: string;
   ctaCduel: string;
   ctaMiddleSchool: string;
@@ -35,6 +36,14 @@ const en: LocaleContent = {
   heroTitle: 'Word games for the classroom — no login, no download, no prep.',
   intro: 'Most classroom games want student accounts, an app install, or both. LexiClash wants a 6-character code. Project it, students type it on any device, and the whole class is playing a live word game in seconds — free, browser-based, nothing to install. Word-formation gameplay (find and spell real words on Boggle-style grids, anagrams, and wheels) makes it perfect for vocabulary review, spelling, and brain breaks. Bring your own word list or use a built-in one for true zero prep.',
   geoQuestion: 'How do teachers run word games for the classroom with no student login?',
+  spellingListAnswer: {
+    question: 'How do I turn this week\'s spelling list into a game the whole class plays together?',
+    paragraphs: [
+      'When you start a class game, paste this week\'s spelling list into a lesson list or upload it as a CSV. Put the six-character join code on the projector and students join from their own phones, tablets or Chromebooks, with no accounts to make.',
+      'Three live modes play straight from your list. Vocab Quiz asks the class four-choice questions built from your words, and its Boss Battle version has the whole room wearing down one boss together. Crossword builds a puzzle from the list with each word\'s meaning as the clue. Wordcraft deals every student their own board from the list to race a bot, while the class leaderboard adds everyone up.',
+      'When the round ends, the results screen lists the words the class missed, so you know which ones to go over again. You can also send the same list home as homework, where each student practises it alone with a spelling drill that says the word and has them type it.',
+    ],
+  },
   ctaStart: 'Start a Class Game Free',
   ctaCduel: 'Run a 1v1 Duel',
   ctaMiddleSchool: 'Middle School Games',

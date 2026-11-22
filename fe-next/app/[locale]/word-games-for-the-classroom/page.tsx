@@ -94,6 +94,17 @@ export default async function Page({ params }: PageProps) {
           </p>
         </section>
 
+        {c.spellingListAnswer && (
+          <section className="mb-12">
+            <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{c.spellingListAnswer.question}</h2>
+            {c.spellingListAnswer.paragraphs.map((p) => (
+              <p key={p} className="mb-3 max-w-[70ch] text-base leading-relaxed text-neo-white/85">
+                {p}
+              </p>
+            ))}
+          </section>
+        )}
+
         <TeacherProCompareCheckoutStrip locale={locale} />
 
         <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
