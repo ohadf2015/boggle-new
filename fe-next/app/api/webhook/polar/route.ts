@@ -22,6 +22,7 @@ import { buildTeacherFunnelStepEvent } from '@/lib/education/teacherFunnelStepSe
 import { isPolarTrialLapse } from '@/lib/education/polarTrial'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
+import logger from '@/backend/utils/logger'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
@@ -153,6 +154,12 @@ function trialMarker(data: WebhookPayload): { trial: boolean; trial_end: string 
 }
 
 export async function POST(request: NextRequest) {
+  // Hoisted so the catch below can name the Polar delivery that failed.
+  const webhookId = request.headers.get('webhook-id') ?? undefined
+  let payload: WebhookPayload = undefined
+  let eventType = ''
+  let userId: string | undefined
+
   try {
     if (!process.env.POLAR_WEBHOOK_SECRET) {
       console.error('[Polar] POLAR_WEBHOOK_SECRET is not configured')
@@ -173,9 +180,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
-    const payload: WebhookPayload = JSON.parse(rawBody)
-    const eventType = String(payload?.type ?? '')
-    const userId = getUserId(payload)
+    payload = JSON.parse(rawBody)
+    eventType = String(payload?.type ?? '')
+    userId = getUserId(payload)
 
     if (eventRequiresProProductId(eventType, payload) && !process.env.POLAR_PRO_PRODUCT_ID) {
       console.error(`[Polar] POLAR_PRO_PRODUCT_ID is not configured — refusing to ack ${eventType}`)
@@ -270,7 +277,18 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ received: true })
   } catch (error) {
-    console.error('[Polar] Webhook error:', error)
+    // IDs only — this context is serialized into the error tracker, and the
+    // payload carries the teacher's email and name.
+    const err = error instanceof Error ? error : new Error(String(error))
+    logger.error('POLAR_WEBHOOK', `handler threw: ${err.message}`, {
+      errorName: err.name,
+      errorMessage: err.message,
+      stack: err.stack,
+      eventType,
+      webhookId,
+      objectId: payload?.data?.id != null ? String(payload.data.id) : undefined,
+      userId,
+    })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
