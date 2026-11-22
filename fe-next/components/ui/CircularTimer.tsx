@@ -27,6 +27,8 @@ interface CircularTimerProps {
   timerKey?: number | string;
   /** Starting point in seconds (for mid-game reconnects). Defaults to duration. */
   initialRemainingTime?: number;
+  /** Skip the built-in m:ss so the caller can draw its own label inside the ring. */
+  hideLabel?: boolean;
 }
 
 const COLOR_FAMILIES = {
@@ -55,6 +57,7 @@ const CircularTimer = memo<CircularTimerProps>(({
   className,
   timerKey = 0,
   initialRemainingTime,
+  hideLabel = false,
 }) => {
   const family = COLOR_FAMILIES[colorFamily];
 
@@ -96,6 +99,7 @@ const CircularTimer = memo<CircularTimerProps>(({
         onComplete={handleComplete}
       >
         {({ remainingTime }) => {
+          if (hideLabel) return null;
           const total = Math.max(0, Math.floor(remainingTime));
           const mins = Math.floor(total / 60);
           const secs = total % 60;
