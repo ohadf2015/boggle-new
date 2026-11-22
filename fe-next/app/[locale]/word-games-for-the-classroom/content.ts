@@ -138,104 +138,104 @@ const en: LocaleContent = {
 
 // Swedish - native translation
 const sv: LocaleContent = {
-  metaTitle: 'Ordspel for klassrummet — Gratis, Ingen inloggning, Ingen nedladdning | LexiClash',
-  metaDescription: 'Gratis ordspel for klassrummet utan inloggning och nedladdning. Elever ansluter till live-spel med en kod på sex tecken pa sekunder. Använd egna ordlistor, 6 sprak, fungerar pa alla enheter. Noll forberedelse for larare.',
-  ogTitle: 'Ordspel for klassrummet — Gratis, Ingen inloggning',
-  ogDescription: 'Direktsand ordspel som eleverna ansluter till med en kod. Ingen nedladdning, ingen registrering. Vilken enhet som helst. Helt gratis.',
-  twitterTitle: 'Ordspel for klassrummet — Gratis',
-  twitterDescription: 'Direktsand ordspel. Ingen inloggning, ingen nedladdning. Gratis.',
-  heroTitle: 'Ordspel for klassrummet — ingen inloggning, ingen nedladdning, ingen forberedelse.',
-  intro: 'De flesta klassrumsspel kraver elevkonton, en appinstallation eller bada. LexiClash behover endast en kod på sex tecken. Projicera den, eleverna skriver in den pa vilken enhet som helst, och hela klassen spelar ett livordspel pa sekunder — gratis, webbaserat, inget att installera. Ordbildningsspelmekanik (soka och stava verkliga ord pa Boggle-inspirerade galler, anagram och hjul) gor det perfekt for vokabularieverkning, stavning och hjarntraning. Ta med din egen ordlista eller anvand en inbyggd for verklig noll forberedelse.',
-  geoQuestion: 'Hur startar larare ordspel i klassrummet utan elevinloggning?',
+  metaTitle: 'Ordspel för klassrummet — Gratis, ingen inloggning, ingen nedladdning | LexiClash',
+  metaDescription: 'Gratis ordspel för klassrummet utan inloggning och nedladdning. Eleverna går med i ett livespel med en kod på sex tecken. Använd egna ordlistor, 6 språk och vilken enhet som helst. Ingen förberedelse för läraren.',
+  ogTitle: 'Ordspel för klassrummet — Gratis, ingen inloggning',
+  ogDescription: 'Ordspel i realtid som eleverna går med i med en kod. Ingen nedladdning, ingen registrering, vilken enhet som helst. Gratis att börja.',
+  twitterTitle: 'Ordspel för klassrummet — Gratis',
+  twitterDescription: 'Ordspel i realtid. Ingen inloggning, ingen nedladdning. Gratis att börja.',
+  heroTitle: 'Ordspel för klassrummet — ingen inloggning, ingen nedladdning, ingen förberedelse.',
+  intro: 'De flesta klassrumsspel kräver elevkonton, en app eller både och. LexiClash behöver bara en kod på sex tecken. Visa den på projektorn, eleverna skriver in den på sin enhet och hela klassen spelar samma ordspel inom en minut, gratis i webbläsaren och utan installation. Eleverna hittar och stavar riktiga ord på bokstavsbräden, i anagram och på bokstavshjul, så spelet passar för ordförråd, stavning och korta pauser. Använd en egen ordlista eller en av de inbyggda.',
+  geoQuestion: 'Hur kör lärare ordspel i klassrummet utan elevinloggning?',
   ctaStart: 'Starta ett klassrumsspel gratis',
-  ctaCduel: 'Kor en 1v1 duel',
-  ctaMiddleSchool: 'Spel for mellanstadiet',
-  fitsTitle: 'Designat for verkliga klassrum',
+  ctaCduel: 'Kör en duell 1 mot 1',
+  ctaMiddleSchool: 'Spel för högstadiet',
+  fitsTitle: 'Byggt för riktiga klassrum',
   fits: [
     {
-      title: 'Spela pa mindre an en minut',
-      desc: 'Ingen kontoregistrering, ingen appinstallation, ingen arbetsflodesgodkannande. Generera en kod, projicera den, eleverna ansluter och spelar omedelbar.'
+      title: 'Igång på under en minut',
+      desc: 'Inga konton, ingen app att installera och inget som behöver godkännas. Skapa en kod, visa den, och eleverna går med direkt.'
     },
     {
-      title: 'Pa vilken enhet som helst',
-      desc: 'Telefoner, surfplattor, laptoper eller en mix i ett rum. Ingen WiFi behovs — fungerar pa mobilt internet, skolnat eller hemmanet.'
+      title: 'På vilken enhet som helst',
+      desc: 'Telefoner, surfplattor, Chromebooks eller en blandning i samma rum. Det fungerar på skolans nätverk, via mobilt internet eller hemifrån.'
     },
     {
-      title: 'Bygg fran dina egna ord',
-      desc: 'Ladda upp en CSV-fil, klistra in en lista eller valj fran vara inbyggda samlingar. Samma spel, din laroplan.'
+      title: 'Bygg från dina egna ord',
+      desc: 'Ladda upp en CSV-fil, klistra in en lista eller välj bland de inbyggda samlingarna. Samma spel, din läroplan.'
     },
     {
-      title: 'Realtidsfeedback',
-      desc: 'Se varje ord nar det landar. Granska resultat tillsammans — barn alskar att se hogsta poang och se vem som fick de knepiga orden.'
+      title: 'Resultat i realtid',
+      desc: 'Du ser varje ord när det kommer in. Gå igenom resultatet tillsammans efteråt och se vilka ord som var svåra.'
     },
     {
-      title: 'Alla aldrar valkommodna',
-      desc: 'Grundskola (stavningsovning), mellanstadium (ordstammar, vokabular), gymnasium (anagram och monster), ESL. En mekanik, obegransad svarghet.'
+      title: 'För alla åldrar',
+      desc: 'Lågstadiet övar stavning, mellanstadiet ordstammar och ordförråd, gymnasiet anagram och mönster, och det fungerar lika bra för sfi och engelska som andraspråk.'
     },
     {
-      title: 'Fungerar pa gammal teknik',
-      desc: 'Ingen GPU kravs, ingen snygg grafik. Kor smidigt pa vilken skolwebblasare som helst fran de senaste 10 aren.'
+      title: 'Fungerar på äldre datorer',
+      desc: 'Inget grafikkort behövs. Spelet körs i en vanlig webbläsare, även på skolans äldre datorer.'
     }
   ],
-  stepsTitle: 'Live pa tre steg',
+  stepsTitle: 'Igång i tre steg',
   steps: [
     {
-      t: 'Valj en lista',
-      d: 'Använd en inbyggd ordbank (6 sprak, alla aldrar) eller ladda upp din egen CSV pa sekunder.'
+      t: 'Välj en lista',
+      d: 'Använd en inbyggd ordbank (6 språk, alla åldrar) eller ladda upp en egen CSV-fil.'
     },
     {
-      t: 'Projicera koden',
-      d: 'Du far en rumskod på sex tecken. Kasta den pa tavlan, skermen eller sag den hogt. Elever skriver in den for att ansluta.'
+      t: 'Visa koden',
+      d: 'Du får en rumskod på sex tecken. Visa den på tavlan eller läs upp den, så skriver eleverna in den för att gå med.'
     },
     {
-      t: 'Spela + granska',
-      d: 'Timern startar, barn ras for att hitta ord. Efter omgangen, granska tavlan live — alla ser vad som missades, vad som hittades, vad som var knepigt.'
+      t: 'Spela och gå igenom',
+      d: 'Klockan startar och eleverna letar ord. Efter omgången går ni igenom brädet tillsammans och ser vad som hittades och vad som missades.'
     }
   ],
-  faqTitle: 'Vanliga fragor',
+  faqTitle: 'Vanliga frågor',
   faqs: [
     {
-      q: 'Behover elever skapa ett konto?',
-      a: 'Nej. De skriver bara in den sex tecken långa rumskoden pa anslutningsskarmenen. Noll friktio, noll installation.'
+      q: 'Behöver eleverna skapa ett konto?',
+      a: 'Nej. De skriver bara in rumskoden på sex tecken. Inget konto och ingen installation.'
     },
     {
-      q: 'Vad om elever inte har en enhet?',
-      a: 'En enhet per par eller liten grupp fungerar bra. Multiplayer-spel (Boggle, Word Hunt) ar samarbets- eller konkurrenskraftiga efter lag, inte individuella.'
+      q: 'Vad gör jag om alla elever inte har en enhet?',
+      a: 'Låt eleverna dela en enhet i par eller små grupper. Då spelar varje grupp som ett lag.'
     },
     {
-      q: 'Kan jag anvanda min egen ordlista?',
-      a: 'Ja. Ladda upp en CSV-fil eller klistra in en lista innan du spelar. Spelet kommer att anvanda den for sessionen. Utmarkt for ordforradenheter, stavningsprov eller ESL-teman.'
+      q: 'Kan jag använda min egen ordlista?',
+      a: 'Ja. Ladda upp en CSV-fil eller klistra in en lista innan ni spelar, så används den under lektionen. Det passar bra för veckans glosor, stavningsprov eller ett tema.'
     },
     {
-      q: 'Vilka sprak stods?',
-      a: 'Engelska, hebreiska (RTL), svenska, japanska, spanska och ryska. Alla spel, alla ordlistor, full i18n.'
+      q: 'Vilka språk finns?',
+      a: 'Engelska, hebreiska (från höger till vänster), svenska, japanska, spanska och ryska, var och en med sin egen ordlista.'
     },
     {
-      q: 'Hur mycket kostar det?',
-      a: 'Gratis att börja — inga annonser, ingen inloggningsvägg, inga avgifter per elev. Det grundläggande klassrumsspelet är gratis för enskilda lärare; Teacher Pro ($9/mån) lägger till obegränsade klasser.'
+      q: 'Vad kostar det?',
+      a: 'Det är gratis att börja, utan annonser och utan avgift per elev. Gratisplanen räcker till 3 klasser med upp till 50 elever, och Teacher Pro ($9/mån) lägger till obegränsat antal klasser.'
     },
     {
-      q: 'Fungerar det pa var skolans WiFi?',
-      a: 'Nastan sakert. Det ar en vanlig webbapp (ingen WebGL, ingen peer-to-peer). Om din skola tillater YouTube eller Google Classroom, fungerar LexiClash.'
+      q: 'Fungerar det på skolans wifi?',
+      a: 'Nästan alltid. Det är en vanlig webbapp. Om skolan släpper igenom YouTube eller Google Classroom fungerar LexiClash också.'
     }
   ],
-  moreTitle: 'Mer for larare',
+  moreTitle: 'Mer för lärare',
   moreCards: [
     {
-      title: 'Vikarie lararspel',
-      sub: 'Noll-forberednings ordspel for vilken klass som helst pa under 2 minuter. Fungerar pa vilken enhet som helst.'
+      title: 'Ordspel för vikarier',
+      sub: 'Ordspel utan förberedelse som fungerar i vilken klass som helst på under 2 minuter.'
     },
     {
-      title: 'Klocka ringare ordspel',
-      sub: 'Snabba dagliga ordutmaningar — perfekt for hjarntraning och vokabulardrill.'
+      title: 'Ordspel för lektionsstart',
+      sub: 'Korta dagliga ordutmaningar för att komma igång eller öva glosor.'
     },
     {
-      title: 'Utbildningscenter',
-      sub: 'Ordspelsguider, undervisningsstrategier och gemenskapslektionsplaner.'
+      title: 'Lärarsidan',
+      sub: 'Guider till ordspel, undervisningsidéer och lektionsupplägg.'
     }
   ],
-  finalTitle: 'Starta en nu',
-  finalBody: 'Inget konto att skapa, inget att installera, inget kreditkort. Valj en ordlista, projicera rumskoden och rummet spelar pa mindre an en minut.',
+  finalTitle: 'Starta ett spel nu',
+  finalBody: 'Inget konto, inget att installera och inget kreditkort. Välj en ordlista, visa rumskoden, så spelar klassen inom en minut.',
   finalCta: 'Starta ett klassrumsspel gratis'
 };
 

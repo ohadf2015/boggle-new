@@ -91,9 +91,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "Word Adventure Game - RPG Word Puzzle Free",
-        "description": "Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles and power-ups. No download, no signup needed.",
+        "description": "Battle bosses, conquer 70 levels across 10 themed worlds. Free RPG word puzzle game with special tiles and power-ups. No download, no signup needed.",
         "ogTitle": "LexiClash Adventure - RPG Word Puzzle Game",
-        "ogDescription": "Battle bosses in an epic word adventure! 100 levels, 10 worlds, special tiles and power-ups. Free to play!"
+        "ogDescription": "Battle bosses in an epic word adventure! 70 levels, 10 worlds, special tiles and power-ups. Free to play!"
       }
     },
     "accessibility": {
@@ -202,9 +202,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "משחק מילים הרפתקה - RPG פאזל מילים חינם",
-        "description": "צאו להרפתקת מילים אפית! הילחמו בבוסים, כבשו 100 שלבים ב-10 עולמות נושאיים. משחק RPG פאזל מילים חינם עם אריחים מיוחדים וכוחות על.",
+        "description": "צאו להרפתקת מילים אפית! הילחמו בבוסים, כבשו 70 שלבים ב-10 עולמות נושאיים. משחק RPG פאזל מילים חינם עם אריחים מיוחדים וכוחות על.",
         "ogTitle": "לקסיקלאש הרפתקה - RPG פאזל מילים",
-        "ogDescription": "הילחמו בבוסים בהרפתקת מילים אפית! 100 שלבים, 10 עולמות. שחקו בחינם!"
+        "ogDescription": "הילחמו בבוסים בהרפתקת מילים אפית! 70 שלבים, 10 עולמות. שחקו בחינם!"
       }
     },
     "accessibility": {
@@ -313,9 +313,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
-        "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
+        "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 70 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
         "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
-        "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
+        "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 70 nivåer, 10 världar. Spela gratis!"
       }
     },
     "accessibility": {
@@ -424,9 +424,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "ワードアドベンチャーゲーム - RPGワードパズル無料",
-        "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
+        "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで70レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
         "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
-        "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
+        "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！70レベル、10ワールド。無料でプレイ！"
       }
     },
     "accessibility": {
@@ -535,9 +535,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "Juego de Palabras Aventura - RPG de Palabras Gratis",
-        "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
+        "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 70 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
         "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
-        "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!"
+        "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 70 niveles, 10 mundos. ¡Juega gratis!"
       }
     },
     "accessibility": {
@@ -646,9 +646,9 @@ export const layoutTranslations: Record<string, any> = {
       },
       "adventure": {
         "title": "Словесное приключение — бесплатная словесная головоломка RPG",
-        "description": "Отправься в эпическое словесное приключение! Сражайся с боссами, покорай 100 уровней в 10 тематических мирах. Бесплатная словесная головоломка RPG со специальными плитками, усилениями и прогрессией. Без скачивания.",
+        "description": "Отправься в эпическое словесное приключение! Сражайся с боссами, покорай 70 уровней в 10 тематических мирах. Бесплатная словесная головоломка RPG со специальными плитками, усилениями и прогрессией. Без скачивания.",
         "ogTitle": "LexiClash Adventure — словесная головоломка RPG",
-        "ogDescription": "Сражайся с боссами в эпическом словесном приключении! 100 уровней, 10 миров, специальные плитки и усиления. Бесплатно!"
+        "ogDescription": "Сражайся с боссами в эпическом словесном приключении! 70 уровней, 10 миров, специальные плитки и усиления. Бесплатно!"
       }
     },
     "accessibility": {

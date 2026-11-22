@@ -1601,7 +1601,7 @@ const sv = {
       "items": {
         "adventure": {
           "title": "Äventyr",
-          "line": "100 nivåer i 10 världar. Klättra och erövra."
+          "line": "70 nivåer i 10 världar. Klättra och erövra."
         },
         "wordTowerV2": {
           "title": "Ordtornet",
@@ -3855,9 +3855,9 @@ const sv = {
     },
     "adventure": {
       "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
-      "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
+      "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 70 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
       "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
-      "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!",
+      "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 70 nivåer, 10 världar. Spela gratis!",
       "playLabel": "Spela"
     },
     "wordTowerV2": {
@@ -9055,7 +9055,7 @@ const sv = {
         "intro": "LexiClash är inte bara ytterligare ett ordspel. Vi har designat varje aspekt av upplevelsen för att vara originell, inkluderande och djupt engagerande. Här är vad som skiljer oss från andra ordspel på marknaden:",
         "gameModes": {
           "title": "Originella spellägen",
-          "content": "Från Blast Mode — där brickor exploderar och kaskadar i kedjereaktioner — till Word Hunt, där spelare tävlar om att hitta specifika målord, och dagliga utmaningar som ger varje spelare samma pussel att lösa varje dag. Vårt äventyrsläge har 100 nivåer i 10 temavärldar med bossstrider, specialbrickor och power-ups."
+          "content": "Från Blast Mode — där brickor exploderar och kaskadar i kedjereaktioner — till Word Hunt, där spelare tävlar om att hitta specifika målord, och dagliga utmaningar som ger varje spelare samma pussel att lösa varje dag. Vårt äventyrsläge har 70 nivåer i 10 temavärldar med bossstrider, specialbrickor och power-ups."
         },
         "multilingual": {
           "title": "Äkta flerspråkigt stöd",
@@ -9500,7 +9500,7 @@ const sv = {
     "brainTraining": "Hjärnträning",
     "brainTrainingDesc": "Spåra kognitiv tillväxt",
     "adventureMode": "Äventyr",
-    "adventureModeDesc": "100 nivåer i 10 världar",
+    "adventureModeDesc": "70 nivåer i 10 världar",
     "adventureResumeA11y": "Fortsätt ditt äventyr: värld {world}, nod {step}, {hp} hjärtan kvar",
     "quickPlayMode": "Snabbspel",
     "quickPlayModeDesc": "Snurra hjulet, slå brädan",
@@ -9594,13 +9594,13 @@ const sv = {
       "feature2Title": "Dagliga utmaningar",
       "feature2Desc": "Samma pussel för alla världen över, varje dag. Håll igång din svit och skicka resultatet till kompisarna för att se vem som klarade sig bäst.",
       "feature3Title": "Äventyrsläge",
-      "feature3Desc": "100 nivåer i 10 tematiserade världar. Specialbrickor, bossstrider och power-ups håller varje omgång fräsch.",
+      "feature3Desc": "70 nivåer i 10 tematiserade världar. Specialbrickor, bossstrider och power-ups håller varje omgång fräsch.",
       "feature4Title": "6 språk",
       "feature4Desc": "Spela på engelska, hebreiska, svenska, japanska, spanska eller ryska. Byt när som helst och utmana vänner på olika språk.",
       "feature4TitleShort": "Blast-läge",
       "modeTagMultiplayer": "2-20 spelare",
       "modeTagDaily": "Nytt pussel varje dag",
-      "modeTagAdventure": "100 nivåer",
+      "modeTagAdventure": "70 nivåer",
       "modeTagBlast": "Kedjereaktioner",
       "feature5Title": "Communitybrädor",
       "modeTagCommunity": "Spelargjorda pussel",
@@ -9621,7 +9621,7 @@ const sv = {
       "gameModesMultiplayer": "Multiplayerrum: skapa ett privat rum och dela koden med upp till 20 vänner. Alla ser samma bokstavsrutnät och tävlar om att hitta ord innan tiden tar slut. Spelaren med högst poäng vinner. Perfekt för fester, klassrum och teambuilding på distans.",
       "gameModesSingle": "Enspelare mot bottar: öva på att hitta ord mot AI-motståndare med varierande svårighetsgrad. Slå personliga rekord, samla prestationer och skärp din strategi utan pressen av live-tävling.",
       "gameModesDaily": "Daglig utmaning: ett nytt pussel varje dag, identiskt för alla spelare världen över. Slutför det för att hålla din svit igång och jämför ditt resultat med det globala communityt. Dela ditt resultat med kompisarna och utmana dem att slå det.",
-      "gameModesAdventure": "Äventyrsläge: res genom 10 temavärldar med 100 nivåer som blir allt svårare. Stöt på speciella bricktyper som is, eld, bomber och regnbågsbrickor. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.",
+      "gameModesAdventure": "Äventyrsläge: res genom 10 temavärldar med 70 nivåer som blir allt svårare. Varje värld lägger till en ny regel, som dimma som döljer brädet eller bomber som måste desarmeras. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.",
       "educationTitle": "Byggt för lärande",
       "educationContent": "Ordspel är ett av de mest effektiva sätten att bygga ordförråd och förbättra stavning. Forskning publicerad i AIMS Neuroscience visar att ordpussel aktiverar flera hjärnregioner samtidigt, bland annat områden ansvariga för språkbearbetning, arbetsminne och exekutiva funktioner. LexiClash tar detta vidare genom att erbjuda spel på sex språk, vilket gör det till ett praktiskt verktyg för språkinlärare. Lärare använder LexiClash i klassrum på tre kontinenter för att göra ordförrådsövningar engagerande. Multiplayerformatet skapar hälsosam konkurrens som motiverar elever att naturligt utöka sin ordkunskap.",
       "faqTitle": "Vanliga frågor",
@@ -21448,7 +21448,7 @@ const sv = {
     "title": "Två nya sätt att spela",
     "description": "Ett äventyr genom tio världar och ett torn som kan rasa.",
     "adventureTitle": "Äventyr",
-    "adventureLine": "10 världar, 100 nivåer och en ordhungrig drake på toppen.",
+    "adventureLine": "10 världar, 70 nivåer och en ordhungrig drake på toppen.",
     "wordTowerTitle": "Ordtornet",
     "wordTowerLine": "Stapla ord mot himlen. Ett vingligt ord och allt rasar.",
     "playAdventure": "Börja äventyret",

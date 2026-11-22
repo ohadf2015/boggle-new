@@ -1601,7 +1601,7 @@ const es = {
       "items": {
         "adventure": {
           "title": "Aventura",
-          "line": "100 niveles en 10 mundos. Sube y conquista."
+          "line": "70 niveles en 10 mundos. Sube y conquista."
         },
         "wordTowerV2": {
           "title": "Torre de Palabras",
@@ -3500,9 +3500,9 @@ const es = {
     },
     "adventure": {
       "title": "Juego de Palabras Aventura - RPG de Palabras Gratis",
-      "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 100 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
+      "description": "¡Embárcate en una aventura épica de palabras! Batalla contra jefes, conquista 70 niveles en 10 mundos temáticos. Juego RPG de palabras gratis con fichas especiales y power-ups.",
       "ogTitle": "LexiClash Aventura - Juego RPG de Palabras",
-      "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 100 niveles, 10 mundos. ¡Juega gratis!",
+      "ogDescription": "¡Batalla contra jefes en una aventura épica de palabras! 70 niveles, 10 mundos. ¡Juega gratis!",
       "playLabel": "Juega"
     },
     "wordTowerV2": {
@@ -7464,7 +7464,7 @@ const es = {
         "intro": "LexiClash no es solo otro juego de palabras. Hemos diseñado cada aspecto de la experiencia para que sea original, inclusivo y profundamente atractivo. Esto es lo que nos distingue de otros juegos de palabras en el mercado:",
         "gameModes": {
           "title": "Modos de Juego Originales",
-          "content": "Desde el Modo Blast — donde las fichas explotan y se producen reacciones en cadena — hasta Word Hunt, donde los jugadores compiten para encontrar palabras objetivo específicas, y Desafíos Diarios que dan a cada jugador el mismo rompecabezas para resolver cada día. Nuestro Modo Aventura presenta 100 niveles en 10 mundos temáticos con batallas de jefes, fichas especiales y power-ups."
+          "content": "Desde el Modo Blast — donde las fichas explotan y se producen reacciones en cadena — hasta Word Hunt, donde los jugadores compiten para encontrar palabras objetivo específicas, y Desafíos Diarios que dan a cada jugador el mismo rompecabezas para resolver cada día. Nuestro Modo Aventura presenta 70 niveles en 10 mundos temáticos con batallas de jefes, fichas especiales y power-ups."
         },
         "multilingual": {
           "title": "Verdadero Soporte Multilingüe",
@@ -9121,7 +9121,7 @@ const es = {
     "brainTraining": "Entrenamiento Cerebral",
     "brainTrainingDesc": "Sigue tu crecimiento cognitivo",
     "adventureMode": "Aventura",
-    "adventureModeDesc": "100 niveles en 10 mundos",
+    "adventureModeDesc": "70 niveles en 10 mundos",
     "adventureResumeA11y": "Continúa tu aventura: mundo {world}, nodo {step}, {hp} corazones",
     "quickPlayMode": "Partida rápida",
     "quickPlayModeDesc": "Gira la rueda y vence al tablero",
@@ -9215,13 +9215,13 @@ const es = {
       "feature2Title": "Desafíos diarios",
       "feature2Desc": "El mismo puzzle para todos en el mundo, cada día. Mantén tu racha y mándales tu resultado a tus amigos para ver quién lo hizo mejor.",
       "feature3Title": "Modo aventura",
-      "feature3Desc": "100 niveles en 10 mundos temáticos. Fichas especiales, batallas contra jefes y potenciadores.",
+      "feature3Desc": "70 niveles en 10 mundos temáticos. Fichas especiales, batallas contra jefes y potenciadores.",
       "feature4Title": "6 idiomas",
       "feature4Desc": "Juega en inglés, hebreo, sueco, japonés, español o ruso. Cambia cuando quieras y desafía a amigos de otros idiomas.",
       "feature4TitleShort": "Modo Blast",
       "modeTagMultiplayer": "2-20 jugadores",
       "modeTagDaily": "Nuevo puzzle cada día",
-      "modeTagAdventure": "100 niveles",
+      "modeTagAdventure": "70 niveles",
       "modeTagBlast": "Reacciones en cadena",
       "feature5Title": "Tableros de la comunidad",
       "modeTagCommunity": "Puzzles creados por jugadores",
@@ -9242,7 +9242,7 @@ const es = {
       "gameModesMultiplayer": "Salas multijugador: crea una sala privada y comparte el código con hasta 20 amigos. Todos ven la misma cuadrícula y compiten por encontrar palabras antes de que se acabe el tiempo. Gana quien tenga más puntos. Ideal para fiestas, aulas y actividades de equipo a distancia.",
       "gameModesSingle": "Un jugador contra bots: practica tu búsqueda de palabras contra rivales de IA de distintas dificultades. Marca récords personales, consigue logros y afina tu estrategia sin la presión de jugar en vivo.",
       "gameModesDaily": "Desafío diario: un puzle nuevo cada día, igual para todos en el mundo. Complétalo para mantener tu racha y compara tu puntuación con la comunidad. Comparte tu resultado con tus amigos y rétalos a superarlo.",
-      "gameModesAdventure": "Modo aventura: recorre 10 mundos temáticos con 100 niveles de dificultad creciente. Encuentra fichas especiales como hielo, fuego, bombas y arcoíris. Derrota jefes con el poder de las palabras y desbloquea mundos nuevos a medida que avanzas.",
+      "gameModesAdventure": "Modo aventura: recorre 10 mundos temáticos con 70 niveles de dificultad creciente. Cada mundo añade una regla nueva, como una niebla que oculta el tablero o bombas que hay que desactivar. Derrota jefes con el poder de las palabras y desbloquea mundos nuevos a medida que avanzas.",
       "educationTitle": "Diseñado para el aprendizaje",
       "educationContent": "Los juegos de palabras son una de las formas más efectivas de ampliar el vocabulario y mejorar la ortografía. Una investigación publicada en AIMS Neuroscience muestra que los puzles de palabras activan varias regiones del cerebro a la vez, incluidas las que se encargan del procesamiento del lenguaje, la memoria de trabajo y las funciones ejecutivas. LexiClash va más allá al ofrecer juego en seis idiomas, y eso lo vuelve una herramienta práctica para quienes aprenden idiomas. Docentes de tres continentes lo usan en el aula para que los ejercicios de vocabulario resulten más entretenidos. El formato multijugador crea una competencia sana que motiva a los estudiantes a ampliar su vocabulario de forma natural.",
       "faqTitle": "Preguntas frecuentes",
@@ -21460,7 +21460,7 @@ const es = {
     "title": "Dos formas nuevas de jugar",
     "description": "Una aventura por diez mundos y una torre que se puede derrumbar.",
     "adventureTitle": "Aventura",
-    "adventureLine": "10 mundos, 100 niveles y un dragón hambriento de palabras al final.",
+    "adventureLine": "10 mundos, 70 niveles y un dragón hambriento de palabras al final.",
     "wordTowerTitle": "Torre de Palabras",
     "wordTowerLine": "Apila palabras hasta el cielo. Una palabra floja y se viene abajo.",
     "playAdventure": "Empezar la aventura",

@@ -55,9 +55,9 @@ const en: LandingSEOContent = {
     },
     {
       title: 'Adventure Mode',
-      tag: '100 levels',
+      tag: '70 levels',
       description:
-        '100 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.',
+        '70 levels across 10 themed worlds. Special tiles, boss battles, and power-ups keep every round fresh.',
     },
     {
       title: 'Blast Mode',
@@ -112,7 +112,7 @@ const en: LandingSEOContent = {
     {
       title: 'Adventure Mode',
       content:
-        'Journey through 10 themed worlds with 100 levels of increasing difficulty. Encounter special tile types like ice, fire, bombs, and rainbow tiles. Defeat bosses using word power and unlock new worlds as you progress.',
+        'Journey through 10 themed worlds with 70 levels of increasing difficulty. Each world adds a new rule, like fog that hides the board or bombs you have to defuse. Defeat bosses using word power and unlock new worlds as you progress.',
     },
   ],
   educationTitle: 'Built for Learning',
@@ -188,9 +188,9 @@ const he: LandingSEOContent = {
     },
     {
       title: 'מצב הרפתקה',
-      tag: '100 שלבים',
+      tag: '70 שלבים',
       description:
-        '100 שלבים על פני 10 עולמות בעלי תמה. אריחים מיוחדים, קרבות בוסים ואפגרייד שומרים על כל סיבוב טרי.',
+        '70 שלבים על פני 10 עולמות בעלי תמה. אריחים מיוחדים, קרבות בוסים ואפגרייד שומרים על כל סיבוב טרי.',
     },
     {
       title: 'מצב בלאסט',
@@ -252,7 +252,7 @@ const he: LandingSEOContent = {
     {
       title: 'מצב הרפתקה',
       content:
-        'עברו דרך 10 עולמות בעלי תמה עם 100 שלבים ברמת קושי גוברת. פגשו סוגי אריחים מיוחדים כמו קרח, אש, פצצות ואריחי קשת. נצחו בוסים בעזרת כוח המילים ופתחו עולמות חדשים עם ההתקדמות.',
+        'עברו דרך 10 עולמות בעלי תמה עם 70 שלבים ברמת קושי גוברת. כל עולם מוסיף חוק חדש, כמו ערפל שמסתיר את הלוח או פצצות שצריך לנטרל. נצחו בוסים בעזרת כוח המילים ופתחו עולמות חדשים עם ההתקדמות.',
     },
   ],
   educationTitle: 'בנוי ללמידה',
@@ -328,9 +328,9 @@ const sv: LandingSEOContent = {
     },
     {
       title: 'Äventyrsläge',
-      tag: '100 nivåer',
+      tag: '70 nivåer',
       description:
-        '100 nivåer över 10 tematiska världar. Specialbrickor, bosstrider och power-ups håller varje runda fräsch.',
+        '70 nivåer över 10 tematiska världar. Specialbrickor, bosstrider och power-ups håller varje runda fräsch.',
     },
     {
       title: 'Blastläge',
@@ -392,7 +392,7 @@ const sv: LandingSEOContent = {
     {
       title: 'Äventyrsläge',
       content:
-        'Res genom 10 tematiska världar med 100 nivåer av ökande svårighet. Möt speciella bricktyper som is, eld, bomber och regnbågsbrickor. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.',
+        'Res genom 10 tematiska världar med 70 nivåer av ökande svårighet. Varje värld lägger till en ny regel, som dimma som döljer brädet eller bomber som måste desarmeras. Besegra bossar med ordkraft och lås upp nya världar allt eftersom du avancerar.',
     },
   ],
   educationTitle: 'Byggt för lärande',
@@ -468,9 +468,9 @@ const ja: LandingSEOContent = {
     },
     {
       title: 'アドベンチャーモード',
-      tag: '100ステージ',
+      tag: '70ステージ',
       description:
-        '10のテーマワールドにわたる100ステージ。特殊タイル、ボス戦、パワーアップで毎回新鮮な体験。',
+        '10のテーマワールドにわたる70ステージ。特殊タイル、ボス戦、パワーアップで毎回新鮮な体験。',
     },
     {
       title: 'ブラストモード',
@@ -532,7 +532,7 @@ const ja: LandingSEOContent = {
     {
       title: 'アドベンチャーモード',
       content:
-        '難易度が増す100ステージで10のテーマワールドを旅しよう。氷、炎、爆弾、レインボータイルなどの特殊タイルが登場。言葉の力でボスを倒し、進むにつれて新しいワールドを解放しよう。',
+        '難易度が増す70ステージで10のテーマワールドを旅しよう。ワールドごとに、盤面を隠す霧や解除が必要な爆弾などの新ルールが加わります。言葉の力でボスを倒し、進むにつれて新しいワールドを解放しよう。',
     },
   ],
   educationTitle: '学びのために作られた',
@@ -608,9 +608,9 @@ const es: LandingSEOContent = {
     },
     {
       title: 'Modo aventura',
-      tag: '100 niveles',
+      tag: '70 niveles',
       description:
-        '100 niveles a través de 10 mundos temáticos. Fichas especiales, batallas contra jefes y mejoras mantienen cada ronda fresca.',
+        '70 niveles a través de 10 mundos temáticos. Fichas especiales, batallas contra jefes y mejoras mantienen cada ronda fresca.',
     },
     {
       title: 'Modo Blast',
@@ -672,7 +672,7 @@ const es: LandingSEOContent = {
     {
       title: 'Modo aventura',
       content:
-        'Viaja por 10 mundos temáticos con 100 niveles de dificultad creciente. Encuentra tipos de fichas especiales como hielo, fuego, bombas y fichas arcoíris. Derrota a los jefes con el poder de las palabras y desbloquea nuevos mundos a medida que avanzas.',
+        'Viaja por 10 mundos temáticos con 70 niveles de dificultad creciente. Cada mundo añade una regla nueva, como una niebla que oculta el tablero o bombas que hay que desactivar. Derrota a los jefes con el poder de las palabras y desbloquea nuevos mundos a medida que avanzas.',
     },
   ],
   educationTitle: 'Diseñado para aprender',
@@ -748,9 +748,9 @@ const ru: LandingSEOContent = {
     },
     {
       title: 'Режим приключений',
-      tag: '100 уровней',
+      tag: '70 уровней',
       description:
-        '100 уровней в 10 тематических мирах. Специальные плитки, боссы и бонусы делают каждый раунд свежим.',
+        '70 уровней в 10 тематических мирах. Специальные плитки, боссы и бонусы делают каждый раунд свежим.',
     },
     {
       title: 'Режим взрыва',
@@ -812,7 +812,7 @@ const ru: LandingSEOContent = {
     {
       title: 'Режим приключений',
       content:
-        'Путешествуйте по 10 тематическим мирам со 100 уровнями нарастающей сложности. Встречайте специальные типы плиток — лед, огонь, бомбы и радугу. Побеждайте боссов силой слов и открывайте новые миры по мере продвижения.',
+        'Путешествуйте по 10 тематическим мирам с 70 уровнями нарастающей сложности. Каждый мир добавляет новое правило, например туман, который скрывает поле, или бомбы, которые нужно обезвредить. Побеждайте боссов силой слов и открывайте новые миры по мере продвижения.',
     },
   ],
   educationTitle: 'Разработано для обучения',

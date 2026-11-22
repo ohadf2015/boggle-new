@@ -63,7 +63,7 @@ export const contentByLocale: Record<string, AboutContent> = {
       intro: 'LexiClash is not just another word game. We have designed every aspect of the experience to be original, inclusive, and deeply engaging. Here is what sets us apart from other word games on the market:',
       gameModes: {
         title: 'Original Game Modes',
-        content: 'From Blast Mode — where tiles explode and cascade in chain reactions — to Word Hunt, where players race to find specific target words, and Daily Challenges that give every player the same puzzle to solve each day. Our Adventure Mode features 100 levels across 10 themed worlds with boss battles, special tiles, and power-ups.',
+        content: 'From Blast Mode — where tiles explode and cascade in chain reactions — to Word Hunt, where players race to find specific target words, and Daily Challenges that give every player the same puzzle to solve each day. Our Adventure Mode features 70 levels across 10 themed worlds with boss battles, special tiles, and power-ups.',
       },
       multilingual: {
         title: 'True Multilingual Support',
