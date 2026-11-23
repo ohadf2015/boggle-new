@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 import type { LetterGrid, Language } from '@/types';
 import { useGridAriaLabels } from '@/hooks/useGridAriaLabels';
@@ -126,25 +126,33 @@ const GridComponent = memo<GridComponentProps>(({
   const quakeOff = useDisableEarthquakeEffects() || reduceMotion;
   const { playTileSelectSound, playEarthquakeRumble, playEarthquakeShake } = useSoundEffects();
 
+  const latest = useRef({ onPathSubmit, onWordSubmit, onWordChange, onSelectionChange, onSingleTapDetected, cellFilter, playTileSelectSound });
+  useLayoutEffect(() => {
+    latest.current = { onPathSubmit, onWordSubmit, onWordChange, onSelectionChange, onSingleTapDetected, cellFilter, playTileSelectSound };
+  });
+
   const handleSubmit = useCallback((path: CellRef[], method: SubmitMethod) => {
     const cells = toSelected(path);
-    onPathSubmit?.(cells);
-    onWordSubmit?.(cells.map((c) => c.letter).join(''), { inputMethod: method === 'kb' ? 'kb' : 'drag' });
-  }, [onPathSubmit, onWordSubmit]);
+    latest.current.onPathSubmit?.(cells);
+    latest.current.onWordSubmit?.(cells.map((c) => c.letter).join(''), { inputMethod: method === 'kb' ? 'kb' : 'drag' });
+  }, []);
 
   const handlePathChange = useCallback((path: CellRef[]) => {
     const cells = toSelected(path);
-    onWordChange?.(cells.map((c) => c.letter).join(''), cells.length);
-    onSelectionChange?.(cells);
-  }, [onWordChange, onSelectionChange]);
+    latest.current.onWordChange?.(cells.map((c) => c.letter).join(''), cells.length);
+    latest.current.onSelectionChange?.(cells);
+  }, []);
+
+  const handleSingleTap = useCallback((cell: CellRef) => latest.current.onSingleTapDetected?.(cell), []);
 
   const handleStep = useCallback(() => {
-    if (!ghostCells) playTileSelectSound?.();
-  }, [ghostCells, playTileSelectSound]);
+    if (!ghostCells) latest.current.playTileSelectSound?.();
+  }, [ghostCells]);
 
+  const hasCellFilter = !!cellFilter;
   const canEnter = useMemo(
-    () => (cellFilter ? (cell: CellRef, len: number) => cellFilter(cell.row, cell.col, len) : undefined),
-    [cellFilter],
+    () => (hasCellFilter ? (cell: CellRef, len: number) => latest.current.cellFilter?.(cell.row, cell.col, len) ?? true : undefined),
+    [hasCellFilter],
   );
 
   const marks = useMemo(() => ({
@@ -205,7 +213,7 @@ const GridComponent = memo<GridComponentProps>(({
           interactive={interactive}
           onSubmit={handleSubmit}
           onPathChange={handlePathChange}
-          onSingleTap={onSingleTapDetected}
+          onSingleTap={onSingleTapDetected ? handleSingleTap : undefined}
           onStep={handleStep}
           canEnter={canEnter}
           adjacent={isAdjacent}

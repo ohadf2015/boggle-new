@@ -13,7 +13,7 @@ import {
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
-import { useSelectionStore, resetSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
+import { resetSelection, scheduleSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
 import { useCoachExampleWord } from '@/hooks/useCoachExampleWord';
@@ -644,7 +644,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
       dragCountedRef.current = true;
       stuckCoach.markDragStart();
     }
-    useSelectionStore.getState().setSelection(word, count);
+    scheduleSelection(word, count);
   }, [stuckCoach]);
 
   // Shared props for layout components

@@ -265,6 +265,7 @@ function bindBoard(
       showLocked();
       return;
     }
+    painter.measure();
     noteTap('tap');
     const cell = cellFromEvent(e);
     if (!cell) return;
@@ -273,7 +274,6 @@ function bindBoard(
     isTouch = e.pointerType === 'touch';
     pointerId = e.pointerId;
     try { root.setPointerCapture?.(e.pointerId); } catch { /* synthetic pointer */ }
-    painter.measure();
     start = { x: e.clientX, y: e.clientY };
     last = start;
     pressing = true;

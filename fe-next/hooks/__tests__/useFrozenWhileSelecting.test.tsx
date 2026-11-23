@@ -75,45 +75,27 @@ describe('useFrozenWhileSelecting', () => {
     expect(result.current).toBe(v2);
   });
 
-  it('does not re-subscribe consumers on every letter count change', () => {
+  it('does not re-render the consumer when a selection starts, grows or ends with the value unchanged', () => {
     let renderCount = 0;
-    const { rerender } = renderHook(
+    renderHook(
       ({ value }: { value: number }) => {
         renderCount++;
         return useFrozenWhileSelecting(value);
       },
       { initialProps: { value: 1 } },
     );
-
     const initialRenderCount = renderCount;
 
-    // Drag from 1 to 5 letters — boolean isSelecting stays true the whole time
     act(() => {
       useSelectionStore.getState().setSelection('A', 1);
     });
-    const afterStart = renderCount;
-    expect(afterStart).toBeGreaterThan(initialRenderCount);
-
     act(() => {
       useSelectionStore.getState().setSelection('AB', 2);
     });
     act(() => {
-      useSelectionStore.getState().setSelection('ABC', 3);
-    });
-    act(() => {
-      useSelectionStore.getState().setSelection('ABCD', 4);
-    });
-    act(() => {
-      useSelectionStore.getState().setSelection('ABCDE', 5);
+      resetSelection();
     });
 
-    // letterCount changed 4 more times, but isSelecting boolean stayed true.
-    // Consumer must NOT re-render on those steps — that's the whole point of
-    // gating on the boolean derived selector instead of the raw count.
-    expect(renderCount).toBe(afterStart);
-
-    // Parent re-renders with same value: no extra count change but a re-render
-    rerender({ value: 1 });
-    expect(renderCount).toBeGreaterThan(afterStart);
+    expect(renderCount).toBe(initialRenderCount);
   });
 });

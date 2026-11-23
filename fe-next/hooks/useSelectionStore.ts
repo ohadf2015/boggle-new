@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useReducer, useRef } from 'react';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 
@@ -16,7 +16,36 @@ export const useSelectionStore = create<SelectionState>()(
   })),
 );
 
+let pending: { word: string; count: number } | null = null;
+let pendingFrame = 0;
+let pendingTimer: ReturnType<typeof setTimeout> | undefined;
+
+function cancelPending(): void {
+  pending = null;
+  if (pendingFrame) cancelAnimationFrame(pendingFrame);
+  clearTimeout(pendingTimer);
+  pendingFrame = 0;
+  pendingTimer = undefined;
+}
+
+function flushPending(): void {
+  const next = pending;
+  cancelPending();
+  if (next) useSelectionStore.getState().setSelection(next.word, next.count);
+}
+
+/** The board paints its own selection; everything reading this store can wait until that frame is on screen. */
+export function scheduleSelection(word: string, count: number): void {
+  pending = { word, count };
+  if (pendingFrame || pendingTimer) return;
+  pendingFrame = requestAnimationFrame(() => {
+    pendingFrame = 0;
+    pendingTimer = setTimeout(flushPending, 0);
+  });
+}
+
 export function resetSelection(): void {
+  cancelPending();
   useSelectionStore.setState({ formedWord: '', letterCount: 0 });
 }
 
@@ -45,8 +74,20 @@ export const useIsSelecting = (): boolean =>
  * eventually fires and lands mid-drag.
  */
 export function useFrozenWhileSelecting<T>(value: T): T {
-  const isSelecting = useIsSelecting();
+  const [, wake] = useReducer((n: number) => n + 1, 0);
   const heldRef = useRef(value);
-  if (!isSelecting) heldRef.current = value;
+  const latestRef = useRef(value);
+  latestRef.current = value;
+  if (useSelectionStore.getState().letterCount === 0) heldRef.current = value;
+  useEffect(
+    () =>
+      useSelectionStore.subscribe(
+        (s) => s.letterCount > 0,
+        (selecting) => {
+          if (!selecting && heldRef.current !== latestRef.current) wake();
+        },
+      ),
+    [],
+  );
   return heldRef.current;
 }

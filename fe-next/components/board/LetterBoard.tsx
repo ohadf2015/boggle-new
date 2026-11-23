@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type CSSProperties, type Ref } from 'react';
+import { memo, useEffect, useMemo, useRef, type CSSProperties, type Ref } from 'react';
 import type { Language, LetterGrid } from '@/types';
 import { cn } from '@/lib/utils';
 import { useBoardSelection, type SubmitMethod } from './useBoardSelection';
@@ -86,7 +86,7 @@ function isMarked(key: string, marks: BoardMarks | undefined): boolean {
  * board; the live selection, trail, preview and release effects are painted
  * straight onto this DOM by the selection engine.
  */
-export default function LetterBoard({
+function LetterBoard({
   grid,
   interactive = false,
   onSubmit,
@@ -163,12 +163,62 @@ export default function LetterBoard({
 
   const rows = grid.length;
   const cols = grid[0]?.length ?? 0;
-  const hintOrder = new Map<string, number>();
-  if (hintPhase !== null) hintPath?.forEach((c, i) => hintOrder.set(keyOf(c.row, c.col), i + 1));
   const template: CSSProperties = {
     gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
     gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
   };
+  const [tiles, glyphs] = useMemo(() => {
+    const hintOrder = new Map<string, number>();
+    if (hintPhase !== null) hintPath?.forEach((c, i) => hintOrder.set(keyOf(c.row, c.col), i + 1));
+    return [
+      grid.map((row, r) =>
+        row.map((letter, c) => {
+          const key = keyOf(r, c);
+          const order = hintOrder.get(key);
+          const eliminated = eliminatedLetters?.has(letter.toUpperCase()) ?? false;
+          return (
+            <div
+              key={key}
+              role="gridcell"
+              data-tile=""
+              data-row={r}
+              data-col={c}
+              data-letter={letter}
+              data-key={key}
+              data-empty={letter ? undefined : ''}
+              data-hint={order ? '' : undefined}
+              data-eliminated={eliminated ? '' : undefined}
+              {...markAttrs(key, marks)}
+              aria-label={cellLabel?.(r, c, letter)}
+              className={cn(styles.tile, !ghost && !order && !eliminated && !isMarked(key, marks) && 'letter-tile-gradient')}
+              style={{ ['--enter-i' as string]: r * cols + c }}
+            >
+              {order && <span className={styles.badge}>{order}</span>}
+              {marks?.golden?.has(key) && <span className={styles.mark}>★</span>}
+            </div>
+          );
+        }),
+      ),
+      grid.map((row, r) =>
+        row.map((letter, c) => {
+          const key = keyOf(r, c);
+          return (
+            <span
+              key={key}
+              data-gk={key}
+              data-eliminated={eliminatedLetters?.has(letter.toUpperCase()) ? '' : undefined}
+              data-hint={hintOrder.has(key) ? '' : undefined}
+              data-marked={isMarked(key, marks) ? '' : undefined}
+              className={styles.glyph}
+              style={{ ['--enter-i' as string]: r * cols + c }}
+            >
+              {ghost ? '' : letter}
+            </span>
+          );
+        }),
+      ),
+    ];
+  }, [grid, cols, hintPhase, hintPath, marks, eliminatedLetters, cellLabel, ghost]);
 
   return (
     <div
@@ -222,34 +272,7 @@ export default function LetterBoard({
           ...gridStyle,
         }}
       >
-        {grid.map((row, r) =>
-          row.map((letter, c) => {
-            const key = keyOf(r, c);
-            const order = hintOrder.get(key);
-            const eliminated = eliminatedLetters?.has(letter.toUpperCase()) ?? false;
-            return (
-              <div
-                key={key}
-                role="gridcell"
-                data-tile=""
-                data-row={r}
-                data-col={c}
-                data-letter={letter}
-                data-key={key}
-                data-empty={letter ? undefined : ''}
-                data-hint={order ? '' : undefined}
-                data-eliminated={eliminated ? '' : undefined}
-                {...markAttrs(key, marks)}
-                aria-label={cellLabel?.(r, c, letter)}
-                className={cn(styles.tile, !ghost && !order && !eliminated && !isMarked(key, marks) && 'letter-tile-gradient')}
-                style={{ ['--enter-i' as string]: r * cols + c }}
-              >
-                {order && <span className={styles.badge}>{order}</span>}
-                {marks?.golden?.has(key) && <span className={styles.mark}>★</span>}
-              </div>
-            );
-          }),
-        )}
+        {tiles}
         <svg data-board-trail="" className={styles.trail} aria-hidden="true">
           <polyline data-trail-echo="" />
           <polyline data-trail="ink" />
@@ -260,24 +283,7 @@ export default function LetterBoard({
           <circle data-finger="" data-off="" r="0" />
         </svg>
         <div className={styles.glyphs} style={template} aria-hidden="true">
-          {grid.map((row, r) =>
-            row.map((letter, c) => {
-              const key = keyOf(r, c);
-              return (
-                <span
-                  key={key}
-                  data-gk={key}
-                  data-eliminated={eliminatedLetters?.has(letter.toUpperCase()) ? '' : undefined}
-                  data-hint={hintOrder.has(key) ? '' : undefined}
-                  data-marked={isMarked(key, marks) ? '' : undefined}
-                  className={styles.glyph}
-                  style={{ ['--enter-i' as string]: r * cols + c }}
-                >
-                  {ghost ? '' : letter}
-                </span>
-              );
-            }),
-          )}
+          {glyphs}
         </div>
         <div data-board-fx="" className={fx.layer} aria-hidden="true" />
       </div>
@@ -285,3 +291,5 @@ export default function LetterBoard({
     </div>
   );
 }
+
+export default memo(LetterBoard);

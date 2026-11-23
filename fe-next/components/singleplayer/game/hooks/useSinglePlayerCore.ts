@@ -1,6 +1,6 @@
 'use client';
 
-import { useSelectionStore } from '@/hooks/useSelectionStore';
+import { scheduleSelection } from '@/hooks/useSelectionStore';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { selectRandomRevealWord, getRevealableWordCount } from '@/utils/wordPathFinder';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -641,7 +641,7 @@ export function useSinglePlayerCore({
   }, [directionGuidance, trainingAnalysisTrackPath, trainingTrackPath]);
 
   const handleWordChange = useCallback((word: string, count: number) => {
-    useSelectionStore.getState().setSelection(word, count);
+    scheduleSelection(word, count);
   }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
   const handleQuitRequest = useCallback(() => {
