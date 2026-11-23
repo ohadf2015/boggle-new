@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
-import { Users } from 'lucide-react';
+import { Play, Users } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
 import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResultsFx';
@@ -16,6 +16,8 @@ import { quickPlayHref } from '@/lib/quickPlay/startMode';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
 import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
+import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
+import { HERO_PLAY_CTA_KEY, heroPrimaryIsSolo } from '@/lib/experiments/heroPlayCta';
 
 const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
 const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
@@ -188,6 +190,11 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
     setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'random'));
   }, [lang]);
 
+  // A/B (Growth Radar, lexiclash-hero-play-cta): new visitors only (onPlay is set just for
+  // them), so returning players are never exposed. Treatment turns the big primary button
+  // into a solo "Play now" in place (same size, no layout shift); control keeps friends.
+  const soloFirst = heroPrimaryIsSolo(useGrowthRadarFlag(HERO_PLAY_CTA_KEY, !!onPlay));
+
   const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
     trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
     if (!onPlay || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
@@ -223,18 +230,23 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
           <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
             <div data-hero-row>
               <Link
-                href={`/${lang}/multiplayer?autoCreate=true`}
-                data-testid="hp-play-friends"
+                href={soloFirst ? playHref : `/${lang}/multiplayer?autoCreate=true`}
+                data-testid={soloFirst ? 'hp-play-now' : 'hp-play-friends'}
                 data-hero-primary
-                onClick={() => trackLandingCtaClick('home_play_friends')}
+                data-variant={soloFirst ? 'treatment' : 'control'}
+                onClick={soloFirst ? handlePlayClick : () => trackLandingCtaClick('home_play_friends')}
                 className={`flex h-[68px] min-w-0 items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-pink ps-2.5 pe-3 text-black shadow-hard-lg ${PRESS} [@media(max-height:700px)]:h-[64px] lg:h-[96px] lg:gap-4 lg:rounded-3xl lg:ps-4`}
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-black text-neo-pink lg:h-16 lg:w-16 lg:rounded-2xl">
-                  <Users className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
+                  {soloFirst ? (
+                    <Play className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
+                  ) : (
+                    <Users className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
+                  )}
                 </span>
                 <span className="flex min-w-0 flex-col items-start leading-none">
-                  <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t('homePlay.friendsPlay')}</span>
-                  <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t('homePlay.friendsSub')}</span>
+                  <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t(soloFirst ? 'homePlay.playNow' : 'homePlay.friendsPlay')}</span>
+                  <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t(soloFirst ? 'homePlay.playNowSub' : 'homePlay.friendsSub')}</span>
                 </span>
               </Link>
             </div>
