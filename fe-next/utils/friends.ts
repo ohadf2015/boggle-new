@@ -46,14 +46,16 @@ export {
   getUserByUsername,
 } from './friendsHeadToHead';
 
-type FriendWriteResult = { success: boolean; error?: string; code?: string };
+type FriendWriteResult = { success: boolean; error?: string; code?: string; autoAccepted?: boolean };
 
 /** Every friendship write goes through the server: it applies the Families gate, notifies the other player and clears the cache. */
 async function friendAction(action: 'request' | 'accept' | 'unfriend' | 'block' | 'unblock', target: string): Promise<FriendWriteResult> {
   try {
     const res = await postWithAuth('/api/friends/action', { action, target }, { requireSession: true });
-    const body = (await res.json().catch(() => ({}))) as { success?: boolean; code?: string };
-    if (res.ok && body.success) return { success: true };
+    const body = (await res.json().catch(() => ({}))) as { success?: boolean; code?: string; autoAccepted?: boolean };
+    // Keep the exact { success: true } shape for a plain request; only a
+    // mutual add (autoAccepted) adds the flag (callers/tests rely on it).
+    if (res.ok && body.success) return body.autoAccepted === true ? { success: true, autoAccepted: true } : { success: true };
     const code = body.code ?? `HTTP_${res.status}`;
     return { success: false, code, error: code };
   } catch (err) {

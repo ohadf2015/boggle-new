@@ -13309,6 +13309,7 @@ const sv = {
       "loadRateLimited": "För många spel på rad. Försök igen om en stund.",
       "challengeShort": "Utmana",
       "challengeBanner": "{name}: {pct}% på det här brädet. Slå det!",
+      "addChallengerCta": "Lägg till {name} som vän — revansch när som helst!",
       "answeredBanner": "{name} svarade på din utmaning: {theirPct}% mot dina {yourPct}%",
       "loadError": "Kunde inte bygga brädet. Kolla anslutningen och försök igen",
       "newBest": "NYTT PERSONBÄSTA!",

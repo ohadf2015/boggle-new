@@ -27,12 +27,13 @@ export interface FriendStatusValue {
   relationFor: (userId: string | null | undefined) => FriendRelation;
   friendFor: (userId: string) => Friend | undefined;
   onlineFriends: Friend[];
-  sendTo: (userId: string, surface: string) => Promise<boolean>;
+  /** 'accepted' when the add auto-completed a mutual request (instant friends). */
+  sendTo: (userId: string, surface: string) => Promise<'sent' | 'accepted' | false>;
   acceptFrom: (userId: string, surface: string) => Promise<boolean>;
   /** Raw lists for legacy consumers (results badge). */
   friends: Friend[];
   outgoingUsernames: Set<string>;
-  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string; autoAccepted?: boolean }>;
   /** Daily board date when rows carry opaque keys instead of ids. */
   boardDate: string | null;
   /** Signed-in player behind an opaque daily-board row key (null for guests / not found). */
@@ -91,11 +92,17 @@ export function FriendStatusProvider({ children, boardDate = null }: { children:
 
   const sendTo = useCallback(async (userId: string, surface: string) => {
     const res = await sendRequest(userId);
-    if (res.success) {
-      setSentIds((prev) => new Set(prev).add(userId));
-      trackGrowthEvent('friend_request_sent', { surface });
+    if (!res.success) return false;
+    if (res.autoAccepted) {
+      // Mutual add: the other side had already requested, so this tap made a
+      // friendship, not a pending request. Track it as the add it is.
+      setAcceptedIds((prev) => new Set(prev).add(userId));
+      trackGrowthEvent('friend_added', { surface, via: 'auto_accept' });
+      return 'accepted';
     }
-    return res.success;
+    setSentIds((prev) => new Set(prev).add(userId));
+    trackGrowthEvent('friend_request_sent', { surface });
+    return 'sent';
   }, [sendRequest]);
 
   const acceptFrom = useCallback(async (userId: string, surface: string) => {

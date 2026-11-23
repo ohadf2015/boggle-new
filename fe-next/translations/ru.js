@@ -11255,6 +11255,7 @@ const ru = {
       "loadRateLimited": "Слишком много игр подряд. Попробуйте ещё раз через минуту.",
       "challengeShort": "Вызов",
       "challengeBanner": "{name}: {pct}% на этой доске. Обгони!",
+      "addChallengerCta": "Добавьте {name} в друзья — реванш в любое время!",
       "answeredBanner": "Ответ {name} на твой вызов: {theirPct}% против твоих {yourPct}%",
       "loadError": "Не удалось подготовить доску. Проверь соединение и попробуй ещё раз",
       "newBest": "НОВЫЙ ЛИЧНЫЙ РЕКОРД!",

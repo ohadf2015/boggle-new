@@ -11952,6 +11952,7 @@ const ja = {
       "loadRateLimited": "続けて遊びすぎです。少し待ってからもう一度どうぞ",
       "challengeShort": "挑戦",
       "challengeBanner": "{name}はこのボードで{pct}%。超えられる？",
+      "addChallengerCta": "{name}をフレンドに追加 — いつでも再戦できる！",
       "answeredBanner": "{name}が挑戦に応えた: {theirPct}%（あなたは{yourPct}%）",
       "loadError": "ボードを準備できませんでした。接続を確認してもう一度試してください",
       "newBest": "自己ベスト更新！",

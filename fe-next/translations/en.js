@@ -11348,6 +11348,7 @@ const en = {
       "loadRateLimited": "Too many games in a row. Try again in a moment.",
       "challengeShort": "Challenge",
       "challengeBanner": "{name}: {pct}% on this board. Beat it!",
+      "addChallengerCta": "Add {name} as a friend — rematch them anytime!",
       "answeredBanner": "{name} answered your challenge: {theirPct}% vs your {yourPct}%",
       "loadError": "Couldn't build your board. Check your connection and try again.",
       "newBest": "NEW PERSONAL BEST!",
