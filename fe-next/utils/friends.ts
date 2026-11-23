@@ -53,7 +53,9 @@ async function friendAction(action: 'request' | 'accept' | 'unfriend' | 'block' 
   try {
     const res = await postWithAuth('/api/friends/action', { action, target }, { requireSession: true });
     const body = (await res.json().catch(() => ({}))) as { success?: boolean; code?: string; autoAccepted?: boolean };
-    if (res.ok && body.success) return { success: true, autoAccepted: body.autoAccepted === true };
+    // Keep the exact { success: true } shape for a plain request; only a
+    // mutual add (autoAccepted) adds the flag (callers/tests rely on it).
+    if (res.ok && body.success) return body.autoAccepted === true ? { success: true, autoAccepted: true } : { success: true };
     const code = body.code ?? `HTTP_${res.status}`;
     return { success: false, code, error: code };
   } catch (err) {
