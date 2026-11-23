@@ -194,10 +194,10 @@ describe('HomeEducationCardConnected slots (returning home)', () => {
     useStudentClassroomMock.mockReturnValue(studentClassroom());
   });
 
-  it('Given a teacher, Then the top slot shows the big class entry and the bottom slot shows nothing', () => {
+  it('Given a teacher, Then the top slot shows the big class entry and the bottom slot shows nothing', async () => {
     useAuthMock.mockReturnValue(auth({ isTeacher: true }));
     const { rerender } = render(<HomeEducationCardConnected slot="top" />);
-    expect(screen.getByTestId('home-teacher-class-entry')).toHaveAttribute('href', '/en/teacher');
+    expect(await screen.findByTestId('home-teacher-class-entry')).toHaveAttribute('href', '/en/teacher');
     rerender(<HomeEducationCardConnected slot="bottom" />);
     expect(screen.queryByTestId('home-teacher-class-entry')).toBeNull();
     expect(screen.queryByTestId('home-education-strip')).toBeNull();
