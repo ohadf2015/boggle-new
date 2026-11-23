@@ -21,7 +21,7 @@ describe('ClassStreakCue', () => {
     render(<ClassStreakCue classroomId="c1" revealed t={t} />);
     expect(await screen.findByTestId('class-streak-cue')).toHaveTextContent('"count":3');
     expect(screen.getByTestId('flame')).toBeInTheDocument();
-    expect(capture).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(capture).toHaveBeenCalledTimes(1));
     expect(capture).toHaveBeenCalledWith('edu_class_streak_cue_shown', { streak: 3, variant: 'kept' });
   });
 
@@ -37,14 +37,14 @@ describe('ClassStreakCue', () => {
     const cue = await screen.findByTestId('class-streak-cue');
     expect(cue).toHaveAttribute('data-variant', 'invite');
     expect(cue).toHaveTextContent('eduLiveRoom.hostResults.streakInvite');
-    expect(capture).toHaveBeenCalledWith('edu_class_streak_cue_shown', { streak: 1, variant: 'invite' });
+    await waitFor(() => expect(capture).toHaveBeenCalledWith('edu_class_streak_cue_shown', { streak: 1, variant: 'invite' }));
   });
 
   it('Given no history at all, Then the invite shows with streak 0', async () => {
     global.fetch = reply({ streak: 0, playedToday: false }) as unknown as typeof fetch;
     render(<ClassStreakCue classroomId="c1" revealed t={t} />);
     expect(await screen.findByTestId('class-streak-cue')).toHaveAttribute('data-variant', 'invite');
-    expect(capture).toHaveBeenCalledWith('edu_class_streak_cue_shown', { streak: 0, variant: 'invite' });
+    await waitFor(() => expect(capture).toHaveBeenCalledWith('edu_class_streak_cue_shown', { streak: 0, variant: 'invite' }));
   });
 
   it('Given the reveal has not landed, Then nothing is fetched, shown or counted until it does', async () => {
@@ -55,7 +55,7 @@ describe('ClassStreakCue', () => {
     expect(screen.queryByTestId('class-streak-cue')).toBeNull();
     rerender(<ClassStreakCue classroomId="c1" revealed t={t} />);
     expect(await screen.findByTestId('class-streak-cue')).toBeInTheDocument();
-    expect(capture).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(capture).toHaveBeenCalledTimes(1));
   });
 
   it('Given a short wall, Then it hides like its neighbours so the buttons never move down', async () => {
