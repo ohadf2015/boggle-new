@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { ShareRecapCard } from '@/components/shared/ShareRecapCard';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import {
   buildShareText,
   getShareParts,
@@ -66,21 +67,13 @@ export const GameEmojiShareCard: React.FC<GameEmojiShareCardProps> = ({ data, t,
   }, [shareText, onShareClick]);
 
   const handleNativeShare = useCallback(async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      onShareClick?.('native');
-      try {
-        await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
-      } catch {
-        try {
-          await navigator.clipboard.writeText(shareText);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } catch { /* ignore */ }
-      }
-    } else {
-      await handleCopy();
+    onShareClick?.(typeof navigator !== 'undefined' && typeof navigator.share === 'function' ? 'native' : 'copy');
+    const result = await shareWithFallback({ text: shareText, url: 'https://lexiclash.live', clipboardText: shareText });
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }, [shareText, handleCopy, onShareClick]);
+  }, [shareText, onShareClick]);
 
   return (
     <ShareRecapCard

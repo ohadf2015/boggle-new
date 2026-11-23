@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { bossDefeatImageUrl, bossShareFilename, shareReady } from './bossShare';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -64,16 +65,15 @@ export default function BossShareButton({ world, word, stars, className }: Props
         setState('idle');
         return;
       }
-      if (navigator.share) {
-        await navigator.share({ text, url });
-        setState('idle');
+      const result = await shareWithFallback({ text, url, clipboardText: url });
+      if (result === 'copied') {
+        setState('copied');
+        setTimeout(() => setState('idle'), 2000);
         return;
       }
-      await navigator.clipboard.writeText(url);
-      setState('copied');
-      setTimeout(() => setState('idle'), 2000);
+      setState('idle');
     } catch {
-      // A cancelled share sheet throws too — just go quiet, never alarm.
+      // A cancelled file-share sheet throws too — just go quiet, never alarm.
       setState('idle');
     }
   }, [state, ready, playButtonClickSound, world, word, profile, stars, t]);

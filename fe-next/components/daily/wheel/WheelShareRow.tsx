@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react';
 import { Check, Copy, Share2 } from 'lucide-react';
 import { buildShareText } from '@/components/shared/gameShareParts';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -35,12 +36,13 @@ export default function WheelShareRow({ t, score, wordsFound, puzzleNumber, gold
   }, [shareText, onShareClick]);
 
   const share = useCallback(async () => {
-    if (typeof navigator === 'undefined' || !navigator.share) return copy();
-    onShareClick?.('native');
-    try {
-      await navigator.share({ text: shareText, url: 'https://lexiclash.live' });
-    } catch { /* dismissed */ }
-  }, [shareText, copy, onShareClick]);
+    onShareClick?.(typeof navigator !== 'undefined' && typeof navigator.share === 'function' ? 'native' : 'copy');
+    const result = await shareWithFallback({ text: shareText, url: 'https://lexiclash.live', clipboardText: shareText });
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }, [shareText, onShareClick]);
 
   if (wordsFound.length === 0) return null;
 

@@ -35,4 +35,20 @@ describe('ConnectionsKeyboard backspace hold', () => {
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onBackspace).not.toHaveBeenCalled();
   });
+
+  it('three quick taps show the hold-to-clear hint', () => {
+    const onBackspace = vi.fn();
+    render(
+      <ConnectionsKeyboard
+        rows={getKeyboardRows('en')} onLetter={() => {}} onSubmit={() => {}}
+        onBackspace={onBackspace} onClear={vi.fn()} backspaceLabel="Delete" submitLabel="Submit"
+        clearHintLabel="Hold to clear"
+      />,
+    );
+    const key = screen.getByRole('button', { name: 'Delete' });
+    expect(screen.queryByText('Hold to clear')).toBeNull();
+    fireEvent.click(key); fireEvent.click(key); fireEvent.click(key);
+    expect(onBackspace).toHaveBeenCalledTimes(3);
+    expect(screen.getByText('Hold to clear')).toBeTruthy();
+  });
 });

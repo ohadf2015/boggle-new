@@ -3,7 +3,8 @@
 import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { Delete, Keyboard } from 'lucide-react';
-import { useHoldToClear } from '@/hooks/useHoldToClear';
+import { useBackspaceKey } from '@/hooks/useBackspaceKey';
+import { HoldHintBubble } from '@/components/game/HoldHintBubble';
 import { letterColumnCount } from '@/lib/connections/keyboard';
 import BridgeSubmitButton from './BridgeSubmitButton';
 
@@ -20,6 +21,8 @@ interface ConnectionsKeyboardProps {
   onSubmit: () => void;
   /** Accessible label for the backspace key. */
   backspaceLabel: string;
+  /** "Hold to clear" hint shown after a burst of backspace taps. */
+  clearHintLabel?: string;
   /** Visible + accessible label for the submit key. */
   submitLabel: string;
   /** Whether there is anything to submit (gates the submit key). */
@@ -99,6 +102,7 @@ export default function ConnectionsKeyboard({
   onClear,
   onSubmit,
   backspaceLabel,
+  clearHintLabel,
   submitLabel,
   canSubmit = false,
   disabled = false,
@@ -110,7 +114,7 @@ export default function ConnectionsKeyboard({
   const keyStyle = letterKeyStyle(columns);
   // Same as Word Tower: players hammer backspace to undo a whole wrong guess
   // (PostHog rage clicks, /he/connections/daily). Holding it clears the guess.
-  const backspaceHold = useHoldToClear({ onTap: onBackspace, onHold: onClear });
+  const { handlers: backspaceHold, showHint } = useBackspaceKey({ onTap: onBackspace, onHold: onClear });
   return (
     // The key grid is a physical-keyboard artifact, not text: on every physical
     // and mobile Hebrew keyboard (and Hebrew Wordle) ק sits at the TOP-LEFT and
@@ -174,9 +178,10 @@ export default function ConnectionsKeyboard({
               data-testid="keyboard-backspace"
               data-pressed={pressedKey === 'Backspace' || undefined}
               style={letterKeyStyle(columns, 1.5)}
-              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
+              className={`relative ${KEY_BASE} ${KEY_SIZE} bg-neo-pink text-neo-navy active:bg-neo-pink-light ${pressedKey === 'Backspace' ? PRESSED : ''}`}
             >
               <Delete className="h-6 w-6" strokeWidth={2.5} aria-hidden="true" />
+              {showHint && clearHintLabel && <HoldHintBubble label={clearHintLabel} />}
             </button>
           )}
         </m.div>

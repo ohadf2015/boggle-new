@@ -1,9 +1,9 @@
 import React from 'react';
-import { m } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useHoldToClear } from '@/hooks/useHoldToClear';
-import { useHoldHint } from '@/hooks/useHoldHint';
+import { useBackspaceKey } from '@/hooks/useBackspaceKey';
+import { HoldHintBubble } from '@/components/game/HoldHintBubble';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -15,6 +15,7 @@ interface WheelActionBarProps {
   onClear: () => void;
   onSubmit: () => void;
   onBackspace: () => void;
+  submitIcon?: React.ReactNode;
 }
 
 const ICON_BUTTON = cn(
@@ -25,13 +26,10 @@ const ICON_BUTTON = cn(
 
 /** Clear, submit and backspace under the wheel. */
 const WheelActionBar: React.FC<WheelActionBarProps> = ({
-  t, hasLetters, canSubmit, isValidating, onClear, onSubmit, onBackspace,
+  t, hasLetters, canSubmit, isValidating, onClear, onSubmit, onBackspace, submitIcon,
 }) => {
-  const holdHint = useHoldHint();
-  const backspaceHold = useHoldToClear({
-    onTap: () => { onBackspace(); holdHint.noteTap(); },
-    onHold: () => { holdHint.noteHold(); onClear(); },
-  });
+  const reducedMotion = useReducedMotion();
+  const { handlers: backspaceHold, showHint } = useBackspaceKey({ onTap: onBackspace, onHold: onClear });
   return (
   <div
     data-testid="word-wheel-action-bar"
@@ -45,7 +43,7 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
       onClick={onClear}
       disabled={!hasLetters}
       className={ICON_BUTTON}
-      whileTap={{ scale: 0.9 }}
+      whileTap={reducedMotion ? {} : { scale: 0.9 }}
       aria-label={t('wordWheel.clear')}
     >
       <RotateCcw className="w-5 h-5" />
@@ -63,11 +61,11 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
         'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
         'disabled:cursor-not-allowed',
       )}
-      whileTap={canSubmit ? { scale: 0.92 } : {}}
+      whileTap={canSubmit && !reducedMotion ? { scale: 0.92 } : {}}
       animate={isValidating ? { opacity: [1, 0.6, 1] } : {}}
       transition={isValidating ? { duration: 0.6, repeat: Infinity } : {}}
     >
-      {t('wordWheel.submit')}
+      {submitIcon ? <span className="flex items-center gap-2">{submitIcon}{t('wordWheel.submit')}</span> : t('wordWheel.submit')}
     </m.button>
 
     <m.button
@@ -75,18 +73,11 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
       {...backspaceHold}
       disabled={!hasLetters}
       className={cn(ICON_BUTTON, 'relative')}
-      whileTap={{ scale: 0.9 }}
+      whileTap={reducedMotion ? {} : { scale: 0.9 }}
       aria-label={t('wordWheel.removeLetter')}
     >
       <Delete className="w-5 h-5" />
-      {holdHint.show && (
-        <span
-          role="status"
-          className="pointer-events-none absolute -top-9 end-0 z-10 whitespace-nowrap rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
-        >
-          {t('common.holdToClear')}
-        </span>
-      )}
+      {showHint && <HoldHintBubble label={t('common.holdToClear')} />}
     </m.button>
   </div>
   );

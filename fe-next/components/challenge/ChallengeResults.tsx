@@ -12,7 +12,7 @@ import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
-import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
 
@@ -130,20 +130,17 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
     const message = generateChallengeShareMessage(challenge, language);
     const url = getChallengeUrl(challenge.challengeCode, 'results-share');
 
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'LexiClash Challenge',
-          text: stripEmoji(message),
-          url,
-        });
-      } catch {
-        // User cancelled or error
-      }
-    } else {
-      handleCopyLink();
+    const result = await shareWithFallback({
+      title: 'LexiClash Challenge',
+      text: message,
+      url,
+      clipboardText: url,
+    });
+    if (result === 'copied') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
-  }, [challenge, language, handleCopyLink]);
+  }, [challenge, language]);
 
   return (
     <div className="flex-1 min-h-screen flex items-center justify-center bg-neo-navy p-4 overflow-y-auto scrollable-area">

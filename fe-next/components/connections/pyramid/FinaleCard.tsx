@@ -266,6 +266,7 @@ export default function FinaleCard({
                   onClear={handleClear}
                   onSubmit={onSubmit}
                   backspaceLabel={t('connections.backspace')}
+                  clearHintLabel={t('common.holdToClear')}
                   submitLabel={t('connections.submit')}
                   canSubmit={input.trim().length > 0}
                   disabled={isDisabled}
