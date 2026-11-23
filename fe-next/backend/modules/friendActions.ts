@@ -62,7 +62,11 @@ export async function runFriendAction(
         emitToUser(actorId, 'friends:requestSent', ids);
         notifyFriendRequest(target, actorName, actorId).catch(() => {});
       }
-      return { success: true, autoAccepted: result.autoAccepted === true };
+      // Only flag the mutual-add case so the success shape stays exactly
+      // { success: true } for a plain request (callers/tests rely on it).
+      return result.autoAccepted === true
+        ? { success: true, autoAccepted: true }
+        : { success: true };
     }
 
     case 'accept': {
