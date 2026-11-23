@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useGameMusic with survival mode (fire-round earthquake state)
  * Verifies that bossa-arcade music plays automatically when game starts

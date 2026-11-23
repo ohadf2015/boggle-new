@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Acceptance for the teacher-aware delete confirm (t_2365e778).
  *

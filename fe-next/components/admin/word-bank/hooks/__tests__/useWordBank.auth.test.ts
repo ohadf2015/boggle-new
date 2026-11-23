@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Bug Fix Test: useWordBank missing Authorization header
  *

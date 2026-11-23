@@ -87,7 +87,6 @@ const ROOTS = [
   'app/[locale]/student',
   'app/[locale]/teacher',
   // Education surfaces living outside the education folders.
-  'components/ui/EducationSkeletons.tsx',
   'components/multiplayer/ClassroomJoinNamePrompt.tsx',
   'components/adventure',
   'components/wordTowerV2',

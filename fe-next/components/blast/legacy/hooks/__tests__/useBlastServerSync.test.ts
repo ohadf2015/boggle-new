@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useBlastServerSync, BLAST_RESYNC_AFTER_MS } from '../useBlastServerSync';

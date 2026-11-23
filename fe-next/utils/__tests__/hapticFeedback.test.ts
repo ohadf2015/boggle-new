@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Haptic feedback SSR-safety + behavior.
  *

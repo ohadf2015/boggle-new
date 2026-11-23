@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The layout LCP shell (#sp-lcp-paint, z-70, never unmounted) covers the
  * results screen once SinglePlayerGame unmounts. Retire it via html[data-sp-ready]

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for hasEverPlayedWordHunt + getPastWordHuntPerformance —
  * power the daily-results "vs your past" comparison and the

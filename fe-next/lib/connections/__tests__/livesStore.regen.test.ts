@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Time-based life regen — the ad-independent recovery path.
  *

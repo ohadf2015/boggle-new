@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 /**
  * Proxy Tests — Supabase Session Refresh & API Route Coverage

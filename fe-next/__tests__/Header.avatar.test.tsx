@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';

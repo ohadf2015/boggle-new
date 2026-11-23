@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Test: Admin page should not show infinite loading when authToken fetching fails

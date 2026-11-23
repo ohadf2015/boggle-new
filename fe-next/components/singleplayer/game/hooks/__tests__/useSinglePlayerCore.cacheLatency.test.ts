@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Dictionary Cache Latency Fix: Verify that valid words with cache hits
  * produce feedback SYNCHRONOUSLY (before fetch completes).

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Integration seams BETWEEN the level half of a run and the map half: what the
  * hook carries forward once a node is settled. These only bite when the run

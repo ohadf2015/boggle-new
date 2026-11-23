@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, expect, it } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { skyAt } from '@/lib/wordTowerV2/biomes';

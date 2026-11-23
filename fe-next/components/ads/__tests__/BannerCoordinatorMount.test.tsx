@@ -56,8 +56,8 @@ vi.mock('@/lib/native/bannerController', () => ({
     setSuppressed: (v: boolean) => setSuppressed(v),
   },
   // Mirror the real pure policy so the mount's wiring is exercised end-to-end.
-  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean; onboarding?: boolean; adFreeRoute?: boolean }) =>
-    Boolean(i.adFreeRoute) || Boolean(i.onboarding) || i.drawerOpen || (i.inGame && !i.allowInGame),
+  shouldSuppressBanner: (i: { drawerOpen: boolean; inGame: boolean; allowInGame: boolean; onboarding?: boolean; adFreeRoute?: boolean; modalOpen?: boolean }) =>
+    Boolean(i.adFreeRoute) || Boolean(i.onboarding) || Boolean(i.modalOpen) || i.drawerOpen || (i.inGame && !i.allowInGame),
 }));
 
 /** Flush the MutationObserver microtask queue. */
@@ -71,7 +71,7 @@ describe('BannerCoordinatorMount', () => {
     isNative.current = true;
     for (const k of Object.keys(listeners)) delete listeners[k];
     foregroundCb.current = null;
-    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game', 'onboarding-active', 'ad-free-route');
+    document.documentElement.classList.remove('mobile-drawer-open', 'banner-allow-in-game', 'onboarding-active', 'ad-free-route', 'modal-open', 'fdw-modal-open', 'blocking-overlay-open');
     document.body.classList.remove('screen-fit-locked');
   });
 
@@ -141,6 +141,20 @@ describe('BannerCoordinatorMount', () => {
     await flushObserver();
     expect(setSuppressed).toHaveBeenCalledWith(false);
   });
+
+  it.each(['modal-open', 'fdw-modal-open', 'blocking-overlay-open'])(
+    'hides the banner while html.%s is set and restores it after',
+    async (cls) => {
+      render(<BannerCoordinatorMount />);
+      setSuppressed.mockClear();
+      document.documentElement.classList.add(cls);
+      await flushObserver();
+      expect(setSuppressed).toHaveBeenLastCalledWith(true);
+      document.documentElement.classList.remove(cls);
+      await flushObserver();
+      expect(setSuppressed).toHaveBeenLastCalledWith(false);
+    },
+  );
 
   it('reflects the initial drawer state on mount (open before render)', () => {
     document.documentElement.classList.add('mobile-drawer-open');

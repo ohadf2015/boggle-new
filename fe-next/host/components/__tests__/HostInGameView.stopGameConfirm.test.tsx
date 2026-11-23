@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * HostInGameView — game-end confirmation modal test
  */

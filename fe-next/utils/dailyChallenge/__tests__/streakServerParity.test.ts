@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const updateDailyStreak = vi.fn(() => ({ currentStreak: 5, longestStreak: 5, lastPlayedDate: 'x', totalDailiesCompleted: 5 }));

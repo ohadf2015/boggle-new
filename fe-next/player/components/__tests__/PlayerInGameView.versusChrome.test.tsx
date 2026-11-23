@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The gridless modes (word-tower, crossword, wheel-rush) render their own full-screen
  * view; the round dialogs (exit confirm) and the reconnect overlay must still

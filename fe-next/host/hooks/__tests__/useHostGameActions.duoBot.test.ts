@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /** exp-mp-duo-bot-v1: the lobby start path carries the host's duo-bot request. */
 

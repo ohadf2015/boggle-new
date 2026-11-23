@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * trackGameEnd — a completion after a hidden/pagehide abandon must carry
  * `resumed_after_hidden: true` so funnels can drop the earlier abandon

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * `lexiclash_games_played` — the counter `shouldShowPushPrompt` gates on
  * (MIN_GAMES_BEFORE_PROMPT=3). Its only incrementer was `coinManager.addCoins`,

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFriends — friend_added event tracking
  *

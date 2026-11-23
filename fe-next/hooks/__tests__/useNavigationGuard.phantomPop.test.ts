@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The guard's own phantom-history pop must not read as a back-button press.
  *

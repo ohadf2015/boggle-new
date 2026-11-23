@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The playing host gets the SAME round frame as the joiner (one HUD, roster,
  * hidden-until-GO board) — two paths to the same screen must not diverge

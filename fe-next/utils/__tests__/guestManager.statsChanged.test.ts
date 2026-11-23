@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * guestManager — dispatches `guestStatsChanged` window event after writes.
  *

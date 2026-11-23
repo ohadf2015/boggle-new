@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * t_a6fb639b / prior t_c3fc4a61 -- adventure overlays must use named z-index
  * tokens (z-60), never Tailwind arbitrary z-[N]. GrowthRadar querySelector

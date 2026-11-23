@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useAppLifecycle Hook
  * Comprehensive test coverage for app foreground/background lifecycle events

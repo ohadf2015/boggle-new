@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * PostHog inbox 01a15a17: the Hebrew Word Tower "dictionary did not load"
  * button reloaded the whole page (20-25s blank per tap) and the app sent no

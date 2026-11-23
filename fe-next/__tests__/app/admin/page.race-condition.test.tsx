@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * Admin Page - Race Condition Test

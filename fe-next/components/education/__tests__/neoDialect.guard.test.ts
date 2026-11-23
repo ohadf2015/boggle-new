@@ -23,7 +23,6 @@ const ALLOW: Record<PatternName, Record<string, number>> = {
     'components/teacher/joinSheet/JoinSheet.tsx': 3,
   },
   borderBlack: {
-    'components/teacher/TeacherPlanBadge.tsx': 1,
     'components/teacher/assignments/AssignmentCreatorDueDate.tsx': 1,
     'components/teacher/assignments/AssignmentStep.tsx': 1,
     'components/teacher/assignments/AssignmentWordcraftOption.tsx': 1,

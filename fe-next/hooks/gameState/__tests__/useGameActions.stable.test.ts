@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: useGameActions returns stable reference across re-renders
  *

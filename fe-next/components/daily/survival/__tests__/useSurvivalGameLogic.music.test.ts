@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for Word Hunt survival music playback
  * Verifies that music starts automatically when game begins

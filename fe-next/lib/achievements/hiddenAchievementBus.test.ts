@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: hidden-achievement bus — dedup → dispatch CustomEvent + light analytics,
  * plus evaluate* convenience that runs the pure detectors and triggers each hit.

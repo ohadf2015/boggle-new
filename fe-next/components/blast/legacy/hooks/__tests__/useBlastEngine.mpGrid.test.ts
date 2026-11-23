@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastEngine — multiplayer uses the SERVER's authoritative letter grid.
  *

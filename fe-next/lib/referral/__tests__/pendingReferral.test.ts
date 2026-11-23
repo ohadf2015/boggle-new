@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * 375 referral codes issued, 0 rows in `referrals`, 0 profiles with referred_by,
  * 0 rewards granted — ever. Not an RLS bug: nothing in the app ever sent a code

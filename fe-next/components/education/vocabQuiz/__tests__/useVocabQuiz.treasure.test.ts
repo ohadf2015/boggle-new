@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useVocabQuiz — Treasure Chest state tests.
  *

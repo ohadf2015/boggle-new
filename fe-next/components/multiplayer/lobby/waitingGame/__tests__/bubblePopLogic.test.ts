@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { COMBO_WINDOW_MS, MAX_COMBO, START, makeBubble, missBubble, readBest, scorePop, spawnDelay, writeBest } from '../bubblePopLogic';
 

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 // ─── SharedFxApp Tests ───────────────────────────────────────────────
 // Singleton Pixi Application + ParticlePool bridge. Tests cover
 // singleton guarantee, preset registry, mount/unmount lifecycle,

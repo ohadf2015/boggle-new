@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Retention streak logic tests — the D1 habit loop.
  *

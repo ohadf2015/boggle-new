@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { StrictMode, createElement, type ReactNode } from 'react';
 import { renderHook, act } from '@testing-library/react';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The last link in the referral chain: friend clicks the link → claims the code
  * → plays their first game → the referrer actually gets paid.

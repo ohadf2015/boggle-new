@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useAdventureDemo hook
  * Verifies demo runs only call /api/adventure/demo, never /api/adventure/start or write routes.

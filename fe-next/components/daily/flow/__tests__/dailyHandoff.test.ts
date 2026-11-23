@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { markDailyHandoff, consumeDailyHandoff, chainPips, HANDOFF_TTL_MS } from '../dailyHandoff';
 

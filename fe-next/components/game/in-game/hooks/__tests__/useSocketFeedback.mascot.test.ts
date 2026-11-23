@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, describe, beforeEach, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
 

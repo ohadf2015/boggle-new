@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * PlayerInGameView renders classic + word-hunt inside the ONE round frame
  * (MpRoundLayout): the mode canvas runs with its own chrome off (`mpChrome`),

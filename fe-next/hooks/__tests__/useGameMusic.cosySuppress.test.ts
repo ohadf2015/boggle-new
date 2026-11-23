@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Cozy / Calm Mode: the "almost out of time" urgent-music ramp is a panic cue.
  * Calm Mode keeps the in-game bed but never escalates to the urgent track.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Behavioral test: a LATE real results broadcast must supersede the empty
  * fallback in usePlayerGameEvents.

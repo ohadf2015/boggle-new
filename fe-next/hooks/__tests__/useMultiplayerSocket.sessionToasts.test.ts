@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { readPlayerGameEventsSource } from '@/player/hooks/socket/__tests__/playerGameEventsSource';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';

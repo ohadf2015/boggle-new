@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A teacher create that fails used to leave only a console line in the
  * teacher's own browser — indistinguishable, in every funnel, from a teacher

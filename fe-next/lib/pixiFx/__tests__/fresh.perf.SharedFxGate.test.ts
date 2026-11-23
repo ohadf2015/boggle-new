@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 // Piece D (perf), SPEC section 10 item 1: pixi.js must not load on first paint.
 //
 // SharedFxMount still calls SharedFxApp.mount() right after hydration (its

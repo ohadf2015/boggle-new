@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useNativeAppStatePause — bridges Capacitor App lifecycle to
  * background/foreground callbacks. iOS swipe-up gesture and incoming-call

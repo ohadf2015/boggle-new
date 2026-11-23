@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { freeHintsRemaining, consumeFreeHint, FREE_HINTS_PER_DAY } from '../freeHints';
 

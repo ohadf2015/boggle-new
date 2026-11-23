@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A host who reloads mid-round gets `joined` + a `reconnect` startGame before
  * HostView's socket listener is mounted, so only the page-level pending path

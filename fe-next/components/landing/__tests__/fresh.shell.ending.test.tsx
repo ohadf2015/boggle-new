@@ -50,7 +50,6 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({ locale: 'en' }),
 }));
 vi.mock('@/components/Header', () => ({ default: () => <header /> }));
-vi.mock('../ReturningHome', () => ({ ReturningHome: () => <div /> }));
 vi.mock('../fresh/FreshPage', () => ({ FreshPage: () => <div data-testid="fresh-page" /> }));
 vi.mock('../LandingSEOSection', () => ({ LandingSEOSection: () => <section /> }));
 vi.mock('../LandingBlogSection', () => ({ LandingBlogSection: () => <section /> }));

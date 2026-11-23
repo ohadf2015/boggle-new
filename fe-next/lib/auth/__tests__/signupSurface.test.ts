@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * One surface id per signup prompt, shared by shown / clicked / dismissed /
  * signup_completed, and still present after an OAuth redirect drops

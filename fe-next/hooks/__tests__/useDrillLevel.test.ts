@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useDrillLevel — picks the correct level for a given drill type
  * out of the user's drillProgress, with a safe default for first-play.

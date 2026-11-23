@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Session-level guard for promotional overlays.
  *

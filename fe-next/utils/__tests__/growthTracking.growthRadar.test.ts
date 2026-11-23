@@ -6,8 +6,8 @@
  * (PostHog consent-gated) still count in Growth Radar's funnel. gr.js is
  * lazyOnload, so events fired before it loads must queue and flush.
  *
- * Runs in the node environment (utils/** per vitest.config.ts
- * environmentMatchGlobs), so window/sessionStorage are faked on globalThis.
+ * Runs in the node environment (the vitest.config.ts node project),
+ * so window/sessionStorage are faked on globalThis.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';

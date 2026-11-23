@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: awardGameEnd — maps a finished game to Play Games leaderboard/achievement calls.
  * Fire-and-forget; the underlying bridge is a no-op off Android.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useGameKeyboardShortcuts Tests
  * Desktop keyboard shortcuts for game navigation and actions

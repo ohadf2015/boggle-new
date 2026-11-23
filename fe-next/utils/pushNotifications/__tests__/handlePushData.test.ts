@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * handlePushData — route foreground push payloads into in-app state.
  *

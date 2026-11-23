@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * savePendingOnboardingProfile — persists in-progress FTUE identity (name +
  * avatar id + edited flag) so a mid-onboarding OAuth signup carries it into

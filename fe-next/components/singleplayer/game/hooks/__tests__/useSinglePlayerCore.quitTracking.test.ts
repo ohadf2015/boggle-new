@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Quit-attempt tracking: handleQuitRequest must emit game_abandon_attempted
  * for non-practice modes so PostHog can measure intentional mid-game quits

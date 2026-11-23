@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Best-of-3 duel series tally.
  *

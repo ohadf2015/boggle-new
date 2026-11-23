@@ -53,9 +53,6 @@ vi.mock('@/hooks/useDailyChallengeStatus', () => ({
   }),
 }));
 vi.mock('@/hooks/useTopPlayers', () => ({ useTopPlayers: () => ({ players: [], loading: false }) }));
-vi.mock('@/hooks/useLandingStats', () => ({
-  useLandingStats: () => ({ activePlayers: 0, gamesToday: 0, gameModes: 0, languages: 5 }),
-}));
 vi.mock('@/hooks/useEvents', () => ({
   useEvents: () => ({ activeEvents: [], myEvents: [], joinEvent: vi.fn() }),
 }));

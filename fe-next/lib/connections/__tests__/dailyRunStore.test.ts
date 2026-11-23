@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { initGameState, applyGuess } from '../gameLogic';
 import { dailyPuzzleSet, DAILY_ATTEMPTS_PER_PUZZLE } from '../daily';

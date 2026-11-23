@@ -1,0 +1,47 @@
+name: Post-deploy smoke
+
+# Unit tests mock the network, the router and the server, so a deploy can pass all of
+# them and still serve a broken page. This drives the real site in a browser once
+# Railway has deployed the pushed commit. Read-only: fe-next/e2e/smoke/readOnly.ts
+# aborts every write and every analytics request.
+on:
+  push:
+    branches: [master]
+    # Railway only deploys changes under fe-next/ (railway.json watchPatterns).
+    paths: ['fe-next/**']
+  workflow_dispatch:
+
+concurrency:
+  group: post-deploy-smoke
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: fe-next
+      - name: Wait for production to serve this commit
+        run: |
+          for _ in $(seq 1 80); do
+            SERVED=$(curl -fsS https://www.lexiclash.live/api/version | node -pe 'JSON.parse(require("fs").readFileSync(0)).commit' 2>/dev/null || true)
+            [ "$SERVED" = "$GITHUB_SHA" ] && { echo "live: $SERVED"; exit 0; }
+            echo "serving ${SERVED:-?}, waiting for $GITHUB_SHA"; sleep 30
+          done
+          echo "::error::production never served $GITHUB_SHA within 40 minutes (deploy failed or was superseded)"
+          exit 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      # Only Playwright is needed, not the app's 2 GB of dependencies.
+      - name: Install Playwright
+        run: |
+          V=$(node -p "require('./fe-next/package-lock.json').packages['node_modules/@playwright/test'].version")
+          mkdir -p /tmp/pw/e2e && cp -r fe-next/e2e/smoke /tmp/pw/e2e/ && cp fe-next/playwright.smoke.config.ts /tmp/pw/
+          cd /tmp/pw && npm init -y >/dev/null && npm i "@playwright/test@$V" --no-audit --no-fund >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Smoke
+        working-directory: /tmp/pw
+        run: npx playwright test -c playwright.smoke.config.ts

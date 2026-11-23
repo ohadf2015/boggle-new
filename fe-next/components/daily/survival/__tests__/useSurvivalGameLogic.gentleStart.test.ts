@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * First games (gentleStart): the life bar holds still until the first word is found, and a
  * swipe that is not a word, or not on the board, costs no life. New players quit after a few

@@ -62,7 +62,6 @@ vi.mock('@/components/education/TeacherGate', () => ({
 vi.mock('@/components/teacher/ProGate', () => ({
   ProGate: ({ children }: { children: React.ReactNode }) => <div data-testid="pro-gate">{children}</div>,
 }));
-vi.mock('@/components/teacher/TeacherPlanBadge', () => ({ TeacherPlanBadge: () => <div /> }));
 vi.mock('@/components/teacher/reports/StudentProgressReport', () => ({
   StudentProgressReport: () => <div data-testid="student-progress-report" />,
 }));

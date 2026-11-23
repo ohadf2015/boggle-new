@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSurvivalGameLogic — no auto-win on allPositionsRevealed.
  *

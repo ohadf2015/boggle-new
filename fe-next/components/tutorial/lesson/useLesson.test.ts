@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useLesson, SUCCESS_MS, COMPLETE_MS, FINALE_DELAY_MS, type UseLessonArgs } from './useLesson';

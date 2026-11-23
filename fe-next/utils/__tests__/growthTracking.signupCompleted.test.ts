@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * maybeTrackSignupCompleted — re-fire-proof signup conversion emit.
  *

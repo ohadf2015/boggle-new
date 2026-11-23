@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
 
 const created = vi.hoisted(() => ({ apps: 0, failInit: false }));

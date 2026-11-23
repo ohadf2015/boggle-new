@@ -105,12 +105,16 @@ RUN node scripts/bundle-server.mjs
 # next build outgrew the 6144MB default heap (exit 134); a Railway variable overrides this.
 ARG BUILD_HEAP_MB=8192
 
-# Build Next.js with standalone output → .next/standalone/
-# .next/cache (webpack + the type-check's tsbuildinfo) persists between Railway
-# builds; without it every deploy compiled cold. Railway requires the
+# Build Next.js with standalone output → .next/standalone/, then type-check with
+# tsc (see the NIGHTLY_SKIP_NEXT_TS note in next.config.mjs). .next/cache holds the
+# webpack cache and tsc's build info and persists between Railway builds, so an
+# unchanged module is neither recompiled nor re-checked. Railway requires the
 # s/<service-id>- prefix on cache ids.
 RUN --mount=type=cache,id=s/cc7a91b5-cd7b-43b0-878d-cacf07b369ad-next-cache,target=/app/.next/cache \
-    npm run build --ignore-scripts
+    (du -sh .next/cache/webpack 2>/dev/null || echo "webpack cache: empty") && \
+    NIGHTLY_SKIP_NEXT_TS=1 npm run build --ignore-scripts && \
+    du -sh .next/cache/webpack && \
+    NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc --noEmit --incremental --tsBuildInfoFile .next/cache/tsc.tsbuildinfo
 
 # ── Stage 4: Production image (slim) ─────────────────────────────────
 FROM node:22-alpine AS runner
@@ -160,7 +164,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/scripts/docker-migrate.sh /app/sc
 RUN chmod +x ./scripts/*.sh
 
 # Create cache dir AFTER all COPY steps so it isn't overwritten
-RUN mkdir -p .next/cache && chown -R nextjs:nodejs .next
+RUN mkdir -p .next/cache && chown nextjs:nodejs .next/cache
 
 USER nextjs
 

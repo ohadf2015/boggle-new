@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useMPFTUEIdle — MP drag-coachmark idle timer.
  * Shows coachmark when player is idle (no drag, no word) for N ms,

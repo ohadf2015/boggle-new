@@ -2,7 +2,7 @@ name: CI Failure Assistant
 
 on:
   workflow_run:
-    workflows: ["CI"]
+    workflows: ["CI", "Post-deploy smoke"]
     types: [completed]
 
 permissions:

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Behavioral test: results-skip race recovery in usePlayerGameEvents.
  *

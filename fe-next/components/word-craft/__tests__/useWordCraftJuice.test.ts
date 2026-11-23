@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useWordCraftJuice — the gsap-driven feel layer for WordCraft.
  *

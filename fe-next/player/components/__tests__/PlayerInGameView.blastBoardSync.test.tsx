@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 /**
  * Test: PlayerInGameView passes initialTileStates and blastSeed to BlastGame

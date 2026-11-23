@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: PlayerInGameView renders null until gameModeConfirmed is true.
  *

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Desktop lobby right rail. DESIGN §3 moves chat out of the lobby body: the
  * r101 capture still spent the rail on an empty "Tell us your age" chat gate.

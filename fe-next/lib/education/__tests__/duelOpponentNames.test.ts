@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Whose name goes on the duel card.
  *

@@ -55,7 +55,7 @@ describe('Privacy policy content', () => {
 
   it.each(LOCALES)('%s describes the actual self-declared age gate, not an unused parental-consent record', (locale) => {
     const flat = JSON.stringify(contentByLocale[locale]);
-    // hooks/useParentalConsent.ts is never mounted anywhere in the app (confirmed by grep) —
+    // No parental-consent record exists in the app —
     // the policy must not claim it as an active practice. See lib/families/socialPolicy.ts /
     // components/families/AgeGateModal.tsx for the mechanism that IS live.
     expect(flat.toLowerCase()).not.toContain('parental-consent record');

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * HostPreGameView — classroom game-mode seeding.
  *

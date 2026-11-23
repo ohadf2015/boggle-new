@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A phantom pop that lands AFTER the 1s claim TTL must still not open
  * "Leave the Hunt?" at the start of the next Quick Play round.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFriendMessages.acceptChallenge — challengeId match filter (B3)
  *

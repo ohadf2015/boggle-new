@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Behavioral test: a fresh MP round start must not toast "GO! You're in!" —
  * the countdown stage (MpCountdownStage) IS the GO moment, and the toast

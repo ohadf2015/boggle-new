@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The classroom projector's live standings.
  *

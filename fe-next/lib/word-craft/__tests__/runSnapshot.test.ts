@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { buildInitialState, wordCraftReducer } from '../useWordCraftGame';
 import { saveRunSnapshot, loadRunSnapshot, clearRunSnapshot } from '../runSnapshot';

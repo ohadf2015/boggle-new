@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useCrazyGamesInvite } from '../useCrazyGamesInvite';

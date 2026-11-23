@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * TDD tests for server-truth sound feedback in useSocketFeedback.
  *

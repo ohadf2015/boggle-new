@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Behavioral test: blastBoardUpdate socket handler in usePlayerGameEvents.
  *

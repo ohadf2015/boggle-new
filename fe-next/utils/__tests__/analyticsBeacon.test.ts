@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Unload-safe write to /api/analytics/track. A pagehide handler is the last code
  * that runs, so the regular async fetch in growthTracking never leaves the

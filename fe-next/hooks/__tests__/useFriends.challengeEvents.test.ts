@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFriends — refresh on challenge socket events (B2)
  *

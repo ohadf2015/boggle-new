@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, afterEach } from 'vitest';
 import { isAllowedAdBannerRoute, isAdFreeRoute, AD_FREE_ROUTE_CLASS } from '../admob-routes';
 

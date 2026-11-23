@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A throw in the OAuth click path must emit growth:signup_failed.
  * Chunk-load failures used to die as an unhandled "x is not a function"

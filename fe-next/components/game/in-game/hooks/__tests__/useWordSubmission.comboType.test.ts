@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * TDD tests for comboType inclusion in submitWord socket emit.
  * Tests that useWordSubmission reads comboTypeRef.current when emitting submitWord.

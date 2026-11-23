@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * Test: PlayerInGameView passes remainingTime to WheelRushView

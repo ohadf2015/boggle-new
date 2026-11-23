@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { findGuidePath, useGuidedFirstWord, GUIDE_STORAGE_KEY, type GuideArgs } from '../useGuidedFirstWord';

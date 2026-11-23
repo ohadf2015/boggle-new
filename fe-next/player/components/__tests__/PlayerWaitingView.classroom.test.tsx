@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A student's lobby is not a party lobby.
  *

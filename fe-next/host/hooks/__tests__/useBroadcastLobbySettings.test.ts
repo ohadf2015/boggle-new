@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useBroadcastLobbySettings, LOBBY_SETTINGS_DEBOUNCE_MS } from '../useBroadcastLobbySettings';

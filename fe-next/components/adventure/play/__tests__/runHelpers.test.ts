@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import type { PublicRun } from '@/lib/adventure/play/runToken';
 import type { RunResult } from '../runTypes';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 /* eslint-disable react/display-name */
 import React from 'react';

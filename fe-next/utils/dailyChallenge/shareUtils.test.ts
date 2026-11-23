@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect } from 'vitest';
 import { generateChallengeShareUrl } from './shareUtils';
 import type { WordHuntResult } from './types';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Retention tracking tests — verifies the PostHog events the D1 dashboard
  * reads actually fire with the right payloads, and that the module never

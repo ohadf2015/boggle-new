@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { clearGuestData } from '@/utils/guestManager';
 import { CARRYOVER_GUEST_SESSION_KEY } from '@/utils/dailyChallenge/constants';

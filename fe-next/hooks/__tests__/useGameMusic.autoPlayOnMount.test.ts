@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useGameMusic automatic music playback when Word Hunt starts
  *

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useBlastGsapTimelines — verifies the hook's
  * range guards, reduced-motion gates, filter stack lifecycle,

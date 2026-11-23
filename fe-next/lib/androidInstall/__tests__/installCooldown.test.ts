@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The 14-day "no thanks" cooldown used to live as a private const inside
  * AndroidAppInstallPromo, so the pill never saw it and the popup's own fire-time

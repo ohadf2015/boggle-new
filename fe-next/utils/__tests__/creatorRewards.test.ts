@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Creator Rewards Tests (TDD — RED phase)
  *

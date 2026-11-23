@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { saveToCloud, loadFromCloud, clearCloudSave, type SaveData } from '../cloudSave';
 import type { Mock } from 'vitest';
 

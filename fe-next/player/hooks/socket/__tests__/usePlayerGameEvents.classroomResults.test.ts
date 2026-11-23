@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The student's end-of-round moment.
  *

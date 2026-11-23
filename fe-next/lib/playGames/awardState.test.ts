@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: Play Games local award state (one-time flags + distinct-languages set).
  */

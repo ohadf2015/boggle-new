@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * t_da22db9a — useOAuthSignIn analyticsSource.
  *

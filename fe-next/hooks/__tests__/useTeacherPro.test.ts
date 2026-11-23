@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * `has_pro` is the only entitlement signal the client has, and it decides whether a paid
  * surface renders. The default when we cannot answer must be "not Pro" — an optimistic

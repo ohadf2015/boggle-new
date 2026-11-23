@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSurvivalGameLogic — solving the target plays its celebration on the board
  * before the results screen takes over. Before this, onComplete fired in the

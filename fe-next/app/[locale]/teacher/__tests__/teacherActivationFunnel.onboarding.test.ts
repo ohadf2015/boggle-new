@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Teacher activation funnel — the onboarding step's once-per-TEACHER latch.
  * Needs DOM storage (happy-dom): the same teacher must not fire twice, a

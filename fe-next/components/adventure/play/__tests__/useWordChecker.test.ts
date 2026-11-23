@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A loaded dictionary is the whole language, so it is authoritative BOTH ways.
  * Before this, only a hit short-circuited: every rejected word (and every word

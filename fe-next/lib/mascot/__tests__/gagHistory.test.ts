@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { loadGagHistory, saveGagHistory, GAG_HISTORY_KEY } from '../gagHistory';
 import { createGagHistory } from '../gagDirector';

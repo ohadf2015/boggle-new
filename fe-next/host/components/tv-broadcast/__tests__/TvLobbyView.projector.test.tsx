@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A classroom room gets ONE join surface.
  *

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { getPlayerSeed, PLAYER_SEED_KEY } from '../playerSeed';
 
