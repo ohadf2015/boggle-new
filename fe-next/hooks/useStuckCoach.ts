@@ -150,6 +150,9 @@ export function useStuckCoach(args: UseStuckCoachArgs): StuckCoach {
 
   const deadEnabled = !!args.deadTime?.enabled;
   useEffect(() => {
+    if (deadEnabled) deadLastActivityRef.current = Date.now();
+  }, [deadEnabled]);
+  useEffect(() => {
     if (!active && !deadEnabled) return;
     const id = setInterval(() => {
       const now = Date.now();

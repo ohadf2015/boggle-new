@@ -101,6 +101,8 @@ const EXAMPLE_MIN_LEN = 3;
 const EXAMPLE_MAX_LEN = 5;
 
 export interface SolvedGridWords {
+  /** Board words that are also everyday words in the language; preferred so the coach never offers FEI or ECU. */
+  common?: string[];
   easy: string[];
   medium: string[];
   hard: string[];
@@ -112,7 +114,7 @@ export interface SolvedGridWords {
  */
 export function pickCoachExampleWord(words: SolvedGridWords | null | undefined): string | null {
   if (!words) return null;
-  for (const bucket of [words.easy, words.medium, words.hard]) {
+  for (const bucket of [words.common, words.easy, words.medium, words.hard]) {
     const usable = (bucket ?? []).filter(
       (w) => w.length >= EXAMPLE_MIN_LEN && w.length <= EXAMPLE_MAX_LEN,
     );

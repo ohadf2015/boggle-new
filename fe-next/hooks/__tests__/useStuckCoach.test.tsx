@@ -187,6 +187,19 @@ describe('useStuckCoach', () => {
       expect(onDeadTime).toHaveBeenCalledTimes(2);
     });
 
+    it('restarts its clock when tracking turns back on (pause, late board)', () => {
+      const onDeadTime = vi.fn();
+      const { rerender } = renderHook((p: UseStuckCoachArgs) => useStuckCoach(p), {
+        initialProps: args({ active: false, deadTime: { enabled: false, thresholdMs: 15_000, onDeadTime } }),
+      });
+      tick(20_000);
+      rerender(args({ active: false, deadTime: { enabled: true, thresholdMs: 15_000, onDeadTime } }));
+      tick(2_000);
+      expect(onDeadTime).not.toHaveBeenCalled();
+      tick(14_000);
+      expect(onDeadTime).toHaveBeenCalledTimes(1);
+    });
+
     it('runs while the coach itself is inactive', () => {
       const onDeadTime = vi.fn();
       renderHook(() => useStuckCoach(args({ active: false, deadTime: { enabled: true, thresholdMs: 15_000, onDeadTime } })));
