@@ -1662,7 +1662,16 @@ const en = {
       "classrooms": {
         "title": "Bring it to your classroom",
         "line": "Run a live word game for your class. Students join with a code from any device.",
-        "cta": "Start a free class"
+        "cta": "Start a free class",
+        "myTitle": "My classroom",
+        "studentsCount": "Students: {count}",
+        "copyCode": "Copy join code",
+        "copied": "Copied",
+        "startGame": "Start a class game",
+        "openClassroom": "Open classroom",
+        "simpleLine": "Your classes, games and reports, all in one place.",
+        "studentTitle": "My class",
+        "openMyClass": "Open my class"
       }
     },
     "close": {

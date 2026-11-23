@@ -1662,7 +1662,16 @@ const ja = {
       "classrooms": {
         "title": "教室でも遊べる",
         "line": "クラスでライブの単語ゲーム。生徒はどの端末からでもコードで参加できます。",
-        "cta": "無料でクラスを作る"
+        "cta": "無料でクラスを作る",
+        "myTitle": "マイクラス",
+        "studentsCount": "生徒：{count}人",
+        "copyCode": "参加コードをコピー",
+        "copied": "コピーしました",
+        "startGame": "クラスでゲームを始める",
+        "openClassroom": "クラスを開く",
+        "simpleLine": "クラス、ゲーム、レポートをまとめて管理できます。",
+        "studentTitle": "自分のクラス",
+        "openMyClass": "クラスを開く"
       }
     },
     "close": {

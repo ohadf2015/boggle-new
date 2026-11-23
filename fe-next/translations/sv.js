@@ -1662,7 +1662,16 @@ const sv = {
       "classrooms": {
         "title": "Ta med spelet till klassrummet",
         "line": "Kör ett ordspel live med klassen. Eleverna går med via en kod från valfri enhet.",
-        "cta": "Starta en klass gratis"
+        "cta": "Starta en klass gratis",
+        "myTitle": "Mitt klassrum",
+        "studentsCount": "Elever: {count}",
+        "copyCode": "Kopiera klasskoden",
+        "copied": "Kopierad",
+        "startGame": "Starta ett klasspel",
+        "openClassroom": "Öppna klassrummet",
+        "simpleLine": "Dina klasser, spel och rapporter på ett ställe.",
+        "studentTitle": "Min klass",
+        "openMyClass": "Öppna min klass"
       }
     },
     "close": {
