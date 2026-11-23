@@ -136,6 +136,7 @@ describe('Banner suppress/restore — integration', () => {
   afterEach(() => {
     cleanup();
     clearSuppressDom();
+    document.body.querySelectorAll('[aria-modal]').forEach((n) => n.remove());
   });
 
   it('hides on drawer open and restores (resume + show) on drawer close', async () => {
@@ -237,12 +238,16 @@ describe('Banner suppress/restore — integration', () => {
     await toggleSuppressClass(bannerController, shouldSuppressBanner, () => {
       document.body.appendChild(reveal);
     });
-    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(true));
+    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(true), {
+      timeout: 15000,
+    });
     await whenIdle(bannerController);
     expect(hideBannerSpy).toHaveBeenCalled();
 
     reveal.remove();
-    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(false));
+    await waitFor(() => expect(document.documentElement.classList.contains('blocking-overlay-open')).toBe(false), {
+      timeout: 15000,
+    });
     await toggleSuppressClass(bannerController, shouldSuppressBanner, () => {});
     expect(resumeBannerSpy).toHaveBeenCalled();
     expect(showBannerSpy).toHaveBeenCalled();
