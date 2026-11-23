@@ -251,6 +251,15 @@ export function buildTeacherTrialConvertedEvent(userId: string, subscriptionId: 
   };
 }
 
+/** The teacher undid a cancel from LexiClash (Keep Pro), before the plan ended. */
+export function buildProResumedEvent(userId: string, status: string): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_pro_resumed',
+    properties: { ...BASE, status, teacher_id: userId },
+  };
+}
+
 /** Polar Teacher Pro trial lapsed without converting. */
 export function buildTrialExpiredEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {
@@ -324,11 +333,15 @@ export function buildRecoveryCtaClickedEvent(
 }
 
 /** Day-10 Polar trial expiry email actually sent. */
-export function buildPolarTrialDay10SentEvent(userId: string, daysLeft: number): EduServerEvent {
+export function buildPolarTrialDay10SentEvent(
+  userId: string,
+  daysLeft: number,
+  email: 'day10' | 'canceled-ending' = 'day10',
+): EduServerEvent {
   return {
     distinctId: userId,
     event: 'teacher_polar_trial_day10_sent',
-    properties: { ...BASE, days_left: daysLeft },
+    properties: { ...BASE, days_left: daysLeft, email },
   };
 }
 

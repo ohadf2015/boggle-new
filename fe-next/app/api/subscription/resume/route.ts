@@ -3,6 +3,8 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getPolarClient } from '@/lib/polar';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
+import { buildProResumedEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import logger from '@/utils/logger';
 
 /**
@@ -12,6 +14,9 @@ import logger from '@/utils/logger';
  * charges on the original date. A new checkout here would start a second subscription.
  */
 export async function POST(request: NextRequest) {
+  if (isNativeAppUserAgent(request.headers.get('user-agent'))) {
+    return NextResponse.json({ error: 'not_in_app' }, { status: 403 });
+  }
   const user = await getAuthedUser(request);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
@@ -39,5 +44,10 @@ export async function POST(request: NextRequest) {
 
   const { error } = await admin.from('subscriptions').update({ cancel_at_period_end: false }).eq('user_id', user.id);
   if (error) logger.warn('[Resume] row update failed; the uncanceled webhook will set it:', error);
+  try {
+    captureProFunnelServerEvent(buildProResumedEvent(user.id, sub.status));
+  } catch {
+    /* analytics never blocks the resume */
+  }
   return NextResponse.json({ ok: true });
 }

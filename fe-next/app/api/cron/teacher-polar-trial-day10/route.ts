@@ -130,6 +130,15 @@ export async function POST(request: NextRequest) {
         if (!row.user_id || !row.email) continue;
         if (!accessByUser.has(row.user_id)) accessByUser.set(row.user_id, row);
       }
+      // Checkout does not require an approved request, and every trialist was promised this notice.
+      for (const id of userIds) {
+        if (accessByUser.has(id)) continue;
+        const { data } = await supabase.auth.admin.getUserById(id);
+        const u = data?.user;
+        if (!u?.email) continue;
+        const meta = (u.user_metadata ?? {}) as Record<string, string | undefined>;
+        accessByUser.set(id, { user_id: id, email: u.email, full_name: meta.full_name || meta.name || '', locale: meta.locale ?? null });
+      }
 
       const now = Date.now();
       const due: Array<{ sub: SubRow; access: AccessRow; daysLeft: number; bucket: Bucket }> = [];
@@ -231,7 +240,7 @@ export async function POST(request: NextRequest) {
           dedupe: { withinMs: 24 * 60 * 60 * 1000 },
         });
         try {
-          if (!isDayBefore) captureProFunnelServerEvent(buildPolarTrialDay10SentEvent(sub.user_id, daysLeft));
+          if (!isDayBefore) captureProFunnelServerEvent(buildPolarTrialDay10SentEvent(sub.user_id, daysLeft, cancelled ? 'canceled-ending' : 'day10'));
         } catch {
           /* analytics must never block the send ledger */
         }

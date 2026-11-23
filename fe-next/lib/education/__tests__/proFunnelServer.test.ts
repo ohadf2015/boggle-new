@@ -232,8 +232,9 @@ describe('Pro funnel server events', () => {
     expect(buildPolarTrialDay10SentEvent('u-1', 4)).toEqual({
       distinctId: 'u-1',
       event: 'teacher_polar_trial_day10_sent',
-      properties: { product: 'teacher_pro', provider: 'polar', days_left: 4 },
+      properties: { product: 'teacher_pro', provider: 'polar', days_left: 4, email: 'day10' },
     });
+    expect(buildPolarTrialDay10SentEvent('u-1', 3, 'canceled-ending').properties.email).toBe('canceled-ending');
   });
 
   it('Given a Polar t-0 expiry email actually sent, When built, Then it is teacher_polar_trial_expiry_sent', () => {

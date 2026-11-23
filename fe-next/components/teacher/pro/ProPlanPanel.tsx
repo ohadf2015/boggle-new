@@ -33,7 +33,7 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
             {t('eg2Pro.plans.youArePro')}
           </p>
           <p data-testid="pro-plan-status" className="mt-1 text-sm font-bold text-neo-navy/85">{line}</p>
-          {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3" /> : null}
+          {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-neo-navy text-neo-yellow" /> : null}
         </div>
         {portalUrl && !gifted ? (
           <a

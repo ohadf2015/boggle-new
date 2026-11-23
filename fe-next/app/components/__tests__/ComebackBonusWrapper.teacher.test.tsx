@@ -30,8 +30,8 @@ describe('ComebackBonusWrapper on teacher screens', () => {
     expect(mockFetchWithAuth).not.toHaveBeenCalled();
   });
 
-  it('still welcomes a returning player on a game screen', async () => {
-    nav.pathname = '/en';
+  it('still welcomes a returning player on a game or student screen', async () => {
+    nav.pathname = '/en/student';
     render(<ComebackBonusWrapper />);
     await waitFor(() => expect(screen.getByTestId('comeback-modal')).toBeInTheDocument());
   });

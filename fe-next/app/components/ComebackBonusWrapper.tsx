@@ -9,7 +9,6 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { isEducationPath } from '@/lib/navigation/sectionHome';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { ComebackBonusModal } from '@/components/engagement/ComebackBonusModal';
@@ -19,7 +18,7 @@ const SESSION_KEY = 'comeback_bonus_checked_v2';
 
 export default function ComebackBonusWrapper() {
   const { user, profile } = useAuth();
-  const onTeacherScreen = isEducationPath(usePathname() ?? '');
+  const onTeacherScreen = /^\/[a-z]{2}\/teacher(\/|$)/.test(usePathname() ?? '');
   const [status, setStatus] = useState<ComebackStatus | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const checked = useRef(false);

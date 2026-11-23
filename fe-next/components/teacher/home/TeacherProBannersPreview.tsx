@@ -19,6 +19,7 @@ import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherPr
 import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
 import { TeacherWinbackBanner } from '@/components/teacher/TeacherWinbackBanner';
 import { TeacherProTrialCanceledBanner } from '@/components/teacher/TeacherProTrialCanceledBanner';
+import { ProPlanPanel } from '@/components/teacher/pro/ProPlanPanel';
 
 const DAY = 86_400_000;
 
@@ -57,6 +58,9 @@ export function TeacherProBannersPreview() {
         </Slot>
         <Slot name="TeacherProTrialCanceledBanner (13d)">
           <TeacherProTrialCanceledBanner endsAt={iso(13)} onResumed={noop} />
+        </Slot>
+        <Slot name="ProPlanPanel (cancelled trial, 13d)">
+          <ProPlanPanel status="trialing" source="polar" trialExpires={iso(13)} periodEnd={iso(13)} portalUrl="#" cancelAtPeriodEnd onResumed={noop} included={['Spaced practice of missed words', 'Parent report links']} />
         </Slot>
         <Slot name="TeacherProTrialEndedBanner">
           <TeacherProTrialEndedBanner onDismiss={noop} />

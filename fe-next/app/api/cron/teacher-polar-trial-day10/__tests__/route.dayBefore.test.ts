@@ -15,6 +15,7 @@ const h = vi.hoisted(() => ({
   sendEmailSpy: vi.fn(async () => ({ ok: true })),
   tables: {} as Record<string, { data: unknown; error: { message: string } | null }>,
   inserts: [] as Array<{ table: string; values: any }>,
+  authUsers: {} as Record<string, { email: string; user_metadata?: Record<string, string> }>,
 }));
 
 function chainFor(name: string) {
@@ -40,7 +41,10 @@ function chainFor(name: string) {
 vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 vi.mock('@/lib/email', async (importOriginal) => ({
   ...(await importOriginal()),
-  getSupabaseAdmin: () => ({ from: (name: string) => chainFor(name) }),
+  getSupabaseAdmin: () => ({
+    from: (name: string) => chainFor(name),
+    auth: { admin: { getUserById: async (id: string) => ({ data: { user: h.authUsers[id] ?? null }, error: null }) } },
+  }),
 }));
 // The durable funnel module reads/writes through the service-role client and
 // logSubscriptionEvent — pin both into the same in-memory tables.
@@ -117,6 +121,15 @@ describe('/api/cron/teacher-polar-trial-day10 day-before notice', () => {
     expect(mail.html).toContain('Manage or cancel');
     expect(mail.html).toContain('utm_campaign=polar_trial_day_before');
     expect(h.inserts[0].values).toMatchObject({ event_type: 'polar_trial_day_before_sent', payload: { bucket: 'day-before' } });
+  });
+
+  it('still warns a trialist with no approved access request, at their account email', async () => {
+    h.tables.teacher_access_requests = { data: [], error: null };
+    h.authUsers = { u1: { email: 'noreq@school.de', user_metadata: { full_name: 'Kim Berg' } } };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ sent: 1 });
+    expect(h.sendEmailSpy.mock.calls[0][0].to).toBe('noreq@school.de');
+    h.authUsers = {};
   });
 
   it('does not send it twice', async () => {
