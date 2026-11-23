@@ -31,6 +31,7 @@ import { MpSoloStage } from './MpSoloStage';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isLeaderboardHidden } from '@/shared/utils/classroomPressure';
 import { MpNextModeCard } from './MpNextModeCard';
+import { MpResultsReactionBar } from './MpResultsReactionBar';
 import { MpFinalFooter, MpIntermissionFooter } from './MpResultsFooter';
 import { WordShowdownPanel } from './WordShowdownPanel';
 import { MpBragStrip, useMpBrag } from './MpBragStrip';
@@ -146,7 +147,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const footerShown = seen('footer');
   // Slots are laid out (invisible) from mount: mounting them on a later beat pushed the screen around (mobile CLS).
   const expectedBranch = branch ?? (isFinalLive ? 'final' : 'intermission');
-  const nextModeSlot = expectedBranch === 'intermission';
+  const nextModeSlot = expectedBranch === 'intermission' || (isHost && !c.isClassroom);
 
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -331,15 +332,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       onPointerDown={done ? undefined : handleSkip}
       className={cn(
         // Desktop/TV scale the whole show up (the HUD bar keeps the shell's --mp-u).
-        'relative isolate flex-1 min-h-0 w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
+        'relative isolate flex-[1_0_auto] w-full max-w-6xl tv:max-w-[1600px] mx-auto flex flex-col lg:[--mp-u:1.3] [@media(min-width:1024px)_and_(max-width:1799px)_and_(min-height:860px)]:[--mp-u:1.45] tv:[--mp-u:1.8]',
         'gap-[calc(10px*var(--mp-u,1))] p-[calc(12px*var(--mp-u,1))] lg:p-[calc(24px*var(--mp-u,1))]',
-        'lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-center',
+        'lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-start',
       )}
     >
       <div aria-hidden="true" className={fx.halftone} />
       <BossOutcomeCard size="phone" className="relative z-10 shrink-0 lg:col-span-2" />
       {/* On a phone the class outcome takes the standings' slot (the column cannot fit both); wide screens show both. */}
-      <div className={cn('min-h-0 flex-1 flex-col justify-center gap-[calc(8px*var(--mp-u,1))] lg:flex lg:h-full', bossOutcome ? 'hidden' : 'flex')}>
+      <div className={cn('min-h-0 flex-1 flex-col justify-center lg:justify-start gap-[calc(8px*var(--mp-u,1))] lg:flex', bossOutcome ? 'hidden' : 'flex')}>
         {champions.length > 0 && (
           <p data-testid="mp-series-champion" className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
             <Trophy aria-hidden="true" className="w-4 h-4" />
@@ -409,6 +410,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           </div>
         ) : null}
         </div>
+        {!classroomStudent && nextModeSlot && (
+          <MpNextModeCard
+            mode={nextMode}
+            onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
+            onPickerOpenChange={setPickerOpen}
+            t={t}
+            className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
+          />
+        )}
         {username && seen('card') && !c.isClassroom && (
           <WordShowdownPanel
             allPlayerWords={c.allPlayerWords}
@@ -462,15 +472,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             onPractice={practiceLessonId && missedWords.length > 0 ? () => openLessonPractice(practiceLessonId) : undefined}
             className={cn('shrink-0', !seen('card') && 'invisible', seen('card') && fx.cardIn)}
           />
-        ) : nextModeSlot && (
-          <MpNextModeCard
-            mode={nextMode}
-            onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
-            onPickerOpenChange={setPickerOpen}
-            t={t}
-            className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
-          />
-        )}
+        ) : null}
         {seen('card') && (grid ? (
           <MpSeriesGrid grid={grid} t={t} className={cn('hidden lg:block', fx.cardIn)} />
         ) : awards && !hideOutcome ? (
@@ -493,6 +495,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   const footer = (
     <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden gap-2">
+      {!c.isClassroom && <MpResultsReactionBar onSend={c.reactions.sendReaction} t={t} />}
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
@@ -526,7 +529,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   return (
     <MpGuestAddPromptProvider value={!c.isClassroom}>
-      <MpScreen testId="mp-results" header={header} body={body} footer={footer} />
+      <MpScreen testId="mp-results" header={header} body={body} footer={footer} bodyScroll="inner" />
       {done && (
         <>
           <ResultsModals

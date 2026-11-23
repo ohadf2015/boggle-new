@@ -18,7 +18,7 @@ function props(over: Partial<ClassPageViewProps> = {}): ClassPageViewProps {
     roster: <div data-testid="roster-slot" />,
     lists: [{ id: 'L1', name: 'Physics', wordCount: 8 }],
     listsLoading: false,
-    lastGame: { status: 'ready', game: { playedAt: '2026-11-10T09:00:00Z', players: [{ name: 'Noa', score: 40 }], participation: { played: 3, roster: 4 }, coveragePct: 75 } },
+    lastGame: { status: 'ready', game: { playedAt: '2026-11-10T09:00:00Z', players: [{ name: 'Noa', score: 40 }], participation: { played: 3, roster: 4 }, coveragePct: 75, totalLessonWords: 8 } },
     onShare: vi.fn(),
     onRequestDelete: vi.fn(),
     t,
@@ -72,11 +72,29 @@ describe('ClassPageView', () => {
     expect(last.innerHTML).not.toMatch(/bg-neo-(yellow|cyan|cream)/);
   });
 
+  it('Given a last game, Then the top scorer is labelled and the players count uses its plural form', () => {
+    render(<ClassPageView {...props()} />);
+    const last = screen.getByTestId('class-page-last-game');
+    expect(last).toHaveTextContent('teacher.lastGame.topScorer:{"name":"Noa","score":40}');
+    expect(last).toHaveTextContent('teacher.lastGame.playersPlayed_other:{"count":3}');
+    expect(last).toHaveTextContent('teacher.classPage.coverage:{"pct":75}');
+  });
+
+  it('Given a round with no list words and nobody scoring, Then neither a 0% coverage nor a 0-point top scorer shows', () => {
+    const game = { playedAt: '2026-11-10T09:00:00Z', players: [{ name: 'Joker', score: 0 }], participation: { played: 1, roster: 4 }, coveragePct: 0, totalLessonWords: 0 };
+    render(<ClassPageView {...props({ lastGame: { status: 'ready', game } })} />);
+    const last = screen.getByTestId('class-page-last-game');
+    expect(last).not.toHaveTextContent('teacher.classPage.coverage');
+    expect(last).not.toHaveTextContent('Joker');
+    expect(last).toHaveTextContent('teacher.lastGame.playersPlayed_one:{"count":1}');
+  });
+
   it('Given word lists, Then they sit folded in one closed disclosure', () => {
     render(<ClassPageView {...props()} />);
     const fold = within(screen.getByTestId('class-page-lists')).getByTestId('class-page-lists-fold');
     expect(fold.tagName).toBe('DETAILS');
     expect(fold).not.toHaveAttribute('open');
+    expect(fold).toHaveTextContent('eduLibrary.card.words_other:{"count":8}');
   });
 
   it('Given no lists and no game yet, Then the last game hides and lists offer only the way forward', () => {

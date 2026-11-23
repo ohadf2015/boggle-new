@@ -33,7 +33,6 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 vi.mock('../ClassroomManager', () => ({ __esModule: true, default: () => null }));
 vi.mock('../PlayTabFirstRunCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('../assignments', () => ({
-  AssignmentTrackingPanel: () => null,
   AssignmentCreator: ({ isOpen, classroomId }: { isOpen: boolean; classroomId: string }) =>
     isOpen ? <div data-testid="assignment-creator" data-classroom={classroomId} /> : null,
 }));

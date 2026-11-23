@@ -95,9 +95,9 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
   const isRTL = language === 'he';
 
   const perks = [
-    { icon: BarChart3, key: 'analytics' },
-    { icon: FileText, key: 'reports' },
-    { icon: Users, key: 'unlimited' },
+    { icon: BarChart3, key: 'analytics', href: `/${language}/teacher/reports` },
+    { icon: FileText, key: 'reports', href: `/${language}/teacher/reports` },
+    { icon: Users, key: 'unlimited', href: `/${language}/teacher` },
   ] as const;
 
   return (
@@ -133,12 +133,18 @@ export function ProWelcomeCelebration({ grant, paid = false, onReturnPage = fals
             </blockquote>
           )}
           <ul className="space-y-2.5">
-            {perks.map(({ icon: Icon, key }) => (
-              <li key={key} className={cn('flex items-center gap-3 rounded-neo-lg border-[3px] px-3 py-2.5 shadow-hard', NB_BLOCK.navy)}>
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan">
-                  <Icon className="size-4 text-neo-black" aria-hidden="true" />
-                </span>
-                <span className="font-neo-body text-sm font-bold">{t(`teacher.proWelcome.perk.${key}`)}</span>
+            {perks.map(({ icon: Icon, key, href }) => (
+              <li key={key}>
+                <Link
+                  href={href}
+                  onClick={close}
+                  className={cn('flex items-center gap-3 rounded-neo-lg border-[3px] px-3 py-2.5 shadow-hard transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan', NB_BLOCK.navy)}
+                >
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cyan">
+                    <Icon className="size-4 text-neo-black" aria-hidden="true" />
+                  </span>
+                  <span className="font-neo-body text-sm font-bold">{t(`teacher.proWelcome.perk.${key}`)}</span>
+                </Link>
               </li>
             ))}
           </ul>

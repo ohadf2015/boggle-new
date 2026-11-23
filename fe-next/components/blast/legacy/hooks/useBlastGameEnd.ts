@@ -88,14 +88,11 @@ export function useBlastGameEnd(deps: GameEndDeps) {
   useEffect(() => {
     const { onGameEnd, onWaveComplete, onHighlightStart, maxCombo, sounds, setExplosionShake, explosionShakeTimerRef, recorder } = depsRef.current;
 
-    // Board cleared in MP — the shared board is exhausted for everyone. Signal the
-    // server to end the room (idempotent endGame) and fire the win-flavored celebration.
-    // The plain `!isMultiplayer` block below never runs for MP, so without this the room
-    // would sit idle until the timer expired even though the board was fully cleared.
+    // Board cleared in MP: boards are per player and the server refreshes an exhausted
+    // one on its own, so this only celebrates; the round ends on the timer.
     if (isMultiplayer && engine.gameState.isComplete) {
       depsRef.current.recorder?.recordEnd('cleared', engine.gameState.score);
       depsRef.current.onMPBoardCleared?.();
-      depsRef.current.onMPDeadEnd?.();
       return undefined;
     }
 
@@ -228,7 +225,12 @@ export function useBlastGameEnd(deps: GameEndDeps) {
         }
       })();
 
-      return () => { cancelled = true; };
+      return () => {
+        cancelled = true;
+        // A fresh board (MP) or a revive clears isDeadEnd mid-finale: the next dead end must run again.
+        sugarCrushRunningRef.current = false;
+        setSugarCrushActive(false);
+      };
     }
 
     return undefined;

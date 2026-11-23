@@ -94,7 +94,7 @@ describe('PracticePicker', () => {
     renderIt();
     expandAll();
     const tile = screen.getByTestId('practice-tile-vocab_focus:definition');
-    expect(tile).toHaveTextContent('education.practicePicker.questions(4)');
+    expect(tile).toHaveTextContent('education.practicePicker.questions_other(4)');
   });
 
   it('locks every tile and explains itself for a lesson with no words', () => {

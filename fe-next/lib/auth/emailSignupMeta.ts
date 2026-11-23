@@ -35,6 +35,12 @@ export interface EmailSignupMetaInput {
   /** Only 'teacher' is honoured. Anything else is dropped so a crafted
    *  payload cannot mint admin. */
   intendedRole?: 'teacher' | 'student' | null;
+  grDistinctId?: string | null;
+}
+
+/** gr.js anonymous ids are `<base36 time>-<base36 random>`; anything else (an identified user id, junk) is dropped. */
+export function normalizeGrDistinctId(value: string | null | undefined): string | null {
+  return value && /^[a-z0-9]{6,12}-[a-z0-9]{4,16}$/.test(value) ? value : null;
 }
 
 export function normalizeLanguage(value: string | null | undefined): string | null {
@@ -81,6 +87,7 @@ export function buildEmailSignupMetadata(input: EmailSignupMetaInput): Record<st
     language: normalizeLanguage(input.language),
     country_code: normalizeCountry(input.countryCode),
     intended_role: role,
+    gr_distinct_id: normalizeGrDistinctId(input.grDistinctId),
   };
   return Object.fromEntries(
     Object.entries(raw).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].length > 0),

@@ -31,9 +31,11 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO = 'prod-pro-1'
 const SECRET = 'whsec_' + Buffer.from('teacher-pro-webhook-key').toString('base64')
@@ -56,6 +58,7 @@ function signed(body: string, secret = SECRET, signature?: string) {
 
 describe('polar webhook signature + checkout.completed grant', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     grantProFromCheckout.mockClear()
     process.env.POLAR_WEBHOOK_SECRET = SECRET
     process.env.POLAR_PRO_PRODUCT_ID = PRO

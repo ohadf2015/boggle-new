@@ -11,7 +11,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 vi.mock('@/components/ui/CircularTimer', () => ({
   default: (props: Record<string, unknown>) => (
-    <div data-testid="ring" data-size={String(props.size)} data-key={String(props.timerKey)} data-color={String(props.colorFamily)} />
+    <div data-testid="ring" data-size={String(props.size)} data-key={String(props.timerKey)} data-color={String(props.colorFamily)} data-hide-label={String(props.hideLabel)} />
   ),
 }));
 
@@ -25,10 +25,18 @@ describe('MpTimer', () => {
   it('shows m:ss from the server seconds and sizes the ring per token', () => {
     render(<MpTimer remainingSec={75} totalSec={120} size="md" />);
     expect(screen.getByTestId('mp-timer-digits').textContent).toBe('1:15');
-    expect(screen.getByTestId('ring').getAttribute('data-size')).toBe('44');
+    expect(screen.getByTestId('ring').getAttribute('data-size')).toBe('52');
   });
 
-  it.each([['sm', '32'], ['md', '44'], ['lg', '72'], ['xl', '96']] as const)('size %s → %spx ring', (size, px) => {
+  it('draws the digits inside the ring, not beside it', () => {
+    render(<MpTimer remainingSec={75} totalSec={120} size="md" />);
+    const digits = screen.getByTestId('mp-timer-digits');
+    expect(digits.parentElement).toContainElement(screen.getByTestId('ring'));
+    expect(digits.className).toContain('absolute');
+    expect(screen.getByTestId('ring').getAttribute('data-hide-label')).toBe('true');
+  });
+
+  it.each([['sm', '32'], ['md', '52'], ['lg', '72'], ['xl', '96']] as const)('size %s → %spx ring', (size, px) => {
     render(<MpTimer remainingSec={10} totalSec={60} size={size} />);
     expect(screen.getByTestId('ring').getAttribute('data-size')).toBe(px);
   });

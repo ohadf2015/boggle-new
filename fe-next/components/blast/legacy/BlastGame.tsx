@@ -16,6 +16,7 @@ import { withBlastCredit, type BlastCredit } from './utils/withBlastCredit';
 import { useSpamDetection } from '@/components/singleplayer/game/hooks/useSpamDetection';
 import { useBlastEngine } from './hooks/useBlastEngine';
 import { useBlastServerSync } from './hooks/useBlastServerSync';
+import { pickQueuedBoard } from '@/shared/utils/blastServerSync';
 import { useBlastObjectives } from './hooks/useBlastObjectives';
 import { useBlastHint } from './hooks/useBlastHint';
 import { pickHintTarget } from './utils/blastHintPicker';
@@ -207,12 +208,12 @@ export function BlastGame({
 
   // MP board sync: apply server-authoritative board state when blastBoardUpdate arrives
   // Queue updates during cascade to prevent ref corruption mid-animation
-  const pendingBoardUpdatesRef = useRef<Array<{ grid: LetterGrid; tileStates: BlastTileState[][] }>>([]);
+  const pendingBoardUpdatesRef = useRef<Array<{ grid: LetterGrid; tileStates: BlastTileState[][]; clearedBy: string }>>([]);
   const blastBoardUpdate = useGameStore((s) => s.blastBoardUpdate);
-  const { noteSubmit: noteServerSubmit, receive: receiveServerBoard } = useBlastServerSync({ enabled: isMultiplayer && !!onRequestBoard, username, onRequestBoard });
+  const { noteSubmit: noteServerSubmit, receive: receiveServerBoard, isSettled: serverSettled } = useBlastServerSync({ enabled: isMultiplayer && !!onRequestBoard, username, onRequestBoard });
   useEffect(() => {
     if (!isMultiplayer || !blastBoardUpdate) return;
-    const boardData = { grid: blastBoardUpdate.grid, tileStates: blastBoardUpdate.tileStates };
+    const boardData = { grid: blastBoardUpdate.grid, tileStates: blastBoardUpdate.tileStates, clearedBy: blastBoardUpdate.clearedBy };
     useGameStore.getState().setBlastBoardUpdate(null);
     if (!receiveServerBoard(blastBoardUpdate.clearedBy)) return;
     // If mid-cascade, queue — apply after cascade completes
@@ -225,21 +226,16 @@ export function BlastGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties, not full engine object
   }, [blastBoardUpdate, isMultiplayer, username, engine.isCascading, engine.applyServerBoard, receiveServerBoard]);
 
-  // Flush queued board updates after cascade completes.
-  // Coalesce to last is intentional: each blastBoardUpdate is a full (grid, tileStates)
-  // snapshot that supersedes prior snapshots. Queued entries are terminal states of N
-  // distinct moves (self + opponents), not animation frames of one cascade. Server does
-  // not broadcast in-flight frames, so sequential apply cannot recover intermediate FX —
-  // it would just waste work and still land on the same final state.
+  // Flush queued board updates after cascade completes. Each is a full snapshot, so one
+  // wins; a word sent during the cascade makes plain acks stale (pickQueuedBoard).
   useEffect(() => {
     if (!engine.isCascading && pendingBoardUpdatesRef.current.length > 0) {
-      const queue = pendingBoardUpdatesRef.current;
-      const last = queue[queue.length - 1];
+      const pick = pickQueuedBoard(pendingBoardUpdatesRef.current, serverSettled());
       pendingBoardUpdatesRef.current = [];
-      engine.applyServerBoard(last.grid, last.tileStates);
+      if (pick) engine.applyServerBoard(pick.grid, pick.tileStates);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally using engine.* properties
-  }, [engine.isCascading, engine.applyServerBoard]);
+  }, [engine.isCascading, engine.applyServerBoard, serverSettled]);
 
   // Dictionary cache for cascade word detection + validation gate
   const { checkWord, isLoaded: isDictionaryLoaded, retry: retryDictionary } = useDictionaryCache(config.language);

@@ -20,4 +20,13 @@ describe('<HardestWordsList> percent', () => {
     );
     expect(screen.getByTestId('report-word-missrate')).toHaveTextContent('eg2Polish.words.missRate:67');
   });
+
+  it('Given one student was asked, When the row renders, Then the count uses the singular form', () => {
+    render(
+      <HardestWordsList
+        words={[{ word: 'earth', display: 'earth', attempts: 1, missed: 1, missRate: 100, studentsMissing: 1, studentsAsked: 1 }]}
+      />,
+    );
+    expect(document.body.textContent).toContain('eduPro.mastery.studentsMissing_one:1,1');
+  });
 });

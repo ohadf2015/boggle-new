@@ -59,6 +59,9 @@ interface ChallengeInfo {
   seed: string;
   challengerName: string;
   challengerScorePct: number;
+  /** Signed-in challenger's user id (row-based links only). Drives the
+   * add-friend moment on results; null for guest-seeded links. */
+  challengerId: string | null;
 }
 
 function challengeFromLink(link: SeededChallengeLink): ChallengeInfo {
@@ -68,6 +71,7 @@ function challengeFromLink(link: SeededChallengeLink): ChallengeInfo {
     seed: link.seed,
     challengerName: link.name ?? '',
     challengerScorePct: link.scorePct,
+    challengerId: null,
   };
 }
 
@@ -97,7 +101,7 @@ function randomSeedId(): string {
 
 export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, coach = false, weekly = false }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { announce } = useAnnouncer();
   const [phase, setPhase] = useState<HubPhase>('loading');
   const [roundIndex, setRoundIndex] = useState(1);
@@ -177,6 +181,9 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
           seed: d.seed,
           challengerName: d.challengerName,
           challengerScorePct: Number(d.challenger_score_pct),
+          // The sender's user id rides the row — without it the results
+          // screen could never offer "add {name} as a friend".
+          challengerId: typeof d.challenger_id === 'string' ? d.challenger_id : null,
         });
         if (!seeded) {
           posthog.capture(RESULTS_LOOP_EVENTS.opened, {
@@ -383,9 +390,10 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
             theirValue: challenge.challengerScorePct,
             myValue: r.scorePct,
             type: 'challenge',
-            // Real player ID for the avatar — seed a deterministic config if
-            // the server didn't provide a custom_avatar (both methods render as "custom")
-            avatarUserId: challenge.id,
+            // The challenger's real user id powers the add-friend CTA (and
+            // their real avatar). Row-less guest links have neither.
+            userId: challenge.challengerId ?? undefined,
+            avatarUserId: challenge.challengerId ?? (challenge.id || undefined),
             avatarConfig: null,
           });
           if (r.scorePct > challenge.challengerScorePct) {
@@ -463,8 +471,17 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
   handlePlayRef.current = handlePlay;
 
   const handleChallenge = useCallback(
-    () => (result ? shareQuickResult({ result, locale: language, t, isGuest: !user?.id, dayStreak }) : undefined),
-    [result, language, t, user?.id, dayStreak],
+    () => (result ? shareQuickResult({
+      result,
+      locale: language,
+      t,
+      isGuest: !user?.id,
+      dayStreak,
+      // The recipient's banner names the challenger — a bare "A friend"
+      // converts worse and made the loop anonymous.
+      senderName: profile?.display_name || profile?.username || null,
+    }) : undefined),
+    [result, language, t, user?.id, dayStreak, profile?.display_name, profile?.username],
   );
 
   if (phase === 'playing' && config) {

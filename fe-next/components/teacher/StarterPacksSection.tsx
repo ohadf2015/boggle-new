@@ -11,6 +11,7 @@ import type { Language } from '@/lib/supabase/education/types';
 import { ContentLanguageChips, contentLanguagesFor } from '@/components/education/pickers/ContentLanguageChips';
 import { SessionTemplatesSection, type SessionRun } from './StarterPacksSection.sessions';
 import { ThemedPacksSection } from './StarterPacksSection.themed';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export type { SessionRun } from './StarterPacksSection.sessions';
 
@@ -44,7 +45,7 @@ function PackCard({
   pack: StarterLessonPack;
   onSelect: () => void;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const Icon = categoryIcons[pack.category];
 
   return (
@@ -52,7 +53,7 @@ function PackCard({
       <div className="flex h-full flex-col gap-3 @2xl:flex-row @2xl:items-center @2xl:gap-5">
         <div className="flex min-w-0 flex-1 flex-col gap-3">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className={cn(chipClass, 'bg-neo-cream')}>{t('teacher.lesson.words', { count: pack.words.length })}</span>
+            <span className={cn(chipClass, 'bg-neo-cream')}>{t(pluralKeyOf('teacher.lesson.words', pack.words.length, language), { count: pack.words.length })}</span>
           </div>
           <div className="flex items-start gap-3">
             <div className="min-w-0 flex-1">

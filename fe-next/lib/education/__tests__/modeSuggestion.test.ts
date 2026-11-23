@@ -10,10 +10,8 @@ const solo = (gameMode: string): SuggestionRound => ({ gameMode, playerCount: 1 
 const base = {
   candidates: ALL,
   selected: 'classic' as const,
-  hasPro: false,
   rehearseIntent: false,
   isBlocked: () => false,
-  isProOnly: () => false,
   botCapable: (id: string) => BOT_CAPABLE.has(id),
 };
 
@@ -56,12 +54,6 @@ describe('suggestNextMode', () => {
       rounds: [real('classic'), real('classic'), real('classic')],
     });
     expect(pick).toBe('vocab-quiz');
-  });
-
-  it('Given a Pro-only mode and a free teacher, when asked, then it is skipped; a Pro teacher may get it', () => {
-    const args = { ...base, candidates: ['word-hunt', 'blast'] as const, isProOnly: (id: string) => id === 'word-hunt', rounds: [real('classic')] };
-    expect(suggestNextMode(args)).toBe('blast');
-    expect(suggestNextMode({ ...args, hasPro: true })).toBe('word-hunt');
   });
 
   it('Given the mode already selected in the lobby, when asked, then it is not suggested again', () => {

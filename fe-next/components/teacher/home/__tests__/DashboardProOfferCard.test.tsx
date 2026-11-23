@@ -92,7 +92,7 @@ describe('DashboardProOfferCard', () => {
     it('Given a class that has played, Then a secondary link opens its insight page, below the checkout button', () => {
       render(<DashboardProOfferCard language="he" t={tp} insight={{ classroomId: 'c1', className: '5B', weekGames: 2 }} />);
       const link = screen.getByTestId('dashboard-class-insight-link');
-      expect(link).toHaveAttribute('href', '/he/teacher/classroom/c1/analytics');
+      expect(link).toHaveAttribute('href', '/he/teacher/reports?classroomId=c1');
       expect(link).toHaveTextContent('teacher.weekInsight.homeCta');
       expect(screen.getByTestId('dashboard-pro-offer-cta').compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });

@@ -78,6 +78,7 @@ import { stopAllBots } from '../modules/botManager.js';
 import { notifyRoomCreated } from '../modules/notificationService.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 import { registerStartGameHandler } from './gameStartHandler.js';
+import { refreshBlastBoardOnDeadEnd } from '../modules/blastBoardRegen.js';
 import { isGameStarting, waitForGameStart } from './gameStartMutex.js';
 import { buildRoundPayload } from '../modes/roundPayload.js';
 import { checkGuestRename, renamePlayerInGame } from '../modules/playerRename.js';
@@ -423,14 +424,17 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
     endGame(io, gameCode);
   });
 
-  // Blast dead-end: client detected no valid moves remain, Sugar Crush played — end game now.
+  // Blast dead-end: this player's board has no word left. Boards are per player,
+  // so only a solo room ends early; otherwise the reporter gets a fresh board.
   socket.on('blastDeadEnd', () => {
     if (!checkRateLimit(socket.id)) { socket.emit('rateLimited'); return; }
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) return;
     const game = getGame(gameCode);
     if (!game || game.gameMode !== 'blast' || !isInProgress(game.gameState)) return;
-    endGame(io, gameCode);
+    const username = getUsernameBySocketId(socket.id);
+    if (!username) return;
+    if (refreshBlastBoardOnDeadEnd({ io, gameCode, game, username, socket, now: Date.now() }) === 'solo') endGame(io, gameCode);
   });
 
   // Debug: Get current game state (development only)

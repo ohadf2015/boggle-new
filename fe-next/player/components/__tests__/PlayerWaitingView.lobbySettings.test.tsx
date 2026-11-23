@@ -98,6 +98,7 @@ describe('PlayerWaitingView — the host\'s lobby pick', () => {
     fire('lobbySettings', BLAST);
     const desktop = within(screen.getByTestId('desktop-lobby-layout'));
     expect(desktop.getByTestId('lobby-mode-chip')).toHaveTextContent('gameModes.blast.name');
-    expect(desktop.getByTestId('game-instructions')).toHaveAttribute('data-mode', 'blast');
+    fireEvent.click(desktop.getByText('mpUi.lobby.howToPlay'));
+    expect(screen.getByTestId('game-instructions')).toHaveAttribute('data-mode', 'blast');
   });
 });

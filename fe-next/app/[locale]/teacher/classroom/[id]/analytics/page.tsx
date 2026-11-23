@@ -1,55 +1,20 @@
-/**
- * Analytics Page - Teacher Classroom Analytics Dashboard
- *
- * Integrates all Phase 20 analytics components:
- * - ClassOverview (metrics overview)
- * - StudentProgressTable (detailed student data)
- * - LessonEffectivenessChart (lesson performance)
- * - VocabularyHeatmap (word mastery grid)
- * - LiveActivityIndicator (real-time updates)
- *
- * Features:
- * - Real-time progress updates via Supabase Realtime
- * - Tabbed interface for detailed views
- * - Neo-brutalist design with responsive layout
- * - RTL support for Hebrew
- */
-
-import { Metadata } from 'next';
-import { AnalyticsPageClient } from './PageClient';
-
-// ============================================
-// METADATA
-// ============================================
-
-export const metadata: Metadata = {
-  title: 'Class Analytics | LexiClash',
-  description: 'Track student progress, lesson effectiveness, and vocabulary mastery in real-time',
-};
-
-// ============================================
-// PAGE PROPS
-// ============================================
+import { notFound, redirect } from 'next/navigation';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
+import { reportId, resolveReportTab } from '../../../reports/reportParams';
 
 interface AnalyticsPageProps {
-  params: Promise<{
-    locale: string;
-    id: string;
-  }>;
+  params: Promise<{ locale: string; id: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-// ============================================
-// SERVER COMPONENT
-// ============================================
+const first = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
-/**
- * Analytics Page
- *
- * Server component that handles params and delegates to client component.
- * Auth check happens in PageClient via useAuth hook.
- */
-export default async function AnalyticsPage({ params }: AnalyticsPageProps) {
+/** The class report lives in Reports now; old links and bookmarks land on the same class there. */
+export default async function AnalyticsPage({ params, searchParams }: AnalyticsPageProps) {
   const { locale, id } = await params;
-
-  return <AnalyticsPageClient classroomId={id} locale={locale} />;
+  const query = await searchParams;
+  const classroomId = reportId(id);
+  if (!classroomId) notFound();
+  const tab = resolveReportTab(first(query.section) ?? first(query.tab));
+  redirect(teacherResultsHref(locale, classroomId, tab ?? undefined));
 }

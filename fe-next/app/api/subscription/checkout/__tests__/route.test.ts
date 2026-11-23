@@ -176,6 +176,37 @@ describe('POST /api/subscription/checkout', () => {
     })
   })
 
+  it.each(['trialing', 'active', 'past_due'])(
+    'Given a live Polar subscription (%s), When the teacher posts another checkout, Then it is refused before Polar is called',
+    async (status) => {
+      getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+      maybeSingle.mockResolvedValue({ data: { status, source: 'polar', tier: 'pro' }, error: null })
+      const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+      expect(res.status).toBe(409)
+      expect(await res.json()).toEqual({ error: 'already_subscribed' })
+      expect(createCheckout).not.toHaveBeenCalled()
+    }
+  )
+
+  it('Given a gifted Pro or an ended subscription, When the teacher buys, Then checkout opens', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
+    for (const row of [{ status: 'active', source: 'admin_grant' }, { status: 'canceled', source: 'polar' }]) {
+      maybeSingle.mockResolvedValue({ data: { ...row, tier: 'pro' }, error: null })
+      const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+      expect(res.status).toBe(200)
+    }
+  })
+
+  it('Given the plan lookup fails, When the teacher posts a checkout, Then it refuses rather than risk a second subscription', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    maybeSingle.mockResolvedValue({ data: null, error: { message: 'timeout' } })
+    const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
+    expect(res.status).toBe(503)
+    expect(await res.json()).toEqual({ error: 'plan_lookup_failed' })
+    expect(createCheckout).not.toHaveBeenCalled()
+  })
+
   it('tags the checkout-started events with the offer the teacher came from', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: 'c1' })
@@ -214,7 +245,7 @@ describe('POST /api/subscription/checkout', () => {
   it('checkout still works when the profile lookup fails (no name prefill, till stays open)', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: '4b9c2f1e-7a3d-4c5e-9f0a-1b2c3d4e5f6a' })
-    maybeSingle.mockRejectedValue(new Error('db down'))
+    maybeSingle.mockResolvedValueOnce({ data: null, error: null }).mockRejectedValue(new Error('db down'))
     const res = await POST(new Request('http://localhost/api/subscription/checkout', { method: 'POST' }))
     expect(res.status).toBe(200)
     expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ name: undefined }))
@@ -401,7 +432,7 @@ describe('POST /api/subscription/checkout', () => {
     expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: false }))
   })
 
-  it('downgrades a trial request to paid when they already have Pro or already used a trial', async () => {
+  it('refuses a trial on top of live Pro, and downgrades a second trial to paid', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/paid', id: '6d1e4f3a-9c5f-4e7a-1b2c-3d4e5f6a7b8c' })
     maybeSingle.mockResolvedValue({
@@ -413,10 +444,10 @@ describe('POST /api/subscription/checkout', () => {
       body: JSON.stringify({ trial: true }),
       headers: { 'Content-Type': 'application/json' },
     }
-    await POST(new Request('http://localhost/api/subscription/checkout', trialBody))
-    expect(createCheckout).toHaveBeenCalledWith(expect.objectContaining({ allowTrial: false }))
+    const live = await POST(new Request('http://localhost/api/subscription/checkout', trialBody))
+    expect(live.status).toBe(409)
+    expect(createCheckout).not.toHaveBeenCalled()
 
-    createCheckout.mockClear()
     maybeSingle.mockResolvedValue({
       data: { tier: 'free', status: 'canceled', source: 'polar', current_period_end: null },
       error: null,

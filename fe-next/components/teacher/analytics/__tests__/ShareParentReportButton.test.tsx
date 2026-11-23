@@ -4,8 +4,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 /**
  * "Share with parent" — a Teacher Pro action that mints a signed report
- * link for one student and copies it to the clipboard. Lives inside
- * StudentProgressTable, which is already rendered behind <ProGate>.
+ * link for one student and copies it to the clipboard.
  */
 
 vi.mock('@/contexts/LanguageContext', () => ({

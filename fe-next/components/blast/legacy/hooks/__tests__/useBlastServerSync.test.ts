@@ -18,6 +18,24 @@ describe('useBlastServerSync', () => {
     expect(result.current.receive(BLAST_RESYNC_CLEARED_BY)).toBe(true);
   });
 
+  it('keeps asking while the word stays unacked (a dropped resync reply must not strand the board)', () => {
+    const onRequestBoard = vi.fn();
+    const { result } = renderHook(() => useBlastServerSync({ enabled: true, username: 'ana', onRequestBoard }));
+
+    act(() => result.current.noteSubmit());
+    act(() => { vi.advanceTimersByTime(BLAST_RESYNC_AFTER_MS * 2 + 2); });
+
+    expect(onRequestBoard).toHaveBeenCalledTimes(2);
+  });
+
+  it('reports settled only once every sent word is acked', () => {
+    const { result } = renderHook(() => useBlastServerSync({ enabled: true, username: 'ana', onRequestBoard: vi.fn() }));
+    act(() => result.current.noteSubmit());
+    expect(result.current.isSettled()).toBe(false);
+    act(() => { result.current.receive('ana'); });
+    expect(result.current.isSettled()).toBe(true);
+  });
+
   it('does not ask when the word is acked in time', () => {
     const onRequestBoard = vi.fn();
     const { result } = renderHook(() => useBlastServerSync({ enabled: true, username: 'ana', onRequestBoard }));

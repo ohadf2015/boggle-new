@@ -27,6 +27,7 @@ import { ClassPageView } from '@/components/teacher/classroom/page/ClassPageView
 import { ClassroomProOffer } from '@/components/teacher/classroom/ClassroomProOfferBanner';
 import { classWordLists } from '@/components/teacher/classroom/page/classWordLists';
 import { NB_PANEL, NB_SECONDARY } from '@/components/teacher/nb/nbStyles';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -119,7 +120,7 @@ function ClassPageLoaded({ classroom, t, language }: LoadedProps) {
         language={language}
         classesHref={`/${language}/teacher/classroom`}
         startHref={teacherHostHref(language, { classroomId: classroom.id })}
-        resultsHref={`/${language}/teacher/classroom/${classroom.id}/analytics`}
+        resultsHref={teacherResultsHref(language, classroom.id)}
         libraryHref={`/${language}/teacher/curriculum`}
         roster={<HomeRosterFold rows={roster.rows} failed={roster.failed} filterable language={language} nowMs={nowMs} t={t} />}
         lists={lists}

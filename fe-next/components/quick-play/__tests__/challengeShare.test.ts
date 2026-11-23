@@ -89,6 +89,19 @@ describe('shareQuickResult', () => {
     expect(trackShareCompleted).toHaveBeenCalledWith('web_share_api', { surface: 'quick_results', mode: 'word-hunt' });
   });
 
+  it('Given a sender name, When sharing, Then it rides the URL so the recipient sees who challenged them', async () => {
+    const out = await shareQuickResult({ result, locale: 'en', t, isGuest: true, dayStreak: 0, senderName: 'Maya' });
+    expect(out).toBe('shared');
+    const url = shareMock.mock.calls[0][0].url as string;
+    expect(url).toContain('cname=Maya');
+  });
+
+  it('Given no sender name, When sharing, Then the URL carries no cname param', async () => {
+    await shareQuickResult({ result, locale: 'en', t, isGuest: true, dayStreak: 0 });
+    const url = shareMock.mock.calls[0][0].url as string;
+    expect(url).not.toContain('cname=');
+  });
+
   it('Given the challenge row fails, When sharing, Then it still shares the result link instead of doing nothing', async () => {
     fetchMock.mockResolvedValue({ ok: false, status: 500, json: async () => ({}) });
     const out = await shareQuickResult({ result, locale: 'en', t, isGuest: false, dayStreak: 0 });

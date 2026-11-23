@@ -51,6 +51,7 @@ import { MissGapStudentActions } from '@/components/education/missGap/MissGapStu
 import { MissGapTurnInActions } from '@/components/education/missGap/MissGapTurnInActions';
 import { MissGapTakeHomeDisclosure } from '@/components/education/missGap/MissGapTakeHomeDisclosure';
 import { useMissGapProgress } from '@/components/education/missGap/useMissGapProgress';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface MissGapAsyncAssignmentProps {
   payload: MissGapAssignmentPayload;
@@ -229,7 +230,7 @@ export function MissGapAsyncAssignment({
         <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">
           {isTeacher
             ? t('education.results.assignMissGapAsyncHeading')
-            : t('education.homework.studentTitle', { count: words.length })}
+            : t(pluralKeyOf('education.homework.studentTitle', words.length, language), { count: words.length })}
         </h1>
         {isTeacher ? (
           <p className="text-neo-cream font-neo-body text-sm mt-3">

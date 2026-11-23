@@ -98,7 +98,7 @@ describe('ClassroomGameLobby — the lesson the teacher actually assigned', () =
     // 3 words in the lesson. Reporting 2 is the "10 words became 9" bug.
     await waitFor(() => {
       expect(
-        screen.getByText('education.classroomGame.words|{"count":3}')
+        screen.getByText('education.classroomGame.words_other|{"count":3}')
       ).toBeInTheDocument();
     });
   });

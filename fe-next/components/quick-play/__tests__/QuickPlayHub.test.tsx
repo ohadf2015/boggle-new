@@ -57,12 +57,16 @@ vi.mock('../adapters/QuickModeAdapter', () => ({
   },
 }));
 
+const resultsSpy = vi.hoisted(() => ({ rival: undefined as unknown }));
 vi.mock('../QuickPlayResults', () => ({
-  QuickPlayResults: ({ onNextRound }: any) => (
+  QuickPlayResults: ({ onNextRound, rival }: any) => {
+    resultsSpy.rival = rival;
+    return (
     <div data-testid="mock-results">
       <button data-testid="mock-next" onClick={() => onNextRound('random')}>next</button>
     </div>
-  ),
+    );
+  },
 }));
 
 import posthog from '@/lib/analytics/lazyPosthog';
@@ -223,6 +227,46 @@ describe('QuickPlayHub', () => {
     const roundCalls = fetchMock.mock.calls.filter((c) => String(c[0]).includes('/round'));
     expect(roundCalls).toHaveLength(1);
     expect(JSON.parse(roundCalls[0][1].body as string)).toMatchObject({ mode: 'classic', seed: 'shared-seed' });
+  });
+
+  it('challenge deep link carries the challenger id to results so the add-friend moment can render', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/challenge?id=ch-9')) {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({
+            id: 'ch-9', mode: 'classic', seed: 'shared-seed',
+            challenger_id: 'u-maya', challengerName: 'Maya', challenger_score_pct: 68,
+          }),
+        });
+      }
+      if (String(url).includes('/round')) {
+        return Promise.resolve({ ok: true, json: async () => ({ ...roundPayload, mode: 'classic', seed: 'shared-seed' }) });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub challengeId="ch-9" startMode="blast" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => screen.getByTestId('mock-results'));
+    const rival = resultsSpy.rival as { type?: string; userId?: string; name?: string; avatarUserId?: string } | null;
+    expect(rival).toMatchObject({ type: 'challenge', userId: 'u-maya', name: 'Maya', avatarUserId: 'u-maya' });
+  });
+
+  it('a guest-seeded challenge link has no challenger id, so no add-friend id is invented', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return Promise.resolve({ ok: true, json: async () => ({ ...roundPayload, mode: 'classic', seed: 'shared-seed' }) });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub seeded={{ mode: 'classic', seed: 'shared-seed', score: 90, scorePct: 40, name: 'Maya' }} />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => screen.getByTestId('mock-results'));
+    const rival = resultsSpy.rival as { type?: string; userId?: string } | null;
+    expect(rival?.type).toBe('challenge');
+    expect(rival?.userId).toBeUndefined();
   });
 
   it('a challenge link that fails to load still starts a round', async () => {

@@ -35,6 +35,15 @@ describe('ProWelcomeCelebration — paid checkout', () => {
     expect(fireConfetti).toHaveBeenCalled();
   });
 
+  it('points each perk at the page where it lives, and closes the dialog on the way', () => {
+    render(<ProWelcomeCelebration grant={null} paid />);
+    expect(screen.getByRole('link', { name: 'teacher.proWelcome.perk.analytics' })).toHaveAttribute('href', '/en/teacher/reports');
+    expect(screen.getByRole('link', { name: 'teacher.proWelcome.perk.reports' })).toHaveAttribute('href', '/en/teacher/reports');
+    expect(screen.getByRole('link', { name: 'teacher.proWelcome.perk.unlimited' })).toHaveAttribute('href', '/en/teacher');
+    fireEvent.click(screen.getByRole('link', { name: 'teacher.proWelcome.perk.reports' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('does not write the gift seen-marker for a paid celebration', () => {
     render(<ProWelcomeCelebration grant={null} paid />);
     // The marker write is POST /api/subscription/pro-welcome-seen. A paid

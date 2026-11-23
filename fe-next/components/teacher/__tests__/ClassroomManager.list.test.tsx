@@ -149,7 +149,7 @@ describe('ClassroomManager — class list', () => {
       );
       expect(screen.getByTestId('classroom-card-report')).toHaveAttribute(
         'href',
-        '/en/teacher/classroom/cls-1/analytics',
+        '/en/teacher/reports?classroomId=cls-1',
       );
     });
 

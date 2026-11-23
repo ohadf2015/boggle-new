@@ -49,7 +49,7 @@ import {
  * a feature in app/[locale]/teacher/upgrade/PageClient.tsx unless it appears here.
  *
  * Current enforcement:
- * - `analytics`: /teacher/classroom/[id]/analytics (per-classroom progress dashboard)
+ * - `analytics`: the per-classroom report in /teacher/reports?classroomId=…
  * - `reports`: /teacher/reports (printable class reports + post-game details)
  * - `pressureDials`: the lobby's calm-mode dials (leaderboard / timer / speed-scoring
  *   per launch). A free teacher keeps the default hyped game-show; Pro unlocks

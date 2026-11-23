@@ -16,6 +16,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
   subscriptionRowIsPastDue: (...args: unknown[]) => subscriptionRowIsPastDue(...args),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
 vi.mock('@/lib/education/dunning', () => ({
@@ -30,6 +31,7 @@ vi.mock('@/backend/utils/educationTelemetry', () => ({
 
 // static import is safe: vitest hoists the vi.mock calls above it
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO_PRODUCT_ID = 'prod-pro-1'
 
@@ -56,6 +58,7 @@ const subscriptionData = {
 
 describe('polar webhook', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     upsertSubscription.mockClear()
     grantProFromOrder.mockClear()
     grantProFromCheckout.mockClear()

@@ -40,6 +40,7 @@ describe('eduStudent translations', () => {
       const broken = enKeys.filter((key) => {
         const want = (String(resolve(en as unknown as Tree, key)).match(/\{\w+\}/g) ?? []).sort();
         const got = (String(resolve(bundle, key)).match(/\{\w+\}/g) ?? []).sort();
+        if (key.endsWith('_one') && got.length === 0) return false;
         return want.join() !== got.join();
       });
       expect(broken).toEqual([]);

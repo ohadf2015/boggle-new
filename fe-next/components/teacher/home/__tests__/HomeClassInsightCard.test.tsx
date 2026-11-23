@@ -25,7 +25,7 @@ describe('HomeClassInsightCard', () => {
     const card = screen.getByTestId('home-class-insight');
     expect(card).toHaveTextContent('5B');
     const link = screen.getByTestId('home-class-insight-cta');
-    expect(link).toHaveAttribute('href', '/he/teacher/classroom/c1/analytics');
+    expect(link).toHaveAttribute('href', '/he/teacher/reports?classroomId=c1');
     fireEvent.click(link);
     expect(onClick).toHaveBeenCalled();
     expect(hookArgs.calls[0].slice(1)).toEqual(['home_class_insight', 'he', true]);

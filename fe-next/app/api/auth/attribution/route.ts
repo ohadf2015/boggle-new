@@ -11,7 +11,7 @@ import {
   metaString,
   type SignupUser,
 } from '@/lib/auth/signupAttributionApply';
-import { normalizeCountry, normalizeLanguage } from '@/lib/auth/emailSignupMeta';
+import { normalizeCountry, normalizeGrDistinctId, normalizeLanguage } from '@/lib/auth/emailSignupMeta';
 import { canonicalSignupSurface } from '@/lib/auth/signupSurface';
 
 /**
@@ -49,6 +49,7 @@ const bodySchema = z.object({
   signup_surface: z.string().max(100).nullish(),
   language: z.string().max(16).nullish(),
   country_code: z.string().max(8).nullish(),
+  gr_distinct_id: z.string().max(100).nullish(),
 });
 
 type AdminWithAuth = {
@@ -174,6 +175,8 @@ export async function POST(request: Request) {
           utm_campaign: decision.update.utm_campaign ?? (profile.utm_campaign as string | null) ?? null,
           referrer_domain: decision.update.referrer ?? (profile.referrer as string | null) ?? null,
           is_test_account: profile.is_test_account === true,
+          // Growth Radar keys this signup on the browser's tracker id so it joins that visitor's pageviews.
+          gr_distinct_id: normalizeGrDistinctId(metaString(meta, 'gr_distinct_id')) ?? normalizeGrDistinctId(body.gr_distinct_id),
         },
       },
     ]);

@@ -97,7 +97,7 @@ describe('ProjectorLobby — the session it is projecting', () => {
     const session = screen.getByTestId('projector-session');
     expect(session).toHaveTextContent('7B English');
     expect(session).toHaveTextContent('Weather');
-    expect(session).toHaveTextContent('education.classroomGame.words:{"count":9}');
+    expect(session).toHaveTextContent('education.classroomGame.words_other:{"count":9}');
   });
 
   it('falls back to the generic session label when the class has no name', () => {

@@ -91,7 +91,7 @@ function IdFriendAction({ userId, name, surface, className }: FriendQuickActionP
       const ok = relation === 'incoming' ? await ctx.acceptFrom(userId, surface) : await ctx.sendTo(userId, surface);
       if (ok) {
         toast.success(
-          (relation === 'incoming' ? t('friendSocial.nowFriends') : t('friendSocial.requestSentTo')).replace('{name}', name),
+          (relation === 'incoming' || ok === 'accepted' ? t('friendSocial.nowFriends') : t('friendSocial.requestSentTo')).replace('{name}', name),
         );
       } else {
         toast.error(t('friendSocial.requestFailed'));
@@ -169,7 +169,7 @@ function BoardKeyFriendAction({ boardKey, name, surface, className, isFriendHint
       }
       if (relation === 'none' || relation === 'incoming') {
         const ok = relation === 'incoming' ? await ctx.acceptFrom(id, surface) : await ctx.sendTo(id, surface);
-        if (ok) toast.success((relation === 'incoming' ? t('friendSocial.nowFriends') : t('friendSocial.requestSentTo')).replace('{name}', name));
+        if (ok) toast.success((relation === 'incoming' || ok === 'accepted' ? t('friendSocial.nowFriends') : t('friendSocial.requestSentTo')).replace('{name}', name));
         else toast.error(t('friendSocial.requestFailed'));
       }
       setResolvedId(id);

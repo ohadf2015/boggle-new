@@ -5,6 +5,7 @@ import { ClassReportHeader } from '../ClassReportHeader';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string, params?: Record<string, unknown>) => (params ? `${key}:${JSON.stringify(params)}` : key),
+    language: 'en',
     dir: 'ltr',
   }),
 }));
@@ -35,11 +36,17 @@ describe('ClassReportHeader', () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
+  it('Given no link, Then the header offers only the way back', () => {
+    const { link: _link, ...rest } = props;
+    render(<ClassReportHeader {...rest} />);
+    expect(screen.queryAllByRole('link')).toHaveLength(0);
+  });
+
   it('states the class size as a plain fact when it is known', () => {
     const { rerender } = render(<ClassReportHeader {...props} memberCount={12} />);
-    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members:{"count":12}');
+    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members_other:{"count":12}');
     rerender(<ClassReportHeader {...props} memberCount={1} />);
-    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.member');
+    expect(screen.getByTestId('class-report-size')).toHaveTextContent('teacher.classroom.members_one:{"count":1}');
     rerender(<ClassReportHeader {...props} />);
     expect(screen.queryByTestId('class-report-size')).toBeNull();
   });

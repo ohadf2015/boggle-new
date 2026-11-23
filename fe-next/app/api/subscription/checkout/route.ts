@@ -96,6 +96,28 @@ async function polarTrialBlocked(userId: string): Promise<boolean> {
   }
 }
 
+const LIVE_PROVIDER_STATUSES = new Set(['trialing', 'active', 'past_due'])
+
+// A second checkout on a live Polar subscription opens a second subscription: the teacher would be billed twice.
+async function liveProviderSubscription(userId: string): Promise<'live' | 'none' | 'error'> {
+  const admin = createAdminClient()
+  if (!admin) return 'none'
+  try {
+    const { data, error } = await admin
+      .from('subscriptions')
+      .select('status,source')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error) return 'error'
+    const row = data as { status?: string; source?: string | null } | null
+    if (!row || row.source === 'admin_grant') return 'none'
+    return LIVE_PROVIDER_STATUSES.has(String(row.status)) ? 'live' : 'none'
+  } catch (err) {
+    logger.warn('Live subscription lookup failed:', err)
+    return 'error'
+  }
+}
+
 /**
  * `{ trial: true }` starts the 14-day Teacher Pro trial. Empty body, malformed
  * JSON, and any other value stay on the paid checkout — older clients post
@@ -196,6 +218,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     identity = resolveCheckoutAnalyticsIdentity({ userId: user.id, cookieHeader: request.headers.get('cookie') });
+
+    const live = await liveProviderSubscription(user.id);
+    if (live === 'live') return NextResponse.json({ error: 'already_subscribed' }, { status: 409 });
+    if (live === 'error') return NextResponse.json({ error: 'plan_lookup_failed' }, { status: 503 });
 
     const body = await parseCheckoutBody(request);
     // One trial: inside the free access window the Polar trial runs only to its end,

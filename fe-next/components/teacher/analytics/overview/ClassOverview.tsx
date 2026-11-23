@@ -16,6 +16,7 @@ import type { ResultsSurface } from '@/components/education/results/trackResults
 import { useProClassAnalytics } from '../useProClassAnalytics';
 import { ATTENTION, STATUSES, pct } from './overviewModel';
 import { ActivityBars, PANEL, PANEL_TITLE, StatusLine, StatusStrip, StudentRow } from './overviewParts';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 const ATTENTION_SHOWN = 6;
 const STARS_SHOWN = 3;
@@ -96,7 +97,12 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
 
   return (
     <div className="space-y-3">
-      {mostlyZero ? <StatusLine counts={counts} active={filter} onToggle={onToggle} /> : <StatusStrip counts={counts} active={filter} onToggle={onToggle} />}
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          {mostlyZero ? <StatusLine counts={counts} active={filter} onToggle={onToggle} /> : <StatusStrip counts={counts} active={filter} onToggle={onToggle} />}
+        </div>
+        <ProPoweredChip className="mt-1 shrink-0" />
+      </div>
 
       <div data-testid="overview-focus" className={`${REPORT_HERO_PANEL} grid gap-6 lg:grid-cols-2 [&>:only-child]:lg:col-span-2`}>
         {attention.length > 0 ? (

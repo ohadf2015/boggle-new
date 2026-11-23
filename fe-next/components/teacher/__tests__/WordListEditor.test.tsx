@@ -48,6 +48,15 @@ describe('WordListEditor', () => {
   });
 
   describe('rendering', () => {
+    it('Given three words or one, Then the label counts them once, in the right plural form', () => {
+      const { unmount } = renderEditor();
+      expect(screen.getByText('3 words')).toBeInTheDocument();
+      expect(screen.queryByText(/\(3\)/)).toBeNull();
+      unmount();
+      renderEditor({ words: [sampleWords[0]] });
+      expect(screen.getByText('1 word')).toBeInTheDocument();
+    });
+
     it('should render all words', () => {
       renderEditor();
       expect(screen.getByText('apple')).toBeInTheDocument();

@@ -42,6 +42,13 @@ describe('POST /api/friends/action', () => {
     expect(run).toHaveBeenCalledWith('me', 'accept', ID);
   });
 
+  it('Given a mutual add, Then the autoAccepted flag reaches the client', async () => {
+    run.mockResolvedValue({ success: true, autoAccepted: true });
+    const res = await post({ action: 'request', target: ID });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ success: true, autoAccepted: true });
+  });
+
   it('Given a policy rejection, Then 403 with the code', async () => {
     run.mockResolvedValue({ success: false, code: 'SOCIAL_RESTRICTED' });
     const res = await post({ action: 'request', target: ID });

@@ -125,6 +125,7 @@ describe('ClassOverview, focused on who needs the teacher and which words', () =
     await screen.findAllByText('Tal');
     expect(screen.queryByTestId('overview-attention')).toBeNull();
     expect(screen.getByText('desk')).toBeInTheDocument();
+    expect(screen.getAllByTestId('pro-powered-chip')).toHaveLength(1);
   });
 
   it('folds the full roster until a teacher asks for it', async () => {

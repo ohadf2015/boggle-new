@@ -9,6 +9,8 @@ import { useVocabularySelection } from '@/hooks/useVocabularySelection';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { cn } from '@/lib/utils';
 import type { Language } from '@/shared/types';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 /**
  * Word item from game results
@@ -75,6 +77,7 @@ export function HostWordSelector({
   allWords,
   t,
 }: HostWordSelectorProps) {
+  const { language: uiLanguage } = useLanguageSafe();
   // Vocabulary selection state and actions
   const { selectedWords, toggleWord, saveAsLesson, isSaving, canSelect } = useVocabularySelection({
     socket,
@@ -211,7 +214,7 @@ export function HostWordSelector({
                 <option value="">{t('teacher.wordSelector.noClassroom')}</option>
                 {classrooms.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.name} ({c.member_count || 0} {t('teacher.classroom.members', { count: c.member_count || 0 })})
+                    {c.name} ({t(pluralKeyOf('teacher.classroom.members', c.member_count || 0, uiLanguage), { count: c.member_count || 0 })})
                   </option>
                 ))}
               </select>

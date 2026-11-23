@@ -20,7 +20,7 @@ function setCtx(relation: FriendRelation, over: Partial<FriendStatusValue> = {})
     canManage: true,
     canMessage: true,
     relationFor: () => relation,
-    sendTo: vi.fn(async () => true),
+    sendTo: vi.fn(async () => 'sent' as const),
     acceptFrom: vi.fn(async () => true),
     ...over,
   };
@@ -52,6 +52,14 @@ describe('FriendQuickAction', () => {
     render(<FriendQuickAction userId="u1" name="Dana" surface="daily_leaderboard" />);
     fireEvent.click(screen.getByTestId('friend-quick-accept'));
     await waitFor(() => expect(ctx.value!.acceptFrom).toHaveBeenCalledWith('u1', 'daily_leaderboard'));
+  });
+
+  it('celebrates an instant friendship when the add auto-completes a mutual request', async () => {
+    const toast = (await import('react-hot-toast')).default;
+    setCtx('none', { sendTo: vi.fn(async () => 'accepted' as const) });
+    render(<FriendQuickAction userId="u1" name="Dana" surface="quick_challenge_results" />);
+    fireEvent.click(screen.getByTestId('friend-quick-add'));
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('friendSocial.nowFriends'));
   });
 
   it('links a friend straight to the chat thread', () => {

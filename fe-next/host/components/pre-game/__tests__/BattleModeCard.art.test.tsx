@@ -17,6 +17,18 @@ describe('BattleModeCard — illustrated mode tiles', () => {
     }
   });
 
+  it('on a phone the sticker art is capped short so both tile rows fit above the START bar', () => {
+    render(<BattleModeCard fill selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
+    const art = within(screen.getByTestId('game-mode-blast')).getByTestId('mode-art-blast');
+    expect(art.getAttribute('class')).toMatch(/max-\[719px\]:max-h-\[40px\]/);
+  });
+
+  it('a filled card never stretches its tile rows apart (tablet showed a tall gap between rows)', () => {
+    render(<BattleModeCard fill selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
+    const grid = screen.getByTestId('game-mode-classic').parentElement!;
+    expect(grid.className).not.toMatch(/auto-rows-fr/);
+  });
+
   it('the tile name is still the accessible label (art adds no text)', () => {
     render(<BattleModeCard selectedGameMode="classic" setSelectedGameMode={vi.fn()} t={t} />);
     expect(screen.getByRole('button', { name: 'gameModes.blast.name' })).toHaveAttribute('aria-pressed', 'false');

@@ -10,6 +10,7 @@ import { ClassStreakLine } from '@/components/teacher/hq/ClassStreakLine';
 import { HqProjectorSheet } from '@/components/teacher/hq/HqProjectorSheet';
 import type { HqClassroom } from '@/components/teacher/hq/GetStudentsInCard';
 import { OUTLINE_BUTTON, PANEL, QUIET_LINK, SKELETON } from './homeStyles';
+import { teacherResultsHref } from '@/lib/education/teacherResultsHref';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -169,7 +170,7 @@ export function HomeClassList({
                 )}
                 <span className="flex min-w-0 flex-col">
                   <Link
-                    href={`/${language}/teacher/classroom/${c.id}/analytics`}
+                    href={teacherResultsHref(language, c.id)}
                     dir="auto"
                     className="truncate rounded-sm text-start font-neo-body text-base font-bold text-neo-cream hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
                   >

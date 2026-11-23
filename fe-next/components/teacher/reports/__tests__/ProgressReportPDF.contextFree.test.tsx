@@ -99,7 +99,7 @@ describe('ProgressReportPDF — rendered outside the app tree', () => {
     const text = renderText(STUDENT);
     expect(text).toContain('teacher.reports.mastery.mastered');
     expect(text).toContain('teacher.reports.mastery.practicing');
-    expect(text).toContain('teacher.reports.streakDays{"count":3}');
+    expect(text).toContain('teacher.reports.streakDays_other{"count":3}');
     expect(text).toContain('teacher.reports.practiceDuration{"hours":1,"minutes":5}');
   });
 
@@ -118,7 +118,7 @@ describe('ProgressReportPDF — rendered outside the app tree', () => {
     expect(text).not.toMatch(/\d+ words/);
     expect(text).not.toContain('Teacher: ');
     expect(text).toContain('teacher.reports.teacherLine{"name":"Ms Plant"}');
-    expect(text).toContain('education.classroomGame.words{"count":21}');
+    expect(text).toContain('education.classroomGame.words_other{"count":21}');
   });
 
   it('prints the students who need attention with a translated issue', () => {
