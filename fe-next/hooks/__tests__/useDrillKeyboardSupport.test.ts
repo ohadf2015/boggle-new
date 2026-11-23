@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useDrillKeyboardSupport Hook Tests
  *

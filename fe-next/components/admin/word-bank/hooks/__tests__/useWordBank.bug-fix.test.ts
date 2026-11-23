@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Bug Fix Test: Word Bank Flickering and Rate Limit Issues
  *

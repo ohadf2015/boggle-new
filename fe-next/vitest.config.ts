@@ -2,6 +2,43 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+const INCLUDE = [
+  'components/**/*.test.{ts,tsx}',
+  'hooks/**/*.test.{ts,tsx}',
+  'contexts/**/*.test.{ts,tsx}',
+  'utils/**/*.test.{ts,tsx}',
+  'app/**/*.test.{ts,tsx}',
+  'host/**/*.test.{ts,tsx}',
+  'player/**/*.test.{ts,tsx}',
+  'types/**/*.test.{ts,tsx}',
+  'lib/**/*.test.{ts,tsx}',
+  'shared/**/*.test.{ts,tsx}',
+  'stores/**/*.test.{ts,tsx}',
+  'server/**/*.test.{ts,tsx}',
+  'scripts/**/*.test.{ts,tsx}',
+  '__tests__/**/*.test.{ts,tsx}',
+];
+
+// A happy-dom environment costs ~0.3s per file, so tests that don't render run in node.
+// A file under these globs that needs a DOM starts with `// @vitest-environment happy-dom`.
+const NODE = [
+  'utils/**/*.test.{ts,tsx}',
+  'shared/**/*.test.{ts,tsx}',
+  'lib/**/*.test.{ts,tsx}',
+  'types/**/*.test.{ts,tsx}',
+  'stores/**/*.test.{ts,tsx}',
+  'server/**/*.test.{ts,tsx}',
+  'scripts/**/*.test.{ts,tsx}',
+  'host/**/*.test.{ts,tsx}',
+  'player/**/*.test.{ts,tsx}',
+  '__tests__/**/*.test.{ts,tsx}',
+  'app/api/**/*.test.{ts,tsx}',
+  'components/**/*.test.ts',
+  'hooks/**/*.test.ts',
+  'contexts/**/*.test.ts',
+  'app/**/*.test.ts',
+];
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -31,59 +68,16 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: 'happy-dom',
     setupFiles: ['./vitest.setup.ts'],
-    environmentMatchGlobs: [
-      // Pure logic tests don't need a DOM — run in fast node environment
-      ['utils/**/*.test.{ts,tsx}', 'node'],
-      ['shared/**/*.test.{ts,tsx}', 'node'],
-      ['lib/**/*.test.{ts,tsx}', 'node'],
-      ['types/**/*.test.{ts,tsx}', 'node'],
-      ['stores/**/*.test.{ts,tsx}', 'node'],
-      ['app/api/**/*.test.{ts,tsx}', 'node'],
-      ['app/**/page.test.{ts,tsx}', 'node'],
-      ['components/**/utils/**/*.test.{ts,tsx}', 'node'],
-      // .test.ts files (not .tsx) in components/hooks rarely need DOM
-      ['components/**/*.test.ts', 'node'],
-      ['hooks/**/*.test.ts', 'node'],
-      ['hooks/__tests__/**/*.test.ts', 'node'],
-      ['host/**/*.test.{ts,tsx}', 'node'],
-      ['player/**/*.test.{ts,tsx}', 'node'],
-      ['__tests__/**/*.test.{ts,tsx}', 'node'],
-      // .tsx files that don't use DOM APIs — verified by grep
-      ['contexts/**/*.test.tsx', 'node'],
-      ['components/game/__tests__/keyboardTrailsUtils.timing.test.tsx', 'node'],
-      ['components/game/__tests__/KeyboardTrailsDisplay.test.tsx', 'node'],
-      ['components/daily/__tests__/bug-fixes.test.tsx', 'node'],
-      ['components/daily/__tests__/DailyChallenge.test.tsx', 'node'],
-      ['components/__tests__/BugFixes.test.tsx', 'node'],
-      ['components/__tests__/NeoToast.contrast.test.tsx', 'node'],
-      ['components/__tests__/SinglePlayerResults.test.tsx', 'node'],
-      ['components/__tests__/ProfileCustomizationModal.test.tsx', 'node'],
-      ['components/__tests__/PlayerView.navigation.test.tsx', 'node'],
-      ['components/__tests__/ResultsPage.test.tsx', 'node'],
-      ['components/__tests__/Header.giftNavigation.test.tsx', 'node'],
-      ['components/__tests__/ExitConfirmation.allGameModes.test.tsx', 'node'],
-      ['components/custom-puzzle/__tests__/CustomPuzzleCreator.test.tsx', 'node'],
-      ['components/student/__tests__/LessonPractice.hebrewNormalization.test.tsx', 'node'],
-      ['components/admin/wikipedia-words/__tests__/adminDashboard.integration.test.tsx', 'node'],
-      ['app/components/__tests__/ProfileCustomizationWrapper.test.tsx', 'node'],
-    ],
-    include: [
-      'components/**/*.test.{ts,tsx}',
-      'hooks/**/*.test.{ts,tsx}',
-      'contexts/**/*.test.{ts,tsx}',
-      'utils/**/*.test.{ts,tsx}',
-      'app/**/*.test.{ts,tsx}',
-      'host/**/*.test.{ts,tsx}',
-      'player/**/*.test.{ts,tsx}',
-      'types/**/*.test.{ts,tsx}',
-      'lib/**/*.test.{ts,tsx}',
-      'shared/**/*.test.{ts,tsx}',
-      'stores/**/*.test.{ts,tsx}',
-      'server/**/*.test.{ts,tsx}',
-      'scripts/**/*.test.{ts,tsx}',
-      '__tests__/**/*.test.{ts,tsx}',
+    projects: [
+      {
+        extends: true,
+        test: { name: 'node', environment: 'node', include: NODE },
+      },
+      {
+        extends: true,
+        test: { name: 'dom', environment: 'happy-dom', include: INCLUDE, exclude: NODE },
+      },
     ],
     exclude: [
       'node_modules',
@@ -97,26 +91,6 @@ export default defineConfig({
       // with "Cannot find package '@testing-library/react'" on files that are
       // fine here. Tests in a worktree belong to that worktree's own run.
       '**/.claude/worktrees/**',
-      '**/LandingView.botLaunch.test.tsx',
-      '**/MusicContext.duplicateProvider.test.tsx',
-      '**/MusicContext.ios.test.tsx',
-      '**/LandingView.spacing.test.tsx',
-      '**/useUnclaimedGifts.bug.test.tsx',
-      '**/CircularTimer.test.tsx',
-      '**/reengagementEmail.test.ts',
-      '**/ScoreReadout.test.tsx',
-      '**/growthTracking.referralClick.test.ts',
-      '**/blastLockedRemoval.test.ts',
-      '**/useAdventureInventory.test.ts',
-      '**/CookieConsent.mascot.test.tsx',
-      '**/gridAriaLabel.i18n.test.ts',
-      '**/loading-layout.test.tsx',
-      '**/chain-builder.test.ts',
-      '**/CrazyGamesSDK.authOutcome.test.tsx',
-      '**/CrazyGamesSDK.embedSticky.test.tsx',
-      '**/ChallengeResults.test.tsx',
-      '**/BlastFxOverlay.test.tsx',
-      '**/BoardClearedCard.test.tsx',
     ],
     testTimeout: 30000,
     pool: 'forks',

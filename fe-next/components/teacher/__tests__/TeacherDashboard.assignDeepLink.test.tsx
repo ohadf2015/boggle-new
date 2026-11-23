@@ -37,7 +37,6 @@ vi.mock('../assignments', () => ({
     isOpen ? <div data-testid="assignment-creator" data-classroom={classroomId} /> : null,
 }));
 vi.mock('../ProGate', () => ({ ProGate: ({ children }: { children: React.ReactNode }) => children }));
-vi.mock('../TeacherPlanBadge', () => ({ TeacherPlanBadge: () => null }));
 vi.mock('../ProWelcomeCelebration', () => ({ ProWelcomeCelebration: () => null }));
 vi.mock('../LessonBuilder', () => ({
   __esModule: true,

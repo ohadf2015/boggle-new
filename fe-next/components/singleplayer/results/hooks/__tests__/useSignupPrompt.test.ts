@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSignupPrompt tests — gate semantics for the prompt variants.
  *

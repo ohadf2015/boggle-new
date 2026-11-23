@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 /**
  * Test: GlobalBottomNav z-index must be higher than other fixed elements

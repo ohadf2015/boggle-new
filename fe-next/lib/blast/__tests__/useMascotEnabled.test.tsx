@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useMascotEnabled — TDD for the localStorage-backed mascot mute toggle.
  * Default ON. Persisted under `boggle_blast_mascot_enabled`.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The quiet zone is the one rule every auto-opening prompt obeys. These tests
  * pin the three things the round-end bug needed: it is TRUE while a surface

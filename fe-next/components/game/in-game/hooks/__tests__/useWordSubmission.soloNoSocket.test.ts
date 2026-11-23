@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Quick Play runs the MULTIPLAYER board (InGameScreen) solo with `socket={null}`
  * — see components/quick-play/adapters/QuickClassicBoard.tsx. The local commit

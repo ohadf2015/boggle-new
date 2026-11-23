@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Blast Badge Store — zustand persist layer.
  *

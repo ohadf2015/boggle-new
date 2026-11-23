@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The client half of the early-join fix: a student told CLASSROOM_NOT_OPEN is
  * held on "waiting for your teacher" and walks in the moment the room opens —

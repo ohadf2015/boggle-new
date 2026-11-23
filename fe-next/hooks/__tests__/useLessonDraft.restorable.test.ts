@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The "Resume Draft?" interstitial must be a mount-time question, not a
  * running state.

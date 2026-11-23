@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useExperiment — typed wrapper around usePostHogFlag.
  *

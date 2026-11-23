@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Today's terminal Word Bridge daily result, persisted so a revisit lands on
  * the results screen instead of restarting the day from scratch.

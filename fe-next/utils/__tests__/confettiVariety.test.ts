@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import type { Options } from 'canvas-confetti';
 
 const fired: Options[] = [];

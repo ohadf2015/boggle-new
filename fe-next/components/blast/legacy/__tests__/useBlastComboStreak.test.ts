@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastComboStreak - Tests for combo streak hook.
  * TDD: written before implementation (RED phase).

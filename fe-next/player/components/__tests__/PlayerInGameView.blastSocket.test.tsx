@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * Test: PlayerInGameView wires onWordWithComboType to socket emit in blast mode

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastMultiplayerBridge Tests
  * Converts Zustand multiplayer state into BlastGame-compatible props.

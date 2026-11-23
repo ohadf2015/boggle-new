@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 /**
  * Test: Deep Link OAuth Callback Handler

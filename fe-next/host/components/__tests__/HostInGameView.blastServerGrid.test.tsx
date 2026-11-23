@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * Regression: HostInGameView must thread the server's authoritative Blast grid

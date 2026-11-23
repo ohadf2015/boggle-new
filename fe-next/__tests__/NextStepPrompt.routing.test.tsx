@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for Word Hunt minimum/maximum word length enforcement
  *

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 import { checkWordIntegration, checkWordIntegrationAsync, useWordIntegration } from '../useWordIntegration';
 import { renderHook } from '@testing-library/react';

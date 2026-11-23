@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Activation must not burn the once-per-device slot while PostHog will drop
  * the capture (game routes defer init; the queue flushes into opt-out).

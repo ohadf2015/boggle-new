@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 /**
  * Test: TV Tutorial shows on initial mount when TV mode is enabled

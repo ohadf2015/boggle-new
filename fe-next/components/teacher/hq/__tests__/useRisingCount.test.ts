@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The joined count beside the roster seats must never read LOWER than the
  * seats: a count-up restarting from 0 once showed "1 joined" beside three

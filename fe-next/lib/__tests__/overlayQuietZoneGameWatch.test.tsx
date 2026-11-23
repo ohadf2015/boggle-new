@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The race this closes: a round ends, an auto-opening prompt starts its 800ms
  * timer, and the recap that would claim the quiet zone is still a `next/dynamic`

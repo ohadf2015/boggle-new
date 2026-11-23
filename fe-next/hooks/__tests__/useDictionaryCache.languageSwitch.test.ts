@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test for language-switch race condition in useDictionaryCache.
  *

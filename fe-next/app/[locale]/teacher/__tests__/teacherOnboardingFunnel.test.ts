@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Teacher onboarding funnel — pins the exact PostHog event names the
  * 65-teacher re-invite funnel is built on, plus the call sites that emit them.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Word Tower — upgrade store glue (Phase 5). Verifies buy() reads the live coin
  * balance, spends through coinManager, and commits the level only on a real spend.

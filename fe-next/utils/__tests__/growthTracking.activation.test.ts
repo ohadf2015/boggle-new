@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * markFirstGameActivation — extracted helper for activation funnel.
  *

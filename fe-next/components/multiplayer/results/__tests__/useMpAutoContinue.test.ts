@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * exp-mp-auto-continue-v1: the results screen's existing auto-advance ring,
  * extended. control keeps today's behaviour exactly; auto-continue also rolls

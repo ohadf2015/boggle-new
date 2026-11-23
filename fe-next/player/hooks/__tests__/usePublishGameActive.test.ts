@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The page reads "is a round being played?" from the STORE (`useGameActive`) to
  * hide the classroom 'Game Settings' banner. PlayerView kept its own local

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Several consumers mount in the same tick (plan badge, ProGate 'analytics', ProGate
  * 'reports') and share one in-flight status request. A real Response body can be read

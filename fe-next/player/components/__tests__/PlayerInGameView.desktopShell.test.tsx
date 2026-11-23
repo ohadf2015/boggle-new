@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * Test: PlayerInGameView wraps the mode canvas in the desktop shell when

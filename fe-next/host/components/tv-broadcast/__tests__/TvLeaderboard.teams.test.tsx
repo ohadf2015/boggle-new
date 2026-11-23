@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Team colours on the live leaderboard.
  *

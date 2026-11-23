@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * `session_start` was a GrowthEvent union member with ZERO call sites
  * anywhere in the codebase (2026-08-01 telemetry coverage audit — 0 live

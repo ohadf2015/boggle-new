@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Unplugged reteach printable pack — cover QR deep-link + practice pages.
  */

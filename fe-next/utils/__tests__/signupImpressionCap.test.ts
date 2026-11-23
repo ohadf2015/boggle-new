@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * signupImpressionCap — the results_inline daily cap (t_561836a1).
  * At most 3 renders per guest per LOCAL day; the date-stamped key resets on

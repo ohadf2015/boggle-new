@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { useHoldToClear, CLEAR_HOLD_MS } from '../useHoldToClear';

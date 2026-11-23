@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { performMobileOAuth } from '../mobileOAuth';
 import { supabase } from '@/lib/supabase';
 

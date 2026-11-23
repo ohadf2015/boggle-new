@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { EDU_FIT_SCREEN, fitScale, useFitToViewport } from '../fitToViewport';

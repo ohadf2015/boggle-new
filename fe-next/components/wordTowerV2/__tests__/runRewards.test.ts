@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { useCallback } from 'react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';

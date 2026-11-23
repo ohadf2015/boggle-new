@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSafeSocketEvent / useSafeSocketEvents / useSocketEmit Tests
  *

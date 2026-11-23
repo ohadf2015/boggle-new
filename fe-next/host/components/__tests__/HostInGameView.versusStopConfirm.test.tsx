@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * HostInGameView — the gridless beta modes (word-tower, crossword) must still
  * mount the stop-game confirmation their exit button opens.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { renderHook, act } from '@testing-library/react';
 import { useBlitzGame } from '../hooks/useBlitzGame';
 import type { VocabularyWord } from '@/lib/supabase/education/types';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: wordHuntEliminatedPlayers in Zustand store
  *

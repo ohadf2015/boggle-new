@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useBoardCreator hook
  * TDD: RED phase — all tests written before implementation

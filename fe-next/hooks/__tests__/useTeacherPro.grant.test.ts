@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { renderHook, waitFor } from '@testing-library/react';
 import { useTeacherPro } from '../useTeacherPro';
 

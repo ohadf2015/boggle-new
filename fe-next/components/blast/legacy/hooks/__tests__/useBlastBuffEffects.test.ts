@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastBuffEffects — tests that the rewarded-ad pregame buff actually
  * affects gameplay (not just labels).

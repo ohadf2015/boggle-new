@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The projector's state sentence.
  *

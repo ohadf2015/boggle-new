@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Teacher onboarding gate — open/complete must land in PostHog under names a
  * funnel can query, with the ids that stitch a teacher to a class.

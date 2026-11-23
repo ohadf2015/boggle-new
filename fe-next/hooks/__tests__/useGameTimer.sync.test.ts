@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useGameTimer synchronization test
  * Tests multiplayer timer synchronization scenarios

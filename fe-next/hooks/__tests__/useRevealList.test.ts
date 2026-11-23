@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useRevealList — top-N reveal/collapse logic for results word lists.
  *

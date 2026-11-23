@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * CrazyGames "multiplayer-only" gating tests.
  *

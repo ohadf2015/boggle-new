@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The classroom teacher's projector, at the end of a round.
  *

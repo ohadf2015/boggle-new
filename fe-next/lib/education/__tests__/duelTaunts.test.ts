@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Taunt sticker catalogue + the device-local memory of what you already sent,
  * so the turn card can keep showing your sticker after a reload.

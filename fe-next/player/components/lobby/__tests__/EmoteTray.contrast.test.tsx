@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The emote trigger measured 1.07:1 against the lobby card it sits on.
  *

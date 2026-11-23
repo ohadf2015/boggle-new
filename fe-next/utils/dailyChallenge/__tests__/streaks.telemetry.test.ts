@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Streak Telemetry Tests
  *

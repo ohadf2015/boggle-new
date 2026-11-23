@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useModeBed } from '../useModeBed';

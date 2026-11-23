@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useGameStartTelemetry — fires trackGameStart on isGameActive rising edge.
  *

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { FIRST_FLOOR_HINT_MS, useFirstFloorHint } from '../useFirstFloorHint';

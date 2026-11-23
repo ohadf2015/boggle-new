@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSurvivalGameLogic — deferGameOver + restoreLife action
  * Backs the rewarded-ad extra-life flow: while a modal offering an ad is open,

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useAdminAuth hook
  * Verifies JWT token management for admin authentication

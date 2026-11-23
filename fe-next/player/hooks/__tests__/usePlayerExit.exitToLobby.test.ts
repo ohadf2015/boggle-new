@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * usePlayerExit - SPA exit-to-lobby (no hard reload) test

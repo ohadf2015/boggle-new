@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The abandon emit used to reach PostHog only. PostHog is consent-gated, so for
  * most players a mid-game exit left no trace in analytics_events (3 rows in 30d

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The word-in-flight object, exercised for real against Pixi.
  *

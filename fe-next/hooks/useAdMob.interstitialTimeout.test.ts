@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The interstitial safety timeout must bound the WAIT FOR A TERMINAL EVENT, not
  * the user's viewing time.

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { runWhenScrollSettles, SCROLL_QUIET_MS, SCROLL_SETTLE_MAX_MS } from '../runWhenScrollSettles';
 

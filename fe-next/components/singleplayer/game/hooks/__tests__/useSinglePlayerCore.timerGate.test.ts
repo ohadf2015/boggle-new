@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * First-15-seconds fix: the round timer must NOT tick down while the board
  * itself is still loading (grid === null). Today useGameTimer is only gated

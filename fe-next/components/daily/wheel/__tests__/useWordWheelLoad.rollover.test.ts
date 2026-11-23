@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { useWordWheelLoad } from '../useWordWheelLoad';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useStudentArc — loading -> arc | error for one student's cross-session
  * learning arc. Mirrors useWordMasteryTrend.

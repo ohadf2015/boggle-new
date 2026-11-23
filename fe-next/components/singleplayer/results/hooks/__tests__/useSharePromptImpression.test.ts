@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useSharePromptImpression tests — share-prompt-timing A/B exposure telemetry.
  *

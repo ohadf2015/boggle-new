@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * TDD RED: updatePlayer should skip state update when values haven't changed.
  *

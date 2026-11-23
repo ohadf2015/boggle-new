@@ -335,7 +335,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
   createAdaptiveThrottle: () => (fn: any) => fn,
 }));
 
-// AvatarRenderer is pulled in through next/dynamic from Avatar.tsx, which sits under a
+// In a DOM environment, AvatarRenderer is pulled in through next/dynamic from Avatar.tsx, which sits under a
 // long chain of multiplayer shells (MpDesktopShellFrame → … → ClosestRivalsPanel → Avatar).
 // Under load its import can still be resolving when the test environment tears down, and
 // vitest reports that as an UNHANDLED ERROR — zero failing assertions, but a nonzero exit,
@@ -343,7 +343,7 @@ vi.mock('@/hooks/useDevicePerformance', () => ({
 // it once here makes the module cache-hot, so the dynamic import settles on a microtask
 // instead of a file read. The real component still renders — tests that assert on avatar
 // internals (ResultsPodiumMood's [data-mood]) keep working.
-import '@/components/avatar/AvatarRenderer';
+if (isBrowser) await import('@/components/avatar/AvatarRenderer');
 
 // DesktopGameNav requires Navigation/CrazyGames/Veteran providers. Most tests
 // that mount Header don't set those up; stub it out (the real component is

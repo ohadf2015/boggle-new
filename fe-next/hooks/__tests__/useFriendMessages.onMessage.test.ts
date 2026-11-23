@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFriendMessages onMessage callback (N-1 live toast wiring)
  * Verifies: incoming friends:messageReceived invokes onMessage ref-stable callback

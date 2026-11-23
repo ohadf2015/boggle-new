@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useGameMusic earthquake/fire-round music priority on mount
  *

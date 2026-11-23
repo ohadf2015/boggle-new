@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Client half of "keep the class together": when the teacher opens a new game
  * for the class, a student re-joins the new code in place.

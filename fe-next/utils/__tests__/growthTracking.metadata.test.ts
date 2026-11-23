@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Analytics Metadata Enrichment Tests
  *

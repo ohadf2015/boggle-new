@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useAssignments — two instances for one classroom stay in sync.
  * Separate hook instances for one classroom must see a created assignment

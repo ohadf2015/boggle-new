@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { clearStoredProfile, getStoredUsername } from '@/utils/profileStorage';
 import { ensureGuestDisplayName, getGuestName, getGuestStats, saveGuestNameEverywhere } from '@/utils/guestManager';

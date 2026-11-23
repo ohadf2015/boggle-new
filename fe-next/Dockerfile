@@ -110,7 +110,9 @@ ARG BUILD_HEAP_MB=8192
 # builds; without it every deploy compiled cold. Railway requires the
 # s/<service-id>- prefix on cache ids.
 RUN --mount=type=cache,id=s/cc7a91b5-cd7b-43b0-878d-cacf07b369ad-next-cache,target=/app/.next/cache \
-    npm run build --ignore-scripts
+    (du -sh .next/cache/webpack 2>/dev/null || echo "webpack cache: empty") && \
+    npm run build --ignore-scripts && \
+    du -sh .next/cache/webpack
 
 # ── Stage 4: Production image (slim) ─────────────────────────────────
 FROM node:22-alpine AS runner

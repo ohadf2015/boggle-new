@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The quick-launch channel: the dashboard writes one intent, the express lobby
  * reads it once and turns it into a live room.

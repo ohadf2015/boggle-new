@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAchievementUnlock, type UnlockPayload } from '../useAchievementUnlock';

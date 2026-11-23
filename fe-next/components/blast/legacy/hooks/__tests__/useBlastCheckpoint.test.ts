@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastCheckpoint — persists highest wave reached so players can resume
  * instead of grinding from wave 1 every run.

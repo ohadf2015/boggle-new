@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { act, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import type { Socket } from 'socket.io-client';

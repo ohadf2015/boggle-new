@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The receipt is what survives a reload.
  *

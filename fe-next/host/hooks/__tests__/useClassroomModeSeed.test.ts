@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A classroom teacher's lobby is the projector (TvLobbyView → ProjectorLobby):
  * there is no mode picker on it, so the mode the teacher chose in the launch

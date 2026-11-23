@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The recap has to be leaveable without a page reload.
  *

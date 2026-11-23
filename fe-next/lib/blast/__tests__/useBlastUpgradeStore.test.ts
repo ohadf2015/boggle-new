@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useBlastUpgradeStore } from '../useBlastUpgradeStore';
 import { getUpgrade, upgradeCost } from '../blastUpgradeCatalog';

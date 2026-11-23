@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastMascot — TDD for the React hook that wraps the pure mascot reducer.
  * Provides current state + a fire(event) callback. Uses Date.now() internally

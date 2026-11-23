@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useAutoAdvance, AUTO_ADVANCE_CANCEL_KEY } from '../useAutoAdvance';

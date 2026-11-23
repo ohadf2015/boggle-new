@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Device-free printable practice sheet from class missed words (after Live).
  */

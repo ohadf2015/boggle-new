@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { writeRehearseIntent, peekRehearseIntent, claimRehearseIntentForLaunch, type RehearseIntent } from '@/lib/education/rehearsal';

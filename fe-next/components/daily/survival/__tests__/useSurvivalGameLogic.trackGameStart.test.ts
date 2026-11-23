@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Funnel parity: survival must emit `trackGameStart('survival')` once on mount
  * to pair with the existing `trackGameEnd('survival', ...)` emission.

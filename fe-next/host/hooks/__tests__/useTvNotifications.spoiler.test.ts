@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, type Mock, } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTvNotifications } from '../useTvNotifications';

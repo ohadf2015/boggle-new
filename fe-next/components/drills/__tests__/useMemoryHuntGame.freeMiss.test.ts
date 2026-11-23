@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Memory Hunt — "first miss per round is free" forgiveness rule.
  *

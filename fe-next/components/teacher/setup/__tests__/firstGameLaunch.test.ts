@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { STARTER_LESSON_PACKS } from '@/lib/education/starterLessonPacks';
 import { resolveIntentMode } from '@/components/teacher/dashboard/quickLaunchIntent';

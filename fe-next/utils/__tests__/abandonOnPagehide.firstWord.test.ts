@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * `first_word_sec` + `score` on the abandon payload — lets the admin game log
  * tell "left before finding anything" from "played a while, then left".

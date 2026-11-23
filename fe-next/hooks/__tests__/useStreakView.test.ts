@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useStreakView } from '../useStreakView';

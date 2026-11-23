@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Practice mode: when `disableLifeDrain` is true the survival timer must NOT
  * tick lifePoints down. Practice should be a no-pressure exploration so the

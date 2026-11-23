@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFirstWinCelebration Hook Tests
  * Verifies celebration fires once + coin award wired.

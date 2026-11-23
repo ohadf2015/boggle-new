@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * A joiner who reloads mid-round gets `joined` + a `reconnect` startGame before
  * PlayerView's socket listener is mounted, so only the page-level pending path

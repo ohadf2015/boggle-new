@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useShareHandlers - challenge share functionality
  * RED phase: written before implementation of handleChallengeShare

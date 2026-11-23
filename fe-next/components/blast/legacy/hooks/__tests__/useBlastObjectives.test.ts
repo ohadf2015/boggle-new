@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useBlastObjectives - Tests for objective progress tracking hook.
  * Uses fixed objective sets so the tests don't move when wave themes are retuned.

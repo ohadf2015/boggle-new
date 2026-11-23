@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, afterEach } from 'vitest';
 import { buildRejoinPayload } from '@/lib/multiplayer/reloadRejoin';
 

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * `games_completed_count` — the localStorage counter three install/engagement
  * gates read from:

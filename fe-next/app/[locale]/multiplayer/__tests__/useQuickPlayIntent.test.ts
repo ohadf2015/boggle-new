@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * PostHog inbox 01a0ed1f-f749: the in-page Quick Start button created the
  * room with `options.quickPlay`, but the lobby read Quick Play only from

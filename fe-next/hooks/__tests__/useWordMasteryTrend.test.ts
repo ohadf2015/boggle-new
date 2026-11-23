@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useWordMasteryTrend — mirrors useRecentClassroomGames: loading -> data |
  * error, plus `refresh`.

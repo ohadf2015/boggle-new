@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useModeFirstSeen — localStorage gate for cozy first-time mode intro.
  *

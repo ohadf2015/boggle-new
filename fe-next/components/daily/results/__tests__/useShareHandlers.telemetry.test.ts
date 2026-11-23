@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useShareHandlers - share telemetry/analytics
  * Verifies that share actions emit PostHog events with proper tracking
@@ -214,21 +215,6 @@ describe('useShareHandlers - Share Telemetry', () => {
       // (the fallback will track completion when the user interacts with the panel)
       // For now, we just verify the panel opens
       expect(result.current.showSharePanel).toBe(true);
-    });
-  });
-
-  describe('Challenge share tracking', () => {
-    it.skip('attempt challenge share when navigator.share is available', async () => {
-      mockShareApi.mockResolvedValueOnce(undefined);
-      const { result } = renderHook(() => useShareHandlers(baseProps));
-
-      // Challenge share uses navigator.share when available
-      await act(async () => {
-        await result.current.handleChallengeShare();
-      });
-
-      // trackShareCompleted should have been called for the successful share
-      expect(trackShareCompleted).toHaveBeenCalledWith('web_share_api');
     });
   });
 });

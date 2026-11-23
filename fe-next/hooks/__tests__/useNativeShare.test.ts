@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useNativeShare Hook
  * Comprehensive test coverage for native Web Share API functionality

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, beforeEach } from 'vitest';
 import { collectPersonalRecords } from '../personalRecords';
 import { evaluateAgainstLedger, publishRunRecord, __resetRunRecordsForTests } from '../runRecord';

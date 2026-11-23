@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The letter board has its own keyboard play when it has focus (useBoardKeyboard:
  * letters trace a path, Enter submits it — and it preventDefault()s each key it

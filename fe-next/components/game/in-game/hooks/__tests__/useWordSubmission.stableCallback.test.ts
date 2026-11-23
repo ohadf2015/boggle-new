@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Perf regression test: `handleGridWordSubmit` must keep a stable identity
  * across `normalizedFoundWords`-only changes.

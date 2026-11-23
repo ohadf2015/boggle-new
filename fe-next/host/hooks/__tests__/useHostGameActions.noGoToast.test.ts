@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi } from 'vitest';
 /**
  * useHostGameActions — MP round start has exactly one GO moment: the

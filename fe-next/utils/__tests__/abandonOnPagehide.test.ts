@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Pagehide-driven `growth:game_abandoned` emit.
  *

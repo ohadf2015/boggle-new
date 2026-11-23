@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Category Preferences Tests
  * Tests for notification category preferences and push prompt logic

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Guest practice progress — the on-device half of "no account needed".
  *

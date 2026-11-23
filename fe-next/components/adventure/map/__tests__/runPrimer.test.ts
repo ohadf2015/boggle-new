@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { RUN_PRIMER_KEY, takeRunPrimer } from '../runPrimer';
 

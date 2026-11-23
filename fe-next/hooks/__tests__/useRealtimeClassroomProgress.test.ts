@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useRealtimeClassroomProgress hook
  * Tests real-time classroom progress tracking

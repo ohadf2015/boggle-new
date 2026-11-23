@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Integration tests for useGameMusic with Word Hunt (survival mode) scenario
  *

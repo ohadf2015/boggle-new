@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { vi, describe, it, expect, beforeEach, type Mock } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useRecentClassroomGames } from '../useRecentClassroomGames';

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * useFriendMessages — polling fallback must pause in hidden/background tabs.
  * UR audit 2026-10-26: rpc/get_friend_threads went 670/day -> 4,029/day with a

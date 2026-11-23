@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for useWordPackBuilder hook
  * TDD: RED phase — all tests written before implementation

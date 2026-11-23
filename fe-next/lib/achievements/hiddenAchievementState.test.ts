@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Test: hidden-achievement dedup state (one-time earn flags, SSR/quota safe).
  */

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Regression for Sentry JAVASCRIPT-NEXTJS-1RP: "Cannot read properties of
  * null (reading 'geometry')" (/:locale/word-tower), same destroy-vs-render

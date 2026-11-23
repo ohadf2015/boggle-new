@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Two teardown pops for ONE phantom entry throw the player off the page.
  *

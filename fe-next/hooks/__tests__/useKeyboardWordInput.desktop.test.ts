@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * Tests for desktop-specific keyboard notification behavior in useKeyboardWordInput
  */

@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * The screen every phone player hits before every game has to FIT, and every
  * control on it has to read as a control.

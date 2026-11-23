@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 /**
  * exp-mp-duo-bot-v1, client half: the host's start asks for a third-seat bot
  * only in the `bot` arm and never from a classroom; exposure is counted only

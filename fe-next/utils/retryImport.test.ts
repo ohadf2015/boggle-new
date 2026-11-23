@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { IMPORT_HANG_ERROR_NAME, retryImport } from './retryImport';
 

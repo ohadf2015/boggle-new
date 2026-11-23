@@ -10,10 +10,6 @@
  *    now-empty `daily_puzzle_attempts` table. Reading the dead table starved
  *    the recipient pool to zero — no re-engagement email sent for ~7 weeks
  *    (regression caught via live DB, not these mocks).
- *
- * The legacy lib/__tests__/reengagementEmail.test.ts is quarantined
- * (vitest.config.ts exclude). This file lives in __tests__/ which is
- * included, so it actually runs.
  */
 
 import { vi, describe, test, expect, beforeEach, type Mock } from 'vitest';
