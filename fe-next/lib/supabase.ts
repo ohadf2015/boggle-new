@@ -1,6 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr';
 import { freshFetch } from './supabaseFreshFetch';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { navigatorLock, NavigatorLockAcquireTimeoutError, type SupabaseClient } from '@supabase/supabase-js';
 import logger from '@/utils/logger';
 import type { ProfileData, RankedProgress } from '@/contexts/auth/authTypes';
 import { broadcastSignedOut } from '@/utils/crossTabAuthSync';
@@ -17,6 +17,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
   logger.warn('Supabase credentials not configured. Auth features will be disabled.');
 }
 
+// auth-js turns a stolen lock into its timeout error only for waits that have a timeout. The
+// refresh tick asks with 0, so its raw AbortError escaped the tick as an unhandled rejection.
+export async function stealSafeLock<R>(name: string, acquireTimeout: number, fn: () => Promise<R>): Promise<R> {
+  if (typeof navigator === 'undefined' || !navigator.locks?.request) return await fn();
+  try {
+    return await navigatorLock(name, acquireTimeout, fn);
+  } catch (e) {
+    if (acquireTimeout === 0 && (e as Error | null)?.name === 'AbortError') {
+      throw new NavigatorLockAcquireTimeoutError(`Lock "${name}" was stolen by another request`);
+    }
+    throw e;
+  }
+}
+
 // Browser client using @supabase/ssr for proper cookie-based session handling
 // CRITICAL: detectSessionInUrl must be false to prevent race condition in auth callback
 // When true (default), Supabase auto-detects and exchanges the auth code in background,
@@ -25,7 +39,8 @@ export const supabase: SupabaseClient | null = supabaseUrl && supabaseAnonKey
   ? createBrowserClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         detectSessionInUrl: false,
-        flowType: 'pkce'
+        flowType: 'pkce',
+        lock: stealSafeLock,
       },
       // Reads must never come from the Android WebView's cache-first HTTP cache (see supabaseFreshFetch).
       global: { fetch: freshFetch() },
