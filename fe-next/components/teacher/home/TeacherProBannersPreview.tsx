@@ -18,6 +18,7 @@ import { ResultsTeacherProTrialCard } from '@/components/education/results/Resul
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { TeacherTrialWelcome } from '@/components/teacher/TeacherTrialWelcome';
 import { TeacherWinbackBanner } from '@/components/teacher/TeacherWinbackBanner';
+import { TeacherProTrialCanceledBanner } from '@/components/teacher/TeacherProTrialCanceledBanner';
 
 const DAY = 86_400_000;
 
@@ -53,6 +54,9 @@ export function TeacherProBannersPreview() {
         </Slot>
         <Slot name="TeacherProTrialExpiringBanner (3d)">
           <TeacherProTrialExpiringBanner trialExpires={iso(3)} onDismiss={noop} />
+        </Slot>
+        <Slot name="TeacherProTrialCanceledBanner (13d)">
+          <TeacherProTrialCanceledBanner endsAt={iso(13)} onResumed={noop} />
         </Slot>
         <Slot name="TeacherProTrialEndedBanner">
           <TeacherProTrialEndedBanner onDismiss={noop} />
@@ -98,5 +102,6 @@ export function previewBanner(name: string | undefined): ReactNode {
   if (name === 'trialEnding') return <TeacherTrialEndingCard trial={teacherTrialStatus(iso(3), Date.now())} />;
   if (name === 'expired') return <TrialUrgencyBanner trial={teacherTrialStatus(iso(-1), Date.now())} href="#" />;
   if (name === 'winback') return <TeacherWinbackBanner approved />;
+  if (name === 'canceled') return <TeacherProTrialCanceledBanner endsAt={iso(13)} onResumed={() => undefined} />;
   return null;
 }

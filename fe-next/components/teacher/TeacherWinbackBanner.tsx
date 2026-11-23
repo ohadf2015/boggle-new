@@ -84,6 +84,7 @@ export function TeacherWinbackBanner({
         tone="calm"
         proLabel={t('eduShell.nav.pro')}
         title={copy.title}
+        body={<span data-testid="teacher-winback-note">{copy.note}</span>}
         onDismiss={() => {
           try {
             trackTeacherWinbackDismissed();

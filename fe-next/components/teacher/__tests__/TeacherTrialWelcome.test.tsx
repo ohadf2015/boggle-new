@@ -36,6 +36,12 @@ describe('TeacherTrialWelcome', () => {
     window.history.replaceState(null, '', '/en/teacher?checkout=success');
   });
 
+  it('Given a card trial just started, When the welcome shows, Then it says when the first charge is and that we email the day before', () => {
+    render(<TeacherTrialWelcome trialExpires="2026-12-06T19:21:51.009Z" onReturnPage />);
+    expect(screen.getByTestId('teacher-trial-welcome-billing')).toHaveTextContent('teacher.proWelcome.noChargeUntil:December 6');
+    expect(screen.getByTestId('teacher-trial-welcome-try')).toHaveTextContent('teacher.proWelcome.tryFirst');
+  });
+
   it('Given a card trial just started, When the welcome shows, Then it shows days left and offers no second checkout', () => {
     const trialExpires = new Date(Date.now() + 14 * 86400000).toISOString();
     render(<TeacherTrialWelcome trialExpires={trialExpires} />);

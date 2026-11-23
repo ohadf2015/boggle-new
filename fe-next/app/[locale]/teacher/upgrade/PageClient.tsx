@@ -53,7 +53,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   const [matrixOpen, setMatrixOpen] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const revealRef = useTeacherReveal<HTMLDivElement>(tab);
-  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, accessTrialExpires, accessTrialEnded } = useTeacherPro();
+  const { hasPro, loading: proLoading, status, source, trialUsed, known, portalUrl, refresh, trialExpires, periodEnd, cancelAtPeriodEnd, accessTrialExpires, accessTrialEnded } = useTeacherPro();
 
   const offerTrial = known === true && !proLoading && polarTrialUx({
     hasPro,
@@ -224,6 +224,8 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
               trialExpires={trialExpires}
               periodEnd={periodEnd}
               portalUrl={portalUrl}
+              cancelAtPeriodEnd={cancelAtPeriodEnd}
+              onResumed={() => void refresh()}
               included={proFeatures}
             />
             <section data-testid="pro-tools" className="mt-8">

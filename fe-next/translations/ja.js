@@ -4341,6 +4341,10 @@ const ja = {
     "soundOff": "サウンドオフ"
   },
   "settings": {
+    "teacherPlan": {
+      "title": "Teacher Proのプランとお支払い",
+      "body": "プランの確認、カードの変更、解約はこちら。"
+    },
     "title": "設定",
     "appearance": "外観",
     "language": "言語",
@@ -15013,6 +15017,8 @@ const ja = {
     },
     "proWelcome": {
       "title": "Teacher Pro が有効になりました",
+      "noChargeUntil": "{date}までは一切請求されません。前日にメールでお知らせし、「プラン」からいつでも解約できます。",
+      "tryFirst": "次の授業で試してみてください。クラスゲームの後、間違えた単語を練習として送れます。生徒には1日後、3日後、7日後にもう一度出題されます。",
       "until": "{date} まであなたのものです。手続きもカードも不要。",
       "perk": {
         "analytics": "毎回のゲーム後に、クラスが苦手だった単語がわかる",
@@ -15026,7 +15032,7 @@ const ja = {
     },
     "checkoutReturn": {
       "activatingTitle": "Teacher Pro を有効化しています",
-      "activatingBody": "お支払いを受け取りました。アクセスを確認しています。通常は数秒です。",
+      "activatingBody": "手続きが完了しました。Teacher Proを有効にしています。通常は数秒で終わります。",
       "successTitle": "Teacher Pro が有効です",
       "successBody": "アクセスはアカウントに反映済みです。",
       "trialSuccessTitle": "Teacher Pro のトライアルが始まりました",
@@ -15211,6 +15217,11 @@ const ja = {
       "trialLifecycleTitleToday": "Teacher Proトライアルは本日期限です",
       "trialLifecycleTitleOne": "Teacher Proトライアル残り1日",
       "trialLifecycleBody": "無制限クラスと印刷レポートを継続。トライアル後は月額9ドルです。",
+      "canceledTrialTitle": "Teacher Proは{date}までご利用いただけます",
+      "canceledTrialBody": "解約済みのため、カードへの請求はありません。気が変わったら「Proを続ける」を押すと、その日以降も月$9で続きます。",
+      "resumeCta": "Proを続ける",
+      "resumeDone": "完了しました。Teacher Proは引き続きご利用いただけます。",
+      "resumeError": "Proを再開できませんでした。もう一度お試しいただくか、「プラン」を開いてください。",
       "trialExpiringLoss": "Proがない場合、無制限のクラスと印刷可能な生徒レポートが利用できなくなります。",
       "trialLifecycleCta": "Proを続ける（月額9ドル）",
       "trialAutoRenewBody": "トライアル終了後、登録したカードに月額9ドルが請求されます。それまでに解約すれば料金はかかりません。",

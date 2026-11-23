@@ -5,7 +5,7 @@
  * a partial catalogue must not render a raw key on the money path.
  * English is the measured line — do not paraphrase it.
  */
-import { TRIAL_COPY_RTL, trialCopyBase } from '@/lib/education/pro/trialCtaCopy';
+import { TRIAL_COPY_RTL, resultsTrialCopy, trialCopyBase } from '@/lib/education/pro/trialCtaCopy';
 
 export const TEACHER_WINBACK_BODY_EN =
   'Your 14-day free Teacher Pro trial is waiting — set up your first class in 2 minutes';
@@ -14,10 +14,12 @@ export type TeacherWinbackCopy = {
   title: string;
   cta: string;
   dismiss: string;
+  /** Card + price disclosure, shared with every other trial CTA. */
+  note: string;
   dir?: 'rtl';
 };
 
-const COPY: Record<string, Omit<TeacherWinbackCopy, 'dir'>> = {
+const COPY: Record<string, Omit<TeacherWinbackCopy, 'dir' | 'note'>> = {
   en: {
     title: TEACHER_WINBACK_BODY_EN,
     cta: 'Start 14-day free trial',
@@ -54,5 +56,5 @@ export function teacherWinbackCopy(locale: string, opts: { hasClass?: boolean } 
   const base = trialCopyBase(locale);
   const row = COPY[base] ?? COPY.en;
   const title = opts.hasClass ? row.title.split(' — ')[0] : row.title;
-  return { ...row, title, dir: TRIAL_COPY_RTL.has(base) ? 'rtl' : undefined };
+  return { ...row, title, note: resultsTrialCopy(locale).trialNote, dir: TRIAL_COPY_RTL.has(base) ? 'rtl' : undefined };
 }

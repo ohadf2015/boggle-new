@@ -7,6 +7,7 @@ import { polarTrialDaysLeft } from '@/lib/education/polarTrial';
 import { cn } from '@/lib/utils';
 import { NB_DIALOG_BODY, NB_DIALOG_FOOTER, NB_DIALOG_TITLE, NB_OVERLAY_LAYER, NB_OVERLAY_PANEL, nbDialogHeaderClass } from '@/components/teacher/nb/nbDialogStyles';
 import { NB_BLOCK, NB_PRIMARY, NB_STICKER } from '@/components/teacher/nb/nbStyles';
+import { planEndDate } from '@/components/teacher/TeacherProTrialCanceledBanner';
 
 /**
  * HQ welcome after Polar opens the 14-day Teacher Pro trial.
@@ -68,8 +69,11 @@ export function TeacherTrialWelcome({ trialExpires, onReturnPage = false }: { tr
           </div>
         </div>
         <div className={NB_DIALOG_BODY}>
-          <p className="font-neo-body text-base font-semibold leading-relaxed text-neo-cream/90">
-            {t('teacher.subscription.trialLifecycleBody')}
+          <p data-testid="teacher-trial-welcome-billing" className="font-neo-body text-base font-semibold leading-relaxed text-neo-cream/90">
+            {t('teacher.proWelcome.noChargeUntil', { date: planEndDate(trialExpires, language) })}
+          </p>
+          <p data-testid="teacher-trial-welcome-try" className="mt-2 font-neo-body text-sm leading-relaxed text-neo-cream/80">
+            {t('teacher.proWelcome.tryFirst')}
           </p>
         </div>
         <div className={NB_DIALOG_FOOTER}>

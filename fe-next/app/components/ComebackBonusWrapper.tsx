@@ -8,6 +8,8 @@
  */
 
 import { useEffect, useState, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { isEducationPath } from '@/lib/navigation/sectionHome';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { ComebackBonusModal } from '@/components/engagement/ComebackBonusModal';
@@ -17,12 +19,13 @@ const SESSION_KEY = 'comeback_bonus_checked_v2';
 
 export default function ComebackBonusWrapper() {
   const { user, profile } = useAuth();
+  const onTeacherScreen = isEducationPath(usePathname() ?? '');
   const [status, setStatus] = useState<ComebackStatus | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const checked = useRef(false);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || onTeacherScreen) return;
     // Only check once per browser session
     if (checked.current || sessionStorage.getItem(SESSION_KEY)) return;
     // Cheap early-out on a conversion surface (checkout pages) — skips the fetch entirely.
@@ -46,9 +49,9 @@ export default function ComebackBonusWrapper() {
         sessionStorage.setItem(SESSION_KEY, '1');
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, onTeacherScreen]);
 
-  if (!status?.eligible || !status.tier) return null;
+  if (!status?.eligible || !status.tier || onTeacherScreen) return null;
   // The effect-time check can't cover the async gap: the /api/engagement/comeback fetch can
   // resolve AFTER the visitor has navigated onto a conversion surface, and this component is
   // mounted at the layout level so its effect doesn't re-run on that navigation. Re-read the

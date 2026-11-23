@@ -14,6 +14,7 @@ export type TeacherBillingBanner =
   | 'trialing'
   | 'trialExpiring'
   | 'chargeSoon'
+  | 'trialCanceled'
   | 'winback';
 
 export type TeacherBannerSelection =
@@ -41,6 +42,8 @@ export interface TeacherBannerInput {
   polarTrialExpiring: boolean;
   /** The card trial converts to $9/mo within a day (and was not cancelled): always say so, no dismiss. */
   polarChargeSoon: boolean;
+  /** Cancelled, so the trial ends without a charge. */
+  cancelAtPeriodEnd: boolean;
   trialExpiringDismissed: boolean;
   /** Latest access request is approved. A teacher role alone is not this. */
   approved: boolean;
@@ -56,6 +59,7 @@ export function selectTeacherBanner(s: TeacherBannerInput): TeacherBannerSelecti
   if (s.status === 'past_due' && s.source === 'polar') return show('paymentFailed');
   const polar = polarTrialUx({ hasPro: s.hasPro, status: s.status, source: s.source, trialUsed: s.trialUsed });
   if (polar.showLifecycleBanner) {
+    if (s.cancelAtPeriodEnd) return show('trialCanceled');
     if (s.polarChargeSoon) return show('chargeSoon');
     if (!s.polarTrialExpiring) return show('trialing');
     return s.trialExpiringDismissed ? { kind: 'none' } : show('trialExpiring');

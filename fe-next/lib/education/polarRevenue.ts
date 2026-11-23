@@ -52,6 +52,13 @@ export function polarRevenueProps(data: PolarData): PolarRevenueProps {
   };
 }
 
+/** The optional reason and comment Polar's portal asks for on cancel. */
+export function polarCancelReasonProps(data: PolarData): { cancel_reason?: string; cancel_comment?: string } {
+  const reason = str(data?.customer_cancellation_reason);
+  const comment = str(data?.customer_cancellation_comment);
+  return { ...(reason ? { cancel_reason: reason } : {}), ...(comment ? { cancel_comment: comment } : {}) };
+}
+
 /** Same event, revenue props merged under the existing ones (never overrides). */
 export function withRevenue(event: EduServerEvent, data: PolarData): EduServerEvent {
   return { ...event, properties: { ...polarRevenueProps(data), ...event.properties } };
@@ -95,7 +102,7 @@ export function buildPolarSubscriptionEndedEvent(
       status: str(data?.status) ?? 'unknown',
       was_trial: wasTrial,
       cancel_at_period_end: Boolean(data?.cancel_at_period_end),
-      ...(str(data?.customer_cancellation_reason) ? { cancel_reason: data.customer_cancellation_reason } : {}),
+      ...polarCancelReasonProps(data),
     },
   };
 }

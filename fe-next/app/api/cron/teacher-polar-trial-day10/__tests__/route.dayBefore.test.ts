@@ -126,11 +126,26 @@ describe('/api/cron/teacher-polar-trial-day10 day-before notice', () => {
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
 
-  it('says nothing about a charge to a teacher who already cancelled', async () => {
-    h.tables.subscriptions = { data: [sub({ cancel_at_period_end: true })], error: null };
+  it('tells a teacher who cancelled when Pro ends, with no charge and a way to keep it, once', async () => {
+    h.tables.subscriptions = { data: [sub({ cancel_at_period_end: true, current_period_end: inHours(72) })], error: null };
+    const body = await (await POST(authed())).json();
+    expect(body).toMatchObject({ sent: 1 });
+    const mail = h.sendEmailSpy.mock.calls[0][0];
+    expect(mail.subject).toMatch(/^Your Teacher Pro ends on /);
+    expect(mail.html).toMatch(/won(&#39;|&#x27;|')t be charged/);
+    expect(mail.html).not.toContain('Manage or cancel');
+    expect(mail.html).toContain('utm_campaign=polar_trial_canceled_ending');
+    expect(h.inserts[0].values).toMatchObject({ event_type: 'polar_trial_day10_sent', payload: { bucket: 'canceled-ending' } });
+
+    h.sendEmailSpy.mockClear();
+    h.tables.subscription_events = { data: [{ user_id: 'u1', event_type: 'polar_trial_day10_sent' }], error: null };
     await POST(authed());
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
-    h.tables.subscriptions = { data: [sub({ cancel_at_period_end: true, current_period_end: inHours(72) })], error: null };
+  });
+
+  it('never sends the charge-tomorrow notice to a teacher who cancelled', async () => {
+    h.tables.subscriptions = { data: [sub({ cancel_at_period_end: true })], error: null };
+    h.tables.subscription_events = { data: [{ user_id: 'u1', event_type: 'polar_trial_day10_sent' }], error: null };
     await POST(authed());
     expect(h.sendEmailSpy).not.toHaveBeenCalled();
   });
