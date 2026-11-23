@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  normalizeGrDistinctId,
   buildEmailSignupMetadata,
   normalizeCountry,
   normalizeLanguage,
@@ -40,5 +41,12 @@ describe('buildEmailSignupMetadata', () => {
     expect(normalizeSurface('multi_games_sheet')).toBe('soft-sheet');
     expect(normalizeLanguage('HE')).toBe('he');
     expect(normalizeCountry('t1')).toBeNull();
+  });
+
+  it('keeps only an anonymous gr.js visitor id, never a user id or junk', () => {
+    expect(normalizeGrDistinctId('mi7x2k3a-8f3k2l9q0zp1')).toBe('mi7x2k3a-8f3k2l9q0zp1');
+    expect(normalizeGrDistinctId('44a8bb33-1c2d-4e5f-8a9b-0c1d2e3f4a5b')).toBeNull();
+    expect(normalizeGrDistinctId('<script>-alert1')).toBeNull();
+    expect(normalizeGrDistinctId(null)).toBeNull();
   });
 });

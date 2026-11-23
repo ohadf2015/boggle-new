@@ -11,7 +11,7 @@ import {
   metaString,
   type SignupUser,
 } from '@/lib/auth/signupAttributionApply';
-import { normalizeCountry, normalizeLanguage } from '@/lib/auth/emailSignupMeta';
+import { normalizeCountry, normalizeGrDistinctId, normalizeLanguage } from '@/lib/auth/emailSignupMeta';
 import { canonicalSignupSurface } from '@/lib/auth/signupSurface';
 
 /**
@@ -176,7 +176,7 @@ export async function POST(request: Request) {
           referrer_domain: decision.update.referrer ?? (profile.referrer as string | null) ?? null,
           is_test_account: profile.is_test_account === true,
           // Growth Radar keys this signup on the browser's tracker id so it joins that visitor's pageviews.
-          gr_distinct_id: metaString(meta, 'gr_distinct_id') ?? body.gr_distinct_id ?? null,
+          gr_distinct_id: normalizeGrDistinctId(metaString(meta, 'gr_distinct_id')) ?? normalizeGrDistinctId(body.gr_distinct_id),
         },
       },
     ]);

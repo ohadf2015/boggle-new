@@ -21,11 +21,12 @@
 // fire-and-forget.
 // ---------------------------------------------------------------------------
 
+import { normalizeGrDistinctId } from '@/lib/auth/emailSignupMeta';
+
 declare global {
   interface Window {
     gr?: {
       capture?: (event: string, properties?: Record<string, unknown>) => void;
-      distinctId?: () => string;
     };
   }
 }
@@ -78,11 +79,11 @@ function grCapture(event: string, properties?: Record<string, unknown>): void {
   }
 }
 
-/** The tracker's visitor id; gr.js persists it as localStorage gr_did before it loads too. */
+/** Only the persisted id: gr.js writes localStorage gr_did when storage is allowed, never for a memory-only visitor. */
 export function grDistinctId(): string | null {
   if (typeof window === 'undefined') return null;
   try {
-    return window.gr?.distinctId?.() || localStorage.getItem('gr_did') || null;
+    return normalizeGrDistinctId(localStorage.getItem('gr_did'));
   } catch {
     return null;
   }
