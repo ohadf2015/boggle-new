@@ -50,6 +50,7 @@ vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
 }));
 vi.mock('@/hooks/useConsentDecided', () => ({ useConsentDecided: () => true }));
 vi.mock('@/utils/growthTracking', () => ({ trackGrowthEvent: vi.fn() }));
+vi.mock('@/utils/platform', () => ({ isNative: () => true }));
 
 import { PushNotificationPrompt } from '../PushNotificationPrompt';
 import { incrementGamesPlayed } from '@/utils/pushNotifications/categoryPreferences';

@@ -25,6 +25,7 @@ import {
   emitAbandonOnExit,
   consumeResumedAfterHidden,
   updateActiveGameExtras,
+  countActiveGameWord,
   __resetAbandonStateForTests,
   setPagehideFinalizer,
   clearPagehideFinalizer,
@@ -120,6 +121,21 @@ describe('abandonOnPagehide', () => {
 
     const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
     expect(payload.words_found).toBe(0);
+    vi.useRealTimers();
+  });
+
+  it('counts words one at a time for modes that only see each accepted word', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    markGameActive('classic', { isMultiplayer: true });
+    countActiveGameWord();
+    countActiveGameWord();
+    vi.setSystemTime(new Date('2026-01-01T00:00:20Z'));
+
+    fireEvent('pagehide');
+
+    const payload = captureMock.mock.calls.find((c) => c[0] === 'growth:game_abandoned')?.[1] as Record<string, unknown>;
+    expect(payload.words_found).toBe(2);
     vi.useRealTimers();
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DOUBLE_TAP_MS } from '@/components/daily/wheel/useWheelLetterInput';
 import type { Socket } from 'socket.io-client';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -434,9 +435,19 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // Letter tap handler — parity with SP WordWheelGame:386.
   // Re-tap on a used wheel index toggles it off (removes from built word) instead
   // of duplicating. Each wheelIndex appears at most once in builtLetters.
+  const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
     ftue.markActivity();
+    const now = Date.now();
+    const last = lastTapRef.current;
+    const isDoubleTap = !!last && last.idx === wheelIndex && now - last.time < DOUBLE_TAP_MS;
+    lastTapRef.current = { idx: wheelIndex, time: now };
     const existingIdx = builtLettersRef.current.findIndex(bl => bl.wheelIndex === wheelIndex);
+    if (isDoubleTap && existingIdx !== -1) {
+      lastTapRef.current = null;
+      handleSubmitRef.current();
+      return;
+    }
     if (existingIdx !== -1) {
       setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
       playButtonClickSound();

@@ -4239,6 +4239,7 @@ const sv = {
     "open": "Öppna lexiclash.live"
   },
   "common": {
+    "holdToClear": "Håll in för att rensa",
     "updateReady": "Uppdateringen är klar",
     "updateRestart": "Starta om",
     "pressBackAgainToExit": "Tryck bakåt igen för att avsluta",

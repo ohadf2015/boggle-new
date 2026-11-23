@@ -1,5 +1,5 @@
 // Server-only: pulls in `bad-words`. Clients ask /api/names/check instead.
-import { isProfane } from '@/backend/utils/profanityFilter';
+import { isProfaneJoinName } from '@/lib/education/joinNameModeration';
 import { isPlaceholderName } from '@/lib/displayName';
 import { isGeneratedName } from '@/utils/defaultPlayerNames';
 
@@ -11,7 +11,7 @@ export function publicNameIssue(name: string | null | undefined): PublicNameIssu
   if (!trimmed) return 'empty';
   if (isPlaceholderName(trimmed)) return 'placeholder';
   if (isGeneratedName(trimmed)) return 'default';
-  if (isProfane(trimmed)) return 'profane';
+  if (isProfaneJoinName(trimmed)) return 'profane';
   return null;
 }
 

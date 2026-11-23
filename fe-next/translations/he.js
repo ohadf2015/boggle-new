@@ -3891,6 +3891,7 @@ const he = {
     "open": "פתחו את lexiclash.live"
   },
   "common": {
+    "holdToClear": "לחיצה ארוכה מוחקת הכול",
     "updateReady": "העדכון מוכן",
     "updateRestart": "הפעלה מחדש",
     "pressBackAgainToExit": "לחצו שוב על חזרה כדי לצאת",

@@ -76,3 +76,19 @@ describe('publicNameIssue with classroom fun names', () => {
     expect(publicNameIssue('Disco Llama')).toBe('default');
   });
 });
+
+describe('publicNameIssue in every game language', () => {
+  it.each(['pendejo', 'Puta madre', 'Jävla idiot', 'сука', 'זונה', 'p.e.n.d.e.j.o'])(
+    'Given %s typed as a public name, Then it is profane',
+    (name) => {
+      expect(publicNameIssue(name)).toBe('profane');
+    },
+  );
+
+  it.each(['José Puttanesca', 'Putin', 'Fittness', 'נועה זילברמן'])(
+    'Given the ordinary name %s, Then it is public',
+    (name) => {
+      expect(publicNameIssue(name)).toBeNull();
+    },
+  );
+});

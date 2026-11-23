@@ -13256,6 +13256,7 @@ const ru = {
     "open": "Открыть lexiclash.live"
   },
   "common": {
+    "holdToClear": "Удерживайте, чтобы стереть",
     "updateReady": "Обновление готово",
     "updateRestart": "Перезапустить",
     "pressBackAgainToExit": "Нажмите «Назад» ещё раз, чтобы выйти",

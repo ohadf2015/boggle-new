@@ -138,5 +138,14 @@ describe('WorldRecordChip', () => {
     fireEvent.click(link);
     expect(capture).toHaveBeenCalledWith('world_record_claim_tapped', { mode: 'quickPlay', record_key: 'qp_classic', state: 'claimName' });
   });
+  it('Given the records refetch while the chip is up, Then the view is counted once', () => {
+    const { rerender } = render(<WorldRecordChip mode="quickPlay" subMode="classic" score={900} />);
+    state.records = [{ ...qp }, { ...tower }];
+    rerender(<WorldRecordChip mode="quickPlay" subMode="classic" score={900} />);
+    state.records = [{ ...qp }, { ...tower }];
+    rerender(<WorldRecordChip mode="quickPlay" subMode="classic" score={900} />);
+
+    expect(capture.mock.calls.filter((c) => c[0] === 'world_record_viewed')).toHaveLength(1);
+  });
 });
 
