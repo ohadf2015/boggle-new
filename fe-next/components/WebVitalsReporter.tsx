@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useReportWebVitals } from 'next/web-vitals';
-import { onINP } from 'web-vitals/attribution';
+import { onCLS, onINP } from 'web-vitals/attribution';
 import { summarizeInpAttribution } from '@/lib/webVitals/inpAttribution';
 import { trackEvent } from './GoogleAnalytics';
 import { getPerfVariant } from '@/utils/perfVariant';
@@ -161,9 +161,9 @@ function sendToSupabase(
 export function WebVitalsReporter() {
   const reported = useRef<Set<string>>(new Set());
 
-  // INP with attribution. `useReportWebVitals` cannot supply this — Next bundles
-  // web-vitals without the attribution build — so INP is reported from here
-  // instead, and skipped in the callback below.
+  // INP and CLS with attribution. `useReportWebVitals` cannot supply this — Next
+  // bundles web-vitals without the attribution build — so both are reported from
+  // here instead, and skipped in the callback below.
   useEffect(() => {
     try {
       onINP((metric) => {
@@ -174,9 +174,23 @@ export function WebVitalsReporter() {
           inpAttribution: summarizeInpAttribution(metric.attribution),
         });
       });
+      onCLS((metric) => {
+        const key = `CLS-${metric.id}`;
+        if (reported.current.has(key)) return;
+        reported.current.add(key);
+        const a = metric.attribution;
+        sendToSupabase(metric, getPerfVariant(), {
+          clsAttribution: {
+            target: a.largestShiftTarget?.slice(0, 120),
+            time: a.largestShiftTime === undefined ? undefined : Math.round(a.largestShiftTime),
+            value: a.largestShiftValue,
+            loadState: a.loadState,
+          },
+        });
+      });
     } catch {
-      // Older browsers lack the entry types web-vitals needs; INP simply goes
-      // unreported rather than breaking the page.
+      // Older browsers lack the entry types web-vitals needs; INP and CLS simply
+      // go unreported rather than breaking the page.
     }
   }, []);
 
@@ -211,10 +225,10 @@ export function WebVitalsReporter() {
     if (!reported.current.has(metricKey)) {
       reported.current.add(metricKey);
 
-      // INP is reported by the attribution effect below, which carries the
-      // interaction target and phase breakdown. Skip it here or the row lands
+      // INP and CLS are reported by the attribution effect above, which carries
+      // the slow interaction or shifted element. Skip them here or the row lands
       // twice, once without attribution.
-      if (metric.name !== 'INP') sendToSupabase(metric, perfVariant);
+      if (metric.name !== 'INP' && metric.name !== 'CLS') sendToSupabase(metric, perfVariant);
     }
 
     // Send to custom endpoint if configured (for advanced analytics)
