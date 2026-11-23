@@ -33,14 +33,6 @@ vi.mock('next/dynamic', () => ({
     },
 }));
 
-const grFlag = vi.hoisted(() => ({ value: null as string | null, calls: [] as { key: string; enabled: boolean }[] }));
-vi.mock('@/hooks/useGrowthRadarFlag', () => ({
-  useGrowthRadarFlag: (key: string, enabled = true) => {
-    grFlag.calls.push({ key, enabled });
-    return enabled ? grFlag.value : null;
-  },
-}));
-
 function hero(container: HTMLElement): HTMLElement {
   const el = container.querySelector<HTMLElement>('[data-fresh-section="hero"]');
   if (!el) throw new Error('no hero');
@@ -51,20 +43,6 @@ describe('FreshHero', () => {
   beforeEach(() => {
     cg.isOnCrazyGamesPlatform = false;
     track.mockClear();
-    grFlag.value = null;
-    grFlag.calls = [];
-  });
-
-  it('asks for the hero CTA flag only for new visitors (onPlay set), and shows the variant label', () => {
-    grFlag.value = 'treatment';
-    const { container, unmount } = render(<FreshHero />);
-    expect(grFlag.calls.every((c) => c.key === 'lexiclash-hero-play-cta' && c.enabled === false)).toBe(true);
-    expect(hero(container).textContent).toContain('homeFresh.hero.play');
-    expect(hero(container).textContent).not.toContain('homeFresh.hero.playNoSignup');
-    unmount();
-    const r = render(<FreshHero onPlay={vi.fn()} />);
-    expect(grFlag.calls.some((c) => c.enabled)).toBe(true);
-    expect(hero(r.container).textContent).toContain('homeFresh.hero.playNoSignup');
   });
 
   it('has exactly one h1 carrying the pitch and the multiplayer-word-game kicker', () => {

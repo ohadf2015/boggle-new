@@ -3,6 +3,13 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/components/quick-play/QuickResultsFx', () => ({ QuickResultsRays: () => null, SparkleLoop: () => null }));
 vi.mock('@/utils/growthTracking', () => ({ trackLandingCtaClick: vi.fn() }));
+const grFlag = vi.hoisted(() => ({ value: null as string | null, calls: [] as { key: string; enabled: boolean }[] }));
+vi.mock('@/hooks/useGrowthRadarFlag', () => ({
+  useGrowthRadarFlag: (key: string, enabled = true) => {
+    grFlag.calls.push({ key, enabled });
+    return enabled ? grFlag.value : null;
+  },
+}));
 
 import { PlayHero } from '../PlayHero';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
@@ -33,6 +40,36 @@ function renderHero(overrides: Partial<React.ComponentProps<typeof PlayHero>> = 
 }
 
 describe('PlayHero', () => {
+  it('given a returning visitor (no onPlay), then the flag is never asked and friends stays the primary', () => {
+    grFlag.value = 'treatment';
+    grFlag.calls = [];
+    renderHero();
+    expect(grFlag.calls.every((c) => c.key === 'lexiclash-hero-play-cta' && !c.enabled)).toBe(true);
+    expect(screen.getByTestId('hp-play-friends')).toBeTruthy();
+    expect(screen.queryByTestId('hp-play-now')).toBeNull();
+    grFlag.value = null;
+  });
+
+  it('given a new visitor in treatment, then the primary is a solo Play now that opens onboarding', () => {
+    grFlag.value = 'treatment';
+    const onPlay = vi.fn();
+    renderHero({ onPlay });
+    const btn = screen.getByTestId('hp-play-now');
+    expect(btn.textContent).toContain(en.homePlay.playNow);
+    expect(btn.getAttribute('data-variant')).toBe('treatment');
+    expect(screen.queryByTestId('hp-play-friends')).toBeNull();
+    fireEvent.click(btn);
+    expect(onPlay).toHaveBeenCalledTimes(1);
+    grFlag.value = null;
+  });
+
+  it('given a new visitor in control, then friends stays the primary', () => {
+    grFlag.value = 'control';
+    renderHero({ onPlay: vi.fn() });
+    expect(screen.getByTestId('hp-play-friends').getAttribute('data-variant')).toBe('control');
+    grFlag.value = null;
+  });
+
   it('given the hero, then the first paragraph after the title says what LexiClash is', () => {
     renderHero();
     const title = screen.getByRole('heading', { level: 1 });
