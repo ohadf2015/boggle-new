@@ -29,6 +29,8 @@ import { HeroGrid } from "./HeroGrid";
 import { FreshMarquee } from "./FreshMarquee";
 import m from "./FreshReveal.module.css";
 import { firstGameRoute } from "@/lib/onboarding/firstGameRoute";
+import { useGrowthRadarFlag } from "@/hooks/useGrowthRadarFlag";
+import { HERO_PLAY_CTA_KEY, heroPlayLabelKey } from "@/lib/experiments/heroPlayCta";
 
 // Same chunk the site Header already lazy-loads for its Sign in button.
 const AuthModal = dynamic(() => import("@/components/auth/AuthModal"), {
@@ -47,6 +49,8 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
   const [authOpen, setAuthOpen] = useState(false);
   const handleFound = useCallback(() => setFound(true), []);
   const titleLines = t("homeFresh.hero.title").split("\n").filter(Boolean);
+  // A/B (Growth Radar): new visitors only (onPlay is set just for them), so returning players are never exposed.
+  const playVariant = useGrowthRadarFlag(HERO_PLAY_CTA_KEY, !!onPlay && !isOnCrazyGamesPlatform);
 
   return (
     <>
@@ -115,7 +119,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
             href={firstGameRoute(language)}
             className="inline-flex min-h-14 items-center justify-center gap-3 rounded-neo-lg border-3 border-neo-black bg-neo-lime px-10 py-4 font-neo-poster text-lg font-extrabold uppercase tracking-[0.02em] text-neo-black shadow-hard-xl active:translate-x-[3px] active:translate-y-[3px] active:shadow-hard-pressed rtl:active:-translate-x-[3px] motion-safe:transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cream md:min-w-[18rem] md:text-xl"
           >
-            {t("homeFresh.hero.play")}
+            <span data-variant={playVariant ?? "control"}>{t(heroPlayLabelKey(playVariant))}</span>
             <DirectionalIcon
               icon={ArrowRight}
               className="hero-play-arrow h-6 w-6"

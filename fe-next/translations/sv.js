@@ -1594,6 +1594,7 @@ const sv = {
       "sub": "Koppla ihop bokstäver som ligger bredvid varandra innan tiden tar slut. Gratis, ingen nedladdning.",
       "play": "Spela nu",
       "playFriend": "Spela med en vän",
+      "playNoSignup": "Spela gratis, utan konto",
       "account": "Jag har ett konto",
       "gridLabel": "Övningsbräde. Tryck på bokstäverna i {word} i tur och ordning.",
       "hint": "Testa: tryck {letters}",
