@@ -10,6 +10,7 @@
 import { supabase } from '@/lib/supabase';
 import { getFirstTouchAttribution } from '@/utils/utmCapture';
 import logger from '@/utils/logger';
+import { grDistinctId } from '@/utils/growthRadarMirror';
 
 export interface ProfileAttributionPayload {
   referrer_domain?: string | null;
@@ -20,6 +21,7 @@ export interface ProfileAttributionPayload {
   signup_surface?: string | null;
   language?: string | null;
   country_code?: string | null;
+  gr_distinct_id?: string | null;
 }
 
 export interface AttributionExtras {
@@ -56,6 +58,8 @@ export async function persistProfileAttribution(
     signup_surface: surface,
     language: extras?.language ?? metaStr(meta, 'language'),
     country_code: extras?.countryCode ?? metaStr(meta, 'country_code'),
+    // The id stashed at signUp matches the pre-signup pageviews; the confirm tab may have a different one.
+    gr_distinct_id: metaStr(meta, 'gr_distinct_id') ?? grDistinctId(),
   };
 
   // Nothing to persist — skip the round-trip. Metadata from a cross-browser
