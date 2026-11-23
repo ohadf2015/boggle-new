@@ -7,7 +7,8 @@ import type { FoundWord } from '@/shared/types/view';
 import type { WordFeedback } from '../../WordFormingArea';
 import { validateWordLocally, couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
 import { reportUnresolvedGameLanguage } from '@/utils/languageTelemetry';
-import { hapticForWordScore, hapticError } from '@/utils/haptics';
+import { hapticForWordScore } from '@/utils/haptics';
+import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
 import type { TranslationFn } from '../types';
 
 interface UseWordSubmissionOptions {
@@ -22,7 +23,6 @@ interface UseWordSubmissionOptions {
   t: TranslationFn;
   /** Plays on client-side rejection (too short, duplicate, not on board). Server-truth accept sound lives in useSocketFeedback. */
   playWordRejectedSound: () => void;
-  announceWordResult: (word: string, isAccepted: boolean, score?: number, message?: string) => void;
   onWordSubmit?: (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   onResetCombo?: () => void;
   setCurrentFeedback: (feedback: WordFeedback | null) => void;
@@ -64,7 +64,6 @@ export function useWordSubmission(
     comboLevelRef,
     t,
     playWordRejectedSound,
-    announceWordResult,
     onWordSubmit,
     onResetCombo,
     setCurrentFeedback,
@@ -72,6 +71,7 @@ export function useWordSubmission(
     clientAuthoritative = false,
     comboTypeRef,
   } = options;
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
 
   // Track current fireRoundActive value via ref for use in callbacks
   // This ensures the socket emit uses the latest value without waiting for re-render
@@ -123,55 +123,31 @@ export function useWordSubmission(
           foundWordsCount: foundWordsSetRef.current.size,
         });
       }
-      let msg: string;
-      const isDuplicate = validation.errorKey === 'playerView.wordAlreadyFound';
-
-      if (validation.errorKey === 'playerView.wordTooShortMin') {
-        const minVal = String(validation.errorParams?.min || minWordLength);
-        msg = t('playerView.wordTooShortMin', { min: minVal })
-          || `Word too short! (min ${minVal} letters)`;
-      } else if (validation.errorKey === 'playerView.wordTooShort') {
-        msg = t('playerView.wordTooShort', 'Word too short');
-      } else if (isDuplicate) {
-        msg = t('playerView.alreadyFound', 'Already found');
-      } else {
-        const errorKey = validation.errorKey ?? 'Invalid word';
-        msg = t(errorKey) || errorKey;
-      }
-      // Show feedback in WordFormingArea - use 'duplicate' type for already found words
+      const reason = validation.reason ?? 'not-a-word';
+      const v = verdicts.reject(formedWord, reason, { min: validation.errorParams?.min ?? minWordLength });
       setCurrentFeedback({
-        id: isDuplicate ? `duplicate-${Date.now()}` : `reject-${Date.now()}`,
-        type: isDuplicate ? 'duplicate' : 'rejected',
+        id: `${v.tone === 'error' ? 'reject' : 'duplicate'}-${Date.now()}`,
+        type: v.tone === 'error' ? 'rejected' : 'duplicate',
         word: formedWord,
-        message: msg,
+        message: v.message,
+        durationMs: v.durationMs,
         timestamp: Date.now(),
       });
-      // Haptic feedback for error
-      hapticError();
-      playWordRejectedSound();
-      // Announce rejection for screen readers
-      announceWordResult(formedWord, false, undefined, msg);
-      // Reset combo if duplicate word
-      if (isDuplicate && onResetCombo) {
-        onResetCombo();
-      }
+      if (v.breaksCombo) onResetCombo?.();
       return;
     }
 
-    // Check if word can be on board
     if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard');
-      // Show feedback in WordFormingArea
+      const v = verdicts.reject(formedWord, 'not-on-board');
       setCurrentFeedback({
         id: `reject-${Date.now()}`,
         type: 'rejected',
         word: formedWord,
-        message: notOnBoardMsg,
+        message: v.message,
+        durationMs: v.durationMs,
         timestamp: Date.now(),
       });
-      hapticError();
-      playWordRejectedSound();
-      announceWordResult(formedWord, false, undefined, notOnBoardMsg);
+      if (v.breaksCombo) onResetCombo?.();
       return;
     }
 
@@ -213,9 +189,7 @@ export function useWordSubmission(
     onWordSubmit,
     onResetCombo,
     clientAuthoritative,
-    t,
-    playWordRejectedSound,
-    announceWordResult,
+    verdicts,
     comboLevelRef,
     comboTypeRef,
     setCurrentFeedback,

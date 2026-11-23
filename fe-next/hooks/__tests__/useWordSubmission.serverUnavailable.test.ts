@@ -43,7 +43,7 @@ describe('useWordSubmission when the dictionary server cannot answer', () => {
 
     act(() => result.current.submitWord('house'));
 
-    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable'), { timeout: 3000 });
+    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('wordVerdict.cantCheck'), { timeout: 3000 });
     expect(result.current.currentFeedback?.type).not.toBe('rejected');
     expect(onWordRejected).not.toHaveBeenCalled();
     expect(onComboReset).not.toHaveBeenCalled();

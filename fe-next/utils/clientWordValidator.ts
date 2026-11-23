@@ -5,6 +5,7 @@
  * Server remains the source of truth, but we show immediate feedback.
  */
 
+import { verdictKey, type VerdictParams, type WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
 // Import normalization functions from shared module
 import {
   normalizeHebrewWord as _normalizeHebrewWord,
@@ -41,8 +42,9 @@ export function getLanguageRegex(language: string): RegExp {
  */
 export interface ClientValidationResult {
   isValid: boolean;
+  reason?: WordVerdictReason;
   errorKey?: string; // i18n key for error message
-  errorParams?: Record<string, string | number>;
+  errorParams?: VerdictParams;
   shouldSubmitToServer: boolean; // Whether to still send to server
 }
 
@@ -60,7 +62,8 @@ export function validateWordLocally(
   if (word.length < minWordLength) {
     return {
       isValid: false,
-      errorKey: 'playerView.wordTooShortMin',
+      reason: 'too-short',
+      errorKey: verdictKey('too-short'),
       errorParams: { min: minWordLength },
       shouldSubmitToServer: false // Don't waste server trip
     };
@@ -71,7 +74,8 @@ export function validateWordLocally(
   if (!regex.test(word)) {
     return {
       isValid: false,
-      errorKey: 'playerView.onlyLanguageWords',
+      reason: 'bad-letters',
+      errorKey: verdictKey('bad-letters'),
       shouldSubmitToServer: false // Invalid characters, don't submit
     };
   }
@@ -85,7 +89,8 @@ export function validateWordLocally(
   if (alreadyFound) {
     return {
       isValid: false,
-      errorKey: 'playerView.wordAlreadyFound',
+      reason: 'already-found',
+      errorKey: verdictKey('already-found'),
       shouldSubmitToServer: false // Already have this word
     };
   }

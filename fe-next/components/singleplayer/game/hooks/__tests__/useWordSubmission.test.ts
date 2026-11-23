@@ -198,7 +198,7 @@ describe('useWordSubmission', () => {
       });
 
       expect(result.current.currentFeedback?.type).toBe('rejected');
-      expect(result.current.currentFeedback?.message).toBe('playerView.wordNotOnBoard');
+      expect(result.current.currentFeedback?.message).toBe('wordVerdict.notOnBoard');
       expect(mockCombo.resetCombo).toHaveBeenCalled();
     });
   });
@@ -235,7 +235,7 @@ describe('useWordSubmission', () => {
       });
 
       expect(result.current.currentFeedback?.type).toBe('rejected');
-      expect(result.current.currentFeedback?.message).toBe('playerView.wordAlreadyFound');
+      expect(result.current.currentFeedback?.message).toBe('wordVerdict.alreadyFound');
       expect(mockCombo.resetCombo).toHaveBeenCalled();
     });
   });
@@ -344,7 +344,7 @@ describe('useWordSubmission', () => {
       subscribeMascotEvents((e) => events.push(e));
       const { result } = renderHook(() => useWordSubmission(createDefaultOptions()));
 
-      mockValidateWordLocally.mockReturnValue({ isValid: false, errorKey: 'playerView.wordAlreadyFound' });
+      mockValidateWordLocally.mockReturnValue({ isValid: false, reason: 'already-found', errorKey: 'wordVerdict.alreadyFound' });
       act(() => { result.current.handleWordSubmit('hello'); });
       mockValidateWordLocally.mockReturnValue({ isValid: true });
       mockIsWordOnBoard.mockReturnValue(false);
@@ -595,7 +595,7 @@ describe('useWordSubmission', () => {
       });
 
       await waitFor(() => {
-        expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable');
+        expect(result.current.currentFeedback?.message).toBe('wordVerdict.cantCheck');
       });
 
       expect(result.current.currentFeedback?.type).not.toBe('rejected');

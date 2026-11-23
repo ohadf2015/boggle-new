@@ -21,6 +21,7 @@ import type { DeathRecapStats, DeathCause } from './WordHuntDeathRecap';
 import type { Socket } from 'socket.io-client';
 import type { LetterGrid, Language } from '@/types';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
+import { verdictMessage, wordVerdict } from '@/lib/wordVerdict/wordVerdict';
 
 const QUICK_RULES_STORAGE_KEY = 'lexiclash_wh_rules_seen';
 
@@ -170,9 +171,9 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       feedbackIdRef.current += 1;
       setWordFeedback({
         id: String(feedbackIdRef.current),
-        type: validation.errorKey === 'playerView.wordAlreadyFound' ? 'duplicate' : 'rejected',
+        type: validation.reason === 'already-found' ? 'duplicate' : 'rejected',
         word,
-        message: validation.errorKey ? t(validation.errorKey) : undefined,
+        message: verdictMessage(t, wordVerdict(validation.reason ?? 'not-a-word', validation.errorParams)),
         timestamp: Date.now(),
       });
       playWordRejectedSound();
@@ -188,7 +189,7 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
         id: String(feedbackIdRef.current),
         type: 'rejected',
         word,
-        message: t('playerView.wordNotOnBoard'),
+        message: verdictMessage(t, wordVerdict('not-on-board')),
         timestamp: Date.now(),
       });
       playWordRejectedSound();

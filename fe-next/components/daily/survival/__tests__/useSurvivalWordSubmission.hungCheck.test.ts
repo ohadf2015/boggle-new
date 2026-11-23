@@ -67,7 +67,7 @@ describe('daily word hunt when the dictionary request never answers', () => {
 
     await act(() => vi.advanceTimersByTimeAsync(PENDING_TIMEOUT_MS - 1));
 
-    expect(showToast).toHaveBeenCalledWith('unavailable', 'playerView.wordCheckUnavailable', 'HOUSE');
+    expect(showToast).toHaveBeenCalledWith('unavailable', 'wordVerdict.cantCheck', 'HOUSE');
   });
 
   it('Given a word check that hung once, When the same word is submitted again, Then it gets feedback again', async () => {
@@ -79,6 +79,6 @@ describe('daily word hunt when the dictionary request never answers', () => {
     act(() => result.current.handleWordSubmit('HOUSE'));
     await act(() => vi.advanceTimersByTimeAsync(PENDING_TIMEOUT_MS - 1));
 
-    expect(showToast).toHaveBeenCalledWith('unavailable', 'playerView.wordCheckUnavailable', 'HOUSE');
+    expect(showToast).toHaveBeenCalledWith('unavailable', 'wordVerdict.cantCheck', 'HOUSE');
   });
 });

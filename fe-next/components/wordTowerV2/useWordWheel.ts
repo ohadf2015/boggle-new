@@ -6,6 +6,8 @@ import { MIN_WORD_LEN, isAcceptedWord, spinWheel } from '@/lib/wordTowerV2/wheel
 import { type RunState, spendScramble } from '@/lib/wordTowerV2/run';
 import { v2DailySeed } from '@/lib/wordTowerV2/daily';
 import type { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
+import { reasonFromCode, VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
 import type { Phase, useTowerRun } from './useTowerRun';
 import type { useBrace } from './rescue/useBrace';
 import { AUTO_BUILD_MS } from './LetterRow';
@@ -16,18 +18,32 @@ type PlaySound = ReturnType<typeof useSoundEffects>['playSound'];
 /** Pentatonic steps: every letter rings a higher note and no pair clashes. */
 const PENTATONIC = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
 
-/** The red "not a word" flash on the wheel, with its buzz. */
-export function useRejectFlash(playSound: PlaySound) {
+type Translate = (key: string, params?: Record<string, string | number>) => string;
+
+/** The red flash on the wheel: a verdict code speaks the shared verdict, a plain key (rescue rules) shows as is. */
+export function useRejectFlash(playSound: PlaySound, t: Translate) {
   const [rejected, setRejected] = useState<string | null>(null);
+  const timer = useRef<number | null>(null);
+  const verdicts = useWordVerdict({ t, playRejectedSound: () => playSound('wordRejected') });
+  useEffect(() => () => { if (timer.current) window.clearTimeout(timer.current); }, []);
   const flash = useCallback(
-    (reason: string) => {
-      setRejected(reason);
-      playSound('wordRejected');
-      window.setTimeout(() => setRejected(null), 900);
+    (code: string, word: string) => {
+      const reason = reasonFromCode(code);
+      let holdMs = VERDICT_MS;
+      if (reason) {
+        const v = verdicts.reject(word, reason, { min: MIN_WORD_LEN });
+        setRejected(v.message);
+        holdMs = v.durationMs;
+      } else {
+        setRejected(t(code));
+        playSound('wordRejected');
+      }
+      if (timer.current) window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => setRejected(null), holdMs);
     },
-    [playSound],
+    [verdicts, playSound, t],
   );
-  return { rejected, flash };
+  return { rejected, flash, clearRepeat: verdicts.clearRepeat };
 }
 
 interface Args {
@@ -42,7 +58,7 @@ interface Args {
   dictRef: MutableRefObject<Set<string> | null>;
   dictReady: boolean;
   braceApi: ReturnType<typeof useBrace>;
-  flashReject: (reason: string) => void;
+  flashReject: (code: string, word: string) => void;
   playSound: PlaySound;
   /** Daily: the first accepted word counts as today's play. */
   recordPlay: () => void;
@@ -158,7 +174,7 @@ export function useWordWheel({
       return;
     }
     if (!accepted) {
-      flashReject(word.length < MIN_WORD_LEN ? 'too_short' : 'not_in_dictionary');
+      flashReject(word.length < MIN_WORD_LEN ? 'too_short' : 'not_in_dictionary', word);
       setSelected([]);
       return;
     }

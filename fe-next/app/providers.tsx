@@ -19,7 +19,6 @@
 
 import React, { useEffect, ReactNode } from 'react';
 import { AchievementQueueProvider } from '@/components/achievements';
-import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { NativeAppProvider } from '@/components/native/NativeAppProvider';
 import { NetworkStatusHandler } from '@/components/native/NetworkStatusHandler';
 import { SocketProvider } from '@/utils/SocketContext';
@@ -79,10 +78,9 @@ if (typeof window !== 'undefined') {
     initHowler();
 }
 
-// Core game feature providers (achievements, announcer)
-// Note: CoinProvider moved to EssentialProviders (needed on profile page for avatar purchases)
+// Core game feature providers (achievements)
+// Note: CoinProvider and the announcer live in EssentialProviders (word modes outside this stack need them)
 const CoreGameProviders = composeProviders([
-    [GameAnnouncerProvider as React.ComponentType<{ children: ReactNode }>, {}],
     [AchievementQueueProvider as React.ComponentType<{ children: ReactNode }>, {}],
 ]);
 
@@ -96,7 +94,7 @@ interface GameSpecificProvidersProps {
  * This component wraps children with game-specific providers:
  * - Network/Native handlers
  * - Socket.IO and game state
- * - Achievements, coins, and announcer
+ * - Achievements
  *
  * IMPORTANT: This does NOT include EssentialProviders - it should be
  * rendered INSIDE EssentialProviders by ConditionalProviders.

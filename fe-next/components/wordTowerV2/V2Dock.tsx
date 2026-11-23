@@ -56,6 +56,15 @@ export const CLEAR_WORD_HOLD_MS = CLEAR_HOLD_MS;
  * third of a phone's height. Its measured height still frames the ground
  * (WordTowerV2), so the camera simply gets the room back.
  */
+
+function RejectChip({ text, at }: { text: string; at: string }) {
+  return (
+    <div className={`absolute inset-x-0 ${at} z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake`}>
+      {text}
+    </div>
+  );
+}
+
 export const V2Dock = memo(function V2Dock(p: Props) {
   const { t } = p;
   // Rage clicks on backspace were the #1 frustration signal on Word Tower
@@ -127,13 +136,10 @@ export const V2Dock = memo(function V2Dock(p: Props) {
             'absolute inset-x-0 bottom-0 z-30 border-t-4 border-neo-cream/20 bg-neo-navy/90 px-4 pb-[max(1rem,calc(env(safe-area-inset-bottom)+0.5rem),calc(var(--cap-safe-area-bottom,0px)+0.5rem))] pt-3'
       }
     >
-      {p.rejected ? (
-        <div className="absolute inset-x-0 -top-10 z-40 mx-auto w-fit rounded-neo border-neo border-black bg-neo-red px-3 py-1 font-neo-display text-sm font-bold text-neo-navy shadow-hard animate-neo-shake">
-          {t(p.rejected.includes('.') ? p.rejected : `wordTower.error.${p.rejected}`)}
-        </div>
-      ) : null}
+      {p.rejected && !p.wide ? <RejectChip text={p.rejected} at="-top-10" /> : null}
 
-      <div className="mx-auto flex w-full max-w-md flex-col gap-2.5 lg:gap-3">
+      <div className="relative mx-auto flex w-full max-w-md flex-col gap-2.5 lg:gap-3">
+        {p.rejected && p.wide ? <RejectChip text={p.rejected} at="-top-12" /> : null}
         {/* Phone: the stability meter heads the panel (never floating over the
             tower); it keeps its row while hidden, so the camera never jumps. */}
         {!p.wide && p.stabilitySlot ? <div className="pointer-events-auto flex justify-center">{p.stabilitySlot}</div> : null}

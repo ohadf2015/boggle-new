@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, type MutableRefObject } from 'react';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
+import type { VerdictParams, WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
 
 export type LetterClear = 'now' | 'later' | 'keep';
 export type RejectKind = 'rule' | 'invalid' | 'found' | 'unknown';
@@ -7,10 +8,10 @@ export type RejectKind = 'rule' | 'invalid' | 'found' | 'unknown';
 export type WordCheck = boolean | null;
 
 interface BuiltLetter { letter: string; wheelIndex: number }
+export interface WheelVerdict { reason: WordVerdictReason; params?: VerdictParams }
 
 interface UseWordWheelSubmitArgs {
   puzzle: WordWheelPuzzle;
-  t: (key: string, params?: Record<string, string | number>) => string;
   builtLettersRef: MutableRefObject<BuiltLetter[]>;
   setBuiltLetters: (letters: BuiltLetter[]) => void;
   wordsFoundRef: MutableRefObject<string[]>;
@@ -20,7 +21,7 @@ interface UseWordWheelSubmitArgs {
   /** Synchronous dictionary answer: true/false when loaded, null when cold. */
   onQuickVerdict?: (word: string) => boolean | null;
   accept: (word: string, spelled: BuiltLetter[]) => void;
-  reject: (message: string, clear: LetterClear, spelled: BuiltLetter[], kind: RejectKind) => void;
+  reject: (verdict: WheelVerdict, clear: LetterClear, spelled: BuiltLetter[], kind: RejectKind) => void;
   /** The spelled letters are out for a network verdict. */
   hold?: (release: { indices: number[]; letters: string[] }) => void;
   /** That verdict came back. */
@@ -33,7 +34,7 @@ interface UseWordWheelSubmitArgs {
  * the network, and a swipe never waits on it: the wheel clears and the word rides as `pendingWord`.
  */
 export function useWordWheelSubmit({
-  puzzle, t, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
+  puzzle, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
   onValidateWord, onQuickVerdict, accept, reject, hold, drop,
 }: UseWordWheelSubmitArgs) {
   const [pendingWord, setPendingWord] = useState<string | null>(null);
@@ -50,14 +51,14 @@ export function useWordWheelSubmit({
     lastSubmitWasDragRef.current = false;
     const clear: LetterClear = byDrag ? 'now' : 'later';
 
-    if (word.length < 3) return reject(t('wordWheel.tooShort', { min: '3' }), clear, spelled, 'rule');
+    if (word.length < 3) return reject({ reason: 'too-short', params: { min: 3 } }, clear, spelled, 'rule');
     if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      return reject(t('wordWheel.missingCenter', { letter: puzzle.centerLetter }), clear, spelled, 'rule');
+      return reject({ reason: 'no-center', params: { letter: puzzle.centerLetter } }, clear, spelled, 'rule');
     }
     if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
-      return reject(t('wordWheel.invalidLetters'), clear, spelled, 'rule');
+      return reject({ reason: 'bad-letters' }, clear, spelled, 'rule');
     }
-    if (wordsFoundRef.current.includes(word)) return reject(t('wordWheel.alreadyFound'), 'now', spelled, 'found');
+    if (wordsFoundRef.current.includes(word)) return reject({ reason: 'already-found' }, 'now', spelled, 'found');
 
     const credit = (ok: WordCheck): WordCheck => {
       if (ok === true && !gameOverRef.current && !wordsFoundRef.current.includes(word)) accept(word, spelled);
@@ -66,8 +67,8 @@ export function useWordWheelSubmit({
     const settle = () => { inFlightRef.current.delete(word); };
     const verdictFailed = (ok: WordCheck, clearFor: LetterClear) => {
       if (ok === true || gameOverRef.current) return;
-      if (ok === null) reject(t('wordWheel.cantCheck'), 'keep', spelled, 'unknown');
-      else reject(t('wordWheel.notInDictionary'), clearFor, spelled, 'invalid');
+      if (ok === null) reject({ reason: 'cant-check' }, 'keep', spelled, 'unknown');
+      else reject({ reason: 'not-a-word' }, clearFor, spelled, 'invalid');
     };
 
     const quick = onQuickVerdict?.(word) ?? null;
@@ -75,7 +76,7 @@ export function useWordWheelSubmit({
     inFlightRef.current.add(word);
 
     if (quick === false) {
-      reject(t('wordWheel.notInDictionary'), clear, spelled, 'invalid');
+      reject({ reason: 'not-a-word' }, clear, spelled, 'invalid');
       // Community-validated words live only on the server; credit them late rather than never.
       void onValidateWord(word).then(credit, () => null).finally(settle);
       return;
@@ -115,7 +116,7 @@ export function useWordWheelSubmit({
         tapBlockRef.current = false;
         setIsValidating(false);
       });
-  }, [puzzle, t, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef, onValidateWord, onQuickVerdict, accept, reject, hold, drop]);
+  }, [puzzle, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef, onValidateWord, onQuickVerdict, accept, reject, hold, drop]);
 
   return { handleSubmit, pendingWord, isValidating };
 }

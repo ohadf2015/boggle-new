@@ -92,7 +92,7 @@ describe('single-player word submission when the dictionary server cannot answer
     const { result, combo: c } = setup();
     act(() => result.current.handleWordSubmit('house'));
 
-    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable'));
+    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('wordVerdict.cantCheck'));
     expect(result.current.currentFeedback?.type).not.toBe('rejected');
     expect(result.current.foundWords.find(fw => fw.word === 'house')).toBeUndefined();
     expect(c.resetCombo).not.toHaveBeenCalled();

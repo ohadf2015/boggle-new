@@ -128,7 +128,7 @@ describe('WordWheelGame — daily duplicate word is blocked', () => {
 
     // Blocked: the already-found error toast shows, and there is NO reduced
     // "repeat bonus" success toast.
-    expect(screen.getByText('wordWheel.alreadyFound')).toBeInTheDocument();
+    expect(screen.getByText('wordVerdict.alreadyFound')).toBeInTheDocument();
     expect(screen.queryByText('wordWheel.alreadyFoundBonus')).toBeNull();
 
     // No points awarded for the duplicate — score is unchanged.

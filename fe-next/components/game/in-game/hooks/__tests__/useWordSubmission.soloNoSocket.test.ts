@@ -87,7 +87,8 @@ describe('useWordSubmission — solo board (socket=null, Quick Play classic)', (
   it('still runs the local rejection path (short word gets feedback, no commit)', () => {
     mockValidateWordLocally.mockReturnValue({
       isValid: false,
-      errorKey: 'playerView.wordTooShortMin',
+      reason: 'too-short',
+      errorKey: 'wordVerdict.tooShort',
       errorParams: { min: 3 },
     });
     const options = buildOptions();
@@ -98,7 +99,7 @@ describe('useWordSubmission — solo board (socket=null, Quick Play classic)', (
     });
 
     expect(options.setCurrentFeedback).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'rejected', word: 'TE' })
+      expect.objectContaining({ type: 'rejected', word: 'TE', message: expect.stringContaining('wordVerdict.tooShort'), durationMs: 1600 })
     );
     expect(options.onWordSubmit).not.toHaveBeenCalled();
   });

@@ -84,6 +84,15 @@ describe('daily word hunt: every verdict names its word', () => {
     expect(showToast).toHaveBeenCalledWith('not-on-board', expect.any(String), 'HOUSES');
   });
 
+  it('Given the same non-word twice, When the second answer lands, Then it says why more plainly', async () => {
+    global.fetch = vi.fn(async () => new Response(JSON.stringify({ isValid: false, source: 'dictionary' }))) as unknown as typeof fetch;
+    const { result, showToast } = setup();
+    act(() => result.current.handleWordSubmit('hous'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('not-in-dictionary', 'wordVerdict.notAWord', 'HOUS'));
+    act(() => result.current.handleWordSubmit('hous'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('not-in-dictionary', 'wordVerdict.notAWordAgain', 'HOUS'));
+  });
+
   it('Given a word the dictionary rejects, When the answer lands, Then the verdict carries the word', async () => {
     const { result, showToast } = setup();
     act(() => result.current.handleWordSubmit('hous'));

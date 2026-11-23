@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import type { LetterClear, RejectKind } from '../useWordWheelSubmit';
 import type { useWheelWordFx } from './useWheelWordFx';
+import { VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
 
 // Score, list and cleared trail paint first; particles, audio and haptics follow the frame.
 export const afterPaint = (fn: () => void) => {
@@ -45,7 +46,7 @@ interface UseWheelFeedbackArgs {
   timers: ReturnType<typeof useChannelTimers>;
 }
 
-const TOAST_MS = 1500;
+const TOAST_MS = VERDICT_MS;
 
 export function useWheelFeedback({ builtLettersRef, setBuiltLetters, fireFx, cancelIdleSubmit, timers }: UseWheelFeedbackArgs) {
   const [feedback, setFeedback] = useState<{ message: string; type: FeedbackType } | null>(null);
@@ -58,22 +59,20 @@ export function useWheelFeedback({ builtLettersRef, setBuiltLetters, fireFx, can
     timers.set('toast', () => setFeedback(null), TOAST_MS);
   }, [timers]);
 
-  const showRejection = useCallback((message: string, kind: RejectKind, clear: LetterClear, spelled?: BuiltLetter[]) => {
+  const showRejection = useCallback((message: string, kind: RejectKind, clear: LetterClear, spelled?: BuiltLetter[], holdMs = TOAST_MS) => {
     const letters = spelled ?? builtLettersRef.current;
     setFeedback({ message, type: kind === 'unknown' ? 'warn' : 'error' });
-    timers.set('toast', () => setFeedback(null), TOAST_MS);
+    timers.set('toast', () => setFeedback(null), holdMs);
     cancelIdleSubmit();
 
     if (kind === 'found') {
       setPulse({ word: letters.map(bl => bl.letter).join('').toUpperCase(), id: ++pulseIdRef.current });
       timers.set('pulse', () => setPulse(null), 900);
-      haptic(15);
     } else if (kind !== 'unknown') {
       if (letters.length > 0) {
         fireFx({ kind: 'bad', indices: letters.map(bl => bl.wheelIndex), letters: letters.map(bl => bl.letter), points: 0 });
       }
       setShake(true);
-      haptic([30, 50, 30]);
       timers.set('shake', () => setShake(false), 400);
     }
 
@@ -86,7 +85,7 @@ export function useWheelFeedback({ builtLettersRef, setBuiltLetters, fireFx, can
       timers.set('autoReset', () => {
         builtLettersRef.current = [];
         setBuiltLetters([]);
-      }, TOAST_MS);
+      }, holdMs);
     }
   }, [builtLettersRef, setBuiltLetters, fireFx, cancelIdleSubmit, timers]);
 

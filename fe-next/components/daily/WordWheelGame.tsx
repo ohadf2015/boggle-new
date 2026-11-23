@@ -26,7 +26,8 @@ import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
 import { claimPointer } from '@/lib/wordWheel/claimPointer';
 import WordWheelRankLadder from './WordWheelRankLadder';
 import WordWheelWordLine from './WordWheelWordLine';
-import { useWordWheelSubmit, type LetterClear, type RejectKind } from './useWordWheelSubmit';
+import { useWordWheelSubmit, type LetterClear, type RejectKind, type WheelVerdict } from './useWordWheelSubmit';
+import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
 import WheelActionBar from './wheel/WheelActionBar';
 import WheelPassToasts from './wheel/WheelPassToasts';
 import type { WordWheelGameProps, WordWheelGameResult } from './wheel/wordWheelGameProps';
@@ -228,7 +229,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   });
 
   // ── Accept a word (score, list, effects) ──
+  const verdicts = useWordVerdict({ t });
   const acceptWord = useCallback((word: string, spelled: { letter: string; wheelIndex: number }[]) => {
+    verdicts.clearRepeat();
     const cx = gameContainerRef.current ? gameContainerRef.current.getBoundingClientRect().width / 2 : 200;
     const step = registerCombo();
     const gold = bonuses && usesGold(word, goldLetter);
@@ -276,19 +279,21 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     });
 
     if (coverage !== 'none') triggerFeatBanner(coverage, word, points);
-  }, [puzzle, bonuses, goldLetter, registerCombo, builtLettersRef, showSuccess, onEffect, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx, timers]);
+  }, [verdicts, puzzle, bonuses, goldLetter, registerCombo, builtLettersRef, showSuccess, onEffect, playWordAcceptedSound, playLegendaryWordSound, playComboSound, playWordLengthSound, triggerFeatBanner, onWordFound, fireFx, timers]);
 
-  const rejectWord = useCallback((message: string, clear: LetterClear, spelled: { letter: string; wheelIndex: number }[], kind: RejectKind) => {
+  const rejectWord = useCallback((v: WheelVerdict, clear: LetterClear, spelled: { letter: string; wheelIndex: number }[], kind: RejectKind) => {
     const cx = gameContainerRef.current ? gameContainerRef.current.getBoundingClientRect().width / 2 : 200;
-    showRejection(message, kind, clear, spelled);
-    emitWheelVerdict(kind, spelled.map(bl => bl.letter).join(''));
-    if (kind === 'invalid') breakCombo();
-    if (kind === 'found' || kind === 'unknown') return;
+    const word = spelled.map(bl => bl.letter).join('');
+    const spoken = verdicts.reject(word, v.reason, v.params);
+    showRejection(spoken.message, kind, clear, spelled, spoken.durationMs);
+    emitWheelVerdict(kind, word);
+    if (spoken.breaksCombo) breakCombo();
+    if (!spoken.sound) return;
     afterPaint(() => {
       onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();
     });
-  }, [showRejection, breakCombo, onEffect, playWordRejectedSound]);
+  }, [verdicts, showRejection, breakCombo, onEffect, playWordRejectedSound]);
 
   flushBuilderRef.current = () => {
     const spelled = builtLettersRef.current;
@@ -299,7 +304,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   };
 
   const { handleSubmit, pendingWord, isValidating } = useWordWheelSubmit({
-    puzzle, t, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
+    puzzle, builtLettersRef, setBuiltLetters, wordsFoundRef, gameOverRef, lastSubmitWasDragRef,
     onValidateWord, onQuickVerdict, accept: acceptWord, reject: rejectWord,
     hold: (r) => flushSync(() => holdRelease(r)), drop: dropRelease,
   });

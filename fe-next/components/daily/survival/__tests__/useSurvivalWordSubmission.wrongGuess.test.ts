@@ -75,7 +75,7 @@ describe('daily word hunt: a tapped selection too short to submit', () => {
     const { result, dispatch, showToast } = setup();
     act(() => result.current.handleTooShort('PL'));
 
-    expect(showToast).toHaveBeenCalledWith('too-short', 'wordHunt.feedback.tooShort', 'PL');
+    expect(showToast).toHaveBeenCalledWith('too-short', 'wordVerdict.tooShort', 'PL');
     expect(dispatch).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'ADJUST_LIFE' }));
   });
 });

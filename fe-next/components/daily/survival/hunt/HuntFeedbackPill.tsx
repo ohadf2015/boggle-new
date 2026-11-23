@@ -22,6 +22,8 @@ function tone(type: FeedbackType): string {
   return 'bg-neo-red/15 text-neo-red';
 }
 
+const ANNOUNCED_ELSEWHERE: ReadonlySet<FeedbackType> = new Set(['too-short', 'too-long', 'not-on-board', 'not-in-dictionary', 'invalid-word', 'duplicate', 'unavailable']);
+
 /** Keyed by seq with no exit: a new result swaps in the same frame instead of queueing behind the old one. */
 export function HuntFeedbackPill({ seq, type, message, word, calm }: HuntFeedbackPillProps) {
   return (
@@ -31,7 +33,7 @@ export function HuntFeedbackPill({ seq, type, message, word, calm }: HuntFeedbac
           key={seq}
           data-testid="hunt-feedback-pill"
           data-type={type}
-          role="status"
+          role={ANNOUNCED_ELSEWHERE.has(type) ? undefined : 'status'}
           initial={calm ? false : { y: -6, scale: 0.7 }}
           animate={{ y: 0, scale: 1 }}
           transition={SPRING_PRESETS.entrance}

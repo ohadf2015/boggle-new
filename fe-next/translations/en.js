@@ -1,5 +1,17 @@
 // EN translations
 const en = {
+  "wordVerdict": {
+    "tooShort": "Too short: {min}+ letters",
+    "tooLong": "Too long: {max} letters max",
+    "missingCenter": "Needs the center letter {letter}",
+    "badLetters": "Only letters in play count",
+    "notOnBoard": "Not on the board",
+    "notOnBoardAgain": "Letters must touch in a chain",
+    "notAWord": "Not in our dictionary",
+    "notAWordAgain": "Still not a word. Try another",
+    "alreadyFound": "You already found that one",
+    "cantCheck": "Couldn't check it. Try again",
+  },
   // @avatarChest:start
   "avatarChest": {
     "kicker": "Chest find!",
@@ -5261,7 +5273,6 @@ const en = {
     "gotIt": "Got it"
   },
   "playerView": {
-    "onlyLanguageWords": "Use only letters from this language",
     "getReadyHint": "Scan the grid now",
     "wordsFound": "Words Found",
     "wordsOnBoard": "Words on Board",
@@ -5270,10 +5281,7 @@ const en = {
     "remaining": "Left",
     "found": "found",
     "total": "total",
-    "wordAlreadyFound": "Word already found ❌",
     "foundByOther": "Found by ${player}",
-    "alreadyFound": "Already found",
-    "wordNotOnBoard": "Not on board",
     "wordNotInList": "Not in the word list",
     "roomClosed": "Room closed",
     "exitConfirmation": "Exit room?",
@@ -5287,7 +5295,6 @@ const en = {
     "leaderboard": "Leaderboard",
     "noPlayersYet": "No players yet",
     "wordTooShort": "Too short. Need 2+ letters",
-    "wordTooShortMin": "Word too short (min {min} letters)",
     "errorOccurred": "That didn't work. Try again",
     "tooFast": "Slow down. You're submitting too fast",
     "me": "Me",
@@ -5320,9 +5327,6 @@ const en = {
     "slowDown": "Easy, speedster. Still crunching your words.",
     "submittingTooFast": "Whoa there. Slow your roll.",
     "words": "Words",
-    "invalidWord": "Not a word",
-    "wordCheckUnavailable": "Couldn't check that word. Try again",
-    "notInDictionary": "Not a word",
     "pendingValidation": "Being checked...",
     "validation": {
       "scanning": "Hunting for fakes...",
@@ -9842,12 +9846,7 @@ const en = {
     "closeRace": "Close race!",
     "gameOver": "Time's Up!",
     "submit": "SUBMIT",
-    "alreadyFound": "Already found",
     "alreadyFoundBonus": "Found again (+{points})",
-    "notInDictionary": "Not a word",
-    "missingCenter": "Use the center letter ({letter})",
-    "tooShort": "Too short (min {min} letters)",
-    "invalidLetters": "Wheel letters only",
     "allLettersUsed": "ALL LETTERS!",
     "almostAllLetters": "ALMOST ALL!",
     "missingLetter": "Missing: {letter}",
@@ -9937,7 +9936,6 @@ const en = {
 "notWord": "Not a word here. Try {word}",
 "check": "Check"
 },
-"cantCheck": "Couldn't check that word. Try again",
 "quitKeepsWords": "The words you've found so far will count as today's result.",
 "goldLetterLabel": "gold letter",
 "comboLabel": "Combo {value}",
@@ -10034,14 +10032,6 @@ const en = {
     "quitConfirmTitle": "Leave the Hunt?",
     "quitConfirmMessage": "Your progress will be lost.",
     "feedback": {
-      "tooShort": "📏 Minimum 3 letters",
-      "tooLong": "📏 Maximum 8 letters",
-      "duplicate": "🔁 Already found",
-      "notOnBoardPenalty": "Not on the board",
-      "notFormablePenalty": "Not on the board",
-      "notInDictionary": "Not a word",
-      "notInDictionaryFree": "📖 Not a word. Try another",
-      "notOnBoardFree": "⚠️ Not on the board. Letters must touch",
       "correct": "Correct",
       "wrongPlace": "Wrong place",
       "notInWord": "Not in word"

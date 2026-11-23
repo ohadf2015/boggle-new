@@ -241,7 +241,8 @@ describe('WordHuntGame', () => {
     it('should reject duplicate words with duplicate feedback', () => {
       (validateWordLocally as Mock).mockReturnValue({
         isValid: false,
-        errorKey: 'playerView.wordAlreadyFound',
+        reason: 'already-found',
+        errorKey: 'wordVerdict.alreadyFound',
         shouldSubmitToServer: false,
       });
 
@@ -263,7 +264,9 @@ describe('WordHuntGame', () => {
     it('should reject too-short words with rejected feedback', () => {
       (validateWordLocally as Mock).mockReturnValue({
         isValid: false,
-        errorKey: 'playerView.wordTooShortMin',
+        reason: 'too-short',
+        errorKey: 'wordVerdict.tooShort',
+        errorParams: { min: 3 },
         shouldSubmitToServer: false,
       });
 

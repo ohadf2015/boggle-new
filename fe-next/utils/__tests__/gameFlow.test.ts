@@ -157,7 +157,7 @@ describe('Game Flow - Word Submission to Results', () => {
       
       const result = validateWordLocally('cat', 'en', 2, foundWords);
       expect(result.isValid).toBe(false);
-      expect(result.errorKey).toBe('playerView.wordAlreadyFound');
+      expect(result.errorKey).toBe('wordVerdict.alreadyFound');
     });
   });
 });

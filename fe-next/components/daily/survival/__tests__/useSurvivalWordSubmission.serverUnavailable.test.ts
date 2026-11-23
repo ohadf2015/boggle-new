@@ -58,7 +58,7 @@ describe('daily word hunt discovery when the dictionary server cannot answer', (
     act(() => result.current.handleWordSubmit('HOUSE'));
 
     await waitFor(() => expect(showToast).toHaveBeenCalled(), { timeout: 3000 });
-    expect(showToast).toHaveBeenCalledWith('unavailable', 'playerView.wordCheckUnavailable', 'HOUSE');
+    expect(showToast).toHaveBeenCalledWith('unavailable', 'wordVerdict.cantCheck', 'HOUSE');
     expect(dispatch).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'ADJUST_LIFE' }));
     expect(dispatch).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'DISCOVER_WORD' }));
     expect(recordNotInDictionary).not.toHaveBeenCalled();

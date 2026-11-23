@@ -128,9 +128,9 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { dictRef, dictReady, dictError, retry: retryDict } = useV2Dictionary(language);
 
   // Emergency brace (coins off the run, a free one from upgrades, or a rescue word).
-  const { rejected, flash: flashReject } = useRejectFlash(playSound);
+  const { rejected, flash: flashReject } = useRejectFlash(playSound, t);
   const onRescueReject = useCallback(
-    (reason: RescueReject) => flashReject(reason === 'rescue_short' ? 'wordTowerV2.brace.short' : reason),
+    (reason: RescueReject) => flashReject(reason === 'rescue_short' ? 'wordTowerV2.brace.short' : reason, ''),
     [flashReject],
   );
   const braceApi = useBrace({

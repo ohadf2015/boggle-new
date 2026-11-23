@@ -13,11 +13,9 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 // Rejected/duplicate get a SHORTER window so a bad word doesn't linger as a
 // "stuck" pill while the player wants to keep moving. Reported in MP classic.
 const FEEDBACK_VISIBLE_MS_ACCEPTED = 5000;
-const FEEDBACK_VISIBLE_MS_REJECTED = 1500;
-function feedbackVisibleMs(type: WordFeedback['type']): number {
-  return type === 'rejected' || type === 'duplicate'
-    ? FEEDBACK_VISIBLE_MS_REJECTED
-    : FEEDBACK_VISIBLE_MS_ACCEPTED;
+function feedbackVisibleMs({ type, durationMs }: WordFeedback): number {
+  if (durationMs) return durationMs;
+  return type === 'rejected' || type === 'duplicate' ? VERDICT_MS : FEEDBACK_VISIBLE_MS_ACCEPTED;
 }
 // How long the just-submitted word bridges the gap until async feedback lands.
 // Covers the socket round-trip (50–200ms typ.). If nothing arrives by then the
@@ -25,6 +23,7 @@ function feedbackVisibleMs(type: WordFeedback['type']): number {
 // than linger forever.
 const BRIDGE_VISIBLE_MS = 1500;
 import { MIN_WORD_LENGTH } from '@/shared/constants/gameConstants';
+import { VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
 
 // Hebrew final letters (sofit) mapping - non-final to final form
 const HEBREW_FINAL_LETTERS: Record<string, string> = {
@@ -57,6 +56,8 @@ export interface WordFeedback {
   word: string;
   score?: number;
   message?: string;
+  /** How long the note stays; a verdict sets it (a repeated miss holds longer). */
+  durationMs?: number;
   fireRoundActive?: boolean;
   fireRoundBonus?: number;
   /** Golden letter bonus points */
@@ -153,7 +154,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
         setVisibleFeedback(null);
         setLastWord('');
         feedbackTimeoutRef.current = null;
-      }, feedbackVisibleMs(feedback.type));
+      }, feedbackVisibleMs(feedback));
     }
 
     return () => {
@@ -330,6 +331,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
 
             {/* Word display - no layout animation to prevent letter wrap during changes */}
             <span
+              aria-hidden={showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate') ? true : undefined}
               className={cn(
                 'font-black uppercase tracking-wide',
                 compact ? 'text-base' : 'text-xl',

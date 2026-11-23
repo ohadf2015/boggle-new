@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
+import type { WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
 import {
   applySubmission,
   awardedWordPoints,
@@ -59,8 +60,8 @@ export function useSoloJuice() {
   return { combo, missions, onResult, snapshot };
 }
 
-export function soloResultFromErrorKey(errorKey: string | undefined): SoloSubmissionResult {
-  if (errorKey === 'playerView.wordTooShortMin') return 'short';
-  if (errorKey === 'playerView.wordAlreadyFound') return 'dup';
+export function soloResultFromReason(reason: WordVerdictReason | undefined): SoloSubmissionResult {
+  if (reason === 'too-short') return 'short';
+  if (reason === 'already-found') return 'dup';
   return 'invalid';
 }

@@ -22,15 +22,14 @@ import { usePrevalidation } from '@/hooks/usePrevalidation';
 import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
 import { trackWordFound, trackInvalidWord } from '@/utils/posthogEngagement';
 import type { Language, LetterGrid } from '@/shared/types/game';
+import { verdictMessage, wordVerdict, type WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
 
 type InvalidWordReason = 'not_in_dictionary' | 'too_short' | 'already_found' | 'invalid_path' | 'other';
 
-/** Maps the hook's i18n errorKey to the PostHog reason taxonomy. */
-function errorKeyToReason(errorKey: string | undefined): InvalidWordReason {
-  if (!errorKey) return 'other';
-  if (errorKey.includes('tooShort') || errorKey.includes('minLength')) return 'too_short';
-  if (errorKey.includes('alreadyFound')) return 'already_found';
-  if (errorKey.includes('notOnBoard') || errorKey.includes('invalidPath')) return 'invalid_path';
+function trackedReason(reason: WordVerdictReason | undefined): InvalidWordReason {
+  if (reason === 'too-short') return 'too_short';
+  if (reason === 'already-found') return 'already_found';
+  if (reason === 'not-on-board') return 'invalid_path';
   return 'other';
 }
 
@@ -279,7 +278,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
         ? { ...fw, isValid: false, score: 0 }
         : fw
     ));
-    const msg = t('playerView.invalidWord', 'Not a valid word');
+    const msg = verdictMessage(t, wordVerdict('not-a-word'));
     setCurrentFeedback({
       id: `reject-${now}`,
       type: 'rejected',
@@ -306,7 +305,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       id: `unchecked-${now}`,
       type: 'duplicate',
       word: normalizedWord.toUpperCase(),
-      message: t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again"),
+      message: verdictMessage(t, wordVerdict('cant-check')),
       timestamp: now,
     });
   }, [t]);
@@ -357,11 +356,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     );
 
     if (!localValidation.isValid) {
-      const errorKey = localValidation.errorKey ?? 'Invalid word';
-      const params = localValidation.errorParams?.min
-        ? { min: String(localValidation.errorParams.min) }
-        : undefined;
-      const msg = params ? t(errorKey, params) : t(errorKey);
+      const msg = verdictMessage(t, wordVerdict(localValidation.reason ?? 'not-a-word', localValidation.errorParams));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -374,7 +369,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       if (mode) {
         trackInvalidWord({
           mode,
-          reason: errorKeyToReason(localValidation.errorKey),
+          reason: trackedReason(localValidation.reason),
           attemptLength: normalizedWord.length,
         });
       }
@@ -383,7 +378,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     // Step 2: Check if word exists on board (uses cached positions map)
     if (!grid || !isWordOnBoard(normalizedWord, grid, language, positionsMapRef.current ?? undefined)) {
-      const msg = t('playerView.wordNotOnBoard', 'Word not on board');
+      const msg = verdictMessage(t, wordVerdict('not-on-board'));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -401,7 +396,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     // Step 3: Check for duplicates
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      const msg = t('playerView.wordAlreadyFound', 'Already found!');
+      const msg = verdictMessage(t, wordVerdict('already-found'));
       setCurrentFeedback({
         id: `duplicate-${now}`,
         type: 'duplicate',
