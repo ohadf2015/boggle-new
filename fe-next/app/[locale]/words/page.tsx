@@ -1,3 +1,4 @@
+import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import type { Metadata } from 'next';
 import { defaultOgImages } from '@/lib/seo/defaultOgImage';
 import Link from 'next/link';
@@ -61,7 +62,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
         ['es-CO', `${BASE_URL}/es/words`],
       ]),
     },
-    robots: { index: true, follow: true },
+    robots: APP_SCREEN_ROBOTS,
   }, '/words', locale);
 }
 

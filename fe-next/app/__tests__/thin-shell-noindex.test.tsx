@@ -20,16 +20,28 @@ const cases: Array<{ name: string; load: () => Promise<any>; params: Record<stri
   { name: '/brain/drills/memory-hunt', load: () => import('../[locale]/brain/drills/memory-hunt/page'), params: { locale: 'en' } },
   { name: '/brain/drills/rare-gems', load: () => import('../[locale]/brain/drills/rare-gems/page'), params: { locale: 'en' } },
   { name: '/word-of-the-day/[date]', load: () => import('../[locale]/word-of-the-day/[date]/page'), params: { locale: 'en', date: '2026-03-05' } },
-  // /adventure left this list at GA (2026-09-25): public, with per-locale crawlable
-  // content + VideoGame/Breadcrumb JSON-LD server-rendered (app/[locale]/adventure/page.test.tsx).
+  { name: '/daily layout', load: () => import('../[locale]/daily/layout'), params: { locale: 'en' } },
+  { name: '/daily/archive', load: () => import('../[locale]/daily/archive/page'), params: { locale: 'en' } },
+  { name: '/adventure', load: () => import('../[locale]/adventure/page'), params: { locale: 'en' } },
+  { name: '/adventure layout', load: () => import('../[locale]/adventure/layout'), params: { locale: 'en' } },
+  { name: '/word-tower', load: () => import('../[locale]/word-tower/page'), params: { locale: 'en' } },
+  { name: '/connections', load: () => import('../[locale]/connections/page'), params: { locale: 'en' } },
+  { name: '/leaderboard', load: () => import('../[locale]/leaderboard/page'), params: { locale: 'en' } },
+  { name: '/leaderboard layout', load: () => import('../[locale]/leaderboard/layout'), params: { locale: 'en' } },
+  { name: '/community', load: () => import('../[locale]/community/page'), params: { locale: 'en' } },
+  { name: '/accessibility', load: () => import('../[locale]/accessibility/page'), params: { locale: 'en' } },
+  { name: '/tools', load: () => import('../[locale]/tools/page'), params: { locale: 'en' } },
+  { name: '/word-of-the-day', load: () => import('../[locale]/word-of-the-day/page'), params: { locale: 'en' } },
+  { name: '/words', load: () => import('../[locale]/words/page'), params: { locale: 'en' } },
+  { name: '/teacher/upgrade', load: () => import('../[locale]/teacher/upgrade/page'), params: { locale: 'en' } },
 ];
 
 describe('thin game-shell pages are noindexed (AdSense remediation)', () => {
   for (const c of cases) {
     it(`${c.name} emits robots index:false`, async () => {
       const mod = await c.load();
-      const meta = await mod.generateMetadata({ params: Promise.resolve(c.params) });
-      expect(meta.robots).toMatchObject({ index: false });
+      const meta = await mod.generateMetadata({ params: Promise.resolve(c.params), searchParams: Promise.resolve({}) });
+      expect(meta.robots).toMatchObject({ index: false, follow: true });
     });
   }
 
@@ -47,5 +59,15 @@ describe('thin game-shell pages are noindexed (AdSense remediation)', () => {
     const mod = await import('../[locale]/word-craft/page');
     const meta = await mod.generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
     expect(meta.robots).toMatchObject({ index: false, follow: true });
+  });
+});
+
+describe('app screens stay out of the sitemap', () => {
+  it('lists no APP_SCREEN_PATHS entry in any locale', async () => {
+    const { APP_SCREEN_PATHS, isAppScreenUrl } = await import('@/lib/seo/appScreens');
+    const sitemap = (await import('../sitemap')).default;
+    const urls = (await sitemap()).map((e: { url: string }) => e.url);
+    expect(APP_SCREEN_PATHS.length).toBeGreaterThan(0);
+    expect(urls.filter(isAppScreenUrl)).toEqual([]);
   });
 });

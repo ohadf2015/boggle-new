@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   // Adventure is now GA — publicly indexed for search and AdSense review.
-  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale, noIndex: false });
+  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {

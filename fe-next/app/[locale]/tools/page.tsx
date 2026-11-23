@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { defaultOgImages } from '@/lib/seo/defaultOgImage';
+import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import ToolsHubPageClient from './PageClient';
 import { getContent, type Locale } from './word-solver/content';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -57,6 +58,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       canonical: pageUrl,
       languages,
     },
+    robots: APP_SCREEN_ROBOTS,
   };
 }
 

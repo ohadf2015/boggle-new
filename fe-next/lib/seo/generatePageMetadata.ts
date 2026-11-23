@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { withBodyLocales } from './bodyLocales';
+import { isAppScreen } from './appScreens';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
@@ -45,6 +46,7 @@ export async function generatePageMetadata({
   englishOnly = false,
   ogType = 'website',
 }: PageMetadataOptions): Promise<Metadata> {
+  noIndex = noIndex || isAppScreen(path);
   if (englishOnly) {
     const meta = await generatePageMetadata({ seoKey, path, locale, noIndex: noIndex || locale !== 'en', ogType });
     const enUrl = `${BASE_URL}/en${path}`;
