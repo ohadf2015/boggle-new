@@ -13,7 +13,7 @@ import {
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
-import { resetSelection, scheduleSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
+import { scheduleSelection, useFrozenWhileSelecting, useSelectionReset } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
 import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
 import { useCoachExampleWord } from '@/hooks/useCoachExampleWord';
@@ -277,9 +277,9 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
   }, []);
 
   // Clear stale feedback and formed word when grid changes (new round)
+  useSelectionReset(letterGrid);
   useEffect(() => {
     setCurrentFeedback(null);
-    resetSelection();
   }, [letterGrid]);
 
   // Reset lastWordFoundTime when game starts

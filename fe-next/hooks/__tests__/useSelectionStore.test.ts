@@ -3,6 +3,7 @@ import {
   useSelectionStore,
   resetSelection,
   scheduleSelection,
+  isSelecting,
 } from '../useSelectionStore';
 
 describe('useSelectionStore', () => {
@@ -88,6 +89,19 @@ describe('useSelectionStore', () => {
       vi.runOnlyPendingTimers();
       expect(useSelectionStore.getState().letterCount).toBe(0);
     });
+
+    it('given a hidden tab where frames never fire, when the player releases, then the clear still lands', () => {
+      useSelectionStore.getState().setSelection('CAT', 3);
+      scheduleSelection('', 0);
+      vi.advanceTimersByTime(150);
+      expect(useSelectionStore.getState().letterCount).toBe(0);
+    });
+
+    it('given a tap whose write is still queued, then isSelecting already reports the drag', () => {
+      scheduleSelection('C', 1);
+      expect(isSelecting()).toBe(true);
+      scheduleSelection('', 0);
+      expect(isSelecting()).toBe(false);
+    });
   });
 });
-

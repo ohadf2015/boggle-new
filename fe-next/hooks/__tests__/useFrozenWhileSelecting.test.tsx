@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useSelectionStore,
   useFrozenWhileSelecting,
   resetSelection,
+  scheduleSelection,
+  useSelectionReset,
 } from '../useSelectionStore';
 
 describe('useFrozenWhileSelecting', () => {
@@ -97,5 +99,31 @@ describe('useFrozenWhileSelecting', () => {
     });
 
     expect(renderCount).toBe(initialRenderCount);
+  });
+
+  it('given a value frozen by the hook, when a drag starts but has not flushed, then a new value is still held', () => {
+    const { result, rerender } = renderHook(({ v }) => useFrozenWhileSelecting(v), { initialProps: { v: 1 } });
+    scheduleSelection('C', 1);
+    rerender({ v: 2 });
+    expect(result.current).toBe(1);
+  });
+
+  describe('useSelectionReset', () => {
+    it('given a queued selection, when the owner unmounts, then it never lands', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'] });
+      const { unmount } = renderHook(() => useSelectionReset('grid-1'));
+      scheduleSelection('CAT', 3);
+      unmount();
+      vi.advanceTimersByTime(200);
+      expect(useSelectionStore.getState().letterCount).toBe(0);
+      vi.useRealTimers();
+    });
+
+    it('given a previous word on screen, when the grid changes, then the selection clears at once', () => {
+      const { rerender } = renderHook(({ g }) => useSelectionReset(g), { initialProps: { g: 'grid-1' } });
+      useSelectionStore.getState().setSelection('CAT', 3);
+      rerender({ g: 'grid-2' });
+      expect(useSelectionStore.getState().formedWord).toBe('');
+    });
   });
 });
