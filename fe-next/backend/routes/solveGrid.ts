@@ -9,6 +9,8 @@ const { ensureLanguageLoaded } = require('../dictionary');
  
 const { findWordsForBots, resolveSolverLanguage } = require('../modules/boggleSolver');
 import logger from '../utils/logger';
+import { getSupabase } from '../modules/supabaseServer';
+import { loadCommonWords } from '@/lib/adventure/play/commonWords';
 
 const router: Router = express.Router();
 
@@ -34,7 +36,7 @@ interface BotWords {
 
 interface SolveGridResponse {
   success: boolean;
-  words?: BotWords;
+  words?: BotWords & { common: string[] };
   error?: string;
 }
 
@@ -92,7 +94,6 @@ function rateLimit(req: Request, res: Response, next: NextFunction): void {
  * Filter blacklisted words from bot word list
  */
 async function filterBlacklistedWords(words: BotWords, language: string): Promise<BotWords> {
-  const { getSupabase } = require('../modules/supabaseServer');
   const supabase = getSupabase();
 
   if (!supabase) {
@@ -178,12 +179,16 @@ router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promis
 
     // Filter out blacklisted words
     const filteredWords = await filterBlacklistedWords(words, language);
+    // Everyday words on this board, so the stuck-player coach never suggests FEI or ECU.
+    const everyday = new Set(await loadCommonWords(language));
+    const common = [...new Set([...filteredWords.easy, ...filteredWords.medium, ...filteredWords.hard])]
+      .filter((w) => everyday.has(w.toLowerCase()));
 
     // The 30s global Express timeout may have answered already on a slow solve.
     if (!res.headersSent) {
       res.json({
         success: true,
-        words: filteredWords,
+        words: { ...filteredWords, common },
       } as SolveGridResponse);
     }
   } catch (error) {
