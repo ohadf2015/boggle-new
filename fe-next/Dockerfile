@@ -102,6 +102,9 @@ RUN npm run build:schemas
 # Build the Express server bundle (esbuild — ~2s)
 RUN node scripts/bundle-server.mjs
 
+# next build outgrew the 6144MB default heap (exit 134); a Railway variable overrides this.
+ARG BUILD_HEAP_MB=8192
+
 # Build Next.js with standalone output → .next/standalone/
 # .next/cache (webpack + the type-check's tsbuildinfo) persists between Railway
 # builds; without it every deploy compiled cold. Railway requires the
