@@ -43,6 +43,11 @@ vi.mock('@/utils/utmCapture', () => ({ getUtmDataForProfile: vi.fn(() => ({})) }
 vi.mock('@/utils/dailyChallenge', () => ({ syncGuestDailyResultsToAccount: vi.fn() }));
 vi.mock('@/utils/sentry', () => ({ captureBackgroundError: vi.fn() }));
 vi.mock('@/utils/onboardingStorage', () => ({ getOnboardingData: vi.fn(() => null) }));
+vi.mock('../authUtils', () => ({
+  fetchGeolocation: vi.fn(async () => ({ countryCode: 'US' })),
+  fetchRandomPlayerName: vi.fn(async () => ({ name: 'Player' })),
+  extractOAuthDisplayName: vi.fn(() => null),
+}));
 
 import { useProfileManagement } from '../hooks/useProfileManagement';
 
@@ -93,19 +98,28 @@ describe('fetchUserData — the silent fall-through', () => {
     expect(mockLoggerError).toHaveBeenCalled();
   });
 
-  it('does not retry the PGRST116 path — that one auto-creates the row', async () => {
-    // GIVEN a genuinely absent profile
+  it('creates the row only when the retry also says it is missing', async () => {
     mockGetProfile.mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
     mockCreateProfile.mockResolvedValue({ data: { id: 'u1' }, error: null });
     const { result } = setup();
 
-    // WHEN the profile is fetched (the create branch pulls in geo/avatar
-    // helpers this focused test does not stub — its outcome is not the point)
-    await act(async () => {
-      await result.current.fetchUserData('u1').catch(() => undefined);
-    });
+    await act(async () => { await result.current.fetchUserData('u1'); });
 
-    // THEN the read was NOT retried: PGRST116 already has an owner
-    expect(mockGetProfile).toHaveBeenCalledTimes(1);
+    expect(mockGetProfile).toHaveBeenCalledTimes(2);
+    expect(mockCreateProfile).toHaveBeenCalledTimes(1);
+    expect(mockLoggerWarn).not.toHaveBeenCalled();
+    expect(mockLoggerError).not.toHaveBeenCalled();
+  });
+
+  it('keeps an existing row that the first read missed', async () => {
+    mockGetProfile
+      .mockResolvedValueOnce({ data: null, error: { code: 'PGRST116' } })
+      .mockResolvedValueOnce({ data: { id: 'u1', username: 'Maya' }, error: null });
+    const { result, setProfile } = setup();
+
+    await act(async () => { await result.current.fetchUserData('u1'); });
+
+    expect(mockCreateProfile).not.toHaveBeenCalled();
+    expect(setProfile).toHaveBeenCalled();
   });
 });

@@ -260,19 +260,15 @@ export function useProfileManagement({
       // Fetch profile
       let { data: profileData, error: profileError } = await getProfile(userId);
 
-      // The third outcome, which used to have no branch at all: no row AND no
-      // PGRST116 to trigger the auto-create. A transient network failure, a
-      // non-PGRST116 PostgREST error, or the own-row `profiles` RLS shape this
-      // repo has hit before (0 rows, `error: null`) all landed here and fell
-      // straight through — `setProfile` never called, nothing logged, nothing
-      // retried, `profile` null for the whole session and the student hub stuck
-      // on a spinner. One retry rescues the transient case; a second empty
-      // answer is written to the log instead of vanishing (pitfall class 4).
-      const isMissingRow = (profileError as { code?: string } | null)?.code === 'PGRST116';
-      if (!profileData && !isMissingRow) {
-        logger.warn('AUTH', `Profile read for ${userId} returned nothing — retrying once`);
+      // Any empty first read is retried before the row is treated as missing: a read
+      // that left before the session token was attached comes back empty for a real row.
+      const isMissingRow = (err: typeof profileError) => err?.code === 'PGRST116';
+      if (!profileData) {
+        if (!isMissingRow(profileError)) {
+          logger.warn('AUTH', `Profile read for ${userId} returned nothing — retrying once`);
+        }
         ({ data: profileData, error: profileError } = await getProfile(userId));
-        if (!profileData && (profileError as { code?: string } | null)?.code !== 'PGRST116') {
+        if (!profileData && !isMissingRow(profileError)) {
           logger.error(
             'AUTH',
             `Profile unavailable for ${userId} after retry: ${JSON.stringify(profileError) ?? 'no error, no rows'}`
@@ -280,7 +276,7 @@ export function useProfileManagement({
         }
       }
 
-      if (profileError && (profileError as { code?: string }).code === 'PGRST116') {
+      if (!profileData && isMissingRow(profileError)) {
         // Profile doesn't exist - auto-create a minimal profile so auth works
         await createNewProfile(
           userId,
