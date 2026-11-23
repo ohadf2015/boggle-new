@@ -3,12 +3,12 @@ import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { withSentryConfig } from '@sentry/nextjs';
-import { withPostHogConfig } from '@posthog/nextjs-config';
 import { RETIRED_PRACTICE_REDIRECTS } from './lib/seo/retiredPracticeRedirects.mjs';
 import { GAME_ROUTE_ALIASES } from './lib/seo/gameRouteAliases.mjs';
 import { SCHOOL_ROUTE_ALIASES } from './lib/seo/schoolRouteAliases.mjs';
 import { RETIRED_MODE_REDIRECTS } from './lib/seo/retiredModeRedirects.mjs';
 import { ChunkLoadRetryPlugin } from './lib/deploy/chunkLoadRetryPlugin.mjs';
+import { uploadPosthogSourcemaps } from './lib/deploy/posthogSourcemaps.mjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
 
@@ -103,6 +103,10 @@ const nextConfig = {
   reactCompiler: true,
 
   experimental: {
+    // A custom webpack() turns this off; on, each compilation gets its own heap.
+    webpackBuildWorker: true,
+    // Server bundles ship without source maps; unminified, their stacks stay readable.
+    serverMinification: false,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -733,18 +737,16 @@ const nextConfig = {
   },
 };
 
-// PostHog source map upload only runs in CI/production, where a personal API key
-// with error-tracking write access is present (POSTHOG_API_KEY). Locally the key
-// is absent, so the wrapper is skipped and the build stays identical to before.
-// PostHog error tracking needs these maps to symbolicate browser exceptions;
-// without them every issue from this site stays minified.
-// Generating maps for every bundle pushes next build past the builder's heap; opt in with BUILD_SOURCEMAPS=1.
-const buildSourcemaps = process.env.BUILD_SOURCEMAPS === '1';
-const hasPostHogSourcemapUpload = buildSourcemaps && !!process.env.POSTHOG_API_KEY;
+// Source maps are built only where an upload token is present (Railway), then
+// uploaded once the compile ends. PostHog's inject rewrites each client chunk and
+// its map, so it runs first; Sentry then uploads the rewritten files and deletes
+// the client maps.
+const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
+if (process.env.POSTHOG_API_KEY) {
+  nextConfig.compiler.runAfterProductionCompile = ({ distDir }) => uploadPosthogSourcemaps(distDir);
+}
 
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
-// Source map upload only in CI/production (SENTRY_AUTH_TOKEN present) — saves ~10-20s locally
-const hasSentryToken = buildSourcemaps && !!process.env.SENTRY_AUTH_TOKEN;
 const sentryConfig = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
@@ -762,11 +764,10 @@ const sentryConfig = withSentryConfig(nextConfig, {
   },
   sourcemaps: {
     disable: !hasSentryToken,
-    // Keep the maps on disk when PostHog also uploads them — its wrapper runs
-    // after Sentry and needs the same files. PostHog then deletes them after its
-    // own upload (deleteAfterUpload below), so they still never ship to browsers.
-    deleteSourcemapsAfterUpload: !hasPostHogSourcemapUpload,
+    deleteSourcemapsAfterUpload: true,
   },
+  // Upload from Next's after-compile hook, not inside each webpack compilation.
+  useRunAfterProductionCompileHook: true,
   webpack: {
     treeshake: {
       removeDebugLogging: true,
@@ -779,21 +780,12 @@ const sentryConfig = withSentryConfig(nextConfig, {
   },
 });
 
-// Inject chunk ids and upload browser source maps to PostHog so error tracking can
-// symbolicate exceptions. Skipped entirely when POSTHOG_API_KEY is absent, keeping
-// the config identical to the Sentry-only build. Upload targets the PostHog
-// management API (EU region), NOT the ingestion host used by the browser SDK.
-const finalConfig = hasPostHogSourcemapUpload
-  ? withPostHogConfig(sentryConfig, {
-      personalApiKey: process.env.POSTHOG_API_KEY,
-      projectId: process.env.POSTHOG_PROJECT_ID,
-      host: process.env.POSTHOG_SOURCEMAP_HOST || 'https://eu.posthog.com',
-      sourcemaps: {
-        enabled: true,
-        deleteAfterUpload: true,
-      },
-    })
-  : sentryConfig;
+// Server maps made the server compilation alone outgrow a 6GB heap.
+const sentryWebpack = sentryConfig.webpack;
+sentryConfig.webpack = (config, ctx) => {
+  const out = sentryWebpack(config, ctx);
+  if (ctx.isServer && !ctx.dev) out.devtool = false;
+  return out;
+};
 
-export default withNextIntl(withBundleAnalyzer(finalConfig));
-
+export default withNextIntl(withBundleAnalyzer(sentryConfig));

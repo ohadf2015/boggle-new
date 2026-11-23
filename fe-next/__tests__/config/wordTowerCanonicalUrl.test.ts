@@ -14,9 +14,6 @@ vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
   captureMessage: vi.fn(),
 }));
-vi.mock('@posthog/nextjs-config', () => ({
-  withPostHogConfig: (config: unknown) => config,
-}));
 
 const nextConfig = (await import('../../next.config.mjs')).default;
 
