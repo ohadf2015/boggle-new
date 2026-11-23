@@ -738,11 +738,13 @@ const nextConfig = {
 // is absent, so the wrapper is skipped and the build stays identical to before.
 // PostHog error tracking needs these maps to symbolicate browser exceptions;
 // without them every issue from this site stays minified.
-const hasPostHogSourcemapUpload = !!process.env.POSTHOG_API_KEY;
+// Generating maps for every bundle pushes next build past the builder's heap; opt in with BUILD_SOURCEMAPS=1.
+const buildSourcemaps = process.env.BUILD_SOURCEMAPS === '1';
+const hasPostHogSourcemapUpload = buildSourcemaps && !!process.env.POSTHOG_API_KEY;
 
 // Sentry configuration - only needs NEXT_PUBLIC_SENTRY_DSN to work
 // Source map upload only in CI/production (SENTRY_AUTH_TOKEN present) — saves ~10-20s locally
-const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
+const hasSentryToken = buildSourcemaps && !!process.env.SENTRY_AUTH_TOKEN;
 const sentryConfig = withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
