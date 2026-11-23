@@ -5,7 +5,7 @@ import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 
 /** The practice tip rotates and hides on the first word; a fixed slot keeps the wheel under the finger the same size. */
 const WheelCoachSlot: React.FC<{ wordsFound: number }> = ({ wordsFound }) => (
-  <div data-testid="wheel-coach-slot" className="w-full h-[56px] short:h-[48px] shrink-0 overflow-hidden flex items-center pb-1.5 short:pb-1">
+  <div data-testid="wheel-coach-slot" className="w-full h-[56px] short:h-[48px] shrink-0 overflow-hidden flex items-center pb-1.5 short:pb-1 px-11 sm:px-0">
     <PracticeCoachTip
       mode="wheelRush"
       wordsFound={wordsFound}

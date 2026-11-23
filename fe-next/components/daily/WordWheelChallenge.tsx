@@ -371,7 +371,8 @@ const WordWheelChallenge: React.FC = () => {
       )}
 
       {phase === 'playing' && isPractice && (
-        <div className="absolute top-3 right-3 z-30 pointer-events-none">
+        // Opposite corner from the sound button; on phones the coach row needs the width.
+        <div className="absolute top-3 start-3 z-30 pointer-events-none hidden md:block">
           <PracticeBadge />
         </div>
       )}
