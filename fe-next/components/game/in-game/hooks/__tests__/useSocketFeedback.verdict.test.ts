@@ -55,5 +55,6 @@ describe('useSocketFeedback — shared word verdicts', () => {
     const { handlers, last } = setup();
     handlers.wordRejected({ word: 'CAT', reason: 'boss_frozen' });
     expect(last().message).toBe('classroomBoss.frozenRejected');
+    expect(hapticError).toHaveBeenCalled();
   });
 });

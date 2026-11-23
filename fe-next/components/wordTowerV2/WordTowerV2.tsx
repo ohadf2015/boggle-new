@@ -128,7 +128,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const { dictRef, dictReady, dictError, retry: retryDict } = useV2Dictionary(language);
 
   // Emergency brace (coins off the run, a free one from upgrades, or a rescue word).
-  const { rejected, flash: flashReject } = useRejectFlash(playSound, t);
+  const { rejected, flash: flashReject, clearRepeat: clearRejectRepeat } = useRejectFlash(playSound, t);
   const onRescueReject = useCallback(
     (reason: RescueReject) => flashReject(reason === 'rescue_short' ? 'wordTowerV2.brace.short' : reason, ''),
     [flashReject],
@@ -204,7 +204,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
   const keysBlocked = smashing || rivalsOpen || raiding || phase === 'draft' || (forceResults && phase !== 'over');
   const ww = useWordWheel({
     daily, language, phase, run, hoist, cancelHoist, drop, setScrambles,
-    dictRef, dictReady, braceApi, flashReject, playSound, recordPlay, keysBlocked,
+    dictRef, dictReady, braceApi, flashReject, clearRejectRepeat, playSound, recordPlay, keysBlocked,
   });
   const { wheel, selected, word, valid, resetForRun } = ww;
   const guide = useGuidedFirstWord({ daily, dict: dictRef.current, dictReady, dictError, wheel, selected, phase, towerFloors, floors: run.floors });

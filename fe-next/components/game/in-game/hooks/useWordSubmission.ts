@@ -133,7 +133,7 @@ export function useWordSubmission(
         durationMs: v.durationMs,
         timestamp: Date.now(),
       });
-      if (v.breaksCombo) onResetCombo?.();
+      if (reason === 'already-found') onResetCombo?.();
       return;
     }
 
@@ -147,10 +147,10 @@ export function useWordSubmission(
         durationMs: v.durationMs,
         timestamp: Date.now(),
       });
-      if (v.breaksCombo) onResetCombo?.();
       return;
     }
 
+    verdicts.clearRepeat();
     // Haptic feedback fires optimistically (client-authoritative feel).
     // Accept SOUND is gated on the server's wordAccepted event — see
     // useSocketFeedback — to avoid audio-lie when server rejects.

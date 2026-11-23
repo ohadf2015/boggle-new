@@ -39,6 +39,14 @@ describe('Word Tower reject flash', () => {
     expect(result.current.rejected).toBeNull();
   });
 
+  it('a placed floor clears the streak, so the next miss on that word is a first miss', () => {
+    const { result } = renderHook(() => useRejectFlash(vi.fn(), t));
+    act(() => { result.current.flash('not_in_dictionary', 'ANUAL'); });
+    act(() => { result.current.clearRepeat(); });
+    act(() => { result.current.flash('not_in_dictionary', 'ANUAL'); });
+    expect(result.current.rejected).toBe('wordVerdict.notAWord');
+  });
+
   it('names the minimum length for a short word', () => {
     const { result } = renderHook(() => useRejectFlash(vi.fn(), t));
     act(() => { result.current.flash('too_short', 'AN'); });

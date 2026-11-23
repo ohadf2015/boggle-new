@@ -287,7 +287,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     const spoken = verdicts.reject(word, v.reason, v.params);
     showRejection(spoken.message, kind, clear, spelled, spoken.durationMs);
     emitWheelVerdict(kind, word);
-    if (spoken.breaksCombo) breakCombo();
+    if (kind === 'invalid') breakCombo();
     if (!spoken.sound) return;
     afterPaint(() => {
       onEffect({ type: 'error', x: cx, y: 80 });

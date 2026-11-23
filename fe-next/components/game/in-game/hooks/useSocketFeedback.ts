@@ -6,7 +6,7 @@ import type { Socket } from 'socket.io-client';
 import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { hapticWordAccepted } from '@/utils/haptics';
+import { hapticError, hapticWordAccepted } from '@/utils/haptics';
 import { MIN_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
 import { reasonFromCode, type VerdictParams, type WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
@@ -123,6 +123,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
           timestamp: Date.now(),
         });
         playWordRejectedSound();
+        hapticError();
         return;
       }
       showVerdict(data.word, reasonFromCode(data.reason) ?? 'not-a-word', { min: minWordLength });

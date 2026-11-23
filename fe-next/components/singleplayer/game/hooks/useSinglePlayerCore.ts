@@ -378,7 +378,7 @@ export function useSinglePlayerCore({
     const rejectAs = (reason: WordVerdictReason, params?: VerdictParams, shown = normalizedWord) => {
       const v = verdicts.reject(normalizedWord, reason, params);
       setCurrentFeedback({ id: `reject-${now}`, type: v.tone === 'error' ? 'rejected' : 'duplicate', word: shown, message: v.message, timestamp: now, durationMs: v.durationMs });
-      if (v.breaksCombo) combo.resetCombo();
+      if (reason !== 'cant-check') combo.resetCombo();
     };
     const missAs = (reason: WordVerdictReason, params?: VerdictParams) => {
       rejectAs(reason, params);

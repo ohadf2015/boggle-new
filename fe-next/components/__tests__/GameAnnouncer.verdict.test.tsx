@@ -11,4 +11,11 @@ describe('GameAnnouncer rejected word', () => {
     const text = screen.getByRole('alert', { hidden: true }).textContent;
     expect(text).toBe('ANUAL: לא במילון שלנו');
   });
+
+  it('given no word (a rescue rule), it reads only the reason', () => {
+    const wrapper = ({ children }: { children: React.ReactNode }) => <GameAnnouncerProvider>{children}</GameAnnouncerProvider>;
+    const { result } = renderHook(() => useAnnouncer(), { wrapper });
+    act(() => { result.current.announceWordResult('', false, undefined, 'Not in our dictionary'); });
+    expect(screen.getByRole('alert', { hidden: true }).textContent).toBe('Not in our dictionary');
+  });
 });

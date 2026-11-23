@@ -13,22 +13,18 @@ const fakeT = (key: string, params?: Record<string, string | number>) =>
   `${key}${params ? JSON.stringify(params) : ''}`;
 
 describe('wordVerdict', () => {
-  it('given an error reason, it buzzes, breaks the combo and holds the standard time', () => {
+  it('given an error reason, it buzzes and holds the standard time', () => {
     const v = wordVerdict('not-a-word');
-    expect(v).toMatchObject({ tone: 'error', sound: true, haptic: 'error', breaksCombo: true, durationMs: VERDICT_MS });
+    expect(v).toMatchObject({ tone: 'error', sound: true, haptic: 'error', durationMs: VERDICT_MS });
+    expect(wordVerdict('too-short', { min: 3 })).toMatchObject({ tone: 'error', sound: true });
   });
 
-  it('given a rule slip (too short, missing center), it buzzes but keeps the combo: only real misses break it', () => {
-    expect(wordVerdict('too-short', { min: 3 })).toMatchObject({ tone: 'error', sound: true, breaksCombo: false });
-    expect(wordVerdict('not-on-board').breaksCombo).toBe(true);
-  });
-
-  it('given an already-found word, it is soft: no buzzer, a light tap, combo kept', () => {
-    expect(wordVerdict('already-found')).toMatchObject({ tone: 'soft', sound: false, haptic: 'tap', breaksCombo: false });
+  it('given an already-found word, it is soft: no buzzer, a light tap', () => {
+    expect(wordVerdict('already-found')).toMatchObject({ tone: 'soft', sound: false, haptic: 'tap' });
   });
 
   it('given a word that could not be checked, it only warns', () => {
-    expect(wordVerdict('cant-check')).toMatchObject({ tone: 'warn', sound: false, haptic: null, breaksCombo: false });
+    expect(wordVerdict('cant-check')).toMatchObject({ tone: 'warn', sound: false, haptic: null });
   });
 
   it('given a repeat, it holds longer and swaps to the "again" line where one exists', () => {

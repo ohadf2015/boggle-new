@@ -352,7 +352,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       if (!data.accepted) {
         const v = verdicts.reject(data.word, reasonFromCode(data.error) ?? 'not-a-word', { min: MIN_LEN, letter: pz?.centerLetter ?? '' });
         flash('err', v.message, v.durationMs);
-        if (v.breaksCombo) setComboLevel(0);
+        setComboLevel(0);
         return;
       }
       verdicts.clearRepeat();

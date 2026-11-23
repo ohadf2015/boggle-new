@@ -59,6 +59,7 @@ interface Args {
   dictReady: boolean;
   braceApi: ReturnType<typeof useBrace>;
   flashReject: (code: string, word: string) => void;
+  clearRejectRepeat?: () => void;
   playSound: PlaySound;
   /** Daily: the first accepted word counts as today's play. */
   recordPlay: () => void;
@@ -83,6 +84,7 @@ export function useWordWheel({
   dictReady,
   braceApi,
   flashReject,
+  clearRejectRepeat,
   playSound,
   recordPlay,
   keysBlocked,
@@ -179,13 +181,14 @@ export function useWordWheel({
       return;
     }
     preSubmitRef.current = { wheel, selected, draw: drawRef.current };
+    clearRejectRepeat?.();
     hoist(word);
     deal(drawRef.current + 1);
     if (daily && !dailyEngagedRef.current) {
       dailyEngagedRef.current = true;
       recordPlay();
     }
-  }, [phase, word, wheel, selected, hoist, flashReject, deal, braceApi, daily, recordPlay, dictRef]);
+  }, [phase, word, wheel, selected, hoist, flashReject, clearRejectRepeat, deal, braceApi, daily, recordPlay, dictRef]);
 
   /**
    * Put the hanging word back: the slab leaves the physics world and the wheel

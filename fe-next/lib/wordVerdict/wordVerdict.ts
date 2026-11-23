@@ -13,7 +13,6 @@ export interface WordVerdict {
   tone: VerdictTone;
   sound: boolean;
   haptic: 'error' | 'tap' | null;
-  breaksCombo: boolean;
   durationMs: number;
   repeat: boolean;
 }
@@ -61,7 +60,6 @@ export function wordVerdict(reason: WordVerdictReason, params: VerdictParams = {
     tone,
     sound: tone === 'error',
     haptic: tone === 'error' ? 'error' : tone === 'soft' ? 'tap' : null,
-    breaksCombo: reason === 'not-a-word' || reason === 'not-on-board',
     durationMs: repeat ? VERDICT_REPEAT_MS : VERDICT_MS,
     repeat,
   };

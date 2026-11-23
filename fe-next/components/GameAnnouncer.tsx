@@ -104,7 +104,7 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
       const scoreText = score ? `, ${score} points` : '';
       announce(`Word accepted: ${word}${scoreText}`);
     } else {
-      announce(reason ? `${word}: ${reason}` : `Word rejected: ${word}`, 'assertive');
+      announce(reason ? (word ? `${word}: ${reason}` : reason) : `Word rejected: ${word}`, 'assertive');
     }
   }, [announce]);
 
