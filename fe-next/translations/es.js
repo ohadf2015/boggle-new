@@ -12953,6 +12953,7 @@ const es = {
       "loadRateLimited": "Demasiadas partidas seguidas. Inténtalo de nuevo en un momento.",
       "challengeShort": "Retar",
       "challengeBanner": "{name}: {pct}% en este tablero. ¡Supéralo!",
+      "addChallengerCta": "Añade a {name} como amigo — ¡revancha cuando quieras!",
       "answeredBanner": "{name} respondió a tu reto: {theirPct}% frente a tu {yourPct}%",
       "loadError": "No pudimos preparar tu tablero. Revisa tu conexión e inténtalo de nuevo",
       "newBest": "¡NUEVO RÉCORD PERSONAL!",

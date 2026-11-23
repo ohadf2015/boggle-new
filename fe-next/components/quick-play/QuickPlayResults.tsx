@@ -28,6 +28,7 @@ import { CoinArt } from '@/components/ui/CoinArt';
 import { RewardLine } from '@/components/results/ResultsLines';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
+import { ChallengeFriendCta } from './ChallengeFriendCta';
 import { ResultsAvatarStage } from '@/components/results/stage/ResultsAvatarStage';
 import { QuickResultsStats } from './QuickResultsStats';
 import { QuickResultsCtaBar } from './QuickResultsNextActions';
@@ -52,6 +53,8 @@ export interface QuickRival {
   /** Your number on the SAME axis */
   myValue: number;
   type: 'challenge' | 'weekly';
+  /** The challenge sender's real user id — powers the add-friend moment. */
+  userId?: string;
   /** Seed for a real (custom or deterministic) avatar instead of a bare emoji */
   avatarUserId?: string;
   avatarConfig?: CustomAvatarConfig | null;
@@ -412,7 +415,7 @@ export function QuickPlayResults({
               myUserId={user?.id}
               myAvatar={profile?.avatar_config ?? guestAvatar}
             />
-            {rival && rival.avatarUserId && (
+            {rival && (rival.avatarUserId || (rival.type === 'challenge' && rival.name !== '')) && (
               <RivalCompareCard
                 // Weekly rival numbers are this week's rank points (sum of round %),
                 // not this round's score — say so, or "you 2, Joker 0" reads as a bug.
@@ -425,10 +428,15 @@ export function QuickPlayResults({
                 rivalEmoji={rival.emoji}
                 rivalScore={rival.theirValue}
                 myScore={rival.myValue}
-                rivalAvatar={{ userId: rival.avatarUserId, customAvatar: rival.avatarConfig ?? undefined }}
+                rivalAvatar={rival.avatarUserId ? { userId: rival.avatarUserId, customAvatar: rival.avatarConfig ?? undefined } : undefined}
                 myAvatar={user?.id ? { userId: user.id, customAvatar: profile?.avatar_config ?? undefined } : undefined}
                 t={t}
               />
+            )}
+            {/* The viral loop's missing half: the challenge delivered the fun,
+                now one tap keeps the rivalry alive. Never gates the result. */}
+            {rival?.type === 'challenge' && rival.userId && (
+              <ChallengeFriendCta userId={rival.userId} name={rival.name} />
             )}
           </div>
           <div className="flex flex-col gap-3">
