@@ -1,9 +1,11 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import {
   useSelectionStore,
   useFrozenWhileSelecting,
   resetSelection,
+  scheduleSelection,
+  useSelectionReset,
 } from '../useSelectionStore';
 
 describe('useFrozenWhileSelecting', () => {
@@ -75,45 +77,53 @@ describe('useFrozenWhileSelecting', () => {
     expect(result.current).toBe(v2);
   });
 
-  it('does not re-subscribe consumers on every letter count change', () => {
+  it('does not re-render the consumer when a selection starts, grows or ends with the value unchanged', () => {
     let renderCount = 0;
-    const { rerender } = renderHook(
+    renderHook(
       ({ value }: { value: number }) => {
         renderCount++;
         return useFrozenWhileSelecting(value);
       },
       { initialProps: { value: 1 } },
     );
-
     const initialRenderCount = renderCount;
 
-    // Drag from 1 to 5 letters — boolean isSelecting stays true the whole time
     act(() => {
       useSelectionStore.getState().setSelection('A', 1);
     });
-    const afterStart = renderCount;
-    expect(afterStart).toBeGreaterThan(initialRenderCount);
-
     act(() => {
       useSelectionStore.getState().setSelection('AB', 2);
     });
     act(() => {
-      useSelectionStore.getState().setSelection('ABC', 3);
-    });
-    act(() => {
-      useSelectionStore.getState().setSelection('ABCD', 4);
-    });
-    act(() => {
-      useSelectionStore.getState().setSelection('ABCDE', 5);
+      resetSelection();
     });
 
-    // letterCount changed 4 more times, but isSelecting boolean stayed true.
-    // Consumer must NOT re-render on those steps — that's the whole point of
-    // gating on the boolean derived selector instead of the raw count.
-    expect(renderCount).toBe(afterStart);
+    expect(renderCount).toBe(initialRenderCount);
+  });
 
-    // Parent re-renders with same value: no extra count change but a re-render
-    rerender({ value: 1 });
-    expect(renderCount).toBeGreaterThan(afterStart);
+  it('given a value frozen by the hook, when a drag starts but has not flushed, then a new value is still held', () => {
+    const { result, rerender } = renderHook(({ v }) => useFrozenWhileSelecting(v), { initialProps: { v: 1 } });
+    scheduleSelection('C', 1);
+    rerender({ v: 2 });
+    expect(result.current).toBe(1);
+  });
+
+  describe('useSelectionReset', () => {
+    it('given a queued selection, when the owner unmounts, then it never lands', () => {
+      vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame', 'cancelAnimationFrame'] });
+      const { unmount } = renderHook(() => useSelectionReset('grid-1'));
+      scheduleSelection('CAT', 3);
+      unmount();
+      vi.advanceTimersByTime(200);
+      expect(useSelectionStore.getState().letterCount).toBe(0);
+      vi.useRealTimers();
+    });
+
+    it('given a previous word on screen, when the grid changes, then the selection clears at once', () => {
+      const { rerender } = renderHook(({ g }) => useSelectionReset(g), { initialProps: { g: 'grid-1' } });
+      useSelectionStore.getState().setSelection('CAT', 3);
+      rerender({ g: 'grid-2' });
+      expect(useSelectionStore.getState().formedWord).toBe('');
+    });
   });
 });

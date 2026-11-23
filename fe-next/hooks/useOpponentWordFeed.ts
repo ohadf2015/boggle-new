@@ -5,7 +5,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react';
 import type { Socket } from 'socket.io-client';
-import { useSelectionStore } from './useSelectionStore';
+import { isSelecting } from './useSelectionStore';
 
 export interface OpponentWordFeedItem {
   id: string;
@@ -72,7 +72,7 @@ export function useOpponentWordFeed({ socket, currentPlayerName }: UseOpponentWo
       // ("MP classic feels slow when selecting"). The feed is ephemeral
       // (auto-removes in 3s) so pops dropped during a sub-2s drag are
       // imperceptible. Mirrors useFrozenWhileSelecting for the leaderboard.
-      if (useSelectionStore.getState().letterCount > 0) return;
+      if (isSelecting()) return;
 
       const words = data?.words;
       if (!Array.isArray(words) || words.length === 0) return;
