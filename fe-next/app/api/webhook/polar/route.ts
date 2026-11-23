@@ -14,7 +14,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, subscriptionRowStatus, subscriptionTrialAlreadyCounted, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
+import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarCancelReasonProps, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
 import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
 import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
@@ -242,7 +242,8 @@ export async function POST(request: NextRequest) {
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
-        await trackTrialExpired(payload, userId)
+        // A cancel inside a running trial keeps Pro until trial_end; revoked at that date is the lapse.
+        if (!isScheduledTrialCancel(payload?.data)) await trackTrialExpired(payload, userId)
         trackSubscriptionEnded('canceled', payload, userId)
         break
       case 'subscription.revoked':
@@ -276,7 +277,7 @@ export async function POST(request: NextRequest) {
       userId,
       eventType,
       subscriptionId: String(payload?.data?.id ?? ''),
-      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end, ...polarRevenueProps(payload?.data) },
+      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end, ...polarRevenueProps(payload?.data), ...polarCancelReasonProps(payload?.data) },
     })
 
     return NextResponse.json({ received: true })
@@ -382,6 +383,10 @@ async function trackProTrial(payload: WebhookPayload, userId?: string) {
  * Canceled/revoked only. A later paid cancel is not a lapse
  * (`isPolarTrialLapse`). Never throws.
  */
+function isScheduledTrialCancel(data: WebhookPayload['data']): boolean {
+  return data?.cancel_at_period_end === true && String(data?.status ?? '') === 'trialing'
+}
+
 async function trackTrialExpired(payload: WebhookPayload, userId?: string) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return

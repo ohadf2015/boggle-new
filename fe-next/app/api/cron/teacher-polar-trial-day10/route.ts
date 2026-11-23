@@ -6,6 +6,7 @@ import { getSupabaseAdmin } from '@/lib/email';
 import { sendEmail } from '@/lib/email/send';
 import { teacherPolarTrialDay10 } from '@/lib/email/templates/teacherPolarTrialDay10';
 import { teacherPolarTrialDayBefore } from '@/lib/email/templates/teacherPolarTrialDayBefore';
+import { teacherPolarTrialCanceledEnding } from '@/lib/email/templates/teacherPolarTrialCanceledEnding';
 import {
   POLAR_TRIAL_DAY_BEFORE_BUCKET,
   pickPolarTrialDayBefore,
@@ -129,6 +130,15 @@ export async function POST(request: NextRequest) {
         if (!row.user_id || !row.email) continue;
         if (!accessByUser.has(row.user_id)) accessByUser.set(row.user_id, row);
       }
+      // Checkout does not require an approved request, and every trialist was promised this notice.
+      for (const id of userIds) {
+        if (accessByUser.has(id)) continue;
+        const { data } = await supabase.auth.admin.getUserById(id);
+        const u = data?.user;
+        if (!u?.email) continue;
+        const meta = (u.user_metadata ?? {}) as Record<string, string | undefined>;
+        accessByUser.set(id, { user_id: id, email: u.email, full_name: meta.full_name || meta.name || '', locale: meta.locale ?? null });
+      }
 
       const now = Date.now();
       const due: Array<{ sub: SubRow; access: AccessRow; daysLeft: number; bucket: Bucket }> = [];
@@ -154,10 +164,8 @@ export async function POST(request: NextRequest) {
         const dayBefore = pickPolarTrialDayBefore(signals);
         // Inside the last 36 hours the day-before notice is the one email; a late day-10 would repeat it.
         const inFinalWindow = dayBefore !== null || alreadySent.includes(POLAR_TRIAL_DAY_BEFORE_BUCKET);
-        // Both emails say "$9 unless you cancel": a teacher who already cancelled gets neither.
-        const cancelled = sub.cancel_at_period_end === true;
-        const bucket: Bucket | null =
-          dayBefore ?? (inFinalWindow || cancelled ? null : pickPolarTrialDay10Nudge(signals));
+        // A teacher who cancelled gets the day-10 slot as a no-charge "Pro ends on" note, never a charge notice.
+        const bucket: Bucket | null = dayBefore ?? (inFinalWindow ? null : pickPolarTrialDay10Nudge(signals));
         if (!bucket) {
           if (alreadySent.length) seenEmail.add(emailKey);
           continue;
@@ -192,7 +200,10 @@ export async function POST(request: NextRequest) {
       for (const { sub, access, daysLeft, bucket } of due) {
         const locale = asLocale(access.locale);
         const isDayBefore = bucket === POLAR_TRIAL_DAY_BEFORE_BUCKET;
-        const tpl = isDayBefore
+        const cancelled = sub.cancel_at_period_end === true;
+        const tpl = cancelled
+          ? teacherPolarTrialCanceledEnding({ full_name: access.full_name || 'Teacher', locale, endsAt: sub.current_period_end! })
+          : isDayBefore
           ? teacherPolarTrialDayBefore({
               full_name: access.full_name || 'Teacher',
               locale,
@@ -214,7 +225,7 @@ export async function POST(request: NextRequest) {
           user_id: sub.user_id,
           event_type: isDayBefore ? DAY_BEFORE_EVENT : DAY10_EVENT,
           subscription_id: null,
-          payload: { bucket, days_left: daysLeft },
+          payload: { bucket: cancelled ? 'canceled-ending' : bucket, days_left: daysLeft },
         });
         if (markError) {
           logger.error(`[Polar Day10] sent to ${sub.user_id} but could not mark it: ${markError.message}`);
@@ -229,7 +240,7 @@ export async function POST(request: NextRequest) {
           dedupe: { withinMs: 24 * 60 * 60 * 1000 },
         });
         try {
-          if (!isDayBefore) captureProFunnelServerEvent(buildPolarTrialDay10SentEvent(sub.user_id, daysLeft));
+          if (!isDayBefore) captureProFunnelServerEvent(buildPolarTrialDay10SentEvent(sub.user_id, daysLeft, cancelled ? 'canceled-ending' : 'day10'));
         } catch {
           /* analytics must never block the send ledger */
         }

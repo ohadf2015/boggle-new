@@ -279,6 +279,13 @@ export class PolarClient {
     })
   }
 
+  async resumeSubscription(subscriptionId: string): Promise<void> {
+    await this.request(`/v1/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ cancel_at_period_end: false }),
+    })
+  }
+
   /**
    * Create a customer portal session for a customer by their external id
    * (our user id, set at checkout time). Returns the portal URL.

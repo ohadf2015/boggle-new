@@ -17,6 +17,7 @@ const base: TeacherBannerInput = {
   trialEndedDismissed: false,
   polarTrialExpiring: false,
   polarChargeSoon: false,
+  cancelAtPeriodEnd: false,
   trialExpiringDismissed: false,
   approved: false,
   winbackDismissed: false,
@@ -31,6 +32,13 @@ describe('selectTeacherBanner', () => {
 
   it('given the plan lookup failed, when picking, then it says error, not "no banner"', () => {
     expect(pick({ proKnown: false })).toEqual({ kind: 'error' });
+  });
+
+  it('given a card trial the teacher cancelled, when picking, then it says Pro runs to the end date with no charge, never the auto-renew countdown', () => {
+    const trial = { hasPro: true, status: 'trialing' as const, cancelAtPeriodEnd: true };
+    expect(pick(trial)).toEqual({ kind: 'show', banner: 'trialCanceled' });
+    expect(pick({ ...trial, polarTrialExpiring: true })).toEqual({ kind: 'show', banner: 'trialCanceled' });
+    expect(pick({ ...trial, polarTrialExpiring: true, trialExpiringDismissed: true })).toEqual({ kind: 'show', banner: 'trialCanceled' });
   });
 
   it('given a free teacher with nothing billing-related going on, when picking, then no banner (upsells are not banners)', () => {

@@ -3942,6 +3942,10 @@ const en = {
     "soundOff": "Sound off"
   },
   "settings": {
+    "teacherPlan": {
+      "title": "Teacher Pro plan & billing",
+      "body": "See your plan, change your card or cancel."
+    },
     "title": "Settings",
     "appearance": "Appearance",
     "language": "Language",
@@ -13298,6 +13302,8 @@ const en = {
     },
     "proWelcome": {
       "title": "You're on Teacher Pro",
+      "noChargeUntil": "Nothing is charged until {date}. We'll email you the day before, and you can cancel any time from Plans.",
+      "tryFirst": "Try it in your next lesson: after a class game, send the missed words as practice. Students get them again after 1, 3 and 7 days.",
       "until": "Yours until {date}. Nothing to claim, no card.",
       "perk": {
         "analytics": "See which words the class struggled with, after every game",
@@ -13311,7 +13317,7 @@ const en = {
     },
     "checkoutReturn": {
       "activatingTitle": "Activating Teacher Pro",
-      "activatingBody": "Payment received. Confirming access. This usually takes a few seconds.",
+      "activatingBody": "Checkout done. Turning on Teacher Pro, this usually takes a few seconds.",
       "successTitle": "Teacher Pro is on",
       "successBody": "Your payment went through and Pro is active on your account.",
       "trialSuccessTitle": "Your Teacher Pro trial is on",
@@ -14439,6 +14445,11 @@ const en = {
       "trialLifecycleTitleToday": "Your Teacher Pro trial ends today",
       "trialLifecycleTitleOne": "1 day left in your Teacher Pro trial",
       "trialLifecycleBody": "Keep unlimited classes and printable reports for $9/mo after the trial.",
+      "canceledTrialTitle": "Teacher Pro stays on until {date}",
+      "canceledTrialBody": "You cancelled, so your card won't be charged. Changed your mind? Keep Pro and it carries on after that date for $9/mo.",
+      "resumeCta": "Keep Pro",
+      "resumeDone": "Done. Teacher Pro will carry on.",
+      "resumeError": "Couldn't turn Pro back on. Try again, or open Plans.",
       "trialExpiringLoss": "Without Pro, you will lose unlimited classes and printable student reports.",
       "trialLifecycleCta": "Keep Pro: $9/mo",
       "trialAutoRenewBody": "When the trial ends, the card you added is charged $9/mo. Cancel any time before and you won't pay.",

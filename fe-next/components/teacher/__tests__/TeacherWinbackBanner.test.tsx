@@ -48,6 +48,11 @@ describe('TeacherWinbackBanner', () => {
     expect(trackTeacherWinbackShown).toHaveBeenCalledTimes(1);
   });
 
+  it('says a card is needed and the price before the teacher meets the card form', () => {
+    render(<TeacherWinbackBanner approved hasClass />);
+    expect(screen.getByTestId('teacher-winback-note')).toHaveTextContent('Card needed · Then $9/mo · Cancel anytime');
+  });
+
   it('renders nothing for anyone who is not an approved teacher, and does not record a show', () => {
     render(<TeacherWinbackBanner approved={false} />);
     expect(screen.queryByTestId('teacher-winback')).not.toBeInTheDocument();

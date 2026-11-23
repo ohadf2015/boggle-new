@@ -4701,6 +4701,10 @@ const sv = {
     "soundOff": "Ljud av"
   },
   "settings": {
+    "teacherPlan": {
+      "title": "Teacher Pro: abonnemang och betalning",
+      "body": "Se ditt abonnemang, byt kort eller avsluta."
+    },
     "title": "Inställningar",
     "appearance": "Utseende",
     "language": "Språk",
@@ -15323,6 +15327,8 @@ const sv = {
     },
     "proWelcome": {
       "title": "Du har Teacher Pro",
+      "noChargeUntil": "Inget dras förrän {date}. Vi mejlar dig dagen innan, och du kan avsluta när du vill under Abonnemang.",
+      "tryFirst": "Testa på nästa lektion: efter ett klasspel skickar du de missade orden som övning. Eleverna får dem igen efter 1, 3 och 7 dagar.",
       "until": "Ditt till {date} – inget att lösa in, inget kort.",
       "perk": {
         "analytics": "Se vilka ord klassen hade svårt med, efter varje omgång",
@@ -15336,7 +15342,7 @@ const sv = {
     },
     "checkoutReturn": {
       "activatingTitle": "Aktiverar Teacher Pro",
-      "activatingBody": "Betalningen är mottagen. Bekräftar åtkomst — det tar oftast några sekunder.",
+      "activatingBody": "Klart i kassan. Vi slår på Teacher Pro, det brukar ta några sekunder.",
       "successTitle": "Teacher Pro är på",
       "successBody": "Åtkomsten finns redan på kontot.",
       "trialSuccessTitle": "Din provperiod för Teacher Pro har börjat",
@@ -15521,6 +15527,11 @@ const sv = {
       "trialLifecycleTitleToday": "Din Teacher Pro-provperiod slutar idag",
       "trialLifecycleTitleOne": "1 dag kvar av din Teacher Pro-provperiod",
       "trialLifecycleBody": "Behåll obegränsade klasser och utskrivbara rapporter. 9 $/mån efter provperioden.",
+      "canceledTrialTitle": "Teacher Pro är kvar till {date}",
+      "canceledTrialBody": "Du har avslutat, så ditt kort debiteras inte. Ångrat dig? Behåll Pro så fortsätter det efter det datumet för $9/mån.",
+      "resumeCta": "Behåll Pro",
+      "resumeDone": "Klart. Teacher Pro fortsätter.",
+      "resumeError": "Det gick inte att slå på Pro igen. Försök igen, eller öppna Abonnemang.",
       "trialExpiringLoss": "Utan Pro förlorar du obegränsade klasser och utskrivbara elevrapporter.",
       "trialLifecycleCta": "Behåll Pro – 9 $/mån",
       "trialAutoRenewBody": "När provperioden är slut dras 9 $/mån från kortet du lade till. Avsluta när du vill innan dess så betalar du inget.",

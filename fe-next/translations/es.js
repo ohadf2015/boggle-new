@@ -4322,6 +4322,10 @@ const es = {
     "soundOff": "Sonido desactivado"
   },
   "settings": {
+    "teacherPlan": {
+      "title": "Plan y pago de Teacher Pro",
+      "body": "Mira tu plan, cambia la tarjeta o cancela."
+    },
     "title": "Configuración",
     "appearance": "Apariencia",
     "language": "Idioma",
@@ -14960,6 +14964,8 @@ const es = {
     },
     "proWelcome": {
       "title": "Tienes Teacher Pro",
+      "noChargeUntil": "No se cobra nada hasta el {date}. Te avisaremos por email el día antes y puedes cancelar cuando quieras desde Planes.",
+      "tryFirst": "Pruébalo en tu próxima clase: después de un juego en clase, envía las palabras falladas como práctica. Tus alumnos las vuelven a ver a los 1, 3 y 7 días.",
       "until": "Tuyo hasta el {date}: nada que canjear, sin tarjeta.",
       "perk": {
         "analytics": "Ver qué palabras costaron a la clase, después de cada partida",
@@ -14973,7 +14979,7 @@ const es = {
     },
     "checkoutReturn": {
       "activatingTitle": "Activando Teacher Pro",
-      "activatingBody": "Pago recibido. Confirmando el acceso — suele tardar unos segundos.",
+      "activatingBody": "Listo. Estamos activando Teacher Pro, suele tardar unos segundos.",
       "successTitle": "Teacher Pro está activo",
       "successBody": "El acceso ya está en tu cuenta.",
       "trialSuccessTitle": "Tu prueba de Teacher Pro ha empezado",
@@ -15159,6 +15165,11 @@ const es = {
       "trialLifecycleTitleToday": "Tu prueba de Teacher Pro termina hoy",
       "trialLifecycleTitleOne": "Queda 1 día de tu prueba de Teacher Pro",
       "trialLifecycleBody": "Conserva clases ilimitadas e informes imprimibles por 9 $/mes al terminar la prueba.",
+      "canceledTrialTitle": "Teacher Pro sigue activo hasta el {date}",
+      "canceledTrialBody": "Cancelaste, así que no se cobrará nada en tu tarjeta. ¿Cambiaste de idea? Quédate con Pro y seguirá después de esa fecha por $9/mes.",
+      "resumeCta": "Quedarme con Pro",
+      "resumeDone": "Listo. Teacher Pro sigue activo.",
+      "resumeError": "No pudimos reactivar Pro. Inténtalo de nuevo o abre Planes.",
       "trialExpiringLoss": "Sin Pro, perderás las clases ilimitadas y los informes de alumnos imprimibles.",
       "trialLifecycleCta": "Seguir con Pro: 9 $/mes",
       "trialAutoRenewBody": "Cuando termine la prueba, se cobrarán 9 $/mes a la tarjeta que agregaste. Cancela antes cuando quieras y no pagarás.",

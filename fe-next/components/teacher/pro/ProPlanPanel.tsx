@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Check, Crown, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { proPlanStatusLine } from './proPlanStatus';
+import { ResumeProButton } from '../TeacherProTrialCanceledBanner';
 
 export interface ProPlanPanelProps {
   status?: string | null;
@@ -11,15 +12,17 @@ export interface ProPlanPanelProps {
   trialExpires?: string | null;
   periodEnd?: string | null;
   portalUrl?: string | null;
+  cancelAtPeriodEnd?: boolean;
+  onResumed?: () => void;
   included: string[];
 }
 
 /** "You're on Pro": what the plan is, when it renews or ends, and where billing lives. No pitch. */
-export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUrl, included }: ProPlanPanelProps) {
+export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUrl, cancelAtPeriodEnd, onResumed, included }: ProPlanPanelProps) {
   const { t, language } = useLanguage();
   const [nowMs] = useState(() => Date.now());
   const gifted = source === 'admin_grant';
-  const line = proPlanStatusLine({ t, language, nowMs, status, source, trialExpires, periodEnd });
+  const line = proPlanStatusLine({ t, language, nowMs, status, source, trialExpires, periodEnd, cancelAtPeriodEnd });
 
   return (
     <section data-testid="pro-plan-panel" aria-labelledby="pro-plan-title" className="rounded-neo border-3 border-neo-black bg-neo-yellow p-4 text-neo-navy shadow-hard sm:p-6">
@@ -30,6 +33,7 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
             {t('eg2Pro.plans.youArePro')}
           </p>
           <p data-testid="pro-plan-status" className="mt-1 text-sm font-bold text-neo-navy/85">{line}</p>
+          {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-neo-navy text-neo-yellow" /> : null}
         </div>
         {portalUrl && !gifted ? (
           <a
