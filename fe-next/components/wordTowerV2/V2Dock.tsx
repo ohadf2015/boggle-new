@@ -2,8 +2,9 @@
 
 import { memo, useCallback, useMemo, type ReactNode, type RefObject } from 'react';
 import { Delete, Shuffle, Undo2 } from 'lucide-react';
-import { CLEAR_HOLD_MS, useHoldToClear } from '@/hooks/useHoldToClear';
-import { useHoldHint } from '@/hooks/useHoldHint';
+import { CLEAR_HOLD_MS } from '@/hooks/useHoldToClear';
+import { useBackspaceKey } from '@/hooks/useBackspaceKey';
+import { HoldHintBubble } from '@/components/game/HoldHintBubble';
 import { LetterRow, WordBox } from './LetterRow';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
@@ -61,15 +62,9 @@ export const V2Dock = memo(function V2Dock(p: Props) {
   // (PostHog, Oct 2026): players hammer it to undo a long wrong word. Holding
   // it now clears the word in one go; the click that ends the hold is eaten so
   // it can't also rub out a letter of the NEXT word.
-  const holdHint = useHoldHint();
-  const onClearWord = p.onClearWord;
-  const backspaceHold = useHoldToClear({
-    onTap: () => {
-      if (p.swinging) return p.onPutBack();
-      p.onBackspace();
-      if (onClearWord) holdHint.noteTap();
-    },
-    onHold: p.swinging || !onClearWord ? undefined : () => { holdHint.noteHold(); onClearWord(); },
+  const { handlers: backspaceHold, showHint } = useBackspaceKey({
+    onTap: () => (p.swinging ? p.onPutBack() : p.onBackspace()),
+    onHold: p.swinging ? undefined : p.onClearWord,
   });
   const tray = useMemo(() => p.wheel.map((l) => l.toUpperCase()), [p.wheel]);
   const wordLetters = useMemo(() => p.selected.map((i) => tray[i] ?? ''), [p.selected, tray]);
@@ -112,14 +107,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
       }`}
     >
       {p.swinging ? <Undo2 className="h-6 w-6" aria-hidden /> : <Delete className="h-6 w-6" aria-hidden />}
-      {holdHint.show && (
-        <span
-          role="status"
-          className="pointer-events-none absolute -top-9 end-0 z-10 whitespace-nowrap rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
-        >
-          {t('common.holdToClear')}
-        </span>
-      )}
+      {showHint && <HoldHintBubble label={t('common.holdToClear')} />}
     </button>
   );
 

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { DOUBLE_TAP_MS } from '@/components/daily/wheel/useWheelLetterInput';
+import { useWheelLetterInput } from '@/components/daily/wheel/useWheelLetterInput';
+import WheelActionBar from '@/components/daily/wheel/WheelActionBar';
 import type { Socket } from 'socket.io-client';
 import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import dynamic from 'next/dynamic';
@@ -197,14 +198,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // Drag-release submits clear instantly on rejection; tap submits wait 1.5s.
   const lastSubmitWasDragRef = useRef(false);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
-  const draggingRef = useRef(false);
-  const lastDragIdxRef = useRef<number | null>(null);
-  const dragStartIdxRef = useRef<number | null>(null);
-  const dragEngagedRef = useRef(false);
-  const usedIndicesRef = useRef<Set<number>>(new Set());
-  // Latest-builtLetters ref + submit ref let handlePointerUp finalize the drag without
-  // re-creating the callback on every keystroke (matches WordWheelGame.tsx:165,176).
-  const builtLettersRef = useRef<BuiltLetter[]>([]);
   const handleSubmitRef = useRef<() => void>(() => {});
 
   // Latest-value refs for socket handlers — prevent listener re-registration when
@@ -247,15 +240,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     };
   }, [startedAt]);
 
-  // Track which wheel indices are used (-1 for center)
-  const usedIndices = useMemo(() => {
-    const set = new Set<number>();
-    for (const bl of builtLetters) set.add(bl.wheelIndex);
-    return set;
-  }, [builtLetters]);
-  useEffect(() => { usedIndicesRef.current = usedIndices; }, [usedIndices]);
   useEffect(() => {
-    builtLettersRef.current = builtLetters;
     // Any user input during the 1.5s post-error window cancels the reset
     // so a fresh attempt isn't wiped mid-typing.
     if (builtLetters.length > 0 && autoResetTimerRef.current) {
@@ -432,98 +417,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     onShown: () => trackMpFtue({ event: 'shown', mode: 'wheel_rush' }),
   });
 
-  // Letter tap handler — parity with SP WordWheelGame:386.
-  // Re-tap on a used wheel index toggles it off (removes from built word) instead
-  // of duplicating. Each wheelIndex appears at most once in builtLetters.
-  const lastTapRef = useRef<{ idx: number; time: number } | null>(null);
-  const handleLetterPress = useCallback((letter: string, wheelIndex: number, _el: HTMLButtonElement) => {
-    ftue.markActivity();
-    const now = Date.now();
-    const last = lastTapRef.current;
-    const isDoubleTap = !!last && last.idx === wheelIndex && now - last.time < DOUBLE_TAP_MS;
-    lastTapRef.current = { idx: wheelIndex, time: now };
-    const existingIdx = builtLettersRef.current.findIndex(bl => bl.wheelIndex === wheelIndex);
-    if (isDoubleTap && existingIdx !== -1) {
-      lastTapRef.current = null;
-      handleSubmitRef.current();
-      return;
-    }
-    if (existingIdx !== -1) {
-      setBuiltLetters(prev => prev.filter((_, i) => i !== existingIdx));
-      playButtonClickSound();
-      haptic(8);
-      return;
-    }
-    setBuiltLetters(prev => [...prev, { letter, wheelIndex }]);
-    playTileSelectSound();
-    haptic(10);
-  }, [playTileSelectSound, playButtonClickSound, ftue]);
-
-  // Drag-to-build — drag engages only after pointer moves to a DIFFERENT letter,
-  // so single taps are handled by the button's native onClick (no double-fire).
-  const tryDragHit = useCallback((clientX: number, clientY: number) => {
-    const el = document.elementFromPoint(clientX, clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    if (!btn || btn.disabled) return;
-    const idx = Number(btn.dataset.wheelIndex);
-    if (idx === lastDragIdxRef.current) return;
-    if (!dragEngagedRef.current) {
-      const startIdx = dragStartIdxRef.current;
-      if (startIdx === null || idx === startIdx) return;
-      dragEngagedRef.current = true;
-      lastDragIdxRef.current = startIdx;
-      const startBtn = document.querySelector<HTMLButtonElement>(
-        `[data-wheel-index="${startIdx}"]`,
-      );
-      if (startBtn && !usedIndicesRef.current.has(startIdx)) {
-        handleLetterPress(startBtn.dataset.wheelLetter || '', startIdx, startBtn);
-      }
-    }
-    if (usedIndicesRef.current.has(idx)) return;
-    lastDragIdxRef.current = idx;
-    handleLetterPress(btn.dataset.wheelLetter || '', idx, btn);
-  }, [handleLetterPress]);
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    draggingRef.current = true;
-    dragEngagedRef.current = false;
-    lastDragIdxRef.current = null;
-    const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-    const btn = el?.closest<HTMLButtonElement>('[data-wheel-letter]');
-    dragStartIdxRef.current = btn ? Number(btn.dataset.wheelIndex) : null;
-  }, []);
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!draggingRef.current) return;
-    tryDragHit(e.clientX, e.clientY);
-  }, [tryDragHit]);
-  const handlePointerUp = useCallback(() => {
-    const wasEngaged = dragEngagedRef.current;
-    draggingRef.current = false;
-    lastDragIdxRef.current = null;
-    dragStartIdxRef.current = null;
-    dragEngagedRef.current = false;
-    // Auto-submit when drag actually traversed letters and built ≥MIN_LEN — mirrors WordWheelGame.tsx:334.
-    if (wasEngaged && builtLettersRef.current.length >= MIN_LEN) {
-      lastSubmitWasDragRef.current = true;
-      handleSubmitRef.current();
-    }
-  }, []);
-
-  const handleRemoveLetter = useCallback((index: number) => {
-    setBuiltLetters(prev => prev.filter((_, i) => i !== index));
-    playButtonClickSound();
-  }, [playButtonClickSound]);
-
-  const handleClear = useCallback(() => {
-    setBuiltLetters([]);
-    playButtonClickSound();
-  }, [playButtonClickSound]);
-
-  // Remove just the last built letter (backspace). Pairs with Clear (wipe all);
-  // replaces the old shuffle button. Parity with daily WordWheelGame.
-  const handleBackspace = useCallback(() => {
-    setBuiltLetters(prev => prev.slice(0, -1));
-    playButtonClickSound();
-  }, [playButtonClickSound]);
+  // Same tap / double-tap / hold-to-submit / drag spelling as the daily wheel.
+  const noop = useCallback(() => {}, []);
+  const gameOverRef = useRef(false);
+  const {
+    usedIndices, holdActiveIndex, holdPointerDown, holdPointerEnd,
+    handleLetterPress, handlePointerDown, handlePointerMove, handlePointerUp,
+    handleRemoveLetter, handleClear, handleBackspace,
+  } = useWheelLetterInput({
+    builtLetters, setBuiltLetters, gameOverRef, handleSubmitRef, lastSubmitWasDragRef,
+    gameContainerRef: wheelContainerRef, cancelIdleSubmit: noop, onActivity: ftue.markActivity,
+    onEffect: noop, playTileSelectSound, playButtonClickSound,
+  });
 
   const handleSubmit = useCallback(() => {
     if (!socket || !puzzle || builtLetters.length === 0) return;
@@ -797,6 +702,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             letter={puzzle.centerLetter}
             isCenter
             onPress={(letter, _i, el) => handleLetterPress(letter, -1, el)}
+            onHoldStart={holdPointerDown}
+            onHoldEnd={holdPointerEnd}
+            showHoldRing={holdActiveIndex === -1}
             isUsed={usedIndices.has(-1)}
             index={-1}
           />
@@ -808,6 +716,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               angle={(360 / outerLetters.length) * i}
               radius={wheelRadius}
               onPress={(l, _idx, el) => handleLetterPress(l, i, el)}
+              onHoldStart={holdPointerDown}
+              onHoldEnd={holdPointerEnd}
+              showHoldRing={holdActiveIndex === i}
               isUsed={usedIndices.has(i)}
               index={i}
             />
@@ -829,57 +740,16 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
 
         {/* Actions (Clear / Submit / Remove-last) — sit directly under the wheel
             so the player's thumb stays in the wheel's gravity well. */}
-        <div data-testid="word-wheel-action-bar" className="w-full flex items-center justify-center gap-3 shrink-0 mt-1 short:mt-0">
-        <m.button
-          type="button"
-          onClick={handleClear}
-          disabled={builtLetters.length === 0}
-          className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
-            'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-            'disabled:opacity-30 disabled:cursor-not-allowed',
-          )}
-          whileTap={prefersReduced ? {} : { scale: 0.9 }}
-          aria-label={t('wordWheel.clear')}
-        >
-          <RotateCcw className="w-5 h-5" />
-        </m.button>
-
-        <m.button
-          type="button"
-          onClick={handleSubmit}
-          disabled={builtWord.length < MIN_LEN}
-          className={cn(
-            'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
-            builtWord.length >= MIN_LEN
-              ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
-              : 'bg-neo-navy-light text-neo-white shadow-hard-lg',
-            'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-            'disabled:cursor-not-allowed',
-          )}
-          whileTap={prefersReduced || builtWord.length < MIN_LEN ? {} : { scale: 0.92 }}
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5" />
-            {t('wordWheel.submit')}
-          </div>
-        </m.button>
-
-        <m.button
-          type="button"
-          onClick={handleBackspace}
-          disabled={builtLetters.length === 0}
-          className={cn(
-            'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
-            'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-            'disabled:opacity-30 disabled:cursor-not-allowed',
-          )}
-          whileTap={prefersReduced ? {} : { scale: 0.9 }}
-          aria-label={t('wordWheel.removeLetter')}
-        >
-          <Delete className="w-5 h-5" />
-        </m.button>
-        </div>
+        <WheelActionBar
+          t={t}
+          hasLetters={builtLetters.length > 0}
+          canSubmit={builtWord.length >= MIN_LEN}
+          isValidating={false}
+          onClear={handleClear}
+          onSubmit={handleSubmit}
+          onBackspace={handleBackspace}
+          submitIcon={<Sparkles className="w-5 h-5" />}
+        />
 
       </div>
 

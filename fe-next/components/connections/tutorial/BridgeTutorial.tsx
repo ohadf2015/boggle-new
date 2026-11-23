@@ -221,6 +221,7 @@ export default function BridgeTutorial({ onDone }: { onDone: () => void }) {
                 onBackspace={typing.handleBackspace}
                 onSubmit={submit}
                 backspaceLabel={t('connections.backspace')}
+                clearHintLabel={t('common.holdToClear')}
                 submitLabel={t('connections.submit')}
                 canSubmit={input.trim().length > 0}
                 disabled={false}

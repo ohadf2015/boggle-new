@@ -349,6 +349,7 @@ export default function PuzzleCard({
                   onClear={handleClear}
                   onSubmit={onSubmit}
                   backspaceLabel={t('connections.backspace')}
+                  clearHintLabel={t('common.holdToClear')}
                   submitLabel={t('connections.submit')}
                   canSubmit={state.input.trim().length > 0}
                   disabled={isDisabled}
