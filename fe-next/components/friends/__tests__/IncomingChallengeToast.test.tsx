@@ -173,6 +173,26 @@ describe('IncomingChallengeToast — challenge received', () => {
     expect(screen.getByRole('button', { name: 'friends.challenges.acceptAndPlay' })).toBeTruthy();
   });
 
+  it('Given a live socket invite, When the realtime refetch returns that row without a profile, Then the card keeps the sender name and face', async () => {
+    await renderToast();
+    await act(async () => {
+      socket.fire('friends:challengeReceived', {
+        challengeId: 'ch-live',
+        fromUserId: 'maya-id',
+        fromUsername: 'maya',
+        fromDisplayName: 'Maya',
+        fromAvatar: { image: 'https://x/maya.png', customAvatar: { hair: 'bun' } },
+        challengeType: 'join_room',
+        roomCode: 'RHCA28',
+        createdAt: Date.now(),
+      });
+    });
+    pending.list = [challenge({ id: 'ch-live', challengerUsername: '', challengerDisplayName: undefined, challengeType: 'join_room' })];
+    await act(async () => realtime.cb?.({ related_entity_type: 'friend_challenge' }));
+    expect(screen.getByText('friends.invitedByTitle|Maya')).toBeTruthy();
+    expect(screen.getByTestId('avatar').getAttribute('data-hair')).toBe('bun');
+  });
+
   it('Given a challenge older than the live window, Then no card (it stays on /friends)', async () => {
     pending.list = [challenge({ createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() })];
     await renderToast();

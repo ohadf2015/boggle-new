@@ -28,6 +28,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { NB_BLOCK, NB_PRIMARY, NB_SECONDARY, NB_STICKER, type NbColor } from '../nb/nbStyles';
 import { LIST_CARD_TITLE, ListCard } from '../ListCard';
 import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface ClassCardData {
   id: string;
@@ -92,7 +93,7 @@ export function ClassCard({
   insightHref,
   color = 'pink',
 }: ClassCardProps) {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
   const count = classroom.member_count || 0;
   const [copied, setCopied] = useState(false);
@@ -107,7 +108,7 @@ export function ClassCard({
   const startGameCls = count === 0 ? NB_SECONDARY : NB_PRIMARY;
   const languageKey = LANGUAGE_LABEL_KEYS[classroom.language as keyof typeof LANGUAGE_LABEL_KEYS];
   const studentsLabel =
-    count === 0 ? t('teacher.classrooms.students.noneYet') : t('teacher.classroom.cardSeeAllStudents', { count });
+    count === 0 ? t('teacher.classrooms.students.noneYet') : t(pluralKeyOf('teacher.classroom.cardSeeAllStudents', count, uiLanguage), { count });
 
   const fact =
     count === 0 ? (
@@ -115,7 +116,7 @@ export function ClassCard({
     ) : (
       <>
         {studentPreview}
-        {activity ?? <span>{t('teacher.classroom.studentCountPro', { count: String(count) })}</span>}
+        {activity ?? <span>{t(pluralKeyOf('teacher.classroom.studentCountPro', count, uiLanguage), { count })}</span>}
       </>
     );
 
@@ -217,7 +218,7 @@ export function ClassCard({
         <NbDialogContent size="lg" phone="full">
           <NbDialogHeader
             title={<bdi>{t('teacher.classroom.cardRosterTitle', { name: classroom.name })}</bdi>}
-            srDescription={t('teacher.classroom.cardSeeAllStudents', { count })}
+            srDescription={t(pluralKeyOf('teacher.classroom.cardSeeAllStudents', count, uiLanguage), { count })}
             closeLabel={t('common.close')}
           />
           <NbDialogBody>

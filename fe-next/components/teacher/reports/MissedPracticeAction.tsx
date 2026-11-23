@@ -8,6 +8,7 @@ import { SPACED_REVIEW_DAYS } from '@/lib/education/wordMasteryReport';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
 import { ProInlineLock } from '@/components/teacher/pro/ProInlineLock';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 type Status =
   | { kind: 'idle' }
@@ -73,7 +74,7 @@ export function MissedPracticeAction({
 
   const dayLabel = (iso: string, offset: number) => {
     const when = new Date(`${iso}T12:00:00`).toLocaleDateString(language, { weekday: 'short', day: 'numeric', month: 'short' });
-    const rel = offset === 1 ? t('eduPro.practice.tomorrow') : t('eduPro.practice.inDays', { count: offset });
+    const rel = offset === 1 ? t('eduPro.practice.tomorrow') : t(pluralKeyOf('eduPro.practice.inDays', offset, language), { count: offset });
     return { rel, when };
   };
 
@@ -94,7 +95,7 @@ export function MissedPracticeAction({
               <CalendarCheck className="size-6" aria-hidden="true" />
               {t('eduPro.practice.assigned')}
             </p>
-            <p className="mt-0.5 text-sm font-bold">{t('eduPro.practice.assignedBody', { count: status.words.length })}</p>
+            <p className="mt-0.5 text-sm font-bold">{t(pluralKeyOf('eduPro.practice.assignedBody', status.words.length, language), { count: status.words.length })}</p>
             <ol className="mt-2 grid grid-cols-3 gap-1.5">
               {status.dueDates.map((iso, i) => {
                 const { rel, when } = dayLabel(iso, SPACED_REVIEW_DAYS[i]);

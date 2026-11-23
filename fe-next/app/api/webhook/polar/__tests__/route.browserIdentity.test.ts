@@ -13,6 +13,7 @@ vi.mock('@/lib/subscriptions', () => ({
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
   subscriptionRowStatus: vi.fn().mockResolvedValue(null),
+  subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
 const capture = vi.fn()
@@ -25,6 +26,7 @@ vi.mock('@/lib/posthog', () => ({
 }))
 
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry'
 
 const PRO = 'prod-pro-1'
@@ -41,6 +43,7 @@ const sub = (over: Record<string, unknown> = {}) => ({
 
 describe('polar webhook — browser identity from checkout metadata', () => {
   beforeEach(() => {
+    resetWebhookTelemetryOnce()
     upsertSubscription.mockReset()
     capture.mockReset()
     signature.valid = true

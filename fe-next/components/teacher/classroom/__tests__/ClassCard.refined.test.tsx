@@ -116,7 +116,7 @@ describe('ClassCard face', () => {
 
   it('Given students but no activity line, Then the fact is the student count', () => {
     render(<ClassCard {...baseProps} />);
-    expect(screen.getByTestId('classroom-card-fact')).toHaveTextContent('teacher.classroom.studentCountPro');
+    expect(screen.getByTestId('classroom-card-fact')).toHaveTextContent('teacher.classroom.studentCountPro_other');
   });
 
   it('Given no students, Then the fact says so instead of the activity, and the plate carries the code', () => {
@@ -201,7 +201,7 @@ describe('ClassCard menu', () => {
   it('names the students, and keeps links as links', async () => {
     render(<ClassCard {...fullProps} />);
     await openMenu();
-    expect(screen.getByTestId('classroom-card-students')).toHaveTextContent('teacher.classroom.cardSeeAllStudents:{"count":12}');
+    expect(screen.getByTestId('classroom-card-students')).toHaveTextContent('teacher.classroom.cardSeeAllStudents_other:{"count":12}');
     expect(screen.getByTestId('classroom-card-students')).toHaveAttribute('aria-haspopup', 'dialog');
     expect(screen.getByTestId('classroom-card-report')).toHaveAttribute('href', '/r');
     expect(screen.getByTestId('classroom-card-assign')).toHaveAttribute('href', '/a');

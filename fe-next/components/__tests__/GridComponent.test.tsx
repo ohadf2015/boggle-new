@@ -73,6 +73,23 @@ describe('GridComponent rendering', () => {
     expect(container.querySelector('[data-testid="board-locked-banner"]')?.textContent).toBe('Tiles still falling');
   });
 
+  it('given a locked tap, when a moment passes, then the hint goes away instead of covering the board for the rest of the round', () => {
+    vi.useFakeTimers();
+    try {
+      const { container } = render(
+        <GridComponent grid={GRID} interactive={false} lockedHint="Tiles still falling" />,
+        { wrapper: Wrapper },
+      );
+      fireEvent.pointerDown(container.querySelector('[role="grid"]') as HTMLElement, { button: 0, pointerId: 1, pointerType: 'touch' });
+      const banner = container.querySelector('[data-testid="board-locked-banner"]') as HTMLElement;
+      expect(banner.hidden).toBe(false);
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(banner.hidden).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('given a tileSkinOverride, then the board carries that skin regardless of the equipped one', () => {
     localStorage.setItem('lexiclash_cosmetics_equipped', JSON.stringify({ tileSkin: 'tile-neon' }));
     const { container } = render(<GridComponent grid={GRID} tileSkinOverride="tile-world-3" />, { wrapper: Wrapper });

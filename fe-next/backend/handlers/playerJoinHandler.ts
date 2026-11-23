@@ -275,7 +275,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // reconnect all pass through this ONE call site — `startGame` is a room
     // broadcast and cannot carry a per-socket value (pitfalls class 3).
     // Fire-and-forget: it must never delay or fail the join.
-    void emitClassroomContext(socket, gameCode, authUserId, seat);
+    void emitClassroomContext(socket, gameCode, authUserId, seat.unread ? undefined : seat);
     if (seat.game && authUserId) void recordClassroomRosterEntry(gameCode, seat.game, authUserId);
 
     // Handle reconnection

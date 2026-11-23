@@ -33,7 +33,7 @@ interface UseFriendsState {
 
 interface UseFriendsActions {
   refresh: () => Promise<void>;
-  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string; autoAccepted?: boolean }>;
   acceptRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   declineRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   cancelRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;

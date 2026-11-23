@@ -36,6 +36,7 @@ import {
 import type { AssignmentProgressMatrix as AssignmentProgressMatrixData } from '@/lib/education/assignmentProgressMatrix';
 import { SAMPLE_STUDENTS, splitSampleList } from '@/lib/education/pro/sampleClass';
 import { ReportEmpty, ReportError, ReportSkeleton, SectionTitle, useReportData } from './ReportChrome';
+import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 export interface AssignmentProgressMatrixProps {
   classroomId: string;
@@ -99,7 +100,9 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
 
   return (
     <section data-testid="assignment-progress-matrix" className="space-y-4">
-      <SectionTitle>{t('teacher.reports.progressMatrix.title')}</SectionTitle>
+      <SectionTitle>
+        {t('teacher.reports.progressMatrix.title')} <ProPoweredChip className="ms-1 align-middle" />
+      </SectionTitle>
       <div className="overflow-x-auto rounded-neo border-2 border-neo-cream/40 bg-neo-navy">
         <table className="w-full border-collapse text-sm">
           <thead>

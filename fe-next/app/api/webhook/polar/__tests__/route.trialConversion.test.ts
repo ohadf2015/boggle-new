@@ -25,6 +25,7 @@ const upsertSubscription = vi.fn()
 const logSubscriptionEvent = vi.fn()
 const subscriptionRowIsPastDue = vi.fn().mockResolvedValue(false)
 const subscriptionRowStatus = vi.fn().mockResolvedValue(null)
+const subscriptionTrialAlreadyCounted = vi.fn().mockResolvedValue(false)
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: vi.fn(),
@@ -32,6 +33,7 @@ vi.mock('@/lib/subscriptions', () => ({
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
   subscriptionRowIsPastDue: (...args: unknown[]) => subscriptionRowIsPastDue(...args),
   subscriptionRowStatus: (...args: unknown[]) => subscriptionRowStatus(...args),
+  subscriptionTrialAlreadyCounted: (...args: unknown[]) => subscriptionTrialAlreadyCounted(...args),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))
 const capture = vi.fn()
@@ -40,6 +42,7 @@ vi.mock('@/lib/posthog', () => ({
 }))
 
 import { POST } from '../route'
+import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO = 'prod-pro-1'
 function polarEvent(type: string, data: Record<string, unknown>) {
@@ -70,6 +73,9 @@ describe('polar webhook — trial → paid conversion (unified transition key)',
     subscriptionRowIsPastDue.mockResolvedValue(false)
     subscriptionRowStatus.mockReset()
     subscriptionRowStatus.mockResolvedValue(null)
+    subscriptionTrialAlreadyCounted.mockReset()
+    subscriptionTrialAlreadyCounted.mockResolvedValue(false)
+    resetWebhookTelemetryOnce()
     process.env.POLAR_PRO_PRODUCT_ID = PRO
     process.env.POLAR_WEBHOOK_SECRET = 'test-webhook-secret'
   })

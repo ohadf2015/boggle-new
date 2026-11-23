@@ -7,6 +7,8 @@ import { cn } from '@/lib/utils';
 import type { StudyCard } from '@/shared/utils/studyCards';
 import type { EduT } from '@/components/education/lobby/eduText';
 import { PRESS } from './eduLiveStyles';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
 
 interface LobbyWordStudyProps {
   cards: StudyCard[];
@@ -19,6 +21,7 @@ interface LobbyWordStudyProps {
 const NAV = 'inline-flex min-h-12 items-center justify-center gap-1.5 rounded-neo border-[3px] px-4 font-neo-display text-base font-black uppercase shadow-hard-sm disabled:opacity-40 disabled:shadow-none';
 
 export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: LobbyWordStudyProps) {
+  const { language } = useLanguageSafe();
   const [index, setIndex] = useState(0);
   const card = cards[Math.min(index, cards.length - 1)];
   const last = index >= cards.length - 1;
@@ -32,7 +35,7 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
         {studied ? (
           <span data-testid="study-learned" className="inline-flex items-center gap-1 rounded-full border-2 border-neo-lime bg-neo-lime/10 px-2 py-0.5 font-neo-display text-sm font-bold text-neo-lime">
             <CheckCircle2 className="size-4" aria-hidden="true" />
-            {t('eduStudent.lobby.studyLearned', { count: cards.length })}
+            {t(pluralKeyOf('eduStudent.lobby.studyLearned', cards.length, language), { count: cards.length })}
           </span>
         ) : (
           <span className="font-neo-display text-sm font-bold tabular-nums text-neo-cream/75">

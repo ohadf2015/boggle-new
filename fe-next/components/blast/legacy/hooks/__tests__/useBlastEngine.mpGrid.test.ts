@@ -128,6 +128,38 @@ describe('useBlastEngine — applyServerBoard skips redundant replacements (anti
   });
 });
 
+describe('useBlastEngine — a fresh server board reopens play (MP)', () => {
+  const FRESH_GRID: LetterGrid = SERVER_GRID.map((row) => [...row].reverse());
+
+  it('Given my board hit a dead end, When the server sends a fresh board, Then I can play again', () => {
+    const seedTiles = mkTiles();
+    const { result } = renderHook(() =>
+      useBlastEngine(config, { isMultiplayer: true, blastSeed: 123, initialTileStates: seedTiles, mpInitialGrid: SERVER_GRID }),
+    );
+    act(() => result.current.endGame());
+    expect(result.current.gameState.isDeadEnd).toBe(true);
+
+    act(() => result.current.applyServerBoard(FRESH_GRID, mkTiles()));
+
+    expect(result.current.grid).toEqual(FRESH_GRID);
+    expect(result.current.gameState.isDeadEnd).toBe(false);
+    expect(result.current.gameState.isComplete).toBe(false);
+  });
+
+  it('Given I already cleared more tiles than one board holds, When a fresh full board arrives, Then it is not marked complete', () => {
+    const seedTiles = mkTiles();
+    const { result } = renderHook(() =>
+      useBlastEngine(config, { isMultiplayer: true, blastSeed: 123, initialTileStates: seedTiles, mpInitialGrid: SERVER_GRID }),
+    );
+    const cleared = mkTiles().map((row) => row.map((t) => ({ ...t, isCleared: true })));
+    act(() => result.current.applyServerBoard(SERVER_GRID, cleared));
+    expect(result.current.gameState.isComplete).toBe(true);
+
+    act(() => result.current.applyServerBoard(FRESH_GRID, mkTiles()));
+    expect(result.current.gameState.isComplete).toBe(false);
+  });
+});
+
 afterAll(() => {
   vi.restoreAllMocks();
   vi.clearAllMocks();

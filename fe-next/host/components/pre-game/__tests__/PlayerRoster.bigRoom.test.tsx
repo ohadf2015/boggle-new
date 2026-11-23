@@ -95,10 +95,10 @@ describe('PlayerRoster — ≥720px host/guest grid for a big room', () => {
     expect(grid.className).toMatch(/max-\[719px\]:grid-cols-4/);
   });
 
-  it('my emote trigger moves to the header at ≥720px so it never makes the first row taller', () => {
+  it('my emote trigger lives in the header, never on my seat, so the first row is never taller', () => {
     render(<PlayerRoster players={room(3)} username="Host" gameCode="ABCD" maxPlayers={8} t={t} selfActions={<button type="button">emote</button>} />);
-    expect(screen.getByTestId('self-seat-actions').className).toMatch(/min-\[720px\]:hidden/);
-    expect(screen.getByTestId('self-header-actions').className).toMatch(/max-\[719px\]:hidden/);
+    expect(screen.queryByTestId('self-seat-actions')).toBeNull();
+    expect(screen.getByTestId('self-header-actions')).toHaveTextContent('emote');
   });
 });
 

@@ -45,6 +45,8 @@ export interface ShareQuickResultInput {
   t: (key: string, params?: Record<string, string>) => string;
   isGuest: boolean;
   dayStreak: number;
+  /** Sender's display name — rides the URL so the recipient's banner names them. */
+  senderName?: string | null;
 }
 
 export async function shareQuickResult({
@@ -53,6 +55,7 @@ export async function shareQuickResult({
   t,
   isGuest,
   dayStreak,
+  senderName = null,
 }: ShareQuickResultInput): Promise<ShareResult> {
   const challengeId = isGuest ? null : await createChallengeId(result);
   // Seed rides in the URL. A signed-out friend plays this board even when no
@@ -64,6 +67,7 @@ export async function shareQuickResult({
     seed: result.seed,
     score: result.score,
     scorePct: result.scorePct,
+    name: senderName,
     challengeId,
   });
   posthog.capture(RESULTS_LOOP_EVENTS.created, {

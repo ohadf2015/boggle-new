@@ -23,6 +23,7 @@ import {
   resumeQuiz,
   addQuizPlayer,
   correctWordsByUser,
+  askedWords,
   type VocabQuizSession,
 } from '../vocabQuizEngine';
 
@@ -424,5 +425,19 @@ describe('buildQuestionPayload', () => {
     expect(payload.serverNow).toBe(T0 + 4_000);
     expect(payload.total).toBe(5);
     expect(payload.index).toBe(0);
+  });
+});
+
+describe('askedWords', () => {
+  it('Given the teacher ends the quiz on question 1, When results persist, Then only the word the class saw counts as asked', () => {
+    const session = makeSession();
+    expect(askedWords(session)).toEqual([session.questions[0].word]);
+  });
+
+  it('Given the class reached question 3, When asked, Then the first three words count', () => {
+    const session = makeSession();
+    advanceQuiz(session, T0 + 1);
+    advanceQuiz(session, T0 + 2);
+    expect(askedWords(session)).toEqual(session.questions.slice(0, 3).map((q) => q.word));
   });
 });

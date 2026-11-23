@@ -11,6 +11,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ARCADE_ACCENTS, ARCADE_BLOCK, type ArcadeAccent } from '@/lib/education/arcadeAccent';
 import { GAME_CARD, GAME_CARD_HOVER } from '@/components/teacher/home/homeStyles';
 import { LIST_CARD_ACCENT } from '@/components/teacher/ListCard';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export const LIBRARY_CARD_H = 116;
 
@@ -76,7 +77,7 @@ export function libraryAccent(id: string): ArcadeAccent {
 
 /** One shared list: name, one fact line, and the whole card opens the preview. */
 export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const author = item.source === 'verified' ? 'LexiClash' : item.authorName ?? t('eduLibrary.card.aTeacher');
   const accent = libraryAccent(item.id);
 
@@ -100,7 +101,7 @@ export default function LibraryCard({ item, index, onOpen }: LibraryCardProps) {
         <BidiText>{item.name}</BidiText>
       </span>
       <span data-testid="library-card-fact" className="truncate text-sm font-semibold text-neo-cream/80" dir="auto">
-        {t('eduLibrary.card.words', { count: item.wordCount })}
+        {t(pluralKeyOf('eduLibrary.card.words', item.wordCount, language), { count: item.wordCount })}
         {' · '}
         <span lang={item.language}>{nativeLanguageName(item.language)}</span>
         {' · '}

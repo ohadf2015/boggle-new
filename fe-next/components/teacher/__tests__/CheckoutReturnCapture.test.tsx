@@ -15,7 +15,7 @@ vi.mock('next/navigation', () => ({
   usePathname: () => '/en/teacher',
 }));
 
-let proState: { hasPro: boolean; loading: boolean; refresh: ReturnType<typeof vi.fn> };
+let proState: { hasPro: boolean; loading: boolean; refresh: ReturnType<typeof vi.fn>; status?: string };
 vi.mock('@/hooks/useTeacherPro', () => ({
   useTeacherPro: () => proState,
 }));
@@ -27,6 +27,7 @@ describe('<CheckoutReturnCapture>', () => {
     trackEduProCheckoutReturnLanded.mockReset();
     replace.mockReset();
     sessionStorage.clear();
+    localStorage.clear();
     window.history.pushState({}, '', '/en/teacher');
     proState = { hasPro: false, loading: false, refresh: vi.fn().mockResolvedValue(undefined) };
   });
@@ -66,5 +67,23 @@ describe('<CheckoutReturnCapture>', () => {
     act(() => { screen.getByTestId('checkout-return-retry').click(); });
     expect(proState.refresh).toHaveBeenCalled();
     expect(screen.getByTestId('checkout-return-status')).toHaveAttribute('data-phase', 'activating');
+  });
+
+  const ID = '52e32342-5f87-49e6-ac1c-7c636b5192ff';
+
+  it('Given this checkout was already shown a minute ago, When the teacher comes Back to the success URL, Then nothing re-opens', () => {
+    localStorage.setItem(`lexi_edu_checkout_welcomed:${ID}`, String(Date.now() - 60_000));
+    window.history.pushState({}, '', `/en/teacher?checkout=success&checkout_id=${ID}`);
+    proState = { ...proState, hasPro: true };
+    render(<CheckoutReturnCapture />);
+    expect(screen.queryByTestId('checkout-return-status')).not.toBeInTheDocument();
+    expect(trackEduProCheckoutReturnLanded).not.toHaveBeenCalled();
+  });
+
+  it('Given a trial checkout lands, When Pro is visible, Then it says the trial started, not that a payment went through', () => {
+    window.history.pushState({}, '', `/en/teacher?checkout=success&checkout_id=${ID}`);
+    proState = { ...proState, hasPro: true, status: 'trialing' };
+    render(<CheckoutReturnCapture />);
+    expect(screen.getByTestId('checkout-return-status')).toHaveTextContent('teacher.checkoutReturn.trialSuccessBody');
   });
 });

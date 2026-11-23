@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { postTeacherProCheckout } from '../postTeacherProCheckout';
+import { checkoutFailureKey, postTeacherProCheckout } from '../postTeacherProCheckout';
 
 const failed = vi.hoisted(() => vi.fn());
 vi.mock('@/lib/education/proFunnelTelemetry', () => ({
@@ -149,5 +149,11 @@ describe('postTeacherProCheckout failure telemetry', () => {
   it('Given no placement, When it fails, Then it is reported as other', async () => {
     await postTeacherProCheckout(vi.fn().mockResolvedValue(res(502)));
     expect(failed).toHaveBeenCalledWith({ reason: 'http_502', placement: 'other', trial: false });
+  });
+});
+
+describe('checkoutFailureKey', () => {
+  it('Given the teacher already has a live subscription (409), When checkout is refused, Then she is told she is already subscribed', () => {
+    expect(checkoutFailureKey({ ok: false, status: 409 })).toBe('teacher.subscription.alreadySubscribed');
   });
 });

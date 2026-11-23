@@ -7,7 +7,7 @@ import { loadSupabaseClient } from '@/utils/supabase/loadClient';
 import { isValidCustomAvatar } from '@/shared/types/customAvatar';
 import logger from '@/utils/logger';
 import { shouldWriteOnlineStatus } from './onlineStatusThrottle';
-import { PUBLIC_PROFILES_TABLE, PUBLIC_PROFILE_COLUMNS } from './publicProfiles';
+import { PUBLIC_PROFILES_TABLE, PUBLIC_PROFILE_COLUMNS, fetchPublicProfiles } from './publicProfiles';
 import {
   isUserOnline,
   type FriendStatus,
@@ -263,15 +263,7 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
       challenge_type,
       message,
       status,
-      created_at,
-      profiles!friend_challenges_challenger_id_fkey (
-        username,
-        display_name,
-        avatar_emoji,
-        avatar_color,
-        avatar_image,
-        avatar_config
-      )
+      created_at
     `)
     .eq('challenged_id', uid)
     .eq('status', 'pending')
@@ -282,7 +274,7 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
     return [];
   }
 
-  interface ChallengeWithRelations {
+  interface ChallengeRow {
     id: string;
     challenger_id: string;
     challenge_id: string;
@@ -290,23 +282,17 @@ export async function getPendingChallenges(userId?: string): Promise<FriendChall
     message?: string;
     status: 'pending' | 'accepted' | 'declined' | 'expired' | 'completed';
     created_at: string;
-    // PostgREST returns a forward (many-to-one) FK embed as a single object, not an array.
-    profiles: {
-      username: string;
-      display_name?: string | null;
-      avatar_emoji?: string;
-      avatar_color?: string;
-      avatar_image?: string | null;
-      avatar_config?: unknown;
-    } | null;
   }
-  return (challenges as unknown as ChallengeWithRelations[]).map((c: ChallengeWithRelations) => {
-    const challenger = c.profiles;
+  const rows = challenges as ChallengeRow[];
+  const profiles = await fetchPublicProfiles(supabase, [...new Set(rows.map((c) => c.challenger_id))]);
+
+  return rows.map((c) => {
+    const challenger = profiles.get(c.challenger_id);
     const built = challenger?.avatar_config;
     return {
       id: c.id,
       challengerId: c.challenger_id,
-      challengerUsername: challenger?.username || 'Unknown',
+      challengerUsername: challenger?.username ?? '',
       challengerDisplayName: challenger?.display_name ?? undefined,
       challengerAvatarImage: challenger?.avatar_image ?? undefined,
       challengerAvatarEmoji: challenger?.avatar_emoji || '😊',

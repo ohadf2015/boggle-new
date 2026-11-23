@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { packLessonInput, seasonThemeFor, type PackLessonInput, type ThemedPack } from '@/lib/education/themedPacks';
 import { CardArt, actionClass, chipClass } from './StarterPacksSection.data';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 const VISIBLE = 6;
 
@@ -15,13 +16,13 @@ interface ThemedProps {
 }
 
 function ThemedPackCard({ pack, isSeason, onSelect }: { pack: ThemedPack; isSeason: boolean; onSelect: () => void }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   return (
     <article className="flex flex-col gap-3 rounded-neo border-3 border-neo-cream bg-neo-navy/80 p-4 shadow-hard">
       <div className="flex flex-wrap items-center gap-1.5">
         {isSeason && <span className={cn(chipClass, 'bg-neo-lime')}>{t('education.starterPacks.themed.thisSeason')}</span>}
         <span className={cn(chipClass, 'bg-neo-cyan')}>{t(`eduLibrary.grade.${pack.gradeBand}`)}</span>
-        <span className={cn(chipClass, 'bg-neo-cream')}>{t('teacher.lesson.words', { count: pack.words.length })}</span>
+        <span className={cn(chipClass, 'bg-neo-cream')}>{t(pluralKeyOf('teacher.lesson.words', pack.words.length, language), { count: pack.words.length })}</span>
       </div>
       <div className="flex flex-1 items-start gap-3">
         <div className="min-w-0 flex-1" lang={pack.language} dir="auto">

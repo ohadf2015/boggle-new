@@ -12,6 +12,9 @@ export const FRIEND_ACTIONS: readonly FriendAction[] = ['request', 'accept', 'un
 export interface FriendActionResult {
   success: boolean;
   code?: string;
+  /** True when the request instantly became a friendship (mutual add). The
+   * client tracks friend_added — not friend_request_sent — for that outcome. */
+  autoAccepted?: boolean;
 }
 
 // Next routes and the socket server share one process but not one module graph; server/socketSetup publishes io here.
@@ -59,7 +62,11 @@ export async function runFriendAction(
         emitToUser(actorId, 'friends:requestSent', ids);
         notifyFriendRequest(target, actorName, actorId).catch(() => {});
       }
-      return { success: true };
+      // Only flag the mutual-add case so the success shape stays exactly
+      // { success: true } for a plain request (callers/tests rely on it).
+      return result.autoAccepted === true
+        ? { success: true, autoAccepted: true }
+        : { success: true };
     }
 
     case 'accept': {

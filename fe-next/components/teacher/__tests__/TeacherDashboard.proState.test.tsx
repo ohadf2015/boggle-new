@@ -17,7 +17,7 @@ vi.mock('@/components/education/TeacherOnboarding', () => ({ TeacherOnboarding: 
 // (both are fixed overlays, z-[90] under z-[100]). This teacher has seen it.
 vi.mock('@/components/teacher/ClassroomManager', () => ({ default: () => <div /> }));
 vi.mock('@/components/teacher/LessonBuilder', () => ({ default: () => <div /> }));
-vi.mock('@/components/teacher/assignments', () => ({ AssignmentTrackingPanel: () => <div />, AssignmentCreator: () => <div /> }));
+vi.mock('@/components/teacher/assignments', () => ({ AssignmentCreator: () => <div /> }));
 vi.mock('@/utils/confettiUtils', () => ({ fireConfetti: vi.fn() }));
 
 let proState: Record<string, unknown>;

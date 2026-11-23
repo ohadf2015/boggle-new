@@ -9,6 +9,8 @@
 
 export const BLAST_RESYNC_CLEARED_BY = '__server_resync__';
 export const BLAST_RESYNC_REQUEST = 'blastRequestBoard';
+/** A fresh board replaced the one every in-flight word was aimed at. */
+export const BLAST_REGEN_CLEARED_BY = '__board_regenerated__';
 /** GridPositionSchema's bound on submitWord.path cells. */
 const SUBMIT_PATH_MAX_INDEX = 10;
 
@@ -37,7 +39,7 @@ export function receiveBlastBoard(
   clearedBy: string,
   username: string | undefined
 ): { apply: boolean; state: BlastSyncState } {
-  if (clearedBy === '__server_reconnect__') return { apply: true, state: INITIAL_BLAST_SYNC };
+  if (clearedBy === '__server_reconnect__' || clearedBy === BLAST_REGEN_CLEARED_BY) return { apply: true, state: INITIAL_BLAST_SYNC };
   if (clearedBy === BLAST_RESYNC_CLEARED_BY) {
     const after = s.sentSinceResync ?? 0;
     return { apply: after === 0, state: { pending: after, sentSinceResync: null } };
@@ -47,6 +49,17 @@ export function receiveBlastBoard(
     return { apply: pending === 0, state: { ...s, pending } };
   }
   return { apply: s.pending === 0, state: s };
+}
+
+/**
+ * Snapshots queued during a cascade, read when it ends: a fresh board always wins;
+ * anything else is stale once a newer word is waiting (its own ack will follow).
+ */
+export function pickQueuedBoard<T extends { clearedBy: string }>(queue: readonly T[], settled: boolean): T | null {
+  for (let i = queue.length - 1; i >= 0; i--) {
+    if (queue[i].clearedBy === BLAST_REGEN_CLEARED_BY || queue[i].clearedBy === '__server_reconnect__') return queue[i];
+  }
+  return settled && queue.length > 0 ? queue[queue.length - 1] : null;
 }
 
 export function blastSubmitPayload(

@@ -39,6 +39,7 @@ export function useBlastServerSync({
       if (stateRef.current.pending === 0 || !requestRef.current) return;
       stateRef.current = noteBlastResyncRequested(stateRef.current);
       requestRef.current();
+      arm();
     }, BLAST_RESYNC_AFTER_MS);
   }, []);
 
@@ -59,5 +60,7 @@ export function useBlastServerSync({
     return apply;
   }, [enabled, username, arm]);
 
-  return { noteSubmit, receive };
+  const isSettled = useCallback(() => !enabled || stateRef.current.pending === 0, [enabled]);
+
+  return { noteSubmit, receive, isSettled };
 }

@@ -215,4 +215,80 @@ describe('PlayerJoinHandler — classroomContext', () => {
     expect(joined).toBeDefined();
     expect(contextEmits()).toHaveLength(0);
   });
+
+  describe('study deck on every seat path', () => {
+    const studyCards = [{ word: 'river', definition: 'a long stream' }, { word: 'planet' }];
+    const deckEmits = () => mockSafeEmit.mock.calls.filter((c) => c[1] === 'classroomStudyCards');
+
+    it('given a student reconnecting in the lobby, when they re-join, then the same deck is re-sent', async () => {
+      mockGetGame.mockReturnValue(lobbyGame({ users: { Ada: { socketId: 'old' } } }));
+      mockGetSocketIdByUsername.mockReturnValue('old-sock');
+      mockGetClassroomGame.mockResolvedValue({ ...classroomGame, studyCards });
+
+      const { join } = captureJoinHandler('student-1');
+      await join({ gameCode: 'ABC123', username: 'Ada' });
+      await flush();
+
+      expect(handleReconnection).toHaveBeenCalled();
+      expect(deckEmits()).toHaveLength(1);
+      expect(deckEmits()[0][2]).toEqual({ gameCode: 'ABC123', cards: studyCards });
+    });
+
+    it('given a cold level lookup that never answers, when a signed-in student reconnects, then the deck still arrives with the seat', async () => {
+      mockGetGame.mockReturnValue(lobbyGame({ users: { Ada: { socketId: 'old' } } }));
+      mockGetSocketIdByUsername.mockReturnValue('old-sock');
+      mockGetClassroomGame.mockResolvedValue({ ...classroomGame, studyCards });
+      mockGetClassroomMembershipLevel.mockReturnValue(new Promise(() => {}));
+
+      const { join } = captureJoinHandler('student-1');
+      await join({ gameCode: 'ABC123', username: 'Ada' });
+      await flush();
+
+      expect(deckEmits()).toHaveLength(1);
+      const reconnectOrder = (handleReconnection as unknown as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0];
+      expect(mockSafeEmit.mock.invocationCallOrder[mockSafeEmit.mock.calls.findIndex((c) => c[1] === 'classroomStudyCards')]).toBeLessThan(reconnectOrder);
+    });
+
+    it('given the seat check could not read the classroom, when the student joins, then the deck is read again rather than skipped', async () => {
+      mockGetGame.mockReturnValue(lobbyGame());
+      mockGetClassroomGame.mockRejectedValueOnce(new Error('redis blip')).mockResolvedValue({ ...classroomGame, studyCards });
+
+      const { join } = captureJoinHandler(undefined);
+      await join({ gameCode: 'ABC123', username: 'Guest' });
+      await flush();
+
+      expect(deckEmits()).toHaveLength(1);
+      expect(contextEmits()).toHaveLength(1);
+    });
+
+    it('given a server restart emptied the socket map, when a seated student re-joins, then they get their seat and the deck back', async () => {
+      mockGetGame.mockReturnValue(undefined);
+      mockRestoreGameFromRedis.mockResolvedValue(lobbyGame({ users: { Ada: { authUserId: 'student-1' } } }));
+      mockGetClassroomGame.mockResolvedValue({ ...classroomGame, studyCards });
+
+      const { join } = captureJoinHandler('student-1');
+      await join({ gameCode: 'ABC123', username: 'Ada' });
+      await flush();
+
+      expect(handleReconnection).toHaveBeenCalled();
+      expect(deckEmits()[0][2]).toEqual({ gameCode: 'ABC123', cards: studyCards });
+    });
+
+    it('given the teacher host re-joining after a restart, when the room is restored, then they reclaim the host seat with no deck', async () => {
+      mockGetGame.mockReturnValue(undefined);
+      mockRestoreGameFromRedis.mockResolvedValue(
+        lobbyGame({ hostUsername: 'Ms K', users: { 'Ms K': { isHost: true, authUserId: 't1' }, Ada: { authUserId: 'student-1' } } }),
+      );
+      mockGetClassroomGame.mockResolvedValue({ ...classroomGame, studyCards });
+
+      const { join } = captureJoinHandler('t1');
+      await join({ gameCode: 'ABC123', username: 'Ms K', hostSeat: true });
+      await flush();
+
+      expect(handleReconnection).toHaveBeenCalled();
+      expect((handleReconnection as unknown as ReturnType<typeof vi.fn>).mock.calls[0][4]).toBe('Ms K');
+      expect(deckEmits()).toHaveLength(0);
+    });
+  });
 });
+

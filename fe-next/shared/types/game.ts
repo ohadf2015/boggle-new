@@ -475,6 +475,8 @@ export interface BlastPlayerBoard {
   seed: number;
   totalMoves: number;
   refillCount: number;
+  /** ms epoch of the last in-place refresh; a dead-end report right after one is stale. */
+  regeneratedAt?: number;
 }
 
 export interface BlastModeState {

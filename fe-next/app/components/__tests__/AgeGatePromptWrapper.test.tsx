@@ -42,6 +42,12 @@ vi.mock('@/components/families/AgeGateModal', () => ({
   ) : null),
 }));
 
+const game = { active: false };
+vi.mock('@/utils/abandonOnPagehide', () => ({
+  isGameActive: () => game.active,
+}));
+
+import { signalGameEnded } from '@/lib/ads/gameEndSignal';
 import AgeGatePromptWrapper, { RE_PROMPT_INTERVAL_MS } from '../AgeGatePromptWrapper';
 
 const MARKER_KEY = 'lc_age_prompt_shown_at';
@@ -52,6 +58,7 @@ describe('AgeGatePromptWrapper', () => {
     adCtx.ageGatePromptOpportunity = false;
     social.needsAgeGate = true;
     social.authResolved = true;
+    game.active = false;
   });
 
   it('renders nothing before an opportunity arises', () => {
@@ -130,5 +137,17 @@ describe('AgeGatePromptWrapper', () => {
     render(<AgeGatePromptWrapper />);
     act(() => { fireEvent.click(screen.getByText('dismiss')); });
     expect(screen.queryByTestId('age-gate-modal')).toBeNull();
+  });
+
+  it('never opens over a game in progress, and asks at the next game end instead', () => {
+    adCtx.ageGatePromptOpportunity = true;
+    game.active = true;
+    render(<AgeGatePromptWrapper />);
+    expect(screen.queryByTestId('age-gate-modal')).toBeNull();
+    expect(localStorage.getItem(MARKER_KEY)).toBeNull();
+
+    game.active = false;
+    act(() => { signalGameEnded(); });
+    expect(screen.getByTestId('age-gate-modal')).toBeTruthy();
   });
 });

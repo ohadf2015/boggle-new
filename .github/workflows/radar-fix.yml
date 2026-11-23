@@ -56,6 +56,7 @@ jobs:
           jq -n --arg t "$GROWTH_RADAR_TOKEN" --arg u "$RADAR/api/mcp" \
             '{mcpServers:{"growth-radar":{type:"http",url:$u,headers:{Authorization:("Bearer "+$t)}}}}' \
             > "$RUNNER_TEMP/mcp.json"
+          curl -fsS --max-time 20 "$RADAR/skills/growth-radar-fix/references/lessons.md" -o "$OUT/lessons.md" || : > "$OUT/lessons.md"
 
       - name: Skip, three radar PRs already await review
         if: steps.open.outputs.full == 'true'
@@ -107,6 +108,7 @@ jobs:
             - Written content must read as human: plain short sentences, no hype words, no "not X, it's Y" reveals,
               no invented anecdotes or numbers. Hebrew copy is rewritten, never translated.
             Goal of this run: clear noise from the backlog, then ship exactly ONE real fix.
+            Read ${{ env.OUT }}/lessons.md before step 1: it holds what reviewers taught from earlier fixes they turned down. Apply every lesson.
 
             1. Call list_apps, then get_recommendations app="${{ env.APP }}" detail="full" limit=20.
                Skip rows whose id is in this list of open PRs: [${{ steps.open.outputs.ids }}]. Skip stale:true rows.

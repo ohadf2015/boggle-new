@@ -80,18 +80,23 @@ describe('PlayerWaitingView — joiner lobby on the shell', () => {
     expect(within(screen.getByTestId('lobby-howto-sheet')).getByTestId('game-instructions')).toHaveAttribute('data-mode', 'classic');
   });
 
-  it('one how-to control per layout: the rules accordion on desktop, the pill → sheet on phone', () => {
+  it('one how-to control at every width: the pill opens the rules sheet (an inline accordion overflowed 720p)', () => {
     setLobbyViewport('desktop');
     onTestFinished(() => setLobbyViewport('phone'));
     const { unmount } = render(<PlayerWaitingView {...props} />);
     const desktop = within(screen.getByTestId('desktop-lobby-layout'));
-    expect(desktop.getAllByTestId('game-instructions')).toHaveLength(1);
-    expect(desktop.queryByText('mpUi.lobby.howToPlay')).toBeNull();
+    expect(desktop.queryByTestId('game-instructions')).toBeNull();
+    expect(desktop.getByText('mpUi.lobby.howToPlay')).toBeInTheDocument();
     unmount();
     setLobbyViewport('phone');
     render(<PlayerWaitingView {...props} />);
     expect(phone().queryByTestId('game-instructions')).toBeNull();
     expect(phone().getByText('mpUi.lobby.howToPlay')).toBeInTheDocument();
+  });
+
+  it('on narrow phones the language chip keeps its flag and the name goes to screen readers (ru INVITE pushed it under EXIT)', () => {
+    render(<PlayerWaitingView {...props} />);
+    expect(screen.getByTestId('lobby-language-name').className).toMatch(/max-\[419px\]:sr-only/);
   });
 
   it('desktop keeps the room chat in the right rail', () => {

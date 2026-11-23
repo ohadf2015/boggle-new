@@ -23,6 +23,7 @@ import { ClipboardList, Play, RotateCcw } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import type { MissGapAssignmentPayload } from '@/lib/education/missGapAsyncAssignment';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface MissGapStudentActionsProps {
   payload: MissGapAssignmentPayload;
@@ -39,7 +40,7 @@ export function MissGapStudentActions({
   turnIn,
   onPlay,
 }: MissGapStudentActionsProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const words = payload.missedWords;
 
   return (
@@ -71,7 +72,7 @@ export function MissGapStudentActions({
         )}
         {completed
           ? t('education.homework.playAgainCta')
-          : t('education.homework.startCta', { count: words.length })}
+          : t(pluralKeyOf('education.homework.startCta', words.length, language), { count: words.length })}
       </button>
     </div>
   );

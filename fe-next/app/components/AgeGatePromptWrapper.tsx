@@ -23,6 +23,8 @@ import { useAdMobContext } from '@/contexts/AdMobContext';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
 import { AgeGateModal } from '@/components/families/AgeGateModal';
 import { trackAgeGate } from '@/utils/growthTracking';
+import { isGameActive } from '@/utils/abandonOnPagehide';
+import { GAME_ENDED_EVENT } from '@/lib/ads/gameEndSignal';
 
 const MARKER_KEY = 'lc_age_prompt_shown_at';
 
@@ -48,12 +50,21 @@ export default function AgeGatePromptWrapper() {
   const { needsAgeGate, authResolved } = useSocialCapabilities();
   const [open, setOpen] = useState(false);
   const [done, setDone] = useState(false);
+  const [gameEnds, setGameEnds] = useState(0);
+
+  useEffect(() => {
+    const onGameEnded = () => setGameEnds((n) => n + 1);
+    window.addEventListener(GAME_ENDED_EVENT, onGameEnded);
+    return () => window.removeEventListener(GAME_ENDED_EVENT, onGameEnded);
+  }, []);
 
   useEffect(() => {
     if (done || open) return;
     // authResolved gate: tier reads 'unknown' while auth is still loading — a
     // logged-in adult must not get flashed the prompt during that window.
     if (!ageGatePromptOpportunity || !needsAgeGate || !authResolved) return;
+    // The opportunity stays latched, so this can re-run mid-round; wait for the next game end.
+    if (isGameActive()) return;
     if (recentlyPrompted()) {
       setDone(true);
       return;
@@ -65,7 +76,7 @@ export default function AgeGatePromptWrapper() {
     }
     trackAgeGate('shown');
     setOpen(true);
-  }, [ageGatePromptOpportunity, needsAgeGate, authResolved, done, open]);
+  }, [ageGatePromptOpportunity, needsAgeGate, authResolved, done, open, gameEnds]);
 
   if (!open) return null;
 

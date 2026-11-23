@@ -84,6 +84,17 @@ export function challengeFromSocket(data: ChallengeReceivedPayload): FriendChall
   };
 }
 
+function senderOf(c: FriendChallenge): Partial<FriendChallenge> {
+  return {
+    challengerUsername: c.challengerUsername,
+    challengerDisplayName: c.challengerDisplayName,
+    challengerAvatarImage: c.challengerAvatarImage,
+    challengerAvatarEmoji: c.challengerAvatarEmoji,
+    challengerAvatarColor: c.challengerAvatarColor,
+    challengerCustomAvatar: c.challengerCustomAvatar,
+  };
+}
+
 /** Friend challenges and room invites on any page, including mid-round: Join/Not now for the invitee, routing (or a Join card) for the challenger. */
 // Limit: the challenger hears accepted/declined/result only on pages with a socket (game routes); elsewhere, the in-app host + push cover it.
 export function IncomingChallengeToast() {
@@ -136,7 +147,13 @@ function ChallengeCards({ me }: { me: string }) {
   // One fetch on mount plus one per realtime invite row: no polling on every page.
   const load = useCallback(async () => {
     const list = await getPendingChallenges(me).catch(() => null);
-    if (list) setPendingChallenges(list);
+    if (!list) return;
+    setPendingChallenges((prev) =>
+      list.map((c) => {
+        const live = prev.find((p) => p.id === c.id);
+        return live && !c.challengerUsername && !c.challengerDisplayName ? { ...c, ...senderOf(live) } : c;
+      }),
+    );
   }, [me]);
   useEffect(() => {
     void load();

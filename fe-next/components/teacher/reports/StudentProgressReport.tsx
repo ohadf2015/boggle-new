@@ -26,6 +26,7 @@ import {
   useReportData,
   useReportExport,
 } from './ReportChrome';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
 export interface StudentProgressReportProps {
   studentId: string;
@@ -84,7 +85,7 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
           <Stat value={`${metrics.wordsLearned} / ${metrics.totalWords}`} label={t('teacher.reports.metrics.wordsLearned')} size="lg" className="w-full" />
           <Stat value={metrics.accuracy === null ? t('parentReport.noValue') : `${metrics.accuracy}%`} label={t('teacher.reports.metrics.accuracy')} size="lg" className="w-full" />
           <Stat value={formatPracticeMinutes(t, metrics.practiceTimeMinutes)} label={t('teacher.reports.metrics.practiceTime')} size="lg" className="w-full" />
-          <Stat value={t('teacher.reports.streakDays', { count: metrics.currentStreak })} label={t('teacher.reports.metrics.currentStreak')} size="lg" className="w-full" />
+          <Stat value={t(pluralKeyOf('teacher.reports.streakDays', metrics.currentStreak, language), { count: metrics.currentStreak })} label={t('teacher.reports.metrics.currentStreak')} size="lg" className="w-full" />
         </div>
 
         <MasteryMeter percent={masteredPct} label={t('teacher.reports.masteredShare', { percent: masteredPct })} />
@@ -93,7 +94,7 @@ export function StudentProgressReport({ studentId, classroomId, dateRange }: Stu
           {[
             [t('teacher.reports.metrics.sessionsCompleted'), metrics.sessionsCompleted],
             [t('teacher.reports.metrics.averageScore'), metrics.averageScore ?? t('parentReport.noValue')],
-            [t('teacher.reports.metrics.longestStreak'), t('teacher.reports.streakDays', { count: metrics.longestStreak })],
+            [t('teacher.reports.metrics.longestStreak'), t(pluralKeyOf('teacher.reports.streakDays', metrics.longestStreak, language), { count: metrics.longestStreak })],
           ].map(([label, value]) => (
             <div key={String(label)} className="flex items-baseline gap-2">
               <dt className="text-neo-cream/75">{label}</dt>

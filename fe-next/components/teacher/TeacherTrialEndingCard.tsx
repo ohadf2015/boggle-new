@@ -20,6 +20,7 @@ import {
 import { teacherHostHref } from '@/lib/education/teacherHostHref';
 import { reportProCtaClick, reportProOfferClick, reportProOfferImpression } from '@/lib/education/reportProCtaClick';
 import { useUpsellImpression } from '@/lib/education/useUpsellImpression';
+import { TrialUsageRecap } from '@/components/teacher/pro/TrialUsageRecap';
 import { trackTeacherProUpgradeClick } from '@/lib/education/proFunnelTelemetry';
 import type { TrialStatus } from '@/lib/education/trial';
 
@@ -112,6 +113,7 @@ export function TeacherTrialEndingCard({ trial }: { trial?: TrialStatus | null }
           <>
             <span>{copy.body}</span>
             {copy.note ? <span className="mt-1 block font-semibold text-neo-cream/70">{copy.note}</span> : null}
+            {!waiting ? <TrialUsageRecap trialExpires={expiresAt} /> : null}
           </>
         }
         lead={

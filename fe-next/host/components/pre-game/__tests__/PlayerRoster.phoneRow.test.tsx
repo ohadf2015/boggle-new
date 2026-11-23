@@ -25,7 +25,7 @@ describe('PlayerRoster — phone 4-column crew grid', () => {
   it('seats render exactly once — no duplicated DOM between phone and desktop layouts', () => {
     render(<PlayerRoster players={room} username="Host" gameCode="ABCD" maxPlayers={8} t={t} />);
     expect(screen.getAllByTestId('lobby-seat')).toHaveLength(3);
-    expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(5);
+    expect(screen.getAllByTestId('lobby-seat-empty')).toHaveLength(1);
   });
 
   it('the roster is a 4-column grid on the phone, not a horizontal scroller', () => {
@@ -46,7 +46,7 @@ describe('PlayerRoster — phone 4-column crew grid', () => {
     }
   });
 
-  it('self actions (the emote tray) sit on MY seat, under my name — not in the roster header row', () => {
+  it('self actions (the emote tray) sit once in the squad header at every width, so my seat stays one row tall', () => {
     render(
       <PlayerRoster
         players={room}
@@ -57,12 +57,11 @@ describe('PlayerRoster — phone 4-column crew grid', () => {
         selfActions={<span data-testid="my-actions" />}
       />,
     );
-    const mine = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-me') === 'true')!;
     const copies = screen.getAllByTestId('my-actions');
-    expect(copies.filter((el) => mine.contains(el))).toHaveLength(1);
-    // The other copy is the ≥720px header placement; on a phone it is hidden.
-    expect(screen.getByTestId('self-header-actions').contains(copies.find((el) => !mine.contains(el))!)).toBe(true);
-    expect(screen.getByTestId('self-header-actions').className).toMatch(/max-\[719px\]:hidden/);
+    expect(copies).toHaveLength(1);
+    const header = screen.getByTestId('self-header-actions');
+    expect(header.contains(copies[0])).toBe(true);
+    expect(header.className).not.toMatch(/hidden/);
   });
 
   it('the emote trigger carries its label so it reads as "emotes" at a glance', () => {
@@ -76,7 +75,6 @@ describe('PlayerRoster — phone 4-column crew grid', () => {
         selfActions={<button type="button" data-testid="emote-trigger" />}
       />,
     );
-    const mine = screen.getAllByTestId('lobby-seat').find((el) => el.getAttribute('data-me') === 'true')!;
-    expect(mine).toHaveTextContent('lobby.emote.title');
+    expect(screen.getByTestId('self-header-actions')).toHaveTextContent('lobby.emote.title');
   });
 });

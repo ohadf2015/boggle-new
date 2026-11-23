@@ -127,15 +127,17 @@ export async function signUpWithEmail(
   // confirm link opens in a different browser (no localStorage, no
   // sessionStorage latch). signup_surface is always set so the row is not
   // an unattributed email signup.
-  const [{ getFirstTouchAttribution }, meta] = await Promise.all([
+  const [{ getFirstTouchAttribution }, meta, { grDistinctId }] = await Promise.all([
     import('@/utils/utmCapture'),
     import('@/lib/auth/emailSignupMeta'),
+    import('@/utils/growthRadarMirror'),
   ]);
   const attributionData = meta.buildEmailSignupMetadata({
     firstTouch: getFirstTouchAttribution(),
     signupSurface: meta.peekClientSignupSurface(),
     language: meta.readStoredSignupLanguage() || currentLocale,
     intendedRole: opts?.intendedRole ?? null,
+    grDistinctId: grDistinctId(),
   });
 
   return supabase.auth.signUp({

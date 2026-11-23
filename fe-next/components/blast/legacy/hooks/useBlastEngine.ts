@@ -244,12 +244,17 @@ export function useBlastEngine(
   // ── Auto-complete when all tiles cleared ──
   const { tilesCleared, totalTiles, isComplete, isDeadEnd, movesRemaining: gsMovesRemaining, movesUsed, totalMoves: gsTotalMoves } = gameState;
 
+  // MP counts tiles across every board the server refreshes, so "complete" there means THIS board is empty.
+  const isMp = !!options?.isMultiplayer;
+  const boardEmpty = isMp
+    ? tileStates.length > 0 && tileStates.every((row) => row.every((t) => t.isCleared))
+    : tilesCleared >= totalTiles && totalTiles > 0;
   useEffect(() => {
-    if (!isComplete && !isDeadEnd && tilesCleared >= totalTiles && totalTiles > 0) {
+    if (!isComplete && !isDeadEnd && boardEmpty) {
       const bonus = calculateLeftoverMoveBonus(gsMovesRemaining);
       setGameState(prev => ({ ...prev, isComplete: true, bonusMoveScore: bonus, score: prev.score + bonus }));
     }
-  }, [tilesCleared, totalTiles, isComplete, isDeadEnd, gsMovesRemaining]);
+  }, [boardEmpty, isComplete, isDeadEnd, gsMovesRemaining]);
 
   // ── Game over on moves exhausted (singleplayer only) ──
   useEffect(() => {
@@ -571,6 +576,9 @@ export function useBlastEngine(
     setCurrentGrid(newGrid);
     tileStatesRef.current = newTileStates;
     setTileStates(() => newTileStates);
+    // A server board is a live board again: a dead end or clear on the old one no longer holds.
+    setNoWordsRemaining(false);
+    setGameState(prev => (prev.isComplete || prev.isDeadEnd ? { ...prev, isComplete: false, isDeadEnd: false } : prev));
   }, []);
 
   // Stable actions object — functions never change identity, so use empty deps

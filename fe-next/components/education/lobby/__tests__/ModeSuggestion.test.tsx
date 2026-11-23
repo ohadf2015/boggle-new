@@ -2,11 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 const rounds = vi.hoisted(() => ({ value: [] as { gameMode: string; playerCount: number }[] }));
-const pro = vi.hoisted(() => ({ loading: false, hasPro: false }));
 const capture = vi.hoisted(() => vi.fn());
 
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teacher-1' } }) }));
-vi.mock('@/hooks/useTeacherPro', () => ({ useTeacherPro: () => ({ ...pro, known: true }) }));
 vi.mock('@/lib/education/recentTeacherRounds', () => ({
   fetchRecentTeacherRounds: vi.fn(async () => rounds.value),
 }));
@@ -39,8 +37,6 @@ function Lobby({ isBlocked = () => false, onPick = vi.fn(), ready = true }: { is
 
 beforeEach(() => {
   capture.mockReset();
-  pro.loading = false;
-  pro.hasPro = false;
   rounds.value = [real('classic'), real('vocab-quiz'), real('classic')];
 });
 
@@ -78,14 +74,6 @@ describe('useModeSuggestion: a small New tag on one tile', () => {
     const other = mode === 'blast' ? 'word-hunt' : 'blast';
     fireEvent.click(screen.getByTestId(`mode-tile-${other}`));
     expect(capture).not.toHaveBeenCalledWith('edu_mode_suggestion_accepted', expect.anything());
-  });
-
-  it('Given the Pro check still loading, when rounds arrive, then nothing renders and nothing is logged', async () => {
-    pro.loading = true;
-    render(<Lobby />);
-    await new Promise((r) => setTimeout(r, 20));
-    expect(screen.queryByTestId('mode-suggestion')).toBeNull();
-    expect(capture).not.toHaveBeenCalled();
   });
 
   it('Given the lobby still settling its list and mode, when rounds arrive, then nothing is decided or logged yet', async () => {

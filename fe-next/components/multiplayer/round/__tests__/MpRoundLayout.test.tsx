@@ -103,9 +103,11 @@ describe('MpRoundLayout', () => {
     expect(bar.className).not.toContain('grid-cols-[1fr_auto_1fr]');
   });
 
-  it('shows ONE clock: the big m:ss digits, not a second label inside the ring', () => {
+  it('shows ONE clock, drawn inside the ring', () => {
     render(<MpRoundLayout {...props()} />);
-    expect(screen.getByTestId('mp-timer').className).toContain('[&_svg~div]:hidden!');
+    const timer = screen.getByTestId('mp-timer');
+    expect(timer.textContent?.match(/\d+:\d\d/g)).toHaveLength(1);
+    expect(screen.getByTestId('mp-timer-digits').className).toContain('absolute');
   });
 
   it('the rank fraction stays LTR in RTL layouts ("#2/3", never "3/#2")', () => {
