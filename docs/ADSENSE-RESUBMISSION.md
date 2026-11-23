@@ -2,6 +2,30 @@
 
 Date: 2026-07-27 · Site: https://www.lexiclash.live · Publisher: `ca-pub-1896836706464880`
 
+## UPDATE 2026-11-23: round 6, app screens out of the index (review unlocks 2026-11-30)
+
+Rejected again 2026-11-16 for low-value content after #2034 (wrong-language
+bodies). imposketch.io, approved on the same publisher, indexes 134 URLs: guides,
+rules, FAQ and `/vs/*` pages, no game screens. lexiclash.live still indexed 12
+app screens in every locale (daily, archive, adventure, word tower, connections,
+leaderboard, community, teacher upgrade, accessibility, tools hub, word of the
+day, words): 47-416 words of app UI each, 0-46 search clicks in 90 days.
+
+- `fe-next/lib/seo/appScreens.ts` is the one list. Listed pages are
+  `noindex,follow` and out of sitemap.xml; they stay live and linked.
+- `npm run seo:adsense-check` now fails when a listed screen is in the sitemap
+  or indexable, so a new screen can't slip back in unnoticed.
+- `/teacher/upgrade` was a 99% duplicate of `/pricing`; `/pricing` stays.
+- Near-duplicate pass (6-word shingles over every indexed EN page): nothing
+  else above 46% overlap.
+
+Before requesting review (on or after 2026-11-30):
+1. `npm run seo:adsense-check` against production exits 0.
+2. Search Console: resubmit `https://www.lexiclash.live/sitemap.xml`, then
+   URL-inspect `/en/daily`, `/en/adventure` and `/en/leaderboard`. Each
+   should show "Excluded by noindex" with a crawl date after the deploy.
+3. AdSense → Sites → lexiclash.live → Request review. Keep Auto ads off.
+
 ## UPDATE 2026-10-30: second "Low value content" pass
 
 Audit method: every EN URL in the live sitemap.xml fetched with a Googlebot UA,
