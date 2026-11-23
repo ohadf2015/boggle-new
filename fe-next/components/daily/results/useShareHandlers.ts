@@ -176,7 +176,7 @@ export function useShareHandlers({
 
   // Handle native share
   const handleNativeShare = useCallback(async () => {
-    if (typeof navigator !== 'undefined' && navigator.share) {
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       settleNativeShare(await shareWithFallback({ text: shareTextWithUrl }));
     } else {
       setShowSharePanel(true);
@@ -205,7 +205,7 @@ export function useShareHandlers({
       .replace('{score}', String(score))
       .replace('{name}', displayName);
 
-    if (typeof navigator !== 'undefined' && navigator.share) {
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
       settleNativeShare(
         await shareWithFallback({
           title: t('wordHunt.title'),

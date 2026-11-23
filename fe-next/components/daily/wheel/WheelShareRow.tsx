@@ -36,7 +36,7 @@ export default function WheelShareRow({ t, score, wordsFound, puzzleNumber, gold
   }, [shareText, onShareClick]);
 
   const share = useCallback(async () => {
-    onShareClick?.(typeof navigator !== 'undefined' && navigator.share ? 'native' : 'copy');
+    onShareClick?.(typeof navigator !== 'undefined' && typeof navigator.share === 'function' ? 'native' : 'copy');
     const result = await shareWithFallback({ text: shareText, url: 'https://lexiclash.live', clipboardText: shareText });
     if (result === 'copied') {
       setCopied(true);
