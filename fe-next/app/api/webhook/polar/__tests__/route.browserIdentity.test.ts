@@ -12,6 +12,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionRowStatus: vi.fn().mockResolvedValue(null),
   subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 vi.mock('@/lib/education/dunning', () => ({ maybeSendPaymentFailedEmail: vi.fn() }))

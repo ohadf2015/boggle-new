@@ -10,12 +10,14 @@ const grantProFromOrder = vi.fn()
 const grantProFromCheckout = vi.fn()
 const logSubscriptionEvent = vi.fn()
 const subscriptionRowIsPastDue = vi.fn()
+const subscriptionRowStatus = vi.fn()
 vi.mock('@/lib/subscriptions', () => ({
   upsertSubscription: (...args: unknown[]) => upsertSubscription(...args),
   grantProFromOrder: (...args: unknown[]) => grantProFromOrder(...args),
   grantProFromCheckout: (...args: unknown[]) => grantProFromCheckout(...args),
   logSubscriptionEvent: (...args: unknown[]) => logSubscriptionEvent(...args),
   subscriptionRowIsPastDue: (...args: unknown[]) => subscriptionRowIsPastDue(...args),
+  subscriptionRowStatus: (...args: unknown[]) => subscriptionRowStatus(...args),
   subscriptionTrialAlreadyCounted: vi.fn().mockResolvedValue(false),
 }))
 const maybeSendPaymentFailedEmail = vi.fn()
@@ -65,6 +67,8 @@ describe('polar webhook', () => {
     logSubscriptionEvent.mockClear()
     subscriptionRowIsPastDue.mockReset()
     subscriptionRowIsPastDue.mockResolvedValue(false)
+    subscriptionRowStatus.mockReset()
+    subscriptionRowStatus.mockResolvedValue(null)
     captureEduServerEvents.mockReset()
     signatureValid = true
     process.env.POLAR_PRO_PRODUCT_ID = PRO_PRODUCT_ID
@@ -222,7 +226,7 @@ describe('polar webhook', () => {
   })
 
   it('emits payment_recovered when a past_due row flips back to active (subscription.updated)', async () => {
-    subscriptionRowIsPastDue.mockResolvedValue(true)
+    subscriptionRowStatus.mockResolvedValue('past_due')
     await POST(polarEvent('subscription.updated', subscriptionData))
     expect(emittedEventNames()).toContain('payment_recovered')
   })

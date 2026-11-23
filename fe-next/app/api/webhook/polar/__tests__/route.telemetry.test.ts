@@ -17,6 +17,7 @@ vi.mock('@/lib/subscriptions', () => ({
   grantProFromCheckout: vi.fn(),
   logSubscriptionEvent: vi.fn(),
   subscriptionRowIsPastDue: vi.fn().mockResolvedValue(false),
+  subscriptionRowStatus: vi.fn().mockResolvedValue(null),
   subscriptionTrialAlreadyCounted: (...args: unknown[]) => subscriptionTrialAlreadyCounted(...args),
 }))
 const subscriptionTrialAlreadyCounted = vi.fn()
