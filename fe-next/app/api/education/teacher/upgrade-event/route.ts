@@ -4,6 +4,10 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { isQaEmail } from '@/backend/utils/educationRoundTelemetry';
 import { isAnyTestAccount } from '@/lib/education/eduTestAccount';
 import { emitTeacherProUpgradeShown, emitTeacherProUpgradeClicked } from '@/lib/education/proFunnelServer';
+import {
+  recordTeacherTrialFunnelStep,
+  TEACHER_TRIAL_PAYWALL_VIEWED_EVENT,
+} from '@/lib/education/teacherTrialFunnel';
 
 /**
  * POST /api/education/teacher/upgrade-event
@@ -58,6 +62,16 @@ export async function POST(request: NextRequest) {
 
     if (event === 'teacher_pro_upgrade_shown') {
       emitTeacherProUpgradeShown(payload);
+      // Durable funnel step: the paywall was actually shown to a signed-in,
+      // non-test teacher. Once per teacher per day — views are frequent.
+      if (user && !isTestAccount) {
+        await recordTeacherTrialFunnelStep({
+          userId: user.id,
+          eventType: TEACHER_TRIAL_PAYWALL_VIEWED_EVENT,
+          payload: { placement, ...(reason ? { reason } : {}), locale },
+          dedupe: { withinMs: 24 * 60 * 60 * 1000 },
+        });
+      }
     } else if (event === 'teacher_pro_upgrade_clicked') {
       emitTeacherProUpgradeClicked(payload);
     } else {

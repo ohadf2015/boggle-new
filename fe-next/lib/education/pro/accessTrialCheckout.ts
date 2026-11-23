@@ -35,3 +35,39 @@ export function polarTrialPlan(accessTrialExpiresAt: string | null | undefined, 
   const days = Math.min(TEACHER_PRO_TRIAL_DAYS, Math.max(1, Math.ceil((end - nowMs) / DAY_MS)));
   return { days, source: 'access_trial' };
 }
+
+/**
+ * The card ask (trial or paid Polar checkout) is only worth showing when the
+ * free access window is about to close. Measured: the only two teachers who
+ * ever reached the trial checkout (2026-10-24/26, minutes after approval) both
+ * bounced at the card wall within minutes and never came back — 0% conversion
+ * at zero demonstrated value. The window's last days are when "keep Pro after
+ * {date}" is a real decision, and the reminder emails already aim there.
+ */
+export const TRIAL_CARD_ASK_LAST_DAYS = 3;
+
+export type TrialCardAskTiming =
+  /** No access window on record (or the lookup failed): keep the current ask. */
+  | 'no_access_window'
+  /** Free window is live with more than TRIAL_CARD_ASK_LAST_DAYS left: hide the card ask. */
+  | 'too_early'
+  /** Free window is live and almost over: the keep-Pro ask is due. */
+  | 'ending_soon'
+  /** Free window already ran out. */
+  | 'access_ended';
+
+export function trialCardAskTiming(
+  accessTrialExpiresAt: string | null | undefined,
+  nowMs: number = Date.now(),
+): TrialCardAskTiming {
+  const end = accessTrialExpiresAt ? Date.parse(accessTrialExpiresAt) : Number.NaN;
+  if (!Number.isFinite(end)) return 'no_access_window';
+  if (end <= nowMs) return 'access_ended';
+  const daysLeft = (end - nowMs) / DAY_MS;
+  return daysLeft <= TRIAL_CARD_ASK_LAST_DAYS ? 'ending_soon' : 'too_early';
+}
+
+/** True when a checkout CTA (trial or paid) should be offered at all. */
+export function showProCardAsk(timing: TrialCardAskTiming): boolean {
+  return timing !== 'too_early';
+}

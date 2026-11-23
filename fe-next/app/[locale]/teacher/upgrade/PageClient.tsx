@@ -32,6 +32,7 @@ import { ParentReportPack } from '@/components/teacher/pro/ParentReportPack';
 import { ProPlanPanel, PlanCardsSkeleton } from '@/components/teacher/pro/ProPlanPanel';
 import { UpgradeYourClasses } from '@/components/teacher/pro/UpgradeYourClasses';
 import { entrySourceTag, isProOfferEntry } from '@/lib/education/pro/upgradeEntry';
+import { showProCardAsk, trialCardAskTiming } from '@/lib/education/pro/accessTrialCheckout';
 import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplainer';
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
@@ -60,6 +61,11 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
     source,
     trialUsed: trialUsed === true,
   }).offerTrial && !accessTrialEnded; // their free trial has ended: straight to paid, no second trial
+  // The card ask waits for the free access window's last days: the only teachers
+  // who ever met the card-required checkout minutes after approval bounced 2/2
+  // (2026-10-24/26). 'too_early' swaps both CTAs for the free-window state.
+  const cardAskTiming = trialCardAskTiming(accessTrialExpires);
+  const cardAskOpen = showProCardAsk(cardAskTiming);
   const viewer = upgradeViewer({ authLoading, signedIn: Boolean(user), proLoading, known: known === true, hasPro });
   const showTrial = showTrialOffer(viewer, offerTrial);
 
@@ -78,13 +84,13 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   // Count a trial view only once the viewer is resolved: while loading the trial is shown to
   // everyone (server render included), and Pro / trial-used accounts would inflate the count.
   useEffect(() => {
-    if (!showTrial || viewer === 'loading') return;
+    if (!showTrial || viewer === 'loading' || !cardAskOpen) return;
     try {
       trackTrialCtaView({ source: 'upgrade_page' });
     } catch {
       /* analytics must never block the till */
     }
-  }, [showTrial, viewer]);
+  }, [showTrial, viewer, cardAskOpen]);
 
   const blockedInApp = useCheckoutBlockedInApp();
   const entrySource = entrySourceTag(searchParams?.get('source'));
@@ -96,9 +102,12 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
   useEffect(() => {
     if (autoOpened.current || !isProOfferEntry(entrySource)) return;
     if (viewer === 'loading' || viewer === 'pro' || blockedInApp) return;
+    // Never auto-open a checkout while the free window has days to spare — that
+    // is precisely the measured 0%-conversion path.
+    if (!cardAskOpen) return;
     autoOpened.current = true;
     handleUpgrade(showTrial, { auto: true });
-  }, [entrySource, viewer, blockedInApp, showTrial, handleUpgrade]);
+  }, [entrySource, viewer, blockedInApp, showTrial, handleUpgrade, cardAskOpen]);
   // Signed in and waiting on the entitlement: a skeleton, not a trial offer that flips away.
   const resolvingPlan = viewer === 'loading' && (Boolean(user) || hasSession);
   // The teacher app nav only links to signed-in screens; a visitor gets the public header instead.
@@ -265,6 +274,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   manageBillingHref={portalUrl}
                   accessTrialEndsAt={accessTrialExpires}
                   accessTrialEnded={accessTrialEnded}
+                  cardAskTiming={cardAskTiming}
                   askSchool={
                     askOpen ? (
                       <AskSchoolPanel

@@ -25,6 +25,8 @@ function chainFor(name: string) {
   chain.select = self;
   chain.eq = self;
   chain.in = self;
+  chain.gte = self;
+  chain.limit = self;
   chain.insert = (values: unknown) => {
     inserting = true;
     h.inserts.push({ table: name, values });
@@ -39,6 +41,24 @@ vi.mock('@/lib/email/send', () => ({ sendEmail: h.sendEmailSpy }));
 vi.mock('@/lib/email', async (importOriginal) => ({
   ...(await importOriginal()),
   getSupabaseAdmin: () => ({ from: (name: string) => chainFor(name) }),
+}));
+// The durable funnel module reads/writes through the service-role client and
+// logSubscriptionEvent — pin both into the same in-memory tables.
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: () => ({ from: (name: string) => chainFor(name) }),
+}));
+vi.mock('@/lib/subscriptions', () => ({
+  logSubscriptionEvent: vi.fn(async (row: { userId?: string; eventType: string; subscriptionId?: string | null; payload: unknown }) => {
+    h.inserts.push({
+      table: 'subscription_events',
+      values: {
+        user_id: row.userId ?? null,
+        event_type: row.eventType,
+        subscription_id: row.subscriptionId ?? null,
+        payload: row.payload,
+      },
+    });
+  }),
 }));
 vi.mock('@/utils/sentry', () => ({ captureApiError: vi.fn() }));
 vi.mock('@/lib/education/proFunnelServer', () => ({
@@ -122,9 +142,18 @@ describe('/api/cron/teacher-polar-trial-day10 day-before notice', () => {
     expect(h.inserts[0].values.event_type).toBe('polar_trial_day10_sent');
   });
 
+  it('records the durable teacher_trial_expiring funnel step alongside the notice ledger', async () => {
+    await POST(authed());
+    const steps = h.inserts.map((i) => i.values.event_type);
+    expect(steps).toContain('polar_trial_day_before_sent');
+    expect(steps).toContain('teacher_trial_expiring');
+    const step = h.inserts.find((i) => i.values.event_type === 'teacher_trial_expiring');
+    expect(step.values.payload).toMatchObject({ bucket: 'day-before', days_left: expect.any(Number) });
+  });
+
   it('sends only the day-before email when day-10 was missed', async () => {
     await POST(authed());
     expect(h.sendEmailSpy).toHaveBeenCalledTimes(1);
-    expect(h.inserts.map((i) => i.values.event_type)).toEqual(['polar_trial_day_before_sent']);
+    expect(h.inserts.map((i) => i.values.event_type)).toEqual(['polar_trial_day_before_sent', 'teacher_trial_expiring']);
   });
 });

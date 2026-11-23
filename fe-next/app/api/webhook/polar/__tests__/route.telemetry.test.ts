@@ -32,6 +32,7 @@ vi.mock('@/lib/posthog', () => ({
 
 import { POST } from '../route'
 import { EDU_ANALYTICS_HOST } from '@/backend/utils/educationTelemetry'
+import { logSubscriptionEvent } from '@/lib/subscriptions'
 import { resetWebhookTelemetryOnce } from '@/lib/education/pro/webhookTelemetryOnce'
 
 const PRO = 'prod-pro-1'
@@ -188,6 +189,37 @@ describe('polar webhook — edu_pro_checkout_succeeded', () => {
     const res = await POST(polarEvent('subscription.active', sub()))
     expect(res.status).toBe(500)
     expect(capture).not.toHaveBeenCalled()
+  })
+
+  it('Given subscription.active while trialing, it durably records teacher_trial_started alongside the PostHog events', async () => {
+    await POST(polarEvent('subscription.active', sub({
+      status: 'trialing',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+    })))
+    const durable = vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0].eventType)
+    expect(durable).toContain('teacher_trial_started')
+    expect(durable).toContain('subscription.active')
+  })
+
+  it('Given subscription.canceled during a Polar trial, it durably records teacher_trial_expired', async () => {
+    await POST(polarEvent('subscription.canceled', sub({
+      status: 'canceled',
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-10-01T00:00:00.000Z',
+    })))
+    expect(vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0].eventType)).toContain('teacher_trial_expired')
+  })
+
+  it('Given a first paid activation after a trial, it durably records teacher_subscription_active once', async () => {
+    await POST(polarEvent('subscription.active', sub({
+      metadata: { user_id: 'u1', trial: true },
+      trial_end: '2026-10-01T00:00:00.000Z',
+    })))
+    const durable = vi.mocked(logSubscriptionEvent).mock.calls.map((c) => c[0].eventType)
+    expect(durable).toContain('teacher_subscription_active')
+    expect(durable).not.toContain('teacher_trial_started')
   })
 
   it('Given PostHog throws, When active, Then the webhook still answers 200 and the upsert ran', async () => {

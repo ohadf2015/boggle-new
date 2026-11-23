@@ -33,6 +33,38 @@ function setup(viewer: UpgradeViewer, extra: Partial<UpgradePlanCardsProps> = {}
   return props;
 }
 
+describe('UpgradePlanCards free window', () => {
+  const endsIn30 = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
+
+  it("replaces BOTH checkout CTAs with the truthful free-window state when the ask is too early", () => {
+    setup('free', {
+      showTrial: true,
+      accessTrialEndsAt: endsIn30,
+      cardAskTiming: 'too_early',
+    });
+    expect(screen.getByTestId('pricing-free-window')).toBeInTheDocument();
+    expect(screen.queryByTestId('pricing-trial-cta')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('pricing-buy-cta')).not.toBeInTheDocument();
+    expect(screen.getByText('Included in your free trial')).toBeInTheDocument();
+    expect(screen.getByText(/no card needed today/)).toBeInTheDocument();
+  });
+
+  it('keeps the trial CTA in the last days of the window', () => {
+    setup('free', {
+      showTrial: true,
+      accessTrialEndsAt: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString(),
+      cardAskTiming: 'last_days',
+    });
+    expect(screen.queryByTestId('pricing-free-window')).not.toBeInTheDocument();
+    expect(screen.getByTestId('pricing-trial-cta')).toBeInTheDocument();
+  });
+
+  it('never shows the free-window state to a Pro teacher or a teacher without a window', () => {
+    setup('pro', { accessTrialEndsAt: endsIn30, cardAskTiming: 'too_early' });
+    expect(screen.queryByTestId('pricing-free-window')).not.toBeInTheDocument();
+  });
+});
+
 describe('UpgradePlanCards school price', () => {
   it('shows the indicative school price on the school card', () => {
     setup('free');
