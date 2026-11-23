@@ -257,7 +257,7 @@ export async function getUser() {
 }
 
 // Profile helpers
-type ProfileResult = { data: ProfileData | null; error: { message: string } | null };
+type ProfileResult = { data: ProfileData | null; error: { message: string; code?: string } | null };
 
 /**
  * Profile field selectors to reduce over-fetching
@@ -290,7 +290,10 @@ export async function getProfile(userId: string, select: ProfileSelectType = 'fu
     .select(PROFILE_SELECTS[select])
     .eq('id', userId)
     .single();
-  return { data: result.data as ProfileData | null, error: result.error ? { message: result.error.message } : null };
+  return {
+    data: result.data as ProfileData | null,
+    error: result.error ? { message: result.error.message, code: result.error.code } : null,
+  };
 }
 
 export async function updateProfile(userId: string, updates: Partial<ProfileData>): Promise<ProfileResult> {
