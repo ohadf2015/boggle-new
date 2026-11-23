@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { toast } from 'sonner';
 import { getBragTier, BlastBragCard } from '../BlastBragCard';
 import type { BlastResultsData } from '../types';
 
@@ -142,5 +143,39 @@ describe('BlastBragCard', () => {
     expect(trackSpy).toHaveBeenCalledWith(
       expect.objectContaining({ method: 'share', percentile: 99 }),
     );
+  });
+
+  it('stays silent when the player dismisses the share sheet', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const shareFn = vi.fn().mockRejectedValue(new DOMException('x', 'AbortError'));
+    Object.defineProperty(navigator, 'share', { value: shareFn, configurable: true });
+    vi.mocked(toast.success).mockClear();
+    vi.mocked(toast.error).mockClear();
+
+    render(<BlastBragCard results={baseResults({ percentile: 99 })} t={t} />);
+    fireEvent.click(screen.getByTestId('blast-brag-share'));
+
+    await waitFor(() => expect(shareFn).toHaveBeenCalledTimes(1));
+    await Promise.resolve();
+    expect(writeText).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(trackSpy).not.toHaveBeenCalled();
+  });
+
+  it('shows the error toast when the clipboard is blocked', async () => {
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: vi.fn().mockRejectedValue(new Error('blocked')) },
+      configurable: true,
+    });
+    Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+    vi.mocked(toast.error).mockClear();
+
+    render(<BlastBragCard results={baseResults({ percentile: 80 })} t={t} />);
+    fireEvent.click(screen.getByTestId('blast-brag-share'));
+
+    await waitFor(() => expect(toast.error).toHaveBeenCalledWith('blast.results.brag.copyFailed'));
+    expect(trackSpy).not.toHaveBeenCalled();
   });
 });

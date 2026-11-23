@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { Copy, Share2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 
 interface BridgeShareRowProps {
   shareText: string;
@@ -33,15 +34,13 @@ export default function BridgeShareRow({ shareText, onShareClick }: BridgeShareR
   }, [copy, onShareClick]);
 
   const handleShare = useCallback(async () => {
-    if (typeof navigator === 'undefined' || !navigator.share) {
-      handleCopy();
-      return;
+    const native = typeof navigator !== 'undefined' && !!navigator.share;
+    onShareClick?.(native ? 'native' : 'copy');
+    if ((await shareWithFallback({ text })) === 'copied') {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
     }
-    onShareClick?.('native');
-    try {
-      await navigator.share({ text });
-    } catch { /* cancelled */ }
-  }, [handleCopy, onShareClick, text]);
+  }, [onShareClick, text]);
 
   return (
     <div data-testid="bridge-share-row" className="flex gap-2">

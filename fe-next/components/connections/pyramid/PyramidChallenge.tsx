@@ -16,7 +16,7 @@ import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC, markConnectionsPlayedToday, advanceClientStreak, type SubmitPayload } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
-import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import { dailySubmitName } from '@/lib/connections/dailyDisplayName';
 import { getChosenGuestName } from '@/utils/guestManager';
 import type { GameState } from '@/lib/connections/types';
@@ -373,17 +373,7 @@ function PyramidRun({
   }, [t, language, today, pyramidState.score, sharePath]);
 
   const handleShare = useCallback(async () => {
-    try {
-      const text = stripEmoji(shareText());
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({ text });
-      } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
-        await navigator.clipboard.writeText(text);
-        setResults({ copied: true });
-      }
-    } catch {
-      /* user cancelled / unsupported */
-    }
+    if ((await shareWithFallback({ text: shareText() })) === 'copied') setResults({ copied: true });
   }, [shareText]);
 
   // Terminal state: won/lost

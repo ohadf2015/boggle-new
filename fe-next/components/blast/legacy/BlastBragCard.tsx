@@ -28,7 +28,7 @@ import { Crown, Share2, Trophy, Zap, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
-import { stripEmoji } from '@/lib/share/stripEmoji';
+import { shareWithFallback } from '@/utils/shareWithFallback';
 import { trackBlastBrag } from './utils/blastTelemetry';
 import type { BlastResultsData } from './types';
 
@@ -104,32 +104,18 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
       : '';
     const body = [title, scoreLine, rankLine].filter(Boolean).join('\n');
 
-    // Prefer Web Share API (mobile). Fall back to clipboard.
-    if (typeof navigator !== 'undefined' && 'share' in navigator) {
-      try {
-        await navigator.share({ title: stripEmoji(title), text: stripEmoji(body) });
-        trackBlastBrag({
-          finalScore: results.finalScore,
-          percentile: results.percentile ?? null,
-          method: 'share',
-        });
-        return;
-      } catch {
-        // User cancelled or share failed — fall through to clipboard.
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(stripEmoji(body));
-      toast.success(t('blast.results.brag.copied'));
-      trackBlastBrag({
-        finalScore: results.finalScore,
-        percentile: results.percentile ?? null,
-        method: 'clipboard',
-      });
-    } catch {
+    const result = await shareWithFallback({ title, text: body });
+    if (result === 'cancelled') return;
+    if (result === 'failed') {
       toast.error(t('blast.results.brag.copyFailed'));
+      return;
     }
+    if (result === 'copied') toast.success(t('blast.results.brag.copied'));
+    trackBlastBrag({
+      finalScore: results.finalScore,
+      percentile: results.percentile ?? null,
+      method: result === 'shared' ? 'share' : 'clipboard',
+    });
   }, [results.finalScore, results.percentile, topPct, t]);
 
   // Don't render until backend has returned a percentile — otherwise the

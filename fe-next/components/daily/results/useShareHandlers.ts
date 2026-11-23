@@ -12,6 +12,7 @@ import {
 import { generateChallengeShareUrl } from '@/utils/dailyChallenge/shareUtils';
 import { stripEmoji } from '@/lib/share/stripEmoji';
 import { trackShareCompleted } from '@/utils/share';
+import { shareWithFallback, type ShareResult } from '@/utils/shareWithFallback';
 // dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
 // share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
@@ -163,25 +164,24 @@ export function useShareHandlers({
     window.location.href = url;
   }, [shareTextWithUrl]);
 
+  // Native share result → analytics + copied state; a cancelled sheet is silent.
+  const settleNativeShare = useCallback((outcome: ShareResult) => {
+    if (outcome === 'shared') trackShareCompleted('web_share_api');
+    else if (outcome === 'copied') {
+      trackShareCompleted('clipboard');
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else if (outcome === 'failed') console.error('Share failed');
+  }, []);
+
   // Handle native share
   const handleNativeShare = useCallback(async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          text: stripEmoji(shareTextWithUrl),
-        });
-        trackShareCompleted('web_share_api');
-      } catch (err) {
-        // AbortError means user cancelled the share dialog - this is normal behavior
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return;
-        }
-        console.error('Share failed:', err);
-      }
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      settleNativeShare(await shareWithFallback({ text: shareTextWithUrl }));
     } else {
       setShowSharePanel(true);
     }
-  }, [shareTextWithUrl]);
+  }, [shareTextWithUrl, settleNativeShare]);
 
   // Build challenge URL on the rival contract (whName/whEmoji/whScore/whPuzzle)
   // that the receiver parses via parseRivalFromParams — same param names the
@@ -206,24 +206,18 @@ export function useShareHandlers({
       .replace('{name}', displayName);
 
     if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share({
-          title: stripEmoji(t('wordHunt.title')),
-          text: stripEmoji(text),
+      settleNativeShare(
+        await shareWithFallback({
+          title: t('wordHunt.title'),
+          text,
           url: challengeUrl,
-        });
-        trackShareCompleted('web_share_api');
-      } catch (err) {
-        // AbortError means user cancelled — don't track
-        if (err instanceof DOMException && err.name === 'AbortError') {
-          return;
-        }
-        // Other errors also shouldn't track as completed
-      }
+          clipboardText: `${text}\n${challengeUrl}`,
+        }),
+      );
     } else {
       setShowSharePanel(true);
     }
-  }, [challengeUrl, displayName, result.efficiencyScore, t]);
+  }, [challengeUrl, displayName, result.efficiencyScore, t, settleNativeShare]);
 
   // Handle download personalized share image
   const handleDownloadShareImage = useCallback(async () => {

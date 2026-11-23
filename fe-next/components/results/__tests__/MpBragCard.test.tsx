@@ -175,6 +175,30 @@ describe('MpBragCard — native share', () => {
     await waitFor(() => expect(share).toHaveBeenCalledOnce());
     expect(onNativeShare).not.toHaveBeenCalled();
   });
+
+  it('cancelling the sheet copies nothing', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const share = vi.fn().mockRejectedValue(new DOMException('cancel', 'AbortError'));
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    renderWithShare();
+    fireEvent.click(await waitFor(() => screen.getByTestId('brag-native-share')));
+    await waitFor(() => expect(share).toHaveBeenCalledOnce());
+    expect(writeText).not.toHaveBeenCalled();
+    expect(screen.queryByText('brag.copied')).toBeNull();
+  });
+
+  it('a blocked native share falls back to the clipboard and shows the copied state', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    const share = vi.fn().mockRejectedValue(new DOMException('blocked', 'NotAllowedError'));
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    const onNativeShare = renderWithShare();
+    fireEvent.click(await waitFor(() => screen.getByTestId('brag-native-share')));
+    await waitFor(() => expect(screen.getByText('brag.copied')).toBeTruthy());
+    expect(writeText).toHaveBeenCalledOnce();
+    expect(onNativeShare).not.toHaveBeenCalled();
+  });
 });
 
 describe('MpBragCard — challenge CTA', () => {

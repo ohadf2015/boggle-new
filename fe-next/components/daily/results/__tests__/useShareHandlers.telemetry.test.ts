@@ -197,6 +197,31 @@ describe('useShareHandlers - Share Telemetry', () => {
       expect(trackShareCompleted).not.toHaveBeenCalled();
     });
 
+    it('does not touch the clipboard or copied state when native share is cancelled', async () => {
+      mockShareApi.mockRejectedValueOnce(new DOMException('User cancelled', 'AbortError'));
+      const { result } = renderHook(() => useShareHandlers(baseProps));
+
+      await act(async () => {
+        await result.current.handleNativeShare();
+      });
+
+      expect(mockClipboardWrite).not.toHaveBeenCalled();
+      expect(result.current.copied).toBe(false);
+    });
+
+    it('copies to the clipboard and sets copied when native share is blocked', async () => {
+      mockShareApi.mockRejectedValueOnce(new DOMException('blocked', 'NotAllowedError'));
+      const { result } = renderHook(() => useShareHandlers(baseProps));
+
+      await act(async () => {
+        await result.current.handleNativeShare();
+      });
+
+      expect(mockClipboardWrite).toHaveBeenCalledOnce();
+      expect(result.current.copied).toBe(true);
+      expect(trackShareCompleted).toHaveBeenCalledWith('clipboard');
+    });
+
     it('emits fallback_clipboard when native share falls back to clipboard panel', async () => {
       // Remove the share API to trigger fallback
       Object.defineProperty(window, 'navigator', {

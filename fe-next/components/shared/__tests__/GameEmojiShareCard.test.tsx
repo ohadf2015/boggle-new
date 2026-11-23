@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
 import { GameEmojiShareCard } from '../GameEmojiShareCard';
 
@@ -154,6 +154,35 @@ describe('GameEmojiShareCard — onShareClick telemetry hook', () => {
     render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
     fireEvent.click(screen.getByText('Share'));
     expect(onShareClick).toHaveBeenCalledWith('native');
+  });
+});
+
+describe('GameEmojiShareCard — share button outcomes', () => {
+  const data = { mode: 'classic' as const, puzzleNumber: 1, score: 100, words: ['CAT'] };
+  const setNav = (share: unknown, writeText: unknown) => {
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+  };
+
+  it('does nothing visible when the user dismisses the share sheet', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    const share = vi.fn().mockRejectedValue(new DOMException('x', 'AbortError'));
+    setNav(share, writeText);
+    render(<GameEmojiShareCard data={data} t={t} />);
+    fireEvent.click(screen.getByText('Share'));
+    await waitFor(() => expect(share).toHaveBeenCalledOnce());
+    expect(writeText).not.toHaveBeenCalled();
+    expect(screen.queryByText('Copied!')).toBeNull();
+  });
+
+  it('copies and shows Copied! when there is no native share', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    setNav(undefined, writeText);
+    const onShareClick = vi.fn();
+    render(<GameEmojiShareCard data={data} t={t} onShareClick={onShareClick} />);
+    fireEvent.click(screen.getByText('Share'));
+    expect(await screen.findByText('Copied!')).toBeInTheDocument();
+    expect(onShareClick).toHaveBeenCalledWith('copy');
   });
 });
 
