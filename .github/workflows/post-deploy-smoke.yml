@@ -17,13 +17,14 @@ concurrency:
 
 jobs:
   smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 50
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: fe-next
       - name: Wait for production to serve this commit
+        if: github.event_name == 'push'
         run: |
           for _ in $(seq 1 80); do
             SERVED=$(curl -fsS https://www.lexiclash.live/api/version | node -pe 'JSON.parse(require("fs").readFileSync(0)).commit' 2>/dev/null || true)
