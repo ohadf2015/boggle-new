@@ -12,7 +12,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
-import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, subscriptionRowStatus, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
 import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
@@ -283,29 +283,42 @@ export async function POST(request: NextRequest) {
 
 /**
  * `edu_pro_checkout_succeeded` + `checkout_complete` + `paid` — analytics only,
- * after the entitlement write landed. Only `subscription.active` counts
- * (created/uncanceled/resumed are not new conversions), only for the Pro
- * product. Never throws: a 500 here would make Polar redeliver and re-run
- * the state writes.
+ * after the entitlement write landed. Fires from the `subscription.active`
+ * envelope (direct paid checkout) AND from handleSubscriptionUpdated on the
+ * stored trialing→active flip (trial conversion — Polar delivers it inside
+ * `subscription.updated`, never re-sending `subscription.active`). Only for
+ * the Pro product. Never throws: a 500 here would make Polar redeliver and
+ * re-run the state writes.
  */
-async function trackProConversion(payload: WebhookPayload, userId?: string) {
+async function trackProConversion(
+  payload: WebhookPayload,
+  userId?: string,
+  opts: { trialConverted?: boolean; via?: string } = {},
+) {
   try {
     if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
     if (mapStatus(payload?.data?.status) === 'trialing') return
     const subId = String(payload?.data?.id ?? '')
+    // A stored trialing→active flip IS a trial conversion by definition, even
+    // when the payload's metadata/trial_end markers are absent.
+    const trialConverted = opts.trialConverted ?? trialMarker(payload?.data).trial
     // Durable funnel terminal step (subscription_events), first paid activation only.
     await recordTeacherTrialFunnelStep({
       userId,
       eventType: TEACHER_SUBSCRIPTION_ACTIVE_EVENT,
       subscriptionId: subId,
-      payload: { trial_converted: trialMarker(payload?.data).trial, locale: getLocale(payload) ?? null },
+      payload: {
+        trial_converted: trialConverted,
+        locale: getLocale(payload) ?? null,
+        ...(opts.via ? { via: opts.via } : {}),
+      },
       dedupe: 'ever',
     })
     captureFunnel(payload, userId, withRevenue(buildProCheckoutSucceededEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildCheckoutCompleteEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildPaidEvent(userId, subId), payload?.data))
     captureFunnel(payload, userId, withRevenue(buildTeacherProUpgradedEvent(userId, subId, getLocale(payload)), payload?.data))
-    if (trialMarker(payload?.data).trial) {
+    if (trialConverted) {
       captureFunnel(payload, userId, withRevenue(buildTeacherTrialConvertedEvent(userId, subId), payload?.data))
     }
   } catch (err) {
@@ -498,7 +511,12 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     return
   }
   const data = payload?.data ?? {}
-  const wasPastDue = await subscriptionRowIsPastDue(userId)
+  // Read the stored status BEFORE the upsert: the previous→next transition is
+  // the signal for two events Polar only delivers inside this catch-all
+  // envelope. `subscription.updated` fires for EVERY change (Polar docs: it is
+  // the catch-all for active/cycled/canceled/past_due/revoked/...); Polar does
+  // NOT re-send `subscription.active` when a trial flips to paid.
+  const previousStatus = await subscriptionRowStatus(userId)
   await upsertSubscription({
     userId,
     tier: getTierFromProductId(getProductId(payload)),
@@ -509,9 +527,23 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     cancelAtPeriodEnd: Boolean(data.cancel_at_period_end ?? false),
     eventAt: getEventAt(payload),
   })
+  const nextStatus = mapStatus(data.status)
   // Polar's dunning retry that succeeds surfaces as subscription.updated with
   // status active (not subscription.active), so recovery is detected here too.
-  if (wasPastDue && mapStatus(data.status) === 'active') trackPaymentRecovered(payload, userId)
+  if (previousStatus === 'past_due' && nextStatus === 'active') trackPaymentRecovered(payload, userId)
+  // THE trial→paid conversion. Writer-key ≠ reader-key fix (audit 2026-11-23):
+  // the funnel's terminal conversion step used to listen only on the
+  // `subscription.active` envelope, but a converting trial arrives as
+  // `subscription.updated` / `subscription.cycled` with status active — so
+  // teacher_trial_converted / teacher_subscription_active could NEVER fire and
+  // the funnel read 0 conversions forever. The stored trialing→active flip is
+  // the unified key: it fires exactly once no matter which envelope carries it
+  // (a later cycled/redelivery reads an already-active row and stays silent),
+  // and the durable step's dedupe:'ever' keeps it once even if Polar ever does
+  // send subscription.active for the same conversion.
+  if (previousStatus === 'trialing' && nextStatus === 'active') {
+    await trackProConversion(payload, userId, { trialConverted: true, via: 'subscription.updated' })
+  }
 }
 
 /**

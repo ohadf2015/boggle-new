@@ -317,14 +317,16 @@ export async function upsertSubscription({
 }
 
 /**
- * True when the stored row is a past_due provider subscription right now.
- * The Polar webhook reads this BEFORE upserting a new status: past_due →
- * active is the recovery the whole dunning path exists to produce, and
- * `payment_recovered` must fire exactly once for it — a redelivery then reads
- * an already-active row and stays silent. Never throws: a failed read must
- * not block the state write; it only costs the analytics event.
+ * The stored provider-subscription status for a teacher, or null when there
+ * is no row (or the read fails). The Polar webhook reads this BEFORE upserting
+ * a new status: the previous→next transition is the only trustworthy signal
+ * for two funnel events Polar delivers inside the catch-all
+ * `subscription.updated` envelope instead of a purpose-named event —
+ * past_due → active (dunning recovery) and trialing → active (trial→paid
+ * conversion). Never throws: a failed read must not block the state write;
+ * it only costs the analytics event.
  */
-export async function subscriptionRowIsPastDue(userId: string): Promise<boolean> {
+export async function subscriptionRowStatus(userId: string): Promise<string | null> {
   try {
     const supabase = createAdminClient() ?? (await createClient())
     const { data, error } = await supabase
@@ -332,12 +334,21 @@ export async function subscriptionRowIsPastDue(userId: string): Promise<boolean>
       .select('status')
       .eq('user_id', userId)
       .maybeSingle()
-    if (error || !data) return false
-    return (data as { status?: string }).status === 'past_due'
+    if (error || !data) return null
+    return (data as { status?: string }).status ?? null
   } catch (err) {
-    console.error('[Subscription] subscriptionRowIsPastDue read failed:', err)
-    return false
+    console.error('[Subscription] subscriptionRowStatus read failed:', err)
+    return null
   }
+}
+
+/**
+ * True when the stored row is a past_due provider subscription right now.
+ * `payment_recovered` must fire exactly once for a past_due → active flip —
+ * a redelivery then reads an already-active row and stays silent.
+ */
+export async function subscriptionRowIsPastDue(userId: string): Promise<boolean> {
+  return (await subscriptionRowStatus(userId)) === 'past_due'
 }
 
 /**
