@@ -1,6 +1,7 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import dynamic from 'next/dynamic';
 import { useAuth } from '@/contexts/AuthContext';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import { useIsGuest } from '@/hooks/useIsGuest';
@@ -8,7 +9,11 @@ import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useStudentClassroom } from '@/hooks/useStudentClassroom';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { HomeEducationCard } from './HomeEducationCard';
-import { TeacherClassEntryCard } from './TeacherClassEntryCard';
+
+// Teacher-only; a static import would pull the Supabase client into the landing bundle.
+const TeacherClassEntryCard = dynamic(() => import('./TeacherClassEntryCard').then((m) => m.TeacherClassEntryCard), {
+  ssr: false,
+});
 
 /**
  * Decides whether the homepage should surface an education entry point, and for
