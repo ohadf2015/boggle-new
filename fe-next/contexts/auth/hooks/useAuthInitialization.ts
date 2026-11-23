@@ -268,10 +268,14 @@ export function useAuthInitialization({
 
     const unansweredTimeout = setTimeout(() => {
       if (!isMountedRef.current || sessionAnswer !== 'unknown') return;
-      logger.warn('Auth session never answered - showing the signed-out screen');
       captureBackgroundError(new Error('Auth session check never answered'), {
         operation: 'auth_session_unanswered',
         service: 'auth',
+        tags: {
+          'auth.visibility': document.visibilityState,
+          'auth.online': String(navigator.onLine),
+          'auth.page_age_s': String(Math.round(performance.now() / 1000)),
+        },
       });
       setLoading(false);
     }, SESSION_UNANSWERED_FALLBACK_MS);

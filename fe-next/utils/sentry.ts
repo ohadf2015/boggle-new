@@ -41,6 +41,7 @@ interface BackgroundErrorContext {
   service?: string;
   userId?: string;
   isRetryable?: boolean;
+  tags?: Record<string, string>;
 }
 
 /**
@@ -581,6 +582,9 @@ export function captureBackgroundError(
       }
       if (context.userId) {
         scope.setUser({ id: context.userId });
+      }
+      for (const [key, value] of Object.entries(context.tags ?? {})) {
+        scope.setTag(key, value);
       }
 
       scope.setContext("background_operation", {

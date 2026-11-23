@@ -130,6 +130,10 @@ describe('useAuthInitialization when the session check is slow', () => {
     expect(result.current.loading).toBe(false);
     expect(result.current.user).toBeNull();
     expect(captureBackgroundError).toHaveBeenCalledTimes(1);
+    expect(captureBackgroundError.mock.calls[0][1].tags).toMatchObject({
+      'auth.visibility': 'visible',
+      'auth.online': 'true',
+    });
   });
 
   it('still reloads once on a real guest sign-up after the session said "no session"', async () => {
