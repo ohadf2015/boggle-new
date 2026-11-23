@@ -1,6 +1,6 @@
-import zlib from 'node:zlib';
-import { test, expect, type Page, type APIRequestContext } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { goto, clearDailyState, type Locale } from './helpers/test-utils';
+import { readEnglishDictionary } from './helpers/dict';
 import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
 
 const CELLS = '[role=gridcell][data-letter]';
@@ -71,12 +71,9 @@ async function readBoard(page: Page): Promise<Cell[]> {
 
 let dictionary: Promise<string[]> | null = null;
 
-function loadWords(request: APIRequestContext): Promise<string[]> {
+function loadWords(): Promise<string[]> {
   dictionary ??= (async () => {
-    const res = await request.get('/dicts/en.dict.gz');
-    expect(res.ok()).toBe(true);
-    const text = zlib.gunzipSync(await res.body()).toString('utf8');
-    return [...new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter((w) => w.length >= 3 && w.length <= 8))].sort();
+    return [...new Set(readEnglishDictionary().map((w) => w.trim().toLowerCase()).filter((w) => w.length >= 3 && w.length <= 8))].sort();
   })();
   return dictionary;
 }
@@ -185,9 +182,9 @@ test.describe('Word Hunt board', () => {
     await expect(page.getByTestId('hunt-stage')).toHaveAttribute('data-phase', 'idle');
   });
 
-  test('a dictionary word pays its reward once on the stage, joins the found list, and a repeat is already found', async ({ page, request }) => {
+  test('a dictionary word pays its reward once on the stage, joins the found list, and a repeat is already found', async ({ page }) => {
     await startGame(page);
-    const { word } = planPaths(await readBoard(page), await loadWords(request));
+    const { word } = planPaths(await readBoard(page), await loadWords());
     test.skip(!word, 'no 3-letter dictionary word on today\'s board');
     const spelled = word!.map((c) => c.letter).join('');
 
@@ -203,9 +200,9 @@ test.describe('Word Hunt board', () => {
     await expectVerdict(page, /^dupe$/);
   });
 
-  test('a non-word is rejected with the reason and the life penalty', async ({ page, request }) => {
+  test('a non-word is rejected with the reason and the life penalty', async ({ page }) => {
     await startGame(page);
-    const { junk } = planPaths(await readBoard(page), await loadWords(request));
+    const { junk } = planPaths(await readBoard(page), await loadWords());
     test.skip(!junk, 'no dead-end path on the board');
 
     await swipe(page, junk!);

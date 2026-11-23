@@ -1,5 +1,5 @@
-import zlib from 'node:zlib';
 import { test, expect, type Page } from '@playwright/test';
+import { readEnglishDictionary } from './helpers/dict';
 
 const PRACTICE = '/en/daily/word-wheel?practice=1';
 
@@ -40,12 +40,10 @@ async function wheelTiles(page: Page) {
 }
 
 async function wheelWords(page: Page, tiles: { l: string; hub: boolean }[]) {
-  const res = await page.request.get('/dicts/en.dict.gz');
-  expect(res.ok()).toBe(true);
   const center = tiles.find((t) => t.hub)?.l;
   const avail: Record<string, number> = {};
   for (const t of tiles) avail[t.l] = (avail[t.l] || 0) + 1;
-  return zlib.gunzipSync(await res.body()).toString('utf8').split('\n').filter((w) => {
+  return readEnglishDictionary().filter((w) => {
     if (w.length !== 4 || !center || !w.includes(center)) return false;
     const need: Record<string, number> = {};
     for (const c of w) if ((need[c] = (need[c] || 0) + 1) > (avail[c] || 0)) return false;
