@@ -151,16 +151,6 @@ describe('sitemap', () => {
     }
   });
 
-  it('still lists the /daily/archive hub (canonical archive entry point)', () => {
-    const urls = new Set(sitemap().map((e) => e.url));
-    for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
-      expect(
-        urls.has(`https://www.lexiclash.live/${locale}/daily/archive`),
-        `sitemap missing archive hub for /${locale}`,
-      ).toBe(true);
-    }
-  });
-
   it('does NOT include today or future archive dates (only finalized past puzzles)', () => {
     const urls = new Set(sitemap().map((e) => e.url));
     const today = new Date().toISOString().split('T')[0];
@@ -216,11 +206,6 @@ describe('sitemap', () => {
         ).toBe(false);
       }
     }
-  });
-
-  it('keeps the /words hub itself listed (real navigable content)', () => {
-    const urls = new Set(sitemap().map((e) => e.url));
-    expect(urls.has('https://www.lexiclash.live/en/words')).toBe(true);
   });
 
   it('lists the anagram hub for EN and SV (zero-click rec 6487)', () => {
@@ -290,7 +275,7 @@ describe('sitemap', () => {
 
   it('still lists genuinely-localized routes for all five locales', () => {
     const urls = new Set(sitemap().map((e) => e.url));
-    const localizedPaths = ['/daily', '/blog', '/blog/word-game-history', '/how-to-play'];
+    const localizedPaths = ['/blog', '/blog/word-game-history', '/how-to-play'];
     for (const path of localizedPaths) {
       for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
         expect(

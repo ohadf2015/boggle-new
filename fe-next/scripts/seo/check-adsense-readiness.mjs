@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Crawls the live sitemap and fails on what a content reviewer or Googlebot would hold against it.
 // Usage: node scripts/seo/check-adsense-readiness.mjs [origin]
+import { readFileSync } from 'node:fs';
+
 const origin = (process.argv[2] ?? 'https://www.lexiclash.live').replace(/\/$/, '');
 const SCRIPTS = { he: /[֐-׿]/g, ru: /[Ѐ-ӿ]/g, ja: /[぀-ヿ一-鿿]/g };
 const STOPWORDS = {
@@ -9,6 +11,12 @@ const STOPWORDS = {
   sv: new Set('och att det som för med en ett på är du av till spel ord de vi har kan inte om'.split(' ')),
 };
 const MIN_WORDS = 40;
+const APP_SCREENS = [
+  ...readFileSync(new URL('../../lib/seo/appScreens.ts', import.meta.url), 'utf8')
+    .match(/APP_SCREEN_PATHS = \[([\s\S]*?)\]/)[1]
+    .matchAll(/'([^']+)'/g),
+].map((m) => m[1]);
+const isAppScreen = (pathname) => APP_SCREENS.includes(pathname.replace(/^\/[a-z]{2}(?=\/|$)/, '') || '/');
 
 const attr = (tag, name) => tag.match(new RegExp(`\\b${name}="([^"]*)"`, 'i'))?.[1];
 const tagWith = (html, re) => html.match(new RegExp(`<(?:meta|link)\\b[^>]*${re}[^>]*>`, 'i'))?.[0] ?? '';
@@ -39,7 +47,7 @@ async function check(url) {
   const res = await fetch(`${origin}${pathname}`, { redirect: 'manual', signal: AbortSignal.timeout(40_000) });
   if (res.status !== 200) return [`status ${res.status}`];
   const html = await res.text();
-  const problems = [];
+  const problems = isAppScreen(pathname) ? ['app screen listed in the sitemap'] : [];
   if (/noindex/i.test(attr(tagWith(html, 'name="robots"'), 'content') ?? '')) problems.push('noindex');
   const canonical = attr(tagWith(html, 'rel="canonical"'), 'href');
   if (canonical && canonical.replace(/\/$/, '') !== url.replace(/\/$/, '')) problems.push(`canonical is ${canonical}`);
@@ -69,6 +77,13 @@ await Promise.all(
     }
   }),
 );
+for (const path of APP_SCREENS) {
+  for (const locale of ['en', 'he']) {
+    const res = await fetch(`${origin}/${locale}${path}`, { signal: AbortSignal.timeout(40_000) }).catch(() => null);
+    const robots = res?.ok ? attr(tagWith(await res.text(), 'name="robots"'), 'content') ?? '' : '';
+    if (res?.ok && !/noindex/i.test(robots)) failures.push(`${origin}/${locale}${path}  app screen is indexable`);
+  }
+}
 console.log(failures.sort().join('\n'));
 console.log(`${urls.length} sitemap URLs checked, ${failures.length} with problems.`);
 process.exit(failures.length ? 1 : 0);

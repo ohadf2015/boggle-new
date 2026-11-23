@@ -4,7 +4,7 @@ import { hreflangAlternates } from '@/lib/seo/hreflang';
 import { EDUCATION_PAGES } from '@/lib/seo/educationPageLinks';
 import { WORD_LISTS_GENERATED_AT } from '@/lib/seo/wordLists/catalog';
 import { wordListSitemapRoutes } from '@/lib/seo/wordLists/sitemapRoutes';
-import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
+import { isAppScreenUrl } from '@/lib/seo/appScreens';
 import buildInfo from '@/lib/seo/buildInfo.generated.json';
 
 const BASE_URL = 'https://www.lexiclash.live';
@@ -104,41 +104,13 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Core game mode pages ───
   // /multiplayer and /singleplayer are noindexed game shells with no visible copy.
-  addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
   // /blast, /word-craft, /daily/word-hunt, /daily/word-wheel are near-empty
   // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed
   // at page level after the AdSense "low value content" rejection. Search
   // intent is covered by /word-craft-game, /daily-word-wheel and /guides/*.
   addForLocaleOnly(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  // Adventure is GA and indexed (layout.tsx robots.index=true). Guests get a
-  // playable demo battle plus the SSR FAQ/feature landing; signed-in players
-  // get the full world-map run. Not a teaser gate — do not noindex this URL.
-  addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 });
-  // Word Tower canonical URL is /word-tower (clean, no -v2 suffix).
-  addForAllLocales(routes, '/word-tower', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
-
-  // Connections emits exactly the locales that have native landing copy —
-  // SUPPORTED_LANDING_LOCALES is the single source of truth, shared with
-  // connections/page.tsx (which gates robots + hreflang off the same list).
-  // Anything not in it is noindex → canonical en, so it must not be listed here.
-  {
-    const connectionsAlternates: Record<string, string> = {
-      'x-default': `${BASE_URL}/en/connections`,
-    };
-    CONNECTIONS_LANDING_LOCALES.forEach((l) => {
-      connectionsAlternates[l] = `${BASE_URL}/${l}/connections`;
-    });
-    CONNECTIONS_LANDING_LOCALES.forEach((locale) => {
-      routes.push({
-        url: `${BASE_URL}/${locale}/connections`,
-        lastModified: LAST_DEPLOYED,
-        changeFrequency: 'daily',
-        priority: 0.8,
-        alternates: { languages: connectionsAlternates },
-      });
-    });
-  }
+  // Play screens in APP_SCREEN_PATHS (daily, adventure, word tower, connections,
+  // leaderboard, community, teacher upgrade) are noindexed and never listed.
 
   // Per-date archive child pages are intentionally NOT listed here.
   // They are thin per-puzzle stat/leaderboard snapshots and were dragging the
@@ -156,22 +128,14 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // docs/2026-06-17-adsense-thin-page-noindex-spec.md
 
   // ─── Tools ───
-  addForAllLocales(routes, '/tools', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
   addForAllLocales(routes, '/tools/word-solver', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
-
-  // ─── Community ───
-  addForAllLocales(routes, '/community', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
 
   // ─── Education ───
   addForAllLocales(routes, '/education', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.7 });
   // /education/access — form/redeem page, noindexed (AdSense thin-page sweep 2026-06-17),
   // so omitted from the sitemap to avoid GSC "Submitted URL marked noindex".
 
-  // ─── Teacher Pro pricing (the paywall's front door) ───
-  // Fully SSR'd (price, features, FAQ in raw HTML) and carries Product+Offer
-  // and FAQPage JSON-LD. Previously absent from the sitemap — the only revenue
-  // surface had no crawl path (added 2026-07-29).
-  addForAllLocales(routes, '/teacher/upgrade', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+  // ─── Teacher Pro pricing ───
   // Public alias people actually type. /en/pricing 404'd while the paywall
   // lived only at /teacher/upgrade — anyone hunting a price never reached checkout.
   addForAllLocales(routes, '/pricing', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
@@ -313,7 +277,6 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Content pages ───
   addForAllLocales(routes, '/how-to-play', { lastModified: GUIDES_UPDATED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales(routes, '/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
-  addForAllLocales(routes, '/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
 
   // Per-date Word of the Day pages dropped (2026-07-02, AdSense round 2):
   // ~106 URLs rendering ~216 crawlable words each — the same thin-per-date
@@ -586,7 +549,6 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/editorial-policy', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.6 });
 
   // ─── Words hub ───
-  addForAllLocales(routes, '/words', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
 
   // ─── Programmatic word lists RETIRED from sitemap 2026-08-09 ───
   // Was: /words/{3..8}-letter-words (6 URLs) + /words/starting-with/{letter} (21 URLs).
@@ -772,5 +734,5 @@ function keepPagesWithBody(routes: MetadataRoute.Sitemap): MetadataRoute.Sitemap
 // /sitemap/[id].xml but does NOT auto-create an index at /sitemap.xml,
 // which then collides with the [locale] catch-all and serves HTML.
 export default function sitemap(): MetadataRoute.Sitemap {
-  return pruneUnconfirmedAlternates(keepPagesWithBody(getAllRoutes()));
+  return pruneUnconfirmedAlternates(keepPagesWithBody(getAllRoutes()).filter((r) => !isAppScreenUrl(r.url)));
 }

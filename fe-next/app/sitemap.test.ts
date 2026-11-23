@@ -1,9 +1,8 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, it, expect } from 'vitest';
 import sitemap from './sitemap';
 import { RU_LANDINGS } from '../components/landing/RuLandingLinks';
-import { SUPPORTED_LANDING_LOCALES as CONNECTIONS_LANDING_LOCALES } from './[locale]/connections/content';
 
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 const BASE_URL = 'https://www.lexiclash.live';
@@ -36,16 +35,6 @@ describe('sitemap', () => {
     ).toBe(0);
   });
 
-  it('still lists the /daily/archive hub for every locale', () => {
-    for (const locale of LOCALES) {
-      const url = `${BASE_URL}/${locale}/daily/archive`;
-      expect(
-        routes.find((r) => r.url === url),
-        `missing archive hub for ${locale}`
-      ).toBeDefined();
-    }
-  });
-
   // REVERSAL (2026-07-02): per-date Word-of-the-Day pages were kept in the
   // 06-04 round on the theory that curated definitions are "genuine text".
   // AdSense then rejected the site for "low value content" WITH them indexed;
@@ -57,15 +46,6 @@ describe('sitemap', () => {
       /\/word-of-the-day\/\d{4}-\d{2}-\d{2}$/.test(r.url)
     );
     expect(wotdDateUrls.length).toBe(0);
-  });
-
-  it('still lists the /word-of-the-day hub for every locale', () => {
-    for (const locale of LOCALES) {
-      expect(
-        routes.find((r) => r.url === `${BASE_URL}/${locale}/word-of-the-day`),
-        `missing word-of-the-day hub for ${locale}`
-      ).toBeDefined();
-    }
   });
 
   // AdSense round 2 (2026-07-02): near-empty game shells measured live at
@@ -82,8 +62,8 @@ describe('sitemap', () => {
     ).toEqual([]);
   });
 
-  it('still lists the content-rich game siblings (/word-craft-game, /daily, /brain-training-word-games)', () => {
-    for (const path of ['/word-craft-game', '/daily', '/brain-training-word-games']) {
+  it('still lists the content-rich game landings (/word-craft-game, /brain-training-word-games)', () => {
+    for (const path of ['/word-craft-game', '/brain-training-word-games']) {
       expect(
         routes.find((r) => r.url === `${BASE_URL}/en${path}`),
         `missing ${path} for en`
@@ -96,48 +76,12 @@ describe('sitemap', () => {
     expect(urls).toEqual([`${BASE_URL}/en/word-craft-game`]);
   });
 
-  // Teacher Pro pricing is the site's only revenue surface — it must be
-  // crawlable from the sitemap. Fully SSR'd with Product+Offer JSON-LD
-  // (added 2026-07-29 after finding it missing entirely).
-  it('lists /teacher/upgrade for every supported locale', () => {
-    for (const locale of ['he', 'en', 'sv', 'ja', 'es', 'ru']) {
-      const entry = routes.find((r) => r.url === `${BASE_URL}/${locale}/teacher/upgrade`);
-      expect(entry, `missing /teacher/upgrade for ${locale}`).toBeDefined();
-      expect(entry?.alternates?.languages).toBeDefined();
-    }
-  });
-
   it('lists /pricing for every supported locale', () => {
     for (const locale of ['he', 'en', 'sv', 'ja', 'es', 'ru']) {
       const entry = routes.find((r) => r.url === `${BASE_URL}/${locale}/pricing`);
       expect(entry, `missing /pricing for ${locale}`).toBeDefined();
       expect(entry?.alternates?.languages).toBeDefined();
     }
-  });
-
-  // Adventure is now GA — publicly listed in the sitemap for all locales.
-  // Word Tower canonical URL is /word-tower (no -v2 suffix in sitemap).
-  it('lists /adventure and /word-tower for all locales (GA)', () => {
-    for (const locale of LOCALES) {
-      const adventureUrl = `${BASE_URL}/${locale}/adventure`;
-      expect(
-        routes.find((r) => r.url === adventureUrl),
-        `missing /adventure for ${locale}`
-      ).toBeDefined();
-
-      const wtUrl = `${BASE_URL}/${locale}/word-tower`;
-      expect(
-        routes.find((r) => r.url === wtUrl),
-        `missing /word-tower for ${locale}`
-      ).toBeDefined();
-    }
-  });
-
-  it('does not describe /adventure as beta-gated or noindexed', () => {
-    const src = readFileSync(join(__dirname, 'sitemap.ts'), 'utf8');
-    expect(src).not.toContain('Adventure is beta-gated');
-    expect(src).not.toMatch(/noindexed at page level \(see app\/\[locale\]\/adventure/);
-    expect(src).toContain('Adventure is GA and indexed');
   });
 
   // /word-tower/daily is a daily run URL — not indexed, stays noindex.
@@ -148,28 +92,6 @@ describe('sitemap', () => {
 
     const v2Urls = routes.filter((r) => /\/word-tower-v2/.test(r.url));
     expect(v2Urls, 'no -v2 paths in sitemap — use canonical /word-tower').toEqual([]);
-  });
-
-  // Connections is LIVE with a real content hub (en+he landing copy in
-  // content.ts; other locales are noindex → canonical en). It was missing
-  // from the sitemap entirely.
-  // Emission is derived from SUPPORTED_LANDING_LOCALES, not restated here —
-  // a restated list is exactly how page.tsx, content.ts and this file drifted
-  // apart in the first place (hreflang advertised sv/ja/es while they were
-  // noindexed). Assert the *relationship*: listed iff it has landing copy.
-  it('lists /connections for exactly the locales with landing copy', () => {
-    for (const locale of CONNECTIONS_LANDING_LOCALES) {
-      expect(
-        routes.find((r) => r.url === `${BASE_URL}/${locale}/connections`),
-        `missing /connections for ${locale}`
-      ).toBeDefined();
-    }
-    const emitted = routes
-      .filter((r) => r.url.endsWith('/connections'))
-      .map((r) => r.url.split('/').at(-2));
-    expect([...emitted].sort(), 'no /connections URL without landing copy').toEqual(
-      [...CONNECTIONS_LANDING_LOCALES].sort()
-    );
   });
 
   // The RU keyword cluster is only worth anything if all three agree: a route
@@ -194,17 +116,6 @@ describe('sitemap', () => {
         `/${slug} is Russian-only — it must not be emitted for other locales`
       ).toEqual([]);
     }
-  });
-
-  it('gives every /connections URL hreflang covering all landing locales', () => {
-    const en = routes.find((r) => r.url === `${BASE_URL}/en/connections`);
-    const langs = en?.alternates?.languages ?? {};
-    for (const locale of CONNECTIONS_LANDING_LOCALES) {
-      expect(langs[locale], `missing hreflang ${locale}`).toBe(
-        `${BASE_URL}/${locale}/connections`
-      );
-    }
-    expect(langs['x-default']).toBe(`${BASE_URL}/en/connections`);
   });
 
   // Blast is a LIVE mode whose play route is a noindexed shell; this landing

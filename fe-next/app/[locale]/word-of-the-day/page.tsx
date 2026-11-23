@@ -1,3 +1,4 @@
+import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import type { Metadata } from 'next';
 import { wordsByLocale, getRotatedTodayWord, type Locale } from './content';
 import WordOfTheDayClient from './PageClient';
@@ -82,7 +83,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'es-CO': `${SITE_URL}/es/word-of-the-day`,
       },
     },
-    robots: { index: true, follow: true },
+    robots: APP_SCREEN_ROBOTS,
   };
 }
 

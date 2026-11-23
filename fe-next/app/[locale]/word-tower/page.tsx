@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   // Word Tower is now public (GA) — indexable for search and AdSense review.
   // Canonical path is /word-tower; legacy /word-tower-v2 URLs 308 here (next.config).
-  return generatePageMetadata({ seoKey: 'wordTowerV2', path: '/word-tower', locale, noIndex: false });
+  return generatePageMetadata({ seoKey: 'wordTowerV2', path: '/word-tower', locale });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {

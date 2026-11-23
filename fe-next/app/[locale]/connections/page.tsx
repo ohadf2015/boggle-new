@@ -1,3 +1,4 @@
+import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import type { Metadata } from 'next';
 import ConnectionsPageClient from './PageClient';
 import {
@@ -85,7 +86,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       canonical,
       languages: languageMap,
     },
-    robots: { index: supported, follow: true },
+    robots: APP_SCREEN_ROBOTS,
   };
 }
 

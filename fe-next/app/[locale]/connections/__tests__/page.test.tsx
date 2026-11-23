@@ -7,27 +7,27 @@ import {
 } from '../content';
 
 describe('connections page metadata', () => {
-  it('returns indexable metadata for EN', async () => {
+  it('returns noindex,follow metadata for EN (game screen)', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) });
     expect(meta.title).toContain('Missing Link Word Game');
-    expect(meta.robots).toMatchObject({ index: true, follow: true });
+    expect(meta.robots).toMatchObject({ index: false, follow: true });
     expect(meta.alternates?.canonical).toBe('https://www.lexiclash.live/en/connections');
   });
 
   it('returns Hebrew metadata for HE', async () => {
     const meta = await generateMetadata({ params: Promise.resolve({ locale: 'he' }) });
     expect(String(meta.title)).toContain('ראש זנב');
-    expect(meta.robots).toMatchObject({ index: true });
+    expect(meta.robots).toMatchObject({ index: false });
   });
 
   // These used to assert "sv/ja/es are noindex → canonical /en". All six locales
   // with a puzzle pool now have native landing copy, so assert the RELATIONSHIP
   // (indexable iff it has copy) rather than restating the list — a restated list
   // is what let page.tsx, content.ts and sitemap.ts drift apart before.
-  it('self-canonicals and indexes every locale that has landing copy', async () => {
+  it('self-canonicals every locale that has landing copy, noindexed as a game screen', async () => {
     for (const locale of SUPPORTED_LANDING_LOCALES) {
       const meta = await generateMetadata({ params: Promise.resolve({ locale }) });
-      expect(meta.robots, `${locale} should be indexable`).toMatchObject({ index: true });
+      expect(meta.robots).toMatchObject({ index: false });
       expect(meta.alternates?.canonical, `${locale} should self-canonical`).toBe(
         `https://www.lexiclash.live/${locale}/connections`
       );

@@ -1,3 +1,4 @@
+import { APP_SCREEN_ROBOTS } from '@/lib/seo/appScreens';
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -71,10 +72,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         'ru-RU': 'https://www.lexiclash.live/ru/daily',
       },
     },
-    robots: {
-      index: true,
-      follow: true,
-    },
+    robots: APP_SCREEN_ROBOTS,
   };
 }
 

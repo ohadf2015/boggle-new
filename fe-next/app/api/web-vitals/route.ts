@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, getSessionUser } from '@/utils/supabase/server';
+import { isAutomatedUserAgent } from '@/lib/seo/botUa';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -40,7 +41,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get Supabase client
+    if (isAutomatedUserAgent(request.headers.get('user-agent')) || isAutomatedUserAgent(data.user_agent)) {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+
     const supabase = await createClient();
 
     // Get current user from session JWT (no network call — proxy already refreshed)
