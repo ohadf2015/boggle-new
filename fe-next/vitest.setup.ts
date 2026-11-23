@@ -9,7 +9,6 @@
  */
 
 import { vi, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
-import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { server as mswServer } from './test/msw/server';
@@ -104,6 +103,7 @@ vi.mock('@sentry/nextjs', () => ({
 // ==========================================
 
 const isBrowser = typeof window !== 'undefined';
+if (isBrowser) await import('@testing-library/jest-dom');
 
 // Mock localStorage with functional storage
 const localStorageStore: Record<string, string> = {};

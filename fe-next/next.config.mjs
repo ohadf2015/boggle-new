@@ -100,6 +100,8 @@ const nextConfig = {
   experimental: {
     // A custom webpack() turns this off; on, each compilation gets its own heap.
     webpackBuildWorker: true,
+    // Collect the server's file traces in a worker while the client compiles (~75s saved).
+    parallelServerBuildTraces: true,
     // Server bundles ship without source maps; unminified, their stacks stay readable.
     serverMinification: false,
     optimizePackageImports: [
