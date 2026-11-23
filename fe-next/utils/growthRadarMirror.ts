@@ -25,6 +25,7 @@ declare global {
   interface Window {
     gr?: {
       capture?: (event: string, properties?: Record<string, unknown>) => void;
+      distinctId?: () => string;
     };
   }
 }
@@ -74,6 +75,16 @@ function grCapture(event: string, properties?: Record<string, unknown>): void {
     gr?.capture?.(event, properties);
   } catch {
     // Analytics must never break the game — swallow anything gr throws.
+  }
+}
+
+/** The tracker's visitor id; gr.js persists it as localStorage gr_did before it loads too. */
+export function grDistinctId(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return window.gr?.distinctId?.() || localStorage.getItem('gr_did') || null;
+  } catch {
+    return null;
   }
 }
 
