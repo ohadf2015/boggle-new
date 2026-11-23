@@ -114,7 +114,7 @@ RUN --mount=type=cache,id=s/cc7a91b5-cd7b-43b0-878d-cacf07b369ad-next-cache,targ
     (du -sh .next/cache/webpack 2>/dev/null || echo "webpack cache: empty") && \
     NIGHTLY_SKIP_NEXT_TS=1 npm run build --ignore-scripts && \
     du -sh .next/cache/webpack && \
-    NODE_OPTIONS=--max-old-space-size=4096 node_modules/.bin/tsc --noEmit --incremental --tsBuildInfoFile .next/cache/tsc.tsbuildinfo
+    NODE_OPTIONS=--max-old-space-size=${BUILD_HEAP_MB} node_modules/.bin/tsc --noEmit --incremental --tsBuildInfoFile .next/cache/tsc.tsbuildinfo
 
 # ── Stage 4: Production image (slim) ─────────────────────────────────
 FROM node:22-alpine AS runner
