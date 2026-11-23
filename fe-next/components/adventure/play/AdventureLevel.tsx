@@ -51,6 +51,7 @@ import { cn } from '@/lib/utils';
 
 import type { DeedEvent } from './deed/DeedStamp';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { verdictMessage, wordVerdict } from '@/lib/wordVerdict/wordVerdict';
 const DraftOverlay = dynamic(() => import('./DraftOverlay'), { ssr: false });
 const DeedStamp = dynamic(() => import('./deed/DeedStamp'), { ssr: false });
 
@@ -155,7 +156,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     tracedRef.current = null;
     const r = await run.submitWord(word);
     if (r === 'idle') return;
-    if (r === 'retry') { const seq = ++hitSeq.current; setFeedback({ id: `adv-${seq}`, type: 'duplicate', word, message: t('playerView.wordCheckUnavailable'), timestamp: seq }); return; }
+    if (r === 'retry') { const seq = ++hitSeq.current; setFeedback({ id: `adv-${seq}`, type: 'duplicate', word, message: verdictMessage(t, wordVerdict('cant-check')), timestamp: seq }); return; }
     setHitPath(resolveHitPath(word, traced, run.grid, language));
     // Monotonic, not Date.now(): GridComponent dedupes the submit burst by id
     // and keys it by timestamp, so two submits in the same millisecond dropped

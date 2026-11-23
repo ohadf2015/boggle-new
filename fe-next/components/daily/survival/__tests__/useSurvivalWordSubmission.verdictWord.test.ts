@@ -28,7 +28,7 @@ function setup(discoveredWords: WordDiscovery[] = []) {
       grid,
       language: 'en',
       targetWord: 'PLANET',
-      t: (key: string) => key,
+      t: (key: string, p?: Record<string, string | number>) => (p ? `${key}${JSON.stringify(p)}` : key),
       isGameOver: false,
       attempts: [],
       discoveredWords,
@@ -82,6 +82,22 @@ describe('daily word hunt: every verdict names its word', () => {
     const { result, showToast } = setup();
     act(() => result.current.handleWordSubmit('houses'));
     expect(showToast).toHaveBeenCalledWith('not-on-board', expect.any(String), 'HOUSES');
+  });
+
+  it('Given the same non-word twice, When the second answer lands, Then it says why more plainly', async () => {
+    global.fetch = vi.fn(async () => new Response(JSON.stringify({ isValid: false, source: 'dictionary' }))) as unknown as typeof fetch;
+    const { result, showToast } = setup();
+    act(() => result.current.handleWordSubmit('hous'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('not-in-dictionary', 'wordVerdict.withPenalty{"reason":"wordVerdict.notAWord","n":4}', 'HOUS'));
+    act(() => result.current.handleWordSubmit('hous'));
+    await waitFor(() => expect(showToast).toHaveBeenCalledWith('not-in-dictionary', 'wordVerdict.withPenalty{"reason":"wordVerdict.notAWordAgain","n":4}', 'HOUS'));
+  });
+
+  it('Given penalty mode and a word off the board, Then the reason carries its life cost', () => {
+    onBoard.mockReturnValue(false);
+    const { result, showToast } = setup();
+    act(() => result.current.handleWordSubmit('hose'));
+    expect(showToast).toHaveBeenCalledWith('not-on-board', 'wordVerdict.withPenalty{"reason":"wordVerdict.notOnBoard","n":5}', 'HOSE');
   });
 
   it('Given a word the dictionary rejects, When the answer lands, Then the verdict carries the word', async () => {

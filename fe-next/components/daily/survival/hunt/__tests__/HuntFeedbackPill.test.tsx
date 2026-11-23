@@ -36,4 +36,16 @@ describe('HuntFeedbackPill', () => {
     expect(screen.getByTestId('hunt-feedback-row')).toBeInTheDocument();
     expect(screen.queryByTestId('hunt-feedback-pill')).toBeNull();
   });
+
+  it('Given a rejected word, Then the pill is not a live region (the shared announcer reads it once); a scored word still is', () => {
+    const { rerender } = render(<HuntFeedbackPill seq={1} type="not-on-board" message="Not on the board" word="QZX" calm />);
+    expect(screen.getByTestId('hunt-feedback-pill')).not.toHaveAttribute('role');
+    rerender(<HuntFeedbackPill seq={2} type="valid-word" message="+3 life" word="CAT" calm />);
+    expect(screen.getByTestId('hunt-feedback-pill')).toHaveAttribute('role', 'status');
+  });
+
+  it('Given a rejection nothing else announces (invalid-word), Then the pill still speaks it', () => {
+    render(<HuntFeedbackPill seq={1} type="invalid-word" message="Not a word" word="QZX" calm />);
+    expect(screen.getByTestId('hunt-feedback-pill')).toHaveAttribute('role', 'status');
+  });
 });

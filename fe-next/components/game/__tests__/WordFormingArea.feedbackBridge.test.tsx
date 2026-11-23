@@ -121,6 +121,23 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     expect(screen.getByText('✓')).toBeInTheDocument(); // still visible — accepted gets full 5s
   });
 
+  it('a verdict with its own hold (a repeated miss) stays that long', () => {
+    render(<WordFormingArea word="" letterCount={0} feedback={{ ...rejected('ANUAL'), durationMs: 2600 }} compact />);
+    act(() => { vi.advanceTimersByTime(2500); });
+    expect(screen.getByText('✗')).toBeInTheDocument();
+    act(() => { vi.advanceTimersByTime(200); });
+    expect(screen.queryByText('✗')).not.toBeInTheDocument();
+  });
+
+  it('the pill stops being a live region while it shows a rejection the announcer already read, so it is read once', () => {
+    const { container, rerender } = render(<WordFormingArea word="" letterCount={0} feedback={{ ...rejected('XQZ'), announced: true }} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('off');
+    rerender(<WordFormingArea word="" letterCount={0} feedback={{ ...rejected('QQQ'), id: 'r2' }} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('polite');
+    rerender(<WordFormingArea word="" letterCount={0} feedback={accepted('CAT')} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('polite');
+  });
+
   // Hebrew sofit invariant: the in-progress forming word is INPUT and must show
   // base letters (the board holds regular forms); the sofit final-letter glyph
   // only appears once the word is submitted/settled.

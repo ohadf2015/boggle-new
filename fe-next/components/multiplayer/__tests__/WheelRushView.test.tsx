@@ -304,6 +304,19 @@ describe('WheelRushView', () => {
     expect(socket.emit).not.toHaveBeenCalledWith('submitWheelWord', expect.anything());
   });
 
+  it('shows no word verdict when the server only paused, and starts the repeat streak over on a new puzzle', () => {
+    const socket = makeMockSocket();
+    render(<WheelRushView socket={socket} username="alice" leaderboard={[{ username: 'alice', score: 0 }]} onQuit={vi.fn()} t={tStub} />);
+    act(() => { socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() }); });
+    act(() => { socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'paused' }); });
+    expect(screen.queryByText(/wordVerdict\./)).toBeNull();
+    act(() => { socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' }); });
+    act(() => { socket.fire('wheelRushInit', { puzzle: { ...puzzle, centerLetter: 'E' }, startedAt: Date.now() }); });
+    act(() => { socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' }); });
+    expect(screen.queryByText(/wordVerdict\.notAWordAgain/)).toBeNull();
+    expect(screen.getAllByText(/wordVerdict\.notAWord/)).toHaveLength(1);
+  });
+
   it('maps server error codes to translation keys instead of showing raw codes', () => {
     const socket = makeMockSocket();
     render(
@@ -322,10 +335,14 @@ describe('WheelRushView', () => {
     act(() => {
       socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' });
     });
-    // The message renders twice by design: the visible feedback pill and the
-    // sr-only aria-live region that mirrors it for screen readers.
-    expect(screen.getAllByText(/wordWheel\.notInDictionary/).length).toBeGreaterThan(0);
+    // Once on screen; the shared announcer (not a second live region) reads it.
+    expect(screen.getAllByText(/wordVerdict\.notAWord/)).toHaveLength(1);
     expect(screen.queryByText(/^not-a-word$/)).toBeNull();
+
+    act(() => {
+      socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' });
+    });
+    expect(screen.getAllByText(/wordVerdict\.notAWordAgain/)).toHaveLength(1);
   });
 
   it('does not re-register socket listeners when puzzle is set after wheelRushInit', () => {

@@ -66,7 +66,7 @@ describe('idle auto-submit respects tap spelling', () => {
     spell('TEM');
     act(() => { vi.advanceTimersByTime(5000); });
     expect(onValidateWord).not.toHaveBeenCalled();
-    expect(screen.queryByText('wordWheel.notInDictionary')).toBeNull();
+    expect(screen.queryByText('wordVerdict.notAWord')).toBeNull();
   });
 });
 

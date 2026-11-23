@@ -224,6 +224,7 @@ vi.mock('@/hooks/useDictionaryCache', () => ({
 
 // Import AFTER mocks
 import { useSinglePlayerCore } from '../useSinglePlayerCore';
+import { validateWordLocally } from '@/utils/clientWordValidator';
 import type { SinglePlayerGameState } from '@/components/singleplayer/SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 
@@ -315,6 +316,43 @@ describe('useSinglePlayerCore — Dictionary Cache Latency', () => {
     );
   });
 
+  it('given a word already found, then it keeps the rejected pill and the error buzz it always had', () => {
+    vi.mocked(validateWordLocally).mockReturnValueOnce({ isValid: false, reason: 'already-found', errorKey: 'wordVerdict.alreadyFound', shouldSubmitToServer: false });
+    mockHapticError.mockClear();
+    const { result } = renderHook(() =>
+      useSinglePlayerCore({ settings: { ...defaultSettings, grid: mockGrid }, targetHighScore: null, onGameEnd: vi.fn(), onQuit: vi.fn() })
+    );
+    act(() => { result.current.handleWordSubmit('test'); });
+    expect(result.current.currentFeedback).toMatchObject({ type: 'rejected', message: 'wordVerdict.alreadyFound' });
+    expect(mockHapticError).toHaveBeenCalled();
+  });
+
+  it('given a new board, then a miss repeated from the last board is a first miss', () => {
+    const { result, rerender } = renderHook(({ grid }) =>
+      useSinglePlayerCore({ settings: { ...defaultSettings, grid }, targetHighScore: null, onGameEnd: vi.fn(), onQuit: vi.fn() }),
+      { initialProps: { grid: mockGrid } },
+    );
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    rerender({ grid: mockGrid.map(row => [...row].reverse()) as typeof mockGrid });
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    expect(result.current.currentFeedback).toMatchObject({ message: 'wordVerdict.notAWord' });
+  });
+
+  it('given a non-word, twice, then it says why and escalates the second time', () => {
+    const { result } = renderHook(() =>
+      useSinglePlayerCore({
+        settings: { ...defaultSettings, grid: mockGrid },
+        targetHighScore: null,
+        onGameEnd: vi.fn(),
+        onQuit: vi.fn(),
+      })
+    );
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    expect(result.current.currentFeedback).toMatchObject({ type: 'rejected', message: 'wordVerdict.notAWord', durationMs: 1600 });
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    expect(result.current.currentFeedback).toMatchObject({ message: 'wordVerdict.notAWordAgain', durationMs: 2600 });
+  });
+
   it('given a rate-limited dictionary check, then the word is neither rejected nor penalised', async () => {
     global.fetch = vi.fn(async () =>
       new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429, headers: { 'Retry-After': '1' } }),
@@ -333,7 +371,7 @@ describe('useSinglePlayerCore — Dictionary Cache Latency', () => {
       result.current.handleWordSubmit('test');
     });
 
-    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('playerView.wordCheckUnavailable'), { timeout: 3000 });
+    await waitFor(() => expect(result.current.currentFeedback?.message).toBe('wordVerdict.cantCheck'), { timeout: 3000 });
     expect(result.current.currentFeedback?.type).not.toBe('rejected');
     expect(result.current.foundWords.some(fw => fw.word === 'test')).toBe(false);
     expect(mockHapticError).not.toHaveBeenCalled();

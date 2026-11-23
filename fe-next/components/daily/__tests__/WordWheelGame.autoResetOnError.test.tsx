@@ -126,14 +126,14 @@ describe('WordWheelGame auto-reset after invalid submission', () => {
     await buildAndSubmitInvalidWord();
 
     // Letters still on screen + error toast visible immediately after rejection.
-    expect(screen.getByText('wordWheel.notInDictionary')).toBeInTheDocument();
+    expect(screen.getByText('wordVerdict.notAWord')).toBeInTheDocument();
     expect(builtLetterCount()).toBeGreaterThan(0);
 
-    // Just before 1.5s — letters still present.
+    // Just before the 1.6s hold ends, letters still present.
     await act(async () => { await sleep(1200); });
     expect(builtLetterCount()).toBeGreaterThan(0);
 
-    // After 1.5s — auto-reset fires (for tap/idle mode).
+    // After the hold, auto-reset fires (tap mode).
     // The test uses tap submit (not drag), so auto-reset waits 1500ms.
     await waitFor(() => {
       expect(builtLetterCount()).toBe(0);

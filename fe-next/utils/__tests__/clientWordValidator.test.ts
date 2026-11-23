@@ -105,14 +105,17 @@ describe('validateWordLocally', () => {
   it('rejects words shorter than minimum length', () => {
     const result = validateWordLocally('a', 'en', 2, mockFoundWords);
     expect(result.isValid).toBe(false);
-    expect(result.errorKey).toBe('playerView.wordTooShortMin');
+    expect(result.reason).toBe('too-short');
+    expect(result.errorKey).toBe('wordVerdict.tooShort');
+    expect(result.errorParams).toEqual({ min: 2 });
     expect(result.shouldSubmitToServer).toBe(false);
   });
 
   it('rejects words with invalid characters', () => {
     const result = validateWordLocally('hello123', 'en', 2, mockFoundWords);
     expect(result.isValid).toBe(false);
-    expect(result.errorKey).toBe('playerView.onlyLanguageWords');
+    expect(result.reason).toBe('bad-letters');
+    expect(result.errorKey).toBe('wordVerdict.badLetters');
     expect(result.shouldSubmitToServer).toBe(false);
   });
 
@@ -120,7 +123,8 @@ describe('validateWordLocally', () => {
     const foundWords = [{ word: 'hello', isValid: true }];
     const result = validateWordLocally('hello', 'en', 2, foundWords);
     expect(result.isValid).toBe(false);
-    expect(result.errorKey).toBe('playerView.wordAlreadyFound');
+    expect(result.reason).toBe('already-found');
+    expect(result.errorKey).toBe('wordVerdict.alreadyFound');
     expect(result.shouldSubmitToServer).toBe(false);
   });
 
@@ -134,7 +138,8 @@ describe('validateWordLocally', () => {
     const foundWords = [{ word: 'Hello', isValid: true }];
     const result = validateWordLocally('HELLO', 'en', 2, foundWords);
     expect(result.isValid).toBe(false);
-    expect(result.errorKey).toBe('playerView.wordAlreadyFound');
+    expect(result.reason).toBe('already-found');
+    expect(result.errorKey).toBe('wordVerdict.alreadyFound');
   });
 
   it('handles Hebrew normalization in duplicate detection', () => {

@@ -30,6 +30,8 @@ import { useQuickReactions } from '@/hooks/useQuickReactions';
 import { useStuckCoach } from '@/hooks/useStuckCoach';
 import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackMpFtue } from '@/utils/posthogEngagement';
+import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
+import { noticeFromCode, reasonFromCode, VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -78,18 +80,6 @@ const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
 const RUSH_COACH_ANCHOR = { selector: '[data-testid="my-words-slot"]', edge: 'over' } as const;
 
 
-// 'duplicate'/'already-closed'/'locked-by-other' used to be real rejections
-// under the old lock/steal model. Parallel discovery removed the lock, and
-// applyWheelWord now scores repeats (reduced) instead of rejecting them, so
-// none of those codes are ever emitted anymore.
-type WheelErrorCode = 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word';
-
-const ERROR_KEY: Record<WheelErrorCode, string> = {
-  'too-short': 'wordWheel.tooShort',
-  'no-center': 'wordWheel.missingCenter',
-  'bad-letters': 'wordWheel.invalidLetters',
-  'not-a-word': 'wordWheel.notInDictionary',
-};
 
 export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {
   // Ref-driven: the 250ms tick writes textContent directly, never triggering a
@@ -118,6 +108,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const prefersReduced = useReducedMotion();
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: puzzle });
   const [loadTimedOut, setLoadTimedOut] = useState(false);
   // Word-row direction follows the LETTERS on screen, not the gameLanguage prop
   // (which can arrive null at in-game render). Hebrew letters → rtl regardless;
@@ -208,10 +199,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // optimize this component (a `ref.current = …` in the render body bails the compiler,
   // "cannot access refs during render"). Socket/fog events fire async — always after
   // this effect runs — so the latest-value guarantee is unchanged.
-  const latestRef = useRef({ t, puzzle, username, playWordAcceptedSound, playWordRejectedSound });
+  const latestRef = useRef({ puzzle, username, playWordAcceptedSound });
   const onFogProgressRef = useRef(onFogProgressChange);
   useEffect(() => {
-    latestRef.current = { t, puzzle, username, playWordAcceptedSound, playWordRejectedSound };
+    latestRef.current = { puzzle, username, playWordAcceptedSound };
     onFogProgressRef.current = onFogProgressChange;
   });
 
@@ -259,11 +250,10 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     [builtLetters],
   );
 
-  const flash = useCallback((type: 'ok' | 'err', msg: string) => {
+  const flash = useCallback((type: 'ok' | 'err', msg: string, holdMs = VERDICT_MS) => {
     setFeedback({ type, msg });
     if (type === 'err') {
       setWordBuilderShake(true);
-      haptic([30, 50, 30]);
       if (shakeTimer.current) clearTimeout(shakeTimer.current);
       shakeTimer.current = setTimeout(() => {
         shakeTimer.current = null;
@@ -287,7 +277,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       lastSubmitWasDragRef.current = false;
     }
     if (fbTimer.current) clearTimeout(fbTimer.current);
-    fbTimer.current = setTimeout(() => setFeedback(null), 1200);
+    fbTimer.current = setTimeout(() => setFeedback(null), holdMs);
   }, []);
 
   // Wheel-coverage celebration — fires when an accepted word uses all (or
@@ -358,16 +348,15 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       }
     };
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; error?: string }) => {
-      const { t: tt, puzzle: pz, playWordAcceptedSound: accSfx, playWordRejectedSound: rejSfx } = latestRef.current;
+      const { puzzle: pz, playWordAcceptedSound: accSfx } = latestRef.current;
       if (!data.accepted) {
-        const code = data.error as WheelErrorCode | undefined;
-        const key = code && ERROR_KEY[code] ? ERROR_KEY[code] : 'wordWheel.notInDictionary';
-        const msg = tt(key, { min: MIN_LEN, letter: pz?.centerLetter ?? '' }) || key;
-        flash('err', msg);
-        rejSfx();
+        if (noticeFromCode(data.error)) return;
+        const v = verdicts.reject(data.word, reasonFromCode(data.error) ?? 'not-a-word', { min: MIN_LEN, letter: pz?.centerLetter ?? '' });
+        flash('err', v.message, v.durationMs);
         setComboLevel(0);
         return;
       }
+      verdicts.clearRepeat();
       if (data.kind === 'locked') {
         // Dedup by word: a duplicate result emission, or a buffered accept that
         // lands right after a reconnect snapshot already hydrated this word,
@@ -409,7 +398,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       clearTimeout(retryTimer);
       clearTimeout(timeoutTimer);
     };
-  }, [socket, flash]);
+  }, [socket, flash, verdicts]);
 
   const ftue = useStuckCoach({
     mode: 'wheelRush',
@@ -436,24 +425,18 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     if (!socket || !puzzle || builtLetters.length === 0) return;
     const word = builtWord.toUpperCase();
 
-    if (word.length < MIN_LEN) {
-      flash('err', t('wordWheel.tooShort', { min: MIN_LEN }));
-      playWordRejectedSound();
-      return;
-    }
-    if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      flash('err', t('wordWheel.missingCenter', { letter: puzzle.centerLetter }));
-      playWordRejectedSound();
-      return;
-    }
-    if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
-      flash('err', t('wordWheel.invalidLetters'));
-      playWordRejectedSound();
+    const reason = word.length < MIN_LEN ? 'too-short'
+      : !word.includes(puzzle.centerLetter.toUpperCase()) ? 'no-center'
+      : !isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters) ? 'bad-letters'
+      : null;
+    if (reason) {
+      const v = verdicts.reject(word, reason, { min: MIN_LEN, letter: puzzle.centerLetter });
+      flash('err', v.message, v.durationMs);
       return;
     }
 
     socket.emit('submitWheelWord', { word });
-  }, [socket, puzzle, builtLetters.length, builtWord, flash, t, playWordRejectedSound]);
+  }, [socket, puzzle, builtLetters.length, builtWord, flash, verdicts]);
 
   // Keep submit ref fresh so handlePointerUp can reach the latest closure without re-binding pointer handlers.
   useEffect(() => { handleSubmitRef.current = handleSubmit; }, [handleSubmit]);
@@ -551,9 +534,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         </div>
       )}
 
-      {/* Live region for screen readers — repeats the transient visual feedback. */}
+      {/* Points only: rejections are read by the shared announcer. */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {feedback ? feedback.msg : ''}
+        {feedback?.type === 'ok' ? feedback.msg : ''}
       </div>
 
       {/* Word builder (shared shake + motion). Fixed height (not min-h) mirrors

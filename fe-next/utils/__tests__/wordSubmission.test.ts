@@ -32,7 +32,7 @@ describe('Word Submission Logic', () => {
       const foundWords = [{ word: 'cat', isValid: true }];
       const result = validateWordLocally('cat', 'en', 2, foundWords);
       expect(result.isValid).toBe(false);
-      expect(result.errorKey).toBe('playerView.wordAlreadyFound');
+      expect(result.errorKey).toBe('wordVerdict.alreadyFound');
     });
   });
 

@@ -163,7 +163,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     setGameActive: setSoundGameActive,
   } = useSoundEffects();
 
-  const { announceWordResult, announceTimer } = useAnnouncer();
+  const { announceTimer } = useAnnouncer();
 
   /**
    * Am I a student inside a teacher's class session? Decides whether the live
@@ -557,7 +557,6 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     comboLevelRef: effectiveComboLevelRef,
     t,
     playWordRejectedSound,
-    announceWordResult,
     onWordSubmit,
     onResetCombo,
     setCurrentFeedback,
@@ -603,6 +602,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     playWordRejectedSound,
     playWordLengthSound,
     onWordAccepted: bumpAccepted,
+    minWordLength,
   });
 
   // Keyboard word input

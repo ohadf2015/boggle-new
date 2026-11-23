@@ -1,5 +1,19 @@
 // HE translations
 const he = {
+  "wordVerdict": {
+    "tooShort": "קצר מדי: לפחות {min} אותיות",
+    "tooLong": "ארוך מדי: עד {max} אותיות",
+    "missingCenter": "חובה להשתמש באות {letter}",
+    "badLetters": "רק אותיות מהמשחק",
+    "notOnBoard": "לא על הלוח",
+    "notOnBoardAgain": "האותיות צריכות לגעת זו בזו",
+    "notAWord": "לא במילון שלנו",
+    "notAWordAgain": "עדיין לא מילה. אולי מילה אחרת?",
+    "alreadyFound": "המילה הזאת כבר נמצאה",
+    "cantCheck": "לא הצלחנו לבדוק. שוב?",
+    "inappropriate": "אולי מילה אחרת?",
+    "withPenalty": "{reason}, מינוס {n}",
+  },
   // @avatarChest:start
   "avatarChest": {
     "kicker": "מציאה מהתיבה!",
@@ -5716,7 +5730,6 @@ const he = {
     "gotIt": "הבנתי"
   },
   "playerView": {
-    "onlyLanguageWords": "השתמשו רק באותיות של השפה הזו",
     "wordsFound": "מילים שנמצאו",
     "getReadyHint": "סרקו את הלוח!",
     "wordsOnBoard": "מילים על הלוח",
@@ -5725,9 +5738,7 @@ const he = {
     "remaining": "נותר",
     "found": "נמצאו",
     "total": "סה\"כ",
-    "wordAlreadyFound": "כבר מצאתם את המילה ❌",
     "foundByOther": "נמצא על ידי ${player}",
-    "wordNotOnBoard": "המילה לא על הלוח 🚫",
     "wordNotInList": "המילה לא זמינה",
     "roomClosed": "החדר נסגר",
     "exitConfirmation": "לצאת מהחדר?",
@@ -5741,7 +5752,6 @@ const he = {
     "leaderboard": "טבלת המובילים",
     "noPlayersYet": "אין שחקנים עדיין",
     "wordTooShort": "מילה קצרה מדי (מינימום 2 אותיות)",
-    "wordTooShortMin": "מילה קצרה מדי (מינימום {min} אותיות)",
     "errorOccurred": "נסו שוב",
     "tooFast": "שולחים מהר מדי, האטו",
     "me": "אני",
@@ -5770,10 +5780,6 @@ const he = {
     "slowDown": "לאט, המילים שלכם עוד בבדיקה.",
     "submittingTooFast": "שולחים מילים מהר מדי",
     "words": "מילים",
-    "alreadyFound": "כבר נמצא",
-    "invalidWord": "מילה לא חוקית",
-    "wordCheckUnavailable": "לא הצלחנו לבדוק את המילה. נסו שוב",
-    "notInDictionary": "לא במילון",
     "pendingValidation": "בבדיקה...",
     "swipeHintWithMin": "החליקו על האותיות כדי למצוא מילים (מינימום {min} אותיות)",
     "longWordsLabel": "מילים ארוכות",
@@ -10381,12 +10387,7 @@ const he = {
     "closeRace": "מרוץ צמוד!",
     "gameOver": "הזמן נגמר!",
     "submit": "שלחו",
-    "alreadyFound": "כבר נמצאה!",
     "alreadyFoundBonus": "נמצאה שוב (+{points})",
-    "notInDictionary": "מילה לא חוקית",
-    "missingCenter": "חובה לכלול את האות המרכזית ({letter})",
-    "tooShort": "קצר מדי (מינימום {min} אותיות)",
-    "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
     "allLettersUsed": "כל האותיות!",
     "almostAllLetters": "כמעט הכל!",
     "missingLetter": "חסרה: {letter}",
@@ -10476,7 +10477,6 @@ const he = {
 "notWord": "זו לא מילה. נסו {word}",
 "check": "בדיקה"
 },
-"cantCheck": "לא הצלחנו לבדוק את המילה. נסו שוב",
 "quitKeepsWords": "המילים שמצאתם עד עכשיו ייחשבו כתוצאה של היום.",
 "goldLetterLabel": "אות זהב",
 "comboLabel": "קומבו {value}",
@@ -10573,14 +10573,6 @@ const he = {
     "quitConfirmTitle": "לעזוב את הציד?",
     "quitConfirmMessage": "ההתקדמות שלכם תלך לאיבוד",
     "feedback": {
-      "tooShort": "📏 לפחות 3 אותיות",
-      "tooLong": "📏 מקסימום 8 אותיות",
-      "duplicate": "🔁 כבר נמצאה!",
-      "notOnBoardPenalty": "לא על הלוח",
-      "notFormablePenalty": "לא על הלוח",
-      "notInDictionary": "לא מילה",
-      "notInDictionaryFree": "📖 לא מילה. נסו אחרת",
-      "notOnBoardFree": "⚠️ לא על הלוח. האותיות צריכות לגעת זו בזו",
       "correct": "נכון",
       "wrongPlace": "מקום לא נכון",
       "notInWord": "לא במילה"

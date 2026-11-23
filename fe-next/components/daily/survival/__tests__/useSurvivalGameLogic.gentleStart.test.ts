@@ -91,7 +91,7 @@ describe('useSurvivalGameLogic gentleStart', () => {
     const { result } = renderHook(() => useSurvivalGameLogic({ ...baseProps, gentleStart: true }));
     await submit(result, 'AAA');
     expect(result.current[0].feedbackType).toBe('not-in-dictionary');
-    expect(result.current[0].feedbackMessage).toBe('wordHunt.feedback.notInDictionaryFree');
+    expect(result.current[0].feedbackMessage).toBe('wordVerdict.notAWord');
     expect(result.current[0].lifePoints).toBe(100);
   });
 

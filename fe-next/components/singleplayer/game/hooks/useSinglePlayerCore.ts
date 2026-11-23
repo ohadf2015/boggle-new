@@ -23,7 +23,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
 import { wordErrorToast } from '@/components/NeoToast';
 import { awardComboCoins } from '@/utils/coinManager';
-import { hapticForWordScore, hapticError } from '@/utils/haptics';
+import { hapticForWordScore } from '@/utils/haptics';
 import { recordNotInDictionary } from '@/utils/invalidWordTracker';
 import { useDictionaryCache } from '@/hooks/useDictionaryCache';
 import { resolveWordVerdict } from '@/lib/dictionary/checkWordRemote';
@@ -46,7 +46,9 @@ import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
 import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
-import { soloResultFromErrorKey, useSoloJuice } from './useSoloJuice';
+import { soloResultFromReason, useSoloJuice } from './useSoloJuice';
+import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
+import type { VerdictParams, WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
 import { trackGrowthEvent, markFirstGameActivation } from '@/utils/growthTracking';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
@@ -149,6 +151,7 @@ export function useSinglePlayerCore({
 
   // Core game state
   const [grid, setGrid] = useState<LetterGrid | null>(null);
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: grid });
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -372,45 +375,23 @@ export function useSinglePlayerCore({
       wordErrorToast(t('playerView.submittingTooFast', 'Submitting too fast!'), { duration: 1500 });
     }
 
+    const rejectAs = (reason: WordVerdictReason, params?: VerdictParams, shown = normalizedWord) => {
+      const v = verdicts.reject(normalizedWord, reason, params);
+      setCurrentFeedback({ id: `reject-${now}`, type: reason === 'cant-check' ? 'duplicate' : 'rejected', word: shown, message: v.message, timestamp: now, durationMs: v.durationMs, announced: true });
+      if (reason !== 'cant-check') combo.resetCombo();
+    };
+    const missAs = (reason: WordVerdictReason, params?: VerdictParams) => {
+      rejectAs(reason, params);
+      soloJuiceRef.current.onResult({ result: soloResultFromReason(reason), word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
+    };
+
     const localValidation = validateWordLocally(normalizedWord, settings.language, minWordLength, foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid })));
-    if (!localValidation.isValid) {
-      const errorKey = localValidation.errorKey ?? 'Invalid word';
-      const params = localValidation.errorParams?.min
-        ? { min: String(localValidation.errorParams.min) }
-        : undefined;
-      const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;
-      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: msg, timestamp: now });
-      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, msg); combo.resetCombo();
-      soloJuiceRef.current.onResult({
-        result: soloResultFromErrorKey(localValidation.errorKey), word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now,
-      });
-      return;
-    }
+    if (!localValidation.isValid) return missAs(localValidation.reason ?? 'not-a-word', localValidation.errorParams);
 
     const currentGrid = gridRef.current;
-    if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Not on board');
-      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notOnBoardMsg, timestamp: now });
-      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notOnBoardMsg); combo.resetCombo();
-      soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
-      return;
-    }
-
-    if (isWordShapeWeird(normalizedWord, settings.language).weird) {
-      const notAWordMsg = t('playerView.invalidWord', 'Not a word');
-      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: notAWordMsg, timestamp: now });
-      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, notAWordMsg); combo.resetCombo();
-      soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
-      return;
-    }
-
-    if (foundWordsSetRef.current.has(normalizedWord)) {
-      const alreadyFoundMsg = t('playerView.wordAlreadyFound', 'Already found!');
-      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord, message: alreadyFoundMsg, timestamp: now });
-      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg); combo.resetCombo();
-      soloJuiceRef.current.onResult({ result: 'dup', word: normalizedWord, basePts: 0, elapsedSec: 0, nowMs: now });
-      return;
-    }
+    if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, settings.language)) return missAs('not-on-board');
+    if (isWordShapeWeird(normalizedWord, settings.language).weird) return missAs('not-a-word');
+    if (foundWordsSetRef.current.has(normalizedWord)) return missAs('already-found');
 
     foundWordsSetRef.current.add(normalizedWord);
     const currentCombo = combo.comboLevelRef.current;
@@ -425,6 +406,7 @@ export function useSinglePlayerCore({
 
     // Helper: Handle accepted word (extracted for reuse)
     const handleValidWord = () => {
+      verdicts.clearRepeat();
       const comboBonus = calculateComboBonus(currentCombo, normalizedWord.length);
       const scoreWithoutMultiplier = canonicalWordScore(normalizedWord, currentCombo, 1);
       const multiplier = getScoreMultiplier();
@@ -493,16 +475,13 @@ export function useSinglePlayerCore({
 
     // Helper: Handle invalid word (not in dictionary)
     const handleInvalidWord = () => {
-      combo.resetCombo();
       soloJuiceRef.current.onResult({ result: 'invalid', word: normalizedWord, basePts: 0, elapsedSec: timeSinceStart, nowMs: now });
       foundWordsRef.current = foundWordsRef.current.map(fw =>
         fw.word === normalizedWord && fw.timestamp === now ? { ...fw, isValid: false, score: 0 } : fw
       );
       setFoundWords(foundWordsRef.current);
       wordPace.recordWord();
-      const invalidMsg = t('playerView.invalidWord', 'Not a word');
-      setCurrentFeedback({ id: `reject-${now}`, type: 'rejected', word: normalizedWord.toUpperCase(), message: invalidMsg, timestamp: now });
-      playWordRejectedSound(); hapticError(); announceWordResult(normalizedWord, false, undefined, invalidMsg);
+      rejectAs('not-a-word', undefined, normalizedWord.toUpperCase());
       recordNotInDictionary(normalizedWord, settings.language, 'single_player');
     };
 
@@ -518,9 +497,7 @@ export function useSinglePlayerCore({
       foundWordsSetRef.current.delete(normalizedWord);
       foundWordsRef.current = foundWordsRef.current.filter(fw => !(fw.word === normalizedWord && fw.timestamp === now));
       setFoundWords(foundWordsRef.current);
-      const msg = t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again");
-      setCurrentFeedback({ id: `unchecked-${now}`, type: 'duplicate', word: normalizedWord.toUpperCase(), message: msg, timestamp: now });
-      announceWordResult(normalizedWord, false, undefined, msg);
+      rejectAs('cant-check', undefined, normalizedWord.toUpperCase());
     };
 
     void resolveWordVerdict(normalizedWord, settings.language).then(verdict => {
@@ -528,7 +505,7 @@ export function useSinglePlayerCore({
       else if (verdict === 'invalid') handleInvalidWord();
       else handleUncheckedWord();
     });
-  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, playWordAcceptedSound, playWordRejectedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace, isDictionaryCacheLoaded, checkWordInCache]);
+  }, [settings.language, settings.minWordLength, settings.timerSeconds, foundWords, t, verdicts, playWordAcceptedSound, playComboSound, announceWordResult, announceCombo, combo, getScoreMultiplier, fireRoundActive, calculateWordScoreLocal, trainingAnalysisTrackValidWord, trainingTrackValidWord, checkSubmission, effects.gameStartTimeRef, effects.lastWordFoundTimeRef, wordPace, isDictionaryCacheLoaded, checkWordInCache]);
 
   const keyboardInput = useKeyboardWordInput({
     grid: grid || ([] as LetterGrid), language: settings.language, gameLanguage: settings.language,

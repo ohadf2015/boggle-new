@@ -21,6 +21,7 @@ import { PlayerStyleProvider } from '@/contexts/PlayerStyleContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
 import { HapticsProvider } from '@/contexts/HapticsContext';
 import { CoinProvider } from '@/contexts/CoinContext';
+import { GameAnnouncerProvider } from '@/components/GameAnnouncer';
 import { CrazyGamesProvider } from '@/components/CrazyGamesSDK';
 import { Toaster } from 'react-hot-toast';
 import { globalToastStyle } from '@/lib/toast/toastStyle';
@@ -292,7 +293,7 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                         <HapticsProvider>
                                             <AdMobProvider>
                                             <NavigationProvider>
-                                                {memoizedChildren}
+                                                <GameAnnouncerProvider>{memoizedChildren}</GameAnnouncerProvider>
                                                 {/* Mute FAB during gameplay. Was a static layout import
                                                     which put lucide + NavigationContext consumers on every
                                                     /singleplayer first-load chunk. Lives here so it only

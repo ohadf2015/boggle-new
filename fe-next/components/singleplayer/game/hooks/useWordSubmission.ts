@@ -15,6 +15,7 @@ import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { LetterGrid, Language } from '@/shared/types/game';
 import type { ComboSystemReturn } from '@/hooks/useComboSystem';
 import type { UseSpamDetectionReturn } from './useSpamDetection';
+import { verdictMessage, wordVerdict } from '@/lib/wordVerdict/wordVerdict';
 
 interface FoundWord {
   word: string;
@@ -192,35 +193,33 @@ export function useWordSubmission({
     );
 
     if (!localValidation.isValid) {
-      const errorKey = localValidation.errorKey ?? 'Invalid word';
-      const params = localValidation.errorParams?.min
-        ? { min: String(localValidation.errorParams.min) }
-        : undefined;
-      const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;
+      const msg = verdictMessage(t, wordVerdict(localValidation.reason ?? 'not-a-word', localValidation.errorParams));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
         message: msg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, msg);
       combo.resetCombo();
-      emitMascotEvent({ kind: errorKey === 'playerView.wordAlreadyFound' ? 'duplicate-word' : 'word-rejected' });
+      emitMascotEvent({ kind: localValidation.reason === 'already-found' ? 'duplicate-word' : 'word-rejected' });
       return;
     }
 
     // Step 2: Check if word exists on board
     const currentGrid = gridRef.current;
     if (!currentGrid || !isWordOnBoard(normalizedWord, currentGrid, language)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard', 'Not on board');
+      const notOnBoardMsg = verdictMessage(t, wordVerdict('not-on-board'));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
         message: notOnBoardMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
@@ -232,13 +231,14 @@ export function useWordSubmission({
 
     // On the board, but not a word (aaa and other shape-weird strings). Never score.
     if (isWordShapeWeird(normalizedWord, language).weird) {
-      const notAWordMsg = t('playerView.invalidWord', 'Not a word');
+      const notAWordMsg = verdictMessage(t, wordVerdict('not-a-word'));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
         message: notAWordMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notAWordMsg);
@@ -249,13 +249,14 @@ export function useWordSubmission({
 
     // Step 3: Check for duplicates
     if (foundWordsSetRef.current.has(normalizedWord)) {
-      const alreadyFoundMsg = t('playerView.wordAlreadyFound', 'Already found!');
+      const alreadyFoundMsg = verdictMessage(t, wordVerdict('already-found'));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord,
         message: alreadyFoundMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
@@ -355,13 +356,14 @@ export function useWordSubmission({
       );
       setFoundWords(foundWordsRef.current);
 
-      const invalidMsg = t('playerView.invalidWord', 'Not a word');
+      const invalidMsg = verdictMessage(t, wordVerdict('not-a-word'));
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
         word: normalizedWord.toUpperCase(),
         message: invalidMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, invalidMsg);
@@ -394,13 +396,14 @@ export function useWordSubmission({
       foundWordsSetRef.current.delete(normalizedWord);
       foundWordsRef.current = foundWordsRef.current.filter(fw => !(fw.word === normalizedWord && fw.timestamp === now));
       setFoundWords(foundWordsRef.current);
-      const msg = t('playerView.wordCheckUnavailable', "Couldn't check that word. Try again");
+      const msg = verdictMessage(t, wordVerdict('cant-check'));
       setCurrentFeedback({
         id: `unchecked-${now}`,
         type: 'duplicate',
         word: normalizedWord.toUpperCase(),
         message: msg,
         timestamp: now,
+        announced: true,
       });
       announceWordResult(normalizedWord, false, undefined, msg);
     };

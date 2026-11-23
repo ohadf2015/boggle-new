@@ -1,5 +1,19 @@
 // RU translations
 const ru = {
+  "wordVerdict": {
+    "tooShort": "Коротко: от {min} букв",
+    "tooLong": "Длинно: до {max} букв",
+    "missingCenter": "Нужна буква {letter} в центре",
+    "badLetters": "Только буквы из игры",
+    "notOnBoard": "Нет на доске",
+    "notOnBoardAgain": "Буквы должны соприкасаться",
+    "notAWord": "Нет в нашем словаре",
+    "notAWordAgain": "Всё ещё не слово. Попробуй другое",
+    "alreadyFound": "Это слово уже найдено",
+    "cantCheck": "Не вышло проверить. Ещё раз?",
+    "inappropriate": "Выбери другое слово",
+    "withPenalty": "{reason} −{n}",
+  },
   // @avatarChest:start
   "avatarChest": {
     "kicker": "Находка из сундука!",
@@ -2544,14 +2558,6 @@ const ru = {
     "quitConfirmTitle": "Покинуть охоту?",
     "quitConfirmMessage": "Прогресс пропадёт.",
     "feedback": {
-      "tooShort": "📏 Минимум 3 буквы",
-      "tooLong": "📏 Максимум 8 букв",
-      "duplicate": "🔁 Уже найдено!",
-      "notOnBoardPenalty": "Не на доске",
-      "notFormablePenalty": "Не на доске",
-      "notInDictionary": "Не слово",
-      "notInDictionaryFree": "📖 Не слово. Попробуй другое",
-      "notOnBoardFree": "⚠️ Не на доске. Буквы должны соприкасаться",
       "correct": "Верно",
       "wrongPlace": "Не на том месте",
       "notInWord": "Не в слове"
@@ -10820,7 +10826,6 @@ const ru = {
     "everyoneVoting": "Все голосуют..."
   },
   "playerView": {
-    "onlyLanguageWords": "Используй только буквы этого языка",
     "getReadyHint": "Изучай сетку",
     "wordsFound": "Найдено слов",
     "wordsOnBoard": "Слов на сетке",
@@ -10829,10 +10834,7 @@ const ru = {
     "remaining": "Осталось",
     "found": "найдено",
     "total": "всего",
-    "wordAlreadyFound": "Слово уже найдено ❌",
     "foundByOther": "Найдено ${player}",
-    "alreadyFound": "Уже найдено",
-    "wordNotOnBoard": "Нет на сетке 🚫",
     "wordNotInList": "Слово недоступно",
     "roomClosed": "Комната закрыта",
     "exitConfirmation": "Выйти из комнаты?",
@@ -10846,7 +10848,6 @@ const ru = {
     "leaderboard": "Таблица лидеров",
     "noPlayersYet": "Игроков ещё нет",
     "wordTooShort": "Слишком короткое: нужно от 2 букв",
-    "wordTooShortMin": "Слишком короткое слово (мин. {min} букв)",
     "errorOccurred": "Не вышло. Попробуй ещё раз",
     "tooFast": "Слишком быстро. Помедленнее",
     "me": "Я",
@@ -10879,9 +10880,6 @@ const ru = {
     "slowDown": "Не так быстро, спринтер! Ещё считаю твои слова.",
     "submittingTooFast": "Стоп! Медленнее.",
     "words": "Слова",
-    "invalidWord": "Недопустимое слово",
-    "wordCheckUnavailable": "Не удалось проверить слово. Попробуйте ещё раз",
-    "notInDictionary": "Не в словаре",
     "pendingValidation": "Проверяется...",
     "validation": {
       "scanning": "Ловлю подделки...",
@@ -17508,12 +17506,7 @@ const ru = {
     "closeRace": "Гонка почти равна!",
     "gameOver": "Время вышло!",
     "submit": "ОТПРАВИТЬ",
-    "alreadyFound": "Уже найдено!",
     "alreadyFoundBonus": "Найдено снова (+{points})",
-    "notInDictionary": "Слово не в словаре",
-    "missingCenter": "Нужна центральная буква ({letter})",
-    "tooShort": "Слишком коротко (мин {min} букв)",
-    "invalidLetters": "Можно использовать только буквы колеса",
     "allLettersUsed": "ВСЕ БУКВЫ!",
     "almostAllLetters": "ПОЧТИ ВСЕ!",
     "missingLetter": "Не хватает: {letter}",
@@ -17603,7 +17596,6 @@ const ru = {
 "notWord": "Такого слова нет. Попробуйте {word}",
 "check": "Проверить"
 },
-"cantCheck": "Не удалось проверить слово. Попробуйте ещё раз",
 "quitKeepsWords": "Слова, которые вы уже нашли, засчитаются как сегодняшний результат.",
 "goldLetterLabel": "золотая буква",
 "comboLabel": "Комбо {value}",
