@@ -16,3 +16,20 @@ describe('hero play CTA experiment', () => {
     expect(HERO_PLAY_CTA_KEY).toBe('lexiclash-hero-play-cta');
   });
 });
+
+import { entryPlayNowHref } from '../heroPlayCta';
+
+describe('entry pages under the hero CTA test', () => {
+  it('maps listed SEO entry pages in any locale to the coached first game', () => {
+    expect(entryPlayNowHref('/en/online-word-games-with-friends', 'en')).toBe('/en/quick-play?mode=classic&coach=1');
+    expect(entryPlayNowHref('/es/juego-de-palabras-multijugador/', 'es')).toBe('/es/quick-play?mode=classic&coach=1');
+  });
+  it('sends the daily wheel landing page to today\'s wheel', () => {
+    expect(entryPlayNowHref('/he/daily-word-wheel', 'he')).toBe('/he/daily/word-wheel');
+  });
+  it('leaves every other page alone, education included', () => {
+    for (const p of ['/en', '/', '/en/multiplayer', '/en/education', '/en/teacher', '/en/education/classroom-game', '/he/daily/word-wheel', null]) {
+      expect(entryPlayNowHref(p, 'en')).toBeNull();
+    }
+  });
+});
