@@ -11,6 +11,8 @@ const ru = {
     "notAWordAgain": "Всё ещё не слово. Попробуй другое",
     "alreadyFound": "Это слово уже найдено",
     "cantCheck": "Не вышло проверить. Ещё раз?",
+    "inappropriate": "Выбери другое слово",
+    "withPenalty": "{reason} −{n}",
   },
   // @avatarChest:start
   "avatarChest": {

@@ -9,7 +9,8 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { hapticError, hapticWordAccepted } from '@/utils/haptics';
 import { MIN_WORD_LENGTH } from '@/shared/constants/gameConstants';
 import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
-import { reasonFromCode, type VerdictParams, type WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
+import { noticeFromCode, reasonFromCode, type VerdictParams, type WordVerdictReason } from '@/lib/wordVerdict/wordVerdict';
+import { useAnnouncer } from '@/components/GameAnnouncer';
 import { countActiveGameWord } from '@/utils/abandonOnPagehide';
 
 interface UseSocketFeedbackOptions {
@@ -46,20 +47,22 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
     onWordAccepted,
     minWordLength = MIN_WORD_LENGTH,
   } = options;
-  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: isPlaying });
+  const { announceWordResult } = useAnnouncer();
 
   useEffect(() => {
     if (!socket || !isPlaying) return;
 
-    const showVerdict = (word: string, reason: WordVerdictReason, params?: VerdictParams): void => {
+    const showVerdict = (word: string, reason: WordVerdictReason, params?: VerdictParams, type: 'rejected' | 'duplicate' = reason === 'cant-check' ? 'duplicate' : 'rejected'): void => {
       emitMascotEvent({ kind: reason === 'already-found' ? 'duplicate-word' : 'word-rejected' });
       const v = verdicts.reject(word, reason, params);
       setCurrentFeedback({
-        id: `${v.tone === 'error' ? 'rejected' : 'duplicate'}-${Date.now()}`,
-        type: v.tone === 'error' ? 'rejected' : 'duplicate',
+        id: `${type}-${Date.now()}`,
+        type,
         word,
         message: v.message,
         durationMs: v.durationMs,
+        announced: true,
         timestamp: Date.now(),
       });
     };
@@ -110,18 +113,28 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       }
     };
 
-    const handleWordAlreadyFound = (data: { word: string }): void => showVerdict(data.word, 'already-found');
+    const handleWordAlreadyFound = (data: { word: string }): void => showVerdict(data.word, 'already-found', undefined, 'duplicate');
 
     const handleWordRejected = (data: { word: string; reason?: string }): void => {
-      if (data.reason === 'boss_frozen') {
+      const notice = noticeFromCode(data.reason);
+      if (notice === 'paused') return;
+      if (notice === 'slow-down') {
+        const message = t('playerView.slowDown');
+        setCurrentFeedback({ id: `duplicate-${Date.now()}`, type: 'duplicate', word: data.word, message, announced: true, timestamp: Date.now() });
+        announceWordResult(data.word.toUpperCase(), false, undefined, message);
+        return;
+      }
+      if (notice === 'frozen') {
         emitMascotEvent({ kind: 'word-rejected' });
         setCurrentFeedback({
           id: `rejected-${Date.now()}`,
           type: 'rejected',
           word: data.word,
           message: t('classroomBoss.frozenRejected'),
+          announced: true,
           timestamp: Date.now(),
         });
+        announceWordResult(data.word.toUpperCase(), false, undefined, t('classroomBoss.frozenRejected'));
         playWordRejectedSound();
         hapticError();
         return;
@@ -172,5 +185,5 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       socket.off('wordNotOnBoard', handleWordNotOnBoard);
       socket.off('wordTooShort', handleWordTooShort);
     };
-  }, [socket, isPlaying, t, verdicts, minWordLength, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound, playWordLengthSound, onWordAccepted]);
+  }, [socket, isPlaying, t, verdicts, announceWordResult, minWordLength, setCurrentFeedback, setLastWordFoundTime, playWordAcceptedSound, playWordRejectedSound, playWordLengthSound, onWordAccepted]);
 }

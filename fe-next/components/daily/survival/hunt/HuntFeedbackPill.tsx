@@ -22,7 +22,7 @@ function tone(type: FeedbackType): string {
   return 'bg-neo-red/15 text-neo-red';
 }
 
-const ANNOUNCED_ELSEWHERE: ReadonlySet<FeedbackType> = new Set(['too-short', 'too-long', 'not-on-board', 'not-in-dictionary', 'invalid-word', 'duplicate', 'unavailable']);
+const ANNOUNCED_ELSEWHERE: ReadonlySet<FeedbackType> = new Set(['too-short', 'too-long', 'not-on-board', 'not-in-dictionary', 'duplicate', 'unavailable']);
 
 /** Keyed by seq with no exit: a new result swaps in the same frame instead of queueing behind the old one. */
 export function HuntFeedbackPill({ seq, type, message, word, calm }: HuntFeedbackPillProps) {

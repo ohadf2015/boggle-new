@@ -43,4 +43,9 @@ describe('HuntFeedbackPill', () => {
     rerender(<HuntFeedbackPill seq={2} type="valid-word" message="+3 life" word="CAT" calm />);
     expect(screen.getByTestId('hunt-feedback-pill')).toHaveAttribute('role', 'status');
   });
+
+  it('Given a rejection nothing else announces (invalid-word), Then the pill still speaks it', () => {
+    render(<HuntFeedbackPill seq={1} type="invalid-word" message="Not a word" word="QZX" calm />);
+    expect(screen.getByTestId('hunt-feedback-pill')).toHaveAttribute('role', 'status');
+  });
 });

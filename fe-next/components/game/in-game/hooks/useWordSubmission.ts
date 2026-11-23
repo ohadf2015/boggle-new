@@ -71,7 +71,7 @@ export function useWordSubmission(
     clientAuthoritative = false,
     comboTypeRef,
   } = options;
-  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: letterGrid });
 
   // Track current fireRoundActive value via ref for use in callbacks
   // This ensures the socket emit uses the latest value without waiting for re-render
@@ -131,6 +131,7 @@ export function useWordSubmission(
         word: formedWord,
         message: v.message,
         durationMs: v.durationMs,
+        announced: true,
         timestamp: Date.now(),
       });
       if (reason === 'already-found') onResetCombo?.();
@@ -145,6 +146,7 @@ export function useWordSubmission(
         word: formedWord,
         message: v.message,
         durationMs: v.durationMs,
+        announced: true,
         timestamp: Date.now(),
       });
       return;

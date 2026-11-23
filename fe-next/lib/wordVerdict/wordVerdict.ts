@@ -1,9 +1,9 @@
 export const WORD_VERDICT_REASONS = [
-  'too-short', 'too-long', 'no-center', 'bad-letters', 'not-on-board', 'not-a-word', 'already-found', 'cant-check',
+  'too-short', 'too-long', 'no-center', 'bad-letters', 'not-on-board', 'not-a-word', 'already-found', 'cant-check', 'inappropriate',
 ] as const;
 export type WordVerdictReason = typeof WORD_VERDICT_REASONS[number];
 
-export type VerdictParams = { min?: number | string; max?: number | string; letter?: string };
+export type VerdictParams = { min?: number | string; max?: number | string; letter?: string; penalty?: number };
 export type VerdictTone = 'error' | 'soft' | 'warn';
 
 export interface WordVerdict {
@@ -12,7 +12,7 @@ export interface WordVerdict {
   params: VerdictParams;
   tone: VerdictTone;
   sound: boolean;
-  haptic: 'error' | 'tap' | null;
+  haptic: 'error' | null;
   durationMs: number;
   repeat: boolean;
 }
@@ -29,6 +29,7 @@ const KEY: Record<WordVerdictReason, string> = {
   'not-a-word': 'wordVerdict.notAWord',
   'already-found': 'wordVerdict.alreadyFound',
   'cant-check': 'wordVerdict.cantCheck',
+  inappropriate: 'wordVerdict.inappropriate',
 };
 
 const AGAIN_KEY: Partial<Record<WordVerdictReason, string>> = {
@@ -42,12 +43,26 @@ const CODE_REASON: Record<string, WordVerdictReason> = {
   not_on_board: 'not-on-board',
   too_short: 'too-short',
   duplicate: 'already-found',
+  error: 'cant-check',
 };
+
+/** Server codes that are not about the word itself; never shown as a word verdict. */
+export type ServerNotice = 'slow-down' | 'paused' | 'frozen';
+const CODE_NOTICE: Record<string, ServerNotice> = { rate_limited: 'slow-down', paused: 'paused', frozen: 'frozen', boss_frozen: 'frozen' };
+
+export function noticeFromCode(code: string | undefined | null): ServerNotice | null {
+  return code ? CODE_NOTICE[code] ?? null : null;
+}
 
 const TONE: Record<WordVerdictReason, VerdictTone> = {
   'too-short': 'error', 'too-long': 'error', 'no-center': 'error', 'bad-letters': 'error',
-  'not-on-board': 'error', 'not-a-word': 'error', 'already-found': 'soft', 'cant-check': 'warn',
+  'not-on-board': 'error', 'not-a-word': 'error', 'already-found': 'soft', 'cant-check': 'warn', inappropriate: 'error',
 };
+
+/** Reasons a second identical miss can escalate; a failed check or a blocked word never does. */
+export function canEscalate(reason: WordVerdictReason): boolean {
+  return reason !== 'cant-check' && reason !== 'inappropriate';
+}
 
 const PARAM: Partial<Record<WordVerdictReason, keyof VerdictParams>> = { 'too-short': 'min', 'too-long': 'max', 'no-center': 'letter' };
 
@@ -56,10 +71,10 @@ export function wordVerdict(reason: WordVerdictReason, params: VerdictParams = {
   return {
     reason,
     key: (repeat && AGAIN_KEY[reason]) || KEY[reason],
-    params: PARAM[reason] ? { [PARAM[reason]!]: params[PARAM[reason]!] } : {},
+    params: { ...(PARAM[reason] ? { [PARAM[reason]!]: params[PARAM[reason]!] } : {}), ...(params.penalty ? { penalty: params.penalty } : {}) },
     tone,
-    sound: tone === 'error',
-    haptic: tone === 'error' ? 'error' : tone === 'soft' ? 'tap' : null,
+    sound: tone !== 'warn',
+    haptic: tone === 'warn' ? null : 'error',
     durationMs: repeat ? VERDICT_REPEAT_MS : VERDICT_MS,
     repeat,
   };
@@ -68,8 +83,10 @@ export function wordVerdict(reason: WordVerdictReason, params: VerdictParams = {
 type Translate = (key: string, params?: Record<string, string | number>) => string | undefined;
 
 export function verdictMessage(t: Translate, verdict: Pick<WordVerdict, 'key' | 'params'>): string {
-  const params = Object.fromEntries(Object.entries(verdict.params).filter(([, v]) => v !== undefined)) as Record<string, string | number>;
-  return (Object.keys(params).length ? t(verdict.key, params) : t(verdict.key)) ?? verdict.key;
+  const { penalty, ...rest } = verdict.params;
+  const params = Object.fromEntries(Object.entries(rest).filter(([, v]) => v !== undefined)) as Record<string, string | number>;
+  const reason = (Object.keys(params).length ? t(verdict.key, params) : t(verdict.key)) ?? verdict.key;
+  return penalty ? t('wordVerdict.withPenalty', { reason, n: penalty }) ?? reason : reason;
 }
 
 /** Server and mode codes (snake or kebab) onto a reason; null for codes that are not word verdicts. */

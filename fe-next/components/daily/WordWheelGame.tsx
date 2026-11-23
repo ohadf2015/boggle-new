@@ -229,7 +229,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   });
 
   // ── Accept a word (score, list, effects) ──
-  const verdicts = useWordVerdict({ t });
+  const verdicts = useWordVerdict({ t, resetKey: puzzle });
   const acceptWord = useCallback((word: string, spelled: { letter: string; wheelIndex: number }[]) => {
     verdicts.clearRepeat();
     const cx = gameContainerRef.current ? gameContainerRef.current.getBoundingClientRect().width / 2 : 200;
@@ -288,7 +288,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     showRejection(spoken.message, kind, clear, spelled, spoken.durationMs);
     emitWheelVerdict(kind, word);
     if (kind === 'invalid') breakCombo();
-    if (!spoken.sound) return;
+    if (kind === 'found' || kind === 'unknown') return;
     afterPaint(() => {
       onEffect({ type: 'error', x: cx, y: 80 });
       playWordRejectedSound();

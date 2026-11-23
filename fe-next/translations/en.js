@@ -11,6 +11,8 @@ const en = {
     "notAWordAgain": "Still not a word. Try another",
     "alreadyFound": "You already found that one",
     "cantCheck": "Couldn't check it. Try again",
+    "inappropriate": "Pick a different word",
+    "withPenalty": "{reason} −{n}",
   },
   // @avatarChest:start
   "avatarChest": {

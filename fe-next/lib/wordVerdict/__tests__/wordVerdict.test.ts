@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { wordVerdict, verdictMessage, reasonFromCode, VERDICT_MS, VERDICT_REPEAT_MS, WORD_VERDICT_REASONS } from '../wordVerdict';
+import { wordVerdict, verdictMessage, reasonFromCode, noticeFromCode, VERDICT_MS, VERDICT_REPEAT_MS, WORD_VERDICT_REASONS } from '../wordVerdict';
 import { en } from '@/translations/en';
 import { he } from '@/translations/he';
 import { es } from '@/translations/es';
@@ -19,8 +19,8 @@ describe('wordVerdict', () => {
     expect(wordVerdict('too-short', { min: 3 })).toMatchObject({ tone: 'error', sound: true });
   });
 
-  it('given an already-found word, it is soft: no buzzer, a light tap', () => {
-    expect(wordVerdict('already-found')).toMatchObject({ tone: 'soft', sound: false, haptic: 'tap' });
+  it('given an already-found word, it keeps the reject sound and error haptic the modes had, in the soft tone', () => {
+    expect(wordVerdict('already-found')).toMatchObject({ tone: 'soft', sound: true, haptic: 'error' });
   });
 
   it('given a word that could not be checked, it only warns', () => {
@@ -52,11 +52,31 @@ describe('wordVerdict', () => {
   });
 
   it('every verdict key resolves to a string in all six locales', () => {
-    const keys = WORD_VERDICT_REASONS.flatMap(r => [wordVerdict(r).key, wordVerdict(r, {}, true).key]);
+    const keys = [...WORD_VERDICT_REASONS.flatMap(r => [wordVerdict(r).key, wordVerdict(r, {}, true).key]), 'wordVerdict.withPenalty'];
     for (const [name, dict] of Object.entries({ en, he, es, sv, ja, ru })) {
       for (const key of keys) {
         expect(typeof lookup(dict as Record<string, unknown>, key), `${name}:${key}`).toBe('string');
       }
     }
+  });
+
+  it('maps a server error to "could not check" and an inappropriate word to its own neutral reason', () => {
+    expect(reasonFromCode('error')).toBe('cant-check');
+    expect(reasonFromCode('inappropriate')).toBe('inappropriate');
+    expect(wordVerdict('inappropriate').key).toBe('wordVerdict.inappropriate');
+  });
+
+  it('keeps rate limits, pauses and freezes out of the word verdicts', () => {
+    for (const code of ['rate_limited', 'paused', 'frozen', 'boss_frozen']) expect(reasonFromCode(code)).toBeNull();
+    expect(noticeFromCode('rate_limited')).toBe('slow-down');
+    expect(noticeFromCode('paused')).toBe('paused');
+    expect(noticeFromCode('frozen')).toBe('frozen');
+    expect(noticeFromCode('boss_frozen')).toBe('frozen');
+    expect(noticeFromCode('not_in_dictionary')).toBeNull();
+  });
+
+  it('given a life cost, it appends the penalty to the reason', () => {
+    expect(verdictMessage(fakeT, wordVerdict('not-on-board', { penalty: 4 }))).toBe('wordVerdict.withPenalty{"reason":"wordVerdict.notOnBoard","n":4}');
+    expect(verdictMessage(fakeT, wordVerdict('not-a-word', { penalty: 0 }))).toBe('wordVerdict.notAWord');
   });
 });

@@ -120,7 +120,7 @@ describe('DailyWordHuntSurvival word feedback', () => {
     await waitFor(() => expect(screen.getByTestId('hunt-feedback-pill')).toBeInTheDocument());
     const pill = screen.getByTestId('hunt-feedback-pill');
     expect(pill.getAttribute('data-type')).toBe('not-on-board');
-    expect(pill.textContent).toContain('wordVerdict.notOnBoard');
+    expect(pill.textContent).toContain('wordVerdict.withPenalty');
     localStorage.removeItem('lexiclash_daily_challenge_progress');
   });
 
@@ -167,6 +167,7 @@ describe('DailyWordHuntSurvival word feedback', () => {
     fireEvent.keyDown(document, { key: 'Enter' });
     await waitFor(() => expect(screen.getByTestId('hunt-feedback-pill')).toBeInTheDocument());
     expect(screen.getByTestId('hunt-feedback-pill').textContent).toContain('wordVerdict.notOnBoard');
+    expect(screen.getByTestId('hunt-feedback-pill').textContent).not.toContain('withPenalty');
   });
 
   it('Given no word submitted yet, Then the pill row is reserved but empty so the board never jumps', () => {

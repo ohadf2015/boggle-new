@@ -11,6 +11,8 @@ const sv = {
     "notAWordAgain": "Fortfarande inget ord. Prova ett annat",
     "alreadyFound": "Det ordet har du redan",
     "cantCheck": "Kunde inte kolla. Försök igen",
+    "inappropriate": "Välj ett annat ord",
+    "withPenalty": "{reason} −{n}",
   },
   // @avatarChest:start
   "avatarChest": {

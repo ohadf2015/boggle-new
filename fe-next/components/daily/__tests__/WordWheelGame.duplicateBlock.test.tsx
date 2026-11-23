@@ -25,11 +25,12 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ language: 'en', t: (k: string) => k }),
 }));
 
+const rejectedSound = vi.hoisted(() => vi.fn());
 vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
     playTileSelectSound: vi.fn(),
     playWordAcceptedSound: vi.fn(),
-    playWordRejectedSound: vi.fn(),
+    playWordRejectedSound: rejectedSound,
     playComboSound: vi.fn(),
     playLegendaryWordSound: vi.fn(),
     playEpicVictorySound: vi.fn(),
@@ -130,6 +131,9 @@ describe('WordWheelGame — daily duplicate word is blocked', () => {
     // "repeat bonus" success toast.
     expect(screen.getByText('wordVerdict.alreadyFound')).toBeInTheDocument();
     expect(screen.queryByText('wordWheel.alreadyFoundBonus')).toBeNull();
+    // The daily wheel answers a repeat with its found-word pulse, never the reject buzzer.
+    await act(async () => { await new Promise(r => setTimeout(r, 200)); });
+    expect(rejectedSound).not.toHaveBeenCalled();
 
     // No points awarded for the duplicate — score is unchanged.
     expect(readScore(container)).toBe(5);

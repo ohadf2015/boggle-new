@@ -104,6 +104,27 @@ describe('useWordSubmission — solo board (socket=null, Quick Play classic)', (
     expect(options.onWordSubmit).not.toHaveBeenCalled();
   });
 
+  it('a duplicate keeps its duplicate pill and its buzz', () => {
+    mockValidateWordLocally.mockReturnValue({ isValid: false, reason: 'already-found', errorKey: 'wordVerdict.alreadyFound' });
+    const options = buildOptions();
+    const { result } = renderHook(() => useWordSubmission(options));
+    act(() => { result.current.handleGridWordSubmit('TEST'); });
+    expect(options.setCurrentFeedback).toHaveBeenCalledWith(expect.objectContaining({ type: 'duplicate', message: 'wordVerdict.alreadyFound' }));
+    expect(options.playWordRejectedSound).toHaveBeenCalledTimes(1);
+  });
+
+  it('a new board starts the repeat streak over', () => {
+    mockValidateWordLocally.mockReturnValue({ isValid: false, reason: 'already-found', errorKey: 'wordVerdict.alreadyFound' });
+    const options = buildOptions();
+    const { result, rerender } = renderHook((o) => useWordSubmission(o), { initialProps: options });
+    act(() => { result.current.handleGridWordSubmit('TEST'); });
+    act(() => { result.current.handleGridWordSubmit('TEST'); });
+    expect(options.setCurrentFeedback).toHaveBeenLastCalledWith(expect.objectContaining({ durationMs: 2600 }));
+    rerender({ ...options, letterGrid: [['A', 'B'], ['C', 'D']] as any });
+    act(() => { result.current.handleGridWordSubmit('TEST'); });
+    expect(options.setCurrentFeedback).toHaveBeenLastCalledWith(expect.objectContaining({ durationMs: 1600 }));
+  });
+
   it('still gates on gameActive — a finished round commits nothing', () => {
     const options = buildOptions({ gameActive: false });
     const { result } = renderHook(() => useWordSubmission(options));

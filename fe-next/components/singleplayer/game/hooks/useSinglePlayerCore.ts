@@ -140,7 +140,6 @@ export function useSinglePlayerCore({
     stopFireCrackleLoop, setGameActive,
   } = useSoundEffects();
   const { announceWordResult, announceCombo, announceTimer } = useAnnouncer();
-  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
   const { isLowEnd } = useDevicePerformance();
   const { isDesktop, isTv } = useDesktopLayout();
   const isGiftModalOpen = useGiftModalPause();
@@ -152,6 +151,7 @@ export function useSinglePlayerCore({
 
   // Core game state
   const [grid, setGrid] = useState<LetterGrid | null>(null);
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: grid });
   const [foundWords, setFoundWords] = useState<FoundWord[]>([]);
   const [score, setScore] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -377,7 +377,7 @@ export function useSinglePlayerCore({
 
     const rejectAs = (reason: WordVerdictReason, params?: VerdictParams, shown = normalizedWord) => {
       const v = verdicts.reject(normalizedWord, reason, params);
-      setCurrentFeedback({ id: `reject-${now}`, type: v.tone === 'error' ? 'rejected' : 'duplicate', word: shown, message: v.message, timestamp: now, durationMs: v.durationMs });
+      setCurrentFeedback({ id: `reject-${now}`, type: reason === 'cant-check' ? 'duplicate' : 'rejected', word: shown, message: v.message, timestamp: now, durationMs: v.durationMs, announced: true });
       if (reason !== 'cant-check') combo.resetCombo();
     };
     const missAs = (reason: WordVerdictReason, params?: VerdictParams) => {

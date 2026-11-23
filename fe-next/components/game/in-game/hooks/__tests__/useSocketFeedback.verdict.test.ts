@@ -15,12 +15,12 @@ function setup() {
   const setCurrentFeedback = vi.fn();
   const playWordRejectedSound = vi.fn();
   const t = (k: string, p?: Record<string, string | number>) => `${k}${p ? JSON.stringify(p) : ''}`;
-  renderHook(() => useSocketFeedback({
-    socket: socket as never, isPlaying: true, t: t as never, setCurrentFeedback, setLastWordFoundTime: vi.fn(),
+  const hook = renderHook(({ isPlaying }) => useSocketFeedback({
+    socket: socket as never, isPlaying, t: t as never, setCurrentFeedback, setLastWordFoundTime: vi.fn(),
     playWordAcceptedSound: vi.fn(), playWordRejectedSound,
-  }));
+  }), { initialProps: { isPlaying: true } });
   const last = () => setCurrentFeedback.mock.calls.at(-1)?.[0];
-  return { handlers, last, playWordRejectedSound };
+  return { handlers, last, playWordRejectedSound, setCurrentFeedback, rerender: hook.rerender };
 }
 
 describe('useSocketFeedback — shared word verdicts', () => {
@@ -29,7 +29,7 @@ describe('useSocketFeedback — shared word verdicts', () => {
   it('maps each server reason onto one verdict message and announces it', () => {
     const { handlers, last } = setup();
     handlers.wordRejected({ word: 'ANUAL', reason: 'not_in_dictionary' });
-    expect(last()).toMatchObject({ type: 'rejected', message: 'wordVerdict.notAWord', durationMs: 1600 });
+    expect(last()).toMatchObject({ type: 'rejected', message: 'wordVerdict.notAWord', durationMs: 1600, announced: true });
     expect(announceWordResult).toHaveBeenCalledWith('ANUAL', false, undefined, 'wordVerdict.notAWord');
     handlers.wordRejected({ word: 'ANUAL', reason: 'invalid_shape' });
     expect(last().message).toBe('wordVerdict.notAWordAgain');
@@ -43,12 +43,40 @@ describe('useSocketFeedback — shared word verdicts', () => {
     expect(last().message).toBe('wordVerdict.tooShort{"min":4}');
   });
 
-  it('treats an already-found word as soft: no buzzer, light tap', () => {
+  it('keeps the buzz for a duplicate, and the pill type each event used before', () => {
     const { handlers, last, playWordRejectedSound } = setup();
-    handlers.wordAlreadyFound({ word: 'CAT' });
+    handlers.wordRejected({ word: 'CAT', reason: 'duplicate' });
+    expect(last()).toMatchObject({ type: 'rejected', message: 'wordVerdict.alreadyFound' });
+    expect(playWordRejectedSound).toHaveBeenCalledTimes(1);
+    expect(hapticError).toHaveBeenCalledTimes(1);
+    handlers.wordAlreadyFound({ word: 'DOG' });
     expect(last()).toMatchObject({ type: 'duplicate', message: 'wordVerdict.alreadyFound' });
+  });
+
+  it('never calls a server problem "not in our dictionary"', () => {
+    const { handlers, last, setCurrentFeedback, playWordRejectedSound } = setup();
+    handlers.wordRejected({ word: 'CAT', reason: 'error' });
+    expect(last().message).toBe('wordVerdict.cantCheck');
+    handlers.wordRejected({ word: 'CAT', reason: 'inappropriate' });
+    expect(last().message).toBe('wordVerdict.inappropriate');
+    handlers.wordRejected({ word: 'CAT', reason: 'frozen' });
+    expect(last().message).toBe('classroomBoss.frozenRejected');
+    playWordRejectedSound.mockClear();
+    handlers.wordRejected({ word: 'CAT', reason: 'rate_limited' });
+    expect(last()).toMatchObject({ type: 'duplicate', message: 'playerView.slowDown' });
     expect(playWordRejectedSound).not.toHaveBeenCalled();
-    expect(tap).toHaveBeenCalled();
+    const calls = setCurrentFeedback.mock.calls.length;
+    handlers.wordRejected({ word: 'CAT', reason: 'paused' });
+    expect(setCurrentFeedback.mock.calls.length).toBe(calls);
+  });
+
+  it('starts the repeat streak over in a new round', () => {
+    const { handlers, last, rerender } = setup();
+    handlers.wordRejected({ word: 'ANUAL', reason: 'not_in_dictionary' });
+    rerender({ isPlaying: false });
+    rerender({ isPlaying: true });
+    handlers.wordRejected({ word: 'ANUAL', reason: 'not_in_dictionary' });
+    expect(last().message).toBe('wordVerdict.notAWord');
   });
 
   it('keeps a classroom-boss freeze as its own message', () => {

@@ -200,6 +200,7 @@ export function useWordSubmission({
         word: normalizedWord,
         message: msg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, msg);
@@ -218,6 +219,7 @@ export function useWordSubmission({
         word: normalizedWord,
         message: notOnBoardMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notOnBoardMsg);
@@ -236,6 +238,7 @@ export function useWordSubmission({
         word: normalizedWord,
         message: notAWordMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, notAWordMsg);
@@ -253,6 +256,7 @@ export function useWordSubmission({
         word: normalizedWord,
         message: alreadyFoundMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, alreadyFoundMsg);
@@ -359,6 +363,7 @@ export function useWordSubmission({
         word: normalizedWord.toUpperCase(),
         message: invalidMsg,
         timestamp: now,
+        announced: true,
       });
       hapticError();
       announceWordResult(normalizedWord, false, undefined, invalidMsg);
@@ -398,6 +403,7 @@ export function useWordSubmission({
         word: normalizedWord.toUpperCase(),
         message: msg,
         timestamp: now,
+        announced: true,
       });
       announceWordResult(normalizedWord, false, undefined, msg);
     };

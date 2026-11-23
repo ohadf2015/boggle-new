@@ -11,6 +11,8 @@ const he = {
     "notAWordAgain": "עדיין לא מילה. אולי מילה אחרת?",
     "alreadyFound": "המילה הזאת כבר נמצאה",
     "cantCheck": "לא הצלחנו לבדוק. שוב?",
+    "inappropriate": "אולי מילה אחרת?",
+    "withPenalty": "{reason}, מינוס {n}",
   },
   // @avatarChest:start
   "avatarChest": {

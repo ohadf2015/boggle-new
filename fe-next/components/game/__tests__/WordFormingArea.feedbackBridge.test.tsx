@@ -129,9 +129,13 @@ describe('WordFormingArea — feedback bridge on submit', () => {
     expect(screen.queryByText('✗')).not.toBeInTheDocument();
   });
 
-  it('a rejection message is not re-read by the pill live region (the shared announcer reads it once)', () => {
-    render(<WordFormingArea word="" letterCount={0} feedback={rejected('XQZ')} compact />);
-    expect(screen.getByText('Not a word').closest('[aria-hidden="true"]')).not.toBeNull();
+  it('the pill stops being a live region while it shows a rejection the announcer already read, so it is read once', () => {
+    const { container, rerender } = render(<WordFormingArea word="" letterCount={0} feedback={{ ...rejected('XQZ'), announced: true }} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('off');
+    rerender(<WordFormingArea word="" letterCount={0} feedback={{ ...rejected('QQQ'), id: 'r2' }} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('polite');
+    rerender(<WordFormingArea word="" letterCount={0} feedback={accepted('CAT')} compact />);
+    expect(container.querySelector('[data-board-fly-target]')?.getAttribute('aria-live')).toBe('polite');
   });
 
   // Hebrew sofit invariant: the in-progress forming word is INPUT and must show

@@ -58,6 +58,8 @@ export interface WordFeedback {
   message?: string;
   /** How long the note stays; a verdict sets it (a repeated miss holds longer). */
   durationMs?: number;
+  /** Already read by the screen-reader announcer, so the pill stays quiet. */
+  announced?: boolean;
   fireRoundActive?: boolean;
   fireRoundBonus?: number;
   /** Golden letter bonus points */
@@ -187,6 +189,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
   // Determine current state
   const isForming = word.length > 0;
   const showFeedback = visibleFeedback !== null;
+  const spokenElsewhere = visibleFeedback?.announced === true;
 
   // Lesson badge label. Screen-reader users get the points spoken, not a bare
   // "lesson word" that hides the thing the badge exists to communicate. Falls
@@ -245,7 +248,7 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
     <div
       className={containerClasses}
       data-board-fly-target=""
-      aria-live="polite"
+      aria-live={spokenElsewhere ? 'off' : 'polite'}
       aria-atomic="true"
     >
       <AnimatePresence mode="wait">
@@ -331,7 +334,6 @@ const WordFormingArea = React.memo<WordFormingAreaProps>(({
 
             {/* Word display - no layout animation to prevent letter wrap during changes */}
             <span
-              aria-hidden={showFeedback && (visibleFeedback?.type === 'rejected' || visibleFeedback?.type === 'duplicate') ? true : undefined}
               className={cn(
                 'font-black uppercase tracking-wide',
                 compact ? 'text-base' : 'text-xl',

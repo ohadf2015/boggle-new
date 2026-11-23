@@ -11,6 +11,8 @@ const es = {
     "notAWordAgain": "Sigue sin ser palabra. Prueba otra",
     "alreadyFound": "Esa ya la tienes",
     "cantCheck": "No pudimos comprobarla. Reintenta",
+    "inappropriate": "Elige otra palabra",
+    "withPenalty": "{reason} −{n}",
   },
   // @avatarChest:start
   "avatarChest": {

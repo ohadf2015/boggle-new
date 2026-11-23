@@ -103,8 +103,9 @@ export function useSurvivalWordSubmission({
   const chargeMiss = useCallback((penalty: number) => {
     if (!forgiveMisses) dispatch({ type: 'ADJUST_LIFE', payload: { delta: -penalty } });
   }, [forgiveMisses, dispatch]);
-  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: grid });
   const { announceWordResult } = useAnnouncer();
+  const missCost = useCallback((penalty: number) => (forgiveMisses ? 0 : penalty), [forgiveMisses]);
 
   const validateWordInDictionary = useCallback(async (word: string): Promise<WordVerdict> => {
     if (word.toLowerCase() === targetWord.toLowerCase()) return 'valid';
@@ -223,7 +224,7 @@ export function useSurvivalWordSubmission({
 
     if (!isWordOnBoard(word, grid, language)) {
       chargeMiss(INVALID_WORD_PENALTY);
-      showToast('not-on-board', verdicts.reject(word, 'not-on-board').message, word);
+      showToast('not-on-board', verdicts.reject(word, 'not-on-board', { penalty: missCost(INVALID_WORD_PENALTY) }).message, word);
       recordNotOnBoard(word, language, 'daily_word_hunt');
       return 'rejected';
     }
@@ -243,7 +244,7 @@ export function useSurvivalWordSubmission({
     }
     if (verdict === 'invalid') {
       chargeMiss(NOT_IN_DICTIONARY_PENALTY);
-      showToast('not-in-dictionary', verdicts.reject(word, 'not-a-word').message, word);
+      showToast('not-in-dictionary', verdicts.reject(word, 'not-a-word', { penalty: missCost(NOT_IN_DICTIONARY_PENALTY) }).message, word);
       recordNotInDictionary(word, language, 'daily_word_hunt');
       return 'invalid';
     }
@@ -287,7 +288,7 @@ export function useSurvivalWordSubmission({
     verdicts.clearRepeat();
     showToast('valid-word', bonusMessage, word);
     return 'accepted';
-  }, [grid, language, targetWord, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch, chargeMiss, verdicts]);
+  }, [grid, language, targetWord, playWordAcceptedSound, showToast, t, validateWordInDictionary, clueActions, lifeAnimationTimeout, dispatch, chargeMiss, verdicts, missCost]);
 
   // Handle word submission (main entry point)
   const handleWordSubmit = useCallback((word: string) => {
@@ -321,14 +322,14 @@ export function useSurvivalWordSubmission({
         });
       } else {
         chargeMiss(INVALID_WORD_PENALTY);
-        showToast('not-on-board', verdicts.reject(displayWord, 'not-on-board').message, displayWord);
+        showToast('not-on-board', verdicts.reject(displayWord, 'not-on-board', { penalty: missCost(INVALID_WORD_PENALTY) }).message, displayWord);
         recordNotOnBoard(displayWord, language, 'daily_word_hunt');
       }
     } else {
       handleWordDiscoveryRef.current?.(displayWord);
       handleDiscoveryFeedbackRef.current?.(displayWord, targetWord.toUpperCase());
     }
-  }, [isGameOver, targetWord, grid, language, showToast, t, chargeMiss, verdicts, announceWordResult]);
+  }, [isGameOver, targetWord, grid, language, showToast, t, chargeMiss, verdicts, announceWordResult, missCost]);
 
   const handleTooShort = useCallback((word: string) => {
     if (isGameOverRef.current) return;

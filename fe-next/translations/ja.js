@@ -11,6 +11,8 @@ const ja = {
     "notAWordAgain": "まだ単語じゃないよ。別の単語を",
     "alreadyFound": "もう見つけた単語です",
     "cantCheck": "確認できませんでした。もう一度",
+    "inappropriate": "別の単語にしよう",
+    "withPenalty": "{reason} −{n}",
   },
   // @avatarChest:start
   "avatarChest": {

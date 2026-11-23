@@ -224,6 +224,7 @@ vi.mock('@/hooks/useDictionaryCache', () => ({
 
 // Import AFTER mocks
 import { useSinglePlayerCore } from '../useSinglePlayerCore';
+import { validateWordLocally } from '@/utils/clientWordValidator';
 import type { SinglePlayerGameState } from '@/components/singleplayer/SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 
@@ -313,6 +314,28 @@ describe('useSinglePlayerCore — Dictionary Cache Latency', () => {
       '/api/dictionary/check',
       expect.objectContaining({ method: 'POST' })
     );
+  });
+
+  it('given a word already found, then it keeps the rejected pill and the error buzz it always had', () => {
+    vi.mocked(validateWordLocally).mockReturnValueOnce({ isValid: false, reason: 'already-found', errorKey: 'wordVerdict.alreadyFound', shouldSubmitToServer: false });
+    mockHapticError.mockClear();
+    const { result } = renderHook(() =>
+      useSinglePlayerCore({ settings: { ...defaultSettings, grid: mockGrid }, targetHighScore: null, onGameEnd: vi.fn(), onQuit: vi.fn() })
+    );
+    act(() => { result.current.handleWordSubmit('test'); });
+    expect(result.current.currentFeedback).toMatchObject({ type: 'rejected', message: 'wordVerdict.alreadyFound' });
+    expect(mockHapticError).toHaveBeenCalled();
+  });
+
+  it('given a new board, then a miss repeated from the last board is a first miss', () => {
+    const { result, rerender } = renderHook(({ grid }) =>
+      useSinglePlayerCore({ settings: { ...defaultSettings, grid }, targetHighScore: null, onGameEnd: vi.fn(), onQuit: vi.fn() }),
+      { initialProps: { grid: mockGrid } },
+    );
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    rerender({ grid: mockGrid.map(row => [...row].reverse()) as typeof mockGrid });
+    act(() => { result.current.handleWordSubmit('zzzq'); });
+    expect(result.current.currentFeedback).toMatchObject({ message: 'wordVerdict.notAWord' });
   });
 
   it('given a non-word, twice, then it says why and escalates the second time', () => {

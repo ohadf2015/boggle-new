@@ -31,7 +31,7 @@ import { useStuckCoach } from '@/hooks/useStuckCoach';
 import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackMpFtue } from '@/utils/posthogEngagement';
 import { useWordVerdict } from '@/lib/wordVerdict/useWordVerdict';
-import { reasonFromCode, VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
+import { noticeFromCode, reasonFromCode, VERDICT_MS } from '@/lib/wordVerdict/wordVerdict';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
 
@@ -106,9 +106,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   } = useSoundEffects();
 
   const prefersReduced = useReducedMotion();
-  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound });
 
   const [puzzle, setPuzzle] = useState<WheelPuzzle | null>(null);
+  const verdicts = useWordVerdict({ t, playRejectedSound: playWordRejectedSound, resetKey: puzzle });
   const [loadTimedOut, setLoadTimedOut] = useState(false);
   // Word-row direction follows the LETTERS on screen, not the gameLanguage prop
   // (which can arrive null at in-game render). Hebrew letters → rtl regardless;
@@ -350,6 +350,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     const onResult = (data: { word: string; accepted: boolean; kind?: string; score?: number; lockUntil?: number; error?: string }) => {
       const { puzzle: pz, playWordAcceptedSound: accSfx } = latestRef.current;
       if (!data.accepted) {
+        if (noticeFromCode(data.error)) return;
         const v = verdicts.reject(data.word, reasonFromCode(data.error) ?? 'not-a-word', { min: MIN_LEN, letter: pz?.centerLetter ?? '' });
         flash('err', v.message, v.durationMs);
         setComboLevel(0);
