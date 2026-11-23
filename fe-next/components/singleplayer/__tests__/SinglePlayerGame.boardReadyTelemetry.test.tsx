@@ -93,7 +93,9 @@ vi.mock('../game', () => ({
 
 vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));
 vi.mock('@/components/achievements', () => ({ useAchievementQueue: () => ({ queueAchievement: vi.fn() }) }));
-vi.mock('@/hooks/useIdleDetection', () => ({ useIdleDetection: () => ({ reportActivity: vi.fn() }) }));
+vi.mock('@/hooks/useStuckCoach', () => ({
+  useStuckCoach: () => ({ mode: 'singlePlayer', stage: 'none', visible: false, exampleWord: null, markActivity: () => {}, markTap: () => {}, markDragStart: () => {}, markSubmit: () => {}, dismiss: () => {} }),
+}));
 
 import SinglePlayerGame from '../SinglePlayerGame';
 import type { SinglePlayerGameState } from '../SinglePlayerView';

@@ -2501,6 +2501,7 @@ const es = {
   },
   "mpCoach": {
     "tryWord": "Prueba: {word}",
+    "wheelNudge": "Toca o desliza por las letras para formar una palabra. Todas llevan la letra del centro",
     "idleNudge": "Arrastra sobre las letras para formar una palabra",
     "tapHint": "Mantén y arrastra sobre las letras, luego suelta para enviar",
     "submitHint": "Levanta el dedo de la última letra para enviar la palabra",
@@ -13752,10 +13753,6 @@ const es = {
       "locksmith": "Máquina de Palabras",
       "bandit": "Pionero",
       "wordsmith": "Maestro de Palabras"
-    },
-    "ftue": {
-      "dragLabel": "Arrastra sobre las letras para formar palabras",
-      "dismiss": "Entendido"
     }
   },
   "blast": {

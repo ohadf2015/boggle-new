@@ -15,7 +15,8 @@ export type StuckStage =
   | 'idle-nudge' // no interaction at all → teach the core gesture
   | 'tap-hint' // tapping single tiles, never dragging (mobile only)
   | 'submit-hint' // building paths but never submitting them
-  | 'validity-hint'; // submitting words but none are valid
+  | 'validity-hint' // submitting words but none are valid
+  | 'example'; // escalation: the nudge was ignored → show a real word from the board
 
 export interface StuckSignals {
   /** ms since the grid became interactive this game. */
@@ -30,8 +31,9 @@ export interface StuckSignals {
   submits: number;
   /** accepted (valid) words this game. */
   accepted: number;
-  /** lifetime games played — used to suppress help for veterans. */
-  totalGamesPlayed: number;
+  /** lifetime games played — suppresses help for veterans. Undefined when the
+   *  mode has no trustworthy count (guest counters skip Blast and the wheels). */
+  totalGamesPlayed?: number;
   /** desktop/mouse session — suppresses the touch-only tap-hint. */
   isDesktop: boolean;
   /** the coach already showed (this game or in a prior session). */
@@ -47,6 +49,7 @@ export const TAP_MIN = 3; // taps-without-drag before we assume confusion
 export const DRAG_MIN = 2; // paths begun before "you forgot to submit" help
 export const SUBMIT_MIN = 2; // junk submits before "spell a real word" help
 export const VETERAN_GAMES = 1; // > this many games played ⇒ no tutorialising
+export const ESCALATE_MS = 8000; // after an ignored nudge → show a real word
 
 export function nextStuckStage(s: StuckSignals): StuckStage {
   // --- Gates (cheapest, highest-confidence reasons to stay silent) ----------
@@ -57,7 +60,7 @@ export function nextStuckStage(s: StuckSignals): StuckStage {
   // One-shot: never re-show within a game or across sessions.
   if (s.alreadyShown) return 'none';
   // Never tutorialise an experienced player who simply paused to scan the board.
-  if (s.totalGamesPlayed > VETERAN_GAMES) return 'none';
+  if (s.totalGamesPlayed !== undefined && s.totalGamesPlayed > VETERAN_GAMES) return 'none';
 
   // --- Stage detection (priority: most-specific confusion first) ------------
   // Submitting words but nothing lands → they don't know the validity rules.
@@ -77,15 +80,8 @@ export function nextStuckStage(s: StuckSignals): StuckStage {
   ) {
     return 'tap-hint';
   }
-  // Frozen — no action of any kind for a while → gentle "drag to spell" nudge.
-  if (
-    s.idleMs >= (s.idleThresholdMs ?? IDLE_MS) &&
-    s.taps === 0 &&
-    s.dragsStarted === 0 &&
-    s.submits === 0
-  ) {
-    return 'idle-nudge';
-  }
+  // Frozen — no action for a while and still no word → gentle "drag to spell" nudge.
+  if (s.idleMs >= (s.idleThresholdMs ?? IDLE_MS)) return 'idle-nudge';
 
   return 'none';
 }
@@ -135,5 +131,22 @@ export function pickCoachExampleWord(words: SolvedGridWords | null | undefined):
  * showing a different word would talk past it.
  */
 export function stageWantsExampleWord(stage: StuckStage): boolean {
-  return stage === 'idle-nudge' || stage === 'tap-hint' || stage === 'validity-hint';
+  return stage === 'idle-nudge' || stage === 'tap-hint' || stage === 'validity-hint' || stage === 'example';
+}
+
+export interface EscalationSignals {
+  firstOutcome: 'helped' | 'dismissed' | 'ignored';
+  accepted: number;
+  msSinceFirstHidden: number;
+  hasExample: boolean;
+}
+
+/** "Got it" means they read it; only an ignored nudge earns the second, concrete card. */
+export function shouldEscalate(s: EscalationSignals): boolean {
+  return (
+    s.firstOutcome === 'ignored' &&
+    s.accepted === 0 &&
+    s.hasExample &&
+    s.msSinceFirstHidden >= ESCALATE_MS
+  );
 }

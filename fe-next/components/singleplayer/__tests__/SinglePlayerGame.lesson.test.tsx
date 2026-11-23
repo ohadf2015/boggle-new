@@ -72,8 +72,8 @@ vi.mock('@/components/ui/PageLoader', () => ({ PageLoader: () => null }));
 vi.mock('@/components/achievements', () => ({
   useAchievementQueue: () => ({ queueAchievement: vi.fn() }),
 }));
-vi.mock('@/hooks/useIdleDetection', () => ({
-  useIdleDetection: () => ({ reportActivity: vi.fn() }),
+vi.mock('@/hooks/useStuckCoach', () => ({
+  useStuckCoach: () => ({ mode: 'singlePlayer', stage: 'none', visible: false, exampleWord: null, markActivity: () => {}, markTap: () => {}, markDragStart: () => {}, markSubmit: () => {}, dismiss: () => {} }),
 }));
 vi.mock('@/utils/growthTracking', () => ({
   trackDeadTime: vi.fn(),

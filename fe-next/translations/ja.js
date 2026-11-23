@@ -2501,6 +2501,7 @@ const ja = {
   },
   "mpCoach": {
     "tryWord": "例: {word}",
+    "wheelNudge": "文字をタップかスワイプして単語を作ろう。どの単語にも真ん中の文字を使うよ",
     "idleNudge": "文字をなぞって単語を作ろう",
     "tapHint": "文字を押しながらなぞり、指を離して送信しよう",
     "submitHint": "最後の文字で指を離すと単語が送信されます",
@@ -13801,10 +13802,6 @@ const ja = {
       "locksmith": "単語マシン",
       "bandit": "先駆者",
       "wordsmith": "言葉の達人"
-    },
-    "ftue": {
-      "dragLabel": "文字をなぞって単語を作ろう",
-      "dismiss": "わかった"
     }
   },
   "blast": {

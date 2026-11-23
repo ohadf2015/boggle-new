@@ -4301,9 +4301,6 @@ html[data-cosy='true'] .animate-neo-press {
   height: 100%;
   align-items: center;
 }
-.mp-coach-diagram[data-dir='rtl'] .mp-coach-tiles {
-  flex-direction: row-reverse;
-}
 .mp-coach-tile {
   display: flex;
   align-items: center;

@@ -51,7 +51,8 @@ import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
 import type { ScoreFlyEvent } from './BlastScoreFly';
 import type { ClearedTileEvent } from './BlastEffectsCanvas';
 import { useGameStore } from '@/hooks/gameState';
-import { useIdleDetection } from '@/hooks/useIdleDetection';
+import { useStuckCoach } from '@/hooks/useStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackDeadTime } from '@/utils/growthTracking';
 import type { LetterGrid, Avatar } from '@/shared/types';
 
@@ -59,6 +60,7 @@ import type { LetterGrid, Avatar } from '@/shared/types';
 const NO_SCORE_FLIES: ScoreFlyEvent[] = [];
 
 const BLAST_DEAD_TIME_THRESHOLD_MS = 15000;
+const BLAST_COACH_ANCHOR = [{ selector: '.blast-board', edge: 'below' }, { selector: '[data-testid="shell-words-empty"]', edge: 'over' }] as const;
 const BLAST_CONTINUE_BONUS_MOVES = 5;
 
 interface BlastGameProps {
@@ -394,18 +396,13 @@ export function BlastGame({
   const boardReady = !!engine.grid && isDictionaryReady;
   useBlastBoardWait(!!engine.grid, isDictionaryReady, isMultiplayer ? 'mp' : 'solo', config.language);
 
-  const handleIdle = useCallback(() => {
-    trackDeadTime(isMultiplayer ? 'blast_multiplayer' : 'blast', BLAST_DEAD_TIME_THRESHOLD_MS, {
-      waveNumber,
-      score: engine.gameState.score,
-    });
-  }, [isMultiplayer, waveNumber, engine.gameState.score]);
-  const { reportActivity: reportIdleActivity } = useIdleDetection({
-    enabled: boardReady && !engine.gameState.isComplete && !engine.gameState.isDeadEnd,
-    thresholdMs: BLAST_DEAD_TIME_THRESHOLD_MS,
-    onIdle: handleIdle,
-    sessionKey: `${waveNumber}`,
+  const handleIdle = () => trackDeadTime(isMultiplayer ? 'blast_multiplayer' : 'blast', BLAST_DEAD_TIME_THRESHOLD_MS, { waveNumber, score: engine.gameState.score });
+  const boardLive = boardReady && !engine.gameState.isComplete && !engine.gameState.isDeadEnd;
+  const stuckCoach = useStuckCoach({
+    mode: 'blast', active: boardLive && pendingDiscovery == null, sessionKey: waveNumber, wordsFound: engine.gameState.wordsFound.length, grid: engine.grid, language: config.language,
+    deadTime: { enabled: boardLive, thresholdMs: BLAST_DEAD_TIME_THRESHOLD_MS, onDeadTime: handleIdle },
   });
+  const reportIdleActivity = stuckCoach.markActivity;
 
   const handleWordChange = useCallback((word: string, _count: number) => {
     reportIdleActivity();
@@ -780,6 +777,7 @@ export function BlastGame({
         progress={isMultiplayer ? undefined : progress}
         t={tAdapter}
       />
+      <StuckCoachOverlay coach={stuckCoach} anchor={BLAST_COACH_ANCHOR} />
     </div>
   );
 }

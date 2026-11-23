@@ -2482,6 +2482,7 @@ const en = {
   },
   "mpCoach": {
     "tryWord": "Try: {word}",
+    "wheelNudge": "Tap or swipe letters to spell a word. Every word uses the center letter",
     "idleNudge": "Drag across letters to spell a word",
     "tapHint": "Hold and drag across letters, then lift to submit",
     "submitHint": "Lift your finger off the last letter to submit the word",
@@ -12147,10 +12148,6 @@ const en = {
       "locksmith": "Word Machine",
       "bandit": "Trailblazer",
       "wordsmith": "Wordsmith"
-    },
-    "ftue": {
-      "dragLabel": "Drag across letters to spell",
-      "dismiss": "Got it"
     }
   },
   "blast": {

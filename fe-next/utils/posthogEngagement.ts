@@ -199,35 +199,37 @@ export function trackMpFtue(args: {
   );
 }
 
-/** MP stuck-player coach: fires when one of the four help stages is shown.
+/** Stuck-player coach (every word mode, `mode` says which): fires when a help stage is shown.
  *  Pairs with trackMpStuckCoachOutcome to answer "did the help work?". */
 export function trackMpStuckCoachShown(args: {
   stage: string;
-  gamesPlayed: number;
+  mode: string;
+  gamesPlayed?: number;
   isDesktop: boolean;
 }): void {
   safe(() =>
     (posthog.capture as PHFn)('mp_stuck_coach_shown', {
       stage: args.stage,
-      mode: 'classic',
+      mode: args.mode,
       games_played: args.gamesPlayed,
       is_desktop: args.isDesktop,
     })
   );
 }
 
-/** MP stuck-player coach outcome — the real "how did the player react" signal.
+/** Stuck-player coach outcome — the real "how did the player react" signal.
  *  helped = a valid word landed within the show window; dismissed = manual close;
  *  ignored = auto-hidden with no valid word. ms_to_valid present only when helped. */
 export function trackMpStuckCoachOutcome(args: {
   stage: string;
+  mode: string;
   outcome: 'helped' | 'dismissed' | 'ignored';
   msToValid?: number;
 }): void {
   safe(() =>
     (posthog.capture as PHFn)('mp_stuck_coach_outcome', {
       stage: args.stage,
-      mode: 'classic',
+      mode: args.mode,
       outcome: args.outcome,
       ms_to_valid: args.msToValid,
     })
