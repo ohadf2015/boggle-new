@@ -1594,6 +1594,7 @@ const es = {
       "sub": "Une letras vecinas para formar palabras antes de que se acabe el tiempo. Gratis y sin descargas.",
       "play": "Jugar ahora",
       "playFriend": "Jugar con un amigo",
+      "playNoSignup": "Juega gratis, sin registro",
       "account": "Ya tengo cuenta",
       "gridLabel": "Tablero de práctica. Toca las letras de {word} en orden.",
       "hint": "Pruébalo: toca {letters}",

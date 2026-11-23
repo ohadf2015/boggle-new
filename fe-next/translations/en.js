@@ -1594,6 +1594,7 @@ const en = {
       "sub": "Link touching letters into words before the clock runs out. Free, no download.",
       "play": "Play now",
       "playFriend": "Play a friend",
+      "playNoSignup": "Play free, no sign-up",
       "account": "I have an account",
       "gridLabel": "Practice board. Tap the letters of {word} in order.",
       "hint": "Try it: tap {letters}",
