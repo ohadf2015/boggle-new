@@ -33,7 +33,7 @@ export interface FriendStatusValue {
   /** Raw lists for legacy consumers (results badge). */
   friends: Friend[];
   outgoingUsernames: Set<string>;
-  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  sendRequest: (userId: string) => Promise<{ success: boolean; error?: string; autoAccepted?: boolean }>;
   /** Daily board date when rows carry opaque keys instead of ids. */
   boardDate: string | null;
   /** Signed-in player behind an opaque daily-board row key (null for guests / not found). */
