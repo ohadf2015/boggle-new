@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { gunzipSync } from 'node:zlib';
+import { readEnglishDictionary } from './helpers/dict';
 
 // Element-driven only: the prod server keeps sockets and analytics open, so
 // networkidle never settles there.
@@ -29,11 +29,8 @@ async function readWheel(page: Page): Promise<Letter[]> {
   );
 }
 
-async function loadDict(page: Page): Promise<Set<string>> {
-  const res = await page.request.get('/dicts/en.dict.gz');
-  expect(res.ok()).toBe(true);
-  const text = gunzipSync(await res.body()).toString('utf8');
-  return new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean));
+function loadDict(): Set<string> {
+  return new Set(readEnglishDictionary().map((w) => w.trim().toLowerCase()).filter(Boolean));
 }
 
 function pathFor(word: string, wheel: Letter[]): Letter[] | null {
@@ -122,7 +119,7 @@ test.describe('Word Wheel play', () => {
 
   test('a drag spells live, an accepted word reacts on the wheel and lands in the found list', async ({ page }) => {
     test.setTimeout(90_000);
-    const dict = await loadDict(page);
+    const dict = loadDict();
     await openWheel(page);
     const wheel = await readWheel(page);
     const word = findWord(dict, wheel);
@@ -139,7 +136,7 @@ test.describe('Word Wheel play', () => {
   });
 
   test('a drag over a non-word shakes the wheel red and keeps the found list empty', async ({ page }) => {
-    const dict = await loadDict(page);
+    const dict = loadDict();
     await openWheel(page);
     const wheel = await readWheel(page);
     const hub = wheel.find((p) => p.hub)!;

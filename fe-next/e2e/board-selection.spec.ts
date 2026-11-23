@@ -1,5 +1,5 @@
-import zlib from 'node:zlib';
 import { test, expect, type Page } from '@playwright/test';
+import { readEnglishDictionary } from './helpers/dict';
 import { readGrid, solveGrid, toGridArray, findWordPath, type GridCellInfo } from './helpers/grid-solver';
 
 const TILE = '[role="grid"] [data-tile]';
@@ -71,13 +71,8 @@ async function openBlast(page: Page) {
   return board;
 }
 
-async function shippedWords(baseURL: string): Promise<Set<string>> {
-  const res = await fetch(`${baseURL}/dicts/en.dict.gz`);
-  expect(res.ok, 'the shipped dictionary is served').toBeTruthy();
-  const buf = Buffer.from(await res.arrayBuffer());
-  let text: string;
-  try { text = zlib.gunzipSync(buf).toString('utf8'); } catch { text = buf.toString('utf8'); }
-  const words = new Set(text.split('\n').map((w) => w.trim().toLowerCase()).filter(Boolean));
+function shippedWords(): Set<string> {
+  const words = new Set(readEnglishDictionary().map((w) => w.trim().toLowerCase()).filter(Boolean));
   expect(words.size, 'a real word list, not an error page').toBeGreaterThan(10_000);
   return words;
 }
@@ -151,9 +146,9 @@ test.describe('shared letter board', () => {
     await page.mouse.up();
   });
 
-  test('Blast turns a non-word red and drops its letters the moment it is released', async ({ page, baseURL }) => {
+  test('Blast turns a non-word red and drops its letters the moment it is released', async ({ page }) => {
     test.setTimeout(90_000);
-    const words = await shippedWords(baseURL!);
+    const words = shippedWords();
     const board = await openBlast(page);
     const cells = (await readGrid(page)).filter((c) => c.letter);
     const rows = [...new Set(cells.map((c) => c.row))];

@@ -175,10 +175,18 @@ describe('public subdirectory assets', () => {
     expect(decideNextHandle('/randomscan/x.php').action).toBe('drop');
     expect(decideNextHandle('/he/mascot/x.webp').action).toBe('drop');
   });
+  // build:dicts output: read from disk by tests and e2e, never fetched by the app (it uses /api/dictionary-words).
+  const BUILD_ONLY_DIRS = new Set(['dicts']);
   it('PUBLIC_DIRS matches public/ on disk', () => {
     const onDisk = fs.readdirSync(PUBLIC_DIR, { withFileTypes: true })
       .filter((d) => d.isDirectory()).map((d) => d.name).sort();
-    expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d))).toEqual([]);
+    expect(onDisk.filter((d) => !PUBLIC_DIRS.has(d) && !BUILD_ONLY_DIRS.has(d))).toEqual([]);
+  });
+  it('keeps build-only dirs off the web', () => {
+    for (const d of BUILD_ONLY_DIRS) {
+      expect(PUBLIC_DIRS.has(d)).toBe(false);
+      expect(decideNextHandle(`/${d}/en.dict.gz`).action).toBe('drop');
+    }
   });
 });
 
