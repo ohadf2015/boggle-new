@@ -8,6 +8,8 @@ import { refreshBlastBoardOnDeadEnd } from '../blastBoardRegen';
 import { initBlastModeState, getOrInitPlayerBoard } from '../blastModeManager';
 import type { GameState } from '../gameState/types';
 
+vi.mock('../../utils/boardSelection', () => ({ generateRichBoard: (make: () => unknown) => make() }));
+
 const GRID = [
   ['c', 'a', 't', 's'],
   ['d', 'o', 'g', 's'],
