@@ -7,6 +7,9 @@ import {
   DRAG_MIN,
   SUBMIT_MIN,
   VETERAN_GAMES,
+  ESCALATE_MS,
+  shouldEscalate,
+  stageWantsExampleWord,
   type StuckSignals,
 } from '../mpStuckCoach';
 
@@ -140,5 +143,47 @@ describe('nextStuckStage — discriminator: thoughtful pause vs fruitless fiddle
         base({ submits: SUBMIT_MIN, accepted: 0, elapsedMs: FRUITLESS_MS - 1 })
       )
     ).toBe('none');
+  });
+});
+
+describe('nextStuckStage — shared idle rule for every mode', () => {
+  it('nudges a player who poked once and then froze for IDLE_MS with no word', () => {
+    expect(nextStuckStage(base({ taps: 1, idleMs: IDLE_MS, elapsedMs: IDLE_MS * 2 }))).toBe('idle-nudge');
+  });
+
+  it('applies no veteran gate when the mode has no lifetime game count', () => {
+    expect(
+      nextStuckStage(base({ totalGamesPlayed: undefined, idleMs: IDLE_MS, elapsedMs: IDLE_MS }))
+    ).toBe('idle-nudge');
+  });
+});
+
+describe('shouldEscalate — nudge, then a real word from the board', () => {
+  const ready = {
+    firstOutcome: 'ignored' as const,
+    accepted: 0,
+    msSinceFirstHidden: ESCALATE_MS,
+    hasExample: true,
+  };
+
+  it('escalates to the example word once the nudge was ignored and the player still has no word', () => {
+    expect(shouldEscalate(ready)).toBe(true);
+  });
+
+  it('waits ESCALATE_MS after the nudge hid', () => {
+    expect(shouldEscalate({ ...ready, msSinceFirstHidden: ESCALATE_MS - 1 })).toBe(false);
+  });
+
+  it('never escalates after "Got it", a found word, or without a word to show', () => {
+    expect(shouldEscalate({ ...ready, firstOutcome: 'dismissed' })).toBe(false);
+    expect(shouldEscalate({ ...ready, firstOutcome: 'helped' })).toBe(false);
+    expect(shouldEscalate({ ...ready, accepted: 1 })).toBe(false);
+    expect(shouldEscalate({ ...ready, hasExample: false })).toBe(false);
+  });
+
+  it('fetches the example during the nudge so it is ready for the escalation', () => {
+    expect(stageWantsExampleWord('idle-nudge')).toBe(true);
+    expect(stageWantsExampleWord('example')).toBe(true);
+    expect(stageWantsExampleWord('submit-hint')).toBe(false);
   });
 });

@@ -6,6 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
+import { loadCommonWords } from '@/lib/adventure/play/commonWords';
+
+// Allowlist: `language` names a word-list file on disk.
+const COMMON_WORD_LANGUAGES = new Set(['en', 'he', 'es', 'sv', 'ja', 'ru']);
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,6 +23,7 @@ interface SolveGridRequest {
 interface SolveGridResponse {
   success: boolean;
   words?: {
+    common: string[];
     easy: string[];
     medium: string[];
     hard: string[];
@@ -88,9 +93,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<SolveGrid
       maxLength: 10,
     }) as { easy: string[]; medium: string[]; hard: string[] };
 
+    const everyday = COMMON_WORD_LANGUAGES.has(language) ? new Set(await loadCommonWords(language)) : new Set<string>();
+    const common = [...words.easy, ...words.medium, ...words.hard].filter((w) => everyday.has(w.toLowerCase()));
+
     return NextResponse.json({
       success: true,
-      words,
+      words: { ...words, common },
     });
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unknown error';

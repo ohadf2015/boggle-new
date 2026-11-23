@@ -2501,6 +2501,7 @@ const sv = {
   },
   "mpCoach": {
     "tryWord": "Testa: {word}",
+    "wheelNudge": "Tryck eller dra över bokstäverna för att stava ett ord. Alla ord har mittenbokstaven",
     "idleNudge": "Dra över bokstäverna för att stava ett ord",
     "tapHint": "Håll och dra över bokstäverna, släpp sedan för att skicka",
     "submitHint": "Lyft fingret från sista bokstaven för att skicka ordet",
@@ -14111,10 +14112,6 @@ const sv = {
       "locksmith": "Ordmaskin",
       "bandit": "Pionjär",
       "wordsmith": "Ordsmed"
-    },
-    "ftue": {
-      "dragLabel": "Dra över bokstäverna för att stava",
-      "dismiss": "Fattar"
     }
   },
   "blast": {

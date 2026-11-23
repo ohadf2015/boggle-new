@@ -27,8 +27,8 @@ import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
-import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
-import { MPDragCoachmark } from './MPDragCoachmark';
+import { useStuckCoach } from '@/hooks/useStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackMpFtue } from '@/utils/posthogEngagement';
 
 const WordWheelPixiRing = dynamic(() => import('@/components/daily/WordWheelPixiRing'), { ssr: false });
@@ -74,6 +74,8 @@ interface Props {
 }
 
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
+/** Over my (still empty) words slot, below the wheel and its action bar. */
+const RUSH_COACH_ANCHOR = { selector: '[data-testid="my-words-slot"]', edge: 'over' } as const;
 
 
 // 'duplicate'/'already-closed'/'locked-by-other' used to be real rejections
@@ -409,12 +411,12 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     };
   }, [socket, flash]);
 
-  // FTUE — drag-teaching coachmark after 20s of no activity / no word.
-  // Hides forever on first valid word; persists 'dismissed' to localStorage.
-  const ftue = useMPFTUEIdle({
-    enabled: !!puzzle,
+  const ftue = useStuckCoach({
+    mode: 'wheelRush',
+    active: !!puzzle,
     wordsFound: myWords.length,
     onShown: () => trackMpFtue({ event: 'shown', mode: 'wheel_rush' }),
+    onDismissed: () => trackMpFtue({ event: 'dismissed', mode: 'wheel_rush', reason: 'manual' }),
   });
 
   // Same tap / double-tap / hold-to-submit / drag spelling as the daily wheel.
@@ -723,16 +725,6 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
               index={i}
             />
           ))}
-          {ftue.visible && (
-            <MPDragCoachmark
-              t={t}
-              accent="pink"
-              onDismiss={() => {
-                trackMpFtue({ event: 'dismissed', mode: 'wheel_rush', reason: 'manual' });
-                ftue.dismiss();
-              }}
-            />
-          )}
         </div>
         <p className="text-neo-white text-xs text-center px-2">
           {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: MIN_LEN })}
@@ -757,6 +749,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           challenge's found-words slot (fixed-height slot inside MyWordsChips
           keeps the layout from reflowing). */}
       {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
+      <StuckCoachOverlay coach={ftue} anchor={isDesktopCanvas ? undefined : RUSH_COACH_ANCHOR} />
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />
       <WheelPassToasts t={t} toasts={passToasts} reducedMotion={!!prefersReduced} />

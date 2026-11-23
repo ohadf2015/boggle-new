@@ -21,7 +21,7 @@ import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
 import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
-import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
 import { claimPointer } from '@/lib/wordWheel/claimPointer';
 import WordWheelRankLadder from './WordWheelRankLadder';
@@ -47,6 +47,9 @@ import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { emitFinalSeconds, emitWheelVerdict, WHEEL_MASCOT_SLOT, WHEEL_ORBIT_MASCOT_SLOT } from './mascot/dailyMascotEvents';
 
 export type { WordWheelGameResult } from './wheel/wordWheelGameProps';
+
+// Over the found-words strip: empty whenever the coach can show.
+const WHEEL_COACH_ANCHOR = { selector: '[data-testid="found-words-slot"]', edge: 'over' } as const;
 
 // Tap spelling gets time to finish a longer word before an idle builder submits itself.
 const TAP_IDLE_SUBMIT_MS = 2500;
@@ -89,7 +92,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const acceptedLogRef = useRef<Array<{ word: string; multiplier: number }>>([]);
   const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
 
-  const dragHint = useWheelDragHint(wordsFound.length);
+  const dragHint = useWheelDragHint(wordsFound.length, !paused && !(practice && !hideModeCoach));
   const mascotStage = useWheelMascotStages();
 
   const gameOverRef = useRef(false);
@@ -365,6 +368,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   const wheelCluster = (
     <>
+      <StuckCoachOverlay coach={dragHint} anchor={WHEEL_COACH_ANCHOR} />
       {practice && !hideModeCoach && <WheelCoachSlot wordsFound={wordsFound.length} />}
 
       <div className="w-full flex flex-col gap-3 shell:gap-4 shrink-0">
@@ -425,8 +429,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onPressedChange={setPendingLetter}
         goldIndex={goldIndex >= 0 ? goldIndex : null}
       >
-        {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
-        {dragHint.visible && <MPDragCoachmark t={t} accent="cyan" onDismiss={dragHint.onDismiss} />}
         {!paused && !inShell && <GameMascotReactions {...mascotProps} personality="quiet" persistent slotClassName={WHEEL_ORBIT_MASCOT_SLOT} />}
       </WheelDisc>
 

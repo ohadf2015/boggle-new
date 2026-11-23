@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback, useMemo, memo, useState } from 'react';
+import { useRef, useEffect, useCallback, useMemo, memo, useState, useReducer } from 'react';
 import {
   useBlastTileOverlay,
   useWordHuntTargetLength,
@@ -15,9 +15,8 @@ import { useAnnouncer } from '../GameAnnouncer';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
 import { scheduleSelection, useFrozenWhileSelecting, useSelectionReset } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
-import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
-import { useCoachExampleWord } from '@/hooks/useCoachExampleWord';
-import { MPStuckCoachCard } from '@/components/game/ftue/MPStuckCoachCard';
+import { useStuckCoach } from '@/hooks/useStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { isBoardInteractive } from '@/components/game/in-game/boardInteractive';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
@@ -305,20 +304,15 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     return window.matchMedia('(pointer: fine)').matches;
   }, []);
 
-  // Single FTUE arbiter for confused classic-MP players (idle / tap-only /
-  // fruitless-fiddle). One coordinator → never stacks popups, never nags veterans.
-  const stuckCoach = useMPStuckCoach({
+  // Server-confirmed words this game: the coach's "they got it" signal.
+  const [acceptedCount, bumpAccepted] = useReducer((n: number) => n + 1, 0);
+  const stuckCoach = useStuckCoach({
+    mode: 'classic',
     // Quick Play's socketless board runs its own coach hint; two stacked hints 2s apart helped no one.
-    active: gameActive && isPlaying && !showStartAnimation && !clientAuthoritative,
-    isClassic: gameMode === 'classic',
+    active: gameActive && isPlaying && !showStartAnimation && !clientAuthoritative && gameMode === 'classic',
+    wordsFound: acceptedCount,
     totalGamesPlayed: totalGamesPlayed ?? 0,
     isDesktop,
-  });
-
-  // A word that is genuinely on this board, so the coach can point at something
-  // real instead of only describing the gesture (70% ignored the generic copy).
-  const coachExampleWord = useCoachExampleWord({
-    stage: stuckCoach.stage,
     grid: letterGrid,
     language: gameLanguage || 'en',
   });
@@ -608,7 +602,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
     playWordAcceptedSound,
     playWordRejectedSound,
     playWordLengthSound,
-    onWordAccepted: stuckCoach.markAccepted,
+    onWordAccepted: bumpAccepted,
   });
 
   // Keyboard word input
@@ -727,15 +721,7 @@ const InGameScreen = memo<InGameScreenProps & MpRoundOptIns>(function InGameScre
         {children}
       </PortraitLayout>
       {/* Stuck-player coach: under the board in the phone tray, else at the screen's foot. */}
-      {stuckCoach.visible && (
-        <MpTrayNudge>
-          <MPStuckCoachCard
-            stage={stuckCoach.stage}
-            exampleWord={coachExampleWord}
-            onDismiss={() => stuckCoach.dismiss('manual')}
-          />
-        </MpTrayNudge>
-      )}
+      <StuckCoachOverlay coach={stuckCoach} />
     </>
   );
 });

@@ -3,11 +3,11 @@ import { render } from '@testing-library/react';
 
 const { coachArgs } = vi.hoisted(() => ({ coachArgs: [] as Array<{ active: boolean }> }));
 
-vi.mock('@/hooks/useMPStuckCoach', () => ({
-  useMPStuckCoach: (args: { active: boolean }) => {
+vi.mock('@/hooks/useStuckCoach', () => ({
+  useStuckCoach: (args: { active: boolean }) => {
     coachArgs.push(args);
     const noop = () => {};
-    return { stage: 'none', visible: false, dismiss: noop, markTap: noop, markDragStart: noop, markSubmit: noop, markAccepted: noop };
+    return { mode: 'classic', stage: 'none', visible: false, exampleWord: null, dismiss: noop, markActivity: noop, markTap: noop, markDragStart: noop, markSubmit: noop };
   },
 }));
 vi.mock('@/components/GridComponent', () => ({ default: () => <div data-testid="grid-component" /> }));
@@ -54,6 +54,11 @@ describe('InGameScreen stuck coach owner', () => {
   it('arms the stuck coach in a real multiplayer round', () => {
     render(<InGameScreen {...props()} />);
     expect(coachArgs.at(-1)?.active).toBe(true);
+  });
+
+  it('stays off outside the classic mode', () => {
+    render(<InGameScreen {...props({ gameMode: 'blast' as never })} />);
+    expect(coachArgs.every((a) => a.active === false)).toBe(true);
   });
 
   it('stays off on the Quick Play board, which shows its own coach hint', () => {

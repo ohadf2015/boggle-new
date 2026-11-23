@@ -5,7 +5,8 @@ import { X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
-import { stageWantsExampleWord, type StuckStage } from '../../../lib/ftue/mpStuckCoach';
+import type { StuckStage } from '../../../lib/ftue/mpStuckCoach';
+import type { StuckCoachMode } from '../../../lib/ftue/stuckCoachMemory';
 import { DragHintDiagram } from './DragHintDiagram';
 
 interface MPStuckCoachCardProps {
@@ -17,6 +18,8 @@ interface MPStuckCoachCardProps {
    * across letters" into something they can actually do right now.
    */
   exampleWord?: string | null;
+  /** Wheel modes are spelled by tapping or swiping around a center letter. */
+  mode?: StuckCoachMode;
 }
 
 // Each stage maps to copy that matches its specific confusion — never generic.
@@ -37,19 +40,30 @@ const COPY: Record<Exclude<StuckStage, 'none'>, { key: string; fallback: string 
     key: 'mpCoach.validityHint',
     fallback: 'Letters must connect. Spell a real word — 2 letters or more',
   },
+  // The escalation card says only "Try: WORD" next to the traced word: it must fit under a phone board.
+  example: {
+    key: 'mpCoach.idleNudge',
+    fallback: 'Drag across letters to spell a word',
+  },
 };
 
+const WHEEL_NUDGE = {
+  key: 'mpCoach.wheelNudge',
+  fallback: 'Tap or swipe letters to spell a word. Every word uses the center letter',
+};
+const isWheel = (mode?: StuckCoachMode) => mode === 'wheelRush' || mode === 'dailyWheel';
+
 /**
- * The single visible surface of the MP stuck-player coach. Neo-brutalist card
+ * The single visible surface of the stuck-player coach, in every word mode. Neo-brutalist card
  * with a stage-matched message, the wordless drag diagram, and a dismiss button.
  * Renders nothing when there is no active hint.
  */
-export function MPStuckCoachCard({ stage, onDismiss, exampleWord }: MPStuckCoachCardProps) {
+export function MPStuckCoachCard({ stage, onDismiss, exampleWord, mode }: MPStuckCoachCardProps) {
   const { t } = useLanguage();
   if (stage === 'none') return null;
 
-  const copy = COPY[stage];
-  const showExample = !!exampleWord && stageWantsExampleWord(stage);
+  const copy = isWheel(mode) && stage === 'idle-nudge' ? WHEEL_NUDGE : COPY[stage];
+  const showExample = !!exampleWord && stage === 'example';
 
   return (
     <div
@@ -60,9 +74,9 @@ export function MPStuckCoachCard({ stage, onDismiss, exampleWord }: MPStuckCoach
     >
       <DragHintDiagram word={showExample ? exampleWord : null} />
       <div className="flex-1">
-        <p className="font-neo-body text-sm leading-snug">{t(copy.key, copy.fallback)}</p>
+        {!showExample && <p className="font-neo-body text-sm leading-snug">{t(copy.key, copy.fallback)}</p>}
         {showExample && (
-          <p className="mt-1 font-neo-display text-sm font-black leading-snug">
+          <p className="font-neo-display text-base font-black leading-snug">
             {t('mpCoach.tryWord', 'Try: {word}', {
               // solve-grid returns Hebrew words sofit-folded (גרמ); the caption
               // must read as a real word (גרם). No-op for other scripts.

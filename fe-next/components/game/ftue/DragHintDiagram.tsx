@@ -25,7 +25,7 @@ export function DragHintDiagram({ word }: { word?: string | null } = {}) {
       className="mp-coach-diagram"
       aria-hidden="true"
     >
-      <div className="mp-coach-tiles">
+      <div className="mp-coach-tiles" dir={dir}>
         {letters.map((ch, i) => (
           <span key={i} className="mp-coach-tile">
             {ch}

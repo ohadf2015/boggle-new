@@ -14,7 +14,8 @@ import { WordHuntCategoryHint } from './WordHuntCategoryHint';
 import { WordHuntFirstTimeNudges } from './WordHuntFirstTimeNudges';
 import { WordHuntQuickRules } from './WordHuntQuickRules';
 import { useWordHuntDangerAlerts } from '@/hooks/useWordHuntDangerAlerts';
-import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
+import { useStuckCoach } from '@/hooks/useStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackMpFtue } from '@/utils/posthogEngagement';
 import type { DeathRecapStats, DeathCause } from './WordHuntDeathRecap';
 import type { Socket } from 'socket.io-client';
@@ -128,19 +129,22 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
     disablePathHighlighting: true,
   });
 
-  // MP drag-to-spell FTUE — shows after 20s of no drag / no word.
-  // Gated on socket presence so solo Survival never triggers it.
+  // Gated on socket presence: solo Survival has its own coach owner.
   const validWordsFound = foundWords.filter(w => w.isValid !== false && !w.duplicate).length;
-  const ftue = useMPFTUEIdle({
-    enabled: !!socket && gameActive && !bridge.isGameOver,
+  const stuckCoach = useStuckCoach({
+    mode: 'wordHunt',
+    active: !!socket && gameActive && !bridge.isGameOver,
     wordsFound: validWordsFound,
+    grid,
+    language: gameLanguage || 'en',
     onShown: () => trackMpFtue({ event: 'shown', mode: 'word_hunt' }),
+    onDismissed: () => trackMpFtue({ event: 'dismissed', mode: 'word_hunt', reason: 'manual' }),
   });
 
   // Handle word change from grid swiping
   // Keyed on the stable callback, not the per-render `ftue` object: a fresh
   // onWordChange re-rendered the board on every leaderboard/score update.
-  const markFtueActivity = ftue.markActivity;
+  const markFtueActivity = stuckCoach.markActivity;
   const handleWordChange = useCallback((word: string, count: number) => {
     if (count > 0) markFtueActivity();
     setFormedWord(word);
@@ -342,18 +346,11 @@ export const WordHuntGame = memo<WordHuntGameProps>(({
       // Death recap
       deathRecapStats={deathRecapStats}
 
-      dragFTUE={{
-        visible: ftue.visible,
-        onDismiss: () => {
-          trackMpFtue({ event: 'dismissed', mode: 'word_hunt', reason: 'manual' });
-          ftue.dismiss();
-        },
-      }}
-
       // Common
       t={t}
       gameDir={dir}
     />
+    <StuckCoachOverlay coach={stuckCoach} />
     {!mpChrome && (
       <WordHuntFirstTimeNudges
         lifePoints={bridge.lifePoints}

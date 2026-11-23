@@ -67,18 +67,39 @@ describe('MPStuckCoachCard', () => {
     const diagram = container.querySelector('[data-testid="drag-hint-diagram"]');
     expect(diagram).not.toBeNull();
     expect(diagram?.getAttribute('data-dir')).toBe('rtl');
+    // The tiles read in the word's own direction (no second flip on top of the page's RTL).
+    expect(diagram?.querySelector('.mp-coach-tiles')?.getAttribute('dir')).toBe('rtl');
     mockDir = 'ltr';
   });
 
   it('shows a Hebrew example word with its final letter in the caption', () => {
     // solve-grid hands back sofit-folded forms (גרמ); the caption must say גרם.
-    render(<MPStuckCoachCard stage="tap-hint" onDismiss={() => {}} exampleWord="גרמ" />);
+    render(<MPStuckCoachCard stage="example" onDismiss={() => {}} exampleWord="גרמ" />);
     // Caption only: the drag diagram mirrors board tiles, which never hold sofit.
     expect(screen.getByText(/^Try:/).textContent).toBe('Try: גרם');
   });
 
   it('leaves non-Hebrew example words as upper-case', () => {
-    render(<MPStuckCoachCard stage="tap-hint" onDismiss={() => {}} exampleWord="cat" />);
+    render(<MPStuckCoachCard stage="example" onDismiss={() => {}} exampleWord="cat" />);
     expect(screen.getByText(/^Try:/).textContent).toBe('Try: CAT');
+  });
+
+  it('the escalation card is just the word to trace, short enough to fit under a phone board', () => {
+    render(<MPStuckCoachCard stage="example" onDismiss={() => {}} exampleWord="cat" />);
+    expect(screen.getByRole('status').textContent).toBe('CATTry: CAT');
+  });
+
+  it('keeps the first nudge about the gesture; the word comes with the escalation', () => {
+    render(<MPStuckCoachCard stage="idle-nudge" onDismiss={() => {}} exampleWord="cat" />);
+    expect(screen.queryByText(/^Try:/)).toBeNull();
+  });
+
+  it('tells wheel players to tap or swipe through the center letter', () => {
+    const { unmount } = render(<MPStuckCoachCard stage="idle-nudge" onDismiss={() => {}} />);
+    const grid = screen.getByRole('status').textContent;
+    unmount();
+    render(<MPStuckCoachCard stage="idle-nudge" mode="wheelRush" onDismiss={() => {}} />);
+    expect(screen.getByRole('status').textContent).not.toBe(grid);
+    expect(screen.getByRole('status').textContent).toMatch(/center letter/i);
   });
 });

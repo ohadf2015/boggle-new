@@ -3,12 +3,18 @@
 import React, { useMemo, useEffect, useRef, useCallback, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAchievementQueue } from '@/components/achievements';
-import { useIdleDetection } from '@/hooks/useIdleDetection';
+import { useStuckCoach } from '@/hooks/useStuckCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 import { trackDeadTime, trackGrowthEvent } from '@/utils/growthTracking';
 import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
 import { useBoardReadyTelemetry } from './game/hooks/useBoardReadyTelemetry';
 
 const DEAD_TIME_THRESHOLD_MS = 15000;
+// Under the board; on a desktop shell whose board fills the height, over the empty words panel.
+const GRID_COACH_ANCHOR = [
+  { selector: '[role="grid"]', edge: 'below' },
+  { selector: '[data-testid="shell-words-empty"]', edge: 'over' },
+] as const;
 import {
   useSinglePlayerCore,
   SinglePlayerShell,
@@ -154,32 +160,6 @@ function SinglePlayerGame({
     core.handleFinishPractice();
   }, [core]);
 
-  // Dead-time growth signal: fire once per round after N seconds of no letter selection
-  const sessionKey = core.grid
-    ? (core.grid as LetterGrid).map((row) => row.join('')).join('|')
-    : 'nogrid';
-  const idleEnabled = Boolean(core.grid) && !core.isPaused && !core.isGameOver;
-  const handleIdle = useCallback(() => {
-    trackDeadTime(settings.mode, DEAD_TIME_THRESHOLD_MS, {
-      wordsFound: core.foundWords.length,
-      score: core.score,
-    });
-  }, [settings.mode, core.foundWords.length, core.score]);
-  const { reportActivity } = useIdleDetection({
-    enabled: idleEnabled,
-    thresholdMs: DEAD_TIME_THRESHOLD_MS,
-    onIdle: handleIdle,
-    sessionKey,
-  });
-
-  const coreWordChange = core.handleWordChange;
-  const wrappedWordChange = useCallback(
-    (word: string, count: number) => {
-      reportActivity();
-      coreWordChange(word, count);
-    },
-    [reportActivity, coreWordChange]
-  );
   const wrappedWordSubmit = core.handleWordSubmit;
 
   const lessonEnabled = settings.mode !== 'practice' && !hideModeCoach && !settings.shortCoach && !core.awaitingStart && !core.isGameOver;
@@ -213,6 +193,37 @@ function SinglePlayerGame({
     if (!coachStep) return;
     updateActiveGameExtras({ coach_step: coachStep });
   }, [coachStep]);
+
+  // Dead-time signal fires for everyone once per round; the coach only when no other coach is teaching.
+  const sessionKey = core.grid
+    ? (core.grid as LetterGrid).map((row) => row.join('')).join('|')
+    : 'nogrid';
+  const idleEnabled = Boolean(core.grid) && !core.isPaused && !core.isGameOver;
+  const handleIdle = useCallback(() => {
+    trackDeadTime(settings.mode, DEAD_TIME_THRESHOLD_MS, {
+      wordsFound: core.foundWords.length,
+      score: core.score,
+    });
+  }, [settings.mode, core.foundWords.length, core.score]);
+  const stuckCoach = useStuckCoach({
+    mode: 'singlePlayer',
+    active: idleEnabled && !core.awaitingStart && !lesson.active && !showSearchHint && settings.mode !== 'practice' && !hideModeCoach,
+    sessionKey,
+    wordsFound: core.foundWords.filter((w) => w.isValid !== false).length,
+    grid: core.grid as LetterGrid | null,
+    language: settings.language,
+    deadTime: { enabled: idleEnabled, thresholdMs: DEAD_TIME_THRESHOLD_MS, onDeadTime: handleIdle },
+  });
+
+  const reportActivity = stuckCoach.markActivity;
+  const coreWordChange = core.handleWordChange;
+  const wrappedWordChange = useCallback(
+    (word: string, count: number) => {
+      reportActivity();
+      coreWordChange(word, count);
+    },
+    [reportActivity, coreWordChange]
+  );
 
   // Wrap path submit to detect the "select every tile in one drag" hidden
   // achievement. Cosmetic + fire-and-forget; always delegates to the real handler.
@@ -427,6 +438,7 @@ function SinglePlayerGame({
         soloChrome={lesson.hud ?? (showSearchHint ? <SearchInlineHint onDismiss={dismissHint} /> : practiceCoachElement)}
         soloLessonActive={lesson.active}
       />
+      <StuckCoachOverlay coach={stuckCoach} anchor={GRID_COACH_ANCHOR} />
     </div>
   );
 }

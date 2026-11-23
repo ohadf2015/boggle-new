@@ -1,8 +1,8 @@
 /**
  * Perf rule 4 for the MP word hunt: a leaderboard/score update (and any
  * parent re-render) must cause ZERO board (GridComponent) re-renders. The
- * real `useMPFTUEIdle` returns a fresh object each render — the mock does too,
- * so a callback keyed on that object would be caught here.
+ * stuck-coach mock returns a fresh object each render, so a callback keyed on
+ * that object instead of its stable `markActivity` would be caught here.
  */
 import React from 'react';
 import { render, act } from '@testing-library/react';
@@ -42,10 +42,11 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t, language
 const EMPTY: never[] = [];
 const keyboard = { typedWord: '', isValidOnGrid: false, highlightedCells: EMPTY, clearTypedWord: () => {}, submitTypedWord: () => {}, isTypingMode: false };
 vi.mock('@/hooks/useKeyboardWordInput', () => ({ useKeyboardWordInput: () => keyboard }));
-vi.mock('@/hooks/useMPFTUEIdle', () => {
-  const markActivity = () => {};
-  const dismiss = () => {};
-  return { useMPFTUEIdle: () => ({ visible: false, markActivity, dismiss }) };
+vi.mock('@/hooks/useStuckCoach', () => {
+  const noop = () => {};
+  return {
+    useStuckCoach: () => ({ mode: 'wordHunt', stage: 'none', visible: false, exampleWord: null, markActivity: noop, markTap: noop, markDragStart: noop, markSubmit: noop, dismiss: noop }),
+  };
 });
 vi.mock('@/hooks/useWordHuntDangerAlerts', () => ({ useWordHuntDangerAlerts: () => ({ toasts: [], dismissToast: () => {} }) }));
 vi.mock('../WordHuntGameOverOverlay', () => ({ WordHuntGameOverOverlay: () => null }));

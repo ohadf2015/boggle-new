@@ -316,44 +316,40 @@ describe('WordHuntGame', () => {
     });
   });
 
-  describe('MP drag-FTUE wiring', () => {
+  describe('stuck coach wiring', () => {
     beforeEach(() => {
       vi.useFakeTimers();
-      localStorage.removeItem('mp_ftue_drag_v1');
+      localStorage.clear();
     });
     afterEach(() => {
       vi.useRealTimers();
-      localStorage.removeItem('mp_ftue_drag_v1');
+      localStorage.clear();
     });
 
-    it('passes a dragFTUE prop to the layout (hidden initially)', () => {
+    it('shows the shared stuck coach card to an idle MP player', () => {
       render(<WordHuntGame {...defaultProps} />);
-      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
-      expect(ftue).toBeTruthy();
-      expect(ftue.visible).toBe(false);
-      expect(typeof ftue.onDismiss).toBe('function');
+      expect(screen.queryByTestId('mp-stuck-coach-card')).toBeNull();
+      act(() => { vi.advanceTimersByTime(13_000); });
+      expect(screen.getByTestId('mp-stuck-coach-card')).toBeTruthy();
     });
 
-    it('does NOT pass FTUE in solo (no socket)', () => {
+    it('never coaches in solo (no socket)', () => {
       render(<WordHuntGame {...defaultProps} socket={null} />);
-      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
-      // Component still passes the prop, but visible never flips true for solo
       act(() => { vi.advanceTimersByTime(25_000); });
-      expect(ftue.visible).toBe(false);
+      expect(screen.queryByTestId('mp-stuck-coach-card')).toBeNull();
     });
 
-    it('hides FTUE once the player has found a valid word', () => {
+    it('hides the coach and remembers the mode once the player finds a valid word', () => {
       const { rerender } = render(<WordHuntGame {...defaultProps} />);
-      act(() => { vi.advanceTimersByTime(25_000); });
+      act(() => { vi.advanceTimersByTime(13_000); });
       rerender(
         <WordHuntGame
           {...defaultProps}
           foundWords={[{ word: 'HELLO', isValid: true, score: 10 }]}
         />,
       );
-      const ftue = capturedLayoutProps.value!.dragFTUE as { visible: boolean; onDismiss: () => void };
-      expect(ftue.visible).toBe(false);
-      expect(localStorage.getItem('mp_ftue_drag_v1')).toBe('dismissed');
+      expect(screen.queryByTestId('mp-stuck-coach-card')).toBeNull();
+      expect(localStorage.getItem('lc_stuck_coach_v1_wordHunt')).toBe('found');
     });
   });
 });
