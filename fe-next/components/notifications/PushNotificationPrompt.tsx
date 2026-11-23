@@ -18,6 +18,7 @@ import {
   dismissPushPrompt,
 } from '@/utils/pushNotifications';
 import { registerPushToken } from '@/utils/pushNotifications/tokenRegistration';
+import { isNative } from '@/utils/platform';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -57,6 +58,8 @@ export function PushNotificationPrompt() {
     // Re-read live rather than closing over the render-time value: the FIRST_WIN
     // listener below fires from an event, which can land mid-round.
     if (isOverlayQuietZoneActive()) return false;
+    // Only the native app can register a push token; on the web Enable did nothing.
+    if (!isNative()) return false;
     if (shouldShowFirstWinPushPrompt()) {
       clearFirstWinPromptPending();
       setTrigger('first_win');
@@ -111,11 +114,10 @@ export function PushNotificationPrompt() {
 
   async function handleEnable() {
     try {
-      // registerPushToken handles Capacitor perms on native and no-ops on web.
       // Do NOT gate on window.Notification.requestPermission — native WebView
       // exposes that API but it does not trigger the native push-perm dialog.
-      await registerPushToken();
-      trackGrowthEvent('push_prompt_granted', { trigger });
+      const registered = await registerPushToken();
+      trackGrowthEvent(registered ? 'push_prompt_granted' : 'push_prompt_failed', { trigger });
     } catch {
       // Permission request failed — close prompt silently
       trackGrowthEvent('push_prompt_failed', { trigger });

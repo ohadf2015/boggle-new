@@ -20,7 +20,7 @@ interface UseWheelLetterInputArgs {
   playButtonClickSound: () => void;
 }
 
-const DOUBLE_TAP_MS = 280;
+export const DOUBLE_TAP_MS = 280;
 
 /** Tap, double-tap, hold and drag spelling on the wheel, plus the builder edits. */
 export function useWheelLetterInput({

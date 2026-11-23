@@ -142,6 +142,12 @@ export function updateActiveGameExtras(patch: AbandonExtras): void {
   active.extras = { ...active.extras, ...patch };
 }
 
+/** For modes that only see each accepted word, not a running total (MP socket feedback). */
+export function countActiveGameWord(): void {
+  const prev = active ? active.extras.words_found : pendingExtras?.words_found;
+  updateActiveGameExtras({ words_found: (prev ?? 0) + 1 });
+}
+
 /**
  * Timing facts about the running game for the end/abandon payload. Read by
  * `trackGameEnd` before it clears the active game. `first_word_sec` is absent

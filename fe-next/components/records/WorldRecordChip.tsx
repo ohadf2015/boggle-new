@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Crown } from 'lucide-react';
@@ -59,10 +59,15 @@ export function WorldRecordChip({ mode, subMode, score, className }: WorldRecord
           ? 'chasing'
           : 'shown';
 
+  const loggedView = useRef<string | null>(null);
+  const recordKey = record?.recordKey;
   useEffect(() => {
-    if (!record || !state) return;
-    posthog.capture('world_record_viewed', { mode, record_key: record.recordKey, state });
-  }, [mode, record, state]);
+    if (!recordKey || !state) return;
+    const key = `${recordKey}:${state}`;
+    if (loggedView.current === key) return;
+    loggedView.current = key;
+    posthog.capture('world_record_viewed', { mode, record_key: recordKey, state });
+  }, [mode, recordKey, state]);
 
   if (!record || !state) return null;
 

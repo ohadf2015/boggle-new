@@ -20,6 +20,7 @@ import { reportGoldenWordFound, useWheelGoldenWord } from './wheel/useWheelGolde
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
+import { updateActiveGameExtras } from '@/utils/abandonOnPagehide';
 import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 import { liveVerdict } from '@/lib/wordWheel/liveVerdict';
 import { claimPointer } from '@/lib/wordWheel/claimPointer';
@@ -234,6 +235,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     wordsFoundRef.current = nextWordsFound;
     scoreRef.current += points;
     setWordsFound(nextWordsFound);
+    updateActiveGameExtras({ words_found: nextWordsFound.length });
     setScore(scoreRef.current);
     onWordFound?.(word, nextWordsFound, scoreRef.current);
     emitWheelVerdict('accepted', word);

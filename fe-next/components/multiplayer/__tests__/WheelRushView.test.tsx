@@ -244,9 +244,41 @@ describe('WheelRushView', () => {
     act(() => { fireEvent.click(cBtn!); });
     expect(container.querySelectorAll('[data-testid="built-letter-tile"]').length).toBe(1);
 
-    // Second tap on the same wheel letter → C is removed (toggle), not duplicated.
+    // A later tap on the same wheel letter → C is removed (toggle), not duplicated.
+    const later = Date.now() + 1000;
+    const nowSpy = vi.spyOn(Date, 'now').mockReturnValue(later);
     act(() => { fireEvent.click(cBtn!); });
+    nowSpy.mockRestore();
     expect(container.querySelectorAll('[data-testid="built-letter-tile"]').length).toBe(0);
+  });
+
+  it('double-tapping the last letter submits the word, as the hint under the wheel says', () => {
+    const socket = makeMockSocket();
+    const { container } = render(
+      <WheelRushView
+        socket={socket}
+        username="alice"
+        leaderboard={[{ username: 'alice', score: 0 }]}
+        onQuit={vi.fn()}
+        t={tStub}
+      />,
+    );
+    act(() => {
+      socket.fire('wheelRushInit', { puzzle, startedAt: Date.now() });
+    });
+    socket.emit.mockClear();
+    const tap = (l: string) => {
+      const btn = container.querySelector<HTMLButtonElement>(`[data-wheel-letter="${l}"]`);
+      act(() => { fireEvent.click(btn!); });
+    };
+    let clock = Date.now();
+    const nowSpy = vi.spyOn(Date, 'now').mockImplementation(() => clock);
+    for (const l of ['C', 'R', 'A', 'N', 'E']) { clock += 600; tap(l); }
+    clock += 120;
+    tap('E');
+    nowSpy.mockRestore();
+
+    expect(socket.emit).toHaveBeenCalledWith('submitWheelWord', { word: 'CRANE' });
   });
 
   it('rejects 2-letter word locally without emitting (matches server min 3)', () => {

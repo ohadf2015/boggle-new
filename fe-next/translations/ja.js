@@ -3879,6 +3879,7 @@ const ja = {
     "open": "lexiclash.live を開く"
   },
   "common": {
+    "holdToClear": "長押しで全部消す",
     "updateReady": "アップデートの準備ができました",
     "updateRestart": "再起動",
     "pressBackAgainToExit": "もう一度戻るで終了",

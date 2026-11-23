@@ -3495,6 +3495,7 @@ const en = {
     "open": "Open lexiclash.live"
   },
   "common": {
+    "holdToClear": "Hold to clear",
     "updateReady": "Update ready",
     "updateRestart": "Restart",
     "pressBackAgainToExit": "Press back again to exit",

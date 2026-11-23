@@ -7,6 +7,7 @@ import type { WordFeedback } from '../../WordFormingArea';
 import type { TranslationFn } from '../types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { hapticError, hapticWordAccepted } from '@/utils/haptics';
+import { countActiveGameWord } from '@/utils/abandonOnPagehide';
 
 interface UseSocketFeedbackOptions {
   socket: Socket | null;
@@ -59,6 +60,7 @@ export function useSocketFeedback(options: UseSocketFeedbackOptions): void {
       setLastWordFoundTime(Date.now());
       // A valid word landed — let the stuck-player coach mark success / "helped".
       onWordAccepted?.();
+      countActiveGameWord();
       const wordLen = data.word.length;
       emitMascotEvent({ kind: 'word-submitted', wordLength: wordLen, gemLetterUsed: false, word: data.word });
       const longWordLabel = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;

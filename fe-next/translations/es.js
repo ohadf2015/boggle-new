@@ -3878,6 +3878,7 @@ const es = {
     "open": "Abrir lexiclash.live"
   },
   "common": {
+    "holdToClear": "Mantén pulsado para borrar",
     "updateReady": "Actualización lista",
     "updateRestart": "Reiniciar",
     "pressBackAgainToExit": "Pulsa atrás otra vez para salir",

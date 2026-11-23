@@ -2,6 +2,8 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useHoldToClear } from '@/hooks/useHoldToClear';
+import { useHoldHint } from '@/hooks/useHoldHint';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -24,7 +26,13 @@ const ICON_BUTTON = cn(
 /** Clear, submit and backspace under the wheel. */
 const WheelActionBar: React.FC<WheelActionBarProps> = ({
   t, hasLetters, canSubmit, isValidating, onClear, onSubmit, onBackspace,
-}) => (
+}) => {
+  const holdHint = useHoldHint();
+  const backspaceHold = useHoldToClear({
+    onTap: () => { onBackspace(); holdHint.noteTap(); },
+    onHold: () => { holdHint.noteHold(); onClear(); },
+  });
+  return (
   <div
     data-testid="word-wheel-action-bar"
     // These are tapped rapidly in normal play; keep them out of rage-click detection.
@@ -64,15 +72,24 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
 
     <m.button
       type="button"
-      onClick={onBackspace}
+      {...backspaceHold}
       disabled={!hasLetters}
-      className={ICON_BUTTON}
+      className={cn(ICON_BUTTON, 'relative')}
       whileTap={{ scale: 0.9 }}
       aria-label={t('wordWheel.removeLetter')}
     >
       <Delete className="w-5 h-5" />
+      {holdHint.show && (
+        <span
+          role="status"
+          className="pointer-events-none absolute -top-9 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-neo border-2 border-black bg-neo-yellow px-2 py-0.5 font-neo-display text-xs font-black text-neo-navy shadow-hard-sm"
+        >
+          {t('common.holdToClear')}
+        </span>
+      )}
     </m.button>
   </div>
-);
+  );
+};
 
 export default WheelActionBar;

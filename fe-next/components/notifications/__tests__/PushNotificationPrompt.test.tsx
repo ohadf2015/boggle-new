@@ -74,6 +74,9 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
 }));
 
+const mockIsNative = vi.fn<() => boolean>();
+vi.mock('@/utils/platform', () => ({ isNative: () => mockIsNative() }));
+
 // Cookie-consent gate: prompt holds until consent is resolved. Default true.
 const mockConsentDecided = vi.fn<() => boolean>();
 vi.mock('@/hooks/useConsentDecided', () => ({
@@ -90,6 +93,7 @@ describe('PushNotificationPrompt', () => {
     mockShouldShow.mockReturnValue(true);
     mockShouldShowFirstWin.mockReturnValue(false);
     mockConsentDecided.mockReturnValue(true);
+    mockIsNative.mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -328,6 +332,31 @@ describe('PushNotificationPrompt', () => {
           expect.any(Object),
         );
       });
+    });
+  });
+  describe('web (no push channel)', () => {
+    it('never shows on the web, where Enable could not register anything', () => {
+      mockIsNative.mockReturnValue(false);
+      mockShouldShowFirstWin.mockReturnValue(true);
+
+      render(<PushNotificationPrompt />);
+      finishGame();
+
+      expect(screen.queryByText('Enable Notifications')).toBeNull();
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('push_prompt_shown', expect.anything());
+    });
+
+    it('reports a failed registration as failed, not granted', async () => {
+      vi.mocked(registerPushToken).mockResolvedValueOnce(false);
+
+      render(<PushNotificationPrompt />);
+      finishGame();
+      fireEvent.click(screen.getByText('Enable Notifications'));
+
+      await waitFor(() => {
+        expect(mockTrackGrowthEvent).toHaveBeenCalledWith('push_prompt_failed', expect.anything());
+      });
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('push_prompt_granted', expect.anything());
     });
   });
 });
