@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { heroPrimaryIsSolo, HERO_PLAY_CTA_KEY } from '../heroPlayCta';
+import { entryPlayNowHref, heroPrimaryIsSolo, HERO_PLAY_CTA_KEY } from '../heroPlayCta';
 import { en } from '@/translations/en';
 
 describe('hero play CTA experiment', () => {
@@ -17,7 +17,6 @@ describe('hero play CTA experiment', () => {
   });
 });
 
-import { entryPlayNowHref } from '../heroPlayCta';
 
 describe('entry pages under the hero CTA test', () => {
   it('maps listed SEO entry pages in any locale to the coached first game', () => {
