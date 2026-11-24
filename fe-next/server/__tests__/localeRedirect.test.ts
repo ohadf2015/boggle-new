@@ -160,3 +160,33 @@ describe('handleLocaleRedirect — root always rewrites (never 301)', () => {
     expect(r.url).toBe('/he?locale=he');
   });
 });
+
+describe('handleLocaleRedirect — root-served marker header', () => {
+  // The [locale] layout reads x-lc-root-served to self-canonicalize the page
+  // at `/` (lib/seo/hreflang.ts). The rewrite must tag the request with the
+  // locale bundle it picked, or `/` keeps emitting /en's canonical + an
+  // hreflang set with no entry for the URL actually served.
+  it('tags a crawler/non-browser rewrite with x-lc-root-served: en', () => {
+    const res = mockRes();
+    const r = rootReq('Googlebot/2.1 (+http://www.google.com/bot.html)');
+    expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
+    expect(r.url).toBe('/en');
+    expect((r.headers as Record<string, string>)['x-lc-root-served']).toBe('en');
+  });
+
+  it('tags a browser-navigation rewrite with the negotiated locale', () => {
+    const res = mockRes();
+    const r = browserNav('Mozilla/5.0 (Macintosh) AppleWebKit/537.36 Chrome/120 Safari/537.36');
+    (r.headers as Record<string, string>)['cookie'] = 'boggle_language=he';
+    expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
+    expect(r.url).toBe('/he');
+    expect((r.headers as Record<string, string>)['x-lc-root-served']).toBe('he');
+  });
+
+  it('overwrites a client-sent copy of the marker', () => {
+    const res = mockRes();
+    const r = rootReq('curl/8.0', { 'x-lc-root-served': 'ru' });
+    expect(handleLocaleRedirect(r, res, parsed())).toBe(false);
+    expect((r.headers as Record<string, string>)['x-lc-root-served']).toBe('en');
+  });
+});

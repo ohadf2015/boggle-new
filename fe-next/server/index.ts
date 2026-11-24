@@ -26,6 +26,7 @@ import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { ROOT_SERVED_HEADER } from '../lib/seo/hreflang';
 import { handleHomeMarkdown } from './markdownHome';
 import { applyOfflineShellCacheHeader } from './offlineShellCache';
 import { errorHandler, notFoundHandler } from './errorMiddleware';
@@ -191,6 +192,11 @@ async function start(): Promise<void> {
       const { pathname } = parsedUrl;
 
       if (handleHomeMarkdown(req, res, pathname)) return;
+
+      // The root-served marker is ours alone: a client-sent copy would make a
+      // locale page emit the root canonical (see lib/seo/hreflang.ts). Strip it
+      // here; handleLocaleRedirect re-adds it only on a genuine `/` rewrite.
+      delete req.headers[ROOT_SERVED_HEADER];
 
       // Handle root path locale redirect
       if (pathname === '/') {

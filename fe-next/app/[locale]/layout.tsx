@@ -4,7 +4,7 @@ import { layoutTranslations as translations } from '@/translations/layout';
 import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
 import { isLandingPath, PATHNAME_HEADER } from '@/lib/i18n/isLandingPath';
 import { isHeavyGamePath } from '@/lib/perf/heavyGamePath';
-import { HREFLANG_LOCALES } from '@/lib/seo/hreflang';
+import { HREFLANG_LOCALES, ROOT_SERVED_HEADER, ROOT_CANONICAL, hreflangAlternates, rootServedAlternates } from '@/lib/seo/hreflang';
 import { LocaleGtagLoader } from '@/components/LocaleGtagLoader';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
@@ -62,6 +62,29 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
 
+    // The bare root `/` is served at 200 via an internal rewrite (never a
+    // redirect — see server/localeRedirect.ts), carrying the locale bundle this
+    // layout renders. A 200 page must self-canonicalize and its hreflang set
+    // must contain an entry that points back at the served URL; emitting /en's
+    // tags here made Google split signals between `/` and `/en` and failed the
+    // live SEO audit ("canonical points elsewhere", "invalid hreflang"). The
+    // rewrite layer marks the request with ROOT_SERVED_HEADER (see
+    // lib/seo/hreflang.ts); x-default then names the negotiating root itself,
+    // which is Google's documented pattern for a locale-negotiating homepage.
+    // headers() is free here: fetchCache = 'force-no-store' below already makes
+    // every [locale] route dynamic. The try/catch is for build-time prerender
+    // (generateStaticParams on the home page) and direct unit-test calls, both
+    // outside a request scope — no marker exists there, so the locale canonical
+    // is the right answer.
+    let rootServed = false;
+    try {
+        rootServed = (await headers()).get(ROOT_SERVED_HEADER) === validLocale;
+    } catch {
+        rootServed = false;
+    }
+    const canonicalUrl = rootServed ? ROOT_CANONICAL : `https://www.lexiclash.live${localePath}`;
+    const languageAlternates = rootServed ? rootServedAlternates() : hreflangAlternates('');
+
     const ogImageAltMap: Record<string, string> = {
         he: 'לקסי קלאש - משחק מילים מרובה משתתפים',
         en: 'LexiClash - Multiplayer Word Game',
@@ -80,7 +103,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
         openGraph: {
             type: 'website',
             locale: seo.locale,
-            url: `https://www.lexiclash.live${localePath}`,
+            url: canonicalUrl,
             title: seo.ogTitle,
             description: seo.ogDescription,
             siteName: 'LexiClash',
@@ -119,33 +142,11 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
             ],
         },
         alternates: {
-            canonical: `https://www.lexiclash.live${localePath}`,
-            languages: {
-                'x-default': 'https://www.lexiclash.live/en',
-                he: 'https://www.lexiclash.live/he',
-                en: 'https://www.lexiclash.live/en',
-                sv: 'https://www.lexiclash.live/sv',
-                ja: 'https://www.lexiclash.live/ja',
-                es: 'https://www.lexiclash.live/es',
-                ru: 'https://www.lexiclash.live/ru',
-                'ru-RU': 'https://www.lexiclash.live/ru',
-                'en-IL': 'https://www.lexiclash.live/en',
-                'he-IL': 'https://www.lexiclash.live/he',
-                'en-US': 'https://www.lexiclash.live/en',
-                'es-US': 'https://www.lexiclash.live/es',
-                'en-GB': 'https://www.lexiclash.live/en',
-                'en-SE': 'https://www.lexiclash.live/en',
-                'sv-SE': 'https://www.lexiclash.live/sv',
-                'en-JP': 'https://www.lexiclash.live/en',
-                'ja-JP': 'https://www.lexiclash.live/ja',
-                'en-ES': 'https://www.lexiclash.live/en',
-                'es-ES': 'https://www.lexiclash.live/es',
-                'en-MX': 'https://www.lexiclash.live/en',
-                'es-MX': 'https://www.lexiclash.live/es',
-                'en-AU': 'https://www.lexiclash.live/en',
-                'es-AR': 'https://www.lexiclash.live/es',
-                'es-CO': 'https://www.lexiclash.live/es',
-            },
+            canonical: canonicalUrl,
+            // Built by lib/seo/hreflang (the same builder the sitemap uses) so
+            // the tags and the sitemap cannot drift apart. On the root-served
+            // page x-default names `/` itself; everywhere else it names /en.
+            languages: languageAlternates,
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',

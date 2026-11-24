@@ -6,6 +6,7 @@ import { isHiddenQaRoute } from './lib/qaRoutes';
 import { decideNextHandle } from './lib/seo/nextHandleGate';
 // Shared with the [locale] layout (RUM beacon suppression for crawlers).
 import { isBotUserAgent } from './lib/seo/botUa';
+import { ROOT_SERVED_HEADER } from './lib/seo/hreflang';
 import { isNativeAppUserAgent, nativeHandoffRoute } from './lib/native/nativeHandoff';
 import { needsSessionRefresh } from './lib/navigation/sessionRefreshRoutes';
 
@@ -182,7 +183,15 @@ export async function proxy(request: NextRequest) {
     const targetPath = pathname === '/' ? `/${locale}${search}` : `/${locale}${pathname}${search}`;
 
     if (isBot) {
-      return withLocaleVary(NextResponse.rewrite(new URL(targetPath, request.url)));
+      // The bare root rewrites to a locale bundle but keeps serving at `/`;
+      // mark it so the [locale] layout self-canonicalizes `/` and names it
+      // x-default (lib/seo/hreflang.ts). Any other rewrite must not carry a
+      // client-sent copy of the marker into a locale page. Production strips
+      // the marker one layer up (server/index.ts) before its own root rewrite.
+      const requestHeaders = new Headers(request.headers);
+      if (pathname === '/') requestHeaders.set(ROOT_SERVED_HEADER, locale);
+      else requestHeaders.delete(ROOT_SERVED_HEADER);
+      return withLocaleVary(NextResponse.rewrite(new URL(targetPath, request.url), { request: { headers: requestHeaders } }));
     }
 
     return withLocaleVary(NextResponse.redirect(new URL(targetPath, request.url), 307));
