@@ -281,7 +281,7 @@ export const WordTowerWheel = memo(function WordTowerWheel({
         >
           {/* Inner span carries the per-letter re-pop (keyed by length) so the
               keyframe's transform never fights the wrapper's centring translate. */}
-          <span key={word.length} data-feedback-ignore-rage="" className={cn('inline-block', !reducedMotion && 'wt-tile-pop')}>
+          <span key={word.length} className={cn('inline-block', !reducedMotion && 'wt-tile-pop')}>
             {word}
           </span>
         </div>

@@ -6,6 +6,7 @@
  * reads as "more below" instead of "cut off by the screen". Nothing in the
  * editor floats over the stage or the grid.
  */
+import { useState } from 'react';
 import { Dices, Undo2 } from 'lucide-react';
 
 type T = (key: string, a?: string | Record<string, string | number>, b?: Record<string, string | number>) => string;
@@ -16,12 +17,18 @@ interface EditorActionBarProps {
   onRandomize: () => void;
   onSave: () => void;
   t: T;
+  /** exp-avatar-randomize-feedback-v1 'feedback' arm: pop the dice icon on every tap. */
+  randomizeFeedback?: boolean;
 }
 
 const ICON_BTN =
   'shrink-0 w-12 h-12 rounded-neo border-[3px] border-black flex items-center justify-center shadow-hard active:translate-x-px active:translate-y-px active:shadow-hard-sm transition-transform disabled:opacity-40 disabled:shadow-none disabled:active:translate-x-0 disabled:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
-export default function EditorActionBar({ canUndo, onUndo, onRandomize, onSave, t }: EditorActionBarProps) {
+export default function EditorActionBar({ canUndo, onUndo, onRandomize, onSave, t, randomizeFeedback }: EditorActionBarProps) {
+  // Re-keying the icon replays `animate-neo-pop` on every click — a tier-change
+  // burst (see AvatarBuilderModal) doesn't fire on most random rolls, so this
+  // is the only feedback the tap gets.
+  const [randomizePulse, setRandomizePulse] = useState(0);
   return (
     <div
       data-testid="editor-actionbar"
@@ -41,12 +48,21 @@ export default function EditorActionBar({ canUndo, onUndo, onRandomize, onSave, 
       <button
         type="button"
         data-testid="editor-randomize"
-        onClick={onRandomize}
+        onClick={() => {
+          if (randomizeFeedback) setRandomizePulse(n => n + 1);
+          onRandomize();
+        }}
         aria-label={t('avatarBuilder.randomize')}
         title={t('avatarBuilder.randomize')}
         className={`${ICON_BTN} bg-neo-purple text-neo-white`}
       >
-        <Dices size={22} strokeWidth={2.5} aria-hidden="true" />
+        <Dices
+          key={randomizeFeedback ? randomizePulse : undefined}
+          size={22}
+          strokeWidth={2.5}
+          aria-hidden="true"
+          className={randomizeFeedback ? 'animate-neo-pop' : undefined}
+        />
       </button>
       <button
         type="button"

@@ -9,7 +9,8 @@ export type ResultsPlacement =
   | 'league-complete'
   | 'challenge-complete'
   | 'boss-rush-complete'
-  | 'multiplayer-round-complete';
+  | 'multiplayer-round-complete'
+  | 'word-tower-complete';
 
 interface ResultsBannerSlotProps {
   /** Analytics anchor — which results screen this slot belongs to. */

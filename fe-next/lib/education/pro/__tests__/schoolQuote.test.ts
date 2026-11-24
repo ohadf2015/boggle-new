@@ -48,6 +48,14 @@ describe('buildSchoolQuotePayload', () => {
     expect(buildSchoolQuotePayload({ ...base, teachers: -4 }).message).toContain('1');
     expect(buildSchoolQuotePayload({ ...base, teachers: 99999 }).student_count).toBe('gte_2000');
   });
+
+  it('adds the trial interest only when the lead asks to try before buying', () => {
+    expect(buildSchoolQuotePayload(base).interests).not.toContain('trial');
+    const payload = buildSchoolQuotePayload({ ...base, wantsTrial: true });
+    expect(payload.interests).toContain('trial');
+    expect(payload.interests).toContain('pricing_info');
+    expect(validateSchoolLeadPayload(payload).ok).toBe(true);
+  });
 });
 
 describe('schoolQuoteErrorKey', () => {

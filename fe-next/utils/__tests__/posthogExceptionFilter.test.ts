@@ -162,6 +162,27 @@ describe('filterEmptyException', () => {
     expect(filterEmptyException(event as never)).toBeNull();
   });
 
+  // Regression: 72 events / 6 users 14d, trending +600%, 100% Chrome (PostHog
+  // issue 01a1cbe1). "Object Not Found Matching Id:N, MethodName:update,
+  // ParamCount:N" is a known Chromium browser-extension artifact (extension
+  // content scripts calling a stale postMessage target after the page they
+  // injected into navigates/unmounts) — fires across unrelated pages
+  // (/en/teacher/upgrade, /audit, /), never from our own promise chains.
+  it('drops "Object Not Found Matching Id" browser-extension noise', () => {
+    const event = {
+      event: '$exception',
+      properties: {
+        $exception_list: [
+          {
+            type: 'UnhandledRejection',
+            value: 'Non-Error promise rejection captured with value: Object Not Found Matching Id:1, MethodName:update, ParamCount:4',
+          },
+        ],
+      },
+    };
+    expect(filterEmptyException(event as never)).toBeNull();
+  });
+
   it('keeps unrelated AbortError (not from Supabase lock)', () => {
     const event = {
       event: '$exception',

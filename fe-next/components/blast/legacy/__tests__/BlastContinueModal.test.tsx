@@ -156,4 +156,19 @@ describe('BlastContinueModal', () => {
     expect(screen.queryByTestId('blast-continue-cta')).toBeNull();
     expect(screen.getByTestId('blast-continue-decline')).toBeDefined();
   });
+
+  it('does not promise an ad in the body copy when no ad is available', () => {
+    hookReturn.canShowAd = false;
+    render(
+      <BlastContinueModal
+        isOpen
+        bonusMoves={5}
+        onContinue={vi.fn()}
+        onDecline={vi.fn()}
+        t={t}
+      />,
+    );
+    expect(screen.getByText('blast.continueModal.bodyNoAd')).toBeDefined();
+    expect(screen.queryByText('blast.continueModal.body')).toBeNull();
+  });
 });

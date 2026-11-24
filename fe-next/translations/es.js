@@ -2538,6 +2538,7 @@ const es = {
       "youWin": "¡Ganas la carrera!",
       "wins": "¡gana la carrera!",
       "winner": "¡{winner} gana la carrera!",
+      "yourRank": "Quedaste",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -14005,18 +14006,21 @@ const es = {
     "continueModal": {
       "title": "¡No pares ahora!",
       "body": "Te quedaste sin movimientos. Mira un anuncio rápido para seguir jugando.",
+      "bodyNoAd": "Te quedaste sin movimientos. No hay anuncio disponible ahora — puedes terminar la partida aquí.",
       "cta": "Ver anuncio por +{moves} movimientos",
       "decline": "Terminar partida"
     },
     "retryWaveModal": {
       "title": "Oleada {wave}: ¡muy cerca!",
       "body": "Limpiaste {percent}%. Mira un anuncio para reintentar la oleada {wave}. Tus oleadas previas se conservan.",
+      "bodyNoAd": "Limpiaste {percent}%. No hay anuncio disponible ahora — puedes reiniciar desde la oleada 1.",
       "cta": "Ver anuncio · reintentar oleada {wave}",
       "decline": "Reiniciar desde la oleada 1"
     },
     "pregameBuff": {
       "title": "¿Potenciar?",
       "body": "Elige un boost, mira un anuncio corto y empieza la partida con ventaja.",
+      "bodyNoAd": "No hay boosts disponibles ahora — puedes saltar y empezar la partida directamente.",
       "shield": "Escudo",
       "bomb": "Bomba",
       "combo2x": "Combo x2",
@@ -14229,12 +14233,16 @@ const es = {
       "highScorerDesc": "Superaste los 10,000 puntos. Nivel élite."
     },
     "mascot": {
+      "mute": "Silenciar reacciones de la mascota",
+      "unmute": "Activar reacciones de la mascota",
       "hyped": "Mascota eufórica celebrando tu combo",
       "sneaky": "Mascota astuta buscando el tesoro",
       "sweating": "Mascota nerviosa sobreviviendo la cuenta atrás",
       "celebrating": "Mascota celebrando con el trofeo",
       "sadSmile": "Mascota con sonrisa consoladora",
-      "neutral": "Mascota lista para la siguiente ola"
+      "neutral": "Mascota lista para la siguiente ola",
+      "mute": "Silenciar las reacciones de la mascota",
+      "unmute": "Activar las reacciones de la mascota"
     },
     "archetypes": {
       "normal": "Ola estándar",
@@ -16211,7 +16219,11 @@ const es = {
       "homeCta": "Ver esta semana"
     },
     "proPowered": {"hint": "Incluido en tu plan Teacher Pro"},
-    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"}
+    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"},
+    "schoolBulkCta": {
+      "text": "¿Lo usas en todo el centro escolar?",
+      "link": "Consulta precios para centros"
+    }
   },
   "education": {
     "race": {
@@ -17330,6 +17342,7 @@ const es = {
         "subtitle": "Tu clase verá este nombre en la pizarra.",
         "placeholder": "Escribe tu nombre",
         "submit": "Entrar al juego",
+        "submitting": "Entrando…",
         "roomLabel": "Sala {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · partida en vivo: {{lesson}}",

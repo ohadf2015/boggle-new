@@ -27,6 +27,7 @@ import { useV2Dictionary } from './useV2Dictionary';
 import { useV2Layout } from './useV2Layout';
 import { useCanvasFeeds } from './useCanvasFeeds';
 import { useRejectFlash, useWordWheel } from './useWordWheel';
+import { useWordTowerPlacingNudge } from './useWordTowerPlacingNudge';
 import { useDailyGoalToast, useTenantArrivals } from './useRunCheers';
 import { RunRewards } from './rewards/RunRewards';
 import { useRewardsFlow } from './rewards/useRewardsFlow';
@@ -207,6 +208,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     dictRef, dictReady, braceApi, flashReject, clearRejectRepeat, playSound, recordPlay, keysBlocked,
   });
   const { wheel, selected, word, valid, resetForRun } = ww;
+  const placingNudge = useWordTowerPlacingNudge();
   const guide = useGuidedFirstWord({ daily, dict: dictRef.current, dictReady, dictError, wheel, selected, phase, towerFloors, floors: run.floors });
   const guideActive = guide.status !== 'off' && guide.status !== 'done';
   const firstFloorHint = useFirstFloorHint({ dict: dictRef.current, dictReady, wheel, selectedCount: selected.length, phase, floors: run.floors, towerFloors, guideActive });
@@ -412,6 +414,7 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
         onClearWord={ww.clearWord}
         hint={firstFloorHint}
         feedSlot={rails ? <DailyTowerFeed t={t} words={builtWords} /> : undefined}
+        {...placingNudge}
       />
 
       {((showOver && resultsReady) || forceResults) && !resultsDismissed ? (

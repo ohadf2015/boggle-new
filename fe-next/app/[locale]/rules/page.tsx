@@ -1,6 +1,7 @@
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
+import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
 import RulesPageClient from './PageClient';
 
@@ -176,6 +177,7 @@ export default async function RulesPage({ params }: { params: Promise<{ locale: 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <RulesPageClient />
       <GuidesCalloutLink locale={locale} />
+      <EducationCalloutLink locale={locale} />
       <EsScrabbleCrossLink locale={locale} anchorVariant="query" />
       <GamePageSeoContent
         title={content.title}

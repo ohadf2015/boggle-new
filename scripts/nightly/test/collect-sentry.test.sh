@@ -73,6 +73,21 @@ assert "all magnitudes numeric"               '[ "$(jq "[.signals[] | select(.ma
 assert "all reaches numeric"                  '[ "$(jq "[.signals[] | select(.reach|type!=\"number\")] | length" "$OUT")" = "0" ]'
 assert "all fingerprints set"                 '[ "$(jq "[.signals[] | select(.fingerprint==\"\")] | length" "$OUT")" = "0" ]'
 
+echo "collect-sentry: query excludes growthradar.app cross-tenant noise"
+rm -f "$OUT" "$BIN/curl.args"
+cat > "$BIN/curl" <<'STUB2'
+#!/bin/bash
+echo "$*" >> "$(dirname "$0")/curl.args"
+echo '[]'
+STUB2
+chmod +x "$BIN/curl"
+PATH="$BIN:$PATH" SENTRY_AUTH_TOKEN=test_token \
+  SENTRY_ORG_SLUG=myorg SENTRY_PROJECT_SLUG=myproj \
+  SENTRY_HOST=https://sentry.io \
+  INTEL_ROOT="$INTEL_ROOT" INTEL_DIR="$INTEL_DIR" bash "$COL" >/dev/null
+assert "query excludes app:growth-radar tag (cross-tenant growthradar.app noise)" \
+  'grep -qi "app%3Agrowth-radar\|app:growth-radar" "$BIN/curl.args"'
+
 echo "collect-sentry: degrade when token unset"
 rm -f "$OUT"
 ( unset SENTRY_AUTH_TOKEN SENTRY_ORG_SLUG SENTRY_PROJECT_SLUG

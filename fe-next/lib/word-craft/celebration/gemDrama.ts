@@ -40,6 +40,17 @@ export function planGemDrama(gem: { rarity: GemRarity }): GemDramaPlan {
   }
 }
 
+/**
+ * Transmuting 3 chips→shard or 3 shards→crown is a reward moment too — the
+ * same tier a board pickup of that rarity would trigger. Without this, every
+ * transmute played the same flat "tierPromotion" sting regardless of whether
+ * it just unlocked a crown (the biggest moment in the mode) or a minor shard.
+ */
+export function dramaForTransmuteResult(sourceRarity: GemRarity): GemDramaPlan {
+  const nextRarity = (sourceRarity + 1) as GemRarity;
+  return planGemDrama({ rarity: nextRarity });
+}
+
 export function clampGemDramaForCosy(plan: GemDramaPlan): GemDramaPlan {
   if (plan.tier !== 'crown') return plan;
   return {

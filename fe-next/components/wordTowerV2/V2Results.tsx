@@ -11,6 +11,7 @@ import { RaidFlow } from './rivals/RaidFlow';
 import { RivalBoard } from './rivals/RivalBoard';
 import { ResultsMute } from './ResultsMute';
 import { DailyTowerResults } from './DailyTowerResults';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -247,6 +248,7 @@ function EndlessResults({ t, peakM, score, bestM, isBest, run, badges, unlocked,
             </div>
           </div>
         ) : null}
+        <ResultsBannerSlot placement="word-tower-complete" className="mt-3" />
         </div>
         <div className={rivals ? 'md:min-w-0 md:flex-1' : 'contents'}>
         {socialSlot ? <div className="mt-3">{socialSlot}</div> : null}

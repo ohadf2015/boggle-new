@@ -17,6 +17,7 @@
 import React from 'react';
 import { VolumeX } from 'lucide-react';
 import { MASCOT_GIF_PATHS, type MascotState } from '@/lib/blast/mascotState';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlastMascotHudProps {
   state: MascotState;
@@ -38,6 +39,7 @@ export function BlastMascotHud({
   onToggle,
   className = '',
 }: BlastMascotHudProps) {
+  const { t } = useLanguage();
   // When muted, force idle pose so no GIF motion plays.
   const effectiveState: MascotState = enabled ? state : 'idle';
   const src = MASCOT_GIF_PATHS[effectiveState];
@@ -47,7 +49,7 @@ export function BlastMascotHud({
     ? {
         onClick: onToggle,
         type: 'button' as const,
-        'aria-label': enabled ? 'Mute mascot reactions' : 'Unmute mascot reactions',
+        'aria-label': t(enabled ? 'blast.mascot.mute' : 'blast.mascot.unmute'),
       }
     : {};
 
