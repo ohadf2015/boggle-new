@@ -20,6 +20,7 @@ import { fromWordWheel, fromSurvival } from './normalizeResult';
 import { ghostsToWheelRivals } from '@/lib/quickPlay/ghostRivals';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import posthog from '@/lib/analytics/lazyPosthog';
 
 // Classic runs the multiplayer board (InGameScreen) solo for everyone.
 const QuickClassicBoard = dynamic(() => import('./QuickClassicBoard'), { ssr: false });
@@ -67,6 +68,12 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  // Inside the hub's error boundary on purpose: a mode whose dynamic chunk
+  // fails is absent here, where a hub-level effect would fire anyway.
+  useEffect(() => {
+    posthog.capture('quick_play_board_render_started', { mode: config.mode, seed: config.seed });
+  }, [config.mode, config.seed]);
 
   const finish = useCallback(
     (result: QuickRoundResult) => {

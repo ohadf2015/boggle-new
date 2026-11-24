@@ -131,6 +131,43 @@ describe('QuickPlayHub', () => {
     expect(bodies).toEqual(['blast', 'blast']);
   });
 
+  it('a board that reached the screen reports its real fetch time, so the drop-off has a denominator', async () => {
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_loaded',
+      expect.objectContaining({ mode: 'blast', roundIndex: 1, ms: expect.any(Number) })
+    );
+  });
+
+  it('a round the server refused reports the status instead of vanishing into the error screen', async () => {
+    fetchMock.mockImplementation((url: string) =>
+      String(url).includes('/round')
+        ? Promise.resolve({ ok: false, status: 503, json: async () => ({}) })
+        : Promise.resolve({ ok: true, json: async () => ({}) })
+    );
+    render(<QuickPlayHub startMode="wheel-rush" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_fetch_failed',
+      expect.objectContaining({ mode: 'wheel-rush', status: 503, roundIndex: 1 })
+    );
+  });
+
+  it('a round request that never answered reports status 0, not a missing event', async () => {
+    fetchMock.mockImplementation((url: string) =>
+      String(url).includes('/round')
+        ? Promise.reject(new Error('offline'))
+        : Promise.resolve({ ok: true, json: async () => ({}) })
+    );
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => expect(screen.getByTestId('quick-load-error')).toBeTruthy());
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_fetch_failed',
+      expect.objectContaining({ mode: 'blast', status: 0 })
+    );
+  });
+
   it('holds the overlay quiet zone while results are on screen so the cookie bar stays off NEXT BOARD', async () => {
     render(<QuickPlayHub />);
     await waitFor(() => screen.getByTestId('mock-finish'));

@@ -270,6 +270,8 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
+    // 0 = never answered (offline, abort) — not the same bug as a server saying no.
+    let status = 0;
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
@@ -279,6 +281,7 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
         // every round. Local history, so guests are covered too; 0 = unknown.
         body: JSON.stringify({ mode, language, seed, recentPct: recentAveragePct() }),
       });
+      status = res.status ?? 0;
       if (!res.ok) {
         setRateLimited(res.status === 429);
         throw new Error(`round fetch ${res.status}`);
@@ -289,9 +292,13 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
       setPhase('playing');
+      // After the phase flip: backing out during the strike hold must not report
+      // a board nobody saw. ms is the fetch that the hold then hides.
+      posthog.capture('quick_play_board_loaded', { mode: round.mode, roundIndex, ms: elapsed });
     } catch {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
       // tap is indistinguishable from a bug).
+      posthog.capture('quick_play_board_fetch_failed', { mode, status, roundIndex });
       setPhase('error');
     } finally {
       loadingRef.current = false;
