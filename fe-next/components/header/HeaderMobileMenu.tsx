@@ -242,10 +242,9 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
             <div className="sm:hidden flex items-center gap-1.5 min-w-0 shrink-0">
                 <MusicControls compact />
 
-                {/* Language lives in the drawer; CrazyGames has no drawer, so it keeps the pill. */}
-                {mounted && isCrazyGames && (
-                    <QuickLanguageSwitcher compact className="w-9 h-9 border-2" />
-                )}
+                {/* Language picker stays in the header on phones and desktop.
+                    (PR #2128 had moved the phone pill into the drawer only.) */}
+                <QuickLanguageSwitcher compact className="min-w-9 h-9 px-1.5 border-2" />
 
                 {/* Unified auth button for guests (hidden on CrazyGames).
                     Also gated on `cgLoading` so the button does not flash

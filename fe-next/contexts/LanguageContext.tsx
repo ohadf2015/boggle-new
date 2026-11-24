@@ -309,6 +309,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             localStorage.setItem('boggle_language', language);
             // Set cookie with 1-year expiry for server-side middleware
             document.cookie = `boggle_language=${language}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+            document.cookie = `NEXT_LOCALE=${language}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         }
     }, [language]);
 
@@ -355,6 +356,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             // Also update cookie immediately for server-side consistency
             if (typeof document !== 'undefined') {
                 document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+                document.cookie = `NEXT_LOCALE=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
                 document.cookie = `boggle_language_explicit=1; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
             }
 

@@ -19,16 +19,24 @@ function rootReq(ua: string, extraHeaders: Record<string, string> = {}): GeoRequ
 // A real browser top-level navigation always sends Sec-Fetch-Mode: navigate.
 const browserNav = (ua: string) => rootReq(ua, { 'sec-fetch-mode': 'navigate' });
 
-function mockRes(): Response & { _status?: number; _location?: string } {
+function mockRes(): Response & { _status?: number; _location?: string; _headers: Record<string, string> } {
   const res = {
+    _headers: {} as Record<string, string>,
     writeHead(status: number, headers: Record<string, string>) {
       (res as { _status?: number })._status = status;
       (res as { _location?: string })._location = headers?.Location;
       return res;
     },
+    getHeader(name: string) {
+      return res._headers[name.toLowerCase()];
+    },
+    setHeader(name: string, value: string) {
+      res._headers[name.toLowerCase()] = value;
+      return res;
+    },
     end() { return res; },
   };
-  return res as unknown as Response & { _status?: number; _location?: string };
+  return res as unknown as Response & { _status?: number; _location?: string; _headers: Record<string, string> };
 }
 
 const parsed = (): UrlWithParsedQuery => ({ pathname: '/', search: '' } as unknown as UrlWithParsedQuery);
@@ -66,6 +74,30 @@ describe('determineLocale', () => {
     expect(determineLocale(req({ 'accept-language': 'de-DE,fr;q=0.8' }))).toBe('en');
     expect(determineLocale(req({}))).toBe('en');
   });
+
+  it('honours NEXT_LOCALE when boggle_language is absent', () => {
+    const r = req({
+      cookie: 'NEXT_LOCALE=ja',
+      'accept-language': 'en-US',
+    });
+    expect(determineLocale(r)).toBe('ja');
+  });
+
+  it('prefers Accept-Language over an IL country header', () => {
+    const r = req({
+      'accept-language': 'en-GB,en;q=0.9',
+      'cf-ipcountry': 'IL',
+    });
+    expect(determineLocale(r)).toBe('en');
+  });
+
+  it('uses country only when Accept-Language does not map', () => {
+    const r = req({
+      'accept-language': 'de-DE,fr;q=0.8',
+      'x-country-code': 'IL',
+    });
+    expect(determineLocale(r)).toBe('he');
+  });
 });
 
 describe('isNonBrowserClient', () => {
@@ -91,6 +123,8 @@ describe('handleLocaleRedirect — root always rewrites (never 301)', () => {
     expect(handled).toBe(false);
     expect(r.url).toBe('/he');
     expect(res._status).toBeUndefined();
+    expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Accept-Language/i);
+    expect((res as { _headers: Record<string, string> })._headers['vary']).toMatch(/Cookie/i);
   });
 
   it('serves x-default /en to SEO crawlers (sitemap canonical)', () => {

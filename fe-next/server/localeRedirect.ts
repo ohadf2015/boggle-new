@@ -6,7 +6,12 @@
 import type { Request, Response } from 'express';
 import type { UrlWithParsedQuery } from 'url';
 import { httpLogger } from './logger';
-import { resolveLocaleFromAcceptLanguage } from '../lib/localeResolution';
+import {
+  COUNTRY_TO_LOCALE,
+  countryFromHeaders,
+  resolveRequestLocale,
+  mergeVary,
+} from '../lib/localeResolution';
 
 /**
  * Extended Request with geo data
@@ -19,19 +24,8 @@ export interface GeoRequest extends Request {
   url: string;
 }
 
-// Country-to-locale mapping
-export const COUNTRY_TO_LOCALE: Record<string, string> = {
-  IL: 'he', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en',
-  IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
-  SE: 'sv', FI: 'sv', JP: 'ja',
-  // Russian-speaking countries
-  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
-  // Spanish-speaking countries
-  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
-  VE: 'es', EC: 'es', GT: 'es', CU: 'es', BO: 'es', DO: 'es',
-  HN: 'es', PY: 'es', SV: 'es', NI: 'es', CR: 'es', PA: 'es',
-  UY: 'es', PR: 'es', GQ: 'es'
-};
+// Re-exported so existing imports keep working. Country is a weak fallback only.
+export { COUNTRY_TO_LOCALE };
 
 export const SUPPORTED_LOCALES: string[] = ['he', 'en', 'sv', 'ja', 'es', 'ru'];
 export const DEFAULT_LOCALE: string = 'en';
@@ -94,39 +88,26 @@ export function isBot(userAgent: string): boolean {
 }
 
 /**
- * Determine locale from request
- * Priority: cookie > Accept-Language > default
- * Location-based detection removed to respect user preferences
- * @param req - Express request object
- * @returns Locale code
+ * Determine locale from request.
+ * Precedence: ?locale= > saved cookie (boggle_language, then NEXT_LOCALE)
+ * > Accept-Language > geo country (weak fallback) > default.
+ * A locale-prefixed URL is never passed through this function.
  */
 export function determineLocale(req: GeoRequest): string {
-  // Priority 1: explicit ?locale= query (supports documented ?locale=he for testing/RTL/automation + deep links)
-  const urlStr = (req as any).url || '';
+  const urlStr = (req as { url?: string }).url || '';
   const qMatch = /[?&]locale=([a-z]{2})/i.exec(urlStr);
-  if (qMatch && SUPPORTED_LOCALES.includes(qMatch[1])) {
-    return qMatch[1];
-  }
-
-  // Priority 2: Cookie preference (explicit user selection)
-  const cookies = req.headers.cookie;
-  const cookieLocale = cookies?.split(';')
-    .find(c => c.trim().startsWith('boggle_language='))
-    ?.split('=')[1];
-
-  if (cookieLocale && SUPPORTED_LOCALES.includes(cookieLocale)) {
-    return cookieLocale;
-  }
-
-  // Priority 3: Accept-Language header (browser preference). Shared resolver
-  // q-sorts the full list AND maps close-but-unshipped languages to a native
-  // bundle (e.g. pt-BR -> es) before falling back to DEFAULT_LOCALE. Previously
-  // this only inspected the first tag and ignored proximity, so Brazilians got
-  // English instead of our (far more intelligible) Spanish bundle.
-  return resolveLocaleFromAcceptLanguage(
-    req.headers['accept-language'],
-    DEFAULT_LOCALE,
-  );
+  const headerCountry = countryFromHeaders((name) => {
+    const value = req.headers[name];
+    return Array.isArray(value) ? value[0] : value;
+  });
+  const country = req.geoData?.countryCode || headerCountry;
+  const accept = req.headers['accept-language'];
+  return resolveRequestLocale({
+    queryLocale: qMatch?.[1] ?? null,
+    cookieHeader: typeof req.headers.cookie === 'string' ? req.headers.cookie : null,
+    acceptLanguage: Array.isArray(accept) ? accept.join(',') : accept,
+    country,
+  }, DEFAULT_LOCALE);
 }
 
 /**
@@ -136,9 +117,19 @@ export function determineLocale(req: GeoRequest): string {
  * @param parsedUrl - Parsed URL object
  * @returns True if request was handled (redirected), false to continue
  */
-export function handleLocaleRedirect(req: GeoRequest, _res: Response, parsedUrl: UrlWithParsedQuery): boolean {
+export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: UrlWithParsedQuery): boolean {
   const userAgent = (req.headers['user-agent'] as string) || '';
   const locale = determineLocale(req);
+  if (typeof res.setHeader === 'function') {
+    const existingVary = typeof res.getHeader === 'function' ? res.getHeader('Vary') : undefined;
+    res.setHeader(
+      'Vary',
+      mergeVary(
+        typeof existingVary === 'number' ? String(existingVary) : (existingVary as string | string[] | undefined),
+        'Accept-Language, Cookie',
+      ),
+    );
+  }
   const queryString = parsedUrl.search || '';
 
   // A real browser TOP-LEVEL navigation always sends `Sec-Fetch-Mode: navigate`

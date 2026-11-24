@@ -1,7 +1,7 @@
 import { legacyClassroomLiveRedirect, legacyHostLiveRedirect } from './lib/education/classroomLivePath';
 import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
-import { matchAcceptLanguage } from './lib/localeResolution';
+import { countryFromHeaders, mergeVary, resolveRequestLocale } from './lib/localeResolution';
 import { isHiddenQaRoute } from './lib/qaRoutes';
 import { decideNextHandle } from './lib/seo/nextHandleGate';
 // Shared with the [locale] layout (RUM beacon suppression for crawlers).
@@ -158,7 +158,10 @@ export async function proxy(request: NextRequest) {
     // (prod after #1177: Location /en/singleplayer, 16-byte body). Match the
     // beforeFiles destination (/en/...) so FCP/LCP stay hop-free.
     if (pathname === '/singleplayer' || pathname.startsWith('/singleplayer/')) {
-      const rewriteUrl = new URL(`/en${pathname}${search}`, request.url);
+      // Hop-free rewrite (keeps FCP off a redirect), but negotiate the locale
+      // instead of hard-coding /en. Bots get the English x-default bundle.
+      const locale = isBot ? DEFAULT_LOCALE : getLocaleFromRequest(request);
+      const rewriteUrl = new URL(`/${locale}${pathname}${search}`, request.url);
       const requestHeaders = new Headers(request.headers);
       requestHeaders.set('x-lc-pathname', pathname);
       const rewriteResponse = NextResponse.rewrite(rewriteUrl, {
@@ -168,19 +171,21 @@ export async function proxy(request: NextRequest) {
       response.cookies.getAll().forEach((cookie) => {
         rewriteResponse.cookies.set(cookie.name, cookie.value);
       });
-      return rewriteResponse;
+      return withLocaleVary(rewriteResponse);
     }
 
-    const locale = getLocaleFromRequest(request) || DEFAULT_LOCALE;
+    // Bots always get the English x-default bundle and stay on the requested
+    // URL (internal rewrite). Users are temporarily redirected so the chosen
+    // locale is in the address bar; 307 (not 301/308) so a later cookie or
+    // Accept-Language change is not permanently cached by the browser.
+    const locale = isBot ? DEFAULT_LOCALE : getLocaleFromRequest(request);
     const targetPath = pathname === '/' ? `/${locale}${search}` : `/${locale}${pathname}${search}`;
 
-    // Bots: internal rewrite (no redirect = saves crawl budget)
     if (isBot) {
-      return NextResponse.rewrite(new URL(targetPath, request.url));
+      return withLocaleVary(NextResponse.rewrite(new URL(targetPath, request.url)));
     }
 
-    // Users: 301 permanent redirect (locale structure is permanent)
-    return NextResponse.redirect(new URL(targetPath, request.url), 301);
+    return withLocaleVary(NextResponse.redirect(new URL(targetPath, request.url), 307));
   }
 
   // Add security headers
@@ -201,20 +206,23 @@ function continueRequest(request: NextRequest): NextResponse {
   });
 }
 
-/**
- * Extract locale from request
- * Checks Accept-Language header, cookie, or defaults to 'en'
- */
-function getLocaleFromRequest(request: NextRequest): string | null {
-  // Check cookie first (user preference) - LanguageContext sets 'boggle_language'
-  const localeCookie = request.cookies.get('boggle_language');
-  if (localeCookie && VALID_LOCALES.includes(localeCookie.value as typeof VALID_LOCALES[number])) {
-    return localeCookie.value;
-  }
+function withLocaleVary(response: NextResponse): NextResponse {
+  response.headers.set('Vary', mergeVary(response.headers.get('Vary'), 'Accept-Language, Cookie'));
+  return response;
+}
 
-  // Check Accept-Language header. Returns null when no tag maps (exactly or by
-  // proximity, e.g. pt-BR -> es) so the Express localeRedirect can decide.
-  return matchAcceptLanguage(request.headers.get('accept-language'));
+/**
+ * Locale for an unprefixed request.
+ * Precedence: ?locale= > boggle_language / NEXT_LOCALE cookie > Accept-Language
+ * > geo country (weak fallback) > default. Prefixed URLs never call this.
+ */
+function getLocaleFromRequest(request: NextRequest): string {
+  return resolveRequestLocale({
+    queryLocale: request.nextUrl.searchParams.get('locale'),
+    cookieHeader: request.headers.get('cookie'),
+    acceptLanguage: request.headers.get('accept-language'),
+    country: countryFromHeaders((name) => request.headers.get(name)),
+  }, DEFAULT_LOCALE);
 }
 
 export const config = {
