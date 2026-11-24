@@ -15,9 +15,13 @@ vi.mock('next/dynamic', () => ({
 // and `headers()` throws "headers was called outside a request scope" when the
 // component is rendered directly by a unit test instead of by the Next router.
 // Empty headers is the realistic default: the beacon falls back to '' for country.
+// Tests that exercise the root-served canonical override swap `current`.
+const { mockRequestHeaders } = vi.hoisted(() => ({
+    mockRequestHeaders: { current: new Headers() },
+}));
 vi.mock('next/headers', () => ({
     __esModule: true,
-    headers: async () => new Headers(),
+    headers: async () => mockRequestHeaders.current,
 }));
 
 // Mock next/script - render as script tag for testing
@@ -175,6 +179,67 @@ describe('generateMetadata App Links (al:android)', () => {
         const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'he' }) } as Parameters<typeof generateMetadata>[0]);
 
         expect(metadata.other?.['al:android:url']).toBe('https://www.lexiclash.live/he');
+    });
+});
+
+describe('generateMetadata canonical + hreflang (root-served override)', () => {
+    afterEach(() => {
+        mockRequestHeaders.current = new Headers();
+    });
+
+    it('self-canonicalizes the locale page and names /en as x-default when the marker is absent', async () => {
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) } as Parameters<typeof generateMetadata>[0]);
+
+        expect(metadata.alternates?.canonical).toBe('https://www.lexiclash.live/en');
+        const languages = metadata.alternates?.languages as Record<string, string>;
+        expect(languages['x-default']).toBe('https://www.lexiclash.live/en');
+        expect(languages.en).toBe('https://www.lexiclash.live/en');
+        expect(languages.he).toBe('https://www.lexiclash.live/he');
+        expect(metadata.openGraph?.url).toBe('https://www.lexiclash.live/en');
+    });
+
+    it('self-canonicalizes `/` and names the root as x-default when served from the bare root (en bundle)', async () => {
+        mockRequestHeaders.current = new Headers({ 'x-lc-root-served': 'en' });
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) } as Parameters<typeof generateMetadata>[0]);
+
+        // The page answers 200 at https://www.lexiclash.live/ — the canonical
+        // must point at the URL actually served, not at /en.
+        expect(metadata.alternates?.canonical).toBe('https://www.lexiclash.live/');
+        expect(metadata.openGraph?.url).toBe('https://www.lexiclash.live/');
+        const languages = metadata.alternates?.languages as Record<string, string>;
+        // The hreflang set must contain an entry that points back at the served
+        // page itself (x-default = the negotiating root).
+        expect(languages['x-default']).toBe('https://www.lexiclash.live/');
+        expect(Object.values(languages)).toContain('https://www.lexiclash.live/');
+        // The per-locale alternates are unchanged.
+        expect(languages.en).toBe('https://www.lexiclash.live/en');
+        expect(languages.he).toBe('https://www.lexiclash.live/he');
+    });
+
+    it('self-canonicalizes `/` for a negotiated non-en bundle at the root (he)', async () => {
+        mockRequestHeaders.current = new Headers({ 'x-lc-root-served': 'he' });
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'he' }) } as Parameters<typeof generateMetadata>[0]);
+
+        expect(metadata.alternates?.canonical).toBe('https://www.lexiclash.live/');
+        const languages = metadata.alternates?.languages as Record<string, string>;
+        expect(languages['x-default']).toBe('https://www.lexiclash.live/');
+    });
+
+    it('ignores a marker that names a different locale than the one being rendered', async () => {
+        // Defensive: the header is only meaningful when the rewrite target and
+        // the rendered locale agree.
+        mockRequestHeaders.current = new Headers({ 'x-lc-root-served': 'he' });
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) } as Parameters<typeof generateMetadata>[0]);
+
+        expect(metadata.alternates?.canonical).toBe('https://www.lexiclash.live/en');
     });
 });
 

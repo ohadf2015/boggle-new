@@ -12,6 +12,7 @@ import {
   resolveRequestLocale,
   mergeVary,
 } from '../lib/localeResolution';
+import { ROOT_SERVED_HEADER } from '../lib/seo/hreflang';
 
 /**
  * Extended Request with geo data
@@ -151,6 +152,14 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   const servesXDefault =
     isSeoCrawler(userAgent) || isNonBrowserClient(userAgent) || !isBrowserNavigation;
   const targetLocale = servesXDefault ? 'en' : locale;
+
+  // Tell the [locale] layout this response is served at the bare root `/`, so
+  // its canonical self-points at `/` and x-default names the negotiating root
+  // (lib/seo/hreflang.ts ROOT_SERVED_HEADER). Without it the page emitted /en's
+  // tags at `/` — canonical elsewhere + an hreflang set with no self entry.
+  // server/index.ts strips any client-sent copy of this header before we run,
+  // so only a genuine root rewrite can set it.
+  req.headers[ROOT_SERVED_HEADER] = targetLocale;
 
   httpLogger.debug({ targetLocale, servesXDefault, queryString }, 'Root rewrite (no redirect)');
   parsedUrl.pathname = `/${targetLocale}`;
