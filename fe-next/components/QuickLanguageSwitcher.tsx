@@ -19,16 +19,17 @@ import type { Language } from '@/types';
 interface LanguageOption {
   code: Language;
   flag: string;
-  labelKey: string;
+  /** Language name in that language, shown regardless of the current UI locale. */
+  endonym: string;
 }
 
 const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { code: 'en', flag: '🇺🇸', labelKey: 'joinView.english' },
-  { code: 'he', flag: '🇮🇱', labelKey: 'joinView.hebrew' },
-  { code: 'sv', flag: '🇸🇪', labelKey: 'joinView.swedish' },
-  { code: 'ja', flag: '🇯🇵', labelKey: 'joinView.japanese' },
-  { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
-  { code: 'ru', flag: '🇷🇺', labelKey: 'joinView.russian' },
+  { code: 'en', flag: '🇺🇸', endonym: 'English' },
+  { code: 'he', flag: '🇮🇱', endonym: 'עברית' },
+  { code: 'sv', flag: '🇸🇪', endonym: 'Svenska' },
+  { code: 'ja', flag: '🇯🇵', endonym: '日本語' },
+  { code: 'es', flag: '🇪🇸', endonym: 'Español' },
+  { code: 'ru', flag: '🇷🇺', endonym: 'Русский' },
 ];
 
 // Not a locale yet: a waitlist entry that measures Arabic demand. Shown as an endonym in every UI language.
@@ -85,9 +86,10 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
       }}
     >
       <SelectTrigger
+        data-testid={compact ? 'header-language-switcher' : 'drawer-language-switcher'}
         className={cn(
           "flex items-center justify-center gap-1",
-          compact ? "w-10 h-10 px-0" : showLabel ? "w-auto h-10 px-3" : "w-14 h-10 px-1.5",
+          compact ? "w-auto min-w-10 h-10 px-1.5" : showLabel ? "w-auto h-10 px-3" : "w-14 h-10 px-1.5",
           // Neo-brutalist base styling
           "bg-neo-cream text-neo-black dark:bg-neo-navy-elevated dark:text-white",
           "border-3 border-neo-black dark:border-neo-cream",
@@ -109,11 +111,16 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
       >
         <SelectValue>
           <div className="flex items-center justify-center gap-1">
-            <span className={cn("leading-none", compact ? "text-lg" : "text-xl")} role="img" aria-label={selectedOption ? t(selectedOption.labelKey) : ''}>
+            <span className={cn("leading-none", compact ? "text-lg" : "text-xl")} role="img" aria-label={selectedOption?.endonym ?? ''}>
               {currentFlag}
             </span>
+            {compact && (
+              <span className="text-[10px] font-black leading-none tracking-wide" aria-hidden="true">
+                {language.toUpperCase()}
+              </span>
+            )}
             {showLabel && selectedOption && (
-              <span className="font-bold text-sm">{t(selectedOption.labelKey)}</span>
+              <span className="font-bold text-sm">{selectedOption.endonym}</span>
             )}
             {!compact && (
               <ChevronDown className="w-4 h-4 text-neo-black/60 dark:text-white" aria-hidden="true" />
@@ -152,11 +159,13 @@ export const QuickLanguageSwitcher = memo<QuickLanguageSwitcherProps>(({
               <span
                 className="text-xl leading-none"
                 role="img"
-                aria-label={t(option.labelKey)}
+                aria-label={option.endonym}
               >
                 {option.flag}
               </span>
-              <span className="font-bold">{t(option.labelKey)}</span>
+              <span className="font-bold" lang={option.code} dir={option.code === 'he' ? 'rtl' : 'ltr'}>
+                {option.endonym}
+              </span>
             </div>
           </SelectItem>
         ))}

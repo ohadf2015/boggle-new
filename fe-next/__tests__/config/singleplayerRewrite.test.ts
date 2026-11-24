@@ -1,14 +1,9 @@
 /**
- * Bare /singleplayer must be an internal rewrite to /en/singleplayer, not the
- * catch-all 308 redirect. PSI (and real visitors) save a full round trip before
- * any render-blocking resource can start; in Lighthouse's Lantern model the 308
- * hop sat in the critical path and pinned simulated FCP at ~1803ms (r4/r5).
- *
- * Next.js order is Headers → Redirects → Middleware (proxy.ts) → beforeFiles
- * rewrites → filesystem. The catch-all permanent redirect MUST exclude
- * `singleplayer`, or it 308s before the rewrite (post-#1176). After that
- * exclusion, proxy.ts must also rewrite (not 301) — see r7 follow-up.
- * Refs: r6 / #1177 / t_dfd64604.
+ * Locale negotiation for unprefixed paths lives in proxy.ts, not in a static
+ * next.config redirect to /en. A permanent catch-all ran BEFORE middleware and
+ * pinned every /multiplayer (and similar) visit to English, ignoring
+ * Accept-Language and the language cookie. /singleplayer is a hop-free rewrite
+ * in proxy.ts to the negotiated locale.
  */
 import { describe, it, expect, vi } from 'vitest';
 
@@ -21,40 +16,26 @@ vi.mock('@sentry/nextjs', () => ({
 
 const nextConfig = (await import('../../next.config.mjs')).default;
 
-describe('/singleplayer rewrite (r6 follow-up)', () => {
-  it('rewrites /singleplayer to /en/singleplayer in beforeFiles', async () => {
+describe('unprefixed paths are not statically pinned to /en', () => {
+  it('does not rewrite /singleplayer to a hard-coded /en/singleplayer', async () => {
     const rewrites = await (nextConfig as { rewrites?: () => Promise<unknown> }).rewrites?.();
     const beforeFiles = (rewrites as { beforeFiles?: Array<{ source: string; destination: string }> })
       ?.beforeFiles;
 
     expect(beforeFiles, 'rewrites() must return { beforeFiles }').toBeDefined();
     const rule = beforeFiles!.find((r) => r.source === '/singleplayer');
-    expect(rule, 'no beforeFiles rewrite for /singleplayer').toBeDefined();
-    expect(rule!.destination).toBe('/en/singleplayer');
+    expect(rule).toBeUndefined();
   });
 
-  it('catch-all locale redirects exclude singleplayer so the rewrite can win', async () => {
+  it('has no catch-all locale redirect to /en/:path', async () => {
     const redirects = await (nextConfig as {
       redirects?: () => Promise<Array<{ source: string; destination: string; permanent?: boolean }>>;
     }).redirects?.();
 
-    // Flat catch-all: /:path → /en/:path
-    const flat = (redirects ?? []).find(
-      (r) => r.destination === '/en/:path' && r.source.includes(':path'),
-    );
-    expect(flat, 'flat catch-all /en/:path redirect missing').toBeDefined();
-    expect(flat!.source).toMatch(/singleplayer/);
-    // Negative-lookahead style exclusion (same family as en|he|…).
-    expect(flat!.source).toMatch(/\(\?!.*singleplayer/);
-    expect(flat!.permanent).toBe(true);
+    const catchAlls = (redirects ?? []).filter((r) => r.destination.startsWith('/en/:path'));
+    expect(catchAlls).toEqual([]);
 
-    // Nested catch-all: /:path/:rest* → /en/:path/:rest*
-    const nested = (redirects ?? []).find(
-      (r) => r.destination === '/en/:path/:rest*' && r.source.includes(':rest*'),
-    );
-    expect(nested, 'nested catch-all /en/:path/:rest* redirect missing').toBeDefined();
-    expect(nested!.source).toMatch(/singleplayer/);
-    expect(nested!.source).toMatch(/\(\?!.*singleplayer/);
-    expect(nested!.permanent).toBe(true);
+    const root = (redirects ?? []).find((r) => r.source === '/' && r.destination === '/en');
+    expect(root).toBeUndefined();
   });
 });

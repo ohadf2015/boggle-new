@@ -94,7 +94,7 @@ describe('QuickLanguageSwitcher', () => {
     const { container } = render(<QuickLanguageSwitcher compact />);
 
     const trigger = container.querySelector('button');
-    expect(trigger).toHaveClass('w-10', 'h-10');
+    expect(trigger).toHaveClass('min-w-10', 'h-10');
   });
 
   it('should apply custom className', () => {

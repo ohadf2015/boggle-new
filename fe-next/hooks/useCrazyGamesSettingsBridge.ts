@@ -6,15 +6,8 @@ import { useCrazyGamesSettings } from '@/hooks/useCrazyGamesSettings';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { locales } from '@/lib/i18n';
+import { localeFromCountry, matchLanguageList } from '@/lib/localeResolution';
 import type { Language } from '@/shared/types/game';
-
-// Map CrazyGames country codes to our supported locales
-const COUNTRY_TO_LOCALE: Record<string, Language> = {
-  IL: 'he',
-  SE: 'sv',
-  JP: 'ja',
-  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
-};
 
 /**
  * Bridge component hook that syncs CrazyGames platform settings to game audio/chat.
@@ -49,11 +42,19 @@ export function useCrazyGamesSettingsBridge() {
 
     const detectLocale = async () => {
       try {
+        // Browser languages outrank the CrazyGames country code: an English
+        // speaker travelling (or living in IL) should not be forced into Hebrew.
+        const fromBrowser = matchLanguageList(
+          typeof navigator !== 'undefined' ? navigator.languages : undefined,
+        );
+        if (fromBrowser) {
+          setLanguage(fromBrowser as Language);
+          return;
+        }
         const info = await getSystemInfo();
-        if (!info?.countryCode) return;
-        const mapped = COUNTRY_TO_LOCALE[info.countryCode.toUpperCase()];
+        const mapped = localeFromCountry(info?.countryCode);
         if (mapped) {
-          setLanguage(mapped);
+          setLanguage(mapped as Language);
         }
       } catch { /* silent */ }
     };

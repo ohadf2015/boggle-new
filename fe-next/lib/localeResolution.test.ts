@@ -6,6 +6,11 @@ import {
   mapToSupportedLocale,
   matchAcceptLanguage,
   resolveLocaleFromAcceptLanguage,
+  localeFromCountry,
+  localeFromCookieHeader,
+  countryFromHeaders,
+  resolveRequestLocale,
+  mergeVary,
 } from './localeResolution';
 
 describe('mapToSupportedLocale', () => {
@@ -99,5 +104,112 @@ describe('resolveLocaleFromAcceptLanguage (defaults to en)', () => {
 
   it('routes a Brazilian header to Spanish, not the English default', () => {
     expect(resolveLocaleFromAcceptLanguage('pt-BR,pt;q=0.9,en;q=0.8')).toBe('es');
+  });
+});
+
+describe('localeFromCountry (weak fallback only)', () => {
+  it('maps known countries and ignores placeholders', () => {
+    expect(localeFromCountry('IL')).toBe('he');
+    expect(localeFromCountry('il')).toBe('he');
+    expect(localeFromCountry('US')).toBe('en');
+    expect(localeFromCountry('SE')).toBe('sv');
+    expect(localeFromCountry('JP')).toBe('ja');
+    expect(localeFromCountry('ES')).toBe('es');
+    expect(localeFromCountry('RU')).toBe('ru');
+    expect(localeFromCountry('XX')).toBeNull();
+    expect(localeFromCountry('T1')).toBeNull();
+    expect(localeFromCountry('DE')).toBeNull();
+    expect(localeFromCountry(null)).toBeNull();
+  });
+});
+
+describe('localeFromCookieHeader', () => {
+  it('prefers boggle_language over NEXT_LOCALE', () => {
+    expect(localeFromCookieHeader('NEXT_LOCALE=he; boggle_language=en')).toBe('en');
+    expect(localeFromCookieHeader('boggle_language=sv')).toBe('sv');
+    expect(localeFromCookieHeader('NEXT_LOCALE=ja')).toBe('ja');
+    expect(localeFromCookieHeader('boggle_language=pt; NEXT_LOCALE=he')).toBe('he');
+    expect(localeFromCookieHeader('session=abc')).toBeNull();
+  });
+});
+
+describe('countryFromHeaders', () => {
+  it('reads the first recognisable geo header', () => {
+    expect(countryFromHeaders((n) => (n === 'cf-ipcountry' ? 'IL' : null))).toBe('IL');
+    expect(countryFromHeaders((n) => (n === 'x-vercel-ip-country' ? 'SE' : 'XX'))).toBe('SE');
+    expect(countryFromHeaders(() => 'XX')).toBeNull();
+  });
+});
+
+describe('resolveRequestLocale precedence', () => {
+  it('honours an explicit ?locale= query first', () => {
+    expect(resolveRequestLocale({
+      queryLocale: 'he',
+      cookieHeader: 'boggle_language=en',
+      acceptLanguage: 'en-US,en;q=0.9',
+      country: 'US',
+    })).toBe('he');
+  });
+
+  it('honours a saved cookie above Accept-Language and country', () => {
+    expect(resolveRequestLocale({
+      cookieHeader: 'boggle_language=en',
+      acceptLanguage: 'he-IL,he;q=0.9',
+      country: 'IL',
+    })).toBe('en');
+    expect(resolveRequestLocale({
+      cookieHeader: 'NEXT_LOCALE=sv',
+      acceptLanguage: 'he',
+      country: 'IL',
+    })).toBe('sv');
+  });
+
+  it('uses Accept-Language above country, including he/iw and regional variants', () => {
+    // English-preferring visitor in Israel must not be forced into Hebrew.
+    expect(resolveRequestLocale({
+      acceptLanguage: 'en-GB,en;q=0.9',
+      country: 'IL',
+    })).toBe('en');
+    expect(resolveRequestLocale({
+      acceptLanguage: 'he-IL,he;q=0.9,en;q=0.8',
+      country: 'US',
+    })).toBe('he');
+    expect(resolveRequestLocale({
+      acceptLanguage: 'iw,en;q=0.8',
+      country: 'US',
+    })).toBe('he');
+    expect(resolveRequestLocale({
+      acceptLanguage: 'pt-BR,pt;q=0.9,en;q=0.8',
+      country: 'IL',
+    })).toBe('es');
+  });
+
+  it('falls back to country only when Accept-Language does not map', () => {
+    expect(resolveRequestLocale({
+      acceptLanguage: 'de-DE,fr;q=0.8',
+      country: 'IL',
+    })).toBe('he');
+    expect(resolveRequestLocale({
+      country: 'JP',
+    })).toBe('ja');
+  });
+
+  it('defaults to English when nothing maps', () => {
+    expect(resolveRequestLocale({
+      acceptLanguage: 'de-DE',
+      country: 'DE',
+    })).toBe('en');
+    expect(resolveRequestLocale({})).toBe('en');
+  });
+});
+
+describe('mergeVary', () => {
+  it('appends Accept-Language and Cookie without duplicating', () => {
+    expect(mergeVary('Accept-Encoding', 'Accept-Language, Cookie')).toBe(
+      'Accept-Encoding, Accept-Language, Cookie',
+    );
+    expect(mergeVary('Accept-Language, Cookie', 'Accept-Language, Cookie')).toBe(
+      'Accept-Language, Cookie',
+    );
   });
 });

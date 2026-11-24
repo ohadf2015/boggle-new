@@ -157,17 +157,9 @@ const nextConfig = {
         // which hid whole teacher sessions. Paths match PostHog's Next.js proxy recipe.
         { source: '/lcx/static/:path*', destination: 'https://eu-assets.i.posthog.com/static/:path*' },
         { source: '/lcx/:path*', destination: 'https://eu.i.posthog.com/:path*' },
-        // Bare /singleplayer: internal rewrite to /en/singleplayer instead of the
-        // catch-all 308 below. PSI (and every real visitor on the bare path) saves
-        // a full redirect round trip before any render-blocking resource can start
-        // — the 308 hop sat in Lantern's critical path and pinned simulated FCP.
-        // SEO is unchanged: the page still canonicals to /en/singleplayer, same as
-        // the redirect target. Locale auto-detect only ever ran at '/', never here
-        // (the catch-all always targeted /en).
-        {
-          source: '/singleplayer',
-          destination: '/en/singleplayer',
-        },
+        // /singleplayer locale negotiation lives in proxy.ts as a hop-free
+        // rewrite to the negotiated locale (not a hard-coded /en). A static
+        // beforeFiles rewrite here would pin every visitor to English.
       ],
       afterFiles: [
         {
@@ -190,16 +182,12 @@ const nextConfig = {
       // /schools and /{locale}/schools 404'd; send them to the school quote page.
       ...SCHOOL_ROUTE_ALIASES,
       ...RETIRED_MODE_REDIRECTS,
-      // Redirect bare root to default locale (prevents 404 and duplicate content flags).
-      // NOTE: in production the custom Express server (server/localeRedirect.ts)
-      // handles `/` BEFORE Next sees it — locale-detecting 301 for browsers,
-      // internal rewrite (200 + content) for bots/verifiers. This rule is the
-      // Next-only-dev / fallback path.
-      {
-        source: '/',
-        destination: '/en',
-        permanent: true,
-      },
+      // Bare `/` is not statically redirected to /en. In production the Express
+      // server (server/localeRedirect.ts) rewrites `/` to the negotiated locale
+      // (cookie > Accept-Language > country > en) and serves 200. In Next-only
+      // dev, proxy.ts does the same negotiation with a 307 for browsers and a
+      // rewrite for bots. A permanent / → /en rule would ignore Accept-Language.
+
       // Legal page aliases: AdSense reviewers and ad verifiers routinely probe
       // Classroom join links written by hand. Only `/[locale]/join/[code]`
       // resolves; the query-string shape 404s (measured on production
@@ -338,24 +326,12 @@ const nextConfig = {
         destination: '/es/juego-de-palabras-multijugador',
         permanent: true,
       },
-      // Catch-all: redirect any path without a locale prefix to /en/...
-      // This prevents 308s from the app router and gives Google clean 301s.
-      // Must be AFTER the non-www redirect and root redirect above.
-      // `singleplayer` is excluded so the beforeFiles rewrite (/singleplayer →
-      // /en/singleplayer) can win: Next.js order is Headers → Redirects →
-      // beforeFiles rewrites → filesystem, so a matching permanent redirect
-      // here would 308 before the rewrite ever runs (r6 / #1176 follow-up).
-      {
-        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|lcx|favicon\\.ico|singleplayer|.*\\..*).*)',
-        destination: '/en/:path',
-        permanent: true,
-      },
-      // Also handle nested paths without locale (e.g. /legal/privacy → /en/legal/privacy)
-      {
-        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|lcx|favicon\\.ico|singleplayer|.*\\..*).*?)/:rest*',
-        destination: '/en/:path/:rest*',
-        permanent: true,
-      },
+      // No static catch-all to /en. Unprefixed paths are negotiated in proxy.ts
+      // (cookie > Accept-Language > country > default) with a 307 for users and
+      // an internal rewrite for bots, so an English-preferring visitor in Israel
+      // is not pinned to Hebrew, and a Hebrew browser is not pinned to /en.
+      // Next.js runs redirects BEFORE middleware, so a permanent /:path → /en/:path
+      // rule here would win and ignore Accept-Language (the previous bug).
     ];
   },
 

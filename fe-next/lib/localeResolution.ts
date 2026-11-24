@@ -130,3 +130,132 @@ export function matchLanguageList(
   }
   return null;
 }
+
+/**
+ * Weak country → locale map. Used only after an explicit choice and
+ * Accept-Language have both failed to produce a supported locale. Country is a
+ * poor proxy for language (an English speaker in Israel, a Spanish speaker in
+ * the US), so this must never outrank the browser language or a saved cookie.
+ */
+export const COUNTRY_TO_LOCALE: Record<string, string> = {
+  IL: 'he', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en',
+  IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
+  SE: 'sv', FI: 'sv', JP: 'ja',
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
+  ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
+  VE: 'es', EC: 'es', GT: 'es', CU: 'es', BO: 'es', DO: 'es',
+  HN: 'es', PY: 'es', SV: 'es', NI: 'es', CR: 'es', PA: 'es',
+  UY: 'es', PR: 'es', GQ: 'es',
+};
+
+/** Cookie names that store an explicit or previously negotiated UI locale. */
+export const LOCALE_COOKIE_NAMES = ['boggle_language', 'NEXT_LOCALE'] as const;
+
+const COUNTRY_HEADER_NAMES = [
+  'x-country-code',
+  'cf-ipcountry',
+  'x-vercel-ip-country',
+  'cloudfront-viewer-country',
+] as const;
+
+/** Cloudflare uses XX for unknown and T1 for Tor — not real countries. */
+const IGNORED_COUNTRY_CODES = new Set(['', 'XX', 'T1', 'ZZ']);
+
+export function localeFromCountry(country: string | null | undefined): string | null {
+  if (!country) return null;
+  const code = country.trim().toUpperCase();
+  if (IGNORED_COUNTRY_CODES.has(code)) return null;
+  const mapped = COUNTRY_TO_LOCALE[code];
+  return mapped && SUPPORTED.has(mapped) ? mapped : null;
+}
+
+export function countryFromHeaders(
+  getHeader: (name: string) => string | null | undefined,
+): string | null {
+  for (const name of COUNTRY_HEADER_NAMES) {
+    const value = getHeader(name);
+    if (!value) continue;
+    const code = value.trim().toUpperCase();
+    if (!IGNORED_COUNTRY_CODES.has(code)) return code;
+  }
+  return null;
+}
+
+export function localeFromCookieHeader(cookieHeader: string | null | undefined): string | null {
+  if (!cookieHeader) return null;
+  const map = new Map<string, string>();
+  for (const part of cookieHeader.split(';')) {
+    const eq = part.indexOf('=');
+    if (eq <= 0) continue;
+    const name = part.slice(0, eq).trim();
+    let value = part.slice(eq + 1).trim();
+    try {
+      value = decodeURIComponent(value);
+    } catch {
+      // keep the raw value
+    }
+    if (name && !map.has(name)) map.set(name, value);
+  }
+  for (const name of LOCALE_COOKIE_NAMES) {
+    const value = map.get(name);
+    if (value && SUPPORTED.has(value)) return value;
+  }
+  return null;
+}
+
+export interface RequestLocaleInput {
+  queryLocale?: string | null;
+  cookieHeader?: string | null;
+  acceptLanguage?: string | null;
+  country?: string | null;
+}
+
+/**
+ * Best-practice UI locale negotiation for an unprefixed request.
+ *
+ * Precedence (first match wins):
+ *  1. Explicit `?locale=` query (docs / RTL / automation)
+ *  2. Saved choice: `boggle_language` cookie, then `NEXT_LOCALE`
+ *  3. `Accept-Language` with q-values, region stripping, and proximity
+ *  4. Geo country, as a weak last hint only
+ *  5. Default locale (English)
+ *
+ * A locale-prefixed URL is handled by the caller and is never overridden here.
+ */
+export function resolveRequestLocale(
+  input: RequestLocaleInput,
+  fallback: string = DEFAULT_LOCALE,
+): string {
+  const query = input.queryLocale?.trim().toLowerCase() ?? '';
+  if (query && SUPPORTED.has(query)) return query;
+  return (
+    localeFromCookieHeader(input.cookieHeader)
+    ?? matchAcceptLanguage(input.acceptLanguage)
+    ?? localeFromCountry(input.country)
+    ?? fallback
+  );
+}
+
+/** Merge a Vary token without duplicating existing values. */
+export function mergeVary(existing: string | string[] | null | undefined, extra: string): string {
+  const current = Array.isArray(existing) ? existing.join(',') : (existing ?? '');
+  const tokens = new Set(
+    current
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .map((t) => t.toLowerCase()),
+  );
+  for (const token of extra.split(',').map((t) => t.trim()).filter(Boolean)) {
+    if (!tokens.has(token.toLowerCase())) {
+      tokens.add(token.toLowerCase());
+    }
+  }
+  // Preserve canonical casing for the tokens we care about.
+  const canon: Record<string, string> = {
+    'accept-language': 'Accept-Language',
+    cookie: 'Cookie',
+    'accept-encoding': 'Accept-Encoding',
+  };
+  return [...tokens].map((t) => canon[t] ?? t).join(', ');
+}

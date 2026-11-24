@@ -131,11 +131,11 @@ const renderMenu = () =>
   render(<HeaderMobileMenu unclaimedCount={0} onOpenGiftModal={vi.fn()} onSignIn={vi.fn()} onSignUp={vi.fn()} />);
 
 describe('HeaderMobileMenu — phone bar stays logo · sound · menu', () => {
-  it('Given the web, When the bar renders, Then the language pill is not in the bar but lives in the drawer', async () => {
+  it('Given the web, When the bar renders, Then the language pill is in the header and also in the drawer', async () => {
     renderMenu();
+    expect(await screen.findByTestId('bar-language')).toBeTruthy();
     fireEvent.click(await screen.findByLabelText(t('common.openMenu')));
     await waitFor(() => expect(screen.getByTestId('mobile-menu-drawer')).toBeTruthy());
-    expect(screen.queryByTestId('bar-language')).toBeNull();
     expect(screen.getByTestId('drawer-language')).toBeTruthy();
   });
 
