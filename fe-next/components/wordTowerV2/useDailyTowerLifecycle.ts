@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { closeDailyTowerSession } from '@/lib/wordTowerV2/telemetry';
 import {
   clearPagehideFinalizer,
+  isGameActive,
   setPagehideFinalizer,
   updateActiveGameExtras,
 } from '@/utils/abandonOnPagehide';
@@ -44,7 +45,8 @@ export function useDailyTowerLifecycle({ daily, floors, peakM, heightM = 0, scor
 
   const close = useCallback(() => {
     const s = latest.current;
-    if (!s.daily || closed.current || s.floors <= 0) return;
+    // A saved tower opened and left without a hoist was looked at, not played.
+    if (!s.daily || closed.current || s.floors <= 0 || !isGameActive()) return;
     closed.current = true;
     const durationSec =
       startedAt.current == null ? undefined : Math.round((Date.now() - startedAt.current) / 1000);

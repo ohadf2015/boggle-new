@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
-import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
+import { emitAbandonOnSpaNavigate } from '@/utils/abandonOnPagehide';
+import { setTowerStartExtras } from '@/lib/wordTowerV2/telemetry';
 import { getWithAuth } from '@/utils/authFetch';
 import { getGuestFingerprint } from '@/utils/guestManager';
 import { canUseV2ReviewHooks, v2ReviewHooksFromSearch } from '@/lib/wordTowerV2/reviewHooks';
@@ -16,7 +17,6 @@ interface Args {
   isAdmin: boolean;
   canSeeInWorkModes: boolean;
   language: string;
-  phase: string;
   floors: number;
   peakM: number;
   heightM: number;
@@ -41,7 +41,6 @@ export function useV2Ready({
   isAdmin,
   canSeeInWorkModes,
   language,
-  phase,
   floors,
   peakM,
   heightM,
@@ -91,11 +90,8 @@ export function useV2Ready({
     }
     return { v2: true, daily, daily_restored: restored };
   }, [daily, language]);
-  useGameStartTelemetry({
-    mode: 'word-tower',
-    isGameActive: phase !== 'over',
-    extras: startExtras,
-  });
+  useEffect(() => setTowerStartExtras(startExtras), [startExtras]);
+  useEffect(() => () => emitAbandonOnSpaNavigate(), []);
   useGameEndTelemetry({
     mode: 'word-tower',
     resultsShown,
@@ -103,7 +99,7 @@ export function useV2Ready({
     wordCount: floors,
     extras: { v2: true, daily, heightM: Math.round(peakM) },
   });
-  // After the start hook so this cleanup runs first and cancels its SPA abandon.
+  // The SPA abandon above is deferred a tick, so this cleanup's completion cancels it.
   const closeSession = useDailyTowerLifecycle({ daily, floors, peakM, heightM, score });
 
   return { dailyRank, dailyBoard, refreshRank: () => setRankTick((n) => n + 1), closeSession };
