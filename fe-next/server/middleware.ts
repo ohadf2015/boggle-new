@@ -294,6 +294,18 @@ function cacheHeaders(): RequestHandler {
  * `acceptsEncoding` — a naive `.includes('gzip')` sees the rewritten `br`
  * header, concludes the client wants no compression, and ships the raw body.
  */
+/**
+ * posthog-js posts every event and flag call with a trailing slash; Next would
+ * answer each with a 308 strip-slash redirect before proxying. PostHog accepts
+ * the bare path, so strip it here and keep Next's slash redirects for pages.
+ */
+export function analyticsProxyNoSlash(): RequestHandler {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    if (req.url.startsWith('/lcx/')) req.url = req.url.replace(/\/+(?=\?|$)/, '');
+    next();
+  };
+}
+
 export function preferBrotli(): RequestHandler {
   return (req: Request, _res: Response, next: NextFunction): void => {
     // Socket.IO long-polling is excluded from compression entirely (see
@@ -527,6 +539,7 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   // must sit immediately before compression() — after it, the original client
   // header is gone. Anything inserted below that reads Accept-Encoding sees
   // `br`, not what the browser sent (see app/api/dictionary-words/route.ts).
+  app.use(analyticsProxyNoSlash());
   app.use(preferBrotli());
 
   // Must sit after preferBrotli (it reads the normalised header) and before
