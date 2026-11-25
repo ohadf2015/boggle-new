@@ -262,7 +262,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     reported.current = res;
     // The node underfoot has now been played out, win or lose: the map must stop
     // offering to resume it.
-    if (lvl && !res.won) rememberLoss(world, run.currentNode ?? lvl.level);
+    if (lvl && !res.won) rememberLoss(world, run.currentNode, lvl);
     if (run.currentNode) {
       recordCleared(world, run.currentNode);
       setCleared(readCleared(world));
@@ -342,7 +342,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
   };
 
   // A retry of the fight just lost goes straight back in: the intro was read last time.
-  const replay = run.phase === 'ready' && !!lvl && isReplay(world, run.currentNode ?? lvl.level);
+  const replay = run.phase === 'ready' && !!lvl && isReplay(world, run.currentNode, lvl);
   useEffect(() => { if (replay) begin(); });
 
   const onMapExit = useCallback(() => {
