@@ -15,6 +15,16 @@ import { suggestPublicPlayerName } from '@/utils/onboardingNameSuggestions';
 import { MAX_GUEST_NAME_LENGTH, useGuestNameSave } from '@/components/daily/results/useGuestNameSave';
 
 export const PUBLIC_NAME_PROMPT_SHOWN_KEY = 'lexiclash_public_name_prompt_shown_at';
+const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000;
+
+function shownRecently(): boolean {
+  try {
+    const at = Date.parse(localStorage.getItem(PUBLIC_NAME_PROMPT_SHOWN_KEY) ?? '');
+    return Date.now() - at < SNOOZE_MS;
+  } catch {
+    return false;
+  }
+}
 
 const looksPublic = (name: string | null | undefined) => !isPlaceholderName(name) && !isGeneratedName(name);
 
@@ -23,7 +33,7 @@ export interface PublicNamePromptProps {
   onSaved?: (name: string) => void;
 }
 
-/** "Pick a name to show up on the board and get a rival": first thing in the results slot while the name can't go public. */
+/** "Pick a name to show up on the board and get a rival": shown at most once a week while the name can't go public. */
 export function PublicNamePrompt({ mode, onSaved }: PublicNamePromptProps) {
   const { loading, isAuthenticated, profile, updateProfile } = useAuth();
   const { t, language } = useLanguage();
@@ -33,6 +43,7 @@ export function PublicNamePrompt({ mode, onSaved }: PublicNamePromptProps) {
   const [saving, setSaving] = useState(false);
   const [savedName, setSavedName] = useState<string | null>(null);
   const shownRef = useRef(false);
+  const [snoozed] = useState(shownRecently);
   const [guestFp, setGuestFp] = useState<string | null>(null);
 
   const guestName = !isAuthenticated ? getGuestName() : null;
@@ -47,7 +58,7 @@ export function PublicNamePrompt({ mode, onSaved }: PublicNamePromptProps) {
   }, [loading, isAuthenticated]);
 
   // Daily guests already get the daily flow's own name prompt; edu students never type names.
-  const needsName = !loading && mode !== 'edu' && !savedName && (isAuthenticated
+  const needsName = !snoozed && !loading && mode !== 'edu' && !savedName && (isAuthenticated
     ? !!profile && !looksPublic(profile.display_name || profile.username)
     : mode !== 'daily' && !getChosenGuestName());
 

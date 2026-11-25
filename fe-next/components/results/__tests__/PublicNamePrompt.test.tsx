@@ -43,6 +43,37 @@ describe('PublicNamePrompt', () => {
     expect(capture).toHaveBeenCalledWith('public_name_prompt_shown', expect.objectContaining({ mode: 'quickPlay', guest: true }));
   });
 
+  it('Given the prompt showed within the last 7 days, Then it stays hidden and is not tracked again', () => {
+    auth.value = guest;
+    localStorage.setItem(PUBLIC_NAME_PROMPT_SHOWN_KEY, new Date(Date.now() - 6 * 86_400_000).toISOString());
+    const { container } = render(<PublicNamePrompt mode="quickPlay" />);
+    expect(container.innerHTML).toBe('');
+    expect(capture).not.toHaveBeenCalled();
+  });
+
+  it('Given the last show was over 7 days ago, Then it shows again', () => {
+    auth.value = guest;
+    localStorage.setItem(PUBLIC_NAME_PROMPT_SHOWN_KEY, new Date(Date.now() - 8 * 86_400_000).toISOString());
+    render(<PublicNamePrompt mode="quickPlay" />);
+    expect(screen.getByTestId('public-name-prompt')).toBeTruthy();
+  });
+
+  it('Given it just showed, When the results screen mounts again, Then it stays hidden', () => {
+    auth.value = guest;
+    render(<PublicNamePrompt mode="quickPlay" />).unmount();
+    const { container } = render(<PublicNamePrompt mode="quickPlay" />);
+    expect(container.innerHTML).toBe('');
+  });
+
+  it('Given localStorage throws, Then the prompt still shows', () => {
+    auth.value = guest;
+    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
+    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    render(<PublicNamePrompt mode="quickPlay" />);
+    expect(screen.getByTestId('public-name-prompt')).toBeTruthy();
+    get.mockRestore(); set.mockRestore();
+  });
+
   it('Given auth is still loading, Then nothing renders (no guest flash)', () => {
     auth.value = { ...guest, loading: true };
     const { container } = render(<PublicNamePrompt mode="quickPlay" />);
