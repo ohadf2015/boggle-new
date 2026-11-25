@@ -13,7 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { gzipSync, brotliCompressSync, constants } from 'zlib';
+import { gzipSync, gunzipSync, brotliCompressSync, constants } from 'zlib';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import { normalizeRussianWord } from '@/shared/utils/wordNormalization';
 import { acceptsEncoding } from '@/lib/http/acceptEncoding';
@@ -33,7 +33,7 @@ import {
 // second time as a per-route array (see lib/server/sharedWordSets.ts, OOM 2026-08-06).
 const gzippedPayloads: Record<
   string,
-  { gzip: Buffer; brotli?: Buffer; raw: string; count: number; encoded?: EncodedPayload } | null
+  { gzip: Buffer; brotli?: Buffer; count: number; encoded?: EncodedPayload } | null
 > = {
   en: null,
   es: null,
@@ -43,13 +43,12 @@ const gzippedPayloads: Record<
   ru: null,
 };
 
-type EncodedPayload = { gzip: Buffer; brotli?: Buffer; raw: string };
+type EncodedPayload = { gzip: Buffer; brotli?: Buffer };
 
 /** Base64 copy for clients whose network blocks the plain list (see sharedDictionaryFetch). */
-function encodedPayload(payload: { raw: string; encoded?: EncodedPayload }): EncodedPayload {
+function encodedPayload(payload: { gzip: Buffer; encoded?: EncodedPayload }): EncodedPayload {
   if (!payload.encoded) {
-    const raw = Buffer.from(payload.raw, 'utf-8').toString('base64');
-    payload.encoded = { raw, gzip: gzipSync(raw, { level: 6 }) };
+    payload.encoded = { gzip: gzipSync(gunzipSync(payload.gzip).toString('base64'), { level: 6 }) };
   }
   return payload.encoded;
 }
@@ -165,8 +164,9 @@ export async function GET(request: NextRequest) {
         console.error(`[dictionary-words] ${language} loaded 0 words — refusing to cache an empty dictionary`);
         return NextResponse.json({ error: 'Dictionary unavailable' }, { status: 503 });
       }
-      const raw = words.join('\n');
-      gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw, count: words.length };
+      // Only compressed bytes stay resident: the joined list as a JS string cost
+      // up to 29MB of heap per language (Cyrillic is stored two bytes per char).
+      gzippedPayloads[language] = { gzip: gzipSync(words.join('\n'), { level: 6 }), count: words.length };
     }
     const built = gzippedPayloads[language]!;
     const isEncoded = searchParams.get('enc') === 'b64';
@@ -220,12 +220,15 @@ export async function GET(request: NextRequest) {
     // in server/middleware.ts rewrites Accept-Encoding to `br`, so without it
     // the gzip check below would miss and every browser would get 6.73MB raw.
     if (acceptsEncoding(accept, 'br')) {
-      payload.brotli ??= brotliCompressSync(payload.raw, {
-        params: {
-          [constants.BROTLI_PARAM_QUALITY]: 5,
-          [constants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(payload.raw),
-        },
-      });
+      if (!payload.brotli) {
+        const raw = gunzipSync(payload.gzip);
+        payload.brotli = brotliCompressSync(raw, {
+          params: {
+            [constants.BROTLI_PARAM_QUALITY]: 5,
+            [constants.BROTLI_PARAM_SIZE_HINT]: raw.length,
+          },
+        });
+      }
       return new NextResponse(new Uint8Array(payload.brotli), {
         status: 200,
         headers: { ...cacheHeaders, 'Content-Encoding': 'br' },
@@ -239,7 +242,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return new NextResponse(payload.raw, {
+    return new NextResponse(new Uint8Array(gunzipSync(payload.gzip)), {
       status: 200,
       headers: cacheHeaders,
     });

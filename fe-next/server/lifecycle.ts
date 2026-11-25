@@ -350,7 +350,7 @@ export function registerProcessErrorHandlers(): void {
 
   // Capture warnings (non-fatal)
   process.on('warning', (warning: Error) => {
-    lifecycleLogger.warn({ warningName: warning.name }, warning.message);
+    lifecycleLogger.warn({ warningName: warning.name, stack: warning.stack }, warning.message);
 
     // Only capture high-severity warnings to Sentry in production
     if (

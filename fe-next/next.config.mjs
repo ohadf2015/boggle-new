@@ -102,8 +102,9 @@ const nextConfig = {
     webpackBuildWorker: true,
     // Collect the server's file traces in a worker while the client compiles (~75s saved).
     parallelServerBuildTraces: true,
-    // Server bundles ship without source maps; unminified, their stacks stay readable.
-    serverMinification: false,
+    // Keep server minification on: V8 keeps every loaded chunk's source text in the
+    // heap, and unminified chunks held ~320MB of it versus ~135MB minified.
+    serverMinification: true,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
