@@ -35,14 +35,6 @@ interface LocalNotificationActionPerformed {
 }
 
 interface LocalNotificationsPlugin {
-  schedule: (opts: {
-    notifications: Array<{
-      id: number;
-      title: string;
-      body: string;
-      extra?: Record<string, string>;
-    }>;
-  }) => Promise<void>;
   addListener?: <T = unknown>(event: string, handler: (data: T) => void) => Promise<{ remove: () => void }>;
 }
 
@@ -251,10 +243,7 @@ export async function setupPushListeners(
 
     const LocalNotifications = capGlobal.Capacitor?.Plugins?.LocalNotifications;
 
-    // Handle notification received while app is in foreground.
-    // Capacitor's PushNotifications plugin does NOT display a system-tray
-    // notification when the app is foregrounded — we must bridge to
-    // LocalNotifications ourselves, otherwise users see nothing.
+    // The native plugin already shows foreground pushes (presentationOptions 'alert'); a local copy here doubles them.
     const receivedListener = await PushNotifications.addListener(
       'pushNotificationReceived',
       async (notification: { title?: string; body?: string; data?: Record<string, string> }) => {
@@ -270,23 +259,6 @@ export async function setupPushListeners(
 
         if (onNotificationReceived && notification.data) {
           onNotificationReceived(notification.data as Record<string, string>);
-        }
-
-        if (LocalNotifications && (notification.title || notification.body)) {
-          try {
-            await LocalNotifications.schedule({
-              notifications: [
-                {
-                  id: Date.now() % 2147483647,
-                  title: notification.title || '',
-                  body: notification.body || '',
-                  extra: notification.data || {},
-                },
-              ],
-            });
-          } catch (err) {
-            console.debug('LocalNotifications.schedule failed:', err);
-          }
         }
       }
     );
@@ -319,11 +291,7 @@ export async function setupPushListeners(
       }
     );
 
-    // Handle taps on the LOCAL notification we scheduled to make a
-    // foreground-received push visible. Capacitor routes these through
-    // `localNotificationActionPerformed` (with the payload in `extra`), NOT
-    // `pushNotificationActionPerformed` — so without this listener a push that
-    // arrived while the app was open silently fails to deep-link on tap.
+    // Local reminders (scheduler.ts) deep-link through `extra`, not the push tap event.
     let localActionListener: { remove: () => void } | null = null;
     if (LocalNotifications?.addListener) {
       localActionListener = await LocalNotifications.addListener(

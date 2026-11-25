@@ -7,8 +7,7 @@ export const PUSH_RECEIVED_EVENT = 'lexiclash:push-received';
  * Handles a push notification data payload received while the app is in the
  * foreground. Ensures in-app state stays in sync with the tray notification.
  *
- * Why: the Capacitor push listener bridges to LocalNotifications for tray
- * visibility, but React Query caches (useUnclaimedGifts has 5-min staleTime)
+ * Why: the tray shows the push at once, but React Query caches (useUnclaimedGifts has 5-min staleTime)
  * would otherwise lag behind by minutes — making the gift/message feel absent.
  */
 export function handlePushData(
