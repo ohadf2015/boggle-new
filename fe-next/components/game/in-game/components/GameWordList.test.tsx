@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { GameWordList, COMPACT_MAX_VISIBLE } from './GameWordList';
 import type { FoundWord } from '@/shared/types/view';
@@ -37,5 +37,33 @@ describe('GameWordList compact view windowing', () => {
     expect(screen.getByText('word0')).toBeInTheDocument();
     expect(screen.getByText('word4')).toBeInTheDocument();
     expect(screen.getByText('5')).toBeInTheDocument();
+  });
+});
+
+describe('GameWordList empty state', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  const stubPointer = (desktop: boolean) =>
+    vi.stubGlobal('matchMedia', (q: string) => ({
+      matches: q.includes('coarse') ? !desktop : q.includes('fine') ? desktop : false,
+      media: q,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+
+  it('tells a mouse-and-keyboard player to type, not swipe', () => {
+    stubPointer(true);
+    const { unmount } = render(<GameWordList foundWords={[]} minWordLength={3} t={t} />);
+    expect(screen.getByText('keyboardHint.typeAndEnter')).toBeInTheDocument();
+    expect(screen.queryByText('playerView.swipeHintWithMin')).toBeNull();
+    unmount();
+    render(<GameWordList foundWords={[]} minWordLength={3} t={t} compact />);
+    expect(screen.getByText('keyboardHint.typeAndEnter')).toBeInTheDocument();
+  });
+
+  it('keeps the swipe hint on touch screens', () => {
+    stubPointer(false);
+    render(<GameWordList foundWords={[]} minWordLength={3} t={t} />);
+    expect(screen.getByText('playerView.swipeHintWithMin')).toBeInTheDocument();
   });
 });

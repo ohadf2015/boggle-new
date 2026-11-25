@@ -50,6 +50,8 @@ export interface QuickRoundConfig {
 }
 
 export const QUICK_ROUND_DURATION_SEC = 60;
+// Finding one hidden word takes longer than a free-for-all: the daily hunt is won in ~130s.
+export const QUICK_HUNT_DURATION_SEC = 120;
 const MAX_WHEEL_WORD_LENGTH = 7; // each wheel letter usable once
 
 function dictionaryFor(language: string): Set<string> {
@@ -170,7 +172,7 @@ export async function buildQuickRound(
     mode,
     seed: roundSeed,
     language,
-    durationSec: QUICK_ROUND_DURATION_SEC,
+    durationSec: mode === 'word-hunt' ? QUICK_HUNT_DURATION_SEC : QUICK_ROUND_DURATION_SEC,
     grid,
     words,
     targetWord,

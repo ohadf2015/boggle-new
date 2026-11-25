@@ -112,7 +112,7 @@ export function GameOverlays({
 
       {/* Keyboard Input Hint - Desktop only */}
       {showKeyboardHint && (
-        <KeyboardHintTooltip delaySeconds={10} desktopOnly={true} t={t} />
+        <KeyboardHintTooltip acceptedCount={validWordCount} t={t} />
       )}
 
 

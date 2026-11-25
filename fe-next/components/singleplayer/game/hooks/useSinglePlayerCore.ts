@@ -107,6 +107,8 @@ interface UseSinglePlayerCoreOptions {
   wordMultiplier?: (word: string) => number;
   /** Fires once per accepted word, after scoring (in-round pops, coach beats). */
   onWordAccepted?: (event: { word: string; points: number; multiplier: number; validCount: number }) => void;
+  /** Bot-free rounds: the score that counts as a win in analytics. Omitted → one valid word. */
+  winScore?: number;
 }
 
 interface AvailableWords {
@@ -123,7 +125,7 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  */
 export function useSinglePlayerCore({
   settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false, clockHold = false,
-  externalInput = false, wordMultiplier, onWordAccepted,
+  externalInput = false, wordMultiplier, onWordAccepted, winScore,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   const wordMultiplierRef = useRef(wordMultiplier);
@@ -599,18 +601,18 @@ export function useSinglePlayerCore({
     };
     try {
       const results = buildGameResults(resultParams);
-      emitSinglePlayerGameEnd(results, settings.mode);
+      emitSinglePlayerGameEnd(results, settings.mode, winScore);
       if (settings.mode === 'practice') trainingAnalysisFinishTraining();
       onGameEndRef.current(results);
     } catch (error) {
       console.error('Game end processing failed:', error);
       setIsValidatingWords(false);
       const fallback = buildFallbackResults(resultParams);
-      emitSinglePlayerGameEnd(fallback, settings.mode);
+      emitSinglePlayerGameEnd(fallback, settings.mode, winScore);
       if (settings.mode === 'practice') trainingAnalysisFinishTraining();
       onGameEndRef.current(fallback);
     }
-  }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining, effects.gameStartTimeRef]);
+  }, [isGameOver, grid, settings.bots, settings.language, settings.timerSeconds, combo.maxCombo, settings.mode, trainingAnalysisFinishTraining, effects.gameStartTimeRef, winScore]);
 
   const handlePathSubmit = useCallback((cells: Array<{ row: number; col: number }>) => {
     directionGuidance.trackWordPath(cells);

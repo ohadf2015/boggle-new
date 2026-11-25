@@ -128,6 +128,17 @@ describe('DailyWordHuntSurvival - timed round (Quick Play)', () => {
     expect(finish.textContent).toContain('wordWheel.gameOver');
   });
 
+  it('reveals the first letter at the halfway mark of a timed round', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'performance', 'Date', 'requestAnimationFrame', 'cancelAnimationFrame'] });
+    renderHunt({ timeLimitSec: 120 });
+    expect(screen.getByTestId('clue-box-0').textContent).toBe('?');
+    act(() => { vi.advanceTimersByTime(59_000); });
+    expect(screen.getByTestId('clue-box-0').textContent).toBe('?');
+    act(() => { vi.advanceTimersByTime(2_000); });
+    expect(screen.getByTestId('clue-box-0').textContent).toBe('H');
+    expect(screen.getByTestId('clue-box-1').textContent).toBe('?');
+  });
+
   it('keeps the daily challenge untimed: life bar, feedback and hint rows as before', () => {
     renderHunt({ practice: false });
     expect(screen.queryByTestId('hunt-round-clock')).toBeNull();

@@ -4186,6 +4186,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "enterOrDoubleClickToSubmit": "Pulsa Enter o haz doble clic en la última letra",
     "tapAgainToSubmit": "Toca otra vez la última letra para enviar",
     "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
@@ -11303,9 +11304,7 @@ const es = {
     "celebrationMessage": "¡Te deseamos un año lleno de palabras, victorias y buenas sorpresas!"
   },
   "keyboardHint": {
-    "title": "⚡ Truco rápido",
-    "message": "Escribe las palabras con el teclado. Solo empieza a teclear y pulsa Enter para enviar. ¡Mucho más rápido que deslizar!",
-    "gotIt": "Entendido"
+    "typeAndEnter": "Escribe la palabra y pulsa Enter"
   },
   "keyboardShortcuts": {
     "title": "Atajos de teclado",
@@ -12994,7 +12993,7 @@ const es = {
       "shareResultHint": "Mándale tu puntuación a alguien y a ver si te supera.",
       "copied": "¡Copiado! Pégalo donde quieras",
       "shareFailed": "No se pudo compartir. ¿Lo intentas otra vez?",
-      "recap": {"header": "Partida rápida de LexiClash: {mode}", "score": "{score} puntos, el {pct}% del perfecto", "words": "{count} palabras, la más larga de {longest} letras", "wordsOne": "1 palabra, de {longest} letras", "noWords": "Ninguna palabra esta ronda, ganó el tablero", "longWords": "{count} con 7 letras o más", "targetFound": "Encontré la palabra oculta", "targetMissed": "Se me escapó la palabra oculta", "streak": "{days} días seguidos", "cta": "¿Te animas a superarlo en 60 segundos?"}
+      "recap": {"header": "Partida rápida de LexiClash: {mode}", "score": "{score} puntos, el {pct}% del perfecto", "words": "{count} palabras, la más larga de {longest} letras", "wordsOne": "1 palabra, de {longest} letras", "noWords": "Ninguna palabra esta ronda, ganó el tablero", "longWords": "{count} con 7 letras o más", "targetFound": "Encontré la palabra oculta", "targetMissed": "Se me escapó la palabra oculta", "streak": "{days} días seguidos", "cta": "¿Te animas a superarlo en 60 segundos?", "ctaHunt": "¿Te animas a encontrarla en 2 minutos?"}
     },
     "title": "Juego rápido",
     "creating": "Creando...",

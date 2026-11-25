@@ -22,6 +22,7 @@ import type { LetterGrid } from '@/types';
 import type { HighlightedCell } from '@/components/GridComponent';
 import type { Language } from '@/shared/types/game';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { noteTypedSubmit } from '@/lib/input/typedWordHint';
 
 // ==================== Types ====================
 
@@ -281,6 +282,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const submitTypedWord = useCallback(() => {
     const word = typedWordRef.current;
     if (word.length >= minWordLength && (isValidOnGrid || submitOffGrid)) {
+      noteTypedSubmit();
       onWordSubmit?.(word, { inputMethod: 'kb' });
       setTypedWord('');
       setIsTypingMode(false);

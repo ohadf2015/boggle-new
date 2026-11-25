@@ -122,6 +122,8 @@ export interface SurvivalGameActions {
   skipFinish: () => void;
   /** Ends the round unsolved (a timed round's clock ran out). No-op once the game is over. */
   endRound: () => void;
+  /** Reveals the first still-hidden letter of the target (never the last one). */
+  revealLetter: () => void;
   gameDir: 'ltr' | 'rtl';
   clueContainerRef: React.RefObject<HTMLDivElement | null>;
 }
@@ -408,6 +410,11 @@ export function useSurvivalGameLogic({
     handleGameOverRef.current?.(false);
   }, []);
 
+  const { autoRevealLetter } = hintActions;
+  const revealLetter = useCallback(() => {
+    if (autoRevealLetter() >= 0) showAutoClueNotification('reveal_letter');
+  }, [autoRevealLetter, showAutoClueNotification]);
+
   const restoreLife = useCallback((amount: number) => {
     dispatch({ type: 'RESTORE_LIFE', payload: { amount } });
   }, []);
@@ -462,6 +469,7 @@ export function useSurvivalGameLogic({
     restoreLife,
     skipFinish: finishHold.skip,
     endRound,
+    revealLetter,
     gameDir,
     clueContainerRef,
   };

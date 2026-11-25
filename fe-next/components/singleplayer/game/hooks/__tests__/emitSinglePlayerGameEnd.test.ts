@@ -81,9 +81,24 @@ describe('emitSinglePlayerGameEnd', () => {
     expect((trackGameEnd.mock.calls[0][5] as Record<string, unknown>).isWinner).toBe(false);
   });
 
-  it('treats practice (no bots) as winner by default', () => {
-    emitSinglePlayerGameEnd(makeResults({ playerScore: 0, botScores: [] }), 'practice');
-    expect((trackGameEnd.mock.calls[0][5] as Record<string, unknown>).isWinner).toBe(true);
+  const wonSolo = (results: Partial<SinglePlayerResultsData>, winScore?: number) => {
+    trackGameEnd.mockClear();
+    emitSinglePlayerGameEnd(makeResults({ botScores: [], ...results }), 'challenge', winScore);
+    return (trackGameEnd.mock.calls[0][5] as Record<string, unknown>).isWinner;
+  };
+
+  it('never counts a solo round with no valid word as a win', () => {
+    expect(wonSolo({ playerScore: 0, playerWords: [] })).toBe(false);
+    expect(wonSolo({ playerScore: 0, playerWords: [] }, 1)).toBe(false);
+  });
+
+  it('counts a solo round with no target as won once a valid word lands', () => {
+    expect(wonSolo({ playerScore: 3, playerWords: ['cat'] })).toBe(true);
+  });
+
+  it('counts a solo round with a target as won only when the score reaches it', () => {
+    expect(wonSolo({ playerScore: 39, playerWords: ['cat'] }, 40)).toBe(false);
+    expect(wonSolo({ playerScore: 40, playerWords: ['cat'] }, 40)).toBe(true);
   });
 
   it('passes subMode through verbatim', () => {

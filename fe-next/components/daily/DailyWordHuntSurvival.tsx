@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useEffect, useState, useCallback } from 'react';
+import React, { useMemo, useEffect, useState, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
 
@@ -157,6 +157,15 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     isPaused: !timed || state.isGameOver || state.showQuitConfirm,
     onTimeUp: endRound,
   });
+
+  const { revealLetter } = actions;
+  const halfwayRevealed = useRef(false);
+  useEffect(() => {
+    if (!timed || halfwayRevealed.current || state.isGameOver) return;
+    if (roundClock.remainingTime > timeLimitSec / 2) return;
+    halfwayRevealed.current = true;
+    revealLetter();
+  }, [timed, timeLimitSec, roundClock.remainingTime, state.isGameOver, revealLetter]);
 
   const extraLifeModalOpen = extraLife.offerOpen && state.lifePoints === 0 && !state.isGameOver;
 

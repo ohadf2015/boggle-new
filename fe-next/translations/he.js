@@ -4198,6 +4198,7 @@ const he = {
   },
   "game": {
     "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
+    "enterOrDoubleClickToSubmit": "Enter או לחיצה כפולה על האות האחרונה לשליחה",
     "tapAgainToSubmit": "הקישו שוב על האות האחרונה לשליחה",
     "boardLocked": "חכו ל-GO — הלוח עדיין לא פעיל",
     "foundByOther": "נמצא על ידי ${player}",
@@ -11228,9 +11229,7 @@ const he = {
     "celebrationMessage": "מאחלים לכם שנה מלאה במילים, ניצחונות והפתעות!"
   },
   "keyboardHint": {
-    "title": "טיפ מהיר ⚡",
-    "message": "הקלידו מילים במקלדת. פשוט התחילו להקליד ולחצו Enter. הרבה יותר מהיר מגרירה!",
-    "gotIt": "הבנתי"
+    "typeAndEnter": "פשוט מקלידים את המילה ולוחצים Enter"
   },
   "keyboardShortcuts": {
     "title": "קיצורי מקלדת",
@@ -12932,7 +12931,7 @@ const he = {
       "shareResultHint": "שלחו את התוצאה לחבר ותראו אם הוא מצליח לעקוף אתכם.",
       "copied": "הועתק! אפשר להדביק איפה שרוצים",
       "shareFailed": "השיתוף לא עבד. ננסה שוב?",
-      "recap": {"header": "LexiClash משחק מהיר: {mode}", "score": "{score} נקודות, {pct}% מהמושלם", "words": "{count} מילים, הארוכה ביותר באורך {longest} אותיות", "wordsOne": "מילה אחת, באורך {longest} אותיות", "noWords": "אף מילה בסיבוב הזה, הלוח ניצח", "longWords": "{count} מהן עם 7 אותיות ומעלה", "targetFound": "מצאתי את המילה הנסתרת", "targetMissed": "המילה הנסתרת חמקה ממני", "streak": "{days} ימים ברצף", "cta": "חושבים שתצליחו לעקוף אותי ב-60 שניות?"}
+      "recap": {"header": "LexiClash משחק מהיר: {mode}", "score": "{score} נקודות, {pct}% מהמושלם", "words": "{count} מילים, הארוכה ביותר באורך {longest} אותיות", "wordsOne": "מילה אחת, באורך {longest} אותיות", "noWords": "אף מילה בסיבוב הזה, הלוח ניצח", "longWords": "{count} מהן עם 7 אותיות ומעלה", "targetFound": "מצאתי את המילה הנסתרת", "targetMissed": "המילה הנסתרת חמקה ממני", "streak": "{days} ימים ברצף", "cta": "חושבים שתצליחו לעקוף אותי ב-60 שניות?", "ctaHunt": "חושבים שתמצאו אותה תוך 2 דקות?"}
     },
     "title": "משחק מהיר",
     "subtitle": "חדר מיידי • הצטרפות ב-QR",

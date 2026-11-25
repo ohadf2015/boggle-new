@@ -66,6 +66,6 @@ export function buildQuickShareText({
 
   if (dayStreak > 1) lines.push(t('quickPlay.solo.recap.streak', { days: num(dayStreak) }));
 
-  lines.push(t('quickPlay.solo.recap.cta'));
+  lines.push(t(mode === 'word-hunt' ? 'quickPlay.solo.recap.ctaHunt' : 'quickPlay.solo.recap.cta'));
   return stripEmoji(lines.join('\n'));
 }

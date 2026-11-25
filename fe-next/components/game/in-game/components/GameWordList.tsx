@@ -6,6 +6,7 @@ import { applyHebrewFinalLetters } from '@/utils/utils';
 import type { FoundWord } from '@/shared/types/view';
 import type { TranslationFn } from '../types';
 import { NeoPanel } from '@/components/ui/panel';
+import { useTypingDesktop } from '@/lib/input/typedWordHint';
 
 const ROTATE_STYLE = { transform: 'rotate(1deg)' } as const;
 
@@ -35,6 +36,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
   t,
   compact = false,
 }) {
+  const typingDesktop = useTypingDesktop();
   // Compact view only: newest-first, capped at COMPACT_MAX_VISIBLE. The badge
   // still reports the true total (foundWords.length) below.
   const reversedWords = React.useMemo(
@@ -55,7 +57,7 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
         <div className="max-h-[50px] overflow-hidden">
           {foundWords.length === 0 ? (
             <p className="text-center text-neo-black/70 py-1 text-[10px]">
-              {t('playerView.swipeHintShort')}
+              {typingDesktop ? t('keyboardHint.typeAndEnter') : t('playerView.swipeHintShort')}
             </p>
           ) : (
             <div className="flex flex-wrap gap-1">
@@ -168,8 +170,10 @@ export const GameWordList = memo<GameWordListProps>(function GameWordList({
                 {t('playerView.noWordsYet')}
               </p>
               <p className="text-neo-black/60 text-xs px-2">
-                {t('playerView.swipeHintWithMin', { min: minWordLength }) ||
-                  `Swipe connected letters (${minWordLength}+ letters)`}
+                {typingDesktop
+                  ? t('keyboardHint.typeAndEnter')
+                  : t('playerView.swipeHintWithMin', { min: minWordLength }) ||
+                    `Swipe connected letters (${minWordLength}+ letters)`}
               </p>
             </div>
           )}
