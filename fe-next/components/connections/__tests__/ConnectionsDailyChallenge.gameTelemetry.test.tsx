@@ -69,8 +69,15 @@ describe('ConnectionsDailyChallenge — shared game start/complete', () => {
     vi.clearAllMocks();
   });
 
-  it('given a fresh daily, when it opens, then one game_started fires as connections', () => {
+  it('given a fresh daily, when it only opens, then no game_started fires', () => {
     render(<ConnectionsDailyChallenge />);
+    expect(trackGameStart).not.toHaveBeenCalled();
+  });
+
+  it('given a fresh daily, when the first guess goes in, then one game_started fires as connections', () => {
+    render(<ConnectionsDailyChallenge />);
+    guessWrong();
+    guessWrong();
     expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameStart).toHaveBeenCalledWith('connections', expect.objectContaining({ daily: true, daily_restored: false }));
     expect(trackGameEnd).not.toHaveBeenCalled();
@@ -82,6 +89,8 @@ describe('ConnectionsDailyChallenge — shared game start/complete', () => {
     first.unmount();
     trackGameStart.mockClear();
     render(<ConnectionsDailyChallenge />);
+    expect(trackGameStart).not.toHaveBeenCalled();
+    guessWrong();
     expect(trackGameStart).toHaveBeenCalledWith('connections', expect.objectContaining({ daily: true, daily_restored: true }));
   });
 

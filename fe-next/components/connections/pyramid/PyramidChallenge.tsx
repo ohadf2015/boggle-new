@@ -178,7 +178,6 @@ function PyramidRun({
   // Stamp start time once mounted; a resumed run keeps the time it already used.
   useEffect(() => {
     startRef.current = Date.now() - (resumed?.elapsedMs ?? 0);
-    if (!restored) trackGameStart('connections', { variant: 'pyramid', daily: !!sharePath, daily_restored: !!resumed, language: runLanguage });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -261,6 +260,15 @@ function PyramidRun({
     prevStatusRef.current = pyramidState.status;
     prevWrongRef.current = pyramidState.wrongAttempts;
   }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved, sharePath]);
+
+  // The first keystroke is the game start: a page view is not a game.
+  const openedStateRef = useRef(pyramidState);
+  const gameStartedRef = useRef(Boolean(restored));
+  useEffect(() => {
+    if (gameStartedRef.current || (input === '' && pyramidState === openedStateRef.current)) return;
+    gameStartedRef.current = true;
+    trackGameStart('connections', { variant: 'pyramid', daily: !!sharePath, daily_restored: !!resumed, language: runLanguage });
+  }, [input, pyramidState, sharePath, resumed, runLanguage]);
 
   const endTrackedRef = useRef(Boolean(restored));
   useEffect(() => {

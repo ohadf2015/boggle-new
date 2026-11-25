@@ -146,10 +146,18 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
 
   useEffect(() => {
     if (!resumed) trackDailyStarted({ locale: language, puzzleCount: total, dateISO: today });
-    trackGameStart('connections', { daily: true, daily_restored: !!resumed, language: runLanguage });
     // Once per run — a resumed run was already counted, and a locale change must not double-count.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The first keystroke is the game start: opening the set (or the tutorial over it) is not playing.
+  const openedStateRef = useRef(state);
+  const gameStartedRef = useRef(false);
+  useEffect(() => {
+    if (gameStartedRef.current || state === openedStateRef.current) return;
+    gameStartedRef.current = true;
+    trackGameStart('connections', { daily: true, daily_restored: !!resumed, language: runLanguage });
+  }, [state, resumed, runLanguage]);
 
   // Per-answer feedback (sound + haptic).
   useEffect(() => {

@@ -70,8 +70,15 @@ function reachFinale() {
 describe('PyramidChallenge — shared game start/complete', () => {
   beforeEach(() => { window.localStorage.clear(); vi.clearAllMocks(); });
 
-  it('given a pyramid, when it opens, then one game_started fires as connections', () => {
+  it('given a pyramid, when it only opens, then no game_started fires', () => {
     render(<PyramidChallenge />);
+    expect(trackGameStart).not.toHaveBeenCalled();
+  });
+
+  it('given a pyramid, when the first letter is typed, then one game_started fires as connections', () => {
+    render(<PyramidChallenge />);
+    typeWord('ST');
+    fireEvent.keyDown(window, { key: 'Enter' });
     expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameStart).toHaveBeenCalledWith('connections', expect.objectContaining({ variant: 'pyramid', daily: false }));
   });
@@ -81,6 +88,7 @@ describe('PyramidChallenge — shared game start/complete', () => {
     reachFinale();
     typeWord('STONE');
     fireEvent.keyDown(window, { key: 'Enter' });
+    expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameEnd).toHaveBeenCalledTimes(1);
     const [mode, , solved, completed, , extras] = trackGameEnd.mock.calls[0];
     expect(mode).toBe('connections');
