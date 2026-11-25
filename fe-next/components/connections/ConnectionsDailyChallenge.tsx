@@ -30,6 +30,7 @@ import {
   trackDailyCompleted,
   trackDailyShared,
 } from '@/lib/connections/dailyTelemetry';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import { patchDailyResult, saveDailyResult } from '@/lib/connections/dailyResultStore';
 import { clearDailyRun, loadDailyRun, restoreGameState, saveDailyRun } from '@/lib/connections/dailyRunStore';
 import { useStoredDailyResult } from './useStoredDailyResult';
@@ -148,6 +149,15 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
     // Once per run — a resumed run was already counted, and a locale change must not double-count.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // The first keystroke is the game start: opening the set (or the tutorial over it) is not playing.
+  const openedStateRef = useRef(state);
+  const gameStartedRef = useRef(false);
+  useEffect(() => {
+    if (gameStartedRef.current || state === openedStateRef.current) return;
+    gameStartedRef.current = true;
+    trackGameStart('connections', { daily: true, daily_restored: !!resumed, language: runLanguage });
+  }, [state, resumed, runLanguage]);
 
   // Per-answer feedback (sound + haptic).
   useEffect(() => {
@@ -310,6 +320,12 @@ function DailyRun({ today, paused, onTerminal }: { today: string; paused: boolea
       total,
       score: state.score,
       durationSeconds: timeTakenSeconds,
+    });
+    trackGameEnd('connections', state.score, puzzlesSolved, true, timeTakenSeconds, {
+      daily: true,
+      isWinner: puzzlesSolved > 0,
+      solved: puzzlesSolved,
+      total,
     });
     setResults({ loading: true, streak: 0, rank: null, totalPlayers: 0, rows: [] });
     void send(payload);

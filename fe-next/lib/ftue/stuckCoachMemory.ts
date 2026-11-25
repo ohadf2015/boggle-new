@@ -11,7 +11,8 @@ export type StuckCoachMode =
   | 'wheelRush'
   | 'dailyWheel'
   | 'blast'
-  | 'singlePlayer';
+  | 'singlePlayer'
+  | 'adventure';
 
 export type StuckCoachMark = 'shown' | 'found';
 

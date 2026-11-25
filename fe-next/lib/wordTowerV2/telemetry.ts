@@ -1,4 +1,4 @@
-import { trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
 
 /**
  * One lifecycle stream. `v2` and `daily` are properties, not a second mode —
@@ -57,16 +57,18 @@ export function emitTowerEnd(stats: V2RunEndStats, durationSec?: number): 'compl
   return end.completed ? 'complete' : 'abandon';
 }
 
-/**
- * First hoist of a run. Arms the duration clock only.
- *
- * The lifecycle start is `useGameStartTelemetry('word-tower')`. Emitting
- * `trackGameStart` here used to fire a second `game_started` as `word-tower-v2`
- * 13–20s later, doubling Word Tower in every mode table.
- */
+let startExtras: Record<string, unknown> = { v2: true, daily: false };
+
+/** The page's start payload (daily, daily_restored); the start itself waits for a hoist. */
+export function setTowerStartExtras(extras: Record<string, unknown>): void {
+  startExtras = extras;
+}
+
+/** First hoist of a run is its `game_started`: opening the page is not playing. */
 export function startV2Run(startedAt: V2RunClock): void {
   if (startedAt.current != null) return;
   startedAt.current = Date.now();
+  trackGameStart(WORD_TOWER_MODE, startExtras);
 }
 
 /**

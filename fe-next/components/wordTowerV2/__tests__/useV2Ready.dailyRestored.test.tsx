@@ -11,13 +11,15 @@ vi.mock('@/utils/guestManager', () => ({ getGuestFingerprint: () => null }));
 
 import { emptySave, saveDailyTower } from '@/lib/wordTowerV2/dailyTower';
 import { useV2Ready } from '../useV2Ready';
+import { startV2Run } from '@/lib/wordTowerV2/telemetry';
+
+const hoist = () => startV2Run({ current: null });
 
 const args = (daily: boolean) => ({
   daily,
   isAdmin: false,
   canSeeInWorkModes: false,
   language: 'he',
-  phase: 'composing',
   floors: 0,
   peakM: 0,
   heightM: 0,
@@ -35,21 +37,29 @@ describe('useV2Ready start telemetry: reopened daily tower', () => {
   });
   afterEach(() => window.localStorage.clear());
 
+  it('given the page just opened, when nothing has been hoisted, then no game_started fires', () => {
+    renderHook(() => useV2Ready(args(false)));
+    expect(trackGameStart).not.toHaveBeenCalled();
+  });
+
   it('marks the start when a saved daily tower is restored', () => {
     saveDailyTower({ ...emptySave('he'), words: ['שלום', 'מים'] }, window.localStorage);
     renderHook(() => useV2Ready(args(true)));
+    hoist();
     expect(trackGameStart).toHaveBeenCalledTimes(1);
     expect(trackGameStart.mock.calls[0][1]).toMatchObject({ daily: true, daily_restored: true });
   });
 
   it('marks a first daily visit as not restored', () => {
     renderHook(() => useV2Ready(args(true)));
+    hoist();
     expect(trackGameStart.mock.calls[0][1]).toMatchObject({ daily: true, daily_restored: false });
   });
 
   it('leaves free runs without the flag', () => {
     saveDailyTower({ ...emptySave('he'), words: ['שלום'] }, window.localStorage);
     renderHook(() => useV2Ready(args(false)));
+    hoist();
     expect(trackGameStart.mock.calls[0][1]).not.toHaveProperty('daily_restored');
   });
 });

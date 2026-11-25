@@ -334,9 +334,9 @@ export function useAdventureRun({ world, level, language, isWord, nodeId, mapFir
       if (!res.ok) throw new Error(`complete ${res.status}`);
       const data: RunResult = await res.json();
       trackGameEnd(
-        ADVENTURE_MODE, data.score ?? 0, data.validWords?.length ?? 0, !!data.won,
+        ADVENTURE_MODE, data.score ?? 0, data.validWords?.length ?? 0, true,
         startedAtRef.current ? Math.round((Date.now() - startedAtRef.current) / 1000) : undefined,
-        { world, nodeKind: data.nodeKind ?? nodeKindRef.current, stars: data.stars ?? 0, runComplete: !!data.runComplete },
+        { world, nodeKind: data.nodeKind ?? nodeKindRef.current, stars: data.stars ?? 0, runComplete: !!data.runComplete, isWinner: !!data.won },
       );
       const nextToken = settleCompletedRun(world, data, dealtRunTokenRef.current || pendingRunTokenRef.current);
       pendingRunTokenRef.current = nextToken;
