@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
@@ -77,7 +78,12 @@ export async function POST(request: NextRequest) {
     // atomically, preventing localStorage bypass or direct-POST farming.
     const isAdReward = reason === 'Watched Ad' && amount > 0;
     const rpcName = isAdReward ? 'award_ad_coins' : 'sync_coins';
-    const { data, error } = await supabase.rpc(rpcName, {
+    // Coin RPCs take any p_user_id, so only the service role may execute them.
+    const admin = createAdminClient();
+    if (!admin) {
+      return NextResponse.json({ success: false, error: 'Failed to process coin transaction' }, { status: 500 });
+    }
+    const { data, error } = await admin.rpc(rpcName, {
       p_user_id: user.id,
       p_amount: amount,
       p_reason: reason,

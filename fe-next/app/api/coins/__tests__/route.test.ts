@@ -13,6 +13,10 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
 }));
 
+vi.mock('@/utils/supabase/admin', () => ({
+  createAdminClient: vi.fn(),
+}));
+
 vi.mock('@/lib/auth/getAuthedUser', () => ({
   getAuthedUser: vi.fn(),
 }));
@@ -28,9 +32,11 @@ vi.mock('@/lib/posthog', () => ({
 import { GET, POST } from '../route';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 const mockGetAuthedUser = getAuthedUser as any;
 const mockCreateClient = createClient as any;
+const mockCreateAdminClient = createAdminClient as any;
 
 const USER_ID = '11111111-2222-3333-4444-555555555555';
 
@@ -152,21 +158,37 @@ describe('POST /api/coins', () => {
 
   it('POST still uses direct auth.getUser (not getAuthedUser helper)', async () => {
     const mockGetUser = vi.fn(() => ({ data: { user: { id: USER_ID } } }));
-    mockCreateClient.mockResolvedValueOnce({
-      auth: {
-        getUser: mockGetUser,
-      },
-      rpc: vi.fn(() =>
-        Promise.resolve({
-          data: [{ success: true, new_balance: 1500, error_message: null }],
-          error: null,
-        })
-      ),
+    mockCreateClient.mockResolvedValueOnce({ auth: { getUser: mockGetUser } });
+    mockCreateAdminClient.mockReturnValueOnce({
+      rpc: vi.fn(() => Promise.resolve({ data: [{ success: true, new_balance: 1500, error_message: null }], error: null })),
     });
 
     const res = await POST(req({ amount: 100, reason: 'test' }));
     expect(res.status).toBe(200);
-    // Verify direct getUser was called (not the helper)
     expect(mockGetUser).toHaveBeenCalled();
+  });
+
+  it.each([
+    ['sync_coins', 'test'],
+    ['award_ad_coins', 'Watched Ad'],
+  ])('credits through the service-role client (%s is not executable by signed-in users)', async (rpcName, reason) => {
+    const userRpc = vi.fn();
+    const adminRpc = vi.fn(() => Promise.resolve({ data: [{ success: true, new_balance: 1500, error_message: null }], error: null }));
+    mockCreateClient.mockResolvedValueOnce({ auth: { getUser: vi.fn(() => ({ data: { user: { id: USER_ID } } })) }, rpc: userRpc });
+    mockCreateAdminClient.mockReturnValueOnce({ rpc: adminRpc });
+
+    const res = await POST(req({ amount: 100, reason }));
+
+    expect(res.status).toBe(200);
+    expect(userRpc).not.toHaveBeenCalled();
+    expect(adminRpc).toHaveBeenCalledWith(rpcName, expect.objectContaining({ p_user_id: USER_ID, p_amount: 100 }));
+  });
+
+  it('returns 500 when the service-role client is unavailable', async () => {
+    mockCreateClient.mockResolvedValueOnce({ auth: { getUser: vi.fn(() => ({ data: { user: { id: USER_ID } } })) } });
+    mockCreateAdminClient.mockReturnValueOnce(null);
+
+    const res = await POST(req({ amount: 100, reason: 'test' }));
+    expect(res.status).toBe(500);
   });
 });
