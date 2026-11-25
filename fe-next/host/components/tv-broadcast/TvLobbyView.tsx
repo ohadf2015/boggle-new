@@ -3,7 +3,7 @@
 import React, { memo, useState, useEffect, useMemo, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Zap, Monitor } from 'lucide-react';
-import { tvJoinAddress } from '@/lib/education/tvJoinAddress';
+import { roomJoinPath, tvJoinAddress } from '@/lib/education/tvJoinAddress';
 import { PlayerRoster } from '../pre-game/PlayerRoster';
 import { StartButton } from '../pre-game/StartButton';
 import { BattleModeCard } from '../pre-game/BattleModeCard';
@@ -297,7 +297,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
 
   // Same address the round's join bar encodes, so the lobby QR and the in-round QR land in the same place.
   const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const joinUrl = origin ? `${origin}/${roomLanguage}/join/${gameCode}` : '';
+  const joinUrl = origin ? `${origin}${roomJoinPath(roomLanguage, gameCode, false)}` : '';
 
   // One join surface on the wall (the hero card), like the classroom projector:
   // a join bar above it printed a second code and a second QR.
@@ -364,7 +364,7 @@ const TvLobbyView = memo<TvLobbyViewProps>(({
             </div>
             {origin && (
               <p dir="ltr" data-testid="tv-lobby-address" className="font-neo-display font-bold text-neo-cream text-[clamp(18px,2.4vh,32px)] break-all">
-                {tvJoinAddress(origin, roomLanguage, gameCode)}
+                {tvJoinAddress(origin, roomLanguage, gameCode, false)}
               </p>
             )}
             <span
