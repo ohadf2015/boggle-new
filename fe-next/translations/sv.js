@@ -2562,6 +2562,7 @@ const sv = {
     "inlineDismiss": "Fattar"
   },
   "modeCoach": {
+    "typeOrDrag": "Skriv ordet eller dra över bokstäverna",
     "skip": "Hoppa över",
     "next": "Nästa",
     "gotIt": "Fattar",
@@ -4546,6 +4547,7 @@ const sv = {
   },
   "game": {
     "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
+    "enterOrDoubleClickToSubmit": "Tryck Enter eller dubbelklicka på sista bokstaven",
     "tapAgainToSubmit": "Tryck på sista bokstaven igen för att skicka",
     "boardLocked": "Vänta på GO — brädet är inte igång än",
     "foundByOther": "Hittades av ${player}",
@@ -10766,6 +10768,7 @@ const sv = {
     "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
     "firstHint": "Tryck eller dra — varje ord har {letter}",
+    "firstHintTyped": "Skriv ordet och tryck Enter. Varje ord har {letter}",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
     "doubleTapToSubmit": "Dubbeltryck på en bokstav för att skicka",
@@ -11048,6 +11051,7 @@ const sv = {
       "scoreBreakdownTooltip": "Tryck för detaljer",
       "stage": {
         "prompt": "Dra över bokstäverna och bilda ett ord",
+        "promptTyped": "Skriv ett ord eller dra över bokstäverna",
         "praiseShort": "Snyggt!|Japp!|Bra!|Där satt den!",
         "praiseMid": "Grymt!|Bom!|Klockrent!|Härligt!",
         "praiseLong": "Vilket monsterord!|Ordsmed!|Jättebra!|Wow!",
@@ -11645,9 +11649,7 @@ const sv = {
     "celebrationMessage": "Vi önskar dig ett riktigt bra år fullt av ord, segrar och under!"
   },
   "keyboardHint": {
-    "title": "⚡ Snabbtips",
-    "message": "Skriv ord med tangentbordet. Börja bara skriva och tryck Enter. Mycket snabbare än att svepa!",
-    "gotIt": "Fattat!"
+    "typeAndEnter": "Skriv bara ordet och tryck Enter"
   },
   "keyboardShortcuts": {
     "title": "Tangentbordsgenvägar",
@@ -13353,7 +13355,7 @@ const sv = {
       "shareResultHint": "Skicka poängen till en kompis och se om hen slår den.",
       "copied": "Kopierat! Klistra in var du vill",
       "shareFailed": "Det gick inte att dela. Testa igen?",
-      "recap": {"header": "LexiClash Snabbspel: {mode}", "score": "{score} poäng, {pct}% av perfekt", "words": "{count} ord, det längsta på {longest} bokstäver", "wordsOne": "1 ord, {longest} bokstäver långt", "noWords": "Inga ord den här rundan, brädet vann", "longWords": "{count} av dem hade 7 bokstäver eller fler", "targetFound": "Hittade det gömda ordet", "targetMissed": "Det gömda ordet slank undan", "streak": "{days} dagar i rad", "cta": "Tror du att du slår det på 60 sekunder?"}
+      "recap": {"header": "LexiClash Snabbspel: {mode}", "score": "{score} poäng, {pct}% av perfekt", "words": "{count} ord, det längsta på {longest} bokstäver", "wordsOne": "1 ord, {longest} bokstäver långt", "noWords": "Inga ord den här rundan, brädet vann", "longWords": "{count} av dem hade 7 bokstäver eller fler", "targetFound": "Hittade det gömda ordet", "targetMissed": "Det gömda ordet slank undan", "streak": "{days} dagar i rad", "cta": "Tror du att du slår det på 60 sekunder?", "ctaHunt": "Tror du att du hittar det på 2 minuter?"}
     },
     "title": "Snabbspel",
     "creating": "Skapar...",
@@ -21647,6 +21649,9 @@ const sv = {
     },
     "round": {
       "getReady": "Gör dig redo",
+      "youVsBots_one": "Du mot {count} bot",
+      "youVsBots_few": "Du mot {count} bottar",
+      "youVsBots_other": "Du mot {count} bottar",
       "mode": {
         "classic": {
           "name": "Klassisk",

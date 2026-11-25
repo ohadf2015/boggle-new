@@ -169,7 +169,7 @@ export async function answerMissingRoom(
   }
 
   if (!record) {
-    emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+    emitError(socket, ErrorCodes.GAME_NOT_FOUND, { details: { gameCode } });
     return;
   }
 
@@ -179,7 +179,7 @@ export async function answerMissingRoom(
     void socket.join(`classroom:${record.classroomId}`);
     emitError(socket, ErrorCodes.CLASSROOM_SESSION_WAITING, { details: { classroomId: record.classroomId } });
   } else {
-    emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+    emitError(socket, ErrorCodes.GAME_NOT_FOUND, { details: { gameCode } });
   }
 
   // Ending a session tears its room down, so an ended session lands here, not

@@ -217,6 +217,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         isPlaying={playing && !soloLessonActive}
+        acceptedCount={validWords.length}
         isDesktop={isDesktop}
         isTypingMode={false}
         isHelpOpen={false}

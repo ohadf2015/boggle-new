@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { isTypingTarget } from '@/lib/dom/isTypingTarget';
+import { noteTypedSubmit } from '@/lib/input/typedWordHint';
 
 interface BuiltLetter { letter: string; wheelIndex: number }
 
@@ -41,7 +42,7 @@ export function useWordWheelKeyboard({
       const key = e.key;
       const { handleSubmit: submit, handleClear: clear, usedIndices: used, outerLetters: outer } = refs.current;
 
-      if (key === 'Enter') { e.preventDefault(); submit(); return; }
+      if (key === 'Enter') { e.preventDefault(); noteTypedSubmit(); submit(); return; }
       if (key === 'Backspace') { e.preventDefault(); setBuiltLetters(prev => prev.slice(0, -1)); playButtonClickSound(); return; }
       if (key === 'Escape') { e.preventDefault(); clear(); return; }
       if (key.length !== 1) return;

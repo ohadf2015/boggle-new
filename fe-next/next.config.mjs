@@ -48,6 +48,9 @@ if (!process.env.NEXT_PUBLIC_SENTRY_RELEASE) {
   if (sha) process.env.NEXT_PUBLIC_SENTRY_RELEASE = sha;
 }
 
+// Set once in the parent process: build workers inherit it, so client, server and SW agree.
+process.env.NEXT_PUBLIC_BUILD_TIME ??= new Date().toISOString();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Build output dir. Default '.next'. The nightly improvement loop overrides it
@@ -102,8 +105,9 @@ const nextConfig = {
     webpackBuildWorker: true,
     // Collect the server's file traces in a worker while the client compiles (~75s saved).
     parallelServerBuildTraces: true,
-    // Server bundles ship without source maps; unminified, their stacks stay readable.
-    serverMinification: false,
+    // Keep server minification on: V8 keeps every loaded chunk's source text in the
+    // heap, and unminified chunks held ~320MB of it versus ~135MB minified.
+    serverMinification: true,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',
@@ -382,7 +386,7 @@ const nextConfig = {
   // Environment variables
   env: {
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
-    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+    NEXT_PUBLIC_BUILD_TIME: process.env.NEXT_PUBLIC_BUILD_TIME,
     NEXT_PUBLIC_APP_VERSION: pkg.version,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

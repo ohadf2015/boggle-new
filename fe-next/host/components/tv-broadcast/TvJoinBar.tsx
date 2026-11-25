@@ -5,7 +5,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Users } from 'lucide-react';
 import { m } from 'framer-motion';
 import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
-import { tvJoinAddress } from '../../../lib/education/tvJoinAddress';
+import { roomJoinPath, tvJoinAddress } from '../../../lib/education/tvJoinAddress';
 import { cn } from '../../../lib/utils';
 
 interface TvJoinBarProps {
@@ -19,6 +19,8 @@ interface TvJoinBarProps {
   dense?: boolean;
   /** In-flow controls at the row's end (e.g. fullscreen), so nothing floats over the QR. */
   trailing?: React.ReactNode;
+  /** False for a friends room: its QR opens the room, not the class join page. */
+  classroom?: boolean;
 }
 
 /**
@@ -34,11 +36,12 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   t,
   dense = false,
   trailing,
+  classroom = true,
 }) => {
   // Generate join URL with locale prefix
   const joinUrl = useMemo(() => {
-    return `${baseUrl}/${language}/join/${gameCode}`;
-  }, [baseUrl, gameCode, language]);
+    return `${baseUrl}${roomJoinPath(language, gameCode, classroom)}`;
+  }, [baseUrl, gameCode, language, classroom]);
 
   return (
     <m.div
@@ -66,7 +69,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
                 game-code input anywhere on it, so a student who cannot scan the
                 QR had the code and nowhere to type it. */}
             <p className={cn('text-neo-cream text-xl md:text-2xl lg:text-3xl font-black tracking-wide break-all', dense && 'md:medium-short:text-xl lg:whitespace-nowrap lg:break-normal lg:text-[clamp(1rem,1.15vw,1.875rem)]')}>
-              {tvJoinAddress(baseUrl, language, gameCode)}
+              {tvJoinAddress(baseUrl, language, gameCode, classroom)}
             </p>
           </div>
 

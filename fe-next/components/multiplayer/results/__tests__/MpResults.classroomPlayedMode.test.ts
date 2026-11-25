@@ -69,6 +69,10 @@ describe('MP results (was ResultsPage) — mode scenes reflect the mode actually
     expect(source).toMatch(/resolvedGameMode\s*=\s*lastConfirmedMode\.current/);
   });
 
+  it('falls back to the mode the server put in the results payload when no round was confirmed here', () => {
+    expect(source).toMatch(/resolvedGameMode\s*=\s*lastConfirmedMode\.current\s*\?\?\s*payloadGameMode/);
+  });
+
   it('still gates every mode hero on the classroom recap flag', () => {
     // The sibling invariant must survive this change, not be traded for it.
     const heroGates = (detailsSource.match(/^.*(blastMpResults|wheel-rush).*$/gm) ?? []).filter(

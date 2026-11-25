@@ -60,4 +60,14 @@ describe('answerMissingRoom - why a classroom join with no room was refused', ()
     expect(codes.some((c) => c.includes('CLASSROOM_SESSION_WAITING'))).toBe(true);
     expect(codes.some((c) => c.includes('GAME_NOT_FOUND'))).toBe(false);
   });
+
+  it('given no room and no class record, then GAME_NOT_FOUND names the dead code so the client can tell a stale rejoin from its live room', async () => {
+    getClassroomGame.mockResolvedValue(null);
+    const { socket, emit } = fakeSocket();
+
+    await answerMissingRoom(socket, 'B3Y98K', 'Pip');
+
+    const payload = emit.mock.calls.find(([, p]) => (p as { code?: string })?.code === 'GAME_NOT_FOUND')?.[1];
+    expect(payload).toMatchObject({ details: { gameCode: 'B3Y98K' } });
+  });
 });

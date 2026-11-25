@@ -176,13 +176,15 @@ export function buildFallbackResults(params: BuildResultsParams): SinglePlayerRe
 export function emitSinglePlayerGameEnd(
   results: SinglePlayerResultsData,
   subMode: string,
+  /** Bot-free rounds only: the score that counts as a win. Omitted → one valid word. */
+  winScore?: number,
 ): void {
   const maxBotScore = results.botScores.reduce(
     (max, bot) => Math.max(max, bot.score),
     0,
   );
   const isWinner = results.botScores.length === 0
-    ? true
+    ? results.playerWords.length > 0 && (winScore == null || results.playerScore >= winScore)
     : results.playerScore > maxBotScore;
 
   trackGameEnd(

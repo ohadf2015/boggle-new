@@ -12,6 +12,7 @@ import {
   normalizeSpanishWord,
   normalizeRussianWord,
 } from '@/shared/utils/wordNormalization';
+import { peekSharedWordSet, publishSharedWordSet } from '@/shared/utils/wordSetRegistry';
 
 // __dirname is unreliable here: Next.js API routes execute this module inside
 // a Turbopack/webpack bundle whose __dirname points into the bundler's own
@@ -75,6 +76,8 @@ export async function loadEnglishDictionary(
 export async function loadHebrewDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
+  const shared = peekSharedWordSet('he');
+  if (shared) return shared;
   const [hebrewContent, hebrewApprovedContent] = await Promise.all([
     safeReadFile(path.join(BACKEND_DIR, 'hebrew_words.txt')),
     safeReadFile(path.join(BACKEND_DIR, 'hebrew_words_approved.txt')),
@@ -89,12 +92,14 @@ export async function loadHebrewDictionary(
 
   mergeApprovedWords(dict, hebrewApprovedContent, 'Hebrew', (w) => normalizeHebrewWord(w.trim()));
   logger.debug('DICT', `Total Hebrew words: ${dict.size}`);
-  return dict;
+  return publishSharedWordSet('he', dict);
 }
 
 export async function loadSwedishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
+  const shared = peekSharedWordSet('sv');
+  if (shared) return shared;
   const [swedishFileContent, swedishApprovedContent] = await Promise.all([
     safeReadFile(path.join(BACKEND_DIR, 'node_modules/@arvidbt/swedish-words/out/index.js')).then(content =>
       content || safeReadFile(path.join(BACKEND_DIR, '../node_modules/@arvidbt/swedish-words/out/index.js'))
@@ -139,7 +144,7 @@ export async function loadSwedishDictionary(
     }
   }
 
-  return dict;
+  return publishSharedWordSet('sv', dict);
 }
 
 // Pure-hiragana (incl. small kana / dakuten) + the long-vowel mark ー (U+30FC).

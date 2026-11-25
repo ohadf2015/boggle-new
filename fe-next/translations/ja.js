@@ -4186,6 +4186,7 @@ const ja = {
   },
   "game": {
     "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
+    "enterOrDoubleClickToSubmit": "Enterか最後の文字をダブルクリック",
     "tapAgainToSubmit": "最後の文字をもう一度タップで送信",
     "boardLocked": "GOを待って — ボードはまだ動けません",
     "foundByOther": "${player}が見つけました",
@@ -10456,6 +10457,7 @@ const ja = {
     "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
     "firstHint": "タップかなぞる。どの単語にも {letter}",
+    "firstHintTyped": "入力して Enter。どの単語にも {letter} を使います",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
     "doubleTapToSubmit": "文字をダブルタップで送信",
@@ -10738,6 +10740,7 @@ const ja = {
       "scoreBreakdownTooltip": "詳細はタップ",
       "stage": {
         "prompt": "文字をなぞって単語を作ろう",
+        "promptTyped": "単語を入力するか、文字をなぞってください",
         "praiseShort": "いいね！|よし！|ナイス！|その調子！",
         "praiseMid": "うまい！|ドーン！|さすが！|最高！",
         "praiseLong": "超ロング！|天才！|お見事！|すごすぎ！",
@@ -11335,9 +11338,7 @@ const ja = {
     "celebrationMessage": "言葉も勝利もたっぷりの一年になりますように！"
   },
   "keyboardHint": {
-    "title": "⚡ 時短テク",
-    "message": "キーボードで単語を入力できるよ。打ってEnterを押すだけ。スワイプより断然速い！",
-    "gotIt": "了解！"
+    "typeAndEnter": "単語を打ってEnterを押すだけ"
   },
   "keyboardShortcuts": {
     "title": "キーボードショートカット",
@@ -11996,7 +11997,7 @@ const ja = {
       "shareResultHint": "スコアを友だちに送って、超えられるか試してもらおう。",
       "copied": "コピーしました。好きな場所に貼り付けてね",
       "shareFailed": "シェアできませんでした。もう一度試してみて",
-      "recap": {"header": "LexiClash クイックプレイ：{mode}", "score": "{score}点（パーフェクトの{pct}%）", "words": "{count}語、いちばん長い単語は{longest}文字", "wordsOne": "1語、{longest}文字", "noWords": "今回は単語ゼロ。ボードの勝ち", "longWords": "そのうち7文字以上が{count}語", "targetFound": "隠された単語を見つけた", "targetMissed": "隠された単語は見つからなかった", "streak": "{days}日連続プレイ中", "cta": "60秒で超えられる？"}
+      "recap": {"header": "LexiClash クイックプレイ：{mode}", "score": "{score}点（パーフェクトの{pct}%）", "words": "{count}語、いちばん長い単語は{longest}文字", "wordsOne": "1語、{longest}文字", "noWords": "今回は単語ゼロ。ボードの勝ち", "longWords": "そのうち7文字以上が{count}語", "targetFound": "隠された単語を見つけた", "targetMissed": "隠された単語は見つからなかった", "streak": "{days}日連続プレイ中", "cta": "60秒で超えられる？", "ctaHunt": "2分で見つけられる？"}
     },
     "title": "クイックプレイ",
     "creating": "作成中...",
@@ -21456,6 +21457,7 @@ const ja = {
     "inlineDismiss": "OK"
   },
   "modeCoach": {
+    "typeOrDrag": "単語を入力するか、文字をなぞってください",
     "skip": "スキップ",
     "next": "次へ",
     "gotIt": "OK",
@@ -21647,6 +21649,9 @@ const ja = {
     },
     "round": {
       "getReady": "準備して",
+      "youVsBots_one": "ボット{count}体と対戦",
+      "youVsBots_few": "ボット{count}体と対戦",
+      "youVsBots_other": "ボット{count}体と対戦",
       "mode": {
         "classic": {
           "name": "クラシック",

@@ -96,7 +96,7 @@ export function buildMpResultsProps({
   onExitToLobby, resultsData, handleReturnToRoom, gameDuration, seriesTracker,
 }: Pick<MpPhaseRouterProps, 'gameCode' | 'username' | 'isHost' | 'socket' | 'roomLanguage' | 'isClassroomMode' | 'classroomGameMode' | 'onExitToLobby' | 'resultsData' | 'handleReturnToRoom' | 'gameDuration' | 'seriesTracker'>): MpResultsScreenProps {
   return {
-    finalScores: resultsData?.scores ?? null, gameCode,
+    finalScores: resultsData?.scores ?? null, gameCode, gameMode: resultsData?.gameMode,
     onReturnToRoom: handleReturnToRoom, onExitToLobby, username, socket,
     duplicateRuleDisabled: resultsData?.duplicateRuleDisabled,
     playerCount: resultsData?.playerCount,

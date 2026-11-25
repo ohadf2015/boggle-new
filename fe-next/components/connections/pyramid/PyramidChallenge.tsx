@@ -33,6 +33,7 @@ import { useStoredDailyResult } from '../useStoredDailyResult';
 import { useDailyScoreSave } from '../useDailyScoreSave';
 import ScoreSaveNotice from '../ScoreSaveNotice';
 import { pyramidReducer } from './pyramidReducer';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import { clearPyramidRun, loadPyramidRun, usePyramidRunSave, type StoredPyramidRun } from './pyramidRunStore';
 
 const UNREACHED: BridgeOutcome = { reached: false, solved: false, wrongAttempts: 0, hintUsed: false };
@@ -259,6 +260,28 @@ function PyramidRun({
     prevStatusRef.current = pyramidState.status;
     prevWrongRef.current = pyramidState.wrongAttempts;
   }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language, onBridgeSolved, sharePath]);
+
+  // The first keystroke is the game start: a page view is not a game.
+  const openedStateRef = useRef(pyramidState);
+  const gameStartedRef = useRef(Boolean(restored));
+  useEffect(() => {
+    if (gameStartedRef.current || (input === '' && pyramidState === openedStateRef.current)) return;
+    gameStartedRef.current = true;
+    trackGameStart('connections', { variant: 'pyramid', daily: !!sharePath, daily_restored: !!resumed, language: runLanguage });
+  }, [input, pyramidState, sharePath, resumed, runLanguage]);
+
+  const endTrackedRef = useRef(Boolean(restored));
+  useEffect(() => {
+    if (!isTerminal || endTrackedRef.current) return;
+    endTrackedRef.current = true;
+    const solved = Array.from(outcomesRef.current.values()).filter((o) => o.solved).length;
+    const durationSec = startRef.current ? Math.floor((Date.now() - startRef.current) / 1000) : undefined;
+    trackGameEnd('connections', pyramidState.score, solved, true, durationSec, {
+      variant: 'pyramid',
+      daily: !!sharePath,
+      isWinner: pyramidState.status === 'won',
+    });
+  }, [isTerminal, pyramidState.score, pyramidState.status, sharePath]);
 
   // After the outcome effect, so a reload on a just-resolved riddle keeps its outcome.
   usePyramidRunSave({

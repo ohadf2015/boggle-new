@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { praiseFor } from '@/lib/wordWheel/rankLadder';
+import { useTypingDesktop } from '@/lib/input/typedWordHint';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -67,6 +68,7 @@ export default function WordWheelWordLine({
   celebrating = false, banner, live = null, className,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
+  const typingDesktop = useTypingDesktop();
   const [lastBuilt, setLastBuilt] = useState('');
   if (word && word !== lastBuilt) setLastBuilt(word);
   const riding = letters.length === 0 && !!pendingWord;
@@ -191,7 +193,7 @@ export default function WordWheelWordLine({
               animate={reducedMotion ? undefined : { opacity: [1, 0, 1] }}
               transition={{ duration: 1.05, repeat: Infinity, ease: 'linear' }}
             />
-            {hint && !accepted && !rejected && t('wordWheel.firstHint', { letter: centerLetter })}
+            {hint && !accepted && !rejected && t(typingDesktop ? 'wordWheel.firstHintTyped' : 'wordWheel.firstHint', { letter: centerLetter })}
           </span>
         ) : (
           <>

@@ -29,6 +29,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { QuickClassicLeftRail, QuickClassicRightRail } from './QuickClassicRails';
 import shellStyles from './quickClassicShell.module.css';
 import { roundTarget, type QuickRoundConfig, type QuickRoundResult } from '../types';
+import { DECENT_ROUND_PCT } from '../celebrationTier';
 import { Loader } from '@/components/ui/Loader';
 
 interface QuickClassicBoardProps {
@@ -107,6 +108,7 @@ export function QuickClassicBoard({ config, onDone, onQuit }: QuickClassicBoardP
     onWordAccepted: handleWordAccepted,
     // Arcade rounds are "your score this round", not a high-score race.
     targetHighScore: null,
+    winScore: coach ? undefined : Math.ceil((roundTarget(config).score * DECENT_ROUND_PCT) / 100),
     onGameEnd: (r: SinglePlayerResultsData) =>
       onDone(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config)),
     onQuit,

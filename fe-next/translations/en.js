@@ -3802,6 +3802,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
+    "enterOrDoubleClickToSubmit": "Press Enter or double-click the last letter",
     "tapAgainToSubmit": "Tap the last letter again to submit",
     "boardLocked": "Wait for GO. This board isn't live yet",
     "foundByOther": "Found by ${player}",
@@ -9857,6 +9858,7 @@ const en = {
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
     "firstHint": "Tap or swipe. Every word uses {letter}",
+    "firstHintTyped": "Type it and press Enter. Every word uses {letter}",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",
@@ -10135,6 +10137,7 @@ const en = {
       "scoreBreakdownTooltip": "Tap for details",
       "stage": {
         "prompt": "Swipe letters to make a word",
+        "promptTyped": "Type a word or drag the letters",
         "praiseShort": "Nice!|Neat!|Got it!|Yes!",
         "praiseMid": "Sweet!|Boom!|Slick!|Love it!",
         "praiseLong": "Monster word!|Big brain!|Wordsmith!|Huge!",
@@ -10425,9 +10428,7 @@ const en = {
     "longerWordsTip": "Longer words score way more."
   },
   "keyboardHint": {
-    "title": "⚡ Speed Tip",
-    "message": "Start typing and hit Enter to submit. Way faster than swiping.",
-    "gotIt": "Got it"
+    "typeAndEnter": "Just type the word and press Enter"
   },
   "keyboardShortcuts": {
     "title": "Keyboard Shortcuts",
@@ -11389,7 +11390,7 @@ const en = {
       "shareResultHint": "Send your score to a friend and see if they can top it.",
       "copied": "Copied! Paste it anywhere",
       "shareFailed": "Couldn't share that. Try again?",
-      "recap": {"header": "LexiClash Quick Play: {mode}", "score": "{score} points, {pct}% of perfect", "words": "{count} words, the longest was {longest} letters", "wordsOne": "1 word, {longest} letters long", "noWords": "No words this round, the board won", "longWords": "{count} of them had 7 letters or more", "targetFound": "Found the hidden word", "targetMissed": "The hidden word got away", "streak": "On a {days}-day streak", "cta": "Think you can beat it in 60 seconds?"}
+      "recap": {"header": "LexiClash Quick Play: {mode}", "score": "{score} points, {pct}% of perfect", "words": "{count} words, the longest was {longest} letters", "wordsOne": "1 word, {longest} letters long", "noWords": "No words this round, the board won", "longWords": "{count} of them had 7 letters or more", "targetFound": "Found the hidden word", "targetMissed": "The hidden word got away", "streak": "On a {days}-day streak", "cta": "Think you can beat it in 60 seconds?", "ctaHunt": "Think you can find it in 2 minutes?"}
     },
     "title": "Quick Play",
     "creating": "Creating...",
@@ -17536,6 +17537,7 @@ const en = {
     "inlineDismiss": "Got it"
   },
   "modeCoach": {
+    "typeOrDrag": "Type the word or drag across the letters",
     "skip": "Skip",
     "next": "Next",
     "gotIt": "Got it",
@@ -20668,6 +20670,9 @@ const en = {
     },
     "round": {
       "getReady": "Get ready",
+      "youVsBots_one": "You vs {count} bot",
+      "youVsBots_few": "You vs {count} bots",
+      "youVsBots_other": "You vs {count} bots",
       "mode": {
         "classic": {
           "name": "Classic",

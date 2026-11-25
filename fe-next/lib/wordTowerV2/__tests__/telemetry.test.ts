@@ -8,7 +8,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackGameEnd: (...args: unknown[]) => trackGameEnd(...args),
 }));
 
-import { WORD_TOWER_MODE, closeDailyTowerSession, endV2Run, startV2Run } from '../telemetry';
+import { WORD_TOWER_MODE, closeDailyTowerSession, endV2Run, setTowerStartExtras, startV2Run } from '../telemetry';
 
 describe('word-tower lifecycle telemetry', () => {
   beforeEach(() => {
@@ -16,19 +16,28 @@ describe('word-tower lifecycle telemetry', () => {
     trackGameEnd.mockClear();
   });
 
-  it('does not emit a second game_started — the start hook owns mode word-tower', () => {
+  it('given a fresh run, when the first floor is hoisted, then one game_started fires with the page extras', () => {
+    setTowerStartExtras({ v2: true, daily: true, daily_restored: false });
     const startedAt = { current: null as number | null };
     startV2Run(startedAt);
     startV2Run(startedAt);
-    expect(trackGameStart).not.toHaveBeenCalled();
+    expect(trackGameStart).toHaveBeenCalledTimes(1);
+    expect(trackGameStart).toHaveBeenCalledWith('word-tower', { v2: true, daily: true, daily_restored: false });
     expect(WORD_TOWER_MODE).toBe('word-tower');
     expect(startedAt.current).toEqual(expect.any(Number));
+  });
+
+  it('given a run that ended, when the next run hoists, then it gets its own game_started', () => {
+    const startedAt = { current: null as number | null };
+    startV2Run(startedAt);
+    endV2Run(startedAt, { floors: 3, heightM: 9 });
+    startV2Run(startedAt);
+    expect(trackGameStart).toHaveBeenCalledTimes(2);
   });
 
   it('ends on word-tower with v2/daily as properties, not a second mode', () => {
     const startedAt = { current: Date.now() - 4000 };
     endV2Run(startedAt, { floors: 7, heightM: 21.4, daily: false });
-    expect(trackGameStart).not.toHaveBeenCalled();
     expect(trackGameEnd).toHaveBeenCalledTimes(1);
     expect(trackGameEnd).toHaveBeenCalledWith(
       'word-tower',

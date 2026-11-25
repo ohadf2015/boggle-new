@@ -36,7 +36,7 @@ vi.mock('next/dynamic', () => ({
     props.isOpen ? <div data-testid="auth-modal" data-mode={props.initialMode} /> : null,
 }));
 
-import { GuestSaveCard } from '../GuestSaveCard';
+import { GuestSaveCard, GUEST_SAVE_SESSION_KEY } from '../GuestSaveCard';
 
 describe('GuestSaveCard', () => {
   beforeEach(() => {
@@ -45,6 +45,8 @@ describe('GuestSaveCard', () => {
     native.value = false;
     vi.stubEnv('NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID', 'cid');
     Object.values(tracking).forEach((f) => f.mockClear());
+    sessionStorage.clear();
+    localStorage.clear();
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -126,5 +128,43 @@ describe('GuestSaveCard', () => {
     render(<GuestSaveCard gained={10} />);
     expect(screen.queryByTestId('google-btn')).toBeNull();
     expect(screen.getByTestId('guest-save-more-ways')).toHaveAttribute('data-primary', 'true');
+  });
+
+  describe('frequency cap', () => {
+    const shownOnGames = (games: number) => {
+      const shown: number[] = [];
+      for (let game = 1; game <= games; game++) {
+        const { unmount } = render(<GuestSaveCard gained={10} />);
+        if (screen.queryByTestId('next-unlock-guest')) shown.push(game);
+        unmount();
+      }
+      return shown;
+    };
+
+    it('Given a new session, Then the card shows on the first results screen and then every 5th game', () => {
+      expect(shownOnGames(11)).toEqual([1, 6, 11]);
+    });
+
+    it('Given a new session after a hidden streak, Then the first results screen shows the card again', () => {
+      shownOnGames(3);
+      sessionStorage.removeItem(GUEST_SAVE_SESSION_KEY);
+      expect(shownOnGames(2)).toEqual([1]);
+    });
+
+    it('Given a hidden results screen, Then no impression is tracked', () => {
+      shownOnGames(2);
+      expect(tracking.trackGrowthEvent).toHaveBeenCalledTimes(0);
+      reduced.value = true;
+      shownOnGames(1);
+      expect(tracking.trackGrowthEvent).toHaveBeenCalledTimes(0);
+    });
+
+    it('Given storage throws, Then the card still shows', () => {
+      const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
+      vi.stubGlobal('sessionStorage', blocked);
+      vi.stubGlobal('localStorage', blocked);
+      expect(shownOnGames(2)).toEqual([1, 2]);
+      vi.unstubAllGlobals();
+    });
   });
 });

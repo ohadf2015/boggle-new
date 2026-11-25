@@ -101,6 +101,7 @@ export interface OnShowResultsData {
   wheelRushSummary?: WheelRushSummary;
   /** Same field the player path carries, so both routes restore the lesson recap. */
   classroomSummary?: ClassroomSummary;
+  gameMode?: string;
 }
 
 export interface FinalScoresState {
@@ -557,6 +558,7 @@ export function useHostGameEvents({
           blastSummary: data.blastSummary,
           wheelRushSummary: data.wheelRushSummary,
           classroomSummary: data.classroomSummary, // both paths to ResultsPage carry the recap (pitfalls Class 3)
+          gameMode: data.gameMode,
         });
       }
     };

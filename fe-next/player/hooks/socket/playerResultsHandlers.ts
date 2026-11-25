@@ -106,6 +106,7 @@ export function createPlayerResultsHandlers(ctx: PlayerResultsContext) {
         classroomSummary: data.classroomSummary,
         isRanked: data.isRanked,
         mmrChanges: data.mmrChanges,
+        gameMode: data.gameMode,
       });
     }
   };

@@ -317,6 +317,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     () => foundWords.filter((fw) => fw.isValid !== false && fw.word.length >= 5).length,
     [foundWords],
   );
+  const validWordCount = useMemo(() => foundWords.filter((fw) => fw.isValid !== false).length, [foundWords]);
   // Track floating score animation
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
@@ -449,6 +450,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         fireRoundActive={fireRoundActive}
         fireRoundRemaining={fireRoundRemaining}
         isPlaying={isPlaying && !mpChrome}
+        acceptedCount={validWordCount}
         isDesktop={isDesktop}
         isTypingMode={isTypingMode}
         isHelpOpen={isHelpOpen}

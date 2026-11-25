@@ -4186,6 +4186,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "enterOrDoubleClickToSubmit": "Pulsa Enter o haz doble clic en la última letra",
     "tapAgainToSubmit": "Toca otra vez la última letra para enviar",
     "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
@@ -10416,6 +10417,7 @@ const es = {
     "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
     "firstHint": "Toca o desliza: todas llevan la {letter}",
+    "firstHintTyped": "Escríbela y pulsa Enter. Cada palabra usa la {letter}",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
     "doubleTapToSubmit": "Toca dos veces una letra para enviar",
@@ -10612,6 +10614,7 @@ const es = {
       "scoreBreakdownTooltip": "Toca para detalles",
       "stage": {
         "prompt": "Desliza por las letras y forma una palabra",
+        "promptTyped": "Escribe una palabra o arrastra las letras",
         "praiseShort": "¡Bien!|¡Eso!|¡Sí!|¡Bravo!",
         "praiseMid": "¡Genial!|¡Bum!|¡Crack!|¡Qué bueno!",
         "praiseLong": "¡Qué palabra!|¡Cerebrito!|¡Enorme!|¡Maestro!",
@@ -11303,9 +11306,7 @@ const es = {
     "celebrationMessage": "¡Te deseamos un año lleno de palabras, victorias y buenas sorpresas!"
   },
   "keyboardHint": {
-    "title": "⚡ Truco rápido",
-    "message": "Escribe las palabras con el teclado. Solo empieza a teclear y pulsa Enter para enviar. ¡Mucho más rápido que deslizar!",
-    "gotIt": "Entendido"
+    "typeAndEnter": "Escribe la palabra y pulsa Enter"
   },
   "keyboardShortcuts": {
     "title": "Atajos de teclado",
@@ -12994,7 +12995,7 @@ const es = {
       "shareResultHint": "Mándale tu puntuación a alguien y a ver si te supera.",
       "copied": "¡Copiado! Pégalo donde quieras",
       "shareFailed": "No se pudo compartir. ¿Lo intentas otra vez?",
-      "recap": {"header": "Partida rápida de LexiClash: {mode}", "score": "{score} puntos, el {pct}% del perfecto", "words": "{count} palabras, la más larga de {longest} letras", "wordsOne": "1 palabra, de {longest} letras", "noWords": "Ninguna palabra esta ronda, ganó el tablero", "longWords": "{count} con 7 letras o más", "targetFound": "Encontré la palabra oculta", "targetMissed": "Se me escapó la palabra oculta", "streak": "{days} días seguidos", "cta": "¿Te animas a superarlo en 60 segundos?"}
+      "recap": {"header": "Partida rápida de LexiClash: {mode}", "score": "{score} puntos, el {pct}% del perfecto", "words": "{count} palabras, la más larga de {longest} letras", "wordsOne": "1 palabra, de {longest} letras", "noWords": "Ninguna palabra esta ronda, ganó el tablero", "longWords": "{count} con 7 letras o más", "targetFound": "Encontré la palabra oculta", "targetMissed": "Se me escapó la palabra oculta", "streak": "{days} días seguidos", "cta": "¿Te animas a superarlo en 60 segundos?", "ctaHunt": "¿Te animas a encontrarla en 2 minutos?"}
     },
     "title": "Juego rápido",
     "creating": "Creando...",
@@ -18919,6 +18920,7 @@ const es = {
     "inlineDismiss": "Listo"
   },
   "modeCoach": {
+    "typeOrDrag": "Escribe la palabra o arrastra por las letras",
     "skip": "Saltar",
     "next": "Siguiente",
     "gotIt": "¡Dale!",
@@ -21659,6 +21661,9 @@ const es = {
     },
     "round": {
       "getReady": "Prepárate",
+      "youVsBots_one": "Tú contra {count} bot",
+      "youVsBots_few": "Tú contra {count} bots",
+      "youVsBots_other": "Tú contra {count} bots",
       "mode": {
         "classic": {
           "name": "Clásico",

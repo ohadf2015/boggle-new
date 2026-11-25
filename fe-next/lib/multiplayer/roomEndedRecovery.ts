@@ -35,6 +35,14 @@ export function shouldOfferQuickPlayRecovery({ wasActive, context, isHost }: Roo
 }
 
 let accepted = false;
+const offeredCodes = new Set<string>();
+
+/** True the first time a dead code is offered; a stored session retrying it must not re-pop the offer. */
+export function claimRoomEndedOffer(code: string): boolean {
+  if (offeredCodes.has(code)) return false;
+  offeredCodes.add(code);
+  return true;
+}
 
 /** The player tapped "Play now" on the room-ended toast. */
 export function markRoomEndedRecoveryAccepted(): void {
@@ -50,4 +58,5 @@ export function consumeRoomEndedRecoveryAccepted(): boolean {
 
 export function resetRoomEndedRecoveryForTests(): void {
   accepted = false;
+  offeredCodes.clear();
 }

@@ -5,6 +5,7 @@ const trackGameEnd = vi.fn();
 const updateActiveGameExtras = vi.fn();
 const setPagehideFinalizer = vi.fn();
 const clearPagehideFinalizer = vi.fn();
+let gameActive = true;
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGameEnd: (...args: unknown[]) => trackGameEnd(...args),
@@ -14,6 +15,7 @@ vi.mock('@/utils/abandonOnPagehide', () => ({
   updateActiveGameExtras: (...args: unknown[]) => updateActiveGameExtras(...args),
   setPagehideFinalizer: (...args: unknown[]) => setPagehideFinalizer(...args),
   clearPagehideFinalizer: (...args: unknown[]) => clearPagehideFinalizer(...args),
+  isGameActive: () => gameActive,
 }));
 
 import { useDailyTowerLifecycle } from '../useDailyTowerLifecycle';
@@ -24,6 +26,16 @@ describe('useDailyTowerLifecycle', () => {
     updateActiveGameExtras.mockClear();
     setPagehideFinalizer.mockClear();
     clearPagehideFinalizer.mockClear();
+    gameActive = true;
+  });
+
+  it('given a saved tower opened but never climbed, when the player leaves, then no game is completed', () => {
+    gameActive = false;
+    const { unmount } = renderHook(() =>
+      useDailyTowerLifecycle({ daily: true, floors: 4, peakM: 0, heightM: 12, score: 30 }),
+    );
+    unmount();
+    expect(trackGameEnd).not.toHaveBeenCalled();
   });
 
   it('registers a pagehide finalizer that completes once, and clears it on unmount', () => {

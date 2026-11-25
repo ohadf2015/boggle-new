@@ -60,6 +60,8 @@ const WORLD_ROWS: Array<{ twist: LevelTwist; slots: Slot[] }> = [
 const KIND_STAR_MULT: Record<LevelKind, number> = {
   classic: 1, hunt: 0.7, chain: 0.6, fog: 0.8, bomb: 0.85, elite: 1, boss: 1,
 };
+// The very first fight teaches the game: new players were losing it with 0-5 words.
+const FIRST_FIGHT_EASE = 0.75;
 const KIND_SECONDS: Record<LevelKind, number> = {
   classic: 90, hunt: 90, chain: 100, fog: 90, bomb: 90, elite: 100, boss: 120,
 };
@@ -98,6 +100,7 @@ function buildSpec(world: number, level: number, slot: Slot, worldTwist: LevelTw
   let mult = KIND_STAR_MULT[kind];
   if (minLength > 3) mult *= 0.9;
   if (seconds < 90) mult *= seconds / 90;
+  if (world === 1 && level === 1) mult *= FIRST_FIGHT_EASE;
   const s1 = r5(one * mult);
   // The ordinary rival's HP IS the top star (it dies there and the level ends).
   // At a flat 1.8/2.8 it outlasted the world's boss (1.3x) by more than 2x —

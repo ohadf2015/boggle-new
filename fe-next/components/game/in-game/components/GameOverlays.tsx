@@ -16,6 +16,8 @@ interface GameOverlaysProps {
 
   // Keyboard features
   isPlaying: boolean;
+  /** Valid words found so far; retires the "just type" hint after a typed one lands. */
+  acceptedCount: number;
   isDesktop: boolean;
   isTypingMode: boolean;
   isHelpOpen: boolean;
@@ -40,6 +42,7 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
   fireRoundActive,
   fireRoundRemaining,
   isPlaying,
+  acceptedCount,
   isDesktop,
   isTypingMode,
   isHelpOpen,
@@ -61,7 +64,7 @@ export const GameOverlays = memo<GameOverlaysProps>(function GameOverlays({
 
       {/* Keyboard Input Hint - Desktop only */}
       {isPlaying && (
-        <KeyboardHintTooltip delaySeconds={10} desktopOnly={true} t={t} />
+        <KeyboardHintTooltip acceptedCount={acceptedCount} t={t} />
       )}
 
       {/* Keyboard Mode Indicator - Desktop only */}

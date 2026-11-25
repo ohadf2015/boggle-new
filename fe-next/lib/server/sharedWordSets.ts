@@ -35,6 +35,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import { clearSharedWordSets, peekSharedWordSet, publishSharedWordSet } from '@/shared/utils/wordSetRegistry';
 
 let englishSet: Set<string> | null = null;
 let spanishBaseSet: Set<string> | null = null;
@@ -69,22 +70,26 @@ export async function getSpanishBaseWordSet(): Promise<Set<string>> {
 /** Hebrew dictionary (base + community-approved), normalized. Cached once. */
 export function getHebrewWordSet(): Set<string> {
   if (hebrewSet) return hebrewSet;
+  const loaded = peekSharedWordSet('he');
+  if (loaded) return (hebrewSet = loaded);
   const set = new Set<string>();
   for (const file of ['hebrew_words.txt', 'hebrew_words_approved.txt']) {
     const p = path.join(backendDir(), file);
     if (!fs.existsSync(p)) continue;
     for (const line of fs.readFileSync(p, 'utf-8').split('\n')) {
       const w = normalizeHebrewWord(line.trim());
-      if (w.length > 0) set.add(w);
+      if (w.length > 0 && !w.startsWith('#')) set.add(w);
     }
   }
-  hebrewSet = set;
+  hebrewSet = publishSharedWordSet('he', set);
   return hebrewSet;
 }
 
 /** Swedish dictionary (@arvidbt/swedish-words + approved), lowercased. Cached once. */
 export function getSwedishWordSet(): Set<string> {
   if (swedishSet) return swedishSet;
+  const loaded = peekSharedWordSet('sv');
+  if (loaded) return (swedishSet = loaded);
   const set = new Set<string>();
   const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
 
@@ -117,11 +122,11 @@ export function getSwedishWordSet(): Set<string> {
   if (fs.existsSync(approvedFile)) {
     for (const line of fs.readFileSync(approvedFile, 'utf-8').split('\n')) {
       const w = line.trim().toLowerCase();
-      if (w.length > 0) set.add(w);
+      if (w.length > 0 && !w.startsWith('#')) set.add(w);
     }
   }
 
-  swedishSet = set;
+  swedishSet = publishSharedWordSet('sv', set);
   return swedishSet;
 }
 
@@ -141,4 +146,5 @@ export function __resetSharedWordSetsForTest(): void {
   spanishBaseSet = null;
   hebrewSet = null;
   swedishSet = null;
+  clearSharedWordSets();
 }

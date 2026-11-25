@@ -29,4 +29,9 @@ describe('Classroom host on a tall projector (1440x900 and up)', () => {
     expect(address.className).toContain('lg:whitespace-nowrap');
     expect(address.className).toContain('lg:break-normal');
   });
+
+  it('Given a friends room, Then the join bar points at the room itself, not the class join page', () => {
+    render(<TvJoinBar gameCode="B3Y98K" playerCount={3} language="en" baseUrl="http://localhost:3323" t={t} classroom={false} />);
+    expect(screen.getByText('localhost:3323/en/multiplayer?room=B3Y98K')).toBeInTheDocument();
+  });
 });

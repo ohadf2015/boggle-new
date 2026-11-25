@@ -212,4 +212,39 @@ describe('VersionChecker manual refresh', () => {
     expect(screen.queryByRole('button', REFRESH_BTN)).not.toBeNull();
     expect(reloadSpy).not.toHaveBeenCalled();
   });
+
+  describe('staleness by commit', () => {
+    const originalRelease = process.env.NEXT_PUBLIC_SENTRY_RELEASE;
+    afterEach(() => {
+      process.env.NEXT_PUBLIC_SENTRY_RELEASE = originalRelease;
+    });
+
+    function serverReports(body: { buildTime: string; commit: string }) {
+      vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => body }));
+    }
+
+    it('Given the same commit with a different build time, Then no refresh prompt shows', async () => {
+      process.env.NEXT_PUBLIC_SENTRY_RELEASE = 'abc123';
+      serverReports({ buildTime: 'build-new', commit: 'abc123' });
+      render(
+        <NavWrapper isInGame={false}>
+          <VersionChecker />
+        </NavWrapper>,
+      );
+      await detectUpdate();
+      expect(screen.queryByRole('button', REFRESH_BTN)).toBeNull();
+    });
+
+    it('Given a different commit, Then the refresh prompt shows', async () => {
+      process.env.NEXT_PUBLIC_SENTRY_RELEASE = 'abc123';
+      serverReports({ buildTime: 'build-old', commit: 'def456' });
+      render(
+        <NavWrapper isInGame={false}>
+          <VersionChecker />
+        </NavWrapper>,
+      );
+      await detectUpdate();
+      expect(screen.getByRole('button', REFRESH_BTN)).toBeTruthy();
+    });
+  });
 });

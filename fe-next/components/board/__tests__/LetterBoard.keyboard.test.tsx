@@ -4,6 +4,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import LetterBoard from '../LetterBoard';
 import { stubBoardLayout, selectedKeys } from './boardTestUtils';
 
+const { noteTypedSubmit } = vi.hoisted(() => ({ noteTypedSubmit: vi.fn() }));
+vi.mock('@/lib/input/typedWordHint', () => ({ noteTypedSubmit }));
+
 const GRID = [
   ['C', 'A', 'T'],
   ['D', 'O', 'G'],
@@ -38,6 +41,15 @@ describe('LetterBoard keyboard typing', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit.mock.calls[0][1]).toBe('kb');
     expect((onSubmit.mock.calls[0][0] as Array<{ letter: string }>).map((c) => c.letter).join('')).toBe('CAT');
+  });
+
+  it('given a word sent with Enter on the focused board, then it counts as typed for the desktop typing hint', () => {
+    noteTypedSubmit.mockClear();
+    const { type } = setup();
+    'cat'.split('').forEach(type);
+    expect(noteTypedSubmit).not.toHaveBeenCalled();
+    type('Enter');
+    expect(noteTypedSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('given a letter that cannot extend the path, then the path is unchanged', () => {

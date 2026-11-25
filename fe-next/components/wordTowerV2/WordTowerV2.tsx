@@ -171,7 +171,6 @@ export default function WordTowerV2({ daily = false }: { daily?: boolean } = {})
     isAdmin: !!isAdmin,
     canSeeInWorkModes: !!canSeeInWorkModes,
     language,
-    phase,
     floors: run.floors,
     peakM: game.peakM,
     heightM: game.heightM,

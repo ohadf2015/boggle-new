@@ -85,7 +85,14 @@ describe('useHostLobby with bots in the roster', () => {
   it('tags the Start-button bot start so it can be told apart from the lane chip', () => {
     const { result } = setup();
     act(() => { result.current.handleStartClick(); });
-    expect(trackSoloPlayPrompt).toHaveBeenCalledWith({ event: 'clicked', surface: 'start_button' });
+    expect(trackSoloPlayPrompt).toHaveBeenCalledWith({ event: 'clicked', surface: 'start_button', lobbyWaitSec: 0 });
+  });
+
+  it('says how long the host sat alone when the bots fill in', () => {
+    setup();
+    act(() => { vi.advanceTimersByTime(15_000); });
+    for (let i = 0; i < 20; i += 1) act(() => { vi.advanceTimersByTime(1000); });
+    expect(trackSoloPlayPrompt).toHaveBeenCalledWith({ event: 'shown', auto_filled: true, lobbyWaitSec: 35 });
   });
 
   it('in TV mode the host is the screen, not a seat', () => {

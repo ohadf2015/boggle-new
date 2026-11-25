@@ -88,10 +88,11 @@ export default function LeaderboardTabSwitch({ t, activeTab, onTabChange, idPref
           <ChevronDown className={cn('w-3.5 h-3.5 shrink-0 transition-transform', menuOpen && 'rotate-180')} aria-hidden />
         </button>
       </div>
+      {/* In flow, not absolute: the board clips its rounded corners, which cut an overlay off on short boards. */}
       {menuOpen && (
         <div
           role="menu"
-          className="absolute end-0 top-full mt-1.5 z-30 min-w-44 p-1 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
+          className="mt-1.5 ms-auto w-fit min-w-44 p-1 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
         >
           {SECONDARY.map(({ tab: value, key, Icon }) => (
             <button

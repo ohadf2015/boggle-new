@@ -81,7 +81,7 @@ describe('TvLobbyView', () => {
     render(<TvLobbyView {...defaultProps} />);
     expect(screen.queryByTestId('tv-join-bar')).not.toBeInTheDocument();
     expect(screen.getByTestId('tv-lobby-code')).toHaveTextContent('ABC123');
-    expect(screen.getByTestId('tv-lobby-address')).toHaveTextContent('/join/ABC123');
+    expect(screen.getByTestId('tv-lobby-address')).toHaveTextContent('/multiplayer?room=ABC123');
   });
 
   it('renders PlayerRoster with players', () => {

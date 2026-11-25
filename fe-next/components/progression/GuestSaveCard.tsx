@@ -25,6 +25,20 @@ const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: fa
 const SOURCE = 'results_card';
 const ENTER_DELAY_MS = 600;
 const SPRING = { type: 'spring', stiffness: 380, damping: 24 } as const;
+export const GUEST_SAVE_SESSION_KEY = 'lexiclash_guest_save_seen_session';
+const GAMES_SINCE_KEY = 'lexiclash_guest_save_games_since';
+const SHOW_EVERY_N_GAMES = 5;
+
+/** First results screen of a session, then every 5th game. */
+function planShow(): { show: boolean; gamesSince: number } {
+  try {
+    if (!sessionStorage.getItem(GUEST_SAVE_SESSION_KEY)) return { show: true, gamesSince: 0 };
+    const gamesSince = (Number(localStorage.getItem(GAMES_SINCE_KEY)) || 0) + 1;
+    return gamesSince >= SHOW_EVERY_N_GAMES ? { show: true, gamesSince: 0 } : { show: false, gamesSince };
+  } catch {
+    return { show: true, gamesSince: 0 };
+  }
+}
 
 function useSignupSheetActive(): boolean {
   const [active, setActive] = useState(isSignupPromptActive);
@@ -48,6 +62,19 @@ export function GuestSaveCard({ gained }: { gained: number }) {
   const [authOpen, setAuthOpen] = useState(false);
   const [from] = useState(() => ({ y: 28, rotate: sign() * jitter(2.5, 1) }));
   const shownRef = useRef(false);
+  const [plan] = useState(planShow);
+  const plannedRef = useRef(false);
+
+  useEffect(() => {
+    if (plannedRef.current) return;
+    plannedRef.current = true;
+    try {
+      sessionStorage.setItem(GUEST_SAVE_SESSION_KEY, '1');
+      localStorage.setItem(GAMES_SINCE_KEY, String(plan.gamesSince));
+    } catch {
+      // storage blocked: the card shows every game, as before the cap
+    }
+  }, [plan]);
 
   useEffect(() => {
     if (reduced) {
@@ -59,10 +86,10 @@ export function GuestSaveCard({ gained }: { gained: number }) {
   }, [reduced]);
 
   useEffect(() => {
-    if (!entered || shownRef.current) return;
+    if (!plan.show || !entered || shownRef.current) return;
     shownRef.current = true;
     trackGrowthEvent('signup_prompt_shown', { source: SOURCE, surface: SOURCE, trigger: SOURCE });
-  }, [entered]);
+  }, [plan, entered]);
 
   const model = buildNextUnlockTeaser(gained);
   const googleInline = !isNative() && !!process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
@@ -74,7 +101,7 @@ export function GuestSaveCard({ gained }: { gained: number }) {
     setAuthOpen(true);
   };
 
-  if (isOnCrazyGamesPlatform) return null;
+  if (isOnCrazyGamesPlatform || !plan.show) return null;
   return (
     <>
       <m.section

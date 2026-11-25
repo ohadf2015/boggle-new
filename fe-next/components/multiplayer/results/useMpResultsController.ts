@@ -56,7 +56,7 @@ export function useMpResultsController(props: MpResultsProps) {
   const {
     finalScores, gameCode, onReturnToRoom, username, socket, achievements, isHost = false,
     roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesRoundNumber, wordHuntSummary, classroomSummary,
-    onResetSeries, gameSessionId, playerCount,
+    onResetSeries, gameSessionId, playerCount, gameMode: payloadGameMode,
   } = props;
   const { t, language } = useLanguage();
   const { isAuthenticated, user } = useAuth();
@@ -79,7 +79,7 @@ export function useMpResultsController(props: MpResultsProps) {
     gameModeConfirmed,
   });
   if (confirmedMode) lastConfirmedMode.current = confirmedMode;
-  const resolvedGameMode = lastConfirmedMode.current;
+  const resolvedGameMode = lastConfirmedMode.current ?? payloadGameMode;
 
   // Host's next-round intent survives rounds ("random" stays random so each round re-rolls).
   const hostSelectedGameMode = useHostSelectedGameMode();

@@ -99,7 +99,12 @@ describe('buildQuickShareText', () => {
     const emojiT = (key: string) => `${key} 🔥`;
     const text = buildQuickShareText({ ...base, words: words('cat', 'remarkable'), dayStreak: 3, t: emojiT });
     expect(text).not.toMatch(EMOJI);
-    expect(text.trimEnd().split('\n').at(-1)).toBe('quickPlay.solo.recap.cta');
+    expect(text.trimEnd().split('\n').at(-1)).toBe('quickPlay.solo.recap.ctaHunt');
+  });
+
+  it('Given a 120s hunt vs a 60s classic round, When built, Then the call to play names the right clock', () => {
+    const classic = buildQuickShareText({ ...base, mode: 'classic', words: words('cat') });
+    expect(classic.trimEnd().split('\n').at(-1)).toBe('quickPlay.solo.recap.cta');
   });
 
   it('Given a Hebrew locale string, When built, Then RTL copy is kept and the numbers stay LTR-isolated', () => {
