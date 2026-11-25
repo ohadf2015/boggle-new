@@ -213,3 +213,26 @@ describe('fcmService', () => {
     });
   });
 });
+
+describe('fcmService duplicate token rows', () => {
+  it('sends once per token string when the same token is stored in two rows', async () => {
+    mockFrom.mockReturnValue({ select: mockSelect });
+    mockSelect.mockReturnValue({ eq: mockEq });
+    mockEq.mockImplementation((field: string) =>
+      field === 'is_active'
+        ? Promise.resolve({
+            data: [
+              { id: 'old', token: 'same-token', platform: 'android' },
+              { id: 'new', token: 'same-token', platform: 'android' },
+            ],
+            error: null,
+          })
+        : { eq: mockEq },
+    );
+    mockSendEachForMulticast.mockResolvedValue({ successCount: 1, failureCount: 0, responses: [{ success: true }] });
+
+    await sendToUser('user-dup', { title: 't', body: 'b' });
+
+    expect(mockSendEachForMulticast.mock.calls[0][0].tokens).toEqual(['same-token']);
+  });
+});

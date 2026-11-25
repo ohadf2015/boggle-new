@@ -8,6 +8,7 @@ import logger from '../utils/logger';
 
 import { getSupabase, isSupabaseConfigured } from '../modules/supabaseServer';
 import { translatePush, isPushLocale, type PushLocale } from '../utils/pushTranslations';
+import { uniquePushTokens } from '../utils/uniquePushTokens';
 
 // ==================== Mascot Imagery ====================
 
@@ -409,7 +410,7 @@ export async function sendToUsers(
   // Send to each token
   const invalidTokenIds: string[] = [];
 
-  for (const tokenRecord of tokens as TokenRecord[]) {
+  for (const tokenRecord of uniquePushTokens(tokens as TokenRecord[])) {
     const locale = userLocales.get(tokenRecord.user_id) ?? 'en';
     const { title, body } = renderNotification(notification, locale);
     const localizedPayload: NotificationPayload = { ...notification, title, body };

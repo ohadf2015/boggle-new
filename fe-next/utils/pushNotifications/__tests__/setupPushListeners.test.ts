@@ -1,11 +1,6 @@
 /**
- * setupPushListeners foreground-display tests
- *
- * Bug: when app is in foreground, FCM fires `pushNotificationReceived` but
- * the Capacitor plugin does NOT render a system-tray notification for you.
- * Users reported no notification appeared for admin gifts even though FCM
- * reported success. Fix: schedule a LocalNotification inside the handler so
- * the push becomes visible regardless of app state.
+ * The native plugin (presentationOptions includes 'alert') already shows a
+ * foreground push in the tray; scheduling a local copy shows it twice.
  */
 
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
@@ -35,7 +30,7 @@ const mockLocalAddListener = vi.fn(async (event: string, cb: PushListener) => {
   return { remove: vi.fn() };
 });
 
-describe('setupPushListeners — foreground display bridge', () => {
+describe('setupPushListeners', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     trackGrowthEvent.mockClear();
@@ -56,26 +51,18 @@ describe('setupPushListeners — foreground display bridge', () => {
     delete (globalThis as any).Capacitor;
   });
 
-  it('schedules a LocalNotification when a push arrives in foreground', async () => {
+  it('does not add a local copy of a foreground push (native already displays it)', async () => {
     await setupPushListeners();
 
-    const received = pushListeners['pushNotificationReceived'];
-    expect(received).toBeDefined();
-
-    received({
+    pushListeners['pushNotificationReceived']({
       title: "You've received a gift! 🎁",
       body: 'Tester sent you 50 coins!',
       data: { type: 'gift', actionUrl: '/' },
     });
-
-    // Allow any promise in the handler to resolve
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(mockSchedule).toHaveBeenCalledTimes(1);
-    const arg = mockSchedule.mock.calls[0][0] as { notifications: Array<{ title: string; body: string }> };
-    expect(arg.notifications[0].title).toBe("You've received a gift! 🎁");
-    expect(arg.notifications[0].body).toBe('Tester sent you 50 coins!');
+    expect(mockSchedule).not.toHaveBeenCalled();
   });
 
   it('still forwards data to onNotificationReceived callback', async () => {
@@ -90,16 +77,6 @@ describe('setupPushListeners — foreground display bridge', () => {
     await Promise.resolve();
 
     expect(cb).toHaveBeenCalledWith({ type: 'gift' });
-  });
-
-  it('does not schedule if title and body are both missing', async () => {
-    await setupPushListeners();
-
-    pushListeners['pushNotificationReceived']({ data: { type: 'silent' } });
-    await Promise.resolve();
-    await Promise.resolve();
-
-    expect(mockSchedule).not.toHaveBeenCalled();
   });
 
   it('emits notification_delivered with type when push is received', async () => {
@@ -149,11 +126,7 @@ describe('setupPushListeners — foreground display bridge', () => {
     expect(onTapped).toHaveBeenCalledWith({ type: 'daily_challenge', deepLink: '/daily?src=push&kind=rival&dir=above' });
   });
 
-  // A push received while the app is FOREGROUND is re-displayed via
-  // LocalNotifications.schedule (with the data copied into `extra`). Tapping
-  // THAT notification fires `localNotificationActionPerformed`, NOT
-  // `pushNotificationActionPerformed` — so without this listener the deep link
-  // is silently dropped and the tap "doesn't redirect" (the reported bug).
+  // Local reminders from scheduler.ts carry their deep link in `extra`.
   it('routes a tapped foreground-bridged (local) notification through onNotificationTapped', async () => {
     const onTapped = vi.fn();
     await setupPushListeners(undefined, onTapped);

@@ -7,6 +7,7 @@
 import logger from '../utils/logger';
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import * as admin from 'firebase-admin';
+import { uniquePushTokens } from '../utils/uniquePushTokens';
 
 export interface FCMPayload {
   title: string;
@@ -84,7 +85,7 @@ export async function sendToUser(userId: string, payload: FCMPayload): Promise<n
     if (!app) return 0;
 
     const messaging = app.messaging();
-    const fcmTokens = tokens.map((t: { token: string }) => t.token);
+    const fcmTokens = uniquePushTokens(tokens as Array<{ token: string }>).map((t) => t.token);
 
     const result = await messaging.sendEachForMulticast({
       tokens: fcmTokens,
