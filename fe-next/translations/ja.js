@@ -4186,6 +4186,7 @@ const ja = {
   },
   "game": {
     "doubleClickToSubmit": "最後の文字をダブルクリックで送信",
+    "enterOrDoubleClickToSubmit": "Enterか最後の文字をダブルクリック",
     "tapAgainToSubmit": "最後の文字をもう一度タップで送信",
     "boardLocked": "GOを待って — ボードはまだ動けません",
     "foundByOther": "${player}が見つけました",
@@ -11335,9 +11336,7 @@ const ja = {
     "celebrationMessage": "言葉も勝利もたっぷりの一年になりますように！"
   },
   "keyboardHint": {
-    "title": "⚡ 時短テク",
-    "message": "キーボードで単語を入力できるよ。打ってEnterを押すだけ。スワイプより断然速い！",
-    "gotIt": "了解！"
+    "typeAndEnter": "単語を打ってEnterを押すだけ"
   },
   "keyboardShortcuts": {
     "title": "キーボードショートカット",

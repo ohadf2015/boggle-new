@@ -4546,6 +4546,7 @@ const sv = {
   },
   "game": {
     "doubleClickToSubmit": "Dubbelklicka på sista bokstaven för att skicka",
+    "enterOrDoubleClickToSubmit": "Tryck Enter eller dubbelklicka på sista bokstaven",
     "tapAgainToSubmit": "Tryck på sista bokstaven igen för att skicka",
     "boardLocked": "Vänta på GO — brädet är inte igång än",
     "foundByOther": "Hittades av ${player}",
@@ -11645,9 +11646,7 @@ const sv = {
     "celebrationMessage": "Vi önskar dig ett riktigt bra år fullt av ord, segrar och under!"
   },
   "keyboardHint": {
-    "title": "⚡ Snabbtips",
-    "message": "Skriv ord med tangentbordet. Börja bara skriva och tryck Enter. Mycket snabbare än att svepa!",
-    "gotIt": "Fattat!"
+    "typeAndEnter": "Skriv bara ordet och tryck Enter"
   },
   "keyboardShortcuts": {
     "title": "Tangentbordsgenvägar",

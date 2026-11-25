@@ -3802,6 +3802,7 @@ const en = {
   },
   "game": {
     "doubleClickToSubmit": "Double-click last letter to submit",
+    "enterOrDoubleClickToSubmit": "Press Enter or double-click the last letter",
     "tapAgainToSubmit": "Tap the last letter again to submit",
     "boardLocked": "Wait for GO. This board isn't live yet",
     "foundByOther": "Found by ${player}",
@@ -10425,9 +10426,7 @@ const en = {
     "longerWordsTip": "Longer words score way more."
   },
   "keyboardHint": {
-    "title": "⚡ Speed Tip",
-    "message": "Start typing and hit Enter to submit. Way faster than swiping.",
-    "gotIt": "Got it"
+    "typeAndEnter": "Just type the word and press Enter"
   },
   "keyboardShortcuts": {
     "title": "Keyboard Shortcuts",

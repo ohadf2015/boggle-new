@@ -4198,6 +4198,7 @@ const he = {
   },
   "game": {
     "doubleClickToSubmit": "לחיצה כפולה על האות האחרונה לשליחה",
+    "enterOrDoubleClickToSubmit": "Enter או לחיצה כפולה על האות האחרונה לשליחה",
     "tapAgainToSubmit": "הקישו שוב על האות האחרונה לשליחה",
     "boardLocked": "חכו ל-GO — הלוח עדיין לא פעיל",
     "foundByOther": "נמצא על ידי ${player}",
@@ -11228,9 +11229,7 @@ const he = {
     "celebrationMessage": "מאחלים לכם שנה מלאה במילים, ניצחונות והפתעות!"
   },
   "keyboardHint": {
-    "title": "טיפ מהיר ⚡",
-    "message": "הקלידו מילים במקלדת. פשוט התחילו להקליד ולחצו Enter. הרבה יותר מהיר מגרירה!",
-    "gotIt": "הבנתי"
+    "typeAndEnter": "פשוט מקלידים את המילה ולוחצים Enter"
   },
   "keyboardShortcuts": {
     "title": "קיצורי מקלדת",

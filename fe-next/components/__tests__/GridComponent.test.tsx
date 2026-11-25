@@ -38,6 +38,11 @@ afterEach(() => {
 });
 
 describe('GridComponent rendering', () => {
+  it('tells a mouse player who clicked letters that Enter sends the word too (the board takes focus on click)', () => {
+    render(<GridComponent grid={GRID} interactive />, { wrapper: Wrapper });
+    expect(screen.getByText('Press Enter or double-click the last letter')).toBeInTheDocument();
+  });
+
   it('renders every letter once as a tile the capture rig and coaches can find', () => {
     const { container } = render(<GridComponent grid={GRID} />, { wrapper: Wrapper });
     const cells = container.querySelectorAll('[role="grid"] [data-row][data-col]');

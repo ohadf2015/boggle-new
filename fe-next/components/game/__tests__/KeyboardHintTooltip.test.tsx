@@ -1,56 +1,69 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { KeyboardHintTooltip } from '../KeyboardHintTooltip';
+import { noteTypedSubmit, TYPED_WORD_ACCEPTED_KEY } from '@/lib/input/typedWordHint';
 
 const t = (k: string) => k;
 
-describe('KeyboardHintTooltip', () => {
+function stubPointer({ fine, coarse }: { fine: boolean; coarse: boolean }) {
+  vi.stubGlobal('matchMedia', (q: string) => ({
+    matches: q.includes('coarse') ? coarse : q.includes('fine') ? fine : false,
+    media: q,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }));
+}
+
+describe('KeyboardHintTooltip (desktop "just type" hint)', () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.useFakeTimers();
-    Object.defineProperty(navigator, 'userAgent', {
-      value: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/537.36',
-      configurable: true,
-    });
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-25T10:00:00Z'));
   });
 
   afterEach(() => {
     vi.useRealTimers();
-  });
-
-  it('renders with explicit fixed width (not max-w) so long ES copy cannot blow it up', async () => {
-    render(<KeyboardHintTooltip delaySeconds={1} t={t} />);
-    await act(async () => { vi.advanceTimersByTime(1100); });
-
-    const tip = screen.getByRole('tooltip');
-    expect(tip.className.split(/\s+/)).toContain('w-[240px]');
-    expect(tip.className.split(/\s+/)).not.toContain('max-w-[220px]');
-  });
-
-  it('anchors to bottom-left so it does not overlap the board or round-start countdown', async () => {
-    render(<KeyboardHintTooltip delaySeconds={1} t={t} />);
-    await act(async () => { vi.advanceTimersByTime(1100); });
-
-    const tip = screen.getByRole('tooltip');
-    expect(tip.className).toMatch(/\bbottom-28\b/);
-    expect(tip.className).toMatch(/\bleft-3\b/);
-    expect(tip.className).not.toMatch(/\btop-28\b/);
-  });
-
-  it('does not render when suppressed (e.g. during start countdown)', async () => {
-    render(<KeyboardHintTooltip delaySeconds={1} suppressed t={t} />);
-    await act(async () => { vi.advanceTimersByTime(2000); });
-    expect(screen.queryByRole('tooltip')).toBeNull();
-  });
-  it('stays hidden on a touch-only device that reports a desktop user agent (iPadOS)', async () => {
-    // GIVEN iPadOS: Mac UA, but the primary pointer is a finger
-    const mm = vi.fn((q: string) => ({ matches: q.includes('coarse'), media: q, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
-    vi.stubGlobal('matchMedia', mm);
-    // WHEN the hint's delay passes
-    render(<KeyboardHintTooltip delaySeconds={1} t={t} />);
-    await act(async () => { vi.advanceTimersByTime(2000); });
-    // THEN no "type on your keyboard" tip
-    expect(screen.queryByRole('tooltip')).toBeNull();
     vi.unstubAllGlobals();
+  });
+
+  it('shows from the first second on a mouse-and-keyboard desktop', () => {
+    stubPointer({ fine: true, coarse: false });
+    render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    expect(screen.getByTestId('type-word-hint').textContent).toContain('keyboardHint.typeAndEnter');
+  });
+
+  it('stays hidden on touch screens, including touch laptops with a mouse', () => {
+    stubPointer({ fine: false, coarse: true });
+    const { unmount } = render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
+    unmount();
+    stubPointer({ fine: true, coarse: true });
+    render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
+  });
+
+  it('stays up while words land by mouse, and goes for good once a typed word is accepted', () => {
+    stubPointer({ fine: true, coarse: false });
+    const { rerender, unmount } = render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    rerender(<KeyboardHintTooltip acceptedCount={1} t={t} />);
+    expect(screen.getByTestId('type-word-hint')).toBeInTheDocument();
+
+    noteTypedSubmit();
+    rerender(<KeyboardHintTooltip acceptedCount={2} t={t} />);
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
+    expect(localStorage.getItem(TYPED_WORD_ACCEPTED_KEY)).toBe('1');
+
+    unmount();
+    render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
+  });
+
+  it('does not credit a typed word that was rejected and followed later by a mouse word', () => {
+    stubPointer({ fine: true, coarse: false });
+    const { rerender } = render(<KeyboardHintTooltip acceptedCount={0} t={t} />);
+    noteTypedSubmit();
+    vi.setSystemTime(new Date('2026-11-25T10:00:30Z'));
+    rerender(<KeyboardHintTooltip acceptedCount={1} t={t} />);
+    expect(screen.getByTestId('type-word-hint')).toBeInTheDocument();
   });
 });

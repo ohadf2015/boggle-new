@@ -4186,6 +4186,7 @@ const es = {
   },
   "game": {
     "doubleClickToSubmit": "Doble clic en la última letra para enviar",
+    "enterOrDoubleClickToSubmit": "Pulsa Enter o haz doble clic en la última letra",
     "tapAgainToSubmit": "Toca otra vez la última letra para enviar",
     "boardLocked": "Espera al GO — el tablero aún no está activo",
     "foundByOther": "Encontrada por ${player}",
@@ -11303,9 +11304,7 @@ const es = {
     "celebrationMessage": "¡Te deseamos un año lleno de palabras, victorias y buenas sorpresas!"
   },
   "keyboardHint": {
-    "title": "⚡ Truco rápido",
-    "message": "Escribe las palabras con el teclado. Solo empieza a teclear y pulsa Enter para enviar. ¡Mucho más rápido que deslizar!",
-    "gotIt": "Entendido"
+    "typeAndEnter": "Escribe la palabra y pulsa Enter"
   },
   "keyboardShortcuts": {
     "title": "Atajos de teclado",

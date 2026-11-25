@@ -4,6 +4,7 @@ import { findWordPath } from '@/utils/wordPathFinder';
 import { vibrateKeyboardSelect, vibrateNavigation, vibrateUndo } from '@/components/grid/hapticFeedback';
 import type { BoardSelectionApi } from './useBoardSelection';
 import type { CellRef } from './selectionPath';
+import { noteTypedSubmit } from '@/lib/input/typedWordHint';
 
 interface BoardKeyboardOptions {
   grid: LetterGrid;
@@ -63,6 +64,7 @@ export function useBoardKeyboard(
       if (e.key === 'Enter') {
         e.preventDefault();
         if (path.length) {
+          noteTypedSubmit();
           api.submit('kb');
           vibrateKeyboardSelect(fireRoundActive);
         } else if (focus) {
