@@ -95,4 +95,14 @@ describe('QuickClassicBoard — the round clock', () => {
     render(<QuickClassicBoard config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
     expect(coreOptions[0].externalInput).toBe(true);
   });
+
+  it('counts the round as won at the score the results screen celebrates (half of par), not just for finishing', () => {
+    render(<QuickClassicBoard config={{ ...config, parScore: 81, parWords: 25 }} onDone={vi.fn()} onQuit={vi.fn()} />);
+    expect(coreOptions[0].winScore).toBe(41);
+  });
+
+  it('a coached first round (shorter clock, brand-new player) wins on its first real word', () => {
+    render(<QuickClassicBoard config={{ ...config, parScore: 81, parWords: 25, coach: true }} onDone={vi.fn()} onQuit={vi.fn()} />);
+    expect(coreOptions[0].winScore).toBeUndefined();
+  });
 });
