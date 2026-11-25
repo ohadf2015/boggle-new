@@ -29,7 +29,7 @@ import { HubTopCards } from './HubTopCards';
 import { studentWarmup } from './todayItems';
 import { canOpenChest } from './dailyChestStore';
 import { buildFirstDayGoals } from './firstDayGoals';
-import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
+import { nextOpenAssignment, nextStartedAssignment } from '@/components/student/nextOpenAssignment';
 import { shouldOpenClassSheet } from './classSheetDeepLink';
 import {
   classifyAssignmentDue,
@@ -160,6 +160,10 @@ export function AcademyHubView(props: AcademyHubViewProps) {
   const action = pickNextAction({ hasClass: !!classroomId, live: isLive, islands, boss });
   const nextAssignment = useMemo(
     () => nextOpenAssignment(data.lessons, language, classroomId),
+    [data.lessons, language, classroomId],
+  );
+  const nextStarted = useMemo(
+    () => nextStartedAssignment(data.lessons, language, classroomId),
     [data.lessons, language, classroomId],
   );
   const warmup = useMemo(() => studentWarmup(data.lessons, language, classroomId), [data.lessons, language, classroomId]);
@@ -434,6 +438,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
           onClose={() => setClassOpen(false)}
           reducedMotion={reducedMotion}
           nextOpenAssignment={nextAssignment}
+          nextStartedAssignment={nextStarted}
         />
       )}
     </div>

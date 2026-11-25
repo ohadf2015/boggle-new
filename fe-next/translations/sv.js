@@ -14923,7 +14923,9 @@ const sv = {
     "classView": {
       "playAssignment": "Spela {title}",
       "playAssignmentDueSoon": "Snart · Spela {title}",
-      "playAssignmentOverdue": "Försenad · Spela {title}"
+      "playAssignmentOverdue": "Försenad · Spela {title}",
+      "resumeAssignment": "Återuppta {title}",
+      "resumeAssignmentLabel": "Fortsätt din uppgift"
     },
     "welcome": {
       "title": "Välkommen till ditt klassrum!",
@@ -16357,6 +16359,17 @@ const sv = {
         "trendNone": "Inte tillräckligt med data ännu",
         "cellCompleted": "Klar, {{score}}% rätt",
         "cellMissing": "Ej klar",
+        "cellStarted": "Påbörjad, inte klar",
+        "incompleteTitle": "Vem är inte klar än",
+        "incompleteStarted": "Påbörjad",
+        "incompleteNotStarted": "Ej påbörjad",
+        "incompleteAllDone": "Alla är klara — bra jobbat.",
+        "nudge": "Påminn",
+        "nudgeSending": "Skickar…",
+        "nudgeSent": "Skickad",
+        "nudgeAlready": "Redan skickad",
+        "nudgeCompleted": "Klar",
+        "nudgeFailed": "Misslyckades — tryck för att försöka igen",
         "sampleTitle": "Korrekthet per elev",
         "gateTitle": "Elevpoäng är en Pro-funktion",
         "gateBody": "Se varje elevs korrekthet på varje uppgift och om de förbättras eller faller — poängen bakom slutförandeantalen.",

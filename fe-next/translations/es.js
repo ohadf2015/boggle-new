@@ -14564,7 +14564,9 @@ const es = {
     "classView": {
       "playAssignment": "Jugar {title}",
       "playAssignmentDueSoon": "Pronto · Jugar {title}",
-      "playAssignmentOverdue": "Atrasada · Jugar {title}"
+      "playAssignmentOverdue": "Atrasada · Jugar {title}",
+      "resumeAssignment": "Reanudar {title}",
+      "resumeAssignmentLabel": "Continúa tu tarea"
     },
     "welcome": {
       "title": "¡Bienvenido a tu aula!",
@@ -15817,6 +15819,17 @@ const es = {
         "trendNone": "Aún no hay datos suficientes",
         "cellCompleted": "Completada, {{score}}% correcto",
         "cellMissing": "No completada",
+        "cellStarted": "Empezada, no terminada",
+        "incompleteTitle": "Quién no ha terminado",
+        "incompleteStarted": "Empezada",
+        "incompleteNotStarted": "Sin empezar",
+        "incompleteAllDone": "Todos terminaron — buen trabajo.",
+        "nudge": "Recordar",
+        "nudgeSending": "Enviando…",
+        "nudgeSent": "Recordado",
+        "nudgeAlready": "Ya recordado",
+        "nudgeCompleted": "Terminada",
+        "nudgeFailed": "Falló — toca para reintentar",
         "sampleTitle": "Corrección por estudiante",
         "gateTitle": "Las puntuaciones por estudiante son de Pro",
         "gateBody": "Ve la corrección de cada estudiante en cada tarea y si está mejorando o empeorando: la puntuación detrás de los recuentos de completado.",

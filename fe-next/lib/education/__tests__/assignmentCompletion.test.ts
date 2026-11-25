@@ -1,5 +1,20 @@
-import { describe, it, expect, vi } from 'vitest';
-import { findSatisfiedAssignment, stampAssignmentCompletion } from '../assignmentCompletion';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+vi.mock('@/lib/education/assignmentEvents.server', () => ({
+  captureAssignmentStartedServer: vi.fn(),
+  captureAssignmentCompletedServer: vi.fn(),
+}));
+
+import {
+  findAssignmentForLesson,
+  findSatisfiedAssignment,
+  stampAssignmentCompletion,
+  stampAssignmentStarted,
+  stampAssignmentStartForLesson,
+} from '../assignmentCompletion';
+import { captureAssignmentStartedServer } from '@/lib/education/assignmentEvents.server';
+
+beforeEach(() => vi.clearAllMocks());
 
 function fakeClient(assignments: Array<{ id: string; practice_focus: string | null; word_count_target?: number | null; classroom_id?: string | null }>, upsertError: unknown = null) {
   const upsert = vi.fn().mockResolvedValue({ error: upsertError });
@@ -104,5 +119,112 @@ describe('stampAssignmentCompletion', () => {
   it('Given the upsert fails, Then it reports false instead of claiming success', async () => {
     const { client } = fakeClient([], { message: 'rls' });
     expect(await stampAssignmentCompletion(client, { studentId: 'S', lessonId: 'L', assignmentId: 'A1', now: NOW })).toBe(false);
+  });
+});
+
+function fakeStartClient({
+  assignments = [] as Array<{ id: string; classroom_id?: string | null }>,
+  progressRow = null as { assignment_id: string | null; completed_at: string | null } | null,
+  insertError = null as unknown,
+  updateError = null as unknown,
+} = {}) {
+  const limit = vi.fn().mockResolvedValue({ data: assignments, error: null });
+  const order = vi.fn(() => ({ limit }));
+  const selectAssignment = vi.fn(() => ({ eq: vi.fn(() => ({ order })) }));
+
+  const maybeSingle = vi.fn().mockResolvedValue({ data: progressRow, error: null });
+  const selectProgress = vi.fn(() => ({ eq: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle })) })) }));
+  const insert = vi.fn().mockResolvedValue({ error: insertError });
+  const updateEq = vi.fn().mockResolvedValue({ error: updateError });
+  const update = vi.fn(() => ({ eq: vi.fn(() => ({ eq: updateEq })) }));
+
+  const from = vi.fn((table: string) => {
+    if (table === 'lesson_assignments') return { select: selectAssignment };
+    if (table === 'student_lesson_progress') return { select: selectProgress, insert, update };
+    throw new Error(`unexpected table ${table}`);
+  });
+  return { client: { from } as never, insert, update, maybeSingle };
+}
+
+describe('findAssignmentForLesson', () => {
+  it('returns the newest assignment for the lesson with its classroom', async () => {
+    const { client } = fakeStartClient({ assignments: [{ id: 'A1', classroom_id: 'C1' }] });
+    expect(await findAssignmentForLesson(client, 'L')).toEqual({ id: 'A1', classroomId: 'C1' });
+  });
+
+  it('Given the lesson is not assigned to any of my classrooms, Then null', async () => {
+    const { client } = fakeStartClient();
+    expect(await findAssignmentForLesson(client, 'L')).toBeNull();
+  });
+});
+
+describe('stampAssignmentStarted', () => {
+  it('inserts a started progress row and emits assignment_started', async () => {
+    const { client, insert } = fakeStartClient();
+    const ok = await stampAssignmentStarted(client, {
+      studentId: 'S',
+      lessonId: 'L',
+      assignmentId: 'A1',
+      classroomId: 'C1',
+      now: NOW,
+    });
+    expect(ok).toBe(true);
+    expect(insert).toHaveBeenCalledWith({
+      student_id: 'S',
+      lesson_id: 'L',
+      assignment_id: 'A1',
+      started_at: NOW,
+    });
+    expect(captureAssignmentStartedServer).toHaveBeenCalledWith({
+      classroom_id: 'C1',
+      assignment_id: 'A1',
+      student_id: 'S',
+    });
+  });
+
+  it('Given a progress row already exists (started or completed), Then it stays silent', async () => {
+    const { client, insert, update } = fakeStartClient({
+      progressRow: { assignment_id: 'A1', completed_at: null },
+    });
+    expect(await stampAssignmentStarted(client, { studentId: 'S', lessonId: 'L', assignmentId: 'A1' })).toBe(false);
+    expect(insert).not.toHaveBeenCalled();
+    expect(update).not.toHaveBeenCalled();
+    expect(captureAssignmentStartedServer).not.toHaveBeenCalled();
+  });
+
+  it('adopts a legacy progress row that has no assignment link yet', async () => {
+    const { client, update } = fakeStartClient({
+      progressRow: { assignment_id: null, completed_at: null },
+    });
+    expect(
+      await stampAssignmentStarted(client, { studentId: 'S', lessonId: 'L', assignmentId: 'A1', classroomId: 'C1' }),
+    ).toBe(true);
+    expect(update).toHaveBeenCalledWith({ assignment_id: 'A1' });
+    expect(captureAssignmentStartedServer).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given the insert fails, Then it reports false and emits nothing', async () => {
+    const { client } = fakeStartClient({ insertError: { message: 'duplicate key' } });
+    expect(await stampAssignmentStarted(client, { studentId: 'S', lessonId: 'L', assignmentId: 'A1' })).toBe(false);
+    expect(captureAssignmentStartedServer).not.toHaveBeenCalled();
+  });
+});
+
+describe('stampAssignmentStartForLesson', () => {
+  it('finds the lesson assignment and stamps the start', async () => {
+    const { client, insert } = fakeStartClient({ assignments: [{ id: 'A9', classroom_id: 'C9' }] });
+    expect(await stampAssignmentStartForLesson(client, { studentId: 'S', lessonId: 'L', now: NOW })).toBe(true);
+    expect(insert).toHaveBeenCalledWith({
+      student_id: 'S',
+      lesson_id: 'L',
+      assignment_id: 'A9',
+      started_at: NOW,
+    });
+  });
+
+  it('Given the lesson has no assignment, Then false and no write', async () => {
+    const { client, insert } = fakeStartClient();
+    expect(await stampAssignmentStartForLesson(client, { studentId: 'S', lessonId: 'L' })).toBe(false);
+    expect(insert).not.toHaveBeenCalled();
   });
 });

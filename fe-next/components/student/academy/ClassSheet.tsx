@@ -11,6 +11,7 @@ import { EyeOff, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ClassroomLeaderboard from '@/components/education/ClassroomLeaderboard';
 import { StudentAssignmentPlayCta } from '@/components/student/StudentAssignmentPlayCta';
+import { StudentAssignmentResumeCard } from '@/components/student/StudentAssignmentResumeCard';
 import { ClassStrip } from './ClassStrip';
 import { ClassSwitcher } from './ClassSwitcher';
 import { useLeaderboardVisibility } from '@/hooks/useLeaderboardVisibility';
@@ -25,13 +26,21 @@ interface Props {
   reducedMotion: boolean;
   /** Next unfinished homework; null/omitted hides the Play CTA. */
   nextOpenAssignment?: NextOpenAssignment | null;
+  /** Started-but-unfinished homework; the resume card takes precedence over the Play CTA for it. */
+  nextStartedAssignment?: NextOpenAssignment | null;
   classrooms?: { id: string; name: string }[];
   onSelectClassroom?: (id: string) => void;
 }
 
-export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null, classrooms = [], onSelectClassroom }: Props) {
+export function ClassSheet({ classroomId, userId, className, onClose, reducedMotion, nextOpenAssignment = null, nextStartedAssignment = null, classrooms = [], onSelectClassroom }: Props) {
   const { t } = useLanguage();
   const visibility = useLeaderboardVisibility(classroomId);
+  // The resume card already points at the started assignment — don't show the
+  // same target twice when it is also the next open one.
+  const playNext =
+    nextOpenAssignment && nextOpenAssignment.assignmentId !== nextStartedAssignment?.assignmentId
+      ? nextOpenAssignment
+      : null;
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={t('student.dashboard.leaderboard', 'Leaderboard')}>
       <button type="button" aria-label={t('common.close', 'Close')} onClick={onClose} className="absolute inset-0 bg-neo-black/70 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black" />
@@ -59,7 +68,8 @@ export function ClassSheet({ classroomId, userId, className, onClose, reducedMot
         </div>
         {onSelectClassroom && <ClassSwitcher classrooms={classrooms} activeId={classroomId} onSelect={onSelectClassroom} />}
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
-          <StudentAssignmentPlayCta next={nextOpenAssignment} />
+          <StudentAssignmentResumeCard next={nextStartedAssignment} />
+          <StudentAssignmentPlayCta next={playNext} />
           <ClassStrip classroomId={classroomId} reducedMotion={reducedMotion} />
           {visibility === null ? (
             <div data-testid="class-sheet-standings-loading" className="flex justify-center py-8">

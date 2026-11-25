@@ -3226,7 +3226,9 @@ const ru = {
     "classView": {
       "playAssignment": "Играть {title}",
       "playAssignmentDueSoon": "Скоро · Играть {title}",
-      "playAssignmentOverdue": "Просрочено · Играть {title}"
+      "playAssignmentOverdue": "Просрочено · Играть {title}",
+      "resumeAssignment": "Продолжить {title}",
+      "resumeAssignmentLabel": "Продолжи своё задание"
     },
     "welcome": {
       "title": "Добро пожаловать в класс!",
@@ -15739,6 +15741,17 @@ const ru = {
         "trendNone": "Пока недостаточно данных",
         "cellCompleted": "Выполнено, {{score}}% верно",
         "cellMissing": "Не выполнено",
+        "cellStarted": "Начато, не завершено",
+        "incompleteTitle": "Кто ещё не закончил",
+        "incompleteStarted": "Начато",
+        "incompleteNotStarted": "Не начато",
+        "incompleteAllDone": "Все закончили — молодцы!",
+        "nudge": "Напомнить",
+        "nudgeSending": "Отправка…",
+        "nudgeSent": "Напомнили",
+        "nudgeAlready": "Уже напомнили",
+        "nudgeCompleted": "Завершено",
+        "nudgeFailed": "Ошибка — нажмите, чтобы повторить",
         "sampleTitle": "Точность по ученикам",
         "gateTitle": "Оценки по ученикам — функция Pro",
         "gateBody": "Смотрите точность каждого ученика по каждому заданию и растёт она или падает — оценку за выполнение.",

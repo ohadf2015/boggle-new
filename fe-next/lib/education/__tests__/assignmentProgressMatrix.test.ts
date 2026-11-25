@@ -51,13 +51,36 @@ describe('buildAssignmentProgressMatrix', () => {
     const ada = matrix.rows[0];
     expect(ada.studentName).toBe('Ada');
     expect(ada.cells).toEqual([
-      { completed: false, correctness: null },
-      { completed: true, correctness: 80 },
-      { completed: false, correctness: null },
+      { completed: false, started: false, correctness: null },
+      { completed: true, started: true, correctness: 80 },
+      { completed: false, started: false, correctness: null },
     ]);
 
     const ben = matrix.rows[1];
     expect(ben.cells.every((c) => !c.completed && c.correctness === null)).toBe(true);
+  });
+
+  it('marks cells started when the student has a progress row, finished or not', () => {
+    const matrix = buildAssignmentProgressMatrix({
+      students: STUDENTS,
+      assignments: ASSIGNMENTS,
+      completions: [{ assignmentId: 'a1', studentId: 's1', score: 80, completedAt: '2026-09-02T00:00:00Z' }],
+      starts: [
+        { studentId: 's1', assignmentId: 'a2' },
+        { studentId: 's2', assignmentId: 'a3' },
+      ],
+    });
+    const ada = matrix.rows[0];
+    expect(ada.cells).toEqual([
+      { completed: true, started: true, correctness: 80 },
+      { completed: false, started: true, correctness: null },
+      { completed: false, started: false, correctness: null },
+    ]);
+    const ben = matrix.rows[1];
+    expect(ben.cells.map((c) => c.started)).toEqual([false, false, true]);
+    // A started-but-unfinished cell carries no correctness — partial words are
+    // not a score.
+    expect(ben.cells[2].correctness).toBeNull();
   });
 
   it('derives correctness the way the passback does: words_attempted, with completion credit when empty', () => {

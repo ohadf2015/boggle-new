@@ -24,7 +24,7 @@ const matrix = {
     {
       studentId: 's1',
       studentName: 'Ada',
-      cells: [{ completed: true, correctness: 75 }],
+      cells: [{ completed: true, started: true, correctness: 75 }],
       trend: 'none',
     },
   ],

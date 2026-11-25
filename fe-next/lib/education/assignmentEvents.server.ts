@@ -9,8 +9,11 @@ import { getPostHogServer } from '@/lib/posthog';
 import logger from '@/utils/logger';
 import {
   ASSIGNMENT_COMPLETED,
+  ASSIGNMENT_STARTED,
   assignmentCompletedProperties,
+  assignmentStartedProperties,
   type AssignmentCompletedProps,
+  type AssignmentStartedProps,
 } from './assignmentEvents';
 
 function analyticsHost(): string {
@@ -38,6 +41,26 @@ export function captureAssignmentCompletedServer(args: AssignmentCompletedProps)
   } catch (err) {
     logger.error(
       'Failed to capture assignment_completed:',
+      err instanceof Error ? err.message : 'unknown',
+    );
+  }
+}
+
+export function captureAssignmentStartedServer(args: AssignmentStartedProps): void {
+  try {
+    const client = getPostHogServer();
+    if (!client) return;
+    client.capture({
+      distinctId: args.student_id,
+      event: ASSIGNMENT_STARTED,
+      properties: {
+        ...assignmentStartedProperties(args),
+        $host: analyticsHost(),
+      },
+    });
+  } catch (err) {
+    logger.error(
+      'Failed to capture assignment_started:',
       err instanceof Error ? err.message : 'unknown',
     );
   }

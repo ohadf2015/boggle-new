@@ -7,7 +7,7 @@ import { calculatePracticeXp, type PracticeSessionXp } from '@/backend/modules/e
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { canStudentPracticeLesson } from '@/lib/education/lessonAccess';
 import { WORDCRAFT_SESSION_MODE } from '@/lib/education/wordcraftAssignment';
-import { findSatisfiedAssignment, stampAssignmentCompletion } from '@/lib/education/assignmentCompletion';
+import { findSatisfiedAssignment, stampAssignmentCompletion, stampAssignmentStartForLesson } from '@/lib/education/assignmentCompletion';
 import { captureStudentReturned } from '@/lib/education/studentReturnTelemetry';
 import { gateWordCraftCompletion } from '@/lib/education/wordcraftCompletionGate';
 import { practiceWordCounts } from '@/lib/education/practiceWordCounts';
@@ -233,6 +233,11 @@ export async function POST(request: NextRequest) {
     }
 
     void captureStudentReturned(admin, { studentId: user.id, gameMode: variant ?? practiceType, surface: 'practice', lessonId });
+    // Assignment loop: stamp the student's start on the lesson's assignment
+    // (student_lesson_progress row, completed_at null) so the student gets a
+    // resume card and the teacher sees started-but-unfinished. Fire-and-forget
+    // — a stamp failure must not break session creation.
+    void stampAssignmentStartForLesson(supabase, { studentId: user.id, lessonId });
     return NextResponse.json({ session }, { status: 201 });
   } catch (error) {
     logger.error('POST practice error:', error);
