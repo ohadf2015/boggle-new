@@ -218,7 +218,7 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     await join({ gameCode: 'ABC123', username: 'Ada' });
     await flush();
 
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND', { details: { gameCode: expect.any(String) } });
     expect(mockCapture).toHaveBeenCalledTimes(1);
     expect(mockCapture.mock.calls[0][0][0]).toMatchObject({ reason: 'ROOM_GONE', door: 'join' });
   });
@@ -230,7 +230,7 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     await join({ gameCode: 'ZZZ999', username: 'Ada' });
     await flush();
 
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND', { details: { gameCode: expect.any(String) } });
     expect(mockCapture).not.toHaveBeenCalled();
   });
 
@@ -241,7 +241,7 @@ describe("base 'join' — a classroom code whose room is not open yet", () => {
     await join({ gameCode: 'ABC123', username: 'Ada' });
     await flush();
 
-    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND');
+    expect(mockEmitError).toHaveBeenCalledWith(socket, 'GAME_NOT_FOUND', { details: { gameCode: expect.any(String) } });
     expect(errorCodes()).not.toContain('CLASSROOM_NOT_OPEN');
   });
 });

@@ -9,7 +9,8 @@
 import { useCallback, useEffect, useRef, type Dispatch, type MutableRefObject, type SetStateAction } from 'react';
 import toast from 'react-hot-toast';
 import { useMultiplayerSocket } from '@/hooks/useMultiplayerSocket';
-import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
+import { saveSession, clearSession, clearSessionPreservingUsername, forgetStoredRoom } from '@/utils/session';
+import { getRejoinIntent } from '@/utils/socketRejoin';
 import { setStoredUsername } from '@/utils/profileStorage';
 import { useGameStore } from '@/hooks/gameState';
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
@@ -20,7 +21,7 @@ import { resetMpFeedback } from '@/lib/multiplayer/mpFeedback';
 import { hostTransferAction, roomGoneAction, type ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { sessionWaitingHref } from '@/lib/education/sessionWaiting';
 import { trackInviteRoomDead, trackInviteConsumed, trackGrowthEvent } from '@/utils/growthTracking';
-import { shouldOfferQuickPlayRecovery, consumeRoomEndedRecoveryAccepted } from '@/lib/multiplayer/roomEndedRecovery';
+import { shouldOfferQuickPlayRecovery, consumeRoomEndedRecoveryAccepted, claimRoomEndedOffer } from '@/lib/multiplayer/roomEndedRecovery';
 import { classifyRoomError } from '@/utils/multiplayer/roomErrorClassifier';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import type { Language, ActiveRoom, Avatar, RoomVisibility } from '@/shared/types/game';
@@ -240,6 +241,13 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
         return;
       }
       if (kind === 'gone') {
+        // A stored session re-joining a room this tab has since joined past: drop that record, keep the live room.
+        const deadCode = (data as { details?: { gameCode?: unknown } } | undefined)?.details?.gameCode;
+        const liveCode = gameCode || getRejoinIntent()?.gameCode;
+        if (typeof deadCode === 'string' && liveCode && deadCode !== liveCode) {
+          forgetStoredRoom(deadCode);
+          return;
+        }
         // Snapshot identity BEFORE handleRoomGone's resets clear it: the dead-
         // invite toast needs the room code, and `cameFromInvite` is derived
         // from the `room=` param that branch strips from the URL at the end.
@@ -357,7 +365,7 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
       context: classroomDecisionRef.current.context,
       isHost: classroomDecisionRef.current.isHost,
     });
-    if (offerRecovery && offerQuickPlayRecovery) {
+    if (offerRecovery && offerQuickPlayRecovery && claimRoomEndedOffer(goneCode)) {
       offerQuickPlayRecovery(goneCode);
       trackGrowthEvent('mp_room_gone_recovery', { stage: 'offered', cameFromInvite });
     } else {
