@@ -9,6 +9,7 @@ import { SCHOOL_ROUTE_ALIASES } from './lib/seo/schoolRouteAliases.mjs';
 import { RETIRED_MODE_REDIRECTS } from './lib/seo/retiredModeRedirects.mjs';
 import { ChunkLoadRetryPlugin } from './lib/deploy/chunkLoadRetryPlugin.mjs';
 import { uploadPosthogSourcemaps } from './lib/deploy/posthogSourcemaps.mjs';
+import { keepServerNames } from './lib/deploy/serverMinifier.mjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
 
@@ -708,6 +709,10 @@ const nextConfig = {
           m.options.parallel = 2;
         }
       }
+    }
+
+    if (!dev && isServer && config.optimization?.minimizer) {
+      config.optimization.minimizer = keepServerNames(config.optimization.minimizer);
     }
 
     return config;
