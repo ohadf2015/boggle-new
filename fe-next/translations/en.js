@@ -11389,7 +11389,7 @@ const en = {
       "shareResultHint": "Send your score to a friend and see if they can top it.",
       "copied": "Copied! Paste it anywhere",
       "shareFailed": "Couldn't share that. Try again?",
-      "recap": {"header": "LexiClash Quick Play: {mode}", "score": "{score} points, {pct}% of perfect", "words": "{count} words, the longest was {longest} letters", "wordsOne": "1 word, {longest} letters long", "noWords": "No words this round, the board won", "longWords": "{count} of them had 7 letters or more", "targetFound": "Found the hidden word", "targetMissed": "The hidden word got away", "streak": "On a {days}-day streak", "cta": "Think you can beat it in 60 seconds?"}
+      "recap": {"header": "LexiClash Quick Play: {mode}", "score": "{score} points, {pct}% of perfect", "words": "{count} words, the longest was {longest} letters", "wordsOne": "1 word, {longest} letters long", "noWords": "No words this round, the board won", "longWords": "{count} of them had 7 letters or more", "targetFound": "Found the hidden word", "targetMissed": "The hidden word got away", "streak": "On a {days}-day streak", "cta": "Think you can beat it in 60 seconds?", "ctaHunt": "Think you can find it in 2 minutes?"}
     },
     "title": "Quick Play",
     "creating": "Creating...",

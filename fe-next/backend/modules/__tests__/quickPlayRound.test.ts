@@ -57,9 +57,11 @@ describe('buildQuickRound', () => {
     expect(r.words.every((w) => w === w.toLowerCase())).toBe(true);
   });
 
-  it('durationSec is 60 for all modes', async () => {
-    const r = await buildQuickRound('word-hunt', 'en', 'seed-3');
-    expect(r.durationSec).toBe(60);
+  it('hunt rounds get 120s, every other mode 60s', async () => {
+    expect((await buildQuickRound('word-hunt', 'en', 'seed-3')).durationSec).toBe(120);
+    expect((await buildQuickRound('classic', 'en', 'seed-3')).durationSec).toBe(60);
+    expect((await buildQuickRound('blast', 'en', 'seed-3')).durationSec).toBe(60);
+    expect((await buildQuickRound('wheel-rush', 'en', 'seed-3')).durationSec).toBe(60);
   });
 
   it('word-hunt round includes a seeded target word', async () => {
