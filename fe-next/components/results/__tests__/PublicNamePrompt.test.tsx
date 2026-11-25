@@ -67,11 +67,10 @@ describe('PublicNamePrompt', () => {
 
   it('Given localStorage throws, Then the prompt still shows', () => {
     auth.value = guest;
-    const get = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });
-    const set = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('blocked'); });
+    vi.stubGlobal('localStorage', { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } });
     render(<PublicNamePrompt mode="quickPlay" />);
     expect(screen.getByTestId('public-name-prompt')).toBeTruthy();
-    get.mockRestore(); set.mockRestore();
+    vi.unstubAllGlobals();
   });
 
   it('Given auth is still loading, Then nothing renders (no guest flash)', () => {
