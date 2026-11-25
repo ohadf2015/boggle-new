@@ -178,3 +178,8 @@ export const ALL_COACH_MODES = Object.keys(MODE_COACH) as CoachModeKey[];
 export function getModeCoach(mode: CoachModeKey): CoachContent | undefined {
   return MODE_COACH[mode];
 }
+
+/** Drag captions tell a mouse-and-keyboard player they can just type. */
+export function captionKeyFor(step: CoachStep, typingDesktop: boolean): string {
+  return typingDesktop && step.demo === 'drag' ? 'modeCoach.typeOrDrag' : step.captionKey;
+}

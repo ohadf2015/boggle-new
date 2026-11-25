@@ -19217,6 +19217,7 @@ const he = {
     "inlineDismiss": "הבנתי"
   },
   "modeCoach": {
+    "typeOrDrag": "הקלידו את המילה או גררו על האותיות",
     "skip": "דלגו",
     "next": "הבא",
     "gotIt": "הבנתי",
