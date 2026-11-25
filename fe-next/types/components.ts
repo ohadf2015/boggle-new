@@ -88,6 +88,8 @@ export interface ResultsPageProps {
   finalScores: PlayerResult[] | null;
   /** Game code (optional for single player) */
   gameCode?: string;
+  /** The mode the server scored this round in; used when this screen never saw the round confirmed. */
+  gameMode?: string;
   /** Handler to return to the room/lobby (optional for single player) */
   onReturnToRoom?: () => void;
   /**
