@@ -2,7 +2,8 @@
  * Pure model for the per-student assignment progress matrix (Teacher Pro).
  *
  * One row per roster student, one cell per assignment, assignments in
- * due_date order (then created time). Each cell carries `completed` and a
+ * due_date order (then created time). Each cell carries `completed`, `started`
+ * (a progress row exists — the student began but may not have finished) and a
  * `correctness` percent (0-100) or null. The trend per student compares their
  * last two SCORED cells: 'up' | 'down' | 'flat', or 'none' when fewer than two
  * scored assignments exist.
@@ -33,6 +34,8 @@ export interface ProgressMatrixStudent {
 
 export interface ProgressMatrixCell {
   completed: boolean;
+  /** A progress row exists for the pair — the student began (and may have finished) the assignment. */
+  started: boolean;
   /** 0-100 when the assignment is completed, else null. */
   correctness: number | null;
 }
@@ -66,23 +69,33 @@ export function sortAssignmentsByDueDate<T extends ProgressMatrixAssignment>(ass
   });
 }
 
+export interface AssignmentProgressStart {
+  studentId: string;
+  assignmentId: string;
+}
+
 export function buildAssignmentProgressMatrix(args: {
   students: ProgressMatrixStudent[];
   assignments: ProgressMatrixAssignment[];
   /** Same shape AssignmentProgressReport consumes; `score` is the correctness percent. */
   completions: AssignmentProgressCompletion[];
+  /** Pairs with ANY progress row, finished or not — the "started" signal. */
+  starts?: AssignmentProgressStart[];
 }): AssignmentProgressMatrix {
   const assignments = sortAssignmentsByDueDate(args.assignments);
   const byPair = new Map<string, AssignmentProgressCompletion>();
   for (const c of args.completions) {
     byPair.set(`${c.studentId}\0${c.assignmentId}`, c);
   }
+  const startedPairs = new Set((args.starts ?? []).map((s) => `${s.studentId}\0${s.assignmentId}`));
 
   const rows: ProgressMatrixRow[] = args.students.map((student) => {
     const cells: ProgressMatrixCell[] = assignments.map((assignment) => {
       const hit = byPair.get(`${student.studentId}\0${assignment.id}`);
+      const completed = Boolean(hit);
       return {
-        completed: Boolean(hit),
+        completed,
+        started: completed || startedPairs.has(`${student.studentId}\0${assignment.id}`),
         correctness: hit && hit.score != null ? hit.score : null,
       };
     });

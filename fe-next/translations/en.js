@@ -12902,7 +12902,9 @@ const en = {
     "classView": {
       "playAssignment": "Play {title}",
       "playAssignmentDueSoon": "Due soon · Play {title}",
-      "playAssignmentOverdue": "Overdue · Play {title}"
+      "playAssignmentOverdue": "Overdue · Play {title}",
+      "resumeAssignment": "Resume {title}",
+      "resumeAssignmentLabel": "Continue your assignment"
     },
     "welcome": {
       "title": "Welcome to your classroom",
@@ -14088,6 +14090,17 @@ const en = {
         "trendNone": "Not enough data yet",
         "cellCompleted": "Completed, {{score}}% correct",
         "cellMissing": "Not completed",
+        "cellStarted": "Started, not finished",
+        "incompleteTitle": "Who hasn't finished",
+        "incompleteStarted": "Started",
+        "incompleteNotStarted": "Not started",
+        "incompleteAllDone": "Everyone finished — nice work.",
+        "nudge": "Nudge",
+        "nudgeSending": "Sending…",
+        "nudgeSent": "Nudged",
+        "nudgeAlready": "Already nudged",
+        "nudgeCompleted": "Finished",
+        "nudgeFailed": "Failed — tap to retry",
         "sampleTitle": "Per-student correctness",
         "gateTitle": "Per-student scores are a Pro feature",
         "gateBody": "See each student's correctness on every assignment and whether they are improving or slipping — the score behind the completion counts.",

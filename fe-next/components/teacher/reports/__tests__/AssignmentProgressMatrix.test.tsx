@@ -79,8 +79,8 @@ const matrix = {
       studentId: 's1',
       studentName: 'Ada',
       cells: [
-        { completed: true, correctness: 75 },
-        { completed: false, correctness: null },
+        { completed: true, started: true, correctness: 75 },
+        { completed: false, started: true, correctness: null },
       ],
       trend: 'down',
     },
@@ -119,7 +119,9 @@ describe('AssignmentProgressMatrix', () => {
     const cell = cells.find((c) => c.getAttribute('data-completed') === 'true');
     expect(cell).toHaveAttribute('data-student', 's1');
     expect(cell).toHaveTextContent('75%');
-    expect(cells.find((c) => c.getAttribute('data-completed') === 'false')).toHaveTextContent('—');
+    const startedCell = cells.find((c) => c.getAttribute('data-completed') === 'false');
+    expect(startedCell).toHaveAttribute('data-started', 'true');
+    expect(startedCell).not.toHaveTextContent('—');
     expect(screen.getByTitle('Declining')).toBeInTheDocument();
 
     await waitFor(() => expect(reportViewed).toHaveBeenCalledWith('c1', 'progress_report'));

@@ -20,11 +20,13 @@ vi.mock('@/utils/logger', () => ({
 import {
   ASSIGNMENT_CREATED,
   ASSIGNMENT_COMPLETED,
+  ASSIGNMENT_STARTED,
   assignmentCreatedProperties,
   assignmentCompletedProperties,
+  assignmentStartedProperties,
   trackAssignmentCreated,
 } from '../assignmentEvents';
-import { captureAssignmentCompletedServer } from '../assignmentEvents.server';
+import { captureAssignmentCompletedServer, captureAssignmentStartedServer } from '../assignmentEvents.server';
 
 describe('assignment funnel events', () => {
   beforeEach(() => {
@@ -91,6 +93,27 @@ describe('assignment funnel events', () => {
         assignment_id: 'a-1',
         student_id: 'stu-1',
         kind: 'word_list',
+      }),
+      $host: expect.any(String),
+    });
+  });
+
+  it('server start keeps the bare funnel name and stamps $host like completion', () => {
+    captureAssignmentStartedServer({
+      classroom_id: 'cls-1',
+      assignment_id: 'a-1',
+      student_id: 'stu-1',
+    });
+    expect(serverCapture).toHaveBeenCalledTimes(1);
+    const payload = serverCapture.mock.calls[0][0];
+    expect(payload.event).toBe(ASSIGNMENT_STARTED);
+    expect(payload.event).toBe('assignment_started');
+    expect(payload.distinctId).toBe('stu-1');
+    expect(payload.properties).toEqual({
+      ...assignmentStartedProperties({
+        classroom_id: 'cls-1',
+        assignment_id: 'a-1',
+        student_id: 'stu-1',
       }),
       $host: expect.any(String),
     });

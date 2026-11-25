@@ -1,6 +1,7 @@
 /**
  * Funnel events the class progress report already keys off:
- * `assignment_created` (teacher) and `assignment_completed` (student).
+ * `assignment_created` (teacher), `assignment_started` (student) and
+ * `assignment_completed` (student).
  *
  * Keep the names bare — Growth Radar / HQ progress strip grep these exact
  * strings. Do not prefix with edu_ here.
@@ -18,6 +19,7 @@ import type { TeacherPlan } from './teacherOnboardingFunnel';
 
 export const ASSIGNMENT_CREATED = 'assignment_created';
 export const ASSIGNMENT_COMPLETED = 'assignment_completed';
+export const ASSIGNMENT_STARTED = 'assignment_started';
 
 export interface AssignmentCreatedProps {
   classroom_id: string;
@@ -61,6 +63,13 @@ export function assignmentCompletedProperties(args: AssignmentCompletedProps): R
     student_id: args.student_id,
     kind: args.kind ?? 'lesson',
   };
+}
+
+/** Same payload shape as completion — the funnel pairs started → completed per student. */
+export type AssignmentStartedProps = AssignmentCompletedProps;
+
+export function assignmentStartedProperties(args: AssignmentStartedProps): Record<string, unknown> {
+  return assignmentCompletedProperties(args);
 }
 
 /** Browser / teacher dashboard. Never throws. */

@@ -44,18 +44,21 @@ export async function readAssignmentProgressMatrix(
     : { data: [] };
 
   const assignmentIds = (assignments ?? []).map((a: { id: string }) => a.id);
+  // All progress rows, not only completed ones: a row with completed_at NULL is
+  // a student who STARTED but has not finished — the signal the matrix's
+  // `started` cells and the incomplete-students list are built from.
   const { data: progressRows, error: progressError } = assignmentIds.length
     ? await sb
         .from('student_lesson_progress')
         .select('student_id, assignment_id, completed_at, words_attempted')
         .in('assignment_id', assignmentIds)
-        .not('completed_at', 'is', null)
     : { data: [], error: null };
   if (progressError) return { data: null, error: { message: progressError.message } };
 
   type NameProfile = { id: string; username?: string | null; display_name?: string | null };
   const profileMap = new Map((profiles ?? []).map((p: NameProfile) => [p.id, p]));
   type ProgressRow = AssignmentProgressSourceRow & { assignment_id?: string | null };
+  const rows = (progressRows ?? []) as ProgressRow[];
   const matrix = buildAssignmentProgressMatrix({
     students: (memberships ?? []).map((m: { student_id: string; roster_name?: string | null }) => ({
       studentId: m.student_id,
@@ -76,9 +79,15 @@ export async function readAssignmentProgressMatrix(
         createdAt: a.created_at ?? null,
       };
     }),
-    completions: (progressRows ?? []).map((row: ProgressRow) =>
-      mapProgressRowToCompletion(String(row.assignment_id ?? ''), row),
-    ) satisfies AssignmentProgressCompletion[],
+    // Only finished rows become completions — a partial row's words_attempted
+    // is not a score.
+    completions: rows
+      .filter((row) => row.completed_at)
+      .map((row) => mapProgressRowToCompletion(String(row.assignment_id ?? ''), row)) satisfies AssignmentProgressCompletion[],
+    starts: rows.map((row) => ({
+      studentId: row.student_id,
+      assignmentId: String(row.assignment_id ?? ''),
+    })),
   });
 
   return { data: matrix, error: null };

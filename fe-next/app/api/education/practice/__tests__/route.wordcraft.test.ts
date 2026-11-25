@@ -53,6 +53,7 @@ const mockStamp = vi.fn();
 vi.mock('@/lib/education/assignmentCompletion', () => ({
   findSatisfiedAssignment: (...args: unknown[]) => mockFind(...(args as [])),
   stampAssignmentCompletion: (...args: unknown[]) => mockStamp(...(args as [])),
+  stampAssignmentStartForLesson: vi.fn().mockResolvedValue(false),
 }));
 
 vi.mock('@/lib/education/practiceXpLimits', async (importOriginal) => ({

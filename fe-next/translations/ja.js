@@ -14612,7 +14612,9 @@ const ja = {
     "classView": {
       "playAssignment": "{title}をプレイ",
       "playAssignmentDueSoon": "まもなく締切 · {title}をプレイ",
-      "playAssignmentOverdue": "期限切れ · {title}をプレイ"
+      "playAssignmentOverdue": "期限切れ · {title}をプレイ",
+      "resumeAssignment": "{title}を再開",
+      "resumeAssignmentLabel": "課題を続けましょう"
     },
     "welcome": {
       "title": "クラスへようこそ！",
@@ -16046,6 +16048,17 @@ const ja = {
         "trendNone": "まだデータが不足しています",
         "cellCompleted": "完了 · 正答率{{score}}%",
         "cellMissing": "未完了",
+        "cellStarted": "開始済み・未完了",
+        "incompleteTitle": "まだ終わっていない生徒",
+        "incompleteStarted": "開始済み",
+        "incompleteNotStarted": "未開始",
+        "incompleteAllDone": "全員完了 — お疲れさまでした。",
+        "nudge": "リマインド",
+        "nudgeSending": "送信中…",
+        "nudgeSent": "リマインドしました",
+        "nudgeAlready": "すでにリマインド済み",
+        "nudgeCompleted": "完了",
+        "nudgeFailed": "失敗しました — タップして再試行",
         "sampleTitle": "生徒ごとの正答率",
         "gateTitle": "生徒ごとのスコアはPro機能です",
         "gateBody": "各課題で各生徒の正答率が向上しているか低下しているかを確認できます。完了数の背後にあるスコアです。",

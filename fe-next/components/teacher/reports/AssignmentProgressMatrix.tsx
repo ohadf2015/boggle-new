@@ -19,7 +19,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Check, Crown, Lock, Minus, TrendingDown, TrendingUp } from 'lucide-react';
+import { Check, Clock, Crown, Lock, Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { useCheckoutBlockedInApp } from '@/hooks/useCheckoutBlockedInApp';
@@ -36,6 +36,7 @@ import {
 import type { AssignmentProgressMatrix as AssignmentProgressMatrixData } from '@/lib/education/assignmentProgressMatrix';
 import { SAMPLE_STUDENTS, splitSampleList } from '@/lib/education/pro/sampleClass';
 import { ReportEmpty, ReportError, ReportSkeleton, SectionTitle, useReportData } from './ReportChrome';
+import { IncompleteAssignmentsPanel } from './IncompleteAssignmentsPanel';
 import { ProPoweredChip } from '@/components/teacher/pro/ProPoweredChip';
 
 export interface AssignmentProgressMatrixProps {
@@ -135,6 +136,7 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
                     data-student={row.studentId}
                     data-assignment={matrix.assignments[i].id}
                     data-completed={cell.completed}
+                    data-started={cell.started}
                     className="px-3 py-2 text-neo-white tabular-nums"
                   >
                     {cell.completed ? (
@@ -144,6 +146,14 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
                       >
                         <Check className="size-4 text-neo-lime" aria-hidden="true" />
                         {cell.correctness}%
+                      </span>
+                    ) : cell.started ? (
+                      <span
+                        className="inline-flex items-center gap-1 text-neo-yellow"
+                        aria-label={t('teacher.reports.progressMatrix.cellStarted')}
+                        title={t('teacher.reports.progressMatrix.cellStarted')}
+                      >
+                        <Clock className="size-4" aria-hidden="true" />
                       </span>
                     ) : (
                       <span aria-label={t('teacher.reports.progressMatrix.cellMissing')}>—</span>
@@ -158,6 +168,7 @@ function MatrixTable({ classroomId, matrix }: { classroomId: string; matrix: Ass
           </tbody>
         </table>
       </div>
+      <IncompleteAssignmentsPanel classroomId={classroomId} matrix={matrix} />
     </section>
   );
 }

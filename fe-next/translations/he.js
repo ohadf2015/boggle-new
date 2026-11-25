@@ -14502,7 +14502,9 @@ const he = {
     "classView": {
       "playAssignment": "שחקו {title}",
       "playAssignmentDueSoon": "עד מחר · שחקו {title}",
-      "playAssignmentOverdue": "באיחור · שחקו {title}"
+      "playAssignmentOverdue": "באיחור · שחקו {title}",
+      "resumeAssignment": "המשיכו {title}",
+      "resumeAssignmentLabel": "המשיכו את המטלה שלכם"
     },
     "welcome": {
       "title": "ברוכים הבאים לכיתה שלכם",
@@ -15931,6 +15933,17 @@ const he = {
         "trendNone": "עדיין אין מספיק נתונים",
         "cellCompleted": "הושלם, {{score}}% נכון",
         "cellMissing": "לא הושלם",
+        "cellStarted": "התחיל, לא סיים",
+        "incompleteTitle": "מי עדיין לא סיים",
+        "incompleteStarted": "התחיל",
+        "incompleteNotStarted": "לא התחיל",
+        "incompleteAllDone": "כולם סיימו — כל הכבוד.",
+        "nudge": "נדנוד",
+        "nudgeSending": "שולח…",
+        "nudgeSent": "נשלח",
+        "nudgeAlready": "כבר נשלח",
+        "nudgeCompleted": "סיים",
+        "nudgeFailed": "נכשל — הקישו לנסות שוב",
         "sampleTitle": "דיוק לפי תלמיד",
         "gateTitle": "ציונים לפי תלמיד הם תכונת Pro",
         "gateBody": "ראו את הדיוק של כל תלמיד בכל מטלה ואם הוא משתפר או מדרדר — הציון שמאחורי ספירות ההשלמה.",

@@ -73,3 +73,20 @@ export function nextOpenAssignment(
     href,
   };
 }
+
+/**
+ * The next assignment the student STARTED but has not finished — the resume
+ * card's target. Same ordering and deep-link rules as nextOpenAssignment,
+ * restricted to status 'started' (a progress row with completed_at NULL).
+ */
+export function nextStartedAssignment(
+  lessons: readonly StudentLesson[],
+  locale: string,
+  classroomId?: string | null,
+): NextOpenAssignment | null {
+  return nextOpenAssignment(
+    lessons.filter((lesson) => lesson.status === 'started'),
+    locale,
+    classroomId,
+  );
+}
