@@ -5,13 +5,14 @@ import { useLanguageSafe } from '@/contexts/LanguageContext';
 import NavigationContext from '@/contexts/NavigationContext';
 import { useVisibilityPausedInterval } from '@/hooks/useVisibilityPausedInterval';
 import { STALE_DEPLOY_UPDATE_EVENT, clearCachesAndReload } from '@/lib/deploy/staleDeployReload';
+import { clientBuildIdentity, isBuildStale } from '@/lib/deploy/staleBuildAutoReload';
 
 /**
  * VersionChecker Component
  *
  * Surfaces a new deployment WITHOUT ever interrupting the player:
- * 1. Checks build time on server every 5 minutes
- * 2. If build time differs, raises a "new version available" flag
+ * 1. Checks /api/version every 5 minutes
+ * 2. If the server runs a different commit (build time only when no commit is known), raises a "new version available" flag
  * 3. Shows a manual "Refresh" button — NEVER auto-reloads
  * 4. On click: purges caches + service worker and reloads with the cache-busting marker
  *
@@ -30,12 +31,8 @@ export function VersionChecker() {
   const nav = useContext(NavigationContext);
   const isInGame = nav?.isInGame ?? false;
 
-  // Get build time from environment (set at build in next.config.mjs)
-  const currentBuildTime = process.env.NEXT_PUBLIC_BUILD_TIME;
-
   const checkForUpdates = useCallback(async () => {
     try {
-      // Fetch current build time from server (bypasses cache)
       const response = await fetch('/api/version?t=' + Date.now(), {
         cache: 'no-store',
         headers: {
@@ -44,23 +41,24 @@ export function VersionChecker() {
         },
       });
 
-      if (!response.ok) return; // Silently fail if version endpoint not available
+      if (!response.ok) return;
 
-      const { buildTime: serverBuildTime } = await response.json();
-
-      // Compare build times
-      if (currentBuildTime && serverBuildTime && currentBuildTime !== serverBuildTime) {
-        console.log('[Version] New version detected:', {
-          current: currentBuildTime,
-          server: serverBuildTime,
-        });
+      const { buildTime: serverBuildTime, commit: serverCommit } = await response.json();
+      const client = clientBuildIdentity();
+      if (
+        isBuildStale({
+          clientCommit: client.commit,
+          serverCommit,
+          clientBuildTime: client.buildTime,
+          serverBuildTime,
+        })
+      ) {
         setNewVersionAvailable(true);
       }
     } catch (error) {
-      // Silently fail - don't disrupt user experience
       console.warn('[Version] Update check failed:', error);
     }
-  }, [currentBuildTime]);
+  }, []);
 
   const forceUpdate = useCallback(async () => {
     console.log('[Version] Force updating to new version...');
