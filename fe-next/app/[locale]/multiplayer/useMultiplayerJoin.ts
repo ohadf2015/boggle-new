@@ -27,6 +27,7 @@ import { clearSession } from '@/utils/session';
 import { waitForSignedInUser } from './classroomHostSignIn';
 import type { Language, Avatar, RoomVisibility } from '@/shared/types/game';
 import { redialSocket } from '@/lib/multiplayer/redialSocket';
+import { accessToken } from '@/utils/supabase/bearerHeader';
 
 // Hex color validation pattern (must match backend schema)
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
@@ -406,12 +407,14 @@ export function useMultiplayerJoin({
 
       // Build auth context
       let authUserId = null;
+      let authToken: string | undefined;
       let guestTokenHash = null;
       let guestSessionId: string | null = null;
 
       if (isSupabaseEnabled) {
         if (liveUser?.id) {
           authUserId = liveUser.id;
+          authToken = await accessToken();
         } else {
           guestSessionId = getGuestSessionId();
           if (guestSessionId) {
@@ -474,6 +477,7 @@ export function useMultiplayerJoin({
           gameCode: attemptCode,
           username: effectiveUsername,
           authUserId,
+          ...(authToken ? { authToken } : {}),
           guestTokenHash,
           guestSessionId,
           avatar: effectiveAvatar,

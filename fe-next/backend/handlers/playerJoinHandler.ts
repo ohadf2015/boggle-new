@@ -56,6 +56,8 @@ import { isGameStarting, waitForGameStart } from './gameStartMutex.js';
 import { resolveJoinIdentity } from './playerJoinIdentity.js';
 import { registerPlayerRoomExitHandlers } from './playerRoomExitHandlers.js';
 import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
+import { verifySocketToken, markSocketIdentity } from '@/server/socketAuth';
+import { getSupabase } from '../modules/supabase/client.js';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -64,10 +66,20 @@ interface JoinGamePayload {
   playerId?: string;
   avatar?: Avatar;
   authUserId?: string;
+  authToken?: string;
   guestTokenHash?: string;
   guestSessionId?: string;
   practiceSeat?: boolean;
   hostSeat?: boolean;
+}
+
+// A socket can connect before the login loads; the token sent with `join` then verifies it the way connect auth would.
+async function adoptJoinToken(socket: Socket, token: string | undefined): Promise<void> {
+  if (!token || socket.data?.verifiedUserId) return;
+  const user = await verifySocketToken(token, getSupabase());
+  if (!user) return;
+  markSocketIdentity(socket.data as Record<string, unknown>, token, user);
+  socket.join(`user:${user.userId}`);
 }
 
 /**
@@ -95,6 +107,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     let { gameCode, username, playerId, avatar, authUserId: clientAuthUserId, guestTokenHash, guestSessionId } = validation.data as JoinGamePayload;
     const wantsPracticeSeat = (validation.data as JoinGamePayload).practiceSeat === true;
+
+    await adoptJoinToken(socket, (validation.data as JoinGamePayload).authToken);
 
     // Use server-verified user ID if available (from JWT middleware), ignore client-supplied value
     const verifiedUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
