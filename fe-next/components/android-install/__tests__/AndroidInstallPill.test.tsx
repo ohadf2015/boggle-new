@@ -2,6 +2,7 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import AndroidInstallPill from '../AndroidInstallPill';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
+import { GAMES_COMPLETED_COUNT_KEY } from '@/utils/gamesCompletedCount';
 
 const captureMock = vi.fn();
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
@@ -21,9 +22,11 @@ vi.mock('@/lib/androidInstall/installEligibility', () => ({
 // bridge race (window.Capacitor can register AFTER the pill mounts).
 let native = false;
 let standalone = false;
+let desktop = false;
 vi.mock('@/utils/androidApp', () => ({
   isCapacitorNative: () => native,
   isStandaloneDisplay: () => standalone,
+  isDesktopInstallContext: () => desktop,
 }));
 
 // Route gate: the pill must never float over a gameplay surface.
@@ -46,6 +49,8 @@ beforeEach(() => {
   eligible = true;
   native = false;
   standalone = false;
+  desktop = false;
+  localStorage.clear();
   pathname = '/en';
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
 });
@@ -63,6 +68,34 @@ function settle() {
 }
 
 describe('AndroidInstallPill', () => {
+  it('Given a desktop visitor who has not finished a game, Then the pill stays hidden', () => {
+    desktop = true;
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+    expect(captureMock).not.toHaveBeenCalled();
+  });
+
+  it('Given a desktop visitor finishes a first game, When they move to the next page, Then the pill shows', () => {
+    desktop = true;
+    useAndroidInstallStore.setState({ pillVisible: true });
+    const { rerender } = render(<AndroidInstallPill />);
+    settle();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+    localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '1');
+    pathname = '/en/results';
+    rerender(<AndroidInstallPill />);
+    expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
+  });
+
+  it('Given a phone visitor with no finished game, Then the pill still shows', () => {
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
+  });
+
   it('renders nothing when the pill is not active', () => {
     render(<AndroidInstallPill />);
     settle();
