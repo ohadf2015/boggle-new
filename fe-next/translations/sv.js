@@ -2562,6 +2562,7 @@ const sv = {
     "inlineDismiss": "Fattar"
   },
   "modeCoach": {
+    "typeOrDrag": "Skriv ordet eller dra över bokstäverna",
     "skip": "Hoppa över",
     "next": "Nästa",
     "gotIt": "Fattar",

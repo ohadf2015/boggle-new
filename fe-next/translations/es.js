@@ -18933,6 +18933,7 @@ const es = {
     "inlineDismiss": "Listo"
   },
   "modeCoach": {
+    "typeOrDrag": "Escribe la palabra o arrastra por las letras",
     "skip": "Saltar",
     "next": "Siguiente",
     "gotIt": "¡Dale!",

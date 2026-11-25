@@ -42,3 +42,21 @@ describe('MpCountdownStage how-to', () => {
     expect(screen.queryByTestId('mp-countdown-howto')).toBeNull();
   });
 });
+
+describe('MpCountdownStage how-to on a keyboard computer', () => {
+  beforeEach(() => {
+    __resetCountdownDupGuard();
+    boss.value = false;
+    vi.stubGlobal('matchMedia', (q: string) => ({
+      matches: q === '(pointer: fine)', media: q,
+      addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {},
+    }));
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('GIVEN a Blast round on a desktop WHEN the 3-2-1 plays THEN the how-to says to type or drag', () => {
+    mode.value = 'blast';
+    render(<MpCountdownStage t={t} />);
+    expect(screen.getByTestId('mp-countdown-howto')).toHaveTextContent('modeCoach.typeOrDrag');
+  });
+});

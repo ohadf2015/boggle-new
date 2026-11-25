@@ -5,7 +5,8 @@ import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useModeCoach } from '@/hooks/useModeCoach';
-import { getModeCoach, type CoachAccent } from '@/lib/tutorial/modeCoachContent';
+import { captionKeyFor, getModeCoach, type CoachAccent } from '@/lib/tutorial/modeCoachContent';
+import { useTypingDesktop } from '@/lib/input/typedWordHint';
 import type { CoachModeKey } from '@/lib/tutorial/modeCoachStore';
 import { CoachDemo } from './CoachDemo';
 
@@ -54,6 +55,7 @@ export function ModeCoach({ mode, onShown, graceMs = 1500, placement = 'top' }: 
   const content = getModeCoach(mode);
   const { t, language } = useLanguage();
   const reduced = useReducedMotion() ?? false;
+  const typingDesktop = useTypingDesktop();
   const { visible, stepIndex, isLastStep, advance, dismiss } = useModeCoach(mode, { onShown });
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -98,7 +100,7 @@ export function ModeCoach({ mode, onShown, graceMs = 1500, placement = 'top' }: 
         compact ? 'text-start text-sm' : 'text-center text-base',
       )}
     >
-      {t(step?.captionKey ?? '')}
+      {step ? t(captionKeyFor(step, typingDesktop)) : null}
     </p>
   );
 

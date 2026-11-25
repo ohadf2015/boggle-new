@@ -12485,6 +12485,7 @@ const ru = {
     "inlineDismiss": "Понял"
   },
   "modeCoach": {
+    "typeOrDrag": "Наберите слово или проведите по буквам",
     "skip": "Пропустить",
     "next": "Далее",
     "gotIt": "Понял!",

@@ -17550,6 +17550,7 @@ const en = {
     "inlineDismiss": "Got it"
   },
   "modeCoach": {
+    "typeOrDrag": "Type the word or drag across the letters",
     "skip": "Skip",
     "next": "Next",
     "gotIt": "Got it",

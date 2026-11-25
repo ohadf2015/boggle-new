@@ -21470,6 +21470,7 @@ const ja = {
     "inlineDismiss": "OK"
   },
   "modeCoach": {
+    "typeOrDrag": "単語を入力するか、文字をなぞってください",
     "skip": "スキップ",
     "next": "次へ",
     "gotIt": "OK",
