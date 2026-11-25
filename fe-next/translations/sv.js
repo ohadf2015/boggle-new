@@ -21646,6 +21646,9 @@ const sv = {
     },
     "round": {
       "getReady": "Gör dig redo",
+      "youVsBots_one": "Du mot {count} bot",
+      "youVsBots_few": "Du mot {count} bottar",
+      "youVsBots_other": "Du mot {count} bottar",
       "mode": {
         "classic": {
           "name": "Klassisk",

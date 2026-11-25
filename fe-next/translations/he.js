@@ -21607,6 +21607,9 @@ const he = {
     },
     "round": {
       "getReady": "היכונו",
+      "youVsBots_one": "סיבוב מול {count} בוט",
+      "youVsBots_few": "סיבוב מול {count} בוטים",
+      "youVsBots_other": "סיבוב מול {count} בוטים",
       "mode": {
         "classic": {
           "name": "קלאסי",

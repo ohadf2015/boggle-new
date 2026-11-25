@@ -8,6 +8,7 @@ import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import { useGameMode } from '@/hooks/gameState/selectors';
 import { prefersStaticFullscreenOverlay } from '@/lib/native/webViewLayerFlash';
 import { cn } from '@/lib/utils';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta, BOSS_ROUND_META } from './roundModes';
 import { useBossActive } from '@/stores/classroomBossStore';
@@ -32,7 +33,7 @@ export interface CountdownPlayer {
 
 export interface MpCountdownStageProps {
   onComplete?: () => void;
-  t?: (key: string) => string;
+  t?: (key: string, params?: Record<string, string | number>) => string;
   players?: ReadonlyArray<CountdownPlayer>;
   /** A classroom room: the teacher's mode wins over the store's board mode (null = not resolved yet). */
   classroom?: { mode: string | null; vocabQuizVariant?: string | null } | null;
@@ -68,7 +69,7 @@ export function __resetCountdownDupGuard(): void {
  * play; the roster row tells you who. Only the numeral animates (transform).
  */
 function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCountdownStageProps) {
-  const { t: tCtx } = useLanguage();
+  const { t: tCtx, language } = useLanguage();
   const t = tProp ?? tCtx;
   const [isDuplicate] = useState(() => Date.now() - lastCompletedAt < DUP_GUARD_MS);
   const [done, setDone] = useState(isDuplicate);
@@ -123,6 +124,9 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
   const Icon = MODE_ICONS[mode.icon] ?? FALLBACK_MODE_ICON;
   const goText = t('countdown.go');
   const label = isGo ? (goText && goText !== 'countdown.go' ? goText : 'GO!') : String(count);
+  const connected = players?.filter((p) => !p.disconnected) ?? [];
+  const botCount = connected.filter((p) => p.isBot).length;
+  const soloVsBots = !classroom && botCount > 0 && connected.length - botCount === 1;
 
   return (
     <div
@@ -198,9 +202,15 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
             )}
           </div>
         )}
-        <p className="font-neo-display font-bold uppercase tracking-[0.2em] rtl:tracking-normal text-sm tv:text-2xl text-neo-white/60">
-          {t('mpUi.round.getReady')}
-        </p>
+        {soloVsBots ? (
+          <p data-testid="mp-countdown-vs-bots" className="rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-1 shadow-hard-sm font-neo-display font-bold uppercase tracking-wide rtl:tracking-normal text-sm tv:text-2xl text-neo-black">
+            {t(pluralKeyOf('mpUi.round.youVsBots', botCount, language), { count: botCount })}
+          </p>
+        ) : (
+          <p className="font-neo-display font-bold uppercase tracking-[0.2em] rtl:tracking-normal text-sm tv:text-2xl text-neo-white/60">
+            {t('mpUi.round.getReady')}
+          </p>
+        )}
       </div>
     </div>
   );

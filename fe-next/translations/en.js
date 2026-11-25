@@ -20667,6 +20667,9 @@ const en = {
     },
     "round": {
       "getReady": "Get ready",
+      "youVsBots_one": "You vs {count} bot",
+      "youVsBots_few": "You vs {count} bots",
+      "youVsBots_other": "You vs {count} bots",
       "mode": {
         "classic": {
           "name": "Classic",
