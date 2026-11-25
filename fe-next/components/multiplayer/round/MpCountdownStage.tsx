@@ -13,7 +13,8 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta, BOSS_ROUND_META } from './roundModes';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { CoachDemo } from '@/components/tutorial/CoachDemo';
-import { getModeCoach } from '@/lib/tutorial/modeCoachContent';
+import { captionKeyFor, getModeCoach } from '@/lib/tutorial/modeCoachContent';
+import { useTypingDesktop } from '@/lib/input/typedWordHint';
 import { mpCoachMode } from '@/lib/tutorial/mpCoachMode';
 import styles from './round.module.css';
 
@@ -79,6 +80,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
   const [staticLayer] = useState(() => prefersStaticFullscreenOverlay());
   const storeMode = useGameMode();
   const bossRound = useBossActive();
+  const typingDesktop = useTypingDesktop();
   const mode = bossRound
     ? BOSS_ROUND_META
     : classroom ? classroomRoundModeMeta(classroom.mode, classroom.vocabQuizVariant) : roundModeMeta(storeMode);
@@ -158,7 +160,7 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
             <div dir="ltr" className="w-full">
               <CoachDemo demo={howTo.steps[0].demo} accent={howTo.accent} emoji={howTo.steps[0].emoji} />
             </div>
-            <span dir="auto" className="font-neo-body text-sm tv:text-xl font-bold text-neo-white/85">{t(howTo.steps[0].captionKey)}</span>
+            <span dir="auto" className="font-neo-body text-sm tv:text-xl font-bold text-neo-white/85">{t(captionKeyFor(howTo.steps[0], typingDesktop))}</span>
           </div>
         )}
       </div>
