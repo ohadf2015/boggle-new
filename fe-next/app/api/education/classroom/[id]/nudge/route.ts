@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { authorizeClassroomOwner } from '@/lib/education/ownedClassroomRoute';
 import { requireTeacherPro } from '@/lib/education/pro/requireTeacherPro';
@@ -29,7 +29,7 @@ const Body = z.object({
   studentId: z.string().uuid(),
 });
 
-export async function POST(req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const limit = checkApiRateLimit(req, 'education-nudge', { maxRequests: 30, windowMs: 60_000 });
   if (!limit.success) {
