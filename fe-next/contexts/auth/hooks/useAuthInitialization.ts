@@ -9,7 +9,8 @@
  * - Loading state safety timeouts
  */
 
-import { useCallback, useEffect, useRef } from 'react';
+import { createElement, useCallback, useEffect, useRef } from 'react';
+import toast from 'react-hot-toast';
 import type { User } from '@supabase/supabase-js';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { linkSessionToUser } from '@/utils/sessionTracking';
@@ -19,6 +20,7 @@ import { captureBackgroundError } from '@/utils/sentry';
 import { triggerWelcomeEmail } from '@/lib/welcome/triggerWelcomeEmail';
 import { triggerExternalIdentityLink } from '@/lib/auth/triggerExternalIdentityLink';
 import logger from '@/utils/logger';
+import { useLanguage } from '@/contexts/LanguageContext';
 import {
   isRefreshTokenError,
   isNetworkError,
@@ -37,6 +39,7 @@ const SESSION_FETCH_TIMEOUT_MS = 5000;
 const LOADING_SAFETY_TIMEOUT_MS = 6000; // Increased to match new session timeout
 const TAB_VISIBILITY_LOADING_TIMEOUT_MS = 1500;
 const SESSION_UNANSWERED_FALLBACK_MS = 15000;
+const SESSION_UNANSWERED_TOAST_ID = 'auth-session-unanswered';
 
 type SessionAnswer = 'unknown' | 'absent' | 'present';
 
@@ -85,16 +88,26 @@ export function useAuthInitialization({
   const { setUser, setProfile, setRankedProgress, setLoading, setIsSupabaseEnabled } = setters;
   const isMountedRef = useRef(true);
   const clearAuthState = useClearAuthState(setters);
+  const { t } = useLanguage();
+  const tRef = useRef(t);
+  tRef.current = t;
 
   useEffect(() => {
     let subscription: { unsubscribe: () => void } | null = null;
     let visibilityTimeout: NodeJS.Timeout | null = null;
     // 'unknown' while the session check has not answered: a timeout is not "no session".
     let sessionAnswer: SessionAnswer = 'unknown';
+    let unansweredNoticeShown = false;
+    const clearUnansweredNotice = () => {
+      if (!unansweredNoticeShown) return;
+      unansweredNoticeShown = false;
+      toast.dismiss(SESSION_UNANSWERED_TOAST_ID);
+    };
     isMountedRef.current = true;
 
     const applyInitialSession = (sessionUser: User | null) => {
       sessionAnswer = sessionUser ? 'present' : 'absent';
+      clearUnansweredNotice();
       if (sessionUser && sessionUser.id !== userIdRef.current) {
         userIdRef.current = sessionUser.id;
         setUser(sessionUser);
@@ -143,6 +156,7 @@ export function useAuthInitialization({
         const knownSignedOut = sessionAnswer === 'absent';
         if (sessionUser) sessionAnswer = 'present';
         else if (event === 'SIGNED_OUT' || event === 'INITIAL_SESSION') sessionAnswer = 'absent';
+        if (sessionAnswer !== 'unknown') clearUnansweredNotice();
 
         setTimeout(() => {
           if (!isMountedRef.current) return;
@@ -277,6 +291,12 @@ export function useAuthInitialization({
           'auth.page_age_s': String(Math.round(performance.now() / 1000)),
         },
       });
+      // Unknown is not signed out: a fresh page load is the honest way to ask again.
+      toast.error(
+        createElement('button', { type: 'button', onClick: () => window.location.reload() }, tRef.current('common.reconnectFailed')),
+        { id: SESSION_UNANSWERED_TOAST_ID, duration: Infinity },
+      );
+      unansweredNoticeShown = true;
       setLoading(false);
     }, SESSION_UNANSWERED_FALLBACK_MS);
 
@@ -285,6 +305,7 @@ export function useAuthInitialization({
       isMountedRef.current = false;
       clearTimeout(loadingTimeout);
       clearTimeout(unansweredTimeout);
+      clearUnansweredNotice();
       if (visibilityTimeout) clearTimeout(visibilityTimeout);
       if (subscription) {
         subscription.unsubscribe();

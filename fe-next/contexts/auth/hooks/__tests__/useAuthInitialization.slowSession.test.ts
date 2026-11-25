@@ -10,6 +10,7 @@ const auth = vi.hoisted(() => ({
   getSession: vi.fn(),
 }));
 const captureBackgroundError = vi.hoisted(() => vi.fn());
+const toast = vi.hoisted(() => ({ error: vi.fn(), dismiss: vi.fn() }));
 
 vi.mock('@/lib/supabase', () => ({
   isSupabaseConfigured: () => Promise.resolve(true),
@@ -31,6 +32,7 @@ vi.mock('@/utils/pushNotifications/tokenRegistration', () => ({
 }));
 vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSessionRefreshed: vi.fn() }));
 vi.mock('@/utils/sentry', () => ({ captureBackgroundError }));
+vi.mock('react-hot-toast', () => ({ default: toast }));
 vi.mock('@/lib/welcome/triggerWelcomeEmail', () => ({ triggerWelcomeEmail: () => Promise.resolve() }));
 vi.mock('@/lib/auth/triggerExternalIdentityLink', () => ({ triggerExternalIdentityLink: () => Promise.resolve() }));
 
@@ -68,6 +70,8 @@ describe('useAuthInitialization when the session check is slow', () => {
     auth.listeners.length = 0;
     auth.getSession.mockReset();
     captureBackgroundError.mockReset();
+    toast.error.mockReset();
+    toast.dismiss.mockReset();
     reload.mockReset();
     sessionStorage.clear();
     Object.defineProperty(window, 'location', {
@@ -134,6 +138,26 @@ describe('useAuthInitialization when the session check is slow', () => {
       'auth.visibility': 'visible',
       'auth.online': 'true',
     });
+  });
+
+  it('tells the player the sign-in check failed and offers a refresh, instead of a silent guest screen', async () => {
+    auth.getSession.mockReturnValue(new Promise(() => {}));
+    const fetchUserData = () => Promise.resolve();
+    renderHook(() => useHarness(fetchUserData));
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(20000);
+    });
+
+    expect(toast.error).toHaveBeenCalledTimes(1);
+    expect(toast.dismiss).not.toHaveBeenCalled();
+    const [notice, options] = toast.error.mock.calls[0];
+    expect(options).toMatchObject({ id: 'auth-session-unanswered', duration: Infinity });
+    notice.props.onClick();
+    expect(reload).toHaveBeenCalledTimes(1);
+
+    await emit('SIGNED_IN', USER);
+    expect(toast.dismiss).toHaveBeenCalledWith('auth-session-unanswered');
   });
 
   it('still reloads once on a real guest sign-up after the session said "no session"', async () => {
