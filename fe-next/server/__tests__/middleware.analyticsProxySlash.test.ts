@@ -5,9 +5,10 @@ import { analyticsProxyNoSlash } from '../middleware';
 describe('analyticsProxyNoSlash', () => {
   const run = (url: string) => {
     const req = { url } as unknown as Request;
+    const res = { setMaxListeners: vi.fn() };
     const next = vi.fn() as unknown as NextFunction;
-    analyticsProxyNoSlash()(req, {} as Response, next);
-    return { url: req.url, next };
+    analyticsProxyNoSlash()(req, res as unknown as Response, next);
+    return { url: req.url, next, res };
   };
 
   it('Given an analytics event posted with a trailing slash, Then it reaches the proxy without one (no 308 round trip)', () => {
@@ -24,5 +25,10 @@ describe('analyticsProxyNoSlash', () => {
 
   it('always continues the chain', () => {
     expect(run('/lcx/e/').next).toHaveBeenCalledOnce();
+  });
+
+  it('Given a proxied analytics call, Then its response allows the proxy its extra close listener', () => {
+    expect(run('/lcx/flags/?v=2').res.setMaxListeners).toHaveBeenCalledWith(20);
+    expect(run('/en').res.setMaxListeners).not.toHaveBeenCalled();
   });
 });

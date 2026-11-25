@@ -300,8 +300,12 @@ function cacheHeaders(): RequestHandler {
  * the bare path, so strip it here and keep Next's slash redirects for pages.
  */
 export function analyticsProxyNoSlash(): RequestHandler {
-  return (req: Request, _res: Response, next: NextFunction): void => {
-    if (req.url.startsWith('/lcx/')) req.url = req.url.replace(/\/+(?=\?|$)/, '');
+  return (req: Request, res: Response, next: NextFunction): void => {
+    if (req.url.startsWith('/lcx/')) {
+      req.url = req.url.replace(/\/+(?=\?|$)/, '');
+      // A proxied response carries ten per-request close listeners plus the proxy's own; always 11, never growing.
+      res.setMaxListeners(20);
+    }
     next();
   };
 }
