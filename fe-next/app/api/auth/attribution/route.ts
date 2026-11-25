@@ -40,6 +40,17 @@ import { canonicalSignupSurface } from '@/lib/auth/signupSurface';
  * email|google so funnels can split by provider.
  */
 
+/** page = where the account was confirmed; landing_page/landing_referrer_host = the visit's first touch, path only. */
+function signupPages(page: string | null | undefined, landing: string | null, referrer: string | null): Record<string, string> {
+  const out: Record<string, string> = {};
+  const here = page ? sanitizeLandingPath(page)?.split('?')[0] : null;
+  const first = landing ? landing.split('?')[0] : null;
+  if (here) out.page = here;
+  if (first || here) out.landing_page = (first || here) as string;
+  if (referrer) out.landing_referrer_host = referrer;
+  return out;
+}
+
 const bodySchema = z.object({
   utm_source: z.string().max(200).nullish(),
   utm_medium: z.string().max(200).nullish(),
@@ -50,6 +61,7 @@ const bodySchema = z.object({
   language: z.string().max(16).nullish(),
   country_code: z.string().max(8).nullish(),
   gr_distinct_id: z.string().max(100).nullish(),
+  page: z.string().max(500).nullish(),
 });
 
 type AdminWithAuth = {
@@ -174,6 +186,7 @@ export async function POST(request: Request) {
           utm_medium: decision.update.utm_medium ?? (profile.utm_medium as string | null) ?? null,
           utm_campaign: decision.update.utm_campaign ?? (profile.utm_campaign as string | null) ?? null,
           referrer_domain: decision.update.referrer ?? (profile.referrer as string | null) ?? null,
+          ...signupPages(body.page, decision.update.landing_path ?? (profile.landing_path as string | null), decision.update.referrer ?? (profile.referrer as string | null)),
           is_test_account: profile.is_test_account === true,
           // Growth Radar keys this signup on the browser's tracker id so it joins that visitor's pageviews.
           gr_distinct_id: normalizeGrDistinctId(metaString(meta, 'gr_distinct_id')) ?? normalizeGrDistinctId(body.gr_distinct_id),

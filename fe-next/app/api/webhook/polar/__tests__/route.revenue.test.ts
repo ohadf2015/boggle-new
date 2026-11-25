@@ -60,6 +60,17 @@ describe('polar webhook — revenue telemetry', () => {
     expect(paid.properties.$host).toBe(EDU_ANALYTICS_HOST)
   })
 
+  it('carries the page and landing page stamped at checkout onto the paid event', async () => {
+    await POST(polarEvent('subscription.active', {
+      id: 'sub_9', status: 'active', product_id: PRO,
+      metadata: { user_id: 'u1', page: '/en/teacher/upgrade', landing_page: '/en/education', utm_source: 'google', email: 't@x.io' },
+      amount: 900, currency: 'usd', recurring_interval: 'month',
+    }))
+    const paid = events().find((e) => e.event === 'paid')
+    expect(paid.properties).toMatchObject({ page: '/en/teacher/upgrade', landing_page: '/en/education', utm_source: 'google' })
+    expect(paid.properties.email).toBeUndefined()
+  })
+
   it('stamps revenue props on trial_started too', async () => {
     await POST(polarEvent('subscription.created', {
       id: 'sub_2', status: 'trialing', product_id: PRO, metadata: { user_id: 'u2' }, amount: 900, currency: 'usd',

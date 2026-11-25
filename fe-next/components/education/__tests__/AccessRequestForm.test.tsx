@@ -102,6 +102,7 @@ describe('<AccessRequestForm> — one tap to the first class', () => {
     await typeReason(); await userEvent.setup().click(submitButton());
     await waitFor(() => expect(onApproved).toHaveBeenCalled());
     expect(onApproved.mock.calls[0][0]).toMatchObject({ paidDay0: true, alreadyApproved: true });
+    expect(track).toHaveBeenCalledWith('edu_access_request_submitted', { status: 200, outcome: 'already_approved', paid_day0: true });
   });
 
   it('Given no page owner, When approved, Then the form itself refreshes and goes to class setup', async () => {
@@ -138,6 +139,7 @@ describe('<AccessRequestForm> — one tap to the first class', () => {
     await user.type(reasonBox(), 'Friday vocab battles'); await user.click(submitButton());
     await screen.findByText('education.access.approval_pending_title');
     expect(onApproved).not.toHaveBeenCalled();
+    expect(track).toHaveBeenCalledWith('edu_access_request_submitted', expect.objectContaining({ status: 202, outcome: 'approval_pending' }));
     await user.click(screen.getByRole('button', { name: 'education.access.approval_pending_back' }));
     expect(submitButton()).toBeEnabled();
   });
@@ -148,7 +150,8 @@ describe('<AccessRequestForm> — one tap to the first class', () => {
     await typeReason(); await userEvent.setup().click(submitButton());
     expect(await screen.findByRole('alert')).toHaveTextContent('education.access.rate_limited');
     expect(submitButton()).toBeEnabled();
-    expect(track).toHaveBeenCalledWith('edu_access_request_submitted', { ok: false, status: 429 });
+    expect(track).toHaveBeenCalledWith('edu_access_request_failed', { status: 429 });
+    expect(track).not.toHaveBeenCalledWith('edu_access_request_submitted', expect.anything());
   });
 
   it('Given a double tap, Then only one request is filed', async () => {

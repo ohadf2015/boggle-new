@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { isCheckoutBlockedInApp } from '@/lib/education/postTeacherProCheckout';
+import { attributionBody } from '@/utils/eventContext';
 
 /**
  * Persistent resume banner for a teacher who started Polar checkout in the last
@@ -33,7 +34,7 @@ export function PendingCheckoutBanner() {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ locale: language }),
+        body: JSON.stringify({ locale: language, ...attributionBody() }),
       });
       if (!response.ok) return;
       const body = (await response.json()) as { url?: unknown } | null;

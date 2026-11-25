@@ -17,6 +17,7 @@ import {
   trackEduProCheckoutFailed,
 } from '@/lib/education/proFunnelTelemetry';
 import { resumeDecision } from '@/lib/education/pro/resumeDecision';
+import { attributionBody } from '@/utils/eventContext';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -61,7 +62,7 @@ export function useUpgradeCheckout({ t, language, user, authLoading, proLoading,
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trial, locale: language, ...(entrySource ? { source: entrySource } : {}) }),
+        body: JSON.stringify({ trial, locale: language, ...(entrySource ? { source: entrySource } : {}), ...attributionBody() }),
       });
       if (!response.ok) {
         if (response.status === 401) {

@@ -228,6 +228,22 @@ describe('POST /api/auth/attribution — server-canonical GR signup (t_b6131f7d)
     }]);
   });
 
+  it('carries where the account was confirmed and the first-touch landing page, both as bare paths', async () => {
+    getUser.mockResolvedValue(AUTHED);
+    await POST(req({
+      signup_surface: 'header_or_menu',
+      landing_path: '/en/daily/word-wheel?utm_source=tiktok',
+      referrer_domain: 'tiktok.com',
+      page: '/en/multiplayer?code=ABCD',
+    }));
+    const [events] = captureEduServerEvents.mock.calls[0];
+    expect(events[0].properties).toMatchObject({
+      page: '/en/multiplayer',
+      landing_page: '/en/daily/word-wheel',
+      landing_referrer_host: 'tiktok.com',
+    });
+  });
+
   it('cross-device: a second browser finds signup_surface set and emits nothing', async () => {
     getUser.mockResolvedValue(AUTHED);
     // First device already wrote signup_surface; second device carries a new referrer.

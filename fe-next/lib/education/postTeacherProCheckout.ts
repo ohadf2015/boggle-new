@@ -9,6 +9,7 @@
 import { trackEduProCheckoutFailed, type EduProCheckoutFailReason } from '@/lib/education/proFunnelTelemetry';
 import { entrySourceTag } from '@/lib/education/pro/upgradeEntry';
 import { isNative } from '@/utils/platform';
+import { attributionBody } from '@/utils/eventContext';
 
 export type TeacherProCheckoutResult =
   | { ok: true; url: string }
@@ -47,6 +48,7 @@ export async function postTeacherProCheckout(
     reportFailure('native_app', placement, trial);
     return { ok: false, status: 0, nativeApp: true };
   }
+  const attr = attributionBody();
   const hasOptions = options.trial !== undefined || options.locale !== undefined || source !== null;
   let response: Response;
   try {
@@ -60,9 +62,12 @@ export async function postTeacherProCheckout(
               trial,
               ...(options.locale ? { locale: options.locale } : {}),
               ...(source ? { source } : {}),
+              ...attr,
             }),
           }
-        : { method: 'POST' },
+        : attr.attribution
+          ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(attr) }
+          : { method: 'POST' },
     );
   } catch (err) {
     reportFailure('network', placement, trial);

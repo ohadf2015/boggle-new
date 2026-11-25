@@ -1,3 +1,4 @@
+import { cleanAttribution } from '@/utils/eventContext';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { resolveProEntitlement } from '@/lib/education/proGrant';
@@ -126,19 +127,20 @@ async function liveProviderSubscription(userId: string): Promise<'live' | 'none'
  */
 async function parseCheckoutBody(
   request: NextRequest,
-): Promise<{ trial: boolean; locale: string; returnTo: string; source: string | null }> {
+): Promise<{ trial: boolean; locale: string; returnTo: string; source: string | null; attribution: Record<string, string> }> {
   const raw = await request.text();
-  if (!raw.trim()) return { trial: false, locale: '', returnTo: '', source: null };
+  if (!raw.trim()) return { trial: false, locale: '', returnTo: '', source: null, attribution: {} };
   try {
-    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown; returnTo?: unknown; source?: unknown };
+    const parsed = JSON.parse(raw) as { trial?: unknown; locale?: unknown; returnTo?: unknown; source?: unknown; attribution?: unknown };
     return {
       trial: parsed?.trial === true,
       locale: typeof parsed?.locale === 'string' ? parsed.locale : '',
       returnTo: typeof parsed?.returnTo === 'string' ? parsed.returnTo : '',
       source: entrySourceTag(parsed?.source),
+      attribution: cleanAttribution(parsed?.attribution),
     };
   } catch {
-    return { trial: false, locale: '', returnTo: '', source: null };
+    return { trial: false, locale: '', returnTo: '', source: null, attribution: {} };
   }
 }
 
@@ -244,6 +246,7 @@ export async function POST(request: NextRequest) {
       trialDays: trial ? trialPlan?.days : undefined,
       locale,
       analyticsDistinctId: identity.distinctId,
+      ...(Object.keys(body.attribution).length ? { attribution: body.attribution } : {}),
       returnPath: [
         body.returnTo,
         returnPathFromReferer(
@@ -311,6 +314,7 @@ export async function POST(request: NextRequest) {
     // checkout_id is the join key to the return beacon, which echoes the same id.
     try {
       const startTags: Record<string, unknown> = {
+        ...body.attribution,
         ...tags,
         ...(checkoutId ? { checkout_id: checkoutId } : {}),
         ...(body.source ? { entry_source: body.source } : {}),

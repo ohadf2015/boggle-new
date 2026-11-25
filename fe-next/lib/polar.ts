@@ -153,6 +153,7 @@ export class PolarClient {
     allowTrial = false,
     trialDays,
     analyticsDistinctId,
+    attribution,
   }: {
     userId: string
     productId: string
@@ -172,6 +173,7 @@ export class PolarClient {
     trialDays?: number
     /** The teacher's browser PostHog id, so webhook events can join the browser person. */
     analyticsDistinctId?: string
+    attribution?: Record<string, string>
   }): Promise<{ url: string; id: string | null }> {
     const trial = allowTrial === true
     const trialLength =
@@ -193,6 +195,7 @@ export class PolarClient {
         ...(email ? { email } : {}),
         ...(trial ? { trial_days: trialLength } : {}),
         ...(analyticsDistinctId ? { posthog_distinct_id: analyticsDistinctId } : {}),
+        ...attribution,
       },
       // Paid path must not inherit a trial configured on the Polar product.
       allow_trial: trial,
