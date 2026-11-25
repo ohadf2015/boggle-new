@@ -41,6 +41,8 @@ async function ensureMigrationsTable() {
           name TEXT UNIQUE NOT NULL,
           executed_at TIMESTAMPTZ DEFAULT NOW()
         );
+        REVOKE ALL ON ${MIGRATIONS_TABLE} FROM PUBLIC, anon, authenticated;
+        ALTER TABLE ${MIGRATIONS_TABLE} ENABLE ROW LEVEL SECURITY;
       `
     });
     if (error) {

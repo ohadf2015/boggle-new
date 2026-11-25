@@ -17,6 +17,7 @@ const INCLUDE = [
   'server/**/*.test.{ts,tsx}',
   'scripts/**/*.test.{ts,tsx}',
   '__tests__/**/*.test.{ts,tsx}',
+  'supabase/**/*.guard.test.js',
 ];
 
 // A happy-dom environment costs ~0.3s per file, so tests that don't render run in node.
@@ -32,6 +33,7 @@ const NODE = [
   'host/**/*.test.{ts,tsx}',
   'player/**/*.test.{ts,tsx}',
   '__tests__/**/*.test.{ts,tsx}',
+  'supabase/**/*.guard.test.js',
   'app/api/**/*.test.{ts,tsx}',
   'components/**/*.test.ts',
   'hooks/**/*.test.ts',
