@@ -52,6 +52,9 @@ import { cn } from '@/lib/utils';
 import type { DeedEvent } from './deed/DeedStamp';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { verdictMessage, wordVerdict } from '@/lib/wordVerdict/wordVerdict';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
+import { useAdventureBoardCoach } from './useAdventureBoardCoach';
+import { rememberLoss, isReplay, clearReplay } from './intro/introReplay';
 const DraftOverlay = dynamic(() => import('./DraftOverlay'), { ssr: false });
 const DeedStamp = dynamic(() => import('./deed/DeedStamp'), { ssr: false });
 
@@ -60,6 +63,7 @@ export const worldBackdrop = (world: number) => `/images/adventure/play/world-${
 // Module-level constant for empty hint array — never changes identity.
 const NO_HINT_CELLS: Cell[] = [];
 const NO_SKINS: ReadonlySet<number> = new Set();
+const COACH_ANCHOR = { selector: '[data-adv-slot="board"] [role="grid"]', edge: 'below' } as const;
 
 interface Props {
   world: number;
@@ -146,6 +150,8 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
   const runRef = useRef(run);
   const variantRef = useRef(variant);
   useEffect(() => { runRef.current = run; variantRef.current = variant; });
+  const board = useAdventureBoardCoach({ active: run.phase === 'playing', grid: run.grid, wordsFound: run.words.length, language });
+  const markSubmit = board.markSubmit;
   const variantOnPath = variant.onPath;
   const onPathSubmit = useCallback((cells: Cell[]) => { tracedRef.current = cells.map(({ row, col }) => ({ row, col })); variantOnPath(cells); }, [variantOnPath]);
 
@@ -154,6 +160,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     const variant = variantRef.current;
     const traced = tracedRef.current;
     tracedRef.current = null;
+    markSubmit();
     const r = await run.submitWord(word);
     if (r === 'idle') return;
     if (r === 'retry') { const seq = ++hitSeq.current; setFeedback({ id: `adv-${seq}`, type: 'duplicate', word, message: verdictMessage(t, wordVerdict('cant-check')), timestamp: seq }); return; }
@@ -204,7 +211,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       if (r === 'chain') setChainBrokenAt(Date.now());
       variant.discard();
     }
-  }, [sfx, lvl, language, earnAchievement, t]);
+  }, [sfx, lvl, language, earnAchievement, t, markSubmit]);
 
   const onHint = useCallback(() => {
     const w = runRef.current.takeHint();
@@ -227,6 +234,8 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         interactive={run.phase === 'playing'}
         onWordSubmit={onWordSubmit}
         onPathSubmit={onPathSubmit}
+        onWordChange={board.onWordChange}
+        onSingleTapDetected={board.onSingleTapDetected}
         language={language}
         tileSkinOverride={worldSkinOverride(world, ownedSkins)}
         frozenTiles={run.frozen}
@@ -235,7 +244,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
         comboLevel={run.combo}
       />
     ),
-    [run.grid, run.phase, onWordSubmit, onPathSubmit, language, world, ownedSkins, run.frozen, frozenFilter, feedback, run.combo],
+    [run.grid, run.phase, onWordSubmit, onPathSubmit, board.onWordChange, board.onSingleTapDetected, language, world, ownedSkins, run.frozen, frozenFilter, feedback, run.combo],
   );
   // Hunt + chain goals live in the VariantPanel (tray / big letter) below the HUD.
   // Hunt: the foe cannot read K.O. before the hidden words are found (that is the real win).
@@ -253,6 +262,7 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     reported.current = res;
     // The node underfoot has now been played out, win or lose: the map must stop
     // offering to resume it.
+    if (lvl && !res.won) rememberLoss(world, run.currentNode ?? lvl.level);
     if (run.currentNode) {
       recordCleared(world, run.currentNode);
       setCleared(readCleared(world));
@@ -326,9 +336,14 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
     setFinaleDone(false);
     setDeed(null);
     setHintWord(null);
+    clearReplay();
     if (lvl?.isBoss || isElite) sfx.playBossEntranceSound?.(); else sfx.playRoundStartSound?.();
     run.begin();
   };
+
+  // A retry of the fight just lost goes straight back in: the intro was read last time.
+  const replay = run.phase === 'ready' && !!lvl && isReplay(world, run.currentNode ?? lvl.level);
+  useEffect(() => { if (replay) begin(); });
 
   const onMapExit = useCallback(() => {
     trackGrowthEvent('adventure_exit', { from: 'level', world });
@@ -437,10 +452,11 @@ export default function AdventureLevel({ world, level, hasNext, onExit, onNext, 
       )}
 
       {/* The card shows the clock the level really starts with (hourglass relic etc.), not the table's base seconds. */}
-      {run.phase === 'ready' && lvl && <LevelIntro world={world} level={shownLevel} floor={floor} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
+      {run.phase === 'ready' && lvl && !replay && <LevelIntro world={world} level={shownLevel} floor={floor} lvl={{ ...lvl, seconds: secs }} onBegin={begin} onExit={onExit} />}
 
       {run.phase === 'playing' && <DeedStamp event={deed} />}
       {run.phase === 'playing' && <ModeCoach mode="adventure" />}
+      {run.phase === 'playing' && <StuckCoachOverlay coach={board.coach} anchor={COACH_ANCHOR} />}
       {/* Ordinary fights: the rival's swing as a watched shot, not a line of HUD text. */}
       {run.phase === 'playing' && lvl && !isCombatKind(lvl.kind) && run.combat && (
         <RivalAttack combat={run.combat} feed={run.combatFx ?? []} />

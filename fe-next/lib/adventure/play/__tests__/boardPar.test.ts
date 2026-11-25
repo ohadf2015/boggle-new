@@ -106,6 +106,14 @@ describe('tuneToBoard', () => {
     expect(medianFor(1, BOSS_LEVEL).enemyHp!).toBeLessThanOrEqual(110);
   });
 
+  it('given the very first fight, when tuned on the same board as the next classic, then it asks clearly less', () => {
+    const par = parForBoard(MEDIAN_TOTAL[4], 4);
+    const first = tuneToBoard(1, 1, par);
+    const third = tuneToBoard(1, 3, par);
+    expect(first.stars[0]).toBeLessThanOrEqual(third.stars[0] * 0.8);
+    expect(first.stars[2]).toBeLessThanOrEqual(third.stars[2] * 0.8);
+  });
+
   it('given a fixed board, when walked world by world, then the clear bar only rises (difficulty grows)', () => {
     const par = parForBoard(MEDIAN_TOTAL[5], 5);
     let prev = 0;
