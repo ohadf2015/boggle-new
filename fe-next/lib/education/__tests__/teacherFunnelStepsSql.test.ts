@@ -22,4 +22,15 @@ describe('teacher funnel 30-day readout', () => {
     expect(report).toContain('is_test_account');
     expect(report).not.toContain('p.email');
   });
+
+  it('reads onboarding and trial_started under the keys the writers persist', () => {
+    // PostHog-only NULL slot: a beacon that fired was invisible to this readout.
+    expect(report).not.toContain('NULL::bigint');
+    expect(report).toContain("event_type = 'teacher_funnel_step'");
+    expect(report).toContain("payload->>'step' = 'onboarding_completed'");
+    expect(report).toContain('min(se.created_at)');
+    expect(report).toContain("p.user_role = 'teacher'");
+    // Canonical Polar trial key, not only the legacy subscription.active envelope.
+    expect(report).toContain("'teacher_trial_started'");
+  });
 });

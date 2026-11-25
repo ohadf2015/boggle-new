@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "node scripts/verify-teacher-funnel.mjs",
     "start": "cd fe-next && npm start",
     "dev": "cd fe-next && npm run dev",
     "build": "cd fe-next && npm run build",
