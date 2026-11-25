@@ -31,6 +31,27 @@ describe('LeaderboardTabSwitch', () => {
     expect(screen.queryByRole('menu')).toBeNull();
   });
 
+  it('opens the More menu in the flow of the board, so the board\'s clipped corners cannot cut it off', () => {
+    render(<LeaderboardTabSwitch t={t} activeTab="today" onTabChange={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('leaderboard-more-tabs'));
+    const menu = screen.getByRole('menu');
+    expect(menu.className.split(/\s+/)).not.toContain('absolute');
+    expect(menu.className.split(/\s+/)).not.toContain('fixed');
+  });
+
+  it('toggles closed and open again on repeated taps of More', () => {
+    render(<LeaderboardTabSwitch t={t} activeTab="today" onTabChange={vi.fn()} />);
+    const more = screen.getByTestId('leaderboard-more-tabs');
+    fireEvent.click(more);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    fireEvent.pointerDown(more);
+    fireEvent.click(more);
+    expect(screen.queryByRole('menu')).toBeNull();
+    fireEvent.pointerDown(more);
+    fireEvent.click(more);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+  });
+
   it('names the picked secondary board on the More segment', () => {
     render(<LeaderboardTabSwitch t={t} activeTab="season" onTabChange={vi.fn()} />);
     const more = screen.getByTestId('leaderboard-more-tabs');
