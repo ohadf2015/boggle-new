@@ -306,14 +306,15 @@ describe('PlayerJoinHandler — two signed-in students share a display name in a
     expect(vi.mocked(handleReconnection).mock.calls[0][4]).toBe('Noa 2');
   });
 
-  it('Given an ordinary multiplayer room, When a second signed-in Noa joins, Then the name is still refused', async () => {
+  it('Given an ordinary multiplayer room, When a second signed-in Noa joins, Then they get in as "Noa 2", never in the first Noa seat', async () => {
     mockCheckSeat.mockResolvedValue({ game: null, refused: false });
     mockGetGame.mockReturnValue(inProgressGame({ users: { Noa: { socketId: 's-a', authUserId: A } } }));
     mockGetSocketIdByUsername.mockReturnValue('s-a');
     const { join, socket } = captureJoinHandler();
     (socket.data as Record<string, unknown>).verifiedUserId = B;
     await join({ gameCode: 'ABC123', username: 'Noa' });
-    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    expect(emitError).not.toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    expect(vi.mocked(handleReconnection).mock.calls[0][4]).toBe('Noa 2');
   });
 });
 
