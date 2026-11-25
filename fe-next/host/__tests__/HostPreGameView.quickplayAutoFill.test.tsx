@@ -197,6 +197,7 @@ describe('HostPreGameView quickplay auto-fill timer', () => {
     expect(trackSoloPlayPrompt).toHaveBeenCalledWith({
       event: 'shown',
       auto_filled: true,
+      lobbyWaitSec: QUICKPLAY_AUTO_FILL_SECONDS,
     });
   });
 

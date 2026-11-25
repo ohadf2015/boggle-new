@@ -33,10 +33,11 @@ export function usePlayerRoundTelemetry({
 }: PlayerRoundTelemetryInput): void {
   // CrazyGames SDK lifecycle (gameplayStart/Stop, happyTime) — required for full launch
   // roundKey resets the lifecycle between tournament rounds so each round emits SDK calls.
+  const serverScore = leaderboard.find(p => p.username === username)?.score;
   useCrazyGamesLifecycle({
     isGameActive: gameActive,
     isGameOver: waitingForResults,
-    score: leaderboard.find(p => p.username === username)?.score ?? 0,
+    score: serverScore ?? 0,
     maxCombo: comboLevel,
     roundKey: tournamentData?.currentRound ?? 0,
   });
@@ -67,7 +68,8 @@ export function usePlayerRoundTelemetry({
     // Same gate the start hook uses — otherwise a `random` room completes under
     // the unresolved mode and never matches its own start.
     ready: gameModeConfirmed,
-    score: mpValidWords.reduce((s, w) => s + (w.score ?? 0), 0),
+    // Wheel Rush and Blast never fill the classic word list; the server's score covers every mode.
+    score: serverScore ?? mpValidWords.reduce((s, w) => s + (w.score ?? 0), 0),
     wordCount: mpValidWords.length,
     extras: {
       gameCode, role: 'player', isMultiplayer: true,

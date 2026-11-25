@@ -233,6 +233,10 @@ export function useHostLobby({
     };
   }, [humanGuestCount, isQuickPlay, isPrivate]);
 
+  const lobbyOpenedAtRef = useRef<number | null>(null);
+  useEffect(() => { lobbyOpenedAtRef.current = Date.now(); }, []);
+  const lobbyWaitSec = () => (lobbyOpenedAtRef.current === null ? 0 : Math.round((Date.now() - lobbyOpenedAtRef.current) / 1000));
+
   // Never leave a queued auto-start behind on unmount.
   useEffect(() => () => {
     if (postFillStartRef.current) clearTimeout(postFillStartRef.current);
@@ -244,7 +248,7 @@ export function useHostLobby({
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
-      trackSoloPlayPrompt({ event: 'shown', auto_filled: true });
+      trackSoloPlayPrompt({ event: 'shown', auto_filled: true, lobbyWaitSec: lobbyWaitSec() });
       // setAutoFill is the backend's bot-fill primitive (the old 'addBots' had
       // no server handler). It adds bots and broadcasts the roster only.
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
@@ -297,7 +301,7 @@ export function useHostLobby({
       clearTimeout(postFillStartRef.current);
       postFillStartRef.current = null;
     }
-    trackSoloPlayPrompt({ event: 'clicked', surface: 'start_button' });
+    trackSoloPlayPrompt({ event: 'clicked', surface: 'start_button', lobbyWaitSec: lobbyWaitSec() });
     (onAutoStartWithBots ?? onStartGame)();
   }, [anyAdActive, startsVsBots, cancelBotCountdown, onAutoStartWithBots, onStartGame]);
 
@@ -312,7 +316,7 @@ export function useHostLobby({
   useEffect(() => {
     if (showSoloPrompt && !soloPromptShownRef.current) {
       soloPromptShownRef.current = true;
-      trackSoloPlayPrompt({ event: 'shown' });
+      trackSoloPlayPrompt({ event: 'shown', lobbyWaitSec: lobbyWaitSec() });
     }
   }, [showSoloPrompt]);
 
@@ -320,7 +324,7 @@ export function useHostLobby({
   // path — no redundant confirm dialog, no client setAutoFill.
   const handleSoloPlayVsBots = useCallback(() => {
     if (anyAdActive) return;
-    trackSoloPlayPrompt({ event: 'clicked', surface: 'status_lane' });
+    trackSoloPlayPrompt({ event: 'clicked', surface: 'status_lane', lobbyWaitSec: lobbyWaitSec() });
     (onAutoStartWithBots ?? onStartGame)();
   }, [anyAdActive, onAutoStartWithBots, onStartGame]);
 
