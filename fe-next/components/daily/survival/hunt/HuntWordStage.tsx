@@ -7,6 +7,7 @@ import { getLifeBonusForWord } from '../constants';
 import { isGoodVerdict, type HuntPhase, type HuntVerdict } from './huntStage';
 import { LUCKY_LIFE_BONUS, pickVariant, praiseFor } from './huntReward';
 import { useLiveWord, type LiveWordStore } from './liveWord';
+import { useTypingDesktop } from '@/lib/input/typedWordHint';
 import styles from './HuntWordStage.module.css';
 
 type TFn = (key: string, params?: Record<string, string | number>) => string;
@@ -34,6 +35,7 @@ const same = (w: string) => w;
 
 export function HuntWordStage({ phase, word, verdict, points, coins = null, message, calm, size = 'phone', live, prompt, combo = 1, lucky = false, t }: HuntWordStageProps) {
   const liveWord = useLiveWord(live, same);
+  const typingDesktop = useTypingDesktop();
   const shownWord = phase === 'live' && live && liveWord ? liveWord : word;
   const letters = phase === 'idle' ? [] : Array.from(shownWord);
   const good = isGoodVerdict(verdict);
@@ -57,7 +59,7 @@ export function HuntWordStage({ phase, word, verdict, points, coins = null, mess
     >
       {phase === 'idle' && (
         <span data-testid="hunt-stage-prompt" data-hint={prompt ? 'true' : undefined} className={styles.prompt}>
-          {prompt || t('wordHunt.survival.stage.prompt')}
+          {prompt || t(typingDesktop ? 'wordHunt.survival.stage.promptTyped' : 'wordHunt.survival.stage.prompt')}
         </span>
       )}
       <div data-testid="hunt-stage-pill" className={styles.pill} data-empty={letters.length === 0 ? 'true' : undefined}>
