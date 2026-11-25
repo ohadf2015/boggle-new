@@ -82,10 +82,7 @@ export const getSession = (): Session | null => {
   }
 };
 
-/**
- * Clear the session cookie
- */
-export const clearSession = (): void => {
+const removeStoredSession = (): void => {
   Cookies.remove(SESSION_COOKIE_NAME);
   try {
     sessionStorage.removeItem(SESSION_COOKIE_NAME);
@@ -93,6 +90,18 @@ export const clearSession = (): void => {
   } catch {
     // Storage blocked
   }
+};
+
+/** Drop the stored room only if it is `gameCode`; the live room's rejoin intent stays. */
+export const forgetStoredRoom = (gameCode: string): void => {
+  if (getSession()?.gameCode === gameCode) removeStoredSession();
+};
+
+/**
+ * Clear the session cookie
+ */
+export const clearSession = (): void => {
+  removeStoredSession();
   // Drop the socket reconnect intent too — leaving the session must prevent any
   // later reconnect from re-joining this game.
   clearRejoinIntent();

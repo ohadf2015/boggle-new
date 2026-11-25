@@ -28,6 +28,7 @@ interface ResultsData {
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, any> };
   wheelRushSummary?: { playerStats?: Record<string, any> };
   classroomSummary?: ClassroomSummary;
+  gameMode?: string;
 }
 
 interface GameStartData {

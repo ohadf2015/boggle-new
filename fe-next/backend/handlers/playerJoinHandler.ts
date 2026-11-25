@@ -55,6 +55,7 @@ import { isLockedOut } from '../modules/classroomLobbyLock.js';
 import { isGameStarting, waitForGameStart } from './gameStartMutex.js';
 import { resolveJoinIdentity } from './playerJoinIdentity.js';
 import { registerPlayerRoomExitHandlers } from './playerRoomExitHandlers.js';
+import { suggestAvailableGuestName } from '@/lib/education/guestNameCollision';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -206,14 +207,18 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // A signed-in seat is never reclaimed without that account: a guest typing the
     // teacher's name would otherwise reconnect into the host seat (and its controls).
     const seated = game.users[username];
+    const friendsRoom = !seat.game && !game.isClassroom;
     if (
       seated &&
       ((seated.authUserId && authUserId && seated.authUserId !== authUserId) ||
         (seated.authUserId && !authUserId) ||
         (seated.guestTokenHash && guestTokenHash && seated.guestTokenHash !== guestTokenHash))
     ) {
-      emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
-      return;
+      if (!friendsRoom || verifiedUserId) {
+        emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
+        return;
+      }
+      username = suggestAvailableGuestName(username, new Set(Object.keys(game.users))).name;
     }
 
     if (isLockedOut(seat.game, { users: game.users, username, authUserId, guestTokenHash, hasSocket: !!getSocketIdByUsername(gameCode, username), inRound: isInProgress(game.gameState) })) {

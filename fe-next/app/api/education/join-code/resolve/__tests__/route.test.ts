@@ -27,6 +27,7 @@ vi.mock('@/lib/education/classroomGameLookup', () => ({
 vi.mock('@/lib/education/liveGameForClassroom', () => ({
   lookupLiveGameForClassroom: vi.fn(async () => null),
 }));
+vi.mock('@/lib/multiplayer/liveArcadeRoom', () => ({ isLiveArcadeRoom: vi.fn(async () => false) }));
 const adminName = vi.hoisted(() => ({ value: null as string | null }));
 vi.mock('@/utils/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -39,6 +40,7 @@ import { createClient } from '@/utils/supabase/server';
 import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
+import { isLiveArcadeRoom } from '@/lib/multiplayer/liveArcadeRoom';
 
 const req = (code: string) =>
   new Request(`https://x.test/api/education/join-code/resolve?code=${code}`) as never;
@@ -62,6 +64,7 @@ beforeEach(() => {
   (checkApiRateLimit as unknown as ReturnType<typeof vi.fn>).mockReturnValue({ success: true });
   (lookupLiveGameForClassroom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(null);
   adminName.value = null;
+  (isLiveArcadeRoom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(false);
 });
 
 describe('GET /api/education/join-code/resolve', () => {
@@ -101,6 +104,20 @@ describe('GET /api/education/join-code/resolve', () => {
     });
     const res = await GET(req('Q3UQ2J'));
     await expect(res.json()).resolves.toMatchObject({ kind: 'classroom', id: 'c1' });
+  });
+
+  it('resolves a live multiplayer room code to kind=arcade', async () => {
+    withClassroom(null);
+    (isLiveArcadeRoom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(true);
+    const res = await GET(req('B3Y98K'));
+    await expect(res.json()).resolves.toEqual({ kind: 'arcade', roomCode: 'B3Y98K' });
+  });
+
+  it('keeps a classroom code ahead of a live room with the same code', async () => {
+    withClassroom({ id: 'c1', name: 'ELA (7th)', language: 'en' });
+    (isLiveArcadeRoom as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(true);
+    const res = await GET(req('Q3UQ2J'));
+    await expect(res.json()).resolves.toMatchObject({ kind: 'classroom' });
   });
 
   it('answers kind=unknown with 200, never an error status', async () => {

@@ -330,6 +330,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
       language={roomLanguage}
       t={t}
       dense={isClassroom}
+      classroom={isClassroom}
       trailing={isClassroom ? <>{fullscreenButton}{exitButton}</> : undefined}
     />
   );

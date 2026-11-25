@@ -122,7 +122,7 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
     // The address has to CARRY the code. A bare "lexiclash.live" has no
     // game-code input anywhere on it (verified on production 2026-08-30), so a
     // student who could not scan the QR had the code and nowhere to type it.
-    expect(screen.getByText(/\/join\/TEST123$/)).toBeInTheDocument();
+    expect(screen.getByText(/\/multiplayer\?room=TEST123$/)).toBeInTheDocument();
     expect(screen.getByText('Game Code')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });
@@ -143,7 +143,7 @@ describe('TvBroadcastView - Join Bar Visibility', () => {
     // The address has to CARRY the code. A bare "lexiclash.live" has no
     // game-code input anywhere on it (verified on production 2026-08-30), so a
     // student who could not scan the QR had the code and nowhere to type it.
-    expect(screen.getByText(/\/join\/TEST123$/)).toBeInTheDocument();
+    expect(screen.getByText(/\/multiplayer\?room=TEST123$/)).toBeInTheDocument();
     expect(screen.getByText('Game Code')).toBeInTheDocument();
     expect(screen.getByText('TEST123')).toBeInTheDocument();
   });

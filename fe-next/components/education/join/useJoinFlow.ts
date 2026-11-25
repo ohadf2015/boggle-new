@@ -133,6 +133,11 @@ export function useJoinFlow(
     setCodeErrorKey('education.student.join.invalidCode');
   }, [step, target, targetCode, code, isSubmitting, name]);
 
+  useEffect(() => {
+    if (target?.verdict !== 'arcade' || targetCode !== code) return;
+    router.replace(`/${language}/multiplayer?room=${encodeURIComponent(target.gameCode ?? code)}`);
+  }, [target, targetCode, code, language, router]);
+
   /* ── Keep the sign-in return path alive from every entry point. ──────── */
   useEffect(() => {
     if (code.length !== JOIN_CODE_LENGTH || user) return;

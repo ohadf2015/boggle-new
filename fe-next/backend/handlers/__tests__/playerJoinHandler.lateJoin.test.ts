@@ -208,12 +208,44 @@ describe('PlayerJoinHandler — a taken display name is not a reconnect', () => 
     mockCheckSeat.mockResolvedValue({ game: null, refused: false });
   });
 
-  it('refuses a different guest who types the name of a seated student', async () => {
+  it('seats a different guest who types a taken name as "Sam 2" instead of refusing', async () => {
     mockGetGame.mockReturnValue(inProgressGame({ users: { Sam: { socketId: 'old-socket', guestTokenHash: 'h1' } } }));
+    mockGetSocketIdByUsername.mockImplementation((_code: string, name: string) => (name === 'Sam' ? 'old-socket' : undefined));
+    const { join, socket } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Sam', guestTokenHash: 'h2' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(handleReconnection).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Sam 2', 'late-socket-1', expect.objectContaining({ guestTokenHash: 'h2' }));
+    expect(socket.emit).toHaveBeenCalledWith('joined', expect.objectContaining({ username: 'Sam 2' }));
+  });
+
+  it('still refuses a taken name in a classroom room, where the join screen asks for another', async () => {
+    mockCheckSeat.mockResolvedValue({ game: { settings: {} }, refused: false });
+    mockGetGame.mockReturnValue(inProgressGame({ isClassroom: true, users: { Sam: { socketId: 'old-socket', authUserId: '11111111-1111-4111-8111-111111111111' } } }));
     const { join } = captureJoinHandler();
     await join({ gameCode: 'ABC123', username: 'Sam', guestTokenHash: 'h2' });
     expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+  });
+
+  it('reconnects the host opening their own invite on a socket verified as their account', async () => {
+    const HOST = '11111111-1111-4111-8111-111111111111';
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'waiting', users: { Dana: { socketId: 'old-socket', isHost: true, authUserId: HOST } } }));
+    const { join, socket } = captureJoinHandler();
+    (socket.data as Record<string, unknown>).verifiedUserId = HOST;
+    await join({ gameCode: 'ABC123', username: 'Dana' });
+    expect(emitError).not.toHaveBeenCalled();
+    expect(handleReconnection).toHaveBeenCalled();
+    expect(mockAddUserToGame).not.toHaveBeenCalled();
+  });
+
+  it('never hands the host seat to an unverified join that only claims the host\'s account id', async () => {
+    const HOST = '11111111-1111-4111-8111-111111111111';
+    mockGetGame.mockReturnValue(inProgressGame({ gameState: 'waiting', users: { Dana: { socketId: 'old-socket', isHost: true, authUserId: HOST } } }));
+    mockGetSocketIdByUsername.mockImplementation((_code: string, name: string) => (name === 'Dana' ? 'old-socket' : undefined));
+    const { join } = captureJoinHandler();
+    await join({ gameCode: 'ABC123', username: 'Dana', authUserId: HOST });
     expect(handleReconnection).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Dana 2', 'late-socket-1', expect.anything());
   });
 
   it('still reconnects the same guest (same token hash)', async () => {
@@ -224,12 +256,13 @@ describe('PlayerJoinHandler — a taken display name is not a reconnect', () => 
     expect(handleReconnection).toHaveBeenCalled();
   });
 
-  it('refuses a guest who types the name of a signed-in seat (the teacher host or a signed-in student)', async () => {
-    mockGetGame.mockReturnValue(inProgressGame({ users: { Dana: { socketId: 'old-socket', authUserId: '11111111-1111-4111-8111-111111111111' } } }));
+  it('never hands a guest typing a signed-in host\'s name that seat: they sit as "Dana 2"', async () => {
+    mockGetGame.mockReturnValue(inProgressGame({ users: { Dana: { socketId: 'old-socket', isHost: true, authUserId: '11111111-1111-4111-8111-111111111111' } } }));
+    mockGetSocketIdByUsername.mockImplementation((_code: string, name: string) => (name === 'Dana' ? 'old-socket' : undefined));
     const { join } = captureJoinHandler();
-    await join({ gameCode: 'ABC123', username: 'Dana', guestTokenHash: 'h2' });
-    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    await join({ gameCode: 'ABC123', username: 'Dana', guestTokenHash: 'h2', authUserId: '99999999-9999-4999-8999-999999999999' });
     expect(handleReconnection).not.toHaveBeenCalled();
+    expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Dana 2', 'late-socket-1', expect.anything());
   });
 
   it('keeps reconnecting when the seat or the joiner carries no identity to compare', async () => {

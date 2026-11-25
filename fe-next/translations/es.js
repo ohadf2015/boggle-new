@@ -21658,6 +21658,9 @@ const es = {
     },
     "round": {
       "getReady": "Prepárate",
+      "youVsBots_one": "Tú contra {count} bot",
+      "youVsBots_few": "Tú contra {count} bots",
+      "youVsBots_other": "Tú contra {count} bots",
       "mode": {
         "classic": {
           "name": "Clásico",

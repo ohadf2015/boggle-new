@@ -12,7 +12,12 @@
  */
 const FALLBACK_HOST = 'lexiclash.live';
 
-export function tvJoinAddress(baseUrl: string, language: string, gameCode: string): string {
+/** `/join/` resolves class codes; a friends room joins on the multiplayer page itself. */
+export function roomJoinPath(language: string, gameCode: string, classroom: boolean): string {
+  return classroom ? `/${language}/join/${gameCode}` : `/${language}/multiplayer?room=${gameCode}`;
+}
+
+export function tvJoinAddress(baseUrl: string, language: string, gameCode: string, classroom = true): string {
   let host: string;
   try {
     host = new URL(baseUrl).host.replace(/^www\./, '');
@@ -21,5 +26,5 @@ export function tvJoinAddress(baseUrl: string, language: string, gameCode: strin
   }
   if (!host) return FALLBACK_HOST;
   if (!gameCode) return host;
-  return `${host}/${language}/join/${gameCode}`;
+  return `${host}${roomJoinPath(language, gameCode, classroom)}`;
 }

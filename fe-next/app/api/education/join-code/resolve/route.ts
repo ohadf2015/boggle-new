@@ -6,6 +6,7 @@ import { lookupLiveClassroomGame } from '@/lib/education/classroomGameLookup';
 import { lookupLiveGameForClassroom } from '@/lib/education/liveGameForClassroom';
 import logger from '@/utils/logger';
 import { foldJoinCode } from '@/lib/education/joinCodeInput';
+import { isLiveArcadeRoom } from '@/lib/multiplayer/liveArcadeRoom';
 
 /**
  * GET /api/education/join-code/resolve?code=ABC123
@@ -120,6 +121,11 @@ export async function GET(request: Request) {
   } catch (err) {
     // Redis unavailable. Degrade to 'unknown' so the page still renders both doors.
     logger.error('join-code resolve: game lookup threw:', err);
+  }
+
+  // 3. A friends' multiplayer room: the TV lobby and shared links once printed /join/ for these.
+  if (await isLiveArcadeRoom(code)) {
+    return NextResponse.json({ kind: 'arcade', roomCode: code });
   }
 
   return NextResponse.json(degraded ? { kind: 'unknown', degraded: true } : { kind: 'unknown' });

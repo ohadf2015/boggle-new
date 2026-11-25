@@ -89,6 +89,7 @@ export interface OnShowResultsData {
   classroomSummary?: ClassroomSummary;
   isRanked?: boolean;
   mmrChanges?: Record<string, { oldMmr: number; newMmr: number; delta: number }>;
+  gameMode?: string;
 }
 
 export interface UsePlayerGameEventsProps {

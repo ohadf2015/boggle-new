@@ -21646,6 +21646,9 @@ const ja = {
     },
     "round": {
       "getReady": "準備して",
+      "youVsBots_one": "ボット{count}体と対戦",
+      "youVsBots_few": "ボット{count}体と対戦",
+      "youVsBots_other": "ボット{count}体と対戦",
       "mode": {
         "classic": {
           "name": "クラシック",

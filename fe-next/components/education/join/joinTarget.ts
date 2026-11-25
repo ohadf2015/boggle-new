@@ -20,7 +20,7 @@ import { endedJoinCodeStatus } from './endedJoinCode';
  * "wrong code" is recurring pitfall class 4 in its most expensive form: our
  * outage, rendered as their typo, to an entire school at once.
  */
-export type JoinTargetVerdict = 'classroom' | 'game' | 'ended' | 'invalid' | 'unverified';
+export type JoinTargetVerdict = 'classroom' | 'game' | 'arcade' | 'ended' | 'invalid' | 'unverified';
 
 export interface JoinTarget {
   verdict: JoinTargetVerdict;
@@ -54,6 +54,7 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
           classroomName?: string;
           gameCode?: string;
           liveGameCode?: string | null;
+          roomCode?: string;
         }
       | null;
 
@@ -71,6 +72,9 @@ export async function resolveJoinTarget(code: string): Promise<JoinTarget> {
         classroomId: data.classroomId,
         gameCode: data.gameCode ?? normalized,
       };
+    }
+    if (data?.kind === 'arcade') {
+      return { verdict: 'arcade', gameCode: data.roomCode ?? normalized };
     }
     if (data?.kind === 'ended') {
       return data.classroomName ? { verdict: 'ended', label: data.classroomName } : { verdict: 'ended' };

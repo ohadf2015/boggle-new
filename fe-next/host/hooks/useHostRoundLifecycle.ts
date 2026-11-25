@@ -72,6 +72,13 @@ export function useHostRoundLifecycle({
     return rows.filter(p => p.isBot).length;
   }, [tournament.finalScores]);
 
+  // Final scores do not exist yet when a round starts; the lobby roster does.
+  const lobbyComposition = useMemo(() => {
+    const roster = players.playersReady ?? [];
+    const bots = roster.filter(p => p?.isBot).length;
+    return { humans: roster.length - bots, bots };
+  }, [players.playersReady]);
+
   // PostHog funnel parity: emit `growth:game_started` once when the host's
   // game becomes active. Without this, MP `game_completed` events have no
   // matching `game_started`, blinding started→finished funnels.
@@ -83,8 +90,8 @@ export function useHostRoundLifecycle({
       gameCode, role: 'host', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
       requestedMode: hostSelectedGameMode ?? 'random',
-      playerCount: tournament.finalScores?.players?.length ?? 0,
-      botCount: botPlayerCount,
+      playerCount: lobbyComposition.humans,
+      botCount: lobbyComposition.bots,
     },
   });
 

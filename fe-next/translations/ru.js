@@ -21368,6 +21368,9 @@ const ru = {
     },
     "round": {
       "getReady": "Приготовься",
+      "youVsBots_one": "Ты против {count} бота",
+      "youVsBots_few": "Ты против {count} ботов",
+      "youVsBots_other": "Ты против {count} ботов",
       "mode": {
         "classic": {
           "name": "Классика",

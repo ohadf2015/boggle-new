@@ -33,6 +33,11 @@ const EDU_AREAS = new Set(['teacher', 'education', 'student', 'join', 'api']);
 // Not the game home: legal and contact pages, opened in a new tab so the classroom stays open behind them.
 const ALLOWED_OUTSIDE = [/^legal\//, /^contact(?:[/?#]|$)/];
 
+// A code typed at /join that belongs to a live friends' room (not a classroom) continues to that room.
+const JOIN_HANDOFF: Record<string, string> = {
+  'components/education/join/useJoinFlow.ts': 'multiplayer?room=',
+};
+
 // Files an open peer PR is rewriting; skipped rather than pinned so either merge order stays green.
 const SAME_TAB_PENDING = new Set<string>();
 
@@ -156,7 +161,8 @@ describe('edu exit targets: every in-product link stays in /teacher, /education,
     const outside = findings
       .filter((f) => f.verdict.kind === 'outside')
       .map((f) => `${f.rel} -> ${f.target}`)
-      .filter((line) => !Object.entries(PENDING).some(([file, head]) => line.startsWith(`${file} -> `) && line.includes(`/${head}`)));
+      .filter((line) => !Object.entries(PENDING).some(([file, head]) => line.startsWith(`${file} -> `) && line.includes(`/${head}`)))
+      .filter((line) => !Object.entries(JOIN_HANDOFF).some(([file, head]) => line.startsWith(`${file} -> `) && line.includes(`/${head}`)));
     expect(outside).toEqual([]);
   });
 

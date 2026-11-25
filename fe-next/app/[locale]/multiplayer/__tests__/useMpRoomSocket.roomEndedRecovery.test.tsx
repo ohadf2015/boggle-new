@@ -8,7 +8,7 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 type Options = {
-  onError: (d: { code?: string; message?: string }) => void;
+  onError: (d: { code?: string; message?: string; details?: { gameCode?: string } }) => void;
   onJoined: (d: { isHost: boolean; gameCode: string }) => void;
 };
 let captured: Options | null = null;
@@ -24,7 +24,10 @@ vi.mock('@/hooks/useMultiplayerSocket', () => ({
     };
   },
 }));
-vi.mock('@/utils/session', () => ({ saveSession: vi.fn(), clearSession: vi.fn(), clearSessionPreservingUsername: vi.fn() }));
+const { clearSession, forgetStoredRoom } = vi.hoisted(() => ({ clearSession: vi.fn(), forgetStoredRoom: vi.fn() }));
+vi.mock('@/utils/session', () => ({
+  saveSession: vi.fn(), clearSession, clearSessionPreservingUsername: vi.fn(), forgetStoredRoom,
+}));
 vi.mock('@/utils/profileStorage', () => ({ setStoredUsername: vi.fn() }));
 const { trackGrowthEvent, toast } = vi.hoisted(() => ({
   trackGrowthEvent: vi.fn(),
@@ -39,6 +42,7 @@ vi.mock('react-hot-toast', () => ({ default: toast }));
 import { useMpRoomSocket, type MpRoomSocketContext } from '../useMpRoomSocket';
 import type { ClassroomContext } from '@/lib/education/classroomRoomGone';
 import { markRoomEndedRecoveryAccepted, resetRoomEndedRecoveryForTests } from '@/lib/multiplayer/roomEndedRecovery';
+import { setRejoinIntent, clearRejoinIntent } from '@/utils/socketRejoin';
 
 function ctx(context: ClassroomContext, overrides: Partial<MpRoomSocketContext> = {}, isHost = false): MpRoomSocketContext {
   return {
@@ -66,6 +70,46 @@ describe('useMpRoomSocket — dead room → one-tap Quick Play', () => {
     trackGrowthEvent.mockClear();
     toast.mockClear();
     resetRoomEndedRecoveryForTests();
+    clearSession.mockClear();
+    forgetStoredRoom.mockClear();
+    clearRejoinIntent();
+  });
+
+  it('GIVEN the same dead code answers again THEN the offer shows once and later replies only toast', () => {
+    const c = ctx('arcade');
+    renderHook(() => useMpRoomSocket(c));
+    act(() => { captured!.onError({ code: 'GAME_NOT_FOUND', details: { gameCode: 'ABC123' } }); });
+    act(() => { captured!.onError({ code: 'GAME_NOT_FOUND', details: { gameCode: 'ABC123' } }); });
+    act(() => { captured!.onError({ code: 'GAME_NOT_FOUND', details: { gameCode: 'ABC123' } }); });
+
+    expect(c.offerQuickPlayRecovery).toHaveBeenCalledTimes(1);
+    expect(recoveryCalls()).toHaveLength(1);
+  });
+
+  it('GIVEN the player now sits in another room WHEN a stale rejoin of the old room is refused THEN only the stored old room is dropped', () => {
+    const c = ctx('arcade', { gameCode: 'NEW111', isActive: true });
+    renderHook(() => useMpRoomSocket(c));
+    act(() => { captured!.onError({ code: 'GAME_NOT_FOUND', details: { gameCode: 'OLD999' } }); });
+
+    expect(forgetStoredRoom).toHaveBeenCalledWith('OLD999');
+    expect(clearSession).not.toHaveBeenCalled();
+    expect(c.offerQuickPlayRecovery).not.toHaveBeenCalled();
+    expect(toast).not.toHaveBeenCalled();
+    expect(c.setIsActive).not.toHaveBeenCalled();
+    expect(c.setGameCode).not.toHaveBeenCalled();
+  });
+
+  it('GIVEN a join to a new room is in flight WHEN the old stored room answers dead first THEN the new join is left running', () => {
+    setRejoinIntent({ gameCode: 'NEW111', username: 'me' });
+    const c = ctx('arcade', { gameCode: '', isActive: false });
+    renderHook(() => useMpRoomSocket(c));
+    act(() => { captured!.onError({ code: 'GAME_NOT_FOUND', details: { gameCode: 'OLD999' } }); });
+
+    expect(forgetStoredRoom).toHaveBeenCalledWith('OLD999');
+    expect(clearSession).not.toHaveBeenCalled();
+    expect(c.offerQuickPlayRecovery).not.toHaveBeenCalled();
+    expect(c.setShouldAutoJoin).not.toHaveBeenCalled();
+    expect(c.setPrefilledRoomCode).not.toHaveBeenCalled();
   });
 
   it('GIVEN a cold arcade join WHEN the room is gone THEN offers Quick Play and counts the offer', () => {
