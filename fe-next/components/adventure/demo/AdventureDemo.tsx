@@ -18,6 +18,8 @@ import type { Language } from '@/types';
 import { GameShell } from '@/components/game/shell';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { AdventureLeftRail, AdventureRightRail } from './AdventureShellRails';
+import { useAdventureBoardCoach } from '../play/useAdventureBoardCoach';
+import { StuckCoachOverlay } from '@/components/game/ftue/StuckCoachOverlay';
 
 interface AdventureDemoProps {
   onExit: () => void;
@@ -26,6 +28,7 @@ interface AdventureDemoProps {
 const WORLD = 1;
 const WORLD_NAME = WORLD_CONFIGS.find((w) => w.id === WORLD)?.name ?? '';
 const worldBackdrop = (world: number) => `/images/adventure/play/world-${world}.webp`;
+const COACH_ANCHOR = { selector: '[data-testid="adventure-board"] [role="grid"]', edge: 'below' } as const;
 
 interface DemoRunProps {
   language: Language;
@@ -37,13 +40,16 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
   const { t } = useLanguageSafe();
   const isWord = useWordChecker(language);
   const run = useAdventureDemo({ language, isWord });
+  const board = useAdventureBoardCoach({ active: run.phase === 'playing', grid: run.grid, wordsFound: run.words.length, language });
+  const { markSubmit } = board;
 
   const handleWordSubmit = useCallback(
     async (word: string) => {
+      markSubmit();
       const result = await run.submit(word);
       return result;
     },
-    [run]
+    [run, markSubmit]
   );
 
   // The guest already chose "play a free battle" — no second start button.
@@ -144,10 +150,13 @@ function DemoRun({ language, onPlayAgain, onExit }: DemoRunProps): ReactNode {
               interactive={run.phase === 'playing'}
               highlightedPath={keyboard.highlightedCells}
               isTypingMode={keyboard.isTypingMode}
+              onWordChange={board.onWordChange}
+              onSingleTapDetected={board.onSingleTapDetected}
             />
           </div>
         </GameShell>
       )}
+      {run.phase === 'playing' && <StuckCoachOverlay coach={board.coach} anchor={COACH_ANCHOR} />}
 
     </div>
   );
