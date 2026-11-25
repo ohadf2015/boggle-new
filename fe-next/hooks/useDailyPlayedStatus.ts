@@ -103,6 +103,7 @@ interface Entry {
   data: DailyPlayedStatus | null;
   fetchedAt: number;
   settled: boolean;
+  failed: boolean;
   inflight: Promise<void> | null;
   inflightSince: number;
 }
@@ -130,7 +131,7 @@ function revalidate(playerId: string, force = false): Promise<void> {
   const day = getDailyChallengeDate();
   const key = entryKey(playerId, day);
   if (!entry || entry.key !== key) {
-    entry = { key, data: null, fetchedAt: 0, settled: false, inflight: null, inflightSince: 0 };
+    entry = { key, data: null, fetchedAt: 0, settled: false, failed: false, inflight: null, inflightSince: 0 };
   }
   const current = entry;
   if (current.inflight && Date.now() - current.inflightSince < STUCK_MS) return current.inflight;
@@ -147,6 +148,7 @@ function revalidate(playerId: string, force = false): Promise<void> {
         `/api/daily/status?userId=${encodeURIComponent(playerId)}&day=${day}`,
         { signal: AbortSignal.timeout(5000), cache: 'no-store' },
       );
+      current.failed = !response.ok;
       if (response.ok) {
         const body = (await response.json()) as DailyPlayedStatus;
         // An answer for another day (clock skew around midnight) is not today's.
@@ -158,6 +160,7 @@ function revalidate(playerId: string, force = false): Promise<void> {
         console.warn('[useDailyPlayedStatus] status', response.status);
       }
     } catch (error) {
+      current.failed = true;
       console.warn('[useDailyPlayedStatus] fetch error:', error);
     } finally {
       current.settled = true;
@@ -190,6 +193,8 @@ export function __resetDailyPlayedStatusStore() {
 export type DailyPlayedStatusResult = DailyPlayedStatus & {
   /** Has this player ever finished a daily (any mode, any day)? */
   hasPlayedBefore: boolean;
+  /** The server never answered: `today` is this device's flags only and the rest is unknown, not zero. */
+  failed: boolean;
   /** Silent revalidation: never flips `loading` back on once resolved. */
   refresh: () => Promise<void>;
 };
@@ -273,6 +278,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
       loading: true,
       fromServer: false,
       hasPlayedBefore: false,
+      failed: false,
       refresh,
     };
   }
@@ -287,6 +293,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
       loading: false,
       fromServer: false,
       hasPlayedBefore: localEver || anyPlayed(today),
+      failed: false,
       refresh,
     };
   }
@@ -302,6 +309,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
       today,
       loading: false,
       hasPlayedBefore: data.allCompletedDates.length > 0 || data.streak.longest > 0 || anyPlayed(today) || localEver,
+      failed: false,
       refresh,
     };
   }
@@ -317,6 +325,7 @@ export function useDailyPlayedStatus(): DailyPlayedStatusResult {
     loading: !shared?.settled,
     fromServer: false,
     hasPlayedBefore: localEver || anyPlayed(today),
+    failed: Boolean(shared?.settled && shared.failed),
     refresh,
   };
 }

@@ -147,6 +147,26 @@ jobs:
                Write ${{ env.OUT }}/body.md: what the radar showed, what you verified (with numbers), what you changed,
                how to check it after deploy, and every dismissal with its evidence.
 
+      - name: Show the agent's error
+        if: failure()
+        run: |
+          f="$RUNNER_TEMP/claude-execution-output.json"
+          mkdir -p "$OUT"
+          if [ -f "$f" ]; then
+            cp "$f" "$OUT/claude-execution-output.json"
+          else
+            echo "::error::Claude failed and wrote no execution output"
+            exit 1
+          fi
+          msg=$(jq -r '[.[] | select(.type == "result") | (.result // empty), (.error // empty)] | map(select(type == "string" and length > 0)) | first // empty' "$f" || true)
+          if [ -z "$msg" ]; then
+            msg=$(jq -c '.[] | select(.type == "result")' "$f" || echo "unreadable claude-execution-output.json")
+          fi
+          one=$(printf '%s' "$msg" | tr '\n' ' ' | cut -c1-500)
+          printf '%s\n' "$one"
+          echo "::error title=Claude execution failed::$one"
+          exit 1
+
       - uses: actions/upload-artifact@v4
         if: always() && steps.open.outputs.full != 'true'
         with:

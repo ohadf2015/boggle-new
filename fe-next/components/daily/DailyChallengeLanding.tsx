@@ -187,7 +187,7 @@ export function DailyChallengeLanding({
   // neutral skeleton rather than a Word Wheel hero that flips.
   const statusReady = local.resolved && !dailyPlayedStatus.loading;
   const anyPlayedToday = Object.values(playedById).some(Boolean);
-  const isNewcomer = statusReady && !dailyPlayedStatus.hasPlayedBefore && !anyPlayedToday;
+  const isNewcomer = statusReady && !dailyPlayedStatus.failed && !dailyPlayedStatus.hasPlayedBefore && !anyPlayedToday;
 
   const completedCount = requiredDailyModes(DAILY_MODES).filter((mode) => playedById[mode.id]).length;
 
@@ -237,6 +237,17 @@ export function DailyChallengeLanding({
 
       {statusReady ? (
         <>
+        {dailyPlayedStatus.failed && (
+          <button
+            type="button"
+            onClick={() => void dailyPlayedStatus.refresh()}
+            className="w-full text-center text-sm font-bold text-neo-cream/80 underline underline-offset-2"
+            data-testid="daily-status-retry"
+          >
+            {t('errors.loadFailed')}
+          </button>
+        )}
+
         {isNewcomer && primaryMode && <NewcomerTip modeTitle={t(primaryMode.titleKey)} />}
 
         {completedCount >= REQUIRED_COUNT && wordHuntStatus !== 'lost' && !dayCleared && (
