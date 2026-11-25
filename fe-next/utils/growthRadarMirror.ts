@@ -22,6 +22,7 @@
 // ---------------------------------------------------------------------------
 
 import { normalizeGrDistinctId } from '@/lib/auth/emailSignupMeta';
+import { SPECIFIC_GAME_EVENT } from '@/utils/eventContext';
 
 declare global {
   interface Window {
@@ -199,7 +200,7 @@ export function mirrorGrowthEvent(
   event: string,
   properties?: Record<string, unknown>,
 ): void {
-  if (!MIRRORED_EVENTS.has(event)) return;
+  if (!MIRRORED_EVENTS.has(event) && !SPECIFIC_GAME_EVENT.test(event)) return;
   if (isLoopbackPage()) return;
   grCaptureOrQueue(`growth:${event}`, sanitizeProps(properties));
 }

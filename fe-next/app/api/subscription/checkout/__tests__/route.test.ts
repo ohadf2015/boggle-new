@@ -221,6 +221,20 @@ describe('POST /api/subscription/checkout', () => {
     for (const e of started) expect(e.properties.entry_source).toBe('class_report_button')
   })
 
+  it('stamps the page and landing page on the started events and the Polar checkout, dropping unknown keys', async () => {
+    getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
+    createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: 'c1' })
+    await POST(new Request('http://localhost/api/subscription/checkout', {
+      method: 'POST',
+      body: JSON.stringify({ trial: true, attribution: { page: '/en/teacher/upgrade', landing_page: 'https://evil.example', utm_source: 'google', email: 'a@b.c' } }),
+    }))
+    expect(createCheckout.mock.calls[0][0].attribution).toEqual({ page: '/en/teacher/upgrade', utm_source: 'google' })
+    const started = captureEduServerEvents.mock.calls.flatMap((c) => c[0] as Array<{ event: string; properties: Record<string, unknown> }>)
+      .filter((e) => e.event === 'checkout_started')
+    expect(started[0].properties).toMatchObject({ page: '/en/teacher/upgrade', utm_source: 'google' })
+    expect(started[0].properties).not.toHaveProperty('email')
+  })
+
   it('drops an entry source that is not a plain tag', async () => {
     getAuthedUser.mockResolvedValue({ id: 'u1', email: 'teacher@example.com' })
     createCheckout.mockResolvedValue({ url: 'https://polar.sh/checkout/u1', id: 'c1' })

@@ -30,6 +30,7 @@ import { incrementGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { incrementGamesPlayed } from '@/utils/pushNotifications';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { mirrorGrowthEvent } from '@/utils/growthRadarMirror';
+import { pageContext, specificGameEventName } from '@/utils/eventContext';
 import {
   setPostHogUserProps,
   setPostHogUserPropsOnce,
@@ -347,6 +348,7 @@ export type GrowthEvent =
   | 'edu_access_verify_resent'
   | 'edu_access_pending_finish'
   | 'edu_access_request_submitted'
+  | 'edu_access_request_failed'
   // Teacher classroom ACTIVATION funnel (t_44f87dd2) — mirrored from
   // lib/education/telemetry.ts with identical props so Growth Radar's
   // run_funnel can measure class created → code copied → first student →
@@ -834,6 +836,7 @@ export const trackGrowthEvent = (
   }
 
   const enrichedData: GrowthEventData = {
+    ...pageContext(),
     ...data,
     timestamp: Date.now(),
     sessionId: getSessionId(),
@@ -880,6 +883,16 @@ export const trackGrowthEvent = (
     }
   } catch {
     // Silently fail if PostHog not initialized
+  }
+
+  const specific = specificGameEventName(event, enrichedData);
+  if (specific) {
+    try {
+      posthog.capture(`growth:${specific}`, enrichedData);
+    } catch {
+      // Silently fail if PostHog not initialized
+    }
+    mirrorGrowthEvent(specific, enrichedData);
   }
 
   // Mirror the funnel spine to Growth Radar (window.gr). PostHog is

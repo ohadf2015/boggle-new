@@ -22,6 +22,7 @@ export interface ProfileAttributionPayload {
   language?: string | null;
   country_code?: string | null;
   gr_distinct_id?: string | null;
+  page?: string | null;
 }
 
 export interface AttributionExtras {
@@ -60,11 +61,12 @@ export async function persistProfileAttribution(
     country_code: extras?.countryCode ?? metaStr(meta, 'country_code'),
     // The id stashed at signUp matches the pre-signup pageviews; the confirm tab may have a different one.
     gr_distinct_id: metaStr(meta, 'gr_distinct_id') ?? grDistinctId(),
+    page: typeof window !== 'undefined' ? window.location.pathname : null,
   };
 
   // Nothing to persist — skip the round-trip. Metadata from a cross-browser
   // confirm counts: the local first-touch is gone, the account still has it.
-  if (!Object.values(payload).some((value) => value)) return false;
+  if (!Object.entries(payload).some(([key, value]) => key !== 'page' && value)) return false;
 
   try {
     // Attach a bearer token when a session is available so the route

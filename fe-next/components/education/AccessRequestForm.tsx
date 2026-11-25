@@ -118,17 +118,27 @@ export function AccessRequestForm({
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ locale: language as TeacherLocale, use_case: useCase.trim(), ...(role ? { role } : {}) }),
       });
-      try {
-        trackGrowthEvent('edu_access_request_submitted', { ok: res.ok, status: res.status });
-      } catch {
-        /* telemetry must never break access request */
-      }
       if (!res.ok) {
+        try {
+          trackGrowthEvent('edu_access_request_failed', { status: res.status });
+        } catch {
+          /* telemetry must never break access request */
+        }
         setError(res.status === 429 ? t('education.access.rate_limited') : t('education.access.submit_error'));
         return;
       }
       writeDraft(userId, null);
       const json = await res.json().catch(() => null);
+      try {
+        trackGrowthEvent('edu_access_request_submitted', {
+          status: res.status,
+          outcome: json?.approvalPending ? 'approval_pending' : json?.alreadyApproved ? 'already_approved' : 'approved',
+          paid_day0: !!json?.paidDay0,
+          ...(role ? { role } : {}),
+        });
+      } catch {
+        /* telemetry must never break access request */
+      }
       if (json?.approvalPending) {
         setApprovalPending(true);
         return;

@@ -29,12 +29,14 @@ import {
 import { firstWebhookTelemetry } from '@/lib/education/pro/webhookTelemetryOnce'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
+import { cleanAttribution } from '@/utils/eventContext'
 
 // Polar payloads are large; we only read a handful of fields.
 type WebhookPayload = any
 
 function captureFunnel(payload: WebhookPayload, userId: string | undefined, event: EduServerEvent) {
-  captureProFunnelServerEvent(withPolarMetadataIdentity(event, payload?.data?.metadata, userId))
+  const tagged = { ...event, properties: { ...cleanAttribution(payload?.data?.metadata), ...event.properties } }
+  captureProFunnelServerEvent(withPolarMetadataIdentity(tagged, payload?.data?.metadata, userId))
 }
 
 /** Map Polar subscription statuses onto our internal union. Anything unrecognised fails closed. */

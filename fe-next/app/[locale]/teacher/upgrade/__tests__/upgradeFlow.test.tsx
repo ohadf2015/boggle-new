@@ -110,7 +110,7 @@ describe('upgrade page — logged-out visitor', () => {
     fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
     await waitFor(() => expect(screen.getByTestId('auth-modal')).toBeInTheDocument());
     expect(mark).toHaveBeenCalledWith({ trial: true });
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en' });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', attribution: { page: '/', landing_page: '/' } });
   });
 
   it('a 503 says checkout is offline (not "try again shortly") and points somewhere useful', async () => {
@@ -203,7 +203,7 @@ describe('upgrade page — signed-in teachers', () => {
     fetchMock.mockResolvedValue({ ok: true, status: 200, json: async () => ({ url: 'https://pay.test' }) });
     await act(async () => { render(<PageClient />); });
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en' });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', attribution: { page: '/', landing_page: '/' } });
   });
 
   it('waits for the entitlement read before consuming the resume intent', async () => {
@@ -258,7 +258,7 @@ describe('upgrade page — arriving from an in-product Pro offer', () => {
     render(<PageClient />);
     fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', source: 'class_report_button' });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', source: 'class_report_button', attribution: { page: '/', landing_page: '/' } });
   });
 
   it('stays closed once the teacher backs out', () => {
@@ -302,6 +302,6 @@ describe('upgrade page — arriving from an in-product Pro offer', () => {
     fireEvent.click(screen.getByTestId('pricing-trial-cta'));
     fireEvent.click(screen.getByTestId('pre-checkout-confirm'));
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en' });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ trial: true, locale: 'en', attribution: { page: '/', landing_page: '/' } });
   });
 });
