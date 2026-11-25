@@ -10457,6 +10457,7 @@ const ja = {
     "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
     "firstHint": "タップかなぞる。どの単語にも {letter}",
+    "firstHintTyped": "入力して Enter。どの単語にも {letter} を使います",
     "tapLetters": "文字をタップまたはドラッグして単語を作ろう",
     "tapToRemove": "追加した文字をもう一度タップで削除",
     "doubleTapToSubmit": "文字をダブルタップで送信",
@@ -10739,6 +10740,7 @@ const ja = {
       "scoreBreakdownTooltip": "詳細はタップ",
       "stage": {
         "prompt": "文字をなぞって単語を作ろう",
+        "promptTyped": "単語を入力するか、文字をなぞってください",
         "praiseShort": "いいね！|よし！|ナイス！|その調子！",
         "praiseMid": "うまい！|ドーン！|さすが！|最高！",
         "praiseLong": "超ロング！|天才！|お見事！|すごすぎ！",

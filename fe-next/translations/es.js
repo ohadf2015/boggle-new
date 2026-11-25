@@ -10417,6 +10417,7 @@ const es = {
     "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
     "firstHint": "Toca o desliza: todas llevan la {letter}",
+    "firstHintTyped": "Escríbela y pulsa Enter. Cada palabra usa la {letter}",
     "tapLetters": "Toca o arrastra letras para formar una palabra",
     "tapToRemove": "Toca otra vez una letra añadida para quitarla",
     "doubleTapToSubmit": "Toca dos veces una letra para enviar",
@@ -10613,6 +10614,7 @@ const es = {
       "scoreBreakdownTooltip": "Toca para detalles",
       "stage": {
         "prompt": "Desliza por las letras y forma una palabra",
+        "promptTyped": "Escribe una palabra o arrastra las letras",
         "praiseShort": "¡Bien!|¡Eso!|¡Sí!|¡Bravo!",
         "praiseMid": "¡Genial!|¡Bum!|¡Crack!|¡Qué bueno!",
         "praiseLong": "¡Qué palabra!|¡Cerebrito!|¡Enorme!|¡Maestro!",

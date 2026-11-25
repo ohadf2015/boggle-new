@@ -9858,6 +9858,7 @@ const en = {
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
     "firstHint": "Tap or swipe. Every word uses {letter}",
+    "firstHintTyped": "Type it and press Enter. Every word uses {letter}",
     "tapLetters": "Tap or drag letters to build a word",
     "tapToRemove": "Tap an added letter again to remove it",
     "doubleTapToSubmit": "Double-tap a letter to submit",
@@ -10136,6 +10137,7 @@ const en = {
       "scoreBreakdownTooltip": "Tap for details",
       "stage": {
         "prompt": "Swipe letters to make a word",
+        "promptTyped": "Type a word or drag the letters",
         "praiseShort": "Nice!|Neat!|Got it!|Yes!",
         "praiseMid": "Sweet!|Boom!|Slick!|Love it!",
         "praiseLong": "Monster word!|Big brain!|Wordsmith!|Huge!",

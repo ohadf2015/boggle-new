@@ -10767,6 +10767,7 @@ const sv = {
     "closeRace": "Jämn kamp",
     "inputPlaceholder": "Skriv ett ord...",
     "firstHint": "Tryck eller dra — varje ord har {letter}",
+    "firstHintTyped": "Skriv ordet och tryck Enter. Varje ord har {letter}",
     "tapLetters": "Tryck eller dra bokstäver för att bygga ett ord",
     "tapToRemove": "Tryck igen på en tillagd bokstav för att ta bort",
     "doubleTapToSubmit": "Dubbeltryck på en bokstav för att skicka",
@@ -11049,6 +11050,7 @@ const sv = {
       "scoreBreakdownTooltip": "Tryck för detaljer",
       "stage": {
         "prompt": "Dra över bokstäverna och bilda ett ord",
+        "promptTyped": "Skriv ett ord eller dra över bokstäverna",
         "praiseShort": "Snyggt!|Japp!|Bra!|Där satt den!",
         "praiseMid": "Grymt!|Bom!|Klockrent!|Härligt!",
         "praiseLong": "Vilket monsterord!|Ordsmed!|Jättebra!|Wow!",

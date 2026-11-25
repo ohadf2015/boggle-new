@@ -10397,6 +10397,7 @@ const he = {
     "closeRace": "מרוץ צמוד",
     "inputPlaceholder": "הקלידו מילה...",
     "firstHint": "מקישים או גוררים — בכל מילה יש {letter}",
+    "firstHintTyped": "הקלידו ולחצו Enter. כל מילה כוללת את {letter}",
     "tapLetters": "הקישו או גררו אותיות כדי לבנות מילה",
     "tapToRemove": "הקישו שוב על אות שהוספתם כדי להסיר",
     "doubleTapToSubmit": "הקישו פעמיים על אות כדי לשלוח",
@@ -10675,6 +10676,7 @@ const he = {
       "scoreBreakdownTooltip": "לחצו לפרטים",
       "stage": {
         "prompt": "החליקו על האותיות ויצרו מילה",
+        "promptTyped": "הקלידו מילה או גררו על האותיות",
         "praiseShort": "יפה!|יש!|נחמד!|תפסתם!",
         "praiseMid": "אחלה!|בום!|חזק!|מגניב!",
         "praiseLong": "מילה ענקית!|גאונות!|אלופים!|וואו!",
