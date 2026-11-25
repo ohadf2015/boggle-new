@@ -206,12 +206,12 @@ describe('PlayerJoinHandler — access token sent with join', () => {
     expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Dana 2', 'late-socket-1', expect.anything());
   });
 
-  it('treats another signed-in account typing the host name like any signed-in clash: refused, no takeover', async () => {
+  it('seats another signed-in account typing the host name as "Dana 2", never in the host seat', async () => {
     const { join } = captureJoinHandler();
     await join({ gameCode: 'ABC123', username: 'Dana', authUserId: HOST, authToken: await accessToken(OTHER) });
     expect(handleReconnection).not.toHaveBeenCalled();
-    expect(mockAddUserToGame).not.toHaveBeenCalled();
-    expect(emitError).toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
+    expect(mockAddUserToGame).toHaveBeenCalledWith('ABC123', 'Dana 2', 'late-socket-1', expect.anything());
+    expect(emitError).not.toHaveBeenCalledWith(expect.anything(), 'PLAYER_USERNAME_TAKEN', expect.anything());
   });
 
   it('keeps the account the socket verified at connect, whatever token the join carries', async () => {

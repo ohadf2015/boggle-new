@@ -228,7 +228,7 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         (seated.authUserId && !authUserId) ||
         (seated.guestTokenHash && guestTokenHash && seated.guestTokenHash !== guestTokenHash))
     ) {
-      if (!friendsRoom || verifiedUserId) {
+      if (!friendsRoom) {
         emitError(socket, ErrorCodes.PLAYER_USERNAME_TAKEN, { message: 'That name is already taken' });
         return;
       }
