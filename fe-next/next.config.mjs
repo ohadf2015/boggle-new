@@ -48,6 +48,9 @@ if (!process.env.NEXT_PUBLIC_SENTRY_RELEASE) {
   if (sha) process.env.NEXT_PUBLIC_SENTRY_RELEASE = sha;
 }
 
+// Set once in the parent process: build workers inherit it, so client, server and SW agree.
+process.env.NEXT_PUBLIC_BUILD_TIME ??= new Date().toISOString();
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Build output dir. Default '.next'. The nightly improvement loop overrides it
@@ -382,7 +385,7 @@ const nextConfig = {
   // Environment variables
   env: {
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
-    NEXT_PUBLIC_BUILD_TIME: new Date().toISOString(),
+    NEXT_PUBLIC_BUILD_TIME: process.env.NEXT_PUBLIC_BUILD_TIME,
     NEXT_PUBLIC_APP_VERSION: pkg.version,
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

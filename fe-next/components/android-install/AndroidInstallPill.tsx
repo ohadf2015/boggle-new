@@ -33,8 +33,10 @@ import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import { useInGameSurface } from '@/lib/inGameSurface';
 import {
   isCapacitorNative,
+  isDesktopInstallContext,
   isStandaloneDisplay,
 } from '@/utils/androidApp';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import {
   trackInstallPillClick,
   trackInstallPillDismissed,
@@ -114,8 +116,16 @@ export default function AndroidInstallPill() {
     typeof document !== 'undefined' &&
     document.documentElement.getAttribute('data-home') === 'returning';
 
+  // Desktop visitors need a phone to install, so ask only once they have finished a game.
+  // Re-read on route and round changes so a game finished on this page view counts.
+  const [desktopBeforeFirstGame, setDesktopBeforeFirstGame] = useState(true);
+  useEffect(() => {
+    setDesktopBeforeFirstGame(isDesktopInstallContext() && readGamesCompletedCount() < 1);
+  }, [pathname, inGame]);
+
   const shown =
-    pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure && !onReturningHome;
+    pillVisible && eligible && !sessionHidden && routeAllowed && !inGame && !onAdventure && !onReturningHome &&
+    !desktopBeforeFirstGame;
 
   // Track the impression once per appearance.
   useEffect(() => {

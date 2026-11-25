@@ -35,11 +35,11 @@ describe('ResultsSocialSlot', () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it('Given a finished run, Then name prompt, record, world record, rival and unlock render in that order', async () => {
+  it('Given a finished run, Then record, world record, rival, name prompt and unlock render in that order', async () => {
     const { container } = render(<ResultsSocialSlot mode="blast" score={120} previousBest={100} />);
     await waitFor(() => expect(screen.getByTestId('slot-rival').textContent).toBe('Bea'));
     const ids = Array.from(container.querySelectorAll('[data-testid^="slot-"]')).map((e) => e.getAttribute('data-testid'));
-    expect(ids).toEqual(['slot-name', 'slot-record', 'slot-world', 'slot-rival', 'slot-unlock']);
+    expect(ids).toEqual(['slot-record', 'slot-world', 'slot-rival', 'slot-name', 'slot-unlock']);
   });
 
   it('Given a publishing mode, Then the slot publishes the run record with the pre-run best', () => {

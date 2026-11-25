@@ -73,10 +73,10 @@ export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, pr
 
   return (
     <div data-testid="results-social-slot" className="flex flex-col gap-3 w-full">
-      <PublicNamePrompt mode={mode} />
       <NewRecordBanner mode={mode} score={score} />
       {mode !== 'edu' && <WorldRecordChip mode={mode} subMode={subMode} score={score} />}
       {rival && <RivalCard rival={rival} mode={mode} onRematch={onRematch} />}
+      <PublicNamePrompt mode={mode} />
       <NextUnlockTeaser mode={mode} xp={xp} />
     </div>
   );
