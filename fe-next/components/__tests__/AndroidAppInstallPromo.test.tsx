@@ -11,13 +11,8 @@ import {
 const captureMock = vi.fn();
 
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: (...a: unknown[]) => captureMock(...a) } }));
-vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
-// exp-install-promo-after-first-game-v1 — mutable so a test can pick the bucket.
-let mockPromoVariant: 'control' | 'after-first-game' = 'control';
-const exposureMock = vi.fn();
-vi.mock('@/hooks/useExperiment', () => ({
-  useExperiment: () => ({ variant: mockPromoVariant, trackExposure: exposureMock }),
-}));
+let mockPath = '/';
+vi.mock('next/navigation', () => ({ usePathname: () => mockPath }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (key: string) => key, language: 'en' }),
 }));
@@ -63,10 +58,12 @@ beforeEach(() => {
   sessionStorage.clear();
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
   mockNative = false;
-  mockPromoVariant = 'control';
+  mockPath = '/';
   mockHasConsentDecision = true;
   resetOverlayQuietZoneForTests();
-  exposureMock.mockClear();
+  // Default: one game finished earlier in this session, the only time the auto-popup may open.
+  sessionStorage.setItem('games_completed_at_session_start', '0');
+  localStorage.setItem('games_completed_count', '1');
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
     value: { href: 'https://www.lexiclash.live/' },
@@ -265,76 +262,49 @@ describe('AndroidAppInstallPromo', () => {
   });
 });
 
-describe('exp-install-promo-after-first-game-v1', () => {
-  // Native players are the whole AdMob pool and weekly activeUsers fell 68 -> 26.
-  // Exposure is at an all-time high while 82% of promos are dismissed, so the
-  // variant trades reach for intent: withhold the auto-popup until one game is done.
+describe('auto-popup waits for a game finished this session', () => {
+  // The re-arm loop never ends while the gate fails: advance by SHOW_DELAY_MS,
+  // never runAllTimersAsync.
   const tapAndRun = async (ms: number) => {
     act(() => { fireEvent.pointerDown(window); });
     await act(async () => { await Promise.resolve(); });
     await act(async () => { vi.advanceTimersByTime(ms); });
   };
 
-  it('control shows the promo with zero completed games (behaviour unchanged)', async () => {
-    mockPromoVariant = 'control';
-    render(<AndroidAppInstallPromo />);
-    await act(async () => { await Promise.resolve(); });
-    await tapAndRun(12_000);
-    expect(useAndroidInstallStore.getState().open).toBe(true);
-  });
-
-  it('variant withholds the promo while no game has been completed', async () => {
-    mockPromoVariant = 'after-first-game';
-    render(<AndroidAppInstallPromo />);
-    await act(async () => { await Promise.resolve(); });
-    await tapAndRun(12_000);
-    expect(useAndroidInstallStore.getState().open).toBe(false);
-  });
-
-  // The whole point: a one-shot check would make "hasn't played yet at 12s" mean
-  // "never sees the promo", which looks like a variant win but is a silent no-op.
-  it('variant RE-ARMS and shows the promo once a game is completed', async () => {
-    mockPromoVariant = 'after-first-game';
+  it('stays closed for a returning player who has not finished a game yet, then opens after one', async () => {
+    sessionStorage.removeItem('games_completed_at_session_start');
+    localStorage.setItem('games_completed_count', '7');
     render(<AndroidAppInstallPromo />);
     await act(async () => { await Promise.resolve(); });
     await tapAndRun(12_000);
     expect(useAndroidInstallStore.getState().open).toBe(false);
 
-    localStorage.setItem('games_completed_count', '1');
+    localStorage.setItem('games_completed_count', '8');
     await act(async () => { vi.advanceTimersByTime(12_000); });
     expect(useAndroidInstallStore.getState().open).toBe(true);
+  });
+
+  it.each(['/en/word-craft', '/en/multiplayer', '/en/daily'])('never opens on a play route (%s)', async (path) => {
+    mockPath = path;
+    render(<AndroidAppInstallPromo />);
+    await act(async () => { await Promise.resolve(); });
+    await tapAndRun(12_000);
+    await act(async () => { vi.advanceTimersByTime(36_000); });
+    expect(useAndroidInstallStore.getState().open).toBe(false);
   });
 
   it('withholds the auto-popup inside the overlay quiet zone, and re-arms after it', async () => {
-    // `inGame: isInGameSurface()` covered a live board but not the round-end
-    // recap or the projector results, which live on /multiplayer — not a game
-    // route, no body class. The quiet zone is raised by the surface itself.
-    // Same re-arm loop as the consent case: advance by SHOW_DELAY_MS, never
-    // runAllTimersAsync (that would chase the infinite re-arm forever).
+    // The round-end recap and projector results live on /multiplayer-adjacent
+    // surfaces with no body class; the quiet zone is raised by the surface itself.
     const release = claimOverlayQuietZone('classroom-results');
     render(<AndroidAppInstallPromo />);
     await act(async () => { await Promise.resolve(); });
-    act(() => { fireEvent.pointerDown(window); });
-    await act(async () => { await Promise.resolve(); });
-    await act(async () => { vi.advanceTimersByTime(12_000); });
+    await tapAndRun(12_000);
     expect(useAndroidInstallStore.getState().open).toBe(false);
 
-    // Recap dismissed, grace window elapsed — the next re-arm cycle fires it.
     release();
     await act(async () => { vi.advanceTimersByTime(OVERLAY_QUIET_ZONE_GRACE_MS + 100); });
     await act(async () => { vi.advanceTimersByTime(12_000); });
     expect(useAndroidInstallStore.getState().open).toBe(true);
-  });
-
-  it('counts exposure only when a promo decision is actually reached', async () => {
-    mockPromoVariant = 'after-first-game';
-    render(<AndroidAppInstallPromo />);
-    await act(async () => { await Promise.resolve(); });
-    await tapAndRun(12_000);
-    expect(exposureMock).not.toHaveBeenCalled();
-
-    localStorage.setItem('games_completed_count', '1');
-    await act(async () => { vi.advanceTimersByTime(12_000); });
-    expect(exposureMock).toHaveBeenCalled();
   });
 });

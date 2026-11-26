@@ -6,6 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import { cn } from '@/lib/utils';
+import { neoChunkyPress } from '@/components/ui/neoStyles';
+import { usePress } from '@/components/motion/usePress';
 
 const HOME_PATH_RE = /^\/?(?:en|he|sv|ja|es|ru)?\/?$/;
 
@@ -14,6 +16,7 @@ export const HeaderBackButton = memo(function HeaderBackButton() {
   const { t } = useLanguage();
   // Navigate one level up the URL hierarchy (push parent), not blind history.back().
   const onClick = useBackOneLevel();
+  const press = usePress<HTMLButtonElement>();
 
   if (HOME_PATH_RE.test(pathname)) return null;
 
@@ -21,13 +24,15 @@ export const HeaderBackButton = memo(function HeaderBackButton() {
     <button
       type="button"
       onClick={onClick}
+      {...press}
       aria-label={t('common.back')}
       className={cn(
         'inline-flex items-center gap-1.5',
         'px-2 py-1.5 lg:px-2.5 rounded-neo border-neo border-black dark:border-neo-cream/40',
         'bg-neo-white dark:bg-neo-navy-light text-neo-navy dark:text-neo-white',
-        'shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px]',
-        'font-neo-body font-bold text-sm transition duration-100'
+        neoChunkyPress(2),
+        'dark:shadow-neo-cream/40',
+        'font-neo-body font-bold text-sm'
       )}
     >
       <ArrowLeft className="w-4 h-4 rtl:rotate-180" aria-hidden="true" />

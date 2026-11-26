@@ -52,6 +52,9 @@ beforeEach(() => {
   desktop = false;
   localStorage.clear();
   pathname = '/en';
+  // Default: a game finished earlier this session, the only time the pill may show.
+  sessionStorage.setItem('games_completed_at_session_start', '0');
+  localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '1');
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
 });
 
@@ -68,8 +71,10 @@ function settle() {
 }
 
 describe('AndroidInstallPill', () => {
-  it('Given a desktop visitor who has not finished a game, Then the pill stays hidden', () => {
-    desktop = true;
+  it.each([true, false])('Given a returning visitor (desktop=%s) with no game finished this session, Then the pill stays hidden', (isDesktop) => {
+    desktop = isDesktop;
+    sessionStorage.removeItem('games_completed_at_session_start');
+    localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '3');
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);
     settle();
@@ -77,23 +82,34 @@ describe('AndroidInstallPill', () => {
     expect(captureMock).not.toHaveBeenCalled();
   });
 
-  it('Given a desktop visitor finishes a first game, When they move to the next page, Then the pill shows', () => {
-    desktop = true;
+  it('Given a visitor finishes a game, When they move to the next page, Then the pill shows', () => {
+    sessionStorage.removeItem('games_completed_at_session_start');
+    localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '3');
     useAndroidInstallStore.setState({ pillVisible: true });
     const { rerender } = render(<AndroidInstallPill />);
     settle();
     expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
-    localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '1');
-    pathname = '/en/results';
+    localStorage.setItem(GAMES_COMPLETED_COUNT_KEY, '4');
+    pathname = '/en/profile';
     rerender(<AndroidInstallPill />);
     expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
   });
 
-  it('Given a phone visitor with no finished game, Then the pill still shows', () => {
+  it('Given another promo (the PWA toast) already took this session, Then the pill stays hidden', () => {
+    sessionStorage.setItem('lexiclash_promo_shown_this_session', '1');
     useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);
     settle();
-    expect(screen.queryByText('androidAppPromo.pillLabel')).toBeInTheDocument();
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+  });
+
+  it('Given the install popup itself was dismissed this session, Then the pill still offers a way back', () => {
+    sessionStorage.setItem('lexiclash_promo_shown_this_session', '1');
+    sessionStorage.setItem('android_app_install_promo_shown', '1');
+    useAndroidInstallStore.setState({ pillVisible: true });
+    render(<AndroidInstallPill />);
+    settle();
+    expect(screen.getByText('androidAppPromo.pillLabel')).toBeInTheDocument();
   });
 
   it('renders nothing when the pill is not active', () => {

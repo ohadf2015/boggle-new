@@ -147,6 +147,20 @@ describe('HeaderMobileMenu — phone bar stays logo · sound · menu', () => {
   });
 });
 
+describe('HeaderMobileMenu — chunky press on bar buttons', () => {
+  it('Given a guest, Then the menu and SIGN IN buttons sink with the shared press', async () => {
+    renderMenu();
+    for (const label of [t('common.openMenu'), t('auth.signIn')]) {
+      const button = await screen.findByLabelText(label);
+      expect(button.className).toContain('data-[pressed=true]:translate-y-[2px]');
+      expect(button.className).not.toContain('active:translate-x-px');
+      fireEvent.pointerDown(button, { button: 0 });
+      expect(button).toHaveAttribute('data-pressed', 'true');
+      fireEvent.pointerUp(button);
+    }
+  });
+});
+
 describe('HeaderMobileMenu — classroom entry in the drawer', () => {
   it.each([
     ['a teacher', { user_role: 'teacher' }, '/en/teacher', 'education.nav.myClassroom'],

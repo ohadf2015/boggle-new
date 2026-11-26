@@ -40,6 +40,7 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 vi.mock('@/components/GoogleAnalytics', () => ({ gameEvents: { pwaInstalled: vi.fn() } }));
 vi.mock('@/utils/platform', () => ({ isNative: () => false }));
 vi.mock('@/utils/gamesCompletedCount', () => ({ readGamesCompletedCount: () => 5 }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/en' }));
 
 async function firePromptable() {
   await act(async () => {
@@ -52,6 +53,9 @@ async function firePromptable() {
 describe('PWAInstallPrompt — overlay quiet zone', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
+    // A game finished earlier this session (count 4 -> 5), so only the guard under test can hide it.
+    sessionStorage.setItem('games_completed_at_session_start', '4');
     resetOverlayQuietZoneForTests();
     Object.defineProperty(navigator, 'userAgent', {
       value:

@@ -1,13 +1,10 @@
 'use client';
 
 import React from 'react';
-import { m } from 'framer-motion';
-import { ArrowLeft, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 
 interface GameSession {
   gameCode?: string;
@@ -16,53 +13,22 @@ interface GameSession {
 interface ProfileBackButtonsProps {
   activeGameSession: GameSession | null;
   isDarkMode: boolean;
-  delay?: number;
 }
 
-export function ProfileBackButtons({
-  activeGameSession,
-  isDarkMode,
-  delay = 0.4
-}: ProfileBackButtonsProps): React.ReactNode {
+/** Shown only while a room is still open; plain "back" lives in the header and tab bar. */
+export function ProfileBackButtons({ activeGameSession }: ProfileBackButtonsProps): React.ReactNode {
   const router = useRouter();
   const { t, language } = useLanguage();
 
-  return (
-    <m.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
-    >
-      {activeGameSession && (
-        <Button
-          onClick={() => router.push(`/${language}`)}
-          className={cn(
-            'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition',
-            'bg-neo-lime text-neo-black hover:opacity-90'
-          )}
-        >
-          <Play className="me-2" />
-          {t('profile.backToRoom')} {activeGameSession.gameCode}
-        </Button>
-      )}
+  if (!activeGameSession) return null;
 
-      <Button
-        onClick={() => router.push(`/${language}`)}
-        variant={activeGameSession ? 'outline' : 'default'}
-        className={cn(
-          'w-full sm:w-auto px-8 py-3 rounded-2xl font-black uppercase tracking-wide transition',
-          activeGameSession
-            ? 'bg-neo-navy-light/40 border border-white/[0.08] text-gray-300 hover:bg-neo-navy-elevated/60'
-            : 'bg-linear-to-r from-neo-cyan to-neo-cyan/80 text-neo-black hover:opacity-90'
-        )}
-      >
-        <DirectionalIcon icon={ArrowLeft} className="me-2" />
-        {activeGameSession
-          ? (t('profile.backToLobby'))
-          : (t('profile.backToGame'))}
+  return (
+    <div className="mt-6 flex justify-center">
+      <Button press="chunky" variant="success" size="lg" onClick={() => router.push(`/${language}`)} className="w-full sm:w-auto">
+        <Play className="me-2" aria-hidden />
+        {t('profile.backToRoom')} {activeGameSession.gameCode}
       </Button>
-    </m.div>
+    </div>
   );
 }
 
