@@ -5,6 +5,7 @@ import { Check, Crown, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { proPlanStatusLine } from './proPlanStatus';
 import { ResumeProButton } from '../TeacherProTrialCanceledBanner';
+import { TeacherProManageLink } from '../TeacherProManageLink';
 
 export interface ProPlanPanelProps {
   status?: string | null;
@@ -23,6 +24,13 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
   const [nowMs] = useState(() => Date.now());
   const gifted = source === 'admin_grant';
   const line = proPlanStatusLine({ t, language, nowMs, status, source, trialExpires, periodEnd, cancelAtPeriodEnd });
+  // During the live trial the manage/cancel path is a quiet text link, never a
+  // primary button — the trial converts on its own, so cancellation must not
+  // out-shout the plan itself (UR 2026-11-26: trial cancelled 80s after start).
+  const onTrial = !cancelAtPeriodEnd && status === 'trialing';
+  const manageClassName = onTrial
+    ? 'self-center text-xs font-bold text-neo-navy/75 underline underline-offset-2 transition-colors hover:text-neo-navy focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan'
+    : 'inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
   return (
     <section data-testid="pro-plan-panel" aria-labelledby="pro-plan-title" className="rounded-neo border-3 border-neo-black bg-neo-yellow p-4 text-neo-navy shadow-hard sm:p-6">
@@ -36,13 +44,16 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
           {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-neo-navy text-neo-yellow" /> : null}
         </div>
         {portalUrl && !gifted ? (
-          <a
-            href={portalUrl}
-            className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          <TeacherProManageLink
+            portalUrl={portalUrl}
+            testId="pro-plan-manage-billing"
+            status={status ?? 'active'}
+            onApplied={onResumed}
+            className={manageClassName}
           >
             {t('eg2Pro.plans.manageBilling')}
             <ExternalLink className="size-4" aria-hidden="true" />
-          </a>
+          </TeacherProManageLink>
         ) : null}
       </div>
       {gifted ? <p className="mt-2 text-xs font-bold text-neo-navy/75">{t('eduPlans.manage.giftedNote')}</p> : null}

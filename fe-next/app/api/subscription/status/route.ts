@@ -188,6 +188,7 @@ export async function GET(request: NextRequest) {
       portal_url: isNativeAppUserAgent(request.headers.get('user-agent')) ? null : portalUrl,
       current_period_end: subscription.current_period_end,
       cancel_at_period_end: subscription.cancel_at_period_end,
+      cancel_reason: subscription.cancel_reason,
       trial_expires: trialExpires,
       trial_used: trialUsed,
       access_trial_expires: accessTrialExpires,

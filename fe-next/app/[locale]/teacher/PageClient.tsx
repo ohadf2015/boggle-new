@@ -86,7 +86,7 @@ function accountBanner(banner: TeacherBillingBanner, b: ReturnType<typeof useTea
     case 'chargeSoon':
       return <TeacherProTrialChargeSoonBanner chargeAt={b.trialExpires} portalUrl={b.portalUrl} />;
     case 'trialCanceled':
-      return <TeacherProTrialCanceledBanner endsAt={b.trialExpires} onResumed={() => void b.refreshPro()} />;
+      return <TeacherProTrialCanceledBanner endsAt={b.trialExpires} onResumed={() => void b.refreshPro()} cancelReason={b.cancelReason} />;
   }
 }
 

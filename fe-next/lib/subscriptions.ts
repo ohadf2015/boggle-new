@@ -23,6 +23,8 @@ export interface TeacherSubscription {
   students_limit_per_class: number | null
   current_period_end: string | null
   cancel_at_period_end: boolean
+  /** One-tap cancel-reason chip the teacher picked after cancelling ('chip' source), else null. */
+  cancel_reason: string | null
   has_pro: boolean
   /** Who owns the row's lifecycle: the payment provider, or an admin grant with a hard deadline. */
   source: SubscriptionSource
@@ -60,6 +62,7 @@ export async function checkTeacherSubscription(
       students_limit_per_class: freeConfig.students_limit_per_class,
       current_period_end: null,
       cancel_at_period_end: false,
+      cancel_reason: null,
       has_pro: false,
       source: 'polar',
       grant_expired: false,
@@ -78,6 +81,7 @@ export async function checkTeacherSubscription(
     students_limit_per_class: entitlement.hasPro ? null : freeConfig.students_limit_per_class,
     current_period_end: data.current_period_end,
     cancel_at_period_end: data.cancel_at_period_end,
+    cancel_reason: typeof data.cancel_reason === 'string' ? data.cancel_reason : null,
     has_pro: entitlement.hasPro,
     source: entitlement.source,
     grant_expired: entitlement.expired,
