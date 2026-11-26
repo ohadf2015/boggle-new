@@ -56,14 +56,14 @@ describe('shouldPinLocaleVary', () => {
 describe('pinLocaleVary', () => {
   it('seeds Vary with Accept-Language and Cookie', () => {
     const res = mockRes();
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
     expect(String(res.getHeader('Vary'))).toMatch(/Accept-Language/i);
     expect(String(res.getHeader('Vary'))).toMatch(/Cookie/i);
   });
 
   it('keeps those tokens when Next overwrites Vary with its RSC list', () => {
     const res = mockRes();
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
     res.setHeader('Vary', 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding');
     const vary = String(res.getHeader('Vary'));
     expect(vary).toMatch(/Accept-Language/i);
@@ -74,7 +74,7 @@ describe('pinLocaleVary', () => {
 
   it('merges Vary passed via writeHead headers', () => {
     const res = mockRes();
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
     res.writeHead(200, {
       Vary: 'rsc, Accept-Encoding',
       'Content-Type': 'text/html',
@@ -87,7 +87,7 @@ describe('pinLocaleVary', () => {
 
   it('merges Vary passed via writeHead(status, reason, headers)', () => {
     const res = mockRes();
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
     res.writeHead(200, 'OK', { vary: 'Accept-Encoding' });
     const vary = String(res.getHeader('vary'));
     expect(vary).toMatch(/Accept-Language/i);
@@ -96,8 +96,8 @@ describe('pinLocaleVary', () => {
 
   it('is idempotent when pinned twice', () => {
     const res = mockRes();
-    pinLocaleVary(res);
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
+    pinLocaleVary(res as unknown as Response);
     res.setHeader('Vary', 'Accept-Encoding');
     const vary = String(res.getHeader('Vary'));
     expect(vary.match(/Accept-Language/gi)).toHaveLength(1);
@@ -108,7 +108,7 @@ describe('pinLocaleVary', () => {
     const res = mockRes();
     const req = { headers: {} } as Request;
     applyOfflineShellCacheHeader(req, res as unknown as Response, '/');
-    pinLocaleVary(res);
+    pinLocaleVary(res as unknown as Response);
     res.setHeader('Cache-Control', 'private, no-cache, no-store, max-age=0, must-revalidate');
     res.setHeader('Vary', 'rsc, next-router-state-tree, Accept-Encoding');
     expect(res.getHeader('Cache-Control')).toBe(OFFLINE_SHELL_CACHE_CONTROL);

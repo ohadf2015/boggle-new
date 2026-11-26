@@ -11,22 +11,14 @@
  * writeHead — is merged rather than replaced. Idempotent: pinning twice is a
  * no-op.
  */
+import type { Response } from 'express';
 import { mergeVary } from '../lib/localeResolution';
 
 export const LOCALE_VARY_TOKENS = 'Accept-Language, Cookie';
 
-const PINNED = Symbol.for('lc.localeVaryPinned');
-
 const SKIP_PREFIXES = ['/api', '/_next', '/lcx', '/favicon', '/robots', '/sitemap', '/manifest'];
 const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
-
-type Pinnable = {
-  setHeader?: (name: string, value: unknown) => unknown;
-  appendHeader?: (name: string, value: string) => unknown;
-  getHeader?: (name: string) => unknown;
-  writeHead?: (...args: unknown[]) => unknown;
-  [PINNED]?: boolean;
-};
+const pinned = new WeakSet<object>();
 
 function asVaryInput(value: unknown): string | string[] | undefined {
   if (typeof value === 'number') return String(value);
@@ -73,43 +65,37 @@ export function shouldPinLocaleVary(pathname: string | null | undefined): boolea
   return true;
 }
 
-export function pinLocaleVary(res: Pinnable): void {
-  if (res[PINNED]) return;
-  res[PINNED] = true;
+export function pinLocaleVary(res: Response): void {
+  if (pinned.has(res)) return;
+  pinned.add(res);
 
-  const originalSet = res.setHeader?.bind(res);
-  const originalAppend = res.appendHeader?.bind(res);
-  const originalWriteHead = res.writeHead?.bind(res);
-  const originalGet = res.getHeader?.bind(res);
+  const originalSet = res.setHeader.bind(res);
+  const originalAppend = typeof res.appendHeader === 'function' ? res.appendHeader.bind(res) : undefined;
+  const originalWriteHead = res.writeHead.bind(res);
+  const originalGet = res.getHeader.bind(res);
 
-  if (originalSet) {
-    res.setHeader = (name: string, value: unknown) => {
-      if (name.toLowerCase() === 'vary') value = merged(value);
-      return originalSet(name, value);
-    };
-  }
+  res.setHeader = ((name: string, value: unknown) => {
+    if (name.toLowerCase() === 'vary') value = merged(value);
+    return originalSet(name, value as string | number | readonly string[]);
+  }) as Response['setHeader'];
 
   if (originalAppend) {
-    res.appendHeader = (name: string, value: string) => {
+    res.appendHeader = ((name: string, value: string) => {
       if (name.toLowerCase() === 'vary') value = merged(value);
       return originalAppend(name, value);
-    };
+    }) as Response['appendHeader'];
   }
 
-  if (originalWriteHead) {
-    res.writeHead = (...args: unknown[]) => {
-      const existing = originalGet ? originalGet('Vary') : undefined;
-      // writeHead(status, headers) or writeHead(status, statusMessage, headers)
-      if (args[1] && typeof args[1] === 'object' && !Array.isArray(args[1])) {
-        args[1] = mergeHeadersObject(args[1] as Record<string, unknown>, existing);
-      } else if (args[2] && typeof args[2] === 'object' && !Array.isArray(args[2])) {
-        args[2] = mergeHeadersObject(args[2] as Record<string, unknown>, existing);
-      }
-      return originalWriteHead(...args);
-    };
-  }
+  res.writeHead = ((...args: unknown[]) => {
+    const existing = originalGet('Vary');
+    // writeHead(status, headers) or writeHead(status, statusMessage, headers)
+    if (args[1] && typeof args[1] === 'object' && !Array.isArray(args[1])) {
+      args[1] = mergeHeadersObject(args[1] as Record<string, unknown>, existing);
+    } else if (args[2] && typeof args[2] === 'object' && !Array.isArray(args[2])) {
+      args[2] = mergeHeadersObject(args[2] as Record<string, unknown>, existing);
+    }
+    return originalWriteHead(...(args as Parameters<Response['writeHead']>));
+  }) as Response['writeHead'];
 
-  if (originalSet) {
-    originalSet('Vary', merged(originalGet ? originalGet('Vary') : undefined));
-  }
+  originalSet('Vary', merged(originalGet('Vary')));
 }
