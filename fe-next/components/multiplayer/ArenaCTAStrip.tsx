@@ -14,7 +14,7 @@ interface ArenaCTAStripProps {
 }
 
 /**
- * The entry footer (DESIGN §b.1): [QUICK START lime, 2/3] [CREATE pink outline,
+ * The entry footer (DESIGN §b.1): [QUICK START lime, 2/3] [CREATE quiet outline,
  * 1/3] on phone. From `lg` CREATE lives in the left column, so the footer is
  * QUICK START alone, centred at 480px (×1.5 on TV). One primary per footer.
  *
@@ -32,7 +32,7 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
   return (
     <section
       data-testid="arena-cta-strip"
-      className="border-t-2 border-neo-cream/30 bg-neo-navy px-4 pt-3 pb-3 lg:pb-5 tv:pb-8"
+      className="px-4 pt-2 pb-3 lg:pb-5 tv:pb-8"
     >
       <div data-cta-row="" className="mx-auto flex w-full max-w-xl items-stretch gap-3 lg:max-w-[calc(480px*var(--mp-u,1))]">
         <div className="relative flex-[2] min-w-0">
@@ -43,7 +43,6 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
             onPress={onQuickPlay}
             disabled={offline}
             loading={isQuickPlayLoading && !offline}
-            className="shadow-hard-lg"
           />
           {/* One glint once the entry has painted: the eye lands on the primary. */}
           <CtaGlint delayMs={900} />
@@ -53,9 +52,9 @@ const ArenaCTAStrip: React.FC<ArenaCTAStripProps> = ({ onQuickPlay, onCreateRoom
           data-testid="arena-create-room"
           onClick={offline ? undefined : onCreateRoom}
           disabled={offline}
-          className="lg:hidden flex-1 min-w-0 h-[calc(64px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-neo border-3 border-neo-pink bg-neo-navy-light px-2 font-neo-display text-xs font-bold uppercase leading-tight text-neo-pink shadow-hard transition-transform duration-100 hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-hard-pressed disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
+          className="lg:hidden flex-1 min-w-0 h-[calc(64px*var(--mp-u,1))] flex flex-col items-center justify-center gap-0.5 rounded-neo border-2 border-neo-cream/40 px-2 font-neo-display text-xs font-bold uppercase leading-tight text-neo-white transition-transform duration-100 hover:border-neo-pink hover:text-neo-pink active:translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
         >
-          <Plus aria-hidden="true" className="h-5 w-5 shrink-0" />
+          <Plus aria-hidden="true" className="h-5 w-5 shrink-0 text-neo-pink" />
           {/* 1/3 of a 390px row is ~93px — too narrow for "CREATE ROOM" on one
               line. Wrap to two centred lines (still fits the 64px button under
               the icon); never truncate the label into "CREAT…". */}

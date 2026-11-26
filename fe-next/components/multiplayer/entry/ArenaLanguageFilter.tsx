@@ -40,7 +40,7 @@ export function ArenaLanguageFilter({ languages, counts, value, onChange }: Aren
               'active:translate-y-0.5 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
               active
                 ? 'border-neo-black bg-neo-yellow text-neo-black shadow-hard-sm'
-                : 'border-neo-cream/40 bg-neo-navy-light text-neo-white hover:-translate-y-0.5',
+                : 'border-neo-cream/20 text-neo-white hover:-translate-y-0.5 hover:border-neo-cream/50',
               !active && count === 0 && 'text-neo-white/60',
             )}
           >

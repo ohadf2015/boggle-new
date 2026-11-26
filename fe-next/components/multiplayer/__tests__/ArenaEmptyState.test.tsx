@@ -38,8 +38,8 @@ describe('ArenaEmptyState', () => {
     const { container } = render(<ArenaEmptyState {...props} />);
     expect(screen.getByTestId('arena-empty-state')).toBeInTheDocument();
     expect(tMock).toHaveBeenCalledWith('mpUi.entry.emptyInLanguage', { language: 'Hebrew' });
-    expect(screen.getByText('mpUi.entry.emptyLine')).toBeInTheDocument();
-    expect(container.querySelector('img')).toHaveAttribute('src', '/mascot/spectating.webp');
+    expect(screen.queryByText('mpUi.entry.emptyLine')).toBeNull();
+    expect(container.querySelector('img')).toHaveAttribute('src', '/mascot/popcorn-nobg.webp');
   });
 
   // With no open arena the mascot is the entry's LCP element; a lazy image would start loading only after layout.
@@ -65,6 +65,14 @@ describe('ArenaEmptyState', () => {
     expect(box.className).toMatch(/\bmp-arena-empty\b/);
     expect(box.className).toMatch(/\bmin-h-\[14\.5rem\]/);
     expect(screen.getByTestId('arena-empty-mascot').className).toMatch(/h-\[clamp\(56px,calc\(100cqh_-_172px\),180px\)\]/);
+  });
+
+  it('sits on the backdrop with no box, the mascot on its idle rig', () => {
+    render(<ArenaEmptyState {...props} />);
+    const box = screen.getByTestId('arena-empty-state');
+    expect(box.className).not.toMatch(/\bborder-dashed\b/);
+    expect(box.className).not.toMatch(/\bbg-neo-/);
+    expect(screen.getByTestId('mascot-rig')).toContainElement(screen.getByTestId('arena-empty-mascot'));
   });
 
   it('Given rooms open in another language, When shown, Then a chip switches to it', () => {

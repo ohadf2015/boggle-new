@@ -8,6 +8,7 @@ import { useReducedMotion } from 'framer-motion';
 import { ChevronRight, ListOrdered, Trophy } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { MpScreen } from '../shell/MpScreen';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { ResultsModals } from '@/components/results/ResultsModals';
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -337,10 +338,9 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         'lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-[calc(28px*var(--mp-u,1))] lg:items-start',
       )}
     >
-      <div aria-hidden="true" className={fx.halftone} />
       <BossOutcomeCard size="phone" className="relative z-10 shrink-0 lg:col-span-2" />
       {/* On a phone the class outcome takes the standings' slot (the column cannot fit both); wide screens show both. */}
-      <div className={cn('min-h-0 flex-1 flex-col justify-center lg:justify-start gap-[calc(8px*var(--mp-u,1))] lg:flex', bossOutcome ? 'hidden' : 'flex')}>
+      <div data-moment="" className={cn('max-lg:min-h-[calc(100dvh-28.5rem)] lg:min-h-0 flex-1 flex-col justify-center lg:justify-start gap-[calc(8px*var(--mp-u,1))] lg:flex', bossOutcome ? 'hidden' : 'flex')}>
         {champions.length > 0 && (
           <p data-testid="mp-series-champion" className={cn('shrink-0 self-center inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-0.5 text-neo-black font-bold text-[calc(12px*var(--mp-u,1))]', fx.chipPop)}>
             <Trophy aria-hidden="true" className="w-4 h-4" />
@@ -410,15 +410,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           </div>
         ) : null}
         </div>
-        {!classroomStudent && nextModeSlot && (
-          <MpNextModeCard
-            mode={nextMode}
-            onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
-            onPickerOpenChange={setPickerOpen}
-            t={t}
-            className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
-          />
-        )}
         {username && seen('card') && !c.isClassroom && (
           <WordShowdownPanel
             allPlayerWords={c.allPlayerWords}
@@ -496,6 +487,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const footer = (
     <div className="relative w-full max-w-xl lg:max-w-2xl tv:max-w-4xl lg:[--mp-u:1.15] tv:[--mp-u:1.6] mx-auto px-[calc(12px*var(--mp-u,1))] pt-2 pb-[calc(10px*var(--mp-u,1))] min-h-[calc(84px*var(--mp-u,1))] flex flex-col justify-center overflow-hidden gap-2">
       {!c.isClassroom && <MpResultsReactionBar onSend={c.reactions.sendReaction} t={t} />}
+      {!classroomStudent && nextModeSlot && (
+        <MpNextModeCard
+          mode={nextMode}
+          onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
+          onPickerOpenChange={setPickerOpen}
+          t={t}
+          className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
+        />
+      )}
       {footerShown ? (
         <div className={fx.footerUp}>
           {branch === 'final' ? (
@@ -529,7 +529,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
 
   return (
     <MpGuestAddPromptProvider value={!c.isClassroom}>
-      <MpScreen testId="mp-results" header={header} body={body} footer={footer} bodyScroll="inner" />
+      <MpScreen testId="mp-results" header={header} body={body} footer={footer} bodyScroll="inner" backdrop={<AmbientBackdrop theme="multiplayer" />} />
       {done && (
         <>
           <ResultsModals

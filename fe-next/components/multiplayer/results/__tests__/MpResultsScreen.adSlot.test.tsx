@@ -63,6 +63,7 @@ vi.mock('framer-motion', () => {
         <span {...props}>{children}</span>
       ),
     },
+    useAnimationControls: () => ({ start: () => Promise.resolve() }),
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
     useReducedMotion: () => false,
     useScroll: () => ({

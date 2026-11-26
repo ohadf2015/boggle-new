@@ -137,3 +137,30 @@ describe('MpMyCard keeps its height across the reveal (mobile CLS)', () => {
     expect(track.mock.calls.map((c) => c[0]).sort()).toEqual(['best_missed_word_shown', 'results_reward_line_shown']);
   });
 });
+
+describe('MpMyCard mascot reaction', () => {
+  const state = () => screen.getByTestId('mascot-rig').getAttribute('data-state');
+
+  it('waits idle until the card is revealed', () => {
+    render(<MpMyCard {...base} revealed={false} />);
+    expect(state()).toBe('idle');
+  });
+
+  it('cheers for the winner, hops for a mid placing, slumps on zero points', () => {
+    const { rerender } = render(<MpMyCard {...base} rank={1} winner score={40} />);
+    expect(state()).toBe('cheer');
+    rerender(<MpMyCard {...base} rank={2} total={4} score={12} />);
+    expect(state()).toBe('hop');
+    rerender(<MpMyCard {...base} rank={4} total={4} score={0} />);
+    expect(state()).toBe('sad');
+  });
+});
+
+describe('MpMyCard slim', () => {
+  it('keeps the missed word to one line and puts coins on the best-word chip row', () => {
+    render(<MpMyCard {...base} bestMissed={{ word: 'stranger', letters: 8, points: 500 } as never} />);
+    expect(screen.getByTestId('best-missed-word').className).toMatch(/\btruncate\b/);
+    const chipRow = screen.getByTestId('mp-my-best-word').parentElement!;
+    expect(chipRow).toContainElement(screen.getByTestId('results-reward-line'));
+  });
+});

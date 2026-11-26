@@ -197,13 +197,12 @@ describe('ArenaList', () => {
   // waiting.webp carries its own dark backdrop, a box a shade off the page navy.
   // Lightening it into a navy group of its own erases the box. The tail is a
   // size container, which isolates blending, so the group's navy has to be its own.
-  it("the tail's sticker blends into a navy group of its own, so its baked box never shows", () => {
+  it('the tail sits on the screen backdrop: a transparent sticker, no box of its own', () => {
     render(<ArenaList {...base} rooms={rooms(1)} />);
     const img = screen.getByTestId('arena-list-tail').querySelector('img')!;
-    expect(img.className).toMatch(/(^|\s)mix-blend-lighten(\s|$)/);
-    const group = img.parentElement!;
-    expect(group.className).toMatch(/(^|\s)isolate(\s|$)/);
-    expect(group.className).toMatch(/(^|\s)bg-neo-navy(\s|$)/);
+    expect(img.getAttribute('src')).toMatch(/-nobg\./);
+    expect(img.className).not.toMatch(/mix-blend/);
+    expect(img.parentElement!.className).not.toMatch(/\b(bg-neo-|border-dashed)/);
   });
 
   it('the tail steps aside on phone once the phone rows are full, and entirely once desktop is', () => {

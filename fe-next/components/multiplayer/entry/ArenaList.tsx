@@ -176,9 +176,7 @@ export function ArenaList({
               data-testid="arena-list-tail"
               className={cn('mp-arena-tail min-h-0 flex-1', phoneMore >= 0 ? 'hidden lg:flex' : 'flex')}
             >
-              {/* The tail is a size container, which isolates blending: the sticker's
-                  baked dark box lightens away against this group's own navy. */}
-              <div className="mp-arena-tail-inner isolate flex w-full flex-col items-center justify-center gap-2 rounded-neo-lg border-3 border-dashed border-neo-cream/40 bg-neo-navy px-4 text-center">
+              <div className="mp-arena-tail-inner flex w-full flex-col items-center justify-center gap-2 px-4 text-center">
                 <Image
                   src="/mascot/waiting-hop-nobg.webp"
                   alt=""
@@ -186,7 +184,7 @@ export function ArenaList({
                   width={176}
                   height={176}
                   loading="eager"
-                  className="mp-arena-tail-img h-[clamp(64px,34cqh,176px)] w-auto object-contain mix-blend-lighten motion-safe:animate-mp-bump"
+                  className="mp-arena-tail-img h-[clamp(64px,34cqh,176px)] w-auto object-contain motion-safe:animate-mp-bump"
                 />
                 <p className="font-neo-display text-sm lg:text-base tv:text-2xl font-bold text-neo-white/75">
                   {t('mpUi.entry.moreSoon')}

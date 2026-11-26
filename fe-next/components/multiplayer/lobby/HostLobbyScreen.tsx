@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { MpScreen } from '../shell/MpScreen';
 
 /**
@@ -9,5 +10,5 @@ import { MpScreen } from '../shell/MpScreen';
  * is frozen. The TV projector lobby (TvLobbyView) is `fixed` and stays outside.
  */
 export function HostLobbyScreen({ children }: { children: ReactNode }) {
-  return <MpScreen testId="mp-host-lobby" bodyScroll="inner" body={children} />;
+  return <MpScreen testId="mp-host-lobby" bodyScroll="inner" backdrop={<AmbientBackdrop theme="multiplayer" />} body={children} />;
 }

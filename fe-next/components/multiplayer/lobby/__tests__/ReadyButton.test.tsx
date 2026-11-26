@@ -5,7 +5,7 @@
  * it steps down to an outlined "ready" state (tap again to un-ready).
  */
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ReadyButton } from '../ReadyButton';
 
@@ -28,5 +28,14 @@ describe('ReadyButton — lobby CTA hierarchy', () => {
     expect(btn.className).toContain('border-neo-lime');
     expect(btn).toHaveAttribute('aria-pressed', 'true');
     expect(btn).toHaveTextContent('playerView.readyConfirmed');
+  });
+
+  it('sinks with the chunky press while held', () => {
+    render(<ReadyButton isReady={false} onToggle={vi.fn()} inFlight={false} t={t} />);
+    const btn = screen.getByTestId('ready-button');
+    fireEvent.pointerDown(btn, { button: 0 });
+    expect(btn).toHaveAttribute('data-pressed', 'true');
+    fireEvent.pointerUp(btn);
+    expect(btn).not.toHaveAttribute('data-pressed');
   });
 });

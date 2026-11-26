@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useSyncExternalStore, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useMpShellLock } from './useMpShellLock';
 
@@ -14,6 +14,8 @@ export interface MpScreenProps {
    * `inner`: the body region scrolls on its own; the page never does.
    */
   bodyScroll?: 'none' | 'inner';
+  /** Decor painted behind the rows (e.g. AmbientBackdrop). Client-only: its motion classes depend on the device. */
+  backdrop?: ReactNode;
   className?: string;
   bodyClassName?: string;
 }
@@ -32,18 +34,22 @@ export interface MpScreenProps {
  *   for first paint (pitfall class 1).
  * - Global nav hiding is NOT done here: PageClient is its single writer.
  */
-export function MpScreen({ header, body, footer, testId, bodyScroll = 'none', className, bodyClassName }: MpScreenProps) {
+const noop = () => () => {};
+
+export function MpScreen({ header, body, footer, testId, bodyScroll = 'none', backdrop, className, bodyClassName }: MpScreenProps) {
   useMpShellLock();
+  const hydrated = useSyncExternalStore(noop, () => true, () => false);
   return (
     <div
       data-testid={testId}
       data-mp-screen=""
       className={cn(
-        'mp-screen relative flex-1 h-full min-h-0 w-full grid grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-neo-navy text-neo-white',
+        'mp-screen relative isolate flex-1 h-full min-h-0 w-full grid grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden bg-neo-navy text-neo-white',
         'ps-[env(safe-area-inset-left)] pe-[env(safe-area-inset-right)]',
         className,
       )}
     >
+      {hydrated && backdrop}
       {header ? (
         <div data-testid={`${testId}-header`} className="min-w-0">
           {header}

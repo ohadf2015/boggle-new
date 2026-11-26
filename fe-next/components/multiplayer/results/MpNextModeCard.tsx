@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
+import { Building2, ChevronDown, Grid2x2, Grid3x3, RotateCw, Search, Shuffle, Target, Zap, type LucideIcon } from 'lucide-react';
 import { MpSheet } from '../shell/MpSheet';
 import { getModePresentation, type ModeColorFamily } from '@/lib/multiplayer/modePresentation';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -56,29 +56,23 @@ export function MpNextModeCard({ mode, onChange, onPickerOpenChange, t, classNam
         onClick={onChange ? () => setPicking(true) : undefined}
         data-testid="mp-next-mode"
         data-mode={mode ?? ''}
+        aria-label={onChange ? `${t('mpUi.results.nextUp')}: ${mode ? t(p.labelKey) : ''} — ${t('mpUi.results.tapToChange')}` : undefined}
         className={cn(
-          'flex items-center min-w-0 w-full text-start rounded-neo-lg border-[3px] bg-neo-navy-light shadow-hard-sm',
-          'gap-[calc(10px*var(--mp-u,1))] p-[calc(8px*var(--mp-u,1))]',
+          'inline-flex items-center self-center max-w-full min-w-0 rounded-full border-2 bg-neo-navy-light ps-1 pe-3 h-[calc(32px*var(--mp-u,1))]',
+          'gap-[calc(6px*var(--mp-u,1))] text-[calc(12px*var(--mp-u,1))] font-bold uppercase',
           tone.card,
-          onChange && 'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
+          onChange && 'active:translate-y-[1px]',
           className,
         )}
       >
-        <span className={cn('shrink-0 grid place-items-center rounded-neo border-2 border-neo-black w-[calc(40px*var(--mp-u,1))] h-[calc(40px*var(--mp-u,1))]', tone.icon)}>
-          <Icon aria-hidden="true" className="w-[calc(22px*var(--mp-u,1))] h-[calc(22px*var(--mp-u,1))]" />
+        <span className={cn('shrink-0 grid place-items-center rounded-full border-2 border-neo-black w-[calc(24px*var(--mp-u,1))] h-[calc(24px*var(--mp-u,1))]', tone.icon)}>
+          <Icon aria-hidden="true" className="w-[calc(14px*var(--mp-u,1))] h-[calc(14px*var(--mp-u,1))]" />
         </span>
-        <span className="min-w-0 flex-1 flex flex-col leading-tight">
-          <span className="text-[calc(10px*var(--mp-u,1))] font-bold uppercase tracking-widest text-neo-white/70">{t('mpUi.results.nextUp')}</span>
-          <span className={cn('font-neo-display font-bold uppercase truncate text-[calc(17px*var(--mp-u,1))]', tone.text)}>
-            {mode ? t(p.labelKey) : t('mpUi.results.hostPicking')}
-          </span>
-          {mode && <span className="truncate text-[calc(11px*var(--mp-u,1))] text-neo-white/80">{t(p.hookKey)}</span>}
+        <span className="shrink-0 tracking-wider text-neo-white/70">{t('mpUi.results.nextUp')}</span>
+        <span className={cn('font-neo-display truncate', tone.text)}>
+          {mode ? t(p.labelKey) : t('mpUi.results.hostPicking')}
         </span>
-        {onChange && (
-          <span className="shrink-0 rounded-full border-2 border-neo-black bg-neo-white px-2 py-0.5 text-[calc(10px*var(--mp-u,1))] font-bold uppercase text-neo-black">
-            {t('mpUi.results.tapToChange')}
-          </span>
-        )}
+        {onChange && <ChevronDown aria-hidden="true" className="shrink-0 w-4 h-4 text-neo-white/70" />}
       </Tag>
       {onChange && (
         <MpSheet open={picking} onClose={() => setPicking(false)} title={t('mpUi.results.chooseMode')} testId="mp-next-mode-sheet">

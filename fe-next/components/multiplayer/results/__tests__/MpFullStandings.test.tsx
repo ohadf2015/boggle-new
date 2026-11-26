@@ -5,6 +5,7 @@ import { pickVisibleRows } from '../mpResultsView';
 import type { MpStandingRow } from '../mpStandings';
 
 vi.mock('@/components/Avatar', () => ({ default: () => <span /> }));
+vi.mock('@/components/ui/AnimatedCounter', () => ({ default: ({ value }: { value: number }) => <span>{value}</span> }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
 vi.mock('@/hooks/useMediaQuery', () => ({ useIsDesktop: () => false }));
 

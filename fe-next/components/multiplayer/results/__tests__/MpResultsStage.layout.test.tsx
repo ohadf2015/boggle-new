@@ -109,11 +109,38 @@ describe('MpResultsStage layout', () => {
     expect(screen.getByTestId('mp-results-stage').className).toMatch(/lg:items-start/);
   });
 
-  it('Given the host on an intermission, When it renders, Then NEXT MODE comes before the secondary cards', async () => {
+  it('Given the host on an intermission, Then NEXT UP is a small chip by the primary, not a card in the body', () => {
     renderAt(1, true);
-    const social = await screen.findByTestId('mp-word-showdown');
     const next = screen.getByTestId('mp-next-mode');
-    expect(next.compareDocumentPosition(social) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByTestId('mp-results-footer')).toContainElement(next);
+    expect(screen.getByTestId('mp-results-body')).not.toContainElement(next);
+    expect(next.className).toMatch(/\brounded-full\b/);
+    expect(next.textContent).not.toContain('hook');
+  });
+
+  it('Given a phone, Then the podium and my card own the first screen (secondary cards start below the fold)', () => {
+    renderAt(1, true);
+    const podium = screen.getByTestId('mp-results-stage').querySelector('[data-moment]')!;
+    expect(podium.className).toMatch(/max-lg:min-h-\[calc\(100dvh/);
+  });
+
+  it('Given a bots-only round mid-series, Then the daily promo waits for the final round', async () => {
+    render(
+      <MpResultsScreen
+        finalScores={[{ ...SCORES[0], isBot: true }, SCORES[1]]}
+        username="Me"
+        gameCode="ROOM12"
+        onReturnToRoom={vi.fn()}
+        socket={{ emit: vi.fn(), on: vi.fn(), off: vi.fn() } as never}
+        isHost
+        roomLanguage="en"
+        seriesRoundNumber={1}
+        seriesTotalGames={3}
+        onResetSeries={vi.fn()}
+      />,
+    );
+    await screen.findByTestId('mp-word-showdown');
+    expect(screen.queryByTestId('mp-tomorrow-card')).toBeNull();
   });
 
   it('Given the series final, When the host views it, Then the host can still change the mode for the rematch', async () => {

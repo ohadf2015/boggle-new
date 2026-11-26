@@ -10,6 +10,7 @@ import { MASCOT_SRC, mascotFor } from './mpResultsView';
 import type { ResultCallout } from './mpResultsStory';
 import { MEDAL_SRC, MpCalloutLine, ResultArt } from './MpResultArt';
 import fx from './mpResults.module.css';
+import { MascotRig, type MascotRigState } from '@/components/motion/MascotRig';
 import { BestMissedWordLine, RewardLine } from '@/components/results/ResultsLines';
 import type { BestMissedWord } from '@/components/results/bestMissedWord';
 
@@ -61,6 +62,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
   const mood = calm || (lostBoss && winner) ? 'cheer' : mascotFor(rank, total, score);
   const showWinner = !calm && winner && !lostBoss;
   const medal = !calm && score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
+  const reaction: MascotRigState = !revealed ? 'idle' : mood === 'victory' ? 'cheer' : mood === 'oops' ? 'sad' : 'hop';
 
   return (
     <section
@@ -78,14 +80,16 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
         className,
       )}
     >
-      <div className="relative shrink-0 w-[calc(76px*var(--mp-u,1))] h-[calc(76px*var(--mp-u,1))]">
-        <Image
-          src={MASCOT_SRC[mood]}
-          alt=""
-          width={152}
-          height={152}
-          className={cn('w-full h-full object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]', revealed && fx.mascotHop)}
-        />
+      <div className="relative shrink-0 w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))]">
+        <MascotRig state={reaction} className="w-full h-full">
+          <Image
+            src={MASCOT_SRC[mood]}
+            alt=""
+            width={152}
+            height={152}
+            className="w-full h-full object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]"
+          />
+        </MascotRig>
         {!calm && (medal ? (
           <span data-testid="mp-my-rank" data-medal={medal} className={cn('absolute -bottom-2 -end-3 block w-[calc(44px*var(--mp-u,1))] h-[calc(44px*var(--mp-u,1))]', revealed && fx.medalDrop)}>
             <span className="sr-only">#{rank}</span>
@@ -140,10 +144,10 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
               <span dir="ltr" className="tabular-nums opacity-70">+{bestWord.score}</span>
             </span>
           )}
+          {/* Mounted while the card is still invisible, so the reveal never changes its height. */}
+          <RewardLine coins={coins} xp={xp} mode="multiplayer" seen={revealed} t={t} className={cn('text-[calc(13px*var(--mp-u,1))]', revealed && fx.rewardPop)} />
         </div>
-        {/* Mounted while the card is still invisible, so the reveal never changes its height. */}
-        <RewardLine coins={coins} xp={xp} mode="multiplayer" seen={revealed} t={t} className={cn('text-[calc(13px*var(--mp-u,1))]', revealed && fx.rewardPop)} />
-        <BestMissedWordLine best={bestMissed} mode="multiplayer" language={language} seen={revealed} t={t} className="text-[calc(12px*var(--mp-u,1))] opacity-80" />
+        <BestMissedWordLine best={bestMissed} mode="multiplayer" language={language} seen={revealed} t={t} className="truncate text-[calc(12px*var(--mp-u,1))] opacity-80" />
       </div>
     </section>
   );

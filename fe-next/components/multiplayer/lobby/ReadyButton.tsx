@@ -2,6 +2,8 @@
 
 import { Check, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { neoChunkyPress } from '@/components/ui/neoStyles';
+import { usePress } from '@/components/motion/usePress';
 import styles from './lobby.module.css';
 
 type T = (path: string, params?: Record<string, string | number>) => string;
@@ -15,6 +17,7 @@ type T = (path: string, params?: Record<string, string | number>) => string;
 export function ReadyButton({
   isReady, onToggle, inFlight, t, className,
 }: { isReady: boolean; onToggle: () => void; inFlight: boolean; t: T; className?: string }) {
+  const press = usePress<HTMLButtonElement>({}, inFlight);
   return (
     <button
       type="button"
@@ -22,10 +25,12 @@ export function ReadyButton({
       onClick={onToggle}
       disabled={inFlight}
       aria-pressed={isReady}
+      {...press}
       className={cn(
+        neoChunkyPress(4),
         'relative w-full h-[calc(64px*var(--mp-u,1))] flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black',
-        'font-neo-display text-xl tv:text-3xl font-bold uppercase tracking-wide shadow-hard transition-[transform,background-color] duration-150',
-        'active:translate-y-0.5 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+        'font-neo-display text-xl tv:text-3xl font-bold uppercase tracking-wide',
+        'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         isReady ? 'bg-neo-navy text-neo-lime border-neo-lime hover:bg-neo-lime/10' : 'bg-neo-lime text-neo-black hover:brightness-110',
         className,

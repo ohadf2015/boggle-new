@@ -24,6 +24,7 @@ export function MpPrimaryCta({ label, sublabel, tone, badge, onPress, disabled, 
   return (
     <Button
       type="button"
+      press="chunky"
       variant={TONE[tone]}
       data-testid={testId}
       disabled={inert}
