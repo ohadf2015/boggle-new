@@ -5,10 +5,13 @@ import Image from 'next/image';
 import { Bomb, Gem, Trophy, type LucideIcon } from 'lucide-react';
 import { Coins } from '@/components/ui/CoinsIcon';
 import { Button } from '@/components/ui/button';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { MascotRig } from '@/components/motion/MascotRig';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
-const PRIMARY_CTA = 'min-h-[56px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black shadow-hard-lg bg-neo-lime text-neo-black hover:bg-neo-lime/90';
+const PRIMARY_CTA = 'min-h-[60px] w-full max-w-xs font-black text-xl uppercase border-3 border-neo-black';
 
 const TILES: ReadonlyArray<{ key: 'bomb' | 'gold' | 'diamond'; Icon: LucideIcon; tone: string }> = [
   { key: 'bomb', Icon: Bomb, tone: 'bg-neo-pink text-neo-white' },
@@ -29,24 +32,28 @@ export function BlastStartScreen({ personalBest, resumeWave, onStart, onResume, 
   const { t, language } = useLanguage();
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-5 px-4 py-6">
-      <Image
-        data-testid="blast-start-art"
-        src="/modes/blast.png"
-        alt=""
-        width={144}
-        height={144}
-        priority
-        className="h-32 w-32 drop-shadow-[4px_4px_0_rgb(var(--neo-black))] sm:h-36 sm:w-36"
-      />
+    <div className="relative isolate flex-1 flex flex-col items-center justify-center gap-5 overflow-hidden px-4 py-6">
+      <AmbientBackdrop theme="solo" />
+      <MascotRig>
+        <Image
+          data-testid="blast-start-art"
+          src="/modes/blast.png"
+          alt=""
+          width={144}
+          height={144}
+          priority
+          className="h-32 w-32 drop-shadow-[4px_4px_0_rgb(var(--neo-black))] sm:h-36 sm:w-36"
+        />
+      </MascotRig>
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-4xl font-black uppercase text-neo-white font-neo-display">{t('blast.ready.title')}</h1>
-        <p className="max-w-xs text-sm font-semibold text-neo-white/85">{t('blast.ready.subtitle')}</p>
+        <p className="max-w-xs text-sm font-semibold text-neo-white/85">{t('blast.ready.tagline')}</p>
       </div>
       <ul className="flex gap-2" aria-label={t('blast.ready.tileGuide')}>
         {TILES.map(({ key, Icon, tone }) => (
           <li
             key={key}
+            title={t(`blast.tileGuide.${key}.desc`)}
             className={cn('flex items-center gap-1.5 rounded-neo border-2 border-neo-black px-2.5 py-1 shadow-hard-sm font-neo-display text-xs font-black uppercase', tone)}
           >
             <Icon className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
@@ -65,21 +72,20 @@ export function BlastStartScreen({ personalBest, resumeWave, onStart, onResume, 
       )}
       {resumeWave != null ? (
         <>
-          <Button data-testid="resume-button" size="lg" onClick={onResume} className={PRIMARY_CTA}>
+          <Button data-testid="resume-button" size="lg" press="chunky" variant="success" onClick={onResume} className={PRIMARY_CTA}>
             {t('blast.ready.resume', { wave: resumeWave })}
           </Button>
-          <Button
+          <PressSurface
             data-testid="play-button"
-            size="sm"
-            variant="ghost"
+            lip={2}
             onClick={onStart}
-            className="min-h-[40px] w-full max-w-xs font-bold text-sm uppercase text-neo-white hover:text-neo-white underline underline-offset-4 decoration-neo-white/40 hover:bg-transparent"
+            className="min-h-[48px] w-full max-w-xs rounded-neo border-2 border-neo-white/70 bg-transparent font-neo-display text-sm font-bold uppercase tracking-wide text-neo-white shadow-neo-white/30"
           >
             {t('blast.ready.play')}
-          </Button>
+          </PressSurface>
         </>
       ) : (
-        <Button data-testid="play-button" size="lg" onClick={onStart} className={PRIMARY_CTA}>
+        <Button data-testid="play-button" size="lg" press="chunky" variant="success" onClick={onStart} className={PRIMARY_CTA}>
           {t('blast.ready.start')}
         </Button>
       )}

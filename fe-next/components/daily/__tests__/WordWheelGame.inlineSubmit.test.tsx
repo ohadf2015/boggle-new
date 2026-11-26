@@ -122,9 +122,9 @@ describe('WordWheelGame inline submit chip', () => {
 });
 
 describe('WordWheelGame layout reserves space (no shift)', () => {
-  it('renders a reserved slot for the next-rival pill even when no rival is visible', () => {
+  it('keeps the phone ladder to one line: no rival label under it', () => {
     mountGame();
-    expect(screen.getByTestId('next-rival-slot')).toBeInTheDocument();
+    expect(screen.queryByTestId('next-rival-slot')).toBeNull();
   });
 
   it('no longer renders a tap-hint line under the word builder', () => {
@@ -135,5 +135,22 @@ describe('WordWheelGame layout reserves space (no shift)', () => {
   it('renders a reserved slot for the combo chip in the top bar', () => {
     mountGame();
     expect(screen.getByTestId('combo-slot')).toBeInTheDocument();
+  });
+});
+
+describe('WordWheelGame first-round coaching', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('shows the how-to line in the first wheel round only, never again', () => {
+    const first = mountGame();
+    expect(screen.getByText(/wordWheel\.firstHint/)).toBeInTheDocument();
+    first.unmount();
+    mountGame();
+    expect(screen.queryByText(/wordWheel\.firstHint/)).toBeNull();
+  });
+
+  it('shows one keyboard hint, not a second floating tooltip', () => {
+    mountGame();
+    expect(screen.queryByTestId('type-word-hint')).toBeNull();
   });
 });

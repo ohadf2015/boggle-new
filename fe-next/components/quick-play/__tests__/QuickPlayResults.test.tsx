@@ -114,12 +114,42 @@ describe('QuickPlayResults redesign', () => {
     expect(hero).toHaveTextContent('quickPlay.solo.ofPerfect');
   });
 
-  it('hero pulls betterThan comparison into the main card', () => {
+  it('a personal best by a margin says it once: the badge carries the margin, no second line', () => {
+    render(
+      <QuickPlayResults result={result} outcome={outcome} rival={null} prevBestScore={180} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+    expect(screen.getByTestId('quick-new-best')).toHaveTextContent('quickLoop.nearMiss.newBestBy');
+    expect(screen.queryByTestId('quick-near-miss-line')).toBeNull();
+  });
+
+  it('keeps the percentile and vs-average comparisons under the fold, not in the hero', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
     const hero = screen.getByTestId('quick-hero-card');
-    expect(hero).toHaveTextContent('quickPlay.solo.betterThan');
+    const details = screen.getByTestId('quick-results-details');
+    expect(hero).not.toHaveTextContent('quickPlay.solo.betterThan');
+    expect(hero).not.toHaveTextContent('quickPlay.solo.vsAverage');
+    expect(details).toHaveTextContent('quickPlay.solo.betterThan');
+    expect(details).toHaveTextContent('quickPlay.solo.vsAverage');
+    // Not the first thing under the fold either: it peeked above the pinned bar there.
+    const rank = screen.getByTestId('quick-rank-bar');
+    const compare = screen.getByTestId('quick-compare-row');
+    expect(rank.compareDocumentPosition(compare) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('shows rank progress as a spring bar in the hero, labelled with the points to the next rank', () => {
+    render(
+      <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
+    );
+    const bar = screen.getByTestId('quick-hero-card').querySelector('[role="progressbar"]');
+    expect(bar).not.toBeNull();
+    // 900 points: Silver band starts at 800, Gold at 1600.
+    expect(bar).toHaveAttribute('aria-valuenow', '100');
+    expect(bar).toHaveAttribute('aria-valuemax', '800');
+    expect(bar).toHaveAttribute('aria-label', 'quickPlay.solo.rankToNext');
+    expect(screen.getByTestId('quick-hero-rank')).toHaveTextContent('quickPlay.solo.rank.silver');
+    expect(screen.getByTestId('quick-hero-rank')).toHaveTextContent('quickPlay.solo.rankToNext');
   });
 
   it('score lives in the stat card under the hero', () => {
@@ -129,14 +159,12 @@ describe('QuickPlayResults redesign', () => {
     expect(screen.getByTestId('quick-stat-score')).toHaveAttribute('data-value', '340');
   });
 
-  // Was "does not display the wordsFound line" — the hero deliberately carried
-  // no word count while the screen showed no words at all. It now lists the
-  // words you found, and "24 / 96" is the coverage context for that list.
-  it('displays how much of the board was cleared', () => {
+  it('leaves the word count to the WORDS stat card instead of repeating it under the headline', () => {
     render(
       <QuickPlayResults result={result} outcome={outcome} rival={null} onNextRound={vi.fn()} onChallenge={vi.fn()} />
     );
-    expect(screen.getByTestId('quick-hero-card')).toHaveTextContent('quickPlay.solo.wordsFound');
+    expect(screen.getByTestId('quick-hero-card')).not.toHaveTextContent('quickPlay.solo.wordsFound');
+    expect(screen.getByTestId('quick-stat-words')).toHaveAttribute('data-value', '7');
   });
 
   it('coins and XP share ONE small reward line (not two chips, not a full-width slab)', () => {

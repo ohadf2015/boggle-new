@@ -32,6 +32,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
   };
   return {
     AdaptiveMotion: new Proxy({}, { get: () => passthrough() }),
+    useSkipAnimations: () => true,
     AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });

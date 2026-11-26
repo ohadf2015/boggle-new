@@ -94,9 +94,9 @@ afterEach(() => {
 });
 
 describe('WordWheelGame — caller-supplied rivals', () => {
-  it('shows the rival pill even under hideCompetitive when rivals are supplied', () => {
+  it('shows the rival marker even under hideCompetitive when rivals are supplied', () => {
     renderGame({ hideCompetitive: true, practice: true, rivals });
-    expect(screen.getByTestId('next-rival-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('rival-marker')).toBeInTheDocument();
   });
 
   it('does not fetch the daily leaderboard — the supplied cohort is the whole cohort', () => {
@@ -109,14 +109,14 @@ describe('WordWheelGame — caller-supplied rivals', () => {
     expect(screen.queryByTestId('combo-slot')).toBeNull();
   });
 
-  it('still hides the pill when hideCompetitive is set and no rivals are supplied', () => {
+  it('still hides the rival when hideCompetitive is set and no rivals are supplied', () => {
     renderGame({ hideCompetitive: true, practice: true });
-    expect(screen.queryByTestId('next-rival-slot')).toBeNull();
+    expect(screen.queryByTestId('rival-marker')).toBeNull();
   });
 
   it('skips the daily fetch when rivals are supplied in competitive mode too', () => {
     renderGame({ rivals });
     expect(global.fetch).not.toHaveBeenCalled();
-    expect(screen.getByTestId('next-rival-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('rival-marker')).toBeInTheDocument();
   });
 });

@@ -26,6 +26,8 @@ import { shareQuickResult } from './challengeShare';
 import { RESULTS_LOOP_EVENTS, seededRoundRequest, type SeededChallengeLink } from '@/lib/quickPlay/seededChallengeLink';
 import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
+import { Button } from '@/components/ui/button';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { BaseErrorBoundary } from '@/components/ErrorBoundaries';
 import { captureError } from '@/utils/sentry';
@@ -502,14 +504,16 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
             <p className="font-neo-display text-lg text-neo-white">
               {t('errors.errorHeading', "Let's Get You Back!")}
             </p>
-            <button
-              type="button"
+            <Button
+              press="chunky"
+              variant="success"
+              size="lg"
               data-testid="quick-round-error-retry"
               onClick={() => handleNextRound()}
-              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
+              className="min-h-14 px-8 font-neo-display"
             >
               {t('common.retry', 'Try Again')}
-            </button>
+            </Button>
           </div>
         }
       >
@@ -554,15 +558,10 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
 
   return (
     <div
-      className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-neo-navy animate-[fadeInUp_0.25s_ease-out_0s_both]"
+      className="relative isolate flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-neo-navy"
       data-testid="quick-play-hub"
     >
-      {/* Arcade atmosphere: a halftone field, the brand texture (no soft blobs). */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(255,255,255,0.07)_1.2px,transparent_1.3px)] bg-size-[14px_14px]"
-        data-testid="quick-hub-atmosphere"
-      />
+      <AmbientBackdrop theme="solo" />
 
       <header className="relative z-[1] flex shrink-0 items-center justify-between px-4 pt-3 sm:px-5 sm:pt-5">
         <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
@@ -625,14 +624,16 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
             >
               {t(rateLimited ? 'quickPlay.solo.loadRateLimited' : 'quickPlay.solo.loadError')}
             </div>
-            <button
-              type="button"
+            <Button
+              press="chunky"
+              variant="success"
+              size="lg"
               data-testid="quick-load-retry"
               onClick={() => void handlePlay(lastSelection.current, 'tap')}
-              className="min-h-11 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-neo-black shadow-hard active:shadow-hard-pressed"
+              className="min-h-14 px-8 font-neo-display"
             >
               {t('common.retry', 'Try Again')}
-            </button>
+            </Button>
           </>
         ) : (
           /* Board build is a real wait (fetch + a held beat). A dancing mascot is

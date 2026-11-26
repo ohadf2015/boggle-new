@@ -69,7 +69,7 @@ function makeResults(overrides: Partial<BlastResultsData> = {}): BlastResultsDat
 describe('BlastResultsSummary', () => {
   const noop = () => {};
 
-  it('renders score and word/wave counts', () => {
+  it('renders score and word/wave counts', async () => {
     render(
       <BlastResultsSummary
         results={makeResults()}
@@ -78,7 +78,8 @@ describe('BlastResultsSummary', () => {
         onQuit={noop}
       />,
     );
-    expect(screen.getByText('5,000')).toBeDefined();
+    // The score counts up into place.
+    expect(await screen.findByText('5,000', {}, { timeout: 3000 })).toBeDefined();
     expect(screen.getByTestId('blast-results-secondary-words').textContent).toContain('3');
     // Waves live on the journey track, not as a loose count that disagrees with checkpoint runs.
     expect(screen.queryByTestId('blast-results-secondary-waves')).toBeNull();

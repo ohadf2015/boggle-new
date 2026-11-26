@@ -8,9 +8,13 @@ const t = (key: string, params?: Record<string, unknown>) =>
   params ? `${key}:${JSON.stringify(params)}` : key;
 
 describe('WordWheelFoundWords', () => {
-  it('strip shows the empty hint before the first word', () => {
+  it('before the first word the strip is just a quiet count: no box, no filler line, nothing to open', () => {
     render(<WordWheelFoundWords t={t} words={[]} lastFound={null} />);
-    expect(screen.getByText('wordWheel.strip.empty')).toBeInTheDocument();
+    expect(screen.queryByText('wordWheel.strip.empty')).toBeNull();
+    expect(screen.queryByRole('button')).toBeNull();
+    expect(screen.getByTestId('found-count').textContent).toBe('0');
+    // Same height either way, so the first word doesn't shove the wheel.
+    expect(screen.getByTestId('found-words-slot').className).toContain('h-11');
   });
 
   it('strip lists the newest word first and highlights it', () => {

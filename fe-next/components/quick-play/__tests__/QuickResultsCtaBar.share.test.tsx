@@ -20,6 +20,27 @@ describe('QuickResultsCtaBar share', () => {
     expect(screen.getByTestId('quick-next-mode-blast')).toBeTruthy();
   });
 
+  it('Given the pinned bar, Then the other modes are a calm outline row with no caption, pressing like chunky tiles', () => {
+    renderBar(vi.fn().mockResolvedValue('shared'));
+    expect(screen.queryByText('quickPlay.solo.pickNextMode')).toBeNull();
+    expect(screen.getByTestId('quick-next-mode-picker')).toHaveAccessibleName('quickPlay.solo.pickNextMode');
+    const chip = screen.getByTestId('quick-next-mode-blast');
+    expect(chip.className).toContain('bg-neo-navy-elevated');
+    expect(chip.className).not.toContain('bg-neo-pink');
+    fireEvent.pointerDown(chip, { button: 0 });
+    expect(chip).toHaveAttribute('data-pressed', 'true');
+  });
+
+  it('Given the bar, Then NEXT BOARD and the challenge button sink with the chunky press', () => {
+    renderBar(vi.fn().mockResolvedValue('shared'));
+    for (const id of ['quick-results-next', 'quick-results-challenge']) {
+      const el = screen.getByTestId(id);
+      fireEvent.pointerDown(el, { button: 0 });
+      expect(el).toHaveAttribute('data-pressed', 'true');
+      expect(el.className).not.toContain('active:translate');
+    }
+  });
+
   it('Given a guest, When the bar renders, Then the side button is still a same-board challenge', () => {
     renderBar(vi.fn().mockResolvedValue('shared'), true);
     expect(screen.getByTestId('quick-results-challenge')).toHaveAccessibleName('quickPlay.solo.challengeFriend');

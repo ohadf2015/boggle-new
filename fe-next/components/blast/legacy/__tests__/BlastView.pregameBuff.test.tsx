@@ -33,6 +33,7 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
   };
   return {
     AdaptiveMotion: new Proxy({}, { get: () => passthrough() }),
+    useSkipAnimations: () => true,
     AdaptiveAnimatePresence: ({ children }: any) => <>{children}</>,
   };
 });
@@ -76,6 +77,14 @@ describe('BlastView pre-game buff wiring', () => {
   it('ready phase shows claim-boost button', () => {
     render(<BlastView />);
     expect(screen.getByTestId('blast-claim-boost-button')).toBeInTheDocument();
+  });
+
+  it('the boost is an outline secondary that never outshouts PLAY', () => {
+    render(<BlastView />);
+    const boost = screen.getByTestId('blast-claim-boost-button');
+    expect(boost.className).not.toContain('bg-neo-pink');
+    expect(boost.className).not.toContain('shadow-hard-lg');
+    expect(boost.className).toContain('border-neo-pink');
   });
 
   it('clicking claim-boost opens the pregame buff modal', () => {

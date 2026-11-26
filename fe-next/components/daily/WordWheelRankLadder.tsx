@@ -147,6 +147,8 @@ export default function WordWheelRankLadder({
         {nextRival && (
           <m.span
             aria-hidden
+            data-testid="rival-marker"
+            data-rival={nextRival.name}
             className="absolute top-1/2 -translate-y-1/2 ltr:-translate-x-1/2 rtl:translate-x-1/2 rounded-full ring-2 ring-neo-pink bg-neo-navy z-[1]"
             initial={false}
             animate={{ insetInlineStart: `${rivalPos * 100}%` }}
@@ -229,7 +231,7 @@ export default function WordWheelRankLadder({
             ? t('wordWheel.rank.toNext', { count: toNext, rank: t(`wordWheel.rank.${WHEEL_RANKS[index + 1]}`) })
             : t('wordWheel.rank.top')}
         </span>
-        {showRival && (
+        {showRival && wide && (
           <span
             data-testid="next-rival-slot"
             className="min-w-0 flex items-center justify-end gap-1 text-neo-pink font-bold whitespace-nowrap"

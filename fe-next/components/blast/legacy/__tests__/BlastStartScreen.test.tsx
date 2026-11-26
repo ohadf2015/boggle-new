@@ -15,7 +15,7 @@ describe('BlastStartScreen', () => {
     const onStart = vi.fn();
     render(<BlastStartScreen personalBest={null} resumeWave={null} onStart={onStart} onResume={vi.fn()} />);
     expect(screen.getByTestId('blast-start-art').getAttribute('src')).toContain('blast.png');
-    expect(screen.getByText('blast.ready.subtitle')).toBeInTheDocument();
+    expect(screen.getByText('blast.ready.tagline')).toBeInTheDocument();
     expect(screen.queryByTestId('blast-start-best')).toBeNull();
     expect(screen.queryByTestId('resume-button')).toBeNull();
     expect(screen.getByTestId('play-button').textContent).toBe('blast.ready.start');
@@ -35,6 +35,34 @@ describe('BlastStartScreen', () => {
     expect(screen.getByTestId('play-button').textContent).toBe('blast.ready.play');
     fireEvent.click(screen.getByTestId('resume-button'));
     expect(onResume).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the pitch to one line under the title', () => {
+    render(<BlastStartScreen personalBest={null} resumeWave={null} onStart={vi.fn()} onResume={vi.fn()} />);
+    expect(screen.queryByText('blast.ready.subtitle')).toBeNull();
+  });
+
+  it('gives the mode art idle mascot life', () => {
+    render(<BlastStartScreen personalBest={null} resumeWave={null} onStart={vi.fn()} onResume={vi.fn()} />);
+    expect(screen.getByTestId('mascot-rig')).toContainElement(screen.getByTestId('blast-start-art'));
+  });
+
+  it('given a saved wave, resume presses like a chunky button and restart is an outline button', () => {
+    render(<BlastStartScreen personalBest={null} resumeWave={4} onStart={vi.fn()} onResume={vi.fn()} />);
+    const resume = screen.getByTestId('resume-button');
+    fireEvent.pointerDown(resume, { button: 0 });
+    expect(resume).toHaveAttribute('data-pressed', 'true');
+    const restart = screen.getByTestId('play-button');
+    expect(restart.className).toContain('border-neo-white');
+    expect(restart.className).not.toContain('underline');
+    expect(restart.className).not.toContain('bg-neo-lime');
+  });
+
+  it('sits on the ambient backdrop, behind the content', () => {
+    const { container } = render(<BlastStartScreen personalBest={null} resumeWave={null} onStart={vi.fn()} onResume={vi.fn()} />);
+    const backdrop = container.querySelector('[data-ambient]');
+    expect(backdrop).not.toBeNull();
+    expect(backdrop?.parentElement?.className).toContain('isolate');
   });
 
   it('renders extra pregame content under the CTAs', () => {
