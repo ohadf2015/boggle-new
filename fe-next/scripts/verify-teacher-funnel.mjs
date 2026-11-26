@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Real-HTTP Teacher Pro trial→paid proof. Disposable Postgres. `npm run check`.
+// Never talks to hosted Supabase. A prod URL here is a hard stop.
 import { spawnSync } from 'node:child_process';
 import { createHmac, randomUUID } from 'node:crypto';
 import { createServer, request as httpRequest } from 'node:http';
@@ -7,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { registerHooks } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { assertDisposableSupabase } from './disposableSupabase.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const feNext = join(here, '..');
@@ -232,6 +234,7 @@ async function main() {
     await listen(supa, SUPA_PORT);
 
     process.env.NEXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${SUPA_PORT}`;
+    assertDisposableSupabase(process.env.NEXT_PUBLIC_SUPABASE_URL);
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = anonKey;
     process.env.SUPABASE_SERVICE_ROLE_KEY = serviceKey;
     process.env.SUPABASE_JWT_SECRET = JWT_SECRET;

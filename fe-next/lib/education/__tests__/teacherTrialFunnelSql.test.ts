@@ -19,7 +19,9 @@ describe('teacher trial funnel readout', () => {
     // The two October trial checkouts predate the canonical events; the report
     // must still see them via the raw webhook rows and the notice ledger.
     expect(report).toContain("payload->>'trial'");
-    expect(report).toContain('polar_trial_day10_sent');
+    expect(report).toContain('teacher_trial_canceled');
+    expect(report).toContain('customer_cancellation_reason');
+    expect(report).toContain("s.status = 'trialing'");
     expect(report).toContain("client_kind");
   });
 });

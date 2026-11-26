@@ -14,19 +14,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { PolarClient } from '@/lib/polar'
 import { upsertSubscription, logSubscriptionEvent, grantProFromOrder, grantProFromCheckout, subscriptionRowIsPastDue, subscriptionRowStatus, subscriptionTrialAlreadyCounted, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 import { maybeSendPaymentFailedEmail } from '@/lib/education/dunning'
-import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarCancelReasonProps, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
+import { buildPolarCheckoutStatusEvent, buildPolarOrderPaidEvent, buildPolarSubscriptionEndedEvent, polarCancelRecord, polarRevenueProps, withRevenue } from '@/lib/education/polarRevenue'
 import { withPolarMetadataIdentity } from '@/lib/education/checkoutAnalyticsIdentity'
 import type { EduServerEvent } from '@/backend/utils/educationTelemetry'
-import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
+import { buildProCheckoutSucceededEvent, buildProTrialSucceededEvent, buildTrialActivatedEvent, buildTrialStartEvent, buildTeacherTrialStartedEvent, buildCheckoutCompleteEvent, buildPaidEvent, buildTeacherTrialConvertedEvent, buildTrialExpiredEvent, buildTrialCanceledEvent, buildTrialStartedEvent, buildTeacherProUpgradedEvent, buildSubscriptionPastDueEvent, buildPaymentRecoveredEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer'
 import { buildTeacherFunnelStepEvent } from '@/lib/education/teacherFunnelStepServer'
-import { isPolarTrialLapse } from '@/lib/education/polarTrial'
+import { classifyPolarTrialCancel, isPolarTrialLapse, polarTrialDaysLeft } from '@/lib/education/polarTrial'
 import {
   recordTeacherTrialFunnelStep,
   TEACHER_TRIAL_STARTED_EVENT,
+  TEACHER_TRIAL_CANCELED_EVENT,
   TEACHER_TRIAL_EXPIRED_EVENT,
   TEACHER_SUBSCRIPTION_ACTIVE_EVENT,
 } from '@/lib/education/teacherTrialFunnel'
 import { firstWebhookTelemetry } from '@/lib/education/pro/webhookTelemetryOnce'
+import { shouldSkipQaMoneyCapture, teacherIsQa } from '@/lib/education/qaMoneyCapture'
 import { notifyAdmins } from '@/lib/admin/adminNotifications'
 import { proNotice } from '@/lib/admin/adminEvents'
 import { cleanAttribution } from '@/utils/eventContext'
@@ -35,6 +37,11 @@ import { cleanAttribution } from '@/utils/eventContext'
 type WebhookPayload = any
 
 function captureFunnel(payload: WebhookPayload, userId: string | undefined, event: EduServerEvent) {
+  const email = payload?.data?.customer?.email ?? payload?.data?.metadata?.email
+  if (shouldSkipQaMoneyCapture(event.event, {
+    email: typeof email === 'string' ? email : null,
+    isTestAccount: payload?.data?.metadata?.is_test_account === true || event.properties?.is_test_account === true,
+  })) return
   const tagged = { ...event, properties: { ...cleanAttribution(payload?.data?.metadata), ...event.properties } }
   captureProFunnelServerEvent(withPolarMetadataIdentity(tagged, payload?.data?.metadata, userId))
 }
@@ -185,6 +192,10 @@ export async function POST(request: NextRequest) {
     const payload: WebhookPayload = JSON.parse(rawBody)
     const eventType = String(payload?.type ?? '')
     const userId = getUserId(payload)
+    if (await teacherIsQa(userId, payload)) {
+      payload.data = payload.data ?? {}
+      payload.data.metadata = { ...(payload.data.metadata ?? {}), is_test_account: true }
+    }
 
     if (eventRequiresProProductId(eventType, payload) && !process.env.POLAR_PRO_PRODUCT_ID) {
       console.error(`[Polar] POLAR_PRO_PRODUCT_ID is not configured — refusing to ack ${eventType}`)
@@ -244,8 +255,7 @@ export async function POST(request: NextRequest) {
         break
       case 'subscription.canceled':
         await handleSubscriptionCanceled(payload, userId)
-        // A cancel inside a running trial keeps Pro until trial_end; revoked at that date is the lapse.
-        if (!isScheduledTrialCancel(payload?.data)) await trackTrialExpired(payload, userId)
+        await trackTrialCancelOrExpiry(payload, userId)
         trackSubscriptionEnded('canceled', payload, userId)
         break
       case 'subscription.revoked':
@@ -279,7 +289,7 @@ export async function POST(request: NextRequest) {
       userId,
       eventType,
       subscriptionId: String(payload?.data?.id ?? ''),
-      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end, ...polarRevenueProps(payload?.data), ...polarCancelReasonProps(payload?.data) },
+      payload: { event_type: eventType, user_id: userId, trial: marker.trial, trial_end: marker.trial_end, ...(payload?.data?.cancel_at_period_end === true ? { cancel_at_period_end: true } : {}), ...polarRevenueProps(payload?.data), ...polarCancelRecord(payload?.data) },
     })
 
     return NextResponse.json({ received: true })
@@ -381,12 +391,50 @@ async function trackProTrial(payload: WebhookPayload, userId?: string) {
 }
 
 /**
- * `trial_expired` — Polar Teacher Pro trial lapsed without converting.
- * Canceled/revoked only. A later paid cancel is not a lapse
- * (`isPolarTrialLapse`). Never throws.
+ * A cancel while the trial is still on is `trial_canceled` (Pro stays until
+ * trial_end). `trial_expired` is only a lapse: the trial ended with no paid
+ * period after it. Never throws.
  */
-function isScheduledTrialCancel(data: WebhookPayload['data']): boolean {
-  return data?.cancel_at_period_end === true && String(data?.status ?? '') === 'trialing'
+async function trackTrialCancelOrExpiry(payload: WebhookPayload, userId?: string) {
+  const data = payload?.data ?? {}
+  const marker = trialMarker(data)
+  const kind = classifyPolarTrialCancel({
+    status: String(data?.status ?? ''),
+    trial: marker.trial,
+    trial_end: marker.trial_end,
+    current_period_end: typeof data?.current_period_end === 'string' ? data.current_period_end : null,
+    cancel_at_period_end: data?.cancel_at_period_end === true,
+  }, Date.now())
+  if (kind === 'scheduled') await trackTrialCanceled(payload, userId)
+  else if (kind === 'lapsed') await trackTrialExpired(payload, userId)
+}
+
+async function trackTrialCanceled(payload: WebhookPayload, userId?: string) {
+  try {
+    if (!userId || getTierFromProductId(getProductId(payload)) !== 'pro') return
+    const data = payload?.data ?? {}
+    const marker = trialMarker(data)
+    const endsAt = (typeof data?.ends_at === 'string' && data.ends_at)
+      || (typeof data?.current_period_end === 'string' && data.current_period_end)
+      || marker.trial_end
+    const daysLeft = polarTrialDaysLeft(endsAt, Date.now())
+    const subId = String(data?.id ?? '')
+    const reason = typeof data?.customer_cancellation_reason === 'string' ? data.customer_cancellation_reason : null
+    await recordTeacherTrialFunnelStep({
+      userId,
+      eventType: TEACHER_TRIAL_CANCELED_EVENT,
+      subscriptionId: subId,
+      payload: { days_left: daysLeft, trial_end: marker.trial_end, ends_at: endsAt, cancel_reason: reason, status: String(data?.status ?? '') },
+      dedupe: 'ever',
+    })
+    captureFunnel(payload, userId, withRevenue(buildTrialCanceledEvent(userId, subId, {
+      days_left: daysLeft,
+      ends_at: endsAt,
+      cancel_reason: reason,
+    }), data))
+  } catch (err) {
+    console.error('[Polar] trial_canceled telemetry threw:', err)
+  }
 }
 
 async function trackTrialExpired(payload: WebhookPayload, userId?: string) {

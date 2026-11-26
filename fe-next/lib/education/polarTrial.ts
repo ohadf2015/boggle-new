@@ -156,6 +156,47 @@ export function isPolarTrialLapse(row: PolarTrialLapseRow | null | undefined): b
   return status === 'canceled' || status === 'unpaid' || status === 'incomplete_expired' || status === 'paused';
 }
 
+export type PolarTrialCancelClass = 'scheduled' | 'lapsed' | 'paid' | 'not_trial';
+
+export interface PolarTrialCancelInput {
+  status?: string | null;
+  trial?: boolean;
+  trial_end?: string | null;
+  current_period_end?: string | null;
+  cancel_at_period_end?: boolean | null;
+}
+
+function instantMs(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const n = Date.parse(iso);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * What a `subscription.canceled` means for a Teacher Pro trial.
+ * A cancel while access is still on (status still trialing, or
+ * cancel_at_period_end with the trial end in the future) is scheduled —
+ * Pro stays until trial_end. It is not an expiry. Expiry is only a cancel
+ * after the trial end with no paid period after it.
+ */
+export function classifyPolarTrialCancel(
+  row: PolarTrialCancelInput | null | undefined,
+  nowMs: number,
+): PolarTrialCancelClass {
+  if (!row) return 'not_trial';
+  const status = String(row.status ?? '');
+  const trialEnd = instantMs(row.trial_end);
+  const periodEnd = instantMs(row.current_period_end);
+  const usedTrial = row.trial === true || trialEnd !== null || status === 'trialing';
+  if (!usedTrial) return 'not_trial';
+  if (trialEnd !== null && periodEnd !== null && periodEnd > trialEnd) return 'paid';
+  if (status === 'trialing') return 'scheduled';
+  const end = trialEnd ?? periodEnd;
+  const stillOpen = end !== null && end > nowMs;
+  if (row.cancel_at_period_end === true && (stillOpen || end === null)) return 'scheduled';
+  return 'lapsed';
+}
+
 type TrialTitleT = (key: string, params?: Record<string, string | number>) => string;
 
 export function polarTrialDaysTitle(t: TrialTitleT, daysLeft: number | null): string {

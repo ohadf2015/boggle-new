@@ -8,6 +8,7 @@ import {
   isPolarTrialDay10Expiring,
   polarCheckoutWelcomeKind,
   isPolarTrialLapse,
+  classifyPolarTrialCancel,
 } from '../polarTrial';
 
 const END = '2026-10-08T00:00:00.000Z';
@@ -169,5 +170,56 @@ describe('polarTrialCountdown', () => {
     expect(polarTrialCountdown('not-a-date', NOW, 'en')).toBeNull();
     expect(polarTrialCountdown(new Date(NOW - 1000).toISOString(), NOW, 'en'))
       .toEqual({ key: 'education.trial.hours_left', count: 0 });
+  });
+});
+
+describe('classifyPolarTrialCancel', () => {
+  const NOW = Date.parse('2026-11-23T07:45:32.000Z');
+  const TRIAL_END = '2026-12-06T19:21:51.009Z';
+
+  it('a cancel while Polar still says trialing is scheduled, even without cancel_at_period_end', () => {
+    expect(classifyPolarTrialCancel({
+      status: 'trialing',
+      trial: true,
+      trial_end: TRIAL_END,
+      current_period_end: TRIAL_END,
+    }, NOW)).toBe('scheduled');
+  });
+
+  it('a cancel_at_period_end during a future trial is scheduled even if status is already canceled', () => {
+    expect(classifyPolarTrialCancel({
+      status: 'canceled',
+      trial: true,
+      cancel_at_period_end: true,
+      trial_end: TRIAL_END,
+      current_period_end: TRIAL_END,
+    }, NOW)).toBe('scheduled');
+  });
+
+  it('a cancel after the trial end, with no paid period after it, is a lapse', () => {
+    expect(classifyPolarTrialCancel({
+      status: 'canceled',
+      trial: true,
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-10-01T00:00:00.000Z',
+    }, NOW)).toBe('lapsed');
+  });
+
+  it('a paid cancel (period continues past the trial) is not a trial end', () => {
+    expect(classifyPolarTrialCancel({
+      status: 'canceled',
+      trial: true,
+      trial_end: '2026-10-01T00:00:00.000Z',
+      current_period_end: '2026-11-08T00:00:00.000Z',
+    }, NOW)).toBe('paid');
+  });
+
+  it('a never-trialed cancel is not a trial end', () => {
+    expect(classifyPolarTrialCancel({
+      status: 'canceled',
+      trial: false,
+      trial_end: null,
+      current_period_end: TRIAL_END,
+    }, NOW)).toBe('not_trial');
   });
 });

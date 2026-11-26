@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { TRIAL_CANCEL_REASONS } from '@/lib/education/trialCancelReason';
 import { PRO_BANNER_CTA, ProBanner, ProShine } from './pro/ProBanner';
 import { TrialUsageRecap } from './pro/TrialUsageRecap';
 
@@ -55,6 +57,23 @@ export function ResumeProButton({ onResumed, className }: { onResumed: () => voi
 /** A card trial the teacher cancelled: Pro runs to the end date, nothing is charged. */
 export function TeacherProTrialCanceledBanner({ endsAt, onResumed }: { endsAt: string | null; onResumed: () => void }) {
   const { t, language } = useLanguage();
+  const [picked, setPicked] = useState<string | null>(null);
+
+  const pickReason = async (reason: string) => {
+    if (picked) return;
+    setPicked(reason);
+    try {
+      await fetch('/api/subscription/cancel-reason', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      });
+    } catch {
+      /* a missed reason must not block the classroom */
+    }
+  };
+
   return (
     <ProBanner
       testId="teacher-pro-trial-canceled"
@@ -64,7 +83,31 @@ export function TeacherProTrialCanceledBanner({ endsAt, onResumed }: { endsAt: s
       body={
         <>
           <span>{t('teacher.subscription.canceledTrialBody')}</span>
+          <Link
+            href={`/${language}/teacher/classroom/new`}
+            data-testid="teacher-pro-trial-canceled-lesson"
+            className="mt-1 block font-bold underline underline-offset-2"
+          >
+            {t('teacher.subscription.canceledTrialPlanLesson')}
+          </Link>
           <TrialUsageRecap trialExpires={endsAt} className="mt-1 block" />
+          <div className="mt-2 flex flex-wrap gap-2" data-testid="teacher-pro-trial-cancel-reasons">
+            {picked ? (
+              <span>{t('teacher.subscription.cancelReasonThanks')}</span>
+            ) : (
+              TRIAL_CANCEL_REASONS.map((reason) => (
+                <button
+                  key={reason}
+                  type="button"
+                  data-testid={`teacher-pro-trial-cancel-reason-${reason}`}
+                  onClick={() => void pickReason(reason)}
+                  className="rounded-full border border-neo-cream/40 px-3 py-1 text-xs font-bold text-neo-cream"
+                >
+                  {t(`teacher.subscription.cancelReason_${reason}`)}
+                </button>
+              ))
+            )}
+          </div>
         </>
       }
       action={<ResumeProButton onResumed={onResumed} />}

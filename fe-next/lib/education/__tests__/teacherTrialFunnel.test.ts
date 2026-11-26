@@ -40,11 +40,12 @@ describe('teacher trial funnel — durable steps', () => {
     selectError = null;
   });
 
-  it('lists the seven canonical steps in funnel order', () => {
+  it('lists the canonical steps in funnel order', () => {
     expect(TEACHER_TRIAL_FUNNEL_STEPS).toEqual([
       'teacher_trial_started',
       'teacher_trial_active',
       'teacher_trial_expiring',
+      'teacher_trial_canceled',
       'teacher_trial_expired',
       'teacher_trial_paywall_viewed',
       'checkout_started',
