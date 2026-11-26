@@ -12,7 +12,7 @@
  * — that file is the regression gate for this split and stays unchanged.
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClassroomResultsCard } from '../ClassroomResultsCard';
@@ -160,14 +160,14 @@ describe('ClassroomResultsCard — honest coverage', () => {
 
   it('draws a coverage meter the teacher can read from across the room', () => {
     render(<ClassroomResultsCard summary={base} username="Ms. Cohen" isTeacher />);
-    const meter = screen.getByTestId('coverage-meter');
+    const meter = within(screen.getByTestId('coverage-meter')).getByRole('progressbar');
     expect(meter).toHaveAttribute('aria-valuenow', '2');
     expect(meter).toHaveAttribute('aria-valuemax', '4');
   });
 
   it('meters the student against their own mastery, not the class', () => {
     render(<ClassroomResultsCard summary={base} username="Noa" isTeacher={false} />);
-    expect(screen.getByTestId('coverage-meter')).toHaveAttribute('aria-valuenow', '1');
+    expect(within(screen.getByTestId('coverage-meter')).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1');
   });
 });
 

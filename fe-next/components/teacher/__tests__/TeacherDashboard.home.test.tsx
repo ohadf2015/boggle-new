@@ -192,10 +192,10 @@ describe('Teacher Home', () => {
     expect(within(screen.getByTestId('home-hero')).queryByTestId('home-insight')).toBeNull();
   });
 
-  it('Given a Pro teacher on a phone, Then the roster is one folded line while the students load', () => {
+  it('Given a Pro teacher on a phone, Then while the students load the strip is just See results and no roster list shows', () => {
     proState = PRO;
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-roster-see-all')).toBeInTheDocument();
+    expect(screen.getByTestId('home-open-results')).toBeInTheDocument();
     expect(screen.queryByTestId('home-status-tile')).toBeNull();
     expect(screen.queryByTestId('home-roster')).toBeNull();
   });

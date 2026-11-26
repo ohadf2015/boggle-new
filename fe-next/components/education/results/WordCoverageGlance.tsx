@@ -28,6 +28,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, X, EyeOff, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireVictoryConfetti, cleanupConfetti } from '@/utils/confettiUtils';
 import { playRoundEndCue, CLASS_SWEEP_SOUND } from '@/lib/education/roundEndSound';
@@ -123,6 +124,11 @@ export function WordCoverageGlance({
   const pct = total > 0 ? Math.round((found / total) * 100) : 0;
   // A lesson with no words is not a sweep, it is an empty lesson.
   const swept = total > 0 && found >= total;
+  const meterLabel = t('education.results.coverageMeterLabel', { percent: pct });
+  const meterClass = cn(
+    'border-neo-cream bg-neo-navy-elevated',
+    projector ? (calm ? 'h-4 @[96rem]/results:h-6' : 'h-6 @[96rem]/results:h-10') : calm ? 'h-3' : 'h-4'
+  );
   // The room's answer, which is not the same question as the meter's. A student
   // who found two of four still lives in a class that found all four.
   const roomSwept = classSwept ?? swept;
@@ -250,27 +256,13 @@ export function WordCoverageGlance({
             </p>
           )}
 
-          <div
-            data-testid="coverage-meter"
-            role="progressbar"
-            aria-valuenow={found}
-            aria-valuemin={0}
-            aria-valuemax={total}
-            aria-label={t('education.results.coverageMeterLabel', { percent: pct })}
-            className={cn(
-              'w-full shrink-0 rounded-neo border-[2px] border-neo-cream bg-neo-navy-elevated overflow-hidden',
-              calm ? 'mb-2' : 'mb-3',
-              projector ? (calm ? 'h-4 @[96rem]/results:h-6' : 'h-6 @[96rem]/results:h-10') : calm ? 'h-3' : 'h-4'
+          <div data-testid="coverage-meter" className={cn('w-full shrink-0', calm ? 'mb-2' : 'mb-3')}>
+            {/* Mounts when the reveal reaches the sweep so the fill springs up from empty; the held track still reports the real count. */}
+            {fill ? (
+              <SpringProgress value={found} max={total} label={meterLabel} tone={swept ? 'yellow' : calm ? 'cream' : 'lime'} animateOnMount className={meterClass} />
+            ) : (
+              <div role="progressbar" aria-label={meterLabel} aria-valuemin={0} aria-valuemax={total} aria-valuenow={found} className={cn('relative w-full overflow-hidden rounded-neo border-2', meterClass)} />
             )}
-          >
-            <div
-              data-testid="coverage-fill"
-              className={cn(
-                'h-full transition-[width] duration-700 ease-out motion-reduce:transition-none',
-                swept ? 'bg-neo-yellow' : calm ? 'bg-neo-cream/80' : 'bg-neo-lime'
-              )}
-              style={{ width: `${fill ? pct : 0}%` }}
-            />
           </div>
         </>
       )}

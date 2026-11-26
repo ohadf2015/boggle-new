@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 const playPlayerJoinedSound = vi.fn();
@@ -49,8 +49,8 @@ describe('ProjectorRoster — who is in the room', () => {
     render(<ProjectorRoster students={[{ username: 'Ana' }, { username: 'Ben', reconnecting: true }]} readyUsernames={['Ana']} t={t} />);
     expect(screen.getByTestId('projector-count')).toHaveTextContent('eduLiveRoom.lobby.joined:{"count":2}');
     // Ready is who can tap. The dropped phone is the connection detail, not the headline.
-    expect(screen.getByTestId('projector-ready-count')).toHaveAttribute('aria-valuemax', '1');
-    expect(screen.getByTestId('projector-ready-count')).toHaveAttribute('aria-valuenow', '1');
+    expect(within(screen.getByTestId('projector-ready-count')).getByRole('progressbar')).toHaveAttribute('aria-valuemax', '1');
+    expect(within(screen.getByTestId('projector-ready-count')).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '1');
     expect(screen.getByTestId('projector-connected-count')).toHaveTextContent('eduLiveRoom.lobby.phonesConnected:{"count":1}');
     const ben = screen.getAllByTestId('projector-student')[1];
     expect(ben).toHaveAttribute('data-reconnecting', 'true');
@@ -120,10 +120,10 @@ describe('ProjectorRoster — readiness', () => {
   it('Given 3 of 10 ready, Then a progress bar reads 3 of 10 and the ready chips carry a check', () => {
     const students = classOf(10);
     render(<ProjectorRoster students={students} readyUsernames={['Student1', 'Student2', 'Student3']} t={t} />);
-    const bar = screen.getByTestId('projector-ready-count');
-    expect(bar).toHaveAttribute('role', 'progressbar');
+    const bar = within(screen.getByTestId('projector-ready-count')).getByRole('progressbar');
     expect(bar).toHaveAttribute('aria-valuenow', '3');
     expect(bar).toHaveAttribute('aria-valuemax', '10');
+    expect(bar.querySelector('[data-part="fill"]')).not.toBeNull();
     expect(screen.getAllByTestId('projector-ready-check')).toHaveLength(3);
   });
 

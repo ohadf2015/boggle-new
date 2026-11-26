@@ -17,6 +17,7 @@ import { localDayPlus } from '@/components/teacher/assignments/AssignmentCreator
 import { ASSIGNMENT_LIMIT_REACHED } from '@/lib/education/assignmentLimit';
 import { safeCapture } from '@/lib/education/telemetryCore';
 import { cn } from '@/lib/utils';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 import { NB_BLOCK, NB_PANEL } from '../nb/nbStyles';
 import { CHALLENGE_DAYS, firstWordSet, nextWordSet, pickWeekChallenge, type ChallengeLesson } from './weekChallengeModel';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
@@ -99,7 +100,6 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
   }
 
   const name = challenge.lessonName || t(`${K}.untitled`);
-  const pct = challenge.students > 0 ? Math.min(100, Math.round((challenge.finished / challenge.students) * 100)) : 0;
   const status = challenge.state === 'ended'
     ? t(`${K}.ended`, { date: dateLabel(challenge.due ?? today) })
     : challenge.due ? t(`${K}.due`, { date: dateLabel(challenge.due) }) : t(`${K}.openAnyTime`);
@@ -117,9 +117,7 @@ export function HomeWeekChallenge({ classroomId, classLanguage, lessons, preferr
         <ListNameButton lessonId={challenge.lessonId} name={name} />
       </p>
       {challenge.students > 0 ? (<div>
-        <div className="h-3 overflow-hidden rounded-full border-2 border-neo-cream/60 bg-neo-navy" role="progressbar" aria-valuemin={0} aria-valuemax={challenge.students} aria-valuenow={challenge.finished} aria-label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}>
-          <div className="h-full bg-neo-lime" style={{ width: `${pct}%` }} />
-        </div>
+        <SpringProgress value={challenge.finished} max={challenge.students} label={t(`${K}.finished`, { done: challenge.finished, total: challenge.students })} animateOnMount className="h-3 rounded-full border-neo-cream/60 bg-neo-navy" />
         <p data-testid="home-challenge-finished" className="mt-1 font-neo-body text-sm font-bold">
           {t(`${K}.finished`, { done: challenge.finished, total: challenge.students })}
         </p>

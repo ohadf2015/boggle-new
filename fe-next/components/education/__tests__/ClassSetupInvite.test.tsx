@@ -113,6 +113,13 @@ describe('ClassSetupInvite', () => {
     expect(markInviteCopied).not.toHaveBeenCalled();
   });
 
+  it('Given a new class, Then Show on projector sinks into its lip on press', () => {
+    render(<ClassSetupInvite classroomId="c1" />);
+    const projector = screen.getByTestId('setup-projector');
+    fireEvent.pointerDown(projector, { button: 0 });
+    expect(projector).toHaveAttribute('data-pressed', 'true');
+  });
+
   it('Given a new class, Then the code, QR and every share channel are on the one screen and the view is recorded once', () => {
     render(<ClassSetupInvite classroomId="c1" />);
     expect(screen.getByTestId('setup-join-code')).toHaveTextContent('BLDA7Q');

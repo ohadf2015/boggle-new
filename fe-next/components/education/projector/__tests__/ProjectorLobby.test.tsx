@@ -58,6 +58,8 @@ describe('ProjectorLobby — the wall', () => {
 
   it('sizes nothing from the viewport', () => {
     const { container } = render(<ProjectorLobby {...base} students={[{ username: 'Noa' }]} />);
+    // The ambient backdrop is decoration on a fixed full-screen layer; only the wall's own layout must size off its container.
+    container.querySelector('[data-ambient]')?.remove();
     expect(container.innerHTML).not.toMatch(/\[[^\]]*\d(vw|vh|dvh)\b/);
     expect(container.innerHTML).not.toMatch(/(^|[\s"])(sm|md|lg|xl|max-md):/);
   });

@@ -341,4 +341,14 @@ describe('PracticeCompletionMoment celebration', () => {
     expect(screen.getByTestId('practice-completion-score')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByTestId('practice-completion-score').previousElementSibling).toHaveClass('sr-only');
   });
+
+  it('ends on exactly one primary, and it sinks on press like every other chunky button', () => {
+    render(<PracticeCompletionMoment {...baseProps} onNext={vi.fn()} nextLabel="Spelling" />);
+    const primaries = document.querySelectorAll('[data-primary="true"]');
+    expect(primaries).toHaveLength(1);
+    fireEvent.pointerDown(primaries[0], { button: 0 });
+    expect(primaries[0]).toHaveAttribute('data-pressed', 'true');
+    fireEvent.pointerUp(primaries[0]);
+    expect(primaries[0]).not.toHaveAttribute('data-pressed');
+  });
 });

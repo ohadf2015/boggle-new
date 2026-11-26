@@ -4,7 +4,6 @@ import { useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AuthContext, useAuth, type AuthContextValue } from '@/contexts/AuthContext';
 import { summarizeTeacherWeek, type TeacherActivityRow } from '@/lib/education/teacherWeekStats';
-import { homeCoachCue, homeSessionRail } from '@/lib/education/homeSessionRail';
 import { homeOnboarding } from '@/lib/education/homeOnboarding';
 import { isPackLanguage } from '@/lib/education/themedPacks';
 import { FREE_TIER_LIMITS } from '@/lib/education/freeTierLimits';
@@ -70,7 +69,6 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
   const lastPlayedIso = selected ? summary.lastPlayedAt[selected.id] : undefined;
   const lastPlayedMs = lastPlayedIso ? Date.parse(lastPlayedIso) : null;
   const railLanguage = isPackLanguage(language) ? language : 'en';
-  const cue = homeCoachCue({ nowMs, lastPlayedMs, everPlayed: true, rail: homeSessionRail({ language: railLanguage, gradeBand: null, nowMs, lastPlayedMs }) });
   const onboarding = homeOnboarding({ classroomCount: 0, studentCount: 0, inviteCopied: false, liveStarted: false, roomOpened: false, gamesPlayed: 0, dismissed: false });
   const newClassHref = `/${language}/teacher/classroom/new`;
   const hrefs = { createClass: newClassHref, shareCode: newClassHref, tryDemo: newClassHref };
@@ -88,7 +86,7 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
       onboarding={<div className="flex min-w-0 flex-col gap-4"><HomeOnboardingCard onboarding={onboarding} hrefs={hrefs} variant="full" t={t} /><HomeHowItWorks t={t} /></div>}
       desk={selected ? (
         <>
-        <div data-tm className="flex min-h-0 flex-1 flex-col">
+        <div data-tm>
           <HomeHero
             classrooms={classes}
             selectedId={selected.id}
@@ -96,7 +94,6 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
             language={language}
             t={t}
             eyebrow={t('eduShell.home.greetMorning', { name: 'Dana' })}
-            cue={cue ? t(cue.key) : null}
             newClassHref={newClassHref}
             rehearse={<RehearseWithBotsButton classroomId={selected.id} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
             capLabel={t('eduShell.setup.capMeter', { count: classes.length, limit: FREE_TIER_LIMITS.classes })}

@@ -319,7 +319,6 @@ export function EduHostResults({ summary, players, t, onRematch, onClose, onExit
               {missed.length === 0 && insight}
               <MissedWordsList
                 words={missed}
-                lead={missed.length > 0 ? insight : null}
                 maxChips={bossOver ? 6 : fillSide ? 14 : 8}
                 fill={fillSide}
                 title={practice ? t('eduLive.results.practice.missedTitle') : tf('eduLiveRoom.hostResults.missedTitle', 'Words your class missed')}

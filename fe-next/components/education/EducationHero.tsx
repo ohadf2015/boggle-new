@@ -10,6 +10,8 @@ import { PRO_COPY_PARAMS } from '@/lib/education/proFeatures';
 import { LandingProPill } from './LandingProPill';
 import { TEACHER_PRO_CHECKOUT_PATH } from './TeacherProCheckoutCta';
 import { Reveal } from './motion';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 
 // Derived from the shipped locales so the "built for N languages" line can't go stale.
 const LANGUAGE_COUNT = String(locales.length);
@@ -32,13 +34,15 @@ const PROOF = [
   { key: 'anyDevice', Icon: Laptop },
 ] as const;
 
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 const PRESS = 'transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 export function EducationHero({ setupPending = false }: { setupPending?: boolean } = {}) {
   const { t, language } = useLanguage();
 
   return (
-    <section data-testid="education-hero" className="relative overflow-hidden border-b-3 border-neo-cream/40 bg-neo-navy">
+    <section data-testid="education-hero" className="relative isolate overflow-hidden border-b-3 border-neo-cream/40 bg-neo-navy">
+      <AmbientBackdrop theme="student" className="max-lg:hidden" />
       <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-6 px-4 pb-8 pt-5 sm:px-6 sm:pt-8 lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)] lg:gap-x-12 xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)] xl:gap-x-14 lg:gap-y-10 lg:px-8 lg:pb-12 lg:pt-12">
         <div className="text-center lg:max-w-[34rem] lg:pt-4 lg:text-start">
           <h1 className="text-balance font-neo-poster text-[1.75rem] font-extrabold leading-[1.08] tracking-[-0.015em] text-neo-cream [overflow-wrap:anywhere] sm:text-[2.6rem] xl:text-[2.9rem]">
@@ -49,16 +53,21 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
           </p>
 
           <div className="mt-6 flex flex-col items-stretch gap-1 sm:items-center sm:gap-2 lg:mt-8 lg:items-start">
-            <Link
-              href={`/${language}/education/access`}
-              data-testid="education-hero-free-cta"
-              data-lc-cta="signup"
-              onClick={() => trackLandingCtaClick(setupPending ? 'education_hero_finish_setup' : 'education_hero')}
-              className={`group inline-flex min-h-14 items-center justify-center gap-3 text-balance rounded-neo py-2 border-3 border-neo-black bg-neo-lime px-6 text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard hover:-translate-y-0.5 ${PRESS}`}
+            <PressSurface
+              asChild
+              lip={6}
+              className={`group inline-flex min-h-14 items-center justify-center gap-3 text-balance rounded-neo py-2 border-3 border-neo-black bg-neo-lime px-6 text-lg font-black uppercase tracking-wide text-neo-navy ${FOCUS}`}
             >
-              {t(setupPending ? 'eg2Land.hero.ctaFinishSetup' : 'eg2Land.hero.ctaPrimary')}
-              <DirectionalIcon icon={ArrowRight} className="size-6 shrink-0" />
-            </Link>
+              <Link
+                href={`/${language}/education/access`}
+                data-testid="education-hero-free-cta"
+                data-lc-cta="signup"
+                onClick={() => trackLandingCtaClick(setupPending ? 'education_hero_finish_setup' : 'education_hero')}
+              >
+                {t(setupPending ? 'eg2Land.hero.ctaFinishSetup' : 'eg2Land.hero.ctaPrimary')}
+                <DirectionalIcon icon={ArrowRight} className="size-6 shrink-0" />
+              </Link>
+            </PressSurface>
             <Link
               href={`/${language}/join`}
               data-testid="education-hero-join-cta"
@@ -75,7 +84,7 @@ export function EducationHero({ setupPending = false }: { setupPending?: boolean
           </div>
 
           <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-0 text-sm sm:mt-3 sm:gap-y-1 font-bold text-neo-cream/70 lg:justify-start">
-            <span>{t('eg2Land.hero.note')}</span>
+            <span className="max-sm:hidden">{t('eg2Land.hero.note')}</span>
             <Link
               href={`/${language}${TEACHER_PRO_CHECKOUT_PATH}`}
               data-testid="education-hero-pro-cta"

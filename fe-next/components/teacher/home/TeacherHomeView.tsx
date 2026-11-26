@@ -3,10 +3,11 @@
 import type { ReactNode, Ref } from 'react';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { cn } from '@/lib/utils';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { HqLoadError } from '../hq/HqLoadError';
 import { HomeSkeleton } from './HomeSkeleton';
 import { HOME_FIRST_FRAME, HOME_GREETING_ROW, HOME_GRID_BASE, HOME_MAIN_COLUMN } from './homeLayout';
-import { MascotBubble } from '../nb/MascotBubble';
+import { HomeGreeting } from './HomeGreeting';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -44,18 +45,13 @@ export function TeacherHomeView({
       scrollRegionLabel={t('eduShell.home.regionLabel')}
       contentClassName="relative isolate"
     >
+      <AmbientBackdrop theme="teacher" density="calm" />
       {welcome}
 
       <div ref={revealRef} data-testid="teacher-home" className={HOME_GRID_BASE}>
         <div data-testid="home-first-frame" className={cn(HOME_MAIN_COLUMN, (deskShown || !ready) && HOME_FIRST_FRAME)}>
           {ready && !deskShown ? (
-            <header data-tm data-testid="home-greeting-row" className={HOME_GREETING_ROW}>
-              <MascotBubble pose="welcome" size={72} className="min-w-0 flex-1 max-sm:self-stretch lg:[&>img]:size-20">
-                <h1 data-wipe suppressHydrationWarning className="font-neo-display text-lg font-black leading-tight text-neo-black sm:text-xl">
-                  {greeting}
-                </h1>
-              </MascotBubble>
-            </header>
+            <div data-tm className={HOME_GREETING_ROW}><HomeGreeting greeting={greeting} /></div>
           ) : null}
 
           {ready && alert ? <div data-testid="home-alert" className="min-w-0 [&>aside]:mt-1">{alert}</div> : null}

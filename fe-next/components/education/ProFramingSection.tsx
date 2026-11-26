@@ -20,7 +20,7 @@ export function ProFramingSection({ cta }: { cta?: ReactNode } = {}) {
 
   return (
     <section id="pro" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
-      <div className="grid gap-6 rounded-neo-xl border-3 border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-lg sm:p-7 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr] lg:gap-10">
         <div className="min-w-0">
           <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl">
             {t('education.landing.pro.title')}

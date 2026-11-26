@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion';
 import { JoinCodeField } from './JoinCodeField';
 import { JoinAlert } from './JoinAlert';
@@ -100,17 +101,12 @@ export function JoinCodeStep({ flow, pasteNoteKey, onPaste }: JoinCodeStepProps)
               {wrongCode && <JoinWrongCodeHelp code={flow.code} />}
             </div>
           ) : (
+            // The sub line already says where the code comes from; this region only speaks up when something happened.
             <p
               role="status"
-              className={
-                stripped
-                  ? 'font-neo-body text-sm font-bold text-neo-yellow lg:text-base'
-                  : pasteNoteKey
-                  ? 'font-neo-body text-sm font-bold text-neo-lime lg:text-base'
-                  : 'font-neo-body text-sm text-neo-white/75 lg:text-base'
-              }
+              className={cn('font-neo-body text-sm font-bold lg:text-base', stripped ? 'text-neo-yellow' : 'text-neo-lime')}
             >
-              {t(stripped ? `${K}.codeStripped` : (pasteNoteKey ?? `${K}.codeHint`))}
+              {stripped ? t(`${K}.codeStripped`) : pasteNoteKey ? t(pasteNoteKey) : null}
             </p>
           )}
         </div>

@@ -5,6 +5,7 @@ import { memo, useCallback } from 'react';
 import { ArrowLeft, BookOpen, GraduationCap } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { getSharedSocketIfExists } from '@/utils/SocketContext';
 import { realStudentCount } from '@/lib/education/rehearsal';
 import { useKickStudent } from '@/hooks/useKickStudent';
@@ -116,7 +117,8 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
   }, [gameCode, onStartPracticeRound]);
 
   return (
-    <div data-testid="projector-lobby" className="fixed inset-0 z-[65] overflow-hidden bg-neo-navy [container-type:size]">
+    <div data-testid="projector-lobby" className="fixed inset-0 z-[65] isolate overflow-hidden bg-neo-navy [container-type:size]">
+      <AmbientBackdrop theme="teacher" density="calm" />
       <style>{LIVE_KEYFRAMES}</style>
 
       <div className="absolute inset-0 overflow-y-auto overscroll-contain">

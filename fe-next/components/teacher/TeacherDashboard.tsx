@@ -41,7 +41,7 @@ import { useTeacherWeekStats } from '@/hooks/useTeacherWeekStats';
 import { useTeacherLiveGameRunning } from '@/hooks/useTeacherLiveGameRunning';
 import { useClassStudentPreview } from '@/hooks/useClassStudentPreview';
 import { useLessons } from '@/hooks/useVocabularyLesson';
-import { classLessonProfile, homeCoachCue, homeSessionRail, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
+import { classLessonProfile, railLanguages, type RailLesson } from '@/lib/education/homeSessionRail';
 import { isPackLanguage } from '@/lib/education/themedPacks';
 import { useTeacherDashboardDeepLink } from '@/hooks/useTeacherDashboardDeepLink';
 import { trackEduTeacherDashboardViewed, trackTeacherOnboardingStep } from '@/lib/education/telemetry';
@@ -270,7 +270,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   const lastPlayedIso = selectedClassroom ? week.summary?.lastPlayedAt[selectedClassroom.id] : undefined;
   const lastPlayedMs = lastPlayedIso ? Date.parse(lastPlayedIso) : null;
   const railReady = (!lessons.isLoading || lessonsCapped) && week.status !== 'loading';
-  const everPlayed = activation.progress.liveStarted || (week.summary?.gamesLast30d ?? 0) > 0;
   const loop = useHomeWeekLoop({
     classroomId: ready && hasClasses && !classroomsError ? effectiveId : '',
     fresh: !activation.progress.liveStarted && week.status !== 'loading' && !lastPlayedIso,
@@ -281,9 +280,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
     t,
   });
   const assignLoopList = () => assign.openWith(loop.listId);
-  const cue =ready && hasClasses && week.status !== 'loading'
-    ? homeCoachCue({ nowMs, lastPlayedMs, everPlayed, rail: homeSessionRail({ language: classLanguage, gradeBand: null, nowMs, lastPlayedMs }) })
-    : null;
 
   const greeting = firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName');
 
@@ -314,7 +310,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
       }
       desk={
         <>
-          {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
           {hasClasses ? (
             <WaitingStudentsNudge
               classroomIds={classrooms.map((c) => c.id)}
@@ -323,16 +318,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               t={t}
             />
           ) : null}
-          {selectedClassroom ? (
-            <ClassroomWeekPanel
-              classroomIds={classrooms.map((c) => c.id)}
-              focusId={selectedClassroom.id}
-              focusName={selectedClassroom.name}
-              language={language}
-              t={t}
-            />
-          ) : null}
-          <div data-tm className="flex min-h-0 flex-1 flex-col">
+          <div data-tm>
             <HomeHero
               classrooms={classrooms}
               selectedId={effectiveId}
@@ -340,7 +326,6 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               language={language}
               t={t}
               eyebrow={greeting}
-              cue={week.status !== 'loading' && cue ? t(cue.key) : null}
               rehearse={<RehearseWithBotsButton classroomId={effectiveId || undefined} source="hq" language={language} t={t} withSeat label={t('eduShell.home.practice.cta')} className={HERO_SECONDARY_WRAP} buttonClassName={HERO_SECONDARY} />}
               newClassHref={newClassHref}
               classesHref={`/${language}/teacher/classroom`}
@@ -380,6 +365,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               />
             </div>
           ) : null}
+          {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
           {selectedClassroom ? (
             <div data-tm>
               <HomeWeekChallenge
@@ -399,6 +385,15 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
             <div data-tm className="empty:hidden">
               <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
             </div>
+          ) : null}
+          {selectedClassroom ? (
+            <ClassroomWeekPanel
+              classroomIds={classrooms.map((c) => c.id)}
+              focusId={selectedClassroom.id}
+              focusName={selectedClassroom.name}
+              language={language}
+              t={t}
+            />
           ) : null}
           {workspaceProCard ? (
             <div data-tm className="empty:hidden">

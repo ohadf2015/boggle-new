@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { ClassSetupInvite } from '@/components/education/ClassSetupInvite';
 import { ClassSetupCreate } from '@/components/teacher/setup/ClassSetupCreate';
@@ -17,7 +18,8 @@ export default function NewClassPageClient() {
   const searchParams = useSearchParams();
   if (ClassReadyPreview && searchParams?.get('preview') === 'ready') return <ClassReadyPreview />;
   return (
-    <EducationShell scrollRegionLabel={t('eduShell.setup.title')} tabs={!searchParams?.get('classroomId')}>
+    <EducationShell scrollRegionLabel={t('eduShell.setup.title')} tabs={!searchParams?.get('classroomId')} contentClassName="relative isolate">
+      <AmbientBackdrop theme="teacher" density="calm" />
       <TeacherGate>
         <SetupMain />
       </TeacherGate>

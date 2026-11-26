@@ -56,12 +56,13 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe('Teacher Home: get students in', () => {
-  it('Given the class has no students, Then the hero shows the code in one row with Share and the goal under it', () => {
+  it('Given the class has no students, Then the hero shows the code chip with Share and the goal line under it', () => {
     render(<TeacherDashboard />);
     const row = screen.getByTestId('home-join-row');
     expect(within(row).getByTestId('home-desk-code')).toHaveTextContent('PLSB66');
     expect(within(row).getByTestId('home-share-code')).toBeInTheDocument();
-    expect(within(row).getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
+    expect(screen.getByTestId('home-join-goal-line')).toContainElement(screen.getByTestId('hq-joined-goal-count'));
+    expect(screen.getByTestId('hq-joined-goal-count')).toHaveTextContent('academy.hq.joinedGoal:{"count":0,"goal":3}');
     expect(screen.queryByTestId('hq-get-students-in')).not.toBeInTheDocument();
   });
 

@@ -64,47 +64,49 @@ describe('ClassCard face', () => {
     hasPro = false;
   });
 
-  it('Given every action exists, Then the card still shows only the name, the menu, the code plate and Start', () => {
+  it('Given every action exists, Then the row shows only the name, the code chip, the round Start and the menu', () => {
     render(<ClassCard {...fullProps} />);
     const card = screen.getByTestId('classroom-card');
     const controls = Array.from(card.querySelectorAll('a, button')).map((el) => el.getAttribute('data-testid'));
-    expect(controls).toEqual(['classroom-card-open', 'classroom-card-menu', 'join-code-plate', 'classroom-card-start-game']);
+    expect(controls).toEqual(['classroom-card-open', 'join-code-plate', 'classroom-card-start-game', 'classroom-card-menu']);
   });
 
-  it('wears a full color band with the name, the language and the menu', () => {
+  it('is a compact row with a colour edge, not a colour band over a big body', () => {
     render(<ClassCard {...baseProps} color="cyan" />);
-    const band = screen.getByTestId('list-card-band');
-    expect(band.className).toContain('bg-neo-cyan');
-    expect(within(band).getByRole('heading', { name: 'Period 3' })).toBeInTheDocument();
-    expect(within(band).getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
-    expect(within(band).getByTestId('classroom-card-menu')).toBeInTheDocument();
+    const card = screen.getByTestId('classroom-card');
+    expect(screen.queryByTestId('list-card-band')).toBeNull();
+    expect(card.className).toContain('border-s-neo-cyan');
+    expect(card.className).not.toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
+    expect(within(card).getByRole('heading', { name: 'Period 3' })).toBeInTheDocument();
+    expect(within(card).getByTestId('classroom-card-language')).toHaveTextContent('languages.english');
   });
 
-  it('shows the join code on a big cream plate that copies when tapped', async () => {
+  it('shows the join code as a small chip that copies when tapped, never a big plate', async () => {
     const onCopy = vi.fn().mockResolvedValue(true);
     render(<ClassCard {...baseProps} onCopy={onCopy} />);
-    const plate = screen.getByTestId('join-code-plate');
-    expect(plate.className).toContain('bg-neo-cream');
-    expect(within(plate).getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
-    expect(plate.tagName).toBe('BUTTON');
+    const chip = screen.getByTestId('join-code-plate');
+    expect(chip.tagName).toBe('BUTTON');
+    expect(within(chip).getByTestId('classroom-join-code')).toHaveTextContent('ABC123');
+    expect(within(chip).getByTestId('classroom-join-code').className).not.toMatch(/text-3xl/);
     expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.tapToCopy');
-    await userEvent.click(plate);
+    await userEvent.click(chip);
     expect(onCopy).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.codeCopiedShort');
   });
 
-  it('When the clipboard refuses, Then the plate does not claim the code was copied', async () => {
+  it('When the clipboard refuses, Then the chip does not claim the code was copied', async () => {
     render(<ClassCard {...baseProps} onCopy={vi.fn().mockResolvedValue(false)} />);
     await userEvent.click(screen.getByTestId('join-code-plate'));
     expect(screen.getByTestId('join-code-plate-caption')).toHaveTextContent('teacher.classroom.tapToCopy');
   });
 
-  it('Given any card, Then Start is the lime primary into the host flow', () => {
+  it('Given the lead card, Then Start is a round lime button into the host flow, named in words', () => {
     render(<ClassCard {...baseProps} />);
     const start = screen.getByTestId('classroom-card-start-game');
     expect(start.className).toContain('bg-neo-lime');
+    expect(start.className).toContain('rounded-full');
     expect(start).toHaveAttribute('href', '/en/teacher?classroomId=cls-1');
-    expect(start).toHaveTextContent('eduShell.home.startLive');
+    expect(start).toHaveAccessibleName('eduShell.home.startLive');
   });
 
   it('Given students and activity, Then the fact is the activity line with the faces beside it', () => {
@@ -127,12 +129,12 @@ describe('ClassCard face', () => {
     expect(fact).not.toHaveTextContent('played');
   });
 
-  it('keeps long class names recoverable: full name in title, two-line clamp', () => {
+  it('keeps long class names recoverable: full name in title, one-line clamp in the row', () => {
     const longName = 'Advanced Placement English Literature and Composition';
     render(<ClassCard {...baseProps} classroom={{ ...CLASSROOM, name: longName }} />);
     const title = screen.getByRole('heading', { name: longName });
     expect(title).toHaveAttribute('title', longName);
-    expect(title.className).toContain('line-clamp-2');
+    expect(title.className).toContain('line-clamp-1');
     expect(title.className).not.toMatch(/(^|\s)(truncate|uppercase)(\s|$)/);
   });
 

@@ -13,7 +13,7 @@ const t = (k: string, p?: Record<string, string | number>) => (p ? `${k}:${JSON.
 const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4, language: 'he' };
 
 describe('<HomeHero> actions', () => {
-  it('Given a class, Then the desk offers Start and Share once each, with each code letter on its own tile', () => {
+  it('Given a class, Then the desk offers Start and Share once each, with the code on one compact chip', () => {
     render(<HomeHero classrooms={[CLASS]} selectedId="c1" onSelect={vi.fn()} language="en" t={t} />);
     expect(screen.getAllByTestId('home-start-live')).toHaveLength(1);
     expect(screen.getAllByTestId('home-share-code')).toHaveLength(1);
@@ -21,7 +21,7 @@ describe('<HomeHero> actions', () => {
     const row = screen.getByTestId('home-join-row');
     expect(within(row).getByTestId('home-desk-code')).toHaveTextContent('AB12CD');
     expect(within(row).getByTestId('home-share-code')).toBeInTheDocument();
-    expect(within(row).getAllByTestId('home-desk-code-tile').map((el) => el.textContent).join('')).toBe('AB12CD');
+    expect(within(row).queryAllByTestId('home-desk-code-tile')).toHaveLength(0);
   });
 
   it('When the teacher taps Share code, Then the one share sheet opens', () => {
@@ -29,7 +29,7 @@ describe('<HomeHero> actions', () => {
     expect(screen.queryByTestId('home-share-sheet')).toBeNull();
     fireEvent.click(screen.getByTestId('home-share-code'));
     expect(screen.getByTestId('home-share-sheet')).toBeInTheDocument();
-    expect(screen.getByTestId('home-share-code')).toHaveTextContent('eduShell.home.shareCode');
+    expect(screen.getByTestId('home-share-code')).toHaveAccessibleName(expect.stringContaining('eduShell.home.shareCode'));
   });
 
   it('Given the page owns sharing, When Share is tapped, Then it asks the page and opens no second sheet', () => {

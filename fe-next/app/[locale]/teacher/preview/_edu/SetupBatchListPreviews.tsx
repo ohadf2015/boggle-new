@@ -35,6 +35,7 @@ export function ClassesPreview() {
                 <ClassCard
                   classroom={c}
                   color={COLORS[i]}
+                  lead={i === 0}
                   expanded={false}
                   onToggleExpanded={noop}
                   onCopy={noop}

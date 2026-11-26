@@ -485,6 +485,7 @@ describe('StudentProgressReport', () => {
       // THEN a labelled progressbar reports 50
       const bar = await screen.findByRole('progressbar');
       expect(bar).toHaveAttribute('aria-valuenow', '50');
+      expect(bar.querySelector('[data-part="fill"]')).not.toBeNull();
       expect(screen.getByText('50% MASTERED_SHARE')).toBeInTheDocument();
     });
 

@@ -25,8 +25,20 @@ import ClassroomStudentList from '../ClassroomStudentList';
 import { GoogleClassroomRosterImport } from './GoogleClassroomRosterImport';
 import { StudentCapMeter } from '../StudentCapMeter';
 import { useTeacherPro } from '@/hooks/useTeacherPro';
-import { NB_BLOCK, NB_PRIMARY, NB_SECONDARY, NB_STICKER, type NbColor } from '../nb/nbStyles';
-import { LIST_CARD_TITLE, ListCard } from '../ListCard';
+import { type NbColor } from '../nb/nbStyles';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { LIST_CARD_TITLE } from '../ListCard';
+
+const EDGE: Record<NbColor, string> = {
+  lime: 'border-s-neo-lime',
+  pink: 'border-s-neo-pink',
+  cyan: 'border-s-neo-cyan',
+  yellow: 'border-s-neo-yellow',
+  purple: 'border-s-neo-purple',
+  orange: 'border-s-neo-orange',
+  cream: 'border-s-neo-cream',
+  navy: 'border-s-neo-cream/40',
+};
 import { CardMenuAction, CardMenuControl, CardMenuDivider, CardMenuLink, CardOverflowMenu } from '../CardOverflowMenu';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 
@@ -69,6 +81,8 @@ export interface ClassCardProps {
   insightHref?: string;
   /** The band color; the list rotates it so classes are easy to tell apart. */
   color?: NbColor;
+  /** Only the first card on the list gets the lime action, so the screen has one primary. */
+  lead?: boolean;
 }
 
 /** One class on the Classes tab: a color band with its name, the join code, Start a game, and a menu with everything else. */
@@ -92,6 +106,7 @@ export function ClassCard({
   classHref,
   insightHref,
   color = 'pink',
+  lead = true,
 }: ClassCardProps) {
   const { t, language: uiLanguage } = useLanguage();
   const { hasPro, loading: proLoading } = useTeacherPro();
@@ -105,7 +120,6 @@ export function ClassCard({
   const copyFromPlate = async () => {
     if ((await onCopy()) !== false) setCopied(true);
   };
-  const startGameCls = count === 0 ? NB_SECONDARY : NB_PRIMARY;
   const languageKey = LANGUAGE_LABEL_KEYS[classroom.language as keyof typeof LANGUAGE_LABEL_KEYS];
   const studentsLabel =
     count === 0 ? t('teacher.classrooms.students.noneYet') : t(pluralKeyOf('teacher.classroom.cardSeeAllStudents', count, uiLanguage), { count });
@@ -120,27 +134,67 @@ export function ClassCard({
       </>
     );
 
+  const round = 'grid size-12 shrink-0 place-items-center rounded-full border-[3px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan';
+  const roundTone = (main: boolean) => (main ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/50 bg-neo-navy text-neo-cream shadow-neo-cream/40');
+
   return (
-    <ListCard
+    <article
       data-testid="classroom-card"
       data-color={color}
-      color={color}
-      titleText={classroom.name}
-      title={
-        classHref ? (
-          <Link href={classHref} data-testid="classroom-card-open" className={LIST_CARD_TITLE}>
+      className={cn('relative flex min-h-[72px] w-full min-w-0 items-center gap-2.5 rounded-neo-lg border-2 border-s-[6px] border-neo-cream/40 bg-neo-navy-light py-1.5 pe-2 ps-3 shadow-hard', EDGE[color])}
+    >
+      <div className="min-w-0 flex-1">
+        <h3 title={classroom.name} className="line-clamp-1 font-neo-display text-lg font-black leading-tight text-neo-cream [overflow-wrap:anywhere]">
+          {classHref ? (
+            <Link href={classHref} data-testid="classroom-card-open" className={cn(LIST_CARD_TITLE, 'line-clamp-1')}>
+              <bdi>{classroom.name}</bdi>
+            </Link>
+          ) : (
             <bdi>{classroom.name}</bdi>
+          )}
+        </h3>
+        <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5">
+          <div data-testid="classroom-card-fact" className="flex min-w-0 items-center gap-x-2 font-neo-body text-xs font-bold text-neo-cream/75">
+            {fact}
+            <span data-testid="classroom-card-language" className="text-neo-cream/60">· {languageKey ? t(languageKey) : classroom.language}</span>
+          </div>
+          <button
+            type="button"
+            data-testid="join-code-plate"
+            aria-label={`${t('teacher.classroom.copyCode')}: ${classroom.join_code}`}
+            onClick={() => void copyFromPlate()}
+            className="inline-flex min-h-7 items-center gap-1.5 rounded-neo-pill border-2 border-neo-cream/40 px-2 text-neo-cream hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          >
+            <code data-testid="classroom-join-code" dir="ltr" className="font-neo-display text-sm font-black tracking-wider">
+              {classroom.join_code}
+            </code>
+            {copied ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : <Copy className="size-3.5" strokeWidth={3} aria-hidden="true" />}
+            <span data-testid="join-code-plate-caption" aria-live="polite" className="sr-only">
+              {copied ? t('teacher.classroom.codeCopiedShort') : t('teacher.classroom.tapToCopy')}
+            </span>
+          </button>
+        </div>
+      </div>
+      {count === 0 ? (
+        <PressSurface
+          lip={4}
+          data-testid="classroom-card-invite"
+          aria-haspopup="dialog"
+          aria-label={t('eduShell.home.shareCode', 'Share code')}
+          title={t('eduShell.home.shareCode', 'Share code')}
+          onClick={onInvite ?? onShare}
+          className={cn(round, roundTone(lead))}
+        >
+          <Share2 className="size-5" aria-hidden="true" />
+        </PressSurface>
+      ) : null}
+      {startGameHref ? (
+        <PressSurface asChild lip={4} className={cn(round, roundTone(lead && count > 0))}>
+          <Link href={startGameHref} data-testid="classroom-card-start-game" aria-label={t('eduShell.home.startLive', 'Start a game')} title={t('eduShell.home.startLive', 'Start a game')}>
+            <Play className="size-5 fill-current" aria-hidden="true" />
           </Link>
-        ) : (
-          <bdi>{classroom.name}</bdi>
-        )
-      }
-      tag={
-        <span data-testid="classroom-card-language" className={cn(NB_STICKER, NB_BLOCK.cream, 'shrink-0')}>
-          {languageKey ? t(languageKey) : classroom.language}
-        </span>
-      }
-      menu={
+        </PressSurface>
+      ) : null}
         <CardOverflowMenu label={t('academy.teacher.classActions', 'Class actions')} testId="classroom-card-menu">
           <CardMenuAction icon={Copy} testId="copy-join-code" onSelect={onCopy}>{t('teacher.classroom.copyCode')}</CardMenuAction>
           <CardMenuAction icon={Share2} testId="share-join-code" onSelect={onShare}>{t('teacher.classroom.share')}</CardMenuAction>
@@ -172,48 +226,6 @@ export function ClassCard({
           <CardMenuAction icon={Edit2} testId="classroom-card-edit" onSelect={onEdit}>{t('teacher.classroom.edit')}</CardMenuAction>
           <CardMenuAction icon={Trash2} testId="classroom-card-delete" onSelect={onDelete} danger>{t('teacher.classroom.delete')}</CardMenuAction>
         </CardOverflowMenu>
-      }
-      action={
-        <div className="flex flex-col gap-2">
-          {count === 0 ? (
-            <button
-              type="button"
-              data-testid="classroom-card-invite"
-              aria-haspopup="dialog"
-              onClick={onInvite ?? onShare}
-              className={cn(NB_PRIMARY, 'min-h-14 w-full text-lg')}
-            >
-              <Share2 className="size-5 shrink-0" aria-hidden="true" />
-              {t('eduShell.home.shareCode', 'Share code')}
-            </button>
-          ) : null}
-          {startGameHref ? (
-            <Link href={startGameHref} data-testid="classroom-card-start-game" className={cn(startGameCls, 'min-h-14 w-full text-lg')}>
-              <Play className="size-5 shrink-0 fill-current" aria-hidden="true" />
-              {t('eduShell.home.startLive', 'Start a game')}
-            </Link>
-          ) : null}
-        </div>
-      }
-    >
-      <div data-testid="classroom-card-fact" className="flex min-h-9 min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-neo-body text-sm font-bold text-neo-cream/85">
-        {fact}
-      </div>
-      <button
-        type="button"
-        data-testid="join-code-plate"
-        aria-label={`${t('teacher.classroom.copyCode')}: ${classroom.join_code}`}
-        onClick={() => void copyFromPlate()}
-        className="flex min-h-16 w-full flex-col items-center justify-center rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-2 py-1 shadow-hard-lg transition-[transform,box-shadow] duration-150 hover:-translate-x-px hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
-      >
-        <code data-testid="classroom-join-code" dir="ltr" className="whitespace-nowrap font-neo-display text-3xl font-black tabular-nums tracking-wider text-neo-black">
-          {classroom.join_code}
-        </code>
-        <span data-testid="join-code-plate-caption" aria-live="polite" className="inline-flex items-center gap-1 font-neo-body text-xs font-black text-neo-black/65">
-          {copied ? <Check className="size-3.5" strokeWidth={3} aria-hidden="true" /> : <Copy className="size-3.5" strokeWidth={3} aria-hidden="true" />}
-          {copied ? t('teacher.classroom.codeCopiedShort') : t('teacher.classroom.tapToCopy')}
-        </span>
-      </button>
       <Dialog open={expanded} onOpenChange={(open) => { if (open !== expanded) onToggleExpanded(); }}>
         <NbDialogContent size="lg" phone="full">
           <NbDialogHeader
@@ -228,7 +240,7 @@ export function ClassCard({
           </NbDialogBody>
         </NbDialogContent>
       </Dialog>
-    </ListCard>
+    </article>
   );
 }
 

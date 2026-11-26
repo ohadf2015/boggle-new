@@ -105,6 +105,8 @@ async function renderPage(page: PageFn, locale: string): Promise<{ text: string;
     .join('\n---\n');
 
   container.querySelectorAll('script').forEach((s) => s.remove());
+  // The ambient backdrop is decoration (aria-hidden); its tile letters are not page copy.
+  container.querySelectorAll('[data-ambient]').forEach((s) => s.remove());
   const text = container.textContent ?? '';
   const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href') ?? '');
   unmount();

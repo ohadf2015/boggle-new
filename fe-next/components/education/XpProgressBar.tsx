@@ -4,10 +4,9 @@
  * XpProgressBar - Education XP Progress Component
  *
  * Displays current level and progress percentage with neo-brutalist styling.
- * Uses Framer Motion for smooth progress animations.
+ * The bar is the shared SpringProgress: springs to the new fill and sweeps a shine when XP rises.
  *
  * Features:
- * - Animated progress bar fill
  * - Recent XP gain highlight with pulse effect
  * - RTL support for Hebrew
  * - Reduced motion preference support
@@ -19,6 +18,7 @@ import { useEduReducedMotion } from '@/lib/education/motion/useEduReducedMotion'
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getXpProgress, type XpProgress } from '@/backend/modules/xpManager';
 import { cn } from '@/lib/utils';
+import { SpringProgress } from '@/components/motion/SpringProgress';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -87,11 +87,6 @@ const XpProgressBar = memo<XpProgressBarProps>(({
   const prefersReducedMotion = useEduReducedMotion();
 
   const sizeConfig = SIZE_CONFIG[size];
-
-  // Animation transition
-  const progressTransition = prefersReducedMotion
-    ? { duration: 0 }
-    : { duration: 0.8, ease: 'easeOut' as const };
 
   return (
     <div
@@ -179,51 +174,15 @@ const XpProgressBar = memo<XpProgressBarProps>(({
         </div>
       )}
 
-      {/* Progress bar container */}
-      <div
-        data-testid="xp-progress-container"
-        className={cn(
-          'relative w-full rounded-neo overflow-hidden',
-          'bg-neo-navy border-[3px] border-neo-cream shadow-hard',
-          sizeConfig.container,
-          // RTL: Progress bar fill direction handled by CSS
-          isRTL && 'rtl:shadow-hard-rtl'
-        )}
-      >
-        {/* Progress fill - uses scaleX for compositor-only animation */}
-        <m.div
-          data-testid="xp-progress-fill"
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: progress.progressPercent / 100 }}
-          transition={progressTransition}
-          className={cn(
-            'absolute inset-y-0 w-full',
-            'bg-neo-lime',
-            // RTL: transform origin on right side
-            isRTL ? 'origin-right' : 'origin-left'
-          )}
+      <div data-testid="xp-progress-container" className={cn('rounded-neo shadow-hard', sizeConfig.container)}>
+        <SpringProgress
+          value={progress.isMaxLevel ? 1 : progress.xpInCurrentLevel}
+          max={progress.isMaxLevel ? 1 : progress.xpNeededForNextLevel}
+          label={t('common.aria.levelProgress')}
+          tone="lime"
+          animateOnMount={!prefersReducedMotion}
+          className="h-full border-[3px] border-neo-cream bg-neo-navy"
         />
-        {/* Border overlay for fill edge */}
-        {!progress.isMaxLevel && progress.progressPercent > 0 && (
-          <div
-            className={cn(
-              'absolute inset-y-0 w-[3px] bg-neo-black',
-              isRTL ? 'right-0' : 'left-0'
-            )}
-            style={{
-              [isRTL ? 'right' : 'left']: `${progress.progressPercent}%`,
-              transform: isRTL ? 'translateX(50%)' : 'translateX(-50%)'
-            }}
-          />
-        )}
-
-        {/*
-          The percentage label that used to sit here is gone. It was painted
-          `text-neo-black mix-blend-difference`, which measures 1.23:1 against
-          the empty navy track — unreadable exactly when it mattered, at 0% —
-          and it was the third telling of one fact: the row above already reads
-          "0 / 264 XP" and the fill itself shows the same ratio.
-        */}
       </div>
 
       {/* Next level preview */}

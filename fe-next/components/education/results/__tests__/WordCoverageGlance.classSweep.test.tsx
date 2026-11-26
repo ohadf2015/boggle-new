@@ -14,7 +14,7 @@
  * fires on the same beat on every device in the room.
  */
 
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, within } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 const fireVictoryConfetti = vi.fn();
@@ -77,7 +77,7 @@ describe('WordCoverageGlance — the class sweep reaches the phone', () => {
     render(studentGlance({ classSwept: true }));
     expect(screen.getByTestId('class-sweep-tag')).toBeInTheDocument();
     // Their own number is still their own — no flattering lie.
-    expect(screen.getByTestId('coverage-meter')).toHaveAttribute('aria-valuenow', '2');
+    expect(within(screen.getByTestId('coverage-meter')).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '2');
   });
 
   it('bursts on the class sweep, not on the viewer’s own tally', () => {

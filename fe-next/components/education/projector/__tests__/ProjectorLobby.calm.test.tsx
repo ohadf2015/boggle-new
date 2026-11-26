@@ -22,7 +22,8 @@ const props = {
 const CLASS_LIST = Array.from({ length: 8 }, (_, i) => ({ username: `Student ${i + 1}` }));
 
 const tokens = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
-const withFill = (root: HTMLElement, fill: RegExp) => [...root.querySelectorAll('*')].filter((el) => tokens(el).some((c) => fill.test(c)));
+// The ambient backdrop is decoration behind the panels, not a control or card.
+const withFill = (root: HTMLElement, fill: RegExp) => [...root.querySelectorAll('*')].filter((el) => !el.closest('[data-ambient]') && tokens(el).some((c) => fill.test(c)));
 const LIME_FILL = /^bg-neo-lime$/;
 const LOUD_FILL = /^bg-neo-(cyan|pink|purple|yellow|orange)(\/\d+)?$/;
 
@@ -53,6 +54,14 @@ describe('ProjectorLobby: calm wall, one lime primary', () => {
     for (const id of ['projector-join-panel', 'projector-roster', 'projector-mode']) {
       expect(tokens(screen.getByTestId(id)).filter((c) => /^bg-neo-navy[\w-]*\/\d+$/.test(c))).toEqual([]);
     }
+  });
+
+  it('Then the calm teacher backdrop sits behind the opaque panels, decorative only', () => {
+    render(<ProjectorLobby {...props} />);
+    const lobby = screen.getByTestId('projector-lobby');
+    const backdrop = lobby.querySelector(':scope > [data-ambient]');
+    expect(backdrop).toHaveAttribute('aria-hidden', 'true');
+    expect(tokens(lobby)).toContain('isolate');
   });
 
   it('shouts nothing: no upper-case labels anywhere on the wall', () => {

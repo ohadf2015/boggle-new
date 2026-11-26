@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
+vi.mock('@number-flow/react', () => ({ default: ({ value }: { value: number }) => <span>{value}</span> }));
 vi.mock('@/components/AvatarLite', () => ({ default: () => <span data-testid="avatar" /> }));
 const wide = { value: false };
 vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: () => wide.value }));
@@ -43,21 +44,20 @@ describe('<HomeDeskBoard>', () => {
     expect(screen.queryByTestId('home-status-tile')).toBeNull();
   });
 
-  it('Given a phone, Then the roster folds behind one line that says who played', () => {
+  it('Given a phone, Then results and students are one strip: counts as numbers over short labels, and no second Students row', () => {
     render(<HomeDeskBoard {...props()} />);
     expect(screen.queryByTestId('home-roster')).toBeNull();
-    const toggle = screen.getByTestId('home-roster-see-all');
+    const strip = screen.getByTestId('home-weekly-reports');
+    const toggle = within(strip).getByTestId('home-roster-see-all');
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(toggle).toHaveTextContent('eduShell.home.roster.count.done:{"count":2}');
-    expect(toggle).toHaveTextContent('eduShell.home.roster.count.late:{"count":1}');
+    const stats = within(strip).getAllByTestId('home-strip-stat').map((el) => el.textContent);
+    expect(stats).toEqual(['2eduShell.home.roster.statusShort.done', '1eduShell.home.roster.statusShort.late', '1eduShell.home.roster.statusShort.idle']);
+    expect(screen.getAllByTestId('home-roster-see-all')).toHaveLength(1);
   });
 
-  it('Given a phone line where nobody is behind, Then the zero is left out', () => {
+  it('Given a phone strip where nobody is behind, Then the zero is left out', () => {
     render(<HomeDeskBoard {...props({ roster: { rows: ALL_DONE, failed: false }, memberCount: 1 })} />);
-    const toggle = screen.getByTestId('home-roster-see-all');
-    expect(toggle).toHaveTextContent('eduShell.home.roster.count.done:{"count":1}');
-    expect(toggle).not.toHaveTextContent('eduShell.home.roster.count.late');
-    expect(toggle).not.toHaveTextContent('eduShell.home.roster.count.idle');
+    expect(screen.getAllByTestId('home-strip-stat').map((el) => el.textContent)).toEqual(['1eduShell.home.roster.statusShort.done']);
   });
 
   it('When the teacher taps that line, Then every student shows, and a second tap folds them away', () => {
@@ -69,11 +69,12 @@ describe('<HomeDeskBoard>', () => {
     expect(screen.queryByTestId('home-roster')).toBeNull();
   });
 
-  it('Given a desktop screen, Then the whole roster is open with no fold control', () => {
+  it('Given a desktop screen, Then the whole roster is open under See results, and its header alone carries the counts', () => {
     wide.value = true;
     render(<HomeDeskBoard {...props()} />);
     expect(within(screen.getByTestId('home-roster')).getAllByTestId('home-roster-row')).toHaveLength(4);
     expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
+    expect(screen.queryByTestId('home-strip-stat')).toBeNull();
   });
 
   it('Given a desktop screen, When the teacher taps Behind in the roster header, Then the list narrows to who is behind', () => {
@@ -95,20 +96,30 @@ describe('<HomeDeskBoard>', () => {
     const onOpenResults = vi.fn();
     render(<HomeDeskBoard {...props({ onOpenResults, readyLabel: '2 of 3 ready' })} />);
     expect(screen.getByTestId('home-ready-chip')).toHaveTextContent('2 of 3 ready');
-    fireEvent.click(within(screen.getByTestId('home-weekly-reports')).getByRole('button'));
+    fireEvent.click(screen.getByTestId('home-open-results'));
     expect(onOpenResults).toHaveBeenCalledTimes(1);
   });
 
-  it('Then the results entry is one purple row', () => {
+  it('Then the strip is calm navy, not a purple slab, and its one results button names the counts', () => {
     render(<HomeDeskBoard {...props()} />);
+    const results = screen.getByTestId('home-open-results');
+    expect(screen.getByTestId('home-weekly-reports').className).not.toMatch(/(^|\s)bg-neo-purple(\s|$)/);
+    expect(results).toHaveAttribute('aria-haspopup', 'dialog');
+    expect(results).toHaveAccessibleName(expect.stringContaining('eduShell.home.focus.barLabel'));
+  });
+
+  it('Given a free teacher with no roster, Then the strip is just the results entry', () => {
+    render(<HomeDeskBoard {...props({ roster: null })} />);
     expect(within(screen.getByTestId('home-weekly-reports')).getAllByRole('button')).toHaveLength(1);
-    expect(within(screen.getByTestId('home-weekly-reports')).getByRole('button').className).toMatch(/(^|\s)bg-neo-purple(\s|$)/);
+    expect(screen.queryByTestId('home-strip-stat')).toBeNull();
   });
 
   it('Given a free teacher, Then no roster shows; who missed the last game gets practice in one tap', () => {
     const onHomework = vi.fn();
     render(<HomeDeskBoard {...props({ roster: null, missed: { count: 6, onHomework } })} />);
     expect(screen.queryByTestId('home-roster-see-all')).toBeNull();
+    expect(screen.getByTestId('home-weekly-reports')).toContainElement(screen.getByTestId('home-homework'));
+    expect(screen.getByTestId('home-homework').className).not.toMatch(/(^|\s)bg-neo-yellow(\s|$)/);
     fireEvent.click(screen.getByTestId('home-homework'));
     expect(onHomework).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId('home-weekly-reports')).toBeInTheDocument();

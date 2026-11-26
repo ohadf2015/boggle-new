@@ -3,6 +3,7 @@
 import React, { useCallback, useRef } from 'react';
 import { ClipboardPaste } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { foldJoinCode, joinCodeStripped } from '@/lib/education/joinCodeInput';
 import { extractJoinCode } from './joinCodeFromLink';
@@ -190,15 +191,15 @@ export function JoinCodeField({
         </div>
 
         {onPaste && (
-          <button
-            type="button"
+          <PressSurface
+            lip={2}
             onClick={onPaste}
-            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-hard transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
+            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-neo-navy-light text-neo-cyan shadow-neo-cyan/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
             aria-label={t('joinView.pasteCode')}
             title={t('joinView.pasteCode')}
           >
             <ClipboardPaste aria-hidden="true" className="size-6" />
-          </button>
+          </PressSurface>
         )}
       </div>
     </div>

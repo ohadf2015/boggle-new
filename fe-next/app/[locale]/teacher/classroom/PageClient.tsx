@@ -5,6 +5,8 @@
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { cn } from '@/lib/utils';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
 import { TEACHER_TV_SCALE } from '@/components/teacher/hq/tvScale';
@@ -48,8 +50,9 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
     <EducationShell
       className={TEACHER_TV_SCALE}
       scrollRegionLabel={t('teacher.nav.classes')}
-      contentClassName={CLASSES_CONTENT_CLASS}
+      contentClassName={cn(CLASSES_CONTENT_CLASS, 'relative isolate')}
     >
+      <AmbientBackdrop theme="teacher" density="calm" />
       {children}
     </EducationShell>
   );

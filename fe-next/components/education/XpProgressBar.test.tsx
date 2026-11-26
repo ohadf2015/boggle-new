@@ -84,7 +84,7 @@ describe('XpProgressBar', () => {
       render(<XpProgressBar totalXp={150} />);
 
       // 150 XP: Level 2, 50 XP into level = 50%
-      const progressBar = screen.getByTestId('xp-progress-fill');
+      const progressBar = document.querySelector('[data-part="fill"]');
       // Uses scaleX for compositor-only animation
       expect(progressBar).toHaveStyle({ transform: 'scaleX(0.5)' });
     });
@@ -120,7 +120,7 @@ describe('XpProgressBar', () => {
 
       expect(screen.getByText('100')).toBeInTheDocument();
       // Progress should be 100% (scaleX(1))
-      const progressBar = screen.getByTestId('xp-progress-fill');
+      const progressBar = document.querySelector('[data-part="fill"]');
       expect(progressBar).toHaveStyle({ transform: 'scaleX(1)' });
     });
   });
@@ -220,17 +220,17 @@ describe('XpProgressBar', () => {
     it('applies neo-brutalist border styles', () => {
       render(<XpProgressBar totalXp={150} />);
 
-      const container = screen.getByTestId('xp-progress-container');
+      const container = screen.getByRole('progressbar');
       // Cream border on the navy track: black-on-navy measured 1.23:1 (invisible),
       // cream keeps the chunky edge visible (WCAG 1.4.11, >= 3:1).
       expect(container).toHaveClass('border-neo-cream');
-      expect(container).toHaveClass('shadow-hard');
+      expect(screen.getByTestId('xp-progress-container')).toHaveClass('shadow-hard');
     });
 
     it('uses neo-lime for progress fill', () => {
       render(<XpProgressBar totalXp={150} />);
 
-      const progressFill = screen.getByTestId('xp-progress-fill');
+      const progressFill = document.querySelector('[data-part="fill"]');
       expect(progressFill).toHaveClass('bg-neo-lime');
     });
   });
@@ -258,5 +258,15 @@ describe('XpProgressBar legibility', () => {
     // row above already reads "0 / 264 XP" and the fill shows the same ratio.
     const { container } = render(<XpProgressBar userId="u1" lessonId="l1" />);
     expect(container.querySelector('.mix-blend-difference')).toBeNull();
+  });
+
+  describe('spring feedback', () => {
+    it('sweeps a shine across the bar when XP goes up', () => {
+      const { rerender } = render(<XpProgressBar totalXp={150} />);
+      expect(document.querySelector('[data-part="shine"]')).toBeNull();
+      rerender(<XpProgressBar totalXp={170} />);
+      expect(document.querySelector('[data-part="shine"]')).toBeInTheDocument();
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '70');
+    });
   });
 });

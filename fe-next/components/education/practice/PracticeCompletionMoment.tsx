@@ -32,6 +32,7 @@ import { cn } from '@/lib/utils';
 import { ArrowRight, RotateCcw, Star, X, Zap } from 'lucide-react';
 import { practiceCelebrationPlan, coinBurstCount } from '@/lib/education/practiceJuice';
 import CoinFlight from '@/components/education/rewards/CoinFlight';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { usePracticeCelebration } from './PracticeCelebrationContext';
 
 export interface CompletionStat {
@@ -397,12 +398,12 @@ export default function PracticeCompletionMoment({
           type size beneath it, so the eye never has to rank two equals.
         */}
         <div data-testid="practice-completion-actions" className="mt-1 flex w-full flex-col items-center gap-2">
-          <button
-            type="button"
+          <PressSurface
+            lip={6}
             data-primary="true"
             data-testid={onNext ? 'practice-completion-next' : 'practice-completion-again'}
             onClick={onNext ?? onAgain}
-            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black shadow-[0_6px_0_0_#0b1530,inset_0_2px_0_rgba(255,255,255,0.55),inset_0_-5px_0_rgba(0,0,0,0.18)] transition active:translate-y-[5px] active:shadow-[0_1px_0_0_#0b1530] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan motion-safe:animate-[lc-cta-breathe_2.4s_ease-in-out_1.2s_infinite]"
+            className="flex min-h-[58px] w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display text-xl font-black uppercase text-neo-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan motion-safe:animate-[lc-cta-breathe_2.4s_ease-in-out_1.2s_infinite]"
           >
             {onNext ? (
               <>
@@ -417,7 +418,7 @@ export default function PracticeCompletionMoment({
                 {t('student.practiceFun.again')}
               </>
             )}
-          </button>
+          </PressSurface>
 
           {onNext && (
             <button

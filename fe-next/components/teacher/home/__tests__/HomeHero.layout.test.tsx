@@ -26,84 +26,65 @@ function renderHero(extra: Partial<React.ComponentProps<typeof HomeHero>> = {}) 
 
 const before = (a: Element, b: Element) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
 
-describe('<HomeHero> layout', () => {
-  it('Then the desk reads top to bottom: the class, Start, the one big secondary, then the join row', () => {
+const BLOCK_FILL = /(^|\s)bg-neo-(pink|purple|yellow)(\s|$)/;
+
+describe('<HomeHero> layout: an open desk on the backdrop, not a colored slab', () => {
+  it('Then it reads top to bottom: the class, its code chip, one Start, then the small secondaries', () => {
     renderHero();
     const title = screen.getByRole('heading', { level: 2 });
+    const code = screen.getByTestId('home-join-row');
     const start = screen.getByTestId('home-start-live');
     const second = screen.getByTestId('rehearse');
-    const join = screen.getByTestId('home-join-row');
-    expect(before(title, start)).toBe(true);
+    expect(before(title, code)).toBe(true);
+    expect(before(code, start)).toBe(true);
     expect(before(start, second)).toBe(true);
-    expect(before(second, join)).toBe(true);
   });
 
-  it('Then the desk is pink on Home and holds the yellow join card', () => {
+  it('Then neither the desk nor the code sits on a color block', () => {
     renderHero();
-    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
-    expect(screen.getByTestId('home-join-row').className).toMatch(/(^|\s)bg-neo-yellow(\s|$)/);
+    expect(screen.getByTestId('home-hero').className).not.toMatch(BLOCK_FILL);
+    expect(screen.getByTestId('home-join-row').className).not.toMatch(BLOCK_FILL);
   });
 
-  it('Given the purple tone, Then the desk is purple', () => {
+  it('Given the purple tone (class page), Then it is not a purple slab either', () => {
     renderHero({ tone: 'purple', titleLevel: 1 });
-    expect(screen.getByTestId('home-hero').className).toMatch(/(^|\s)bg-neo-purple(\s|$)/);
+    expect(screen.getByTestId('home-hero').className).not.toMatch(BLOCK_FILL);
   });
 
-  it('Then Start spans the column and the secondary sits in the same stack', () => {
+  it('Then the class code is one compact chip, not a row of letter tiles', () => {
     renderHero();
-    const startRow = screen.getByTestId('home-hero-start-row');
-    expect(startRow.className).toMatch(/(^|\s)flex-col(\s|$)/);
-    expect(screen.getByTestId('home-start-live').className).toMatch(/(^|\s)w-full(\s|$)/);
-    expect(startRow).toContainElement(screen.getByTestId('rehearse'));
+    expect(screen.queryAllByTestId('home-desk-code-tile')).toHaveLength(0);
+    expect(within(screen.getByTestId('home-join-row')).getByTestId('home-desk-code')).toHaveTextContent('AB12CD');
   });
 
-  it('Given a 360px phone in a long language, Then the single column cannot grow past the card', () => {
-    renderHero();
-    expect(screen.getByTestId('home-hero-grid').className.split(/\s+/)).toContain('grid-cols-[minmax(0,1fr)]');
+  it('Then Start is the one marked hero action and the secondaries share one row beside each other', () => {
+    renderHero({ replay: { kind: 'ready', href: '/again', detail: 'Word Hunt' } });
+    expect(document.querySelectorAll('[data-hero="true"]')).toHaveLength(1);
+    const chips = screen.getByTestId('home-hero-chips');
+    expect(chips).toContainElement(screen.getByTestId('rehearse'));
+    expect(chips).toContainElement(screen.getByTestId('home-pick-game'));
+    expect(chips.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
   });
 
-  it('Then the desk has one even border, no thick colored edge on one side', () => {
-    renderHero();
-    expect(screen.getByTestId('home-hero').className).not.toMatch(/border-s-\[/);
-  });
-
-  it('Given a greeting on Home, Then it is the small page heading above the class name', () => {
+  it('Given a greeting on Home, Then it is one plain line with a small mascot, no speech bubble and no second line', () => {
     renderHero({ eyebrow: 'Good morning, Dana' });
-    const greeting = screen.getByRole('heading', { level: 1 });
-    expect(greeting).toHaveTextContent('Good morning, Dana');
-    expect(before(greeting, screen.getByRole('heading', { level: 2 }))).toBe(true);
+    const row = screen.getByTestId('home-greeting-row');
+    expect(within(row).getByRole('heading', { level: 1 })).toHaveTextContent('Good morning, Dana');
+    expect(row.querySelector('[class*="bg-neo-cream"]')).toBeNull();
+    expect(screen.queryByTestId('home-coach-cue')).toBeNull();
+    expect(before(row, screen.getByRole('heading', { level: 2 }))).toBe(true);
   });
 
-  it('Given the class page, Then the class name is the page heading and the small line is plain text', () => {
+  it('Given the class page, Then the class name is the page heading and the small line is plain text, with no greeting', () => {
     renderHero({ eyebrow: 'English', titleLevel: 1 });
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Period 3');
     expect(screen.queryByRole('heading', { level: 2 })).toBeNull();
     expect(screen.getByText('English').tagName).toBe('P');
-  });
-
-  it('Given a greeting and a cue, Then the mascot says both in one bubble above the desk, on every width', () => {
-    renderHero({ eyebrow: 'Good morning, Dana', cue: 'Autumn words are ready' });
-    const bubble = screen.getByTestId('home-greeting-row');
-    expect(within(bubble).getByTestId('home-coach-cue')).toHaveTextContent('Autumn words are ready');
-    expect(bubble.className).not.toMatch(/(^|\s)hidden(\s|$)/);
-    expect(screen.getByTestId('home-hero')).not.toContainElement(bubble);
-  });
-
-  it('Given the class page, Then no mascot bubble shows', () => {
-    renderHero({ eyebrow: 'English', titleLevel: 1 });
     expect(screen.queryByTestId('home-greeting-row')).toBeNull();
   });
 
-  it('Given a class below its goal, Then the join row says who joined and is headed Get students in', () => {
+  it('Given a class below its goal, Then who joined shows as a quiet line under the code chip', () => {
     renderHero({ joinGoal: <span data-testid="goal">1 joined</span> });
-    const row = screen.getByTestId('home-join-row');
-    expect(within(row).getByTestId('goal')).toBeInTheDocument();
-    expect(row).toHaveTextContent('academy.hq.getStudentsIn');
-    expect(row).not.toHaveTextContent('academy.hq.classCode');
-  });
-
-  it('Given a class at its goal, Then the join row just names the class code', () => {
-    renderHero();
-    expect(screen.getByTestId('home-join-row')).toHaveTextContent('academy.hq.classCode');
+    expect(before(screen.getByTestId('home-join-row'), screen.getByTestId('goal'))).toBe(true);
   });
 });

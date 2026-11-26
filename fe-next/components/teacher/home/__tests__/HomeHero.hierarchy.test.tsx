@@ -12,7 +12,7 @@ const CLASS = { id: 'c1', name: 'Period 3', join_code: 'AB12CD', member_count: 4
 const classes = (s: string) => s.split(/\s+/);
 
 describe('<HomeHero> hierarchy', () => {
-  it('Given a class that played, When the desk renders with its secondary, Then Play again is the one hero action and the secondary is a smaller, lighter cyan button', () => {
+  it('Given a class that played, When the desk renders with its secondary, Then Play again is the one hero action and the secondary is a small outlined chip', () => {
     render(
       <HomeHero
         classrooms={[CLASS]}
@@ -30,9 +30,10 @@ describe('<HomeHero> hierarchy', () => {
 
     const primary = classes(screen.getByTestId('home-play-again').className);
     const secondary = classes(screen.getByTestId('rehearse').className);
-    expect(secondary).toContain('bg-neo-cyan');
-    expect(primary).toContain('shadow-hard-xl');
-    expect(secondary).not.toContain('shadow-hard-xl');
+    expect(secondary).not.toContain('bg-neo-cyan');
+    expect(secondary).toContain('rounded-neo-pill');
+    expect(primary).toContain('shadow-[0_6px_0_0]');
+    expect(secondary).toContain('shadow-[0_2px_0_0]');
     expect(secondary).not.toContain('min-h-[72px]');
     expect(secondary).not.toContain('min-h-[60px]');
   });
