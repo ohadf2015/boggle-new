@@ -4281,7 +4281,8 @@ const es = {
     "photosensitivity": "Luces parpadeantes. Puedes desactivarlas en Ajustes",
     "fireRound": "🔥 RONDA DE FUEGO",
     "multiplier": "2× TODO",
-    "effect": "Se reemplaza todo el tablero: anota rápido para 2× puntos"
+    "effect": "Se reemplaza todo el tablero: anota rápido para 2× puntos",
+    "fireChip": "FUEGO ×2"
   },
   "effects": {
     "preferenceTitle": "Ajustes de animación",
@@ -21736,6 +21737,7 @@ const es = {
     "results": {
       "time": "¡Tiempo!",
       "finalTitle": "Resultados finales",
+      "nextLabel": "Siguiente ronda",
       "roundDone": "Ronda {round}/{total} terminada",
       "details": "Detalles",
       "detailsTitle": "Detalles de la batalla",

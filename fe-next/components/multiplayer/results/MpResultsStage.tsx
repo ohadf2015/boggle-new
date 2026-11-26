@@ -13,13 +13,16 @@ import { ResultsModals } from '@/components/results/ResultsModals';
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import InlineSignupCard from '@/components/auth/InlineSignupCard';
-import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
 import { guestAskPlan, nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing, showInlineSignup } from './mpResultsView';
+import { useNextModeRelay } from './useNextModeRelay';
+import { CLASSROOM_NEXT_OPTIONS, useTeacherNextMode } from './useTeacherNextMode';
+import { useMpResultsChallenge } from './useMpResultsChallenge';
+import { MpResultsExitDialog } from './MpResultsExitDialog';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useMpAutoContinue } from './useMpAutoContinue';
@@ -38,11 +41,7 @@ import { WordShowdownPanel } from './WordShowdownPanel';
 import { MpBragStrip, useMpBrag } from './MpBragStrip';
 import { MpGuestAddPromptProvider } from './MpGuestAddChip';
 import MpResultsDetails from './MpResultsDetails';
-import { ChallengeInviteDialog } from '@/components/friends/ChallengeInviteDialog';
-import { sendChallengeWithAck } from '@/lib/friends/sendChallengeWithAck';
 import { useFriends } from '@/hooks/useFriends';
-import { useSocketOptional } from '@/utils/SocketContext';
-import toast from 'react-hot-toast';
 import ChestRewardCta from '@/components/education/economy/ChestRewardCta';
 import { rewardRoundId } from '@/shared/constants/classroomEconomy';
 import RoundShop from '@/components/education/economy/RoundShop';
@@ -55,7 +54,6 @@ import fx from './mpResults.module.css';
 import { useOpenLessonPractice } from './useOpenLessonPractice';
 import { classroomRoundModeMeta } from '../round/roundModes';
 import { StudentMissedWords } from '@/components/student/live/StudentMissedWords';
-import { StudentExitDialog } from '@/components/student/live/StudentExitDialog';
 import { myMissedWords } from '@/components/student/live/missedWords';
 import { resultsExitCopy } from '@/lib/multiplayer/resultsExitCopy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -90,10 +88,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const { username, isHost = false, seriesRoundNumber = 0, seriesTotalGames = SERIES_TOTAL_GAMES, seriesStandings, gameCode } = props;
   const reduced = !!useReducedMotion();
   const { friends } = useFriends();
-  const socketCtx = useSocketOptional();
-  const challengeSocket = socketCtx?.socket ?? null;
-  const challengeConnected = !!socketCtx?.isConnected;
-  const [challengeFriend, setChallengeFriend] = useState<{ odUserId: string; username: string; displayName?: string } | null>(null);
+  const { challengeFriend, setChallengeFriend, challengeDialog } = useMpResultsChallenge({ gameCode, t });
 
   const rows = useMemo(() => buildMpStandings({
     sortedScores: data.sortedScores,
@@ -151,7 +146,6 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const nextModeSlot = expectedBranch === 'intermission' || (isHost && !c.isClassroom);
 
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
   const [standingsOpen, setStandingsOpen] = useState(false);
 
   // A guest's first MP game of the session ends on the replay countdown alone (guestAskPlan).
@@ -196,7 +190,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     isHost,
     isReady,
     armed: footerShown,
-    paused: detailsOpen || pickerOpen || standingsOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || !!challengeFriend || socketEvents.showWordFeedback || c.adGate.anyAdActive,
+    paused: detailsOpen || standingsOpen || nudgeSheetOpen || c.showExitConfirm || c.showShareModal || !!challengeFriend || socketEvents.showWordFeedback || c.adGate.anyAdActive,
     persistCancel: !isOnCrazyGamesPlatform,
     onStartNext: handleStartGame,
     onNewSeries: handleNewSeries,
@@ -217,7 +211,16 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
     }, (event, props) => posthog.capture(event, props));
   }, [isHost, handleNewSeries, handleMarkReady]);
 
-  const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode });
+  const relayedMode = useNextModeRelay<GameModeOption>({ socket: props.socket ?? null, gameCode, isHost, pick: c.selectedGameMode, enabled: !c.isClassroom });
+  const nextMode = nextModeForViewer<GameModeOption>({ isHost, hostPick: c.selectedGameMode, relayed: relayedMode });
+  const teacherNext = useTeacherNextMode({
+    enabled: isHost && c.isClassroom,
+    socket: props.socket ?? null,
+    gameCode: gameCode ?? '',
+    current: (props.classroomNextMode ?? c.resolvedGameMode ?? 'classic') as Parameters<typeof useTeacherNextMode>[0]['current'],
+    t,
+    onBoardMode: c.setSelectedGameMode,
+  });
   const openLessonPractice = useOpenLessonPractice();
   const classroomStudent = c.isClassroom && !isHost && !!props.classroomSummary;
   const missedWords = useMemo(() => myMissedWords(props.classroomSummary, username), [props.classroomSummary, username]);
@@ -277,41 +280,7 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       username: rivalFriend.username,
       displayName: rivalFriend.displayName,
     });
-  }, [auto, rivalFriend, rival, c.isAuthenticated, c.isGuest, setShowShareModal]);
-  const handleSendChallenge = useCallback(async (
-    friendId: string,
-    challengeType: 'new_game' | 'join_room',
-    settings?: { language?: string; timerSeconds?: number; mode?: string; message?: string; flow?: 'async' | 'live' },
-  ) => {
-    // Results only offers live (allowedFlows=['live']). Async would promise a
-    // score-to-beat path this surface does not implement — reject rather than
-    // fake success via share modal.
-    if (settings?.flow === 'async') {
-      toast.error(t('friends.errors.sendFailed'));
-      throw new Error('ASYNC_UNSUPPORTED_ON_RESULTS');
-    }
-    if (!challengeSocket || !challengeConnected) {
-      toast.error(t('friends.errors.sendFailed'));
-      throw new Error('NOT_CONNECTED');
-    }
-    const result = await sendChallengeWithAck(challengeSocket, {
-      friendUserId: friendId,
-      challengeType,
-      roomCode: gameCode || undefined,
-      gameSettings: settings ? {
-        language: settings.language,
-        timerSeconds: settings.timerSeconds,
-        mode: settings.mode,
-      } : undefined,
-      message: settings?.message,
-    });
-    if (!result.ok) {
-      toast.error(t('friends.errors.sendFailed'));
-      throw new Error(result.code);
-    }
-    toast.success(t('friends.challenges.sent'));
-    setChallengeFriend(null);
-  }, [challengeSocket, challengeConnected, t, gameCode]);
+  }, [auto, rivalFriend, rival, c.isAuthenticated, c.isGuest, setShowShareModal, setChallengeFriend]);
   const champions = series?.champions ?? NO_CHAMPIONS;
   // The album (desktop/TV): the series final tells the series round by round;
   // otherwise the round is told as three awards.
@@ -500,9 +469,13 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
       {!c.isClassroom && <MpResultsReactionBar onSend={c.reactions.sendReaction} t={t} />}
       {!classroomStudent && nextModeSlot && (
         <MpNextModeCard
-          mode={nextMode}
-          onChange={isHost && !c.isClassroom ? c.setSelectedGameMode : undefined}
-          onPickerOpenChange={setPickerOpen}
+          mode={isHost && c.isClassroom ? teacherNext.mode : nextMode}
+          options={isHost && c.isClassroom ? CLASSROOM_NEXT_OPTIONS : undefined}
+          onChange={!isHost ? undefined : (m) => {
+            if (c.isClassroom) teacherNext.pick(m);
+            else c.setSelectedGameMode(m as GameModeOption);
+            auto.restart();
+          }}
           t={t}
           className={cn(!seen('card') && 'invisible', seen('card') && fx.cardIn)}
         />
@@ -559,32 +532,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
         </>
       )}
       <MpResultsDetails open={detailsOpen} onClose={() => setDetailsOpen(false)} c={c} />
-      {classroomStudent ? (
-        <StudentExitDialog open={c.showExitConfirm} onOpenChange={c.setShowExitConfirm} onConfirm={c.confirmExitRoom} t={t} analyticsId="exit_room_confirm" />
-      ) : (
-      <ConfirmationDialog
-        open={c.showExitConfirm}
-        onOpenChange={c.setShowExitConfirm}
-        title={t(exitCopy.titleKey)}
-        description={t(exitCopy.bodyKey)}
-        confirmText={t('common.confirm')}
-        cancelText={t('common.cancel')}
-        onConfirm={c.confirmExitRoom}
-        variant="default"
-        analyticsId="exit_room_confirm"
-      />
-      )}
-
-      {challengeFriend && (
-        <ChallengeInviteDialog
-          isOpen={!!challengeFriend}
-          friendUsername={challengeFriend.displayName || challengeFriend.username}
-          friendId={challengeFriend.odUserId}
-          onClose={() => setChallengeFriend(null)}
-          onSendChallenge={handleSendChallenge}
-          allowedFlows={['live']}
-        />
-      )}
+      <MpResultsExitDialog c={c} classroomStudent={classroomStudent} copy={exitCopy} />
+      {challengeDialog}
     </MpGuestAddPromptProvider>
   );
 }

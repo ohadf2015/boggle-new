@@ -201,6 +201,25 @@ describe('MpResultsScreen', () => {
     useGameStore.getState().setHostSelectedGameMode('random');
   });
 
+  it('intermission joiner: NEXT UP follows the pick the host makes on results', () => {
+    const { socket } = renderScreen({ isHost: false });
+    skip();
+    expect(socket.emit).toHaveBeenCalledWith('requestNextMode');
+    const onNextMode = (socket.on as ReturnType<typeof vi.fn>).mock.calls.find(([e]) => e === 'nextMode')?.[1];
+    act(() => onNextMode({ gameCode: 'ROOM12', mode: 'blast' }));
+    expect(screen.getByTestId('mp-next-mode').getAttribute('data-mode')).toBe('blast');
+  });
+
+  it('intermission host: one tap on a mode chip picks it and tells the room', () => {
+    useGameStore.getState().setHostSelectedGameMode('classic');
+    const { socket } = renderScreen({ isHost: true });
+    skip();
+    fireEvent.click(screen.getByTestId('mp-next-mode-option-blast'));
+    expect(screen.getByTestId('mp-next-mode').getAttribute('data-mode')).toBe('blast');
+    expect(socket.emit).toHaveBeenCalledWith('updateNextMode', { gameCode: 'ROOM12', mode: 'blast' });
+    useGameStore.getState().setHostSelectedGameMode('random');
+  });
+
   it('intermission host: NEXT UP shows the mode the host picked', () => {
     useGameStore.getState().setHostSelectedGameMode('classic');
     renderScreen({ isHost: true });

@@ -4312,7 +4312,8 @@ const he = {
     "photosensitivity": "אורות מהבהבים. אפשר לכבות בהגדרות",
     "fireRound": "🔥 סיבוב אש",
     "multiplier": "×2 על הכל",
-    "effect": "כל הלוח מתחלף. צברו נקודות מהר לבונוס ×2"
+    "effect": "כל הלוח מתחלף. צברו נקודות מהר לבונוס ×2",
+    "fireChip": "אש ×2"
   },
   "effects": {
     "preferenceTitle": "הגדרות אנימציה",
@@ -21685,6 +21686,7 @@ const he = {
     "results": {
       "time": "נגמר הזמן!",
       "finalTitle": "תוצאות סופיות",
+      "nextLabel": "הסיבוב הבא",
       "roundDone": "סיבוב {round}/{total} הסתיים",
       "details": "פרטים",
       "detailsTitle": "פרטי הקרב",

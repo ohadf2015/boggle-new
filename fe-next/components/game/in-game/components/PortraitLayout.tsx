@@ -4,6 +4,7 @@ import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode, type RefObject, type AnimationEvent } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
+import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
 import { StudentRankRail } from '@/components/education/StudentRankRail';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import {
@@ -369,6 +370,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
 
   // Stable highlighted path for GridComponent — avoids new [] ref every render
   const showTrails = shouldShowKeyboardTrails(isTypingMode, lastWordFoundTime, totalGamesPlayed);
+  const showSideColumns = !inDesktopShell && !mpChrome && ((deferredLeaderboard?.length ?? 0) > 1 || !gameplayFocusMode);
   const gridHighlightedPath = useMemo(
     () => showTrails ? highlightedCells : EMPTY_HIGHLIGHTED_PATH,
     [showTrails, highlightedCells]
@@ -482,9 +484,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             Render the container whenever the right panel renders so the
             center column stays optically centered (countdown overlay is
             fixed inset-0 → viewport center must equal game-area center). */}
-        {!gameplayFocusMode && !mpChrome && (
+        {showSideColumns && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 min-h-0 shrink-0 overflow-y-auto">
-            {isPlaying && (
+            {isPlaying && !gameplayFocusMode && (
               <GameWordList foundWords={foundWords} minWordLength={minWordLength} t={t} />
             )}
           </div>
@@ -528,6 +530,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 className="flex w-full items-center justify-center lg:grid lg:grid-cols-[1fr_auto_1fr] relative min-h-[88px] md:min-h-[108px] medium-short:min-h-[88px] medium-short:md:min-h-[108px] lg:min-h-[clamp(72px,10dvh,128px)] desktop-short:lg:min-h-[88px] desktop-medium-short:lg:min-h-[100px] short:min-h-[84px] short:md:min-h-[88px] gap-2"
                 data-testid="stats-row"
               >
+                <span {...{ [HUD_FIRE_SLOT]: '' }} className="absolute inset-s-1 md:inset-s-2 top-1/2 -translate-y-1/2 lg:hidden" />
                 {/* Desktop header */}
                 <GameHeader
                   onExitRoom={onExitRoom}
@@ -584,6 +587,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                     className="hidden lg:flex lg:flex-col lg:items-end lg:gap-1 lg:ms-auto shrink-0 z-30"
                     data-testid="combo-desktop"
                   >
+                    <span {...{ [HUD_FIRE_SLOT]: '' }} className="flex justify-end empty:hidden" />
                     <div className="h-[32px] flex items-center justify-end">
                       {comboLevel > 0 ? (
                         <ComboDisplayConnected
@@ -830,7 +834,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             including classic mode, which runs in gameplayFocusMode. Focus mode
             now only suppresses chat here (it keeps the grid screen calm), NOT the
             standings: desktop players were previously blind to who was winning. */}
-        {!inDesktopShell && !mpChrome && ((deferredLeaderboard && deferredLeaderboard.length > 1) || !gameplayFocusMode) && (
+        {showSideColumns && (
           <div className="hidden lg:flex lg:flex-col lg:w-56 xl:w-64 2xl:w-72 gap-2 shrink-0 min-h-0 overflow-y-auto">
             {/* Single live leaderboard — ranked standings with a "your standing"
                 cue (leading by N / N points to catch). Replaces the previous

@@ -4661,7 +4661,8 @@ const sv = {
     "photosensitivity": "Blinkande ljus! Inaktivera i inställningar",
     "fireRound": "🔥 ELDRUNDA",
     "multiplier": "2× ALLT",
-    "effect": "Hela brädet byts ut. Poängjaga snabbt för 2× poäng"
+    "effect": "Hela brädet byts ut. Poängjaga snabbt för 2× poäng",
+    "fireChip": "ELD ×2"
   },
   "effects": {
     "preferenceTitle": "Animationsinställningar",
@@ -21724,6 +21725,7 @@ const sv = {
     "results": {
       "time": "Tiden är ute!",
       "finalTitle": "Slutresultat",
+      "nextLabel": "Nästa runda",
       "roundDone": "Runda {round}/{total} klar",
       "details": "Detaljer",
       "detailsTitle": "Stridsdetaljer",
