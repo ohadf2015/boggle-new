@@ -3,6 +3,7 @@ import { defaultOgImages, defaultOgImageUrl } from '@/lib/seo/defaultOgImage';
 import GlossaryPageClient from './PageClient';
 import { contentByLocale } from './content';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
+import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { withBodyLocales } from '@/lib/seo/bodyLocales';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +95,7 @@ export default async function GlossaryPage({ params }: PageProps) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <GlossaryPageClient />
       <GuidesCalloutLink locale={locale} />
+      <EducationCalloutLink locale={locale} />
 
       {/* Server-rendered glossary terms for crawlers — visually hidden, not aria-hidden */}
       <section className="sr-only">

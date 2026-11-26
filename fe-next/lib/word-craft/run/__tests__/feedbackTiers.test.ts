@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getProgressPercent, meterZone, wordFeedbackTier } from '../feedbackTiers';
+import { getProgressPercent, meterZone, wordFeedbackTier, nextStreak } from '../feedbackTiers';
 
 describe('getProgressPercent — round score toward target', () => {
   it('is score/target, clamped to [0,1]', () => {
@@ -36,5 +36,17 @@ describe('wordFeedbackTier — escalating per-word praise', () => {
   it('treats the band edges sensibly', () => {
     expect(wordFeedbackTier(15)).toBe('great'); // 15+ is great
     expect(wordFeedbackTier(30)).toBe('huge');  // 30+ is huge
+  });
+});
+
+describe('nextStreak — chain counter for variable-reward escalation', () => {
+  it('grows the chain on a great/huge word', () => {
+    expect(nextStreak(0, 'great')).toBe(1);
+    expect(nextStreak(1, 'huge')).toBe(2);
+    expect(nextStreak(4, 'great')).toBe(5);
+  });
+  it('resets to 0 on a plain "nice" word — the chain is earned, not free', () => {
+    expect(nextStreak(3, 'nice')).toBe(0);
+    expect(nextStreak(0, 'nice')).toBe(0);
   });
 });

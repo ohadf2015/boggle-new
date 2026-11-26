@@ -26,7 +26,10 @@ fi
 # Fetch unresolved error issues from the last 24h, sorted by frequency (count).
 fetch_issues() {
   local url="$HOST/api/0/projects/$ORG_SLUG/$PROJECT_SLUG/issues/"
-  local query="is:unresolved+level:error"
+  # !app:growth-radar excludes cross-tenant noise: growthradar.app's own Next.js
+  # app shares this Sentry project but tags its events app=growth-radar (lexiclash's
+  # own sentry.*.config.ts never sets an "app" tag) — see JAVASCRIPT-NEXTJS-2SB/2M8.
+  local query="is:unresolved+level:error+!app:growth-radar"
   local params="query=$query&statsPeriod=24h&sort=freq&limit=10"
 
   curl -sS --max-time 30 -X GET "$url?$params" \

@@ -24,7 +24,7 @@ import { GemHuntWinScene } from './GemHuntWinScene';
 import { GemHuntRuleHint } from './GemHuntRuleHint';
 import { cn } from '@/lib/utils';
 import type { AbilityCard, AbilityKind, GemColor, GemRarity } from '@/lib/word-craft/gems/types';
-import { planGemDrama, clampGemDramaForCosy } from '@/lib/word-craft/celebration/gemDrama';
+import { planGemDrama, clampGemDramaForCosy, dramaForTransmuteResult } from '@/lib/word-craft/celebration/gemDrama';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -246,11 +246,30 @@ export default function GemHuntPageClient() {
 
   const handleTransmute = useCallback(
     (color: GemColor, rarity: GemRarity) => {
-      playSound('tierPromotion', {});
+      const dramaRaw = dramaForTransmuteResult(rarity);
+      const drama = cosyMode ? clampGemDramaForCosy(dramaRaw) : dramaRaw;
+      playSound((drama.soundKey ?? 'tierPromotion') as SoundEffectKey, {});
       haptics.success();
+      if (drama.sharedFxPreset && SharedFxApp.isInitialized()) {
+        const nextRarity = (rarity + 1) as GemRarity;
+        const chipEl = document.querySelector<HTMLElement>(`[data-inv-cell="${color}-${nextRarity}"]`);
+        if (chipEl) {
+          const r = chipEl.getBoundingClientRect();
+          SharedFxApp.spawnBurst(drama.sharedFxPreset, r.left + r.width / 2, r.top + r.height / 2);
+        }
+      }
+      if (drama.freezeFrameMs > 0) {
+        const board = document.querySelector<HTMLElement>('[data-wc-board]');
+        if (board) {
+          board.style.filter = 'brightness(1.25) saturate(1.4)';
+          setTimeout(() => {
+            if (board) board.style.filter = '';
+          }, drama.freezeFrameMs);
+        }
+      }
       hunt.transmuteGem(color, rarity);
     },
-    [hunt, playSound],
+    [hunt, playSound, cosyMode],
   );
   const handleSubmit = useCallback(() => hunt.submitMove(), [hunt]);
   const handleRecallAll = useCallback(() => hunt.recallAll(), [hunt]);

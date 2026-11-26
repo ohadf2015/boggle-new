@@ -54,7 +54,7 @@ export function BlastRetryWaveModal({
             </h2>
 
             <p className="font-neo-body text-sm text-neo-white">
-              {t('blast.retryWaveModal.body', { wave: waveNumber, percent: Math.round(clearPct) })}
+              {t(canShowAd ? 'blast.retryWaveModal.body' : 'blast.retryWaveModal.bodyNoAd', { wave: waveNumber, percent: Math.round(clearPct) })}
             </p>
 
             <div className="flex w-full flex-col gap-3 pt-2">

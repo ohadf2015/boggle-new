@@ -13,6 +13,7 @@ export interface SchoolQuoteInput {
   message: string;
   requester: string;
   locale: string;
+  wantsTrial?: boolean;
 }
 
 export function clampTeachers(n: number): number {
@@ -42,7 +43,7 @@ export function buildSchoolQuotePayload(input: SchoolQuoteInput): SchoolLeadPayl
     role: input.role,
     school_or_district: input.school.trim(),
     student_count: studentBucketForTeachers(teachers),
-    interests: ['pricing_info'],
+    interests: input.wantsTrial ? ['pricing_info', 'trial'] : ['pricing_info'],
     message: lines.join('\n').slice(0, 800),
     locale,
     source: 'teacher-upgrade',

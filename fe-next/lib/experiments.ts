@@ -32,6 +32,20 @@ function defineExperiment<V extends readonly string[]>(
 
 export const EXPERIMENTS = {
   /**
+   * Practice picker locked-tile tap feedback. Hypothesis: a locked tile is a
+   * native `disabled` button — a tap on it dispatches nothing, which is a
+   * dead click PostHog's rage-click detector flags (student lesson page,
+   * reach=12/24h). feedback = the tile stays tappable and toasts the unlock
+   * reason instead of doing nothing; control = unchanged silent disabled tile.
+   */
+  'exp-edu-locked-tile-feedback-v1': defineExperiment({
+    variants: ['control', 'feedback'] as const,
+    default: 'control',
+    description:
+      'Practice picker locked tile tap. control = native disabled, silent. feedback = tappable, toasts the unlock reason. Targets rage/dead-clicks on /student/lessons/[id].',
+  }),
+
+  /**
    * Word Wheel drag-hint coachmark. Hypothesis: the wheel's drag-to-spell
    * mechanic is not tap-discoverable → confused/idle players rage-click and
    * abandon (PostHog: word-wheel is the most rage-clicked SP surface). The
@@ -649,6 +663,20 @@ export const EXPERIMENTS = {
   }),
 
   /**
+   * Classroom join-name submit button shows a spinner + "Joining…" while the
+   * join request is in flight, instead of staying static until the game
+   * screen swaps in. control = static button (current). loading-feedback =
+   * spinner + submitting label while `disabled`.
+   * Ship to PostHog: flag key = 'exp-edu-join-loading-feedback-v1', 50/50.
+   */
+  'exp-edu-join-loading-feedback-v1': defineExperiment({
+    variants: ['control', 'loading-feedback'] as const,
+    default: 'control',
+    description:
+      'Classroom join-name submit button loading feedback. loading-feedback = spinner + "Joining…" label while the submit is in flight. control = static button.',
+  }),
+
+  /**
    * Classic/survival word-count goal badge. Classic mode 7d completion = 16%
    * (73 started, 12 completed) — worst of all modes. Hypothesis: players
    * abandon because there is no concrete progress anchor (only a timer). The
@@ -921,6 +949,39 @@ export const EXPERIMENTS = {
     default: 'control',
     description:
       'Guest /profile locked stat tiles. control = static, no onClick (dead tap). tappable = tiles open the sign-in modal on tap. Targets /es/profile?from=header rage-click signal (score 0.358, 2026-11-07). Conversion = rage-click rate on /profile falls; guardrail = signup_prompt_shown from profile_locked_tile.',
+  }),
+
+  /**
+   * Word Tower tray tiles while a built word hangs on the hook (`placing`):
+   * tapping a tile gives zero feedback, so players hammer the tray thinking
+   * it froze (/he/word-tower/daily rage-click signal, reach 7, 2026-11-12 —
+   * rageclick el_text was individual tray letters). nudge makes the DROP
+   * button shake on a blocked tap, pointing the player at the real action.
+   * Conversion = rage-click rate on /word-tower/daily falls.
+   */
+  'exp-wordtower-placing-nudge-v1': defineExperiment({
+    variants: ['control', 'nudge'] as const,
+    default: 'control',
+    description:
+      'Word Tower LetterRow blocked-tile-tap feedback while a word is on the hook. control = silent (no change). nudge = DROP button shakes once per blocked tap. Targets /he/word-tower/daily rage-click signal (reach 7, 2026-11-12). Conversion = rage-click rate on /word-tower/daily falls.',
+  }),
+
+  /**
+   * Avatar editor randomize-dice feedback. Homepage's #1 rage-click signal
+   * (reach 14, 2026-11-22) is entirely the "Randomize" dice button in the
+   * Avatar Builder modal — `onRandomize` swaps parts instantly with no visual
+   * confirmation (the existing equip-burst only fires on a tier change, which
+   * most random rolls don't trigger), so repeated taps look identical whether
+   * the click registered or not. control = silent swap (current). feedback =
+   * dice icon pops on every click, independent of tier. Conversion =
+   * rage-click rate on editor-randomize falls; guardrail = avatar_saved rate
+   * from sessions that opened the editor stays stable.
+   */
+  'exp-avatar-randomize-feedback-v1': defineExperiment({
+    variants: ['control', 'feedback'] as const,
+    default: 'control',
+    description:
+      'Avatar Builder randomize dice tap. control = instant silent swap. feedback = dice icon pops on every click regardless of tier change. Targets homepage editor-randomize rage-click signal (reach 14, 2026-11-22). Conversion = rage-click rate on that element falls.',
   }),
 } as const;
 

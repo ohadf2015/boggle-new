@@ -2,12 +2,12 @@
 'use client';
 
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { pickHomeAsk } from '@/lib/education/teacherBannerPriority';
 import { useTeacherReveal } from './motion/useTeacherReveal';
-import { AssignmentCreator } from './assignments';
 import { TeacherHqWelcome } from './TeacherHqWelcome';
 import { greetingName } from './home/greetingName';
 import { HomeHero } from './home/HomeHero';
@@ -57,6 +57,10 @@ import {
 } from '@/lib/education/teacherOnboardingGate';
 import { isTeacherProfile } from '@/lib/education/teacherRole';
 import { TeacherWorkspaceProCard } from '@/components/education/TeacherWorkspaceProCard';
+
+// Only needed once a teacher opens "create assignment" (click or ?assign=1 deep link) — never on first paint.
+// Imports the barrel (not the file directly) so existing tests' `vi.mock('.../assignments', ...)` still intercepts it.
+const AssignmentCreator = dynamic(() => import('./assignments').then((m) => m.AssignmentCreator), { ssr: false });
 
 export interface TeacherDashboardProps {
   /** Account-state strip for a teacher already on (or just off) a Pro trial: days left / renew. */

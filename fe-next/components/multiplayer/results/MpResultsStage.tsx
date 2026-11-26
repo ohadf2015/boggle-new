@@ -470,11 +470,15 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
           <MpRoundAwards awards={awards} t={t} className="hidden lg:block" />
         ) : null)}
         {/* Native AdMob banner / CrazyGames banner. The web dev placeholder
-            ([data-ad-zone], null in production) is hidden so dev matches prod. */}
-        <div className="shrink-0 empty:hidden [&_[data-ad-zone]]:hidden">
-          <ResultsBannerSlot placement="multiplayer-round-complete" />
-          <CrazyGamesBanner size="320x50" />
-        </div>
+            ([data-ad-zone], null in production) is hidden so dev matches prod.
+            Classroom rounds are ad-free (for-schools pricing promise) — same
+            exclusion as the other c.isClassroom branches in this file. */}
+        {!c.isClassroom && (
+          <div className="shrink-0 empty:hidden [&_[data-ad-zone]]:hidden">
+            <ResultsBannerSlot placement="multiplayer-round-complete" />
+            <CrazyGamesBanner size="320x50" />
+          </div>
+        )}
       </div>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-40 overflow-hidden">
         {c.reactions.floatingReactions.map((r) => (

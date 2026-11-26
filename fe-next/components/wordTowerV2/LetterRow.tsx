@@ -26,6 +26,10 @@ export interface LetterRowProps {
   onDrop: () => void;
   /** A real word to light up for a stuck new player (tray slots, in order), or null. */
   hint?: number[] | null;
+  /** Fired when a tap lands on the tray while `placing` is true (dead tap). */
+  onBlockedTap?: () => void;
+  /** DROP button plays a one-shot shake (exp-wordtower-placing-nudge-v1). */
+  shake?: boolean;
 }
 
 /**
@@ -49,6 +53,7 @@ const DRAG_ENGAGEMENT_THRESHOLD_PX = 8;
  */
 export const LetterRow = memo(function LetterRow({
   t, tray, selected, placing, canBuild, reducedMotion, dir, onSelectTile, onDeselectTile, onSubmit, onDrop, hint = null,
+  onBlockedTap, shake = false,
 }: LetterRowProps) {
   const draggingRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
@@ -87,7 +92,10 @@ export const LetterRow = memo(function LetterRow({
   });
 
   const onDown = (e: React.PointerEvent) => {
-    if (placing) return;
+    if (placing) {
+      onBlockedTap?.();
+      return;
+    }
     addedDuringDragRef.current = false;
     downRef.current = { x: e.clientX, y: e.clientY };
     gestureRef.current = { id: e.pointerId, el: e.currentTarget as HTMLElement };
@@ -175,6 +183,8 @@ export const LetterRow = memo(function LetterRow({
               type="button"
               data-wheel-letter={letter}
               data-wheel-index={i}
+              // FDT: spelling a word IS a burst of taps in one small area.
+              data-feedback-ignore-rage="true"
               disabled={placing}
               onClick={() => tapLetter(i)}
               aria-label={t('wordTower.a11y.tile', { letter })}
@@ -208,6 +218,7 @@ export const LetterRow = memo(function LetterRow({
       <button
         type="button"
         data-wt2-action={action}
+        data-feedback-ignore-rage="true"
         disabled={action === 'idle'}
         onClick={() => {
           if (action === 'drop') onDrop();
@@ -221,6 +232,7 @@ export const LetterRow = memo(function LetterRow({
           'relative flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-neo border-neo-thick border-black font-neo-display text-xl font-black uppercase text-neo-navy shadow-hard transition-colors duration-150 active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed lg:h-14',
           action === 'drop' ? 'bg-neo-cyan' : 'bg-neo-lime',
           action === 'idle' && 'opacity-40 shadow-none',
+          action === 'drop' && shake && !reducedMotion && 'animate-neo-shake',
         )}
       >
         {/* The auto-build beat, drawn: the button fills, then the word goes up. */}

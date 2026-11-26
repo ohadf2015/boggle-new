@@ -53,7 +53,10 @@ sev_of() { jq -n --argjson v "$1" --argjson m "$2" '(((($v / (if $m>0 then $m el
 # collect-sentry.sh: status filter (active) + infra-noise skip + issue permalink.
 # Skip low-signal infra errors (parity with collect-sentry.sh is_noise()).
 is_noise() { echo "$1" | grep -iE '(socket|CSP violation|CORS|timeout|abort|net::|ResizeObserver|NetworkError)' >/dev/null 2>&1; }
-ETQ='{"query":{"kind":"ErrorTrackingQuery","orderBy":"occurrences","dateRange":{"date_from":"-24h"},"status":"active","volumeResolution":0,"limit":10}}'
+# $current_url not_icontains growthradar.app excludes cross-tenant noise: growthradar.app's
+# own Next.js app shares this PostHog project (its errors surface under path /app,
+# /app/acquire) but is a different site entirely — see PostHog issue 01a1b58d-e596-....
+ETQ='{"query":{"kind":"ErrorTrackingQuery","orderBy":"occurrences","dateRange":{"date_from":"-24h"},"status":"active","volumeResolution":0,"limit":10,"filterGroup":[{"key":"$current_url","value":"growthradar.app","operator":"not_icontains","type":"event"}]}}'
 ISSUES=$(curl -sS --max-time 30 -X POST "$HOST/api/projects/$PID/query/" \
            -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
            -d "$ETQ" 2>/dev/null)

@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/app/[locale]/faq/page.tsx
+next_steps: structure-only night. Live word-count audit found no genuinely thin informational page (all >=300 words real tokenizer count except /ja, verified as a CJK tokenizer artifact — real H1 + 22 <p> tags present). dead_pages.py found 0 zero-traffic noindex candidates. Scanned all informational pages for BreadcrumbList JSON-LD coverage (component or inline): /faq was the only one with none; added via existing BreadcrumbJsonLd component, same pattern as how-to-play/rules. Tomorrow: re-run the word-count + dead-page sweep: fixes land fast, revisit after a few AdSense-adjacent nights to see if enough thin-page work has accumulated to consider re-submitting.

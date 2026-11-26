@@ -4,6 +4,18 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-11-23
+- [Supabase] `rls_disabled_in_public` on `public._migrations` (ERROR level)
+  - `anon` + `authenticated` had full INSERT/SELECT/UPDATE/DELETE/TRUNCATE on the migration-history table, no RLS, no anon/authenticated-reachable callsite — the migration runner (fe-next/supabase/migrations/run-migrations.js) connects via SUPABASE_SERVICE_ROLE_KEY, which bypasses RLS and keeps its grants
+  - status: shipped (migration `lock_down_migrations_table`) — `REVOKE ALL ... FROM anon, authenticated` + `ENABLE ROW LEVEL SECURITY`, verified 0 remaining grants + RLS on
+  - why shipped autonomously: pure hardening, no legitimate client ever read/wrote this table, reversible (re-grant if ever needed)
+  - recommended owner: review-by-eod
+- [Supabase] `security_definer_view` on `public.public_profiles` — NOT fixed, confirmed intentional (memory `friends-empty-profiles-rls-and-pill-cooldown-2026-08-15`: "that shape is the point" — it needs its own SECURITY DEFINER lookup to hide columns from anon regardless of RLS). No action needed.
+- [Sentry + PostHog] RE-CONFIRMED (4th time, first flagged 2026-11-07, see entry below): every unresolved Sentry issue (`javascript-nextjs` project, org `lexiclash`, 7d window, 25 issues) and the one active PostHog error-tracking issue (project 151059) trace to `growthradar.app` / Growth Radar's own Next.js app (`src/lib/engine-cause.ts`, `src/components/ui/Button.tsx`, `/p/[slug]/revenue`, `/api/cron` competitor-crawl failures) — none of it is in `boggle-new`. Zero actionable LexiClash game errors in either source tonight.
+  - status: deferred (repeat finding, not a boggle-new fix)
+  - why: can't fix another repo's bugs from here; the recurring cost is lane-01 re-discovering this every run it's scheduled
+  - recommended owner: lane 7 (self-learn) — script the `app:growth-radar` / `growthradar.app` exclusion into the Sentry/PostHog query helpers so lane 01 stops re-deriving it each night. 2026-11-07's same recommendation ("split the Sentry project per app") still hasn't landed either.
+
 ## 2026-11-07
 - [Sentry] JAVASCRIPT-NEXTJS-2M4 + 2M3 — canvas ellipse IndexSizeError + Bing NotAuthorized
   - first/last seen 2026-11-06 ~14:00-16:35 UTC, 5+2 events, tag `app: growth-radar`, `url: growthradar.app`
@@ -2907,3 +2919,67 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred (no action this run)
   - why: zero code references anywhere in fe-next — never wired, same root cause as `exp-wordtower-busy-tap-feedback-v1` was until tonight (lane 03 2026-11-17 finally wired the latter). Likely a dropped prior-night lane artifact (see nightly-learnings Headline 3).
   - recommended owner: lane 03/07 — either wire a variant or disable the flag so it stops serving a no-op experiment
+
+## 2026-11-19
+- [PostHog] checkout route: Error "timed out after 800ms", source `/app/.next/server/app/api/subscription/checkout/route.js`, fn `Timeout._onTimeout`
+  - first/last seen 2026-11-18T13:29, count 1, userCount 1, severity critical (auto-tagged), trend new
+  - https://eu.posthog.com/project/151059/error-tracking/01a1eed9-4593-7c73-a2f6-787c679ed60e
+  - status: deferred
+  - why: payment/billing-adjacent route (app/api/subscription/checkout). Traced every withTimeout call site in route.ts (800ms matches TEST_FLAG_LOOKUP_TIMEOUT_MS / ACCESS_TRIAL_LOOKUP_TIMEOUT_MS) — all 4 are already try/caught at the await, and probeCheckoutUrl() never throws (catches internally). Root cause not conclusively pinned (1 occurrence, minified frame, line:1 = lost sourcemap) and the file is explicitly payment code — hard rule says defer rather than guess-edit.
+  - recommended owner: backend (re-check after next deploy whether it recurs; if it does, add stack capture inside each withTimeout call site to pin which one)
+- [PostHog] React hydration error #418 (minified), path `/app`, library web, 16 occurrences/1 user/4 sessions, trend increasing
+  - first seen 2026-11-14, last seen 2026-11-18T22:28
+  - https://eu.posthog.com/project/151059/error-tracking/01a1b58d-e596-7e62-a5ab-541139d3fea5
+  - status: deferred
+  - why: single user across 4 sessions (not a widespread regression), minified stack with no resolvable source line — needs a sourcemap-enabled repro, not a blind guess at /app's SSR/CSR branches.
+  - recommended owner: review-by-eod (worth a 9am skim in case it's the known SW-stale-bundle class; same user hitting it repeatedly is consistent with a stuck service worker)
+
+## 2026-11-20
+- [Infra] Sentry + Supabase MCP never surfaced tools this run (ToolSearch kept returning "still connecting" then "no matching tool" after repeated retries; posthog MCP connected fine and was used).
+  - status: deferred
+  - why: ambiguous — could be an auth/config issue on those two servers specific to tonight's run; not diagnosable from inside the lane without more MCP surface
+  - recommended owner: review-by-eod (check sentry/supabase MCP server config for this session)
+- [PostHog error-tracking] 2 active issues in last 24h, both occurrences=1/users=1 — not worth a fix (below any reasonable bar). No action taken.
+  - status: deferred
+  - why: below severity/reach threshold
+  - recommended owner: self (re-check next night, only act if occurrences grow)
+- [Restore] 20261112-010001 (8 nights stale) 3-way merged: 13/17 files landed (PublicTeacherPayCta, PowerCardView, LetterRow test, ru.txt candidates, experiments.ts exp-edu-locked-tile-feedback-v1, 6 translation files). 4 files skipped on CONFLICT vs current master (BlastMascotHud.tsx + its test, QuickPlayHub.tsx, wordTowerV2/LetterRow.tsx) — current master already diverged on those paths, left untouched per restore-script contract.
+  - status: shipped (uncommitted — orchestrator commits)
+  - why: environment-local eslint is broken in this checkout (`Cannot find module '@eslint-community/eslint-utils'` — missing transitive dep in node_modules, not caused by this change) so self-verify was by diff read only, not eslint
+  - recommended owner: review-by-eod
+
+## 2026-11-22
+- [Sentry|PostHog] Cross-tenant noise: growthradar.app errors polluting lexiclash's Sentry + PostHog projects
+  - Sentry JAVASCRIPT-NEXTJS-2SB ("security grade produced no grades for 1 site(s): wp-live-test", culprit `GET /api/cron`, tag `app:growth-radar`) and JAVASCRIPT-NEXTJS-2M8 (`TypeError: ... parentNode`, url `https://growthradar.app/app`) — both are growthradar.app's own bugs, not lexiclash code. Same root cause produced the PostHog React #418 brief item (issue 01a1b58d-...), whose breakdown paths were literally `/app` and `/app/acquire` (growthradar.app routes, confirmed via the Sentry event's `url` tag).
+  - status: shipped 20261122-collector-filter (scripts/nightly/lib/intel/collect-sentry.sh, collect-posthog.sh)
+  - why: root cause is growthradar.app sharing lexiclash's Sentry project + PostHog project (its own Sentry/PostHog config points at lexiclash's DSN/token) — that's a growthradar.app-repo fix I can't make from here. What I *could* fix in-scope: the nightly intel collectors now exclude it (`!app:growth-radar` Sentry tag filter; PostHog `$current_url not_icontains growthradar.app`), so these 3 items won't reappear as false "lexiclash bugs" every night. The underlying DSN/token mix-up still needs a human to fix in growthradar.app's own config.
+  - recommended owner: review-by-eod (to fix growthradar.app's own Sentry DSN / PostHog project token so it stops sharing lexiclash's)
+- [PostHog] lane-02's LCP query (`collect-posthog.sh` web_vitals section, same file) has the identical cross-tenant gap — no `$current_url not_icontains growthradar.app` filter, so lane 02's LCP top-5 can also be growthradar.app pages mislabeled as lexiclash perf problems (memory already flagged this exact pattern for imposketch.io). Out of scope for lane 01 tonight; lane 02 should apply the same filterGroup fix.
+  - status: deferred
+  - why: belongs to lane 02's query, not lane 01's error inventory; keeping tonight's diff scoped to triage's own signals
+  - recommended owner: lane 02 (perf)
+=== Sentry Triage 2026-11-23 08:08 ===
+
+### JAVASCRIPT-NEXTJS-2GP (children destructure)
+- **Status**: SKIPPED - last seen 19 days ago, outside 4h window
+- **Events**: 52 total, 4 users
+- **Resolution**: Appears naturally resolved; no occurrences since 2026-11-04
+
+### Last 4h scan result
+- No user-facing game errors found
+- Recent errors: infrastructure/cron timeouts, bot 429s - not player-impacting
+
+
+## 2026-11-24
+- [PostHog] UnhandledRejection "Object Not Found Matching Id:1, MethodName:update, ParamCount:4" (issue 01a1cbe1) — 72 occurrences/6 users/14d, trending +600%, 100% Chrome, spread across unrelated pages (/en/teacher/upgrade, /audit, /sv/teacher/upgrade, /, /en/education/access). Confirmed Chromium extension content-script artifact (stale postMessage target after the page it injected into navigates) — not reachable from our own promise chains.
+  - status: shipped <PENDING_SHA> (utils/posthogExceptionFilter.ts NOISE_VALUE_PATTERNS + utils/__tests__/posthogExceptionFilter.test.ts, TDD)
+  - why: pure noise-filter addition (same pattern as existing Pixi/Supabase-lock/@context suppressions in the same file), reversible, no app behavior change
+  - recommended owner: review-by-eod
+- [Sentry] 4 issues in javascript-nextjs project (JAVASCRIPT-NEXTJS-2YN/2YM/2YQ/2YP: "statement timeout" on `GET /sites`, integrity-check violations on `GET /api/cron`, "away-story checks skipped" / away-story-load) — none of these strings (`/sites` route, `away-story`, `completed_but_refound`) exist anywhere in this repo (`rg` across fe-next + repo root: 0 hits). Same cross-tenant class already identified 2026-11-22 (growthradar.app shares lexiclash's Sentry DSN) — not a lexiclash bug, can't fix from here.
+  - status: deferred
+  - why: not this app's code; root fix is growthradar.app's own Sentry DSN config (same as 2026-11-22 entry)
+  - recommended owner: review-by-eod (growthradar.app Sentry DSN mix-up — recurring, 2nd night confirmed)
+- [Supabase security advisor] anon_security_definer_function_executable (7 functions: bump_vocabulary_lesson_stat, flagged_vocabulary_lesson_ids, get_leaderboard, get_past_season_leaderboard, lookup_classroom_by_join_code, record_word_mastery_event, report_vocabulary_lesson) — checked each against autonomy-matrix REVOKE criterion. All 7 have real anon-reachable callsites consistent with intentional guest UX (public leaderboard viewing, guest classroom join-by-code, guest vocabulary practice). Not revoked — would break guest/anon flows.
+  - status: deferred (reviewed, no action — confirmed intentional)
+  - why: anon access is by design for these 7, not a vulnerability
+  - recommended owner: self (re-check only if a new anon-executable function appears without an obvious guest-flow reason)

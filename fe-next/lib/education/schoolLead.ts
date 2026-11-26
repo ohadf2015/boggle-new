@@ -33,6 +33,7 @@ export const SCHOOL_LEAD_INTERESTS = [
   'ad_free',
   'sso',
   'pricing_info',
+  'trial',
 ] as const;
 export type SchoolLeadInterest = (typeof SCHOOL_LEAD_INTERESTS)[number];
 

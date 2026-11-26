@@ -31,6 +31,7 @@ import {
   useCognitiveScoring,
 } from '../results';
 import { CatalystTeaser } from './CatalystTeaser';
+import { RemoveAdsProbe } from '@/components/ads/RemoveAdsProbe';
 import type { SinglePlayerResultsData } from '../SinglePlayerView';
 import { StreakFlame } from '@/components/streak/StreakFlame';
 
@@ -420,6 +421,9 @@ const PracticeResults = memo(function PracticeResults({
 
           {/* ── Catalyst teaser — surfaces what's coming in arena/adventure ── */}
           <CatalystTeaser t={t} />
+
+          {/* ── Remove-ads interest probe — pure demand signal, no purchase path ── */}
+          <RemoveAdsProbe isDarkMode surface="practice_results" />
 
           {/* ── Primary CTA: Word Hunt Daily — desktop big card; mobile uses sticky bottom only ── */}
           <m.div

@@ -2534,6 +2534,7 @@ const he = {
       "youWin": "ניצחת במירוץ!",
       "wins": "ניצח במירוץ!",
       "winner": "{winner} ניצח במירוץ!",
+      "yourRank": "המקום שלך",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -13940,18 +13941,21 @@ const he = {
     "continueModal": {
       "title": "אל תעצרו עכשיו!",
       "body": "נגמרו המהלכים. צפו בפרסומת קצרה והמשיכו לשחק.",
+      "bodyNoAd": "נגמרו המהלכים. אין פרסומת זמינה כרגע — אפשר לסיים את המשחק.",
       "cta": "צפו בפרסומת ל-+{moves} מהלכים",
       "decline": "סיימו משחק"
     },
     "retryWaveModal": {
       "title": "גל {wave}, כמעט!",
       "body": "ניקית {percent}%. צפו בפרסומת ונסו שוב את גל {wave}. הגלים הקודמים נשמרים.",
+      "bodyNoAd": "ניקית {percent}%. אין פרסומת זמינה כרגע — אפשר להתחיל מחדש מגל 1.",
       "cta": "צפו בפרסומת · נסו שוב את גל {wave}",
       "decline": "התחילו מחדש מגל 1"
     },
     "pregameBuff": {
       "title": "לחזק?",
       "body": "בחרו בוסט, צפו בפרסומת קצרה והתחילו את הריצה עם יתרון.",
+      "bodyNoAd": "אין בוסטים זמינים כרגע — אפשר לדלג ולהתחיל ישר במשחק.",
       "shield": "מגן",
       "bomb": "פצצה",
       "combo2x": "קומבו x2",
@@ -14140,12 +14144,16 @@ const he = {
       "highScorerDesc": "שברת 10,000 נקודות. עילית."
     },
     "mascot": {
+      "mute": "השתק את תגובות הקמע",
+      "unmute": "בטל השתקה של תגובות הקמע",
       "hyped": "קמע נלהב חוגג את הקומבו שלך",
       "sneaky": "קמע ערמומי מחפש אוצר",
       "sweating": "קמע מתוח ששורד את הספירה לאחור",
       "celebrating": "קמע חוגג עם גביע",
       "sadSmile": "קמע עם חיוך מנחם",
-      "neutral": "קמע עליז מוכן לגל הבא"
+      "neutral": "קמע עליז מוכן לגל הבא",
+      "mute": "השתק תגובות קמע",
+      "unmute": "בטל השתקת תגובות קמע"
     },
     "archetypes": {
       "normal": "גל רגיל",
@@ -16158,7 +16166,11 @@ const he = {
       "homeCta": "לצפייה בשבוע הזה"
     },
     "proPowered": {"hint": "חלק מתוכנית פרו למורים שלך"},
-    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"}
+    "trialUsage": {"lead": "בתקופת הניסיון:", "games_one": "משחק כיתתי אחד", "games_other": "{count} משחקים כיתתיים", "students_one": "תלמיד אחד במעקב", "students_other": "{count} תלמידים במעקב", "practice_one": "תרגול אחד", "practice_other": "{count} תרגולים"},
+    "schoolBulkCta": {
+      "text": "מריצים את זה בכל בית הספר?",
+      "link": "קבלו מחיר לבתי ספר"
+    }
   },
   "education": {
     "race": {
@@ -17277,6 +17289,7 @@ const he = {
         "subtitle": "השם הזה יופיע על לוח הכיתה.",
         "placeholder": "הקלידו את השם",
         "submit": "כניסה למשחק",
+        "submitting": "נכנסים…",
         "roomLabel": "חדר {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · משחק חי: {{lesson}}",
