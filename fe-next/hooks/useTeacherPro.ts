@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import type { SubscriptionSource } from '@/lib/education/proGrant';
+import { TEACHER_PRO_REFRESH_EVENT } from '@/lib/education/cancelRetention';
 
 export interface TeacherProGrant {
   id: string;
@@ -156,6 +157,14 @@ export function useTeacherPro(): TeacherProState {
     return () => {
       cancelled = true;
     };
+  }, [load]);
+
+  useEffect(() => {
+    const onRefresh = () => {
+      void load(() => false, true);
+    };
+    window.addEventListener(TEACHER_PRO_REFRESH_EVENT, onRefresh);
+    return () => window.removeEventListener(TEACHER_PRO_REFRESH_EVENT, onRefresh);
   }, [load]);
 
   const refresh = useCallback(() => load(() => false, true), [load]);

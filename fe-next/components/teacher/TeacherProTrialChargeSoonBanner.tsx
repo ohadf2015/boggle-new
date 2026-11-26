@@ -42,7 +42,7 @@ export function TeacherProTrialChargeSoonBanner({
         </>
       }
       action={
-        <TeacherProManageLink portalUrl={portalUrl} testId="teacher-pro-trial-charge-soon-cta">
+        <TeacherProManageLink portalUrl={portalUrl} testId="teacher-pro-trial-charge-soon-cta" surface="trial_charge_soon">
           {t('teacher.subscription.trialManageCta')}
         </TeacherProManageLink>
       }

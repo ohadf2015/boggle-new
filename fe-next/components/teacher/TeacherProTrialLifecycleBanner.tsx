@@ -90,6 +90,7 @@ export function TeacherProTrialLifecycleBanner({
           <TeacherProManageLink
             portalUrl={portalUrl}
             testId="teacher-pro-trial-lifecycle-manage"
+            surface="trial_lifecycle"
             className={MANAGE_QUIET}
           >
             {t('teacher.subscription.trialManageCta')}

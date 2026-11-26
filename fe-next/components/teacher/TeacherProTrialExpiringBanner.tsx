@@ -112,6 +112,7 @@ export function TeacherProTrialExpiringBanner({
           <TeacherProManageLink
             portalUrl={portalUrl}
             testId="teacher-pro-trial-expiring-cta"
+            surface="trial_expiring"
             className={MANAGE_QUIET}
           >
             {t('teacher.subscription.trialManageCta')}

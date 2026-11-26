@@ -289,6 +289,29 @@ export class PolarClient {
     })
   }
 
+  /** Live Polar row. Used before a retain offer so we never pause or discount the wrong subscription. */
+  async getSubscription(subscriptionId: string): Promise<Record<string, unknown>> {
+    return this.request(`/v1/subscriptions/${encodeURIComponent(subscriptionId)}`)
+  }
+
+  async updateSubscription(subscriptionId: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
+    return this.request(`/v1/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    })
+  }
+
+  async listDiscounts(limit = 100): Promise<{ items: Array<Record<string, unknown>> }> {
+    return this.request(`/v1/discounts/?limit=${encodeURIComponent(String(limit))}`)
+  }
+
+  async createDiscount(body: Record<string, unknown>): Promise<{ id?: string }> {
+    return this.request('/v1/discounts/', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+  }
+
   /**
    * Create a customer portal session for a customer by their external id
    * (our user id, set at checkout time). Returns the portal URL.

@@ -260,6 +260,21 @@ export function buildProResumedEvent(userId: string, status: string): EduServerE
   };
 }
 
+/**
+ * A teacher took a keep-offer from the pre-cancel interstitial instead of opening
+ * the Polar portal. Server-only: the Polar PATCH is the truth, a click is not.
+ */
+export function buildCancelOfferAppliedEvent(
+  userId: string,
+  props: { offer: 'pause' | 'discount'; mechanism: string; status: string; already: boolean },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_cancel_offer_applied',
+    properties: { ...BASE, ...props, teacher_id: userId },
+  };
+}
+
 /** Polar Teacher Pro trial lapsed without converting. */
 export function buildTrialExpiredEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {

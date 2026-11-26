@@ -51,6 +51,8 @@ const ALLOWED_EVENTS: ReadonlySet<string> = new Set([
   'recovery_cta_clicked',
   'dunning_email_sent',
   'edu_pro_telemetry_client_key_missing',
+  'teacher_cancel_intercept_shown',
+  'teacher_cancel_intercept_chosen',
 ]);
 
 const MAX_PROPS = 20;

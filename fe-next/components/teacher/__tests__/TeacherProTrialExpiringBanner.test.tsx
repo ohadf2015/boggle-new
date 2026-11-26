@@ -65,6 +65,7 @@ describe('TeacherProTrialExpiringBanner', () => {
     expect(cta).toHaveAttribute('href', PORTAL);
     expect(cta).toHaveAttribute('target', '_blank');
     fireEvent.click(cta);
+    expect(screen.getByTestId('teacher-cancel-intercept')).toBeInTheDocument();
     expect(postTeacherProCheckout).not.toHaveBeenCalled();
   });
 

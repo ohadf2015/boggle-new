@@ -332,6 +332,10 @@ export type GrowthEvent =
   // urgent variant (<=3 days, the day-10 expiring banner). days_remaining on both.
   | 'teacher_trial_banner_shown'
   | 'teacher_trial_upgrade_clicked'
+  // Pre-cancel interstitial on Teacher Pro billing. Shown once per open; chosen
+  // carries offer=pause|discount|continue|keep|dismiss. NOT in CANONICAL_DUAL_EMIT.
+  | 'teacher_cancel_intercept_shown'
+  | 'teacher_cancel_intercept_chosen'
   // Unconditional return-from-Polar signal (t: webhook-broken vs abandoned).
   // Fires on ?checkout=success regardless of entitlement, unlike
   // edu_pro_checkout_success_seen which waits for hasPro.

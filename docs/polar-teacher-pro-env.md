@@ -14,6 +14,12 @@ A missing var must name itself in a non-2xx body. Do not ack 200 and grant nothi
 
 The access token, product id, and webhook secret must all come from the same Polar environment as `POLAR_ENVIRONMENT`. A production token with a sandbox webhook secret 401s every delivery.
 
+## Optional
+
+| Var | Used by | If missing |
+| --- | --- | --- |
+| `POLAR_RETAIN_DISCOUNT_ID` | `POST /api/subscription/retain` 50% keep-offer | The route lists discounts by `metadata.purpose=teacher_pro_retain_50_3mo` and creates one (percentage, 5000 basis points, repeating 3 months, no checkout code) if none exists. Set this to pin a dashboard discount when the token cannot write discounts. |
+
 ## Signature
 
 `PolarClient.validateWebhookSignature` reads `POLAR_WEBHOOK_SECRET` only. Polar issues `whsec_<base64>`. The HMAC key is the base64 payload decoded to raw bytes (Standard Webhooks). Signed content is `webhook-id.webhook-timestamp.rawBody`. Header is `webhook-signature: v1,<base64>`.

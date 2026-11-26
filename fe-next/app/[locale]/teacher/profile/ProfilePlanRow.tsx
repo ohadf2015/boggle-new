@@ -8,6 +8,7 @@ import { useTeacherPro } from '@/hooks/useTeacherPro';
 import { cn } from '@/lib/utils';
 import { NB_BLOCK, NB_LINK, NB_SMALL, NB_STICKER } from '@/components/teacher/nb/nbStyles';
 import { proPlanStatusLine } from '@/components/teacher/pro/proPlanStatus';
+import { TeacherProCancelIntercept } from '@/components/teacher/TeacherProCancelIntercept';
 
 const ROW = 'flex flex-col gap-3 border-t-2 border-neo-cream/15 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6';
 
@@ -16,6 +17,7 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
   const { t, language } = useLanguage();
   const pro = useTeacherPro();
   const [nowMs] = useState(() => Date.now());
+  const [keepOpen, setKeepOpen] = useState(false);
 
   if (pro.loading) {
     return (
@@ -78,10 +80,29 @@ export function ProfilePlanRow({ usage }: { usage?: string }) {
           {t('teacher.subscription.upgradeNow')}
         </Link>
       ) : pro.portalUrl && !gifted ? (
-        <a href={pro.portalUrl} target="_blank" rel="noopener noreferrer" className={cn(NB_SMALL, NB_BLOCK.cream, 'shrink-0 self-start sm:self-center')}>
-          <ExternalLink className="size-4" aria-hidden="true" />
-          {t('teacher.subscription.manageSubscription')}
-        </a>
+        <>
+          <a
+            href={pro.portalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn(NB_SMALL, NB_BLOCK.cream, 'shrink-0 self-start sm:self-center')}
+            onClick={(event) => {
+              event.preventDefault();
+              setKeepOpen(true);
+            }}
+          >
+            <ExternalLink className="size-4" aria-hidden="true" />
+            {t('teacher.subscription.manageSubscription')}
+          </a>
+          {keepOpen ? (
+            <TeacherProCancelIntercept
+              href={pro.portalUrl}
+              phase={pro.status === 'trialing' ? 'trial' : 'paid'}
+              surface="profile_plan"
+              onClose={() => setKeepOpen(false)}
+            />
+          ) : null}
+        </>
       ) : null}
     </div>
   );
