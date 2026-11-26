@@ -10,8 +10,8 @@ import {
   COUNTRY_TO_LOCALE,
   countryFromHeaders,
   resolveRequestLocale,
-  mergeVary,
 } from '../lib/localeResolution';
+import { pinLocaleVary } from './pinLocaleVary';
 import { ROOT_SERVED_HEADER } from '../lib/seo/hreflang';
 
 /**
@@ -121,16 +121,8 @@ export function determineLocale(req: GeoRequest): string {
 export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: UrlWithParsedQuery): boolean {
   const userAgent = (req.headers['user-agent'] as string) || '';
   const locale = determineLocale(req);
-  if (typeof res.setHeader === 'function') {
-    const existingVary = typeof res.getHeader === 'function' ? res.getHeader('Vary') : undefined;
-    res.setHeader(
-      'Vary',
-      mergeVary(
-        typeof existingVary === 'number' ? String(existingVary) : (existingVary as string | string[] | undefined),
-        'Accept-Language, Cookie',
-      ),
-    );
-  }
+  // Pin, don't just set once: Next overwrites Vary on the rendered 200.
+  pinLocaleVary(res);
   const queryString = parsedUrl.search || '';
 
   // A real browser TOP-LEVEL navigation always sends `Sec-Fetch-Mode: navigate`

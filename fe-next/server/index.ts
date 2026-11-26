@@ -26,6 +26,7 @@ import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { pinLocaleVary, shouldPinLocaleVary } from './pinLocaleVary';
 import { ROOT_SERVED_HEADER } from '../lib/seo/hreflang';
 import { handleHomeMarkdown } from './markdownHome';
 import { applyOfflineShellCacheHeader } from './offlineShellCache';
@@ -210,6 +211,12 @@ async function start(): Promise<void> {
       // the Android WebView — device-verified 2026-09-03). See
       // server/offlineShellCache.ts for the safety invariants.
       applyOfflineShellCacheHeader(req, res, pathname ?? '');
+
+      // Locale-negotiated documents (bare `/`, `/multiplayer`, …) must keep
+      // Accept-Language and Cookie on Vary even after Next overwrites it.
+      if (shouldPinLocaleVary(pathname)) {
+        pinLocaleVary(res);
+      }
 
       // Drop scanner / unknown-segment URLs before Next handle() — proxy.ts
       // used to rewrite them into /{locale}/… which SSRs the locale layout
