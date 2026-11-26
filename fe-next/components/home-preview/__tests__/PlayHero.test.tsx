@@ -40,34 +40,56 @@ function renderHero(overrides: Partial<React.ComponentProps<typeof PlayHero>> = 
 }
 
 describe('PlayHero', () => {
-  it('given a returning visitor (no onPlay), then the flag is never asked and friends stays the primary', () => {
-    grFlag.value = 'treatment';
+  it('given any visitor, then the hero never asks the old hero-CTA experiment flag', () => {
     grFlag.calls = [];
+    renderHero({ onPlay: vi.fn() });
     renderHero();
-    expect(grFlag.calls.every((c) => c.key === 'lexiclash-hero-play-cta' && !c.enabled)).toBe(true);
-    expect(screen.getByTestId('hp-play-friends')).toBeTruthy();
-    expect(screen.queryByTestId('hp-play-now')).toBeNull();
-    grFlag.value = null;
+    expect(grFlag.calls).toHaveLength(0);
   });
 
-  it('given a new visitor in treatment, then the primary is a solo Play now that opens onboarding', () => {
-    grFlag.value = 'treatment';
+  it('given the hero, then exactly one primary action exists and it is the big solo PLAY', () => {
+    renderHero();
+    const primaries = document.querySelectorAll('[data-hero-primary]');
+    expect(primaries).toHaveLength(1);
+    const play = screen.getByTestId('hp-play-now');
+    expect(primaries[0]).toBe(play);
+    expect(play.textContent).toContain(en.homePlay.playNow);
+    expect(play.className).toContain('bg-neo-lime');
+  });
+
+  it('given a returning device, then PLAY deep-links a classic round', () => {
+    window.localStorage.setItem('lexiclash_quick_guest_v1', JSON.stringify({ points: 20, history: [20], coinsPending: 0, xpPending: 0, bestByMode: {}, lastPlayedDay: null, dayStreak: 0 }));
+    renderHero({ lang: 'he' });
+    expect(screen.getByTestId('hp-play-now').getAttribute('href')).toBe('/he/quick-play?mode=classic');
+  });
+
+  it('given PLAY, when it is pressed, then it sinks onto its lip (chunky press) and still navigates', () => {
     const onPlay = vi.fn();
     renderHero({ onPlay });
-    const btn = screen.getByTestId('hp-play-now');
-    expect(btn.textContent).toContain(en.homePlay.playNow);
-    expect(btn.getAttribute('data-variant')).toBe('treatment');
-    expect(screen.queryByTestId('hp-play-friends')).toBeNull();
-    fireEvent.click(btn);
+    const play = screen.getByTestId('hp-play-now');
+    fireEvent.pointerDown(play, { button: 0 });
+    expect(play.getAttribute('data-pressed')).toBe('true');
+    fireEvent.pointerUp(play);
+    expect(play.getAttribute('data-pressed')).toBeNull();
+    fireEvent.click(play);
     expect(onPlay).toHaveBeenCalledTimes(1);
-    grFlag.value = null;
   });
 
-  it('given a new visitor in control, then friends stays the primary', () => {
-    grFlag.value = 'control';
-    renderHero({ onPlay: vi.fn() });
-    expect(screen.getByTestId('hp-play-friends').getAttribute('data-variant')).toBe('control');
-    grFlag.value = null;
+  it('given the hero, then friends and daily share one secondary row under PLAY, neither styled as primary', () => {
+    renderHero({ lang: 'he' });
+    const row = screen.getByTestId('hp-secondary');
+    const friends = screen.getByTestId('hp-play-friends');
+    const daily = screen.getByTestId('hp-chip-daily');
+    expect(row.contains(friends) && row.contains(daily)).toBe(true);
+    expect(friends.getAttribute('href')).toBe('/he/multiplayer?autoCreate=true');
+    expect(friends.textContent).toContain(en.homePlay.friendsPlay);
+    for (const el of [friends, daily]) expect(el.className).not.toContain('shadow-hard-lg');
+    expect(screen.getByTestId('hp-play-now').compareDocumentPosition(row) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('given the hero, then the 60s badge is gone (the H1 already says 60 seconds)', () => {
+    renderHero();
+    expect(screen.queryByTestId('hp-timer-badge')).toBeNull();
   });
 
   it('given the hero, then the first paragraph after the title says what LexiClash is', () => {
@@ -112,54 +134,26 @@ describe('PlayHero', () => {
     expect(mascot.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
-  it('given the hero, then exactly one action is marked primary and it is "Play with friends", opening a new room', () => {
-    renderHero({ lang: 'he' });
-    const primaries = document.querySelectorAll('[data-hero-primary]');
-    expect(primaries).toHaveLength(1);
-    const friends = screen.getByTestId('hp-play-friends');
-    expect(primaries[0]).toBe(friends);
-    expect(friends.getAttribute('href')).toBe('/he/multiplayer?autoCreate=true');
-    expect(friends.textContent).toContain(en.homePlay.friendsPlay);
-    expect(friends.className).toContain('bg-neo-pink');
-    expect(friends.className).toContain('shadow-hard-lg');
-  });
-
-  it('given the hero, then the order is friends, daily, then the mode keys', () => {
-    renderHero();
-    const order = ['hp-play-friends', 'hp-chip-daily', 'hp-keycaps'].map((id) => screen.getByTestId(id));
-    for (let i = 1; i < order.length; i++) {
-      expect(order[i - 1].compareDocumentPosition(order[i]) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    }
-    expect(screen.getByTestId('hp-chip-daily').className).not.toContain('shadow-hard-lg');
-  });
-
   it('given the hero, then there is no separate "Join with a code" button (the multiplayer page has the code entry)', () => {
     renderHero();
     expect(screen.queryByTestId('hp-join-code')).toBeNull();
   });
 
-  it('given the hero, then the random round is a fifth mode key labelled Random, with no separate quick-game row', () => {
-    renderHero();
-    const random = screen.getByTestId('hp-play');
-    expect(screen.getByTestId('hp-keycaps').contains(random)).toBe(true);
-    expect(screen.getByTestId('hp-keycaps').querySelectorAll('li')).toHaveLength(5);
-    expect(random.textContent).toBe(en.homePlay.random);
-  });
-
-  it('given today\'s daily is not played, then the daily card offers to play and shows no countdown', () => {
+  it('given today\'s daily is not played, then the daily chip shows no Done and no countdown', () => {
     renderHero({ playedToday: false });
     const daily = screen.getByTestId('hp-chip-daily');
     expect(daily.getAttribute('href')).toBe('/en/daily');
-    expect(daily.textContent).toContain(en.quickLoop.daily.play);
+    expect(daily.textContent).toContain(en.homePlay.chipDaily);
+    expect(daily.textContent).not.toContain(en.homePlay.dailyDone);
     expect(screen.queryByTestId('hp-daily-next')).toBeNull();
   });
 
-  it('given today\'s daily is done, then the card says so and counts down to the next puzzle', () => {
+  it('given today\'s daily is done, then the chip says Done and shows the time to the next puzzle', () => {
     renderHero({ streak: 5, playedToday: true });
     const daily = screen.getByTestId('hp-chip-daily');
     expect(daily.textContent).toContain(en.homePlay.dailyDone);
-    expect(daily.textContent).not.toContain(en.quickLoop.daily.play);
-    expect(screen.getByTestId('hp-daily-next').textContent).toMatch(/^Next puzzle in \d{2}:\d{2}:\d{2}$/);
+    expect(screen.getByTestId('hp-daily-next').textContent).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+    expect(daily.textContent).toMatch(/Next puzzle in \d{2}:\d{2}:\d{2}/);
   });
 
   it('given the streak is still loading, then the daily card shows neither done nor a countdown', () => {
@@ -189,7 +183,8 @@ describe('PlayHero', () => {
   it('given the streak is at risk, then the daily chip says to play today to keep it, with a worried flame', () => {
     renderHero({ streak: 4, atRisk: true });
     const chip = screen.getByTestId('hp-chip-daily');
-    expect(chip.textContent).toContain('Play today to keep your 4-day streak');
+    expect(chip.getAttribute('aria-label')).toContain('Play today to keep your 4-day streak');
+    expect(chip.textContent).toContain('4');
     expect(chip.querySelector('[data-testid="streak-flame"]')?.getAttribute('data-mood')).toBe('worried');
   });
 
@@ -198,40 +193,33 @@ describe('PlayHero', () => {
     expect(screen.getByTestId('hp-chip-daily').textContent).not.toContain('streak');
   });
 
-  it('given a device that never played, then PLAY opens the coached first round', () => {
-    window.localStorage.removeItem('lexiclash_quick_guest_v1');
-    renderHero({ lang: 'he' });
-    expect(screen.getByTestId('hp-play').getAttribute('href')).toBe('/he/quick-play?mode=classic&coach=1');
-  });
-
-  it('given the hero, then PLAY deep-links a random round and each mode key deep-links its mode', () => {
-    window.localStorage.setItem('lexiclash_quick_guest_v1', JSON.stringify({ points: 20, history: [20], coinsPending: 0, xpPending: 0, bestByMode: {}, lastPlayedDay: null, dayStreak: 0 }));
-    renderHero({ lang: 'he' });
-    expect(screen.getByTestId('hp-play').getAttribute('href')).toBe('/he/quick-play?mode=random');
-    const keys = Array.from(screen.getByTestId('hp-keycaps').querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    expect(keys).toEqual([
-      '/he/quick-play?mode=classic',
+  it('given the mode row, then it is a calm row of the other four modes, each deep-linked, none counted as hero PLAY', () => {
+    mockTrackCta.mockClear();
+    renderHero({ lang: 'he', onPlay: vi.fn() });
+    const row = screen.getByTestId('hp-keycaps');
+    const links = Array.from(row.querySelectorAll('a'));
+    expect(links.map((a) => a.getAttribute('href'))).toEqual([
       '/he/quick-play?mode=blast',
       '/he/quick-play?mode=word-hunt',
       '/he/quick-play?mode=wheel-rush',
       '/he/quick-play?mode=random',
     ]);
+    for (const a of links) expect(a.className).not.toMatch(/shadow-hard|rotate-/);
+    fireEvent.click(links[3]);
+    expect(mockTrackCta).not.toHaveBeenCalled();
   });
 
-  it('given the hero, then the 60-second badge is a one-line pill so the label never wraps or clips', () => {
-    renderHero();
-    const badge = screen.getByTestId('hp-timer-badge');
-    expect(badge.textContent).toBe(en.homePlay.timerBadge);
-    expect(badge.className).toContain('whitespace-nowrap');
-    expect(badge.className).not.toMatch(/\bw-14\b|\bh-14\b/);
-    expect(badge.getAttribute('aria-hidden')).toBe('true');
+  it('given a device that never played, then PLAY opens the coached first round', () => {
+    window.localStorage.removeItem('lexiclash_quick_guest_v1');
+    renderHero({ lang: 'he' });
+    expect(screen.getByTestId('hp-play-now').getAttribute('href')).toBe('/he/quick-play?mode=classic&coach=1');
   });
 
   it('given a new user (onPlay set), when PLAY is tapped, then the funnel numerator fires with opens_ftue:true and the handler runs', () => {
     mockTrackCta.mockClear();
     const onPlay = vi.fn();
     renderHero({ onPlay });
-    fireEvent.click(screen.getByTestId('hp-play'));
+    fireEvent.click(screen.getByTestId('hp-play-now'));
     expect(mockTrackCta).toHaveBeenCalledTimes(1);
     expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: true });
     expect(onPlay).toHaveBeenCalledTimes(1);
@@ -240,7 +228,7 @@ describe('PlayHero', () => {
   it('given a returning user (no onPlay), when PLAY is tapped, then the click still counts with opens_ftue:false and nothing is hijacked', () => {
     mockTrackCta.mockClear();
     renderHero();
-    fireEvent.click(screen.getByTestId('hp-play'));
+    fireEvent.click(screen.getByTestId('hp-play-now'));
     expect(mockTrackCta).toHaveBeenCalledTimes(1);
     expect(mockTrackCta).toHaveBeenCalledWith('fresh_hero_play', { opens_ftue: false });
   });

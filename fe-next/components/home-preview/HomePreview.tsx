@@ -10,6 +10,7 @@ import { getOrCreateStoredCustomAvatar } from '@/utils/profileStorage';
 import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { PlayHero } from './PlayHero';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { DailyBlock } from './DailyBlock';
 import { StreakSavedToast } from '@/components/streak/StreakSavedToast';
 import { StreakMilestoneCheer } from '@/components/streak/StreakMilestoneCheer';
@@ -55,21 +56,24 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
       <div className="mx-auto w-full max-w-md px-4 pt-3 empty:hidden lg:max-w-[1600px] lg:px-14 lg:pt-6">
         <HomeEducationCardConnected slot="top" />
       </div>
-      <div className="mx-auto w-full lg:max-w-[1600px] lg:px-14 lg:pt-6">
-        <PlayHero
-          lang={language}
-          t={tt}
-          animate={animate}
-          avatar={avatar}
-          greeting={greeting}
-          streak={streak}
-          streakLoading={streakLoading}
-          atRisk={streakView.atRisk}
-          freezes={freezes}
-          playedToday={streakView.playedToday}
-          onAvatarSaved={setGuestAvatar}
-          onPlay={onPlay}
-        />
+      <div className="relative isolate">
+        {/* Shapes stay beside the avatar, never under the text or PLAY. */}
+        <AmbientBackdrop theme="home" hill={false} className="bottom-auto h-[116px] max-lg:mask-b-from-50% lg:bottom-0 lg:h-auto lg:end-[calc(50%+96px)] lg:overflow-visible" />
+        <div className="mx-auto w-full lg:max-w-[1600px] lg:px-14 lg:pt-6">
+          <PlayHero
+            lang={language}
+            t={tt}
+            animate={animate}
+            avatar={avatar}
+            greeting={greeting}
+            streak={streak}
+            streakLoading={streakLoading}
+            atRisk={streakView.atRisk}
+            playedToday={streakView.playedToday}
+            onAvatarSaved={setGuestAvatar}
+            onPlay={onPlay}
+          />
+        </div>
       </div>
 
       {/* grid-cols-1, not an implicit column: an implicit `auto` track sizes itself

@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
-import { Play, Users } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { ModeGlyph } from '@/components/quick-play/ModeGlyph';
 import { RandomGlyph } from '@/components/quick-play/RandomGlyph';
 import { QuickResultsRays, SparkleLoop } from '@/components/quick-play/QuickResultsFx';
@@ -16,13 +16,15 @@ import { quickPlayHref } from '@/lib/quickPlay/startMode';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
 import { firstGameRoute } from '@/lib/onboarding/firstGameRoute';
-import { useGrowthRadarFlag } from '@/hooks/useGrowthRadarFlag';
-import { HERO_PLAY_CTA_KEY, heroPrimaryIsSolo } from '@/lib/experiments/heroPlayCta';
+import { PressSurface } from '@/components/motion/PressSurface';
+import { MascotRig } from '@/components/motion/MascotRig';
 
-const MODES: QuickMode[] = ['classic', 'blast', 'word-hunt', 'wheel-rush'];
-const KEY_TILT = ['-rotate-2', 'rotate-1', '-rotate-1', 'rotate-2'];
+// Classic is the big PLAY; the row offers the rest.
+const MODES: QuickMode[] = ['blast', 'word-hunt', 'wheel-rush'];
 const EASE_OUT = 'cubic-bezier(0.22,1,0.36,1)';
-const PRESS = 'active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed';
+const MODE_KEY =
+  'flex h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl border-2 border-neo-cream/20 bg-neo-navy-elevated/80 px-1 text-neo-cream lg:h-16 lg:flex-row lg:gap-2.5 lg:rounded-2xl';
+const MODE_LABEL = 'max-w-full truncate font-neo-display text-[clamp(10px,3vw,12px)] font-bold leading-none lg:text-base';
 
 /** Touch phone: ornamental loops must not run for the whole time the home sits open. */
 function useCoarsePointer(): boolean {
@@ -47,8 +49,6 @@ interface PlayHeroProps {
   streakLoading: boolean;
   /** Streak alive but today not played: the daily chip warns. */
   atRisk?: boolean;
-  /** Banked streak freezes, shown on the daily chip. */
-  freezes?: number;
   playedToday?: boolean;
   onAvatarSaved: (config: CustomAvatarConfig) => void;
   onPlay?: () => void;
@@ -75,8 +75,8 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
   }, [avatar, t, onAvatarSaved]);
 
   return (
-    <div className="relative flex h-[132px] w-full items-center [@media(max-height:700px)]:h-[112px] justify-center lg:h-[300px] 2xl:h-[340px]">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 lg:opacity-60">
+    <div className="relative flex h-[108px] w-full items-center [@media(max-height:700px)]:h-[96px] justify-center lg:h-[300px] 2xl:h-[340px]">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 [mask-image:radial-gradient(closest-side,black_55%,transparent)] lg:opacity-60">
         <QuickResultsRays color={NODE_COLORS.classic.hex} spinning={loop} compact />
       </div>
       <SparkleLoop enabled={loop} />
@@ -96,7 +96,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
             <div
               ref={avatar ? avatarSlotCallback : undefined}
               data-testid="hp-avatar-slot"
-              className="h-[108px] w-[108px] lg:h-[190px] lg:w-[190px] 2xl:h-[220px] 2xl:w-[220px]"
+              className="h-[92px] w-[92px] lg:h-[190px] lg:w-[190px] 2xl:h-[220px] 2xl:w-[220px]"
             />
           </div>
         </div>
@@ -110,7 +110,7 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
           aria-hidden="true"
           className="absolute -start-[40px] bottom-0 -z-10 -rotate-12 lg:-start-[60px] lg:bottom-0 2xl:-start-[70px]"
         >
-          <span className={`block ${loop ? 'animate-[qp-avatar-bob_2.2s_ease-in-out_0.4s_infinite]' : ''}`}>
+          <MascotRig state={animate ? 'hop' : 'idle'}>
             <Image
               src="/mascot/hello-nobg.webp"
               alt=""
@@ -119,9 +119,9 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
               data-testid="hp-mascot"
               loading="eager"
               unoptimized
-              className="h-[64px] w-[64px] drop-shadow-[0_3px_0_black] lg:h-[96px] lg:w-[96px] 2xl:h-[112px] 2xl:w-[112px]"
+              className="h-[54px] w-[54px] drop-shadow-[0_3px_0_black] lg:h-[96px] lg:w-[96px] 2xl:h-[112px] 2xl:w-[112px]"
             />
-          </span>
+          </MascotRig>
         </span>
       </div>
       {avatar && (
@@ -133,18 +133,11 @@ function AvatarStage({ avatar, animate, loop, t, onAvatarSaved }: Pick<PlayHeroP
         </div>
       )}
       </div>
-      <span
-        aria-hidden="true"
-        data-testid="hp-timer-badge"
-        className="absolute end-[10%] top-2 z-20 rotate-6 whitespace-nowrap rounded-full border-2 border-black bg-neo-yellow px-2.5 py-1 font-neo-display text-sm font-bold leading-none text-black shadow-hard-sm lg:end-[14%] lg:top-[10%] lg:border-[3px] lg:px-3 lg:py-1.5 lg:text-xl lg:shadow-hard"
-      >
-        {t('homePlay.timerBadge')}
-      </span>
     </div>
   );
 }
 
-export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, freezes = 0, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
+export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoading, atRisk = false, playedToday = false, onAvatarSaved, onPlay }: PlayHeroProps) {
   const coarse = useCoarsePointer();
   const loop = animate && !coarse;
   const actionsRef = useRef<HTMLDivElement>(null);
@@ -166,20 +159,12 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
       ?.querySelector('[data-testid="hp-chip-daily"]')
       ?.animate?.([{ transform: 'scale(1)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 520, delay: 480, easing: EASE_OUT });
   }, [animate, streakLoading, playedToday]);
-  // Funnel numerator for the landing PLAY→onboarding leak, restored: the
-  // play-first redesign (#1706) replaced FreshHero — which fired
-  // `fresh_hero_play` on this CTA — with this hero, and the event's main
-  // contributor went silent (read as "mounted-gate telemetry dead"). Same cta
-  // value as the old hero keeps before/after funnels comparable
-  // (FreshPlayLink convention). `opens_ftue` splits the leak cohorts: false =
-  // returning user navigating natively BY DESIGN (their clicks must not count
-  // as gate fall-through); true − onboarding_open_requested = the real
-  // mounted-gate loss. Fires on every click, handler or not — same
-  // "tracking is not gated on onPlay" semantics as FreshPlayLink.
-  // First-timers (no finished Quick Play round on this device) get the coached
-  // first game; everyone else keeps the instant random round. Decided after
-  // mount so server HTML and hydration agree on the default href.
-  const [playHref, setPlayHref] = useState(() => quickPlayHref(lang, 'random'));
+
+  // `fresh_hero_play` is the landing PLAY→onboarding funnel numerator; `opens_ftue`
+  // false = a returning user navigating natively, true − onboarding_open_requested =
+  // the mounted-gate loss. First-timers on this device get the coached first round,
+  // decided after mount so server HTML and hydration agree on the default href.
+  const [playHref, setPlayHref] = useState(() => quickPlayHref(lang, 'classic'));
   useEffect(() => {
     let first = false;
     try {
@@ -187,13 +172,8 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
     } catch {
       /* storage blocked: keep the plain round */
     }
-    setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'random'));
+    setPlayHref(first ? firstGameRoute(lang) : quickPlayHref(lang, 'classic'));
   }, [lang]);
-
-  // A/B (Growth Radar, lexiclash-hero-play-cta): new visitors only (onPlay is set just for
-  // them), so returning players are never exposed. Treatment turns the big primary button
-  // into a solo "Play now" in place (same size, no layout shift); control keeps friends.
-  const soloFirst = heroPrimaryIsSolo(useGrowthRadarFlag(HERO_PLAY_CTA_KEY, !!onPlay));
 
   const handlePlayClick = (e: MouseEvent<HTMLAnchorElement>) => {
     trackLandingCtaClick('fresh_hero_play', { opens_ftue: !!onPlay });
@@ -203,15 +183,11 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
   };
 
   return (
-    <section
-      aria-labelledby="hp-play-title"
-      className="relative overflow-hidden border-b-[3px] border-black lg:rounded-[28px] lg:border-[3px] lg:bg-neo-navy-elevated lg:shadow-hard-xl"
-      data-testid="hp-hero"
-    >
+    <section aria-labelledby="hp-play-title" className="relative" data-testid="hp-hero">
       <div className="relative mx-auto grid w-full max-w-md grid-cols-1 gap-3 px-4 pb-5 lg:max-w-none lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-8 lg:px-12 lg:py-7">
         <AvatarStage avatar={avatar} animate={animate} loop={loop} t={t} onAvatarSaved={onAvatarSaved} />
 
-        <div className="relative z-10 flex min-w-0 flex-col gap-3 lg:gap-4">
+        <div className="relative z-10 flex min-w-0 flex-col gap-4 lg:gap-5">
           <div className="text-center lg:text-start">
             <p className="font-neo-display text-xs font-bold tracking-[0.14em] text-neo-lime/90 uppercase lg:text-base">
               {greeting}
@@ -227,72 +203,53 @@ export function PlayHero({ lang, t, animate, avatar, greeting, streak, streakLoa
             </p>
           </div>
 
-          <div ref={actionsRef} className="flex flex-col gap-2.5 lg:gap-4">
+          <div ref={actionsRef} className="flex flex-col gap-3 lg:gap-4">
             <div data-hero-row>
-              <Link
-                href={soloFirst ? playHref : `/${lang}/multiplayer?autoCreate=true`}
-                data-testid={soloFirst ? 'hp-play-now' : 'hp-play-friends'}
-                data-hero-primary
-                data-variant={soloFirst ? 'treatment' : 'control'}
-                onClick={soloFirst ? handlePlayClick : () => trackLandingCtaClick('home_play_friends')}
-                className={`flex h-[68px] min-w-0 items-center gap-3 rounded-2xl border-[3px] border-black bg-neo-pink ps-2.5 pe-3 text-black shadow-hard-lg ${PRESS} [@media(max-height:700px)]:h-[64px] lg:h-[96px] lg:gap-4 lg:rounded-3xl lg:ps-4`}
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-black text-neo-pink lg:h-16 lg:w-16 lg:rounded-2xl">
-                  {soloFirst ? (
-                    <Play className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
-                  ) : (
-                    <Users className="h-6 w-6 lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
-                  )}
-                </span>
-                <span className="flex min-w-0 flex-col items-start leading-none">
-                  <span className="truncate font-neo-display text-[21px] font-bold lg:text-3xl">{t(soloFirst ? 'homePlay.playNow' : 'homePlay.friendsPlay')}</span>
-                  <span className="mt-1 line-clamp-2 text-xs leading-tight font-bold lg:text-base">{t(soloFirst ? 'homePlay.playNowSub' : 'homePlay.friendsSub')}</span>
-                </span>
-              </Link>
+              <PressSurface asChild lip={6}>
+                <Link
+                  href={playHref}
+                  data-testid="hp-play-now"
+                  data-hero-primary
+                  onClick={handlePlayClick}
+                  className="flex h-[72px] w-full items-center justify-center gap-3 rounded-2xl border-[3px] border-black bg-neo-lime px-4 font-neo-display text-[26px] font-bold tracking-wide text-black uppercase [@media(max-height:700px)]:h-[64px] lg:h-[96px] lg:rounded-3xl lg:text-4xl"
+                >
+                  <Play className="h-7 w-7 shrink-0 fill-current lg:h-9 lg:w-9" strokeWidth={2.75} aria-hidden="true" />
+                  <span className="truncate">{t('homePlay.playNow')}</span>
+                </Link>
+              </PressSurface>
             </div>
 
             <div data-hero-row>
-              <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} freezes={freezes} playedToday={playedToday} />
+              <HeroQuickLinks lang={lang} t={t} streak={streak} streakLoading={streakLoading} atRisk={atRisk} playedToday={playedToday} />
             </div>
-
           </div>
 
           <div>
-            <p className="mb-2 text-center text-xs font-bold text-neo-white/60 lg:text-start lg:text-base">{t('homePlay.pickMode')}</p>
-            <ul className="grid grid-cols-5 gap-2 lg:gap-3" data-testid="hp-keycaps">
-              {MODES.map((mode, i) => (
-                <li key={mode}>
-                  <Link
-                    href={quickPlayHref(lang, mode)}
-                    className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${NODE_COLORS[mode].bg} ${KEY_TILT[i]} ${
-                      animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
-                    }`}
-                    style={animate ? { animationDelay: `${300 + i * 90}ms` } : undefined}
-                  >
-                    <ModeGlyph mode={mode} size={30} className="lg:h-10 lg:w-10" />
-                    <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">
-                      {t(`quickPlay.solo.mode.${mode}`)}
-                    </span>
-                  </Link>
+            <ul className="grid grid-cols-4 gap-2 lg:gap-3" data-testid="hp-keycaps" aria-label={t('homePlay.pickMode')}>
+              {MODES.map((mode) => (
+                <li key={mode} className="min-w-0">
+                  <PressSurface asChild lip={2}>
+                    <Link href={quickPlayHref(lang, mode)} className={`${MODE_KEY} shadow-neo-cream/15`}>
+                      <span className={`flex shrink-0 rounded-md p-0.5 text-black ${NODE_COLORS[mode].bg}`}>
+                        <ModeGlyph mode={mode} size={16} className="lg:h-7 lg:w-7" />
+                      </span>
+                      <span className={MODE_LABEL}>{t(`quickPlay.solo.mode.${mode}`)}</span>
+                    </Link>
+                  </PressSurface>
                 </li>
               ))}
-              <li>
-                <Link
-                  href={playHref}
-                  data-testid="hp-play"
-                  onClick={handlePlayClick}
-                  className={`flex aspect-square flex-col items-center lg:aspect-auto lg:h-24 justify-center gap-1 rounded-2xl border-[3px] border-black bg-neo-yellow text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${KEY_TILT[MODES.length % KEY_TILT.length]} ${
-                    animate ? 'animate-[qp-card-in_0.55s_cubic-bezier(0.3,0.9,0.4,1)_both]' : ''
-                  }`}
-                  style={animate ? { animationDelay: `${300 + MODES.length * 90}ms` } : undefined}
-                >
-                  <RandomGlyph size={30} className="lg:h-10 lg:w-10" />
-                  <span className="max-w-full px-0.5 text-center font-neo-display text-[clamp(9px,2.8vw,13px)] font-bold leading-none tracking-tight lg:text-base lg:tracking-normal">{t('homePlay.random')}</span>
-                </Link>
+              <li className="min-w-0">
+                <PressSurface asChild lip={2}>
+                  <Link href={quickPlayHref(lang, 'random')} className={`${MODE_KEY} shadow-neo-cream/15`}>
+                    <span className="flex shrink-0 rounded-md bg-neo-yellow p-0.5 text-black">
+                      <RandomGlyph size={16} className="lg:h-7 lg:w-7" />
+                    </span>
+                    <span className={MODE_LABEL}>{t('homePlay.random')}</span>
+                  </Link>
+                </PressSurface>
               </li>
             </ul>
           </div>
-
         </div>
       </div>
     </section>

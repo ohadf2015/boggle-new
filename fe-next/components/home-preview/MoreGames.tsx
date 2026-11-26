@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { PressSurface } from '@/components/motion/PressSurface';
 
 interface Game {
   id: string;
@@ -142,23 +143,25 @@ export function MoreGames({ lang, t, hideAdventure = false, showCrossword = fals
       <ul className="grid grid-cols-2 gap-x-3 gap-y-4 lg:grid-cols-4 lg:gap-8">
         {games.filter((g) => !TUCKED.has(g.id)).map((g) => (
           <li key={g.id}>
-            <Link
-              href={`/${lang}/${g.href}`}
-              className={`group flex h-full flex-col overflow-hidden rounded-2xl border-[3px] border-black text-black shadow-hard transition-transform hover:rotate-0 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:rounded-3xl lg:shadow-hard-lg ${g.bg} ${g.tilt}`}
-            >
-              <div className="relative flex items-end justify-center border-b-[3px] border-black bg-neo-navy pt-3 lg:pt-6">
-                <span aria-hidden="true" className="absolute inset-x-0 top-1.5 flex justify-center gap-1 lg:top-3">
-                  {[0, 1, 2, 3, 4].map((n) => (
-                    <span key={n} className="h-1 w-3 rounded-full bg-neo-white/20 lg:w-5" />
-                  ))}
-                </span>
-                <GameArt art={g.art} />
-              </div>
-              <div className="flex flex-1 flex-col gap-0.5 p-2.5 lg:p-5">
-                <h3 className="font-neo-display text-base font-bold leading-tight lg:text-2xl">{t(g.titleKey)}</h3>
-                <p className="text-[12px] leading-snug font-medium lg:text-base">{t(g.lineKey)}</p>
-              </div>
-            </Link>
+            <PressSurface asChild lip={4}>
+              <Link
+                href={`/${lang}/${g.href}`}
+                className={`group flex h-full flex-col overflow-hidden rounded-2xl border-[3px] border-black text-black hover:rotate-0 lg:rounded-3xl ${g.bg} ${g.tilt}`}
+              >
+                <div className="relative flex items-end justify-center border-b-[3px] border-black bg-neo-navy pt-3 lg:pt-6">
+                  <span aria-hidden="true" className="absolute inset-x-0 top-1.5 flex justify-center gap-1 lg:top-3">
+                    {[0, 1, 2, 3, 4].map((n) => (
+                      <span key={n} className="h-1 w-3 rounded-full bg-neo-white/20 lg:w-5" />
+                    ))}
+                  </span>
+                  <GameArt art={g.art} />
+                </div>
+                <div className="flex flex-1 flex-col gap-0.5 p-2.5 lg:p-5">
+                  <h3 className="font-neo-display text-base font-bold leading-tight lg:text-2xl">{t(g.titleKey)}</h3>
+                  <p className="text-[12px] leading-snug font-medium lg:text-base">{t(g.lineKey)}</p>
+                </div>
+              </Link>
+            </PressSurface>
           </li>
         ))}
       </ul>
@@ -170,14 +173,16 @@ export function MoreGames({ lang, t, hideAdventure = false, showCrossword = fals
         <ul className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
           {games.filter((g) => TUCKED.has(g.id)).map((g) => (
             <li key={g.id}>
-              <Link
-                href={`/${lang}/${g.href}`}
-                data-testid={`hp-games-more-${g.id}`}
-                className={`flex h-full flex-col gap-0.5 rounded-2xl border-[3px] border-black p-3 text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${g.bg}`}
-              >
-                <span className="font-neo-display text-sm font-bold leading-tight lg:text-lg">{t(g.titleKey)}</span>
-                <span className="text-[12px] leading-snug font-medium lg:text-sm">{t(g.lineKey)}</span>
-              </Link>
+              <PressSurface asChild lip={2}>
+                <Link
+                  href={`/${lang}/${g.href}`}
+                  data-testid={`hp-games-more-${g.id}`}
+                  className={`flex h-full flex-col gap-0.5 rounded-2xl border-[3px] border-black p-3 text-black ${g.bg}`}
+                >
+                  <span className="font-neo-display text-sm font-bold leading-tight lg:text-lg">{t(g.titleKey)}</span>
+                  <span className="text-[12px] leading-snug font-medium lg:text-sm">{t(g.lineKey)}</span>
+                </Link>
+              </PressSurface>
             </li>
           ))}
         </ul>

@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Check, Shield } from 'lucide-react';
+import { Check, Users } from 'lucide-react';
 import { StreakFlame } from '@/components/streak/StreakFlame';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { getSecondsUntilNextDaily } from '@/utils/dailyChallenge/dateUtils';
 import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
@@ -15,71 +16,92 @@ interface HeroQuickLinksProps {
   streak: number;
   streakLoading: boolean;
   atRisk?: boolean;
-  /** Banked streak freezes (signed-in only); shown on the chip when > 0. */
-  freezes?: number;
   playedToday?: boolean;
 }
 
-function NextPuzzleIn({ t }: Pick<HeroQuickLinksProps, 't'>) {
+const CHIP =
+  'flex h-[60px] min-w-0 items-center gap-2 rounded-2xl border-[3px] border-black ps-2 pe-2.5 text-black [@media(max-height:700px)]:h-[54px] lg:h-[80px] lg:gap-3 lg:rounded-3xl lg:ps-3 lg:pe-4';
+const ICON_TILE =
+  'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black lg:h-14 lg:w-14 lg:rounded-2xl';
+const TITLE = 'line-clamp-2 font-neo-display text-[15px] font-bold leading-tight lg:text-2xl';
+
+function useNextDailyIn(): string {
   const [left, setLeft] = useState(getSecondsUntilNextDaily);
   useEffect(() => {
     const id = setInterval(() => setLeft(getSecondsUntilNextDaily()), 1000);
     return () => clearInterval(id);
   }, []);
+  return formatTimeHHMMSS(left);
+}
+
+function DoneLine({ t }: Pick<HeroQuickLinksProps, 't'>) {
+  const time = useNextDailyIn();
   return (
-    <span data-sub data-testid="hp-daily-next" className="mt-1 truncate text-xs font-bold tracking-wide tabular-nums opacity-90 lg:text-base">
-      {t('homePlay.dailyNextIn', { time: formatTimeHHMMSS(left) })}
+    <span data-sub className="mt-0.5 flex items-center gap-1 truncate text-xs font-bold tabular-nums opacity-90 lg:text-base">
+      {t('homePlay.dailyDone')}
+      <span aria-hidden="true">
+        · <span data-testid="hp-daily-next">{time}</span>
+      </span>
+      <span className="sr-only">{t('homePlay.dailyNextIn', { time })}</span>
     </span>
   );
 }
 
-export function HeroQuickLinks({ lang, t, streak, streakLoading, atRisk = false, freezes = 0, playedToday = false }: HeroQuickLinksProps) {
+/** The hero's secondary row: friends and today's daily, side by side and below PLAY. */
+export function HeroQuickLinks({ lang, t, streak, streakLoading, atRisk = false, playedToday = false }: HeroQuickLinksProps) {
   const date = useTodayLabel(lang, { weekday: 'short', day: 'numeric', month: 'short' });
   const known = !streakLoading && streak > 0;
   const done = !streakLoading && playedToday;
-  const dailySub = known ? (atRisk ? t('dailyStreak.flame.atRisk', { n: streak }) : t('homePlay.chipStreak', { n: streak })) : date;
+  const dailySub = known ? t('homePlay.chipStreak', { n: streak }) : date;
+  const dailyAria = done
+    ? undefined
+    : known && atRisk
+      ? `${t('homePlay.chipDaily')}: ${t('dailyStreak.flame.atRisk', { n: streak })}`
+      : undefined;
+
   return (
-    <ul className="grid grid-cols-1" data-testid="hp-quick-links">
-      <li className="min-w-0">
+    <div className="grid grid-cols-2 gap-2.5 lg:gap-4" data-testid="hp-secondary">
+      <PressSurface asChild lip={4}>
         <Link
-          // One tap into today's puzzle (the Word Wheel), not the hub in between.
+          href={`/${lang}/multiplayer?autoCreate=true`}
+          data-testid="hp-play-friends"
+          onClick={() => trackLandingCtaClick('home_play_friends')}
+          className={`${CHIP} bg-neo-pink`}
+        >
+          <span className={`${ICON_TILE} bg-black text-neo-pink`}>
+            <Users className="h-5 w-5 lg:h-7 lg:w-7" strokeWidth={2.75} aria-hidden="true" />
+          </span>
+          <span className={TITLE}>{t('homePlay.friendsPlay')}</span>
+        </Link>
+      </PressSurface>
+
+      <PressSurface asChild lip={4}>
+        <Link
+          // One tap into today's puzzle, not the hub in between.
           href={`/${lang}/daily`}
           data-testid="hp-chip-daily"
+          aria-label={dailyAria}
           onClick={() => trackLandingCtaClick('home_daily_chip')}
-          className="relative flex h-[60px] items-center gap-3 overflow-hidden rounded-2xl border-[3px] border-black bg-neo-orange ps-2 pe-3 text-black shadow-hard-sm transition-transform hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed [@media(max-height:700px)]:h-[54px] lg:h-[80px] lg:gap-4 lg:rounded-3xl lg:ps-3 lg:pe-5 lg:shadow-hard"
+          className={`${CHIP} bg-neo-orange`}
         >
-          <span className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-black bg-neo-yellow lg:h-14 lg:w-14 lg:rounded-2xl">
-            <StreakFlame days={known ? streak : 0} size={30} mood={known && atRisk ? 'worried' : 'happy'} animated={known} />
-          </span>
-          <span className="relative flex min-w-0 flex-col items-start leading-none">
-            <span className="truncate font-neo-display text-[19px] font-bold lg:text-3xl">{t('homePlay.chipDaily')}</span>
-            {done ? <NextPuzzleIn t={t} /> : <span data-sub className="mt-1 truncate text-xs font-bold tracking-wide opacity-90 lg:text-base">{dailySub}</span>}
-          </span>
-          <span className="relative ms-auto flex shrink-0 items-center gap-2">
-            {freezes > 0 && (
-              <span
-                className="flex items-center gap-1 rounded-full border-2 border-black bg-neo-cyan px-2 py-0.5 text-[11px] font-bold text-black lg:text-sm"
-                data-testid="hp-chip-freezes"
-                title={t('quickLoop.freezes.title')}
-                aria-label={t('quickLoop.freezes.aria', { n: freezes })}
-              >
-                <Shield className="h-3 w-3 lg:h-4 lg:w-4" strokeWidth={3} aria-hidden="true" />
-                {freezes}
+          <span className={`${ICON_TILE} bg-neo-yellow`}>
+            <StreakFlame days={known ? streak : 0} size={26} mood={known && atRisk ? 'worried' : 'happy'} animated={known} />
+            {done && (
+              <span className="absolute -end-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-black bg-neo-lime">
+                <Check className="h-3 w-3" strokeWidth={4} aria-hidden="true" />
               </span>
             )}
+          </span>
+          <span className="flex min-w-0 flex-col items-start leading-none">
+            <span className={TITLE}>{t('homePlay.chipDaily')}</span>
             {done ? (
-              <span className="flex items-center gap-1 rounded-xl border-2 border-black bg-neo-lime px-2.5 py-1.5 font-neo-display text-sm font-bold text-black lg:px-4 lg:py-2 lg:text-lg">
-                <Check className="h-4 w-4" strokeWidth={3} aria-hidden="true" />
-                {t('homePlay.dailyDone')}
-              </span>
+              <DoneLine t={t} />
             ) : (
-              <span className="rounded-xl border-2 border-black bg-neo-navy px-3 py-1.5 font-neo-display text-sm font-bold text-neo-cream shadow-hard-sm lg:px-4 lg:py-2 lg:text-lg">
-                {t('quickLoop.daily.play')}
-              </span>
+              <span data-sub className="mt-0.5 truncate text-xs font-bold opacity-90 lg:text-base">{dailySub}</span>
             )}
           </span>
         </Link>
-      </li>
-    </ul>
+      </PressSurface>
+    </div>
   );
 }

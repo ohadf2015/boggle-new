@@ -2,8 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 
 vi.mock('@/components/Avatar', () => ({
-  default: ({ userId, avatarImage }: { userId?: string; avatarImage?: string }) => (
-    <div data-testid={`avatar-${userId}`} data-image={avatarImage ?? ''} />
+  default: ({ userId, avatarImage, pixelSize }: { userId?: string; avatarImage?: string; pixelSize?: number }) => (
+    <div data-testid={`avatar-${userId}`} data-image={avatarImage ?? ''} data-px={pixelSize} />
   ),
 }));
 vi.mock('@/components/quick-play/QuickResultsFx', () => ({ QuickResultsRays: () => null, SparkleLoop: () => null }));
@@ -115,5 +115,13 @@ describe('HeroAvatarIsland', () => {
     unmount();
     render(<HeroAvatarIsland />);
     expect(screen.queryByTestId('avatar-bea')).toBeNull();
+  });
+
+  it('given a phone, then the hero avatar is drawn at the slot size, not larger', () => {
+    renderHeroWithIsland();
+    const slot = screen.getByTestId('hp-avatar-slot');
+    const px = Number(/(?:^|\s)h-\[(\d+)px\]/.exec(slot.className)?.[1]);
+    const phone = slot.querySelector('.lg\\:hidden [data-px]');
+    expect(Number(phone?.getAttribute('data-px'))).toBe(px);
   });
 });

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { PressSurface } from '@/components/motion/PressSurface';
 import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useState } from 'react';
 import { Users } from 'lucide-react';
@@ -97,16 +98,20 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
         </div>
       </div>
 
-      <div className="mt-auto flex flex-wrap gap-2.5">
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2">
+        <PressSurface asChild lip={4}>
+          <Link
+            href={`/${lang}/multiplayer`}
+            data-testid="hp-friends-start"
+            className="flex-1 rounded-xl border-[3px] border-black bg-black px-4 py-2.5 text-center font-neo-display text-sm font-bold whitespace-nowrap text-neo-pink lg:py-3.5 lg:text-lg"
+          >
+            {t('homeFresh.sections.friends.cta')}
+          </Link>
+        </PressSurface>
         <Link
           href={`/${lang}/multiplayer`}
-          className="flex-1 rounded-xl border-[3px] border-black bg-black px-4 py-2.5 text-center font-neo-display text-sm font-bold whitespace-nowrap text-neo-pink shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:py-3.5 lg:text-lg"
-        >
-          {t('homeFresh.sections.friends.cta')}
-        </Link>
-        <Link
-          href={`/${lang}/multiplayer`}
-          className="flex-1 rounded-xl border-[3px] border-black bg-neo-cream px-4 py-2.5 text-center font-neo-display text-sm font-bold whitespace-nowrap text-black shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed lg:py-3.5 lg:text-lg"
+          data-testid="hp-friends-join"
+          className="px-1 py-2 font-neo-display text-sm font-bold whitespace-nowrap underline decoration-2 underline-offset-4 lg:text-lg"
         >
           {t('homePlay.friendsJoin')}
         </Link>
