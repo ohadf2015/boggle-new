@@ -183,3 +183,31 @@ export function showInlineSignup(_input: {
   // ask is the soft sheet (non-MP) or mp_sheet — not a second inline card.
   return false;
 }
+
+export interface GuestAskPlan {
+  /** "Pick a name for the board" (PublicNamePrompt). */
+  namePrompt: boolean;
+  /** "Sign in to keep your XP" (GuestSaveCard, signup trigger results_card). */
+  saveCard: boolean;
+  /** Something a guest would have seen here was held back (tracked on mp_results_viewed). */
+  deferred: boolean;
+}
+
+/**
+ * Which asks a guest gets on the MP results screen, by MP game of the session.
+ * Nov 23-26: of 30 guests who left after game 1, 21 saw the name prompt and 18
+ * the save card stacked on the replay countdown. results_card: 175 shown, 0
+ * signups in 14d. So game 1 shows only the countdown; game 2 adds the name
+ * (the mp_sheet signup ask lands on game 2 too); the save card waits for game 3.
+ */
+export function guestAskPlan({ isGuest, isClassroom, sessionGame }: {
+  isGuest: boolean;
+  isClassroom: boolean;
+  /** 1 = this results screen is the guest's first MP game this session. */
+  sessionGame: number;
+}): GuestAskPlan {
+  if (!isGuest || isClassroom) return { namePrompt: true, saveCard: true, deferred: false };
+  const namePrompt = sessionGame >= 2;
+  const saveCard = sessionGame >= 3;
+  return { namePrompt, saveCard, deferred: !namePrompt || !saveCard };
+}

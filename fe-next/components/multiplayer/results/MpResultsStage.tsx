@@ -18,7 +18,7 @@ import { SERIES_TOTAL_GAMES } from '@/hooks/useSeriesTracker';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import { cn } from '@/lib/utils';
 import { buildMpStandings, podiumTier } from './mpStandings';
-import { nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing, showInlineSignup } from './mpResultsView';
+import { guestAskPlan, nextModeForViewer, pickBestWord, pickVisibleRows, readyTally, seriesLadder, seriesPlacing, showInlineSignup } from './mpResultsView';
 import { buildRevealTimeline } from './revealTimeline';
 import { useRevealStage } from './useRevealStage';
 import { useMpAutoContinue } from './useMpAutoContinue';
@@ -153,10 +153,19 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [standingsOpen, setStandingsOpen] = useState(false);
 
+  // A guest's first MP game of the session ends on the replay countdown alone (guestAskPlan).
+  const asks = guestAskPlan({ isGuest: c.isGuest, isClassroom: c.isClassroom, sessionGame: c.mpSessionGame });
+
   // Fired here, on the always-mounted reveal; DETAILS only mounts on open.
   useEffect(() => {
     if (data.sortedScores.length > 1) {
-      trackGrowthEvent('mp_results_viewed', { gameMode: c.resolvedGameMode ?? 'unknown', language: c.language });
+      trackGrowthEvent('mp_results_viewed', {
+        gameMode: c.resolvedGameMode ?? 'unknown',
+        language: c.language,
+        isGuest: c.isGuest,
+        mpSessionGame: c.mpSessionGame,
+        guestAsksDeferred: asks.deferred,
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once per stage mount
   }, []);
@@ -438,6 +447,8 @@ export function MpResultsStage({ c }: { c: MpResultsController }) {
             score={myScore}
             xp={socketEvents.xpGainedData && { gained: socketEvents.xpGainedData.xpEarned, total: socketEvents.xpGainedData.newTotalXp }}
             opponentUserIds={boardRows.flatMap((r) => (!r.isMe && !r.isBot && r.userId ? [r.userId] : []))}
+            holdNamePrompt={!asks.namePrompt}
+            holdGuestSave={!asks.saveCard}
             {...(showH2hStrip ? { rival: mpH2hRival(rival, h2h), onRematch: rematch } : {})}
           />
         )}
