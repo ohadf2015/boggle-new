@@ -1593,7 +1593,6 @@ const es = {
     "chipStreak": "Racha de {n} días",
     "friendsPlay": "Juega con amigos",
     "playNow": "Juega ya",
-    "playNowSub": "Gratis, sin registro. Una ronda de 60 segundos.",
     "random": "Al azar",
     "dailyDone": "Hecho",
     "dailyNextIn": "Siguiente reto en {time}"

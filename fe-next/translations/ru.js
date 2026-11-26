@@ -1596,7 +1596,6 @@ const ru = {
     "chipStreak": "{n} дн. подряд",
     "friendsPlay": "Играть с друзьями",
     "playNow": "Играть сейчас",
-    "playNowSub": "Бесплатно, без регистрации. Раунд на 60 секунд.",
     "random": "Наугад",
     "dailyDone": "Готово",
     "dailyNextIn": "Новый пазл через {time}"

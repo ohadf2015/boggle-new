@@ -1593,7 +1593,6 @@ const ja = {
     "chipStreak": "{n}日連続",
     "friendsPlay": "友だちと遊ぶ",
     "playNow": "今すぐプレイ",
-    "playNowSub": "無料・登録不要。1ラウンド60秒。",
     "random": "おまかせ",
     "dailyDone": "クリア",
     "dailyNextIn": "次のパズルまで {time}"

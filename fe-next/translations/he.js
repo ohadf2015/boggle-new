@@ -1593,7 +1593,6 @@ const he = {
     "chipStreak": "רצף של {n} ימים",
     "friendsPlay": "שחקו עם חברים",
     "playNow": "שחקו עכשיו",
-    "playNowSub": "בחינם, בלי הרשמה. סיבוב של 60 שניות.",
     "random": "אקראי",
     "dailyDone": "סיימת",
     "dailyNextIn": "החידה הבאה בעוד {time}"

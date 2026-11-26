@@ -1593,7 +1593,6 @@ const en = {
     "chipStreak": "{n}-day streak",
     "friendsPlay": "Play with friends",
     "playNow": "Play now",
-    "playNowSub": "Free, no sign-up. One 60-second round.",
     "random": "Random",
     "dailyDone": "Done",
     "dailyNextIn": "Next puzzle in {time}"

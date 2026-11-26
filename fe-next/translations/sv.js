@@ -1593,7 +1593,6 @@ const sv = {
     "chipStreak": "{n} dagar i rad",
     "friendsPlay": "Spela med vänner",
     "playNow": "Spela nu",
-    "playNowSub": "Gratis, inget konto. En runda på 60 sekunder.",
     "random": "Slumpa",
     "dailyDone": "Klart",
     "dailyNextIn": "Nästa pussel om {time}"
