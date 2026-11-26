@@ -58,21 +58,29 @@ describe('TeacherProTrialExpiringBanner', () => {
     expect(postTeacherProCheckout).not.toHaveBeenCalled();
   });
 
-  it('Given a trialing teacher, Then manage-or-cancel stays a secondary portal link, never a new checkout', () => {
+  it('Given a trialing teacher, Then manage-or-cancel opens the retention offer, never a new checkout', () => {
     render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={PORTAL} />);
     const cta = screen.getByTestId('teacher-pro-trial-expiring-cta');
     expect(cta).toHaveTextContent('teacher.subscription.trialManageCta');
-    expect(cta).toHaveAttribute('href', PORTAL);
-    expect(cta).toHaveAttribute('target', '_blank');
     fireEvent.click(cta);
+    expect(screen.getByTestId('cancel-offer-dialog')).toBeInTheDocument();
     expect(postTeacherProCheckout).not.toHaveBeenCalled();
   });
 
-  it('Given no portal link yet, Then the manage link opens the plan page in-app', () => {
+  it('Given no portal link yet, Then the manage link still opens the offer, and continuing lands on the plan page', () => {
     render(<TeacherProTrialExpiringBanner trialExpires={expiresIn(2)} portalUrl={null} />);
     const cta = screen.getByTestId('teacher-pro-trial-expiring-cta');
-    expect(cta).toHaveAttribute('href', '/en/teacher/upgrade');
-    expect(cta).not.toHaveAttribute('target');
+    fireEvent.click(cta);
+    expect(screen.getByTestId('cancel-offer-dialog')).toBeInTheDocument();
+    const assign = vi.fn();
+    const original = window.location;
+    Object.defineProperty(window, 'location', { value: { assign }, configurable: true });
+    try {
+      fireEvent.click(screen.getByTestId('cancel-offer-continue'));
+      expect(assign).toHaveBeenCalledWith('/en/teacher/upgrade');
+    } finally {
+      Object.defineProperty(window, 'location', { value: original, configurable: true });
+    }
   });
 
   it('Given more than 4 days left, Then it renders nothing', () => {

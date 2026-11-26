@@ -260,6 +260,24 @@ export function buildProResumedEvent(userId: string, status: string): EduServerE
   };
 }
 
+/**
+ * A pre-cancel retention offer was taken from the manage/cancel interstitial.
+ * Server-side twin of the client's `trial_cancel_offer_accepted`, fired by the
+ * API route that actually applies (or, for `discount`, records) the offer, so
+ * the outcome survives a closed tab. `applied` is 'pause' when the Polar trial
+ * end moved, 'recorded' when the provider has no live call for it yet.
+ */
+export function buildTeacherProRetentionOfferEvent(
+  userId: string,
+  args: { offer: 'pause' | 'discount'; status: string; applied: 'pause' | 'recorded' },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_pro_retention_offer_applied',
+    properties: { ...BASE, teacher_id: userId, offer: args.offer, status: args.status, applied: args.applied },
+  };
+}
+
 /** Polar Teacher Pro trial lapsed without converting. */
 export function buildTrialExpiredEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {

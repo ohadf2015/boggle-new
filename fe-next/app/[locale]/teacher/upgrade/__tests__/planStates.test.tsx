@@ -77,7 +77,8 @@ describe('plan page — Pro teacher', () => {
     render(<PageClient />);
     expect(screen.getByTestId('pro-plan-panel')).toBeInTheDocument();
     expect(screen.getByTestId('pricing-pro-current')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'eg2Pro.plans.manageBilling' })).toHaveAttribute('href', 'https://billing.example/portal');
+    fireEvent.click(screen.getByRole('button', { name: 'eg2Pro.plans.manageBilling' }));
+    expect(screen.getByTestId('cancel-offer-dialog')).toBeInTheDocument();
     expect(screen.queryByTestId('pricing-cards')).not.toBeInTheDocument();
     expect(screen.queryByTestId('pro-preview-strip')).not.toBeInTheDocument();
     expect(screen.queryByTestId('trust-chip')).not.toBeInTheDocument();

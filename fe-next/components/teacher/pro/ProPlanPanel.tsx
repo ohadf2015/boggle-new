@@ -5,6 +5,7 @@ import { Check, Crown, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { proPlanStatusLine } from './proPlanStatus';
 import { ResumeProButton } from '../TeacherProTrialCanceledBanner';
+import { TeacherProManageLink } from '../TeacherProManageLink';
 
 export interface ProPlanPanelProps {
   status?: string | null;
@@ -36,13 +37,16 @@ export function ProPlanPanel({ status, source, trialExpires, periodEnd, portalUr
           {cancelAtPeriodEnd && !gifted && onResumed ? <ResumeProButton onResumed={onResumed} className="mt-3 border-neo-navy bg-neo-navy text-neo-yellow" /> : null}
         </div>
         {portalUrl && !gifted ? (
-          <a
-            href={portalUrl}
+          <TeacherProManageLink
+            portalUrl={portalUrl}
+            testId="pro-plan-manage-billing"
+            status={status ?? 'active'}
+            onApplied={onResumed}
             className="inline-flex min-h-11 items-center gap-2 rounded-neo border-3 border-neo-cream/40 bg-neo-navy px-4 font-neo-display text-sm font-black text-neo-yellow shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             {t('eg2Pro.plans.manageBilling')}
             <ExternalLink className="size-4" aria-hidden="true" />
-          </a>
+          </TeacherProManageLink>
         ) : null}
       </div>
       {gifted ? <p className="mt-2 text-xs font-bold text-neo-navy/75">{t('eduPlans.manage.giftedNote')}</p> : null}

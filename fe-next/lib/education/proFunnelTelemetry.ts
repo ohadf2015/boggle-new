@@ -464,6 +464,39 @@ export function trackTeacherPlanGateShown(args: TeacherPlanGateShownArgs): void 
   });
 }
 
+/**
+ * Pre-cancel retention interstitial shown (Teacher Pro, active or trialing).
+ * The teacher opened the manage/cancel path and saw the pause/discount offer
+ * instead of landing straight on the Polar portal's raw cancel. Fires once per
+ * open; the dialog owns when it opens.
+ */
+export function trackTrialCancelOfferViewed(args: { status: string }): void {
+  captureStep('trial_cancel_offer_viewed', {
+    status: args.status,
+    product: 'teacher_pro',
+    provider: 'polar',
+  });
+}
+
+/** One-click offer taken on the interstitial: `pause` (1 month) or `discount` (50% off 3 months). */
+export function trackTrialCancelOfferAccepted(args: { offer: 'pause' | 'discount'; status: string }): void {
+  captureStep('trial_cancel_offer_accepted', {
+    offer: args.offer,
+    status: args.status,
+    product: 'teacher_pro',
+    provider: 'polar',
+  });
+}
+
+/** The teacher passed on both offers and continued to the Polar portal cancel. */
+export function trackTrialCancelOfferDismissed(args: { status: string }): void {
+  captureStep('trial_cancel_offer_dismissed', {
+    status: args.status,
+    product: 'teacher_pro',
+    provider: 'polar',
+  });
+}
+
 /** Upgrade tap on the usage-wall sheet, immediately before Polar checkout POST. */
 export function trackTeacherPlanGateUpgradeClick(args: TeacherPlanGateShownArgs): void {
   safeCapture('teacher_plan_gate_upgrade_click', {

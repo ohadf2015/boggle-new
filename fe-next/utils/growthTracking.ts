@@ -342,6 +342,12 @@ export type GrowthEvent =
   | 'teacher_pro_checkout_started'
   | 'teacher_pro_checkout_redirect'
   | 'school_quote_requested'
+  // Pre-cancel retention interstitial (Teacher Pro manage/cancel path):
+  // viewed / accepted {offer: pause|discount} / dismissed. Mirrored from
+  // lib/education/proFunnelTelemetry. NOT in CANONICAL_DUAL_EMIT.
+  | 'trial_cancel_offer_viewed'
+  | 'trial_cancel_offer_accepted'
+  | 'trial_cancel_offer_dismissed'
   // Teacher access gate telemetry (Growth Radar funnel)
   | 'edu_access_gate_viewed'
   | 'edu_access_signup_tapped'

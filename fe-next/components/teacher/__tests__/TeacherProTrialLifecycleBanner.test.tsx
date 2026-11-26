@@ -79,11 +79,12 @@ describe('TeacherProTrialLifecycleBanner', () => {
     expect(goToPolarCheckout).not.toHaveBeenCalled();
   });
 
-  it('keeps manage-or-cancel as a secondary link to the Polar portal', () => {
+  it('manage-or-cancel opens the retention offer before the raw Polar cancel', () => {
     render(<TeacherProTrialLifecycleBanner trialExpires={expiresIn(5)} portalUrl={PORTAL} />);
     const manage = screen.getByTestId('teacher-pro-trial-lifecycle-manage');
-    expect(manage).toHaveAttribute('href', PORTAL);
-    expect(manage).toHaveAttribute('target', '_blank');
+    fireEvent.click(manage);
+    // The interstitial stands between the teacher and the Polar portal cancel.
+    expect(screen.getByTestId('cancel-offer-dialog')).toBeInTheDocument();
   });
 
   it('with no expiry known, renders the active-trial title and fires nothing', () => {
