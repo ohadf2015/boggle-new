@@ -142,6 +142,7 @@ describe('useMpRoomSocket — dead room → one-tap Quick Play', () => {
 
     expect(c.offerQuickPlayRecovery).not.toHaveBeenCalled();
     expect(toast).toHaveBeenCalledTimes(1);
+    expect(recoveryCalls()).toEqual([['mp_room_gone_recovery', { stage: 'not_offered', reason: 'host', cameFromInvite: false }]]);
   });
 
   it('GIVEN the player was in the room WHEN it is gone THEN keeps the timed-out toast', () => {
@@ -151,6 +152,7 @@ describe('useMpRoomSocket — dead room → one-tap Quick Play', () => {
 
     expect(c.offerQuickPlayRecovery).not.toHaveBeenCalled();
     expect(toast).toHaveBeenCalledWith('multiplayerFlow.roomTimedOut', expect.anything());
+    expect(recoveryCalls()).toEqual([['mp_room_gone_recovery', { stage: 'not_offered', reason: 'was_active', cameFromInvite: false }]]);
   });
 
   it('GIVEN the player tapped Play now WHEN the next join lands THEN counts one recovered join', () => {

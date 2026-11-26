@@ -371,6 +371,13 @@ export function useMpRoomSocket(ctx: MpRoomSocketContext) {
     } else {
       const feedback = roomGoneFeedback({ wasActive: isActive, cameFromInvite, roomCode: goneCode });
       toast(t(feedback.key, feedback.params), { duration: 5000, icon: feedback.icon, id: MP_TOAST_IDS.roomGone });
+      // Splits the dead-room population: who got the Quick Play offer vs who
+      // saw only the plain toast, and why (room_link_opened → seated funnel).
+      const reason = isActive ? 'was_active'
+        : classroomDecisionRef.current.isHost ? 'host'
+        : classroomDecisionRef.current.context !== 'arcade' ? 'classroom'
+        : 'repeat';
+      trackGrowthEvent('mp_room_gone_recovery', { stage: 'not_offered', reason, cameFromInvite });
     }
     if (!isActive && cameFromInvite) {
       trackInviteRoomDead({ roomCode: goneCode || 'unknown' });
