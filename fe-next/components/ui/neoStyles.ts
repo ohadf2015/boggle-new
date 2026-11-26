@@ -21,6 +21,26 @@ export function neoPress(lip: PressLip = 4): string {
   ].join(' ');
 }
 
+export type ChunkyLip = 2 | 4 | 6;
+
+const CHUNKY_LIP: Record<ChunkyLip, string> = {
+  2: 'shadow-[0_2px_0_0] data-[pressed=true]:translate-y-[2px]',
+  4: 'shadow-[0_4px_0_0] data-[pressed=true]:translate-y-[4px]',
+  6: 'shadow-[0_6px_0_0] data-[pressed=true]:translate-y-[6px]',
+};
+
+export function neoChunkyPress(lip: ChunkyLip = 4): string {
+  return [
+    CHUNKY_LIP[lip],
+    'shadow-neo-black data-[pressed=true]:shadow-none',
+    // The lip is box-shadow, so it has to travel with the transform or the surface floats for a frame.
+    'transition-[transform,box-shadow] duration-[var(--duration-release)] ease-[var(--ease-release)]',
+    'data-[pressed=true]:duration-[var(--duration-press)] data-[pressed=true]:ease-out',
+    'motion-reduce:transition-none select-none touch-manipulation [-webkit-tap-highlight-color:transparent]',
+    'disabled:pointer-events-none aria-disabled:pointer-events-none',
+  ].join(' ');
+}
+
 export const NEO_FOCUS =
   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 

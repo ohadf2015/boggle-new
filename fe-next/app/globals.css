@@ -1866,6 +1866,11 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     --duration-snap: 100ms;
     --duration-quick: 150ms;
 
+    /* Chunky press + springs (components/motion/tokens.ts holds the JS twins) */
+    --duration-press: 80ms;
+    --duration-release: 240ms;
+    --ease-release: cubic-bezier(0.34, 1.56, 0.64, 1);
+
     /* Halftone Pattern (SVG-based) - white dots for dark backgrounds - nearly invisible for cleaner look */
     --halftone-pattern: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
     --halftone-pattern-lg: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='15' cy='15' r='1.5' fill='%23FFFFFF' fill-opacity='0.005'/%3E%3C/svg%3E");
@@ -5369,4 +5374,34 @@ html.feedback-capturing [data-dialog-overlay] {
   .gift-card, .gift-box, .gift-rise, .gift-chip, .gift-chip-open, .gift-cta, .gift-twinkle, .gift-rays, .gift-box[data-open='false'] .gift-box-body { animation: none; }
   .gift-box[data-open='true'] .gift-lid { animation: none; opacity: 0; }
   .gift-box[data-open='true'] .gift-burst { animation: none; }
+}
+
+/* MascotRig idle: slow breathe, then a small head tilt. Transform only. */
+.neo-mascot-idle {
+  transform-origin: 50% 100%;
+  animation: neo-mascot-idle 4.8s ease-in-out infinite;
+}
+@keyframes neo-mascot-idle {
+  0%, 100% { transform: scale(1, 1) rotate(0deg); }
+  35% { transform: scale(0.99, 1.03) rotate(0deg); }
+  65% { transform: scale(1, 1) rotate(0deg); }
+  75% { transform: scale(1, 1) rotate(-3deg); }
+  85% { transform: scale(1, 1) rotate(2deg); }
+  92% { transform: scale(1, 1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .neo-mascot-idle { animation: none; }
+}
+
+/* AmbientBackdrop idle bob. */
+.neo-ambient-bob {
+  animation: neo-ambient-bob 14s ease-in-out infinite;
+}
+@keyframes neo-ambient-bob {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -12px, 0) rotate(4deg); }
+}
+[data-paused="true"] .neo-ambient-bob { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) {
+  .neo-ambient-bob { animation: none; }
 }
