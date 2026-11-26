@@ -9,6 +9,10 @@ import { SvScrabbleCrossLink } from '@/components/seo/SvScrabbleCrossLink';
 import { HeScrabbleCrossLink } from '@/components/seo/HeScrabbleCrossLink';
 import { EnBoggleCrossLink } from '@/components/seo/EnBoggleCrossLink';
 import { withBodyLocales } from '@/lib/seo/bodyLocales';
+import { PressGroup } from './_components/PressGroup';
+import { VALID_LETTERS } from './_utils/wordListData';
+import { HeroBand } from './_components/HeroBand';
+import { PRIMARY_CTA, CHIP, SECTION_LABEL } from './_components/wordStyles';
 
 export const dynamic = 'force-dynamic';
 
@@ -67,17 +71,15 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 }
 
 const WORD_LENGTHS = [3, 4, 5, 6, 7, 8] as const;
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 export default async function WordsHubPage({ params }: PageParams) {
   const { locale } = await params;
 
   return (
-    <div className="min-h-screen bg-neo-navy text-neo-white">
+    <PressGroup className="min-h-screen bg-neo-navy text-neo-white">
       <Header />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Breadcrumb */}
-        <nav className="mb-6 text-sm text-slate-400">
+      <HeroBand className="max-w-3xl">
+        <nav className="mb-6 text-sm text-neo-cream/60">
           <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">
             Home
           </Link>
@@ -85,12 +87,87 @@ export default async function WordsHubPage({ params }: PageParams) {
           <span className="text-neo-white">Words</span>
         </nav>
 
-        {/* Hero */}
-        <h1 className="text-4xl font-neo-display font-black text-neo-yellow tracking-wider mb-4">
+        <h1 className="text-4xl sm:text-5xl font-neo-display font-black text-neo-yellow tracking-wider mb-6">
           LexiClash Word Dictionary
         </h1>
 
-        <div className="text-slate-300 text-base leading-relaxed mb-8 space-y-4">
+        <Link href={`/${locale}/tools/word-solver`} data-press data-primary-cta className={PRIMARY_CTA}>
+          Open Word Solver
+        </Link>
+        <p className="text-neo-cream/60 text-sm mt-2">
+          Search for any word and check if it scores in LexiClash
+        </p>
+      </HeroBand>
+
+      <div className="max-w-3xl mx-auto px-4 pb-10">
+        <section className="mb-10">
+          <h2 className={`${SECTION_LABEL} text-lg mb-4`}>
+            Browse by Word Length
+          </h2>
+          <div className="grid grid-cols-3 gap-3">
+            {WORD_LENGTHS.map(n => (
+              <Link
+                key={n}
+                href={`/${locale}/words/${n}-letter-words`}
+                data-press
+                className={`${CHIP} p-3 text-center`}
+              >
+                <span className="text-2xl font-neo-display font-black text-neo-yellow">
+                  {n}
+                </span>
+                <span className="block text-sm text-neo-cream/70">letter words</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="mb-10">
+          <h2 className={`${SECTION_LABEL} text-lg mb-4`}>
+            Browse by Starting Letter
+          </h2>
+          <div className="grid grid-cols-6 sm:grid-cols-9 md:grid-cols-13 gap-2">
+            {VALID_LETTERS.map(letter => (
+              <Link
+                key={letter}
+                href={`/${locale}/words/starting-with/${letter}`}
+                data-press
+                className={`${CHIP} py-2 text-center text-lg font-neo-display font-black`}
+              >
+                {letter.toUpperCase()}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <InlineBannerAd webZone="content-page" className="my-6" />
+
+        <section className="mb-10">
+          <h2 className="text-lg font-bold text-neo-pink uppercase tracking-wider mb-1">
+            Popular Anagram Lookups
+          </h2>
+          <p className="text-neo-cream/60 text-sm mb-4">
+            Find every word you can form from these letters — instant results, no signup.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'].map((letters) => (
+              <Link
+                key={letters}
+                href={`/${locale}/anagram/${letters}`}
+                data-press
+                className={`${CHIP} px-3 py-1.5 text-sm font-neo-display font-bold uppercase`}
+              >
+                {letters}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <EsScrabbleCrossLink locale={locale} anchorVariant="words" queryAnchor />
+        <SvScrabbleCrossLink locale={locale} anchorVariant="words" />
+        <EnBoggleCrossLink locale={locale} anchorVariant="words" />
+        <HeScrabbleCrossLink locale={locale} anchorVariant="words" />
+
+        <div className="text-neo-cream/75 text-base leading-relaxed space-y-4 border-t-2 border-neo-cream/15 pt-8">
           <p>
             Welcome to the LexiClash word dictionary, your go-to resource for finding valid words
             across every game mode. Whether you are warming up for a Daily Challenge, hunting for
@@ -117,91 +194,7 @@ export default async function WordsHubPage({ params }: PageParams) {
             instantly instead of calculating during precious game seconds.
           </p>
         </div>
-
-        {/* Words by Length */}
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
-            Browse by Word Length
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {WORD_LENGTHS.map(n => (
-              <Link
-                key={n}
-                href={`/${locale}/words/${n}-letter-words`}
-                className="bg-neo-navy border-3 border-neo-black rounded-neo p-4 shadow-hard-sm hover:shadow-hard hover:border-neo-cyan transition-[box-shadow,border-color] text-center group"
-              >
-                <span className="text-2xl font-neo-display font-black text-neo-yellow group-hover:text-neo-white transition-colors">
-                  {n}
-                </span>
-                <span className="block text-sm text-slate-400 mt-1">letter words</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <InlineBannerAd webZone="content-page" className="my-6" />
-
-        <EsScrabbleCrossLink locale={locale} anchorVariant="words" queryAnchor />
-        <SvScrabbleCrossLink locale={locale} anchorVariant="words" />
-        <EnBoggleCrossLink locale={locale} anchorVariant="words" />
-        <HeScrabbleCrossLink locale={locale} anchorVariant="words" />
-
-        {/* Words by Starting Letter */}
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-cyan uppercase tracking-wider mb-4">
-            Browse by Starting Letter
-          </h2>
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-            {ALPHABET.map(letter => (
-              <Link
-                key={letter}
-                href={`/${locale}/words/starting-with/${letter}`}
-                className="bg-neo-navy border-2 border-neo-black rounded-neo p-3 shadow-hard-sm hover:shadow-hard hover:border-neo-yellow transition-[box-shadow,border-color] text-center"
-              >
-                <span className="text-lg font-neo-display font-black text-neo-white">
-                  {letter.toUpperCase()}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* Popular Anagram Lookups */}
-        <section className="mb-10">
-          <h2 className="text-xl font-neo-display font-bold text-neo-pink uppercase tracking-wider mb-4">
-            Popular Anagram Lookups
-          </h2>
-          <p className="text-slate-400 text-sm mb-4">
-            Find every word you can form from these letters — instant results, no signup.
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-            {['listen', 'stared', 'heart', 'stone', 'rates', 'learn', 'smart', 'great', 'earth', 'words'].map((letters) => (
-              <Link
-                key={letters}
-                href={`/${locale}/anagram/${letters}`}
-                className="bg-neo-navy border-2 border-neo-black rounded-neo px-3 py-2 shadow-hard-sm hover:shadow-hard hover:border-neo-pink transition-[box-shadow,border-color] text-center"
-              >
-                <span className="text-sm font-neo-display font-bold text-neo-white uppercase">
-                  {letters}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* CTA */}
-        <div className="text-center mt-8">
-          <Link
-            href={`/${locale}/tools/word-solver`}
-            className="inline-block bg-neo-yellow text-neo-black font-neo-display font-black px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform]"
-          >
-            Open Word Solver
-          </Link>
-          <p className="text-slate-500 text-xs mt-2">
-            Search for any word and check if it scores in LexiClash
-          </p>
-        </div>
       </div>
-    </div>
+    </PressGroup>
   );
 }

@@ -12,9 +12,10 @@ import {
   VALID_LENGTHS,
   type Letter,
 } from '../../_utils/wordListData';
-import { ScrollReveal, StaggerReveal } from '../../_components/ScrollReveal';
-import { AnimatedCounter } from '../../_components/AnimatedCounter';
-import { PulseCTA } from '../../_components/PulseCTA';
+import { PopIn } from '@/components/motion/PopIn';
+import { PressGroup } from '../../_components/PressGroup';
+import { HeroBand } from '../../_components/HeroBand';
+import { PRIMARY_CTA, SECONDARY_CTA, CHIP, SECTION_LABEL } from '../../_components/wordStyles';
 import { LETTER_CONTENT } from './letterContent';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
@@ -160,10 +161,9 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
       {/* JSON-LD is static server data — no user input involved */}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: schemaJson }} />
 
-      <div className="min-h-screen bg-neo-navy text-neo-white">
-        <div className="max-w-4xl mx-auto px-4 py-8">
-
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-slate-400 flex items-center gap-2">
+      <PressGroup className="min-h-screen bg-neo-navy text-neo-white">
+        <HeroBand className="max-w-4xl">
+          <nav aria-label="Breadcrumb" className="mb-6 text-sm text-neo-cream/60 flex items-center gap-2">
             <Link href={`/${locale}`} className="hover:text-neo-cyan transition-colors">Home</Link>
             <span aria-hidden="true">/</span>
             <Link href={`/${locale}/words`} className="hover:text-neo-cyan transition-colors">Words</Link>
@@ -171,174 +171,109 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
             <span className="text-neo-white" aria-current="page">Starting With {upper}</span>
           </nav>
 
-          {/* Header — animated entrance */}
-          <ScrollReveal className="mb-8">
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-16 h-16 bg-neo-lime text-neo-black font-neo-display font-black text-4xl flex items-center justify-center rounded-neo border-3 border-neo-black shadow-hard hover:rotate-6 transition-transform">
-                {upper}
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl font-neo-display font-black text-neo-lime">
-                  {totalWords} Words That Start With {upper}
-                </h1>
-              </div>
-            </div>
-            {letterInfo && (
-              <p className="text-slate-300 text-lg leading-relaxed max-w-2xl mb-3">
-                {letterInfo.intro}
-              </p>
-            )}
-            <p className="text-slate-400 text-base leading-relaxed max-w-2xl">
-              Complete list of words starting with {upper}, from {sortedLengths[0]}-letter
-              to {sortedLengths[sortedLengths.length - 1]}-letter words. Each word shows its
-              game score — tap any word for its definition.
+          <div className="flex items-center gap-4 mb-3">
+            <PopIn className="w-16 h-16 shrink-0 bg-neo-lime text-neo-black font-neo-display font-black text-4xl flex items-center justify-center rounded-neo border-3 border-neo-black shadow-[0_4px_0_0] shadow-neo-lime-dark">
+              {upper}
+            </PopIn>
+            <h1 className="text-3xl sm:text-4xl font-neo-display font-black text-neo-lime">
+              {totalWords} Words That Start With {upper}
+            </h1>
+          </div>
+          <p className="flex flex-wrap gap-x-4 gap-y-1 text-neo-cream/70">
+            <span><strong className="text-neo-cyan text-lg">{totalWords}</strong> total words</span>
+            <span><strong className="text-neo-lime text-lg">{sortedLengths.length}</strong> length groups</span>
+            <span><strong className="text-neo-cyan text-lg">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</strong> letters</span>
+          </p>
+
+          <div className="mt-6">
+            <Link href={`/${locale}/quick-play`} data-press data-primary-cta className={PRIMARY_CTA}>
+              Play Free Now →
+            </Link>
+            <p className="text-neo-cream/60 text-sm mt-3">
+              Free, no signup required — play instantly.
             </p>
-          </ScrollReveal>
+          </div>
+        </HeroBand>
 
-          {/* Hero CTA — above the fold, with pulse */}
-          <ScrollReveal delay={0.15} className="mb-8">
-            <div className="bg-linear-to-r from-neo-lime/10 to-neo-cyan/10 border-3 border-neo-lime rounded-neo p-5 shadow-hard">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                <div className="flex-1">
-                  <p className="font-neo-display font-black text-xl text-neo-white mb-1">
-                    Think you know your {upper}-words?
-                  </p>
-                  <p className="text-slate-300 text-sm">
-                    Find words on a letter grid before time runs out.
-                    Free, no signup required — play instantly.
-                  </p>
-                </div>
-                <PulseCTA href={`/${locale}/quick-play`} color="lime" className="text-lg">
-                  Play Free Now →
-                </PulseCTA>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* Stats bar — animated counters */}
-          <ScrollReveal delay={0.25} className="mb-8">
-            <div className="flex flex-wrap gap-4">
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <AnimatedCounter value={totalWords} className="text-neo-cyan font-bold text-lg" />
-                <span className="text-slate-400 text-sm">total words</span>
-              </div>
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <AnimatedCounter value={sortedLengths.length} className="text-neo-lime font-bold text-lg" />
-                <span className="text-slate-400 text-sm">length groups</span>
-              </div>
-              <div className="bg-neo-navy border-2 border-neo-black rounded-neo px-4 py-2 shadow-hard-sm flex items-center gap-2">
-                <span className="text-neo-cyan font-bold text-lg">{sortedLengths[0]}–{sortedLengths[sortedLengths.length - 1]}</span>
-                <span className="text-slate-400 text-sm">letters</span>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* Letter navigation */}
+        <div className="max-w-4xl mx-auto px-4 pb-10">
           <div className="flex items-center gap-3 mb-8">
             {prevLetter ? (
-              <Link
-                href={`/${locale}/words/starting-with/${prevLetter}`}
-                className="bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-2 text-sm font-bold hover:border-neo-cyan transition-colors"
-              >
+              <Link href={`/${locale}/words/starting-with/${prevLetter}`} data-press className={`${CHIP} px-3 py-2 text-sm font-bold`}>
                 ← {prevLetter.toUpperCase()}
               </Link>
             ) : (
-              <span className="bg-neo-navy-light/40 border border-slate-800 rounded-neo px-3 py-2 text-sm font-bold text-slate-600 cursor-not-allowed">
-                ←
-              </span>
+              <span className="rounded-neo border-2 border-neo-cream/10 px-3 py-2 text-sm font-bold text-neo-cream/30 cursor-not-allowed">←</span>
             )}
-            <span className="text-slate-400 text-sm flex-1 text-center">
+            <span className="text-neo-cream/60 text-sm flex-1 text-center">
               Words starting with {upper}
             </span>
             {nextLetter ? (
-              <Link
-                href={`/${locale}/words/starting-with/${nextLetter}`}
-                className="bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-2 text-sm font-bold hover:border-neo-cyan transition-colors"
-              >
+              <Link href={`/${locale}/words/starting-with/${nextLetter}`} data-press className={`${CHIP} px-3 py-2 text-sm font-bold`}>
                 {nextLetter.toUpperCase()} →
               </Link>
             ) : (
-              <span className="bg-neo-navy-light/40 border border-slate-800 rounded-neo px-3 py-2 text-sm font-bold text-slate-600 cursor-not-allowed">
-                →
-              </span>
+              <span className="rounded-neo border-2 border-neo-cream/10 px-3 py-2 text-sm font-bold text-neo-cream/30 cursor-not-allowed">→</span>
             )}
           </div>
 
           <div className="space-y-8">
             {sortedLengths.map((len, groupIndex) => (
               <div key={len}>
-                <ScrollReveal>
-                  <section>
-                    <div className="flex items-center gap-3 mb-3 border-b-2 border-slate-700 pb-2">
-                      <h2 className="text-2xl font-neo-display font-black text-neo-cyan">
-                        {len}-Letter Words Starting With {upper}
-                      </h2>
+                <section>
+                  <div className="flex flex-wrap items-baseline gap-x-3 mb-3">
+                    <h2 className="text-xl sm:text-2xl font-neo-display font-black text-neo-cyan">
+                      {len}-Letter Words Starting With {upper}
+                    </h2>
+                    <Link href={`/${locale}/words/${len}-letter-words`} className="text-xs text-neo-cream/60 hover:text-neo-cyan transition-colors">
+                      see all {len}-letter words →
+                    </Link>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                    {(grouped[len] ?? []).map(word => (
                       <Link
-                        href={`/${locale}/words/${len}-letter-words`}
-                        className="text-xs text-slate-500 hover:text-neo-cyan transition-colors"
+                        key={word}
+                        href={`/${locale}/words/${word}`}
+                        data-press
+                        className={`${CHIP} flex items-center justify-between px-3 py-2`}
                       >
-                        see all {len}-letter words →
+                        <span className="font-bold text-sm uppercase tracking-wide">{word}</span>
+                        <span className="text-xs font-bold text-neo-cyan ms-1 shrink-0">{getWordScore(word)}pt</span>
                       </Link>
-                    </div>
-                    <StaggerReveal
-                      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2"
-                      staggerMs={30}
-                    >
-                      {(grouped[len] ?? []).map(word => (
-                        <Link
-                          key={word}
-                          href={`/${locale}/words/${word}`}
-                          className="group flex items-center justify-between bg-neo-navy border border-slate-700 hover:border-neo-cyan hover:shadow-[0_0_12px_rgba(0,255,255,0.15)] rounded-neo px-3 py-2 transition-[border-color,box-shadow] duration-200"
-                        >
-                          <span className="font-bold text-sm text-neo-white group-hover:text-neo-lime transition-colors uppercase tracking-wide">
-                            {word}
-                          </span>
-                          <span className="text-xs font-bold text-neo-cyan bg-neo-navy-light rounded px-1.5 py-0.5 ms-1 shrink-0">
-                            {getWordScore(word)}pt
-                          </span>
-                        </Link>
-                      ))}
-                    </StaggerReveal>
-                  </section>
-                </ScrollReveal>
+                    ))}
+                  </div>
+                </section>
 
-                {/* Inline CTA after 2nd group */}
                 {groupIndex === 1 && (
-                  <ScrollReveal delay={0.1} direction="left" className="mt-6">
-                    <div className="bg-neo-navy border-2 border-neo-cyan rounded-neo p-4 shadow-hard-sm flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      <div className="flex-1">
-                        <p className="font-bold text-neo-white">
-                          Can you spot {len}-letter {upper}-words on a grid?
-                        </p>
-                        <p className="text-slate-400 text-sm">
-                          Longer words score more. The highest-scoring {upper}-word is worth{' '}
-                          <span className="text-neo-lime font-bold">{getWordScore(words[words.length - 1])}pt</span>.
-                        </p>
-                      </div>
-                      <PulseCTA href={`/${locale}/quick-play`} color="cyan" className="text-sm">
-                        Try It Free →
-                      </PulseCTA>
+                  <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 border-s-4 border-neo-cyan ps-4">
+                    <div className="flex-1">
+                      <p className="font-bold text-neo-white">
+                        Can you spot {len}-letter {upper}-words on a grid?
+                      </p>
+                      <p className="text-neo-cream/70 text-sm">
+                        Longer words score more. The highest-scoring {upper}-word is worth{' '}
+                        <span className="text-neo-lime font-bold">{getWordScore(words[words.length - 1])}pt</span>.
+                      </p>
                     </div>
-                  </ScrollReveal>
+                    <Link href={`/${locale}/quick-play`} data-press className={SECONDARY_CTA}>
+                      Try It Free →
+                    </Link>
+                  </div>
                 )}
 
-                {/* Inline CTA after 4th group */}
                 {groupIndex === 3 && sortedLengths.length > 4 && (
-                  <ScrollReveal delay={0.1} direction="left" className="mt-6">
-                    <div className="bg-neo-navy border-2 border-neo-pink rounded-neo p-4 shadow-hard-sm flex flex-col sm:flex-row items-start sm:items-center gap-3">
-                      <div className="flex-1">
-                        <p className="font-bold text-neo-white">
-                          Challenge a friend to find {upper}-words
-                        </p>
-                        <p className="text-slate-400 text-sm">
-                          Real-time 1v1 word battle — same grid, who finds more?
-                        </p>
-                      </div>
-                      <PulseCTA href={`/${locale}/multiplayer`} color="pink" className="text-sm">
-                        Play Multiplayer →
-                      </PulseCTA>
+                  <div className="mt-6 flex flex-col sm:flex-row sm:items-center gap-3 border-s-4 border-neo-pink ps-4">
+                    <div className="flex-1">
+                      <p className="font-bold text-neo-white">
+                        Challenge a friend to find {upper}-words
+                      </p>
+                      <p className="text-neo-cream/70 text-sm">
+                        Real-time 1v1 word battle — same grid, who finds more?
+                      </p>
                     </div>
-                  </ScrollReveal>
+                    <Link href={`/${locale}/multiplayer`} data-press className={SECONDARY_CTA}>
+                      Play Multiplayer →
+                    </Link>
+                  </div>
                 )}
               </div>
             ))}
@@ -346,71 +281,73 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
 
           <InlineBannerAd webZone="content-page" className="mt-10" />
 
+          <div className="mt-12 max-w-2xl space-y-3">
+            {letterInfo && (
+              <p className="text-neo-cream/85 text-lg leading-relaxed">{letterInfo.intro}</p>
+            )}
+            <p className="text-neo-cream/70 leading-relaxed">
+              Complete list of words starting with {upper}, from {sortedLengths[0]}-letter
+              to {sortedLengths[sortedLengths.length - 1]}-letter words. Each word shows its
+              game score — tap any word for its definition.
+            </p>
+          </div>
+
           {/* FAQ section — renders as FAQ rich snippet in Google */}
-          <ScrollReveal className="mt-12 pt-8 border-t-2 border-slate-700">
-            <h2 className="text-2xl font-neo-display font-black text-neo-lime mb-6">
+          <section className="mt-10 max-w-2xl">
+            <h2 className="text-2xl font-neo-display font-black text-neo-lime mb-3">
               Frequently Asked Questions
             </h2>
-            <div className="space-y-4">
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group" open>
+            <div className="divide-y divide-neo-cream/15">
+              <details className="group py-4" open>
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   How many words start with {upper}?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
                   <p>
                     There are <strong className="text-neo-lime">{totalWords} words</strong> that start with the letter {upper} in the
                     LexiClash dictionary, ranging from {sortedLengths[0]} to {sortedLengths[sortedLengths.length - 1]} letters long.
                     The most common lengths are {sortedLengths.filter(l => (grouped[l]?.length ?? 0) > 5).slice(0, 3).join(', ')} letters.
                   </p>
-                  {letterInfo && (
-                    <p className="text-slate-400">{letterInfo.funFact}</p>
-                  )}
+                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.funFact}</p>}
                 </div>
               </details>
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
+              <details className="group py-4">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   What are common words that start with {upper}?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
                   <p>
                     Some popular {upper}-words include{' '}
                     <strong>{words.slice(0, 8).map(w => w.toUpperCase()).join(', ')}</strong>.
                     Browse the full list above organized by word length, with game scores for each word.
                   </p>
-                  {letterInfo && (
-                    <p className="text-slate-400">{letterInfo.intro}</p>
-                  )}
+                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.intro}</p>}
                 </div>
               </details>
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
+              <details className="group py-4">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   How can I practice words starting with {upper}?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <div className="mt-3 text-slate-300 text-sm leading-relaxed space-y-2">
+                <div className="mt-3 text-neo-cream/80 text-sm leading-relaxed space-y-2">
                   <p>
                     LexiClash is a free word game where you find words on a letter grid under time pressure.
                     It&apos;s the best way to practice vocabulary and improve your word skills.
                   </p>
-                  {letterInfo && (
-                    <p className="text-slate-400">{letterInfo.strategy}</p>
-                  )}
-                  <Link
-                    href={`/${locale}/quick-play`}
-                    className="inline-block bg-neo-lime text-neo-black font-bold px-4 py-2 rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-[box-shadow,translate,scale,rotate,transform] text-sm"
-                  >
+                  {letterInfo && <p className="text-neo-cream/70">{letterInfo.strategy}</p>}
+                  <Link href={`/${locale}/quick-play`} className="inline-block font-bold text-neo-cyan hover:underline">
                     Start Practicing →
                   </Link>
                 </div>
               </details>
-              <details className="bg-neo-navy border-2 border-slate-700 rounded-neo p-4 group">
+              <details className="group py-4">
                 <summary className="font-bold text-neo-white cursor-pointer list-none flex items-center justify-between">
                   What is the highest-scoring {upper}-word?
-                  <span className="text-slate-500 group-open:rotate-180 transition-transform">▾</span>
+                  <span className="text-neo-cream/50 group-open:rotate-180 transition-transform">▾</span>
                 </summary>
-                <p className="mt-3 text-slate-300 text-sm leading-relaxed">
+                <p className="mt-3 text-neo-cream/80 text-sm leading-relaxed">
                   The highest-scoring word starting with {upper} is{' '}
                   <strong className="text-neo-lime">{words[words.length - 1]?.toUpperCase()}</strong> worth{' '}
                   <strong className="text-neo-cyan">{getWordScore(words[words.length - 1])} points</strong>.
@@ -418,39 +355,38 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
                 </p>
               </details>
             </div>
-          </ScrollReveal>
+          </section>
 
-          <ScrollReveal direction="scale" className="mt-10">
-            <div className="bg-linear-to-r from-neo-lime/10 to-neo-pink/10 border-3 border-neo-lime rounded-neo p-6 shadow-hard text-center">
-              <p className="font-neo-display font-black text-2xl text-neo-white mb-2">
-                Ready to test your {upper}-word skills?
-              </p>
-              <p className="text-slate-300 mb-4 max-w-md mx-auto">
-                Free word game — no download, no signup. Find words on a grid against the clock.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <PulseCTA href={`/${locale}/quick-play`} color="lime">
-                  Play Solo →
-                </PulseCTA>
-                <PulseCTA href={`/${locale}/multiplayer`} color="pink">
-                  Challenge a Friend →
-                </PulseCTA>
-              </div>
+          <div className="mt-10 border-2 border-neo-black rounded-neo bg-neo-navy-light/50 p-6 text-center">
+            <p className="font-neo-display font-black text-2xl text-neo-white mb-2">
+              Ready to test your {upper}-word skills?
+            </p>
+            <p className="text-neo-cream/70 mb-5 max-w-md mx-auto">
+              Free word game — no download, no signup. Find words on a grid against the clock.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link href={`/${locale}/quick-play`} data-press className={PRIMARY_CTA}>
+                Play Solo →
+              </Link>
+              <Link href={`/${locale}/multiplayer`} data-press className={SECONDARY_CTA}>
+                Challenge a Friend →
+              </Link>
             </div>
-          </ScrollReveal>
+          </div>
 
-          <div className="mt-12 pt-8 border-t-2 border-slate-700">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-4">Browse All Letters</h2>
+          <div className="mt-12 pt-8 border-t-2 border-neo-cream/15">
+            <h2 className={`${SECTION_LABEL} mb-4`}>Browse All Letters</h2>
             <div className="flex flex-wrap gap-1.5">
               {VALID_LETTERS.map((l: string) => (
                 <Link
                   key={l}
                   href={`/${locale}/words/starting-with/${l}`}
-                  className={`w-8 h-8 flex items-center justify-center rounded-neo text-sm font-bold uppercase transition-colors border ${
+                  data-press
+                  className={
                     l === letter
-                      ? 'bg-neo-lime text-neo-black border-neo-black'
-                      : 'bg-neo-navy-light border-slate-700 hover:border-neo-cyan hover:text-neo-lime'
-                  }`}
+                      ? 'w-9 h-9 flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black text-sm font-bold uppercase'
+                      : `${CHIP} w-9 h-9 flex items-center justify-center text-sm font-bold uppercase`
+                  }
                   aria-current={l === letter ? 'page' : undefined}
                 >
                   {l}
@@ -460,22 +396,17 @@ export default async function StartingWithLetterPage({ params }: PageParams) {
           </div>
 
           <div className="mt-6">
-            <h2 className="text-sm font-bold text-neo-cyan uppercase tracking-wider mb-4">Browse by Word Length</h2>
+            <h2 className={`${SECTION_LABEL} mb-4`}>Browse by Word Length</h2>
             <div className="flex flex-wrap gap-2">
               {VALID_LENGTHS.map(l => (
-                <Link
-                  key={l}
-                  href={`/${locale}/words/${l}-letter-words`}
-                  className="text-sm bg-neo-navy-light border border-slate-700 rounded-neo px-3 py-1.5 hover:border-neo-cyan transition-colors"
-                >
+                <Link key={l} href={`/${locale}/words/${l}-letter-words`} data-press className={`${CHIP} text-sm px-3 py-1.5`}>
                   {l}-letter words
                 </Link>
               ))}
             </div>
           </div>
-
         </div>
-      </div>
+      </PressGroup>
     </>
   );
 }
