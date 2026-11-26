@@ -17,9 +17,8 @@ import { getGuestStats } from '@/utils/guestManager';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { trackGrowthEvent, trackSignupFunnel } from '@/utils/growthTracking';
 import { hasPostGameCompleted, markPostGameCompleted, hasResultsInlineShownThisSession } from '@/lib/auth/signupPromptCoordination';
+import { MP_SESSION_GAMES_KEY, readMpSessionGames } from '@/lib/multiplayer/mpSessionGames';
 
-// Session-scoped MP game counter (separate from global guest stats)
-const MP_SESSION_GAMES_KEY = 'boggle_mp_session_games';
 const MP_NUDGE_SHEET_SHOWN_KEY = 'boggle_mp_nudge_sheet_shown';
 const MP_NUDGE_TOAST_SHOWN_KEY = 'boggle_mp_nudge_toast_shown';
 
@@ -51,10 +50,7 @@ interface UseMultiplayerSignupNudgeReturn {
   shouldPulseCoins: boolean;
 }
 
-function getMpSessionGames(): number {
-  if (typeof window === 'undefined') return 0;
-  return parseInt(sessionStorage.getItem(MP_SESSION_GAMES_KEY) || '0', 10);
-}
+const getMpSessionGames = readMpSessionGames;
 
 function setMpSessionGames(count: number): void {
   if (typeof window === 'undefined') return;

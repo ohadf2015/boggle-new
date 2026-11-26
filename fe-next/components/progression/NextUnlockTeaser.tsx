@@ -23,6 +23,8 @@ export interface ResultsXp {
 export interface NextUnlockTeaserProps {
   mode?: ResultsMode;
   xp?: ResultsXp | null;
+  /** Guests: show nothing here instead of the sign-in-to-keep card (MP holds it for early games). */
+  holdGuestSave?: boolean;
 }
 
 const none = () => null;
@@ -51,7 +53,7 @@ function useTrustedTotal(xp: ResultsXp | null | undefined, signedIn: boolean): n
   return null;
 }
 
-export function NextUnlockTeaser({ mode, xp }: NextUnlockTeaserProps = {}) {
+export function NextUnlockTeaser({ mode, xp, holdGuestSave = false }: NextUnlockTeaserProps = {}) {
   const { user, profile, loading } = useAuth();
   const { t, language } = useLanguage();
   const levelUp = useSyncExternalStore(subscribeLevelUp, getPendingLevelUp, none);
@@ -63,7 +65,7 @@ export function NextUnlockTeaser({ mode, xp }: NextUnlockTeaserProps = {}) {
   const gained = Math.max(0, xp?.gained ?? 0);
   let body: ReactNode = null;
   if (!loading && !user) {
-    body = <GuestSaveCard gained={gained} />;
+    body = holdGuestSave ? null : <GuestSaveCard gained={gained} />;
   } else if (!loading && profile) {
     const total = trustedTotal ?? profile.total_xp ?? 0;
     const moment = gained > 0 && trustedTotal != null ? buildXpMoment(gained, trustedTotal) : null;

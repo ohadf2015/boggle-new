@@ -32,10 +32,14 @@ export interface ResultsSocialSlotProps {
   onRematch?: () => void;
   /** Server XP for this game (null until it arrives, or for modes that award none). */
   xp?: ResultsXp | null;
+  /** Hold the public-name prompt back on this screen (MP: a guest's first game). */
+  holdNamePrompt?: boolean;
+  /** Hold the guest "sign in to keep your XP" card back on this screen. */
+  holdGuestSave?: boolean;
 }
 
 /** The one social block every results screen mounts: name prompt, new record, rival, next unlock. */
-export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch, xp }: ResultsSocialSlotProps) {
+export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, previousBest, subMode, date, rival: given, onRematch, xp, holdNamePrompt = false, holdGuestSave = false }: ResultsSocialSlotProps) {
   const { loading, isAuthenticated } = useAuth();
   const { language } = useLanguage();
   const [fetched, setFetched] = useState<RivalSummary | null>(null);
@@ -76,8 +80,8 @@ export function ResultsSocialSlot({ mode, score, rivalScore, opponentUserIds, pr
       <NewRecordBanner mode={mode} score={score} />
       {mode !== 'edu' && <WorldRecordChip mode={mode} subMode={subMode} score={score} />}
       {rival && <RivalCard rival={rival} mode={mode} onRematch={onRematch} />}
-      <PublicNamePrompt mode={mode} />
-      <NextUnlockTeaser mode={mode} xp={xp} />
+      {!holdNamePrompt && <PublicNamePrompt mode={mode} />}
+      <NextUnlockTeaser mode={mode} xp={xp} holdGuestSave={holdGuestSave} />
     </div>
   );
 }

@@ -46,6 +46,12 @@ describe('NextUnlockTeaser', () => {
     expect(screen.queryByTestId('next-unlock-teaser')).toBeNull();
   });
 
+  it('Given holdGuestSave, Then a guest sees no sign-in card (MP holds it for early games)', () => {
+    auth.value = { loading: false, user: null, profile: null, isGuest: true };
+    const { container } = render(<NextUnlockTeaser holdGuestSave />);
+    expect(container.querySelector('[data-testid="next-unlock-guest"]')).toBeNull();
+  });
+
   it('signed-in players see Lv now -> Lv unlock with rarity and an XP bar', () => {
     auth.value = { loading: false, user: { id: 'u1' }, profile: { total_xp: getXpForLevel(3) } };
     render(<NextUnlockTeaser />);
