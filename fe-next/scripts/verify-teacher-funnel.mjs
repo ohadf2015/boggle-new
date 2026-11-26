@@ -8,12 +8,16 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { registerHooks } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { assertDisposableSupabase } from './disposableSupabase.mjs';
+import { assertDisposableSupabase, stripHostedSupabaseEnv } from './disposableSupabase.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const feNext = join(here, '..');
 
 if (!process.env.VERIFY_TEACHER_FUNNEL_HOOKED) {
+  const childEnv = { ...process.env, VERIFY_TEACHER_FUNNEL_HOOKED: '1', LD_LIBRARY_PATH: '' };
+  // A shell that already points at LexiClash prod must not be inherited. The child
+  // only talks to the local stub it starts below.
+  stripHostedSupabaseEnv(childEnv);
   const child = spawnSync(process.execPath, [
     '--import', 'tsx',
     '--import', join(here, 'verify-teacher-funnel-register.mjs'),
@@ -21,12 +25,14 @@ if (!process.env.VERIFY_TEACHER_FUNNEL_HOOKED) {
   ], {
     stdio: 'inherit',
     cwd: feNext,
-    env: { ...process.env, VERIFY_TEACHER_FUNNEL_HOOKED: '1', LD_LIBRARY_PATH: '' },
+    env: childEnv,
   });
   process.exit(child.status ?? 1);
 }
 
 // Sync hook — module.register() from --import loses the race against route imports.
+// Strip again in this process: a direct --import run must not keep a hosted URL either.
+stripHostedSupabaseEnv(process.env);
 const shimUrl = pathToFileURL(join(here, 'verify-teacher-funnel-next-headers.mjs')).href;
 registerHooks({
   resolve(specifier, context, nextResolve) {

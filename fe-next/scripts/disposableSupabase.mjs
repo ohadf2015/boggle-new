@@ -18,3 +18,20 @@ export function assertDisposableSupabase(url) {
     throw err;
   }
 }
+
+/** Keys a Supabase client reads. A harness that inherits prod env must not keep these. */
+const HOSTED_ENV_KEYS = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_URL'];
+
+/**
+ * Delete hosted project URLs from `env` before any client is constructed.
+ * Returns the keys that were stripped. Loopback and branch URLs are left alone.
+ */
+export function stripHostedSupabaseEnv(env) {
+  const stripped = [];
+  for (const key of HOSTED_ENV_KEYS) {
+    if (!isHostedSupabaseUrl(env[key])) continue;
+    stripped.push(key);
+    delete env[key];
+  }
+  return stripped;
+}
