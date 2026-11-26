@@ -117,10 +117,10 @@ describe('nextModeForViewer', () => {
     expect(nextModeForViewer({ isHost: true, hostPick: 'random' })).toBe('random');
   });
 
-  it('a joiner never sees a guessed mode: the server does not send the host pick, so their store holds its "random" default', () => {
-    // Round-1 capture: host card read CLASSIC while every joiner read SURPRISE MODE.
+  it('a joiner sees the pick the server relayed, and nothing guessed before it arrives', () => {
+    expect(nextModeForViewer({ isHost: false, hostPick: 'classic', relayed: 'blast' })).toBe('blast');
     expect(nextModeForViewer({ isHost: false, hostPick: 'random' })).toBeNull();
-    expect(nextModeForViewer({ isHost: false, hostPick: 'classic' })).toBeNull();
+    expect(nextModeForViewer({ isHost: false, hostPick: 'classic', relayed: null })).toBeNull();
   });
 });
 

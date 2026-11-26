@@ -211,3 +211,29 @@ describe('PortraitLayout desktop-shell timer suppression', () => {
     expect(timers.length).toBeGreaterThan(0);
   });
 });
+
+describe('PortraitLayout desktop side columns stay symmetric (board centred)', () => {
+  const board = [['A', 'B'], ['C', 'D']];
+  const lb = [{ username: 'testuser', score: 3 }, { username: 'rival', score: 5 }];
+  const sideColumns = (c: HTMLElement) => c.querySelectorAll('div.lg\\:w-56');
+  const props = (over: Record<string, unknown>) => ({
+    username: 'testuser', gameCode: 'ABC123', isHost: false, isPlaying: true, t: (k: string) => k, dir: 'ltr' as const,
+    letterGrid: board, remainingTime: 60, timerValue: 1, gameActive: true, showStartAnimation: false, gameLanguage: 'en' as const,
+    comboLevel: 0, lastWordTime: null, fireRoundActive: false, minWordLength: 2, hasAnimated: true, earthquakeState: 'idle' as const,
+    playerScore: 0, playerRank: 1, leaderboard: lb, deferredLeaderboard: lb, foundWords: [], currentFeedback: null,
+    isTypingMode: false, typedWord: '', highlightedCells: [], lastWordFoundTime: 0, onExitRoom: vi.fn(), onShowTutorial: vi.fn(),
+    onWordSubmit: vi.fn(), onWordChange: vi.fn(), onSingleTapDetected: vi.fn(), fireRoundRemaining: 0, isDesktop: true,
+    isHelpOpen: false, onCloseHelp: vi.fn(), tournamentData: null, totalBoardWords: null, gameStatsRef: { current: null }, onTimerState: vi.fn(),
+    gameplayFocusMode: false, ...over,
+  });
+
+  it('focus mode with rivals renders a column on BOTH sides of the board', () => {
+    const { container } = render(<PortraitLayout {...(props({ gameplayFocusMode: true }) as never)} />);
+    expect(sideColumns(container)).toHaveLength(2);
+  });
+
+  it('inside the desktop shell renders neither column (the shell supplies the rails)', () => {
+    const { container } = render(<PortraitLayout {...(props({ inDesktopShell: true }) as never)} />);
+    expect(sideColumns(container)).toHaveLength(0);
+  });
+});

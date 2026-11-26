@@ -109,12 +109,12 @@ describe('MpResultsStage layout', () => {
     expect(screen.getByTestId('mp-results-stage').className).toMatch(/lg:items-start/);
   });
 
-  it('Given the host on an intermission, Then NEXT UP is a small chip by the primary, not a card in the body', () => {
+  it('Given the host on an intermission, Then every next mode is one tap away in the footer, right above the primary', () => {
     renderAt(1, true);
     const next = screen.getByTestId('mp-next-mode');
     expect(screen.getByTestId('mp-results-footer')).toContainElement(next);
     expect(screen.getByTestId('mp-results-body')).not.toContainElement(next);
-    expect(next.className).toMatch(/\brounded-full\b/);
+    expect(within(next).getAllByRole('radio')).toHaveLength(5);
     expect(next.textContent).not.toContain('hook');
   });
 
@@ -146,7 +146,7 @@ describe('MpResultsStage layout', () => {
   it('Given the series final, When the host views it, Then the host can still change the mode for the rematch', async () => {
     renderAt(3, true);
     await waitFor(() => expect(screen.getByTestId('mp-results-stage').getAttribute('data-branch')).toBe('final'));
-    expect(screen.getByTestId('mp-next-mode').tagName).toBe('BUTTON');
+    expect(within(screen.getByTestId('mp-next-mode')).getAllByRole('radio').length).toBeGreaterThan(0);
   });
 });
 

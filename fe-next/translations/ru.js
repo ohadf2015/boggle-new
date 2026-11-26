@@ -19459,7 +19459,8 @@ const ru = {
     "photosensitivity": "Скоро мигающие огни. Отключить можно в настройках",
     "fireRound": "🔥 РАУНД ОГНЯ",
     "multiplier": "2× ВСЁ",
-    "effect": "Доска заменена целиком. Набирай быстро: очки 2×"
+    "effect": "Доска заменена целиком. Набирай быстро: очки 2×",
+    "fireChip": "ОГОНЬ ×2"
   },
   "mpModeBreakdown": {
     "title": "Разбор раунда",
@@ -21446,6 +21447,7 @@ const ru = {
     "results": {
       "time": "Время вышло!",
       "finalTitle": "Итоги",
+      "nextLabel": "Следующий раунд",
       "roundDone": "Раунд {round}/{total} окончен",
       "details": "Подробнее",
       "detailsTitle": "Детали битвы",

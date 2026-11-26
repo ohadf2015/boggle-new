@@ -5,6 +5,7 @@ import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { MpBackButton, MpHudBar, MpRankChip, MpScoreChip, MpTimer, type MpScoreGain, type MpTimerColor } from '../shell';
 import { MpComboMeter } from './MpComboMeter';
+import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
 import { MpRoundMute } from './MpRoundMute';
 import { QuietBoundary } from './QuietBoundary';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
@@ -82,15 +83,18 @@ function MpRoundHudImpl({ remainingTime, totalTime, score, gain, rank, total, ra
         </>
       }
       center={
-        !timerHidden && (
-          <MpTimer
-            remainingSec={remainingTime}
-            totalSec={Math.max(totalTime, 1)}
-            size={timerSize}
-            colorFamily={timerColor}
-            suppressUrgency={timerGentle}
-          />
-        )
+        <>
+          {!timerHidden && (
+            <MpTimer
+              remainingSec={remainingTime}
+              totalSec={Math.max(totalTime, 1)}
+              size={timerSize}
+              colorFamily={timerColor}
+              suppressUrgency={timerGentle}
+            />
+          )}
+          <span {...{ [HUD_FIRE_SLOT]: '' }} className="inline-flex empty:hidden" />
+        </>
       }
       end={
         <>

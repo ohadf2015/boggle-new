@@ -974,7 +974,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     radial-gradient(120% 80% at 50% 0%, rgb(255 255 255 / 0.08), transparent 62%),
     #20234a;
   border: 4px solid rgb(var(--neo-black));
-  box-shadow: 6px 6px 0px rgb(var(--neo-black));
+  box-shadow: 0 6px 0 rgb(var(--neo-black));
   border-radius: var(--radius-lg);
   padding: 6px;
   /* Simplified sizing using vmin to prevent layout shift on orientation change */
@@ -1080,11 +1080,6 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-  }
-
-  /* RTL-aware hard shadow for game board frame */
-  [dir='rtl'] & {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
   }
 
   /* Practice sandbox: live game's desktop sizing (`100vw - 500px`) assumes
@@ -1343,14 +1338,10 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
 @utility blast-grid-frame {
   /* Blast grid frame styling */
   border: 4px solid rgb(var(--neo-black));
-  box-shadow: 6px 6px 0px rgb(var(--neo-black));
+  box-shadow: 0 6px 0 rgb(var(--neo-black));
   border-radius: 8px;
   padding: 3px;
   background: rgba(26, 26, 46, 0.6);
-
-  [dir='rtl'] & {
-    box-shadow: -6px 6px 0px rgb(var(--neo-black));
-  }
 }
 
 @utility clipboard-clip {

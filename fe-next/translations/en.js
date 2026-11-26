@@ -3901,7 +3901,8 @@ const en = {
     "photosensitivity": "Flashing lights coming. Disable in Settings",
     "fireRound": "🔥 FIRE ROUND",
     "multiplier": "2× EVERYTHING",
-    "effect": "The whole board is replaced. Score fast for 2× points"
+    "effect": "The whole board is replaced. Score fast for 2× points",
+    "fireChip": "FIRE ×2"
   },
   "effects": {
     "preferenceTitle": "Animation Settings",
@@ -20745,6 +20746,7 @@ const en = {
     "results": {
       "time": "Time!",
       "finalTitle": "Final results",
+      "nextLabel": "Next round",
       "roundDone": "Round {round}/{total} done",
       "details": "Details",
       "detailsTitle": "Battle details",

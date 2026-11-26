@@ -4300,7 +4300,8 @@ const ja = {
     "photosensitivity": "点滅注意！設定で無効化できます",
     "fireRound": "🔥 ファイアラウンド",
     "multiplier": "全て2倍",
-    "effect": "ボード全体が入れ替わる。急いで得点して2倍ボーナス"
+    "effect": "ボード全体が入れ替わる。急いで得点して2倍ボーナス",
+    "fireChip": "炎 ×2"
   },
   "effects": {
     "preferenceTitle": "アニメーション設定",
@@ -21724,6 +21725,7 @@ const ja = {
     "results": {
       "time": "タイムアップ！",
       "finalTitle": "最終結果",
+      "nextLabel": "次のラウンド",
       "roundDone": "ラウンド {round}/{total} 終了",
       "details": "詳細",
       "detailsTitle": "バトル詳細",

@@ -31,6 +31,7 @@ import { Pause, Play, Timer, X } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { WordFormingAreaConnected } from '@/components/game/in-game/components/WordFormingAreaConnected';
 import { GameOverlays } from '@/components/game/in-game/components/GameOverlays';
+import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
 import FloatingScoreAnimation from '@/components/game/FloatingScoreAnimation';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
@@ -269,6 +270,7 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
             </div>
           )}
 
+          <span {...{ [HUD_FIRE_SLOT]: '' }} className="ms-2 inline-flex empty:hidden" />
           <div className="flex-1" />
 
           {onPauseToggle && (
