@@ -248,7 +248,7 @@ function ClassMenu({ classrooms, selected, onSelect, capLabel, newClassHref, cla
         {label}
         <ChevronDown className="size-6 shrink-0 sm:size-8" aria-hidden="true" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo border-2 border-edu-line bg-edu-surface p-1 shadow-hard">
+      <DropdownMenuContent align="start" className="max-h-80 w-64 overflow-y-auto rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-1.5 shadow-edu-lip">
         {several ? classrooms.map((c) => (
           <DropdownMenuItem key={c.id} data-testid="home-class-option" onSelect={() => onSelect(c.id)} className={MENU_ROW}>
             <Check className={cn('size-4 shrink-0', c.id === selected?.id ? 'opacity-100' : 'opacity-0')} aria-hidden="true" />
