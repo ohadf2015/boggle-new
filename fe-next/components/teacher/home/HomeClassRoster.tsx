@@ -14,7 +14,7 @@ type T = (key: string, params?: Record<string, string | number>) => string;
 
 const STATUSES: readonly RosterStatus[] = ['done', 'late', 'idle'];
 // Every cell is placed explicitly so a narrow box falls back to the two-line phone row, never a wrapped grid.
-const COLS = 'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 @md/roster:grid-cols-[minmax(7rem,12rem)_minmax(5.5rem,1fr)_5.5rem_4.5rem] @md/roster:gap-x-4 @[40rem]/list:grid-cols-[minmax(7rem,12rem)_5.5rem_minmax(6rem,1fr)_5.5rem_4.5rem]';
+const COLS = 'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 @md/roster:grid-cols-[minmax(7rem,12rem)_minmax(7rem,1fr)_5.5rem_4.5rem] @md/roster:gap-x-4 @[40rem]/list:grid-cols-[minmax(7rem,12rem)_7rem_minmax(6rem,1fr)_5.5rem_4.5rem]';
 const CELL = {
   name: 'col-start-1 row-start-1',
   status: 'col-start-1 row-start-2 ps-10 @md/roster:col-start-2 @md/roster:row-start-1 @md/roster:ps-0',

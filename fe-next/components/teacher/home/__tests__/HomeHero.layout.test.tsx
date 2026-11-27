@@ -81,6 +81,7 @@ describe('<HomeHero> layout', () => {
     expect(chips).toContainElement(screen.getByTestId('rehearse'));
     expect(chips).toContainElement(screen.getByTestId('home-pick-game'));
     expect(chips.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
+    expect(chips.className).toContain('[&>*]:grow');
   });
 
   it('Given a greeting on Home, Then it is one plain line above the desk, and the mascot sits in the desk once, hidden from readers', () => {

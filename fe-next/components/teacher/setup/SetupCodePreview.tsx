@@ -21,7 +21,7 @@ export function SetupCodePreview({ name, t }: { name: string; t: T }) {
         <p dir="auto" className={cn('line-clamp-1 font-neo-display text-xl font-black leading-tight [overflow-wrap:anywhere] sm:line-clamp-2 sm:text-3xl', !typed && 'text-edu-ink/45')}>
           {typed || t('eduShell.setup.codePending')}
         </p>
-        <p className="mt-1 hidden font-neo-body text-sm font-bold text-edu-ink/80 sm:block">{t('eduShell.setup.side.step2')}</p>
+        <p className="mt-1 hidden font-neo-body text-sm font-bold text-edu-ink/80 sm:block [@media(min-width:1024px)_and_(max-height:860px)]:hidden">{t('eduShell.setup.side.step2')}</p>
       </div>
       <Pop pulseKey={typed ? typed.length : 0} className="shrink-0">
         <div dir="ltr" className="flex gap-1 sm:gap-2">

@@ -162,7 +162,7 @@ export function HomeHero({
             </PressSurface>
           )}
           {rehearse || replay?.kind === 'ready' ? (
-            <div data-testid="home-hero-chips" className={cn('flex min-w-0 flex-wrap items-stretch gap-3', desk && 'lg:grid lg:flex-[2] lg:auto-cols-fr lg:grid-flow-col')}>
+            <div data-testid="home-hero-chips" className={cn('flex min-w-0 flex-wrap items-stretch gap-3 [&>*]:grow [&>*]:basis-56', desk && 'lg:grid lg:flex-[2] lg:auto-cols-fr lg:grid-flow-col')}>
               {rehearse}
               {replay?.kind === 'ready' ? (
                 <PressSurface asChild lip={4} className={HERO_PICK}>

@@ -70,10 +70,10 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
       }}
       className="flex flex-col gap-3"
     >
-      <div className="flex flex-col gap-5 py-2 sm:gap-6">
+      <div className="flex flex-col gap-5 py-2 sm:gap-6 [@media(min-width:1024px)_and_(max-height:860px)]:gap-3 [@media(min-width:1024px)_and_(max-height:860px)]:py-0">
         <div className="flex items-center gap-3">
-          <EduMascot moment="success" size={112} className="size-16 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-24" />
-          <h1 data-wipe className="font-neo-display text-5xl font-black leading-none text-edu-ink sm:text-6xl">{t('eduShell.setup.title')}</h1>
+          <EduMascot moment="success" size={112} className="size-16 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-24 [@media(min-width:1024px)_and_(max-height:860px)]:size-16" />
+          <h1 data-wipe className="font-neo-display text-5xl font-black leading-none text-edu-ink sm:text-6xl [@media(min-width:1024px)_and_(max-height:860px)]:text-5xl">{t('eduShell.setup.title')}</h1>
         </div>
 
         <div data-testid="setup-name-card" className="edu-card flex flex-col gap-2 p-4 sm:p-5">
@@ -179,7 +179,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           data-hero="true"
           disabled={busy !== null}
           aria-busy={busy === 'live' || undefined}
-          className={cn(NB_PRIMARY_FACE, 'min-h-[80px] w-full text-3xl sm:min-h-[88px] sm:text-4xl', busy === 'done' && 'disabled:opacity-100')}
+          className={cn(NB_PRIMARY_FACE, 'min-h-[80px] w-full text-3xl sm:min-h-[88px] sm:text-4xl [@media(min-width:1024px)_and_(max-height:860px)]:min-h-[64px] [@media(min-width:1024px)_and_(max-height:860px)]:text-3xl', busy === 'done' && 'disabled:opacity-100')}
         >
           {busy === 'live' ? <Loader2 className="size-7 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {busy === 'done' ? <Check className="size-7" strokeWidth={3} aria-hidden="true" /> : null}

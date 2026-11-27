@@ -278,3 +278,12 @@ describe('<HomeClassRoster>', () => {
     expect(screen.queryByTestId('home-roster-filter')).toBeNull();
   });
 });
+
+describe('HomeClassRoster status column', () => {
+  it('Then the week column is 7rem wide at every breakpoint, so Hebrew "needs to catch up" fits its pill untruncated', () => {
+    renderRoster();
+    const head = screen.getByTestId('home-roster-head').className;
+    expect(head).toContain('@md/roster:grid-cols-[minmax(7rem,12rem)_minmax(7rem,1fr)_5.5rem_4.5rem]');
+    expect(head).toContain('@[40rem]/list:grid-cols-[minmax(7rem,12rem)_7rem_minmax(6rem,1fr)_5.5rem_4.5rem]');
+  });
+});

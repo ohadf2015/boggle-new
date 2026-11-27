@@ -206,3 +206,13 @@ describe('ClassSetupDetails own words field', () => {
     expect(screen.getAllByTestId('setup-dropped-word').map((w) => w.textContent)).toEqual(['electromagnetism-induction', 'x', '42']);
   });
 });
+
+describe('ClassSetupDetails on a short laptop screen', () => {
+  const SHORT = '[@media(min-width:1024px)_and_(max-height:860px)]:';
+  it('Then the title, the gaps and Create class shrink so Create stays above the fold at 1366x768', () => {
+    renderDetails();
+    expect(screen.getByRole('heading', { level: 1 }).className).toContain(`${SHORT}text-5xl`);
+    expect(screen.getByTestId('setup-start-live').className).toContain(`${SHORT}min-h-[64px]`);
+    expect(screen.getByTestId('setup-step-details').firstElementChild!.className).toContain(`${SHORT}gap-3`);
+  });
+});

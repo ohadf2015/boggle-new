@@ -63,7 +63,7 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
             target="_blank"
             rel="noopener"
             data-testid="home-share-print"
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-edu-line px-4 font-neo-body text-sm font-bold text-edu-ink hover:bg-edu-surface focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-4 font-neo-body text-sm font-bold text-edu-ink shadow-edu-lip-sm hover:bg-edu-tile active:translate-y-[3px] active:shadow-none motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <Printer className="size-4" aria-hidden="true" />
             {t('teacher.joinSheet.printAria')}
