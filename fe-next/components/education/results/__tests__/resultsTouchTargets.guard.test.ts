@@ -29,7 +29,7 @@ describe('round-end and reports controls: sizes', () => {
   });
 
   it('the coverage "more" toggle is 44px tall', () => {
-    expect(read('components/education/results/WordCoverageGlance.tsx')).toMatch(/'min-h-11 hover:bg-edu-surface[^']*focus-visible:ring-4/);
+    expect(read('components/education/results/WordCoverageGlance.tsx')).toMatch(/'min-h-11 [^']*focus-visible:ring-4/);
   });
 });
 

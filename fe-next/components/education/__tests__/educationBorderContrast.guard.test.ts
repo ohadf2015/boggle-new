@@ -150,6 +150,28 @@ function scan(): Violation[] {
     const src = fs.readFileSync(file, 'utf8');
     for (const m of src.matchAll(CLASS_ATTR)) {
       const raw = m[1] ?? m[2] ?? quotedFragments(m[3] ?? '');
+      // A dual-skin class list (shared with dark pages) keeps master's classes for the dark
+      // render and overrides them with `edu-sky:` twins: judge each render on its own ground.
+      if (raw.includes('edu-sky:')) {
+        const words = raw.split(/\s+/).filter(Boolean);
+        const sky = words.filter((w) => w.startsWith('edu-sky:')).map((w) => w.slice('edu-sky:'.length));
+        const base = words.filter((w) => !w.includes(':'));
+        const colour = (w: string) => /^(bg|border(-[xytrblse])?)-(neo|edu)-/.test(w) || w === 'border-black';
+        const kind = (w: string) => (w.startsWith('bg-') ? 'bg' : 'border');
+        const overridden = (w: string) => colour(w) && sky.some((t) => colour(t) && kind(t) === kind(w));
+        check(file, base.join(' '), 'neo-navy', violations);
+        check(file, [...base.filter((w) => !overridden(w)), ...sky].join(' '), 'edu-surface', violations);
+        continue;
+      }
+      check(file, raw, isExtra(path.relative(REPO, file)) ? 'neo-navy' : 'edu-surface', violations);
+    }
+  }
+  return violations;
+}
+
+function check(file: string, raw: string, behindToken: string, violations: Violation[]): void {
+  {
+    {
       // Ternaries inside a backtick template (`${earned ? 'bg-neo-navy/50' : …}`)
       // leave quotes and `${` glued to the class — strip them or the token
       // never matches and the card scans green.
@@ -158,7 +180,7 @@ function scan(): Violation[] {
         .replace(/\s+/g, ' ')
         .split(' ')
         .filter(Boolean);
-      if (!tokens.some((t) => HAS_BORDER_WIDTH.test(t))) continue;
+      if (!tokens.some((t) => HAS_BORDER_WIDTH.test(t))) return;
 
       // Take the first token that RESOLVES, not the first that matches the
       // prefix: `border-neo-thick` is a width utility, and finding it first
@@ -178,25 +200,25 @@ function scan(): Violation[] {
         )
         .find((t): t is string => t !== null && resolve(t) !== null) ??
         (tokens.some((t) => BLACK_BY_DEFAULT.test(t)) ? 'neo-black' : undefined);
-      if (!bgToken || !border) continue;
+      if (!bgToken || !border) return;
 
       const bg = resolve(bgToken);
       const bd = resolve(border);
-      if (!bg || !bd) continue;
+      if (!bg || !bd) return;
 
       // A translucent fill (`bg-neo-pink/10`) sits on whatever is behind it:
       // a white sky card in the classroom, a navy card in adventure/wordTower.
       // Composite rather than skip: skipping is how the note-tile failures
       // (`border-neo-pink/40` on `bg-neo-pink/10` = 1.69:1) hid from an
       // earlier version of this check while it reported green.
-      const behind = TOKENS[isExtra(path.relative(REPO, file)) ? 'neo-navy' : 'edu-surface'];
+      const behind = TOKENS[behindToken];
       const ground = bg.alpha === 1 ? bg.rgb : over(bg.rgb, toRgb(behind), bg.alpha);
 
       const painted = over(bd.rgb, ground, bd.alpha);
       // Border painted identically to its fill = a deliberate solid block, not a
       // failed outline (a black button with a black border, a phone bezel). The
       // edge that matters there is against the PARENT, which this cannot see.
-      if (painted.every((c, i) => c === ground[i])) continue;
+      if (painted.every((c, i) => c === ground[i])) return;
 
       pairCount++;
       const r = ratio(painted, ground);
@@ -210,7 +232,6 @@ function scan(): Violation[] {
       }
     }
   }
-  return violations;
 }
 
 const EXTRA_ROOTS = [
