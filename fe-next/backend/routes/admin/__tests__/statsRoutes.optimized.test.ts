@@ -48,13 +48,20 @@ describe('statsService', () => {
 
     expect(mockRpc).toHaveBeenCalledTimes(4);
     expect(mockRpc).toHaveBeenCalledWith('admin_overview_stats');
-    expect(mockRpc).toHaveBeenCalledWith('admin_activity_stats');
+    expect(mockRpc).toHaveBeenCalledWith('admin_activity_stats', { p_tz: 'UTC' });
     expect(mockRpc).toHaveBeenCalledWith('admin_language_breakdown');
-    expect(mockRpc).toHaveBeenCalledWith('admin_real_games_stats');
+    expect(mockRpc).toHaveBeenCalledWith('admin_real_games_stats', { p_tz: 'UTC' });
     expect(result.overview.totalPlayers).toBe(100);
     expect(result.activity.gamesToday).toBe(10);
     expect(result.languages).toEqual({ en: 300, he: 100, sv: 50, ja: 50 });
     expect(result.realGames).toEqual({ total: 5678, today: 44, week: 469 });
+  });
+
+  it('passes the viewer timezone into the day-bucketed RPCs', async () => {
+    mockRpc.mockResolvedValue({ data: {}, error: null });
+    await fetchDashboardStats(mockSupabase as never, 'Asia/Jerusalem');
+    expect(mockRpc).toHaveBeenCalledWith('admin_activity_stats', { p_tz: 'Asia/Jerusalem' });
+    expect(mockRpc).toHaveBeenCalledWith('admin_real_games_stats', { p_tz: 'Asia/Jerusalem' });
   });
 
   it('should handle RPC errors gracefully', async () => {

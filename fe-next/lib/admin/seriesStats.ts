@@ -1,5 +1,7 @@
 /** Small pure helpers for daily series, shared by the education insights and the Overview pulse. */
 
+import { localDayElapsed } from './viewerTimeZone';
+
 export const sum = (xs: number[]): number => xs.reduce((a, b) => a + b, 0);
 
 /** Percent change, rounded; null when there is no baseline to compare against. */
@@ -29,8 +31,8 @@ export function momentum(daily: number[]): number | null {
 export const MIN_DAY_ELAPSED = 0.25;
 
 /** Today's expected total at its current pace and its change against a full yesterday; null early in the day. */
-export function dayPace(current: number, prior: number, nowMs: number): { projected: number | null; pct: number | null } {
-  const elapsed = (nowMs % 86_400_000) / 86_400_000;
+export function dayPace(current: number, prior: number, nowMs: number, timeZone = 'UTC'): { projected: number | null; pct: number | null } {
+  const elapsed = localDayElapsed(nowMs, timeZone);
   if (elapsed < MIN_DAY_ELAPSED) return { projected: null, pct: null };
   const projected = Math.round(current / elapsed);
   return { projected, pct: pctChange(projected, prior) };

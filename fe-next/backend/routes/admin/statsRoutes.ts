@@ -8,6 +8,7 @@ import type { AdminRequest } from './types';
 import { successResponse, errorResponse } from './responseHelpers';
 import { withCache } from './adminCache';
 import { fetchDashboardStats } from './statsService';
+import { resolveAdminTimeZone } from '../../../lib/admin/viewerTimeZone';
 import logger from '../../utils/logger';
 import * as dictionary from '../../dictionary';
 import { getCacheStats as getBotCacheStats, clearBehaviorCaches } from '../../../backend/modules/botBehavior';
@@ -22,10 +23,11 @@ const router: Router = express.Router();
  * Dashboard statistics — optimized with RPC + Redis cache.
  * Was: 14 sequential queries. Now: 3 parallel RPCs, cached 60s.
  */
-router.get('/stats', async (_req: AdminRequest, res: Response): Promise<void> => {
+router.get('/stats', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
-    const stats = await withCache('admin:stats:overview', 60, () =>
-      fetchDashboardStats(getSupabase())
+    const tz = resolveAdminTimeZone(req.query.tz);
+    const stats = await withCache(`admin:stats:overview:${tz}`, 60, () =>
+      fetchDashboardStats(getSupabase(), tz)
     );
     res.json(successResponse(stats));
   } catch (error) {

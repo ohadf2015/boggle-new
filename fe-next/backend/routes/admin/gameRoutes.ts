@@ -8,6 +8,7 @@ import type { AdminRequest, SocketIO, GameInfo, GuestSession, GuestPlayerStat, E
 import logger from '../../utils/logger';
 import { withCache } from './adminCache';
 import { fetchDailyActivity } from '../../../lib/admin/dailyActivity';
+import { resolveAdminTimeZone } from '../../../lib/admin/viewerTimeZone';
 import { getActiveSinglePlayerCount, getActiveSinglePlayerSessions } from '../singlePlayer';
 import { getActivePagePresence } from '../presence';
 import { playersOnOtherPages } from '../../../lib/admin/liveMonitor/playersOnOtherPages';
@@ -72,7 +73,8 @@ router.get('/games/history', async (req: AdminRequest, res: Response): Promise<v
 router.get('/activity/daily', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const days = Math.min(parseInt(req.query.days as string) || 30, 90);
-    const daily = await withCache(`admin:activity-daily:${days}`, 60, () => fetchDailyActivity(getSupabase(), days));
+    const tz = resolveAdminTimeZone(req.query.tz);
+    const daily = await withCache(`admin:activity-daily:${days}:${tz}`, 60, () => fetchDailyActivity(getSupabase(), days, Date.now(), tz));
     res.json({ daily });
   } catch (error) {
     const err = error as Error;

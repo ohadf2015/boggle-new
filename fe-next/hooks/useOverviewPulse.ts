@@ -9,6 +9,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { buildPulse, type DailyPoint, type GrowthWeek, type Pulse, type PulseInput, type PulseWindow } from '@/lib/admin/overviewPulse';
 import type { HealthData, StatsData } from './useAdminDashboard';
 import { fetchAdminJson, useAdminPoll } from './useAdminPoll';
+import { viewerTimeZone, withViewerTz } from '@/lib/admin/viewerTimeZone';
 
 const REFRESH_INTERVAL = 60_000;
 const daysNeeded = (w: PulseWindow) => (w === 30 ? 60 : 14);
@@ -40,8 +41,8 @@ export function useOverviewPulse(authToken: string | null, stats: StatsData | nu
     if (!authToken) return;
     const get = <T,>(path: string) => fetchAdminJson<T>(path, authToken);
     const [daily, growth, revenue, feed] = await Promise.allSettled([
-      get<{ daily: DailyPoint[] }>(`/api/admin/activity/daily?days=${dailyDays}`),
-      get<{ growth: GrowthWeek[] }>(`/api/admin/analytics/signup-growth?weeks=${GROWTH_WEEKS}`),
+      get<{ daily: DailyPoint[] }>(withViewerTz(`/api/admin/activity/daily?days=${dailyDays}`)),
+      get<{ growth: GrowthWeek[] }>(withViewerTz(`/api/admin/analytics/signup-growth?weeks=${GROWTH_WEEKS}`)),
       get<{ revenue: NonNullable<PulseInput['revenue']> }>('/api/admin/analytics/revenue'),
       get<{ items: FeedItem[] }>('/api/admin/notifications'),
     ]);
@@ -63,7 +64,7 @@ export function useOverviewPulse(authToken: string | null, stats: StatsData | nu
     () =>
       raw.daily === null || raw.dailyDays < daysNeeded(windowDays)
         ? null
-        : buildPulse({ nowMs: raw.fetchedAt, windowDays, daily: raw.daily, growth: raw.growth ?? [], stats, revenue: raw.revenue, health, unreadReports: raw.unreadReports }),
+        : buildPulse({ nowMs: raw.fetchedAt, windowDays, timeZone: viewerTimeZone(), daily: raw.daily, growth: raw.growth ?? [], stats, revenue: raw.revenue, health, unreadReports: raw.unreadReports }),
     [raw, windowDays, stats, health],
   );
 

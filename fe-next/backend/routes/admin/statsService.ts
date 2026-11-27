@@ -17,12 +17,12 @@ interface SupabaseClient {
  * Falls back to zeroed defaults if RPCs don't exist yet (pre-migration); the real-games
  * count is left out instead, so the UI hides it rather than show a false zero.
  */
-export async function fetchDashboardStats(supabase: SupabaseClient): Promise<StatsResponse> {
+export async function fetchDashboardStats(supabase: SupabaseClient, timeZone = 'UTC'): Promise<StatsResponse> {
   const [overviewResult, activityResult, languagesResult, realGamesResult] = await Promise.all([
     supabase.rpc('admin_overview_stats'),
-    supabase.rpc('admin_activity_stats'),
+    supabase.rpc('admin_activity_stats', { p_tz: timeZone }),
     supabase.rpc('admin_language_breakdown'),
-    supabase.rpc('admin_real_games_stats'),
+    supabase.rpc('admin_real_games_stats', { p_tz: timeZone }),
   ]);
 
   const overview = overviewResult.error ? EMPTY_OVERVIEW : (overviewResult.data as StatsResponse['overview']);

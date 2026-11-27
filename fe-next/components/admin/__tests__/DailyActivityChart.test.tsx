@@ -71,7 +71,7 @@ describe('DailyActivityChart', () => {
     render(<DailyActivityChart authToken="my-tok" />);
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/admin/activity/daily?days=30',
+        expect.stringMatching(/^\/api\/admin\/activity\/daily\?days=30&tz=/),
         expect.objectContaining({
           headers: { Authorization: 'Bearer my-tok' },
         })
@@ -93,7 +93,7 @@ describe('DailyActivityChart', () => {
     fireEvent.click(screen.getByRole('button', { name: /90d/i }));
     await waitFor(() => {
       expect(global.fetch).toHaveBeenLastCalledWith(
-        '/api/admin/activity/daily?days=90',
+        expect.stringMatching(/^\/api\/admin\/activity\/daily\?days=90&tz=/),
         expect.anything()
       );
     });

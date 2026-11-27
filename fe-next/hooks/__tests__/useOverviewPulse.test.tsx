@@ -1,6 +1,11 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useOverviewPulse } from '../useOverviewPulse';
 
+vi.mock('@/lib/admin/viewerTimeZone', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/admin/viewerTimeZone')>('@/lib/admin/viewerTimeZone');
+  return { ...actual, viewerTimeZone: () => 'UTC', withViewerTz: (path: string) => actual.withViewerTz(path, 'UTC') };
+});
+
 const DAY = 86_400_000;
 const day = (daysAgo: number, games: number) => ({
   date: new Date(Date.now() - daysAgo * DAY).toISOString().slice(0, 10),

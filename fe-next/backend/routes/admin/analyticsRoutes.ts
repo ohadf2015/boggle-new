@@ -8,6 +8,7 @@ import type { AdminRequest } from './types';
 import { successResponse, errorResponse, buildPaginationMeta } from './responseHelpers';
 import { paginationSchema } from './paginationSchema';
 import { withCache } from './adminCache';
+import { resolveAdminTimeZone } from '../../../lib/admin/viewerTimeZone';
 import logger from '../../utils/logger';
 
 const { getSupabase } = require('../../modules/supabaseServer');
@@ -58,8 +59,8 @@ interface SupabaseClient {
 
 const EMPTY_FUNNEL: FunnelData = { registered: 0, playedFirstGame: 0, returnedDay7: 0, returnedDay30: 0 };
 
-export async function fetchCohortRetention(supabase: SupabaseClient, weeks: number): Promise<CohortRow[]> {
-  const { data, error } = await supabase.rpc('admin_cohort_retention', { weeks });
+export async function fetchCohortRetention(supabase: SupabaseClient, weeks: number, timeZone = 'UTC'): Promise<CohortRow[]> {
+  const { data, error } = await supabase.rpc('admin_cohort_retention', { weeks, p_tz: timeZone });
   if (error || !data) return [];
   return data as CohortRow[];
 }
@@ -98,8 +99,8 @@ export async function fetchEngagementFunnel(supabase: SupabaseClient): Promise<F
   return data as FunnelData;
 }
 
-export async function fetchSignupGrowth(supabase: SupabaseClient, weeks: number): Promise<SignupGrowthRow[]> {
-  const { data, error } = await supabase.rpc('admin_signup_growth', { weeks });
+export async function fetchSignupGrowth(supabase: SupabaseClient, weeks: number, timeZone = 'UTC'): Promise<SignupGrowthRow[]> {
+  const { data, error } = await supabase.rpc('admin_signup_growth', { weeks, p_tz: timeZone });
   if (error || !data) return [];
   return data as SignupGrowthRow[];
 }
@@ -155,8 +156,9 @@ router.get('/analytics/drilldown', async (req: AdminRequest, res: Response): Pro
 router.get('/analytics/signup-growth', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const weeks = Math.min(Math.max(Number(req.query.weeks) || 26, 4), 104);
-    const growth = await withCache(`admin:signup-growth:${weeks}`, 300, () =>
-      fetchSignupGrowth(getSupabase(), weeks)
+    const tz = resolveAdminTimeZone(req.query.tz);
+    const growth = await withCache(`admin:signup-growth:${weeks}:${tz}`, 300, () =>
+      fetchSignupGrowth(getSupabase(), weeks, tz)
     );
     res.json(successResponse({ growth }));
   } catch (err) {
@@ -172,9 +174,10 @@ router.get('/analytics/signup-growth', async (req: AdminRequest, res: Response):
 router.get('/analytics/cohorts', async (req: AdminRequest, res: Response): Promise<void> => {
   try {
     const weeks = Math.min(Math.max(Number(req.query.weeks) || 12, 1), 24);
+    const tz = resolveAdminTimeZone(req.query.tz);
 
-    const cohorts = await withCache(`admin:cohorts:${weeks}`, 300, () =>
-      fetchCohortRetention(getSupabase(), weeks)
+    const cohorts = await withCache(`admin:cohorts:${weeks}:${tz}`, 300, () =>
+      fetchCohortRetention(getSupabase(), weeks, tz)
     );
 
     res.json(successResponse({ cohorts }));

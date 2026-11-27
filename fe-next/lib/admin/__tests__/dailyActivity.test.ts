@@ -67,6 +67,24 @@ describe('buildDailyActivity', () => {
     );
     expect(rows[2]).toMatchObject({ games: 1, signups: 1 });
   });
+
+  it('buckets signups on the viewer\'s local date, not UTC', () => {
+    const nowMs = Date.parse('2026-11-27T22:30:00Z'); // 00:30 on 28 Nov in Israel
+    const rows = buildDailyActivity(
+      input({
+        days: 2,
+        nowMs,
+        timeZone: 'Asia/Jerusalem',
+        signups: [
+          { created_at: '2026-11-27T22:10:00Z', id: 'after-midnight' },
+          { created_at: '2026-11-27T20:00:00Z', id: 'evening-before' },
+        ],
+      }),
+    );
+    expect(rows.map((r) => r.date)).toEqual(['2026-11-27', '2026-11-28']);
+    expect(rows[0].signups).toBe(1);
+    expect(rows[1].signups).toBe(1);
+  });
 });
 
 describe('fetchAnonymousUserIdsSince', () => {
