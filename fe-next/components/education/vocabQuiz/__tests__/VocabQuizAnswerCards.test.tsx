@@ -32,10 +32,10 @@ function grid(selectedIndex: number | null = null, correctIndex: number | null =
 }
 
 describe('Answer cards are dark cards on one neutral edge, not saturated slabs', () => {
-  it('Given no pick, Then every card rests on the navy with the same neutral border and white ink', () => {
+  it('Given no pick, Then every card rests on the page with the same ink outline and ink text', () => {
     grid().forEach((card, i) => {
       expect(card.className).toContain('bg-edu-surface');
-      expect(card.className).toContain('border-edu-line/20');
+      expect(card.className).toMatch(/(^|\s)border-edu-line(\s|$)/);
       expect(card.className).toContain('border-[3px]');
       expect(card.className).toContain('text-edu-ink');
       expect(card.className).not.toMatch(new RegExp(`(^|\\s)bg-neo-${FAMILIES[i]}(\\s|$)`));

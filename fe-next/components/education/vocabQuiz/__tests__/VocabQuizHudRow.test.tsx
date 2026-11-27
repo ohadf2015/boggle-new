@@ -102,7 +102,7 @@ describe('The topic is a label above the question, not a chip', () => {
     expect(block.contains(focus)).toBe(true);
     expect(focus.compareDocumentPosition(screen.getByTestId('vocab-quiz-prompt')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(focus.className).not.toContain('rounded-full');
-    expect(focus.className).toContain('text-edu-purple-ink');
+    expect(focus).toHaveClass('bg-neo-pink', 'text-neo-black', 'border-neo-black');
   });
 });
 

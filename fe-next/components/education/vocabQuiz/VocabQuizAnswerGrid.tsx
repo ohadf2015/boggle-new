@@ -126,11 +126,10 @@ export function VocabQuizAnswerGrid({
                 ? 'border-neo-black bg-neo-lime text-neo-black'
                 : faded
                   ? 'scale-[0.97] border-edu-line bg-edu-surface text-edu-ink/70'
-                  : cn('bg-edu-surface text-edu-ink', isWrongPick ? 'border-neo-red' : isSelected ? style.border : 'border-edu-line/20'),
+                  : cn('bg-edu-surface text-edu-ink', isWrongPick ? 'border-neo-red' : isSelected ? style.border : 'border-edu-line'),
               // A pick sits half pressed in, so it reads as held down until the reveal.
               isSelected && !revealed ? 'translate-y-[3px] shadow-[0_3px_0_0]' : 'shadow-[0_6px_0_0]',
-              // One neutral lip for every resting tile; a black one vanishes on the navy.
-              isCorrect || faded || isWrongPick ? 'shadow-neo-black' : 'shadow-edu-line/15',
+              isCorrect || faded || isWrongPick ? 'shadow-neo-black' : 'shadow-edu-line',
               isSelected && cn('outline outline-4 outline-offset-2', isWrongPick ? 'outline-neo-red' : 'outline-neo-cyan'),
               !disabled && cn(style.hover, style.press, 'active:translate-y-[6px] active:shadow-none'),
               isWrongPick && 'animate-neo-shake motion-reduce:animate-none'

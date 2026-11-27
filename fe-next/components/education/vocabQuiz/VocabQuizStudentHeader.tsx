@@ -98,10 +98,10 @@ export function VocabQuizStudentHeader({
         aria-valuemax={total}
         aria-valuenow={done}
         aria-label={t('vocabQuiz.progress', { current: done, total })}
-        className="h-5 min-w-0 flex-1 overflow-hidden rounded-full bg-edu-surface sm:h-6"
+        className="h-5 min-w-0 flex-1 overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface sm:h-6"
       >
         <div
-          className="relative h-full rounded-full bg-neo-lime transition-[width] duration-500 ease-out motion-reduce:transition-none"
+          className="relative h-full rounded-full bg-neo-pink transition-[width] duration-500 ease-out motion-reduce:transition-none"
           style={{ width: `${(done / total) * 100}%` }}
         >
           <span

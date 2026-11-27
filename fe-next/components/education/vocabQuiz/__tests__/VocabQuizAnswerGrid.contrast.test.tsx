@@ -57,10 +57,10 @@ describe('VocabQuizAnswerGrid — reads as a control', () => {
     }
   });
 
-  it('draws one neutral edu-line lip on every resting tile, never a family-coloured one', () => {
+  it('draws one solid edu-line lip on every resting tile, never a family-coloured one', () => {
     const tiles = setup();
     ['lime', 'pink', 'cyan', 'purple'].forEach((family, i) => {
-      expect(tiles[i].className).toContain('shadow-edu-line/15');
+      expect(tiles[i].className).toMatch(/(^|\s)shadow-edu-line(\s|$)/);
       expect(tiles[i].className).not.toContain(`shadow-neo-${family}-muted`);
     });
   });

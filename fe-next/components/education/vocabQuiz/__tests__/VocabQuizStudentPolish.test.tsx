@@ -66,7 +66,7 @@ describe('Student quiz phone — the question is the hero', () => {
     const prompt = screen.getByTestId('vocab-quiz-prompt');
     expect(prompt).toHaveTextContent('to leave behind for good');
     expect(prompt.className).toContain('font-black');
-    expect(screen.getByTestId('vocab-quiz-focus').className).toContain('text-edu-purple-ink');
+    expect(screen.getByTestId('vocab-quiz-focus')).toHaveClass('bg-neo-pink', 'text-neo-black');
   });
 
   it('Given the last seconds tick, Then the clock turns orange without an opacity pulse on the full-width strip', () => {
