@@ -16506,7 +16506,7 @@ const en = {
         "codePasted": "Pasted",
         "flow": {
           "steps": "Join steps",
-          "codeHeadline": "TYPE THE CODE",
+          "codeHeadline": "Type the code",
           "codeSub": "Six characters, straight off your teacher's screen.",
           "codeTooShort": "Six characters. A couple still missing.",
           "next": "Next",

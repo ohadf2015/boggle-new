@@ -18541,7 +18541,7 @@ const sv = {
         "codePasted": "Inklistrad",
         "flow": {
           "steps": "Steg för att gå med",
-          "codeHeadline": "SKRIV IN KODEN",
+          "codeHeadline": "Skriv in koden",
           "codeSub": "Sex tecken, direkt från lärarens skärm.",
           "codeTooShort": "Sex tecken – det fattas några.",
           "next": "Vidare",

@@ -18192,7 +18192,7 @@ const es = {
         "codePasted": "¡Código pegado!",
         "flow": {
           "steps": "Pasos para unirte",
-          "codeHeadline": "ESCRIBE EL CÓDIGO",
+          "codeHeadline": "Escribe el código",
           "codeSub": "Seis caracteres, los que salen en la pantalla del profe.",
           "codeTooShort": "Son seis caracteres: aún faltan algunos.",
           "next": "Siguiente",
