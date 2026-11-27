@@ -15,6 +15,7 @@ export const EDU_DARK_EDGE = 'border-edu-line';
 export const EDU_BLOCK_TONES = {
   ...NEO_BLOCK_TONES,
   pink: 'bg-neo-pink text-edu-ink border-neo-black',
+  purple: 'bg-neo-purple text-neo-black border-neo-black',
   navy: `bg-edu-surface text-edu-ink ${EDU_DARK_EDGE}`,
 } as const;
 

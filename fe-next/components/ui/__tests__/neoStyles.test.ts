@@ -15,7 +15,7 @@ const NB_BASELINE = {
     "pink": "bg-neo-pink text-edu-ink border-neo-black",
     "cyan": "bg-neo-cyan text-neo-black border-neo-black",
     "yellow": "bg-neo-yellow text-neo-black border-neo-black",
-    "purple": "bg-neo-purple text-white border-neo-black",
+    "purple": "bg-neo-purple text-neo-black border-neo-black",
     "orange": "bg-neo-orange text-neo-black border-neo-black",
     "cream": "bg-neo-cream text-neo-black border-neo-black",
     "navy": "bg-edu-surface text-edu-ink border-edu-line"

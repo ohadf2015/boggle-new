@@ -14,7 +14,8 @@ describe('classroom twins of the shared neo styles', () => {
     expect(EDU_FOCUS).toBe(mapClassString(NEO_FOCUS));
     expect(EDU_QUIET_FOCUS).toBe(mapClassString(NEO_QUIET_FOCUS));
     expect(EDU_DARK_EDGE).toBe(mapClassString(NEO_DARK_EDGE));
-    for (const [tone, cls] of Object.entries(NEO_BLOCK_TONES)) {
+    expect(EDU_BLOCK_TONES.purple).toBe('bg-neo-purple text-neo-black border-neo-black');
+    for (const [tone, cls] of Object.entries(NEO_BLOCK_TONES).filter(([name]) => name !== 'purple')) {
       expect(EDU_BLOCK_TONES[tone as keyof typeof EDU_BLOCK_TONES], tone).toBe(mapClassString(cls));
     }
     for (const [variant, cls] of Object.entries(NEO_BUTTON)) {
