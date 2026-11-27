@@ -30,6 +30,7 @@ import { ReportsProGate } from './ReportsGate';
 import { ReportsClassView } from './ReportsClassView';
 import { ReportsStudentView } from './ReportsStudentView';
 import { ownedClassroomId, reportId, resolveReportTab, type ReportTab } from './reportParams';
+import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -201,9 +202,12 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <h1 data-wipe className="mb-3 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">
-          {t('teacher.reports.title')}
-        </h1>
+        <div className="mb-3 flex items-center justify-between gap-4">
+          <h1 data-wipe className="min-w-0 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">
+            {t('teacher.reports.title')}
+          </h1>
+          <HeadingMascot moment="success" testId="reports-heading-mascot" />
+        </div>
         <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-edu-ink/85 max-sm:hidden">
           {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
         </p>

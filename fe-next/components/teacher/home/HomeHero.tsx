@@ -112,7 +112,7 @@ export function HomeHero({
         aria-labelledby="home-hero-title"
         className={cn('flex min-w-0 flex-col gap-4', desk && 'edu-card relative gap-4 p-4 sm:gap-5 sm:p-5 lg:p-6')}
       >
-        <div className={cn('flex min-w-0 flex-col gap-3', desk && 'lg:flex-row lg:items-start lg:justify-between lg:gap-6')}>
+        <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
           <div className="flex min-w-0 flex-col gap-2">
             {!desk && eyebrow ? <p className={cn(NB_STICKER, NB_BLOCK.cream, 'self-start')}>{eyebrow}</p> : null}
             {heading}
@@ -132,7 +132,11 @@ export function HomeHero({
                 <EduMascot moment="welcome" size={112} className="size-24 shrink-0 xl:size-28" />
               </span>
             </div>
-          ) : null}
+          ) : (
+            <span data-testid="class-page-mascot" aria-hidden="true" className="shrink-0 max-lg:hidden">
+              <EduMascot moment="welcome" size={112} className="size-24 xl:size-28" />
+            </span>
+          )}
         </div>
 
         <div data-testid="home-hero-start-row" className={cn('flex min-w-0 flex-col items-stretch gap-3', desk && 'lg:flex-row lg:gap-4')}>

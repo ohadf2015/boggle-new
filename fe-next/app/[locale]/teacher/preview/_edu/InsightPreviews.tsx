@@ -16,6 +16,7 @@ import { rankWeekHardestWords, toFreeClassPulse, type FreeClassInsight } from '@
 import type { ClassAnalytics } from '@/lib/education/pro/classAnalyticsServer';
 import { FREE_PREVIEW_WORDS } from '@/lib/education/wordMasteryReport';
 import { fixtureFor } from './fixtures';
+import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 const noop = () => undefined;
@@ -112,7 +113,10 @@ export function ReportsPreview({ v }: { v?: string }) {
     return (
       <ReportsShell>
         <div className="mx-auto w-full max-w-5xl">
-          <h1 className="mb-5 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h1 className="min-w-0 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
+            <HeadingMascot moment="success" testId="reports-heading-mascot" />
+          </div>
           <ClassroomPicker classrooms={classes} onSelect={noop} />
         </div>
       </ReportsShell>

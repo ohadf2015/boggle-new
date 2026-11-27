@@ -37,6 +37,7 @@ import { PreCheckoutExplainer } from '@/components/teacher/pro/PreCheckoutExplai
 import { useClassrooms } from '@/hooks/useClassroom';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import { NB_ADVANCED } from '@/components/teacher/nb/nbStyles';
+import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 
 const AuthModal = nextDynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
@@ -250,6 +251,7 @@ export default function UpgradePricingPageClient({ hasSession = false }: { hasSe
                   {t('teacher.subscription.valueHeadline')}
                 </p>
               </div>
+              <HeadingMascot moment="pro" testId="upgrade-heading-mascot" className="lg:self-center" />
               <div role="tablist" aria-label={t('eg2Pro.tabs.label')} className="flex gap-2">
                 {tabButton('teacher', t('eg2Pro.tabs.teacher'))}
                 {tabButton('school', t('eg2Pro.tabs.school'))}

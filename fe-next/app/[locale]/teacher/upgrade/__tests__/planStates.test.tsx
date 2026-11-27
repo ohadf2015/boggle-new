@@ -119,6 +119,17 @@ describe('plan page — loading', () => {
 });
 
 describe('plan page — free teacher', () => {
+  it('puts a decorative desktop-only mascot beside the pricing headline', () => {
+    auth.user = { id: 't1' };
+    Object.assign(pro, { known: true });
+    render(<PageClient />);
+    const mascot = screen.getByTestId('upgrade-heading-mascot');
+    expect(mascot).toHaveAttribute('aria-hidden', 'true');
+    expect(mascot.className).toContain('max-lg:hidden');
+    expect(mascot.querySelector('img')).toHaveAttribute('alt', '');
+    expect(mascot.parentElement).toContainElement(screen.getByRole('tablist'));
+  });
+
   it('sells the Free card by what it includes, with no struck-through rows', () => {
     auth.user = { id: 't1' };
     Object.assign(pro, { known: true });

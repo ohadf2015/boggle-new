@@ -144,4 +144,13 @@ describe('ClassPageView', () => {
     expect(fold.className).toContain('shadow-edu-lip');
     expect(fold.querySelector('svg[class*="bg-neo-cyan"]')).not.toBeNull();
   });
+
+  it('Given a desktop class page, Then the mascot sits beside the class name, decorative and hidden on phones', () => {
+    render(<ClassPageView {...props()} />);
+    const mascot = screen.getByTestId('class-page-mascot');
+    expect(mascot).toHaveAttribute('aria-hidden', 'true');
+    expect(mascot.className).toContain('max-lg:hidden');
+    expect(mascot.querySelector('img')).toHaveAttribute('alt', '');
+    expect(mascot.parentElement).toContainElement(screen.getByRole('heading', { level: 1 }));
+  });
 });
