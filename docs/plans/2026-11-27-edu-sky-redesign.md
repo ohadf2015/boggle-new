@@ -28,7 +28,7 @@ Out of scope: SEO article pages under `/education/*`, their titles and descripti
 
 - Semantic Tailwind colours `edu-*` backed by CSS variables in `app/edu-sky.css`. **`:root` defaults equal today's dark values**; `html:has([data-edu-theme="sky"])` overrides them. A component shared with the main game or an SEO page therefore stays dark; only in-scope pages turn sky.
 - `data-edu-theme="sky"` goes on each in-scope root element (server-rendered, never added in an effect). The scope also sets `html`/`body` background (no halftone image), `color-scheme: light`, and the shadcn vars (`--background --foreground --card --popover --muted --border --input`) so portals, dialogs and the toaster follow.
-- Per-segment `viewport.themeColor` / `colorScheme` for the in-scope routes (new `student` and `join` layouts).
+- Per-segment `viewport.themeColor` / `colorScheme` for the in-scope routes (new `student` and `join` layouts; `/pricing` exports it from its page).
 - Never swap `--neo-*` values and never add per-utility `!important` overrides.
 
 | Token | Default (dark) | Sky |
@@ -57,8 +57,8 @@ Works per string literal, keeps variant prefixes (`hover:`, `md:` …). Files: `
 
 ## Routes
 
-In (sky): `/teacher/**`, `/join/**`, `/student/**`, `/classroom/**`, `/education` (landing), `/education/{access,classroom-game,live,duels,help}/**`, parent report `/report/[token]`, dev previews.
-Out (stay dark): SEO article, list and comparison pages under `/education/*`, `/education/for-schools`, `/education/classroom-addon/**`, miss-gap / passback share pages, `/pricing`, `/admin/**`, the main game.
+In (sky): `/teacher/**`, `/join/**`, `/student/**`, `/classroom/**`, `/education` (landing), `/education/{access,classroom-game,live,duels,help}/**`, parent report `/report/[token]`, `/pricing` (renders the teacher upgrade page), dev previews.
+Out (stay dark): SEO article, list and comparison pages under `/education/*`, `/education/for-schools`, `/education/classroom-addon/**`, miss-gap / passback share pages, `/admin/**`, the main game.
 
 Shared live board: classroom skin keyed on `isClassroomMode` / `readClassroomLiveFlags` (present on every classroom path including reconnect), never on `EduLiveSurfacesProvider`.
 
