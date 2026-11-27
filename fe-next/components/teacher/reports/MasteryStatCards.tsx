@@ -12,7 +12,7 @@ const TONES = {
   lime: 'text-edu-lime-ink border-neo-lime',
   cyan: 'text-edu-cyan-ink border-neo-cyan',
   pink: 'text-edu-pink-ink border-neo-pink',
-  purple: 'text-neo-purple-light border-neo-purple-light',
+  purple: 'text-edu-purple-ink border-neo-purple-light',
 } as const;
 
 function StatCard({

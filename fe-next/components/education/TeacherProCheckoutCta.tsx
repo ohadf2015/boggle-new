@@ -188,7 +188,7 @@ export function TeacherProCheckoutCta({
       data-testid="teacher-pro-checkout-cta"
       className={`max-w-xl rounded-neo border-2 border-s-4 border-edu-line border-s-neo-pink bg-edu-surface p-4 text-edu-ink sm:p-5 ${className}`}
     >
-      <p className="font-neo-display text-base font-bold leading-snug text-neo-pink-light sm:text-lg">
+      <p className="font-neo-display text-base font-bold leading-snug text-edu-pink-ink sm:text-lg">
         {c.heading}
       </p>
       <p className="mt-1.5 text-sm leading-relaxed text-edu-ink/80">{c.body}</p>

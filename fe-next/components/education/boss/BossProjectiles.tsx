@@ -8,7 +8,7 @@ import styles from './boss.module.css';
 import { bossImpactBus } from './fx/bossFxBus';
 
 const MAX_IN_FLIGHT = 8;
-const COLORS = ['text-edu-cyan-ink', 'text-edu-lime-ink', 'text-neo-purple-light', 'text-edu-orange-ink', 'text-neo-cyan-light'];
+const COLORS = ['text-edu-cyan-ink', 'text-edu-lime-ink', 'text-edu-purple-ink', 'text-edu-orange-ink', 'text-edu-cyan-ink'];
 const LAUNCH = [
   { x: '-38cqw', y: '26cqw', r: '-30deg' },
   { x: '36cqw', y: '25cqw', r: '28deg' },

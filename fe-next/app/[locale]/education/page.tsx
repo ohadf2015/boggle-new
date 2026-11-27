@@ -188,12 +188,12 @@ function EducationResourceLinks({ locale }: { locale: string }) {
 const MOMENT_ACCENT: Record<string, string> = {
   'brain-breaks-word-games': 'text-edu-lime-ink',
   'indoor-recess-games': 'text-edu-cyan-ink',
-  'end-of-year-classroom-activities': 'text-neo-pink-light',
-  'first-day-of-school-icebreakers': 'text-neo-purple-light',
+  'end-of-year-classroom-activities': 'text-edu-pink-ink',
+  'first-day-of-school-icebreakers': 'text-edu-purple-ink',
   'early-finishers-activities': 'text-edu-lime-ink',
-  'middle-school-word-games': 'text-neo-pink-light',
+  'middle-school-word-games': 'text-edu-pink-ink',
   'boggle-for-the-classroom': 'text-edu-cyan-ink',
-  'boggle-for-kids': 'text-neo-pink-light',
+  'boggle-for-kids': 'text-edu-pink-ink',
 };
 
 function TeacherMomentLinks({ locale }: { locale: string }) {
@@ -247,8 +247,8 @@ const LEARNER_SLUGS = [
 
 const LEARNER_ACCENT: Record<(typeof LEARNER_SLUGS)[number], string> = {
   'english-games-elementary': 'text-edu-lime-ink',
-  'english-games-middle-school': 'text-neo-pink-light',
-  'english-games-adults': 'text-neo-purple-light',
+  'english-games-middle-school': 'text-edu-pink-ink',
+  'english-games-adults': 'text-edu-purple-ink',
   'irregular-verbs-games': 'text-edu-cyan-ink',
   'english-vocabulary-topics': 'text-edu-lime-ink',
 };

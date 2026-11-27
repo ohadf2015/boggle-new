@@ -173,7 +173,7 @@ function TeacherReportPdfExport({ language, summary, players, proLabel = 'Pro', 
           <ProPoweredChip />
         </button>
         {state === 'failed' && (
-          <p role="alert" data-testid="report-pdf-export-failed" className="text-center text-xs font-semibold text-neo-pink-light">
+          <p role="alert" data-testid="report-pdf-export-failed" className="text-center text-xs font-semibold text-edu-pink-ink">
             {copy.failed}
           </p>
         )}

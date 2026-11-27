@@ -153,7 +153,7 @@ export function ResultsTeacherProTrialCard({
       )}
     >
       <div className="flex items-start gap-2">
-        <p className={cn('flex flex-1 items-center gap-2 font-neo-display font-black text-neo-pink-light', dismissible ? 'text-base leading-snug' : 'text-sm leading-tight @[96rem]/results:text-lg')}>
+        <p className={cn('flex flex-1 items-center gap-2 font-neo-display font-black text-edu-pink-ink', dismissible ? 'text-base leading-snug' : 'text-sm leading-tight @[96rem]/results:text-lg')}>
           <Sparkles className="size-4 shrink-0" aria-hidden="true" />
           {copy.title}
         </p>
@@ -198,7 +198,7 @@ export function ResultsTeacherProTrialCard({
           }
         }}
         className={cn(
-          'inline-flex items-center justify-center rounded-neo border-[3px] border-neo-pink bg-edu-surface px-4 text-center font-neo-display text-sm font-black text-neo-pink-light transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
+          'inline-flex items-center justify-center rounded-neo border-[3px] border-neo-pink bg-edu-surface px-4 text-center font-neo-display text-sm font-black text-edu-pink-ink transition-transform hover:-translate-y-px focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan active:translate-y-px',
           dismissible ? 'mt-3 min-h-11 w-full' : 'min-h-10 shrink-0 px-3 text-[0.8125rem] @[96rem]/results:min-h-12 @[96rem]/results:px-4 @[96rem]/results:text-base',
         )}
       >

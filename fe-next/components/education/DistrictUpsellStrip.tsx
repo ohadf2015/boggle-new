@@ -87,7 +87,7 @@ export function DistrictUpsellStrip({ hideTeacherCta = false }: { hideTeacherCta
       <aside className="rounded-neo border-neo border-neo-purple/90 bg-edu-surface px-6 py-5 shadow-hard">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-lg font-neo-display font-black text-neo-purple-light">
+            <h3 className="text-lg font-neo-display font-black text-edu-purple-ink">
               {t('education.landing.districtCta.title')}
             </h3>
             <p className="mt-1 text-sm text-edu-ink/80">
