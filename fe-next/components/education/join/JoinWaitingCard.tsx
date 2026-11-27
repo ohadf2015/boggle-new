@@ -10,7 +10,7 @@ export function JoinWaitingCard({ name }: { name?: string }) {
   const { profile } = useAuth();
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-neo border-3 border-edu-line bg-edu-surface p-4 text-center shadow-hard">
+    <div className="flex flex-col items-center gap-3 rounded-neo border-3 border-edu-line bg-edu-surface p-4 text-center shadow-edu-lip">
       <Pop>
         <Avatar customAvatar={profile?.avatar_config ?? null} userId={name} size="2xl" />
       </Pop>
@@ -19,7 +19,7 @@ export function JoinWaitingCard({ name }: { name?: string }) {
           {name}
         </p>
       )}
-      <p className="font-neo-body text-base font-bold text-edu-cyan-ink lg:text-lg">
+      <p className="font-neo-body text-base font-bold text-edu-ink lg:text-lg">
         {t('eduLiveRoom.student.watchBoard')}
       </p>
     </div>

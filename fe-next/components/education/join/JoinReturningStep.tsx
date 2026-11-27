@@ -28,7 +28,7 @@ export function JoinReturningStep({ name, leaving, leaveFailed, onYes, onNotMe }
         >
           {name ? t(`${K}.returning.title`, { name }) : t(`${K}.returning.titleNoName`)}
         </h1>
-        <p className="mt-2 font-neo-body text-base font-bold text-edu-cyan-ink short:mt-1 short:text-sm lg:text-lg">
+        <p className="mt-2 font-neo-body text-base font-bold text-edu-ink short:mt-1 short:text-sm lg:text-lg">
           {t(`${K}.returning.sub`)}
         </p>
       </div>

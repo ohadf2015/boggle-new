@@ -127,7 +127,7 @@ export function JoinCodeField({
       dir="ltr"
       className="group relative w-full select-none"
     >
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div data-testid="join-code-card" className="edu-card flex items-center gap-2 p-2.5 lg:gap-3 lg:p-3">
         <div className="@container relative flex-1">
           <div data-testid="join-code-cells" className={cn('grid grid-cols-6 gap-[clamp(0.25rem,2cqi,0.75rem)]', invalid && 'motion-safe:animate-neo-shake')}>
             {cells.map((char, i) => {
@@ -141,11 +141,11 @@ export function JoinCodeField({
                   className={cn(
                     'flex aspect-[4/5] items-center justify-center rounded-neo border-3 font-neo-display text-[clamp(1.5rem,11cqi,4.5rem)] font-black leading-none transition-colors duration-100',
                     invalid
-                      ? 'border-neo-black bg-neo-red text-neo-white shadow-hard'
+                      ? 'border-neo-black bg-neo-red text-neo-white shadow-edu-lip-sm'
                       : filled
-                        ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                        : 'border-edu-line bg-edu-surface text-edu-ink/30 shadow-hard-sm',
-                    isActive && 'group-focus-within:border-neo-black group-focus-within:bg-neo-cyan group-focus-within:text-neo-navy group-focus-within:shadow-hard'
+                        ? 'border-neo-black bg-edu-tile text-neo-black shadow-edu-lip-sm'
+                        : 'border-edu-line bg-edu-tile text-edu-ink/30 shadow-edu-lip-sm',
+                    isActive && 'group-focus-within:border-neo-black group-focus-within:bg-neo-cyan group-focus-within:text-neo-navy'
                   )}
                 >
                   {filled ? (
@@ -194,7 +194,7 @@ export function JoinCodeField({
           <PressSurface
             lip={2}
             onClick={onPaste}
-            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-cyan bg-edu-surface text-edu-cyan-ink shadow-neo-cyan/40 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
+            className="flex size-12 shrink-0 items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black shadow-neo-black focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan lg:size-14"
             aria-label={t('joinView.pasteCode')}
             title={t('joinView.pasteCode')}
           >

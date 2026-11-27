@@ -40,10 +40,9 @@ describe('<JoinFlow> layout', () => {
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Year 9 English' });
   });
 
-  it('Given any door, Then the arena backdrop paints behind a transparent root, with no slabs', () => {
+  it('Given any door, Then the sky page shows through a transparent root: no night arena, no slabs', () => {
     render(<JoinFlow />);
-    expect(screen.getByTestId('academy-backdrop')).toHaveAttribute('data-art', 'arena');
-    expect(root()).toContainElement(screen.getByTestId('academy-backdrop'));
+    expect(screen.queryByTestId('academy-backdrop')).not.toBeInTheDocument();
     expect(root().className).toContain('isolate');
     expect(root().className).not.toMatch(/(^|\s)bg-neo-navy(\s|$)/);
     expect(screen.queryByTestId('join-decor')).not.toBeInTheDocument();
@@ -61,11 +60,11 @@ describe('<JoinFlow> layout', () => {
     expect(scroller).toContainElement(screen.getByTestId('join-stage'));
   });
 
-  it('Then the form sits on a solid panel over the busy stage and widens on desktop', () => {
+  it('Then the form sits straight on the sky (its cards are the boxes) and widens on desktop', () => {
     render(<JoinFlow />);
     const stage = screen.getByTestId('join-stage').className;
-    expect(stage).toMatch(/(^|\s)bg-edu-surface(\s|$)/);
-    expect(stage).toContain('border-edu-line');
+    expect(stage).not.toMatch(/(^|\s)bg-edu-surface(\s|$)/);
+    expect(stage).not.toContain('border-edu-line');
     expect(stage).toContain('lg:max-w-2xl');
   });
 

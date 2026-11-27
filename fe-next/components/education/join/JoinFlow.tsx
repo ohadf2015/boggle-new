@@ -6,7 +6,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { signedInNeedsRecovery } from '@/lib/education/unconfirmedJoinEmail';
 import { cn } from '@/lib/utils';
-import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
 import { JOIN_CODE_LENGTH, joinCodeOverflows, sanitizeJoinCode } from './JoinCodeField';
 import { useJoinFlow } from './useJoinFlow';
 import { pickFunName } from './funName';
@@ -150,8 +149,6 @@ export function JoinFlow({
         dir={dir}
         className="fixed inset-x-0 top-0 bottom-[var(--cookie-consent-height,0px)] isolate flex flex-col overflow-hidden text-edu-ink"
       >
-        <AcademyBackdrop art="arena" />
-
         <div
           data-testid="join-scroll"
           className="relative z-10 flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain"
@@ -160,12 +157,11 @@ export function JoinFlow({
           data-testid="join-stage"
           className={cn(
             'mx-auto flex w-full max-w-md flex-col justify-center short:justify-start sm:max-w-lg [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:max-w-3xl [@media(orientation:landscape)_and_(max-height:520px)_and_(min-width:600px)]:justify-center',
-            // The arena art is loud: a solid panel keeps the subtitle and helper text readable and lets the form own the screen.
-            'my-auto w-[calc(100%-1.5rem)] flex-none rounded-neo border-3 border-edu-line bg-edu-surface px-5 py-6 shadow-hard-lg short:py-3 lg:max-w-2xl lg:px-12 lg:py-10 tv:max-w-4xl'
+            'my-auto w-full flex-none px-4 py-6 short:py-3 lg:max-w-2xl lg:px-6 lg:py-10 tv:max-w-4xl'
           )}
         >
           <header className="mb-5 flex items-center justify-between gap-3 short:mb-3 lg:mb-8">
-            <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-navy shadow-hard lg:text-2xl">
+            <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-lg font-black uppercase tracking-tight text-neo-black shadow-edu-lip-sm lg:text-2xl">
               LexiClash
             </span>
             <div className="flex items-center gap-3">

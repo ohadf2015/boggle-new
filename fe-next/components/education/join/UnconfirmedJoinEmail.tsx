@@ -117,7 +117,7 @@ export function UnconfirmedJoinEmail({
     : null;
 
   return (
-    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard-sm">
+    <div data-testid="join-unconfirmed-panel" className="mt-4 rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-edu-lip-sm">
       <h2 className="font-neo-display text-base font-black">{t(`${K}.unconfirmed.title`, 'Fix the email, then join')}</h2>
       <p className="mt-1 text-sm text-edu-ink/80">
         {signedInEmail
@@ -155,7 +155,7 @@ export function UnconfirmedJoinEmail({
           data-testid="join-unconfirmed-resend"
           disabled={status === 'sending'}
           onClick={onResend}
-          className="min-h-11 rounded-neo border-3 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm disabled:opacity-60"
+          className="min-h-11 rounded-neo border-3 border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black text-neo-navy shadow-edu-lip-sm disabled:opacity-60"
         >
           {status === 'sending'
             ? t(`${K}.unconfirmed.resending`, 'Sending…')

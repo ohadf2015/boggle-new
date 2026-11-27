@@ -48,7 +48,7 @@ export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode
           {t('education.student.gameEnded.title')}
         </h1>
         {label && <p className="mt-2 font-neo-display text-lg font-black text-edu-lime-ink lg:text-xl">{label}</p>}
-        <p data-testid="join-ended-practice-line" className="mt-3 font-neo-body text-base font-bold text-edu-cyan-ink lg:text-lg">
+        <p data-testid="join-ended-practice-line" className="mt-3 font-neo-body text-base font-bold text-edu-ink lg:text-lg">
           {t('education.student.deadEnd.endedLine')}
         </p>
       </div>
@@ -64,7 +64,7 @@ export function JoinEndedPanel({ code, label, classroomId: enrolledIn, onNewCode
         {classroomId && (
           <Link
             href={joinClassHref(language)}
-            className="flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-hard-sm transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5 active:shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
+            className="flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cyan px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-navy shadow-edu-lip-sm transition-transform duration-100 motion-safe:active:translate-y-0.5 active:shadow-edu-lip-sm focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan"
           >
             {t('education.student.gameEnded.toClass')}
           </Link>

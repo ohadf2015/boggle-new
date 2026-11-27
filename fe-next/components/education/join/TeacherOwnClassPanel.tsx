@@ -20,7 +20,7 @@ interface TeacherOwnClassPanelProps {
 }
 
 const ACTION =
-  'flex min-h-14 w-full items-center justify-center rounded-neo border-3 border-neo-black px-4 py-3 text-center font-neo-display text-lg font-black uppercase leading-tight text-neo-navy [overflow-wrap:anywhere] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan transition-transform duration-100 motion-safe:active:translate-x-0.5 motion-safe:active:translate-y-0.5';
+  'flex min-h-14 w-full items-center justify-center rounded-neo border-3 border-neo-black px-4 py-3 text-center font-neo-display text-lg font-black uppercase leading-tight text-neo-navy [overflow-wrap:anywhere] focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-neo-cyan transition-transform duration-100 motion-safe:active:translate-y-0.5';
 
 export function teacherClassHref(locale: string, classroomId: string): string {
   return `/${locale}/teacher/classroom/${encodeURIComponent(classroomId)}`;
@@ -83,10 +83,10 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode, joinCode }: Te
         </p>
       </div>
       <div className="flex flex-col gap-3">
-        <Link href={primaryHref} data-testid="own-class-primary" onClick={onPrimary} className={cn(ACTION, 'bg-neo-lime shadow-hard')}>
+        <Link href={primaryHref} data-testid="own-class-primary" onClick={onPrimary} className={cn(ACTION, 'bg-neo-lime shadow-edu-lip')}>
           {t(live ? 'education.student.join.ownClass.openBoard' : 'education.student.join.ownClass.startGame')}
         </Link>
-        <Link href={teacherClassHref(language, classroomId)} data-testid="own-class-secondary" className={cn(ACTION, 'min-h-12 bg-neo-cream shadow-hard-sm')}>
+        <Link href={teacherClassHref(language, classroomId)} data-testid="own-class-secondary" className={cn(ACTION, 'min-h-12 bg-neo-cream shadow-edu-lip-sm')}>
           {t('education.student.join.ownClass.openClass')}
         </Link>
         {joinCode ? (
@@ -96,7 +96,7 @@ export function TeacherOwnClassPanel({ classroomId, liveGameCode, joinCode }: Te
             onClick={() => { void joinAsStudent(); }}
             disabled={leaving}
             aria-busy={leaving || undefined}
-            className={cn(ACTION, 'min-h-12 bg-neo-cyan text-neo-navy shadow-hard-sm disabled:cursor-wait disabled:opacity-60')}
+            className={cn(ACTION, 'min-h-12 bg-neo-cyan text-neo-navy shadow-edu-lip-sm disabled:cursor-wait disabled:opacity-60')}
           >
             <UserPlus aria-hidden="true" className="me-2 size-5" strokeWidth={2.75} />
             {leaving
