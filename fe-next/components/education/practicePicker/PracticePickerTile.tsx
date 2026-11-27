@@ -78,12 +78,12 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
             'cursor-not-allowed border-edu-line bg-edu-surface text-edu-ink'
       )}
     >
-      {/* Art: bespoke poster bleeds to the edges, chip art floats on the accent. */}
+      {/* Art: a poster sits whole on its own field colour above the band, chip art floats on the tile. */}
       {art.kind === 'poster' ? (
-        // Inset by the frame width so the accent shows as a hard rim around the
-        // poster. Bespoke posters are painted on the same navy as the page, so
-        // edge-to-edge art would put a navy tile on a navy grid again.
-        <span data-poster-frame="" className="absolute inset-0 overflow-hidden rounded-[5px]">
+        <span
+          data-poster-frame=""
+          className={cn('relative block min-h-0 flex-1 overflow-hidden', art.field, !tile.ready && 'grayscale')}
+        >
           <Image
             data-testid={`practice-tile-art-${tile.id}`}
             src={art.src}
@@ -91,7 +91,7 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
             fill
             sizes="(max-width: 640px) 45vw, 180px"
             unoptimized
-            className={cn('object-cover object-top', !tile.ready && 'grayscale')}
+            className="object-contain"
           />
         </span>
       ) : (

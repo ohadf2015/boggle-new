@@ -63,6 +63,16 @@ describe('PracticePickerTile contrast', () => {
     ).not.toBeNull();
   });
 
+  it('shows the whole poster above the name band, on its own field colour', () => {
+    render(<PracticePickerTile tile={tile({ id: 'blitz', mode: 'blitz' })} onSelect={vi.fn()} />);
+    const art = screen.getByTestId('practice-tile-art-blitz');
+    const frame = art.closest('[data-poster-frame]')!;
+    expect(art.className).toContain('object-contain');
+    expect(frame.className).toContain('bg-neo-pink');
+    expect(frame.className).toContain('flex-1');
+    expect(frame.className).not.toContain('absolute');
+  });
+
   it('keeps a locked tile bordered so it still reads as a control', () => {
     render(
       <PracticePickerTile

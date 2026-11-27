@@ -5,5 +5,6 @@ Generated in Higgsfield (nano_banana_pro + seedance_2_5) from the plain LexiClas
 - hero-empty-classroom (16:9) · podium-three (16:9) · peek-card (4:5)
 - mode-classic-nobg · mode-word-hunt-nobg · mode-blast-nobg · mode-wheel-rush-nobg · mode-vocab-quiz-nobg — mode posters (1:1, 320px, transparent: the baked navy #1a1a2e was floodfilled out at fuzz 8% on 2026-09-11 so each poster sits on its own accent field in the mode picker). Renamed with the `-nobg` suffix in the same pass — `/_next/image` caches by URL for a year, so new bytes under an old name never reach a warm browser.
 - practice-flashcard · practice-spelling · practice-blitz — practice posters (3:4, navy background)
+- practice-blitz-sky · practice-flashcard-sky · practice-spelling-sky — the same posters re-keyed onto flat neo pink / cyan / yellow for the cream classroom tiles (2026-11-27: navy flood-filled from the edges plus enclosed blobs, edge pixels unmixed against the nearest foreground colour)
 - sticker-cool · sticker-panic · sticker-lol · sticker-flex — duel taunt stickers (transparent)
 - video/teacher-hero-idle.mp4 · trophy-celebrate.mp4 · level-up.mp4 · peek-card.mp4 — 4 s loops, navy background, no audio. Use <video autoPlay loop muted playsInline poster=…webp>.
