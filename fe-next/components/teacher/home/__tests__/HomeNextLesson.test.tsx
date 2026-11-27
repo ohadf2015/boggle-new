@@ -17,9 +17,15 @@ afterEach(() => {
 });
 
 describe('<HomeNextLesson>', () => {
-  it('Given a class with no students, When it mounts before the saved plan arrives, Then nothing renders so no sibling moves', () => {
+  it('Given a class with no students, When it mounts before the saved plan arrives, Then it holds the card space so the desk under it does not jump', () => {
     vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
-    const { container } = render(<HomeNextLesson classroomId="c1" memberCount={0} />);
+    render(<HomeNextLesson classroomId="c1" memberCount={0} />);
+    expect(screen.getByTestId('lesson-plan-placeholder')).toBeInTheDocument();
+  });
+
+  it('Given a class with students, When it mounts before the saved plan arrives, Then nothing renders (it sits at the bottom and has no ask)', () => {
+    vi.stubGlobal('fetch', vi.fn(() => new Promise(() => {})));
+    const { container } = render(<HomeNextLesson classroomId="c1" memberCount={4} />);
     expect(container).toBeEmptyDOMElement();
   });
 

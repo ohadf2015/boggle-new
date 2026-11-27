@@ -300,6 +300,8 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
   });
   const assignLoopList = () => assign.openWith(loop.listId);
 
+  const noStudentsYet = selectedClassroom?.member_count === 0;
+
   const greeting = firstName ? t(greetingKey(hour), { name: firstName }) : t('eduShell.home.greetNoName');
 
   return (
@@ -366,7 +368,14 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               joinGoal={selectedClassroom && shareCardShown ? <HomeJoinGoal key={selectedClassroom.id} classroom={selectedClassroom} /> : undefined}
             />
           </div>
-          {selectedClassroom ? (
+          {selectedClassroom && noStudentsYet ? (
+            // A class nobody has joined yet: its first lesson is the next step, so the ask sits under the hero. The
+            // results link and the week challenge wait for students: with nobody in the class they have nothing to show.
+            <div data-tm className="empty:hidden">
+              <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
+            </div>
+          ) : null}
+          {selectedClassroom && !noStudentsYet ? (
             <div data-tm>
               <HomeDeskBoard
                 key={selectedClassroom.id}
@@ -385,7 +394,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
             </div>
           ) : null}
           {selectedClassroom ? <EndedCodeTriesNotice classroomId={selectedClassroom.id} pro={pro} /> : null}
-          {selectedClassroom ? (
+          {selectedClassroom && !noStudentsYet ? (
             <div data-tm>
               <HomeWeekChallenge
                 key={selectedClassroom.id}
@@ -400,7 +409,7 @@ export default function TeacherDashboard({ banner, alert }: TeacherDashboardProp
               />
             </div>
           ) : null}
-          {selectedClassroom ? (
+          {selectedClassroom && !noStudentsYet ? (
             <div data-tm className="empty:hidden">
               <HomeNextLesson classroomId={selectedClassroom.id} memberCount={selectedClassroom.member_count} />
             </div>

@@ -23,8 +23,9 @@ import { weekLoopFixture } from './weekLoopFixture';
 import { missedLastGame, playAgainTarget, readyForTest, replayDetail } from './weekLoopModel';
 import { previewBanner } from './TeacherProBannersPreview';
 import { HomeClassInsightCard } from './HomeClassInsightCard';
+import { HomeNextLesson } from './HomeNextLesson';
 
-export type TeacherHomePreviewState = 'classes' | 'empty' | 'loading';
+export type TeacherHomePreviewState = 'classes' | 'empty' | 'loading' | 'new';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -34,6 +35,8 @@ const CLASSES = [
   { id: 'p4a', name: '4A - Reading', member_count: 26, join_code: 'ZT4H9N' },
   { id: 'p6c', name: '6C - Spelling', member_count: 24, join_code: 'M3XPRA' },
 ];
+// A teacher back after setting up: one class, nobody has joined it yet.
+const NEW_CLASS = [{ id: 'pnew', name: '3B - Vocabulary', member_count: 0, join_code: 'R8KD2P' }];
 const noopSubscribe = () => () => undefined;
 const PLAYS: [string, number][] = [['p5b', 3], ['p5b', 26], ['p4a', 50], ['p5b', 74], ['p6c', 98], ['p4a', 122]];
 
@@ -50,8 +53,10 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
   const { t: rawT, language } = useLanguage();
   const t = rawT as T;
   const [nowMs] = useState(() => Date.now());
-  const [selectedId, setSelectedId] = useState(fixture[0].id);
-  const classes = state === 'classes' ? fixture : [];
+  const isNew = state === 'new';
+  const shown = isNew ? NEW_CLASS : fixture;
+  const [selectedId, setSelectedId] = useState(shown[0].id);
+  const classes = state === 'classes' || isNew ? shown : [];
   // Skeleton until mounted: the insight cursor and clock differ between server and browser.
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const ready = mounted && state !== 'loading';
@@ -59,7 +64,7 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
   const selected = classes.find((c) => c.id === selectedId) ?? null;
 
   const summary = useMemo(() => summarizeTeacherWeek(activity(nowMs), CLASSES, nowMs), [nowMs]);
-  const rosterInput = selected ? rosterFixture(selected.id, selected.member_count, nowMs) : null;
+  const rosterInput = selected && !isNew ? rosterFixture(selected.id, selected.member_count, nowMs) : null;
   const roster = rosterInput ? rosterRows(rosterInput, nowMs) : null;
   const loop = selected && rosterInput ? weekLoopFixture(selected.id, rosterInput, language, nowMs) : null;
   const readyCount = loop ? readyForTest(loop.game) : null;
@@ -103,10 +108,16 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
             replay={replay ? { kind: 'ready', href: replay.href, detail: replayDetail(replay, t) } : undefined}
           />
         </div>
+        {isNew ? (
+          <div data-tm className="empty:hidden">
+            <HomeNextLesson classroomId={selected.id} memberCount={selected.member_count} />
+          </div>
+        ) : null}
+        {isNew ? null : (
         <div data-tm>
           <HomeDeskBoard
             key={selected.id}
-            roster={pro ? { rows: roster, failed: false } : null}
+            roster={pro && !isNew ? { rows: roster, failed: false } : null}
             memberCount={selected.member_count}
             onOpenResults={() => undefined}
             readyLabel={readyCount?.kind === 'counts' ? t('eduShell.home.loop.ready', { ready: readyCount.ready, total: readyCount.rated }) : null}
@@ -118,6 +129,7 @@ export function TeacherHomePreview({ state, banner, insight = false, pro = !insi
             t={t}
           />
         </div>
+        )}
         </>
       ) : null}
       sessions={ready && selected ? (
