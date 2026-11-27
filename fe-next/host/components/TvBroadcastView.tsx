@@ -265,7 +265,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
 
   if (isVocabQuizRoom) {
     return (
-      <div className="flex-1 flex flex-col min-h-0 bg-neo-navy" style={TEACHER_CONTROLS_INSET}>
+      <div className="flex-1 flex flex-col min-h-0 bg-edu-page" style={TEACHER_CONTROLS_INSET}>
         <VocabQuizHostView
           socket={socket}
           joinCode={gameCode}

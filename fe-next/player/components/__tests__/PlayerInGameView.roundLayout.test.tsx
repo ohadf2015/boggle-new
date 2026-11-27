@@ -233,4 +233,9 @@ describe('PlayerInGameView — round frame', () => {
     expect((container.firstElementChild as HTMLElement).className).toContain('bg-neo-navy');
     expect(screen.getByTestId('mp-round-layout')).toHaveClass('bg-neo-navy');
   });
+
+  it('classroom: the board placeholder before the grid arrives is the sky page, not a navy flash', () => {
+    const { container } = render(<PlayerInGameView {...baseProps} classroom letterGrid={null as never} />);
+    expect((container.firstElementChild as HTMLElement).className).toContain('bg-edu-page');
+  });
 });

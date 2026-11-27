@@ -271,7 +271,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
     if (shellEnabled) {
       return (
         <>
-          <div className={getMpInGameContainerClass(gameMode)}>
+          <div className={getMpInGameContainerClass(gameMode, { classroom })}>
             <RoundClock>{(remainingTime) => (
               <MpDesktopShellFrame
                 gameMode={gameMode}
@@ -323,7 +323,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // rage-click inert tiles while startGame is in flight.
   if (!effectiveGrid) {
     return (
-      <div className={getMpInGamePlaceholderClass()}>
+      <div className={getMpInGamePlaceholderClass({ classroom })}>
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4 pointer-events-none" aria-label="Loading board">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
