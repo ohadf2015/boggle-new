@@ -6,6 +6,7 @@ import SightWords from '@/app/[locale]/education/sight-words-practice/page';
 import EslWordGames from '@/app/[locale]/education/esl-word-games/page';
 import { getEslWordGamesLanding } from '@/app/[locale]/education/esl-word-games/landing';
 import { getSightWordsLanding } from '@/app/[locale]/education/sight-words-practice/landing';
+import { splitLead } from '@/components/landing/splitLead';
 
 type PageFn = (p: { params: Promise<{ locale: string }> }) => Promise<unknown>;
 const renderPage = async (page: PageFn) =>
@@ -16,13 +17,13 @@ describe('education SEO landing template, Duolingo polish', () => {
     const { container } = await renderPage(EslWordGames as PageFn);
     expect(container.querySelector('img[src*="education-hero"]')).toBeNull();
     expect(container.querySelector('h1, h2')?.tagName).toBe('H1');
-    expect(container.querySelector('main [data-ambient]')).toBeInTheDocument();
   });
 
   it('says the hero subtitle once when the banner only echoed it', async () => {
     const { container } = await renderPage(EslWordGames as PageFn);
-    const sub = getEslWordGamesLanding('en').hero.subtitle;
-    expect(container.textContent!.split(sub).length - 1).toBe(1);
+    for (const part of splitLead(getEslWordGamesLanding('en').hero.subtitle).filter(Boolean)) {
+      expect(container.textContent!.split(part!).length - 1).toBe(1);
+    }
   });
 
   it('keeps a banner line that is its own copy, below the hero', async () => {

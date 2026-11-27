@@ -414,6 +414,20 @@ export function FaqList({
   );
 }
 
+/** Always-open answers, for pages whose FAQ must be readable without a click. */
+export function FaqCards({ items }: { items: { q: React.ReactNode; a: React.ReactNode }[] }) {
+  return (
+    <div className="grid items-start gap-3 md:grid-cols-2">
+      {items.map((item, i) => (
+        <article key={i} className={cn(PAPER, 'flex flex-col gap-2 p-4 sm:p-5')}>
+          <h3 className="font-neo-display text-lg font-bold leading-snug">{item.q}</h3>
+          <div className="text-[15px] leading-relaxed">{item.a}</div>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 /** Secondary internal links, kept compact so they don't compete with the page's CTA. */
 export function LinkPills({ items }: { items: { href: string; label: React.ReactNode }[] }) {
   return (

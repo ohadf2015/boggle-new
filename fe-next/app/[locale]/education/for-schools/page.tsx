@@ -105,7 +105,7 @@ export default async function Page({ params }: PageProps) {
   const play = { href: `/${locale}/education/classroom-game`, label: c.heroCta1 };
 
   return (
-    <LandingPage locale={locale} play={play.label.length <= 18 ? play : undefined}>
+    <LandingPage locale={locale}>
       <JsonLd data={faqJsonLd} />
       <JsonLd data={orgJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />

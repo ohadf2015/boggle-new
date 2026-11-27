@@ -13,12 +13,13 @@ describe('games-for-teachers page', () => {
     expect(districtLink).not.toBeNull();
   });
 
-  it('renders a visible GEO answer block and H3 FAQs whose answers ship in the HTML', async () => {
+  it('renders a visible GEO answer block and H3 FAQs (not collapsed details)', async () => {
     const { container } = render(
       await Page({ params: Promise.resolve({ locale: 'en' }) }),
     );
     expect(container.querySelector('[data-answer]')).not.toBeNull();
     expect(container.querySelector('[data-geo-faq] h3')).not.toBeNull();
+    expect(container.querySelector('[data-geo-faq] details')).toBeNull();
     const faq = container.querySelector('[data-geo-faq]')!.textContent;
     for (const { a } of getGamesForTeachersLanding('en').faqs) expect(faq).toContain(a);
   });

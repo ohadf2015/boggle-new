@@ -1,13 +1,16 @@
+import Link from 'next/link';
 import { JsonLd } from '@/components/seo/JsonLd';
+import { PressSurface } from '@/components/motion/PressSurface';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import {
   CtaBand,
-  FaqList,
+  FaqCards,
   LandingButton,
   LandingHero,
   LandingPage,
   Mark,
   Section,
+  landingButtonClass,
   type LandingTone,
 } from '@/components/landing/kit';
 import { LANDING_ART } from '@/components/landing/kit/art';
@@ -112,9 +115,11 @@ export function EducationKitLanding({
         lead={lead}
         actions={
           <>
-            <LandingButton href={primary.href} data-hero-primary>
-              <CtaLabel cta={hero.primaryCta} />
-            </LandingButton>
+            <PressSurface asChild data-hero-primary className={landingButtonClass('primary')}>
+              <Link href={primary.href}>
+                <CtaLabel cta={hero.primaryCta} />
+              </Link>
+            </PressSurface>
             {hero.secondaryCta && (
               <LandingButton href={`/${locale}${hero.secondaryCta.href}`} variant="secondary">
                 <CtaLabel cta={hero.secondaryCta} />
@@ -163,7 +168,7 @@ export function EducationKitLanding({
       {content.faqs.length > 0 && (
         <div data-geo-faq>
           <Section title={content.labels.faqTitle}>
-            <FaqList headingLevel={3} items={content.faqs} />
+            <FaqCards items={content.faqs} />
           </Section>
         </div>
       )}

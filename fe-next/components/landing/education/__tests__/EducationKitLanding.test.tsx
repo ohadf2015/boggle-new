@@ -39,12 +39,12 @@ describe('EducationKitLanding', () => {
     expect(marked(filler, '/education/boggle-for-kids')).toBeNull();
   });
 
-  it('folds the FAQ but keeps every question an h3', () => {
+  it('keeps the FAQ open for answer engines, each question an h3', () => {
     const content = getBoggleForKidsContent('en');
     const { container } = render(<EducationKitLanding locale="en" path="/education/boggle-for-kids" content={content} />);
     const faq = container.querySelector('[data-geo-faq]')!;
     for (const { q, a } of content.faqs) {
-      expect(screen.getByRole('heading', { level: 3, name: q }).closest('summary')).not.toBeNull();
+      expect(screen.getByRole('heading', { level: 3, name: q }).closest('details')).toBeNull();
       expect(faq.textContent).toContain(a);
     }
   });
@@ -62,6 +62,23 @@ describe('EducationKitLanding', () => {
     );
     const mine = new Set(hrefs(container));
     for (const href of hrefs(old.container)) expect(mine).toContain(href);
+  });
+
+  it('marks the schools link for measurement only where the teacher ask is shown, as before', () => {
+    const base = getBoggleForKidsContent('en');
+    const { container } = render(
+      <EducationKitLanding locale="en" path="/education/boggle-for-kids" content={{ ...base, showTeacherAccessCta: false }} />,
+    );
+    expect(container.querySelector('[data-lc-cta="for_schools"]')).toBeNull();
+  });
+
+  it('counts each closing ask only when its own card is seen', () => {
+    const observed: Element[] = [];
+    vi.stubGlobal('IntersectionObserver', class { observe(el: Element) { observed.push(el); } disconnect() {} });
+    render(<EducationKitLanding locale="en" path="/education/boggle-for-kids" content={getBoggleForKidsContent('en')} />);
+    const asks = observed.filter((el) => el.hasAttribute('data-impression'));
+    expect(asks.map((el) => el.getAttribute('data-impression'))).toEqual(['teacher_individual', 'district_upsell']);
+    vi.unstubAllGlobals();
   });
 
   it('keeps teacher and district CTA tracking hooks', () => {

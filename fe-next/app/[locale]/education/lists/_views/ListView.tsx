@@ -1,7 +1,7 @@
 import { WORD_LIST_INDEXING } from '@/lib/seo/wordLists/indexPolicy';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { FaqList, Section, landingButtonClass } from '@/components/landing/kit';
+import { FaqCards, Section, landingButtonClass } from '@/components/landing/kit';
 import { EducationKitRelated } from '@/components/landing/education/EducationKitRelated';
 import { getCatalog, relatedLists } from '@/lib/seo/wordLists/catalog';
 import { listGraph } from '@/lib/seo/wordLists/jsonLd';
@@ -229,7 +229,7 @@ export function ListView({ list, locale }: { list: WordList; locale: string }) {
 
       <div data-geo-faq className="mt-14">
         <Section title={tr(locale, 'detail.faqTitle')}>
-          <FaqList headingLevel={3} items={faqs} />
+          <FaqCards items={faqs} />
         </Section>
       </div>
 
