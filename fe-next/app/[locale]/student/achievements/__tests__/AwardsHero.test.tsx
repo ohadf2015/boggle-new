@@ -66,4 +66,13 @@ describe('AwardsHero', () => {
     expect(screen.queryByTestId('awards-next')).not.toBeInTheDocument();
     expect(screen.getByText('academy.pages.awardsAllMaxed')).toBeInTheDocument();
   });
+
+  it('given the page panel is already a card, when rendered, then the summary is a plain group, not a card inside it', () => {
+    render(<AwardsHero achievements={{ near: a(13), far: a(2) }} />);
+    const card = screen.getByTestId('awards-hero-card');
+    expect(card.className).not.toMatch(/(^|\s)(border-\d|rounded-|shadow-)/);
+    expect(card.style.background).toBe('');
+    expect(card.style.backgroundColor).toBe('');
+    expect(card.style.boxShadow).toBe('');
+  });
 });

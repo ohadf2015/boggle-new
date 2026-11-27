@@ -105,8 +105,7 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
         <div
           data-testid="awards-hero-card"
           data-hero-card
-          className="relative grid gap-2.5 overflow-hidden rounded-[18px] border-3 border-neo-black p-2.5 sm:p-3 md:grid-cols-2 md:gap-3"
-          style={toneStyle('night', { shadow: 3 })}
+          className="relative grid gap-2.5 md:grid-cols-2 md:gap-3"
         >
           <div className="flex min-w-0 flex-col justify-center gap-2.5">
             <div className="flex items-center gap-3">
