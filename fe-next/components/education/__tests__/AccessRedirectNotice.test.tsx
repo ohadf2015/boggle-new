@@ -76,4 +76,12 @@ describe('<AccessRedirectNotice>', () => {
     render(<AccessRedirectNotice from="/en/teacher" />);
     expect(screen.getByRole('status')).toBeInTheDocument();
   });
+
+  it('is a solid outlined chip on the sky page and keeps its cyan wash on dark pages', () => {
+    render(<AccessRedirectNotice from="/en/teacher" />);
+    const chip = screen.getByRole('status').className.split(/\s+/);
+    expect(chip).toEqual(expect.arrayContaining(['bg-neo-cyan/10', 'border-neo-cyan/60']));
+    expect(chip).toEqual(expect.arrayContaining(['edu-sky:bg-edu-surface', 'edu-sky:border-edu-line', 'edu-sky:text-edu-ink']));
+    expect(chip.filter((c) => /edu-(surface|line|ink)/.test(c) && !c.startsWith('edu-sky:'))).toEqual([]);
+  });
 });
