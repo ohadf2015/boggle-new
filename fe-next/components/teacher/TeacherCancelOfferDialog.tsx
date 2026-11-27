@@ -9,10 +9,11 @@
  *
  * Two one-click offers, each applied to the EXISTING Polar subscription
  * (POST /api/subscription/retention-offer — never a new checkout):
- *   pause    — trial subscriptions only for now: the trial end (and first
- *              charge) moves out one month, live via Polar.
- *   discount — 50% off the next 3 months; recorded until the provider-side
- *              discount object is wired (see PR).
+ *   pause    — trialing only. The server moves trial_end out one month via
+ *              Polar. An active plan has no live pause call, so the button
+ *              is not shown (a recorded "pause" must not claim the charge moved).
+ *   discount — a request only. Polar discount_id is not wired; the copy must
+ *              not say the price already changed.
  * Dismissal ("continue to cancellation", or the backdrop) lands on the
  * original manage href — the Polar portal or the in-app plan page.
  *
@@ -117,7 +118,9 @@ export function TeacherCancelOfferDialog({ status, manageHref, external, onClose
           <div className={nbDialogHeaderClass('lime')}>
             <div className="flex items-center gap-3">
               <Check className="size-7 shrink-0" strokeWidth={3} aria-hidden="true" />
-              <h2 className={NB_DIALOG_TITLE}>{t('teacher.subscription.cancelOfferAppliedTitle')}</h2>
+              <h2 className={NB_DIALOG_TITLE}>
+                {t(applied.live ? 'teacher.subscription.cancelOfferAppliedTitle' : 'teacher.subscription.cancelOfferRequestTitle')}
+              </h2>
             </div>
           </div>
           <div className={NB_DIALOG_BODY}>
@@ -177,13 +180,15 @@ export function TeacherCancelOfferDialog({ status, manageHref, external, onClose
         <div className={NB_DIALOG_BODY}>
           <p className="font-neo-body text-sm font-bold text-neo-cream">{t('teacher.subscription.cancelOfferBody')}</p>
           <div className="mt-4 flex flex-col gap-2">
-            {offerButton(
-              'pause',
-              <CalendarClock className="size-5" strokeWidth={2.5} aria-hidden="true" />,
-              t('teacher.subscription.cancelOfferPauseTitle'),
-              t('teacher.subscription.cancelOfferPauseBody', { price }),
-              NB_BLOCK.lime,
-            )}
+            {status === 'trialing'
+              ? offerButton(
+                  'pause',
+                  <CalendarClock className="size-5" strokeWidth={2.5} aria-hidden="true" />,
+                  t('teacher.subscription.cancelOfferPauseTitle'),
+                  t('teacher.subscription.cancelOfferPauseBody', { price }),
+                  NB_BLOCK.lime,
+                )
+              : null}
             {offerButton(
               'discount',
               <BadgePercent className="size-5" strokeWidth={2.5} aria-hidden="true" />,

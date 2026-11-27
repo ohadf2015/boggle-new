@@ -61,7 +61,13 @@ describe('TeacherCancelOfferDialog', () => {
     expect(onClose).toHaveBeenCalledWith('applied');
   });
 
-  it('discount is one click: fires accepted {offer:discount} and says the change will show on the subscription', async () => {
+  it('an active plan does not offer a live pause — that Polar call is not wired', () => {
+    render(<TeacherCancelOfferDialog status="active" manageHref={PORTAL} external onClose={vi.fn()} />);
+    expect(screen.queryByTestId('cancel-offer-pause')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cancel-offer-discount')).toBeInTheDocument();
+  });
+
+  it('discount is one click: fires accepted {offer:discount} and saves a request, not a bill change', async () => {
     fetchOk({ ok: true, applied: 'recorded' });
     render(<TeacherCancelOfferDialog status="active" manageHref={PORTAL} external onClose={vi.fn()} />);
     fireEvent.click(screen.getByTestId('cancel-offer-discount'));
