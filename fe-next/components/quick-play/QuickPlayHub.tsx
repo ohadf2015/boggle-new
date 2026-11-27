@@ -281,6 +281,7 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
     setPhase('loading');
     const hold = strikeHoldMs(prefersReducedMotion());
     const started = Date.now();
+    let failStatus = 0; // 0 = network error / bad body, not an HTTP status
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
@@ -292,15 +293,24 @@ export function QuickPlayHub({ challengeId, seeded = null, backHref, startMode, 
       });
       if (!res.ok) {
         setRateLimited(res.status === 429);
+        failStatus = res.status;
         throw new Error(`round fetch ${res.status}`);
       }
       const round = (await res.json()) as QuickRoundConfig;
       if (variant === 'coach') round.coach = true;
       const elapsed = Date.now() - started;
+      posthog.capture('quick_play_board_loaded', { mode, method, roundIndex, loadMs: elapsed });
       if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
       setPhase('playing');
     } catch {
+      posthog.capture('quick_play_board_fetch_failed', {
+        mode,
+        method,
+        roundIndex,
+        status: failStatus,
+        loadMs: Date.now() - started,
+      });
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
       // tap is indistinguishable from a bug).
       setPhase('error');

@@ -141,6 +141,28 @@ describe('QuickPlayHub', () => {
     expect(bodies).toEqual(['blast', 'blast']);
   });
 
+  it('reports quick_play_board_loaded on success and quick_play_board_fetch_failed with the status on failure', async () => {
+    const { unmount } = render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => screen.getByTestId('mock-finish'), { timeout: 3000 });
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_loaded',
+      expect.objectContaining({ mode: 'blast', loadMs: expect.any(Number) })
+    );
+    unmount();
+    vi.mocked(posthog.capture).mockClear();
+    fetchMock.mockImplementation((url: string) =>
+      String(url).includes('/round')
+        ? Promise.resolve({ ok: false, status: 503, json: async () => ({}) })
+        : Promise.resolve({ ok: true, json: async () => ({}) })
+    );
+    render(<QuickPlayHub startMode="blast" />);
+    await waitFor(() => screen.getByTestId('quick-load-error'));
+    expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
+      'quick_play_board_fetch_failed',
+      expect.objectContaining({ mode: 'blast', status: 503 })
+    );
+  });
+
   it('holds the overlay quiet zone while results are on screen so the cookie bar stays off NEXT BOARD', async () => {
     render(<QuickPlayHub />);
     await waitFor(() => screen.getByTestId('mock-finish'));
