@@ -95,7 +95,7 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 18:35: freeze checker fix = PR #2205 (worktree boggle-wt-seofreeze); redesign branch passes it with 0 violations.
   Merging #2205 when CI green (fix PR rule), then merge master here and rerun the freeze check. Landing branch itself
   still waits for OWNER APPROVAL of https://claude.ai/artifact/C3zbSRzDPekuMbpRBMDVYg before push/PR/merge.
-  After #2205 merges: `git worktree remove ~/git/boggle-wt-seofreeze`.
+  #2205 MERGED (0e4994253), merged into this branch, freeze check OK, its worktree removed.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
