@@ -177,6 +177,15 @@ describe('captureEduServerEvents — $host', () => {
     }
   });
 
+  it('Given a test-account flag on a money event, When captured, Then PostHog is not called', () => {
+    captureEduServerEvents([{
+      distinctId: 'qa-1',
+      event: 'teacher_pro_upgraded',
+      properties: { is_test_account: true },
+    }]);
+    expect(mockCapture).not.toHaveBeenCalled();
+  });
+
   it('Given a test-account flag, When captured, Then is_test_account rides the event so funnels can exclude it', () => {
     const ev = buildClassroomGameStartedEvent(makeGame(), { isTestAccount: true })!;
     captureEduServerEvents([ev]);

@@ -52,11 +52,34 @@ export function polarRevenueProps(data: PolarData): PolarRevenueProps {
   };
 }
 
-/** The optional reason and comment Polar's portal asks for on cancel. */
-export function polarCancelReasonProps(data: PolarData): { cancel_reason?: string; cancel_comment?: string } {
+/** The optional reason and comment Polar's portal asks for on cancel, plus when it ends. */
+export function polarCancelRecord(data: PolarData): {
+  customer_cancellation_reason?: string;
+  customer_cancellation_comment?: string;
+  cancel_reason?: string;
+  cancel_comment?: string;
+  canceled_at?: string;
+  ends_at?: string;
+} {
   const reason = str(data?.customer_cancellation_reason);
   const comment = str(data?.customer_cancellation_comment);
-  return { ...(reason ? { cancel_reason: reason } : {}), ...(comment ? { cancel_comment: comment } : {}) };
+  const canceledAt = str(data?.canceled_at);
+  const endsAt = str(data?.ends_at) ?? str(data?.current_period_end) ?? str(data?.trial_end);
+  return {
+    ...(reason ? { customer_cancellation_reason: reason, cancel_reason: reason } : {}),
+    ...(comment ? { customer_cancellation_comment: comment, cancel_comment: comment } : {}),
+    ...(canceledAt ? { canceled_at: canceledAt } : {}),
+    ...(endsAt ? { ends_at: endsAt } : {}),
+  };
+}
+
+/** The optional reason and comment Polar's portal asks for on cancel. */
+export function polarCancelReasonProps(data: PolarData): { cancel_reason?: string; cancel_comment?: string } {
+  const rec = polarCancelRecord(data);
+  return {
+    ...(rec.cancel_reason ? { cancel_reason: rec.cancel_reason } : {}),
+    ...(rec.cancel_comment ? { cancel_comment: rec.cancel_comment } : {}),
+  };
 }
 
 /** Same event, revenue props merged under the existing ones (never overrides). */

@@ -24,7 +24,10 @@ describe('TeacherProTrialCanceledBanner', () => {
     render(<TeacherProTrialCanceledBanner endsAt="2026-12-06T19:21:51.009Z" onResumed={vi.fn()} />);
     expect(screen.getByText('teacher.subscription.canceledTrialTitle:December 6')).toBeInTheDocument();
     expect(screen.getByText('teacher.subscription.canceledTrialBody')).toBeInTheDocument();
-    expect(screen.queryByRole('link')).toBeNull();
+    const lesson = screen.getByTestId('teacher-pro-trial-canceled-lesson');
+    expect(lesson).toHaveAttribute('href', '/en/teacher/classroom/new');
+    expect(screen.queryByRole('link', { name: /upgrade|checkout/i })).toBeNull();
+    expect(screen.getByTestId('teacher-pro-trial-cancel-reason-too_expensive')).toBeInTheDocument();
   });
 
   it('turns renewal back on with one tap and refreshes the plan', async () => {
@@ -45,5 +48,16 @@ describe('TeacherProTrialCanceledBanner', () => {
     await waitFor(() => expect(toast.error).toHaveBeenCalledWith('teacher.subscription.resumeError'));
     expect(onResumed).not.toHaveBeenCalled();
     expect(screen.getByTestId('teacher-pro-resume-cta')).not.toBeDisabled();
+  });
+
+  it('records a one-tap reason without starting a checkout', async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ ok: true }) });
+    render(<TeacherProTrialCanceledBanner endsAt="2026-12-06T19:21:51.009Z" onResumed={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('teacher-pro-trial-cancel-reason-school_pays'));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(
+      '/api/subscription/cancel-reason',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ reason: 'school_pays' }) }),
+    ));
+    expect(screen.getByText('teacher.subscription.cancelReasonThanks')).toBeInTheDocument();
   });
 });

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Real-HTTP Teacher Pro trial→paid proof. Disposable Postgres. `npm run check`.
+// Never talks to hosted Supabase. A prod URL here is a hard stop.
 import { spawnSync } from 'node:child_process';
 import { createHmac, randomUUID } from 'node:crypto';
 import { createServer, request as httpRequest } from 'node:http';
@@ -7,11 +8,16 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { registerHooks } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { assertDisposableSupabase, stripHostedSupabaseEnv } from './disposableSupabase.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const feNext = join(here, '..');
 
 if (!process.env.VERIFY_TEACHER_FUNNEL_HOOKED) {
+  const childEnv = { ...process.env, VERIFY_TEACHER_FUNNEL_HOOKED: '1', LD_LIBRARY_PATH: '' };
+  // A shell that already points at LexiClash prod must not be inherited. The child
+  // only talks to the local stub it starts below.
+  stripHostedSupabaseEnv(childEnv);
   const child = spawnSync(process.execPath, [
     '--import', 'tsx',
     '--import', join(here, 'verify-teacher-funnel-register.mjs'),
@@ -19,12 +25,14 @@ if (!process.env.VERIFY_TEACHER_FUNNEL_HOOKED) {
   ], {
     stdio: 'inherit',
     cwd: feNext,
-    env: { ...process.env, VERIFY_TEACHER_FUNNEL_HOOKED: '1', LD_LIBRARY_PATH: '' },
+    env: childEnv,
   });
   process.exit(child.status ?? 1);
 }
 
 // Sync hook — module.register() from --import loses the race against route imports.
+// Strip again in this process: a direct --import run must not keep a hosted URL either.
+stripHostedSupabaseEnv(process.env);
 const shimUrl = pathToFileURL(join(here, 'verify-teacher-funnel-next-headers.mjs')).href;
 registerHooks({
   resolve(specifier, context, nextResolve) {
@@ -232,6 +240,7 @@ async function main() {
     await listen(supa, SUPA_PORT);
 
     process.env.NEXT_PUBLIC_SUPABASE_URL = `http://127.0.0.1:${SUPA_PORT}`;
+    assertDisposableSupabase(process.env.NEXT_PUBLIC_SUPABASE_URL);
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = anonKey;
     process.env.SUPABASE_SERVICE_ROLE_KEY = serviceKey;
     process.env.SUPABASE_JWT_SECRET = JWT_SECRET;
