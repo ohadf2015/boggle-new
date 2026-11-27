@@ -10,6 +10,7 @@ import type { ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { tr } from './eduText';
+import { EduMascot } from '@/components/education/EduMascot';
 
 export interface ClassroomLobbyShellProps {
   /** Pinned above the scroller — the class line and the mode picker. */
@@ -37,7 +38,7 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
     >
       <div className="mx-auto flex w-full max-w-[1200px] min-h-0 flex-1 flex-col gap-2 px-1 py-1 @4xl/lobby:gap-3 @4xl/lobby:px-4">
         {/* The h1 is for screen readers; the visible line is information, so GO LIVE stays the only call to action. */}
-        <header className="flex shrink-0 justify-center text-center @4xl/lobby:justify-start @4xl/lobby:text-start">
+        <header className="relative flex shrink-0 justify-center text-center @4xl/lobby:justify-start @4xl/lobby:text-start">
           <h1 data-testid="lobby-stage-title" className="sr-only">
             {tr(t, 'academy.launch.title', 'Start a live game')}
           </h1>
@@ -47,6 +48,10 @@ export function ClassroomLobbyShell({ pinned, children, footer, aside, className
           >
             {tr(t, 'academy.launch.subtitle', 'Pick a game. Your class joins with one code.')}
           </p>
+          {/* Hangs into the empty end of the class row below, so it adds no height. */}
+          <span data-testid="lobby-mascot" aria-hidden="true" className="pointer-events-none absolute -bottom-[4.5rem] end-10 hidden size-28 @4xl/lobby:block">
+            <EduMascot moment="gameStart" size={112} className="size-full" />
+          </span>
         </header>
 
         <div data-testid="lobby-columns" className="flex min-h-0 flex-1 flex-col gap-3">

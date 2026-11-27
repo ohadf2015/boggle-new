@@ -37,8 +37,8 @@ export function VocabQuizPromptPanel({ focusLabel, ask, prompt, mascot, revealed
       <span data-testid="vocab-quiz-question-mascot" className={cn('shrink-0 self-center [@media(max-height:560px)]:hidden', revealed && 'sm:hidden')}>
         <VocabQuizMascotFace
           face={mascot}
-          className="size-16 sm:size-24 [@media(max-width:639px)_and_(min-height:800px)]:size-20"
-          border="purple"
+          className="size-20 sm:size-28"
+          framed={false}
           alt={t('vocabQuiz.mascot.alt')}
         />
       </span>

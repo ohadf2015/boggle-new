@@ -85,6 +85,12 @@ describe('Student quiz top row: X, one bar, one score-and-clock cluster', () => 
     expect(within(screen.getByTestId('vocab-quiz-column')).getByRole('img')).toBeInTheDocument();
   });
 
+  it('Given a question, Then Lexi stands beside the word unframed, as in the approved mockup', () => {
+    mount();
+    const lexi = within(screen.getByTestId('vocab-quiz-question-mascot')).getByRole('img');
+    expect(lexi.className).not.toMatch(/border-\[3px\]|rounded-full|bg-edu-surface/);
+  });
+
   it('Given the reveal on a wide screen, Then the verdict sheet owns Lexi and the framed panel drops her slot instead of leaving a hole', () => {
     const s = mount();
     s.server(VOCAB_QUIZ_EVENTS.reveal, REVEAL);
