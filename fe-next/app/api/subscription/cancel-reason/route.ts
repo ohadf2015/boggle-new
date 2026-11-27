@@ -14,6 +14,7 @@ import {
   TEACHER_TRIAL_CANCEL_REASON_SELECTED_EVENT,
 } from '@/lib/education/teacherTrialFunnel';
 import logger from '@/utils/logger';
+import { isCancelReason } from '@/lib/education/teacherCancelRetention';
 
 /**
  * POST /api/subscription/cancel-reason  { reason: CancelReason }
@@ -29,13 +30,6 @@ import logger from '@/utils/logger';
  * QA accounts (@lexiclash.test / profiles.is_test_account) still store their
  * answer but never emit the event, per the QA-pollution guards.
  */
-
-export const CANCEL_REASONS = ['too_expensive', 'school_pays', 'just_testing', 'missing_feature'] as const;
-export type CancelReason = (typeof CANCEL_REASONS)[number];
-
-export function isCancelReason(value: unknown): value is CancelReason {
-  return typeof value === 'string' && (CANCEL_REASONS as readonly string[]).includes(value);
-}
 
 export async function POST(request: NextRequest) {
   if (isNativeAppUserAgent(request.headers.get('user-agent'))) {

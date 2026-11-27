@@ -38,7 +38,8 @@ vi.mock('@/lib/education/teacherTrialFunnel', () => ({
 }));
 vi.mock('@/utils/logger', () => ({ default: { warn: vi.fn(), error: vi.fn(), log: vi.fn() } }));
 
-import { POST, isCancelReason } from '../route';
+import { POST } from '../route';
+import { isCancelReason } from '@/lib/education/teacherCancelRetention';
 
 const req = (body: unknown) =>
   new NextRequest('https://www.lexiclash.live/api/subscription/cancel-reason', {

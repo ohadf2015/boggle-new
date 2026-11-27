@@ -332,6 +332,11 @@ export type GrowthEvent =
   // urgent variant (<=3 days, the day-10 expiring banner). days_remaining on both.
   | 'teacher_trial_banner_shown'
   | 'teacher_trial_upgrade_clicked'
+  // Pre-cancel retention interstitial (TeacherCancelOfferDialog). Bare names
+  // are already captured by proFunnelTelemetry — not in CANONICAL_DUAL_EMIT.
+  | 'trial_cancel_offer_viewed'
+  | 'trial_cancel_offer_accepted'
+  | 'trial_cancel_offer_dismissed'
   // Unconditional return-from-Polar signal (t: webhook-broken vs abandoned).
   // Fires on ?checkout=success regardless of entitlement, unlike
   // edu_pro_checkout_success_seen which waits for hasPro.

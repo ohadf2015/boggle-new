@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, type MouseEvent, type ReactNode } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PRO_BANNER_CTA, ProShine } from './pro/ProBanner';
 import { TeacherCancelOfferDialog } from './TeacherCancelOfferDialog';
@@ -39,17 +39,26 @@ export function TeacherProManageLink({
   const external = typeof portalUrl === 'string' && portalUrl.startsWith('https://');
   const href = external ? portalUrl : `/${language}/teacher/upgrade`;
   const primary = !className;
+  // The trigger stays an <a href> (portal, or the plan page). Existing banners
+  // assert that contract: secondary link, never a new checkout, never a button.
+  // A plain click opens the retention interstitial first; the href is where
+  // "continue to cancellation" lands, and it still works without JS.
+  const openOffer = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    setOfferOpen(true);
+  };
   return (
     <>
-      <button
-        type="button"
+      <a
         data-testid={testId}
-        onClick={() => setOfferOpen(true)}
+        href={href}
+        {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+        onClick={openOffer}
         className={className ?? PRO_BANNER_CTA}
       >
         {primary ? <ProShine /> : null}
         {children}
-      </button>
+      </a>
       {offerOpen ? (
         <TeacherCancelOfferDialog
           status={status}

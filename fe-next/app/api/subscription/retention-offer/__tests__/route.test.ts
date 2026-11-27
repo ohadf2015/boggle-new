@@ -25,7 +25,8 @@ vi.mock('@/lib/education/proFunnelServer', async (orig) => ({
 }));
 vi.mock('@/utils/logger', () => ({ default: { warn: vi.fn(), error: vi.fn(), log: vi.fn() } }));
 
-import { POST, addMonthsUtc } from '../route';
+import { POST } from '../route';
+import { addMonthsUtc } from '@/lib/education/teacherCancelRetention';
 
 const req = (body: unknown) =>
   new NextRequest('https://www.lexiclash.live/api/subscription/retention-offer', {

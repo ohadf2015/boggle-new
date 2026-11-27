@@ -6,6 +6,7 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { isNativeAppUserAgent } from '@/lib/native/nativeHandoff';
 import { buildTeacherProRetentionOfferEvent, captureProFunnelServerEvent } from '@/lib/education/proFunnelServer';
 import logger from '@/utils/logger';
+import { addMonthsUtc, type RetentionOfferKind } from '@/lib/education/teacherCancelRetention';
 
 /**
  * POST /api/subscription/retention-offer  { offer: 'pause' | 'discount' }
@@ -24,18 +25,6 @@ import logger from '@/utils/logger';
  *
  * Read-only on plans/prices: no checkout, no product or price change.
  */
-export type RetentionOfferKind = 'pause' | 'discount';
-
-/** `iso` + `months` in the UTC calendar, clamping day-of-month overflow (Jan 31 + 1mo → Feb 28). */
-export function addMonthsUtc(iso: string, months: number): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return new Date(Date.now() + months * 30 * 86_400_000).toISOString();
-  const day = d.getUTCDate();
-  d.setUTCMonth(d.getUTCMonth() + months);
-  if (d.getUTCDate() < day) d.setUTCDate(0);
-  return d.toISOString();
-}
-
 function emitOffer(userId: string, args: { offer: RetentionOfferKind; status: string; applied: 'pause' | 'recorded' }): void {
   try {
     captureProFunnelServerEvent(buildTeacherProRetentionOfferEvent(userId, args));
