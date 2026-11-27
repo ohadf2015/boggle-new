@@ -9,6 +9,7 @@
  *   /en/education/classroom-game?preview=waiting    — a student's /education/live lobby
  *   (&count=N sets the projector roster size, default 12; &ready=all readies everyone so Start unlocks)
  *   &stage=wheel|fallback|wordcraft — an in-game projector stage instead of the lobby
+ *   ?preview=paused — the live phone board under the teacher's pause
  *   ?preview=hostresults|phone|quiz|duel|ended — the round-end surfaces, see LiveResultsPreviews
  *   ?preview=ingame — the teacher's in-game projector mid-round
  *   ?preview=lobby — the game picker; ?preview=setup — the new-class invite step, students landing
@@ -42,6 +43,7 @@ import { LobbyPickerPreview } from './LobbyPickerPreview';
 import { WarmUpPreview } from './WarmUpPreview';
 import { SetupInvitePreview } from './SetupInvitePreview';
 import { CrosswordPreview } from './CrosswordPreview';
+import { GamePausedOverlay } from '@/components/education/GamePausedOverlay';
 
 export type { LiveSurfacePreviewKind };
 
@@ -148,6 +150,7 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'quizphone') return <StudentQuizPreview />;
   if (kind === 'ingame') return <InGamePreview />;
   if (kind === 'phonegame') return <PhoneGamePreview />;
+  if (kind === 'paused') return <><PhoneGamePreview /><GamePausedOverlay /></>;
   if (kind === 'lobby') return <LobbyPickerPreview />;
   if (kind === 'warmup') return <WarmUpPreview />;
   if (kind === 'setup') return <SetupInvitePreview />;

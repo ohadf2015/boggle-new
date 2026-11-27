@@ -16,7 +16,7 @@ interface ClassroomGameEndedStateProps {
 }
 
 const SECONDARY =
-  'flex min-h-12 w-full items-center justify-center rounded-neo border-3 border-neo-black bg-neo-cream px-6 py-3 font-neo-display font-black text-neo-black shadow-hard-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black';
+  'flex min-h-12 w-full items-center justify-center rounded-neo border-[3px] border-neo-black bg-edu-paper px-6 py-3 font-neo-display font-black text-neo-black shadow-edu-lip-sm transition hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-black';
 
 export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }: ClassroomGameEndedStateProps) {
   const { t, language } = useLanguage();
@@ -28,7 +28,7 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
       aria-labelledby="classroom-game-ended-title"
       className="fixed inset-0 z-[90] flex items-center justify-center bg-edu-page px-4"
     >
-      <div className="relative w-full max-w-sm rounded-neo-lg border-3 border-neo-black bg-neo-lime px-6 pb-6 pt-16 text-neo-black shadow-hard-lg">
+      <div className="relative w-full max-w-sm rounded-neo-lg border-[3px] border-neo-black bg-edu-surface px-6 pb-6 pt-16 text-neo-black shadow-edu-lip">
         {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
         <img
           src={EDU_MASCOT.empty}
@@ -41,7 +41,7 @@ export function ClassroomGameEndedState({ roomCode, message, hubHref, onRetry }:
         </h1>
         <p className="mb-5 font-neo-body text-neo-black/80">{message}</p>
         <div className="flex flex-col gap-3">
-          <DeadEndPracticeLink state="room_gone" className="bg-neo-black text-neo-lime focus-visible:outline-neo-black" />
+          <DeadEndPracticeLink state="room_gone" className="bg-neo-lime text-neo-black focus-visible:outline-neo-black" />
           {!isLoading && classroomId && (
             <Link data-testid="ended-primary" href={hubHref} className={SECONDARY}>
               {t('education.student.gameEnded.toClass')}

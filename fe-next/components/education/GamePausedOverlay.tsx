@@ -17,7 +17,7 @@ interface GamePausedOverlayProps {
  * tapped, and is announced (`role="status"`) so screen-reader students hear
  * the pause instead of wondering why the board stopped responding.
  *
- * Dark-only surface → hard-coded `bg-neo-navy` (no cream/dark pair; pitfall 5).
+ * The veil is the page token, never a cream/dark pair that could flash on a lazy mount (pitfall 5).
  */
 export function GamePausedOverlay({ isHost = false }: GamePausedOverlayProps) {
   const { t, language } = useLanguage();
@@ -32,11 +32,11 @@ export function GamePausedOverlay({ isHost = false }: GamePausedOverlayProps) {
       className={cn(
         // Below TeacherLiveControls (z-[70]) so the host can still hit Resume.
         'fixed inset-0 z-[60] flex items-center justify-center p-6',
-        'pointer-events-auto bg-edu-surface/90',
+        'pointer-events-auto bg-edu-page/85',
       )}
     >
       <Reveal className="w-full max-w-sm">
-        <div className="relative rounded-neo border-3 border-neo-black bg-neo-cream px-6 pb-6 pt-16 text-center text-neo-black shadow-hard-lg">
+        <div className="relative rounded-neo-lg border-[3px] border-neo-black bg-edu-surface px-6 pb-6 pt-16 text-center text-neo-black shadow-edu-lip">
           <EduMascot
             moment="brainBreak"
             size={128}
