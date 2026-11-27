@@ -86,8 +86,8 @@ export interface StartSessionData {
   practiceType: PracticeType;
   /** vocab_focus only: which skill this session drills (stored in session results). */
   focus?: VocabFocus;
-  /** solo_board only: Word Craft round (recorded in `practice_sessions.mode`). */
-  variant?: 'wordcraft';
+  /** → `practice_sessions.mode`: solo_board Word Craft round, or flashcard Missed Words Review run. */
+  variant?: 'wordcraft' | 'missed_review';
 }
 
 
@@ -157,7 +157,7 @@ interface UsePracticeProgressActions {
   refresh: () => Promise<void>;
   startSession: (
     practiceType: PracticeType,
-    options?: { focus?: VocabFocus; variant?: 'wordcraft' }
+    options?: { focus?: VocabFocus; variant?: 'wordcraft' | 'missed_review' }
   ) => Promise<{ success: boolean; sessionId?: string; error?: string }>;
 }
 
@@ -274,7 +274,7 @@ export function usePracticeProgress(
   // Start new practice session
   const startSession = useCallback(async (
     practiceType: PracticeType,
-    options?: { focus?: VocabFocus; variant?: 'wordcraft' }
+    options?: { focus?: VocabFocus; variant?: 'wordcraft' | 'missed_review' }
   ): Promise<{ success: boolean; sessionId?: string; error?: string }> => {
     if (!lessonId) {
       return { success: false, error: 'No lesson ID' };

@@ -9,7 +9,7 @@
  * candidate. Order comes from the server word memory (due words first).
  *
  * XP: one run = one `flashcard` practice session on the run's lesson —
- * startSession('flashcard') + PATCH /api/education/practice with { cardsReviewed,
+ * startSession('flashcard', { variant: 'missed_review' }) + PATCH /api/education/practice with { cardsReviewed,
  * cardsCorrect, wordResults } (server-scored; the answers feed the word memory).
  */
 
@@ -61,7 +61,7 @@ function ReviewSession({ deck, onBack, onPlayAgain }: { deck: Deck & { lessonId:
   const player = useAcademyPlayer();
 
   const onFinish = async (answers: boolean[]): Promise<number | null> => {
-    const started = await startSession('flashcard');
+    const started = await startSession('flashcard', { variant: 'missed_review' });
     if (!started.success) return null;
     return record({
       type: 'flashcard',

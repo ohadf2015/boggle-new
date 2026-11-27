@@ -13,7 +13,9 @@ export function tooManyRequests(retryAfter: number | undefined) {
 }
 
 // Validation schemas
-const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz', 'vocab_focus']);
+const practiceTypeSchema = z.enum(['flashcard', 'solo_board', 'warmup', 'word_list', 'matching', 'spelling', 'blitz', 'vocab_focus', 'daily_quest']);
+/** flashcard sessions started by the Missed Words Review run (its unscramble cards are spelling). */
+export const MISSED_REVIEW_SESSION_MODE = 'missed_review';
 const vocabFocusSchema = z.enum(VOCAB_FOCUSES as [string, ...string[]]);
 
 export const startSessionSchema = z.object({
@@ -21,8 +23,8 @@ export const startSessionSchema = z.object({
   practiceType: practiceTypeSchema,
   // vocab_focus only — which skill is drilled; persisted in `mode` + `results.focus`
   focus: vocabFocusSchema.optional(),
-  // solo_board only: Word Craft (no 'wordcraft' in the practice_type CHECK) → `mode`
-  variant: z.literal(WORDCRAFT_SESSION_MODE).optional(),
+  // → `mode`: solo_board + Word Craft (no 'wordcraft' in the practice_type CHECK), flashcard + Missed Words Review
+  variant: z.enum([WORDCRAFT_SESSION_MODE, MISSED_REVIEW_SESSION_MODE]).optional(),
 });
 
 export const updateSessionSchema = z.object({

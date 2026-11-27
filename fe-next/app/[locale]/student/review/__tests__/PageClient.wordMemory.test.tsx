@@ -83,6 +83,7 @@ describe('/student/review on the server word memory', () => {
     await act(async () => {
       await onFinish(answers);
     });
+    expect(h.startSession).toHaveBeenCalledWith('flashcard', { variant: 'missed_review' });
     const sent = h.record.mock.calls[0][0] as { type: string; sessionId: string; cardsReviewed: number; cardsCorrect: number; wordResults: unknown[] };
     expect(sent).toMatchObject({ type: 'flashcard', sessionId: 'sess-1', cardsReviewed: cards.length, cardsCorrect: cards.length - 1 });
     expect(sent.wordResults).toEqual(cards.map((c, i) => ({ word: c.word, correct: answers[i], kind: c.kind === 'meaning' ? 'recognise' : 'spell' })));

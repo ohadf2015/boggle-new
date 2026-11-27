@@ -75,6 +75,12 @@ vi.mock('@/lib/education/practiceWordReviews', () => ({
   recordPracticeWordReviews: (...args: unknown[]) => mockRecordPracticeWordReviews(...args),
 }));
 
+const mockGate = vi.fn();
+vi.mock('@/lib/education/wordcraftCompletionGate', async (importOriginal) => {
+  const real = await importOriginal<typeof import('@/lib/education/wordcraftCompletionGate')>();
+  return { ...real, gateWordCraftCompletion: (...a: Parameters<typeof real.gateWordCraftCompletion>) => mockGate(...a) ?? real.gateWordCraftCompletion(...a) };
+});
+
 import { NextRequest } from 'next/server';
 import { PATCH, POST } from '../route';
 import { createClient } from '@/utils/supabase/server';
@@ -196,10 +202,17 @@ describe('PATCH /api/education/practice: word memory', () => {
     expect(response.status).toBe(200);
     expect(mockRecordPracticeWordReviews).toHaveBeenCalledTimes(1);
     const [, args] = mockRecordPracticeWordReviews.mock.calls[0];
-    expect(args).toMatchObject({ studentId: existing.student_id, lessonId: existing.lesson_id, wordResults });
+    expect(args).toMatchObject({ studentId: existing.student_id, lessonId: existing.lesson_id, wordResults, practiceType: 'spelling' });
     expect(typeof args.nowMs).toBe('number');
     expect(writes[0]).not.toHaveProperty('wordResults');
     expect(writes[0]).not.toHaveProperty('word_results');
+  });
+
+  it('GIVEN completion requested but the server gate says "attempt only" WHEN patched THEN nothing is recorded (a re-PATCH could replay it)', async () => {
+    mockGate.mockResolvedValueOnce({ completed: false });
+    const { existing } = mockSession('solo_board');
+    await patch({ sessionId: existing.id, completed: true, wordResults: [{ word: 'cat', correct: true, kind: 'find' }] });
+    expect(mockRecordPracticeWordReviews).not.toHaveBeenCalled();
   });
 
   it('GIVEN a progress PATCH without completion WHEN patched THEN nothing is recorded', async () => {
