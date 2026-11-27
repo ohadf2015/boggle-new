@@ -30,6 +30,7 @@ import { ProjectorStageFallback } from '@/components/education/live/ProjectorSta
 import { useGameStore } from '@/hooks/gameState/store';
 import Avatar from '@/components/Avatar';
 import { EduStudentLobby } from '@/components/education/live/EduStudentLobby';
+import { ReadyButton } from '@/components/multiplayer/lobby/ReadyButton';
 import { sampleProjectorStudents } from '@/components/education/results/previewFixtures';
 import { DuelPreview, EndedPreview, HostResultsPreview, PhoneResultsPreview, QuizPreview } from './LiveResultsPreviews';
 
@@ -119,17 +120,7 @@ function WaitingPreview() {
         avatar={<Avatar userId="Maya" size="2xl" className="!h-full !w-full" />}
         onEditAvatar={() => toast('Preview: avatar builder')}
         nameSlot={<h2 className="truncate text-xl font-black text-edu-ink">Maya</h2>}
-        readySlot={
-          <button
-            type="button"
-            onClick={() => setReady((v) => !v)}
-            className={`focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan ${ready
-              ? 'w-full rounded-neo border-3 border-neo-black bg-neo-lime py-3 font-black uppercase text-neo-black shadow-hard'
-              : 'w-full rounded-neo border-3 border-neo-lime bg-edu-surface py-3 font-black uppercase text-edu-lime-ink shadow-hard'}`}
-          >
-            {ready ? t('playerView.readyConfirmed') : t('playerView.readyUp')}
-          </button>
-        }
+        readySlot={<ReadyButton isReady={ready} onToggle={() => setReady((v) => !v)} inFlight={false} t={t} />}
         classmates={classmates}
         onExit={() => toast('Preview: exit')}
         isReady={ready}

@@ -11,7 +11,7 @@ import { newArrivals } from './lobbyArrivals';
 const MAX_FACES = 11;
 const ROW = 4;
 const ARRIVAL_MS = 2600;
-const FACE = 'grid size-12 place-items-center overflow-hidden rounded-full border-[3px] shadow-hard-sm';
+const FACE = 'grid size-12 place-items-center overflow-hidden rounded-full border-[3px] shadow-edu-lip-sm';
 
 function useArrivals(names: string[]): { latest: string | null; fresh: ReadonlySet<string> } {
   const prev = useRef<string[] | null>(null);

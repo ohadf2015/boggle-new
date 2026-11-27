@@ -31,7 +31,7 @@ function StudentHud({ userId, profileXp, t }: { userId: string | null; profileXp
       <div data-testid="edu-student-hud" className="col-start-2 row-start-2 flex min-w-0 flex-wrap items-center gap-2">
         <span
           data-testid="edu-student-hud-level"
-          className="inline-flex min-h-9 items-center rounded-full border-[3px] border-neo-black bg-neo-lime px-3 font-neo-display text-sm font-black uppercase text-neo-black shadow-hard-sm"
+          className="inline-flex min-h-9 items-center rounded-full border-[3px] border-neo-black bg-neo-yellow px-3 font-neo-display text-sm font-black uppercase text-neo-black shadow-edu-lip-sm"
         >
           {t('academy.student.level', { level })}
         </span>

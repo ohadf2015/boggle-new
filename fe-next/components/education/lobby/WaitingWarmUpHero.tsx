@@ -76,7 +76,7 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
             role="img"
             aria-label={t('mpUi.round.combo', { level: state.combo })}
             className={cn(
-              'inline-flex min-w-16 items-center justify-center gap-0.5 rounded-neo border-[3px] px-2 py-1 font-neo-display font-black leading-none tabular-nums shadow-hard-sm',
+              'inline-flex min-w-16 items-center justify-center gap-0.5 rounded-neo border-[3px] px-2 py-1 font-neo-display font-black leading-none tabular-nums shadow-edu-lip-sm',
               state.combo === 0 ? 'border-edu-line bg-edu-surface text-2xl text-edu-ink/70' : hot ? 'border-neo-black bg-neo-pink text-3xl text-neo-black' : 'border-neo-black bg-neo-orange text-2xl text-neo-black',
               state.combo > 0 && 'motion-safe:animate-[lc-combo-bump_260ms_cubic-bezier(0.34,1.56,0.64,1)]',
             )}
@@ -108,8 +108,8 @@ export function WaitingWarmUpHero({ username, seed, t }: { username: string; see
                   : mine === 'hit'
                     ? 'border-neo-black bg-neo-cyan text-neo-black motion-safe:animate-[lc-tile-burst_320ms_cubic-bezier(0.34,1.56,0.64,1)]'
                     : lit
-                      ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-hard-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'
-                      : 'border-edu-line bg-edu-surface text-edu-ink',
+                      ? 'z-10 scale-110 border-neo-black bg-neo-lime text-neo-black shadow-edu-lip-sm motion-safe:animate-[lc-tile-glow_900ms_ease-in-out_infinite]'
+                      : 'border-edu-line bg-edu-surface text-edu-ink shadow-edu-lip-sm',
               )}
             >
               {letter}
