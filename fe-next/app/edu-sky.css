@@ -65,6 +65,12 @@
     background-image: none;
     color: var(--edu-ink);
   }
+
+  /* Cyan focus rings are ~1.2:1 on white and sky; this outranks the ring utilities. */
+  html:has([data-edu-theme='sky']) :focus-visible:not([data-edu-theme='dark'] *, .edu-rays-dark *) {
+    --tw-ring-color: var(--edu-pink-ink);
+    outline-color: var(--edu-pink-ink);
+  }
 }
 
 @layer components {
