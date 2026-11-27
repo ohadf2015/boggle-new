@@ -59,6 +59,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 15:xx: builder A done and committed; all three batches in. A parity: 4 pages under 95% words only because
   repeated slogan marquees/decor glyphs were removed (words-with-friends-alt, download-android, word-craft-game, ja).
   Copy facts changed (verified against lib/seo/dictionaryStats.generated.json): sv/he/ja counts, 5->6 languages.
+- Independent review (15:xx) found: showcase videos replaced by stills (HIGH, restore), word-shake height
+  reservation, hebrew page lost dir=rtl, table captions lost, h3 demotions (balda, RuLandingLinks), juego FAQ
+  open-first/exclusive lost, back button replaced by home logo, copy changes (sv/he counts, he About text).
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
