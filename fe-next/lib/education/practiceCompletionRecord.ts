@@ -8,6 +8,7 @@
  * saved would still show "+N XP" (Pitfalls Class 4). These helpers make the
  * results screen show the SERVER's number or nothing.
  */
+import type { WordResult } from './wordMemory';
 
 export interface CompletionRecordInput {
   type: string;
@@ -17,6 +18,7 @@ export interface CompletionRecordInput {
   wordsFound?: string[];
   vocabularyWordsFound?: string[];
   newWordsFound?: string[];
+  wordResults?: WordResult[];
 }
 
 /** Same fields the provider's PATCH sends. */
@@ -26,6 +28,7 @@ export function completionPatchBody(data: CompletionRecordInput): Record<string,
   if (data.cardsCorrect !== undefined) body.cardsCorrect = data.cardsCorrect;
   if (data.wordsFound !== undefined) body.wordsFound = data.wordsFound;
   if (data.vocabularyWordsFound !== undefined) body.vocabularyWordsFound = data.vocabularyWordsFound;
+  if (data.wordResults?.length) body.wordResults = data.wordResults;
   return body;
 }
 

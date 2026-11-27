@@ -26,12 +26,14 @@ import {
   type VocabFocus,
 } from '@/lib/education/vocabFocus';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 export interface VocabFocusResults {
   correct: number;
   total: number;
   accuracy: number;
   focus: VocabFocus;
+  wordResults: WordResult[];
 }
 
 export interface VocabFocusPracticeProps {
@@ -122,6 +124,7 @@ export function VocabFocusPractice({
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const [wordResults, setWordResults] = useState<WordResult[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [timeSpent, setTimeSpent] = useState(0);
   // Session clock — set in an effect so render stays pure (react-hooks/purity)
@@ -140,14 +143,16 @@ export function VocabFocusPractice({
     (choiceIndex: number) => {
       if (answered || !question) return;
       setSelected(choiceIndex);
-      if (choiceIndex === question.answerIndex) {
+      const correct = choiceIndex === question.answerIndex;
+      setWordResults((prev) => [...prev, { word: question.word, correct, kind: focus === 'context' ? 'context' : 'recognise' }]);
+      if (correct) {
         sfx.correct();
         setCorrectCount((c) => c + 1);
       } else {
         sfx.wrong();
       }
     },
-    [answered, question, sfx]
+    [answered, question, sfx, focus]
   );
 
   const handleNext = useCallback(() => {
@@ -156,19 +161,20 @@ export function VocabFocusPractice({
       const seconds = Math.floor((Date.now() - (startedAt.current ?? Date.now())) / 1000);
       setTimeSpent(seconds);
       setShowResults(true);
-      onComplete({ correct: correctCount, total, accuracy: total ? correctCount / total : 0, focus });
+      onComplete({ correct: correctCount, total, accuracy: total ? correctCount / total : 0, focus, wordResults });
       return;
     }
     sfx.advance();
     setIndex((i) => i + 1);
     setSelected(null);
-  }, [answered, isLast, correctCount, total, focus, onComplete, sfx]);
+  }, [answered, isLast, correctCount, total, focus, wordResults, onComplete, sfx]);
 
   const handleRestart = useCallback(() => {
     setRound((r) => r + 1);
     setIndex(0);
     setSelected(null);
     setCorrectCount(0);
+    setWordResults([]);
     setShowResults(false);
     setTimeSpent(0);
     startedAt.current = Date.now();

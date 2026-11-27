@@ -59,3 +59,21 @@ describe('FlashcardReview grading feedback', () => {
     expect(screen.getByText('education.practice.dontKnow').closest('button')).toHaveClass('bg-neo-pink');
   });
 });
+
+describe('FlashcardReview word results', () => {
+  it('Given one card known and one not, When the deck ends, Then onComplete carries one recognise entry per card', () => {
+    const onComplete = vi.fn();
+    render(<FlashcardReview words={WORDS} onComplete={onComplete} onBack={vi.fn()} />);
+    flipFirstCard();
+    fireEvent.click(screen.getByText('education.practice.gotIt'));
+    flipFirstCard();
+    fireEvent.click(screen.getByText('education.practice.dontKnow'));
+    expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({
+      wordResults: [
+        { word: 'hesitant', correct: true, kind: 'recognise' },
+        { word: 'reluctant', correct: false, kind: 'recognise' },
+      ],
+    }));
+  });
+});
+

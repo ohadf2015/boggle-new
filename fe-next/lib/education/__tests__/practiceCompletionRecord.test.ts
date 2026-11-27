@@ -16,6 +16,11 @@ describe('completionPatchBody', () => {
       completionPatchBody({ type: 'solo_board', sessionId: 's2', wordsFound: ['CAT'], vocabularyWordsFound: ['cat'], newWordsFound: [] }),
     ).toEqual({ sessionId: 's2', completed: true, wordsFound: ['CAT'], vocabularyWordsFound: ['cat'] });
   });
+
+  it('GIVEN per-word results WHEN built THEN they travel with the completion for the word memory', () => {
+    const wordResults = [{ word: 'cat', correct: true, kind: 'spell' as const, ms: 900 }, { word: 'dog', correct: false, kind: 'spell' as const }];
+    expect(completionPatchBody({ type: 'spelling', sessionId: 's3', wordResults })).toEqual({ sessionId: 's3', completed: true, wordResults });
+  });
 });
 
 describe('recordedXpFrom', () => {

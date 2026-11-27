@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 export interface MatchingItem {
   id: string;
@@ -14,6 +15,8 @@ export interface MatchingGameState {
   correctCount: number;
   isComplete: boolean;
   accuracy: number;
+  /** One recognise entry per word: correct only if it was matched with no wrong drop first. */
+  wordResults: WordResult[];
   checkMatch: (wordId: string, definitionId: string) => { correct: boolean };
   resetGame: () => void;
 }
@@ -64,6 +67,7 @@ export function useMatchingGame(words: VocabularyWord[]): MatchingGameState {
   const [matchedPairs, setMatchedPairs] = useState<Map<string, string>>(new Map());
   const [attempts, setAttempts] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
+  const [missedWords, setMissedWords] = useState<ReadonlySet<string>>(new Set());
 
   // Check if game is complete
   const isComplete = useMemo(() => {
@@ -97,6 +101,8 @@ export function useMatchingGame(words: VocabularyWord[]): MatchingGameState {
           newMap.set(wordId, definitionText);
           return newMap;
         });
+      } else {
+        setMissedWords((prev) => new Set(prev).add(wordId));
       }
 
       return { correct: isCorrect };
@@ -125,7 +131,13 @@ export function useMatchingGame(words: VocabularyWord[]): MatchingGameState {
     setMatchedPairs(new Map());
     setAttempts(0);
     setCorrectCount(0);
+    setMissedWords(new Set());
   }, [words, shuffle]);
+
+  const wordResults = useMemo(
+    () => words.map((w): WordResult => ({ word: w.word, correct: !missedWords.has(w.word), kind: 'recognise' })),
+    [words, missedWords]
+  );
 
   return {
     wordColumn,
@@ -135,6 +147,7 @@ export function useMatchingGame(words: VocabularyWord[]): MatchingGameState {
     correctCount,
     isComplete,
     accuracy,
+    wordResults,
     checkMatch,
     resetGame,
   };

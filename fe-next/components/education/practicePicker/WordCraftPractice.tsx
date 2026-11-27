@@ -30,7 +30,9 @@ import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
 import { onWordCraftGameEnd } from '@/components/word-craft/wordCraftTelemetry';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
 import { lessonWordsPlayed, wordCraftAttemptIsMeaningful, WORDCRAFT_MIN_VALID_WORDS } from '@/lib/education/wordcraftAssignment';
-import { missedReviewHref, saveWordCraftMisses, wordCraftMissedLessonWords } from '@/lib/education/wordcraftMissedWords';
+import { missedReviewHref } from '@/lib/education/wordcraftMissedWords';
+import { wordCraftWordResults } from '@/lib/education/lessonWordResults';
+import type { WordResult } from '@/lib/education/wordMemory';
 import type { WordCraftServerOutcome } from '@/lib/education/wordcraftServerOutcome';
 import { clearRunSnapshot, loadRunSnapshot, saveRunSnapshot } from '@/lib/word-craft/runSnapshot';
 import type { WordCraftState } from '@/lib/word-craft/useWordCraftGame';
@@ -46,6 +48,8 @@ export interface WordCraftPracticeResults {
   score: number;
   botScore: number;
   won: boolean;
+  /** Built lesson words (correct) and dealt-but-unbuilt ones (wrong), for the word memory. */
+  wordResults: WordResult[];
 }
 
 export interface WordCraftPracticeProps {
@@ -57,7 +61,7 @@ export interface WordCraftPracticeProps {
   onBack: () => void;
   onNext?: () => void;
   nextLabel?: string;
-  /** Signed-in student: unbuilt lesson words are queued for Missed Words Review. */
+  /** Signed-in student: the results link to Missed Words Review for this lesson. */
   review?: { studentId: string; lessonId: string };
   /** Device key (student or guest + lesson) a round in progress is saved under, so a reload resumes it. */
   runKey?: string;
@@ -96,9 +100,9 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
   }, [words, language, uiLanguage]);
 
   // Latest props for the listener without re-subscribing on every render.
-  const latest = useRef({ words, language, onComplete, review, runKey, dealt: deal.targets });
+  const latest = useRef({ words, language, onComplete, runKey, dealt: deal.targets });
   useEffect(() => {
-    latest.current = { words, language, onComplete, review, runKey, dealt: deal.targets };
+    latest.current = { words, language, onComplete, runKey, dealt: deal.targets };
   });
 
   const playing = phase.name === 'playing';
@@ -108,19 +112,19 @@ export default function WordCraftPractice({ words, language, onComplete, onBack,
     return onWordCraftGameEnd((state, { hotseat }) => {
       if (reported || hotseat) return;
       reported = true;
-      const { words: lessonWords, language: lang, onComplete: report, review: reviewTo, runKey: key, dealt } = latest.current;
+      const { words: lessonWords, language: lang, onComplete: report, runKey: key, dealt } = latest.current;
       if (key) clearRunSnapshot(key);
+      const built = lessonWordsPlayed(state.history, lessonWords, lang);
+      const wordResults = wordCraftWordResults({ lessonWords, dealt, built, language: lang });
       const results: WordCraftPracticeResults = {
-        vocabularyWordsFound: lessonWordsPlayed(state.history, lessonWords, lang),
+        vocabularyWordsFound: built,
         wordsFound: [...new Set(state.history.filter((m) => m.who === 'player').flatMap((m) => m.words))],
         score: state.player.score,
         botScore: state.bot.score,
         won: state.player.score > state.bot.score,
+        wordResults,
       };
-      const missed = reviewTo
-        ? wordCraftMissedLessonWords({ lessonWords, dealt, built: results.vocabularyWordsFound, language: lang })
-        : [];
-      if (reviewTo) saveWordCraftMisses(reviewTo.studentId, reviewTo.lessonId, missed);
+      const missed = wordResults.filter((r) => !r.correct).map((r) => r.word);
       setPhase({ name: 'done', results, missed });
       void Promise.resolve(report(results)).then((verdict) => { if (verdict) setOutcome(verdict); }).catch(() => undefined);
     });

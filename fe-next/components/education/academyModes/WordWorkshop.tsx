@@ -26,7 +26,8 @@ import { lessonTargetsFor, wordCraftLocaleFor } from '@/lib/word-craft/lessonBag
 import { planWorkshopOpener, WORKSHOP_DIMS } from '@/lib/education/workshopOpener';
 import { claimWorkshopGuide } from '@/lib/education/workshopCoach';
 import { wordCraftAttemptIsMeaningful } from '@/lib/education/wordcraftAssignment';
-import { saveWordCraftMisses, wordCraftMissedLessonWords } from '@/lib/education/wordcraftMissedWords';
+import { wordCraftWordResults } from '@/lib/education/lessonWordResults';
+import type { WordResult } from '@/lib/education/wordMemory';
 import WordCraftMissedReview from '@/components/education/practice/WordCraftMissedReview';
 import { lessonWordHits, summarizeWorkshop, workshopStarsFor, type LessonWordHit } from '@/lib/education/workshopLessonBonus';
 import { RIVAL_ART, rivalFinalMood, rivalReaction, workshopChestTier, type RivalMood, type Taunt } from '@/lib/education/academyReactions';
@@ -52,6 +53,7 @@ import { GoldSparks, WorkshopBoardSkin, markNewGoldCells, placedCellKeys, useBui
 export interface WorkshopRecord {
   vocabularyWordsFound: string[];
   wordsFound: string[];
+  wordResults: WordResult[];
 }
 
 export interface WordWorkshopProps {
@@ -65,7 +67,7 @@ export interface WordWorkshopProps {
   recordResult: (r: WorkshopRecord) => Promise<number | null>;
   /** The signed-in student (avatar + name) — shown in the HUD and on the scoreboard. */
   player?: AcademyPlayer;
-  /** Signed-in student: unbuilt lesson words are queued for Missed Words Review. */
+  /** Signed-in student: the results link to Missed Words Review for this lesson. */
   review?: { studentId: string; lessonId: string };
 }
 
@@ -140,9 +142,9 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
   }, [lessonWords, lessonLanguage, uiLanguage]);
 
   const openerKeys = useMemo(() => deal.opener.map((t) => `${t.row},${t.col}`), [deal.opener]);
-  const latest = useRef({ lessonWords, lang, recordResult, sfx, openerKeys, review, dealt: deal.dealt });
+  const latest = useRef({ lessonWords, lang, recordResult, sfx, openerKeys, dealt: deal.dealt });
   useEffect(() => {
-    latest.current = { lessonWords, lang, recordResult, sfx, openerKeys, review, dealt: deal.dealt };
+    latest.current = { lessonWords, lang, recordResult, sfx, openerKeys, dealt: deal.dealt };
   });
 
   const { setGameActive } = sfx;
@@ -202,10 +204,10 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
     const offEnd = onWordCraftGameEnd((state, { hotseat }) => {
       if (ended || hotseat) return;
       ended = true;
-      const { lessonWords: words, lang: l, recordResult: record, sfx: s, review: reviewTo, dealt } = latest.current;
+      const { lessonWords: words, lang: l, recordResult: record, sfx: s, dealt } = latest.current;
       const summary = summarizeWorkshop(state.history, words, l);
-      const missed = reviewTo ? wordCraftMissedLessonWords({ lessonWords: words, dealt, built: summary.lessonWordsFound, language: l }) : [];
-      if (reviewTo) saveWordCraftMisses(reviewTo.studentId, reviewTo.lessonId, missed);
+      const wordResults = wordCraftWordResults({ lessonWords: words, dealt, built: summary.lessonWordsFound, language: l });
+      const missed = wordResults.filter((r) => !r.correct).map((r) => r.word);
       const wordsFound = [...new Set(state.history.filter((m) => m.who === 'player').flatMap((m) => m.words))];
       const result: Done = {
         lessonWordsFound: summary.lessonWordsFound,
@@ -227,7 +229,7 @@ export default function WordWorkshop({ lessonName, lessonWords, lessonLanguage, 
         setRecordFailed(true);
         setXp(0);
       };
-      void record({ vocabularyWordsFound: summary.lessonWordsFound, wordsFound }).then(
+      void record({ vocabularyWordsFound: summary.lessonWordsFound, wordsFound, wordResults }).then(
         (value) => (value === null ? failed() : setXp(value)),
         failed,
       );

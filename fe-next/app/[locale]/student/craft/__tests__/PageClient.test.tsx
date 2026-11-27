@@ -21,7 +21,8 @@ vi.mock('@/components/education/PracticeSessionProvider', () => ({
     <div data-testid="session" data-student={studentId}>{children}</div>
   ),
 }));
-vi.mock('@/components/education/academyModes/useRecordedXp', () => ({ useRecordedXp: () => vi.fn() }));
+const record = vi.hoisted(() => vi.fn());
+vi.mock('@/components/education/academyModes/useRecordedXp', () => ({ useRecordedXp: () => record }));
 vi.mock('@/components/education/academyModes/useAcademyPlayer', () => ({ useAcademyPlayer: () => undefined }));
 vi.mock('@/utils/guestManager', () => ({ getGuestSessionId: () => 'guest-device-1' }));
 const workshopProps = vi.fn();
@@ -40,7 +41,7 @@ beforeEach(() => {
 });
 
 describe('student craft page', () => {
-  it('GIVEN a signed-in student (account or class guest) THEN missed words are queued under their account for this lesson', async () => {
+  it('GIVEN a signed-in student (account or class guest) THEN the missed-words review link is for their account on this lesson', async () => {
     authUser = { id: 'stu-1' };
     render(<WordWorkshopPageClient />);
     await screen.findByTestId('workshop');
@@ -49,10 +50,19 @@ describe('student craft page', () => {
     );
   });
 
-  it('GIVEN a visitor with no account THEN the workshop still opens on the device id, with nothing queued for review', async () => {
+  it('GIVEN a visitor with no account THEN the workshop still opens on the device id, with no review link', async () => {
     render(<WordWorkshopPageClient />);
     await screen.findByTestId('workshop');
     expect(screen.getByTestId('session').getAttribute('data-student')).toBe('guest-device-1');
     expect(workshopProps.mock.calls.at(-1)![0]).toEqual(expect.objectContaining({ review: undefined }));
+  });
+
+  it('GIVEN a finished workshop round WHEN it is recorded THEN its word results reach the completion record', async () => {
+    authUser = { id: 'stu-1' };
+    render(<WordWorkshopPageClient />);
+    await screen.findByTestId('workshop');
+    const wordResults = [{ word: 'cat', correct: true, kind: 'find' }, { word: 'dog', correct: false, kind: 'find' }];
+    workshopProps.mock.calls.at(-1)![0].recordResult({ vocabularyWordsFound: ['CAT'], wordsFound: ['CAT'], wordResults });
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ type: 'solo_board', vocabularyWordsFound: ['CAT'], wordResults }));
   });
 });

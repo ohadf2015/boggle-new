@@ -13,6 +13,7 @@ import StreakFlame from '@/components/education/practice/StreakFlame';
 import { PracticeInsufficientData } from './PracticeInsufficientData';
 import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 import type { VocabularyWord } from '@/lib/supabase/education/types';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 export interface TimedBlitzPracticeProps {
   words: VocabularyWord[];
@@ -22,6 +23,7 @@ export interface TimedBlitzPracticeProps {
     combo: number;
     maxCombo: number;
     score: number;
+    wordResults: WordResult[];
   }) => void;
   onBack: () => void;
   /** XP session data to display on results screen (optional) */
@@ -94,6 +96,7 @@ export function TimedBlitzPractice({
     isGameOver,
     isStarted,
     score,
+    wordResults,
     submitAnswer,
     startGame,
   } = useBlitzGame(usable, 60);
@@ -147,10 +150,11 @@ export function TimedBlitzPractice({
           combo,
           maxCombo,
           score,
+          wordResults,
         });
       }, 1500);
     }
-  }, [isGameOver, phase, wordsFound, wordsAttempted, combo, maxCombo, score, onComplete, sfx]);
+  }, [isGameOver, phase, wordsFound, wordsAttempted, combo, maxCombo, score, wordResults, onComplete, sfx]);
 
   /**
    * Handle answer submission

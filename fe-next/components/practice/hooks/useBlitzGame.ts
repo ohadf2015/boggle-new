@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { normalizeForStorage, type VocabularyWord } from '@/lib/supabase/education/types';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 // XP constants from educationXpManager (for score calculation)
 const BLITZ_WORD_FOUND = 10;
@@ -16,6 +17,8 @@ interface BlitzGameState {
   isGameOver: boolean;
   isStarted: boolean;
   score: number;
+  /** One recall entry per submitted answer, in answer order. */
+  wordResults: WordResult[];
 }
 
 interface SubmitAnswerResponse {
@@ -64,6 +67,7 @@ export function useBlitzGame(
   const [wordsAttempted, setWordsAttempted] = useState(0);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [shuffledWords, setShuffledWords] = useState<VocabularyWord[]>([]);
+  const [wordResults, setWordResults] = useState<WordResult[]>([]);
 
   // Refs for timestamp-based timing (avoid drift)
   const startTimestamp = useRef<number>(0);
@@ -101,6 +105,7 @@ export function useBlitzGame(
     setMaxCombo(0);
     setWordsFound(0);
     setWordsAttempted(0);
+    setWordResults([]);
     setIsGameOver(false);
     setRemainingTime(totalTime);
 
@@ -128,6 +133,7 @@ export function useBlitzGame(
 
       // Always count the attempt
       setWordsAttempted((prev) => prev + 1);
+      setWordResults((prev) => [...prev, { word: currentWord.word, correct, kind: 'recall' }]);
 
       if (correct) {
         // Increment combo and wordsFound
@@ -196,6 +202,7 @@ export function useBlitzGame(
     isGameOver,
     isStarted,
     score,
+    wordResults,
     submitAnswer,
     startGame,
   };

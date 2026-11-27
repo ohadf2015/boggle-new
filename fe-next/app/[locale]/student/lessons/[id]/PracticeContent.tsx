@@ -18,7 +18,7 @@ import { toVocabularyWords } from '@/lib/education/practiceWordShape';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import type { VocabFocus } from '@/lib/education/vocabFocus';
 import PracticePicker from '@/components/education/practicePicker/PracticePicker';
-import PracticeModeStage from '@/components/education/practice/PracticeModeStage';
+import PracticeModeStage, { type PracticeRoundPayload } from '@/components/education/practice/PracticeModeStage';
 import { PracticeCelebrationProvider } from '@/components/education/practice/PracticeCelebrationContext';
 import {
   buildPracticeTiles,
@@ -87,7 +87,7 @@ export interface PracticeContentProps {
   initialFocus: VocabFocus | null;
   /** solo_board only: 'wordcraft' when a Word Craft assignment deep-links here. */
   initialVariant?: PracticeVariant | null;
-  /** Signed-in student id: Word Craft queues missed lesson words for their review. */
+  /** Signed-in student id: Word Craft results link to their Missed Words Review. */
   reviewStudentId?: string;
   /** Signed-in or guest id: a Word Craft round in progress is kept on the device under it. */
   runOwnerId?: string;
@@ -233,14 +233,7 @@ export default function PracticeContent({
    */
   const finishRound = useCallback(async (
     type: PracticeType,
-    payload: {
-      focus?: VocabFocus;
-      cardsReviewed?: number;
-      cardsCorrect?: number;
-      vocabularyWordsFound?: string[];
-      wordsFound?: string[];
-      newWordsFound?: string[];
-    }
+    payload: PracticeRoundPayload
   ) => {
     setRoundFinished(true);
     onGuestResult({

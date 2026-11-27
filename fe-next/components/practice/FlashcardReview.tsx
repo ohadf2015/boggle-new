@@ -25,10 +25,11 @@ import BeatTheClock from '@/components/education/practice/BeatTheClock';
 import { PracticeInsufficientData } from './PracticeInsufficientData';
 import { wordsReadyForDrill } from '@/lib/education/normalizePracticeWords';
 import { usePracticeSfx } from '@/components/education/practice/usePracticeSfx';
+import type { WordResult } from '@/lib/education/wordMemory';
 
 interface FlashcardReviewProps {
   words: VocabularyWord[];
-  onComplete: (results: { correct: number; total: number }) => void;
+  onComplete: (results: { correct: number; total: number; wordResults: WordResult[] }) => void;
   onBack: () => void;
   onCardReviewed?: (correct: boolean) => void;
   /** Jump straight into the next ready mode, when the lesson offers one. */
@@ -119,6 +120,11 @@ export default function FlashcardReview({
     });
   }, [autoPronounce, currentWord, speak]);
 
+  const toWordResults = useCallback(
+    (answers: boolean[]) => answers.map((known, i): WordResult => ({ word: usable[i].word, correct: known, kind: 'recognise' })),
+    [usable]
+  );
+
   const handleAnswer = useCallback((correct: boolean) => {
     sfx[correct ? 'correct' : 'wrong']();
     setResults((prev) => [...prev, correct]);
@@ -129,13 +135,13 @@ export default function FlashcardReview({
       const finalResults = [...results, correct];
       const correctCount = finalResults.filter(Boolean).length;
       setShowResults(true);
-      onComplete({ correct: correctCount, total: usable.length });
+      onComplete({ correct: correctCount, total: usable.length, wordResults: toWordResults(finalResults) });
     } else {
       // Next card
       setCurrentIndex((prev) => prev + 1);
       setIsFlipped(false);
     }
-  }, [currentIndex, usable.length, results, onCardReviewed, onComplete, sfx]);
+  }, [currentIndex, usable.length, results, onCardReviewed, onComplete, sfx, toWordResults]);
 
   const handleRestart = useCallback(() => {
     setCurrentIndex(0);
@@ -156,8 +162,8 @@ export default function FlashcardReview({
     finishedRef.current = true;
     const correctCount = results.filter(Boolean).length;
     setShowResults(true);
-    onComplete({ correct: correctCount, total: usable.length });
-  }, [results, usable.length, onComplete, showResults]);
+    onComplete({ correct: correctCount, total: usable.length, wordResults: toWordResults(results) });
+  }, [results, usable.length, onComplete, showResults, toWordResults]);
 
   /*
     The deck used to end on a trophy glyph, a percentage and a scroll of every
@@ -274,7 +280,7 @@ export default function FlashcardReview({
             onComplete={() => {
               const correctCount = results.filter(Boolean).length;
               setShowResults(true);
-              onComplete({ correct: correctCount, total: usable.length });
+              onComplete({ correct: correctCount, total: usable.length, wordResults: toWordResults(results) });
             }}
           />
         </div>
