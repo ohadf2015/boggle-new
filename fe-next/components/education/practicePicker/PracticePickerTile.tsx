@@ -19,6 +19,7 @@
  */
 
 import Image from 'next/image';
+import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Lock, Zap } from 'lucide-react';
@@ -26,6 +27,8 @@ import { practiceTileArt, practiceTileAccent } from '@/lib/education/practiceTil
 import { practiceXpRate } from '@/lib/education/practiceJuice';
 import type { PracticeTile } from '@/lib/education/practicePicker';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 export interface PracticePickerTileProps {
   tile: PracticeTile;
@@ -37,6 +40,20 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
   const art = practiceTileArt(tile.id);
   const accent = practiceTileAccent(tile.id);
   const xp = practiceXpRate(tile.id);
+  // A locked tile is a native `disabled` button: a tap dispatches nothing,
+  // which reads to PostHog as a dead/rage click with no event to attribute it
+  // to. `feedback` keeps the tile tappable and tells the student why instead.
+  const { variant } = useExperiment('exp-edu-locked-tile-feedback-v1');
+  const lockedMessage = t(tile.lockedKey ?? tile.skillKey, { min: 4 });
+
+  const handleClick = () => {
+    if (tile.ready) {
+      onSelect(tile);
+      return;
+    }
+    trackGrowthEvent('practice_tile_locked_tapped', { tileId: tile.id, mode: tile.mode });
+    if (variant === 'feedback') toast(lockedMessage);
+  };
 
   const countLabel =
     tile.countKind === 'questions'
@@ -47,9 +64,9 @@ export default function PracticePickerTile({ tile, onSelect }: PracticePickerTil
     <button
       type="button"
       data-testid={`practice-tile-${tile.id}`}
-      disabled={!tile.ready}
+      disabled={!tile.ready && variant !== 'feedback'}
       aria-disabled={!tile.ready}
-      onClick={() => tile.ready && onSelect(tile)}
+      onClick={handleClick}
       // Inline, for the same reason as the hero: at `auto` the tile collapses
       // to its name band and the art never shows.
       style={{ minHeight: 128 }}

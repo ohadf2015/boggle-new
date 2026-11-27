@@ -85,6 +85,14 @@ describe('WheelRushView — wheel-coverage celebration', () => {
     expect(legendarySpy).toHaveBeenCalled();
   });
 
+  it('shows the points the word scored inside the celebration banner', () => {
+    const socket = renderView();
+    act(() => {
+      socket.fire('wheelWordResult', { word: 'CANTERS', accepted: true, kind: 'locked', score: 60 });
+    });
+    expect(screen.getByTestId('wheel-celebration').textContent).toContain('+60');
+  });
+
   it('celebrates (almost) when an accepted word uses all-but-one wheel letter', () => {
     const socket = renderView();
     act(() => {

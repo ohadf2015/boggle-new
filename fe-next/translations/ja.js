@@ -2546,6 +2546,7 @@ const ja = {
       "youWin": "レースに勝利！",
       "wins": "がレースに勝利！",
       "winner": "{winner}がレースに勝利！",
+      "yourRank": "あなたの順位",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -10454,7 +10455,6 @@ const ja = {
     "minLetters": "最低{min}文字",
     "scoreLabel": "スコア",
     "timeLeft": "残り時間",
-    "closeRace": "接戦中!",
     "gameOver": "時間切れ！",
     "submit": "送信",
     "alreadyFoundBonus": "再発見 (+{points})",
@@ -10463,6 +10463,8 @@ const ja = {
     "missingLetter": "不足: {letter}",
     "streakBadge": "{count}連続！",
     "onFireBadge": "{count}連続、絶好調！",
+    "chipLockedLabel": "{word}、{score}ポイント獲得",
+    "chipClosedLabel": "{word}、対戦相手に取られました",
     "closeRace": "接戦中",
     "inputPlaceholder": "単語を入力...",
     "firstHint": "タップかなぞる。どの単語にも {letter}",
@@ -14064,18 +14066,21 @@ const ja = {
     "continueModal": {
       "title": "まだ終わらせない！",
       "body": "手数がなくなりました。短い広告を見てプレイを続けよう。",
+      "bodyNoAd": "手数がなくなりました。広告は今は利用できません——ここで終了できます。",
       "cta": "広告を見て+{moves}手獲得",
       "decline": "終了する"
     },
     "retryWaveModal": {
       "title": "ウェーブ{wave}、あと少し！",
       "body": "{percent}%クリア。広告を見てウェーブ{wave}に再挑戦。前のウェーブは保持されます。",
+      "bodyNoAd": "{percent}%クリア。広告は今は利用できません——ウェーブ1から再開できます。",
       "cta": "広告を見て · ウェーブ{wave}に再挑戦",
       "decline": "ウェーブ1から再開"
     },
     "pregameBuff": {
       "title": "パワーアップ？",
       "body": "ブーストを選び、短い広告を見て、有利にランを始めよう。",
+      "bodyNoAd": "今はブーストを利用できません——スキップしてすぐにランを始めよう。",
       "shield": "シールド",
       "bomb": "ボム",
       "combo2x": "コンボ2倍",
@@ -14285,7 +14290,9 @@ const ja = {
       "sweating": "カウントダウンに耐える緊張したマスコット",
       "celebrating": "トロフィーを掲げて祝うマスコット",
       "sadSmile": "慰めるような笑顔のマスコット",
-      "neutral": "次のウェーブを待つ陽気なマスコット"
+      "neutral": "次のウェーブを待つ陽気なマスコット",
+      "mute": "マスコットの反応をミュート",
+      "unmute": "マスコットの反応のミュートを解除"
     },
     "archetypes": {
       "normal": "通常ウェーブ",
@@ -16313,7 +16320,11 @@ const ja = {
       "homeCta": "今週を見る"
     },
     "proPowered": {"hint": "Teacher Pro プランの機能です"},
-    "trialUsage": {"lead": "お試し期間中の利用:", "games_one": "クラスゲーム{count}回", "games_other": "クラスゲーム{count}回", "students_one": "生徒{count}人を記録", "students_other": "生徒{count}人を記録", "practice_one": "練習{count}回", "practice_other": "練習{count}回"}
+    "trialUsage": {"lead": "お試し期間中の利用:", "games_one": "クラスゲーム{count}回", "games_other": "クラスゲーム{count}回", "students_one": "生徒{count}人を記録", "students_other": "生徒{count}人を記録", "practice_one": "練習{count}回", "practice_other": "練習{count}回"},
+    "schoolBulkCta": {
+      "text": "学校全体で使っていますか？",
+      "link": "学校向け価格を見る"
+    }
   },
   "education": {
     "race": {
@@ -17432,6 +17443,7 @@ const ja = {
         "subtitle": "この名前がクラスの画面に表示されます。",
         "placeholder": "名前を入力",
         "submit": "ゲームに参加",
+        "submitting": "参加しています…",
         "roomLabel": "ルーム {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · ライブ中: {{lesson}}",
@@ -20869,6 +20881,7 @@ const ja = {
         "titleLost": "タイル切れ",
         "subtitleWon": "すべてのクラウンジェムを集めました。ハント完了。",
         "subtitleLost": "袋が空になりました。もう一度挑戦しよう。",
+        "subtitleLostClose": "もう少し——あと1つで王冠！",
         "restart": "新しいハント",
         "crownsCaption": "クラウン {{n}}/4 個獲得"
       },

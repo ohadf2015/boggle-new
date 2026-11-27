@@ -23,4 +23,12 @@ describe('CardPickScreen', () => {
     fireEvent.click(screen.getByText(`wordcraft.run.card.${cards[1].id}.name`));
     expect(onPick).toHaveBeenCalledWith(cards[1].id);
   });
+
+  it('staggers each card reveal by its position in the draw', () => {
+    render(<CardPickScreen cards={cards} onPick={vi.fn()} />);
+    const buttons = screen.getAllByRole('button');
+    expect(buttons[0].style.getPropertyValue('--wc-delay')).toBe('0ms');
+    expect(buttons[1].style.getPropertyValue('--wc-delay')).toBe('70ms');
+    expect(buttons[2].style.getPropertyValue('--wc-delay')).toBe('140ms');
+  });
 });

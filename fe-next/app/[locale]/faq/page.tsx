@@ -8,6 +8,7 @@ import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { GuidesCalloutLink } from '@/components/seo/GuidesCalloutLink';
 import { EducationCalloutLink } from '@/components/seo/EducationCalloutLink';
 import { EsScrabbleCrossLink } from '@/components/seo/EsScrabbleCrossLink';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 
 function buildFaqJsonLd(locale: string): string {
   const data = contentByLocale[locale] ?? contentByLocale.en;
@@ -241,9 +242,14 @@ export default async function FAQPage({ params }: { params: Promise<{ locale: st
   const { locale } = await params;
   const content = faqSeoContent[locale] ?? faqSeoContent.en;
   const faqJsonLd = buildFaqJsonLd(locale);
+  const breadcrumbItems = [
+    { name: 'LexiClash', url: `https://www.lexiclash.live/${locale}` },
+    { name: 'FAQ', url: `https://www.lexiclash.live/${locale}/faq` },
+  ];
   return (
     <>
       <script type="application/ld+json">{faqJsonLd}</script>
+      <BreadcrumbJsonLd items={breadcrumbItems} />
       <FAQPageClient />
       <GuidesCalloutLink locale={locale} />
       <EducationCalloutLink locale={locale} />

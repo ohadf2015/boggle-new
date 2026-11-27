@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Check, CheckCircle2 } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
+import posthog from '@/lib/analytics/lazyPosthog';
+import { useExperiment } from '@/hooks/useExperiment';
 import type { StudyCard } from '@/shared/utils/studyCards';
 import type { EduT } from '@/components/education/lobby/eduText';
 import { PRESS } from './eduLiveStyles';
@@ -23,8 +25,16 @@ const NAV = 'inline-flex min-h-12 items-center justify-center gap-1.5 rounded-ne
 export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: LobbyWordStudyProps) {
   const { language } = useLanguageSafe();
   const [index, setIndex] = useState(0);
+  const [navBump, setNavBump] = useState(0);
   const card = cards[Math.min(index, cards.length - 1)];
   const last = index >= cards.length - 1;
+  const { variant } = useExperiment('exp-edu-study-card-feedback-v1');
+
+  const nav = (direction: 'next' | 'back') => {
+    posthog.capture('edu_lobby_study_nav_clicked', { direction, cardIndex: index, totalCards: cards.length });
+    setNavBump((n) => n + 1);
+    setIndex((i) => (direction === 'next' ? i + 1 : i - 1));
+  };
 
   return (
     <section data-testid="lobby-word-study" aria-labelledby="lobby-word-study-title" className="flex w-full flex-col gap-3">
@@ -44,7 +54,15 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
         )}
       </div>
 
-      <div aria-live="polite" className="flex min-h-36 flex-col justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-5 py-4 text-neo-black shadow-hard">
+      <div
+        data-testid="study-card"
+        key={variant === 'card-pulse' ? navBump : undefined}
+        aria-live="polite"
+        className={cn(
+          'flex min-h-36 flex-col justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream px-5 py-4 text-neo-black shadow-hard',
+          variant === 'card-pulse' && 'animate-neo-pop'
+        )}
+      >
         <p data-testid="study-word" dir="auto" className="break-words font-neo-display text-[clamp(1.75rem,9cqw,2.5rem)] font-black leading-tight">
           {card.word}
         </p>
@@ -56,7 +74,7 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
         <button
           type="button"
           data-testid="study-back"
-          onClick={() => setIndex((i) => i - 1)}
+          onClick={() => nav('back')}
           disabled={index === 0}
           className={cn(NAV, PRESS, 'flex-1 border-neo-cream/40 bg-neo-navy-light text-neo-cream')}
         >
@@ -64,7 +82,12 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
           {t('eduStudent.lobby.studyBack')}
         </button>
         {last && !studied ? (
-          <button type="button" data-testid="study-done" onClick={onDone} className={cn(NAV, PRESS, 'flex-[2]', quiet ? 'border-neo-cream/40 bg-neo-navy text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black')}>
+          <button type="button" data-testid="study-done"
+            onClick={() => {
+              posthog.capture('edu_lobby_study_done_clicked', { totalCards: cards.length });
+              onDone();
+            }}
+            className={cn(NAV, PRESS, 'flex-[2]', quiet ? 'border-neo-cream/40 bg-neo-navy text-neo-cream' : 'border-neo-black bg-neo-lime text-neo-black')}>
             <Check className="size-5" aria-hidden="true" />
             {t('eduStudent.lobby.studyDone')}
           </button>
@@ -72,7 +95,7 @@ export function LobbyWordStudy({ cards, studied, onDone, quiet = false, t }: Lob
           <button
             type="button"
             data-testid="study-next"
-            onClick={() => setIndex((i) => i + 1)}
+            onClick={() => nav('next')}
             disabled={last}
             className={cn(NAV, PRESS, 'flex-[2] border-neo-black bg-neo-cyan text-neo-black')}
           >

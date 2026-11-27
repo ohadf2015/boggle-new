@@ -47,8 +47,8 @@ export function CardPickScreen({ cards, activeCards = [], onPick }: CardPickScre
         </div>
       )}
       <div className="grid w-full max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3">
-        {cards.map((card) => (
-          <PowerCardView key={card.id} card={card} onSelect={handlePick} />
+        {cards.map((card, i) => (
+          <PowerCardView key={card.id} card={card} onSelect={handlePick} revealIndex={i} />
         ))}
       </div>
     </section>

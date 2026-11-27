@@ -10,7 +10,8 @@ const RARITY_BORDER: Record<PowerCard['rarity'], string> = {
 };
 
 // Filled rarity chip — bg + navy ink reads at a glance, unlike a faint label.
-const RARITY_CHIP: Record<PowerCard['rarity'], string> = {
+// Exported so the run-result recap can reuse the same rarity colors.
+export const RARITY_CHIP: Record<PowerCard['rarity'], string> = {
   common: 'bg-neo-cyan text-neo-navy',
   rare: 'bg-neo-purple text-neo-white',
   legendary: 'bg-neo-yellow text-neo-navy',
@@ -20,9 +21,11 @@ interface PowerCardViewProps {
   card: PowerCard;
   onSelect?: (cardId: string) => void;
   selected?: boolean;
+  /** Position in the draw (0-based) — staggers the wc-rise reveal so a 3-card pack deals in one at a time instead of popping together. */
+  revealIndex?: number;
 }
 
-export function PowerCardView({ card, onSelect, selected = false }: PowerCardViewProps) {
+export function PowerCardView({ card, onSelect, selected = false, revealIndex }: PowerCardViewProps) {
   const { t } = useLanguage();
   const inner = (
     <>
@@ -40,8 +43,9 @@ export function PowerCardView({ card, onSelect, selected = false }: PowerCardVie
     </>
   );
 
-  // Legendary cards get a faint inner glow so the rare pick feels special.
-  const legendaryAccent = card.rarity === 'legendary' ? 'ring-2 ring-neo-yellow/40' : '';
+  // Legendary cards pulse so a rare drop reads as a genuine moment, not a coin flip.
+  const legendaryAccent =
+    card.rarity === 'legendary' ? 'ring-2 ring-neo-yellow/40 animate-pulse motion-reduce:animate-none' : '';
   const className = `flex flex-col gap-2 rounded-neo border-neo-thick ${RARITY_BORDER[card.rarity]} ${legendaryAccent} bg-neo-navy-light p-4 text-left ${
     selected ? 'shadow-hard-lg' : 'shadow-hard'
   }`;
@@ -52,7 +56,8 @@ export function PowerCardView({ card, onSelect, selected = false }: PowerCardVie
   return (
     <button
       type="button"
-      className={`${className} animate-neo-pop transition-transform duration-150 hover:-translate-y-1 active:translate-y-0`}
+      className={`${className} wc-rise transition-transform duration-150 hover:-translate-y-1 active:translate-y-0`}
+      style={{ '--wc-delay': `${(revealIndex ?? 0) * 70}ms` } as React.CSSProperties}
       onClick={() => onSelect(card.id)}
     >
       {inner}

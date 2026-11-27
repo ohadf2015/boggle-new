@@ -32,6 +32,10 @@ const NOISE_VALUE_PATTERNS: RegExp[] = [
   /\["@context"\]\.toLowerCase/i,
   // Browser refused to open an audio device; Sentry drops it too (lib/sentry/clientInit.ts).
   /Failed to start the audio device/i,
+  // Chromium extension content-script artifact (stale postMessage target
+  // after the page it injected into navigates). Fires across unrelated
+  // pages, 100% Chrome — not reachable from our own promise chains.
+  /Object Not Found Matching Id/i,
 ];
 
 // Multi-tab Supabase auth-token lock contention. Three observed shapes:

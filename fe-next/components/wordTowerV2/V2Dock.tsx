@@ -43,6 +43,10 @@ interface Props {
   onClearWord?: () => void;
   /** A real word to light up for a stuck new player (tray slots), or null. */
   hint?: number[] | null;
+  /** Fired when a tap lands on the tray while a word hangs on the hook. */
+  onBlockedTap?: () => void;
+  /** DROP button plays a one-shot shake (exp-wordtower-placing-nudge-v1). */
+  shake?: boolean;
 }
 
 /** Hold this long on backspace to clear the whole word. */
@@ -124,7 +128,7 @@ export const V2Dock = memo(function V2Dock(p: Props) {
     <div
       ref={p.dockRef}
       // FDT: tower tiles + backspace are tapped rapidly by design.
-      data-feedback-ignore-rage=""
+      data-feedback-ignore-rage="true"
       className={
         p.wide && feed
           ? 'absolute bottom-0 end-0 top-0 z-30 flex w-[22rem] flex-col justify-start gap-4 border-s-4 border-neo-cream/30 bg-neo-navy px-5 pb-4 pt-14 xl:w-[26rem]'
@@ -178,6 +182,8 @@ export const V2Dock = memo(function V2Dock(p: Props) {
               onSubmit={p.onSubmit}
               onDrop={p.onDrop}
               hint={p.hint}
+              onBlockedTap={p.onBlockedTap}
+              shake={p.shake}
             />
           </>
         )}

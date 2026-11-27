@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useCallback, useState } from 'react';
-import { GraduationCap, ArrowRight } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { GraduationCap, ArrowRight, Loader2 } from 'lucide-react';
+import posthog from '@/lib/analytics/lazyPosthog';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useExperiment } from '@/hooks/useExperiment';
 import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 
@@ -39,13 +41,20 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
   const { t } = useLanguage();
   const [name, setName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
+  const { variant, trackExposure } = useExperiment('exp-edu-join-loading-feedback-v1');
+
+  useEffect(() => {
+    trackExposure();
+  }, [trackExposure]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
       const trimmed = name.trim();
       const validation = validateUsername(trimmed);
+      posthog.capture('edu_classroom_name_submit_clicked', { valid: validation.isValid });
       if (!validation.isValid) {
+        posthog.capture('edu_classroom_name_validation_failed', { reason: validation.error ?? 'unknown' });
         setError(validation.error ?? 'validation.usernameRequired');
         return;
       }
@@ -54,6 +63,8 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
     },
     [name, onSubmit]
   );
+
+  const showLoadingFeedback = variant === 'loading-feedback' && disabled;
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-8">
@@ -119,8 +130,17 @@ export const ClassroomJoinNamePrompt: React.FC<ClassroomJoinNamePromptProps> = (
             disabled && 'opacity-50 cursor-not-allowed'
           )}
         >
-          <span>{t('education.classroomGame.namePrompt.submit')}</span>
-          <ArrowRight className="w-5 h-5 rtl:scale-x-[-1]" />
+          {showLoadingFeedback ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" />
+              <span>{t('education.classroomGame.namePrompt.submitting')}</span>
+            </>
+          ) : (
+            <>
+              <span>{t('education.classroomGame.namePrompt.submit')}</span>
+              <ArrowRight className="w-5 h-5 rtl:scale-x-[-1]" />
+            </>
+          )}
         </button>
 
         <p className="mt-3 text-center text-xs font-neo-body text-neo-white/70">

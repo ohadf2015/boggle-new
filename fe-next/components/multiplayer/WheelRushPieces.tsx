@@ -16,6 +16,9 @@ interface MyWordsChipsProps {
   /** Text direction for the words, driven by the GAME language (not the UI
    *  locale) so English words read LTR even for a Hebrew-UI player. */
   dir?: 'rtl' | 'ltr';
+  /** Optional — when absent, chips render with no aria-label (used by older
+   *  call sites/tests that don't care about the status legend). */
+  t?: (path: string, params?: Record<string, string | number>) => string;
 }
 
 // Calm, dark chips that mirror the daily-challenge found-words language
@@ -30,7 +33,7 @@ const CHIP_TONE: Record<WordEntry['kind'], { chip: string; score: string }> = {
   closed: { chip: 'bg-neo-navy-light border-neo-black', score: 'text-neo-cyan' },
 };
 
-export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }) => {
+export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr', t }) => {
   // Always render a fixed-height slot so the wheel cluster's `flex-1
   // justify-center` doesn't re-center when the first chip lands. Empty
   // state is silent — no header/placeholder, just reserved space.
@@ -43,14 +46,24 @@ export const MyWordsChips: React.FC<MyWordsChipsProps> = ({ words, dir = 'ltr' }
     >
       {words.slice(0, 20).map((w) => {
         const tone = CHIP_TONE[w.kind];
+        const closed = w.kind === 'closed';
+        const label = t
+          ? closed
+            ? t('wordWheel.chipClosedLabel', { word: w.word })
+            : t('wordWheel.chipLockedLabel', { word: w.word, score: w.score ?? 0 })
+          : undefined;
         return (
           <span
             key={w.word}
             data-kind={w.kind}
             dir={dir}
+            aria-label={label}
             className={cn(
               'inline-flex items-center h-7 px-2.5 rounded-neo border-2 text-neo-white text-xs font-semibold whitespace-nowrap shadow-hard-xs',
               tone.chip,
+              // Status must not rely on the border color alone (WCAG 1.4.1) —
+              // a closed word reads as struck-through regardless of hue.
+              closed && 'line-through opacity-80',
             )}
           >
             {w.word}

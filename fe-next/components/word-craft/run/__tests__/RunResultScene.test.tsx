@@ -27,4 +27,14 @@ describe('RunResultScene', () => {
     fireEvent.click(screen.getByRole('button', { name: 'wordcraft.run.restart' }));
     expect(onRestart).toHaveBeenCalled();
   });
+
+  it('color-codes each taken card by rarity so a legendary pull reads as a highlight, not a plain list', () => {
+    const common = POWER_CARD_POOL.find((c) => c.rarity === 'common')!;
+    const legendary = POWER_CARD_POOL.find((c) => c.rarity === 'legendary')!;
+    render(
+      <RunResultScene cleared runTotal={420} activeCards={[common, legendary]} onRestart={vi.fn()} />,
+    );
+    expect(screen.getByTestId(`run-result-card-${common.id}`).className).toContain('bg-neo-cyan');
+    expect(screen.getByTestId(`run-result-card-${legendary.id}`).className).toContain('bg-neo-yellow');
+  });
 });

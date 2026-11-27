@@ -30,3 +30,12 @@ export function wordFeedbackTier(wordTotal: number): WordFeedbackTier {
   if (wordTotal >= 15) return 'great';
   return 'nice';
 }
+
+/**
+ * Chain counter for variable-reward escalation: a run of great/huge words
+ * builds a streak; a plain "nice" word breaks it. Earned, not free — makes
+ * consecutive good plays feel like momentum instead of flat repeat praise.
+ */
+export function nextStreak(prevStreak: number, tier: WordFeedbackTier): number {
+  return tier === 'nice' ? 0 : prevStreak + 1;
+}

@@ -132,7 +132,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // (WordWheelPixiRing already supports it; daily-challenge wires it, Wheel Rush never did).
   const [comboLevel, setComboLevel] = useState(0);
   // Ref-bridged so the once-bound socket onResult closure can reach the latest trigger.
-  const celebrateRef = useRef<(tier: 'all' | 'almost', word: string, missingLetter?: string | null) => void>(() => {});
+  const celebrateRef = useRef<(tier: 'all' | 'almost', word: string, missingLetter?: string | null, score?: number) => void>(() => {});
 
   const { floatingReactions, dismissReaction } = useQuickReactions({ socket, username });
 
@@ -284,9 +284,9 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   // all-but-one) distinct wheel letters, mirroring the daily-challenge pangram
   // beat. Single keyed state so a second pangram replaces (re-animates) rather
   // than queues. fireConfetti self-gates on reduced-motion/low-end devices.
-  const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string, missingLetter?: string | null) => {
+  const triggerCelebration = useCallback((tier: 'all' | 'almost', word: string, missingLetter?: string | null, score?: number) => {
     wheelStreakRef.current = tier === 'all' ? wheelStreakRef.current + 1 : 0;
-    setCelebration({ tier, word, key: Date.now(), streak: wheelStreakRef.current, missingLetter: missingLetter ?? undefined });
+    setCelebration({ tier, word, key: Date.now(), streak: wheelStreakRef.current, missingLetter: missingLetter ?? undefined, points: score });
     playLegendaryWordSound?.();
     haptic([50, 30, 50, 30, 80]);
     fireConfetti({
@@ -370,7 +370,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
       if (coverage !== 'none') {
         const missingLetter = coverage === 'almost' ? missingWheelLetter(data.word, pz?.allLetters ?? []) : null;
-        celebrateRef.current(coverage, data.word, missingLetter);
+        celebrateRef.current(coverage, data.word, missingLetter, data.score);
       }
       accSfx();
       haptic(20);
@@ -731,7 +731,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {/* Found words — sit below the wheel cluster, mirroring the daily
           challenge's found-words slot (fixed-height slot inside MyWordsChips
           keeps the layout from reflowing). */}
-      {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} />}
+      {!isDesktopCanvas && <MyWordsChips words={myWords} dir={wordDir} t={t} />}
       <StuckCoachOverlay coach={ftue} anchor={isDesktopCanvas ? undefined : RUSH_COACH_ANCHOR} />
 
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={!!prefersReduced} />

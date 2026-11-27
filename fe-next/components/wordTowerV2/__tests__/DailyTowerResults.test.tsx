@@ -23,6 +23,9 @@ vi.mock('@/hooks/useDailyPlayedStatus', () => ({
     refresh: vi.fn(),
   }),
 }));
+vi.mock('@/components/ads/ResultsBannerSlot', () => ({
+  default: ({ placement }: { placement: string }) => <div data-testid="results-banner" data-placement={placement} />,
+}));
 
 import { V2Results } from '../V2Results';
 
@@ -187,6 +190,12 @@ describe('V2Results — daily tower', () => {
   it('given a daily run, then no second streak (best-streak cell) is shown', () => {
     const { container } = daily();
     expect(container.textContent).not.toContain('wordTowerV2.results.combo');
+  });
+
+  it('given a daily run, when shown, then the results ad banner is rendered', () => {
+    daily();
+    const banner = screen.getByTestId('results-banner');
+    expect(banner).toHaveAttribute('data-placement', 'word-tower-complete');
   });
 
   it('given daily, then keep building and home are in the pinned actions bar', () => {

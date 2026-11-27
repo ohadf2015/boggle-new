@@ -41,6 +41,8 @@ import { useAvatarEditor } from './editor/useAvatarEditor';
 import { getEditorTabs, describeSlot, type ColorSection, type PartsSection, type EditorTab } from './editor/editorTabs';
 import { getPartLockInfo } from './editor/partLock';
 import { downloadAvatarPng } from './editor/downloadAvatar';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackAvatarRandomizeClicked } from '@/lib/avatar/avatarTelemetry';
 import './editor/avatarEditor.css';
 
 export interface AvatarPremium {
@@ -119,7 +121,14 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
     if (Object.keys(patch).length > 0) setMany(patch, committed);
     if (locked && premium) tryOnPart(locked.key, locked.value);
   }, [premium, setMany, committed, tryOnPart]);
-  const onRandomize = useCallback(() => replace(getRandomAvatarConfig()), [replace]);
+  const { variant: randomizeVariant, trackExposure: trackRandomizeExposure } = useExperiment('exp-avatar-randomize-feedback-v1');
+  useEffect(() => {
+    if (isOpen) trackRandomizeExposure();
+  }, [isOpen, trackRandomizeExposure]);
+  const onRandomize = useCallback(() => {
+    trackAvatarRandomizeClicked(randomizeVariant);
+    replace(getRandomAvatarConfig());
+  }, [replace, randomizeVariant]);
   const onRestorePrevious = useCallback(() => {
     if (previousConfig) replace(previousConfig);
   }, [replace, previousConfig]);
@@ -286,7 +295,14 @@ export default function AvatarBuilderModal({ isOpen, onClose, onSave, initialCon
                 />
               </div>
             )}
-            <EditorActionBar canUndo={editor.canUndo} onUndo={editor.undo} onRandomize={onRandomize} onSave={handleSave} t={t} />
+            <EditorActionBar
+              canUndo={editor.canUndo}
+              onUndo={editor.undo}
+              onRandomize={onRandomize}
+              onSave={handleSave}
+              t={t}
+              randomizeFeedback={randomizeVariant === 'feedback'}
+            />
           </div>
         </div>
 

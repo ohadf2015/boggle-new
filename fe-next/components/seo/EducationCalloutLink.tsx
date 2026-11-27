@@ -4,7 +4,7 @@ interface Props {
   locale: string;
 }
 
-type LocaleKey = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type LocaleKey = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 const CONTENT: Record<LocaleKey, { title: string; tagline: string; cta: string }> = {
   en: {
@@ -31,6 +31,11 @@ const CONTENT: Record<LocaleKey, { title: string; tagline: string; cta: string }
     title: '¿Enseñas esto en un aula real?',
     tagline: 'LexiClash para Escuelas: panel gratuito para profesores, sin cuentas de estudiante, rondas de vocabulario en vivo a las que toda la clase se une con un código de 6 caracteres.',
     cta: 'Ver LexiClash para Escuelas →',
+  },
+  ru: {
+    title: 'Преподаёте это в настоящем классе?',
+    tagline: 'LexiClash для школ: бесплатная панель для учителя, без аккаунтов для учеников, живые раунды словарного запаса — весь класс присоединяется по 6-значному коду.',
+    cta: 'Посмотреть LexiClash для школ →',
   },
 };
 

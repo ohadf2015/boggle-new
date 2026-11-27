@@ -116,6 +116,10 @@ describe('WheelRushHeader', () => {
     expect(screen.getByTestId('wheel-close-race-indicator')).toBeTruthy();
     expect(screen.getByTestId('wheel-opp-carol').className).toContain('border-neo-orange');
     expect(screen.getByTestId('wheel-self-badge').className).toContain('border-neo-orange');
+    // Icon+shape pairing (design-system.md), not just a border color, so the
+    // cue reads for colorblind players too — the rival card gets the same
+    // zap glyph the self badge shows.
+    expect(screen.getByTestId('wheel-opp-close-race-carol')).toBeTruthy();
   });
 
   it('does not flag a close race when the rival gap is wide', () => {
@@ -123,6 +127,7 @@ describe('WheelRushHeader', () => {
     expect(screen.queryByTestId('wheel-close-race-indicator')).toBeNull();
     expect(screen.getByTestId('wheel-opp-bob').className).not.toContain('border-neo-orange');
     expect(screen.getByTestId('wheel-self-badge').className).not.toContain('border-neo-orange');
+    expect(screen.queryByTestId('wheel-opp-close-race-bob')).toBeNull();
   });
 
   it('suppresses the close-race cue during fog so proximity is never leaked via animation', () => {
@@ -136,6 +141,7 @@ describe('WheelRushHeader', () => {
     });
     expect(screen.queryByTestId('wheel-close-race-indicator')).toBeNull();
     expect(screen.getByTestId('wheel-opp-carol').className).not.toContain('border-neo-orange');
+    expect(screen.queryByTestId('wheel-opp-close-race-carol')).toBeNull();
   });
 
   it('one lesson-style HUD row: leave, a single timer bar, my score pill, mute; the rival sits on one slim row below', () => {

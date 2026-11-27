@@ -7,6 +7,10 @@ import { render, screen } from '@testing-library/react';
 import { BlastMascotHud, BLAST_MASCOT_SLOT_CLASS } from '../BlastMascotHud';
 import { MASCOT_GIF_PATHS } from '@/lib/blast/mascotState';
 
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (key: string) => key }),
+}));
+
 describe('BlastMascotHud', () => {
   it('renders idle mascot by default', () => {
     render(<BlastMascotHud state="idle" />);
@@ -63,6 +67,18 @@ describe('BlastMascotHud', () => {
     render(<BlastMascotHud state="awe" enabled={true} onToggle={onToggle} />);
     screen.getByTestId('blast-mascot-hud').click();
     expect(onToggle).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses a translated aria-label for the mute toggle, not a hardcoded English literal', () => {
+    const onToggle = vi.fn();
+    render(<BlastMascotHud state="awe" enabled={true} onToggle={onToggle} />);
+    expect(screen.getByTestId('blast-mascot-hud').getAttribute('aria-label')).toBe('blast.mascot.mute');
+  });
+
+  it('uses a translated aria-label for the unmute toggle when muted', () => {
+    const onToggle = vi.fn();
+    render(<BlastMascotHud state="awe" enabled={false} onToggle={onToggle} />);
+    expect(screen.getByTestId('blast-mascot-hud').getAttribute('aria-label')).toBe('blast.mascot.unmute');
   });
 
   it('forces idle pose when disabled (no animated reactions while muted)', () => {

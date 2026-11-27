@@ -45,7 +45,7 @@ export function BlastContinueModal({
             </h2>
 
             <p className="font-neo-body text-sm text-neo-white">
-              {t('blast.continueModal.body')}
+              {t(canShowAd ? 'blast.continueModal.body' : 'blast.continueModal.bodyNoAd')}
             </p>
 
             <div className="flex w-full flex-col gap-3 pt-2">

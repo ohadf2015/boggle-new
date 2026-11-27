@@ -9,9 +9,10 @@ import { shouldSuppressAdsForTier } from '@/lib/families/adPolicy';
 
 interface RemoveAdsProbeProps {
   isDarkMode: boolean;
+  surface?: string;
 }
 
-export function RemoveAdsProbe({ isDarkMode }: RemoveAdsProbeProps) {
+export function RemoveAdsProbe({ isDarkMode, surface = 'settings' }: RemoveAdsProbeProps) {
   const { t } = useLanguage();
   const { tier } = useSocialCapabilities();
   // Families: never surface purchase offers (or their telemetry) to a known child.
@@ -20,15 +21,15 @@ export function RemoveAdsProbe({ isDarkMode }: RemoveAdsProbeProps) {
 
   useEffect(() => {
     if (suppressed) return;
-    trackGrowthEvent('iap_viewed', { surface: 'settings' });
-  }, [suppressed]);
+    trackGrowthEvent('iap_viewed', { surface });
+  }, [suppressed, surface]);
 
   if (suppressed) return null;
 
   function handleTap() {
     if (tapped) return;
     setTapped(true);
-    trackGrowthEvent('iap_tapped', { surface: 'settings', intent: 'remove_ads' });
+    trackGrowthEvent('iap_tapped', { surface, intent: 'remove_ads' });
   }
 
   return (

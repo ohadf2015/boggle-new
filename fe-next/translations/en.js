@@ -2527,6 +2527,7 @@ const en = {
       "youWin": "You win the race!",
       "wins": "wins the race!",
       "winner": "{winner} wins the race!",
+      "yourRank": "You placed",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -9855,7 +9856,6 @@ const en = {
     "minLetters": "Min {min} letters",
     "scoreLabel": "Score",
     "timeLeft": "Time left",
-    "closeRace": "Close race!",
     "gameOver": "Time's Up!",
     "submit": "SUBMIT",
     "alreadyFoundBonus": "Found again (+{points})",
@@ -9864,6 +9864,8 @@ const en = {
     "missingLetter": "Missing: {letter}",
     "streakBadge": "{count} in a row!",
     "onFireBadge": "{count} on fire!",
+    "chipLockedLabel": "{word}, scored, worth {score} points",
+    "chipClosedLabel": "{word}, claimed by an opponent",
     "closeRace": "Close race",
     "inputPlaceholder": "Type a word...",
     "firstHint": "Tap or swipe. Every word uses {letter}",
@@ -12354,18 +12356,21 @@ const en = {
     "continueModal": {
       "title": "Don't stop now!",
       "body": "You're out of moves. Watch a quick ad to keep your run alive.",
+      "bodyNoAd": "You're out of moves. No ad available right now — end your run here.",
       "cta": "Watch ad for +{moves} moves",
       "decline": "End run"
     },
     "retryWaveModal": {
       "title": "Wave {wave}: so close!",
       "body": "You cleared {percent}%. Watch an ad to retry wave {wave}. Your earlier waves are safe.",
+      "bodyNoAd": "You cleared {percent}%. No ad available right now — restart from wave 1 to keep going.",
       "cta": "Watch ad · Retry wave {wave}",
       "decline": "Restart from wave 1"
     },
     "pregameBuff": {
       "title": "Power up?",
       "body": "Pick a boost, watch a quick ad, and start this run with an edge.",
+      "bodyNoAd": "No boosts available right now — skip to jump straight into your run.",
       "shield": "Shield",
       "bomb": "Bomb",
       "combo2x": "2x Combo",
@@ -12559,7 +12564,9 @@ const en = {
       "sweating": "Nervous mascot surviving the countdown",
       "celebrating": "Celebrating mascot with trophy",
       "sadSmile": "Mascot with a consoling smile",
-      "neutral": "Cheerful mascot ready for the next wave"
+      "neutral": "Cheerful mascot ready for the next wave",
+      "mute": "Mute mascot reactions",
+      "unmute": "Unmute mascot reactions"
     },
     "archetypes": {
       "normal": "Standard Wave",
@@ -14598,7 +14605,11 @@ const en = {
       "homeCta": "See this week"
     },
     "proPowered": {"hint": "Part of your Teacher Pro plan"},
-    "trialUsage": {"lead": "During your trial:", "games_one": "{count} class game", "games_other": "{count} class games", "students_one": "{count} student tracked", "students_other": "{count} students tracked", "practice_one": "{count} practice session", "practice_other": "{count} practice sessions"}
+    "trialUsage": {"lead": "During your trial:", "games_one": "{count} class game", "games_other": "{count} class games", "students_one": "{count} student tracked", "students_other": "{count} students tracked", "practice_one": "{count} practice session", "practice_other": "{count} practice sessions"},
+    "schoolBulkCta": {
+      "text": "Running this for your whole school?",
+      "link": "Get bulk pricing"
+    }
   },
   "education": {
     "race": {
@@ -15707,6 +15718,7 @@ const en = {
         "subtitle": "Your class sees this name on the board.",
         "placeholder": "Type your name",
         "submit": "Join game",
+        "submitting": "Joining…",
         "roomLabel": "Room {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · live game: {{lesson}}",
@@ -19291,6 +19303,7 @@ const en = {
         "titleLost": "Out of Tiles",
         "subtitleWon": "You collected every crown gem. Hunt complete.",
         "subtitleLost": "Bag emptied before you could finish. Try again.",
+        "subtitleLostClose": "So close — one crown away!",
         "restart": "New Hunt",
         "crownsCaption": "{{n}}/4 crowns collected"
       },

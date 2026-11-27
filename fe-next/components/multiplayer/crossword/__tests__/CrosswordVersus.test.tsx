@@ -139,6 +139,18 @@ describe('CrosswordVersus', () => {
     expect(screen.getByText('crossword.mp.youWin')).toBeInTheDocument();
   });
 
+  it('tells a non-winner their own final rank when the race ends', () => {
+    mp = { puzzle: PUZZLE, standings, raceOver: true, ready: true };
+    render(<CrosswordVersus socket={null} username="bob" />);
+    expect(screen.getByTestId('crossword-final-rank').textContent).toMatch(/#2.*2$/);
+  });
+
+  it('does not show a rank chip for the winner (already said "you win")', () => {
+    mp = { puzzle: PUZZLE, standings, raceOver: true, ready: true };
+    render(<CrosswordVersus socket={null} username="me" />);
+    expect(screen.queryByTestId('crossword-final-rank')).not.toBeInTheDocument();
+  });
+
   it('keeps the on-screen keyboard touch-only for en, with no IME input', () => {
     render(<CrosswordVersus socket={null} username="me" />);
     expect(screen.getByTestId('kbd').parentElement?.className).toContain('lg:hidden');

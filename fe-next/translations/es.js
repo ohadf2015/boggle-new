@@ -2546,6 +2546,7 @@ const es = {
       "youWin": "¡Ganas la carrera!",
       "wins": "¡gana la carrera!",
       "winner": "¡{winner} gana la carrera!",
+      "yourRank": "Quedaste",
       "statSeparator": "/",
       "statPercent": "{percent}%"
     },
@@ -10414,7 +10415,6 @@ const es = {
     "minLetters": "Mín {min} letras",
     "scoreLabel": "Puntuación",
     "timeLeft": "Tiempo restante",
-    "closeRace": "¡Carrera reñida!",
     "gameOver": "¡Se acabó el tiempo!",
     "submit": "ENVIAR",
     "alreadyFoundBonus": "Encontrada de nuevo (+{points})",
@@ -10423,6 +10423,8 @@ const es = {
     "missingLetter": "Falta: {letter}",
     "streakBadge": "¡{count} seguidas!",
     "onFireBadge": "¡{count} seguidas, en racha!",
+    "chipLockedLabel": "{word}, anotó {score} puntos",
+    "chipClosedLabel": "{word}, reclamada por un rival",
     "closeRace": "Carrera reñida",
     "inputPlaceholder": "Escribe una palabra...",
     "firstHint": "Toca o desliza: todas llevan la {letter}",
@@ -14015,18 +14017,21 @@ const es = {
     "continueModal": {
       "title": "¡No pares ahora!",
       "body": "Te quedaste sin movimientos. Mira un anuncio rápido para seguir jugando.",
+      "bodyNoAd": "Te quedaste sin movimientos. No hay anuncio disponible ahora — puedes terminar la partida aquí.",
       "cta": "Ver anuncio por +{moves} movimientos",
       "decline": "Terminar partida"
     },
     "retryWaveModal": {
       "title": "Oleada {wave}: ¡muy cerca!",
       "body": "Limpiaste {percent}%. Mira un anuncio para reintentar la oleada {wave}. Tus oleadas previas se conservan.",
+      "bodyNoAd": "Limpiaste {percent}%. No hay anuncio disponible ahora — puedes reiniciar desde la oleada 1.",
       "cta": "Ver anuncio · reintentar oleada {wave}",
       "decline": "Reiniciar desde la oleada 1"
     },
     "pregameBuff": {
       "title": "¿Potenciar?",
       "body": "Elige un boost, mira un anuncio corto y empieza la partida con ventaja.",
+      "bodyNoAd": "No hay boosts disponibles ahora — puedes saltar y empezar la partida directamente.",
       "shield": "Escudo",
       "bomb": "Bomba",
       "combo2x": "Combo x2",
@@ -14244,7 +14249,9 @@ const es = {
       "sweating": "Mascota nerviosa sobreviviendo la cuenta atrás",
       "celebrating": "Mascota celebrando con el trofeo",
       "sadSmile": "Mascota con sonrisa consoladora",
-      "neutral": "Mascota lista para la siguiente ola"
+      "neutral": "Mascota lista para la siguiente ola",
+      "mute": "Silenciar las reacciones de la mascota",
+      "unmute": "Activar las reacciones de la mascota"
     },
     "archetypes": {
       "normal": "Ola estándar",
@@ -16261,7 +16268,11 @@ const es = {
       "homeCta": "Ver esta semana"
     },
     "proPowered": {"hint": "Incluido en tu plan Teacher Pro"},
-    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"}
+    "trialUsage": {"lead": "Durante tu prueba:", "games_one": "{count} partida de clase", "games_other": "{count} partidas de clase", "students_one": "{count} alumno con seguimiento", "students_other": "{count} alumnos con seguimiento", "practice_one": "{count} sesión de práctica", "practice_other": "{count} sesiones de práctica"},
+    "schoolBulkCta": {
+      "text": "¿Lo usas en todo el centro escolar?",
+      "link": "Consulta precios para centros"
+    }
   },
   "education": {
     "race": {
@@ -17380,6 +17391,7 @@ const es = {
         "subtitle": "Tu clase verá este nombre en la pizarra.",
         "placeholder": "Escribe tu nombre",
         "submit": "Entrar al juego",
+        "submitting": "Entrando…",
         "roomLabel": "Sala {{code}}"
       },
       "classroomLessonLabel": "{{classroom}} · partida en vivo: {{lesson}}",
@@ -20995,6 +21007,7 @@ const es = {
         "titleLost": "Sin fichas",
         "subtitleWon": "Recolectaste todas las gemas corona. Caza completada.",
         "subtitleLost": "Se vació la bolsa antes de terminar. Inténtalo de nuevo.",
+        "subtitleLostClose": "Muy cerca — ¡te falta una corona!",
         "restart": "Nueva caza",
         "crownsCaption": "{{n}}/4 coronas conseguidas"
       },
