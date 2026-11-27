@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { Language } from '@/shared/types/game';
 import { Loader } from '@/components/ui/Loader';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 const SHOW_RECOVERY_MS = 8000;
 const STUCK_EVENT_MS = 15000;
@@ -72,6 +73,7 @@ export function BlastLoadingGate({
   onBackToLobby,
 }: BlastLoadingGateProps) {
   const [showRecovery, setShowRecovery] = useState(false);
+  const classroom = useClassroomBoard();
   const [showLobby, setShowLobby] = useState(false);
 
   const mountTimeRef = useRef<number>(Date.now());
@@ -119,18 +121,18 @@ export function BlastLoadingGate({
     <div className="flex-1 flex items-center justify-center" data-testid="blast-loading">
       <div className="flex flex-col items-center gap-3">
         <Loader size="lg" />
-        <span className="text-neo-white text-sm font-bold">
+        <span className={classroom ? 'text-edu-ink text-sm font-bold' : 'text-neo-white text-sm font-bold'}>
           {t('blast.generating')}
         </span>
         {showRecovery && (
           <div className="flex flex-col items-center gap-2" data-testid="blast-loading-recovery">
             {!dictionaryReady && (
-              <span className="text-neo-white/80 text-xs" data-testid="blast-loading-dictionary-status">
+              <span className={classroom ? 'text-edu-ink/80 text-xs' : 'text-neo-white/80 text-xs'} data-testid="blast-loading-dictionary-status">
                 {t('blast.loadingDictionary')}
               </span>
             )}
             {!gridReady && mode === 'mp' && (
-              <span className="text-neo-white/80 text-xs" data-testid="blast-loading-board-status">
+              <span className={classroom ? 'text-edu-ink/80 text-xs' : 'text-neo-white/80 text-xs'} data-testid="blast-loading-board-status">
                 {t('blast.waitingForBoard')}
               </span>
             )}
@@ -149,7 +151,7 @@ export function BlastLoadingGate({
             type="button"
             onClick={onBackToLobby}
             data-testid="blast-loading-back-to-lobby"
-            className="text-neo-white/70 text-xs underline underline-offset-2 hover:text-neo-white"
+            className={classroom ? 'text-edu-ink/70 text-xs underline underline-offset-2 hover:text-edu-ink' : 'text-neo-white/70 text-xs underline underline-offset-2 hover:text-neo-white'}
           >
             {t('blast.backToLobby')}
           </button>

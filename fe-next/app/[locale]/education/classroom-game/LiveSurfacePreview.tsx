@@ -160,6 +160,8 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'wheelphone') return <VersusPhonePreview mode="wheel" />;
   if (kind === 'towerphone') return <VersusPhonePreview mode="tower" />;
   if (kind === 'wordcraftphone') return <VersusPhonePreview mode="wordcraft" />;
+  if (kind === 'blastphone') return <VersusPhonePreview mode="blast" />;
+  if (kind === 'huntphone') return <VersusPhonePreview mode="hunt" />;
   return <ProjectorOrStagePreview />;
 }
 

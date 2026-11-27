@@ -11,6 +11,7 @@ import { inferTargetLetterCounts, exactLetterCounts, computeYellowState } from '
 import type { Language } from '@/types';
 import { FeedbackLegend, KnownLettersDisplay } from './SurvivalClueLegend';
 import { HuntSolvedRow } from './hunt/HuntSolvedRow';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface SurvivalClueBoxesProps {
   currentHint: HintLevel | null;
@@ -55,6 +56,7 @@ export interface SurvivalClueBoxesProps {
 const CLUE_GREEN = "bg-emerald-400 border-neo-black text-neo-black";
 const CLUE_YELLOW = "bg-amber-400 border-neo-black text-neo-black";
 const CLUE_UNKNOWN = "bg-neo-navy-elevated border-dashed border-neo-white/45 text-neo-white";
+const CLUE_UNKNOWN_CLASSROOM = "bg-edu-tile border-dashed border-edu-line/50 text-edu-ink";
 
 /**
  * Clue-tile size classes, keyed by word length. `compact` returns small fixed
@@ -102,6 +104,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
   language,
 }, ref) => {
   const shownRef = useRef<string[]>([]);
+  const classroom = useClassroomBoard();
   if (!currentHint) return null;
 
   const showMatchWarning = matchesTargetLength && !showFeedbackOverlay;
@@ -115,7 +118,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "mx-auto max-w-3xl w-full transition-[border-color,box-shadow] duration-300",
-        "bg-neo-navy/50 border-neo-black/20",
+        classroom ? "bg-edu-surface border-neo-black" : "bg-neo-navy/50 border-neo-black/20",
         compact
           ? "px-1.5 py-px mb-0 border rounded-md"
           : "px-3 py-2 mb-0.5 border-2 rounded-neo-lg cramped:py-px cramped:px-1.5 cramped:mb-0 cramped:border cramped:rounded-md",
@@ -160,7 +163,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
         if (showGoal) {
           return (
             <div className={cn("text-center", compact ? "mb-0.5" : "mb-2 cramped:mb-0.5")}>
-              <span data-testid="hunt-goal" className="font-black text-neo-white text-base sm:text-lg cramped:text-sm">
+              <span data-testid="hunt-goal" className={classroom ? "font-black text-edu-ink text-base sm:text-lg cramped:text-sm" : "font-black text-neo-white text-base sm:text-lg cramped:text-sm"}>
                 {t('wordHunt.survival.goal', { count: targetWord.length, tries: MAX_ATTEMPTS })}
               </span>
             </div>
@@ -174,8 +177,8 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
               triesRemaining <= 2
                 ? "text-neo-red"
                 : triesRemaining <= 4
-                  ? "text-neo-yellow"
-                  : "text-neo-white"
+                  ? (classroom ? "text-edu-yellow-ink" : "text-neo-yellow")
+                  : classroom ? "text-edu-ink" : "text-neo-white"
             )}>
               {triesRemaining}/{MAX_ATTEMPTS} {t('wordHunt.survival.triesLeft')}
             </span>
@@ -285,6 +288,7 @@ interface FeedbackOverlayProps {
 const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordLength, skipAnimations, compact }) => {
   // Gray letters flash briefly then fade to '?' after a delay
   const [grayFaded, setGrayFaded] = useState(false);
+  const unknown = useClassroomBoard() ? CLUE_UNKNOWN_CLASSROOM : CLUE_UNKNOWN;
 
   useEffect(() => {
     const timer = setTimeout(() => setGrayFaded(true), GRAY_LETTER_FADE_DELAY);
@@ -329,7 +333,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
               letterFb.feedback === 'green' && CLUE_GREEN,
               letterFb.feedback === 'yellow' && CLUE_YELLOW,
               isGray && showGrayLetter && "bg-slate-500 border-neo-black text-neo-white",
-              isGray && !showGrayLetter && CLUE_UNKNOWN
+              isGray && !showGrayLetter && unknown
             )}
           >
             {isClue ? letterFb.letter : (showGrayLetter ? letterFb.letter : '?')}
@@ -361,6 +365,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
   shownRef,
 }) => {
   const hintChars = currentHint.hint.split(' ').filter(c => c !== '');
+  const unknown = useClassroomBoard() ? CLUE_UNKNOWN_CLASSROOM : CLUE_UNKNOWN;
   const shownNow: string[] = [];
   useEffect(() => { shownRef.current = shownNow; });
   const wordLength = hintChars.length;
@@ -419,7 +424,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
             : CLUE_YELLOW;
         } else {
           displayChar = '?';
-          bgClass = CLUE_UNKNOWN;
+          bgClass = unknown;
         }
 
         const isRevealed = !!accumulatedClue || isHintRevealed || isShopRevealed || !!persistedLetter;

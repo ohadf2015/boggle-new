@@ -1,11 +1,13 @@
 'use client';
 
-/** DEV-ONLY: `?preview=wheelphone|towerphone|wordcraftphone[&arcade=1]` a student's phone mid Wheel Rush / Word Tower / Wordcraft in a classroom (arcade=1: the main game's look). */
+/** DEV-ONLY: `?preview=wheelphone|towerphone|wordcraftphone|blastphone|huntphone[&arcade=1]` a student's phone mid Wheel Rush / Word Tower / Wordcraft / Blast / Word Hunt in a classroom (arcade=1: the main game's look). */
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { WheelRushView } from '@/components/multiplayer/WheelRushView';
 import { WordTowerVersus } from '@/components/wordTower/WordTowerVersus';
 import { WordcraftLiveView } from '@/components/multiplayer/wordcraft/WordcraftLiveView';
+import { MpBlastCanvas } from '@/components/multiplayer/round/MpBlastCanvas';
+import { WordHuntGame } from '@/components/wordhunt/WordHuntGame';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import { FakeSocket } from '../../teacher/preview/_edu/fakeSocket';
@@ -39,7 +41,12 @@ function makeSocket() {
   }).asSocket();
 }
 
-export function VersusPhonePreview({ mode }: { mode: 'wheel' | 'tower' | 'wordcraft' }) {
+// The arcade comparison needs the main game's navy page on this sky route.
+const ARCADE_PAGE = { background: 'rgb(var(--neo-navy))' };
+
+const BLAST_GRID = [['S', 'T', 'O', 'R', 'M', 'A'], ['H', 'A', 'D', 'E', 'W', 'L'], ['I', 'N', 'L', 'S', 'A', 'E'], ['V', 'E', 'R', 'T', 'Y', 'P'], ['O', 'C', 'K', 'B', 'U', 'N'], ['R', 'I', 'G', 'H', 'T', 'S']];
+
+export function VersusPhonePreview({ mode }: { mode: 'wheel' | 'tower' | 'wordcraft' | 'blast' | 'hunt' }) {
   const { t } = useLanguage();
   const classroom = useSearchParams()?.get('arcade') !== '1';
   const [socket] = useState(makeSocket);
@@ -49,6 +56,14 @@ export function VersusPhonePreview({ mode }: { mode: 'wheel' | 'tower' | 'wordcr
       {mode === 'wheel' ? (
         <div className="flex h-dvh flex-col">
           <WheelRushView socket={socket} username="Maya" leaderboard={LEADERBOARD} onQuit={() => undefined} t={t as never} remainingTime={95} totalTime={120} />
+        </div>
+      ) : mode === 'blast' ? (
+        <div className="flex h-dvh flex-col bg-edu-page" style={classroom ? undefined : ARCADE_PAGE}>
+          <MpBlastCanvas grid={BLAST_GRID as never} username="Maya" socket={socket} totalTime={120} onQuit={() => undefined} onWordWithComboType={() => undefined} onBoardCleared={() => undefined} />
+        </div>
+      ) : mode === 'hunt' ? (
+        <div className="flex h-dvh flex-col bg-edu-page" style={classroom ? undefined : ARCADE_PAGE}>
+          <WordHuntGame grid={BLAST_GRID as never} gameLanguage="en" leaderboard={LEADERBOARD as never} username="Maya" score={42} onQuit={() => undefined} onWordSubmit={() => undefined} onWordHuntGuess={() => undefined} gameActive minWordLength={3} socket={socket} foundWords={[{ word: 'storm', isValid: true, score: 5 }]} mpChrome />
         </div>
       ) : mode === 'wordcraft' ? (
         <div className="flex h-dvh flex-col">

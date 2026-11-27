@@ -29,4 +29,9 @@ describe('<LobbyClassPicker>', () => {
     expect(on).toHaveClass('bg-neo-pink', 'text-neo-black', 'border-neo-black');
     expect(on.className).not.toMatch(/neo-lime/);
   });
+
+  it('Given many classes on a wide lobby, Then the row stops short of the mascot hanging over its end', () => {
+    render(<LobbyClassPicker classrooms={[{ id: 'a', name: '5B' }, { id: 'b', name: '4A' }]} selectedId="b" onSelect={vi.fn()} label="Class" />);
+    expect(screen.getByTestId('lobby-class-picker').parentElement?.className).toContain('@4xl/lobby:pe-[9.5rem]');
+  });
 });

@@ -19,7 +19,7 @@ export function LobbyClassPicker({ classrooms, selectedId, onSelect, label }: Lo
   }, [selectedId]);
   if (classrooms.length < 2) return null;
   return (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className="flex min-w-0 items-center gap-2 @4xl/lobby:pe-[9.5rem]">
       <span className="inline-flex shrink-0 items-center gap-1 font-neo-body text-xs font-bold text-edu-ink/70 lg:text-sm">
         <Users className="size-4" aria-hidden="true" />
         {label}

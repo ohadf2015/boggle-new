@@ -155,11 +155,21 @@ const CLASSROOM_BRANCHES: ReadonlyArray<readonly [string, RegExp, readonly strin
   ['components/blast/legacy/blastStageSkin.ts', /classroom/, ['bg-edu-surface', 'text-edu-ink']],
   ['components/GridComponent.tsx', HOOK, ['CLASSROOM_BOARD_FRAME']],
   ['lib/multiplayer/inGameContainerClass.ts', /classroom/, ['bg-edu-page']],
+  ['components/blast/legacy/BlastHUD.tsx', HOOK, ['bg-edu-surface text-edu-ink']],
+  ['components/blast/legacy/hud/BlastHudClearMeter.tsx', HOOK, ['text-edu-lime-ink', 'text-edu-ink']],
+  ['components/blast/legacy/BlastLoadingGate.tsx', HOOK, ['text-edu-ink text-sm font-bold']],
+  ['components/blast/legacy/BlastTileFirstUseCallout.tsx', HOOK, ['bg-edu-surface']],
+  ['components/daily/survival/SurvivalClueBoxes.tsx', HOOK, ['bg-edu-surface border-neo-black', 'CLUE_UNKNOWN_CLASSROOM']],
+  ['components/daily/survival/SurvivalClueLegend.tsx', HOOK, ['text-edu-ink', 'text-edu-cyan-ink']],
+  ['components/wordhunt/WordHuntGameLayout.tsx', /wordHuntLayoutSkin\(useClassroomBoard\(\)\)/, []],
+  ['components/wordhunt/wordHuntLayoutSkin.ts', /classroom/, ['bg-edu-surface', 'text-edu-ink']],
+  // The boss art stays dark, so its title and HP readout keep the dark edu tokens.
+  ['components/education/boss/ProjectorBossStage.tsx', /<header data-edu-theme="dark"/, []],
 ];
 
 describe('classroom branches in shared game files', () => {
   it('covers the live round, projector wall and every gridless mode', () => {
-    expect(CLASSROOM_BRANCHES.length).toBeGreaterThanOrEqual(36);
+    expect(CLASSROOM_BRANCHES.length).toBeGreaterThanOrEqual(45);
   });
 
   it.each(CLASSROOM_BRANCHES)('%s keeps its classroom branch', (rel, signal, sky) => {

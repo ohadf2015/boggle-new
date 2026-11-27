@@ -24,7 +24,13 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
   const classroom = useClassroomBoard();
   if (classroom) {
     return (
-      <button type="button" disabled={rest.disabled} onClick={onClick} aria-label={label} className={cn(HUD_EXIT_BUTTON_CLASSROOM, className)}>
+      <button
+        {...(rest as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className={cn(HUD_EXIT_BUTTON_CLASSROOM, "relative before:absolute before:-inset-1 before:content-['']", className)}
+      >
         <DoorOpen className="w-5 h-5" aria-hidden="true" />
       </button>
     );

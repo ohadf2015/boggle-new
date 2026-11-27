@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BlastHUD classroom skin > arcade: a met goal on the clear meter keeps its lime count 1`] = `
+[
+  "relative flex basis-1/3 min-w-0 flex-col items-end gap-0.5",
+  "h-3.5 text-sm font-black leading-none text-neo-lime",
+  "relative w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/40 transition-transform duration-200 h-2.5",
+  "blast-meter-fill h-full rounded-full transition-[width] duration-300 blast-progress-shimmer",
+  "shrink-0 font-black uppercase tabular-nums transition-transform duration-150 text-[9px] tracking-wider origin-[100%_50%] rtl:origin-[0%_50%] text-neo-lime",
+]
+`;
+
+exports[`BlastHUD classroom skin > arcade: the MP hero row and clear meter keep their exact classes 1`] = `
+[
+  "flex flex-col gap-0 bg-neo-navy border-b-2 border-neo-black",
+]
+`;
+
+exports[`BlastHUD classroom skin > arcade: the MP hero row and clear meter keep their exact classes 2`] = `
+[
+  "flex items-center gap-3 px-3 pb-2 pt-1 tv:gap-5 tv:px-4",
+  "flex flex-col items-center gap-0.5 w-[56px]",
+  "text-xl font-black text-neo-white tabular-nums",
+  "text-[9px] font-bold uppercase tracking-wider text-white",
+  "flex min-w-0 flex-1 flex-col justify-center",
+  "text-[9px] font-black uppercase tracking-[0.14em] text-white leading-none tv:text-xs",
+  "block w-fit font-neo-display text-[30px] font-black leading-tight tabular-nums text-neo-white transition-transform duration-150 origin-[0%_50%] rtl:origin-[100%_50%] tv:text-5xl",
+  "w-[44px] h-[44px] shrink-0 flex items-center justify-center rounded-full transition-transform duration-200",
+  "grid h-10 w-10 place-items-center rounded-full border-[3px] border-white/15 font-neo-display text-xs font-black text-white/35",
+  "relative flex basis-1/3 min-w-0 flex-col items-end gap-0.5",
+  "h-3.5 text-sm font-black leading-none text-neo-lime",
+  "relative w-full overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/40 transition-transform duration-200 h-2.5",
+  "blast-meter-fill h-full rounded-full transition-[width] duration-300",
+  "shrink-0 font-black uppercase tabular-nums transition-transform duration-150 text-[9px] tracking-wider origin-[100%_50%] rtl:origin-[0%_50%] text-neo-white",
+]
+`;
