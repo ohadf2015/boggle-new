@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Achievement } from '@/components/education/achievements/AchievementGrid';
 import { AnimatedNumber, CelebrationBurst, EDU_MOTION, Reveal, useReducedMotionSafe } from '@/components/education/motion';
-import { Medallion, INK_TEXT, toneStyle, type Tone } from '@/components/student/academy/chrome';
+import { Medallion, toneStyle, type Tone } from '@/components/student/academy/chrome';
 import { getTierDisplay, type TierName } from '@/utils/achievementTiers';
 import { cn } from '@/lib/utils';
 import { summarizeAwards, type NextAward } from './awardsSummary';
@@ -22,14 +22,14 @@ const TIER_TONE = Object.fromEntries(TIERS.map(({ tier, tone }) => [tier, tone])
 const tierLabel = (t: T, tier: TierName) => t(`achievementTiers.${tier.toLowerCase()}`, tier);
 const CAPS = 'font-neo-display text-xs font-black uppercase tracking-[0.08em]';
 // Sunken well inside the summary card: sets Next up apart without a second bordered card.
-const WELL = 'rounded-[14px] border-2 border-neo-black/60 bg-neo-black/30 p-2 sm:p-2.5';
+const WELL = 'rounded-[14px] border-3 border-edu-line bg-edu-surface p-2 shadow-edu-lip-sm sm:p-2.5';
 
 /** Chunky quest-style bar; the fill grows by transform, never by width. */
 function FillBar({ pct, className, children }: { pct: number; className?: string; children?: React.ReactNode }) {
   const reduced = useReducedMotionSafe();
   const scale = Math.max(0, Math.min(1, pct));
   return (
-    <span className={cn('relative block overflow-hidden rounded-full border-2 border-edu-line bg-neo-black/50', className)}>
+    <span className={cn('relative block overflow-hidden rounded-full border-2 border-edu-line bg-edu-surface', className)}>
       <m.span
         className="absolute inset-0 block origin-left rounded-full rtl:origin-right"
         style={toneStyle('gold', { shadow: 0, trim: 1 })}
@@ -38,7 +38,7 @@ function FillBar({ pct, className, children }: { pct: number; className?: string
         transition={reduced ? { duration: 0 } : { ...EDU_MOTION.spring.settle, delay: 0.15 }}
       />
       {children && (
-        <span className="relative flex h-full items-center justify-center font-neo-display text-xs font-black text-edu-ink [text-shadow:0_1px_0_rgb(var(--neo-black))]">
+        <span className="relative flex h-full items-center justify-center font-neo-display text-xs font-black text-neo-black">
           {children}
         </span>
       )}
@@ -55,12 +55,12 @@ function NextUpCard({ next, t, lead = true }: { next: NextAward; t: T; lead?: bo
       </Medallion>
       <div className="min-w-0">
         <p className="flex items-baseline gap-2">
-          {lead && <span dir="auto" className={cn(CAPS, 'shrink-0 text-edu-lime-ink')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>}
+          {lead && <span dir="auto" className={cn(CAPS, 'shrink-0 rounded-full border-2 border-neo-black bg-neo-pink px-2 text-neo-black')}>{t('academy.pages.awardsNextUp', 'Next up')}</span>}
           <span dir="auto" className="ms-auto truncate font-neo-body text-xs font-bold text-edu-ink/80">
             {t('academy.pages.awardsToTier', '{left} more for {tier}', { left: next.left, tier: tierLabel(t, next.nextTier) })}
           </span>
         </p>
-        <p dir="auto" className={cn('truncate font-neo-display font-black leading-tight text-edu-ink', lead ? 'text-lg sm:text-xl' : 'text-sm', INK_TEXT)}>
+        <p dir="auto" className={cn('truncate font-neo-display font-black leading-tight text-edu-ink', lead ? 'text-lg sm:text-xl' : 'text-sm')}>
           {t(next.award.nameKey)}
         </p>
         {lead && (
@@ -106,7 +106,7 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
           data-testid="awards-hero-card"
           data-hero-card
           className="relative grid gap-2.5 overflow-hidden rounded-[18px] border-3 border-neo-black p-2.5 sm:p-3 md:grid-cols-2 md:gap-3"
-          style={toneStyle('plum', { shadow: 3, trim: 2 })}
+          style={toneStyle('night', { shadow: 3 })}
         >
           <div className="flex min-w-0 flex-col justify-center gap-2.5">
             <div className="flex items-center gap-3">
@@ -114,13 +114,13 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
                 <span className="text-2xl leading-none">🏆</span>
               </Medallion>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={cn(CAPS, 'text-edu-yellow-ink', INK_TEXT)}>{t('academy.pages.awardsWon', 'Awards won')}</p>
+                <p dir="auto" className={cn(CAPS, 'text-edu-ink')}>{t('academy.pages.awardsWon', 'Awards won')}</p>
                 <div className="flex items-center gap-2.5">
                   <p className="flex shrink-0 items-baseline gap-1.5">
-                    <span data-testid="awards-hero-earned" className={cn('font-neo-display text-[2rem] font-black leading-none text-edu-ink tabular-nums sm:text-4xl', INK_TEXT)}>
+                    <span data-testid="awards-hero-earned" className={cn('font-neo-display text-[2rem] font-black leading-none text-edu-ink tabular-nums sm:text-4xl')}>
                       <AnimatedNumber to={earned} from={0} onDone={() => setLanded(true)} />
                     </span>
-                    <span dir="auto" className={cn('font-neo-display text-base font-black text-edu-ink/85', INK_TEXT)}>
+                    <span dir="auto" className={cn('font-neo-display text-base font-black text-edu-ink/85')}>
                       {t('academy.pages.awardsOfTotal', 'of {total}', { total })}
                     </span>
                   </p>
@@ -154,7 +154,7 @@ export function AwardsHero({ achievements, celebrate = false }: { achievements: 
               ))}
             </div>
           ) : (
-            <p dir="auto" className={cn(WELL, 'flex items-center justify-center text-center font-neo-display text-base font-black text-edu-yellow-ink', INK_TEXT)}>
+            <p dir="auto" className={cn(WELL, 'flex items-center justify-center text-center font-neo-display text-base font-black text-edu-ink')}>
               {t('academy.pages.awardsAllMaxed', 'Every award maxed out!')}
             </p>
           )}

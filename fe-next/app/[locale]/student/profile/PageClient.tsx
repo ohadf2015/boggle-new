@@ -16,7 +16,7 @@ import { EducationBadgeGrid, type StudentAchievement } from '@/components/educat
 import { AcademyPageFrame, FrameSkeleton } from '@/components/student/pages/AcademyPageFrame';
 import { useStudentSubpageGuard } from '@/components/student/pages/useStudentSubpageGuard';
 import { nextOpenAssignment } from '@/components/student/nextOpenAssignment';
-import { Medallion, INK_TEXT, toneStyle } from '@/components/student/academy/chrome';
+import { Medallion, toneStyle } from '@/components/student/academy/chrome';
 import { pressClasses } from '@/components/education/motion';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -32,7 +32,7 @@ import { StreakFlame } from '@/components/streak/StreakFlame';
 type T = (k: string, fallback?: string, params?: Record<string, unknown>) => string;
 
 const CARD = 'rounded-[18px] border-3 border-neo-black p-4 sm:p-5';
-const STAT = 'rounded-[14px] border-2 border-neo-black/60 bg-neo-black/30 p-3';
+const STAT = 'rounded-[14px] border-3 border-edu-line bg-edu-surface p-3 shadow-edu-lip-sm';
 
 export default function StudentProfilePageClient() {
   const { profile } = useAuth();
@@ -126,21 +126,21 @@ export default function StudentProfilePageClient() {
                 customAvatar={profile?.avatar_config ?? null}
                 userId={user?.id}
                 pixelSize={72}
-                className="shrink-0 rounded-full border-3 border-neo-black shadow-hard"
+                className="shrink-0 rounded-full border-3 border-neo-black shadow-edu-lip"
               />
               <div className="min-w-0 flex-1">
-                <h1 dir="auto" className={cn('line-clamp-2 break-words font-neo-display text-2xl font-black text-edu-ink sm:text-3xl', INK_TEXT)}>
+                <h1 dir="auto" className={cn('line-clamp-2 break-words font-neo-display text-2xl font-black text-edu-ink sm:text-3xl')}>
                   {profile?.display_name || profile?.username || t('common.guest')}
                 </h1>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <span className="rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-sm font-bold text-neo-black shadow-hard-sm">
+                  <span className="rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-sm font-bold text-neo-black shadow-edu-lip-sm">
                     {t('education.xp.level')} {currentLevel}
                   </span>
-                  <span className="rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-bold tabular-nums text-neo-black shadow-hard-sm">
+                  <span className="rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-1 font-neo-display text-sm font-bold tabular-nums text-neo-black shadow-edu-lip-sm">
                     {totalXp} {t('education.xp.totalXp')}
                   </span>
                   {currentStreak > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-orange px-3 py-1 font-neo-display text-sm font-bold tabular-nums text-neo-black shadow-hard-sm">
+                    <span className="inline-flex items-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-orange px-3 py-1 font-neo-display text-sm font-bold tabular-nums text-neo-black shadow-edu-lip-sm">
                       <StreakFlame days={currentStreak} size={18} />
                       {currentStreak} {t('education.xp.streak')}
                     </span>
@@ -161,7 +161,7 @@ export default function StudentProfilePageClient() {
             <div data-testid="profile-first-step" className={cn(CARD, 'flex items-center gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
               <Medallion tone="gold" size={48} shadow={2}><span className="text-2xl leading-none" aria-hidden="true">🚀</span></Medallion>
               <div className="min-w-0 flex-1">
-                <p dir="auto" className={cn('font-neo-display text-lg font-black leading-tight text-edu-ink', INK_TEXT)}>
+                <p dir="auto" className={cn('font-neo-display text-lg font-black leading-tight text-edu-ink')}>
                   {t('academy.pages.profileFirstTitle', 'Your first lesson starts your level')}
                 </p>
                 <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/85">
@@ -200,7 +200,7 @@ export default function StudentProfilePageClient() {
             </div>
           ) : (
             <div data-testid="profile-awards-teaser" className={cn(CARD, 'flex flex-col gap-3')} style={toneStyle('night', { shadow: 3, trim: 2 })}>
-              <h2 className={cn('font-neo-display text-xl font-black text-edu-ink', INK_TEXT)}>{t('student.dashboard.achievements')}</h2>
+              <h2 className={cn('font-neo-display text-xl font-black text-edu-ink')}>{t('student.dashboard.achievements')}</h2>
               <p dir="auto" className="font-neo-body text-sm font-bold text-edu-ink/85">
                 {next
                   ? t('academy.pages.profileNextAward', 'Closest award: {name}. {how}', { name: t(next.award.nameKey), how: t(next.award.descriptionKey) })

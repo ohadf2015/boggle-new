@@ -235,7 +235,7 @@ export function WorkshopVsIntro({
             boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 30px rgba(255,20,147,0.7)',
           }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
+          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-edu-paper/60" />
           <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
         </m.button>

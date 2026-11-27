@@ -40,7 +40,7 @@ export function StudentAssignmentPlayCta({ next }: StudentAssignmentPlayCtaProps
           lesson_id: next.lessonId,
         });
       }}
-      className="mb-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-black shadow-hard-sm outline-none transition-transform hover:-translate-y-0.5 active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow"
+      className="mb-3 flex min-h-[48px] w-full items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-lime px-4 py-3 font-neo-display text-lg font-black uppercase text-neo-black shadow-edu-lip-sm outline-none transition-transform hover:-translate-y-0.5 active:translate-y-[2px] focus-visible:ring-2 focus-visible:ring-neo-yellow"
     >
       <DirectionalIcon icon={Play} mirror className="h-5 w-5 fill-neo-black text-neo-black" />
       <span dir="auto" className="line-clamp-2 text-center">

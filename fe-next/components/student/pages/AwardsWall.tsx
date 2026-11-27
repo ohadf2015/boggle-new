@@ -15,7 +15,7 @@ import type { AchievementCategory } from '@/lib/supabase/education/types';
 import { getTierDisplay } from '@/utils/achievementTiers';
 import { awardTier, isEarnableAward } from '@/app/[locale]/student/achievements/awardsSummary';
 import { pressClasses } from '@/components/education/motion';
-import { Medallion, INK_TEXT, toneStyle } from '@/components/student/academy/chrome';
+import { Medallion, toneStyle } from '@/components/student/academy/chrome';
 import { cn } from '@/lib/utils';
 
 export type AwardsFilter = 'all' | AchievementCategory;
@@ -53,7 +53,7 @@ export function AwardsFilterBar({ active, onChange, compact }: { active: AwardsF
               compact ? 'h-8 px-2.5 text-xs' : 'h-9 px-2.5 text-xs sm:h-10 sm:px-3 sm:text-sm',
               on ? 'text-neo-black' : 'text-edu-ink',
             )}
-            style={on ? toneStyle('lime', { shadow: 2, trim: 1 }) : { background: 'rgba(255,255,255,0.08)', boxShadow: 'inset 0 0 0 1.5px rgba(245,197,66,0.55)' }}
+            style={toneStyle(on ? 'lime' : 'night', { shadow: 2 })}
           >
             {t(labelKey)}
           </button>
@@ -86,7 +86,7 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
           {a.isSecret && !earned ? '?' : a.icon}
         </span>
       </Medallion>
-      <span dir="auto" className={cn('line-clamp-2 min-h-[2.4em] font-neo-display text-sm font-black leading-tight text-edu-ink', INK_TEXT)}>
+      <span dir="auto" className={cn('line-clamp-2 min-h-[2.4em] font-neo-display text-sm font-black leading-tight text-edu-ink')}>
         {name}
       </span>
       {!earned && (
@@ -113,10 +113,10 @@ function AwardCard({ id, a, t, fresh = false }: { id: string; a: Achievement; t:
       )}
       {!tier.isMaxTier && tier.nextThreshold ? (
         <span className="flex w-full items-center gap-1.5" aria-label={`${a.count}/${tier.nextThreshold}`}>
-          <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-black/40">
+          <span className="h-2.5 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-edu-surface">
             <span
               className="block h-full w-full origin-left rtl:origin-right rounded-full motion-safe:transition-transform motion-safe:duration-700"
-              style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundImage: 'linear-gradient(90deg,color-mix(in srgb,var(--neo-yellow) 55%,var(--neo-cream)),color-mix(in srgb,var(--neo-yellow) 85%,var(--neo-orange)))' }}
+              style={{ transform: `scaleX(${Math.max(0, Math.min(100, tier.progress)) / 100})`, backgroundColor: 'var(--neo-yellow)' }}
             />
           </span>
           <span className="shrink-0 font-neo-body text-xs font-bold text-edu-ink/85">

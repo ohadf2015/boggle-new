@@ -195,7 +195,7 @@ export function ReviewVaultIntro({
           )}
           style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan-light) 45%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cyan) 80%, var(--neo-purple-light)) 45%, var(--neo-purple) 120%)', boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 28px rgba(0,255,255,0.7)' }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
+          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-edu-paper/60" />
           <KeyRound className="relative h-[1.2em] w-[1.2em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.review.crack', 'Crack the vault')}</span>
         </m.button>

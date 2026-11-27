@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { StudentLesson } from '@/hooks/useStudentProgress';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { lessonHref, lessonMastery, lessonStars, type NodeType } from '@/components/student/academy/academyNodes';
-import { INK_TEXT, toneStyle, type Tone } from '@/components/student/academy/chrome';
+import { toneStyle, type Tone } from '@/components/student/academy/chrome';
 import { cn } from '@/lib/utils';
 
 const NODE_ART: Partial<Record<NodeType, string>> = {
@@ -81,7 +81,7 @@ export function LessonCard({ entry, level, locale }: { entry: StudentLesson; lev
         <Image src={NODE_ART[type] ?? NODE_ART.lesson!} alt="" fill unoptimized sizes="56px" className="object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-edu-ink', INK_TEXT)}>
+        <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-edu-ink')}>
           {entry.lesson?.name ?? t('academy.pages.untitledLesson', 'Lesson')}
         </span>
         <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-neo-body text-xs font-bold text-edu-ink/85">
@@ -111,7 +111,7 @@ export function LessonsEmpty({ locale }: { locale: string }) {
       <span className="relative h-24 w-24 sm:h-32 sm:w-32" aria-hidden="true">
         <Image src="/images/education/chest-books.webp" alt="" fill unoptimized sizes="128px" className="object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]" />
       </span>
-      <p dir="auto" className={cn('font-neo-display text-xl font-black text-edu-ink', INK_TEXT)}>
+      <p dir="auto" className={cn('font-neo-display text-xl font-black text-edu-ink')}>
         {t('academy.pages.noLessonsTitle', 'No lessons yet')}
       </p>
       <p dir="auto" className="max-w-xs font-neo-body text-sm font-bold text-edu-ink/85">

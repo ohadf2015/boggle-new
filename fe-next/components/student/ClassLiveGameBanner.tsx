@@ -46,7 +46,7 @@ function LiveBanner({ classroomId, userId, username }: LiveProps) {
         role="status"
         aria-live="polite"
         data-testid="class-live-banner"
-        className="pointer-events-auto flex w-full max-w-md flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-hard"
+        className="pointer-events-auto flex w-full max-w-md flex-col gap-2 rounded-neo border-3 border-neo-black bg-neo-lime p-3 text-neo-navy shadow-edu-lip"
       >
         <div className="flex items-center gap-3">
           <span aria-hidden="true" className="size-3 shrink-0 rounded-full border-2 border-neo-black bg-neo-pink motion-safe:animate-pulse" />
@@ -61,7 +61,7 @@ function LiveBanner({ classroomId, userId, username }: LiveProps) {
             data-testid="class-live-banner-join"
             onClick={onJoin}
             disabled={isJoining}
-            className="min-h-12 flex-1 rounded-neo border-3 border-neo-lime bg-edu-page px-3 font-neo-display text-base font-black uppercase text-edu-lime-ink shadow-hard-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-70"
+            className="min-h-12 flex-1 rounded-neo border-3 border-neo-lime bg-edu-page px-3 font-neo-display text-base font-black uppercase text-edu-lime-ink shadow-edu-lip-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan disabled:opacity-70"
           >
             {t('academy.student.ctaLive')}
           </button>

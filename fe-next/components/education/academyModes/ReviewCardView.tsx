@@ -64,7 +64,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
                 }}
                 className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'min-h-12 rounded-neo border-[3px] border-neo-black px-3 py-2 text-start font-neo-body text-sm font-bold leading-snug text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:min-h-16 sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:min-h-11! [@media(orientation:landscape)_and_(max-height:520px)]:py-1! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:min-h-[clamp(4rem,8vh,5rem)] lg:text-xl',
-                  answered && isAnswer ? 'bg-neo-lime' : answered && chosen === opt ? 'bg-neo-pink' : 'bg-neo-white',
+                  answered && isAnswer ? 'bg-neo-lime' : answered && chosen === opt ? 'bg-neo-pink' : 'bg-edu-paper',
                   'line-clamp-3',
                 )}
               >
