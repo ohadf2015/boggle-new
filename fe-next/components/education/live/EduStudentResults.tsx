@@ -42,7 +42,6 @@ import { EduStudentShareButton } from './EduStudentShareButton';
 import { EduStudentClassGoal, EduStudentXpBar } from './EduStudentProgress';
 import { LIVE_KEYFRAMES, PRESS } from './eduLiveStyles';
 import { useClaimedLevelUp } from './useClaimedLevelUp';
-import { AcademyBackdrop } from '@/components/student/academy/AcademyBackdrop';
 import { classModeBridgeOffer } from '@/lib/education/classModeBridge';
 import { ClassModeBridgeCard } from '@/components/education/results/ClassModeBridgeCard';
 
@@ -137,7 +136,6 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
 
   return (
     <div data-testid="edu-student-results" className="relative isolate flex min-h-0 flex-1 flex-col overflow-hidden bg-edu-page text-edu-ink">
-      <AcademyBackdrop art="podium" />
       <style>{LIVE_KEYFRAMES}</style>
       <header className="flex shrink-0 items-center justify-end gap-2 pe-16 ps-4 pt-1.5">
         <EduStudentShareButton t={t} language={c.language} placing={placing} />
@@ -145,7 +143,7 @@ function EduStudentResultsInner(props: EduStudentResultsProps) {
           type="button"
           data-testid="edu-student-results-leave"
           onClick={c.requestExit}
-          className={cn('inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 font-neo-display text-sm font-black uppercase shadow-hard-sm hover:bg-edu-surface', PRESS)}
+          className={cn('inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] border-edu-line bg-edu-surface px-3 font-neo-display text-sm font-black uppercase shadow-edu-lip-sm hover:bg-edu-surface', PRESS)}
         >
           <LogOut className="size-4" aria-hidden="true" />
           {t('eduLiveRoom.studentResults.leave')}

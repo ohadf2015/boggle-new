@@ -12,11 +12,12 @@ const t = (key: string, params?: Record<string, string | number>) => (params ? `
 const base = { rank: 4, total: 26, score: 37, reduceMotion: true, t };
 
 describe('StudentRevealHero', () => {
-  it('given I won my duel, when the verdict beat lands, then the card turns lime with the victory mascot, confetti and one big rival line', () => {
+  it('given I won my duel, when the verdict beat lands, then the verdict square turns yellow with the victory mascot, confetti and one big rival line', () => {
     render(<StudentRevealHero {...base} reduceMotion={false} beat="verdict" verdict="won" rival={{ rivalName: 'Dana', diff: 4, won: true }} gap={null} />);
     const hero = screen.getByTestId('edu-student-hero');
     expect(hero).toHaveAttribute('data-verdict', 'won');
-    expect(hero).toHaveClass('bg-neo-lime');
+    expect(hero).toHaveClass('bg-edu-surface', 'border-[3px]', 'shadow-edu-lip');
+    expect(screen.getByTestId('edu-student-verdict-icon')).toHaveClass('bg-neo-yellow');
     expect(screen.getByTestId('mascot').getAttribute('data-src')).toContain('victory');
     expect(screen.getByTestId('confetti')).toBeInTheDocument();
     expect(screen.getByTestId('edu-student-rival')).toHaveTextContent('education.rivals.outcome.won:{"name":"Dana","points":4}');
@@ -25,20 +26,20 @@ describe('StudentRevealHero', () => {
 
   it('given a tie and a loss, then each gets its own colour and mascot, and neither throws confetti', () => {
     const { unmount } = render(<StudentRevealHero {...base} beat="done" verdict="tied" rival={{ rivalName: 'Dana', diff: 0, won: false }} gap={null} />);
-    expect(screen.getByTestId('edu-student-hero')).toHaveClass('bg-neo-yellow');
+    expect(screen.getByTestId('edu-student-verdict-icon')).toHaveClass('bg-neo-pink');
     expect(screen.getByTestId('mascot').getAttribute('data-src')).toContain('cheer');
     unmount();
     render(<StudentRevealHero {...base} beat="done" verdict="lost" rival={null} gap={{ kind: 'behind', points: 10, name: 'Noa' }} />);
-    expect(screen.getByTestId('edu-student-hero')).toHaveClass('bg-neo-cyan');
+    expect(screen.getByTestId('edu-student-verdict-icon')).toHaveClass('bg-neo-cyan');
     expect(screen.getByTestId('mascot').getAttribute('data-src')).toContain('think');
     expect(screen.getByTestId('edu-student-gap')).toHaveTextContent('mpUi.results.behind:{"points":10,"name":"Noa"}');
     expect(screen.queryByTestId('confetti')).toBeNull();
   });
 
-  it('given the reveal has only reached my rank, then the verdict is held back and the card is not coloured yet', () => {
+  it('given the reveal has only reached my rank, then the verdict is held back and its square is not coloured yet', () => {
     render(<StudentRevealHero {...base} reduceMotion={false} beat="rank" verdict="won" rival={{ rivalName: 'Dana', diff: 4, won: true }} gap={null} />);
     expect(screen.getByTestId('edu-student-hero')).toHaveAttribute('data-verdict', 'pending');
-    expect(screen.getByTestId('edu-student-hero')).not.toHaveClass('bg-neo-lime');
+    expect(screen.getByTestId('edu-student-verdict-icon')).not.toHaveClass('bg-neo-yellow');
     expect(screen.getByTestId('edu-student-rival')).toHaveClass('invisible');
   });
 
@@ -63,5 +64,10 @@ describe('StudentRevealHero', () => {
     render(<StudentRevealHero {...base} score={0} beat="done" verdict="lost" rival={null} gap={null} />);
     expect(screen.queryByTestId('edu-student-rank')).toBeNull();
     expect(screen.getByTestId('edu-student-headline')).toHaveTextContent('education.results.you.roundComplete');
+  });
+
+  it('the headline is a pink tag with black ink on the white card', () => {
+    render(<StudentRevealHero {...base} beat="done" verdict="won" rival={null} gap={null} />);
+    expect(screen.getByTestId('edu-student-headline')).toHaveClass('bg-neo-pink', 'text-neo-black');
   });
 });

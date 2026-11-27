@@ -68,7 +68,7 @@ export function StudentChestBeat({ reveal, beat, reduceMotion, t }: StudentChest
     <div
       data-testid="edu-student-chest"
       data-phase={phase}
-      className="relative flex flex-col items-center gap-1 overflow-hidden rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-2 pb-2.5 pt-2 text-edu-ink shadow-hard"
+      className="relative flex flex-col items-center gap-1 overflow-hidden edu-rays-dark rounded-neo-lg border-[3px] border-neo-black px-2 pb-2.5 pt-2 text-edu-ink"
     >
       {reveal.underdog && (
         <p data-testid="chest-comeback" className="relative z-10 rounded-full border-2 border-neo-black bg-neo-pink px-3 py-0.5 text-center font-neo-display text-sm font-black text-neo-black shadow-hard-sm">
