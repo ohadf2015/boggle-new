@@ -12,7 +12,8 @@
 --   6 checkout_started     checkout_started (script probes excluded)
 --   7 subscription_active  teacher_subscription_active (legacy: paid webhook rows)
 --
--- QA rigs excluded via profiles.is_test_account + the lexiclash.test domain.
+-- QA rigs excluded via profiles.is_test_account, the lexiclash.test domain,
+-- and the known analytics-rig user prefixes (14f10c13 / 1f0715b5).
 -- Legacy rows (pre-instrumentation webhooks) count so the all-time numbers are
 -- honest about the two October trial checkouts that never completed.
 -- =============================================
@@ -24,6 +25,8 @@ WITH real_teachers AS (
   WHERE COALESCE(p.is_test_account, false) = false
     AND u.email IS NOT NULL
     AND u.email NOT ILIKE '%@lexiclash.test'
+    AND u.id::text NOT LIKE '14f10c13%'
+    AND u.id::text NOT LIKE '1f0715b5%'
 ),
 step_rows AS (
   SELECT se.user_id, 1 AS step_index, 'trial_started' AS step, se.created_at
@@ -109,8 +112,9 @@ GROUP BY step_index, step
 ORDER BY step_index;
 
 -- Cancel reasons for the last 30 days. Polar portal fields, plus the in-app chip
--- (event_type teacher_trial_cancel_reason). Paste on its own. A still-running
--- trial that was canceled must show up here, not as trial_expired above.
+-- (event_type trial_cancel_reason_selected, payload.reason — the same key the
+-- writer stores). Paste on its own. A still-running trial that was canceled
+-- must show up here, not as trial_expired above.
 WITH real_teachers AS (
   SELECT p.id
   FROM public.profiles p
@@ -118,9 +122,12 @@ WITH real_teachers AS (
   WHERE COALESCE(p.is_test_account, false) = false
     AND u.email IS NOT NULL
     AND u.email NOT ILIKE '%@lexiclash.test'
+    AND u.id::text NOT LIKE '14f10c13%'
+    AND u.id::text NOT LIKE '1f0715b5%'
 )
 SELECT
   COALESCE(
+    NULLIF(se.payload->>'reason', ''),
     NULLIF(se.payload->>'customer_cancellation_reason', ''),
     NULLIF(se.payload->>'cancel_reason', ''),
     '(none)'
@@ -129,9 +136,9 @@ SELECT
 FROM public.subscription_events se
 JOIN real_teachers t ON t.id = se.user_id
 WHERE se.created_at >= now() - interval '30 days'
-  AND se.event_type IN ('teacher_trial_canceled', 'teacher_trial_cancel_reason', 'subscription.canceled')
+  AND se.event_type IN ('teacher_trial_canceled', 'trial_cancel_reason_selected', 'subscription.canceled')
   AND (
-    se.event_type = 'teacher_trial_cancel_reason'
+    se.event_type = 'trial_cancel_reason_selected'
     OR COALESCE(se.payload->>'trial', '') = 'true'
   )
 GROUP BY 1
