@@ -136,4 +136,82 @@ describe('seo freeze', () => {
       expect(v).toEqual([]);
     });
   });
+
+  describe('metadata scope from file contents', () => {
+    const PAGE = [
+      "import type { Metadata } from 'next';",
+      "const BASE_URL = 'https://www.lexiclash.live';",
+      "const PAGE_TITLE = 'Old title';",
+      'const META_FALLBACK = {',
+      "  description: 'Fallback description',",
+      '};',
+      'export async function generateMetadata(): Promise<Metadata> {',
+      '  return {',
+      '    title: PAGE_TITLE,',
+      "    description: 'Meta description',",
+      '    openGraph: {',
+      "      description: 'OG description',",
+      '    },',
+      '    ...META_FALLBACK,',
+      '  };',
+      '}',
+      'const modes = [',
+      "  { title: 'Classic', desc: 'Find words' },",
+      '];',
+      'export default function Page() {',
+      '  return (',
+      "    <TileGrid items={[{ title: 'Word Hunt', body: 'Find words' }]} />",
+      '  );',
+      '}',
+    ];
+    const edit = (lines: string[], n: number, text: string) => lines.map((l, i) => (i === n - 1 ? text : l));
+    const hunk = (file: string, n: number, before: string[], after: string[]) =>
+      [`diff --git a/${file} b/${file}`, `--- a/${file}`, `+++ b/${file}`, `@@ -${n} +${n} @@`, `-${before[n - 1]}`, `+${after[n - 1]}`].join('\n');
+    const changed = (file: string, n: number, text: string, before = PAGE) => {
+      const after = edit(before, n, text);
+      const files: Record<string, string> = { [`base:${file}`]: before.join('\n'), [`head:${file}`]: after.join('\n') };
+      return snippetChanges(hunk(file, n, before, after), (side: string, f: string) => files[`${side}:${f}`] ?? null);
+    };
+
+    it('ignores title keys of body tiles inside the page component', () => {
+      expect(changed(ES_PAGE, 22, "    <TileGrid items={[{ title: 'Word Hunt!', body: 'Find words' }]} />")).toEqual([]);
+    });
+
+    it('ignores title keys in a top-level body list the metadata never reads', () => {
+      expect(changed(ES_PAGE, 18, "  { title: 'Classic!', desc: 'Find words' },")).toEqual([]);
+    });
+
+    it('ignores every title key in a client component', () => {
+      const client = ["'use client';", 'export default function PageClient() {', "  const tiles = [{ title: 'a' }];", '}'];
+      expect(changed('fe-next/app/[locale]/guides/PageClient.tsx', 3, "  const tiles = [{ title: 'b' }];", client)).toEqual([]);
+    });
+
+    it('ignores a client component whose directive follows a comment, and a component named *Title', () => {
+      const client = ['// Teacher classes', "'use client';", 'function ClassesTitle() {', "  return <h1 className='a'>x</h1>;", '}'];
+      expect(changed('fe-next/app/[locale]/teacher/PageClient.tsx', 4, "  return <h1 className='b'>x</h1>;", client)).toEqual([]);
+      const server = client.slice(2);
+      expect(changed('fe-next/app/[locale]/teacher/Hero.tsx', 2, "  return <h1 className='b'>x</h1>;", server)).toEqual([]);
+    });
+
+    it('flags a title or description edit inside generateMetadata', () => {
+      expect(changed(ES_PAGE, 10, "    description: 'New meta description',")).toHaveLength(1);
+    });
+
+    it('flags an openGraph description edit', () => {
+      expect(changed(ES_PAGE, 12, "      description: 'New OG description',")).toHaveLength(1);
+    });
+
+    it('flags a TITLE constant edit', () => {
+      expect(changed(ES_PAGE, 3, "const PAGE_TITLE = 'New title';")).toHaveLength(1);
+    });
+
+    it('flags an object generateMetadata reads by name', () => {
+      expect(changed(ES_PAGE, 5, "  description: 'New fallback',")).toHaveLength(1);
+    });
+
+    it('flags a title edit in a content module the metadata imports', () => {
+      const content = ['export const content = {', '  en: {', "    pageTitle: 'How to play',", '  },', '};'];
+      expect(changed('fe-next/app/[locale]/how-to-play/content.ts', 3, "    pageTitle: 'How to play LexiClash',", content)).toHaveLength(1);
+    });
+  });
 });
