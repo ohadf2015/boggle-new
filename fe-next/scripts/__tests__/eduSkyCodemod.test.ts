@@ -44,7 +44,14 @@ describe('edu-sky codemod: ink', () => {
       'text-edu-yellow-ink text-edu-pink-ink text-edu-purple-ink text-edu-orange-ink',
     );
     expect(map('bg-neo-black text-neo-lime')).toBe('bg-neo-black text-neo-lime');
-    expect(map('text-neo-lime-light')).toBe('text-neo-lime-light');
+  });
+
+  it('maps the light accent tints, which only read on navy, to the same inks', () => {
+    expect(map('text-neo-pink-light hover:text-neo-purple-light/80')).toBe(
+      'text-edu-pink-ink hover:text-edu-purple-ink/80',
+    );
+    expect(map('bg-neo-black text-neo-cyan-light')).toBe('bg-neo-black text-neo-cyan-light');
+    expect(map('text-neo-lime-dark')).toBe('text-neo-lime-dark');
   });
 });
 

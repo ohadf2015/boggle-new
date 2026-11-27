@@ -107,7 +107,7 @@ function mapBase(base, ctx) {
   if ((m = /^text-neo-gray-(100|200|300|400)$/.exec(base))) {
     return ctx.dark ? base : `text-edu-ink${GRAY_INK[m[1]]}`;
   }
-  if ((m = /^text-neo-(lime|cyan|yellow|pink|purple|orange)(\/\d+)?$/.exec(base))) {
+  if ((m = /^text-neo-(lime|cyan|yellow|pink|purple|orange)(?:-light)?(\/\d+)?$/.exec(base))) {
     return ctx.dark ? base : `text-edu-${m[1]}-ink${m[2] ?? ''}`;
   }
   if ((m = /^(border(?:-[xytrblse])?|ring|divide|outline|shadow)-(?:neo-cream|neo-white|white)(?:\/(\d+))?$/.exec(base))) {
