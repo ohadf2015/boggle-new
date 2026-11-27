@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { NeoButton } from '@/components/ui/button';
+import { EDU_BUTTON } from '@/components/education/eduNeoStyles';
 import { OUTLINE_BUTTON } from '@/components/teacher/home/homeStyles';
 import { cn } from '@/lib/utils';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
@@ -46,9 +46,7 @@ export function ClassReportHeader({ eyebrow, name, onBack, link, memberCount, ch
         ) : null}
       </div>
       {link ? (
-        <NeoButton asChild variant="outline" className="shrink-0">
-          <Link href={link.href} data-testid={link.testId}>{link.label}</Link>
-        </NeoButton>
+        <Link href={link.href} data-testid={link.testId} className={cn(EDU_BUTTON.secondary, 'shrink-0')}>{link.label}</Link>
       ) : null}
       {children}
     </div>

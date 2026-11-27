@@ -109,9 +109,9 @@ export function FreeWeekCard({ classroomId, locale, insight, names, t, proLine =
                 const view = STATUS_VIEW[s.status];
                 const Icon = view.icon;
                 return (
-                  <li key={s.id} data-testid="free-week-needs-help-row" className={`flex items-center justify-between gap-2 rounded-neo border-2 px-2.5 py-1.5 ${view.chip}`}>
-                    <bdi className="min-w-0 truncate font-neo-body font-bold">{names.get(s.id) || t('education.analytics.overview.unnamed')}</bdi>
-                    <span className="inline-flex shrink-0 items-center gap-1 font-neo-body text-xs font-bold">
+                  <li key={s.id} data-testid="free-week-needs-help-row" className="flex items-center justify-between gap-2 rounded-neo border-2 border-edu-line bg-edu-surface px-2.5 py-1.5">
+                    <bdi className="min-w-0 truncate font-neo-body font-bold text-edu-ink">{names.get(s.id) || t('education.analytics.overview.unnamed')}</bdi>
+                    <span data-testid="free-week-status-chip" className={`inline-flex shrink-0 items-center gap-1 rounded-full border-2 px-2 py-0.5 font-neo-body text-xs font-bold ${view.chip}`}>
                       <Icon className="size-3.5" aria-hidden="true" />
                       {t(`education.analytics.overview.status.${s.status}`)}
                     </span>

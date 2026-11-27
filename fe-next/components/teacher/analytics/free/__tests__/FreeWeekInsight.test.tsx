@@ -64,7 +64,10 @@ describe('FreeWeekInsight', () => {
     render(<FreeWeekInsight classroomId="c1" locale="en" />);
     expect(screen.getByTestId('free-week-insight')).toBeInTheDocument();
     expect(await screen.findByText('Noa')).toBeInTheDocument();
-    expect(screen.getAllByTestId('free-week-needs-help-row')).toHaveLength(2);
+    const rows = screen.getAllByTestId('free-week-needs-help-row');
+    expect(rows).toHaveLength(2);
+    expect(rows[0].className).toContain('bg-edu-surface');
+    expect(rows[0].querySelector('[data-testid="free-week-status-chip"]')!.className).toMatch(/(^|\s)bg-neo-red(\s|$)/);
     expect(screen.getAllByTestId('free-week-hard-word').map((n) => n.textContent)).toEqual([
       expect.stringContaining('desk'), expect.stringContaining('lamp'), expect.stringContaining('door'),
     ]);
