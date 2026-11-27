@@ -53,6 +53,8 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   check with `python3 -I ~/.cache/lexiclash/lp1127/compare.py <after dirs>`.
 - Dev server: `PORT=3011` with dummy `NEXT_PUBLIC_SUPABASE_*` (port 3001 belongs to the edu session).
   The shot script must not block `/_next/` URLs (a chunk path contains "sentry").
+- 14:2x: builder B done and committed (6508218e2): comparisons, RU, classroom keyword, daily-word-wheel; parity 90 shots 0 failing. A and C still running.
+- Review pending for B: view cabanagrams, popple, wordfeud, contra-wordle shots.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
