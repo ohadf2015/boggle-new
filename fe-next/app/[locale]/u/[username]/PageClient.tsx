@@ -11,6 +11,7 @@ import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
 import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
 import { ProfileAchievementsPublic } from '@/components/profile/ProfileAchievementsPublic';
 import { ShowcaseStage } from '@/components/profile/showcase/ShowcaseStage';
+import { PlayerHolidayBadge } from '@/components/holidays/HolidayProfileBadge';
 import { useShareProfile } from '@/components/profile/showcase/useShareProfile';
 import { useProfileViewTracking } from '@/components/profile/showcase/useProfileViewTracking';
 import { ProfileSocialActions } from '@/components/players/ProfileSocialActions';
@@ -107,6 +108,7 @@ export default function PublicProfilePageClient({ username }: { username: string
             isPlaceholderName={isPlaceholder}
             handle={isPlaceholder ? null : profile.username}
             countryCode={profile.countryCode}
+            holidayNode={<PlayerHolidayBadge holidayKey={profile.holidayKey} countryCode={profile.countryCode} />}
             level={profile.currentLevel}
             levelPercent={view.xp.progressPercent}
             isMaxLevel={view.xp.isMaxLevel}

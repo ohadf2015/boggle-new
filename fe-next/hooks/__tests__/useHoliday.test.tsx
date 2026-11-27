@@ -1,7 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const auth = { isAuthenticated: false, loading: false, profile: null as null | { country_code?: string | null } };
+type Profile = { country_code?: string | null; holiday_key?: 'hanukkah' | 'christmas' | null };
+const updateProfile = vi.fn(async (_u: Partial<Profile>) => ({ data: null, error: null as null | { message: string } }));
+const auth = { isAuthenticated: false, loading: false, profile: null as null | Profile, updateProfile };
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth }));
 
 import { useHoliday } from '../useHoliday';
@@ -21,6 +23,8 @@ beforeEach(() => {
   html.removeAttribute('data-holiday-preview');
   clearCookie();
   Object.assign(auth, { isAuthenticated: false, loading: false, profile: null });
+  updateProfile.mockReset();
+  updateProfile.mockResolvedValue({ data: null, error: null });
   __resetHolidayStore();
 });
 
@@ -122,13 +126,77 @@ describe('useHoliday', () => {
     expect(result.current).toMatchObject({ holiday: 'hanukkah', theme: 'hanukkah', phase: 'live' });
   });
 
-  it('setOverride writes the cookie and swaps the class', () => {
-    html.classList.add('holiday-christmas');
+  it('given a saved profile holiday that differs from the location, applies it and mirrors it to the cookie', () => {
+    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    html.classList.add('holiday-hanukkah', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'IL');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'IL', holiday_key: 'christmas' } });
     const { result } = renderHook(() => useHoliday());
-    act(() => result.current.setOverride('off'));
-    expect(document.cookie).toContain('lx_holiday=off');
+    expect(result.current).toMatchObject({ theme: 'christmas', phase: 'preview', resolved: true });
+    expect(html.classList.contains('holiday-hanukkah')).toBe(false);
+    expect(document.cookie).toContain('lx_holiday=christmas');
+  });
+
+  it('given a null profile holiday, leaves a landing-link cookie alone', () => {
+    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    document.cookie = 'lx_holiday=hanukkah; path=/';
+    html.classList.add('holiday-hanukkah', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'world');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'US', holiday_key: null } });
+    const { result } = renderHook(() => useHoliday());
+    expect(result.current.theme).toBe('hanukkah');
+    expect(document.cookie).toContain('lx_holiday=hanukkah');
+  });
+
+  it('given a guest, offers no swap', () => {
+    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'world');
+    expect(renderHook(() => useHoliday()).result.current.canSwap).toBe(false);
+  });
+
+  it('given a signed-in player after Hanukkah ends, offers no swap to a closed holiday', () => {
+    vi.setSystemTime(new Date('2026-12-20T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'world');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'US' } });
+    expect(renderHook(() => useHoliday()).result.current.canSwap).toBe(false);
+  });
+
+  it('swap flips the html class at once, mirrors the cookie and saves the other holiday on the profile', async () => {
+    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'world');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'US' } });
+    const { result } = renderHook(() => useHoliday());
+    expect(result.current.canSwap).toBe(true);
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.swap();
+    });
+    expect(ok).toBe(true);
+    expect(updateProfile).toHaveBeenCalledWith({ holiday_key: 'hanukkah' });
+    expect(html.classList.contains('holiday-hanukkah')).toBe(true);
     expect(html.classList.contains('holiday-christmas')).toBe(false);
-    expect(result.current.holiday).toBeNull();
+    expect(document.cookie).toContain('lx_holiday=hanukkah');
+    expect(result.current.theme).toBe('hanukkah');
+  });
+
+  it('given the save fails, swap puts the previous holiday back', async () => {
+    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'world');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'US' } });
+    updateProfile.mockResolvedValue({ data: null, error: { message: 'nope' } });
+    const { result } = renderHook(() => useHoliday());
+    let ok: boolean | undefined;
+    await act(async () => {
+      ok = await result.current.swap();
+    });
+    expect(ok).toBe(false);
+    expect(result.current.theme).toBe('christmas');
+    expect(html.classList.contains('holiday-christmas')).toBe(true);
+    expect(document.cookie).toContain('lx_holiday=christmas');
   });
 });
 

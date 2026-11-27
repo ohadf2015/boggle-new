@@ -306,11 +306,11 @@ const he = {
       "eventOnly": "אירוע חג",
       "eventOnlyHint": "רק בזמן אירוע החג. שחקו משחק אחד בכל יום כדי לזכות בו."
     },
-    "toggle": {
-      "label": "עיצוב חג",
+    "badge": {
       "hanukkah": "חנוכה",
       "christmas": "חג המולד",
-      "off": "בלי עיצוב"
+      "swap": "לעבור ל{holiday}",
+      "swapError": "לא הצלחנו להחליף את החג. נסו שוב."
     },
     "gift": {
       "hanukkah": {

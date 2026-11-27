@@ -96,8 +96,8 @@ describe('holiday pre-paint script', () => {
     expect(run({ now: '2027-01-02T12:00:00', lang: 'en' }).classes).toEqual([]);
   });
 
-  it('given cookie off, adds nothing in season', () => {
-    expect(run({ now: '2026-12-20T12:00:00', cookie: 'lx_holiday=off' }).classes).toEqual([]);
+  it('given a stale cookie off from the retired picker, falls back to the location holiday', () => {
+    expect(run({ now: '2026-12-20T12:00:00', cookie: 'lx_holiday=off' }).classes).toEqual(['holiday-christmas', 'holiday-live']);
   });
 
   it('given cookie hanukkah for a world visitor in hanukkah, switches theme', () => {
@@ -105,9 +105,9 @@ describe('holiday pre-paint script', () => {
   });
 
   it('given ?holiday=, writes the cookie and applies it', () => {
-    const r = run({ now: '2026-12-20T12:00:00', search: '?holiday=off', cookie: 'lx_holiday=christmas' });
-    expect(r.classes).toEqual([]);
-    expect(r.writes).toEqual(['lx_holiday=off; path=/; max-age=5184000; samesite=lax']);
+    const r = run({ now: '2026-12-06T12:00:00', search: '?holiday=hanukkah', cookie: 'lx_holiday=christmas' });
+    expect(r.classes).toEqual(['holiday-hanukkah', 'holiday-live']);
+    expect(r.writes).toEqual(['lx_holiday=hanukkah; path=/; max-age=5184000; samesite=lax']);
   });
 
   it('given ?holiday= out of season without preview in production, adds nothing', () => {
@@ -132,8 +132,8 @@ describe('holiday pre-paint script', () => {
   });
 
   it('given an unknown ?holiday= value, ignores it and the cookie wins', () => {
-    const r = run({ now: '2026-12-20T12:00:00', search: '?holiday=easter', cookie: 'lx_holiday=off' });
-    expect(r.classes).toEqual([]);
+    const r = run({ now: '2026-12-06T12:00:00', search: '?holiday=off', cookie: 'lx_holiday=hanukkah' });
+    expect(r.classes).toEqual(['holiday-hanukkah', 'holiday-live']);
     expect(r.writes).toEqual([]);
   });
 

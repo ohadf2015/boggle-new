@@ -1,7 +1,6 @@
 import { previewWindowFor, type HolidayKey } from './calendar';
 
 export type HolidayRegion = 'IL' | 'world';
-export type HolidayOverride = HolidayKey | 'off';
 
 const IL_TIME_ZONES = new Set(['Asia/Jerusalem', 'Asia/Tel_Aviv']);
 
@@ -23,11 +22,10 @@ export function otherHoliday(key: HolidayKey): HolidayKey {
 export function activeHoliday(i: {
   localDate: string;
   region: HolidayRegion;
-  override?: HolidayOverride | null;
+  override?: HolidayKey | null;
   preview?: boolean;
   locale?: string | null;
 }): HolidayKey | null {
-  if (i.override === 'off') return null;
   if (i.override && (i.preview || previewWindowFor(i.override, i.localDate, i.locale))) return i.override;
   const key = defaultHoliday(i.region);
   return previewWindowFor(key, i.localDate, i.locale) ? key : null;

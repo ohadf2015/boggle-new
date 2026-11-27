@@ -41,6 +41,13 @@ describe('toPublicProfile', () => {
     expect(toPublicProfile({ ...row, premium_avatar_parts: null }, { higherCount: 0, totalPlayers: 1 }).ownedAvatarParts).toEqual([]);
   });
 
+  it('Given a saved holiday, Then exposes it; junk or null become null', () => {
+    expect(PUBLIC_PROFILE_COLUMNS).toContain('holiday_key');
+    expect(toPublicProfile({ ...row, holiday_key: 'christmas' }, { higherCount: 0, totalPlayers: 1 }).holidayKey).toBe('christmas');
+    expect(toPublicProfile({ ...row, holiday_key: 'off' }, { higherCount: 0, totalPlayers: 1 }).holidayKey).toBeNull();
+    expect(toPublicProfile(row, { higherCount: 0, totalPlayers: 1 }).holidayKey).toBeNull();
+  });
+
   it('Never selects or returns private columns', () => {
     for (const col of ['email', 'total_coins', 'is_admin', 'email_unsubscribe_token', 'utm_source']) {
       expect(PUBLIC_PROFILE_COLUMNS).not.toContain(col);

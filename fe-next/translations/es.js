@@ -306,11 +306,11 @@ const es = {
       "eventOnly": "Evento festivo",
       "eventOnlyHint": "Solo durante el evento festivo. Juega una partida cada día para conseguirlo."
     },
-    "toggle": {
-      "label": "Tema festivo",
+    "badge": {
       "hanukkah": "Janucá",
       "christmas": "Navidad",
-      "off": "Sin tema"
+      "swap": "Cambiar a {holiday}",
+      "swapError": "No pudimos cambiar tu fiesta. Inténtalo de nuevo."
     },
     "gift": {
       "hanukkah": {

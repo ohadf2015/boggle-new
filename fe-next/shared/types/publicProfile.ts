@@ -4,6 +4,7 @@
  */
 
 import type { CustomAvatarConfig } from './customAvatar';
+import type { HolidayKey } from '../../lib/holidays/calendar';
 import type { ModeXpSlice } from '../../lib/xp/xpByMode';
 
 export type { ModeXpSlice };
@@ -18,6 +19,7 @@ export interface PublicProfile {
   displayName: string;
   customAvatar?: CustomAvatarConfig | null;
   countryCode?: string | null;
+  holidayKey?: HolidayKey | null;
   currentLevel: number;
   totalXp: number;
   totalGames: number;

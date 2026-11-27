@@ -306,11 +306,11 @@ const sv = {
       "eventOnly": "Högtidsevent",
       "eventOnlyHint": "Bara under högtidseventet. Spela en omgång varje dag för att få den."
     },
-    "toggle": {
-      "label": "Högtidstema",
+    "badge": {
       "hanukkah": "Chanukka",
       "christmas": "Jul",
-      "off": "Inget tema"
+      "swap": "Byt till {holiday}",
+      "swapError": "Kunde inte byta högtid. Försök igen."
     },
     "gift": {
       "hanukkah": {

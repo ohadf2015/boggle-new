@@ -33,6 +33,8 @@ export interface ShowcaseStageProps {
   countryCode?: string | null;
   /** Own profile: replaces the flag with an editable country control. */
   countryNode?: React.ReactNode;
+  /** Holiday badge beside the flag (own: with the swap icon). */
+  holidayNode?: React.ReactNode;
   /** Own profile: inline editor that replaces the name heading while editing. */
   nameEditor?: React.ReactNode;
   level: number;
@@ -139,7 +141,7 @@ function CollectionChip({ owned, total }: { owned: number; total: number }) {
  */
 export function ShowcaseStage(props: ShowcaseStageProps): React.ReactElement {
   const {
-    config: rawConfig, name, isPlaceholderName, handle, countryCode, countryNode, nameEditor,
+    config: rawConfig, name, isPlaceholderName, handle, countryCode, countryNode, holidayNode, nameEditor,
     level, levelPercent, isMaxLevel, xpToNext, rankTier, collection, stats, isOwn,
     onEditAvatar, onEditName, onShare, onSettings, avatarBadge, footer, frameId, ringColorHex, memberSince, className,
   } = props;
@@ -228,6 +230,7 @@ export function ShowcaseStage(props: ShowcaseStageProps): React.ReactElement {
             {t(`profile.showcase.titles.${titleId}`)}
           </span>
           {rankTier && rankTier !== 'stone' && <RankTierChip tier={rankTier} size="xs" />}
+          {holidayNode}
           {handle && <span className="text-sm text-neo-white/60 font-neo-body" dir="ltr">@{handle}</span>}
           <span className="text-xs text-neo-white/60 font-neo-body tabular-nums">
             {isMaxLevel ? t('profile.showcase.maxLevel') : xpToNext != null ? t('profile.showcase.xpToNext', { xp: xpToNext.toLocaleString(), level: level + 1 }) : null}
