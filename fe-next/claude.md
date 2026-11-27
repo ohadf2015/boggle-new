@@ -16,6 +16,7 @@
 - **MANDATORY TESTING**: Every new component and logic MUST have tests
 - **TEST FAILURE PROTOCOL**: If a test fails, first analyze whether it discovered a bug — if so, fix the bug, never the test. Tests are source of truth.
 - **Supabase Realtime publication**: NEVER add a table to `supabase_realtime` publication without a matching `supabase.channel(...).on('postgres_changes', ...)` consumer in code. WAL→JSON parsing fires per-write even with zero subscribers (caused 95% DB CPU regression on 2026-05-06). Audit: `SELECT * FROM public.v_suspicious_realtime_publications;` — must return 0 rows.
+- **Emails**: every customer email is built on `lib/email/kit/neoEmail` (template in `lib/email/templates/`, a `lib/email/samples/*.sample.ts` entry for the render guard). The react-email format in `fe-next/emails/` is retired: never add or revive a template there (`lib/email/__tests__/legacyEmailsFolder.guard.test.ts` fails on new files).
 - **Growth Radar**: a product/UX PR that should be graded appends a column-0 `GR-Intervention:` line (`.claude/rules/10-git.md`). Omit it for radar/* SEO PRs, docs, and detector opt-outs.
 
 ## Tech Stack
