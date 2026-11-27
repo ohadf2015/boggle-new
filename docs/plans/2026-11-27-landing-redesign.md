@@ -85,6 +85,8 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   edu branch (6101a33d6). Left: verify shots + events, tsc, build, suite, prod shots, review page v3.
 - 17:10 review of education commit: duoPolish test, FAQ must stay expanded (GEO), per-card impression observers,
   stray data-lc-cta, for-schools top-bar link, clientBoundary list. Fixing now; then tsc/build/suite/prod shots/review v3.
+- 17:25: education review fixed + committed (14936 related tests green). Running `~/.cache/lexiclash/lp1127/final-gate.sh`
+  (tsc, build, prod shots, review page, full suite, eslint, seo freeze). Then publish review v3 and report.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
