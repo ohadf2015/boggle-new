@@ -54,9 +54,9 @@ const STATUS_LABEL_KEY: Record<RosterJoinFunnelStatus, string> = {
 };
 
 const STATUS_BADGE_CLASS: Record<RosterJoinFunnelStatus, string> = {
-  joined_idle: 'border-neo-cream text-neo-cream',
-  guest: 'border-neo-cream/50 text-neo-cream/85',
-  signed_in: 'border-neo-cream/35 text-neo-cream/75',
+  joined_idle: 'border-edu-line text-edu-ink',
+  guest: 'border-edu-line text-edu-ink/85',
+  signed_in: 'border-edu-line text-edu-ink/75',
 };
 
 /**
@@ -83,14 +83,14 @@ const PRINT_CSS = `
 `;
 
 const SHARE_BTN =
-  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
+  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-page px-3 py-1.5 text-sm font-bold text-edu-ink transition-colors hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
 
 const SHARE_BTN_QUIET =
-  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 bg-neo-navy px-3 py-1.5 text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
+  'inline-flex min-h-10 items-center justify-center gap-1.5 rounded-neo border-2 border-edu-line bg-edu-page px-3 py-1.5 text-sm font-bold text-edu-ink transition-colors hover:bg-edu-ink/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime disabled:opacity-50';
 
 const ROW_H = 44;
 const PAGER_RESERVE = 88;
-const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-neo-cream/60 px-3 text-sm font-bold text-neo-cream hover:border-neo-cream disabled:opacity-40';
+const PAGER_BUTTON = 'min-h-10 rounded-neo border-2 border-edu-line px-3 text-sm font-bold text-edu-ink hover:border-edu-line disabled:opacity-40';
 
 export function ClassroomRosterProgress({ classroomId, classroomName = '' }: ClassroomRosterProgressProps) {
   const { t, language } = useLanguage();
@@ -245,11 +245,11 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
   return (
     <section
       data-testid="classroom-roster-progress"
-      className="space-y-3 rounded-neo-lg border-2 border-neo-cream/40 bg-neo-navy-light/95 p-4 shadow-hard sm:p-5"
+      className="space-y-3 rounded-neo-lg border-2 border-edu-line bg-edu-surface/95 p-4 shadow-hard sm:p-5"
     >
       <style>{PRINT_CSS}</style>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <h3 className="font-neo-display text-lg font-bold text-neo-white">
+        <h3 className="font-neo-display text-lg font-bold text-edu-ink">
           {t('teacher.reports.rosterProgress.title')}
         </h3>
         {proLoading ? null : hasPro ? (
@@ -279,7 +279,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b-2 border-neo-cream/25 text-xs text-neo-cream/70">
+            <tr className="border-b-2 border-edu-line text-xs text-edu-ink/70">
               <th scope="col" className="p-3 text-start font-bold">
                 {t('teacher.reports.rosterProgress.columns.student')}
               </th>
@@ -303,21 +303,21 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
                 key={row.studentId}
                 data-testid="classroom-roster-row"
                 data-status={row.joinFunnelStatus}
-                className="border-b border-neo-cream/15 last:border-b-0"
+                className="border-b border-edu-line/15 last:border-b-0"
               >
-                <td className="px-3 py-2 font-bold text-neo-white">
+                <td className="px-3 py-2 font-bold text-edu-ink">
                   <span className="flex items-center gap-2.5">
                     <AvatarLite userId={row.studentId} pixelSize={28} />
                     <span dir="auto">{row.name}</span>
                   </span>
                 </td>
-                <td className="hidden px-3 py-2 text-end text-neo-white tabular-nums sm:table-cell">
+                <td className="hidden px-3 py-2 text-end text-edu-ink tabular-nums sm:table-cell">
                   {formatCompletion(row.completedAssignments, row.totalAssignments)}
                 </td>
-                <td className="px-3 py-2 text-end text-neo-white tabular-nums">
+                <td className="px-3 py-2 text-end text-edu-ink tabular-nums">
                   {formatScore(row.averageScore)}
                 </td>
-                <td className="px-3 py-2 text-end text-neo-white tabular-nums">
+                <td className="px-3 py-2 text-end text-edu-ink tabular-nums">
                   {formatLastActive(row.lastActiveAt)}
                 </td>
                 <td className="hidden px-3 py-2 sm:table-cell">
@@ -338,7 +338,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
           <button type="button" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.prev')}
           </button>
-          <span className="text-sm font-bold text-neo-cream/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
+          <span className="text-sm font-bold text-edu-ink/80">{t('eduLibrary.pager.status', { page: shownPage + 1, total: pageCount })}</span>
           <button type="button" disabled={shownPage >= pageCount - 1} onClick={() => setPage(shownPage + 1)} className={PAGER_BUTTON}>
             {t('eduLibrary.pager.next')}
           </button>
@@ -349,7 +349,7 @@ export function ClassroomRosterProgress({ classroomId, classroomName = '' }: Cla
           href={`/${language}/teacher/upgrade`}
           data-testid="classroom-roster-upgrade"
           onClick={() => trackTeacherRosterProgressUpgradeClicked({ classroomId })}
-          className="inline-flex min-h-11 items-center rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+          className="inline-flex min-h-11 items-center rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line"
         >
           {t('teacher.reports.rosterProgress.upgrade', { price: `$${TEACHER_PRO_PRICE_USD}` })}
         </Link>

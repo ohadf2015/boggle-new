@@ -33,4 +33,16 @@ describe('<ClassSetupInviteCode> join address', () => {
       expect(screen.getByTestId(id).className).not.toMatch(/bg-neo-lime/);
     }
   });
+
+  it('Then the card is white with a black lip and the code reads as six letter tiles students can copy from the back row', () => {
+    render(<ClassSetupInviteCode code="KITE43" className="Room 12" joinUrl="https://www.lexiclash.live/en/join/KITE43" displayHost="lexiclash.live/en/join" onShare={vi.fn()} t={t} />);
+    const card = screen.getByTestId('invite-code-card');
+    expect(card.className).toContain('edu-card');
+    expect(card.className).not.toMatch(/bg-neo-cream|shadow-hard-lime/);
+    const code = screen.getByTestId('setup-join-code');
+    expect(code).toHaveTextContent('KITE43');
+    const tiles = screen.getAllByTestId('setup-join-code-tile');
+    expect(tiles.map((el) => el.textContent)).toEqual(['K', 'I', 'T', 'E', '4', '3']);
+    for (const tile of tiles) expect(tile.className).toContain('edu-tile');
+  });
 });

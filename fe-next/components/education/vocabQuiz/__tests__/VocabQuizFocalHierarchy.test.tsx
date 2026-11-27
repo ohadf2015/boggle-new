@@ -56,7 +56,7 @@ describe('The prompt is the one focal point, sitting on the navy', () => {
 describe('Answer tiles are a calm field', () => {
   it('Given no pick, Then all four share one neutral border and lip, and the family colour lives only in the shape chip', () => {
     tiles().forEach((tile, i) => {
-      expect(tile.className).toContain('border-neo-white/20');
+      expect(tile.className).toMatch(/(^|\s)border-edu-line(\s|$)/);
       expect(tile.className).not.toMatch(new RegExp(`(^|\\s)border-neo-${FAMILIES[i]}(\\s|$)`));
       expect(tile.className).not.toContain(`shadow-neo-${FAMILIES[i]}-muted`);
       expect(tile.querySelector('[data-testid="vocab-quiz-choice-badge"]')!.className).toContain(`bg-neo-${FAMILIES[i]}`);

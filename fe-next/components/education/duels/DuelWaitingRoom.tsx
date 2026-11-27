@@ -48,7 +48,7 @@ export function DuelWaitingRoom({
     <div
       data-testid="duel-waiting"
       data-stalled={stalled ? 'true' : 'false'}
-      className="flex h-full min-h-[400px] flex-col items-center justify-center gap-4 bg-neo-navy px-4 text-center"
+      className="flex h-full min-h-[400px] flex-col items-center justify-center gap-4 bg-edu-page px-4 text-center"
     >
       {/* The mascot waits with you rather than leaving you alone with a spinner. */}
       {/* eslint-disable-next-line @next/next/no-img-element -- a 104px static webp; next/image adds a loader round-trip to a screen that must paint instantly */}
@@ -64,7 +64,7 @@ export function DuelWaitingRoom({
       {!stalled && (
         <div className="flex items-center gap-3">
           <Loader size="lg" />
-          <p className="font-neo-display text-lg font-black uppercase italic tracking-tight text-neo-cream">
+          <p className="font-neo-display text-lg font-black uppercase italic tracking-tight text-edu-ink">
             {t('education.duels.waitingForName', undefined, { name: opponentName })}
           </p>
         </div>
@@ -73,12 +73,12 @@ export function DuelWaitingRoom({
       {stalled && (
         <div
           data-testid="duel-waiting-recovery"
-          className="w-full max-w-sm rounded-neo border-[3px] border-neo-cream bg-neo-navy p-4 shadow-hard"
+          className="w-full max-w-sm rounded-neo border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard"
         >
-          <p className="font-neo-display text-xl font-black uppercase italic tracking-tight text-neo-cream">
+          <p className="font-neo-display text-xl font-black uppercase italic tracking-tight text-edu-ink">
             {t('education.duels.stillWaiting', undefined, { name: opponentName })}
           </p>
-          <p className="mt-1 font-neo-body text-sm font-bold text-neo-cream/85">
+          <p className="mt-1 font-neo-body text-sm font-bold text-edu-ink/85">
             {t('education.duels.waitingHint')}
           </p>
 
@@ -103,8 +103,8 @@ export function DuelWaitingRoom({
               data-testid="duel-waiting-exit"
               onClick={onBackToLobby}
               className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
-                'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-neo-cream bg-neo-navy px-4 py-2.5',
-                'font-neo-body text-sm font-black text-neo-cream shadow-hard-sm',
+                'inline-flex w-full items-center justify-center gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface px-4 py-2.5',
+                'font-neo-body text-sm font-black text-edu-ink shadow-hard-sm',
                 'transition hover:-translate-y-0.5 hover:shadow-hard active:translate-y-0.5 active:shadow-hard-pressed'
               )}
             >

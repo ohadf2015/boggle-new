@@ -36,7 +36,7 @@ export function PracticeInsufficientData({
           size="sm"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+          className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10"
         >
           <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </Button>

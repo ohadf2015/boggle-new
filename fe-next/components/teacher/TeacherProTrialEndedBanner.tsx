@@ -39,7 +39,7 @@ export function TeacherProTrialEndedBanner({ onDismiss, recap }: { onDismiss?: (
         </TeacherProCheckoutButton>
       }
     >
-      <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-neo-cream" />
+      <TrialRecapLine recap={recap} className="mt-1 font-neo-body text-sm font-black text-edu-ink" />
     </ProBanner>
   );
 }

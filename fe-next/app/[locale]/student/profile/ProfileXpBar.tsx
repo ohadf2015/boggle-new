@@ -11,15 +11,15 @@ export function ProfileXpBar({ xp, level }: { xp: XpProgress; level: number }) {
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-neo-body text-xs font-bold tabular-nums text-neo-cream/80 sm:text-sm">
+        <span className="font-neo-body text-xs font-bold tabular-nums text-edu-ink/80 sm:text-sm">
           <CountUp to={xp.xpInCurrentLevel} /> / {xp.xpNeededForNextLevel} XP
         </span>
         {!xp.isMaxLevel ? (
-          <span className="font-neo-body text-xs font-bold tabular-nums text-neo-cream/80 sm:text-sm">
+          <span className="font-neo-body text-xs font-bold tabular-nums text-edu-ink/80 sm:text-sm">
             {t('education.xp.nextLevel')}: {level + 1}
           </span>
         ) : (
-          <span className="font-neo-display text-xs font-bold text-neo-pink sm:text-sm">{t('education.xp.maxLevel')}</span>
+          <span className="font-neo-display text-xs font-bold text-edu-pink-ink sm:text-sm">{t('education.xp.maxLevel')}</span>
         )}
       </div>
       <SpringProgress
@@ -28,7 +28,7 @@ export function ProfileXpBar({ xp, level }: { xp: XpProgress; level: number }) {
         label={t('common.aria.levelProgress')}
         tone="cyan"
         animateOnMount
-        className="border-neo-cream/40 bg-neo-navy"
+        className="border-edu-line bg-edu-surface"
       />
     </div>
   );

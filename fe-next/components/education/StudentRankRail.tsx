@@ -84,9 +84,9 @@ const PRELOADED_VARIANTS = [
 ] as const;
 
 const MESSAGE_TONE = {
-  ok: 'bg-neo-lime/15 border-neo-lime text-neo-lime',
-  info: 'bg-neo-cyan/15 border-neo-cyan text-neo-cyan',
-  muted: 'bg-neo-cream/10 border-neo-cream/40 text-neo-cream',
+  ok: 'bg-neo-lime/15 border-neo-lime text-neo-lime edu-sky:text-edu-lime-ink',
+  info: 'bg-neo-cyan/15 border-neo-cyan text-neo-cyan edu-sky:text-edu-cyan-ink',
+  muted: 'bg-neo-cream/10 edu-sky:bg-edu-ink/10 border-neo-cream/40 edu-sky:border-edu-line text-neo-cream edu-sky:text-edu-ink',
 } as const;
 
 export function StudentRankRail({
@@ -152,8 +152,8 @@ export function StudentRankRail({
     <div
       data-testid="student-own-progress"
       className={cn(
-        'relative flex items-center gap-1 rounded-neo border-neo border-neo-cream/40 px-2 py-1',
-        'bg-neo-navy-light font-neo-display text-neo-cream shadow-hard-sm select-none',
+        'relative flex items-center gap-1 rounded-neo border-neo border-neo-cream/40 edu-sky:border-edu-line px-2 py-1',
+        'bg-neo-navy-light edu-sky:bg-edu-surface font-neo-display text-neo-cream edu-sky:text-edu-ink shadow-hard-sm select-none',
       )}
       role="status"
       aria-live="polite"
@@ -202,8 +202,8 @@ export function StudentRankRail({
             face changes. Sized small: this rail sits above a game board. */}
         <span
           className={cn(
-            'shrink-0 overflow-hidden rounded-full border-neo border-neo-cream/40',
-            'h-9 w-9 bg-neo-navy',
+            'shrink-0 overflow-hidden rounded-full border-neo border-neo-cream/40 edu-sky:border-edu-line',
+            'h-9 w-9 bg-neo-navy edu-sky:bg-edu-surface',
           )}
         >
           <Image

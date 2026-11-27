@@ -20,7 +20,7 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 import type { ActiveGame } from '@/hooks/useActiveClassroomGame';
 import type { AcademyIsland, NextActionKind } from './academyIslands';
-import { INK_TEXT, Medallion, toneStyle, type Tone } from './chrome';
+import { Medallion, toneStyle, type Tone } from './chrome';
 
 export type CtaKind = NextActionKind;
 
@@ -46,7 +46,7 @@ const ART: Partial<Record<CtaKind, string>> = {
 
 /** The hero's colour — the spotlight over the island wears the same one. */
 export function ctaTone(kind: CtaKind): Tone {
-  return kind === 'live' ? 'pink' : kind === 'waiting' ? 'teal' : kind === 'join-class' || kind === 'solo' ? 'teal' : 'gold';
+  return kind === 'live' ? 'pink' : kind === 'waiting' ? 'teal' : kind === 'join-class' || kind === 'solo' ? 'teal' : 'lime';
 }
 
 /**
@@ -117,7 +117,7 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
       {joinError && (
         <p
           role="alert"
-          className="absolute bottom-full mb-2 w-full rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard"
+          className="absolute bottom-full mb-2 w-full rounded-neo border-3 border-neo-black bg-neo-red px-3 py-2 font-neo-body text-sm font-bold text-neo-black shadow-edu-lip-sm"
         >
           {joinError}
         </p>
@@ -145,25 +145,24 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         style={{ ...toneStyle(tone, { shadow: 5, trim: 2.5 }), willChange: 'transform' }}
         whileTap={{ scaleX: 1.04, scaleY: 0.9, y: 3 }}
       >
-        {/* Shine sweep — the hero catches the light. */}
         {!still && (
           <span
             ref={shine}
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-neo-white/45"
+            className="pointer-events-none absolute inset-y-0 left-0 w-1/4 -skew-x-12 bg-edu-paper/45"
           />
         )}
         <span className={cn('relative flex shrink-0 items-center justify-center', big ? 'h-20 w-20' : compact ? 'h-11 w-11' : 'h-14 w-14 sm:h-16 sm:w-16')}>
           {art ? (
             <>
-              <Image src={art} alt="" aria-hidden="true" fill priority unoptimized sizes="64px" className="object-contain drop-shadow-[2px_3px_0_#000]" />
+              <Image src={art} alt="" aria-hidden="true" fill priority unoptimized sizes="64px" className="object-contain drop-shadow-[0_3px_0_rgba(16,17,20,0.3)]" />
               {target?.badge != null && (
                 <span
                   className="absolute -top-1 -end-1"
                   aria-label={t('academy.student.reviewDueAria', '{count} words to review', { count: target.badge })}
                 >
                   <Medallion tone="pink" size={24} shadow={1}>
-                    <span className="font-neo-display text-xs font-black leading-none text-neo-white [text-shadow:0_1px_0_#000]">{target.badge}</span>
+                    <span className="font-neo-display text-xs font-black leading-none text-neo-black">{target.badge}</span>
                   </Medallion>
                 </span>
               )}
@@ -171,9 +170,9 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
           ) : (
             <Medallion tone="night" size={compact ? 40 : 48}>
               {kind === 'join-class' ? (
-                <UserPlus className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
+                <UserPlus className="h-6 w-6 text-edu-yellow-ink" strokeWidth={2.5} />
               ) : kind === 'waiting' ? (
-                <Hourglass className="h-6 w-6 text-neo-yellow" strokeWidth={2.5} />
+                <Hourglass className="h-6 w-6 text-edu-yellow-ink" strokeWidth={2.5} />
               ) : (
                 <Sparkles className="h-6 w-6 fill-neo-yellow text-neo-black" strokeWidth={2} />
               )}
@@ -203,9 +202,9 @@ export function AcademyCta({ kind, activeGame, target, targetLabel, isJoining, j
         <span className="relative flex shrink-0">
           <Medallion tone="night" size={big ? 58 : compact ? 38 : 46} shadow={2}>
             {isJoining ? (
-              <Loader2 className="h-5 w-5 animate-spin text-neo-yellow" aria-hidden="true" />
+              <Loader2 className="h-5 w-5 animate-spin text-edu-yellow-ink" aria-hidden="true" />
             ) : (
-              <DirectionalIcon icon={Play} mirror className={`h-5 w-5 fill-neo-yellow text-neo-black ${INK_TEXT}`} />
+              <DirectionalIcon icon={Play} mirror className="h-6 w-6 fill-neo-black text-neo-black" />
             )}
           </Medallion>
         </span>

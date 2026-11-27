@@ -10,7 +10,7 @@ describe('StudentExitDialog', () => {
   it('Given it is open, Then it uses the same dark surface as the host exit, not cream', () => {
     render(<StudentExitDialog open onOpenChange={vi.fn()} onConfirm={vi.fn()} t={t} />);
     const dialog = screen.getByRole('alertdialog');
-    expect(dialog.className).toContain('bg-neo-navy-light');
+    expect(dialog.className).toContain('bg-edu-surface');
     expect(dialog.className).not.toContain('bg-neo-cream');
   });
 

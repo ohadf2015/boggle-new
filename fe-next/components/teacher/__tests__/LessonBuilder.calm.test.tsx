@@ -70,3 +70,13 @@ describe('LessonBuilder: calm My lists', () => {
     expect(screen.getByTestId('my-list-lesson-1')).toHaveTextContent('English');
   });
 });
+
+describe('LessonBuilder on the sky page', () => {
+  it('Then New word list is the full-size chunky primary and the hint reads at body size', () => {
+    render(<LessonBuilder />);
+    const create = screen.getByTestId('lessons-create');
+    expect(create.className).toContain('min-h-[56px]');
+    expect(create.className).toContain('text-xl');
+    expect(screen.getByTestId('lessons-hint').className).toContain('text-base');
+  });
+});

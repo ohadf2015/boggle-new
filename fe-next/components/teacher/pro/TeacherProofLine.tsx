@@ -29,8 +29,8 @@ export function TeacherProofLine({ className }: { className?: string }) {
 
   if (!proof) return null;
   return (
-    <p data-testid="teacher-proof" className={className ?? 'mt-3 flex items-center justify-center gap-2 text-center text-xs font-bold text-neo-white/85'}>
-      <Users className="h-4 w-4 shrink-0 text-neo-lime" aria-hidden />
+    <p data-testid="teacher-proof" className={className ?? 'mt-3 flex items-center justify-center gap-2 text-center text-xs font-bold text-edu-ink/85'}>
+      <Users className="h-4 w-4 shrink-0 text-edu-lime-ink" aria-hidden />
       {t('eduPro.upgrade.socialProof', { teachers: proof.teachers, games: proof.games })}
     </p>
   );

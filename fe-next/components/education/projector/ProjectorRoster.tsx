@@ -104,8 +104,8 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
       className={cn('@container flex min-h-0 flex-1 flex-col gap-[clamp(0.5rem,1.2cqw,1rem)] p-3 @5xl:p-[clamp(0.75rem,1.4cqw,1.5rem)]', WALL_PANEL)}
     >
       <header className="flex flex-wrap items-center gap-x-[clamp(0.5rem,1.5cqw,1.5rem)] gap-y-2">
-        <h2 data-testid="projector-count" className="inline-flex items-center gap-[0.3em] font-neo-display font-black leading-none text-neo-cream text-[clamp(1.25rem,min(3.6cqw,4cqh),3.25rem)]">
-          <Users className="size-[1em] shrink-0 text-neo-cream/80" aria-hidden="true" />
+        <h2 data-testid="projector-count" className="inline-flex items-center gap-[0.3em] font-neo-display font-black leading-none text-edu-ink text-[clamp(1.25rem,min(3.6cqw,4cqh),3.25rem)]">
+          <Users className="size-[1em] shrink-0 text-edu-ink/80" aria-hidden="true" />
           <span key={joined} className="inline-block tabular-nums motion-safe:animate-[edu-live-tick_260ms_cubic-bezier(0.23,1,0.32,1)]">
             {t('eduLiveRoom.lobby.joined', { count: joined })}
           </span>
@@ -113,7 +113,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         {phonesConnected < joined && (
           <span
             data-testid="projector-connected-count"
-            className="inline-flex items-center rounded-full border-[3px] border-neo-cream/50 bg-neo-navy-elevated px-[0.6em] py-[0.15em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.75rem,min(1.5cqw,1.8cqh),1.25rem)]"
+            className="inline-flex items-center rounded-full border-[3px] border-edu-line bg-edu-tile px-[0.6em] py-[0.15em] font-neo-body font-bold text-edu-ink/85 text-[clamp(0.75rem,min(1.5cqw,1.8cqh),1.25rem)]"
           >
             {t('eduLiveRoom.lobby.phonesConnected', { count: phonesConnected })}
           </span>
@@ -121,15 +121,15 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
         {phonesConnected > 0 && (
           <div
             data-testid="projector-ready-count"
-            className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
+            className="flex min-w-[min(100%,12rem)] flex-1 items-center gap-[0.6em] font-neo-body font-bold text-edu-ink/85 text-[clamp(0.875rem,min(1.8cqw,2.2cqh),1.75rem)]"
           >
             <span aria-hidden="true" className="shrink-0 tabular-nums">{t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}</span>
             <SpringProgress
               value={readyCount}
               max={phonesConnected}
               label={t('eduLiveRoom.lobby.readyCount', { ready: readyCount, total: phonesConnected })}
-              tone="cream"
-              className="h-[0.8em] min-w-0 flex-1 border-[3px] border-neo-cream/60 bg-neo-navy"
+              tone="pink"
+              className="h-[0.8em] min-w-0 flex-1 border-[3px] border-edu-line bg-edu-surface"
             />
           </div>
         )}
@@ -140,8 +140,8 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
             aria-pressed={editing}
             onClick={() => setEditing((v) => !v)}
             className={cn(
-              'ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] px-3 font-neo-display text-sm font-black shadow-hard',
-              editing ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-neo-cream/50 bg-neo-navy-elevated text-neo-cream',
+              'ms-auto inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[3px] px-3 font-neo-display text-sm font-black shadow-edu-lip-sm',
+              editing ? 'border-neo-black bg-neo-cream text-neo-black' : 'border-edu-line bg-edu-surface text-edu-ink',
               PRESS
             )}
           >
@@ -161,8 +161,8 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
               aria-hidden="true"
               className="pointer-events-none size-[clamp(4rem,min(16cqw,18cqh),12rem)] select-none @max-md:hidden"
             />
-            <p className="font-neo-display font-bold text-neo-cream text-[clamp(1.125rem,min(3.6cqw,3.4cqh),2.5rem)]">{t('eduLiveRoom.lobby.waitingTitle')}</p>
-            <p className="max-w-[34ch] font-neo-body text-neo-cream/75 text-[clamp(0.875rem,min(1.9cqw,2.2cqh),1.5rem)]">{t('eduLiveRoom.lobby.waitingHint')}</p>
+            <p className="font-neo-display font-bold text-edu-ink text-[clamp(1.125rem,min(3.6cqw,3.4cqh),2.5rem)]">{t('eduLiveRoom.lobby.waitingTitle')}</p>
+            <p className="max-w-[34ch] font-neo-body text-edu-ink/75 text-[clamp(0.875rem,min(1.9cqw,2.2cqh),1.5rem)]">{t('eduLiveRoom.lobby.waitingHint')}</p>
             {emptyActions}
           </div>
         </div>
@@ -185,9 +185,9 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                 data-reconnecting={student.reconnecting ? 'true' : undefined}
                 style={{ '--tilt': tiltOf(student.username) } as CSSProperties}
                 className={cn(
-                  'relative flex min-w-0 items-center gap-[0.35em] rounded-full py-[0.15em] pe-[0.6em] ps-[0.15em] font-neo-display font-black leading-none',
-                  isReady ? 'shadow-[0_0_0_3px_var(--neo-lime),4px_4px_0_rgb(var(--neo-black))]' : 'shadow-hard-sm',
-                  readyCount > 0 && !isReady && !student.reconnecting && 'brightness-[0.65] saturate-[0.6]',
+                  'relative flex min-w-0 items-center gap-[0.4em] rounded-neo-lg py-[0.2em] pe-[0.6em] ps-[0.2em] font-neo-display font-black leading-none shadow-edu-lip-sm',
+                  // Not ready yet: the face and name fade, the card keeps its edge so the grid stays even.
+                  readyCount > 0 && !isReady && !student.reconnecting && '[&>*]:opacity-55',
                   student.reconnecting && 'opacity-60 grayscale',
                   !arrivals.still.has(student.username) && 'motion-safe:animate-[edu-live-pop_260ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
                   tier.chip,
@@ -195,17 +195,17 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                   index >= PHONE_VISIBLE && !showAll && '@max-md:hidden'
                 )}
               >
-                <span aria-hidden="true" className="inline-flex size-[1.5em] shrink-0 overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-cream">
+                <span aria-hidden="true" className="inline-flex size-[1.5em] shrink-0 overflow-hidden rounded-neo border-[3px] border-neo-black bg-neo-cream">
                   <Avatar userId={student.username} customAvatar={student.avatar?.customAvatar ?? undefined} size="xl" disableEffects className="!h-full !w-full" />
                 </span>
                 <span dir="auto" title={student.username} className={cn('min-w-0 flex-1 leading-[1.05] [overflow-wrap:anywhere]', Array.from(student.username).length > 11 && 'text-[0.7em]')}>
                   {student.username}
                   {student.reconnecting && (
-                    <span className="block font-neo-body text-[0.55em] font-bold normal-case leading-tight text-neo-cream/80">{t('common.playerReconnecting')}</span>
+                    <span className="block font-neo-body text-[0.55em] font-bold normal-case leading-tight text-edu-ink/80">{t('common.playerReconnecting')}</span>
                   )}
                 </span>
                 {editing && !student.isBot && status === 'failed' && (
-                  <span data-testid="projector-remove-failed" role="status" className="shrink-0 rounded-full bg-neo-navy px-1.5 font-neo-body text-[0.6em] font-bold text-neo-pink">
+                  <span data-testid="projector-remove-failed" role="status" className="shrink-0 rounded-full bg-edu-surface px-1.5 font-neo-body text-[0.6em] font-bold text-edu-pink-ink">
                     {t('eduLiveRoom.lobby.removeFailed')}
                   </span>
                 )}
@@ -224,7 +224,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                   </button>
                 )}
                 {!editing && isReady && (
-                  <span data-testid="projector-ready-check" aria-hidden="true" className="absolute -end-1 -top-1 grid size-[0.8em] min-h-4 min-w-4 place-items-center rounded-full border-2 border-neo-black bg-neo-white text-neo-black">
+                  <span data-testid="projector-ready-check" aria-hidden="true" className="absolute -end-2 -top-2 grid size-[0.8em] min-h-5 min-w-5 place-items-center rounded-full border-[3px] border-neo-black bg-neo-pink text-neo-black">
                     <Check className="size-[0.55em] min-h-2.5 min-w-2.5" strokeWidth={4} />
                   </span>
                 )}
@@ -238,7 +238,7 @@ export const ProjectorRoster = memo<ProjectorRosterProps>(function ProjectorRost
                 aria-expanded={showAll}
                 aria-controls="projector-roster-list"
                 onClick={() => setShowAll((v) => !v)}
-                className={cn('flex w-full items-center justify-center rounded-full font-neo-display font-bold leading-none', tier.chip, STUDENT_CHIP, PRESS)}
+                className={cn('flex w-full items-center justify-center rounded-neo-lg font-neo-display font-bold leading-none shadow-edu-lip-sm', tier.chip, STUDENT_CHIP, PRESS)}
               >
                 {showAll ? t('eduLiveRoom.lobby.showFewer') : t('eduLiveRoom.lobby.moreJoined', { count: students.length - PHONE_VISIBLE })}
               </button>

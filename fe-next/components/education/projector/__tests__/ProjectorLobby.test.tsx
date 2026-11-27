@@ -51,7 +51,7 @@ describe('ProjectorLobby — the wall', () => {
     expect(root.className).toContain('fixed');
     expect(root.className).toContain('inset-0');
     expect(root.className).toContain(`z-[${PROJECTOR_LOBBY_Z}]`);
-    expect(root.className).toContain('bg-neo-navy');
+    expect(root.className).toContain('bg-edu-page');
     expect(root.className).not.toMatch(/dark:bg-|bg-neo-cream/);
     expect(root.className).toContain('[container-type:size]');
   });
@@ -175,7 +175,7 @@ describe('ProjectorLobby — Start', () => {
     expect(bar).toContainElement(screen.getByTestId('projector-start'));
     expect(bar.className).toMatch(/@max-5xl:sticky/);
     expect(bar.className).toMatch(/@max-5xl:bottom-0/);
-    expect(bar.className).toMatch(/@max-5xl:bg-neo-navy/);
+    expect(bar.className).toMatch(/@max-5xl:bg-edu-surface/);
   });
 
   it('keeps the mascot out of the Start bar', () => {

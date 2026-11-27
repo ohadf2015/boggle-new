@@ -164,11 +164,11 @@ describe('PracticePicker poster grid', () => {
     renderIt();
     expandAll();
     // The bespoke posters live on the tiles; the hero floats a transparent
-    // mascot on its accent instead (a navy poster plate on a pink fill reads as
-    // a failed image load).
+    // mascot on its accent instead (a poster plate on another fill reads as a
+    // failed image load).
     expect(screen.getByTestId('practice-tile-art-spelling')).toHaveAttribute(
       'src',
-      '/mascot/teacher/practice-spelling.webp'
+      '/mascot/teacher/practice-spelling-sky.webp'
     );
   });
 

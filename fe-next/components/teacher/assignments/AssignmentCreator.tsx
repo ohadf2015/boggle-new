@@ -407,7 +407,7 @@ export default function AssignmentCreator({
                   <AssignmentFocusPicker focus={focus} onFocus={setFocus} supportedFocuses={supportedFocuses} focusCounts={focusCounts} language={language} t={t} />
                 )}
                 <div>
-                  <label htmlFor="assignment-instructions" className="mb-2 block font-neo-body text-sm font-bold text-neo-cream">
+                  <label htmlFor="assignment-instructions" className="mb-2 block font-neo-body text-sm font-bold text-edu-ink">
                     {t('teacher.assignment.instructionsLabel')} {t('common.optional')}
                   </label>
                   <textarea
@@ -429,7 +429,7 @@ export default function AssignmentCreator({
                   id="assignment-submit-hint"
                   data-testid="assignment-submit-hint"
                   role="status"
-                  className="font-neo-body text-sm font-bold text-neo-cream/85 max-sm:order-last sm:me-auto"
+                  className="font-neo-body text-sm font-bold text-edu-ink/85 max-sm:order-last sm:me-auto"
                 >
                   {t(submitHint)}
                 </p>

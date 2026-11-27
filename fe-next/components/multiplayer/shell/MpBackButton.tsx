@@ -4,6 +4,7 @@ import { ArrowLeft, Home, LogOut } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export interface MpBackButtonProps {
   onPress: () => void;
@@ -19,6 +20,7 @@ const LABEL = { back: 'mpUi.shell.back', home: 'mpUi.shell.home', leave: 'mpUi.s
  * Link/router.push to a non-MP route. Arrows are DirectionalIcon (RTL-aware).
  */
 export function MpBackButton({ onPress, kind, className }: MpBackButtonProps) {
+  const classroom = useClassroomBoard();
   const { t } = useLanguage();
   return (
     <button
@@ -27,7 +29,7 @@ export function MpBackButton({ onPress, kind, className }: MpBackButtonProps) {
       aria-label={t(LABEL[kind])}
       data-testid={`mp-back-${kind}`}
       className={cn(
-        'inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm',
+        (classroom ? 'inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-black bg-edu-surface text-edu-ink shadow-hard-sm' : 'inline-flex items-center justify-center w-11 h-11 tv:w-16 tv:h-16 shrink-0 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm'),
         className,
       )}
     >

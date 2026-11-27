@@ -4,7 +4,8 @@ import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBackspaceKey } from '@/hooks/useBackspaceKey';
 import { HoldHintBubble } from '@/components/game/HoldHintBubble';
-import { ACTION_BAR, ACTION_ROUND, actionPrimary } from '@/components/game/hud/actionBar';
+import { ACTION_BAR, ACTION_ROUND, ACTION_ROUND_CLASSROOM, actionPrimary } from '@/components/game/hud/actionBar';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 
@@ -42,6 +43,8 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
   const { handlers: backspaceHold, showHint } = useBackspaceKey({ onTap: onBackspace, onHold: onClear });
   const ready = canSubmit && !isValidating;
   const reducedMotion = useReducedMotion();
+  const classroom = useClassroomBoard();
+  const round = classroom ? ACTION_ROUND_CLASSROOM : ACTION_ROUND;
   const shortWord = useShortWordFeedback(hasLetters, canSubmit);
   return (
   <div
@@ -51,7 +54,7 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
     data-gr-no-rage=""
     className={cn(ACTION_BAR, 'w-full mt-2 short:mt-0')}
   >
-    <button type="button" onClick={onClear} disabled={!hasLetters} className={ACTION_ROUND} aria-label={t('wordWheel.clear')}>
+    <button type="button" onClick={onClear} disabled={!hasLetters} className={round} aria-label={t('wordWheel.clear')}>
       <RotateCcw className="size-5 tv:size-9" strokeWidth={2.75} />
     </button>
 
@@ -60,7 +63,7 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
       onClick={canSubmit ? onSubmit : shortWord.onShortAttempt}
       disabled={isValidating || !(canSubmit || shortWord.active)}
       data-ready={String(ready)}
-      className={cn(actionPrimary(ready), 'inline-flex items-center justify-center gap-2')}
+      className={cn(actionPrimary(ready, { classroom }), 'inline-flex items-center justify-center gap-2')}
       animate={shortWord.shake ? { x: [0, -6, 6, -4, 4, 0] } : isValidating ? { opacity: [1, 0.6, 1] } : ready && !reducedMotion ? { scale: [1, 1.12, 1] } : { scale: 1 }}
       transition={shortWord.shake ? { duration: 0.35 } : isValidating ? { duration: 0.6, repeat: Infinity } : { duration: 0.24, ease: 'easeOut' }}
     >
@@ -68,7 +71,7 @@ const WheelActionBar: React.FC<WheelActionBarProps> = ({
       {t('wordWheel.submit')}
     </m.button>
 
-    <button type="button" {...backspaceHold} disabled={!hasLetters} className={cn(ACTION_ROUND, 'relative')} aria-label={t('wordWheel.removeLetter')}>
+    <button type="button" {...backspaceHold} disabled={!hasLetters} className={cn(round, 'relative')} aria-label={t('wordWheel.removeLetter')}>
       <Delete className="size-5 rtl:-scale-x-100 tv:size-9" strokeWidth={2.75} />
       {showHint && <HoldHintBubble label={t('common.holdToClear')} />}
     </button>

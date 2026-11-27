@@ -22,8 +22,8 @@ export function studentVerdict({ rank, total, score, rivalDiff, gapKind }: Stude
 }
 
 export function verdictLook(verdict: StudentVerdict): { surface: string; mascot: MascotMood } {
-  if (verdict === 'won') return { surface: 'bg-neo-lime', mascot: 'victory' };
-  if (verdict === 'tied') return { surface: 'bg-neo-yellow', mascot: 'cheer' };
+  if (verdict === 'won') return { surface: 'bg-neo-yellow', mascot: 'victory' };
+  if (verdict === 'tied') return { surface: 'bg-neo-pink', mascot: 'cheer' };
   return { surface: 'bg-neo-cyan', mascot: 'think' };
 }
 

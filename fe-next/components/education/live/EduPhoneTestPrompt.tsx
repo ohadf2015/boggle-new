@@ -41,17 +41,17 @@ export function EduPhoneTestPrompt({ gameCode, language, baseUrl, mode, t }: Edu
         data-testid="edu-phone-test-open"
         aria-expanded={open}
         onClick={toggle}
-        className={cn('inline-flex items-center gap-2 self-start rounded-neo border-[3px] border-neo-cream bg-neo-navy-light px-3 py-1.5 min-h-11 font-neo-display font-black text-neo-cream shadow-hard-sm hover:bg-neo-navy text-[clamp(1rem,min(1.1cqw,2cqh),1.75rem)]', PRESS)}
+        className={cn('inline-flex items-center gap-2 self-start rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface px-3 py-1.5 min-h-11 font-neo-display font-black text-neo-cream edu-sky:text-edu-ink shadow-hard-sm hover:bg-neo-navy edu-sky:hover:bg-edu-page text-[clamp(1rem,min(1.1cqw,2cqh),1.75rem)]', PRESS)}
       >
         <Smartphone className="size-[1.1em]" aria-hidden="true" />
         {t('eduLiveRoom.lobby.phoneTestCta')}
       </button>
       {open && (
         <div data-testid="edu-phone-test-qr" className="flex items-center gap-3">
-          <div className="shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-white p-1.5 shadow-hard-sm">
+          <div className="shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-white edu-sky:bg-edu-paper p-1.5 shadow-hard-sm">
             <QRCodeSVG value={phoneTestUrl(baseUrl, language, gameCode)} size={112} level="M" />
           </div>
-          <p className="font-neo-body font-bold text-neo-cream/85 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]">{t('eduLiveRoom.lobby.phoneTestHint')}</p>
+          <p className="font-neo-body font-bold text-neo-cream/85 edu-sky:text-edu-ink/85 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]">{t('eduLiveRoom.lobby.phoneTestHint')}</p>
         </div>
       )}
       {!open && <p className="sr-only">{t('eduLiveRoom.lobby.phoneTestHint')}</p>}

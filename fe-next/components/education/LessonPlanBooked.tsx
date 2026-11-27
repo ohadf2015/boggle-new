@@ -69,11 +69,11 @@ export function LessonPlanBooked({ lessonAt, when, classroom, origin, language, 
           <Check className="size-4" aria-hidden="true" />
           {t(`${K}.booked`)}
         </span>
-        <span className="font-neo-display text-lg font-black leading-tight text-neo-cream">{when}</span>
+        <span className="font-neo-display text-lg font-black leading-tight text-neo-cream edu-sky:text-edu-ink">{when}</span>
         <button
           type="button"
           onClick={onChange}
-          className="min-h-11 font-neo-body text-sm font-bold text-neo-cyan underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="min-h-11 font-neo-body text-sm font-bold text-neo-cyan edu-sky:text-edu-cyan-ink underline decoration-2 underline-offset-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t(`${K}.change`)}
         </button>
@@ -91,7 +91,7 @@ export function LessonPlanBooked({ lessonAt, when, classroom, origin, language, 
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="font-neo-body text-xs font-bold text-neo-cream/80">{t(`${K}.linkLabel`)}</p>
+        <p className="font-neo-body text-xs font-bold text-neo-cream/80 edu-sky:text-edu-ink/80">{t(`${K}.linkLabel`)}</p>
         <div className="flex flex-wrap items-stretch gap-2">
           <span
             data-testid="lesson-plan-link"

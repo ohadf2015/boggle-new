@@ -53,12 +53,12 @@ describe('<JoinFlow> nickname step polish', () => {
     expect(nameField().className).not.toMatch(/bg-neo-red\/\d+/);
   });
 
-  it('Given the class is found, Then its confirmation is a lime-edged panel, not a second lime slab beside LET\'S GO', async () => {
+  it('Given the class is found, Then its confirmation is a white card, not a second lime slab beside LET\'S GO', async () => {
     mockResolve.mockResolvedValue({ verdict: 'classroom', label: 'Ms Levy', classroomId: 'c1' });
     render(<JoinFlow initialCode="P45KRT" />);
-    const label = await screen.findByText('Ms Levy');
-    const card = label.parentElement!;
-    expect(card.className).toContain('border-neo-lime');
+    await screen.findByText('Ms Levy');
+    const card = screen.getByTestId('join-target-card');
+    expect(card.className).toContain('edu-card');
     expect(card.className).not.toMatch(/(^|\s)bg-neo-lime(\s|$)/);
     expect(goButton().className).toMatch(/(^|\s)bg-neo-lime(\s|$)/);
   });
@@ -74,7 +74,7 @@ describe('<JoinFlow> nickname step polish', () => {
     render(<JoinFlow initialCode="ZZZZZ9" />);
     const alert = await screen.findByRole('alert');
     expect(alert.className).toContain('text-neo-black');
-    expect(alert.className).not.toContain('text-neo-white');
+    expect(alert.className).not.toContain('text-edu-ink');
   });
 
   it('Given a saved nickname on this device, Then the invite link asks "Continue as Maya?" before reusing it, never a random one', async () => {

@@ -1,0 +1,64 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WordTowerVersus classroom skin > arcade (waiting false): the main game keeps its exact classes 1`] = `
+[
+  "relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy",
+  "",
+  "pointer-events-none fixed inset-0 z-40 overflow-hidden",
+  "pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3",
+  "pointer-events-auto flex items-center gap-2",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap uppercase tracking-wide rounded-neo shadow-hard duration-100 active:shadow-hard-pressed focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy disabled:pointer-events-none disabled:opacity-70 disabled:translate-x-0 disabled:translate-y-0 [&_svg]:pointer-events-none [&_svg]:shrink-0 text-neo-black dark:text-neo-white dark:border-neo-cream hover:translate-x-0 hover:translate-y-0 text-xs [&_svg]:w-4 [&_svg]:h-4 relative min-h-[36px] min-w-[36px] w-9 h-9 p-0 before:absolute before:-inset-1 before:content-[''] rounded-full bg-neo-white/10 border-2 border-neo-white/20 shadow-none hover:bg-neo-red/80 hover:border-neo-red hover:shadow-hard-sm active:translate-x-px active:translate-y-px active:shadow-none font-black transition-all",
+  "lucide lucide-door-open w-4 h-4 text-neo-white",
+  "rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 shadow-hard backdrop-blur-sm",
+  "font-neo-display text-2xl font-bold text-neo-white tabular-nums",
+  "text-sm text-neo-cyan",
+  "font-neo-body text-xs font-bold text-neo-orange tabular-nums",
+  "relative ",
+  "w-10 h-10 flex items-center justify-center text-xl
+          bg-neo-navy/80 border-2 border-neo-white/15 rounded-xl
+          hover:border-neo-yellow hover:bg-neo-navy hover:scale-110
+          active:translate-x-px active:translate-y-px transition-[color,background-color,border-color,box-shadow,translate,scale,transform,opacity] duration-150",
+  "w-44 max-w-[45%]",
+  "pointer-events-auto flex flex-col gap-1.5",
+  "flex items-center justify-between gap-2 rounded-neo border-neo border-black px-2 py-1.5 shadow-hard-sm bg-neo-lime text-black",
+  "flex items-center gap-1.5 truncate",
+  "lucide lucide-crown h-3.5 w-3.5 text-neo-yellow",
+  "truncate font-neo-body text-xs font-bold",
+  "flex items-center gap-2",
+  "font-neo-display text-sm font-bold tabular-nums",
+  "flex items-center justify-between gap-2 rounded-neo border-neo border-black px-2 py-1.5 shadow-hard-sm bg-neo-navy-light/90 text-neo-white",
+  "flex items-center gap-1.5 truncate",
+  "truncate font-neo-body text-xs font-bold",
+  "flex items-center gap-2",
+  "font-neo-display text-sm font-bold tabular-nums",
+  "rounded border-neo border-black bg-neo-pink p-1 text-neo-white shadow-hard-sm disabled:opacity-30",
+  "lucide lucide-bomb h-3.5 w-3.5",
+  "absolute inset-x-0 bottom-0 z-10 space-y-3 p-4",
+  "flex items-center justify-center gap-1.5",
+  "flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-yellow font-neo-display text-2xl font-bold text-black shadow-hard ring-2 ring-neo-yellow ring-offset-2 ring-offset-neo-navy",
+  "flex h-11 w-11 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cyan font-neo-display text-2xl font-bold text-black shadow-hard",
+  "mx-auto grid max-w-md grid-cols-6 gap-2",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-navy-light text-neo-white/30",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-lime text-black",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-lime text-black",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-lime text-black",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-lime text-black",
+  "flex aspect-square min-h-[44px] items-center justify-center rounded-neo border-neo-thick border-black font-neo-display text-2xl font-bold shadow-hard active:translate-y-0.5 bg-neo-lime text-black",
+  "mx-auto flex max-w-md items-center gap-2",
+  "flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-3 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40",
+  "lucide lucide-shuffle h-5 w-5",
+  "tabular-nums",
+  "rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40",
+  "lucide lucide-delete h-5 w-5",
+  "flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan py-3 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40",
+  "lucide lucide-arrow-up h-5 w-5",
+  "text-center font-neo-body text-sm font-bold text-neo-red",
+]
+`;
+
+exports[`WordTowerVersus classroom skin > arcade (waiting true): the main game keeps its exact classes 1`] = `
+[
+  "flex min-h-[100dvh] items-center justify-center bg-neo-navy",
+  "animate-pulse font-neo-display text-xl text-neo-cyan",
+]
+`;

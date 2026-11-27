@@ -68,20 +68,20 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
   );
 
   if (isLoading) {
-    return withFocus(<div aria-busy="true" className="h-16 rounded-neo-lg bg-neo-cream/10 motion-safe:animate-pulse" />);
+    return withFocus(<div aria-busy="true" className="h-16 rounded-neo-lg bg-edu-ink/10 motion-safe:animate-pulse" />);
   }
   if (error || !metrics) {
     return withFocus(
       <div className={PANEL} role="alert">
-        <p className="font-neo-body font-bold text-neo-cream">{t('education.analytics.error')}</p>
-        <button type="button" onClick={refresh} className="mt-2 min-h-11 rounded-neo border-2 border-neo-cream/60 px-4 font-neo-body font-bold text-neo-cream">
+        <p className="font-neo-body font-bold text-edu-ink">{t('education.analytics.error')}</p>
+        <button type="button" onClick={refresh} className="mt-2 min-h-11 rounded-neo border-2 border-edu-line px-4 font-neo-body font-bold text-edu-ink">
           {t('education.analytics.retry')}
         </button>
       </div>
     );
   }
   if (students.length === 0) {
-    return withFocus(<p className="font-neo-body text-neo-cream">{t('education.analytics.noData')}</p>);
+    return withFocus(<p className="font-neo-body text-edu-ink">{t('education.analytics.noData')}</p>);
   }
 
   const today = metrics.dailyActive[metrics.dailyActive.length - 1]?.day ?? '';
@@ -125,7 +125,7 @@ export function ClassOverview({ classroomId, classroomName, surface = 'class_rep
                 <IconBadge icon={CalendarDays} tone="cyan" />
                 <h3 id="ov-act" className={PANEL_TITLE}>{t('education.analytics.overview.activityTitle')}</h3>
               </div>
-              <p className="mb-2 mt-1 font-neo-body text-xs text-neo-cream/80">{t('education.analytics.overview.activityHint')}</p>
+              <p className="mb-2 mt-1 font-neo-body text-xs text-edu-ink/80">{t('education.analytics.overview.activityHint')}</p>
               <ActivityBars days={metrics.dailyActive} locale={language} />
             </section>
           ) : null}

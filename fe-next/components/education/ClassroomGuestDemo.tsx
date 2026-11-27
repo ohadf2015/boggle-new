@@ -51,7 +51,7 @@ export function ClassroomGuestDemo() {
   const pose = errorKey ? 'error' : ready ? 'success' : 'welcome';
 
   return (
-    <div className={cn('flex h-dvh min-h-0 flex-col overflow-hidden bg-neo-navy text-neo-white', isRTL && 'rtl')}>
+    <div className={cn('flex h-dvh min-h-0 flex-col overflow-hidden bg-edu-page text-edu-ink', isRTL && 'rtl')}>
       <EducationHeader compact showBackButton title={t('education.classroomGame.title')} />
       <form
         onSubmit={submit}
@@ -61,7 +61,7 @@ export function ClassroomGuestDemo() {
         <div className={cn('flex w-full max-w-[37.5rem] flex-col items-center gap-4 sm:gap-5 lg:max-w-[46rem]', TV_STAGE_ZOOM_CLASS)}>
           <div
             data-testid="guest-join-column"
-            className="relative mt-[clamp(3rem,11dvh,7.5rem)] flex w-full flex-col gap-4 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light px-4 pb-5 pt-[clamp(2.75rem,8dvh,5.5rem)] shadow-[0_8px_0_0] shadow-neo-purple sm:gap-5 sm:px-8 sm:pb-7 lg:gap-6 lg:px-12 lg:pb-9"
+            className="relative mt-[clamp(3rem,11dvh,7.5rem)] flex w-full flex-col gap-4 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface px-4 pb-5 pt-[clamp(2.75rem,8dvh,5.5rem)] shadow-[0_8px_0_0] shadow-neo-purple sm:gap-5 sm:px-8 sm:pb-7 lg:gap-6 lg:px-12 lg:pb-9"
           >
             <m.div
               aria-hidden="true"
@@ -120,7 +120,7 @@ export function ClassroomGuestDemo() {
                   'transition-[filter,background-color,color,box-shadow,border-color] duration-200 motion-reduce:transition-none',
                   ready
                     ? cn(pressClasses(4), 'border-neo-black bg-neo-lime text-neo-black shadow-neo-lime-dark')
-                    : 'cursor-not-allowed border-neo-lime/70 bg-neo-lime/10 text-neo-lime shadow-[0_4px_0_0] shadow-neo-lime-dark/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+                    : 'cursor-not-allowed border-neo-lime/70 bg-neo-lime/10 text-edu-lime-ink shadow-[0_4px_0_0] shadow-neo-lime-dark/60 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
                 )}
               >
                 {t('joinByCode.submit')}
@@ -136,7 +136,7 @@ export function ClassroomGuestDemo() {
 
 function ClassroomGuestDemoLive({ label, reduced }: { label: string; reduced: boolean }) {
   return (
-    <p data-testid="guest-join-live" className="mx-auto mt-2 flex w-fit max-w-full items-center justify-center gap-2 text-start font-neo-body text-[0.9375rem] font-bold leading-snug text-neo-cream/85 sm:gap-2.5 sm:text-lg lg:text-xl">
+    <p data-testid="guest-join-live" className="mx-auto mt-2 flex w-fit max-w-full items-center justify-center gap-2 text-start font-neo-body text-[0.9375rem] font-bold leading-snug text-edu-ink/85 sm:gap-2.5 sm:text-lg lg:text-xl">
       <span aria-hidden="true" className="relative flex size-3 shrink-0 items-center justify-center">
         {!reduced && (
           <m.span

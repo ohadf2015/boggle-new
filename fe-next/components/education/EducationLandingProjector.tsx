@@ -66,11 +66,11 @@ export function EducationLandingProjector({ youScore, children }: { youScore: nu
     <>
       <div
         aria-hidden="true"
-        className="flex items-center justify-between gap-3 border-b-3 border-neo-cream/40 bg-neo-navy px-3 py-2 sm:px-4"
+        className="flex items-center justify-between gap-3 border-b-3 border-edu-line bg-edu-surface px-3 py-2 sm:px-4"
       >
         <div className="flex min-w-0 items-center gap-2">
           <EduMascot moment="gameStart" size={36} className="size-9 shrink-0" />
-          <span className="truncate text-xs font-black uppercase tracking-wider text-neo-cream/75">
+          <span className="truncate text-xs font-black uppercase tracking-wider text-edu-ink/75">
             {t('eg6Land.projector.joinLabel')}
           </span>
         </div>
@@ -87,7 +87,7 @@ export function EducationLandingProjector({ youScore, children }: { youScore: nu
               key={p}
               data-player={p}
               className={cn(
-                'rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-1.5 py-1 transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none',
+                'rounded-neo border-2 border-edu-line bg-edu-surface px-1.5 py-1 transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none',
                 popped ? 'translate-y-0 opacity-100' : 'translate-y-1 opacity-0',
                 p === 'you' && 'border-neo-pink',
               )}
@@ -97,10 +97,10 @@ export function EducationLandingProjector({ youScore, children }: { youScore: nu
                 <span className={cn('grid size-5 shrink-0 place-items-center rounded-full border-2 border-neo-black text-xs font-black', CHIP_TONE[p])}>
                   {t(NAME_KEYS[p]).charAt(0)}
                 </span>
-                <span className="min-w-0 flex-1 truncate text-xs font-bold text-neo-cream">{t(NAME_KEYS[p])}</span>
-                <span className="font-neo-display text-sm font-black tabular-nums text-neo-cream">{scores[p]}</span>
+                <span className="min-w-0 flex-1 truncate text-xs font-bold text-edu-ink">{t(NAME_KEYS[p])}</span>
+                <span className="font-neo-display text-sm font-black tabular-nums text-edu-ink">{scores[p]}</span>
               </div>
-              <span aria-hidden="true" className="mt-1 block h-1.5 overflow-hidden rounded-full bg-neo-cream/15">
+              <span aria-hidden="true" className="mt-1 block h-1.5 overflow-hidden rounded-full bg-edu-ink/15">
                 <span
                   className={cn(
                     'block h-full rounded-full transition-[width] duration-300 motion-reduce:transition-none',

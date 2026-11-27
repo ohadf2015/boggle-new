@@ -17,7 +17,7 @@ export const WARM_UP_SAMPLE: Record<string, string[]> = {
 export function WarmUpPreview() {
   const { t, language } = useLanguage();
   return (
-    <div dir={language === 'he' ? 'rtl' : 'ltr'} className="fixed inset-0 z-[80] flex items-center justify-center bg-neo-navy px-4">
+    <div dir={language === 'he' ? 'rtl' : 'ltr'} className="fixed inset-0 z-[80] flex items-center justify-center bg-edu-page px-4">
       <WaitingWarmUp username="Maya" words={WARM_UP_SAMPLE[language] ?? WARM_UP_SAMPLE.en} t={t} />
     </div>
   );

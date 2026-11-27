@@ -50,11 +50,12 @@ export function DuelRevealMascot({ src, poster, label, className }: DuelRevealMa
       data-testid="duel-reveal-mascot"
       data-clip-state={clipState}
       className={cn(
-        'relative isolate aspect-square w-full overflow-hidden rounded-neo border-[3px] border-neo-cream bg-neo-navy shadow-hard',
+        'relative isolate aspect-square w-full overflow-hidden rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-hard',
         className
       )}
     >
       {/* The floor: always painted, never black. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- poster still under the reveal clip, sized by its frame */}
       <img
         data-testid="duel-reveal-still"
         src={poster}

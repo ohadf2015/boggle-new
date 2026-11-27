@@ -14,7 +14,7 @@
  *
  * Lesson-word tiles: after a player move that builds a lesson word, the cells
  * that turned "placed" in that move get `data-wk-gold` (see markNewGoldCells)
- * and glow gold for the rest of the match.
+ * and turn gold for the rest of the match.
  */
 
 import { useEffect, type RefObject } from 'react';
@@ -69,17 +69,17 @@ ${CELL}[data-wk-near="2"]::after { animation-delay: -1.1s; }
 ${CELL}[data-wk-near="3"]::after { animation-delay: -1.65s; }
 ${CELL}[data-wk-near="4"]::after { animation-delay: -2.2s; }
 ${CELL}[data-tile-state="empty"][data-cell-invite="true"] {
-  background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--neo-lime-light) 40%, rgb(var(--neo-black))), color-mix(in srgb, var(--neo-lime-light) 20%, rgb(var(--neo-black))));
+  background: color-mix(in srgb, var(--neo-lime-light) 30%, rgb(var(--neo-black)));
   box-shadow: inset 0 0 0 2px rgba(191,255,0,0.55), inset 0 3px 5px rgba(0,0,0,0.6);
 }
 ${CELL}[data-tile-state="empty"][data-drag-target="true"] { background: color-mix(in srgb, var(--neo-cyan-muted) 45%, rgb(var(--neo-black))); box-shadow: inset 0 0 0 3px var(--neo-cyan); }
 ${CELL}[data-tile-state="placed"], ${CELL}[data-tile-state="pending"] {
   color: color-mix(in srgb, var(--neo-cozy) 10%, rgb(var(--neo-black)));
-  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow-hover) 5%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-light) 40%, var(--neo-cream)) 100%);
-  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), inset 0 -4px 0 rgba(120,76,28,0.35), 0 2px 0 rgb(var(--neo-black));
+  background: var(--neo-cream);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 2px 0 rgb(var(--neo-black));
 }
-${CELL}[data-claim="player"] { background: linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan-light) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cyan-muted) 40%, rgb(var(--neo-white))) 100%); }
-${CELL}[data-claim="bot"] { background: linear-gradient(180deg, color-mix(in srgb, var(--neo-pink-light) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-pink-light) 40%, var(--neo-cream)) 100%); }
+${CELL}[data-claim="player"] { background: color-mix(in srgb, var(--neo-cyan-muted) 30%, rgb(var(--neo-white))); }
+${CELL}[data-claim="bot"] { background: color-mix(in srgb, var(--neo-pink-light) 30%, var(--neo-cream)); }
 ${CELL}[data-claim]::after {
   content: ''; position: absolute; left: 2px; right: 2px; bottom: 2px; height: 22%;
   border-top: 2px solid rgb(var(--neo-black)); border-radius: 0 0 4px 4px; pointer-events: none;
@@ -87,13 +87,13 @@ ${CELL}[data-claim]::after {
 ${CELL}[data-claim="player"]::after { background: var(--neo-cyan); }
 ${CELL}[data-claim="bot"]::after { background: var(--neo-pink); }
 ${CELL}[data-tile-state="pending"] {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-lime) 10%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-lime) 45%, rgb(var(--neo-white))) 100%);
-  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 0 0 2px var(--neo-lime), 0 0 14px 2px rgba(191,255,0,0.7), 0 3px 0 rgb(var(--neo-black));
+  background: var(--neo-lime);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 3px 0 rgb(var(--neo-black));
   ${reduce ? '' : 'animation: wk-pop 280ms cubic-bezier(.3,1.6,.5,1) both;'}
 }
 ${CELL}[data-wk-gold] {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 100%);
-  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 0 0 2px var(--neo-yellow), 0 0 16px 4px rgba(255,214,0,0.85);
+  background: var(--neo-yellow);
+  box-shadow: inset 0 0 0 2px rgb(var(--neo-black)), 0 3px 0 rgb(var(--neo-black));
   z-index: 5;
   ${reduce ? '' : 'animation: wk-gold 1.8s ease-in-out infinite;'}
 }
@@ -114,16 +114,16 @@ ${S} div:has(> div > [data-score-value="player"]) > div:nth-child(2) { display: 
 ${S} [data-score-value] { font-size: 46px; text-shadow: 3px 3px 0 rgb(var(--neo-black)); }
 ${S} [role="img"]:has(> .wc-bar-fill) {
   height: 20px; overflow: visible; border: 3px solid rgb(var(--neo-black)); border-radius: 9999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-pink) 20%, var(--neo-pink-light)), var(--neo-pink) 60%, color-mix(in srgb, var(--neo-pink) 75%, rgb(var(--neo-black)))); box-shadow: 0 4px 0 rgb(var(--neo-black));
+  background: var(--neo-pink); box-shadow: 0 4px 0 rgb(var(--neo-black));
 }
 ${S} .wc-bar-fill {
   border-radius: 0; border-start-start-radius: 9999px; border-end-start-radius: 9999px; border-inline-end: 0 !important;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--neo-cyan) 45%, rgb(var(--neo-white))), var(--neo-cyan) 60%, color-mix(in srgb, var(--neo-cyan-dark) 90%, var(--neo-purple-light)));
+  background: var(--neo-cyan);
 }
 ${S} .wc-bar-fill::after {
   content: ''; position: absolute; inset-inline-end: -13px; top: 50%; width: 26px; height: 26px; margin-top: -13px;
   border-radius: 9999px; border: 3px solid rgb(var(--neo-black)); box-shadow: 2px 2px 0 rgb(var(--neo-black));
-  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))), color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 55%, color-mix(in srgb, var(--neo-lime-dark) 50%, var(--neo-orange-hover)));
+  background: var(--neo-yellow);
 }
 ${S} [role="img"]:has(> .wc-bar-fill) > span[aria-hidden] { display: none; }
 ${S} span:has(> svg.lucide-crown) { display: none; }

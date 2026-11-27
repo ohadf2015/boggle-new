@@ -56,12 +56,12 @@ export function LiveActivityIndicator({
     case 'connected':
       if (activeStudentsCount > 0) {
         statusText = t('education.analytics.live');
-        statusColor = 'text-neo-cyan';
+        statusColor = 'text-edu-cyan-ink';
         dotColor = 'bg-neo-cyan';
         shouldPulse = true;
       } else {
         statusText = t('education.analytics.live');
-        statusColor = 'text-neo-white';
+        statusColor = 'text-edu-ink';
         dotColor = 'bg-green-500';
         shouldPulse = false;
       }
@@ -69,14 +69,14 @@ export function LiveActivityIndicator({
 
     case 'connecting':
       statusText = t('education.analytics.connecting');
-      statusColor = 'text-neo-lime';
+      statusColor = 'text-edu-lime-ink';
       dotColor = 'bg-neo-lime';
       shouldPulse = false;
       break;
 
     case 'error':
       statusText = t('education.analytics.connectionError');
-      statusColor = 'text-neo-orange';
+      statusColor = 'text-edu-orange-ink';
       dotColor = 'bg-neo-orange';
       shouldPulse = false;
       break;
@@ -84,8 +84,8 @@ export function LiveActivityIndicator({
     case 'disconnected':
     default:
       statusText = t('education.analytics.offline');
-      statusColor = 'text-neo-white';
-      dotColor = 'bg-neo-navy';
+      statusColor = 'text-edu-ink';
+      dotColor = 'bg-edu-surface';
       shouldPulse = false;
       break;
   }
@@ -149,7 +149,7 @@ export function LiveActivityIndicator({
 
         {/* Activity/Last Update */}
         {activityText && (
-          <span className="text-xs text-neo-white font-neo-body">
+          <span className="text-xs text-edu-ink font-neo-body">
             {activityText}
             {lastUpdateText && ` • ${lastUpdateText}`}
           </span>

@@ -10,7 +10,7 @@ describe('<TeacherBrand>', () => {
   it('reads the "for Teachers" subtitle as quiet cream, not a second lime accent', () => {
     render(<TeacherBrand href="/en/teacher" t={(k) => k} />);
     const tagline = screen.getByText('eduShell.brand.tagline');
-    expect(tagline.className).toContain('text-neo-cream/70');
-    expect(tagline.className).not.toContain('text-neo-lime');
+    expect(tagline.className).toContain('text-edu-ink/70');
+    expect(tagline.className).not.toContain('text-edu-lime-ink');
   });
 });

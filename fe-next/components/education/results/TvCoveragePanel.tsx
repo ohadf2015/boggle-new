@@ -39,12 +39,12 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
   return (
     <section
       data-testid="tv-coverage-panel"
-      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
+      className="flex flex-col @5xl/results:min-h-0 @5xl/results:flex-initial @5xl/results:overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard-xl px-3 pt-3 pb-0 @5xl/results:p-3 @[96rem]/results:p-4"
     >
       {practice && !(compact && phone) && (
         <p
           data-testid="tv-practice-note"
-          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream'}
+          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream edu-sky:text-edu-ink' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream edu-sky:text-edu-ink'}
         >
           {t('eduLive.results.practice.coverageNote')}
         </p>
@@ -52,7 +52,7 @@ export function TvCoveragePanel({ summary, players, neverPlaced, stage, pointsWi
       {!practice && verdict === 'wholeLesson' && !(compact && phone) && (
         <p
           data-testid="tv-reteach-whole-lesson"
-          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream'}
+          className={phone ? 'mb-1.5 font-neo-display font-bold text-sm text-neo-cream edu-sky:text-edu-ink' : 'mb-2 font-neo-display font-bold text-base @[96rem]/results:text-xl text-neo-cream edu-sky:text-edu-ink'}
         >
           {t('education.results.wholeLessonAgain')}
         </p>

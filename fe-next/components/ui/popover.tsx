@@ -19,7 +19,7 @@ const PopoverContent = React.forwardRef<
       align={align}
       sideOffset={sideOffset}
       className={cn(
-        "z-100 w-72 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-neo-navy-light p-4 text-neo-black dark:text-neo-white shadow-hard-lg outline-none",
+        "z-100 w-72 rounded-neo border-3 border-neo-black dark:border-slate-500 bg-neo-cream dark:bg-neo-navy-light p-4 text-neo-black dark:text-neo-white edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:text-edu-ink shadow-hard-lg outline-none",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
         "origin-[--radix-popover-content-transform-origin]",

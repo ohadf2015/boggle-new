@@ -27,10 +27,10 @@ export function LandingModes() {
 
   return (
     <section id="modes" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-14 lg:px-8">
-      <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-neo-white [overflow-wrap:anywhere] sm:text-3xl">
+      <h2 className="text-balance font-neo-poster text-2xl font-extrabold leading-tight tracking-[-0.01em] text-edu-ink [overflow-wrap:anywhere] sm:text-3xl">
         {t('eduPlans.modes.title', { count: modes.length })}
       </h2>
-      <p className="mt-2 max-w-[60ch] text-base text-neo-white/75">
+      <p className="mt-2 max-w-[60ch] text-base text-edu-ink/75">
         {t('eduPro.modesSub', t('eduPlans.modes.sub'))}
       </p>
 
@@ -65,13 +65,13 @@ export function LandingModes() {
           <li
             key={mode.id}
             data-testid="landing-mode-card"
-            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light py-1.5 pe-2 ps-1.5"
+            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-neo border-2 border-edu-line bg-edu-surface py-1.5 pe-2 ps-1.5"
           >
             <span className={`relative size-8 shrink-0 overflow-hidden rounded-neo-sm border-2 border-neo-black ${ACCENT_BG[mode.accent]}`}>
               <Image src={mode.poster} alt="" aria-hidden="true" width={32} height={32} className="absolute inset-0 size-full object-contain object-bottom" />
             </span>
-            <span className="font-neo-display text-sm font-black text-neo-white">{t(mode.nameKey)}</span>
-            <DeliveryTag delivery={mode.delivery} t={t} className="bg-neo-cream/15" />
+            <span className="font-neo-display text-sm font-black text-edu-ink">{t(mode.nameKey)}</span>
+            <DeliveryTag delivery={mode.delivery} t={t} />
           </li>
         ))}
       </ul>

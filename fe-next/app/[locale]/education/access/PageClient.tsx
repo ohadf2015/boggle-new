@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Gift, KeyRound, ShieldCheck } from 'lucide-react';
+import { Gift, KeyRound, ShieldCheck, Sparkle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
@@ -19,7 +19,6 @@ import { LandingHeader } from '@/components/education/landing/LandingHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { MascotRig } from '@/components/motion/MascotRig';
-import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { accessHandoffHref, type AccessApproval } from '@/components/education/AccessRequestHandoff';
 
 const TRUST = [
@@ -103,7 +102,7 @@ export function PageClient() {
   const statusCard = handingOff ? (
     <div
       role="status"
-      className="flex min-h-[220px] items-center justify-center rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy p-6 shadow-hard-lg sm:min-h-[260px]"
+      className="flex min-h-[220px] items-center justify-center rounded-neo border-neo-thick border-edu-line bg-edu-page p-6 shadow-hard-lg sm:min-h-[260px]"
     >
       <PageLoader size="md" text={t('education.access.class_ready_creating')} />
     </div>
@@ -114,7 +113,7 @@ export function PageClient() {
       <button
         type="button"
         onClick={retry}
-        className="mt-4 inline-flex min-h-11 items-center rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+        className="mt-4 inline-flex min-h-11 items-center rounded-neo border-neo border-edu-line bg-edu-page px-5 py-3 font-neo-display font-bold text-edu-ink shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
       >
         {t('education.access.load_error_retry')}
       </button>
@@ -125,7 +124,7 @@ export function PageClient() {
         <div
           data-testid="access-gate-skeleton"
           aria-hidden="true"
-          className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-6 sm:min-h-[260px]"
+          className="min-h-[220px] animate-pulse rounded-neo border-neo-thick border-edu-line bg-edu-surface p-6 sm:min-h-[260px]"
         />
       )}
 
@@ -133,12 +132,12 @@ export function PageClient() {
       {settledWithoutRole && status === 'approved' && <AccessPendingCard mode="review" request={latestRequest} onApproved={setApproval} />}
 
       {!isLoading && status === 'declined' && (
-        <div className="rounded-neo border-neo-thick border-neo-black bg-neo-pink p-6 text-neo-white shadow-hard-lg">
+        <div className="rounded-neo border-neo-thick border-neo-black bg-neo-pink p-6 text-edu-ink shadow-hard-lg">
           <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
             {t('education.access.declined_title')}
           </h2>
           {latestRequest?.admin_note && (
-            <p className="mt-3 rounded-neo border border-neo-cream/60 bg-neo-navy/50 p-3 text-sm">
+            <p className="mt-3 rounded-neo border border-edu-line bg-edu-surface/50 p-3 text-sm">
               {latestRequest.admin_note}
             </p>
           )}
@@ -160,7 +159,7 @@ export function PageClient() {
             <p className="mt-2">{t('education.access.status_unknown_body')}</p>
             <Link
               href={`/${language}/teacher`}
-              className="mt-4 inline-block rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-5 py-3 font-neo-display font-bold text-neo-white shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+              className="mt-4 inline-block rounded-neo border-neo border-edu-line bg-edu-surface px-5 py-3 font-neo-display font-bold text-edu-ink shadow-hard transition hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0 active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
             >
               {t('education.access.go_to_teacher')}
             </Link>
@@ -173,7 +172,7 @@ export function PageClient() {
   if (approved) {
     return (
       <EducationShell header={<LandingHeader showStart={false} />} contentClassName="flex flex-col">
-        <main className="flex flex-1 flex-col text-neo-white">
+        <main className="flex flex-1 flex-col text-edu-ink">
           <section className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-4 pb-10 pt-16">
             <AccessApprovedCard trial={trial} showTrial={!hasPro && !proLoading} autoContinue={!returnTo} />
           </section>
@@ -184,27 +183,32 @@ export function PageClient() {
 
   return (
     <EducationShell header={<LandingHeader showStart={false} />}>
-      <main className="text-neo-white">
-        <section className={`mx-auto px-4 py-5 sm:py-12 ${showPitch ? 'max-w-md pt-[4svh] sm:pt-[8svh]' : 'max-w-2xl'}`}>
+      <main className="text-edu-ink">
+        <section className={`mx-auto px-4 py-5 sm:py-12 ${showPitch ? 'max-w-lg pt-[2svh] sm:pt-[4svh]' : 'max-w-2xl'}`}>
           {/* Only for someone who still has to apply — an approved teacher who
               happens to carry a `from` needs their status, not this. */}
           {showPitch && !handingOff && <AccessRedirectNotice from={redirectedFrom} />}
 
           {/* No `priority`: the h1 is the LCP; the mascot is a fixed box, so it never shifts it. */}
           {showPitch && (
-            <div aria-hidden="true" className="relative isolate flex justify-center overflow-hidden rounded-3xl border-2 border-neo-cyan/70 bg-neo-cyan/10 py-3">
-              <AmbientBackdrop theme="teacher" density="lively" hill={false} />
+            <div aria-hidden="true" dir="ltr" data-testid="access-art" className="relative isolate mx-auto flex h-[176px] sm:h-[232px] w-full max-w-[19rem] items-end justify-center sm:max-w-[25rem]">
+              <span data-testid="access-stage" className="absolute bottom-1 left-1/2 -z-10 h-9 w-44 -translate-x-1/2 rounded-[50%] border-[3px] border-neo-black bg-neo-cyan shadow-edu-lip sm:h-11 sm:w-60" />
+              <span className="edu-tile absolute left-1 top-5 size-16 -rotate-12 bg-neo-pink text-4xl sm:left-4 sm:top-6 sm:size-20 sm:text-5xl">A</span>
               <MascotRig state="hop">
                 <Image
                   src="/mascot/teacher/teacher-hero.webp"
                   alt=""
                   width={1024}
                   height={1024}
-                  sizes="176px"
+                  sizes="250px"
                   data-testid="access-mascot"
-                  className="h-[136px] w-[136px] drop-shadow-[0_4px_0_black] sm:h-[176px] sm:w-[176px]"
+                  className="-mb-3 h-[180px] w-[180px] drop-shadow-[0_4px_0_black] sm:-mb-5 sm:h-[250px] sm:w-[250px]"
                 />
               </MascotRig>
+              <span className="edu-tile absolute right-1 top-12 size-16 rotate-12 bg-neo-cyan text-4xl sm:right-4 sm:top-16 sm:size-20 sm:text-5xl">B</span>
+              <Sparkle className="absolute left-[18%] top-0 size-6 fill-neo-yellow text-neo-black sm:size-7" strokeWidth={2.5} />
+              <Sparkle className="absolute bottom-6 left-6 size-5 fill-neo-yellow text-neo-black sm:left-10 sm:size-6" strokeWidth={2.5} />
+              <Sparkle className="absolute right-[16%] top-1 size-5 fill-neo-yellow text-neo-black sm:size-6" strokeWidth={2.5} />
             </div>
           )}
 
@@ -214,13 +218,13 @@ export function PageClient() {
             {t('education.access.h1')}
           </h1>
           {!showPitch && (
-            <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85 max-sm:hidden">{t('teacher.classroom.wizard.subtitle')}</p>
+            <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-edu-ink/85 max-sm:hidden">{t('teacher.classroom.wizard.subtitle')}</p>
           )}
 
           <div className="mt-5 sm:mt-7">{statusCard}</div>
         </section>
 
-        <section className={`mx-auto px-4 pb-14 ${showPitch ? 'max-w-md' : 'max-w-2xl'}`}>
+        <section className={`mx-auto px-4 pb-14 ${showPitch ? 'max-w-lg' : 'max-w-2xl'}`}>
           {showPitch && (
             <ul className="flex flex-col gap-4">
               {TRUST.map(({ key, Icon, chip }) => (
@@ -228,7 +232,7 @@ export function PageClient() {
                   <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-neo-black ${chip} text-neo-navy shadow-[0_3px_0_0] shadow-neo-black`}>
                     <Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
                   </span>
-                  <span className="font-semibold text-neo-white">{t(key)}</span>
+                  <span className="font-semibold text-edu-ink">{t(key)}</span>
                 </li>
               ))}
             </ul>
@@ -238,17 +242,17 @@ export function PageClient() {
           <div ref={belowRef} className="mt-12">
             <ol
               data-access-reveal
-              className="grid divide-y-2 divide-neo-cream/15 overflow-hidden rounded-3xl border-2 border-neo-cream/50 bg-neo-navy-light/60"
+              className="grid divide-y-2 divide-edu-line/15 overflow-hidden rounded-3xl border-2 border-edu-line bg-edu-surface/60"
             >
               {STEPS.map(({ title, body }, i) => (
                 <li key={title} className="p-5">
-                  <span className="font-neo-display text-sm font-black text-neo-lime">
+                  <span className="font-neo-display text-sm font-black text-edu-lime-ink">
                     {i + 1}
                   </span>
-                  <h2 className="mt-1 font-neo-display text-base font-bold text-neo-white">
+                  <h2 className="mt-1 font-neo-display text-base font-bold text-edu-ink">
                     {t(title)}
                   </h2>
-                  <p className="mt-1 text-sm leading-relaxed text-neo-white/70">
+                  <p className="mt-1 text-sm leading-relaxed text-edu-ink/70">
                     {t(body)}
                   </p>
                 </li>

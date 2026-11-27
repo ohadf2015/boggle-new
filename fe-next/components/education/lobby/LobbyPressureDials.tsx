@@ -60,11 +60,11 @@ export function LobbyPressureDials({ pressure, onChange, access }: LobbyPressure
   return (
     <section
       data-testid="pressure-dials"
-      className="space-y-3 rounded-neo-lg border-2 border-neo-cream/35 bg-neo-navy-light p-3"
+      className="space-y-3 rounded-neo-lg border-2 border-edu-line bg-edu-surface p-3"
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-neo-cream">
-          <Gauge className="size-4 shrink-0 text-neo-cream/70" strokeWidth={3} aria-hidden="true" />
+        <span className="inline-flex min-w-[7.5rem] items-center gap-1.5 font-neo-display text-sm font-bold text-edu-ink">
+          <Gauge className="size-4 shrink-0 text-edu-ink/70" strokeWidth={3} aria-hidden="true" />
           {t('teacher.classroom.pressure.title')}
         </span>
         {!locked && <ProPoweredChip />}

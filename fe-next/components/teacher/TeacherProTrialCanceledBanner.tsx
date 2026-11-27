@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { PRO_BANNER_CTA, ProBanner, ProShine } from './pro/ProBanner';
 import { TrialUsageRecap } from './pro/TrialUsageRecap';
-import { NEO_FOCUS } from '@/components/ui/neoStyles';
+import { EDU_FOCUS } from '@/components/education/eduNeoStyles';
 
 const DATE_LOCALE: Record<string, string> = {
   en: 'en-US', he: 'he-IL', sv: 'sv-SE', ja: 'ja-JP', es: 'es-ES', ru: 'ru-RU',
@@ -33,7 +33,7 @@ const CANCEL_REASON_CHIPS = [
 
 const CHIP = cn(
   'min-h-[36px] rounded-neo-pill border-2 border-neo-black bg-neo-cream px-3 font-neo-body text-xs font-black text-neo-navy shadow-hard-sm transition-transform duration-150 hover:-translate-y-0.5 active:scale-[0.97] motion-reduce:transition-none',
-  NEO_FOCUS,
+  EDU_FOCUS,
 );
 
 export function CancelReasonChips({ initialReason }: { initialReason: string | null }) {
@@ -62,14 +62,14 @@ export function CancelReasonChips({ initialReason }: { initialReason: string | n
 
   if (answered) {
     return (
-      <p data-testid="cancel-reason-thanks" className="mt-2 text-xs font-bold text-neo-cream/70">
+      <p data-testid="cancel-reason-thanks" className="mt-2 text-xs font-bold text-edu-ink/70">
         {t('teacher.subscription.cancelReasonThanks')}
       </p>
     );
   }
   return (
-    <div data-testid="cancel-reason-row" className="mt-3 border-t-2 border-neo-cream/15 pt-3">
-      <p data-testid="cancel-reason-prompt" className="text-xs font-black uppercase tracking-wide text-neo-cream/70">
+    <div data-testid="cancel-reason-row" className="mt-3 border-t-2 border-edu-line/15 pt-3">
+      <p data-testid="cancel-reason-prompt" className="text-xs font-black uppercase tracking-wide text-edu-ink/70">
         {t('teacher.subscription.cancelReasonPrompt')}
       </p>
       <div className="mt-2 flex flex-wrap gap-2" data-testid="teacher-pro-trial-cancel-reasons">

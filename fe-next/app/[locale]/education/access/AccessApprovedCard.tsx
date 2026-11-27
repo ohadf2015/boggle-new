@@ -10,12 +10,12 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import type { TrialStatus } from '@/lib/education/trial';
 
 const PRIMARY =
-  'group flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-navy px-5 py-3 ' +
-  'font-neo-display text-lg font-black text-neo-white text-balance shadow-hard-lg transition-[box-shadow,transform] duration-100 ' +
+  'group flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-black bg-edu-page px-5 py-3 ' +
+  'font-neo-display text-lg font-black text-edu-ink text-balance shadow-hard-lg transition-[box-shadow,transform] duration-100 ' +
   'hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0.5 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
 const SECONDARY =
   'flex min-h-11 w-full items-center justify-center rounded-neo border-neo border-neo-navy/40 px-4 py-2 font-neo-display text-base font-bold ' +
-  'text-neo-navy transition-colors hover:bg-neo-navy/10 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
+  'text-neo-navy transition-colors hover:bg-edu-surface/10 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan';
 
 function TrialNote({ trial }: { trial: TrialStatus }) {
   const { t, language } = useLanguage();
@@ -58,7 +58,7 @@ export function AccessApprovedCard({ trial, showTrial, autoContinue = false }: {
       </h1>
       {isLoading ? (
         <div data-testid="approved-actions-loading" aria-hidden="true" className="mt-6 flex flex-col gap-3">
-          <div className="min-h-14 animate-pulse rounded-neo bg-neo-navy/20" />
+          <div className="min-h-14 animate-pulse rounded-neo bg-edu-surface/20" />
           <div className="min-h-11" />
         </div>
       ) : (

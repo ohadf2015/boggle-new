@@ -53,9 +53,9 @@ export function accuracyTone(pct: number): AccuracyTone {
  * as pale green.
  */
 export const TONE_TEXT: Record<AccuracyTone, string> = {
-  success: 'text-neo-lime print:text-green-800',
-  warning: 'text-neo-yellow print:text-amber-800',
-  danger: 'text-neo-pink print:text-red-700',
+  success: 'text-edu-lime-ink print:text-green-800',
+  warning: 'text-edu-yellow-ink print:text-amber-800',
+  danger: 'text-edu-pink-ink print:text-red-700',
 };
 
 export type RoundSortKey = 'score' | 'accuracy' | 'name';

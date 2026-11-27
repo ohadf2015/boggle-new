@@ -30,6 +30,7 @@ import { ReportsProGate } from './ReportsGate';
 import { ReportsClassView } from './ReportsClassView';
 import { ReportsStudentView } from './ReportsStudentView';
 import { ownedClassroomId, reportId, resolveReportTab, type ReportTab } from './reportParams';
+import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 
 /** Slide distance for the drill-down; the direction follows depth and locale. */
 const SLIDE_PX = 56;
@@ -201,10 +202,13 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
   if (!selectedClassroomId) {
     view = (
       <>
-        <h1 data-wipe className="mb-2 font-neo-display text-3xl font-bold leading-tight text-neo-white sm:text-4xl">
-          {t('teacher.reports.title')}
-        </h1>
-        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-neo-cream/85 max-sm:hidden">
+        <div className="mb-3 flex items-center justify-between gap-4">
+          <h1 data-wipe className="min-w-0 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">
+            {t('teacher.reports.title')}
+          </h1>
+          <HeadingMascot moment="success" testId="reports-heading-mascot" />
+        </div>
+        <p data-testid="reports-value-line" dir="auto" className="mb-5 max-w-prose text-base leading-snug text-edu-ink/85 max-sm:hidden">
           {t('teacher.reports.valueLine', 'After every game, see which words each class missed, who needs help, and what to practice next.')}
         </p>
 
@@ -214,7 +218,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
           <ReportsReteachPanel classrooms={classrooms} onShown={setShownClassId} />
         ) : null}
 
-        <h2 className="mb-3 text-base font-bold text-neo-cream">{t('teacher.reports.selectClassroom')}</h2>
+        <h2 className="mb-3 text-base font-bold text-edu-ink">{t('teacher.reports.selectClassroom')}</h2>
 
         {classroomsLoading ? (
           <div aria-busy="true" className="grid gap-3 sm:grid-cols-2">
@@ -222,7 +226,7 @@ function TeacherReportsInner({ gradePassbackEnabled }: { gradePassbackEnabled: b
               {t('teacher.reports.loadingClassrooms')}
             </span>
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+              <div key={i} aria-hidden="true" className="h-20 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
             ))}
           </div>
         ) : classrooms && classrooms.length > 0 ? (

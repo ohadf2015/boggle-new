@@ -35,10 +35,10 @@ export default function WordChips({ words, language, fresh, selected, onSelect, 
               data-issue={issue ?? undefined}
               style={slot !== undefined ? { animationDelay: `${Math.min(slot * 28, 420)}ms` } : undefined}
               className={cn(
-                'group inline-flex max-w-full min-w-0 items-stretch rounded-neo border-2 bg-neo-navy-light shadow-hard-sm',
+                'group inline-flex max-w-full min-w-0 items-stretch rounded-neo border-2 bg-edu-surface shadow-hard-sm',
                 'transition-transform duration-150 hover:-translate-y-0.5',
                 slot !== undefined && 'motion-safe:animate-neo-pop motion-safe:opacity-0',
-                issue ? 'border-neo-pink' : 'border-neo-cream',
+                issue ? 'border-neo-pink' : 'border-edu-line',
                 isSelected && 'ring-3 ring-neo-cyan',
               )}
             >
@@ -50,10 +50,10 @@ export default function WordChips({ words, language, fresh, selected, onSelect, 
                 title={issue ? t(`eduLibrary.issue.${issue}`) : undefined}
                 className="flex min-w-0 items-baseline gap-1.5 px-2.5 py-1.5 text-start focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
               >
-                {issue && <AlertTriangle className="size-3.5 shrink-0 self-center text-neo-pink" aria-hidden="true" />}
-                <span className="truncate font-neo-body text-sm font-bold text-neo-white">{w.word}</span>
+                {issue && <AlertTriangle className="size-3.5 shrink-0 self-center text-edu-pink-ink" aria-hidden="true" />}
+                <span className="truncate font-neo-body text-sm font-bold text-edu-ink">{w.word}</span>
                 {w.definition && (
-                  <span className="hidden max-w-[11rem] truncate text-xs text-neo-white/70 sm:inline">{w.definition}</span>
+                  <span className="hidden max-w-[11rem] truncate text-xs text-edu-ink/70 sm:inline">{w.definition}</span>
                 )}
                 {w.definition && <span className="sr-only sm:hidden">{w.definition}</span>}
                 {!w.definition && <span className="sr-only">{t('eduLibrary.editor.noDefinition')}</span>}
@@ -63,7 +63,7 @@ export default function WordChips({ words, language, fresh, selected, onSelect, 
                 type="button"
                 onClick={() => onRemove(i)}
                 aria-label={t('eduLibrary.editor.removeWord', { word: w.word })}
-                className="flex w-8 shrink-0 items-center justify-center border-s-2 border-neo-cream/40 text-neo-white/70 hover:text-neo-pink focus:outline-hidden focus-visible:text-neo-pink"
+                className="flex w-8 shrink-0 items-center justify-center border-s-2 border-edu-line text-edu-ink/70 hover:text-edu-pink-ink focus:outline-hidden focus-visible:text-edu-pink-ink"
               >
                 <X className="size-3.5" strokeWidth={3} aria-hidden="true" />
               </button>
@@ -78,15 +78,15 @@ export default function WordChips({ words, language, fresh, selected, onSelect, 
           className="grid gap-2 rounded-neo border-2 border-neo-cyan bg-neo-black/40 p-3 shadow-hard-sm motion-safe:animate-pop-in sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto]"
         >
           <label className="block min-w-0">
-            <span className="mb-1 block text-xs font-bold uppercase text-neo-white/70">{t('eduLibrary.editor.word')}</span>
+            <span className="mb-1 block text-xs font-bold uppercase text-edu-ink/70">{t('eduLibrary.editor.word')}</span>
             <input
               value={current.word}
               onChange={(e) => onChange(selected, { word: e.target.value })}
-              className="h-10 w-full min-w-0 rounded-neo border-2 border-neo-cream bg-neo-navy px-2 font-neo-body text-neo-white focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+              className="h-10 w-full min-w-0 rounded-neo border-2 border-edu-line bg-edu-surface px-2 font-neo-body text-edu-ink focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
           </label>
           <label className="block min-w-0">
-            <span className="mb-1 block text-xs font-bold uppercase text-neo-white/70">{t('eduLibrary.editor.definition')}</span>
+            <span className="mb-1 block text-xs font-bold uppercase text-edu-ink/70">{t('eduLibrary.editor.definition')}</span>
             <input
               data-testid="list-word-definition"
               autoFocus
@@ -94,7 +94,7 @@ export default function WordChips({ words, language, fresh, selected, onSelect, 
               onChange={(e) => onChange(selected, { definition: e.target.value })}
               onKeyDown={(e) => { if (e.key === 'Enter') onSelect(null); }}
               placeholder={t('eduLibrary.editor.definitionPlaceholder')}
-              className="h-10 w-full min-w-0 rounded-neo border-2 border-neo-cream bg-neo-navy px-2 font-neo-body text-neo-white placeholder:text-neo-white/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+              className="h-10 w-full min-w-0 rounded-neo border-2 border-edu-line bg-edu-surface px-2 font-neo-body text-edu-ink placeholder:text-edu-ink/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
           </label>
           <button

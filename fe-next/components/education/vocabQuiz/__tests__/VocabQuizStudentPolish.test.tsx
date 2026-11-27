@@ -66,14 +66,14 @@ describe('Student quiz phone — the question is the hero', () => {
     const prompt = screen.getByTestId('vocab-quiz-prompt');
     expect(prompt).toHaveTextContent('to leave behind for good');
     expect(prompt.className).toContain('font-black');
-    expect(screen.getByTestId('vocab-quiz-focus').className).toContain('text-neo-purple');
+    expect(screen.getByTestId('vocab-quiz-focus')).toHaveClass('bg-neo-pink', 'text-neo-black');
   });
 
   it('Given the last seconds tick, Then the clock turns orange without an opacity pulse on the full-width strip', () => {
     const { socket, server } = makeSocket();
     render(<VocabQuizView socket={socket} username="ana" t={t} />);
     server(VOCAB_QUIZ_EVENTS.question, { ...QUESTION, remainingMs: 3_000, serverNow: Date.now() });
-    expect(screen.getByRole('timer').className).toContain('text-neo-orange');
+    expect(screen.getByRole('timer').className).toContain('text-edu-orange-ink');
     expect(screen.getByRole('timer').outerHTML).not.toContain('animate-pulse');
   });
 });

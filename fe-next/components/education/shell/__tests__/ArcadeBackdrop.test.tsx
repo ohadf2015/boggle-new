@@ -2,7 +2,7 @@ import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, cleanup } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ArcadeBackdrop } from '../ArcadeBackdrop';
+import { ArcadeBackdrop, HIDE_ON_SKY } from '../ArcadeBackdrop';
 import { EducationShell } from '../EducationShell';
 
 const pathname = vi.hoisted(() => ({ current: '/' }));
@@ -30,6 +30,12 @@ describe('ArcadeBackdrop', () => {
     const bg = getByTestId('arcade-backdrop');
     expect(bg.getAttribute('aria-hidden')).toBe('true');
     expect(bg.className).toContain('pointer-events-none');
+  });
+
+  it('Given a sky page, Then the shapes step aside so the plain sky carries the screen', () => {
+    const { getByTestId } = render(<ArcadeBackdrop />);
+    expect(getByTestId('arcade-backdrop').className).toContain(HIDE_ON_SKY);
+    expect(HIDE_ON_SKY).toBe('[[data-edu-theme=sky]_&]:hidden');
   });
 
   it('Then it draws five to seven outlined shapes, faint enough that text on top stays legible', () => {

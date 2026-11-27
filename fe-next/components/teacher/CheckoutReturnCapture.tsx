@@ -161,7 +161,7 @@ function CheckoutReturnBanner() {
           <button
             type="button"
             data-testid="checkout-return-dismiss"
-            className={cn(NB_SMALL, 'bg-neo-navy text-neo-cream')}
+            className={cn(NB_SMALL, 'bg-edu-surface text-edu-ink')}
             onClick={dismiss}
           >
             {t('teacher.checkoutReturn.close')}

@@ -184,9 +184,9 @@ export function MissGapAsyncAssignment({
     return (
       <div
         data-testid="miss-gap-async-assignment"
-        className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard text-center"
+        className="w-full max-w-xl p-6 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard text-center"
       >
-        <p className="text-neo-white font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
+        <p className="text-neo-white edu-sky:text-edu-ink font-neo-body mb-4">{t(classGapCardKind(payload) === 'sweep' ? 'education.results.allFound' : 'eg2Fix.gap.empty')}</p>
         <Link
           href={`/${locale}/education`}
           className="inline-flex items-center justify-center px-4 py-3 font-bold bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo shadow-hard focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
@@ -210,8 +210,8 @@ export function MissGapAsyncAssignment({
           'lg:max-w-5xl lg:grid lg:grid-cols-2 lg:items-start lg:content-start lg:gap-5',
       )}
     >
-      <section className="p-6 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard">
-        <p className="text-neo-lime font-bold text-xs uppercase tracking-widest mb-2">
+      <section className="p-6 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard">
+        <p className="text-neo-lime edu-sky:text-edu-lime-ink font-bold text-xs uppercase tracking-widest mb-2">
           {isTeacher
             ? t('education.results.assignMissGapAsyncEyebrow')
             : t('education.homework.studentEyebrow')}
@@ -227,13 +227,13 @@ export function MissGapAsyncAssignment({
             className="w-20 h-20 mb-1 drop-shadow-[4px_4px_0_rgba(0,0,0,0.4)]"
           />
         ) : null}
-        <h1 className="text-neo-white font-neo-display font-bold text-2xl leading-tight">
+        <h1 className="text-neo-white edu-sky:text-edu-ink font-neo-display font-bold text-2xl leading-tight">
           {isTeacher
             ? t('education.results.assignMissGapAsyncHeading')
             : t(pluralKeyOf('education.homework.studentTitle', words.length, language), { count: words.length })}
         </h1>
         {isTeacher ? (
-          <p className="text-neo-cream font-neo-body text-sm mt-3">
+          <p className="text-neo-cream edu-sky:text-edu-ink font-neo-body text-sm mt-3">
             {t('education.results.assignMissGapAsyncSubtitle')}
           </p>
         ) : (
@@ -241,8 +241,8 @@ export function MissGapAsyncAssignment({
             {classStreak.resolved ? (
               <MissGapStreakFlame streak={classStreak.streak} size="hero" />
             ) : (
-              <p className="flex items-center gap-2 text-neo-cream text-sm">
-                <Flame className="w-4 h-4 text-neo-orange" aria-hidden />
+              <p className="flex items-center gap-2 text-neo-cream edu-sky:text-edu-ink text-sm">
+                <Flame className="w-4 h-4 text-neo-orange edu-sky:text-edu-orange-ink" aria-hidden />
                 {t('education.homework.classStreakChecking')}
               </p>
             )}

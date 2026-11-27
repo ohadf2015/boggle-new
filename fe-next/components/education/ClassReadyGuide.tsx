@@ -54,9 +54,9 @@ export function ClassReadyGuide({
       key="ask"
       data-testid="setup-together"
       {...enter(reduced)}
-      className="flex flex-col gap-4 rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light p-4 shadow-hard-xl sm:p-6"
+      className="flex flex-col gap-4 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-4 shadow-hard-xl sm:p-6"
     >
-      <h2 className="font-neo-display text-2xl font-black text-neo-cream sm:text-3xl">{t(`${K}.askTitle`)}</h2>
+      <h2 className="font-neo-display text-2xl font-black text-edu-ink sm:text-3xl">{t(`${K}.askTitle`)}</h2>
       <button type="button" data-testid="setup-together-now" data-hero="true" disabled={!ready} onClick={onWithStudents} className={cn(BIG_CHOICE, 'bg-neo-lime text-neo-black')}>
         <UsersRound className="size-7 shrink-0" aria-hidden="true" />
         <span className="min-w-0">
@@ -67,7 +67,7 @@ export function ClassReadyGuide({
       {tryAsStudent ? (
         <div data-testid="setup-try-hero" className="flex flex-col gap-1.5">
           {tryAsStudent}
-          <p className="px-1 font-neo-body text-sm font-semibold text-neo-cream/75">{t(`${K}.tryBody`)}</p>
+          <p className="px-1 font-neo-body text-sm font-semibold text-edu-ink/75">{t(`${K}.tryBody`)}</p>
         </div>
       ) : null}
       <button type="button" data-testid="setup-together-later" disabled={!ready} onClick={onAlone} className={cn(NB_LINK, 'self-start')}>

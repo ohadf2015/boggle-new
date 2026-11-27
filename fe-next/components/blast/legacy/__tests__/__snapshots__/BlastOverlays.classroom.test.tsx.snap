@@ -1,0 +1,30 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Blast join and tip overlays in a classroom round > arcade: the first-use tile tip keeps its exact classes 1`] = `
+[
+  "pointer-events-none relative z-30 flex w-full justify-center px-3",
+  "pointer-events-auto flex max-w-xs items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-2 text-neo-cream shadow-hard ",
+  "text-2xl leading-none",
+  "min-w-0 flex-1",
+  "font-neo-display text-sm font-bold leading-tight text-neo-lime",
+  "font-neo-body text-xs leading-snug text-neo-cream/90",
+]
+`;
+
+exports[`Blast join and tip overlays in a classroom round > arcade: the loading gate (fresh join and reconnect) keeps its exact classes 1`] = `
+[
+  "flex-1 flex items-center justify-center",
+  "flex flex-col items-center gap-3",
+  "flex flex-col items-center justify-center",
+  "flex items-end pt-1.5 gap-2",
+  "lc-loader-tile rounded-[2px] border-neo-black size-3.5 border-2 bg-neo-lime",
+  "lc-loader-tile rounded-[2px] border-neo-black size-3.5 border-2 bg-neo-pink",
+  "lc-loader-tile rounded-[2px] border-neo-black size-3.5 border-2 bg-neo-cyan",
+  "text-neo-white text-sm font-bold",
+  "flex flex-col items-center gap-2",
+  "text-neo-white/80 text-xs",
+  "text-neo-white/80 text-xs",
+  "px-4 py-1.5 rounded-neo border-neo-thick border-black bg-neo-cyan text-neo-navy text-xs font-black uppercase tracking-wide shadow-hard-sm hover:translate-y-[-1px] active:translate-y-[1px] transition-transform",
+  "text-neo-white/70 text-xs underline underline-offset-2 hover:text-neo-white",
+]
+`;

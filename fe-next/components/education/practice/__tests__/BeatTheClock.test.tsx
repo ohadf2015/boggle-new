@@ -113,7 +113,7 @@ describe('BeatTheClock', () => {
   it('stays visible against the navy surface while switched off', () => {
     render(<BeatTheClock {...baseProps} defaultOn={false} />);
     const toggle = screen.getByTestId('beat-the-clock-toggle');
-    expect(toggle.className).toContain('border-neo-cream');
-    expect(toggle.className).toContain('text-neo-cream');
+    expect(toggle.className).toContain('border-edu-line');
+    expect(toggle.className).toContain('text-edu-ink');
   });
 });

@@ -34,7 +34,7 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
       data-outcome={view.status}
       className={cn(
         'mx-auto flex w-full rounded-neo-lg border-[3px] shadow-hard-lg',
-        won ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-cream/50 bg-neo-navy-light text-neo-white',
+        won ? 'border-neo-black edu-sky:border-neo-black bg-neo-lime edu-sky:bg-neo-lime text-neo-black edu-sky:text-neo-black' : 'border-neo-cream/50 edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink',
         tv ? 'max-w-[1800px] flex-row items-center gap-6 px-6 py-4 min-[2200px]:gap-10 min-[2200px]:px-10' : 'max-w-md flex-col gap-2.5 p-3',
         className,
       )}
@@ -54,17 +54,17 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
             {won ? (
               <Trophy className={cn('shrink-0', tv ? 'size-10 2xl:size-12' : 'size-5')} aria-hidden="true" />
             ) : (
-              <Wind className={cn('shrink-0 text-neo-pink', tv ? 'size-10 2xl:size-12' : 'size-5')} aria-hidden="true" />
+              <Wind className={cn('shrink-0 text-neo-pink edu-sky:text-edu-pink-ink', tv ? 'size-10 2xl:size-12' : 'size-5')} aria-hidden="true" />
             )}
             <span dir="auto" className="min-w-0 line-clamp-2 leading-tight">{won ? t('classroomBoss.defeated', { name }) : t('classroomBoss.escaped', { name })}</span>
           </p>
-          <p className={cn('font-neo-body font-bold', tv ? 'mt-1.5 text-xl 2xl:text-2xl min-[2200px]:text-4xl' : 'mt-0.5 text-sm', won ? 'text-neo-black/85' : 'text-neo-white/85')}>
+          <p className={cn('font-neo-body font-bold', tv ? 'mt-1.5 text-xl 2xl:text-2xl min-[2200px]:text-4xl' : 'mt-0.5 text-sm', won ? 'text-neo-black/85 edu-sky:text-neo-black/85' : 'text-neo-white/85 edu-sky:text-edu-ink/85')}>
             {t('classroomBoss.dealtPct', { pct: view.pctDealt })}
           </p>
           <div className={cn('flex items-center gap-3', tv ? 'mt-3' : 'mt-2')}>
             <div
               aria-hidden="true"
-              className={cn('relative min-w-0 flex-1 overflow-hidden rounded-full border-[3px] border-neo-cream bg-neo-navy', tv ? 'h-5 2xl:h-6' : 'h-3')}
+              className={cn('relative min-w-0 flex-1 overflow-hidden rounded-full border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-page', tv ? 'h-5 2xl:h-6' : 'h-3')}
             >
               <m.div
                 className="absolute inset-0 origin-left bg-neo-pink rtl:origin-right"
@@ -74,7 +74,7 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
               />
             </div>
             {!won && (
-              <span data-testid="boss-hp-left" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-pink', tv ? 'text-xl 2xl:text-2xl' : 'text-xs')}>
+              <span data-testid="boss-hp-left" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-pink edu-sky:text-edu-pink-ink', tv ? 'text-xl 2xl:text-2xl' : 'text-xs')}>
                 {t('classroomBoss.hpLeft', { pct: Math.round(left * 100) })}
               </span>
             )}
@@ -96,7 +96,7 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
 
       {hitters.length > 0 && (
         <div className={cn('min-w-0', tv ? 'w-[min(34%,30rem)] shrink-0 border-s-[3px] border-neo-black/30 ps-6' : 'border-t-2 border-neo-black/20 pt-2')}>
-          <p className={cn('font-neo-display font-black uppercase tracking-widest', tv ? 'mb-2 text-base 2xl:text-lg' : 'mb-1 text-xs', won ? 'text-neo-black/75' : 'text-neo-cream/80')}>
+          <p className={cn('font-neo-display font-black uppercase tracking-widest', tv ? 'mb-2 text-base 2xl:text-lg' : 'mb-1 text-xs', won ? 'text-neo-black/75 edu-sky:text-neo-black/75' : 'text-neo-cream/80 edu-sky:text-edu-ink/80')}>
             {t('classroomBoss.topHitters')}
           </p>
           <ol className={cn('flex', tv ? 'flex-col gap-1.5' : 'flex-wrap gap-x-3 gap-y-1')}>
@@ -106,7 +106,7 @@ export function BossOutcomeCard({ size, density, className }: { size: 'tv' | 'ph
                   {i + 1}
                 </span>
                 <span dir="auto" className={cn('min-w-0 truncate font-neo-display font-black', tv ? 'text-xl 2xl:text-2xl' : 'text-sm')}>{h.username}</span>
-                <span className={cn('ms-auto shrink-0 font-neo-body font-bold tabular-nums', tv ? 'text-lg 2xl:text-xl' : 'text-xs', won ? 'text-neo-black/75' : 'text-neo-cream/80')}>
+                <span className={cn('ms-auto shrink-0 font-neo-body font-bold tabular-nums', tv ? 'text-lg 2xl:text-xl' : 'text-xs', won ? 'text-neo-black/75 edu-sky:text-neo-black/75' : 'text-neo-cream/80 edu-sky:text-edu-ink/80')}>
                   {t('eduResultsV3.bossDamage', { dmg: h.dmg })}
                 </span>
               </li>

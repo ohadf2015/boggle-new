@@ -13,9 +13,20 @@ describe('ClassroomLobbyShell — the launch stage', () => {
   it('paints a solid navy stage with no art layer behind the lobby text', () => {
     render(<ClassroomLobbyShell pinned={<div />} aside={<div />}>body</ClassroomLobbyShell>);
     const shell = screen.getByTestId('classroom-lobby-shell');
-    expect(shell.className).toContain('bg-neo-navy');
-    expect(shell.querySelector('img')).toBeNull();
+    expect(shell.className).toContain('bg-edu-page');
+    expect([...shell.querySelectorAll('img')].filter((img) => !img.closest('[data-testid="lobby-mascot"]'))).toEqual([]);
     expect(screen.queryByTestId('lobby-arena-art')).toBeNull();
+  });
+
+  it('waves the mascot beside the class row on wide screens only, as silent decoration that takes no height', () => {
+    render(<ClassroomLobbyShell pinned={<div />}>body</ClassroomLobbyShell>);
+    const mascot = screen.getByTestId('lobby-mascot');
+    expect(mascot).toHaveAttribute('aria-hidden', 'true');
+    expect(mascot.querySelector('img')).toHaveAttribute('alt', '');
+    expect(mascot.className).toMatch(/(^|\s)absolute(\s|$)/);
+    expect(mascot.className).toMatch(/(^|\s)hidden(\s|$)/);
+    expect(mascot.className).toContain('@4xl/lobby:block');
+    expect(mascot.className).toContain('pointer-events-none');
   });
 
   it('keeps the subtitle a plain line of text, not a pill', () => {

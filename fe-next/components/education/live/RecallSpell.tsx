@@ -56,12 +56,12 @@ export function RecallSpell({ word, seed, onDone }: RecallSpellProps) {
               key={i}
               data-testid={`recall-spell-slot-${i}`}
               className={cn(
-                'grid h-11 min-w-9 place-items-center rounded-neo border-2 bg-neo-navy-light px-1 font-neo-display text-xl font-black leading-none',
+                'grid h-11 min-w-9 place-items-center rounded-neo border-2 bg-neo-navy-light edu-sky:bg-edu-surface px-1 font-neo-display text-xl font-black leading-none',
                 filled
-                  ? 'border-neo-lime text-neo-lime motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
+                  ? 'border-neo-lime edu-sky:border-neo-lime text-neo-lime edu-sky:text-edu-lime-ink motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
                   : i === state.filled
-                    ? 'border-neo-cream text-transparent'
-                    : 'border-dashed border-neo-cream/35 text-transparent'
+                    ? 'border-neo-cream edu-sky:border-edu-line text-transparent edu-sky:text-transparent'
+                    : 'border-dashed border-neo-cream/35 edu-sky:border-edu-line text-transparent edu-sky:text-transparent'
               )}
             >
               {filled ? letter : ' '}

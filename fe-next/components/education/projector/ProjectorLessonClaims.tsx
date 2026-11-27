@@ -23,7 +23,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
   const race = useLessonClaims();
   const reduced = useEduReducedMotion();
   const listRef = useRef<HTMLUListElement>(null);
-  const capacity = useTileCapacity(listRef);
+  const capacity = useTileCapacity(listRef, !!race);
   if (!race) return null;
   const { shown, hidden } = raceTilesToShow(race.slots, capacity);
 
@@ -33,13 +33,13 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
       aria-label={t('education.race.projectorTitle')}
       className={cn(
         'flex h-full min-h-0 flex-col gap-[clamp(6px,1.6cqh,18px)] overflow-hidden [container-type:size]',
-        'rounded-neo-lg border-[3px] border-neo-cream/40 bg-neo-navy-elevated p-[clamp(8px,2cqh,24px)] text-neo-cream shadow-hard-lg',
+        'rounded-neo-lg border-[3px] border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy-elevated edu-sky:bg-edu-surface p-[clamp(8px,2cqh,24px)] text-neo-cream edu-sky:text-edu-ink shadow-hard-lg',
         className,
       )}
     >
       <header className="flex shrink-0 items-center justify-between gap-2 font-neo-display font-black uppercase tracking-wide text-[clamp(18px,min(8cqh,4.6cqw),40px)] @max-[15rem]:flex-col @max-[15rem]:items-start @max-[15rem]:gap-1 @max-[15rem]:text-base">
         <span className="flex min-w-0 items-center gap-2">
-          <Target className="size-[1em] shrink-0 text-neo-cyan" aria-hidden />
+          <Target className="size-[1em] shrink-0 text-neo-cyan edu-sky:text-edu-cyan-ink" aria-hidden />
           <span className="truncate">{t('education.race.projectorTitle')}</span>
         </span>
         <Pop pulseKey={race.claimedCount} className="shrink-0 rounded-full border-2 border-neo-black bg-neo-yellow px-[0.6em] text-neo-black tabular-nums shadow-hard-sm">
@@ -49,7 +49,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
       <ul ref={listRef} className="grid min-h-0 flex-1 grid-cols-2 content-start gap-2 overflow-hidden @max-[15rem]:grid-cols-1 @min-[24rem]:grid-cols-3">
         {shown.map((slot) => <ClaimTile key={slot.index} slot={slot} reduced={reduced} t={t} />)}
         {hidden > 0 && (
-          <li data-testid="claim-tiles-more" className={cn(TILE, 'justify-center border-dashed border-neo-cream/60 bg-neo-navy text-neo-cream')}>
+          <li data-testid="claim-tiles-more" className={cn(TILE, 'justify-center border-dashed border-neo-cream/60 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink')}>
             {t('education.projectorLobby.moreWords', { count: hidden })}
           </li>
         )}
@@ -61,7 +61,7 @@ export const ProjectorLessonClaims = memo(function ProjectorLessonClaims({ t, cl
 const TILE = 'flex min-h-[2em] min-w-0 flex-row items-center gap-[0.35em] rounded-neo border-[3px] px-[0.45em] font-neo-display font-black leading-none shadow-hard-sm text-[clamp(16px,min(3.6cqw,7cqh),30px)]';
 
 /** How many whole tiles fit the list: rows that fit times the columns the grid resolved to. Unmeasured (SSR, jsdom) = all. */
-function useTileCapacity(ref: RefObject<HTMLUListElement | null>): number {
+function useTileCapacity(ref: RefObject<HTMLUListElement | null>, mounted: boolean): number {
   const [capacity, setCapacity] = useState(Infinity);
   useEffect(() => {
     const list = ref.current;
@@ -78,7 +78,7 @@ function useTileCapacity(ref: RefObject<HTMLUListElement | null>): number {
     const ro = new ResizeObserver(measure);
     ro.observe(list);
     return () => ro.disconnect();
-  }, [ref]);
+  }, [ref, mounted]);
   return capacity;
 }
 

@@ -66,12 +66,12 @@ describe('Teacher Home first frame: the class desk leads', () => {
     expect(start).not.toHaveAttribute('data-pressed');
   });
 
-  it('Then the secondary chip presses too, and is far smaller than Start', () => {
+  it('Then the secondary tile presses too, and is shorter than Start', () => {
     render(<TeacherDashboard />);
     const rehearse = screen.getByTestId('rehearse-with-bots');
     fireEvent.pointerDown(rehearse, { button: 0 });
     expect(rehearse).toHaveAttribute('data-pressed', 'true');
-    expect(rehearse.className).toContain('min-h-11');
+    expect(rehearse.className).toContain('min-h-14');
     expect(screen.getByTestId('home-start-live').className).toContain('min-h-[72px]');
   });
 

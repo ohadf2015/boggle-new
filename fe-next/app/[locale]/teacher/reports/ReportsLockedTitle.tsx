@@ -36,7 +36,7 @@ export function ReportsLockedTitle({ onWeekStatus }: { onWeekStatus?: (status: F
   const askedId = reportId(searchParams?.get('classroomId'));
   const selected = askedId ? classrooms?.find((c) => c.id === askedId) : undefined;
 
-  if (askedId && isLoading) return <div aria-busy="true" className={`${FRAME} h-40 rounded-neo-xl bg-neo-cream/10 motion-safe:animate-pulse`} />;
+  if (askedId && isLoading) return <div aria-busy="true" className={`${FRAME} h-40 rounded-neo-xl bg-edu-ink/10 motion-safe:animate-pulse`} />;
 
   if (selected) {
     return (
@@ -58,8 +58,8 @@ export function ReportsLockedTitle({ onWeekStatus }: { onWeekStatus?: (status: F
   return (
     <div className={FRAME}>
       <div>
-        <h1 className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">{t('teacher.reports.title')}</h1>
-        <p data-testid="reports-locked-value" className="mt-1 max-w-prose text-sm leading-snug text-neo-cream sm:text-base">
+        <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
+        <p data-testid="reports-locked-value" className="mt-1 max-w-prose text-sm leading-snug text-edu-ink sm:text-base">
           {t('teacher.reports.lockedValue')}
         </p>
       </div>

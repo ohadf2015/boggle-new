@@ -64,4 +64,9 @@ describe('StudentChestBeat', () => {
     render(<StudentChestBeat reveal={reveal} beat="done" reduceMotion t={t} />);
     expect(screen.queryByTestId('chest-comeback')).toBeNull();
   });
+
+  it('the chest opens on the navy stage with cyan rays, a dark island on the sky page', () => {
+    render(<StudentChestBeat reveal={reveal} beat="done" reduceMotion t={t} />);
+    expect(screen.getByTestId('edu-student-chest')).toHaveClass('edu-rays-dark', 'border-[3px]', 'border-neo-black');
+  });
 });

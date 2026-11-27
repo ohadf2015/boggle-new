@@ -38,10 +38,10 @@ export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: reado
     return (
       <section data-testid="reports-reteach-panel" aria-busy="true" className={cn(REPORT_HERO_PANEL, 'mb-6 min-h-64')}>
         <span className="sr-only" role="status">{t('teacher.reports.loadingClassrooms')}</span>
-        <div aria-hidden="true" className="h-8 w-56 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+        <div aria-hidden="true" className="h-8 w-56 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
         <div aria-hidden="true" className="mt-4 grid gap-2 sm:grid-cols-2">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-12 rounded-neo bg-neo-cream/10 motion-safe:animate-pulse" />
+            <div key={i} className="h-12 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
           ))}
         </div>
       </section>
@@ -63,7 +63,7 @@ export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: reado
     <section data-testid="reports-reteach-panel" aria-labelledby="reports-reteach-title" className={cn(REPORT_HERO_PANEL, 'mb-6')}>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <IconBadge icon={Target} tone="pink" />
-        <h2 id="reports-reteach-title" dir="auto" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-neo-white sm:text-3xl">
+        <h2 id="reports-reteach-title" dir="auto" className="min-w-0 font-neo-display text-2xl font-black leading-tight text-edu-ink sm:text-3xl">
           {t('teacher.reports.reteach.title', 'What to reteach')}
         </h2>
         {example ? (
@@ -83,7 +83,7 @@ export function ReportsReteachPanel({ classrooms, onShown }: { classrooms: reado
           </span>
         )}
       </div>
-      <p dir="auto" className="mt-2 max-w-prose text-sm leading-snug text-neo-cream/85 sm:text-base">
+      <p dir="auto" className="mt-2 max-w-prose text-sm leading-snug text-edu-ink/85 sm:text-base">
         {example
           ? t(
               'teacher.reports.reteach.exampleBody',
@@ -111,20 +111,20 @@ function NeedsHelp({ snapshot, example }: { snapshot: ClassEvidence; example: bo
 
   return (
     <div data-testid="reteach-needs-help" className="mt-3 flex flex-wrap items-center gap-1.5 sm:gap-2">
-      <span dir="auto" className="text-sm font-black text-neo-cream">{t('teacher.reports.reteach.needsHelp', 'Needs help:')}</span>
+      <span dir="auto" className="text-sm font-black text-edu-ink">{t('teacher.reports.reteach.needsHelp', 'Needs help:')}</span>
       {snapshot.locked ? (
         <>
           <ProPill label={t('eduLiveRoom.hostResults.proPill', 'Pro')} />
-          <span dir="auto" className="text-sm font-bold text-neo-cream/80">
+          <span dir="auto" className="text-sm font-bold text-edu-ink/80">
             {t('teacher.reports.reteach.needsHelpPro', 'Student-by-student detail comes with Teacher Pro.')}
           </span>
         </>
       ) : snapshot.needsHelp.length === 0 ? (
-        <span dir="auto" className="text-sm font-bold text-neo-cream/80">
+        <span dir="auto" className="text-sm font-bold text-edu-ink/80">
           {t('teacher.reports.reteach.needsHelpNone', 'Everyone is at the class goal.')}
         </span>
       ) : names.length === 0 ? (
-        <span aria-hidden="true" className="h-7 w-32 rounded-full bg-neo-cream/10 motion-safe:animate-pulse" />
+        <span aria-hidden="true" className="h-7 w-32 rounded-full bg-edu-ink/10 motion-safe:animate-pulse" />
       ) : (
         <>
           {names.slice(0, NAMES_SHOWN).map((name) => (
@@ -137,7 +137,7 @@ function NeedsHelp({ snapshot, example }: { snapshot: ClassEvidence; example: bo
             </bdi>
           ))}
           {extra > 0 ? (
-            <span dir="auto" className="text-sm font-bold text-neo-cream/80">
+            <span dir="auto" className="text-sm font-bold text-edu-ink/80">
               {t('teacher.reports.reteach.moreStudents', '+{count} more', { count: extra })}
             </span>
           ) : null}

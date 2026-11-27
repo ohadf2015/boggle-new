@@ -56,14 +56,14 @@ export interface EducationNavProps {
 }
 
 const FOCUS =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface';
 
 function tabClasses(active: boolean, chunky = false) {
   return cn(
     'relative z-10 flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-neo px-1 pb-1 pt-1.5',
     'font-neo-display text-xs font-bold transition-[color,transform] duration-150 ease-out active:scale-[0.97]',
     FOCUS,
-    active ? 'text-neo-cream' : 'text-neo-cream/70 [@media(hover:hover)]:hover:text-neo-cream',
+    active ? 'text-edu-ink' : 'text-edu-ink/70 [@media(hover:hover)]:hover:text-edu-ink',
     chunky && active && '[&>svg]:text-neo-black',
   );
 }
@@ -93,14 +93,18 @@ function TabIndicator({ index, count, chunky = false }: { index: number; count: 
         data-testid="education-tab-indicator"
         className={cn(
           'h-8 w-14 rounded-full border-[2px]',
-          // Teacher tabs: a chunky cream pill with a black outline and hard shadow. Never lime:
+          // Teacher tabs: a chunky purple pill with a black outline and hard shadow. Never lime:
           // lime belongs to the page's one main button.
-          chunky ? 'border-neo-black bg-neo-cream shadow-hard' : 'border-neo-cream/40 bg-neo-navy-light',
+          chunky ? 'border-neo-black bg-neo-purple shadow-hard' : 'border-edu-line bg-edu-surface',
         )}
       />
     </div>
   );
 }
+
+// Teacher sidebar items are pressable tiles: outline, solid lip, a press that sinks into the lip.
+const SIDE_TILE =
+  'min-h-[56px] rounded-neo-lg border-[3px] px-3.5 text-lg font-black shadow-edu-lip-sm [&>svg]:size-6 active:translate-y-[3px] active:scale-100 active:shadow-none motion-reduce:active:translate-y-0';
 
 function sideClasses(active: boolean, chunky = false) {
   return cn(
@@ -109,11 +113,11 @@ function sideClasses(active: boolean, chunky = false) {
     FOCUS,
     chunky
       ? active
-        ? 'border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-hard-lg'
-        : 'border-[3px] border-transparent text-neo-cream hover:border-neo-cream/50 hover:bg-neo-navy-light hover:shadow-hard-lg'
+        ? cn(SIDE_TILE, 'border-neo-black bg-neo-purple text-white')
+        : cn(SIDE_TILE, 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-tile')
       : active
-        ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-neo-navy-light text-neo-cream'
-        : 'border-[2px] border-transparent text-neo-cream hover:bg-neo-navy-light',
+        ? 'border-[2px] border-transparent border-s-[3px] border-s-neo-lime bg-edu-surface text-edu-ink'
+        : 'border-[2px] border-transparent text-edu-ink hover:bg-edu-surface',
   );
 }
 
@@ -173,25 +177,27 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
         className={cn(
           // Desktop only (`lg` = 1024); short enough never to scroll.
           'hidden shrink-0 lg:flex w-60 flex-col gap-1.5 overflow-hidden',
-          'border-e-[3px] border-neo-cream bg-neo-navy px-3 py-4',
+          chunky
+            ? 'm-3 me-0 gap-3 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface px-3 py-4 shadow-edu-lip'
+            : 'border-e-[3px] border-edu-line bg-edu-surface px-3 py-4',
           className,
         )}
       >
         {brand ? <div className="mb-4 px-1">{brand}</div> : null}
         {links}
-        <div className="mt-auto flex flex-col gap-2 border-t-[2px] border-neo-cream/15 pt-3">
+        <div className="mt-auto flex flex-col gap-2 border-t-[2px] border-edu-line/15 pt-3">
           {nav.proHref && plan === 'free' ? (
             <Link
               href={nav.proHref}
               data-testid="education-side-pro"
               className={cn(
                 'flex min-h-[44px] w-full items-center gap-2 rounded-neo px-3 py-2',
-                'font-neo-display text-sm font-bold text-neo-cream/85 transition-[colors,transform] duration-150',
-                'hover:bg-neo-navy-light hover:text-neo-cream active:scale-[0.97]',
+                'font-neo-display text-sm font-bold text-edu-ink/85 transition-[colors,transform] duration-150',
+                'hover:bg-edu-surface hover:text-edu-ink active:scale-[0.97]',
                 FOCUS,
               )}
             >
-              <Crown className="h-4 w-4 shrink-0 text-neo-yellow" aria-hidden />
+              <Crown className="h-4 w-4 shrink-0 text-edu-yellow-ink" aria-hidden />
               <span className="min-w-0">{t('teacher.plan.upgrade')}</span>
             </Link>
           ) : null}
@@ -211,7 +217,7 @@ export function EducationNav({ nav, t, variant, brand, account, plan, className 
       className={cn(
         // Hidden the instant the sidebar arrives (lg): never carry both.
         'relative shrink-0 lg:hidden grid',
-        'border-t-[3px] border-neo-cream bg-neo-navy px-2 pt-1',
+        'border-t-[3px] border-edu-line bg-edu-surface px-2 pt-1',
         'pb-[max(0.25rem,env(safe-area-inset-bottom))]',
         className,
       )}

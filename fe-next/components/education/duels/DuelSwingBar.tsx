@@ -63,14 +63,14 @@ export function DuelSwingBar({
       data-testid="duel-swing-bar"
       data-swing={swing}
       className={cn(
-        'rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy p-2 shadow-hard',
+        'rounded-neo border-[3px] border-edu-line bg-edu-surface p-2 shadow-hard',
         className
       )}
     >
       {/* Names + live scores */}
       <div className="mb-1.5 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-neo-cyan">
+          <span className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-edu-cyan-ink">
             {myName}
           </span>
           {myStreak >= 2 && (
@@ -86,7 +86,7 @@ export function DuelSwingBar({
           )}
           <span
             data-testid="duel-swing-my-score"
-            className="font-neo-display text-lg font-black leading-none tabular-nums text-neo-white"
+            className="font-neo-display text-lg font-black leading-none tabular-nums text-edu-ink"
           >
             {myScore}
           </span>
@@ -99,7 +99,7 @@ export function DuelSwingBar({
         <div className="flex min-w-0 items-center justify-end gap-1.5">
           <span
             data-testid="duel-swing-opponent-score"
-            className="font-neo-display text-lg font-black leading-none tabular-nums text-neo-white"
+            className="font-neo-display text-lg font-black leading-none tabular-nums text-edu-ink"
           >
             {opponentScore}
           </span>
@@ -115,7 +115,7 @@ export function DuelSwingBar({
               className="h-4 w-4 shrink-0 object-contain"
             />
           )}
-          <span className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-neo-pink">
+          <span className="truncate font-neo-body text-xs font-black uppercase tracking-wide text-edu-pink-ink">
             {opponentName}
           </span>
         </div>
@@ -145,9 +145,9 @@ export function DuelSwingBar({
         aria-live="polite"
         className={cn(
           'mt-1.5 text-center font-neo-display text-sm font-black uppercase tracking-tight',
-          swing === 'ahead' && 'text-neo-lime',
-          swing === 'behind' && 'text-neo-pink',
-          swing === 'level' && 'text-neo-white/70'
+          swing === 'ahead' && 'text-edu-lime-ink',
+          swing === 'behind' && 'text-edu-pink-ink',
+          swing === 'level' && 'text-edu-ink/70'
         )}
       >
         {swing === 'level' ? t(verdictKey) : t(verdictKey, undefined, { points: gap })}

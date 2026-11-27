@@ -44,11 +44,13 @@ describe('studentVerdict', () => {
 });
 
 describe('verdictLook', () => {
-  it('gives win, tie and loss each their own colour and mascot', () => {
+  // Accent squares, never the card: lime belongs to the page's one primary.
+  it('gives win, tie and loss each their own accent colour and mascot', () => {
     const looks = (['won', 'tied', 'lost'] as const).map(verdictLook);
     expect(new Set(looks.map((l) => l.surface)).size).toBe(3);
     expect(new Set(looks.map((l) => l.mascot)).size).toBe(3);
-    expect(verdictLook('won').surface).toBe('bg-neo-lime');
+    expect(verdictLook('won').surface).toBe('bg-neo-yellow');
+    expect(looks.map((l) => l.surface)).not.toContain('bg-neo-lime');
     expect(verdictLook('lost').surface).toBe('bg-neo-cyan');
   });
 });

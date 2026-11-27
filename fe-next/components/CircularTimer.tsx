@@ -19,6 +19,8 @@ interface CircularTimerProps {
   onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
   /** Teacher's gentle-timer dial: keep counting, stop shouting. ORed with the cosy context. */
   suppressUrgency?: boolean;
+  /** Digits for a light plate (the classroom wall); the arcade default is white. */
+  ink?: 'light' | 'dark';
 }
 
 // Size configurations - frameClasses removed since we no longer have a background frame
@@ -34,7 +36,7 @@ const SIZES = {
  * Memoized to prevent unnecessary re-renders when parent updates
  * Respects prefers-reduced-motion for accessibility
  */
-const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState, suppressUrgency: suppressUrgencyProp = false }) => {
+const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180, size = 'md', onTimerState, suppressUrgency: suppressUrgencyProp = false, ink = 'light' }) => {
   const reduceMotion = useReducedMotion();
   const isSelecting = useIsSelecting();
   // Cosy / Calm mode: keep the timer counting but stop it shouting.
@@ -151,7 +153,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
               running their own framer-motion pulse loop at 5s remaining. */}
           <div className="absolute inset-0 flex items-center justify-center">
             <m.div
-              className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : 'text-neo-white'}`}
+              className={`${isCriticalTime ? 'text-4xl sm:text-5xl' : config.textSize} font-black ${isLowTime ? 'text-neo-red' : ink === 'dark' ? 'text-neo-black' : 'text-neo-white'}`}
               animate={isSelecting ? {} : isCriticalTime && !reduceMotion ? {
                 scale: [1, 1.25, 1],
                 opacity: [1, 0.8, 1],
@@ -168,7 +170,7 @@ const CircularTimer = memo<CircularTimerProps>(({ remainingTime, totalTime = 180
                 ease: 'easeInOut',
               } : {}}
               style={{
-                textShadow: isLowTime
+                textShadow: ink === 'dark' ? 'none' : isLowTime
                   ? `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.3)`
                   : `${size === 'xs' || size === 'sm' ? '1px 1px' : '2px 2px'} 0px rgba(0,0,0,0.5)`,
                 transition: 'color 0.3s ease',

@@ -51,7 +51,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t, compact = false
             'w-full flex items-center justify-center gap-2 px-4 py-3.5 font-neo-display font-bold',
             'bg-neo-lime text-neo-black border-[3px] border-neo-black rounded-neo',
             'min-h-11 shadow-hard hover:shadow-hard-lg transition hover:-translate-y-0.5',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy edu-sky:focus-visible:ring-offset-edu-surface'
           )}
         >
           <RotateCcw className="w-5 h-5 shrink-0" aria-hidden />
@@ -110,7 +110,7 @@ export function StudentNextActions({ onPlayAgain, onPractice, t, compact = false
             'bg-neo-cyan text-neo-black border-[3px] border-neo-black rounded-neo-lg',
             'shadow-hard-lg transition',
             'min-h-12',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy edu-sky:focus-visible:ring-offset-edu-surface'
           )}
         >
           <BookOpen className="w-5 h-5 shrink-0" aria-hidden />

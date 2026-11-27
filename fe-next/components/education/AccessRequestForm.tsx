@@ -163,7 +163,7 @@ export function AccessRequestForm({
         <button
           type="button"
           onClick={() => setApprovalPending(false)}
-          className="mt-4 min-h-11 rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-4 py-2 font-neo-display text-sm font-bold text-neo-white shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="mt-4 min-h-11 rounded-neo border-neo border-edu-line bg-edu-page px-4 py-2 font-neo-display text-sm font-bold text-edu-ink shadow-hard-sm transition hover:-translate-y-0.5 hover:shadow-hard active:shadow-hard-pressed focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
         >
           {t('education.access.approval_pending_back')}
         </button>
@@ -172,7 +172,7 @@ export function AccessRequestForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="text-neo-white">
+    <form onSubmit={handleSubmit} className="text-edu-ink">
       <h2 className="font-neo-display text-2xl font-black tracking-[-0.02em]">
         {firstName
           ? t('education.access.greeting', { name: firstName })
@@ -180,10 +180,10 @@ export function AccessRequestForm({
       </h2>
 
       <div className="mt-5">
-        <label htmlFor="tar-use_case" className="block font-neo-display text-sm font-semibold text-neo-white/80">
+        <label htmlFor="tar-use_case" className="block font-neo-display text-sm font-semibold text-edu-ink/80">
           {t('education.access.use_case_q')}
         </label>
-        <p className="mt-0.5 text-sm text-neo-white/70">{t('education.access.use_case_hint')}</p>
+        <p className="mt-0.5 text-sm text-edu-ink/70">{t('education.access.use_case_hint')}</p>
         <textarea
           id="tar-use_case"
           required
@@ -196,9 +196,9 @@ export function AccessRequestForm({
           aria-invalid={error ? true : undefined}
           readOnly={submitting}
           placeholder={t('education.access.use_case_placeholder')}
-          className="mt-2 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white placeholder:text-neo-white/50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
+          className="mt-2 w-full rounded-neo border-neo border-edu-line bg-edu-surface px-3 py-2 text-edu-ink placeholder:text-edu-ink/50 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan"
         />
-        <p className={`mt-1 text-xs ${useCaseOk ? 'text-neo-lime' : 'text-neo-white/70'}`}>
+        <p className={`mt-1 text-xs ${useCaseOk ? 'text-edu-lime-ink' : 'text-edu-ink/70'}`}>
           {useCaseOk
             ? t('education.access.use_case_ready')
             : t('education.access.use_case_remaining', { count: USE_CASE_MIN - useCaseLen })}
@@ -206,8 +206,8 @@ export function AccessRequestForm({
       </div>
 
       <fieldset className="mt-5">
-        <legend className="font-neo-display text-sm font-semibold text-neo-white/80">
-          {t('education.access.role')} <span className="font-normal text-neo-white/60">· {t('common.optional')}</span>
+        <legend className="font-neo-display text-sm font-semibold text-edu-ink/80">
+          {t('education.access.role')} <span className="font-normal text-edu-ink/60">· {t('common.optional')}</span>
         </legend>
         <div role="radiogroup" aria-label={t('education.access.role')} className="mt-2 grid grid-cols-2 gap-2">
           {ROLE_OPTIONS.map(({ value, emoji }) => {
@@ -222,7 +222,7 @@ export function AccessRequestForm({
                 className={`flex min-h-11 items-center gap-2 rounded-neo border-neo px-3 py-2 text-start font-neo-display text-sm font-semibold leading-tight shadow-hard-sm transition-[box-shadow,transform] duration-100 focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan ${
                   selected
                     ? 'border-neo-black bg-neo-lime text-neo-navy shadow-hard'
-                    : 'border-neo-cream/40 bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'
+                    : 'border-edu-line bg-edu-surface text-edu-ink hover:-translate-y-0.5 hover:shadow-hard'
                 }`}
               >
                 <span aria-hidden="true">{emoji}</span>

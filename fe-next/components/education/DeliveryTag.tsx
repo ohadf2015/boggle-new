@@ -21,8 +21,8 @@ export function DeliveryTag({
     <span
       data-testid={`delivery-tag-${delivery}`}
       className={cn(
-        'inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-neo-black/85 px-2 py-0.5',
-        'font-neo-body text-xs font-bold leading-none text-neo-cream',
+        'inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-edu-ink/10 px-2 py-0.5',
+        'font-neo-body text-xs font-bold leading-none text-edu-ink',
         className,
       )}
     >

@@ -28,7 +28,7 @@ export function AccessRequestGoogleButton({ onTap }: { onTap: () => void }) {
           onTap();
           void signIn('google');
         }}
-        className="flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-white px-5 py-3 font-neo-display text-base font-black text-neo-navy shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait sm:text-lg"
+        className="flex min-h-14 w-full items-center justify-center gap-3 rounded-neo border-neo-thick border-neo-black bg-edu-paper px-5 py-3 font-neo-display text-base font-black text-neo-navy shadow-hard-lg transition-[box-shadow,transform] duration-100 hover:-translate-y-0.5 hover:shadow-hard-xl active:translate-y-0 active:shadow-hard-pressed focus:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan disabled:cursor-wait sm:text-lg"
       >
         <GoogleIcon className="size-6 shrink-0" />
         {t('auth.continueWithGoogle')}

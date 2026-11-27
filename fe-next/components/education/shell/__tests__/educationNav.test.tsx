@@ -122,22 +122,22 @@ describe('<EducationNav>', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const bar = getByTestId('education-tabbar');
     expect(bar.className).toContain('border-t-[3px]');
-    expect(bar.className).toContain('border-neo-cream');
+    expect(bar.className).toContain('border-edu-line');
     // `border-neo` would be dropped by twMerge and render borderless.
     expect(bar.className).not.toMatch(/border-neo(\s|$)/);
   });
 
-  it('marks the active teacher tab with a chunky cream pill behind a black icon, never lime', () => {
+  it('marks the active teacher tab with a chunky purple pill behind a black icon, never lime', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="tabs" />);
     const active = getByTestId('education-tab-home');
     const inactive = getByTestId('education-tab-reports');
 
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('text-neo-cream');
+    expect(active.className).toContain('text-edu-ink');
     expect(active.className).not.toMatch(/neo-lime/);
 
     const pill = getByTestId('education-tab-indicator');
-    expect(pill.className).toContain('bg-neo-cream');
+    expect(pill.className).toContain('bg-neo-purple');
     expect(pill.className).toContain('border-neo-black');
     expect(pill.className).toContain('shadow-hard');
     expect(pill.className).not.toMatch(/neo-lime/);
@@ -146,7 +146,7 @@ describe('<EducationNav>', () => {
     expect(inactive.getAttribute('aria-current')).toBeNull();
     // One dock, not four boxed buttons.
     expect(inactive.className).not.toMatch(/border-\[2px\]/);
-    expect(inactive.className).not.toContain('bg-neo-navy-light');
+    expect(inactive.className).not.toContain('bg-edu-surface');
   });
 
   it('slides the pill to the active tab with a short transform-only transition', async () => {
@@ -215,15 +215,30 @@ describe('EducationNav — the lg handover', () => {
     expect(getByTestId('education-tabbar').className).toContain('lg:hidden');
   });
 
-  it('marks the active teacher sidebar item as a chunky cream block with black ink, never lime', () => {
+  it('draws every teacher sidebar item as a pressable outlined tile and the active one purple, never lime', () => {
     const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
     const active = getByTestId('education-side-home');
+    const inactive = getByTestId('education-side-reports');
     expect(active.getAttribute('aria-current')).toBe('page');
-    expect(active.className).toContain('bg-neo-cream');
-    expect(active.className).toContain('text-neo-black');
-    expect(active.className).toContain('border-neo-black');
+    expect(active.className).toContain('bg-neo-purple');
+    expect(active.className).toContain('text-white');
     expect(active.className).not.toMatch(/neo-lime/);
     expect(active.className).not.toMatch(/border-(l|r)-/);
+    for (const tile of [active, inactive]) {
+      expect(tile.className).toContain('border-[3px]');
+      expect(tile.className).toContain('shadow-edu-lip-sm');
+      expect(tile.className).toContain('min-h-[56px]');
+    }
+    expect(inactive.className).toContain('border-edu-line');
+    expect(inactive.className).toContain('bg-edu-surface');
+  });
+
+  it('floats the teacher sidebar as one outlined card, not a full-height rail', () => {
+    const { getByTestId } = render(<EducationNav nav={nav} t={t} variant="sidebar" />);
+    const side = getByTestId('education-sidebar');
+    expect(side.className).toContain('rounded-neo-xl');
+    expect(side.className).toContain('shadow-edu-lip');
+    expect(side.className).not.toMatch(/border-e-/);
   });
 
   it('keeps every sidebar label painted (no tablet icon-rail hide)', () => {

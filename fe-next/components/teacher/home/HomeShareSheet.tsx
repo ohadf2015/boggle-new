@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Printer, Projector } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
-import { NeoButton } from '@/components/ui/button';
+import { EDU_BUTTON } from '@/components/education/eduNeoStyles';
 import { ClassSetupInviteCode } from '@/components/education/ClassSetupInviteCode';
 import { useInviteShare } from '@/components/education/useInviteShare';
 import { useTeacherActivationProgress } from '@/hooks/useTeacherActivationProgress';
@@ -40,10 +40,10 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
           closeButtonLabel={t('common.close')}
           closeButtonVariant="minimal"
           style={{ backgroundImage: 'none' }}
-          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-2 border-neo-cream/40 bg-neo-navy p-5 text-neo-cream dark:border-neo-cream/40 dark:bg-neo-navy sm:max-w-lg"
+          className="max-h-[90dvh] w-[calc(100%-1.5rem)] overflow-auto border-[3px] border-edu-line bg-edu-surface p-5 text-edu-ink shadow-edu-lip dark:border-edu-line dark:bg-edu-surface sm:max-w-lg"
         >
-          <DialogTitle className="pe-12 font-neo-display text-xl font-black normal-case tracking-normal text-neo-cream">{t('eduShell.home.shareTitle')}</DialogTitle>
-          <DialogDescription dir="auto" className="font-neo-body text-sm text-neo-cream/75">{classroom.name}</DialogDescription>
+          <DialogTitle className="pe-12 font-neo-display text-2xl font-black normal-case tracking-normal text-edu-ink">{t('eduShell.home.shareTitle')}</DialogTitle>
+          <DialogDescription dir="auto" className="font-neo-body text-sm text-edu-ink/75">{classroom.name}</DialogDescription>
           {open ? (
             <ClassSetupInviteCode
               code={classroom.join_code}
@@ -54,16 +54,16 @@ export function HomeShareSheet({ classroom, open, onOpenChange, uiLanguage, t }:
               t={t}
             />
           ) : null}
-          <NeoButton variant="secondary" data-testid="home-share-board" onClick={() => setBoardOpen(true)} className="w-full">
+          <button type="button" data-testid="home-share-board" onClick={() => setBoardOpen(true)} className={`${EDU_BUTTON.secondary} w-full`}>
             <Projector className="size-5" aria-hidden="true" />
             {t('academy.hq.openProjector')}
-          </NeoButton>
+          </button>
           <Link
             href={`/${language}/teacher/join-sheet?code=${encodeURIComponent(classroom.join_code)}&name=${encodeURIComponent(classroom.name)}`}
             target="_blank"
             rel="noopener"
             data-testid="home-share-print"
-            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo border-2 border-neo-cream/50 px-4 font-neo-body text-sm font-bold text-neo-cream hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+            className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-neo-lg border-[3px] border-edu-line bg-edu-surface px-4 font-neo-body text-sm font-bold text-edu-ink shadow-edu-lip-sm hover:bg-edu-tile active:translate-y-[3px] active:shadow-none motion-reduce:active:translate-y-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
           >
             <Printer className="size-4" aria-hidden="true" />
             {t('teacher.joinSheet.printAria')}

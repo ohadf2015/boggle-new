@@ -35,7 +35,7 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
     <section
       data-testid="boss-bar"
       className={cn(
-        'relative flex shrink-0 items-center gap-3 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard',
+        'relative flex shrink-0 items-center gap-3 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard',
         host ? 'p-2 md:gap-5 md:p-3' : 'p-1.5'
       )}
     >
@@ -69,11 +69,11 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
 
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <span className={cn('inline-flex items-center gap-1.5 truncate font-neo-display font-black uppercase text-neo-pink', host ? 'text-base md:text-2xl' : 'text-xs')}>
+          <span className={cn('inline-flex items-center gap-1.5 truncate font-neo-display font-black uppercase text-neo-pink edu-sky:text-edu-pink-ink', host ? 'text-base md:text-2xl' : 'text-xs')}>
             <Swords className={host ? 'size-4 md:size-6' : 'size-3.5'} strokeWidth={3} aria-hidden="true" />
             {t('eg2Modes.boss.dragon')}
           </span>
-          <span data-testid="boss-hp-text" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-cream', host ? 'text-sm md:text-xl' : 'text-xs')}>
+          <span data-testid="boss-hp-text" className={cn('shrink-0 font-neo-display font-black tabular-nums text-neo-cream edu-sky:text-edu-ink', host ? 'text-sm md:text-xl' : 'text-xs')}>
             {t('eg2Modes.boss.hp', { hp: boss.hp, max: boss.maxHp })}
           </span>
         </div>
@@ -83,7 +83,7 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
           aria-valuemax={boss.maxHp}
           aria-valuenow={boss.hp}
           aria-label={t('eg2Modes.boss.dragon')}
-          className={cn('mt-1 w-full overflow-hidden rounded-full border-[2px] border-neo-cream bg-neo-navy', host ? 'h-4 md:h-7' : 'h-3')}
+          className={cn('mt-1 w-full overflow-hidden rounded-full border-[2px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface', host ? 'h-4 md:h-7' : 'h-3')}
         >
           <span
             data-testid="boss-hp-fill"
@@ -96,10 +96,10 @@ export function ClassroomBossBar({ boss, phase, surface, myHit = null, t }: Clas
           />
         </div>
         {host && hitNow && (
-          <p className="mt-1 font-neo-body text-sm font-bold text-neo-lime md:text-lg">{t('eg2Modes.boss.classHits', { hits: boss.lastHits })}</p>
+          <p className="mt-1 font-neo-body text-sm font-bold text-neo-lime edu-sky:text-edu-lime-ink md:text-lg">{t('eg2Modes.boss.classHits', { hits: boss.lastHits })}</p>
         )}
         {!host && phase === 'reveal' && myHit !== null && (
-          <p data-testid="boss-my-hit" className={cn('mt-1 font-neo-body text-xs font-bold', myHit > 0 ? 'text-neo-lime' : 'text-neo-cream/80')}>
+          <p data-testid="boss-my-hit" className={cn('mt-1 font-neo-body text-xs font-bold', myHit > 0 ? 'text-neo-lime edu-sky:text-edu-lime-ink' : 'text-neo-cream/80 edu-sky:text-edu-ink/80')}>
             {myHit > 1
               ? t('eg2Modes.boss.yourCrit', { hits: myHit })
               : myHit === 1

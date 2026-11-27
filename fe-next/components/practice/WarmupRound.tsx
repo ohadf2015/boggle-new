@@ -201,7 +201,7 @@ export default function WarmupRound({
 
   if (showComplete) {
     return (
-      <div className="flex min-h-full items-center justify-center bg-neo-navy p-4" translate="no">
+      <div className="flex min-h-full items-center justify-center bg-neo-navy edu-sky:bg-edu-page p-4" translate="no">
         <PracticeCompletionMoment
           correct={vocabularyFound.length}
           total={vocabularyWords.length}
@@ -236,23 +236,23 @@ export default function WarmupRound({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-cream hover:text-neo-white"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">
-              <Lightbulb className="w-5 h-5 text-neo-pink" />
+            <h1 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink flex items-center gap-2">
+              <Lightbulb className="w-5 h-5 text-neo-pink edu-sky:text-edu-pink-ink" />
               {t('education.practice.warmup')}
             </h1>
-            <p className="text-sm text-neo-cream">{lessonName}</p>
+            <p className="text-sm text-neo-cream edu-sky:text-edu-ink">{lessonName}</p>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleRegenerate}
             aria-label={t('common.refresh')}
-            className="text-neo-cream hover:text-neo-white"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink"
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -263,8 +263,8 @@ export default function WarmupRound({
           <CardContent className="py-3">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <Lightbulb className="w-4 h-4 text-neo-pink" />
-                <span className="text-sm font-neo-body text-neo-pink">
+                <Lightbulb className="w-4 h-4 text-neo-pink edu-sky:text-edu-pink-ink" />
+                <span className="text-sm font-neo-body text-neo-pink edu-sky:text-edu-pink-ink">
                   {t('education.practice.hints')}
                 </span>
               </div>
@@ -272,7 +272,7 @@ export default function WarmupRound({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowHints((prev) => !prev)}
-                className="text-neo-cream hover:text-neo-white p-1"
+                className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-cream edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink p-1"
               >
                 {showHints ? (
                   <EyeOff className="w-4 h-4" />
@@ -293,7 +293,7 @@ export default function WarmupRound({
                   </span>
                 ))}
                 {remainingVocabWords.length > 6 && (
-                  <span className="px-2 py-1 text-neo-cream text-sm">
+                  <span className="px-2 py-1 text-neo-cream edu-sky:text-edu-ink text-sm">
                     +{remainingVocabWords.length - 6} {t('education.practice.more')}
                   </span>
                 )}
@@ -301,7 +301,7 @@ export default function WarmupRound({
             )}
 
             {showHints && remainingVocabWords.length === 0 && (
-              <p className="text-sm text-neo-cyan">
+              <p className="text-sm text-neo-cyan edu-sky:text-edu-cyan-ink">
                 <CheckCircle className="w-4 h-4 inline me-1" />
                 {t('education.practice.allVocabFound')}
               </p>
@@ -310,24 +310,24 @@ export default function WarmupRound({
         </Card>
 
         {/* Stats bar */}
-        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
+        <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-4 shrink-0">
           <CardContent className="py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-neo-yellow" />
-                  <span className="font-neo-display text-neo-white">{score}</span>
+                  <Star className="w-4 h-4 text-neo-yellow edu-sky:text-edu-yellow-ink" />
+                  <span className="font-neo-display text-neo-white edu-sky:text-edu-ink">{score}</span>
                 </div>
                 <div className="h-4 w-px bg-neo-black/30" />
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-sm text-neo-cream">
+                  <CheckCircle className="w-4 h-4 text-neo-cyan edu-sky:text-edu-cyan-ink" />
+                  <span className="text-sm text-neo-cream edu-sky:text-edu-ink">
                     {foundWords.length} {t('education.practice.wordCount')}
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-sm text-neo-pink font-bold">
+                <span className="text-sm text-neo-pink edu-sky:text-edu-pink-ink font-bold">
                   {vocabularyFound.length}/{vocabularyWords.length}
                 </span>
               </div>
@@ -351,9 +351,9 @@ export default function WarmupRound({
 
         {/* Found words */}
         {foundWords.length > 0 && (
-          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 mb-4 shrink-0">
+          <Card className="h-auto border-[3px] border-neo-black shadow-hard bg-neo-navy/80 edu-sky:bg-edu-surface mb-4 shrink-0">
             <CardContent className="py-3">
-              <p className="text-xs text-neo-cream mb-2">{t('education.practice.foundWordsLabel')}</p>
+              <p className="text-xs text-neo-cream edu-sky:text-edu-ink mb-2">{t('education.practice.foundWordsLabel')}</p>
               <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
                 {foundWords.map((word) => (
                   <span
@@ -361,8 +361,8 @@ export default function WarmupRound({
                     className={cn(
                       'px-2 py-1 text-sm rounded font-neo-body',
                       isVocabularyWord(word)
-                        ? 'bg-neo-pink/20 text-neo-pink'
-                        : 'bg-neo-black/30 text-neo-cream'
+                        ? 'bg-neo-pink/20 text-neo-pink edu-sky:text-edu-pink-ink'
+                        : 'bg-neo-black/30 text-neo-cream edu-sky:text-edu-ink'
                     )}
                   >
                     {word}

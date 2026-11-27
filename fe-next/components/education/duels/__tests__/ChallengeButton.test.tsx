@@ -168,8 +168,8 @@ describe('ChallengeButton', () => {
       render(<ChallengeButton {...mockProps} variant="icon" />);
 
       const button = screen.getByTestId('challenge-button-icon');
-      expect(button).toHaveClass('text-neo-pink');
-      expect(button).toHaveClass('hover:text-neo-lime');
+      expect(button).toHaveClass('text-edu-pink-ink');
+      expect(button).toHaveClass('hover:text-edu-lime-ink');
     });
   });
 

@@ -26,7 +26,7 @@ import { AcademyAmbient } from './AcademyAmbient';
 import type { Tone } from './chrome';
 
 /** Beam light per spotlight tone (r,g,b). */
-const BEAM_RGB: Partial<Record<Tone, string>> = { gold: '255,238,160', pink: '255,130,200', teal: '140,245,235' };
+const BEAM_RGB: Partial<Record<Tone, string>> = { gold: '255,238,160', lime: '214,255,120', pink: '255,130,200', teal: '140,245,235' };
 
 export type MapLayout = 'portrait' | 'landscape';
 
@@ -80,19 +80,11 @@ export function useRegionSize(ref: React.RefObject<HTMLDivElement | null>) {
   return size;
 }
 
-/** Light falling on the ONE recommended island, and a hush over everything else. */
+/** Light falling on the ONE recommended island. */
 function Spotlight({ at, still, tone }: { at: IslandPoint; still: boolean; tone: Tone }) {
   const rgb = BEAM_RGB[tone] ?? BEAM_RGB.gold;
   return (
     <>
-      <span
-        aria-hidden="true"
-        data-testid="academy-spotlight"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background: `radial-gradient(circle at ${at.x}% ${at.y - 4}%, rgba(18,13,51,0) 0%, rgba(18,13,51,0) 13%, rgba(18,13,51,0.38) 34%, rgba(18,13,51,0.5) 70%)`,
-        }}
-      />
       {/* The beam: soft on every edge (a horizontal falloff inside a flared
           wedge, faded in from the sky and out into the island's glow). */}
       <span
@@ -198,7 +190,7 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
           sizes="100vw"
           data-testid="academy-map-backdrop"
           className="pointer-events-none select-none object-cover"
-          style={{ filter: 'blur(14px) brightness(.55) saturate(.85)', transform: 'scale(1.08)', maxWidth: 'none' }}
+          style={{ filter: 'blur(14px)', transform: 'scale(1.08)', maxWidth: 'none' }}
           draggable={false}
         />
       )}
@@ -269,15 +261,6 @@ export function AcademyMap({ layout, islands, boss, recommendedKey, spotlightTag
           />
         ))}
       </div>
-      {/* Ink vignette: the sky darkens toward the chrome so HUD and dock sit IN the scene. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(180deg, rgba(18,13,51,0.78) 0%, rgba(18,13,51,0) 18%, rgba(18,13,51,0) 70%, rgba(18,13,51,0.92) 100%)',
-        }}
-      />
     </div>
   );
 }

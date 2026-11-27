@@ -36,10 +36,10 @@ function PlayerMedallion({ player, fallbackName }: { player?: AcademyPlayer; fal
   return (
     <div className="flex flex-col items-center">
       <div
-        className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-neo-navy-elevated"
+        className="relative grid h-[min(40cqw,34cqh)] w-[min(40cqw,34cqh)] place-items-center overflow-hidden rounded-full border-[clamp(3px,1cqmin,6px)] border-neo-cyan bg-edu-surface"
         style={{ boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 36px rgba(0,255,255,0.55)' }}
       >
-        <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-neo-cyan/50">
+        <span aria-hidden className="absolute font-neo-display text-[min(24cqw,20cqh)] font-black uppercase leading-none text-edu-cyan-ink/50">
           {name.slice(0, 1)}
         </span>
         <Avatar customAvatar={player?.avatarConfig ?? null} userId={player?.userId ?? name} pixelSize={256} disableEffects className="relative !h-full !w-full" />
@@ -163,7 +163,7 @@ export function WorkshopVsIntro({
             }}
           />
           <span
-            className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-neo-yellow"
+            className="absolute font-neo-display text-[11cqmin] font-black italic leading-none text-edu-yellow-ink"
             style={{ WebkitTextStroke: '3px rgb(var(--neo-black))', textShadow: '4px 4px 0 rgb(var(--neo-black))' }}
           >
             {t('academy.modes.workshop.vs', 'VS')}
@@ -178,7 +178,7 @@ export function WorkshopVsIntro({
         transition={spring(0.15)}
         className={INTRO_COPY}
       >
-        <p className={cn(INTRO_KICKER, 'text-neo-yellow')}>{lessonName}</p>
+        <p className={cn(INTRO_KICKER, 'text-edu-yellow-ink')}>{lessonName}</p>
         <h2 className={cn(INTRO_TITLE, 'lg:text-[clamp(2.5rem,min(5vw,8.5vh),8rem)]')} style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>
           {t('academy.modes.workshop.introTitleBaron', 'Out-build the Baron')}
         </h2>
@@ -194,8 +194,7 @@ export function WorkshopVsIntro({
                 <li
                   key={w}
                   data-testid="workshop-lesson-word"
-                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-neo border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black"
-                  style={{ background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 30%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-red) 10%, var(--neo-yellow)) 60%, color-mix(in srgb, var(--neo-lime) 50%, var(--neo-orange-hover)) 100%)', boxShadow: 'inset 0 2px 0 rgb(var(--neo-white)), inset 0 -3px 0 color-mix(in srgb, var(--neo-lime-dark) 40%, var(--neo-cozy-dark)), 2px 3px 0 rgb(var(--neo-black))' }}
+                  className="flex h-[calc(var(--chip-fs)*1.25+10px)] items-center gap-[0.3em] rounded-neo border-[3px] border-neo-black pe-[0.55em] ps-[0.3em] font-neo-display text-[length:var(--chip-fs)] font-black leading-[1.25] text-neo-black bg-neo-yellow shadow-edu-lip-sm"
                 >
                   {/* Each word is literally a gold coin: the stakes read on the pill itself, not only in the label. */}
                   <Coins aria-hidden className="h-[1.1em] w-[1.1em] shrink-0" strokeWidth={2.75} />
@@ -206,36 +205,18 @@ export function WorkshopVsIntro({
           </div>
         )}
         {startFailed && (
-          <p className="mb-2 font-neo-body text-sm text-neo-pink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
+          <p className="mb-2 font-neo-body text-sm text-edu-pink-ink lg:text-[clamp(1rem,1.4vw,1.25rem)]">{t('academy.modes.startFailed', "Couldn't start. Check your connection and try again.")}</p>
         )}
         <m.button
           type="button"
           data-testid={loading ? 'workshop-play-pending' : 'workshop-play'}
           disabled={starting || loading}
           onClick={onPlay}
-          whileTap={{ scale: 0.95 }}
-          animate={
-            reduce || starting || loading
-              ? undefined
-              : {
-                  boxShadow: [
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 46px rgba(255,20,147,0.95)',
-                    '6px 6px 0 rgb(var(--neo-black)), 0 0 18px rgba(255,20,147,0.45)',
-                  ],
-                }
-          }
-          transition={reduce ? undefined : { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           className={cn(
             INTRO_CTA,
             'text-3xl [@media(orientation:landscape)_and_(max-height:520px)]:text-2xl! lg:text-[clamp(1.75rem,min(3.4vw,5.5vh),4.5rem)]',
           )}
-          style={{
-            background: 'linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow) 70%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy) 30%, var(--neo-yellow-hover)) 45%, color-mix(in srgb, var(--neo-yellow-hover) 40%, var(--neo-orange-hover)) 100%)',
-            boxShadow: '6px 6px 0 rgb(var(--neo-black)), 0 0 30px rgba(255,20,147,0.7)',
-          }}
         >
-          <span aria-hidden className="pointer-events-none absolute inset-x-2 top-1 h-2 rounded-full bg-neo-white/60" />
           <Swords className="relative h-[1.1em] w-[1.1em] shrink-0" aria-hidden />
           <span className="relative">{loading ? t('common.loading', 'Loading…') : t('academy.modes.workshop.battle', 'Battle!')}</span>
         </m.button>

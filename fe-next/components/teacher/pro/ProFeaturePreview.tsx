@@ -37,12 +37,12 @@ function Frame({ feature, title, children, className, calm = false }: { feature:
   return (
     <div
       data-testid={`pro-preview-${feature}`}
-      className={cn('rounded-neo border-2 border-neo-cream/50 bg-neo-navy p-3 text-start shadow-hard-sm', className)}
+      className={cn('rounded-neo border-2 border-edu-line bg-edu-surface p-3 text-start shadow-hard-sm', className)}
     >
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="truncate font-neo-display text-sm font-black text-neo-white">{title}</p>
+        <p className="truncate font-neo-display text-sm font-black text-edu-ink">{title}</p>
         {calm ? (
-          <span data-testid="pro-preview-sample-badge" className="shrink-0 rounded-full border-2 border-neo-cream/60 px-2 py-0.5 text-[10px] font-black text-neo-cream">
+          <span data-testid="pro-preview-sample-badge" className="shrink-0 rounded-full border-2 border-edu-line px-2 py-0.5 text-[10px] font-black text-edu-ink">
             {t('eg2Pro.sample.badge')}
           </span>
         ) : (
@@ -57,9 +57,9 @@ function Frame({ feature, title, children, className, calm = false }: { feature:
 }
 
 function TrendIcon({ trend, calm = false }: { trend: 'up' | 'flat' | 'down'; calm?: boolean }) {
-  if (trend === 'up') return <TrendingUp className={cn('h-3.5 w-3.5', calm ? 'text-neo-cream' : 'text-neo-lime')} aria-hidden />;
-  if (trend === 'down') return <TrendingDown className={cn('h-3.5 w-3.5', calm ? 'text-neo-cream' : 'text-neo-pink')} aria-hidden />;
-  return <Minus className="h-3.5 w-3.5 text-neo-white/60" aria-hidden />;
+  if (trend === 'up') return <TrendingUp className={cn('h-3.5 w-3.5', calm ? 'text-edu-ink' : 'text-edu-lime-ink')} aria-hidden />;
+  if (trend === 'down') return <TrendingDown className={cn('h-3.5 w-3.5', calm ? 'text-edu-ink' : 'text-edu-pink-ink')} aria-hidden />;
+  return <Minus className="h-3.5 w-3.5 text-edu-ink/60" aria-hidden />;
 }
 
 function accuracyFill(accuracy: number, calm: boolean): string {
@@ -80,22 +80,22 @@ function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
             className={cn(
               'flex items-center gap-2 rounded-neo border-2 px-2 py-1',
               i >= PHONE_ROWS && 'max-sm:hidden',
-              s.trend === 'down' && !calm ? 'border-neo-pink bg-neo-pink/10' : 'border-neo-cream/40 bg-neo-navy-light',
+              s.trend === 'down' && !calm ? 'border-neo-black bg-neo-pink' : 'border-edu-line bg-edu-surface',
             )}
           >
-            <span className="w-14 shrink-0 truncate text-xs font-bold text-neo-white">{names[i]}</span>
-            <span className="h-2 flex-1 overflow-hidden rounded-full bg-neo-white/10">
+            <span className="w-14 shrink-0 truncate text-xs font-bold text-edu-ink">{names[i]}</span>
+            <span className="h-2 flex-1 overflow-hidden rounded-full bg-edu-ink/10">
               <span
                 className={cn('block h-full rounded-full', accuracyFill(s.accuracy, calm))}
                 style={{ width: `${s.accuracy}%` }}
               />
             </span>
-            <span className="w-9 shrink-0 text-end text-xs font-black tabular-nums text-neo-white">{s.accuracy}%</span>
+            <span className="w-9 shrink-0 text-end text-xs font-black tabular-nums text-edu-ink">{s.accuracy}%</span>
             <TrendIcon trend={s.trend} calm={calm} />
           </div>
         ))}
       </div>
-      <p className={cn('mt-2 text-xs font-bold', calm ? 'text-neo-cream/80' : 'text-neo-pink')}>
+      <p className={cn('mt-2 text-xs font-bold', calm ? 'text-edu-ink/80' : 'text-edu-pink-ink')}>
         {t('eg2Pro.sample.stuckOn', { name: names[2], word: hardest })}
       </p>
     </Frame>
@@ -118,7 +118,7 @@ function MasteryPreview() {
             title={w}
             dir="auto"
             className={cn(
-              'max-h-20 self-end justify-self-center overflow-hidden text-[10px] font-bold leading-tight text-neo-white/70 [writing-mode:vertical-rl]',
+              'max-h-20 self-end justify-self-center overflow-hidden text-[10px] font-bold leading-tight text-edu-ink/70 [writing-mode:vertical-rl]',
               // Latin, Cyrillic and Hebrew read bottom-up like a chart axis; Japanese stays upright top-down.
               language !== 'ja' && 'rotate-180',
             )}
@@ -128,7 +128,7 @@ function MasteryPreview() {
         ))}
         {grid.map((row, r) => (
           <div key={names[r]} className="contents">
-            <span className="truncate text-xs font-bold text-neo-white">{names[r]}</span>
+            <span className="truncate text-xs font-bold text-edu-ink">{names[r]}</span>
             {row.map((level, c) => (
               <span
                 key={`${r}-${c}`}
@@ -140,7 +140,7 @@ function MasteryPreview() {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs font-bold text-neo-white/80">{t('eg2Pro.sample.hardest', { words: hardest })}</p>
+      <p className="mt-2 text-xs font-bold text-edu-ink/80">{t('eg2Pro.sample.hardest', { words: hardest })}</p>
     </Frame>
   );
 }
@@ -157,8 +157,8 @@ function PracticePreview() {
     <Frame feature="missedPractice" title={t('eg2Pro.sample.practiceTitle')}>
       <div className="grid grid-cols-3 gap-1.5">
         {rounds.map((r) => (
-          <div key={r.days} className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1.5">
-            <p data-testid="pro-preview-day" className="mb-1 text-[11px] font-black uppercase text-neo-cyan">
+          <div key={r.days} className="rounded-neo border-2 border-edu-line bg-edu-surface p-1.5">
+            <p data-testid="pro-preview-day" className="mb-1 text-[11px] font-black uppercase text-edu-cyan-ink">
               {t('eg2Pro.sample.inDays', { days: r.days })}
             </p>
             <div className="flex flex-wrap gap-1">
@@ -169,7 +169,7 @@ function PracticePreview() {
           </div>
         ))}
       </div>
-      <p className="mt-2 text-xs font-bold text-neo-white/80">{t('eg2Pro.sample.practiceNote')}</p>
+      <p className="mt-2 text-xs font-bold text-edu-ink/80">{t('eg2Pro.sample.practiceNote')}</p>
     </Frame>
   );
 }
@@ -189,7 +189,7 @@ function SegmentBar({ filled, fill, className, testId }: { filled: number; fill:
   return (
     <span data-testid={testId} aria-hidden="true" className={cn('flex gap-0.5', className)}>
       {Array.from({ length: AVERAGE_SEGMENTS }, (_, i) => (
-        <span key={i} className={cn('h-full flex-1 rounded-[2px] border border-neo-cream/40', i < filled ? cn(fill, STRIPES) : 'bg-neo-navy')} />
+        <span key={i} className={cn('h-full flex-1 rounded-[2px] border border-edu-line', i < filled ? cn(fill, STRIPES) : 'bg-edu-surface')} />
       ))}
     </span>
   );
@@ -198,10 +198,10 @@ function SegmentBar({ filled, fill, className, testId }: { filled: number; fill:
 function ArcadeReportSheet({ names, reteach, t }: { names: string[]; reteach: string; t: T }) {
   const average = sampleClassAverage();
   return (
-    <div data-testid="pro-preview-report-sheet" className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-2 text-neo-cream sm:p-2.5">
+    <div data-testid="pro-preview-report-sheet" className="rounded-neo border-2 border-edu-line bg-edu-surface p-2 text-edu-ink sm:p-2.5">
       <div className="flex items-end justify-between gap-2">
         <span className="text-[11px] font-bold sm:text-xs">{t('eg2Pro.sample.classAverage')}</span>
-        <span className="font-neo-display text-xl font-black tabular-nums text-neo-white sm:text-2xl">{average}%</span>
+        <span className="font-neo-display text-xl font-black tabular-nums text-edu-ink sm:text-2xl">{average}%</span>
       </div>
       <SegmentBar filled={Math.round(average / AVERAGE_SEGMENTS)} fill="bg-neo-cyan" className="mt-1 h-2.5 max-sm:hidden" />
       <ul className="mt-1 space-y-0.5 sm:mt-2 sm:space-y-1">
@@ -242,9 +242,9 @@ function ReportsPreview({ calm = false, arcade = false }: { calm?: boolean; arca
       ) : (
       <div
         data-testid="pro-preview-report-sheet"
-        className={cn('rounded-sm border-2 p-2', calm ? 'border-neo-cream/40 bg-neo-navy-light text-neo-cream' : 'border-neo-black bg-neo-white text-neo-black')}
+        className={cn('rounded-sm border-2 p-2', calm ? 'border-edu-line bg-edu-surface text-edu-ink' : 'border-neo-black bg-edu-paper text-neo-black')}
       >
-        <div className={cn('flex items-end justify-between border-b-2 border-dashed pb-1', calm ? 'border-neo-cream/30' : 'border-neo-black/30')}>
+        <div className={cn('flex items-end justify-between border-b-2 border-dashed pb-1', calm ? 'border-edu-line' : 'border-neo-black/30')}>
           <span className={cn('text-[11px] font-bold', !calm && 'uppercase')}>{t('eg2Pro.sample.classAverage')}</span>
           <span className="font-neo-display text-xl font-black tabular-nums">{sampleClassAverage()}%</span>
         </div>
@@ -259,7 +259,7 @@ function ReportsPreview({ calm = false, arcade = false }: { calm?: boolean; arca
         <p className="mt-1 text-[11px] font-black">{t('eg2Pro.sample.reportWords')}: {reteach}</p>
       </div>
       )}
-      <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-neo-white/80 max-sm:hidden">
+      <p className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-edu-ink/80 max-sm:hidden">
         <Printer className="h-3.5 w-3.5" aria-hidden /> {t('eg2Pro.sample.print')}
       </p>
     </Frame>
@@ -277,8 +277,8 @@ function DialsPreview() {
     <Frame feature="pressureDials" title={t('eg2Pro.sample.dialsTitle')}>
       <div className="space-y-1.5">
         {dials.map((d) => (
-          <div key={d.label} className="flex items-center justify-between rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-2 py-1">
-            <span className="text-xs font-bold text-neo-white">{d.label}</span>
+          <div key={d.label} className="flex items-center justify-between rounded-neo border-2 border-edu-line bg-edu-surface px-2 py-1">
+            <span className="text-xs font-bold text-edu-ink">{d.label}</span>
             <span className="rounded-full border-2 border-neo-black bg-neo-cyan px-2 text-[11px] font-black text-neo-black">{d.value}</span>
           </div>
         ))}

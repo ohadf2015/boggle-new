@@ -4,6 +4,7 @@ import type { ReactNode, Ref } from 'react';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { cn } from '@/lib/utils';
 import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { HIDE_ON_SKY } from '@/components/education/shell/ArcadeBackdrop';
 import { HqLoadError } from '../hq/HqLoadError';
 import { HomeSkeleton } from './HomeSkeleton';
 import { HOME_FIRST_FRAME, HOME_GREETING_ROW, HOME_GRID_BASE, HOME_MAIN_COLUMN } from './homeLayout';
@@ -45,7 +46,7 @@ export function TeacherHomeView({
       scrollRegionLabel={t('eduShell.home.regionLabel')}
       contentClassName="relative isolate"
     >
-      <AmbientBackdrop theme="teacher" density="calm" />
+      <AmbientBackdrop theme="teacher" density="calm" className={HIDE_ON_SKY} />
       {welcome}
 
       <div ref={revealRef} data-testid="teacher-home" className={HOME_GRID_BASE}>

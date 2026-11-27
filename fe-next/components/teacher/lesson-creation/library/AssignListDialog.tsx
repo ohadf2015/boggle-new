@@ -66,7 +66,7 @@ export default function AssignListDialog({ lessonId, onClose }: AssignListDialog
                   onClick={() => setClassroomId(c.id)}
                   className={cn(NB_SMALL, NB_BLOCK.navy, 'min-h-14 w-full justify-start gap-3 px-3 text-start text-base')}
                 >
-                  <GraduationCap className="size-5 shrink-0 text-neo-cyan" aria-hidden="true" />
+                  <GraduationCap className="size-5 shrink-0 text-edu-cyan-ink" aria-hidden="true" />
                   <span dir="auto" className="min-w-0 flex-1 truncate">{c.name}</span>
                   <ChevronRight className="size-5 shrink-0 rtl:rotate-180" aria-hidden="true" />
                 </button>

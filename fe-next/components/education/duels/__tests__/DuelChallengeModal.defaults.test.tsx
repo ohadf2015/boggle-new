@@ -89,7 +89,7 @@ describe('DuelChallengeModal — one tap to a duel', () => {
     // tailwind-merge cannot collapse it into the colour class.
     const unselected = screen.getByTestId('duel-type-async');
     expect(unselected).toHaveClass('border-[3px]');
-    expect(unselected).toHaveClass('border-neo-cream');
+    expect(unselected).toHaveClass('border-edu-line');
   });
 
   it('still lets the student change both choices', () => {

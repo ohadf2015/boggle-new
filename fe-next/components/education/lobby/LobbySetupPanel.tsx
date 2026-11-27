@@ -62,18 +62,18 @@ export function LobbySetupPanel({
                 className={cn('min-h-12 rounded-neo border-2 px-3 py-2 text-start transition-colors', CALM_FOCUS, on ? CALM_SELECTED : CALM_IDLE)}
               >
                 <span className="flex items-center gap-2 font-neo-display text-sm font-bold">
-                  <Icon className="size-4 shrink-0 text-neo-cream/70" aria-hidden="true" />
+                  <Icon className="size-4 shrink-0 text-edu-ink/70" aria-hidden="true" />
                   {t(`teacher.classroom.playStyle.${style}`)}
                   {on && <Check className="ms-auto size-4 shrink-0" strokeWidth={3} aria-hidden="true" />}
                 </span>
-                <span className="mt-0.5 hidden font-neo-body text-xs text-neo-cream/75 @sm:block">{t(`teacher.classroom.playStyle.${style}Desc`)}</span>
+                <span className="mt-0.5 hidden font-neo-body text-xs text-edu-ink/75 @sm:block">{t(`teacher.classroom.playStyle.${style}Desc`)}</span>
               </button>
             );
           })}
         </div>
         {playStyle === 'teams' && (
           <div className="flex flex-wrap items-center gap-2">
-            <span id="lobby-opt-teams" className="font-neo-body text-sm font-bold text-neo-cream">{t('teacher.classroom.playStyle.teamCount')}</span>
+            <span id="lobby-opt-teams" className="font-neo-body text-sm font-bold text-edu-ink">{t('teacher.classroom.playStyle.teamCount')}</span>
             <div role="radiogroup" aria-labelledby="lobby-opt-teams" className="flex gap-2">
               {TEAM_COUNTS.map((count) => {
                 const on = teamCount === count;

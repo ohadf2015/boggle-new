@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { StudentLesson } from '@/hooks/useStudentProgress';
 import type { VocabularyLevel } from '@/lib/supabase/education/types';
 import { lessonHref, lessonMastery, lessonStars, type NodeType } from '@/components/student/academy/academyNodes';
-import { INK_TEXT, toneStyle, type Tone } from '@/components/student/academy/chrome';
+import { toneStyle, type Tone } from '@/components/student/academy/chrome';
 import { cn } from '@/lib/utils';
 
 const NODE_ART: Partial<Record<NodeType, string>> = {
@@ -56,7 +56,7 @@ function Stars({ count, t }: { count: number; t: T }) {
         <Star
           key={i}
           aria-hidden="true"
-          className={cn('h-4 w-4 stroke-neo-black stroke-[2.5]', i < count ? 'fill-neo-yellow' : 'fill-white/15')}
+          className={cn('h-4 w-4 stroke-neo-black stroke-[2.5]', i < count ? 'fill-neo-yellow' : 'fill-edu-ink/10')}
         />
       ))}
     </span>
@@ -81,14 +81,14 @@ export function LessonCard({ entry, level, locale }: { entry: StudentLesson; lev
         <Image src={NODE_ART[type] ?? NODE_ART.lesson!} alt="" fill unoptimized sizes="56px" className="object-contain drop-shadow-[2px_2px_0_rgb(var(--neo-black))]" />
       </span>
       <span className="flex min-w-0 flex-1 flex-col gap-1">
-        <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-neo-white', INK_TEXT)}>
+        <span dir="auto" className={cn('line-clamp-2 font-neo-display text-lg font-black leading-tight text-edu-ink')}>
           {entry.lesson?.name ?? t('academy.pages.untitledLesson', 'Lesson')}
         </span>
-        <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-neo-body text-xs font-bold text-neo-white/85">
+        <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1 font-neo-body text-xs font-bold text-edu-ink/85">
           {words > 0 && <span dir="auto">{t('academy.pages.wordCount', '{count} words', { count: words })}</span>}
           {mastery > 0 && !done && <span dir="auto">{t('academy.pages.mastered', '{pct}% mastered', { pct: mastery })}</span>}
           {entry.dueDate && !done && (
-            <span className="text-neo-yellow">
+            <span className="text-edu-yellow-ink">
               {t('academy.pages.due', 'Due {date}', { date: new Date(entry.dueDate).toLocaleDateString(locale, { month: 'short', day: 'numeric' }) })}
             </span>
           )}
@@ -111,10 +111,10 @@ export function LessonsEmpty({ locale }: { locale: string }) {
       <span className="relative h-24 w-24 sm:h-32 sm:w-32" aria-hidden="true">
         <Image src="/images/education/chest-books.webp" alt="" fill unoptimized sizes="128px" className="object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]" />
       </span>
-      <p dir="auto" className={cn('font-neo-display text-xl font-black text-neo-white', INK_TEXT)}>
+      <p dir="auto" className={cn('font-neo-display text-xl font-black text-edu-ink')}>
         {t('academy.pages.noLessonsTitle', 'No lessons yet')}
       </p>
-      <p dir="auto" className="max-w-xs font-neo-body text-sm font-bold text-neo-white/85">
+      <p dir="auto" className="max-w-xs font-neo-body text-sm font-bold text-edu-ink/85">
         {t('academy.pages.noLessonsBody', 'When your teacher shares a lesson, it lands here.')}
       </p>
       <Link
@@ -133,7 +133,7 @@ export function LessonsEmpty({ locale }: { locale: string }) {
 export function LessonsFootnote() {
   const { t } = useLanguage() as unknown as { t: T };
   return (
-    <p dir="auto" className="mt-4 flex items-center justify-center gap-2 text-center font-neo-body text-sm font-bold text-neo-white/80">
+    <p dir="auto" className="mt-4 flex items-center justify-center gap-2 text-center font-neo-body text-sm font-bold text-edu-ink/80">
       <span className="relative h-8 w-8 shrink-0" aria-hidden="true">
         <Image src="/images/education/node-locked.webp" alt="" fill unoptimized sizes="32px" className="object-contain" />
       </span>

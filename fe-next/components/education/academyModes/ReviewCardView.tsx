@@ -18,7 +18,7 @@ interface Props {
 
 const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
 
-const TILE_BEVEL = 'inset 0 2px 0 rgb(var(--neo-white)), inset 0 -6px 0 color-mix(in srgb, var(--neo-purple) 40%, var(--neo-yellow-hover)), 0 4px 0 rgb(var(--neo-black)), 0 8px 12px rgba(0,0,0,0.35)';
+const TILE_LIP = '0 4px 0 rgb(var(--neo-black))';
 const TILT = [-2, 1.5, -1, 2, -1.5, 1];
 
 export default function ReviewCardView({ card, answered, correct, onAnswer, onTile }: Props) {
@@ -34,17 +34,15 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
   // The panel is a size container: tiles are sized from ITS width (it is ~58vw on a laptop, not the viewport).
   const panel = cn('w-full [container-type:inline-size] rounded-neo border-[3px] border-neo-black bg-neo-cream p-4 text-neo-black shadow-hard-lg sm:p-8 [@media(orientation:landscape)_and_(max-height:520px)]:p-3! lg:p-[clamp(1.5rem,3.5vh,2.5rem)]');
   const panelStyle = {
-    backgroundImage: 'radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.9), transparent 60%), linear-gradient(180deg, color-mix(in srgb, var(--neo-yellow-hover) 5%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-light) 40%, var(--neo-cream)) 100%)',
     boxShadow: answered
-      ? `8px 8px 0 rgb(var(--neo-black)), 0 0 0 4px ${correct ? 'var(--neo-lime)' : 'var(--neo-pink)'}, 0 0 40px ${correct ? 'rgba(191,255,0,0.55)' : 'rgba(255,20,147,0.55)'}`
-      : '8px 8px 0 rgb(var(--neo-black)), 0 0 40px rgba(0,255,255,0.25)',
+      ? `8px 8px 0 rgb(var(--neo-black)), 0 0 0 4px ${correct ? 'var(--neo-lime)' : 'var(--neo-pink)'}`
+      : '8px 8px 0 rgb(var(--neo-black))',
   };
-  const ivory = 'linear-gradient(180deg, color-mix(in srgb, var(--neo-cream) 55%, rgb(var(--neo-white))) 0%, color-mix(in srgb, var(--neo-cozy-light) 40%, var(--neo-cream)) 55%, color-mix(in srgb, var(--neo-cyan) 10%, var(--neo-cozy-light)) 100%)';
 
   if (card.kind === 'meaning') {
     return (
       <div className={panel} style={panelStyle}>
-        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
+        <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-edu-purple-ink lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
           {t('academy.modes.review.pickMeaning', 'What does it mean?')}
         </p>
         <p data-testid="review-meaning-prompt" dir={dir} translate="no" className="mb-4 text-center font-neo-display text-4xl font-black text-neo-black sm:text-6xl [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-3xl! lg:text-[clamp(3rem,min(5vw,8vh),4.5rem)]">
@@ -64,7 +62,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
                 }}
                 className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
                   'min-h-12 rounded-neo border-[3px] border-neo-black px-3 py-2 text-start font-neo-body text-sm font-bold leading-snug text-neo-black shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:min-h-16 sm:text-base [@media(orientation:landscape)_and_(max-height:520px)]:min-h-11! [@media(orientation:landscape)_and_(max-height:520px)]:py-1! [@media(orientation:landscape)_and_(max-height:520px)]:text-sm! lg:min-h-[clamp(4rem,8vh,5rem)] lg:text-xl',
-                  answered && isAnswer ? 'bg-neo-lime' : answered && chosen === opt ? 'bg-neo-pink' : 'bg-neo-white',
+                  answered && isAnswer ? 'bg-neo-lime' : answered && chosen === opt ? 'bg-neo-pink' : 'bg-edu-paper',
                   'line-clamp-3',
                 )}
               >
@@ -108,7 +106,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
 
   return (
     <div className={panel} style={panelStyle}>
-      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-neo-purple lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
+      <p className="mb-1 text-center font-neo-display text-xs font-black uppercase tracking-widest text-edu-purple-ink lg:mb-3 lg:text-lg min-[2200px]:text-2xl">
         {t('academy.modes.review.unscramble', 'Unscramble the word')}
       </p>
       {card.definition && (
@@ -149,9 +147,7 @@ export default function ReviewCardView({ card, answered, correct, onAnswer, onTi
               style={{
                 width: tileWidth,
                 fontSize: tileFont,
-                backgroundImage: used ? undefined : ivory,
-                // Carved ivory tile: top highlight, a thick baked bottom edge, a hard drop and a soft cast shadow.
-                boxShadow: used ? undefined : TILE_BEVEL,
+                boxShadow: used ? undefined : TILE_LIP,
                 rotate: used ? undefined : `${TILT[i % TILT.length]}deg`,
               }}
               className={cn(

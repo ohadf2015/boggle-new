@@ -122,12 +122,12 @@ function DuelsPageClientInner({ seoContent }: DuelsPageClientProps) {
       data-testid="duels-empty"
       /** Proof the chrome switch ran — a capture can read it. */
       data-chrome="hidden"
-      className="flex h-dvh flex-col overflow-hidden bg-neo-navy"
+      className="flex h-dvh flex-col overflow-hidden bg-edu-page"
     >
       <div className="edu-shell-scroll flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain px-6 py-8">
         <div className="flex flex-1 flex-col items-center justify-center text-center">
-          <Swords className="mb-4 h-16 w-16 text-neo-white" />
-          <p className="text-center font-neo-body text-lg text-neo-white">
+          <Swords className="mb-4 h-16 w-16 text-edu-ink" />
+          <p className="text-center font-neo-body text-lg text-edu-ink">
             {t('education.duels.joinClassroomToDuel')}
           </p>
         </div>
@@ -176,7 +176,7 @@ function DuelsPageClientInner({ seoContent }: DuelsPageClientProps) {
       data-testid="duels-shell"
       /** Proof the chrome switch ran — a capture can read it. */
       data-chrome="hidden"
-      className="flex h-dvh flex-col overflow-hidden bg-neo-navy"
+      className="flex h-dvh flex-col overflow-hidden bg-edu-page"
     >
       <Tabs
         value={activeTab}
@@ -205,7 +205,7 @@ function DuelsPageClientInner({ seoContent }: DuelsPageClientProps) {
                   'min-w-0 gap-1.5 rounded-neo px-2 py-2 text-sm font-black normal-case',
                   // A selected tab differs by FILL, not by text colour alone,
                   // and an unselected one still carries a visible edge.
-                  'border-[3px] border-neo-cream bg-neo-navy text-neo-cream',
+                  'border-[3px] border-edu-line bg-edu-surface text-edu-ink',
                   'data-[state=active]:border-neo-black data-[state=active]:bg-neo-lime data-[state=active]:text-neo-black'
                 )}
               >

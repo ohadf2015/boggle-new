@@ -44,7 +44,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
       aria-live="polite"
       aria-label={t('education.duels.comboAria', undefined, { count: streak })}
       className={cn(
-        'flex items-center gap-2 rounded-neo border-[3px] border-neo-cream/70 bg-neo-navy px-2 py-1.5 shadow-hard-sm',
+        'flex items-center gap-2 rounded-neo border-[3px] border-edu-line bg-edu-surface px-2 py-1.5 shadow-hard-sm',
         className
       )}
     >
@@ -68,7 +68,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
             data-testid="duel-combo-streak"
             className={cn(
               'font-neo-display text-base font-black leading-none tabular-nums',
-              isHot ? 'text-neo-orange' : 'text-neo-cream/80'
+              isHot ? 'text-edu-orange-ink' : 'text-edu-ink/80'
             )}
           >
             {streak}
@@ -76,7 +76,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
           <span
             className={cn(
               'truncate font-neo-body text-xs font-black uppercase tracking-widest',
-              isHot ? 'text-neo-white' : 'text-neo-cream/80'
+              isHot ? 'text-edu-ink' : 'text-edu-ink/80'
             )}
           >
             {t(tier.labelKey)}
@@ -84,7 +84,7 @@ export function DuelComboMeter({ streak, bonus, className }: DuelComboMeterProps
         </div>
 
         {/* Meter track */}
-        <div aria-hidden="true" className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-neo-cream/40 bg-neo-black/60">
+        <div aria-hidden="true" className="mt-1 h-2 w-full overflow-hidden rounded-full border-2 border-edu-line bg-neo-black/60">
           <m.div
             data-testid="duel-combo-fill"
             className={cn('h-full', tier.fillClass)}

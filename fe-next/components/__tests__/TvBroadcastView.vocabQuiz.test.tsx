@@ -106,6 +106,8 @@ describe('TvBroadcastView — live Vocab Quiz on the classroom projector', () =>
     // THEN the projector shows the quiz, not the board-game broadcast
     expect(screen.getByTestId('vocab-quiz-host-view')).toBeInTheDocument();
     expect(screen.queryByTestId('tv-leaderboard-mock')).not.toBeInTheDocument();
+    // The quiz is a classroom wall: its frame is the sky page, never a navy band under the quiz.
+    expect(screen.getByTestId('vocab-quiz-host-view').parentElement).toHaveClass('bg-edu-page');
   });
 
   it('hands the teacher a one-tap rematch on the quiz finale (no stranded projector)', () => {

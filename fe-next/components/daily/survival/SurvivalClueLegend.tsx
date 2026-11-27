@@ -2,12 +2,15 @@
 
 import React from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 interface FeedbackLegendProps {
   t: (key: string) => string;
 }
 
-export const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
+export const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => {
+  const label = useClassroomBoard() ? 'text-edu-ink' : 'text-neo-white';
+  return (
   <AdaptiveMotion.div
     key="feedback-legend"
     initial={{ opacity: 0 }}
@@ -19,18 +22,19 @@ export const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
   >
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-400 rounded border border-neo-black"></span>
-      <span className="text-neo-white">{t('wordHunt.feedback.correct')}</span>
+      <span className={label}>{t('wordHunt.feedback.correct')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-amber-400 rounded border border-neo-black"></span>
-      <span className="text-neo-white">{t('wordHunt.feedback.wrongPlace')}</span>
+      <span className={label}>{t('wordHunt.feedback.wrongPlace')}</span>
     </span>
     <span className="flex items-center gap-1">
       <span className="w-3 h-3 sm:w-4 sm:h-4 bg-slate-500 rounded border border-neo-black"></span>
-      <span className="text-neo-white">{t('wordHunt.feedback.notInWord')}</span>
+      <span className={label}>{t('wordHunt.feedback.notInWord')}</span>
     </span>
   </AdaptiveMotion.div>
-);
+  );
+};
 
 interface KnownLettersDisplayProps {
   knownLetters: Set<string>;
@@ -41,7 +45,9 @@ interface KnownLettersDisplayProps {
   t: (key: string) => string;
 }
 
-export const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, noCluesYet, cue, t }) => (
+export const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, noCluesYet, cue, t }) => {
+  const classroom = useClassroomBoard();
+  return (
   <AdaptiveMotion.div
     key="known-letters"
     initial={{ opacity: 0 }}
@@ -56,7 +62,7 @@ export const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownL
     {noCluesYet && (
       <span
         data-testid="clue-empty-cue"
-        className="text-[10px] sm:text-xs font-bold text-neo-cyan animate-pulse text-center leading-snug"
+        className={classroom ? 'text-[10px] sm:text-xs font-bold text-edu-cyan-ink animate-pulse text-center leading-snug' : 'text-[10px] sm:text-xs font-bold text-neo-cyan animate-pulse text-center leading-snug'}
         role="status"
         aria-live="polite"
       >
@@ -69,7 +75,7 @@ export const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownL
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-1 text-[10px] sm:text-xs"
       >
-        <span className="text-amber-300 font-bold">
+        <span className={classroom ? 'text-edu-yellow-ink font-bold' : 'text-amber-300 font-bold'}>
           {t('wordHunt.survival.knownLetters')}
         </span>
         <div className="flex gap-0.5">
@@ -85,4 +91,5 @@ export const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownL
       </AdaptiveMotion.div>
     )}
   </AdaptiveMotion.div>
-);
+  );
+};

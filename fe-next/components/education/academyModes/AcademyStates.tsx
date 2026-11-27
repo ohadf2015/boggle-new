@@ -55,8 +55,8 @@ export function AcademyNotice({
       <div data-testid={testId} className="flex w-full max-w-md flex-col items-center text-center lg:max-w-3xl">
         {/* eslint-disable-next-line @next/next/no-img-element -- static art */}
         <img src={art} alt="" className="mb-3 h-44 w-44 object-contain drop-shadow-[6px_6px_0_rgb(var(--neo-black))] lg:h-80 lg:w-80" />
-        <h2 className="mb-2 font-neo-display text-3xl font-black uppercase text-neo-white lg:text-6xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>{heading}</h2>
-        <p className="mb-5 font-neo-body text-base text-neo-cream lg:text-2xl">{body}</p>
+        <h2 className="mb-2 font-neo-display text-3xl font-black uppercase text-edu-ink lg:text-6xl" style={{ textShadow: '3px 3px 0 rgb(var(--neo-black))' }}>{heading}</h2>
+        <p className="mb-5 font-neo-body text-base text-edu-ink lg:text-2xl">{body}</p>
         {primaryAction && (
           <button type="button" onClick={primaryAction.onClick} className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black', primaryButtonClass, 'mb-2 w-full lg:max-w-xl')}>
             {primaryAction.label}

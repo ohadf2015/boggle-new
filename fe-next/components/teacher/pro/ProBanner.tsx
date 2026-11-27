@@ -11,6 +11,8 @@ export const PRO_BANNER_CTA = cn(
   NB_SMALL,
   NB_BLOCK.yellow,
   'animate-edu-shine min-h-12 shrink-0 px-5 text-base max-sm:w-full',
+  // SEO pages render this CTA on the dark site.
+  'focus-visible:ring-offset-neo-navy edu-sky:focus-visible:ring-offset-edu-surface',
 );
 
 export function ProShine() {
@@ -82,7 +84,7 @@ export function ProBanner({
           onClick={onDismiss}
           aria-label={dismissLabel}
           className={cn(
-            'absolute end-2 top-3 grid size-11 place-items-center rounded-neo border-2 text-neo-cream/80 transition-colors hover:bg-neo-cream/10 hover:text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+            'absolute end-2 top-3 grid size-11 place-items-center rounded-neo border-2 text-neo-cream/80 edu-sky:text-edu-ink/80 transition-colors hover:bg-neo-cream/10 edu-sky:hover:bg-edu-ink/10 hover:text-neo-cream edu-sky:hover:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
             NB_DARK_EDGE,
           )}
         >
@@ -93,11 +95,11 @@ export function ProBanner({
         <div className={cn('flex min-w-0 flex-1 items-center gap-4', onDismiss && 'pe-12 sm:pe-0')}>
           {lead}
           <div className="min-w-0">
-            <h3 className="font-neo-display text-lg font-black leading-snug text-neo-cream sm:text-xl">
+            <h3 className="font-neo-display text-lg font-black leading-snug text-neo-cream edu-sky:text-edu-ink sm:text-xl">
               {title}
               <ProBadge aria-hidden="true" data-testid={`${testId}-sticker`} size="xs" label={proLabel} className="ms-2 align-middle" />
             </h3>
-            {body ? <div className="mt-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80">{body}</div> : null}
+            {body ? <div className="mt-1 font-neo-body text-sm font-semibold leading-snug text-neo-cream/80 edu-sky:text-edu-ink/80">{body}</div> : null}
             {children}
           </div>
         </div>

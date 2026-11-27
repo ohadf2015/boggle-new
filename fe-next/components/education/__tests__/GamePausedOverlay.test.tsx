@@ -45,4 +45,12 @@ describe('GamePausedOverlay', () => {
     render(<GamePausedOverlay />);
     expect(screen.getByTestId('game-paused-overlay')).toHaveAttribute('dir', 'rtl');
   });
+
+  it('Given the sky page, Then the board dims behind a page-coloured veil and the card is the cream surface with a lip', () => {
+    render(<GamePausedOverlay />);
+    const overlay = screen.getByTestId('game-paused-overlay');
+    expect(overlay.className).toContain('bg-edu-page/85');
+    const card = screen.getByRole('heading').closest('div') as HTMLElement;
+    expect(card).toHaveClass('bg-edu-surface', 'border-neo-black', 'shadow-edu-lip');
+  });
 });

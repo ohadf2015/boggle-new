@@ -39,7 +39,7 @@ export function ProInlineLock({ feature, label, className }: { feature: ProFeatu
         aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 px-3 py-2 font-neo-display text-sm font-bold text-neo-cream',
+          'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line px-3 py-2 font-neo-display text-sm font-bold text-edu-ink',
           PRESS,
         )}
       >
@@ -51,14 +51,14 @@ export function ProInlineLock({ feature, label, className }: { feature: ProFeatu
         <div
           id={panelId}
           data-testid={`pro-inline-peek-${feature}`}
-          className="w-full max-w-md rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-1"
+          className="w-full max-w-md rounded-neo border-2 border-edu-line bg-edu-surface p-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-1"
         >
           <div aria-hidden="true" className="pointer-events-none select-none">
             <ProFeaturePreview feature={feature} />
           </div>
-          <p className="mt-2 text-sm font-bold leading-snug text-neo-white/85">{t(`teacher.proGate.${feature}.body`)}</p>
+          <p className="mt-2 text-sm font-bold leading-snug text-edu-ink/85">{t(`teacher.proGate.${feature}.body`)}</p>
           {blockedInApp ? (
-            <p className="mt-2 text-sm font-bold text-neo-white/80">{t('teacher.subscription.notInApp')}</p>
+            <p className="mt-2 text-sm font-bold text-edu-ink/80">{t('teacher.subscription.notInApp')}</p>
           ) : (
             <button
               type="button"

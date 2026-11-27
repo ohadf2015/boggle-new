@@ -86,11 +86,11 @@ export function useReportExport(build: () => Promise<void>) {
 
 export function ReportSkeleton() {
   const { t } = useLanguage();
-  const block = 'rounded-neo bg-neo-cream/10 motion-safe:animate-pulse';
+  const block = 'rounded-neo bg-edu-ink/10 motion-safe:animate-pulse';
   return (
     <div aria-busy="true" className="space-y-6">
       <span className="sr-only" role="status">{t('teacher.reports.loading')}</span>
-      <div aria-hidden="true" className="flex flex-col gap-3 border-b-2 border-neo-cream/15 pb-6">
+      <div aria-hidden="true" className="flex flex-col gap-3 border-b-2 border-edu-line/15 pb-6">
         <div className={cn(block, 'h-9 w-2/3 max-w-sm')} />
         <div className={cn(block, 'h-4 w-1/2 max-w-xs')} />
       </div>
@@ -111,12 +111,12 @@ export function ReportSkeleton() {
 export function ReportError({ onRetry }: { onRetry: () => void }) {
   const { t } = useLanguage();
   return (
-    <div className="flex flex-col items-center gap-4 rounded-neo border-[3px] border-neo-pink bg-neo-navy-light p-8 text-center shadow-hard">
-      <p className="font-neo-display text-lg font-bold text-neo-white">{t('teacher.reports.error')}</p>
+    <div className="flex flex-col items-center gap-4 rounded-neo border-[3px] border-neo-pink bg-edu-surface p-8 text-center shadow-hard">
+      <p className="font-neo-display text-lg font-bold text-edu-ink">{t('teacher.reports.error')}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-black shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white active:translate-y-0 active:shadow-none"
+        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-black shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line active:translate-y-0 active:shadow-none"
       >
         <RotateCcw aria-hidden="true" className="size-4" />
         {t('teacher.reports.retry')}
@@ -128,7 +128,7 @@ export function ReportError({ onRetry }: { onRetry: () => void }) {
 export function ReportEmpty() {
   const { t } = useLanguage();
   return (
-    <div className="rounded-neo border-2 border-dashed border-neo-cream/30 p-8 text-center text-neo-cream/80">
+    <div className="rounded-neo border-2 border-dashed border-edu-line p-8 text-center text-edu-ink/80">
       {t('teacher.reports.noData')}
     </div>
   );
@@ -154,18 +154,18 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
   const Icon = busy ? Loader2 : done ? Check : Download;
 
   return (
-    <header className="border-b-2 border-neo-cream/15 pb-6">
+    <header className="border-b-2 border-edu-line/15 pb-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0">
-          <h1 className="font-neo-display text-3xl font-bold leading-tight text-neo-white text-balance sm:text-4xl">
+          <h1 className="font-neo-display text-3xl font-bold leading-tight text-edu-ink text-balance sm:text-4xl">
             <span className="sr-only">{title}: </span>
             <span className="break-words">{subject}</span>
           </h1>
-          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neo-cream/80">
+          <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-edu-ink/80">
             <span aria-hidden="true">{title}</span>
             {meta.map((item, i) => (
               <span key={i} className="contents">
-                <span aria-hidden="true" className="text-neo-cream/40">·</span>
+                <span aria-hidden="true" className="text-edu-ink/40">·</span>
                 <span>{item}</span>
               </span>
             ))}
@@ -185,7 +185,7 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
             className={cn(
               'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-4 py-2 font-bold text-black shadow-hard',
               'transition-[transform,box-shadow,background-color] duration-150 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:cursor-progress disabled:hover:translate-y-0',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line disabled:cursor-progress disabled:hover:translate-y-0',
               done ? 'bg-neo-cyan' : 'bg-neo-lime'
             )}
           >
@@ -200,7 +200,7 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
       </div>
 
       {exportState === 'failed' && (
-        <p role="alert" className="mt-4 rounded-neo border-2 border-neo-pink bg-neo-pink/15 px-3 py-2 text-sm font-medium text-neo-white">
+        <p role="alert" className="mt-4 rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-medium text-neo-black">
           {t('teacher.reports.export.failed')}
         </p>
       )}
@@ -213,7 +213,7 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
 // =============================================
 
 export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className="mb-4 font-neo-display text-xl font-bold text-neo-white">{children}</h2>;
+  return <h2 className="mb-4 font-neo-display text-xl font-bold text-edu-ink">{children}</h2>;
 }
 
 /** Accuracy as a number AND a bar — the number carries meaning, the bar scans. */
@@ -223,7 +223,7 @@ export function AccuracyBar({ value }: { value: number }) {
   return (
     <span className="inline-flex items-center gap-2">
       <span aria-hidden="true" className="w-14 sm:w-20">
-        <SpringProgress value={pct} max={100} label={`${value}%`} tone={tone} animateOnMount className="h-2 rounded-none border-0 bg-neo-cream/15" />
+        <SpringProgress value={pct} max={100} label={`${value}%`} tone={tone} animateOnMount className="h-2 rounded-none border-0 bg-edu-ink/15" />
       </span>
       <span className="tabular-nums">{value}%</span>
     </span>
@@ -234,8 +234,8 @@ export function AccuracyBar({ value }: { value: number }) {
 export function MasteryMeter({ percent, label }: { percent: number; label: string }) {
   return (
     <div>
-      <p className="mb-2 text-sm font-bold text-neo-white tabular-nums">{label}</p>
-      <SpringProgress value={percent} max={100} label={label} animateOnMount className="h-5 border-neo-cream bg-neo-navy shadow-hard-sm" />
+      <p className="mb-2 text-sm font-bold text-edu-ink tabular-nums">{label}</p>
+      <SpringProgress value={percent} max={100} label={label} animateOnMount className="h-5 border-edu-line bg-edu-surface shadow-hard-sm" />
     </div>
   );
 }

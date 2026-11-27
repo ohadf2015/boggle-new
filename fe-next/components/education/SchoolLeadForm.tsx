@@ -20,10 +20,10 @@ import { clampTeachers, MAX_QUOTE_TEACHERS, studentBucketForTeachers } from '@/l
 import { trackSchoolQuoteRequested } from '@/lib/education/proFunnelTelemetry';
 
 const FIELD_CLASS =
-  'mt-1 w-full rounded-neo border-neo border-neo-cream/40 bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
+  'mt-1 w-full rounded-neo border-neo border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-white edu-sky:text-edu-ink placeholder-neo-white/40 p-3 ' +
   'transition duration-150 outline-none ' +
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
-const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
+const LABEL_CLASS = 'block text-sm font-semibold text-neo-white edu-sky:text-edu-ink font-neo-display';
 
 const LEAD_LOCALES: readonly TeacherLocale[] = ['en', 'he', 'sv', 'ja', 'es'];
 
@@ -205,7 +205,7 @@ export function SchoolLeadForm({
         <legend className={LABEL_CLASS}>{t('education.forSchools.form.interests_legend')}</legend>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {SCHOOL_LEAD_INTERESTS.map((key) => (
-            <label key={key} htmlFor={`sl-int-${key}`} className="flex cursor-pointer items-center gap-2 rounded-neo border-neo border-neo-cream/40 bg-neo-navy p-2 text-sm text-neo-white">
+            <label key={key} htmlFor={`sl-int-${key}`} className="flex cursor-pointer items-center gap-2 rounded-neo border-neo border-neo-cream/40 edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface p-2 text-sm text-neo-white edu-sky:text-edu-ink">
               <input
                 id={`sl-int-${key}`}
                 type="checkbox"
@@ -238,7 +238,7 @@ export function SchoolLeadForm({
       >
         {submitting ? t('education.forSchools.form.submitting') : t('education.forSchools.form.submit')}
       </m.button>
-      <p className="text-center text-xs text-neo-white/60">{t('education.forSchools.form.privacy_note')}</p>
+      <p className="text-center text-xs text-neo-white/60 edu-sky:text-edu-ink/60">{t('education.forSchools.form.privacy_note')}</p>
     </m.form>
   );
 }

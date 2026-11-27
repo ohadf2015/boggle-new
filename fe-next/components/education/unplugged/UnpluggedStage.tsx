@@ -74,7 +74,7 @@ const BTN_SOLID = 'border-[3px] border-neo-black';
  * as no control at all (DESIGN-ADDENDUM), so the edge is cream at >=3:1 and the
  * fill still differs from the surrounding surface.
  */
-const BTN_OUTLINE = 'border-[3px] border-neo-cream bg-neo-navy-light text-neo-cream';
+const BTN_OUTLINE = 'border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink';
 
 export function UnpluggedStage({
   state,
@@ -101,7 +101,7 @@ export function UnpluggedStage({
         data-revealed={String(revealed)}
         className={cn(
           'flex-1 min-h-0 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-8 px-3 sm:px-6 py-3',
-          'rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard',
+          'rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard',
         )}
       >
         <UnpluggedRingTimer
@@ -118,7 +118,7 @@ export function UnpluggedStage({
         <div className="min-w-0 w-full sm:flex-1 flex flex-col items-center justify-center text-center">
           {revealed ? (
             <span
-              className="font-neo-display font-bold text-neo-lime leading-none tracking-tight max-w-full break-words"
+              className="font-neo-display font-bold text-neo-lime edu-sky:text-edu-lime-ink leading-none tracking-tight max-w-full break-words"
               style={{ fontSize }}
             >
               {word}
@@ -137,7 +137,7 @@ export function UnpluggedStage({
               {Array.from({ length: Math.max(1, word.length) }, (_, i) => (
                 <span
                   key={i}
-                  className="w-[0.55em] h-[0.1em] min-h-[3px] rounded-full bg-neo-white/30 shrink-0"
+                  className="w-[0.55em] h-[0.1em] min-h-[3px] rounded-full bg-neo-white/30 edu-sky:bg-edu-ink/30 shrink-0"
                 />
               ))}
             </span>
@@ -146,7 +146,7 @@ export function UnpluggedStage({
             className={cn(
               'mt-3 sm:mt-6 font-neo-display font-bold uppercase tracking-widest leading-tight',
               'text-[clamp(0.8rem,1.8vw,1.7rem)]',
-              running ? 'text-neo-pink' : revealed ? 'text-neo-white/60' : 'text-neo-cyan',
+              running ? 'text-neo-pink edu-sky:text-edu-pink-ink' : revealed ? 'text-neo-white/60 edu-sky:text-edu-ink/60' : 'text-neo-cyan edu-sky:text-edu-cyan-ink',
             )}
           >
             {revealed ? labels.letters : running ? labels.writeNow : labels.chooseTime}
@@ -222,21 +222,21 @@ export function UnpluggedStage({
 
         {revealed ? (
           <div className="flex flex-col sm:flex-row gap-2">
-            <div className="flex shrink-0 items-center gap-1 px-2 py-1 rounded-neo border-[3px] border-neo-cream bg-neo-navy-light shadow-hard-sm">
-              <Hand className="w-4 h-4 sm:w-5 sm:h-5 text-neo-cyan shrink-0" aria-hidden />
+            <div className="flex shrink-0 items-center gap-1 px-2 py-1 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy-light edu-sky:bg-edu-surface shadow-hard-sm">
+              <Hand className="w-4 h-4 sm:w-5 sm:h-5 text-neo-cyan edu-sky:text-edu-cyan-ink shrink-0" aria-hidden />
               <span className="sr-only">{labels.hands}</span>
               <button
                 type="button"
                 data-testid="unplugged-hands-down"
                 aria-label={labels.handsFewer}
                 onClick={() => onAdjustHands(-1)}
-                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               >
                 <Minus className="w-4 h-4" aria-hidden />
               </button>
               <span
                 data-testid="unplugged-hands-count"
-                className="w-8 text-center font-neo-display font-bold text-neo-white tabular-nums text-[clamp(1rem,1.8vw,1.5rem)]"
+                className="w-8 text-center font-neo-display font-bold text-neo-white edu-sky:text-edu-ink tabular-nums text-[clamp(1rem,1.8vw,1.5rem)]"
               >
                 {state.hands}
               </span>
@@ -245,7 +245,7 @@ export function UnpluggedStage({
                 data-testid="unplugged-hands-up"
                 aria-label={labels.handsMore}
                 onClick={() => onAdjustHands(1)}
-                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream bg-neo-navy text-neo-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+                className="grid place-items-center w-11 h-11 rounded-neo border-[3px] border-neo-cream edu-sky:border-edu-line bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
               >
                 <Plus className="w-4 h-4" aria-hidden />
               </button>

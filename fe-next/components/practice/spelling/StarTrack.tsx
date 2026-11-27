@@ -47,7 +47,7 @@ export function StarTrack({ total, current, outcomes, label }: StarTrackProps) {
                   state === 'hit' && 'motion-safe:animate-[lc-star-pop_380ms_cubic-bezier(.34,1.56,.64,1)]',
                   state === 'current' &&
                     'border-2 border-neo-cyan bg-neo-cyan/20 shadow-[0_0_0_3px_rgba(0,255,255,0.18)] motion-safe:animate-pulse',
-                  state === 'todo' && 'border-2 border-neo-cream/30 bg-neo-white/5'
+                  state === 'todo' && 'border-2 border-neo-cream/30 edu-sky:border-edu-line bg-neo-white/5 edu-sky:bg-edu-ink/5'
                 )}
               >
                 {state === 'hit' ? (
@@ -55,13 +55,13 @@ export function StarTrack({ total, current, outcomes, label }: StarTrackProps) {
                 ) : state === 'miss' ? (
                   <X aria-hidden="true" className="size-[55%] text-neo-navy" strokeWidth={4} />
                 ) : (
-                  <Star aria-hidden="true" className={cn('size-[50%]', state === 'current' ? 'text-neo-cyan' : 'text-neo-cream/35')} />
+                  <Star aria-hidden="true" className={cn('size-[50%]', state === 'current' ? 'text-neo-cyan edu-sky:text-edu-cyan-ink' : 'text-neo-cream/35 edu-sky:text-edu-ink/35')} />
                 )}
               </span>
             );
           })
         ) : (
-          <span className="h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-white/15">
+          <span className="h-3 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-white/15 edu-sky:bg-edu-ink/15">
             <span
               className="block h-full bg-neo-yellow transition-[width] duration-300"
               style={{ width: `${(current / Math.max(total, 1)) * 100}%` }}

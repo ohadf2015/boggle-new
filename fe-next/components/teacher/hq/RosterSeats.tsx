@@ -122,7 +122,7 @@ export const RosterSeats = memo(function RosterSeats({
             )}
             </span>
             {showNames ? (
-              <span className="w-full truncate text-center font-neo-body text-xs font-bold text-neo-white">
+              <span className="w-full truncate text-center font-neo-body text-xs font-bold text-edu-ink">
                 {s.name}
               </span>
             ) : null}
@@ -136,7 +136,7 @@ export const RosterSeats = memo(function RosterSeats({
           aria-hidden="true"
           // An empty chair, not a broken image: solid and faint. (Dashed rings
           // read as "failed to load" — critic, cp1.)
-          className="flex shrink-0 items-center justify-center rounded-full bg-neo-cream/10 text-neo-cream/30"
+          className="flex shrink-0 items-center justify-center rounded-full bg-edu-ink/10 text-edu-ink/30"
           style={{ width: size, height: size }}
         >
           <UserRound className="size-1/2" aria-hidden="true" />

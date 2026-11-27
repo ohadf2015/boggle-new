@@ -85,7 +85,7 @@ describe('ClassroomTvResultsScreen — returning to the lobby', () => {
     const cls = screen.getByTestId('edu-results-next-mode').className;
     // `border-neo` does not survive a cn() merge next to a colour class, so the width is written literally.
     expect(cls).toMatch(/border-\[(2|3)px\]/);
-    expect(cls).toMatch(/border-neo-cream/);
+    expect(cls).toMatch(/border-edu-line/);
   });
 
   it('does not render a dismiss when the host has nowhere to go back to', () => {

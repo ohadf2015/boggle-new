@@ -21,7 +21,7 @@ export function ReportsStudentView({ classroomId, studentId, studentName, onBack
       <button
         type="button"
         onClick={onBack}
-        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2 text-neo-white shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
+        className="inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-edu-line bg-edu-surface px-3 py-2 text-edu-ink shadow-hard-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan active:translate-y-0 active:shadow-none"
         aria-label={t('teacher.reports.backToClass')}
       >
         <DirectionalIcon icon={ArrowLeft} className="size-5" />

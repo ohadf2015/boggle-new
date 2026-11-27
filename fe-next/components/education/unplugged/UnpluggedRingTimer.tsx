@@ -80,13 +80,13 @@ export function UnpluggedRingTimer({
           className={cn(
             'font-neo-display font-bold leading-none tabular-nums',
             'text-[clamp(1.5rem,4.2vw,3.5rem)]',
-            spent ? 'text-neo-white/40' : urgent ? 'text-neo-orange' : 'text-neo-white',
+            spent ? 'text-neo-white/40 edu-sky:text-edu-ink/40' : urgent ? 'text-neo-orange edu-sky:text-edu-orange-ink' : 'text-neo-white edu-sky:text-edu-ink',
             urgent && !reducedMotion && 'animate-neo-wobble',
           )}
         >
           {Math.max(0, secondsLeft)}
         </span>
-        <span className="font-neo-body font-bold uppercase tracking-widest text-neo-white/50 text-[clamp(0.45rem,0.8vw,0.7rem)] mt-0.5">
+        <span className="font-neo-body font-bold uppercase tracking-widest text-neo-white/50 edu-sky:text-edu-ink/50 text-[clamp(0.45rem,0.8vw,0.7rem)] mt-0.5">
           {label}
         </span>
       </div>

@@ -76,7 +76,7 @@ export function WaitingForFirstWord({ t }: { t: Translate }) {
       <p className="font-neo-display text-[clamp(1.25rem,5cqw,3.25rem)] font-black uppercase leading-tight">
         {tr(t, 'eduLive.wordcraft.waiting', 'Waiting for the first word…')}
       </p>
-      <p className="max-w-[36ch] font-neo-body text-[clamp(1rem,2.6cqw,1.75rem)] font-bold text-neo-cream/85">
+      <p className="max-w-[36ch] font-neo-body text-[clamp(1rem,2.6cqw,1.75rem)] font-bold text-neo-cream/85 edu-sky:text-edu-ink/85">
         {tr(t, 'education.wordcraftLive.tapLetters', 'Tap letters to build a word')}
       </p>
     </div>
@@ -98,8 +98,8 @@ export function LessonWordWall({ targets }: { targets: FeedTarget[] }) {
           transition={{ duration: 0.45 }}
           className={
             x.built
-              ? 'inline-flex items-center gap-2 rounded-neo border-[3px] border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display text-base font-black text-neo-black shadow-hard-sm md:text-xl 2xl:text-2xl'
-              : 'inline-flex items-center rounded-neo border-[3px] border-dashed border-neo-cream/70 px-3 py-1.5 font-neo-display text-base font-black text-neo-cream md:text-xl 2xl:text-2xl'
+              ? 'inline-flex items-center gap-2 rounded-neo border-[3px] border-neo-black edu-sky:border-neo-black bg-neo-lime px-3 py-1.5 font-neo-display text-base font-black text-neo-black edu-sky:text-neo-black shadow-hard-sm md:text-xl 2xl:text-2xl'
+              : 'inline-flex items-center rounded-neo border-[3px] border-dashed border-neo-cream/70 edu-sky:border-edu-line px-3 py-1.5 font-neo-display text-base font-black text-neo-cream edu-sky:text-edu-ink md:text-xl 2xl:text-2xl'
           }
         >
           <span dir="auto">{x.built ? `✓ ${x.word}` : x.word}</span>

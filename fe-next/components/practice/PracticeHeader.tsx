@@ -98,7 +98,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
       data-testid="practice-header"
       className={cn(
         'sticky top-0 z-50',
-        'bg-neo-navy/95',
+        'bg-neo-navy/95 edu-sky:bg-edu-surface',
         'border-b-neo border-neo-black/30',
         className
       )}
@@ -116,17 +116,17 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10 p-2"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10 p-2"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
 
           {/* Title and mode */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-neo-display text-neo-white line-clamp-2">
+            <h1 className="text-lg font-neo-display text-neo-white edu-sky:text-edu-ink line-clamp-2">
               {lessonName}
             </h1>
-            <p className="text-xs text-neo-white font-neo-body">
+            <p className="text-xs text-neo-white edu-sky:text-edu-ink font-neo-body">
               {getModeLabel(mode)}
             </p>
           </div>

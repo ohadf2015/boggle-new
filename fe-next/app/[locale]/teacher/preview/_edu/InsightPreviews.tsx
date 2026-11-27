@@ -16,6 +16,7 @@ import { rankWeekHardestWords, toFreeClassPulse, type FreeClassInsight } from '@
 import type { ClassAnalytics } from '@/lib/education/pro/classAnalyticsServer';
 import { FREE_PREVIEW_WORDS } from '@/lib/education/wordMasteryReport';
 import { fixtureFor } from './fixtures';
+import { HeadingMascot } from '@/components/teacher/HeadingMascot';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 const noop = () => undefined;
@@ -112,7 +113,10 @@ export function ReportsPreview({ v }: { v?: string }) {
     return (
       <ReportsShell>
         <div className="mx-auto w-full max-w-5xl">
-          <h1 className="mb-4 font-neo-display text-2xl font-bold text-neo-white sm:text-3xl">{t('teacher.reports.title')}</h1>
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <h1 className="min-w-0 font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
+            <HeadingMascot moment="success" testId="reports-heading-mascot" />
+          </div>
           <ClassroomPicker classrooms={classes} onSelect={noop} />
         </div>
       </ReportsShell>
@@ -128,8 +132,8 @@ export function ReportsPreview({ v }: { v?: string }) {
         lockedTitle={
           <div className="mx-auto mb-4 flex w-full max-w-5xl flex-col gap-4 sm:mb-6">
             <div>
-              <h1 className="font-neo-display text-2xl font-bold leading-tight text-neo-white sm:text-3xl">{t('teacher.reports.title')}</h1>
-              <p className="mt-1 max-w-prose text-sm leading-snug text-neo-cream sm:text-base">{t('teacher.reports.lockedValue')}</p>
+              <h1 className="font-neo-display text-4xl font-black leading-none text-edu-ink [overflow-wrap:anywhere] sm:text-6xl">{t('teacher.reports.title')}</h1>
+              <p className="mt-1 max-w-prose text-sm leading-snug text-edu-ink sm:text-base">{t('teacher.reports.lockedValue')}</p>
             </div>
             <ReportsFreeInsightsView free={classes[0]} others={classes.slice(1)}>
               <FreeWeekCard classroomId="c1" locale={language} insight={insight} names={names} t={t} proLine={false} />

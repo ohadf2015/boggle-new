@@ -10,6 +10,7 @@ import { MpRoundMute } from '@/components/multiplayer/round/MpRoundMute';
 import { formatClock } from '@/components/game/shell/formatClock';
 import { MOTION } from '@/components/motion/tokens';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 export type TimerTone = 'lime' | 'yellow' | 'pink';
 
@@ -32,6 +33,7 @@ export const HUD_EXIT_BUTTON = cn(
   'grid h-10 w-10 shrink-0 place-items-center rounded-xl border-2 border-neo-black bg-neo-navy-light text-neo-cream active:translate-y-0.5 active:shadow-none tv:h-16 tv:w-16',
   LIP,
 );
+export const HUD_EXIT_BUTTON_CLASSROOM = HUD_EXIT_BUTTON.replace('bg-neo-navy-light text-neo-cream', 'bg-edu-surface text-edu-ink');
 
 export function GameTimerBar({ remaining, total, gentle = false, className }: { remaining: number; total: number; gentle?: boolean; className?: string }) {
   const { t } = useLanguage();
@@ -39,6 +41,7 @@ export function GameTimerBar({ remaining, total, gentle = false, className }: { 
   const left = Math.max(0, remaining);
   const tone = timerTone(left, total);
   const urgent = !gentle && tone === 'pink' && left > 0;
+  const classroom = useClassroomBoard();
   return (
     <div className={cn('relative flex min-w-0 flex-1 items-center gap-2', className)}>
       <div
@@ -50,7 +53,7 @@ export function GameTimerBar({ remaining, total, gentle = false, className }: { 
         aria-valuetext={formatClock(left)}
         data-tone={gentle ? 'lime' : tone}
         data-urgent={String(urgent)}
-        className="relative h-5 min-w-0 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/45 tv:h-8"
+        className={classroom ? 'relative h-5 min-w-0 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-edu-surface tv:h-8' : 'relative h-5 min-w-0 flex-1 overflow-hidden rounded-full border-2 border-neo-black bg-neo-black/45 tv:h-8'}
       >
         <div
           data-testid="hud-timer-fill"
@@ -68,7 +71,7 @@ export function GameTimerBar({ remaining, total, gentle = false, className }: { 
       <span
         aria-hidden
         dir="ltr"
-        className={cn('w-10 shrink-0 text-end font-neo-display text-base font-bold tabular-nums leading-none tv:w-20 tv:text-3xl', urgent ? 'text-neo-pink' : 'text-neo-cream')}
+        className={cn('w-10 shrink-0 text-end font-neo-display text-base font-bold tabular-nums leading-none tv:w-20 tv:text-3xl', urgent ? (classroom ? 'text-edu-pink-ink' : 'text-neo-pink') : classroom ? 'text-edu-ink' : 'text-neo-cream')}
       >
         {formatClock(left)}
       </span>
@@ -122,10 +125,11 @@ export interface GameHudProps {
 /** The lesson-style top row: exit · one thick timer bar · score pill (· mute). */
 function GameHudImpl({ onExit, remaining, total, score, gentle, start, end, mute = true, className }: GameHudProps) {
   const { t } = useLanguage();
+  const classroom = useClassroomBoard();
   return (
     <div data-testid="game-hud" className={cn('flex h-14 w-full items-center gap-2.5 tv:h-24 tv:gap-4', className)}>
       {onExit && (
-        <button type="button" onClick={onExit} aria-label={t('common.exit')} className={HUD_EXIT_BUTTON}>
+        <button type="button" onClick={onExit} aria-label={t('common.exit')} className={classroom ? HUD_EXIT_BUTTON_CLASSROOM : HUD_EXIT_BUTTON}>
           <X className="h-5 w-5 tv:h-8 tv:w-8" strokeWidth={3} aria-hidden />
         </button>
       )}

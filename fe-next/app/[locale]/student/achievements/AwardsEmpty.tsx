@@ -5,7 +5,6 @@ import { Play } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Reveal, pressClasses } from '@/components/education/motion';
 import { EDU_MASCOT } from '@/lib/education/mascotArt';
-import { INK_TEXT } from '@/components/student/academy/chrome';
 import { cn } from '@/lib/utils';
 
 export function AwardsEmpty() {
@@ -20,10 +19,10 @@ export function AwardsEmpty() {
           aria-hidden="true"
           className="pointer-events-none size-36 select-none object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))] [@media(max-height:700px)]:size-24 sm:size-44"
         />
-        <h2 dir="auto" className={cn('font-neo-display text-2xl font-black text-neo-white sm:text-3xl', INK_TEXT)}>
+        <h2 dir="auto" className={cn('font-neo-display text-2xl font-black text-edu-ink sm:text-3xl')}>
           {t('academy.pages.awardsEmptyTitle', 'No awards yet')}
         </h2>
-        <p dir="auto" className="font-neo-body text-base font-bold text-neo-white/85">
+        <p dir="auto" className="font-neo-body text-base font-bold text-edu-ink/85">
           {t('academy.pages.awardsEmptyBody', 'Finish your first lesson and your first award lands here.')}
         </p>
         <Link

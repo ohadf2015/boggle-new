@@ -24,7 +24,13 @@ function lesson(i: number) {
     name: ['Animals and their habitats', 'Weather words', 'Kitchen verbs'][i % 3],
     description: null,
     language: 'en',
-    words: ['habitat', 'predator', 'migrate', 'burrow', 'nocturnal'].map((word) => ({ word })),
+    words: [
+      ['habitat', 'The natural home of an animal'],
+      ['predator', 'An animal that hunts other animals'],
+      ['migrate', 'To move to another place when seasons change'],
+      ['burrow', 'A hole an animal digs to live in'],
+      ['nocturnal', 'Awake and active at night'],
+    ].map(([word, definition]) => ({ word, definition })),
     classroom_id: CLASSROOM_ID,
     assignment: i === 0
       ? { lesson_id: `e2e-lesson-${i}`, classroom_id: CLASSROOM_ID, due_date: new Date(Date.now() + 86_400_000).toISOString() }
@@ -32,12 +38,8 @@ function lesson(i: number) {
   };
 }
 
-async function projectRef(page: Page, baseURL: string): Promise<string> {
-  const html = await (await page.request.get(`${baseURL}/en/education`)).text();
-  const ref = html.match(/https:\/\/([a-z0-9]+)\.supabase\.co/)?.[1];
-  if (!ref) throw new Error('Supabase project ref not found in the page');
-  return ref;
-}
+/** The local client's project. Not read from the page: its HTML also preconnects to the production project. */
+const projectRef = () => process.env.E2E_SUPABASE_REF ?? 'localdummyproject';
 
 /**
  * A forged session the browser reads from its cookie. Every Supabase call the
@@ -64,7 +66,7 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
     created_at: '2026-10-01T00:00:00Z',
   };
   const session = { access_token: access, refresh_token: 'e2e', token_type: 'bearer', expires_in: 3600, expires_at: exp, user };
-  const ref = await projectRef(page, baseURL);
+  const ref = projectRef();
   const url = new URL(baseURL);
   await context.addCookies([{
     name: `sb-${ref}-auth-token`,
@@ -90,6 +92,7 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
   const assignment = { id: 'e2e-assign-0', lesson_id: 'e2e-lesson-0', classroom_id: CLASSROOM_ID, due_date: soon, created_at: '2026-10-03T00:00:00Z', vocabulary_lessons: lesson(0) };
   const progress = { id: 'e2e-progress-1', student_id: USER_ID, lesson_id: 'e2e-lesson-1', started_at: '2026-10-04T00:00:00Z', completed_at: '2026-10-04T00:10:00Z', words_mastered: lesson(1).words.map((w) => w.word) };
 
+  await context.route(/\/\/([a-z0-9-]+\.)*lexiclash\.live\//, (route) => route.abort());
   await context.route(/\.supabase\.co\//, (route) => {
     const req = route.request();
     const u = new URL(req.url());
@@ -112,11 +115,21 @@ export async function signInAs(context: BrowserContext, page: Page, baseURL: str
 
   await context.route('**/api/**', (route) => {
     const req = route.request();
-    const path = new URL(req.url()).pathname;
+    const reqUrl = new URL(req.url());
+    const path = reqUrl.pathname;
+    const lessonId = reqUrl.searchParams.get('lessonId');
+    if (path === '/api/education/practice/lessons' && lessonId) {
+      const i = [0, 1, 2].find((n) => `e2e-lesson-${n}` === lessonId);
+      return i === undefined ? json(route, { error: 'Not found' }, 404) : json(route, { lesson: lesson(i) });
+    }
     if (path === '/api/education/practice/lessons') return json(route, { lessons: full ? [0, 1, 2].map(lesson) : [] });
     if (path === '/api/streak') return json(route, full ? { currentStreak: 4, longestStreak: 6, lastWinDate: new Date(Date.now() - 86_400_000).toISOString() } : { currentStreak: 0 });
     if (path.startsWith('/api/education/spaced-repetition')) return json(route, { words: [], progress: [] });
     if (path.includes('/hub')) return json(route, { classroom: { id: CLASSROOM_ID, name: 'Class 5B Explorers' }, standings: [], members: [] });
+    if (path === '/api/education/practice' && req.method() === 'POST') {
+      const body = (req.postDataJSON() ?? {}) as { lessonId?: string; practiceType?: string };
+      return json(route, { session: { id: 'e2e-session', student_id: USER_ID, lesson_id: body.lessonId ?? 'e2e-lesson-0', practice_type: body.practiceType ?? 'flashcard', cards_reviewed: 0, cards_correct: 0, words_found: [], vocabulary_words_found: [], total_score: 0, time_spent_seconds: 0, started_at: new Date().toISOString(), completed_at: null } });
+    }
     if (req.method() !== 'GET') return json(route, { ok: true });
     return json(route, {});
   });

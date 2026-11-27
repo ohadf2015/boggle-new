@@ -55,6 +55,15 @@ describe('StudentProfilePageClient', () => {
     expect(screen.queryByText('education.practice.wordsFound')).toBeNull();
   });
 
+  test('given a new student on a phone, then the play button drops under the copy instead of squeezing it to one word per line', async () => {
+    state.lessons = [lesson({})];
+    render(<StudentProfilePageClient />);
+    const card = await screen.findByTestId('profile-first-step');
+    expect(card.className).toMatch(/(^|\s)flex-wrap(\s|$)/);
+    expect(card.querySelector('a')!.className).toMatch(/(^|\s)w-full(\s|$)/);
+    expect(card.querySelector('a')!.className).toMatch(/(^|\s)sm:w-auto(\s|$)/);
+  });
+
   test('given nothing earned, then the achievements heading appears once with a link to all awards and no pin line', async () => {
     state.lessons = [lesson({})];
     render(<StudentProfilePageClient />);

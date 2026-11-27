@@ -147,5 +147,8 @@ describe('/student/lessons lists the student lessons', () => {
     expect(cards).toHaveLength(2);
     expect(cards[0]).toHaveAttribute('href', '/en/student/lessons/l1');
     expect(screen.getByText('Space words')).toBeInTheDocument();
+    const empty = cards[0].querySelectorAll('svg.lucide-star');
+    expect(empty.length).toBe(3);
+    for (const star of empty) expect(star.getAttribute('class')).not.toMatch(/fill-white\//);
   });
 });

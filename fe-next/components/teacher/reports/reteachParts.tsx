@@ -19,10 +19,10 @@ export function snapshotWords(words: readonly HardWord[], limit = SNAPSHOT_WORDS
     .slice(0, limit);
 }
 
-export const REPORT_HERO_PANEL = 'rounded-neo-xl border-[3px] border-neo-black bg-neo-navy-light p-5 shadow-hard-lg sm:p-7';
+export const REPORT_HERO_PANEL = 'rounded-neo-xl border-[3px] border-neo-black bg-edu-surface p-5 shadow-hard-lg sm:p-7';
 
 const HERO_ACTION =
-  'flex min-h-16 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-xl font-black text-neo-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy-light';
+  'flex min-h-16 w-full items-center justify-center gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 py-3 font-neo-display text-xl font-black text-neo-black shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface';
 
 const BADGE_TONE = {
   pink: 'bg-neo-pink',
@@ -53,7 +53,7 @@ export function ReteachWordRows({ words, columns = false, noteSingleStudent = fa
   return (
     <>
       {single ? (
-        <p data-testid="reteach-single-sample" dir="auto" className="mt-3 text-sm font-bold text-neo-cream/80">
+        <p data-testid="reteach-single-sample" dir="auto" className="mt-3 text-sm font-bold text-edu-ink/80">
           {t('teacher.reports.reteach.singleStudent', 'Only one student has played so far, so these are their misses.')}
         </p>
       ) : null}
@@ -63,16 +63,16 @@ export function ReteachWordRows({ words, columns = false, noteSingleStudent = fa
             key={w.word}
             data-testid="reteach-word"
             data-word={w.word}
-            className="border-b-2 border-neo-cream/15 py-2 max-sm:[&:nth-child(n+4)]:hidden"
+            className="border-b-2 border-edu-line/15 py-2 max-sm:[&:nth-child(n+4)]:hidden"
           >
             <div className="flex items-baseline justify-between gap-3">
-              <span dir="auto" className="min-w-0 truncate font-neo-display text-xl font-black text-neo-white">{w.display}</span>
+              <span dir="auto" className="min-w-0 truncate font-neo-display text-xl font-black text-edu-ink">{w.display}</span>
               {single ? null : (
                 <span className="shrink-0 text-end">
-                  <span dir="auto" className="block text-sm font-black tabular-nums text-neo-pink">
+                  <span dir="auto" className="block text-sm font-black tabular-nums text-edu-pink-ink">
                     {t('teacher.reports.reteach.missRate', '{pct}% missed', { pct: w.missRate })}
                   </span>
-                  <span dir="auto" className="block text-xs font-bold text-neo-cream/70">
+                  <span dir="auto" className="block text-xs font-bold text-edu-ink/70">
                     {t('teacher.reports.reteach.studentsMissed', '{missing} of {asked} students missed it', {
                       missing: w.studentsMissing,
                       asked: w.studentsAsked,

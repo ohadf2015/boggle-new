@@ -248,7 +248,7 @@ export function TimedBlitzPractice({
               transition={{ type: 'spring', stiffness: 200 }}
               className={cn(
                 'text-[120px] font-neo-display',
-                'text-neo-yellow',
+                'text-neo-yellow edu-sky:text-edu-yellow-ink',
                 'drop-shadow-[4px_4px_0px_rgba(0,0,0,0.5)]'
               )}
             >
@@ -309,7 +309,7 @@ export function TimedBlitzPractice({
                 className={cn(
                   'px-4 py-2 rounded-neo',
                   'bg-neo-yellow/20 border-[3px] border-neo-yellow',
-                  'font-neo-display text-neo-yellow text-2xl'
+                  'font-neo-display text-neo-yellow edu-sky:text-edu-yellow-ink text-2xl'
                 )}
               >
                 {score}
@@ -326,16 +326,16 @@ export function TimedBlitzPractice({
               className={cn(
                 'p-8 rounded-neo',
                 // Cream edge, not black: black on navy measures 1.23:1.
-                'bg-neo-navy-light border-[3px] border-neo-cream',
+                'bg-neo-navy-light edu-sky:bg-edu-surface border-[3px] border-neo-cream edu-sky:border-edu-line',
                 'shadow-hard-lg',
                 'min-h-[150px] flex flex-col items-center justify-center'
               )}
             >
-              <p className="font-neo-body text-neo-white text-2xl text-center">
+              <p className="font-neo-body text-neo-white edu-sky:text-edu-ink text-2xl text-center">
                 {currentWord?.definition || t('education.practice.noWords')}
               </p>
               {currentWord?.word && (
-                <p data-testid="blitz-hint" dir="auto" aria-hidden="true" className="mt-3 whitespace-pre text-center font-neo-display text-xl tracking-widest text-neo-cyan">
+                <p data-testid="blitz-hint" dir="auto" aria-hidden="true" className="mt-3 whitespace-pre text-center font-neo-display text-xl tracking-widest text-neo-cyan edu-sky:text-edu-cyan-ink">
                   {Array.from(currentWord.word.trim()).map((ch, i) => (i === 0 || ch === ' ' ? ch : '_')).join(' ')}
                 </p>
               )}
@@ -345,10 +345,10 @@ export function TimedBlitzPractice({
               <p
                 role="status"
                 data-testid="blitz-miss-reveal"
-                className="-mt-3 text-center font-neo-body text-lg font-bold text-neo-pink"
+                className="-mt-3 text-center font-neo-body text-lg font-bold text-neo-pink edu-sky:text-edu-pink-ink"
               >
                 {t('education.produce.theWordWas')}{' '}
-                <bdi className="text-neo-cream">{missedAnswer}</bdi>
+                <bdi className="text-neo-cream edu-sky:text-edu-ink">{missedAnswer}</bdi>
               </p>
             )}
 
@@ -392,7 +392,7 @@ export function TimedBlitzPractice({
                 'font-neo-display text-black text-xl',
                 // Disabled drains the FILL and keeps a readable label and a
                 // visible edge, instead of fading the whole control.
-                'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
+                'disabled:bg-neo-navy-light edu-sky:disabled:bg-edu-tile disabled:text-neo-cream edu-sky:disabled:text-edu-ink disabled:border-neo-cream edu-sky:disabled:border-edu-line',
                 'disabled:shadow-none disabled:cursor-not-allowed',
                 'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity] active:translate-y-1'
                 )}
@@ -423,7 +423,7 @@ export function TimedBlitzPractice({
             >
               {t('education.practice.timesUp')}
             </div>
-            <Sparkles className="w-12 h-12 text-neo-yellow mx-auto mt-4" />
+            <Sparkles className="w-12 h-12 text-neo-yellow edu-sky:text-edu-yellow-ink mx-auto mt-4" />
           </AdaptiveMotion.div>
         )}
 

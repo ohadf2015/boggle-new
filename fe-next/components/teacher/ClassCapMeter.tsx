@@ -41,13 +41,13 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
     <div
       data-testid="class-cap-meter"
       className={cn(
-        'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-neo border-2 bg-neo-navy-light px-3 py-1.5',
-        full ? 'border-neo-cream/60' : 'border-neo-cream/35',
+        'flex flex-wrap items-center gap-x-3 gap-y-1 rounded-neo border-2 bg-edu-surface px-3 py-1.5',
+        full ? 'border-edu-line' : 'border-edu-line',
         className,
       )}
     >
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-1">
-        <p className="text-xs font-bold leading-tight text-neo-cream sm:text-sm">
+        <p className="text-xs font-bold leading-tight text-edu-ink sm:text-sm">
           {full ? (
             <>
               <span className="max-sm:hidden">{t('eduPlans.cap.full', { limit })}</span>
@@ -66,7 +66,7 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
           className="flex w-20 shrink-0 gap-1 max-sm:hidden sm:w-28"
         >
           {Array.from({ length: limit }, (_, i) => (
-            <span key={i} className={cn('h-1.5 flex-1 rounded-full', i < count ? 'bg-neo-cream' : 'bg-neo-cream/20')} />
+            <span key={i} className={cn('h-1.5 flex-1 rounded-full', i < count ? 'bg-neo-cream' : 'bg-edu-ink/20')} />
           ))}
         </div>
       </div>
@@ -85,9 +85,9 @@ export function ClassCapMeter({ count, className }: { count: number; className?:
               locale: language,
             });
           }}
-          className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-cream/60 px-3 max-sm:min-h-9 max-sm:min-w-9 max-sm:px-0 font-neo-display text-sm font-bold text-neo-cream transition-colors hover:bg-neo-cream/10 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
+          className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-neo border-2 border-edu-line px-3 max-sm:min-h-9 max-sm:min-w-9 max-sm:px-0 font-neo-display text-sm font-bold text-edu-ink transition-colors hover:bg-edu-ink/10 motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
         >
-          <Crown className="size-4 text-neo-yellow" aria-hidden="true" />
+          <Crown className="size-4 text-edu-yellow-ink" aria-hidden="true" />
           <span className="max-sm:sr-only">{t('eduPlans.cap.cta')}</span>
         </Link>
       ) : null}

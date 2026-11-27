@@ -18,7 +18,7 @@ export function HelpShotFigure({
   const phone = shot.phone;
   return (
     <figure className={phone ? 'mx-auto max-w-[300px]' : 'w-full'}>
-      <div className="overflow-hidden rounded-neo border-4 border-neo-cream/50 bg-neo-navy-light shadow-hard-lg">
+      <div className="overflow-hidden rounded-neo border-4 border-edu-line bg-edu-surface shadow-hard-lg">
         <Image
           src={shot.src}
           alt={alt}
@@ -30,7 +30,7 @@ export function HelpShotFigure({
         />
       </div>
       {caption ? (
-        <figcaption className="mt-2 text-sm font-medium text-neo-gray-300">{caption}</figcaption>
+        <figcaption className="mt-2 text-sm font-medium text-edu-ink/70">{caption}</figcaption>
       ) : null}
     </figure>
   );

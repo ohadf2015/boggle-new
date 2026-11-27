@@ -51,8 +51,8 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
       <div data-testid="lobby-mode-cells" className="grid grid-cols-2 gap-x-1.5 gap-y-2.5 p-1 @2xl:grid-cols-4 @2xl:gap-x-3 @2xl:gap-y-4">
         {CATALOGUE_CATEGORIES.map((category) => (
           <section key={category} data-testid={`mode-group-${category}`} className={cn('grid grid-cols-subgrid content-start gap-y-1.5', GROUP_SPAN[category])}>
-            <h2 className="col-span-full flex items-center gap-1.5 px-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream/80 @2xl:text-sm">
-              <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-neo-cream" />
+            <h2 className="col-span-full flex items-center gap-1.5 px-0.5 font-neo-body text-xs font-bold leading-none text-edu-ink/80 @2xl:text-sm">
+              <span aria-hidden="true" className="h-[3px] w-3 shrink-0 bg-edu-ink" />
               {t(`eg2Modes.category.${category}`)}
             </h2>
             {modes
@@ -94,7 +94,7 @@ export function LobbyModeGrid({ selected, recommended = null, suggested = null, 
 const DELIVERY_ICON = { projector: MonitorPlay, phones: Smartphone, both: MonitorSmartphone } as const;
 
 const STICKER =
-  'inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-neo-cream/40 bg-neo-navy px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-neo-cream';
+  'inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-edu-line bg-edu-surface px-1.5 py-0.5 font-neo-body text-xs font-bold leading-none text-edu-ink';
 
 function ModeTile({
   mode,
@@ -143,18 +143,18 @@ function ModeTile({
         if (!selected && !blockedReason) onPick(mode.id);
       }}
       className={cn(
-        'group relative flex min-w-0 items-center gap-2 overflow-hidden rounded-neo border-2 bg-neo-navy-light p-1.5 text-start text-neo-cream',
+        'group relative flex min-w-0 items-center gap-2 overflow-hidden rounded-neo border-2 bg-edu-surface p-1.5 text-start text-edu-ink',
         'motion-safe:animate-[lc-mode-in_360ms_cubic-bezier(0.23,1,0.32,1)_backwards]',
         mode.category === 'together' && 'col-span-2 @2xl:col-span-1',
         blockedReason && 'cursor-not-allowed border-dashed [&_img]:grayscale',
         '@2xl:flex-col @2xl:items-stretch @2xl:gap-0 @2xl:p-0',
         'transition-[border-color,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.98] motion-reduce:transition-none',
-        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy disabled:cursor-wait',
+        'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-edu-line focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface disabled:cursor-wait',
         selected
-          ? 'border-neo-lime ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy'
+          ? 'border-neo-black ring-[3px] ring-neo-pink ring-offset-2 ring-offset-edu-page'
           : blockedReason
-            ? 'border-neo-cream/25'
-            : 'border-neo-cream/35 [@media(hover:hover)]:hover:border-neo-cream/50',
+            ? 'border-edu-line'
+            : 'border-edu-line [@media(hover:hover)]:hover:border-edu-line',
       )}
     >
       <span
@@ -164,7 +164,7 @@ function ModeTile({
           ARCADE_BLOCK[accent],
           dense
             ? 'size-10 @2xl:[@media(max-height:800px)]:aspect-[3/1]'
-            : 'size-12 @2xl:[@media(max-height:800px)]:aspect-[2/1] @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))]',
+            : 'size-12 @2xl:min-h-[min(calc(50cqh-12rem),calc(25cqw-0.75rem))] @2xl:[@media(max-height:1100px)]:aspect-[4/1] @2xl:[@media(max-height:1100px)]:min-h-0',
         )}
       >
         <span className="relative block h-full w-full -rotate-2 overflow-hidden rounded-[4px] border-2 border-neo-black shadow-hard transition-transform duration-150 group-hover:rotate-0 motion-reduce:transition-none">
@@ -183,9 +183,9 @@ function ModeTile({
           <span
             data-testid="mode-selected-check"
             aria-hidden="true"
-            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-lime bg-neo-navy"
+            className="absolute end-1 top-1 grid size-6 place-items-center rounded-full border-2 border-neo-black bg-edu-surface"
           >
-            <Check className="size-3.5 text-neo-lime" strokeWidth={4} />
+            <Check className="size-3.5 text-edu-pink-ink" strokeWidth={4} />
           </span>
         ) : null}
       </span>
@@ -204,7 +204,7 @@ function ModeTile({
             </span>
           ) : null}
         </span>
-        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-neo-cream/70">
+        <span className="flex min-w-0 flex-nowrap items-center gap-x-2 whitespace-nowrap font-neo-body text-xs font-bold text-edu-ink/70 [@media(max-height:860px)]:@2xl:hidden">
           <span className="inline-flex items-center gap-1 whitespace-nowrap">
             <Clock className="size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             {minutesLabel}
@@ -215,12 +215,12 @@ function ModeTile({
           </span>
         </span>
         {blockedReason ? (
-          <span data-testid="mode-blocked-reason" className="flex items-start gap-1 font-neo-body text-xs font-bold leading-snug text-neo-cream/85">
+          <span data-testid="mode-blocked-reason" className="flex items-start gap-1 font-neo-body text-xs font-bold leading-snug text-edu-ink/85">
             <Ban className="mt-px size-3 shrink-0" strokeWidth={2.5} aria-hidden="true" />
             {blockedReason}
           </span>
         ) : hint ? (
-          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-neo-cream/80', mode.category !== 'together' && 'hidden @2xl:block')}>
+          <span data-testid="mode-hint" className={cn('font-neo-body text-xs leading-snug text-edu-ink/80 [@media(max-height:1100px)]:@2xl:hidden', mode.category !== 'together' && 'hidden @2xl:block')}>
             {hint}
           </span>
         ) : null}

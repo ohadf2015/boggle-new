@@ -85,10 +85,10 @@ export const HQ_ACCENT_BG: Record<HqModeAccent, string> = {
 
 /** The idle chip's icon colour — the accent as ink on navy, not a filled stage. Literal strings: Tailwind only generates what it can read. */
 export const HQ_ACCENT_TEXT: Record<HqModeAccent, string> = {
-  cyan: 'text-neo-cyan',
-  lime: 'text-neo-lime',
-  pink: 'text-neo-pink',
-  purple: 'text-neo-purple',
+  cyan: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
+  lime: 'text-neo-lime edu-sky:text-edu-lime-ink',
+  pink: 'text-neo-pink edu-sky:text-edu-pink-ink',
+  purple: 'text-neo-purple edu-sky:text-edu-purple-ink',
 };
 
 export interface HqModeFacts {

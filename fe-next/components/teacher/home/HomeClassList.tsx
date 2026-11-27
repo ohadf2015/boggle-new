@@ -60,7 +60,7 @@ export function HomeNewClass({ href, count, limit, t }: { href: string; count: n
   return (
     <div className="flex shrink-0 items-center gap-3">
       {limit !== null ? (
-        <span data-testid="home-class-cap" className="hidden font-neo-body text-xs font-bold text-neo-cream/70 sm:inline">
+        <span data-testid="home-class-cap" className="hidden font-neo-body text-xs font-bold text-edu-ink/70 sm:inline">
           {t('eduShell.setup.capMeter', { count, limit })}
         </span>
       ) : null}
@@ -94,7 +94,7 @@ export function HomeClassMeta({
   t: T;
 }) {
   return (
-    <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-bold text-white sm:text-base">
+    <div data-testid="home-desk-meta" className="flex flex-wrap items-center gap-x-4 gap-y-2 font-neo-body text-sm font-bold text-edu-ink sm:text-base">
       {previewIds.length > 0 ? <span className="contents max-sm:hidden"><StudentStack ids={previewIds} total={memberCount} /></span> : null}
       <span className="inline-flex items-center gap-1.5">
         <Users className="size-4" aria-hidden="true" />
@@ -139,13 +139,13 @@ export function HomeClassList({
   return (
     <section aria-labelledby="home-classes-title" className="flex flex-col gap-3">
       <div className="flex items-end justify-between gap-3">
-        <h2 id="home-classes-title" className="whitespace-nowrap font-neo-display text-xl font-black text-neo-cream sm:text-2xl">
+        <h2 id="home-classes-title" className="whitespace-nowrap font-neo-display text-xl font-black text-edu-ink sm:text-2xl">
           {t('eduShell.home.yourClasses')}
         </h2>
         {newClassHref ? <HomeNewClass href={newClassHref} count={classrooms.length} limit={classLimit} t={t} /> : null}
       </div>
 
-      <ul className={cn(PANEL, 'divide-y-[2px] divide-neo-cream/10 overflow-hidden p-0')}>
+      <ul className={cn(PANEL, 'divide-y-[2px] divide-edu-line/10 overflow-hidden p-0')}>
         {classrooms.map((c) => {
           const played = lastPlayedAt?.[c.id];
           const previewIds = studentPreview?.[c.id] ?? [];
@@ -163,7 +163,7 @@ export function HomeClassList({
                   <span
                     aria-hidden="true"
                     data-testid="home-class-badge"
-                    className="grid size-9 shrink-0 place-items-center rounded-neo border-2 border-neo-cream/35 bg-neo-navy font-neo-display text-xs font-black text-neo-cream"
+                    className="grid size-9 shrink-0 place-items-center rounded-neo border-2 border-edu-line bg-edu-surface font-neo-display text-xs font-black text-edu-ink"
                   >
                     {classBadge(c.name)}
                   </span>
@@ -172,11 +172,11 @@ export function HomeClassList({
                   <Link
                     href={teacherResultsHref(language, c.id)}
                     dir="auto"
-                    className="truncate rounded-sm text-start font-neo-body text-base font-bold text-neo-cream hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                    className="truncate rounded-sm text-start font-neo-body text-base font-bold text-edu-ink hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
                   >
                     {c.name}
                   </Link>
-                  <span className="mt-0.5 flex items-center gap-3 font-neo-body text-xs font-semibold text-neo-cream/70 sm:text-sm">
+                  <span className="mt-0.5 flex items-center gap-3 font-neo-body text-xs font-semibold text-edu-ink/70 sm:text-sm">
                     <span className="inline-flex items-center gap-1">
                       <Users className="size-3.5 sm:size-4" aria-hidden="true" />
                       <span className="sm:hidden">{c.member_count ?? 0}</span>

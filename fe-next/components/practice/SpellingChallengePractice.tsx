@@ -27,15 +27,16 @@ import { streakFlameStage } from '@/lib/education/practiceJuice';
 /*
  * The stage behind the drill: two soft brand-colour glows and a faint dot grid
  * over the navy, so the round reads as a game board rather than a blank form.
- * Static (no animation), so it costs nothing on a low-end phone.
+ * Static (no animation), so it costs nothing on a low-end phone. The sky
+ * classroom skin sets --practice-stage-art to none: no glows on the light page.
  */
 const STAGE_STYLE: React.CSSProperties = {
-  backgroundImage: [
+  backgroundImage: `var(--practice-stage-art, ${[
     'radial-gradient(60% 38% at 12% 0%, color-mix(in srgb, var(--neo-cyan) 20%, transparent), transparent 70%)',
     'radial-gradient(55% 35% at 100% 40%, color-mix(in srgb, var(--neo-pink) 18%, transparent), transparent 70%)',
     'radial-gradient(55% 30% at 0% 100%, color-mix(in srgb, var(--neo-lime) 12%, transparent), transparent 70%)',
     'radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.6px)',
-  ].join(','),
+  ].join(',')})`,
   backgroundSize: 'auto, auto, auto, 18px 18px',
 };
 
@@ -259,7 +260,7 @@ function SpellingRound({
 
   if (showResults) {
     return (
-      <div className="min-h-full bg-neo-navy flex items-center justify-center p-4" style={STAGE_STYLE}>
+      <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page edu-sky:[--practice-stage-art:none] flex items-center justify-center p-4" style={STAGE_STYLE}>
         <PracticeResultsCard
           correct={correctCount}
           total={attempts}
@@ -274,7 +275,7 @@ function SpellingRound({
           footer={
             missed.length > 0 ? (
               <div data-testid="spelling-missed" className="mt-1 flex flex-col items-center gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
-                <p className="font-neo-display text-sm font-bold uppercase tracking-wide text-neo-cream">
+                <p className="font-neo-display text-sm font-bold uppercase tracking-wide text-neo-cream edu-sky:text-edu-ink">
                   {t('eduStudent.results.missedTitle')}
                 </p>
                 <ul className="flex flex-wrap justify-center gap-2">
@@ -292,7 +293,7 @@ function SpellingRound({
                   type="button"
                   data-testid="spelling-retry-missed"
                   onClick={() => onNewRound(missed)}
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-pink bg-neo-navy px-4 font-neo-body text-sm font-bold uppercase text-neo-pink transition-colors hover:bg-neo-navy-light focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-neo border-[2px] border-neo-pink bg-neo-navy edu-sky:bg-edu-surface px-4 font-neo-body text-sm font-bold uppercase text-neo-pink edu-sky:text-edu-pink-ink transition-colors hover:bg-neo-navy-light edu-sky:hover:bg-edu-tile focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan"
                 >
                   {t('eduStudent.results.practiceThese')}
                   <DirectionalIcon icon={ArrowRight} className="size-4" />
@@ -307,7 +308,7 @@ function SpellingRound({
 
   return (
     <div
-      className="@container min-h-full bg-neo-navy p-4 @3xl:rounded-neo @3xl:border-[3px] @3xl:border-neo-cream/15 @3xl:px-8 @3xl:py-6"
+      className="@container min-h-full bg-neo-navy edu-sky:bg-edu-page edu-sky:[--practice-stage-art:none] p-4 @3xl:rounded-neo @3xl:border-[3px] @3xl:border-neo-cream/15 edu-sky:@3xl:border-edu-line @3xl:px-8 @3xl:py-6"
       style={STAGE_STYLE}
       data-testid="spelling-stage"
       dir={isRTL ? 'rtl' : 'ltr'}
@@ -321,17 +322,17 @@ function SpellingRound({
             size="sm"
             onClick={onBack}
             aria-label={t('common.back')}
-            className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
+            className="edu-sky:border-edu-line edu-sky:bg-edu-surface edu-sky:shadow-edu-lip-sm text-neo-white edu-sky:text-edu-ink hover:text-neo-white edu-sky:hover:text-edu-ink hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10"
           >
             <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
 
           <div className="text-center">
-            <h2 className="text-xl font-neo-display text-neo-white mb-1">
+            <h2 className="text-xl font-neo-display text-neo-white edu-sky:text-edu-ink mb-1">
               {t('education.practice.spellTheWord')}
             </h2>
             <div className="flex flex-col items-center gap-1">
-              <p className="text-neo-white font-neo-body" data-testid="progress-text">
+              <p className="text-neo-white edu-sky:text-edu-ink font-neo-body" data-testid="progress-text">
                 {wordIndex + (isComplete ? 0 : 0)} / {totalWords}
               </p>
             </div>
@@ -390,12 +391,12 @@ function SpellingRound({
               'p-8 rounded-neo',
               // Cream edge, not black: a black border on navy measures 1.23:1,
               // so the prompt card had no visible edge at all.
-              'bg-neo-navy-light border-[3px] border-neo-cream',
-              'shadow-hard-cyan-xl',
+              'bg-neo-navy-light edu-sky:bg-edu-surface border-[3px] border-neo-cream edu-sky:border-edu-line',
+              'shadow-hard-cyan-xl edu-sky:shadow-edu-lip',
               'min-h-[120px] flex items-center justify-center'
             )}
           >
-            <p className="font-neo-body text-neo-white text-2xl text-center">
+            <p className="font-neo-body text-neo-white edu-sky:text-edu-ink text-2xl text-center">
               {/*
                 A word with no definition is not a broken round — Spelling's
                 prompt is the audio. "No words to practice" over a live 8-word
@@ -513,7 +514,7 @@ function SpellingRound({
               'font-neo-display text-black text-2xl font-black uppercase tracking-wide',
               // Disabled drains the FILL and keeps a readable label and a
               // visible edge, instead of fading the whole control.
-              'disabled:bg-neo-navy-light disabled:text-neo-cream disabled:border-neo-cream',
+              'disabled:bg-neo-navy-light edu-sky:disabled:bg-edu-tile disabled:text-neo-cream edu-sky:disabled:text-edu-ink disabled:border-neo-cream edu-sky:disabled:border-edu-line',
               'disabled:shadow-none disabled:cursor-not-allowed',
               'transition-[transform,translate,scale,rotate,box-shadow,background-color,border-color,color,opacity]'
             )}
@@ -569,7 +570,7 @@ function SpellingRound({
                   type="button"
                   onClick={handleNext}
                   autoFocus
-                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-navy px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-lime shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:mt-1 sm:px-5 sm:py-2 sm:text-lg"
+                  className="inline-flex items-center gap-2 whitespace-nowrap rounded-neo border-[3px] border-neo-black bg-neo-navy edu-sky:bg-edu-surface px-4 py-1.5 font-neo-display text-base font-black uppercase text-neo-lime edu-sky:text-edu-lime-ink shadow-hard transition-transform active:translate-y-0.5 active:shadow-none sm:mt-1 sm:px-5 sm:py-2 sm:text-lg"
                 >
                   {wordIndex + 1 >= totalWords ? t('eduStudent.practice.finish') : t('eduStudent.practice.next')}
                   <DirectionalIcon icon={ArrowRight} className="size-5" />
@@ -579,7 +580,7 @@ function SpellingRound({
           </div>
         )}
         </div>
-        <p className="hidden text-center font-neo-body text-sm font-bold text-neo-cream/70 @3xl:block">
+        <p className="hidden text-center font-neo-body text-sm font-bold text-neo-cream/70 edu-sky:text-edu-ink/70 @3xl:block">
           {t('eduStudent.practice.enterHint')}
         </p>
       </div>

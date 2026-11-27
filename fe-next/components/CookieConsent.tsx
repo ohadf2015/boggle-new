@@ -241,6 +241,7 @@ export default function CookieConsent() {
         // screen edge on a 411px phone (6px, RTL). An upward shadow stays
         // inside the viewport and still separates the bar.
         'bg-neo-navy border-t-4 border-s-4 border-e-4 border-neo-black rounded-t-2xl shadow-[0_-4px_0_0_#000]',
+        'edu-sky:bg-edu-surface edu-sky:border-edu-line',
         dense ? 'px-2.5 pt-1.5 sm:px-4 sm:pt-2' : 'px-3 pt-2 sm:px-4 sm:pt-3',
         'animate-slide-up pointer-events-auto'
       )}
@@ -264,14 +265,14 @@ export default function CookieConsent() {
             className="hidden sm:block mt-0.5 h-10 w-10 shrink-0 object-contain sm:mt-0"
           />
           <div className="min-w-0 flex-1">
-            <h2 className={cn('text-sm font-bold font-neo-display text-neo-white sm:text-base', dense && 'sr-only')}>
+            <h2 className={cn('text-sm font-bold font-neo-display text-neo-white edu-sky:text-edu-ink sm:text-base', dense && 'sr-only')}>
               {t('cookieConsent.title')}
             </h2>
-            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 sm:text-[13px]">
+            <p className="mt-0.5 text-xs font-medium leading-snug text-neo-white/90 edu-sky:text-edu-ink sm:text-[13px]">
               {t(dense ? 'eduStudent.cookie.message' : adFree ? 'eg2Fix.cookie.adFreeMessage' : 'cookieConsent.message')}{' '}
               <a
                 href={`/${language}/legal/cookies`}
-                className="font-bold text-neo-cyan hover:underline"
+                className="font-bold text-neo-cyan edu-sky:text-edu-cyan-ink hover:underline"
               >
                 {t('cookieConsent.learnMore')}
               </a>
@@ -306,6 +307,7 @@ export default function CookieConsent() {
               'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase max-sm:whitespace-nowrap max-sm:px-1.5 max-sm:normal-case sm:flex-none',
               'text-neo-cyan hover:text-neo-white',
               'border-3 border-neo-cyan rounded-neo transition-colors duration-100',
+              'edu-sky:text-edu-ink edu-sky:border-edu-line edu-sky:hover:text-edu-ink',
               dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
             )}
           >
@@ -318,6 +320,7 @@ export default function CookieConsent() {
               'min-h-[44px] flex-1 px-3 py-2 text-sm font-bold uppercase max-sm:whitespace-nowrap max-sm:px-1.5 max-sm:normal-case sm:flex-none',
               'text-neo-white',
               'border-3 border-neo-cream rounded-neo transition-colors duration-100',
+              'edu-sky:text-edu-ink edu-sky:border-edu-line',
               dense && 'min-w-0 px-1 normal-case leading-tight sm:px-3 sm:uppercase'
             )}
           >
@@ -328,7 +331,7 @@ export default function CookieConsent() {
 
       {/* Granular preferences panel — expands the bar; reservation tracks height */}
       {showDetails && (
-        <div className="mt-3 border-t-2 border-neo-cream/10 pt-3">
+        <div className="mt-3 border-t-2 border-neo-cream/10 edu-sky:border-edu-line/20 pt-3">
           <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
             <ConsentToggle
               label={t('cookieConsent.categories.essential')}
@@ -393,8 +396,9 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
           ? 'border-neo-cream/10 opacity-70'
           : checked
             ? 'border-neo-lime/40 bg-neo-lime/5'
-            : 'border-neo-cream/20 hover:border-neo-cream/40',
-        !disabled && 'cursor-pointer'
+            : 'border-neo-cream/20 hover:border-neo-cream/40 edu-sky:border-edu-line/30',
+        !disabled && 'cursor-pointer',
+        'edu-sky:text-edu-ink'
       )}
     >
       <span className="mt-0.5 shrink-0">
@@ -402,19 +406,19 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
           checked={checked}
           disabled={disabled}
           onCheckedChange={onChange}
-          className="border-neo-cream/40 data-[state=checked]:bg-neo-lime data-[state=unchecked]:bg-neo-cream/20"
+          className="border-neo-cream/40 data-[state=checked]:bg-neo-lime data-[state=unchecked]:bg-neo-cream/20 edu-sky:border-edu-line edu-sky:data-[state=unchecked]:bg-edu-line/20"
         />
       </span>
       <div className="flex-1 min-w-0">
-        <span className="text-sm font-bold text-neo-white block">
+        <span className="text-sm font-bold text-neo-white edu-sky:text-edu-ink block">
           {label}
           {disabled && (
-            <span className="text-neo-white font-normal ms-1">
+            <span className="text-neo-white edu-sky:text-edu-ink font-normal ms-1">
               ({requiredLabel || 'Required'})
             </span>
           )}
         </span>
-        <span className="text-xs text-neo-white block mt-0.5">{description}</span>
+        <span className="text-xs text-neo-white edu-sky:text-edu-ink block mt-0.5">{description}</span>
       </div>
     </label>
   );

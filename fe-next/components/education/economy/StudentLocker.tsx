@@ -26,7 +26,7 @@ export default function StudentLocker() {
         <span>{items.length}</span>
       </button>
       {open && (
-        <div className="absolute end-0 top-full z-50 mt-2 w-56 rounded-neo border-3 border-neo-cream bg-neo-navy p-3 text-white shadow-hard-xl">
+        <div className="absolute end-0 top-full z-50 mt-2 w-56 rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard-xl">
           <h3 className="mb-2 text-base font-bold">{t('economy.locker.title')}</h3>
           <LockerGrid items={items} />
         </div>

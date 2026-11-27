@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TvClassroomStage } from '@/host/components/tv-broadcast/TvClassroomStage';
 import TvLeaderboard from '@/host/components/tv-broadcast/TvLeaderboard';
 import TvJoinBar from '@/host/components/tv-broadcast/TvJoinBar';
+import { CLASSROOM_WALL } from '@/host/components/tv-broadcast/classroomWallSkin';
 import TvGameHeader from '@/host/components/tv-broadcast/TvGameHeader';
 import TvNotificationQueue from '@/host/components/tv-broadcast/TvNotificationQueue';
 import { TvFormatChip, TvRoundLabel } from '@/host/components/tv-broadcast/TvBattleBar';
@@ -81,10 +82,11 @@ function ProjectorRoundPreview({ v }: { v: string }) {
 
   if (!ready) return null;
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-neo-navy text-neo-cream">
+    <div className="flex h-dvh flex-col overflow-hidden bg-edu-page text-edu-ink">
       <TvJoinBar gameCode="S32RH6" playerCount={players.length} language={language} t={t} dense />
       <TvGameHeader
         compact
+        classroom
         leading={<TvRoundLabel classroom={classroom as never} t={t} />}
         toastSlot={(
           <div className="flex min-w-0 flex-col items-end gap-2">
@@ -114,7 +116,7 @@ function ProjectorRoundPreview({ v }: { v: string }) {
             t={t}
           />
         </div>
-        <div data-testid="tv-leaderboard-card" className="min-h-[120px] rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light text-neo-cream shadow-hard-lg md:min-h-0 md:overflow-auto md:border-4">
+        <div data-testid="tv-leaderboard-card" className={`min-h-[120px] rounded-neo md:min-h-0 md:overflow-auto ${CLASSROOM_WALL.leaderboardCard}`}>
           <TvLeaderboard players={players as never} classroom hostUsername="Teacher" gameMode="classic" t={t} />
         </div>
       </div>

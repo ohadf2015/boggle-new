@@ -279,16 +279,16 @@ export default function DuelLobby({
      * and its black edge on a navy fill measures 1.23:1. The pieces inside
      * carry the one card style.
      */
-    <div data-testid="duel-lobby-container" className="bg-neo-navy">
+    <div data-testid="duel-lobby-container" className="bg-edu-surface">
       {/* Header — the title row lost its duplicate PVP chip and its decorative
           icon tile; the tab strip above already says where you are. */}
-      <h2 className="mb-3 font-neo-display text-xl font-black uppercase italic tracking-tight text-neo-white">
+      <h2 className="mb-3 font-neo-display text-xl font-black uppercase italic tracking-tight text-edu-ink">
         {t('duelLobbyTitle')}
       </h2>
 
       {/* Pending Challenges Section */}
       <section className="mb-6">
-        <h3 className="text-lg font-neo-display font-black text-neo-lime uppercase tracking-wide mb-4">
+        <h3 className="text-lg font-neo-display font-black text-edu-lime-ink uppercase tracking-wide mb-4">
           {t('pendingChallenges')}
         </h3>
 
@@ -297,7 +297,7 @@ export default function DuelLobby({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-neo-cyan"></div>
           </div>
         ) : pendingChallenges.length === 0 ? (
-          <p className="text-neo-white text-center py-4">{t('noPendingChallenges')}</p>
+          <p className="text-edu-ink text-center py-4">{t('noPendingChallenges')}</p>
         ) : (
           <div className="space-y-3">
             {pendingChallenges.map((challenge) => (
@@ -355,16 +355,16 @@ export default function DuelLobby({
           edge (black on navy is 1.23:1), hard shadow. */}
       <section
         data-testid="duel-lobby-opponents"
-        className="rounded-neo border-[3px] border-neo-cream bg-neo-navy p-3 shadow-hard"
+        className="rounded-neo border-[3px] border-edu-line bg-edu-surface p-3 shadow-hard"
       >
-        <h3 className="text-base font-neo-display font-black text-neo-cyan uppercase tracking-wide mb-3">
+        <h3 className="text-base font-neo-display font-black text-edu-cyan-ink uppercase tracking-wide mb-3">
           {t('availableOpponents')}
         </h3>
 
         {visibleOpponents.length === 0 ? (
           <div className="text-center py-6">
-            <Users className="w-10 h-10 mx-auto mb-3 text-neo-white" />
-            <p className="text-neo-white mb-3">{t('education.duels.noClassmatesOnline')}</p>
+            <Users className="w-10 h-10 mx-auto mb-3 text-edu-ink" />
+            <p className="text-edu-ink mb-3">{t('education.duels.noClassmatesOnline')}</p>
             {onTabChange && (
               <button
                 type="button"

@@ -9,14 +9,15 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { TrendingUp } from 'lucide-react';
 
-// Neo-brutalist chart colors
-const CHART_COLORS = {
-  avgXpGain: '#00FFFF', // neo-cyan
-  completionRate: '#FF1493', // neo-pink
-  grid: '#333333',
-  text: '#FFFFFF',
-  tooltip: '#1a1a2e',
-  tooltipBorder: '#00FFFF',
+export const CHART_COLORS = {
+  avgXpGain: '#00FFFF',
+  completionRate: '#FF1493',
+  avgXpGainInk: 'var(--edu-cyan-ink)',
+  completionRateInk: 'var(--edu-pink-ink)',
+  grid: 'var(--edu-line)',
+  text: 'var(--edu-ink)',
+  tooltip: 'var(--edu-surface)',
+  tooltipBorder: 'var(--edu-line)',
 };
 
 // Custom tooltip component (must be outside render)
@@ -33,27 +34,27 @@ const CustomTooltip = ({ active, payload, t }: CustomTooltipProps) => {
 
   return (
     <div
-      className="bg-neo-navy border-neo border-neo-cyan shadow-hard p-3 rounded-neo"
+      className="border-neo shadow-hard p-3 rounded-neo"
       style={{ backgroundColor: CHART_COLORS.tooltip, borderColor: CHART_COLORS.tooltipBorder }}
     >
-      <p className="text-neo-white font-neo-body font-bold mb-2">{data.lessonName}</p>
+      <p className="text-edu-ink font-neo-body font-bold mb-2">{data.lessonName}</p>
       <div className="space-y-1">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.avgXpGain }} />
-          <span className="text-neo-cyan text-sm">
+          <span className="text-edu-cyan-ink text-sm">
             {t('education.analytics.avgXpGain')}: {data.averageXpGain}
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS.completionRate }} />
-          <span className="text-neo-pink text-sm">
+          <span className="text-edu-pink-ink text-sm">
             {t('education.analytics.completionRate')}: {data.completionRate}%
           </span>
         </div>
-        <div className="text-neo-white text-sm mt-2">
+        <div className="text-edu-ink text-sm mt-2">
           {t('education.analytics.avgAccuracy')}: {data.averageAccuracy}%
         </div>
-        <div className="text-neo-white text-sm">
+        <div className="text-edu-ink text-sm">
           {t('education.analytics.students')}: {data.totalStudents}
         </div>
       </div>
@@ -79,7 +80,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (error) {
     return (
-      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/50">
         <CardContent className="py-12 text-center">
           <p className="text-red-400">{t('education.analytics.error')}</p>
         </CardContent>
@@ -89,22 +90,22 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
 
   if (effectiveness.length === 0) {
     return (
-      <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/50">
+      <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/50">
         <CardContent className="py-12 text-center">
-          <TrendingUp className="w-12 h-12 text-neo-white mx-auto mb-4" />
-          <h3 className="text-xl font-neo-display text-neo-white mb-2">
+          <TrendingUp className="w-12 h-12 text-edu-ink mx-auto mb-4" />
+          <h3 className="text-xl font-neo-display text-edu-ink mb-2">
             {t('education.analytics.noLessons')}
           </h3>
-          <p className="text-neo-white">{t('education.analytics.assignLessonsHint')}</p>
+          <p className="text-edu-ink">{t('education.analytics.assignLessonsHint')}</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="border-neo border-neo-cream/40 shadow-hard bg-neo-navy/80">
+    <Card className="border-neo border-edu-line shadow-hard bg-edu-surface/80">
       <CardHeader>
-        <CardTitle className="text-2xl font-neo-display text-neo-white">
+        <CardTitle className="text-2xl font-neo-display text-edu-ink">
           {t('education.analytics.lessonEffectiveness')}
         </CardTitle>
       </CardHeader>
@@ -114,7 +115,7 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
             data={effectiveness}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} />
+            <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.grid} strokeOpacity={0.2} />
             <XAxis
               dataKey="lessonName"
               stroke={CHART_COLORS.text}
@@ -122,25 +123,25 @@ export function LessonEffectivenessChart({ classroomId }: LessonEffectivenessCha
             />
             <YAxis
               yAxisId="left"
-              stroke={CHART_COLORS.avgXpGain}
+              stroke={CHART_COLORS.avgXpGainInk}
               style={{ fontSize: '12px', fontFamily: 'Rubik' }}
               label={{
                 value: t('education.analytics.avgXpGain'),
                 angle: -90,
                 position: 'insideLeft',
-                style: { fill: CHART_COLORS.avgXpGain, fontFamily: 'Rubik', fontSize: '14px' },
+                style: { fill: CHART_COLORS.avgXpGainInk, fontFamily: 'Rubik', fontSize: '14px' },
               }}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              stroke={CHART_COLORS.completionRate}
+              stroke={CHART_COLORS.completionRateInk}
               style={{ fontSize: '12px', fontFamily: 'Rubik' }}
               label={{
                 value: t('education.analytics.completionRate'),
                 angle: 90,
                 position: 'insideRight',
-                style: { fill: CHART_COLORS.completionRate, fontFamily: 'Rubik', fontSize: '14px' },
+                style: { fill: CHART_COLORS.completionRateInk, fontFamily: 'Rubik', fontSize: '14px' },
               }}
             />
             <Tooltip content={<CustomTooltip t={t} />} />

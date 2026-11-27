@@ -124,7 +124,7 @@ export function TeacherCancelOfferDialog({ status, manageHref, external, onClose
             </div>
           </div>
           <div className={NB_DIALOG_BODY}>
-            <p className="font-neo-body text-sm font-bold text-neo-cream">
+            <p className="font-neo-body text-sm font-bold text-edu-ink">
               {applied.live && applied.trialEnd
                 ? t('teacher.subscription.cancelOfferAppliedPause', { date: planEndDate(applied.trialEnd, language) })
                 : t('teacher.subscription.cancelOfferRecorded')}
@@ -178,7 +178,7 @@ export function TeacherCancelOfferDialog({ status, manageHref, external, onClose
           <h2 className={NB_DIALOG_TITLE}>{t('teacher.subscription.cancelOfferTitle')}</h2>
         </div>
         <div className={NB_DIALOG_BODY}>
-          <p className="font-neo-body text-sm font-bold text-neo-cream">{t('teacher.subscription.cancelOfferBody')}</p>
+          <p className="font-neo-body text-sm font-bold text-edu-ink">{t('teacher.subscription.cancelOfferBody')}</p>
           <div className="mt-4 flex flex-col gap-2">
             {status === 'trialing'
               ? offerButton(

@@ -10,10 +10,10 @@ export function HqLoadError({ onRetry, className }: { onRetry: () => void; class
   return (
     <div
       data-testid="play-tab-error-card"
-      className={cn('rounded-neo border-3 border-neo-red bg-neo-cream px-6 py-8 text-center shadow-hard', className)}
+      className={cn('edu-card px-6 py-8 text-center', className)}
     >
-      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-2 border-neo-red bg-neo-red/10 shadow-hard-sm">
-        <BarChart3 className="h-8 w-8 text-neo-red" />
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-neo border-[3px] border-neo-black bg-neo-pink text-neo-black shadow-edu-lip-sm">
+        <BarChart3 className="h-8 w-8" />
       </div>
       <p className="font-neo-body text-lg font-black text-black text-balance">{t('teacher.dashboard.classroomLoadError')}</p>
       <p className="mt-1 text-sm font-bold text-black/60 text-pretty">{t('teacher.dashboard.classroomLoadErrorHint')}</p>

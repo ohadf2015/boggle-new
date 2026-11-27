@@ -204,7 +204,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] text-center">
         <X className="w-12 h-12 text-red-500 mb-4" />
-        <p className="text-neo-white text-lg mb-6" data-testid="duel-error">
+        <p className="text-edu-ink text-lg mb-6" data-testid="duel-error">
           {error}
         </p>
         <button
@@ -250,25 +250,25 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           {isWinner ? (
             <Trophy className="w-16 h-16 text-neo-black" />
           ) : (
-            <Swords className="w-16 h-16 text-neo-white" />
+            <Swords className="w-16 h-16 text-edu-ink" />
           )}
         </AdaptiveMotion.div>
 
         {/* Result Text */}
-        <h2 className="text-4xl font-neo-display font-bold text-neo-white mb-4">
+        <h2 className="text-4xl font-neo-display font-bold text-edu-ink mb-4">
           {isDraw ? t('duels.draw') : isWinner ? t('duels.youWin') : t('duels.youLose')}
         </h2>
 
         {/* Scores */}
         <div className="flex gap-6 mb-6">
-          <div className="text-neo-white">
+          <div className="text-edu-ink">
             <p className="text-sm opacity-70">{t('duels.you')}</p>
             <p className="text-3xl font-bold">
               {duelData.isChallenger ? result.challengerScore : result.opponentScore}
             </p>
           </div>
-          <div className="text-neo-white text-3xl">{t('duels.vs')}</div>
-          <div className="text-neo-white">
+          <div className="text-edu-ink text-3xl">{t('duels.vs')}</div>
+          <div className="text-edu-ink">
             <p className="text-sm opacity-70">{duelData.opponentName}</p>
             <p className="text-3xl font-bold">
               {duelData.isChallenger ? result.opponentScore : result.challengerScore}
@@ -277,10 +277,10 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         </div>
 
         {/* XP Earned */}
-        <div className="flex items-center gap-2 mb-8 p-4 bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard">
-          <Flame className="w-6 h-6 text-neo-pink" />
-          <span className="text-neo-white font-neo-body">
-            {t('duels.xpEarned')}: <span className="font-bold text-neo-lime">{xp}</span>
+        <div className="flex items-center gap-2 mb-8 p-4 bg-edu-surface border-[2px] border-edu-line rounded-neo shadow-hard">
+          <Flame className="w-6 h-6 text-edu-pink-ink" />
+          <span className="text-edu-ink font-neo-body">
+            {t('duels.xpEarned')}: <span className="font-bold text-edu-lime-ink">{xp}</span>
           </span>
         </div>
 
@@ -294,7 +294,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
                 onBackToLobby?.();
               }
             }}
-            className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
+            className="px-6 py-3 bg-neo-pink text-edu-ink font-neo-display font-bold rounded-neo border-[3px] border-neo-black shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black"
           >
             {t('duels.rematch')}
           </button>
@@ -322,30 +322,30 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         className="flex flex-col items-center justify-center min-h-[500px] text-center p-8"
       >
         <Loader size="lg" className="mb-6" />
-        <h2 className="text-2xl font-neo-display font-bold text-neo-white mb-4">
+        <h2 className="text-2xl font-neo-display font-bold text-edu-ink mb-4">
           {t('duels.waitingForOpponent')}
         </h2>
 
         {/* Score Feedback */}
-        <div className="bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard p-6 mb-6 max-w-md">
+        <div className="bg-edu-surface border-[2px] border-edu-line rounded-neo shadow-hard p-6 mb-6 max-w-md">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Check className="w-5 h-5 text-green-500" />
-              <span className="text-neo-white">{t('duels.wordsAccepted')}</span>
+              <span className="text-edu-ink">{t('duels.wordsAccepted')}</span>
             </div>
-            <span className="text-neo-lime font-bold">{validatedScore.wordsValidated}</span>
+            <span className="text-edu-lime-ink font-bold">{validatedScore.wordsValidated}</span>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <X className="w-5 h-5 text-red-500" />
-              <span className="text-neo-white">{t('duels.wordsRejected')}</span>
+              <span className="text-edu-ink">{t('duels.wordsRejected')}</span>
             </div>
             <span className="text-red-400 font-bold">{validatedScore.wordsRejected}</span>
           </div>
         </div>
 
-        <p className="text-neo-white text-sm">
+        <p className="text-edu-ink text-sm">
           {t('duels.scoreToBeat')}: <span className="font-bold">{validatedScore.score}</span>
         </p>
       </AdaptiveMotion.div>
@@ -359,10 +359,10 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6 p-4 bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard">
+      <div className="flex items-center justify-between mb-6 p-4 bg-edu-surface border-[2px] border-edu-line rounded-neo shadow-hard">
         <div className="flex items-center gap-3">
-          <Swords className="w-6 h-6 text-neo-pink" />
-          <h1 className="text-xl font-neo-display font-bold text-neo-white">
+          <Swords className="w-6 h-6 text-edu-pink-ink" />
+          <h1 className="text-xl font-neo-display font-bold text-edu-ink">
             {t('duels.playDuel')}
           </h1>
         </div>
@@ -371,8 +371,8 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         <div className="flex items-center gap-4">
           {/* G4: Countdown timer */}
           <div className={cn(
-            'flex items-center gap-1 px-3 py-1 rounded-neo border-[2px] border-neo-cream font-neo-display font-bold',
-            timeRemaining <= 30 ? 'bg-red-500 text-neo-white animate-pulse' :
+            'flex items-center gap-1 px-3 py-1 rounded-neo border-[2px] border-edu-line font-neo-display font-bold',
+            timeRemaining <= 30 ? 'bg-red-500 text-edu-ink animate-pulse' :
             timeRemaining <= 60 ? 'bg-neo-pink text-neo-black' :
             'bg-neo-lime text-neo-black'
           )}>
@@ -381,8 +381,8 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-neo-white text-sm">{t('duels.vs')}</span>
-            <span className="text-neo-white font-bold">{duelData.opponentName}</span>
+            <span className="text-edu-ink text-sm">{t('duels.vs')}</span>
+            <span className="text-edu-ink font-bold">{duelData.opponentName}</span>
           </div>
         </div>
       </div>
@@ -390,11 +390,11 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Board Grid */}
         <div>
-          <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
+          <h2 className="text-lg font-neo-display font-bold text-edu-ink mb-4">
             {t('duels.findWords')}
           </h2>
           <div
-            className="grid grid-cols-4 gap-2 p-4 bg-neo-navy border-[3px] border-neo-cream rounded-neo shadow-hard"
+            className="grid grid-cols-4 gap-2 p-4 bg-edu-surface border-[3px] border-edu-line rounded-neo shadow-hard"
             data-testid="duel-board-grid"
           >
             {duelData.boardState.flat().map((letter, idx) => (
@@ -411,7 +411,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
         {/* Word Input & Found Words */}
         <div>
-          <h2 className="text-lg font-neo-display font-bold text-neo-white mb-4">
+          <h2 className="text-lg font-neo-display font-bold text-edu-ink mb-4">
             {t('duels.typeWord')}
           </h2>
 
@@ -422,7 +422,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               {...wordInputProps}
               onKeyDown={handleKeyPress}
               placeholder={t('duels.typeWord')}
-              className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-[2px] border-neo-cream rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
+              className="flex-1 px-4 py-2 bg-edu-page text-edu-ink border-[2px] border-edu-line rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
               type="button"
@@ -438,10 +438,10 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           </div>
 
           {/* Found Words List */}
-          <div className="bg-neo-navy border-[2px] border-neo-cream rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
+          <div className="bg-edu-page border-[2px] border-edu-line rounded-neo shadow-hard p-4 mb-4 min-h-[200px] max-h-[300px] overflow-y-auto">
             <AdaptiveAnimatePresence>
               {wordsFound.length === 0 ? (
-                <p className="text-neo-white text-sm text-center py-8">
+                <p className="text-edu-ink text-sm text-center py-8">
                   {t('duels.typeWord')}
                 </p>
               ) : (

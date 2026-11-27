@@ -57,9 +57,9 @@ export function AssignmentCompletionReport({ classroomId }: AssignmentCompletion
   return (
     <section
       data-testid="assignment-completion-report"
-      className="space-y-3 rounded-neo border-2 border-neo-cream/40 bg-neo-navy/40 p-4"
+      className="space-y-3 rounded-neo border-2 border-edu-line bg-edu-surface/40 p-4"
     >
-      <h3 className="font-neo-display text-lg font-bold text-neo-white">
+      <h3 className="font-neo-display text-lg font-bold text-edu-ink">
         {t('teacher.reports.assignmentCompletion.title')}
       </h3>
       <ul className="space-y-2">
@@ -71,8 +71,8 @@ export function AssignmentCompletionReport({ classroomId }: AssignmentCompletion
             data-roster={row.roster}
             className="flex items-baseline justify-between gap-3 text-sm"
           >
-            <span className="min-w-0 break-words font-bold text-neo-white">{row.title}</span>
-            <span className="shrink-0 tabular-nums text-neo-cyan">
+            <span className="min-w-0 break-words font-bold text-edu-ink">{row.title}</span>
+            <span className="shrink-0 tabular-nums text-edu-cyan-ink">
               {t('teacher.reports.assignmentCompletion.submitted', {
                 submitted: row.submitted,
                 roster: row.roster,
@@ -86,7 +86,7 @@ export function AssignmentCompletionReport({ classroomId }: AssignmentCompletion
           href={`/${language}/teacher/upgrade`}
           data-testid="assignment-completion-upgrade"
           onClick={() => trackTeacherAssignmentReportUpgradeClicked({ classroomId })}
-          className="inline-flex min-h-11 items-center rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white"
+          className="inline-flex min-h-11 items-center rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-bold text-neo-navy shadow-hard transition-shadow hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line"
         >
           {t('teacher.reports.assignmentCompletion.upgrade', { price: `$${TEACHER_PRO_PRICE_USD}` })}
         </Link>

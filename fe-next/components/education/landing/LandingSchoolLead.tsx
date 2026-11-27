@@ -45,13 +45,13 @@ export function LandingSchoolLead() {
           </ForSchoolsLink>
         </div>
 
-        <div className={`rounded-neo border-3 border-neo-cream/40 bg-neo-navy-light p-3 text-neo-white shadow-hard sm:p-5 ${open ? '' : 'self-center'}`}>
+        <div className={`rounded-neo border-3 border-edu-line bg-edu-surface p-3 text-edu-ink shadow-hard sm:p-5 ${open ? '' : 'self-center'}`}>
           {open ? (
             <SchoolLeadForm plan="school" surface="education_landing" />
           ) : (
             <div className="flex flex-col gap-4">
               <p className="hidden font-neo-display text-lg font-black sm:block">{t('eg2Land.school.formTeaser')}</p>
-              <p className="hidden text-sm text-neo-white/75 sm:block">{t('eg2Land.school.formNote')}</p>
+              <p className="hidden text-sm text-edu-ink/75 sm:block">{t('eg2Land.school.formNote')}</p>
               <button
                 type="button"
                 data-testid="landing-school-quote-open"

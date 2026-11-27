@@ -98,7 +98,7 @@ function DevBoss() {
 
   if (view === 'phone') {
     return (
-      <div className="min-h-[100dvh] bg-neo-navy pt-4">
+      <div className="min-h-[100dvh] bg-edu-page pt-4">
         <PhoneBossStrip />
         <div className="game-board-frame mx-auto mt-4 grid aspect-square w-[88%] max-w-md grid-cols-5 gap-1.5">
           {Array.from({ length: 25 }, (_, i) => (
@@ -111,7 +111,7 @@ function DevBoss() {
     );
   }
   return (
-    <div className="flex h-[100dvh] flex-col bg-neo-navy">
+    <div className="flex h-[100dvh] flex-col bg-edu-page">
       <ProjectorBossStage remainingTime={left} />
     </div>
   );

@@ -77,7 +77,7 @@ function EduLiveRoom(): React.JSX.Element {
     <SocketContext.Provider value={s.socketContextValue}>
       <MpExitProvider value={s.exitMp}>
         <ErrorBoundary>
-          <div data-testid="edu-live-root" tabIndex={-1} className="flex w-full min-h-0 flex-1 flex-col overflow-x-clip bg-neo-navy">
+          <div data-testid="edu-live-root" tabIndex={-1} className="flex w-full min-h-0 flex-1 flex-col overflow-x-clip bg-edu-page">
             {s.isActive ? <ConnectionBanner showScoreSafe={!isTeacher} onLeaveGame={leaveFromBanner} /> : !studentView && <ConnectionDot />}
             {s.isActive && s.isConnected && (
               <div className="pointer-events-none fixed end-2 top-14 z-40">

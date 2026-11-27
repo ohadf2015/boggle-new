@@ -16,6 +16,8 @@ import type { AccumulatedClue, TargetAttempt } from '@/components/daily/survival
 import type { HintLevel } from '@/utils/aiHintGenerator';
 import type { HighlightedCell } from '@/components/GridComponent';
 import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
+import { wordHuntLayoutSkin } from './wordHuntLayoutSkin';
 
 /** MP round frame on a 10-ft TV: the compact mode panel (12px text) scales with
  *  the shell's --mp-u (1.5). `zoom` scales px, not %, so the strip keeps its width. */
@@ -152,6 +154,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
   t,
   gameDir,
 }) => {
+  const skin = wordHuntLayoutSkin(useClassroomBoard());
   // Wide-but-short viewports (e.g. 1530×695) run the row layout (≥720px) but
   // have too little height for the full-size chrome — the clue boxes + header
   // crowd the grid until it's squished and selected tiles overlap. In that band
@@ -217,7 +220,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
         {targetLength > 0 && !shortLandscape && (
           <p
             data-testid="wh-heal-hint"
-            className="shrink-0 px-2 text-center text-[11px] sm:text-xs font-neo-body text-neo-white leading-tight"
+            className={skin.healHint}
           >
             {t('wordHunt.survival.healHint')}
           </p>
@@ -341,24 +344,25 @@ WordHuntGameLayout.displayName = 'WordHuntGameLayout';
  * Auto-recovery in WordHuntGame emits `requestGameState` after 1.5s.
  */
 function ClueTilesSkeleton({ t }: { t: (key: string) => string }) {
+  const skin = wordHuntLayoutSkin(useClassroomBoard());
   return (
     <div
       data-testid="wh-clue-skeleton"
-      className="mx-auto max-w-3xl w-full px-3 py-2 mb-0.5 rounded-neo-lg bg-neo-navy/30 dark:bg-neo-navy/50 border-2 border-neo-black/20 animate-pulse"
+      className={skin.skeleton}
       role="status"
       aria-live="polite"
       aria-label={t('wordHunt.survival.syncingTarget')}
     >
       {/* Match the real clue box's reserved warning slot so the skeleton→real swap doesn't shift. */}
       <div className="min-h-[1.5rem] sm:min-h-[1.75rem] mb-1 [@media(max-height:560px)]:hidden [@media(max-height:560px)]:min-h-0 [@media(max-height:560px)]:mb-0" />
-      <div className="text-center mb-2 text-xl sm:text-2xl font-black text-neo-white">
+      <div className={skin.skeletonTitle}>
         {t('wordHunt.survival.syncingTarget')}
       </div>
       <div className="flex justify-center flex-wrap gap-2 sm:gap-2.5">
         {Array.from({ length: 5 }).map((_, i) => (
           <div
             key={i}
-            className="w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center border-2 rounded-neo font-bold shadow-hard bg-neo-black/60 border-neo-black text-neo-white"
+            className={skin.skeletonTile}
           >
             ?
           </div>

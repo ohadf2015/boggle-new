@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { TeacherGate } from '@/components/education/TeacherGate';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
+import { HIDE_ON_SKY } from '@/components/education/shell/ArcadeBackdrop';
 import { cn } from '@/lib/utils';
 import { useTeacherReveal } from '@/components/teacher/motion/useTeacherReveal';
 import ClassroomManager from '@/components/teacher/ClassroomManager';
@@ -37,7 +38,7 @@ export default function TeacherClassroomsPage() {
 function ClassesTitle() {
   const { t } = useLanguage();
   return (
-    <h1 data-wipe className="min-w-0 whitespace-nowrap font-neo-display text-2xl font-bold leading-tight tracking-tight text-neo-cream sm:text-3xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
+    <h1 data-wipe className="min-w-0 whitespace-nowrap font-neo-display text-3xl font-black leading-tight tracking-tight text-edu-ink sm:text-5xl [@media(orientation:landscape)_and_(max-height:500px)]:text-xl">
       {t('academy.teacher.classesTitle', 'Your classes')}
     </h1>
   );
@@ -52,7 +53,7 @@ function ClassesShell({ children }: { children: React.ReactNode }) {
       scrollRegionLabel={t('teacher.nav.classes')}
       contentClassName={cn(CLASSES_CONTENT_CLASS, 'relative isolate')}
     >
-      <AmbientBackdrop theme="teacher" density="calm" />
+      <AmbientBackdrop theme="teacher" density="calm" className={HIDE_ON_SKY} />
       {children}
     </EducationShell>
   );

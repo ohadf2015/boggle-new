@@ -21,7 +21,7 @@ export const INTRO_KICKER =
   'min-h-4 font-neo-display text-xs font-black uppercase tracking-widest lg:min-h-[1.2em] lg:text-[clamp(0.9rem,min(1.6vw,2.6vh),1.75rem)]';
 
 export const INTRO_TITLE =
-  'mb-2 font-neo-display text-3xl font-black uppercase leading-none text-neo-white sm:text-5xl [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-[clamp(1.4rem,9vh,2.6rem)]! lg:mb-[clamp(0.75rem,2.5vh,1.5rem)]';
+  'mb-2 font-neo-display text-3xl font-black uppercase leading-none text-edu-ink sm:text-5xl [@media(orientation:landscape)_and_(max-height:520px)]:mb-2! [@media(orientation:landscape)_and_(max-height:520px)]:text-[clamp(1.4rem,9vh,2.6rem)]! lg:mb-[clamp(0.75rem,2.5vh,1.5rem)]';
 
 export const INTRO_CTA =
-  'relative flex min-h-[4.25rem] w-full items-center justify-center gap-3 overflow-hidden rounded-neo border-[3px] border-neo-black px-4 font-neo-display font-black uppercase tracking-wide text-neo-black disabled:opacity-60 [@media(orientation:landscape)_and_(max-height:520px)]:min-h-[3.25rem]! lg:min-h-[clamp(4.25rem,11vh,9rem)] lg:max-w-[clamp(36rem,30vw,50rem)]';
+  'relative flex min-h-[4.25rem] w-full items-center justify-center gap-3 overflow-hidden rounded-neo border-[3px] border-neo-black bg-neo-lime px-4 font-neo-display font-black uppercase tracking-wide text-neo-black shadow-edu-lip transition-transform active:translate-y-[3px] active:shadow-none disabled:opacity-60 [@media(orientation:landscape)_and_(max-height:520px)]:min-h-[3.25rem]! lg:min-h-[clamp(4.25rem,11vh,9rem)] lg:max-w-[clamp(36rem,30vw,50rem)]';

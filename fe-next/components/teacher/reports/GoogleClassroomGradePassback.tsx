@@ -56,8 +56,8 @@ async function callApi(url: string, init?: RequestInit): Promise<{ status: numbe
 }
 
 const btn =
-  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-4 py-2 font-bold shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-white disabled:opacity-50 disabled:hover:translate-y-0';
-const selectCls = 'min-h-11 w-full rounded-neo border-2 border-neo-cream/40 bg-neo-navy px-3 py-2 text-neo-white';
+  'inline-flex min-h-11 items-center gap-2 rounded-neo border-2 border-black px-4 py-2 font-bold shadow-hard transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-hard-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-edu-line disabled:opacity-50 disabled:hover:translate-y-0';
+const selectCls = 'min-h-11 w-full rounded-neo border-2 border-edu-line bg-edu-page px-3 py-2 text-edu-ink';
 
 export function GoogleClassroomGradePassback({ classroomId, enabled }: { classroomId: string; enabled: boolean }) {
   const { t, language } = useLanguage();
@@ -224,8 +224,8 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
   const selectedCw = courseWork.find((w) => w.id === courseWorkId);
 
   return (
-    <section data-testid="gc-grade-passback" className="space-y-3 rounded-neo border-2 border-neo-cream/40 p-4">
-      {notice && <p className="text-sm text-neo-cream/80" role="status">{notice}</p>}
+    <section data-testid="gc-grade-passback" className="space-y-3 rounded-neo border-2 border-edu-line p-4">
+      {notice && <p className="text-sm text-edu-ink/80" role="status">{notice}</p>}
 
       {phase === 'idle' && (
         <button type="button" onClick={open} className={`${btn} bg-neo-lime text-black`}>
@@ -235,7 +235,7 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
       )}
 
       {(phase === 'loading' || phase === 'sending') && (
-        <p className="inline-flex items-center gap-2 text-neo-cream/80" role="status">
+        <p className="inline-flex items-center gap-2 text-edu-ink/80" role="status">
           <Loader2 className="size-4 animate-spin" aria-hidden="true" />
           {t(phase === 'loading' ? 'teacher.reports.googleClassroom.loading' : 'teacher.reports.googleClassroom.sending')}
         </p>
@@ -243,8 +243,8 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
 
       {phase === 'connect' && (
         <div className="space-y-2">
-          <h3 className="font-bold text-neo-white">{t('teacher.reports.googleClassroom.connectTitle')}</h3>
-          <p className="text-sm text-neo-cream/80">{t('teacher.reports.googleClassroom.connectBody')}</p>
+          <h3 className="font-bold text-edu-ink">{t('teacher.reports.googleClassroom.connectTitle')}</h3>
+          <p className="text-sm text-edu-ink/80">{t('teacher.reports.googleClassroom.connectBody')}</p>
           <a
             href={`${API}/oauth/start?returnTo=${encodeURIComponent(returnTo)}`}
             className={`${btn} bg-neo-cyan text-neo-navy`}
@@ -256,25 +256,25 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
 
       {phase === 'pick' && (
         <div className="space-y-3">
-          <label className="block space-y-1 text-sm text-neo-cream/80">
+          <label className="block space-y-1 text-sm text-edu-ink/80">
             <span>{t('teacher.reports.googleClassroom.lessonLabel')}</span>
             <select className={selectCls} value={lessonId} onChange={(e) => setLessonId(e.target.value)}>
               {lessons.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
             </select>
           </label>
 
-          <label className="block space-y-1 text-sm text-neo-cream/80">
+          <label className="block space-y-1 text-sm text-edu-ink/80">
             <span>{t('teacher.reports.googleClassroom.courseLabel')}</span>
             <select className={selectCls} value={courseId} onChange={(e) => chooseCourse(e.target.value)}>
               <option value="">{t('teacher.reports.googleClassroom.choose')}</option>
               {courses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </label>
-          {courses.length === 0 && !error && <p className="text-sm text-neo-cream/70">{t('teacher.reports.googleClassroom.noCourses')}</p>}
+          {courses.length === 0 && !error && <p className="text-sm text-edu-ink/70">{t('teacher.reports.googleClassroom.noCourses')}</p>}
 
           {courseId && (
             <>
-              <label className="block space-y-1 text-sm text-neo-cream/80">
+              <label className="block space-y-1 text-sm text-edu-ink/80">
                 <span>{t('teacher.reports.googleClassroom.courseWorkLabel')}</span>
                 <select className={selectCls} value={courseWorkId} onChange={(e) => setCourseWorkId(e.target.value)}>
                   <option value="">{t('teacher.reports.googleClassroom.choose')}</option>
@@ -291,12 +291,12 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
             </>
           )}
 
-          <label className="flex items-start gap-2 text-sm text-neo-cream/80">
+          <label className="flex items-start gap-2 text-sm text-edu-ink/80">
             <input type="checkbox" className="mt-1" checked={returnGrades} onChange={(e) => setReturnGrades(e.target.checked)} />
             <span>{t('teacher.reports.googleClassroom.returnGrades')}</span>
           </label>
 
-          {selectedCw && <p className="text-sm text-neo-cream/70">{t('teacher.reports.googleClassroom.confirmHint', { points: selectedCw.maxPoints ?? 0 })}</p>}
+          {selectedCw && <p className="text-sm text-edu-ink/70">{t('teacher.reports.googleClassroom.confirmHint', { points: selectedCw.maxPoints ?? 0 })}</p>}
 
           <div className="flex flex-wrap gap-2">
             <button
@@ -307,7 +307,7 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
             >
               {t('teacher.reports.googleClassroom.confirm')}
             </button>
-            <button type="button" onClick={() => setPhase('idle')} className={`${btn} bg-neo-navy text-neo-white`}>
+            <button type="button" onClick={() => setPhase('idle')} className={`${btn} bg-edu-surface text-edu-ink`}>
               {t('teacher.reports.googleClassroom.cancel')}
             </button>
           </div>
@@ -315,13 +315,13 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
       )}
 
       {error && (
-        <p role="alert" className="rounded-neo border-2 border-neo-pink p-3 text-sm text-neo-white">
+        <p role="alert" className="rounded-neo border-2 border-neo-pink p-3 text-sm text-edu-ink">
           {error}
         </p>
       )}
 
       {phase === 'done' && summary && (
-        <div className="space-y-2 text-sm text-neo-white" data-testid="gc-grade-summary">
+        <div className="space-y-2 text-sm text-edu-ink" data-testid="gc-grade-summary">
           <h3 className="font-bold">{t('teacher.reports.googleClassroom.resultTitle')}</h3>
           <p>{t(pluralKeyOf('teacher.reports.googleClassroom.updated', summary.updated, language), { count: summary.updated })}</p>
           {summary.skipped.length > 0 && <p>{t(pluralKeyOf('teacher.reports.googleClassroom.skipped', summary.skipped.length, language), { count: summary.skipped.length })}</p>}
@@ -363,7 +363,7 @@ export function GoogleClassroomGradePassback({ classroomId, enabled }: { classro
               // Returning grades is a deliberate, per-run choice — never carry it into the next run silently.
               setReturnGrades(false);
             }}
-            className={`${btn} bg-neo-navy text-neo-white`}
+            className={`${btn} bg-edu-surface text-edu-ink`}
           >
             {t('teacher.reports.googleClassroom.done')}
           </button>

@@ -145,18 +145,18 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
     return (
       <div
         data-testid="duel-page-error"
-        className={cn('flex h-dvh w-full flex-col overflow-hidden bg-neo-navy', isRTL && 'rtl')}
+        className={cn('flex h-dvh w-full flex-col overflow-hidden bg-edu-page', isRTL && 'rtl')}
       >
         <EducationHeader showBackButton title={t('duelsTitle')} />
 
         <main className="flex-1 flex items-center justify-center px-4">
           <div
             className={cn(
-              'p-8 rounded-neo border-[3px] border-neo-cream',
-              'bg-neo-navy shadow-hard text-center max-w-md'
+              'p-8 rounded-neo border-[3px] border-edu-line',
+              'bg-edu-surface shadow-hard text-center max-w-md'
             )}
           >
-            <p className="text-neo-white text-xl font-bold mb-4">{duelError}</p>
+            <p className="text-edu-ink text-xl font-bold mb-4">{duelError}</p>
             <button
               type="button"
               onClick={handleBackToLobby}
@@ -183,7 +183,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
       /** Proof the chrome switch ran — a capture can read it. */
       data-chrome="hidden"
       className={cn(
-        'flex w-full flex-col overflow-hidden bg-neo-navy',
+        'flex w-full flex-col overflow-hidden bg-edu-surface',
         // Both halves of this route are fixed-height phone screens now. A live
         // duel's play panel owns the one scrolling region; an async turn's
         // <main> does. `min-h-dvh` on the async half let the body grow past the

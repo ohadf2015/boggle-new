@@ -103,8 +103,8 @@ export function ChallengeButton({
           onClick={handleClick}
           className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'p-2 rounded-neo transition',
-            'text-neo-pink hover:text-neo-lime',
-            'hover:bg-neo-navy/30',
+            'text-edu-pink-ink hover:text-edu-lime-ink',
+            'hover:bg-edu-surface/30',
             className
           )}
           aria-label={t('challengePlayer')}

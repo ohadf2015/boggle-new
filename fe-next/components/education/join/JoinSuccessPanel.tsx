@@ -26,14 +26,14 @@ export function JoinSuccessPanel(props: JoinSuccessPanelProps) {
       <h1
         ref={headingRef}
         tabIndex={-1}
-        className="flex items-center gap-3 font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-neo-white outline-none! sm:text-5xl lg:text-6xl"
+        className="flex items-center gap-3 font-neo-display text-4xl font-black uppercase leading-[0.95] tracking-tight text-edu-ink outline-none! sm:text-5xl lg:text-6xl"
       >
-        <PartyPopper aria-hidden="true" className="size-9 shrink-0 text-neo-lime lg:size-12" />
+        <PartyPopper aria-hidden="true" className="size-9 shrink-0 text-edu-lime-ink lg:size-12" />
         {t(alreadyMember ? `${K}.alreadyMember` : `${K}.success`)}
       </h1>
 
       {props.label && (
-        <div className="rounded-neo border-3 border-neo-black bg-neo-lime p-3 shadow-hard">
+        <div className="rounded-neo border-3 border-neo-black bg-neo-lime p-3 shadow-edu-lip">
           <p className="font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy/70">
             {t(props.mode === 'game' ? `${K}.preview.gameLabel` : `${K}.flow.yourClass`)}
           </p>
@@ -44,13 +44,13 @@ export function JoinSuccessPanel(props: JoinSuccessPanelProps) {
       {props.mode === 'game' ? (
         <>
           <JoinWaitingCard name={props.name} />
-          <p role="status" className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">
+          <p role="status" className="font-neo-body text-base font-bold text-edu-ink lg:text-lg">
             {t(`${K}.flow.successGame`)}
           </p>
         </>
       ) : (
         <>
-          <p className="font-neo-body text-base font-bold text-neo-cyan lg:text-lg">{t(`${K}.flow.joinedSub`)}</p>
+          <p className="font-neo-body text-base font-bold text-edu-ink lg:text-lg">{t(`${K}.flow.joinedSub`)}</p>
           <JoinNextAssignmentCta classroomId={props.classroomId} />
         </>
       )}

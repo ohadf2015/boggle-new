@@ -43,7 +43,7 @@ export function MissGapTakeHomeDisclosure({ payload }: MissGapTakeHomeDisclosure
         onClick={() => setShowTakeHome((open) => !open)}
         className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
           'w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold',
-          'bg-neo-navy text-neo-cream border-[3px] border-neo-cream rounded-neo',
+          'bg-neo-navy edu-sky:bg-edu-surface text-neo-cream edu-sky:text-edu-ink border-[3px] border-neo-cream edu-sky:border-edu-line rounded-neo',
           'transition-transform active:translate-x-[2px] active:translate-y-[2px]',
         )}
       >

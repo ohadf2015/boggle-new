@@ -70,7 +70,7 @@ export function HomeSessionFlowCard({
       data-testid={testId}
       data-accent={accent}
       className={cn(
-        "group relative flex min-w-0 flex-col overflow-hidden rounded-neo-xl border-[3px] border-neo-cream/50 bg-neo-navy-light shadow-hard-xl",
+        "group relative flex min-w-0 flex-col overflow-hidden rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-hard-xl",
         "transition-[translate,rotate] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] focus-within:-translate-y-1 hover:-translate-y-1 motion-reduce:transition-none motion-reduce:hover:rotate-0",
         tilt === "left" ? "hover:-rotate-1" : "hover:rotate-1",
       )}
@@ -99,10 +99,10 @@ export function HomeSessionFlowCard({
       </div>
       <div className="flex min-w-0 flex-1 flex-col items-stretch gap-1 p-2 @2xl:gap-2 @2xl:p-3 [@media(max-height:820px)]:@2xl:gap-1.5 [@media(max-height:820px)]:@2xl:p-2.5">
         <div className="min-w-0 flex-1">
-          <h3 className="line-clamp-2 font-neo-display text-sm font-black leading-tight text-neo-cream @2xl:truncate @2xl:text-lg">
+          <h3 className="line-clamp-2 font-neo-display text-sm font-black leading-tight text-edu-ink @2xl:truncate @2xl:text-lg">
             {t(session.nameKey)}
           </h3>
-          <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-neo-body text-xs font-semibold text-neo-cream/70">
+          <p className="mt-0.5 flex flex-wrap gap-x-1.5 font-neo-body text-xs font-semibold text-edu-ink/70">
             <span data-testid="home-session-minutes">
               {t("education.modePicker.minutes", { count: item.minutes })}
             </span>
@@ -123,7 +123,7 @@ export function HomeSessionFlowCard({
           </p>
           <p
             data-testid="home-session-when"
-            className="mt-0.5 line-clamp-1 hidden font-neo-body text-sm leading-snug text-neo-cream/80 @2xl:mt-2 @2xl:block"
+            className="mt-0.5 line-clamp-1 hidden font-neo-body text-sm leading-snug text-edu-ink/80 @2xl:mt-2 @2xl:block"
           >
             {t(session.whenShortKey)}
           </p>
