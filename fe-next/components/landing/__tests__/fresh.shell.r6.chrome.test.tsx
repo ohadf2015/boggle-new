@@ -72,41 +72,40 @@ describe('homepage: no cross-link banner boxes', () => {
   });
 });
 
-describe('footer: For Teachers folds on phones only', () => {
+describe('footer: For Teachers shows four pages and folds the rest', () => {
   const teachers = () => screen.getByRole('navigation', { name: 'For Teachers' });
 
-  it('keeps Education Hub visible above the fold', () => {
+  it('keeps Education Hub and the four evergreen pages above the fold', () => {
     render(<Footer />);
-    const hub = within(teachers()).getByRole('link', { name: 'Education Hub' });
     const fold = teachers().querySelector('details') as HTMLElement;
-    expect(fold).not.toBeNull();
+    const hub = within(teachers()).getByRole('link', { name: 'Education Hub' });
     expect(hub.compareDocumentPosition(fold) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(hub.closest('details')).toBeNull();
+    for (const page of EDUCATION_PAGES.slice(0, 4)) {
+      const link = teachers().querySelector(`a[href="/en/education/${page.slug}"]`) as HTMLElement;
+      expect(link.closest('details')).toBeNull();
+      expect(link.compareDocumentPosition(fold) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    }
   });
 
-  it('is ONE native disclosure, closed at rest, labelled "All teacher pages", gone at md', () => {
+  it('is ONE native disclosure, closed at rest, labelled "All teacher pages", at every width', () => {
     render(<Footer />);
     const folds = teachers().querySelectorAll('details');
     expect(folds).toHaveLength(1);
     const fold = folds[0] as HTMLElement;
     expect(fold.hasAttribute('open')).toBe(false);
     expect(fold.className).toMatch(/(^|\s)peer(\s|$)/);
-    expect(fold.className).toMatch(/\bmd:hidden\b/);
-    // The mock t() returns the fallback: like every other footer label, the
-    // summary carries an English fallback for a catalogue without the key.
+    expect(fold.className).not.toMatch(/\bmd:hidden\b/);
     expect(fold.querySelector('summary')?.textContent).toContain('All teacher pages');
     expect(read('components/Footer.tsx')).toContain("t('homeFresh.close.teacherPages', 'All teacher pages')");
   });
 
-  it('keeps every teacher page in the HTML, shown when the fold opens and always at md', () => {
+  it('keeps every other teacher page in the HTML, shown when the fold opens', () => {
     render(<Footer />);
     const fold = teachers().querySelector('details') as HTMLElement;
     const list = fold.nextElementSibling as HTMLElement;
     expect(list.tagName).toBe('UL');
-    for (const cls of ['hidden', 'peer-open:grid', 'md:grid']) {
-      expect(list.className.split(/\s+/)).toContain(cls);
-    }
+    expect(list.className.split(/\s+/)).toEqual(expect.arrayContaining(['hidden', 'peer-open:grid']));
     const hrefs = [...list.querySelectorAll('a')].map((a) => a.getAttribute('href'));
-    expect(hrefs).toEqual(EDUCATION_PAGES.map((p) => `/en/education/${p.slug}`));
+    expect(hrefs).toEqual(EDUCATION_PAGES.slice(4).map((p) => `/en/education/${p.slug}`));
   });
 });
