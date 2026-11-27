@@ -12,6 +12,7 @@ import {
   TileGrid,
   type LandingTone,
 } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 // Keyword landing for the LIVE Blast mode (its play route /blast is a
 // noindexed game shell). English body → EN canonical, same convention as
@@ -174,7 +175,7 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
             </LandingButton>
           </>
         }
-        art={{ src: '/mascot/onfire-nobg.webp', alt: 'A LexiClash mascot in sunglasses surfing a wave of fire', width: 200, height: 200 }}
+        art={LANDING_ART.blast('A LexiClash mascot leaping out of an explosion of letter tiles')}
         artTone="orange"
       >
         <p className="text-xs font-bold uppercase tracking-wide text-neo-white/70">★ No download · Play in 5s · Free to play · 5x combos · Chain reactions · Beat the waves</p>
@@ -210,7 +211,7 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
         tone="orange"
         title="Beat the waves"
         actions={<LandingButton href={`/${locale}/blast`}>Start a run — it&apos;s free</LandingButton>}
-        art={{ src: '/mascot/onfire-nobg.webp', alt: '', width: 200, height: 200 }}
+        art={LANDING_ART.blast('')}
       />
     </LandingPage>
   );

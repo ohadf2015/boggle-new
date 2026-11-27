@@ -305,7 +305,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
           <Link
             href={`/${locale}`}
             dir="ltr"
-            className="absolute left-5 top-6 z-20 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)] sm:left-10"
+            className="absolute left-5 top-6 z-20 font-neo-display text-xl font-bold uppercase tracking-widest text-neo-lime drop-shadow-[2px_2px_0_rgb(var(--neo-black))] sm:left-10"
           >
             LexiClash
           </Link>
@@ -362,7 +362,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
                     </span>
                   )}
                   <h2 className="mt-2 font-neo-display text-4xl font-bold leading-[0.95] text-neo-white sm:text-6xl" style={{ textShadow: '0 1px 0 #0a0a12,0 2px 0 #0a0a12,0 3px 0 #0a0a12,0 4px 0 #0a0a12,0 5px 0 rgba(0,255,255,0.65),0 6px 0 #0a0a12,0 7px 0 #0a0a12,0 8px 0 #0a0a12,0 10px 0 rgba(255,20,147,0.45),0 16px 24px rgba(0,0,0,0.6)' }}>{cap.title}</h2>
-                  <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.7)] sm:text-lg">{cap.body}</p>
+                  <p className="mx-auto mt-3 max-w-xl font-neo-body text-base text-neo-white drop-shadow-[2px_2px_0_rgb(var(--neo-black)/0.7)] sm:text-lg">{cap.body}</p>
                 </div>
               ))}
             </div>
@@ -372,7 +372,7 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
             <span className="rounded-neo border-neo-thick border-black bg-neo-lime px-4 py-1.5 font-neo-display text-sm font-bold uppercase tracking-widest text-black shadow-hard">
               {t('showcase3d.scrollHint', 'Scroll to play')}
             </span>
-            <span aria-hidden className="animate-bounce font-neo-display text-3xl font-bold leading-none text-neo-lime drop-shadow-[2px_2px_0_rgb(10,10,18)]">
+            <span aria-hidden className="animate-bounce font-neo-display text-3xl font-bold leading-none text-neo-lime drop-shadow-[2px_2px_0_rgb(var(--neo-black))]">
               ↓
             </span>
           </div>

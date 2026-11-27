@@ -17,4 +17,5 @@ export const LANDING_ART = {
   reading: art('reading', 416, 640),
   brain: art('brain', 640, 461),
   trophy: art('trophy', 484, 640),
+  blast: art('blast', 640, 604),
 };
