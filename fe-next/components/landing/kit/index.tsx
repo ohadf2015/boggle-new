@@ -89,7 +89,7 @@ export function LandingPage({
           )}
         </nav>
       )}
-      <div className={cn(CONTAINER, 'flex flex-col gap-14 pb-20 pt-2 sm:gap-20', className)}>{children}</div>
+      <div className={cn(CONTAINER, 'flex flex-col gap-9 pb-14 pt-2 sm:gap-20 sm:pb-20', className)}>{children}</div>
     </main>
   );
 }
@@ -137,7 +137,7 @@ export function LandingHero({
         <h1 className="font-neo-display text-[2rem] font-bold leading-[1.1] text-balance sm:text-5xl lg:text-[3.25rem]">
           {title}
         </h1>
-        {lead && <p className="max-w-xl text-lg leading-relaxed text-neo-white/85">{lead}</p>}
+        {lead && <p className="max-w-xl text-base leading-relaxed text-neo-white/85 sm:text-lg">{lead}</p>}
         {actions && <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap">{actions}</div>}
         {children}
       </div>
@@ -156,7 +156,7 @@ export function LandingHero({
               height={art.height}
               priority
               sizes="(min-width: 1024px) 384px, 256px"
-              className="h-36 w-auto max-w-full object-contain sm:h-56 lg:h-80"
+              className="h-28 w-auto max-w-full object-contain sm:h-56 lg:h-80"
             />
           </div>
         </div>
@@ -183,11 +183,11 @@ export function Prose({
   return (
     <div
       className={cn(
-        'max-w-3xl space-y-4 text-base font-normal leading-relaxed',
+        'max-w-3xl space-y-3 text-[15px] font-normal leading-relaxed sm:space-y-4 sm:text-base',
         '[&_a]:font-bold [&_a]:underline [&_a]:underline-offset-2 [&_h2]:font-neo-display [&_h2]:text-2xl [&_h2]:font-bold',
         '[&_h3]:font-neo-display [&_h3]:text-xl [&_h3]:font-bold [&_ol]:list-decimal [&_ol]:space-y-1 [&_ol]:ps-5 [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:ps-5',
         paper
-          ? cn(PAPER, 'p-5 sm:p-8 [&_a]:decoration-neo-pink [&_a]:decoration-2')
+          ? cn(PAPER, 'p-4 sm:p-8 [&_a]:decoration-neo-pink [&_a]:decoration-2')
           : 'text-neo-white/85 [&_a]:text-neo-cyan [&_h2]:text-neo-white [&_h3]:text-neo-white [&_strong]:text-neo-white',
         className,
       )}
@@ -211,7 +211,7 @@ export function Section({
   children?: React.ReactNode;
 }) {
   return (
-    <section id={id} className={cn('flex scroll-mt-20 flex-col gap-5', className)}>
+    <section id={id} className={cn('flex scroll-mt-20 flex-col gap-3 sm:gap-5', className)}>
       {(title || intro) && (
         <div className="flex flex-col gap-2">
           {title && <h2 className={H2}>{title}</h2>}
@@ -248,7 +248,7 @@ export function TileGrid({
 }) {
   const Heading = `h${headingLevel}` as const;
   return (
-    <div className={cn('grid gap-4', COLS[columns])}>
+    <div className={cn('grid gap-3 sm:gap-4', COLS[columns])}>
       {items.map((item, i) => {
         const tone = item.tone ?? toneAt(i);
         const cls = cn(
@@ -258,7 +258,7 @@ export function TileGrid({
         const inner = (
           <>
             {variant === 'paper' && <span aria-hidden className={cn('h-3 border-b-3 border-neo-black', TONE_BG[tone])} />}
-            <span className="flex flex-col gap-1.5 p-5">
+            <span className="flex flex-col gap-1 p-4 sm:gap-1.5 sm:p-5">
               {item.icon}
               <Heading className="font-neo-display text-xl font-bold leading-tight">{item.title}</Heading>
               {item.body && <span className="text-[15px] leading-relaxed">{item.body}</span>}
@@ -281,20 +281,20 @@ export function TileGrid({
 
 export function Steps({ items }: { items: { title: React.ReactNode; body?: React.ReactNode }[] }) {
   return (
-    <ol className={cn('grid gap-4', items.length === 3 ? 'md:grid-cols-3' : COLS[items.length >= 4 ? 4 : 2])}>
+    <ol className={cn('grid gap-3 sm:gap-4', items.length === 3 ? 'md:grid-cols-3' : COLS[items.length >= 4 ? 4 : 2])}>
       {items.map((item, i) => (
-        <li key={i} className={cn(PAPER, 'flex flex-col gap-2 p-5')}>
+        <li key={i} className={cn(PAPER, 'grid grid-cols-[auto_1fr] content-start items-center gap-x-3 gap-y-1 p-4 sm:flex sm:flex-col sm:items-stretch sm:gap-2 sm:p-5')}>
           <span
             aria-hidden
             className={cn(
-              'flex h-11 w-11 -rotate-3 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-xl font-bold',
+              'flex h-9 w-9 -rotate-3 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-bold sm:h-11 sm:w-11 sm:text-xl',
               TONE_BG[toneAt(i)],
             )}
           >
             {i + 1}
           </span>
           <h3 className="font-neo-display text-xl font-bold leading-tight">{item.title}</h3>
-          {item.body && <div className="text-[15px] leading-relaxed">{item.body}</div>}
+          {item.body && <div className="col-span-2 text-[15px] leading-relaxed">{item.body}</div>}
         </li>
       ))}
     </ol>
@@ -303,7 +303,7 @@ export function Steps({ items }: { items: { title: React.ReactNode; body?: React
 
 export function CheckList({ items }: { items: React.ReactNode[] }) {
   return (
-    <ul className={cn(PAPER, 'grid gap-x-8 gap-y-3 p-5 sm:grid-cols-2 sm:p-7')}>
+    <ul className={cn(PAPER, 'grid gap-x-8 gap-y-2.5 p-4 sm:grid-cols-2 sm:gap-y-3 sm:p-7')}>
       {items.map((item, i) => (
         <li key={i} className="flex items-start gap-3 leading-snug">
           <span aria-hidden className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-neo-black bg-neo-lime">
@@ -444,7 +444,7 @@ export function CtaBand({
   return (
     <section
       className={cn(
-        'flex flex-col items-center gap-6 rounded-neo-lg border-3 border-neo-black p-6 text-center text-neo-black shadow-hard-xl sm:p-10 lg:flex-row lg:justify-between lg:text-start',
+        'flex flex-col items-center gap-4 rounded-neo-lg border-3 border-neo-black p-5 sm:gap-6 text-center text-neo-black shadow-hard-xl sm:p-10 lg:flex-row lg:justify-between lg:text-start',
         TONE_BG[tone],
       )}
     >

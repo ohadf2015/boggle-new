@@ -61,8 +61,8 @@ export function BlogPostLayout({
   return (
     <div className="flex min-h-screen flex-col bg-neo-navy">
       <AutoHideHeader />
-      <LandingPage locale={locale} topBar={false} className="max-w-3xl gap-8 sm:gap-10">
-        <article className="flex flex-col gap-8 sm:gap-10">
+      <LandingPage locale={locale} topBar={false} className="max-w-3xl gap-5 sm:gap-10">
+        <article className="flex flex-col gap-5 sm:gap-10">
           <header className="flex flex-col items-start gap-4 pt-2 lg:pt-6">
             <Link
               href={backHref ?? `/${locale}/blog`}
