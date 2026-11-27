@@ -281,7 +281,7 @@ export function TileGrid({
 
 export function Steps({ items }: { items: { title: React.ReactNode; body?: React.ReactNode }[] }) {
   return (
-    <ol className={cn('grid gap-3 sm:gap-4', items.length === 3 ? 'md:grid-cols-3' : COLS[items.length >= 4 ? 4 : 2])}>
+    <ol className={cn('grid gap-3 sm:gap-4', items.length === 3 ? 'md:grid-cols-3' : items.length === 5 ? 'sm:grid-cols-2 lg:grid-cols-5' : COLS[items.length >= 4 ? 4 : 2])}>
       {items.map((item, i) => (
         <li key={i} className={cn(PAPER, 'grid grid-cols-[auto_1fr] content-start items-center gap-x-3 gap-y-1 p-4 sm:flex sm:flex-col sm:items-stretch sm:gap-2 sm:p-5')}>
           <span

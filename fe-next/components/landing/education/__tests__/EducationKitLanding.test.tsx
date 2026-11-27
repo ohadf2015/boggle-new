@@ -26,6 +26,19 @@ describe('EducationKitLanding', () => {
     expect(container.querySelector('[data-testid="teacher-pro-compare-checkout-strip"]')).not.toBeNull();
   });
 
+  it('puts the highlight chip on real words only, never on filler like "for the"', () => {
+    const marked = (content: ReturnType<typeof getBoggleForKidsContent>, path: string) => {
+      const { container, unmount } = render(<EducationKitLanding locale="en" path={path} content={content} />);
+      const chip = container.querySelector('h1 span.box-decoration-clone')?.textContent ?? null;
+      unmount();
+      return chip;
+    };
+    const kids = getBoggleForKidsContent('en');
+    expect(marked(kids, '/education/boggle-for-kids')).toBe(kids.hero.h1.highlight);
+    const filler = { ...kids, hero: { ...kids.hero, h1: { part1: 'Games', highlight: 'for the', part2: ' class' } } };
+    expect(marked(filler, '/education/boggle-for-kids')).toBeNull();
+  });
+
   it('folds the FAQ but keeps every question an h3', () => {
     const content = getBoggleForKidsContent('en');
     const { container } = render(<EducationKitLanding locale="en" path="/education/boggle-for-kids" content={content} />);

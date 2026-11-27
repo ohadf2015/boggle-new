@@ -51,6 +51,8 @@ function CtaLabel({ cta }: { cta: EducationCta }) {
 }
 
 /** Education article landings on the shared landing kit. Server-rendered so the answer and FAQ ship as HTML. */
+const FILLER = /^\s*(?:(?:by|for|the|in|of|to|on|a|an|and|with|para|el|la|de|en|för|i|på|med)\b[\s.]*)+$/i;
+
 export function EducationKitLanding({
   locale,
   path,
@@ -101,7 +103,8 @@ export function EducationKitLanding({
         eyebrow={hero.tag}
         title={
           <>
-            {hero.h1.part1} <Mark tone={content.accent}>{hero.h1.highlight}</Mark>
+            {hero.h1.part1}{' '}
+            {FILLER.test(hero.h1.highlight) ? hero.h1.highlight : <Mark tone={content.accent}>{hero.h1.highlight}</Mark>}
             {/^[\s,.;:!?]/.test(hero.h1.part2) ? null : <br />}
             {hero.h1.part2}
           </>
