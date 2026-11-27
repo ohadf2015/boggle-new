@@ -37,6 +37,7 @@ LexiClash is a free online multiplayer word game and an alternative to Words Wit
 - Global leaderboard resets at 00:00 UTC alongside the new puzzle
 - Emoji result-card sharing (Wordle-style) reveals attempt count without spoiling the word
 - Public archive of finalized past puzzles with stats (solve rate %, attempt distribution, leaderboard) at /[locale]/daily/archive/YYYY-MM-DD; the current day is intentionally not in the archive
+- Agent access (read-only, no auth): GET https://www.lexiclash.live/api/v1/daily?date=YYYY-MM-DD&language=en returns the board (today's answer withheld); MCP server (JSON-RPC over HTTP) at https://www.lexiclash.live/api/v1/mcp with tools get_daily_puzzle, check_word, daily_leaderboard, share_result
 - URLs:
   - [Today](https://www.lexiclash.live/en/daily)
   - [Word Hunt](https://www.lexiclash.live/en/daily/word-hunt)
