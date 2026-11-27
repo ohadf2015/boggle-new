@@ -6,8 +6,8 @@
  * One verb: craft a word from your rack and PLACE it before the Baron (and the
  * class) outpace you. Everything server-known (board, rack, scores, targets)
  * comes from the useWordcraftLive snapshot; this component is pure rendering
- * plus tap choreography. Dark-only game surface: hardcoded neo-navy, never the
- * theme-responsive cream pair (mobile-web FOUC).
+ * plus tap choreography. Arcade: hardcoded neo-navy, never the theme-responsive
+ * cream pair (mobile-web FOUC); a classroom round takes the sky skin.
  */
 import { useMemo } from 'react';
 import { Hammer, ArrowRightLeft } from 'lucide-react';
@@ -15,6 +15,7 @@ import { createBoard, type Board, type BoardSize } from '@/lib/word-craft/board'
 import type { WordcraftLiveSnapshot } from '@/shared/types/wordcraftLive';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import { isStudentTimerHidden } from '@/shared/utils/classroomPressure';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import { useWordcraftLive, type WordcraftHint, type WordcraftLiveSocket } from './useWordcraftLive';
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
@@ -39,6 +40,75 @@ const PREMIUM_CLASS: Record<string, string> = {
   TW: 'bg-neo-pink/50 text-neo-navy',
 };
 
+// Classroom: solid accent fills with black ink, since a 25% tint vanishes on cream.
+const PREMIUM_CLASS_CLASSROOM: Record<string, string> = {
+  DL: 'bg-neo-cyan/50 text-neo-black',
+  TL: 'bg-neo-cyan text-neo-black',
+  DW: 'bg-neo-pink/50 text-neo-black',
+  TW: 'bg-neo-pink text-neo-black',
+};
+
+const SKIN = {
+  arcade: {
+    waiting: 'flex min-h-[60vh] items-center justify-center bg-neo-navy text-neo-cream font-neo-body',
+    waitingCard: 'flex items-center gap-3 rounded-neo border-2 border-neo-cyan bg-neo-navy-light px-6 py-4 shadow-hard',
+    waitingIcon: 'h-6 w-6 text-neo-cyan animate-neo-wobble',
+    root: 'flex h-full min-h-0 flex-1 flex-col gap-1.5 overflow-hidden bg-neo-navy px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-neo-cream font-neo-body',
+    hud: 'flex shrink-0 items-center justify-between gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 shadow-hard',
+    myScore: 'font-neo-display text-xl font-black text-neo-cyan motion-safe:animate-[lc-wc-bump_380ms_cubic-bezier(.34,1.56,.64,1)]',
+    hudLabel: 'text-xs uppercase text-neo-cream/70',
+    clock: 'font-neo-display font-bold text-neo-cream',
+    tiles: 'text-[10px] uppercase text-neo-cream/60',
+    rivalScore: 'font-neo-display text-xl font-black text-neo-pink',
+    targetBuilt: 'shrink-0 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-2 py-0.5 text-xs font-bold text-neo-lime',
+    target: 'shrink-0 rounded-neo border-2 border-neo-cream/40 px-2 py-0.5 text-xs font-bold text-neo-cream/80',
+    board: 'grid size-[min(100cqw,100cqh)] grid-cols-9 gap-0.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 shadow-hard',
+    previewLoose: 'border-neo-lime/70 bg-neo-lime/25 text-neo-lime motion-safe:animate-[lc-wc-drop_260ms_cubic-bezier(.34,1.56,.64,1)]',
+    star: 'border-neo-yellow bg-neo-yellow/20 text-neo-yellow motion-safe:animate-[lc-wc-star_1.4s_ease-in-out_infinite]',
+    premiumEdge: 'border-neo-cream/40',
+    empty: 'border-neo-cream/40 bg-neo-navy text-neo-cream/40',
+    hintReady: 'shrink-0 text-center font-neo-display text-sm font-black text-neo-lime',
+    hint: 'shrink-0 text-center font-neo-body text-sm font-bold text-neo-yellow',
+    staged: 'flex min-h-10 flex-1 items-center rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy-light px-2 font-neo-display font-bold tracking-widest text-neo-lime',
+    dirBtn: 'rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-2.5 text-neo-cream shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+    recall: 'rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2.5 text-xs font-bold text-neo-cream shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+    placeDisabled: 'disabled:border-neo-cream/40 disabled:bg-neo-navy-light disabled:text-neo-cream/60',
+    tileStaged: 'flex size-11 shrink flex-col items-center justify-center rounded-neo border-2 border-neo-lime bg-neo-lime/25 text-neo-lime shadow-hard-pressed -translate-y-1 transition-transform',
+    activity: 'truncate rounded-neo border border-neo-cream/20 bg-neo-navy-light px-2 py-0.5 text-xs text-neo-cream/80 motion-safe:animate-[lc-wc-drop_260ms_ease-out]',
+    bingo: 'me-1 font-black text-neo-yellow',
+    gain: 'ms-1 font-bold text-neo-lime',
+  },
+  classroom: {
+    waiting: 'flex min-h-[60vh] items-center justify-center bg-edu-page text-edu-ink font-neo-body',
+    waitingCard: 'flex items-center gap-3 rounded-neo border-2 border-neo-black bg-edu-surface px-6 py-4 shadow-edu-lip-sm',
+    waitingIcon: 'h-6 w-6 text-edu-cyan-ink animate-neo-wobble',
+    root: 'flex h-full min-h-0 flex-1 flex-col gap-1.5 overflow-hidden bg-edu-page px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-edu-ink font-neo-body',
+    hud: 'me-11 flex shrink-0 items-center justify-between gap-2 rounded-neo border-2 border-neo-black bg-edu-surface px-3 py-1.5 shadow-edu-lip-sm',
+    myScore: 'font-neo-display text-xl font-black text-edu-cyan-ink motion-safe:animate-[lc-wc-bump_380ms_cubic-bezier(.34,1.56,.64,1)]',
+    hudLabel: 'text-xs uppercase text-edu-ink/70',
+    clock: 'font-neo-display font-bold text-edu-ink',
+    tiles: 'text-[10px] uppercase text-edu-ink/70',
+    rivalScore: 'font-neo-display text-xl font-black text-edu-pink-ink',
+    targetBuilt: 'shrink-0 rounded-neo border-2 border-neo-black bg-neo-lime px-2 py-0.5 text-xs font-bold text-neo-black',
+    target: 'shrink-0 rounded-neo border-2 border-neo-black bg-edu-surface px-2 py-0.5 text-xs font-bold text-edu-ink',
+    board: 'grid size-[min(100cqw,100cqh)] grid-cols-9 gap-0.5 rounded-neo border-[3px] border-neo-black bg-edu-surface p-1 shadow-edu-lip',
+    previewLoose: 'border-neo-black bg-neo-lime/50 text-neo-black motion-safe:animate-[lc-wc-drop_260ms_cubic-bezier(.34,1.56,.64,1)]',
+    star: 'border-neo-black bg-neo-yellow text-neo-black motion-safe:animate-[lc-wc-star_1.4s_ease-in-out_infinite]',
+    premiumEdge: 'border-edu-line/30',
+    empty: 'border-edu-line/30 bg-edu-tile text-edu-ink/40',
+    hintReady: 'shrink-0 text-center font-neo-display text-sm font-black text-edu-lime-ink',
+    hint: 'shrink-0 text-center font-neo-body text-sm font-bold text-edu-ink',
+    staged: 'flex min-h-10 flex-1 items-center rounded-neo border-2 border-dashed border-neo-black bg-edu-surface px-2 font-neo-display font-bold tracking-widest text-edu-ink',
+    dirBtn: 'rounded-neo border-2 border-neo-black bg-edu-surface p-2.5 text-edu-ink shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+    recall: 'rounded-neo border-2 border-neo-black bg-edu-surface px-3 py-2.5 text-xs font-bold text-edu-ink shadow-hard-sm active:translate-y-0.5 active:shadow-none',
+    placeDisabled: 'disabled:border-neo-black disabled:bg-edu-surface disabled:text-edu-ink/60',
+    tileStaged: 'flex size-11 shrink flex-col items-center justify-center rounded-neo border-2 border-neo-black bg-neo-lime text-neo-black shadow-hard-pressed -translate-y-1 transition-transform',
+    activity: 'truncate rounded-neo border border-neo-black bg-edu-surface px-2 py-0.5 text-xs text-edu-ink motion-safe:animate-[lc-wc-drop_260ms_ease-out]',
+    bingo: 'me-1 font-black text-edu-yellow-ink',
+    gain: 'ms-1 font-bold text-edu-lime-ink',
+  },
+} as const;
+
 const HINT_KEY: Record<NonNullable<WordcraftHint>, string> = {
   first: 'eduStudent.wordcraft.hintFirst',
   more: 'eduStudent.wordcraft.hintMore',
@@ -60,6 +130,8 @@ function formatClock(sec: number | null | undefined): string {
 
 export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveViewProps) {
   const live = useWordcraftLive({ socket });
+  const classroom = useClassroomBoard();
+  const k = SKIN[classroom ? 'classroom' : 'arcade'];
   const { snapshot } = live;
   // The teacher's pressure dials (null outside a classroom room = loud default).
   // Timer-off drops the student countdown; the tiles-in-sack line stays — it
@@ -86,9 +158,9 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
 
   if (!snapshot) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-neo-navy text-neo-cream font-neo-body">
-        <div className="flex items-center gap-3 rounded-neo border-2 border-neo-cyan bg-neo-navy-light px-6 py-4 shadow-hard">
-          <Hammer className="h-6 w-6 text-neo-cyan animate-neo-wobble" aria-hidden />
+      <div className={k.waiting}>
+        <div className={k.waitingCard}>
+          <Hammer className={k.waitingIcon} aria-hidden />
           <span className="font-neo-display font-bold">{t('education.wordcraftLive.waitingBoard')}</span>
         </div>
       </div>
@@ -101,29 +173,29 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
   const boardEmpty = snapshot.cells.length === 0;
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col gap-1.5 overflow-hidden bg-neo-navy px-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 text-neo-cream font-neo-body">
+    <div className={k.root}>
       <style>{WORDCRAFT_KEYFRAMES}</style>
       <div
         data-testid="race-hud"
-        className="flex shrink-0 items-center justify-between gap-2 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-1.5 shadow-hard"
+        className={k.hud}
       >
         <div className="flex items-baseline gap-2">
-          <span key={snapshot.myScore} className="font-neo-display text-xl font-black text-neo-cyan motion-safe:animate-[lc-wc-bump_380ms_cubic-bezier(.34,1.56,.64,1)]">{snapshot.myScore}</span>
-          <span className="text-xs uppercase text-neo-cream/70">{t('education.wordcraftLive.you')}</span>
+          <span key={snapshot.myScore} className={k.myScore}>{snapshot.myScore}</span>
+          <span className={k.hudLabel}>{t('education.wordcraftLive.you')}</span>
         </div>
         <div className="text-center">
           {!timerHidden ? (
-            <div className="font-neo-display font-bold text-neo-cream" data-testid="race-clock">
+            <div className={k.clock} data-testid="race-clock">
               {formatClock(remainingTime)}
             </div>
           ) : null}
-          <div className="text-[10px] uppercase text-neo-cream/60">
+          <div className={k.tiles}>
             {t('education.wordcraftLive.tilesLeft', { count: snapshot.bagCount })}
           </div>
         </div>
         <div className="flex items-baseline gap-2">
-          <span className="text-xs uppercase text-neo-cream/70">{t('education.wordcraftLive.rival')}</span>
-          <span className="font-neo-display text-xl font-black text-neo-pink">{snapshot.botScore}</span>
+          <span className={k.hudLabel}>{t('education.wordcraftLive.rival')}</span>
+          <span className={k.rivalScore}>{snapshot.botScore}</span>
         </div>
       </div>
 
@@ -146,8 +218,8 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
               data-built={target.built}
               className={
                 target.built
-                  ? 'shrink-0 rounded-neo border-2 border-neo-lime bg-neo-lime/15 px-2 py-0.5 text-xs font-bold text-neo-lime'
-                  : 'shrink-0 rounded-neo border-2 border-neo-cream/40 px-2 py-0.5 text-xs font-bold text-neo-cream/80'
+                  ? k.targetBuilt
+                  : k.target
               }
             >
               {target.built ? `✓ ${target.word}` : target.word}
@@ -158,7 +230,7 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
 
       <div className="relative flex min-h-0 flex-1 items-center justify-center [container-type:size]">
         <div
-          className="grid size-[min(100cqw,100cqh)] grid-cols-9 gap-0.5 rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-1 shadow-hard"
+          className={k.board}
           role="group"
           aria-label="wordcraft-board"
         >
@@ -176,12 +248,12 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
                 : preview
                   ? isAnchor || live.autoCentered
                     ? 'border-neo-lime bg-neo-lime text-neo-navy motion-safe:animate-[lc-wc-drop_260ms_cubic-bezier(.34,1.56,.64,1)]'
-                    : 'border-neo-lime/70 bg-neo-lime/25 text-neo-lime motion-safe:animate-[lc-wc-drop_260ms_cubic-bezier(.34,1.56,.64,1)]'
+                    : k.previewLoose
                   : isStar
-                    ? 'border-neo-yellow bg-neo-yellow/20 text-neo-yellow motion-safe:animate-[lc-wc-star_1.4s_ease-in-out_infinite]'
+                    ? k.star
                     : cell.premium
-                      ? `border-neo-cream/40 ${PREMIUM_CLASS[cell.premium]}`
-                      : 'border-neo-cream/40 bg-neo-navy text-neo-cream/40';
+                      ? `${k.premiumEdge} ${(classroom ? PREMIUM_CLASS_CLASSROOM : PREMIUM_CLASS)[cell.premium]}`
+                      : k.empty;
               return (
                 <button
                   key={`${r}-${c}`}
@@ -216,8 +288,8 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
         role="status"
         className={
           live.hint === 'ready'
-            ? 'shrink-0 text-center font-neo-display text-sm font-black text-neo-lime'
-            : 'shrink-0 text-center font-neo-body text-sm font-bold text-neo-yellow'
+            ? k.hintReady
+            : k.hint
         }
       >
         {live.lastError
@@ -234,7 +306,7 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
       <div className="flex shrink-0 items-center gap-2">
         <div
           data-testid="staged-word"
-          className="flex min-h-10 flex-1 items-center rounded-neo border-2 border-dashed border-neo-cream/40 bg-neo-navy-light px-2 font-neo-display font-bold tracking-widest text-neo-lime"
+          className={k.staged}
         >
           {live.stagedWord}
         </div>
@@ -243,14 +315,14 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
           onClick={live.toggleDirection}
           aria-label={t('education.wordcraftLive.switchDirection')}
           title={t('education.wordcraftLive.switchDirection')}
-          className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light p-2.5 text-neo-cream shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+          className={k.dirBtn}
         >
           <ArrowRightLeft className={`h-4 w-4 transition-transform ${live.direction === 'down' ? 'rotate-90' : ''}`} aria-hidden />
         </button>
         <button
           type="button"
           onClick={live.clearStage}
-          className="rounded-neo border-2 border-neo-cream/40 bg-neo-navy-light px-3 py-2.5 text-xs font-bold text-neo-cream shadow-hard-sm active:translate-y-0.5 active:shadow-none"
+          className={k.recall}
         >
           {t('education.wordcraftLive.recall')}
         </button>
@@ -258,7 +330,7 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
           type="button"
           onClick={live.submit}
           disabled={!live.canSubmit}
-          className={`rounded-neo border-[3px] border-neo-black px-4 py-2 font-neo-display font-black uppercase shadow-hard-sm active:translate-y-0.5 active:shadow-none disabled:border-neo-cream/40 disabled:bg-neo-navy-light disabled:text-neo-cream/60 disabled:shadow-none ${live.canSubmit ? 'bg-neo-lime text-neo-black motion-safe:animate-[lc-wc-ready_1s_ease-in-out_infinite]' : 'bg-neo-lime text-neo-black'}`}
+          className={`rounded-neo border-[3px] border-neo-black px-4 py-2 font-neo-display font-black uppercase shadow-hard-sm active:translate-y-0.5 active:shadow-none ${k.placeDisabled} disabled:shadow-none ${live.canSubmit ? 'bg-neo-lime text-neo-black motion-safe:animate-[lc-wc-ready_1s_ease-in-out_infinite]' : 'bg-neo-lime text-neo-black'}`}
         >
           {t('education.wordcraftLive.place')}
         </button>
@@ -275,7 +347,7 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
               onClick={() => (staged ? live.recallTile(tile.id) : live.tapRackTile(tile.id))}
               className={
                 staged
-                  ? 'flex size-11 shrink flex-col items-center justify-center rounded-neo border-2 border-neo-lime bg-neo-lime/25 text-neo-lime shadow-hard-pressed -translate-y-1 transition-transform'
+                  ? k.tileStaged
                   : 'flex size-11 shrink flex-col items-center justify-center rounded-neo border-2 border-neo-black bg-neo-cream text-neo-black shadow-hard-sm transition-transform active:scale-90 active:shadow-hard-pressed'
               }
             >
@@ -290,11 +362,11 @@ export function WordcraftLiveView({ socket, t, remainingTime }: WordcraftLiveVie
         {live.activity.slice(0, 1).map((a, i) => (
           <div
             key={`${a.username}-${i}-${live.activity.length}`}
-            className="truncate rounded-neo border border-neo-cream/20 bg-neo-navy-light px-2 py-0.5 text-xs text-neo-cream/80 motion-safe:animate-[lc-wc-drop_260ms_ease-out]"
+            className={k.activity}
           >
-            {a.bingo ? <span className="me-1 font-black text-neo-yellow">BINGO!</span> : null}
+            {a.bingo ? <span className={k.bingo}>BINGO!</span> : null}
             {t('education.wordcraftLive.builtBy', { name: a.username, word: a.words[0]?.word ?? '' })}
-            <span className="ms-1 font-bold text-neo-lime">+{a.score}</span>
+            <span className={k.gain}>+{a.score}</span>
           </div>
         ))}
       </div>

@@ -82,9 +82,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t, labelInHead
   if (labelInHeader && !isTeams) return null;
 
   return (
-    // Dark-only surface: hardcoded navy, never `bg-neo-cream dark:bg-neo-navy`.
-    // The projector mounts lazily and that pair flashes cream first.
-    <div className="w-full px-4 pb-2 bg-neo-navy" data-testid="tv-battle-bar">
+    <div className="w-full px-4 pb-2 bg-edu-page" data-testid="tv-battle-bar">
       {!labelInHeader && (
         <div className="max-w-7xl mx-auto flex flex-wrap max-md:flex-nowrap items-center gap-x-4 max-md:gap-x-2 gap-y-2">
           <TvRoundLabel classroom={classroom} t={t} />
@@ -99,7 +97,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t, labelInHead
           data-testid="tv-battle-tug"
           role="group"
           aria-label={formatLabel}
-          className="max-w-7xl mx-auto mt-2 flex h-14 md:h-20 rounded-neo border-[3px] border-neo-cream overflow-hidden shadow-hard"
+          className="max-w-7xl mx-auto mt-2 flex h-14 md:h-20 rounded-neo border-[3px] border-neo-black overflow-hidden shadow-edu-lip"
         >
           {standings.map((team) => (
             <div
@@ -115,7 +113,7 @@ const TvBattleBar = memo<TvBattleBarProps>(({ classroom, players, t, labelInHead
                 // theirs. Each side's mass belongs over its own territory.
                 'flex flex-col items-center justify-center gap-0 px-1 md:px-3 min-w-0 overflow-hidden',
                 // Black on an accent fill — the pair that passes the contrast gate.
-                'text-neo-black border-e-[3px] border-neo-cream last:border-e-0',
+                'text-neo-black border-e-[3px] border-neo-black last:border-e-0',
                 reduceMotion ? '' : 'transition-[width] duration-700 ease-out',
               ].join(' ')}
             >

@@ -159,6 +159,7 @@ export default function LiveSurfacePreview({ kind }: { kind: LiveSurfacePreviewK
   if (kind === 'crosswordphone') return <CrosswordPreview surface="phone" />;
   if (kind === 'wheelphone') return <VersusPhonePreview mode="wheel" />;
   if (kind === 'towerphone') return <VersusPhonePreview mode="tower" />;
+  if (kind === 'wordcraftphone') return <VersusPhonePreview mode="wordcraft" />;
   return <ProjectorOrStagePreview />;
 }
 

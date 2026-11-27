@@ -33,7 +33,11 @@ vi.mock('@/hooks/gameState/store', () => ({
   useWordHuntTargetLength: () => 0,
 }));
 vi.mock('@/components/education/vocabQuiz/useIsVocabQuizRoom', () => ({ useIsVocabQuizRoom: () => false }));
-vi.mock('@/host/components/tv-broadcast/TvLeaderboard', () => ({ __esModule: true, default: () => <div /> }));
+vi.mock('@/host/components/tv-broadcast/TvLeaderboard', async () => {
+  const { useClassroomBoard } = await import('@/components/education/live/classroomBoard');
+  const LeaderboardProbe = () => <div data-testid="tv-leaderboard-probe" data-classroom={String(useClassroomBoard())} />;
+  return { __esModule: true, default: LeaderboardProbe };
+});
 vi.mock('@/host/components/tv-broadcast/TvNotificationQueue', () => ({
   __esModule: true,
   default: ({ placement }: { placement?: string }) => <div data-testid="tv-toast-queue" data-placement={placement ?? 'overlay'} />,
@@ -91,6 +95,7 @@ describe('TvBroadcastView classroom wall skin', () => {
     expect(screen.getByTestId('tv-leaderboard-card')).toHaveClass('bg-edu-surface', 'border-neo-black', 'shadow-edu-lip');
     expect(headerProps.current?.classroom).toBe(true);
     expect(screen.getByTestId('tv-fullscreen-toggle').className).not.toContain('text-neo-cream');
+    expect(screen.getByTestId('tv-leaderboard-probe').dataset.classroom).toBe('true');
   });
 
   it('given an arcade room, then the navy wall, its mode art and the navy leaderboard card stay as before', () => {
@@ -100,5 +105,6 @@ describe('TvBroadcastView classroom wall skin', () => {
     expect(screen.getByTestId('tv-leaderboard-card').className).toContain('bg-neo-navy-light text-neo-cream');
     expect(headerProps.current?.classroom).toBeFalsy();
     expect(screen.getByTestId('tv-fullscreen-toggle').className).toContain('bg-neo-black/80');
+    expect(screen.getByTestId('tv-leaderboard-probe').dataset.classroom).toBe('false');
   });
 });

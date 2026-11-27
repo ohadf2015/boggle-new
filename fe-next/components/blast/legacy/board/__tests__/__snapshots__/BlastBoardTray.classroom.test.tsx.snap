@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BlastBoardTray classroom skin > arcade: the navy tray keeps its exact classes 1`] = `"blast-tray relative w-[min(100cqw,calc(100cqh-3.5rem))] rounded-neo border-3 p-1 shadow-hard-lg transition-colors duration-300 sm:p-1.5 2xl:max-w-[min(820px,86dvh)] border-neo-black"`;

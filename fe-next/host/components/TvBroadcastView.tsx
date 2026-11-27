@@ -13,6 +13,7 @@ import TvBattleBar, { TvFormatChip, TvRoundLabel } from './tv-broadcast/TvBattle
 import type { ClassroomLiveContext } from '@/shared/utils/classroomLiveContext';
 import TvLeaderboard from './tv-broadcast/TvLeaderboard';
 import { CLASSROOM_WALL } from './tv-broadcast/classroomWallSkin';
+import { ClassroomBoardProvider } from '@/components/education/live/classroomBoard';
 import TvActivityPanel from './tv-broadcast/TvActivityPanel';
 import TvMomentumTicker from './tv-broadcast/TvMomentumTicker';
 import TvNotificationQueue from './tv-broadcast/TvNotificationQueue';
@@ -347,6 +348,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
   }
 
   return (
+    <ClassroomBoardProvider value={isClassroom}>
     <div
       className={`flex-1 flex flex-col min-h-0 ${isClassroom ? CLASSROOM_WALL.root : 'bg-neo-navy'} overflow-hidden relative isolate`}
       style={TEACHER_CONTROLS_INSET}
@@ -489,6 +491,7 @@ const TvBroadcastView = memo<TvBroadcastViewProps>(({
         forceShow={showTutorial}
       />
     </div>
+    </ClassroomBoardProvider>
   );
 });
 
