@@ -72,7 +72,7 @@ export function listCodemodFiles(repo, { tests = false } = {}) {
 }
 
 const DARK_SOLID = new Set(['bg-neo-purple', 'bg-neo-red', 'bg-neo-black', 'bg-black', 'edu-rays-dark']);
-const PAGE_ROOT = /^(min-h-.+|h-dvh|h-screen|flex-1)$/;
+const PAGE_ROOT = /^(min-h-.+|h-dvh|h-screen|h-\[100[dsl]?vh\]|flex-1)$/;
 const OWN_FILL = /^bg-(neo-|edu-|white|black|transparent|\[)/;
 
 /** `md:hover:!text-white/60` → { prefix: 'md:hover:', bang: '!', base: 'text-white/60', tail: '' } */
@@ -134,10 +134,11 @@ function mapBase(base, ctx) {
 export function mapClassString(str, group = str) {
   const own = bases(str);
   const scope = own.some((b) => OWN_FILL.test(b)) ? own : bases(group);
+  const fullScreen = own.includes('fixed') && own.includes('inset-0');
   const ctx = {
     dark: scope.some((b) => DARK_SOLID.has(b)),
-    pageRoot: own.some((b) => PAGE_ROOT.test(b)),
-    dimmer: own.includes('fixed') && own.includes('inset-0'),
+    pageRoot: fullScreen || own.some((b) => PAGE_ROOT.test(b)),
+    dimmer: fullScreen,
   };
   return str.replace(/\S+/g, (token) => {
     const { prefix, bang, base, tail } = splitToken(token);

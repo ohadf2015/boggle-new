@@ -92,6 +92,8 @@ describe('edu-sky codemod: fills', () => {
     expect(map('min-h-dvh bg-neo-navy')).toBe('min-h-dvh bg-edu-page');
     expect(map('h-dvh bg-neo-navy')).toBe('h-dvh bg-edu-page');
     expect(map('flex-1 bg-neo-navy')).toBe('flex-1 bg-edu-page');
+    expect(map('fixed inset-0 z-[80] flex bg-neo-navy')).toBe('fixed inset-0 z-[80] flex bg-edu-page');
+    expect(map('h-[100dvh] bg-neo-navy')).toBe('h-[100dvh] bg-edu-page');
     expect(map('rounded-xl bg-neo-navy')).toBe('rounded-xl bg-edu-surface');
     expect(map('bg-neo-navy-light bg-neo-navy-elevated')).toBe('bg-edu-surface bg-edu-surface');
     expect(map('bg-neo-navy-light/80')).toBe('bg-edu-surface/80');
