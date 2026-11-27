@@ -175,6 +175,17 @@ async function dropNonMembers(
   }
 }
 
+/** Longest the round end waits for word memory writes; they keep running after it. */
+const WORD_MEMORY_WAIT_MS = 4_000;
+
+async function settleWithin(work: Promise<unknown>, ms: number, onTimeout: () => void): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const cap = new Promise<'timeout'>((resolve) => { timer = setTimeout(() => resolve('timeout'), ms); });
+  const outcome = await Promise.race([work.then(() => 'done' as const), cap]);
+  clearTimeout(timer);
+  if (outcome === 'timeout') onTimeout();
+}
+
 export async function persistClassroomGameScores(
   game: ClassroomGame | null | undefined,
   playerScores?: PlayerScore[],
@@ -436,7 +447,9 @@ export async function persistClassroomGameScores(
     });
   }
 
-  await Promise.all(wordMemoryWrites);
+  await settleWithin(Promise.all(wordMemoryWrites), WORD_MEMORY_WAIT_MS, () =>
+    logger.error('CLASSROOM_GAME', `Game ${game.gameCode}: word memory writes still running after ${WORD_MEMORY_WAIT_MS}ms; finishing the round without them`)
+  );
 
   // The only place a real classroom practice completion is observable. The
   // browser-side `edu_practice_complete` cannot see this path at all — it lives

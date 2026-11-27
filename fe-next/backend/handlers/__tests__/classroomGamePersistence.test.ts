@@ -235,7 +235,7 @@ describe('persistClassroomGameScores', () => {
       expect(payload).not.toHaveProperty('words_mastered');
     });
 
-    it('records each found lesson word as a live find in the word memory (a find alone never masters)', async () => {
+    it('records each found lesson word as a live find in the word memory', async () => {
       await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 30, wordsFound: ['DOG', 'tree'] }]);
       expect(mockRecordWordReviews).toHaveBeenCalledTimes(1);
       const [, args] = mockRecordWordReviews.mock.calls[0];
@@ -285,6 +285,23 @@ describe('persistClassroomGameScores', () => {
       expect(mockRecordWordReviews).toHaveBeenCalledTimes(2);
       release();
       await done;
+    });
+
+    it('never waits on a hung word memory write past its cap: logs and finishes the round', async () => {
+      vi.useFakeTimers();
+      try {
+        mockRecordWordReviews.mockImplementationOnce(() => new Promise(() => {}));
+        let finished = false;
+        const done = persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 30, wordsFound: ['dog'] }]).then(() => { finished = true; });
+        await vi.advanceTimersByTimeAsync(3_900);
+        expect(finished).toBe(false);
+        await vi.advanceTimersByTimeAsync(200);
+        await done;
+        expect(finished).toBe(true);
+        expect(mockLogger.error).toHaveBeenCalledWith('CLASSROOM_GAME', expect.stringContaining('word memory writes still running after 4000ms'));
+      } finally {
+        vi.useRealTimers();
+      }
     });
 
     it('keeps the round, its progress and XP when the word memory write fails, and logs it', async () => {
