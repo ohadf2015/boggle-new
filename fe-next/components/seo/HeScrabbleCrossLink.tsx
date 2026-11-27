@@ -28,16 +28,16 @@ export function HeScrabbleCrossLink({ locale, anchorVariant }: Props) {
   return (
     <aside
       dir="rtl"
-      className="my-8 rounded-neo border-3 border-neo-pink bg-neo-navy-light p-5 shadow-hard"
+      className="my-8 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl"
     >
       <Link
         href="/he/hebrew-multiplayer-word-game"
         className="block group"
       >
-        <h3 className="font-neo-display text-lg font-black text-neo-pink underline decoration-2 underline-offset-4 group-hover:text-neo-white transition-colors">
+        <h3 className="font-neo-display text-lg font-black text-neo-black underline decoration-neo-pink decoration-4 underline-offset-4">
           {text}
         </h3>
-        <p className="mt-2 text-sm text-slate-300">{tagline}</p>
+        <p className="mt-2 text-sm text-neo-black/80">{tagline}</p>
       </Link>
     </aside>
   );

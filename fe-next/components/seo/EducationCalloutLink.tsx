@@ -43,14 +43,14 @@ export function EducationCalloutLink({ locale }: Props) {
   const lang = (locale in CONTENT ? locale : 'en') as LocaleKey;
   const { title, tagline, cta } = CONTENT[lang];
   return (
-    <aside className="my-8 rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
-      <h3 className="font-neo-display text-lg font-black text-neo-lime">
+    <aside className="my-8 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
+      <h3 className="font-neo-display text-lg font-black text-neo-black">
         {title}
       </h3>
-      <p className="mt-2 text-sm text-slate-300">{tagline}</p>
+      <p className="mt-2 text-sm text-neo-black/80">{tagline}</p>
       <Link
         href={`/${locale}/education/for-schools`}
-        className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-slate-400 hover:text-neo-white transition-colors"
+        className="mt-3 inline-block font-neo-display text-xs font-black uppercase tracking-widest text-neo-black underline decoration-neo-pink decoration-2 underline-offset-4"
       >
         {cta}
       </Link>

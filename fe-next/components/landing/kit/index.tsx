@@ -353,7 +353,7 @@ export function CompareTable({
               <tr key={r} className="border-t-2 border-neo-black/15">
                 {row.map((cell, c) =>
                   c === 0 ? (
-                    <th key={c} scope="row" className="px-3 py-3 text-start font-bold sm:px-5">
+                    <th key={c} scope="row" className="px-3 py-3 text-start align-top font-bold sm:px-5">
                       {cell}
                     </th>
                   ) : (

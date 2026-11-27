@@ -38,15 +38,15 @@ export function EnBoggleCrossLink({ locale, anchorVariant }: Props) {
   if (locale !== 'en') return null;
   const { text, tagline } = ANCHORS[anchorVariant];
   return (
-    <aside className="my-8 rounded-neo border-3 border-neo-cyan bg-neo-navy-light p-5 shadow-hard">
+    <aside className="my-8 rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
       <Link
         href="/en/play-boggle-online-free"
         className="block group"
       >
-        <h3 className="font-neo-display text-lg font-black text-neo-cyan underline decoration-2 underline-offset-4 group-hover:text-neo-white transition-colors">
+        <h3 className="font-neo-display text-lg font-black text-neo-black underline decoration-neo-cyan decoration-4 underline-offset-4">
           {text}
         </h3>
-        <p className="mt-2 text-sm text-slate-300">{tagline}</p>
+        <p className="mt-2 text-sm text-neo-black/80">{tagline}</p>
       </Link>
     </aside>
   );
