@@ -11,7 +11,7 @@ import { LanguagePicker } from '@/components/education/pickers/LanguagePicker';
 import { nativeLanguageName } from '@/components/education/pickers/nativeLanguageName';
 import { languageFlag } from '@/lib/i18n/languageLabels';
 import { EduMascot } from '@/components/education/EduMascot';
-import { NB_ADVANCED, NB_BLOCK, NB_INPUT, NB_LINK, NB_PRIMARY_FACE, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
+import { NB_BLOCK, NB_FOLD, NB_INPUT, NB_LINK, NB_PRIMARY_FACE, NB_SECONDARY, NB_STICKER } from '../nb/nbStyles';
 import { SetupCodePreview } from './SetupCodePreview';
 import { GRADE_BANDS, type GradeBand } from './classSetupDefaults';
 import { StarterPackRow } from './StarterPackRow';
@@ -45,7 +45,6 @@ export interface ClassSetupDetailsProps {
 const FIELD_LABEL = SETUP_FIELD_LABEL;
 // The name field and the fold sit on white cards, so the field itself is white with a black edge too.
 const NAME_INPUT = 'border-edu-line bg-edu-surface text-edu-ink shadow-edu-lip-sm placeholder:text-edu-ink/45';
-const FOLD = 'rounded-neo-xl border-solid bg-edu-surface p-4 text-base font-black text-edu-ink shadow-edu-lip sm:p-5';
 const STICKER_BIG = 'px-3 py-1 text-sm shadow-edu-lip-sm';
 
 /** One name field and one Create button; language, grade and the first word list wait behind one fold that names them. */
@@ -103,7 +102,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             aria-controls="setup-advanced"
             disabled={ownIncomplete}
             onClick={() => setAdvancedOpen((open) => !open)}
-            className={cn(NB_ADVANCED, FOLD)}
+            className={NB_FOLD}
           >
             <span className="flex min-w-0 flex-col">
               <span>{t(foldOpen ? 'eduShell.setup.advancedClose' : 'eduShell.setup.advancedOpen')}</span>

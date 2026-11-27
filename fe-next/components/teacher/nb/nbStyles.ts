@@ -4,6 +4,7 @@
  * Same vocabulary as the live game screens, so the dashboard and the game feel like one product.
  */
 
+import { cn } from '@/lib/utils';
 import { EDU_BLOCK_TONES, EDU_BUTTON, EDU_DARK_EDGE, EDU_FOCUS as FOCUS } from '@/components/education/eduNeoStyles';
 
 /** Outline for anything dark sitting on the dark page (cream, since black on navy has no edge). */
@@ -57,6 +58,9 @@ export const NB_ADVANCED = [
   'flex min-h-[48px] w-full items-center justify-between gap-2 rounded-neo-lg border-[3px] border-dashed border-edu-line px-3 text-start font-neo-body text-sm font-bold text-edu-ink/85 hover:border-edu-line hover:text-edu-ink',
   FOCUS,
 ].join(' ');
+
+/** A fold that opens rarer options, drawn as a solid white card with a lip instead of a dashed row. */
+export const NB_FOLD = cn(NB_ADVANCED, 'rounded-neo-xl border-solid bg-edu-surface p-4 text-base font-black text-edu-ink shadow-edu-lip sm:p-5');
 
 /** Input on a cream field with the same outline and shadow. */
 export const NB_INPUT =

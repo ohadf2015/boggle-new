@@ -23,8 +23,8 @@ export interface ClassSetupInviteCodeProps {
 }
 
 const CHIP_BASE = cn(
-  'flex min-h-[56px] min-w-0 flex-col items-center justify-center gap-1 rounded-neo-lg border-[3px] border-neo-black px-1 py-1.5 shadow-hard',
-  'font-neo-display text-xs font-black leading-tight sm:text-sm',
+  'flex min-h-[64px] min-w-0 flex-col items-center justify-center gap-1 rounded-neo-lg border-[3px] border-neo-black px-1 py-1.5 shadow-hard',
+  'font-neo-display text-xs font-black leading-tight sm:text-sm [&>svg]:size-6',
   pressClasses(2),
 );
 // One color per way to share (same blocks as the live game); none is lime, which belongs to the screen's start button.
@@ -32,7 +32,7 @@ const CHIP = {
   copy: cn(CHIP_BASE, 'bg-neo-pink text-neo-black'),
   whatsapp: cn(CHIP_BASE, 'bg-neo-cyan text-neo-black'),
   google: cn(CHIP_BASE, 'bg-neo-yellow text-neo-black'),
-  native: cn(CHIP_BASE, 'bg-neo-white text-neo-black'),
+  native: cn(CHIP_BASE, 'bg-edu-surface text-edu-ink border-edu-line'),
 };
 
 function googleHref(joinUrl: string, name: string, t: T): string | null {
@@ -77,27 +77,31 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
     <span
       data-testid="setup-join-code"
       dir="ltr"
-      className="whitespace-nowrap font-neo-display font-black leading-none tracking-[0.04em] tabular-nums text-neo-black [font-size:clamp(2rem,17cqi,5.5rem)] lg:[font-size:clamp(2rem,17cqi,8rem)]"
+      className="inline-flex gap-[0.15em] whitespace-nowrap font-neo-display font-black leading-none [font-size:clamp(1.5rem,12cqi,3.5rem)] lg:[font-size:clamp(1.5rem,12cqi,4.5rem)]"
     >
-      {code}
+      {[...code].map((ch, i) => (
+        <span key={i} data-testid="setup-join-code-tile" className="edu-tile h-[1.35em] w-[1.05em] rounded-[0.22em]">
+          {ch}
+        </span>
+      ))}
     </span>
   );
 
   return (
     <div
       data-testid="invite-code-card"
-      className="flex flex-col gap-3 rounded-neo-lg border-[3px] border-neo-black bg-neo-cream p-3 text-neo-black shadow-hard-lime-xl sm:p-4 lg:p-5"
+      className="edu-card flex flex-col gap-3 p-3 sm:p-4 lg:p-5"
     >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 text-start sm:gap-5 lg:flex-1 lg:grid-cols-1 lg:content-center lg:justify-items-center lg:gap-5 lg:py-2 lg:text-center">
         <div className="@container flex w-full min-w-0 flex-col gap-1 lg:items-center">
-          <span className="font-neo-body text-xs font-black uppercase tracking-wide text-neo-black/70">{t('eduShell.setup.joinCode')}</span>
+          <span className="font-neo-body text-xs font-black uppercase tracking-wide text-edu-ink/75 sm:text-sm">{t('eduShell.setup.joinCode')}</span>
           {joinUrl ? (
             <button
               type="button"
               data-testid="setup-code-copy"
               onClick={() => void copy()}
               aria-label={t('eduShell.setup.copyLink')}
-              className={cn('min-h-11 self-start rounded-neo px-1 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-neo-black lg:self-center', pressClasses(2))}
+              className={cn('min-h-11 self-start rounded-neo px-1 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-edu-line lg:self-center', pressClasses(2))}
             >
               {codeText}
             </button>
@@ -105,7 +109,7 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
             codeText
           )}
           {displayHost ? (
-            <span dir="ltr" className="mt-1 inline-flex min-w-0 items-center gap-1 font-neo-body text-xs font-bold text-neo-black/80 min-[400px]:text-sm">
+            <span dir="ltr" className="mt-1 inline-flex min-w-0 items-center gap-1 font-neo-body text-xs font-bold text-edu-ink min-[400px]:text-sm lg:text-base">
               <Link2 className="size-4 shrink-0" aria-hidden="true" />
               {/* Never truncated: a student types this. If it still cannot fit, it breaks after a slash. */}
               <span data-testid="setup-join-address" className="min-w-0">
@@ -116,7 +120,7 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
             </span>
           ) : null}
         </div>
-        <div data-testid="setup-qr" className="border-s-[2px] border-neo-black/20 ps-3 sm:ps-5 lg:border-s-0 lg:ps-0">
+        <div data-testid="setup-qr" className="border-s-[2px] border-edu-line/20 ps-3 sm:ps-5 lg:border-s-0 lg:ps-0">
           {joinUrl ? (
             <QRCodeSVG
               value={joinUrl}
@@ -128,13 +132,13 @@ export function ClassSetupInviteCode({ code, className, joinUrl, displayHost, on
               className="block size-[96px] min-[400px]:size-[112px] lg:size-[176px]"
             />
           ) : (
-            <span aria-hidden="true" className="block size-[96px] animate-pulse rounded bg-neo-black/10 motion-reduce:animate-none min-[400px]:size-[112px] lg:size-[176px]" />
+            <span aria-hidden="true" className="block size-[96px] animate-pulse rounded bg-edu-ink/10 motion-reduce:animate-none min-[400px]:size-[112px] lg:size-[176px]" />
           )}
         </div>
       </div>
 
       {joinUrl ? (
-        <div data-testid="setup-share-row" className="grid grid-cols-4 gap-2 border-t-2 border-dashed border-neo-black/25 pt-3">
+        <div data-testid="setup-share-row" className="grid grid-cols-4 gap-2 border-t-2 border-dashed border-edu-line/25 pt-3">
           <button type="button" data-testid="setup-copy-link" onClick={() => void copy()} className={CHIP.copy}>
             <ChipBody icon={copied ? Check : Copy} label={t(copied ? 'eduShell.setup.copied' : 'eduShell.setup.copyLink')} />
           </button>

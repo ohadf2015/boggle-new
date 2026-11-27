@@ -135,4 +135,28 @@ describe('class-ready guide', () => {
     expect(screen.getByTestId('setup-words-toggle')).toBeDisabled();
     expect(screen.getByTestId('setup-words-body')).not.toHaveClass('hidden');
   });
+
+  it('GIVEN no plan THEN the waiting card is a white outlined card with a pink icon square and the words fold is solid, not dashed', () => {
+    render(
+      <ClassSetupInviteView
+        classroom={{ name: 'Class', join_code: 'ABC234' }}
+        roster={empty}
+        joinUrl="https://x.test/join/ABC234"
+        displayHost="x.test"
+        homeHref="/home"
+        reduced
+        onShare={vi.fn()}
+        onOpenProjector={vi.fn()}
+        words={<div data-testid="words" />}
+        t={(k) => k}
+      />,
+    );
+    const card = screen.getByTestId('invite-roster');
+    expect(card.className).toContain('edu-card');
+    expect(card.className).not.toMatch(/shadow-hard-pink/);
+    expect(card.querySelector('svg[class*="bg-neo-pink"]')).not.toBeNull();
+    const fold = screen.getByTestId('setup-words-toggle');
+    expect(fold.className).not.toContain('border-dashed');
+    expect(fold.className).toContain('shadow-edu-lip');
+  });
 });
