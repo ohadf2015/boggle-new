@@ -5,7 +5,7 @@ export function EmptyRoundCard({ t }: { t: (key: string) => string }) {
   return (
     <div
       data-testid="empty-round-card"
-      className="flex items-center gap-3 @3xl/results:gap-6 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 @3xl/results:p-6 shadow-hard-xl"
+      className="flex items-center gap-3 @3xl/results:gap-6 rounded-neo-xl border-[3px] border-edu-line bg-edu-surface p-3 @3xl/results:p-6 shadow-edu-lip"
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static decorative mascot */}
       <img

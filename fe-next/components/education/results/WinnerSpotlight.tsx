@@ -143,8 +143,8 @@ export function WinnerSpotlight({
       className={cn(
         'relative flex items-center gap-4 text-edu-ink',
         quiet
-          ? cn('rounded-neo-lg border-[3px] shadow-hard-xl', lead ? 'border-neo-black bg-neo-pink' : 'border-edu-line bg-edu-surface')
-          : 'rounded-neo border-[2px] border-edu-line bg-edu-surface shadow-hard',
+          ? 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-edu-lip'
+          : 'rounded-neo border-[3px] border-edu-line bg-edu-surface shadow-edu-lip-sm',
         projector
           ? quiet
             ? 'px-4 py-3 gap-4 @[96rem]/results:px-6 @[96rem]/results:py-4 @[137.5rem]/results:px-10 @[137.5rem]/results:py-6'
@@ -175,7 +175,7 @@ export function WinnerSpotlight({
           // nothing about hit-testing, and a capture run lost a lobby click to
           // `covered by <video>`. Nothing here is ever the target of a tap.
           'pointer-events-none shrink-0 overflow-hidden rounded-neo',
-          lead ? 'border-[3px] border-neo-black bg-neo-cream' : 'border-[2px] border-edu-line bg-edu-surface',
+          lead ? 'border-[3px] border-neo-black bg-neo-pink' : 'border-[3px] border-edu-line bg-edu-surface',
           projector
             ? quiet
               ? 'w-20 h-20 @[96rem]/results:w-28 @[96rem]/results:h-28 @[137.5rem]/results:w-40 @[137.5rem]/results:h-40'
@@ -268,7 +268,7 @@ export function WinnerSpotlight({
               animate={{ scale: 1, rotate: i === 0 ? -4 : 5 }}
               transition={calm ? { duration: 0 } : { type: 'spring', stiffness: 380, damping: 14, delay: 0.15 + i * 0.12 }}
               className={cn(
-                'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-hard [&_svg]:h-full [&_svg]:w-full',
+                'grid place-items-center overflow-hidden rounded-full border-[3px] border-neo-black bg-neo-yellow shadow-edu-lip-sm [&_svg]:h-full [&_svg]:w-full',
                 'size-24 @[96rem]/results:size-32 @[137.5rem]/results:size-48',
                 i > 0 && '-ms-6'
               )}

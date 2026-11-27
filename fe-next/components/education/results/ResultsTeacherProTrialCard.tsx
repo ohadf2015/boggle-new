@@ -147,7 +147,7 @@ export function ResultsTeacherProTrialCard({
       data-offer={proOffer.offer}
       dir={dir}
       className={cn(
-        'shrink-0 rounded-neo-lg border-[3px] border-s-[6px] border-edu-line border-s-neo-pink bg-edu-surface text-edu-ink shadow-hard-lg',
+        'shrink-0 rounded-neo-lg border-[3px] border-s-[6px] border-edu-line border-s-neo-pink bg-edu-surface text-edu-ink shadow-edu-lip-sm',
         dismissible ? 'p-4' : 'px-3 py-2.5 @[96rem]/results:px-4 @[96rem]/results:py-3.5',
         className,
       )}

@@ -93,14 +93,6 @@ const CONFETTI: Array<[number, number, number, number, string]> = [
   [93, 34, 2.4, -12, 'bg-neo-yellow'],
 ];
 
-/** A hard-edged comic burst: 16 solid wedges, no gradient, no mask. */
-const BURST_POINTS = Array.from({ length: 16 }, (_, i) => {
-  const a0 = (i / 16) * Math.PI * 2;
-  const a1 = a0 + Math.PI / 32;
-  const r = 50;
-  return `50,50 ${(50 + r * Math.cos(a0)).toFixed(2)},${(50 + r * Math.sin(a0)).toFixed(2)} ${(50 + r * Math.cos(a1)).toFixed(2)},${(50 + r * Math.sin(a1)).toFixed(2)}`;
-});
-
 export interface PodiumStageProps {
   entries: PodiumEntry[];
   stage?: RoundEndStage;
@@ -177,7 +169,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
       <div
         data-testid={`podium-plate-${rank}`}
         className={cn(
-          'absolute flex -translate-x-1/2 flex-col items-center justify-start gap-[0.4cqw] rounded-t-neo border-[3px] px-[1cqw] pb-[1cqw] pt-[3cqw] shadow-[0.5cqw_0.5cqw_0_rgb(var(--neo-black))]',
+          'absolute flex -translate-x-1/2 flex-col items-center justify-start gap-[0.4cqw] rounded-t-neo border-[3px] px-[1cqw] pb-[1cqw] pt-[3cqw] shadow-[0_0.5cqw_0_rgb(var(--neo-black))]',
           muted ? MUTED_PLATE : PLATE[place]
         )}
         style={{
@@ -225,7 +217,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
           data-testid={revealed ? 'podium-avatar' : undefined}
           aria-hidden="true"
           className={cn(
-            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-edu-line bg-edu-surface shadow-[0.4cqw_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
+            'relative grid place-items-center overflow-hidden rounded-full border-[3px] border-edu-line bg-edu-surface shadow-[0_0.4cqw_0_rgb(var(--neo-black))] [&_svg]:h-full [&_svg]:w-full',
             winner && !muted ? 'ring-[0.4cqw] ring-neo-yellow' : ''
           )}
           style={{ width: winner ? '10cqw' : '8cqw', height: winner ? '10cqw' : '8cqw' }}
@@ -238,7 +230,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         </span>
         <p
           dir="auto"
-          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[2px] border-neo-black bg-neo-cream px-[1cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-black shadow-[0.3cqw_0.3cqw_0_rgb(var(--neo-black))]"
+          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[3px] border-neo-black bg-neo-white px-[1.2cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-black shadow-[0_0.3cqw_0_rgb(var(--neo-black))]"
           style={{ fontSize: winner ? '2.6cqw' : '2.1cqw' }}
         >
           {revealed ? entry.username : '—'}
@@ -259,26 +251,12 @@ export function PodiumStage({ entries, stage = FINAL_STAGE, t, children, classNa
       data-muted={muted ? 'true' : undefined}
       dir="ltr"
       className={cn(
-        'relative mx-auto aspect-[1920/1086] w-full overflow-hidden rounded-neo-lg border-4 border-edu-line bg-edu-surface shadow-hard-lg [container-type:inline-size]',
+        'relative mx-auto aspect-[1920/1086] w-full overflow-hidden rounded-neo-xl border-[3px] border-edu-line shadow-edu-lip [container-type:inline-size]',
+        // Rays are the winner's moment only, and static.
+        winnerUp ? 'edu-rays-gold' : 'bg-edu-surface',
         className
       )}
     >
-      {winnerUp && (
-        <svg
-          aria-hidden="true"
-          data-testid="podium-burst"
-          viewBox="0 0 100 100"
-          className="pointer-events-none absolute"
-          style={{ left: `${PEDESTALS[1].x}%`, top: `${PEDESTALS[1].top - 18}%`, width: '62cqw', height: '62cqw', marginLeft: '-31cqw', marginTop: '-31cqw' }}
-        >
-          <g className="motion-safe:animate-[spin_40s_linear_infinite]" style={{ transformOrigin: '50px 50px', transformBox: 'view-box' }}>
-            {BURST_POINTS.map((points) => (
-              <polygon key={points} points={points} className="fill-neo-yellow" opacity={0.16} />
-            ))}
-          </g>
-        </svg>
-      )}
-
       {!muted &&
         CONFETTI.map(([left, top, size, tilt, fill]) => (
           <span

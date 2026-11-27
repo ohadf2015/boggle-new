@@ -31,7 +31,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
       data-testid="edu-reteach-words"
       aria-labelledby="edu-reteach-words-title"
       data-fill={fill ? '' : undefined}
-      className={cn(NB_PANEL, 'flex shrink-0 flex-col gap-2.5 px-3 py-3 @5xl/results:gap-3 @5xl/results:px-4 @5xl/results:py-4', fill && '@5xl/results:flex-1')}
+      className={cn(NB_PANEL, 'shadow-edu-lip flex shrink-0 flex-col gap-2.5 px-3 py-3 @5xl/results:gap-3 @5xl/results:px-4 @5xl/results:py-4', fill && '@5xl/results:flex-1')}
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2
@@ -50,7 +50,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
             data-testid="edu-most-missed-word"
             dir="auto"
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-full border-2 border-neo-black bg-neo-cream shadow-hard-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
+              'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-neo-white shadow-edu-lip-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
               fill && '@5xl/results:px-4 @5xl/results:py-1.5 @5xl/results:text-2xl'
             )}
           >
@@ -67,7 +67,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
         {rest > 0 && (
           <li
             data-testid="edu-most-missed-more"
-            className="inline-flex items-center rounded-full border-2 border-dashed border-edu-line px-2.5 py-0.5 font-neo-body text-sm font-bold text-edu-ink @5xl/results:text-lg @[96rem]/results:text-xl"
+            className="inline-flex items-center rounded-neo border-2 border-dashed border-edu-line px-2.5 py-0.5 font-neo-body text-sm font-bold text-edu-ink @5xl/results:text-lg @[96rem]/results:text-xl"
           >
             {t('eduLiveRoom.hostResults.moreWords', { count: rest })}
           </li>
