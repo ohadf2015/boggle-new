@@ -15,7 +15,7 @@ export function RuLandingLinks({ locale, current, className = 'mb-12' }: { local
   const others = RU_LANDINGS.filter((l) => l.slug !== current);
   return (
     <Section title="Другие игры в слова" className={className}>
-      <LinkPills items={others.map((l) => ({ href: `/${locale}/${l.slug}`, label: l.label }))} />
+      <LinkPills items={others.map((l) => ({ href: `/${locale}/${l.slug}`, label: <h3 className="text-sm font-bold">{l.label}</h3> }))} />
     </Section>
   );
 }

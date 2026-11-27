@@ -62,9 +62,12 @@ export function LandingPage({
   locale,
   play,
   topBar = true,
+  dir,
   className,
   children,
 }: {
+  /** only for pages written in one language whatever the URL locale */
+  dir?: 'rtl';
   locale: string;
   play?: { href: string; label: string };
   /** false when the route already renders the app header */
@@ -73,7 +76,7 @@ export function LandingPage({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen bg-neo-navy font-neo-body font-normal text-neo-white">
+    <main dir={dir} className="min-h-screen bg-neo-navy font-neo-body font-normal text-neo-white">
       {topBar && (
         <nav className={cn(CONTAINER, 'flex items-center justify-between gap-3 py-3')}>
           <Link href={`/${locale}`} dir="ltr" aria-label="LexiClash" className={cn('font-neo-display text-2xl font-bold', FOCUS)}>
@@ -302,7 +305,7 @@ export function CheckList({ items }: { items: React.ReactNode[] }) {
           <span aria-hidden className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-neo-black bg-neo-lime">
             <Check className="h-4 w-4" strokeWidth={3.5} />
           </span>
-          <span className="font-medium">{item}</span>
+          <div className="font-medium">{item}</div>
         </li>
       ))}
     </ul>
@@ -327,7 +330,9 @@ export function CompareTable({
   rows,
   highlight = 1,
   caption,
+  captionHidden = false,
 }: {
+  captionHidden?: boolean;
   columns: React.ReactNode[];
   /** first cell of each row is its row header */
   rows: React.ReactNode[][];
@@ -336,9 +341,13 @@ export function CompareTable({
   caption?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className={cn(PAPER, 'relative overflow-x-auto')}>
-        <table className="w-full border-collapse text-start text-sm sm:text-base">
+    <div className={cn(PAPER, 'relative overflow-x-auto')}>
+      <table className="w-full border-collapse text-start text-sm sm:text-base">
+        {caption && (
+          <caption className={captionHidden ? 'sr-only' : 'caption-bottom border-t-2 border-neo-black/15 px-3 py-3 text-start text-xs leading-relaxed sm:px-5'}>
+            {caption}
+          </caption>
+        )}
           <thead className="bg-neo-black text-neo-white">
             <tr>
               {columns.map((col, i) => (
@@ -365,18 +374,25 @@ export function CompareTable({
               </tr>
             ))}
           </tbody>
-        </table>
-      </div>
-      {caption && <p className="text-xs leading-relaxed text-neo-white/70">{caption}</p>}
+      </table>
     </div>
   );
 }
 
-export function FaqList({ items }: { items: { q: React.ReactNode; a: React.ReactNode }[] }) {
+export function FaqList({
+  items,
+  openFirst = false,
+  exclusive,
+}: {
+  items: { q: React.ReactNode; a: React.ReactNode }[];
+  openFirst?: boolean;
+  /** shared name: opening one answer closes the others */
+  exclusive?: string;
+}) {
   return (
     <div className="grid items-start gap-3 lg:grid-cols-2">
       {items.map((item, i) => (
-        <details key={i} className="group rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-lg">
+        <details key={i} name={exclusive} open={openFirst && i === 0} className="group rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-lg">
           <summary className={cn('flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-neo-lg px-4 py-3 font-bold [&::-webkit-details-marker]:hidden', FOCUS)}>
             <span>{item.q}</span>
             <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-2 border-neo-black bg-neo-yellow group-open:rotate-45 motion-safe:transition-transform">

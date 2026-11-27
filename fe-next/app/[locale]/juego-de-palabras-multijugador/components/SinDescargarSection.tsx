@@ -32,8 +32,6 @@ export function SinDescargarSection({ locale }: { locale: string }) {
     >
       <div data-seo="sin-descargar" className="grid gap-8 lg:grid-cols-2">
         <div
-          role="group"
-          aria-label="Apalabrados pide una app. LexiClash se juega en el navegador, sin instalar nada, y publica el suelo del diccionario español."
           className="flex flex-col gap-3"
         >
           <h3 className={H3}>Requisitos: cero descarga</h3>
@@ -61,6 +59,7 @@ export function SinDescargarSection({ locale }: { locale: string }) {
           <CompareTable
             columns={['Su modo', 'Aquí, sin descargar']}
             rows={MODES.map((row) => [row.theirs, row.ours])}
+            captionHidden
             caption="Qué modo de Apalabrados cubre LexiClash sin descarga."
           />
         </div>

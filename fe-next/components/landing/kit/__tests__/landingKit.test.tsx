@@ -86,6 +86,25 @@ describe('landing kit', () => {
     expect(screen.getByText('Yes.')).toBeInTheDocument();
   });
 
+  it('names a table with its caption, hidden or shown', () => {
+    const { container } = render(<CompareTable columns={['A', 'B']} rows={[['1', '2']]} caption="Scores" captionHidden />);
+    expect(screen.getByRole('table', { name: 'Scores' })).toBeInTheDocument();
+    expect(container.querySelector('caption')).toHaveClass('sr-only');
+  });
+
+  it('faq can open its first answer and keep only one open', () => {
+    const { container } = render(<FaqList items={[{ q: 'a', a: '1' }, { q: 'b', a: '2' }]} openFirst exclusive="faq" />);
+    const [first, second] = container.querySelectorAll('details');
+    expect(first).toHaveAttribute('open');
+    expect(second).not.toHaveAttribute('open');
+    expect(second).toHaveAttribute('name', 'faq');
+  });
+
+  it('page can force a reading direction', () => {
+    render(<LandingPage locale="en" dir="rtl">x</LandingPage>);
+    expect(screen.getByRole('main')).toHaveAttribute('dir', 'rtl');
+  });
+
   it('cta band renders its heading and actions', () => {
     render(<CtaBand title="Ready?" actions={<LandingButton href="/en/daily" variant="secondary">Daily</LandingButton>} />);
     expect(screen.getByRole('heading', { level: 2, name: 'Ready?' })).toBeInTheDocument();

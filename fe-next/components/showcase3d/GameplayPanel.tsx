@@ -1,7 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
-import Image from 'next/image';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -17,19 +16,21 @@ export interface Mode {
   tag: string;
   title: string;
   body: string;
-  image: string;
+  video: string;
+  poster: string;
 }
 
 /**
  * Gameplay panel: a ScrollTrigger scrub rotates + lifts the OUTER wrapper into
  * place as it enters; the copy staggers in; the INNER frame keeps a live pointer
- * micro-tilt (tested tilt.ts).
+ * micro-tilt (tested tilt.ts). Clip plays only while in view (off-screen pause).
  */
 export default function GameplayPanel({ mode, isRTL }: { mode: Mode; isRTL: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const shadow = useRef<HTMLDivElement>(null);
+  const vid = useRef<HTMLVideoElement>(null);
   const sign = isRTL ? -1 : 1;
   const dir = mode.side === 'left' ? -1 : 1;
 
@@ -91,6 +92,21 @@ export default function GameplayPanel({ mode, isRTL }: { mode: Mode; isRTL: bool
     { scope: root },
   );
 
+  useEffect(() => {
+    const el = root.current;
+    if (!el) return;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !reduce) vid.current?.play().catch(() => {});
+        else vid.current?.pause();
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div
       ref={root}
@@ -108,7 +124,7 @@ export default function GameplayPanel({ mode, isRTL }: { mode: Mode; isRTL: bool
         <div ref={wrap} className="relative grid">
           <div ref={shadow} aria-hidden className="[grid-area:1/1] rounded-neo-lg bg-neo-black" style={{ transform: `translate(${sign * 10}px, 10px)` }} />
           <div ref={frame} className="relative z-10 aspect-[16/9] overflow-hidden rounded-neo-lg border-3 border-neo-black bg-neo-navy [grid-area:1/1]">
-            <Image src={mode.image} alt={mode.title} fill unoptimized className="object-cover" />
+            <video ref={vid} className="absolute inset-0 h-full w-full object-contain" src={mode.video} poster={mode.poster} muted loop playsInline preload="metadata" />
           </div>
         </div>
       </div>

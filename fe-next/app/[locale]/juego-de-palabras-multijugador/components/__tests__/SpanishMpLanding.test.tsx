@@ -81,6 +81,10 @@ describe('Spanish MP landing — composition', () => {
   it('FaqAccordion renders every question with its answer in the DOM', () => {
     const { container } = render(<FaqAccordion />);
     expect(container.querySelectorAll('details')).toHaveLength(FAQS.length);
+    const [first, second] = container.querySelectorAll('details');
+    expect(first).toHaveAttribute('open');
+    expect(second).not.toHaveAttribute('open');
+    expect(second.getAttribute('name')).toBe(first.getAttribute('name'));
     FAQS.forEach((f) => {
       expect(screen.getByText(f.q)).toBeInTheDocument();
       expect(screen.getByText(f.a)).toBeInTheDocument();

@@ -110,7 +110,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
   ];
 
   return (
-    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'התחילו לשחק' }}>
+    <LandingPage locale={locale} dir="rtl" play={{ href: `/${locale}/multiplayer`, label: 'התחילו לשחק' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

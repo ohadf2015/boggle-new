@@ -30,7 +30,7 @@ describe('SinDescargarSection — GR #3729 heading gaps', () => {
 
   it('publishes the measured dictionary floor and a no-install row, not a store size', () => {
     render(<SinDescargarSection locale="es" />);
-    const table = screen.getByRole('group', { name: /sin instalar nada, y publica el suelo del diccionario/i });
+    const table = screen.getByRole('table', { name: /sin instalar nada, y publica el suelo del diccionario/i });
     expect(within(table).getByRole('cell', { name: 'Nada que instalar' })).toBeInTheDocument();
     expect(within(table).getByRole('cell', { name: `${ES_DICT_FLOOR}+` })).toBeInTheDocument();
     expect(screen.queryByText(/158/)).not.toBeInTheDocument();

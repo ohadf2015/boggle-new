@@ -117,10 +117,10 @@ export default async function Page({ params }: PageProps) {
             { t: 'На двоих, компанией или с ИИ', d: 'Закрытая комната для друзей, случайные соперники или боты разной сложности.' },
             { t: 'Очки, серии, таблицы лидеров', d: 'Длинные и редкие слова приносят больше очков. Поднимайтесь в рейтинге.' },
           ].map((item) => (
-            <span key={item.t}>
-              <strong className="block font-neo-display text-lg">{item.t}</strong>
+            <div key={item.t}>
+              <h3 className="font-neo-display text-lg font-bold">{item.t}</h3>
               <span className="font-normal">{item.d}</span>
-            </span>
+            </div>
           ))}
         />
       </Section>

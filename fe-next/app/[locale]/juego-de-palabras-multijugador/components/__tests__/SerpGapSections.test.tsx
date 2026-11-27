@@ -54,7 +54,7 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
 
   it('renders the length-scoring table from Classic rules', () => {
     render(<SerpGapSections locale="es" />);
-    const scoring = screen.getByRole('group', { name: /puntos por longitud/i });
+    const scoring = screen.getByRole('table', { name: /puntos por longitud/i });
     LENGTH_SCORES.forEach((row) => {
       expect(within(scoring).getByRole('rowheader', { name: row.letters })).toBeInTheDocument();
     });
@@ -78,7 +78,7 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
   it('renders the measured Spanish dictionary floor and the Ñ tile row', () => {
     render(<SerpGapSections locale="es" />);
     expect(screen.getAllByText(new RegExp(ES_DICT_FLOOR.replace(',', ','))).length).toBeGreaterThan(0);
-    const contrast = screen.getByRole('group', { name: /valor de las fichas del scrabble en español/i });
+    const contrast = screen.getByRole('table', { name: /valor de las fichas del scrabble en español/i });
     expect(within(contrast).getByRole('rowheader', { name: 'Ñ' })).toBeInTheDocument();
     SPANISH_TILES.forEach((row) => {
       expect(within(contrast).getByRole('rowheader', { name: row.tile })).toBeInTheDocument();
@@ -88,7 +88,7 @@ describe('SerpGapSections — competitor heading gaps + unique round table', () 
   it('renders the public Spanish bag (100 tiles) and the teacher room the top 3 lack', () => {
     render(<SerpGapSections locale="es" />);
     expect(SPANISH_BAG_TOTAL).toBe(100);
-    const bag = screen.getByRole('group', { name: /distribución pública de las 100 fichas/i });
+    const bag = screen.getByRole('table', { name: /distribución pública de las 100 fichas/i });
     expect(within(bag).getByRole('rowheader', { name: 'Comodín' })).toBeInTheDocument();
     SPANISH_BAG.forEach((row) => {
       expect(within(bag).getByRole('rowheader', { name: row.tile })).toBeInTheDocument();

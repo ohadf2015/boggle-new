@@ -91,12 +91,14 @@ export function PlayBoggleWithFriendsSection({ locale }: { locale: string }) {
         </Prose>
       </div>
 
-      <div role="group" aria-label="LexiClash friends-room modes and player cap" className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         <h3 className="font-neo-display text-xl font-bold">Multiplayer modes and how many can join</h3>
         <p className="max-w-3xl leading-relaxed text-neo-white/80">
           A friends room rotates four modes. The player cap is the room, not the mode: up to 50 people on that grid. The host can also fill empty seats with up to 3 bots.
         </p>
         <CompareTable
+          caption="LexiClash friends-room modes and player cap"
+          captionHidden
           columns={['Mode', 'Players', 'What you do']}
           rows={FRIENDS_MODES.map((row) => [row.mode, row.players, row.what])}
         />

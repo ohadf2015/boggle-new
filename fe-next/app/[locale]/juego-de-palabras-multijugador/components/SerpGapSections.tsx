@@ -91,6 +91,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
               ...EXAMPLE_WORDS.map((row) => [row.word, row.letters, row.points, row.path]),
               ['Total', '—', EXAMPLE_TOTAL_POINTS, '8 palabras, una ronda'],
             ]}
+            captionHidden
             caption="Palabras encontradas en la cuadrícula de ejemplo y su puntuación LexiClash."
           />
         </div>
@@ -100,10 +101,11 @@ export function SerpGapSections({ locale }: { locale: string }) {
         title="Puntuación: longitud LexiClash vs fichas de Scrabble"
         intro="El Scrabble clásico paga por ficha (la Ñ vale 8, la Z vale 10). LexiClash paga por longitud para que la ronda quepa en 3 minutos. Misma familia de palabras; ritmo distinto."
       >
-        <div role="group" aria-label="Puntos por longitud de palabra en el modo clásico de LexiClash." className="max-w-md">
+        <div className="max-w-md">
           <CompareTable
             columns={['Letras', 'Puntos LexiClash']}
             rows={LENGTH_SCORES.map((row) => [row.letters, row.points])}
+            captionHidden
             caption="Puntos por longitud de palabra en el modo clásico de LexiClash."
           />
         </div>
@@ -178,15 +180,16 @@ export function SerpGapSections({ locale }: { locale: string }) {
         intro="El Scrabble en español (FISE) paga por ficha: la Ñ vale 8, la Z vale 10, CH/LL/RR son fichas propias. LexiClash no tiene atril. La Ñ es una letra más; lo que paga es la longitud (tabla de arriba)."
       >
         <div className="grid items-start gap-8 lg:grid-cols-2">
-          <div role="group" aria-label="Valor de las fichas del Scrabble en español frente a LexiClash." className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <CompareTable
               highlight={2}
               columns={['Letra', 'Scrabble ES', 'LexiClash']}
               rows={SPANISH_TILES.map((row) => [row.tile, row.scrabble, row.lexiclash])}
+              captionHidden
               caption="Valor de las fichas del Scrabble en español frente a LexiClash."
             />
           </div>
-          <div role="group" aria-label="Distribución pública de las 100 fichas del Scrabble en español. No es el atril de LexiClash." className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             <details className="group rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-lg">
               <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
                 <h3 className={H3}>Distribución de las {SPANISH_BAG_TOTAL} fichas en español</h3>
@@ -203,10 +206,8 @@ export function SerpGapSections({ locale }: { locale: string }) {
               highlight={-1}
               columns={['Ficha', 'Cuántas', 'Puntos Scrabble']}
               rows={SPANISH_BAG.map((row) => [row.tile, row.count, row.points])}
+              caption="Distribución pública de las 100 fichas del Scrabble en español. No es el atril de LexiClash."
             />
-            <p className="text-xs leading-relaxed text-neo-black/70">
-              Distribución pública de las 100 fichas del Scrabble en español. No es el atril de LexiClash.
-            </p>
               </div>
             </details>
           </div>

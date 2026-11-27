@@ -33,6 +33,7 @@ export function ComparisonTable() {
       <CompareTable
         columns={[<span key="c" className="sr-only">Característica</span>, ...COMPARISON.columns]}
         rows={COMPARISON.rows.map((row) => [row.label, ...row.cells.map((c, i) => <Cell key={i} value={c} />)])}
+        captionHidden
         caption="Comparación de LexiClash con Scrabble y Apalabrados online: precio, registro, multijugador en tiempo real, modos de juego y anuncios."
       />
     </Section>
