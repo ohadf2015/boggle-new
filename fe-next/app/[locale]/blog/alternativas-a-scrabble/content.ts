@@ -16,6 +16,7 @@ export type LocaleContent = {
   backToBlog: string;
   playDaily: string;
   startPracticing: string;
+  compareApalabrados: string;
 };
 
 export const contentByLocale: Record<string, LocaleContent> = {
@@ -42,19 +43,21 @@ Antes tenías domingos largos. Tenías amigos que vivían cerca. Tenías pacienc
 
 El problema no es Scrabble. El problema es que el formato — turnos de varios minutos, partidas de una hora, tablero físico — no encaja en muchas vidas modernas. Las alternativas que funcionan son las que adaptaron el corazón del juego (encontrar palabras que valen puntos) a tiempos más cortos, dispositivos más pequeños, y compañeros de juego que están en otros países.
 
-Hay cuatro alternativas que recomiendo. Cada una resuelve un problema distinto. Ninguna reemplaza a Scrabble — todas lo complementan.`,
+Hay cuatro alternativas que recomiendo. Cada una resuelve un problema distinto. Ninguna reemplaza a Scrabble — todas lo complementan.
+
+Si lo que echas de menos es jugar con amigos que están lejos, la alternativa que casi todo el mundo conoce es Apalabrados: es por turnos y cada partida puede durar días. Al final del artículo tienes el enlace a nuestra comparativa de LexiClash y Apalabrados punto por punto.`,
       },
       {
-        title: 'Velocidad pura: el modelo de Boggle (Wheel Rush)',
+        title: 'Velocidad pura: como el Boggle, pero con la Rueda de palabras',
         content: `Imagínate que en lugar de turnos, todos juegan al mismo tiempo. Imagínate que en lugar de una hora, la partida dura tres minutos. Imagínate que en lugar de una rejilla fija, las letras rotan y cambian. Eso es lo que sucede cuando la velocidad se convierte en el ingrediente principal.
 
-Wheel Rush — el formato moderno de letras giratorias — toma la idea básica de Boggle (encontrar palabras en un conjunto limitado de letras) y le añade movimiento. Las letras giran. Aparecen nuevas. Tienes que decidir rápido si vas a usar la "C" antes de que rote a una "B."
+La Rueda de palabras, el formato moderno de letras giratorias, toma la idea básica de Boggle (encontrar palabras en un conjunto limitado de letras) y le añade movimiento. Las letras giran. Aparecen nuevas. Tienes que decidir rápido si vas a usar la "C" antes de que rote a una "B."
 
 Lo bueno: terminas una partida en tres minutos. Puedes jugar mientras esperas el café. Tu cerebro hace un ejercicio diferente al de Scrabble — no estás planeando, estás escaneando.
 
 Lo malo: no es para todo el mundo. Si te gusta pensar las jugadas, vas a frustrarte. Si tu fuerte es el vocabulario raro de cuatro letras, te va a ir muy bien. Es un juego de reflejos lingüísticos, no de estrategia profunda.
 
-Probé Wheel Rush durante un viaje en autobús de tres horas. Jugué doce partidas. Llegué al destino sintiendo que mi cerebro había hecho ejercicio, en el buen sentido. No es Scrabble. No quiere serlo.`,
+Probé la Rueda de palabras durante un viaje en autobús de tres horas. Jugué doce partidas. Llegué al destino sintiendo que mi cerebro había hecho ejercicio, en el buen sentido. No es Scrabble. No quiere serlo.`,
       },
       {
         title: 'Caza de palabras objetivo: cuando el caos es demasiado',
@@ -112,7 +115,7 @@ Cinco preguntas. Dos minutos por aplicación. Vas a filtrar el 80% de la basura.
         title: 'Entonces, ¿cuál elegir?',
         content: `No te voy a dar una respuesta única porque sería deshonesto. Cada una de las cuatro alternativas resuelve un problema distinto.
 
-Si tienes prisa y quieres ejercicio mental rápido: Wheel Rush u otro juego de velocidad.
+Si tienes prisa y quieres ejercicio mental rápido: la Rueda de palabras u otro juego de velocidad.
 Si te paralizas frente a tableros aleatorios pero quieres algo más rápido que Scrabble: caza de palabras objetivo.
 Si tienes amigos lejanos y quieres mantener la conexión: duelos en línea contra humanos reales.
 Si te gustan los crucigramas pero te parecen demasiado largos: el formato de agrupación tipo Connections.
@@ -125,5 +128,6 @@ El clásico juego de letras seguirá ahí cuando lo quieras. Las alternativas no
     backToBlog: 'Volver al Blog',
     playDaily: 'Prueba el Reto Diario',
     startPracticing: 'Juega Multijugador',
+    compareApalabrados: 'LexiClash vs Apalabrados',
   },
 };

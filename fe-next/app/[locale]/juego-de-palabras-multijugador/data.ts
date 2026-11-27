@@ -14,7 +14,7 @@ export const FEATURES = [
   'Batallas en tiempo real con puntos al instante',
   'Crea sala e invita por enlace — sin registrarse',
   `Más de ${ES_DICT_FLOOR} palabras en español`,
-  'Modos múltiples: Boggle, Cazador, Explosión',
+  'Modos: Clásico, Caza de palabras, Blast y Rueda de palabras',
   'Desafíos diarios con clasificaciones',
   'Batallas de jefes con giros únicos',
   '100 % gratis, sin descargas',
@@ -41,12 +41,12 @@ export const STEPS = [
 
 export const MODES = [
   {
-    name: 'Cazador de Palabras',
-    desc: 'Encuentra todas las palabras escondidas en la rejilla antes que los demás.',
+    name: 'Caza de palabras',
+    desc: 'Hay una palabra secreta escondida en el tablero. La primera persona que la encuentra gana la ronda.',
   },
   {
-    name: 'Modo Explosión',
-    desc: 'Las letras explotan, la rejilla cambia. Caos puro, palabras rápidas.',
+    name: 'Blast',
+    desc: 'Forma una palabra y sus fichas explotan. Caen letras nuevas y, si encadenas palabras, sube el combo.',
   },
   {
     name: 'Batalla de Jefes',
@@ -81,7 +81,7 @@ export const FAQS = [
   DIRECT_ANSWER,
   {
     q: '¿Hay scrabble español online gratis sin registrarse?',
-    a: 'Sí. LexiClash es scrabble español online gratis sin registrarse: abres el navegador, pulsas Crear sala y la partida empieza. No pide email ni contraseña. Si no tienes un nombre guardado, escribes un apodo — eso no crea una cuenta. Quien entra por el enlace de WhatsApp tampoco se registra.',
+    a: 'Sí. LexiClash no es Scrabble, pero se juega con la misma idea de formar palabras, online, gratis y sin registro: abres el navegador, pulsas Crear sala y la partida empieza. No pide email ni contraseña. Si no tienes un nombre guardado, escribes un apodo — eso no crea una cuenta. Quien entra por el enlace de WhatsApp tampoco se registra.',
   },
   {
     q: '¿Dónde jugar scrabble online español multijugador gratis?',
@@ -105,7 +105,7 @@ export const FAQS = [
   },
   {
     q: '¿Qué modos de juego multijugador hay?',
-    a: 'Salas multijugador en tiempo real, desafíos diarios, cazadores de palabras, modo explosión, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
+    a: 'Salas multijugador en tiempo real, desafíos diarios, Caza de palabras, Blast, Rueda de palabras, batallas de jefes y más. Cada modo tiene reglas y puntuación únicas.',
   },
   {
     q: '¿Dónde puedo jugar Scrabble en línea gratis en español?',
@@ -133,7 +133,7 @@ export const FAQS = [
   },
   {
     q: '¿Qué juegos son parecidos a Scrabble online en español?',
-    a: 'Apalabrados y Words With Friends son por turnos (esperas horas). El Scrabble oficial es app + registro. Wordle es un puzzle diario en solitario. LexiClash es la partida multijugador en tiempo real: misma cuadrícula, 2–50 jugadores, 2–3 minutos, en el navegador.',
+    a: 'Apalabrados y Words With Friends son por turnos (esperas horas). El Scrabble oficial es app + registro. Wordle es un puzzle diario en solitario. LexiClash es la partida multijugador en tiempo real: misma cuadrícula, 2–50 jugadores, rondas de 90 segundos, en el navegador.',
   },
   {
     q: '¿Cuál es el objetivo de una partida multijugador?',
@@ -145,7 +145,7 @@ export const FAQS = [
   },
   {
     q: '¿Cuándo termina la partida?',
-    a: 'Cuando se acaba el temporizador de la ronda (unos 180 segundos en Clásico). No hay bolsa de fichas que vaciar ni restar puntos del atril. El marcador se congela y puedes repetir o cambiar de modo.',
+    a: 'Cuando se acaba el tiempo de la ronda: 90 segundos por defecto en Clásico, aunque quien crea la sala puede cambiarlo. No hay bolsa de fichas que vaciar ni restar puntos del atril. El marcador se congela y puedes repetir o cambiar de modo.',
   },
   {
     q: '¿Puedo desafiar una palabra colocada por otro jugador?',
@@ -153,7 +153,7 @@ export const FAQS = [
   },
   {
     q: '¿Cómo se reparten las letras?',
-    a: 'No se reparten. En el Scrabble de tablero cada quien recibe 7 fichas al azar de una bolsa de 100. En LexiClash no hay bolsa ni atril: la sala comparte una cuadrícula y todos buscan a la vez. Si el tablero no te gusta, la ronda dura unos 180 segundos y la siguiente trae otra rejilla.',
+    a: 'No se reparten. En el Scrabble de tablero cada quien recibe 7 fichas al azar de una bolsa de 100. En LexiClash no hay bolsa ni atril: la sala comparte una cuadrícula y todos buscan a la vez. Si el tablero no te gusta, la ronda dura 90 segundos por defecto y la siguiente trae otra rejilla.',
   },
   {
     q: '¿Puedo ver las letras del rival?',
@@ -204,14 +204,15 @@ export const TIPS: { title: string; body: string }[] = [
   { title: 'Empieza por el centro', body: 'Las letras del medio tocan a más vecinas. Una R o una A central abre CASA, CARO y ARTE en la misma ronda.' },
   { title: 'Las de 3 letras pagan el combo', body: 'ASA, ORA, TES: 1 punto cada una, pero encadenadas en 5 segundos suben el multiplicador. No las desprecies.' },
   { title: 'Una letra extra cambia el tramo', body: 'CARTA vale 2; añade la S adyacente y CARTAS vale 3. Revisa siempre si la palabra sigue un paso más.' },
-  { title: 'No esperes turno', body: 'En Scrabble online clásico tu rival piensa 2 minutos. Aquí los 8 jugadores buscan a la vez: el reloj es de 180 segundos para todos.' },
+  { title: 'No esperes turno', body: 'En Scrabble online clásico tu rival piensa 2 minutos. Aquí los 8 jugadores buscan a la vez y el reloj corre igual para todos: 90 segundos por defecto.' },
 ];
 
 export const SIMILAR_GAMES: { name: string; vs: string }[] = [
-  { name: 'Scrabble (app oficial)', vs: 'Por turnos, registro, tablero 15×15. LexiClash: misma sala, todos a la vez, 2–3 min.' },
+  { name: 'Scrabble (app oficial)', vs: 'Por turnos, registro, tablero 15×15. LexiClash: misma sala, todos a la vez, rondas de 90 segundos.' },
   { name: 'Apalabrados', vs: 'Asíncrono con amigos. LexiClash no te deja esperando el próximo movimiento.' },
-  { name: 'Wordle / Wordle en español', vs: 'Un puzzle al día, solo. LexiClash tiene desafío diario y además salas de 2–50.' },
+  { name: 'Wordle en español', vs: 'Una palabra oculta al día y juegas solo. LexiClash también tiene reto diario, y además salas de 2 a 50 personas.' },
   { name: 'Boggle', vs: 'Misma idea de cuadrícula; LexiClash añade puntuación en vivo, 8 modos y 6 idiomas.' },
+  { name: 'Ruzzle', vs: 'También es tipo Boggle, pero cada uno juega su tablero por turnos. En LexiClash toda la sala juega el mismo tablero a la vez.' },
 ];
 
 /** FISE-style Spanish Scrabble tile values vs LexiClash (length only). Public bag. */

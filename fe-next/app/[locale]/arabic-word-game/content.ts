@@ -41,7 +41,7 @@ export const enContent: ComingSoonContent = {
       },
       {
         title: 'Scores for everyone',
-        body: 'Rounds last two or three minutes, and the scoreboard shows up for everyone right after.',
+        body: 'A round lasts one minute by default, and the scoreboard shows up for everyone right after.',
       },
     ],
   },
@@ -74,6 +74,10 @@ export const enContent: ComingSoonContent = {
     {
       q: 'Can I play now?',
       a: "Yes, in English, Hebrew, Spanish, Swedish, Japanese or Russian. Arabic is the only one that isn't out yet.",
+    },
+    {
+      q: 'Is it like Arabic Scrabble?',
+      a: 'Not quite. In Scrabble you place a word and wait for your turn. Here there are no turns: everyone searches the same letter grid at the same time, and a round is usually over in a minute.',
     },
     {
       q: 'Will it work for Arabic learners and classrooms?',

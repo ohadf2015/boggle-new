@@ -132,7 +132,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
                 step: [
                   { '@type': 'HowToStep', name: 'Abrir LexiClash', text: 'Entra a lexiclash.live desde cualquier navegador en móvil, tablet o computadora. No requiere descarga.' },
                   { '@type': 'HowToStep', name: 'Crear una sala', text: 'Pulsa "Crear sala" y comparte el enlace por WhatsApp, Discord o mensaje directo. Hasta 50 jugadores pueden unirse.' },
-                  { '@type': 'HowToStep', name: 'Encontrar palabras en tiempo real', text: 'Todos ven la misma cuadrícula al mismo tiempo. Haz clic o arrastra para formar palabras — las más largas dan más puntos. Partida de 2-3 minutos.' },
+                  { '@type': 'HowToStep', name: 'Encontrar palabras en tiempo real', text: 'Todos ven la misma cuadrícula al mismo tiempo. Haz clic o arrastra para formar palabras — las más largas dan más puntos. Cada ronda dura 90 segundos por defecto.' },
                 ],
               },
             ],
@@ -183,7 +183,7 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               LexiClash es la alternativa que se salta todo eso: se juega en el navegador del PC (y del móvil
               y la tablet), gratis, sin descargar nada, sin emulador y sin registro. Diccionario de más de{' '}
               {ES_DICT_FLOOR} palabras en español con variantes de España y Latinoamérica, salas de 2 a 50
-              jugadores en tiempo real y partidas de 2-3 minutos. Abre lexiclash.live, pulsa Crear sala y
+              jugadores en tiempo real y rondas de 90 segundos. Abre lexiclash.live, pulsa Crear sala y
               comparte el enlace — eso es toda la &quot;instalación&quot;.
             </p>
           </Prose>
@@ -214,12 +214,12 @@ export default async function SpanishWordGamePage({ params }: PageProps) {
               LexiClash nació de una frustración simple: intentar jugar al Scrabble online en español con
               amigos y toparse con apps que exigen registro, interrumpen con anuncios y te hacen esperar
               turnos eternos. Aquí funciona al revés — abres el navegador, creas una sala y en 10 segundos
-              todos compiten en tiempo real sobre el mismo tablero. La estrategia del Scrabble, la velocidad
-              del Boggle y el formato social de Apalabrados, sin fricción.
+              todos compiten en tiempo real sobre el mismo tablero. Tiene algo de la estrategia del Scrabble, la
+              velocidad del Boggle y el pique con amigos de Apalabrados, pero sin esperas.
             </p>
             <p>
-              Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una partida rápida de
-              2-3 minutos o una sesión competitiva más larga — tú pones el ritmo. Y como todo ocurre en el
+              Juega con amigos, familia o rivales de todo el mundo hispanohablante. Una ronda rápida de
+              90 segundos o una sesión competitiva más larga — tú pones el ritmo. Y como todo ocurre en el
               navegador, da igual quién juega desde el móvil y quién desde el ordenador.
             </p>
             <p>

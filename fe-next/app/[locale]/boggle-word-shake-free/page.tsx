@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Boggle WordShake Free Online — Play Boggle Shake | LexiClash',
-    description: 'Wordplay boggle shake: shake a 4x4 letter grid, find words in 3 minutes. Play free in the browser — no download, no signup. Solo or 2-20 friends live.',
+    description: 'Wordplay boggle shake: shake a 4x4 letter grid, find words in 3 minutes. Play free in the browser — no download, no signup. Solo or with up to 50 friends live.',
     keywords: 'wordplay boggle shake, boggle wordshake, boggle shake, boggle shake free, wordshake boggle, play boggle shake online, free boggle online no download, boggle word shake free no download, boggle word shake online, word shake game free, boggle shake free online, word scramble game free no download, boggle word game free, word shake multiplayer',
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
     openGraph: {
@@ -59,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const WORDPLAY_BOGGLE_SHAKE_ANSWER =
-  'Wordplay boggle shake is the opening move of classic Boggle, the letter-cube game Allan Turoff designed and Parker Brothers released in 1973. Sixteen letter cubes sit in a 4x4 grid under a clear dome. Players shake the dome so each cube shows one letter, then have 3 minutes to find words of at least 3 letters by linking letters that touch on a side or a corner. A cube may be used only once in a word, and the Qu face counts as two letters. Classic Boggle scoring is 1 point for a 3- or 4-letter word, 2 points for 5 letters, 3 for 6, 5 for 7, and 11 for 8 or more. LexiClash plays that same shake-and-find game free in the browser at lexiclash.live, with no download, no signup, 5x5 and 6x6 grids, and live rooms for 2 to 20 players. Wordplay boggle shake is the game you shake, not the dictionary verb boggle (to be overwhelmed, from the old word bogle).';
+  '"Boggle shake" is the opening move of classic Boggle, the letter-cube game Allan Turoff designed and Parker Brothers released in 1973. Sixteen letter cubes sit in a 4x4 grid under a clear dome. Players shake the dome so each cube shows one letter, then have 3 minutes to find words of at least 3 letters by linking letters that touch on a side or a corner. A cube may be used only once in a word, and the Qu face counts as two letters. Classic Boggle scoring is 1 point for a 3- or 4-letter word, 2 points for 5 letters, 3 for 6, 5 for 7, and 11 for 8 or more. LexiClash plays that same shake-and-find game free in the browser at lexiclash.live, with no download, no signup, 5×5, 6×6 and 7×7 boards, and live rooms for up to 50 players. Wordplay boggle shake is the game you shake, not the dictionary verb boggle (to be overwhelmed, from the old word bogle).';
 
 const classicBoggleScoring = [
   { letters: '3-4', points: '1' },
@@ -71,12 +71,16 @@ const classicBoggleScoring = [
 
 const faqs = [
   {
+    q: 'Is this the British Council Wordshake game?',
+    a: "No. Wordshake is the British Council's LearnEnglish game: a 4×4 board, three minutes, and you can pick letters from anywhere on the board. LexiClash plays the Boggle way: each word has to follow letters that touch, and multiplayer boards are 5×5, 6×6 or 7×7. If you liked Wordshake's three-minute rounds, set the round to 3 minutes in a multiplayer room.",
+  },
+  {
     q: 'What is wordplay boggle shake?',
     a: WORDPLAY_BOGGLE_SHAKE_ANSWER,
   },
   {
     q: 'What is Boggle Word Shake?',
-    a: 'Boggle Word Shake is a word-finding game where letters are scrambled on a grid and you find words by connecting adjacent letters. LexiClash brings this classic gameplay online — free, no download, with multiplayer support for up to 20 players.',
+    a: 'Boggle Word Shake is a word-finding game where letters are scrambled on a grid and you find words by connecting adjacent letters. LexiClash brings this classic gameplay online — free, no download, with rooms for up to 50 players.',
   },
   {
     q: 'Can I play Boggle Word Shake free with no download?',
@@ -84,7 +88,7 @@ const faqs = [
   },
   {
     q: 'How is this different from the original Boggle Word Shake app?',
-    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer (2-20+ players), multiple grid sizes (4x4, 5x5, 6x6), daily challenges, combo scoring, and 6-language support — all free with no pay-to-win boosts.',
+    a: 'LexiClash offers the same word-shake gameplay plus real-time multiplayer for up to 50 players, three board sizes (5×5, 6×6 and 7×7), daily challenges, combo scoring, and 6-language support — all free with no pay-to-win boosts.',
   },
   {
     q: 'Can I play Boggle Word Shake with friends online?',
@@ -156,7 +160,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
             Miss the classic Boggle Shake game? LexiClash brings the same scramble-and-find gameplay to your browser —
             completely free, no download required. Shake up a grid of letters, find as many words as you can, and compete
             against friends or AI bots in real-time. Looking for free boggle online no download? You found it. Choose from
-            4x4, 5x5, or 6x6 grids with combo scoring for extra challenge.
+            5×5, 6×6 or 7×7 boards with combo scoring for extra challenge.
           </p>
         </Prose>
         <div className="flex flex-col gap-3">
@@ -179,7 +183,7 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
         <Steps
           items={[
             { title: 'Open LexiClash', body: 'Visit lexiclash.live — works on any device. No download or signup.' },
-            { title: 'Start a Game', body: 'Play solo vs AI bots, or create a room and invite 2-20+ friends via link.' },
+            { title: 'Start a Game', body: 'Play solo vs AI bots, or create a room and invite up to 49 friends via link.' },
             { title: 'Shake & Find Words', body: 'Letters scramble on the grid. Connect adjacent letters to form words. Longer = more points!' },
           ]}
         />
@@ -189,8 +193,8 @@ export default async function BoggleWordShakeFreePage({ params }: PageProps) {
         <CheckList
           items={[
             'Same scramble-and-find gameplay you love',
-            'Real-time multiplayer with 2-20+ players',
-            'Multiple grid sizes: 4x4, 5x5, 6x6',
+            'Real-time multiplayer for up to 50 players',
+            'Three board sizes: 5×5, 6×6, 7×7',
             'Combo scoring for fast word chains',
             'No download — plays in any browser',
             'Daily challenges with global leaderboard',

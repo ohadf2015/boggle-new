@@ -30,9 +30,11 @@ describe('anagram hub zero-click (anagram svenska)', () => {
     expect(SRC).not.toContain("from 'next/script'");
   });
 
-  it('keeps a play/tool CTA after the answer', () => {
+  it('sends the Swedish tool CTA to the Swedish word solver, not the English-dictionary /anagram/[letters]', () => {
     const q = SRC.indexOf('{ANAGRAM_SVENSKA_ANSWER}');
-    const cta = SRC.indexOf('/anagram/', q);
+    const cta = SRC.indexOf('/tools/word-solver', q);
+    expect(SRC).not.toContain('/sv/anagram/listen');
+    expect(SRC).not.toContain('Prova med listen');
     const play = SRC.indexOf('/multiplayer', q);
     expect(q).toBeGreaterThan(-1);
     expect(cta).toBeGreaterThan(q);

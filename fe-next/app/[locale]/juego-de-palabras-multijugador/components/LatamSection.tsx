@@ -80,7 +80,7 @@ export function LatamSection({ locale }: { locale: string }) {
             <p>
               Si buscabas algo como <strong>Palabras con amigos</strong> pero sin
               esperar un día entero a que el otro haga su jugada, aquí todo pasa en vivo. Todos ven la misma
-              cuadrícula al mismo tiempo y la ronda se termina en dos o tres minutos. Se abre en el navegador
+              cuadrícula al mismo tiempo y la ronda se termina en un minuto y medio. Se abre en el navegador
               del celular o de la compu, así que no hace falta bajar ninguna app ni crearse una cuenta.
             </p>
             <p>

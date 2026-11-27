@@ -9,7 +9,7 @@ import { ES_DICT_FLOOR } from '../data';
 const QUERY = 'apalabrados online gratis sin descargar';
 
 const MODES: { theirs: string; ours: string }[] = [
-  { theirs: 'Clásico / Rápido', ours: 'Sala en tiempo real, 2–50, ronda de 180 s' },
+  { theirs: 'Clásico / Rápido', ours: 'Sala en tiempo real, 2–50, ronda de 90 s' },
   { theirs: 'Sopa de letras', ours: 'Caza de palabras, en el navegador' },
   { theirs: 'Desafío', ours: 'Desafío diario, el mismo tablero para todos' },
   { theirs: 'Adivina la palabra', ours: 'Rueda de palabras diaria' },

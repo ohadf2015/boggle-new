@@ -83,6 +83,10 @@ const faqs = [
         q: '¿Hay un modo aula para profesores?',
         a: 'Sí. LexiClash Education es gratuito para profesores, sin registro de alumnos. Crea listas de vocabulario propias, ejecuta duelos de vocabulario, sigue el progreso de los estudiantes en un panel docente. No existe en Apalabrados. Ideal para aulas hispanohablantes, ESL/ELE y enseñanza de idiomas.',
     },
+    {
+        q: '¿Se puede jugar a Apalabrados online gratis sin descargar nada?',
+        a: 'Apalabrados está pensado para su app de móvil. Si lo que quieres es una partida de palabras con amigos en el navegador, sin instalar nada y sin registrarte, LexiClash se abre en cualquier móvil u ordenador: creas una sala, mandas el enlace y jugáis todos a la vez.',
+    },
 ];
 
 const faqJsonLd = JSON.stringify({
@@ -173,7 +177,7 @@ export default async function LexiClashVsApalabradosPage({ params }: PageProps) 
             { title: 'Desafío Diario Estilo Wordle', body: 'Word Hunt Survival y Daily Buzz — puzles diarios globales con resultados para compartir y seguimiento de rachas. Apalabrados no tiene formato diario equivalente.' },
             { title: 'Multijugador Para 20+ Personas', body: 'Crea una sala, comparte el código, mete a toda la clase o toda la fiesta a la vez en la misma cuadrícula. Apalabrados se limita a 1 contra 1.' },
             { title: 'Modo Aula Para Profesores', body: 'Listas de vocabulario propias del programa, duelos léxicos, panel docente con progreso. Completamente gratis sin registro de alumnos. No existe en Apalabrados.' },
-            { title: 'Brain Drills (6 Minijuegos)', body: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Ejercicios cognitivos rápidos — no están en Apalabrados.' },
+            { title: 'Gimnasio Mental: 4 ejercicios de un minuto', body: 'Velocidad, memoria, atención y vocabulario raro, en rondas de 60 segundos. Apalabrados no tiene nada parecido.' },
             { title: 'Cobertura Hispanoamericana', body: 'Hreflang configurado para España, México, Argentina, Colombia y EE. UU. hispanohablante. El diccionario acepta variantes ibéricas y latinoamericanas.' },
             { title: 'Sin Registro Obligatorio', body: 'Pulsa Jugar, escribe un alias, listo. La cuenta es opcional — solo para sincronizar entre dispositivos. Apalabrados requiere registro desde el inicio.' },
           ]}

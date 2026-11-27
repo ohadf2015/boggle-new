@@ -16,8 +16,8 @@ export function DosJugadoresSection({ locale }: { locale: string }) {
           </li>
           <li>Pásale el enlace por WhatsApp. Tu amigo entra con un apodo, sin registrarse.</li>
           <li>
-            Los dos ven la misma cuadrícula y buscan palabras a la vez. Nada de esperar turno: la ronda dura 2–3
-            minutos y al final el marcador dice quién ganó.
+            Los dos ven la misma cuadrícula y buscan palabras a la vez. Nada de esperar turno: la ronda dura 90
+            segundos por defecto y al final el marcador dice quién ganó.
           </li>
         </ol>
         <p>

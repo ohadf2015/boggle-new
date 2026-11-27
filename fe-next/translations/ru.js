@@ -11987,7 +11987,7 @@ const ru = {
     "presetParty": "Вечеринка",
     "presetPartyDesc": "Вечеринка на 2 мин",
     "presetChallenge": "Вызов",
-    "presetChallengeDesc": "Сложный режим на 3 мин",
+    "presetChallengeDesc": "Сложный режим на 2 мин",
     "presetFastDetails": "Быстро и бешено. Для разминки или короткого перерыва.",
     "presetPartyDetails": "Ровный темп. Для компании.",
     "presetChallengeDetails": "Большая доска, больше времени, без пощады.",

@@ -88,7 +88,7 @@ export const educationSeoContent: Record<string, EducationSeoEntry> = {
       'リアルタイムリーダーボードで生徒のモチベーションを高める',
     ],
     geoAnswer: {
-      question: '生徒のログインなしで、無料の語彙ゲームを授業で始めるには？',
+      question: '授業で使える無料のクラスルームゲームを、生徒のログインなしで始めるには？',
       answer:
         `LexiClash Educationでクラスを作り、6文字の参加コードを共有します。生徒はChromebook、スマホ、タブレットのブラウザですぐに遊べます。アプリもメールも生徒アカウントも不要です。自分の単語リストを使えます。1ラウンドは2〜10分で、ウォームアップ、休憩、復習に向きます。無料プランは1クラス${P.students}人まで、最大${P.classes}クラスです。`,
     },

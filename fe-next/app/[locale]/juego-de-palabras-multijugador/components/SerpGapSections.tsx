@@ -27,8 +27,8 @@ export function SerpGapSections({ locale }: { locale: string }) {
           <Prose>
             <p>
               No hay atril de 7 fichas ni turnos. En LexiClash todos ven la misma cuadrícula y buscan a la vez. Eso
-              es <strong>scrabble online español multijugador</strong> sin la espera: 2 a 50 jugadores, ronda de 2–3
-              minutos, navegador.
+              es <strong>scrabble online español multijugador</strong> sin la espera: 2 a 50 jugadores, rondas de 90
+              segundos, navegador.
             </p>
             <ol>
               <li>
@@ -51,7 +51,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
               `Diccionario ES ${ES_DICT_FLOOR}+ palabras`,
               '8 modos, 6 idiomas, 0€',
               'Móvil y PC, sin app',
-              'Ronda media: 180 segundos',
+              'Ronda por defecto: 90 segundos',
             ]}
           />
         </Section>
@@ -67,7 +67,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
               las reglas
             </Link>
             ). Total de esta ronda de ejemplo: <strong className="text-neo-lime">{EXAMPLE_TOTAL_POINTS} puntos</strong>{' '}
-            en menos de tres minutos de reloj.
+            en una sola ronda de 90 segundos.
           </>
         }
       >
@@ -99,7 +99,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
 
       <Section
         title="Puntuación: longitud LexiClash vs fichas de Scrabble"
-        intro="El Scrabble clásico paga por ficha (la Ñ vale 8, la Z vale 10). LexiClash paga por longitud para que la ronda quepa en 3 minutos. Misma familia de palabras; ritmo distinto."
+        intro="El Scrabble clásico paga por ficha (la Ñ vale 8, la Z vale 10). LexiClash paga por longitud para que la ronda quepa en 90 segundos. Misma familia de palabras; ritmo distinto."
       >
         <div className="max-w-md">
           <CompareTable
@@ -130,7 +130,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
           <p>
             En el Scrabble clásico el objetivo es colocar fichas en un tablero 15×15 y vaciar el atril. En{' '}
             <strong>scrabble online español multijugador</strong> en LexiClash el objetivo es otro: encontrar más
-            palabras válidas que el resto de la sala en la misma cuadrícula, en 2–3 minutos. Gana el marcador más
+            palabras válidas que el resto de la sala en la misma cuadrícula, en 90 segundos. Gana el marcador más
             alto, no la última ficha.
           </p>
         </div>
@@ -145,7 +145,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
         <div className="space-y-2 pt-4">
           <h2>Fin de la partida</h2>
           <p>
-            Se acaba el reloj (≈180 s en Clásico) y el marcador se congela. No se vacía una bolsa ni se restan las
+            Se acaba el reloj (90 s por defecto en Clásico) y el marcador se congela. No se vacía una bolsa ni se restan las
             fichas del atril. Empate: mismo tablero, misma ronda — gana quien encontró más. Luego creas otra sala o
             cambias de modo.
           </p>
@@ -244,7 +244,7 @@ export function SerpGapSections({ locale }: { locale: string }) {
           <p>
             En LexiClash el profesor pulsa Crear sala y proyecta el enlace o el QR. Hasta 50 estudiantes entran en la
             misma cuadrícula, en español (ñ incluida), sin email de alumno y sin app — vale en el navegador del
-            Chromebook o del móvil. La ronda dura 2–3 minutos, así que cabe entre dos explicaciones.
+            Chromebook o del móvil. La ronda dura 90 segundos, así que cabe entre dos explicaciones.
           </p>
           <p>
             El Internet Scrabble Club publica un contador de jugadores conectados a su lobby. Una sala de LexiClash es

@@ -4892,7 +4892,7 @@ const en = {
     "presetParty": "Party",
     "presetPartyDesc": "2 min party mode",
     "presetChallenge": "Challenge",
-    "presetChallengeDesc": "3 min hard mode",
+    "presetChallengeDesc": "2 min hard mode",
     "presetFastDetails": "Fast and frantic. Great for a warmup or quick break.",
     "presetPartyDetails": "Balanced pace. Built for groups.",
     "presetChallengeDetails": "Bigger board, longer time, no mercy.",

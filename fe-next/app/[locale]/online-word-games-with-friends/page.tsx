@@ -64,7 +64,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 const faqs = [
   {
     q: 'Can I play Words With Friends online for free, without the app?',
-    a: "Words With Friends itself requires the mobile app and an account. LexiClash is a free alternative that runs entirely in your browser — no app, no account, no ads popping between turns. And instead of waiting for each other's moves, everyone plays the same grid live, so a whole rivalry resolves in one sitting.",
+    a: "Words With Friends is built around its mobile app, and the browser route people mention is its Facebook version. LexiClash is a free alternative that runs entirely in your browser — no app, no account, no ads popping between turns. And instead of waiting for each other's moves, everyone plays the same grid live, so a whole rivalry resolves in one sitting.",
+  },
+  {
+    q: 'Can I play a Words With Friends style game on Android with no download?',
+    a: "Yes. Open lexiclash.live in Chrome on your Android phone and you're in a room in a few seconds. Nothing installs, and friends on iPhone or a laptop join the same game from the link.",
   },
   {
     q: 'How do I play word games online with friends?',
@@ -114,7 +118,7 @@ export default async function OnlineWordGamesWithFriendsPage({ params }: PagePro
         eyebrow="Live · Up to 50 friends"
         title={
           <>
-            Play Words With Friends Online — <Mark>Free</Mark>, Real-Time, No App
+            A <Mark>Free</Mark> Words With Friends Online Alternative With No App
           </>
         }
         lead="Looking for Words With Friends online, without the app and without the waiting?"

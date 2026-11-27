@@ -5292,7 +5292,7 @@ const ja = {
     "presetParty": "パーティー",
     "presetPartyDesc": "2分パーティーモード",
     "presetChallenge": "チャレンジ",
-    "presetChallengeDesc": "3分ハードモード",
+    "presetChallengeDesc": "2分ハードモード",
     "presetFastDetails": "サクッと一発勝負。ウォームアップに最適。",
     "presetPartyDetails": "バランス重視。グループ向け。",
     "presetChallengeDetails": "大きなボード、長い時間、容赦なし。",

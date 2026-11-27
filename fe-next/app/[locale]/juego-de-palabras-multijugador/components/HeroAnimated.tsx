@@ -9,12 +9,12 @@ export function HeroAnimated({ locale }: { locale: string }) {
         eyebrow="Gratis · Sin registrarse · Sin descarga"
         title={
           <>
-            Juega gratis <Mark tone="pink">Scrabble español</Mark> sin registrarse
+            Como el <Mark tone="pink">Scrabble en español</Mark>, pero online, gratis y sin registro
           </>
         }
         lead={
           <>
-            <strong className="font-bold text-neo-white">Scrabble español online gratis sin registrarse</strong>: pulsa Crear sala y juegas en el navegador. Sin email, sin cuenta, sin app. Más de {ES_DICT_FLOOR} palabras, multijugador en tiempo real.
+            <strong className="font-bold text-neo-white">¿Buscas scrabble en español online, gratis y sin registrarte?</strong> LexiClash es un juego de palabras propio con la misma gracia: pulsas Crear sala, mandas el enlace y todos buscan palabras en el mismo tablero a la vez. Sin email, sin cuenta y sin app, con más de {ES_DICT_FLOOR} palabras en español, multijugador en tiempo real.
           </>
         }
         actions={
@@ -25,7 +25,7 @@ export function HeroAnimated({ locale }: { locale: string }) {
             </LandingButton>
           </>
         }
-        art={LANDING_ART.friends('Dos mascotas de LexiClash en scrabble online español multijugador')}
+        art={LANDING_ART.friends('Dos mascotas de LexiClash jugando a un juego de palabras tipo Scrabble en español, online y multijugador')}
         artTone="purple"
       >
         <p className="text-sm font-bold text-neo-lime">

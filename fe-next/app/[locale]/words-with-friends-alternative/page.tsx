@@ -28,11 +28,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Words With Friends Alternative — Free Online | LexiClash',
-    description: 'Free Words With Friends alternative: everyone plays the same board at once, no waiting days for a move. 2-20+ players, no download, no signup.',
+    description: 'Free Words With Friends alternative: everyone plays the same board at once, no waiting days for a move. 2-50 players, no download, no signup.',
     keywords: 'words with friends multiplayer free online, words with friends alternative, free word game with friends online, online multiplayer word games like words with friends, word games multiplayer free, word battle online free, word game like words with friends, online word games with friends free, web word games with friends, spell game with friends online, free multiplayer word games',
     openGraph: {
       title: 'Words With Friends Alternative — Real-Time Multiplayer | LexiClash',
-      description: 'Free multiplayer word game — 2-20 players play simultaneously, not turn-based. 8 game modes, no download.',
+      description: 'Free multiplayer word game — 2-50 players play simultaneously, not turn-based. 8 game modes, no download.',
       locale: 'en_US',
       type: 'website',
       url: pageUrl,
@@ -65,16 +65,16 @@ const faqs = [
     a: "Yes, LexiClash. It runs in the browser on your phone or computer, so there is nothing to install. Instead of taking turns over days, everyone plays the same letter grid at the same time and a round is over in about three minutes. Open a room, send your friends the link, and you can be playing in under a minute.",
   },
   {
-    q: 'Can I play word games with friends free online?',
-    a: 'Yes. LexiClash is 100% free to play online with friends — no download, no signup, no pay-to-win. Create a room, share the 6-character code or QR, and your friends are in the game in seconds. Works in any modern browser on phone, tablet, or laptop.',
+    q: 'What games are like Words With Friends but faster?',
+    a: "LexiClash is built for that: nobody takes turns, everyone gets the same letter grid at once, and a round is over in one to three minutes. It's free, with no download, no signup and no pay-to-win. Create a room, share the 4-letter code or QR, and your friends are in the game in seconds from any modern browser on a phone, tablet or laptop.",
   },
   {
     q: "What's the best free Words With Friends multiplayer alternative?",
-    a: 'LexiClash is the best free alternative if you want real-time gameplay (no turn waiting), more than 2 players (we support 2-20+ in one room), no app download, daily challenges, adventure mode, and 5 language support. Words With Friends is great if you specifically want async turn-based; LexiClash is built for everything else.',
+    a: 'LexiClash is the best free alternative if you want real-time gameplay (no turn waiting), more than 2 players (up to 50 in one room), no app download, daily challenges, adventure mode, and 6 languages. Words With Friends is great if you specifically want async turn-based; LexiClash is built for everything else.',
   },
   {
     q: 'How many players can I play with at once?',
-    a: 'Up to 20+ players can join a single LexiClash room. That makes it the only free word game built for parties, family game nights, classrooms, and team building — Words With Friends maxes out at 2 players per match.',
+    a: 'Up to 50 players can join a single LexiClash room, so it works for parties, family game nights, classrooms, and team building — Words With Friends maxes out at 2 players per match.',
   },
   {
     q: 'Do I need to download an app?',
@@ -110,7 +110,7 @@ const videoGameJsonLd = JSON.stringify({
   name: 'LexiClash',
   alternateName: ['LexiClash Word Battle', 'LexiClash Multiplayer Word Game'],
   url: 'https://www.lexiclash.live/en/words-with-friends-alternative',
-  description: 'Free real-time multiplayer word game. A browser-based alternative to Words With Friends — 2 to 20+ players play the same letter grid simultaneously. 8 game modes including real-time grid battles, Wordle-style daily survival, word wheel, adventure mode with boss battles, blast cascading, brain drills, vocabulary duels, and party games. No download, no signup, no pay-to-win.',
+  description: 'Free real-time multiplayer word game. A browser-based alternative to Words With Friends — 2 to 50 players play the same letter grid simultaneously. 8 game modes including real-time grid battles, Wordle-style daily survival, word wheel, adventure mode with boss battles, blast cascading, brain drills, vocabulary duels, and party games. No download, no signup, no pay-to-win.',
   image: 'https://www.lexiclash.live/og-image-en.webp',
   genre: ['Word Game', 'Puzzle', 'Multiplayer', 'Casual', 'Educational'],
   gamePlatform: ['Web Browser', 'iOS', 'Android', 'PWA'],
@@ -139,7 +139,7 @@ const softwareAppJsonLd = JSON.stringify({
   url: 'https://www.lexiclash.live/en/words-with-friends-alternative',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   featureList: [
-    'Real-time multiplayer (2-20+ players, not turn-based)',
+    'Real-time multiplayer (2-50 players, not turn-based)',
     'No download or app install required',
     'Free to play with no pay-to-win',
     '6 languages with full dictionaries (English, Hebrew RTL, Swedish, Japanese, Spanish, Russian)',
@@ -160,7 +160,7 @@ const howToJsonLd = JSON.stringify({
   totalTime: 'PT30S',
   step: [
     { '@type': 'HowToStep', name: 'Open LexiClash multiplayer', text: 'Visit lexiclash.live/en/multiplayer in any browser. No download, no signup, no app store.', url: 'https://www.lexiclash.live/en/multiplayer' },
-    { '@type': 'HowToStep', name: 'Create or join a room', text: 'Click Create Room to get a 6-character code, or paste a friend\'s code to join. Share the room link or QR code with up to 20 players.' },
+    { '@type': 'HowToStep', name: 'Create or join a room', text: 'Click Create Room to get a 4-letter code, or paste a friend\'s code to join. Share the room link or QR code with up to 50 players.' },
     { '@type': 'HowToStep', name: 'Find words simultaneously', text: 'Everyone plays the same letter grid at the same time. Connect adjacent letters to form words. Longer words and faster combos score more points.' },
     { '@type': 'HowToStep', name: 'Highest score wins', text: 'After 2-3 minutes, the highest scorer wins. Words found by multiple players don\'t count for anyone — uniqueness is rewarded.' },
   ],
@@ -176,7 +176,7 @@ const breadcrumbJsonLd = JSON.stringify({
   ],
 });
 
-const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'REAL-TIME', '2-20 PLAYERS', '6 LANGUAGES', 'NO PAY-TO-WIN', 'PLAY IN 30s', '8 GAME MODES'];
+const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'REAL-TIME', '2-50 PLAYERS', '6 LANGUAGES', 'NO PAY-TO-WIN', 'PLAY IN 30s', '8 GAME MODES'];
 
 const stats = [
   { value: '8', label: 'Game Modes' },
@@ -188,20 +188,20 @@ const stats = [
 const compareRows: ReadonlyArray<readonly [string, string, string]> = [
   ['Gameplay style', 'Real-time (everyone plays at once)', 'Turn-based (wait for friends)'],
   ['Avg match duration', '2-3 minutes', 'Days (asynchronous)'],
-  ['Players per room', '2-20+', '2 only'],
+  ['Players per room', '2-50', '2 only'],
   ['Price', 'Free, no pay-to-win', 'Free with ads + paid boosts'],
   ['App download', 'No (browser)', 'Yes (app store install)'],
   ['Languages', '6 (EN · HE · SV · JA · ES · RU)', '1 (English)'],
   ['Daily challenges', 'Yes (Word Wheel + Word Hunt)', 'No'],
   ['Adventure / story mode', 'Yes (boss battles)', 'No'],
-  ['Group / party mode', 'Yes (20+ players, classrooms)', 'No'],
+  ['Group / party mode', 'Yes (up to 50 players, classrooms)', 'No'],
   ['Brain training drills', 'Yes (5+ drill types)', 'No'],
   ['Sign-up required', 'No', 'Yes (account)'],
   ['Cross-device room links', 'Yes (link + QR)', 'Limited (in-app only)'],
 ];
 
 const gameModes = [
-  { mode: 'Multiplayer Grid Battle', tag: 'CORE', desc: 'Real-time word brawl — 2-20+ players race the same grid for 2-3 min.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
+  { mode: 'Multiplayer Grid Battle', tag: 'CORE', desc: 'Real-time word brawl — 2-50 players race the same grid for 1-3 min.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
   { mode: 'Word Hunt Survival', tag: 'DAILY', desc: 'Wordle-meets-Boggle. Find a hidden 4-6 letter target in 10 attempts. Green/yellow feedback.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
   { mode: 'Daily Word Wheel', tag: 'DAILY', desc: 'One letter wheel, the whole world plays it. Use the center letter, climb the global leaderboard.', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
   { mode: 'Adventure', tag: 'STORY', desc: 'Roguelike word-crawler. Boss battles, abilities, loot. 5-8 rooms per run, 3 chapters.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
@@ -358,7 +358,7 @@ export default async function WordsWithFriendsAlternativePage({ params }: PagePr
         <Steps
           items={[
             { title: 'Open lexiclash.live', body: 'Any browser, any device. No download. No account.' },
-            { title: 'Create or join', body: 'Get a 6-character room code. Share via link or QR. Friends drop in instantly.' },
+            { title: 'Create or join', body: 'Get a 4-letter room code. Share via link or QR. Friends drop in instantly.' },
             { title: 'Find words. Win.', body: 'Same grid for everyone. Race the clock and friends. Highest score wins.' },
           ]}
         />
