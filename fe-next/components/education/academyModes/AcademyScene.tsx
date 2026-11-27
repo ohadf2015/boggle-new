@@ -131,15 +131,15 @@ export function AcademyScene({ theme, children, dim = 0.5 }: { theme: SceneTheme
         </m.div>
       </m.div>
 
-      {/* Scene light + legibility: mode glow, dark vignette, floor fade. */}
-      <div aria-hidden className="absolute inset-0" style={{ background: `rgba(14,14,34,${dim})` }} />
+      {/* Scene light + legibility: mode glow, vignette and floor fade in the page colour. */}
+      <div aria-hidden className="absolute inset-0" style={{ background: `color-mix(in srgb, var(--edu-page) ${Math.round(dim * 100)}%, transparent)` }} />
       <div aria-hidden className="absolute inset-0" style={{ background: cfg.glow }} />
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 90% 80% at 50% 45%, transparent 45%, rgba(10,10,28,0.85) 100%)' }}
+        style={{ background: 'radial-gradient(ellipse 90% 80% at 50% 45%, transparent 45%, color-mix(in srgb, var(--edu-page) 85%, transparent) 100%)' }}
       />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3" style={{ background: 'linear-gradient(to top, rgba(12,12,30,0.9), transparent)' }} />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3" style={{ background: 'linear-gradient(to top, color-mix(in srgb, var(--edu-page) 90%, transparent), transparent)' }} />
 
       {/* Lanterns + runes drift in front, the other way from the map. */}
       <m.div aria-hidden className="pointer-events-none absolute inset-0" style={{ x: frontX, y: frontY }}>
