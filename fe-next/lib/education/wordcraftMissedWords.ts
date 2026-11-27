@@ -1,7 +1,6 @@
 import type { Language } from '@/shared/types/game';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
-import { applyLeitnerAnswer, isReviewableWord, reviewKey, type LeitnerState } from './missedWordsReview';
-import { loadLeitnerState, saveLeitnerState } from './missedWordsLeitnerStore';
+import { isReviewableWord } from './missedWordsReview';
 
 /**
  * Lesson words a Word Craft round dealt but the player never built, spelled as
@@ -27,20 +26,6 @@ export function wordCraftMissedLessonWords(args: {
     missed.push(word);
   }
   return missed;
-}
-
-export function queueMissedForReview(state: LeitnerState, lessonId: string, missed: readonly string[], now: number): LeitnerState {
-  const next = { ...state };
-  for (const word of missed) {
-    const key = reviewKey(lessonId, word);
-    next[key] = applyLeitnerAnswer(next[key], false, now);
-  }
-  return next;
-}
-
-export function saveWordCraftMisses(studentId: string, lessonId: string, missed: readonly string[], now: number = Date.now()): void {
-  if (missed.length === 0) return;
-  saveLeitnerState(studentId, queueMissedForReview(loadLeitnerState(studentId), lessonId, missed, now));
 }
 
 export const missedReviewHref = (locale: string, lessonId: string) =>

@@ -1,15 +1,15 @@
 import { describe, it, expect } from 'vitest';
 import {
-  LEITNER_INTERVAL_DAYS,
   REVIEW_RUN_SIZE,
   reviewKey,
   collectReviewCandidates,
-  applyLeitnerAnswer,
   pickRunLesson,
   buildReviewRun,
+  reviewScheduleFromMemory,
+  runWordResults,
   scoreReviewAnswer,
   summarizeReviewRun,
-  type LeitnerState,
+  type ReviewSchedule,
   type ReviewLessonInput,
 } from '../missedWordsReview';
 
@@ -51,27 +51,51 @@ describe('collectReviewCandidates', () => {
   });
 });
 
-describe('applyLeitnerAnswer', () => {
-  it('GIVEN a new word answered right WHEN applied THEN it moves to box 2 and is due after box-2 interval', () => {
-    const e = applyLeitnerAnswer(undefined, true, NOW);
-    expect(e.box).toBe(2);
-    expect(e.due).toBe(NOW + LEITNER_INTERVAL_DAYS[2] * DAY);
+describe('reviewScheduleFromMemory', () => {
+  it('GIVEN server words WHEN mapped THEN each lesson word gets its due time (UTC day start) and a box from its strength', () => {
+    const schedule = reviewScheduleFromMemory([
+      { lessonId: 'L', word: 'dog', strength: 'sprout', nextReviewDate: '2026-09-23' },
+      { lessonId: 'L', word: 'cat', strength: 'gold', nextReviewDate: '2026-10-30' },
+    ]);
+    expect(schedule[reviewKey('L', 'dog')]).toEqual({ box: 1, due: Date.UTC(2026, 8, 23) });
+    expect(schedule[reviewKey('L', 'cat')]).toEqual({ box: 4, due: Date.UTC(2026, 9, 30) });
   });
 
-  it('GIVEN a box-4 word answered wrong WHEN applied THEN it drops to box 1 and is due now', () => {
-    const e = applyLeitnerAnswer({ box: 4, due: NOW - DAY, lapses: 0 }, false, NOW);
-    expect(e).toEqual({ box: 1, due: NOW, lapses: 1 });
+  it('GIVEN a word due today WHEN the run is built at noon THEN it counts as due', () => {
+    const schedule = reviewScheduleFromMemory([{ lessonId: 'B', word: 'sun', strength: 'plant', nextReviewDate: '2026-09-23' }]);
+    const run = buildReviewRun(collectReviewCandidates([lesson('B', ['sun', 'moon'])], []), schedule, NOW, 'B', 1);
+    expect(run[0].word).toBe('sun');
+  });
+});
+
+describe('runWordResults', () => {
+  it('GIVEN a finished run WHEN mapped THEN meaning cards are recognition, unscramble cards are spelling, one per answer', () => {
+    const defs = lesson('D', [
+      { word: 'dog', definition: 'a pet that barks' },
+      { word: 'cat', definition: 'a pet that purrs' },
+      { word: 'cow', definition: 'gives milk' },
+      { word: 'owl', definition: 'hoots at night' },
+      { word: 'ant' },
+    ]);
+    const run = buildReviewRun(collectReviewCandidates([defs], []), {}, NOW, 'D', 3);
+    const answers = run.map((_, i) => i % 2 === 0);
+    const results = runWordResults(run, answers);
+    expect(results).toHaveLength(run.length);
+    results.forEach((r, i) => {
+      expect(r).toEqual({ word: run[i].word, correct: answers[i], kind: run[i].kind === 'meaning' ? 'recognise' : 'spell' });
+    });
   });
 
-  it('GIVEN a box-5 word answered right WHEN applied THEN it stays capped at 5', () => {
-    expect(applyLeitnerAnswer({ box: 5, due: NOW, lapses: 0 }, true, NOW).box).toBe(5);
+  it('GIVEN fewer answers than cards WHEN mapped THEN only answered cards are sent', () => {
+    const run = buildReviewRun(collectReviewCandidates([lesson('B', ['sun', 'moon'])], []), {}, NOW, 'B', 1);
+    expect(runWordResults(run, [true, false])).toHaveLength(2);
   });
 });
 
 describe('pickRunLesson + buildReviewRun', () => {
   const lessons = [lesson('A', ['dog', 'cat']), lesson('B', ['sun', 'moon', 'star', 'sky'])];
 
-  it('GIVEN no Leitner state WHEN picking THEN the lesson with the most candidates wins', () => {
+  it('GIVEN no reviewed words WHEN picking THEN the lesson with the most candidates wins', () => {
     const cands = collectReviewCandidates(lessons, []);
     expect(pickRunLesson(cands, {}, NOW)).toBe('B');
   });
@@ -84,9 +108,9 @@ describe('pickRunLesson + buildReviewRun', () => {
 
   it('GIVEN not-yet-due words WHEN building THEN due and new words come first, and the run is always REVIEW_RUN_SIZE cards when any word exists', () => {
     const cands = collectReviewCandidates(lessons, []);
-    const state: LeitnerState = {
-      [reviewKey('B', 'sun')]: { box: 3, due: NOW + 5 * DAY, lapses: 0 },
-      [reviewKey('B', 'moon')]: { box: 1, due: NOW - DAY, lapses: 2 },
+    const state: ReviewSchedule = {
+      [reviewKey('B', 'sun')]: { box: 3, due: NOW + 5 * DAY },
+      [reviewKey('B', 'moon')]: { box: 1, due: NOW - DAY },
     };
     const run = buildReviewRun(cands, state, NOW, 'B', 7);
     expect(run).toHaveLength(REVIEW_RUN_SIZE);

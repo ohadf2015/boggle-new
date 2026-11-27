@@ -28,6 +28,7 @@ vi.mock('@/components/education/academyModes/AcademyChrome', () => ({
 vi.mock('@/components/education/academyModes/useRecordedXp', () => ({ useRecordedXp: () => ({}) }));
 vi.mock('@/components/education/academyModes/useAcademyPlayer', () => ({ useAcademyPlayer: () => ({}) }));
 vi.mock('@/lib/supabase/education/progress', () => ({ getStudentProgress: vi.fn() }));
+vi.mock('@/hooks/useWordMemory', () => ({ useWordMemory: () => ({ data: undefined, isError: false, refetch: vi.fn() }) }));
 
 import ReviewPageClient from '../PageClient';
 

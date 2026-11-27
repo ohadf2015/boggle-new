@@ -8,29 +8,27 @@
  * A student with no progress rows still gets a run: every unmastered lesson
  * word is a candidate, ranked after real misses.
  *
- * Scheduling is Leitner: 5 boxes, a right answer moves a word up one box (and
- * further out in time), a wrong one sends it back to box 1, due now.
+ * Scheduling is the server word memory (`word_review_state`, read through
+ * /api/education/word-memory): due words first, weakest first, then new ones.
+ * The run's answers go back through the practice PATCH as `wordResults`.
  * Pure: no I/O, no Date.now() — callers pass `now` and a seed.
  */
 
 import type { Language } from '@/shared/types/game';
 import { canonLessonWord } from '@/lib/wordTower/lessonSeed';
 import { mulberry32, fnv1aHash } from '@/lib/rng/seededRandom';
+import { STRENGTHS, type Strength, type WordResult } from './wordMemory';
 
 export const REVIEW_RUN_SIZE = 10;
-/** Days until a word in box N is due again (index = box; box 1 = same day). */
-export const LEITNER_INTERVAL_DAYS = [0, 0, 1, 3, 7, 14] as const;
-export const LEITNER_MAX_BOX = 5;
-const DAY_MS = 86_400_000;
 const MAX_WORD_CHARS = 12;
 
-export interface LeitnerEntry {
+export interface ReviewScheduleEntry {
+  /** Strength rank (sprout 1 … gold 4): weaker words go first. */
   box: number;
   /** Epoch ms when the word is next due. */
   due: number;
-  lapses: number;
 }
-export type LeitnerState = Record<string, LeitnerEntry>;
+export type ReviewSchedule = Record<string, ReviewScheduleEntry>;
 
 export interface ReviewLessonInput {
   id: string;
@@ -121,20 +119,31 @@ export function collectReviewCandidates(
   return out.map(({ order: _order, ...c }) => c);
 }
 
-export function applyLeitnerAnswer(entry: LeitnerEntry | undefined, correct: boolean, now: number): LeitnerEntry {
-  const box = entry?.box ?? 1;
-  const lapses = entry?.lapses ?? 0;
-  if (!correct) return { box: 1, due: now, lapses: lapses + 1 };
-  const next = Math.min(LEITNER_MAX_BOX, box + 1);
-  return { box: next, due: now + LEITNER_INTERVAL_DAYS[next] * DAY_MS, lapses };
+/** Server word memory → the run's schedule, keyed like the candidates. */
+export function reviewScheduleFromMemory(
+  words: ReadonlyArray<{ lessonId: string; word: string; strength: Strength; nextReviewDate: string }>,
+): ReviewSchedule {
+  const out: ReviewSchedule = {};
+  for (const w of words) {
+    out[reviewKey(w.lessonId, w.word)] = { box: STRENGTHS.indexOf(w.strength), due: Date.parse(`${w.nextReviewDate}T00:00:00Z`) };
+  }
+  return out;
 }
 
-const isDue = (e: LeitnerEntry | undefined, now: number) => !e || e.due <= now;
+/** One answer per card, for the word memory: picking a meaning is recognition, building the word is spelling. */
+export function runWordResults(cards: readonly ReviewCard[], answers: readonly boolean[]): WordResult[] {
+  return answers.flatMap((correct, i) => {
+    const card = cards[i];
+    return card ? [{ word: card.word, correct, kind: card.kind === 'meaning' ? ('recognise' as const) : ('spell' as const) }] : [];
+  });
+}
+
+const isDue = (e: ReviewScheduleEntry | undefined, now: number) => !e || e.due <= now;
 
 /** The lesson a run anchors to (one practice session per run). */
 export function pickRunLesson(
   candidates: readonly ReviewCandidate[],
-  state: LeitnerState,
+  state: ReviewSchedule,
   now: number,
   preferred?: string | null,
 ): string | null {
@@ -168,7 +177,7 @@ function shuffle<T>(items: readonly T[], rand: () => number): T[] {
 
 export function buildReviewRun(
   candidates: readonly ReviewCandidate[],
-  state: LeitnerState,
+  state: ReviewSchedule,
   now: number,
   lessonId: string | null,
   seed: number,
@@ -204,21 +213,6 @@ export function buildReviewRun(
     cards.push({ ...c, id, kind: 'unscramble', tiles });
   }
   return cards;
-}
-
-/** Fold a finished run into the Leitner state (in answer order). */
-export function applyRunToLeitner(
-  state: LeitnerState,
-  cards: readonly ReviewCard[],
-  answers: readonly boolean[],
-  now: number,
-): LeitnerState {
-  const next = { ...state };
-  answers.forEach((correct, i) => {
-    const card = cards[i];
-    if (card) next[card.key] = applyLeitnerAnswer(next[card.key], correct, now);
-  });
-  return next;
 }
 
 /** `streak` counts this answer (1 = first right answer in a row). */

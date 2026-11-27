@@ -6,12 +6,11 @@
  * Data: lessons from /api/education/practice/lessons + the student's own
  * `student_lesson_progress` rows (words_attempted / words_mastered, written by
  * live classroom games). No rows → every unmastered lesson word is a
- * candidate. Leitner boxes live on the device, per student
- * (lib/education/missedWordsLeitnerStore — ponytail upgrade path in there).
+ * candidate. Order comes from the server word memory (due words first).
  *
  * XP: one run = one `flashcard` practice session on the run's lesson —
- * startSession('flashcard') + completePracticeSession({ cardsReviewed,
- * cardsCorrect }) → PATCH /api/education/practice (server-scored).
+ * startSession('flashcard') + PATCH /api/education/practice with { cardsReviewed,
+ * cardsCorrect, wordResults } (server-scored; the answers feed the word memory).
  */
 
 import { useCallback, useEffect, useState } from 'react';
@@ -30,15 +29,16 @@ import { useAcademyPlayer } from '@/components/education/academyModes/useAcademy
 import { getStudentProgress } from '@/lib/supabase/education/progress';
 import { toVocabularyWords } from '@/lib/education/practiceWordShape';
 import {
-  applyRunToLeitner,
   buildReviewRun,
   collectReviewCandidates,
   pickRunLesson,
+  reviewScheduleFromMemory,
+  runWordResults,
   type ReviewCard,
   type ReviewLessonInput,
   type ReviewProgressRow,
 } from '@/lib/education/missedWordsReview';
-import { loadLeitnerState, saveLeitnerState } from '@/lib/education/missedWordsLeitnerStore';
+import { useWordMemory } from '@/hooks/useWordMemory';
 
 interface Deck {
   lessonId: string | null;
@@ -55,14 +55,12 @@ function toReviewLesson(l: PracticeLesson): ReviewLessonInput {
   };
 }
 
-function ReviewSession({ deck, studentId, onBack, onPlayAgain }: { deck: Deck & { lessonId: string }; studentId: string; onBack: () => void; onPlayAgain: () => void }) {
+function ReviewSession({ deck, onBack, onPlayAgain }: { deck: Deck & { lessonId: string }; onBack: () => void; onPlayAgain: () => void }) {
   const { startSession } = usePracticeProgress(deck.lessonId);
   const record = useRecordedXp();
   const player = useAcademyPlayer();
 
   const onFinish = async (answers: boolean[]): Promise<number | null> => {
-    // Boxes move first: the retrieval happened whether or not XP saves.
-    saveLeitnerState(studentId, applyRunToLeitner(loadLeitnerState(studentId), deck.cards, answers, Date.now()));
     const started = await startSession('flashcard');
     if (!started.success) return null;
     return record({
@@ -70,6 +68,7 @@ function ReviewSession({ deck, studentId, onBack, onPlayAgain }: { deck: Deck & 
       sessionId: started.sessionId,
       cardsReviewed: answers.length,
       cardsCorrect: answers.filter(Boolean).length,
+      wordResults: runWordResults(deck.cards, answers),
     });
   };
 
@@ -101,21 +100,27 @@ export default function MissedWordsReviewPageClient() {
     };
   }, [userId, lessonsReady]);
 
+  const memory = useWordMemory(undefined, !!userId && lessonsReady);
+  const memoryData = memory.data;
+  const memoryFailed = memory.isError;
+
   const [deck, setDeck] = useState<Deck | null>(null);
   const [runKey, setRunKey] = useState(0);
   const buildDeck = useCallback(() => {
-    if (!userId || progress === null || lessons === null) return;
+    // Deal only once the memory answered (or failed): a late read must not reorder a dealt deck.
+    const memoryWords = memoryData?.words ?? (memoryFailed ? [] : null);
+    if (!userId || progress === null || lessons === null || memoryWords === null) return;
     const reviewLessons = lessons.map(toReviewLesson);
     const candidates = collectReviewCandidates(reviewLessons, progress);
-    const state = loadLeitnerState(userId);
+    const state = reviewScheduleFromMemory(memoryWords);
     const now = Date.now();
     const lessonId = pickRunLesson(candidates, state, now, lessonParam);
     const cards = buildReviewRun(candidates, state, now, lessonId, Math.floor(Math.random() * 1_000_000));
     setDeck({ lessonId, lessonName: reviewLessons.find((l) => l.id === lessonId)?.name ?? '', cards });
-  }, [userId, progress, lessons, lessonParam]);
+  }, [userId, progress, lessons, lessonParam, memoryData, memoryFailed]);
   useEffect(() => {
-    buildDeck();
-  }, [buildDeck]);
+    if (!deck) buildDeck();
+  }, [buildDeck, deck]);
 
   const onBack = () => router.push(`/${language}/student`);
   const title = t('academy.modes.review.title', 'Missed Words Review');
@@ -158,11 +163,11 @@ export default function MissedWordsReviewPageClient() {
       <ReviewSession
         key={`${deck.lessonId}-${runKey}`}
         deck={deck as Deck & { lessonId: string }}
-        studentId={user.id}
         onBack={onBack}
         onPlayAgain={() => {
           setRunKey((k) => k + 1);
-          buildDeck();
+          // Re-deal from the memory the finished run just updated.
+          void memory.refetch().finally(() => setDeck(null));
         }}
       />
     </PracticeSessionProvider>
