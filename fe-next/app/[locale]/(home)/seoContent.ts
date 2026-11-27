@@ -49,7 +49,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'Is LexiClash free to play?',
         answer:
-          'Yes — LexiClash is completely free with no download or account required. Open it in your browser and start playing immediately. There are no paywalls, ads-to-unlock mechanics, or premium-only game modes.',
+          'Yes — LexiClash is completely free with no download or account required. Open it in your browser and start playing immediately. Every game mode is free to play. Ads are optional: you watch one only when you want a bonus, like extra moves to keep a Blast run going.',
       },
       {
         question: 'How is LexiClash different from Boggle, Scrabble, or Wordle?',
@@ -108,7 +108,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'LexiClash бесплатный?',
         answer:
-          'Да — LexiClash полностью бесплатный, без скачивания и без регистрации. Откройте его в браузере и сразу начинайте играть. Никаких платных стен, рекламы для разблокировки или режимов только по подписке.',
+          'Да — LexiClash полностью бесплатный, без скачивания и без регистрации. Откройте его в браузере и сразу начинайте играть. Все режимы бесплатны. Реклама по желанию: её смотрят, только если хотят бонус, например лишние ходы, чтобы продолжить забег в Blast.',
       },
       {
         question: 'Чем LexiClash отличается от «Балды», «Эрудита» или Wordle?',
@@ -167,7 +167,7 @@ export const seoContent: Record<string, HomepageSeoContent> = {
       {
         question: 'האם LexiClash חינמי לשחק?',
         answer:
-          'כן — LexiClash חינמי לגמרי, בלי הורדה ובלי צורך בחשבון. פותחים בדפדפן ומתחילים לשחק מיד. אין תשלומים נסתרים, אין פרסומות שצריך לצפות בהן כדי לפתוח תכנים, ואין מצבי משחק בתשלום.',
+          'כן — LexiClash חינמי לגמרי, בלי הורדה ובלי צורך בחשבון. פותחים בדפדפן ומתחילים לשחק מיד. כל מצבי המשחק חינמיים. פרסומות הן לבחירתכם: צופים בהן רק כשרוצים בונוס, למשל עוד מהלכים כדי להמשיך ריצה ב-Blast.',
       },
       {
         question: 'במה LexiClash שונה מבוגל, סקרבל או וורדל?',
