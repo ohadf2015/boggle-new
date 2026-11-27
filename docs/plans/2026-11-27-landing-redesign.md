@@ -55,6 +55,7 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   The shot script must not block `/_next/` URLs (a chunk path contains "sentry").
 - 14:2x: builder B done and committed (6508218e2): comparisons, RU, classroom keyword, daily-word-wheel; parity 90 shots 0 failing. A and C still running.
 - Review pending for B: view cabanagrams, popple, wordfeud, contra-wordle shots.
+- 14:3x: builder C done and committed (b64b82502): tools, blog, words, content, legal; parity 148 pairs 0 failing; guard suite 143 files green. Requests: scratchpad builder-c/requests.md (table align, callout link restyle). Types unverified until tsc.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
