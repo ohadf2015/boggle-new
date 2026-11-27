@@ -49,4 +49,16 @@ describe('buildEmailSignupMetadata', () => {
     expect(normalizeGrDistinctId('<script>-alert1')).toBeNull();
     expect(normalizeGrDistinctId(null)).toBeNull();
   });
+
+  it('stashes a consented gr.js id so a confirm in another browser keeps the same visitor', () => {
+    expect(buildEmailSignupMetadata({
+      grDistinctId: 'mi7x2k3a-8f3k2l9q0zp1',
+    })).toEqual({
+      signup_surface: 'header_or_menu',
+      gr_distinct_id: 'mi7x2k3a-8f3k2l9q0zp1',
+    });
+    expect(buildEmailSignupMetadata({
+      grDistinctId: '44a8bb33-1c2d-4e5f-8a9b-0c1d2e3f4a5b',
+    })).toEqual({ signup_surface: 'header_or_menu' });
+  });
 });

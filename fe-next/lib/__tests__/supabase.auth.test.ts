@@ -129,7 +129,12 @@ describe('signInWithEmail', () => {
 });
 
 describe('signUpWithEmail', () => {
-  beforeEach(() => { vi.clearAllMocks(); mockLocation.pathname = '/en/multiplayer'; mockLocation.search = ''; });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockLocation.pathname = '/en/multiplayer';
+    mockLocation.search = '';
+    try { window.localStorage.clear(); } catch { /* noop */ }
+  });
 
   it('calls signUp with locale-aware redirect and stashed signup metadata', async () => {
     mockAuth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
@@ -144,6 +149,17 @@ describe('signUpWithEmail', () => {
           intended_role: 'teacher',
         }),
       },
+    });
+    expect(mockAuth.signUp.mock.calls[0][0].options.data).not.toHaveProperty('gr_distinct_id');
+  });
+
+  it('stashes the consented gr.js id on user metadata for a cross-browser confirm', async () => {
+    window.localStorage.setItem('gr_did', 'mi7x2k3a-8f3k2l9q0zp1');
+    mockAuth.signUp.mockResolvedValue({ data: { user: {} }, error: null });
+    await signUpWithEmail('new@example.com', 'password123');
+    expect(mockAuth.signUp.mock.calls[0][0].options.data).toMatchObject({
+      signup_surface: 'header_or_menu',
+      gr_distinct_id: 'mi7x2k3a-8f3k2l9q0zp1',
     });
   });
 });
