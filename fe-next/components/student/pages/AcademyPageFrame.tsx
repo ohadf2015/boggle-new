@@ -3,9 +3,9 @@
 /**
  * The frame every Academy sub-page (Lessons, Awards) sits in, so opening one
  * from the map's dock doesn't feel like a different app:
- *  - the map art, blurred and darkened, as the ground (dark-only: bg-neo-navy);
- *  - an ink plaque on top with a way back to the map and the page title;
- *  - ONE ink panel that owns all the scrolling — the page itself never scrolls;
+ *  - the map art, blurred under a sky wash, as the ground;
+ *  - a cream plaque on top with a way back to the map and the page title;
+ *  - ONE cream panel that owns all the scrolling — the page itself never scrolls;
  *  - the map's own dock at the bottom (in the top row on a phone on its side).
  *
  * Layout modes are the hub's (`pickHubLayout`), so the frame and the map switch

@@ -43,7 +43,7 @@ export function HelpHome({ locale }: { locale: string }) {
   return (
     <main className="relative min-h-dvh overflow-x-hidden bg-edu-page text-edu-ink">
       <HelpFallbackNote locale={locale} />
-      <section className="border-b-4 border-edu-line bg-edu-surface texture-halftone">
+      <section className="border-b-4 border-edu-line bg-edu-page">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-12 lg:px-8 lg:pb-20 lg:pt-14">
           <div className="lg:col-span-8">
             <span className="inline-block -rotate-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">

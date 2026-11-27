@@ -56,7 +56,7 @@ function Stars({ count, t }: { count: number; t: T }) {
         <Star
           key={i}
           aria-hidden="true"
-          className={cn('h-4 w-4 stroke-neo-black stroke-[2.5]', i < count ? 'fill-neo-yellow' : 'fill-white/15')}
+          className={cn('h-4 w-4 stroke-neo-black stroke-[2.5]', i < count ? 'fill-neo-yellow' : 'fill-edu-ink/10')}
         />
       ))}
     </span>
