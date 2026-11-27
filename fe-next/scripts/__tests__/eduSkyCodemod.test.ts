@@ -3,6 +3,14 @@ import { mapClassString, transformSource } from '../edu-sky-codemod.mjs';
 
 const map = (s: string, group?: string) => mapClassString(s, group);
 
+describe('edu-sky codemod: paper', () => {
+  it('turns solid and strong white fills into the cream paper token, leaving print white alone', () => {
+    expect(map('bg-neo-white hover:bg-neo-white/60')).toBe('bg-edu-paper hover:bg-edu-paper/60');
+    expect(map('bg-neo-white/10')).toBe('bg-edu-ink/10');
+    expect(map('bg-white print:bg-white')).toBe('bg-white print:bg-white');
+  });
+});
+
 describe('edu-sky codemod: ink', () => {
   it('maps white and cream ink to edu-ink, keeping alpha and variants', () => {
     expect(map('text-neo-white')).toBe('text-edu-ink');
@@ -92,7 +100,7 @@ describe('edu-sky codemod: fills', () => {
   it('turns faint light washes into ink washes and keeps solid light fills', () => {
     expect(map('bg-neo-cream/10 bg-white/30 bg-neo-white/5')).toBe('bg-edu-ink/10 bg-edu-ink/30 bg-edu-ink/5');
     expect(map('bg-neo-cream/40')).toBe('bg-neo-cream/40');
-    expect(map('bg-neo-cream bg-neo-white bg-white')).toBe('bg-neo-cream bg-neo-white bg-white');
+    expect(map('bg-neo-cream bg-neo-white bg-white')).toBe('bg-neo-cream bg-edu-paper bg-white');
   });
 
   it('paints a navy page root as the page and any other navy box as a surface', () => {

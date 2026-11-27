@@ -119,6 +119,7 @@ function mapBase(base, ctx) {
   if ((m = /^bg-(?:neo-cream|neo-white|white)\/(\d+)$/.exec(base)) && Number(m[1]) <= 30) {
     return `bg-edu-ink/${m[1]}`;
   }
+  if ((m = /^bg-neo-white(\/\d+)?$/.exec(base))) return `bg-edu-paper${m[1] ?? ''}`;
   if (base === 'bg-neo-navy') return ctx.pageRoot ? 'bg-edu-page' : 'bg-edu-surface';
   if ((m = /^bg-neo-navy-(?:light|elevated)(\/\d+)?$/.exec(base))) return `bg-edu-surface${m[1] ?? ''}`;
   if ((m = /^bg-neo-navy\/(\d+)$/.exec(base))) return ctx.dimmer ? base : `bg-edu-surface/${m[1]}`;

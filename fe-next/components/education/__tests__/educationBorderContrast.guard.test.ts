@@ -37,8 +37,8 @@ const TOKENS: Record<string, string> = {
   'neo-orange': '#ff6b35',
   // Classroom sky values (app/edu-sky.css): the education roots render under data-edu-theme="sky".
   'edu-page': '#9ed8ff',
-  'edu-surface': '#ffffff',
-  'edu-tile': '#fff6e3',
+  'edu-surface': '#fff8ea',
+  'edu-tile': '#ffefd2',
   'edu-ink': '#101114',
   'edu-line': '#101114',
 };

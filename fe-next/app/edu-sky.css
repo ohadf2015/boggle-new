@@ -17,6 +17,7 @@
     --edu-page: var(--neo-navy);
     --edu-surface: var(--neo-navy-light);
     --edu-tile: var(--neo-cream);
+    --edu-paper-rgb: var(--neo-white);
     --edu-ink: rgb(var(--neo-white));
     --edu-line: var(--neo-cream);
     --edu-lime-ink: var(--neo-lime);
@@ -31,8 +32,9 @@
 
   html:has([data-edu-theme='sky']) {
     --edu-page: #9ed8ff;
-    --edu-surface: #ffffff;
-    --edu-tile: #fff6e3;
+    --edu-surface: #fff8ea;
+    --edu-tile: #ffefd2;
+    --edu-paper-rgb: 255 248 234;
     --edu-ink: #101114;
     --edu-line: #101114;
     --edu-lime-ink: #3d5c00;

@@ -157,7 +157,7 @@ describe('PlayerWaitingView — icon-only controls still read as controls', () =
   it('gives the avatar button its own border width AND colour', () => {
     render(<PlayerWaitingView {...defaultProps} isClassroomMode />);
     const avatarBtn = screen.getByTestId('edu-student-edit-avatar');
-    expect(avatarBtn.className).toContain('border-4');
+    expect(avatarBtn.className).toContain('border-[3px]');
     expect(avatarBtn.className).toContain('border-neo-black');
   });
 

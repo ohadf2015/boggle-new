@@ -49,6 +49,7 @@ module.exports = {
           page: "var(--edu-page)",
           surface: "var(--edu-surface)",
           tile: "var(--edu-tile)",
+          paper: "rgb(var(--edu-paper-rgb) / <alpha-value>)",
           ink: "var(--edu-ink)",
           line: "var(--edu-line)",
           "lime-ink": "var(--edu-lime-ink)",

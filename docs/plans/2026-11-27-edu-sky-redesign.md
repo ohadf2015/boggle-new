@@ -5,7 +5,7 @@ Review page: https://claude.ai/artifact/W2KUyph6MV1B99KK3QnaAx. Mockups (local):
 
 ## Look
 - Page background: sky `#9ED8FF`, one token. Text on it is black.
-- Surfaces: white / near-white cards, thick black outline, solid black bottom lip (pressable), no blur, no gradients.
+- Surfaces: cream (`#FFF8EA`, never pure white) cards, thick black outline, solid black bottom lip (pressable), no blur, no gradients.
 - Letter tiles and codes: chunky cream tiles, black outline, lip.
 - One lime `#BFFF00` primary button per screen. Pink, cyan, yellow are small accents (header band, icon squares, class colour tab). Purple only on the active nav item and where a class or list is already purple. Black ink on every accent fill.
 - Type: Fredoka headings, Rubik body (unchanged). Larger sizes, fewer boxes, clear hierarchy, nothing clipped.
@@ -34,8 +34,8 @@ Out of scope: SEO article pages under `/education/*`, their titles and descripti
 | Token | Default (dark) | Sky |
 |---|---|---|
 | `edu-page` | neo-navy | `#9ED8FF` |
-| `edu-surface` | neo-navy-light | `#FFFFFF` |
-| `edu-tile` | neo-cream | `#FFF6E3` |
+| `edu-surface` | neo-navy-light | `#FFF8EA` (cream: owner wants no pure white) |
+| `edu-tile` | neo-cream | `#FFEFD2` |
 | `edu-ink` (alpha capable) | neo-white | `#101114` |
 | `edu-line` (alpha capable) | neo-cream | `#101114` |
 | `edu-lime-ink` / `cyan-ink` / `yellow-ink` / `pink-ink` / `purple-ink` / `orange-ink` | the neo accent | `#3D5C00` / `#005F6B` / `#6B4A00` / `#B0105F` / `#5B21B6` / `#A8380A` |
