@@ -5,6 +5,25 @@ const en = {
     // @holiday-arcade:start
     "arcade": {
       "wordSection": "Word games",
+      "lobby": {
+        "home": "Home",
+        "night": "Night {n} of {total}",
+        "day": "Gift {n} of {total}",
+        "moreTitle": "More holiday fun",
+        "moreLine": "The rest of LexiClash dressed up for the holidays too.",
+        "daily": {
+          "title": "Holiday Daily",
+          "line": "Today's festive board, the same one for everybody"
+        },
+        "friends": {
+          "title": "Play with friends",
+          "line": "Pull up a chair and open a room for the whole family"
+        },
+        "track": {
+          "title": "Your holiday track",
+          "line": "See tonight's reward and how far the community got"
+        }
+      },
       "family": {
         "badge": "Pass & Play",
         "section": "Family party games",

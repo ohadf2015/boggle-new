@@ -5,6 +5,25 @@ const ja = {
     // @holiday-arcade:start
     "arcade": {
       "wordSection": "言葉ゲーム",
+      "lobby": {
+        "home": "ホーム",
+        "night": "{total}夜のうち{n}夜目",
+        "day": "{total}個のうち{n}個目のギフト",
+        "moreTitle": "ほかにもホリデーの楽しみ",
+        "moreLine": "LexiClashのほかのゲームもホリデー仕様になっています。",
+        "daily": {
+          "title": "ホリデーデイリー",
+          "line": "今日だけのお祝いボード。みんな同じ盤面です"
+        },
+        "friends": {
+          "title": "友だちと遊ぶ",
+          "line": "部屋を作って家族みんなで集まろう"
+        },
+        "track": {
+          "title": "あなたのホリデートラック",
+          "line": "今夜のごほうびと、みんなの進み具合をチェック"
+        }
+      },
       "family": {
         "badge": "みんなで",
         "section": "家族のパーティーゲーム",

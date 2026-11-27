@@ -58,6 +58,7 @@ const NO_FOOTER_ROUTES = new Set([
   'ai-fanfare-demo',
   'avatar-test',
   'comeback-test',
+  'holiday-arcade',
 ]);
 
 /**
