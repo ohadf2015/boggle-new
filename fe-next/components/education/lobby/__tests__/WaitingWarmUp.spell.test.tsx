@@ -86,3 +86,22 @@ describe('WaitingWarmUp with list words: spelling tiles', () => {
     }
   });
 });
+
+describe('WaitingWarmUp spelling on the sky page', () => {
+  it('Given list words, Then the card is solid cream with a lip and the letters are chunky outlined tiles', () => {
+    render(<WaitingWarmUp username="Maya" words={['cat', 'dog']} t={t} />);
+    const card = screen.getByTestId('waiting-warmup');
+    expect(card).toHaveClass('bg-edu-surface', 'shadow-edu-lip');
+    expect(card.className).not.toContain('bg-edu-surface/90');
+    for (const tile of within(screen.getByTestId('warmup-spell-tiles')).getAllByRole('button')) {
+      expect(tile).toHaveClass('bg-edu-tile', 'border-neo-black', 'shadow-edu-lip-sm');
+    }
+  });
+
+  it('When a letter lands, Then its slot fills solid with black ink, never a lime outline on cream', () => {
+    render(<WaitingWarmUp username="Maya" words={['cat', 'dog']} t={t} />);
+    tapLetter('C');
+    expect(slots()[0]).toHaveClass('bg-neo-lime', 'border-neo-black', 'text-neo-black');
+    expect(slots()[0].className).not.toContain('border-neo-lime');
+  });
+});

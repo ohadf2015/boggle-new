@@ -14,7 +14,7 @@ export const WARM_UP_KEYFRAMES =
   '@keyframes lc-tile-glow{0%,100%{transform:scale(1.1)}50%{transform:scale(1.18)}}' +
   '@keyframes lc-tile-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}';
 
-const FOCUS = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black';
+const FOCUS = 'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-edu-surface';
 
 /** A list word's letters dealt scrambled; tap them back in order. A wrong tap shakes the tile and costs nothing. */
 export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: string[][]; seed: number; t: EduT; bare?: boolean }) {
@@ -46,7 +46,7 @@ export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: stri
       data-testid="waiting-warmup"
       data-kind="spell"
       aria-label={tr(t, 'academy.live.warmUpTitle', 'Warm-up')}
-      className={bare ? 'w-full' : 'w-full max-w-sm rounded-neo-lg border-[3px] border-edu-line bg-edu-surface/90 p-2 shadow-hard'}
+      className={bare ? 'w-full' : 'w-full max-w-sm rounded-neo-lg border-[3px] border-edu-line bg-edu-surface p-2.5 shadow-edu-lip'}
     >
       <style>{WARM_UP_KEYFRAMES}</style>
       <div className="mb-1.5 flex items-center justify-between gap-2">
@@ -81,12 +81,12 @@ export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: stri
               data-testid={`warmup-slot-${i}`}
               data-filled={done ? 'true' : 'false'}
               className={cn(
-                'grid h-11 min-w-10 place-items-center rounded-neo border-2 bg-edu-surface px-1 font-neo-display text-xl font-black leading-none',
+                'grid h-11 min-w-10 place-items-center rounded-neo border-2 px-1 font-neo-display text-xl font-black leading-none',
                 done
-                  ? 'border-neo-lime text-edu-lime-ink motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
+                  ? 'border-neo-black bg-neo-lime text-neo-black motion-safe:animate-[lc-tile-hit_200ms_ease-out]'
                   : i === state.filled
-                    ? 'border-edu-line text-edu-ink/35'
-                    : 'border-dashed border-edu-line text-edu-ink/35'
+                    ? 'border-edu-line bg-edu-surface text-edu-ink/35'
+                    : 'border-dashed border-edu-line bg-edu-surface text-edu-ink/35'
               )}
             >
               {letter}
@@ -111,7 +111,7 @@ export function WarmUpSpellTiles({ words, seed, t, bare = false }: { words: stri
               onClick={() => tap(i)}
               className={cn(
                 FOCUS,
-                'grid size-11 place-items-center rounded-neo border-[3px] border-neo-black bg-neo-cream font-neo-display text-xl font-black leading-none text-neo-black shadow-hard-sm transition-transform duration-100 motion-reduce:transition-none motion-safe:active:scale-90',
+                'grid size-11 place-items-center rounded-neo border-[3px] border-neo-black bg-edu-tile font-neo-display text-xl font-black leading-none text-neo-black shadow-edu-lip-sm transition-transform duration-100 motion-reduce:transition-none motion-safe:active:scale-90',
                 used && 'invisible',
                 shaking && 'border-neo-pink motion-safe:animate-[lc-tile-shake_220ms_ease-in-out]'
               )}
