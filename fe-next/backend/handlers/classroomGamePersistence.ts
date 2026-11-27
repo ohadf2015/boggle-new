@@ -300,6 +300,8 @@ export async function persistClassroomGameScores(
     ? Math.max(0, Math.round((Date.now() - roundStartMs) / 1000))
     : undefined;
 
+  // Started per player, awaited once after the loop: they must not hold the next player's writes.
+  const wordMemoryWrites: Promise<void>[] = [];
   for (const player of participants) {
     let xpEarned = 0;
     // Telemetry-only mirrors of the per-player stats computed inside the try.
@@ -396,20 +398,22 @@ export async function persistClassroomGameScores(
         }
         const reviews = liveWordResults(vocab, foundKeys, quizAnswers);
         if (reviews.length === 0) continue;
-        try {
-          await recordWordReviews(supabase, {
-            studentId: player.userId,
+        const studentId = player.userId;
+        wordMemoryWrites.push(
+          recordWordReviews(supabase, {
+            studentId,
             lessonId,
             lesson: { language: lessonVocab.language, words: [...lessonVocab.words.values()] },
             reviews,
             today: now.slice(0, 10),
-          });
-        } catch (err) {
-          logger.error(
-            'CLASSROOM_GAME',
-            `Failed to update word memory for ${player.userId} on lesson ${lessonId} (game ${game.gameCode}): ${(err as Error).message}`
-          );
-        }
+          }).then(
+            () => undefined,
+            (err) => logger.error(
+              'CLASSROOM_GAME',
+              `Failed to update word memory for ${studentId} on lesson ${lessonId} (game ${game.gameCode}): ${(err as Error).message}`
+            )
+          )
+        );
       }
 
       xpEarned = await awardLessonXp(supabase, { userId: player.userId, lessonIds, score, gameCode: game.gameCode });
@@ -431,6 +435,8 @@ export async function persistClassroomGameScores(
       isTestAccount: false,
     });
   }
+
+  await Promise.all(wordMemoryWrites);
 
   // The only place a real classroom practice completion is observable. The
   // browser-side `edu_practice_complete` cannot see this path at all — it lives

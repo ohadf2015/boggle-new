@@ -268,6 +268,25 @@ describe('persistClassroomGameScores', () => {
       ]);
     });
 
+    it('does not hold the next player behind a slow word memory write (rewards reach the room sooner)', async () => {
+      let release: () => void = () => {};
+      mockRecordWordReviews.mockImplementationOnce(() => new Promise((resolve) => { release = () => resolve({ recorded: 1, dropped: 0, mastered: [] }); }));
+      const game = makeGame({
+        players: [
+          { userId: 'stu-1', username: 'Alice', socketId: 's1' },
+          { userId: 'stu-2', username: 'Bob', socketId: 's2' },
+        ],
+      });
+      const done = persistClassroomGameScores(game, [
+        { userId: 'stu-1', score: 30, wordsFound: ['cat'] },
+        { userId: 'stu-2', score: 20, wordsFound: ['dog'] },
+      ]);
+      await vi.waitFor(() => expect(upsertsFor().map((p) => p.student_id)).toEqual(['stu-1', 'stu-2']));
+      expect(mockRecordWordReviews).toHaveBeenCalledTimes(2);
+      release();
+      await done;
+    });
+
     it('keeps the round, its progress and XP when the word memory write fails, and logs it', async () => {
       mockRecordWordReviews.mockRejectedValueOnce(new Error('boom'));
       await persistClassroomGameScores(makeGame(), [{ userId: 'stu-1', score: 30, wordsFound: ['dog'] }]);
