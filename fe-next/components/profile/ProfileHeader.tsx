@@ -29,6 +29,7 @@ import { resolveDisplayTitle } from '@/lib/titles/playerTitles';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { ShowcaseStage } from '@/components/profile/showcase/ShowcaseStage';
+import { OwnHolidayBadge } from '@/components/holidays/HolidayProfileBadge';
 import { AvatarCollectionCard } from '@/components/profile/showcase/AvatarCollectionCard';
 import { useShareProfile } from '@/components/profile/showcase/useShareProfile';
 import { friendlyDisplayName, getHeadlineStats } from '@/components/profile/showcase/profileShowcaseModel';
@@ -254,6 +255,7 @@ export function ProfileHeader({
             {countryNode}
           </span>
         }
+        holidayNode={<OwnHolidayBadge />}
         nameEditor={nameEditor}
         level={level}
         levelPercent={xp.progressPercent}

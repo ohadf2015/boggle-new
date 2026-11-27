@@ -22,6 +22,7 @@ import type { PublicProfile } from '@/shared/types/publicProfile';
 import { RankBadge } from '@/components/results/MmrChangeBadge';
 import { ProfileSocialActions } from '@/components/players/ProfileSocialActions';
 import { ProfileShareButton } from '@/components/players/ProfileShareButton';
+import { PlayerHolidayBadge } from '@/components/holidays/HolidayProfileBadge';
 
 /**
  * Percentile tier styling
@@ -148,6 +149,7 @@ export default function PlayerProfilePageClient() {
               {profile.countryCode && (
                 <span className="text-xl">{getCountryFlag(profile.countryCode)}</span>
               )}
+              <PlayerHolidayBadge holidayKey={profile.holidayKey} countryCode={profile.countryCode} />
             </div>
 
             {/* Level + Percentile */}

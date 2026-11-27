@@ -6,6 +6,7 @@
 import type { User, Session } from '@supabase/supabase-js';
 import type { Dispatch, SetStateAction } from 'react';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import type { HolidayKey } from '@/lib/holidays/calendar';
 
 export interface ProfileData {
   id: string;
@@ -45,6 +46,7 @@ export interface ProfileData {
   has_customized_profile?: boolean;
   // Player music/theme style (genre). null = default. See lib/playerStyle/styles.ts.
   player_style?: string | null;
+  holiday_key?: HolidayKey | null;
   // ISO timestamp the one-time style-choice popup was shown. null = not shown yet.
   player_style_modal_shown_at?: string | null;
   created_at?: string;

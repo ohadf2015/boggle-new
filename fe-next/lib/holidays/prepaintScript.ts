@@ -22,7 +22,7 @@ export function buildPrepaintScript(dev: boolean): string {
     `(function(){try{var W=${JSON.stringify(HOLIDAY_WINDOW_TABLE)};` +
     `var d=document.documentElement,n=new Date(),p=function(x){return(x<10?'0':'')+x};` +
     `var t=n.getFullYear()+'-'+p(n.getMonth()+1)+'-'+p(n.getDate());` +
-    `var K=['hanukkah','christmas','off'],s=location.search||'';` +
+    `var K=['hanukkah','christmas'],s=location.search||'';` +
     `var g=function(k){var m=s.match(new RegExp('[?&]'+k+'=([^&]*)'));return m?m[1]:null};` +
     `var v=g('holiday');` +
     `if(K.indexOf(v)>=0){document.cookie='${HOLIDAY_COOKIE}='+v+'; path=/; max-age=${HOLIDAY_COOKIE_MAX_AGE}; samesite=lax'}` +
@@ -33,7 +33,7 @@ export function buildPrepaintScript(dev: boolean): string {
     `var L=(d.lang||'').slice(0,2).toLowerCase();` +
     `var o=function(k){var r=0;for(var i=0;i<W.length;i++){var w=W[i];if(w[0]===k&&(!w[4]||w[4]===L)&&t>=w[1]&&t<=w[3])r=Math.max(r,t>=w[2]?2:1)}return r};` +
     `var h=null,q=0,k=il?'hanukkah':'christmas';` +
-    `if(v==='off')h=null;else if(v&&(f||o(v))){h=v;q=o(v);if(!q||P&&q<2){q=2;d.setAttribute('data-holiday-preview','1')}}else if(o(k)){h=k;q=o(k)}` +
+    `if(v&&(f||o(v))){h=v;q=o(v);if(!q||P&&q<2){q=2;d.setAttribute('data-holiday-preview','1')}}else if(o(k)){h=k;q=o(k)}` +
     `d.setAttribute('data-holiday-region',il?'IL':'world');` +
     `if(h){d.classList.add('holiday-'+h);d.classList.add(q>1?'holiday-live':'holiday-preview')}}catch(e){}})();`
   );

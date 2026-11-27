@@ -7,6 +7,7 @@ import express, { Request, Response, Router } from 'express';
 import { getSupabase } from '../modules/supabaseServer';
 import { fetchXpByMode } from '../modules/xpByMode';
 import logger from '../utils/logger';
+import { parseOverride } from '../../lib/holidays/override';
 
 const router: Router = express.Router();
 
@@ -15,7 +16,7 @@ const PUBLIC_PROFILE_COLUMNS = [
   'id', 'username', 'display_name', 'avatar_config',
   'country_code', 'current_level', 'total_xp', 'total_games', 'total_score',
   'total_words', 'casual_wins', 'ranked_wins', 'longest_word', 'longest_word_length',
-  'achievement_counts', 'created_at', 'ranked_mmr', 'peak_mmr',
+  'achievement_counts', 'created_at', 'ranked_mmr', 'peak_mmr', 'holiday_key',
 ].join(', ');
 
 interface ProfileRow {
@@ -35,6 +36,7 @@ interface ProfileRow {
   longest_word_length: number | null;
   achievement_counts: Record<string, number> | null;
   created_at: string | null;
+  holiday_key: string | null;
 }
 
 /**
@@ -113,6 +115,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       displayName: profile.display_name || profile.username,
       customAvatar: profile.avatar_config || null,
       countryCode: profile.country_code || null,
+      holidayKey: parseOverride(profile.holiday_key),
       currentLevel: profile.current_level || 1,
       totalXp: profile.total_xp || 0,
       totalGames,

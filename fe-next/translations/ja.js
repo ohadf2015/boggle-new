@@ -306,11 +306,11 @@ const ja = {
       "eventOnly": "ホリデーイベント",
       "eventOnlyHint": "ホリデーイベント期間だけの限定アイテム。毎日1回プレイしてゲットしよう。"
     },
-    "toggle": {
-      "label": "ホリデーテーマ",
+    "badge": {
       "hanukkah": "ハヌカ",
       "christmas": "クリスマス",
-      "off": "テーマなし"
+      "swap": "{holiday}に切り替える",
+      "swapError": "ホリデーを切り替えられませんでした。もう一度お試しください。"
     },
     "gift": {
       "hanukkah": {

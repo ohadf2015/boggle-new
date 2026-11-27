@@ -61,15 +61,10 @@ describe('activeHoliday', () => {
     expect(activeHoliday({ localDate: '2027-12-10', region: 'IL' })).toBe('hanukkah');
   });
 
-  it('given override off, returns null even in season', () => {
-    expect(activeHoliday({ localDate: '2026-12-05', region: 'IL', override: 'off' })).toBeNull();
-  });
-
   it('given preview, forces the override on outside every window', () => {
     expect(activeHoliday({ localDate: '2026-07-01', region: 'world', override: 'christmas', preview: true })).toBe(
       'christmas',
     );
-    expect(activeHoliday({ localDate: '2026-07-01', region: 'world', override: 'off', preview: true })).toBeNull();
   });
 
   it('outside every window returns null', () => {

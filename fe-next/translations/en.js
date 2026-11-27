@@ -306,11 +306,11 @@ const en = {
       "eventOnly": "Holiday event",
       "eventOnlyHint": "Only during the holiday event. Play a game each day to earn it."
     },
-    "toggle": {
-      "label": "Holiday theme",
+    "badge": {
       "hanukkah": "Hanukkah",
       "christmas": "Christmas",
-      "off": "No theme"
+      "swap": "Switch to {holiday}",
+      "swapError": "Couldn't switch your holiday. Try again."
     },
     "gift": {
       "hanukkah": {

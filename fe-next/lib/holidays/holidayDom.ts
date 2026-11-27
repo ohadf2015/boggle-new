@@ -1,12 +1,13 @@
 import { HOLIDAY_KEYS, holidayPhase, localDateIn, type HolidayKey, type HolidayPhase } from './calendar';
 import { holidayClass, holidayCookie, readOverrideCookie } from './override';
-import { activeHoliday, resolveRegion, type HolidayOverride, type HolidayRegion } from './region';
+import { activeHoliday, resolveRegion, type HolidayRegion } from './region';
 
 export interface HolidayDomState {
   holiday: HolidayKey | null;
   phase: HolidayPhase;
   region: HolidayRegion;
   available: HolidayKey[];
+  override: HolidayKey | null;
 }
 
 let state: HolidayDomState | null = null;
@@ -61,6 +62,7 @@ export function getHolidayState(): HolidayDomState {
       phase: !holiday ? 'off' : cl.contains(PHASE_CLASS.preview) ? 'preview' : 'live',
       region: guessedRegion(),
       available: openToday(),
+      override: readOverrideCookie(document.cookie),
     };
   }
   return state;
@@ -75,13 +77,13 @@ export function refineHolidayRegion(region: HolidayRegion) {
   const cur = getHolidayState();
   if (cur.region === region) return;
   const override = readOverrideCookie(document.cookie);
-  commit({ ...cur, region, holiday: activeHoliday({ localDate: today(), region, override, preview: isPreview(), locale: locale() }) });
+  commit({ ...cur, region, override, holiday: activeHoliday({ localDate: today(), region, override, preview: isPreview(), locale: locale() }) });
 }
 
-export function applyHolidayOverride(override: HolidayOverride) {
+export function applyHolidayOverride(override: HolidayKey) {
   const cur = getHolidayState();
   document.cookie = holidayCookie(override);
-  commit({ ...cur, holiday: activeHoliday({ localDate: today(), region: cur.region, override, preview: isPreview(), locale: locale() }) });
+  commit({ ...cur, override, holiday: activeHoliday({ localDate: today(), region: cur.region, override, preview: isPreview(), locale: locale() }) });
 }
 
 export function keepHolidayClass(): () => void {

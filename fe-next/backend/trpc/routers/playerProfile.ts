@@ -4,6 +4,7 @@ import { router, loggedProcedure } from '../trpc';
 import { cacheAside } from '../../cache/redisCache';
 import logger from '../../utils/logger';
 import type { CustomAvatarConfig } from '../../../shared/types/customAvatar';
+import { parseOverride } from '../../../lib/holidays/override';
 
 const { getSupabase, isSupabaseConfigured } = require('../../modules/supabaseServer');
 
@@ -14,7 +15,7 @@ export const PUBLIC_PROFILE_COLUMNS = [
   'id', 'username', 'display_name', 'avatar_config',
   'country_code', 'current_level', 'total_xp', 'total_games', 'total_score',
   'total_words', 'casual_wins', 'ranked_wins', 'longest_word', 'longest_word_length',
-  'achievement_counts', 'created_at', 'premium_avatar_parts',
+  'achievement_counts', 'created_at', 'premium_avatar_parts', 'holiday_key',
 ].join(', ');
 
 export interface PublicProfileRow {
@@ -35,6 +36,7 @@ export interface PublicProfileRow {
   achievement_counts?: Record<string, number> | null;
   created_at?: string | null;
   premium_avatar_parts?: unknown;
+  holiday_key?: string | null;
 }
 
 /** Pure row → public payload. Whitelists every field; nothing passes through. */
@@ -63,6 +65,7 @@ export function toPublicProfile(
     displayName: profile.display_name || profile.username,
     customAvatar: (profile.avatar_config as CustomAvatarConfig | null) || null,
     countryCode: profile.country_code || null,
+    holidayKey: parseOverride(profile.holiday_key),
     currentLevel: profile.current_level || 1,
     totalXp: profile.total_xp || 0,
     totalGames,
