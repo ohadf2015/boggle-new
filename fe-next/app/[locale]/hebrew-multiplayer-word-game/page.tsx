@@ -1,6 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import NativePageEnhancements from '@/components/landing/NativePageEnhancements';
+import {
+  CheckList,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Prose,
+  Section,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { dictionaryFloor } from '@/lib/seo/dictionaryStats';
+
+const HE_DICT_FLOOR = dictionaryFloor('he', 'he');
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -86,7 +101,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
     },
     {
       q: 'כמה מילים בעברית יש בלקסיקלאש?',
-      a: 'לקסיקלאש כולל 10,000+ מילים בעברית. המילון שלנו מתעדכן כל הזמן.',
+      a: `לקסיקלאש כולל ${HE_DICT_FLOOR}+ מילים בעברית. המילון שלנו מתעדכן כל הזמן.`,
     },
     {
       q: 'אילו מצבי משחק קיימים?',
@@ -95,7 +110,7 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
   ];
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white" dir="rtl">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'התחילו לשחק' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -114,159 +129,115 @@ export default async function HebrewMultiplayerWordGamePage({ params }: PageProp
         }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          משחק מילים בעברית אונליין — סקראבל, בוגל וראש בראש מרובה משתתפים
-        </h1>
+      <LandingHero
+        title={
+          <>
+            משחק מילים <Mark>בעברית</Mark> אונליין — סקראבל, בוגל וראש בראש מרובה משתתפים
+          </>
+        }
+        lead="ברוכים הבאים ללקסיקלאש - משחק המילים בעברית הטוב באינטרנט למשחק ראש בראש אונליין עם חברים."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>התחילו לשחק</LandingButton>
+            <LandingButton href={`/${locale}/quick-play`} variant="secondary">
+              משחק יחיד
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('שתי דמויות של לקסיקלאש בקרב מילים מול לוח אותיות')}
+        artTone="cyan"
+        more={
+          <p>
+            אם אתם מחפשים סקראבל אונליין, בוגל בעברית או אתגר יומי בסגנון וורדל — הפלטפורמה שלנו משלבת את הטוב ביותר
+            מכל אחד. צרו חדר, שלחו לינק, והתחרו בקרבות מילים בזמן אמת, ראש בראש, מול חברים או שחקנים מכל העולם.
+            עם {HE_DICT_FLOOR}+ מילים במילון בעברית, ללא הורדה וללא הרשמה, לקסיקלאש היא משחק המילים האידיאלי לכם.
+          </p>
+        }
+      />
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          ברוכים הבאים ללקסיקלאש - משחק המילים בעברית הטוב באינטרנט למשחק ראש בראש אונליין עם חברים. אם אתם
-          מחפשים סקראבל אונליין, בוגל בעברית או אתגר יומי בסגנון וורדל — הפלטפורמה שלנו משלבת את הטוב ביותר
-          מכל אחד. צרו חדר, שלחו לינק, והתחרו בקרבות מילים בזמן אמת, ראש בראש, מול חברים או שחקנים מכל העולם.
-          עם 10,000+ מילים במילון בעברית, ללא הורדה וללא הרשמה, לקסיקלאש היא משחק המילים האידיאלי לכם.
-        </p>
+      <Section title="למה לשחק בלקסיקלאש?">
+        <CheckList
+          items={[
+            'קרבות מרובי משתתפים בזמן אמת עם משוב ניקוד מיידי',
+            'צרו חדרים ושלחו לינק לחברים',
+            `${HE_DICT_FLOOR}+ מילים בעברית`,
+            'מצבי משחק מרובים (בוגל, ציד, בלסט)',
+            'אתגרים יומיים ודירוגים',
+            'קרבות בוסים עם הפתעות ייחודיות',
+            'לגמרי חינם, ללא הורדה',
+            'שחקו בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית',
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            למה לשחק בלקסיקלאש?
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              'קרבות מרובי משתתפים בזמן אמת עם משוב ניקוד מיידי',
-              'צרו חדרים ושלחו לינק לחברים',
-              '10,000+ מילים בעברית',
-              'מצבי משחק מרובים (בוגל, ציד, בלסט)',
-              'אתגרים יומיים ודירוגים',
-              'קרבות בוסים עם הפתעות ייחודיות',
-              'לגמרי חינם, ללא הורדה',
-              'שחקו בעברית, אנגלית, שוודית, יפנית, ספרדית ורוסית',
-            ].map((feature) => (
-              <div
-                key={feature}
-                className="flex gap-3 rounded-neo border-3 border-neo-yellow bg-neo-navy/50 p-4 shadow-hard"
-              >
-                <span className="text-neo-yellow">✓</span>
-                <p className="text-sm sm:text-base">{feature}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">סקראבל בעברית מול לקסיקלאש</h2>
-          <div className="space-y-4 text-lg leading-relaxed text-neo-gray-200">
+      <Section title="סקראבל בעברית מול לקסיקלאש">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-6 leading-relaxed text-neo-black shadow-hard-xl">
             <p>
               בסקראבל הקלאסי משחקים שניים עד ארבעה. כל אחד מחזיק שבע אותיות, מניח מילה על לוח של 15 על 15 ומחכה
               לתור הבא. הכיף הוא בתכנון: איפה לשים אות יקרה ואיך לתפוס משבצת שמכפילה את הניקוד.
             </p>
+          </div>
+          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-lime p-6 leading-relaxed text-neo-black shadow-hard-xl">
             <p>
               בלקסיקלאש אין תורות. כולם רואים את אותו לוח אותיות ומחפשים מילים בעברית באותו הזמן, עד שהשעון נגמר.
               גם בחדר של 50 שחקנים אף אחד לא יושב ומחכה.
             </p>
-            <p>
-              רוצים את ההשוואה המלאה?{' '}
-              <Link href={`/${locale}/lexiclash-vs-scrabble`} className="text-neo-lime underline underline-offset-2">
-                לקסיקלאש מול סקראבל
-              </Link>
-            </p>
           </div>
-        </section>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row-reverse sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-yellow bg-neo-yellow px-6 py-3 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            התחילו לשחק
+        </div>
+        <p className="text-neo-white/85">
+          רוצים את ההשוואה המלאה?{' '}
+          <Link href={`/${locale}/lexiclash-vs-scrabble`} className="font-bold text-neo-cyan underline underline-offset-2">
+            לקסיקלאש מול סקראבל
           </Link>
-          <Link
-            href={`/${locale}/quick-play`}
-            className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4"
-          >
-            משחק יחיד
-          </Link>
-          <Link
-            href={`/${locale}/daily`}
-            className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4"
-          >
-            אתגר יומי
-          </Link>
-        </section>
+        </p>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">שאלות נפוצות</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details
-                key={`faq-${idx}-${faq.q}`}
-                className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">▼</span>
-                  <span>{faq.q}</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <TileGrid
+        items={[
+          { href: `/${locale}/multiplayer`, title: 'התחילו לשחק ←', tone: 'yellow' },
+          { href: `/${locale}/quick-play`, title: 'משחק יחיד ←', tone: 'cyan' },
+          { href: `/${locale}/daily`, title: 'אתגר יומי ←', tone: 'pink' },
+        ]}
+      />
 
-        <section className="mb-12 max-w-none">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">על לקסיקלאש</h2>
-          <p className="mt-4 text-neo-gray-200">
-            לקסיקלאש מסיבת משחקי מילים אונליין על ידי שילוב של עומק אסטרטגי של סקראבל, מהירות זמן אמת של בוגל,
-            וסיפוק חידות של וורדל. הפלטפורמה שלנו מעוצבת לאוהבי מילים, שחקנים רגילים ושחקנים תחרותיים כאחד.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            שחקו משחקי מילים מרובי משתתפים עם חברים, משפחה ותושבי עולם. בין אם אתם רוצים משחק מהיר של 15 דקות
-            או הושב תחרותי ארוך יותר, לקסיקלאש מתאימה לכל סגנון משחק. הממשק האינטואיטיבי עובד במחשב ובנייד,
-            מה שמאפשר לכם לשחק כל היום בכל מקום.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            התחרו בדירוגים גלובליים, אור הישגים, וביטלו מצבי משחק מיוחדים. קרבות הבוסים שלנו מוסיפים טוויסט
-            PvE ייחודי שבו שחקנים שיתפו פעולה נגד יריבים בינה מלאכותית.{' '}
-            <Link href={`/${locale}/daily`} className="text-neo-lime underline underline-offset-2 hover:text-neo-lime/80">
-              המילה היומית
-            </Link>{' '}
-            מציעה חידות טריות כל יום עם פרסים בלעדיים.
-          </p>
-        </section>
+      <Section title="שאלות נפוצות">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12" dir="rtl">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">כלים ומשאבים בעברית</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link
-              href={`/${locale}/daily`}
-              className="rounded-neo border-3 border-neo-lime/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-lime"
-            >
-              <h3 className="font-neo-display font-bold text-neo-lime">המילה היומית — מילת היום</h3>
-              <p className="mt-1 text-xs text-slate-300">גלגל מילים וציד מילים — חידה חדשה כל יום עם טבלת מובילים גלובלית.</p>
-            </Link>
-            <Link
-              href={`/${locale}/words`}
-              className="rounded-neo border-3 border-neo-cyan/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-cyan"
-            >
-              <h3 className="font-neo-display font-bold text-neo-cyan">מילון מילים בעברית</h3>
-              <p className="mt-1 text-xs text-slate-300">חפשו לפי אורך מילה או אות ראשונה — כל המילים התקניות במשחק.</p>
-            </Link>
-            <Link
-              href={`/${locale}/anagram`}
-              className="rounded-neo border-3 border-neo-pink/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-pink"
-            >
-              <h3 className="font-neo-display font-bold text-neo-pink">פותר אנגרמות בעברית</h3>
-              <p className="mt-1 text-xs text-slate-300">הכניסו אותיות וגלו כל המילים האפשריות שאפשר לבנות.</p>
-            </Link>
-            <Link
-              href={`/${locale}/leaderboard`}
-              className="rounded-neo border-3 border-neo-yellow/60 bg-neo-navy-light p-4 shadow-hard transition-[border-color] hover:border-neo-yellow"
-            >
-              <h3 className="font-neo-display font-bold text-neo-yellow">טבלת מובילים</h3>
-              <p className="mt-1 text-xs text-slate-300">דירוגים יומיים, שבועיים וכלליים — עלו בדירוג הגלובלי.</p>
-            </Link>
-          </div>
-        </section>
-        <NativePageEnhancements locale={locale} />
-      </div>
-    </main>
+      <Section title="על לקסיקלאש">
+        <Prose>
+          <p>
+            לקסיקלאש היא מסיבת משחקי מילים אונליין שמשלבת עומק אסטרטגי של סקראבל, מהירות בזמן אמת של בוגל
+            וסיפוק של חידת וורדל. הפלטפורמה שלנו מעוצבת לאוהבי מילים, לשחקנים מזדמנים ולשחקנים תחרותיים כאחד.
+          </p>
+          <p>
+            שחקו משחקי מילים מרובי משתתפים עם חברים, משפחה ושחקנים מכל העולם. בין אם אתם רוצים משחק מהיר של 15
+            דקות או מושב תחרותי ארוך יותר, לקסיקלאש מתאימה לכל סגנון משחק. הממשק האינטואיטיבי עובד במחשב ובנייד,
+            כך שאפשר לשחק בכל מקום ובכל שעה.
+          </p>
+          <p>
+            התחרו בדירוגים עולמיים, צברו הישגים ופתחו מצבי משחק מיוחדים. קרבות הבוסים שלנו מוסיפים טוויסט PvE
+            ייחודי שבו שחקנים משתפים פעולה נגד יריבי בינה מלאכותית.{' '}
+            <Link href={`/${locale}/daily`}>המילה היומית</Link> מציעה חידות טריות כל יום עם פרסים בלעדיים.
+          </p>
+        </Prose>
+      </Section>
+
+      <Section title="כלים ומשאבים בעברית">
+        <TileGrid
+          variant="paper"
+          columns={4}
+          items={[
+            { href: `/${locale}/daily`, title: 'המילה היומית — מילת היום', body: 'גלגל מילים וציד מילים — חידה חדשה כל יום עם טבלת מובילים גלובלית.' },
+            { href: `/${locale}/words`, title: 'מילון מילים בעברית', body: 'חפשו לפי אורך מילה או אות ראשונה — כל המילים התקניות במשחק.' },
+            { href: `/${locale}/anagram`, title: 'פותר אנגרמות בעברית', body: 'הכניסו אותיות וגלו כל המילים האפשריות שאפשר לבנות.' },
+            { href: `/${locale}/leaderboard`, title: 'טבלת מובילים', body: 'דירוגים יומיים, שבועיים וכלליים — עלו בדירוג הגלובלי.' },
+          ]}
+        />
+      </Section>
+
+      <NativePageEnhancements locale={locale} />
+    </LandingPage>
   );
 }

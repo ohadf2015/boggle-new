@@ -63,9 +63,9 @@ export function ComingSoonLanding({ content: c }: { content: ComingSoonContent }
       <section className={cn('relative border-b-3 border-neo-black', styles.dots)}>
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-16 pt-6 sm:px-6 sm:pt-12 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 lg:pb-20 lg:pt-16">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-navy-light px-3 py-1 shadow-hard-pink">
+            <p className="inline-flex items-center gap-2 rounded-full border-2 border-neo-black bg-neo-yellow px-3 py-1 text-neo-black shadow-hard-sm">
               <span aria-hidden="true" className="h-2 w-2 rounded-full bg-neo-pink motion-safe:animate-pulse" />
-              <span className={cn('text-sm text-neo-pink', typo.display, typo.rtl ? '' : 'text-xs uppercase tracking-widest')}>
+              <span className={cn('text-sm', typo.display, typo.rtl ? '' : 'text-xs uppercase tracking-wide')}>
                 {c.waitlist.heading}
               </span>
             </p>

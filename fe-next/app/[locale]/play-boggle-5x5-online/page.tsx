@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Prose,
+  Section,
+  Steps,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 import { enOnlyAlternates } from '@/lib/seo/enOnlyAlternates';
 
 export const dynamic = 'force-dynamic';
@@ -137,192 +150,133 @@ const TIPS = [
   { title: 'Keep the streak', desc: 'Words found back to back build a combo, and the combo bonus grows with word length. Do not stop to double-check a short word.' },
 ];
 
+const SAMPLE_BOARD = 'STARELINOPCADEMRUGHTOWSNE'.split('');
+
 export default async function PlayBoggle5x5OnlinePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Start a 5×5 Room' }}>
       <script id="ld-faq-boggle-5x5" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-article-boggle-5x5" type="application/ld+json" dangerouslySetInnerHTML={{ __html: articleJsonLd }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        title={
+          <>
+            Play Boggle <Mark>5x5</Mark> Online Free, With Friends
+          </>
+        }
+        lead={
+          <span data-speakable="true">
+            You can play 5x5 Boggle online free on LexiClash: create a multiplayer room, set the board to 5×5
+            and share the 4-letter code. Up to 50 players race the same 25 letters live, in the browser, with no
+            download and no signup.
+          </span>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Start a 5×5 Room</LandingButton>
+            <LandingButton href={`/${locale}/how-to-play`} variant="secondary">
+              How to Play
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.solver('A LexiClash mascot studying a grid of letter tiles')}
+        artTone="cyan"
+      />
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Play Boggle 5x5 Online Free, With Friends
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200" data-speakable="true">
-          You can play 5x5 Boggle online free on LexiClash: create a multiplayer room, set the board to 5×5
-          and share the 4-letter code. Up to 50 players race the same 25 letters live, in the browser, with no
-          download and no signup.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Start a 5×5 Room
-          </Link>
-          <Link
-            href={`/${locale}/how-to-play`}
-            className="rounded-neo border-4 border-neo-yellow bg-transparent px-6 py-3 text-center font-bold text-neo-yellow shadow-hard transition-[background-color] hover:bg-neo-yellow/10 sm:px-8 sm:py-4"
-          >
-            How to Play
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">What Is 5x5 Boggle?</h2>
-          <p className="mb-6 leading-relaxed text-neo-gray-200" data-speakable="true">
-            Classic Boggle is a 4×4 grid of 16 letter cubes. Big Boggle, the board game&apos;s bigger edition,
-            uses a 5×5 grid of 25 cubes. The rules stay the same: link letters that touch on a side or a corner,
-            use each tile once per word, and find as many words as you can before time runs out. Nine more tiles
-            means far more long words, which is why players who find 4×4 too cramped move up to 5×5.
-          </p>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-gray-400 shadow-hard">
-            <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="bg-neo-navy/80 text-neo-yellow">
-                <tr>
-                  <th scope="col" className="px-4 py-3 font-bold">Board</th>
-                  <th scope="col" className="px-4 py-3 font-bold">4×4 (classic)</th>
-                  <th scope="col" className="px-4 py-3 font-bold">5×5 (big board)</th>
-                  <th scope="col" className="px-4 py-3 font-bold">6×6 / 7×7</th>
-                </tr>
-              </thead>
-              <tbody className="text-neo-gray-200">
-                {BOARD_ROWS.map(([label, a, b, c]) => (
-                  <tr key={label} className="border-t border-neo-gray-400">
-                    <th scope="row" className="px-4 py-3 font-bold text-neo-cream">{label}</th>
-                    <td className="px-4 py-3">{a}</td>
-                    <td className="px-4 py-3">{b}</td>
-                    <td className="px-4 py-3">{c}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <Section title="What Is 5x5 Boggle?">
+        <div className="grid items-start gap-8 lg:grid-cols-[1fr_auto] lg:gap-12">
+          <div className="flex flex-col gap-6">
+            <Prose>
+              <p data-speakable="true">
+                Classic Boggle is a 4×4 grid of 16 letter cubes. Big Boggle, the board game&apos;s bigger edition,
+                uses a 5×5 grid of 25 cubes. The rules stay the same: link letters that touch on a side or a corner,
+                use each tile once per word, and find as many words as you can before time runs out. Nine more tiles
+                means far more long words, which is why players who find 4×4 too cramped move up to 5×5.
+              </p>
+            </Prose>
+            <CompareTable
+              highlight={2}
+              columns={['Board', '4×4 (classic)', '5×5 (big board)', '6×6 / 7×7']}
+              rows={BOARD_ROWS.map((r) => [...r])}
+            />
           </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">How to Play Boggle 5x5 Online Free</h2>
-          <ol className="grid gap-4 sm:grid-cols-2">
-            {STEPS.map((step, i) => (
-              <li key={step.title} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-pink">
-                  {i + 1}. {step.title}
-                </h3>
-                <p className="text-sm text-neo-gray-200">{step.desc}</p>
-              </li>
+          <div aria-hidden className="mx-auto grid w-fit rotate-2 grid-cols-5 gap-1.5 rounded-neo-lg border-3 border-neo-black bg-neo-pink p-3 shadow-hard-xl">
+            {SAMPLE_BOARD.map((ch, i) => (
+              <span
+                key={i}
+                className="grid h-11 w-11 place-items-center rounded-neo border-3 border-neo-black bg-neo-yellow font-neo-display text-xl font-bold text-neo-black sm:h-14 sm:w-14 sm:text-2xl"
+              >
+                {ch}
+              </span>
             ))}
-          </ol>
-        </section>
+          </div>
+        </div>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">5x5 Multiplayer: Play With Friends in Real Time</h2>
-          <p className="mb-4 leading-relaxed text-neo-gray-200" data-speakable="true">
+      <Section title="How to Play Boggle 5x5 Online Free">
+        <Steps items={STEPS.map((step) => ({ title: step.title, body: step.desc }))} />
+      </Section>
+
+      <Section title="5x5 Multiplayer: Play With Friends in Real Time">
+        <Prose>
+          <p data-speakable="true">
             Every player in a LexiClash room sees the same 5×5 board at the same moment, and the round ends for
             everyone together. There are no turns to wait for, and the standings show as soon as the round ends,
             so you can run a rematch on a fresh board straight away.
           </p>
-          <p className="leading-relaxed text-neo-gray-200">
+          <p>
             Friends can join from anywhere with the link or the 4-letter code. For a group in one room, put the
             board on a TV and let everyone play on their phones. The host picks 5×5, 6×6 or 7×7 in the lobby, so a
             mixed group can start on 5×5 and move up when it gets easy.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Scoring on the 5x5 Board</h2>
-          <p className="mb-6 leading-relaxed text-neo-gray-200">
-            LexiClash uses one scoring table on every board, and it pays far more for length than the board
-            game does. The host also sets the minimum word length to 2, 3 or 4 letters. For Big Boggle rules,
-            choose 4 letters and a 3-minute timer.
-          </p>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-gray-400 shadow-hard">
-            <table className="w-full min-w-[24rem] text-left text-sm">
-              <thead className="bg-neo-navy/80 text-neo-yellow">
-                <tr>
-                  <th scope="col" className="px-4 py-3 font-bold">Word length</th>
-                  <th scope="col" className="px-4 py-3 font-bold">Classic Boggle points</th>
-                  <th scope="col" className="px-4 py-3 font-bold">LexiClash points</th>
-                </tr>
-              </thead>
-              <tbody className="text-neo-gray-200">
-                {SCORE_ROWS.map(([len, classic, lexi]) => (
-                  <tr key={len} className="border-t border-neo-gray-400">
-                    <th scope="row" className="px-4 py-3 font-bold text-neo-cream">{len}</th>
-                    <td className="px-4 py-3">{classic}</td>
-                    <td className="px-4 py-3">{lexi}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <Section
+        title="Scoring on the 5x5 Board"
+        intro="LexiClash uses one scoring table on every board, and it pays far more for length than the board game does. The host also sets the minimum word length to 2, 3 or 4 letters. For Big Boggle rules, choose 4 letters and a 3-minute timer."
+      >
+        <div className="max-w-2xl">
+          <CompareTable
+            highlight={2}
+            columns={['Word length', 'Classic Boggle points', 'LexiClash points']}
+            rows={SCORE_ROWS.map((r) => [...r])}
+          />
+        </div>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Strategy Tips for the Bigger Grid</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {TIPS.map((tip) => (
-              <div key={tip.title} className="rounded-neo border-3 border-neo-lime bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{tip.title}</h3>
-                <p className="text-sm text-neo-gray-200">{tip.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="Strategy Tips for the Bigger Grid">
+        <TileGrid columns={4} items={TIPS.map((tip) => ({ title: tip.title, body: tip.desc }))} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">FAQ: Board Sizes, Timers and Languages</h2>
-          <div className="space-y-4">
-            {faqs.map((faq) => (
-              <details key={faq.q} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200" data-speakable="true">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="FAQ: Board Sizes, Timers and Languages">
+        <FaqList items={faqs.map((f) => ({ q: f.q, a: <span data-speakable="true">{f.a}</span> }))} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Boggle-Style Games</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Play Boggle Online Free</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Every mode, solo and multiplayer</p>
-            </Link>
-            <Link href={`/${locale}/boggle-word-shake-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Boggle Word Shake</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">The classic 4×4 rules explained</p>
-            </Link>
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-yellow/40">
-              <h3 className="font-bold text-neo-yellow">Daily Word Wheel</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">One new puzzle every day</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More Boggle-Style Games">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/play-boggle-online-free`, title: 'Play Boggle Online Free', body: 'Every mode, solo and multiplayer' },
+            { href: `/${locale}/boggle-word-shake-free`, title: 'Boggle Word Shake', body: 'The classic 4×4 rules explained' },
+            { href: `/${locale}/daily-word-wheel`, title: 'Daily Word Wheel', body: 'One new puzzle every day' },
+          ]}
+        />
+      </Section>
 
-        <section>
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Start a 5×5 Game Now</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Create a room, set Board size to 5×5 and send the code to your friends. The first round starts as
-            soon as you press Start.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/multiplayer`}
-              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Play Boggle 5x5 Online
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="lime"
+        title="Start a 5×5 Game Now"
+        body="Create a room, set Board size to 5×5 and send the code to your friends. The first round starts as soon as you press Start."
+        actions={
+          <LandingButton href={`/${locale}/multiplayer`} variant="dark">
+            Play Boggle 5x5 Online
+          </LandingButton>
+        }
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

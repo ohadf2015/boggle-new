@@ -1,6 +1,17 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import {
+  CompareTable,
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Prose,
+  Section,
+  TileGrid,
+} from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,184 +119,115 @@ export default async function CompetitiveWordGamesPage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Play a Ranked Match' }}>
       <script id="ld-faq-competitive" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-videogame-competitive" type="application/ld+json" dangerouslySetInnerHTML={{ __html: videoGameJsonLd }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        title="The Best Competitive Word Games with Global Leaderboards"
+        lead={
+          <span data-speakable="true">
+            Play competitive word games free — live ranked matches vs real players, a global
+            leaderboard, and no download. Most word games are solitary. LexiClash is the other way
+            around: real-time grid battles and ranked daily puzzles where everyone gets the same board.
+            No pay-to-win. Start a match in your browser now.
+          </span>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Play a Ranked Match</LandingButton>
+            <LandingButton href={`/${locale}/leaderboard`} variant="secondary">
+              View Global Leaderboard
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.trophy('A LexiClash mascot holding a trophy on a winners podium')}
+        artTone="yellow"
+      >
+        <Link href={`/${locale}/daily-word-wheel`} className="font-bold text-neo-lime underline underline-offset-4">
+          Ranked Daily Challenge →
+        </Link>
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          The Best Competitive Word Games with Global Leaderboards
-        </h1>
+      <Section title="What Makes a Word Game Genuinely Competitive">
+        <TileGrid
+          columns={4}
+          items={[
+            { title: 'Real-time, not turn-based', body: 'Everyone races the same grid at once. No four-day waits between turns — a match ends in 2-3 minutes.' },
+            { title: 'A leaderboard that persists', body: 'Daily and seasonal global rankings. Your score is comparable because everyone solved the identical puzzle.' },
+            { title: 'No pay-to-win', body: 'No bought power-ups freezing the clock or revealing words. Skill decides the match, not your wallet.' },
+            { title: 'Same puzzle for everyone', body: 'Ranked daily challenges hand every player the exact same board, so the leaderboard reflects real skill.' },
+          ]}
+        />
+      </Section>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200" data-speakable="true">
-          Play competitive word games free — live ranked matches vs real players, a global
-          leaderboard, and no download. Most word games are solitary. LexiClash is the other way
-          around: real-time grid battles and ranked daily puzzles where everyone gets the same board.
-          No pay-to-win. Start a match in your browser now.
-        </p>
+      <Section title="Competitive Game Modes on LexiClash">
+        <TileGrid
+          variant="paper"
+          columns={4}
+          items={[
+            { href: `/${locale}/multiplayer`, title: 'Multiplayer Grid Battle', body: 'Real-time head-to-head for 2-20+ players on a shared grid. The core competitive mode.', tone: 'pink' },
+            { href: `/${locale}/daily-word-wheel`, title: 'Daily Word Wheel', body: 'Same puzzle for everyone, every day. Leaderboard-scored — pure skill comparison.', tone: 'lime' },
+            { href: `/${locale}/daily`, title: 'Daily Word Hunt', body: 'A daily target-word hunt on a Boggle-style grid. Ranked on the global board.', tone: 'cyan' },
+            { href: `/${locale}/leaderboard`, title: 'Global Leaderboard', body: 'Where every ranked match and daily challenge lands. See your worldwide standing.', tone: 'yellow' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link
-            href={`/${locale}/multiplayer`}
-            className="rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4"
-          >
-            Play a Ranked Match
-          </Link>
-          <Link
-            href={`/${locale}/leaderboard`}
-            className="rounded-neo border-4 border-neo-yellow bg-transparent px-6 py-3 text-center font-bold text-neo-yellow shadow-hard transition-[background-color] hover:bg-neo-yellow/10 sm:px-8 sm:py-4"
-          >
-            View Global Leaderboard
-          </Link>
-          <Link
-            href={`/${locale}/daily-word-wheel`}
-            className="rounded-neo border-4 border-neo-lime bg-transparent px-6 py-3 text-center font-bold text-neo-lime shadow-hard transition-[background-color] hover:bg-neo-lime/10 sm:px-8 sm:py-4"
-          >
-            Ranked Daily Challenge
-          </Link>
-        </section>
+      <Section title="Leaderboard Games Online: How Each LexiClash Board Ranks You">
+        <div className="grid items-start gap-8 lg:grid-cols-[2fr_3fr]">
+          <Prose>
+            <p data-speakable="true">
+              LexiClash is a free online word game with four leaderboards you can climb from a browser,
+              no download: an all-time global board, a board for each daily puzzle, a friends board, and
+              the live standings inside every multiplayer room. The daily boards are the fairest test,
+              because every player gets the identical puzzle, so a higher score means more words found,
+              not an easier board.
+            </p>
+          </Prose>
+          <CompareTable
+            highlight={-1}
+            columns={['Leaderboard', 'Who you are ranked against', 'What decides your rank']}
+            rows={[
+              ['Global (all-time)', 'Every LexiClash player worldwide', 'Total points across your ranked games'],
+              ['Daily Word Wheel and Daily Word Hunt', 'Everyone who plays that day’s puzzle', 'Your score on the same board everyone got'],
+              ['Friends', 'The friends you have added', 'Who scored most on today’s puzzle'],
+              ['Multiplayer room', 'The 2-20+ players in your room', 'Points per round; unique words score more'],
+            ]}
+          />
+        </div>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            What Makes a Word Game Genuinely Competitive
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Real-time, not turn-based', desc: 'Everyone races the same grid at once. No four-day waits between turns — a match ends in 2-3 minutes.' },
-              { title: 'A leaderboard that persists', desc: 'Daily and seasonal global rankings. Your score is comparable because everyone solved the identical puzzle.' },
-              { title: 'No pay-to-win', desc: 'No bought power-ups freezing the clock or revealing words. Skill decides the match, not your wallet.' },
-              { title: 'Same puzzle for everyone', desc: 'Ranked daily challenges hand every player the exact same board, so the leaderboard reflects real skill.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-pink bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-pink">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs.map((f) => ({ q: f.q, a: <span data-speakable="true">{f.a}</span> }))} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">
-            Competitive Game Modes on LexiClash
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Link href={`/${locale}/multiplayer`} className="rounded-neo border-3 border-neo-pink/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-pink">
-              <h3 className="font-bold text-neo-pink">Multiplayer Grid Battle</h3>
-              <p className="mt-1 text-sm text-neo-gray-200">Real-time head-to-head for 2-20+ players on a shared grid. The core competitive mode.</p>
-            </Link>
-            <Link href={`/${locale}/daily-word-wheel`} className="rounded-neo border-3 border-neo-lime/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-lime">
-              <h3 className="font-bold text-neo-lime">Daily Word Wheel</h3>
-              <p className="mt-1 text-sm text-neo-gray-200">Same puzzle for everyone, every day. Leaderboard-scored — pure skill comparison.</p>
-            </Link>
-            <Link href={`/${locale}/daily`} className="rounded-neo border-3 border-neo-cyan/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-cyan">
-              <h3 className="font-bold text-neo-cyan">Daily Word Hunt</h3>
-              <p className="mt-1 text-sm text-neo-gray-200">A daily target-word hunt on a Boggle-style grid. Ranked on the global board.</p>
-            </Link>
-            <Link href={`/${locale}/leaderboard`} className="rounded-neo border-3 border-neo-yellow/50 bg-neo-navy/50 p-5 shadow-hard transition-[border-color] hover:border-neo-yellow">
-              <h3 className="font-bold text-neo-yellow">Global Leaderboard</h3>
-              <p className="mt-1 text-sm text-neo-gray-200">Where every ranked match and daily challenge lands. See your worldwide standing.</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More Word Games">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/blog/most-popular-word-games-2026`, title: 'Most Popular Word Games 2026', body: 'The games everyone is playing — and why' },
+            { href: `/${locale}/best-online-word-games`, title: 'Best Online Word Games', body: '9 honest picks, no download' },
+            { href: `/${locale}/free-multiplayer-word-game`, title: 'Multiplayer Word Game Online', body: 'Real-time, browser-based, free' },
+            { href: `/${locale}/education/esl-word-games`, title: 'Vocabulary Games for the Classroom', body: 'ESL & classroom vocabulary practice mode' },
+            { href: `/${locale}/play-boggle-online-free`, title: 'Boggle Online', body: 'Free, 2 to 50 players on one board' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">
-            Leaderboard Games Online: How Each LexiClash Board Ranks You
-          </h2>
-          <p className="mb-6 leading-relaxed text-neo-gray-200" data-speakable="true">
-            LexiClash is a free online word game with four leaderboards you can climb from a browser,
-            no download: an all-time global board, a board for each daily puzzle, a friends board, and
-            the live standings inside every multiplayer room. The daily boards are the fairest test,
-            because every player gets the identical puzzle, so a higher score means more words found,
-            not an easier board.
-          </p>
-          <div className="overflow-x-auto rounded-neo border-3 border-neo-gray-400 shadow-hard">
-            <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="bg-neo-navy/80 text-neo-yellow">
-                <tr>
-                  <th scope="col" className="px-4 py-3 font-bold">Leaderboard</th>
-                  <th scope="col" className="px-4 py-3 font-bold">Who you are ranked against</th>
-                  <th scope="col" className="px-4 py-3 font-bold">What decides your rank</th>
-                </tr>
-              </thead>
-              <tbody className="text-neo-gray-200">
-                {[
-                  ['Global (all-time)', 'Every LexiClash player worldwide', 'Total points across your ranked games'],
-                  ['Daily Word Wheel and Daily Word Hunt', 'Everyone who plays that day’s puzzle', 'Your score on the same board everyone got'],
-                  ['Friends', 'The friends you have added', 'Who scored most on today’s puzzle'],
-                  ['Multiplayer room', 'The 2-20+ players in your room', 'Points per round; unique words score more'],
-                ].map(([board, who, rank]) => (
-                  <tr key={board} className="border-t border-neo-gray-400">
-                    <th scope="row" className="px-4 py-3 font-bold text-neo-cream">{board}</th>
-                    <td className="px-4 py-3">{who}</td>
-                    <td className="px-4 py-3">{rank}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-yellow transition-transform group-open:rotate-180">&#9660;</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200" data-speakable="true">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Word Games</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/blog/most-popular-word-games-2026`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Most Popular Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">The games everyone is playing — and why</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-lime">Best Online Word Games</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">9 honest picks, no download</p>
-            </Link>
-            <Link href={`/${locale}/free-multiplayer-word-game`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-pink/40">
-              <h3 className="font-bold text-neo-pink">Multiplayer Word Game Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Real-time, browser-based, free</p>
-            </Link>
-            <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-yellow/40">
-              <h3 className="font-bold text-neo-yellow">Vocabulary Games for the Classroom</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">ESL & classroom vocabulary practice mode</p>
-            </Link>
-            <Link href={`/${locale}/play-boggle-online-free`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-cyan/40">
-              <h3 className="font-bold text-neo-cyan">Boggle Online</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Free, 2 to 50 players on one board</p>
-            </Link>
-          </div>
-        </section>
-
-        <section>
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Climb the Leaderboard Now</h2>
-          <p className="mt-4 text-neo-gray-200">
+      <CtaBand
+        tone="pink"
+        title="Climb the Leaderboard Now"
+        body={
+          <>
             Stop searching for &quot;competitive word games with global leaderboards&quot; — you found the
             one that is free, real-time, and runs in your browser. Play a ranked match and see where you
             land worldwide.
-          </p>
-          <div className="mt-6">
-            <Link
-              href={`/${locale}/multiplayer`}
-              className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg"
-            >
-              Play a Ranked Match
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+          </>
+        }
+        actions={<LandingButton href={`/${locale}/multiplayer`}>Play a Ranked Match</LandingButton>}
+        art={LANDING_ART.duel('')}
+      />
+    </LandingPage>
   );
 }

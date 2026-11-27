@@ -1,5 +1,17 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import {
+  CtaBand,
+  FaqList,
+  LandingButton,
+  LandingHero,
+  LandingPage,
+  Mark,
+  Prose,
+  Section,
+  Steps,
+  TileGrid,
+  type LandingTone,
+} from '@/components/landing/kit';
 
 // Keyword landing for the LIVE Blast mode (its play route /blast is a
 // noindexed game shell). English body → EN canonical, same convention as
@@ -85,10 +97,10 @@ const faqs = [
 ];
 
 const tiles = [
-  { name: 'Fire', desc: 'Wipes the entire row it sits on.', accent: 'text-neo-orange' },
-  { name: 'Bomb', desc: 'Detonates a 3x3 zone around the tile.', accent: 'text-neo-pink' },
-  { name: 'Lightning', desc: 'Clears the full column in one strike.', accent: 'text-neo-cyan' },
-  { name: 'Ice', desc: 'Freezes neighbouring tiles in place.', accent: 'text-neo-lime' },
+  { name: 'Fire', desc: 'Wipes the entire row it sits on.', tone: 'orange' as LandingTone },
+  { name: 'Bomb', desc: 'Detonates a 3x3 zone around the tile.', tone: 'pink' as LandingTone },
+  { name: 'Lightning', desc: 'Clears the full column in one strike.', tone: 'cyan' as LandingTone },
+  { name: 'Ice', desc: 'Freezes neighbouring tiles in place.', tone: 'lime' as LandingTone },
 ];
 
 const steps = [
@@ -142,115 +154,64 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
   });
 
   return (
-    <main className="min-h-dvh bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/blast`, label: 'Play free' }}>
       <script id="ld-wb-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: faqJsonLd }} />
       <script id="ld-wb-howto" type="application/ld+json" dangerouslySetInnerHTML={{ __html: howToJsonLd }} />
       <script id="ld-wb-game" type="application/ld+json" dangerouslySetInnerHTML={{ __html: gameJsonLd }} />
 
-      {/* Sticker marquee */}
-      <div className="overflow-hidden border-y-2 border-black bg-neo-orange">
-        <div className="flex whitespace-nowrap py-2 font-neo-display text-sm font-black uppercase tracking-widest text-neo-navy">
-          {Array.from({ length: 2 }).map((_, i) => (
-            <span key={i} className="flex shrink-0">
-              {['No download', 'Play in 5s', 'Free to play', '5x combos', 'Chain reactions', 'Beat the waves'].map((s) => (
-                <span key={s} className="mx-4">★ {s}</span>
-              ))}
-            </span>
-          ))}
-        </div>
-      </div>
+      <LandingHero
+        title={
+          <>
+            <Mark tone="orange">Word Blast</Mark> — chain words, grow the combo, blast the board
+          </>
+        }
+        lead="A free fast-paced word game where every back-to-back word raises your score multiplier and special tiles set off chain reactions. Play instantly — no download, no signup."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/blast`}>Play free</LandingButton>
+            <LandingButton href={`/${locale}/guides/blast-strategy`} variant="secondary">
+              Read the strategy guide
+            </LandingButton>
+          </>
+        }
+        art={{ src: '/mascot/onfire-nobg.webp', alt: 'A LexiClash mascot in sunglasses surfing a wave of fire', width: 200, height: 200 }}
+        artTone="orange"
+      >
+        <p className="text-xs font-bold uppercase tracking-wide text-neo-white/70">★ No download · Play in 5s · Free to play · 5x combos · Chain reactions · Beat the waves</p>
+      </LandingHero>
 
-      {/* Hero */}
-      <section className="mx-auto max-w-4xl px-5 py-14 text-center sm:py-20">
-        <h1 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-6xl">
-          <span className="bg-neo-orange px-3 text-neo-navy shadow-hard">Word Blast</span>
-          <br className="hidden sm:block" />
-          <span className="text-neo-white"> — chain words, </span>
-          <span className="text-neo-cyan">grow the combo</span>
-          <span className="text-neo-white">, </span>
-          <span className="text-neo-pink">blast the board</span>
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl font-neo-body text-lg text-neo-white/90">
-          A free fast-paced word game where every back-to-back word raises your score
-          multiplier and special tiles set off chain reactions. Play instantly — no
-          download, no signup.
-        </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href={`/${locale}/blast`}
-            className="rounded-neo border-neo-thick border-black bg-neo-lime px-8 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-transform hover:-translate-x-1 hover:-translate-y-1"
-          >
-            Play free
-          </Link>
-          <Link
-            href={`/${locale}/guides/blast-strategy`}
-            className="rounded-neo border-neo-thick border-black bg-neo-pink px-8 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-x-1 hover:-translate-y-1"
-          >
-            Read the strategy guide
-          </Link>
-        </div>
-      </section>
+      <Section title="How Word Blast works">
+        <Prose>
+          <p>
+            Waves of letter tiles fill the board. You clear them by spelling words —
+            the longer the word, the bigger the base score. But the real points live in
+            the <strong>combo meter</strong>: every word submitted inside the shrinking
+            combo window raises your level, scaling the multiplier from 1x to 5x and
+            beyond. The window starts at 3 seconds and tightens toward 1 second at high
+            levels, so the top of the leaderboard belongs to players who keep the chain
+            alive with quick, short words while hunting the long ones.
+          </p>
+        </Prose>
+        <Steps items={steps.map((s) => ({ title: s.title, body: s.text }))} />
+      </Section>
 
-      {/* How it plays */}
-      <section className="mx-auto max-w-4xl px-5 pb-14">
-        <h2 className="font-neo-display text-2xl font-black uppercase sm:text-3xl">How Word Blast works</h2>
-        <p className="mt-4 max-w-3xl font-neo-body text-neo-white/90">
-          Waves of letter tiles fill the board. You clear them by spelling words —
-          the longer the word, the bigger the base score. But the real points live in
-          the <strong>combo meter</strong>: every word submitted inside the shrinking
-          combo window raises your level, scaling the multiplier from 1x to 5x and
-          beyond. The window starts at 3 seconds and tightens toward 1 second at high
-          levels, so the top of the leaderboard belongs to players who keep the chain
-          alive with quick, short words while hunting the long ones.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          {steps.map((s) => (
-            <div key={s.n} className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-5 shadow-hard">
-              <div className="font-neo-display text-3xl font-black text-neo-orange">{s.n}</div>
-              <h3 className="mt-2 font-neo-display text-lg font-black uppercase">{s.title}</h3>
-              <p className="mt-2 font-neo-body text-sm text-neo-white/85">{s.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Section
+        title="Effect tiles = chain reactions"
+        intro="Special tiles appear as the waves escalate. Use one inside a word and it detonates; use two in the same word and both trigger at once."
+      >
+        <TileGrid columns={4} items={tiles.map((t) => ({ title: t.name, body: t.desc, tone: t.tone }))} />
+      </Section>
 
-      {/* Effect tiles */}
-      <section className="mx-auto max-w-4xl px-5 pb-14">
-        <h2 className="font-neo-display text-2xl font-black uppercase sm:text-3xl">Effect tiles = chain reactions</h2>
-        <p className="mt-4 max-w-3xl font-neo-body text-neo-white/90">
-          Special tiles appear as the waves escalate. Use one inside a word and it
-          detonates; use two in the same word and both trigger at once.
-        </p>
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          {tiles.map((t) => (
-            <div key={t.name} className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-5 shadow-hard">
-              <h3 className={`font-neo-display text-lg font-black uppercase ${t.accent}`}>{t.name}</h3>
-              <p className="mt-2 font-neo-body text-sm text-neo-white/85">{t.desc}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Section title="Word Blast FAQ">
+        <FaqList items={faqs} />
+      </Section>
 
-      {/* FAQ */}
-      <section className="mx-auto max-w-4xl px-5 pb-16">
-        <h2 className="font-neo-display text-2xl font-black uppercase sm:text-3xl">Word Blast FAQ</h2>
-        <div className="mt-6 space-y-4">
-          {faqs.map((f) => (
-            <details key={f.q} className="rounded-neo border-neo-thick border-black bg-neo-navy-light p-5 shadow-hard">
-              <summary className="cursor-pointer font-neo-display font-black">{f.q}</summary>
-              <p className="mt-3 font-neo-body text-sm text-neo-white/85">{f.a}</p>
-            </details>
-          ))}
-        </div>
-        <div className="mt-10 text-center">
-          <Link
-            href={`/${locale}/blast`}
-            className="inline-block rounded-neo border-neo-thick border-black bg-neo-orange px-8 py-4 font-neo-display text-lg font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-transform hover:-translate-x-1 hover:-translate-y-1"
-          >
-            Start a run — it&apos;s free
-          </Link>
-        </div>
-      </section>
-    </main>
+      <CtaBand
+        tone="orange"
+        title="Beat the waves"
+        actions={<LandingButton href={`/${locale}/blast`}>Start a run — it&apos;s free</LandingButton>}
+        art={{ src: '/mascot/onfire-nobg.webp', alt: '', width: 200, height: 200 }}
+      />
+    </LandingPage>
   );
 }

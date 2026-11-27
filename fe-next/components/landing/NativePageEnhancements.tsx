@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { getMascotBgTypeForSrc } from '@/components/ui/mascotData';
+import { CtaBand, LandingButton, Section, TileGrid, type LandingTone } from '@/components/landing/kit';
 
 type SupportedLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -34,20 +34,6 @@ interface LocaleStrings {
   modes: ModeRow[];
   bestFor: BestForRow[];
 }
-
-const accentBorder: Record<ModeRow['accent'], string> = {
-  pink: 'border-neo-pink text-neo-pink',
-  cyan: 'border-neo-cyan text-neo-cyan',
-  lime: 'border-neo-lime text-neo-lime',
-  purple: 'border-neo-purple text-neo-purple',
-};
-
-const accentChip: Record<ModeRow['accent'], string> = {
-  pink: 'bg-neo-pink text-neo-white',
-  cyan: 'bg-neo-cyan text-neo-navy',
-  lime: 'bg-neo-lime text-neo-navy',
-  purple: 'bg-neo-purple text-neo-white',
-};
 
 const en: LocaleStrings = {
   modesHeading: '8 modes, not 1.',
@@ -92,7 +78,7 @@ const he: LocaleStrings = {
     { mode: 'ציד מילים יומי', tag: 'יומי', desc: 'מילון פוגש בוגל. מצאו מילה נסתרת בת 4-6 אותיות תוך 10 ניסיונות.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
     { mode: 'גלגל מילים יומי', tag: 'יומי', desc: 'גלגל אותיות אחד, כל העולם משחק. השתמשו באות המרכזית, טפסו בטבלה.', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
     { mode: 'הרפתקה', tag: 'סיפור', desc: 'מסע רוגלייק עם מילים. קרבות בוסים, יכולות, שלל. 5-8 חדרים בריצה.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
-    { mode: 'בלאסט', tag: "ג'וס", desc: 'קומבואים מפלים מהירים. אריחים נופלים, שרשראות מתפוצצות. המצב הארקייד.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
+    { mode: 'בלאסט', tag: 'ארקייד', desc: 'קומבואים מפלים מהירים. אריחים נופלים, שרשראות מתפוצצות. המצב הארקייד.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
     { mode: 'תרגילי מוח', tag: 'אימון', desc: 'אימוני אוצר מילים מהירים: אנאגרמות, הגדרות, ספרינטים של איות. סטים של 60 שניות.', href: 'brain', mascot: '/mascot/flexing.webp', accent: 'purple' },
     { mode: 'דו-קרבות אוצר מילים', tag: 'חינוך', desc: 'קרבות 1 על 1 בין תלמידים. לוח בקרה למורה + רשימות מילים מותאמות.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
     { mode: 'משחקי מסיבה', tag: 'מסיבה', desc: 'היברידי טלוויזיה+טלפון. וויל ראש, קונקשנס, משחקי קבוצה בסגנון קודנמס.', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
@@ -120,19 +106,19 @@ const sv: LocaleStrings = {
     { mode: 'Ordstrid i realtid', tag: 'KÄRNA', desc: 'Realtidsordkamp — 2-20+ spelare tävlar på samma rutnät i 2-3 minuter.', href: 'multiplayer', mascot: '/mascot/dj.webp', accent: 'pink' },
     { mode: 'Ordjakt', tag: 'DAGLIG', desc: 'Wordle möter Boggle. Hitta ett dolt 4-6 bokstäver långt målord på 10 försök.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
     { mode: 'Dagligt Ordhjul', tag: 'DAGLIG', desc: 'Ett bokstavshjul, hela världen spelar. Använd mittbokstaven, klättra på topplistan.', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
-    { mode: 'Äventyr', tag: 'STORY', desc: 'Roguelike-ordresa. Bossstrider, förmågor, byte. 5-8 rum per körning.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
-    { mode: 'Blast', tag: 'JUICE', desc: 'Snabba kaskadkombos. Brickor faller, kedjor exploderar. Den arkadiga.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
+    { mode: 'Äventyr', tag: 'BERÄTTELSE', desc: 'Roguelike-ordresa. Bossstrider, förmågor, byte. 5-8 rum per körning.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
+    { mode: 'Blast', tag: 'ARKAD', desc: 'Snabba kaskadkombos. Brickor faller, kedjor exploderar. Den arkadiga.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
     { mode: 'Hjärnträning', tag: 'TRÄNA', desc: 'Snabba ordförrådsövningar: anagram, definitioner, stavningssprint. 60-sekunders set.', href: 'brain', mascot: '/mascot/flexing.webp', accent: 'purple' },
-    { mode: 'Ordduell', tag: 'EDU', desc: '1v1 elev-mot-elev ordförrådsstrider. Lärardashboard + anpassade ordlistor.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
+    { mode: 'Ordduell', tag: 'SKOLA', desc: '1v1 elev-mot-elev ordförrådsstrider. Lärarpanel + anpassade ordlistor.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
     { mode: 'Festspel', tag: 'FEST', desc: 'TV + telefonhybrid. Wheel Rush, Connections, Codenames-stilade gruppspel.', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
   ],
   bestFor: [
     { tag: 'FESTER', title: 'Bäst för fester & grupper', desc: '20+ spelare i ett rum. Dela en QR, alla spelar samtidigt. Ingen app, ingen installation.', cta: 'Starta ett festrum', href: 'multiplayer', color: 'pink' },
-    { tag: 'KLASSRUM', title: 'Bäst för klassrum', desc: 'Ordduell, anpassade ordlistor, lärardashboard. Gratis, inga elevkonton behövs.', cta: 'Öppna utbildning', href: 'education', color: 'lime' },
+    { tag: 'KLASSRUM', title: 'Bäst för klassrum', desc: 'Ordduell, anpassade ordlistor, lärarpanel. Gratis, inga elevkonton behövs.', cta: 'Öppna utbildning', href: 'education', color: 'lime' },
     { tag: 'FAMILJ', title: 'Bäst för familjekvällen', desc: 'Telefon + surfplatta + TV. Samma spel överallt. Åldrar 6+, alla nivåer.', cta: 'Spela med familjen', href: 'multiplayer', color: 'cyan' },
-    { tag: 'ASYNK', title: 'Bäst som Words With Friends-ersättare', desc: 'Dagliga utmaningar håller streaken vid liv. Snabba 2-min sessioner istället för dagars väntan.', cta: 'Prova Dagligt', href: 'daily', color: 'lime' },
+    { tag: 'ASYNK', title: 'Bäst som Words With Friends-ersättare', desc: 'Dagliga utmaningar håller sviten vid liv. Snabba 2-min sessioner istället för dagars väntan.', cta: 'Prova Dagligt', href: 'daily', color: 'lime' },
     { tag: 'TEAM', title: 'Bäst för fjärrteambuilding', desc: 'Skicka en Slack-länk. 5-min isbrytare. Ingen nedladdning, inget IT-godkännande, ingen friktion.', cta: 'Starta ett rum', href: 'multiplayer', color: 'pink' },
-    { tag: 'SPRÅK', title: 'Bäst för språkinlärare', desc: '5 fullständiga ordböcker inklusive hebreiska (RTL) och japanska. Ordförrådsträning på målspråket.', cta: 'Välj ett språk', href: 'multiplayer', color: 'purple' },
+    { tag: 'SPRÅK', title: 'Bäst för språkinlärare', desc: '6 fullständiga ordböcker inklusive hebreiska (RTL) och japanska. Ordförrådsträning på målspråket.', cta: 'Välj ett språk', href: 'multiplayer', color: 'purple' },
   ],
 };
 
@@ -150,7 +136,7 @@ const ja: LocaleStrings = {
     { mode: 'ワードハント・サバイバル', tag: 'デイリー', desc: 'WordleとBoggleの融合。隠された4-6文字のターゲット語を10回で見つける。', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
     { mode: 'デイリー・ワードホイール', tag: 'デイリー', desc: '1つの文字ホイール、世界中がプレイ。中央の文字を使ってリーダーボードを登る。', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
     { mode: 'アドベンチャー', tag: 'ストーリー', desc: 'ローグライク単語クロウラー。ボス戦、アビリティ、戦利品。1ランあたり5-8部屋。', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
-    { mode: 'ブラスト', tag: 'ジュース', desc: '高速カスケードコンボ。タイルが落ち、連鎖が爆発。アーケード風モード。', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
+    { mode: 'ブラスト', tag: 'アーケード', desc: '高速カスケードコンボ。タイルが落ち、連鎖が爆発。アーケード風モード。', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
     { mode: 'ブレインドリル', tag: 'トレーニング', desc: '素早い語彙ワークアウト:アナグラム、定義、スペリングスプリント。60秒セット。', href: 'brain', mascot: '/mascot/flexing.webp', accent: 'purple' },
     { mode: '語彙デュエル', tag: '教育', desc: '生徒対生徒の1v1語彙バトル。教師ダッシュボード + カスタム単語リスト。', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
     { mode: 'パーティーゲーム', tag: 'パーティー', desc: 'TV + 電話ハイブリッド。Wheel Rush、Connections、Codenamesスタイルのグループゲーム。', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
@@ -161,7 +147,7 @@ const ja: LocaleStrings = {
     { tag: '家族', title: '家族のゲームナイトに最適', desc: '電話 + タブレット + TV。どこでも同じゲーム。6歳以上、全レベル対応。', cta: '家族で遊ぶ', href: 'multiplayer', color: 'cyan' },
     { tag: '非同期', title: 'Words With Friendsの代替に最適', desc: 'デイリーチャレンジでストリークを維持。何日も待つ代わりに2分の高速セッション。', cta: 'デイリーを試す', href: 'daily', color: 'lime' },
     { tag: 'チーム', title: 'リモートチームビルディングに最適', desc: 'Slackリンクを送信。5分のアイスブレイク。ダウンロード不要、IT承認不要、摩擦なし。', cta: 'ルームを起動', href: 'multiplayer', color: 'pink' },
-    { tag: '言語', title: '言語学習者に最適', desc: 'ヘブライ語(RTL)と日本語を含む5つの完全な辞書。ターゲット言語での語彙練習。', cta: '言語を選ぶ', href: 'multiplayer', color: 'purple' },
+    { tag: '言語', title: '言語学習者に最適', desc: 'ヘブライ語(RTL)と日本語を含む6つの完全な辞書。ターゲット言語での語彙練習。', cta: '言語を選ぶ', href: 'multiplayer', color: 'purple' },
   ],
 };
 
@@ -179,7 +165,7 @@ const es: LocaleStrings = {
     { mode: 'Caza de Palabras Diaria', tag: 'DIARIO', desc: 'Wordle se encuentra con Boggle. Encuentra una palabra objetivo oculta de 4-6 letras en 10 intentos.', href: 'daily/word-hunt', mascot: '/mascot/explorer.webp', accent: 'cyan' },
     { mode: 'Rueda de Palabras Diaria', tag: 'DIARIO', desc: 'Una rueda de letras, todo el mundo juega. Usa la letra central, sube en la clasificación global.', href: 'daily/word-wheel', mascot: '/mascot/scholar.webp', accent: 'lime' },
     { mode: 'Aventura', tag: 'HISTORIA', desc: 'Roguelike de palabras. Batallas de jefes, habilidades, botín. 5-8 salas por partida.', href: 'adventure', mascot: '/mascot/knight.webp', accent: 'purple' },
-    { mode: 'Blast', tag: 'JUICE', desc: 'Combos en cascada rápidos. Las fichas caen, las cadenas explotan. El modo arcade.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
+    { mode: 'Blast', tag: 'ARCADE', desc: 'Combos en cascada rápidos. Las fichas caen, las cadenas explotan. El modo arcade.', href: 'singleplayer', mascot: '/mascot/bomber.webp', accent: 'pink' },
     { mode: 'Ejercicios Mentales', tag: 'ENTRENA', desc: 'Entrenamientos de vocabulario rápidos: anagramas, definiciones, sprints de ortografía. Sets de 60 seg.', href: 'brain', mascot: '/mascot/flexing.webp', accent: 'purple' },
     { mode: 'Duelos de Vocabulario', tag: 'EDU', desc: 'Batallas de vocabulario 1v1 entre estudiantes. Panel del profesor + listas personalizadas.', href: 'education', mascot: '/mascot/encouraging.webp', accent: 'lime' },
     { mode: 'Juegos de Fiesta', tag: 'FIESTA', desc: 'Híbrido TV + teléfono. Wheel Rush, Connections, juegos grupales estilo Codenames.', href: 'multiplayer', mascot: '/mascot/celebration.webp', accent: 'cyan' },
@@ -196,6 +182,8 @@ const es: LocaleStrings = {
 
 const localeContent: Record<SupportedLocale, LocaleStrings> = { en, he, sv, ja, es };
 
+const TONE: Record<ModeRow['accent'], LandingTone> = { pink: 'pink', cyan: 'cyan', lime: 'lime', purple: 'purple' };
+
 interface Props {
   locale: string;
 }
@@ -206,72 +194,62 @@ export default function NativePageEnhancements({ locale }: Props) {
   const isRtl = lang === 'he';
 
   return (
-    <div dir={isRtl ? 'rtl' : 'ltr'} className="my-16 space-y-16">
-      {/* 8 GAME MODES */}
-      <section>
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
-            {c.modesHeading}
-          </h2>
-        </div>
-        <p className="mb-8 max-w-2xl text-neo-gray-200">{c.modesSubhead}</p>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {c.modes.map((m, i) => (
-            <Link
-              key={m.mode}
-              href={`/${locale}/${m.href}`}
-              className={`group relative flex flex-col gap-3 rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl ${accentBorder[m.accent]}`}
-              style={{ transform: `rotate(${(i % 3) - 1}deg)` }}
-            >
-              <span className={`absolute -right-2 -top-3 inline-block rotate-[6deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[m.accent]}`}>
-                {m.tag}
+    <div dir={isRtl ? 'rtl' : 'ltr'} className="flex flex-col gap-14 sm:gap-20">
+      <Section title={c.modesHeading} intro={c.modesSubhead}>
+        <TileGrid
+          columns={4}
+          items={c.modes.map((m) => ({
+            href: `/${locale}/${m.href}`,
+            tone: TONE[m.accent],
+            title: m.mode,
+            body: m.desc,
+            icon: (
+              <span className="mb-1 flex items-center justify-between gap-2">
+                <span data-mascot-bg={getMascotBgTypeForSrc(m.mascot)} className="relative h-14 w-14">
+                  <Image src={m.mascot} alt="" fill sizes="56px" className="object-contain" />
+                </span>
+                <span className="rounded-full border-2 border-neo-black bg-neo-cream px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
+                  {m.tag}
+                </span>
               </span>
-              <div data-mascot-bg={getMascotBgTypeForSrc(m.mascot)} className="relative h-16 w-16">
-                <Image src={m.mascot} alt="" fill sizes="64px" className="object-contain" />
-              </div>
-              <h3 className="font-neo-display text-lg font-black leading-tight">{m.mode}</h3>
-              <p className="text-xs text-neo-gray-200">{m.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+            ),
+          }))}
+        />
+      </Section>
 
-      {/* BEST FOR BUCKETS */}
-      <section>
-        <h2 className="mb-2 font-neo-display text-3xl font-black uppercase sm:text-4xl">{c.bestForHeading}</h2>
-        <p className="mb-8 max-w-2xl text-neo-gray-200">{c.bestForSubhead}</p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {c.bestFor.map((b, i) => (
-            <div
-              key={b.title}
-              className={`relative rounded-neo border-4 border-neo-black bg-neo-navy-light p-5 shadow-hard-lg ${accentBorder[b.color]}`}
-              style={{ transform: i % 2 === 0 ? 'rotate(-0.5deg)' : 'rotate(0.5deg)' }}
-            >
-              <span className={`absolute -top-3 left-4 rotate-[-3deg] rounded border-3 border-neo-black px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest shadow-hard ${accentChip[b.color]}`}>{b.tag}</span>
-              <h3 className="mt-3 font-neo-display text-lg font-black leading-tight">{b.title}</h3>
-              <p className="mt-2 text-sm text-neo-gray-200">{b.desc}</p>
-              <Link href={`/${locale}/${b.href}`} className="mt-4 inline-flex items-center gap-1 font-neo-display text-xs font-black uppercase tracking-widest">
-                {b.cta} {isRtl ? '←' : '→'}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Section title={c.bestForHeading} intro={c.bestForSubhead}>
+        <TileGrid
+          variant="paper"
+          items={c.bestFor.map((b) => ({
+            href: `/${locale}/${b.href}`,
+            tone: TONE[b.color],
+            icon: <span className="text-xs font-bold uppercase tracking-wide text-neo-black/60">{b.tag}</span>,
+            title: b.title,
+            body: (
+              <>
+                {b.desc}
+                <span className="mt-3 block font-neo-display font-bold">
+                  {b.cta} {isRtl ? '←' : '→'}
+                </span>
+              </>
+            ),
+          }))}
+        />
+      </Section>
 
-      {/* CTA STRIP */}
-      <section className="relative overflow-hidden rounded-neo border-4 border-neo-black bg-neo-yellow p-6 text-neo-navy shadow-hard-xl sm:p-10">
-        <div className="absolute inset-0 texture-halftone-comic opacity-30" aria-hidden="true" />
-        <div className="relative grid items-center gap-6 lg:grid-cols-[1fr_auto]">
-          <div>
-            <h2 className="font-neo-display text-3xl font-black leading-[0.95] sm:text-4xl">{c.ctaHeading}</h2>
-            <p className="mt-3 max-w-xl text-base font-bold sm:text-lg">{c.ctaBody}</p>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">▶ {c.ctaPrimary}</Link>
-              <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-6 py-3 text-center font-neo-display font-black uppercase tracking-wider text-neo-lime shadow-hard transition hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">★ {c.ctaSecondary}</Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <CtaBand
+        tone="yellow"
+        title={c.ctaHeading}
+        body={c.ctaBody}
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>{c.ctaPrimary}</LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">
+              {c.ctaSecondary}
+            </LandingButton>
+          </>
+        }
+      />
     </div>
   );
 }
