@@ -201,7 +201,7 @@ export default function AdminPageClient() {
               <DrillSection id="overview-modes" title={t('admin.overview.section.modes', 'Game modes')} summary={t('admin.overview.section.modesHint', 'What people choose to play')} open={isOpen('overview-modes')} onOpenChange={setSection('overview-modes')}>
                 <ModeMixPanel />
               </DrillSection>
-              <DrillSection id="overview-signups" title={t('admin.overview.section.signups', 'Signups')} summary={stats ? t('admin.overview.section.signupsHint', '{today} today, {week} this week', { today: stats.activity.signupsToday, week: stats.activity.signupsWeek }) : undefined} open={isOpen('overview-signups')} onOpenChange={setSection('overview-signups')}>
+              <DrillSection id="overview-signups" title={t('admin.overview.section.signups', 'Signups')} summary={stats ? t('admin.overview.section.signupsHint', '{today} today, {week} in the last 7 days', { today: stats.activity.signupsToday, week: stats.activity.signupsWeek }) : undefined} open={isOpen('overview-signups')} onOpenChange={setSection('overview-signups')}>
                 <SignupGrowthChart authToken={authToken} />
               </DrillSection>
               <DrillSection id="overview-app" title={t('admin.overview.section.app', 'Mobile app')} summary={t('admin.overview.section.appHint', 'New and active app users, store visits')} open={isOpen('overview-app')} onOpenChange={setSection('overview-app')}>

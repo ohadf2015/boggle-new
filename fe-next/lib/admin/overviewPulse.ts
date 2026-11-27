@@ -19,7 +19,7 @@ export interface DailyPoint {
   guestGames: number;
   totalGames: number;
   totalUniquePlayers: number;
-  /** New registered users that day (test accounts excluded). */
+  /** New registered, non-anonymous users that day (test accounts excluded). */
   signups?: number;
 }
 

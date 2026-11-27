@@ -42,11 +42,11 @@ export function SignupsHero({ total, today, week }: Props) {
               +{fmt(today)} {t('admin.signupsHero.today', 'today')}
             </span>
             <span className="rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-1 text-sm font-black text-neo-black shadow-hard-sm">
-              +{fmt(week)} {t('admin.signupsHero.week', 'this week')}
+              +{fmt(week)} {t('admin.signupsHero.week', 'last 7 days')}
             </span>
             {m.crossedThisWeek && (
               <span data-testid="signups-milestone" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-1 text-sm font-black text-neo-black shadow-hard-sm">
-                🎉 {t('admin.signupsHero.milestone', 'Passed {n} this week!', { n: fmt(m.prev) })}
+                🎉 {t('admin.signupsHero.milestone', 'Passed {n} in the last 7 days!', { n: fmt(m.prev) })}
               </span>
             )}
           </div>
