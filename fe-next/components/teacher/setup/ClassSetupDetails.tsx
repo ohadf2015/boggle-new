@@ -43,6 +43,10 @@ export interface ClassSetupDetailsProps {
 }
 
 const FIELD_LABEL = SETUP_FIELD_LABEL;
+// The name field and the fold sit on white cards, so the field itself is white with a black edge too.
+const NAME_INPUT = 'border-edu-line bg-edu-surface text-edu-ink shadow-edu-lip-sm placeholder:text-edu-ink/45';
+const FOLD = 'rounded-neo-xl border-solid bg-edu-surface p-4 text-base font-black text-edu-ink shadow-edu-lip sm:p-5';
+const STICKER_BIG = 'px-3 py-1 text-sm shadow-edu-lip-sm';
 
 /** One name field and one Create button; language, grade and the first word list wait behind one fold that names them. */
 export function ClassSetupDetails(props: ClassSetupDetailsProps) {
@@ -69,12 +73,12 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
     >
       <div className="flex flex-col gap-5 py-2 sm:gap-6">
         <div className="flex items-center gap-3">
-          <EduMascot moment="success" size={96} className="size-14 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-20" />
-          <h1 data-wipe className="font-neo-display text-4xl font-black leading-none text-edu-ink sm:text-5xl">{t('eduShell.setup.title')}</h1>
+          <EduMascot moment="success" size={112} className="size-16 shrink-0 drop-shadow-[3px_3px_0_rgb(var(--neo-black))] sm:size-24" />
+          <h1 data-wipe className="font-neo-display text-5xl font-black leading-none text-edu-ink sm:text-6xl">{t('eduShell.setup.title')}</h1>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="setup-name" className={cn(FIELD_LABEL, 'text-base')}>
+        <div data-testid="setup-name-card" className="edu-card flex flex-col gap-2 p-4 sm:p-5">
+          <label htmlFor="setup-name" className={cn(FIELD_LABEL, 'text-lg')}>
             {t('eduShell.setup.nameLabel')}
           </label>
           <input
@@ -85,7 +89,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             autoComplete="off"
             onChange={(e) => onNameChange(e.target.value)}
             placeholder={placeholder}
-            className={cn(NB_INPUT, 'min-h-16 text-xl')}
+            className={cn(NB_INPUT, NAME_INPUT, 'min-h-16 text-xl')}
           />
         </div>
 
@@ -99,17 +103,17 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
             aria-controls="setup-advanced"
             disabled={ownIncomplete}
             onClick={() => setAdvancedOpen((open) => !open)}
-            className={cn(NB_ADVANCED, 'min-h-[56px] py-2.5')}
+            className={cn(NB_ADVANCED, FOLD)}
           >
             <span className="flex min-w-0 flex-col">
               <span>{t(foldOpen ? 'eduShell.setup.advancedClose' : 'eduShell.setup.advancedOpen')}</span>
-              <span data-testid="setup-advanced-summary" className="mt-1.5 flex min-w-0 flex-wrap gap-1.5">
-                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream)}>{languageFlag(language)} {nativeLanguageName(language)}</span>
-                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cyan, 'min-w-0 truncate')}>{listLabel}</span>
-                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream)}>{grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}</span>
+              <span data-testid="setup-advanced-summary" className="mt-2.5 flex min-w-0 flex-wrap gap-2">
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream, STICKER_BIG)}>{languageFlag(language)} {nativeLanguageName(language)}</span>
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cyan, STICKER_BIG, 'min-w-0 truncate')}>{listLabel}</span>
+                <span data-sticker className={cn(NB_STICKER, NB_BLOCK.cream, STICKER_BIG)}>{grade ? t(`eduShell.setup.grade.${grade}`) : t('eduShell.setup.anyGrade')}</span>
               </span>
             </span>
-            <ChevronDown className={cn('size-5 shrink-0 transition-transform motion-reduce:transition-none', foldOpen && 'rotate-180')} aria-hidden="true" />
+            <ChevronDown className={cn('size-6 shrink-0 transition-transform motion-reduce:transition-none', foldOpen && 'rotate-180')} aria-hidden="true" />
           </button>
 
           {foldOpen ? (
@@ -176,7 +180,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           data-hero="true"
           disabled={busy !== null}
           aria-busy={busy === 'live' || undefined}
-          className={cn(NB_PRIMARY_FACE, 'min-h-[72px] w-full text-3xl', busy === 'done' && 'disabled:opacity-100')}
+          className={cn(NB_PRIMARY_FACE, 'min-h-[80px] w-full text-3xl sm:min-h-[88px] sm:text-4xl', busy === 'done' && 'disabled:opacity-100')}
         >
           {busy === 'live' ? <Loader2 className="size-7 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : null}
           {busy === 'done' ? <Check className="size-7" strokeWidth={3} aria-hidden="true" /> : null}
@@ -206,7 +210,7 @@ export function ClassSetupDetails(props: ClassSetupDetailsProps) {
           {t('eduShell.setup.skip')}
         </Link>
         {cap ? (
-          <p data-testid="setup-cap-meter" className="font-neo-body text-xs font-bold text-edu-ink/75">
+          <p data-testid="setup-cap-meter" className="font-neo-body text-sm font-bold text-edu-ink/80">
             {t('eduShell.setup.capMeter', { count: cap.count, limit: cap.limit })}
           </p>
         ) : null}

@@ -119,7 +119,7 @@ export function ClassSetupCreate() {
   );
 
   return (
-    <div className="mx-auto w-full max-w-2xl px-3 py-3 sm:px-4 sm:py-6 lg:py-10">
+    <div className="mx-auto w-full max-w-4xl px-3 py-3 sm:px-4 sm:py-6 lg:py-8">
       <ClassSetupDetails
         name={name}
         onNameChange={setName}

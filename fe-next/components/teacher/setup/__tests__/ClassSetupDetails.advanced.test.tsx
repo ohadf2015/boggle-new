@@ -75,6 +75,20 @@ describe('ClassSetupDetails first frame', () => {
     expect(screen.getByTestId('setup-code-preview')).not.toHaveTextContent('eduShell.setup.gradeName.g35');
   });
 
+  it('Then the name, the code preview and the fold are white outlined cards with a black lip, and the fold is never dashed', () => {
+    renderDetails();
+    const field = screen.getByTestId('setup-name-card');
+    expect(field.className).toContain('edu-card');
+    expect(field).toContainElement(screen.getByLabelText('eduShell.setup.nameLabel'));
+    const preview = screen.getByTestId('setup-code-preview');
+    expect(preview.className).toContain('edu-card');
+    expect(preview.className).not.toMatch(/bg-neo-cream|shadow-hard-lime/);
+    const fold = screen.getByTestId('setup-advanced-toggle');
+    expect(fold.className).not.toContain('border-dashed');
+    expect(fold.className).toContain('bg-edu-surface');
+    expect(fold.className).toContain('shadow-edu-lip');
+  });
+
   it('Given a name typed, Then the tiles turn solid so the card answers the typing', () => {
     const { rerender } = renderDetails();
     expect(screen.getAllByTestId('setup-code-placeholder')[0].className).toContain('border-dashed');
