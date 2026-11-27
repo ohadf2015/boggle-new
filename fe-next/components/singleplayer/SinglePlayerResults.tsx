@@ -199,6 +199,10 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   });
 
   const validWordCount = results.playerWordData?.filter(w => w.isValid).length || 0;
+  const topWords = useMemo(() => (results.playerWordData ?? [])
+    .filter((w) => w.isValid)
+    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || b.word.length - a.word.length)
+    .map((w) => w.word), [results.playerWordData]);
 
   const bannerConfig = useBannerConfig({
     playerScore: results.playerScore, validWordCount, mode,
@@ -290,6 +294,7 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
         rank={playerRank}
         totalPlayers={mode === 'solo-bots' ? allParticipants.length : 1}
         isNewHighScore={!!results.isNewHighScore}
+        topWords={topWords}
       />
       <RecordBadges
         scoreIsRecord={!!recordFlags?.scoreIsRecord}

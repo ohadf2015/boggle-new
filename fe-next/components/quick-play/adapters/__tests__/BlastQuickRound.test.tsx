@@ -43,6 +43,12 @@ describe('BlastQuickRound', () => {
     expect(lastBlastGameProps.current.config.boardClearMode).toBe('shrink');
   });
 
+  it('asks the Blast HUD to carry its own mute: quick-play has no round shell to host one', async () => {
+    render(<BlastQuickRound config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
+    await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());
+    expect(lastBlastGameProps.current.ownMute).toBe(true);
+  });
+
   it('passes totalTime so the MP HUD countdown is visible', async () => {
     render(<BlastQuickRound config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
     await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());

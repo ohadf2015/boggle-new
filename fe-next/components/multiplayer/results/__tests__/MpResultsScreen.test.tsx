@@ -38,7 +38,7 @@ vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 vi.mock('@/components/auth/InlineSignupCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({
@@ -389,7 +389,8 @@ describe('MpResultsScreen', () => {
       renderScreen({ finalScores: TIED.map((p) => ({ ...p, score: 0 })), username: 'T' });
       expect(screen.queryByTestId('mp-standing-crown')).toBeNull();
       expect(screen.getByTestId('mp-my-card').getAttribute('data-winner')).toBe('false');
-      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.tiedWithMore:{"name":"Host","more":2}');
+      expect(screen.getByTestId('mp-my-card').textContent).toContain('mpUi.results.headAllZero');
+      expect(screen.queryByTestId('mp-my-rank')).toBeNull();
     });
   });
   describe('final screen of a series (r4 capture: round 5 all on 0, host 94 over the series)', () => {

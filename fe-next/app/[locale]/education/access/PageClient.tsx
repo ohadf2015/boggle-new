@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Gift, ShieldCheck } from 'lucide-react';
+import { Gift, KeyRound, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRedirectNotice } from '@/components/education/AccessRedirectNotice';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
@@ -18,11 +18,14 @@ import { accessReturnPath } from '@/lib/education/accessReturnPath';
 import { LandingHeader } from '@/components/education/landing/LandingHeader';
 import { EducationShell } from '@/components/education/shell/EducationShell';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { MascotRig } from '@/components/motion/MascotRig';
+import { AmbientBackdrop } from '@/components/motion/AmbientBackdrop';
 import { accessHandoffHref, type AccessApproval } from '@/components/education/AccessRequestHandoff';
 
 const TRUST = [
   { key: 'education.access.trust_free', Icon: Gift, chip: 'bg-neo-cyan' },
   { key: 'education.access.trust_nologins', Icon: ShieldCheck, chip: 'bg-neo-pink' },
+  { key: 'teacher.classroom.wizard.subtitle', Icon: KeyRound, chip: 'bg-neo-lime' },
 ] as const;
 
 const STEPS = [
@@ -88,8 +91,7 @@ export function PageClient() {
   const approved = !handingOff && !failed && !isLoading && hasAccess;
   const settledWithoutRole = !handingOff && !failed && !isLoading && !hasAccess;
 
-  // Steps + escape hatch reveal on scroll. The hero itself is NOT animated:
-  // an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
+  // The hero itself is NOT faded in: an opacity-0 start on the h1 flashes on mobile Chromium above the fold.
   const belowRef = useGsapReveal<HTMLDivElement>({
     selector: '[data-access-reveal]',
     y: 20,
@@ -144,11 +146,7 @@ export function PageClient() {
         </div>
       )}
 
-      {!isLoading && showPitch && (
-        <div className="rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light p-4 shadow-hard-lg sm:p-7">
-          <AccessRequestGate onApproved={setApproval} />
-        </div>
-      )}
+      {!isLoading && showPitch && <AccessRequestGate onApproved={setApproval} />}
 
       {!isLoading &&
         status !== 'pending' &&
@@ -187,78 +185,60 @@ export function PageClient() {
   return (
     <EducationShell header={<LandingHeader showStart={false} />}>
       <main className="text-neo-white">
-        <section
-          className={`mx-auto px-4 py-5 sm:py-14 ${showPitch ? 'max-w-6xl' : 'max-w-2xl'}`}
-        >
-          <div
-            className={
-              showPitch
-                ? 'grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14'
-                : ''
-            }
-          >
-            <div>
-              <h1 className="text-balance font-neo-poster text-[clamp(1.75rem,5vw,2.9rem)] font-extrabold leading-[1.08] tracking-[-0.015em] [overflow-wrap:anywhere]">
-                {t('education.access.h1')}
-              </h1>
-              <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85 max-sm:hidden">
-                {t('teacher.classroom.wizard.subtitle')}
-              </p>
+        <section className={`mx-auto px-4 py-5 sm:py-12 ${showPitch ? 'max-w-md pt-[4svh] sm:pt-[8svh]' : 'max-w-2xl'}`}>
+          {/* Only for someone who still has to apply — an approved teacher who
+              happens to carry a `from` needs their status, not this. */}
+          {showPitch && !handingOff && <AccessRedirectNotice from={redirectedFrom} />}
 
-              {/* The action (sign up, or sign in in one tap) sits right under the lede — on a phone the trust list used to push it below the fold. */}
-              <div className="mt-3 sm:mt-6">{statusCard}</div>
-
-              {/* Only for someone who still has to apply — an approved teacher who
-                  happens to carry a `from` needs their status, not this. */}
-              {showPitch && !handingOff && (
-                <div className="mt-6 max-w-[62ch]">
-                  <AccessRedirectNotice from={redirectedFrom} />
-                </div>
-              )}
-
-              {showPitch && (
-                <ul className="mt-6 flex flex-col gap-3">
-                  {TRUST.map(({ key, Icon, chip }) => (
-                    <li key={key} className="flex items-center gap-3">
-                      <span
-                        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-neo border-neo border-neo-black ${chip} text-neo-navy shadow-hard-sm`}
-                      >
-                        <Icon className="h-[18px] w-[18px]" strokeWidth={2.5} aria-hidden="true" />
-                      </span>
-                      <span className="font-semibold text-neo-white">
-                        {t(key)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-
-            </div>
-
-            {/* Support art, not the message: on a phone the CTA comes first and the
-                illustration follows it. On lg it sits beside the pitch. No
-                `priority` — on phones (the primary device) it is below the CTA, so
-                a high-priority preload would compete with the h1 for LCP. */}
-            {showPitch && (
-              <div className="mx-auto w-full max-w-sm lg:mt-2 lg:max-w-none">
+          {/* No `priority`: the h1 is the LCP; the mascot is a fixed box, so it never shifts it. */}
+          {showPitch && (
+            <div aria-hidden="true" className="relative isolate flex justify-center overflow-hidden rounded-3xl border-2 border-neo-cyan/70 bg-neo-cyan/10 py-3">
+              <AmbientBackdrop theme="teacher" density="lively" hill={false} />
+              <MascotRig state="hop">
                 <Image
-                  src="/images/education-access-hero.webp"
-                  alt={t('education.access.hero_alt')}
-                  width={918}
-                  height={880}
-                  sizes="(min-width: 1024px) 34rem, (min-width: 640px) 24rem, 100vw"
-                  className="w-full rounded-neo-xl border-neo-thick border-neo-black shadow-hard-lg"
+                  src="/mascot/teacher/teacher-hero.webp"
+                  alt=""
+                  width={1024}
+                  height={1024}
+                  sizes="176px"
+                  data-testid="access-mascot"
+                  className="h-[136px] w-[136px] drop-shadow-[0_4px_0_black] sm:h-[176px] sm:w-[176px]"
                 />
-              </div>
-            )}
-          </div>
+              </MascotRig>
+            </div>
+          )}
 
-          {/* Full section width so the ribbon's left edge lines up with the h1 —
-              a narrower centred block reads as misaligned against the hero. */}
-          <div ref={belowRef} className="mt-16">
+          <h1
+            className={`text-balance font-neo-poster text-[clamp(1.75rem,5vw,2.9rem)] font-extrabold leading-[1.08] tracking-[-0.015em] [overflow-wrap:anywhere] ${showPitch ? 'mt-4 text-center sm:text-[2.5rem]' : ''}`}
+          >
+            {t('education.access.h1')}
+          </h1>
+          {!showPitch && (
+            <p className="mt-4 max-w-[62ch] text-lg leading-relaxed text-neo-white/85 max-sm:hidden">{t('teacher.classroom.wizard.subtitle')}</p>
+          )}
+
+          <div className="mt-5 sm:mt-7">{statusCard}</div>
+        </section>
+
+        <section className={`mx-auto px-4 pb-14 ${showPitch ? 'max-w-md' : 'max-w-2xl'}`}>
+          {showPitch && (
+            <ul className="flex flex-col gap-4">
+              {TRUST.map(({ key, Icon, chip }) => (
+                <li key={key} className="flex items-center gap-3">
+                  <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-2 border-neo-black ${chip} text-neo-navy shadow-[0_3px_0_0] shadow-neo-black`}>
+                    <Icon className="h-5 w-5" strokeWidth={2.5} aria-hidden="true" />
+                  </span>
+                  <span className="font-semibold text-neo-white">{t(key)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Steps + escape hatch reveal on scroll. */}
+          <div ref={belowRef} className="mt-12">
             <ol
               data-access-reveal
-              className="grid divide-y-2 divide-neo-cream/30 overflow-hidden rounded-neo border-neo-thick border-neo-cream/40 bg-neo-navy-light sm:grid-cols-2 sm:divide-x-2 sm:rtl:divide-x-reverse sm:divide-y-0"
+              className="grid divide-y-2 divide-neo-cream/15 overflow-hidden rounded-3xl border-2 border-neo-cream/50 bg-neo-navy-light/60"
             >
               {STEPS.map(({ title, body }, i) => (
                 <li key={title} className="p-5">

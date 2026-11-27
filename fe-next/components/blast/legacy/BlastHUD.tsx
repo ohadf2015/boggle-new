@@ -127,6 +127,8 @@ interface BlastHUDProps {
    *  The shell's left-rail badge already renders the (server-synced) countdown,
    *  so the HUD must NOT render its own — two timers drifted apart otherwise. */
   isDesktopCanvas?: boolean;
+  /** Solo round on the MP engine (quick-play): no round shell hosts a mute, so the HUD carries one. */
+  ownMute?: boolean;
   /** In-run coins balance (SP only) */
   coins?: number;
   /** SP run context — ribbon, run diamonds, target to beat. */
@@ -166,6 +168,7 @@ export function BlastHUD({
   remainingTime = null,
   totalTime,
   isDesktopCanvas = false,
+  ownMute: ownMuteProp,
   coins = 0,
   progress,
   waveDiamonds = 0,
@@ -173,7 +176,7 @@ export function BlastHUD({
   modifierSlot,
   t,
 }: BlastHUDProps) {
-  const ownMute = !isMultiplayer && !isDesktopCanvas;
+  const ownMute = (ownMuteProp ?? !isMultiplayer) && !isDesktopCanvas;
   useRegisterHeaderAudioControl(ownMute);
   const showTimer =
     !isDesktopCanvas &&

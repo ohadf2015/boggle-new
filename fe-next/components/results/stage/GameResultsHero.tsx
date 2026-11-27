@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, type ReactNode } from 'react';
 import useReducedMotion from '@/hooks/useReducedMotion';
-import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { ResultsAvatarStage, type ResultsAvatar } from './ResultsAvatarStage';
+import { useHeroCheer } from '@/lib/quickPlay/useHeroCheer';
 import { ResultsStatCards, TONE_BAND, type ResultsStatItem, type ResultsTone } from './ResultsStatCards';
 
 export interface ResultsBadge {
@@ -56,7 +56,7 @@ export function GameResultsHero({
 
   return (
     <section
-      className={`relative mx-auto flex w-full max-w-xl flex-col items-center gap-3 lg:max-w-3xl lg:gap-4 ${className}`}
+      className={`relative mx-auto flex min-h-[calc(100dvh-14rem)] w-full max-w-xl flex-col items-center justify-center gap-3 lg:max-w-3xl lg:gap-4 ${className}`}
       data-testid="game-results-hero"
     >
       <ResultsAvatarStage

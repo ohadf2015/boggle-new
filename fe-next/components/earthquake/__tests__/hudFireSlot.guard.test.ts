@@ -14,7 +14,7 @@ const GAME_HUDS = [
 
 describe('every in-game HUD hosts the fire-round chip', () => {
   it.each(GAME_HUDS)('%s renders a HUD_FIRE_SLOT', (file) => {
-    expect(read(file)).toMatch(/\[HUD_FIRE_SLOT\]/);
+    expect(read(file)).toMatch(/\[HUD_FIRE_SLOT\]|<GameHud\b|<GameTimerBar\b/);
   });
 
   it('the overlays still mount the chip for every HUD that hosts the slot', () => {

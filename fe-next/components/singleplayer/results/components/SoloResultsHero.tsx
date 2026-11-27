@@ -17,6 +17,8 @@ interface SoloResultsHeroProps {
   rank: number;
   totalPlayers: number;
   isNewHighScore: boolean;
+  /** Valid words, best first: the best-word tile and the top-three chip row. */
+  topWords?: string[];
 }
 
 export function SoloResultsHero({
@@ -28,6 +30,7 @@ export function SoloResultsHero({
   rank,
   totalPlayers,
   isNewHighScore,
+  topWords = [],
 }: SoloResultsHeroProps) {
   const { t } = useLanguage();
   const badges: ResultsBadge[] = [];
@@ -39,6 +42,7 @@ export function SoloResultsHero({
   const stats: ResultsStatItem[] = [
     { key: 'score', label: t('quickPlay.solo.statScore', 'Score'), value: score, tone: 'yellow', icon: <Zap className="h-5 w-5 fill-current" strokeWidth={2.5} /> },
     { key: 'words', label: t('results.words'), value: words, tone: 'cyan', icon: <BookOpen className="h-5 w-5" strokeWidth={2.75} /> },
+    { key: 'best', label: t('mpUi.results.bestWord'), value: 0, tone: 'lime', display: topWords[0] ?? t('mpUi.results.bestWordNone') },
   ];
 
   return (
@@ -52,6 +56,22 @@ export function SoloResultsHero({
       badges={badges}
       stats={stats}
       focusHeading
-    />
+    >
+      {topWords.length > 1 && (
+        <ul className="flex flex-wrap justify-center gap-2" aria-label={t('mpUi.results.bestWord')}>
+          {topWords.slice(0, 3).map((w, i) => (
+            <li
+              key={w}
+              data-testid="results-top-word"
+              dir="auto"
+              style={{ animationDelay: `${1.4 + i * 0.12}s` }}
+              className="animate-neo-pop rounded-full border-2 border-neo-black bg-neo-lime px-3 py-1 font-neo-display text-sm font-bold uppercase text-neo-black shadow-hard-sm motion-reduce:animate-none"
+            >
+              {w}
+            </li>
+          ))}
+        </ul>
+      )}
+    </GameResultsHero>
   );
 }

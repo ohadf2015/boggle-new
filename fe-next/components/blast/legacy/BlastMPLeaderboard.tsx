@@ -98,7 +98,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
     console.info('[lbdebug][render] BlastMPLeaderboard prop:', (leaderboard || []).map(e => `${e.username}=${e.score}`).join(', ') || '(empty)');
   }
 
-  const rows = selectBlastLeaderboardStrip(leaderboard, username, 4);
+  const rows = selectBlastLeaderboardStrip(leaderboard, username, 3);
   if (rows.length === 0) return null;
 
   // Competitive gap to the nearest rival, shown ONLY on the player's own pill so
@@ -110,7 +110,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
   return (
     <div className="relative shrink-0 px-2 pt-1.5 pb-1" data-testid="blast-mp-leaderboard">
       {/* Compact horizontal pill row, framed by a pulsing LIVE chip */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 overflow-hidden">
         <span
           className="flex items-center gap-1 shrink-0 ps-0.5 pe-1 text-[10px] font-black uppercase tracking-wider text-neo-pink"
           aria-hidden="true"
@@ -143,7 +143,8 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
               }
               transition={{ duration: 0.9, ease: 'easeOut' }}
               className={cn(
-                'flex items-center gap-1.5 rounded-neo text-xs font-bold tabular-nums shrink-0',
+                'flex items-center gap-1.5 rounded-neo text-xs font-bold tabular-nums',
+                isMe ? 'shrink-0' : 'min-w-[5.5rem] flex-1',
                 isMe
                   // YOU pill is deliberately the heaviest object in the strip —
                   // thicker border, a deeper hard shadow and more padding lift it
@@ -168,7 +169,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
                 )}
               </span>
               {/* Name — own row reads "YOU" so the player spots themself instantly */}
-              <span className={cn('truncate max-w-[72px]', isMe && 'font-black uppercase tracking-wide')}>
+              <span className={cn('min-w-0 truncate', isMe ? 'font-black uppercase tracking-wide max-sm:sr-only' : 'flex-1')}>
                 {isMe ? label('blast.you', 'YOU') : entry.username}
               </span>
               {/* Live score — pops + flashes the instant it climbs */}
@@ -182,7 +183,7 @@ export const BlastMPLeaderboard = memo(function BlastMPLeaderboard({
                   data-kind={myGap.kind}
                   aria-hidden="true"
                   className={cn(
-                    'flex items-center gap-0.5 shrink-0 ms-1 rounded-full px-1.5 py-px text-[10px] font-black tabular-nums',
+                    'flex items-center gap-0.5 shrink-0 ms-1 rounded-full px-1.5 py-px text-[10px] font-black tabular-nums max-sm:hidden',
                     myGap.kind === 'lead'
                       ? 'bg-neo-navy text-neo-lime'
                       : 'bg-neo-navy/15 text-neo-navy',

@@ -5,6 +5,7 @@ import { memo, useState, useEffect, useCallback, useRef, useMemo, type ReactNode
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { MobileRankIndicator } from './MobileRankIndicator';
 import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
+import { GameHud, HUD_EXIT_BUTTON } from '@/components/game/hud/GameHud';
 import { StudentRankRail } from '@/components/education/StudentRankRail';
 import { useClassroomPressure } from '@/hooks/gameState/classroomPressureStore';
 import {
@@ -16,7 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { MpRoundTraySlot } from '@/components/multiplayer/round/MpRoundTray';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
-import { Trophy } from 'lucide-react';
+import { Pause, Play, Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import GridComponent, { type HighlightedCell } from '@/components/GridComponent';
@@ -399,6 +400,27 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
     prevFeedbackRef.current = currentFeedback;
   }, [currentFeedback, comboLevel, fireRoundActive, hapticsEnabled]);
 
+  /* Classroom students get local framing (own score + one nearby classmate), never a whole-class rank. */
+  const rankRail = !isPlaying || mpChrome ? null : leaderboardHidden ? (
+    <p data-testid="leaderboard-reveal-note" className="text-center text-sm font-neo-body text-neo-cream/80">
+      {t('education.classroomGame.pressure.revealAtEnd')}
+    </p>
+  ) : deferredLeaderboard.length > 1 ? (
+    isClassroomStudentPlay ? (
+      <StudentRankRail
+        leaderboard={classroomPressure ? trimLeaderboardForPressure(deferredLeaderboard, classroomPressure) : deferredLeaderboard}
+        currentUsername={username}
+        wordsFound={foundWords.length}
+        feedback={currentFeedback}
+        roundOver={remainingTime !== null && remainingTime <= 0}
+        t={t}
+        dir={dir}
+      />
+    ) : (
+      <MobileRankIndicator leaderboard={deferredLeaderboard} currentUsername={username} t={t} dir={dir} />
+    )
+  ) : null;
+
   return (
     <>
       {/* Note: SP's DynamicEnergyBackground intentionally not rendered here.
@@ -461,24 +483,14 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
       />
 
       <div className={mpChrome ? cn(MP_CHROME_ROOT_CLASS, isComboShaking && 'animate-combo-shake') : cn(
-        'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-[gap,padding,transform,opacity] duration-500 ease-in-out pb-16 medium-short:pb-12 lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
+        'flex flex-col gap-0 md:gap-2 lg:gap-2 desktop-tall:lg:gap-3 desktop-short:lg:gap-0 desktop-medium-short:lg:gap-1 flex-1 w-full max-w-[1920px] mx-auto overflow-x-clip overflow-hidden transition-[gap,padding,transform,opacity] duration-500 ease-in-out lg:pb-1 desktop-tall:lg:pb-2 desktop-short:lg:pb-0 desktop-medium-short:lg:pb-1 px-2 lg:px-2 desktop-tall:lg:px-3 xl:px-4 min-h-0',
         // In the MP shell the canvas is just the board column — don't run the
         // internal lg: 3-column split (the shell supplies the side rails).
         !inDesktopShell && 'lg:flex-row lg:items-stretch lg:justify-center',
+        gameplayFocusMode ? 'pb-[max(0.75rem,env(safe-area-inset-bottom))]' : 'pb-16 medium-short:pb-12',
         // Screen shake on mythic combo (7+)
         isComboShaking && 'animate-combo-shake',
       )} onAnimationEnd={handleComboShakeEnd}>
-        {/* Mobile Header */}
-        {!mpChrome && <GameHeader
-          onExitRoom={onExitRoom}
-          onShowTutorial={onShowTutorial}
-          onPauseToggle={onPauseToggle}
-          isPaused={isPaused}
-          hints={hints}
-          gameActive={gameActive}
-          t={t}
-          variant="mobile"
-        />}
 
         {/* Left Column: Found Words (Desktop only).
             Render the container whenever the right panel renders so the
@@ -509,17 +521,23 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 <div className="w-full shrink-0 empty:hidden">{soloChrome}</div>
               )}
 
-              {/* Combo row - mobile only, centered. Container always present to prevent layout shift */}
+              <GameHud
+                className={inDesktopShell ? 'lg:px-1' : 'lg:hidden'}
+                onExit={onExitRoom}
+                remaining={timerHidden ? null : remainingTime}
+                total={timerValue * 60}
+                score={playerScore}
+                gentle={timerGentle}
+                end={onPauseToggle && (
+                  <button type="button" onClick={onPauseToggle} disabled={!gameActive} aria-label={t(isPaused ? 'common.resume' : 'common.pause')} className={HUD_EXIT_BUTTON}>
+                    {isPaused ? <Play className="h-5 w-5" strokeWidth={3} aria-hidden /> : <Pause className="h-5 w-5" strokeWidth={3} aria-hidden />}
+                  </button>
+                )}
+              />
               {isPlaying && (
-                <div
-                  className="flex lg:hidden justify-center items-center h-[32px]"
-                  data-testid="combo-row-mobile"
-                >
-                  <ComboDisplayConnected
-                    comboLevel={comboLevel}
-                    lastWordTime={lastWordTime}
-                    compact
-                  />
+                <div data-testid="combo-row-mobile" className="flex lg:hidden min-h-9 items-center justify-center gap-2">
+                  {rankRail}
+                  <ComboDisplayConnected comboLevel={comboLevel} lastWordTime={lastWordTime} compact />
                 </div>
               )}
 
@@ -527,10 +545,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   lg uses grid [1fr_auto_1fr] so timer (middle, auto-sized) sits at viewport
                   center regardless of asymmetric flank widths (GameHeader vs Combo+Score). */}
               <div
-                className="flex w-full items-center justify-center lg:grid lg:grid-cols-[1fr_auto_1fr] relative min-h-[88px] md:min-h-[108px] medium-short:min-h-[88px] medium-short:md:min-h-[108px] lg:min-h-[clamp(72px,10dvh,128px)] desktop-short:lg:min-h-[88px] desktop-medium-short:lg:min-h-[100px] short:min-h-[84px] short:md:min-h-[88px] gap-2"
+                className={cn(inDesktopShell ? 'hidden' : 'hidden lg:grid', "w-full items-center justify-center lg:grid-cols-[1fr_auto_1fr] relative min-h-[88px] md:min-h-[108px] medium-short:min-h-[88px] medium-short:md:min-h-[108px] lg:min-h-[clamp(72px,10dvh,128px)] desktop-short:lg:min-h-[88px] desktop-medium-short:lg:min-h-[100px] short:min-h-[84px] short:md:min-h-[88px] gap-2")}
                 data-testid="stats-row"
               >
-                <span {...{ [HUD_FIRE_SLOT]: '' }} className="absolute inset-s-1 md:inset-s-2 top-1/2 -translate-y-1/2 lg:hidden" />
                 {/* Desktop header */}
                 <GameHeader
                   onExitRoom={onExitRoom}
@@ -564,23 +581,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   </AdaptiveMotion.div>
                 )}
 
-                {/* Right Side: Score (mobile) - positioned absolutely to not affect timer centering */}
-                {isPlaying && (
-                  <div
-                    className="absolute inset-e-1 md:inset-e-2 short:inset-e-0 short:scale-90 medium-short:inset-e-0 medium-short:scale-90 top-1/2 -translate-y-1/2 lg:hidden"
-                    data-testid="score-mobile"
-                  >
-                    <ScoreDisplay
-                      score={playerScore}
-                      rank={playerRank}
-                      leaderboardSize={deferredLeaderboard.length}
-                      minWordLength={minWordLength}
-                      t={t}
-                      variant="mobile"
-                    />
-                  </div>
-                )}
-
                 {/* Desktop: Combo + Score — positioned at end of flex row, not absolute */}
                 {isPlaying && (
                   <div
@@ -589,21 +589,12 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                   >
                     <span {...{ [HUD_FIRE_SLOT]: '' }} className="flex justify-end empty:hidden" />
                     <div className="h-[32px] flex items-center justify-end">
-                      {comboLevel > 0 ? (
+                      {comboLevel > 0 && (
                         <ComboDisplayConnected
                           comboLevel={comboLevel}
                           lastWordTime={lastWordTime}
                           compact
                         />
-                      ) : (
-                        <AdaptiveMotion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 0.5 }}
-                          className="text-[10px] text-neo-white text-end leading-tight max-w-[70px]"
-                        >
-                          <span className="text-neo-cyan/60">⚡</span>{' '}
-                          {t('game.comboHint')}
-                        </AdaptiveMotion.div>
                       )}
                     </div>
                     <ScoreDisplay
@@ -620,15 +611,9 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
             </div>
           )}
 
-          {/* Word Forming Area - inside header area for tighter integration */}
-          {isPlaying && gameMode !== 'word-hunt' && (
-            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5 desktop-short:lg:-mt-2 desktop-short:lg:mb-0 desktop-medium-short:lg:-mt-2 desktop-medium-short:lg:mb-0">
-              {!mpChrome && <LeadChangeBanner event={leadChangeEvent ?? null} />}
-              <WordFormingAreaConnected
-                isTypingMode={isTypingMode}
-                typedWord={typedWord}
-                feedback={currentFeedback}
-              />
+          {mpChrome && isPlaying && gameMode !== 'word-hunt' && (
+            <div className="relative flex items-center justify-center shrink-0 -mt-1 mb-0.5">
+              <WordFormingAreaConnected isTypingMode={isTypingMode} typedWord={typedWord} feedback={currentFeedback} />
             </div>
           )}
 
@@ -696,7 +681,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
           >
             <div
               data-testid="grid-frame"
-              className={mpChrome ? MP_CHROME_FRAME_CLASS : "relative aspect-square mx-auto w-[min(720px,94cqi,calc(100cqb-200px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-120px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-90px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-100px))] max-h-full"}
+              className={mpChrome ? MP_CHROME_FRAME_CLASS : "relative aspect-square mx-auto w-[min(720px,94cqi,calc(100cqb-200px))] medium-short:w-[min(560px,92cqi,calc(100cqb-150px))] short:w-[min(560px,94cqi,calc(100cqb-150px))] lg:w-[min(680px,100cqi,calc(100cqb-150px))] desktop-short:lg:w-[min(560px,100cqi,calc(100cqb-130px))] desktop-medium-short:lg:w-[min(620px,100cqi,calc(100cqb-140px))] max-h-full"}
             >
               <GridComponent
                 key={isPlaying ? 'playing-grid' : 'spectating-grid'}
@@ -733,6 +718,13 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
               )}
             </div>
 
+            {!mpChrome && isPlaying && gameMode !== 'word-hunt' && (
+              <div data-testid="word-chip-under-board" className="relative flex w-full items-center justify-center shrink-0">
+                <LeadChangeBanner event={leadChangeEvent ?? null} />
+                <WordFormingAreaConnected isTypingMode={isTypingMode} typedWord={typedWord} feedback={currentFeedback} />
+              </div>
+            )}
+
             {/* Desktop keyboard input hint - appears below grid */}
             {isPlaying && isDesktop && (
               <KeyboardInlineHint
@@ -758,49 +750,6 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 />
               </div>
             )}
-
-          {/* Mobile rank rail — always visible in MP (even in gameplayFocusMode,
-              which hides the full mobile leaderboard below). Gives phone players a
-              clear "You're #N" plus a transient "{name} passed you!" cue. */}
-          {isPlaying && !mpChrome && leaderboardHidden && (
-            <p
-              data-testid="leaderboard-reveal-note"
-              className="mt-0.5 text-center text-sm font-neo-body text-neo-cream/80"
-            >
-              {t('education.classroomGame.pressure.revealAtEnd')}
-            </p>
-          )}
-
-          {isPlaying && !mpChrome && !leaderboardHidden && deferredLeaderboard && deferredLeaderboard.length > 1 && (
-            <div className="mt-0.5 flex justify-center">
-              {isClassroomStudentPlay ? (
-                /* A class session swaps the absolute pill for local framing:
-                   own score + ONE nearby classmate, and no "{name} passed you!"
-                   alert. Constant visible whole-class rank is the documented
-                   harm (it demotivates the bottom half and widens the gap);
-                   points are not. End-of-round standings are untouched — bounded
-                   exposure is the form the research permits. The top-3 dial
-                   trims to the podium; hidden never reaches here — the reveal
-                   beat replaces the whole rail above. */
-                <StudentRankRail
-                  leaderboard={classroomPressure ? trimLeaderboardForPressure(deferredLeaderboard, classroomPressure) : deferredLeaderboard}
-                  currentUsername={username}
-                  wordsFound={foundWords.length}
-                  feedback={currentFeedback}
-                  roundOver={remainingTime !== null && remainingTime <= 0}
-                  t={t}
-                  dir={dir}
-                />
-              ) : (
-                <MobileRankIndicator
-                  leaderboard={deferredLeaderboard}
-                  currentUsername={username}
-                  t={t}
-                  dir={dir}
-                />
-              )}
-            </div>
-          )}
 
           {/* Mobile: Split-view with the single live leaderboard + words.
               Leaderboard only when there are other players; word list always shows while playing

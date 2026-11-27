@@ -27,11 +27,11 @@
  */
 import { GameMascotReactions } from '@/components/mascot/GameMascotReactions';
 import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react';
-import { Pause, Play, Timer, X } from 'lucide-react';
+import { Pause, Play } from 'lucide-react';
 import GridComponent from '@/components/GridComponent';
 import { WordFormingAreaConnected } from '@/components/game/in-game/components/WordFormingAreaConnected';
 import { GameOverlays } from '@/components/game/in-game/components/GameOverlays';
-import { HUD_FIRE_SLOT } from '@/components/earthquake/FireRoundIndicator';
+import { GameHud, HUD_EXIT_BUTTON } from '@/components/game/hud/GameHud';
 import FloatingScoreAnimation from '@/components/game/FloatingScoreAnimation';
 import { ComboMilestoneAnnouncement } from '@/components/game/ComboMilestoneAnnouncement';
 import { vibrateWordSubmit } from '@/components/grid/hapticFeedback';
@@ -48,7 +48,6 @@ import { MissionChips } from './components/MissionChips';
 import { SoloStartCard } from './components/SoloStartCard';
 import { SoloLeftRail, SoloRightRail } from './components/SoloShellRails';
 import { GameShell } from '@/components/game/shell';
-import { formatClock } from '@/components/game/shell/formatClock';
 import { STAGE_TARGET_PX, boardFloorPx } from '@/lib/mascot/stage';
 
 export interface SoloGameLayoutProps {
@@ -151,9 +150,6 @@ const SOLO_SHELL_CSS = `
   [data-game-shell].${LESSON_SHELL} { padding-bottom: ${LESSON_LANE_CLEARANCE}; }
 }`;
 
-const HUD_BUTTON =
-  'grid h-11 w-11 shrink-0 place-items-center rounded-xl border-[3px] border-neo-black bg-neo-cream text-neo-black shadow-[3px_3px_0_#000] active:translate-y-0.5 active:shadow-none';
-
 export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayoutProps) {
   const {
     grid, language, score, remainingTime, totalSeconds, isPaused, isGameOver, bots,
@@ -245,39 +241,20 @@ export const SoloGameLayout = memo(function SoloGameLayout(props: SoloGameLayout
           '[--solo-board-max:560px] [--solo-word-h:3.25rem]',
         )}
       >
-        {/* Bar: exit · race · clock · pause */}
-        <div ref={gameStatsRef} data-solo-slot="bar" role="status" aria-label={t('singlePlayer.gameTime')} className="flex items-center gap-2 pe-12">
-          <button type="button" onClick={onExit} aria-label={t('common.exit')} className={HUD_BUTTON}>
-            <X className="h-5 w-5" strokeWidth={3} />
-          </button>
-
-          <div className="flex-1" />
-
-          {remainingTime !== null && (
-            <div ref={setMascotTimer} className="relative isolate shrink-0">
-            <div
-              data-testid="solo-timer"
-              data-urgent={String(urgent)}
-              className={cn(
-                'inline-flex h-11 shrink-0 items-center gap-1 rounded-xl border-[3px] border-neo-black px-2.5 font-neo-display text-lg font-bold tabular-nums text-neo-black shadow-[3px_3px_0_#000]',
-                urgent ? cn('bg-neo-pink', !reduceMotion && 'animate-pulse') : 'bg-neo-yellow',
-              )}
-            >
-              <Timer className="h-4 w-4" strokeWidth={3} aria-hidden />
-              {/* Before Start the hook still holds its previous value; show the round length. */}
-              <span dir="ltr">{formatClock(awaitingStart ? totalSeconds : remainingTime)}</span>
-            </div>
-            </div>
-          )}
-
-          <span {...{ [HUD_FIRE_SLOT]: '' }} className="ms-2 inline-flex empty:hidden" />
-          <div className="flex-1" />
-
-          {onPauseToggle && (
-            <button type="button" onClick={onPauseToggle} aria-label={t('common.pause')} className={HUD_BUTTON} disabled={awaitingStart || isGameOver}>
-              {isPaused ? <Play className="h-5 w-5" strokeWidth={3} /> : <Pause className="h-5 w-5" strokeWidth={3} />}
-            </button>
-          )}
+        <div ref={gameStatsRef} data-solo-slot="bar" role="status" aria-label={t('singlePlayer.gameTime')}>
+          <div ref={setMascotTimer}>
+          <GameHud
+            onExit={onExit}
+            remaining={remainingTime === null ? null : awaitingStart ? totalSeconds : remainingTime}
+            total={totalSeconds}
+            score={score}
+            end={onPauseToggle && (
+              <button type="button" onClick={onPauseToggle} aria-label={t('common.pause')} className={HUD_EXIT_BUTTON} disabled={awaitingStart || isGameOver}>
+                {isPaused ? <Play className="h-5 w-5" strokeWidth={3} /> : <Pause className="h-5 w-5" strokeWidth={3} />}
+              </button>
+            )}
+          />
+          </div>
         </div>
 
         {/* The race: you vs the leading bot, as a tug-of-war bar. */}

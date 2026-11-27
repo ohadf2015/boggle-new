@@ -4,6 +4,7 @@ import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useBackspaceKey } from '@/hooks/useBackspaceKey';
 import { HoldHintBubble } from '@/components/game/HoldHintBubble';
+import { ACTION_BAR, ACTION_ROUND, actionPrimary } from '@/components/game/hud/actionBar';
 
 type T = (key: string, params?: Record<string, string | number>) => string;
 
@@ -18,67 +19,42 @@ interface WheelActionBarProps {
   submitIcon?: React.ReactNode;
 }
 
-const ICON_BUTTON = cn(
-  'p-3 rounded-neo border-3 border-neo-black bg-neo-navy-light text-neo-white shadow-hard',
-  'hover:bg-neo-navy active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-  'disabled:opacity-30 disabled:cursor-not-allowed',
-);
-
 /** Clear, submit and backspace under the wheel. */
 const WheelActionBar: React.FC<WheelActionBarProps> = ({
   t, hasLetters, canSubmit, isValidating, onClear, onSubmit, onBackspace, submitIcon,
 }) => {
-  const reducedMotion = useReducedMotion();
   const { handlers: backspaceHold, showHint } = useBackspaceKey({ onTap: onBackspace, onHold: onClear });
+  const ready = canSubmit && !isValidating;
+  const reducedMotion = useReducedMotion();
   return (
   <div
     data-testid="word-wheel-action-bar"
     // These are tapped rapidly in normal play; keep them out of rage-click detection.
     data-feedback-ignore-rage=""
     data-gr-no-rage=""
-    className="w-full flex items-center justify-center gap-3 mt-1 short:mt-0"
+    className={cn(ACTION_BAR, 'w-full mt-2 short:mt-0')}
   >
-    <m.button
-      type="button"
-      onClick={onClear}
-      disabled={!hasLetters}
-      className={ICON_BUTTON}
-      whileTap={reducedMotion ? {} : { scale: 0.9 }}
-      aria-label={t('wordWheel.clear')}
-    >
-      <RotateCcw className="w-5 h-5" />
-    </m.button>
+    <button type="button" onClick={onClear} disabled={!hasLetters} className={ACTION_ROUND} aria-label={t('wordWheel.clear')}>
+      <RotateCcw className="size-5 tv:size-9" strokeWidth={2.75} />
+    </button>
 
     <m.button
       type="button"
       onClick={onSubmit}
       disabled={isValidating || !canSubmit}
-      className={cn(
-        'px-8 py-3 rounded-neo border-3 border-neo-black font-neo-display font-black text-lg',
-        canSubmit
-          ? 'bg-linear-to-r from-neo-lime to-neo-cyan text-neo-black shadow-[3px_3px_0px_black,0_0_16px_rgba(191,255,0,0.3)] hover:shadow-[3px_3px_0px_black,0_0_22px_rgba(0,255,255,0.4)]'
-          : 'bg-neo-navy-light text-neo-white shadow-hard-lg',
-        'active:shadow-hard-pressed active:translate-x-px active:translate-y-px',
-        'disabled:cursor-not-allowed',
-      )}
-      whileTap={canSubmit && !reducedMotion ? { scale: 0.92 } : {}}
-      animate={isValidating ? { opacity: [1, 0.6, 1] } : {}}
-      transition={isValidating ? { duration: 0.6, repeat: Infinity } : {}}
+      data-ready={String(ready)}
+      className={cn(actionPrimary(ready), 'inline-flex items-center justify-center gap-2')}
+      animate={isValidating ? { opacity: [1, 0.6, 1] } : ready && !reducedMotion ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+      transition={isValidating ? { duration: 0.6, repeat: Infinity } : { duration: 0.24, ease: 'easeOut' }}
     >
-      {submitIcon ? <span className="flex items-center gap-2">{submitIcon}{t('wordWheel.submit')}</span> : t('wordWheel.submit')}
+      {submitIcon}
+      {t('wordWheel.submit')}
     </m.button>
 
-    <m.button
-      type="button"
-      {...backspaceHold}
-      disabled={!hasLetters}
-      className={cn(ICON_BUTTON, 'relative')}
-      whileTap={reducedMotion ? {} : { scale: 0.9 }}
-      aria-label={t('wordWheel.removeLetter')}
-    >
-      <Delete className="w-5 h-5" />
+    <button type="button" {...backspaceHold} disabled={!hasLetters} className={cn(ACTION_ROUND, 'relative')} aria-label={t('wordWheel.removeLetter')}>
+      <Delete className="size-5 rtl:-scale-x-100 tv:size-9" strokeWidth={2.75} />
       {showHint && <HoldHintBubble label={t('common.holdToClear')} />}
-    </m.button>
+    </button>
   </div>
   );
 };

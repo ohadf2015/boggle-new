@@ -53,19 +53,14 @@ export function AccessRedirectNotice({ from }: { from?: string | null }) {
   const dest = t(destKey ?? 'education.access.redirect_dest_fallback');
 
   return (
-    <div
-      role="status"
-      className="mb-5 flex items-start gap-3 rounded-neo border-neo-thick border-neo-black bg-neo-cyan p-4 text-neo-navy shadow-hard"
-    >
-      <Info aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0" />
-      <div>
-        <p className="font-neo-display text-base font-black tracking-[-0.01em]">
-          {t('education.access.redirect_title')}
-        </p>
-        <p className="mt-1 text-sm font-semibold text-neo-navy/85">
-          {t('education.access.redirect_body', { dest })}
-        </p>
-      </div>
+    <div className="mb-3 flex justify-center">
+      <p
+        role="status"
+        className="inline-flex max-w-full items-center gap-1.5 rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/10 px-3 py-1 text-sm font-bold text-neo-cyan"
+      >
+        <Info aria-hidden="true" className="h-4 w-4 shrink-0" />
+        <span className="min-w-0">{t('education.access.redirect_chip', { dest })}</span>
+      </p>
     </div>
   );
 }

@@ -91,12 +91,12 @@ describe('QuickClassicBoard — desktop shell', () => {
     expect(boardProps.at(-1)?.inDesktopShell).toBe(false);
   });
 
-  it('given ghosts, then the start rail carries the clock, the race and the keyboard card', () => {
+  it('given ghosts, then the start rail carries the race and a first-game keyboard hint; the clock lives in the HUD bar', () => {
     render(<QuickClassicBoard config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
     const left = within(screen.getByTestId('game-shell-left'));
-    expect(left.getByTestId('shell-clock-value').textContent).toBe('0:42');
+    expect(left.queryByTestId('shell-clock-value')).toBeNull();
     expect(left.getByTestId('shell-standings')).toBeInTheDocument();
-    expect(left.getByTestId('shell-keys')).toBeInTheDocument();
+    expect(left.getByTestId('shell-keys-hint')).toBeInTheDocument();
   });
 
   it('given found words, then the end rail lists only valid ones, newest first', () => {

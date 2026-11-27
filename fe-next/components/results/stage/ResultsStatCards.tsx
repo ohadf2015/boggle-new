@@ -27,6 +27,8 @@ export interface ResultsStatItem {
   key: string;
   label: string;
   value: number;
+  /** A word instead of a number (the best-word tile); no count-up. */
+  display?: string;
   prefix?: string;
   suffix?: string;
   icon?: ReactNode;
@@ -84,9 +86,15 @@ function StatCard({ item, index, animate }: { item: ResultsStatItem; index: numb
             style={animate ? { animationDelay: `${timing.count + STAT_COUNT_MS}ms` } : undefined}
             data-testid={item.valueTestId}
           >
-            {item.prefix}
-            {shown}
-            {item.suffix}
+            {item.display !== undefined ? (
+              <span dir="auto" className="block max-w-full truncate text-xl uppercase lg:text-2xl">{item.display}</span>
+            ) : (
+              <>
+                {item.prefix}
+                {shown}
+                {item.suffix}
+              </>
+            )}
           </b>
         </span>
       </div>

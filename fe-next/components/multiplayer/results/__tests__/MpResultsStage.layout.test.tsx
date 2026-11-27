@@ -33,7 +33,7 @@ vi.mock('framer-motion', async (orig) => ({ ...(await orig<typeof import('framer
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
 vi.mock('@/contexts/NavigationContext', () => ({ useRegisterHeaderAudioControl: () => {} }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 vi.mock('next/dynamic', () => ({ __esModule: true, default: () => () => null }));
 vi.mock('@/components/auth/InlineSignupCard', () => ({ __esModule: true, default: () => null }));
 vi.mock('@/components/ads/ResultsBannerSlot', () => ({
@@ -105,8 +105,7 @@ describe('MpResultsStage layout', () => {
   it('Given a tall results column on a phone, When it renders, Then the body scrolls instead of clipping', () => {
     renderAt(1, true);
     expect(screen.getByTestId('mp-results-body').className).toMatch(/overflow-y-auto/);
-    // Desktop: both columns start at the top, so the standings never begin at the fold of a scrolled body.
-    expect(screen.getByTestId('mp-results-stage').className).toMatch(/lg:items-start/);
+    expect(screen.getByTestId('mp-results-stage').className).toMatch(/max-w-xl/);
   });
 
   it('Given the host on an intermission, Then every next mode is one tap away in the footer, right above the primary', () => {
@@ -118,10 +117,15 @@ describe('MpResultsStage layout', () => {
     expect(next.textContent).not.toContain('hook');
   });
 
-  it('Given a phone, Then the podium and my card own the first screen (secondary cards start below the fold)', () => {
+  it('Given a phone, Then the first screen is the podium and my card, with words behind the Details pill', () => {
     renderAt(1, true);
-    const podium = screen.getByTestId('mp-results-stage').querySelector('[data-moment]')!;
-    expect(podium.className).toMatch(/max-lg:min-h-\[calc\(100dvh/);
+    const body = screen.getByTestId('mp-results-body');
+    expect(within(body).getByTestId('mp-podium')).toBeTruthy();
+    expect(within(body).getByTestId('mp-my-card')).toBeTruthy();
+    for (const id of ['mp-word-showdown', 'mp-brag-strip', 'mp-tomorrow-card']) {
+      expect(within(body).queryByTestId(id)).toBeNull();
+    }
+    expect(within(body).getByTestId('mp-results-details-open').textContent).toContain('mpUi.results.details');
   });
 
   it('Given a bots-only round mid-series, Then the daily promo waits for the final round', async () => {
@@ -139,7 +143,7 @@ describe('MpResultsStage layout', () => {
         onResetSeries={vi.fn()}
       />,
     );
-    await screen.findByTestId('mp-word-showdown');
+    await screen.findByTestId('mp-my-card');
     expect(screen.queryByTestId('mp-tomorrow-card')).toBeNull();
   });
 

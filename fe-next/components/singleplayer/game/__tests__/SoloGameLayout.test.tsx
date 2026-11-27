@@ -88,7 +88,7 @@ describe('SoloGameLayout', () => {
     expect(band.className).toContain('flex-1');
     expect(band.contains(screen.getByTestId('combo-meter'))).toBe(true);
     expect(mascotProps.last?.stages).toEqual([screen.getByTestId('shell-mascot'), band]);
-    expect(mascotProps.last?.timerAnchor?.contains(screen.getByTestId('solo-timer'))).toBe(true);
+    expect(mascotProps.last?.timerAnchor?.contains(screen.getByRole('progressbar'))).toBe(true);
   });
 
   it('on phones the board leaves the gag stage room for a full-size mascot, never shrinking tiles under 44px', () => {
@@ -138,15 +138,15 @@ describe('SoloGameLayout', () => {
 
   it('renders the clock as m:ss and marks the last 10 seconds urgent', () => {
     const { rerender } = render(<SoloGameLayout {...props({ remainingTime: 65 })} />);
-    expect(screen.getByTestId('solo-timer').textContent).toContain('1:05');
-    expect(screen.getByTestId('solo-timer').getAttribute('data-urgent')).toBe('false');
+    expect(screen.getByRole('progressbar').getAttribute('aria-valuetext')).toBe('1:05');
+    expect(screen.getByRole('progressbar').getAttribute('data-urgent')).toBe('false');
     rerender(<SoloGameLayout {...props({ remainingTime: 9 })} />);
-    expect(screen.getByTestId('solo-timer').getAttribute('data-urgent')).toBe('true');
+    expect(screen.getByRole('progressbar').getAttribute('data-urgent')).toBe('true');
   });
 
   it('has no clock in untimed play', () => {
     render(<SoloGameLayout {...props({ remainingTime: null, bots: [] })} />);
-    expect(screen.queryByTestId('solo-timer')).toBeNull();
+    expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
   it('holds the board behind a start card until the player taps Start', () => {
@@ -221,9 +221,9 @@ describe('SoloGameLayout', () => {
       expect(screen.getByTestId('game-shell-stage').contains(screen.getByTestId('solo-slot-board'))).toBe(true);
     });
 
-    it('teaches keyboard play beside the board', () => {
+    it('hints at keyboard play beside the board on a first game', () => {
       render(<SoloGameLayout {...props()} />);
-      expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys')).toBeInTheDocument();
+      expect(within(screen.getByTestId('game-shell-left')).getByTestId('shell-keys-hint')).toBeInTheDocument();
     });
 
     it('shows the typed word on the board strip and lights its path while typing', () => {

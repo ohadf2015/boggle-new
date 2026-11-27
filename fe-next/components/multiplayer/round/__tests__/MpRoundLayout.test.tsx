@@ -81,7 +81,7 @@ describe('MpRoundLayout', () => {
   it('renders ONE hud: exit, timer, my server score and my rank', () => {
     render(<MpRoundLayout {...props()} />);
     expect(screen.getAllByTestId('mp-hud-bar')).toHaveLength(1);
-    expect(screen.getAllByTestId('mp-timer')).toHaveLength(1);
+    expect(screen.getAllByRole('progressbar')).toHaveLength(1);
     expect(screen.getByTestId('mp-score-chip')).toHaveTextContent('4');
     expect(screen.getByTestId('mp-rank-value')).toHaveTextContent('#2');
     expect(screen.getByTestId('mp-rank-chip')).toHaveTextContent('/3');
@@ -103,11 +103,11 @@ describe('MpRoundLayout', () => {
     expect(bar.className).not.toContain('grid-cols-[1fr_auto_1fr]');
   });
 
-  it('shows ONE clock, drawn inside the ring', () => {
+  it('shows ONE clock: a lesson-style timer bar with its m:ss beside it', () => {
     render(<MpRoundLayout {...props()} />);
-    const timer = screen.getByTestId('mp-timer');
-    expect(timer.textContent?.match(/\d+:\d\d/g)).toHaveLength(1);
-    expect(screen.getByTestId('mp-timer-digits').className).toContain('absolute');
+    const hud = screen.getByTestId('mp-hud-bar');
+    expect(hud.textContent?.match(/\d+:\d\d/g)).toHaveLength(1);
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuetext');
   });
 
   it('the rank fraction stays LTR in RTL layouts ("#2/3", never "3/#2")', () => {
