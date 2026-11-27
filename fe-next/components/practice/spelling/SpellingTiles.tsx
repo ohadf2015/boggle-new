@@ -74,7 +74,7 @@ export function SpellingTiles({ length, hint, typed, state, answer }: SpellingTi
               compact ? 'text-lg @3xl:basis-12 @3xl:text-2xl' : 'text-2xl @3xl:basis-16 @3xl:text-4xl',
               // A tile you can point at reacts, so the row feels touchable on desktop.
               'transition-transform duration-150 hover:-translate-y-0.5',
-              !hue && 'border-2 border-dashed border-neo-cream/50 bg-neo-white/5',
+              !hue && 'border-2 border-dashed border-neo-cream/50 edu-sky:border-edu-line bg-neo-white/5 edu-sky:bg-edu-ink/5',
               // The typed / revealed letter is drawn here, so it never adds to the text content.
               shown && 'before:content-[attr(data-letter)]',
               typedCh && state === 'typing' && 'motion-safe:animate-[lc-tile-pop_170ms_cubic-bezier(.34,1.56,.64,1)]',

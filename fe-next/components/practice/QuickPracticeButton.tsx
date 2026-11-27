@@ -65,22 +65,22 @@ export function QuickPracticeButton({
     {
       type: 'flashcard',
       icon: <Layers className="w-4 h-4" />,
-      colorClass: 'text-neo-cyan',
+      colorClass: 'text-neo-cyan edu-sky:text-edu-cyan-ink',
     },
     {
       type: 'solo_board',
       icon: <Grid3X3 className="w-4 h-4" />,
-      colorClass: 'text-neo-orange',
+      colorClass: 'text-neo-orange edu-sky:text-edu-orange-ink',
     },
     {
       type: 'word_list',
       icon: <List className="w-4 h-4" />,
-      colorClass: 'text-neo-yellow',
+      colorClass: 'text-neo-yellow edu-sky:text-edu-yellow-ink',
     },
     {
       type: 'warmup',
       icon: <Zap className="w-4 h-4" />,
-      colorClass: 'text-neo-pink',
+      colorClass: 'text-neo-pink edu-sky:text-edu-pink-ink',
     },
   ];
 
@@ -207,7 +207,7 @@ export function QuickPracticeButton({
             className={cn(
               'absolute top-full mt-2 z-50',
               'min-w-[200px]',
-              'bg-neo-navy border-[3px] border-neo-black rounded-neo shadow-hard-lg',
+              'bg-neo-navy edu-sky:bg-edu-surface border-[3px] border-neo-black rounded-neo shadow-hard-lg',
               'overflow-hidden',
               isRTL ? 'left-0' : 'right-0'
             )}
@@ -223,9 +223,9 @@ export function QuickPracticeButton({
                   onClick={() => handleModeSelect(option.type)}
                   className={cn(
                     'w-full px-4 py-3 flex items-center gap-3',
-                    'hover:bg-neo-white/10 transition-colors',
+                    'hover:bg-neo-white/10 edu-sky:hover:bg-edu-ink/10 transition-colors',
                     'text-left',
-                    'focus:outline-hidden focus:bg-neo-white/10'
+                    'focus:outline-hidden focus:bg-neo-white/10 edu-sky:focus:bg-edu-ink/10'
                   )}
                   role="option"
                   aria-selected={false}
@@ -234,11 +234,11 @@ export function QuickPracticeButton({
                     {option.icon}
                   </span>
                   <div className="flex-1">
-                    <span className={cn('font-neo-body font-medium text-neo-white')}>
+                    <span className={cn('font-neo-body font-medium text-neo-white edu-sky:text-edu-ink')}>
                       {getModeLabel(option.type)}
                     </span>
                     {sessionCount > 0 && (
-                      <span className="block text-xs text-neo-white">
+                      <span className="block text-xs text-neo-white edu-sky:text-edu-ink">
                         {sessionCount} {sessionCount === 1 ? 'session' : 'sessions'}
                       </span>
                     )}

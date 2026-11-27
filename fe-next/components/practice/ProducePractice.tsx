@@ -220,7 +220,7 @@ export function ProducePractice({
     return (
       <div
         data-testid="produce-empty"
-        className="min-h-full bg-neo-navy flex items-center justify-center p-4"
+        className="min-h-full bg-neo-navy edu-sky:bg-edu-page flex items-center justify-center p-4"
         dir={isRTL ? 'rtl' : 'ltr'}
       >
         <div className="max-w-md w-full rounded-neo border-[3px] border-black shadow-hard bg-neo-cream p-6 text-center">
@@ -259,7 +259,7 @@ export function ProducePractice({
   }
 
   return (
-    <div className="min-h-full bg-neo-navy p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+    <div className="min-h-full bg-neo-navy edu-sky:bg-edu-page p-4" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="max-w-xl mx-auto">
         {/* Header: cue type + progress */}
         <div className="flex items-center gap-3 mb-4">
@@ -279,7 +279,7 @@ export function ProducePractice({
             {style.icon}
             {t(`education.produce.cue.${focus}`)}
           </span>
-          <span className="ms-auto font-neo-body text-neo-cream" data-testid="produce-progress">
+          <span className="ms-auto font-neo-body text-neo-cream edu-sky:text-edu-ink" data-testid="produce-progress">
             {index + 1} / {total}
           </span>
         </div>
@@ -340,7 +340,7 @@ export function ProducePractice({
               {hint && (
                 <span
                   data-testid="produce-hint-display"
-                  className="font-neo-display text-neo-cream tracking-widest"
+                  className="font-neo-display text-neo-cream edu-sky:text-edu-ink tracking-widest"
                 >
                   {hint.kind === 'length'
                     ? t('education.produce.hintLength', { count: hint.length })
@@ -394,7 +394,7 @@ export function ProducePractice({
                   <span className="sr-only">{t(`education.produce.verdict.${verdict}`)}</span>
                 </div>
                 {verdict !== 'correct' && (
-                  <p className="mt-3 text-center font-neo-body text-neo-cream">
+                  <p className="mt-3 text-center font-neo-body text-neo-cream edu-sky:text-edu-ink">
                     {t('education.produce.theWordWas')}{' '}
                     <strong data-testid="produce-correct-spelling" className="font-neo-display">
                       {question.word}
