@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, LogOut, Share2, Swords, X } from 'lucide-react';
+import { Check, LogOut, Share2, X } from 'lucide-react';
 import { MpPrimaryCta } from '../shell/MpPrimaryCta';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
@@ -22,17 +22,22 @@ type AutoState = { active: boolean; secondsLeft: number; total: number; cancel: 
 const R = 20;
 const C = 2 * Math.PI * R;
 
-/** Ready joiner: status only. Never a disabled primary CTA (GR #10820). */
-function MpWaitingHostChip({ t }: { t: TFn }) {
+/** Ready joiner: a calm status bar (never a disabled primary) naming the host's pick once it arrives. */
+function MpWaitingHostChip({ next, t }: { next?: string; t: TFn }) {
   return (
     <div
       role="status"
       aria-live="polite"
       data-testid="mp-waiting-host"
-      className="flex-1 min-w-0 flex flex-col justify-center px-1 py-2 font-neo-display font-bold uppercase text-neo-cyan/70"
+      className="flex-1 min-w-0 flex items-center gap-3 rounded-2xl border-2 border-neo-cream/20 bg-neo-navy-light px-3 py-2.5"
     >
-      <span className="leading-tight text-xl tv:text-3xl">{t('mpUi.results.youreReady')}</span>
-      <span className="text-xs font-neo-body normal-case leading-tight text-neo-cyan/50">{t('mpUi.results.waitingHost')}</span>
+      <Check aria-hidden="true" className={cn('shrink-0 w-8 h-8 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black p-1', fx.stamp)} />
+      <span className="min-w-0 flex flex-col">
+        <span className="font-neo-display font-bold uppercase leading-tight text-lg tv:text-3xl text-neo-cyan">{t('mpUi.results.youreReady')}</span>
+        <span key={next ?? ''} className={cn('text-sm font-neo-body font-bold leading-tight text-neo-white/70 truncate', next && fx.chipPop)}>
+          {next ? t('mpUi.results.waitingNext', { mode: next }) : t('mpUi.results.waitingHost')}
+        </span>
+      </span>
     </div>
   );
 }
@@ -81,7 +86,7 @@ export interface MpIntermissionFooterProps {
   adHold?: boolean;
   onStart: () => void;
   onReady: () => void;
-  /** A classroom student's view of the game the teacher switched the room to. */
+  /** A classroom student's view of the game the teacher switched the room to; a ready joiner's view of the host's pick. */
   nextModeLabel?: string;
   t: TFn;
 }
@@ -114,12 +119,9 @@ export function MpIntermissionFooter({ isHost, isClassroom, isReady, ready, tota
           className="flex-1 min-w-0"
         />
       ) : isReady ? (
-        <MpWaitingHostChip t={t} />
+        <MpWaitingHostChip next={nextModeLabel} t={t} />
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.ready')} sublabel={status} onPress={onReady} className="flex-1 min-w-0" />
-      )}
-      {!isHost && isReady && (
-        <Check aria-hidden="true" className={cn('shrink-0 w-8 h-8 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black p-1', fx.stamp)} />
       )}
     </div>
   );
@@ -131,17 +133,15 @@ export interface MpFinalFooterProps {
   onRematch: () => void;
   onLeave: () => void;
   onShare: () => void;
-  /** One-tap Challenge — opens ChallengeInviteDialog or share/signup. Never auto-sends. */
-  onChallenge?: () => void;
-  /** Exit label key; a classroom host's exit goes back to class. */
+  /** Exit label key; a classroom host's exit goes back to class (the footer's one extra). Arcade rooms leave from the header. */
   leaveKey?: string;
   /** exp-mp-auto-continue-v1: the series final counts down to a new series. */
   auto?: AutoState | null;
   t: TFn;
 }
 
-/** Final results: [REMATCH] [Challenge] [LEAVE] [share]. One primary; the rest are quiet. */
-export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, onChallenge, leaveKey = 'mpUi.results.leave', auto = null, t }: MpFinalFooterProps) {
+/** Final results: [REMATCH] + one quiet extra (share, or back to class). */
+export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, leaveKey = 'mpUi.results.leave', auto = null, t }: MpFinalFooterProps) {
   const quiet = 'shrink-0 inline-flex flex-col items-center justify-center gap-0.5 rounded-neo border-[3px] border-neo-cream/40 bg-neo-navy-light text-neo-white shadow-hard-sm font-bold uppercase w-[calc(64px*var(--mp-u,1))] h-[calc(64px*var(--mp-u,1))] text-[calc(10px*var(--mp-u,1))] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none';
   return (
     <div className="flex items-center gap-[calc(10px*var(--mp-u,1))]">
@@ -151,20 +151,17 @@ export function MpFinalFooter({ isHost, isReady, onRematch, onLeave, onShare, on
       ) : (
         <MpPrimaryCta tone="lime" label={t('mpUi.results.rematch')} sublabel={isHost ? t('mpUi.results.newSeries') : undefined} onPress={onRematch} className="flex-1 min-w-0" />
       )}
-      {onChallenge && (
-        <button type="button" data-testid="mp-results-challenge" onClick={onChallenge} className={quiet}>
-          <Swords aria-hidden="true" className="w-5 h-5 text-neo-pink" />
-          {t('mpUi.results.challenge')}
+      {leaveKey !== 'mpUi.results.leave' ? (
+        <button type="button" data-testid="mp-results-leave" onClick={onLeave} className={cn(quiet, 'w-auto px-3')}>
+          <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
+          {t(leaveKey)}
+        </button>
+      ) : (
+        <button type="button" data-testid="mp-results-share" onClick={onShare} className={quiet}>
+          <Share2 aria-hidden="true" className="w-5 h-5" />
+          {t('mpUi.results.share')}
         </button>
       )}
-      <button type="button" data-testid="mp-results-leave" onClick={onLeave} className={cn(quiet, leaveKey !== 'mpUi.results.leave' && 'w-auto px-3')}>
-        <DirectionalIcon icon={LogOut} mirror className="w-5 h-5" />
-        {t(leaveKey)}
-      </button>
-      <button type="button" data-testid="mp-results-share" onClick={onShare} className={quiet}>
-        <Share2 aria-hidden="true" className="w-5 h-5" />
-        {t('mpUi.results.share')}
-      </button>
     </div>
   );
 }

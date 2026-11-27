@@ -23,13 +23,10 @@ export default function HeroAvatarIsland() {
         ? createPortal(
             <>
               <div className="lg:hidden">
-                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={92} mood="idle" />
+                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={104} mood="idle" />
               </div>
-              <div className="hidden lg:block 2xl:hidden">
-                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={260} mood="idle" />
-              </div>
-              <div className="hidden 2xl:block">
-                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={300} mood="idle" />
+              <div className="hidden lg:block">
+                <Avatar userId={heroProps.userId} customAvatar={heroProps.customAvatar ?? undefined} pixelSize={136} mood="idle" />
               </div>
             </>,
             slots.hero,
@@ -45,19 +42,13 @@ export default function HeroAvatarIsland() {
           layout owns the box; only the SVG itself rides the lazy chunk. */}
       {friendsAvatars && slots.friendsYou
         ? createPortal(
-            <>
-              <Avatar userId="hp-friend-you" pixelSize={56} mood="emoteCool" className="lg:hidden" />
-              <Avatar userId="hp-friend-you" pixelSize={80} mood="emoteCool" className="hidden lg:block" />
-            </>,
+            <Avatar userId="hp-friend-you" pixelSize={56} mood="emoteCool" />,
             slots.friendsYou,
           )
         : null}
       {friendsAvatars && slots.friendsRival
         ? createPortal(
-            <>
-              <Avatar userId="hp-friend-maya" pixelSize={56} mood="emoteSilly" className="lg:hidden" />
-              <Avatar userId="hp-friend-maya" pixelSize={80} mood="emoteSilly" className="hidden lg:block" />
-            </>,
+            <Avatar userId="hp-friend-maya" pixelSize={56} mood="emoteSilly" />,
             slots.friendsRival,
           )
         : null}

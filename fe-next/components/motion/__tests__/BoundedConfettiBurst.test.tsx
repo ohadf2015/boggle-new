@@ -127,3 +127,16 @@ describe('BoundedConfettiBurst', () => {
   });
 });
 
+
+describe('BoundedConfettiBurst hydration', () => {
+  it('Given a server render with the burst triggered, Then no confetti layer is in the HTML (a phone client skips it, so it would not match)', async () => {
+    const { renderToString } = await import('react-dom/server');
+    const html = renderToString(
+      <BoundedConfettiBurst trigger>
+        <span>child</span>
+      </BoundedConfettiBurst>,
+    );
+    expect(html).not.toContain('inline-confetti');
+    expect(html).toContain('child');
+  });
+});

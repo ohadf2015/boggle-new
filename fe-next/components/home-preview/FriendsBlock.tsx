@@ -50,39 +50,39 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
   return (
     <section
       aria-labelledby="hp-friends-title"
-      className="relative flex h-full flex-col gap-4 rounded-3xl border-[3px] border-black bg-neo-pink p-4 text-black shadow-hard-lg lg:gap-6 lg:p-8"
+      className="relative flex h-full flex-col gap-4 rounded-3xl border-[3px] border-neo-cream/15 bg-neo-navy-elevated p-4 text-neo-cream lg:gap-5 lg:p-5"
       data-testid="hp-friends"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="flex items-center gap-1.5 font-neo-display text-xs font-bold tracking-widest uppercase lg:text-sm">
+          <p className="flex items-center gap-1.5 font-neo-display text-xs font-bold tracking-widest text-neo-pink uppercase">
             <Users className="h-4 w-4" strokeWidth={2.75} aria-hidden="true" />
             {t('nav.play')}
           </p>
-          <h2 id="hp-friends-title" className="mt-1 font-neo-display text-xl font-bold leading-tight lg:text-4xl">
+          <h2 id="hp-friends-title" className="mt-1 font-neo-display text-xl font-bold leading-tight lg:text-2xl">
             {t('homeFresh.sections.friends.title')}
           </h2>
-          <p className="mt-1 text-sm font-medium lg:text-lg">{t('homeFresh.sections.friends.line')}</p>
+          <p className="mt-1 text-sm font-medium text-neo-cream/70">{t('homeFresh.sections.friends.line')}</p>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 rounded-2xl border-[3px] border-black bg-neo-navy px-2.5 py-3 sm:px-3 lg:px-6 lg:py-5">
+      <div className="flex items-center justify-between gap-2 rounded-2xl bg-neo-navy px-2.5 py-3 sm:px-3 lg:px-4 lg:py-4">
         <div className="flex flex-col items-center gap-1">
-          <div className="h-14 w-14 lg:h-20 lg:w-20">
+          <div className="h-14 w-14">
             {showAvatars && <div ref={youSlotCallback} data-testid="hp-friend-you-slot" className="h-full w-full" />}
           </div>
-          <span className="text-[11px] font-bold text-neo-cream lg:text-sm">{t('homeFresh.sections.friends.you')}</span>
+          <span className="text-[11px] font-bold text-neo-cream">{t('homeFresh.sections.friends.you')}</span>
         </div>
 
         <div className="flex flex-col items-center gap-1.5">
-          <span className="text-[10px] font-bold tracking-[0.2em] text-neo-white/60 uppercase lg:text-xs">
+          <span className="text-[10px] font-bold tracking-[0.2em] text-neo-white/60 uppercase">
             {t('homeFresh.sections.friends.room')}
           </span>
           <div className="flex gap-1 sm:gap-1.5" dir="ltr">
             {ROOM_CODE.map((ch, i) => (
               <span
                 key={ch}
-                className={`flex h-9 w-7 items-center justify-center rounded-lg sm:w-8 border-[3px] border-black bg-neo-cream font-neo-display text-lg font-bold text-black shadow-hard-sm lg:h-14 lg:w-12 lg:text-3xl ${TILE_TILT[i]}`}
+                className={`flex h-9 w-7 items-center justify-center rounded-lg sm:w-8 border-[3px] border-black bg-neo-cream font-neo-display text-lg font-bold text-black shadow-hard-sm ${TILE_TILT[i]}`}
               >
                 {ch}
               </span>
@@ -91,10 +91,10 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
         </div>
 
         <div className="flex flex-col items-center gap-1">
-          <div className="h-14 w-14 lg:h-20 lg:w-20">
+          <div className="h-14 w-14">
             {showAvatars && <div ref={rivalSlotCallback} data-testid="hp-friend-rival-slot" className="h-full w-full" />}
           </div>
-          <span className="text-[11px] font-bold text-neo-cream lg:text-sm">{t('homeFresh.sections.friends.rival')}</span>
+          <span className="text-[11px] font-bold text-neo-cream">{t('homeFresh.sections.friends.rival')}</span>
         </div>
       </div>
 
@@ -103,7 +103,7 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
           <Link
             href={`/${lang}/multiplayer`}
             data-testid="hp-friends-start"
-            className="flex-1 rounded-xl border-[3px] border-black bg-black px-4 py-2.5 text-center font-neo-display text-sm font-bold whitespace-nowrap text-neo-pink lg:py-3.5 lg:text-lg"
+            className="flex-1 rounded-2xl border-[3px] border-neo-pink bg-neo-navy px-4 py-2 text-center font-neo-display text-sm font-bold whitespace-nowrap text-neo-pink shadow-neo-pink/40"
           >
             {t('homeFresh.sections.friends.cta')}
           </Link>
@@ -111,7 +111,7 @@ function FriendsDemo({ lang, t, showAvatars }: FriendsBlockProps) {
         <Link
           href={`/${lang}/multiplayer`}
           data-testid="hp-friends-join"
-          className="px-1 py-2 font-neo-display text-sm font-bold whitespace-nowrap underline decoration-2 underline-offset-4 lg:text-lg"
+          className="px-1 py-2 font-neo-display text-sm font-bold whitespace-nowrap text-neo-cream/75 underline decoration-2 underline-offset-4 hover:text-neo-cream"
         >
           {t('homePlay.friendsJoin')}
         </Link>

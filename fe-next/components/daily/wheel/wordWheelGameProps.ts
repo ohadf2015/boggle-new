@@ -30,6 +30,8 @@ export interface WordWheelGameProps {
    * gameplay changes (timer off, etc.). Used by Quick Play arcade rounds.
    */
   hideModeCoach?: boolean;
+  /** Quick-play and MP Wheel Rush: the shared lesson-style game HUD. Daily keeps its own top bar. */
+  lessonHud?: boolean;
   /**
    * Hide all competitive chrome — leaderboard fetch, rival pill, pass toasts,
    * the combo counter, and the game_started funnel event. Lets the practice

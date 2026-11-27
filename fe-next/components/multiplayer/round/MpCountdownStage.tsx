@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState, type CSSProperties } from 'react';
 import Avatar from '@/components/Avatar';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,8 @@ import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { MODE_FILL, MODE_TEXT, FALLBACK_MODE_ICON, MODE_ICONS, roundModeMeta, classroomRoundModeMeta, BOSS_ROUND_META } from './roundModes';
 import { useBossActive } from '@/stores/classroomBossStore';
 import { CoachDemo } from '@/components/tutorial/CoachDemo';
+import { MiniBoardDemo } from '@/components/tutorial/MiniBoardDemo';
+import { PopIn } from '@/components/motion/PopIn';
 import { captionKeyFor, getModeCoach } from '@/lib/tutorial/modeCoachContent';
 import { useTypingDesktop } from '@/lib/input/typedWordHint';
 import { mpCoachMode } from '@/lib/tutorial/mpCoachMode';
@@ -24,6 +26,10 @@ export const MAX_COUNTDOWN_AVATARS = 5;
 export const COUNT_STEP_MS = 1000;
 /** GO! holds this long before the round is revealed. */
 export const GO_HOLD_MS = 650;
+
+const RING_TICKS = Array.from({ length: 12 }, (_, i) => i);
+const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
+const HOP_STEP_MS = 90;
 
 export interface CountdownPlayer {
   username: string;
@@ -70,7 +76,7 @@ export function __resetCountdownDupGuard(): void {
  * play; the roster row tells you who. Only the numeral animates (transform).
  */
 function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCountdownStageProps) {
-  const { t: tCtx, language } = useLanguage();
+  const { t: tCtx, language, dir } = useLanguage();
   const t = tProp ?? tCtx;
   const [isDuplicate] = useState(() => Date.now() - lastCompletedAt < DUP_GUARD_MS);
   const [done, setDone] = useState(isDuplicate);
@@ -130,55 +136,87 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
   const botCount = connected.filter((p) => p.isBot).length;
   const soloVsBots = !classroom && botCount > 0 && connected.length - botCount === 1;
 
+  const animate = !reduceMotion && !staticLayer;
+  const demo = howTo?.steps[0];
+
   return (
     <div
       data-testid="mp-countdown"
       data-mode={mode.slug}
       role="status"
       aria-live="assertive"
-      className="fixed inset-0 z-[10000] flex flex-col items-center justify-between overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none"
+      className="fixed inset-0 z-[10000] flex flex-col items-center justify-center gap-[min(3vh,1.5rem)] overflow-hidden bg-neo-navy opacity-100 text-neo-white pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] px-4 select-none tv:gap-10"
     >
-      {/* What you're about to play (mode badge + one-line rule) */}
-      <div className="flex flex-col items-center gap-3 tv:gap-5 text-center max-w-md tv:max-w-3xl">
+      {/* 1. The mode card springs in: what you're about to play, in one line. */}
+      <PopIn
+        data-testid="mp-countdown-card"
+        className="flex w-full max-w-sm flex-col items-center gap-2 rounded-[28px] border-3 border-neo-black bg-neo-navy-light px-5 pt-5 pb-4 text-center shadow-[0_6px_0_rgb(var(--neo-black))] tv:max-w-2xl tv:gap-4 tv:p-10"
+      >
         <span
-          data-testid="mp-countdown-mode"
-          className={cn(
-            'inline-flex items-center gap-2 rounded-neo border-3 border-neo-black px-4 py-1.5 shadow-hard font-neo-display font-bold uppercase tracking-wide text-neo-black',
-            'text-lg lg:text-2xl tv:text-4xl',
-            MODE_FILL[mode.color],
-          )}
+          data-testid="mp-countdown-icon"
+          className={cn('-mt-12 grid h-16 w-16 place-items-center rounded-2xl border-3 border-neo-black text-neo-black shadow-[0_4px_0_rgb(var(--neo-black))] tv:-mt-20 tv:h-28 tv:w-28', MODE_FILL[mode.color])}
         >
-          <Icon aria-hidden="true" className="w-5 h-5 lg:w-6 lg:h-6 tv:w-9 tv:h-9" strokeWidth={2.75} />
+          <Icon aria-hidden="true" className="h-9 w-9 tv:h-16 tv:w-16" strokeWidth={2.5} />
+        </span>
+        <span data-testid="mp-countdown-mode" className={cn('font-neo-display font-bold uppercase tracking-wide text-3xl tv:text-6xl', MODE_TEXT[mode.color])}>
           {t(mode.nameKey)}
         </span>
-        <p data-testid="mp-countdown-rule" dir="auto" className="font-neo-body font-bold text-base lg:text-xl tv:text-3xl text-neo-white/90 leading-snug text-balance">
+        <p data-testid="mp-countdown-rule" dir="auto" className="font-neo-body font-bold text-base tv:text-3xl text-neo-white/85 leading-snug text-balance">
           {t(mode.ruleKey)}
         </p>
-        {howTo?.steps[0] && (
-          <div data-testid="mp-countdown-howto" className="flex w-64 tv:w-96 flex-col items-center gap-1.5 rounded-neo border-3 border-neo-black bg-neo-navy-light p-2 shadow-hard">
-            {/* The demo spells a Latin sample word: keep it left-to-right inside an RTL page. */}
-            <div dir="ltr" className="w-full">
-              <CoachDemo demo={howTo.steps[0].demo} accent={howTo.accent} emoji={howTo.steps[0].emoji} />
-            </div>
-            <span dir="auto" className="font-neo-body text-sm tv:text-xl font-bold text-neo-white/85">{t(captionKeyFor(howTo.steps[0], typingDesktop))}</span>
+        {/* 2. The move itself, looping: a finger swipes a real word and it scores. */}
+        {demo && howTo && (
+          <PopIn delay={0.15} data-testid="mp-countdown-howto" className="mt-1 flex flex-col items-center gap-1.5 tv:scale-150 tv:my-8">
+            {demo.demo === 'drag' ? (
+              <MiniBoardDemo word={t('mpUi.round.demoWord')} points={3} rtl={dir === 'rtl'} reduced={reduceMotion} />
+            ) : (
+              <div dir="ltr" className="w-64">
+                <CoachDemo demo={demo.demo} accent={howTo.accent} emoji={demo.emoji} />
+              </div>
+            )}
+            <span dir="auto" className={demo.demo === 'drag' ? 'sr-only' : 'font-neo-body text-sm font-bold text-neo-white/70'}>{t(captionKeyFor(demo, typingDesktop))}</span>
+          </PopIn>
+        )}
+      </PopIn>
+
+      {/* 4. 3-2-1: each numeral springs in while a ring of ticks fills around it, then GO bursts. */}
+      <div className="relative grid aspect-square h-[min(24vh,11rem)] max-w-full place-items-center tv:h-[22rem]">
+        {!isGo && (
+          <div
+            key={`ring-${count}`}
+            data-testid="mp-countdown-ring"
+            aria-hidden="true"
+            className={cn('absolute inset-0', animate && styles.ringFill)}
+          >
+            {RING_TICKS.map((i) => (
+              <span key={i} className="absolute inset-0" style={{ transform: `rotate(${i * 30}deg)` }}>
+                <span
+                  className={cn('absolute left-1/2 top-0 -ms-1.5 h-4 w-3 rounded-full border-2 border-neo-black tv:h-7 tv:w-5', MODE_FILL[mode.color])}
+                  style={animate ? { animationDelay: `${Math.round((i * COUNT_STEP_MS * 0.85) / RING_TICKS.length)}ms` } : undefined}
+                />
+              </span>
+            ))}
           </div>
         )}
-      </div>
-
-      {/* The numeral — 40vh, keyed so the punch runs once per step. GO is width-capped: a 5+ glyph word (קדימה) at the 1.4x punch peak must still fit a phone. */}
-      <div className="relative flex flex-1 min-h-0 items-center justify-center w-full">
-        {isGo && !staticLayer && (
-          <span
-            aria-hidden="true"
-            className={cn('pointer-events-none absolute w-32 h-32 rounded-full border-8 border-neo-lime', styles.goRing)}
-          />
+        {isGo && animate && (
+          <>
+            <span aria-hidden="true" className={cn('pointer-events-none absolute w-32 h-32 rounded-full border-8 border-neo-lime', styles.goRing)} />
+            {RAY_ANGLES.map((a) => (
+              <span
+                key={a}
+                aria-hidden="true"
+                className={cn('pointer-events-none absolute h-8 w-3 rounded-full bg-neo-yellow', styles.goRay)}
+                style={{ '--ray-a': `${a}deg` } as CSSProperties}
+              />
+            ))}
+          </>
         )}
         <span
           key={count}
           data-testid="mp-countdown-numeral"
           className={cn(
             'relative max-w-full text-center font-neo-display font-bold leading-none tabular-nums [text-shadow:0.06em_0.06em_0_var(--neo-black)]',
-            isGo ? 'text-[min(26vh,14vw)] md:text-[min(26vh,20vw)] text-neo-lime' : cn('text-[40vh]', MODE_TEXT[mode.color]),
+            isGo ? 'text-[min(26vh,14vw)] md:text-[min(26vh,20vw)] text-neo-lime' : 'text-[min(20vh,36vw)] text-neo-white',
             !reduceMotion && styles.countPunch,
           )}
         >
@@ -186,26 +224,27 @@ function MpCountdownStageImpl({ onComplete, t: tProp, players, classroom }: MpCo
         </span>
       </div>
 
-      {/* Who you're about to face */}
+      {/* 3. Who you're about to face: avatars hop in one by one. */}
       <div className="flex flex-col items-center gap-2 tv:gap-4">
         {avatars.length > 0 && (
-          <div data-testid="countdown-avatars" className="flex items-center justify-center -space-x-2 rtl:space-x-reverse">
-            {avatars.map((p) => (
+          <div data-testid="countdown-avatars" className="flex items-center justify-center gap-1.5">
+            {avatars.map((p, i) => (
               <span
                 key={p.username}
-                className="rounded-full border-3 border-neo-black bg-neo-navy-light shadow-hard-sm"
-                style={{ width: 'calc(48px * var(--mp-u, 1))', height: 'calc(48px * var(--mp-u, 1))' }}
+                data-hop={i}
+                className={cn('rounded-full border-3 border-neo-black bg-neo-navy-light shadow-[0_3px_0_rgb(var(--neo-black))]', animate && styles.hopIn)}
+                style={{ width: 'calc(48px * var(--mp-u, 1))', height: 'calc(48px * var(--mp-u, 1))', ...(animate ? { animationDelay: `${300 + i * HOP_STEP_MS}ms` } : null) }}
               >
                 <Avatar pixelSize={44} customAvatar={p.avatar?.customAvatar ?? null} userId={p.username} className="rounded-full" />
               </span>
             ))}
             {overflow > 0 && (
-              <span className="ms-3 rounded-full border-2 border-neo-black bg-neo-navy-light px-2 py-0.5 text-sm font-bold">+{overflow}</span>
+              <span className="ms-1 rounded-full border-2 border-neo-black bg-neo-navy-light px-2 py-0.5 text-sm font-bold">+{overflow}</span>
             )}
           </div>
         )}
         {soloVsBots ? (
-          <p data-testid="mp-countdown-vs-bots" className="rounded-neo border-3 border-neo-black bg-neo-cyan px-3 py-1 shadow-hard-sm font-neo-display font-bold uppercase tracking-wide rtl:tracking-normal text-sm tv:text-2xl text-neo-black">
+          <p data-testid="mp-countdown-vs-bots" className="rounded-full border-3 border-neo-black bg-neo-cyan px-4 py-1 shadow-[0_3px_0_rgb(var(--neo-black))] font-neo-display font-bold uppercase tracking-wide rtl:tracking-normal text-sm tv:text-2xl text-neo-black">
             {t(pluralKeyOf('mpUi.round.youVsBots', botCount, language), { count: botCount })}
           </p>
         ) : (

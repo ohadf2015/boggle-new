@@ -22,6 +22,8 @@ import { ClassroomStrip } from './ClassroomStrip';
 import { HomeEducationCardConnected } from '@/components/education/HomeEducationCardConnected';
 import { FreshAdSlot } from '@/components/landing/fresh/FreshAdSlot';
 import { pickHeroAvatar, type HeroAvatar } from './heroAvatar';
+import { heroBubble, type HeroBubbleLine } from './heroBubble';
+import { quickRoundsPlayed } from '@/lib/quickPlay/guestProgress';
 import { readLastAccountAvatar } from '@/utils/accountAvatarCache';
 
 export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
@@ -33,9 +35,15 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   const [guestAvatar, setGuestAvatar] = useState<CustomAvatarConfig | null>(null);
   const [mounted, setMounted] = useState(false);
   const [lastAccount, setLastAccount] = useState<HeroAvatar | null>(null);
+  const [roundsPlayed, setRoundsPlayed] = useState(0);
 
   useEffect(() => {
     setMounted(true);
+    try {
+      setRoundsPlayed(quickRoundsPlayed());
+    } catch {
+      /* storage blocked: reads as a first visit */
+    }
     setGuestAvatar(getOrCreateStoredCustomAvatar());
     const last = readLastAccountAvatar();
     setLastAccount(last ? { userId: last.userId, customAvatar: last.config } : null);
@@ -46,34 +54,34 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
   // (or the placeholder) holds the spot: no guest face, no id-generated face.
   const avatar = ready ? pickHeroAvatar(user?.id ?? null, profile, guestAvatar) : mounted ? lastAccount : null;
   const name = profile?.display_name || profile?.username;
-  const greeting = name ? t('homePlay.greetingUser', { name }) : t('homePlay.greetingGuest');
   const tt = t as (key: string, params?: Record<string, string | number>) => string;
   const animate = mounted && !reduced;
+  // The line is picked once, when auth, profile, streak and this device's rounds are all known, then frozen.
+  const liveLine = heroBubble({ ready: ready && !streakLoading && (!user || !!profile), roundsPlayed, streak, atRisk: streakView.atRisk, name });
+  const [line, setLine] = useState<HeroBubbleLine | null>(null);
+  if (!line && liveLine) setLine(liveLine);
 
   return (
     <div className="overflow-x-clip bg-neo-navy pb-8" data-testid="home-preview">
       {/* Teachers: their class first, above the play hero. Renders nothing for anyone else. */}
-      <div className="mx-auto w-full max-w-md px-4 pt-3 empty:hidden lg:max-w-[1600px] lg:px-14 lg:pt-6">
+      <div className="mx-auto w-full max-w-[480px] px-4 pt-3 empty:hidden lg:max-w-4xl lg:pt-6">
         <HomeEducationCardConnected slot="top" />
       </div>
       <div className="relative isolate">
-        {/* Shapes stay beside the avatar, never under the text or PLAY. */}
-        <AmbientBackdrop theme="home" hill={false} className="bottom-auto h-[116px] max-lg:mask-b-from-50% lg:bottom-0 lg:h-auto lg:end-[calc(50%+96px)] lg:overflow-visible" />
-        <div className="mx-auto w-full lg:max-w-[1600px] lg:px-14 lg:pt-6">
-          <PlayHero
-            lang={language}
-            t={tt}
-            animate={animate}
-            avatar={avatar}
-            greeting={greeting}
-            streak={streak}
-            streakLoading={streakLoading}
-            atRisk={streakView.atRisk}
-            playedToday={streakView.playedToday}
-            onAvatarSaved={setGuestAvatar}
-            onPlay={onPlay}
-          />
-        </div>
+        <AmbientBackdrop theme="home" hill={false} className="max-lg:bottom-[68%]" />
+        <PlayHero
+          lang={language}
+          t={tt}
+          animate={animate}
+          avatar={avatar}
+          bubble={line ? tt(line.key, line.params) : null}
+          streak={streak}
+          streakLoading={streakLoading}
+          atRisk={streakView.atRisk}
+          playedToday={streakView.playedToday}
+          onAvatarSaved={setGuestAvatar}
+          onPlay={onPlay}
+        />
       </div>
 
       {/* grid-cols-1, not an implicit column: an implicit `auto` track sizes itself
@@ -82,9 +90,9 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           min-w-0 on each cell lets truncate/wrap work inside the track. */}
       <div
         data-testid="hp-cards"
-        className="mx-auto mt-8 grid w-full max-w-md grid-cols-1 gap-8 px-4 lg:mt-14 lg:max-w-[1600px] lg:grid-cols-12 lg:gap-10 lg:px-14"
+        className="mx-auto mt-16 grid w-full max-w-[480px] grid-cols-1 gap-8 lg:mt-10 lg:max-w-4xl lg:grid-cols-2 lg:gap-6 lg:px-6"
       >
-        <div className="flex min-w-0 flex-col gap-4 lg:col-span-7">
+        <div className="flex min-w-0 flex-col gap-4 px-4 lg:px-0">
           <DailyBlock
             lang={language}
             t={tt}
@@ -101,13 +109,13 @@ export function HomePreview({ onPlay }: { onPlay?: () => void } = {}) {
           <StreakMilestoneCheer view={streakView} />
           <WeeklyThemeCard lang={language} t={tt} source="home" compact />
         </div>
-        <div className="min-w-0 lg:col-span-5">
+        <div className="min-w-0 px-4 lg:px-0">
           <FriendsBlock lang={language} t={tt} showAvatars={mounted} />
         </div>
-        <div className="min-w-0 lg:col-span-12">
+        <div className="min-w-0 px-4 lg:col-span-2 lg:px-0">
           <HomeAdventureCard />
         </div>
-        <div className="min-w-0 lg:col-span-12">
+        <div className="min-w-0 px-4 lg:col-span-2 lg:px-0">
           <MoreGames lang={language} t={tt} hideAdventure showCrossword={canSeeInWorkModes && hasCrosswordPuzzles(language)} />
         </div>
       </div>

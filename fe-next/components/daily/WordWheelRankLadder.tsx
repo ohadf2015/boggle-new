@@ -23,7 +23,7 @@ interface WordWheelRankLadderProps {
   rivals: LadderRival[];
   showRival?: boolean;
   /** bar = phone strip, wide = desktop hero strip, list = desktop side panel. */
-  variant?: 'bar' | 'wide' | 'list';
+  variant?: 'bar' | 'wide' | 'list' | 'chip';
 }
 
 const SPRING = { type: 'spring', stiffness: 260, damping: 26 } as const;
@@ -103,6 +103,16 @@ export default function WordWheelRankLadder({
     if (index > prevIndexRef.current) setRankUpKey(k => k + 1);
     prevIndexRef.current = index;
   }, [index]);
+
+  if (variant === 'chip') {
+    return (
+      <p data-testid="rank-chip" data-rank-index={index} className="mx-auto flex max-w-full items-center gap-1.5 truncate rounded-full bg-neo-cream/10 px-3 py-1 font-neo-display text-sm font-bold text-neo-cream/80">
+        <span className="text-neo-lime">{rankName}</span>
+        {toNext > 0 && <span aria-hidden>·</span>}
+        {toNext > 0 && <span className="truncate">{t('wordWheel.rank.toNext', { count: toNext, rank: t(`wordWheel.rank.${WHEEL_RANKS[index + 1]}`) })}</span>}
+      </p>
+    );
+  }
 
   if (variant === 'list') {
     return (

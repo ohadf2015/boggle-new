@@ -41,4 +41,3 @@ describe('HomePreview — teacher class entry', () => {
     expect(order[1]).toBe('slot-hero');
   });
 });
-

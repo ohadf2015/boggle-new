@@ -102,6 +102,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
             duration={config.durationSec}
             language={config.language as never}
             hideCompetitive
+            lessonHud
             // The wheel owns a rival pill + pass toasts already; hideCompetitive
             // only switches them off because the DAILY board is the wrong cohort
             // for a quick round. Hand it the quick-play ghosts instead — undefined

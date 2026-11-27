@@ -109,6 +109,7 @@ export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps
         boardClearMode: 'shrink',
       }}
       mode="multiplayer"
+      ownMute
       serverGrid={config.grid as never}
       blastSeed={hashString(config.seed)}
       remainingTime={remaining}

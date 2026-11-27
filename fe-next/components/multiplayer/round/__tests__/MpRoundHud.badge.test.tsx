@@ -14,7 +14,6 @@ const PROPS = {
   rank: 2,
   total: 5,
   comboLevel: 3,
-  timerColor: 'cyan' as const,
   onExit: () => {},
 };
 

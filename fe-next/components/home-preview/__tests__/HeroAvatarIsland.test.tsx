@@ -39,7 +39,7 @@ function renderHeroWithIsland(overrides: Partial<React.ComponentProps<typeof Pla
         t={t}
         animate={false}
         avatar={{ userId: 'u1', customAvatar: null }}
-        greeting="Hey there"
+        bubble={null}
         streak={0}
         streakLoading={false}
         onAvatarSaved={vi.fn()}
@@ -121,7 +121,6 @@ describe('HeroAvatarIsland', () => {
     renderHeroWithIsland();
     const slot = screen.getByTestId('hp-avatar-slot');
     const px = Number(/(?:^|\s)h-\[(\d+)px\]/.exec(slot.className)?.[1]);
-    const phone = slot.querySelector('.lg\\:hidden [data-px]');
-    expect(Number(phone?.getAttribute('data-px'))).toBe(px);
+    expect(Number(slot.querySelector('.lg\\:hidden [data-px]')?.getAttribute('data-px'))).toBe(px);
   });
 });

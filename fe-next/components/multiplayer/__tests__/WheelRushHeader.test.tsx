@@ -137,4 +137,15 @@ describe('WheelRushHeader', () => {
     expect(screen.queryByTestId('wheel-close-race-indicator')).toBeNull();
     expect(screen.getByTestId('wheel-opp-carol').className).not.toContain('border-neo-orange');
   });
+
+  it('one lesson-style HUD row: leave, a single timer bar, my score pill, mute; the rival sits on one slim row below', () => {
+    setup({ remainingTime: 40, totalTime: 60 });
+    const row = screen.getByTestId('wheel-hud-row');
+    expect(within(row).getByTestId('wheel-rush-leave')).toBeTruthy();
+    expect(within(row).getByRole('progressbar')).toBeTruthy();
+    expect(within(row).getByTestId('wheel-self-badge')).toBeTruthy();
+    expect(within(row).getByTestId('mp-round-mute')).toBeTruthy();
+    expect(screen.getAllByRole('progressbar')).toHaveLength(1);
+    expect(within(row).queryByTestId('wheel-opponent-rail')).toBeNull();
+  });
 });

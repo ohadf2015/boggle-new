@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Star } from 'lucide-react';
 import AnimatedCounter from '@/components/ui/AnimatedCounter';
 import { cn } from '@/lib/utils';
-import { MASCOT_SRC, mascotFor } from './mpResultsView';
+import { MASCOT_SRC, mpVerdict } from './mpResultsView';
 import type { ResultCallout } from './mpResultsStory';
 import { MEDAL_SRC, MpCalloutLine, ResultArt } from './MpResultArt';
 import fx from './mpResults.module.css';
@@ -24,6 +24,12 @@ export interface MpMyCardProps {
   total: number;
   /** The server's round score for me. */
   score: number;
+  /** Counted words this round. */
+  words?: number;
+  /** Someone else shares my rank. */
+  tied?: boolean;
+  /** Nobody in the room scored. */
+  allZero?: boolean;
   bestWord: { word: string; score: number } | null;
   xp: number | null;
   coins: number | null;
@@ -55,13 +61,17 @@ export interface MpMyCardProps {
  * up, the best word and what I earned. Numbers are the server's (the counter
  * only animates the display, from 0 to `score`).
  */
-function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMissed = null, language = 'en', callout, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
+function MpMyCardImpl({ rank, winner, total, score, tied = false, allZero = false, bestWord, xp, coins, bestMissed = null, language = 'en', callout, revealed, series = false, hideClassPosition = false, t, className }: MpMyCardProps) {
   const calm = hideClassPosition;
   // A class that lost to the boss has no winner: the top scorer keeps a rank, not a crown.
   const lostBoss = useClassroomBossStore((s) => s.view?.status === 'escaped');
-  const mood = calm || (lostBoss && winner) ? 'cheer' : mascotFor(rank, total, score);
-  const showWinner = !calm && winner && !lostBoss;
-  const medal = !calm && score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
+  const verdict = lostBoss && winner && !calm
+    ? { key: 'mpUi.results.headPlace', mood: 'cheer' as const, badge: true }
+    : mpVerdict({ rank, total, score, tied, allZero, series, calm });
+  const mood = verdict.mood;
+  const showWinner = !calm && winner && !lostBoss && !tied;
+  const medal = verdict.badge && score > 0 && rank >= 1 && rank <= 3 ? (rank as 1 | 2 | 3) : null;
+  const tieOrBlank = ['mpUi.results.headTiedFirst', 'mpUi.results.headTiedPlace', 'mpUi.results.headAllZero'].includes(verdict.key);
   const reaction: MascotRigState = !revealed ? 'idle' : mood === 'victory' ? 'cheer' : mood === 'oops' ? 'sad' : 'hop';
 
   return (
@@ -90,7 +100,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
             className="w-full h-full object-contain drop-shadow-[3px_3px_0_rgb(var(--neo-black))]"
           />
         </MascotRig>
-        {!calm && (medal ? (
+        {verdict.badge && (medal ? (
           <span data-testid="mp-my-rank" data-medal={medal} className={cn('absolute -bottom-2 -end-3 block w-[calc(44px*var(--mp-u,1))] h-[calc(44px*var(--mp-u,1))]', revealed && fx.medalDrop)}>
             <span className="sr-only">#{rank}</span>
             <ResultArt
@@ -119,6 +129,8 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
           <span className="font-neo-display font-bold uppercase leading-none text-[calc(15px*var(--mp-u,1))] truncate">
             {calm
               ? t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.roundPoints')
+              : tieOrBlank
+                ? t(verdict.key, { rank })
               : showWinner
                 ? t(series ? 'mpUi.results.seriesChampion' : 'mpUi.results.winner')
                 : series
@@ -132,7 +144,7 @@ function MpMyCardImpl({ rank, winner, total, score, bestWord, xp, coins, bestMis
           </span>
           <span className="min-w-0 truncate font-neo-body font-bold text-[calc(13px*var(--mp-u,1))] opacity-70">{t(series ? 'mpUi.results.seriesPts' : 'mpUi.results.pts')}</span>
         </div>
-        {!calm && callout && <MpCalloutLine callout={callout} revealed={revealed} t={t} />}
+        {!calm && !allZero && callout && <MpCalloutLine callout={callout} revealed={revealed} t={t} />}
         <div className="flex flex-wrap items-center gap-1.5 min-w-0">
           {bestWord && (
             <span data-testid="mp-my-best-word" className={cn('inline-flex items-center gap-1 rounded-full border-2 border-neo-black bg-neo-lime px-2 py-0.5 text-[calc(12px*var(--mp-u,1))] font-bold max-w-full min-w-0', revealed && fx.chipPop)}>

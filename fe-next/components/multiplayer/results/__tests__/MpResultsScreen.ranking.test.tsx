@@ -60,6 +60,9 @@ vi.mock('framer-motion', () => {
       span: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
         <span {...props}>{children}</span>
       ),
+      li: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+        <li {...props}>{children}</li>
+      ),
     },
     useAnimationControls: () => ({ start: () => Promise.resolve() }),
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
@@ -111,7 +114,7 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
 // NumberFlow needs a real browser; the rank under test is not the counter.
 // The header's sound toggle (new on the rebuilt screen) reads the app's MusicProvider.
 vi.mock('@/hooks/useMasterMute', () => ({ useMasterMute: () => ({ allMuted: false, toggle: () => {}, label: 'Mute', title: 'Mute' }) }));
-vi.mock('@/components/ui/AnimatedCounter', () => ({ __esModule: true, default: ({ value }: { value: number }) => <span>{value}</span> }));
+vi.mock('@/components/ui/AnimatedCounter', () => { const C = ({ value }: { value: number }) => <span>{value}</span>; return { __esModule: true, default: C, AnimatedCounter: C }; });
 
 // Import after all mocks are set up
 import ResultsPage from '../MpResultsScreen';
@@ -226,7 +229,7 @@ describe('ResultsPage Ranking', () => {
       expect(myCardRank()).toBe('#1');
     });
 
-    it('should show rank 1 for zero-score player listed first in multiplayer', () => {
+    it('an all-zero room ranks no one: no badge, the nobody-scored headline', () => {
       // When both players have zero score, sort is stable so first player stays first.
       // currentPlayerRank reflects the raw position (1-based).
       const finalScores = [
@@ -240,7 +243,8 @@ describe('ResultsPage Ranking', () => {
       });
 
       // ZeroScorePlayer is first in the sorted list (stable sort, both score 0)
-      expect(myCardRank()).toBe('#1');
+      expect(screen.queryByTestId('mp-my-rank')).toBeNull();
+      expect(screen.getByTestId('mp-my-card').textContent).toContain('Nobody scored!');
     });
   });
 });

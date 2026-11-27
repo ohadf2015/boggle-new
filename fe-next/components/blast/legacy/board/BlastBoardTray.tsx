@@ -10,6 +10,8 @@ interface BlastBoardTrayProps {
   animateGlow: boolean;
   isDesktopCanvas: boolean;
   children: ReactNode;
+  /** The word chip, kept directly under the board. */
+  footer?: ReactNode;
 }
 
 function trayBorder(chainLevel: number, comboFlashTier: number): string {
@@ -31,14 +33,14 @@ function glowColor(chainLevel: number, comboFlashTier: number): string {
  * short side of whatever space the HUD and word bar leave. Phones anchor it
  * under the HUD; the space below belongs to the word bar and coach.
  */
-export function BlastBoardTray({ chainLevel, comboFlashTier, animateGlow, isDesktopCanvas, children }: BlastBoardTrayProps) {
+export function BlastBoardTray({ chainLevel, comboFlashTier, animateGlow, isDesktopCanvas, children, footer }: BlastBoardTrayProps) {
   const glowing = chainLevel >= 2 || comboFlashTier >= 2;
   return (
-    <div className="blast-tray-slot flex w-full min-h-0 flex-1 items-start justify-center pt-3 shell:items-center shell:pt-0 [container-type:size]">
+    <div className="blast-tray-slot flex w-full min-h-0 flex-1 flex-col items-center justify-center gap-2 [container-type:size]">
       <div
         data-testid="blast-board-tray"
         className={cn(
-          'blast-tray relative w-[min(100cqw,100cqh)] rounded-neo border-3 p-1 shadow-hard-lg transition-colors duration-300 sm:p-1.5',
+          'blast-tray relative w-[min(100cqw,calc(100cqh-3.5rem))] rounded-neo border-3 p-1 shadow-hard-lg transition-colors duration-300 sm:p-1.5',
           isDesktopCanvas ? 'max-w-[min(680px,82dvh)]' : '2xl:max-w-[min(820px,86dvh)]',
           trayBorder(chainLevel, comboFlashTier),
         )}
@@ -49,6 +51,7 @@ export function BlastBoardTray({ chainLevel, comboFlashTier, animateGlow, isDesk
       >
         {children}
       </div>
+      {footer}
     </div>
   );
 }

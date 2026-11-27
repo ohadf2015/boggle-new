@@ -179,6 +179,33 @@ export function showInlineSignup(_input: {
   return false;
 }
 
+export interface VerdictInput {
+  rank: number;
+  total: number;
+  score: number;
+  /** Someone else shares my rank. */
+  tied: boolean;
+  /** Nobody in the room scored. */
+  allZero: boolean;
+  series?: boolean;
+  /** The teacher hid placings: no verdict about rank. */
+  calm?: boolean;
+}
+
+/** One verdict per result: the headline key, the mascot's face, and whether a rank badge belongs on it. */
+export function mpVerdict({ rank, total, score, tied, allZero, series = false, calm = false }: VerdictInput): { key: string; mood: MascotMood; badge: boolean } {
+  if (calm) return { key: 'mpUi.results.headCalm', mood: 'cheer', badge: false };
+  if (allZero) return { key: 'mpUi.results.headAllZero', mood: 'think', badge: false };
+  if (rank <= 1 && score > 0) {
+    if (tied) return { key: 'mpUi.results.headTiedFirst', mood: 'cheer', badge: true };
+    return { key: series ? 'mpUi.results.headSeriesWon' : 'mpUi.results.winner', mood: 'victory', badge: true };
+  }
+  if (tied) return { key: 'mpUi.results.headTiedPlace', mood: 'think', badge: true };
+  if (series) return { key: 'mpUi.results.seriesPlace', mood: mascotFor(rank, total, score), badge: true };
+  if (total >= 2 && rank >= total) return { key: 'mpUi.results.headTough', mood: 'oops', badge: true };
+  return { key: 'mpUi.results.headPlace', mood: mascotFor(rank, total, score), badge: true };
+}
+
 export interface GuestAskPlan {
   /** "Pick a name for the board" (PublicNamePrompt). */
   namePrompt: boolean;

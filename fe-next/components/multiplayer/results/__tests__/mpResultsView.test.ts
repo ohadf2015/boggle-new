@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer, seriesPlacing, seriesLadder } from '../mpResultsView';
+import { pickVisibleRows, mascotFor, pickBestWord, rivalGap, nextModeForViewer, seriesPlacing, seriesLadder, mpVerdict } from '../mpResultsView';
 import type { MpStandingRow } from '../mpStandings';
 
 const row = (username: string, rank: number, score: number, isMe = false): MpStandingRow => ({
@@ -215,5 +215,30 @@ describe('seriesLadder (the final board of a series ranks the SERIES)', () => {
   it('is null without series totals (round 1 / no series)', () => {
     expect(seriesLadder([sRow('A', 1, 5, null)])).toBeNull();
     expect(seriesLadder([])).toBeNull();
+  });
+});
+
+describe('mpVerdict (the results headline + mascot)', () => {
+  const v = (o: Partial<Parameters<typeof mpVerdict>[0]>) => mpVerdict({ rank: 1, total: 4, score: 40, tied: false, allZero: false, ...o });
+  it.each([
+    ['win', {}, 'mpUi.results.winner', 'victory'],
+    ['tie for first', { tied: true }, 'mpUi.results.headTiedFirst', 'cheer'],
+    ['mid', { rank: 2, score: 20 }, 'mpUi.results.headPlace', 'cheer'],
+    ['last', { rank: 4, score: 5 }, 'mpUi.results.headTough', 'oops'],
+    ['tied last', { rank: 3, score: 0, tied: true }, 'mpUi.results.headTiedPlace', 'think'],
+    ['all zero', { rank: 1, score: 0, tied: true, allZero: true }, 'mpUi.results.headAllZero', 'think'],
+    ['series win', { series: true }, 'mpUi.results.headSeriesWon', 'victory'],
+    ['series mid', { series: true, rank: 2, score: 10 }, 'mpUi.results.seriesPlace', 'cheer'],
+    ['hidden placings', { calm: true, rank: 4 }, 'mpUi.results.headCalm', 'cheer'],
+  ] as const)('%s', (_name, input, key, mood) => {
+    const out = v(input as never);
+    expect(out.key).toBe(key);
+    expect(out.mood).toBe(mood);
+  });
+
+  it('only a sole winner or a podium placing earns a rank badge; an all-zero room shows none', () => {
+    expect(v({ allZero: true, score: 0, tied: true }).badge).toBe(false);
+    expect(v({}).badge).toBe(true);
+    expect(v({ calm: true }).badge).toBe(false);
   });
 });

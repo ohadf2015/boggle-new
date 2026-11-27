@@ -70,7 +70,7 @@ describe('<AccessRequestGate>', () => {
 
   it('prompts unauthenticated visitors to sign up instead of showing the form', () => {
     render(<AccessRequestGate />);
-    expect(screen.getByText('education.access.auth_required_title')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /education\.access\.auth_required_cta/ })).toBeInTheDocument();
     expect(screen.queryByTestId('access-form')).not.toBeInTheDocument();
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('edu_access_gate_viewed', { state: 'auth_required' });
     expect(mockTrackSignupFunnel).toHaveBeenCalledWith('prompt_shown', false, {

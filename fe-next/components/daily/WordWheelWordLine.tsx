@@ -43,6 +43,8 @@ interface WordWheelWordLineProps {
   /** What the loaded dictionary says about the word being built: a new word, a non-word, or one already found. */
   live?: 'word' | 'no' | 'found' | null;
   className?: string;
+  /** Hide the inline submit on touch screens, where a big SUBMIT sits under the wheel. */
+  keyboardOnlySubmit?: boolean;
 }
 
 const POP = { type: 'spring', stiffness: 640, damping: 17 } as const;
@@ -65,7 +67,7 @@ function PendingLetter({ letter, reducedMotion }: { letter: string; reducedMotio
 export default function WordWheelWordLine({
   t, letters, centerLetter, allLetters, dir, onRemove, onSubmit, isValidating, pendingWord = null, shake, feedback,
   acceptedWord, acceptedPoints, acceptedMultiplier = null, acceptedGold = false, acceptedId, reducedMotion = false, hint = false, pending = null,
-  celebrating = false, banner, live = null, className,
+  celebrating = false, banner, live = null, className, keyboardOnlySubmit = false,
 }: WordWheelWordLineProps) {
   const word = letters.map(l => l.letter).join('');
   const typingDesktop = useTypingDesktop();
@@ -247,6 +249,7 @@ export default function WordWheelWordLine({
               aria-label={t('wordWheel.submit')}
               className={cn(
                 'relative ms-2 w-10 h-10 rounded-full border-[3px] border-neo-black grid place-items-center touch-manipulation',
+                keyboardOnlySubmit && 'pointer-coarse:hidden',
                 'before:absolute before:-inset-2 before:content-[""] active:translate-y-px',
                 isWord
                   ? 'bg-neo-lime text-neo-black shadow-[2px_2px_0_#000,0_0_14px_rgba(191,255,0,0.55)]'
