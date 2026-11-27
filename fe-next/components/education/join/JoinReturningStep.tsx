@@ -3,7 +3,7 @@
 import { UserCheck, UserX } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { NEO_BUTTON } from '@/components/ui/neoStyles';
+import { EDU_BUTTON } from '@/components/education/eduNeoStyles';
 import { JoinAlert } from './JoinAlert';
 import { JoinPrimaryButton } from './JoinPrimaryButton';
 
@@ -42,7 +42,7 @@ export function JoinReturningStep({ name, leaving, leaveFailed, onYes, onNotMe }
           onClick={onNotMe}
           disabled={leaving}
           aria-busy={leaving || undefined}
-          className={cn(NEO_BUTTON.secondary, 'w-full min-h-14 text-lg disabled:cursor-wait disabled:opacity-60')}
+          className={cn(EDU_BUTTON.secondary, 'w-full min-h-14 text-lg disabled:cursor-wait disabled:opacity-60')}
         >
           <UserX aria-hidden="true" className="size-5" />
           {leaving ? t(`${K}.returning.leaving`) : t(`${K}.returning.notMe`)}

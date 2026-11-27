@@ -1,8 +1,9 @@
 // One button and card vocabulary for Teacher Home, class setup and their states.
-import { NEO_BLOCK_TONES, NEO_BUTTON, NEO_FOCUS, NEO_QUIET_FOCUS as FOCUS, NEO_QUIET_PRESS as PRESS, neoChunkyPress } from '@/components/ui/neoStyles';
+import { NEO_QUIET_PRESS as PRESS, neoChunkyPress } from '@/components/ui/neoStyles';
+import { EDU_BUTTON, EDU_FOCUS, EDU_QUIET_FOCUS as FOCUS } from '@/components/education/eduNeoStyles';
 import { cn } from '@/lib/utils';
 
-export const SECONDARY_BUTTON = NEO_BUTTON.outlineLarge;
+export const SECONDARY_BUTTON = EDU_BUTTON.outlineLarge;
 
 export const QUIET_LINK = [
   'inline-flex min-h-[44px] items-center gap-1.5 rounded-neo px-2 font-neo-body text-sm font-bold text-edu-ink/80',
@@ -15,8 +16,8 @@ export const PANEL = 'rounded-neo-lg border-2 border-edu-line bg-edu-surface sha
 // The one card that leads the page sits a step lighter than the base panels beside it.
 export const PANEL_RAISED = 'rounded-neo-lg border-2 border-edu-line bg-edu-surface shadow-hard-lg';
 
-export const OUTLINE_BUTTON = NEO_BUTTON.outline;
-export const GHOST_BUTTON = NEO_BUTTON.ghost;
+export const OUTLINE_BUTTON = EDU_BUTTON.outline;
+export const GHOST_BUTTON = EDU_BUTTON.ghost;
 
 export const CHIP = 'inline-flex items-center whitespace-nowrap rounded-neo border border-edu-line px-1.5 py-px font-neo-body text-xs font-bold text-edu-ink/80';
 
@@ -40,7 +41,7 @@ export const HERO_CHIP = cn(
   'inline-flex min-h-11 min-w-0 items-center justify-center gap-1.5 rounded-neo-pill border-2 border-edu-line bg-edu-surface px-3 font-neo-display text-[0.8125rem] font-bold sm:px-3.5 sm:text-sm text-edu-ink [&_svg]:size-4',
   neoChunkyPress(2),
   'shadow-edu-line',
-  NEO_FOCUS,
+  EDU_FOCUS,
 );
 export const HERO_SECONDARY = HERO_CHIP;
 export const HERO_SECONDARY_WRAP = 'contents';

@@ -4,23 +4,23 @@
  * Same vocabulary as the live game screens, so the dashboard and the game feel like one product.
  */
 
-import { NEO_BLOCK_TONES, NEO_BUTTON, NEO_DARK_EDGE, NEO_FOCUS as FOCUS } from '@/components/ui/neoStyles';
+import { EDU_BLOCK_TONES, EDU_BUTTON, EDU_DARK_EDGE, EDU_FOCUS as FOCUS } from '@/components/education/eduNeoStyles';
 
 /** Outline for anything dark sitting on the dark page (cream, since black on navy has no edge). */
-export const NB_DARK_EDGE = NEO_DARK_EDGE;
+export const NB_DARK_EDGE = EDU_DARK_EDGE;
 
 /** Panel: dark card with a cream outline and a hard shadow. Pass a color block for the lead card. */
-export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-[#2a2b4a] text-edu-ink shadow-hard-xl`;
+export const NB_PANEL = `rounded-neo-xl border-[3px] ${NB_DARK_EDGE} bg-edu-surface text-edu-ink shadow-hard-xl`;
 
 /**
  * Bold panel for a screen that should shout: full cream outline and a big colored offset,
  * since a black shadow barely shows on the navy page. Pick the color per panel.
  */
 export const NB_PANEL_POP = {
-  lime: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-lime-xl',
-  cyan: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-cyan-xl',
-  pink: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-pink-xl',
-  yellow: 'rounded-neo-xl border-[3px] border-edu-line bg-[#2a2b4a] text-edu-ink shadow-hard-yellow-xl',
+  lime: 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-lime-xl',
+  cyan: 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-cyan-xl',
+  pink: 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-pink-xl',
+  yellow: 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface text-edu-ink shadow-hard-yellow-xl',
 } as const;
 
 /** Tilted icon tile for a panel heading. Combine with an NB_BLOCK color. */
@@ -28,19 +28,19 @@ export const NB_ICON_TILE =
   'inline-flex size-10 shrink-0 -rotate-3 items-center justify-center rounded-neo border-[3px] border-neo-black shadow-hard';
 
 /** Flat color blocks for lead cards. Put the block after the base style in cn() so its outline wins. */
-export const NB_BLOCK = NEO_BLOCK_TONES;
+export const NB_BLOCK = EDU_BLOCK_TONES;
 export type NbColor = keyof typeof NB_BLOCK;
 
 /** The one main action on a screen. */
-export const NB_PRIMARY = NEO_BUTTON.primary;
+export const NB_PRIMARY = EDU_BUTTON.primary;
 /** NB_PRIMARY's face for a <PressSurface asChild>, which adds the chunky lip and press. */
 export const NB_PRIMARY_FACE = `inline-flex items-center justify-center gap-2 rounded-neo-lg border-[3px] border-neo-black bg-neo-lime px-5 text-center font-neo-display text-xl font-black leading-tight text-neo-black ${FOCUS}`;
 /** A real second action: dark, still chunky. */
-export const NB_SECONDARY = NEO_BUTTON.secondary;
+export const NB_SECONDARY = EDU_BUTTON.secondary;
 /** NB_SECONDARY's face for a <PressSurface asChild>; pair with a cream/40 lip, since black has no edge on navy. */
 export const NB_SECONDARY_FACE = `inline-flex min-h-[48px] items-center justify-center gap-2 rounded-neo-lg border-[3px] ${NB_DARK_EDGE} bg-edu-surface px-4 text-center font-neo-display text-base font-black leading-tight text-edu-ink shadow-edu-line ${FOCUS}`;
 /** Small chunky button for inside cards. Combine with an NB_BLOCK color. */
-export const NB_SMALL = NEO_BUTTON.small;
+export const NB_SMALL = EDU_BUTTON.small;
 
 /** Sticker: a small tilted-ready pill for facts and states (defaults, counts, streaks). */
 export const NB_STICKER =

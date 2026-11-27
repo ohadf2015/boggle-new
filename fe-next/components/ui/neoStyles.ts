@@ -45,7 +45,7 @@ export const NEO_FOCUS =
   'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy';
 
 /** Teacher press: lift on hover, drop into the offset shadow on press. */
-const NEO_TRANSLATE_PRESS =
+export const NEO_TRANSLATE_PRESS =
   'transition-[transform,box-shadow] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:-translate-x-px hover:-translate-y-px active:translate-x-[3px] active:translate-y-[3px] rtl:hover:translate-x-px rtl:active:-translate-x-[3px] active:shadow-none motion-reduce:transition-none motion-reduce:hover:translate-x-0 motion-reduce:hover:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60';
 
 /** Quiet outline press for secondary teacher controls: a small squash instead of a lift. */
