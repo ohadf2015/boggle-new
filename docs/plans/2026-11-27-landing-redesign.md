@@ -72,7 +72,7 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 15:45: prod-build shots: 266+dyn+juego parity OK, headings OK. Phone pages were 1.09x taller -> kit/blog phone
   spacing tightened; rebuilding, re-shooting, then full suite and review page (`~/.cache/lexiclash/lp1127/build_review.py`).
   Helper scripts live in `~/.cache/lexiclash/lp1127/` (scratchpad was cleared once mid-run).
-- 15:50: review page published https://claude.ai/artifact/4QJpueuw6p7gMvTKZoGXor (rebuild: `build_review.py`).
+- 15:50: review page published https://claude.ai/artifact/C3zbSRzDPekuMbpRBMDVYg (rebuild: `build_review.py`).
   Full suite running (~/.cache/lexiclash/lp1127/suite-{fe,be}.log). Then WAIT for owner approval before push/PR/merge.
 - 16:25: full suite green (FE 61164, BE 5220). GAP FOUND: `/education/*` SEO article/list pages + for-schools are
   out of edu-sky's scope ("stay dark") and were not done here. Doing them now as batch D. `/pricing` = edu session's
