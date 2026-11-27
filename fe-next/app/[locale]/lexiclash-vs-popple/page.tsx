@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,170 +90,128 @@ export default async function LexiClashVsPopplePage({ params }: PageProps) {
   const { locale } = await params;
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Try LexiClash Free' }}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}
       />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs Popple"
+        title="LexiClash vs Popple — Grid Swipe vs Letter Hunt"
+        lead="Both are real-time competitive multiplayer word games. Both are tactile, fast-paced, and weirdly addictive."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/adventure`} variant="secondary">Adventure Mode</LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Two LexiClash mascots facing off in a word duel')}
+        artTone="cyan"
+        more={
+          <p>
+            But they play very differently. Popple puts you on a grid and you swipe words, rack up combos, and strategically attack your opponents with fog, tornado, freeze, and mirror effects. LexiClash drops you on a shared grid and asks you to find words by connecting adjacent letters, race everyone else simultaneously. Same vibe of real-time tension, wildly different playbooks. Here&apos;s the full breakdown so you can pick your game.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/brain`, label: 'Brain Drills' }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          LexiClash vs Popple — Grid Swipe vs Letter Hunt
-        </h1>
+      <Section title="The Honest Comparison">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Popple']}
+          rows={[
+            ['Game type', 'Grid letter-finding, simultaneous', 'Grid swipe puzzle, simultaneous'],
+            ['Tactile input', 'Click/tap adjacent letters', 'Finger swipe on grid'],
+            ['Core mechanic', 'Find unlimited words per round', 'Swipe words, rack combos & multipliers'],
+            ['Attack system', 'No (pure word-finding)', 'Yes (fog, tornado, freeze, mirror)'],
+            ['Game modes', '30+', '1 main mode + daily'],
+            ['Multiplayer', 'Real-time, 2-20+ players', 'Real-time, 1v1 or teams'],
+            ['Solo gameplay', 'Extensive (adventure, drills, daily)', 'Minimal (daily streak only)'],
+            ['Languages', '5 (EN, HE, SV, JA, ES)', '1 (English)'],
+            ['RTL support', 'Yes (Hebrew)', 'No'],
+            ['Platforms', 'Web + Android', 'iOS + Android + Web'],
+            ['No download needed', 'Yes (browser only)', 'Yes + app available'],
+            ['Free to play', 'Completely', 'Free with cosmetic/premium options'],
+            ['Accessibility (WCAG)', 'AA standard', 'Standard'],
+          ]}
+        />
+      </Section>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Both are real-time competitive multiplayer word games. Both are tactile, fast-paced, and weirdly addictive. But they play very differently. Popple puts you on a grid and you swipe words, rack up combos, and strategically attack your opponents with fog, tornado, freeze, and mirror effects. LexiClash drops you on a shared grid and asks you to find words by connecting adjacent letters, race everyone else simultaneously. Same vibe of real-time tension, wildly different playbooks. Here&apos;s the full breakdown so you can pick your game.
-        </p>
+      <Section title="What LexiClash Does That Popple Doesn't">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'Adventure Campaign', body: '100+ levels across 10 worlds with boss battles, upgrades, and loot. A full story mode that turns word hunting into a journey.' },
+            { title: 'Brain Training Drills', body: '5 dedicated modes (Memory Hunt, Combo Master, etc.) that sharpen specific cognitive skills. Gameplay designed around learning, not just winning.' },
+            { title: 'Multilingual & RTL', body: 'English, Hebrew (full RTL), Swedish, Japanese, Spanish, Russian. Play word games in your language. Hebrew speakers especially — this is the only option.' },
+            { title: 'Unlimited Game Modes', body: '30+ modes including Connections, Wordle-style daily, Blast (action), Party games, and more. Same core skill set, wildly different experiences.' },
+            { title: 'Global Leaderboards', body: 'Daily challenges with worldwide rankings. Integrated into adventure progression and multiple game types.' },
+            { title: 'No App Required', body: 'Runs in your browser. Open a link, play immediately. Popple has apps, which is nice, but a web game is always faster to jump into.' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/adventure`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Adventure Mode
-          </Link>
-          <Link href={`/${locale}/brain`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-[background-color] hover:bg-neo-purple/10 sm:px-8 sm:py-4">
-            Brain Drills
-          </Link>
-        </section>
+      <Section title="The Gameplay Difference: Swipe vs Hunt">
+        <TileGrid
+          columns={2}
+          items={[
+            {
+              tone: 'cyan',
+              title: 'Popple (Swipe Model)',
+              body: "You get a grid (4×4 to 6×6). Your job: swipe words with your finger, rack up combo multipliers with consecutive words, and strategically deploy attacks (fog to obscure opponent grid, tornado to shuffle, freeze to lock input, mirror to flip view). Think Scrabble-meets-strategy-game. The sabotage system is what makes Popple unique — you're not just finding words, you're also managing what your opponent can do.",
+            },
+            {
+              tone: 'pink',
+              title: 'LexiClash (Hunt Model)',
+              body: "You get a grid of random letters. Your job: find as many words as possible by tapping or swiping to connect adjacent letters. No limit on how many you can make. It's scanning + pattern recognition + speed. Less chess-like than Popple, more arcade-like. Anyone can find something, but finding everything (and finding it fast) takes practice.",
+            },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Honest Comparison</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Popple</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ['Game type', 'Grid letter-finding, simultaneous', 'Grid swipe puzzle, simultaneous'],
-                  ['Tactile input', 'Click/tap adjacent letters', 'Finger swipe on grid'],
-                  ['Core mechanic', 'Find unlimited words per round', 'Swipe words, rack combos & multipliers'],
-                  ['Attack system', 'No (pure word-finding)', 'Yes (fog, tornado, freeze, mirror)'],
-                  ['Game modes', '30+', '1 main mode + daily'],
-                  ['Multiplayer', 'Real-time, 2-20+ players', 'Real-time, 1v1 or teams'],
-                  ['Solo gameplay', 'Extensive (adventure, drills, daily)', 'Minimal (daily streak only)'],
-                  ['Languages', '5 (EN, HE, SV, JA, ES)', '1 (English)'],
-                  ['RTL support', 'Yes (Hebrew)', 'No'],
-                  ['Platforms', 'Web + Android', 'iOS + Android + Web'],
-                  ['No download needed', 'Yes (browser only)', 'Yes + app available'],
-                  ['Free to play', 'Completely', 'Free with cosmetic/premium options'],
-                  ['Accessibility (WCAG)', 'AA standard', 'Standard'],
-                ].map(([feature, lexi, popple]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{popple}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <Section title="Why Popple Is Brilliant">
+        <Prose paper>
+          <p>
+            Popple&apos;s attack system is genuinely clever. Fog, tornado, freeze, mirror — they&apos;re not random power-ups, they&apos;re tactical choices that add a whole strategic layer. You have to think: do I use my attack now to disrupt them mid-round, or save it for the final turn? Do I go for a combo multiplier or play safe? That decision-making is what makes Popple special. If you love the tactile swipe input + the head-to-head puzzle of managing attacks, Popple is exactly what you need.
+          </p>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">What LexiClash Does That Popple Doesn&apos;t</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Adventure Campaign', desc: '100+ levels across 10 worlds with boss battles, upgrades, and loot. A full story mode that turns word hunting into a journey.' },
-              { title: 'Brain Training Drills', desc: '5 dedicated modes (Memory Hunt, Combo Master, etc.) that sharpen specific cognitive skills. Gameplay designed around learning, not just winning.' },
-              { title: 'Multilingual & RTL', desc: 'English, Hebrew (full RTL), Swedish, Japanese, Spanish, Russian. Play word games in your language. Hebrew speakers especially — this is the only option.' },
-              { title: 'Unlimited Game Modes', desc: '30+ modes including Connections, Wordle-style daily, Blast (action), Party games, and more. Same core skill set, wildly different experiences.' },
-              { title: 'Global Leaderboards', desc: 'Daily challenges with worldwide rankings. Integrated into adventure progression and multiple game types.' },
-              { title: 'No App Required', desc: 'Runs in your browser. Open a link, play immediately. Popple has apps, which is nice, but a web game is always faster to jump into.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently Asked Questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">The Gameplay Difference: Swipe vs Hunt</h2>
-          <div className="rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 p-6 shadow-hard">
-            <div className="mb-6">
-              <h3 className="mb-2 font-bold text-neo-cyan">Popple (Swipe Model)</h3>
-              <p className="text-neo-gray-200">
-                You get a grid (4×4 to 6×6). Your job: swipe words with your finger, rack up combo multipliers with consecutive words, and strategically deploy attacks (fog to obscure opponent grid, tornado to shuffle, freeze to lock input, mirror to flip view). Think Scrabble-meets-strategy-game. The sabotage system is what makes Popple unique — you&apos;re not just finding words, you&apos;re also managing what your opponent can do.
-              </p>
-            </div>
-            <div>
-              <h3 className="mb-2 font-bold text-neo-pink">LexiClash (Hunt Model)</h3>
-              <p className="text-neo-gray-200">
-                You get a grid of random letters. Your job: find as many words as possible by tapping or swiping to connect adjacent letters. No limit on how many you can make. It&apos;s scanning + pattern recognition + speed. Less chess-like than Popple, more arcade-like. Anyone can find something, but finding everything (and finding it fast) takes practice.
-              </p>
-            </div>
-          </div>
-        </section>
+      <Section title="More Comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', body: 'Unlimited vs 1 puzzle/day' },
+            { href: `/${locale}/lexiclash-vs-scrabble`, title: 'LexiClash vs Scrabble GO', body: 'No interruptions, no bots' },
+            { href: `/${locale}/lexiclash-vs-puzzly-words`, title: 'LexiClash vs Puzzly Words', body: 'Grid vs Rack gameplay' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Why Popple Is Brilliant</h2>
-          <div className="rounded-neo border-3 border-neo-gray-400/50 bg-neo-navy/50 p-6 shadow-hard">
-            <p className="text-neo-gray-200">
-              Popple&apos;s attack system is genuinely clever. Fog, tornado, freeze, mirror — they&apos;re not random power-ups, they&apos;re tactical choices that add a whole strategic layer. You have to think: do I use my attack now to disrupt them mid-round, or save it for the final turn? Do I go for a combo multiplier or play safe? That decision-making is what makes Popple special. If you love the tactile swipe input + the head-to-head puzzle of managing attacks, Popple is exactly what you need.
+      <CtaBand
+        tone="pink"
+        title="So Which One?"
+        body={
+          <div className="flex flex-col gap-3">
+            <p>
+              Popple is a fantastic game. If you love the tactile swipe input, the combo strategy, and especially the attack system (fog, tornado, freeze, mirror), that&apos;s your game. Period. The sabotage mechanic is genuinely unique and excellent.
+            </p>
+            <p>
+              LexiClash is for people who want more: the same multiplayer rush, but also story campaigns, brain training, daily challenges, six languages, party games, and the freedom to play as much as they want. It&apos;s bigger, deeper, and weird in the best way.
+            </p>
+            <p>
+              Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash offers beyond the single-grid puzzle format. Here&apos;s your shot.
             </p>
           </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently Asked Questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More Comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Unlimited vs 1 puzzle/day</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">No interruptions, no bots</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-puzzly-words`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Puzzly Words</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Grid vs Rack gameplay</p>
-            </Link>
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">So Which One?</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Popple is a fantastic game. If you love the tactile swipe input, the combo strategy, and especially the attack system (fog, tornado, freeze, mirror), that&apos;s your game. Period. The sabotage mechanic is genuinely unique and excellent.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            LexiClash is for people who want more: the same multiplayer rush, but also story campaigns, brain training, daily challenges, six languages, party games, and the freedom to play as much as they want. It&apos;s bigger, deeper, and weird in the best way.
-          </p>
-          <p className="mt-4 text-neo-gray-200">
-            Both are free. Both are real multiplayer. You honestly can&apos;t go wrong. But if you&apos;re scrolling this page, you probably want to see what LexiClash offers beyond the single-grid puzzle format. Here&apos;s your shot.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Play LexiClash Now — Free, No Download
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        }
+        actions={<LandingButton href={`/${locale}/multiplayer`}>Play LexiClash Now — Free, No Download</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -91,139 +91,94 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: 'Try LexiClash Free' }}>
       <script id="ld-vs-flocabulary-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-flocabulary-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs Flocabulary"
+        title="Flocabulary plays the song. LexiClash makes students play the words."
+        lead="Flocabulary nailed vocabulary hooks — its hip-hop videos make terms stick, and students enjoy them."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/education/vocabulary-games-classroom`} variant="secondary">
+              Classroom Games
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.reading('A LexiClash mascot reading a book of words')}
+        artTone="yellow"
+        more={
+          <p>
+            But it&apos;s a reception-first model: watch the song, then do the activity. For teachers who want{' '}
+            <strong>active recall and review</strong> on a zero budget, LexiClash flips it. Students form and spell real
+            words on Boggle-style grids, anagrams, and wheels in live rounds — no subscription, no student signup, six
+            languages. Many teachers introduce words with Flocabulary and <em>review</em> them with LexiClash.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education/esl-word-games`, label: 'ESL Word Games' }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Flocabulary plays the song. LexiClash makes students play the words.
-        </h1>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+      </div>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Flocabulary nailed vocabulary hooks — its hip-hop videos make terms stick, and students enjoy them. But it&apos;s a
-          reception-first model: watch the song, then do the activity. For teachers who want <strong>active recall and
-          review</strong> on a zero budget, LexiClash flips it. Students form and spell real words on Boggle-style grids,
-          anagrams, and wheels in live rounds — no subscription, no student signup, six languages. Many teachers introduce
-          words with Flocabulary and <em>review</em> them with LexiClash.
-        </p>
+      <Section title="Side-by-side, no spin">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Flocabulary']}
+          rows={compareRows.map((row) => [...row])}
+          caption="Flocabulary plan details and pricing as of 2026 — check flocabulary.com for current individual and school plans."
+        />
+      </Section>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+      <Section title="When LexiClash beats Flocabulary">
+        <TileGrid
+          items={[
+            { title: 'Free, no subscription', desc: 'Flocabulary is a paid annual plan. LexiClash classroom features are free and full — useful when there is no budget line for another license.' },
+            { title: 'Active recall, not reception', desc: 'Watching a song builds recognition. Forming and spelling words under time pressure builds production and retrieval — the harder, stickier skill.' },
+            { title: 'No student accounts', desc: 'A 6-character join code means any class plays instantly, including students without emails or rostered logins.' },
+            { title: 'Live multiplayer + duels', desc: 'Whole-class real-time games and 1v1 vocabulary duels add competitive energy Flocabulary’s lesson model doesn’t.' },
+            { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA/RU. Flocabulary content is English-first.' },
+            { title: 'Instant setup', desc: 'Pick a list, project the code, go. No lesson to assign, no roster to manage.' },
+          ].map((item) => ({ title: item.title, body: item.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Classroom Games
-          </Link>
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            ESL Word Games
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Side-by-side, no spin</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Flocabulary</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map(([feature, lexi, floc]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{floc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Flocabulary plan details and pricing as of 2026 — check flocabulary.com for current individual and school plans.</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Flocabulary</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Free, no subscription', desc: 'Flocabulary is a paid annual plan. LexiClash classroom features are free and full — useful when there is no budget line for another license.' },
-              { title: 'Active recall, not reception', desc: 'Watching a song builds recognition. Forming and spelling words under time pressure builds production and retrieval — the harder, stickier skill.' },
-              { title: 'No student accounts', desc: 'A 6-character join code means any class plays instantly, including students without emails or rostered logins.' },
-              { title: 'Live multiplayer + duels', desc: 'Whole-class real-time games and 1v1 vocabulary duels add competitive energy Flocabulary’s lesson model doesn’t.' },
-              { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash validates real words in EN/HE/ES/SV/JA/RU. Flocabulary content is English-first.' },
-              { title: 'Instant setup', desc: 'Pick a list, project the code, go. No lesson to assign, no roster to manage.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When Flocabulary still wins</h2>
-          <p className="text-neo-gray-200">
+      <Section title="When Flocabulary still wins">
+        <Prose paper>
+          <p>
             LexiClash doesn&apos;t teach new vocabulary the way Flocabulary does. If you want to <em>introduce</em> a unit&apos;s words
             with memorable, standards-aligned songs and structured lessons, Flocabulary&apos;s produced content is excellent and
             hard to replicate. LexiClash shines at the next step: turning those words into fast, competitive review that students
             actually play. The two pair naturally — introduce with Flocabulary, review with LexiClash.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently asked questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-quizlet`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Quizlet</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs flashcards. Free.</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-vocabularyspellingcity`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs SpellingCity</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Multiplayer vs individual drills</p>
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Education Hub</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">All classroom word games</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-quizlet`, title: 'LexiClash vs Quizlet', body: 'Word games vs flashcards. Free.' },
+            { href: `/${locale}/lexiclash-vs-vocabularyspellingcity`, title: 'LexiClash vs SpellingCity', body: 'Multiplayer vs individual drills' },
+            { href: `/${locale}/education`, title: 'Education Hub', body: 'All classroom word games' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Try it before next class</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Take this week&apos;s vocabulary list, drop it in, project the join code. Students play the words instead of watching
-            them. No subscription, no signup, no email capture — five minutes to find out if it fits your class.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Start a Classroom Game Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="purple"
+        title="Try it before next class"
+        body="Take this week's vocabulary list, drop it in, project the join code. Students play the words instead of watching them. No subscription, no signup, no email capture — five minutes to find out if it fits your class."
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>Start a Classroom Game Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

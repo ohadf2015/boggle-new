@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -92,140 +92,95 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: 'Try LexiClash Free' }}>
       <script id="ld-vs-quizlet-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-quizlet-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs Quizlet"
+        title="Quizlet's great. LexiClash is what classrooms use when the budget is zero."
+        lead="Quizlet built the modern flashcard standard, and millions of students use it every day."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/education/vocabulary-games-classroom`} variant="secondary">
+              Classroom Games
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Two LexiClash mascots facing off in a word duel')}
+        artTone="cyan"
+        more={
+          <p>
+            But for teachers running classroom vocabulary review with no budget, no IT permissions, and no time to set up
+            student accounts, LexiClash is built differently. Word-formation gameplay (not flashcards), no student signup
+            (6-character join code), live whole-class multiplayer in the free tier, and six languages with native
+            dictionaries. Same vocabulary goal, opposite philosophy.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education/duels`, label: 'Vocabulary Duels' }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Quizlet&apos;s great. LexiClash is what classrooms use when the budget is zero.
-        </h1>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+      </div>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Quizlet built the modern flashcard standard, and millions of students use it every day. But for teachers
-          running classroom vocabulary review with no budget, no IT permissions, and no time to set up student
-          accounts, LexiClash is built differently. Word-formation gameplay (not flashcards), no student signup
-          (6-character join code), live whole-class multiplayer in the free tier, and six languages with native
-          dictionaries. Same vocabulary goal, opposite philosophy.
-        </p>
+      <Section title="Side-by-side, no spin">
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'Quizlet']}
+          rows={compareRows.map((row) => [...row])}
+          caption="Quizlet pricing as of 2026: free tier with ads + Quizlet Plus $35.99/year for ad-free + offline + advanced features."
+        />
+      </Section>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+      <Section title="When LexiClash beats Quizlet">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'No student accounts required', desc: 'A teacher with 30 students who don’t have email addresses (or parental consent for under-13s) can’t use Quizlet without setup friction. LexiClash uses a 6-character join code — students play instantly.' },
+            { title: 'Spelling + word-pattern practice', desc: 'Flashcards drill memorization. Word-formation games drill spelling, letter patterns, and recall under time pressure — different cognitive skills, both useful.' },
+            { title: 'Free whole-class multiplayer', desc: 'Quizlet Live full features need Quizlet Plus. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
+            { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash has full dictionaries in EN/HE/ES/SV/JA. Quizlet relies on user-generated decks for non-English content.' },
+            { title: 'No ads in classroom', desc: 'Quizlet free tier shows ads to students during sessions. LexiClash classroom mode is ad-free.' },
+            { title: 'Faster setup', desc: 'Quizlet decks take 5-10 minutes to create. LexiClash word lists upload in under a minute, and most teachers use one of the built-in lists for instant play.' },
+          ].map((item) => ({ title: item.title, body: item.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Classroom Games
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            Vocabulary Duels
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Side-by-side, no spin</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Quizlet</th>
-                </tr>
-              </thead>
-              <tbody>
-                {compareRows.map(([feature, lexi, quizlet]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{quizlet}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Quizlet pricing as of 2026: free tier with ads + Quizlet Plus $35.99/year for ad-free + offline + advanced features.</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Quizlet</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'No student accounts required', desc: 'A teacher with 30 students who don’t have email addresses (or parental consent for under-13s) can’t use Quizlet without setup friction. LexiClash uses a 6-character join code — students play instantly.' },
-              { title: 'Spelling + word-pattern practice', desc: 'Flashcards drill memorization. Word-formation games drill spelling, letter patterns, and recall under time pressure — different cognitive skills, both useful.' },
-              { title: 'Free whole-class multiplayer', desc: 'Quizlet Live full features need Quizlet Plus. LexiClash classroom multiplayer is free, full-featured, and supports up to 30 students.' },
-              { title: '6 native-dictionary languages', desc: 'For ESL/EFL, Hebrew immersion, or Spanish bilingual programs, LexiClash has full dictionaries in EN/HE/ES/SV/JA. Quizlet relies on user-generated decks for non-English content.' },
-              { title: 'No ads in classroom', desc: 'Quizlet free tier shows ads to students during sessions. LexiClash classroom mode is ad-free.' },
-              { title: 'Faster setup', desc: 'Quizlet decks take 5-10 minutes to create. LexiClash word lists upload in under a minute, and most teachers use one of the built-in lists for instant play.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When Quizlet still wins</h2>
-          <p className="text-neo-gray-200">
+      <Section title="When Quizlet still wins">
+        <Prose paper>
+          <p>
             LexiClash isn&apos;t trying to replace Quizlet. If your students need term-definition memorization (foreign language vocabulary
             paired with translations, science terminology, anatomy memorization), Quizlet&apos;s flashcard system is the right tool.
             LexiClash shines for spelling practice, vocabulary recall under time pressure, ESL word-pattern drilling, and
             classroom-wide engagement. Many teachers use both: Quizlet for term-definition, LexiClash for review games.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently asked questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Kahoot</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs quiz-only. Free vs Kahoot+.</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Unlimited play vs 1 puzzle/day</p>
-            </Link>
-            <Link href={`/${locale}/best-online-word-games`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Best Word Games 2026</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Complete comparison guide</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-kahoot`, title: 'LexiClash vs Kahoot', body: 'Word games vs quiz-only. Free vs Kahoot+.' },
+            { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', body: 'Unlimited play vs 1 puzzle/day' },
+            { href: `/${locale}/best-online-word-games`, title: 'Best Word Games 2026', body: 'Complete comparison guide' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Try it before next class</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Pick a word list. Project the join code. Watch 30 students dive in. If LexiClash isn&apos;t a fit for your classroom,
-            you&apos;ve lost 5 minutes — no signup, no credit card, no email capture. If it is a fit, you have a new tool that
-            costs nothing and takes nothing to set up.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Start a Classroom Game Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="pink"
+        title="Try it before next class"
+        body="Pick a word list. Project the join code. Watch 30 students dive in. If LexiClash isn't a fit for your classroom, you've lost 5 minutes — no signup, no credit card, no email capture. If it is a fit, you have a new tool that costs nothing and takes nothing to set up."
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>Start a Classroom Game Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

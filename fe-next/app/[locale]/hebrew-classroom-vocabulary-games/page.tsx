@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getHebrewClassroomContent } from './content';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CheckList, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, Mark, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -105,112 +107,115 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main dir={locale === 'he' ? 'rtl' : 'ltr'} className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
-      <script id="ld-cvg-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-cvg-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(learningResourceJsonLd) }} />
-      <script id="ld-cvg-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+    <div dir={locale === 'he' ? 'rtl' : 'ltr'}>
+      <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: c.ctaPrimaryBtn }}>
+        <script id="ld-cvg-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+        <script id="ld-cvg-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(learningResourceJsonLd) }} />
+        <script id="ld-cvg-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-
-        <section className="grid items-center gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              {c.heroTag}
-            </span>
-            <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              {c.heroPart1}<span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">{c.heroHighlight1}</span>
+        <LandingHero
+          eyebrow={c.heroTag}
+          title={
+            <>
+              {c.heroPart1}<Mark>{c.heroHighlight1}</Mark>
               <br />{c.heroPart2}<span className="text-neo-pink">{c.heroHighlight2}</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              {c.heroSubtitle}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                <span className="block text-base sm:text-lg">{c.ctaPrimary.label}</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaPrimary.sub}</span>
-              </Link>
-              <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
-                <span className="block text-base sm:text-lg">{c.ctaSecondary.label}</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">{c.ctaSecondary.sub}</span>
-              </Link>
-            </div>
-          </div>
-        </section>
+            </>
+          }
+          lead={c.heroSubtitle}
+          actions={
+            <>
+              <LandingButton href={`/${locale}/education/classroom-game`} className="flex-col gap-0">
+                <span className="block">{c.ctaPrimary.label}</span>
+                <span className="block text-xs font-bold opacity-70">{c.ctaPrimary.sub}</span>
+              </LandingButton>
+              <LandingButton href={`/${locale}/education/duels`} variant="secondary" className="flex-col gap-0">
+                <span className="block">{c.ctaSecondary.label}</span>
+                <span className="block text-xs font-bold opacity-70">{c.ctaSecondary.sub}</span>
+              </LandingButton>
+            </>
+          }
+          art={LANDING_ART.languages('')}
+          artTone="cyan"
+        />
 
-        <div className="mt-12">
+        <div className="min-w-0">
           <TeacherProCompareCheckoutStrip locale={locale} />
         </div>
 
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.featuresTitlePart}<span className="text-neo-lime">{c.featuresTitleHighlight}</span>.
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {c.features.map((f, i) => (
-              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard"
-                  style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-lime text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
-                <p className="pt-1.5 text-sm sm:text-base">{f.text}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Section
+          title={
+            <>
+              {c.featuresTitlePart}<span className="text-neo-lime">{c.featuresTitleHighlight}</span>.
+            </>
+          }
+        >
+          <CheckList items={c.features.map((f) => f.text)} />
+        </Section>
 
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.useCasesTitlePart}<span className="text-neo-cyan">{c.useCasesTitleHighlight}</span> {locale === 'he' ? 'משתמשים' : 'use it'}.
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {c.useCases.map((u) => (
-              <div key={u.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
-                <span className="absolute -top-3 right-3 border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{u.tag}</span>
-                <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
-                <p className="mt-2 text-sm text-neo-gray-200">{u.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+        <Section
+          title={
+            <>
+              {c.useCasesTitlePart}<span className="text-neo-cyan">{c.useCasesTitleHighlight}</span> {locale === 'he' ? 'משתמשים' : 'use it'}.
+            </>
+          }
+        >
+          <TileGrid
+            variant="paper"
+            columns={4}
+            items={c.useCases.map((u) => ({
+              icon: (
+                <span className="self-start rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[11px] font-bold uppercase tracking-wide">
+                  {u.tag}
+                </span>
+              ),
+              title: u.title,
+              body: u.desc,
+            }))}
+          />
+        </Section>
 
-        <section className="mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            {c.faqTitlePart}<span className="text-neo-cyan">{c.faqTitleHighlight}</span>.
-          </h2>
-          <div className="space-y-3">
-            {c.faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
-                  <span>{faq.q}</span>
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <div className="border-t-3 border-neo-black bg-neo-navy/40 px-5 py-4 text-sm text-neo-gray-200 sm:px-6 sm:text-base">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+        <Section
+          title={
+            <>
+              {c.faqTitlePart}<span className="text-neo-cyan">{c.faqTitleHighlight}</span>.
+            </>
+          }
+        >
+          <FaqList items={c.faqs} />
+        </Section>
 
-        <section className="mt-20 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
-          <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
-            {c.ctaHeading1}
-            <br /><span className="bg-neo-navy px-3 text-neo-yellow">{c.ctaHeading2}</span>
-          </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">{c.ctaBody}</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
-              {c.ctaPrimaryBtn}
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
-              {c.ctaSecondaryBtn}
-            </Link>
-          </div>
-          <p className="mt-6 text-sm font-bold text-neo-navy/70">
-            {c.compareText}{' '}
-            <Link href={`/${locale}/lexiclash-vs-wordwall-kahoot-quizlet`} className="underline decoration-2 underline-offset-2 hover:text-neo-navy">
-              {c.compareLinkLabel}
-            </Link>
-          </p>
-        </section>
-      </div>
-    </main>
+        <CtaBand
+          tone="yellow"
+          title={
+            <>
+              {c.ctaHeading1}
+              <br />
+              <span className="box-decoration-clone bg-neo-navy px-2 text-neo-yellow">{c.ctaHeading2}</span>
+            </>
+          }
+          body={
+            <>
+              <p>{c.ctaBody}</p>
+              <p className="mt-3 text-sm">
+                {c.compareText}{' '}
+                <Link href={`/${locale}/lexiclash-vs-wordwall-kahoot-quizlet`} className="font-bold underline decoration-2 underline-offset-2">
+                  {c.compareLinkLabel}
+                </Link>
+              </p>
+            </>
+          }
+          actions={
+            <>
+              <LandingButton href={`/${locale}/education/classroom-game`}>{c.ctaPrimaryBtn}</LandingButton>
+              <LandingButton href={`/${locale}/education`} variant="secondary">
+                {c.ctaSecondaryBtn}
+              </LandingButton>
+            </>
+          }
+          art={LANDING_ART.trophy('')}
+        />
+      </LandingPage>
+    </div>
   );
 }
 

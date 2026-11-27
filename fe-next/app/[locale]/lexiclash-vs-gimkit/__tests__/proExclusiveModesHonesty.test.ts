@@ -21,7 +21,6 @@ describe('lexiclash-vs-gimkit Pro-Exclusive 5-player honesty foil', () => {
   });
 
   it('does not pass invalid locale prop to TopBackLink', () => {
-    expect(page).toContain('TopBackLink');
     expect(page).not.toMatch(/<TopBackLink[^>]*\blocale=/);
   });
 

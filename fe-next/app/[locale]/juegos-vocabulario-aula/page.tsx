@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { CheckList, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, Mark, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -119,102 +119,98 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden bg-neo-navy text-neo-white texture-halftone">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: '▶ Iniciar Juego de Aula' }}>
       <script id="ld-es-jva-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-es-jva-resource" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(learningResourceJsonLd) }} />
       <script id="ld-es-jva-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="★ Para Profesores ★ Empieza Gratis ★"
+        title={
+          <>
+            Juegos de <Mark>Vocabulario</Mark>
+            <br />para el Aula. <span className="text-neo-pink">Gratis.</span>
+          </>
+        }
+        lead="El juego de vocabulario que los profesores realmente usan. Multijugador en vivo, duelos 1v1, tus listas de palabras, seis idiomas — y los estudiantes nunca necesitan una cuenta."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`} className="flex-col gap-0">
+              <span className="block">▶ Iniciar Juego de Aula</span>
+              <span className="block text-xs font-bold opacity-70">Gratis · Sin registro de estudiantes</span>
+            </LandingButton>
+            <LandingButton href={`/${locale}/education/duels`} variant="secondary" className="flex-col gap-0">
+              <span className="block">⚔ Duelo 1v1</span>
+              <span className="block text-xs font-bold opacity-70">Estudiantes cara a cara</span>
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.reading('Mascota de LexiClash leyendo un libro')}
+        artTone="yellow"
+      />
 
-        <section className="grid items-center gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-8">
-            <span className="inline-block rotate-[-3deg] rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-1 font-neo-display text-xs font-black uppercase tracking-widest text-neo-navy shadow-hard">
-              ★ Para Profesores ★ Empieza Gratis ★
-            </span>
-            <h1 className="mt-5 font-neo-display text-5xl font-black leading-[0.92] tracking-tight sm:text-6xl lg:text-7xl">
-              Juegos de <span className="inline-block rotate-[-2deg] bg-neo-lime px-3 text-neo-navy shadow-hard">Vocabulario</span>
-              <br />para el Aula. <span className="text-neo-pink">Gratis.</span>
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">
-              El juego de vocabulario que los profesores realmente usan. Multijugador en vivo, duelos 1v1, tus listas de palabras, seis idiomas — y los estudiantes nunca necesitan una cuenta.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                <span className="block text-base sm:text-lg">▶ Iniciar Juego de Aula</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Gratis · Sin registro de estudiantes</span>
-              </Link>
-              <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
-                <span className="block text-base sm:text-lg">⚔ Duelo 1v1</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-80">Estudiantes cara a cara</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+      <Section
+        title={
+          <>
             Lo que <span className="text-neo-lime">obtienes</span>.
-          </h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
-            {features.map((f, i) => (
-              <li key={f.text} className="flex items-start gap-4 rounded-neo border-3 border-neo-black bg-neo-navy-light p-4 shadow-hard"
-                  style={{ transform: i % 3 === 0 ? 'rotate(-0.4deg)' : i % 3 === 1 ? 'rotate(0.3deg)' : 'rotate(0deg)' }}>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-neo border-3 border-neo-black bg-neo-lime text-xl shadow-hard-sm" aria-hidden="true">{f.icon}</span>
-                <p className="pt-1.5 text-sm sm:text-base">{f.text}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+          </>
+        }
+      >
+        <CheckList items={features.map((f) => f.text)} />
+      </Section>
 
-        <section className="mt-20">
-          <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+      <Section
+        title={
+          <>
             Cómo lo <span className="text-neo-cyan">usan los profesores</span>.
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {useCases.map((u) => (
-              <div key={u.title} className="relative rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard">
-                <span className="absolute -top-3 left-3 border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{u.tag}</span>
-                <h3 className="mt-2 font-neo-display text-base font-black">{u.title}</h3>
-                <p className="mt-2 text-sm text-neo-gray-200">{u.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
+          </>
+        }
+      >
+        <TileGrid
+          variant="paper"
+          columns={4}
+          items={useCases.map((u) => ({
+            icon: (
+              <span className="self-start rounded-full border-2 border-neo-black bg-neo-yellow px-2 py-0.5 font-neo-display text-[11px] font-bold uppercase tracking-wide">
+                {u.tag}
+              </span>
+            ),
+            title: u.title,
+            body: u.desc,
+          }))}
+        />
+      </Section>
 
-        <section className="mt-20">
-          <h2 className="mb-6 font-neo-display text-3xl font-black uppercase sm:text-4xl">
+      <Section
+        title={
+          <>
             Preguntas <span className="text-neo-cyan">de profesores</span>.
-          </h2>
-          <div className="space-y-3">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-black bg-neo-navy-light shadow-hard transition-[box-shadow] open:shadow-hard-lg">
-                <summary className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 font-neo-display font-black uppercase tracking-wide sm:px-6">
-                  <span>{faq.q}</span>
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded border-2 border-neo-black bg-neo-yellow text-neo-navy transition-transform group-open:rotate-45">+</span>
-                </summary>
-                <div className="border-t-3 border-neo-black bg-neo-navy/40 px-5 py-4 text-sm text-neo-gray-200 sm:px-6 sm:text-base">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+          </>
+        }
+      >
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mt-20 mb-12 rounded-neo border-4 border-neo-black bg-neo-yellow p-8 text-neo-navy shadow-hard-xl sm:p-12">
-          <h2 className="font-neo-display text-4xl font-black leading-[0.95] sm:text-5xl">
+      <CtaBand
+        tone="yellow"
+        title={
+          <>
             ¿Diez minutos antes de salir?
-            <br /><span className="bg-neo-navy px-3 text-neo-yellow">Lanza un juego de vocabulario.</span>
-          </h2>
-          <p className="mt-4 max-w-xl text-base font-bold sm:text-lg">Elige una lista. Comparte el código. Juega. Revisa el panel. Eso es todo el bucle.</p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-navy px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-yellow shadow-hard-lg transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl sm:text-lg">
-              ▶ Iniciar Juego de Aula
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display text-base font-black uppercase tracking-wider text-neo-white shadow-hard transition-[translate,scale,rotate,transform,box-shadow] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:text-lg">
+            <br />
+            <span className="box-decoration-clone bg-neo-navy px-2 text-neo-yellow">Lanza un juego de vocabulario.</span>
+          </>
+        }
+        body="Elige una lista. Comparte el código. Juega. Revisa el panel. Eso es todo el bucle."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>▶ Iniciar Juego de Aula</LandingButton>
+            <LandingButton href={`/${locale}/education`} variant="secondary">
               Ver Hub Educativo
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

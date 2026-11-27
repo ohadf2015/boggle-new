@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { AnimatedLanding } from './AnimatedLanding';
+import { WheelLanding } from './WheelLanding';
 import { jsonLdGraph } from '@/lib/seo/jsonLdGraph';
 
 export const dynamic = 'force-dynamic';
@@ -203,16 +202,14 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
   ];
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <TopBackLink className="mb-4" />
+    <>
       {/* Static JSON-LD — all content from translation constants, no user input, safe */}
       <script
         type="application/ld+json"
-
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGraph(structuredDataPayload)) }}
       />
 
-      <AnimatedLanding
+      <WheelLanding
         locale={validLocale}
         hero={{
           title: resolve('dailyWordWheelLanding.hero.title', 'Daily Word Wheel'),
@@ -235,6 +232,6 @@ export default async function DailyWordWheelPage({ params }: PageProps) {
           desc: resolve('wordTower.daily.questDesc', 'Stack words sky-high. Same letters for everyone today.'),
         }}
       />
-    </main>
+    </>
   );
 }

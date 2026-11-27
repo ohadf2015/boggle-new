@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getSubstituteContent } from './content';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { ClassroomKeywordLanding } from '@/components/landing/classroom/ClassroomKeywordLanding';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { Prose, Section } from '@/components/landing/kit';
 
 export const revalidate = 86400;
 
@@ -85,102 +86,26 @@ export default async function Page({ params }: PageProps) {
   ];
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-substitute-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-substitute-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          {c.heroTitle}
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          {c.intro}
-        </p>
-
-        <TeacherProCompareCheckoutStrip locale={locale} />
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            {c.ctaStart}
-          </Link>
-          <Link href={`/${locale}/word-games-for-the-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            {c.ctaClassroom}
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            {c.ctaDuels}
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.fitsTitle}</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {c.fits.map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.stepsTitle}</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {c.steps.map((s, i) => (
-              <div key={s.t} className="rounded-neo border-3 border-neo-cyan/40 bg-neo-navy/50 p-5 shadow-hard">
-                <div className="mb-2 grid h-9 w-9 place-items-center rounded-neo border-3 border-neo-black bg-neo-cyan font-bold text-neo-navy">{i + 1}</div>
-                <h3 className="mb-1 font-bold text-neo-cyan">{s.t}</h3>
-                <p className="text-sm text-neo-gray-200">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.regularTitle}</h2>
-          <p className="text-neo-gray-200">{c.regularBody}</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.faqTitle}</h2>
-          <div className="space-y-4">
-            {c.faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{c.moreTitle}</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {c.moreCards.map((card, i) => (
-              <Link key={card.title} href={moreHrefs[i]} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                <h3 className="font-bold text-neo-cyan">{card.title}</h3>
-                <p className="mt-1 text-xs text-neo-gray-200">{card.sub}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">{c.finalTitle}</h2>
-          <p className="mt-4 text-neo-gray-200">{c.finalBody}</p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              {c.finalCta}
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+    <ClassroomKeywordLanding
+      locale={locale}
+      c={c}
+      jsonLd={[
+        { id: 'ld-substitute-faq', data: faqJsonLd },
+        { id: 'ld-substitute-breadcrumb', data: breadcrumbJsonLd },
+      ]}
+      strip={<TeacherProCompareCheckoutStrip locale={locale} />}
+      primary={{ href: `/${locale}/education/classroom-game`, label: c.ctaStart }}
+      secondary={{ href: `/${locale}/word-games-for-the-classroom`, label: c.ctaClassroom }}
+      extra={[{ href: `/${locale}/education/duels`, label: c.ctaDuels }]}
+      moreHrefs={moreHrefs}
+      art={LANDING_ART.reading('')}
+      afterSteps={
+        <Section title={c.regularTitle}>
+          <Prose paper>
+            <p>{c.regularBody}</p>
+          </Prose>
+        </Section>
+      }
+    />
   );
 }

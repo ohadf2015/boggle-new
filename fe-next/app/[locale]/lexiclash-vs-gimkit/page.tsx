@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { GimkitProExclusiveModesHonestyStrip } from '@/components/education/GimkitProExclusiveModesHonestyStrip';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
 import { locales } from '@/lib/i18n';
 import { translateKey } from '@/lib/i18n/serverTranslate';
+import { CompareTable, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Section } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -84,30 +84,34 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+    <LandingPage locale={locale}>
       <script
         id="lexiclash-vs-gimkit-faq-jsonld"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      {/* Do not pass locale to TopBackLink — it has no locale prop (#1136 type pitfall). */}
-      <TopBackLink className="mb-4" />
 
-      <header className="mb-8">
-        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-neo-cyan">{K('eyebrow', locale)}</p>
-        <h1 className="mb-3 font-neo-display text-3xl font-bold sm:text-4xl">{K('h1', locale)}</h1>
-        <p className="text-base leading-relaxed text-neo-gray-200 sm:text-lg">
-          {K('introBefore', locale)}{' '}
-          <strong>{K('introBold', locale)}</strong>{' '}
-          {K('introAfter', locale)}
-        </p>
-        <p className="mt-2 text-sm text-neo-gray-300">
+      <LandingHero
+        eyebrow={K('eyebrow', locale)}
+        title={K('h1', locale)}
+        lead={
+          <>
+            {K('introBefore', locale)}{' '}
+            <strong>{K('introBold', locale)}</strong>{' '}
+            {K('introAfter', locale)}
+          </>
+        }
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>{K('footStart', locale)}</LandingButton>}
+        art={LANDING_ART.duel('')}
+        artTone="purple"
+      >
+        <p className="text-sm text-neo-white/70">
           {K('evidence', locale)}{' '}
           <a
             href="https://help.gimkit.com/en/article/player-maximums-18mbcz0/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-neo-cyan/60"
+            className="underline decoration-neo-cyan"
           >
             help.gimkit.com Player maximums
           </a>
@@ -116,68 +120,37 @@ export default async function Page({ params }: PageProps) {
             href="https://help.gimkit.com/en/article/gimkit-pro-faq-14h6d62/"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline decoration-neo-cyan/60"
+            className="underline decoration-neo-cyan"
           >
             Gimkit Pro FAQ
           </a>
         </p>
-      </header>
+      </LandingHero>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+        <GimkitProExclusiveModesHonestyStrip locale={locale} />
+      </div>
 
-      <GimkitProExclusiveModesHonestyStrip locale={locale} />
+      <Section title={K('sideHeading', locale)}>
+        <CompareTable
+          columns={[K('colFeature', locale), K('colLexi', locale), K('colGimkit', locale)]}
+          rows={ROW_KEYS.map((row, i) => [K(`${row}Feature`, locale), K(`${row}Lexi`, locale), GIMKIT_COLUMN[i]])}
+        />
+      </Section>
 
-      <section className="mb-12 overflow-x-auto">
-        <h2 className="mb-4 font-neo-display text-2xl font-bold">{K('sideHeading', locale)}</h2>
-        <table className="w-full min-w-[640px] border-3 border-neo-gray-400 text-left text-sm">
-          <thead className="bg-neo-navy/80">
-            <tr>
-              <th className="border-b-3 border-neo-gray-400 p-3">{K('colFeature', locale)}</th>
-              <th className="border-b-3 border-neo-gray-400 p-3 text-neo-lime">{K('colLexi', locale)}</th>
-              <th className="border-b-3 border-neo-gray-400 p-3">{K('colGimkit', locale)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ROW_KEYS.map((row, i) => (
-              <tr key={row} className="odd:bg-neo-navy/40">
-                <td className="border-b border-neo-gray-500/40 p-3 font-medium">{K(`${row}Feature`, locale)}</td>
-                <td className="border-b border-neo-gray-500/40 p-3">{K(`${row}Lexi`, locale)}</td>
-                <td className="border-b border-neo-gray-500/40 p-3">{GIMKIT_COLUMN[i]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <Section title={K('faqHeading', locale)}>
+        <FaqList items={faqs} />
+      </Section>
 
-      <section className="mb-12">
-        <h2 className="mb-4 font-neo-display text-2xl font-bold">{K('faqHeading', locale)}</h2>
-        <dl className="space-y-4">
-          {faqs.map((f) => (
-            <div key={f.q} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/40 p-4">
-              <dt className="font-bold">{f.q}</dt>
-              <dd className="mt-2 text-sm text-neo-gray-200">{f.a}</dd>
-            </div>
-          ))}
-        </dl>
-      </section>
-
-      <p className="text-sm text-neo-gray-300">
-        <Link href={`/${locale}/education/classroom-game`} className="text-neo-lime underline">
-          {K('footStart', locale)}
-        </Link>
-        {' · '}
-        <Link href={`/${locale}/lexiclash-vs-kahoot`} className="underline">
-          {K('footKahoot', locale)}
-        </Link>
-        {' · '}
-        <Link href={`/${locale}/lexiclash-vs-wayground`} className="underline">
-          {K('footWayground', locale)}
-        </Link>
-        {' · '}
-        <Link href={`/${locale}/lexiclash-vs-blooket`} className="underline">
-          {K('footBlooket', locale)}
-        </Link>
-      </p>
-    </main>
+      <LinkPills
+        items={[
+          { href: `/${locale}/education/classroom-game`, label: K('footStart', locale) },
+          { href: `/${locale}/lexiclash-vs-kahoot`, label: K('footKahoot', locale) },
+          { href: `/${locale}/lexiclash-vs-wayground`, label: K('footWayground', locale) },
+          { href: `/${locale}/lexiclash-vs-blooket`, label: K('footBlooket', locale) },
+        ]}
+      />
+    </LandingPage>
   );
 }

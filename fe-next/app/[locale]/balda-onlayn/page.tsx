@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
+import { RuLanding } from '@/components/landing/ru/RuLanding';
+import { CheckList, Section } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -75,81 +75,55 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-balda-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-balda-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Балда онлайн — составляй слова и побеждай в реальном времени
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          LexiClash — это <strong>современная «Балда» онлайн, бесплатно и без регистрации</strong>. Составляйте слова из
-          букв на общем поле, соревнуйтесь с друзьями, случайными соперниками или против ИИ. В отличие от классической
-          балды по очереди, здесь все играют одновременно — со счётом в прямом эфире, цепочками комбо и таблицами
-          лидеров. Играйте прямо в браузере на телефоне или компьютере: нажмите «Играть в балду бесплатно» ниже,
-          и первая партия начнётся через несколько секунд.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Играть в балду бесплатно
-          </Link>
-          <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Слово дня
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Почему это лучше балды на бумаге</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { t: 'Автопроверка по словарю', d: 'Слова проверяются мгновенно — никаких споров, засчитано слово или нет.' },
-              { t: 'В реальном времени', d: 'Все играют одновременно — не нужно ждать хода соперника.' },
-              { t: 'На двоих, компанией или с ИИ', d: 'Закрытая комната для друзей, случайные соперники или боты разной сложности.' },
-              { t: 'Очки, серии, таблицы лидеров', d: 'Длинные и редкие слова приносят больше очков. Поднимайтесь в рейтинге.' },
-            ].map((item) => (
-              <div key={item.t} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.t}</h3>
-                <p className="text-sm text-neo-gray-200">{item.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Частые вопросы</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <RuLandingLinks locale={locale} current="balda-onlayn" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Начни играть в балду прямо сейчас</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Открой LexiClash в браузере и начни составлять слова из букв за пару секунд. Без установки, без регистрации,
-            бесплатно навсегда.
+    <RuLanding
+      locale={locale}
+      slug="balda-onlayn"
+      jsonLd={[
+        { id: 'ld-balda-faq', data: faqJsonLd },
+        { id: 'ld-balda-breadcrumb', data: breadcrumbJsonLd },
+      ]}
+      hero={{
+        title: 'Балда онлайн — составляй слова и побеждай в реальном времени',
+        lead: (
+          <>
+            LexiClash — это <strong>современная «Балда» онлайн, бесплатно и без регистрации</strong>.
+          </>
+        ),
+        more: (
+          <p>
+            Составляйте слова из букв на общем поле, соревнуйтесь с друзьями, случайными соперниками или против ИИ. В
+            отличие от классической балды по очереди, здесь все играют одновременно — со счётом в прямом эфире, цепочками
+            комбо и таблицами лидеров. Играйте прямо в браузере на телефоне или компьютере: нажмите «Играть в балду
+            бесплатно» ниже, и первая партия начнётся через несколько секунд.
           </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Играть в балду бесплатно
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+        ),
+        art: LANDING_ART.duel('Два маскота LexiClash сражаются в словесной дуэли'),
+        artTone: 'pink',
+        cta: { href: `/${locale}/multiplayer`, label: 'Играть в балду бесплатно' },
+        secondary: { href: `/${locale}/daily`, label: 'Слово дня' },
+      }}
+      faqs={faqs}
+      final={{
+        title: 'Начни играть в балду прямо сейчас',
+        body: 'Открой LexiClash в браузере и начни составлять слова из букв за пару секунд. Без установки, без регистрации, бесплатно навсегда.',
+        cta: { href: `/${locale}/multiplayer`, label: 'Играть в балду бесплатно' },
+      }}
+    >
+      <Section title="Почему это лучше балды на бумаге">
+        <CheckList
+          items={[
+            { t: 'Автопроверка по словарю', d: 'Слова проверяются мгновенно — никаких споров, засчитано слово или нет.' },
+            { t: 'В реальном времени', d: 'Все играют одновременно — не нужно ждать хода соперника.' },
+            { t: 'На двоих, компанией или с ИИ', d: 'Закрытая комната для друзей, случайные соперники или боты разной сложности.' },
+            { t: 'Очки, серии, таблицы лидеров', d: 'Длинные и редкие слова приносят больше очков. Поднимайтесь в рейтинге.' },
+          ].map((item) => (
+            <span key={item.t}>
+              <strong className="block font-neo-display text-lg">{item.t}</strong>
+              <span className="font-normal">{item.d}</span>
+            </span>
+          ))}
+        />
+      </Section>
+    </RuLanding>
   );
 }

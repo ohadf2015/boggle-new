@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { CheckList, CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,186 +96,148 @@ const faqJsonLd = JSON.stringify({
 export default async function LexiClashVsWordfeudPage({ params }: PageProps) {
     const { locale } = await params;
 
-    return (
-        <main className="min-h-screen bg-neo-navy text-neo-white">
-            <script type="application/ld+json">{faqJsonLd}</script>
+  return (
+    <LandingPage locale={locale} play={{ href: `/${locale}/multiplayer`, label: 'Spela LexiClash Gratis' }}>
+      <script type="application/ld+json">{faqJsonLd}</script>
 
-            <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-                <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-                    LexiClash vs Wordfeud — Vilket Ordspel Vinner?
-                </h1>
+      <LandingHero
+        eyebrow="LexiClash vs Wordfeud"
+        title="LexiClash vs Wordfeud — Vilket Ordspel Vinner?"
+        lead="Wordfeud har dominerat svenska ordspel sedan 2010 — turbaserat, asynkront, perfekt för långsamma matcher mellan dragen."
+        actions={
+          <>
+            <LandingButton href={`/${locale}/multiplayer`}>Spela LexiClash Gratis</LandingButton>
+            <LandingButton href={`/${locale}/daily`} variant="secondary">Daglig Utmaning</LandingButton>
+          </>
+        }
+        art={LANDING_ART.duel('Två LexiClash-maskotar möts i en ordduell')}
+        artTone="cyan"
+        more={
+          <p>
+            LexiClash är något annat: synkront i realtid, 2-20+ spelare på samma rutnät samtidigt, en full match på 90 sekunder. Båda är gratis. Båda är webbläsarvänliga. Men gameplay-känslan är helt olika. Här är den ärliga jämförelsen för svenska ordspelfans.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education`, label: 'För Lärare' }]} />
+      </LandingHero>
 
-                <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-                    Wordfeud har dominerat svenska ordspel sedan 2010 — turbaserat, asynkront, perfekt för långsamma matcher mellan dragen. LexiClash är något annat: synkront i realtid, 2-20+ spelare på samma rutnät samtidigt, en full match på 90 sekunder. Båda är gratis. Båda är webbläsarvänliga. Men gameplay-känslan är helt olika. Här är den ärliga jämförelsen för svenska ordspelfans.
-                </p>
+      <Section title="Den Ärliga Jämförelsen">
+        <CompareTable
+          columns={['Funktion', 'LexiClash', 'Wordfeud']}
+          rows={[
+            ['Speltakt', 'Realtid (synkront)', 'Turbaserat (dagar)'],
+            ['Matchlängd', '~90 sekunder', 'Dagar till veckor'],
+            ['Antal spelare per rum', '2 till 20+', '2 (fast)'],
+            ['Spelmekanik', 'Hitta ord på delat rutnät', 'Lägg ord på Scrabble-bräda'],
+            ['Ordlista', 'SAOL-anpassad', 'SAOL-baserad'],
+            ['Konto krävs', 'Nej (valfritt)', 'Ja'],
+            ['Plattformar', 'Webb + Android', 'Endast app'],
+            ['Webbläsarspel', 'Ja', 'Begränsat'],
+            ['Bjud in vänner', 'kod på sex tecken / QR / länk', 'Användarnamn / Facebook'],
+            ['Pris', 'Gratis (annonser)', 'Gratis (annonser)'],
+            ['Pay-to-win', 'Nej', 'Powerups via köp finns'],
+            ['Daglig utmaning', 'Ja (Wordle-stil + Daily Buzz)', 'Inte primärt'],
+            ['Klassrumsläge', 'Ja, gratis lärardashboard', 'Nej'],
+            ['Antal språk', '5 (EN, HE, SV, JA, ES)', 'Främst nordiska'],
+            ['Hebrew RTL-stöd', 'Ja', 'Nej'],
+          ]}
+        />
+      </Section>
 
-                <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-                    <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-                        Spela LexiClash Gratis
-                    </Link>
-                    <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-                        Daglig Utmaning
-                    </Link>
-                    <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-purple bg-transparent px-6 py-3 text-center font-bold text-neo-purple shadow-hard transition-[background-color] hover:bg-neo-purple/10 sm:px-8 sm:py-4">
-                        För Lärare
-                    </Link>
-                </section>
+      <Section title="Varför Realtid Slår Turordning">
+        <TileGrid
+          columns={2}
+          items={[
+            {
+              tone: 'cyan',
+              title: 'Wordfeud (Asynkron Turordning)',
+              body: 'Du gör ditt drag, motståndaren gör sitt — kanske om en timme, kanske om tre dagar. För strategiska spelare är väntetiden faktiskt en del av charmen: du har gott om tid att hitta det perfekta ordet. För andra känns det utdraget. Wordfeud är riktmärket för långsam, eftertänksam ordstrategi.',
+            },
+            {
+              tone: 'pink',
+              title: 'LexiClash (Synkron Realtid)',
+              body: 'Alla spelare ser samma rutnät av slumpmässiga bokstäver. Klockan tickar. Du letar ord genom att koppla ihop intilliggande bokstäver — diagonalt, vertikalt, horisontellt. Längre ord = mer poäng. Komboer multiplicerar. Efter 90 sekunder är matchen slut. Mer puls, mer pannlobsarbete per minut, mindre väntan. Bra för fester och pauser; sämre för "jag svarar imorgon när jag har tid"-stilen.',
+            },
+          ]}
+        />
+      </Section>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Den Ärliga Jämförelsen</h2>
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-                            <thead>
-                                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                                    <th className="px-4 py-3 text-left font-bold text-neo-lime">Funktion</th>
-                                    <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                                    <th className="px-4 py-3 text-center text-neo-gray-300">Wordfeud</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {[
-                                    ['Speltakt', 'Realtid (synkront)', 'Turbaserat (dagar)'],
-                                    ['Matchlängd', '~90 sekunder', 'Dagar till veckor'],
-                                    ['Antal spelare per rum', '2 till 20+', '2 (fast)'],
-                                    ['Spelmekanik', 'Hitta ord på delat rutnät', 'Lägg ord på Scrabble-bräda'],
-                                    ['Ordlista', 'SAOL-anpassad', 'SAOL-baserad'],
-                                    ['Konto krävs', 'Nej (valfritt)', 'Ja'],
-                                    ['Plattformar', 'Webb + Android', 'Endast app'],
-                                    ['Webbläsarspel', 'Ja', 'Begränsat'],
-                                    ['Bjud in vänner', 'kod på sex tecken / QR / länk', 'Användarnamn / Facebook'],
-                                    ['Pris', 'Gratis (annonser)', 'Gratis (annonser)'],
-                                    ['Pay-to-win', 'Nej', 'Powerups via köp finns'],
-                                    ['Daglig utmaning', 'Ja (Wordle-stil + Daily Buzz)', 'Inte primärt'],
-                                    ['Klassrumsläge', 'Ja, gratis lärardashboard', 'Nej'],
-                                    ['Antal språk', '5 (EN, HE, SV, JA, ES)', 'Främst nordiska'],
-                                    ['Hebrew RTL-stöd', 'Ja', 'Nej'],
-                                ].map(([feature, lexi, wordfeud]) => (
-                                    <tr key={feature} className="border-b border-neo-gray-400/50">
-                                        <td className="px-4 py-3 font-medium">{feature}</td>
-                                        <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                                        <td className="px-4 py-3 text-center text-neo-gray-300">{wordfeud}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+      <Section title="Vad LexiClash Erbjuder Som Wordfeud Saknar">
+        <TileGrid
+          variant="paper"
+          items={[
+            { title: 'Daglig utmaning i Wordle-stil', body: 'Word Hunt Survival och Daily Buzz — globala dagliga pussel med resultat att dela och streak-uppföljning. Wordfeud har inget motsvarande dagligt format.' },
+            { title: 'Multiplayer för 20+ spelare', body: 'Skapa ett rum, dela koden, få in hela klassen eller hela festen samtidigt på samma rutnät. Wordfeud är begränsat till 1 mot 1.' },
+            { title: 'Klassrumsläge för lärare', body: 'Egna ordlistor från läroplanen, vokabulärduells, lärardashboard med elevernas framsteg. Helt gratis utan elevregistrering. Saknas i Wordfeud.' },
+            { title: 'Brain Drills (6 minispel)', body: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Snabba kognitionsövningar — finns inte i Wordfeud.' },
+            { title: '6 språk i samma app', body: 'Engelska, hebreiska (RTL), svenska, japanska, spanska, ryska. Användbart för språkstudier eller flerspråkiga vänner. Wordfeud fokuserar på nordiska språk var för sig.' },
+            { title: 'Ingen registrering krävs', body: 'Klicka Spela, ange smeknamn, kör. Konto är valfritt — för synk mellan enheter. Wordfeud kräver konto från start.' },
+          ]}
+        />
+      </Section>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Varför Realtid Slår Turordning</h2>
-                    <div className="rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 p-6 shadow-hard">
-                        <div className="mb-6">
-                            <h3 className="mb-2 font-bold text-neo-cyan">Wordfeud (Asynkron Turordning)</h3>
-                            <p className="text-neo-gray-200">
-                                Du gör ditt drag, motståndaren gör sitt — kanske om en timme, kanske om tre dagar. För strategiska spelare är väntetiden faktiskt en del av charmen: du har gott om tid att hitta det perfekta ordet. För andra känns det utdraget. Wordfeud är riktmärket för långsam, eftertänksam ordstrategi.
-                            </p>
-                        </div>
-                        <div>
-                            <h3 className="mb-2 font-bold text-neo-pink">LexiClash (Synkron Realtid)</h3>
-                            <p className="text-neo-gray-200">
-                                Alla spelare ser samma rutnät av slumpmässiga bokstäver. Klockan tickar. Du letar ord genom att koppla ihop intilliggande bokstäver — diagonalt, vertikalt, horisontellt. Längre ord = mer poäng. Komboer multiplicerar. Efter 90 sekunder är matchen slut. Mer puls, mer pannlobsarbete per minut, mindre väntan. Bra för fester och pauser; sämre för &quot;jag svarar imorgon när jag har tid&quot;-stilen.
-                            </p>
-                        </div>
-                    </div>
-                </section>
+      <Section title="När Du Ska Välja Vilket">
+        <div className="grid gap-6 lg:grid-cols-2">
+          <div className="flex flex-col gap-3">
+            <h3 className="font-neo-display text-xl font-bold text-neo-cyan">Välj Wordfeud Om Du Vill:</h3>
+            <CheckList
+              items={[
+                'Spela Scrabble-stil med taktisk planering',
+                'Ha matcher som pågår i dagar — inget tidstryck',
+                'Möta en specifik motståndare 1 mot 1',
+                'Använda en etablerad app med stor svensk spelarbas',
+                'Ha en lugnare, eftertänksam ordspelupplevelse',
+              ]}
+            />
+          </div>
+          <div className="flex flex-col gap-3">
+            <h3 className="font-neo-display text-xl font-bold text-neo-lime">Välj LexiClash Om Du Vill:</h3>
+            <CheckList
+              items={[
+                'Spela en match på 90 sekunder, inte dagar',
+                'Få med 5-20 personer på samma fest eller klass',
+                'Spela direkt i webbläsaren utan att ladda ner',
+                'Ha daglig utmaning med streaks (Wordle-stil)',
+                'Använda klassrumsläge i undervisningen',
+                'Spela på flera språk i samma app',
+              ]}
+            />
+          </div>
+        </div>
+      </Section>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Vad LexiClash Erbjuder Som Wordfeud Saknar</h2>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        {[
-                            { title: 'Daglig utmaning i Wordle-stil', desc: 'Word Hunt Survival och Daily Buzz — globala dagliga pussel med resultat att dela och streak-uppföljning. Wordfeud har inget motsvarande dagligt format.' },
-                            { title: 'Multiplayer för 20+ spelare', desc: 'Skapa ett rum, dela koden, få in hela klassen eller hela festen samtidigt på samma rutnät. Wordfeud är begränsat till 1 mot 1.' },
-                            { title: 'Klassrumsläge för lärare', desc: 'Egna ordlistor från läroplanen, vokabulärduells, lärardashboard med elevernas framsteg. Helt gratis utan elevregistrering. Saknas i Wordfeud.' },
-                            { title: 'Brain Drills (6 minispel)', desc: 'Word Wheel, Anagram Sprint, Connections, Word Detective, Word of the Day, Speed Spell. Snabba kognitionsövningar — finns inte i Wordfeud.' },
-                            { title: '6 språk i samma app', desc: 'Engelska, hebreiska (RTL), svenska, japanska, spanska, ryska. Användbart för språkstudier eller flerspråkiga vänner. Wordfeud fokuserar på nordiska språk var för sig.' },
-                            { title: 'Ingen registrering krävs', desc: 'Klicka Spela, ange smeknamn, kör. Konto är valfritt — för synk mellan enheter. Wordfeud kräver konto från start.' },
-                        ].map((item) => (
-                            <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+      <Section title="Vanliga Frågor">
+        <FaqList items={faqs} />
+      </Section>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">När Du Ska Välja Vilket</h2>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="rounded-neo border-3 border-neo-cyan bg-neo-navy/50 p-6 shadow-hard">
-                            <h3 className="mb-3 font-bold text-neo-cyan">Välj Wordfeud Om Du Vill:</h3>
-                            <ul className="space-y-2 text-sm text-neo-gray-200">
-                                <li>Spela Scrabble-stil med taktisk planering</li>
-                                <li>Ha matcher som pågår i dagar — inget tidstryck</li>
-                                <li>Möta en specifik motståndare 1 mot 1</li>
-                                <li>Använda en etablerad app med stor svensk spelarbas</li>
-                                <li>Ha en lugnare, eftertänksam ordspelupplevelse</li>
-                            </ul>
-                        </div>
-                        <div className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-6 shadow-hard">
-                            <h3 className="mb-3 font-bold text-neo-lime">Välj LexiClash Om Du Vill:</h3>
-                            <ul className="space-y-2 text-sm text-neo-gray-200">
-                                <li>Spela en match på 90 sekunder, inte dagar</li>
-                                <li>Få med 5-20 personer på samma fest eller klass</li>
-                                <li>Spela direkt i webbläsaren utan att ladda ner</li>
-                                <li>Ha daglig utmaning med streaks (Wordle-stil)</li>
-                                <li>Använda klassrumsläge i undervisningen</li>
-                                <li>Spela på flera språk i samma app</li>
-                            </ul>
-                        </div>
-                    </div>
-                </section>
+      <Section title="Andra Jämförelser">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-wordle`, title: 'LexiClash vs Wordle', body: 'Multiplayer vs 1 dagligt pussel' },
+            { href: `/${locale}/lexiclash-vs-scrabble`, title: 'LexiClash vs Scrabble GO', body: 'Realtid vs turordning' },
+            { href: `/${locale}/lexiclash-vs-cabanagrams`, title: 'LexiClash vs Cabanagrams', body: 'Delat rutnät vs personligt' },
+          ]}
+        />
+      </Section>
 
-                <section className="mb-12">
-                    <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Vanliga Frågor</h2>
-                    <div className="space-y-4">
-                        {faqs.map((faq, idx) => (
-                            <details key={`faq-${idx}-${faq.q}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                                    <span>{faq.q}</span>
-                                    <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                                </summary>
-                                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-                            </details>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mb-12">
-                    <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Andra Jämförelser</h2>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                        <Link href={`/${locale}/lexiclash-vs-wordle`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                            <h3 className="font-bold text-neo-cyan">LexiClash vs Wordle</h3>
-                            <p className="mt-1 text-xs text-neo-gray-200">Multiplayer vs 1 dagligt pussel</p>
-                        </Link>
-                        <Link href={`/${locale}/lexiclash-vs-scrabble`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                            <h3 className="font-bold text-neo-cyan">LexiClash vs Scrabble GO</h3>
-                            <p className="mt-1 text-xs text-neo-gray-200">Realtid vs turordning</p>
-                        </Link>
-                        <Link href={`/${locale}/lexiclash-vs-cabanagrams`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                            <h3 className="font-bold text-neo-cyan">LexiClash vs Cabanagrams</h3>
-                            <p className="mt-1 text-xs text-neo-gray-200">Delat rutnät vs personligt</p>
-                        </Link>
-                    </div>
-                </section>
-
-                <section className="mb-12">
-                    <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Sammanfattning</h2>
-                    <p className="mt-4 text-neo-gray-200">
-                        Wordfeud är ett briljant turbaserat ordspel — Sveriges ordspelsklassiker sedan 2010. Om du älskar långsam, taktisk Scrabble-stil mellan en specifik motståndare så finns det inget bättre. Den stora svenska spelarbasen och den välslipade matchningen är reella fördelar.
-                    </p>
-                    <p className="mt-4 text-neo-gray-200">
-                        LexiClash är för dig som vill ha samma ordspelsglädje men i ett snabbare format: 90-sekunders synkrona matcher, 2-20+ spelare i samma rum, ingen nedladdning, klassrumsläge, daglig utmaning. Det är inte ett ersättning för Wordfeud — det är ett komplement för andra tillfällen. Wordfeud till morgonkaffet, LexiClash till festen.
-                    </p>
-                    <p className="mt-4 text-neo-gray-200">
-                        Båda är gratis. Båda fungerar i Sverige. Båda har svenska ordlistor. Skillnaden är vilken känsla du är ute efter.
-                    </p>
-                    <div className="mt-6">
-                        <Link href={`/${locale}/multiplayer`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-                            Prova LexiClash Nu — Gratis, Ingen Nedladdning
-                        </Link>
-                    </div>
-                </section>
-            </div>
-        </main>
-    );
+      <CtaBand
+        tone="pink"
+        title="Sammanfattning"
+        body={
+          <div className="flex flex-col gap-3">
+            <p>
+              Wordfeud är ett briljant turbaserat ordspel — Sveriges ordspelsklassiker sedan 2010. Om du älskar långsam, taktisk Scrabble-stil mellan en specifik motståndare så finns det inget bättre. Den stora svenska spelarbasen och den välslipade matchningen är reella fördelar.
+            </p>
+            <p>
+              LexiClash är för dig som vill ha samma ordspelsglädje men i ett snabbare format: 90-sekunders synkrona matcher, 2-20+ spelare i samma rum, ingen nedladdning, klassrumsläge, daglig utmaning. Det är inte ett ersättning för Wordfeud — det är ett komplement för andra tillfällen. Wordfeud till morgonkaffet, LexiClash till festen.
+            </p>
+            <p>Båda är gratis. Båda fungerar i Sverige. Båda har svenska ordlistor. Skillnaden är vilken känsla du är ute efter.</p>
+          </div>
+        }
+        actions={<LandingButton href={`/${locale}/multiplayer`}>Prova LexiClash Nu — Gratis, Ingen Nedladdning</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
+  );
 }

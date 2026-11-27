@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
-import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
 import { WHEEL_EXAMPLE } from './wheelExample';
+import { RuLanding } from '@/components/landing/ru/RuLanding';
+import { Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const revalidate = 86400;
 
@@ -76,102 +76,88 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
-      <script id="ld-slovodnya-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
-      <script id="ld-slovodnya-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
-
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
-
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Слово дня — новая игра в слова каждый день
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Каждый день — новое <strong>колесо слов</strong>: составляйте как можно больше слов из заданных букв, держите
-          серию и соревнуйтесь в таблице лидеров. Одна головоломка в день, одинаковая для всех — честное сравнение
-          результатов. Бесплатно, без регистрации и скачивания: решайте сегодняшнее слово дня прямо в браузере.
-        </p>
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/daily`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Играть в слово дня
-          </Link>
-          <Link href={`/${locale}/multiplayer`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Игры в слова
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Как устроена игра</h2>
-          <p className="mb-4 text-neo-gray-200">
-            На колесе семь букв, одна из них стоит в центре. Слово засчитывается, если в нём есть центральная буква и
-            не меньше трёх букв. Каждую букву колеса можно взять в слове только один раз. На раунд даётся две минуты, а
-            длинные слова стоят намного дороже: слово из трёх букв приносит 12 очков, из семи букв — 144.
+    <RuLanding
+      locale={locale}
+      slug="slovo-dnya"
+      jsonLd={[
+        { id: 'ld-slovodnya-faq', data: faqJsonLd },
+        { id: 'ld-slovodnya-breadcrumb', data: breadcrumbJsonLd },
+      ]}
+      hero={{
+        title: 'Слово дня — новая игра в слова каждый день',
+        lead: (
+          <>
+            Каждый день — новое <strong>колесо слов</strong>: составляйте как можно больше слов из заданных букв, держите
+            серию и соревнуйтесь в таблице лидеров.
+          </>
+        ),
+        more: (
+          <p>
+            Одна головоломка в день, одинаковая для всех — честное сравнение результатов. Бесплатно, без регистрации и
+            скачивания: решайте сегодняшнее слово дня прямо в браузере.
           </p>
-          <h3 className="mb-2 font-bold text-neo-cyan">Пример: колесо за 2 ноября</h3>
-          <p className="text-neo-gray-200">
-            В центре буква <strong>{WHEEL_EXAMPLE.center}</strong>, вокруг неё {WHEEL_EXAMPLE.outer.join(', ')}. По нашему
-            словарю из этих букв получается {WHEEL_EXAMPLE.total} слово, например: {WHEEL_EXAMPLE.picks.join(', ')}. Самая
-            дорогая находка в этом колесе — «{WHEEL_EXAMPLE.longest}»: в ней заняты все семь букв.
-          </p>
-        </section>
+        ),
+        art: LANDING_ART.wheel('Маскот LexiClash крутит колесо букв'),
+        artTone: 'lime',
+        cta: { href: `/${locale}/daily`, label: 'Играть в слово дня' },
+        secondary: { href: `/${locale}/multiplayer`, label: 'Игры в слова' },
+      }}
+      faqs={faqs}
+      final={{
+        title: 'Реши слово дня прямо сейчас',
+        body: 'Сегодняшняя головоломка уже ждёт. Открой колесо слов, составь слова из букв и начни свою серию — бесплатно, без установки.',
+        cta: { href: `/${locale}/daily`, label: 'Играть в слово дня бесплатно' },
+      }}
+    >
+      <Section title="Как устроена игра">
+        <div className="grid items-start gap-6 lg:grid-cols-[1.3fr_1fr]">
+          <Prose>
+            <p>
+              На колесе семь букв, одна из них стоит в центре. Слово засчитывается, если в нём есть центральная буква и не
+              меньше трёх букв. Каждую букву колеса можно взять в слове только один раз. На раунд даётся две минуты, а
+              длинные слова стоят намного дороже: слово из трёх букв приносит 12 очков, из семи букв — 144.
+            </p>
+          </Prose>
+          <div className="rounded-neo-lg border-3 border-neo-black bg-neo-cream p-5 text-neo-black shadow-hard-xl">
+            <h3 className="font-neo-display text-xl font-bold">Пример: колесо за 2 ноября</h3>
+            <div aria-hidden className="my-4 flex flex-wrap gap-2">
+              {[WHEEL_EXAMPLE.center, ...WHEEL_EXAMPLE.outer].map((letter, i) => (
+                <span
+                  key={i}
+                  className={`flex h-11 w-11 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-xl font-bold uppercase shadow-hard-sm ${i === 0 ? 'bg-neo-lime' : 'bg-neo-white'}`}
+                >
+                  {letter}
+                </span>
+              ))}
+            </div>
+            <p className="text-[15px] leading-relaxed">
+              В центре буква <strong>{WHEEL_EXAMPLE.center}</strong>, вокруг неё {WHEEL_EXAMPLE.outer.join(', ')}. По нашему
+              словарю из этих букв получается {WHEEL_EXAMPLE.total} слово, например: {WHEEL_EXAMPLE.picks.join(', ')}. Самая
+              дорогая находка в этом колесе — «{WHEEL_EXAMPLE.longest}»: в ней заняты все семь букв.
+            </p>
+          </div>
+        </div>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">Если вы искали игру, где надо угадать слово</h2>
-          <p className="text-neo-gray-200">
+      <Section title="Если вы искали игру, где надо угадать слово">
+        <Prose paper>
+          <p>
             Во многих играх со словом дня, как в Wordle, нужно за шесть попыток угадать одно слово из пяти букв. Здесь всё
             иначе: загаданного слова нет, ошибки не заканчивают игру, а результат зависит от того, сколько слов вы успели
             найти за две минуты. Цветных подсказок тоже нет, зато вы сразу видите все буквы, которые можно использовать.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Почему стоит играть каждый день</h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { t: 'Новая головоломка ежедневно', d: 'Каждый день свежее колесо букв — одинаковое для всех игроков.' },
-              { t: 'Держи серию', d: 'Возвращайся каждый день, чтобы не прервать серию и расти в рейтинге.' },
-              { t: 'Развивай словарный запас', d: 'Регулярная игра в слова тренирует память и скорость мышления.' },
-            ].map((s) => (
-              <div key={s.t} className="rounded-neo border-3 border-neo-cyan/40 bg-neo-navy/50 p-5 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-cyan">{s.t}</h3>
-                <p className="text-sm text-neo-gray-200">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Частые вопросы</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <RuLandingLinks locale={locale} current="slovo-dnya" />
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Реши слово дня прямо сейчас</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Сегодняшняя головоломка уже ждёт. Открой колесо слов, составь слова из букв и начни свою серию — бесплатно,
-            без установки.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/daily`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Играть в слово дня бесплатно
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <Section title="Почему стоит играть каждый день">
+        <TileGrid
+          items={[
+            { t: 'Новая головоломка ежедневно', d: 'Каждый день свежее колесо букв — одинаковое для всех игроков.' },
+            { t: 'Держи серию', d: 'Возвращайся каждый день, чтобы не прервать серию и расти в рейтинге.' },
+            { t: 'Развивай словарный запас', d: 'Регулярная игра в слова тренирует память и скорость мышления.' },
+          ].map((s) => ({ title: s.t, body: s.d }))}
+        />
+      </Section>
+    </RuLanding>
   );
 }

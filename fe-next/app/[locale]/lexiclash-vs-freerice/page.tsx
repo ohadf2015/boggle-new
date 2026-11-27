@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { permanentRedirect } from 'next/navigation';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { englishComparisonRedirect } from '@/lib/comparison/enOnlyRedirect';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { buildComparisonRows, FREERICE_ROW_DEFS } from '@/lib/comparison/comparisonTable';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
 
 export const dynamic = 'force-dynamic';
 
@@ -89,139 +89,101 @@ export default async function Page({ params }: PageProps) {
   };
 
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={{ href: `/${locale}/education/classroom-game`, label: 'Try LexiClash Free' }}>
       <script id="ld-vs-freerice-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-freerice-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs Freerice"
+        title="Freerice is solo and quiet. LexiClash is the whole class, live."
+        lead={
+          <>
+            Freerice is a lovely idea — answer vocabulary questions, the World Food Programme donates rice, and it&apos;s free
+            with no login.
+          </>
+        }
+        actions={
+          <>
+            <LandingButton href={`/${locale}/education/classroom-game`}>Try LexiClash Free</LandingButton>
+            <LandingButton href={`/${locale}/education/vocabulary-games-classroom`} variant="secondary">
+              Classroom Games
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.friends('Two LexiClash mascots high-fiving over a pile of letter tiles')}
+        artTone="lime"
+        more={
+          <p>
+            But it&apos;s a <strong>solo, multiple-choice</strong> quiz with no teacher view. LexiClash keeps the free,
+            no-login part and adds what a classroom needs: live whole-class multiplayer and 1v1 duels, word-formation gameplay
+            (spell and build real words, not pick a definition), custom word lists, a teacher dashboard, and six languages.
+            Different jobs — keep Freerice for solo do-good practice, run LexiClash for the live review game.
+          </p>
+        }
+      >
+        <LinkPills items={[{ href: `/${locale}/education/duels`, label: 'Vocabulary Duels' }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          Freerice is solo and quiet. LexiClash is the whole class, live.
-        </h1>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
+      </div>
 
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          Freerice is a lovely idea — answer vocabulary questions, the World Food Programme donates rice, and it&apos;s free with
-          no login. But it&apos;s a <strong>solo, multiple-choice</strong> quiz with no teacher view. LexiClash keeps the free,
-          no-login part and adds what a classroom needs: live whole-class multiplayer and 1v1 duels, word-formation gameplay
-          (spell and build real words, not pick a definition), custom word lists, a teacher dashboard, and six languages.
-          Different jobs — keep Freerice for solo do-good practice, run LexiClash for the live review game.
-        </p>
+      <Section title={vs.sideBySide || 'Side-by-side, no spin'}>
+        <CompareTable
+          columns={[featureLabel, 'LexiClash', 'Freerice']}
+          rows={rows.map((row) => [...row])}
+          caption="Freerice is operated by the UN World Food Programme; features as of 2026 — see freerice.com."
+        />
+      </Section>
 
-      <TeacherProCompareCheckoutStrip locale={locale} />
+      <Section title="When LexiClash beats Freerice">
+        <TileGrid
+          columns={2}
+          variant="paper"
+          items={[
+            { title: 'Live multiplayer, not solo', desc: 'Freerice is one student, one screen. LexiClash is the whole class playing the same word list at once, plus 1v1 duels.' },
+            { title: 'Teacher visibility', desc: 'Freerice is anonymous. LexiClash shows per-student accuracy, missed words, and which words tripped the whole class.' },
+            { title: 'Your own word lists', desc: 'Freerice uses fixed question banks. LexiClash plays this week’s unit vocabulary — upload it in under a minute.' },
+            { title: 'Word formation, not multiple choice', desc: 'Freerice asks you to pick a definition. LexiClash makes students spell and build real words — active production, not recognition.' },
+            { title: '6 native-dictionary languages', desc: 'EN/HE/ES/SV/JA/RU word validation with difficulty the teacher sets for ESL and bilingual classes.' },
+            { title: 'Still free, still no login', desc: 'You keep everything that makes Freerice easy to start — and add classroom structure on top.' },
+          ].map((item) => ({ title: item.title, body: item.desc }))}
+        />
+      </Section>
 
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            Try LexiClash Free
-          </Link>
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            Classroom Games
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            Vocabulary Duels
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{vs.sideBySide || 'Side-by-side, no spin'}</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">{featureLabel}</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">Freerice</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map(([feature, lexi, fr]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{fr}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">Freerice is operated by the UN World Food Programme; features as of 2026 — see freerice.com.</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When LexiClash beats Freerice</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {[
-              { title: 'Live multiplayer, not solo', desc: 'Freerice is one student, one screen. LexiClash is the whole class playing the same word list at once, plus 1v1 duels.' },
-              { title: 'Teacher visibility', desc: 'Freerice is anonymous. LexiClash shows per-student accuracy, missed words, and which words tripped the whole class.' },
-              { title: 'Your own word lists', desc: 'Freerice uses fixed question banks. LexiClash plays this week’s unit vocabulary — upload it in under a minute.' },
-              { title: 'Word formation, not multiple choice', desc: 'Freerice asks you to pick a definition. LexiClash makes students spell and build real words — active production, not recognition.' },
-              { title: '6 native-dictionary languages', desc: 'EN/HE/ES/SV/JA/RU word validation with difficulty the teacher sets for ESL and bilingual classes.' },
-              { title: 'Still free, still no login', desc: 'You keep everything that makes Freerice easy to start — and add classroom structure on top.' },
-            ].map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">When Freerice still wins</h2>
-          <p className="text-neo-gray-200">
+      <Section title="When Freerice still wins">
+        <Prose paper>
+          <p>
             Freerice has something LexiClash doesn&apos;t: every correct answer funds real food aid through the World Food
             Programme. For a calm, independent, feel-good activity — early finishers, a quiet vocabulary warm-up, or a service
             tie-in — Freerice is hard to beat. LexiClash is the opposite energy: loud, fast, whole-class review. Use Freerice
             for solo practice with purpose, and LexiClash when you want the room competing.
           </p>
-        </section>
+        </Prose>
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Frequently asked questions</h2>
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
+      <Section title="Frequently asked questions">
+        <FaqList items={faqs} />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">More comparisons</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <Link href={`/${locale}/lexiclash-vs-blooket`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Blooket</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Pre-built word games vs build-a-quiz</p>
-            </Link>
-            <Link href={`/${locale}/lexiclash-vs-quizlet`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">LexiClash vs Quizlet</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">Word games vs flashcards. Free.</p>
-            </Link>
-            <Link href={`/${locale}/education`} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-              <h3 className="font-bold text-neo-cyan">Education Hub</h3>
-              <p className="mt-1 text-xs text-neo-gray-200">All classroom word games</p>
-            </Link>
-          </div>
-        </section>
+      <Section title="More comparisons">
+        <TileGrid
+          variant="paper"
+          items={[
+            { href: `/${locale}/lexiclash-vs-blooket`, title: 'LexiClash vs Blooket', body: 'Pre-built word games vs build-a-quiz' },
+            { href: `/${locale}/lexiclash-vs-quizlet`, title: 'LexiClash vs Quizlet', body: 'Word games vs flashcards. Free.' },
+            { href: `/${locale}/education`, title: 'Education Hub', body: 'All classroom word games' },
+          ]}
+        />
+      </Section>
 
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Try it before next class</h2>
-          <p className="mt-4 text-neo-gray-200">
-            Keep Freerice for quiet practice. When you want the whole room competing on your vocabulary list, project a
-            LexiClash join code and go. Free, no login, no email capture — five minutes to see the difference live makes.
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              Start a Classroom Game Free
-            </Link>
-          </div>
-        </section>
-      </div>
-    </main>
+      <CtaBand
+        tone="yellow"
+        title="Try it before next class"
+        body="Keep Freerice for quiet practice. When you want the whole room competing on your vocabulary list, project a LexiClash join code and go. Free, no login, no email capture — five minutes to see the difference live makes."
+        actions={<LandingButton href={`/${locale}/education/classroom-game`}>Start a Classroom Game Free</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }

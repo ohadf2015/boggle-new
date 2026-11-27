@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getComparisonContent } from './content';
 import { TeacherProCompareCheckoutStrip } from '@/components/education/TeacherProCompareCheckoutStrip';
+import { CompareTable, CtaBand, FaqList, LandingButton, LandingHero, LandingPage, LinkPills, Prose, Section, TileGrid } from '@/components/landing/kit';
+import { LANDING_ART } from '@/components/landing/kit/art';
+import { splitLead } from '@/components/landing/splitLead';
 
 export const revalidate = 86400;
 
@@ -84,119 +85,73 @@ export default async function Page({ params }: PageProps) {
     `/${locale}/education`,
   ];
 
+  const [lead, leadRest] = splitLead(c.intro);
+  const playHref = `/${locale}/education/classroom-game`;
+
   return (
-    <main className="min-h-screen bg-neo-navy text-neo-white">
+    <LandingPage locale={locale} play={c.ctaStart.length <= 22 ? { href: playHref, label: c.ctaStart } : undefined}>
       <script id="ld-vs-spellingcity-faq" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script id="ld-vs-spellingcity-breadcrumb" type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-        <TopBackLink className="mb-4" />
+      <LandingHero
+        eyebrow="LexiClash vs SpellingCity"
+        title={c.heroTitle}
+        lead={lead}
+        actions={
+          <>
+            <LandingButton href={playHref}>{c.ctaStart}</LandingButton>
+            <LandingButton href={`/${locale}/education/spelling-bee-practice`} variant="secondary">
+              {c.ctaSpelling}
+            </LandingButton>
+          </>
+        }
+        art={LANDING_ART.reading('')}
+        artTone="cyan"
+        more={leadRest ? <p>{leadRest}</p> : undefined}
+      >
+        <LinkPills items={[{ href: `/${locale}/education/duels`, label: c.ctaDuels }]} />
+      </LandingHero>
 
-        <h1 className="mb-6 font-neo-display text-4xl font-bold leading-tight sm:text-5xl">
-          {c.heroTitle}
-        </h1>
-
-        <p className="mb-8 text-lg leading-relaxed text-neo-gray-200">
-          {c.intro}
-        </p>
-
-      <TeacherProCompareCheckoutStrip locale={locale} />
-
-        <section className="mb-12 flex flex-col gap-3 sm:flex-row sm:gap-4">
-          <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-lime bg-neo-lime px-6 py-3 text-center font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg sm:px-8 sm:py-4">
-            {c.ctaStart}
-          </Link>
-          <Link href={`/${locale}/education/spelling-bee-practice`} className="rounded-neo border-4 border-neo-cyan bg-transparent px-6 py-3 text-center font-bold text-neo-cyan shadow-hard transition-[background-color] hover:bg-neo-cyan/10 sm:px-8 sm:py-4">
-            {c.ctaSpelling}
-          </Link>
-          <Link href={`/${locale}/education/duels`} className="rounded-neo border-4 border-neo-pink bg-transparent px-6 py-3 text-center font-bold text-neo-pink shadow-hard transition-[background-color] hover:bg-neo-pink/10 sm:px-8 sm:py-4">
-            {c.ctaDuels}
-          </Link>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.compareTitle}</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
-              <thead>
-                <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
-                  <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
-                  <th className="px-4 py-3 text-center text-neo-gray-300">SpellingCity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {c.compareRows.map(([feature, lexi, sc]) => (
-                  <tr key={feature} className="border-b border-neo-gray-400/50">
-                    <td className="px-4 py-3 font-medium">{feature}</td>
-                    <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>
-                    <td className="px-4 py-3 text-center text-neo-gray-300">{sc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-3 text-xs text-neo-gray-300">{c.compareFootnote}</p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.beatsTitle}</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {c.beats.map((item) => (
-              <div key={item.title} className="rounded-neo border-3 border-neo-lime/40 bg-neo-navy/50 p-4 shadow-hard">
-                <h3 className="mb-1 font-bold text-neo-lime">{item.title}</h3>
-                <p className="text-sm text-neo-gray-200">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.stillWinsTitle}</h2>
-          <p className="text-neo-gray-200">
-            {c.stillWinsBody}
-          </p>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{c.faqTitle}</h2>
-          <div className="space-y-4">
-            {c.faqs.map((faq, idx) => (
-              <details key={`faq-${idx}`} className="group rounded-neo border-3 border-neo-gray-400 bg-neo-navy/50 shadow-hard">
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-4 font-bold">
-                  <span>{faq.q}</span>
-                  <span className="text-neo-lime transition-transform group-open:rotate-180">▼</span>
-                </summary>
-                <div className="border-t border-neo-gray-400 px-6 py-4 text-neo-gray-200">{faq.a}</div>
-              </details>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="mb-4 font-neo-display text-2xl font-bold sm:text-3xl">{c.moreTitle}</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {c.moreCards.map((card, i) => (
-              <Link key={card.title} href={moreHrefs[i]} className="rounded-neo border-3 border-neo-gray-400/40 bg-neo-navy/50 p-4 shadow-hard transition-[border-color] hover:border-neo-lime/40">
-                <h3 className="font-bold text-neo-cyan">{card.title}</h3>
-                <p className="mt-1 text-xs text-neo-gray-200">{card.sub}</p>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className="mb-12">
-          <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">{c.finalTitle}</h2>
-          <p className="mt-4 text-neo-gray-200">
-            {c.finalBody}
-          </p>
-          <div className="mt-6">
-            <Link href={`/${locale}/education/classroom-game`} className="inline-block rounded-neo border-4 border-neo-lime bg-neo-lime px-8 py-4 font-bold text-neo-navy shadow-hard transition-[box-shadow] hover:shadow-hard-lg">
-              {c.finalCta}
-            </Link>
-          </div>
-        </section>
+      <div className="min-w-0">
+        <TeacherProCompareCheckoutStrip locale={locale} />
       </div>
-    </main>
+
+      <Section title={c.compareTitle}>
+        <CompareTable
+          columns={['Feature', 'LexiClash', 'SpellingCity']}
+          rows={c.compareRows.map((row) => [...row])}
+          caption={c.compareFootnote}
+        />
+      </Section>
+
+      <Section title={c.beatsTitle}>
+        <TileGrid columns={2} items={c.beats.map((item) => ({ title: item.title, body: item.desc }))} />
+      </Section>
+
+      <Section title={c.stillWinsTitle}>
+        <Prose paper>
+          <p>{c.stillWinsBody}</p>
+        </Prose>
+      </Section>
+
+      <Section title={c.faqTitle}>
+        <FaqList items={c.faqs} />
+      </Section>
+
+      <Section title={c.moreTitle}>
+        <TileGrid
+          variant="paper"
+          items={c.moreCards.map((card, i) => ({ href: moreHrefs[i], title: card.title, body: card.sub }))}
+        />
+      </Section>
+
+      <CtaBand
+        tone="yellow"
+        title={c.finalTitle}
+        body={c.finalBody}
+        actions={<LandingButton href={playHref}>{c.finalCta}</LandingButton>}
+        art={LANDING_ART.trophy('')}
+      />
+    </LandingPage>
   );
 }
