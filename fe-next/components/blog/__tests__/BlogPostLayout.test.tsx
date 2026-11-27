@@ -23,6 +23,15 @@ describe('BlogSections', () => {
 describe('BlogPostLayout', () => {
   const base = { locale: 'en', backLabel: 'Back', category: 'Guide', title: 'Title', readTime: '5 min', ctas: [{ href: '/en/daily', label: 'Play' }] };
 
+  it('draws one back arrow even when the translated label carries its own', () => {
+    render(
+      <BlogPostLayout {...base} backLabel="← Back to Blog">
+        <p>Body</p>
+      </BlogPostLayout>,
+    );
+    expect(screen.getByRole('link', { name: 'Back to Blog' }).textContent).toBe('Back to Blog');
+  });
+
   it('shows the byline instead of a date row when no date is given, and links back to the given index', () => {
     const { container } = render(
       <BlogPostLayout {...base} byline="Ohad Fisher" backHref="/en/guides">

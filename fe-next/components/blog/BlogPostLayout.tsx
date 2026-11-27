@@ -69,7 +69,7 @@ export function BlogPostLayout({
               className="inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-neo-white/25 px-4 text-sm font-bold text-neo-white/85 hover:border-neo-white/60 hover:text-neo-white focus-visible:outline-3 focus-visible:outline-neo-white"
             >
               <ArrowLeft aria-hidden className="h-4 w-4 rtl:rotate-180" />
-              {backLabel}
+              {typeof backLabel === 'string' ? backLabel.replace(/^[←→\s]+/, '') : backLabel}
             </Link>
             <span
               className={cn(
