@@ -260,6 +260,42 @@ export function buildProResumedEvent(userId: string, status: string): EduServerE
   };
 }
 
+/**
+ * A pre-cancel retention offer was taken from the manage/cancel interstitial.
+ * Server-side twin of the client's `trial_cancel_offer_accepted`, fired by the
+ * API route that actually applies (or, for `discount`, records) the offer, so
+ * the outcome survives a closed tab. `applied` is 'pause' when the Polar trial
+ * end moved, 'recorded' when the provider has no live call for it yet.
+ */
+export function buildTeacherProRetentionOfferEvent(
+  userId: string,
+  args: { offer: 'pause' | 'discount'; status: string; applied: 'pause' | 'recorded' },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'teacher_pro_retention_offer_applied',
+    properties: { ...BASE, teacher_id: userId, offer: args.offer, status: args.status, applied: args.applied },
+  };
+}
+
+/**
+ * The one-tap reason a teacher picked after cancelling their Pro trial
+ * (cancel_at_period_end). Server-side twin of the chip tap, fired only when
+ * the subscriptions row actually took the reason (the IS NULL write), so it
+ * is once per subscription. `distinctId` is the same user_id the funnel
+ * report joins on — writer key = reader key.
+ */
+export function buildTrialCancelReasonSelectedEvent(
+  userId: string,
+  args: { reason: string; subscriptionId: string | null },
+): EduServerEvent {
+  return {
+    distinctId: userId,
+    event: 'trial_cancel_reason_selected',
+    properties: { ...BASE, teacher_id: userId, reason: args.reason, reason_source: 'chip', subscription_id: args.subscriptionId },
+  };
+}
+
 /** Polar Teacher Pro trial lapsed without converting. */
 export function buildTrialExpiredEvent(userId: string, subscriptionId: string): EduServerEvent {
   return {

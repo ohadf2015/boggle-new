@@ -60,6 +60,7 @@ export function useTeacherBanner() {
     trialExpires,
     portalUrl: pro.portalUrl,
     hasPro: pro.hasPro,
+    cancelReason: pro.cancelReason,
     refreshPro: pro.refresh,
     dismissReminder: reminder.dismiss,
     dismissEnded: ended.dismiss,

@@ -33,6 +33,8 @@ export const TEACHER_TRIAL_CANCELED_EVENT = 'teacher_trial_canceled';
 export const TEACHER_TRIAL_EXPIRED_EVENT = 'teacher_trial_expired';
 export const TEACHER_TRIAL_PAYWALL_VIEWED_EVENT = 'teacher_trial_paywall_viewed';
 export const TEACHER_SUBSCRIPTION_ACTIVE_EVENT = 'teacher_subscription_active';
+/** One-tap chip answer on a cancelled trial. Written by POST /api/subscription/cancel-reason. */
+export const TEACHER_TRIAL_CANCEL_REASON_SELECTED_EVENT = 'trial_cancel_reason_selected';
 
 /** Canonical order, matching supabase/reports/teacher_trial_funnel.sql. */
 export const TEACHER_TRIAL_FUNNEL_STEPS = [
