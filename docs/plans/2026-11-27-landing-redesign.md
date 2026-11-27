@@ -68,6 +68,7 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 15:30: all fixes committed; parity 266 shots (only the 4 explained pages), headings and CLS checked, dev :3011
   stopped. NOW: tsc -> `npm run build` -> `test:frontend` + `test:backend` once -> review page artifact
   (before/after from ~/.cache/lexiclash/lp1127/{before,after-final,after-fix*}) -> owner approval -> PR/merge.
+- 15:12: tsc 0 errors; `npm run build` RC 0. Running full shoot on prod build (:3011) -> after-prod/, then suite.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
