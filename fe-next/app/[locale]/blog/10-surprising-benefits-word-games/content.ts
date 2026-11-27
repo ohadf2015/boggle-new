@@ -29,13 +29,13 @@ en: {
       {
         content: `I'll tell you about the dumbest experiment I've ever run on myself.
 
-Last January, I decided to play at least one word game every single day for a full year. Not because I wanted to "optimize my brain" or whatever LinkedIn gurus are selling these days. I just... really like finding words in jumbled letters. Always have. But somewhere around month three, I started reading the research. And honestly? Some of it blew my mind. Some of it made me roll my eyes. What follows is what's real and what's marketing.`,
+Last January, I decided to play at least one word game every single day for a full year. Not because I wanted to "optimize my brain" or whatever LinkedIn gurus are selling these days. I just... really like finding words in jumbled letters. Always have. But somewhere around month three, I started reading the research, and honestly, some of it blew my mind and some of it made me roll my eyes. What follows is what's real and what's marketing.`,
       },
       {
         title: 'The study that made me take this seriously',
         content: `In 2019, researchers from the University of Exeter and King's College London published a study in the International Journal of Geriatric Psychiatry that tracked 19,000 adults aged 50 to 93.
 
-The people who regularly solved word puzzles showed reasoning abilities equivalent to someone ten years younger. And short-term memory of someone eight years younger. Not "marginally better." Not "statistically significant but practically meaningless." A full decade of cognitive difference.
+The people who regularly solved word puzzles showed reasoning abilities equivalent to someone ten years younger, and short-term memory of someone eight years younger. That's a full decade of cognitive difference, which is a lot more than a marginal edge.
 
 Professor Keith Wesnes summed it up: "Performance was consistently better in those who reported engaging in puzzles, and generally improved incrementally with the frequency of puzzle use."
 
@@ -51,9 +51,9 @@ The truth: Dr. Anne Corbett, one of the lead researchers from Exeter, specifical
 
 And she's right to be cautious. The studies show correlation. People who do puzzles tend to have better cognitive function. But that doesn't prove the puzzles caused it. Maybe people with naturally sharper minds are just more drawn to word games in the first place. Maybe it's the kind of person who does puzzles daily, not the puzzles themselves.
 
-I know. Disappointing. I was disappointed too. But I'd rather tell you the truth than sell you a comforting lie that some blog cooked up for clicks.
+I was disappointed by that too, but I'd rather tell you what the research actually says than repeat a comforting claim some blog made up for clicks.
 
-What is clear, and this part is solid, is that word games are linked to better cognitive function right now. In the present. Today. Not in some hypothetical future. That's worth something on its own.`,
+What is clear, and this part is solid, is that word games are linked to better cognitive function right now, in the present, and that's worth something on its own.`,
       },
       {
         title: 'Crosswords vs. brain training apps',
@@ -65,17 +65,17 @@ After 78 weeks, a year and a half, the crossword group showed cognitive improvem
 
 Read that again. The brain games group got worse.
 
-Dr. D.P. Devanand from Columbia noted the benefits showed up "not only in cognition but also in daily activities, with indications of brain shrinkage on MRI that suggests the effects are clinically meaningful."
+Dr. D.P. Devanand from Columbia said the gains reached people's daily activities as well as their test scores, and that the MRI evidence on brain shrinkage "suggests the effects are clinically meaningful."
 
-First study to document long-term benefits of home-based crossword training. I felt stupidly vindicated for every time someone told me I was "wasting time" playing word games instead of using Lumosity.`,
+It was the first study to document long-term benefits of home-based crossword training, and I felt stupidly vindicated for every time someone told me I was "wasting time" playing word games instead of using Lumosity.`,
       },
       {
         title: 'Who benefits most',
-        content: `The Columbia-Duke study gets more interesting. At a very early stage of cognitive impairment, both crosswords and brain games help about equally. But at later stages, crosswords pull ahead. Significantly.
+        content: `The Columbia-Duke study gets more interesting. At a very early stage of cognitive impairment, both crosswords and brain games help about equally. But at later stages, crosswords pull ahead by a wide margin.
 
-A separate 2024 study from Texas A&M backed this up, finding that games, puzzles, and reading slow cognitive decline even in people who already have mild impairment. Not prevent. Slow. But slowing down cognitive decline is still a big deal.
+A separate 2024 study from Texas A&M backed this up, finding that games, puzzles, and reading slow cognitive decline even in people who already have mild impairment. They slow it down rather than prevent it, and that's still a big deal.
 
-A personal observation: I'm not 50. Nowhere near it. But the pattern-recognition improvements I noticed after months of daily play were dramatic enough that I'm convinced this isn't just an "older adults" thing. Your brain is plastic at any age. The question is whether you're giving it something interesting to chew on.`,
+A personal observation: I'm nowhere near 50, but the pattern-recognition improvements I noticed after months of daily play were dramatic enough that I'm convinced this isn't just an "older adults" thing. Your brain is plastic at any age, so what matters is giving it something interesting to chew on.`,
       },
       {
         title: 'The vocabulary trick',
@@ -83,11 +83,11 @@ A personal observation: I'm not 50. Nowhere near it. But the pattern-recognition
 
 A systematic review of 17 studies on learning words through games found something beautifully counterintuitive: your brain remembers words better when it discovers them during problem-solving than when you read them off a list.
 
-When was the last time you remembered a word from a vocabulary flashcard? Really think about it. Now think about the last weird word you stumbled into during a game. "QANAT." "ETUI." "ZAX." Those stick because your brain encountered them in context. During a challenge, while problem-solving, when emotions were engaged.
+I can't name a single word I learned from a vocabulary flashcard, but I remember the weird ones I stumbled into during games: "QANAT," "ETUI," "ZAX." Those stick because your brain met them in context, during a challenge, while it was solving a problem and you actually cared.
 
 Games provide what researchers clinically call "rich contexts, cognitive engagement, and virtual learning situations." Fancy way of saying: your brain pays more attention when it's having fun.
 
-I've personally learned more obscure English words from Scrabble and word games than from four years of formal education. Not a brag. An indictment of how I studied.`,
+I've personally learned more obscure English words from Scrabble and word games than from four years of formal education, which says more about how I studied than about me.`,
       },
       {
         title: 'What I actually noticed after a year',
@@ -97,7 +97,7 @@ The speed thing was dramatic. By month three, letter patterns started jumping ou
 
 My vocabulary grew in weird ways. I now know words I couldn't define but instantly recognize as "real." Turns out competitive Scrabble players have the same experience. Only 6.4% say they "always" learn word meanings. They just know the words exist.
 
-The one that surprised me most: the daily game became a form of meditation. Five minutes of absolute focus. No notifications, no scrolling, no multitasking. Just me and letters. In a world that's constantly screaming for your attention, that five minutes of flow state is worth more than any brain-health benefit.`,
+The one that surprised me most: the daily game became a form of meditation. Five minutes of absolute focus with no notifications and no scrolling, just me and the letters. In a world that's constantly screaming for your attention, that five minutes of flow state is worth more than any brain-health benefit.`,
       },
       {
         title: 'The honest downsides',
@@ -111,11 +111,11 @@ One more thing: there's a real risk of getting obsessive about it. Ask my partne
       },
       {
         title: 'So is it worth playing every day?',
-        content: `Yeah. I think so. But maybe not for the reasons you'd expect.
+        content: `Yeah, I think so, though maybe not for the reasons you'd expect.
 
-The neuroscience is real. The Exeter study with 19,000 people. The Columbia-Duke trial showing crosswords beating brain games over 78 weeks. The vocabulary research across 17 studies. The evidence points in one clear direction.
+The neuroscience is real: the Exeter study with 19,000 people, the Columbia-Duke trial where crosswords beat brain games over 78 weeks, and the vocabulary research across 17 studies all point the same way.
 
-But the best reason to play word games daily isn't the science. It's five minutes of doing something slightly challenging that happens to be fun. Not everything needs a neuroscience justification.
+My best reason to play every day is simpler than the science: five minutes of doing something slightly challenging that happens to be fun. Not everything needs a neuroscience justification.
 
 Play because it's enjoyable. The brain benefits are a bonus.
 
@@ -140,13 +140,13 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
       {
         content: `בואו אספר לכם על הניסוי הכי מטופש שעשיתי על עצמי.
 
-בינואר שעבר החלטתי לשחק לפחות משחק מילים אחד כל יום, במשך שנה שלמה. לא בגלל שרציתי "לאמן את המוח" או מה שגורואים של לינקדאין מוכרים בימים האלה. פשוט... אני ממש אוהב למצוא מילים באותיות מעורבבות. תמיד אהבתי. אבל אז, איפשהו סביב חודש שלוש, התחלתי לקרוא את המחקרים. ובכנות? חלק מהם פוצצו לי את הראש. חלק גרמו לי לגלגל עיניים. בואו נעבור על מה שאמיתי ומה שזה שיווק.`,
+בינואר שעבר החלטתי לשחק לפחות משחק מילים אחד כל יום, במשך שנה שלמה. לא בגלל שרציתי "לאמן את המוח" או מה שגורואים של לינקדאין מוכרים בימים האלה. פשוט... אני ממש אוהב למצוא מילים באותיות מעורבבות. תמיד אהבתי. אבל אז, איפשהו סביב חודש שלוש, התחלתי לקרוא את המחקרים. ובכנות, חלק מהם פוצצו לי את הראש וחלק גרמו לי לגלגל עיניים. בואו נעבור על מה שאמיתי ומה שזה שיווק.`,
       },
       {
         title: 'המחקר שגרם לי לקחת את זה ברצינות',
         content: `ב-2019, חוקרים מאוניברסיטת אקסטר וקינגס קולג׳ לונדון פרסמו מחקר ב-International Journal of Geriatric Psychiatry שעקב אחרי — תחזיקו חזק — 19,000 מבוגרים בגילאי 50 עד 93. זו לא שגיאת כתיב. תשע עשרה אלף בני אדם.
 
-מי שפתר חידות מילים באופן קבוע הראה יכולת חשיבה לוגית של מישהו עשר שנים צעיר ממנו. וזיכרון לטווח קצר של מישהו שמונה שנים צעיר. לא "קצת יותר טוב". לא "מובהק סטטיסטית אבל חסר משמעות מעשית". עשור שלם של הבדל קוגניטיבי.
+מי שפתר חידות מילים באופן קבוע הראה יכולת חשיבה לוגית של מישהו עשר שנים צעיר ממנו. וזיכרון לטווח קצר של מישהו צעיר ממנו בשמונה שנים. מדובר בעשור שלם של הבדל קוגניטיבי, הרבה מעבר לשיפור קטן.
 
 פרופ׳ קית׳ וסנס סיכם את זה: "הביצועים היו טובים יותר באופן עקבי אצל מי שדיווח על פתרון חידות, והשתפרו בהדרגה עם תדירות השימוש."
 
@@ -162,9 +162,9 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
 
 והיא צודקת שהיא נזהרת. המחקרים מראים קורלציה — אנשים שפותרים חידות נוטים להראות תפקוד קוגניטיבי טוב יותר. אבל זה לא מוכיח שהחידות גרמו לזה. אולי אנשים עם מוח חד מטבעו פשוט נמשכים יותר למשחקי מילים מלכתחילה. אולי זה הסוג של אדם שפותר חידות, לא החידות עצמן.
 
-אני יודע. מאכזב. גם אני התאכזבתי. אבל אני מעדיף לספר לכם את האמת מאשר למכור לכם שקר נעים שאיזה בלוג בישל בשביל קליקים.
+גם אני התאכזבתי, אבל אני מעדיף לספר לכם מה המחקר באמת אומר מאשר לחזור על הבטחה נעימה שאיזה בלוג המציא בשביל קליקים.
 
-מה שכן ברור — והחלק הזה מוצק — משחקי מילים קשורים לתפקוד קוגניטיבי טוב יותר עכשיו. בהווה. היום. לא באיזה עתיד היפותטי. וזה שווה משהו בפני עצמו.`,
+מה שכן ברור — והחלק הזה מוצק — משחקי מילים קשורים לתפקוד קוגניטיבי טוב יותר כבר עכשיו, וזה שווה משהו בפני עצמו.`,
       },
       {
         title: 'תשבצים נגד אפליקציות אימון מוח (זה באמת הפתיע אותי)',
@@ -176,17 +176,17 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
 
 קראו את זה שוב. הקבוצה של משחקי המוח נהייתה פחות טובה.
 
-ד״ר דבננד מקולומביה ציין שהיתרונות הופיעו "לא רק בקוגניציה אלא גם בפעילויות יומיומיות, עם סימנים להתכווצות מוחית מופחתת ב-MRI שמרמזים שההשפעות משמעותיות קלינית."
+ד״ר דבננד מקולומביה אמר שהשיפור הגיע גם לפעילויות היומיומיות של המשתתפים, ושממצאי ה-MRI על התכווצות המוח מרמזים שההשפעות משמעותיות קלינית.
 
-זה היה המחקר הראשון שתיעד יתרונות ארוכי טווח לאימון תשבצים ביתי. ובכנות? הרגשתי מוצדק באופן מטופש על כל פעם שמישהו אמר לי שאני "מבזבז זמן" על משחקי מילים במקום להשתמש ב-Lumosity.`,
+זה היה המחקר הראשון שתיעד יתרונות ארוכי טווח לאימון תשבצים ביתי. ובכנות, הרגשתי מוצדק באופן מטופש על כל פעם שמישהו אמר לי שאני "מבזבז זמן" על משחקי מילים במקום להשתמש ב-Lumosity.`,
       },
       {
         title: 'למי זה הכי עוזר? (לא למי שחשבתם)',
         content: `פה המחקר של קולומביה-דיוק נהיה אפילו יותר מעניין. אם אתם בשלב מאוד מוקדם של ליקוי קוגניטיבי, גם תשבצים וגם משחקי מוח עוזרים בערך באותה מידה. אבל בשלבים מאוחרים יותר, התשבצים עוקפים — משמעותית.
 
-מחקר נפרד מ-2024 מטקסס A&M גיבה את זה, וגילה שמשחקים, חידות וקריאה מאטים ירידה קוגניטיבית גם אצל אנשים שכבר יש להם ליקוי קל. לא מונעים. מאטים. אבל האטה של ירידה קוגניטיבית זה עדיין עניין גדול.
+מחקר נפרד מ-2024 מטקסס A&M גיבה את זה, וגילה שמשחקים, חידות וקריאה מאטים ירידה קוגניטיבית גם אצל אנשים שכבר יש להם ליקוי קל. הם לא מונעים אותה, רק מאטים, וגם זה עניין גדול.
 
-ותצפית אישית: אני לא בן 50. אני רחוק מזה. אבל שיפורי זיהוי הדפוסים שהרגשתי אחרי חודשים של משחק יומי היו דרמטיים מספיק שאני משוכנע שזה לא רק "עניין של מבוגרים". המוח פלסטי בכל גיל — השאלה היא אם אתה נותן לו משהו מעניין ללעוס.`,
+ותצפית אישית: אני רחוק מגיל 50, אבל שיפורי זיהוי הדפוסים שהרגשתי אחרי חודשים של משחק יומי היו דרמטיים מספיק שאני משוכנע שזה לא רק "עניין של מבוגרים". המוח פלסטי בכל גיל — השאלה היא אם אתה נותן לו משהו מעניין ללעוס.`,
       },
       {
         title: 'הטריק של אוצר המילים שאף אחד לא מדבר עליו',
@@ -198,7 +198,7 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
 
 משחקים מספקים מה שחוקרים קוראים בשפה קלינית "הקשרים עשירים, מעורבות קוגניטיבית, וסיטואציות למידה וירטואליות." שזה פשוט דרך מפוצצת לומר: המוח מקשיב יותר כשכיף לו.
 
-אני אישית למדתי יותר מילים אובסקוריות באנגלית מסקראבל ומשחקי מילים מאשר מארבע שנות לימודים פורמליים. זה לא שוויץ — זו הרשעה של איך שלמדתי.`,
+אני אישית למדתי יותר מילים אובסקוריות באנגלית מסקראבל ומשחקי מילים מאשר מארבע שנות לימודים פורמליים, וזה אומר יותר על הדרך שבה למדתי מאשר עליי.`,
       },
       {
         title: 'מה באמת שמתי לב אליו אחרי שנה',
@@ -222,11 +222,11 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
       },
       {
         title: 'אז, שווה לשחק כל יום?',
-        content: `בכנות? כן. אני חושב שכן. אבל אולי לא מהסיבות שציפיתם.
+        content: `כן, אני חושב שכן, אבל אולי לא מהסיבות שציפיתם.
 
-המדע אמיתי. מחקר אקסטר עם 19,000 אנשים. הניסוי של קולומביה-דיוק שהראה שתשבצים מנצחים משחקי מוח ב-78 שבועות. מחקר אוצר המילים על פני 17 מחקרים. הראיות מצביעות בכיוון אחד ברור.
+המדע אמיתי: מחקר אקסטר עם 19,000 אנשים, הניסוי של קולומביה-דיוק שבו תשבצים ניצחו משחקי מוח לאורך 78 שבועות, וסקירת אוצר המילים של 17 מחקרים מצביעים כולם לאותו כיוון.
 
-אבל הסיבה הכי טובה לשחק משחקי מילים יומית היא לא המדע. זה שזה חמש דקות של עשייה של משהו קצת מאתגר שבמקרה גם כיף. לא הכל צריך הצדקה נוירומדעית. לא כל הרגל צריך חישוב ROI.
+הסיבה הכי טובה שלי לשחק כל יום פשוטה יותר: חמש דקות של משהו קצת מאתגר שבמקרה גם כיף. לא הכל צריך הצדקה נוירומדעית. לא כל הרגל צריך חישוב ROI.
 
 תשחקו כי זה מהנה. התועלות למוח הן בונוס.
 
@@ -251,13 +251,13 @@ Now if you'll excuse me, I have a daily challenge to finish. I'm currently on a 
       {
         content: `Låt mig berätta om det dummaste experimentet jag någonsin gjort på mig själv.
 
-I januari förra året bestämde jag mig för att spela minst ett ordspel varje dag i ett helt år. Inte för att jag ville "optimera min hjärna" eller vad LinkedIn-guruer nu säljer för tiden. Jag bara... gillar verkligen att hitta ord i blandade bokstäver. Har alltid gjort det. Men någonstans runt månad tre började jag läsa forskningen. Och ärligt talat? En del sprängde mitt sinne. En del fick mig att himla med ögonen. Låt mig gå igenom vad som är verkligt och vad som är marknadsföring.`,
+I januari förra året bestämde jag mig för att spela minst ett ordspel varje dag i ett helt år. Inte för att jag ville "optimera min hjärna" eller vad LinkedIn-guruer nu säljer för tiden. Jag bara... gillar verkligen att hitta ord i blandade bokstäver. Har alltid gjort det. Men någonstans runt månad tre började jag läsa forskningen. Och ärligt talat sprängde en del av den mitt sinne, medan en del fick mig att himla med ögonen. Låt mig gå igenom vad som är verkligt och vad som är marknadsföring.`,
       },
       {
         title: 'Studien som fick mig att ta det här på allvar',
         content: `År 2019 släppte forskare från University of Exeter och King's College London en studie i International Journal of Geriatric Psychiatry som följde — håll i er — 19 000 vuxna i åldern 50 till 93. Det är inte ett skrivfel. Nittontusen personer.
 
-De som regelbundet löste ordpussel visade resonemangförmåga motsvarande någon TIO år yngre. Och korttidsminne som någon åtta år yngre. Inte "marginellt bättre". Inte "statistiskt signifikant men praktiskt meningslöst". Vi pratar ett helt decennium av kognitiv skillnad.
+De som regelbundet löste ordpussel visade resonemangförmåga motsvarande någon TIO år yngre. Och korttidsminne som någon åtta år yngre. Det är ett helt decennium av kognitiv skillnad, långt mer än en marginell förbättring.
 
 Professor Keith Wesnes sammanfattade det: "Prestationen var konsekvent bättre hos dem som rapporterade att de sysslade med pussel, och förbättrades generellt stegvis med frekvensen av pusselanvändning."
 
@@ -273,9 +273,9 @@ Här är sanningen. Dr. Anne Corbett, en av de ledande forskarna från Exeter, s
 
 Och hon har rätt att vara försiktig. Studierna visar korrelation — personer som gör pussel tenderar att ha bättre kognitiv funktion. Men det bevisar inte att pusslen orsakade det. Kanske dras personer med naturligt skarpare sinnen helt enkelt mer till ordspel. Kanske är det typen av person som gör pussel dagligen, inte pusslen i sig.
 
-Jag vet. Nedslående. Jag blev besviken jag med. Men jag berättar hellre sanningen än säljer dig en bekväm lögn som någon blogg kokade ihop för klick.
+Jag blev också besviken, men jag berättar hellre vad forskningen faktiskt säger än upprepar ett bekvämt påstående som någon blogg hittat på för klick.
 
-Det som ÄR klart — och den här delen är solid — är att ordspel är kopplade till bättre kognitiv funktion just nu. I nuet. Idag. Inte i någon hypotetisk framtid. Det är värt något i sig.`,
+Det som ÄR klart — och den här delen är solid — är att ordspel är kopplade till bättre kognitiv funktion redan nu, och det är värt något i sig.`,
       },
       {
         title: 'Korsord mot hjärnträningsappar (den här överraskade mig genuint)',
@@ -287,7 +287,7 @@ Efter 78 veckor — det är ett och ett halvt år — visade korsordgruppen kogn
 
 Läs det igen. Hjärnspelgruppen blev sämre.
 
-Dr. D.P. Devanand från Columbia noterade att fördelarna visade sig "inte bara i kognition utan också i dagliga aktiviteter, med indikationer på hjärnkrympning på MRI som tyder på att effekterna är kliniskt meningsfulla."
+Dr. D.P. Devanand från Columbia sa att förbättringen märktes i deltagarnas dagliga aktiviteter också, och att MRI-fynden om hjärnkrympning tyder på att effekterna är kliniskt meningsfulla.
 
 Detta var den första studien som dokumenterade långsiktiga fördelar av hembaserad korsordträning. Och det fick mig att känna mig löjligt rättfärdigad för varje gång någon sa att jag "slösade tid" på ordspel istället för att använda Lumosity.`,
       },
@@ -295,9 +295,9 @@ Detta var den första studien som dokumenterade långsiktiga fördelar av hembas
         title: 'Vem har mest nytta? (Inte den du tror)',
         content: `Här blir Columbia-Duke-studien ännu mer intressant. Om du är i ett mycket tidigt skede av kognitiv nedsättning hjälper både korsord och hjärnspel ungefär lika mycket. Men i senare stadier drar korsorden ifrån — avsevärt.
 
-En separat studie från Texas A&M 2024 bekräftade detta, och fann att spel, pussel och läsning bromsar kognitiv nedgång även hos personer som redan har mild nedsättning. Inte förebygger. Bromsar. Men att bromsa kognitiv nedgång är fortfarande en stor grej.
+En separat studie från Texas A&M 2024 bekräftade detta, och fann att spel, pussel och läsning bromsar kognitiv nedgång även hos personer som redan har mild nedsättning. De bromsar nedgången snarare än förebygger den, och det är fortfarande en stor grej.
 
-Och en personlig observation: jag är inte 50. Jag är inte ens i närheten. Men de förbättringar i mönsterigenkänning jag märkte efter månader av dagligt spelande var dramatiska nog att jag är övertygad om att det här inte bara är en "äldre vuxna"-grej. Din hjärna är plastisk i alla åldrar — frågan är om du ger den något intressant att tugga på.`,
+Och en personlig observation: jag är inte ens i närheten av 50, men de förbättringar i mönsterigenkänning jag märkte efter månader av dagligt spelande var dramatiska nog att jag är övertygad om att det här inte bara är en "äldre vuxna"-grej. Din hjärna är plastisk i alla åldrar — frågan är om du ger den något intressant att tugga på.`,
       },
       {
         title: 'Ordförrådstricket som ingen pratar om',
@@ -309,7 +309,7 @@ När mindes du senast ett ord från ett ordförrådskort? Tänk verkligen efter.
 
 Spel ger vad forskare kliniskt kallar "rika sammanhang, kognitivt engagemang och virtuella inlärningssituationer." Vilket bara är ett fint sätt att säga: din hjärna lyssnar mer när den har kul.
 
-Jag har personligen lärt mig fler obskyra engelska ord från Scrabble och ordspel än från fyra års formell utbildning. Det är inte skryt — det är en anklagelse mot hur jag pluggade.`,
+Jag har personligen lärt mig fler obskyra engelska ord från Scrabble och ordspel än från fyra års formell utbildning, vilket säger mer om hur jag pluggade än om mig.`,
       },
       {
         title: 'Vad jag faktiskt märkte efter ett år',
@@ -333,11 +333,11 @@ Och en sak till: det finns en riktig risk att bli besatt. Fråga min partner. Vi
       },
       {
         title: 'Så, är det värt att spela varje dag?',
-        content: `Ärligt? Ja. Det tycker jag. Men kanske inte av de skäl du förväntar dig.
+        content: `Ja, det tycker jag, men kanske inte av de skäl du förväntar dig.
 
-Neurovetenskapen är verklig. Exeter-studien med 19 000 personer. Columbia-Duke-studien som visade att korsord slog hjärnspel över 78 veckor. Ordförrådsforskningen över 17 studier. Bevisen pekar i en tydlig riktning.
+Neurovetenskapen är verklig: Exeter-studien med 19 000 personer, Columbia-Duke-studien där korsord slog hjärnspel över 78 veckor och ordförrådsforskningen över 17 studier pekar alla åt samma håll.
 
-Men det bästa skälet att spela ordspel dagligen är inte vetenskapen. Det är att det är fem minuter av att göra något lite utmanande som råkar vara kul. Inte allt behöver en neurovetenskaplig motivering. Inte varje vana behöver en ROI-kalkyl.
+Mitt bästa skäl att spela varje dag är enklare än vetenskapen: fem minuter av något lite utmanande som råkar vara kul. Inte allt behöver en neurovetenskaplig motivering. Inte varje vana behöver en ROI-kalkyl.
 
 Spela för att det är roligt. Hjärnfördelarna är en bonus.
 
@@ -362,13 +362,13 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
       {
         content: `自分で行った最も馬鹿げた実験について話させてください。
 
-去年の1月、丸1年間、毎日少なくとも1つのワードゲームをプレイすることにしました。「脳を最適化」したかったわけでも、LinkedInのグルたちが最近売っているものを信じたわけでもありません。ただ...バラバラの文字から言葉を見つけるのが本当に好きなんです。ずっとそうでした。でも3ヶ月目あたりで研究論文を読み始めました。正直に言うと？一部は衝撃的でした。一部は目を丸くしました。何が本物で何がマーケティングなのか、一緒に見ていきましょう。`,
+去年の1月、丸1年間、毎日少なくとも1つのワードゲームをプレイすることにしました。「脳を最適化」したかったわけでも、LinkedInのグルたちが最近売っているものを信じたわけでもありません。ただ...バラバラの文字から言葉を見つけるのが本当に好きなんです。ずっとそうでした。でも3ヶ月目あたりで研究論文を読み始めました。正直に言うと、衝撃的なものもあれば、あきれるものもありました。何が本物で何がマーケティングなのか、一緒に見ていきましょう。`,
       },
       {
         title: 'これを真剣に受け止めるきっかけになった研究',
         content: `2019年、エクセター大学とキングス・カレッジ・ロンドンの研究者たちがInternational Journal of Geriatric Psychiatryに研究を発表しました。追跡した人数は — 驚かないでください — 50歳から93歳の19,000人。打ち間違いではありません。1万9千人です。
 
-定期的にワードパズルを解いていた人は、10歳若い人と同等の推論能力を示しました。そして8歳若い人と同等の短期記憶を。「わずかに良い」ではなく。「統計的に有意だが実質的には無意味」でもなく。丸10年分の認知機能の差です。
+定期的にワードパズルを解いていた人は、10歳若い人と同等の推論能力を示しました。短期記憶も8歳若い人と同等でした。わずかな差どころか、丸10年分の認知機能の差です。
 
 キース・ウェスネス教授はこうまとめました：「パズルに取り組んでいると報告した人は一貫してパフォーマンスが良く、パズルの使用頻度に応じて段階的に改善していました。」
 
@@ -384,9 +384,9 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
 
 そして彼女が慎重なのは正しい。研究は相関関係を示しています — パズルをする人は認知機能が良い傾向がある。しかしパズルがそれを引き起こしたとは証明されていない。もともと頭の鋭い人がワードゲームに惹かれやすいだけかもしれない。
 
-わかっています。がっかりですよね。私もがっかりしました。でもクリックのためにどこかのブログが作り上げた心地よい嘘を売るより、本当のことを伝えたい。
+私もがっかりしましたが、どこかのブログがクリック目当てで作った心地よい話を繰り返すより、研究が実際に示していることを伝えたいと思います。
 
-明確なのは — そしてこの部分は確実 — ワードゲームは今この瞬間の認知機能の向上と関連しているということ。仮定の未来ではなく。今。それ自体に価値があります。`,
+明確なのは — そしてこの部分は確実 — ワードゲームは今この瞬間の認知機能の向上と関連しているということで、それ自体に価値があります。`,
       },
       {
         title: 'クロスワード vs 脳トレアプリ（これには本当に驚いた）',
@@ -398,7 +398,7 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
 
 もう一度読んでください。脳トレゲーム群は悪くなった。
 
-コロンビア大学のD.P.デバナンド博士は、効果が「認知だけでなく日常活動にも見られ、MRIでの脳萎縮の減少の兆候は効果が臨床的に意味があることを示唆している」と述べました。
+コロンビア大学のD.P.デバナンド博士によると、効果は参加者の日常活動にも表れ、脳萎縮に関するMRIの結果は効果が臨床的に意味のあるものだと示唆しています。
 
 これは自宅でのクロスワードトレーニングの長期的な利点を記録した最初の研究でした。ワードゲームで「時間を無駄にしている」と言われるたびに感じていた悔しさが、少し報われた気がしました。`,
       },
@@ -406,9 +406,9 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
         title: '誰に最も効果があるか？（予想外の答え）',
         content: `コロンビア-デューク研究はさらに興味深くなります。軽度認知障害の非常に初期段階では、クロスワードも脳トレゲームもほぼ同じくらい効果があります。しかし後期段階では、クロスワードが大きくリードします。
 
-2024年のテキサスA&M大学の別の研究でもこれが裏付けられ、ゲーム、パズル、読書は、すでに軽度の障害がある人でも認知機能の低下を遅らせることがわかりました。予防ではなく、減速。でも認知機能の低下を遅らせることは、それだけで大きなことです。
+2024年のテキサスA&M大学の別の研究でもこれが裏付けられ、ゲーム、パズル、読書は、すでに軽度の障害がある人でも認知機能の低下を遅らせることがわかりました。防ぐわけではなく遅らせるだけですが、それでも大きなことです。
 
-個人的な観察：私は50歳ではありません。ほど遠い。でも数ヶ月の毎日のプレイ後に気づいたパターン認識の改善は、これが「高齢者だけの話」ではないと確信させるほど劇的でした。脳はどの年齢でも可塑的です — 問題は、脳に噛みごたえのある面白いものを与えているかどうかです。`,
+個人的な観察：私は50歳にはほど遠いのですが、数ヶ月の毎日のプレイ後に気づいたパターン認識の改善は、これが「高齢者だけの話」ではないと確信させるほど劇的でした。脳はどの年齢でも可塑的です — 問題は、脳に噛みごたえのある面白いものを与えているかどうかです。`,
       },
       {
         title: '誰も話さない語彙のトリック',
@@ -420,7 +420,7 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
 
 研究者が臨床的に「豊かなコンテキスト、認知的関与、仮想学習状況」と呼ぶものをゲームは提供します。これは「脳は楽しんでいる時にもっと注意を払う」という華麗な言い方です。
 
-私は個人的に、4年間の正式な教育よりもスクラブルやワードゲームからより多くの珍しい英単語を学びました。自慢ではなく、自分の学び方への反省です。`,
+私は個人的に、4年間の正式な教育よりもスクラブルやワードゲームからより多くの珍しい英単語を学びました。これは自分の学び方の問題を物語っていると思います。`,
       },
       {
         title: '1年後に実際に気づいたこと',
@@ -444,11 +444,11 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
       },
       {
         title: 'で、毎日プレイする価値はある？',
-        content: `正直に？はい。そう思います。でも予想する理由とは違うかもしれません。
+        content: `はい、そう思います。ただ、理由は予想とは違うかもしれません。
 
-神経科学は本物です。19,000人のエクセター研究。78週間にわたってクロスワードが脳トレゲームに勝ったコロンビア-デューク試験。17の研究にわたる語彙研究。証拠は一つの明確な方向を指しています。
+神経科学は本物です。19,000人のエクセター研究、78週間にわたってクロスワードが脳トレゲームに勝ったコロンビア-デューク試験、17の研究にわたる語彙研究は、どれも同じ方向を指しています。
 
-でも毎日ワードゲームをプレイする最高の理由は科学ではありません。たまたま楽しい、ちょっとチャレンジングなことを5分間やること。すべてに神経科学的正当化が必要なわけではありません。すべての習慣にROI計算が必要なわけでもありません。
+私が毎日プレイする一番の理由はもっと単純で、ちょっと難しくてたまたま楽しいことを5分間やれるからです。すべてに神経科学的正当化が必要なわけではありません。すべての習慣にROI計算が必要なわけでもありません。
 
 楽しいからプレイしてください。脳の利益はボーナスです。
 
@@ -473,13 +473,13 @@ Och nu, om ni ursäktar, har jag en daglig utmaning att avsluta. Jag har en 47-d
       {
         content: `El año pasado decidí jugar al menos un juego de palabras cada día durante 365 días seguidos. No fue porque quisiera "optimizar mi cerebro" ni porque creara en los gurús motivacionales de LinkedIn. Simplemente... me encanta encontrar palabras en un montón de letras revueltas. Siempre me encantó.
 
-Pero alrededor del tercer mes de hacerlo, empecé a investigar la neurociencia detrás. Y créeme, algunos resultados me sorprendieron. Otros me parecieron exagerados. Aquí está lo que la ciencia realmente nos dice, sin el marketing.`,
+Pero alrededor del tercer mes de hacerlo, empecé a investigar la neurociencia detrás. Algunos resultados me sorprendieron y otros me parecieron exagerados. Aquí está lo que la ciencia realmente nos dice, sin el marketing.`,
       },
       {
         title: 'El estudio que cambió cómo veía todo',
         content: `En 2019, investigadores de la Universidad de Exeter y King's College London publicaron un análisis que monitoreó a 19,000 adultos entre 50 y 93 años durante años. No es un error tipográfico. Diecinueve mil personas.
 
-Quienes resolvían puzzles de palabras de forma regular mostraban una capacidad de razonamiento equivalente a alguien diez años más joven. Y una memoria a corto plazo comparable a alguien ocho años más joven. No estamos hablando de mejoras marginales. Estos eran cambios cognitivos drásticos.
+Quienes resolvían puzzles de palabras de forma regular mostraban una capacidad de razonamiento equivalente a alguien diez años más joven. Y una memoria a corto plazo comparable a alguien ocho años más joven, una diferencia de casi una década.
 
 El profesor Keith Wesnes resumió los datos: "Quienes hacen puzzles regularmente muestran un rendimiento consistentemente mejor, y esa mejora es proporcional a cuánto juegan."
 
@@ -495,7 +495,7 @@ La verdad es más matizada. La Dra. Anne Corbett, una de las investigadoras prin
 
 Y tiene razón en ser cauta. Los estudios muestran correlación, no causa. Las personas que hacen puzzles tienden a tener mejor función cognitiva. Pero eso no prueba que los puzzles lo causen. Podría ser que las personas naturalmente más agudas simplemente disfruten más de los juegos de palabras. Es el tipo de pregunta que la ciencia aún no responde completamente.
 
-Lo que sí sabemos con seguridad es que los juegos de palabras están conectados a una mejor función cognitiva en el presente. Ahora mismo. Hoy. Eso por sí solo tiene valor.`,
+Lo que sí sabemos con seguridad es que los juegos de palabras están conectados a una mejor función cognitiva ahora mismo, y eso por sí solo tiene valor.`,
       },
       {
         title: 'Crucigramas contra apps de "entrenamiento cerebral"',
@@ -505,7 +505,7 @@ Columbia y Duke tomaron 107 adultos mayores con deterioro cognitivo leve. Dividi
 
 Después de 78 semanas (más de un año), el grupo de crucigramas mostró mejora en cognición. El grupo de apps de entrenamiento mostró declive.
 
-El Dr. D.P. Devanand de Columbia documentó que las mejoras aparecieron no solo en pruebas de cognición sino en las actividades diarias, sugiriendo que estos cambios son clínicamente significativos.
+El Dr. D.P. Devanand de Columbia documentó que las mejoras llegaron a las actividades diarias de los participantes, y que eso sugiere que los cambios son clínicamente significativos.
 
 Esa fue la primera evidencia en la literatura científica de que los crucigramas en casa producen beneficios medibles a largo plazo. Debo admitir que sentí cierta satisfacción cuando vi ese resultado.`,
       },
@@ -513,7 +513,7 @@ Esa fue la primera evidencia en la literatura científica de que los crucigramas
         title: '¿A quién le sirve más?',
         content: `El estudio Columbia-Duke nos cuenta aún más. En etapas muy tempranas de deterioro cognitivo, tanto crucigramas como juegos cerebrales ayudan aproximadamente igual. Pero en etapas posteriores, los crucigramas se separan claramente del grupo.
 
-Un análisis de 2024 de Texas A&M confirmó que los juegos, puzzles y la lectura ralentizan el declive cognitivo incluso en personas que ya están perdiendo función. No lo previenen. Lo ralentizan. Y ralentizar un declive cognitivo es algo importante.
+Un análisis de 2024 de Texas A&M confirmó que los juegos, puzzles y la lectura ralentizan el declive cognitivo incluso en personas que ya están perdiendo función. Lo ralentizan en lugar de prevenirlo, y eso ya es importante.
 
 Observación personal: tengo menos de 50 años. Pero las mejoras que noté en reconocer patrones después de meses jugando diariamente fueron tan notables que me convencieron de que esto no es solo un fenómeno de personas mayores. El cerebro es plástico a cualquier edad. La pregunta es si le estamos dando algo interesante para trabajar.`,
       },
@@ -525,7 +525,7 @@ Observación personal: tengo menos de 50 años. Pero las mejoras que noté en re
 
 Los investigadores lo llaman "contextos ricos, compromiso cognitivo y situaciones de aprendizaje significativo." Es decir: el cerebro presta más atención cuando se divierte.
 
-He aprendido más palabras oscuras en inglés jugando Scrabble que en cuatro años de educación formal. Eso no es un alarde. Es una crítica de cómo estudiaba.`,
+He aprendido más palabras oscuras en inglés jugando Scrabble que en cuatro años de educación formal, lo que dice más de cómo estudiaba que de mí.`,
       },
       {
         title: 'Lo que noté después de 365 días',
@@ -547,11 +547,11 @@ Una última cosa: hay un riesgo real de obsesionarse. Algunas noches me quedé d
       },
       {
         title: '¿Vale la pena jugar todos los días?',
-        content: `Sí. Creo que sí. Pero quizá no por las razones que esperas.
+        content: `Sí, creo que sí, aunque quizá no por las razones que esperas.
 
-La neurociencia es sólida. El estudio de Exeter con 19,000 participantes. El ensayo Columbia-Duke mostrando que los crucigramas superan las apps de entrenamiento tras 78 semanas. Dieciséis estudios sobre vocabulario. Las pruebas apuntan claramente en una dirección.
+La neurociencia es sólida: el estudio de Exeter con 19,000 participantes, el ensayo Columbia-Duke en el que los crucigramas superaron a las apps de entrenamiento tras 78 semanas y la revisión de 17 estudios sobre vocabulario apuntan en la misma dirección.
 
-Pero la mejor razón para jugar juegos de palabras cada día no es la ciencia. Es que son cinco minutos de hacer algo levemente difícil que resulta ser divertido. No necesitas una justificación neurocientífica para cada hábito. No todo requiere un análisis de costo-beneficio.
+Mi mejor razón para jugar cada día es más sencilla que la ciencia: cinco minutos de hacer algo levemente difícil que resulta ser divertido. No necesitas una justificación neurocientífica para cada hábito. No todo requiere un análisis de costo-beneficio.
 
 Juega porque te divierte. Los beneficios para el cerebro son un plus.
 
@@ -576,13 +576,13 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
       {
         content: `Расскажу об самом глупом эксперименте, который я когда-либо проводил над собой.
 
-В январе прошлого года я решил играть в словесные игры каждый день целый год. Не потому что хотел "оптимизировать свой мозг" или верил в какого-нибудь гуру из LinkedIn. Просто... я действительно люблю искать слова в перемешанных буквах. Всегда любил. Но на третьем месяце я начал читать исследования. И честно? Часть из них взорвала мне мозг. Часть заставила закатить глаза. Давайте разберемся, что здесь реально, а что просто маркетинг.`,
+В январе прошлого года я решил играть в словесные игры каждый день целый год. Не потому что хотел "оптимизировать свой мозг" или верил в какого-нибудь гуру из LinkedIn. Просто... я действительно люблю искать слова в перемешанных буквах. Всегда любил. Но на третьем месяце я начал читать исследования. И честно говоря, часть из них взорвала мне мозг, а часть заставила закатить глаза. Давайте разберемся, что здесь реально, а что просто маркетинг.`,
       },
       {
         title: 'Исследование, которое заставило меня отнестись к этому серьезно',
         content: `В 2019 году исследователи из Университета Exeter и King's College London опубликовали исследование в International Journal of Geriatric Psychiatry. Они отслеживали 19,000 взрослых в возрасте от 50 до 93 лет. Не опечатка. Девятнадцать тысяч человек.
 
-Те, кто регулярно решал словесные головоломки, показали умственную работоспособность человека на десять лет моложе. И краткосрочную память человека на восемь лет моложе. Не "немного лучше". Не "статистически значимо, но практически бессмысленно". Полноценное десятилетие когнитивной разницы.
+Те, кто регулярно решал словесные головоломки, показали умственную работоспособность человека на десять лет моложе. И краткосрочную память человека на восемь лет моложе. Это целое десятилетие когнитивной разницы, гораздо больше, чем небольшое улучшение.
 
 Профессор Кит Уэсес резюмировал: "Результаты были постоянно лучше у тех, кто занимался головоломками, и улучшались пропорционально частоте их использования".
 
@@ -598,9 +598,9 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
 
 И она права в своей осторожности. Исследования показывают корреляцию. Люди, которые решают головоломки, как правило, имеют лучшую когнитивную функцию. Но это не доказывает, что головоломки это вызвали. Может быть, люди от природы более острого ума просто больше тянутся к словесным играм. Может быть, это не сами игры, а тип человека, который в них играет.
 
-Я знаю. Разочаровывающе. Я тоже разочаровался. Но я лучше скажу тебе правду, чем продам тебе удобную ложь, которую какой-то блог придумал для кликов.
+Я тоже разочаровался, но лучше расскажу, что на самом деле говорят исследования, чем повторю удобное обещание, которое какой-то блог придумал ради кликов.
 
-Что действительно ясно — и эта часть надежна — словесные игры связаны с лучшей когнитивной функцией прямо сейчас. В настоящем. Сегодня. Не в каком-то гипотетическом будущем. А это уже что-то стоит.`,
+Что действительно ясно — и эта часть надежна — словесные игры связаны с лучшей когнитивной функцией прямо сейчас, и это уже чего-то стоит.`,
       },
       {
         title: 'Кроссворды против приложений для тренировки мозга (это меня реально удивило)',
@@ -612,7 +612,7 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
 
 Прочитай еще раз. Группа "тренировок мозга" получила хуже.
 
-Доктор D.P. Деванд из Columbia заметил, что улучшения проявились "не только в когнитивных функциях, но и в повседневной деятельности, с признаками уменьшения объема мозга на МРТ, что говорит о клинической значимости эффектов".
+Доктор D.P. Деванд из Columbia отметил, что улучшения дошли и до повседневной деятельности участников, а данные МРТ об уменьшении объема мозга говорят о клинической значимости эффектов.
 
 Это было первое исследование, которое задокументировало долгосрочные преимущества домашней тренировки на кроссвордах. И я чувствовал себя глупо оправданным за каждый раз, когда кто-то говорил, что я "трачу время" на словесные игры вместо Lumosity.`,
       },
@@ -620,9 +620,9 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
         title: 'Кому это помогает больше всего? (Не тем, кого ты думаешь)',
         content: `Исследование Columbia-Duke становится еще интереснее. На очень ранней стадии когнитивного снижения кроссворды и "тренировки мозга" помогают примерно одинаково. Но на более поздних стадиях кроссворды значительно выходят вперед.
 
-Отдельное исследование из Texas A&M в 2024 году подтвердило это, обнаружив, что игры, головоломки и чтение замедляют когнитивное снижение даже у людей, которые уже теряют функцию. Не предотвращают. Замедляют. Но замедление когнитивного снижения — это все равно большое дело.
+Отдельное исследование из Texas A&M в 2024 году подтвердило это, обнаружив, что игры, головоломки и чтение замедляют когнитивное снижение даже у людей, которые уже теряют функцию. Они замедляют снижение, а не предотвращают его, и это все равно большое дело.
 
-Личное наблюдение: мне нет 50. Я от этого далеко. Но улучшения в распознавании паттернов, которые я заметил после месяцев ежедневной игры, были настолько драматичны, что я убежден — это не просто "штука для пожилых людей". Мозг пластичен в любом возрасте — вопрос только в том, даешь ли ты ему что-то интересное для работы.`,
+Личное наблюдение: мне далеко до 50, но улучшения в распознавании паттернов, которые я заметил после месяцев ежедневной игры, были настолько драматичны, что я убежден — это не просто "штука для пожилых людей". Мозг пластичен в любом возрасте — вопрос только в том, даешь ли ты ему что-то интересное для работы.`,
       },
       {
         title: 'Трюк со словарным запасом, о котором никто не говорит',
@@ -634,7 +634,7 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
 
 Исследователи называют это "богатые контексты, когнитивная вовлеченность и виртуальные ситуации обучения". Красивый способ сказать: твой мозг больше внимания уделяет, когда ему весело.
 
-Я лично выучил больше редких английских слов из Scrabble и словесных игр, чем за четыре года формального образования. Не хвастовство. Обвинение в том, как я учился.`,
+Я лично выучил больше редких английских слов из Scrabble и словесных игр, чем за четыре года формального образования, и это говорит скорее о том, как я учился.`,
       },
       {
         title: 'Что я реально заметил через год',
@@ -658,11 +658,11 @@ Ahora, si me disculpas, tengo un desafío diario que completar. Llevo 47 días s
       },
       {
         title: 'Так что, стоит ли играть каждый день?',
-        content: `Честно? Да. Я думаю, что да. Но может быть, не по тем причинам, которые ты ожидаешь.
+        content: `Да, я думаю, что да, но может быть, не по тем причинам, которые ты ожидаешь.
 
-Нейронаука реальна. Исследование Exeter с 19,000 людьми. Испытание Columbia-Duke, показавшее, что кроссворды победили "тренировки мозга" за 78 недель. Исследование словарного запаса через 17 работ. Доказательства указывают в одном ясном направлении.
+Нейронаука реальна: исследование Exeter с 19,000 людьми, испытание Columbia-Duke, где кроссворды победили "тренировки мозга" за 78 недель, и обзор 17 работ о словарном запасе указывают в одном направлении.
 
-Но лучшая причина играть в словесные игры каждый день — это не наука. Это пять минут, во время которых ты делаешь что-то немного сложное, что оказывается еще и забавным. Не все нуждается в оправдании нейронаукой. Не каждая привычка нуждается в расчете ROI.
+Моя главная причина играть каждый день проще науки: пять минут чего-то немного сложного, что оказывается еще и забавным. Не все нуждается в оправдании нейронаукой. Не каждая привычка нуждается в расчете ROI.
 
 Играй потому что это весело. Выгода для мозга — это бонус.
 
