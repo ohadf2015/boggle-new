@@ -98,7 +98,7 @@ export const ProjectorJoinPanel = memo<ProjectorJoinPanelProps>(function Project
         data-testid="projector-qr"
         data-waiting={waiting ? 'true' : 'false'}
         data-join-url={joinUrl}
-        className="relative shrink-0 rounded-neo-lg border-[3px] border-neo-black bg-neo-white p-[clamp(0.375rem,0.8cqw,1rem)] shadow-edu-lip"
+        className="relative shrink-0 rounded-neo-lg border-[3px] border-neo-black bg-edu-paper p-[clamp(0.375rem,0.8cqw,1rem)] shadow-edu-lip"
       >
         {waiting && (
           <span aria-hidden="true" className="pointer-events-none absolute -inset-[8px] rounded-neo-lg border-4 border-neo-pink/60 motion-safe:animate-[edu-live-beckon_2.2s_ease-in-out_infinite]" />

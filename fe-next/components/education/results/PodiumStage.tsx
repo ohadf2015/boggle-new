@@ -230,7 +230,7 @@ function Placing({ entry, place, stage, floor, muted }: { entry: PodiumEntry; pl
         </span>
         <p
           dir="auto"
-          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[3px] border-neo-black bg-neo-white px-[1.2cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-black shadow-[0_0.3cqw_0_rgb(var(--neo-black))]"
+          className="mt-[0.6cqw] max-w-full truncate rounded-neo border-[3px] border-neo-black bg-edu-paper px-[1.2cqw] py-[0.3cqw] text-center font-neo-display font-black leading-tight text-neo-black shadow-[0_0.3cqw_0_rgb(var(--neo-black))]"
           style={{ fontSize: winner ? '2.6cqw' : '2.1cqw' }}
         >
           {revealed ? entry.username : '—'}

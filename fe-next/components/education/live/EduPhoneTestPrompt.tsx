@@ -48,7 +48,7 @@ export function EduPhoneTestPrompt({ gameCode, language, baseUrl, mode, t }: Edu
       </button>
       {open && (
         <div data-testid="edu-phone-test-qr" className="flex items-center gap-3">
-          <div className="shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-white p-1.5 shadow-hard-sm">
+          <div className="shrink-0 rounded-neo border-[3px] border-neo-black bg-edu-paper p-1.5 shadow-hard-sm">
             <QRCodeSVG value={phoneTestUrl(baseUrl, language, gameCode)} size={112} level="M" />
           </div>
           <p className="font-neo-body font-bold text-edu-ink/85 text-[clamp(0.875rem,min(1cqw,1.9cqh),1.5rem)]">{t('eduLiveRoom.lobby.phoneTestHint')}</p>

@@ -29,7 +29,7 @@ export const BossTopHitters = memo(function BossTopHitters({ hitters }: Props) {
         <ol className="mt-[0.8cqw] space-y-[0.7cqw]">
           {hitters.map((h, i) => (
             <li key={h.username} className="flex items-center gap-[0.6cqw] transition-transform duration-300">
-              <span className={cn('grid size-[2.4cqw] shrink-0 place-items-center rounded-[0.4cqw] border-2 border-neo-black font-neo-display text-[1.6cqw] font-black text-neo-black', i === 0 ? 'bg-neo-yellow' : 'bg-neo-white/80')}>
+              <span className={cn('grid size-[2.4cqw] shrink-0 place-items-center rounded-[0.4cqw] border-2 border-neo-black font-neo-display text-[1.6cqw] font-black text-neo-black', i === 0 ? 'bg-neo-yellow' : 'bg-edu-paper/80')}>
                 {i + 1}
               </span>
               <div className="min-w-0 flex-1">

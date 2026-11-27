@@ -57,7 +57,7 @@ function ChoiceChip({ kind, reduced }: { kind: ChipKind; reduced: boolean }) {
       initial={reduced ? false : { scale: 0.4, rotate: -12 }}
       animate={{ scale: 1, rotate: 0 }}
       transition={EDU_MOTION.spring.pop}
-      className={cn(CHIP, kind === 'picked' ? 'bg-neo-cyan' : 'bg-neo-white')}
+      className={cn(CHIP, kind === 'picked' ? 'bg-neo-cyan' : 'bg-edu-paper')}
     >
       <Icon className="size-5" strokeWidth={3.5} />
     </m.span>

@@ -252,7 +252,7 @@ function ReteachOptionGrid({
         {googleLinks.length > 0 && (
           <details data-testid="reteach-google-classroom" className="group/gc rounded-neo">
             <summary className={cn(ROW, 'cursor-pointer list-none [&::-webkit-details-marker]:hidden')}>
-              <RowContent icon={<GraduationCap />} tone="bg-neo-white" label={t('eduLive.reteach.googleClassroom')} />
+              <RowContent icon={<GraduationCap />} tone="bg-edu-paper" label={t('eduLive.reteach.googleClassroom')} />
               <ChevronDown className="size-4 shrink-0 transition-transform group-open/gc:rotate-180" aria-hidden />
             </summary>
             <div className="mt-1.5 flex flex-col gap-1.5 ps-3">
@@ -276,7 +276,7 @@ function ReteachOptionGrid({
         <button type="button" data-testid="share-miss-gap-practice" onClick={links.onShareMissGapPractice} className={ROW}>
           <RowContent
             icon={links.missGapShareState === 'idle' ? <Share2 /> : <Check />}
-            tone={links.missGapShareState === 'idle' ? 'bg-neo-white' : 'bg-neo-lime'}
+            tone={links.missGapShareState === 'idle' ? 'bg-edu-paper' : 'bg-neo-lime'}
             label={t(links.missGapShareState === 'idle' ? 'education.results.shareMissGapPractice' : 'education.results.shareMissGapPracticeCopied')}
           />
         </button>

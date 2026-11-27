@@ -58,7 +58,7 @@ export function VocabQuizNextBeat({ nextInMs, beatKey, isLast, paused, reduced, 
         {t(isLast ? 'vocabQuiz.nextUp.finalScores' : 'vocabQuiz.nextUp.label')}
       </span>
       {!reduced && (
-        <span aria-hidden className="h-2 min-w-0 flex-1 overflow-hidden rounded-full border-[1.5px] border-neo-black bg-neo-white">
+        <span aria-hidden className="h-2 min-w-0 flex-1 overflow-hidden rounded-full border-[1.5px] border-neo-black bg-edu-paper">
           <span ref={fillRef} className="block h-full w-full origin-left bg-neo-black rtl:origin-right" />
         </span>
       )}

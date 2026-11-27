@@ -107,7 +107,7 @@ export function VocabQuizStudentHeader({
           <span
             data-testid="vocab-quiz-progress-stripe"
             aria-hidden
-            className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-neo-white/45 sm:h-1.5"
+            className="absolute inset-x-2 top-[3px] h-1 rounded-full bg-edu-paper/45 sm:h-1.5"
           />
         </div>
       </div>

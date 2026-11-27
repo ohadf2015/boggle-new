@@ -84,7 +84,7 @@ export function ProjectorStartBar({
         <div role="status" aria-live="polite" className="flex items-center justify-between gap-3 rounded-neo border-[3px] border-neo-black bg-neo-cream px-3 py-2 font-neo-display font-black text-neo-black shadow-hard text-[clamp(1rem,min(1.2cqw,2.2cqh),1.75rem)]">
           {t('hostView.allReadyAutoStart', { seconds: autoStartSecondsLeft })}
           {onCancelAutoStart && (
-            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-neo-white px-3 text-sm text-neo-black shadow-hard-sm', PRESS)}>
+            <button type="button" data-testid="projector-autostart-cancel" onClick={onCancelAutoStart} className={cn('min-h-11 rounded-neo border-[3px] border-neo-black bg-edu-paper px-3 text-sm text-neo-black shadow-hard-sm', PRESS)}>
               {t('common.cancel')}
             </button>
           )}

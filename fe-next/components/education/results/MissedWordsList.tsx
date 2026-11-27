@@ -50,7 +50,7 @@ export function MissedWordsList({ words, maxChips = 8, title, t, children, fill 
             data-testid="edu-most-missed-word"
             dir="auto"
             className={cn(
-              'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-neo-white shadow-edu-lip-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
+              'inline-flex items-center gap-1.5 rounded-neo border-[3px] border-neo-black bg-edu-paper shadow-edu-lip-sm px-2.5 py-0.5 font-neo-display text-base font-black text-neo-black @5xl/results:px-3 @5xl/results:text-xl @[96rem]/results:px-4 @[96rem]/results:py-1 @[96rem]/results:text-3xl',
               fill && '@5xl/results:px-4 @5xl/results:py-1.5 @5xl/results:text-2xl'
             )}
           >

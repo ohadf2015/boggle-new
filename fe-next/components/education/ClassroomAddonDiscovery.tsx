@@ -237,7 +237,7 @@ export function ClassroomAddonDiscovery({
           onClick={handlePrint}
           className={cn('focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-black',
             'mt-2 w-full flex items-center justify-center gap-2 px-4 py-2.5 font-bold text-sm',
-            'bg-neo-white text-neo-black border-neo border-neo-black rounded-neo',
+            'bg-edu-paper text-neo-black border-neo border-neo-black rounded-neo',
             'shadow-hard-sm hover:shadow-hard transition',
           )}
         >

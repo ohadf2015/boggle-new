@@ -81,7 +81,7 @@ export function VocabQuizNextUp({ secondsLeft, hint, isLast, t }: VocabQuizNextU
                 key={i}
                 data-blank=""
                 aria-hidden
-                className="inline-block w-5 h-1.5 rounded-neo-sm bg-neo-white/40"
+                className="inline-block w-5 h-1.5 rounded-neo-sm bg-edu-paper/40"
               />
             ))}
           </span>

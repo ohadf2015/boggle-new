@@ -49,11 +49,11 @@ const SPARKS: ReadonlyArray<{ x: number; y: number; fill: string }> = [
   { x: 64, y: 0, fill: 'bg-neo-yellow' },
   { x: 46, y: -30, fill: 'bg-neo-pink' },
   { x: 8, y: -34, fill: 'bg-neo-cyan' },
-  { x: -34, y: -26, fill: 'bg-neo-white' },
+  { x: -34, y: -26, fill: 'bg-edu-paper' },
   { x: -44, y: 4, fill: 'bg-neo-yellow' },
   { x: -30, y: 30, fill: 'bg-neo-pink' },
   { x: 12, y: 34, fill: 'bg-neo-cyan' },
-  { x: 50, y: 28, fill: 'bg-neo-white' },
+  { x: 50, y: 28, fill: 'bg-edu-paper' },
 ];
 
 function VerdictBurst() {
@@ -84,7 +84,7 @@ function VerdictBadge({ correct }: { correct: boolean | null }) {
       data-testid="vocab-quiz-verdict-badge"
       data-verdict={correct ? 'correct' : correct === false ? 'wrong' : 'missed'}
       className={cn(
-        'grid shrink-0 place-items-center rounded-full border-[3px] border-neo-black bg-neo-white text-neo-black shadow-hard-sm',
+        'grid shrink-0 place-items-center rounded-full border-[3px] border-neo-black bg-edu-paper text-neo-black shadow-hard-sm',
         'size-12 sm:size-14'
       )}
     >
@@ -172,7 +172,7 @@ export function VocabQuizRevealBanner({
                   <span
                     data-testid="vocab-quiz-verdict-points"
                     dir="ltr"
-                    className="shrink-0 rounded-neo border-[3px] border-neo-black bg-neo-white px-2 py-0.5 text-xl leading-none tabular-nums text-neo-black shadow-hard-sm sm:px-3 sm:py-1 sm:text-2xl"
+                    className="shrink-0 rounded-neo border-[3px] border-neo-black bg-edu-paper px-2 py-0.5 text-xl leading-none tabular-nums text-neo-black shadow-hard-sm sm:px-3 sm:py-1 sm:text-2xl"
                   >
                     +{points}
                   </span>
