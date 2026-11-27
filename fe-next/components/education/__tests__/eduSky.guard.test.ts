@@ -69,6 +69,13 @@ describe('classroom sky skin', () => {
     }
   });
 
+  it('paints the shared dialog, popover and select as sky surfaces under the scope', () => {
+    for (const rel of ['components/ui/dialog.tsx', 'components/ui/popover.tsx', 'components/ui/select.tsx']) {
+      expect(read(rel), rel).toMatch(/edu-sky:bg-edu-surface edu-sky:text-edu-ink/);
+    }
+    expect(read('app/globals.css')).toMatch(/@custom-variant edu-sky \(html:has\(\[data-edu-theme='sky'\]\) &\)/);
+  });
+
   it('defaults every edu token to the dark app and flips them only under the sky scope', () => {
     const css = read('app/edu-sky.css');
     const rootBlock = /:root\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';

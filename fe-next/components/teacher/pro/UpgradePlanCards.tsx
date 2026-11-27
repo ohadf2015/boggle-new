@@ -80,10 +80,10 @@ function FeatureRow({ label, dark }: { label: string; dark?: boolean }) {
       <span
         className={cn(
           'mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded border-2 border-neo-black',
-          dark ? 'bg-neo-black' : 'bg-neo-lime',
+          dark ? 'bg-neo-black text-neo-yellow' : 'bg-neo-lime text-neo-black',
         )}
       >
-        <Check className={cn('h-3 w-3', dark ? 'text-edu-yellow-ink' : 'text-neo-black')} strokeWidth={3} aria-hidden />
+        <Check className="h-3 w-3" strokeWidth={3} aria-hidden />
       </span>
       <span className={cn('text-sm font-bold leading-snug', dark ? 'text-neo-black' : 'text-edu-ink')}>{label}</span>
     </li>

@@ -37,8 +37,8 @@ export function LessonPickerOption({ lesson, label, selected, onToggle, mode, ra
   const body = (
     <>
       {selected && (
-        <span aria-hidden="true" className="absolute end-2 top-2 rounded-full bg-neo-black p-1">
-          <Check className="size-4 text-edu-cyan-ink" />
+        <span aria-hidden="true" className="absolute end-2 top-2 rounded-full bg-neo-black p-1 text-neo-cyan">
+          <Check className="size-4" />
         </span>
       )}
       <span className="flex items-start gap-2 pe-7">

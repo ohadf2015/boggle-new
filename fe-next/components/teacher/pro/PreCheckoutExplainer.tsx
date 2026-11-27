@@ -45,7 +45,7 @@ export function PreCheckoutExplainer({ mode, pending, onConfirm, onBack }: PreCh
       aria-modal="true"
       aria-label={t('eg2Pro.preCheckout.title')}
       data-testid="pre-checkout-explainer"
-      className={cn(NB_OVERLAY_LAYER, 'z-50 items-center bg-edu-surface/60 p-4')}
+      className={cn(NB_OVERLAY_LAYER, 'fixed inset-0 z-50 items-center bg-neo-navy/60 p-4')}
       onClick={pending ? undefined : onBack}
     >
       <div className={cn(NB_OVERLAY_PANEL, 'max-w-md rounded-neo-xl border-b-[3px] shadow-hard-xl')} onClick={(e) => e.stopPropagation()}>
