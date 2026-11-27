@@ -55,6 +55,7 @@ export function DuelRevealMascot({ src, poster, label, className }: DuelRevealMa
       )}
     >
       {/* The floor: always painted, never black. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- poster still under the reveal clip, sized by its frame */}
       <img
         data-testid="duel-reveal-still"
         src={poster}

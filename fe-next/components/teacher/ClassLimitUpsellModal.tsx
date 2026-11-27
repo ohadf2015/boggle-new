@@ -122,7 +122,7 @@ export default function ClassLimitUpsellModal({
     } finally {
       setPending(false);
     }
-  }, [pending, reason, isStudentLimit, language, t, source]);
+  }, [pending, reason, isStudentLimit, isTrialExpired, currentCount, limit, language, t, source]);
 
   const titleKey = isTrialExpired
     ? 'teacher.subscription.trialExpiredTitle'
