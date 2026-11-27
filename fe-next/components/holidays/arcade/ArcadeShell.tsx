@@ -7,8 +7,7 @@ import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import HolidayMascotPop from '@/components/daily/holiday/HolidayMascotPop';
 import { spawnBurst, type BurstKind } from '@/components/daily/holiday/holidayBurst';
 import type { HolidayKey } from '@/lib/holidays/calendar';
-import { ARCADE_GAMES, type ArcadeGameId } from '@/lib/holidays/arcade/games';
-import ArcadeBackdrop from './ArcadeBackdrop';
+import type { ArcadeGameId } from '@/lib/holidays/arcade/games';
 import { cn } from '@/lib/utils';
 import styles from './arcade.module.css';
 
@@ -36,7 +35,6 @@ interface Props {
 
 export default function ArcadeShell({ holiday, game, score, onExit, children, overlay }: Props) {
   const { t } = useLanguage();
-  const meta = ARCADE_GAMES[game];
   const reduced = usePrefersReducedMotion();
   const layer = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
@@ -75,7 +73,7 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
         const host = layer.current;
         if (!p || !host) return;
         const span = document.createElement('span');
-        span.className = cn(styles.floatUp, 'font-neo-display text-lg font-black text-neo-holiday-gold [text-shadow:2px_2px_0_rgb(var(--neo-black))]');
+        span.className = cn(styles.floatUp, 'font-neo-display text-lg font-black text-neo-cream [text-shadow:2px_2px_0_rgb(var(--neo-black))]');
         span.textContent = text;
         span.style.left = `${p.x}px`;
         span.style.top = `${p.y - 10}px`;
@@ -96,7 +94,7 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
 
   return (
     <Ctx.Provider value={fx}>
-      <div data-testid={`arcade-${game}`} className="mx-auto flex w-full max-w-lg flex-[1_0_auto] flex-col gap-2 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 text-neo-white">
+      <div data-testid={`arcade-${game}`} className={cn(holiday === 'hanukkah' ? '[--arcade-accent:var(--neo-holiday-blue)]' : '[--arcade-accent:var(--neo-holiday-red)]', 'mx-auto flex w-full max-w-lg flex-[1_0_auto] flex-col gap-2 px-3 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 text-neo-white')}>
         <header className="flex items-center gap-2">
           <button
             type="button"
@@ -110,7 +108,7 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
           <output
             key={score}
             aria-label={t('holiday.arcade.scoreLabel')}
-            className={cn('rounded-xl border-[3px] border-black bg-neo-holiday-gold px-3 py-1 font-neo-display text-lg font-black tabular-nums text-neo-navy shadow-hard', score > 0 && styles.pop)}
+            className={cn('rounded-xl border-[3px] border-black bg-[var(--arcade-accent)] text-neo-white px-3 py-1 font-neo-display text-lg font-black tabular-nums shadow-hard', score > 0 && styles.pop)}
           >
             {score}
           </output>
@@ -124,11 +122,10 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
           </button>
         </header>
         <div className="flex min-h-16 items-center">
-          <HolidayMascotPop holiday={holiday} cue={cue} line={line} className="flex-row-reverse items-center gap-2" />
+          <HolidayMascotPop holiday={holiday} cue={cue} line={line} className="flex-row-reverse items-center gap-2" bubbleClassName="mb-0 max-w-[15rem] text-sm" />
         </div>
         <div data-arcade-stage className={cn(styles.stage, 'flex flex-[1_0_auto] flex-col rounded-2xl border-[3px] border-black bg-neo-navy shadow-hard-lg')}>
           <div className="relative z-[1] flex flex-[1_0_auto] flex-col">{children}</div>
-          {!meta.family && <ArcadeBackdrop meta={meta} />}
           <div ref={layer} className={styles.layer} aria-hidden="true" />
           {paused && !overlay && (
             <div className="absolute inset-0 z-40 grid place-items-center bg-neo-navy/85">
@@ -136,7 +133,7 @@ export default function ArcadeShell({ holiday, game, score, onExit, children, ov
                 type="button"
                 autoFocus
                 onClick={() => setPaused(false)}
-                className="flex items-center gap-2 rounded-2xl border-[3px] border-black bg-neo-holiday-gold px-6 py-3 font-neo-display text-xl font-black text-neo-navy shadow-hard-lg"
+                className="flex items-center gap-2 rounded-2xl border-[3px] border-black bg-[var(--arcade-accent)] text-neo-white px-6 py-3 font-neo-display text-xl font-black shadow-hard-lg"
               >
                 <Play className="size-6" aria-hidden="true" />
                 {t('holiday.arcade.resume')}

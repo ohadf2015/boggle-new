@@ -119,3 +119,19 @@ describe('landingJsonLd', () => {
     expect(graph.some((n) => n['@type'] === 'Event')).toBe(false);
   });
 });
+
+describe('holiday landing arcade list', () => {
+  it('Given each landing page, then every arcade game of its holiday has its own name and blurb, so the grid is never empty', async () => {
+    const { landingCopy } = await import('../landingCopy');
+    const { gamesFor } = await import('../arcade/games');
+    for (const p of HOLIDAY_LANDINGS) {
+      const copy = landingCopy(p.holiday, p.locale);
+      const games = gamesFor(p.holiday);
+      expect(Object.keys(copy.arcade).sort(), p.slug).toEqual([...games].sort());
+      for (const id of games) {
+        expect(copy.arcade[id]?.name.length, `${p.slug} ${id}`).toBeGreaterThan(2);
+        expect(copy.arcade[id]?.blurb.length, `${p.slug} ${id}`).toBeGreaterThan(20);
+      }
+    }
+  });
+});

@@ -63,4 +63,50 @@ describe('PixiStage lifecycle', () => {
     await waitFor(() => expect(px.apps[0].destroy).toHaveBeenCalledTimes(1));
     expect(create).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [false, [1, 3]],
+    [true, [9, 10]],
+  ])('Given a final fall asks for slow motion (reduced=%s), then the game steps at the matching speed', async (reduced, expected) => {
+    const update = vi.fn();
+    const create = vi.fn((ctx: { slowMo: (ms: number) => void }) => {
+      ctx.slowMo(1000);
+      return { update };
+    });
+    render(<PixiStage art={[]} create={create} paused={false} reduced={reduced} sfx={sfx} label="game" />);
+    await waitFor(() => expect(create).toHaveBeenCalled());
+    const app = (create.mock.calls[0][0] as unknown as { app: { ticker: { add: ReturnType<typeof vi.fn> } } }).app;
+    const tick = app.ticker.add.mock.calls[0][0] as (t: { deltaMS: number }) => void;
+    for (let i = 0; i < 10; i++) tick({ deltaMS: 1000 / 60 });
+    expect(update.mock.calls.length).toBeGreaterThanOrEqual(expected[0]);
+    expect(update.mock.calls.length).toBeLessThanOrEqual(expected[1]);
+  });
+
+  it('Given the first tap or key, then the stage reports it once so the hint can go away', async () => {
+    const onInput = vi.fn();
+    const { getByRole } = render(<PixiStage art={[]} create={() => ({ update: vi.fn() })} paused={false} reduced={false} sfx={sfx} label="game" onInput={onInput} />);
+    const stage = getByRole('application');
+    stage.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    stage.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(onInput).toHaveBeenCalled();
+  });
+});
+
+describe('PixiStage tween safety', () => {
+  it('Given a tween whose sprite was destroyed, then the game keeps stepping instead of freezing', async () => {
+    const update = vi.fn();
+    const create = vi.fn((ctx: { tweens: { add: (o: { from: number; to: number; duration: number; onUpdate: (v: number) => void }) => number } }) => {
+      ctx.tweens.add({ from: 0, to: 1, duration: 5, onUpdate: () => { throw new TypeError("Cannot read properties of null (reading 'set')"); } });
+      return { update };
+    });
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<PixiStage art={[]} create={create as never} paused={false} reduced={false} sfx={sfx} label="game" />);
+    await waitFor(() => expect(create).toHaveBeenCalled());
+    const app = (create.mock.calls[0][0] as unknown as { app: { ticker: { add: ReturnType<typeof vi.fn> } } }).app;
+    const tick = app.ticker.add.mock.calls[0][0] as (t: { deltaMS: number }) => void;
+    for (let i = 0; i < 10; i++) expect(() => tick({ deltaMS: 1000 / 60 })).not.toThrow();
+    expect(update.mock.calls.length).toBeGreaterThanOrEqual(9);
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
 });

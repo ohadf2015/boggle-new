@@ -19,8 +19,10 @@ export interface KitCtx {
   tweens: TweenManager;
   shake: (intensity: number, seconds?: number) => void;
   hitStop: (ms: number) => void;
+  slowMo: (ms: number) => void;
   burst: (preset: ParticleConfig, x: number, y: number, count?: number) => void;
   float: (x: number, y: number, text: string, tone?: FloatTone) => void;
+  banner: (text: string) => void;
   sfx: KitSfx;
 }
 
@@ -30,6 +32,8 @@ export interface Scene {
   pointerMove?: (p: PointerSample) => void;
   pointerUp?: (p: PointerSample) => void;
   action?: () => void;
+  release?: () => void;
+  steer?: (dir: -1 | 1) => void;
   destroy?: () => void;
 }
 

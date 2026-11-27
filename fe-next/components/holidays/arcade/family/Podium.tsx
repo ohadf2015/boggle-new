@@ -8,6 +8,7 @@ import { useArcadeFx } from '../ArcadeShell';
 import { useKitSfx } from '../kit/useKitSfx';
 import { PLAYER_BG, playerName } from './playerChip';
 import styles from './family.module.css';
+import { useFreshTap } from '../useFreshTap';
 
 const STEP = ['h-28', 'h-20', 'h-14', 'h-10'];
 
@@ -16,6 +17,7 @@ export default function Podium({ match, onDone }: { match: Match; onDone: () => 
   const sfx = useKitSfx();
   const fx = useArcadeFx();
   const rows = podium(match);
+  const { surface, guard } = useFreshTap();
   const champ = rows[0];
 
   useEffect(() => {
@@ -25,8 +27,8 @@ export default function Podium({ match, onDone }: { match: Match; onDone: () => 
   }, []);
 
   return (
-    <div role="dialog" aria-modal="true" aria-labelledby="family-podium" data-testid="family-podium" className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-neo-navy/80 p-4 text-center">
-      <h2 id="family-podium" className="font-neo-display text-3xl font-black text-neo-holiday-gold [text-shadow:3px_3px_0_rgb(var(--neo-black))]">
+    <div {...surface} role="dialog" aria-modal="true" aria-labelledby="family-podium" data-testid="family-podium" className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-4 bg-neo-navy/80 p-4 text-center">
+      <h2 id="family-podium" className="font-neo-display text-3xl font-black text-neo-white [text-shadow:3px_3px_0_rgb(var(--neo-black))]">
         {t('holiday.arcade.family.podium')}
       </h2>
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -35,7 +37,7 @@ export default function Podium({ match, onDone }: { match: Match; onDone: () => 
         {rows.map((r, i) => (
           <li key={r.index} className={cn('flex min-w-0 flex-1 flex-col items-center gap-1', styles.rise)} style={{ animationDelay: `${(rows.length - i) * 120}ms` }}>
             <span className="max-w-full truncate font-neo-display text-sm font-black">{playerName(t, r, r.index)}</span>
-            <span className="font-neo-display text-lg font-black tabular-nums text-neo-holiday-gold">{r.score}</span>
+            <span className="font-neo-display text-lg font-black tabular-nums text-neo-white">{r.score}</span>
             <span className={cn('grid w-full place-items-center rounded-t-xl border-[3px] border-b-0 border-black font-neo-display text-2xl font-black text-neo-navy shadow-hard', PLAYER_BG[r.color], STEP[r.place - 1])}>
               {r.place}
             </span>
@@ -46,7 +48,7 @@ export default function Podium({ match, onDone }: { match: Match; onDone: () => 
         type="button"
         autoFocus
         data-testid="family-finish"
-        onClick={onDone}
+        onClick={guard(onDone)}
         className="h-12 w-full max-w-xs rounded-xl border-[3px] border-black bg-neo-lime font-neo-display text-lg font-black text-neo-navy shadow-hard active:translate-x-px active:translate-y-px active:shadow-hard-pressed"
       >
         {t('holiday.arcade.family.finish')}

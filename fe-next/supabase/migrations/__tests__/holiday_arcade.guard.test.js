@@ -24,17 +24,16 @@ describe('holiday arcade migration', () => {
   });
 });
 
-describe('holiday arcade family games migration', () => {
-  const famFile = fs.readdirSync(dir).find((f) => f.endsWith('_holiday_arcade_family.sql'));
-  const fam = famFile ? fs.readFileSync(path.join(dir, famFile), 'utf8') : '';
+describe('holiday arcade party games migration', () => {
+  const nextFile = fs.readdirSync(dir).find((f) => f.endsWith('_holiday_arcade_party_games.sql'));
+  const next = nextFile ? fs.readFileSync(path.join(dir, nextFile), 'utf8') : '';
 
-  it('Given the family games, then the rounds table accepts their ids alongside the word games', () => {
-    expect(famFile).toBeTruthy();
-    expect(famFile > file).toBe(true);
-    expect(fam).toMatch(/DROP CONSTRAINT IF EXISTS holiday_arcade_rounds_game_check/);
-    for (const id of ['oil', 'dreidel', 'sufganiyah', 'sleigh', 'snowball', 'wrap', 'latke', 'spin', 'presents', 'splat']) {
-      expect(fam).toMatch(new RegExp(`'${id}'`));
-    }
-    expect(fam).not.toMatch(/supabase_realtime/i);
+  it('Given the six family games, then the rounds table accepts exactly their ids', () => {
+    expect(nextFile).toBeTruthy();
+    expect(nextFile > file).toBe(true);
+    expect(next).toMatch(/DROP CONSTRAINT IF EXISTS holiday_arcade_rounds_game_check/);
+    const ids = [...next.matchAll(/'([a-z]+)'/g)].map((m) => m[1]).sort();
+    expect(ids).toEqual(['catch', 'dash', 'latke', 'presents', 'spin', 'splat']);
+    expect(next).not.toMatch(/supabase_realtime/i);
   });
 });

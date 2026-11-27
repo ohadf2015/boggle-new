@@ -14,16 +14,17 @@ const staticImport = /^import (?!type\b)[^;]*from '(pixi\.js|matter-js|@\/lib\/g
 
 describe('holiday arcade bundle boundary', () => {
   it('Given the hub, tile, shell and game list, then none of them pulls pixi, matter or the kit into the page bundle', () => {
-    for (const f of ['ArcadeHub.tsx', 'ArcadeTile.tsx', 'ArcadeShell.tsx', 'ArcadeGameHost.tsx', 'ArcadeCard.tsx', '../../../lib/holidays/arcade/games.ts']) {
+    for (const f of ['ArcadeHub.tsx', 'ArcadeTile.tsx', 'ArcadeShell.tsx', 'ArcadeGameHost.tsx', 'ArcadeCard.tsx', 'gameLoaders.ts', '../../../lib/holidays/arcade/games.ts']) {
       const src = read(f);
       expect(src, f).not.toMatch(staticImport);
-      expect(src, f).not.toMatch(/from '\.\/(kit|family)\//);
+      expect(src, f).not.toMatch(/^import (?!type\b)[^;]*from '\.\/(kit|family)\//m);
     }
   });
 
-  it('Given the family games, then the host loads each one lazily', () => {
-    const host = read('ArcadeGameHost.tsx');
-    for (const g of ['LatkeFlip', 'SpinOff', 'PresentStack', 'SnowballSplat']) expect(host).toContain(`dynamic(() => import('./family/${g}')`);
+  it('Given the six games, then each one is loaded lazily through the shared loaders', () => {
+    const loaders = read('gameLoaders.ts');
+    for (const g of ['LatkeFlip', 'SpinOff', 'SufganiyahCatch', 'PresentStack', 'SnowballSplat', 'SleighDash']) expect(loaders).toContain(`() => import('./family/${g}')`);
+    expect(read('ArcadeGameHost.tsx')).toMatch(/dynamic\(GAME_LOADERS\.\w+/);
   });
 
   it('Given the kit and family scenes, then pixi is only imported at runtime by the stage', () => {

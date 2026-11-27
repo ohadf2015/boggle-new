@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ARCADE_GAMES, type FamilyGameId } from '@/lib/holidays/arcade/games';
+import { ARCADE_GAMES, type ArcadeGameId } from '@/lib/holidays/arcade/games';
 import { MAX_PLAYERS, PLAYER_COLORS } from '@/lib/holidays/arcade/kit/passPlay';
 import { cn } from '@/lib/utils';
 import { PLAYER_BG } from './playerChip';
 import styles from './family.module.css';
 
 interface Props {
-  game: FamilyGameId;
+  game: ArcadeGameId;
   onStart: (names: string[]) => void;
 }
 
@@ -24,7 +24,7 @@ export default function PassPlaySetup({ game, onStart }: Props) {
     <div data-testid="family-setup" className="absolute inset-0 z-10 flex flex-col items-center justify-end gap-3 overflow-y-auto bg-gradient-to-t from-neo-navy via-neo-navy/80 to-neo-navy/10 px-4 pb-5 pt-8 text-center">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={meta.hero} alt="" width={160} height={160} className={cn('h-28 w-auto drop-shadow-[4px_4px_0_rgb(var(--neo-black))]', styles.bob)} />
-      <span className="inline-flex items-center gap-1 rounded-full border-2 border-black bg-neo-holiday-gold px-3 py-0.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-navy shadow-hard-sm">
+      <span className="inline-flex items-center gap-1 rounded-full border-2 border-black bg-[var(--arcade-accent)] text-neo-white px-3 py-0.5 font-neo-display text-xs font-black uppercase tracking-wide shadow-hard-sm">
         <Users className="size-3.5" aria-hidden="true" />
         {t('holiday.arcade.family.badge')}
       </span>
@@ -42,7 +42,7 @@ export default function PassPlaySetup({ game, onStart }: Props) {
               onClick={() => setCount(i + 1)}
               className={cn(
                 'flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl border-[3px] border-black font-neo-display text-lg font-black shadow-hard transition-transform active:translate-x-px active:translate-y-px active:shadow-hard-pressed',
-                count === i + 1 ? 'bg-neo-holiday-gold text-neo-navy' : 'bg-neo-navy-light text-neo-white',
+                count === i + 1 ? 'bg-[var(--arcade-accent)] text-neo-white' : 'bg-neo-navy-light text-neo-white',
               )}
             >
               {i + 1}

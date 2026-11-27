@@ -20,7 +20,7 @@ const server = createServer(async (req, res) => {
 }).listen(0);
 const base = `http://127.0.0.1:${server.address().port}`;
 const VIEWPORTS = { phone: { width: 390, height: 844 }, desktop: { width: 1440, height: 900 } };
-const FOCUS = { latke: [0.5, 0.92], spin: [0.5, 0.5], presents: [0.5, 1], splat: [0.5, 0.8] };
+const FOCUS = { latke: [0.5, 0.92], spin: [0.5, 0.5], catch: [0.5, 0.85], presents: [0.5, 1], splat: [0.5, 0.8], dash: [0.2, 0.6] };
 
 async function toScreen(page, g, ax, ay) {
   const r = await page.locator('[role=application]').boundingBox();
@@ -68,14 +68,34 @@ const PLAY = {
     await tap(page, 'splat', 430, 620);
     await page.waitForTimeout(160);
   },
+  async catch(page) {
+    await page.waitForTimeout(600);
+    for (let i = 0; i < 40; i++) {
+      const x = await page.evaluate(() => 0);
+      const p = await toScreen(page, 'catch', 150 + ((i * 97) % 470), 1150);
+      await page.mouse.move(p.x, p.y);
+      await page.waitForTimeout(90 + x);
+    }
+  },
+  async dash(page) {
+    await page.waitForTimeout(500);
+    const r = await page.locator('[role=application]').boundingBox();
+    for (let i = 0; i < 8; i++) {
+      await page.mouse.move(r.x + r.width / 2, r.y + r.height / 2);
+      await page.mouse.down();
+      await page.waitForTimeout(280);
+      await page.mouse.up();
+      await page.waitForTimeout(320);
+    }
+  },
 };
 
+const HOL = { latke: 'hanukkah', spin: 'hanukkah', catch: 'hanukkah', presents: 'christmas', splat: 'christmas', dash: 'christmas' };
 const shots = [
   ...['hanukkah', 'christmas'].map((h) => ({ name: `hub-${h}`, q: `h=${h}` })),
-  ...['latke', 'spin', 'presents', 'splat'].map((g) => ({ name: g, q: `g=${g}&h=${['latke', 'spin'].includes(g) ? 'hanukkah' : 'christmas'}`, family: g })),
+  ...Object.keys(HOL).map((g) => ({ name: g, q: `g=${g}&h=${HOL[g]}`, family: g })),
   { name: 'setup-latke', q: 'g=latke&h=hanukkah', setup: true },
-  { name: 'latke-he', q: 'g=latke&h=hanukkah&lang=he&region=IL', family: 'latke' },
-  ...['oil', 'dreidel', 'sufganiyah', 'sleigh', 'snowball', 'wrap'].map((g) => ({ name: g, q: `g=${g}&h=${['oil', 'dreidel', 'sufganiyah'].includes(g) ? 'hanukkah' : 'christmas'}` })),
+  { name: 'catch-he', q: 'g=catch&h=hanukkah&lang=he&region=IL', family: 'catch' },
 ].filter((s) => !only || s.name.startsWith(only));
 
 const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });

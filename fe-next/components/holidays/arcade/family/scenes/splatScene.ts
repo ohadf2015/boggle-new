@@ -3,7 +3,8 @@ import { classifyGesture, type PointerSample } from '@/lib/holidays/arcade/kit/g
 import { ballAt, HOLES, newSplatGame, popHeight, stepSplat, THROW_FROM, throwBall, type Pop, type PopKind } from '@/lib/holidays/arcade/splat';
 import type { KitCtx, Scene } from '../../kit/types';
 import { neoColor } from '../../kit/neoColor';
-import { ambience, backdrop, burstPreset, fadeAway, popIn, reporter, sprite, type TurnOpts } from './common';
+import { comboMult } from '@/lib/holidays/arcade/kit/pace';
+import { ambience, backdrop, burstPreset, fadeAway, finale, levelUp, multPop, popIn, reporter, sprite, type TurnOpts } from './common';
 
 const MASCOT = '/holidays/m-christmas.webp';
 export const SPLAT_ART = ['bg-snowball', 'spr-popup-elf', 'spr-popup-snowman', 'spr-popup-gremlin', 'spr-snowball', 'spr-splat', 'spr-spark-impact', MASCOT];
@@ -78,6 +79,13 @@ export function createSplatScene(ctx: KitCtx, opts: TurnOpts): Scene {
   const handle = () => {
     for (const e of g.events) {
       if (e.type === 'throw') ctx.sfx.play('throw');
+      else if (e.type === 'party') {
+        ctx.sfx.play('giggle');
+        ctx.shake(6, 0.3);
+        ctx.banner(opts.say('splat.party'));
+        opts.cheer(opts.say('splat.partyCheer'));
+      } else if (e.type === 'level') levelUp(ctx, opts, 'splat', e.level);
+      else if (e.type === 'mult') multPop(ctx, opts, e.mult, 384, 520);
       else if (e.type === 'hit' || e.type === 'oops') {
         ctx.sfx.play('splat');
         ctx.burst(puff, e.x, e.y);
@@ -147,8 +155,8 @@ export function createSplatScene(ctx: KitCtx, opts: TurnOpts): Scene {
       snow(dt);
       reticle.clear();
       if (aimAt) reticle.circle(aimAt.x, aimAt.y, 34).stroke({ width: 5, color: snowColor, alpha: 0.9 }).circle(aimAt.x, aimAt.y, 6).fill({ color: snowColor });
-      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo });
-      if (g.over) report.end({ score: g.score, won: g.hits >= 12 });
+      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo, mult: comboMult(g.combo) });
+      if (g.over) finale(ctx, opts, report, { score: g.score, won: g.hits >= 20 }, opts.say(g.hits >= 20 ? 'splat.finaleWin' : 'splat.finale', { n: g.hits }));
     },
     pointerDown(p) {
       press = p;

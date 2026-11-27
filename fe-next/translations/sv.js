@@ -4,7 +4,6 @@ const sv = {
   "holiday": {
     // @holiday-arcade:start
     "arcade": {
-      "wordSection": "Ordspel",
       "lobby": {
         "home": "Hem",
         "night": "Kväll {n} av {total}",
@@ -40,12 +39,17 @@ const sv = {
         "combo": "{count}x kombo",
         "timeLeft_one": "{count} sekund kvar",
         "timeLeft_other": "{count} sekunder kvar",
-        "yourScore": "Mynten räknas på spelare 1:s poäng"
+        "yourScore": "Mynten räknas på spelare 1:s poäng",
+        "yourTurn": "{name}, din tur!",
+        "toBeat": "Att slå: {score}",
+        "scoreboard": "Poäng",
+        "mult": "x{n}!",
+        "onFire": "Du är het nu!"
       },
       "latke": {
         "title": "Latkevändning",
         "blurb": "Vänd latkesen när de blir gyllene. Låt dem inte bränna vid!",
-        "how": "Tryck på en latke när ringen når det gyllene fältet. Vänd båda sidorna för att servera den.",
+        "how": "Tryck på en latke när ringen når det gyllene fältet",
         "win": "Gyllene! Vilken stekning",
         "over": "Stekpannan har kallnat",
         "turnWin": "Latkelegend!",
@@ -54,17 +58,24 @@ const sv = {
         "cheer": "Kolla så gyllene och krispig!",
         "early": "Inte än!",
         "cough": "*hostar* Lite för krispig…",
-        "burnt": "Vidbränd!"
+        "burnt": "Vidbränd!",
+        "star": "Stjärnlatke! En perfekt vändning ger trippelt",
+        "level1": "En fjärde latke i pannan!",
+        "level2": "Oljan blir varmare!",
+        "level3": "Fem latkes på en gång!",
+        "level4": "Rusningstid vid spisen!",
+        "finale": "Pannan är av! Serverade latkes: {n}",
+        "finaleWin": "Vilken stekfest! Serverade latkes: {n}"
       },
       "spin": {
         "title": "Snurrstriden",
         "blurb": "Knäpp in din dreidel i ringen. Den som snurrar sist vinner.",
-        "how": "Svep för att skjuta iväg din blå dreidel. Knuffa omkull de andra och fortsätt snurra!",
+        "how": "Svep hårt för att skjuta iväg, tryck sedan på en motståndare för att knuffa den",
+        "swipe": "Svep uppåt för att skjuta iväg!",
         "win": "Snurrmästare!",
         "over": "Dreidlarna har talat",
         "turnWin": "Snurrmästare!",
         "turnOver": "Alla har snurrat klart!",
-        "round": "Runda {n} av {total}",
         "roundOf": "Runda {n} av {total}",
         "youWin": "Din snurrar fortfarande!",
         "knocked": "Omkullknuffad! Ta nästa runda",
@@ -74,28 +85,64 @@ const sv = {
           "hei": "Hej! +{gelt} chokladmynt",
           "shin": "Shin: +{gelt} chokladmynt",
           "pe": "Pe: +{gelt} chokladmynt"
-        }
+        },
+        "pushes": "Knuffar: {count}",
+        "rain": "Det regnar mynt! Snurra över dem",
+        "ko": "Knockout!",
+        "koCheer": "Mästare på krocksnurror!",
+        "level1": "Runda 2: en fjärde snurra är med!",
+        "level2": "Runda 3: se upp för jättesnurran!",
+        "level3": "Nu är det allvar!",
+        "level4": "Sista rundan!",
+        "finale": "Snurrorna har talat! Vunna rundor: {n}",
+        "finaleWin": "Snurrmästare! Vunna rundor: {n}"
+      },
+      "catch": {
+        "title": "Fånga munkarna",
+        "blurb": "Fånga munkarna som faller och undvik de brända latkesarna.",
+        "how": "Dra tallriken för att fånga munkarna",
+        "win": "Munkmästare!",
+        "over": "Bageriet har stängt",
+        "turnWin": "Full tallrik!",
+        "turnOver": "Tiden är ute!",
+        "frenzy": "MUNKSTORM!",
+        "frenzyCheer": "Det regnar sufganiyot!",
+        "burnt": "Bränd!",
+        "cough": "*host* Vem slängde in en bränd latke?",
+        "splat": "Splatt!",
+        "oops": "Neeej, sylten!",
+        "goldenComing": "Guldmunk på väg!",
+        "level1": "Se upp för brända latkes!",
+        "level2": "Vingliga munkar!",
+        "level3": "Dubbla munkar!",
+        "level4": "Snabbare och snabbare!",
+        "finale": "Bageriet stänger!",
+        "finaleWin": "Vilken fångst!"
       },
       "presents": {
-        "miss": "Hoppsan! Sikta på släden",
-        "lives_one": "{count} paket kvar",
-        "lives_other": "{count} paket kvar",
         "title": "Paketstapeln",
         "blurb": "Släpp de gungande paketen på tomtens släde. Hur högt kommer du?",
-        "how": "Tryck för att släppa paketet. Landa det mitt på toppen för en perfekt stapel.",
+        "how": "Tryck för att släppa paketet på högen",
         "win": "Släden är fullastad!",
-        "over": "Pang! Paketen flög åt alla håll",
+        "over": "Släden är packad för i kväll",
         "turnWin": "Vilket torn!",
-        "turnOver": "Pang!",
+        "turnOver": "Tiden är ute!",
         "perfect": "Perfekt stapel!",
         "cheer": "Tomten kommer att behöva en större släde!",
         "topple": "PANG!",
-        "facepalm": "Åh nej… renarna orkar inte titta"
+        "facepalm": "Åh nej… renarna orkar inte titta",
+        "golden": "Guldpaket! +300",
+        "level1": "Kranen går fortare!",
+        "level2": "Det börjar blåsa!",
+        "level3": "Snabbare gungningar!",
+        "level4": "Snöstorm!",
+        "finale": "Högsta tornet: {n}",
+        "finaleWin": "Ända upp till himlen! Högsta tornet: {n}"
       },
       "splat": {
         "title": "Snöbollssplash",
         "blurb": "Prick tomtenissarna och den lömska gremlinen. Träffa inte maskoten!",
-        "how": "Tryck eller svep för att kasta en snöboll. Gremlinen ger mest poäng. Låt maskoten vara!",
+        "how": "Tryck eller svep för att kasta. Träffa inte maskoten!",
         "win": "Snöbollsmästare!",
         "over": "Snöfästningen höll",
         "turnWin": "Splash-tastiskt!",
@@ -103,28 +150,47 @@ const sv = {
         "gotcha": "Där fick du, gremlin!",
         "cheer": "Vilken arm!",
         "oops": "Hoppsan!",
-        "mascotLine": "Hallå! Inte mig!"
+        "mascotLine": "Hallå! Inte mig!",
+        "party": "GREMLINFEST!",
+        "partyCheer": "Gremliner överallt! Pricka allihop!",
+        "level1": "Fler gremliner smyger fram!",
+        "level2": "De blir snabbare!",
+        "level3": "Akta dig, maskoten tittar fram!",
+        "level4": "Snöstorm på slutet!",
+        "finale": "Snöbollar som träffade: {n}",
+        "finaleWin": "Snöbollslegend! Träffar: {n}"
+      },
+      "dash": {
+        "title": "Slädfärden",
+        "blurb": "Flyg över taken, plocka julklappar och undvik ugglorna.",
+        "how": "Håll inne för att stiga, släpp för att glida ner",
+        "win": "Vilken klappskörd!",
+        "over": "Släden är parkerad för natten",
+        "turnWin": "Fena på att flyga!",
+        "turnOver": "Tiden är ute!",
+        "near": "Nära ögat! +{n}",
+        "owlHit": "Hoo! Förlåt, uggla!",
+        "smokeHit": "*host* Skorstensrök!",
+        "starComing": "Ta stjärnan!",
+        "turbo": "RENTURBO!",
+        "turboCheer": "Svisch! Nu stoppar oss ingen!",
+        "level1": "Ugglorna är ute!",
+        "level2": "Det går fortare!",
+        "level3": "Ugglepatrull!",
+        "level4": "Full fart mot midnatt!",
+        "finale": "Dags att landa!",
+        "finaleWin": "Tomtens bästa pilot!"
       },
       "back": "Tillbaka till arkaden",
       "scoreLabel": "Poäng",
       "pause": "Paus",
       "resume": "Spela vidare",
-      "rackHint": "Tryck på bokstäver för att bilda ett ord",
-      "erase": "Sudda",
-      "submit": "Klar",
-      "shuffle": "Blanda",
-      "great": "Snyggt!",
       "loading": "Laddar arkaden…",
-      "loadError": "Vi kunde inte starta spelet.",
-      "retry": "Försök igen",
-      "play": "Spela",
       "coinNote": "Varje spel räknas för dagens högtidsspår. Mynten har ett tak per dag.",
       "tileTitle": "Högtidsarkad",
-      "tileSubtitle": "Festspel för hela familjen och ordspel, bara den här säsongen",
+      "tileSubtitle": "Partyspel för hela familjen, bara den här säsongen",
       "tileLocked": "Öppnar den {date}",
       "shareText": "Jag fick {score} poäng i {game} på LexiClash! Klår du mig?",
-      "wordsFound_one": "{count} ord",
-      "wordsFound_other": "{count} ord",
       "saving": "Sparar dina poäng…",
       "saveError": "Vi kunde inte spara rundan. Den räknas ändå för i dag.",
       "coins_one": "+{count} mynt",
@@ -134,14 +200,6 @@ const sv = {
       "share": "Dela",
       "hub": "Alla spel",
       "signIn": "Logga in för att tjäna mynt",
-      "reject": {
-        "short": "För kort",
-        "letters": "Alla de bokstäverna finns inte här",
-        "dup": "Det ordet har du redan tagit",
-        "unknown": "Finns inte i vår ordlista",
-        "offline": "Anslutningen hackade, försök igen",
-        "all": "Använd alla bokstäver i paketet"
-      },
       "hanukkah": {
         "title": "Chanukka-arkad",
         "subtitle": "Snabba spel för ljusens högtid"
@@ -150,109 +208,10 @@ const sv = {
         "title": "Jularkad",
         "subtitle": "Snabba spel medan snön faller"
       },
-      "oil": {
-        "title": "Olja för 8 nätter",
-        "blurb": "Varje ord håller menoran tänd. Klara dig till den åttonde natten.",
-        "win": "Alla åtta ljus brinner!",
-        "over": "Oljan tog slut",
-        "nightLit": "Natt {night} är tänd",
-        "miracle": "Ett under! Sista droppen räcker",
-        "nightOf": "Natt {night} av {total}",
-        "candlesLit_one": "{count} ljus tänt",
-        "candlesLit_other": "{count} ljus tända",
-        "oilLevel": "Olja kvar",
-        "hint": "Längre ord fyller på mer olja"
-      },
-      "sleigh": {
-        "title": "Släde och stavning",
-        "blurb": "Stava ett ord vid varje skorsten för att släppa ner en julklapp.",
-        "win": "Alla julklappar levererade!",
-        "over": "Tomtens runda är slut",
-        "bells_one": "{count} bjällra kvar",
-        "bells_other": "{count} bjällror kvar",
-        "hint": "Stava ett ord innan skorstenen glider förbi",
-        "missed": "Den skorstenen missade du!"
-      },
-      "snowball": {
-        "title": "Snöbollskrig",
-        "blurb": "Fånga de riktiga orden och kasta tillbaka de falska.",
-        "win": "Vilket snöbollskrig!",
-        "over": "Snöbollskriget är slut",
-        "catch": "Fånga",
-        "toss": "Kasta",
-        "combo": "{count} i rad!",
-        "hint": "Svep uppåt för att fånga ett riktigt ord, åt sidan för att kasta ett falskt",
-        "oops": "Brr, det där var falskt!"
-      },
-      "wrap": {
-        "title": "Slå in det",
-        "blurb": "Kasta om bokstäverna i varje paket innan det rullar av bandet.",
-        "win": "Alla paket inslagna!",
-        "over": "Bandet vann den här gången",
-        "hint": "Använd alla bokstäver för att slå in paketet",
-        "missed": "Det paketet slank iväg!",
-        "misses_one": "{count} miss kvar",
-        "misses_other": "{count} missar kvar",
-        "mystery": "Hemligt paket öppnat!",
-        "mysteryHint": "Hemligt paket! Här gömmer sig ett julord"
-      },
-      "dreidel": {
-        "title": "Snurrduell",
-        "blurb": "Snurra, hitta ord och vinn mynten. Först till 10 vinner.",
-        "win": "Du vann alla mynt!",
-        "over": "Snurran valde andra sidan",
-        "you": "Du",
-        "bot": "Botten",
-        "yourSpin": "Din tur att snurra…",
-        "botSpin": "Botten snurrar…",
-        "botThinking": "Botten tänker…",
-        "botFound": "Botten hittade {word}",
-        "giveUp": "Hoppa över turen",
-        "goal": "Först till {count} mynt vinner",
-        "needLetter": "Ordet måste innehålla bokstaven {letter}",
-        "needLong": "Gimel kräver ett ord med minst {count} bokstäver",
-        "pot": "Potten: {count}",
-        "rule": {
-          "nun": "Nun: ingenting händer den här turen",
-          "gimel": "Gimel! Ett ord med {count}+ bokstäver tar hela potten",
-          "hei": "He! Vilket ord som helst tar halva potten",
-          "shin": "Shin: hitta ett ord med {letter} eller lägg ett mynt i potten"
-        },
-        "result": {
-          "nun": {
-            "win": "Nun, ingenting händer",
-            "miss": "Nun, ingenting händer"
-          },
-          "gimel": {
-            "win": "Gimel! Hela potten är din",
-            "miss": "Inget långt ord, potten ligger kvar"
-          },
-          "hei": {
-            "win": "He! Halva potten är din",
-            "miss": "Inget ord, inga mynt den här gången"
-          },
-          "shin": {
-            "win": "Klarade dig! Du betalar inget",
-            "miss": "Ett mynt åker ner i potten"
-          }
-        },
-        "side": {
-          "nun": "Nun",
-          "gimel": "Gimel",
-          "hei": "He",
-          "shin": "Shin"
-        }
-      },
-      "sufganiyah": {
-        "title": "Munktornet",
-        "blurb": "Koppla ihop munkar som nuddar varandra till ord innan brickan blir full.",
-        "win": "Brickan höll!",
-        "over": "Brickan svämmade över",
-        "hint": "Dra över munkar som nuddar varandra för att stava ett ord",
-        "pick": "Välj munkar som nuddar varandra",
-        "splash": "Syltexplosion!",
-        "tray": "Munkbricka"
-      }
+      "newBest": "Nytt rekord!",
+      "tieBest": "Du tangerade ditt rekord!",
+      "soClose": "Så nära! Bara {gap} från ditt rekord",
+      "bestScore": "Ditt rekord: {score}"
     },
     // @holiday-arcade:end
     "event": {

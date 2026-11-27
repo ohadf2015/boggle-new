@@ -2,7 +2,8 @@ import type { Container, Graphics, Sprite } from 'pixi.js';
 import { flipLatke, latkeStage, newLatkeGame, PERFECT_BAND, stepLatke, type LatkeStage } from '@/lib/holidays/arcade/latke';
 import type { KitCtx, Scene } from '../../kit/types';
 import { neoColor } from '../../kit/neoColor';
-import { ambience, backdrop, burstPreset, fadeAway, glow, popIn, reporter, sprite, squash, type TurnOpts } from './common';
+import { comboMult } from '@/lib/holidays/arcade/kit/pace';
+import { ambience, backdrop, burstPreset, fadeAway, finale, glow, levelUp, multPop, popIn, reporter, sprite, squash, type TurnOpts } from './common';
 
 export const LATKE_ART = ['bg-latke', 'spr-latke-raw', 'spr-latke-light', 'spr-latke-golden', 'spr-latke-burnt', 'spr-smoke', 'spr-spark-star', 'spr-sour-cream', 'spr-applesauce', 'spr-oil-drop'];
 
@@ -24,6 +25,7 @@ interface View {
   halo: Graphics;
   id: number;
   stage: LatkeStage | null;
+  star: Sprite | null;
 }
 
 export function createLatkeScene(ctx: KitCtx, opts: TurnOpts): Scene {
@@ -64,7 +66,7 @@ export function createLatkeScene(ctx: KitCtx, opts: TurnOpts): Scene {
     root.addChild(ring, body);
     ctx.world.addChild(root);
     popIn(ctx, latke, latke.scale.x);
-    return { root, body, latke, ring, halo, id: -1, stage: null };
+    return { root, body, latke, ring, halo, id: -1, stage: null, star: null };
   };
 
   const drawRing = (v: View, cook: number, stage: LatkeStage, t: number) => {
@@ -166,10 +168,15 @@ export function createLatkeScene(ctx: KitCtx, opts: TurnOpts): Scene {
         v = views[slot] = makeView(slot);
         v.id = l.id;
       }
+      if (l.star && !v.star && l.state === 'cooking') {
+        v.star = sprite(ctx, 'spr-spark-star', 0, -96, 70, v.root);
+        v.latke.tint = color.golden;
+      }
+      if (v.star && !ctx.reduced) v.star.rotation = g.time * 3;
       const stage = l.state === 'burnt' ? 'burnt' : latkeStage(Math.min(l.cook, 0.999));
       if (stage !== v.stage) {
         v.latke.texture = ctx.tex(TEX[stage]);
-        v.latke.tint = stage === 'dark' ? color.dark : 0xffffff;
+        v.latke.tint = stage === 'dark' ? color.dark : v.star ? color.golden : 0xffffff;
         v.stage = stage;
       }
       v.ring.visible = l.state === 'cooking';
@@ -182,12 +189,21 @@ export function createLatkeScene(ctx: KitCtx, opts: TurnOpts): Scene {
 
   const handle = () => {
     for (const e of g.events) {
+      if (!('slot' in e)) continue;
       const v = views[e.slot];
       if (!v) continue;
       if (e.type === 'perfect' || e.type === 'flip') fx.flip(v, e.points, e.type === 'perfect');
       else if (e.type === 'serve') fx.serve(v);
       else if (e.type === 'early') fx.early(v);
       else if (e.type === 'burn') fx.burn(v);
+      else if (e.type === 'star') {
+        ctx.sfx.play('giggle');
+        ctx.banner(opts.say('latke.star'));
+      }
+    }
+    for (const e of g.events) {
+      if (e.type === 'level') levelUp(ctx, opts, 'latke', e.level);
+      else if (e.type === 'mult') multPop(ctx, opts, e.mult, 384, 760);
     }
     g.events.length = 0;
   };
@@ -208,8 +224,8 @@ export function createLatkeScene(ctx: KitCtx, opts: TurnOpts): Scene {
         const s = SPOTS[Math.floor(Math.random() * g.latkes.length)];
         ctx.burst(bubbles, s.x + (Math.random() - 0.5) * 120, s.y + 30);
       }
-      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo });
-      if (g.over) report.end({ score: g.score, won: g.served >= 6 });
+      report.hud({ score: g.score, left: Math.ceil(g.seconds - g.time), combo: g.combo, mult: comboMult(g.combo) });
+      if (g.over) finale(ctx, opts, report, { score: g.score, won: g.served >= 10 }, opts.say(g.served >= 10 ? 'latke.finaleWin' : 'latke.finale', { n: g.served }));
     },
     pointerDown(p) {
       let best = -1;

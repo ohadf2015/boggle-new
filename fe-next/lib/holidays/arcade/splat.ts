@@ -1,4 +1,5 @@
 import { mulberry32 } from '@/utils/dailyChallenge/prng';
+import { comboMult, newPace, stepPace, type Pace } from './kit/pace';
 
 export type PopKind = 'elf' | 'snowman' | 'gremlin' | 'mascot';
 
@@ -37,6 +38,10 @@ export type SplatEvent =
   | { type: 'oops'; points: number; x: number; y: number }
   | { type: 'miss'; x: number; y: number }
   | { type: 'spawn'; hole: number; kind: PopKind }
+  | { type: 'party' }
+  | { type: 'partyEnd' }
+  | { type: 'level'; level: number }
+  | { type: 'mult'; mult: number }
   | { type: 'throw' };
 
 export interface SplatGame {
@@ -50,6 +55,9 @@ export interface SplatGame {
   balls: Ball[];
   nextSpawn: number;
   nextId: number;
+  party: number;
+  firstGremlin: boolean;
+  pace: Pace;
   over: boolean;
   events: SplatEvent[];
   rng: () => number;
@@ -57,6 +65,7 @@ export interface SplatGame {
 
 export const SPLAT_POINTS: Record<PopKind, number> = { elf: 50, snowman: 80, gremlin: 150, mascot: -100 };
 export const FLIGHT_S = 0.34;
+export const PARTY_S = 4;
 export const THROW_FROM = { x: 384, y: 1420 };
 const POP_MS = 0.18;
 const HIT_S = 0.6;
@@ -64,17 +73,25 @@ const MAX_BALLS = 3;
 const LIFE: Record<PopKind, number> = { elf: 1.6, snowman: 2.1, gremlin: 1.0, mascot: 1.8 };
 
 export function newSplatGame(seed: number, seconds: number): SplatGame {
+  const rng = mulberry32(seed);
   return {
     seconds, time: 0, score: 0, combo: 0, bestCombo: 0, hits: 0, pops: [], balls: [],
-    nextSpawn: 0.6, nextId: 1, over: false, events: [], rng: mulberry32(seed),
+    nextSpawn: 0.4, nextId: 1, party: 0, firstGremlin: false, pace: newPace(rng), over: false, events: [], rng,
   };
 }
 
-function pickKind(r: number): PopKind {
-  if (r < 0.5) return 'elf';
-  if (r < 0.75) return 'snowman';
-  if (r < 0.9) return 'gremlin';
-  return 'mascot';
+function pickKind(g: SplatGame): PopKind {
+  if (g.party > 0) return 'gremlin';
+  if (!g.firstGremlin && g.time >= 4) {
+    g.firstGremlin = true;
+    return 'gremlin';
+  }
+  const r = g.rng();
+  const gremlin = 0.1 + g.pace.level * 0.03;
+  const mascot = g.pace.level >= 3 ? 0.16 : 0.1;
+  if (r < mascot) return 'mascot';
+  if (r < mascot + gremlin) return 'gremlin';
+  return r < 0.72 ? 'elf' : 'snowman';
 }
 
 function spawn(g: SplatGame) {
@@ -82,8 +99,8 @@ function spawn(g: SplatGame) {
   const free = HOLES.map((_, i) => i).filter((i) => !busy.has(i));
   if (!free.length) return;
   const hole = free[Math.floor(g.rng() * free.length)];
-  const kind = pickKind(g.rng());
-  const speed = 1 - 0.35 * Math.min(1, g.time / g.seconds);
+  const kind = pickKind(g);
+  const speed = g.party > 0 ? 0.9 : 1 - 0.09 * g.pace.level;
   g.pops.push({ id: g.nextId++, hole, kind, phase: 'rising', t: 0, life: LIFE[kind] * speed });
   g.events.push({ type: 'spawn', hole, kind });
 }
@@ -115,8 +132,10 @@ function land(g: SplatGame, b: Ball) {
     g.events.push({ type: 'oops', points: SPLAT_POINTS.mascot, x: h.x, y });
     return;
   }
-  const points = Math.round(SPLAT_POINTS[p.kind] * (1 + Math.min(g.combo, 4) * 0.25));
+  const points = SPLAT_POINTS[p.kind] * comboMult(g.combo);
+  const before = comboMult(g.combo);
   g.combo += 1;
+  if (comboMult(g.combo) > before) g.events.push({ type: 'mult', mult: comboMult(g.combo) });
   g.bestCombo = Math.max(g.bestCombo, g.combo);
   g.hits += 1;
   g.score += points;
@@ -126,6 +145,18 @@ function land(g: SplatGame, b: Ball) {
 export function stepSplat(g: SplatGame, dt: number): void {
   if (g.over) return;
   g.time = Math.min(g.seconds, g.time + dt);
+  for (const e of stepPace(g.pace, g.time)) {
+    if (e.type === 'level') g.events.push({ type: 'level', level: e.level });
+    else {
+      g.party = PARTY_S;
+      g.nextSpawn = 0;
+      g.events.push({ type: 'party' });
+    }
+  }
+  if (g.party > 0) {
+    g.party = Math.max(0, g.party - dt);
+    if (g.party === 0) g.events.push({ type: 'partyEnd' });
+  }
   g.balls = g.balls.filter((b) => {
     b.t += dt;
     if (b.t < FLIGHT_S) return true;
@@ -143,8 +174,7 @@ export function stepSplat(g: SplatGame, dt: number): void {
   g.nextSpawn -= dt;
   if (g.nextSpawn <= 0) {
     spawn(g);
-    const speed = 1 - 0.4 * Math.min(1, g.time / g.seconds);
-    g.nextSpawn = (0.75 + g.rng() * 0.55) * speed;
+    g.nextSpawn = g.party > 0 ? 0.15 : (0.85 + g.rng() * 0.5) * (1 - 0.11 * g.pace.level);
   }
   if (g.time >= g.seconds) g.over = true;
 }

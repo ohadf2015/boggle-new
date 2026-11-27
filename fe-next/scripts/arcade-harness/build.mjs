@@ -6,7 +6,6 @@ import tailwind from '@tailwindcss/postcss';
 
 const app = path.resolve(import.meta.dirname, '../..');
 const out = process.argv[2];
-const content = process.argv[3];
 mkdirSync(out, { recursive: true });
 const stub = (f) => path.join(import.meta.dirname, 'stubs', f);
 const alias = {
@@ -14,6 +13,11 @@ const alias = {
   '@/contexts/SoundEffectsContext': stub('SoundEffectsContext.ts'),
   '@/hooks/useHoliday': stub('useHoliday.ts'),
   'next/navigation': stub('navigation.ts'),
+  '@/lib/holidays/holidayClient': stub('holidayClient.ts'),
+  '@/contexts/NavigationContext': stub('noop.tsx'),
+  '@/utils/growthTracking': stub('noop.tsx'),
+  '@/utils/onboardingStorage': stub('noop.tsx'),
+  '@/components/auth/AuthModal': stub('noop.tsx'),
 };
 
 await build({
@@ -24,7 +28,8 @@ await build({
   outdir: out,
   jsx: 'automatic',
   loader: { '.webp': 'file', '.png': 'file', '.mp3': 'file' },
-  define: { 'process.env.NODE_ENV': '"development"', CONTENT: readFileSync(content, 'utf8') },
+  define: { 'process.env.NODE_ENV': '"development"' },
+  banner: { js: "globalThis.process ??= { env: { NODE_ENV: 'development' } };" },
   tsconfig: path.join(app, 'tsconfig.json'),
   logLevel: 'warning',
   plugins: [{
@@ -32,7 +37,7 @@ await build({
     setup(b) {
       b.onResolve({ filter: /^(node:)?(fs|path|url|stream|zlib|async_hooks|readline|crypto|os|util|events|child_process)$|^posthog-node|gzip-size/ }, (a) => ({ path: a.path, namespace: 'empty' }));
       b.onLoad({ filter: /.*/, namespace: 'empty' }, () => ({ contents: 'module.exports = new Proxy({}, { get: () => () => ({}) });', loader: 'js' }));
-      b.onResolve({ filter: /.*/ }, (a) => (alias[a.path] ? { path: alias[a.path] } : /\/ArcadeGameHost$/.test(a.path) ? { path: stub('GameHost.tsx') } : undefined));
+      b.onResolve({ filter: /.*/ }, (a) => (alias[a.path] ? { path: alias[a.path] } : undefined));
     },
   }],
 });

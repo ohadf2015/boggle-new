@@ -15,7 +15,7 @@ describe('HolidayLanding', () => {
     expect(screen.getByTestId('holiday-landing-cta').getAttribute('href')).toBe('/he?holiday=hanukkah');
     expect(screen.getByRole('link', { name: 'לאתגר היומי' }).getAttribute('href')).toBe('/he/daily?holiday=hanukkah');
     const arcade = screen.getByTestId('holiday-landing-arcade');
-    expect(hrefs(arcade)).toEqual(['oil', 'dreidel', 'sufganiyah'].map((g) => `/he/holiday-arcade?g=${g}&holiday=hanukkah`));
+    expect(hrefs(arcade)).toEqual(['latke', 'spin', 'catch'].map((g) => `/he/holiday-arcade?g=${g}&holiday=hanukkah`));
   });
 
   it('Given July 2027, When the en Hanukkah page renders, Then it shows the next start date and links to the regular game', () => {
@@ -88,7 +88,7 @@ describe('HolidayLanding', () => {
       const srcs = [...container.querySelectorAll('img')].map((i) => decodeURIComponent(i.getAttribute('src') ?? ''));
       expect(srcs.some((s) => s.includes('/holidays/hero-christmas.webp'))).toBe(true);
       expect(srcs.some((s) => s.includes(`/holidays/${mascot}.webp`))).toBe(true);
-      expect(srcs.filter((s) => s.includes('/holidays/arcade-')).length).toBe(3);
+      expect(srcs.filter((s) => s.includes('/holidays/arcade/bg-')).length).toBe(3);
       unmount();
     }
   });

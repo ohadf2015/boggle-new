@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Users } from 'lucide-react';
+import { ArrowLeft, Users } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useArcadeGate } from './useArcadeGate';
@@ -10,6 +10,7 @@ import { ARCADE_GAMES, gamesFor, isArcadeGame, type ArcadeGameId } from '@/lib/h
 import { cn } from '@/lib/utils';
 import ArcadeGameHost from './ArcadeGameHost';
 import ArcadeCard from './ArcadeCard';
+import { prefetchGame } from './gameLoaders';
 import ArcadeMoreFun from './ArcadeMoreFun';
 import { localDateIn, trackIndex, windowFor } from '@/lib/holidays/calendar';
 import styles from './arcade.module.css';
@@ -49,9 +50,7 @@ export default function ArcadeHub() {
 
   if (selected) return <ArcadeGameHost key={selected} holiday={holiday} game={selected} onExit={() => go(null)} />;
 
-  const all = gamesFor(holiday);
-  const family = all.filter((g) => ARCADE_GAMES[g].family);
-  const words = all.filter((g) => !ARCADE_GAMES[g].family);
+  const games = gamesFor(holiday);
   const today = localDateIn(new Date());
   const win = windowFor(holiday, today, language);
   const night = win ? trackIndex(win, today) : null;
@@ -90,36 +89,19 @@ export default function ArcadeHub() {
         </div>
       </header>
 
-      {family.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
-            <Users className="size-6" aria-hidden="true" />
-            {t('holiday.arcade.family.section')}
-          </h2>
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4">
-            {family.map((g) => (
-              <li key={g}>
-                <ArcadeCard game={g} onPick={() => go(g)} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {words.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
-            <Sparkles className="size-6" aria-hidden="true" />
-            {t('holiday.arcade.wordSection')}
-          </h2>
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-            {words.map((g) => (
-              <li key={g}>
-                <ArcadeCard game={g} onPick={() => go(g)} />
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div className="flex flex-col gap-3">
+        <h2 className="flex items-center gap-2 font-neo-display text-2xl font-black text-neo-holiday-gold">
+          <Users className="size-6" aria-hidden="true" />
+          {t('holiday.arcade.family.section')}
+        </h2>
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+          {games.map((g, i) => (
+            <li key={g} className={cn(i === 0 && 'col-span-2 sm:col-span-1')}>
+              <ArcadeCard game={g} wide={i === 0} onPick={() => go(g)} onWarm={() => prefetchGame(g)} />
+            </li>
+          ))}
+        </ul>
+      </div>
       <p className="-mt-2 text-center text-xs text-neo-white/60">{t('holiday.arcade.coinNote')}</p>
 
       <ArcadeMoreFun holiday={holiday} lang={language} t={t} />
