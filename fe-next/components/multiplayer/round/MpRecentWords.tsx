@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import type { LadderWord } from '../desktop/WordsLadder';
 
 /** Chips the phone trail shows; older words fold into one "+N" chip (at most ~3 rows on a 390px phone). */
@@ -17,9 +18,10 @@ export const MAX_RECENT_WORDS = 12;
  * mode's one-line rule, quietly.
  */
 function MpRecentWordsImpl({ words, emptyHint, label }: { words: LadderWord[]; emptyHint?: string; label?: string }) {
+  const classroom = useClassroomBoard();
   if (words.length === 0) {
     return emptyHint ? (
-      <p data-testid="mp-words-hint" dir="auto" className="lg:hidden px-6 pt-4 text-center text-sm font-bold leading-snug text-neo-white/50 text-balance">
+      <p data-testid="mp-words-hint" dir="auto" className={classroom ? 'lg:hidden px-6 pt-4 text-center text-sm font-bold leading-snug text-edu-ink/50 text-balance' : 'lg:hidden px-6 pt-4 text-center text-sm font-bold leading-snug text-neo-white/50 text-balance'}>
         {emptyHint}
       </p>
     ) : null;
@@ -30,7 +32,7 @@ function MpRecentWordsImpl({ words, emptyHint, label }: { words: LadderWord[]; e
   return (
     <ul data-testid="mp-recent-words" className="lg:hidden flex flex-wrap items-center justify-center gap-1.5 px-3 pt-2" aria-hidden="true">
       {label && (
-        <li data-testid="mp-recent-label" dir="auto" className="font-neo-display font-bold uppercase tracking-wider text-[11px] text-neo-white/50">
+        <li data-testid="mp-recent-label" dir="auto" className={classroom ? 'font-neo-display font-bold uppercase tracking-wider text-[11px] text-edu-ink/50' : 'font-neo-display font-bold uppercase tracking-wider text-[11px] text-neo-white/50'}>
           {label}
         </li>
       )}
@@ -43,8 +45,8 @@ function MpRecentWordsImpl({ words, emptyHint, label }: { words: LadderWord[]; e
             data-newest={newest ? 'true' : undefined}
             className={cn(
               // Never wider than the phone: a long word clips.
-              'inline-flex items-baseline max-w-full min-w-0 rounded-full border-2 bg-neo-navy-light px-2.5 py-0.5 font-neo-display font-bold uppercase text-sm shadow-hard-sm',
-              newest ? 'border-neo-lime text-neo-white' : 'border-neo-black text-neo-white/80',
+              (classroom ? 'inline-flex items-baseline max-w-full min-w-0 rounded-full border-2 bg-edu-surface px-2.5 py-0.5 font-neo-display font-bold uppercase text-sm shadow-hard-sm' : 'inline-flex items-baseline max-w-full min-w-0 rounded-full border-2 bg-neo-navy-light px-2.5 py-0.5 font-neo-display font-bold uppercase text-sm shadow-hard-sm'),
+              newest ? (classroom ? 'border-neo-black bg-neo-lime text-neo-black' : 'border-neo-lime text-neo-white') : (classroom ? 'border-neo-black text-edu-ink/80' : 'border-neo-black text-neo-white/80'),
             )}
           >
             <span dir="auto" className="truncate min-w-0">{w.word}</span>
@@ -52,7 +54,7 @@ function MpRecentWordsImpl({ words, emptyHint, label }: { words: LadderWord[]; e
         );
       })}
       {more > 0 && (
-        <li data-testid="mp-recent-more" dir="ltr" className="inline-flex items-center rounded-full border-2 border-dashed border-neo-white/30 px-2.5 py-0.5 text-sm font-bold tabular-nums text-neo-white/60">
+        <li data-testid="mp-recent-more" dir="ltr" className={classroom ? 'inline-flex items-center rounded-full border-2 border-dashed border-edu-line/30 px-2.5 py-0.5 text-sm font-bold tabular-nums text-edu-ink/60' : 'inline-flex items-center rounded-full border-2 border-dashed border-neo-white/30 px-2.5 py-0.5 text-sm font-bold tabular-nums text-neo-white/60'}>
           +{more}
         </li>
       )}

@@ -5,6 +5,7 @@ import { Bot, Check, Crown, Plus } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import type { MpRosterPlayer } from '@/lib/multiplayer/roster';
 
 export type { MpRosterPlayer } from '@/lib/multiplayer/roster';
@@ -37,6 +38,7 @@ function visiblePlayers(players: MpRosterPlayer[], meId: string, max?: number): 
 const AVATAR_PX = { row: 28, rail: 40, grid: 72 } as const;
 
 function MpRosterStripImpl({ players, meId, layout, max, showScores, seats, onSeatAction, className }: MpRosterStripProps) {
+  const classroom = useClassroomBoard();
   const { t } = useLanguage();
   const shown = visiblePlayers(players, meId, max);
   const overflow = players.length - shown.length;
@@ -67,7 +69,7 @@ function MpRosterStripImpl({ players, meId, layout, max, showScores, seats, onSe
             data-me={String(isMe)}
             data-conn={p.conn}
             className={cn(
-              'relative flex items-center min-w-0 text-neo-white',
+              (classroom ? 'relative flex items-center min-w-0 text-edu-ink' : 'relative flex items-center min-w-0 text-neo-white'),
               layout === 'grid' ? 'flex-col gap-1' : 'gap-1.5',
               p.conn !== 'ok' && 'opacity-50',
             )}
@@ -75,7 +77,7 @@ function MpRosterStripImpl({ players, meId, layout, max, showScores, seats, onSe
             <span
               className={cn(
                 'relative shrink-0 rounded-full border-2',
-                isMe ? 'border-neo-lime' : 'border-neo-black',
+                isMe ? (classroom ? 'border-neo-pink' : 'border-neo-lime') : 'border-neo-black',
               )}
               style={{ width: `calc(${px}px * var(--mp-u, 1))`, height: `calc(${px}px * var(--mp-u, 1))` }}
             >
@@ -106,7 +108,7 @@ function MpRosterStripImpl({ players, meId, layout, max, showScores, seats, onSe
         );
       })}
       {overflow > 0 && (
-        <span data-testid="mp-roster-overflow" className="shrink-0 rounded-full bg-neo-navy-light px-2 text-xs font-bold text-neo-white">
+        <span data-testid="mp-roster-overflow" className={classroom ? 'shrink-0 rounded-full bg-edu-surface px-2 text-xs font-bold text-edu-ink' : 'shrink-0 rounded-full bg-neo-navy-light px-2 text-xs font-bold text-neo-white'}>
           +{overflow}
         </span>
       )}
@@ -119,7 +121,7 @@ function MpRosterStripImpl({ players, meId, layout, max, showScores, seats, onSe
             onClick={onSeatAction ? () => onSeatAction(null) : undefined}
             data-testid="mp-roster-empty"
             aria-label={t('mpUi.shell.emptySeat')}
-            className="flex items-center justify-center rounded-full border-2 border-dashed border-neo-white/30 text-neo-white/50"
+            className={classroom ? 'flex items-center justify-center rounded-full border-2 border-dashed border-edu-line/30 text-edu-ink/50' : 'flex items-center justify-center rounded-full border-2 border-dashed border-neo-white/30 text-neo-white/50'}
             style={{ width: `calc(${px}px * var(--mp-u, 1))`, height: `calc(${px}px * var(--mp-u, 1))` }}
           >
             {onSeatAction && <Plus aria-hidden="true" className="w-5 h-5" />}

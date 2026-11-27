@@ -187,6 +187,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo((props) => {
       <MpRoundScreen>
       <RoundClockProvider value={roundClock.store}>
       <PlayerInGameView
+        classroom={isClassroomMode}
         username={username}
         gameCode={gameCode}
         t={t}

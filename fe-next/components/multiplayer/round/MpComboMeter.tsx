@@ -3,6 +3,7 @@
 import { memo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 import styles from './round.module.css';
 
 export const COMBO_SEGMENTS = 5;
@@ -15,6 +16,7 @@ const SEG_COLOR = ['bg-neo-cyan', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-yellow',
  * with a transform pop; transform + color only.
  */
 function MpComboMeterImpl({ level, className }: { level: number; className?: string }) {
+  const classroom = useClassroomBoard();
   const { t } = useLanguage();
   const lit = Math.max(0, Math.min(COMBO_SEGMENTS, level));
   return (
@@ -36,7 +38,7 @@ function MpComboMeterImpl({ level, className }: { level: number; className?: str
             key={on ? `on-${i}` : `off-${i}`}
             className={cn(
               'block w-[calc(5px*var(--mp-u,1))] rounded-[2px] border border-neo-black',
-              on ? cn(SEG_COLOR[i], styles.segPop) : 'bg-neo-navy-light',
+              on ? cn(SEG_COLOR[i], styles.segPop) : classroom ? 'bg-edu-surface' : 'bg-neo-navy-light',
             )}
             style={{ height: `${40 + i * 15}%` }}
           />

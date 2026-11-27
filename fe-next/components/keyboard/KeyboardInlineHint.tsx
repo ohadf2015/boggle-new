@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useClassroomBoard } from '@/components/education/live/classroomBoard';
 
 interface KeyboardInlineHintProps {
   /** Translation function */
@@ -33,6 +34,7 @@ export function KeyboardInlineHint({
 }: KeyboardInlineHintProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasDismissed, setHasDismissed] = useState(true);
+  const classroom = useClassroomBoard();
 
   // Desktop detection - only show on non-mobile devices
   const isDesktop = useMemo(() => {
@@ -114,9 +116,9 @@ export function KeyboardInlineHint({
           onClick={handleDismiss}
           className={cn(
             'flex items-center gap-1.5 px-3 py-1.5',
-            'bg-neo-navy/80',
-            'text-neo-white hover:text-neo-white',
-            'border-2 border-neo-cream/20 hover:border-neo-cyan/50',
+            classroom ? 'bg-edu-surface' : 'bg-neo-navy/80',
+            classroom ? 'text-edu-ink hover:text-edu-ink' : 'text-neo-white hover:text-neo-white',
+            classroom ? 'border-2 border-neo-black' : 'border-2 border-neo-cream/20 hover:border-neo-cyan/50',
             'rounded-neo',
             'text-xs font-medium',
             'transition-colors cursor-pointer',
@@ -129,7 +131,7 @@ export function KeyboardInlineHint({
           <m.div
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="text-neo-cyan group-hover:text-neo-lime transition-colors"
+            className={classroom ? 'text-edu-cyan-ink' : 'text-neo-cyan group-hover:text-neo-lime transition-colors'}
           >
             <Keyboard className="w-3.5 h-3.5" />
           </m.div>
@@ -140,7 +142,7 @@ export function KeyboardInlineHint({
           </span>
 
           {/* Keyboard visualization */}
-          <span className="text-neo-white group-hover:text-neo-white transition-colors">
+          <span className={classroom ? undefined : 'text-neo-white group-hover:text-neo-white transition-colors'}>
             ⌨️
           </span>
         </m.button>

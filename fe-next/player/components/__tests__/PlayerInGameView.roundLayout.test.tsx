@@ -220,4 +220,17 @@ describe('PlayerInGameView — round frame', () => {
     expect(exit).toHaveBeenCalledWith('continue-solo');
     expect(routerPush).not.toHaveBeenCalled();
   });
+
+  it('classroom: the round frame stands on the sky page and the board pieces get the classroom skin', () => {
+    const { container } = render(<PlayerInGameView {...baseProps} classroom />);
+    expect((container.firstElementChild as HTMLElement).className).toContain('bg-edu-page');
+    expect((container.firstElementChild as HTMLElement).className).not.toContain('bg-neo-navy');
+    expect(screen.getByTestId('mp-round-layout')).toHaveClass('bg-edu-page');
+  });
+
+  it('arcade: the same frame stays navy with no classroom skin', () => {
+    const { container } = render(<PlayerInGameView {...baseProps} />);
+    expect((container.firstElementChild as HTMLElement).className).toContain('bg-neo-navy');
+    expect(screen.getByTestId('mp-round-layout')).toHaveClass('bg-neo-navy');
+  });
 });
