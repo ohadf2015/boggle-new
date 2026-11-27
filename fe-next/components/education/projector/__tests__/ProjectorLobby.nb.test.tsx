@@ -29,7 +29,9 @@ const props = {
 };
 
 const tokens = (el: Element) => (el.getAttribute('class') ?? '').split(/\s+/);
-const chunky = (el: Element) => tokens(el).includes('border-[3px]') && tokens(el).some((c) => /^shadow-hard(-\w+)?$/.test(c));
+/** Sky wall: a 3px outline sitting on a solid bottom lip (shadow-edu-lip*, or the primary's own neoPress lip). */
+const chunky = (el: Element) =>
+  (tokens(el).includes('border-[3px]') || tokens(el).includes('border-4')) && tokens(el).some((c) => /^shadow-(edu-lip(-sm)?|\[0_\dpx_0_0\])$/.test(c));
 
 describe('ProjectorLobby: neo-brutalist wall', () => {
   it.each(['projector-join-panel', 'projector-roster', 'projector-mode', 'projector-words', 'projector-exit', 'projector-copy', 'projector-lobby-lock'])(
@@ -45,6 +47,29 @@ describe('ProjectorLobby: neo-brutalist wall', () => {
     const chips = screen.getAllByTestId('projector-session-chip');
     expect(chips.length).toBeGreaterThan(0);
     chips.forEach((chip) => expect(chunky(chip)).toBe(true));
+  });
+
+  it('the join hero is a white card, with the address on a pink highlight and the code on cream tiles', () => {
+    render(<ProjectorLobby {...props} />);
+    const panel = tokens(screen.getByTestId('projector-join-panel'));
+    expect(panel).toContain('bg-edu-surface');
+    expect(panel).not.toContain('bg-neo-yellow');
+    expect(tokens(screen.getByTestId('projector-join-address'))).toEqual(expect.arrayContaining(['bg-neo-pink', 'text-neo-black']));
+    screen.getAllByTestId('projector-code-char').forEach((c) => expect(tokens(c)).toEqual(expect.arrayContaining(['bg-edu-tile', 'border-neo-black'])));
+  });
+
+  it('the classroom chip is the one purple sticker; the lesson chip stays white', () => {
+    render(<ProjectorLobby {...props} />);
+    const [session] = screen.getAllByTestId('projector-session-chip');
+    expect(tokens(session)).toEqual(expect.arrayContaining(['bg-neo-purple', 'text-neo-white']));
+  });
+
+  it('a student who is not ready yet is quieter without a grey brightness filter (mud on sky)', () => {
+    render(<ProjectorLobby {...props} readyUsernames={['Ada']} />);
+    const ben = screen.getAllByTestId('projector-student').find((s) => s.getAttribute('data-dim') === 'true')!;
+    expect(ben).toBeDefined();
+    expect(tokens(ben).some((c) => c.startsWith('brightness-'))).toBe(false);
+    expect(tokens(ben)).not.toContain('border-dashed');
   });
 
   it('the join code leads with a cream sticker naming it', () => {

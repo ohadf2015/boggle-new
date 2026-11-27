@@ -108,7 +108,7 @@ export function ProjectorStartBar({
             startLocked
               ? 'border-[3px] border-dashed border-edu-line bg-edu-surface font-bold text-edu-ink/80 shadow-none hover:translate-y-0 hover:shadow-none'
               : waitingOnClass
-                ? 'border-[3px] border-edu-line bg-edu-surface font-bold text-edu-ink shadow-hard'
+                ? 'border-[3px] border-edu-line bg-edu-surface font-bold text-edu-ink shadow-edu-lip-sm'
                 : 'motion-safe:animate-[edu-live-unlock_300ms_cubic-bezier(0.23,1,0.32,1)]',
             lobby.quizBlocked && 'hidden'
           )}

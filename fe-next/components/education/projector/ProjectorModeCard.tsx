@@ -41,7 +41,7 @@ export function ProjectorModeCard({ gameCode, lobby, t, canChange, className, st
       )}
     >
       {entry?.poster && (
-        <Image src={entry.poster} alt="" width={96} height={96} className="size-[clamp(2.75rem,min(4.5cqw,8cqh),7rem)] shrink-0 -rotate-2 rounded-neo border-[3px] border-edu-line object-cover shadow-hard @max-5xl:hidden" />
+        <Image src={entry.poster} alt="" width={96} height={96} className="size-[clamp(2.75rem,min(4.5cqw,8cqh),7rem)] shrink-0 -rotate-2 rounded-neo border-[3px] border-edu-line object-cover shadow-edu-lip-sm @max-5xl:hidden" />
       )}
       <div className="min-w-[8rem] flex-1">
         <p className="font-neo-display font-black leading-tight text-[clamp(1.25rem,min(2cqw,3.6cqh),3rem)]">{t(entry?.nameKey ?? 'teacher.classroom.gameModes.classic')}</p>
@@ -49,7 +49,7 @@ export function ProjectorModeCard({ gameCode, lobby, t, canChange, className, st
           {lobby.facts.map((fact) => {
             const Icon = factIcon(fact.key);
             return (
-              <li key={fact.key} data-testid="projector-mode-fact" className={cn(WALL_STICKER, 'font-neo-body font-black shadow-hard-sm')}>
+              <li key={fact.key} data-testid="projector-mode-fact" className={cn(WALL_STICKER, 'font-neo-body font-black')}>
                 <Icon className="size-[1em] shrink-0" aria-hidden="true" />
                 {fact.text}
               </li>

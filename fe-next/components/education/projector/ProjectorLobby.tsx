@@ -62,6 +62,8 @@ export interface ProjectorLobbyProps {
 }
 
 const CHIP = cn(WALL_STICKER, '@5xl:px-[0.8em]');
+/** The class itself: the one purple sticker on the wall. */
+const CLASS_CHIP = cn(CHIP, 'border-neo-black bg-neo-purple text-neo-white');
 
 /**
  * The classroom lobby on the wall and on the teacher's own screen. The root is a size container, so every
@@ -146,11 +148,11 @@ export const ProjectorLobby = memo<ProjectorLobbyProps>(function ProjectorLobby(
               </button>
             )}
             {/* eslint-disable-next-line @next/next/no-img-element -- mascot art map path, decorative */}
-            <img src={EDU_MASCOT.welcome} alt="" aria-hidden="true" className="size-[2.6em] shrink-0 select-none drop-shadow-[3px_3px_0_rgb(var(--neo-black))] @max-5xl:hidden motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
-            <h1 className="whitespace-nowrap font-neo-display text-[1.6em] font-black leading-none text-edu-ink @max-5xl:text-[1.25em]">
+            <img src={EDU_MASCOT.welcome} alt="" aria-hidden="true" className="size-[3.2em] shrink-0 select-none drop-shadow-[0_3px_0_rgb(var(--neo-black))] @max-5xl:hidden motion-safe:animate-[edu-live-bob_2.4s_ease-in-out_infinite]" />
+            <h1 className="whitespace-nowrap font-neo-display text-[2em] font-black leading-none text-edu-ink @max-5xl:text-[1.25em]">
               {t('eduLiveRoom.lobby.joinTitle')}
             </h1>
-            <span data-testid="projector-session-chip" className={CHIP}>
+            <span data-testid="projector-session-chip" className={CLASS_CHIP}>
               <GraduationCap className="size-[1em] shrink-0 @max-5xl:hidden" aria-hidden="true" />
               <span dir="auto" className="truncate">{lobby.className || t('education.classroomGame.classroomSession')}</span>
             </span>

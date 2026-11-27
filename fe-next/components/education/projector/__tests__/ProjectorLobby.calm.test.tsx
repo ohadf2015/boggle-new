@@ -37,15 +37,19 @@ describe('ProjectorLobby: calm wall, one lime primary', () => {
     expect(withFill(container, LIME_FILL)).toHaveLength(1);
   });
 
-  // The one loud block on the wall is the way in: the yellow code and QR panel (approved D4 mockup).
-  it('Given students, Then their name chips are neutral, not a rainbow of fills, and only the join block is loud', () => {
+  // Sky wall (approved mockup): the loud bits are the class's purple chip and the pink join address; the
+  // ready bar fills pink once phones are in. Student chips and cards stay white.
+  it('Given students, Then their name chips are neutral, not a rainbow of fills, and only the class chip, address and ready bar are loud', () => {
     const { container } = render(<ProjectorLobby {...props} students={CLASS_LIST} />);
-    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-join-panel']);
+    const loud = withFill(container, LOUD_FILL);
+    expect(loud.map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-session-chip', 'projector-join-address', 'DIV']);
+    expect(loud[2].closest('[data-testid="projector-ready-count"]')).not.toBeNull();
+    screen.getAllByTestId('projector-student').forEach((chip) => expect(tokens(chip).some((c) => LOUD_FILL.test(c))).toBe(false));
   });
 
-  it('Given an empty room, Then no badge, chip or card is loud except the yellow join block', () => {
+  it('Given an empty room, Then no badge, chip or card is loud except the class chip and the join address', () => {
     const { container } = render(<ProjectorLobby {...props} />);
-    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-join-panel']);
+    expect(withFill(container, LOUD_FILL).map((el) => el.getAttribute('data-testid') || el.tagName)).toEqual(['projector-session-chip', 'projector-join-address']);
   });
 
   it('paints no art behind the text: the wall is solid navy and the panels are opaque', () => {

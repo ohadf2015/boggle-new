@@ -42,7 +42,7 @@ export function ProjectorWordPanel({ cards, t, className, style }: ProjectorWord
           <li
             key={card.word}
             data-testid="projector-word"
-            className={cn('min-w-0 rounded-neo bg-edu-surface px-[0.6em] py-[0.4em] shadow-hard [@container(max-height:800px)]:px-[0.4em] [@container(max-height:800px)]:py-[0.1em]', WALL_EDGE)}
+            className={cn('min-w-0 rounded-neo bg-edu-surface px-[0.6em] py-[0.4em] shadow-edu-lip-sm [@container(max-height:800px)]:px-[0.4em] [@container(max-height:800px)]:py-[0.1em]', WALL_EDGE)}
           >
             <p dir="auto" className="truncate font-neo-display font-black leading-tight text-edu-lime-ink text-[clamp(1.125rem,min(2.2cqw,3.6cqh),3.25rem)] [@container(max-height:800px)]:@5xl:text-[clamp(1rem,1.5cqw,1.5rem)]">
               {card.word}
