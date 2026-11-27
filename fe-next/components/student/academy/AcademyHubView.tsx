@@ -267,6 +267,7 @@ export function AcademyHubView(props: AcademyHubViewProps) {
     <div
       dir={dir}
       data-testid="academy-hub"
+      data-edu-theme="dark"
       data-chrome={hub.chrome}
       data-scale={hub.scale}
       ref={hubRef}

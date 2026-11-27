@@ -4,11 +4,16 @@
   root carries data-edu-theme="sky" (EduSkyScope); html:has() flips the tokens for
   the whole document, so portals, dialogs and the toaster follow.
 
+  A dark island inside a sky page (data-edu-theme="dark", or the .edu-rays-dark
+  stage) resets the tokens to the dark defaults for its subtree.
+
   Loaded after globals.css. Tokens live in the utilities layer because the app's
   :root and body rules sit there; primitives sit in components so utilities win.
 */
 @layer utilities {
-  :root {
+  :root,
+  [data-edu-theme='dark'],
+  .edu-rays-dark {
     --edu-page: var(--neo-navy);
     --edu-surface: var(--neo-navy-light);
     --edu-tile: var(--neo-cream);

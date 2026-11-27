@@ -58,6 +58,12 @@ describe('classroom sky skin', () => {
     }
   });
 
+  it('keeps the dark academy art a dark island until it is redrawn', () => {
+    for (const rel of ['components/student/academy/AcademyHubView.tsx', 'components/student/pages/AcademyPageFrame.tsx']) {
+      expect(read(rel), rel).toMatch(/data-edu-theme="dark"/);
+    }
+  });
+
   it('never marks a wrapper shared with dark pages', () => {
     for (const rel of [
       'app/layout.tsx',
@@ -69,8 +75,20 @@ describe('classroom sky skin', () => {
     }
   });
 
-  it('paints the shared dialog, popover and select as sky surfaces under the scope', () => {
-    for (const rel of ['components/ui/dialog.tsx', 'components/ui/popover.tsx', 'components/ui/select.tsx']) {
+  it('reads dark neo pieces only through their edu twins', () => {
+    const dark = /import\s*\{[^}]*\b(NEO_DARK_EDGE|NEO_FOCUS|NEO_QUIET_FOCUS|NEO_BLOCK_TONES|NEO_BUTTON)\b[^}]*\}\s*from\s*'@\/components\/ui\/neoStyles'/;
+    const offenders = files.filter((rel) => !rel.endsWith('eduNeoStyles.ts') && dark.test(read(rel)));
+    expect(offenders, 'import the EDU_* twin from components/education/eduNeoStyles').toEqual([]);
+  });
+
+  it('paints the shared portal and form primitives as sky surfaces under the scope', () => {
+    for (const rel of [
+      'components/ui/dialog.tsx',
+      'components/ui/alert-dialog.tsx',
+      'components/ui/popover.tsx',
+      'components/ui/select.tsx',
+      'components/ui/textarea.tsx',
+    ]) {
       expect(read(rel), rel).toMatch(/edu-sky:bg-edu-surface edu-sky:text-edu-ink/);
     }
     expect(read('app/globals.css')).toMatch(/@custom-variant edu-sky \(html:has\(\[data-edu-theme='sky'\]\) &\)/);
@@ -78,7 +96,8 @@ describe('classroom sky skin', () => {
 
   it('defaults every edu token to the dark app and flips them only under the sky scope', () => {
     const css = read('app/edu-sky.css');
-    const rootBlock = /:root\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
+    // A dark island (academy art, the rays stage) shares the dark defaults, so edu ink stays white there.
+    const rootBlock = /:root,\s*\[data-edu-theme='dark'\],\s*\.edu-rays-dark\s*\{([^}]*)\}/.exec(css)?.[1] ?? '';
     expect(rootBlock).toMatch(/--edu-page:\s*var\(--neo-navy\)/);
     expect(rootBlock).toMatch(/--edu-ink:\s*rgb\(var\(--neo-white\)\)/);
     expect(css).toMatch(/html:has\(\[data-edu-theme='sky'\]\)\s*\{[^}]*--edu-page:\s*#9ed8ff/i);

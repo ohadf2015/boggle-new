@@ -80,6 +80,7 @@ export function AcademyPageFrame({ title, art, badge, toolbar, regionLabel, pend
     <div
       dir={dir ?? (language === 'he' ? 'rtl' : 'ltr')}
       data-testid={pending ? 'academy-page-pending' : 'academy-page'}
+      data-edu-theme="dark"
       data-chrome={layout.chrome}
       className="fixed inset-0 isolate overflow-hidden bg-edu-page text-edu-ink"
     >
