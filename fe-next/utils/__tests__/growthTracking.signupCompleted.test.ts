@@ -117,4 +117,21 @@ describe('maybeTrackSignupCompleted', () => {
     // server emit from /api/auth/attribution.
     expect(names).not.toContain('growth:signup_completed');
   });
+
+  it('sends the consented gr.js id so Growth Radar keys the import on the same visitor as the server event', async () => {
+    window.localStorage.setItem('gr_did', 'mi7x2k3a-8f3k2l9q0zp1');
+    const { maybeTrackSignupCompleted } = await import('../growthTracking');
+    maybeTrackSignupCompleted({ source: 'header_or_menu', userId: 'u1', createdAt: iso(NOW - 10_000), nowMs: NOW });
+    const call = capture.mock.calls.find((c) => c[0] === 'signup_completed');
+    expect(call?.[1]).toMatchObject({ source: 'header_or_menu', gr_distinct_id: 'mi7x2k3a-8f3k2l9q0zp1' });
+  });
+
+  it('does not send a user id or junk as gr_distinct_id', async () => {
+    window.localStorage.setItem('gr_did', '44a8bb33-1c2d-4e5f-8a9b-0c1d2e3f4a5b');
+    const { maybeTrackSignupCompleted } = await import('../growthTracking');
+    maybeTrackSignupCompleted({ source: 'header_or_menu', userId: 'u1', createdAt: iso(NOW - 10_000), nowMs: NOW });
+    const call = capture.mock.calls.find((c) => c[0] === 'signup_completed');
+    expect(call?.[1]).toMatchObject({ source: 'header_or_menu' });
+    expect(call?.[1]).not.toHaveProperty('gr_distinct_id');
+  });
 });
