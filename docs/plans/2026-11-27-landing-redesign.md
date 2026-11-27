@@ -41,3 +41,21 @@ No shared hero/FAQ/CTA kit exists; FAQ `<details>` repeated inline. Header diffe
 es juego (36k impr) > en/sv word-solver (20k/18k) > en online-with-friends (14.5k) >
 en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > he daily-word-wheel
 (310 entry sessions) > scrabble-alt, competitive, ja solver, ru erudit/balda.
+
+## Progress (13:55 IST)
+- Committed: shared kit `fe-next/components/landing/kit/`, 8 mascot stickers `fe-next/public/landing/kit/`
+  (Higgsfield, 14 credits, sources + `gen.sh`/`slice.py` in `~/.cache/lexiclash/lp1127/assets/`),
+  reference page `online-word-games-with-friends`.
+- Three Opus builders running in this worktree, uncommitted, disjoint files: A keyword/mode landings,
+  B comparisons + RU + Hebrew/classroom keyword pages + daily-word-wheel, C tools/content/blog/legal.
+  Brief: scratchpad `brief.md`; their shots in `~/.cache/lexiclash/lp1127/after-{A,B,C}/`.
+- Live baseline done (consent set, parity fields): `~/.cache/lexiclash/lp1127/before/report-md.json`;
+  check with `python3 -I ~/.cache/lexiclash/lp1127/compare.py <after dirs>`.
+- Dev server: `PORT=3011` with dummy `NEXT_PUBLIC_SUPABASE_*` (port 3001 belongs to the edu session).
+  The shot script must not block `/_next/` URLs (a chunk path contains "sentry").
+
+## Coordinator, after builders stop
+1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
+2. Full compare.py, view every sheet, independent review of the diff, tsc + build + suite once.
+3. Commit per batch, publish before/after review page, wait for owner approval before PR/merge.
+4. After merge: GR-Intervention line per surface + `record_intervention`; stop :3011; remove worktree.
