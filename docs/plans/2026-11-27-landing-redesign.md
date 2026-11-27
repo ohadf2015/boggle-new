@@ -69,6 +69,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   stopped. NOW: tsc -> `npm run build` -> `test:frontend` + `test:backend` once -> review page artifact
   (before/after from ~/.cache/lexiclash/lp1127/{before,after-final,after-fix*}) -> owner approval -> PR/merge.
 - 15:12: tsc 0 errors; `npm run build` RC 0. Running full shoot on prod build (:3011) -> after-prod/, then suite.
+- 15:45: prod-build shots: 266+dyn+juego parity OK, headings OK. Phone pages were 1.09x taller -> kit/blog phone
+  spacing tightened; rebuilding, re-shooting, then full suite and review page (`~/.cache/lexiclash/lp1127/build_review.py`).
+  Helper scripts live in `~/.cache/lexiclash/lp1127/` (scratchpad was cleared once mid-run).
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
