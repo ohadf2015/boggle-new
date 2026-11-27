@@ -108,4 +108,19 @@ describe('GamePageSeoContent', () => {
     expect(container.querySelector('[data-geo-faq]')).not.toBeNull();
     expect(container.querySelector('details')).toBeNull();
   });
+
+  // Dark game pages keep their navy card; only a sky route (data-edu-theme="sky") flips it.
+  it.each([false, true])('keeps the dark card and adds sky twins only behind edu-sky: (collapsible=%s)', (collapsible) => {
+    const { container } = render(<GamePageSeoContent {...props} collapsible={collapsible} />);
+    const classes = Array.from(container.querySelectorAll<HTMLElement>('[class]')).flatMap((el) => el.className.toString().split(/\s+/));
+    expect(classes).toContain('bg-neo-navy-light/60');
+    expect(classes).toContain('edu-sky:bg-edu-surface');
+    expect(classes).toContain('edu-sky:text-edu-ink');
+    expect(classes.filter((c) => /edu-/.test(c) && !c.startsWith('edu-sky:'))).toEqual([]);
+    const darkWithoutTwin = Array.from(container.querySelectorAll<HTMLElement>('[class]')).filter((el) => {
+      const c = el.className.toString();
+      return /(^|\s)(bg-neo-navy|text-neo-(white|cream|pink))/.test(c) && !c.includes('edu-sky:');
+    });
+    expect(darkWithoutTwin.map((el) => el.className)).toEqual([]);
+  });
 });
