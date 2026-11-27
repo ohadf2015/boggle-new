@@ -62,6 +62,9 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - Independent review (15:xx) found: showcase videos replaced by stills (HIGH, restore), word-shake height
   reservation, hebrew page lost dir=rtl, table captions lost, h3 demotions (balda, RuLandingLinks), juego FAQ
   open-first/exclusive lost, back button replaced by home logo, copy changes (sv/he counts, he About text).
+- 15:xx: review findings fixed and committed (766 related tests green). Full parity: 266 shots, 8 failing = the 4
+  explained pages. Left: heading parity, word-shake CLS check, stop dev server, tsc+build+suite, review page.
+  Back button -> logo is deliberate (parentRoute == home for top-level pages; education keyword pages keep links).
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
