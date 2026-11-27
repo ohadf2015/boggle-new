@@ -24,4 +24,15 @@ describe('teacher trial funnel readout', () => {
     expect(report).toContain("s.status = 'trialing'");
     expect(report).toContain("client_kind");
   });
+
+  it('reads the chip event the writer stores, and drops the known rig user prefixes', () => {
+    // Writer: POST /api/subscription/cancel-reason stores event_type
+    // trial_cancel_reason_selected with payload.reason. The old name
+    // teacher_trial_cancel_reason was never written, so a readout on it stays at 0.
+    expect(report).toContain('trial_cancel_reason_selected');
+    expect(report).toContain("payload->>'reason'");
+    expect(report).not.toContain('teacher_trial_cancel_reason');
+    expect(report).toContain('14f10c13');
+    expect(report).toContain('1f0715b5');
+  });
 });
