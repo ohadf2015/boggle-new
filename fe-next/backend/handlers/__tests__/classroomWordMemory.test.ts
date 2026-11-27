@@ -1,6 +1,6 @@
 /**
- * A word is mastered by recall on two days, never by being found once in a
- * live game. Runs the real live-round mapping and the real engine against an
+ * A word is mastered by recall on two days (a live board find counts as recall),
+ * never by one game. Runs the real live-round mapping and the real engine against an
  * in-memory database.
  */
 import { describe, expect, it } from 'vitest';
@@ -14,14 +14,21 @@ const base = { studentId: 'stu-1', lessonId: 'lesson-1', lesson };
 const masteredOf = (m: ReturnType<typeof memoryDb>) => m.tables.student_lesson_progress[0]?.words_mastered ?? [];
 
 describe('live finds vs mastery', () => {
-  it('GIVEN a student who finds a lesson word in a live game WHEN the round is recorded THEN the word is not mastered', async () => {
+  it('GIVEN a student who finds a lesson word in ONE live game WHEN recorded THEN the word is not mastered', async () => {
     const m = memoryDb({ progress: [{ student_id: 'stu-1', lesson_id: 'lesson-1', words_mastered: [] }] });
     const reviews = liveWordResults(vocab, new Set([keyOf('CAT', 'en')]), null);
     await recordWordReviews(m.db, { ...base, reviews, today: '2026-11-02' });
+    await recordWordReviews(m.db, { ...base, reviews, today: '2026-11-02' });
+    expect(m.tables.word_review_state[0]).toMatchObject({ word: 'cat', strength: 'plant' });
     expect(masteredOf(m)).toEqual([]);
-    // Finding it again every day for a month still only shows it was seen.
-    for (let d = 3; d < 30; d++) await recordWordReviews(m.db, { ...base, reviews, today: `2026-11-${String(d).padStart(2, '0')}` });
-    expect(masteredOf(m)).toEqual([]);
+  });
+
+  it('GIVEN a live-only class WHEN the student finds the word on two different days THEN it is mastered', async () => {
+    const m = memoryDb();
+    const reviews = liveWordResults(vocab, new Set([keyOf('cat', 'en')]), null);
+    await recordWordReviews(m.db, { ...base, reviews, today: '2026-11-02' });
+    await recordWordReviews(m.db, { ...base, reviews, today: '2026-11-03' });
+    expect(masteredOf(m)).toEqual(['cat']);
   });
 
   it('GIVEN a student who recalls the word on two different days THEN it is mastered', async () => {

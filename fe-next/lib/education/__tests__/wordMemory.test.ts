@@ -32,8 +32,8 @@ describe('date helpers', () => {
 });
 
 describe('isRecallKind', () => {
-  it.each(['recall', 'spell', 'use', 'context'] as const)('GIVEN %s THEN recall-level', (k) => expect(isRecallKind(k)).toBe(true));
-  it.each(['recognise', 'find'] as const)('GIVEN %s THEN not recall-level', (k) => expect(isRecallKind(k)).toBe(false));
+  it.each(['recall', 'spell', 'use', 'context', 'find'] as const)('GIVEN %s THEN recall-level', (k) => expect(isRecallKind(k)).toBe(true));
+  it('GIVEN recognise THEN not recall-level', () => expect(isRecallKind('recognise')).toBe(false));
 });
 
 describe('applyReview: schedule', () => {
@@ -97,9 +97,9 @@ describe('applyReview: schedule', () => {
 });
 
 describe('applyReview: strength stages', () => {
-  it('GIVEN a new word WHEN recognised or found THEN sprout, never higher however often', () => {
+  it('GIVEN a new word WHEN recognised THEN sprout, never higher however often', () => {
     expect(applyReview(null, recall(true, 'recognise'), D0).strength).toBe('sprout');
-    const many = run(Array.from({ length: 30 }, (_, i) => [i * 8, recall(true, i % 2 ? 'find' : 'recognise')] as [number, { correct: boolean; kind: ReviewKind }]));
+    const many = run(Array.from({ length: 30 }, (_, i) => [i * 8, recall(true, 'recognise')] as [number, { correct: boolean; kind: ReviewKind }]));
     expect(many.strength).toBe('sprout');
     expect(many.correctDays).toBe(0);
   });
@@ -108,7 +108,7 @@ describe('applyReview: strength stages', () => {
     expect(applyReview(null, recall(false), D0).strength).toBe('sprout');
   });
 
-  it.each(['recall', 'spell', 'use', 'context'] as const)('GIVEN a new word WHEN %s is right THEN plant', (kind) => {
+  it.each(['recall', 'spell', 'use', 'context', 'find'] as const)('GIVEN a new word WHEN %s is right THEN plant', (kind) => {
     expect(applyReview(null, recall(true, kind), D0).strength).toBe('plant');
   });
 
@@ -176,10 +176,20 @@ describe('effectiveStrength: wilting at read time', () => {
     expect(effectiveStrength(s, day(30))).toBe('sprout');
   });
 
-  it('GIVEN an overdue flower WHEN recognised THEN the review starts from the wilted stage', () => {
+  it.each(['recognise', 'find'] as const)('GIVEN an overdue flower WHEN a %s is right THEN it stays flower (a right answer never lowers a word)', (kind) => {
     const s = run([[0, recall()], [1, recall()]]);
-    const after = applyReview(s, recall(true, 'recognise'), addDays(s.nextReviewDate, 2));
-    expect(after.strength).toBe('plant');
+    const after = applyReview(s, recall(true, kind), addDays(s.nextReviewDate, 2));
+    expect(after.strength).toBe('flower');
+  });
+
+  it('GIVEN an overdue flower WHEN answered wrong THEN the wilt is stored (plant)', () => {
+    const s = run([[0, recall()], [1, recall()]]);
+    expect(applyReview(s, recall(false), addDays(s.nextReviewDate, 2)).strength).toBe('plant');
+  });
+
+  it('GIVEN a grandfathered flower found live two days later THEN it stays flower', () => {
+    const s = applyReview(null, recall(true, 'find'), D0, { grandfathered: true });
+    expect(applyReview(s, recall(true, 'find'), day(3)).strength).not.toBe('plant');
   });
 
   it('GIVEN an overdue plant WHEN recalled on a later day THEN flower again', () => {

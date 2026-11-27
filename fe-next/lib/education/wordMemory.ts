@@ -54,7 +54,8 @@ const utc = (isoDay: string) => Date.UTC(+isoDay.slice(0, 4), +isoDay.slice(5, 7
 export const dayDiff = (from: string, to: string) => Math.round((utc(to) - utc(from)) / DAY_MS);
 export const addDays = (isoDay: string, n: number) => new Date(utc(isoDay) + n * DAY_MS).toISOString().slice(0, 10);
 
-export const isRecallKind = (kind: ReviewKind) => kind !== 'recognise' && kind !== 'find';
+/** A live board find counts: the student produced and spelled the word from letters. */
+export const isRecallKind = (kind: ReviewKind) => kind !== 'recognise';
 export const isMasteredStrength = (s: Strength) => s === 'flower' || s === 'gold';
 export const isDue = (state: MemoryState | null, today: string) => !!state && state.nextReviewDate <= today;
 
@@ -83,7 +84,8 @@ export function applyReview(
   today: string,
   opts: { grandfathered?: boolean } = {},
 ): MemoryState {
-  const base: Strength = prev ? effectiveStrength(prev, today) : opts.grandfathered ? 'flower' : 'seed';
+  // A right answer never lowers a word; only a wrong one makes the wilt stick.
+  const base: Strength = !prev ? (opts.grandfathered ? 'flower' : 'seed') : review.correct ? prev.strength : effectiveStrength(prev, today);
   const strength = nextStrength(prev, base, review, today);
   const ease = prev?.easeFactor ?? START_EASE;
   const recallRight = review.correct && isRecallKind(review.kind);
