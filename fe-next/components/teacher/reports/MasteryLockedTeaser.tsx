@@ -40,10 +40,10 @@ export function MasteryLockedTeaser({ words, hidden }: { words: HardWord[]; hidd
                     {FREE_PREVIEW_WORDS + i + 1}
                   </span>
                   <span className="min-w-0 space-y-1.5 blur-[3px]">
-                    <span className="block h-3.5 rounded-full bg-neo-white/50" style={{ width: `${width - 25}%` }} />
+                    <span className="block h-3.5 rounded-full bg-edu-paper/50" style={{ width: `${width - 25}%` }} />
                     <span className="block h-1.5 rounded-full bg-neo-pink/70" style={{ width: `${width}%` }} />
                   </span>
-                  <span className="block h-4 w-9 rounded-full bg-neo-white/40 blur-[3px]" />
+                  <span className="block h-4 w-9 rounded-full bg-edu-paper/40 blur-[3px]" />
                 </li>
               ))}
             </>

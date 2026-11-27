@@ -58,7 +58,7 @@ export function SetupOwnWordsField({ own, t }: { own: SetupOwnWords; t: T }) {
                 <li
                   key={`${word}-${i}`}
                   data-testid="setup-dropped-word"
-                  className="max-w-full truncate rounded-neo-pill border-2 border-neo-black bg-neo-white px-2 font-neo-body text-xs font-black text-neo-black line-through decoration-2"
+                  className="max-w-full truncate rounded-neo-pill border-2 border-neo-black bg-edu-paper px-2 font-neo-body text-xs font-black text-neo-black line-through decoration-2"
                 >
                   {word}
                 </li>

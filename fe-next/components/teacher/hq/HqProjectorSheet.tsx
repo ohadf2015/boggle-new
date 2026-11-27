@@ -114,7 +114,7 @@ export function HqProjectorSheet({
           {origin ? (
             <div
               data-testid="hq-projector-qr"
-              className="rounded-neo-lg border-4 border-neo-black bg-neo-white p-3 shadow-hard-xl"
+              className="rounded-neo-lg border-4 border-neo-black bg-edu-paper p-3 shadow-hard-xl"
             >
               <QRCodeSVG
                 value={joinUrl}

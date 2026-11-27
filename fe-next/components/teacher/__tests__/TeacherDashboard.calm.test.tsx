@@ -63,18 +63,21 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(limeFills(screen.getByTestId('teacher-home'))).toEqual([screen.getByTestId('home-start-live')]);
   });
 
-  it('Then the desk is open on the backdrop (no colour slab) and the secondary is a small outlined chip', () => {
+  it('Then the desk is one cream card (no colour slab) and the secondary is an outlined tile whose icon alone is cyan', () => {
     render(<TeacherDashboard />);
-    expect(screen.getByTestId('home-hero').className).not.toMatch(/(^|\s)bg-neo-(pink|purple)(\s|$)/);
+    const hero = screen.getByTestId('home-hero');
+    expect(hero.className).toContain('edu-card');
+    expect(hero.className).not.toMatch(/(^|\s)bg-neo-(pink|purple)(\s|$)/);
     const rehearse = screen.getByTestId('rehearse-with-bots');
     expect(rehearse.className).not.toMatch(/(^|\s)bg-neo-cyan(\s|$)/);
-    expect(rehearse.className).toMatch(/rounded-neo-pill/);
+    expect(rehearse.className).toContain('[&>svg]:bg-neo-cyan');
+    expect(rehearse.className).toContain('border-[3px]');
   });
 
-  it('Then Home has exactly one primary and the class code is a chip, never six letter tiles', () => {
+  it('Then Home has exactly one primary and the class code reads as one letter tile per character', () => {
     render(<TeacherDashboard />);
     expect(screen.getByTestId('teacher-home').querySelectorAll('[data-hero="true"]')).toHaveLength(1);
-    expect(screen.queryAllByTestId('home-desk-code-tile')).toHaveLength(0);
+    expect(screen.getAllByTestId('home-desk-code-tile').map((el) => el.textContent)).toEqual(['K', '7', 'Q', '2']);
     expect(screen.getByTestId('home-desk-code')).toHaveTextContent('K7Q2');
   });
 
@@ -104,10 +107,11 @@ describe('Teacher Home: one primary, chunky blocks', () => {
     expect(screen.getByTestId('home-hero').innerHTML).not.toMatch(/animate-\[edu-mascot-bob/);
   });
 
-  it('Then the class name is white on the panel, not a lime headline', () => {
+  it('Then the class name sits on a pink band in black ink, not a lime headline', () => {
     render(<TeacherDashboard />);
     const title = screen.getByRole('heading', { level: 2, name: '5B - English' });
-    expect(title.className).toContain('text-edu-ink');
+    expect(title.className).toMatch(/(^|\s)bg-neo-pink(\s|$)/);
+    expect(title.className).toMatch(/(^|\s)text-neo-black(\s|$)/);
     expect(title.className).not.toMatch(/text-neo-lime/);
   });
 

@@ -23,7 +23,7 @@ export function AskSchoolPanel({ requesterName, origin }: { requesterName: strin
   };
 
   return (
-    <div data-testid="ask-school-panel" className="rounded-neo border-2 border-neo-black bg-neo-white p-3 text-neo-black shadow-hard-sm">
+    <div data-testid="ask-school-panel" className="rounded-neo border-2 border-neo-black bg-edu-paper p-3 text-neo-black shadow-hard-sm">
       <p className="text-sm font-black">{t('eg2Pro.ask.title')}</p>
       <p className="mt-1 text-xs font-bold text-neo-black/70">{t('eg2Pro.ask.lead')}</p>
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -37,7 +37,7 @@ export function AskSchoolPanel({ requesterName, origin }: { requesterName: strin
         <button
           type="button"
           onClick={() => { void onShare(); }}
-          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-neo-white px-3 text-sm font-black shadow-hard-sm transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
+          className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black bg-edu-paper px-3 text-sm font-black shadow-hard-sm transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
         >
           <Share2 className="h-4 w-4" aria-hidden /> {t('eg2Pro.ask.share')}
         </button>

@@ -16,7 +16,7 @@ interface ParentStudentSelectProps {
 }
 
 const SMALL_BTN =
-  'min-h-9 rounded-neo border-2 border-neo-black bg-neo-white px-3 text-xs font-black text-neo-black hover:-translate-y-0.5 transition-transform motion-reduce:transition-none disabled:opacity-50';
+  'min-h-9 rounded-neo border-2 border-neo-black bg-edu-paper px-3 text-xs font-black text-neo-black hover:-translate-y-0.5 transition-transform motion-reduce:transition-none disabled:opacity-50';
 
 /** Search + checkbox roster. Every parent-report flow picks its students here. */
 export function ParentStudentSelect({ students, selected, onChange }: ParentStudentSelectProps) {
@@ -49,7 +49,7 @@ export function ParentStudentSelect({ students, selected, onChange }: ParentStud
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('parentReportsFlow.search')}
-          className="min-h-11 w-full rounded-neo border-2 border-neo-black bg-neo-white ps-9 pe-3 text-sm font-bold text-neo-black placeholder:text-neo-black/50"
+          className="min-h-11 w-full rounded-neo border-2 border-neo-black bg-edu-paper ps-9 pe-3 text-sm font-bold text-neo-black placeholder:text-neo-black/50"
         />
       </div>
       <div className="flex flex-wrap items-center gap-2">
@@ -68,7 +68,7 @@ export function ParentStudentSelect({ students, selected, onChange }: ParentStud
           {t('parentReportsFlow.noMatch')}
         </p>
       ) : (
-        <ul className="max-h-64 space-y-1 overflow-y-auto rounded-neo border-2 border-neo-black bg-neo-white p-2">
+        <ul className="max-h-64 space-y-1 overflow-y-auto rounded-neo border-2 border-neo-black bg-edu-paper p-2">
           {visible.map((s) => (
             <li key={s.id}>
               <label className="flex min-h-10 cursor-pointer items-center gap-3 rounded-neo px-2 text-sm font-bold text-neo-black hover:bg-neo-cyan/15">

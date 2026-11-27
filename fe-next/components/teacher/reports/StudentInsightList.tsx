@@ -72,7 +72,7 @@ function StudentRow({
               animate={{ width: `${Math.max(3, student.accuracy)}%` }}
               transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.08 + Math.min(index, 8) * 0.04 }}
             />
-            <span aria-hidden="true" className="absolute inset-y-0 w-0.5 bg-neo-white/70" style={{ insetInlineStart: `${goal}%` }} />
+            <span aria-hidden="true" className="absolute inset-y-0 w-0.5 bg-edu-paper/70" style={{ insetInlineStart: `${goal}%` }} />
           </span>
           {student.missedWords.length > 0 ? (
             <span className="mt-1 flex flex-wrap items-center gap-1">

@@ -73,7 +73,7 @@ export function WordStudentGrid({
       <div
         data-testid="report-grid-scroll"
         className={cn(
-          'overflow-x-auto rounded-neo border-3 border-neo-black bg-neo-white',
+          'overflow-x-auto rounded-neo border-3 border-neo-black bg-edu-paper',
           // A printed report must show every column, not the first screenful.
           'print:overflow-visible print:border-black print:text-[9px]'
         )}

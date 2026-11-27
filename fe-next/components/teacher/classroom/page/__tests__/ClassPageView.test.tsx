@@ -65,11 +65,11 @@ describe('ClassPageView', () => {
     expect(screen.queryByTestId('home-start-pending')).toBeNull();
   });
 
-  it('Given a last game, Then it is one quiet row that opens the results', () => {
+  it('Given a last game, Then it is one cream row that opens the results, colour only on its icon', () => {
     render(<ClassPageView {...props()} />);
     const last = screen.getByTestId('class-page-last-game');
     expect(within(last).getAllByRole('link')).toHaveLength(1);
-    expect(last.innerHTML).not.toMatch(/bg-neo-(yellow|cyan|cream)/);
+    expect(within(last).getByRole('link').className).not.toMatch(/(^|\s)bg-neo-(yellow|cyan|cream)(\s|$)/);
   });
 
   it('Given a last game, Then the top scorer is labelled and the players count uses its plural form', () => {
@@ -133,5 +133,15 @@ describe('ClassPageView', () => {
     expect(all[all.length - 1]).toBe(zone);
     fireEvent.click(within(zone).getByTestId('delete-class-affordance'));
     expect(p.onRequestDelete).toHaveBeenCalledTimes(1);
+  });
+
+  it('Given a last game and word lists, Then both rows are white outlined cards whose icons sit in yellow and cyan squares', () => {
+    render(<ClassPageView {...props()} />);
+    const last = screen.getByTestId('class-page-last-game').querySelector('a')!;
+    expect(last.className).toContain('border-[3px]');
+    expect(last.querySelector('svg[class*="bg-neo-yellow"]')).not.toBeNull();
+    const fold = screen.getByTestId('class-page-lists-fold');
+    expect(fold.className).toContain('shadow-edu-lip');
+    expect(fold.querySelector('svg[class*="bg-neo-cyan"]')).not.toBeNull();
   });
 });

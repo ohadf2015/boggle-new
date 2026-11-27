@@ -12,9 +12,10 @@ export const QUIET_LINK = [
   FOCUS,
 ].join(' ');
 
-export const PANEL = 'rounded-neo-lg border-2 border-edu-line bg-edu-surface shadow-hard';
-// The one card that leads the page sits a step lighter than the base panels beside it.
-export const PANEL_RAISED = 'rounded-neo-lg border-2 border-edu-line bg-edu-surface shadow-hard-lg';
+export const PANEL = 'rounded-neo-xl border-[3px] border-edu-line bg-edu-surface shadow-edu-lip';
+export const PANEL_RAISED = PANEL;
+/** Turns a row's leading lucide icon into a small coloured square; add the fill (bg-neo-yellow, bg-neo-cyan …). */
+export const ICON_SQUARE = 'box-content size-6 shrink-0 rounded-neo border-[3px] border-neo-black p-1.5 text-neo-black';
 
 export const OUTLINE_BUTTON = EDU_BUTTON.outline;
 export const GHOST_BUTTON = EDU_BUTTON.ghost;

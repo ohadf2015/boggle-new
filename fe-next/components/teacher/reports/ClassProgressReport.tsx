@@ -150,7 +150,7 @@ export function ClassProgressReport({ classroomId, dateRange, onStudentClick }: 
       {data.studentsNeedingAttention.length > 0 && (
         <section>
           <SectionTitle>{t('teacher.reports.sections.needsAttention')}</SectionTitle>
-          <ul className="divide-y divide-neo-pink/25 rounded-neo border-2 border-neo-pink bg-neo-pink/10">
+          <ul className="divide-y divide-neo-pink/25 rounded-neo border-2 border-edu-pink-ink bg-neo-pink/10">
             {data.studentsNeedingAttention.map((student) => (
               <li key={student.studentId} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-1">
                 <div className="min-w-0 flex-1">{studentName(student.studentId, student.studentName)}</div>

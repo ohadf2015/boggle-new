@@ -80,7 +80,7 @@ function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
             className={cn(
               'flex items-center gap-2 rounded-neo border-2 px-2 py-1',
               i >= PHONE_ROWS && 'max-sm:hidden',
-              s.trend === 'down' && !calm ? 'border-neo-pink bg-neo-pink/10' : 'border-edu-line bg-edu-surface',
+              s.trend === 'down' && !calm ? 'border-edu-pink-ink bg-neo-pink/10' : 'border-edu-line bg-edu-surface',
             )}
           >
             <span className="w-14 shrink-0 truncate text-xs font-bold text-edu-ink">{names[i]}</span>
@@ -242,7 +242,7 @@ function ReportsPreview({ calm = false, arcade = false }: { calm?: boolean; arca
       ) : (
       <div
         data-testid="pro-preview-report-sheet"
-        className={cn('rounded-sm border-2 p-2', calm ? 'border-edu-line bg-edu-surface text-edu-ink' : 'border-neo-black bg-neo-white text-neo-black')}
+        className={cn('rounded-sm border-2 p-2', calm ? 'border-edu-line bg-edu-surface text-edu-ink' : 'border-neo-black bg-edu-paper text-neo-black')}
       >
         <div className={cn('flex items-end justify-between border-b-2 border-dashed pb-1', calm ? 'border-edu-line' : 'border-neo-black/30')}>
           <span className={cn('text-[11px] font-bold', !calm && 'uppercase')}>{t('eg2Pro.sample.classAverage')}</span>

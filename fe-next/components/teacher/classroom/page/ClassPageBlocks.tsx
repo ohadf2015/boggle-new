@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { ChevronDown, ChevronRight, ClipboardList, Plus, Trash2, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
-import { HOME_ROW, OUTLINE_BUTTON, PANEL, QUIET_LINK } from '../../home/homeStyles';
+import { HOME_ROW, ICON_SQUARE, OUTLINE_BUTTON, PANEL, QUIET_LINK } from '../../home/homeStyles';
+import { PressSurface } from '@/components/motion/PressSurface';
 import type { ClassWordList } from './classWordLists';
 import ListNameButton from '@/components/teacher/lesson-creation/ListNameButton';
 import { pluralKeyOf } from '@/lib/i18n/pluralKey';
@@ -24,8 +25,8 @@ export interface ClassLastGameState {
   game: ClassLastGameSummary | null;
 }
 
-const TITLE = 'font-neo-display text-base font-black leading-tight text-edu-ink';
-const LINE = 'truncate font-neo-body text-xs font-bold text-edu-ink/75';
+const TITLE = 'font-neo-display text-lg font-black leading-tight text-edu-ink sm:text-xl';
+const LINE = 'truncate font-neo-body text-sm font-bold text-edu-ink/80';
 
 /** The last class game as one row that opens its results; hidden until a game exists. */
 export function ClassLastGame({ state, resultsHref, language, t }: { state: ClassLastGameState; resultsHref: string; language: string; t: T }) {
@@ -50,14 +51,16 @@ export function ClassLastGame({ state, resultsHref, language, t }: { state: Clas
   ].filter(Boolean).join(' · ');
   return (
     <div data-testid="class-page-last-game">
-      <Link href={resultsHref} className={HOME_ROW}>
-        <Trophy className="size-6 shrink-0 text-edu-yellow-ink" strokeWidth={2.5} aria-hidden="true" />
-        <span className="flex min-w-0 flex-1 flex-col">
-          <span className={TITLE}>{t('teacher.lastGame.title')}</span>
-          <bdi className={LINE}>{facts}</bdi>
-        </span>
-        <DirectionalIcon icon={ChevronRight} className="size-5 shrink-0" />
-      </Link>
+      <PressSurface asChild lip={4} className={cn(HOME_ROW, 'min-h-[72px] shadow-edu-line')}>
+        <Link href={resultsHref}>
+          <Trophy className={cn(ICON_SQUARE, 'bg-neo-yellow')} strokeWidth={2.5} aria-hidden="true" />
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className={TITLE}>{t('teacher.lastGame.title')}</span>
+            <bdi className={LINE}>{facts}</bdi>
+          </span>
+          <DirectionalIcon icon={ChevronRight} className="size-6 shrink-0" />
+        </Link>
+      </PressSurface>
     </div>
   );
 }
@@ -76,11 +79,11 @@ export function ClassWordLists({ lists, loading, libraryHref, language, t }: { l
         <div aria-busy="true" className={cn(PANEL, 'h-[60px] motion-safe:animate-pulse')} />
       ) : lists.length > 0 ? (
         <details data-testid="class-page-lists-fold" className={cn(PANEL, 'group')}>
-          <summary className="flex min-h-[60px] cursor-pointer list-none items-center gap-3 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
-            <ClipboardList className="size-6 shrink-0 text-edu-cyan-ink" strokeWidth={2.5} aria-hidden="true" />
+          <summary className="flex min-h-[72px] cursor-pointer list-none items-center gap-3 px-4 py-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan [&::-webkit-details-marker]:hidden">
+            <ClipboardList className={cn(ICON_SQUARE, 'bg-neo-cyan')} strokeWidth={2.5} aria-hidden="true" />
             <span className={cn(TITLE, 'flex-1')}>{t('eduHq.lists.label')}</span>
-            <span className="font-neo-body text-sm font-bold tabular-nums text-edu-ink/70">{lists.length}</span>
-            <ChevronDown className="size-5 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
+            <span className="font-neo-display text-xl font-black tabular-nums text-edu-ink">{lists.length}</span>
+            <ChevronDown className="size-6 shrink-0 transition-transform group-open:rotate-180 motion-reduce:transition-none" aria-hidden="true" />
           </summary>
           <ul className="flex flex-col divide-y divide-edu-line/10 border-t-2 border-edu-line/10 px-4">
             {lists.slice(0, 5).map((l) => (
