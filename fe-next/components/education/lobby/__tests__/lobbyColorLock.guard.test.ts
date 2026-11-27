@@ -19,11 +19,19 @@ const SETUP_SURFACES = [
   'components/education/ClassroomModeSpotlight.tsx',
 ];
 
-describe('Pick-a-game setup: one lime fill, everything else neutral', () => {
-  it.each(SETUP_SURFACES)('%s has no colored fills or accent tints', (rel) => {
+// The approved sky mockup marks the chosen class with a pink chip and gives each preset a small
+// pink, cyan or yellow icon square; those are the only accent fills on the setup.
+const SMALL_ACCENTS: Record<string, string[]> = {
+  'components/education/lobby/LobbyClassPicker.tsx': ['bg-neo-pink'],
+  'components/education/lobby/LobbyPresetCards.tsx': ['bg-neo-pink', 'bg-neo-cyan', 'bg-neo-yellow'],
+};
+
+describe('Pick-a-game setup: one lime fill, small accents only where the mockup puts them', () => {
+  it.each(SETUP_SURFACES)('%s has no colored fills or accent tints beyond its approved accents', (rel) => {
     const src = read(rel);
     expect(src).not.toMatch(/ACCENT_FILL/);
-    expect(src).not.toMatch(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/);
+    const fills = [...new Set(src.match(/bg-neo-(cyan|pink|purple|yellow|orange)(?![\w-])/g) ?? [])].sort();
+    expect(fills).toEqual([...(SMALL_ACCENTS[rel] ?? [])].sort());
     expect(src).not.toMatch(/text-neo-(cyan|purple)(?![\w-])/);
   });
 
