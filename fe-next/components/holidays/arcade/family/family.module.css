@@ -1,0 +1,32 @@
+.bob {
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.slideIn {
+  animation: slideIn 320ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(40px) scale(0.9); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.rise {
+  animation: rise 520ms cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes rise {
+  from { transform: translateY(60px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bob, .slideIn, .rise {
+    animation: none;
+  }
+}

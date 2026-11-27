@@ -139,7 +139,6 @@ export default function SnowballGame({ content, lang, onScore, onEnd }: Props) {
         </div>
       </div>
       <div className={styles.field} onPointerDown={down} onPointerUp={up} onPointerCancel={() => (start.current = null)}>
-        <div className={styles.ground} aria-hidden="true" />
         {current && !snap.over && (
           <div key={snap.i} ref={ball} className={styles.ball} aria-live="polite">
             <span dir="auto" className={cn(styles.word, 'font-neo-display')}>{displayWord(current.text, lang)}</span>

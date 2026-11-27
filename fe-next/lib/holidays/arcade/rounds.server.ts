@@ -6,7 +6,8 @@ import { BadRequest } from '../holidayRoute.server';
 import type { HolidayInput } from '../holidayRequest.server';
 import { playFits, playKey, scoreBound } from './content';
 import { buildContent } from './content.server';
-import { ARCADE_GAMES, DAILY_COIN_CAP, isArcadeGame, roundCoins, type ArcadeGameId, type ArcadePlay } from './games';
+import { familyBound } from './family';
+import { ARCADE_GAMES, DAILY_COIN_CAP, isArcadeGame, isFamilyGame, roundCoins, type ArcadeGameId, type ArcadePlay } from './games';
 import { wordLength } from './letters';
 
 const TABLE = 'holiday_arcade_rounds';
@@ -85,10 +86,16 @@ export async function finishRound(
   const elapsed = (now.getTime() - Date.parse(row.started_at)) / 1000;
   if (elapsed < MIN_SECONDS) throw new BadRequest('Round too short');
 
-  const content = await buildContent(row.game, row.lang, row.seed);
-  const lengths = elapsed > MAX_SECONDS ? [] : await acceptedLengths(row, content, cleanPlays(body.plays));
   const claimed = Math.max(0, Math.floor(Number(body.score) || 0));
-  const score = Math.floor(Math.min(claimed, scoreBound(row.game, content, lengths), elapsed * MAX_POINTS_PER_SECOND));
+  let lengths: number[] = [];
+  let score: number;
+  if (isFamilyGame(row.game)) {
+    score = elapsed > MAX_SECONDS ? 0 : familyBound(row.game, claimed, elapsed);
+  } else {
+    const content = await buildContent(row.game, row.lang, row.seed);
+    lengths = elapsed > MAX_SECONDS ? [] : await acceptedLengths(row, content, cleanPlays(body.plays));
+    score = Math.floor(Math.min(claimed, scoreBound(row.game, content, lengths), elapsed * MAX_POINTS_PER_SECOND));
+  }
   const earned = elapsed > MAX_SECONDS ? 0 : roundCoins(score);
 
   const { data: granted, error: rpcErr } = await supabase.rpc('holiday_arcade_settle', {

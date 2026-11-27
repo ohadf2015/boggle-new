@@ -3,7 +3,7 @@ import { WHEEL_V3_SOURCES } from '@/utils/dailyChallenge/wordWheelSources';
 import { shuffleInPlace } from '@/utils/dailyChallenge/wordWheelLetters';
 import { loadWordChecker } from '@/lib/server/dictionarySet';
 import type { Language } from '@/shared/types/game';
-import type { ArcadeGameId } from './games';
+import { isFamilyGame, type ArcadeGameId, type WordGameId } from './games';
 import type { ArcadeContentMap } from './content';
 import { fold } from './letters';
 import { huntWords, themedWords } from './wordPool.server';
@@ -54,7 +54,7 @@ function mutate(word: string, lang: string, r: Rng): string {
 
 const small = (lang: string) => (lang === 'ja' || lang === 'he' ? 2 : 3);
 
-const builders: { [G in ArcadeGameId]: (lang: string, r: Rng, isWord: IsWord) => ArcadeContentMap[G] } = {
+const builders: { [G in WordGameId]: (lang: string, r: Rng, isWord: IsWord) => ArcadeContentMap[G] } = {
   oil: (lang, r) => {
     const sources = WHEEL_V3_SOURCES[lang as Language] ?? WHEEL_V3_SOURCES.en;
     const size = lang === 'ja' ? 7 : 9;
@@ -111,6 +111,7 @@ const builders: { [G in ArcadeGameId]: (lang: string, r: Rng, isWord: IsWord) =>
 };
 
 export async function buildContent<G extends ArcadeGameId>(game: G, lang: string, seed: number, isWord?: IsWord): Promise<ArcadeContentMap[G]> {
+  if (isFamilyGame(game)) return { seed } as ArcadeContentMap[G];
   const check = isWord ?? (game === 'snowball' ? (await loadWordChecker(lang)) ?? (() => false) : () => false);
-  return builders[game](lang, mulberry32(seed), check);
+  return builders[game as WordGameId](lang, mulberry32(seed), check) as ArcadeContentMap[G];
 }

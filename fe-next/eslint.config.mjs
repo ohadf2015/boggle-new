@@ -20,6 +20,8 @@ const PIXI_ALLOWED = [
   "components/daily/WordWheelPixiRing.tsx",
   "components/blast/legacy/**",
   "components/adventure/play/arena/**",
+  "components/holidays/arcade/kit/**",
+  "components/holidays/arcade/family/**",
 ];
 const TEST_FILES = ["**/__tests__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "e2e/**"];
 

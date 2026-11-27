@@ -6,34 +6,6 @@
   background: radial-gradient(circle at 80% 18%, color-mix(in srgb, var(--neo-holiday-snow) 30%, transparent) 0 18px, transparent 19px);
 }
 
-.roofs {
-  position: absolute;
-  inset-inline-start: 0;
-  bottom: 0;
-  width: 200%;
-  height: 56px;
-  background:
-    linear-gradient(135deg, transparent 50%, var(--neo-holiday-red-dark) 50%) 0 0 / 60px 28px repeat-x,
-    linear-gradient(225deg, transparent 50%, var(--neo-holiday-red-dark) 50%) 30px 0 / 60px 28px repeat-x,
-    linear-gradient(var(--neo-navy-light), var(--neo-navy-light)) 0 28px / 100% 28px no-repeat;
-  border-top: 0;
-  animation: scroll 6s linear infinite;
-  will-change: transform;
-}
-
-:global([dir='rtl']) .roofs {
-  animation-name: scrollRtl;
-}
-
-@keyframes scroll {
-  to { transform: translateX(-50%); }
-}
-
-@keyframes scrollRtl {
-  to { transform: translateX(50%); }
-}
-
-.paused .roofs,
 .paused .sleigh {
   animation-play-state: paused;
 }
@@ -130,6 +102,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .roofs, .sleigh, .bellLost { animation: none; }
+  .sleigh, .bellLost { animation: none; }
   .gift { animation-duration: 1ms; }
 }

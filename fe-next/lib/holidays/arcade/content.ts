@@ -1,6 +1,7 @@
 import type { ArcadeGameId, ArcadePlay } from './games';
 import { canSpell, fold, minWordLength, wordLength, wordPoints } from './letters';
 import { oilBound } from './oil';
+import type { FamilyContent } from './family';
 
 export interface OilContent { rack: string[] }
 export interface DreidelContent { racks: string[][]; botWords: string[]; spins: number[] }
@@ -16,6 +17,10 @@ export interface ArcadeContentMap {
   sleigh: SleighContent;
   snowball: SnowballContent;
   wrap: WrapContent;
+  latke: FamilyContent;
+  spin: FamilyContent;
+  presents: FamilyContent;
+  splat: FamilyContent;
 }
 
 export type ArcadeContent = ArcadeContentMap[ArcadeGameId];
@@ -50,6 +55,8 @@ export function playFits(game: ArcadeGameId, raw: unknown, play: ArcadePlay, lan
     }
     case 'sufganiyah':
       return canSpell(w, (c.drops ?? []).map((d) => d.letter), lang);
+    default:
+      return false;
   }
 }
 
@@ -78,5 +85,7 @@ export function scoreBound(game: ArcadeGameId, raw: unknown, lengths: number[]):
       return base * SLEIGH_SPEED_BONUS;
     case 'sufganiyah':
       return base * STACK_COMBO;
+    default:
+      return 0;
   }
 }

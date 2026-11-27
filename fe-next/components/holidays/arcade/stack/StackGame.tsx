@@ -178,8 +178,8 @@ export default function StackGame({ content, lang, onScore, onEnd }: Props) {
       <div className="flex flex-[1_0_auto] flex-col justify-center">
         <div className="relative mx-auto mt-2 h-6" style={{ width: STACK_COLS * CELL }} dir="ltr" aria-hidden="true">
           {nextDrop && (
-            <span className={cn(styles.letter, styles.next, 'absolute top-0')} style={{ left: nextDrop.col * CELL + CELL / 2 - 13 }}>
-              {nextDrop.letter}
+            <span data-testid="stack-next" className="absolute top-0" style={{ left: nextDrop.col * CELL + CELL / 2 - 13 }}>
+              <span className={cn(styles.letter, styles.next)}>{nextDrop.letter}</span>
             </span>
           )}
         </div>

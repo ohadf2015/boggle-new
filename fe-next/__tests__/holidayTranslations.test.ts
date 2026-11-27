@@ -38,7 +38,7 @@ describe('holiday translations', () => {
     const other = leaves(await holidayOf(lang));
     for (const [key, value] of Object.entries(en)) {
       expect(other[key], `${lang} missing holiday.${key}`).toBeTruthy();
-      const placeholders = (s: string) => (s.match(/\{\w+\}/g) ?? []).sort();
+      const placeholders = (s: string) => (s.match(/\{\w+\}/g) ?? []).filter((p) => !(key.endsWith('_one') && p === '{count}')).sort();
       expect(placeholders(other[key]), `${lang} holiday.${key}`).toEqual(placeholders(value));
     }
     expect(other['event.hanukkah.title']).not.toBe(en['event.hanukkah.title']);

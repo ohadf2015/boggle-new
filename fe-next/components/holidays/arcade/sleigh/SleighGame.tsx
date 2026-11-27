@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { pluralKeyOf } from '@/lib/i18n/pluralKey';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import type { SleighContent } from '@/lib/holidays/arcade/content';
 import { SLEIGH_BELLS, SLEIGH_SECONDS, newSleigh, passFor, sleighAccept, sleighTick, type SleighState } from '@/lib/holidays/arcade/sleigh';
@@ -24,7 +25,7 @@ const SLEIGH_X = 0.06;
 const CHIMNEY_W = 46;
 
 export default function SleighGame({ content, lang, onScore, onEnd }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const sfx = useSoundEffects();
   const fx = useArcadeFx();
   const judge = useWordJudge(lang);
@@ -109,13 +110,12 @@ export default function SleighGame({ content, lang, onScore, onEnd }: Props) {
     <div className={cn('flex flex-[1_0_auto] flex-col', fx.paused && styles.paused)}>
       <div ref={timeBar} className={styles.timeBar} aria-hidden="true" />
       <div ref={sky} className={styles.sky}>
-        <div className="absolute end-2 top-2 z-10 flex gap-1" role="img" aria-label={t('holiday.arcade.sleigh.bells', { count: snap.bells })}>
+        <div className="absolute end-2 top-2 z-10 flex gap-1" role="img" aria-label={t(pluralKeyOf('holiday.arcade.sleigh.bells', snap.bells, language), { count: snap.bells })}>
           {Array.from({ length: SLEIGH_BELLS }, (_, k) => (
             // eslint-disable-next-line @next/next/no-img-element
             <img key={k} src="/holidays/gold-bell.webp" alt="" width={28} height={28} className={cn('size-7', k >= snap.bells && styles.bellLost)} />
           ))}
         </div>
-        <div className={styles.roofs} aria-hidden="true" />
         <div ref={chimney} className={styles.chimney} aria-hidden="true" />
         <div className={styles.sleigh} aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -169,7 +169,7 @@ export default function HolidayEventCard() {
       {tracked && <HolidayRescueCard holiday={holiday} />}
       {tracked && <HolidayTablePanel holiday={holiday} />}
       {tracked && load.state === 'ready' && <HolidayCardExtras holiday={holiday} win={win} today={today} view={view} locale={language} />}
-      <ArcadeTile holiday={holiday} />
+      <ArcadeTile />
       <HolidaySeasonLink className="mt-3 block text-center text-sm font-bold text-neo-holiday-gold underline-offset-4 hover:underline" />
 
       {pop && (

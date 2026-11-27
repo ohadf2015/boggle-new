@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 
-const fx = vi.hoisted(() => ({ post: vi.fn(), start: vi.fn(), end: vi.fn(), active: vi.fn(), session: vi.fn() }));
+const fx = vi.hoisted(() => ({ post: vi.fn(), start: vi.fn(), end: vi.fn(), active: vi.fn(), session: vi.fn(), inGame: vi.fn() }));
 vi.mock('@/lib/holidays/holidayClient', () => ({
   holidayQuery: () => ({ holiday: 'christmas', localDate: '2026-12-15', locale: 'en' }),
   holidayPost: (...a: unknown[]) => fx.post(...a),
 }));
 vi.mock('@/utils/growthTracking', () => ({ trackGameStart: fx.start, trackGameEnd: fx.end }));
 vi.mock('@/utils/onboardingStorage', () => ({ hasSupabaseSession: () => fx.session() }));
+vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => fx.inGame }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ setGameActive: fx.active }) }));
 
 import { useArcadeRound } from '../useArcadeRound';
@@ -58,5 +59,15 @@ describe('useArcadeRound', () => {
     fx.post.mockRejectedValue(new Error('500'));
     const { result } = renderHook(() => useArcadeRound('oil'));
     await waitFor(() => expect(result.current.state.phase).toBe('error'));
+  });
+
+  it('Given a round is running, then the page is marked in-game so promos stay away, and cleared at game over and on leave', async () => {
+    const { result, unmount } = renderHook(() => useArcadeRound('splat'));
+    await waitFor(() => expect(result.current.state.phase).toBe('playing'));
+    expect(fx.inGame).toHaveBeenLastCalledWith(true);
+    act(() => result.current.finish({ score: 10, plays: [] }));
+    expect(fx.inGame).toHaveBeenLastCalledWith(false);
+    unmount();
+    expect(fx.inGame).toHaveBeenLastCalledWith(false);
   });
 });
