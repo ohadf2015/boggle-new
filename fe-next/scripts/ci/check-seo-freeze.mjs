@@ -30,6 +30,17 @@ import {
 
 const [base = 'HEAD^1', head = 'HEAD'] = process.argv.slice(2);
 const git = (...args) => execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+const contentsAt = (baseRev, headRev) => (side, file) => {
+  try {
+    return execFileSync('git', ['show', `${side === 'base' ? baseRev : headRev}:${file}`], {
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+  } catch {
+    return null;
+  }
+};
 
 let freeze;
 try {
@@ -41,18 +52,18 @@ try {
 
 const diffText = git('diff', '-U0', '--no-color', base, head, '--', 'fe-next/app');
 const today = new Date().toISOString().slice(0, 10);
-const violations = findFreezeViolations({ freeze, diffText, today });
+const violations = findFreezeViolations({ freeze, diffText, today, readFile: contentsAt(base, head) });
 
 // The base commit that last changed each touched file's title/description lines.
 const since = new Date(Date.now() - (GRADING_WINDOW_DAYS + 1) * 86400000).toISOString().slice(0, 10);
-const changes = snippetChanges(diffText);
+const changes = snippetChanges(diffText, contentsAt(base, head));
 const lastChanged = {};
 for (const { file } of changes) {
   try {
     const commits = git('log', '--format=%h%x09%cs', `--since=${since}`, base, '--', file).trim();
     for (const row of commits ? commits.split('\n') : []) {
       const [sha, date] = row.split('\t');
-      if (snippetChanges(git('show', '-U0', '--no-color', '--format=', sha, '--', file)).length) {
+      if (snippetChanges(git('show', '-U0', '--no-color', '--format=', sha, '--', file), contentsAt(`${sha}^`, sha)).length) {
         lastChanged[file] = { sha, date };
         break;
       }
