@@ -51,6 +51,8 @@ export function TeacherTrialWelcome({
       window.history.replaceState(null, '', url);
     }
   };
+  // One lime primary. The step link and the no-step dismiss are mutually exclusive.
+  const primary = NB_PRIMARY;
 
   if (!open) return null;
 
@@ -103,12 +105,12 @@ export function TeacherTrialWelcome({
                 onEngage?.();
                 close(false);
               }}
-              className={NB_PRIMARY}
+              className={primary}
             >
               {t(nextLabelKey ?? 'teacher.proWelcome.cta')}
             </Link>
           ) : (
-            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(false)} className={NB_PRIMARY}>
+            <button type="button" data-testid="teacher-trial-welcome-dismiss" onClick={() => close(false)} className={primary}>
               {t('teacher.proWelcome.cta')}
             </button>
           )}
