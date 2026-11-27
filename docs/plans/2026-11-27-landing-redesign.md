@@ -81,6 +81,8 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
 - 16:35: builder D running (education article + lists + for-schools, new files in components/landing/education,
   dev :3011, baselines before/report-edu*.json, list `edu-all.txt`, shots after-edu/). Review page v2 says so.
   After D: review, commit, tsc/build/suite again, prod-build shots, add "Education articles" group to the review page.
+- 17:00: builder D committed (23 education routes; parity 52 shots 0 failing; phone height -30%). /pricing now in the
+  edu branch (6101a33d6). Left: verify shots + events, tsc, build, suite, prod shots, review page v3.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
