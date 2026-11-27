@@ -90,6 +90,44 @@ export function grDistinctId(): string | null {
   }
 }
 
+/** How long signUp waits for lazyOnload gr.js to persist the visitor id. */
+export const GR_DISTINCT_ID_WAIT_MS = 2000;
+
+function trackerIsLoading(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (typeof window.gr?.capture === 'function') return true;
+  try {
+    return Boolean(document.querySelector('script[src*="growthradar.app/gr.js"]'));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The email confirm link often opens in another browser, so the visitor id
+ * has to travel in user_metadata from this tab's signUp. gr.js is lazyOnload
+ * and may not have written localStorage yet; wait briefly when the script is
+ * present. Never invent an id — a made-up one would not match existing
+ * pageviews. If storage is blocked or the tracker never loads, return null.
+ */
+export async function waitForGrDistinctId(timeoutMs = GR_DISTINCT_ID_WAIT_MS): Promise<string | null> {
+  const existing = grDistinctId();
+  if (existing) return existing;
+  if (timeoutMs <= 0 || !trackerIsLoading()) return null;
+
+  const deadline = Date.now() + timeoutMs;
+  return new Promise((resolve) => {
+    const tick = () => {
+      const id = grDistinctId();
+      if (id || Date.now() >= deadline) {
+        clearInterval(timer);
+        resolve(id);
+      }
+    };
+    const timer = setInterval(tick, 50);
+  });
+}
+
 // --- pre-gr queue -----------------------------------------------------------
 // Events that fire before window.gr exists are held here and flushed (in
 // order) once gr appears. Bounded so a broken CDN can never grow memory, and
