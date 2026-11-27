@@ -83,6 +83,8 @@ en play-boggle (5k) > sv swedish (4k) > en blog best-boggle-alternatives (3k) > 
   After D: review, commit, tsc/build/suite again, prod-build shots, add "Education articles" group to the review page.
 - 17:00: builder D committed (23 education routes; parity 52 shots 0 failing; phone height -30%). /pricing now in the
   edu branch (6101a33d6). Left: verify shots + events, tsc, build, suite, prod shots, review page v3.
+- 17:10 review of education commit: duoPolish test, FAQ must stay expanded (GEO), per-card impression observers,
+  stray data-lc-cta, for-schools top-bar link, clientBoundary list. Fixing now; then tsc/build/suite/prod shots/review v3.
 
 ## Coordinator, after builders stop
 1. Apply their requests files; add `landingKit.guard.test.ts` (kit adopters have no hex, listed routes import kit).
