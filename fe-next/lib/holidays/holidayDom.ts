@@ -1,9 +1,10 @@
-import { HOLIDAY_KEYS, localDateIn, windowFor, type HolidayKey } from './calendar';
+import { HOLIDAY_KEYS, holidayPhase, localDateIn, type HolidayKey, type HolidayPhase } from './calendar';
 import { holidayClass, holidayCookie, readOverrideCookie } from './override';
 import { activeHoliday, resolveRegion, type HolidayOverride, type HolidayRegion } from './region';
 
 export interface HolidayDomState {
   holiday: HolidayKey | null;
+  phase: HolidayPhase;
   region: HolidayRegion;
   available: HolidayKey[];
 }
@@ -26,23 +27,38 @@ function guessedRegion(): HolidayRegion {
   return resolveRegion({ timeZone, locale: html().lang });
 }
 
+const PHASE_CLASS = { preview: 'holiday-preview', live: 'holiday-live' } as const;
+
 function openToday(): HolidayKey[] {
   const date = today();
-  return HOLIDAY_KEYS.filter((k) => windowFor(k, date, locale()));
+  return HOLIDAY_KEYS.filter((k) => holidayPhase(k, date, locale()) !== 'off');
 }
 
-function commit(next: HolidayDomState) {
-  state = next;
+function phaseOf(key: HolidayKey | null): HolidayPhase {
+  if (!key) return 'off';
+  return isPreview() ? 'live' : holidayPhase(key, today(), locale());
+}
+
+function applyClasses(next: Pick<HolidayDomState, 'holiday' | 'phase'>) {
   const cl = html().classList;
   for (const k of HOLIDAY_KEYS) cl.toggle(holidayClass(k), k === next.holiday);
+  cl.toggle(PHASE_CLASS.preview, next.phase === 'preview');
+  cl.toggle(PHASE_CLASS.live, next.phase === 'live');
+}
+
+function commit(next: Omit<HolidayDomState, 'phase'>) {
+  state = { ...next, phase: phaseOf(next.holiday) };
+  applyClasses(state);
   listeners.forEach((l) => l());
 }
 
 export function getHolidayState(): HolidayDomState {
   if (!state) {
     const cl = html().classList;
+    const holiday = HOLIDAY_KEYS.find((k) => cl.contains(holidayClass(k))) ?? null;
     state = {
-      holiday: HOLIDAY_KEYS.find((k) => cl.contains(holidayClass(k))) ?? null,
+      holiday,
+      phase: !holiday ? 'off' : cl.contains(PHASE_CLASS.preview) ? 'preview' : 'live',
       region: guessedRegion(),
       available: openToday(),
     };
@@ -71,8 +87,11 @@ export function applyHolidayOverride(override: HolidayOverride) {
 export function keepHolidayClass(): () => void {
   getHolidayState();
   const observer = new MutationObserver(() => {
-    const key = getHolidayState().holiday;
-    if (key && !html().classList.contains(holidayClass(key))) html().classList.add(holidayClass(key));
+    const cur = getHolidayState();
+    if (!cur.holiday) return;
+    const cl = html().classList;
+    const phaseClass = cur.phase === 'preview' ? PHASE_CLASS.preview : PHASE_CLASS.live;
+    if (!cl.contains(holidayClass(cur.holiday)) || !cl.contains(phaseClass)) applyClasses(cur);
   });
   observer.observe(html(), { attributes: true, attributeFilter: ['class'] });
   return () => observer.disconnect();

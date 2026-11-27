@@ -15,6 +15,7 @@ Two limited-time events. Region picks the default; a toggle lets anyone switch t
   Board bonus tile: "gift" (red).
 - Region: Israel if `profiles.country_code === 'IL'`, else timezone `Asia/Jerusalem`/`Asia/Tel_Aviv`, else locale `he`. Israel → hanukkah default, everyone else → christmas.
 - Override: cookie `lx_holiday` = `hanukkah|christmas|off`; query `?holiday=hanukkah|christmas|off` sets that cookie (and lets us screenshot out of season: `?holiday=` forces the theme on even outside its window ONLY when also `?holidayPreview=1` or NODE_ENV!=='production').
+- Three phases per holiday (`holidayPhase()` in `lib/holidays/calendar.ts`, `phase`/`theme` from `useHoliday`, html `holiday-preview|holiday-live`): **off** → **preview** from Dec 1 (`previewStart`) until the event start → **live** from the event start (Hanukkah night 1, Christmas Dec 13). Preview = light coming soon only: home mascot, home-hero sparkle, event card with locked days + countdown, locked arcade tile with its opening date, landing pages in season. Board skins, music, full ambience, eggs, hunt, holiday daily, tables, rescue, arcade games and track lighting are live-only (`useHoliday().holiday` is set only when live; server routes use `windowFor` = event window). `?holidayPreview=1` forces live for screenshots.
 - Outside every window nothing holiday renders. Earned avatar parts are kept forever.
 
 ## Hard rules

@@ -1,6 +1,6 @@
-import { HOLIDAY_KEYS, type HolidayKey } from './calendar';
+import type { HolidayKey } from './calendar';
 import type { HolidaySettlement } from './dailyBonus.server';
-import { holidayClass } from './override';
+import { liveHolidayIn } from './override';
 
 export type { HolidaySettlement };
 
@@ -15,8 +15,7 @@ const listeners = new Set<() => void>();
 
 export function themedHolidayNow(): HolidayKey | null {
   if (typeof document === 'undefined') return null;
-  const cl = document.documentElement.classList;
-  return HOLIDAY_KEYS.find((k) => cl.contains(holidayClass(k))) ?? null;
+  return liveHolidayIn(document.documentElement.classList);
 }
 
 export function publishHolidaySettlement(s: unknown): void {

@@ -91,9 +91,35 @@ describe('useHoliday', () => {
   it('lists the holidays whose window is open today', () => {
     vi.setSystemTime(new Date('2027-12-26T12:00:00'));
     expect(renderHook(() => useHoliday()).result.current.available).toEqual(['hanukkah', 'christmas']);
-    vi.setSystemTime(new Date('2026-12-06T12:00:00'));
+    vi.setSystemTime(new Date('2026-12-14T12:00:00'));
     __resetHolidayStore();
-    expect(renderHook(() => useHoliday()).result.current.available).toEqual(['hanukkah']);
+    expect(renderHook(() => useHoliday()).result.current.available).toEqual(['christmas']);
+  });
+
+  it('given the Dec 1 coming-soon preview class, exposes the theme but no live holiday', () => {
+    vi.setSystemTime(new Date('2026-12-05T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-preview');
+    html.setAttribute('data-holiday-region', 'world');
+    const { result } = renderHook(() => useHoliday());
+    expect(result.current).toMatchObject({ holiday: null, theme: 'christmas', phase: 'preview', resolved: true });
+  });
+
+  it('given the profile says IL on Dec 2, switches to the hanukkah preview and its classes', () => {
+    vi.setSystemTime(new Date('2026-12-02T12:00:00'));
+    html.classList.add('holiday-christmas', 'holiday-preview');
+    html.setAttribute('data-holiday-region', 'world');
+    Object.assign(auth, { isAuthenticated: true, loading: false, profile: { country_code: 'IL' } });
+    const { result } = renderHook(() => useHoliday());
+    expect(result.current).toMatchObject({ holiday: null, theme: 'hanukkah', phase: 'preview' });
+    expect([...html.classList].sort()).toEqual(['dark', 'holiday-hanukkah', 'holiday-preview']);
+  });
+
+  it('given night 1 after the preview, the store flips to live', () => {
+    vi.setSystemTime(new Date('2026-12-04T12:00:00'));
+    html.classList.add('holiday-hanukkah', 'holiday-live');
+    html.setAttribute('data-holiday-region', 'IL');
+    const { result } = renderHook(() => useHoliday());
+    expect(result.current).toMatchObject({ holiday: 'hanukkah', theme: 'hanukkah', phase: 'live' });
   });
 
   it('setOverride writes the cookie and swaps the class', () => {

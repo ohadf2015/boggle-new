@@ -20,7 +20,7 @@ const huntState = { slot: 'profile', item: 'gelt', foundToday: false, count: 3, 
 describe('HolidayHideSpot', () => {
   beforeEach(() => {
     resetHolidayClientForTests();
-    document.documentElement.className = 'holiday-hanukkah';
+    document.documentElement.className = 'holiday-hanukkah holiday-live';
     holidayState.mockReturnValue({ holiday: 'hanukkah', resolved: true });
     fetchMock.mockReset().mockImplementation(async (_url: string, init?: RequestInit) => ({
       ok: true,
@@ -33,6 +33,14 @@ describe('HolidayHideSpot', () => {
     const { container } = render(<HolidayHideSpot slot="settings" />);
     await waitFor(() => expect(fetchMock).toHaveBeenCalled());
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('Given the coming-soon preview, then nothing renders and nothing is fetched', () => {
+    document.documentElement.className = 'holiday-christmas holiday-preview';
+    holidayState.mockReturnValue({ holiday: null, theme: 'christmas', phase: 'preview', resolved: true });
+    const { container } = render(<HolidayHideSpot slot="profile" />);
+    expect(container).toBeEmptyDOMElement();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('Given the holiday has not resolved, then nothing renders and nothing is fetched', () => {

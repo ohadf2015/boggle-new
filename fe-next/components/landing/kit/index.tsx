@@ -58,6 +58,21 @@ export function Mark({ tone = 'lime', children }: { tone?: LandingTone; children
 
 const CONTAINER = 'mx-auto w-full max-w-6xl px-4 sm:px-6';
 
+export function LandingTopBar({ locale, play }: { locale: string; play?: { href: string; label: string } }) {
+  return (
+    <nav className={cn(CONTAINER, 'flex items-center justify-between gap-3 py-3')}>
+      <Link href={`/${locale}`} dir="ltr" aria-label="LexiClash" className={cn('font-neo-display text-2xl font-bold', FOCUS)}>
+        Lexi<span className="text-neo-lime">Clash</span>
+      </Link>
+      {play && (
+        <Link href={play.href} className={cn(landingButtonClass('primary'), 'min-h-11 px-4 py-1.5 text-base')}>
+          {play.label}
+        </Link>
+      )}
+    </nav>
+  );
+}
+
 export function LandingPage({
   locale,
   play,
@@ -77,18 +92,7 @@ export function LandingPage({
 }) {
   return (
     <main dir={dir} className="min-h-screen bg-neo-navy font-neo-body font-normal text-neo-white">
-      {topBar && (
-        <nav className={cn(CONTAINER, 'flex items-center justify-between gap-3 py-3')}>
-          <Link href={`/${locale}`} dir="ltr" aria-label="LexiClash" className={cn('font-neo-display text-2xl font-bold', FOCUS)}>
-            Lexi<span className="text-neo-lime">Clash</span>
-          </Link>
-          {play && (
-            <Link href={play.href} className={cn(landingButtonClass('primary'), 'min-h-11 px-4 py-1.5 text-base')}>
-              {play.label}
-            </Link>
-          )}
-        </nav>
-      )}
+      {topBar && <LandingTopBar locale={locale} play={play} />}
       <div className={cn(CONTAINER, 'flex flex-col gap-9 pb-14 pt-2 sm:gap-20 sm:pb-20', className)}>{children}</div>
     </main>
   );

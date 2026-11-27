@@ -54,7 +54,7 @@ export function FreshHero({ onPlay }: FreshHeroProps) {
       <section
         data-fresh-section="hero"
         aria-labelledby="fresh-hero-title"
-        className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-x-10 gap-y-5 lg:gap-x-16 px-4 pb-12 pt-5 sm:px-6 sm:pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:gap-y-8 md:pb-24 md:pt-16 lg:px-8"
+        className="holiday-hero-glow mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-x-10 gap-y-5 lg:gap-x-16 px-4 pb-12 pt-5 sm:px-6 sm:pt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,300px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:gap-y-8 md:pb-24 md:pt-16 lg:px-8"
       >
         <div className="flex flex-col items-start gap-3 md:col-start-1 md:row-start-1 md:self-end md:gap-5">
           <h1

@@ -65,15 +65,16 @@ describe('ArcadeHub', () => {
     expect(screen.getAllByText('holiday.arcade.family.badge')).toHaveLength(2);
   });
 
-  it('Given the event card tile, then it links to the arcade in the player language', () => {
-    holiday.mockReturnValue({ holiday: 'christmas', resolved: true });
-    render(<ArcadeTile />);
-    expect(screen.getByTestId('holiday-arcade-tile')).toHaveAttribute('href', '/he/holiday-arcade');
+  it('Given the preview before the event, then the tile is locked with its opening date and links nowhere', () => {
+    render(<ArcadeTile holiday="christmas" opensOn="2026-12-13" />);
+    const tile = screen.getByTestId('holiday-arcade-tile');
+    expect(tile).not.toHaveAttribute('href');
+    expect(tile).toHaveAttribute('aria-disabled', 'true');
+    expect(tile.textContent).toContain('holiday.arcade.tileLocked');
   });
 
-  it('Given the arcade gate is closed, then the event card shows no arcade tile', () => {
-    holiday.mockReturnValue({ holiday: null, resolved: true });
-    render(<ArcadeTile />);
-    expect(screen.queryByTestId('holiday-arcade-tile')).toBeNull();
+  it('Given the event card tile, then it links to the arcade in the player language', () => {
+    render(<ArcadeTile holiday="christmas" />);
+    expect(screen.getByTestId('holiday-arcade-tile')).toHaveAttribute('href', '/he/holiday-arcade');
   });
 });

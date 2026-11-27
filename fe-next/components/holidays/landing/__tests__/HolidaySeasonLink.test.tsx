@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const state = { holiday: 'hanukkah' as 'hanukkah' | 'christmas' | null, resolved: true };
+const state = { theme: 'hanukkah' as 'hanukkah' | 'christmas' | null, resolved: true };
 const lang = { language: 'he' };
 vi.mock('@/hooks/useHoliday', () => ({ useHoliday: () => state }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => lang }));
@@ -9,7 +9,7 @@ vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => lang }));
 import HolidaySeasonLink from '../HolidaySeasonLink';
 
 beforeEach(() => {
-  Object.assign(state, { holiday: 'hanukkah', resolved: true });
+  Object.assign(state, { theme: 'hanukkah', resolved: true });
   lang.language = 'he';
 });
 
@@ -22,7 +22,7 @@ describe('HolidaySeasonLink', () => {
   });
 
   it('Given Christmas active in Russian, Then it links to the New Year landing', () => {
-    Object.assign(state, { holiday: 'christmas' });
+    Object.assign(state, { theme: 'christmas' });
     lang.language = 'ru';
     render(<HolidaySeasonLink />);
     expect(screen.getByRole('link').getAttribute('href')).toBe('/ru/novogodnie-igry');
@@ -35,7 +35,7 @@ describe('HolidaySeasonLink', () => {
       ['christmas', true, 'he'],
       ['hanukkah', true, 'sv'],
     ] as const) {
-      Object.assign(state, { holiday, resolved });
+      Object.assign(state, { theme: holiday, resolved });
       lang.language = language;
       const { container, unmount } = render(<HolidaySeasonLink />);
       expect(container.innerHTML).toBe('');

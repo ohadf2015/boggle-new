@@ -25,14 +25,14 @@ describe('markHolidayPlayed', () => {
   });
 
   it('Given a guest, then nothing is sent (the track is read-only for guests)', async () => {
-    document.documentElement.classList.add('holiday-hanukkah');
+    document.documentElement.classList.add('holiday-hanukkah', 'holiday-live');
     hasSession.mockReturnValue(false);
     await markHolidayPlayed();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('Given Hanukkah is on, when two games finish the same local day, then one POST with the local date goes out and the card is told', async () => {
-    document.documentElement.classList.add('holiday-hanukkah');
+    document.documentElement.classList.add('holiday-hanukkah', 'holiday-live');
     const heard = vi.fn();
     window.addEventListener(HOLIDAY_PROGRESS_EVENT, heard);
     await markHolidayPlayed();
@@ -46,15 +46,21 @@ describe('markHolidayPlayed', () => {
   });
 
   it('Given the POST fails, then a later game the same day may retry', async () => {
-    document.documentElement.classList.add('holiday-christmas');
+    document.documentElement.classList.add('holiday-christmas', 'holiday-live');
     fetchMock.mockResolvedValueOnce({ ok: false, json: async () => ({}) });
     await markHolidayPlayed();
     await markHolidayPlayed();
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('Given only the Dec 1 coming-soon preview, then a finished game posts nothing', async () => {
+    document.documentElement.classList.add('holiday-christmas', 'holiday-preview');
+    await markHolidayPlayed();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('Given fetch throws, then it never throws into the game-end path', async () => {
-    document.documentElement.classList.add('holiday-christmas');
+    document.documentElement.classList.add('holiday-christmas', 'holiday-live');
     fetchMock.mockRejectedValue(new Error('offline'));
     await expect(markHolidayPlayed()).resolves.toBeUndefined();
   });

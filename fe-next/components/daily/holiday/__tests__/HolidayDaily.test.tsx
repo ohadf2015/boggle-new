@@ -166,6 +166,32 @@ describe('Intro and results cards', () => {
     expect(screen.getByTestId('holiday-daily-intro').textContent).toContain('Night 3');
   });
 
+  it('Given Christmas on Dec 13 (event day before the first gift), Then a teaser shows when the gifts start', () => {
+    holidayState.holiday = 'christmas';
+    render(<HolidayDailyIntro puzzleDate="2026-12-13" language="en" />);
+    const teaser = screen.getByTestId('holiday-daily-teaser');
+    expect(teaser.textContent).toContain('Advent Board');
+    expect(teaser.textContent).toContain('December 14');
+    expect(screen.queryByTestId('holiday-daily-intro')).toBeNull();
+    holidayState.holiday = 'hanukkah';
+  });
+
+  it('Given the Dec 5 preview, Then no Advent teaser or board renders', () => {
+    holidayState.holiday = null;
+    render(<HolidayDailyIntro puzzleDate="2026-12-05" language="en" />);
+    expect(screen.queryByTestId('holiday-daily-teaser')).toBeNull();
+    expect(screen.queryByTestId('holiday-daily-intro')).toBeNull();
+    holidayState.holiday = 'hanukkah';
+  });
+
+  it('Given Christmas on Dec 28 after the gifts, Then neither intro nor teaser renders', () => {
+    holidayState.holiday = 'christmas';
+    render(<HolidayDailyIntro puzzleDate="2026-12-28" language="en" />);
+    expect(screen.queryByTestId('holiday-daily-teaser')).toBeNull();
+    expect(screen.queryByTestId('holiday-daily-intro')).toBeNull();
+    holidayState.holiday = 'hanukkah';
+  });
+
   it('Given a date outside the holiday, Then no intro renders', () => {
     render(<HolidayDailyIntro puzzleDate="2026-11-27" language="en" />);
     expect(screen.queryByTestId('holiday-daily-intro')).toBeNull();

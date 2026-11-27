@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { fill, formatLandingDate, landingCopy, type LandingCopy } from '@/lib/holidays/landingCopy';
 import { heroArt, landingJsonLd, landingSeason, type HolidayLanding as Landing, type LandingSeason } from '@/lib/holidays/landing';
+import { LandingTopBar } from '@/components/landing/kit';
 import LandingMascot from './LandingMascot';
 import { ArcadeSection, ClosingSection, EggSection, FaqSection, FeatureSection } from './HolidayLandingSections';
 
@@ -15,18 +16,24 @@ const ACCENT = {
   christmas: { cta: 'bg-neo-holiday-red text-neo-white', ring: 'border-neo-holiday-pine', chip: 'bg-neo-holiday-pine text-neo-white', spark: '/holidays/props-snowflake.webp' },
 } as const;
 
+function dateVars(copy: LandingCopy, win: NonNullable<LandingSeason['window']>) {
+  return {
+    preview: formatLandingDate(win.previewStart, copy.dateLocale),
+    start: formatLandingDate(win.start, copy.dateLocale),
+    end: formatLandingDate(win.end, copy.dateLocale),
+  };
+}
+
+const STATUS = { off: 'offBanner', preview: 'soonBadge', live: 'liveBadge' } as const;
+
 function statusLine(copy: LandingCopy, season: LandingSeason): string {
   if (!season.window) return copy.offUnknown;
-  const vars = { start: formatLandingDate(season.window.start, copy.dateLocale), end: formatLandingDate(season.window.end, copy.dateLocale) };
-  return fill(season.live ? copy.liveBadge : copy.offBanner, vars);
+  return fill(copy[STATUS[season.phase]], dateVars(copy, season.window));
 }
 
 function whenAnswer(copy: LandingCopy, season: LandingSeason): string {
   if (!season.window) return copy.whenUnknown;
-  return fill(copy.whenA, {
-    start: formatLandingDate(season.window.start, copy.dateLocale),
-    end: formatLandingDate(season.window.end, copy.dateLocale),
-  });
+  return fill(copy.whenA, dateVars(copy, season.window));
 }
 
 export default function HolidayLanding({ page, now }: Props) {
@@ -45,7 +52,8 @@ export default function HolidayLanding({ page, now }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(landingJsonLd(page, season, faqs)).replace(/</g, '\\u003c') }}
       />
-      <div className="mx-auto max-w-5xl px-4 pb-16 pt-8 sm:px-6">
+      <LandingTopBar locale={locale} play={{ href: ctaHref, label: season.live ? copy.ctaLive : copy.ctaOff }} />
+      <div className="mx-auto max-w-5xl px-4 pb-16 pt-2 sm:px-6">
         <section className={`relative overflow-hidden rounded-neo-xl border-4 ${accent.ring} bg-neo-navy shadow-hard-xl`}>
           <Image src={hero.url} alt="" width={hero.width} height={hero.height} priority sizes="(min-width: 1024px) 960px, 100vw" className="h-44 w-full object-cover sm:h-64" />
           <div className="flex flex-col gap-5 p-5 sm:flex-row sm:items-end sm:p-8">
@@ -55,6 +63,7 @@ export default function HolidayLanding({ page, now }: Props) {
             <div className="flex-1">
               <p
                 data-testid="holiday-landing-status"
+                data-phase={season.phase}
                 className={`mb-3 inline-block rounded-neo-pill border-2 border-neo-black px-3 py-1 text-sm font-bold shadow-hard-sm ${season.live ? accent.chip : 'bg-neo-holiday-snow text-neo-navy'}`}
               >
                 {statusLine(copy, season)}

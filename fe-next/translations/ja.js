@@ -102,6 +102,7 @@ const ja = {
       "coinNote": "どのゲームも今日のホリデー記録にカウントされます。コインは1日の上限があります。",
       "tileTitle": "ホリデーアーケード",
       "tileSubtitle": "家族で盛り上がるパーティーゲームと言葉ゲーム。今の季節だけ",
+      "tileLocked": "{date}にオープン",
       "shareText": "LexiClashの{game}で{score}点とったよ！勝てるかな？",
       "wordsFound_one": "{count}語",
       "wordsFound_other": "{count}語",
@@ -238,11 +239,15 @@ const ja = {
     "event": {
       "hanukkah": {
         "title": "光の祭り",
-        "subtitle": "プレイした夜ごとに、ろうそくを1本灯そう"
+        "subtitle": "プレイした夜ごとに、ろうそくを1本灯そう",
+        "startsIn_other": "最初のキャンドルまであと{count}日",
+        "startsTomorrow": "最初のキャンドルは明日の夜"
       },
       "christmas": {
         "title": "スノークラッシュ",
-        "subtitle": "プレイした日は毎日プレゼント"
+        "subtitle": "プレイした日は毎日プレゼント",
+        "startsIn_other": "12のプレゼントまであと{count}日",
+        "startsTomorrow": "12のプレゼントは明日スタート"
       },
       "progress": "{lit} / {total}",
       "dayLit": "{day}日目：獲得済み",
@@ -475,6 +480,7 @@ const ja = {
       "giftN": "プレゼント{n}",
       "nightlyIntro": "今夜のボードには金のゲルトマスが{n}個。そこを通る言葉でコインを集めたら、ドレイドルを回そう。",
       "adventIntro": "今日のボードには、ホリデーの言葉がひとつ包まれているよ。見つけて今日のプレゼントを開けよう。",
+      "adventSoon": "アドベントボードは{date}にスタート。その日からクリスマスまで、毎日ボードにホリデーの言葉がひとつ包まれているよ。",
       "guestLine": "ログインして今夜のろうそくを灯そう。ホリデーの連続記録もキープできるよ。",
       "litByBoard": "今夜のボードで{n}夜目が灯ったよ。ゲルトの言葉{words}個、+{coins}コイン。",
       "giftUnwrapped": "プレゼント{n}を開けた！+{coins}コイン。",

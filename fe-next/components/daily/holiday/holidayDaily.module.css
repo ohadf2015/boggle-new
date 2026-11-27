@@ -1,12 +1,12 @@
 /* Holiday Daily: wins over the season skin from the first frame because the pre-paint script sets html.holiday-* */
 
-:global(html.holiday-hanukkah) .root {
+:global(html.holiday-hanukkah.holiday-live) .root {
   background-image:
     radial-gradient(circle at 50% -10%, color-mix(in srgb, var(--neo-holiday-gold) 22%, transparent), transparent 55%),
     linear-gradient(160deg, color-mix(in srgb, var(--neo-holiday-blue) 22%, transparent), transparent 65%) !important;
 }
 
-:global(html.holiday-christmas) .root {
+:global(html.holiday-christmas.holiday-live) .root {
   background-image:
     radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--neo-holiday-red) 22%, transparent), transparent 50%),
     linear-gradient(200deg, color-mix(in srgb, var(--neo-holiday-pine) 24%, transparent), transparent 65%) !important;

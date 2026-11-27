@@ -21,7 +21,7 @@ describe('HolidayMascotEggs', () => {
   beforeEach(() => {
     resetHolidayClientForTests();
     lang.mockReturnValue('en');
-    document.documentElement.className = 'holiday-hanukkah';
+    document.documentElement.className = 'holiday-hanukkah holiday-live';
     vi.useFakeTimers({ toFake: ['Date', 'setTimeout', 'clearTimeout'] });
     vi.setSystemTime(new Date(2026, 11, 6, 12));
     Object.values(sounds).forEach((s) => s.mockReset());
@@ -51,7 +51,7 @@ describe('HolidayMascotEggs', () => {
 
   it('Given Christmas, when tapped 12 times, then a snowball fight starts; slow taps never count', () => {
     holidayState.mockReturnValue({ holiday: 'christmas', resolved: true });
-    document.documentElement.className = 'holiday-christmas';
+    document.documentElement.className = 'holiday-christmas holiday-live';
     vi.setSystemTime(new Date(2026, 11, 20, 12));
     const snow = vi.fn();
     window.addEventListener(SNOWBALL_EVENT, snow);

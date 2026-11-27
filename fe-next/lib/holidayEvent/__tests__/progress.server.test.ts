@@ -92,6 +92,8 @@ describe('markHolidayDayPlayed', () => {
     const { rows, supabase } = fakeDb();
     expect((await markHolidayDayPlayed({ supabase, userId: 'u1', holiday: 'hanukkah', localDate: '2026-11-30' })).status).toBe('outside_window');
     expect((await markHolidayDayPlayed({ supabase, userId: 'u1', holiday: 'christmas', localDate: '2026-12-13' })).status).toBe('not_track_day');
+    expect((await markHolidayDayPlayed({ supabase, userId: 'u1', holiday: 'christmas', localDate: '2026-12-05' })).status).toBe('outside_window');
+    expect((await markHolidayDayPlayed({ supabase, userId: 'u1', holiday: 'hanukkah', localDate: '2026-12-02' })).status).toBe('outside_window');
     expect(rows).toHaveLength(0);
   });
 

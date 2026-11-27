@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 
 const holidayState = vi.fn();
+const live = (k: string | null) => ({ holiday: k, theme: k, phase: k ? 'live' : 'off', resolved: true });
+const preview = (k: string) => ({ holiday: null, theme: k, phase: 'preview', resolved: true });
 const authState = vi.fn();
 vi.mock('@/hooks/useHoliday', () => ({ useHoliday: () => holidayState() }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => authState() }));
@@ -11,6 +13,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/components/daily/holiday/HolidayCommunityCounter', () => ({ default: () => <p data-testid="d-community" /> }));
 vi.mock('@/components/daily/holiday/HolidayRescueCard', () => ({ default: () => <p data-testid="d-rescue" /> }));
 vi.mock('@/components/daily/holiday/HolidayTablePanel', () => ({ default: () => <p data-testid="d-table" /> }));
+vi.mock('@/components/holidays/arcade/ArcadeTile', () => ({ default: ({ opensOn }: { opensOn?: string }) => <p data-testid="d-arcade" data-opens={opensOn ?? ''} /> }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div data-testid="auth-modal" /> : null) }));
 
 import HolidayEventCard from '../HolidayEventCard';
@@ -26,14 +29,14 @@ describe('HolidayEventCard', () => {
     resetHolidayPlayedForTests();
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(new Date(2026, 11, 5, 12, 0));
-    holidayState.mockReturnValue({ holiday: 'hanukkah', resolved: true });
+    holidayState.mockReturnValue(live('hanukkah'));
     authState.mockReturnValue({ user: null, loading: false });
     fetchMock.mockReset().mockResolvedValue({ ok: true, json: async () => hanukkahView([0, 1]) });
     vi.stubGlobal('fetch', fetchMock);
   });
 
   it('Given no active holiday, then nothing renders', () => {
-    holidayState.mockReturnValue({ holiday: null, resolved: true });
+    holidayState.mockReturnValue(live(null));
     const { container } = render(<HolidayEventCard />);
     expect(container).toBeEmptyDOMElement();
   });
@@ -102,12 +105,60 @@ describe('HolidayEventCard', () => {
   });
 
   it('Given Christmas, then 12 gifts show', () => {
-    holidayState.mockReturnValue({ holiday: 'christmas', resolved: true });
+    holidayState.mockReturnValue(live('christmas'));
     vi.setSystemTime(new Date(2026, 11, 15, 12, 0));
     render(<HolidayEventCard />);
     const days = screen.getAllByTestId('holiday-day');
     expect(days).toHaveLength(12);
     expect(days[1]).toHaveAttribute('aria-current', 'date');
+  });
+
+  it('Given the Christmas preview on Dec 5, then 12 locked gifts, a countdown and a locked arcade show, with no server reads', () => {
+    holidayState.mockReturnValue(preview('christmas'));
+    authState.mockReturnValue({ user: { id: 'u1' }, loading: false });
+    vi.setSystemTime(new Date(2026, 11, 5, 12, 0));
+    render(<HolidayEventCard />);
+    const days = screen.getAllByTestId('holiday-day');
+    expect(days).toHaveLength(12);
+    expect(days.every((d) => d.getAttribute('data-locked') === 'true')).toBe(true);
+    expect(days.some((d) => d.hasAttribute('aria-current'))).toBe(false);
+    expect(screen.getByTestId('holiday-event-card')).toHaveAttribute('data-phase', 'preview');
+    expect(screen.getByTestId('holiday-countdown')).toHaveTextContent('holiday.event.christmas.startsIn_other:{"count":9}');
+    expect(screen.getByTestId('d-arcade')).toHaveAttribute('data-opens', '2026-12-13');
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('d-community')).toBeNull();
+    expect(screen.queryByTestId('d-rescue')).toBeNull();
+    expect(screen.queryByTestId('d-table')).toBeNull();
+  });
+
+  it('Given the Hanukkah preview on Dec 3, then 8 unlit candles and a first-candle-tomorrow line show', () => {
+    holidayState.mockReturnValue(preview('hanukkah'));
+    vi.setSystemTime(new Date(2026, 11, 3, 12, 0));
+    render(<HolidayEventCard />);
+    expect(screen.getAllByTestId('holiday-day')).toHaveLength(8);
+    expect(screen.getByTestId('holiday-countdown')).toHaveTextContent('holiday.event.hanukkah.startsTomorrow');
+    expect(screen.getByTestId('d-arcade')).toHaveAttribute('data-opens', '2026-12-04');
+  });
+
+  it('Given Dec 13 (event live, gifts tomorrow), then the server track loads, the arcade opens and the countdown says tomorrow', async () => {
+    holidayState.mockReturnValue(live('christmas'));
+    authState.mockReturnValue({ user: { id: 'u1' }, loading: false });
+    vi.setSystemTime(new Date(2026, 11, 13, 12, 0));
+    fetchMock.mockResolvedValue({ ok: true, json: async () => buildProgressView(windowFor('christmas', '2026-12-13')!, new Set()) });
+    render(<HolidayEventCard />);
+    await waitFor(() => expect(screen.getAllByTestId('holiday-day')).toHaveLength(12));
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/holiday/progress?holiday=christmas&localDate=2026-12-13&locale=en');
+    expect(screen.getByTestId('holiday-countdown')).toHaveTextContent('holiday.event.christmas.startsTomorrow');
+    expect(screen.getByTestId('d-arcade')).toHaveAttribute('data-opens', '');
+    expect(screen.getByTestId('d-rescue')).toBeInTheDocument();
+  });
+
+  it('Given the 12 Gifts have started, then no countdown shows', () => {
+    holidayState.mockReturnValue(live('christmas'));
+    vi.setSystemTime(new Date(2026, 11, 14, 12, 0));
+    render(<HolidayEventCard />);
+    expect(screen.queryByTestId('holiday-countdown')).toBeNull();
+    expect(screen.getAllByTestId('holiday-day')[0]).toHaveAttribute('data-locked', 'false');
   });
 
   it('Given nights lit by the Holiday Daily and by a friend, then those candles glow and say so', async () => {

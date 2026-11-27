@@ -1,16 +1,16 @@
-/* Winter holidays: html.holiday-hanukkah / html.holiday-christmas, set by the pre-paint script.
+/* Winter holidays: html.holiday-hanukkah / html.holiday-christmas plus html.holiday-preview (Dec 1 coming soon: mascot and home-hero sparkle only) or html.holiday-live (full skin), set by the pre-paint script.
    A paid board theme or tile skin always wins over the holiday skin. */
 
 /* ── Board frame ─────────────────────────────────────────── */
 
-html.holiday-hanukkah .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
+html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
   outline: 3px solid var(--neo-holiday-blue);
   outline-offset: 4px;
   box-shadow: 6px 6px 0 var(--neo-holiday-gold);
   border-radius: 1rem;
 }
 
-html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
+html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) {
   outline: 3px dashed var(--neo-holiday-red);
   outline-offset: 4px;
   box-shadow: 6px 6px 0 var(--neo-holiday-pine);
@@ -19,8 +19,8 @@ html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([da
 
 /* ── Tiles: a cap painted inside the tile's own corners; backgrounds stay so selection/fx states read as usual ── */
 
-html.holiday-hanukkah .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before,
-html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
+html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before,
+html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -28,11 +28,11 @@ html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([da
   pointer-events: none;
 }
 
-html.holiday-hanukkah .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
+html.holiday-hanukkah.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
   background: linear-gradient(to top, var(--neo-holiday-blue) 0 12%, var(--neo-holiday-gold) 12% 16%, transparent 16%);
 }
 
-html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
+html.holiday-christmas.holiday-live .game-board-frame:not([class*='cosmetic-board-']):not([data-tile-skin]) [data-board]:not([data-ghost]) [data-tile]:not([data-empty])::before {
   background: linear-gradient(to bottom, var(--neo-holiday-snow) 0 15%, var(--neo-holiday-red) 15% 19%, transparent 19%);
 }
 
@@ -45,7 +45,7 @@ html.holiday-christmas .game-board-frame:not([class*='cosmetic-board-']):not([da
   color: var(--neo-navy) !important;
 }
 
-html.holiday-christmas .holiday-bonus-tile:not([data-sel]):not([data-fx]) {
+html.holiday-christmas.holiday-live .holiday-bonus-tile:not([data-sel]):not([data-fx]) {
   background:
     linear-gradient(90deg, transparent 42%, var(--neo-holiday-gold) 42% 58%, transparent 58%),
     linear-gradient(0deg, transparent 42%, var(--neo-holiday-gold) 42% 58%, transparent 58%),
@@ -71,8 +71,8 @@ html.holiday-christmas .holiday-mascot-christmas {
 /* ── Ambience: one fixed layer drifting by transform only; off in games (server attr on first load, keeper attr after client navigation) and for reduced motion ── */
 
 @media (prefers-reduced-motion: no-preference) {
-  html.holiday-christmas body:not([data-lc-heavy-game]):not([data-holiday-calm])::after,
-  html.holiday-hanukkah body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
+  html.holiday-christmas.holiday-live body:not([data-lc-heavy-game]):not([data-holiday-calm])::after,
+  html.holiday-hanukkah.holiday-live body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
     content: '';
     position: fixed;
     inset: -960px 0 0 0;
@@ -82,7 +82,7 @@ html.holiday-christmas .holiday-mascot-christmas {
     animation: holiday-drift 24s linear infinite;
   }
 
-  html.holiday-christmas body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
+  html.holiday-christmas.holiday-live body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
     background-image:
       radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 55%, transparent) 0 1.5px, transparent 2.5px),
       radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 35%, transparent) 0 1px, transparent 2px);
@@ -90,7 +90,7 @@ html.holiday-christmas .holiday-mascot-christmas {
     background-position: 0 0, 40px 60px;
   }
 
-  html.holiday-hanukkah body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
+  html.holiday-hanukkah.holiday-live body:not([data-lc-heavy-game]):not([data-holiday-calm])::after {
     background-image:
       radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-gold) 50%, transparent) 0 1.2px, transparent 2.2px),
       radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-blue) 35%, transparent) 0 1px, transparent 2px);
@@ -106,5 +106,53 @@ html.holiday-christmas .holiday-mascot-christmas {
   }
   to {
     transform: translate3d(0, 960px, 0);
+  }
+}
+
+/* ── Coming-soon preview: a soft sparkle behind the home hero only, swaying a few px by transform ── */
+
+html.holiday-preview .holiday-hero-glow {
+  position: relative;
+  isolation: isolate;
+}
+
+html.holiday-preview .holiday-hero-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+html.holiday-christmas.holiday-preview .holiday-hero-glow::before {
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 45%, transparent) 0 1.5px, transparent 2.5px),
+    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-snow) 30%, transparent) 0 1px, transparent 2px);
+  background-size: 140px 140px, 70px 70px;
+  background-position: 0 0, 35px 50px;
+}
+
+html.holiday-hanukkah.holiday-preview .holiday-hero-glow::before {
+  background-image:
+    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-gold) 45%, transparent) 0 1.2px, transparent 2.2px),
+    radial-gradient(circle, color-mix(in srgb, var(--neo-holiday-blue) 30%, transparent) 0 1px, transparent 2px);
+  background-size: 150px 150px, 90px 90px;
+  background-position: 0 0, 60px 25px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html.holiday-preview .holiday-hero-glow::before {
+    will-change: transform;
+    animation: holiday-sway 6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes holiday-sway {
+  from {
+    transform: translate3d(0, -4px, 0);
+  }
+  to {
+    transform: translate3d(0, 4px, 0);
   }
 }

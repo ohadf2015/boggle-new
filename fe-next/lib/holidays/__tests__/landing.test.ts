@@ -48,6 +48,15 @@ describe('landingSeason', () => {
     expect(s.window?.start).toBe('2026-12-04');
   });
 
+  it('Given the Dec 1-12 preview, When reading christmas, Then the page is in season while the Event still starts Dec 13', () => {
+    const s = landingSeason('christmas', 'en', at('2026-12-05'));
+    expect(s.live).toBe(true);
+    const graph = landingJsonLd(landingFor('christmas', 'en')!, s, [])['@graph'] as Array<Record<string, unknown>>;
+    expect(graph.find((n) => n['@type'] === 'Event')!.startDate).toBe('2026-12-13');
+    expect(landingSeason('hanukkah', 'he', at('2026-12-02')).live).toBe(true);
+    expect(landingSeason('christmas', 'en', at('2026-11-30')).live).toBe(false);
+  });
+
   it('Given July 2027, When reading hanukkah, Then it is off with Dec 24 2027 next', () => {
     const s = landingSeason('hanukkah', 'en', at('2027-07-01'));
     expect(s.live).toBe(false);
@@ -56,7 +65,7 @@ describe('landingSeason', () => {
 
   it('Given 2029 (no calendar data), When reading hanukkah, Then it is off with no window', () => {
     const s = landingSeason('hanukkah', 'en', at('2029-03-01'));
-    expect(s).toEqual({ live: false, window: null });
+    expect(s).toEqual({ live: false, phase: 'off', window: null });
   });
 
   it('Given Jan 5 2027, When reading es christmas, Then it is still live (Reyes window)', () => {

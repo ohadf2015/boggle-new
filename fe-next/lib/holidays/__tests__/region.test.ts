@@ -41,7 +41,6 @@ describe('activeHoliday', () => {
   });
 
   it('given the default closed and the other open, returns null (no auto-fallback)', () => {
-    expect(activeHoliday({ localDate: '2026-12-05', region: 'world' })).toBeNull();
     expect(activeHoliday({ localDate: '2026-12-20', region: 'IL' })).toBeNull();
   });
 
@@ -53,6 +52,13 @@ describe('activeHoliday', () => {
   it('given an override outside its window, falls back to the default', () => {
     expect(activeHoliday({ localDate: '2026-12-20', region: 'world', override: 'hanukkah' })).toBe('christmas');
     expect(activeHoliday({ localDate: '2026-12-20', region: 'IL', override: 'hanukkah' })).toBeNull();
+  });
+
+  it('given the Dec 1 preview, the region default theme is already on', () => {
+    expect(activeHoliday({ localDate: '2026-11-30', region: 'world' })).toBeNull();
+    expect(activeHoliday({ localDate: '2026-12-01', region: 'world' })).toBe('christmas');
+    expect(activeHoliday({ localDate: '2026-12-01', region: 'IL' })).toBe('hanukkah');
+    expect(activeHoliday({ localDate: '2027-12-10', region: 'IL' })).toBe('hanukkah');
   });
 
   it('given override off, returns null even in season', () => {

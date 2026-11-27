@@ -102,6 +102,7 @@ const sv = {
       "coinNote": "Varje spel räknas för dagens högtidsspår. Mynten har ett tak per dag.",
       "tileTitle": "Högtidsarkad",
       "tileSubtitle": "Festspel för hela familjen och ordspel, bara den här säsongen",
+      "tileLocked": "Öppnar den {date}",
       "shareText": "Jag fick {score} poäng i {game} på LexiClash! Klår du mig?",
       "wordsFound_one": "{count} ord",
       "wordsFound_other": "{count} ord",
@@ -238,11 +239,15 @@ const sv = {
     "event": {
       "hanukkah": {
         "title": "Ljusens högtid",
-        "subtitle": "Tänd ett ljus varje kväll du spelar"
+        "subtitle": "Tänd ett ljus varje kväll du spelar",
+        "startsIn_other": "Första ljuset om {count} dagar",
+        "startsTomorrow": "Första ljuset i morgon kväll"
       },
       "christmas": {
         "title": "Snöbatalj",
-        "subtitle": "En present för varje dag du spelar"
+        "subtitle": "En present för varje dag du spelar",
+        "startsIn_other": "De 12 paketen börjar om {count} dagar",
+        "startsTomorrow": "De 12 paketen börjar i morgon"
       },
       "progress": "{lit} av {total}",
       "dayLit": "Dag {day}: klar",
@@ -475,6 +480,7 @@ const sv = {
       "giftN": "Paket {n}",
       "nightlyIntro": "{n} gyllene gelt-rutor glittrar på kvällens bräde. Dra ord genom dem för att få mynt och snurra sedan snurran.",
       "adventIntro": "Ett julord ligger inslaget på dagens bräde. Hitta det så får du öppna dagens paket.",
+      "adventSoon": "Adventsbrädet öppnar den {date}. Sedan ligger ett julord inslaget på brädet varje dag fram till jul.",
       "guestLine": "Logga in för att tända kvällens ljus och hålla liv i din högtidssvit.",
       "litByBoard": "Kväll {n} tänd med Kvällens bräde. {words} gelt-ord, +{coins} mynt.",
       "giftUnwrapped": "Paket {n} öppnat! +{coins} mynt.",
