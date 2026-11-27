@@ -54,33 +54,43 @@ describe('the no-account CTA', () => {
   });
 
   /**
-   * Six of the twelve landings render through `EducationLandingTemplate`, which
-   * carries the CTA once for all of them. Counting only the page file would read
-   * those as missing it, so the template stands in for the pages that delegate.
+   * Most landings render through a shared template, which carries the CTA once for
+   * all of them. Counting only the page file would read those as missing it, so the
+   * template stands in for the pages that delegate.
    */
-  const TEMPLATE = join(ROOT, 'components', 'education', 'EducationLandingTemplate.tsx');
+  const TEMPLATES: Record<string, string> = {
+    EducationKitLanding: join(ROOT, 'components', 'landing', 'education', 'EducationKitLanding.tsx'),
+    EducationLandingTemplate: join(ROOT, 'components', 'education', 'EducationLandingTemplate.tsx'),
+  };
+  const CARD = join(ROOT, 'components', 'landing', 'education', 'NoAccountCard.tsx');
   const sourceFor = (file: string) => {
     const src = readFileSync(file, 'utf8');
-    return /EducationLandingTemplate/.test(src) ? readFileSync(TEMPLATE, 'utf8') : src;
+    const template = Object.keys(TEMPLATES).find((name) => new RegExp(`<${name}\\b`).test(src));
+    return template ? readFileSync(TEMPLATES[template], 'utf8') : src;
   };
 
   it.each(PAGES)('%s carries exactly one quick-play link', (_name, file) => {
     const src = sourceFor(file);
     // Rendered either through the shared component or, if someone hand-rolls it,
     // as a literal href. Both count, so the guard cannot be dodged by inlining.
-    const viaComponent = (src.match(/<NoAccountCta\b/g) ?? []).length;
+    const viaComponent = (src.match(/<NoAccount(?:Cta|Card)\b/g) ?? []).length;
     const viaConsumerMp = (src.match(/multiplayer\?quickPlay=true/g) ?? []).length;
     expect(viaComponent).toBe(1);
     expect(viaConsumerMp).toBe(0);
   });
 
   it.each(PAGES)('%s imports the shared component rather than reinventing it', (_name, file) => {
-    expect(sourceFor(file)).toMatch(/from '@\/components\/education\/NoAccountCta'/);
+    expect(sourceFor(file)).toMatch(/from '@\/components\/(?:education\/NoAccountCta|landing\/education\/NoAccountCard)'/);
   });
 
-  it('the template carries it exactly once, for the six pages that delegate', () => {
-    const src = readFileSync(TEMPLATE, 'utf8');
-    expect((src.match(/<NoAccountCta\b/g) ?? []).length).toBe(1);
+  it('the kit card reads the shared copy and destination', () => {
+    expect(readFileSync(CARD, 'utf8')).toMatch(/QUICK_PLAY_PATH, noAccountCopy.*from '@\/components\/education\/NoAccountCta'/);
+  });
+
+  it('each template carries it exactly once, for the pages that delegate', () => {
+    for (const file of Object.values(TEMPLATES)) {
+      expect((readFileSync(file, 'utf8').match(/<NoAccount(?:Cta|Card)\b/g) ?? []).length).toBe(1);
+    }
   });
 });
 

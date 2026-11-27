@@ -103,11 +103,12 @@ describe('each landing page links three siblings', () => {
     const src = readFileSync(join(EDUCATION_DIR, slug, 'page.tsx'), 'utf8');
     const siblings = educationRelatedPages(slug).map((r) => r.slug);
     // Three ways to satisfy this, all of which put the rotation on the page:
-    // the thin pages render `EducationLandingTemplate`, which mounts the shared
-    // rail; the older pages mount `EducationRelatedLinks` directly; or a page
-    // names all three siblings itself.
-    const usesShared =
-      src.includes('EducationRelatedLinks') || src.includes('EducationLandingTemplate');
+    // the thin pages render a shared template (`EducationKitLanding`), which mounts
+    // the shared rail; the older pages mount the rail (`EducationKitRelated` or
+    // `EducationRelatedLinks`) directly; or a page names all three siblings itself.
+    const usesShared = ['EducationRelatedLinks', 'EducationKitRelated', 'EducationLandingTemplate', 'EducationKitLanding'].some((name) =>
+      src.includes(name),
+    );
     const namesAll = siblings.every((s) => src.includes(s));
     expect(usesShared || namesAll, `${slug} links none of ${siblings.join(', ')}`).toBe(true);
   });

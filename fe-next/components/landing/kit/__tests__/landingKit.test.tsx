@@ -91,6 +91,11 @@ describe('landing kit', () => {
     expect(screen.getByText('Yes.')).toBeInTheDocument();
   });
 
+  it('faq questions can stay h3 headings inside the fold', () => {
+    render(<FaqList items={[{ q: 'Free?', a: 'Yes.' }]} headingLevel={3} />);
+    expect(screen.getByRole('heading', { level: 3, name: 'Free?' }).closest('summary')).not.toBeNull();
+  });
+
   it('names a table with its caption, hidden or shown', () => {
     const { container } = render(<CompareTable columns={['A', 'B']} rows={[['1', '2']]} caption="Scores" captionHidden />);
     expect(screen.getByRole('table', { name: 'Scores' })).toBeInTheDocument();

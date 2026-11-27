@@ -49,6 +49,10 @@ import Icebreakers, { generateMetadata as metaIcebreakers } from '../first-day-o
  * Metadata snapshots are unchanged, and `for-schools` does not use the template.
  * The for-schools hero and trial FAQ text/JSON-LD were regenerated when the
  * 14-day Teacher Pro trial became card-required (card needed, then $9/mo).
+ * The visible-text snapshots were regenerated again when these pages moved onto the
+ * landing kit: same copy and link targets, in kit order, plus the kit's logo link,
+ * minus the Back button, decorative emoji and bullet glyphs, the class-game
+ * numbering, and the district line the teacher CTA used to repeat.
  *
  * Regenerate them only when the copy itself is meant to change:
  *

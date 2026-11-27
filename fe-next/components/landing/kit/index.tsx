@@ -387,18 +387,22 @@ export function FaqList({
   items,
   openFirst = false,
   exclusive,
+  headingLevel,
 }: {
   items: { q: React.ReactNode; a: React.ReactNode }[];
   openFirst?: boolean;
   /** shared name: opening one answer closes the others */
   exclusive?: string;
+  /** keeps each question a heading where the page outline needs it */
+  headingLevel?: 3;
 }) {
+  const Q = headingLevel ? 'h3' : 'span';
   return (
     <div className="grid items-start gap-3 lg:grid-cols-2">
       {items.map((item, i) => (
         <details key={i} name={exclusive} open={openFirst && i === 0} className="group rounded-neo-lg border-3 border-neo-black bg-neo-cream text-neo-black shadow-hard-lg">
           <summary className={cn('flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 rounded-neo-lg px-4 py-3 font-bold [&::-webkit-details-marker]:hidden', FOCUS)}>
-            <span>{item.q}</span>
+            <Q>{item.q}</Q>
             <span aria-hidden className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border-2 border-neo-black bg-neo-yellow group-open:rotate-45 motion-safe:transition-transform">
               <Plus className="h-5 w-5" strokeWidth={3} />
             </span>
