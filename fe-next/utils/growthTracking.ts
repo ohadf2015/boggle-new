@@ -29,7 +29,7 @@ import {
 import { incrementGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { incrementGamesPlayed } from '@/utils/pushNotifications';
 import posthog from '@/lib/analytics/lazyPosthog';
-import { mirrorGrowthEvent } from '@/utils/growthRadarMirror';
+import { grDistinctId, mirrorGrowthEvent } from '@/utils/growthRadarMirror';
 import { pageContext, specificGameEventName } from '@/utils/eventContext';
 import {
   setPostHogUserProps,
@@ -1418,11 +1418,19 @@ export const consumePendingSignupCompletion = (): void => {
  * dedupe double-counts one account across two browsers) and no growth: copy in
  * PostHog (posthogGrowth:false — GR's PostHog ingest imports every growth:*
  * event). PostHog keeps the bare canonical `signup_completed` via the
- * dual-emit whitelist, so PostHog dashboards are unchanged.
+ * dual-emit whitelist, so PostHog dashboards are unchanged. The event still
+ * carries gr_distinct_id when the browser has a consented tracker id, so
+ * Growth Radar imports it onto the same visitor as the server event instead
+ * of counting one signup as two people.
  */
 export const trackSignupCompleted = (source: string = 'unknown'): void => {
   const surface = canonicalSignupSurface(source) ?? source;
-  trackGrowthEvent('signup_completed', { source: surface, surface }, { mirror: false, posthogGrowth: false });
+  const trackerId = grDistinctId();
+  trackGrowthEvent(
+    'signup_completed',
+    { source: surface, surface, ...(trackerId ? { gr_distinct_id: trackerId } : {}) },
+    { mirror: false, posthogGrowth: false },
+  );
 };
 
 /** localStorage key holding the JSON array of userIds already counted as a
