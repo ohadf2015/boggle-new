@@ -15,7 +15,7 @@ export function StatusStrip({
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-5" role="group" aria-label={t('education.analytics.overview.statusTitle')}>
       {STATUSES.map((s) => {
-        const { icon: Icon, chip, text } = STATUS_VIEW[s];
+        const { icon: Icon, chip } = STATUS_VIEW[s];
         const label = t(`education.analytics.overview.status.${s}`);
         return (
           <button
@@ -30,9 +30,9 @@ export function StatusStrip({
               chip, active === s && 'ring-4 ring-edu-line',
             )}
           >
-            <Icon aria-hidden className={cn('size-5 shrink-0', text)} />
-            <span className="font-neo-display text-2xl font-bold leading-none text-edu-ink">{counts[s]}</span>
-            <span className="min-w-0 font-neo-body text-xs font-bold leading-tight text-edu-ink/90">{label}</span>
+            <Icon aria-hidden className="size-5 shrink-0" />
+            <span className="font-neo-display text-2xl font-bold leading-none">{counts[s]}</span>
+            <span className="min-w-0 font-neo-body text-xs font-bold leading-tight">{label}</span>
           </button>
         );
       })}
@@ -48,7 +48,7 @@ export function StatusLine({
   return (
     <div data-testid="overview-status-line" className="flex flex-wrap items-center gap-2" role="group" aria-label={t('education.analytics.overview.statusTitle')}>
       {STATUSES.filter((s) => counts[s] > 0).map((s) => {
-        const { icon: Icon, chip, text } = STATUS_VIEW[s];
+        const { icon: Icon, chip } = STATUS_VIEW[s];
         return (
           <button
             key={s}
@@ -57,11 +57,11 @@ export function StatusLine({
             aria-pressed={active === s}
             onClick={() => onToggle(s)}
             className={cn(
-              'inline-flex min-h-11 items-center gap-1.5 rounded-neo-lg border-[3px] px-3 font-neo-body text-base font-bold text-edu-ink shadow-hard transition-transform active:translate-y-px motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              'inline-flex min-h-11 items-center gap-1.5 rounded-neo-lg border-[3px] px-3 font-neo-body text-base font-bold shadow-hard transition-transform active:translate-y-px motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-cyan',
               chip, active === s && 'ring-4 ring-edu-line',
             )}
           >
-            <Icon aria-hidden className={cn('size-5 shrink-0', text)} />
+            <Icon aria-hidden className="size-5 shrink-0" />
             <span className="font-neo-display font-black">{counts[s]}</span>
             {t(`education.analytics.overview.status.${s}`)}
           </button>

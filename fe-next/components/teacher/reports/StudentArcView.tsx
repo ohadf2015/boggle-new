@@ -74,7 +74,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
   if (error) {
     return (
       <section className={PANEL}>
-        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-neo-black">
           {t('teacher.reports.error')}
         </p>
       </section>
@@ -122,7 +122,7 @@ export function StudentArcView({ studentId, classroomId, studentName }: StudentA
       {arc.mastery.stuckWords.length > 0 && (
         <p
           data-testid="student-arc-requeue"
-          className="mb-4 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-2 text-xs font-bold text-edu-ink/90"
+          className="mb-4 rounded-neo border-2 border-neo-black bg-neo-cyan px-3 py-2 text-xs font-bold text-neo-black"
         >
           {t('teacher.reports.arc.requeueStudent', { name: studentName ?? '' })}
         </p>

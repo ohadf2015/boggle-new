@@ -49,7 +49,7 @@ export function StudentParentPreview({ classroomId, studentId, studentName }: St
         <div aria-busy="true" className="h-40 rounded-neo bg-edu-ink/10 motion-safe:animate-pulse" />
       )}
       {state.status === 'error' && (
-        <p role="alert" className="rounded-neo border-2 border-edu-pink-ink bg-neo-pink/10 p-3 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink p-3 text-sm font-bold text-neo-black">
           {t('parentReport.loadFailed')}
         </p>
       )}

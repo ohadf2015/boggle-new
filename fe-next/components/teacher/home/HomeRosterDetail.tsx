@@ -85,7 +85,7 @@ function DetailBody({ row, onClose, onAssign, language, nowMs, t, titleAs }: Det
             {row.level !== null ? (
               <span
                 data-testid="home-roster-level"
-                className="ms-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-cyan/60 bg-neo-cyan/15 px-2 py-px align-middle text-xs font-black text-edu-cyan-ink"
+                className="ms-1.5 inline-flex items-center gap-1 whitespace-nowrap rounded-full border-2 border-neo-black bg-neo-cyan px-2 py-px align-middle text-xs font-black text-neo-black"
               >
                 <Star className="size-3" aria-hidden="true" />
                 {t('eduShell.home.roster.statLevel', { level: row.level })}

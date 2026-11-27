@@ -200,7 +200,7 @@ export function ReportHeader({ title, subject, meta, exportState, onExport }: Re
       </div>
 
       {exportState === 'failed' && (
-        <p role="alert" className="mt-4 rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-medium text-edu-ink">
+        <p role="alert" className="mt-4 rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-medium text-neo-black">
           {t('teacher.reports.export.failed')}
         </p>
       )}

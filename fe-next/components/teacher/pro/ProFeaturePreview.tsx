@@ -80,7 +80,7 @@ function AnalyticsPreview({ calm = false }: { calm?: boolean }) {
             className={cn(
               'flex items-center gap-2 rounded-neo border-2 px-2 py-1',
               i >= PHONE_ROWS && 'max-sm:hidden',
-              s.trend === 'down' && !calm ? 'border-edu-pink-ink bg-neo-pink/10' : 'border-edu-line bg-edu-surface',
+              s.trend === 'down' && !calm ? 'border-neo-black bg-neo-pink' : 'border-edu-line bg-edu-surface',
             )}
           >
             <span className="w-14 shrink-0 truncate text-xs font-bold text-edu-ink">{names[i]}</span>

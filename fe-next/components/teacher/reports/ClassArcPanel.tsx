@@ -127,7 +127,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
   if (error) {
     return (
       <Shell embedded={embedded} title={t('teacher.reports.arc.title')} subtitle={t('teacher.reports.arc.subtitle')}>
-        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-edu-ink">
+        <p role="alert" className="rounded-neo border-2 border-neo-black bg-neo-pink px-3 py-2 text-sm font-bold text-neo-black">
           {t('teacher.reports.error')}
         </p>
       </Shell>
@@ -169,7 +169,7 @@ export function ClassArcPanel({ classroomId, classroomName, classroomLanguage, o
           {status === 'done' ? (
             <p
               data-testid="class-arc-assigned"
-              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-2 text-sm font-black text-edu-ink"
+              className="inline-flex items-center gap-2 rounded-neo border-2 border-neo-black bg-neo-lime px-3 py-2 text-sm font-black text-neo-black"
             >
               <Check className="size-4 shrink-0 text-edu-lime-ink" aria-hidden="true" />
               {t('teacher.reports.arc.followUpDone')}

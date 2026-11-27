@@ -49,7 +49,7 @@ export function AssignmentCreatorDueDate({ value, onChange }: { value: string; o
                 'min-h-11 rounded-neo border-2 px-2 font-neo-body text-sm font-bold transition-[transform,box-shadow] active:translate-y-0.5 motion-reduce:transition-none',
                 active
                   ? 'border-black bg-neo-lime text-neo-black shadow-hard-sm'
-                  : 'border-neo-cyan/70 bg-neo-cyan/10 text-edu-cyan-ink hover:bg-neo-cyan/20',
+                  : 'border-edu-line bg-edu-surface text-edu-ink hover:bg-edu-tile',
               )}
             >
               {t(key)}
