@@ -111,3 +111,61 @@ describe('classroom sky skin', () => {
     expect(sky, 'edu-sky.css must load after globals.css').toBeGreaterThan(globals);
   });
 });
+
+/**
+ * Shared game files stay navy for the main game and carry a classroom branch for the sky page.
+ * The ratchet above can't scan them (it would ban the arcade's navy), so each one must keep its
+ * classroom signal and the sky classes that branch paints. Deleting a branch fails here.
+ */
+const HOOK = /useClassroomBoard\(\)/;
+const CLASSROOM_BRANCHES: ReadonlyArray<readonly [string, RegExp, readonly string[]]> = [
+  ['player/components/PlayerInGameView.tsx', /<ClassroomBoardProvider value=\{classroom\}>/, ['MP_ROUND_CONTAINER_CLASSROOM_CLASS']],
+  ['host/components/TvBroadcastView.tsx', /<ClassroomBoardProvider value=\{isClassroom\}>/, ['CLASSROOM_WALL.root', 'CLASSROOM_WALL.leaderboardCard']],
+  ['host/components/tv-broadcast/classroomWallSkin.ts', /CLASSROOM_WALL/, ['bg-edu-page text-edu-ink', 'bg-edu-surface text-edu-ink']],
+  ['host/components/tv-broadcast/TvLeaderboard.tsx', HOOK, ['text-edu-ink', 'border-edu-line']],
+  ['host/components/tv-broadcast/TvPlayerCard.tsx', HOOK, ['bg-edu-surface shadow-hard-sm', 'text-edu-ink']],
+  ['host/components/tv-broadcast/TvActivityPanel.tsx', HOOK, ['bg-edu-surface text-edu-ink', 'text-edu-cyan-ink']],
+  ['host/components/tv-broadcast/TvGapIndicator.tsx', HOOK, ['text-edu-ink/70']],
+  ['host/components/tv-broadcast/TvBattleBar.tsx', /classroom/, ['bg-edu-page']],
+  ['host/components/tv-broadcast/TvJoinBar.tsx', /classroom/, ['bg-edu-page']],
+  ['components/multiplayer/round/roundContainer.ts', /MP_ROUND_CONTAINER_CLASSROOM_CLASS/, ['bg-edu-page']],
+  ['components/multiplayer/round/MpRoundLayout.tsx', HOOK, ['bg-edu-page', 'bg-edu-surface']],
+  ['components/multiplayer/round/MpRoundMute.tsx', HOOK, ['bg-edu-surface text-edu-ink']],
+  ['components/multiplayer/round/MpComboMeter.tsx', HOOK, ['bg-edu-surface']],
+  ['components/multiplayer/round/MpRecentWords.tsx', HOOK, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/multiplayer/shell/MpBackButton.tsx', HOOK, ['bg-edu-surface text-edu-ink']],
+  ['components/multiplayer/shell/MpRankChip.tsx', HOOK, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/multiplayer/shell/MpRosterStrip.tsx', HOOK, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/multiplayer/WheelRushView.tsx', HOOK, ['bg-edu-page', 'bg-edu-surface']],
+  ['components/multiplayer/WheelRushHeader.tsx', HOOK, ['HUD_EXIT_BUTTON_CLASSROOM', 'bg-edu-surface']],
+  ['components/multiplayer/WheelRushPieces.tsx', HOOK, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/multiplayer/crossword/CrosswordVersus.tsx', HOOK, ['bg-edu-page', 'bg-edu-surface']],
+  ['components/multiplayer/wordcraft/WordcraftLiveView.tsx', HOOK, ['bg-edu-page', 'bg-edu-surface']],
+  ['components/wordTower/WordTowerVersus.tsx', HOOK, ['bg-edu-page', 'bg-edu-surface']],
+  ['components/wordTower/WordTowerVersusRail.tsx', HOOK, ['bg-edu-surface text-edu-ink']],
+  ['components/game/hud/GameHud.tsx', HOOK, ['bg-edu-surface text-edu-ink']],
+  ['components/game/hud/actionBar.ts', /ACTION_ROUND_CLASSROOM/, ['bg-edu-surface text-edu-ink']],
+  ['components/daily/wheel/WheelActionBar.tsx', HOOK, ['ACTION_ROUND_CLASSROOM', '{ classroom }']],
+  ['components/daily/WordWheelParts.tsx', HOOK, ['bg-edu-tile']],
+  ['components/game/QuickReactions.tsx', HOOK, ['bg-edu-surface']],
+  ['components/ExitRoomButton.tsx', HOOK, ['HUD_EXIT_BUTTON_CLASSROOM']],
+  ['components/InGameAudioButton.tsx', /edu-sky:/, ['edu-sky:bg-edu-surface', 'edu-sky:text-edu-ink']],
+  ['components/blast/legacy/board/BlastBoardTray.tsx', HOOK, ['CLASSROOM_BOARD_FRAME']],
+  ['components/blast/legacy/BlastStage.tsx', /blastStageSkin\(useClassroomBoard\(\)\)/, []],
+  ['components/blast/legacy/blastStageSkin.ts', /classroom/, ['bg-edu-surface', 'text-edu-ink']],
+  ['components/GridComponent.tsx', HOOK, ['CLASSROOM_BOARD_FRAME']],
+  ['lib/multiplayer/inGameContainerClass.ts', /classroom/, ['bg-edu-page']],
+];
+
+describe('classroom branches in shared game files', () => {
+  it('covers the live round, projector wall and every gridless mode', () => {
+    expect(CLASSROOM_BRANCHES.length).toBeGreaterThanOrEqual(36);
+  });
+
+  it.each(CLASSROOM_BRANCHES)('%s keeps its classroom branch', (rel, signal, sky) => {
+    const src = read(rel);
+    expect(src, `${rel} lost its classroom signal`).toMatch(signal);
+    for (const cls of sky) expect(src, `${rel} lost "${cls}"`).toContain(cls);
+  });
+});
+
